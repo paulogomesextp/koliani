@@ -89,13 +89,26 @@ SDK) -- ajustar pelo log do Actions.
 
 ## Setup ainda por fazer (fora do repositório)
 
-- Instalar o **Godot 4.x** (editor) no PC.
-- Criar `github.com/paulogomesextp/koliani` e ligar o remote
-  (`git remote add ...` -- corrido pelo Paulo; o agente não mexe em git
-  config).
-- Guardar a **key art** em `assets/branding/key_art.png`.
-- *Opcional, só para APK local:* JDK 17 + Android SDK + templates de
-  export do Godot + keystore de debug. Sem isto, o APK sai só do CI.
+- ~~Instalar o **Godot 4.x**~~ -- feito: Godot **4.7.2** em
+  `C:\Users\paulo\Desktop\Godot_v4.7.2-stable_win64.exe`.
+- ~~Guardar a **key art**~~ -- feito: `assets/branding/key_art.png`.
+- **Ligar o remote:** `git remote add origin <URL do repo>` (corrido pelo
+  Paulo -- o agente não mexe em git config).
+- **Instalar os modelos de export** (1x, ~700 MB): no editor,
+  *Editor > Gerir Modelos de Exportação > Transferir e Instalar*. Precisos
+  para o build **Web** local (verificação visual) e para o APK local. O CI
+  já traz os dele na imagem `barichello/godot-ci`.
+- *Opcional, só para APK local:* JDK 17 + Android SDK + keystore de debug.
+  Sem isto, o APK sai só do CI.
+
+## Estado da validação (2026-08-29, Godot 4.7.2 headless)
+
+- `--import` -- OK, classes globais registadas, assets importados.
+- `godot --headless --script res://tests/run_tests.gd` -- **8 testes, todos
+  a passar**.
+- `Main.tscn` corre 180 frames headless **sem erros nem avisos**.
+- Build Web/APK local -- bloqueado só pela falta dos modelos de export
+  (ver acima).
 
 ## Regras
 
