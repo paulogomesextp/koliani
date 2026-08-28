@@ -47,21 +47,24 @@ export_presets.cfg     -- presets "Web" e "Android" (re-gravar pelo editor se pr
 icon.svg               -- icone placeholder
 
 scripts/
-  movimento.gd         -- LOGICA PURA do movimento (coyote, jump buffer, corte de salto); testavel
-  koliani.gd           -- CharacterBody2D: liga movimento.gd + dash + ataque + dano + morte
+  movimento.gd         -- LOGICA PURA do movimento (coyote, jump buffer, corte de salto, salto duplo); testavel
+  koliani.gd           -- CharacterBody2D: liga movimento.gd + dash + ataque + dano + morte + salto duplo
   demonio_base.gd      -- inimigo base (patrulha + dano por contacto); classe-pai dos demonios
+  coletavel.gd         -- Area2D: apanhar => regista pista / desbloqueia habilidade; nao reaparece
   porta.gd             -- Area2D: avanca para o mundo seguinte / termina a campanha
   checkpoint.gd        -- Area2D: guarda posicao de reaparecimento
   estado_jogo.gd       -- autoload EstadoJogo: vidas, nivel, checkpoint, habilidades, pistas, save
   controlos_toque.gd   -- HUD de toque (esconde-se com teclado)
-  main.gd              -- cena de arranque: carrega o nivel atual + HUD
+  main.gd              -- cena de arranque: carrega o nivel atual + HUD + cartao de fim
 
 scenes/
-  Main.tscn                    -- main_scene (ver project.godot)
-  levels/Level_Test.tscn       -- sala de teste: plataformas, 1 demonio, checkpoint, porta
-  actors/Koliani.tscn          -- placeholder ColorRect + hitbox + camara
-  actors/DemonioBase.tscn      -- placeholder ColorRect + area de contacto
-  ui/HUD.tscn                  -- barra de vida, vidas, TouchScreenButtons
+  Main.tscn                        -- main_scene (ver project.godot)
+  levels/Floresta_Putrefata.tscn   -- MUNDO 1: parallax + luz tipo Dead Cells, fosso c/ salto duplo, coletaveis, chefe(-) demonios, checkpoint, porta
+  levels/Level_Test.tscn           -- sala de treino (fora da campanha)
+  actors/Koliani.tscn              -- placeholder ColorRect (silhueta key art) + lamina c/ PointLight2D
+  actors/DemonioBase.tscn          -- placeholder ColorRect + olho c/ PointLight2D + area de contacto
+  actors/Coletavel.tscn            -- gema magenta c/ PointLight2D (pista / habilidade)
+  ui/HUD.tscn                      -- barra de vida, vidas, TouchScreenButtons
 
 tests/run_tests.gd     -- corredor headless proprio (movimento + estado_jogo)
 docs/                  -- historia.md, design.md (bibliografia viva)
@@ -103,12 +106,28 @@ SDK) -- ajustar pelo log do Actions.
 
 ## Estado da validação (2026-08-29, Godot 4.7.2 headless)
 
-- `--import` -- OK, classes globais registadas, assets importados.
-- `godot --headless --script res://tests/run_tests.gd` -- **8 testes, todos
-  a passar**.
-- `Main.tscn` corre 180 frames headless **sem erros nem avisos**.
+- `--import` -- OK, classes globais registadas (`Coletavel`, `Koliani`,
+  `Movimento`), assets importados.
+- `godot --headless --script res://tests/run_tests.gd` -- **11 testes, todos
+  a passar** (inclui salto duplo + sair da borda).
+- `Main.tscn` (agora carrega o mundo 1) corre 200 frames headless **sem
+  erros nem avisos**.
 - Build Web/APK local -- bloqueado só pela falta dos modelos de export
   (ver acima).
+
+## Dúvidas para o Paulo (2026-08-29)
+
+1. **Sprites CC0.** Posso avançar e integrar packs concretos (Kenney
+   "Pixel Platformer" / "Pixel Adventure" no itch.io, ambos CC0) para
+   Koliani, demónios e tiles da floresta? Ou preferes escolher tu os
+   packs primeiro? Nada foi descarregado ainda.
+2. **Level_Test fora da campanha.** Tirei-o de `EstadoJogo.NIVEIS`; a
+   campanha começa já na Floresta Putrefata. Ok assim?
+3. **Fim da campanha.** Com só o mundo 1, a porta final mostra um cartão
+   de texto e pausa. Deixo assim até existir o mundo 2, certo?
+4. **Ligar o remote / CI.** O `git remote` continua por ligar (regra:
+   não mexo em git config). Sem isso o GitHub Actions não corre e não há
+   APK do CI para o telemóvel.
 
 ## Regras
 

@@ -64,11 +64,13 @@ func _physics_process(dt: float) -> void:
 			_dash_recarga = RECARGA_DASH
 			_invulneravel = maxf(_invulneravel, DUR_DASH)
 		else:
+			# salto duplo: habilidade permanente ganha ao longo da campanha
+			var saltos_max := 2 if EstadoJogo.tem_habilidade("salto_duplo") else 1
 			_mov = Movimento.passo(
 				_mov, dir,
 				Input.is_action_just_pressed("saltar"),
 				Input.is_action_pressed("saltar"),
-				is_on_floor(), dt,
+				is_on_floor(), dt, saltos_max,
 			)
 			velocity = _mov.velocidade
 

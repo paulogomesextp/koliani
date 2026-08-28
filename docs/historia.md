@@ -44,6 +44,16 @@ key art; os detalhes são para o agente `gaming` desenhar.
 
 (`Level_Test.tscn` é só uma sala de teste, não conta como mundo.)
 
+### Mundo 1 -- pistas e habilidade (implementado em `Floresta_Putrefata.tscn`)
+
+| id da pista | tipo | onde | texto (rascunho) |
+|-------------|------|------|------------------|
+| `floresta_sinal_da_porta` | obrigatória (na `Porta`) | atravessar para o mundo 2 | "A porta ainda cheira ao enxofre dele. Ela passou por aqui." |
+| `floresta_carta_rasgada` | segredo (`Coletavel`) | plataforma alta sobre o fosso -- **precisa do salto duplo** | "Metade de uma carta da mãe, rasgada: *...não me procures, Kol...*" |
+
+Habilidade ganha no mundo 1: **`salto_duplo`** (`Coletavel` no caminho
+principal, antes do fosso). É o gate do segredo e do resto da campanha.
+
 ## Estrutura de pista
 
 Cada mundo tem **1 pista** obrigatória (avança a história) e pode ter

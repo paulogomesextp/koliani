@@ -8,6 +8,8 @@ extends RefCounted
 ##  - coyote time (saltar logo depois de sair da plataforma)
 ##  - jump buffer (carregar em saltar um pouco antes de aterrar)
 ##  - corte de salto (largar o botão a meio encurta o pulo)
+##  - saltos extra no ar (salto duplo) quando `saltos_max` > 1 -- a
+##    habilidade permanente "salto_duplo" liga isto em `koliani.gd`
 
 const GRAVIDADE := 1400.0
 const VEL_MAX_QUEDA := 1100.0
@@ -25,12 +27,18 @@ class Estado:
 	var coyote_restante := 0.0
 	var buffer_restante := 0.0
 	var no_chao := false
+	## Saltos já gastos desde que saiu do chão (o 1.º salto conta mesmo
+	## quando é feito no coyote time). Volta a 0 ao tocar no chão.
+	var saltos_dados := 0
 
 
-static func passo(e: Estado, direcao: float, saltar_premido: bool, saltar_a_segurar: bool, no_chao: bool, dt: float) -> Estado:
+## `saltos_max` = quantos saltos a Koliani pode encadear no ar antes de
+## voltar a tocar no chão (1 = normal, 2 = salto duplo).
+static func passo(e: Estado, direcao: float, saltar_premido: bool, saltar_a_segurar: bool, no_chao: bool, dt: float, saltos_max: int = 1) -> Estado:
 	# temporizadores
 	if no_chao:
 		e.coyote_restante = COYOTE
+		e.saltos_dados = 0
 	else:
 		e.coyote_restante = maxf(0.0, e.coyote_restante - dt)
 	e.buffer_restante = maxf(0.0, e.buffer_restante - dt)
@@ -42,11 +50,20 @@ static func passo(e: Estado, direcao: float, saltar_premido: bool, saltar_a_segu
 	var acel := ACEL_CHAO if no_chao else ACEL_AR
 	e.velocidade.x = move_toward(e.velocidade.x, alvo, acel * dt)
 
-	# salto (buffer + coyote)
-	if e.buffer_restante > 0.0 and e.coyote_restante > 0.0:
+	# quem sai da plataforma a andar (sem saltar) e deixa o coyote expirar
+	# perde o "salto do chão": o próximo salto no ar já é o 2.º
+	if not no_chao and e.coyote_restante <= 0.0 and e.saltos_dados == 0:
+		e.saltos_dados = 1
+
+	# salto: 1.º usa buffer + coyote; os seguintes só enquanto houver
+	# saltos_max por gastar (salto duplo)
+	var pode_saltar_chao := e.coyote_restante > 0.0 and e.saltos_dados == 0
+	var pode_saltar_ar := e.saltos_dados > 0 and e.saltos_dados < saltos_max
+	if e.buffer_restante > 0.0 and (pode_saltar_chao or pode_saltar_ar):
 		e.velocidade.y = -FORCA_SALTO
 		e.buffer_restante = 0.0
 		e.coyote_restante = 0.0
+		e.saltos_dados += 1
 
 	# gravidade
 	if not no_chao:

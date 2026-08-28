@@ -1,0 +1,415 @@
+[gd_scene load_steps=16 format=3 uid="uid://bkolianiflorestaput01"]
+
+; Mundo 1 -- Floresta Putrefata.
+; Floresta morta, nevoa, raizes; verde-podre com brilho poison-green.
+; Ainda tudo ColorRect placeholder, mas ja com a "montagem de luz" tipo
+; Dead Cells: CanvasModulate escuro + PointLight2D a recortar + parallax
+; de silhuetas + vinheta. Trocar os ColorRect por sprites CC0 mantendo os
+; nos e as luzes.
+
+[ext_resource type="PackedScene" uid="uid://bkolianiactor01" path="res://scenes/actors/Koliani.tscn" id="1_kol"]
+[ext_resource type="PackedScene" uid="uid://bdemoniobase01" path="res://scenes/actors/DemonioBase.tscn" id="2_dem"]
+[ext_resource type="PackedScene" uid="uid://bkolianicoletavel01" path="res://scenes/actors/Coletavel.tscn" id="3_col"]
+[ext_resource type="Script" path="res://scripts/porta.gd" id="4_porta"]
+[ext_resource type="Script" path="res://scripts/checkpoint.gd" id="5_chk"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_chaoa"]
+size = Vector2(960, 48)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_chaob"]
+size = Vector2(560, 48)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_platm"]
+size = Vector2(180, 26)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_platp"]
+size = Vector2(140, 26)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_porta"]
+size = Vector2(48, 96)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_chk"]
+size = Vector2(40, 80)
+
+[sub_resource type="Gradient" id="Gradient_luz"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_luz"]
+gradient = SubResource("Gradient_luz")
+width = 256
+height = 256
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[sub_resource type="Gradient" id="Gradient_vinheta"]
+offsets = PackedFloat32Array(0.55, 1)
+colors = PackedColorArray(0, 0, 0, 0, 0.023, 0.035, 0.02, 0.72)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_vinheta"]
+gradient = SubResource("Gradient_vinheta")
+width = 512
+height = 512
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[node name="Floresta_Putrefata" type="Node2D"]
+
+[node name="Ambiente" type="CanvasModulate" parent="."]
+color = Color(0.42, 0.5, 0.42, 1)
+
+[node name="Parallax" type="ParallaxBackground" parent="."]
+
+[node name="Longe" type="ParallaxLayer" parent="Parallax"]
+motion_scale = Vector2(0.15, 0.15)
+
+[node name="Ceu" type="ColorRect" parent="Parallax/Longe"]
+offset_left = -600.0
+offset_top = -300.0
+offset_right = 2600.0
+offset_bottom = 900.0
+color = Color(0.043, 0.075, 0.043, 1)
+
+[node name="Arv1" type="ColorRect" parent="Parallax/Longe"]
+offset_left = 120.0
+offset_top = 180.0
+offset_right = 190.0
+offset_bottom = 720.0
+color = Color(0.055, 0.09, 0.05, 1)
+
+[node name="Arv2" type="ColorRect" parent="Parallax/Longe"]
+offset_left = 520.0
+offset_top = 250.0
+offset_right = 575.0
+offset_bottom = 720.0
+color = Color(0.05, 0.082, 0.046, 1)
+
+[node name="Arv3" type="ColorRect" parent="Parallax/Longe"]
+offset_left = 980.0
+offset_top = 150.0
+offset_right = 1055.0
+offset_bottom = 720.0
+color = Color(0.058, 0.095, 0.052, 1)
+
+[node name="Arv4" type="ColorRect" parent="Parallax/Longe"]
+offset_left = 1480.0
+offset_top = 220.0
+offset_right = 1545.0
+offset_bottom = 720.0
+color = Color(0.05, 0.082, 0.046, 1)
+
+[node name="Arv5" type="ColorRect" parent="Parallax/Longe"]
+offset_left = 1980.0
+offset_top = 190.0
+offset_right = 2050.0
+offset_bottom = 720.0
+color = Color(0.055, 0.09, 0.05, 1)
+
+[node name="Meio" type="ParallaxLayer" parent="Parallax"]
+motion_scale = Vector2(0.45, 0.55)
+
+[node name="Bruma" type="ColorRect" parent="Parallax/Meio"]
+offset_left = -400.0
+offset_top = 380.0
+offset_right = 2400.0
+offset_bottom = 760.0
+color = Color(0.09, 0.16, 0.09, 0.5)
+
+[node name="Tronco1" type="ColorRect" parent="Parallax/Meio"]
+offset_left = 60.0
+offset_top = 300.0
+offset_right = 118.0
+offset_bottom = 720.0
+color = Color(0.078, 0.13, 0.07, 1)
+
+[node name="Tronco2" type="ColorRect" parent="Parallax/Meio"]
+offset_left = 360.0
+offset_top = 360.0
+offset_right = 405.0
+offset_bottom = 720.0
+color = Color(0.07, 0.12, 0.065, 1)
+
+[node name="Tronco3" type="ColorRect" parent="Parallax/Meio"]
+offset_left = 720.0
+offset_top = 260.0
+offset_right = 790.0
+offset_bottom = 720.0
+color = Color(0.085, 0.14, 0.075, 1)
+
+[node name="Tronco4" type="ColorRect" parent="Parallax/Meio"]
+offset_left = 1120.0
+offset_top = 330.0
+offset_right = 1175.0
+offset_bottom = 720.0
+color = Color(0.07, 0.12, 0.065, 1)
+
+[node name="Tronco5" type="ColorRect" parent="Parallax/Meio"]
+offset_left = 1520.0
+offset_top = 290.0
+offset_right = 1585.0
+offset_bottom = 720.0
+color = Color(0.08, 0.135, 0.072, 1)
+
+[node name="Tronco6" type="ColorRect" parent="Parallax/Meio"]
+offset_left = 1900.0
+offset_top = 350.0
+offset_right = 1955.0
+offset_bottom = 720.0
+color = Color(0.072, 0.122, 0.066, 1)
+
+[node name="ChaoA" type="StaticBody2D" parent="."]
+position = Vector2(430, 660)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Corpo" type="ColorRect" parent="ChaoA"]
+offset_left = -480.0
+offset_top = -24.0
+offset_right = 480.0
+offset_bottom = 60.0
+color = Color(0.086, 0.13, 0.06, 1)
+
+[node name="Lip" type="ColorRect" parent="ChaoA"]
+offset_left = -480.0
+offset_top = -24.0
+offset_right = 480.0
+offset_bottom = -17.0
+color = Color(0.247, 0.42, 0.18, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ChaoA"]
+shape = SubResource("RectangleShape2D_chaoa")
+
+[node name="ChaoB" type="StaticBody2D" parent="."]
+position = Vector2(1440, 660)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Corpo" type="ColorRect" parent="ChaoB"]
+offset_left = -280.0
+offset_top = -24.0
+offset_right = 280.0
+offset_bottom = 60.0
+color = Color(0.086, 0.13, 0.06, 1)
+
+[node name="Lip" type="ColorRect" parent="ChaoB"]
+offset_left = -280.0
+offset_top = -24.0
+offset_right = 280.0
+offset_bottom = -17.0
+color = Color(0.247, 0.42, 0.18, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ChaoB"]
+shape = SubResource("RectangleShape2D_chaob")
+
+[node name="Plat1" type="StaticBody2D" parent="."]
+position = Vector2(300, 545)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Corpo" type="ColorRect" parent="Plat1"]
+offset_left = -70.0
+offset_top = -13.0
+offset_right = 70.0
+offset_bottom = 13.0
+color = Color(0.098, 0.145, 0.07, 1)
+
+[node name="Lip" type="ColorRect" parent="Plat1"]
+offset_left = -70.0
+offset_top = -13.0
+offset_right = 70.0
+offset_bottom = -7.0
+color = Color(0.247, 0.42, 0.18, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Plat1"]
+shape = SubResource("RectangleShape2D_platp")
+
+[node name="Plat2" type="StaticBody2D" parent="."]
+position = Vector2(585, 458)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Corpo" type="ColorRect" parent="Plat2"]
+offset_left = -90.0
+offset_top = -13.0
+offset_right = 90.0
+offset_bottom = 13.0
+color = Color(0.098, 0.145, 0.07, 1)
+
+[node name="Lip" type="ColorRect" parent="Plat2"]
+offset_left = -90.0
+offset_top = -13.0
+offset_right = 90.0
+offset_bottom = -7.0
+color = Color(0.247, 0.42, 0.18, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Plat2"]
+shape = SubResource("RectangleShape2D_platm")
+
+[node name="Plat3" type="StaticBody2D" parent="."]
+position = Vector2(1030, 405)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Corpo" type="ColorRect" parent="Plat3"]
+offset_left = -90.0
+offset_top = -13.0
+offset_right = 90.0
+offset_bottom = 13.0
+color = Color(0.098, 0.145, 0.07, 1)
+
+[node name="Lip" type="ColorRect" parent="Plat3"]
+offset_left = -90.0
+offset_top = -13.0
+offset_right = 90.0
+offset_bottom = -7.0
+color = Color(0.31, 0.5, 0.22, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Plat3"]
+shape = SubResource("RectangleShape2D_platm")
+
+[node name="Plat4" type="StaticBody2D" parent="."]
+position = Vector2(1275, 520)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Corpo" type="ColorRect" parent="Plat4"]
+offset_left = -70.0
+offset_top = -13.0
+offset_right = 70.0
+offset_bottom = 13.0
+color = Color(0.098, 0.145, 0.07, 1)
+
+[node name="Lip" type="ColorRect" parent="Plat4"]
+offset_left = -70.0
+offset_top = -13.0
+offset_right = 70.0
+offset_bottom = -7.0
+color = Color(0.247, 0.42, 0.18, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Plat4"]
+shape = SubResource("RectangleShape2D_platp")
+
+[node name="Fog1" type="ColorRect" parent="."]
+z_index = 5
+offset_left = -100.0
+offset_top = 430.0
+offset_right = 900.0
+offset_bottom = 700.0
+color = Color(0.5, 0.72, 0.45, 0.05)
+
+[node name="Fog2" type="ColorRect" parent="."]
+z_index = 5
+offset_left = 800.0
+offset_top = 360.0
+offset_right = 1800.0
+offset_bottom = 700.0
+color = Color(0.5, 0.72, 0.45, 0.05)
+
+[node name="LuzPantano1" type="PointLight2D" parent="."]
+position = Vector2(250, 630)
+texture = SubResource("GradientTexture2D_luz")
+energy = 0.6
+color = Color(0.35, 0.72, 0.36, 1)
+scale = Vector2(1.6, 1.1)
+
+[node name="LuzPantano2" type="PointLight2D" parent="."]
+position = Vector2(1500, 630)
+texture = SubResource("GradientTexture2D_luz")
+energy = 0.55
+color = Color(0.34, 0.7, 0.4, 1)
+scale = Vector2(1.5, 1.1)
+
+[node name="Koliani" parent="." instance=ExtResource("1_kol")]
+position = Vector2(120, 560)
+
+[node name="Demonio1" parent="." instance=ExtResource("2_dem")]
+position = Vector2(470, 604)
+alcance_patrulha = 170.0
+
+[node name="Demonio2" parent="." instance=ExtResource("2_dem")]
+position = Vector2(1470, 604)
+alcance_patrulha = 150.0
+
+[node name="ColSaltoDuplo" parent="." instance=ExtResource("3_col")]
+position = Vector2(720, 588)
+habilidade_id = "salto_duplo"
+
+[node name="ColPistaSecreta" parent="." instance=ExtResource("3_col")]
+position = Vector2(1030, 372)
+pista_id = "floresta_carta_rasgada"
+
+[node name="Checkpoint" type="Area2D" parent="."]
+position = Vector2(640, 588)
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("5_chk")
+
+[node name="Visual" type="ColorRect" parent="Checkpoint"]
+offset_left = -5.0
+offset_top = -42.0
+offset_right = 5.0
+offset_bottom = 40.0
+color = Color(0.36, 0.28, 0.55, 1)
+
+[node name="Luz" type="Node2D" parent="Checkpoint"]
+visible = false
+
+[node name="Brilho" type="ColorRect" parent="Checkpoint/Luz"]
+offset_left = -20.0
+offset_top = -54.0
+offset_right = 20.0
+offset_bottom = 44.0
+color = Color(0.85, 0.31, 0.83, 0.32)
+
+[node name="PointLight2D" type="PointLight2D" parent="Checkpoint/Luz"]
+texture = SubResource("GradientTexture2D_luz")
+energy = 1.1
+color = Color(0.93, 0.4, 0.9, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Checkpoint"]
+shape = SubResource("RectangleShape2D_chk")
+
+[node name="Porta" type="Area2D" parent="."]
+position = Vector2(1650, 586)
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("4_porta")
+pista_ao_atravessar = "floresta_sinal_da_porta"
+
+[node name="Moldura" type="ColorRect" parent="Porta"]
+offset_left = -24.0
+offset_top = -48.0
+offset_right = 24.0
+offset_bottom = 48.0
+color = Color(0.6, 0.18, 0.59, 1)
+
+[node name="Nucleo" type="ColorRect" parent="Porta"]
+offset_left = -12.0
+offset_top = -34.0
+offset_right = 12.0
+offset_bottom = 34.0
+color = Color(0.933, 0.435, 0.91, 1)
+
+[node name="PointLight2D" type="PointLight2D" parent="Porta"]
+texture = SubResource("GradientTexture2D_luz")
+energy = 1.5
+color = Color(0.95, 0.45, 0.92, 1)
+scale = Vector2(1.3, 1.3)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Porta"]
+shape = SubResource("RectangleShape2D_porta")
+
+[node name="Vinheta" type="CanvasLayer" parent="."]
+layer = 10
+
+[node name="Tex" type="TextureRect" parent="Vinheta"]
+texture_repeat = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+texture = SubResource("GradientTexture2D_vinheta")
+expand_mode = 1
+stretch_mode = 6

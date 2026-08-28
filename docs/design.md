@@ -36,9 +36,13 @@ quando se joga com teclado.
 - Corrida: vel. 240, aceleração 2000 no chão / 1200 no ar.
 - Salto: força 470, **coyote time** 0.10s, **jump buffer** 0.12s,
   **corte de salto** (largar o botão mantém 45% da vel. vertical).
+- **Salto duplo**: `Movimento.passo(..., saltos_max)` -- `saltos_max` = quantos
+  saltos se encadeiam no ar antes de tocar no chão (1 normal, 2 com a
+  habilidade `salto_duplo`). Sair da plataforma a andar e deixar o coyote
+  expirar gasta o "salto do chão" (o 1.º salto no ar já é o 2.º).
 - `Movimento.passo(estado, direcao, saltar_premido, saltar_a_segurar,
-  no_chao, dt)` devolve o estado atualizado. Sem nós, sem física do Godot
-  -- por isso dá para testar headless.
+  no_chao, dt, saltos_max := 1)` devolve o estado atualizado. Sem nós, sem
+  física do Godot -- por isso dá para testar headless.
 
 `scripts/koliani.gd` liga isto ao `CharacterBody2D` real e acrescenta:
 
@@ -76,8 +80,28 @@ Um nível é uma `scene` `Node2D` com:
 - 0+ `Checkpoint`;
 - **1 `Porta`** para o mundo seguinte (a última porta termina a campanha).
 
-`Level_Test.tscn` é o exemplo mínimo. Níveis a sério devem usar
-`TileMapLayer` para a geometria em vez de `ColorRect`.
+`Level_Test.tscn` é o exemplo mínimo (fora da campanha -- sala de treino).
+`Floresta_Putrefata.tscn` é o **mundo 1** e serve de molde: geometria
+`StaticBody2D` com "lip" claro no topo (look de tile Dead Cells),
+`ParallaxBackground` de silhuetas, `CanvasModulate` escuro +
+`PointLight2D` a recortar a luz, e uma `CanvasLayer` de vinheta. Níveis a
+sério ainda devem migrar para `TileMapLayer` quando houver tileset.
+
+### Coletáveis (`scripts/coletavel.gd`, `scenes/actors/Coletavel.tscn`)
+
+`Area2D` na layer `triggers`. `@export pista_id` e/ou `@export
+habilidade_id`: ao tocar na Koliani regista a pista / desbloqueia a
+habilidade em `EstadoJogo` e desaparece. Se já foi apanhado numa sessão
+anterior (já está no save), nem aparece.
+
+### Montagem de luz / ambiente (por mundo)
+
+Objetivo: sentir Dead Cells com placeholders. Cada nível traz:
+`CanvasModulate` (tom do mundo, ~0.45 de brilho), `ParallaxBackground`
+com 2 camadas de silhuetas, `PointLight2D` em pontos de interesse
+(checkpoint e porta a magenta; luzes de ambiente na cor do mundo),
+`CanvasLayer` de vinheta radial. Reaproveitar os `sub_resource`
+`Gradient`/`GradientTexture2D` (radial) para as luzes.
 
 ## Progressão (`scripts/estado_jogo.gd`)
 
@@ -92,11 +116,18 @@ Autoload `EstadoJogo`. Guarda em `user://progresso.json`:
 
 ## Por fazer (lista viva)
 
-- Sprites a substituir os `ColorRect`.
+- Sprites CC0 a substituir os `ColorRect` (Koliani, demónios, tiles da
+  floresta, folhagem de parallax) -- ver dúvidas no fim do README.
 - `TileMapLayer` + tileset para geometria de nível.
-- Ecrã de diário das pistas.
-- Habilidades desbloqueáveis ligadas ao `koliani.gd`.
-- Chefe por mundo.
-- Cena de final.
-- Som e "juice" (shake, hitstop, partículas).
-- Mapear `rolar` no HUD de toque.
+- Ecrã de **diário das pistas** (lista `EstadoJogo.pistas`, com títulos
+  legíveis por id).
+- ~~Habilidades desbloqueáveis ligadas ao `koliani.gd`~~ -- feito para
+  `salto_duplo`; falta `dash_aereo`, `partir_paredes`.
+- **Chefe** por mundo (herda de `demonio_base.gd`; falta a máquina de
+  estados de telegrafar/atacar).
+- Cena de final a sério (o `main.gd._ao_fim_da_campanha` é um cartão).
+- Som e "juice" (screen shake curto, hitstop leve, partículas de impacto
+  e de aterragem).
+- Mapear `rolar` no HUD de toque (`scenes/ui/HUD.tscn`).
+- Mundos 2-4 (`Prisao_dos_Condenados`, `Torres_Esquecidas`,
+  `Castelo_de_Zeriko`) -- usar `Floresta_Putrefata.tscn` como molde.

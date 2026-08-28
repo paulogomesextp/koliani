@@ -1,4 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://bkolianiactor01"]
+[gd_scene load_steps=7 format=3 uid="uid://bkolianiactor01"]
+
+; Koliani -- placeholder ColorRect com silhueta a apontar ao key art:
+; menina agil, rabo-de-cavalo, cachecol, lamina magenta que brilha
+; (PointLight2D). Trocar por sprite/AnimatedSprite2D mantendo o no "Sprite"
+; (koliani.gd faz-lhe flip pelo scale.x) e a "HitboxAtaque".
 
 [ext_resource type="Script" path="res://scripts/koliani.gd" id="1_kol"]
 
@@ -8,6 +13,18 @@ size = Vector2(20, 44)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_hit"]
 size = Vector2(30, 34)
 
+[sub_resource type="Gradient" id="Gradient_luz"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_luz"]
+gradient = SubResource("Gradient_luz")
+width = 200
+height = 200
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
 [node name="Koliani" type="CharacterBody2D" groups=["koliani"]]
 collision_layer = 2
 collision_mask = 1
@@ -15,12 +32,26 @@ script = ExtResource("1_kol")
 
 [node name="Sprite" type="Node2D" parent="."]
 
+[node name="Rabo" type="ColorRect" parent="Sprite"]
+offset_left = -14.0
+offset_top = -32.0
+offset_right = -4.0
+offset_bottom = -6.0
+color = Color(0.7, 0.16, 0.32, 1)
+
 [node name="Corpo" type="ColorRect" parent="Sprite"]
 offset_left = -10.0
 offset_top = -22.0
 offset_right = 10.0
 offset_bottom = 22.0
 color = Color(0.878431, 0.32549, 0.694118, 1)
+
+[node name="Cachecol" type="ColorRect" parent="Sprite"]
+offset_left = -10.0
+offset_top = -22.0
+offset_right = 10.0
+offset_bottom = -14.0
+color = Color(0.76, 0.2, 0.36, 1)
 
 [node name="Cabeca" type="ColorRect" parent="Sprite"]
 offset_left = -7.0
@@ -32,9 +63,24 @@ color = Color(1, 0.898039, 0.976471, 1)
 [node name="Lamina" type="ColorRect" parent="Sprite"]
 offset_left = 10.0
 offset_top = -6.0
-offset_right = 30.0
+offset_right = 32.0
 offset_bottom = 0.0
-color = Color(0.85098, 0.309804, 0.831373, 1)
+color = Color(1, 0.62, 0.98, 1)
+
+[node name="LaminaAura" type="ColorRect" parent="Sprite"]
+show_behind_parent = true
+offset_left = 8.0
+offset_top = -10.0
+offset_right = 36.0
+offset_bottom = 4.0
+color = Color(0.85, 0.31, 0.83, 0.35)
+
+[node name="LuzLamina" type="PointLight2D" parent="Sprite"]
+position = Vector2(22, -3)
+texture = SubResource("GradientTexture2D_luz")
+energy = 1.2
+color = Color(0.95, 0.45, 0.93, 1)
+scale = Vector2(0.7, 0.7)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_body")

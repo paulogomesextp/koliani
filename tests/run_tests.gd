@@ -25,6 +25,9 @@ func _correr_tudo() -> void:
 	teste_movimento_salto_com_coyote()
 	teste_movimento_corte_de_salto()
 	teste_movimento_anda_para_a_direita()
+	teste_movimento_salto_duplo()
+	teste_movimento_sem_habilidade_nao_ha_salto_duplo()
+	teste_movimento_sair_da_borda_perde_primeiro_salto()
 	teste_estado_tres_mortes_sem_vidas()
 	teste_estado_pistas_sem_duplicados()
 	teste_estado_habilidade_sem_duplicados()
@@ -76,6 +79,42 @@ func teste_movimento_anda_para_a_direita() -> void:
 		Movimento.passo(e, 1.0, false, false, true, DT)
 	_ok(e.velocidade.x > 0.0, "input para a direita devia acelerar em x")
 	_ok(e.velocidade.x <= Movimento.VEL_CORRIDA + 0.001, "nao devia passar a velocidade de corrida")
+
+
+func teste_movimento_salto_duplo() -> void:
+	var e := Movimento.Estado.new()
+	Movimento.passo(e, 0.0, false, false, true, DT, 2)   # 1 frame no chao arma o coyote
+	Movimento.passo(e, 0.0, true, true, false, DT, 2)    # 1.o salto (dentro do coyote)
+	_ok(e.saltos_dados == 1, "o 1.o salto devia contar como 1 salto gasto")
+	for i in 20:                                         # deixa a subida abrandar
+		Movimento.passo(e, 0.0, false, true, false, DT, 2)
+	var vy_antes := e.velocidade.y
+	Movimento.passo(e, 0.0, true, true, false, DT, 2)    # 2.o salto, no ar
+	_ok(e.velocidade.y < vy_antes, "o salto duplo devia voltar a impulsionar para cima")
+	_ok(e.saltos_dados == 2, "apos o salto duplo deviam estar 2 saltos gastos")
+
+
+func teste_movimento_sem_habilidade_nao_ha_salto_duplo() -> void:
+	var e := Movimento.Estado.new()
+	Movimento.passo(e, 0.0, false, false, true, DT)      # chao (saltos_max = 1 por omissao)
+	Movimento.passo(e, 0.0, true, true, false, DT)       # 1.o salto
+	for i in 8:
+		Movimento.passo(e, 0.0, false, true, false, DT)
+	var vy_antes := e.velocidade.y
+	Movimento.passo(e, 0.0, true, true, false, DT)       # tenta 2.o salto sem habilidade
+	_ok(e.velocidade.y > vy_antes, "sem salto duplo o 2.o salto no ar nao faz nada (so gravidade)")
+	_ok(e.saltos_dados == 1, "sem salto duplo fica-se por 1 salto")
+
+
+func teste_movimento_sair_da_borda_perde_primeiro_salto() -> void:
+	var e := Movimento.Estado.new()
+	Movimento.passo(e, 0.0, false, false, true, DT)      # no chao
+	for i in 12:                                         # anda para lá da borda sem saltar
+		Movimento.passo(e, 0.0, false, false, false, DT)
+	_ok(e.saltos_dados == 1, "coyote expirado sem saltar gasta o salto do chao")
+	var vy_antes := e.velocidade.y
+	Movimento.passo(e, 0.0, true, true, false, DT, 2)    # com salto duplo ainda resta 1
+	_ok(e.velocidade.y < vy_antes, "com salto duplo resta 1 salto no ar mesmo saindo da borda")
 
 
 # --- EstadoJogo ------------------------------------------------------

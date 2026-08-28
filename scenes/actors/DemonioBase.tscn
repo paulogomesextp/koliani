@@ -1,4 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://bdemoniobase01"]
+[gd_scene load_steps=7 format=3 uid="uid://bdemoniobase01"]
+
+; Demonio comum -- placeholder: massa roxa escura com um olho magenta que
+; brilha (PointLight2D), no tom do key art. Classe-pai; os demonios de
+; cada mundo herdam de demonio_base.gd. Trocar o visual mantendo os nos
+; "Sprite" e "AreaContacto".
 
 [ext_resource type="Script" path="res://scripts/demonio_base.gd" id="1_dem"]
 
@@ -8,12 +13,32 @@ size = Vector2(26, 40)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_contacto"]
 size = Vector2(34, 44)
 
+[sub_resource type="Gradient" id="Gradient_luz"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_luz"]
+gradient = SubResource("Gradient_luz")
+width = 160
+height = 160
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
 [node name="DemonioBase" type="CharacterBody2D" groups=["inimigos"]]
 collision_layer = 4
 collision_mask = 1
 script = ExtResource("1_dem")
 
 [node name="Sprite" type="Node2D" parent="."]
+
+[node name="Sombra" type="ColorRect" parent="Sprite"]
+show_behind_parent = true
+offset_left = -16.0
+offset_top = -22.0
+offset_right = 16.0
+offset_bottom = 22.0
+color = Color(0.16, 0.05, 0.22, 0.55)
 
 [node name="Corpo" type="ColorRect" parent="Sprite"]
 offset_left = -13.0
@@ -27,7 +52,14 @@ offset_left = 1.0
 offset_top = -12.0
 offset_right = 9.0
 offset_bottom = -4.0
-color = Color(0.968627, 0.313726, 0.541176, 1)
+color = Color(1, 0.45, 0.62, 1)
+
+[node name="LuzOlho" type="PointLight2D" parent="Sprite"]
+position = Vector2(5, -8)
+texture = SubResource("GradientTexture2D_luz")
+energy = 0.9
+color = Color(0.97, 0.35, 0.5, 1)
+scale = Vector2(0.55, 0.55)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_body")
