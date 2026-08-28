@@ -1,0 +1,15 @@
+# Godot lida melhor com LF em todas as plataformas (.gd, .tscn, .godot).
+* text=auto eol=lf
+
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.webp binary
+*.svg  text eol=lf
+*.ogg  binary
+*.wav  binary
+*.mp3  binary
+*.ttf  binary
+*.otf  binary
+*.res  binary
+*.import text eol=lf
