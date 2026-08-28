@@ -1,0 +1,25 @@
+# Godot 4
+.godot/
+/android/
+/build/
+export_presets.cfg.bak
+
+# Import cache
+*.import.bak
+
+# Sistema
+.DS_Store
+Thumbs.db
+*.tmp
+
+# Builds locais / templates de export
+*.apk
+*.aab
+*.pck
+*.zip
+/exports/
+
+# Keystores (nunca commitar chaves de assinatura reais)
+*.keystore
+*.jks
+release.keystore

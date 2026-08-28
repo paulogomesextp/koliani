@@ -1,0 +1,120 @@
+[gd_scene load_steps=9 format=3 uid="uid://bkolianileveltest"]
+
+[ext_resource type="PackedScene" uid="uid://bkolianiactor01" path="res://scenes/actors/Koliani.tscn" id="1_kol"]
+[ext_resource type="PackedScene" uid="uid://bdemoniobase01" path="res://scenes/actors/DemonioBase.tscn" id="2_dem"]
+[ext_resource type="Script" path="res://scripts/porta.gd" id="3_porta"]
+[ext_resource type="Script" path="res://scripts/checkpoint.gd" id="4_chk"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_chao"]
+size = Vector2(1400, 48)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_plat"]
+size = Vector2(220, 32)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_porta"]
+size = Vector2(48, 96)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_chk"]
+size = Vector2(40, 80)
+
+[node name="Level_Test" type="Node2D"]
+
+[node name="Chao" type="StaticBody2D" parent="."]
+position = Vector2(640, 660)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Visual" type="ColorRect" parent="Chao"]
+offset_left = -700.0
+offset_top = -24.0
+offset_right = 700.0
+offset_bottom = 24.0
+color = Color(0.129412, 0.0862745, 0.184314, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Chao"]
+shape = SubResource("RectangleShape2D_chao")
+
+[node name="Plataforma1" type="StaticBody2D" parent="."]
+position = Vector2(420, 520)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Visual" type="ColorRect" parent="Plataforma1"]
+offset_left = -110.0
+offset_top = -16.0
+offset_right = 110.0
+offset_bottom = 16.0
+color = Color(0.152941, 0.101961, 0.219608, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Plataforma1"]
+shape = SubResource("RectangleShape2D_plat")
+
+[node name="Plataforma2" type="StaticBody2D" parent="."]
+position = Vector2(800, 420)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Visual" type="ColorRect" parent="Plataforma2"]
+offset_left = -110.0
+offset_top = -16.0
+offset_right = 110.0
+offset_bottom = 16.0
+color = Color(0.152941, 0.101961, 0.219608, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Plataforma2"]
+shape = SubResource("RectangleShape2D_plat")
+
+[node name="Koliani" parent="." instance=ExtResource("1_kol")]
+position = Vector2(180, 560)
+
+[node name="DemonioBase" parent="." instance=ExtResource("2_dem")]
+position = Vector2(700, 600)
+
+[node name="Checkpoint" type="Area2D" parent="."]
+position = Vector2(420, 470)
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("4_chk")
+
+[node name="Visual" type="ColorRect" parent="Checkpoint"]
+offset_left = -6.0
+offset_top = -40.0
+offset_right = 6.0
+offset_bottom = 40.0
+color = Color(0.4, 0.301961, 0.6, 1)
+
+[node name="Luz" type="Node2D" parent="Checkpoint"]
+visible = false
+
+[node name="Brilho" type="ColorRect" parent="Checkpoint/Luz"]
+offset_left = -18.0
+offset_top = -52.0
+offset_right = 18.0
+offset_bottom = 44.0
+color = Color(0.85098, 0.309804, 0.831373, 0.34902)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Checkpoint"]
+shape = SubResource("RectangleShape2D_chk")
+
+[node name="Porta" type="Area2D" parent="."]
+position = Vector2(1180, 588)
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("3_porta")
+
+[node name="Visual" type="ColorRect" parent="Porta"]
+offset_left = -24.0
+offset_top = -48.0
+offset_right = 24.0
+offset_bottom = 48.0
+color = Color(0.6, 0.180392, 0.588235, 1)
+
+[node name="Nucleo" type="ColorRect" parent="Porta"]
+offset_left = -12.0
+offset_top = -34.0
+offset_right = 12.0
+offset_bottom = 34.0
+color = Color(0.933333, 0.435294, 0.909804, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Porta"]
+shape = SubResource("RectangleShape2D_porta")

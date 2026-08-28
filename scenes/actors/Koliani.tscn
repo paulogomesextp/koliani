@@ -1,0 +1,53 @@
+[gd_scene load_steps=4 format=3 uid="uid://bkolianiactor01"]
+
+[ext_resource type="Script" path="res://scripts/koliani.gd" id="1_kol"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_body"]
+size = Vector2(20, 44)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_hit"]
+size = Vector2(30, 34)
+
+[node name="Koliani" type="CharacterBody2D" groups=["koliani"]]
+collision_layer = 2
+collision_mask = 1
+script = ExtResource("1_kol")
+
+[node name="Sprite" type="Node2D" parent="."]
+
+[node name="Corpo" type="ColorRect" parent="Sprite"]
+offset_left = -10.0
+offset_top = -22.0
+offset_right = 10.0
+offset_bottom = 22.0
+color = Color(0.878431, 0.32549, 0.694118, 1)
+
+[node name="Cabeca" type="ColorRect" parent="Sprite"]
+offset_left = -7.0
+offset_top = -34.0
+offset_right = 7.0
+offset_bottom = -22.0
+color = Color(1, 0.898039, 0.976471, 1)
+
+[node name="Lamina" type="ColorRect" parent="Sprite"]
+offset_left = 10.0
+offset_top = -6.0
+offset_right = 30.0
+offset_bottom = 0.0
+color = Color(0.85098, 0.309804, 0.831373, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_body")
+
+[node name="HitboxAtaque" type="Area2D" parent="."]
+collision_layer = 8
+collision_mask = 4
+monitoring = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitboxAtaque"]
+position = Vector2(23, -4)
+shape = SubResource("RectangleShape2D_hit")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position_smoothing_enabled = true
+position_smoothing_speed = 8.0
