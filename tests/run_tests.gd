@@ -29,6 +29,7 @@ func _correr_tudo() -> void:
 	teste_movimento_sem_habilidade_nao_ha_salto_duplo()
 	teste_movimento_sair_da_borda_perde_primeiro_salto()
 	teste_koliani_pode_rolar()
+	teste_diario_entradas_e_fallback()
 	teste_estado_tres_mortes_sem_vidas()
 	teste_estado_pistas_sem_duplicados()
 	teste_estado_habilidade_sem_duplicados()
@@ -131,6 +132,17 @@ func teste_koliani_pode_rolar() -> void:
 		"ja a rolar => nao encadeia")
 	_ok(not Movimento.pode_rolar(0.0, true, 0.0, 0.1),
 		"em dash => nao rola")
+
+
+# --- Diário de pistas ----------------------------------------------------
+
+func teste_diario_entradas_e_fallback() -> void:
+	var lista := DiarioPistas.entradas(["floresta_sinal_da_porta", "id_desconhecido"])
+	_ok(lista.size() == 2, "entradas devia devolver uma linha por id")
+	_ok(lista[0]["titulo"] == "O cheiro na porta", "id conhecido traz o titulo certo")
+	_ok(lista[0]["mundo"] == "Floresta Putrefata", "id conhecido traz o mundo certo")
+	_ok(lista[1]["titulo"] == "id_desconhecido", "id sem texto cai no proprio id")
+	_ok(DiarioPistas.total_no_jogo() >= 2, "total_no_jogo conta o dicionario")
 
 
 # --- EstadoJogo ------------------------------------------------------

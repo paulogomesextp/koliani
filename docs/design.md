@@ -25,6 +25,7 @@ Mapa de input em `project.godot` (nomes em português):
 | `atacar` | J | botão de ação (cima) |
 | `dash` | K | botão de ação (baixo) |
 | `rolar` | seta baixo | botão de ação (esquerda) |
+| `diario` | I / Tab | botão canto sup. direito |
 
 `scenes/ui/HUD.tscn` tem os `TouchScreenButton` com a `action` certa; o
 Godot injeta a InputAction sozinho. `controlos_toque.gd` só esconde o HUD
@@ -115,17 +116,19 @@ Autoload `EstadoJogo`. Guarda em `user://progresso.json`:
 
 - `NIVEIS` -- lista ordenada de cenas = a campanha.
 - `avancar_nivel()` -- passa ao seguinte e limpa o checkpoint.
-- `desbloquear_habilidade(id)` / `tem_habilidade(id)` -- para `koliani.gd`
-  ligar habilidades novas (salto duplo, dash aéreo, partir paredes...).
-- `registar_pista(id)` -- chamado pelas portas / objetos de mundo.
+- `desbloquear_habilidade(id)` / `tem_habilidade(id)` -- `koliani.gd` já lê
+  `salto_duplo` e `dash_aereo`; falta `partir_paredes`.
+- `registar_pista(id)` -- chamado pelas `Porta` e pelos `Coletavel`. O
+  texto legível de cada id está em `scripts/diario_pistas.gd`.
 
 ## Por fazer (lista viva)
 
 - Sprites CC0 a substituir os `ColorRect` (Koliani, demónios, tiles da
   floresta, folhagem de parallax) -- ver dúvidas no fim do README.
 - `TileMapLayer` + tileset para geometria de nível.
-- Ecrã de **diário das pistas** (lista `EstadoJogo.pistas`, com títulos
-  legíveis por id).
+- ~~Ecrã de **diário das pistas**~~ -- feito (`scenes/ui/Diario.tscn` +
+  `scripts/diario.gd`; textos em `scripts/diario_pistas.gd`). Falta arte
+  e afinar o layout com o jogo a correr.
 - ~~Habilidades desbloqueáveis ligadas ao `koliani.gd`~~ -- feito para
   `salto_duplo`; falta `dash_aereo`, `partir_paredes`.
 - **Chefe** por mundo (herda de `demonio_base.gd`; falta a máquina de

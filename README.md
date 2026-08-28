@@ -54,8 +54,10 @@ scripts/
   porta.gd             -- Area2D: avanca para o mundo seguinte / termina a campanha
   checkpoint.gd        -- Area2D: guarda posicao de reaparecimento
   estado_jogo.gd       -- autoload EstadoJogo: vidas, nivel, checkpoint, habilidades, pistas, save
+  diario_pistas.gd     -- DADOS PUROS: textos das pistas por id (para o diario + testes)
+  diario.gd            -- ecra de diario: I/Tab, pausa o jogo, lista EstadoJogo.pistas
   controlos_toque.gd   -- HUD de toque (esconde-se com teclado)
-  main.gd              -- cena de arranque: carrega o nivel atual + HUD + cartao de fim
+  main.gd              -- cena de arranque: carrega o nivel atual + HUD + diario + cartao de fim
 
 scenes/
   Main.tscn                        -- main_scene (ver project.godot)
@@ -64,7 +66,8 @@ scenes/
   actors/Koliani.tscn              -- placeholder ColorRect (silhueta key art) + lamina c/ PointLight2D
   actors/DemonioBase.tscn          -- placeholder ColorRect + olho c/ PointLight2D + area de contacto
   actors/Coletavel.tscn            -- gema magenta c/ PointLight2D (pista / habilidade)
-  ui/HUD.tscn                      -- barra de vida, vidas, TouchScreenButtons
+  ui/HUD.tscn                      -- barra de vida, vidas, TouchScreenButtons (+ rolar, diario)
+  ui/Diario.tscn                   -- painel do diario de pistas (instanciado pelo main.gd)
 
 tests/run_tests.gd     -- corredor headless proprio (movimento + estado_jogo)
 docs/                  -- historia.md, design.md (bibliografia viva)
@@ -108,9 +111,9 @@ SDK) -- ajustar pelo log do Actions.
 
 - `--import` -- OK, classes globais registadas (`Coletavel`, `Koliani`,
   `Movimento`), assets importados.
-- `godot --headless --script res://tests/run_tests.gd` -- **11 testes, todos
-  a passar** (inclui salto duplo + sair da borda).
-- `Main.tscn` (agora carrega o mundo 1) corre 200 frames headless **sem
+- `godot --headless --script res://tests/run_tests.gd` -- **13 testes, todos
+  a passar** (movimento + salto duplo + rolar + estado + diário).
+- `Main.tscn` (mundo 1 + HUD + diário) corre 300 frames headless **sem
   erros nem avisos**.
 - Build Web/APK local -- bloqueado só pela falta dos modelos de export
   (ver acima).

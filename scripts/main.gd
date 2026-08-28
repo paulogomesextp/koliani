@@ -5,6 +5,7 @@ extends Node2D
 ## cena (é o que a Porta faz).
 
 const CENA_HUD := preload("res://scenes/ui/HUD.tscn")
+const CENA_DIARIO := preload("res://scenes/ui/Diario.tscn")
 
 
 func _ready() -> void:
@@ -21,6 +22,7 @@ func _ready() -> void:
 		porta.fim_da_campanha.connect(_ao_fim_da_campanha)
 
 	add_child(CENA_HUD.instantiate())
+	add_child(CENA_DIARIO.instantiate())
 
 
 func _procurar_porta(no: Node) -> Porta:
