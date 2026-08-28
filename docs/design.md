@@ -22,9 +22,9 @@ Mapa de input em `project.godot` (nomes em português):
 |------|-----------------|-------|
 | `mover_esquerda` / `mover_direita` | setas / A D | d-pad esquerdo (HUD) |
 | `saltar` | Espaço / seta cima | botão direito-baixo |
-| `atacar` | J | botão direito |
-| `dash` | K | botão direito |
-| `rolar` | seta baixo | (por mapear no HUD) |
+| `atacar` | J | botão de ação (cima) |
+| `dash` | K | botão de ação (baixo) |
+| `rolar` | seta baixo | botão de ação (esquerda) |
 
 `scenes/ui/HUD.tscn` tem os `TouchScreenButton` com a `action` certa; o
 Godot injeta a InputAction sozinho. `controlos_toque.gd` só esconde o HUD
@@ -47,6 +47,11 @@ quando se joga com teclado.
 `scripts/koliani.gd` liga isto ao `CharacterBody2D` real e acrescenta:
 
 - **Dash**: vel. 620, duração 0.16s, recarga 0.55s, i-frames durante o dash.
+  Só do chão, exceto com a habilidade `dash_aereo`.
+- **Rolamento** (`rolar`): vel. 360, duração 0.30s, recarga 0.45s, i-frames
+  toda a duração; só do chão, não permite atacar/virar a meio. Estado
+  exclusivo (rolamento > dash > movimento normal). Predicado testável:
+  `Movimento.pode_rolar(...)`.
 - **Ataque leve**: dura 0.18s, ativa a `Area2D` `HitboxAtaque` à frente da
   Koliani; dano 25.
 - **Dano recebido**: 0.6s de i-frames; ao chegar a 0 de vida ->

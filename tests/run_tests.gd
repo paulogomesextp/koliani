@@ -28,6 +28,7 @@ func _correr_tudo() -> void:
 	teste_movimento_salto_duplo()
 	teste_movimento_sem_habilidade_nao_ha_salto_duplo()
 	teste_movimento_sair_da_borda_perde_primeiro_salto()
+	teste_koliani_pode_rolar()
 	teste_estado_tres_mortes_sem_vidas()
 	teste_estado_pistas_sem_duplicados()
 	teste_estado_habilidade_sem_duplicados()
@@ -115,6 +116,21 @@ func teste_movimento_sair_da_borda_perde_primeiro_salto() -> void:
 	var vy_antes := e.velocidade.y
 	Movimento.passo(e, 0.0, true, true, false, DT, 2)    # com salto duplo ainda resta 1
 	_ok(e.velocidade.y < vy_antes, "com salto duplo resta 1 salto no ar mesmo saindo da borda")
+
+
+# --- Rolamento (predicado puro) ------------------------------------------
+
+func teste_koliani_pode_rolar() -> void:
+	_ok(Movimento.pode_rolar(0.0, true, 0.0, 0.0),
+		"recarga pronta + no chao => pode rolar")
+	_ok(not Movimento.pode_rolar(0.2, true, 0.0, 0.0),
+		"recarga a decorrer => nao pode rolar")
+	_ok(not Movimento.pode_rolar(0.0, false, 0.0, 0.0),
+		"no ar => nao pode rolar")
+	_ok(not Movimento.pode_rolar(0.0, true, 0.1, 0.0),
+		"ja a rolar => nao encadeia")
+	_ok(not Movimento.pode_rolar(0.0, true, 0.0, 0.1),
+		"em dash => nao rola")
 
 
 # --- EstadoJogo ------------------------------------------------------

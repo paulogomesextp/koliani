@@ -75,3 +75,10 @@ static func passo(e: Estado, direcao: float, saltar_premido: bool, saltar_a_segu
 
 	e.no_chao = no_chao
 	return e
+
+
+## Predicado puro (testável) para começar um rolamento: recarga pronta, no
+## chão, e sem já estar a rolar ou em dash. Fica aqui (e não em koliani.gd)
+## para dar para testar headless em modo `--script` sem os autoloads.
+static func pode_rolar(recarga: float, no_chao: bool, rolar_restante: float, dash_restante: float) -> bool:
+	return recarga <= 0.0 and no_chao and rolar_restante <= 0.0 and dash_restante <= 0.0

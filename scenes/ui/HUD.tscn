@@ -71,3 +71,9 @@ position = Vector2(1000, 620)
 shape = SubResource("RectangleShape2D_botao")
 visibility_mode = 1
 action = &"dash"
+
+[node name="Rolar" type="TouchScreenButton" parent="Toque"]
+position = Vector2(870, 600)
+shape = SubResource("RectangleShape2D_botao")
+visibility_mode = 1
+action = &"rolar"
