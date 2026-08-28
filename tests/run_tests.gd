@@ -6,13 +6,18 @@ extends SceneTree
 ## Sai com codigo 1 se algum teste falhar -- o CI (.github/workflows/ci.yml)
 ## usa isso para marcar o build como vermelho. Acrescenta testes novos como
 ## metodos `teste_*` e chama-os em `_correr_tudo`.
+##
+## NOTA: em modo `--script` os autoloads (EstadoJogo) NAO existem como
+## identificador global, por isso os testes do estado instanciam
+## `estado_jogo.gd` diretamente com `load(...).new()`.
+
+const EstadoJogoScript := preload("res://scripts/estado_jogo.gd")
+const DT := 1.0 / 60.0
 
 var _falhas: Array[String] = []
 
 
 func _initialize() -> void:
-	# adiado uma vez para garantir que os autoloads (EstadoJogo) ja estao
-	# registados na arvore antes de os tocar
 	call_deferred("_correr_tudo")
 
 
@@ -24,6 +29,7 @@ func _correr_tudo() -> void:
 	teste_estado_pistas_sem_duplicados()
 	teste_estado_habilidade_sem_duplicados()
 	teste_estado_nivel_atual_e_caminho_valido()
+	teste_estado_save_ida_e_volta()
 
 	if _falhas.is_empty():
 		print("OK -- todos os testes passaram")
@@ -40,9 +46,15 @@ func _ok(condicao: bool, mensagem: String) -> void:
 		_falhas.append(mensagem)
 
 
-# --- Movimento (logica pura) -------------------------------------------------
+## Instancia estado_jogo.gd fora da arvore (nao chama _ready, logo nao le o
+## save do disco) e reinicia a campanha para um ponto conhecido.
+func _novo_estado() -> Node:
+	var e: Node = EstadoJogoScript.new()
+	e.reiniciar_campanha()
+	return e
 
-const DT := 1.0 / 60.0
+
+# --- Movimento (logica pura) -------------------------------------------------
 
 func teste_movimento_salto_com_coyote() -> void:
 	var e := Movimento.Estado.new()
@@ -69,32 +81,50 @@ func teste_movimento_anda_para_a_direita() -> void:
 # --- EstadoJogo ------------------------------------------------------
 
 func teste_estado_tres_mortes_sem_vidas() -> void:
-	EstadoJogo.reiniciar_campanha()
-	EstadoJogo.perder_vida()
-	EstadoJogo.perder_vida()
-	EstadoJogo.perder_vida()
-	_ok(EstadoJogo.sem_vidas(), "3 vidas perdidas deviam deixar sem_vidas() verdadeiro")
+	var e := _novo_estado()
+	e.perder_vida()
+	e.perder_vida()
+	e.perder_vida()
+	_ok(e.sem_vidas(), "3 vidas perdidas deviam deixar sem_vidas() verdadeiro")
+	e.free()
 
 
 func teste_estado_pistas_sem_duplicados() -> void:
-	EstadoJogo.reiniciar_campanha()
-	EstadoJogo.registar_pista("carta_da_mae")
-	EstadoJogo.registar_pista("carta_da_mae")
-	_ok(EstadoJogo.pistas.size() == 1, "registar a mesma pista duas vezes nao devia duplicar")
+	var e := _novo_estado()
+	e.registar_pista("carta_da_mae")
+	e.registar_pista("carta_da_mae")
+	_ok(e.pistas.size() == 1, "registar a mesma pista duas vezes nao devia duplicar")
+	e.free()
 
 
 func teste_estado_habilidade_sem_duplicados() -> void:
-	EstadoJogo.reiniciar_campanha()
-	EstadoJogo.desbloquear_habilidade("salto_duplo")
-	EstadoJogo.desbloquear_habilidade("salto_duplo")
-	_ok(EstadoJogo.habilidades.size() == 1, "desbloquear a mesma habilidade duas vezes nao devia duplicar")
-	_ok(EstadoJogo.tem_habilidade("salto_duplo"), "tem_habilidade devia ser verdadeiro apos desbloquear")
+	var e := _novo_estado()
+	e.desbloquear_habilidade("salto_duplo")
+	e.desbloquear_habilidade("salto_duplo")
+	_ok(e.habilidades.size() == 1, "desbloquear a mesma habilidade duas vezes nao devia duplicar")
+	_ok(e.tem_habilidade("salto_duplo"), "tem_habilidade devia ser verdadeiro apos desbloquear")
+	e.free()
 
 
 func teste_estado_nivel_atual_e_caminho_valido() -> void:
-	EstadoJogo.reiniciar_campanha()
-	var caminho := EstadoJogo.caminho_nivel_atual()
+	var e := _novo_estado()
+	var caminho: String = e.caminho_nivel_atual()
 	_ok(caminho.begins_with("res://"), "caminho do nivel atual devia comecar por res://")
-	EstadoJogo.avancar_nivel()  # so avanca se houver proximo; nao pode ir fora dos limites
-	_ok(EstadoJogo.indice_nivel >= 0 and EstadoJogo.indice_nivel < EstadoJogo.NIVEIS.size(),
+	e.avancar_nivel()  # so avanca se houver proximo; nao pode ir fora dos limites
+	_ok(e.indice_nivel >= 0 and e.indice_nivel < e.NIVEIS.size(),
 		"indice_nivel devia manter-se dentro dos limites de NIVEIS")
+	e.free()
+
+
+func teste_estado_save_ida_e_volta() -> void:
+	var e := _novo_estado()
+	e.perder_vida()
+	e.registar_pista("pista_x")
+	e.desbloquear_habilidade("dash_aereo")
+	var copia := _novo_estado()
+	copia.de_dicionario(e.para_dicionario())
+	_ok(copia.vidas == e.vidas, "vidas deviam sobreviver ao ida-e-volta do dicionario")
+	_ok(copia.pistas == e.pistas, "pistas deviam sobreviver ao ida-e-volta do dicionario")
+	_ok(copia.habilidades == e.habilidades, "habilidades deviam sobreviver ao ida-e-volta")
+	e.free()
+	copia.free()
