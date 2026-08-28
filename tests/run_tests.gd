@@ -29,6 +29,7 @@ func _correr_tudo() -> void:
 	teste_movimento_sem_habilidade_nao_ha_salto_duplo()
 	teste_movimento_sair_da_borda_perde_primeiro_salto()
 	teste_koliani_pode_rolar()
+	teste_tremor_impulso_e_decaimento()
 	teste_diario_entradas_e_fallback()
 	teste_estado_tres_mortes_sem_vidas()
 	teste_estado_pistas_sem_duplicados()
@@ -132,6 +133,19 @@ func teste_koliani_pode_rolar() -> void:
 		"ja a rolar => nao encadeia")
 	_ok(not Movimento.pode_rolar(0.0, true, 0.0, 0.1),
 		"em dash => nao rola")
+
+
+# --- Tremor (screen shake, lógica pura) --------------------------------
+
+func teste_tremor_impulso_e_decaimento() -> void:
+	var t := Tremor.new()
+	_ok(t.passo(DT) == Vector2.ZERO, "sem impulso nao ha deslocamento")
+	t.bater(10.0)
+	_ok(t.passo(DT).length() > 0.0, "apos bater() ha deslocamento")
+	for i in 200:
+		t.passo(DT)
+	_ok(not t.ativo(), "o tremor decai ate parar")
+	_ok(t.passo(DT) == Vector2.ZERO, "parado => deslocamento zero")
 
 
 # --- Diário de pistas ----------------------------------------------------

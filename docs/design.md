@@ -134,8 +134,11 @@ Autoload `EstadoJogo`. Guarda em `user://progresso.json`:
 - **Chefe** por mundo (herda de `demonio_base.gd`; falta a máquina de
   estados de telegrafar/atacar).
 - Cena de final a sério (o `main.gd._ao_fim_da_campanha` é um cartão).
-- Som e "juice" (screen shake curto, hitstop leve, partículas de impacto
-  e de aterragem).
+- Som (sem áudio ainda). **Juice** parcial feito: screen shake
+  (`scripts/tremor.gd` puro + `camera_tremor.gd` na câmara), hitstop de
+  tempo real (`Koliani._hitstop`), `CPUParticles2D` de impacto e de
+  aterragem. Falta afinar valores com o jogo a correr e partículas nos
+  demónios.
 - Mapear `rolar` no HUD de toque (`scenes/ui/HUD.tscn`).
 - Mundos 2-4 (`Prisao_dos_Condenados`, `Torres_Esquecidas`,
   `Castelo_de_Zeriko`) -- usar `Floresta_Putrefata.tscn` como molde.

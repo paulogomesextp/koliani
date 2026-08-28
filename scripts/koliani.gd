@@ -21,6 +21,9 @@ const I_FRAMES := 0.6
 
 @onready var _hitbox: Area2D = $HitboxAtaque
 @onready var _sprite: Node2D = $Sprite
+@onready var _camera: Camera2D = $Camera2D
+@onready var _faiscas: CPUParticles2D = $FaiscasAtaque
+@onready var _po: CPUParticles2D = $PoAterragem
 
 var _mov := Movimento.Estado.new()
 var vida := VIDA_MAXIMA
@@ -31,6 +34,7 @@ var _rolar_restante := 0.0
 var _rolar_recarga := 0.0
 var _ataque_restante := 0.0
 var _invulneravel := 0.0
+var _estava_no_chao := true
 
 
 func _ready() -> void:
@@ -92,8 +96,31 @@ func _physics_process(dt: float) -> void:
 		)
 		velocity = _mov.velocidade
 
+	var vel_queda := velocity.y
 	move_and_slide()
 	_mov.velocidade = velocity
+
+	# aterragem: pó + abanão leve, proporcional à velocidade de queda
+	var no_chao := is_on_floor()
+	if no_chao and not _estava_no_chao and vel_queda > 180.0:
+		if _po:
+			_po.restart()
+		_abanar(remap(minf(vel_queda, 1100.0), 180.0, 1100.0, 1.0, 4.5))
+	_estava_no_chao = no_chao
+
+
+func _abanar(forca: float) -> void:
+	if _camera and _camera.has_method("bater"):
+		_camera.bater(forca)
+
+
+## Pequena paragem de tempo real ("hitstop") para dar peso ao impacto.
+func _hitstop(segundos: float) -> void:
+	if Engine.time_scale < 0.5:
+		return
+	Engine.time_scale = 0.0
+	await get_tree().create_timer(segundos, true, false, true).timeout
+	Engine.time_scale = 1.0
 
 
 func _iniciar_ataque() -> void:
@@ -106,6 +133,11 @@ func _iniciar_ataque() -> void:
 func _ao_acertar_corpo(corpo: Node) -> void:
 	if corpo.has_method("receber_dano"):
 		corpo.receber_dano(DANO_ATAQUE, sign(_olha_para))
+		if _faiscas:
+			_faiscas.position.x = absf(_faiscas.position.x) * _olha_para
+			_faiscas.restart()
+		_abanar(4.0)
+		_hitstop(0.05)
 
 
 func receber_dano(quantidade: int, _dir_empurrao: float = 0.0) -> void:
@@ -114,11 +146,14 @@ func receber_dano(quantidade: int, _dir_empurrao: float = 0.0) -> void:
 	vida = maxi(0, vida - quantidade)
 	_invulneravel = I_FRAMES
 	vida_mudou.emit(vida, VIDA_MAXIMA)
+	_abanar(8.0)
+	_hitstop(0.07)
 	if vida <= 0:
 		_morrer()
 
 
 func _morrer() -> void:
+	Engine.time_scale = 1.0  # não deixar um hitstop pendente a segurar o tempo
 	morreu.emit()
 	EstadoJogo.perder_vida()
 	if EstadoJogo.sem_vidas():

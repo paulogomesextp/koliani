@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://bkolianiactor01"]
+[gd_scene load_steps=8 format=3 uid="uid://bkolianiactor01"]
 
 ; Koliani -- placeholder ColorRect com silhueta a apontar ao key art:
 ; menina agil, rabo-de-cavalo, cachecol, lamina magenta que brilha
@@ -6,6 +6,7 @@
 ; (koliani.gd faz-lhe flip pelo scale.x) e a "HitboxAtaque".
 
 [ext_resource type="Script" path="res://scripts/koliani.gd" id="1_kol"]
+[ext_resource type="Script" path="res://scripts/camera_tremor.gd" id="2_cam"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_body"]
 size = Vector2(20, 44)
@@ -94,6 +95,39 @@ monitoring = false
 position = Vector2(23, -4)
 shape = SubResource("RectangleShape2D_hit")
 
+[node name="FaiscasAtaque" type="CPUParticles2D" parent="."]
+position = Vector2(24, -4)
+emitting = false
+amount = 12
+lifetime = 0.35
+one_shot = true
+explosiveness = 0.9
+direction = Vector2(1, 0)
+spread = 60.0
+gravity = Vector2(0, 320)
+initial_velocity_min = 90.0
+initial_velocity_max = 230.0
+scale_amount_min = 1.5
+scale_amount_max = 3.0
+color = Color(1, 0.55, 0.95, 1)
+
+[node name="PoAterragem" type="CPUParticles2D" parent="."]
+position = Vector2(0, 22)
+emitting = false
+amount = 14
+lifetime = 0.4
+one_shot = true
+explosiveness = 1.0
+direction = Vector2(0, -1)
+spread = 80.0
+gravity = Vector2(0, 140)
+initial_velocity_min = 15.0
+initial_velocity_max = 70.0
+scale_amount_min = 1.0
+scale_amount_max = 2.5
+color = Color(0.53, 0.62, 0.42, 0.7)
+
 [node name="Camera2D" type="Camera2D" parent="."]
 position_smoothing_enabled = true
 position_smoothing_speed = 8.0
+script = ExtResource("2_cam")

@@ -56,6 +56,8 @@ scripts/
   estado_jogo.gd       -- autoload EstadoJogo: vidas, nivel, checkpoint, habilidades, pistas, save
   diario_pistas.gd     -- DADOS PUROS: textos das pistas por id (para o diario + testes)
   diario.gd            -- ecra de diario: I/Tab, pausa o jogo, lista EstadoJogo.pistas
+  tremor.gd            -- LOGICA PURA do screen shake (amplitude decai a zero); testavel
+  camera_tremor.gd     -- Camera2D da Koliani: aplica o Tremor ao offset
   controlos_toque.gd   -- HUD de toque (esconde-se com teclado)
   main.gd              -- cena de arranque: carrega o nivel atual + HUD + diario + cartao de fim
 
@@ -111,8 +113,8 @@ SDK) -- ajustar pelo log do Actions.
 
 - `--import` -- OK, classes globais registadas (`Coletavel`, `Koliani`,
   `Movimento`), assets importados.
-- `godot --headless --script res://tests/run_tests.gd` -- **13 testes, todos
-  a passar** (movimento + salto duplo + rolar + estado + diário).
+- `godot --headless --script res://tests/run_tests.gd` -- **14 testes, todos
+  a passar** (movimento + salto duplo + rolar + tremor + estado + diário).
 - `Main.tscn` (mundo 1 + HUD + diário) corre 300 frames headless **sem
   erros nem avisos**.
 - Build Web/APK local -- bloqueado só pela falta dos modelos de export
