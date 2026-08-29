@@ -61,6 +61,22 @@ func _px(x: int, y: int, c: Color) -> void:
 		_img.set_pixel(x, y, c)
 
 
+## Desenha a partir de um "mapa" de linhas de texto (1 char = 1 pixel).
+## `leg` mapeia char -> Color; espaço = transparente.
+func _mapa(linhas: PackedStringArray, leg: Dictionary) -> void:
+	var h := linhas.size()
+	var w := 0
+	for l in linhas:
+		w = maxi(w, l.length())
+	_novo(w, h)
+	for j in h:
+		var linha: String = linhas[j]
+		for i in linha.length():
+			var ch := linha[i]
+			if leg.has(ch):
+				_img.set_pixel(i, j, leg[ch])
+
+
 func _rect(x: int, y: int, w: int, h: int, c: Color) -> void:
 	for j in range(y, y + h):
 		for i in range(x, x + w):
@@ -122,49 +138,75 @@ func _guardar(nome: String) -> void:
 	var caminho := "%s/%s.png" % [DIR, nome]
 	var err := _img.save_png(caminho)
 	print("  ", nome, "  ", _w, "x", _h, "  err=", err)
+	# preview x8 (nearest) so' para inspecao -- nao usado pelo jogo
+	if OS.get_environment("PREVIEW") == "1":
+		var big := _img.duplicate() as Image
+		big.resize(_w * 8, _h * 8, Image.INTERPOLATE_NEAREST)
+		big.save_png("%s/_preview_%s.png" % [DIR, nome])
 
 
 ## --- sprites ---------------------------------------------------------
 
 func _koliani() -> void:
-	_novo(48, 64)
-	# capa atras
-	_elipse(24, 40, 12, 19, PAL["x"])
-	_elipse(23, 38, 9, 15, PAL["p"])
-	# pernas + botas
-	_rect(19, 42, 5, 15, PAL["x"])
-	_rect(25, 42, 5, 15, PAL["p"])
-	_rect(18, 56, 7, 4, PAL["o"])
-	_rect(25, 56, 7, 4, PAL["o"])
-	# tunica
-	_rect(17, 25, 15, 20, PAL["p"])
-	_rect(17, 25, 4, 20, PAL["x"])
-	_rect(28, 25, 4, 20, PAL["P"])
-	# cachecol
-	_rect(16, 24, 17, 3, PAL["h"])
-	_rect(31, 24, 9, 2, PAL["h"])
-	# rabo-de-cavalo
-	_rect(12, 10, 6, 12, PAL["h"])
-	# cabeca / capuz
-	_elipse(24, 14, 8, 8, PAL["x"])
-	_elipse(24, 15, 5, 5, PAL["k"])
-	_rect(19, 8, 11, 5, PAL["x"])
-	_rect(19, 17, 11, 3, PAL["x"])
-	_px(19, 15, PAL["s"])
-	_px(28, 15, PAL["m"])
-	_px(27, 15, PAL["w"])
-	# braco esticado p/ a lamina
-	_linha(19, 29, 9, 36, 3, PAL["s"])
-	# lamina magenta a brilhar (baixo-esquerda)
-	_linha(12, 37, 1, 30, 4, PAL["M"])
-	_linha(12, 37, 1, 30, 2, PAL["m"])
-	_linha(11, 36, 2, 31, 1, PAL["w"])
-	_elipse(6, 34, 5, 5, PAL["M"])
-	_px(6, 34, PAL["w"])
-	# realce frio na aresta esquerda do tronco
-	for j in range(26, 44):
-		if _img.get_pixel(17, j).a > 0.5:
-			_img.set_pixel(17, j, PAL["W"])
+	# mapa de pixels feito a' mao. Vista 3/4 virada a' esquerda, capuz,
+	# rabo-de-cavalo, capa que abre, adaga magenta a brilhar em baixo.
+	#  c capa escura  C capa media  v capa clara  l rim (luz fria)
+	#  k pele  s pele sombra  r cabelo/cachecol  e olho
+	#  B brilho lamina  b nucleo lamina
+	var leg := {
+		"c": PAL["x"], "C": PAL["p"], "v": PAL["P"], "l": PAL["W"],
+		"t": Color("4a3a68"),  # painel da tunica (frente)
+		"k": PAL["k"], "s": PAL["s"], "r": PAL["h"], "e": PAL["m"],
+		"B": PAL["M"], "b": PAL["w"],
+	}
+	_mapa(PackedStringArray([
+		"                                  ",
+		"              cccc                ",
+		"            ccCCCCcc              ",
+		"           cCCCvvvCCc             ",
+		"          clCCvvvvvCCc            ",
+		"          clCvvvvvvvCc   r        ",
+		"          clCvkkkkkvCc  rrr       ",
+		"          clCvkksskvCc  rrrr      ",
+		"          clCkkkseekCc rrrrr      ",
+		"          clCkksseekCc rrrrr      ",
+		"          clCkkksskvCc rrrrr      ",
+		"          clCvkkkkkvCc rrrrr      ",
+		"           clCvkkkvCc  rrrrr      ",
+		"           clCCvvvCCc  rrrr       ",
+		"           clCCvvvCCc  rrrr       ",
+		"            clCCvCCc  rrrr        ",
+		"            crrCCrrc rrrr         ",
+		"           crrrCCrrrrrrr          ",
+		"          ccCCCCCCCCcrr           ",
+		"         clCCCvvvvCCCc            ",
+		"         clCCvvttvvCCc            ",
+		"        clCCvvttttvvCc            ",
+		"    r   clCCvttttttvCc            ",
+		"  rBr   cCCvttttttvCCc            ",
+		" rBbBr scCvttttttvCCc            ",
+		" rBbBr ksCvtttttttvCc            ",
+		"  rBbBrksCvttttttvCCc             ",
+		"   rBbrksCvtttttvvCCc             ",
+		"    rbksCCvttttvvCCc              ",
+		"     bksCCvtttvvvCCc              ",
+		"      sCCCvvttvvvCCc              ",
+		"      cCCCvvttvvCCCc              ",
+		"      cCCCvvttvvCCCc              ",
+		"      cCCCvvttvvCCCc              ",
+		"      cCCCCvttvCCCCc              ",
+		"      cCCCCvttvCCCCc              ",
+		"      ccCCCvttvCCCcc              ",
+		"       cCCCvttvCCCc               ",
+		"       cCCCc  cCCCc               ",
+		"       cCCc    cCCc               ",
+		"       cCCc    cCCc               ",
+		"       cCc      cCc               ",
+		"       cCc      cCc               ",
+		"      ccCc      cCcc              ",
+		"      cccc      cccc              ",
+		"                                 ",
+	]), leg)
 	_guardar("koliani")
 
 

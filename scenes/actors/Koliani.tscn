@@ -7,7 +7,7 @@
 
 [ext_resource type="Script" path="res://scripts/koliani.gd" id="1_kol"]
 [ext_resource type="Script" path="res://scripts/camera_tremor.gd" id="2_cam"]
-[ext_resource type="Texture2D" uid="uid://ium5ae35i3wo" path="res://assets/sprites/koliani.svg" id="3_tex"]
+[ext_resource type="Texture2D" uid="uid://cxh2j8jap0lc4" path="res://assets/sprites/pixel/koliani.png" id="3_tex"]
 [ext_resource type="Shader" path="res://assets/shaders/personagem.gdshader" id="4_sh"]
 
 [sub_resource type="ShaderMaterial" id="mat_kol"]
