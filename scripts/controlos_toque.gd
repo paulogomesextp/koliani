@@ -9,9 +9,11 @@ const NOME_HABILIDADE := {
 	"dash_aereo": "hud.ability.dash_aereo",
 	"partir_paredes": "hud.ability.partir_paredes",
 	"escudo": "hud.ability.escudo",
+	"projetil": "hud.ability.projetil",
 }
 
 @onready var _barra_vida: ProgressBar = $Vida/Barra
+@onready var _barra_energia: ProgressBar = $Energia/Barra
 @onready var _label_vidas: Label = $Vidas/Label
 @onready var _toque: Control = $Toque
 
@@ -19,6 +21,9 @@ const NOME_HABILIDADE := {
 func _ready() -> void:
 	if _toque:
 		_toque.visible = DisplayServer.is_touchscreen_available()
+	# a barra de Energia só aparece depois de apanhar a habilidade "projetil"
+	if _barra_energia:
+		_barra_energia.get_parent().visible = EstadoJogo.tem_habilidade("projetil")
 	EstadoJogo.vidas_mudaram.connect(_atualizar_vidas)
 	EstadoJogo.habilidade_desbloqueada.connect(_ao_habilidade)
 	EstadoJogo.pista_encontrada.connect(_ao_pista)
@@ -26,6 +31,8 @@ func _ready() -> void:
 	var koliani := get_tree().get_first_node_in_group("koliani")
 	if koliani and koliani.has_signal("vida_mudou"):
 		koliani.vida_mudou.connect(_atualizar_barra_vida)
+	if koliani and koliani.has_signal("energia_mudou"):
+		koliani.energia_mudou.connect(_atualizar_energia)
 
 
 func _input(evento: InputEvent) -> void:
@@ -39,12 +46,20 @@ func _atualizar_barra_vida(atual: int, maximo: int) -> void:
 		_barra_vida.value = atual
 
 
+func _atualizar_energia(atual: float, maximo: float) -> void:
+	if _barra_energia:
+		_barra_energia.max_value = maximo
+		_barra_energia.value = atual
+
+
 func _atualizar_vidas(vidas: int) -> void:
 	if _label_vidas:
 		_label_vidas.text = "x%d" % vidas
 
 
 func _ao_habilidade(id: String) -> void:
+	if id == "projetil" and _barra_energia:
+		_barra_energia.get_parent().visible = true
 	var nome: String = Textos.t(NOME_HABILIDADE.get(id, id))
 	_aviso(Textos.tf("hud.new_ability", [nome]))
 

@@ -29,6 +29,7 @@
 	"hud.ability.dash_aereo": "Air dash",
 	"hud.ability.partir_paredes": "Wall breaking",
 	"hud.ability.escudo": "Shield",
+	"hud.ability.projetil": "Magic bolt",
 	"hud.new_ability": "New ability: %s",
 	"hud.clue_found": "Clue found  (%d)",
 

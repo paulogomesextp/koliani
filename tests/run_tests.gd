@@ -30,6 +30,7 @@ func _correr_tudo() -> void:
 	teste_movimento_sair_da_borda_perde_primeiro_salto()
 	teste_koliani_pode_rolar()
 	teste_koliani_bloqueio_de_frente()
+	teste_koliani_direcao_mira()
 	teste_tremor_impulso_e_decaimento()
 	teste_diario_entradas_e_fallback()
 	teste_diario_tem_todas_as_pistas_dos_niveis()
@@ -154,6 +155,19 @@ func teste_koliani_bloqueio_de_frente() -> void:
 	_ok(Movimento.bloqueia_de_frente(1.0, -1.0), "golpe de frente (da esquerda) devia ser bloqueado")
 	_ok(not Movimento.bloqueia_de_frente(-1.0, -1.0), "golpe pelas costas (virada a' esquerda) passa")
 	_ok(Movimento.bloqueia_de_frente(0.0, 1.0), "sem direcao conhecida o escudo vale")
+
+
+## O projétil mágico sai numa das 8 direções conforme a mira; sem mira vai
+## para onde a Koliani está virada.
+func teste_koliani_direcao_mira() -> void:
+	var r2 := sqrt(0.5)
+	_ok(Movimento.direcao_mira(0.0, 0.0, 1.0) == Vector2.RIGHT, "sem mira -> para onde esta' virada (direita)")
+	_ok(Movimento.direcao_mira(0.0, 0.0, -1.0) == Vector2.LEFT, "sem mira -> para onde esta' virada (esquerda)")
+	_ok(Movimento.direcao_mira(0.0, -1.0, 1.0) == Vector2.UP, "mira em cima -> cima")
+	_ok(Movimento.direcao_mira(0.0, 1.0, 1.0) == Vector2.DOWN, "mira em baixo -> baixo")
+	var d := Movimento.direcao_mira(1.0, -1.0, 1.0)
+	_ok(is_equal_approx(d.x, r2) and is_equal_approx(d.y, -r2), "mira diagonal cima-direita -> 45 graus normalizado")
+	_ok(Movimento.direcao_mira(0.1, 0.0, -1.0) == Vector2.LEFT, "input abaixo da deadzone conta como sem mira")
 
 
 # --- Tremor (screen shake, lógica pura) --------------------------------

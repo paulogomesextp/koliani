@@ -178,6 +178,10 @@ habilidade_id = "dash_aereo"
 position = Vector2(1670, 268)
 pista_id = "prisao_grito_nas_correntes"
 
+[node name="ColProjetil" parent="." instance=ExtResource("3_col")]
+position = Vector2(1470, 320)
+habilidade_id = "projetil"
+
 [node name="CheckInicio" type="Area2D" parent="."]
 position = Vector2(700, 588)
 collision_layer = 16

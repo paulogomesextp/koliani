@@ -255,6 +255,10 @@ Ver **`docs/testar.md`**: como correr o jogo, controlos, atalhos de debug
 
 ## Decisões de direção (Paulo)
 
+- **Campanha alvo: 30 níveis em 6 regiões** com chefe próprio cada um --
+  plano completo em [`docs/niveis.md`](docs/niveis.md). Hoje jogam-se 4
+  (uma amostra por região I/II/III/VI). Chefes "realistas" e mecânicas
+  novas: **arte e design a cargo do agente**, estilo SVG rim-lit.
 - Chefes distintos por mundo · mãe = **Aurora** · final = **luta + cena
   narrativa** · música = **B** (drone + melodia esparsa).
 - **Estilo de arte:** manter **vetorial** (SVG rim-lit). Pixel-art fica

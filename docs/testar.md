@@ -80,6 +80,7 @@ em `assets/audio/`. A seguir, no editor (ou `--import`) o Godot reimporta;
 | Dash | K | botão de ação (baixo) |
 | Rolar | ↓ | botão de ação (esquerda) |
 | Defender (escudo, depois de o apanhar) — hold | L ou botão direito do rato | botão de ação (meio-esq.) |
+| Projétil mágico (depois de o apanhar) | U ou clique esquerdo; mira com A/D + W/S (8 direções) | botão de ação |
 | Diário de pistas | I ou Tab | botão canto sup. direito |
 | Fechar diário | Esc | (toca fora / botão) |
 | Pausa | P | botão abaixo do diário |

@@ -7,6 +7,7 @@ extends CharacterBody2D
 
 signal morreu
 signal vida_mudou(atual: int, maximo: int)
+signal energia_mudou(atual: float, maximo: float)
 
 const VIDA_MAXIMA := 100
 const DANO_ATAQUE := 25
@@ -22,6 +23,14 @@ const I_FRAMES := 0.6
 ## ataque que venha de frente é bloqueado (sem dano) com um som subtil.
 const VEL_DEFESA := 70.0
 const BLOQUEIO_IFRAMES := 0.14
+## Projétil mágico (habilidade "projetil"): lança em 8 direções, bate igual
+## à espada. Gasta uma fração da barra de Energia, que regenera com o
+## tempo. 3 disparos antes de esvaziar (33% cada).
+const ENERGIA_MAX := 99.0
+const CUSTO_PROJETIL := 33.0
+const REGEN_ENERGIA := 22.0   # por segundo (barra cheia em ~4.5 s)
+const DUR_LANCAR := 0.16
+const PROJETIL_MAGICO := preload("res://scenes/actors/ProjetilKoliani.tscn")
 ## Abaixo deste Y considera-se que caiu no vazio (fosso sem fundo).
 const Y_MORTE := 1200.0
 const TEX_IMPACTO := preload("res://assets/sprites/impacto.svg")
@@ -46,6 +55,8 @@ var _ataque_restante := 0.0
 var _invulneravel := 0.0
 var _estava_no_chao := true
 var _defendendo := false
+var _energia := ENERGIA_MAX
+var _lancar_restante := 0.0
 
 # animação procedural (visual, corre em _process)
 var _mat: ShaderMaterial
@@ -63,12 +74,19 @@ func _ready() -> void:
 	if _corpo:
 		_mat = _corpo.material as ShaderMaterial
 	vida_mudou.emit(vida, VIDA_MAXIMA)
+	energia_mudou.emit(_energia, ENERGIA_MAX)
 
 
 func _physics_process(dt: float) -> void:
 	_dash_recarga = maxf(0.0, _dash_recarga - dt)
 	_rolar_recarga = maxf(0.0, _rolar_recarga - dt)
 	_invulneravel = maxf(0.0, _invulneravel - dt)
+	_lancar_restante = maxf(0.0, _lancar_restante - dt)
+
+	# a barra de Energia regenera-se sozinha depois de usada
+	if _energia < ENERGIA_MAX:
+		_energia = minf(ENERGIA_MAX, _energia + REGEN_ENERGIA * dt)
+		energia_mudou.emit(_energia, ENERGIA_MAX)
 
 	var dir := Input.get_axis("mover_esquerda", "mover_direita")
 	if dir != 0.0 and _rolar_restante <= 0.0:
@@ -87,6 +105,14 @@ func _physics_process(dt: float) -> void:
 			_hitbox.monitoring = false
 	elif not _defendendo and _rolar_restante <= 0.0 and Input.is_action_just_pressed("atacar"):
 		_iniciar_ataque()
+
+	# projétil mágico -- 8 direções, custa 33% da Energia, bate igual à espada
+	if not _defendendo and _lancar_restante <= 0.0 \
+			and _rolar_restante <= 0.0 and _dash_restante <= 0.0 \
+			and EstadoJogo.tem_habilidade("projetil") \
+			and Input.is_action_just_pressed("lancar") \
+			and _energia >= CUSTO_PROJETIL:
+		_lancar_projetil()
 
 	# estados exclusivos de movimento: rolamento > dash > movimento normal
 	if _rolar_restante > 0.0:
@@ -256,6 +282,26 @@ func _iniciar_ataque() -> void:
 	if _hitbox:
 		_hitbox.scale.x = _olha_para
 		_hitbox.monitoring = true
+
+
+## Lança um projétil mágico numa das 8 direções (mira = eixos de movimento
+## + W/S; sem mira, para onde está virada). Já validado que há Energia.
+func _lancar_projetil() -> void:
+	_energia -= CUSTO_PROJETIL
+	energia_mudou.emit(_energia, ENERGIA_MAX)
+	_lancar_restante = DUR_LANCAR
+	_pop = 1.0
+	var ax := Input.get_action_strength("mover_direita") - Input.get_action_strength("mover_esquerda")
+	var ay := Input.get_action_strength("mirar_baixo") - Input.get_action_strength("mirar_cima")
+	var aim := Movimento.direcao_mira(ax, ay, _olha_para)
+	var p := PROJETIL_MAGICO.instantiate()
+	get_parent().add_child(p)
+	p.global_position = global_position + aim * 20.0 + Vector2(0.0, -4.0)
+	p.lancar(aim, DANO_ATAQUE)
+	Som.toca("projetil", -12.0, 1.25)
+	if _faiscas:
+		_faiscas.position.x = absf(_faiscas.position.x) * signf(aim.x if aim.x != 0.0 else _olha_para)
+		_faiscas.restart()
 
 
 func _ao_acertar_corpo(corpo: Node) -> void:

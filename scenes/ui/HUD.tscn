@@ -27,6 +27,13 @@ corner_radius_top_right = 2
 corner_radius_bottom_right = 2
 corner_radius_bottom_left = 2
 
+[sub_resource type="StyleBoxFlat" id="sb_energia"]
+bg_color = Color(0.35, 0.78, 0.95, 1)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
 [node name="HUD" type="CanvasLayer"]
 layer = 11
 script = ExtResource("1_hud")
@@ -47,12 +54,28 @@ max_value = 100.0
 value = 100.0
 show_percentage = false
 
+[node name="Energia" type="Control" parent="."]
+anchors_preset = 0
+offset_left = 24.0
+offset_top = 46.0
+offset_right = 204.0
+offset_bottom = 60.0
+
+[node name="Barra" type="ProgressBar" parent="Energia"]
+offset_right = 180.0
+offset_bottom = 13.0
+theme_override_styles/background = SubResource("sb_fundo")
+theme_override_styles/fill = SubResource("sb_energia")
+max_value = 99.0
+value = 99.0
+show_percentage = false
+
 [node name="Vidas" type="Control" parent="."]
 anchors_preset = 0
 offset_left = 24.0
-offset_top = 52.0
+offset_top = 66.0
 offset_right = 120.0
-offset_bottom = 78.0
+offset_bottom = 92.0
 
 [node name="Label" type="Label" parent="Vidas"]
 offset_right = 96.0
@@ -106,6 +129,12 @@ position = Vector2(870, 470)
 shape = SubResource("RectangleShape2D_botao")
 visibility_mode = 1
 action = &"defender"
+
+[node name="Lancar" type="TouchScreenButton" parent="Toque"]
+position = Vector2(740, 540)
+shape = SubResource("RectangleShape2D_botao")
+visibility_mode = 1
+action = &"lancar"
 
 [node name="Diario" type="TouchScreenButton" parent="Toque"]
 position = Vector2(1180, 24)

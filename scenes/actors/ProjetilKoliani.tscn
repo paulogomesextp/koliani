@@ -1,0 +1,45 @@
+[gd_scene load_steps=5 format=3 uid="uid://bkolianiprojkoliani01"]
+
+; Projétil mágico da Koliani (habilidade "projetil"). Bate igual à espada e
+; parte-se contra inimigos ou cenário. collision_mask = 5 -> "mundo" (1) +
+; "inimigos" (4); collision_layer = 0 (não é sólido, só deteta).
+
+[ext_resource type="Script" path="res://scripts/projetil_koliani.gd" id="1_proj"]
+
+[sub_resource type="CircleShape2D" id="cs_proj"]
+radius = 9.0
+
+[sub_resource type="Gradient" id="grad_luz"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="tex_luz"]
+gradient = SubResource("grad_luz")
+width = 128
+height = 128
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[node name="ProjetilKoliani" type="Area2D"]
+collision_layer = 0
+collision_mask = 5
+script = ExtResource("1_proj")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("cs_proj")
+
+[node name="Luz" type="PointLight2D" parent="."]
+texture = SubResource("tex_luz")
+energy = 1.3
+color = Color(1, 0.5, 0.95, 1)
+scale = Vector2(0.7, 0.7)
+
+[node name="Halo" type="Polygon2D" parent="."]
+show_behind_parent = true
+color = Color(0.95, 0.45, 0.96, 0.38)
+polygon = PackedVector2Array(-13, 0, -3, -7, 12, 0, -3, 7)
+
+[node name="Nucleo" type="Polygon2D" parent="."]
+color = Color(1, 0.85, 0.99, 1)
+polygon = PackedVector2Array(-9, 0, -2, -4, 9, 0, -2, 4)

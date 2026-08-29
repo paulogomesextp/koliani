@@ -92,3 +92,15 @@ static func bloqueia_de_frente(dir_empurrao: float, olha_para: float) -> bool:
 	if dir_empurrao == 0.0:
 		return true
 	return signf(dir_empurrao) == -signf(olha_para)
+
+
+## Direção do projétil mágico a partir da mira: `ax`/`ay` são os eixos de
+## input (-1..1; ay negativo = cima). Devolve um dos 8 vetores unitários
+## (cima/baixo/lados/diagonais); sem mira nenhuma, dispara para onde a
+## Koliani está virada (`olha_para`). Puro para dar para testar headless.
+static func direcao_mira(ax: float, ay: float, olha_para: float) -> Vector2:
+	var x := signf(ax) if absf(ax) > 0.3 else 0.0
+	var y := signf(ay) if absf(ay) > 0.3 else 0.0
+	if x == 0.0 and y == 0.0:
+		return Vector2(signf(olha_para) if olha_para != 0.0 else 1.0, 0.0)
+	return Vector2(x, y).normalized()

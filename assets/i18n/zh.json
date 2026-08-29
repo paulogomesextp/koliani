@@ -29,6 +29,7 @@
 	"hud.ability.dash_aereo": "空中冲刺",
 	"hud.ability.partir_paredes": "破墙",
 	"hud.ability.escudo": "盾牌",
+	"hud.ability.projetil": "魔法弹",
 	"hud.new_ability": "新能力：%s",
 	"hud.clue_found": "找到线索  (%d)",
 
