@@ -29,11 +29,23 @@ corre a *cena aberta* (útil para testar um nível isolado).
 ```
 
 O jogo arranca no **menu inicial** (`scenes/ui/MenuInicial.tscn`):
-*Continuar* (só aparece se houver progresso guardado), *Novo jogo* e
-*Sair*. Para saltar o menu e cair já no jogo (capturas, testes):
+
+- **NEW GAME** — campanha nova do mundo 1 (apaga o save; pede confirmação).
+- **LOAD GAME** — retoma o save (só aparece se houver progresso guardado).
+- **HARDCORE MODE** — campanha nova com **tempo limite por mundo**; se o
+  relógio (topo do ecrã) chegar a zero é *Game Over* e recomeça do mundo 1.
+  O relógio pára enquanto o jogo está em pausa / no diário.
+- **Sair**.
+
+Atalhos para saltar o menu (capturas, testes):
 ```
 & "C:\Users\paulo\Desktop\Godot_v4.7.2-stable_win64.exe" . -- --jogar
+& "C:\Users\paulo\Desktop\Godot_v4.7.2-stable_win64.exe" . -- --nivel=3
+& "C:\Users\paulo\Desktop\Godot_v4.7.2-stable_win64.exe" . -- --hardcore
+& "C:\Users\paulo\Desktop\Godot_v4.7.2-stable_win64.exe" . -- --hardcore --hc-tempo=15
 ```
+`--hc-tempo=N` força N segundos em todos os mundos (afinar / ver o Game
+Over depressa).
 
 ## Controlos
 

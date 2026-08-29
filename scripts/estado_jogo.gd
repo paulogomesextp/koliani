@@ -12,6 +12,11 @@ const CAMINHO_SAVE := "user://progresso.json"
 
 const VIDAS_INICIAIS := 3
 
+## Modo hardcore: tempo (segundos) para completar cada mundo. Ao esgotar ->
+## Game Over e a campanha recomeça do mundo 1. Números de partida -- afinar
+## com o jogo a correr.
+const TEMPO_HARDCORE := [90.0, 120.0, 120.0, 150.0]
+
 ## Sequencia fixa de mundos ate ao Zeriko (platformer por niveis, nao
 ## roguelite). O agente "gaming" acrescenta/renomeia niveis aqui a medida
 ## que os desenha; a ordem desta lista E a ordem da campanha.
@@ -35,6 +40,15 @@ var indice_nivel: int = 0
 var checkpoint: Vector2 = Vector2.ZERO
 var habilidades: Array[String] = []
 var pistas: Array[String] = []
+## Campanha a decorrer em modo hardcore (tempo limite por mundo). Fica
+## gravada no save -- um LOAD GAME retoma no mesmo modo. O menu inicial é
+## que a liga/desliga; `reiniciar_campanha()` de propósito NÃO lhe mexe
+## (assim o Game Over do hardcore recomeça já em hardcore).
+var hardcore: bool = false
+
+## Posto a true pelos testes (ver tests/run_tests.gd) para NÃO tocar no
+## ficheiro de save real ao instanciar o estado fora do jogo.
+var modo_teste: bool = false
 
 
 func _ready() -> void:
@@ -49,6 +63,11 @@ func caminho_nivel_atual() -> String:
 
 func ha_proximo_nivel() -> bool:
 	return indice_nivel + 1 < NIVEIS.size()
+
+
+## Tempo limite (segundos) do mundo atual em modo hardcore.
+func tempo_hardcore_nivel() -> float:
+	return TEMPO_HARDCORE[clampi(indice_nivel, 0, TEMPO_HARDCORE.size() - 1)]
 
 
 func avancar_nivel() -> void:
@@ -70,11 +89,10 @@ func sem_vidas() -> bool:
 	return vidas <= 0
 
 
-## Há um save no disco E com progresso feito (não é um arranque limpo)?
-## Usado pelo menu inicial para decidir se mostra "Continuar".
+## Há progresso feito (não é um arranque limpo)? O estado já foi carregado
+## do save em `_ready`, por isso basta olhar para os campos. Usado pelo
+## menu inicial para decidir se mostra o "LOAD GAME".
 func ha_progresso() -> bool:
-	if not FileAccess.file_exists(CAMINHO_SAVE):
-		return false
 	return indice_nivel > 0 or checkpoint != Vector2.ZERO \
 		or not habilidades.is_empty() or not pistas.is_empty()
 
@@ -127,6 +145,7 @@ func para_dicionario() -> Dictionary:
 		"checkpoint": [checkpoint.x, checkpoint.y],
 		"habilidades": habilidades,
 		"pistas": pistas,
+		"hardcore": hardcore,
 	}
 
 
@@ -137,9 +156,12 @@ func de_dicionario(d: Dictionary) -> void:
 	checkpoint = Vector2(c[0], c[1]) if c.size() == 2 else Vector2.ZERO
 	habilidades.assign(d.get("habilidades", []))
 	pistas.assign(d.get("pistas", []))
+	hardcore = bool(d.get("hardcore", false))
 
 
 func guardar() -> void:
+	if modo_teste:
+		return
 	var f := FileAccess.open(CAMINHO_SAVE, FileAccess.WRITE)
 	if f == null:
 		push_warning("Nao consegui gravar o progresso em %s" % CAMINHO_SAVE)
@@ -149,6 +171,8 @@ func guardar() -> void:
 
 
 func carregar() -> void:
+	if modo_teste:
+		return
 	if not FileAccess.file_exists(CAMINHO_SAVE):
 		return
 	var f := FileAccess.open(CAMINHO_SAVE, FileAccess.READ)

@@ -38,6 +38,7 @@ func _correr_tudo() -> void:
 	teste_estado_nivel_atual_e_caminho_valido()
 	teste_estado_save_ida_e_volta()
 	teste_estado_ha_progresso()
+	teste_estado_hardcore()
 
 	if _falhas.is_empty():
 		print("OK -- todos os testes passaram")
@@ -55,9 +56,11 @@ func _ok(condicao: bool, mensagem: String) -> void:
 
 
 ## Instancia estado_jogo.gd fora da arvore (nao chama _ready, logo nao le o
-## save do disco) e reinicia a campanha para um ponto conhecido.
+## save do disco), poe modo_teste (nao grava nada no disco) e reinicia a
+## campanha para um ponto conhecido.
 func _novo_estado() -> Node:
 	var e: Node = EstadoJogoScript.new()
+	e.modo_teste = true
 	e.reiniciar_campanha()
 	return e
 
@@ -238,3 +241,28 @@ func teste_estado_ha_progresso() -> void:
 	e.reiniciar_campanha()
 	_ok(not e.ha_progresso(), "reiniciar a campanha volta a 'sem progresso'")
 	e.free()
+
+
+## Modo hardcore: a flag sobrevive ao save, `reiniciar_campanha()` NÃO lhe
+## mexe (o Game Over recomeça já em hardcore), e o tempo por mundo é
+## positivo e limitado aos 4 mundos.
+func teste_estado_hardcore() -> void:
+	var e := _novo_estado()
+	_ok(not e.hardcore, "arranque normal não é hardcore")
+	e.hardcore = true
+	e.reiniciar_campanha()
+	_ok(e.hardcore, "reiniciar_campanha() não deve desligar o hardcore")
+
+	var copia := _novo_estado()
+	copia.de_dicionario(e.para_dicionario())
+	_ok(copia.hardcore, "a flag hardcore devia sobreviver ao save")
+
+	e.indice_nivel = 0
+	var t0: float = e.tempo_hardcore_nivel()
+	e.indice_nivel = 99  # fora dos limites -> usa o último mundo
+	var tn: float = e.tempo_hardcore_nivel()
+	_ok(t0 > 0.0 and tn > 0.0, "o tempo hardcore de cada mundo é positivo")
+	_ok(tn == e.TEMPO_HARDCORE[e.TEMPO_HARDCORE.size() - 1],
+		"índice fora dos limites cai no tempo do último mundo")
+	e.free()
+	copia.free()

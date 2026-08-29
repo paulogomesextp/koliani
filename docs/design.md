@@ -124,8 +124,27 @@ Autoload `EstadoJogo`. Guarda em `user://progresso.json`:
 - `desbloquear_habilidade(id)` / `tem_habilidade(id)` -- `koliani.gd` lê
   `salto_duplo` e `dash_aereo`; `partir_paredes` é lido pela
   `scripts/parede_fragil.gd` (não precisa de nada no `koliani.gd`).
-- `ha_progresso()` -- há save no disco com progresso feito? (usado pelo
-  menu inicial para mostrar/esconder o "Continuar").
+- `ha_progresso()` -- há progresso feito? (usado pelo menu inicial para
+  mostrar/esconder o "LOAD GAME"). Olha só para os campos -- o save já foi
+  lido em `_ready`.
+- `hardcore` (bool, gravado) -- campanha em modo hardcore. `TEMPO_HARDCORE`
+  = tempo (s) por mundo; `tempo_hardcore_nivel()` devolve o do mundo atual.
+  `reiniciar_campanha()` de propósito NÃO lhe mexe (o Game Over recomeça já
+  em hardcore); o menu inicial é que liga/desliga.
+- `modo_teste` (bool) -- posto pelos testes; `guardar()`/`carregar()` viram
+  no-op para não tocar no save real.
+
+### Modo hardcore
+
+`scripts/relogio_hardcore.gd` (CanvasLayer criado pelo `main.gd` só quando
+`EstadoJogo.hardcore`): relógio no topo do ecrã a contar para trás desde
+`tempo_hardcore_nivel()`. Herda o `process_mode` do Main => pára quando a
+árvore está em pausa (menu de pausa, diário). Reinicia a cada carga de cena
+(uma morte com respawn dá relógio novo -- ver dúvidas). A zero instancia
+`scripts/game_over.gd`, que pausa, mostra "GAME OVER" e -- a saltar/atacar
+-- faz `reiniciar_campanha()` (mantém o hardcore) e volta ao mundo 1.
+Dev: `godot . -- --hardcore` (campanha hardcore nova) e `-- --hc-tempo=N`
+(força N s por mundo, para afinar/testar o Game Over).
 - `registar_pista(id)` -- chamado pelas `Porta` e pelos `Coletavel`. O
   texto legível de cada id está em `scripts/diario_pistas.gd`.
 
@@ -160,11 +179,17 @@ Autoload `EstadoJogo`. Guarda em `user://progresso.json`:
   a pausa não abrem um por cima do outro (ambos só abrem se
   `get_tree().paused` for falso).
 - ~~**Menu inicial / ecrã de título**~~ -- feito (`scripts/menu_inicial.gd`
-  + `scenes/ui/MenuInicial.tscn`, é a `main_scene`). *Continuar* só aparece
-  se `EstadoJogo.ha_progresso()`; *Novo jogo* pede confirmação antes de
-  apagar um save. `godot . -- --jogar` (ou `-- --foto...`) salta o menu.
-  Falta: arte a sério, música no menu, e decidir se o fim da campanha
-  volta ao menu em vez de reiniciar já (ver dúvidas).
+  + `scenes/ui/MenuInicial.tscn`, é a `main_scene`): **NEW GAME**,
+  **LOAD GAME** (só se `ha_progresso()`), **HARDCORE MODE**, *Sair*.
+  NEW GAME / HARDCORE pedem confirmação se houver save por cima.
+  `godot . -- --jogar` / `-- --nivel=N` / `-- --hardcore` saltam o menu.
+  Falta: arte a sério e música própria do menu (por agora usa o drone do
+  mundo 1).
+- ~~**Modo hardcore**~~ -- feito (tempo limite por mundo; Game Over
+  recomeça do mundo 1). Falta: **afinar `EstadoJogo.TEMPO_HARDCORE`** com o
+  jogo a correr, e decidir se uma morte com respawn devia manter o tempo
+  em vez de o reiniciar (ver dúvidas).
+- ~~Fim da campanha~~ -- volta ao **menu inicial** sem apagar o save.
 - **Afinar todos os níveis e chefes com o jogo a correr** (distâncias de
   salto, ritmo, dano, posições) -- os 4 mundos foram montados sem playtest.
 - Sprites + áudio (CC0) -- o Paulo autorizou; por integrar.

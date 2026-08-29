@@ -55,12 +55,14 @@ scripts/
   chefe_carcereiro.gd  -- chefe M2 -- Carcereiro: salto + onda de choque rasteira
   chefe_vento.gd       -- chefe M3 -- Uivo: voa, paira, mira e mergulha
   zeriko.gd            -- chefe M4 -- Zeriko: teleporta e dispara projeteis; 2.a fase < 50% vida
+  relogio_hardcore.gd  -- modo hardcore: conta o tempo do mundo; a zero -> game_over.gd
+  game_over.gd         -- cartao "GAME OVER" do hardcore; recomeca a campanha do mundo 1
   projetil_zeriko.gd   -- bola de energia do Zeriko (Area2D em linha reta)
   parede_fragil.gd     -- StaticBody2D: parte-se a golpe se a Koliani tiver "partir_paredes"
   nivel_com_chefe.gd   -- no raiz de M1-M3: sela a porta ate o no "Chefe" cair
   nivel_castelo.gd     -- no raiz de M4: sem porta -- ao "derrotado" do Zeriko arranca a cena final
-  cena_final.gd        -- cena narrativa (libertacao da Aurora); no fim recomeca a campanha
-  fim_campanha.gd      -- (legado) cartao de fim usado pela porta quando nao ha proximo nivel
+  cena_final.gd        -- cena narrativa (libertacao da Aurora); no fim volta ao menu inicial
+  fim_campanha.gd      -- (legado) cartao de fim usado pela porta quando nao ha proximo nivel; volta ao menu
   atmosfera.gd         -- montagem de ambiente reutilizavel (CanvasModulate + parallax + vinheta + luzes), cores por @export
   coletavel.gd         -- Area2D: apanhar => regista pista / desbloqueia habilidade; nao reaparece
   porta.gd             -- Area2D: avanca para o mundo seguinte / termina a campanha
@@ -77,8 +79,8 @@ scripts/
   atmosfera.gd         -- pinta o ambiente (modulate/parallax/luzes) + poeira segue a camara
   plataforma.gd        -- @tool: plataforma reutilizavel (colisao + shader) por "tamanho"
   controlos_toque.gd   -- HUD: vida sempre visivel; botoes de toque so em ecra tactil
-  menu_inicial.gd      -- MENU INICIAL (main_scene): continuar / novo jogo / sair; `-- --jogar` salta-o
-  main.gd              -- cena de jogo: carrega o nivel atual + HUD + diario + pausa; atalhos de debug (F1-F9)
+  menu_inicial.gd      -- MENU INICIAL (main_scene): NEW GAME / LOAD GAME / HARDCORE MODE / Sair; `-- --jogar` salta-o
+  main.gd              -- cena de jogo: carrega o nivel atual + HUD + diario + pausa (+ relogio no hardcore); debug F1-F9
 
 scenes/
   Main.tscn                        -- main_scene (ver project.godot)
@@ -155,13 +157,20 @@ SDK) -- ajustar pelo log do Actions.
   com o Zeriko + cena da Aurora (M4). Chefes distintos nos 4 mundos.
   Diário de pistas funcional (7 pistas escritas).
 - **Menu inicial** (`scripts/menu_inicial.gd` + `scenes/ui/MenuInicial.tscn`,
-  agora a `main_scene`): título + *Continuar* (só se houver progresso) /
-  *Novo jogo* (pede confirmação se apagar um save) / *Sair*. `-- --jogar`
-  salta o menu (mantém as capturas `--foto` a funcionar).
+  a `main_scene`): **NEW GAME** (campanha nova, apaga o save com
+  confirmação), **LOAD GAME** (retoma o save; só aparece se houver
+  progresso), **HARDCORE MODE** (campanha nova com tempo limite por mundo)
+  e *Sair*. `-- --jogar` / `-- --nivel=N` / `-- --hardcore` saltam o menu.
+- **Modo hardcore**: `EstadoJogo.hardcore` (gravado no save). Cada mundo
+  tem um tempo (`EstadoJogo.TEMPO_HARDCORE`, ponto de partida) mostrado por
+  `relogio_hardcore.gd` (relógio no topo; pára quando o jogo está em
+  pausa). Ao esgotar -> `game_over.gd` e a campanha recomeça do mundo 1,
+  ainda em hardcore. Dev: `-- --hc-tempo=N` força N segundos por mundo.
+- **Fim da campanha** volta ao **menu inicial** (o save fica como está --
+  o jogador escolhe NEW GAME / LOAD GAME / HARDCORE MODE).
 - **Menu de pausa** (`scripts/pausa.gd` + `scenes/ui/Pausa.tscn`): P ou
   botão do HUD; pausa a árvore; continuar / recomeçar no checkpoint / menu
-  principal / sair. Verificado no build Web (abrir, fechar, recomeçar e
-  voltar ao menu com fade).
+  principal / sair. Verificado no build Web.
 - **Playtest do Paulo em curso.** Corrigido já: chefe atirava-se para um
   fosso e ficava o nível bloqueado (rede de segurança em `chefe_base.gd`
   + inimigos viram na beira via `ha_chao_a_frente`); atalhos F1-F9 agora

@@ -1,6 +1,7 @@
 extends CanvasLayer
 ## Cena narrativa do fim da campanha: mostra as linhas uma a uma (avança a
-## saltar/atacar) e no fim recomeça a campanha. Instanciada por
+## saltar/atacar) e no fim volta ao menu inicial (o save fica como está --
+## o jogador escolhe NEW GAME / LOAD GAME / HARDCORE MODE). Instanciada por
 ## `nivel_castelo.gd` quando o Zeriko cai.
 
 const LINHAS := [
@@ -40,7 +41,7 @@ func _ready() -> void:
 
 
 func _mostrar() -> void:
-	var dica := "\n\n(saltar / atacar)" if _i < LINHAS.size() - 1 else "\n\n(saltar / atacar: recomeçar)"
+	var dica := "\n\n(saltar / atacar)" if _i < LINHAS.size() - 1 else "\n\n(saltar / atacar: voltar ao menu)"
 	_label.text = LINHAS[_i] + dica
 
 
@@ -52,8 +53,7 @@ func _process(dt: float) -> void:
 		_i += 1
 		if _i >= LINHAS.size():
 			get_tree().paused = false
-			EstadoJogo.reiniciar_campanha()
-			get_tree().change_scene_to_file("res://scenes/Main.tscn")
+			get_tree().change_scene_to_file("res://scenes/ui/MenuInicial.tscn")
 		else:
 			_t = 0.0
 			_mostrar()

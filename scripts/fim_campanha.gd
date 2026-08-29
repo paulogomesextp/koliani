@@ -1,7 +1,7 @@
 extends CanvasLayer
 ## Cartão de fim de campanha (provisório). Aparece quando se atravessa a
-## última porta; o jogo fica em pausa e um toque em saltar/atacar recomeça
-## a campanha. Substituir por uma cena de final a sério quando o mundo 4
+## última porta; o jogo fica em pausa e um toque em saltar/atacar volta ao
+## menu inicial. Substituir por uma cena de final a sério quando o mundo 4
 ## (Castelo de Zeriko) existir.
 
 func _ready() -> void:
@@ -14,7 +14,7 @@ func _ready() -> void:
 	add_child(fundo)
 
 	var texto := Label.new()
-	texto.text = "A última porta cede.\nKoliani encontra a mãe.\n\n— fim do que existe por agora —\n\n(saltar / atacar: recomeçar)"
+	texto.text = "A última porta cede.\nKoliani encontra a mãe.\n\n— fim do que existe por agora —\n\n(saltar / atacar: voltar ao menu)"
 	texto.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	texto.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	texto.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -27,5 +27,4 @@ func _ready() -> void:
 func _process(_dt: float) -> void:
 	if Input.is_action_just_pressed("saltar") or Input.is_action_just_pressed("atacar"):
 		get_tree().paused = false
-		EstadoJogo.reiniciar_campanha()
-		get_tree().change_scene_to_file("res://scenes/Main.tscn")
+		get_tree().change_scene_to_file("res://scenes/ui/MenuInicial.tscn")
