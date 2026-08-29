@@ -5,6 +5,8 @@
 
   - game_over.wav       voz de "GAME OVER" estilo speaker de arcada (síntese
                         de formantes, grave, com grão e cauda de reverb)
+  - menu.wav            tema do menu inicial: lento, pad + melodia esparsa
+                        de sino, fantasmagórico e calmo (loop de 16 s)
   - boss.wav            cama de música do chefe final: mais rápida, mais
                         alta, fantasmagórica (loop de 8 s)
   - assombracao.wav     ruídos de casa assombrada para pôr por baixo da
@@ -156,6 +158,68 @@ def game_over_voz():
     for n in range(N - fo, N):
         buf[n] *= (N - n) / fo
     escrever("game_over.wav", buf, 0.97)
+
+
+# --------------------------------------------------------------------------
+# 1b) TEMA DO MENU  (loop 16 s, lento e calmo -- "drone + melodia esparsa")
+# --------------------------------------------------------------------------
+def menu_loop():
+    random.seed(909)
+    dur = 16.0
+    cf = int(0.5 * FS)
+    N = int(dur * FS)
+    total = N + cf
+    buf = [0.0] * total
+
+    def nota(semi):
+        return 146.83 * (2.0 ** (semi / 12.0))  # a partir de Re3
+
+    frigia = [0, 3, 5, 7, 10, 12, 15]
+
+    # pad: tres vozes (unissono/quinta/oitava) com vibrato lento e swell
+    for n in range(total):
+        t = n / FS
+        vib = 1.0 + 0.003 * math.sin(2 * math.pi * 0.13 * t)
+        p = 0.0
+        for k, semi in enumerate((-12, -5, 0)):
+            fp = nota(semi) * vib * (1.0 + 0.002 * k)
+            p += math.sin(2 * math.pi * fp * t + k * 1.7)
+        swell = 0.55 + 0.45 * math.sin(2 * math.pi * (t / dur) * 2.0 - 1.2)
+        buf[n] += p * 0.07 * swell
+
+    # melodia esparsa: notas de "sino" (sino = seno + parcial 2.76 + decay)
+    melodia = [(0.5, 12), (2.0, 15), (3.5, 10), (6.0, 7), (8.5, 12),
+               (10.0, 17), (12.0, 10), (13.5, 8), (14.5, 5)]
+    for t0, semi in melodia:
+        f = nota(semi)
+        dur_n = 2.2
+        for n in range(int(t0 * FS), min(total, int((t0 + dur_n) * FS))):
+            tt = n / FS - t0
+            env = math.exp(-tt * 1.9)
+            s = math.sin(2 * math.pi * f * tt)
+            s += 0.5 * math.sin(2 * math.pi * f * 2.76 * tt) * math.exp(-tt * 3.5)
+            s += 0.25 * math.sin(2 * math.pi * f * 5.4 * tt) * math.exp(-tt * 6.0)
+            buf[n] += s * env * 0.16
+
+    # sopro de vento muito ao fundo
+    rw = Reson()
+    lp = 0.0
+    for n in range(total):
+        t = n / FS
+        x = random.uniform(-1, 1)
+        lp += 0.04 * (x - lp)
+        s = rw.passo(lp, 420 + 150 * math.sin(2 * math.pi * 0.03 * t), 260.0)
+        buf[n] += s * 0.12
+
+    # passa-baixo geral (suave)
+    lp = 0.0
+    alp = math.exp(-2 * math.pi * 4200 / FS)
+    for n in range(total):
+        lp += (1 - alp) * (buf[n] - lp)
+        buf[n] = math.tanh(lp * 1.1)
+
+    buf = enrolar(buf, N, cf)
+    escrever("menu.wav", buf, 0.85)
 
 
 # --------------------------------------------------------------------------
@@ -363,6 +427,7 @@ def demonio_ataque():
 
 if __name__ == "__main__":
     game_over_voz()
+    menu_loop()
     boss_loop()
     assombracao_loop()
     demonio_ataque()

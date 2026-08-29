@@ -34,7 +34,7 @@ func _ready() -> void:
 	if _tratar_atalhos_dev():
 		return
 
-	Musica.ambiente(0)  # drone de ambiente por baixo do título
+	Musica.menu()  # tema próprio do menu (por baixo do título)
 	_aviso.visible = false
 
 	_novo.pressed.connect(_ao_novo)

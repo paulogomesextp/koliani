@@ -12,6 +12,7 @@ extends Node
 ## cortar entre recargas de cena. Tudo encaminha para o bus "Music".
 
 const CAMINHO := "res://assets/audio/ambiente.wav"
+const CAMINHO_MENU := "res://assets/audio/menu.wav"
 const CAMINHO_BOSS := "res://assets/audio/boss.wav"
 const CAMINHO_ASSOMBRACAO := "res://assets/audio/assombracao.wav"
 
@@ -42,6 +43,23 @@ func _ready() -> void:
 	if ResourceLoader.exists(CAMINHO_ASSOMBRACAO):
 		_amb.stream = load(CAMINHO_ASSOMBRACAO)
 		_amb.play()
+
+
+## Tema do menu inicial (lento, pad + melodia esparsa). A camada de
+## assombração fica por baixo, como nos mundos.
+func menu() -> void:
+	if _amb.stream and not _amb.playing:
+		_amb.play()
+	if _p.playing and _caminho_atual == CAMINHO_MENU:
+		return
+	if not ResourceLoader.exists(CAMINHO_MENU):
+		return
+	_p.stream = load(CAMINHO_MENU)
+	_p.pitch_scale = 1.0
+	_p.volume_db = VOL_CAMA
+	_caminho_atual = CAMINHO_MENU
+	_pitch_atual = 1.0
+	_p.play()
 
 
 func ambiente(indice_nivel: int) -> void:
