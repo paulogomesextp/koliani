@@ -38,6 +38,11 @@ const PISTAS := {
 		"titulo": "Um sussurro no vento",
 		"texto": "Atrás da parede rachada, gravado à pressa: \"Ele guarda-me para o fim, Kol. Chega antes disso.\"",
 	},
+	"castelo_aurora_livre": {
+		"mundo": "Castelo de Zeriko",
+		"titulo": "Aurora",
+		"texto": "A lanterna-jaula partiu-se. A mãe -- Aurora -- está livre. Saem juntas pela última porta.",
+	},
 }
 
 
