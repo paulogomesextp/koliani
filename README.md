@@ -154,9 +154,15 @@ com a versão mais recente:
 extrai e corre `Koliani.exe` (SmartScreen: *Mais informações* -> *Executar
 mesmo assim*; é um `.exe` não assinado).
 
+**Publicar num clique:** `publicar.bat` (atalho **"Publicar Koliani"** no
+Ambiente de Trabalho, via `criar-atalho.ps1`) sobe o patch de
+`config/version`, faz `commit` de tudo e `push`. É o que dispara o ciclo
+acima quando as alterações foram feitas no editor. Sessões do agente
+fazem o `push` sozinhas.
+
 **Versão:** o número no canto do menu (`config/version` em `project.godot`,
-lido em `scripts/menu_inicial.gd`) identifica a build -- bumpar a cada
-entrega para o feedback ser rastreável.
+lido em `scripts/menu_inicial.gd`) identifica a build -- o `publicar.bat`
+sobe-o automaticamente para o feedback ser rastreável.
 
 **Save do amigo:** `%APPDATA%\Godot\app_userdata\Koliani\progresso.json`
 (apagar = recomeçar; o F9 de dev não existe na build release).
