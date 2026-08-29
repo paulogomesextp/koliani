@@ -1,6 +1,7 @@
 extends Node2D
-## Lógica própria do mundo 1: a `Porta` para o mundo seguinte fica selada
-## até o `Chefe` da Floresta cair.
+## Script para o nó raiz de um mundo com chefe: a `Porta` para o mundo
+## seguinte fica selada (`monitoring = false` + tom escuro) até o nó
+## `Chefe` emitir `derrotado`. Se não houver `Chefe`, a porta abre já.
 
 @onready var _porta: Area2D = $Porta
 @onready var _chefe: Node = get_node_or_null("Chefe")

@@ -1,0 +1,326 @@
+[gd_scene load_steps=18 format=3 uid="uid://bkolianiprisao01"]
+
+; Mundo 2 -- Prisao dos Condenados.
+; Masmorra, correntes, celas; azul-frio. A Koliani ja tem salto duplo (do
+; mundo 1), por isso o nivel pede-o: fossos e uma subida longa. Greybox --
+; ColorRect + Atmosfera.tscn recolorida.
+
+[ext_resource type="PackedScene" uid="uid://bkolianiactor01" path="res://scenes/actors/Koliani.tscn" id="1_kol"]
+[ext_resource type="PackedScene" uid="uid://bdemoniobase01" path="res://scenes/actors/DemonioBase.tscn" id="2_dem"]
+[ext_resource type="PackedScene" uid="uid://bkolianicoletavel01" path="res://scenes/actors/Coletavel.tscn" id="3_col"]
+[ext_resource type="Script" path="res://scripts/porta.gd" id="4_porta"]
+[ext_resource type="Script" path="res://scripts/checkpoint.gd" id="5_chk"]
+[ext_resource type="PackedScene" uid="uid://bkolianichefefloresta01" path="res://scenes/actors/ChefeFloresta.tscn" id="6_chefe"]
+[ext_resource type="Script" path="res://scripts/nivel_com_chefe.gd" id="7_niv"]
+[ext_resource type="PackedScene" uid="uid://bkolianiatmosfera01" path="res://scenes/fx/Atmosfera.tscn" id="8_atm"]
+
+[sub_resource type="RectangleShape2D" id="rs_chao_i"]
+size = Vector2(900, 48)
+
+[sub_resource type="RectangleShape2D" id="rs_chao_m"]
+size = Vector2(480, 48)
+
+[sub_resource type="RectangleShape2D" id="rs_chao_f"]
+size = Vector2(520, 48)
+
+[sub_resource type="RectangleShape2D" id="rs_plat_p"]
+size = Vector2(140, 26)
+
+[sub_resource type="RectangleShape2D" id="rs_plat_m"]
+size = Vector2(160, 26)
+
+[sub_resource type="RectangleShape2D" id="rs_porta"]
+size = Vector2(48, 96)
+
+[sub_resource type="RectangleShape2D" id="rs_chk"]
+size = Vector2(40, 80)
+
+[sub_resource type="Gradient" id="grad_luz"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="tex_luz"]
+gradient = SubResource("grad_luz")
+width = 256
+height = 256
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[node name="Prisao_dos_Condenados" type="Node2D"]
+script = ExtResource("7_niv")
+
+[node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
+cor_ambiente = Color(0.4, 0.44, 0.55, 1)
+cor_fundo = Color(0.04, 0.06, 0.1, 1)
+cor_silhueta = Color(0.08, 0.12, 0.18, 1)
+cor_luz = Color(0.35, 0.6, 0.85, 1)
+
+[node name="ChaoInicio" type="StaticBody2D" parent="."]
+position = Vector2(400, 660)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Corpo" type="ColorRect" parent="ChaoInicio"]
+offset_left = -450.0
+offset_top = -24.0
+offset_right = 450.0
+offset_bottom = 60.0
+color = Color(0.105, 0.125, 0.17, 1)
+
+[node name="Lip" type="ColorRect" parent="ChaoInicio"]
+offset_left = -450.0
+offset_top = -24.0
+offset_right = 450.0
+offset_bottom = -18.0
+color = Color(0.28, 0.36, 0.46, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ChaoInicio"]
+shape = SubResource("rs_chao_i")
+
+[node name="PlatVao" type="StaticBody2D" parent="."]
+position = Vector2(980, 470)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Corpo" type="ColorRect" parent="PlatVao"]
+offset_left = -80.0
+offset_top = -13.0
+offset_right = 80.0
+offset_bottom = 13.0
+color = Color(0.115, 0.135, 0.18, 1)
+
+[node name="Lip" type="ColorRect" parent="PlatVao"]
+offset_left = -80.0
+offset_top = -13.0
+offset_right = 80.0
+offset_bottom = -7.0
+color = Color(0.28, 0.36, 0.46, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PlatVao"]
+shape = SubResource("rs_plat_m")
+
+[node name="ChaoMeio" type="StaticBody2D" parent="."]
+position = Vector2(1350, 600)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Corpo" type="ColorRect" parent="ChaoMeio"]
+offset_left = -240.0
+offset_top = -24.0
+offset_right = 240.0
+offset_bottom = 60.0
+color = Color(0.105, 0.125, 0.17, 1)
+
+[node name="Lip" type="ColorRect" parent="ChaoMeio"]
+offset_left = -240.0
+offset_top = -24.0
+offset_right = 240.0
+offset_bottom = -18.0
+color = Color(0.28, 0.36, 0.46, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ChaoMeio"]
+shape = SubResource("rs_chao_m")
+
+[node name="PlatB" type="StaticBody2D" parent="."]
+position = Vector2(1250, 470)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Corpo" type="ColorRect" parent="PlatB"]
+offset_left = -70.0
+offset_top = -13.0
+offset_right = 70.0
+offset_bottom = 13.0
+color = Color(0.115, 0.135, 0.18, 1)
+
+[node name="Lip" type="ColorRect" parent="PlatB"]
+offset_left = -70.0
+offset_top = -13.0
+offset_right = 70.0
+offset_bottom = -7.0
+color = Color(0.28, 0.36, 0.46, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PlatB"]
+shape = SubResource("rs_plat_p")
+
+[node name="PlatC" type="StaticBody2D" parent="."]
+position = Vector2(1470, 360)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Corpo" type="ColorRect" parent="PlatC"]
+offset_left = -70.0
+offset_top = -13.0
+offset_right = 70.0
+offset_bottom = 13.0
+color = Color(0.115, 0.135, 0.18, 1)
+
+[node name="Lip" type="ColorRect" parent="PlatC"]
+offset_left = -70.0
+offset_top = -13.0
+offset_right = 70.0
+offset_bottom = -7.0
+color = Color(0.28, 0.36, 0.46, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PlatC"]
+shape = SubResource("rs_plat_p")
+
+[node name="PlatD" type="StaticBody2D" parent="."]
+position = Vector2(1670, 300)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Corpo" type="ColorRect" parent="PlatD"]
+offset_left = -80.0
+offset_top = -13.0
+offset_right = 80.0
+offset_bottom = 13.0
+color = Color(0.115, 0.135, 0.18, 1)
+
+[node name="Lip" type="ColorRect" parent="PlatD"]
+offset_left = -80.0
+offset_top = -13.0
+offset_right = 80.0
+offset_bottom = -7.0
+color = Color(0.28, 0.36, 0.46, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PlatD"]
+shape = SubResource("rs_plat_m")
+
+[node name="ChaoFim" type="StaticBody2D" parent="."]
+position = Vector2(1980, 320)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Corpo" type="ColorRect" parent="ChaoFim"]
+offset_left = -260.0
+offset_top = -24.0
+offset_right = 260.0
+offset_bottom = 60.0
+color = Color(0.105, 0.125, 0.17, 1)
+
+[node name="Lip" type="ColorRect" parent="ChaoFim"]
+offset_left = -260.0
+offset_top = -24.0
+offset_right = 260.0
+offset_bottom = -18.0
+color = Color(0.28, 0.36, 0.46, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ChaoFim"]
+shape = SubResource("rs_chao_f")
+
+[node name="Fog1" type="ColorRect" parent="."]
+z_index = 5
+offset_left = -100.0
+offset_top = 400.0
+offset_right = 1000.0
+offset_bottom = 720.0
+color = Color(0.45, 0.6, 0.8, 0.045)
+
+[node name="Koliani" parent="." instance=ExtResource("1_kol")]
+position = Vector2(120, 560)
+
+[node name="Demonio1" parent="." instance=ExtResource("2_dem")]
+position = Vector2(520, 600)
+alcance_patrulha = 170.0
+cor_estilhacos = Color(0.35, 0.6, 0.85, 1)
+
+[node name="Demonio2" parent="." instance=ExtResource("2_dem")]
+position = Vector2(1350, 540)
+alcance_patrulha = 130.0
+cor_estilhacos = Color(0.35, 0.6, 0.85, 1)
+
+[node name="Chefe" parent="." instance=ExtResource("6_chefe")]
+position = Vector2(1980, 262)
+cor_estilhacos = Color(0.4, 0.65, 0.9, 1)
+
+[node name="ColDashAereo" parent="." instance=ExtResource("3_col")]
+position = Vector2(1200, 552)
+habilidade_id = "dash_aereo"
+
+[node name="ColPistaSecreta" parent="." instance=ExtResource("3_col")]
+position = Vector2(1670, 268)
+pista_id = "prisao_grito_nas_correntes"
+
+[node name="CheckInicio" type="Area2D" parent="."]
+position = Vector2(700, 588)
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("5_chk")
+
+[node name="Visual" type="ColorRect" parent="CheckInicio"]
+offset_left = -5.0
+offset_top = -42.0
+offset_right = 5.0
+offset_bottom = 40.0
+color = Color(0.3, 0.4, 0.6, 1)
+
+[node name="Luz" type="Node2D" parent="CheckInicio"]
+visible = false
+
+[node name="Brilho" type="ColorRect" parent="CheckInicio/Luz"]
+offset_left = -20.0
+offset_top = -54.0
+offset_right = 20.0
+offset_bottom = 44.0
+color = Color(0.4, 0.6, 0.95, 0.32)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckInicio"]
+shape = SubResource("rs_chk")
+
+[node name="CheckMeio" type="Area2D" parent="."]
+position = Vector2(1350, 528)
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("5_chk")
+
+[node name="Visual" type="ColorRect" parent="CheckMeio"]
+offset_left = -5.0
+offset_top = -42.0
+offset_right = 5.0
+offset_bottom = 40.0
+color = Color(0.3, 0.4, 0.6, 1)
+
+[node name="Luz" type="Node2D" parent="CheckMeio"]
+visible = false
+
+[node name="Brilho" type="ColorRect" parent="CheckMeio/Luz"]
+offset_left = -20.0
+offset_top = -54.0
+offset_right = 20.0
+offset_bottom = 44.0
+color = Color(0.4, 0.6, 0.95, 0.32)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckMeio"]
+shape = SubResource("rs_chk")
+
+[node name="Porta" type="Area2D" parent="."]
+position = Vector2(2150, 248)
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("4_porta")
+pista_ao_atravessar = "prisao_carta_na_cela"
+
+[node name="Moldura" type="ColorRect" parent="Porta"]
+offset_left = -24.0
+offset_top = -48.0
+offset_right = 24.0
+offset_bottom = 48.0
+color = Color(0.6, 0.18, 0.59, 1)
+
+[node name="Nucleo" type="ColorRect" parent="Porta"]
+offset_left = -12.0
+offset_top = -34.0
+offset_right = 12.0
+offset_bottom = 34.0
+color = Color(0.933, 0.435, 0.91, 1)
+
+[node name="PointLight2D" type="PointLight2D" parent="Porta"]
+texture = SubResource("tex_luz")
+energy = 1.4
+color = Color(0.95, 0.45, 0.92, 1)
+scale = Vector2(1.3, 1.3)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Porta"]
+shape = SubResource("rs_porta")

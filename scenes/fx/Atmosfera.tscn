@@ -1,0 +1,164 @@
+[gd_scene load_steps=6 format=3 uid="uid://bkolianiatmosfera01"]
+
+; Montagem de ambiente reutilizavel (ver scripts/atmosfera.gd). Instanciar
+; em cada mundo e afinar as cores pelos @export do no raiz.
+
+[ext_resource type="Script" path="res://scripts/atmosfera.gd" id="1_atm"]
+
+[sub_resource type="Gradient" id="Gradient_luz"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_luz"]
+gradient = SubResource("Gradient_luz")
+width = 256
+height = 256
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[sub_resource type="Gradient" id="Gradient_vinheta"]
+offsets = PackedFloat32Array(0.55, 1)
+colors = PackedColorArray(0, 0, 0, 0, 0.02, 0.02, 0.03, 0.72)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_vinheta"]
+gradient = SubResource("Gradient_vinheta")
+width = 512
+height = 512
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[node name="Atmosfera" type="Node2D"]
+script = ExtResource("1_atm")
+
+[node name="Modulacao" type="CanvasModulate" parent="."]
+color = Color(0.45, 0.45, 0.5, 1)
+
+[node name="Parallax" type="ParallaxBackground" parent="."]
+
+[node name="Longe" type="ParallaxLayer" parent="Parallax"]
+motion_scale = Vector2(0.15, 0.15)
+
+[node name="Fundo" type="ColorRect" parent="Parallax/Longe"]
+offset_left = -800.0
+offset_top = -400.0
+offset_right = 2800.0
+offset_bottom = 1000.0
+color = Color(0.05, 0.06, 0.09, 1)
+
+[node name="S1" type="ColorRect" parent="Parallax/Longe"]
+offset_left = 100.0
+offset_top = 160.0
+offset_right = 180.0
+offset_bottom = 760.0
+color = Color(0.07, 0.08, 0.12, 1)
+
+[node name="S2" type="ColorRect" parent="Parallax/Longe"]
+offset_left = 560.0
+offset_top = 230.0
+offset_right = 625.0
+offset_bottom = 760.0
+color = Color(0.07, 0.08, 0.12, 1)
+
+[node name="S3" type="ColorRect" parent="Parallax/Longe"]
+offset_left = 1040.0
+offset_top = 140.0
+offset_right = 1120.0
+offset_bottom = 760.0
+color = Color(0.07, 0.08, 0.12, 1)
+
+[node name="S4" type="ColorRect" parent="Parallax/Longe"]
+offset_left = 1560.0
+offset_top = 200.0
+offset_right = 1630.0
+offset_bottom = 760.0
+color = Color(0.07, 0.08, 0.12, 1)
+
+[node name="S5" type="ColorRect" parent="Parallax/Longe"]
+offset_left = 2080.0
+offset_top = 175.0
+offset_right = 2155.0
+offset_bottom = 760.0
+color = Color(0.07, 0.08, 0.12, 1)
+
+[node name="Meio" type="ParallaxLayer" parent="Parallax"]
+motion_scale = Vector2(0.45, 0.55)
+
+[node name="Bruma" type="ColorRect" parent="Parallax/Meio"]
+offset_left = -600.0
+offset_top = 360.0
+offset_right = 2800.0
+offset_bottom = 780.0
+color = Color(0.09, 0.11, 0.16, 0.5)
+
+[node name="M1" type="ColorRect" parent="Parallax/Meio"]
+offset_left = 40.0
+offset_top = 300.0
+offset_right = 110.0
+offset_bottom = 760.0
+color = Color(0.09, 0.11, 0.16, 1)
+
+[node name="M2" type="ColorRect" parent="Parallax/Meio"]
+offset_left = 380.0
+offset_top = 350.0
+offset_right = 435.0
+offset_bottom = 760.0
+color = Color(0.09, 0.11, 0.16, 1)
+
+[node name="M3" type="ColorRect" parent="Parallax/Meio"]
+offset_left = 760.0
+offset_top = 270.0
+offset_right = 835.0
+offset_bottom = 760.0
+color = Color(0.09, 0.11, 0.16, 1)
+
+[node name="M4" type="ColorRect" parent="Parallax/Meio"]
+offset_left = 1180.0
+offset_top = 330.0
+offset_right = 1240.0
+offset_bottom = 760.0
+color = Color(0.09, 0.11, 0.16, 1)
+
+[node name="M5" type="ColorRect" parent="Parallax/Meio"]
+offset_left = 1600.0
+offset_top = 290.0
+offset_right = 1670.0
+offset_bottom = 760.0
+color = Color(0.09, 0.11, 0.16, 1)
+
+[node name="M6" type="ColorRect" parent="Parallax/Meio"]
+offset_left = 2040.0
+offset_top = 340.0
+offset_right = 2100.0
+offset_bottom = 760.0
+color = Color(0.09, 0.11, 0.16, 1)
+
+[node name="Luzes" type="Node2D" parent="."]
+
+[node name="Luz1" type="PointLight2D" parent="Luzes"]
+position = Vector2(300, 620)
+texture = SubResource("GradientTexture2D_luz")
+energy = 0.6
+color = Color(0.4, 0.55, 0.9, 1)
+scale = Vector2(1.6, 1.1)
+
+[node name="Luz2" type="PointLight2D" parent="Luzes"]
+position = Vector2(1400, 620)
+texture = SubResource("GradientTexture2D_luz")
+energy = 0.55
+color = Color(0.4, 0.55, 0.9, 1)
+scale = Vector2(1.5, 1.1)
+
+[node name="Vinheta" type="CanvasLayer" parent="."]
+layer = 10
+
+[node name="Tex" type="TextureRect" parent="Vinheta"]
+texture_repeat = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+texture = SubResource("GradientTexture2D_vinheta")
+expand_mode = 1
+stretch_mode = 6

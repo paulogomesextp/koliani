@@ -51,7 +51,8 @@ scripts/
   koliani.gd           -- CharacterBody2D: liga movimento.gd + dash + ataque + dano + morte + salto duplo
   demonio_base.gd      -- inimigo base (patrulha + dano por contacto); classe-pai dos demonios
   chefe_floresta.gd    -- chefe do mundo 1: FSM patrulha/telegrafo/investida/recupera; sinal "derrotado"
-  nivel_floresta.gd    -- script do no raiz do mundo 1: sela a porta ate o chefe cair
+  nivel_com_chefe.gd   -- script do no raiz de um mundo: sela a porta ate o no "Chefe" cair
+  atmosfera.gd         -- montagem de ambiente reutilizavel (CanvasModulate + parallax + vinheta + luzes), cores por @export
   coletavel.gd         -- Area2D: apanhar => regista pista / desbloqueia habilidade; nao reaparece
   porta.gd             -- Area2D: avanca para o mundo seguinte / termina a campanha
   checkpoint.gd        -- Area2D: guarda posicao de reaparecimento

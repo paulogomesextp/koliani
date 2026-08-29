@@ -54,6 +54,16 @@ key art; os detalhes são para o agente `gaming` desenhar.
 Habilidade ganha no mundo 1: **`salto_duplo`** (`Coletavel` no caminho
 principal, antes do fosso). É o gate do segredo e do resto da campanha.
 
+### Mundo 2 -- pistas e habilidade (`Prisao_dos_Condenados.tscn`)
+
+| id da pista | tipo | onde | texto (rascunho) |
+|-------------|------|------|------------------|
+| `prisao_carta_na_cela` | obrigatória (na `Porta`) | atravessar para o mundo 3 | nome dela riscado na pedra, data de há três dias |
+| `prisao_grito_nas_correntes` | segredo (`Coletavel`) | cela alta, no topo da subida | correntes ainda a oscilar -- passou agora mesmo |
+
+Habilidade ganha no mundo 2: **`dash_aereo`** (`Coletavel` no caminho
+principal, em `ChaoMeio`). Permite fazer dash no ar.
+
 ## Estrutura de pista
 
 Cada mundo tem **1 pista** obrigatória (avança a história) e pode ter

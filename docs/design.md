@@ -87,7 +87,7 @@ Um nível é uma `scene` `Node2D` com:
 - 0+ `Coletavel` (pistas/habilidades);
 - **1 `Porta`** para o mundo seguinte (a última porta termina a campanha).
   Fica **selada** (`monitoring = false`) até o chefe cair -- ver
-  `scripts/nivel_floresta.gd` (script no nó raiz do nível que liga
+  `scripts/nivel_com_chefe.gd` (script no nó raiz do nível que liga
   `Chefe.derrotado` à porta).
 
 `Level_Test.tscn` é o exemplo mínimo (fora da campanha -- sala de treino).
@@ -137,7 +137,7 @@ Autoload `EstadoJogo`. Guarda em `user://progresso.json`:
   `salto_duplo`; falta `dash_aereo`, `partir_paredes`.
 - **Chefe** por mundo. Feito o do mundo 1 (`scripts/chefe_floresta.gd`,
   `scenes/actors/ChefeFloresta.tscn`): FSM patrulha -> telegrafo -> investida
-  -> recupera, emite `derrotado`. `scripts/nivel_floresta.gd` sela a porta
+  -> recupera, emite `derrotado`. `scripts/nivel_com_chefe.gd` sela a porta
   até ele cair. Faltam chefes dos mundos 2-4 e afinar tempos/dano.
 - Cena de final a sério (o `main.gd._ao_fim_da_campanha` é um cartão).
 - Som (sem áudio ainda). **Juice** parcial feito: screen shake

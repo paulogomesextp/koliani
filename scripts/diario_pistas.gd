@@ -18,6 +18,16 @@ const PISTAS := {
 		"titulo": "Meia carta",
 		"texto": "Metade de uma carta da mãe, rasgada a meio: \"...não me procures, Kol. O que ele quer não sou eu...\"",
 	},
+	"prisao_carta_na_cela": {
+		"mundo": "Prisão dos Condenados",
+		"titulo": "A cela vazia",
+		"texto": "Numa cela ao fundo, o nome dela riscado na pedra e uma data -- de há três dias. Zeriko não a deixou aqui muito tempo.",
+	},
+	"prisao_grito_nas_correntes": {
+		"mundo": "Prisão dos Condenados",
+		"titulo": "Correntes que ainda oscilam",
+		"texto": "As correntes de uma cela alta ainda balançam. Quem passou por aqui, passou agora mesmo -- e à força.",
+	},
 }
 
 
