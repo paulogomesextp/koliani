@@ -109,4 +109,7 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0) -> void:
 	global_position.x += dir_empurrao * 4.0
 	if vida <= 0:
 		derrotado.emit()
+		soltar_estilhacos()
 		queue_free()
+	else:
+		piscar_dano()
