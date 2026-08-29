@@ -10,6 +10,7 @@ const FIM_CAMPANHA := preload("res://scripts/fim_campanha.gd")
 
 
 func _ready() -> void:
+	Musica.ambiente(EstadoJogo.indice_nivel)
 	var caminho := EstadoJogo.caminho_nivel_atual()
 	var cena_nivel: PackedScene = load(caminho)
 	if cena_nivel == null:

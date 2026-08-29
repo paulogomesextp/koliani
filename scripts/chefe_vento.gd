@@ -46,6 +46,7 @@ func _physics_process(dt: float) -> void:
 				var k := _obter_koliani()
 				_alvo = k.global_position if k else global_position + Vector2(0, 220)
 				_ataque_forte = dur_mergulho
+				Som.toca("investida", -10.0)
 				_ir_para(Fase.MERGULHO)
 		Fase.MERGULHO:
 			_ataque_forte = maxf(0.0, _ataque_forte - dt)

@@ -274,8 +274,9 @@ func receber_dano(quantidade: int, _dir_empurrao: float = 0.0) -> void:
 
 func _morrer() -> void:
 	Engine.time_scale = 1.0  # não deixar um hitstop pendente a segurar o tempo
+	set_physics_process(false)
 	morreu.emit()
 	EstadoJogo.perder_vida()
 	if EstadoJogo.sem_vidas():
 		EstadoJogo.reiniciar_campanha()
-	get_tree().reload_current_scene()
+	Transicao.fechar_e(get_tree().reload_current_scene)

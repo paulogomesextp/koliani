@@ -22,6 +22,8 @@ config/icon="res://icon.svg"
 
 EstadoJogo="*res://scripts/estado_jogo.gd"
 Som="*res://scripts/som.gd"
+Musica="*res://scripts/musica.gd"
+Transicao="*res://scripts/transicao.gd"
 
 [display]
 

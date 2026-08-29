@@ -17,6 +17,9 @@ const CAMINHOS := {
 	"porta": "res://assets/audio/porta.wav",
 	"chefe_cai": "res://assets/audio/chefe_cai.wav",
 	"selo": "res://assets/audio/selo.wav",
+	"projetil": "res://assets/audio/projetil.wav",
+	"investida": "res://assets/audio/investida.wav",
+	"onda": "res://assets/audio/onda.wav",
 }
 const VOZES := 8
 

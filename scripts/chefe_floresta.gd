@@ -39,6 +39,7 @@ func _physics_process(dt: float) -> void:
 					_sprite.scale.x = _alvo_dir
 				_piscar(false)
 				_ataque_forte = dur_investida
+				Som.toca("investida", -9.0)
 				_ir_para(Fase.INVESTIDA)
 		Fase.INVESTIDA:
 			_ataque_forte = maxf(0.0, _ataque_forte - dt)

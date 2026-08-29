@@ -92,6 +92,7 @@ func _disparar() -> void:
 	var k := _obter_koliani()
 	if k == null:
 		return
+	Som.toca("projetil", -12.0)
 	var base_dir := k.global_position - global_position
 	var n := 2 if _fase_2() else 1
 	for i in n:
