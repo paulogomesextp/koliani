@@ -20,6 +20,7 @@ const DUR_ATAQUE := 0.18
 const I_FRAMES := 0.6
 ## Abaixo deste Y considera-se que caiu no vazio (fosso sem fundo).
 const Y_MORTE := 1200.0
+const TEX_IMPACTO := preload("res://assets/sprites/impacto.svg")
 
 @onready var _hitbox: Area2D = $HitboxAtaque
 @onready var _sprite: Node2D = $Sprite
@@ -230,8 +231,25 @@ func _ao_acertar_corpo(corpo: Node) -> void:
 		if _faiscas:
 			_faiscas.position.x = absf(_faiscas.position.x) * _olha_para
 			_faiscas.restart()
-		_abanar(4.0)
-		_hitstop(0.05)
+		_pop_impacto((corpo as Node2D).global_position if corpo is Node2D else global_position)
+		_abanar(4.5)
+		_hitstop(0.06)
+
+
+## "Frame de impacto" -- clarão branco que estica e desaparece depressa.
+func _pop_impacto(pos: Vector2) -> void:
+	var s := Sprite2D.new()
+	s.texture = TEX_IMPACTO
+	s.global_position = pos
+	s.rotation = randf() * TAU
+	s.scale = Vector2(0.3, 0.3)
+	s.z_index = 40
+	get_parent().add_child(s)
+	var t := s.create_tween()
+	t.set_parallel(true)
+	t.tween_property(s, "scale", Vector2(1.7, 1.7), 0.16).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	t.tween_property(s, "modulate:a", 0.0, 0.16)
+	t.chain().tween_callback(s.queue_free)
 
 
 func receber_dano(quantidade: int, _dir_empurrao: float = 0.0) -> void:
