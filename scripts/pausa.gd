@@ -7,7 +7,7 @@ extends CanvasLayer
 
 const CENA_MENU := "res://scenes/ui/MenuInicial.tscn"
 
-@onready var _painel: Control = $Painel
+@onready var _titulo: Label = $Painel/Coluna/Titulo
 @onready var _continuar: Button = $Painel/Coluna/Continuar
 @onready var _recomecar: Button = $Painel/Coluna/Recomecar
 @onready var _menu: Button = $Painel/Coluna/Menu
@@ -21,6 +21,16 @@ func _ready() -> void:
 	_recomecar.pressed.connect(_ao_recomecar)
 	_menu.pressed.connect(_ao_menu)
 	_sair.pressed.connect(_ao_sair)
+	Textos.idioma_mudou.connect(func(_l: String) -> void: _traduzir())
+	_traduzir()
+
+
+func _traduzir() -> void:
+	_titulo.text = Textos.t("pause.title")
+	_continuar.text = Textos.t("pause.resume")
+	_recomecar.text = Textos.t("pause.restart_checkpoint")
+	_menu.text = Textos.t("pause.main_menu")
+	_sair.text = Textos.t("pause.quit")
 
 
 func _process(_dt: float) -> void:

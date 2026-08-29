@@ -42,9 +42,11 @@ python -m http.server 8060 --directory build/web
 ## Estrutura
 
 ```
-project.godot          -- config + input map (pt) + autoload EstadoJogo + camadas de fisica
-export_presets.cfg     -- presets "Web" e "Android" (re-gravar pelo editor se preciso)
+project.godot          -- config + input map + autoloads (EstadoJogo, Textos, Opcoes, Som, Musica, Transicao) + camadas
+export_presets.cfg     -- presets "Web" e "Android"; include_filter = assets/i18n/*.json (o .json nao e "importado")
 icon.svg               -- icone placeholder
+assets/i18n/*.json     -- traducoes por idioma: en (base), pt, es, fr, de, zh
+tools/gerar_audio.py   -- gera game_over/boss/assombracao/demonio_ataque .wav (sintese pura, sem numpy)
 
 scripts/
   movimento.gd         -- LOGICA PURA do movimento (coyote, jump buffer, corte de salto, salto duplo); testavel
@@ -67,11 +69,14 @@ scripts/
   coletavel.gd         -- Area2D: apanhar => regista pista / desbloqueia habilidade; nao reaparece
   porta.gd             -- Area2D: avanca para o mundo seguinte / termina a campanha
   checkpoint.gd        -- Area2D: guarda posicao de reaparecimento
-  estado_jogo.gd       -- autoload EstadoJogo: vidas, nivel, checkpoint, habilidades, pistas, save
-  som.gd               -- autoload Som: pool de vozes; toca(nome) SFX (assets/audio/*.wav sintetizados)
-  musica.gd            -- autoload Musica: cama de ambiente em loop, pitch por bioma
+  estado_jogo.gd       -- autoload EstadoJogo: vidas, nivel, checkpoint, habilidades, pistas, hardcore, save
+  textos.gd            -- autoload Textos: i18n por JSON (assets/i18n/<loc>.json); Textos.t("chave"); EN por omissao
+  opcoes.gd            -- autoload Opcoes: volume musica/efeitos (buses "Music"/"SFX") + idioma; user://opcoes.json
+  som.gd               -- autoload Som: pool de vozes (bus "SFX"); toca(nome) SFX (assets/audio/*.wav sintetizados)
+  musica.gd            -- autoload Musica: cama por bioma + boss.wav no M4 + assombracao.wav por baixo (bus "Music")
   transicao.gd         -- autoload Transicao: fade a preto entre cenas (morte/reaparecer)
-  diario_pistas.gd     -- DADOS PUROS: textos das pistas por id (para o diario + testes)
+  diario_pistas.gd     -- DADOS PUROS: chaves de traducao das pistas por id (para o diario + testes)
+  opcoes_menu.gd       -- ecra de Opcoes (sobreposto ao menu): cursores de som + seletor de idioma
   diario.gd            -- ecra de diario: I/Tab, pausa o jogo, lista EstadoJogo.pistas
   pausa.gd             -- menu de pausa: P/botao; pausa a arvore; continuar/recomecar/sair
   tremor.gd            -- LOGICA PURA do screen shake (amplitude decai a zero); testavel
@@ -79,7 +84,7 @@ scripts/
   atmosfera.gd         -- pinta o ambiente (modulate/parallax/luzes) + poeira segue a camara
   plataforma.gd        -- @tool: plataforma reutilizavel (colisao + shader) por "tamanho"
   controlos_toque.gd   -- HUD: vida sempre visivel; botoes de toque so em ecra tactil
-  menu_inicial.gd      -- MENU INICIAL (main_scene): NEW GAME / LOAD GAME / HARDCORE MODE / Sair; `-- --jogar` salta-o
+  menu_inicial.gd      -- MENU INICIAL (main_scene): NEW GAME / LOAD GAME / HARDCORE MODE / OPTIONS / Quit; `-- --jogar` salta-o
   main.gd              -- cena de jogo: carrega o nivel atual + HUD + diario + pausa (+ relogio no hardcore); debug F1-F9
 
 scenes/
@@ -102,12 +107,13 @@ assets/shaders/                    -- personagem (rim+flash), plataforma (pedra)
   ui/Diario.tscn                   -- painel do diario de pistas (instanciado pelo main.gd)
   ui/Pausa.tscn                    -- menu de pausa (instanciado pelo main.gd)
   ui/MenuInicial.tscn              -- ecra inicial / titulo (main_scene do projeto)
+  ui/Opcoes.tscn                   -- ecra de Opcoes (som + idioma), sobreposto ao menu inicial
 
 tests/run_tests.gd     -- corredor headless proprio (movimento + estado_jogo)
 docs/                  -- historia.md, design.md (bibliografia viva)
 assets/sprites/*.svg   -- arte SVG original (Koliani, demonios, 4 chefes, gema, porta, impacto)
 assets/shaders/*.gdshader -- personagem, plataforma, grade
-assets/audio/*.wav     -- SFX + ambiente SINTETIZADOS (script no repo; sem licenca de terceiros)
+assets/audio/*.wav     -- SFX + musica SINTETIZADOS (tools/gerar_audio.py; sem licenca de terceiros)
 assets/                -- branding/, fonts/, tiles/ -- SO CC0/gratis (ou nosso)
 .github/workflows/ci.yml
 .claude/agents/gaming.md  -- o agente responsavel por este jogo
@@ -156,16 +162,38 @@ SDK) -- ajustar pelo log do Actions.
   salto_duplo (M1) -> dash_aereo (M2) -> partir_paredes (M3) -> luta final
   com o Zeriko + cena da Aurora (M4). Chefes distintos nos 4 mundos.
   Diário de pistas funcional (7 pistas escritas).
+- **Idioma / i18n**: o jogo é **em inglês por omissão**; todo o texto
+  visível vem de `Textos.t("chave")` (autoload `textos.gd`), com os textos
+  em `assets/i18n/<loc>.json`. Idiomas: **en** (base), **pt, es, fr, de,
+  zh**. O `en.json` é a referência; os testes garantem que os outros têm
+  exatamente as mesmas chaves. Trocar de idioma no jogo: **OPTIONS >
+  LANGUAGE** -> `Textos` emite `idioma_mudou` e cada ecrã re-traduz na
+  hora. **zh (chinês) aparece como quadrados** -- falta uma fonte CJK (ver
+  "Por fazer").
+- **Menu de Opções** (`scripts/opcoes_menu.gd` + `scenes/ui/Opcoes.tscn`,
+  sobreposto ao menu inicial). **SOUND**: cursores de volume de *Music* e
+  *Effects* (buses de áudio `Music`/`SFX` criados por `opcoes.gd`).
+  **LANGUAGE**: um botão por idioma. Guardado em `user://opcoes.json`
+  (separado do progresso).
 - **Menu inicial** (`scripts/menu_inicial.gd` + `scenes/ui/MenuInicial.tscn`,
   a `main_scene`): **NEW GAME** (campanha nova, apaga o save com
   confirmação), **LOAD GAME** (retoma o save; só aparece se houver
-  progresso), **HARDCORE MODE** (campanha nova com tempo limite por mundo)
-  e *Sair*. `-- --jogar` / `-- --nivel=N` / `-- --hardcore` saltam o menu.
+  progresso), **HARDCORE MODE** (campanha nova com tempo limite por mundo),
+  **OPTIONS** e *Quit*. `-- --jogar` / `-- --nivel=N` / `-- --hardcore`
+  saltam o menu.
 - **Modo hardcore**: `EstadoJogo.hardcore` (gravado no save). Cada mundo
   tem um tempo (`EstadoJogo.TEMPO_HARDCORE`, ponto de partida) mostrado por
-  `relogio_hardcore.gd` (relógio no topo; pára quando o jogo está em
-  pausa). Ao esgotar -> `game_over.gd` e a campanha recomeça do mundo 1,
+  `relogio_hardcore.gd` (relógio no topo; pára em pausa/diário). O tempo
+  que falta vive em `EstadoJogo.hardcore_tempo_restante`, por isso
+  **continua a contar através das mortes** -- só reinicia ao mudar de
+  mundo ou recomeçar. Fim do run (tempo a zero **ou** 3 vidas gastas) ->
+  `game_over.gd` com a voz "GAME OVER" e a campanha recomeça do mundo 1,
   ainda em hardcore. Dev: `-- --hc-tempo=N` força N segundos por mundo.
+- **Áudio novo** (`tools/gerar_audio.py`, síntese pura): `game_over.wav`
+  (voz de speaker de arcada), `boss.wav` (cama do M4 -- mais rápida e mais
+  alta), `assombracao.wav` (ruídos de casa assombrada por baixo da música),
+  `demonio_ataque.wav` (rosnar do demónio ao acertar). Música global mais
+  alta (`musica.gd`: cama a -12 dB, chefe a -6 dB).
 - **Fim da campanha** volta ao **menu inicial** (o save fica como está --
   o jogador escolhe NEW GAME / LOAD GAME / HARDCORE MODE).
 - **Menu de pausa** (`scripts/pausa.gd` + `scenes/ui/Pausa.tscn`): P ou
@@ -204,16 +232,27 @@ Ver **`docs/testar.md`**: como correr o jogo, controlos, atalhos de debug
 ## Por fazer (à espera do Paulo)
 
 1. **Playtest + afinação** -- testar (`docs/testar.md`) e passar notas de
-   feel/dificuldade (os níveis foram montados sem jogar).
-2. **Remote / CI** -- ligar o `git remote` (é trabalho do Paulo; o build
+   feel/dificuldade (os níveis foram montados sem jogar). Inclui afinar
+   `EstadoJogo.TEMPO_HARDCORE` (tempos do modo hardcore) e os volumes/mix
+   do áudio novo (`game_over`, `boss`, `assombracao`).
+2. **Fonte CJK** -- o idioma **zh (chinês)** já está traduzido mas a fonte
+   por omissão do Godot não tem glifos CJK (aparecem quadrados). Falta
+   juntar uma fonte livre (ex.: Noto Sans SC, OFL) e pô-la no tema -- ~8 MB,
+   por isso **a decidir com o Paulo** (tamanho / licença).
+3. **Revisão nativa das traduções** -- es/fr/de/zh foram feitas por nós
+   (boa-fé, sem revisão nativa).
+4. **Remote / CI** -- ligar o `git remote` (é trabalho do Paulo; o build
    Web local já funciona).
-3. Frames de animação, fundos temáticos, tiles/decoração, mixagem de
-   áudio -- quando o Paulo der luz verde.
+5. Frames de animação, fundos temáticos, tiles/decoração -- quando o Paulo
+   der luz verde.
 
 ## Regras
 
 - Código, comentários e logs em **português**.
-- Assets só **CC0/grátis**.
+- **Texto do jogo**: nada de strings à mão nos ecrãs -- sempre
+  `Textos.t("chave")` + entrada nos 6 `assets/i18n/*.json` (o `en.json`
+  manda). O jogo vê-se **em inglês** por omissão.
+- Assets só **CC0/grátis**. Áudio: sintetizado por nós (`tools/gerar_audio.py`).
 - **Nunca** mexer em `git config` -- pedir ao Paulo.
 - Mobile-first: landscape, toque, 60fps. Testar no telemóvel do Paulo.
 - Manter o export Web a funcionar.

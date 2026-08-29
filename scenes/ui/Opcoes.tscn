@@ -1,0 +1,120 @@
+[gd_scene load_steps=3 format=3 uid="uid://bkolianiopcoes01"]
+
+[ext_resource type="Script" path="res://scripts/opcoes_menu.gd" id="1_op"]
+
+[sub_resource type="StyleBoxFlat" id="sb_painel"]
+content_margin_left = 40.0
+content_margin_top = 32.0
+content_margin_right = 40.0
+content_margin_bottom = 32.0
+bg_color = Color(0.06, 0.04, 0.09, 0.99)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.6, 0.22, 0.6, 0.9)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[node name="Opcoes" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_op")
+
+[node name="Fundo" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.02, 0.015, 0.03, 0.82)
+
+[node name="Painel" type="PanelContainer" parent="."]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -300.0
+offset_top = -220.0
+offset_right = 300.0
+offset_bottom = 220.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("sb_painel")
+
+[node name="Coluna" type="VBoxContainer" parent="Painel"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Titulo" type="Label" parent="Painel/Coluna"]
+layout_mode = 2
+horizontal_alignment = 1
+text = "OPTIONS"
+theme_override_colors/font_color = Color(1, 0.85, 0.98, 1)
+theme_override_font_sizes/font_size = 30
+
+[node name="Sep1" type="HSeparator" parent="Painel/Coluna"]
+layout_mode = 2
+
+[node name="Som" type="Label" parent="Painel/Coluna"]
+layout_mode = 2
+text = "SOUND"
+theme_override_colors/font_color = Color(0.85, 0.7, 0.9, 1)
+
+[node name="Musica" type="HBoxContainer" parent="Painel/Coluna"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Nome" type="Label" parent="Painel/Coluna/Musica"]
+custom_minimum_size = Vector2(110, 0)
+layout_mode = 2
+text = "Music"
+
+[node name="Cursor" type="HSlider" parent="Painel/Coluna/Musica"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+
+[node name="Efeitos" type="HBoxContainer" parent="Painel/Coluna"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Nome" type="Label" parent="Painel/Coluna/Efeitos"]
+custom_minimum_size = Vector2(110, 0)
+layout_mode = 2
+text = "Effects"
+
+[node name="Cursor" type="HSlider" parent="Painel/Coluna/Efeitos"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+
+[node name="EspacoL" type="Control" parent="Painel/Coluna"]
+custom_minimum_size = Vector2(0, 8)
+layout_mode = 2
+
+[node name="Idioma" type="Label" parent="Painel/Coluna"]
+layout_mode = 2
+text = "LANGUAGE"
+theme_override_colors/font_color = Color(0.85, 0.7, 0.9, 1)
+
+[node name="Idiomas" type="GridContainer" parent="Painel/Coluna"]
+layout_mode = 2
+theme_override_constants/h_separation = 10
+theme_override_constants/v_separation = 8
+columns = 3
+
+[node name="Sep2" type="HSeparator" parent="Painel/Coluna"]
+layout_mode = 2
+
+[node name="Voltar" type="Button" parent="Painel/Coluna"]
+layout_mode = 2
+text = "BACK"

@@ -45,6 +45,11 @@ var pistas: Array[String] = []
 ## que a liga/desliga; `reiniciar_campanha()` de propósito NÃO lhe mexe
 ## (assim o Game Over do hardcore recomeça já em hardcore).
 var hardcore: bool = false
+## Segundos que faltam no relógio do mundo atual (modo hardcore). < 0 =
+## "ainda não começou / recomeçar cheio". Gravado no save e mantido em
+## memória através das mortes -- por isso o tempo **continua a contar** a
+## cada morte; só `avancar_nivel()` / `reiniciar_campanha()` o repõem.
+var hardcore_tempo_restante: float = -1.0
 
 ## Posto a true pelos testes (ver tests/run_tests.gd) para NÃO tocar no
 ## ficheiro de save real ao instanciar o estado fora do jogo.
@@ -74,6 +79,7 @@ func avancar_nivel() -> void:
 	if ha_proximo_nivel():
 		indice_nivel += 1
 		checkpoint = Vector2.ZERO
+		hardcore_tempo_restante = -1.0  # mundo novo = relógio cheio
 		guardar()
 
 
@@ -103,6 +109,7 @@ func reiniciar_campanha() -> void:
 	checkpoint = Vector2.ZERO
 	habilidades.clear()
 	pistas.clear()
+	hardcore_tempo_restante = -1.0  # NB: `hardcore` (o modo) fica como está
 	vidas_mudaram.emit(vidas)
 	guardar()
 
@@ -146,6 +153,7 @@ func para_dicionario() -> Dictionary:
 		"habilidades": habilidades,
 		"pistas": pistas,
 		"hardcore": hardcore,
+		"hardcore_tempo_restante": hardcore_tempo_restante,
 	}
 
 
@@ -157,6 +165,7 @@ func de_dicionario(d: Dictionary) -> void:
 	habilidades.assign(d.get("habilidades", []))
 	pistas.assign(d.get("pistas", []))
 	hardcore = bool(d.get("hardcore", false))
+	hardcore_tempo_restante = float(d.get("hardcore_tempo_restante", -1.0))
 
 
 func guardar() -> void:

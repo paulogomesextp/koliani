@@ -1,62 +1,66 @@
 class_name DiarioPistas
 extends RefCounted
-## Textos das pistas sobre a mãe, por id. Dados puros (sem nós) para o
+## Pistas sobre a mãe, por id. Dados puros (sem nós, sem autoloads) para o
 ## ecrã de diário (`scenes/ui/Diario.tscn`) e para os testes headless.
 ##
+## Cada entrada guarda **chaves de tradução** (não o texto): o `Textos`
+## resolve-as no idioma atual. Ver `assets/i18n/*.json` (`world.*`,
+## `clue.<id>.title`, `clue.<id>.body`).
+##
 ## Os ids são os mesmos que as `Porta`/`Coletavel` passam a
-## `EstadoJogo.registar_pista(...)`. Quando o agente "gaming" desenha um
-## mundo novo, acrescenta aqui as pistas desse mundo.
+## `EstadoJogo.registar_pista(...)`.
 
 const PISTAS := {
 	"floresta_sinal_da_porta": {
-		"mundo": "Floresta Putrefata",
-		"titulo": "O cheiro na porta",
-		"texto": "A porta ainda cheira ao enxofre dele. Ela passou por aqui -- e não sozinha.",
+		"mundo": "world.forest",
+		"titulo": "clue.floresta_sinal_da_porta.title",
+		"texto": "clue.floresta_sinal_da_porta.body",
 	},
 	"floresta_carta_rasgada": {
-		"mundo": "Floresta Putrefata",
-		"titulo": "Meia carta",
-		"texto": "Metade de uma carta da mãe, rasgada a meio: \"...não me procures, Kol. O que ele quer não sou eu...\"",
+		"mundo": "world.forest",
+		"titulo": "clue.floresta_carta_rasgada.title",
+		"texto": "clue.floresta_carta_rasgada.body",
 	},
 	"prisao_carta_na_cela": {
-		"mundo": "Prisão dos Condenados",
-		"titulo": "A cela vazia",
-		"texto": "Numa cela ao fundo, o nome dela riscado na pedra e uma data -- de há três dias. Zeriko não a deixou aqui muito tempo.",
+		"mundo": "world.prison",
+		"titulo": "clue.prisao_carta_na_cela.title",
+		"texto": "clue.prisao_carta_na_cela.body",
 	},
 	"prisao_grito_nas_correntes": {
-		"mundo": "Prisão dos Condenados",
-		"titulo": "Correntes que ainda oscilam",
-		"texto": "As correntes de uma cela alta ainda balançam. Quem passou por aqui, passou agora mesmo -- e à força.",
+		"mundo": "world.prison",
+		"titulo": "clue.prisao_grito_nas_correntes.title",
+		"texto": "clue.prisao_grito_nas_correntes.body",
 	},
 	"torres_lanterna_de_zeriko": {
-		"mundo": "Torres Esquecidas",
-		"titulo": "A lanterna ao longe",
-		"texto": "Entre duas torres partidas, muito ao fundo, uma luz que não é estrela: a lanterna-jaula de Zeriko. Lá dentro, uma silhueta.",
+		"mundo": "world.towers",
+		"titulo": "clue.torres_lanterna_de_zeriko.title",
+		"texto": "clue.torres_lanterna_de_zeriko.body",
 	},
 	"torres_sussurro_da_mae": {
-		"mundo": "Torres Esquecidas",
-		"titulo": "Um sussurro no vento",
-		"texto": "Atrás da parede rachada, gravado à pressa: \"Ele guarda-me para o fim, Kol. Chega antes disso.\"",
+		"mundo": "world.towers",
+		"titulo": "clue.torres_sussurro_da_mae.title",
+		"texto": "clue.torres_sussurro_da_mae.body",
 	},
 	"castelo_aurora_livre": {
-		"mundo": "Castelo de Zeriko",
-		"titulo": "Aurora",
-		"texto": "A lanterna-jaula partiu-se. A mãe -- Aurora -- está livre. Saem juntas pela última porta.",
+		"mundo": "world.castle",
+		"titulo": "clue.castelo_aurora_livre.title",
+		"texto": "clue.castelo_aurora_livre.body",
 	},
 }
 
 
-## Constrói a lista de entradas legíveis para os ids dados (pela ordem em
-## que foram encontrados). Ids sem texto ainda aparecem, com um aviso.
+## Lista de entradas (chaves de tradução) para os ids dados, pela ordem em
+## que foram encontrados. Ids sem pista escrita: `titulo` = o próprio id,
+## `texto` = "" (o diário mostra o aviso "por escrever").
 static func entradas(ids: Array) -> Array:
 	var lista: Array = []
 	for id: String in ids:
 		var p: Dictionary = PISTAS.get(id, {})
 		lista.append({
 			"id": id,
-			"mundo": p.get("mundo", "?"),
+			"mundo": p.get("mundo", "world.unknown"),
 			"titulo": p.get("titulo", id),
-			"texto": p.get("texto", "(pista por escrever)"),
+			"texto": p.get("texto", ""),
 		})
 	return lista
 

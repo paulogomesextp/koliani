@@ -4,13 +4,10 @@ extends CanvasLayer
 ## o jogador escolhe NEW GAME / LOAD GAME / HARDCORE MODE). Instanciada por
 ## `nivel_castelo.gd` quando o Zeriko cai.
 
+## chaves de tradução das linhas, por ordem (ver assets/i18n: final.line1..6)
 const LINHAS := [
-	"Zeriko cai. A lanterna-jaula estilhaça-se no chão de pedra.",
-	"A luz que estava presa lá dentro levanta-se. Ganha ombros, mãos, um rosto cansado.",
-	"«Aurora.» O nome sai de Koliani antes de ela o pensar.",
-	"«Vieste mesmo», diz a mãe. «Eu sabia que virias.»",
-	"Saem juntas pela última porta. Lá fora ainda é noite -- mas agora é a noite delas.",
-	"-- fim --",
+	"final.line1", "final.line2", "final.line3",
+	"final.line4", "final.line5", "final.line6",
 ]
 
 var _i := 0
@@ -41,8 +38,8 @@ func _ready() -> void:
 
 
 func _mostrar() -> void:
-	var dica := "\n\n(saltar / atacar)" if _i < LINHAS.size() - 1 else "\n\n(saltar / atacar: voltar ao menu)"
-	_label.text = LINHAS[_i] + dica
+	var chave_dica := "final.prompt" if _i < LINHAS.size() - 1 else "final.prompt_last"
+	_label.text = Textos.t(LINHAS[_i]) + "\n\n" + Textos.t(chave_dica)
 
 
 func _process(dt: float) -> void:

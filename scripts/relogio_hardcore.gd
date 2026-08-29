@@ -4,11 +4,14 @@ extends CanvasLayer
 ## `game_over.gd`. O `main.gd` só o cria quando `EstadoJogo.hardcore`.
 ##
 ## Herda o process_mode do Main, por isso PÁRA quando a árvore está em
-## pausa (menu de pausa, diário) -- o tempo só corre a jogar. Reinicia a
-## cada (re)carga de cena: uma morte com respawn dá relógio novo.
+## pausa (menu de pausa, diário) -- o tempo só corre a jogar.
 ##
-## Dev: `-- --hc-tempo=N` força N segundos em todos os mundos (afinação /
-## testar o Game Over depressa).
+## O tempo que falta vive em `EstadoJogo.hardcore_tempo_restante`, por isso
+## **continua a contar através das mortes** (o autoload não recarrega). Só
+## é reposto ao mudar de mundo ou ao recomeçar a campanha.
+##
+## Dev: `-- --hc-tempo=N` força N segundos (afinação / ver o Game Over
+## depressa).
 
 var _restante := 0.0
 var _acabou := false
@@ -17,10 +20,14 @@ var _label: Label
 
 func _ready() -> void:
 	layer = 12
-	_restante = EstadoJogo.tempo_hardcore_nivel()
+	if EstadoJogo.hardcore_tempo_restante > 0.0:
+		_restante = EstadoJogo.hardcore_tempo_restante
+	else:
+		_restante = EstadoJogo.tempo_hardcore_nivel()
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--hc-tempo="):
 			_restante = maxf(1.0, float(a.get_slice("=", 1)))
+	EstadoJogo.hardcore_tempo_restante = _restante
 
 	_label = Label.new()
 	_label.set_anchors_preset(Control.PRESET_TOP_WIDE)
@@ -38,12 +45,12 @@ func _process(dt: float) -> void:
 	if _acabou:
 		return
 	_restante -= dt
+	EstadoJogo.hardcore_tempo_restante = _restante  # sobrevive a mortes/recargas
 	_atualizar()
 	if _restante <= 0.0:
 		_acabou = true
-		var over := CanvasLayer.new()
-		over.set_script(load("res://scripts/game_over.gd"))
-		add_child(over)
+		EstadoJogo.hardcore_tempo_restante = -1.0  # o próximo run começa cheio
+		GameOver.mostrar(get_tree(), "time")
 
 
 func _atualizar() -> void:

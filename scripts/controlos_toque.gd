@@ -3,10 +3,11 @@ extends CanvasLayer
 ## (`Toque`), que só aparecem em ecrã táctil / ao primeiro toque. Mostra
 ## também avisos curtos ao ganhar habilidade ou encontrar pista.
 
+## chave de tradução do nome de cada habilidade (ver assets/i18n)
 const NOME_HABILIDADE := {
-	"salto_duplo": "Salto duplo",
-	"dash_aereo": "Dash aéreo",
-	"partir_paredes": "Partir paredes",
+	"salto_duplo": "hud.ability.salto_duplo",
+	"dash_aereo": "hud.ability.dash_aereo",
+	"partir_paredes": "hud.ability.partir_paredes",
 }
 
 @onready var _barra_vida: ProgressBar = $Vida/Barra
@@ -43,11 +44,12 @@ func _atualizar_vidas(vidas: int) -> void:
 
 
 func _ao_habilidade(id: String) -> void:
-	_aviso("Nova habilidade: %s" % NOME_HABILIDADE.get(id, id))
+	var nome: String = Textos.t(NOME_HABILIDADE.get(id, id))
+	_aviso(Textos.tf("hud.new_ability", [nome]))
 
 
 func _ao_pista(_id: String, total: int) -> void:
-	_aviso("Pista encontrada  (%d)" % total)
+	_aviso(Textos.tf("hud.clue_found", [total]))
 
 
 func _aviso(txt: String) -> void:

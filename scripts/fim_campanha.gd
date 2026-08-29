@@ -14,7 +14,7 @@ func _ready() -> void:
 	add_child(fundo)
 
 	var texto := Label.new()
-	texto.text = "A última porta cede.\nKoliani encontra a mãe.\n\n— fim do que existe por agora —\n\n(saltar / atacar: voltar ao menu)"
+	texto.text = Textos.t("endcard.text") + "\n\n" + Textos.t("endcard.prompt")
 	texto.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	texto.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	texto.set_anchors_preset(Control.PRESET_FULL_RECT)

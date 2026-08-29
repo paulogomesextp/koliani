@@ -21,6 +21,8 @@ config/icon="res://icon.svg"
 [autoload]
 
 EstadoJogo="*res://scripts/estado_jogo.gd"
+Textos="*res://scripts/textos.gd"
+Opcoes="*res://scripts/opcoes.gd"
 Som="*res://scripts/som.gd"
 Musica="*res://scripts/musica.gd"
 Transicao="*res://scripts/transicao.gd"

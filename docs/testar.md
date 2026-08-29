@@ -35,7 +35,20 @@ O jogo arranca no **menu inicial** (`scenes/ui/MenuInicial.tscn`):
 - **HARDCORE MODE** — campanha nova com **tempo limite por mundo**; se o
   relógio (topo do ecrã) chegar a zero é *Game Over* e recomeça do mundo 1.
   O relógio pára enquanto o jogo está em pausa / no diário.
-- **Sair**.
+- **OPTIONS** — volume da *Music* e dos *Effects*, e **LANGUAGE**
+  (English/Português/Español/Français/Deutsch/中文; muda o jogo todo na
+  hora). O jogo arranca **em inglês**. As definições ficam em
+  `%APPDATA%\Godot\app_userdata\Koliani\opcoes.json`.
+- **Quit**.
+
+> O modo **hardcore**: o relógio **não** reinicia quando morres (só ao
+> mudar de mundo). Fim do run = tempo a zero **ou** gastar as 3 vidas →
+> cartão "GAME OVER" (com voz) → recomeça do mundo 1.
+
+> **Áudio**: música de fundo mais alta; no **mundo 4 (Zeriko)** muda para
+> uma faixa mais rápida e alta; por baixo há sempre ruídos de casa
+> assombrada; os demónios rosnam ao acertar-te. Tudo sintetizado
+> (`tools/gerar_audio.py`).
 
 Atalhos para saltar o menu (capturas, testes):
 ```
@@ -45,7 +58,17 @@ Atalhos para saltar o menu (capturas, testes):
 & "C:\Users\paulo\Desktop\Godot_v4.7.2-stable_win64.exe" . -- --hardcore --hc-tempo=15
 ```
 `--hc-tempo=N` força N segundos em todos os mundos (afinar / ver o Game
-Over depressa).
+Over depressa). `--nivel=4` cai já no chefe final (para ouvir a música do
+boss).
+
+## Regerar o áudio sintetizado
+
+```
+python tools/gerar_audio.py
+```
+Gera `game_over.wav`, `boss.wav`, `assombracao.wav`, `demonio_ataque.wav`
+em `assets/audio/`. A seguir, no editor (ou `--import`) o Godot reimporta;
+`boss.wav` e `assombracao.wav` têm `loop_mode=1` no `.import`.
 
 ## Controlos
 

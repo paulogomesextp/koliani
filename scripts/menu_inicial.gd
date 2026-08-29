@@ -1,24 +1,28 @@
 extends Control
-## Menu inicial (é a `main_scene` do projeto). Três formas de jogar:
+## Menu inicial (é a `main_scene` do projeto). Formas de jogar:
 ##
 ##   NEW GAME       campanha nova, do mundo 1 (apaga o save se existir)
 ##   LOAD GAME      retoma o save (só aparece se houver progresso)
 ##   HARDCORE MODE  campanha nova com tempo limite por mundo -- se o tempo
 ##                  esgotar num mundo é Game Over e recomeça do início
+##   OPTIONS        volume (música / efeitos) e idioma
 ##
 ## NEW GAME / HARDCORE MODE pedem confirmação quando há um save por cima.
+## Todo o texto vem do `Textos` (idioma por omissão: inglês).
 ##
 ## Atalhos de dev (a seguir a `--`):
-##   --jogar         salta o menu e arranca já em Main.tscn (retoma o save)
-##   --foto[=...]    idem (o main.gd trata da captura)
-##   --nivel=N       salta o menu e arranca no mundo N (1..4)
-##   --hardcore      salta o menu e arranca uma campanha hardcore nova
+##   --jogar / --foto[=...]   salta o menu e arranca já em Main.tscn
+##   --nivel=N                salta o menu e arranca no mundo N (1..4)
+##   --hardcore               salta o menu e arranca uma campanha hardcore
 
 const CENA_JOGO := "res://scenes/Main.tscn"
+const CENA_OPCOES := preload("res://scenes/ui/Opcoes.tscn")
 
+@onready var _subtitulo: Label = $Centro/Subtitulo
 @onready var _novo: Button = $Centro/NovoJogo
 @onready var _load: Button = $Centro/LoadGame
 @onready var _hardcore: Button = $Centro/Hardcore
+@onready var _opcoes: Button = $Centro/Opcoes
 @onready var _aviso: Label = $Centro/Aviso
 @onready var _sair: Button = $Centro/Sair
 
@@ -33,18 +37,40 @@ func _ready() -> void:
 	Musica.ambiente(0)  # drone de ambiente por baixo do título
 	_aviso.visible = false
 
-	var ha := EstadoJogo.ha_progresso()
-	_load.visible = ha
-	if ha:
-		var extra := "  ·  Hardcore" if EstadoJogo.hardcore else ""
-		_load.text = "LOAD GAME  —  mundo %d%s" % [EstadoJogo.indice_nivel + 1, extra]
-
 	_novo.pressed.connect(_ao_novo)
 	_load.pressed.connect(_ir_jogar)
 	_hardcore.pressed.connect(_ao_hardcore)
+	_opcoes.pressed.connect(_abrir_opcoes)
 	_sair.pressed.connect(func() -> void: get_tree().quit())
 
-	(_load if ha else _novo).grab_focus()
+	Textos.idioma_mudou.connect(func(_l: String) -> void: _traduzir())
+	_traduzir()
+	(_load if EstadoJogo.ha_progresso() else _novo).grab_focus()
+
+
+## (Re)escreve todo o texto do menu no idioma atual.
+func _traduzir() -> void:
+	_subtitulo.text = Textos.t("game.subtitle")
+	_novo.text = Textos.t("menu.new_game")
+	_hardcore.text = Textos.t("menu.hardcore")
+	_opcoes.text = Textos.t("menu.options")
+	_sair.text = Textos.t("menu.quit")
+
+	var ha := EstadoJogo.ha_progresso()
+	_load.visible = ha
+	if ha:
+		var txt := Textos.tf("menu.load_world", [EstadoJogo.indice_nivel + 1])
+		if EstadoJogo.hardcore:
+			txt += Textos.t("menu.hardcore_tag")
+		_load.text = txt
+
+	# se um botão estava "armado" para confirmar, repõe o aviso/sufixo
+	if _armado == "novo":
+		_novo.text += Textos.t("menu.confirm_suffix")
+		_aviso.text = Textos.t("menu.warn_new_game")
+	elif _armado == "hardcore":
+		_hardcore.text += Textos.t("menu.confirm_suffix")
+		_aviso.text = Textos.t("menu.warn_hardcore")
 
 
 ## Devolve true se um atalho de dev tratou o arranque (e já não há menu).
@@ -73,17 +99,21 @@ func _tratar_atalhos_dev() -> bool:
 	return true
 
 
+func _abrir_opcoes() -> void:
+	_repor_botoes()
+	add_child(CENA_OPCOES.instantiate())
+
+
 func _ao_novo() -> void:
 	if _precisa_confirmar("novo"):
-		_armar("novo", _novo, "NEW GAME apaga o progresso guardado.")
+		_armar("novo", _novo, Textos.t("menu.warn_new_game"))
 		return
 	_comecar_campanha(false)
 
 
 func _ao_hardcore() -> void:
 	if _precisa_confirmar("hardcore"):
-		_armar("hardcore", _hardcore,
-			"HARDCORE MODE apaga o progresso e liga o tempo limite por mundo.")
+		_armar("hardcore", _hardcore, Textos.t("menu.warn_hardcore"))
 		return
 	_comecar_campanha(true)
 
@@ -96,7 +126,7 @@ func _precisa_confirmar(qual: String) -> bool:
 func _armar(qual: String, botao: Button, texto: String) -> void:
 	_repor_botoes()
 	_armado = qual
-	botao.text = botao.text + "  —  confirmar"
+	botao.text = botao.text + Textos.t("menu.confirm_suffix")
 	_aviso.text = texto
 	_aviso.visible = true
 	botao.grab_focus()
@@ -104,8 +134,8 @@ func _armar(qual: String, botao: Button, texto: String) -> void:
 
 func _repor_botoes() -> void:
 	_armado = ""
-	_novo.text = "NEW GAME"
-	_hardcore.text = "HARDCORE MODE"
+	_novo.text = Textos.t("menu.new_game")
+	_hardcore.text = Textos.t("menu.hardcore")
 	_aviso.visible = false
 
 

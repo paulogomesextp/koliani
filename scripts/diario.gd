@@ -5,15 +5,27 @@ extends CanvasLayer
 
 @onready var _lista: VBoxContainer = $Painel/Margem/Coluna/Scroll/Lista
 @onready var _contador: Label = $Painel/Margem/Coluna/Cabecalho/Contador
+@onready var _titulo: Label = $Painel/Margem/Coluna/Cabecalho/Titulo
+@onready var _fechar_btn: Button = $Painel/Margem/Coluna/Cabecalho/Fechar
 
 
 func _ready() -> void:
 	visible = false
 	# funciona com o jogo em pausa
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	var botao := get_node_or_null("Painel/Margem/Coluna/Cabecalho/Fechar")
-	if botao:
-		botao.pressed.connect(_fechar)
+	if _fechar_btn:
+		_fechar_btn.pressed.connect(_fechar)
+	Textos.idioma_mudou.connect(func(_l: String) -> void: _traduzir())
+	_traduzir()
+
+
+func _traduzir() -> void:
+	if _titulo:
+		_titulo.text = Textos.t("journal.title")
+	if _fechar_btn:
+		_fechar_btn.text = Textos.t("journal.close")
+	if visible:
+		_reconstruir()
 
 
 func _process(_dt: float) -> void:
@@ -49,23 +61,28 @@ func _reconstruir() -> void:
 		filho.queue_free()
 
 	var entradas := DiarioPistas.entradas(EstadoJogo.pistas)
-	_contador.text = "%d / %d pistas" % [entradas.size(), DiarioPistas.total_no_jogo()]
+	_contador.text = Textos.tf("journal.counter", [entradas.size(), DiarioPistas.total_no_jogo()])
 
 	if entradas.is_empty():
 		var vazio := Label.new()
-		vazio.text = "Ainda não encontraste nenhuma pista.\nProcura pelos mundos."
+		vazio.text = Textos.t("journal.empty")
 		vazio.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		_lista.add_child(vazio)
 		return
 
 	for e in entradas:
+		var chave_titulo: String = e["titulo"]
+		var texto_titulo := Textos.t(chave_titulo) if chave_titulo.begins_with("clue.") else chave_titulo
+		var chave_corpo: String = e["texto"]
+		var texto_corpo := Textos.t(chave_corpo) if chave_corpo != "" else Textos.t("journal.unwritten")
+
 		var titulo := Label.new()
-		titulo.text = "%s  —  %s" % [e["titulo"], e["mundo"]]
+		titulo.text = "%s  —  %s" % [texto_titulo, Textos.t(e["mundo"])]
 		titulo.add_theme_color_override("font_color", Color(0.96, 0.7, 0.95))
 		_lista.add_child(titulo)
 
 		var corpo := Label.new()
-		corpo.text = e["texto"]
+		corpo.text = texto_corpo
 		corpo.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		corpo.add_theme_color_override("font_color", Color(0.86, 0.83, 0.9))
 		_lista.add_child(corpo)

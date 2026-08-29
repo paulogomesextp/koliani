@@ -20,6 +20,8 @@ const CAMINHOS := {
 	"projetil": "res://assets/audio/projetil.wav",
 	"investida": "res://assets/audio/investida.wav",
 	"onda": "res://assets/audio/onda.wav",
+	"game_over": "res://assets/audio/game_over.wav",
+	"demonio_ataque": "res://assets/audio/demonio_ataque.wav",
 }
 const VOZES := 8
 
@@ -31,6 +33,7 @@ var _cache := {}
 func _ready() -> void:
 	for i in VOZES:
 		var p := AudioStreamPlayer.new()
+		p.bus = "SFX"  # bus criado pelo autoload Opcoes
 		add_child(p)
 		_pool.append(p)
 

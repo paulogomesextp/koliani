@@ -278,5 +278,9 @@ func _morrer() -> void:
 	morreu.emit()
 	EstadoJogo.perder_vida()
 	if EstadoJogo.sem_vidas():
+		if EstadoJogo.hardcore:
+			# hardcore: 3 vidas gastas = fim do run -> cartão GAME OVER (com voz)
+			GameOver.mostrar(get_tree(), "lives")
+			return
 		EstadoJogo.reiniciar_campanha()
 	Transicao.fechar_e(get_tree().reload_current_scene)

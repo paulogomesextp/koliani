@@ -134,17 +134,41 @@ Autoload `EstadoJogo`. Guarda em `user://progresso.json`:
 - `modo_teste` (bool) -- posto pelos testes; `guardar()`/`carregar()` viram
   no-op para não tocar no save real.
 
+## Idioma (i18n) e Opções
+
+- **Todo o texto visível** passa por `Textos.t("chave")` (autoload
+  `scripts/textos.gd`). Os textos vivem em `assets/i18n/<loc>.json` (mapa
+  chave→string). Idiomas: `en` (base/fallback), `pt`, `es`, `fr`, `de`,
+  `zh`. O jogo arranca **em inglês**.
+- Regra: **nunca** escrever uma string à mão num ecrã. Chave nova → linha
+  nos 6 JSON (`en.json` é a referência; `teste_i18n_ficheiros_validos`
+  falha se algum idioma não tiver exatamente as mesmas chaves).
+- Trocar de idioma: `Opcoes.definir_idioma(loc)` → `Textos` emite
+  `idioma_mudou` → cada ecrã tem um `_traduzir()` ligado a esse sinal e
+  reescreve o seu texto na hora (sem recarregar cena).
+- `assets/i18n/*.json` **não** é "importado" pelo Godot 4.7 → está no
+  `export_presets.cfg > include_filter`. O `Textos._carregar` tenta
+  `load()` (recurso) e cai para `FileAccess` (ficheiro em disco).
+- **Opções** (`scripts/opcoes.gd` autoload + `scripts/opcoes_menu.gd` /
+  `scenes/ui/Opcoes.tscn`): volume de *Music* / *Effects* (buses de áudio
+  `Music` e `SFX`, criados por `opcoes.gd`; `musica.gd`/`som.gd`
+  encaminham para lá) e seletor de idioma. Guarda em `user://opcoes.json`.
+- Falta: fonte CJK para o `zh` (glifos aparecem como quadrados).
+
 ### Modo hardcore
 
 `scripts/relogio_hardcore.gd` (CanvasLayer criado pelo `main.gd` só quando
-`EstadoJogo.hardcore`): relógio no topo do ecrã a contar para trás desde
-`tempo_hardcore_nivel()`. Herda o `process_mode` do Main => pára quando a
-árvore está em pausa (menu de pausa, diário). Reinicia a cada carga de cena
-(uma morte com respawn dá relógio novo -- ver dúvidas). A zero instancia
-`scripts/game_over.gd`, que pausa, mostra "GAME OVER" e -- a saltar/atacar
--- faz `reiniciar_campanha()` (mantém o hardcore) e volta ao mundo 1.
-Dev: `godot . -- --hardcore` (campanha hardcore nova) e `-- --hc-tempo=N`
-(força N s por mundo, para afinar/testar o Game Over).
+`EstadoJogo.hardcore`): relógio no topo do ecrã a contar para trás. O
+tempo que falta vive em `EstadoJogo.hardcore_tempo_restante` (gravado no
+save), por isso **continua a contar através das mortes** -- só
+`avancar_nivel()` / `reiniciar_campanha()` o repõem (-1 = "cheio no
+próximo relógio"). Herda o `process_mode` do Main => pára em pausa/diário.
+Fim do run: tempo a zero **ou** `EstadoJogo.sem_vidas()` (as 3 vidas) em
+modo hardcore -> `GameOver.mostrar(get_tree(), "time"|"lives")`.
+`scripts/game_over.gd` (`class_name GameOver`) pausa, toca a voz
+`Som.toca("game_over")`, mostra o cartão e -- a saltar/atacar -- faz
+`reiniciar_campanha()` (mantém o hardcore) e volta ao mundo 1.
+Dev: `godot . -- --hardcore` e `-- --hc-tempo=N`.
 - `registar_pista(id)` -- chamado pelas `Porta` e pelos `Coletavel`. O
   texto legível de cada id está em `scripts/diario_pistas.gd`.
 
@@ -166,11 +190,12 @@ Dev: `godot . -- --hardcore` (campanha hardcore nova) e `-- --hc-tempo=N`
   projéteis, 2 fases). Falta afinar tempos/dano com o jogo a correr.
 - ~~Cena de final~~ -- feita (`scripts/cena_final.gd`, libertação da
   Aurora). É só texto; transformar em momento com arte/áudio.
-- Som (sem áudio ainda). **Juice** parcial feito: screen shake
-  (`scripts/tremor.gd` puro + `camera_tremor.gd` na câmara), hitstop de
-  tempo real (`Koliani._hitstop`), `CPUParticles2D` de impacto e de
-  aterragem. Falta afinar valores com o jogo a correr e partículas nos
-  demónios.
+- **Áudio** -- SFX + música + voz "GAME OVER" sintetizados
+  (`tools/gerar_audio.py` e o script perdido do 1.º lote). Buses `Music` /
+  `SFX` com volume no menu de Opções. **Juice**: screen shake
+  (`scripts/tremor.gd` + `camera_tremor.gd`), hitstop (`Koliani._hitstop`),
+  `CPUParticles2D` de impacto/aterragem, flinch dos demónios ao levar/dar
+  dano. Falta afinar valores/mix com o jogo a correr.
 - ~~Mapear `rolar` no HUD de toque~~ -- feito (`scenes/ui/HUD.tscn > Toque/Rolar`).
 - ~~**Menu de pausa**~~ -- feito (`scripts/pausa.gd` + `scenes/ui/Pausa.tscn`,
   instanciado pelo `main.gd` como o diário). Pausa a árvore; opções:
@@ -185,11 +210,16 @@ Dev: `godot . -- --hardcore` (campanha hardcore nova) e `-- --hc-tempo=N`
   `godot . -- --jogar` / `-- --nivel=N` / `-- --hardcore` saltam o menu.
   Falta: arte a sério e música própria do menu (por agora usa o drone do
   mundo 1).
-- ~~**Modo hardcore**~~ -- feito (tempo limite por mundo; Game Over
-  recomeça do mundo 1). Falta: **afinar `EstadoJogo.TEMPO_HARDCORE`** com o
-  jogo a correr, e decidir se uma morte com respawn devia manter o tempo
-  em vez de o reiniciar (ver dúvidas).
+- ~~**Menu de Opções**~~ -- feito (SOUND: volume música/efeitos; LANGUAGE:
+  6 idiomas). Ver secção "Idioma (i18n) e Opções".
+- ~~**i18n / jogo em inglês**~~ -- feito. Falta fonte CJK (zh) e revisão
+  nativa de es/fr/de/zh.
+- ~~**Modo hardcore**~~ -- feito. O tempo **continua a contar através das
+  mortes**; fim do run também com as 3 vidas gastas. Falta: **afinar
+  `EstadoJogo.TEMPO_HARDCORE`** com o jogo a correr.
 - ~~Fim da campanha~~ -- volta ao **menu inicial** sem apagar o save.
+- ~~Áudio: voz "GAME OVER", música do chefe, ambiente assombrado, som dos
+  demónios~~ -- feito (`tools/gerar_audio.py`). Falta afinar volumes/mix.
 - **Afinar todos os níveis e chefes com o jogo a correr** (distâncias de
   salto, ritmo, dano, posições) -- os 4 mundos foram montados sem playtest.
 - Sprites + áudio (CC0) -- o Paulo autorizou; por integrar.

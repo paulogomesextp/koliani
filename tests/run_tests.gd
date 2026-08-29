@@ -32,6 +32,8 @@ func _correr_tudo() -> void:
 	teste_tremor_impulso_e_decaimento()
 	teste_diario_entradas_e_fallback()
 	teste_diario_tem_todas_as_pistas_dos_niveis()
+	teste_i18n_en_tem_as_chaves_das_pistas()
+	teste_i18n_ficheiros_validos()
 	teste_estado_tres_mortes_sem_vidas()
 	teste_estado_pistas_sem_duplicados()
 	teste_estado_habilidade_sem_duplicados()
@@ -158,10 +160,54 @@ func teste_tremor_impulso_e_decaimento() -> void:
 func teste_diario_entradas_e_fallback() -> void:
 	var lista := DiarioPistas.entradas(["floresta_sinal_da_porta", "id_desconhecido"])
 	_ok(lista.size() == 2, "entradas devia devolver uma linha por id")
-	_ok(lista[0]["titulo"] == "O cheiro na porta", "id conhecido traz o titulo certo")
-	_ok(lista[0]["mundo"] == "Floresta Putrefata", "id conhecido traz o mundo certo")
-	_ok(lista[1]["titulo"] == "id_desconhecido", "id sem texto cai no proprio id")
+	_ok(lista[0]["titulo"] == "clue.floresta_sinal_da_porta.title", "id conhecido traz a chave do titulo")
+	_ok(lista[0]["mundo"] == "world.forest", "id conhecido traz a chave do mundo")
+	_ok(lista[0]["texto"] == "clue.floresta_sinal_da_porta.body", "id conhecido traz a chave do corpo")
+	_ok(lista[1]["titulo"] == "id_desconhecido", "id sem pista cai no proprio id")
+	_ok(lista[1]["texto"] == "", "id sem pista tem corpo vazio")
 	_ok(DiarioPistas.total_no_jogo() >= 2, "total_no_jogo conta o dicionario")
+
+
+## Toda a chave que o DiarioPistas usa tem de existir no en.json (fallback).
+func teste_i18n_en_tem_as_chaves_das_pistas() -> void:
+	var f := FileAccess.open("res://assets/i18n/en.json", FileAccess.READ)
+	_ok(f != null, "en.json devia existir")
+	if f == null:
+		return
+	var en: Variant = JSON.parse_string(f.get_as_text())
+	f.close()
+	_ok(en is Dictionary, "en.json devia ser um objecto")
+	if not (en is Dictionary):
+		return
+	for id: String in DiarioPistas.PISTAS:
+		var p: Dictionary = DiarioPistas.PISTAS[id]
+		for campo in ["mundo", "titulo", "texto"]:
+			_ok(en.has(p[campo]), "en.json sem a chave '%s' (pista %s)" % [p[campo], id])
+
+
+## Todos os idiomas existem, são JSON válido e têm exatamente o mesmo
+## conjunto de chaves do inglês (sem traduções em falta nem chaves a mais).
+func teste_i18n_ficheiros_validos() -> void:
+	var locs := ["en", "pt", "es", "fr", "de", "zh"]
+	var chaves_en := {}
+	for loc in locs:
+		var caminho := "res://assets/i18n/%s.json" % loc
+		var f := FileAccess.open(caminho, FileAccess.READ)
+		_ok(f != null, "falta o idioma %s (%s)" % [loc, caminho])
+		if f == null:
+			continue
+		var d: Variant = JSON.parse_string(f.get_as_text())
+		f.close()
+		_ok(d is Dictionary, "%s.json devia ser um objecto JSON" % loc)
+		if not (d is Dictionary):
+			continue
+		if loc == "en":
+			chaves_en = d
+			continue
+		for k: String in chaves_en:
+			_ok(d.has(k), "%s.json sem a chave '%s'" % [loc, k])
+		for k: String in d:
+			_ok(chaves_en.has(k), "%s.json tem a chave a mais '%s'" % [loc, k])
 
 
 ## Os ids que as cenas de nível usam (Porta.pista_ao_atravessar e
@@ -253,9 +299,21 @@ func teste_estado_hardcore() -> void:
 	e.reiniciar_campanha()
 	_ok(e.hardcore, "reiniciar_campanha() não deve desligar o hardcore")
 
+	# o tempo restante conta através das mortes (fica no EstadoJogo), mas
+	# reinicia ao mudar de mundo ou recomeçar
+	e.hardcore_tempo_restante = 42.0
+	e.avancar_nivel()
+	_ok(e.hardcore_tempo_restante < 0.0, "mudar de mundo repõe o relógio hardcore")
+	e.hardcore_tempo_restante = 20.0
+	e.reiniciar_campanha()
+	_ok(e.hardcore_tempo_restante < 0.0, "reiniciar a campanha repõe o relógio hardcore")
+
 	var copia := _novo_estado()
+	e.hardcore_tempo_restante = 33.0
 	copia.de_dicionario(e.para_dicionario())
 	_ok(copia.hardcore, "a flag hardcore devia sobreviver ao save")
+	_ok(is_equal_approx(copia.hardcore_tempo_restante, 33.0),
+		"o tempo restante hardcore devia sobreviver ao save")
 
 	e.indice_nivel = 0
 	var t0: float = e.tempo_hardcore_nivel()
