@@ -14,11 +14,28 @@ signal derrotado
 var _koliani: Node2D
 ## Fica > 0 durante um golpe forte do chefe (o contacto magoa mais).
 var _ataque_forte := 0.0
+var _ja_derrotado := false
 
 
 func _ready() -> void:
 	super._ready()
 	add_to_group("chefes")
+
+
+func _process(dt: float) -> void:
+	super._process(dt)
+	# rede de segurança: se o chefe se atirar para fora do mapa (investida
+	# num fosso, etc.), conta como derrotado -- senão o nível fica
+	# bloqueado porque a porta nunca abre.
+	if not _ja_derrotado and global_position.y - _origem.y > 520.0:
+		_cair_derrotado()
+
+
+func _cair_derrotado() -> void:
+	_ja_derrotado = true
+	Som.toca("chefe_cai", -3.0)
+	derrotado.emit()
+	queue_free()
 
 
 func _obter_koliani() -> Node2D:
@@ -58,9 +75,12 @@ func _ao_tocar(corpo: Node) -> void:
 
 
 func receber_dano(quantidade: int, dir_empurrao: float = 0.0) -> void:
+	if _ja_derrotado:
+		return
 	vida -= quantidade
 	global_position.x += dir_empurrao * 3.0
 	if vida <= 0:
+		_ja_derrotado = true
 		Som.toca("chefe_cai", -2.0)
 		derrotado.emit()
 		soltar_estilhacos()

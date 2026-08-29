@@ -43,11 +43,14 @@ func _physics_process(dt: float) -> void:
 				_ir_para(Fase.INVESTIDA)
 		Fase.INVESTIDA:
 			_ataque_forte = maxf(0.0, _ataque_forte - dt)
-			velocity.x = _alvo_dir * vel_investida
+			# se sair do chão a meio da investida (fosso), corta o impulso
+			# e cai a direito -- não sai a voar pelo mapa fora
+			var no_vazio := _t > 0.05 and not is_on_floor()
+			velocity.x = 0.0 if no_vazio else _alvo_dir * vel_investida
 			if not is_on_floor():
 				velocity.y += GRAVIDADE * dt
 			move_and_slide()
-			if _t >= dur_investida or is_on_wall():
+			if no_vazio or _t >= dur_investida or is_on_wall():
 				_ir_para(Fase.RECUPERA)
 		Fase.RECUPERA:
 			_travar(dt)

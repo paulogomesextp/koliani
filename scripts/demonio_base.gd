@@ -11,6 +11,9 @@ const GRAVIDADE := 1400.0
 @export var vida := 50
 @export var dano_contacto := 15
 @export var alcance_patrulha := 120.0
+## A que distância à frente se testa se ainda há chão (evita cair da
+## plataforma na patrulha / na perseguição).
+@export var margem_borda := 20.0
 ## Cor do rasto de partículas quando morre.
 @export var cor_estilhacos := Color(0.7, 0.25, 0.45)
 ## Cor da luz de recorte (rim) do sprite -- normalmente o tom do bioma.
@@ -62,7 +65,8 @@ func _physics_process(dt: float) -> void:
 		velocity.y += GRAVIDADE * dt
 	move_and_slide()
 
-	if is_on_wall() or absf(global_position.x - _origem.x) > alcance_patrulha:
+	if is_on_wall() or absf(global_position.x - _origem.x) > alcance_patrulha \
+			or (is_on_floor() and not ha_chao_a_frente(_direcao)):
 		_virar()
 
 
@@ -70,6 +74,15 @@ func _virar() -> void:
 	_direcao *= -1.0
 	if _sprite:
 		_sprite.scale.x = _direcao
+
+
+## Há chão logo a seguir à beira, na direção `dir`? (raycast para baixo)
+func ha_chao_a_frente(dir: float) -> bool:
+	var espaco := get_world_2d().direct_space_state
+	var origem := global_position + Vector2(signf(dir) * margem_borda, -6.0)
+	var q := PhysicsRayQueryParameters2D.create(origem, origem + Vector2(0.0, 74.0), 1)
+	q.exclude = [self]
+	return not espaco.intersect_ray(q).is_empty()
 
 
 func _ao_tocar(corpo: Node) -> void:

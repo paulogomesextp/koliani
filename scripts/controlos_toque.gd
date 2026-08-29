@@ -1,7 +1,13 @@
 extends CanvasLayer
 ## HUD: barra de vida + vidas (sempre visíveis) e os botões de toque
-## (`Toque`), que só aparecem em ecrã táctil / ao primeiro toque -- assim
-## no desktop joga-se com teclado sem os botões por cima.
+## (`Toque`), que só aparecem em ecrã táctil / ao primeiro toque. Mostra
+## também avisos curtos ao ganhar habilidade ou encontrar pista.
+
+const NOME_HABILIDADE := {
+	"salto_duplo": "Salto duplo",
+	"dash_aereo": "Dash aéreo",
+	"partir_paredes": "Partir paredes",
+}
 
 @onready var _barra_vida: ProgressBar = $Vida/Barra
 @onready var _label_vidas: Label = $Vidas/Label
@@ -12,6 +18,8 @@ func _ready() -> void:
 	if _toque:
 		_toque.visible = DisplayServer.is_touchscreen_available()
 	EstadoJogo.vidas_mudaram.connect(_atualizar_vidas)
+	EstadoJogo.habilidade_desbloqueada.connect(_ao_habilidade)
+	EstadoJogo.pista_encontrada.connect(_ao_pista)
 	_atualizar_vidas(EstadoJogo.vidas)
 	var koliani := get_tree().get_first_node_in_group("koliani")
 	if koliani and koliani.has_signal("vida_mudou"):
@@ -32,3 +40,30 @@ func _atualizar_barra_vida(atual: int, maximo: int) -> void:
 func _atualizar_vidas(vidas: int) -> void:
 	if _label_vidas:
 		_label_vidas.text = "x%d" % vidas
+
+
+func _ao_habilidade(id: String) -> void:
+	_aviso("Nova habilidade: %s" % NOME_HABILIDADE.get(id, id))
+
+
+func _ao_pista(_id: String, total: int) -> void:
+	_aviso("Pista encontrada  (%d)" % total)
+
+
+func _aviso(txt: String) -> void:
+	var l := Label.new()
+	l.text = "  " + txt + "  "
+	var larg := get_viewport().get_visible_rect().size.x
+	l.position = Vector2(larg * 0.5 - 130.0, 68.0)
+	l.add_theme_color_override("font_color", Color(1, 0.92, 1))
+	l.add_theme_font_size_override("font_size", 20)
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0.55, 0.18, 0.5, 0.9)
+	sb.set_corner_radius_all(5)
+	sb.set_content_margin_all(6)
+	l.add_theme_stylebox_override("normal", sb)
+	add_child(l)
+	var t := l.create_tween()
+	t.tween_interval(1.8)
+	t.tween_property(l, "modulate:a", 0.0, 0.6)
+	t.tween_callback(l.queue_free)

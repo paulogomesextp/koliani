@@ -31,7 +31,7 @@ func _physics_process(dt: float) -> void:
 		Fase.APROXIMA:
 			_encarar_koliani()
 			var dx := _vetor_para_koliani().x
-			if absf(dx) > dist_parar:
+			if absf(dx) > dist_parar and ha_chao_a_frente(signf(dx)):
 				velocity.x = signf(dx) * vel_aproxima
 			else:
 				velocity.x = move_toward(velocity.x, 0.0, 700.0 * dt)

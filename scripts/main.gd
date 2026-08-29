@@ -51,25 +51,53 @@ func _unhandled_input(evento: InputEvent) -> void:
 		return
 	if not (evento is InputEventKey and evento.pressed and not evento.echo):
 		return
-	match evento.keycode:
+	# usa o physical_keycode (posição da tecla) -- mais fiável que keycode
+	match evento.physical_keycode:
 		KEY_F1, KEY_F2, KEY_F3, KEY_F4:
-			var i: int = int(evento.keycode) - KEY_F1
+			var i: int = int(evento.physical_keycode) - KEY_F1
 			if i < EstadoJogo.NIVEIS.size():
 				EstadoJogo.indice_nivel = i
 				EstadoJogo.checkpoint = Vector2.ZERO
+				_toast_debug("mundo %d" % (i + 1))
+				await get_tree().create_timer(0.35).timeout
 				get_tree().change_scene_to_file("res://scenes/Main.tscn")
 		KEY_F5:
 			for h in ["salto_duplo", "dash_aereo", "partir_paredes"]:
 				EstadoJogo.desbloquear_habilidade(h)
-			print("DEBUG: todas as habilidades desbloqueadas")
+			_toast_debug("habilidades todas: salto duplo + dash aereo + partir paredes")
 		KEY_F6:
 			EstadoJogo.vidas += 3
 			EstadoJogo.vidas_mudaram.emit(EstadoJogo.vidas)
-			print("DEBUG: +3 vidas (", EstadoJogo.vidas, ")")
+			_toast_debug("+3 vidas  (%d)" % EstadoJogo.vidas)
 		KEY_F9:
 			EstadoJogo.reiniciar_campanha()
+			_toast_debug("save apagado -- recomecar")
+			await get_tree().create_timer(0.35).timeout
 			get_tree().change_scene_to_file("res://scenes/Main.tscn")
-			print("DEBUG: save apagado, campanha reiniciada")
+
+
+func _toast_debug(txt: String) -> void:
+	print("DEBUG: ", txt)
+	var camada := CanvasLayer.new()
+	camada.layer = 26
+	camada.process_mode = Node.PROCESS_MODE_ALWAYS
+	add_child(camada)
+	var l := Label.new()
+	l.text = "  " + txt + "  "
+	l.position = Vector2(20, 92)
+	l.add_theme_color_override("font_color", Color(0.1, 0.05, 0.12))
+	l.add_theme_font_size_override("font_size", 18)
+	var estilo := StyleBoxFlat.new()
+	estilo.bg_color = Color(1, 0.82, 0.4, 0.92)
+	estilo.set_corner_radius_all(4)
+	estilo.content_margin_top = 3
+	estilo.content_margin_bottom = 3
+	l.add_theme_stylebox_override("normal", estilo)
+	camada.add_child(l)
+	var t := create_tween()
+	t.tween_interval(1.6)
+	t.tween_property(l, "modulate:a", 0.0, 0.5)
+	t.tween_callback(camada.queue_free)
 
 
 func _tirar_foto(caminho: String) -> void:
