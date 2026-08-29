@@ -26,6 +26,7 @@ Mapa de input em `project.godot` (nomes em português):
 | `dash` | K | botão de ação (baixo) |
 | `rolar` | seta baixo | botão de ação (esquerda) |
 | `diario` | I / Tab | botão canto sup. direito |
+| `pausa` | P (Esc fecha) | botão abaixo do diário |
 
 `scenes/ui/HUD.tscn` tem os `TouchScreenButton` com a `action` certa; o
 Godot injeta a InputAction sozinho. `controlos_toque.gd` só esconde o HUD
@@ -148,7 +149,12 @@ Autoload `EstadoJogo`. Guarda em `user://progresso.json`:
   tempo real (`Koliani._hitstop`), `CPUParticles2D` de impacto e de
   aterragem. Falta afinar valores com o jogo a correr e partículas nos
   demónios.
-- Mapear `rolar` no HUD de toque (`scenes/ui/HUD.tscn`).
+- ~~Mapear `rolar` no HUD de toque~~ -- feito (`scenes/ui/HUD.tscn > Toque/Rolar`).
+- ~~**Menu de pausa**~~ -- feito (`scripts/pausa.gd` + `scenes/ui/Pausa.tscn`,
+  instanciado pelo `main.gd` como o diário). Pausa a árvore; opções:
+  continuar / recomeçar no checkpoint / sair. Abre com `pausa` (P ou botão
+  do HUD), fecha com `pausa` ou `ui_cancel`. O diário e a pausa não abrem
+  um por cima do outro (ambos só abrem se `get_tree().paused` for falso).
 - **Afinar todos os níveis e chefes com o jogo a correr** (distâncias de
   salto, ritmo, dano, posições) -- os 4 mundos foram montados sem playtest.
 - Sprites + áudio (CC0) -- o Paulo autorizou; por integrar.

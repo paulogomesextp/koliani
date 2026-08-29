@@ -6,6 +6,7 @@ extends Node2D
 
 const CENA_HUD := preload("res://scenes/ui/HUD.tscn")
 const CENA_DIARIO := preload("res://scenes/ui/Diario.tscn")
+const CENA_PAUSA := preload("res://scenes/ui/Pausa.tscn")
 const FIM_CAMPANHA := preload("res://scripts/fim_campanha.gd")
 
 
@@ -25,6 +26,7 @@ func _ready() -> void:
 
 	add_child(CENA_HUD.instantiate())
 	add_child(CENA_DIARIO.instantiate())
+	add_child(CENA_PAUSA.instantiate())
 
 	# `godot --path . -- --foto[=ficheiro]`: tira uma captura e sai (dev).
 	for a in OS.get_cmdline_user_args():

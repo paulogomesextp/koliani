@@ -1,0 +1,71 @@
+[gd_scene load_steps=3 format=3 uid="uid://bkolianipausa01"]
+
+[ext_resource type="Script" path="res://scripts/pausa.gd" id="1_pausa"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_painel"]
+content_margin_left = 40.0
+content_margin_top = 32.0
+content_margin_right = 40.0
+content_margin_bottom = 32.0
+bg_color = Color(0.06, 0.04, 0.09, 0.98)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.6, 0.22, 0.6, 0.9)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[node name="Pausa" type="CanvasLayer"]
+layer = 20
+script = ExtResource("1_pausa")
+
+[node name="Fundo" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.02, 0.015, 0.03, 0.78)
+
+[node name="Painel" type="PanelContainer" parent="."]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -220.0
+offset_top = -170.0
+offset_right = 220.0
+offset_bottom = 170.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_painel")
+
+[node name="Coluna" type="VBoxContainer" parent="Painel"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Titulo" type="Label" parent="Painel/Coluna"]
+layout_mode = 2
+horizontal_alignment = 1
+text = "Pausa"
+theme_override_colors/font_color = Color(1, 0.85, 0.98, 1)
+theme_override_font_sizes/font_size = 32
+
+[node name="Separador" type="HSeparator" parent="Painel/Coluna"]
+layout_mode = 2
+
+[node name="Continuar" type="Button" parent="Painel/Coluna"]
+layout_mode = 2
+focus_neighbor_top = NodePath("../Sair")
+focus_neighbor_bottom = NodePath("../Recomecar")
+text = "Continuar"
+
+[node name="Recomecar" type="Button" parent="Painel/Coluna"]
+layout_mode = 2
+text = "Recomeçar no checkpoint"
+
+[node name="Sair" type="Button" parent="Painel/Coluna"]
+layout_mode = 2
+text = "Sair do jogo"

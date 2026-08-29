@@ -71,6 +71,7 @@ scripts/
   transicao.gd         -- autoload Transicao: fade a preto entre cenas (morte/reaparecer)
   diario_pistas.gd     -- DADOS PUROS: textos das pistas por id (para o diario + testes)
   diario.gd            -- ecra de diario: I/Tab, pausa o jogo, lista EstadoJogo.pistas
+  pausa.gd             -- menu de pausa: P/botao; pausa a arvore; continuar/recomecar/sair
   tremor.gd            -- LOGICA PURA do screen shake (amplitude decai a zero); testavel
   camera_tremor.gd     -- Camera2D da Koliani: aplica o Tremor ao offset (zoom 1.4)
   atmosfera.gd         -- pinta o ambiente (modulate/parallax/luzes) + poeira segue a camara
@@ -94,8 +95,9 @@ scenes/
   actors/Plataforma.tscn           -- plataforma "chunky" (shader de pedra/tijolo procedural)
   fx/Atmosfera.tscn                -- ambiente: parallax 4 camadas (silhuetas Polygon2D) + feixes de luz + poeira + vinheta + grade de ecra
 assets/shaders/                    -- personagem (rim+flash), plataforma (pedra), grade (contraste/sat/bloom)
-  ui/HUD.tscn                      -- barra de vida, vidas, TouchScreenButtons (+ rolar, diario)
+  ui/HUD.tscn                      -- barra de vida, vidas, TouchScreenButtons (+ rolar, diario, pausa)
   ui/Diario.tscn                   -- painel do diario de pistas (instanciado pelo main.gd)
+  ui/Pausa.tscn                    -- menu de pausa (instanciado pelo main.gd)
 
 tests/run_tests.gd     -- corredor headless proprio (movimento + estado_jogo)
 docs/                  -- historia.md, design.md (bibliografia viva)
@@ -150,6 +152,9 @@ SDK) -- ajustar pelo log do Actions.
   salto_duplo (M1) -> dash_aereo (M2) -> partir_paredes (M3) -> luta final
   com o Zeriko + cena da Aurora (M4). Chefes distintos nos 4 mundos.
   Diário de pistas funcional (7 pistas escritas).
+- **Menu de pausa** (`scripts/pausa.gd` + `scenes/ui/Pausa.tscn`): P ou
+  botão do HUD; pausa a árvore; continuar / recomeçar no checkpoint / sair.
+  Verificado no build Web (abrir, fechar, recomeçar com fade).
 - **Playtest do Paulo em curso.** Corrigido já: chefe atirava-se para um
   fosso e ficava o nível bloqueado (rede de segurança em `chefe_base.gd`
   + inimigos viram na beira via `ha_chao_a_frente`); atalhos F1-F9 agora

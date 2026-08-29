@@ -39,6 +39,8 @@ corre a *cena aberta* (útil para testar um nível isolado).
 | Rolar | ↓ | botão de ação (esquerda) |
 | Diário de pistas | I ou Tab | botão canto sup. direito |
 | Fechar diário | Esc | (toca fora / botão) |
+| Pausa | P | botão abaixo do diário |
+| Fechar pausa | P ou Esc | botão "Continuar" |
 
 ## Atalhos de depuração (só no editor / build de debug)
 

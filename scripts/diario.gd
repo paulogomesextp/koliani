@@ -28,7 +28,8 @@ func _process(_dt: float) -> void:
 func _alternar() -> void:
 	if visible:
 		_fechar()
-	else:
+	elif not get_tree().paused:
+		# não abrir por cima de outra coisa que já segura a pausa (menu de pausa)
 		_abrir()
 
 
