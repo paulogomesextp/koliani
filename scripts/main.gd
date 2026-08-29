@@ -36,6 +36,35 @@ func _procurar_porta(no: Node) -> Porta:
 	return null
 
 
+## Atalhos de depuração -- só em builds de debug (editor / export-debug).
+## F1..F4: salta para o mundo 1..4. F5: dá todas as habilidades.
+## F6: +3 vidas. F9: apaga o save e recomeça.
+func _unhandled_input(evento: InputEvent) -> void:
+	if not OS.is_debug_build():
+		return
+	if not (evento is InputEventKey and evento.pressed and not evento.echo):
+		return
+	match evento.keycode:
+		KEY_F1, KEY_F2, KEY_F3, KEY_F4:
+			var i: int = int(evento.keycode) - KEY_F1
+			if i < EstadoJogo.NIVEIS.size():
+				EstadoJogo.indice_nivel = i
+				EstadoJogo.checkpoint = Vector2.ZERO
+				get_tree().change_scene_to_file("res://scenes/Main.tscn")
+		KEY_F5:
+			for h in ["salto_duplo", "dash_aereo", "partir_paredes"]:
+				EstadoJogo.desbloquear_habilidade(h)
+			print("DEBUG: todas as habilidades desbloqueadas")
+		KEY_F6:
+			EstadoJogo.vidas += 3
+			EstadoJogo.vidas_mudaram.emit(EstadoJogo.vidas)
+			print("DEBUG: +3 vidas (", EstadoJogo.vidas, ")")
+		KEY_F9:
+			EstadoJogo.reiniciar_campanha()
+			get_tree().change_scene_to_file("res://scenes/Main.tscn")
+			print("DEBUG: save apagado, campanha reiniciada")
+
+
 func _ao_fim_da_campanha() -> void:
 	print("FIM: Koliani liberta a mãe de Zeriko.")
 	var fim := CanvasLayer.new()
