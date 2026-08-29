@@ -161,29 +161,29 @@ SDK) -- ajustar pelo log do Actions.
 Ver **`docs/testar.md`**: como correr o jogo, controlos, atalhos de debug
 (F1-F9), instalar os modelos de export, e ligar o remote/CI.
 
-## Em aberto
+## Decisões de direção (Paulo)
 
-Respostas do Paulo já aplicadas: arte/áudio CC0 **OK**, chefes distintos
-**OK**, mãe = **Aurora**, final = **luta + cena narrativa**.
+- Chefes distintos por mundo · mãe = **Aurora** · final = **luta + cena
+  narrativa** · música = **B** (drone + melodia esparsa).
+- **Estilo de arte:** manter **vetorial** (SVG rim-lit). Pixel-art fica
+  como hipótese futura (swap dos sprites).
+- **Brilho (bloom):** **suave** -- `Atmosfera.tscn > Grade`
+  `shader_parameter/bloom = 0.14`.
+- **Animação com frames:** adiada -- só **depois** de afinar a
+  jogabilidade. Por agora é procedural (squash/stretch, lean, wind-up,
+  rastro, frame de impacto).
+- **Fundo temático por mundo** (árvores / grades / torres / arcos):
+  aprovado em princípio, mas **polir depois** do gameplay; hoje são
+  silhuetas genéricas recortadas.
 
-1. **Arte** -- 2.º passe feito (look Dead Cells): sprites SVG como
-   silhuetas rim-lit + `assets/shaders/personagem.gdshader` (flash de
-   dano), animação **procedural** (squash/stretch, lean, wind-up dos
-   chefes, rastro da lâmina, frame de impacto), `Atmosfera.tscn` com
-   parallax de 4 camadas (silhuetas recortadas), feixes de luz, poeira e
-   passe de ecrã (contraste/saturação/bloom), plataformas "chunky" com
-   shader de pedra. **Falta:** frames de animação a sério, mais variedade
-   nas silhuetas por bioma, tiles/decoração de nível. Se preferires
-   pixel-art de packs CC0, continua a ser um swap.
-2. **Áudio** -- 1.º passe: **SFX sintetizados** por nós
-   (`assets/audio/*.wav`, gerados por script) ligados a salto/ataque/
-   acerto/dano/aterrar/apanhar/porta/checkpoint/chefes; **cama de
-   ambiente** em loop com pitch por bioma. Falta música a sério e mixagem.
-   Se quiseres packs CC0 (Kenney), é um swap dos `.wav`.
-3. **Playtest + afinação** -- o Paulo vai testar (`docs/testar.md`) e
-   passar notas de feel/dificuldade (níveis montados sem jogar).
-4. **Remote / CI + modelos de export** -- passos em `docs/testar.md`;
-   é trabalho do Paulo (git config).
+## Por fazer (à espera do Paulo)
+
+1. **Playtest + afinação** -- testar (`docs/testar.md`) e passar notas de
+   feel/dificuldade (os níveis foram montados sem jogar).
+2. **Remote / CI** -- ligar o `git remote` (é trabalho do Paulo; o build
+   Web local já funciona).
+3. Frames de animação, fundos temáticos, tiles/decoração, mixagem de
+   áudio -- quando o Paulo der luz verde.
 
 ## Regras
 
