@@ -99,6 +99,7 @@ func _physics_process(dt: float) -> void:
 	else:
 		# salto duplo: habilidade permanente ganha ao longo da campanha
 		var saltos_max := 2 if EstadoJogo.tem_habilidade("salto_duplo") else 1
+		var saltos_antes := _mov.saltos_dados
 		_mov = Movimento.passo(
 			_mov, dir,
 			Input.is_action_just_pressed("saltar"),
@@ -106,6 +107,8 @@ func _physics_process(dt: float) -> void:
 			is_on_floor(), dt, saltos_max,
 		)
 		velocity = _mov.velocidade
+		if _mov.saltos_dados > saltos_antes:
+			Som.toca("salto_duplo" if _mov.saltos_dados >= 2 else "salto", -12.0)
 
 	var vel_queda := velocity.y
 	move_and_slide()
@@ -119,6 +122,7 @@ func _physics_process(dt: float) -> void:
 		var f := remap(minf(vel_queda, 1100.0), 180.0, 1100.0, 0.35, 1.0)
 		_squash = maxf(_squash, f)
 		_abanar(remap(minf(vel_queda, 1100.0), 180.0, 1100.0, 1.0, 4.5))
+		Som.toca("aterrar", remap(f, 0.35, 1.0, -20.0, -8.0))
 	_estava_no_chao = no_chao
 
 	# caiu num fosso sem fundo -> conta como morte (reaparece no checkpoint)
@@ -220,6 +224,7 @@ func _hitstop(segundos: float) -> void:
 func _iniciar_ataque() -> void:
 	_ataque_restante = DUR_ATAQUE
 	_pop = 1.0
+	Som.toca("ataque", -13.0)
 	if _hitbox:
 		_hitbox.scale.x = _olha_para
 		_hitbox.monitoring = true
@@ -234,6 +239,7 @@ func _ao_acertar_corpo(corpo: Node) -> void:
 		_pop_impacto((corpo as Node2D).global_position if corpo is Node2D else global_position)
 		_abanar(4.5)
 		_hitstop(0.06)
+		Som.toca("acerto", -5.0)
 
 
 ## "Frame de impacto" -- clarão branco que estica e desaparece depressa.
@@ -261,6 +267,7 @@ func receber_dano(quantidade: int, _dir_empurrao: float = 0.0) -> void:
 	_flash_branco()
 	_abanar(8.0)
 	_hitstop(0.07)
+	Som.toca("dano", -4.0)
 	if vida <= 0:
 		_morrer()
 

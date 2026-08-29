@@ -69,8 +69,10 @@ scripts/
   diario_pistas.gd     -- DADOS PUROS: textos das pistas por id (para o diario + testes)
   diario.gd            -- ecra de diario: I/Tab, pausa o jogo, lista EstadoJogo.pistas
   tremor.gd            -- LOGICA PURA do screen shake (amplitude decai a zero); testavel
-  camera_tremor.gd     -- Camera2D da Koliani: aplica o Tremor ao offset
-  controlos_toque.gd   -- HUD de toque (esconde-se com teclado)
+  camera_tremor.gd     -- Camera2D da Koliani: aplica o Tremor ao offset (zoom 1.4)
+  atmosfera.gd         -- pinta o ambiente (modulate/parallax/luzes) + poeira segue a camara
+  plataforma.gd        -- @tool: plataforma reutilizavel (colisao + shader) por "tamanho"
+  controlos_toque.gd   -- HUD: vida sempre visivel; botoes de toque so em ecra tactil
   main.gd              -- arranque: carrega o nivel atual + HUD + diario; atalhos de debug (F1-F9)
 
 scenes/
@@ -86,7 +88,9 @@ scenes/
   actors/ProjetilZeriko.tscn       -- projetil do chefe final
   actors/Coletavel.tscn            -- gema magenta c/ PointLight2D (pista / habilidade)
   actors/ParedeFragil.tscn         -- parede rachada que se parte a golpe (c/ habilidade)
-  fx/Atmosfera.tscn                -- ambiente reutilizavel (parallax + luz + vinheta), recolorido por mundo
+  actors/Plataforma.tscn           -- plataforma "chunky" (shader de pedra/tijolo procedural)
+  fx/Atmosfera.tscn                -- ambiente: parallax 4 camadas (silhuetas Polygon2D) + feixes de luz + poeira + vinheta + grade de ecra
+assets/shaders/                    -- personagem (rim+flash), plataforma (pedra), grade (contraste/sat/bloom)
   ui/HUD.tscn                      -- barra de vida, vidas, TouchScreenButtons (+ rolar, diario)
   ui/Diario.tscn                   -- painel do diario de pistas (instanciado pelo main.gd)
 
@@ -155,13 +159,16 @@ Ver **`docs/testar.md`**: como correr o jogo, controlos, atalhos de debug
 Respostas do Paulo já aplicadas: arte/áudio CC0 **OK**, chefes distintos
 **OK**, mãe = **Aurora**, final = **luta + cena narrativa**.
 
-1. **Arte** -- feito um 1.º passe: sprites **SVG originais** (nossos, sem
-   licença de terceiros) em `assets/sprites/` para Koliani, demónios, os
-   4 chefes, gema e porta. Ainda são estáticos (falta animação/frames) e
-   as plataformas/parallax continuam `ColorRect`. Se preferires pixel-art
-   de packs CC0 (Kenney, etc.), é um swap.
-2. **Áudio** -- ainda nada. Plano: Kenney "Impact Sounds"/"UI Audio" +
-   ambiente. Por descarregar/integrar.
+1. **Arte** -- 2.º passe feito (look Dead Cells): sprites SVG como
+   silhuetas rim-lit + `assets/shaders/personagem.gdshader` (flash de
+   dano), animação **procedural** (squash/stretch, lean, wind-up dos
+   chefes, rastro da lâmina, frame de impacto), `Atmosfera.tscn` com
+   parallax de 4 camadas (silhuetas recortadas), feixes de luz, poeira e
+   passe de ecrã (contraste/saturação/bloom), plataformas "chunky" com
+   shader de pedra. **Falta:** frames de animação a sério, mais variedade
+   nas silhuetas por bioma, tiles/decoração de nível. Se preferires
+   pixel-art de packs CC0, continua a ser um swap.
+2. **Áudio** -- ainda nada (sem SFX nem música). Plano: packs CC0.
 3. **Playtest + afinação** -- o Paulo vai testar (`docs/testar.md`) e
    passar notas de feel/dificuldade (níveis montados sem jogar).
 4. **Remote / CI + modelos de export** -- passos em `docs/testar.md`;

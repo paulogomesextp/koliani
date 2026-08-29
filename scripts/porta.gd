@@ -18,6 +18,7 @@ func _ao_entrar(corpo: Node) -> void:
 		return
 	if pista_ao_atravessar != "":
 		EstadoJogo.registar_pista(pista_ao_atravessar)
+	Som.toca("porta", -3.0)
 	if EstadoJogo.ha_proximo_nivel():
 		EstadoJogo.avancar_nivel()
 		get_tree().change_scene_to_file("res://scenes/Main.tscn")

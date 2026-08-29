@@ -48,5 +48,6 @@ func _ao_entrar(corpo: Node) -> void:
 		EstadoJogo.registar_pista(pista_id)
 	if habilidade_id != "":
 		EstadoJogo.desbloquear_habilidade(habilidade_id)
+	Som.toca("apanhar", -6.0)
 	apanhado.emit(pista_id, habilidade_id)
 	queue_free()

@@ -61,6 +61,7 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0) -> void:
 	vida -= quantidade
 	global_position.x += dir_empurrao * 3.0
 	if vida <= 0:
+		Som.toca("chefe_cai", -2.0)
 		derrotado.emit()
 		soltar_estilhacos()
 		queue_free()

@@ -19,6 +19,7 @@ func _ao_entrar(corpo: Node) -> void:
 	if corpo is Koliani and not _ativo:
 		_ativar()
 		EstadoJogo.definir_checkpoint(global_position)
+		Som.toca("selo", -12.0)
 
 
 func _ativar() -> void:
