@@ -6,6 +6,18 @@
 
 [ext_resource type="Script" path="res://scripts/chefe_vento.gd" id="1_vento"]
 [ext_resource type="Texture2D" uid="uid://dv763vqjcqvsn" path="res://assets/sprites/chefe_vento.svg" id="2_tex"]
+[ext_resource type="Shader" path="res://assets/shaders/personagem.gdshader" id="3_sh"]
+
+[sub_resource type="ShaderMaterial" id="mat_b"]
+resource_local_to_scene = true
+shader = ExtResource("3_sh")
+shader_parameter/flash = 0.0
+shader_parameter/flash_cor = Color(1, 1, 1, 1)
+shader_parameter/rim_cor = Color(0.82, 0.58, 1, 1)
+shader_parameter/rim_forca = 0.7
+shader_parameter/rim_dir = Vector2(-1, -0.55)
+shader_parameter/rim_espessura = 1.4
+shader_parameter/interior = 0.2
 
 [sub_resource type="RectangleShape2D" id="rs_body"]
 size = Vector2(30, 64)
@@ -38,6 +50,7 @@ cor_estilhacos = Color(0.78, 0.5, 1, 1)
 [node name="Corpo" type="Sprite2D" parent="Sprite"]
 position = Vector2(0, -2)
 texture = ExtResource("2_tex")
+material = SubResource("mat_b")
 
 [node name="LuzOlhos" type="PointLight2D" parent="Sprite"]
 position = Vector2(0, -18)

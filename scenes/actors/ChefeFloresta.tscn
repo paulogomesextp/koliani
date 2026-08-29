@@ -5,6 +5,18 @@
 
 [ext_resource type="Script" path="res://scripts/chefe_floresta.gd" id="1_chefe"]
 [ext_resource type="Texture2D" uid="uid://y1tkdsyjw1ah" path="res://assets/sprites/chefe_raiz.svg" id="2_tex"]
+[ext_resource type="Shader" path="res://assets/shaders/personagem.gdshader" id="3_sh"]
+
+[sub_resource type="ShaderMaterial" id="mat_b"]
+resource_local_to_scene = true
+shader = ExtResource("3_sh")
+shader_parameter/flash = 0.0
+shader_parameter/flash_cor = Color(1, 1, 1, 1)
+shader_parameter/rim_cor = Color(0.55, 0.95, 0.4, 1)
+shader_parameter/rim_forca = 0.65
+shader_parameter/rim_dir = Vector2(-1, -0.55)
+shader_parameter/rim_espessura = 1.4
+shader_parameter/interior = 0.22
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_body"]
 size = Vector2(46, 62)
@@ -38,6 +50,7 @@ cor_estilhacos = Color(0.45, 0.7, 0.3, 1)
 [node name="Corpo" type="Sprite2D" parent="Sprite"]
 position = Vector2(0, -1)
 texture = ExtResource("2_tex")
+material = SubResource("mat_b")
 
 [node name="LuzOlhos" type="PointLight2D" parent="Sprite"]
 position = Vector2(0, -6)

@@ -13,17 +13,24 @@ const GRAVIDADE := 1400.0
 @export var alcance_patrulha := 120.0
 ## Cor do rasto de partículas quando morre.
 @export var cor_estilhacos := Color(0.7, 0.25, 0.45)
+## Cor da luz de recorte (rim) do sprite -- normalmente o tom do bioma.
+@export var cor_rim := Color(0.95, 0.5, 0.72)
 
 @onready var _origem := global_position
 @onready var _sprite: Node2D = $Sprite
+@onready var _corpo: Sprite2D = get_node_or_null("Sprite/Corpo")
 @onready var _area_contacto: Area2D = $AreaContacto
 
 var _direcao := 1.0
+var _mat: ShaderMaterial
 
 
 func _ready() -> void:
 	if _area_contacto:
 		_area_contacto.body_entered.connect(_ao_tocar)
+	if _corpo and _corpo.material is ShaderMaterial:
+		_mat = _corpo.material
+		_mat.set_shader_parameter("rim_cor", cor_rim)
 
 
 func _physics_process(dt: float) -> void:
@@ -59,11 +66,13 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0) -> void:
 
 ## Flash branco curto ao levar dano (feedback de acerto).
 func piscar_dano() -> void:
-	if _sprite == null:
-		return
-	_sprite.modulate = Color(2.2, 2.2, 2.2)
-	var t := create_tween()
-	t.tween_property(_sprite, "modulate", Color(1, 1, 1), 0.12)
+	if _mat:
+		_mat.set_shader_parameter("flash", 1.0)
+		var t := create_tween()
+		t.tween_method(func(v: float): _mat.set_shader_parameter("flash", v), 1.0, 0.0, 0.12)
+	elif _sprite:
+		_sprite.modulate = Color(2.2, 2.2, 2.2)
+		create_tween().tween_property(_sprite, "modulate", Color(1, 1, 1), 0.12)
 
 
 ## Larga um pequeno rebentamento de partículas na posição da morte. O nó

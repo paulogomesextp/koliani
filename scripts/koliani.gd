@@ -23,6 +23,8 @@ const Y_MORTE := 1200.0
 
 @onready var _hitbox: Area2D = $HitboxAtaque
 @onready var _sprite: Node2D = $Sprite
+@onready var _corpo: Sprite2D = $Sprite/Corpo
+@onready var _rastro: Line2D = $Sprite/Rastro
 @onready var _camera: Camera2D = $Camera2D
 @onready var _faiscas: CPUParticles2D = $FaiscasAtaque
 @onready var _po: CPUParticles2D = $PoAterragem
@@ -38,6 +40,12 @@ var _ataque_restante := 0.0
 var _invulneravel := 0.0
 var _estava_no_chao := true
 
+# animação procedural (visual, corre em _process)
+var _mat: ShaderMaterial
+var _anim_t := 0.0
+var _squash := 0.0   # impulso da aterragem
+var _pop := 0.0      # impulso do ataque
+
 
 func _ready() -> void:
 	if EstadoJogo.checkpoint != Vector2.ZERO:
@@ -45,6 +53,8 @@ func _ready() -> void:
 	if _hitbox:
 		_hitbox.monitoring = false
 		_hitbox.body_entered.connect(_ao_acertar_corpo)
+	if _corpo:
+		_mat = _corpo.material as ShaderMaterial
 	vida_mudou.emit(vida, VIDA_MAXIMA)
 
 
@@ -55,9 +65,7 @@ func _physics_process(dt: float) -> void:
 
 	var dir := Input.get_axis("mover_esquerda", "mover_direita")
 	if dir != 0.0 and _rolar_restante <= 0.0:
-		_olha_para = signf(dir)
-		if _sprite:
-			_sprite.scale.x = _olha_para
+		_olha_para = signf(dir)  # o flip visual é feito em _animar()
 
 	# ataque leve -- bloqueado enquanto rola
 	if _ataque_restante > 0.0:
@@ -102,17 +110,96 @@ func _physics_process(dt: float) -> void:
 	move_and_slide()
 	_mov.velocidade = velocity
 
-	# aterragem: pó + abanão leve, proporcional à velocidade de queda
+	# aterragem: pó + abanão + squash, proporcional à velocidade de queda
 	var no_chao := is_on_floor()
 	if no_chao and not _estava_no_chao and vel_queda > 180.0:
 		if _po:
 			_po.restart()
+		var f := remap(minf(vel_queda, 1100.0), 180.0, 1100.0, 0.35, 1.0)
+		_squash = maxf(_squash, f)
 		_abanar(remap(minf(vel_queda, 1100.0), 180.0, 1100.0, 1.0, 4.5))
 	_estava_no_chao = no_chao
 
 	# caiu num fosso sem fundo -> conta como morte (reaparece no checkpoint)
 	if global_position.y > Y_MORTE and vida > 0:
 		receber_dano(vida)
+
+
+func _process(dt: float) -> void:
+	_animar(dt)
+
+
+## Animação procedural do sprite: flip, squash/stretch, lean, pop de
+## ataque e rastro da lâmina. Nada disto afeta a física.
+func _animar(dt: float) -> void:
+	if _sprite == null:
+		return
+	_anim_t += dt
+	_squash = move_toward(_squash, 0.0, dt * 5.0)
+	_pop = move_toward(_pop, 0.0, dt * 7.0)
+
+	var no_chao := is_on_floor()
+	var vx := absf(velocity.x)
+	var escala := Vector2.ONE
+	var rot_alvo := 0.0
+
+	if _rolar_restante > 0.0:
+		escala = Vector2(1.2, 0.8)
+		_sprite.rotation += dt * _olha_para * 20.0
+	elif _dash_restante > 0.0:
+		escala = Vector2(1.32, 0.78)
+		_sprite.rotation = lerp_angle(_sprite.rotation, 0.0, dt * 18.0)
+	else:
+		_sprite.rotation = lerp_angle(_sprite.rotation, rot_alvo, dt * 12.0)
+		if not no_chao:
+			if velocity.y < 0.0:
+				escala = Vector2(0.86, 1.16)
+			else:
+				var f := clampf(velocity.y / 900.0, 0.0, 1.0)
+				escala = Vector2(1.0 + 0.16 * f, 1.0 - 0.16 * f)
+		elif vx > 25.0:
+			var b := sin(_anim_t * 22.0) * 0.06
+			escala = Vector2(1.0 + b, 1.0 - b)
+			_sprite.rotation = lerp_angle(_sprite.rotation, -_olha_para * 0.08, dt * 12.0)
+		else:
+			var b := sin(_anim_t * 3.0) * 0.02
+			escala = Vector2(1.0 - b, 1.0 + b)
+
+	escala.x += _squash * 0.32 + _pop * 0.10
+	escala.y += -_squash * 0.32 + _pop * 0.18
+	_sprite.scale = Vector2(escala.x * _olha_para, escala.y)
+
+	_animar_rastro(dt)
+
+
+func _animar_rastro(dt: float) -> void:
+	if _rastro == null:
+		return
+	if _ataque_restante > 0.0:
+		_rastro.visible = true
+		_rastro.modulate.a = 1.0
+		var p := clampf(1.0 - _ataque_restante / DUR_ATAQUE, 0.0, 1.0)
+		var pts := PackedVector2Array()
+		for i in 7:
+			var f := p - i * 0.06
+			if f < 0.0:
+				break
+			var ang := lerpf(deg_to_rad(-120.0), deg_to_rad(35.0), f)
+			pts.append(Vector2(cos(ang), sin(ang)) * 30.0 + Vector2(0.0, -4.0))
+		_rastro.points = pts
+	elif _rastro.visible:
+		_rastro.modulate.a = move_toward(_rastro.modulate.a, 0.0, dt * 7.0)
+		if _rastro.modulate.a <= 0.02:
+			_rastro.visible = false
+			_rastro.points = PackedVector2Array()
+
+
+func _flash_branco() -> void:
+	if _mat == null:
+		return
+	_mat.set_shader_parameter("flash", 1.0)
+	var t := create_tween()
+	t.tween_method(func(v: float): _mat.set_shader_parameter("flash", v), 1.0, 0.0, 0.16)
 
 
 func _abanar(forca: float) -> void:
@@ -131,6 +218,7 @@ func _hitstop(segundos: float) -> void:
 
 func _iniciar_ataque() -> void:
 	_ataque_restante = DUR_ATAQUE
+	_pop = 1.0
 	if _hitbox:
 		_hitbox.scale.x = _olha_para
 		_hitbox.monitoring = true
@@ -152,6 +240,7 @@ func receber_dano(quantidade: int, _dir_empurrao: float = 0.0) -> void:
 	vida = maxi(0, vida - quantidade)
 	_invulneravel = I_FRAMES
 	vida_mudou.emit(vida, VIDA_MAXIMA)
+	_flash_branco()
 	_abanar(8.0)
 	_hitstop(0.07)
 	if vida <= 0:

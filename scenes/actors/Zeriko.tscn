@@ -5,6 +5,18 @@
 
 [ext_resource type="Script" path="res://scripts/zeriko.gd" id="1_zk"]
 [ext_resource type="Texture2D" uid="uid://d2ra0d0pwad1w" path="res://assets/sprites/zeriko.svg" id="2_tex"]
+[ext_resource type="Shader" path="res://assets/shaders/personagem.gdshader" id="3_sh"]
+
+[sub_resource type="ShaderMaterial" id="mat_b"]
+resource_local_to_scene = true
+shader = ExtResource("3_sh")
+shader_parameter/flash = 0.0
+shader_parameter/flash_cor = Color(1, 1, 1, 1)
+shader_parameter/rim_cor = Color(1, 0.45, 0.92, 1)
+shader_parameter/rim_forca = 0.85
+shader_parameter/rim_dir = Vector2(-1, -0.5)
+shader_parameter/rim_espessura = 1.4
+shader_parameter/interior = 0.2
 
 [sub_resource type="RectangleShape2D" id="rs_body"]
 size = Vector2(52, 78)
@@ -37,6 +49,7 @@ cor_estilhacos = Color(0.95, 0.4, 0.9, 1)
 [node name="Corpo" type="Sprite2D" parent="Sprite"]
 position = Vector2(0, -1)
 texture = ExtResource("2_tex")
+material = SubResource("mat_b")
 
 [node name="Luz" type="PointLight2D" parent="Sprite"]
 position = Vector2(0, -14)

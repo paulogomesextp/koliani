@@ -1,12 +1,22 @@
-[gd_scene load_steps=6 format=3 uid="uid://bdemoniobase01"]
+[gd_scene load_steps=8 format=3 uid="uid://bdemoniobase01"]
 
-; Demonio comum -- sprite SVG (assets/sprites/demonio.svg): massa roxa com
-; um olho magenta que brilha, no tom do key art. Classe-pai; os chefes de
-; cada mundo herdam de chefe_base.gd. Trocar por AnimatedSprite2D quando
-; houver frames, mantendo os nos "Sprite" e "AreaContacto".
+; Demonio comum -- sprite SVG (silhueta escura) + shader de personagem
+; (rim light + flash de dano). Classe-pai; os chefes herdam de chefe_base.gd.
 
 [ext_resource type="Script" path="res://scripts/demonio_base.gd" id="1_dem"]
 [ext_resource type="Texture2D" uid="uid://c5iufnmhy32mx" path="res://assets/sprites/demonio.svg" id="2_tex"]
+[ext_resource type="Shader" path="res://assets/shaders/personagem.gdshader" id="3_sh"]
+
+[sub_resource type="ShaderMaterial" id="mat_dem"]
+resource_local_to_scene = true
+shader = ExtResource("3_sh")
+shader_parameter/flash = 0.0
+shader_parameter/flash_cor = Color(1, 1, 1, 1)
+shader_parameter/rim_cor = Color(0.95, 0.5, 0.72, 1)
+shader_parameter/rim_forca = 0.65
+shader_parameter/rim_dir = Vector2(-1, -0.55)
+shader_parameter/rim_espessura = 1.3
+shader_parameter/interior = 0.22
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_body"]
 size = Vector2(26, 40)
@@ -36,6 +46,7 @@ script = ExtResource("1_dem")
 [node name="Corpo" type="Sprite2D" parent="Sprite"]
 position = Vector2(0, 2)
 texture = ExtResource("2_tex")
+material = SubResource("mat_dem")
 
 [node name="LuzOlho" type="PointLight2D" parent="Sprite"]
 position = Vector2(2, -6)

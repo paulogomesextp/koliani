@@ -1,24 +1,19 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="48" height="76" viewBox="0 0 48 76">
   <defs>
     <radialGradient id="olhoVento" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stop-color="#e6d0ff" stop-opacity="0.95"/>
+      <stop offset="0%" stop-color="#efe0ff" stop-opacity="1"/>
       <stop offset="100%" stop-color="#9a6fd8" stop-opacity="0"/>
     </radialGradient>
-    <linearGradient id="mantoVento" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#3a2758" stop-opacity="0.9"/>
-      <stop offset="100%" stop-color="#2a1a42" stop-opacity="0.15"/>
-    </linearGradient>
   </defs>
   <!-- cauda esfarrapada -->
-  <path d="M18 44 C12 56 20 60 16 72 C22 62 26 66 24 74 C30 64 34 68 32 74 C36 60 30 54 30 44 Z" fill="url(#mantoVento)"/>
-  <!-- corpo / manto -->
-  <path d="M16 16 C16 8 22 3 24 3 C26 3 32 8 32 16 L34 46 C28 50 20 50 14 46 Z" fill="#37244f" opacity="0.92"/>
-  <path d="M24 3 C26 3 32 8 32 16 L34 46 C31 48 27 49 24 49 Z" fill="#2c1c40" opacity="0.92"/>
+  <path d="M18 44 C12 56 20 60 16 73 C22 63 26 67 24 74 C30 64 34 68 32 74 C36 60 30 54 30 44 Z" fill="#1a1130" opacity="0.55"/>
+  <!-- corpo / manto (escuro, translucido) -->
+  <path d="M16 16 C16 8 22 3 24 3 C26 3 32 8 32 16 L34 46 C28 50 20 50 14 46 Z" fill="#1c1234" opacity="0.9"/>
   <!-- capuz -->
-  <path d="M15 15 C15 5 33 5 33 15 C27 9 21 9 15 15 Z" fill="#241634"/>
+  <path d="M15 15 C15 5 33 5 33 15 C27 9 21 9 15 15 Z" fill="#140c26"/>
   <!-- braços de véu -->
-  <path d="M16 22 C8 26 5 34 6 42 C10 34 13 30 18 28 Z" fill="#33224c" opacity="0.7"/>
-  <path d="M32 22 C40 26 43 34 42 42 C38 34 35 30 30 28 Z" fill="#33224c" opacity="0.7"/>
+  <path d="M16 22 C8 26 5 34 6 42 C10 34 13 30 18 28 Z" fill="#1a1030" opacity="0.6"/>
+  <path d="M32 22 C40 26 43 34 42 42 C38 34 35 30 30 28 Z" fill="#1a1030" opacity="0.6"/>
   <!-- olhos -->
   <circle cx="24" cy="17" r="11" fill="url(#olhoVento)"/>
   <ellipse cx="20.5" cy="17" rx="2.4" ry="3" fill="#f2e9ff"/>
