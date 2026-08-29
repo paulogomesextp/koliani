@@ -70,6 +70,15 @@ func sem_vidas() -> bool:
 	return vidas <= 0
 
 
+## Há um save no disco E com progresso feito (não é um arranque limpo)?
+## Usado pelo menu inicial para decidir se mostra "Continuar".
+func ha_progresso() -> bool:
+	if not FileAccess.file_exists(CAMINHO_SAVE):
+		return false
+	return indice_nivel > 0 or checkpoint != Vector2.ZERO \
+		or not habilidades.is_empty() or not pistas.is_empty()
+
+
 func reiniciar_campanha() -> void:
 	vidas = VIDAS_INICIAIS
 	indice_nivel = 0

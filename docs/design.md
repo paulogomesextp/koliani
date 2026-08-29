@@ -121,8 +121,11 @@ Autoload `EstadoJogo`. Guarda em `user://progresso.json`:
 
 - `NIVEIS` -- lista ordenada de cenas = a campanha.
 - `avancar_nivel()` -- passa ao seguinte e limpa o checkpoint.
-- `desbloquear_habilidade(id)` / `tem_habilidade(id)` -- `koliani.gd` já lê
-  `salto_duplo` e `dash_aereo`; falta `partir_paredes`.
+- `desbloquear_habilidade(id)` / `tem_habilidade(id)` -- `koliani.gd` lê
+  `salto_duplo` e `dash_aereo`; `partir_paredes` é lido pela
+  `scripts/parede_fragil.gd` (não precisa de nada no `koliani.gd`).
+- `ha_progresso()` -- há save no disco com progresso feito? (usado pelo
+  menu inicial para mostrar/esconder o "Continuar").
 - `registar_pista(id)` -- chamado pelas `Porta` e pelos `Coletavel`. O
   texto legível de cada id está em `scripts/diario_pistas.gd`.
 
@@ -152,9 +155,16 @@ Autoload `EstadoJogo`. Guarda em `user://progresso.json`:
 - ~~Mapear `rolar` no HUD de toque~~ -- feito (`scenes/ui/HUD.tscn > Toque/Rolar`).
 - ~~**Menu de pausa**~~ -- feito (`scripts/pausa.gd` + `scenes/ui/Pausa.tscn`,
   instanciado pelo `main.gd` como o diário). Pausa a árvore; opções:
-  continuar / recomeçar no checkpoint / sair. Abre com `pausa` (P ou botão
-  do HUD), fecha com `pausa` ou `ui_cancel`. O diário e a pausa não abrem
-  um por cima do outro (ambos só abrem se `get_tree().paused` for falso).
+  continuar / recomeçar no checkpoint / menu principal / sair. Abre com
+  `pausa` (P ou botão do HUD), fecha com `pausa` ou `ui_cancel`. O diário e
+  a pausa não abrem um por cima do outro (ambos só abrem se
+  `get_tree().paused` for falso).
+- ~~**Menu inicial / ecrã de título**~~ -- feito (`scripts/menu_inicial.gd`
+  + `scenes/ui/MenuInicial.tscn`, é a `main_scene`). *Continuar* só aparece
+  se `EstadoJogo.ha_progresso()`; *Novo jogo* pede confirmação antes de
+  apagar um save. `godot . -- --jogar` (ou `-- --foto...`) salta o menu.
+  Falta: arte a sério, música no menu, e decidir se o fim da campanha
+  volta ao menu em vez de reiniciar já (ver dúvidas).
 - **Afinar todos os níveis e chefes com o jogo a correr** (distâncias de
   salto, ritmo, dano, posições) -- os 4 mundos foram montados sem playtest.
 - Sprites + áudio (CC0) -- o Paulo autorizou; por integrar.

@@ -28,6 +28,13 @@ corre a *cena aberta* (útil para testar um nível isolado).
 & "C:\Users\paulo\Desktop\Godot_v4.7.2-stable_win64.exe" .
 ```
 
+O jogo arranca no **menu inicial** (`scenes/ui/MenuInicial.tscn`):
+*Continuar* (só aparece se houver progresso guardado), *Novo jogo* e
+*Sair*. Para saltar o menu e cair já no jogo (capturas, testes):
+```
+& "C:\Users\paulo\Desktop\Godot_v4.7.2-stable_win64.exe" . -- --jogar
+```
+
 ## Controlos
 
 | Ação | Teclado | Toque (telemóvel) |
@@ -41,6 +48,9 @@ corre a *cena aberta* (útil para testar um nível isolado).
 | Fechar diário | Esc | (toca fora / botão) |
 | Pausa | P | botão abaixo do diário |
 | Fechar pausa | P ou Esc | botão "Continuar" |
+
+Menu de pausa: *Continuar*, *Recomeçar no checkpoint*, *Menu principal*
+(volta ao ecrã inicial) e *Sair do jogo*.
 
 ## Atalhos de depuração (só no editor / build de debug)
 

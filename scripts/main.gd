@@ -1,8 +1,9 @@
 extends Node2D
-## Cena de arranque (`scenes/Main.tscn`, definida em project.godot como
-## main_scene). Carrega o nível atual da campanha e cola-lhe o HUD por
-## cima. Trocar de nível = mudar `EstadoJogo.indice_nivel` e voltar a esta
-## cena (é o que a Porta faz).
+## Cena de jogo (`scenes/Main.tscn`). A `main_scene` do projeto é o
+## `MenuInicial.tscn`, que carrega esta a seguir a "Continuar"/"Novo jogo"
+## (ou logo, com `-- --jogar`). Carrega o nível atual da campanha e cola-lhe
+## o HUD por cima. Trocar de nível = mudar `EstadoJogo.indice_nivel` e
+## voltar a esta cena (é o que a Porta faz).
 
 const CENA_HUD := preload("res://scenes/ui/HUD.tscn")
 const CENA_DIARIO := preload("res://scenes/ui/Diario.tscn")

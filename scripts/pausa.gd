@@ -5,9 +5,12 @@ extends CanvasLayer
 ## sair. O diário usa o mesmo esquema -- só um deles segura a pausa de cada
 ## vez (ambos só abrem se a árvore ainda não estiver em pausa).
 
+const CENA_MENU := "res://scenes/ui/MenuInicial.tscn"
+
 @onready var _painel: Control = $Painel
 @onready var _continuar: Button = $Painel/Coluna/Continuar
 @onready var _recomecar: Button = $Painel/Coluna/Recomecar
+@onready var _menu: Button = $Painel/Coluna/Menu
 @onready var _sair: Button = $Painel/Coluna/Sair
 
 
@@ -16,6 +19,7 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_continuar.pressed.connect(_fechar)
 	_recomecar.pressed.connect(_ao_recomecar)
+	_menu.pressed.connect(_ao_menu)
 	_sair.pressed.connect(_ao_sair)
 
 
@@ -45,6 +49,11 @@ func _fechar() -> void:
 func _ao_recomecar() -> void:
 	get_tree().paused = false
 	Transicao.fechar_e(get_tree().reload_current_scene)
+
+
+func _ao_menu() -> void:
+	get_tree().paused = false
+	Transicao.fechar_e(func() -> void: get_tree().change_scene_to_file(CENA_MENU))
 
 
 func _ao_sair() -> void:

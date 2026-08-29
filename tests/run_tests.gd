@@ -37,6 +37,7 @@ func _correr_tudo() -> void:
 	teste_estado_habilidade_sem_duplicados()
 	teste_estado_nivel_atual_e_caminho_valido()
 	teste_estado_save_ida_e_volta()
+	teste_estado_ha_progresso()
 
 	if _falhas.is_empty():
 		print("OK -- todos os testes passaram")
@@ -224,3 +225,16 @@ func teste_estado_save_ida_e_volta() -> void:
 	_ok(copia.habilidades == e.habilidades, "habilidades deviam sobreviver ao ida-e-volta")
 	e.free()
 	copia.free()
+
+
+## O menu inicial usa isto para decidir se mostra "Continuar". Um arranque
+## limpo (campanha reiniciada) não conta como progresso; desbloquear uma
+## habilidade ou avançar de mundo já conta.
+func teste_estado_ha_progresso() -> void:
+	var e := _novo_estado()  # reiniciar_campanha() já gravou um save limpo
+	_ok(not e.ha_progresso(), "arranque limpo não devia contar como progresso")
+	e.desbloquear_habilidade("salto_duplo")
+	_ok(e.ha_progresso(), "com uma habilidade desbloqueada já há progresso")
+	e.reiniciar_campanha()
+	_ok(not e.ha_progresso(), "reiniciar a campanha volta a 'sem progresso'")
+	e.free()

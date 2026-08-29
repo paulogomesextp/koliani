@@ -77,7 +77,8 @@ scripts/
   atmosfera.gd         -- pinta o ambiente (modulate/parallax/luzes) + poeira segue a camara
   plataforma.gd        -- @tool: plataforma reutilizavel (colisao + shader) por "tamanho"
   controlos_toque.gd   -- HUD: vida sempre visivel; botoes de toque so em ecra tactil
-  main.gd              -- arranque: carrega o nivel atual + HUD + diario; atalhos de debug (F1-F9)
+  menu_inicial.gd      -- MENU INICIAL (main_scene): continuar / novo jogo / sair; `-- --jogar` salta-o
+  main.gd              -- cena de jogo: carrega o nivel atual + HUD + diario + pausa; atalhos de debug (F1-F9)
 
 scenes/
   Main.tscn                        -- main_scene (ver project.godot)
@@ -98,6 +99,7 @@ assets/shaders/                    -- personagem (rim+flash), plataforma (pedra)
   ui/HUD.tscn                      -- barra de vida, vidas, TouchScreenButtons (+ rolar, diario, pausa)
   ui/Diario.tscn                   -- painel do diario de pistas (instanciado pelo main.gd)
   ui/Pausa.tscn                    -- menu de pausa (instanciado pelo main.gd)
+  ui/MenuInicial.tscn              -- ecra inicial / titulo (main_scene do projeto)
 
 tests/run_tests.gd     -- corredor headless proprio (movimento + estado_jogo)
 docs/                  -- historia.md, design.md (bibliografia viva)
@@ -152,9 +154,14 @@ SDK) -- ajustar pelo log do Actions.
   salto_duplo (M1) -> dash_aereo (M2) -> partir_paredes (M3) -> luta final
   com o Zeriko + cena da Aurora (M4). Chefes distintos nos 4 mundos.
   Diário de pistas funcional (7 pistas escritas).
+- **Menu inicial** (`scripts/menu_inicial.gd` + `scenes/ui/MenuInicial.tscn`,
+  agora a `main_scene`): título + *Continuar* (só se houver progresso) /
+  *Novo jogo* (pede confirmação se apagar um save) / *Sair*. `-- --jogar`
+  salta o menu (mantém as capturas `--foto` a funcionar).
 - **Menu de pausa** (`scripts/pausa.gd` + `scenes/ui/Pausa.tscn`): P ou
-  botão do HUD; pausa a árvore; continuar / recomeçar no checkpoint / sair.
-  Verificado no build Web (abrir, fechar, recomeçar com fade).
+  botão do HUD; pausa a árvore; continuar / recomeçar no checkpoint / menu
+  principal / sair. Verificado no build Web (abrir, fechar, recomeçar e
+  voltar ao menu com fade).
 - **Playtest do Paulo em curso.** Corrigido já: chefe atirava-se para um
   fosso e ficava o nível bloqueado (rede de segurança em `chefe_base.gd`
   + inimigos viram na beira via `ha_chao_a_frente`); atalhos F1-F9 agora
