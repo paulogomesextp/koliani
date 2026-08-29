@@ -79,6 +79,7 @@ em `assets/audio/`. A seguir, no editor (ou `--import`) o Godot reimporta;
 | Atacar | J | botão de ação (cima) |
 | Dash | K | botão de ação (baixo) |
 | Rolar | ↓ | botão de ação (esquerda) |
+| Defender (escudo, depois de o apanhar) — hold | L ou botão direito do rato | botão de ação (meio-esq.) |
 | Diário de pistas | I ou Tab | botão canto sup. direito |
 | Fechar diário | Esc | (toca fora / botão) |
 | Pausa | P | botão abaixo do diário |
@@ -92,7 +93,7 @@ Menu de pausa: *Continuar*, *Recomeçar no checkpoint*, *Menu principal*
 | Tecla | Efeito |
 |-------|--------|
 | F1 / F2 / F3 / F4 | saltar para o mundo 1 / 2 / 3 / 4 |
-| F5 | desbloquear todas as habilidades (salto duplo, dash aéreo, partir paredes) |
+| F5 | desbloquear todas as habilidades (salto duplo, dash aéreo, partir paredes, escudo) |
 | F6 | +3 vidas |
 | F9 | apagar o save e recomeçar a campanha |
 
