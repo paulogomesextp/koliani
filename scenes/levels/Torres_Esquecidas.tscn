@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3 uid="uid://bkolianitorres01"]
+[gd_scene load_steps=22 format=3 uid="uid://bkolianitorres01"]
 
 ; Mundo 3 -- Torres Esquecidas.
 ; Torres partidas ao vento, vazio por baixo; roxo. A Koliani ja tem salto
@@ -16,6 +16,8 @@
 [ext_resource type="PackedScene" uid="uid://bkolianiatmosfera01" path="res://scenes/fx/Atmosfera.tscn" id="8_atm"]
 [ext_resource type="PackedScene" uid="uid://bkolianiparedefragil01" path="res://scenes/actors/ParedeFragil.tscn" id="9_pf"]
 [ext_resource type="PackedScene" uid="uid://bkolianiplataforma01" path="res://scenes/actors/Plataforma.tscn" id="10_pl"]
+[ext_resource type="PackedScene" uid="uid://bkolianiserra01" path="res://scenes/actors/Serra.tscn" id="11_serra"]
+[ext_resource type="PackedScene" uid="uid://bkolianiespinhos01" path="res://scenes/actors/Espinhos.tscn" id="12_esp"]
 
 [sub_resource type="RectangleShape2D" id="rs_ta"]
 size = Vector2(360, 48)
@@ -149,6 +151,17 @@ tamanho = Vector2(620, 48)
 altura_visual = 92
 cor_base = Color(0.24, 0.19, 0.34, 1)
 cor_topo = Color(0.56, 0.4, 0.74, 1)
+
+[node name="SerraA" parent="." instance=ExtResource("11_serra")]
+position = Vector2(1850, 430)
+percurso = Vector2(0, -120)
+tempo = 1.2
+dano = 24
+
+[node name="EspinhosA" parent="." instance=ExtResource("12_esp")]
+position = Vector2(2665, 436)
+largura = 3
+dano = 18
 
 [node name="Koliani" parent="." instance=ExtResource("1_kol")]
 position = Vector2(180, 440)

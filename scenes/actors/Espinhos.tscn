@@ -1,0 +1,18 @@
+[gd_scene load_steps=3 format=3 uid="uid://bkolianiespinhos01"]
+
+; Fila de espinhos fixos (Pixel Adventure 1, CC0). Por a origem ao nivel do
+; chao e ajustar `largura` (tiles de 16px). Ver scripts/espinhos.gd.
+
+[ext_resource type="Script" path="res://scripts/espinhos.gd" id="1_esp"]
+
+[sub_resource type="RectangleShape2D" id="rs_esp"]
+size = Vector2(44, 9)
+
+[node name="Espinhos" type="Area2D"]
+script = ExtResource("1_esp")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -5)
+shape = SubResource("rs_esp")

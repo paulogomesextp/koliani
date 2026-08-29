@@ -15,8 +15,9 @@ A personagem principal (Koliani) é original do projeto
 - https://pixelfrog-assets.itch.io/pixel-adventure-1
 - Licença: CC0 1.0
 - Uso: patch de relva/terra das plataformas da floresta
-  (`assets/sprites/pixel/tiles/floresta_block.png`, do Terrain 16x16) e
-  (a integrar) armadilhas (espinhos/serra/fogo), caixas, fruta.
+  (`assets/sprites/pixel/tiles/floresta_block.png`, do Terrain 16x16),
+  armadilhas (`assets/sprites/pixel/traps/`: espinhos, serra, fogo) e
+  (a integrar) caixas, fruta.
 
 ## Kenney — "Pixel Platformer"
 - https://kenney.nl/assets/pixel-platformer

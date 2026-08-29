@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3 uid="uid://bkolianiprisao01"]
+[gd_scene load_steps=19 format=3 uid="uid://bkolianiprisao01"]
 
 ; Mundo 2 -- Prisao dos Condenados.
 ; Masmorra, correntes, celas; azul-frio. A Koliani ja tem salto duplo (do
@@ -14,6 +14,7 @@
 [ext_resource type="Script" path="res://scripts/nivel_com_chefe.gd" id="7_niv"]
 [ext_resource type="PackedScene" uid="uid://bkolianiatmosfera01" path="res://scenes/fx/Atmosfera.tscn" id="8_atm"]
 [ext_resource type="PackedScene" uid="uid://bkolianiplataforma01" path="res://scenes/actors/Plataforma.tscn" id="9_pl"]
+[ext_resource type="PackedScene" uid="uid://bkolianifogo01" path="res://scenes/actors/Fogo.tscn" id="10_fogo"]
 
 [sub_resource type="RectangleShape2D" id="rs_chao_i"]
 size = Vector2(900, 48)
@@ -137,6 +138,25 @@ tamanho = Vector2(760, 48)
 altura_visual = 92
 cor_base = Color(0.2, 0.24, 0.32, 1)
 cor_topo = Color(0.42, 0.54, 0.68, 1)
+
+[node name="FogoA" parent="." instance=ExtResource("10_fogo")]
+position = Vector2(330, 636)
+fase = 0.0
+intervalo = 1.9
+dur_ativa = 1.3
+
+[node name="FogoB" parent="." instance=ExtResource("10_fogo")]
+position = Vector2(520, 636)
+fase = 1.1
+intervalo = 1.9
+dur_ativa = 1.3
+
+[node name="FogoC" parent="." instance=ExtResource("10_fogo")]
+position = Vector2(2880, 316)
+fase = 0.5
+intervalo = 2.2
+dur_ativa = 1.5
+dano = 20
 
 [node name="Fog1" type="ColorRect" parent="."]
 z_index = 5

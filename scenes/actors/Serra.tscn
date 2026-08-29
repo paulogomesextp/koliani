@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3 uid="uid://bkolianiserra01"]
+
+; Serra circular que gira e faz vaivem (Pixel Adventure 1, CC0). Ajustar
+; `percurso` e `tempo`. Ver scripts/serra.gd.
+
+[ext_resource type="Script" path="res://scripts/serra.gd" id="1_serra"]
+
+[sub_resource type="CircleShape2D" id="cs_serra"]
+radius = 15.0
+
+[node name="Serra" type="Area2D"]
+script = ExtResource("1_serra")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("cs_serra")
