@@ -7,9 +7,9 @@ extends CharacterBody2D
 
 const GRAVIDADE := 1400.0
 
-@export var velocidade := 60.0
-@export var vida := 50
-@export var dano_contacto := 15
+@export var velocidade := 66.0
+@export var vida := 58
+@export var dano_contacto := 16
 @export var alcance_patrulha := 120.0
 ## A que distância à frente se testa se ainda há chão (evita cair da
 ## plataforma na patrulha / na perseguição).
@@ -37,7 +37,21 @@ var _flinch := 0.0
 var _flinch_dir := 1.0
 
 
+## Os chefes (ChefeBase) sobrepõem isto para NÃO levarem a escala de mundo
+## dos demónios comuns (têm a sua própria vida/dano).
+func _e_chefe() -> bool:
+	return false
+
+
 func _ready() -> void:
+	# dificuldade a subir por mundo: demónios comuns ficam mais duros e
+	# mais perigosos a cada nível da campanha (mundo 1 = x1.0 ... mundo 4 ~ x1.39)
+	if not _e_chefe():
+		var m := 1.0 + 0.13 * float(clampi(EstadoJogo.indice_nivel, 0, 3))
+		vida = int(round(vida * m))
+		dano_contacto = int(round(dano_contacto * m))
+		velocidade *= 1.0 + 0.06 * float(clampi(EstadoJogo.indice_nivel, 0, 3))
+
 	if _area_contacto:
 		_area_contacto.body_entered.connect(_ao_tocar)
 	if _corpo:

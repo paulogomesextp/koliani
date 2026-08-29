@@ -11,35 +11,46 @@ extends DemonioBase
 
 signal derrotado
 
-## A que distância da Koliani o chefe "entra em cena" (troca a música).
-## ~= largura de ecrã, para a música mudar ao entrar na arena do chefe.
-const DIST_MUSICA_BOSS := 900.0
-
 var _koliani: Node2D
 ## Fica > 0 durante um golpe forte do chefe (o contacto magoa mais).
 var _ataque_forte := 0.0
 var _ja_derrotado := false
+## true assim que o combate começa (troca a música para a do chefe). Fica
+## false num chefe recém-instanciado (após morte/recarga), por isso a
+## música só volta a mudar quando a luta recomeça de facto.
 var _musica_boss := false
+
+
+func _e_chefe() -> bool:
+	return true
 
 
 func _ready() -> void:
 	super._ready()
 	add_to_group("chefes")
+	# chefe mais perigoso ao contacto nos mundos mais avançados (a vida-base
+	# é definida por cada chefe concreto no seu _ready)
+	dano_contacto = int(round(dano_contacto * (1.0 + 0.09 * float(clampi(EstadoJogo.indice_nivel, 0, 3)))))
 
 
 func _process(dt: float) -> void:
 	super._process(dt)
-	# ao aproximar-se do chefe, muda a música para a do boss (em qualquer
-	# mundo -- no mundo 4 já vem assim do arranque)
-	if not _musica_boss and not _ja_derrotado \
-			and _vetor_para_koliani().length() < DIST_MUSICA_BOSS:
-		_musica_boss = true
-		Musica.boss()
 	# rede de segurança: se o chefe se atirar para fora do mapa (investida
 	# num fosso, etc.), conta como derrotado -- senão o nível fica
 	# bloqueado porque a porta nunca abre.
 	if not _ja_derrotado and global_position.y - _origem.y > 520.0:
 		_cair_derrotado()
+
+
+## Marca o início do combate: troca para a música de chefe. Idempotente --
+## cada chefe concreto chama isto quando a sua máquina de estados sai da
+## patrulha (deteta a Koliani); `chefe_base` também chama ao trocar o
+## primeiro golpe. Não basta ver o chefe: é preciso "começar a fight".
+func provocar() -> void:
+	if _musica_boss or _ja_derrotado:
+		return
+	_musica_boss = true
+	Musica.boss()
 
 
 func _cair_derrotado() -> void:
@@ -82,6 +93,7 @@ func _piscar(ligado: bool) -> void:
 
 func _ao_tocar(corpo: Node) -> void:
 	if corpo is Koliani:
+		provocar()  # trocar o primeiro golpe = combate a sério
 		var dano := int(round(dano_contacto * (1.8 if _ataque_forte > 0.0 else 1.0)))
 		corpo.receber_dano(dano, signf(corpo.global_position.x - global_position.x))
 
@@ -89,6 +101,7 @@ func _ao_tocar(corpo: Node) -> void:
 func receber_dano(quantidade: int, dir_empurrao: float = 0.0) -> void:
 	if _ja_derrotado:
 		return
+	provocar()  # levou o primeiro golpe = combate a sério
 	vida -= quantidade
 	global_position.x += dir_empurrao * 3.0
 	if vida <= 0:

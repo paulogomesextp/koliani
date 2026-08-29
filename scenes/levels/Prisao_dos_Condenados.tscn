@@ -52,10 +52,12 @@ fill_to = Vector2(1, 0.5)
 script = ExtResource("7_niv")
 
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
-cor_ambiente = Color(0.62, 0.66, 0.78, 1)
-cor_fundo = Color(0.04, 0.06, 0.1, 1)
-cor_silhueta = Color(0.08, 0.12, 0.18, 1)
-cor_luz = Color(0.35, 0.6, 0.85, 1)
+cor_ambiente = Color(0.55, 0.66, 0.8, 1)
+cor_fundo = Color(0.03, 0.055, 0.09, 1)
+cor_silhueta = Color(0.06, 0.11, 0.17, 1)
+cor_luz = Color(0.3, 0.7, 0.95, 1)
+cor_poeira = Color(0.6, 0.85, 1, 1)
+densidade_poeira = 1.3
 
 [node name="ChaoInicio" parent="." instance=ExtResource("9_pl")]
 position = Vector2(400, 660)
@@ -106,6 +108,34 @@ altura_visual = 92
 cor_base = Color(0.2, 0.24, 0.32, 1)
 cor_topo = Color(0.42, 0.54, 0.68, 1)
 
+[node name="PlatE" parent="." instance=ExtResource("9_pl")]
+position = Vector2(2380, 300)
+tamanho = Vector2(120, 24)
+altura_visual = 30
+cor_base = Color(0.2, 0.24, 0.32, 1)
+cor_topo = Color(0.42, 0.54, 0.68, 1)
+
+[node name="PlatF" parent="." instance=ExtResource("9_pl")]
+position = Vector2(2640, 244)
+tamanho = Vector2(120, 24)
+altura_visual = 30
+cor_base = Color(0.2, 0.24, 0.32, 1)
+cor_topo = Color(0.42, 0.54, 0.68, 1)
+
+[node name="PlatG" parent="." instance=ExtResource("9_pl")]
+position = Vector2(2840, 320)
+tamanho = Vector2(110, 24)
+altura_visual = 30
+cor_base = Color(0.2, 0.24, 0.32, 1)
+cor_topo = Color(0.42, 0.54, 0.68, 1)
+
+[node name="ChaoFim2" parent="." instance=ExtResource("9_pl")]
+position = Vector2(3120, 340)
+tamanho = Vector2(760, 48)
+altura_visual = 92
+cor_base = Color(0.2, 0.24, 0.32, 1)
+cor_topo = Color(0.42, 0.54, 0.68, 1)
+
 [node name="Fog1" type="ColorRect" parent="."]
 z_index = 5
 offset_left = -100.0
@@ -127,8 +157,18 @@ position = Vector2(1350, 540)
 alcance_patrulha = 130.0
 cor_estilhacos = Color(0.35, 0.6, 0.85, 1)
 
+[node name="Demonio3" parent="." instance=ExtResource("2_dem")]
+position = Vector2(2150, 288)
+alcance_patrulha = 150.0
+cor_estilhacos = Color(0.35, 0.6, 0.85, 1)
+
+[node name="Demonio4" parent="." instance=ExtResource("2_dem")]
+position = Vector2(3250, 316)
+alcance_patrulha = 230.0
+cor_estilhacos = Color(0.35, 0.6, 0.85, 1)
+
 [node name="Chefe" parent="." instance=ExtResource("6_chefe")]
-position = Vector2(1980, 258)
+position = Vector2(3120, 296)
 
 [node name="ColDashAereo" parent="." instance=ExtResource("3_col")]
 position = Vector2(1200, 552)
@@ -190,6 +230,32 @@ color = Color(0.4, 0.6, 0.95, 0.32)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CheckMeio"]
 shape = SubResource("rs_chk")
 
-[node name="Porta" parent="." instance=ExtResource("4_porta")]
+[node name="CheckAlto" type="Area2D" parent="."]
 position = Vector2(2150, 248)
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("5_chk")
+
+[node name="Visual" type="ColorRect" parent="CheckAlto"]
+offset_left = -5.0
+offset_top = -42.0
+offset_right = 5.0
+offset_bottom = 40.0
+color = Color(0.3, 0.4, 0.6, 1)
+
+[node name="Luz" type="Node2D" parent="CheckAlto"]
+visible = false
+
+[node name="Brilho" type="ColorRect" parent="CheckAlto/Luz"]
+offset_left = -20.0
+offset_top = -54.0
+offset_right = 20.0
+offset_bottom = 44.0
+color = Color(0.4, 0.6, 0.95, 0.32)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckAlto"]
+shape = SubResource("rs_chk")
+
+[node name="Porta" parent="." instance=ExtResource("4_porta")]
+position = Vector2(3360, 288)
 pista_ao_atravessar = "prisao_carta_na_cela"

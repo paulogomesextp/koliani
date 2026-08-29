@@ -36,12 +36,12 @@ fill_to = Vector2(1, 0.5)
 script = ExtResource("7_niv")
 
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
-cor_ambiente = Color(0.64, 0.72, 0.6, 1)
-cor_fundo = Color(0.05, 0.075, 0.045, 1)
-cor_silhueta = Color(0.1, 0.15, 0.08, 1)
-cor_luz = Color(0.5, 0.8, 0.4, 1)
-cor_poeira = Color(0.7, 0.9, 0.55, 1)
-densidade_poeira = 1.2
+cor_ambiente = Color(0.58, 0.7, 0.54, 1)
+cor_fundo = Color(0.035, 0.06, 0.03, 1)
+cor_silhueta = Color(0.08, 0.13, 0.07, 1)
+cor_luz = Color(0.55, 0.95, 0.42, 1)
+cor_poeira = Color(0.72, 0.95, 0.5, 1)
+densidade_poeira = 1.5
 
 [node name="ChaoA" parent="." instance=ExtResource("9_pl")]
 position = Vector2(430, 660)
@@ -51,8 +51,8 @@ cor_base = Color(0.16, 0.24, 0.1, 1)
 cor_topo = Color(0.42, 0.64, 0.29, 1)
 
 [node name="ChaoB" parent="." instance=ExtResource("9_pl")]
-position = Vector2(1440, 660)
-tamanho = Vector2(560, 48)
+position = Vector2(1500, 660)
+tamanho = Vector2(720, 48)
 altura_visual = 92.0
 cor_base = Color(0.16, 0.24, 0.1, 1)
 cor_topo = Color(0.42, 0.64, 0.29, 1)
@@ -85,6 +85,34 @@ altura_visual = 34.0
 cor_base = Color(0.17, 0.25, 0.11, 1)
 cor_topo = Color(0.42, 0.64, 0.29, 1)
 
+[node name="Plat5" parent="." instance=ExtResource("9_pl")]
+position = Vector2(1620, 430)
+tamanho = Vector2(120, 24)
+altura_visual = 32.0
+cor_base = Color(0.17, 0.25, 0.11, 1)
+cor_topo = Color(0.42, 0.64, 0.29, 1)
+
+[node name="Plat6" parent="." instance=ExtResource("9_pl")]
+position = Vector2(1880, 360)
+tamanho = Vector2(120, 24)
+altura_visual = 32.0
+cor_base = Color(0.17, 0.25, 0.11, 1)
+cor_topo = Color(0.42, 0.64, 0.29, 1)
+
+[node name="Plat7" parent="." instance=ExtResource("9_pl")]
+position = Vector2(2140, 470)
+tamanho = Vector2(120, 24)
+altura_visual = 32.0
+cor_base = Color(0.17, 0.25, 0.11, 1)
+cor_topo = Color(0.42, 0.64, 0.29, 1)
+
+[node name="ChaoC" parent="." instance=ExtResource("9_pl")]
+position = Vector2(2500, 660)
+tamanho = Vector2(900, 48)
+altura_visual = 92.0
+cor_base = Color(0.16, 0.24, 0.1, 1)
+cor_topo = Color(0.42, 0.64, 0.29, 1)
+
 [node name="LuzPantano1" type="PointLight2D" parent="."]
 position = Vector2(250, 630)
 texture = SubResource("GradientTexture2D_luz")
@@ -110,8 +138,20 @@ alcance_patrulha = 170.0
 position = Vector2(300, 520)
 alcance_patrulha = 55.0
 
+[node name="Demonio3" parent="." instance=ExtResource("2_dem")]
+position = Vector2(1650, 604)
+alcance_patrulha = 210.0
+
+[node name="Demonio4" parent="." instance=ExtResource("2_dem")]
+position = Vector2(2300, 604)
+alcance_patrulha = 190.0
+
+[node name="Demonio5" parent="." instance=ExtResource("2_dem")]
+position = Vector2(1880, 320)
+alcance_patrulha = 45.0
+
 [node name="Chefe" parent="." instance=ExtResource("6_chefe")]
-position = Vector2(1380, 604)
+position = Vector2(2550, 604)
 
 [node name="ColSaltoDuplo" parent="." instance=ExtResource("3_col")]
 position = Vector2(720, 588)
@@ -120,6 +160,10 @@ habilidade_id = "salto_duplo"
 [node name="ColPistaSecreta" parent="." instance=ExtResource("3_col")]
 position = Vector2(1030, 372)
 pista_id = "floresta_carta_rasgada"
+
+[node name="ColEscudo" parent="." instance=ExtResource("3_col")]
+position = Vector2(1275, 486)
+habilidade_id = "escudo"
 
 [node name="Checkpoint" type="Area2D" parent="."]
 position = Vector2(640, 588)
@@ -152,7 +196,38 @@ color = Color(0.93, 0.4, 0.9, 1)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Checkpoint"]
 shape = SubResource("RectangleShape2D_chk")
 
+[node name="CheckMeio" type="Area2D" parent="."]
+position = Vector2(1780, 588)
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("5_chk")
+
+[node name="Visual" type="ColorRect" parent="CheckMeio"]
+offset_left = -5.0
+offset_top = -42.0
+offset_right = 5.0
+offset_bottom = 40.0
+color = Color(0.36, 0.28, 0.55, 1)
+
+[node name="Luz" type="Node2D" parent="CheckMeio"]
+visible = false
+
+[node name="Brilho" type="ColorRect" parent="CheckMeio/Luz"]
+offset_left = -20.0
+offset_top = -54.0
+offset_right = 20.0
+offset_bottom = 44.0
+color = Color(0.85, 0.31, 0.83, 0.32)
+
+[node name="PointLight2D" type="PointLight2D" parent="CheckMeio/Luz"]
+texture = SubResource("GradientTexture2D_luz")
+energy = 1.1
+color = Color(0.93, 0.4, 0.9, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckMeio"]
+shape = SubResource("RectangleShape2D_chk")
+
 [node name="Porta" parent="." instance=ExtResource("4_porta")]
-position = Vector2(1650, 586)
+position = Vector2(2880, 586)
 pista_ao_atravessar = "floresta_sinal_da_porta"
 

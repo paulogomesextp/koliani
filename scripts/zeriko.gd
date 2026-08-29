@@ -16,7 +16,11 @@ const PROJETIL := preload("res://scenes/actors/ProjetilZeriko.tscn")
 @export var dur_surge := 0.35
 @export var dur_ataca := 0.5
 @export var dur_some := 0.3
-@export var dur_espera := 0.8
+@export var dur_espera := 0.7
+
+## A que distância (x) da 1.ª marca o Zeriko "acorda" e começa a atacar.
+## Antes disso fica invisível -- a Koliani ainda vem pelo corredor.
+@export var dist_acorda := 640.0
 
 var _fase: Fase = Fase.SURGE
 var _t := 0.0
@@ -24,11 +28,12 @@ var _pontos: Array[Vector2] = []
 var _idx := 0
 var _vida_max := 1
 var _disparou := false
+var _acordado := false
 
 
 func _ready() -> void:
 	super._ready()
-	vida = maxi(vida, 360)
+	vida = maxi(vida, 420)
 	_vida_max = vida
 	modulate.a = 0.0
 
@@ -48,6 +53,14 @@ func _fase_2() -> bool:
 
 
 func _physics_process(dt: float) -> void:
+	if not _acordado:
+		var k := _obter_koliani()
+		if k and absf(k.global_position.x - _pontos[0].x) <= dist_acorda:
+			_acordado = true
+		else:
+			modulate.a = 0.0
+			return
+
 	match _fase:
 		Fase.SURGE:
 			modulate.a = minf(1.0, modulate.a + dt / dur_surge)
@@ -92,6 +105,7 @@ func _disparar() -> void:
 	var k := _obter_koliani()
 	if k == null:
 		return
+	provocar()  # primeiro disparo do Zeriko = combate final a sério
 	Som.toca("projetil", -12.0)
 	var base_dir := k.global_position - global_position
 	var n := 2 if _fase_2() else 1

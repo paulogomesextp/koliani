@@ -518,6 +518,36 @@ def conquista():
     escrever("conquista.wav", buf, 0.9)
 
 
+# --------------------------------------------------------------------------
+# 7) BLOQUEIO  (defesa com escudo -- "tink" metalico curto e subtil)
+# --------------------------------------------------------------------------
+def bloqueio():
+    random.seed(51)
+    dur = 0.16
+    N = int(dur * FS)
+    buf = [0.0] * N
+    # duas "campainhas" metalicas curtas + um toque de ruido no ataque
+    r1, r2, r3 = Reson(), Reson(), Reson()
+    for n in range(N):
+        p = n / N
+        # excitacao: clique de ruido nos primeiros ~4 ms
+        exc = random.uniform(-1, 1) * math.exp(-p * 140.0)
+        s = r1.passo(exc, 1850.0, 90.0)
+        s += 0.7 * r2.passo(exc, 3200.0, 150.0)
+        s += 0.4 * r3.passo(exc, 5400.0, 260.0)
+        env = min(1.0, p / 0.002) * math.exp(-p * 22.0)
+        buf[n] = s * env
+    # passa-alto leve para soar "metal" e nao "madeira"
+    hp, ain = 0.0, 0.0
+    ahp = math.exp(-2 * math.pi * 500 / FS)
+    for n in range(N):
+        x = buf[n]
+        hp = ahp * (hp + x - ain)
+        ain = x
+        buf[n] = math.tanh(hp * 1.4)
+    escrever("bloqueio.wav", buf, 0.55)
+
+
 if __name__ == "__main__":
     game_over_voz()
     menu_loop()
@@ -526,3 +556,4 @@ if __name__ == "__main__":
     demonio_ataque()
     saltos()
     conquista()
+    bloqueio()

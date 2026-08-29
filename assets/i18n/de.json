@@ -28,6 +28,7 @@
 	"hud.ability.salto_duplo": "Doppelsprung",
 	"hud.ability.dash_aereo": "Luft-Dash",
 	"hud.ability.partir_paredes": "Wände brechen",
+	"hud.ability.escudo": "Schild",
 	"hud.new_ability": "Neue Fähigkeit: %s",
 	"hud.clue_found": "Hinweis gefunden  (%d)",
 

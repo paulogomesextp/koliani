@@ -11,7 +11,7 @@ enum Fase { PATRULHA, TELEGRAFO, INVESTIDA, RECUPERA }
 @export var vel_investida := 440.0
 @export var dur_telegrafo := 0.55
 @export var dur_investida := 0.42
-@export var dur_recupera := 0.9
+@export var dur_recupera := 0.78
 
 var _fase: Fase = Fase.PATRULHA
 var _t := 0.0
@@ -20,7 +20,7 @@ var _alvo_dir := 1.0
 
 func _ready() -> void:
 	super._ready()
-	vida = maxi(vida, 220)
+	vida = maxi(vida, 250)
 	velocidade *= 0.6
 
 
@@ -29,6 +29,7 @@ func _physics_process(dt: float) -> void:
 		Fase.PATRULHA:
 			super._physics_process(dt)
 			if _ve_koliani():
+				provocar()  # detetou a Koliani -> música de combate
 				_ir_para(Fase.TELEGRAFO)
 		Fase.TELEGRAFO:
 			_travar(dt)

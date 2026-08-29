@@ -28,6 +28,7 @@
 	"hud.ability.salto_duplo": "Double saut",
 	"hud.ability.dash_aereo": "Dash aérien",
 	"hud.ability.partir_paredes": "Briser les murs",
+	"hud.ability.escudo": "Bouclier",
 	"hud.new_ability": "Nouvelle capacité : %s",
 	"hud.clue_found": "Indice trouvé  (%d)",
 

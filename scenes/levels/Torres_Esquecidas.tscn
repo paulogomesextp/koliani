@@ -57,10 +57,12 @@ fill_to = Vector2(1, 0.5)
 script = ExtResource("7_niv")
 
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
-cor_ambiente = Color(0.66, 0.6, 0.74, 1)
-cor_fundo = Color(0.06, 0.05, 0.1, 1)
-cor_silhueta = Color(0.13, 0.1, 0.19, 1)
-cor_luz = Color(0.7, 0.45, 0.95, 1)
+cor_ambiente = Color(0.82, 0.66, 0.5, 1)
+cor_fundo = Color(0.09, 0.06, 0.07, 1)
+cor_silhueta = Color(0.17, 0.11, 0.1, 1)
+cor_luz = Color(1, 0.7, 0.35, 1)
+cor_poeira = Color(1, 0.82, 0.55, 1)
+densidade_poeira = 1.4
 
 [node name="TorreA" parent="." instance=ExtResource("10_pl")]
 position = Vector2(300, 520)
@@ -118,6 +120,34 @@ altura_visual = 92
 cor_base = Color(0.24, 0.19, 0.34, 1)
 cor_topo = Color(0.56, 0.4, 0.74, 1)
 
+[node name="PlatH" parent="." instance=ExtResource("10_pl")]
+position = Vector2(1990, 400)
+tamanho = Vector2(110, 24)
+altura_visual = 30
+cor_base = Color(0.24, 0.19, 0.34, 1)
+cor_topo = Color(0.56, 0.4, 0.74, 1)
+
+[node name="PlatI" parent="." instance=ExtResource("10_pl")]
+position = Vector2(2230, 320)
+tamanho = Vector2(110, 24)
+altura_visual = 30
+cor_base = Color(0.24, 0.19, 0.34, 1)
+cor_topo = Color(0.56, 0.4, 0.74, 1)
+
+[node name="PlatJ" parent="." instance=ExtResource("10_pl")]
+position = Vector2(2450, 410)
+tamanho = Vector2(110, 24)
+altura_visual = 30
+cor_base = Color(0.24, 0.19, 0.34, 1)
+cor_topo = Color(0.56, 0.4, 0.74, 1)
+
+[node name="TorreE" parent="." instance=ExtResource("10_pl")]
+position = Vector2(2800, 460)
+tamanho = Vector2(620, 48)
+altura_visual = 92
+cor_base = Color(0.24, 0.19, 0.34, 1)
+cor_topo = Color(0.56, 0.4, 0.74, 1)
+
 [node name="Koliani" parent="." instance=ExtResource("1_kol")]
 position = Vector2(180, 440)
 
@@ -131,8 +161,13 @@ position = Vector2(1600, 420)
 alcance_patrulha = 150.0
 cor_estilhacos = Color(0.7, 0.45, 0.95, 1)
 
+[node name="Demonio3" parent="." instance=ExtResource("2_dem")]
+position = Vector2(2700, 428)
+alcance_patrulha = 240.0
+cor_estilhacos = Color(0.7, 0.45, 0.95, 1)
+
 [node name="Chefe" parent="." instance=ExtResource("6_chefe")]
-position = Vector2(1660, 408)
+position = Vector2(2820, 398)
 cor_estilhacos = Color(0.78, 0.5, 1, 1)
 
 [node name="ColPartirParedes" parent="." instance=ExtResource("3_col")]
@@ -198,6 +233,32 @@ color = Color(0.8, 0.5, 1, 0.32)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CheckFim"]
 shape = SubResource("rs_chk")
 
+[node name="CheckChegada" type="Area2D" parent="."]
+position = Vector2(2560, 428)
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("5_chk")
+
+[node name="Visual" type="ColorRect" parent="CheckChegada"]
+offset_left = -5.0
+offset_top = -42.0
+offset_right = 5.0
+offset_bottom = 40.0
+color = Color(0.5, 0.35, 0.65, 1)
+
+[node name="Luz" type="Node2D" parent="CheckChegada"]
+visible = false
+
+[node name="Brilho" type="ColorRect" parent="CheckChegada/Luz"]
+offset_left = -20.0
+offset_top = -54.0
+offset_right = 20.0
+offset_bottom = 44.0
+color = Color(0.8, 0.5, 1, 0.32)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckChegada"]
+shape = SubResource("rs_chk")
+
 [node name="Porta" parent="." instance=ExtResource("4_porta")]
-position = Vector2(1740, 398)
+position = Vector2(3090, 388)
 pista_ao_atravessar = "torres_lanterna_de_zeriko"

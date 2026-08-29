@@ -23,3 +23,7 @@ Thumbs.db
 *.keystore
 *.jks
 release.keystore
+
+# Python
+__pycache__/
+*.pyc

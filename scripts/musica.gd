@@ -4,9 +4,12 @@ extends Node
 ## a Koliani se aproxima.
 ##
 ## - Menu: `menu.wav` (lento, tema próprio).
-## - Mundos 1-3: `ambiente.wav`, pitch por bioma.
-## - Chefe (qualquer mundo, ao aproximar-se): `boss.wav` -- mais rápida,
-##   mais alta e fantasmagórica.
+## - Mundos 1-4: `ambiente.wav`, pitch por bioma (o mundo 4 arranca numa
+##   cama mais grave -- a aproximação ao Zeriko, ainda sem combate).
+## - Chefe (qualquer mundo): `boss.wav` -- mais rápida, mais alta e
+##   fantasmagórica. Só entra quando o **combate começa** (o chefe deteta a
+##   Koliani / troca o primeiro golpe), NÃO só por o ver. Cada chefe chama
+##   `Musica.boss()` via `ChefeBase.provocar()`.
 ## - Por baixo (exceto no chefe): `assombracao.wav` -- casa assombrada.
 ##
 ## Não recomeça a cama se já estiver a tocar a faixa certa, para não
@@ -17,10 +20,10 @@ const CAMINHO_MENU := "res://assets/audio/menu.wav"
 const CAMINHO_BOSS := "res://assets/audio/boss.wav"
 const CAMINHO_ASSOMBRACAO := "res://assets/audio/assombracao.wav"
 
-## Pitch por índice de mundo (0..2): floresta, prisão, torres.
-const PITCH_BIOMA := [1.0, 0.94, 1.06]
-## Mundo 4 = arena do chefe final (0-indexado): já arranca em boss.
-const IDX_CHEFE := 3
+## Pitch por índice de mundo (0..3): floresta, prisão, torres, castelo.
+## O castelo (mundo 4) arranca mais grave -- é a caminhada até ao Zeriko;
+## a música de combate entra quando o Zeriko ataca (ver `chefe_base.gd`).
+const PITCH_BIOMA := [1.0, 0.94, 1.06, 0.88]
 
 const VOL_CAMA := -12.0
 const VOL_BOSS := -6.0
@@ -57,17 +60,16 @@ func menu() -> void:
 	_tocar(CAMINHO_MENU, 1.0, VOL_CAMA, true)
 
 
-## Cama de um mundo normal (ou boss, se for o mundo do chefe final).
+## Cama de exploração de um mundo (pitch por bioma). O combate de chefe
+## troca para `boss()` por cima disto; ao morrer/recarregar a cena volta-se
+## aqui até o combate recomeçar.
 func ambiente(indice_nivel: int) -> void:
-	if indice_nivel >= IDX_CHEFE:
-		boss()
-	else:
-		var pitch: float = PITCH_BIOMA[clampi(indice_nivel, 0, PITCH_BIOMA.size() - 1)]
-		_tocar(CAMINHO, pitch, VOL_CAMA, true)
+	var pitch: float = PITCH_BIOMA[clampi(indice_nivel, 0, PITCH_BIOMA.size() - 1)]
+	_tocar(CAMINHO, pitch, VOL_CAMA, true)
 
 
-## Música de chefe -- chamada por `chefe_base.gd` quando a Koliani se
-## aproxima do chefe (em qualquer mundo).
+## Música de chefe -- chamada por `chefe_base.gd` quando o **combate
+## começa** (o chefe deteta a Koliani ou troca-se o primeiro golpe).
 func boss() -> void:
 	_tocar(CAMINHO_BOSS, 1.0, VOL_BOSS, false)
 

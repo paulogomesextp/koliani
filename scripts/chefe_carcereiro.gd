@@ -11,10 +11,10 @@ enum Fase { APROXIMA, TELEGRAFO, SALTO, IMPACTO, RECUPERA }
 @export var vel_aproxima := 55.0
 @export var dur_telegrafo := 0.6
 @export var forca_salto := 360.0
-@export var raio_onda := 230.0
-@export var dano_onda := 22
+@export var raio_onda := 250.0
+@export var dano_onda := 24
 @export var dur_impacto := 0.28
-@export var dur_recupera := 1.0
+@export var dur_recupera := 0.85
 
 var _fase: Fase = Fase.APROXIMA
 var _t := 0.0
@@ -23,7 +23,7 @@ var _onda_feita := false
 
 func _ready() -> void:
 	super._ready()
-	vida = maxi(vida, 260)
+	vida = maxi(vida, 300)
 
 
 func _physics_process(dt: float) -> void:
@@ -38,6 +38,7 @@ func _physics_process(dt: float) -> void:
 			_cair(dt)
 			move_and_slide()
 			if absf(dx) <= dist_parar and is_on_floor() and _t > 0.5:
+				provocar()  # a alcance -> música de combate
 				_ir_para(Fase.TELEGRAFO)
 		Fase.TELEGRAFO:
 			velocity.x = 0.0

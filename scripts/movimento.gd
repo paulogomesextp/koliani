@@ -82,3 +82,13 @@ static func passo(e: Estado, direcao: float, saltar_premido: bool, saltar_a_segu
 ## para dar para testar headless em modo `--script` sem os autoloads.
 static func pode_rolar(recarga: float, no_chao: bool, rolar_restante: float, dash_restante: float) -> bool:
 	return recarga <= 0.0 and no_chao and rolar_restante <= 0.0 and dash_restante <= 0.0
+
+
+## Um golpe é bloqueável pelo escudo se vier de frente. `dir_empurrao` é o
+## sentido em que o golpe empurra a Koliani (para longe da fonte);
+## `olha_para` é para onde ela está virada (-1 esq, +1 dir). Sem direção
+## conhecida (0) o escudo vale. Puro para dar para testar headless.
+static func bloqueia_de_frente(dir_empurrao: float, olha_para: float) -> bool:
+	if dir_empurrao == 0.0:
+		return true
+	return signf(dir_empurrao) == -signf(olha_para)

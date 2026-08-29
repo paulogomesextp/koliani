@@ -10,7 +10,7 @@ enum Fase { PAIRA, MIRA, MERGULHO, SOBE }
 @export var alt_voo := 130.0
 @export var vel_deriva := 80.0
 @export var vel_mergulho := 540.0
-@export var dur_paira := 1.4
+@export var dur_paira := 1.15
 @export var dur_mira := 0.5
 @export var dur_mergulho := 0.6
 
@@ -22,7 +22,7 @@ var _alvo := Vector2.ZERO
 
 func _ready() -> void:
 	super._ready()
-	vida = maxi(vida, 200)
+	vida = maxi(vida, 235)
 	_y_ref = global_position.y
 
 
@@ -36,6 +36,7 @@ func _physics_process(dt: float) -> void:
 			_encarar_koliani()
 			move_and_slide()
 			if _t >= dur_paira and absf(dx) < 380.0:
+				provocar()  # travou para mirar -> música de combate
 				_ir_para(Fase.MIRA)
 		Fase.MIRA:
 			velocity = velocity.move_toward(Vector2.ZERO, 1200.0 * dt)

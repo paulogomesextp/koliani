@@ -18,6 +18,10 @@ const DUR_ROLAR := 0.30
 const RECARGA_ROLAR := 0.45
 const DUR_ATAQUE := 0.18
 const I_FRAMES := 0.6
+## Defesa (habilidade "escudo"): anda-se devagar de escudo erguido; um
+## ataque que venha de frente é bloqueado (sem dano) com um som subtil.
+const VEL_DEFESA := 70.0
+const BLOQUEIO_IFRAMES := 0.14
 ## Abaixo deste Y considera-se que caiu no vazio (fosso sem fundo).
 const Y_MORTE := 1200.0
 const TEX_IMPACTO := preload("res://assets/sprites/impacto.svg")
@@ -26,6 +30,7 @@ const TEX_IMPACTO := preload("res://assets/sprites/impacto.svg")
 @onready var _sprite: Node2D = $Sprite
 @onready var _corpo: Sprite2D = $Sprite/Corpo
 @onready var _rastro: Line2D = $Sprite/Rastro
+@onready var _escudo: Node2D = $Sprite/Escudo
 @onready var _camera: Camera2D = $Camera2D
 @onready var _faiscas: CPUParticles2D = $FaiscasAtaque
 @onready var _po: CPUParticles2D = $PoAterragem
@@ -40,6 +45,7 @@ var _rolar_recarga := 0.0
 var _ataque_restante := 0.0
 var _invulneravel := 0.0
 var _estava_no_chao := true
+var _defendendo := false
 
 # animação procedural (visual, corre em _process)
 var _mat: ShaderMaterial
@@ -68,12 +74,18 @@ func _physics_process(dt: float) -> void:
 	if dir != 0.0 and _rolar_restante <= 0.0:
 		_olha_para = signf(dir)  # o flip visual é feito em _animar()
 
-	# ataque leve -- bloqueado enquanto rola
+	# defesa: só com a habilidade "escudo", em pé, e não a meio de outra ação
+	_defendendo = EstadoJogo.tem_habilidade("escudo") \
+		and Input.is_action_pressed("defender") \
+		and _rolar_restante <= 0.0 and _dash_restante <= 0.0 and _ataque_restante <= 0.0 \
+		and is_on_floor()
+
+	# ataque leve -- bloqueado enquanto rola ou defende
 	if _ataque_restante > 0.0:
 		_ataque_restante -= dt
 		if _ataque_restante <= 0.0 and _hitbox:
 			_hitbox.monitoring = false
-	elif _rolar_restante <= 0.0 and Input.is_action_just_pressed("atacar"):
+	elif not _defendendo and _rolar_restante <= 0.0 and Input.is_action_just_pressed("atacar"):
 		_iniciar_ataque()
 
 	# estados exclusivos de movimento: rolamento > dash > movimento normal
@@ -86,6 +98,14 @@ func _physics_process(dt: float) -> void:
 		_dash_restante -= dt
 		velocity.x = _olha_para * VEL_DASH
 		velocity.y = 0.0
+	elif _defendendo:
+		# escudo erguido: anda-se devagar, sem saltar/dash/rolar
+		velocity.x = move_toward(velocity.x, dir * VEL_DEFESA, Movimento.ACEL_CHAO * dt)
+		if is_on_floor():
+			velocity.y = 0.0
+		else:
+			velocity.y = minf(Movimento.VEL_MAX_QUEDA, velocity.y + Movimento.GRAVIDADE * dt)
+		_mov.velocidade = velocity
 	elif Input.is_action_just_pressed("rolar") and Movimento.pode_rolar(
 			_rolar_recarga, is_on_floor(), _rolar_restante, _dash_restante):
 		_rolar_restante = DUR_ROLAR
@@ -142,6 +162,14 @@ func _animar(dt: float) -> void:
 	_anim_t += dt
 	_squash = move_toward(_squash, 0.0, dt * 5.0)
 	_pop = move_toward(_pop, 0.0, dt * 7.0)
+
+	if _escudo:
+		if _defendendo != _escudo.visible:
+			_escudo.visible = _defendendo
+			if _defendendo:
+				_escudo.scale = Vector2.ONE
+		if _defendendo:
+			_escudo.modulate.a = 0.82 + 0.18 * (0.5 + 0.5 * sin(_anim_t * 7.0))
 
 	var no_chao := is_on_floor()
 	var vx := absf(velocity.x)
@@ -258,8 +286,31 @@ func _pop_impacto(pos: Vector2) -> void:
 	t.chain().tween_callback(s.queue_free)
 
 
-func receber_dano(quantidade: int, _dir_empurrao: float = 0.0) -> void:
+## Um golpe é bloqueável se vier de frente. `dir_empurrao` é o sentido em
+## que o golpe empurra a Koliani (para longe da fonte); ela bloqueia se
+## estiver virada para a fonte. Sem direção conhecida (0), o escudo vale.
+func _bloqueia(dir_empurrao: float) -> bool:
+	return Movimento.bloqueia_de_frente(dir_empurrao, _olha_para)
+
+
+func _ao_bloquear() -> void:
+	_invulneravel = maxf(_invulneravel, BLOQUEIO_IFRAMES)
+	Som.toca("bloqueio", -15.0, randf_range(0.97, 1.06))
+	_abanar(2.5)
+	if _escudo:
+		_escudo.scale = Vector2(1.28, 1.16)
+		var t := _escudo.create_tween()
+		t.tween_property(_escudo, "scale", Vector2.ONE, 0.18).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	if _faiscas:
+		_faiscas.position.x = absf(_faiscas.position.x) * _olha_para
+		_faiscas.restart()
+
+
+func receber_dano(quantidade: int, dir_empurrao: float = 0.0) -> void:
 	if _invulneravel > 0.0:
+		return
+	if _defendendo and _bloqueia(dir_empurrao):
+		_ao_bloquear()
 		return
 	vida = maxi(0, vida - quantidade)
 	_invulneravel = I_FRAMES

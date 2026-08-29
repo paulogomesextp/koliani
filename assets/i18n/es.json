@@ -28,6 +28,7 @@
 	"hud.ability.salto_duplo": "Doble salto",
 	"hud.ability.dash_aereo": "Impulso aéreo",
 	"hud.ability.partir_paredes": "Romper muros",
+	"hud.ability.escudo": "Escudo",
 	"hud.new_ability": "Nueva habilidad: %s",
 	"hud.clue_found": "Pista encontrada  (%d)",
 
