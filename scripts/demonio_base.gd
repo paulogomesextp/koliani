@@ -19,13 +19,23 @@ const GRAVIDADE := 1400.0
 ## Cor da luz de recorte (rim) do sprite -- normalmente o tom do bioma.
 @export var cor_rim := Color(0.95, 0.5, 0.72)
 
+## Tiras pixel-art do inimigo comum (pack CC0 "Kings and Pigs"). Os chefes
+## nao usam isto -- trazem o seu proprio `Sprite/Corpo`.
+const TIRA_IDLE := preload("res://assets/sprites/pixel/enemies/pig_idle.png")
+const TIRA_RUN := preload("res://assets/sprites/pixel/enemies/pig_run.png")
+const TIRA_HIT := preload("res://assets/sprites/pixel/enemies/pig_hit.png")
+const TIRA_DEAD := preload("res://assets/sprites/pixel/enemies/pig_dead.png")
+
 @onready var _origem := global_position
 @onready var _sprite: Node2D = $Sprite
 @onready var _corpo: Sprite2D = get_node_or_null("Sprite/Corpo")
+@onready var _anim: AnimatedSprite2D = get_node_or_null("Sprite/Anim")
 @onready var _area_contacto: Area2D = $AreaContacto
 
 var _direcao := 1.0
 var _mat: ShaderMaterial
+## true a partir do momento em que morre (toca a anim de morte e liberta-se).
+var _morto := false
 # animação procedural (visual): bob de idle/andar + antecipação (wind-up)
 var _t_anim := 0.0
 var _corpo_base := Vector2.ZERO
@@ -59,9 +69,39 @@ func _ready() -> void:
 		if _corpo.material is ShaderMaterial:
 			_mat = _corpo.material
 			_mat.set_shader_parameter("rim_cor", cor_rim)
+	if _anim:
+		_montar_frames()
+		_anim.play("idle")
+
+
+## Monta os SpriteFrames do inimigo comum a partir das tiras horizontais.
+func _montar_frames() -> void:
+	var sf := SpriteFrames.new()
+	sf.remove_animation("default")
+	_add_tira(sf, "idle", TIRA_IDLE, 11, 9.0, true)
+	_add_tira(sf, "run", TIRA_RUN, 6, 13.0, true)
+	_add_tira(sf, "hit", TIRA_HIT, 2, 14.0, false)
+	_add_tira(sf, "dead", TIRA_DEAD, 4, 11.0, false)
+	_anim.sprite_frames = sf
+
+
+func _add_tira(sf: SpriteFrames, nome: String, tex: Texture2D, n: int, fps: float, ciclo: bool) -> void:
+	sf.add_animation(nome)
+	sf.set_animation_speed(nome, fps)
+	sf.set_animation_loop(nome, ciclo)
+	var fw := tex.get_width() / n
+	var fh := tex.get_height()
+	for i in n:
+		var at := AtlasTexture.new()
+		at.atlas = tex
+		at.region = Rect2(i * fw, 0, fw, fh)
+		sf.add_frame(nome, at)
 
 
 func _process(dt: float) -> void:
+	if _anim:
+		_atualizar_anim()
+		return
 	if _corpo == null:
 		return
 	_t_anim += dt
@@ -80,7 +120,20 @@ func _process(dt: float) -> void:
 		_sprite.rotation = _flinch * _flinch_dir * 0.5
 
 
+## Estado da anim do inimigo comum (idle/run). "hit" e "dead" mandam.
+func _atualizar_anim() -> void:
+	if _morto:
+		return
+	if _anim.animation == "hit" and _anim.is_playing():
+		return
+	var alvo := "run" if absf(velocity.x) > 6.0 else "idle"
+	if _anim.animation != alvo:
+		_anim.play(alvo)
+
+
 func _physics_process(dt: float) -> void:
+	if _morto:
+		return
 	velocity.x = _direcao * velocidade
 	if not is_on_floor():
 		velocity.y += GRAVIDADE * dt
@@ -107,6 +160,8 @@ func ha_chao_a_frente(dir: float) -> bool:
 
 
 func _ao_tocar(corpo: Node) -> void:
+	if _morto:
+		return
 	if corpo is Koliani:
 		corpo.receber_dano(dano_contacto, signf(corpo.global_position.x - global_position.x))
 		Som.toca("demonio_ataque", -10.0, randf_range(0.9, 1.15))
@@ -114,16 +169,36 @@ func _ao_tocar(corpo: Node) -> void:
 
 
 func receber_dano(quantidade: int, dir_empurrao: float = 0.0) -> void:
+	if _morto:
+		return
 	vida -= quantidade
 	global_position.x += dir_empurrao * 8.0
 	if vida <= 0:
-		soltar_estilhacos()
-		queue_free()
+		if _anim:
+			_morrer_anim()
+		else:
+			soltar_estilhacos()
+			queue_free()
 	else:
 		if dir_empurrao != 0.0:
 			_flinch_dir = signf(dir_empurrao)
 		_flinch = 1.0
+		if _anim:
+			_anim.play("hit")
 		piscar_dano()
+
+
+## Toca a animação de morte e só então solta estilhaços e liberta-se.
+func _morrer_anim() -> void:
+	_morto = true
+	velocity = Vector2.ZERO
+	if _area_contacto:
+		_area_contacto.set_deferred("monitoring", false)
+	set_deferred("collision_layer", 0)
+	_anim.play("dead")
+	await _anim.animation_finished
+	soltar_estilhacos()
+	queue_free()
 
 
 ## Flash branco curto ao levar dano (feedback de acerto).
@@ -132,6 +207,9 @@ func piscar_dano() -> void:
 		_mat.set_shader_parameter("flash", 1.0)
 		var t := create_tween()
 		t.tween_method(func(v: float): _mat.set_shader_parameter("flash", v), 1.0, 0.0, 0.12)
+	elif _anim:
+		_anim.modulate = Color(3.0, 3.0, 3.0)
+		create_tween().tween_property(_anim, "modulate", Color(1, 1, 1), 0.14)
 	elif _sprite:
 		_sprite.modulate = Color(2.2, 2.2, 2.2)
 		create_tween().tween_property(_sprite, "modulate", Color(1, 1, 1), 0.12)
