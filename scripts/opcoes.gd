@@ -10,8 +10,8 @@ extends Node
 
 const CAMINHO := "user://opcoes.json"
 
-var vol_musica := 1.0   # 0.0 .. 1.0 (linear)
-var vol_efeitos := 0.9  # 0.0 .. 1.0 (linear)
+var vol_musica := 1.0    # 0.0 .. 1.0 (linear)
+var vol_efeitos := 0.45  # 0.0 .. 1.0 -- efeitos deliberadamente por baixo da música
 var idioma := "en"
 
 

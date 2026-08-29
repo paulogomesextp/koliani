@@ -12,6 +12,11 @@
   - assombracao.wav     ruídos de casa assombrada para pôr por baixo da
                         música (vento, rangidos, correntes, gemido) -- loop
   - demonio_ataque.wav  rosnar curto quando um demónio nos acerta
+  - salto.wav           salto: "whoop" suave e curto (sino filtrado, pouco
+                        ruído) -- substitui o som antigo, que era áspero
+  - salto_duplo.wav     salto duplo: igual mas mais brilhante + faísca
+  - conquista.wav       chefe derrotado: arpejo de sino ascendente +
+                        cintilação + cauda de reverb (som de "conquista")
 
 Tudo é nosso (sem licença de terceiros). Puro Python (sem numpy).
 """
@@ -425,9 +430,99 @@ def demonio_ataque():
     escrever("demonio_ataque.wav", buf, 0.9)
 
 
+# --------------------------------------------------------------------------
+# 5) SALTO / SALTO DUPLO  (substituem os antigos, que eram asperos e altos)
+# --------------------------------------------------------------------------
+def _salto(nome, f0c, f1c, brilho, ganho):
+    """'Whoop' curto e suave: seno com glissando ascendente + sopro de ar
+    muito filtrado. Nada de dente-de-serra/quadrada."""
+    random.seed(hash(nome) & 0xffff)
+    dur = 0.12
+    N = int(dur * FS)
+    buf = [0.0] * N
+    lp = 0.0
+    for n in range(N):
+        p = n / N
+        f = f0c + (f1c - f0c) * (p ** 0.6)          # sobe depressa e assenta
+        env = min(1.0, p / 0.02) * math.exp(-p * 7.0)  # ataque 2 ms, cai rapido
+        s = math.sin(2 * math.pi * f * (n / FS))
+        s += 0.18 * brilho * math.sin(2 * math.pi * f * 2.0 * (n / FS)) * math.exp(-p * 10.0)
+        ar = random.uniform(-1, 1)
+        lp += 0.06 * (ar - lp)                       # ar bem abafado
+        s += lp * 0.12 * math.exp(-p * 9.0)
+        buf[n] = s * env
+    # lowpass geral (~2.6 kHz) para tirar aspereza
+    y = 0.0
+    a = math.exp(-2 * math.pi * 2600 / FS)
+    for n in range(N):
+        y += (1 - a) * (buf[n] - y)
+        buf[n] = y
+    escrever(nome, buf, ganho)
+
+
+def saltos():
+    _salto("salto.wav", 190.0, 360.0, 0.5, 0.34)
+    _salto("salto_duplo.wav", 300.0, 560.0, 1.0, 0.30)
+
+
+# --------------------------------------------------------------------------
+# 6) CONQUISTA  (chefe derrotado -- arpejo de sino ascendente, com brilho)
+# --------------------------------------------------------------------------
+def conquista():
+    random.seed(2027)
+    dur = 1.7
+    N = int(dur * FS)
+    buf = [0.0] * N
+
+    def sino(t0, f, amp, decai):
+        for n in range(int(t0 * FS), N):
+            tt = n / FS - t0
+            env = math.exp(-tt * decai)
+            s = math.sin(2 * math.pi * f * tt)
+            s += 0.55 * math.sin(2 * math.pi * f * 2.01 * tt) * math.exp(-tt * decai * 1.8)
+            s += 0.30 * math.sin(2 * math.pi * f * 3.03 * tt) * math.exp(-tt * decai * 3.0)
+            s += 0.16 * math.sin(2 * math.pi * f * 4.7 * tt) * math.exp(-tt * decai * 5.0)
+            buf[n] += s * env * amp
+
+    # arpejo ascendente (Re maior add9): D4 F#4 A4 D5 E5  -> "hopeful"
+    freqs = [293.66, 369.99, 440.0, 587.33, 659.25]
+    for i, f in enumerate(freqs):
+        sino(0.02 + i * 0.09, f, 0.22 - i * 0.015, 3.4 + i * 0.5)
+    # acorde a segurar por baixo
+    for f in (146.83, 220.0, 293.66):
+        sino(0.0, f, 0.10, 1.6)
+
+    # boom sub no arranque
+    for n in range(int(0.5 * FS)):
+        tt = n / FS
+        buf[n] += math.sin(2 * math.pi * (70 * math.exp(-tt * 4.0) + 32) * tt) * math.exp(-tt * 5.0) * 0.35
+
+    # cintilacao aguda a subir
+    for n in range(N):
+        tt = n / FS
+        f = 1400 + 2600 * min(1.0, tt / 0.6)
+        buf[n] += math.sin(2 * math.pi * f * tt) * 0.05 * math.exp(-tt * 2.2) * (tt < 0.7)
+
+    # reverb FIR curto
+    taps = [(0.037, 0.4), (0.061, 0.3), (0.089, 0.22), (0.125, 0.15), (0.170, 0.09)]
+    wet = [0.0] * N
+    for dt, g in taps:
+        d = int(dt * FS)
+        for n in range(d, N):
+            wet[n] += buf[n - d] * g
+    for n in range(N):
+        buf[n] = buf[n] * 0.9 + wet[n] * 0.5
+    fo = int(0.25 * FS)
+    for n in range(N - fo, N):
+        buf[n] *= (N - n) / fo
+    escrever("conquista.wav", buf, 0.9)
+
+
 if __name__ == "__main__":
     game_over_voz()
     menu_loop()
     boss_loop()
     assombracao_loop()
     demonio_ataque()
+    saltos()
+    conquista()

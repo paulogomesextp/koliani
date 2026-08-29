@@ -18,6 +18,7 @@ extends Control
 const CENA_JOGO := "res://scenes/Main.tscn"
 const CENA_OPCOES := preload("res://scenes/ui/Opcoes.tscn")
 
+@onready var _arte: TextureRect = $Arte
 @onready var _subtitulo: Label = $Centro/Subtitulo
 @onready var _novo: Button = $Centro/NovoJogo
 @onready var _load: Button = $Centro/LoadGame
@@ -36,6 +37,7 @@ func _ready() -> void:
 
 	Musica.menu()  # tema próprio do menu (por baixo do título)
 	_aviso.visible = false
+	_deriva_arte()  # leve "Ken Burns" no fundo (key art)
 
 	_novo.pressed.connect(_ao_novo)
 	_load.pressed.connect(_ir_jogar)
@@ -97,6 +99,17 @@ func _tratar_atalhos_dev() -> bool:
 		EstadoJogo.checkpoint = Vector2.ZERO
 	_ir_jogar()
 	return true
+
+
+## Deriva muito lenta do fundo (a `Arte` é maior que o ecrã, sobra folga).
+func _deriva_arte() -> void:
+	if _arte == null:
+		return
+	var base := _arte.position
+	var t := create_tween().set_loops().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	t.tween_property(_arte, "position", base + Vector2(46, -30), 24.0)
+	t.tween_property(_arte, "position", base + Vector2(-40, 24), 26.0)
+	t.tween_property(_arte, "position", base, 22.0)
 
 
 func _abrir_opcoes() -> void:

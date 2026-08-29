@@ -22,6 +22,7 @@ const CAMINHOS := {
 	"onda": "res://assets/audio/onda.wav",
 	"game_over": "res://assets/audio/game_over.wav",
 	"demonio_ataque": "res://assets/audio/demonio_ataque.wav",
+	"conquista": "res://assets/audio/conquista.wav",
 }
 const VOZES := 8
 

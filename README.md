@@ -189,11 +189,18 @@ SDK) -- ajustar pelo log do Actions.
   mundo ou recomeçar. Fim do run (tempo a zero **ou** 3 vidas gastas) ->
   `game_over.gd` com a voz "GAME OVER" e a campanha recomeça do mundo 1,
   ainda em hardcore. Dev: `-- --hc-tempo=N` força N segundos por mundo.
-- **Áudio novo** (`tools/gerar_audio.py`, síntese pura): `game_over.wav`
-  (voz de speaker de arcada), `boss.wav` (cama do M4 -- mais rápida e mais
-  alta), `assombracao.wav` (ruídos de casa assombrada por baixo da música),
-  `demonio_ataque.wav` (rosnar do demónio ao acertar). Música global mais
-  alta (`musica.gd`: cama a -12 dB, chefe a -6 dB).
+- **Fundo do menu** (`scenes/ui/MenuInicial.tscn`): recorte da key art
+  (`assets/branding/menu_bg.png` -- só o desenho, sem o texto do poster),
+  com scrim + vinheta radial e deriva lenta ("Ken Burns").
+- **Áudio** (`tools/gerar_audio.py`, síntese pura): `menu.wav` (tema do
+  menu), `boss.wav` (música de chefe -- toca **ao aproximar-se do chefe em
+  qualquer mundo**, via `chefe_base.gd` + `Musica.boss()`; no M4 já vem do
+  arranque), `assombracao.wav` (casa assombrada por baixo da música),
+  `game_over.wav` (voz de arcada), `demonio_ataque.wav` (rosnar ao
+  acertar), `conquista.wav` (chefe derrotado -- som de conquista, distinto
+  de matar um inimigo), `salto`/`salto_duplo` **refeitos** mais suaves.
+  Música global mais alta (cama -12 dB, chefe -6 dB); **efeitos por baixo
+  da música** (`Opcoes.vol_efeitos` = 0.45 por omissão).
 - **Fim da campanha** volta ao **menu inicial** (o save fica como está --
   o jogador escolhe NEW GAME / LOAD GAME / HARDCORE MODE).
 - **Menu de pausa** (`scripts/pausa.gd` + `scenes/ui/Pausa.tscn`): P ou

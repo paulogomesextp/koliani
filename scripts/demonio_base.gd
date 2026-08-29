@@ -95,7 +95,7 @@ func ha_chao_a_frente(dir: float) -> bool:
 func _ao_tocar(corpo: Node) -> void:
 	if corpo is Koliani:
 		corpo.receber_dano(dano_contacto, signf(corpo.global_position.x - global_position.x))
-		Som.toca("demonio_ataque", -7.0, randf_range(0.9, 1.15))
+		Som.toca("demonio_ataque", -10.0, randf_range(0.9, 1.15))
 		anticipacao = 1.0  # dá um "bote" visual no ataque
 
 

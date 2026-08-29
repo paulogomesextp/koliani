@@ -11,10 +11,14 @@ extends DemonioBase
 
 signal derrotado
 
+## A que distância da Koliani o chefe "entra em cena" (troca a música).
+const DIST_MUSICA_BOSS := 470.0
+
 var _koliani: Node2D
 ## Fica > 0 durante um golpe forte do chefe (o contacto magoa mais).
 var _ataque_forte := 0.0
 var _ja_derrotado := false
+var _musica_boss := false
 
 
 func _ready() -> void:
@@ -24,6 +28,12 @@ func _ready() -> void:
 
 func _process(dt: float) -> void:
 	super._process(dt)
+	# ao aproximar-se do chefe, muda a música para a do boss (em qualquer
+	# mundo -- no mundo 4 já vem assim do arranque)
+	if not _musica_boss and not _ja_derrotado \
+			and _vetor_para_koliani().length() < DIST_MUSICA_BOSS:
+		_musica_boss = true
+		Musica.boss()
 	# rede de segurança: se o chefe se atirar para fora do mapa (investida
 	# num fosso, etc.), conta como derrotado -- senão o nível fica
 	# bloqueado porque a porta nunca abre.
@@ -33,7 +43,8 @@ func _process(dt: float) -> void:
 
 func _cair_derrotado() -> void:
 	_ja_derrotado = true
-	Som.toca("chefe_cai", -3.0)
+	Som.toca("chefe_cai", -6.0)
+	Som.toca("conquista", -4.0)  # som de "conquista", distinto de matar um inimigo
 	derrotado.emit()
 	queue_free()
 
@@ -81,7 +92,8 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0) -> void:
 	global_position.x += dir_empurrao * 3.0
 	if vida <= 0:
 		_ja_derrotado = true
-		Som.toca("chefe_cai", -2.0)
+		Som.toca("chefe_cai", -6.0)
+		Som.toca("conquista", -4.0)  # som de "conquista", distinto de matar um inimigo
 		derrotado.emit()
 		soltar_estilhacos()
 		queue_free()

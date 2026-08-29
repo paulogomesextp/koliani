@@ -108,7 +108,7 @@ func _physics_process(dt: float) -> void:
 		)
 		velocity = _mov.velocidade
 		if _mov.saltos_dados > saltos_antes:
-			Som.toca("salto_duplo" if _mov.saltos_dados >= 2 else "salto", -12.0)
+			Som.toca("salto_duplo" if _mov.saltos_dados >= 2 else "salto", -10.0)
 
 	var vel_queda := velocity.y
 	move_and_slide()
@@ -239,7 +239,7 @@ func _ao_acertar_corpo(corpo: Node) -> void:
 		_pop_impacto((corpo as Node2D).global_position if corpo is Node2D else global_position)
 		_abanar(4.5)
 		_hitstop(0.06)
-		Som.toca("acerto", -5.0)
+		Som.toca("acerto", -8.0)
 
 
 ## "Frame de impacto" -- clarão branco que estica e desaparece depressa.
@@ -267,7 +267,7 @@ func receber_dano(quantidade: int, _dir_empurrao: float = 0.0) -> void:
 	_flash_branco()
 	_abanar(8.0)
 	_hitstop(0.07)
-	Som.toca("dano", -4.0)
+	Som.toca("dano", -7.0)
 	if vida <= 0:
 		_morrer()
 
