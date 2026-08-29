@@ -31,6 +31,7 @@ func _correr_tudo() -> void:
 	teste_koliani_pode_rolar()
 	teste_tremor_impulso_e_decaimento()
 	teste_diario_entradas_e_fallback()
+	teste_diario_tem_todas_as_pistas_dos_niveis()
 	teste_estado_tres_mortes_sem_vidas()
 	teste_estado_pistas_sem_duplicados()
 	teste_estado_habilidade_sem_duplicados()
@@ -157,6 +158,20 @@ func teste_diario_entradas_e_fallback() -> void:
 	_ok(lista[0]["mundo"] == "Floresta Putrefata", "id conhecido traz o mundo certo")
 	_ok(lista[1]["titulo"] == "id_desconhecido", "id sem texto cai no proprio id")
 	_ok(DiarioPistas.total_no_jogo() >= 2, "total_no_jogo conta o dicionario")
+
+
+## Os ids que as cenas de nível usam (Porta.pista_ao_atravessar e
+## Coletavel.pista_id) têm de ter texto em DiarioPistas -- senão aparecem
+## no diário como "(pista por escrever)".
+func teste_diario_tem_todas_as_pistas_dos_niveis() -> void:
+	var ids := [
+		"floresta_sinal_da_porta", "floresta_carta_rasgada",
+		"prisao_carta_na_cela", "prisao_grito_nas_correntes",
+		"torres_lanterna_de_zeriko", "torres_sussurro_da_mae",
+		"castelo_aurora_livre",
+	]
+	for id in ids:
+		_ok(DiarioPistas.PISTAS.has(id), "falta o texto da pista '%s' em DiarioPistas" % id)
 
 
 # --- EstadoJogo ------------------------------------------------------

@@ -136,20 +136,23 @@ Autoload `EstadoJogo`. Guarda em `user://progresso.json`:
 - ~~Habilidades desbloqueáveis~~ -- `salto_duplo` (mundo 1), `dash_aereo`
   (mundo 2) e `partir_paredes` (mundo 3, via `scripts/parede_fragil.gd`)
   ligadas. Falta a arte e possíveis habilidades extra.
-- **Chefe** por mundo. Feito o do mundo 1 (`scripts/chefe_floresta.gd`,
-  `scenes/actors/ChefeFloresta.tscn`): FSM patrulha -> telegrafo -> investida
-  -> recupera, emite `derrotado`. `scripts/nivel_com_chefe.gd` sela a porta
-  até ele cair. Faltam chefes dos mundos 2-4 e afinar tempos/dano.
-- Cena de final a sério (o `main.gd._ao_fim_da_campanha` é um cartão).
+- ~~**Chefe** por mundo~~ -- feitos os 4, todos herdam de
+  `scripts/chefe_base.gd` (sinal `derrotado`, telegrafo, contacto forte,
+  morte com estilhaços): `ChefeFloresta` (investida), `ChefeCarcereiro`
+  (onda de choque), `ChefeVento` (voa + mergulha), `Zeriko` (teleporta +
+  projéteis, 2 fases). Falta afinar tempos/dano com o jogo a correr.
+- ~~Cena de final~~ -- feita (`scripts/cena_final.gd`, libertação da
+  Aurora). É só texto; transformar em momento com arte/áudio.
 - Som (sem áudio ainda). **Juice** parcial feito: screen shake
   (`scripts/tremor.gd` puro + `camera_tremor.gd` na câmara), hitstop de
   tempo real (`Koliani._hitstop`), `CPUParticles2D` de impacto e de
   aterragem. Falta afinar valores com o jogo a correr e partículas nos
   demónios.
 - Mapear `rolar` no HUD de toque (`scenes/ui/HUD.tscn`).
-- Mundo 4 `Castelo_de_Zeriko` -- falta. É o final: luta com o Zeriko +
-  libertar a mãe (ver dúvida no README). Mundos 1-3 já existem (greybox).
-- Afinar todos os níveis com o jogo a correr (distâncias de salto, ritmo,
-  posição de inimigos) -- foram montados sem playtest.
+- **Afinar todos os níveis e chefes com o jogo a correr** (distâncias de
+  salto, ritmo, dano, posições) -- os 4 mundos foram montados sem playtest.
+- Sprites + áudio (CC0) -- o Paulo autorizou; por integrar.
+- Chefes: `Zeriko` podia ter mais um tipo de ataque (a lanterna); os
+  outros podiam ter ataques secundários.
 - `koliani.gd`: `Y_MORTE` (cair no vazio = morte) é global; talvez passar
   a ser por-nível.

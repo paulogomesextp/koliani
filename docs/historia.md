@@ -25,10 +25,15 @@ key_art.png`). Slogan da key art: *"Uma menina. Um propósito. Uma lenda."*
   distância nos primeiros mundos (a espreitar, a provocar) antes do
   confronto final. Segura uma lanterna-jaula onde se vê uma silhueta -- a
   mãe.
-- **A mãe** -- objetivo. Nome por definir. Deixa sinais pelos mundos
-  (cartas, objetos, sombras) que formam as **pistas**.
-- **Demónios de mundo** -- um "chefe" temático por reino, além dos
-  inimigos comuns (`DemonioBase` e derivados).
+- **Aurora** -- a mãe. Objetivo da Koliani. Deixa sinais pelos mundos
+  (cartas, objetos, sombras) que formam as **pistas**. Zeriko guarda-a na
+  lanterna-jaula "para o fim".
+- **Demónios de mundo** -- um "chefe" temático por reino (herdam de
+  `scripts/chefe_base.gd`), além dos inimigos comuns (`DemonioBase`):
+  - M1 `ChefeFloresta` (Raiz-que-Anda) -- investida horizontal
+  - M2 `ChefeCarcereiro` -- salto + onda de choque rasteira
+  - M3 `ChefeVento` (Uivo) -- voa, mira e mergulha
+  - M4 `Zeriko` -- teleporta e dispara projéteis; 2.ª fase < 50% vida
 
 ## Mundos (ordem da campanha)
 
@@ -81,9 +86,16 @@ segredos opcionais. As pistas ficam guardadas em `EstadoJogo.pistas` e
 mostram-se num ecrã de "diário" (por fazer). A porta de cada mundo pode
 registar uma pista ao ser atravessada (`Porta.pista_ao_atravessar`).
 
+### Mundo 4 -- Castelo de Zeriko (`Castelo_de_Zeriko.tscn`)
+
+Sala do trono, magenta intenso. **Não tem porta** -- o mundo acaba quando
+o `Zeriko` cai. `scripts/nivel_castelo.gd` ouve o sinal `derrotado`,
+ilumina a lanterna-jaula, regista a pista `castelo_aurora_livre` e arranca
+a **cena final** (`scripts/cena_final.gd`): a jaula parte-se, a Aurora
+sai, e as duas partem juntas. No fim, recomeça a campanha.
+
 ## Final
 
-Ao atravessar a última porta (`EstadoJogo.ha_proximo_nivel()` falso),
-`main.gd` dispara `_ao_fim_da_campanha()` -- por agora um placeholder.
-A cena de final a sério (Koliani liberta a mãe, Zeriko derrotado) é
-trabalho do agente `gaming`.
+Implementado em `scripts/cena_final.gd` (luta com o Zeriko + cena
+narrativa, decisão do Paulo). Texto ainda em rascunho -- afinar tom e,
+mais tarde, transformar num momento com arte/áudio em vez de só texto.

@@ -50,9 +50,17 @@ scripts/
   movimento.gd         -- LOGICA PURA do movimento (coyote, jump buffer, corte de salto, salto duplo); testavel
   koliani.gd           -- CharacterBody2D: liga movimento.gd + dash + ataque + dano + morte + salto duplo
   demonio_base.gd      -- inimigo base (patrulha + dano por contacto); classe-pai dos demonios
-  chefe_floresta.gd    -- chefe: FSM patrulha/telegrafo/investida/recupera; sinal "derrotado" (usado nos 3 mundos)
+  chefe_base.gd        -- base dos chefes (herda DemonioBase): sinal "derrotado", telegrafo, contacto forte
+  chefe_floresta.gd    -- chefe M1 -- Raiz-que-Anda: investida horizontal
+  chefe_carcereiro.gd  -- chefe M2 -- Carcereiro: salto + onda de choque rasteira
+  chefe_vento.gd       -- chefe M3 -- Uivo: voa, paira, mira e mergulha
+  zeriko.gd            -- chefe M4 -- Zeriko: teleporta e dispara projeteis; 2.a fase < 50% vida
+  projetil_zeriko.gd   -- bola de energia do Zeriko (Area2D em linha reta)
   parede_fragil.gd     -- StaticBody2D: parte-se a golpe se a Koliani tiver "partir_paredes"
-  nivel_com_chefe.gd   -- script do no raiz de um mundo: sela a porta ate o no "Chefe" cair
+  nivel_com_chefe.gd   -- no raiz de M1-M3: sela a porta ate o no "Chefe" cair
+  nivel_castelo.gd     -- no raiz de M4: sem porta -- ao "derrotado" do Zeriko arranca a cena final
+  cena_final.gd        -- cena narrativa (libertacao da Aurora); no fim recomeca a campanha
+  fim_campanha.gd      -- (legado) cartao de fim usado pela porta quando nao ha proximo nivel
   atmosfera.gd         -- montagem de ambiente reutilizavel (CanvasModulate + parallax + vinheta + luzes), cores por @export
   coletavel.gd         -- Area2D: apanhar => regista pista / desbloqueia habilidade; nao reaparece
   porta.gd             -- Area2D: avanca para o mundo seguinte / termina a campanha
@@ -63,17 +71,19 @@ scripts/
   tremor.gd            -- LOGICA PURA do screen shake (amplitude decai a zero); testavel
   camera_tremor.gd     -- Camera2D da Koliani: aplica o Tremor ao offset
   controlos_toque.gd   -- HUD de toque (esconde-se com teclado)
-  main.gd              -- cena de arranque: carrega o nivel atual + HUD + diario + cartao de fim
+  main.gd              -- arranque: carrega o nivel atual + HUD + diario; atalhos de debug (F1-F9)
 
 scenes/
   Main.tscn                        -- main_scene (ver project.godot)
   levels/Floresta_Putrefata.tscn   -- MUNDO 1: verde-podre, fosso c/ salto duplo, da salto_duplo
   levels/Prisao_dos_Condenados.tscn-- MUNDO 2: azul-frio, subida longa, da dash_aereo
   levels/Torres_Esquecidas.tscn    -- MUNDO 3: roxo, saltos sobre o vazio, da partir_paredes (+ ParedeFragil)
+  levels/Castelo_de_Zeriko.tscn    -- MUNDO 4: magenta, arena do Zeriko, sem porta -> cena final da Aurora
   levels/Level_Test.tscn           -- sala de treino (fora da campanha)
   actors/Koliani.tscn              -- placeholder ColorRect (silhueta key art) + lamina c/ PointLight2D + particulas
   actors/DemonioBase.tscn          -- placeholder ColorRect + olho c/ PointLight2D + area de contacto
-  actors/ChefeFloresta.tscn        -- chefe (massa roxa, 2 olhos, luz) -- usado nos 3 mundos
+  actors/ChefeFloresta.tscn / ChefeCarcereiro.tscn / ChefeVento.tscn / Zeriko.tscn -- chefes M1..M4
+  actors/ProjetilZeriko.tscn       -- projetil do chefe final
   actors/Coletavel.tscn            -- gema magenta c/ PointLight2D (pista / habilidade)
   actors/ParedeFragil.tscn         -- parede rachada que se parte a golpe (c/ habilidade)
   fx/Atmosfera.tscn                -- ambiente reutilizavel (parallax + luz + vinheta), recolorido por mundo
@@ -118,51 +128,38 @@ SDK) -- ajustar pelo log do Actions.
 - *Opcional, só para APK local:* JDK 17 + Android SDK + keystore de debug.
   Sem isto, o APK sai só do CI.
 
-## Estado da validação (2026-08-29, Godot 4.7.2 headless)
+## Estado da validação (2026-08-30, Godot 4.7.2 headless)
 
-- `--import` -- OK, classes globais registadas (`Coletavel`, `Koliani`,
-  `Movimento`), assets importados.
-- `godot --headless --script res://tests/run_tests.gd` -- **14 testes, todos
-  a passar** (movimento + salto duplo + rolar + tremor + estado + diário).
 - `--import` sem erros nem avisos; classes globais todas registadas.
-- **As 4 cenas de nível + `Main.tscn` correm headless (150-600 frames)
+- `godot --headless --script res://tests/run_tests.gd` -- **15 testes, todos
+  a passar** (movimento + salto duplo + rolar + tremor + estado + diário).
+- **As 4 cenas de nível + `Main.tscn` correm headless (200-500 frames)
   sem erros nem avisos.**
-- Campanha: **3 mundos** ligados em `EstadoJogo.NIVEIS` (mundo 4 por fazer).
-  Progressão de habilidades: salto_duplo (M1) -> dash_aereo (M2) ->
-  partir_paredes (M3). Diário de pistas funcional (6 pistas escritas).
-- Build Web/APK local -- bloqueado só pela falta dos modelos de export
-  (ver acima).
+- Campanha **completa (4 mundos)** em `EstadoJogo.NIVEIS`. Progressão:
+  salto_duplo (M1) -> dash_aereo (M2) -> partir_paredes (M3) -> luta final
+  com o Zeriko + cena da Aurora (M4). Chefes distintos nos 4 mundos.
+  Diário de pistas funcional (7 pistas escritas).
+- **Ainda não foi jogado** -- greybox montado às cegas; a afinação
+  (distâncias, ritmo, dano) precisa de playtest -- ver `docs/testar.md`.
+- Build Web/APK local -- bloqueado só pela falta dos modelos de export.
 
-## Dúvidas para o Paulo (sessão de 2026-08-29, noite)
+## Como testar / instalar
 
-> Trabalhei em headless, sem playtest visual. Tudo importa e corre limpo,
-> mas os níveis foram montados **às cegas** -- distâncias de salto, ritmo e
-> posições de inimigos precisam de afinação com o jogo a correr.
+Ver **`docs/testar.md`**: como correr o jogo, controlos, atalhos de debug
+(F1-F9), instalar os modelos de export, e ligar o remote/CI.
 
-1. **Sprites / arte (o maior bloqueio para o "look Dead Cells").** Posso
-   descarregar e integrar packs **CC0** concretos? A minha sugestão:
-   Kenney "Pixel Platformer" + "Pixel Adventure" (personagem/tiles) e
-   OpenGameArt para efeitos. Ou preferes escolher tu os packs primeiro?
-   **Nada foi descarregado** -- fiquei-me pelos `ColorRect` + luz/parallax.
-2. **Áudio.** Mesma pergunta: uso packs CC0 (ex.: Kenney "Impact Sounds",
-   "UI Audio") para passos, golpe, salto, dano, ambiente? Não há som nenhum.
-3. **Mundo 4 -- Castelo de Zeriko / final.** Não o fiz: é o clímax (luta
-   com o Zeriko + libertar a mãe) e merece o teu input. Queres uma luta a
-   sério (o `ChefeFloresta` dá para evoluir) ou uma cena mais narrativa?
-   Há nome para a mãe? Por agora a última porta da campanha mostra um
-   cartão de texto com opção de recomeçar (`scripts/fim_campanha.gd`).
-4. **Chefe único.** Os 3 mundos usam o mesmo `ChefeFloresta.tscn` (só
-   recolorido). Faço chefes distintos por mundo, ou chega um arquétipo
-   afinado?
-5. **Level_Test fora da campanha.** Tirei-o de `EstadoJogo.NIVEIS`; a
-   campanha arranca já na Floresta Putrefata. `Level_Test.tscn` fica no
-   repo como sala de treino. Ok?
-6. **Ligar o remote / CI.** Continua por ligar (`git remote add origin …`
-   é contigo -- não mexo em git config). Sem isso o GitHub Actions não
-   corre e não há APK do CI para o telemóvel.
-7. **Modelos de export.** Continuam por instalar (Editor > Gerir Modelos
-   de Exportação). Sem eles não consigo gerar o build Web local para
-   verificação visual.
+## Em aberto
+
+Respostas do Paulo já aplicadas: arte/áudio CC0 **OK**, chefes distintos
+**OK**, mãe = **Aurora**, final = **luta + cena narrativa**.
+
+1. **Sprites / áudio CC0** -- autorizado; por integrar. Plano: Kenney
+   "Pixel Platformer"/"Pixel Adventure" (personagem/tiles) + Kenney
+   "Impact Sounds"/"UI Audio". Nada descarregado ainda.
+2. **Playtest + afinação** -- o Paulo vai testar (`docs/testar.md`) e
+   passar notas de feel/dificuldade.
+3. **Remote / CI + modelos de export** -- passos em `docs/testar.md`
+   (parte "Instalar o que falta"); é trabalho do Paulo (git config).
 
 ## Regras
 
