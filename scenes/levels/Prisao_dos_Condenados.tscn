@@ -8,7 +8,7 @@
 [ext_resource type="PackedScene" uid="uid://bkolianiactor01" path="res://scenes/actors/Koliani.tscn" id="1_kol"]
 [ext_resource type="PackedScene" uid="uid://bdemoniobase01" path="res://scenes/actors/DemonioBase.tscn" id="2_dem"]
 [ext_resource type="PackedScene" uid="uid://bkolianicoletavel01" path="res://scenes/actors/Coletavel.tscn" id="3_col"]
-[ext_resource type="Script" path="res://scripts/porta.gd" id="4_porta"]
+[ext_resource type="PackedScene" uid="uid://bkolianiporta01" path="res://scenes/actors/Porta.tscn" id="4_porta"]
 [ext_resource type="Script" path="res://scripts/checkpoint.gd" id="5_chk"]
 [ext_resource type="PackedScene" uid="uid://bkolianichefecarcereiro01" path="res://scenes/actors/ChefeCarcereiro.tscn" id="6_chefe"]
 [ext_resource type="Script" path="res://scripts/nivel_com_chefe.gd" id="7_niv"]
@@ -51,7 +51,7 @@ fill_to = Vector2(1, 0.5)
 script = ExtResource("7_niv")
 
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
-cor_ambiente = Color(0.4, 0.44, 0.55, 1)
+cor_ambiente = Color(0.62, 0.66, 0.78, 1)
 cor_fundo = Color(0.04, 0.06, 0.1, 1)
 cor_silhueta = Color(0.08, 0.12, 0.18, 1)
 cor_luz = Color(0.35, 0.6, 0.85, 1)
@@ -66,14 +66,14 @@ offset_left = -450.0
 offset_top = -24.0
 offset_right = 450.0
 offset_bottom = 60.0
-color = Color(0.105, 0.125, 0.17, 1)
+color = Color(0.2, 0.24, 0.32, 1)
 
 [node name="Lip" type="ColorRect" parent="ChaoInicio"]
 offset_left = -450.0
 offset_top = -24.0
 offset_right = 450.0
 offset_bottom = -18.0
-color = Color(0.28, 0.36, 0.46, 1)
+color = Color(0.42, 0.54, 0.68, 1)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="ChaoInicio"]
 shape = SubResource("rs_chao_i")
@@ -88,14 +88,14 @@ offset_left = -80.0
 offset_top = -13.0
 offset_right = 80.0
 offset_bottom = 13.0
-color = Color(0.115, 0.135, 0.18, 1)
+color = Color(0.22, 0.26, 0.34, 1)
 
 [node name="Lip" type="ColorRect" parent="PlatVao"]
 offset_left = -80.0
 offset_top = -13.0
 offset_right = 80.0
 offset_bottom = -7.0
-color = Color(0.28, 0.36, 0.46, 1)
+color = Color(0.42, 0.54, 0.68, 1)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="PlatVao"]
 shape = SubResource("rs_plat_m")
@@ -110,14 +110,14 @@ offset_left = -240.0
 offset_top = -24.0
 offset_right = 240.0
 offset_bottom = 60.0
-color = Color(0.105, 0.125, 0.17, 1)
+color = Color(0.2, 0.24, 0.32, 1)
 
 [node name="Lip" type="ColorRect" parent="ChaoMeio"]
 offset_left = -240.0
 offset_top = -24.0
 offset_right = 240.0
 offset_bottom = -18.0
-color = Color(0.28, 0.36, 0.46, 1)
+color = Color(0.42, 0.54, 0.68, 1)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="ChaoMeio"]
 shape = SubResource("rs_chao_m")
@@ -132,14 +132,14 @@ offset_left = -70.0
 offset_top = -13.0
 offset_right = 70.0
 offset_bottom = 13.0
-color = Color(0.115, 0.135, 0.18, 1)
+color = Color(0.22, 0.26, 0.34, 1)
 
 [node name="Lip" type="ColorRect" parent="PlatB"]
 offset_left = -70.0
 offset_top = -13.0
 offset_right = 70.0
 offset_bottom = -7.0
-color = Color(0.28, 0.36, 0.46, 1)
+color = Color(0.42, 0.54, 0.68, 1)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="PlatB"]
 shape = SubResource("rs_plat_p")
@@ -154,14 +154,14 @@ offset_left = -70.0
 offset_top = -13.0
 offset_right = 70.0
 offset_bottom = 13.0
-color = Color(0.115, 0.135, 0.18, 1)
+color = Color(0.22, 0.26, 0.34, 1)
 
 [node name="Lip" type="ColorRect" parent="PlatC"]
 offset_left = -70.0
 offset_top = -13.0
 offset_right = 70.0
 offset_bottom = -7.0
-color = Color(0.28, 0.36, 0.46, 1)
+color = Color(0.42, 0.54, 0.68, 1)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="PlatC"]
 shape = SubResource("rs_plat_p")
@@ -176,14 +176,14 @@ offset_left = -80.0
 offset_top = -13.0
 offset_right = 80.0
 offset_bottom = 13.0
-color = Color(0.115, 0.135, 0.18, 1)
+color = Color(0.22, 0.26, 0.34, 1)
 
 [node name="Lip" type="ColorRect" parent="PlatD"]
 offset_left = -80.0
 offset_top = -13.0
 offset_right = 80.0
 offset_bottom = -7.0
-color = Color(0.28, 0.36, 0.46, 1)
+color = Color(0.42, 0.54, 0.68, 1)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="PlatD"]
 shape = SubResource("rs_plat_m")
@@ -198,14 +198,14 @@ offset_left = -260.0
 offset_top = -24.0
 offset_right = 260.0
 offset_bottom = 60.0
-color = Color(0.105, 0.125, 0.17, 1)
+color = Color(0.2, 0.24, 0.32, 1)
 
 [node name="Lip" type="ColorRect" parent="ChaoFim"]
 offset_left = -260.0
 offset_top = -24.0
 offset_right = 260.0
 offset_bottom = -18.0
-color = Color(0.28, 0.36, 0.46, 1)
+color = Color(0.42, 0.54, 0.68, 1)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="ChaoFim"]
 shape = SubResource("rs_chao_f")
@@ -294,32 +294,6 @@ color = Color(0.4, 0.6, 0.95, 0.32)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CheckMeio"]
 shape = SubResource("rs_chk")
 
-[node name="Porta" type="Area2D" parent="."]
+[node name="Porta" parent="." instance=ExtResource("4_porta")]
 position = Vector2(2150, 248)
-collision_layer = 16
-collision_mask = 2
-script = ExtResource("4_porta")
 pista_ao_atravessar = "prisao_carta_na_cela"
-
-[node name="Moldura" type="ColorRect" parent="Porta"]
-offset_left = -24.0
-offset_top = -48.0
-offset_right = 24.0
-offset_bottom = 48.0
-color = Color(0.6, 0.18, 0.59, 1)
-
-[node name="Nucleo" type="ColorRect" parent="Porta"]
-offset_left = -12.0
-offset_top = -34.0
-offset_right = 12.0
-offset_bottom = 34.0
-color = Color(0.933, 0.435, 0.91, 1)
-
-[node name="PointLight2D" type="PointLight2D" parent="Porta"]
-texture = SubResource("tex_luz")
-energy = 1.4
-color = Color(0.95, 0.45, 0.92, 1)
-scale = Vector2(1.3, 1.3)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Porta"]
-shape = SubResource("rs_porta")

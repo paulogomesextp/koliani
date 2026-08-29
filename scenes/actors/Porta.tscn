@@ -1,0 +1,42 @@
+[gd_scene load_steps=5 format=3 uid="uid://bkolianiporta01"]
+
+; Porta entre mundos. Sprite SVG assets/sprites/porta.svg + luz magenta.
+; Cada nivel instancia isto e poe a sua "pista_ao_atravessar". O
+; nivel_com_chefe.gd escurece/ilumina via modulate e liga/desliga o
+; monitoring (porta selada ate o chefe cair).
+
+[ext_resource type="Script" path="res://scripts/porta.gd" id="1_porta"]
+[ext_resource type="Texture2D" uid="uid://o4shaq5srhor" path="res://assets/sprites/porta.svg" id="2_tex"]
+
+[sub_resource type="RectangleShape2D" id="rs_porta"]
+size = Vector2(48, 96)
+
+[sub_resource type="Gradient" id="grad_luz"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="tex_luz"]
+gradient = SubResource("grad_luz")
+width = 256
+height = 256
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[node name="Porta" type="Area2D" groups=["portas"]]
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("1_porta")
+
+[node name="Corpo" type="Sprite2D" parent="."]
+texture = ExtResource("2_tex")
+
+[node name="PointLight2D" type="PointLight2D" parent="."]
+position = Vector2(0, 8)
+texture = SubResource("tex_luz")
+energy = 1.5
+color = Color(0.95, 0.45, 0.92, 1)
+scale = Vector2(1.3, 1.3)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("rs_porta")

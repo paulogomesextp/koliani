@@ -1,9 +1,10 @@
 [gd_scene load_steps=6 format=3 uid="uid://bkolianizeriko01"]
 
-; Chefe final -- Zeriko. Placeholder: silhueta grande, chifres, olhos
-; magenta, luz forte. Teleporta (nao usa gravidade). Script zeriko.gd.
+; Chefe final -- Zeriko. Sprite SVG assets/sprites/zeriko.svg. Teleporta
+; (nao usa gravidade). Script zeriko.gd (herda ChefeBase).
 
 [ext_resource type="Script" path="res://scripts/zeriko.gd" id="1_zk"]
+[ext_resource type="Texture2D" uid="uid://d2ra0d0pwad1w" path="res://assets/sprites/zeriko.svg" id="2_tex"]
 
 [sub_resource type="RectangleShape2D" id="rs_body"]
 size = Vector2(52, 78)
@@ -33,51 +34,12 @@ cor_estilhacos = Color(0.95, 0.4, 0.9, 1)
 
 [node name="Sprite" type="Node2D" parent="."]
 
-[node name="Sombra" type="ColorRect" parent="Sprite"]
-show_behind_parent = true
-offset_left = -34.0
-offset_top = -44.0
-offset_right = 34.0
-offset_bottom = 44.0
-color = Color(0.12, 0.03, 0.16, 0.6)
-
-[node name="Corpo" type="ColorRect" parent="Sprite"]
-offset_left = -26.0
-offset_top = -39.0
-offset_right = 26.0
-offset_bottom = 39.0
-color = Color(0.22, 0.06, 0.3, 1)
-
-[node name="ChifreE" type="ColorRect" parent="Sprite"]
-offset_left = -26.0
-offset_top = -54.0
-offset_right = -14.0
-offset_bottom = -34.0
-color = Color(0.16, 0.04, 0.22, 1)
-
-[node name="ChifreD" type="ColorRect" parent="Sprite"]
-offset_left = 14.0
-offset_top = -54.0
-offset_right = 26.0
-offset_bottom = -34.0
-color = Color(0.16, 0.04, 0.22, 1)
-
-[node name="OlhoE" type="ColorRect" parent="Sprite"]
-offset_left = -15.0
-offset_top = -20.0
-offset_right = -5.0
-offset_bottom = -10.0
-color = Color(1, 0.4, 0.75, 1)
-
-[node name="OlhoD" type="ColorRect" parent="Sprite"]
-offset_left = 5.0
-offset_top = -20.0
-offset_right = 15.0
-offset_bottom = -10.0
-color = Color(1, 0.4, 0.75, 1)
+[node name="Corpo" type="Sprite2D" parent="Sprite"]
+position = Vector2(0, -1)
+texture = ExtResource("2_tex")
 
 [node name="Luz" type="PointLight2D" parent="Sprite"]
-position = Vector2(0, -10)
+position = Vector2(0, -14)
 texture = SubResource("tex_luz")
 energy = 1.6
 color = Color(0.97, 0.4, 0.92, 1)

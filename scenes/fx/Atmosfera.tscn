@@ -18,8 +18,8 @@ fill_from = Vector2(0.5, 0.5)
 fill_to = Vector2(1, 0.5)
 
 [sub_resource type="Gradient" id="Gradient_vinheta"]
-offsets = PackedFloat32Array(0.55, 1)
-colors = PackedColorArray(0, 0, 0, 0, 0.02, 0.02, 0.03, 0.72)
+offsets = PackedFloat32Array(0.62, 1)
+colors = PackedColorArray(0, 0, 0, 0, 0.02, 0.02, 0.03, 0.42)
 
 [sub_resource type="GradientTexture2D" id="GradientTexture2D_vinheta"]
 gradient = SubResource("Gradient_vinheta")

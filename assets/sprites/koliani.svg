@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="64" viewBox="0 0 48 64">
+  <defs>
+    <radialGradient id="brilhoLamina" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffd9fb" stop-opacity="0.9"/>
+      <stop offset="45%" stop-color="#e64fd8" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#e64fd8" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- rabo-de-cavalo a esvoacar -->
+  <path d="M18 15 C9 12 6 22 8 30 C10 25 14 22 19 22 Z" fill="#7d1f33"/>
+  <path d="M18 15 C11 13 8 20 9 27 C12 22 15 20 19 21 Z" fill="#9c2b45"/>
+
+  <!-- pernas / botas -->
+  <rect x="19" y="40" width="5" height="14" rx="1.5" fill="#241531"/>
+  <rect x="25" y="40" width="5" height="14" rx="1.5" fill="#1c1026"/>
+  <rect x="18" y="52" width="7" height="5" rx="1.5" fill="#120a1c"/>
+  <rect x="25" y="52" width="7" height="5" rx="1.5" fill="#120a1c"/>
+
+  <!-- túnica -->
+  <path d="M16 24 C16 21 21 19 24 19 C27 19 32 21 32 24 L33 41 C29 43 19 43 15 41 Z" fill="#e0539f"/>
+  <path d="M24 19 C27 19 32 21 32 24 L33 41 C31 42 27 42.5 24 42.6 Z" fill="#c4448a"/>
+  <!-- luz de recorte no bordo esquerdo -->
+  <path d="M16 24 C16 21 20 19.3 23 19.1 L22.5 42.5 C19 42.3 16.7 41.6 15 41 Z" fill="#ff8fd0" opacity="0.55"/>
+
+  <!-- cachecol -->
+  <path d="M17 24 C20 26 28 26 31 24 L31 28 C27 30 21 30 17 28 Z" fill="#c33a5c"/>
+  <path d="M30 25 C34 26 36 31 34 37 C33 31 31 29 29 28 Z" fill="#a92e4c"/>
+
+  <!-- cabeça -->
+  <circle cx="24" cy="14" r="7.2" fill="#12091b"/>
+  <path d="M18 14 a6 6 0 0 1 12 0 a6 6 0 0 1 -12 0" fill="#ffe6f4"/>
+  <path d="M18.2 12.5 a6 6 0 0 1 11.6 0 C28 10 20 10 18.2 12.5 Z" fill="#12091b"/>
+  <circle cx="22" cy="14.5" r="1" fill="#3a1030"/>
+  <circle cx="27" cy="14.5" r="1" fill="#3a1030"/>
+
+  <!-- braço da frente -->
+  <path d="M30 27 C34 27 37 29 39 31 L37 34 C34 32 31 31 29 31 Z" fill="#f0e6f2"/>
+
+  <!-- lâmina -->
+  <ellipse cx="40" cy="31" rx="9" ry="7" fill="url(#brilhoLamina)"/>
+  <path d="M35 31 L45 28.5 L47 31 L45 33.5 Z" fill="#ffd9fb"/>
+  <path d="M35 31 L45 29.6 L46 31 Z" fill="#ffffff"/>
+</svg>

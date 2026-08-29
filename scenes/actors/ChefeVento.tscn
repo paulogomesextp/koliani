@@ -1,10 +1,11 @@
 [gd_scene load_steps=6 format=3 uid="uid://bkolianichefevento01"]
 
-; Chefe do mundo 3 -- o Uivo. Placeholder: silhueta alta e fina, roxa e
-; semitransparente, dois olhos pálidos. Script chefe_vento.gd (herda
-; ChefeBase). Voa -- colide com o mundo mas ignora a gravidade.
+; Chefe do mundo 3 -- o Uivo. Sprite SVG assets/sprites/chefe_vento.svg.
+; Script chefe_vento.gd (herda ChefeBase). Voa -- colide com o mundo mas
+; ignora a gravidade.
 
 [ext_resource type="Script" path="res://scripts/chefe_vento.gd" id="1_vento"]
+[ext_resource type="Texture2D" uid="uid://dv763vqjcqvsn" path="res://assets/sprites/chefe_vento.svg" id="2_tex"]
 
 [sub_resource type="RectangleShape2D" id="rs_body"]
 size = Vector2(30, 64)
@@ -34,44 +35,12 @@ cor_estilhacos = Color(0.78, 0.5, 1, 1)
 
 [node name="Sprite" type="Node2D" parent="."]
 
-[node name="Cauda" type="ColorRect" parent="Sprite"]
-show_behind_parent = true
-offset_left = -10.0
-offset_top = 20.0
-offset_right = 10.0
-offset_bottom = 60.0
-color = Color(0.3, 0.2, 0.45, 0.35)
-
-[node name="Corpo" type="ColorRect" parent="Sprite"]
-offset_left = -15.0
-offset_top = -32.0
-offset_right = 15.0
-offset_bottom = 22.0
-color = Color(0.34, 0.24, 0.5, 0.85)
-
-[node name="Manto" type="ColorRect" parent="Sprite"]
-offset_left = -18.0
-offset_top = -20.0
-offset_right = 18.0
-offset_bottom = 4.0
-color = Color(0.28, 0.19, 0.42, 0.6)
-
-[node name="OlhoE" type="ColorRect" parent="Sprite"]
-offset_left = -9.0
-offset_top = -24.0
-offset_right = -3.0
-offset_bottom = -18.0
-color = Color(0.95, 0.9, 1, 1)
-
-[node name="OlhoD" type="ColorRect" parent="Sprite"]
-offset_left = 3.0
-offset_top = -24.0
-offset_right = 9.0
-offset_bottom = -18.0
-color = Color(0.95, 0.9, 1, 1)
+[node name="Corpo" type="Sprite2D" parent="Sprite"]
+position = Vector2(0, -2)
+texture = ExtResource("2_tex")
 
 [node name="LuzOlhos" type="PointLight2D" parent="Sprite"]
-position = Vector2(0, -20)
+position = Vector2(0, -18)
 texture = SubResource("tex_luz")
 energy = 1.1
 color = Color(0.8, 0.55, 1, 1)

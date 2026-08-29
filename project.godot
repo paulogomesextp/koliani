@@ -1,18 +1,22 @@
-; Projeto Godot 4 -- Koliani
-; Ficheiro de configuracao. Editavel a mao, mas o editor do Godot volta a
-; escreve-lo formatado quando gravas o projeto. Ver README.md.
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
 
 config_version=5
 
 [application]
 
 config/name="Koliani"
-config/version="0.1.0"
 config/description="Platformer mobile. Koliani, 10 anos, atravessa mundos fantasmagoricos para libertar a mae do demonio Zeriko."
+config/version="0.1.0"
 run/main_scene="res://scenes/Main.tscn"
 config/features=PackedStringArray("4.7", "Mobile")
-config/icon="res://icon.svg"
 boot_splash/bg_color=Color(0.05, 0.03, 0.08, 1)
+config/icon="res://icon.svg"
 
 [autoload]
 
@@ -78,12 +82,10 @@ diario={
 
 [physics]
 
-common/physics_ticks_per_second=60
 2d/default_gravity=1400.0
 
 [rendering]
 
-renderer/rendering_method="mobile"
-renderer/rendering_method.mobile="mobile"
-environment/defaults/default_clear_color=Color(0.05, 0.03, 0.08, 1)
 textures/canvas_textures/default_texture_filter=0
+renderer/rendering_method="mobile"
+environment/defaults/default_clear_color=Color(0.05, 0.03, 0.08, 1)

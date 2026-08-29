@@ -1,12 +1,13 @@
 [gd_scene load_steps=8 format=3 uid="uid://bkolianiactor01"]
 
-; Koliani -- placeholder ColorRect com silhueta a apontar ao key art:
-; menina agil, rabo-de-cavalo, cachecol, lamina magenta que brilha
-; (PointLight2D). Trocar por sprite/AnimatedSprite2D mantendo o no "Sprite"
-; (koliani.gd faz-lhe flip pelo scale.x) e a "HitboxAtaque".
+; Koliani -- sprite SVG (assets/sprites/koliani.svg) desenhada no tom do
+; key art (menina agil, rabo-de-cavalo, cachecol, lamina magenta que
+; brilha). O no "Sprite" e um Node2D; koliani.gd faz-lhe flip pelo
+; scale.x. Trocar por AnimatedSprite2D quando houver frames.
 
 [ext_resource type="Script" path="res://scripts/koliani.gd" id="1_kol"]
 [ext_resource type="Script" path="res://scripts/camera_tremor.gd" id="2_cam"]
+[ext_resource type="Texture2D" uid="uid://ium5ae35i3wo" path="res://assets/sprites/koliani.svg" id="3_tex"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_body"]
 size = Vector2(20, 44)
@@ -33,48 +34,9 @@ script = ExtResource("1_kol")
 
 [node name="Sprite" type="Node2D" parent="."]
 
-[node name="Rabo" type="ColorRect" parent="Sprite"]
-offset_left = -14.0
-offset_top = -32.0
-offset_right = -4.0
-offset_bottom = -6.0
-color = Color(0.7, 0.16, 0.32, 1)
-
-[node name="Corpo" type="ColorRect" parent="Sprite"]
-offset_left = -10.0
-offset_top = -22.0
-offset_right = 10.0
-offset_bottom = 22.0
-color = Color(0.878431, 0.32549, 0.694118, 1)
-
-[node name="Cachecol" type="ColorRect" parent="Sprite"]
-offset_left = -10.0
-offset_top = -22.0
-offset_right = 10.0
-offset_bottom = -14.0
-color = Color(0.76, 0.2, 0.36, 1)
-
-[node name="Cabeca" type="ColorRect" parent="Sprite"]
-offset_left = -7.0
-offset_top = -34.0
-offset_right = 7.0
-offset_bottom = -22.0
-color = Color(1, 0.898039, 0.976471, 1)
-
-[node name="Lamina" type="ColorRect" parent="Sprite"]
-offset_left = 10.0
-offset_top = -6.0
-offset_right = 32.0
-offset_bottom = 0.0
-color = Color(1, 0.62, 0.98, 1)
-
-[node name="LaminaAura" type="ColorRect" parent="Sprite"]
-show_behind_parent = true
-offset_left = 8.0
-offset_top = -10.0
-offset_right = 36.0
-offset_bottom = 4.0
-color = Color(0.85, 0.31, 0.83, 0.35)
+[node name="Corpo" type="Sprite2D" parent="Sprite"]
+position = Vector2(-2, -3)
+texture = ExtResource("3_tex")
 
 [node name="LuzLamina" type="PointLight2D" parent="Sprite"]
 position = Vector2(22, -3)

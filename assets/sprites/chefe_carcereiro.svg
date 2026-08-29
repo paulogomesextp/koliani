@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="68" height="76" viewBox="0 0 68 76">
+  <defs>
+    <radialGradient id="olhoCarc" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#bfe6ff" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#5aa8e0" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <!-- pés -->
+  <rect x="14" y="62" width="16" height="10" rx="2" fill="#12181f"/>
+  <rect x="38" y="62" width="16" height="10" rx="2" fill="#12181f"/>
+  <!-- corpo pesado -->
+  <path d="M12 24 C12 14 20 8 34 8 C48 8 56 14 56 24 L58 58 C48 64 20 64 10 58 Z" fill="#28313f"/>
+  <path d="M34 8 C48 8 56 14 56 24 L58 58 C50 62 42 63 34 63 Z" fill="#1f2833"/>
+  <!-- ombreiras -->
+  <path d="M8 22 C8 14 16 12 22 14 L20 26 C14 26 10 25 8 22 Z" fill="#3b4859"/>
+  <path d="M60 22 C60 14 52 12 46 14 L48 26 C54 26 58 25 60 22 Z" fill="#3b4859"/>
+  <!-- grilhetas -->
+  <rect x="16" y="40" width="10" height="16" rx="3" fill="#4a5666"/>
+  <rect x="42" y="40" width="10" height="16" rx="3" fill="#4a5666"/>
+  <circle cx="21" cy="38" r="3.5" fill="none" stroke="#4a5666" stroke-width="2"/>
+  <circle cx="47" cy="38" r="3.5" fill="none" stroke="#4a5666" stroke-width="2"/>
+  <!-- capuz -->
+  <path d="M20 18 C20 8 48 8 48 18 C40 12 28 12 20 18 Z" fill="#1a222c"/>
+  <!-- olho -->
+  <circle cx="34" cy="26" r="13" fill="url(#olhoCarc)"/>
+  <rect x="26" y="24" width="16" height="4" rx="2" fill="#8fd0ff"/>
+  <rect x="31" y="22.5" width="5" height="3" rx="1.5" fill="#eaf6ff"/>
+</svg>

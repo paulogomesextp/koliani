@@ -9,7 +9,7 @@
 [ext_resource type="PackedScene" uid="uid://bkolianiactor01" path="res://scenes/actors/Koliani.tscn" id="1_kol"]
 [ext_resource type="PackedScene" uid="uid://bdemoniobase01" path="res://scenes/actors/DemonioBase.tscn" id="2_dem"]
 [ext_resource type="PackedScene" uid="uid://bkolianicoletavel01" path="res://scenes/actors/Coletavel.tscn" id="3_col"]
-[ext_resource type="Script" path="res://scripts/porta.gd" id="4_porta"]
+[ext_resource type="PackedScene" uid="uid://bkolianiporta01" path="res://scenes/actors/Porta.tscn" id="4_porta"]
 [ext_resource type="Script" path="res://scripts/checkpoint.gd" id="5_chk"]
 [ext_resource type="PackedScene" uid="uid://bkolianichefevento01" path="res://scenes/actors/ChefeVento.tscn" id="6_chefe"]
 [ext_resource type="Script" path="res://scripts/nivel_com_chefe.gd" id="7_niv"]
@@ -56,7 +56,7 @@ fill_to = Vector2(1, 0.5)
 script = ExtResource("7_niv")
 
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
-cor_ambiente = Color(0.44, 0.4, 0.52, 1)
+cor_ambiente = Color(0.66, 0.6, 0.74, 1)
 cor_fundo = Color(0.06, 0.05, 0.1, 1)
 cor_silhueta = Color(0.13, 0.1, 0.19, 1)
 cor_luz = Color(0.7, 0.45, 0.95, 1)
@@ -71,14 +71,14 @@ offset_left = -180.0
 offset_top = -24.0
 offset_right = 180.0
 offset_bottom = 200.0
-color = Color(0.14, 0.11, 0.2, 1)
+color = Color(0.24, 0.19, 0.34, 1)
 
 [node name="Lip" type="ColorRect" parent="TorreA"]
 offset_left = -180.0
 offset_top = -24.0
 offset_right = 180.0
 offset_bottom = -18.0
-color = Color(0.42, 0.3, 0.56, 1)
+color = Color(0.56, 0.4, 0.74, 1)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="TorreA"]
 shape = SubResource("rs_ta")
@@ -93,14 +93,14 @@ offset_left = -60.0
 offset_top = -13.0
 offset_right = 60.0
 offset_bottom = 13.0
-color = Color(0.15, 0.12, 0.21, 1)
+color = Color(0.26, 0.21, 0.36, 1)
 
 [node name="Lip" type="ColorRect" parent="PlatMid1"]
 offset_left = -60.0
 offset_top = -13.0
 offset_right = 60.0
 offset_bottom = -7.0
-color = Color(0.42, 0.3, 0.56, 1)
+color = Color(0.56, 0.4, 0.74, 1)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="PlatMid1"]
 shape = SubResource("rs_ps")
@@ -115,14 +115,14 @@ offset_left = -160.0
 offset_top = -24.0
 offset_right = 160.0
 offset_bottom = 240.0
-color = Color(0.14, 0.11, 0.2, 1)
+color = Color(0.24, 0.19, 0.34, 1)
 
 [node name="Lip" type="ColorRect" parent="TorreB"]
 offset_left = -160.0
 offset_top = -24.0
 offset_right = 160.0
 offset_bottom = -18.0
-color = Color(0.42, 0.3, 0.56, 1)
+color = Color(0.56, 0.4, 0.74, 1)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="TorreB"]
 shape = SubResource("rs_tb")
@@ -137,14 +137,14 @@ offset_left = -60.0
 offset_top = -13.0
 offset_right = 60.0
 offset_bottom = 13.0
-color = Color(0.15, 0.12, 0.21, 1)
+color = Color(0.26, 0.21, 0.36, 1)
 
 [node name="Lip" type="ColorRect" parent="PlatUp1"]
 offset_left = -60.0
 offset_top = -13.0
 offset_right = 60.0
 offset_bottom = -7.0
-color = Color(0.42, 0.3, 0.56, 1)
+color = Color(0.56, 0.4, 0.74, 1)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="PlatUp1"]
 shape = SubResource("rs_pp")
@@ -159,14 +159,14 @@ offset_left = -60.0
 offset_top = -13.0
 offset_right = 60.0
 offset_bottom = 13.0
-color = Color(0.15, 0.12, 0.21, 1)
+color = Color(0.26, 0.21, 0.36, 1)
 
 [node name="Lip" type="ColorRect" parent="PlatUp2"]
 offset_left = -60.0
 offset_top = -13.0
 offset_right = 60.0
 offset_bottom = -7.0
-color = Color(0.42, 0.3, 0.56, 1)
+color = Color(0.56, 0.4, 0.74, 1)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="PlatUp2"]
 shape = SubResource("rs_pp")
@@ -181,14 +181,14 @@ offset_left = -140.0
 offset_top = -24.0
 offset_right = 140.0
 offset_bottom = 90.0
-color = Color(0.14, 0.11, 0.2, 1)
+color = Color(0.24, 0.19, 0.34, 1)
 
 [node name="Lip" type="ColorRect" parent="TorreCtopo"]
 offset_left = -140.0
 offset_top = -24.0
 offset_right = 140.0
 offset_bottom = -18.0
-color = Color(0.42, 0.3, 0.56, 1)
+color = Color(0.56, 0.4, 0.74, 1)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="TorreCtopo"]
 shape = SubResource("rs_tc")
@@ -203,14 +203,14 @@ offset_left = -55.0
 offset_top = -13.0
 offset_right = 55.0
 offset_bottom = 13.0
-color = Color(0.15, 0.12, 0.21, 1)
+color = Color(0.26, 0.21, 0.36, 1)
 
 [node name="Lip" type="ColorRect" parent="PlatMid2"]
 offset_left = -55.0
 offset_top = -13.0
 offset_right = 55.0
 offset_bottom = -7.0
-color = Color(0.42, 0.3, 0.56, 1)
+color = Color(0.56, 0.4, 0.74, 1)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="PlatMid2"]
 shape = SubResource("rs_ps")
@@ -225,14 +225,14 @@ offset_left = -180.0
 offset_top = -24.0
 offset_right = 180.0
 offset_bottom = 240.0
-color = Color(0.14, 0.11, 0.2, 1)
+color = Color(0.24, 0.19, 0.34, 1)
 
 [node name="Lip" type="ColorRect" parent="TorreD"]
 offset_left = -180.0
 offset_top = -24.0
 offset_right = 180.0
 offset_bottom = -18.0
-color = Color(0.42, 0.3, 0.56, 1)
+color = Color(0.56, 0.4, 0.74, 1)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="TorreD"]
 shape = SubResource("rs_td")
@@ -317,32 +317,6 @@ color = Color(0.8, 0.5, 1, 0.32)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CheckFim"]
 shape = SubResource("rs_chk")
 
-[node name="Porta" type="Area2D" parent="."]
+[node name="Porta" parent="." instance=ExtResource("4_porta")]
 position = Vector2(1740, 398)
-collision_layer = 16
-collision_mask = 2
-script = ExtResource("4_porta")
 pista_ao_atravessar = "torres_lanterna_de_zeriko"
-
-[node name="Moldura" type="ColorRect" parent="Porta"]
-offset_left = -24.0
-offset_top = -48.0
-offset_right = 24.0
-offset_bottom = 48.0
-color = Color(0.6, 0.18, 0.59, 1)
-
-[node name="Nucleo" type="ColorRect" parent="Porta"]
-offset_left = -12.0
-offset_top = -34.0
-offset_right = 12.0
-offset_bottom = 34.0
-color = Color(0.933, 0.435, 0.91, 1)
-
-[node name="PointLight2D" type="PointLight2D" parent="Porta"]
-texture = SubResource("tex_luz")
-energy = 1.4
-color = Color(0.95, 0.45, 0.92, 1)
-scale = Vector2(1.3, 1.3)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Porta"]
-shape = SubResource("rs_porta")

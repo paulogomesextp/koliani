@@ -25,6 +25,12 @@ func _ready() -> void:
 	add_child(CENA_HUD.instantiate())
 	add_child(CENA_DIARIO.instantiate())
 
+	# `godot --path . -- --foto[=ficheiro]`: tira uma captura e sai (dev).
+	for a in OS.get_cmdline_user_args():
+		if a.begins_with("--foto"):
+			var alvo := a.get_slice("=", 1) if "=" in a else "user://foto.png"
+			_tirar_foto(alvo)
+
 
 func _procurar_porta(no: Node) -> Porta:
 	if no is Porta:
@@ -63,6 +69,14 @@ func _unhandled_input(evento: InputEvent) -> void:
 			EstadoJogo.reiniciar_campanha()
 			get_tree().change_scene_to_file("res://scenes/Main.tscn")
 			print("DEBUG: save apagado, campanha reiniciada")
+
+
+func _tirar_foto(caminho: String) -> void:
+	await get_tree().create_timer(0.8).timeout
+	var img := get_viewport().get_texture().get_image()
+	img.save_png(caminho)
+	print("FOTO guardada: ", ProjectSettings.globalize_path(caminho))
+	get_tree().quit(0)
 
 
 func _ao_fim_da_campanha() -> void:
