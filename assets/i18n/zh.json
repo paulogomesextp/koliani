@@ -1,5 +1,5 @@
 {
-	"game.subtitle": "穿越幽灵般的世界。解救奥萝拉。",
+	"game.subtitle": "穿越幽灵般的世界。解救奥罗拉。",
 
 	"menu.new_game": "新游戏",
 	"menu.load_game": "读取游戏",
@@ -45,7 +45,7 @@
 
 	"final.line1": "泽里科倒下了。笼灯在石地上摔得粉碎。",
 	"final.line2": "被困在里面的光升起。它长出了肩膀、双手，还有一张疲惫的脸。",
-	"final.line3": "“奥萝拉。”这个名字在科莉亚妮想到之前就脱口而出。",
+	"final.line3": "“奥罗拉。”这个名字在科莉亚妮想到之前就脱口而出。",
 	"final.line4": "“你真的来了，”母亲说。“我就知道你会来。”",
 	"final.line5": "她们一起走出最后一扇门。外面仍是夜晚——但如今这是属于她们的夜。",
 	"final.line6": "— 完 —",
@@ -73,6 +73,6 @@
 	"clue.torres_lanterna_de_zeriko.body": "在两座断塔之间，很远的地方，有一点不是星星的光：泽里科的笼灯。灯里有个身影。",
 	"clue.torres_sussurro_da_mae.title": "风中的低语",
 	"clue.torres_sussurro_da_mae.body": "在裂开的墙后，匆忙刻下：“他把我留到最后，科尔。在那之前赶到。”",
-	"clue.castelo_aurora_livre.title": "奥萝拉",
-	"clue.castelo_aurora_livre.body": "笼灯碎了。母亲——奥萝拉——自由了。她们一起走出最后一扇门。"
+	"clue.castelo_aurora_livre.title": "奥罗拉",
+	"clue.castelo_aurora_livre.body": "笼灯碎了。母亲——奥罗拉——自由了。她们一起走出最后一扇门。"
 }
