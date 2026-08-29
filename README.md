@@ -150,11 +150,15 @@ SDK) -- ajustar pelo log do Actions.
   salto_duplo (M1) -> dash_aereo (M2) -> partir_paredes (M3) -> luta final
   com o Zeriko + cena da Aurora (M4). Chefes distintos nos 4 mundos.
   Diário de pistas funcional (7 pistas escritas).
-- **Ainda não foi jogado** -- greybox montado às cegas; a afinação
-  (distâncias, ritmo, dano) precisa de playtest -- ver `docs/testar.md`.
-- **Build Web local FUNCIONA** (modelos de export instalados):
-  `godot --headless --export-release "Web" build/web/index.html` -> OK.
-  Servir com o preview `koliani-web` (`.claude/launch.json`, autoPort).
+- **Playtest do Paulo em curso.** Corrigido já: chefe atirava-se para um
+  fosso e ficava o nível bloqueado (rede de segurança em `chefe_base.gd`
+  + inimigos viram na beira via `ha_chao_a_frente`); atalhos F1-F9 agora
+  mostram um toast (F5 "parecia não fazer nada"). Falta afinar
+  distâncias/ritmo/dano com mais notas de jogo.
+- **Builds locais FUNCIONAM** (modelos de export instalados):
+  `--export-release "Web" build/web/index.html` e
+  `--export-release "Windows Desktop" build/windows/Koliani.exe`.
+  Atalho no Ambiente de Trabalho: **"Koliani (testar)"** (ver `docs/testar.md`).
 
 ## Como testar / instalar
 
