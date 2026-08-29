@@ -121,8 +121,8 @@ cor_base = Color(0.24, 0.19, 0.34, 1)
 cor_topo = Color(0.56, 0.4, 0.74, 1)
 
 [node name="PlatH" parent="." instance=ExtResource("10_pl")]
-position = Vector2(1990, 400)
-tamanho = Vector2(110, 24)
+position = Vector2(1960, 442)
+tamanho = Vector2(120, 24)
 altura_visual = 30
 cor_base = Color(0.24, 0.19, 0.34, 1)
 cor_topo = Color(0.56, 0.4, 0.74, 1)
