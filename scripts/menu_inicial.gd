@@ -10,12 +10,16 @@ extends Control
 ## NEW GAME / HARDCORE MODE pedem confirmação quando há um save por cima.
 ## Todo o texto vem do `Textos` (idioma por omissão: inglês).
 ##
+## Em modo normal, NEW GAME / LOAD GAME abrem o **Mapa do Mundo**
+## (`MapaMundo.tscn`) para escolher o nível; HARDCORE vai direto ao jogo.
+##
 ## Atalhos de dev (a seguir a `--`):
 ##   --jogar / --foto[=...]   salta o menu e arranca já em Main.tscn
 ##   --nivel=N                salta o menu e arranca no mundo N (1..4)
 ##   --hardcore               salta o menu e arranca uma campanha hardcore
 
 const CENA_JOGO := "res://scenes/Main.tscn"
+const CENA_MAPA := "res://scenes/ui/MapaMundo.tscn"
 const CENA_OPCOES := preload("res://scenes/ui/Opcoes.tscn")
 
 @onready var _arte: TextureRect = $Arte
@@ -43,7 +47,7 @@ func _ready() -> void:
 	_deriva_arte()  # leve "Ken Burns" no fundo (key art)
 
 	_novo.pressed.connect(_ao_novo)
-	_load.pressed.connect(_ir_jogar)
+	_load.pressed.connect(_entrar_campanha)
 	_hardcore.pressed.connect(_ao_hardcore)
 	_opcoes.pressed.connect(_abrir_opcoes)
 	_sair.pressed.connect(func() -> void: get_tree().quit())
@@ -158,8 +162,16 @@ func _repor_botoes() -> void:
 func _comecar_campanha(hardcore: bool) -> void:
 	EstadoJogo.hardcore = hardcore
 	EstadoJogo.reiniciar_campanha()
-	_ir_jogar()
+	_entrar_campanha()
 
 
+## Entrada normal na campanha: modo normal abre o Mapa do Mundo (escolher
+## nível); hardcore vai direto ao jogo (corre linear).
+func _entrar_campanha() -> void:
+	var destino := CENA_JOGO if EstadoJogo.hardcore else CENA_MAPA
+	Transicao.fechar_e(func() -> void: get_tree().change_scene_to_file(destino))
+
+
+## Salto direto para o jogo -- usado só pelos atalhos de dev (--jogar/--nivel).
 func _ir_jogar() -> void:
 	Transicao.fechar_e(func() -> void: get_tree().change_scene_to_file(CENA_JOGO))

@@ -62,6 +62,17 @@
 	"world.towers": "Forgotten Towers",
 	"world.castle": "Zeriko's Castle",
 	"world.unknown": "?",
+	"world.catacombs": "Catacombs of the Abyss",
+	"world.city": "Corrupted City",
+
+	"map.title": "WORLD MAP",
+	"map.play": "PLAY",
+	"map.back": "‹ Menu",
+	"map.level": "Level %d",
+	"map.done": "cleared",
+	"map.locked": "locked",
+	"map.soon": "coming soon",
+	"map.hint": "←  →  choose      ·      jump / attack: play",
 
 	"clue.floresta_sinal_da_porta.title": "The smell on the door",
 	"clue.floresta_sinal_da_porta.body": "The door still smells of his sulphur. She came through here — and not alone.",

@@ -44,6 +44,7 @@ func _correr_tudo() -> void:
 	teste_estado_ha_progresso()
 	teste_estado_hardcore()
 	teste_estado_regioes_e_conclusao()
+	teste_estado_mapa_desbloqueio()
 
 	if _falhas.is_empty():
 		print("OK -- todos os testes passaram")
@@ -393,4 +394,32 @@ func teste_estado_regioes_e_conclusao() -> void:
 	e.avancar_nivel()
 	_ok(e.nivel_esta_concluido(0), "avancar_nivel marca o nível de onde se sai")
 	_ok(e.indice_nivel == 1, "avancar_nivel avançou para o nível 1")
+	e.free()
+
+
+## Mapa do Mundo: que níveis se podem escolher. O nível 0 está sempre
+## aberto; concluir um nível abre o seguinte; um save linear antigo
+## (indice_nivel à frente) não regride; tudo concluído = campanha feita.
+func teste_estado_mapa_desbloqueio() -> void:
+	var e := _novo_estado()
+	_ok(e.nivel_desbloqueado(0), "o primeiro nível está sempre desbloqueado")
+	_ok(not e.nivel_desbloqueado(1), "nível 1 bloqueado num arranque limpo")
+	_ok(e.fronteira() == 0, "fronteira num arranque limpo é 0")
+	_ok(not e.campanha_concluida(), "campanha não concluída no arranque")
+
+	e.marcar_nivel_concluido(0)
+	_ok(e.nivel_desbloqueado(1), "concluir o nível 0 desbloqueia o 1")
+	_ok(not e.nivel_desbloqueado(2), "o nível 2 continua bloqueado")
+	_ok(e.fronteira() == 1, "fronteira passa a 1")
+
+	e.reiniciar_campanha()
+	e.indice_nivel = 2  # save linear antigo, sem 'concluidos'
+	_ok(e.nivel_desbloqueado(2), "um nível já alcançado pela campanha linear fica jogável")
+	_ok(not e.nivel_desbloqueado(3), "mas não os que vêm depois")
+
+	e.reiniciar_campanha()
+	for i in e.NIVEIS.size():
+		e.marcar_nivel_concluido(i)
+	_ok(e.campanha_concluida(), "marcar todos os níveis conclui a campanha")
+	_ok(e.nivel_desbloqueado(e.NIVEIS.size() - 1), "com tudo feito, o último nível é jogável")
 	e.free()

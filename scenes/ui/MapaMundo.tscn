@@ -1,0 +1,208 @@
+[gd_scene load_steps=6 format=3 uid="uid://bkolianimapamundo01"]
+
+; Mapa da campanha (overworld). Shell visual; os nos do caminho e o token
+; sao construidos em runtime por mapa_mundo.gd a partir de EstadoJogo.REGIOES.
+
+[ext_resource type="Script" path="res://scripts/mapa_mundo.gd" id="1_mapa"]
+[ext_resource type="Texture2D" path="res://assets/branding/menu_bg.png" id="2_art"]
+
+[sub_resource type="StyleBoxFlat" id="sb_botao"]
+content_margin_left = 20.0
+content_margin_top = 10.0
+content_margin_right = 20.0
+content_margin_bottom = 10.0
+bg_color = Color(0.07, 0.04, 0.1, 0.92)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.62, 0.24, 0.62, 0.9)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[sub_resource type="StyleBoxFlat" id="sb_botao_hover"]
+content_margin_left = 20.0
+content_margin_top = 10.0
+content_margin_right = 20.0
+content_margin_bottom = 10.0
+bg_color = Color(0.28, 0.12, 0.32, 0.96)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.95, 0.45, 0.88, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[sub_resource type="Gradient" id="grad_vinheta"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(0, 0, 0, 0, 0.02, 0.012, 0.03, 0.92)
+
+[sub_resource type="GradientTexture2D" id="tex_vinheta"]
+gradient = SubResource("grad_vinheta")
+width = 512
+height = 512
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.08, 0.08)
+
+[node name="MapaMundo" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_mapa")
+
+[node name="Fundo" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.03, 0.02, 0.05, 1)
+
+[node name="Arte" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+texture = ExtResource("2_art")
+expand_mode = 1
+stretch_mode = 6
+modulate = Color(0.5, 0.5, 0.62, 0.5)
+
+[node name="Scrim" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+color = Color(0.03, 0.02, 0.05, 0.55)
+
+[node name="Vinheta" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+texture = SubResource("tex_vinheta")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Titulo" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -360.0
+offset_top = 48.0
+offset_right = 360.0
+offset_bottom = 104.0
+grow_horizontal = 2
+horizontal_alignment = 1
+text = "KOLIANI"
+theme_override_colors/font_color = Color(1, 0.86, 0.98, 1)
+theme_override_colors/font_outline_color = Color(0.55, 0.12, 0.5, 0.85)
+theme_override_constants/outline_size = 12
+theme_override_font_sizes/font_size = 44
+
+[node name="Subtitulo" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -360.0
+offset_top = 104.0
+offset_right = 360.0
+offset_bottom = 136.0
+grow_horizontal = 2
+horizontal_alignment = 1
+text = ""
+theme_override_colors/font_color = Color(0.82, 0.72, 0.9, 1)
+theme_override_colors/font_outline_color = Color(0.02, 0.01, 0.03, 0.9)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 20
+
+[node name="Caminho" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+
+[node name="Linha" type="Line2D" parent="Caminho"]
+width = 6.0
+default_color = Color(0.62, 0.5, 0.72, 0.5)
+joint_mode = 2
+begin_cap_mode = 2
+end_cap_mode = 2
+
+[node name="Nos" type="Control" parent="Caminho"]
+layout_mode = 1
+anchors_preset = 0
+mouse_filter = 2
+
+[node name="Token" type="TextureRect" parent="Caminho"]
+custom_minimum_size = Vector2(44, 58)
+offset_right = 44.0
+offset_bottom = 58.0
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Rodape" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -220.0
+offset_top = -76.0
+offset_right = 220.0
+offset_bottom = -28.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = 24
+alignment = 1
+
+[node name="Menu" type="Button" parent="Rodape"]
+layout_mode = 2
+theme_override_styles/normal = SubResource("sb_botao")
+theme_override_styles/hover = SubResource("sb_botao_hover")
+theme_override_styles/focus = SubResource("sb_botao_hover")
+theme_override_styles/pressed = SubResource("sb_botao_hover")
+text = "‹ Menu"
+
+[node name="Jogar" type="Button" parent="Rodape"]
+layout_mode = 2
+theme_override_styles/normal = SubResource("sb_botao")
+theme_override_styles/hover = SubResource("sb_botao_hover")
+theme_override_styles/focus = SubResource("sb_botao_hover")
+theme_override_styles/pressed = SubResource("sb_botao_hover")
+text = "PLAY"
+
+[node name="Dica" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -420.0
+offset_top = -24.0
+offset_right = 420.0
+offset_bottom = -6.0
+grow_horizontal = 2
+grow_vertical = 0
+horizontal_alignment = 1
+text = ""
+theme_override_colors/font_color = Color(0.66, 0.6, 0.76, 0.7)
+theme_override_colors/font_outline_color = Color(0.02, 0.01, 0.03, 0.9)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 14

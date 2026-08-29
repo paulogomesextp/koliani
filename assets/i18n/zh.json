@@ -62,6 +62,17 @@
 	"world.towers": "被遗忘之塔",
 	"world.castle": "泽里科的城堡",
 	"world.unknown": "?",
+	"world.catacombs": "深渊地下墓穴",
+	"world.city": "堕落之城",
+
+	"map.title": "世界地图",
+	"map.play": "开始",
+	"map.back": "‹ 菜单",
+	"map.level": "第 %d 关",
+	"map.done": "已通关",
+	"map.locked": "未解锁",
+	"map.soon": "敬请期待",
+	"map.hint": "←  →  选择      ·      跳跃 / 攻击：开始",
 
 	"clue.floresta_sinal_da_porta.title": "门上的气味",
 	"clue.floresta_sinal_da_porta.body": "门上仍有他的硫磺味。她从这里经过——而且不是一个人。",

@@ -62,6 +62,17 @@
 	"world.towers": "Torres Esquecidas",
 	"world.castle": "Castelo de Zeriko",
 	"world.unknown": "?",
+	"world.catacombs": "Catacumbas do Abismo",
+	"world.city": "Cidade Corrompida",
+
+	"map.title": "MAPA DO MUNDO",
+	"map.play": "JOGAR",
+	"map.back": "‹ Menu",
+	"map.level": "Nível %d",
+	"map.done": "concluído",
+	"map.locked": "bloqueado",
+	"map.soon": "em breve",
+	"map.hint": "←  →  escolher      ·      saltar / atacar: jogar",
 
 	"clue.floresta_sinal_da_porta.title": "O cheiro na porta",
 	"clue.floresta_sinal_da_porta.body": "A porta ainda cheira ao enxofre dele. Ela passou por aqui — e não sozinha.",

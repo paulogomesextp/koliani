@@ -129,6 +129,33 @@ func regiao_atual() -> int:
 	return regiao_do_nivel(indice_nivel)
 
 
+## Um nível é jogável no mapa se for o primeiro, se a campanha linear já lá
+## chegou (`indice_nivel`), ou se o nível anterior está concluído.
+func nivel_desbloqueado(indice: int) -> bool:
+	if indice <= 0:
+		return true
+	if indice >= NIVEIS.size():
+		return false
+	return indice <= indice_nivel or (indice - 1) in concluidos
+
+
+## Índice do nível mais avançado que já se pode jogar (a "fronteira").
+func fronteira() -> int:
+	var f := 0
+	for i in NIVEIS.size():
+		if nivel_desbloqueado(i):
+			f = i
+	return f
+
+
+## Todos os níveis da campanha concluídos?
+func campanha_concluida() -> bool:
+	for i in NIVEIS.size():
+		if i not in concluidos:
+			return false
+	return true
+
+
 ## Uma região está concluída quando tem níveis e todos estão concluídos.
 func regiao_esta_concluida(regiao: int) -> bool:
 	if regiao < 0 or regiao >= REGIOES.size():

@@ -62,6 +62,17 @@
 	"world.towers": "Tours Oubliées",
 	"world.castle": "Château de Zeriko",
 	"world.unknown": "?",
+	"world.catacombs": "Catacombes de l'Abîme",
+	"world.city": "Cité Corrompue",
+
+	"map.title": "CARTE DU MONDE",
+	"map.play": "JOUER",
+	"map.back": "‹ Menu",
+	"map.level": "Niveau %d",
+	"map.done": "terminé",
+	"map.locked": "verrouillé",
+	"map.soon": "bientôt disponible",
+	"map.hint": "←  →  choisir      ·      saut / attaque : jouer",
 
 	"clue.floresta_sinal_da_porta.title": "L'odeur sur la porte",
 	"clue.floresta_sinal_da_porta.body": "La porte sent encore son soufre. Elle est passée par ici — et pas seule.",

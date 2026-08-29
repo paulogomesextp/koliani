@@ -62,6 +62,17 @@
 	"world.towers": "Vergessene Türme",
 	"world.castle": "Zerikos Schloss",
 	"world.unknown": "?",
+	"world.catacombs": "Katakomben des Abgrunds",
+	"world.city": "Verdorbene Stadt",
+
+	"map.title": "WELTKARTE",
+	"map.play": "SPIELEN",
+	"map.back": "‹ Menü",
+	"map.level": "Level %d",
+	"map.done": "geschafft",
+	"map.locked": "gesperrt",
+	"map.soon": "bald verfügbar",
+	"map.hint": "←  →  wählen      ·      Sprung / Angriff: spielen",
 
 	"clue.floresta_sinal_da_porta.title": "Der Geruch an der Tür",
 	"clue.floresta_sinal_da_porta.body": "Die Tür riecht noch nach seinem Schwefel. Sie ist hier durchgegangen — und nicht allein.",

@@ -62,6 +62,17 @@
 	"world.towers": "Torres Olvidadas",
 	"world.castle": "Castillo de Zeriko",
 	"world.unknown": "?",
+	"world.catacombs": "Catacumbas del Abismo",
+	"world.city": "Ciudad Corrompida",
+
+	"map.title": "MAPA DEL MUNDO",
+	"map.play": "JUGAR",
+	"map.back": "‹ Menú",
+	"map.level": "Nivel %d",
+	"map.done": "completado",
+	"map.locked": "bloqueado",
+	"map.soon": "próximamente",
+	"map.hint": "←  →  elegir      ·      saltar / atacar: jugar",
 
 	"clue.floresta_sinal_da_porta.title": "El olor en la puerta",
 	"clue.floresta_sinal_da_porta.body": "La puerta todavía huele a su azufre. Ella pasó por aquí, y no sola.",
