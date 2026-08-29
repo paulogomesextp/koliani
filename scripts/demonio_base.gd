@@ -23,14 +23,37 @@ const GRAVIDADE := 1400.0
 
 var _direcao := 1.0
 var _mat: ShaderMaterial
+# animação procedural (visual): bob de idle/andar + antecipação (wind-up)
+var _t_anim := 0.0
+var _corpo_base := Vector2.ZERO
+## Posto a 1.0 por quem quer um "wind-up" (chefes, no telegrafo).
+var anticipacao := 0.0
 
 
 func _ready() -> void:
 	if _area_contacto:
 		_area_contacto.body_entered.connect(_ao_tocar)
-	if _corpo and _corpo.material is ShaderMaterial:
-		_mat = _corpo.material
-		_mat.set_shader_parameter("rim_cor", cor_rim)
+	if _corpo:
+		_corpo_base = _corpo.position
+		if _corpo.material is ShaderMaterial:
+			_mat = _corpo.material
+			_mat.set_shader_parameter("rim_cor", cor_rim)
+
+
+func _process(dt: float) -> void:
+	if _corpo == null:
+		return
+	_t_anim += dt
+	anticipacao = move_toward(anticipacao, 0.0, dt * 3.5)
+	var anda := absf(velocity.x) > 5.0
+	var vel := 9.0 if anda else 3.2
+	var amp := 1.8 if anda else 1.0
+	_corpo.position.y = _corpo_base.y + sin(_t_anim * vel) * amp
+	var resp := sin(_t_anim * vel * 0.5) * 0.03
+	# wind-up: achata e alarga
+	var sx := 1.0 - resp + anticipacao * 0.22
+	var sy := 1.0 + resp - anticipacao * 0.2
+	_corpo.scale = Vector2(sx, sy)
 
 
 func _physics_process(dt: float) -> void:

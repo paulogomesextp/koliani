@@ -72,40 +72,25 @@ color = Color(0.06, 0.07, 0.1, 1)
 [node name="Longe" type="ParallaxLayer" parent="Parallax"]
 motion_scale = Vector2(0.2, 0.16)
 
-[node name="L1" type="ColorRect" parent="Parallax/Longe"]
-offset_left = 60.0
-offset_top = 150.0
-offset_right = 150.0
-offset_bottom = 800.0
+[node name="L1" type="Polygon2D" parent="Parallax/Longe"]
 color = Color(0.08, 0.1, 0.15, 1)
+polygon = PackedVector2Array(60, 190, 84, 150, 108, 172, 132, 146, 150, 200, 150, 800, 60, 800)
 
-[node name="L2" type="ColorRect" parent="Parallax/Longe"]
-offset_left = 470.0
-offset_top = 220.0
-offset_right = 545.0
-offset_bottom = 800.0
+[node name="L2" type="Polygon2D" parent="Parallax/Longe"]
 color = Color(0.08, 0.1, 0.15, 1)
+polygon = PackedVector2Array(470, 260, 492, 220, 512, 244, 545, 232, 545, 800, 470, 800)
 
-[node name="L3" type="ColorRect" parent="Parallax/Longe"]
-offset_left = 950.0
-offset_top = 120.0
-offset_right = 1050.0
-offset_bottom = 800.0
+[node name="L3" type="Polygon2D" parent="Parallax/Longe"]
 color = Color(0.08, 0.1, 0.15, 1)
+polygon = PackedVector2Array(950, 170, 985, 120, 1012, 150, 1040, 128, 1050, 190, 1050, 800, 950, 800)
 
-[node name="L4" type="ColorRect" parent="Parallax/Longe"]
-offset_left = 1480.0
-offset_top = 200.0
-offset_right = 1560.0
-offset_bottom = 800.0
+[node name="L4" type="Polygon2D" parent="Parallax/Longe"]
 color = Color(0.08, 0.1, 0.15, 1)
+polygon = PackedVector2Array(1480, 240, 1506, 200, 1532, 222, 1560, 210, 1560, 800, 1480, 800)
 
-[node name="L5" type="ColorRect" parent="Parallax/Longe"]
-offset_left = 2000.0
-offset_top = 165.0
-offset_right = 2090.0
-offset_bottom = 800.0
+[node name="L5" type="Polygon2D" parent="Parallax/Longe"]
 color = Color(0.08, 0.1, 0.15, 1)
+polygon = PackedVector2Array(2000, 210, 2024, 165, 2050, 190, 2072, 168, 2090, 220, 2090, 800, 2000, 800)
 
 [node name="Meio" type="ParallaxLayer" parent="Parallax"]
 motion_scale = Vector2(0.45, 0.4)
@@ -117,66 +102,42 @@ offset_right = 3000.0
 offset_bottom = 820.0
 color = Color(0.1, 0.12, 0.17, 0.5)
 
-[node name="M1" type="ColorRect" parent="Parallax/Meio"]
-offset_left = 20.0
-offset_top = 300.0
-offset_right = 92.0
-offset_bottom = 800.0
+[node name="M1" type="Polygon2D" parent="Parallax/Meio"]
 color = Color(0.1, 0.12, 0.17, 1)
+polygon = PackedVector2Array(20, 340, 44, 300, 66, 322, 92, 306, 92, 800, 20, 800)
 
-[node name="M2" type="ColorRect" parent="Parallax/Meio"]
-offset_left = 360.0
-offset_top = 350.0
-offset_right = 420.0
-offset_bottom = 800.0
+[node name="M2" type="Polygon2D" parent="Parallax/Meio"]
 color = Color(0.1, 0.12, 0.17, 1)
+polygon = PackedVector2Array(360, 388, 382, 350, 404, 372, 420, 360, 420, 800, 360, 800)
 
-[node name="M3" type="ColorRect" parent="Parallax/Meio"]
-offset_left = 740.0
-offset_top = 260.0
-offset_right = 820.0
-offset_bottom = 800.0
+[node name="M3" type="Polygon2D" parent="Parallax/Meio"]
 color = Color(0.1, 0.12, 0.17, 1)
+polygon = PackedVector2Array(740, 300, 766, 260, 792, 284, 820, 268, 820, 800, 740, 800)
 
-[node name="M4" type="ColorRect" parent="Parallax/Meio"]
-offset_left = 1160.0
-offset_top = 330.0
-offset_right = 1226.0
-offset_bottom = 800.0
+[node name="M4" type="Polygon2D" parent="Parallax/Meio"]
 color = Color(0.1, 0.12, 0.17, 1)
+polygon = PackedVector2Array(1160, 372, 1184, 330, 1206, 354, 1226, 340, 1226, 800, 1160, 800)
 
-[node name="M5" type="ColorRect" parent="Parallax/Meio"]
-offset_left = 1580.0
-offset_top = 290.0
-offset_right = 1652.0
-offset_bottom = 800.0
+[node name="M5" type="Polygon2D" parent="Parallax/Meio"]
 color = Color(0.1, 0.12, 0.17, 1)
+polygon = PackedVector2Array(1580, 330, 1604, 290, 1628, 314, 1652, 300, 1652, 800, 1580, 800)
 
-[node name="M6" type="ColorRect" parent="Parallax/Meio"]
-offset_left = 2020.0
-offset_top = 340.0
-offset_right = 2090.0
-offset_bottom = 800.0
+[node name="M6" type="Polygon2D" parent="Parallax/Meio"]
 color = Color(0.1, 0.12, 0.17, 1)
+polygon = PackedVector2Array(2020, 380, 2044, 340, 2066, 362, 2090, 348, 2090, 800, 2020, 800)
 
 [node name="Perto" type="ParallaxLayer" parent="Parallax"]
 motion_scale = Vector2(0.85, 0.8)
 
-[node name="P1" type="ColorRect" parent="Parallax/Perto"]
+[node name="P1" type="Polygon2D" parent="Parallax/Perto"]
 modulate = Color(1, 1, 1, 0.55)
-offset_left = -120.0
-offset_top = 420.0
-offset_right = 90.0
-offset_bottom = 820.0
 color = Color(0.04, 0.05, 0.08, 1)
+polygon = PackedVector2Array(-120, 470, -40, 420, 20, 452, 90, 430, 90, 820, -120, 820)
 
-[node name="P2" type="ColorRect" parent="Parallax/Perto"]
+[node name="P2" type="Polygon2D" parent="Parallax/Perto"]
 modulate = Color(1, 1, 1, 0.5)
-offset_left = 1120.0
-offset_top = 470.0
-offset_right = 1330.0
-offset_bottom = 820.0
 color = Color(0.04, 0.05, 0.08, 1)
+polygon = PackedVector2Array(1120, 520, 1180, 470, 1250, 500, 1330, 478, 1330, 820, 1120, 820)
 
 [node name="Raios" type="Node2D" parent="."]
 

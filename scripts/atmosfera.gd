@@ -63,3 +63,5 @@ func _pintar_layer(caminho: String, cor_bruma: Color, cor_forma: Color) -> void:
 				n.color = Color(cor_forma.r, cor_forma.g, cor_forma.b, 0.5)
 			else:
 				n.color = cor_forma
+		elif n is Polygon2D:
+			n.color = cor_forma

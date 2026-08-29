@@ -47,6 +47,8 @@ func _encarar_koliani() -> void:
 func _piscar(ligado: bool) -> void:
 	if _sprite:
 		_sprite.modulate = Color(1.7, 1.25, 1.5) if ligado else Color(1, 1, 1)
+	if ligado:
+		anticipacao = 1.0  # wind-up visual (ver DemonioBase._process)
 
 
 func _ao_tocar(corpo: Node) -> void:
