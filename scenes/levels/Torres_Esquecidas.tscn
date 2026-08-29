@@ -15,6 +15,7 @@
 [ext_resource type="Script" path="res://scripts/nivel_com_chefe.gd" id="7_niv"]
 [ext_resource type="PackedScene" uid="uid://bkolianiatmosfera01" path="res://scenes/fx/Atmosfera.tscn" id="8_atm"]
 [ext_resource type="PackedScene" uid="uid://bkolianiparedefragil01" path="res://scenes/actors/ParedeFragil.tscn" id="9_pf"]
+[ext_resource type="PackedScene" uid="uid://bkolianiplataforma01" path="res://scenes/actors/Plataforma.tscn" id="10_pl"]
 
 [sub_resource type="RectangleShape2D" id="rs_ta"]
 size = Vector2(360, 48)
@@ -61,181 +62,61 @@ cor_fundo = Color(0.06, 0.05, 0.1, 1)
 cor_silhueta = Color(0.13, 0.1, 0.19, 1)
 cor_luz = Color(0.7, 0.45, 0.95, 1)
 
-[node name="TorreA" type="StaticBody2D" parent="."]
+[node name="TorreA" parent="." instance=ExtResource("10_pl")]
 position = Vector2(300, 520)
-collision_layer = 1
-collision_mask = 0
+tamanho = Vector2(360, 48)
+altura_visual = 92
+cor_base = Color(0.24, 0.19, 0.34, 1)
+cor_topo = Color(0.56, 0.4, 0.74, 1)
 
-[node name="Corpo" type="ColorRect" parent="TorreA"]
-offset_left = -180.0
-offset_top = -24.0
-offset_right = 180.0
-offset_bottom = 200.0
-color = Color(0.24, 0.19, 0.34, 1)
-
-[node name="Lip" type="ColorRect" parent="TorreA"]
-offset_left = -180.0
-offset_top = -24.0
-offset_right = 180.0
-offset_bottom = -18.0
-color = Color(0.56, 0.4, 0.74, 1)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="TorreA"]
-shape = SubResource("rs_ta")
-
-[node name="PlatMid1" type="StaticBody2D" parent="."]
+[node name="PlatMid1" parent="." instance=ExtResource("10_pl")]
 position = Vector2(620, 430)
-collision_layer = 1
-collision_mask = 0
+tamanho = Vector2(110, 26)
+altura_visual = 34
+cor_base = Color(0.24, 0.19, 0.34, 1)
+cor_topo = Color(0.56, 0.4, 0.74, 1)
 
-[node name="Corpo" type="ColorRect" parent="PlatMid1"]
-offset_left = -60.0
-offset_top = -13.0
-offset_right = 60.0
-offset_bottom = 13.0
-color = Color(0.26, 0.21, 0.36, 1)
-
-[node name="Lip" type="ColorRect" parent="PlatMid1"]
-offset_left = -60.0
-offset_top = -13.0
-offset_right = 60.0
-offset_bottom = -7.0
-color = Color(0.56, 0.4, 0.74, 1)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="PlatMid1"]
-shape = SubResource("rs_ps")
-
-[node name="TorreB" type="StaticBody2D" parent="."]
+[node name="TorreB" parent="." instance=ExtResource("10_pl")]
 position = Vector2(940, 470)
-collision_layer = 1
-collision_mask = 0
+tamanho = Vector2(320, 48)
+altura_visual = 92
+cor_base = Color(0.24, 0.19, 0.34, 1)
+cor_topo = Color(0.56, 0.4, 0.74, 1)
 
-[node name="Corpo" type="ColorRect" parent="TorreB"]
-offset_left = -160.0
-offset_top = -24.0
-offset_right = 160.0
-offset_bottom = 240.0
-color = Color(0.24, 0.19, 0.34, 1)
-
-[node name="Lip" type="ColorRect" parent="TorreB"]
-offset_left = -160.0
-offset_top = -24.0
-offset_right = 160.0
-offset_bottom = -18.0
-color = Color(0.56, 0.4, 0.74, 1)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="TorreB"]
-shape = SubResource("rs_tb")
-
-[node name="PlatUp1" type="StaticBody2D" parent="."]
+[node name="PlatUp1" parent="." instance=ExtResource("10_pl")]
 position = Vector2(1010, 340)
-collision_layer = 1
-collision_mask = 0
+tamanho = Vector2(120, 26)
+altura_visual = 34
+cor_base = Color(0.24, 0.19, 0.34, 1)
+cor_topo = Color(0.56, 0.4, 0.74, 1)
 
-[node name="Corpo" type="ColorRect" parent="PlatUp1"]
-offset_left = -60.0
-offset_top = -13.0
-offset_right = 60.0
-offset_bottom = 13.0
-color = Color(0.26, 0.21, 0.36, 1)
-
-[node name="Lip" type="ColorRect" parent="PlatUp1"]
-offset_left = -60.0
-offset_top = -13.0
-offset_right = 60.0
-offset_bottom = -7.0
-color = Color(0.56, 0.4, 0.74, 1)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="PlatUp1"]
-shape = SubResource("rs_pp")
-
-[node name="PlatUp2" type="StaticBody2D" parent="."]
+[node name="PlatUp2" parent="." instance=ExtResource("10_pl")]
 position = Vector2(900, 235)
-collision_layer = 1
-collision_mask = 0
+tamanho = Vector2(120, 26)
+altura_visual = 34
+cor_base = Color(0.24, 0.19, 0.34, 1)
+cor_topo = Color(0.56, 0.4, 0.74, 1)
 
-[node name="Corpo" type="ColorRect" parent="PlatUp2"]
-offset_left = -60.0
-offset_top = -13.0
-offset_right = 60.0
-offset_bottom = 13.0
-color = Color(0.26, 0.21, 0.36, 1)
-
-[node name="Lip" type="ColorRect" parent="PlatUp2"]
-offset_left = -60.0
-offset_top = -13.0
-offset_right = 60.0
-offset_bottom = -7.0
-color = Color(0.56, 0.4, 0.74, 1)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="PlatUp2"]
-shape = SubResource("rs_pp")
-
-[node name="TorreCtopo" type="StaticBody2D" parent="."]
+[node name="TorreCtopo" parent="." instance=ExtResource("10_pl")]
 position = Vector2(960, 150)
-collision_layer = 1
-collision_mask = 0
+tamanho = Vector2(280, 48)
+altura_visual = 92
+cor_base = Color(0.24, 0.19, 0.34, 1)
+cor_topo = Color(0.56, 0.4, 0.74, 1)
 
-[node name="Corpo" type="ColorRect" parent="TorreCtopo"]
-offset_left = -140.0
-offset_top = -24.0
-offset_right = 140.0
-offset_bottom = 90.0
-color = Color(0.24, 0.19, 0.34, 1)
-
-[node name="Lip" type="ColorRect" parent="TorreCtopo"]
-offset_left = -140.0
-offset_top = -24.0
-offset_right = 140.0
-offset_bottom = -18.0
-color = Color(0.56, 0.4, 0.74, 1)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="TorreCtopo"]
-shape = SubResource("rs_tc")
-
-[node name="PlatMid2" type="StaticBody2D" parent="."]
+[node name="PlatMid2" parent="." instance=ExtResource("10_pl")]
 position = Vector2(1260, 440)
-collision_layer = 1
-collision_mask = 0
+tamanho = Vector2(110, 26)
+altura_visual = 34
+cor_base = Color(0.24, 0.19, 0.34, 1)
+cor_topo = Color(0.56, 0.4, 0.74, 1)
 
-[node name="Corpo" type="ColorRect" parent="PlatMid2"]
-offset_left = -55.0
-offset_top = -13.0
-offset_right = 55.0
-offset_bottom = 13.0
-color = Color(0.26, 0.21, 0.36, 1)
-
-[node name="Lip" type="ColorRect" parent="PlatMid2"]
-offset_left = -55.0
-offset_top = -13.0
-offset_right = 55.0
-offset_bottom = -7.0
-color = Color(0.56, 0.4, 0.74, 1)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="PlatMid2"]
-shape = SubResource("rs_ps")
-
-[node name="TorreD" type="StaticBody2D" parent="."]
+[node name="TorreD" parent="." instance=ExtResource("10_pl")]
 position = Vector2(1600, 470)
-collision_layer = 1
-collision_mask = 0
-
-[node name="Corpo" type="ColorRect" parent="TorreD"]
-offset_left = -180.0
-offset_top = -24.0
-offset_right = 180.0
-offset_bottom = 240.0
-color = Color(0.24, 0.19, 0.34, 1)
-
-[node name="Lip" type="ColorRect" parent="TorreD"]
-offset_left = -180.0
-offset_top = -24.0
-offset_right = 180.0
-offset_bottom = -18.0
-color = Color(0.56, 0.4, 0.74, 1)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="TorreD"]
-shape = SubResource("rs_td")
+tamanho = Vector2(360, 48)
+altura_visual = 92
+cor_base = Color(0.24, 0.19, 0.34, 1)
+cor_topo = Color(0.56, 0.4, 0.74, 1)
 
 [node name="Koliani" parent="." instance=ExtResource("1_kol")]
 position = Vector2(180, 440)

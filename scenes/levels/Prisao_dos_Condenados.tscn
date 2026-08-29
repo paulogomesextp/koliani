@@ -13,6 +13,7 @@
 [ext_resource type="PackedScene" uid="uid://bkolianichefecarcereiro01" path="res://scenes/actors/ChefeCarcereiro.tscn" id="6_chefe"]
 [ext_resource type="Script" path="res://scripts/nivel_com_chefe.gd" id="7_niv"]
 [ext_resource type="PackedScene" uid="uid://bkolianiatmosfera01" path="res://scenes/fx/Atmosfera.tscn" id="8_atm"]
+[ext_resource type="PackedScene" uid="uid://bkolianiplataforma01" path="res://scenes/actors/Plataforma.tscn" id="9_pl"]
 
 [sub_resource type="RectangleShape2D" id="rs_chao_i"]
 size = Vector2(900, 48)
@@ -56,159 +57,54 @@ cor_fundo = Color(0.04, 0.06, 0.1, 1)
 cor_silhueta = Color(0.08, 0.12, 0.18, 1)
 cor_luz = Color(0.35, 0.6, 0.85, 1)
 
-[node name="ChaoInicio" type="StaticBody2D" parent="."]
+[node name="ChaoInicio" parent="." instance=ExtResource("9_pl")]
 position = Vector2(400, 660)
-collision_layer = 1
-collision_mask = 0
+tamanho = Vector2(900, 48)
+altura_visual = 92
+cor_base = Color(0.2, 0.24, 0.32, 1)
+cor_topo = Color(0.42, 0.54, 0.68, 1)
 
-[node name="Corpo" type="ColorRect" parent="ChaoInicio"]
-offset_left = -450.0
-offset_top = -24.0
-offset_right = 450.0
-offset_bottom = 60.0
-color = Color(0.2, 0.24, 0.32, 1)
-
-[node name="Lip" type="ColorRect" parent="ChaoInicio"]
-offset_left = -450.0
-offset_top = -24.0
-offset_right = 450.0
-offset_bottom = -18.0
-color = Color(0.42, 0.54, 0.68, 1)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="ChaoInicio"]
-shape = SubResource("rs_chao_i")
-
-[node name="PlatVao" type="StaticBody2D" parent="."]
+[node name="PlatVao" parent="." instance=ExtResource("9_pl")]
 position = Vector2(980, 470)
-collision_layer = 1
-collision_mask = 0
+tamanho = Vector2(160, 26)
+altura_visual = 34
+cor_base = Color(0.2, 0.24, 0.32, 1)
+cor_topo = Color(0.42, 0.54, 0.68, 1)
 
-[node name="Corpo" type="ColorRect" parent="PlatVao"]
-offset_left = -80.0
-offset_top = -13.0
-offset_right = 80.0
-offset_bottom = 13.0
-color = Color(0.22, 0.26, 0.34, 1)
-
-[node name="Lip" type="ColorRect" parent="PlatVao"]
-offset_left = -80.0
-offset_top = -13.0
-offset_right = 80.0
-offset_bottom = -7.0
-color = Color(0.42, 0.54, 0.68, 1)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="PlatVao"]
-shape = SubResource("rs_plat_m")
-
-[node name="ChaoMeio" type="StaticBody2D" parent="."]
+[node name="ChaoMeio" parent="." instance=ExtResource("9_pl")]
 position = Vector2(1350, 600)
-collision_layer = 1
-collision_mask = 0
+tamanho = Vector2(480, 48)
+altura_visual = 92
+cor_base = Color(0.2, 0.24, 0.32, 1)
+cor_topo = Color(0.42, 0.54, 0.68, 1)
 
-[node name="Corpo" type="ColorRect" parent="ChaoMeio"]
-offset_left = -240.0
-offset_top = -24.0
-offset_right = 240.0
-offset_bottom = 60.0
-color = Color(0.2, 0.24, 0.32, 1)
-
-[node name="Lip" type="ColorRect" parent="ChaoMeio"]
-offset_left = -240.0
-offset_top = -24.0
-offset_right = 240.0
-offset_bottom = -18.0
-color = Color(0.42, 0.54, 0.68, 1)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="ChaoMeio"]
-shape = SubResource("rs_chao_m")
-
-[node name="PlatB" type="StaticBody2D" parent="."]
+[node name="PlatB" parent="." instance=ExtResource("9_pl")]
 position = Vector2(1250, 470)
-collision_layer = 1
-collision_mask = 0
+tamanho = Vector2(140, 26)
+altura_visual = 34
+cor_base = Color(0.2, 0.24, 0.32, 1)
+cor_topo = Color(0.42, 0.54, 0.68, 1)
 
-[node name="Corpo" type="ColorRect" parent="PlatB"]
-offset_left = -70.0
-offset_top = -13.0
-offset_right = 70.0
-offset_bottom = 13.0
-color = Color(0.22, 0.26, 0.34, 1)
-
-[node name="Lip" type="ColorRect" parent="PlatB"]
-offset_left = -70.0
-offset_top = -13.0
-offset_right = 70.0
-offset_bottom = -7.0
-color = Color(0.42, 0.54, 0.68, 1)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="PlatB"]
-shape = SubResource("rs_plat_p")
-
-[node name="PlatC" type="StaticBody2D" parent="."]
+[node name="PlatC" parent="." instance=ExtResource("9_pl")]
 position = Vector2(1470, 360)
-collision_layer = 1
-collision_mask = 0
+tamanho = Vector2(140, 26)
+altura_visual = 34
+cor_base = Color(0.2, 0.24, 0.32, 1)
+cor_topo = Color(0.42, 0.54, 0.68, 1)
 
-[node name="Corpo" type="ColorRect" parent="PlatC"]
-offset_left = -70.0
-offset_top = -13.0
-offset_right = 70.0
-offset_bottom = 13.0
-color = Color(0.22, 0.26, 0.34, 1)
-
-[node name="Lip" type="ColorRect" parent="PlatC"]
-offset_left = -70.0
-offset_top = -13.0
-offset_right = 70.0
-offset_bottom = -7.0
-color = Color(0.42, 0.54, 0.68, 1)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="PlatC"]
-shape = SubResource("rs_plat_p")
-
-[node name="PlatD" type="StaticBody2D" parent="."]
+[node name="PlatD" parent="." instance=ExtResource("9_pl")]
 position = Vector2(1670, 300)
-collision_layer = 1
-collision_mask = 0
+tamanho = Vector2(160, 26)
+altura_visual = 34
+cor_base = Color(0.2, 0.24, 0.32, 1)
+cor_topo = Color(0.42, 0.54, 0.68, 1)
 
-[node name="Corpo" type="ColorRect" parent="PlatD"]
-offset_left = -80.0
-offset_top = -13.0
-offset_right = 80.0
-offset_bottom = 13.0
-color = Color(0.22, 0.26, 0.34, 1)
-
-[node name="Lip" type="ColorRect" parent="PlatD"]
-offset_left = -80.0
-offset_top = -13.0
-offset_right = 80.0
-offset_bottom = -7.0
-color = Color(0.42, 0.54, 0.68, 1)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="PlatD"]
-shape = SubResource("rs_plat_m")
-
-[node name="ChaoFim" type="StaticBody2D" parent="."]
+[node name="ChaoFim" parent="." instance=ExtResource("9_pl")]
 position = Vector2(1980, 320)
-collision_layer = 1
-collision_mask = 0
-
-[node name="Corpo" type="ColorRect" parent="ChaoFim"]
-offset_left = -260.0
-offset_top = -24.0
-offset_right = 260.0
-offset_bottom = 60.0
-color = Color(0.2, 0.24, 0.32, 1)
-
-[node name="Lip" type="ColorRect" parent="ChaoFim"]
-offset_left = -260.0
-offset_top = -24.0
-offset_right = 260.0
-offset_bottom = -18.0
-color = Color(0.42, 0.54, 0.68, 1)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="ChaoFim"]
-shape = SubResource("rs_chao_f")
+tamanho = Vector2(520, 48)
+altura_visual = 92
+cor_base = Color(0.2, 0.24, 0.32, 1)
+cor_topo = Color(0.42, 0.54, 0.68, 1)
 
 [node name="Fog1" type="ColorRect" parent="."]
 z_index = 5

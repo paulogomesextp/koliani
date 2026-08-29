@@ -15,18 +15,7 @@
 [ext_resource type="PackedScene" uid="uid://bkolianichefefloresta01" path="res://scenes/actors/ChefeFloresta.tscn" id="6_chefe"]
 [ext_resource type="Script" path="res://scripts/nivel_com_chefe.gd" id="7_niv"]
 [ext_resource type="PackedScene" uid="uid://bkolianiatmosfera01" path="res://scenes/fx/Atmosfera.tscn" id="8_atm"]
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_chaoa"]
-size = Vector2(960, 48)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_chaob"]
-size = Vector2(560, 48)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_platm"]
-size = Vector2(180, 26)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_platp"]
-size = Vector2(140, 26)
+[ext_resource type="PackedScene" uid="uid://bkolianiplataforma01" path="res://scenes/actors/Plataforma.tscn" id="9_pl"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_chk"]
 size = Vector2(40, 80)
@@ -54,137 +43,47 @@ cor_luz = Color(0.5, 0.8, 0.4, 1)
 cor_poeira = Color(0.7, 0.9, 0.55, 1)
 densidade_poeira = 1.2
 
-[node name="ChaoA" type="StaticBody2D" parent="."]
+[node name="ChaoA" parent="." instance=ExtResource("9_pl")]
 position = Vector2(430, 660)
-collision_layer = 1
-collision_mask = 0
+tamanho = Vector2(960, 48)
+altura_visual = 92.0
+cor_base = Color(0.16, 0.24, 0.1, 1)
+cor_topo = Color(0.42, 0.64, 0.29, 1)
 
-[node name="Corpo" type="ColorRect" parent="ChaoA"]
-offset_left = -480.0
-offset_top = -24.0
-offset_right = 480.0
-offset_bottom = 60.0
-color = Color(0.2, 0.29, 0.14, 1)
-
-[node name="Lip" type="ColorRect" parent="ChaoA"]
-offset_left = -480.0
-offset_top = -24.0
-offset_right = 480.0
-offset_bottom = -17.0
-color = Color(0.42, 0.64, 0.29, 1)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="ChaoA"]
-shape = SubResource("RectangleShape2D_chaoa")
-
-[node name="ChaoB" type="StaticBody2D" parent="."]
+[node name="ChaoB" parent="." instance=ExtResource("9_pl")]
 position = Vector2(1440, 660)
-collision_layer = 1
-collision_mask = 0
+tamanho = Vector2(560, 48)
+altura_visual = 92.0
+cor_base = Color(0.16, 0.24, 0.1, 1)
+cor_topo = Color(0.42, 0.64, 0.29, 1)
 
-[node name="Corpo" type="ColorRect" parent="ChaoB"]
-offset_left = -280.0
-offset_top = -24.0
-offset_right = 280.0
-offset_bottom = 60.0
-color = Color(0.2, 0.29, 0.14, 1)
-
-[node name="Lip" type="ColorRect" parent="ChaoB"]
-offset_left = -280.0
-offset_top = -24.0
-offset_right = 280.0
-offset_bottom = -17.0
-color = Color(0.42, 0.64, 0.29, 1)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="ChaoB"]
-shape = SubResource("RectangleShape2D_chaob")
-
-[node name="Plat1" type="StaticBody2D" parent="."]
+[node name="Plat1" parent="." instance=ExtResource("9_pl")]
 position = Vector2(300, 545)
-collision_layer = 1
-collision_mask = 0
+tamanho = Vector2(140, 26)
+altura_visual = 34.0
+cor_base = Color(0.17, 0.25, 0.11, 1)
+cor_topo = Color(0.42, 0.64, 0.29, 1)
 
-[node name="Corpo" type="ColorRect" parent="Plat1"]
-offset_left = -70.0
-offset_top = -13.0
-offset_right = 70.0
-offset_bottom = 13.0
-color = Color(0.22, 0.31, 0.15, 1)
-
-[node name="Lip" type="ColorRect" parent="Plat1"]
-offset_left = -70.0
-offset_top = -13.0
-offset_right = 70.0
-offset_bottom = -7.0
-color = Color(0.42, 0.64, 0.29, 1)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Plat1"]
-shape = SubResource("RectangleShape2D_platp")
-
-[node name="Plat2" type="StaticBody2D" parent="."]
+[node name="Plat2" parent="." instance=ExtResource("9_pl")]
 position = Vector2(585, 458)
-collision_layer = 1
-collision_mask = 0
+tamanho = Vector2(180, 26)
+altura_visual = 34.0
+cor_base = Color(0.17, 0.25, 0.11, 1)
+cor_topo = Color(0.42, 0.64, 0.29, 1)
 
-[node name="Corpo" type="ColorRect" parent="Plat2"]
-offset_left = -90.0
-offset_top = -13.0
-offset_right = 90.0
-offset_bottom = 13.0
-color = Color(0.22, 0.31, 0.15, 1)
-
-[node name="Lip" type="ColorRect" parent="Plat2"]
-offset_left = -90.0
-offset_top = -13.0
-offset_right = 90.0
-offset_bottom = -7.0
-color = Color(0.42, 0.64, 0.29, 1)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Plat2"]
-shape = SubResource("RectangleShape2D_platm")
-
-[node name="Plat3" type="StaticBody2D" parent="."]
+[node name="Plat3" parent="." instance=ExtResource("9_pl")]
 position = Vector2(1030, 405)
-collision_layer = 1
-collision_mask = 0
+tamanho = Vector2(180, 26)
+altura_visual = 34.0
+cor_base = Color(0.18, 0.27, 0.12, 1)
+cor_topo = Color(0.34, 0.55, 0.24, 1)
 
-[node name="Corpo" type="ColorRect" parent="Plat3"]
-offset_left = -90.0
-offset_top = -13.0
-offset_right = 90.0
-offset_bottom = 13.0
-color = Color(0.22, 0.31, 0.15, 1)
-
-[node name="Lip" type="ColorRect" parent="Plat3"]
-offset_left = -90.0
-offset_top = -13.0
-offset_right = 90.0
-offset_bottom = -7.0
-color = Color(0.31, 0.5, 0.22, 1)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Plat3"]
-shape = SubResource("RectangleShape2D_platm")
-
-[node name="Plat4" type="StaticBody2D" parent="."]
+[node name="Plat4" parent="." instance=ExtResource("9_pl")]
 position = Vector2(1275, 520)
-collision_layer = 1
-collision_mask = 0
-
-[node name="Corpo" type="ColorRect" parent="Plat4"]
-offset_left = -70.0
-offset_top = -13.0
-offset_right = 70.0
-offset_bottom = 13.0
-color = Color(0.22, 0.31, 0.15, 1)
-
-[node name="Lip" type="ColorRect" parent="Plat4"]
-offset_left = -70.0
-offset_top = -13.0
-offset_right = 70.0
-offset_bottom = -7.0
-color = Color(0.42, 0.64, 0.29, 1)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Plat4"]
-shape = SubResource("RectangleShape2D_platp")
+tamanho = Vector2(140, 26)
+altura_visual = 34.0
+cor_base = Color(0.17, 0.25, 0.11, 1)
+cor_topo = Color(0.42, 0.64, 0.29, 1)
 
 [node name="LuzPantano1" type="PointLight2D" parent="."]
 position = Vector2(250, 630)

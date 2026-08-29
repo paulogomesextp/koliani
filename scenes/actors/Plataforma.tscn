@@ -1,0 +1,34 @@
+[gd_scene load_steps=5 format=3 uid="uid://bkolianiplataforma01"]
+
+; Plataforma reutilizavel com visual procedural. Instanciar e por
+; "tamanho" (+ cor_base/cor_topo do bioma). Ver scripts/plataforma.gd.
+
+[ext_resource type="Script" path="res://scripts/plataforma.gd" id="1_pl"]
+[ext_resource type="Shader" path="res://assets/shaders/plataforma.gdshader" id="2_sh"]
+
+[sub_resource type="ShaderMaterial" id="mat_pl"]
+resource_local_to_scene = true
+shader = ExtResource("2_sh")
+shader_parameter/tamanho = Vector2(200, 40)
+shader_parameter/cor_base = Color(0.15, 0.21, 0.11, 1)
+shader_parameter/cor_topo = Color(0.42, 0.62, 0.28, 1)
+shader_parameter/cor_fundo = Color(0.03, 0.045, 0.02, 1)
+shader_parameter/brilho_topo = 0.9
+
+[sub_resource type="RectangleShape2D" id="rs_pl"]
+size = Vector2(200, 40)
+
+[node name="Plataforma" type="StaticBody2D"]
+collision_layer = 1
+collision_mask = 0
+script = ExtResource("1_pl")
+
+[node name="Visual" type="ColorRect" parent="."]
+material = SubResource("mat_pl")
+offset_left = -100.0
+offset_top = -20.0
+offset_right = 100.0
+offset_bottom = 20.0
+
+[node name="Col" type="CollisionShape2D" parent="."]
+shape = SubResource("rs_pl")
