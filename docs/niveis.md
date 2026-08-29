@@ -8,6 +8,16 @@
 > Cada nível novo precisa de: cena `scenes/levels/*.tscn`, entrada em
 > `EstadoJogo.NIVEIS`, pistas no `DiarioPistas` + i18n, e (quando tiver
 > chefe próprio) script de chefe + sprite. Ordem de ataque sugerida no fim.
+>
+> **Feito até agora (2026‑08‑29):**
+> - `EstadoJogo.REGIOES` — camada de dados das 6 regiões + `concluidos`
+>   (estado de conclusão por nível, gravado no save). Falta a UI (mapa).
+> - Região I / nível 01: chefe **Ghorak** (`chefe_ghorak.gd` +
+>   `ChefeGhorak.tscn` + `assets/sprites/chefe_ghorak.svg`), a substituir o
+>   placeholder `ChefeFloresta` na `Floresta_Putrefata.tscn`.
+> - Mecânica partilhada **`RaizPerigo`** (`scenes/actors/RaizPerigo.tscn`):
+>   espinho de raiz que telegrafa, irrompe e recolhe — base das raízes da
+>   região I; reutilizável como perigo/plataforma temporária.
 
 ---
 
@@ -211,14 +221,18 @@ Região final; cada nível é uma parte do castelo.
 
 ## Ordem de trabalho sugerida (agente)
 
-1. Refatorar `EstadoJogo.NIVEIS` para suportar regiões + N níveis + estado
-   de conclusão (o menu/mapa passa a listar regiões).
+1. ~~Refatorar `EstadoJogo.NIVEIS` para suportar regiões + N níveis + estado
+   de conclusão~~ **feito** (`REGIOES` + `concluidos`). Falta o menu/mapa
+   passar a listar regiões (só UI; a camada de dados já existe).
 2. Definir e implementar as **mecânicas partilhadas** reutilizáveis:
-   plataforma temporária (raízes/teias/espectral), plataforma móvel
-   (correntes), água/lava mortal, vento, gravidade variável, luz↔escuridão,
-   cenário rítmico ("batimento"). Cada uma como cena/nó reutilizável.
+   plataforma temporária (raízes/teias/espectral — **`RaizPerigo` feito**
+   para a variante raiz), plataforma móvel (correntes), água/lava mortal,
+   vento, gravidade variável, luz↔escuridão, cenário rítmico ("batimento").
+   Cada uma como cena/nó reutilizável.
 3. Construir os níveis por região, começando pela I (biomas e atmosfera já
-   existem). 1 chefe novo por nível — herdar de `ChefeBase`.
+   existem). 1 chefe novo por nível — herdar de `ChefeBase`. **Feito:**
+   Ghorak (nível 01). **A seguir:** Morvanna, Rainha Aracnídea, Entrevane,
+   Coração Putrefacto — e as cenas de nível 02‑05 propriamente ditas.
 4. Arte: sprites SVG (rim‑lit) no estilo atual; pixel‑art fica como opção
    futura (swap). Núcleos/fraquezas a magenta.
 5. Afinar com playtest (Paulo + amigo) a cada região fechada.

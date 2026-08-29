@@ -12,7 +12,7 @@
 [ext_resource type="PackedScene" uid="uid://bkolianicoletavel01" path="res://scenes/actors/Coletavel.tscn" id="3_col"]
 [ext_resource type="PackedScene" uid="uid://bkolianiporta01" path="res://scenes/actors/Porta.tscn" id="4_porta"]
 [ext_resource type="Script" path="res://scripts/checkpoint.gd" id="5_chk"]
-[ext_resource type="PackedScene" uid="uid://bkolianichefefloresta01" path="res://scenes/actors/ChefeFloresta.tscn" id="6_chefe"]
+[ext_resource type="PackedScene" uid="uid://bkolianichefeghorak01" path="res://scenes/actors/ChefeGhorak.tscn" id="6_chefe"]
 [ext_resource type="Script" path="res://scripts/nivel_com_chefe.gd" id="7_niv"]
 [ext_resource type="PackedScene" uid="uid://bkolianiatmosfera01" path="res://scenes/fx/Atmosfera.tscn" id="8_atm"]
 [ext_resource type="PackedScene" uid="uid://bkolianiplataforma01" path="res://scenes/actors/Plataforma.tscn" id="9_pl"]
@@ -151,7 +151,7 @@ position = Vector2(1880, 320)
 alcance_patrulha = 45.0
 
 [node name="Chefe" parent="." instance=ExtResource("6_chefe")]
-position = Vector2(2550, 604)
+position = Vector2(2560, 588)
 
 [node name="ColSaltoDuplo" parent="." instance=ExtResource("3_col")]
 position = Vector2(720, 588)

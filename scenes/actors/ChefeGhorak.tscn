@@ -1,0 +1,98 @@
+[gd_scene load_steps=8 format=3 uid="uid://bkolianichefeghorak01"]
+
+; Regiao I / nivel 01 -- Ghorak, o Guardiao Raiz.
+; Sprite SVG assets/sprites/chefe_ghorak.svg + nucleo purpura (o ponto
+; fraco) montado como no. Script chefe_ghorak.gd (herda ChefeBase).
+
+[ext_resource type="Script" path="res://scripts/chefe_ghorak.gd" id="1_chefe"]
+[ext_resource type="Texture2D" uid="uid://876iqyii7h4o" path="res://assets/sprites/chefe_ghorak.svg" id="2_tex"]
+[ext_resource type="Shader" path="res://assets/shaders/personagem.gdshader" id="3_sh"]
+
+[sub_resource type="ShaderMaterial" id="mat_g"]
+resource_local_to_scene = true
+shader = ExtResource("3_sh")
+shader_parameter/flash = 0.0
+shader_parameter/flash_cor = Color(1, 1, 1, 1)
+shader_parameter/rim_cor = Color(0.55, 0.95, 0.4, 1)
+shader_parameter/rim_forca = 0.7
+shader_parameter/rim_dir = Vector2(-1, -0.55)
+shader_parameter/rim_espessura = 1.5
+shader_parameter/interior = 0.2
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_body"]
+size = Vector2(58, 88)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_contacto"]
+size = Vector2(72, 98)
+
+[sub_resource type="Gradient" id="Gradient_luz"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_luz"]
+gradient = SubResource("Gradient_luz")
+width = 256
+height = 256
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[node name="ChefeGhorak" type="CharacterBody2D" groups=["inimigos"]]
+collision_layer = 4
+collision_mask = 1
+script = ExtResource("1_chefe")
+vida = 420
+dano_contacto = 20
+alcance_patrulha = 150.0
+cor_estilhacos = Color(0.42, 0.66, 0.28, 1)
+cor_rim = Color(0.55, 0.95, 0.4, 1)
+
+[node name="Sprite" type="Node2D" parent="."]
+
+[node name="Corpo" type="Sprite2D" parent="Sprite"]
+position = Vector2(0, -2)
+texture = ExtResource("2_tex")
+material = SubResource("mat_g")
+
+[node name="LuzOlhos" type="PointLight2D" parent="Sprite"]
+position = Vector2(0, -34)
+texture = SubResource("GradientTexture2D_luz")
+energy = 1.0
+color = Color(0.55, 0.9, 0.4, 1)
+scale = Vector2(1.0, 0.8)
+
+[node name="Nucleo" type="Node2D" parent="Sprite"]
+position = Vector2(0, -14)
+scale = Vector2(0.5, 0.5)
+
+[node name="Brilho" type="Sprite2D" parent="Sprite/Nucleo"]
+visible = false
+texture = SubResource("GradientTexture2D_luz")
+modulate = Color(0.86, 0.31, 0.9, 0.85)
+scale = Vector2(0.28, 0.28)
+
+[node name="Diamante" type="Polygon2D" parent="Sprite/Nucleo"]
+color = Color(0.62, 0.16, 0.72, 1)
+polygon = PackedVector2Array(-8, 0, 0, -13, 8, 0, 0, 13)
+
+[node name="Cerne" type="Polygon2D" parent="Sprite/Nucleo"]
+color = Color(0.98, 0.62, 1, 1)
+polygon = PackedVector2Array(-3.5, 0, 0, -6, 3.5, 0, 0, 6)
+
+[node name="Luz" type="PointLight2D" parent="Sprite/Nucleo"]
+texture = SubResource("GradientTexture2D_luz")
+energy = 0.15
+color = Color(0.95, 0.4, 1, 1)
+scale = Vector2(0.55, 0.55)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 4)
+shape = SubResource("RectangleShape2D_body")
+
+[node name="AreaContacto" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AreaContacto"]
+position = Vector2(0, 2)
+shape = SubResource("RectangleShape2D_contacto")
