@@ -12,7 +12,8 @@ extends DemonioBase
 signal derrotado
 
 ## A que distância da Koliani o chefe "entra em cena" (troca a música).
-const DIST_MUSICA_BOSS := 470.0
+## ~= largura de ecrã, para a música mudar ao entrar na arena do chefe.
+const DIST_MUSICA_BOSS := 900.0
 
 var _koliani: Node2D
 ## Fica > 0 durante um golpe forte do chefe (o contacto magoa mais).

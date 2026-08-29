@@ -35,14 +35,20 @@ var _pitch_atual := -1.0
 func _ready() -> void:
 	_p = AudioStreamPlayer.new()
 	_p.bus = "Music"
+	# rede de segurança: se por alguma razão a cama não estiver marcada como
+	# loop no import, volta a tocá-la ao terminar (a cama nunca é one-shot).
+	_p.finished.connect(func() -> void:
+		if _caminho_atual != "":
+			_p.play())
 	add_child(_p)
 
 	_amb = AudioStreamPlayer.new()
 	_amb.bus = "Music"
 	_amb.volume_db = VOL_ASSOMBRACAO
+	_amb.finished.connect(func() -> void: _amb.play())
 	add_child(_amb)
 	if ResourceLoader.exists(CAMINHO_ASSOMBRACAO):
-		_amb.stream = load(CAMINHO_ASSOMBRACAO)
+		_amb.stream = _carregar_loop(CAMINHO_ASSOMBRACAO)
 		_amb.play()
 
 
@@ -85,12 +91,24 @@ func _tocar(caminho: String, pitch: float, vol: float, com_assombracao: bool) ->
 		return
 	if not ResourceLoader.exists(caminho):
 		return
-	_p.stream = load(caminho)  # o loop vem do .import (edit/loop_mode=1)
+	_p.stream = _carregar_loop(caminho)
 	_p.pitch_scale = pitch
 	_p.volume_db = vol
 	_caminho_atual = caminho
 	_pitch_atual = pitch
 	_p.play()
+
+
+## Carrega um .wav e força o loop no próprio recurso. Em 4.7.2 o
+## `edit/loop_mode` do .import NÃO chega ao AudioStreamWAV (vem sempre
+## LOOP_DISABLED), por isso marca-se aqui, do início ao fim do sample.
+func _carregar_loop(caminho: String) -> AudioStream:
+	var st: AudioStream = load(caminho)
+	if st is AudioStreamWAV:
+		st.loop_mode = AudioStreamWAV.LOOP_FORWARD
+		st.loop_begin = 0
+		st.loop_end = int(round(st.get_length() * st.mix_rate))
+	return st
 
 
 func _exit_tree() -> void:
