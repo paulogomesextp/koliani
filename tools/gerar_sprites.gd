@@ -148,66 +148,92 @@ func _guardar(nome: String) -> void:
 ## --- sprites ---------------------------------------------------------
 
 func _koliani() -> void:
-	# mapa de pixels feito a' mao. Vista 3/4 virada a' esquerda, capuz,
-	# rabo-de-cavalo, capa que abre, adaga magenta a brilhar em baixo.
-	#  c capa escura  C capa media  v capa clara  l rim (luz fria)
-	#  k pele  s pele sombra  r cabelo/cachecol  e olho
-	#  B brilho lamina  b nucleo lamina
-	var leg := {
-		"c": PAL["x"], "C": PAL["p"], "v": PAL["P"], "l": PAL["W"],
-		"t": Color("4a3a68"),  # painel da tunica (frente)
-		"k": PAL["k"], "s": PAL["s"], "r": PAL["h"], "e": PAL["m"],
-		"B": PAL["M"], "b": PAL["w"],
-	}
-	_mapa(PackedStringArray([
-		"                                  ",
-		"              cccc                ",
-		"            ccCCCCcc              ",
-		"           cCCCvvvCCc             ",
-		"          clCCvvvvvCCc            ",
-		"          clCvvvvvvvCc   r        ",
-		"          clCvkkkkkvCc  rrr       ",
-		"          clCvkksskvCc  rrrr      ",
-		"          clCkkkseekCc rrrrr      ",
-		"          clCkksseekCc rrrrr      ",
-		"          clCkkksskvCc rrrrr      ",
-		"          clCvkkkkkvCc rrrrr      ",
-		"           clCvkkkvCc  rrrrr      ",
-		"           clCCvvvCCc  rrrr       ",
-		"           clCCvvvCCc  rrrr       ",
-		"            clCCvCCc  rrrr        ",
-		"            crrCCrrc rrrr         ",
-		"           crrrCCrrrrrrr          ",
-		"          ccCCCCCCCCcrr           ",
-		"         clCCCvvvvCCCc            ",
-		"         clCCvvttvvCCc            ",
-		"        clCCvvttttvvCc            ",
-		"    r   clCCvttttttvCc            ",
-		"  rBr   cCCvttttttvCCc            ",
-		" rBbBr scCvttttttvCCc            ",
-		" rBbBr ksCvtttttttvCc            ",
-		"  rBbBrksCvttttttvCCc             ",
-		"   rBbrksCvtttttvvCCc             ",
-		"    rbksCCvttttvvCCc              ",
-		"     bksCCvtttvvvCCc              ",
-		"      sCCCvvttvvvCCc              ",
-		"      cCCCvvttvvCCCc              ",
-		"      cCCCvvttvvCCCc              ",
-		"      cCCCvvttvvCCCc              ",
-		"      cCCCCvttvCCCCc              ",
-		"      cCCCCvttvCCCCc              ",
-		"      ccCCCvttvCCCcc              ",
-		"       cCCCvttvCCCc               ",
-		"       cCCCc  cCCCc               ",
-		"       cCCc    cCCc               ",
-		"       cCCc    cCCc               ",
-		"       cCc      cCc               ",
-		"       cCc      cCc               ",
-		"      ccCc      cCcc              ",
-		"      cccc      cccc              ",
-		"                                 ",
-	]), leg)
+	# Vista lateral, VIRADA A' DIREITA (o flip do jogo faz `scale.x =
+	# +olha_para` -> sem espelho = a olhar p/ a direita). Construida por
+	# primitivas + rim frio no bordo da frente/topo + adaga magenta acesa.
+	_novo(30, 44)
+	var CAPA_ESC: Color = PAL["x"]
+	var CAPA: Color = PAL["p"]
+	var CAPA_CLR: Color = PAL["P"]
+	var TUNICA := Color("5f4b95")
+	var PELE: Color = PAL["k"]
+	var PELE_S: Color = PAL["s"]
+	var CAB := Color("3a1326")
+	var CAB_R := Color("6a2440")
+	var RIM := Color("bcabe8")   # luar frio -- destaca a silhueta
+
+	# --- tronco+capa: trapezio (ombros ~9 -> orla ~17), orla a cair p/ tras
+	for j in range(14, 33):
+		var f := float(j - 14) / 18.0
+		var meia := lerpf(4.5, 8.5, f)
+		var cx := 15.5 - f * 1.2
+		_rect(int(round(cx - meia)), j, int(round(meia * 2.0)), 1, CAPA)
+	# vinco/dobras da capa (risca escura de cada lado) -- ANTES do painel
+	_linha(11, 17, 10, 31, 1, CAPA_ESC)
+	_linha(20, 17, 22, 31, 1, CAPA_ESC)
+	# painel da tunica: barra vertical clara ao centro (por cima do vinco)
+	for j in range(15, 31):
+		var f := float(j - 15) / 15.0
+		var meia := lerpf(2.5, 3.6, f)
+		_rect(int(round(15.0 - meia)), j, int(round(meia * 2.0)), 1, TUNICA)
+
+	# --- pernas (passada leve), por cima da orla ---
+	_rect(10, 33, 4, 9, CAPA); _rect(9, 41, 5, 2, CAPA_ESC)    # perna tras
+	_rect(17, 33, 5, 10, CAPA); _rect(17, 42, 6, 2, CAPA_ESC)  # perna frente
+	_px(21, 42, CAPA_CLR)
+
+	# --- cabeca com capuz (compacta) ---
+	_elipse(16, 8, 6.5, 7, CAPA)         # capuz
+	_linha(15, 1, 20, 5, 3, CAPA)        # bico do capuz
+	_rect(17, 7, 4, 5, PELE_S)           # abertura da cara (em sombra)
+	_rect(18, 9, 3, 3, PELE)             # face iluminada (bochecha/queixo)
+	_rect(17, 6, 5, 1, CAPA_ESC)         # sombra da aba sobre a testa
+	# olho magenta
+	_px(19, 9, PAL["m"]); _px(20, 9, PAL["m"])
+
+	# --- ombro/gola da capa (fecha o pescoco) ---
+	_rect(11, 12, 10, 3, CAPA)
+	_px(12, 12, CAPA_CLR); _px(19, 12, CAPA_CLR)
+
+	# --- braco da frente + adaga (manga por cima da gola) ---
+	_linha(19, 15, 24, 24, 3, CAPA)
+	_elipse(24, 25, 2.5, 2.5, PELE)      # mao
+
+	# --- rim de luar no bordo da frente/topo (tronco+cabeca; a orla e as
+	#     pernas ficam de fora) ---
+	_rim_frente(RIM, 0, 26)
+
+	# --- rabo-de-cavalo: DEPOIS do rim, p/ ficar limpo ---
+	_linha(11, 6, 7, 12, 4, CAB)
+	_linha(7, 12, 5, 20, 3, CAB)
+	_linha(5, 20, 5, 25, 2, CAB_R)
+	_px(10, 7, CAB_R); _px(8, 11, CAB_R); _px(6, 17, CAB_R)
+
+	# --- lamina: nucleo branco-quente + halo magenta, p/ baixo-frente ---
+	_linha(25, 26, 29, 37, 3, PAL["M"])
+	_linha(25, 26, 29, 37, 1, PAL["w"])
+	_px(24, 24, PAL["M"]); _px(25, 25, PAL["m"])
+	_px(29, 38, PAL["w"])                # faisca na ponta
+
 	_guardar("koliani")
+
+
+## Realca o bordo superior e o bordo direito (frente) da silhueta com `cor`,
+## 1px para dentro, para a leitura "recortada" tipo Dead Cells. `y0..y1`
+## limita as linhas afetadas (evita apanhar o rabo-de-cavalo / a lamina).
+func _rim_frente(cor: Color, y0: int = 0, y1: int = 9999) -> void:
+	for i in _w:
+		for j in _h:
+			if _img.get_pixel(i, j).a > 0.5:
+				if j >= y0 and j <= y1:
+					_img.set_pixel(i, j, cor)
+				break
+	for j in range(maxi(0, y0), mini(_h, y1 + 1)):
+		for i in range(_w - 1, -1, -1):
+			if _img.get_pixel(i, j).a > 0.5:
+				if j > 0 and _img.get_pixel(i, j - 1).a > 0.5:
+					_img.set_pixel(i, j, cor)
+				break
 
 
 func _ghorak() -> void:
