@@ -1,0 +1,95 @@
+[gd_scene load_steps=6 format=3 uid="uid://bkolianichefecarcereiro01"]
+
+; Chefe do mundo 2 -- o Carcereiro. Placeholder: massa larga azul-cinza,
+; grilhetas, um olho frio. Script chefe_carcereiro.gd (herda ChefeBase).
+
+[ext_resource type="Script" path="res://scripts/chefe_carcereiro.gd" id="1_carc"]
+
+[sub_resource type="RectangleShape2D" id="rs_body"]
+size = Vector2(54, 72)
+
+[sub_resource type="RectangleShape2D" id="rs_contacto"]
+size = Vector2(66, 80)
+
+[sub_resource type="Gradient" id="grad_luz"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="tex_luz"]
+gradient = SubResource("grad_luz")
+width = 256
+height = 256
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[node name="ChefeCarcereiro" type="CharacterBody2D" groups=["inimigos"]]
+collision_layer = 4
+collision_mask = 1
+script = ExtResource("1_carc")
+vida = 280
+dano_contacto = 16
+alcance_patrulha = 60.0
+cor_estilhacos = Color(0.4, 0.62, 0.9, 1)
+
+[node name="Sprite" type="Node2D" parent="."]
+
+[node name="Sombra" type="ColorRect" parent="Sprite"]
+show_behind_parent = true
+offset_left = -32.0
+offset_top = -40.0
+offset_right = 32.0
+offset_bottom = 40.0
+color = Color(0.05, 0.08, 0.14, 0.6)
+
+[node name="Corpo" type="ColorRect" parent="Sprite"]
+offset_left = -27.0
+offset_top = -36.0
+offset_right = 27.0
+offset_bottom = 36.0
+color = Color(0.16, 0.2, 0.28, 1)
+
+[node name="Ombro" type="ColorRect" parent="Sprite"]
+offset_left = -27.0
+offset_top = -36.0
+offset_right = 27.0
+offset_bottom = -22.0
+color = Color(0.24, 0.3, 0.4, 1)
+
+[node name="GrilhetaE" type="ColorRect" parent="Sprite"]
+offset_left = -24.0
+offset_top = 6.0
+offset_right = -14.0
+offset_bottom = 34.0
+color = Color(0.32, 0.38, 0.46, 1)
+
+[node name="GrilhetaD" type="ColorRect" parent="Sprite"]
+offset_left = 14.0
+offset_top = 6.0
+offset_right = 24.0
+offset_bottom = 34.0
+color = Color(0.32, 0.38, 0.46, 1)
+
+[node name="Olho" type="ColorRect" parent="Sprite"]
+offset_left = -5.0
+offset_top = -18.0
+offset_right = 7.0
+offset_bottom = -8.0
+color = Color(0.6, 0.85, 1, 1)
+
+[node name="LuzOlhos" type="PointLight2D" parent="Sprite"]
+position = Vector2(1, -12)
+texture = SubResource("tex_luz")
+energy = 1.0
+color = Color(0.45, 0.7, 1, 1)
+scale = Vector2(0.9, 0.75)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("rs_body")
+
+[node name="AreaContacto" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AreaContacto"]
+shape = SubResource("rs_contacto")

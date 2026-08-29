@@ -10,7 +10,7 @@
 [ext_resource type="PackedScene" uid="uid://bkolianicoletavel01" path="res://scenes/actors/Coletavel.tscn" id="3_col"]
 [ext_resource type="Script" path="res://scripts/porta.gd" id="4_porta"]
 [ext_resource type="Script" path="res://scripts/checkpoint.gd" id="5_chk"]
-[ext_resource type="PackedScene" uid="uid://bkolianichefefloresta01" path="res://scenes/actors/ChefeFloresta.tscn" id="6_chefe"]
+[ext_resource type="PackedScene" uid="uid://bkolianichefecarcereiro01" path="res://scenes/actors/ChefeCarcereiro.tscn" id="6_chefe"]
 [ext_resource type="Script" path="res://scripts/nivel_com_chefe.gd" id="7_niv"]
 [ext_resource type="PackedScene" uid="uid://bkolianiatmosfera01" path="res://scenes/fx/Atmosfera.tscn" id="8_atm"]
 
@@ -232,8 +232,7 @@ alcance_patrulha = 130.0
 cor_estilhacos = Color(0.35, 0.6, 0.85, 1)
 
 [node name="Chefe" parent="." instance=ExtResource("6_chefe")]
-position = Vector2(1980, 262)
-cor_estilhacos = Color(0.4, 0.65, 0.9, 1)
+position = Vector2(1980, 258)
 
 [node name="ColDashAereo" parent="." instance=ExtResource("3_col")]
 position = Vector2(1200, 552)
