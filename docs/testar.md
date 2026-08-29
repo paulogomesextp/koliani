@@ -1,5 +1,19 @@
 # Como testar o Koliani (Paulo)
 
+## Atalho no Ambiente de Trabalho
+
+**"Koliani (testar)"** &mdash; duplo-clique abre o jogo **com o código
+atual** (não precisa de reexportar nada). Aponta para `jogar.bat`.
+Se desaparecer, recria com:
+```
+powershell -ExecutionPolicy Bypass -File criar-atalho.ps1
+```
+
+Builds prontos (gerados por `godot --headless --export-release ...`):
+- `build/windows/Koliani.exe` &mdash; jogo autónomo Windows (snapshot; não
+  se atualiza sozinho).
+- `build/web/` &mdash; versão browser (o preview do Claude Code serve-a).
+
 ## Correr o jogo no PC
 
 **Editor (recomendado para desenvolver):**
