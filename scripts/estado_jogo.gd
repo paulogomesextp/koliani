@@ -2,8 +2,8 @@ extends Node
 ## Estado global do jogo (autoload "EstadoJogo").
 ##
 ## Guarda o progresso da Koliani entre niveis e entre sessoes: vidas,
-## mundo/nivel atual, checkpoint ativo, habilidades desbloqueadas e as
-## pistas sobre a mae ja encontradas. Toda a logica aqui e pura o
+## mundo/nivel atual, checkpoint ativo, habilidades desbloqueadas, pistas
+## sobre a mae e que niveis/regioes ja foram concluidos. Toda a logica aqui e pura o
 ## suficiente para ser testada com `godot --headless` (ver tests/).
 ##
 ## Save simples em JSON em `user://progresso.json`. Sem servidor.
@@ -29,6 +29,20 @@ const NIVEIS := [
 # "res://scenes/levels/Level_Test.tscn" fica no repo como sala de treino,
 # fora da campanha (correr a cena diretamente no editor).
 
+## As 6 regioes da campanha-alvo (plano completo em `docs/niveis.md`). Cada
+## regiao agrupa indices de `NIVEIS`; o menu/mapa passa a listar regioes e o
+## seu estado de conclusao. Uma regiao com `niveis` vazio ainda esta por
+## construir -- o agente vai enchendo `NIVEIS` e estes indices a medida que
+## desenha os niveis. A ordem aqui E a ordem das regioes na campanha.
+const REGIOES := [
+	{"id": "floresta", "nome": "Floresta Putrefacta", "niveis": [0]},
+	{"id": "prisao", "nome": "Prisao dos Condenados", "niveis": [1]},
+	{"id": "torres", "nome": "Torres Esquecidas", "niveis": [2]},
+	{"id": "catacumbas", "nome": "Catacumbas do Abismo", "niveis": []},
+	{"id": "cidade", "nome": "Cidade Corrompida", "niveis": []},
+	{"id": "castelo", "nome": "Castelo de Zeriko", "niveis": [3]},
+]
+
 signal vidas_mudaram(vidas: int)
 signal pista_encontrada(id: String, total: int)
 signal habilidade_desbloqueada(id: String)
@@ -40,6 +54,10 @@ var indice_nivel: int = 0
 var checkpoint: Vector2 = Vector2.ZERO
 var habilidades: Array[String] = []
 var pistas: Array[String] = []
+## Indices de `NIVEIS` ja concluidos (Porta atravessada). Sobrevive ao save;
+## `reiniciar_campanha()` limpa. E' o que o mapa de regioes usa para marcar
+## niveis/regioes como feitos.
+var concluidos: Array[int] = []
 ## Campanha a decorrer em modo hardcore (tempo limite por mundo). Fica
 ## gravada no save -- um LOAD GAME retoma no mesmo modo. O menu inicial é
 ## que a liga/desliga; `reiniciar_campanha()` de propósito NÃO lhe mexe
@@ -76,11 +94,52 @@ func tempo_hardcore_nivel() -> float:
 
 
 func avancar_nivel() -> void:
+	marcar_nivel_concluido(indice_nivel)
 	if ha_proximo_nivel():
 		indice_nivel += 1
 		checkpoint = Vector2.ZERO
 		hardcore_tempo_restante = -1.0  # mundo novo = relógio cheio
 		guardar()
+
+
+## --- Regiões / conclusão ---------------------------------------------------
+
+func marcar_nivel_concluido(indice: int) -> void:
+	if indice < 0 or indice >= NIVEIS.size() or indice in concluidos:
+		return
+	concluidos.append(indice)
+	concluidos.sort()
+	guardar()
+
+
+func nivel_esta_concluido(indice: int) -> bool:
+	return indice in concluidos
+
+
+## Região (0..REGIOES.size()-1) a que pertence o nível `indice`, ou -1.
+func regiao_do_nivel(indice: int) -> int:
+	for r in REGIOES.size():
+		if indice in REGIOES[r]["niveis"]:
+			return r
+	return -1
+
+
+## Região do nível que está a ser jogado agora.
+func regiao_atual() -> int:
+	return regiao_do_nivel(indice_nivel)
+
+
+## Uma região está concluída quando tem níveis e todos estão concluídos.
+func regiao_esta_concluida(regiao: int) -> bool:
+	if regiao < 0 or regiao >= REGIOES.size():
+		return false
+	var ns: Array = REGIOES[regiao]["niveis"]
+	if ns.is_empty():
+		return false
+	for i in ns:
+		if i not in concluidos:
+			return false
+	return true
 
 
 ## --- Vidas / morte ------------------------------------------------------
@@ -109,6 +168,7 @@ func reiniciar_campanha() -> void:
 	checkpoint = Vector2.ZERO
 	habilidades.clear()
 	pistas.clear()
+	concluidos.clear()
 	hardcore_tempo_restante = -1.0  # NB: `hardcore` (o modo) fica como está
 	vidas_mudaram.emit(vidas)
 	guardar()
@@ -152,6 +212,7 @@ func para_dicionario() -> Dictionary:
 		"checkpoint": [checkpoint.x, checkpoint.y],
 		"habilidades": habilidades,
 		"pistas": pistas,
+		"concluidos": concluidos,
 		"hardcore": hardcore,
 		"hardcore_tempo_restante": hardcore_tempo_restante,
 	}
@@ -164,6 +225,11 @@ func de_dicionario(d: Dictionary) -> void:
 	checkpoint = Vector2(c[0], c[1]) if c.size() == 2 else Vector2.ZERO
 	habilidades.assign(d.get("habilidades", []))
 	pistas.assign(d.get("pistas", []))
+	# JSON traz os índices como float -> converter para int
+	var cs: Array = d.get("concluidos", [])
+	concluidos.clear()
+	for ci in cs:
+		concluidos.append(int(ci))
 	hardcore = bool(d.get("hardcore", false))
 	hardcore_tempo_restante = float(d.get("hardcore_tempo_restante", -1.0))
 

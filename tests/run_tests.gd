@@ -43,6 +43,7 @@ func _correr_tudo() -> void:
 	teste_estado_save_ida_e_volta()
 	teste_estado_ha_progresso()
 	teste_estado_hardcore()
+	teste_estado_regioes_e_conclusao()
 
 	if _falhas.is_empty():
 		print("OK -- todos os testes passaram")
@@ -295,11 +296,14 @@ func teste_estado_save_ida_e_volta() -> void:
 	e.perder_vida()
 	e.registar_pista("pista_x")
 	e.desbloquear_habilidade("dash_aereo")
+	e.marcar_nivel_concluido(0)
 	var copia := _novo_estado()
 	copia.de_dicionario(e.para_dicionario())
 	_ok(copia.vidas == e.vidas, "vidas deviam sobreviver ao ida-e-volta do dicionario")
 	_ok(copia.pistas == e.pistas, "pistas deviam sobreviver ao ida-e-volta do dicionario")
 	_ok(copia.habilidades == e.habilidades, "habilidades deviam sobreviver ao ida-e-volta")
+	_ok(copia.concluidos == e.concluidos, "niveis concluidos deviam sobreviver ao ida-e-volta")
+	_ok(copia.nivel_esta_concluido(0), "o nivel 0 concluido devia continuar concluido apos o save")
 	e.free()
 	copia.free()
 
@@ -352,3 +356,41 @@ func teste_estado_hardcore() -> void:
 		"índice fora dos limites cai no tempo do último mundo")
 	e.free()
 	copia.free()
+
+
+## Regiões: cada nível da campanha pertence a uma região; concluir todos os
+## níveis de uma região marca-a como concluída; `reiniciar_campanha()` limpa
+## e `avancar_nivel()` vai marcando o nível de onde se sai.
+func teste_estado_regioes_e_conclusao() -> void:
+	var e := _novo_estado()
+	_ok(e.REGIOES.size() == 6, "a campanha-alvo tem 6 regiões (docs/niveis.md)")
+	# todo o nível de NIVEIS tem de estar nalguma região
+	for i in e.NIVEIS.size():
+		_ok(e.regiao_do_nivel(i) >= 0, "o nível %d devia pertencer a uma região" % i)
+
+	_ok(not e.nivel_esta_concluido(0), "arranque limpo: nada concluído")
+	_ok(not e.regiao_esta_concluida(0), "arranque limpo: nenhuma região concluída")
+
+	var r0: int = e.regiao_do_nivel(0)
+	e.marcar_nivel_concluido(0)
+	e.marcar_nivel_concluido(0)  # idempotente
+	_ok(e.concluidos.size() == 1, "marcar o mesmo nível duas vezes não duplica")
+	_ok(e.nivel_esta_concluido(0), "o nível 0 ficou concluído")
+	_ok(e.regiao_esta_concluida(r0), "a região do nível 0 (só tem esse nível) ficou concluída")
+
+	# uma região sem níveis definidos nunca conta como concluída
+	var vazia := -1
+	for r in e.REGIOES.size():
+		if (e.REGIOES[r]["niveis"] as Array).is_empty():
+			vazia = r
+			break
+	_ok(vazia >= 0, "há pelo menos uma região ainda por construir")
+	_ok(not e.regiao_esta_concluida(vazia), "região sem níveis não está concluída")
+
+	# avancar_nivel marca o nível de partida
+	e.reiniciar_campanha()
+	_ok(e.concluidos.is_empty(), "reiniciar_campanha limpa os níveis concluídos")
+	e.avancar_nivel()
+	_ok(e.nivel_esta_concluido(0), "avancar_nivel marca o nível de onde se sai")
+	_ok(e.indice_nivel == 1, "avancar_nivel avançou para o nível 1")
+	e.free()

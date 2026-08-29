@@ -23,4 +23,5 @@ func _ao_entrar(corpo: Node) -> void:
 		EstadoJogo.avancar_nivel()
 		get_tree().change_scene_to_file("res://scenes/Main.tscn")
 	else:
+		EstadoJogo.marcar_nivel_concluido(EstadoJogo.indice_nivel)
 		fim_da_campanha.emit()
