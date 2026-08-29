@@ -1,154 +1,237 @@
-[gd_scene load_steps=6 format=3 uid="uid://bkolianiatmosfera01"]
+[gd_scene load_steps=9 format=3 uid="uid://bkolianiatmosfera01"]
 
-; Montagem de ambiente reutilizavel (ver scripts/atmosfera.gd). Instanciar
-; em cada mundo e afinar as cores pelos @export do no raiz.
+; Montagem de ambiente reutilizavel (ver scripts/atmosfera.gd): modulate +
+; parallax de 4 camadas + feixes de luz + poeira que segue a camara +
+; vinheta + passe de ecra (contraste/saturacao/bloom). Recolorir por
+; mundo pelos @export do no raiz.
 
 [ext_resource type="Script" path="res://scripts/atmosfera.gd" id="1_atm"]
+[ext_resource type="Shader" path="res://assets/shaders/grade.gdshader" id="2_grade"]
 
-[sub_resource type="Gradient" id="Gradient_luz"]
-offsets = PackedFloat32Array(0, 1)
-colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+[sub_resource type="Gradient" id="grad_vinheta"]
+offsets = PackedFloat32Array(0.6, 1)
+colors = PackedColorArray(0, 0, 0, 0, 0.015, 0.015, 0.02, 0.5)
 
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_luz"]
-gradient = SubResource("Gradient_luz")
-width = 256
-height = 256
-fill = 1
-fill_from = Vector2(0.5, 0.5)
-fill_to = Vector2(1, 0.5)
-
-[sub_resource type="Gradient" id="Gradient_vinheta"]
-offsets = PackedFloat32Array(0.62, 1)
-colors = PackedColorArray(0, 0, 0, 0, 0.02, 0.02, 0.03, 0.42)
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_vinheta"]
-gradient = SubResource("Gradient_vinheta")
+[sub_resource type="GradientTexture2D" id="tex_vinheta"]
+gradient = SubResource("grad_vinheta")
 width = 512
 height = 512
 fill = 1
 fill_from = Vector2(0.5, 0.5)
 fill_to = Vector2(1, 0.5)
 
+[sub_resource type="CanvasItemMaterial" id="mat_add"]
+blend_mode = 1
+
+[sub_resource type="ShaderMaterial" id="mat_grade"]
+shader = ExtResource("2_grade")
+shader_parameter/contraste = 1.06
+shader_parameter/saturacao = 1.13
+shader_parameter/bloom = 0.3
+shader_parameter/bloom_limiar = 0.64
+
 [node name="Atmosfera" type="Node2D"]
 script = ExtResource("1_atm")
 
 [node name="Modulacao" type="CanvasModulate" parent="."]
-color = Color(0.45, 0.45, 0.5, 1)
+color = Color(0.6, 0.6, 0.66, 1)
 
 [node name="Parallax" type="ParallaxBackground" parent="."]
 
-[node name="Longe" type="ParallaxLayer" parent="Parallax"]
-motion_scale = Vector2(0.15, 0.15)
+[node name="Fundo" type="ParallaxLayer" parent="Parallax"]
+motion_scale = Vector2(0.08, 0.06)
 
-[node name="Fundo" type="ColorRect" parent="Parallax/Longe"]
-offset_left = -800.0
-offset_top = -400.0
-offset_right = 2800.0
-offset_bottom = 1000.0
+[node name="Fundo" type="ColorRect" parent="Parallax/Fundo"]
+offset_left = -1000.0
+offset_top = -500.0
+offset_right = 3200.0
+offset_bottom = 1100.0
 color = Color(0.05, 0.06, 0.09, 1)
 
-[node name="S1" type="ColorRect" parent="Parallax/Longe"]
-offset_left = 100.0
-offset_top = 160.0
-offset_right = 180.0
-offset_bottom = 760.0
-color = Color(0.07, 0.08, 0.12, 1)
+[node name="F1" type="ColorRect" parent="Parallax/Fundo"]
+offset_left = -200.0
+offset_top = 300.0
+offset_right = 500.0
+offset_bottom = 900.0
+color = Color(0.06, 0.07, 0.1, 1)
 
-[node name="S2" type="ColorRect" parent="Parallax/Longe"]
-offset_left = 560.0
-offset_top = 230.0
-offset_right = 625.0
-offset_bottom = 760.0
-color = Color(0.07, 0.08, 0.12, 1)
+[node name="F2" type="ColorRect" parent="Parallax/Fundo"]
+offset_left = 900.0
+offset_top = 260.0
+offset_right = 1700.0
+offset_bottom = 900.0
+color = Color(0.06, 0.07, 0.1, 1)
 
-[node name="S3" type="ColorRect" parent="Parallax/Longe"]
-offset_left = 1040.0
-offset_top = 140.0
-offset_right = 1120.0
-offset_bottom = 760.0
-color = Color(0.07, 0.08, 0.12, 1)
+[node name="F3" type="ColorRect" parent="Parallax/Fundo"]
+offset_left = 2100.0
+offset_top = 320.0
+offset_right = 2900.0
+offset_bottom = 900.0
+color = Color(0.06, 0.07, 0.1, 1)
 
-[node name="S4" type="ColorRect" parent="Parallax/Longe"]
-offset_left = 1560.0
+[node name="Longe" type="ParallaxLayer" parent="Parallax"]
+motion_scale = Vector2(0.2, 0.16)
+
+[node name="L1" type="ColorRect" parent="Parallax/Longe"]
+offset_left = 60.0
+offset_top = 150.0
+offset_right = 150.0
+offset_bottom = 800.0
+color = Color(0.08, 0.1, 0.15, 1)
+
+[node name="L2" type="ColorRect" parent="Parallax/Longe"]
+offset_left = 470.0
+offset_top = 220.0
+offset_right = 545.0
+offset_bottom = 800.0
+color = Color(0.08, 0.1, 0.15, 1)
+
+[node name="L3" type="ColorRect" parent="Parallax/Longe"]
+offset_left = 950.0
+offset_top = 120.0
+offset_right = 1050.0
+offset_bottom = 800.0
+color = Color(0.08, 0.1, 0.15, 1)
+
+[node name="L4" type="ColorRect" parent="Parallax/Longe"]
+offset_left = 1480.0
 offset_top = 200.0
-offset_right = 1630.0
-offset_bottom = 760.0
-color = Color(0.07, 0.08, 0.12, 1)
+offset_right = 1560.0
+offset_bottom = 800.0
+color = Color(0.08, 0.1, 0.15, 1)
 
-[node name="S5" type="ColorRect" parent="Parallax/Longe"]
-offset_left = 2080.0
-offset_top = 175.0
-offset_right = 2155.0
-offset_bottom = 760.0
-color = Color(0.07, 0.08, 0.12, 1)
+[node name="L5" type="ColorRect" parent="Parallax/Longe"]
+offset_left = 2000.0
+offset_top = 165.0
+offset_right = 2090.0
+offset_bottom = 800.0
+color = Color(0.08, 0.1, 0.15, 1)
 
 [node name="Meio" type="ParallaxLayer" parent="Parallax"]
-motion_scale = Vector2(0.45, 0.55)
+motion_scale = Vector2(0.45, 0.4)
 
 [node name="Bruma" type="ColorRect" parent="Parallax/Meio"]
 offset_left = -600.0
 offset_top = 360.0
-offset_right = 2800.0
-offset_bottom = 780.0
-color = Color(0.09, 0.11, 0.16, 0.5)
+offset_right = 3000.0
+offset_bottom = 820.0
+color = Color(0.1, 0.12, 0.17, 0.5)
 
 [node name="M1" type="ColorRect" parent="Parallax/Meio"]
-offset_left = 40.0
+offset_left = 20.0
 offset_top = 300.0
-offset_right = 110.0
-offset_bottom = 760.0
-color = Color(0.09, 0.11, 0.16, 1)
+offset_right = 92.0
+offset_bottom = 800.0
+color = Color(0.1, 0.12, 0.17, 1)
 
 [node name="M2" type="ColorRect" parent="Parallax/Meio"]
-offset_left = 380.0
+offset_left = 360.0
 offset_top = 350.0
-offset_right = 435.0
-offset_bottom = 760.0
-color = Color(0.09, 0.11, 0.16, 1)
+offset_right = 420.0
+offset_bottom = 800.0
+color = Color(0.1, 0.12, 0.17, 1)
 
 [node name="M3" type="ColorRect" parent="Parallax/Meio"]
-offset_left = 760.0
-offset_top = 270.0
-offset_right = 835.0
-offset_bottom = 760.0
-color = Color(0.09, 0.11, 0.16, 1)
+offset_left = 740.0
+offset_top = 260.0
+offset_right = 820.0
+offset_bottom = 800.0
+color = Color(0.1, 0.12, 0.17, 1)
 
 [node name="M4" type="ColorRect" parent="Parallax/Meio"]
-offset_left = 1180.0
+offset_left = 1160.0
 offset_top = 330.0
-offset_right = 1240.0
-offset_bottom = 760.0
-color = Color(0.09, 0.11, 0.16, 1)
+offset_right = 1226.0
+offset_bottom = 800.0
+color = Color(0.1, 0.12, 0.17, 1)
 
 [node name="M5" type="ColorRect" parent="Parallax/Meio"]
-offset_left = 1600.0
+offset_left = 1580.0
 offset_top = 290.0
-offset_right = 1670.0
-offset_bottom = 760.0
-color = Color(0.09, 0.11, 0.16, 1)
+offset_right = 1652.0
+offset_bottom = 800.0
+color = Color(0.1, 0.12, 0.17, 1)
 
 [node name="M6" type="ColorRect" parent="Parallax/Meio"]
-offset_left = 2040.0
+offset_left = 2020.0
 offset_top = 340.0
-offset_right = 2100.0
-offset_bottom = 760.0
-color = Color(0.09, 0.11, 0.16, 1)
+offset_right = 2090.0
+offset_bottom = 800.0
+color = Color(0.1, 0.12, 0.17, 1)
 
-[node name="Luzes" type="Node2D" parent="."]
+[node name="Perto" type="ParallaxLayer" parent="Parallax"]
+motion_scale = Vector2(0.85, 0.8)
 
-[node name="Luz1" type="PointLight2D" parent="Luzes"]
-position = Vector2(300, 620)
-texture = SubResource("GradientTexture2D_luz")
-energy = 0.6
-color = Color(0.4, 0.55, 0.9, 1)
-scale = Vector2(1.6, 1.1)
+[node name="P1" type="ColorRect" parent="Parallax/Perto"]
+modulate = Color(1, 1, 1, 0.55)
+offset_left = -120.0
+offset_top = 420.0
+offset_right = 90.0
+offset_bottom = 820.0
+color = Color(0.04, 0.05, 0.08, 1)
 
-[node name="Luz2" type="PointLight2D" parent="Luzes"]
-position = Vector2(1400, 620)
-texture = SubResource("GradientTexture2D_luz")
-energy = 0.55
-color = Color(0.4, 0.55, 0.9, 1)
-scale = Vector2(1.5, 1.1)
+[node name="P2" type="ColorRect" parent="Parallax/Perto"]
+modulate = Color(1, 1, 1, 0.5)
+offset_left = 1120.0
+offset_top = 470.0
+offset_right = 1330.0
+offset_bottom = 820.0
+color = Color(0.04, 0.05, 0.08, 1)
+
+[node name="Raios" type="Node2D" parent="."]
+
+[node name="R1" type="Polygon2D" parent="Raios"]
+material = SubResource("mat_add")
+position = Vector2(180, -60)
+color = Color(0.6, 0.7, 0.95, 0.05)
+polygon = PackedVector2Array(0, 0, 70, 0, 250, 640, 170, 640)
+
+[node name="R2" type="Polygon2D" parent="Raios"]
+material = SubResource("mat_add")
+position = Vector2(620, -60)
+color = Color(0.6, 0.7, 0.95, 0.045)
+polygon = PackedVector2Array(0, 0, 90, 0, 300, 640, 190, 640)
+
+[node name="R3" type="Polygon2D" parent="Raios"]
+material = SubResource("mat_add")
+position = Vector2(1120, -60)
+color = Color(0.6, 0.7, 0.95, 0.05)
+polygon = PackedVector2Array(0, 0, 70, 0, 240, 640, 160, 640)
+
+[node name="R4" type="Polygon2D" parent="Raios"]
+material = SubResource("mat_add")
+position = Vector2(1640, -60)
+color = Color(0.6, 0.7, 0.95, 0.04)
+polygon = PackedVector2Array(0, 0, 80, 0, 260, 640, 170, 640)
+
+[node name="Poeira" type="CPUParticles2D" parent="."]
+amount = 46
+lifetime = 7.0
+local_coords = false
+preprocess = 4.0
+lifetime_randomness = 0.5
+emission_shape = 3
+emission_rect_extents = Vector2(760, 400)
+direction = Vector2(0.4, -1)
+spread = 35.0
+gravity = Vector2(3, -5)
+initial_velocity_min = 2.0
+initial_velocity_max = 12.0
+angular_velocity_min = -25.0
+angular_velocity_max = 25.0
+scale_amount_min = 1.0
+scale_amount_max = 2.6
+color = Color(0.8, 0.9, 1, 0.5)
+
+[node name="Grade" type="CanvasLayer" parent="."]
+layer = 8
+
+[node name="Passe" type="ColorRect" parent="Grade"]
+material = SubResource("mat_grade")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
 
 [node name="Vinheta" type="CanvasLayer" parent="."]
 layer = 10
@@ -159,6 +242,6 @@ anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 2
-texture = SubResource("GradientTexture2D_vinheta")
+texture = SubResource("tex_vinheta")
 expand_mode = 1
 stretch_mode = 6

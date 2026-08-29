@@ -14,6 +14,7 @@
 [ext_resource type="Script" path="res://scripts/checkpoint.gd" id="5_chk"]
 [ext_resource type="PackedScene" uid="uid://bkolianichefefloresta01" path="res://scenes/actors/ChefeFloresta.tscn" id="6_chefe"]
 [ext_resource type="Script" path="res://scripts/nivel_com_chefe.gd" id="7_niv"]
+[ext_resource type="PackedScene" uid="uid://bkolianiatmosfera01" path="res://scenes/fx/Atmosfera.tscn" id="8_atm"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_chaoa"]
 size = Vector2(960, 48)
@@ -42,122 +43,16 @@ fill = 1
 fill_from = Vector2(0.5, 0.5)
 fill_to = Vector2(1, 0.5)
 
-[sub_resource type="Gradient" id="Gradient_vinheta"]
-offsets = PackedFloat32Array(0.62, 1)
-colors = PackedColorArray(0, 0, 0, 0, 0.02, 0.03, 0.018, 0.42)
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_vinheta"]
-gradient = SubResource("Gradient_vinheta")
-width = 512
-height = 512
-fill = 1
-fill_from = Vector2(0.5, 0.5)
-fill_to = Vector2(1, 0.5)
-
 [node name="Floresta_Putrefata" type="Node2D"]
 script = ExtResource("7_niv")
 
-[node name="Ambiente" type="CanvasModulate" parent="."]
-color = Color(0.64, 0.72, 0.6, 1)
-
-[node name="Parallax" type="ParallaxBackground" parent="."]
-
-[node name="Longe" type="ParallaxLayer" parent="Parallax"]
-motion_scale = Vector2(0.15, 0.15)
-
-[node name="Ceu" type="ColorRect" parent="Parallax/Longe"]
-offset_left = -600.0
-offset_top = -300.0
-offset_right = 2600.0
-offset_bottom = 900.0
-color = Color(0.043, 0.075, 0.043, 1)
-
-[node name="Arv1" type="ColorRect" parent="Parallax/Longe"]
-offset_left = 120.0
-offset_top = 180.0
-offset_right = 190.0
-offset_bottom = 720.0
-color = Color(0.055, 0.09, 0.05, 1)
-
-[node name="Arv2" type="ColorRect" parent="Parallax/Longe"]
-offset_left = 520.0
-offset_top = 250.0
-offset_right = 575.0
-offset_bottom = 720.0
-color = Color(0.05, 0.082, 0.046, 1)
-
-[node name="Arv3" type="ColorRect" parent="Parallax/Longe"]
-offset_left = 980.0
-offset_top = 150.0
-offset_right = 1055.0
-offset_bottom = 720.0
-color = Color(0.058, 0.095, 0.052, 1)
-
-[node name="Arv4" type="ColorRect" parent="Parallax/Longe"]
-offset_left = 1480.0
-offset_top = 220.0
-offset_right = 1545.0
-offset_bottom = 720.0
-color = Color(0.05, 0.082, 0.046, 1)
-
-[node name="Arv5" type="ColorRect" parent="Parallax/Longe"]
-offset_left = 1980.0
-offset_top = 190.0
-offset_right = 2050.0
-offset_bottom = 720.0
-color = Color(0.055, 0.09, 0.05, 1)
-
-[node name="Meio" type="ParallaxLayer" parent="Parallax"]
-motion_scale = Vector2(0.45, 0.55)
-
-[node name="Bruma" type="ColorRect" parent="Parallax/Meio"]
-offset_left = -400.0
-offset_top = 380.0
-offset_right = 2400.0
-offset_bottom = 760.0
-color = Color(0.09, 0.16, 0.09, 0.5)
-
-[node name="Tronco1" type="ColorRect" parent="Parallax/Meio"]
-offset_left = 60.0
-offset_top = 300.0
-offset_right = 118.0
-offset_bottom = 720.0
-color = Color(0.078, 0.13, 0.07, 1)
-
-[node name="Tronco2" type="ColorRect" parent="Parallax/Meio"]
-offset_left = 360.0
-offset_top = 360.0
-offset_right = 405.0
-offset_bottom = 720.0
-color = Color(0.07, 0.12, 0.065, 1)
-
-[node name="Tronco3" type="ColorRect" parent="Parallax/Meio"]
-offset_left = 720.0
-offset_top = 260.0
-offset_right = 790.0
-offset_bottom = 720.0
-color = Color(0.085, 0.14, 0.075, 1)
-
-[node name="Tronco4" type="ColorRect" parent="Parallax/Meio"]
-offset_left = 1120.0
-offset_top = 330.0
-offset_right = 1175.0
-offset_bottom = 720.0
-color = Color(0.07, 0.12, 0.065, 1)
-
-[node name="Tronco5" type="ColorRect" parent="Parallax/Meio"]
-offset_left = 1520.0
-offset_top = 290.0
-offset_right = 1585.0
-offset_bottom = 720.0
-color = Color(0.08, 0.135, 0.072, 1)
-
-[node name="Tronco6" type="ColorRect" parent="Parallax/Meio"]
-offset_left = 1900.0
-offset_top = 350.0
-offset_right = 1955.0
-offset_bottom = 720.0
-color = Color(0.072, 0.122, 0.066, 1)
+[node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
+cor_ambiente = Color(0.64, 0.72, 0.6, 1)
+cor_fundo = Color(0.05, 0.075, 0.045, 1)
+cor_silhueta = Color(0.1, 0.15, 0.08, 1)
+cor_luz = Color(0.5, 0.8, 0.4, 1)
+cor_poeira = Color(0.7, 0.9, 0.55, 1)
+densidade_poeira = 1.2
 
 [node name="ChaoA" type="StaticBody2D" parent="."]
 position = Vector2(430, 660)
@@ -291,22 +186,6 @@ color = Color(0.42, 0.64, 0.29, 1)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Plat4"]
 shape = SubResource("RectangleShape2D_platp")
 
-[node name="Fog1" type="ColorRect" parent="."]
-z_index = 5
-offset_left = -100.0
-offset_top = 430.0
-offset_right = 900.0
-offset_bottom = 700.0
-color = Color(0.5, 0.72, 0.45, 0.05)
-
-[node name="Fog2" type="ColorRect" parent="."]
-z_index = 5
-offset_left = 800.0
-offset_top = 360.0
-offset_right = 1800.0
-offset_bottom = 700.0
-color = Color(0.5, 0.72, 0.45, 0.05)
-
 [node name="LuzPantano1" type="PointLight2D" parent="."]
 position = Vector2(250, 630)
 texture = SubResource("GradientTexture2D_luz")
@@ -378,15 +257,3 @@ shape = SubResource("RectangleShape2D_chk")
 position = Vector2(1650, 586)
 pista_ao_atravessar = "floresta_sinal_da_porta"
 
-[node name="Vinheta" type="CanvasLayer" parent="."]
-layer = 10
-
-[node name="Tex" type="TextureRect" parent="Vinheta"]
-texture_repeat = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-mouse_filter = 2
-texture = SubResource("GradientTexture2D_vinheta")
-expand_mode = 1
-stretch_mode = 6
