@@ -26,12 +26,15 @@ const CENA_OPCOES := preload("res://scenes/ui/Opcoes.tscn")
 @onready var _opcoes: Button = $Centro/Opcoes
 @onready var _aviso: Label = $Centro/Aviso
 @onready var _sair: Button = $Centro/Sair
+@onready var _versao: Label = $Versao
 
 # "" (nada), "novo" ou "hardcore" -- qual o botão à espera de confirmação
 var _armado := ""
 
 
 func _ready() -> void:
+	_versao.text = "v" + str(ProjectSettings.get_setting("application/config/version", "0.0.0"))
+
 	if _tratar_atalhos_dev():
 		return
 

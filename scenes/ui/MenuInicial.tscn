@@ -183,3 +183,24 @@ theme_override_styles/hover = SubResource("sb_botao_hover")
 theme_override_styles/focus = SubResource("sb_botao_hover")
 theme_override_styles/pressed = SubResource("sb_botao_hover")
 text = "QUIT"
+
+[node name="Versao" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -200.0
+offset_top = -32.0
+offset_right = -12.0
+offset_bottom = -10.0
+grow_horizontal = 0
+grow_vertical = 0
+mouse_filter = 2
+text = "v0.0.0"
+horizontal_alignment = 2
+theme_override_colors/font_color = Color(0.62, 0.56, 0.72, 0.55)
+theme_override_colors/font_outline_color = Color(0.02, 0.01, 0.03, 0.9)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 13

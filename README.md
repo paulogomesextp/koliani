@@ -131,11 +131,35 @@ assets/                -- branding/, fonts/, tiles/ -- SO CC0/gratis (ou nosso)
 2. **web** -- export "Web" -> artifact `koliani-web`
 3. **android** -- gera keystore de debug + export "Android" -> artifact
    `koliani-android`
+4. **windows** -- export "Windows Desktop" (release) -> artifact
+   `koliani-windows` **e** publica `Koliani-windows.zip` no Release
+   **`win-latest`** (tag rolante, marcado como *latest*).
 
 Assim há sempre um APK para instalar no telemóvel sem o PC ligado (mesma
 ideia do deploy do jogo do jardim). A **primeira execução** pode precisar
 de afinação (versão exata da imagem `godot-ci`, nome do preset, Android
 SDK) -- ajustar pelo log do Actions.
+
+### Playtester (build Windows para um amigo testar)
+
+O amigo não precisa de conta no GitHub (repo público). Link fixo, sempre
+com a versão mais recente:
+
+- Página: <https://github.com/paulogomesextp/koliani/releases/tag/win-latest>
+- Download directo:
+  <https://github.com/paulogomesextp/koliani/releases/download/win-latest/Koliani-windows.zip>
+
+**Ciclo:** `git push` para `master` -> o CI corre os testes, exporta o
+`.exe` e actualiza o `win-latest`. O amigo volta ao mesmo link, descarrega,
+extrai e corre `Koliani.exe` (SmartScreen: *Mais informações* -> *Executar
+mesmo assim*; é um `.exe` não assinado).
+
+**Versão:** o número no canto do menu (`config/version` em `project.godot`,
+lido em `scripts/menu_inicial.gd`) identifica a build -- bumpar a cada
+entrega para o feedback ser rastreável.
+
+**Save do amigo:** `%APPDATA%\Godot\app_userdata\Koliani\progresso.json`
+(apagar = recomeçar; o F9 de dev não existe na build release).
 
 ## Setup ainda por fazer (fora do repositório)
 

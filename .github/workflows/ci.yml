@@ -1,9 +1,13 @@
 name: CI
 
-# Corre os testes headless e produz os builds (Web + APK Android) como
-# artifacts em cada push. Assim ha sempre um APK para o Paulo instalar no
-# telemovel sem depender do PC dele estar ligado (mesma filosofia do deploy
-# do jogo do jardim).
+# Corre os testes headless e produz os builds (Web + APK Android + Windows)
+# como artifacts em cada push. Assim ha sempre um APK para o Paulo instalar no
+# telemovel e um .exe para o playtester, sem depender do PC do Paulo estar
+# ligado (mesma filosofia do deploy do jogo do jardim).
+#
+# O build Windows e ainda publicado no Release "win-latest" (tag rolante):
+# assim o playtester tem sempre um link fixo com a versao mais recente --
+# https://github.com/paulogomesextp/koliani/releases/tag/win-latest
 #
 # NOTA: a primeira execucao real pode precisar de afinacao (versao exata da
 # imagem godot-ci, nome do preset, sdk Android). Ajustar aqui conforme os
@@ -14,6 +18,10 @@ on:
     branches: [main, master]
   pull_request:
   workflow_dispatch:
+
+# Necessario para o job "windows" criar/atualizar o Release "win-latest".
+permissions:
+  contents: write
 
 env:
   GODOT_CI_IMAGE: barichello/godot-ci:4.7.2
@@ -86,3 +94,48 @@ jobs:
         with:
           name: koliani-android
           path: build/android/koliani.apk
+
+  windows:
+    name: Build Windows (release)
+    runs-on: ubuntu-latest
+    needs: testes
+    container:
+      image: barichello/godot-ci:4.7.2
+    steps:
+      - uses: actions/checkout@v4
+      - name: Instalar templates de export
+        run: |
+          mkdir -p ~/.local/share/godot/export_templates/
+          cp -r /root/.local/share/godot/export_templates/* ~/.local/share/godot/export_templates/ || true
+      - name: Importar recursos
+        run: godot --headless --import || true
+      - name: Export Windows
+        run: |
+          mkdir -p build/windows
+          godot --headless --export-release "Windows Desktop" build/windows/Koliani.exe
+      - name: Empacotar zip
+        run: |
+          cd build/windows
+          zip -r ../../Koliani-windows.zip .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: koliani-windows
+          path: Koliani-windows.zip
+      - name: Publicar no Release "win-latest"
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: win-latest
+          name: Koliani -- build Windows mais recente
+          make_latest: true
+          files: Koliani-windows.zip
+          body: |
+            Build automatica do commit `${{ github.sha }}` (run #${{ github.run_number }}).
+
+            **Como jogar:** descarrega `Koliani-windows.zip`, extrai a pasta toda
+            e corre `Koliani.exe`. O Windows SmartScreen vai avisar ("editor
+            desconhecido") -> *Mais informacoes* -> *Executar mesmo assim*.
+
+            O progresso fica guardado em
+            `%APPDATA%\Godot\app_userdata\Koliani\progresso.json` -- apagar esse
+            ficheiro recomeca o jogo do zero.
