@@ -28,6 +28,16 @@ const PISTAS := {
 		"titulo": "Correntes que ainda oscilam",
 		"texto": "As correntes de uma cela alta ainda balançam. Quem passou por aqui, passou agora mesmo -- e à força.",
 	},
+	"torres_lanterna_de_zeriko": {
+		"mundo": "Torres Esquecidas",
+		"titulo": "A lanterna ao longe",
+		"texto": "Entre duas torres partidas, muito ao fundo, uma luz que não é estrela: a lanterna-jaula de Zeriko. Lá dentro, uma silhueta.",
+	},
+	"torres_sussurro_da_mae": {
+		"mundo": "Torres Esquecidas",
+		"titulo": "Um sussurro no vento",
+		"texto": "Atrás da parede rachada, gravado à pressa: \"Ele guarda-me para o fim, Kol. Chega antes disso.\"",
+	},
 }
 
 

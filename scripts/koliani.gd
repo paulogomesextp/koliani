@@ -18,6 +18,8 @@ const DUR_ROLAR := 0.30
 const RECARGA_ROLAR := 0.45
 const DUR_ATAQUE := 0.18
 const I_FRAMES := 0.6
+## Abaixo deste Y considera-se que caiu no vazio (fosso sem fundo).
+const Y_MORTE := 1200.0
 
 @onready var _hitbox: Area2D = $HitboxAtaque
 @onready var _sprite: Node2D = $Sprite
@@ -107,6 +109,10 @@ func _physics_process(dt: float) -> void:
 			_po.restart()
 		_abanar(remap(minf(vel_queda, 1100.0), 180.0, 1100.0, 1.0, 4.5))
 	_estava_no_chao = no_chao
+
+	# caiu num fosso sem fundo -> conta como morte (reaparece no checkpoint)
+	if global_position.y > Y_MORTE and vida > 0:
+		receber_dano(vida)
 
 
 func _abanar(forca: float) -> void:

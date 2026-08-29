@@ -64,6 +64,16 @@ principal, antes do fosso). É o gate do segredo e do resto da campanha.
 Habilidade ganha no mundo 2: **`dash_aereo`** (`Coletavel` no caminho
 principal, em `ChaoMeio`). Permite fazer dash no ar.
 
+### Mundo 3 -- pistas e habilidade (`Torres_Esquecidas.tscn`)
+
+| id da pista | tipo | onde | texto (rascunho) |
+|-------------|------|------|------------------|
+| `torres_lanterna_de_zeriko` | obrigatória (na `Porta`) | atravessar para o mundo 4 | vê-se a lanterna-jaula de Zeriko ao longe, com uma silhueta |
+| `torres_sussurro_da_mae` | segredo (`Coletavel`) | atrás de uma `ParedeFragil`, no topo da torre C | "Ele guarda-me para o fim, Kol. Chega antes disso." |
+
+Habilidade ganha no mundo 3: **`partir_paredes`** (`Coletavel` no caminho
+principal, em `TorreB`). Golpe + esta habilidade parte uma `ParedeFragil`.
+
 ## Estrutura de pista
 
 Cada mundo tem **1 pista** obrigatória (avança a história) e pode ter

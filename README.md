@@ -50,7 +50,8 @@ scripts/
   movimento.gd         -- LOGICA PURA do movimento (coyote, jump buffer, corte de salto, salto duplo); testavel
   koliani.gd           -- CharacterBody2D: liga movimento.gd + dash + ataque + dano + morte + salto duplo
   demonio_base.gd      -- inimigo base (patrulha + dano por contacto); classe-pai dos demonios
-  chefe_floresta.gd    -- chefe do mundo 1: FSM patrulha/telegrafo/investida/recupera; sinal "derrotado"
+  chefe_floresta.gd    -- chefe: FSM patrulha/telegrafo/investida/recupera; sinal "derrotado" (usado nos 3 mundos)
+  parede_fragil.gd     -- StaticBody2D: parte-se a golpe se a Koliani tiver "partir_paredes"
   nivel_com_chefe.gd   -- script do no raiz de um mundo: sela a porta ate o no "Chefe" cair
   atmosfera.gd         -- montagem de ambiente reutilizavel (CanvasModulate + parallax + vinheta + luzes), cores por @export
   coletavel.gd         -- Area2D: apanhar => regista pista / desbloqueia habilidade; nao reaparece
@@ -66,12 +67,16 @@ scripts/
 
 scenes/
   Main.tscn                        -- main_scene (ver project.godot)
-  levels/Floresta_Putrefata.tscn   -- MUNDO 1: parallax + luz tipo Dead Cells, fosso c/ salto duplo, coletaveis, demonios, chefe, checkpoint, porta selada
+  levels/Floresta_Putrefata.tscn   -- MUNDO 1: verde-podre, fosso c/ salto duplo, da salto_duplo
+  levels/Prisao_dos_Condenados.tscn-- MUNDO 2: azul-frio, subida longa, da dash_aereo
+  levels/Torres_Esquecidas.tscn    -- MUNDO 3: roxo, saltos sobre o vazio, da partir_paredes (+ ParedeFragil)
   levels/Level_Test.tscn           -- sala de treino (fora da campanha)
   actors/Koliani.tscn              -- placeholder ColorRect (silhueta key art) + lamina c/ PointLight2D + particulas
   actors/DemonioBase.tscn          -- placeholder ColorRect + olho c/ PointLight2D + area de contacto
-  actors/ChefeFloresta.tscn        -- chefe do mundo 1 (massa roxa, 2 olhos, luz)
+  actors/ChefeFloresta.tscn        -- chefe (massa roxa, 2 olhos, luz) -- usado nos 3 mundos
   actors/Coletavel.tscn            -- gema magenta c/ PointLight2D (pista / habilidade)
+  actors/ParedeFragil.tscn         -- parede rachada que se parte a golpe (c/ habilidade)
+  fx/Atmosfera.tscn                -- ambiente reutilizavel (parallax + luz + vinheta), recolorido por mundo
   ui/HUD.tscn                      -- barra de vida, vidas, TouchScreenButtons (+ rolar, diario)
   ui/Diario.tscn                   -- painel do diario de pistas (instanciado pelo main.gd)
 
@@ -120,7 +125,8 @@ SDK) -- ajustar pelo log do Actions.
 - `godot --headless --script res://tests/run_tests.gd` -- **14 testes, todos
   a passar** (movimento + salto duplo + rolar + tremor + estado + diário).
 - `Main.tscn` (mundo 1 + chefe + HUD + diário) corre 600 frames headless
-  **sem erros nem avisos**.
+  **sem erros nem avisos**. Mundos 2 e 3 correm isolados 400 frames limpos.
+- Campanha: 3 mundos ligados em `EstadoJogo.NIVEIS` (mundo 4 por fazer).
 - Build Web/APK local -- bloqueado só pela falta dos modelos de export
   (ver acima).
 

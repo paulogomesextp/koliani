@@ -133,8 +133,9 @@ Autoload `EstadoJogo`. Guarda em `user://progresso.json`:
 - ~~Ecrã de **diário das pistas**~~ -- feito (`scenes/ui/Diario.tscn` +
   `scripts/diario.gd`; textos em `scripts/diario_pistas.gd`). Falta arte
   e afinar o layout com o jogo a correr.
-- ~~Habilidades desbloqueáveis ligadas ao `koliani.gd`~~ -- feito para
-  `salto_duplo`; falta `dash_aereo`, `partir_paredes`.
+- ~~Habilidades desbloqueáveis~~ -- `salto_duplo` (mundo 1), `dash_aereo`
+  (mundo 2) e `partir_paredes` (mundo 3, via `scripts/parede_fragil.gd`)
+  ligadas. Falta a arte e possíveis habilidades extra.
 - **Chefe** por mundo. Feito o do mundo 1 (`scripts/chefe_floresta.gd`,
   `scenes/actors/ChefeFloresta.tscn`): FSM patrulha -> telegrafo -> investida
   -> recupera, emite `derrotado`. `scripts/nivel_com_chefe.gd` sela a porta
@@ -146,5 +147,9 @@ Autoload `EstadoJogo`. Guarda em `user://progresso.json`:
   aterragem. Falta afinar valores com o jogo a correr e partículas nos
   demónios.
 - Mapear `rolar` no HUD de toque (`scenes/ui/HUD.tscn`).
-- Mundos 2-4 (`Prisao_dos_Condenados`, `Torres_Esquecidas`,
-  `Castelo_de_Zeriko`) -- usar `Floresta_Putrefata.tscn` como molde.
+- Mundo 4 `Castelo_de_Zeriko` -- falta. É o final: luta com o Zeriko +
+  libertar a mãe (ver dúvida no README). Mundos 1-3 já existem (greybox).
+- Afinar todos os níveis com o jogo a correr (distâncias de salto, ritmo,
+  posição de inimigos) -- foram montados sem playtest.
+- `koliani.gd`: `Y_MORTE` (cair no vazio = morte) é global; talvez passar
+  a ser por-nível.
