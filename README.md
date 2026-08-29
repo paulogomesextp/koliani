@@ -50,6 +50,8 @@ scripts/
   movimento.gd         -- LOGICA PURA do movimento (coyote, jump buffer, corte de salto, salto duplo); testavel
   koliani.gd           -- CharacterBody2D: liga movimento.gd + dash + ataque + dano + morte + salto duplo
   demonio_base.gd      -- inimigo base (patrulha + dano por contacto); classe-pai dos demonios
+  chefe_floresta.gd    -- chefe do mundo 1: FSM patrulha/telegrafo/investida/recupera; sinal "derrotado"
+  nivel_floresta.gd    -- script do no raiz do mundo 1: sela a porta ate o chefe cair
   coletavel.gd         -- Area2D: apanhar => regista pista / desbloqueia habilidade; nao reaparece
   porta.gd             -- Area2D: avanca para o mundo seguinte / termina a campanha
   checkpoint.gd        -- Area2D: guarda posicao de reaparecimento
@@ -63,10 +65,11 @@ scripts/
 
 scenes/
   Main.tscn                        -- main_scene (ver project.godot)
-  levels/Floresta_Putrefata.tscn   -- MUNDO 1: parallax + luz tipo Dead Cells, fosso c/ salto duplo, coletaveis, chefe(-) demonios, checkpoint, porta
+  levels/Floresta_Putrefata.tscn   -- MUNDO 1: parallax + luz tipo Dead Cells, fosso c/ salto duplo, coletaveis, demonios, chefe, checkpoint, porta selada
   levels/Level_Test.tscn           -- sala de treino (fora da campanha)
-  actors/Koliani.tscn              -- placeholder ColorRect (silhueta key art) + lamina c/ PointLight2D
+  actors/Koliani.tscn              -- placeholder ColorRect (silhueta key art) + lamina c/ PointLight2D + particulas
   actors/DemonioBase.tscn          -- placeholder ColorRect + olho c/ PointLight2D + area de contacto
+  actors/ChefeFloresta.tscn        -- chefe do mundo 1 (massa roxa, 2 olhos, luz)
   actors/Coletavel.tscn            -- gema magenta c/ PointLight2D (pista / habilidade)
   ui/HUD.tscn                      -- barra de vida, vidas, TouchScreenButtons (+ rolar, diario)
   ui/Diario.tscn                   -- painel do diario de pistas (instanciado pelo main.gd)
@@ -115,8 +118,8 @@ SDK) -- ajustar pelo log do Actions.
   `Movimento`), assets importados.
 - `godot --headless --script res://tests/run_tests.gd` -- **14 testes, todos
   a passar** (movimento + salto duplo + rolar + tremor + estado + diário).
-- `Main.tscn` (mundo 1 + HUD + diário) corre 300 frames headless **sem
-  erros nem avisos**.
+- `Main.tscn` (mundo 1 + chefe + HUD + diário) corre 600 frames headless
+  **sem erros nem avisos**.
 - Build Web/APK local -- bloqueado só pela falta dos modelos de export
   (ver acima).
 

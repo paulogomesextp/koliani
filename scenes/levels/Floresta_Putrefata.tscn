@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://bkolianiflorestaput01"]
+[gd_scene load_steps=18 format=3 uid="uid://bkolianiflorestaput01"]
 
 ; Mundo 1 -- Floresta Putrefata.
 ; Floresta morta, nevoa, raizes; verde-podre com brilho poison-green.
@@ -12,6 +12,8 @@
 [ext_resource type="PackedScene" uid="uid://bkolianicoletavel01" path="res://scenes/actors/Coletavel.tscn" id="3_col"]
 [ext_resource type="Script" path="res://scripts/porta.gd" id="4_porta"]
 [ext_resource type="Script" path="res://scripts/checkpoint.gd" id="5_chk"]
+[ext_resource type="PackedScene" uid="uid://bkolianichefefloresta01" path="res://scenes/actors/ChefeFloresta.tscn" id="6_chefe"]
+[ext_resource type="Script" path="res://scripts/nivel_floresta.gd" id="7_niv"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_chaoa"]
 size = Vector2(960, 48)
@@ -56,6 +58,7 @@ fill_from = Vector2(0.5, 0.5)
 fill_to = Vector2(1, 0.5)
 
 [node name="Floresta_Putrefata" type="Node2D"]
+script = ExtResource("7_niv")
 
 [node name="Ambiente" type="CanvasModulate" parent="."]
 color = Color(0.42, 0.5, 0.42, 1)
@@ -329,8 +332,11 @@ position = Vector2(470, 604)
 alcance_patrulha = 170.0
 
 [node name="Demonio2" parent="." instance=ExtResource("2_dem")]
-position = Vector2(1470, 604)
-alcance_patrulha = 150.0
+position = Vector2(300, 520)
+alcance_patrulha = 55.0
+
+[node name="Chefe" parent="." instance=ExtResource("6_chefe")]
+position = Vector2(1380, 604)
 
 [node name="ColSaltoDuplo" parent="." instance=ExtResource("3_col")]
 position = Vector2(720, 588)

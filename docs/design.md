@@ -82,9 +82,13 @@ Números são ponto de partida -- afinar com o jogo a correr.
 Um nível é uma `scene` `Node2D` com:
 - geometria (`StaticBody2D` + `CollisionShape2D` + visual) na layer `mundo`;
 - a Koliani instanciada no ponto de spawn (ou no checkpoint guardado);
-- inimigos (`DemonioBase` ou derivados);
+- inimigos (`DemonioBase` ou derivados) e, no fim, o **chefe** do mundo;
 - 0+ `Checkpoint`;
+- 0+ `Coletavel` (pistas/habilidades);
 - **1 `Porta`** para o mundo seguinte (a última porta termina a campanha).
+  Fica **selada** (`monitoring = false`) até o chefe cair -- ver
+  `scripts/nivel_floresta.gd` (script no nó raiz do nível que liga
+  `Chefe.derrotado` à porta).
 
 `Level_Test.tscn` é o exemplo mínimo (fora da campanha -- sala de treino).
 `Floresta_Putrefata.tscn` é o **mundo 1** e serve de molde: geometria
@@ -131,8 +135,10 @@ Autoload `EstadoJogo`. Guarda em `user://progresso.json`:
   e afinar o layout com o jogo a correr.
 - ~~Habilidades desbloqueáveis ligadas ao `koliani.gd`~~ -- feito para
   `salto_duplo`; falta `dash_aereo`, `partir_paredes`.
-- **Chefe** por mundo (herda de `demonio_base.gd`; falta a máquina de
-  estados de telegrafar/atacar).
+- **Chefe** por mundo. Feito o do mundo 1 (`scripts/chefe_floresta.gd`,
+  `scenes/actors/ChefeFloresta.tscn`): FSM patrulha -> telegrafo -> investida
+  -> recupera, emite `derrotado`. `scripts/nivel_floresta.gd` sela a porta
+  até ele cair. Faltam chefes dos mundos 2-4 e afinar tempos/dano.
 - Cena de final a sério (o `main.gd._ao_fim_da_campanha` é um cartão).
 - Som (sem áudio ainda). **Juice** parcial feito: screen shake
   (`scripts/tremor.gd` puro + `camera_tremor.gd` na câmara), hitstop de
