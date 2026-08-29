@@ -39,7 +39,18 @@ O save fica em
 `%APPDATA%\Godot\app_userdata\Koliani\progresso.json` — apagar esse ficheiro
 também recomeça do zero.
 
-## O que olhar (esta fase é *greybox* — formas a substituir por sprites)
+## Estado visual/áudio (2.º passe, "look Dead Cells")
+
+Personagens são sprites SVG rim-lit com shader (flash de dano) e animação
+procedural (squash/stretch, wind-up dos chefes, rastro da lâmina, frame de
+impacto). Ambiente: parallax de 4 camadas com silhuetas recortadas, feixes
+de luz, poeira, e passe de ecrã (contraste/saturação/**bloom** — baixa em
+`Atmosfera.tscn > Grade > Passe` se estiver forte para o teu gosto).
+Plataformas com shader de pedra/tijolo. SFX sintetizados + cama de
+ambiente em loop. **Falta:** frames de animação a sério, música, tiles
+decorados, mixagem de áudio.
+
+## O que olhar (a jogabilidade ainda é *greybox* — layout por afinar)
 
 - **Feel do movimento**: salto/duplo salto, corte de salto, dash, rolar.
   Os números estão em `scripts/movimento.gd` e `scripts/koliani.gd`.

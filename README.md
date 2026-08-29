@@ -66,6 +66,9 @@ scripts/
   porta.gd             -- Area2D: avanca para o mundo seguinte / termina a campanha
   checkpoint.gd        -- Area2D: guarda posicao de reaparecimento
   estado_jogo.gd       -- autoload EstadoJogo: vidas, nivel, checkpoint, habilidades, pistas, save
+  som.gd               -- autoload Som: pool de vozes; toca(nome) SFX (assets/audio/*.wav sintetizados)
+  musica.gd            -- autoload Musica: cama de ambiente em loop, pitch por bioma
+  transicao.gd         -- autoload Transicao: fade a preto entre cenas (morte/reaparecer)
   diario_pistas.gd     -- DADOS PUROS: textos das pistas por id (para o diario + testes)
   diario.gd            -- ecra de diario: I/Tab, pausa o jogo, lista EstadoJogo.pistas
   tremor.gd            -- LOGICA PURA do screen shake (amplitude decai a zero); testavel
@@ -96,8 +99,10 @@ assets/shaders/                    -- personagem (rim+flash), plataforma (pedra)
 
 tests/run_tests.gd     -- corredor headless proprio (movimento + estado_jogo)
 docs/                  -- historia.md, design.md (bibliografia viva)
-assets/sprites/*.svg   -- arte SVG original (Koliani, demonios, 4 chefes, gema, porta)
-assets/                -- branding/, audio/, fonts/, tiles/ -- SO CC0/gratis (ou nosso)
+assets/sprites/*.svg   -- arte SVG original (Koliani, demonios, 4 chefes, gema, porta, impacto)
+assets/shaders/*.gdshader -- personagem, plataforma, grade
+assets/audio/*.wav     -- SFX + ambiente SINTETIZADOS (script no repo; sem licenca de terceiros)
+assets/                -- branding/, fonts/, tiles/ -- SO CC0/gratis (ou nosso)
 .github/workflows/ci.yml
 .claude/agents/gaming.md  -- o agente responsavel por este jogo
 ```
@@ -168,7 +173,11 @@ Respostas do Paulo já aplicadas: arte/áudio CC0 **OK**, chefes distintos
    shader de pedra. **Falta:** frames de animação a sério, mais variedade
    nas silhuetas por bioma, tiles/decoração de nível. Se preferires
    pixel-art de packs CC0, continua a ser um swap.
-2. **Áudio** -- ainda nada (sem SFX nem música). Plano: packs CC0.
+2. **Áudio** -- 1.º passe: **SFX sintetizados** por nós
+   (`assets/audio/*.wav`, gerados por script) ligados a salto/ataque/
+   acerto/dano/aterrar/apanhar/porta/checkpoint/chefes; **cama de
+   ambiente** em loop com pitch por bioma. Falta música a sério e mixagem.
+   Se quiseres packs CC0 (Kenney), é um swap dos `.wav`.
 3. **Playtest + afinação** -- o Paulo vai testar (`docs/testar.md`) e
    passar notas de feel/dificuldade (níveis montados sem jogar).
 4. **Remote / CI + modelos de export** -- passos em `docs/testar.md`;
