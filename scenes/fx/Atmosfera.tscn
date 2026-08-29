@@ -30,7 +30,7 @@ shader_parameter/saturacao = 1.13
 shader_parameter/bloom = 0.14
 shader_parameter/bloom_limiar = 0.66
 
-[node name="Atmosfera" type="Node2D"]
+[node name="Atmosfera" type="Node2D" groups=["atmosfera"]]
 script = ExtResource("1_atm")
 
 [node name="Modulacao" type="CanvasModulate" parent="."]

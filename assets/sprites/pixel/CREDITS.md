@@ -6,13 +6,17 @@ A personagem principal (Koliani) é original do projeto
 ## Pixel Frog — "Kings and Pigs"
 - https://pixelfrog-assets.itch.io/kings-and-pigs
 - Licença: CC0 1.0 (https://creativecommons.org/publicdomain/zero/1.0/)
-- Uso: inimigo comum (Pig → `assets/sprites/pixel/enemies/pig_*.png`), e
-  (a integrar) tiles de calabouço, portas, tochas, caixas.
+- Uso: inimigo comum (Pig → `assets/sprites/pixel/enemies/pig_*.png`),
+  patch de pedra/tijolo das plataformas
+  (`assets/sprites/pixel/tiles/pedra_block.png`, do TileSet 32x32) e
+  (a integrar) portas, tochas, caixas.
 
 ## Pixel Frog — "Pixel Adventure 1"
 - https://pixelfrog-assets.itch.io/pixel-adventure-1
 - Licença: CC0 1.0
-- Uso: (a integrar) terreno, armadilhas (espinhos/serra/fogo), caixas, fruta.
+- Uso: patch de relva/terra das plataformas da floresta
+  (`assets/sprites/pixel/tiles/floresta_block.png`, do Terrain 16x16) e
+  (a integrar) armadilhas (espinhos/serra/fogo), caixas, fruta.
 
 ## Kenney — "Pixel Platformer"
 - https://kenney.nl/assets/pixel-platformer
