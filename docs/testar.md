@@ -64,19 +64,18 @@ Anota o que estiver mal (muito curto / muito longo / injusto) que eu afino.
 
 # Instalar o que falta
 
-## 1. Modelos de export (para builds Web/APK locais, ~700 MB, uma vez)
+## 1. Modelos de export -- JÁ INSTALADOS ✔
 
-No editor: **Editor → Gerir Modelos de Exportação → Transferir e Instalar**.
-Ou, se a transferência falhar: descarregar
-`Godot_v4.7.2-stable_export_templates.tpz` de
-<https://godotengine.org/download/archive/4.7.2-stable/> e, no mesmo
-diálogo, **Instalar a partir de ficheiro**.
-
-Depois disto funciona:
+O build Web local já funciona:
 ```
-& "C:\...\Godot_v4.7.2-stable_win64.exe" --headless --export-release "Web" build/web/index.html
+& "C:\Users\paulo\Desktop\Godot_v4.7.2-stable_win64.exe" --headless --export-release "Web" build/web/index.html
+```
+Para ver no browser: o Claude Code arranca o preview `koliani-web`
+(`.claude/launch.json`) e abre a página. Ou à mão:
+```
 python -m http.server 8060 --directory build/web
 ```
+(APK local ainda precisa de JDK 17 + Android SDK + keystore; o CI trata disso.)
 
 ## 2. Ligar o repositório ao GitHub + CI
 

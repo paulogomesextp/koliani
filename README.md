@@ -152,7 +152,9 @@ SDK) -- ajustar pelo log do Actions.
   Diário de pistas funcional (7 pistas escritas).
 - **Ainda não foi jogado** -- greybox montado às cegas; a afinação
   (distâncias, ritmo, dano) precisa de playtest -- ver `docs/testar.md`.
-- Build Web/APK local -- bloqueado só pela falta dos modelos de export.
+- **Build Web local FUNCIONA** (modelos de export instalados):
+  `godot --headless --export-release "Web" build/web/index.html` -> OK.
+  Servir com o preview `koliani-web` (`.claude/launch.json`, autoPort).
 
 ## Como testar / instalar
 

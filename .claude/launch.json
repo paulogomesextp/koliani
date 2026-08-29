@@ -4,8 +4,12 @@
     {
       "name": "koliani-web",
       "runtimeExecutable": "python",
-      "runtimeArgs": ["-m", "http.server", "8060", "--directory", "build/web"],
-      "port": 8060
+      "runtimeArgs": [
+        "-c",
+        "import os,functools,http.server as h,socketserver as s;s.ThreadingTCPServer.allow_reuse_address=True;port=int(os.environ.get('PORT','8060'));srv=s.ThreadingTCPServer(('',port),functools.partial(h.SimpleHTTPRequestHandler,directory='build/web'));print('koliani-web: a servir build/web em http://localhost:%d/' % srv.server_address[1]);srv.serve_forever()"
+      ],
+      "port": 8060,
+      "autoPort": true
     }
   ]
 }
