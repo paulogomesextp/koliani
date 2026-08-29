@@ -6,6 +6,7 @@ extends Node2D
 
 const CENA_HUD := preload("res://scenes/ui/HUD.tscn")
 const CENA_DIARIO := preload("res://scenes/ui/Diario.tscn")
+const FIM_CAMPANHA := preload("res://scripts/fim_campanha.gd")
 
 
 func _ready() -> void:
@@ -36,26 +37,7 @@ func _procurar_porta(no: Node) -> Porta:
 
 
 func _ao_fim_da_campanha() -> void:
-	# Final provisório: cartão de fim por cima do jogo. Uma cena de final a
-	# sério (Koliani liberta a mãe, Zeriko cai) fica para quando os mundos
-	# 2-4 existirem.
 	print("FIM: Koliani liberta a mãe de Zeriko.")
-
-	var camada := CanvasLayer.new()
-	camada.layer = 20
-	add_child(camada)
-
-	var fundo := ColorRect.new()
-	fundo.color = Color(0.03, 0.02, 0.05, 0.94)
-	fundo.set_anchors_preset(Control.PRESET_FULL_RECT)
-	camada.add_child(fundo)
-
-	var texto := Label.new()
-	texto.text = "A última porta cede.\nKoliani encontra a mãe.\n\n— fim do que existe por agora —"
-	texto.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	texto.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	texto.set_anchors_preset(Control.PRESET_FULL_RECT)
-	texto.add_theme_color_override("font_color", Color(0.95, 0.85, 0.98))
-	camada.add_child(texto)
-
-	get_tree().paused = true
+	var fim := CanvasLayer.new()
+	fim.set_script(FIM_CAMPANHA)
+	add_child(fim)
