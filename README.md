@@ -124,25 +124,45 @@ SDK) -- ajustar pelo log do Actions.
   `Movimento`), assets importados.
 - `godot --headless --script res://tests/run_tests.gd` -- **14 testes, todos
   a passar** (movimento + salto duplo + rolar + tremor + estado + diário).
-- `Main.tscn` (mundo 1 + chefe + HUD + diário) corre 600 frames headless
-  **sem erros nem avisos**. Mundos 2 e 3 correm isolados 400 frames limpos.
-- Campanha: 3 mundos ligados em `EstadoJogo.NIVEIS` (mundo 4 por fazer).
+- `--import` sem erros nem avisos; classes globais todas registadas.
+- **As 4 cenas de nível + `Main.tscn` correm headless (150-600 frames)
+  sem erros nem avisos.**
+- Campanha: **3 mundos** ligados em `EstadoJogo.NIVEIS` (mundo 4 por fazer).
+  Progressão de habilidades: salto_duplo (M1) -> dash_aereo (M2) ->
+  partir_paredes (M3). Diário de pistas funcional (6 pistas escritas).
 - Build Web/APK local -- bloqueado só pela falta dos modelos de export
   (ver acima).
 
-## Dúvidas para o Paulo (2026-08-29)
+## Dúvidas para o Paulo (sessão de 2026-08-29, noite)
 
-1. **Sprites CC0.** Posso avançar e integrar packs concretos (Kenney
-   "Pixel Platformer" / "Pixel Adventure" no itch.io, ambos CC0) para
-   Koliani, demónios e tiles da floresta? Ou preferes escolher tu os
-   packs primeiro? Nada foi descarregado ainda.
-2. **Level_Test fora da campanha.** Tirei-o de `EstadoJogo.NIVEIS`; a
-   campanha começa já na Floresta Putrefata. Ok assim?
-3. **Fim da campanha.** Com só o mundo 1, a porta final mostra um cartão
-   de texto e pausa. Deixo assim até existir o mundo 2, certo?
-4. **Ligar o remote / CI.** O `git remote` continua por ligar (regra:
-   não mexo em git config). Sem isso o GitHub Actions não corre e não há
-   APK do CI para o telemóvel.
+> Trabalhei em headless, sem playtest visual. Tudo importa e corre limpo,
+> mas os níveis foram montados **às cegas** -- distâncias de salto, ritmo e
+> posições de inimigos precisam de afinação com o jogo a correr.
+
+1. **Sprites / arte (o maior bloqueio para o "look Dead Cells").** Posso
+   descarregar e integrar packs **CC0** concretos? A minha sugestão:
+   Kenney "Pixel Platformer" + "Pixel Adventure" (personagem/tiles) e
+   OpenGameArt para efeitos. Ou preferes escolher tu os packs primeiro?
+   **Nada foi descarregado** -- fiquei-me pelos `ColorRect` + luz/parallax.
+2. **Áudio.** Mesma pergunta: uso packs CC0 (ex.: Kenney "Impact Sounds",
+   "UI Audio") para passos, golpe, salto, dano, ambiente? Não há som nenhum.
+3. **Mundo 4 -- Castelo de Zeriko / final.** Não o fiz: é o clímax (luta
+   com o Zeriko + libertar a mãe) e merece o teu input. Queres uma luta a
+   sério (o `ChefeFloresta` dá para evoluir) ou uma cena mais narrativa?
+   Há nome para a mãe? Por agora a última porta da campanha mostra um
+   cartão de texto com opção de recomeçar (`scripts/fim_campanha.gd`).
+4. **Chefe único.** Os 3 mundos usam o mesmo `ChefeFloresta.tscn` (só
+   recolorido). Faço chefes distintos por mundo, ou chega um arquétipo
+   afinado?
+5. **Level_Test fora da campanha.** Tirei-o de `EstadoJogo.NIVEIS`; a
+   campanha arranca já na Floresta Putrefata. `Level_Test.tscn` fica no
+   repo como sala de treino. Ok?
+6. **Ligar o remote / CI.** Continua por ligar (`git remote add origin …`
+   é contigo -- não mexo em git config). Sem isso o GitHub Actions não
+   corre e não há APK do CI para o telemóvel.
+7. **Modelos de export.** Continuam por instalar (Editor > Gerir Modelos
+   de Exportação). Sem eles não consigo gerar o build Web local para
+   verificação visual.
 
 ## Regras
 
