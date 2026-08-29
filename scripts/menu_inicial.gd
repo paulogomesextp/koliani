@@ -3,9 +3,11 @@ extends Control
 ## jogo. "Continuar" só aparece se houver progresso guardado; "Novo jogo"
 ## pede confirmação antes de apagar um save existente.
 ##
-## Atalho de dev: `godot . -- --jogar` (ou `-- --foto...`) salta o menu e
-## arranca já em `Main.tscn` -- mantém os fluxos de captura/headless a
-## funcionar.
+## Atalhos de dev (a seguir a `--`):
+##   --jogar        salta o menu e arranca já em Main.tscn
+##   --foto[=...]   idem (o main.gd trata da captura)
+##   --nivel=N      salta o menu e arranca no mundo N (1..4)
+## Mantêm os fluxos de captura/headless a funcionar.
 
 const CENA_JOGO := "res://scenes/Main.tscn"
 
@@ -19,10 +21,16 @@ var _novo_armado := false
 
 func _ready() -> void:
 	for a in OS.get_cmdline_user_args():
+		if a.begins_with("--nivel="):
+			EstadoJogo.indice_nivel = clampi(int(a.get_slice("=", 1)) - 1, 0, EstadoJogo.NIVEIS.size() - 1)
+			EstadoJogo.checkpoint = Vector2.ZERO
+			_ir_jogar()
+			return
 		if a == "--jogar" or a.begins_with("--foto"):
 			_ir_jogar()
 			return
 
+	Musica.ambiente(0)  # drone de ambiente por baixo do título
 	_aviso.visible = false
 	var ha := EstadoJogo.ha_progresso()
 	_continuar.visible = ha
