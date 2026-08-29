@@ -189,9 +189,11 @@ SDK) -- ajustar pelo log do Actions.
   mundo ou recomeçar. Fim do run (tempo a zero **ou** 3 vidas gastas) ->
   `game_over.gd` com a voz "GAME OVER" e a campanha recomeça do mundo 1,
   ainda em hardcore. Dev: `-- --hc-tempo=N` força N segundos por mundo.
-- **Fundo do menu** (`scenes/ui/MenuInicial.tscn`): recorte da key art
-  (`assets/branding/menu_bg.png` -- só o desenho, sem o texto do poster),
-  com scrim + vinheta radial e deriva lenta ("Ken Burns").
+- **Fundo do menu** (`scenes/ui/MenuInicial.tscn`): arte HD 16:9
+  (`assets/branding/menu_bg.png`, dada pelo Paulo -- Koliani na ruína,
+  Zeriko + lanterna-jaula, castelo, lua), com scrim leve + vinheta radial
+  e deriva lenta ("Ken Burns"). Substituir o ficheiro por outro 16:9 e
+  reimportar chega para trocar.
 - **Áudio** (`tools/gerar_audio.py`, síntese pura): `menu.wav` (tema do
   menu), `boss.wav` (música de chefe -- toca **ao aproximar-se do chefe em
   qualquer mundo**, via `chefe_base.gd` + `Musica.boss()`; no M4 já vem do
