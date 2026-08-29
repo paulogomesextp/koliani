@@ -31,6 +31,10 @@ var _t_anim := 0.0
 var _corpo_base := Vector2.ZERO
 ## Posto a 1.0 por quem quer um "wind-up" (chefes, no telegrafo).
 var anticipacao := 0.0
+## Recuo visual ao levar dano (roda o sprite para o lado do empurrão e
+## decai a zero). Não afeta a física -- só o "juice".
+var _flinch := 0.0
+var _flinch_dir := 1.0
 
 
 func _ready() -> void:
@@ -48,15 +52,18 @@ func _process(dt: float) -> void:
 		return
 	_t_anim += dt
 	anticipacao = move_toward(anticipacao, 0.0, dt * 3.5)
+	_flinch = move_toward(_flinch, 0.0, dt * 6.0)
 	var anda := absf(velocity.x) > 5.0
 	var vel := 9.0 if anda else 3.2
 	var amp := 1.8 if anda else 1.0
 	_corpo.position.y = _corpo_base.y + sin(_t_anim * vel) * amp
 	var resp := sin(_t_anim * vel * 0.5) * 0.03
-	# wind-up: achata e alarga
-	var sx := 1.0 - resp + anticipacao * 0.22
-	var sy := 1.0 + resp - anticipacao * 0.2
+	# wind-up: achata e alarga; flinch: comprime na horizontal + roda
+	var sx := 1.0 - resp + anticipacao * 0.22 - _flinch * 0.25
+	var sy := 1.0 + resp - anticipacao * 0.2 + _flinch * 0.2
 	_corpo.scale = Vector2(sx, sy)
+	if _sprite:
+		_sprite.rotation = _flinch * _flinch_dir * 0.5
 
 
 func _physics_process(dt: float) -> void:
@@ -97,6 +104,9 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0) -> void:
 		soltar_estilhacos()
 		queue_free()
 	else:
+		if dir_empurrao != 0.0:
+			_flinch_dir = signf(dir_empurrao)
+		_flinch = 1.0
 		piscar_dano()
 
 
