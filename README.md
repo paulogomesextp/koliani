@@ -92,13 +92,15 @@ scenes/
 
 tests/run_tests.gd     -- corredor headless proprio (movimento + estado_jogo)
 docs/                  -- historia.md, design.md (bibliografia viva)
-assets/                -- branding/, sprites/, audio/, fonts/, tiles/ -- SO CC0/gratis
+assets/sprites/*.svg   -- arte SVG original (Koliani, demonios, 4 chefes, gema, porta)
+assets/                -- branding/, audio/, fonts/, tiles/ -- SO CC0/gratis (ou nosso)
 .github/workflows/ci.yml
 .claude/agents/gaming.md  -- o agente responsavel por este jogo
 ```
 
-> **Visuais são `ColorRect` placeholder.** Substituir por sprites CC0
-> (Kenney, itch.io CC0, OpenGameArt). Nada pago sem perguntar ao Paulo.
+> **Personagens já usam sprites SVG** (`assets/sprites/`, desenhados por
+> nós). Plataformas e parallax ainda são `ColorRect`. Nada pago sem
+> perguntar ao Paulo.
 
 ## CI / builds
 
@@ -153,13 +155,17 @@ Ver **`docs/testar.md`**: como correr o jogo, controlos, atalhos de debug
 Respostas do Paulo já aplicadas: arte/áudio CC0 **OK**, chefes distintos
 **OK**, mãe = **Aurora**, final = **luta + cena narrativa**.
 
-1. **Sprites / áudio CC0** -- autorizado; por integrar. Plano: Kenney
-   "Pixel Platformer"/"Pixel Adventure" (personagem/tiles) + Kenney
-   "Impact Sounds"/"UI Audio". Nada descarregado ainda.
-2. **Playtest + afinação** -- o Paulo vai testar (`docs/testar.md`) e
-   passar notas de feel/dificuldade.
-3. **Remote / CI + modelos de export** -- passos em `docs/testar.md`
-   (parte "Instalar o que falta"); é trabalho do Paulo (git config).
+1. **Arte** -- feito um 1.º passe: sprites **SVG originais** (nossos, sem
+   licença de terceiros) em `assets/sprites/` para Koliani, demónios, os
+   4 chefes, gema e porta. Ainda são estáticos (falta animação/frames) e
+   as plataformas/parallax continuam `ColorRect`. Se preferires pixel-art
+   de packs CC0 (Kenney, etc.), é um swap.
+2. **Áudio** -- ainda nada. Plano: Kenney "Impact Sounds"/"UI Audio" +
+   ambiente. Por descarregar/integrar.
+3. **Playtest + afinação** -- o Paulo vai testar (`docs/testar.md`) e
+   passar notas de feel/dificuldade (níveis montados sem jogar).
+4. **Remote / CI + modelos de export** -- passos em `docs/testar.md`;
+   é trabalho do Paulo (git config).
 
 ## Regras
 
