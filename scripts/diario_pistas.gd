@@ -171,6 +171,11 @@ const PISTAS := {
 		"titulo": "clue.praca_para_o_castelo.title",
 		"texto": "clue.praca_para_o_castelo.body",
 	},
+	"portoes_estandarte_rasgado": {
+		"mundo": "world.castle",
+		"titulo": "clue.portoes_estandarte_rasgado.title",
+		"texto": "clue.portoes_estandarte_rasgado.body",
+	},
 	"castelo_aurora_livre": {
 		"mundo": "world.castle",
 		"titulo": "clue.castelo_aurora_livre.title",

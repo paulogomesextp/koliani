@@ -70,6 +70,7 @@ func _initialize() -> void:
 	_boss_maquinista() # regiao V / nivel 23
 	_boss_bispo()    # regiao V / nivel 24
 	_boss_noiva()    # regiao V / nivel 25
+	_boss_capitao()  # regiao VI / nivel 26
 	print("OK -- sprites pixel-art em ", DIR)
 	quit(0)
 
@@ -1530,4 +1531,64 @@ func _boss_noiva() -> void:
 		else:
 			_linha(int(cx) - 8, 32, int(cx) - 14, 54, 4, VESTIDO_S)
 			_linha(int(cx) + 8, 32, int(cx) + 14, 54, 4, VESTIDO_S)
+	)
+
+
+## Nivel 26 -- Portoes de Zeriko. O Capitao Negro: armadura de placas
+## negra, elmo com crista, espada e escudo enormes. Frame 2 = escudo
+## erguido / guarda (telegrafo); frame 3 = elmo/peito a mostra, escudo
+## partido (exposto / fase 2).
+func _boss_capitao() -> void:
+	var PLACA := Color("1c1a22")
+	var PLACA_C := Color("343240")
+	var MAGENTA := Color("b023cf")
+	var GUME := Color("d8c4ff")
+	var ESCUDO := Color("2a2735")
+	_boss("capitao", 84, 116, func(f: int) -> void:
+		var guarda := f == 2
+		var partido := f == 3
+		var cx := 42.0
+		# pernas
+		_rect(int(cx) - 13, 90, 11, 22, PLACA)
+		_rect(int(cx) + 2, 90, 11, 22, PLACA)
+		_rect(int(cx) - 16, 110, 15, 5, PLACA_C)
+		_rect(int(cx) + 1, 110, 15, 5, PLACA_C)
+		# tronco / peitoral de placas
+		_elipse(cx, 50, 18, 22, PLACA)
+		_elipse(cx, 48, 12, 16, PLACA_C)
+		for j in range(40, 76):
+			var t := float(j - 40) / 36.0
+			var meia := lerpf(12.0, 15.0, t)
+			_rect(int(cx - meia), j, int(meia * 2.0), 1, PLACA if j % 4 else PLACA_C)
+		# nucleo do peito (fenda magenta)
+		var g: float = [0.9, 0.95, 1.0, 1.5][f]
+		_elipse(cx, 50, 4.0 * g, 5.0 * g, MAGENTA)
+		if partido:
+			_elipse(cx, 50, 2.0, 2.4, PAL["w"])
+		# elmo com crista
+		_elipse(cx, 22, 10, 11, PLACA)
+		_rect(int(cx) - 6, 22, 12, 2, Color("0a0a0c"))  # visor
+		_linha(int(cx), 12, int(cx), 4, 2, MAGENTA)     # crista
+		_px(int(cx) - 3, 21, MAGENTA); _px(int(cx) + 3, 21, MAGENTA)
+		# braco da espada (direita)
+		if guarda:
+			_linha(int(cx) + 12, 40, int(cx) + 26, 54, 5, PLACA_C)
+			_linha(int(cx) + 22, 44, int(cx) + 46, 22, 3, Color("c8ccdc"))  # espada baixa
+			_linha(int(cx) + 24, 42, int(cx) + 48, 20, 1, GUME)
+		else:
+			_linha(int(cx) + 12, 40, int(cx) + 22, 26, 5, PLACA_C)
+			_linha(int(cx) + 18, 30, int(cx) + 20, -8, 4, Color("c8ccdc"))  # espada alta
+			_linha(int(cx) + 20, 30, int(cx) + 22, -8, 1, GUME)
+		# escudo (esquerda) -- erguido no frame 2, partido no 3
+		if partido:
+			_linha(int(cx) - 14, 44, int(cx) - 24, 60, 5, PLACA_C)
+			_rect(int(cx) - 34, 52, 8, 10, ESCUDO)   # so' um caco
+		elif guarda:
+			_rect(int(cx) - 40, 20, 18, 44, ESCUDO)
+			_rect(int(cx) - 38, 24, 14, 36, PLACA_C)
+			_elipse(cx - 31, 42, 3, 3, MAGENTA)
+		else:
+			_linha(int(cx) - 12, 40, int(cx) - 24, 56, 5, PLACA_C)
+			_rect(int(cx) - 40, 40, 16, 34, ESCUDO)
+			_elipse(cx - 32, 56, 3, 3, MAGENTA)
 	)
