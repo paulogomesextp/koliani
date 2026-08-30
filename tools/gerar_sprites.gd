@@ -69,6 +69,7 @@ func _initialize() -> void:
 	_boss_acougueiro() # regiao V / nivel 22
 	_boss_maquinista() # regiao V / nivel 23
 	_boss_bispo()    # regiao V / nivel 24
+	_boss_noiva()    # regiao V / nivel 25
 	print("OK -- sprites pixel-art em ", DIR)
 	quit(0)
 
@@ -1474,4 +1475,59 @@ func _boss_bispo() -> void:
 			_linha(int(cx) + 14, 44, int(cx) + 14, 62, 1, Color("3a2c1e"))
 			_elipse(cx + 14, 64, 4, 4, OURO)
 			_linha(int(cx) - 8, 32, int(cx) - 14, 52, 4, CASULA_C)
+	)
+
+
+## Nivel 25 -- Praca do Eclipse. A Noiva do Eclipse: rainha antiga, vestido
+## de noiva esfarrapado, veu comprido, um sol negro no peito (a marca do
+## sacrificio). Frame 2 = maos ao alto, aneis de sombra (telegrafo);
+## frame 3 = veu para tras, sol negro do peito aberto (exposta).
+func _boss_noiva() -> void:
+	var VESTIDO := Color("c9c2d0")
+	var VESTIDO_S := Color("968fa6")
+	var VEU := Color("e8e4ee")
+	var SOMBRA := Color("140f1c")
+	var SOL := Color("2a1636")
+	var HALO := Color("a24cff")
+	var PELE := Color("cbb49a")
+	_boss("noiva", 78, 112, func(f: int) -> void:
+		var maos := f == 2
+		var expo := f == 3
+		var cx := 39.0
+		# vestido comprido (cauda que alarga)
+		for j in range(30, 106):
+			var t := float(j - 30) / 76.0
+			var meia := lerpf(8.0, 24.0, t)
+			_rect(int(cx - meia), j, int(meia * 2.0), 1, VESTIDO if j % 4 else VESTIDO_S)
+		# renda da cauda
+		for d in 8:
+			_px(int(cx) - 20 + d * 6, 104, VEU)
+		# sol negro no peito
+		var g: float = [0.9, 0.95, 1.05, 1.6][f]
+		_elipse(cx, 44, 6.0 * g, 6.5 * g, SOL if not expo else SOMBRA)
+		if expo:
+			for a in 8:
+				var ang := TAU * float(a) / 8.0
+				_linha(int(cx), 44, int(cx + cos(ang) * 12.0), int(44 + sin(ang) * 12.0), 1, HALO)
+			_elipse(cx, 44, 2.4, 2.6, HALO)
+		# cabeca + veu
+		_elipse(cx, 20, 7, 8, PELE)
+		_px(int(cx) - 2, 19, HALO); _px(int(cx) + 2, 19, HALO)
+		if expo:
+			_linha(int(cx) - 7, 12, int(cx) - 18, 4, 3, VEU)
+			_linha(int(cx) + 7, 12, int(cx) + 18, 4, 3, VEU)
+		else:
+			_elipse(cx, 18, 11, 14, Color(VEU.r, VEU.g, VEU.b, 0.85))
+			_rect(int(cx) - 4, 14, 8, 7, PELE)
+		# diadema
+		_rect(int(cx) - 6, 10, 12, 2, Color("d9b64a"))
+		# bracos
+		if maos:
+			_linha(int(cx) - 8, 32, int(cx) - 18, 8, 4, VESTIDO_S)
+			_linha(int(cx) + 8, 32, int(cx) + 18, 8, 4, VESTIDO_S)
+			_elipse(cx - 18, 6, 3, 3, HALO)
+			_elipse(cx + 18, 6, 3, 3, HALO)
+		else:
+			_linha(int(cx) - 8, 32, int(cx) - 14, 54, 4, VESTIDO_S)
+			_linha(int(cx) + 8, 32, int(cx) + 14, 54, 4, VESTIDO_S)
 	)

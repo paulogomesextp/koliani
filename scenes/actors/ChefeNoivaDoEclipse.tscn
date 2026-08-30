@@ -1,0 +1,88 @@
+[gd_scene load_steps=6 format=3 uid="uid://bkolianichefenoiva25"]
+
+; Região V / nível 25 -- A Noiva do Eclipse. Tira pixel-art de 4 frames
+; (0/1 a pairar, 2 mãos ao alto / anéis (telegrafo), 3 véu para trás --
+; sol negro do peito aberto (exposta)) em
+; assets/sprites/pixel/bosses/noiva.png. Script chefe_noiva_do_eclipse.gd.
+
+[ext_resource type="Script" path="res://scripts/chefe_noiva_do_eclipse.gd" id="1_chefe"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/bosses/noiva.png" id="2_tex"]
+
+[sub_resource type="RectangleShape2D" id="rs_body"]
+size = Vector2(46, 96)
+
+[sub_resource type="RectangleShape2D" id="rs_contacto"]
+size = Vector2(58, 102)
+
+[sub_resource type="Gradient" id="grad_luz"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="tex_luz"]
+gradient = SubResource("grad_luz")
+width = 256
+height = 256
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[node name="ChefeNoivaDoEclipse" type="CharacterBody2D" groups=["inimigos"]]
+collision_layer = 4
+collision_mask = 1
+script = ExtResource("1_chefe")
+vida = 420
+dano_contacto = 16
+alcance_patrulha = 0.0
+cor_estilhacos = Color(0.5, 0.42, 0.6, 1)
+cor_rim = Color(0.75, 0.55, 1, 1)
+
+[node name="Sprite" type="Node2D" parent="."]
+
+[node name="Corpo" type="Sprite2D" parent="Sprite"]
+texture_filter = 1
+position = Vector2(0, -6)
+texture = ExtResource("2_tex")
+hframes = 4
+
+[node name="LuzSol" type="PointLight2D" parent="Sprite"]
+position = Vector2(0, -12)
+texture = SubResource("tex_luz")
+energy = 0.5
+color = Color(0.65, 0.35, 1, 1)
+scale = Vector2(0.9, 0.9)
+
+[node name="Nucleo" type="Node2D" parent="Sprite"]
+position = Vector2(0, -12)
+scale = Vector2(0.4, 0.4)
+
+[node name="Brilho" type="Sprite2D" parent="Sprite/Nucleo"]
+visible = false
+texture = SubResource("tex_luz")
+modulate = Color(0.65, 0.35, 1, 0.9)
+scale = Vector2(0.34, 0.34)
+
+[node name="Diamante" type="Polygon2D" parent="Sprite/Nucleo"]
+color = Color(0.6, 0.32, 1, 1)
+polygon = PackedVector2Array(-8, 0, 0, -12, 8, 0, 0, 12)
+
+[node name="Cerne" type="Polygon2D" parent="Sprite/Nucleo"]
+color = Color(0.97, 0.92, 1, 1)
+polygon = PackedVector2Array(-3.5, 0, 0, -6, 3.5, 0, 0, 6)
+
+[node name="Luz" type="PointLight2D" parent="Sprite/Nucleo"]
+texture = SubResource("tex_luz")
+energy = 0.12
+color = Color(0.65, 0.35, 1, 1)
+scale = Vector2(0.6, 0.6)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 0)
+shape = SubResource("rs_body")
+
+[node name="AreaContacto" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AreaContacto"]
+position = Vector2(0, -4)
+shape = SubResource("rs_contacto")

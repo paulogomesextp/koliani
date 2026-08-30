@@ -161,6 +161,16 @@ const PISTAS := {
 		"titulo": "clue.catedral_registo_de_almas.title",
 		"texto": "clue.catedral_registo_de_almas.body",
 	},
+	"praca_o_que_ela_diz": {
+		"mundo": "world.city",
+		"titulo": "clue.praca_o_que_ela_diz.title",
+		"texto": "clue.praca_o_que_ela_diz.body",
+	},
+	"praca_para_o_castelo": {
+		"mundo": "world.city",
+		"titulo": "clue.praca_para_o_castelo.title",
+		"texto": "clue.praca_para_o_castelo.body",
+	},
 	"castelo_aurora_livre": {
 		"mundo": "world.castle",
 		"titulo": "clue.castelo_aurora_livre.title",
