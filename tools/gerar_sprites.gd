@@ -57,6 +57,7 @@ func _initialize() -> void:
 	_boss_irmaos()   # regiao II / nivel 09
 	_boss_primeiro() # regiao II / nivel 10
 	_boss_sino()     # regiao III / nivel 11
+	_boss_voltaris() # regiao III / nivel 13
 	print("OK -- sprites pixel-art em ", DIR)
 	quit(0)
 
@@ -810,4 +811,56 @@ func _boss_sino() -> void:
 		if f == 2:
 			for r in [16, 22, 28]:
 				_linha(int(cx) - 40 - r, 40, int(cx) - 40 - r, 60, 1, SOM)
+	)
+
+
+## Nivel 13 -- Torre da Tempestade. Voltaris, o Mago Morto-Vivo: manto
+## esfarrapado, cranio com olhos acesos, cajado alto com um orbe. Tom
+## ciano eletrico. Frame 2 = cajado erguido, arcos (telegrafo);
+## frame 3 = orbe aberto, nucleo a vista (exposto).
+func _boss_voltaris() -> void:
+	var MANTO := Color("1a2230")
+	var MANTO_C := Color("2b3850")
+	var RAIO := Color("bfe8ff")
+	var OSSO := Color("d8d2be")
+	var ORBE := Color("6fd8ff")
+	_boss("voltaris", 78, 108, func(f: int) -> void:
+		var sway: float = [0.0, 1.5, -1.0, 0.0][f]
+		var cx := 39.0 + sway
+		# manto conico
+		for j in range(26, 100):
+			var t := float(j - 26) / 74.0
+			var meia := lerpf(9.0, 22.0, t)
+			_rect(int(cx - meia), j, int(meia * 2.0), 1, MANTO if j % 3 else MANTO_C)
+		for d in 6:
+			var fx := int(cx - 16 + d * 6)
+			_linha(fx, 98, fx + int(sway), 98 + 5 + (d % 3) * 4, 1, RAIO)
+		# capuz + cranio
+		_elipse(cx, 20, 11, 12, MANTO)
+		if f == 3:
+			_elipse(cx, 21, 7.0, 8.0, OSSO)
+			_px(int(cx) - 3, 20, ORBE); _px(int(cx) + 3, 20, ORBE)
+			_rect(int(cx) - 3, 25, 7, 1, Color("20232a"))
+			# nucleo no peito
+			_elipse(cx, 46, 5.5, 6.5, ORBE)
+			_elipse(cx, 46, 2.4, 2.8, PAL["w"])
+		else:
+			_rect(int(cx) - 5, 16, 10, 6, Color("06080c"))
+			_px(int(cx) - 3, 19, RAIO); _px(int(cx) + 3, 19, RAIO)
+		# braco + cajado
+		var erguido := f == 2
+		if erguido:
+			_linha(int(cx) + 8, 34, int(cx) + 16, 12, 4, MANTO_C)
+			_linha(int(cx) + 18, 4, int(cx) + 18, 70, 3, Color("3a2c1e"))
+			_elipse(cx + 18, 2, 6, 6, ORBE)
+			_elipse(cx + 18, 2, 2.5, 2.5, PAL["w"])
+			# arcos
+			_linha(int(cx) + 18, 2, int(cx) + 30, 14, 1, RAIO)
+			_linha(int(cx) + 18, 2, int(cx) + 6, 12, 1, RAIO)
+		else:
+			_linha(int(cx) + 8, 36, int(cx) + 20, 58, 4, MANTO_C)
+			_linha(int(cx) + 22, 12, int(cx) + 22, 78, 3, Color("3a2c1e"))
+			_elipse(cx + 22, 10, 6, 6, ORBE)
+			_elipse(cx + 22, 10, 2.5, 2.5, PAL["w"])
+		_linha(int(cx) - 8, 34, int(cx) - 16, 56, 4, MANTO_C)
 	)

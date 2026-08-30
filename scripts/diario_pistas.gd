@@ -81,6 +81,11 @@ const PISTAS := {
 		"titulo": "clue.sinos_badalada_familiar.title",
 		"texto": "clue.sinos_badalada_familiar.body",
 	},
+	"tempestade_cajado_de_osso": {
+		"mundo": "world.towers",
+		"titulo": "clue.tempestade_cajado_de_osso.title",
+		"texto": "clue.tempestade_cajado_de_osso.body",
+	},
 	"torres_lanterna_de_zeriko": {
 		"mundo": "world.towers",
 		"titulo": "clue.torres_lanterna_de_zeriko.title",

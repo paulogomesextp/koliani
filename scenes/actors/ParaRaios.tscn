@@ -1,0 +1,34 @@
+[gd_scene load_steps=3 format=3 uid="uid://bkolianipararaios13"]
+
+; Pára-raios de metal (ver scripts/para_raios.gd). Bater-lhe arma-o; a
+; próxima descarga por perto desvia-se para cá e volta contra o chefe.
+; Está na layer 4 só para o golpe/projétil da Koliani lhe acertarem.
+
+[ext_resource type="Script" path="res://scripts/para_raios.gd" id="1_pr"]
+
+[sub_resource type="RectangleShape2D" id="rs_pr"]
+size = Vector2(18, 96)
+
+[node name="ParaRaios" type="StaticBody2D"]
+collision_layer = 4
+collision_mask = 0
+script = ExtResource("1_pr")
+
+[node name="Base" type="Polygon2D" parent="."]
+color = Color(0.24, 0.25, 0.3, 1)
+polygon = PackedVector2Array(-14, 48, 14, 48, 10, 36, -10, 36)
+
+[node name="Haste" type="Polygon2D" parent="."]
+color = Color(0.5, 0.53, 0.6, 1)
+polygon = PackedVector2Array(-4, 40, 4, 40, 3, -46, -3, -46)
+
+[node name="Ponta" type="Node2D" parent="."]
+position = Vector2(0, -46)
+
+[node name="Bico" type="Polygon2D" parent="Ponta"]
+color = Color(0.8, 0.85, 0.95, 1)
+polygon = PackedVector2Array(-4, 6, 4, 6, 0, -14)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -4)
+shape = SubResource("rs_pr")
