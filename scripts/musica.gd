@@ -19,7 +19,7 @@ extends Node
 ## assets/audio/CREDITS.md).
 const CAMINHO := "res://assets/audio/bg_niveis.mp3"       # "Shadow of the Forsaken"
 const CAMINHO_MENU := "res://assets/audio/bg_menu.mp3"    # "The Alchemist's Library"
-const CAMINHO_BOSS := "res://assets/audio/boss.wav"
+const CAMINHO_BOSS := "res://assets/audio/bg_boss.mp3"    # "Final Battle II" (Nyxaurora)
 const CAMINHO_ASSOMBRACAO := "res://assets/audio/assombracao.wav"
 
 ## Pitch por índice de mundo (0..3): floresta, prisão, torres, castelo.

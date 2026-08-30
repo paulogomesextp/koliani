@@ -11,5 +11,7 @@ licenças).
 - **`bg_menu.mp3`** — "The Alchemist's Library · Mysterious Dark Academia &
   Fantasy" — OneCinematicStudio. Abertura do jogo / menu inicial
   (`Musica.menu`).
+- **`bg_boss.mp3`** — "Final Battle II · Epic Cinematic Battle Music" —
+  Nyxaurora. Combate de chefe (`Musica.boss`).
 
 Ficheiros entregues pelo Paulo; licença/uso à responsabilidade dele.

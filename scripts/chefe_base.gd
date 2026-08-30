@@ -114,8 +114,16 @@ func _garantir_vida_maxima() -> void:
 		_vida_maxima = maxi(vida, 1)
 
 
+## Volta à cama de fundo normal do nível (a de chefe entrou em `provocar`).
+func _restaurar_musica() -> void:
+	if _musica_boss:
+		_musica_boss = false
+		Musica.ambiente(EstadoJogo.indice_nivel)
+
+
 func _cair_derrotado() -> void:
 	_ja_derrotado = true
+	_restaurar_musica()
 	Som.toca("chefe_cai", -6.0)
 	Som.toca("conquista", -4.0)  # som de "conquista", distinto de matar um inimigo
 	derrotado.emit()
@@ -169,6 +177,7 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0) -> void:
 	vida_mudou.emit(maxi(vida, 0), _vida_maxima)
 	if vida <= 0:
 		_ja_derrotado = true
+		_restaurar_musica()
 		if not falas_fim.is_empty():
 			_cair_com_falas()
 		else:
