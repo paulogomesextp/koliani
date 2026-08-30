@@ -109,12 +109,6 @@ tamanho = Vector2(160, 24)
 periodo = 2.0
 fase = 0.0
 
-[node name="ArenaPasso2" parent="." instance=ExtResource("10_plr") groups=["plataformas_coracao"]]
-position = Vector2(2950, 476)
-tamanho = Vector2(160, 24)
-periodo = 2.0
-fase = 0.5
-
 [node name="ArenaPasso3" parent="." instance=ExtResource("10_plr") groups=["plataformas_coracao"]]
 position = Vector2(3200, 520)
 tamanho = Vector2(160, 24)

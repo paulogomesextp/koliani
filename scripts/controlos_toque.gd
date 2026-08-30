@@ -49,6 +49,7 @@ const LEGENDA_CONTROLOS := [
 	["hud.controls.pause", "pausa"],
 ]
 var _legenda_caixa: HBoxContainer
+var _cab_nivel: VBoxContainer
 
 
 func _ready() -> void:
@@ -84,7 +85,10 @@ func _ready() -> void:
 	_traduzir_equip()
 
 	_montar_legenda_controlos()
-	Textos.idioma_mudou.connect(func(_l: String) -> void: _encher_legenda())
+	_montar_cabecalho_nivel()
+	Textos.idioma_mudou.connect(func(_l: String) -> void:
+		_encher_legenda()
+		_encher_cabecalho_nivel())
 
 
 ## Dois botões pequenos (WEAPONS / ARMOR) por cima da barra de vida.
@@ -380,6 +384,49 @@ func _primeira_tecla(accao: String) -> String:
 			var kc: int = ev.physical_keycode if ev.physical_keycode != 0 else ev.keycode
 			return OS.get_keycode_string(kc as Key)
 	return "—"
+
+
+# --- cabeçalho do nível (canto superior esquerdo) -----------------
+
+func _montar_cabecalho_nivel() -> void:
+	_cab_nivel = VBoxContainer.new()
+	_cab_nivel.name = "CabecalhoNivel"
+	_cab_nivel.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	_cab_nivel.position = Vector2(12.0, 8.0)
+	_cab_nivel.custom_minimum_size = Vector2(420.0, 0.0)
+	_cab_nivel.add_theme_constant_override("separation", 1)
+	_cab_nivel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_cab_nivel)
+	_encher_cabecalho_nivel()
+
+
+func _encher_cabecalho_nivel() -> void:
+	if _cab_nivel == null:
+		return
+	for c in _cab_nivel.get_children():
+		c.queue_free()
+	var i: int = EstadoJogo.indice_nivel
+	# nº do nível + nome
+	_cab_nivel.add_child(_linha_cab(
+		Textos.tf("map.level", [i + 1]), 13, Color(0.78, 0.7, 0.86), true))
+	_cab_nivel.add_child(_linha_cab(
+		Textos.t(CatalogoCampanha.chave_nivel(i)), 17, Color(1, 0.95, 1), false))
+	# nome do chefe, se houver
+	var ck := CatalogoCampanha.chave_chefe(i)
+	if ck != "":
+		_cab_nivel.add_child(_linha_cab(
+			Textos.tf("sel.boss", [Textos.t(ck)]), 13, Color(0.98, 0.7, 0.72), true))
+
+
+func _linha_cab(txt: String, tam: int, cor: Color, pequeno: bool) -> Label:
+	var l := Label.new()
+	l.text = txt if not pequeno else txt.to_upper()
+	l.add_theme_font_size_override("font_size", tam)
+	l.add_theme_color_override("font_color", cor)
+	l.add_theme_color_override("font_outline_color", Color(0.03, 0.01, 0.05))
+	l.add_theme_constant_override("outline_size", 4)
+	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return l
 
 
 func _input(evento: InputEvent) -> void:

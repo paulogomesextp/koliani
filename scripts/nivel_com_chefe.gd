@@ -3,14 +3,15 @@ extends Node2D
 ## seguinte fica selada (`monitoring = false` + tom escuro) até o nó
 ## `Chefe` emitir `derrotado`. Se não houver `Chefe`, a porta abre já.
 ##
-## Também prepende um CORREDOR DE APROXIMAÇÃO (ver `gerador_corredor.gd`),
-## que faz o nível crescer com o seu número. Pôr `corredor = false` na cena
-## para o desligar (o último nível não o tem).
+## Podia prepender um CORREDOR DE APROXIMAÇÃO (ver `gerador_corredor.gd`),
+## mas está DESLIGADO por omissão: gerava paredes/portas impossíveis e
+## softlocks nos playtests (a Koliani ficava presa sem saber o que fazer).
+## Pôr `corredor = true` numa cena para o voltar a experimentar nesse nível.
 
 const GERADOR := preload("res://scripts/gerador_corredor.gd")
 
-## Prepende o corredor de aproximação escalável.
-@export var corredor := true
+## Prepende o corredor de aproximação escalável (ver nota acima -- off).
+@export var corredor := false
 
 @onready var _porta: Area2D = $Porta
 @onready var _chefe: Node = get_node_or_null("Chefe")
