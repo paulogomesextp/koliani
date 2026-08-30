@@ -243,20 +243,23 @@ func _especie_do_nivel() -> String:
 
 # --- câmaras -----------------------------------------------------------
 
-## Muros escalonados saltáveis + rota elevada de atalho + inimigos.
+## Muros escalonados saltáveis + rota elevada de atalho. SEM inimigos (têm
+## geometria no meio do caminho -- um inimigo entalado = softlock para quem
+## não ataca).
 func _c_muros(par: Node2D, cx0: float) -> void:
-	var n := 3 + int(round(_dif * 2.0))
+	var n := 3 + int(round(_dif * 1.5))
 	var passo := (LARG - 320.0) / float(n)
 	for k in n:
 		var mx := cx0 + 190.0 + float(k) * passo
-		var alt := _rng.randf_range(40.0, 58.0)
-		_plat(par, Vector2(mx - 48.0, _chao_y - alt * 0.28), Vector2(30.0, alt * 0.55))
-		_plat(par, Vector2(mx, _chao_y - alt * 0.5), Vector2(42.0, alt))
-		if k == n - 1 and _rng.randf() < 0.35 + 0.3 * _dif:
+		var alt := _rng.randf_range(36.0, 50.0)
+		# degrau à frente -> salta-se sem colar à parede (o salto duplo, sempre
+		# disponível, torna-o trivial)
+		_plat(par, Vector2(mx - 46.0, _chao_y - alt * 0.34), Vector2(34.0, alt * 0.7))
+		_plat(par, Vector2(mx, _chao_y - alt * 0.5), Vector2(40.0, alt))
+		if k == n - 1 and _rng.randf() < 0.3 + 0.3 * _dif:
 			_espinhos(par, mx + passo * 0.5, 2 + int(2.0 * _dif))
 	for j in 3:
-		_plat(par, Vector2(cx0 + 360.0 + float(j) * 150.0, _chao_y - 168.0), Vector2(96.0, 16.0))
-	_inimigos(par, cx0, 1 + int(_dif * 2.0))
+		_plat(par, Vector2(cx0 + 360.0 + float(j) * 150.0, _chao_y - 176.0), Vector2(96.0, 16.0))
 
 
 ## Serras em calhas (horizontal + vertical) + abrigo + fila de espinhos.
@@ -309,9 +312,9 @@ func _c_gruta(par: Node2D, cx0: float) -> void:
 	# lajes de tecto com um vão para passar
 	_plat(par, Vector2(cx0 + 300.0, _chao_y - 150.0), Vector2(360.0, 40.0))
 	_plat(par, Vector2(cx0 + 820.0, _chao_y - 150.0), Vector2(360.0, 40.0))
-	# muro central a saltar (com degrau à frente)
-	_plat(par, Vector2(cx0 + 560.0, _chao_y - 26.0), Vector2(40.0, 52.0))
-	_plat(par, Vector2(cx0 + 512.0, _chao_y - 14.0), Vector2(30.0, 30.0))
+	# muro central baixo a saltar (com degrau à frente)
+	_plat(par, Vector2(cx0 + 560.0, _chao_y - 23.0), Vector2(38.0, 46.0))
+	_plat(par, Vector2(cx0 + 514.0, _chao_y - 12.0), Vector2(30.0, 26.0))
 	var n := 2 + int(round(_dif * 2.0))
 	for k in n:
 		var pd := PEDRA.instantiate()
@@ -322,7 +325,6 @@ func _c_gruta(par: Node2D, cx0: float) -> void:
 		pd.position = Vector2(cx0 + 200.0 + float(k) * ((LARG - 320.0) / float(maxi(1, n - 1))), _chao_y - 168.0)
 		par.add_child(pd)
 	_espinhos(par, cx0 + 940.0, 2 + int(_dif * 2.0))
-	_inimigos(par, cx0, 1 + int(_dif * 2.0))
 
 
 ## Corredor de pedras que caem em ciclo -- sprinta-se a cronometrar.
@@ -418,18 +420,20 @@ func _c_fogo(par: Node2D, cx0: float) -> void:
 	_inimigos(par, cx0, 1 + int(_dif * 1.5))
 
 
-## Prensas verticais que nunca fecham até ao chão.
+## Prensas verticais que descem MUITO mas deixam sempre ~95 px de folga ao
+## chão -- quem anta a pé passa; quem salta por baixo na hora errada leva.
+## SEM inimigos (a prensa já ocupa o meio do caminho).
 func _c_prensa(par: Node2D, cx0: float) -> void:
 	var n := 2 if _dif < 0.5 else 3
 	for k in n:
 		var pm := PAREDE_MOVEL.instantiate()
-		pm.tamanho = Vector2(88.0, 150.0)
-		pm.curso = Vector2(0.0, 82.0)
+		pm.tamanho = Vector2(88.0, 140.0)
+		pm.curso = Vector2(0.0, 66.0)
 		pm.periodo = _rng.randf_range(1.9, 2.6)
 		pm.fase = 0.5 * float(k % 2)
-		pm.position = Vector2(cx0 + 240.0 + float(k) * 280.0, _chao_y - 226.0)
+		# base (f=0): bordo inferior a ~165 px; desce até ~99 px do chão
+		pm.position = Vector2(cx0 + 240.0 + float(k) * 300.0, _chao_y - 235.0)
 		par.add_child(pm)
-	_inimigos(par, cx0, 1 + int(_dif * 2.0))
 
 
 ## Fosso de espinhos largo com DUAS rotas: plataformas/pêndulo por cima OU
@@ -450,13 +454,14 @@ func _c_portal(par: Node2D, cx0: float) -> void:
 	pe.position = Vector2(moat_x + 190.0, _chao_y - 240.0)
 	par.add_child(pe)
 
-	# rota B: portal de entrada num pedestal antes do fosso, saída depois
+	# rota B: portal de entrada mesmo no caminho (antes do fosso) -> saída
+	# em chão solido já depois dele. Area2D, não bloqueia; `so_saida` na
+	# chegada evita o ping-pong.
 	var idp := "jorn_%d" % _n
-	_plat(par, Vector2(cx0 + 150.0, _chao_y - 20.0), Vector2(70.0, 40.0))
 	var pa := PORTAL.instantiate()
 	pa.id = idp + "_a"
 	pa.destino_id = idp + "_b"
-	pa.position = Vector2(cx0 + 150.0, _chao_y - 60.0)
+	pa.position = Vector2(cx0 + 170.0, _chao_y - 30.0)
 	par.add_child(pa)
 	var pb := PORTAL.instantiate()
 	pb.id = idp + "_b"
@@ -464,5 +469,3 @@ func _c_portal(par: Node2D, cx0: float) -> void:
 	pb.so_saida = true
 	pb.position = Vector2(cx0 + LARG - 170.0, _chao_y - 34.0)
 	par.add_child(pb)
-
-	_inimigos(par, cx0, 1 + int(_dif))
