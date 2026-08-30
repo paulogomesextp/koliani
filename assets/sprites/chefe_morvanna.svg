@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="56" height="86" viewBox="0 0 56 86">
+  <defs>
+    <radialGradient id="olhoMorv" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#d6ffe6" stop-opacity="1"/>
+      <stop offset="100%" stop-color="#3f8f6a" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="mantoMorv" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#14241c"/>
+      <stop offset="100%" stop-color="#0b1a16"/>
+    </linearGradient>
+  </defs>
+  <!-- cauda / manto esfarrapado a arrastar na agua -->
+  <path d="M18 50 C10 64 22 70 15 84 C24 72 30 78 27 85 C34 72 40 78 37 85 C42 66 34 58 36 50 Z" fill="#0a1712" opacity="0.6"/>
+  <!-- corpo / manto -->
+  <path d="M16 18 C16 9 23 3 28 3 C33 3 40 9 40 18 L42 52 C34 58 22 58 14 52 Z" fill="url(#mantoMorv)" opacity="0.95"/>
+  <!-- capuz -->
+  <path d="M15 17 C15 5 41 5 41 17 C33 9 23 9 15 17 Z" fill="#081410"/>
+  <!-- maos espectrais penduradas nas mangas -->
+  <path d="M15 24 C6 30 3 40 5 50 C10 40 13 34 19 31 Z" fill="#0e2019" opacity="0.7"/>
+  <path d="M41 24 C50 30 53 40 51 50 C46 40 43 34 37 31 Z" fill="#0e2019" opacity="0.7"/>
+  <!-- brilho purpura no peito (nucleo) -->
+  <circle cx="28" cy="34" r="6" fill="#8f2fb0" opacity="0.55"/>
+  <!-- olhos -->
+  <circle cx="28" cy="18" r="12" fill="url(#olhoMorv)"/>
+  <ellipse cx="24" cy="18" rx="2.6" ry="3.4" fill="#e9fff2"/>
+  <ellipse cx="32" cy="18" rx="2.6" ry="3.4" fill="#e9fff2"/>
+</svg>

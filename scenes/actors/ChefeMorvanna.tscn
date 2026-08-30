@@ -1,0 +1,100 @@
+[gd_scene load_steps=8 format=3 uid="uid://bkolianichefemorvanna01"]
+
+; Região I / nível 02 -- Morvanna, a Bruxa do Pântano.
+; Sprite SVG assets/sprites/chefe_morvanna.svg + núcleo púrpura (ponto
+; fraco, só a descoberto no estado EXPOSTA). Script chefe_morvanna.gd
+; (herda ChefeBase). Ela flutua -- a posição é gerida pelo script, não há
+; gravidade/move_and_slide.
+
+[ext_resource type="Script" path="res://scripts/chefe_morvanna.gd" id="1_chefe"]
+[ext_resource type="Texture2D" path="res://assets/sprites/chefe_morvanna.svg" id="2_tex"]
+[ext_resource type="Shader" path="res://assets/shaders/personagem.gdshader" id="3_sh"]
+
+[sub_resource type="ShaderMaterial" id="mat_m"]
+resource_local_to_scene = true
+shader = ExtResource("3_sh")
+shader_parameter/flash = 0.0
+shader_parameter/flash_cor = Color(1, 1, 1, 1)
+shader_parameter/rim_cor = Color(0.45, 0.95, 0.62, 1)
+shader_parameter/rim_forca = 0.75
+shader_parameter/rim_dir = Vector2(-1, -0.55)
+shader_parameter/rim_espessura = 1.5
+shader_parameter/interior = 0.22
+
+[sub_resource type="RectangleShape2D" id="rs_body"]
+size = Vector2(52, 84)
+
+[sub_resource type="RectangleShape2D" id="rs_contacto"]
+size = Vector2(66, 92)
+
+[sub_resource type="Gradient" id="grad_luz"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="tex_luz"]
+gradient = SubResource("grad_luz")
+width = 256
+height = 256
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[node name="ChefeMorvanna" type="CharacterBody2D" groups=["inimigos"]]
+collision_layer = 4
+collision_mask = 1
+script = ExtResource("1_chefe")
+vida = 300
+dano_contacto = 18
+alcance_patrulha = 40.0
+cor_estilhacos = Color(0.34, 0.6, 0.4, 1)
+cor_rim = Color(0.45, 0.95, 0.62, 1)
+
+[node name="Sprite" type="Node2D" parent="."]
+
+[node name="Corpo" type="Sprite2D" parent="Sprite"]
+position = Vector2(0, -2)
+texture = ExtResource("2_tex")
+material = SubResource("mat_m")
+
+[node name="LuzOlhos" type="PointLight2D" parent="Sprite"]
+position = Vector2(0, -30)
+texture = SubResource("tex_luz")
+energy = 0.9
+color = Color(0.5, 0.95, 0.6, 1)
+scale = Vector2(1.0, 0.8)
+
+[node name="Nucleo" type="Node2D" parent="Sprite"]
+position = Vector2(0, -8)
+scale = Vector2(0.4, 0.4)
+
+[node name="Brilho" type="Sprite2D" parent="Sprite/Nucleo"]
+visible = false
+texture = SubResource("tex_luz")
+modulate = Color(0.86, 0.31, 0.9, 0.85)
+scale = Vector2(0.28, 0.28)
+
+[node name="Diamante" type="Polygon2D" parent="Sprite/Nucleo"]
+color = Color(0.62, 0.16, 0.72, 1)
+polygon = PackedVector2Array(-8, 0, 0, -13, 8, 0, 0, 13)
+
+[node name="Cerne" type="Polygon2D" parent="Sprite/Nucleo"]
+color = Color(0.98, 0.62, 1, 1)
+polygon = PackedVector2Array(-3.5, 0, 0, -6, 3.5, 0, 0, 6)
+
+[node name="Luz" type="PointLight2D" parent="Sprite/Nucleo"]
+texture = SubResource("tex_luz")
+energy = 0.12
+color = Color(0.95, 0.4, 1, 1)
+scale = Vector2(0.55, 0.55)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 4)
+shape = SubResource("rs_body")
+
+[node name="AreaContacto" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AreaContacto"]
+position = Vector2(0, 2)
+shape = SubResource("rs_contacto")

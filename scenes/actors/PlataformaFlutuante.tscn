@@ -1,0 +1,19 @@
+[gd_scene load_steps=2 format=3 uid="uid://bkolianiplatflutuante01"]
+
+; Plataforma que baloiça / deriva (ver scripts/plataforma_flutuante.gd).
+; Instanciar, pôr `largura` e (opcional) `balanco`/`deriva`/`fase`.
+
+[ext_resource type="Script" path="res://scripts/plataforma_flutuante.gd" id="1_pf"]
+
+[node name="PlataformaFlutuante" type="AnimatableBody2D"]
+collision_layer = 1
+collision_mask = 0
+sync_to_physics = true
+script = ExtResource("1_pf")
+
+[node name="Visual" type="Polygon2D" parent="."]
+color = Color(0.4, 0.36, 0.28, 1)
+polygon = PackedVector2Array(-75, -10, 75, -10, 67, 16, -67, 16)
+
+[node name="Col" type="CollisionShape2D" parent="."]
+position = Vector2(0, 4)

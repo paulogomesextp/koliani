@@ -21,6 +21,11 @@ const PISTAS := {
 		"titulo": "clue.floresta_carta_rasgada.title",
 		"texto": "clue.floresta_carta_rasgada.body",
 	},
+	"pantano_bilhete_na_agua": {
+		"mundo": "world.forest",
+		"titulo": "clue.pantano_bilhete_na_agua.title",
+		"texto": "clue.pantano_bilhete_na_agua.body",
+	},
 	"prisao_carta_na_cela": {
 		"mundo": "world.prison",
 		"titulo": "clue.prisao_carta_na_cela.title",

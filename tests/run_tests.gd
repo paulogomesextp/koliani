@@ -373,11 +373,17 @@ func teste_estado_regioes_e_conclusao() -> void:
 	_ok(not e.regiao_esta_concluida(0), "arranque limpo: nenhuma região concluída")
 
 	var r0: int = e.regiao_do_nivel(0)
+	var niveis_r0: Array = e.REGIOES[r0]["niveis"]
 	e.marcar_nivel_concluido(0)
 	e.marcar_nivel_concluido(0)  # idempotente
 	_ok(e.concluidos.size() == 1, "marcar o mesmo nível duas vezes não duplica")
 	_ok(e.nivel_esta_concluido(0), "o nível 0 ficou concluído")
-	_ok(e.regiao_esta_concluida(r0), "a região do nível 0 (só tem esse nível) ficou concluída")
+	if niveis_r0.size() > 1:
+		_ok(not e.regiao_esta_concluida(r0), "região com vários níveis não fecha só com o primeiro")
+	# concluir todos os níveis da região fecha-a
+	for idx in niveis_r0:
+		e.marcar_nivel_concluido(idx)
+	_ok(e.regiao_esta_concluida(r0), "concluir todos os níveis da região marca-a como concluída")
 
 	# uma região sem níveis definidos nunca conta como concluída
 	var vazia := -1
