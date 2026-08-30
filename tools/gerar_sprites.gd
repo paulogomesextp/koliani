@@ -353,22 +353,24 @@ func _koliani() -> void:
 
 const KPAL := {
 	"o":  Color("15121c"),  # contorno
-	"d":  Color("29252f"),  # escuro (roupa)
-	"D":  Color("3a3446"),  # roupa clara
-	"cp": Color("42335a"),  # capa
-	"cP": Color("62468a"),  # capa realce
-	"m":  Color("a24ec4"),  # magenta halo
-	"M":  Color("6c3d94"),  # magenta medio
+	"d":  Color("342c42"),  # escuro (roupa) -- carvao com tom roxo
+	"D":  Color("4b4160"),  # roupa clara
+	"t":  Color("5a4a7a"),  # realce roxo do tronco (luz de frente)
+	"cp": Color("4a2f70"),  # capa (roxo saturado)
+	"cP": Color("7d55b0"),  # capa realce
+	"m":  Color("b45ad6"),  # magenta halo
+	"M":  Color("7a45a6"),  # magenta medio
+	"rb": Color("9a54c8"),  # rim de tras (luar violeta)
 	"w":  Color("efe3ff"),  # brilho
 	"k":  Color("cda486"),  # pele
 	"s":  Color("8f6d54"),  # pele sombra
 	"h":  Color("241d2c"),  # cabelo
-	"H":  Color("5a3648"),  # cabelo streak (vinho)
-	"g":  Color("7d7883"),  # metal (pauldron / fivelas)
-	"G":  Color("a7a2ad"),  # metal claro
-	"c":  Color("d7cbb4"),  # creme (bandana / detalhes)
-	"b":  Color("221b14"),  # bota
-	"B":  Color("3a2e22"),  # bota cuff
+	"H":  Color("6a4052"),  # cabelo streak (vinho)
+	"g":  Color("8a8592"),  # metal (pauldron / fivelas)
+	"G":  Color("bcb8c4"),  # metal claro
+	"c":  Color("dccdb4"),  # creme (bandana / detalhes)
+	"b":  Color("26212e"),  # bota (couro escuro frio)
+	"B":  Color("453a5c"),  # bota cuff (lit)
 }
 
 
@@ -508,16 +510,22 @@ func _kol_pose(p: Dictionary, fw: int, fh: int) -> void:
 
 	# --- PERNAS + BOTAS ALTAS ---
 	var passo_px := int(passo * 4.0)
-	_rect(cx - 5, y_quadril - 1, 11, 4, KPAL["d"])   # anca (nunca deixa vao)
+	_rect(cx - 5, y_quadril - 1, 11, 4, KPAL["d"])   # anca
+	# "calcoes": bloco solido entre as coxas -> nunca deixa um vao emoldurado
+	var h_short := int(h_perna * 0.5)
+	_rect(cx - 5, y_quadril, 10, h_short, KPAL["d"])
 	for lado: int in [-1, 1]:
-		var lx: int = cx + (-4 if lado < 0 else 1) + lado * passo_px
-		var lw: int = 4 if lado < 0 else 5
-		var lcima := int(h_perna * 0.55)
-		_rect(lx, y_quadril, lw, lcima, KPAL["d"])                 # coxa
-		_rect(lx, y_quadril + lcima, lw + 1, h_perna - lcima, KPAL["b"])  # bota
-		_rect(lx, y_quadril + lcima, lw + 1, 1, KPAL["B"])         # cuff da bota
-		_px(lx + lw, y_quadril + h_perna - 3, KPAL["g"])          # fivela lateral
-	_rect(cx - 3, y_quadril + h_perna - 1, 8 + passo_px, 1, KPAL["b"])  # solas
+		# afastamento dos pes mesmo parada, p/ os nao virarem um bloco
+		var lx: int = cx + (-6 if lado < 0 else 3) + lado * passo_px
+		var lw := 4
+		_rect(lx, y_quadril, lw, h_short, KPAL["d"])              # coxa
+		_px(lx + lw - 1, y_quadril + 1, KPAL["t"])               # luz na coxa
+		_rect(lx, y_quadril + h_short, lw, h_perna - h_short, KPAL["b"])  # bota (canela)
+		_rect(lx, y_quadril + h_perna - 3, lw + 1, 3, KPAL["b"])         # pe
+		_rect(lx, y_quadril + h_short, lw, 1, KPAL["B"])          # cuff da bota
+		_px(lx + lw - 1, y_quadril + h_short + 3, KPAL["B"])      # aresta lit da canela
+		_px(lx + lw - 1, y_quadril + h_perna - 4, KPAL["g"])      # fivela lateral
+		_rect(lx, y_quadril + h_perna - 1, lw + 1, 1, KPAL["o"])  # sola (por pe, sem bridge)
 
 	# --- TRONCO (top sem mangas) + cintos ---
 	for j in range(y_ombro, y_quadril + 1):
@@ -525,6 +533,9 @@ func _kol_pose(p: Dictionary, fw: int, fh: int) -> void:
 		var meia := lerpf(5.0, 4.0, f)
 		var tx := cx + int(lean * (1.0 - f) * 0.4)
 		_rect(int(tx - meia), j, int(meia * 2.0), 1, KPAL["d"])
+		_px(int(tx + meia) - 1, j, KPAL["t"])            # luz roxa na frente do tronco
+		if j == y_ombro + 1:
+			_px(int(tx - meia) + 1, j, KPAL["D"])
 	_rect(cx - 5, y_quadril - 3, 11, 2, KPAL["D"])       # cinto da cintura
 	_px(cx, y_quadril - 2, KPAL["G"])                    # fivela
 	_linha(cx - 5, y_quadril - 4, cx + 4, y_quadril + 1, 1, KPAL["D"])  # bandoleira
@@ -541,6 +552,9 @@ func _kol_pose(p: Dictionary, fw: int, fh: int) -> void:
 	_px(head_x + 4, y_cabeca + 2, KPAL["s"])                # sombra da bochecha
 	_rect(head_x - 3, y_cabeca - 5, 8, 3, KPAL["h"])        # franja/topo
 	_px(head_x + 3, y_cabeca - 3, KPAL["h"])                # ponta da franja p/ a cara
+	_px(head_x - 2, y_cabeca - 5, KPAL["D"])                # brilho no cimo do cabelo
+	_px(head_x - 1, y_cabeca - 4, KPAL["H"])               # streak vinho na franja
+	_px(head_x, y_cabeca - 3, KPAL["H"])
 	# madeixa lateral + streak vinho
 	_linha(head_x - 6, y_cabeca, head_x - 7, y_cabeca + 9, 3, KPAL["h"])
 	_px(head_x - 7, y_cabeca + 4, KPAL["H"]); _px(head_x - 6, y_cabeca + 7, KPAL["H"])
@@ -580,19 +594,31 @@ func _kol_pose(p: Dictionary, fw: int, fh: int) -> void:
 			var pp := c + Vector2(cos(ang), sin(ang) * 0.8) * rad
 			_px(int(pp.x), int(pp.y), KPAL["m"] if t % 2 == 0 else KPAL["M"])
 
-	# --- FANTASMINHAS roxos a arrastar atras ---
+	# --- FANTASMINHAS roxos a arrastar atras (pequenos e espacados) ---
 	for k in wisps:
-		var wx := cx - 9 - k * 6 - int(sway * 0.6)
-		var wy := y_ombro - 2 + k * 7 + int(sin(float(_ox) * 0.7 + k * 1.3) * 3.0)
-		var r := 2.6 - k * 0.35
-		_elipse(wx, wy, r, r * 0.85, KPAL["M"])          # cabeca do fantasma
-		_px(wx, wy - int(r), KPAL["m"])                   # topo aceso
-		# cauda ondulada
-		_px(wx - 1, wy + int(r), KPAL["cp"])
-		_px(wx + 1, wy + int(r) + 1, KPAL["cp"])
-		_px(wx, wy + int(r) + 2, KPAL["M"])
-		# olhos
-		_px(wx - 1, wy, KPAL["w"]); _px(wx + 1, wy, KPAL["w"])
+		var wx := cx - 10 - k * 7 - int(sway * 0.7)
+		var wy := y_ombro + k * 6 + int(sin(float(_ox) * 0.7 + k * 1.6) * 4.0)
+		var r := 2.3 - k * 0.4
+		if r < 1.0:
+			r = 1.0
+		_elipse(wx, wy, r, r * 0.9, KPAL["M"])            # corpo do fantasma
+		_px(wx, wy - int(r) - 0, KPAL["m"])               # topo aceso
+		# cauda em gancho
+		_px(wx, wy + int(r), KPAL["cp"])
+		_px(wx + (1 if k % 2 else -1), wy + int(r) + 1, KPAL["M"])
+		# olhos (so' nos 2 da frente, senao vira ruido)
+		if k <= 1:
+			_px(wx - 1, wy, KPAL["w"]); _px(wx + 1, wy, KPAL["w"])
+
+	# --- RIM de tras (luar violeta na aresta das costas) -----------------
+	for j in range(0, fh):
+		for i in range(_ox, _ox + fw):
+			var c := _img.get_pixel(i, j)
+			if c.a > 0.5:
+				# nao pinta se for wisp/magia (ja e' claro) nem contorno
+				if c != KPAL["m"] and c != KPAL["M"] and c != KPAL["w"] and c != KPAL["o"]:
+					_img.set_pixel(i, j, KPAL["rb"])
+				break
 
 
 ## Realca o bordo superior e o bordo direito (frente) da silhueta com `cor`,
