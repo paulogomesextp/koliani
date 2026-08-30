@@ -8,10 +8,10 @@
 [ext_resource type="Script" path="res://scripts/demonio_base.gd" id="1_dem"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_body"]
-size = Vector2(22, 28)
+size = Vector2(26, 38)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_contacto"]
-size = Vector2(30, 32)
+size = Vector2(38, 44)
 
 [sub_resource type="Gradient" id="Gradient_luz"]
 offsets = PackedFloat32Array(0, 1)
@@ -33,7 +33,9 @@ script = ExtResource("1_dem")
 [node name="Sprite" type="Node2D" parent="."]
 
 [node name="Anim" type="AnimatedSprite2D" parent="Sprite"]
-position = Vector2(0, -1)
+texture_filter = 1
+position = Vector2(0, -34)
+scale = Vector2(0.42, 0.42)
 
 [node name="LuzOlho" type="PointLight2D" parent="Sprite"]
 position = Vector2(3, -6)

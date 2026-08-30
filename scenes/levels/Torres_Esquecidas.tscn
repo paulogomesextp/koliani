@@ -168,16 +168,19 @@ dano = 18
 position = Vector2(180, 440)
 
 [node name="Demonio1" parent="." instance=ExtResource("2_dem")]
+especie = "olho"
 position = Vector2(300, 470)
 alcance_patrulha = 150.0
 cor_estilhacos = Color(0.7, 0.45, 0.95, 1)
 
 [node name="Demonio2" parent="." instance=ExtResource("2_dem")]
+especie = "olho"
 position = Vector2(1600, 420)
 alcance_patrulha = 150.0
 cor_estilhacos = Color(0.7, 0.45, 0.95, 1)
 
 [node name="Demonio3" parent="." instance=ExtResource("2_dem")]
+especie = "olho"
 position = Vector2(2700, 428)
 alcance_patrulha = 240.0
 cor_estilhacos = Color(0.7, 0.45, 0.95, 1)

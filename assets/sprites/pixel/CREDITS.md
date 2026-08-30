@@ -24,4 +24,19 @@ A personagem principal (Koliani) é original do projeto
 - Licença: CC0 1.0
 - Uso: (a integrar) tiles e props de preenchimento.
 
+## LuizMelo — "Monsters Creatures Fantasy"
+- https://luizmelo.itch.io/monsters-creatures-fantasy
+- Licença: CC0 1.0
+- Uso: inimigos comuns pixel-art animados
+  (`assets/sprites/pixel/enemies/{goblin,mushroom,esqueleto,olho}/`) —
+  Goblin, Mushroom, Skeleton, Flying Eye. `DemonioBase.especie` escolhe.
+
+## Ansimuz (Luis Zuno) — packs "GothicVania" / parallax
+- https://ansimuz.itch.io/ · https://opengameart.org/users/ansimuz
+- Licença: CC0 / domínio público ("free to use, personal or commercial")
+- Uso: fundos parallax pixel-art por nível
+  (`assets/sprites/pixel/backgrounds/{floresta,pantano,corredores,rochoso,montanhas}/`)
+  — Parallax Forest v2, Gothicvania Swamp, Cold Corridors, Rocky Pass,
+  Mountain Dusk.
+
 CC0 não exige atribuição; fica aqui à mesma por cortesia.

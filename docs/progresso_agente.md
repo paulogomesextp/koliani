@@ -1,5 +1,42 @@
 # Progresso do agente `gaming` — campanha dos 30 níveis
 
+## COMO RETOMAR (depois de um /clear)
+
+Pedir ao agente `gaming` (ou dizer "continua o koliani"): **continuar a
+campanha pelo guia `docs/niveis.md`**, um nível/chefe por commit, no padrão
+já estabelecido (ver "Padrão de um nível novo" abaixo). Estado atual:
+
+- **Região I — COMPLETA** (níveis 0–4): Floresta/Ghorak, Pântano/Morvanna,
+  Ninho/Rainha Aracnídea, A Árvore que Chora/Entrevane, Coração da
+  Floresta/Coração Putrefacto.
+- **Região II — 2/5**: nível 5 Prisão/Carcereiro (antigo), nível 6
+  Fornalha/Ignivar (novo). **A SEGUIR:** nível 07 Corredor das Execuções /
+  Dama da Guilhotina → 08 Ala dos Mortos / Irmãos Condenados → 09 A Cela
+  Zero / Primeiro Prisioneiro. `EstadoJogo.NIVEIS` = 9.
+- Chefes: pixel-art gerado em `tools/gerar_sprites.gd` (`_boss_*`), tiras
+  de 4 frames (0/1 idle, 2 telegrafo, 3 exposto).
+- Fundos: `Atmosfera.fundo_pack` → `assets/sprites/pixel/backgrounds/<pack>/`
+  (packs Ansimuz CC0). Mapa em `atmosfera.gd::PACKS`.
+- Inimigos comuns: `DemonioBase.especie` = goblin | mushroom | esqueleto |
+  olho (LuizMelo CC0). Já atribuídos por região nas cenas.
+- **Assets CC0 disponíveis** em `assets/sprites/incoming/` (fora do git):
+  gothicvania (tilesets+inimigos), luizmelo, clembod (Bringer of Death),
+  chierit (bosses Minotaur/Golem/Slime), 0x72 DungeonTileset II. Catálogo:
+  `docs/assets_cc0.md`. **Regra nova do Paulo:** ao mexer em modelos/fundos,
+  se não der para fazer bem por código, LEMBRAR de ir buscar assets CC0 —
+  poupa tempo e melhora muito (foi assim que ganhámos os fundos reais).
+- Antes de cada commit: `tests/run_tests.gd` OK + export Web OK + smoke da
+  cena. `push` para master. Bumpar `config/version` em `project.godot`.
+- **Padrão de um nível novo:** cena `scenes/levels/*.tscn` + chefe
+  (`chefe_*.gd` herda `ChefeBase`, ponto fraco = `Nucleo` só na janela
+  EXPOSTA, dano x2) + `ChefeX.tscn` (Sprite2D `hframes=4` → pixel-art) +
+  `_boss_x` em `gerar_sprites.gd` + entrada em `EstadoJogo.NIVEIS`/`REGIOES`
+  + `TEMPO_HARDCORE` + pista em `diario_pistas.gd` + i18n ×6 +
+  `fundo_pack`/`especie` na cena. Mecânica partilhada nova = cena+script
+  reutilizável (ver `RaizPerigo`, `GotaAcida`, `PlataformaCorrente`…).
+
+---
+
 Registo vivo do avanço pela bíblia `docs/niveis.md`. Serve para retomar
 depois de um `/clear` sem perder o fio: o estado real está sempre no
 `git log` + no código; isto é só o índice do que já foi feito e o que

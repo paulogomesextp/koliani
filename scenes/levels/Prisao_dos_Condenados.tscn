@@ -171,21 +171,25 @@ color = Color(0.45, 0.6, 0.8, 0.045)
 position = Vector2(120, 560)
 
 [node name="Demonio1" parent="." instance=ExtResource("2_dem")]
+especie = "esqueleto"
 position = Vector2(520, 600)
 alcance_patrulha = 170.0
 cor_estilhacos = Color(0.35, 0.6, 0.85, 1)
 
 [node name="Demonio2" parent="." instance=ExtResource("2_dem")]
+especie = "esqueleto"
 position = Vector2(1350, 540)
 alcance_patrulha = 130.0
 cor_estilhacos = Color(0.35, 0.6, 0.85, 1)
 
 [node name="Demonio3" parent="." instance=ExtResource("2_dem")]
+especie = "esqueleto"
 position = Vector2(2150, 288)
 alcance_patrulha = 150.0
 cor_estilhacos = Color(0.35, 0.6, 0.85, 1)
 
 [node name="Demonio4" parent="." instance=ExtResource("2_dem")]
+especie = "esqueleto"
 position = Vector2(3250, 316)
 alcance_patrulha = 230.0
 cor_estilhacos = Color(0.35, 0.6, 0.85, 1)

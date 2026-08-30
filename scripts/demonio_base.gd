@@ -18,13 +18,17 @@ const GRAVIDADE := 1400.0
 @export var cor_estilhacos := Color(0.7, 0.25, 0.45)
 ## Cor da luz de recorte (rim) do sprite -- normalmente o tom do bioma.
 @export var cor_rim := Color(0.95, 0.5, 0.72)
+## Que monstro pixel-art usar (pack CC0 LuizMelo "Monsters Creatures
+## Fantasy"). Pastas em `assets/sprites/pixel/enemies/<especie>/`.
+@export_enum("goblin", "mushroom", "esqueleto", "olho") var especie := "goblin"
 
-## Tiras pixel-art do inimigo comum (pack CC0 "Kings and Pigs"). Os chefes
-## nao usam isto -- trazem o seu proprio `Sprite/Corpo`.
-const TIRA_IDLE := preload("res://assets/sprites/pixel/enemies/pig_idle.png")
-const TIRA_RUN := preload("res://assets/sprites/pixel/enemies/pig_run.png")
-const TIRA_HIT := preload("res://assets/sprites/pixel/enemies/pig_hit.png")
-const TIRA_DEAD := preload("res://assets/sprites/pixel/enemies/pig_dead.png")
+## Frames por animação de cada espécie (tiras horizontais de 150x150).
+const ESPECIES := {
+	"goblin":    {"idle": 4, "run": 8, "hit": 4, "dead": 4},
+	"mushroom":  {"idle": 4, "run": 8, "hit": 4, "dead": 4},
+	"esqueleto": {"idle": 4, "run": 4, "hit": 4, "dead": 4},
+	"olho":      {"idle": 8, "run": 8, "hit": 4, "dead": 4},
+}
 
 @onready var _origem := global_position
 @onready var _sprite: Node2D = $Sprite
@@ -74,14 +78,18 @@ func _ready() -> void:
 		_anim.play("idle")
 
 
-## Monta os SpriteFrames do inimigo comum a partir das tiras horizontais.
+## Monta os SpriteFrames a partir das tiras da espécie escolhida.
 func _montar_frames() -> void:
+	if _anim.sprite_frames != null:
+		return  # a cena já traz os seus (chefes pixel-art)
+	var cfg: Dictionary = ESPECIES.get(especie, ESPECIES["goblin"])
+	var base := "res://assets/sprites/pixel/enemies/%s" % especie
 	var sf := SpriteFrames.new()
 	sf.remove_animation("default")
-	_add_tira(sf, "idle", TIRA_IDLE, 11, 9.0, true)
-	_add_tira(sf, "run", TIRA_RUN, 6, 13.0, true)
-	_add_tira(sf, "hit", TIRA_HIT, 2, 14.0, false)
-	_add_tira(sf, "dead", TIRA_DEAD, 4, 11.0, false)
+	_add_tira(sf, "idle", load("%s/idle.png" % base), int(cfg["idle"]), 9.0, true)
+	_add_tira(sf, "run", load("%s/run.png" % base), int(cfg["run"]), 11.0, true)
+	_add_tira(sf, "hit", load("%s/hit.png" % base), int(cfg["hit"]), 14.0, false)
+	_add_tira(sf, "dead", load("%s/dead.png" % base), int(cfg["dead"]), 11.0, false)
 	_anim.sprite_frames = sf
 
 
@@ -89,7 +97,9 @@ func _add_tira(sf: SpriteFrames, nome: String, tex: Texture2D, n: int, fps: floa
 	sf.add_animation(nome)
 	sf.set_animation_speed(nome, fps)
 	sf.set_animation_loop(nome, ciclo)
-	var fw := tex.get_width() / n
+	if tex == null:
+		return
+	var fw := tex.get_width() / maxi(1, n)
 	var fh := tex.get_height()
 	for i in n:
 		var at := AtlasTexture.new()
