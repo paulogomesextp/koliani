@@ -12,13 +12,13 @@ extends ChefeBase
 ## Fase 2 (< 50% vida): três tornados, salvas de lanças em leque, mergulho
 ## duplo e mais rápido.
 
-const LANCA_VEL := 420.0
+const LANCA_VEL := 300.0
 
 enum Fase { DORME, DECIDE, LANCAS_TEL, LANCAS, TORNADO_TEL, TORNADO, INVESTIDA_TEL, INVESTIDA, EXPOSTO }
 
 @export var dist_deteta := 720.0
 @export var altura_voo := 210.0
-@export var dur_tel := 0.55
+@export var dur_tel := 0.75
 @export var dur_exposto := 1.4
 @export var dano_lanca := 15
 @export var dano_tornado := 12
@@ -34,6 +34,10 @@ var _vida_max := 400
 var _chao_cache := 0.0
 var _inv_de := Vector2.ZERO
 var _inv_para := Vector2.ZERO
+## Ponto onde a Koliani estava quando o telégrafo das LANCAS começou -- as
+## lanças vão para AQUI, não para a posição actual, por isso correr durante
+## o aviso desvia-as de verdade.
+var _mira_lancas := Vector2.ZERO
 
 @onready var _nucleo: Node2D = get_node_or_null("Sprite/Nucleo")
 
@@ -82,13 +86,16 @@ func _physics_process(dt: float) -> void:
 					1: _ir(Fase.TORNADO_TEL)
 					_: _ir(Fase.INVESTIDA_TEL)
 		Fase.LANCAS_TEL:
+			if _t < dt:
+				var kl := _obter_koliani()
+				_mira_lancas = kl.global_position if kl else global_position + Vector2(_direcao * 220.0, 180.0)
 			_piscar(true)
 			if _t >= dur_tel:
 				_piscar(false)
 				_lancas()
 				_ir(Fase.LANCAS)
 		Fase.LANCAS:
-			if _t >= 0.45:
+			if _t >= 0.5:
 				_ir(Fase.EXPOSTO)
 		Fase.TORNADO_TEL:
 			_piscar(true)
@@ -151,11 +158,14 @@ func _ve_koliani() -> bool:
 
 func _lancas() -> void:
 	Som.toca("investida", -8.0, 1.3)
-	var base := _vetor_para_koliani().normalized()
+	# aponta para onde a Koliani ESTAVA no início do telégrafo -> correr
+	# durante o aviso desvia mesmo
+	var base := (_mira_lancas - global_position).normalized()
 	if base.length() < 0.5:
-		base = Vector2(_direcao, 0)
-	var n := 5 if _fase2 else 3
-	var esp := 0.16
+		base = Vector2(_direcao, 0.4).normalized()
+	var n := 4 if _fase2 else 3
+	# leque largo: fica sempre um vão claro entre lanças para passar
+	var esp := 0.30
 	for i in n:
 		_lanca(base.rotated((i - (n - 1) * 0.5) * esp))
 
