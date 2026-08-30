@@ -1,0 +1,56 @@
+[gd_scene load_steps=4 format=3 uid="uid://bkolianivitral24"]
+
+; Vitral partível (ver scripts/vitral.gd). Inteiro = parede colorida que
+; bloqueia; um golpe/projétil parte-o e a luz entra (as PlataformaLuz do
+; grupo `grupo_luz` -- normalmente instâncias de PlataformaLuz noutro
+; grupo -- ficam sólidas). Na layer 4 para o hitbox/projétil lhe acertar.
+
+[ext_resource type="Script" path="res://scripts/vitral.gd" id="1_v"]
+
+[sub_resource type="RectangleShape2D" id="rs_v"]
+size = Vector2(28, 160)
+
+[sub_resource type="Gradient" id="grad"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="tex"]
+gradient = SubResource("grad")
+width = 128
+height = 128
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[node name="Vitral" type="StaticBody2D"]
+collision_layer = 5
+collision_mask = 0
+script = ExtResource("1_v")
+
+[node name="Corpo" type="Polygon2D" parent="."]
+color = Color(0.42, 0.2, 0.62, 0.9)
+polygon = PackedVector2Array(-14, -80, 14, -80, 14, 80, -14, 80)
+
+[node name="Chumbo1" type="Line2D" parent="Corpo"]
+points = PackedVector2Array(-14, -40, 14, -40)
+width = 2.0
+default_color = Color(0.1, 0.09, 0.12, 1)
+
+[node name="Chumbo2" type="Line2D" parent="Corpo"]
+points = PackedVector2Array(-14, 20, 14, 20)
+width = 2.0
+default_color = Color(0.1, 0.09, 0.12, 1)
+
+[node name="Chumbo3" type="Line2D" parent="Corpo"]
+points = PackedVector2Array(0, -80, 0, 80)
+width = 2.0
+default_color = Color(0.1, 0.09, 0.12, 1)
+
+[node name="Luz" type="PointLight2D" parent="."]
+texture = SubResource("tex")
+energy = 0.0
+color = Color(0.75, 0.5, 1, 1)
+scale = Vector2(2.6, 3.4)
+
+[node name="Col" type="CollisionShape2D" parent="."]
+shape = SubResource("rs_v")

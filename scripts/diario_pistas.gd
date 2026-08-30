@@ -156,6 +156,11 @@ const PISTAS := {
 		"titulo": "clue.trem_bilhete_so_ida.title",
 		"texto": "clue.trem_bilhete_so_ida.body",
 	},
+	"catedral_registo_de_almas": {
+		"mundo": "world.city",
+		"titulo": "clue.catedral_registo_de_almas.title",
+		"texto": "clue.catedral_registo_de_almas.body",
+	},
 	"castelo_aurora_livre": {
 		"mundo": "world.castle",
 		"titulo": "clue.castelo_aurora_livre.title",

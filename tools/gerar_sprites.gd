@@ -68,6 +68,7 @@ func _initialize() -> void:
 	_boss_prefeito() # regiao V / nivel 21
 	_boss_acougueiro() # regiao V / nivel 22
 	_boss_maquinista() # regiao V / nivel 23
+	_boss_bispo()    # regiao V / nivel 24
 	print("OK -- sprites pixel-art em ", DIR)
 	quit(0)
 
@@ -1417,4 +1418,60 @@ func _boss_maquinista() -> void:
 			_linha(int(cx) + 18, ty + 12, int(cx) + 34, ty + 34, 2, Color("3a2c1e"))
 			_rect(int(cx) + 30, ty + 30, 16, 12, ACO)
 		_linha(int(cx) - 10, ty + 4, int(cx) - 16, ty + 26, 5, CASACO_C)
+	)
+
+
+## Nivel 24 -- Catedral da Corrupcao. O Bispo Purpura: mitra, casula
+## comprida, turibulo. Frame 2 = maos erguidas, magia purpura (telegrafo);
+## frame 3 = turibulo ao alto, relicario do peito aberto (exposto).
+func _boss_bispo() -> void:
+	var CASULA := Color("2a1636")
+	var CASULA_C := Color("452455")
+	var OURO := Color("d9b64a")
+	var PURPURA := Color("a24cff")
+	var PELE := Color("cbb49a")
+	_boss("bispo", 76, 112, func(f: int) -> void:
+		var maos := f == 2
+		var abre := f == 3
+		var cx := 38.0
+		# casula conica
+		for j in range(28, 104):
+			var t := float(j - 28) / 76.0
+			var meia := lerpf(9.0, 20.0, t)
+			_rect(int(cx - meia), j, int(meia * 2.0), 1, CASULA if j % 4 else CASULA_C)
+		# galao dourado ao centro
+		for j in range(34, 100):
+			_px(int(cx), j, OURO)
+		# cruz no peito / relicario
+		var g: float = [0.9, 0.95, 1.05, 1.6][f]
+		if abre:
+			_elipse(cx, 44, 5.5 * g, 6.5 * g, PURPURA)
+			_elipse(cx, 44, 2.4, 2.8, PAL["w"])
+		else:
+			_linha(int(cx), 38, int(cx), 54, 2, OURO)
+			_linha(int(cx) - 5, 44, int(cx) + 5, 44, 2, OURO)
+		# cabeca + mitra
+		_elipse(cx, 20, 7, 8, PELE)
+		_px(int(cx) - 2, 19, PURPURA); _px(int(cx) + 2, 19, PURPURA)
+		_rect(int(cx) - 8, 6, 16, 8, CASULA_C)          # base da mitra
+		_linha(int(cx) - 8, 6, int(cx), -8, 3, CASULA)  # ponta esq
+		_linha(int(cx) + 8, 6, int(cx), -8, 3, CASULA)  # ponta dir
+		_linha(int(cx), -8, int(cx), 14, 1, OURO)
+		# bracos + turibulo
+		if maos:
+			_linha(int(cx) - 8, 32, int(cx) - 18, 8, 4, CASULA_C)
+			_linha(int(cx) + 8, 32, int(cx) + 18, 8, 4, CASULA_C)
+			_elipse(cx - 18, 6, 3, 3, PURPURA)
+			_elipse(cx + 18, 6, 3, 3, PURPURA)
+		elif abre:
+			_linha(int(cx) + 8, 30, int(cx) + 16, 8, 4, CASULA_C)
+			_linha(int(cx) + 16, 8, int(cx) + 16, -6, 1, Color("3a2c1e"))
+			_elipse(cx + 16, -8, 4, 4, OURO)
+			_px(int(cx) + 16, -8, PURPURA)
+			_linha(int(cx) - 8, 32, int(cx) - 14, 52, 4, CASULA_C)
+		else:
+			_linha(int(cx) + 8, 32, int(cx) + 16, 54, 4, CASULA_C)
+			_linha(int(cx) + 14, 44, int(cx) + 14, 62, 1, Color("3a2c1e"))
+			_elipse(cx + 14, 64, 4, 4, OURO)
+			_linha(int(cx) - 8, 32, int(cx) - 14, 52, 4, CASULA_C)
 	)
