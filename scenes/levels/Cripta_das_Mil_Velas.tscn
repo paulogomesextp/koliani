@@ -1,0 +1,213 @@
+[gd_scene load_steps=16 format=3 uid="uid://bkolianicripta18"]
+
+; Região IV / nível 18 -- Cripta das Mil Velas.
+; Luz e escuridão: as `PlataformaLuz` só são sólidas enquanto houver uma
+; `Vela` acesa por perto. A Freira apaga; a Koliani reacende ao tocar. Na
+; arena, manter as velas acesas restaura as plataformas E é a única janela
+; para acertar na Freira Negra (ela desce à luz para as soprar = EXPOSTA).
+
+[ext_resource type="PackedScene" uid="uid://bkolianiactor01" path="res://scenes/actors/Koliani.tscn" id="1_kol"]
+[ext_resource type="PackedScene" uid="uid://bdemoniobase01" path="res://scenes/actors/DemonioBase.tscn" id="2_dem"]
+[ext_resource type="PackedScene" uid="uid://bkolianicoletavel01" path="res://scenes/actors/Coletavel.tscn" id="3_col"]
+[ext_resource type="PackedScene" uid="uid://bkolianiporta01" path="res://scenes/actors/Porta.tscn" id="4_porta"]
+[ext_resource type="Script" path="res://scripts/checkpoint.gd" id="5_chk"]
+[ext_resource type="PackedScene" uid="uid://bkolianichefefreira18" path="res://scenes/actors/ChefeFreiraNegra.tscn" id="6_chefe"]
+[ext_resource type="Script" path="res://scripts/nivel_com_chefe.gd" id="7_niv"]
+[ext_resource type="PackedScene" uid="uid://bkolianiatmosfera01" path="res://scenes/fx/Atmosfera.tscn" id="8_atm"]
+[ext_resource type="PackedScene" uid="uid://bkolianiplataforma01" path="res://scenes/actors/Plataforma.tscn" id="9_pl"]
+[ext_resource type="PackedScene" uid="uid://bkolianiplatluz18" path="res://scenes/actors/PlataformaLuz.tscn" id="10_plz"]
+[ext_resource type="PackedScene" uid="uid://bkolianivela18" path="res://scenes/actors/Vela.tscn" id="11_vela"]
+[ext_resource type="PackedScene" uid="uid://bkolianiespinhos01" path="res://scenes/actors/Espinhos.tscn" id="12_esp"]
+
+[sub_resource type="RectangleShape2D" id="rs_chk"]
+size = Vector2(40, 80)
+
+[sub_resource type="Gradient" id="grad_luz"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="tex_luz"]
+gradient = SubResource("grad_luz")
+width = 256
+height = 256
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[node name="Cripta_das_Mil_Velas" type="Node2D"]
+script = ExtResource("7_niv")
+
+[node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
+cor_ambiente = Color(0.34, 0.32, 0.4, 1)
+cor_fundo = Color(0.02, 0.02, 0.035, 1)
+cor_silhueta = Color(0.05, 0.05, 0.08, 1)
+cor_luz = Color(1, 0.8, 0.5, 1)
+cor_poeira = Color(0.8, 0.7, 0.55, 1)
+densidade_poeira = 1.3
+bioma = "catacumbas"
+largura_nivel = 3100.0
+luzes_horizonte = false
+fundo_pack = "corredores"
+
+[node name="ChaoInicio" parent="." instance=ExtResource("9_pl")]
+position = Vector2(380, 660)
+tamanho = Vector2(520, 48)
+altura_visual = 96.0
+
+[node name="LedgeVela1" parent="." instance=ExtResource("9_pl")]
+position = Vector2(760, 540)
+tamanho = Vector2(140, 40)
+altura_visual = 54.0
+
+[node name="LedgeVela2" parent="." instance=ExtResource("9_pl")]
+position = Vector2(1180, 500)
+tamanho = Vector2(140, 40)
+altura_visual = 54.0
+
+[node name="ChaoMeio" parent="." instance=ExtResource("9_pl")]
+position = Vector2(1560, 636)
+tamanho = Vector2(320, 44)
+altura_visual = 80.0
+
+[node name="LedgeVela3" parent="." instance=ExtResource("9_pl")]
+position = Vector2(1900, 520)
+tamanho = Vector2(140, 40)
+altura_visual = 54.0
+
+[node name="ChaoArena" parent="." instance=ExtResource("9_pl")]
+position = Vector2(2600, 660)
+tamanho = Vector2(880, 48)
+altura_visual = 96.0
+
+[node name="PlatLuzA1" parent="." instance=ExtResource("10_plz")]
+position = Vector2(950, 590)
+tamanho = Vector2(150, 22)
+
+[node name="PlatLuzA2" parent="." instance=ExtResource("10_plz")]
+position = Vector2(1060, 560)
+tamanho = Vector2(150, 22)
+
+[node name="PlatLuzB1" parent="." instance=ExtResource("10_plz")]
+position = Vector2(1740, 560)
+tamanho = Vector2(150, 22)
+
+[node name="PlatLuzB2" parent="." instance=ExtResource("10_plz")]
+position = Vector2(2040, 560)
+tamanho = Vector2(150, 22)
+
+[node name="PlatLuzArena1" parent="." instance=ExtResource("10_plz")]
+position = Vector2(2420, 520)
+tamanho = Vector2(150, 22)
+
+[node name="PlatLuzArena2" parent="." instance=ExtResource("10_plz")]
+position = Vector2(2820, 520)
+tamanho = Vector2(150, 22)
+
+[node name="Vela1" parent="." instance=ExtResource("11_vela")]
+position = Vector2(760, 500)
+
+[node name="Vela2" parent="." instance=ExtResource("11_vela")]
+position = Vector2(1180, 460)
+
+[node name="Vela3" parent="." instance=ExtResource("11_vela")]
+position = Vector2(1900, 480)
+acesa = false
+
+[node name="VelaArenaE" parent="." instance=ExtResource("11_vela")]
+position = Vector2(2400, 620)
+
+[node name="VelaArenaM" parent="." instance=ExtResource("11_vela")]
+position = Vector2(2680, 620)
+
+[node name="VelaArenaD" parent="." instance=ExtResource("11_vela")]
+position = Vector2(2960, 620)
+
+[node name="EspinhosPoco" parent="." instance=ExtResource("12_esp")]
+position = Vector2(1400, 616)
+largura = 9
+
+[node name="Koliani" parent="." instance=ExtResource("1_kol")]
+position = Vector2(150, 560)
+
+[node name="Demonio1" parent="." instance=ExtResource("2_dem")]
+especie = "esqueleto"
+position = Vector2(520, 604)
+alcance_patrulha = 200.0
+
+[node name="Demonio2" parent="." instance=ExtResource("2_dem")]
+especie = "esqueleto"
+position = Vector2(1560, 588)
+alcance_patrulha = 120.0
+
+[node name="Chefe" parent="." instance=ExtResource("6_chefe")]
+position = Vector2(2660, 420)
+
+[node name="ColRosario" parent="." instance=ExtResource("3_col")]
+position = Vector2(1900, 440)
+pista_id = "velas_rosario_da_freira"
+
+[node name="CheckInicio" type="Area2D" parent="."]
+position = Vector2(360, 588)
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("5_chk")
+
+[node name="Visual" type="ColorRect" parent="CheckInicio"]
+offset_left = -5.0
+offset_top = -42.0
+offset_right = 5.0
+offset_bottom = 40.0
+color = Color(0.36, 0.28, 0.55, 1)
+
+[node name="Luz" type="Node2D" parent="CheckInicio"]
+visible = false
+
+[node name="Brilho" type="ColorRect" parent="CheckInicio/Luz"]
+offset_left = -20.0
+offset_top = -54.0
+offset_right = 20.0
+offset_bottom = 44.0
+color = Color(0.85, 0.31, 0.83, 0.32)
+
+[node name="PointLight2D" type="PointLight2D" parent="CheckInicio/Luz"]
+texture = SubResource("tex_luz")
+energy = 1.1
+color = Color(0.93, 0.4, 0.9, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckInicio"]
+shape = SubResource("rs_chk")
+
+[node name="CheckArena" type="Area2D" parent="."]
+position = Vector2(2300, 588)
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("5_chk")
+
+[node name="Visual" type="ColorRect" parent="CheckArena"]
+offset_left = -5.0
+offset_top = -42.0
+offset_right = 5.0
+offset_bottom = 40.0
+color = Color(0.36, 0.28, 0.55, 1)
+
+[node name="Luz" type="Node2D" parent="CheckArena"]
+visible = false
+
+[node name="Brilho" type="ColorRect" parent="CheckArena/Luz"]
+offset_left = -20.0
+offset_top = -54.0
+offset_right = 20.0
+offset_bottom = 44.0
+color = Color(0.85, 0.31, 0.83, 0.32)
+
+[node name="PointLight2D" type="PointLight2D" parent="CheckArena/Luz"]
+texture = SubResource("tex_luz")
+energy = 1.1
+color = Color(0.93, 0.4, 0.9, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckArena"]
+shape = SubResource("rs_chk")
+
+[node name="Porta" parent="." instance=ExtResource("4_porta")]
+position = Vector2(2980, 586)
+pista_ao_atravessar = ""

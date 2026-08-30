@@ -121,6 +121,11 @@ const PISTAS := {
 		"titulo": "clue.ossos_placa_do_colosso.title",
 		"texto": "clue.ossos_placa_do_colosso.body",
 	},
+	"velas_rosario_da_freira": {
+		"mundo": "world.catacombs",
+		"titulo": "clue.velas_rosario_da_freira.title",
+		"texto": "clue.velas_rosario_da_freira.body",
+	},
 	"castelo_aurora_livre": {
 		"mundo": "world.castle",
 		"titulo": "clue.castelo_aurora_livre.title",

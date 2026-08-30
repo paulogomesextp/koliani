@@ -62,6 +62,7 @@ func _initialize() -> void:
 	_boss_vyrak()    # regiao III / nivel 15
 	_boss_rei_ossario() # regiao IV / nivel 16
 	_boss_colosso()  # regiao IV / nivel 17
+	_boss_freira()   # regiao IV / nivel 18
 	print("OK -- sprites pixel-art em ", DIR)
 	quit(0)
 
@@ -1091,4 +1092,56 @@ func _boss_colosso() -> void:
 		_elipse(cx, 58, 3.5 * g, 3.5 * g, NUCLEO)
 		if f == 3:
 			_elipse(cx, 58, 1.8, 1.8, PAL["w"])
+	)
+
+
+## Nivel 18 -- Cripta das Mil Velas. A Freira Negra: habito negro comprido,
+## veu, um apagador de velas na mao. Frame 2 = braco erguido p/ apagar
+## (telegrafo); frame 3 = veu queimado para tras, cara palida + nucleo
+## violeta (exposta).
+func _boss_freira() -> void:
+	var HABITO := Color("100e16")
+	var HABITO_C := Color("221d2e")
+	var VEU := Color("1a1622")
+	var OSSO := Color("d7cdbe")
+	var NUCLEO := Color("9a5cff")
+	var CHAMA := Color("3a2050")
+	_boss("freira", 72, 110, func(f: int) -> void:
+		var apaga := f == 2
+		var expo := f == 3
+		var cx := 36.0
+		# habito conico
+		for j in range(28, 104):
+			var t := float(j - 28) / 76.0
+			var meia := lerpf(8.0, 20.0, t)
+			_rect(int(cx - meia), j, int(meia * 2.0), 1, HABITO if j % 4 else HABITO_C)
+		# vinco central
+		_linha(int(cx), 30, int(cx), 100, 1, HABITO_C)
+		# veu / cabeca
+		if expo:
+			_elipse(cx, 18, 8, 9, OSSO)
+			_px(int(cx) - 3, 17, NUCLEO); _px(int(cx) + 3, 17, NUCLEO)
+			_rect(int(cx) - 3, 22, 7, 1, Color("22201c"))
+			# veu para tras
+			_linha(int(cx) + 6, 12, int(cx) + 16, 4, 3, VEU)
+			_linha(int(cx) - 6, 12, int(cx) - 16, 4, 3, VEU)
+			# nucleo no peito
+			_elipse(cx, 42, 5.5, 6.5, NUCLEO)
+			_elipse(cx, 42, 2.4, 2.8, PAL["w"])
+		else:
+			_elipse(cx, 16, 11, 13, VEU)          # veu a cair
+			_rect(int(cx) - 5, 14, 10, 8, Color("07060a"))
+			_px(int(cx) - 3, 18, CHAMA); _px(int(cx) + 3, 18, CHAMA)
+		# ombros / gola branca
+		_rect(int(cx) - 9, 28, 18, 3, OSSO)
+		# bracos + apagador
+		if apaga:
+			_linha(int(cx) + 7, 32, int(cx) + 16, 10, 4, HABITO_C)
+			_linha(int(cx) + 16, 12, int(cx) + 16, -2, 2, Color("3a2c1e"))  # cabo
+			_elipse(cx + 16, -4, 4, 4, Color("57503b"))                     # cone do apagador
+		else:
+			_linha(int(cx) + 7, 34, int(cx) + 14, 54, 4, HABITO_C)
+			_linha(int(cx) + 12, 46, int(cx) + 12, 66, 2, Color("3a2c1e"))
+			_elipse(cx + 12, 68, 3, 3, Color("57503b"))
+		_linha(int(cx) - 7, 34, int(cx) - 13, 56, 4, HABITO_C)
 	)

@@ -1,0 +1,50 @@
+[gd_scene load_steps=3 format=3 uid="uid://bkolianivela18"]
+
+; Vela da Cripta das Mil Velas (ver scripts/vela.gd). Acesa -> ilumina as
+; PlataformaLuz por perto. A Freira apaga; a Koliani reacende ao tocar.
+
+[ext_resource type="Script" path="res://scripts/vela.gd" id="1_vela"]
+
+[sub_resource type="RectangleShape2D" id="rs_vela"]
+size = Vector2(44, 90)
+
+[sub_resource type="Gradient" id="grad_luz"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(1, 0.92, 0.7, 1, 1, 0.92, 0.7, 0)
+
+[sub_resource type="GradientTexture2D" id="tex_luz"]
+gradient = SubResource("grad_luz")
+width = 128
+height = 128
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[node name="Vela" type="Area2D"]
+collision_layer = 0
+collision_mask = 2
+script = ExtResource("1_vela")
+
+[node name="Haste" type="Polygon2D" parent="."]
+color = Color(0.86, 0.83, 0.72, 1)
+polygon = PackedVector2Array(-6, 40, 6, 40, 5, -8, -5, -8)
+
+[node name="Pingente" type="Polygon2D" parent="."]
+color = Color(0.7, 0.66, 0.55, 1)
+polygon = PackedVector2Array(-6, 40, 6, 40, 10, 46, -10, 46)
+
+[node name="Chama" type="Polygon2D" parent="."]
+position = Vector2(0, -12)
+color = Color(1, 0.8, 0.4, 1)
+polygon = PackedVector2Array(-4, 6, 0, -10, 4, 6)
+
+[node name="Luz" type="PointLight2D" parent="."]
+position = Vector2(0, -12)
+texture = SubResource("tex_luz")
+energy = 1.0
+color = Color(1, 0.85, 0.55, 1)
+scale = Vector2(3, 3)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 8)
+shape = SubResource("rs_vela")
