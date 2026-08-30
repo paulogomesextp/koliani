@@ -1,20 +1,37 @@
 # Progresso do agente `gaming` — campanha dos 30 níveis
 
-## COMO RETOMAR (depois de um /clear)
+## ESTADO: CAMPANHA COMPLETA — 30/30 níveis, 30 chefes (v0.5.0, 2026-08-30)
 
-Pedir ao agente `gaming` (ou dizer "continua o koliani"): **continuar a
-campanha pelo guia `docs/niveis.md`**, um nível/chefe por commit, no padrão
-já estabelecido (ver "Padrão de um nível novo" abaixo). Estado atual:
+As **6 regiões** estão construídas de ponta a ponta. `EstadoJogo.NIVEIS`
+tem 30 entradas (índices 0–29), todas dentro de uma região; cada nível
+tem cena + chefe (herda `ChefeBase`) + `_boss_*` em `gerar_sprites.gd` +
+pista i18n×6 + `TEMPO_HARDCORE`. `Castelo_de_Zeriko.tscn` / `zeriko.gd` /
+`Zeriko.tscn` ficaram como **legado** (fora da campanha).
 
-- **Região I — COMPLETA** (níveis 0–4): Floresta/Ghorak, Pântano/Morvanna,
-  Ninho/Rainha Aracnídea, A Árvore que Chora/Entrevane, Coração da
-  Floresta/Coração Putrefacto.
-- **Região II — 2/5**: nível 5 Prisão/Carcereiro (antigo), nível 6
-  Fornalha/Ignivar (novo). **A SEGUIR:** nível 07 Corredor das Execuções /
-  Dama da Guilhotina → 08 Ala dos Mortos / Irmãos Condenados → 09 A Cela
-  Zero / Primeiro Prisioneiro. `EstadoJogo.NIVEIS` = 9.
-- Chefes: pixel-art gerado em `tools/gerar_sprites.gd` (`_boss_*`), tiras
-  de 4 frames (0/1 idle, 2 telegrafo, 3 exposto).
+**O QUE FALTA (não é construção nova — é polish):**
+1. **Playtest + afinar números.** Vida/dano/telégrafos/tempos de TODOS os
+   30 chefes foram postos "a olho". Idem `TEMPO_HARDCORE`.
+2. **Sistema de diálogo.** Não existe. As falas de chefes-história
+   (Primeiro Prisioneiro, Noiva do Eclipse, Arauto, Zeriko) estão só nas
+   pistas do diário. É a maior lacuna — decisão do Paulo.
+3. **Mecânicas aproximadas** (assinaladas nos comentários das cenas):
+   nível 12 "Torre dos Ventos / Aerion" nunca foi construído (o slot é
+   servido pela `Torres_Esquecidas.tscn` antiga); nível 19 "paredes
+   móveis"; nível 23 "trem que anda de facto"; Vyrak (15) F3 "arena em
+   cima do dragão"; nível 15 é nível-luta sem traversia própria.
+4. **Ecrã de mapa/menu por regiões** — a camada de dados (`REGIOES`)
+   existe; a UI (`MapaMundo`) pode não listar as 25 regiões novas bem.
+5. **`tools/shot_plataforma.gd`** não gerou PNG em headless nesta
+   máquina (parece precisar de GPU) — verificação foi só por smoke.
+
+## COMO RETOMAR (para continuar o polish)
+
+Pedir ao agente `gaming`: playtestar região a região e **afinar os
+números** dos chefes, OU pegar num dos pontos de dívida acima. O padrão de
+um nível/chefe está em "Padrão de um nível novo" mais abaixo. Chefes:
+pixel-art gerado em `tools/gerar_sprites.gd` (`_boss_*`), tiras de 4
+frames (0/1 idle, 2 telegrafo, 3 exposto; multi-forma usa 0/1 = forma,
+2 telegrafo, 3 exposto).
 - Fundos: `Atmosfera.fundo_pack` → `assets/sprites/pixel/backgrounds/<pack>/`
   (packs Ansimuz CC0). Mapa em `atmosfera.gd::PACKS`.
 - Inimigos comuns: `DemonioBase.especie` = goblin | mushroom | esqueleto |
@@ -321,3 +338,43 @@ finale merece cuidado; ha 5 chefes, um deles 4 fases).
   precisam de playtest.
 - `tools/shot_plataforma.gd` nao produziu PNG nesta sessao (parece
   precisar de GPU/display) -- verificacao foi so' por smoke headless.
+
+---
+
+## Regiao VI -- Castelo de Zeriko (fechada) -- niveis 26..30
+
+- **26 Portoes de Zeriko / O Capitao Negro** -- twist: luta como
+  personagem, telegrafos curtos, muito mais rapido. COMBO/BASH/GUARDA
+  (bloqueia e devolve)/MERGULHO. Fase 2: escudo estilhaca, +RODOPIO 360.
+- **27 Salao dos Espelhos / Koliani Sombria** -- mecanica `Espelho`
+  (parte-se, solta um "reflexo" que persegue). Chefe usa o kit da
+  Koliani (combo/dash/rola/projetil-leque/salto); espelha `magia_lancada`.
+  Fase 2: dash vira pestanejo, projetil persegue, combo +onda.
+- **28 Banquete dos Imortais / O Rei Devorador** -- arena = mesa gigante
+  (grupo "mesa_banquete"). GARFADA/PRATOS/SERVOS + DEVORAR: come um
+  inimigo comum perto e RECUPERA vida (matar os servos longe dele).
+- **29 Torre do Coracao Negro / O Arauto de Zeriko** -- PlataformaRitmada
+  (pulsos de energia). Chefe 3 FORMAS: Cavaleiro -> Demonio (garras +
+  sopro purpura + salto) -> Entidade (flutua, teleporta, dardos, nova).
+- **30 O TRONO DE ZERIKO / ZERIKO** -- `O_Trono_de_Zeriko.tscn` (sala do
+  trono que mistura elementos: PlataformaCorrente, PlataformaRitmada,
+  trono, magia purpura). Chefe final `chefe_zeriko_final.gd`, **4 FORMAS**:
+  F1 O MAGO (teleporta, salvas de ProjetilZeriko em leque, meteoros) ->
+  F2 O REI (5 garras RaizPerigo em roda + cavaleiros) -> F3 A COISA DO
+  ABISMO (tentaculos RaizPerigo + olho que varre um feixe) -> F4 O QUE
+  RESTA (pequeno/rapido, golpes de magia curtos, NOVA a partir dele --
+  seguro e' colar-se-lhe). Porta com a pista `castelo_aurora_livre` (o
+  fim). Legado: `Castelo_de_Zeriko.tscn` fica fora de `NIVEIS`.
+
+## Mecanicas partilhadas criadas nesta campanha (resumo, para reutilizar)
+
+`Guilhotina` (n8) - `PlataformaEspectral` + sinal `Koliani.magia_lancada`
+(n9) - `SinoTorre` + `DemonioBase.congelar` (n11) - `RaioTempestade` +
+`ParaRaios` + `receber_dano_ignorando_guarda` (n13) - `ZonaGravidade` +
+`Koliani.definir_grav_escala` + 8.o arg de `Movimento.passo` (n14) -
+`TumuloElevador` (n16) - `Vela` + `PlataformaLuz` (n18) - `LuzSeguidora` +
+`Koliani.inverter_controlos` (n20) - `DemonioBase.dormente`/`raio_acorda`
+(n21) - `Vitral` (n24) - `eclipse_tint.gd` (n25) - `Espelho` (n27).
+Grupos usados por chefes: "estatuas_naga", "plat_falsas", "acougue_moveis",
+"vagoes_trem", "mesa_banquete", "plataformas_pico", "plataformas_execucoes",
+"lava_fornalha", "sino_alterna"/"vitral_luz"/"vitral_luz_b".
