@@ -24,6 +24,15 @@ A personagem principal (Koliani) é original do projeto
 - Licença: CC0 1.0
 - Uso: (a integrar) tiles e props de preenchimento.
 
+## 0x72 — "DungeonTileset II" (v1.7)
+- https://0x72.itch.io/dungeontileset-ii
+- Licença: CC0 1.0
+- Uso: tileset de masmorra 16x16 (`assets/sprites/pixel/tiles/dungeon_0x72.png`)
+  — chão, paredes, tecto, escadas, buracos, estandartes. Base do
+  `assets/tiles/masmorra.tres` (TileSet gerado por `tools/gerar_tileset_masmorra.gd`)
+  usado nas regiões II (Prisão) e IV (Catacumbas). `dungeon_0x72_tile_list.txt`
+  é a lista de coordenadas do pack (nome x y w h).
+
 ## LuizMelo — "Monsters Creatures Fantasy"
 - https://luizmelo.itch.io/monsters-creatures-fantasy
 - Licença: CC0 1.0
