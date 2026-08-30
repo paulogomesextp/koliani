@@ -537,12 +537,23 @@ Grupos usados por chefes: "estatuas_naga", "plat_falsas", "acougue_moveis",
      fecha um nivel (tecto + paredes + chao de seguranca em tiles do
      `masmorra.tres`, `TileMapLayer` x2 z=-2, colisao por `StaticBody2D`).
      `@export largura/altura/topo/esquerda/borda_tiles/chao/chao_y`.
-     **Piloto: Prisao dos Condenados** ja o usa (Casca 4150x580 topo y150)
-     + Atmosfera recolorida a pedra. `f3cb159`. FALTA: rework da GEOMETRIA
-     interior nivel-a-nivel (corredores apertados, pocos verticais, muros
-     internos) -- precisa de screenshot por nivel (`tools/shot_plataforma.gd`
-     em modo `--window` FUNCIONA; headless as vezes crasha a' saida sem
-     gravar). Replicar a Casca nos niveis 6-9 e 15-19.
+   - **FEITO (rollout, sessao 2026-08-30 cont.):** a Casca esta agora nos
+     **10 niveis das regioes II e IV** -- piloto Prisao (idx 5) +
+     Fornalha/Corredor das Execucoes/Ala dos Mortos/Cela Zero (6-9) +
+     Cemiterio/Galeria dos Ossos/Cripta das Mil Velas/Templo da Serpente/
+     O Abismo (15-19). Um commit por nivel. Cada um leva tambem
+     **`corredor = false`** no no' raiz: um nivel selado nao leva o
+     corredor de aproximacao do `GeradorCorredor` (a parede esquerda da
+     Casca colidia com o corredor -> softlock; a `SalaLabirinto` embebida
+     ja estava EM PAUSA por softlock). Cela Zero usa Casca vertical
+     (topo = -90). Fornalha tem chao a y1400, por baixo do lago de lava.
+     `tools/verifica_casca.gd` corre os 10 headless e confirma a moldura +
+     que Koliani/Porta/Chefe nao ficam presos. Atmosferas dos 9 mantidas
+     (ja tinham paletas proprias por nivel).
+   - **FALTA:** rework da GEOMETRIA interior nivel-a-nivel (corredores
+     apertados, pocos verticais, muros internos) -- a Casca so' da a
+     moldura. `tools/shot_plataforma.gd` em modo `--window` FUNCIONA
+     (headless as vezes crasha a' saida sem gravar).
    - Koliani apurada mais perto do guia (`d0ec161`): rim violeta, pernas
      sem vao branco, contraste. Continuar o loop PREVIEW=1 se preciso.
 
