@@ -1,0 +1,16 @@
+[gd_scene load_steps=2 format=3 uid="uid://bkolianiseletorequip01"]
+
+; Ecrã de armas / armaduras. Grelha com os 15 itens; os que ainda não se
+; têm aparecem a cinzento com o nível a que desbloqueiam. Tudo construído
+; em runtime por seletor_equip.gd. Aberto pelo menu de Pausa.
+
+[ext_resource type="Script" path="res://scripts/seletor_equip.gd" id="1_se"]
+
+[node name="SeletorEquip" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_se")
