@@ -138,6 +138,10 @@ func _ready() -> void:
 	if EstadoJogo.checkpoint != Vector2.ZERO:
 		global_position = EstadoJogo.checkpoint
 	_pos_inicial = global_position
+	# a entrada do nível é um checkpoint implícito: morrer antes de tocar
+	# numa gema devolve a Koliani aqui (não ao início da campanha)
+	if EstadoJogo.checkpoint == Vector2.ZERO and not EstadoJogo.modo_dev:
+		EstadoJogo.definir_checkpoint(_pos_inicial)
 	if _hitbox:
 		_hitbox.monitoring = false
 		_hitbox.body_entered.connect(_ao_acertar_corpo)
