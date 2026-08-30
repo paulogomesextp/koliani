@@ -53,6 +53,7 @@ func _initialize() -> void:
 	_boss_morvanna()
 	_boss_rainha()
 	_boss_ignivar()  # regiao II / nivel 07
+	_boss_dama()     # regiao II / nivel 08
 	print("OK -- sprites pixel-art em ", DIR)
 	quit(0)
 
@@ -595,4 +596,54 @@ func _boss_ignivar() -> void:
 			_px(40, 44, BRASA_C)
 			_px(64, 48, BRASA)
 			_px(58, 40, BRASA_C)
+	)
+
+
+## Nivel 08 -- Corredor das Execucoes. A Dama da Guilhotina: executora
+## fantasma, manto negro esfarrapado que se esvai em fios no fim, capuz de
+## carrasco, uma lamina larga na mao. Frame 2 ergue a lamina (telegrafo);
+## frame 3 recolhe o capuz -- cranio palido + nucleo ciano a' vista.
+func _boss_dama() -> void:
+	var MANTO := Color("14121c")
+	var MANTO_C := Color("262034")
+	var ESPETRO := Color("bfeaff")
+	var OSSO := Color("d7cdb8")
+	var ACO := Color("9aa6c8")
+	var ACO_C := Color("e6ecff")
+	var NUCLEO := Color("6fe0ff")
+	_boss("dama", 84, 108, func(f: int) -> void:
+		var sway: float = [0.0, 1.5, -1.0, 0.0][f]
+		var cx := 42.0 + sway
+		for j in range(24, 92):
+			var t := float(j - 24) / 68.0
+			var meia := lerpf(11.0, 24.0, t)
+			_rect(int(cx - meia), j, int(meia * 2.0), 1, MANTO if j % 3 else MANTO_C)
+		for d in 7:
+			var fx := int(cx - 20 + d * 7)
+			_linha(fx, 90, fx + int(sway), 90 + 8 + (d % 3) * 5, 1, ESPETRO)
+		_linha(int(cx), 26, int(cx), 88, 1, MANTO_C)
+		_elipse(cx, 16, 12, 13, MANTO)
+		_linha(int(cx) - 8, 3, int(cx) + 4, 9, 3, MANTO)
+		if f == 3:
+			_elipse(cx, 17, 7.5, 8.5, OSSO)
+			_px(int(cx) - 3, 16, NUCLEO)
+			_px(int(cx) + 3, 16, NUCLEO)
+			_rect(int(cx) - 3, 21, 7, 1, Color("2a2622"))
+			_elipse(cx, 40, 5.5, 6.5, NUCLEO)
+			_elipse(cx, 40, 2.5, 3.0, ACO_C)
+			_px(int(cx), 39, PAL["w"])
+		else:
+			_rect(int(cx) - 5, 14, 10, 6, Color("07070c"))
+			_px(int(cx) - 3, 16, ESPETRO)
+			_px(int(cx) + 3, 16, ESPETRO)
+		if f == 2:
+			_linha(int(cx) + 8, 30, int(cx) + 14, 6, 4, MANTO_C)
+			_rect(int(cx) + 2, 0, 30, 8, ACO)
+			_rect(int(cx) + 2, 8, 30, 3, ACO_C)
+			_px(int(cx) + 30, 4, ACO_C)
+		else:
+			_linha(int(cx) + 8, 32, int(cx) + 20, 60, 4, MANTO_C)
+			_linha(int(cx) + 16, 54, int(cx) + 40, 78, 7, ACO)
+			_linha(int(cx) + 18, 52, int(cx) + 42, 76, 2, ACO_C)
+		_linha(int(cx) - 8, 32, int(cx) - 16, 58, 4, MANTO_C)
 	)

@@ -12,7 +12,7 @@ config_version=5
 
 config/name="Koliani"
 config/description="Platformer mobile. Koliani, 10 anos, atravessa mundos fantasmagoricos para libertar a mae do demonio Zeriko."
-config/version="0.2.0"
+config/version="0.2.1"
 run/main_scene="res://scenes/ui/MenuInicial.tscn"
 config/features=PackedStringArray("4.7", "Mobile")
 boot_splash/bg_color=Color(0.05, 0.03, 0.08, 1)

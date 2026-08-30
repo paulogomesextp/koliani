@@ -46,6 +46,11 @@ const PISTAS := {
 		"titulo": "clue.fornalha_marca_do_ferreiro.title",
 		"texto": "clue.fornalha_marca_do_ferreiro.body",
 	},
+	"execucoes_lista_de_nomes": {
+		"mundo": "world.prison",
+		"titulo": "clue.execucoes_lista_de_nomes.title",
+		"texto": "clue.execucoes_lista_de_nomes.body",
+	},
 	"prisao_carta_na_cela": {
 		"mundo": "world.prison",
 		"titulo": "clue.prisao_carta_na_cela.title",
