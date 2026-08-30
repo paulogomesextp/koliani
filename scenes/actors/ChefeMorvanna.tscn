@@ -1,25 +1,14 @@
-[gd_scene load_steps=8 format=3 uid="uid://bkolianichefemorvanna01"]
+[gd_scene load_steps=6 format=3 uid="uid://bkolianichefemorvanna01"]
 
 ; Região I / nível 02 -- Morvanna, a Bruxa do Pântano.
-; Sprite SVG assets/sprites/chefe_morvanna.svg + núcleo púrpura (ponto
-; fraco, só a descoberto no estado EXPOSTA). Script chefe_morvanna.gd
-; (herda ChefeBase). Ela flutua -- a posição é gerida pelo script, não há
-; gravidade/move_and_slide.
+; Sprite pixel-art animado (tira de 4 frames: 0/1 flutua, 2 mãos
+; espectrais erguidas, 3 desce + cara acesa) em
+; assets/sprites/pixel/bosses/morvanna.png -- o script troca `frame`.
+; Núcleo = overlay do ponto fraco. Script chefe_morvanna.gd (herda
+; ChefeBase). Ela flutua -- a posição é gerida pelo script.
 
 [ext_resource type="Script" path="res://scripts/chefe_morvanna.gd" id="1_chefe"]
-[ext_resource type="Texture2D" path="res://assets/sprites/chefe_morvanna.svg" id="2_tex"]
-[ext_resource type="Shader" path="res://assets/shaders/personagem.gdshader" id="3_sh"]
-
-[sub_resource type="ShaderMaterial" id="mat_m"]
-resource_local_to_scene = true
-shader = ExtResource("3_sh")
-shader_parameter/flash = 0.0
-shader_parameter/flash_cor = Color(1, 1, 1, 1)
-shader_parameter/rim_cor = Color(0.45, 0.95, 0.62, 1)
-shader_parameter/rim_forca = 0.75
-shader_parameter/rim_dir = Vector2(-1, -0.55)
-shader_parameter/rim_espessura = 1.5
-shader_parameter/interior = 0.22
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/bosses/morvanna.png" id="2_tex"]
 
 [sub_resource type="RectangleShape2D" id="rs_body"]
 size = Vector2(52, 84)
@@ -52,9 +41,10 @@ cor_rim = Color(0.45, 0.95, 0.62, 1)
 [node name="Sprite" type="Node2D" parent="."]
 
 [node name="Corpo" type="Sprite2D" parent="Sprite"]
+texture_filter = 1
 position = Vector2(0, -2)
 texture = ExtResource("2_tex")
-material = SubResource("mat_m")
+hframes = 4
 
 [node name="LuzOlhos" type="PointLight2D" parent="Sprite"]
 position = Vector2(0, -30)

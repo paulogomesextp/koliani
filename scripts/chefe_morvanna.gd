@@ -263,7 +263,16 @@ func _entrar_fase2() -> void:
 
 ## --- núcleo / dano -------------------------------------------------
 
+## Telegrafo -> frame 2 (mãos espectrais erguidas) da tira pixel-art.
+func _piscar(ligado: bool) -> void:
+	super._piscar(ligado)
+	if _corpo and not _exposta:
+		_corpo.frame = 2 if ligado else 0
+
+
 func _mostrar_nucleo(v: bool) -> void:
+	if _corpo:
+		_corpo.frame = 3 if v else 0
 	if _nucleo == null:
 		return
 	_nucleo.scale = Vector2.ONE * (1.0 if v else 0.4)

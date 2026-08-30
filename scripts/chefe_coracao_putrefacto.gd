@@ -156,6 +156,7 @@ func _atualiza_fase() -> void:
 		novo = 2
 	if novo != _nivel:
 		_nivel = novo
+		_atualizar_frame()
 		Som.toca("chefe_cai", -9.0, 0.7)
 		_abanar_camera(6.0)
 		if _nivel == 2:
@@ -277,8 +278,20 @@ func _desmoronar_um_pedaco() -> void:
 
 ## --- núcleo / dano ----------------------------------------------------
 
+## Escolhe o frame da tira pixel-art conforme o estado: sístole (batida) usa
+## o frame "grande/aceso"; entre batidas usa o frame da fase actual.
+func _atualizar_frame() -> void:
+	if _corpo == null:
+		return
+	if _nucleo_exposto:
+		_corpo.frame = 2 if _nivel >= 2 else 1
+	else:
+		_corpo.frame = 3 if _nivel >= 3 else 0
+
+
 func _mostrar_nucleo(v: bool) -> void:
 	_nucleo_exposto = v
+	_atualizar_frame()
 	if _nucleo == null:
 		return
 	_nucleo.scale = Vector2.ONE * (1.0 if v else 0.4)

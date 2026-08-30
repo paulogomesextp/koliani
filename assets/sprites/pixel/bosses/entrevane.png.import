@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cfkfl5w4cvr0v"
-path="res://.godot/imported/chefe_rainha_aracnidea.svg-58c1642467b00de5a276269cd0c0e6a1.ctex"
+uid="uid://dh8y6j2uwgxxp"
+path="res://.godot/imported/entrevane.png-906a189f32ed20617ac1043933351592.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/chefe_rainha_aracnidea.svg"
-dest_files=["res://.godot/imported/chefe_rainha_aracnidea.svg-58c1642467b00de5a276269cd0c0e6a1.ctex"]
+source_file="res://assets/sprites/pixel/bosses/entrevane.png"
+dest_files=["res://.godot/imported/entrevane.png-906a189f32ed20617ac1043933351592.ctex"]
 
 [params]
 
@@ -38,6 +38,3 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
-svg/scale=1.0
-editor/scale_with_editor_scale=false
-editor/convert_colors_with_editor_theme=false

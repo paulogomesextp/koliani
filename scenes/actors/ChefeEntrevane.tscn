@@ -1,24 +1,13 @@
-[gd_scene load_steps=8 format=3 uid="uid://bkolianichefeentrevane04"]
+[gd_scene load_steps=6 format=3 uid="uid://bkolianichefeentrevane04"]
 
-; Região I / nível 04 -- Entrevane, a Árvore Amaldiçoada. Sprite
-; assets/sprites/chefe_entrevane.svg + Nucleo (o rosto que chora = ponto
-; fraco, só à vista no estado EXPOSTA). Script chefe_entrevane.gd (herda
-; ChefeBase). Enraizada: não patrulha, só assenta no chão e ataca.
+; Região I / nível 04 -- Entrevane, a Árvore Amaldiçoada. Sprite pixel-art
+; animado (tira de 4 frames: 0/1 oscila, 2 galho estendido, 3 rosto aberto
+; + seiva a escorrer) em assets/sprites/pixel/bosses/entrevane.png -- o
+; script troca `frame`. Nucleo = overlay do ponto fraco. Script
+; chefe_entrevane.gd (herda ChefeBase). Enraizada: não patrulha.
 
 [ext_resource type="Script" path="res://scripts/chefe_entrevane.gd" id="1_chefe"]
-[ext_resource type="Texture2D" path="res://assets/sprites/chefe_entrevane.svg" id="2_tex"]
-[ext_resource type="Shader" path="res://assets/shaders/personagem.gdshader" id="3_sh"]
-
-[sub_resource type="ShaderMaterial" id="mat_e"]
-resource_local_to_scene = true
-shader = ExtResource("3_sh")
-shader_parameter/flash = 0.0
-shader_parameter/flash_cor = Color(1, 1, 1, 1)
-shader_parameter/rim_cor = Color(0.62, 0.75, 0.32, 1)
-shader_parameter/rim_forca = 0.7
-shader_parameter/rim_dir = Vector2(-1, -0.55)
-shader_parameter/rim_espessura = 1.5
-shader_parameter/interior = 0.2
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/bosses/entrevane.png" id="2_tex"]
 
 [sub_resource type="RectangleShape2D" id="rs_body"]
 size = Vector2(52, 110)
@@ -51,10 +40,11 @@ cor_rim = Color(0.62, 0.75, 0.32, 1)
 [node name="Sprite" type="Node2D" parent="."]
 
 [node name="Corpo" type="Sprite2D" parent="Sprite"]
+texture_filter = 1
 position = Vector2(0, -14)
 scale = Vector2(1.5, 1.5)
 texture = ExtResource("2_tex")
-material = SubResource("mat_e")
+hframes = 4
 
 [node name="LuzCopa" type="PointLight2D" parent="Sprite"]
 position = Vector2(0, -70)

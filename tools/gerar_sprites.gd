@@ -40,9 +40,18 @@ var _h := 0
 func _initialize() -> void:
 	var abs_dir := ProjectSettings.globalize_path(DIR)
 	DirAccess.make_dir_recursive_absolute(abs_dir)
+	DirAccess.make_dir_recursive_absolute(abs_dir + "/bosses")
 	_koliani()
 	_ghorak()
 	_demonio()
+	# chefes da regiao I em pixel-art animado (tiras horizontais de 4 frames:
+	# 0 idle A, 1 idle B, 2 telegrafo/ataque, 3 exposto). A tematica vem do
+	# nome do nivel -- ver docs/niveis.md.
+	_boss_coracao()
+	_boss_entrevane()
+	_boss_ghorak_anim()
+	_boss_morvanna()
+	_boss_rainha()
 	print("OK -- sprites pixel-art em ", DIR)
 	quit(0)
 
@@ -56,9 +65,15 @@ func _novo(w: int, h: int) -> void:
 	_img.fill(Color(0, 0, 0, 0))
 
 
+## Deslocamento horizontal aplicado a `_px` -- serve para desenhar cada
+## frame de uma tira num offset diferente (ver `_boss`).
+var _ox := 0
+
+
 func _px(x: int, y: int, c: Color) -> void:
-	if x >= 0 and x < _w and y >= 0 and y < _h:
-		_img.set_pixel(x, y, c)
+	var xx := x + _ox
+	if xx >= 0 and xx < _w and y >= 0 and y < _h:
+		_img.set_pixel(xx, y, c)
 
 
 ## Desenha a partir de um "mapa" de linhas de texto (1 char = 1 pixel).
@@ -292,3 +307,235 @@ func _demonio() -> void:
 	_px(24, 24, PAL["M"])
 	_px(18, 30, PAL["m"])
 	_guardar("demonio")
+
+
+## --- chefes pixel-art animados (regiao I) -------------------------------
+##
+## Cada chefe e' uma TIRA horizontal de 4 frames (fw x fh por frame).
+## `desenhar.call(f)` desenha o frame f (0..3); o offset horizontal e'
+## tratado por `_ox`. Convencao:
+##   0 idle A   1 idle B (respira/oscila)   2 telegrafo/ataque   3 exposto
+## O jogo poe `hframes = 4` no Sprite2D e o script troca `frame` conforme o
+## estado. Sem shader -- contorno + sombra "baked".
+
+func _boss(nome: String, fw: int, fh: int, desenhar: Callable) -> void:
+	_novo(fw * 4, fh)
+	for f in 4:
+		_ox = f * fw
+		desenhar.call(f)
+	_ox = 0
+	_sombra_topo()
+	_contorno()
+	var err := _img.save_png("%s/bosses/%s.png" % [DIR, nome])
+	print("  boss ", nome, "  ", _w, "x", _h, "  err=", err)
+	if OS.get_environment("PREVIEW") == "1":
+		var big := _img.duplicate() as Image
+		big.resize(_w * 6, _h * 6, Image.INTERPOLATE_NEAREST)
+		big.save_png("%s/bosses/_preview_%s.png" % [DIR, nome])
+
+
+## Nivel 05 -- Coracao da Floresta. Coracao purpura pulsante numa gaiola de
+## raizes. Batida: 0 diastole (pequeno/apagado) -> 1 sistole (grande/aceso)
+## -> 2 fase 2 (fendas radiais) -> 3 fase 3 (partido).
+func _boss_coracao() -> void:
+	var VEIA := Color("3a1140")
+	var CARNE := Color("2a0c33")
+	var CARNE_C := Color("5a1668")
+	var CAIXA := Color("14090f")
+	_boss("coracao", 96, 96, func(f: int) -> void:
+		var cx := 48.0
+		var cy := 46.0
+		var esc: float = [0.86, 1.06, 1.02, 0.9][f]
+		for a in 6:
+			var ang := TAU * float(a) / 6.0
+			_linha(int(cx), int(cy), int(cx + cos(ang) * 40.0), int(cy + sin(ang) * 40.0), 3, CAIXA)
+		_linha(10, 30, 30, 66, 2, VEIA)
+		_linha(86, 30, 66, 66, 2, VEIA)
+		_elipse(16, 62, 4, 3, Color("0e0510"))
+		_elipse(80, 60, 4, 3, Color("0e0510"))
+		var rx := 22.0 * esc
+		var ry := 20.0 * esc
+		_elipse(cx - rx * 0.5, cy - ry * 0.3, rx * 0.62, ry * 0.62, CARNE)
+		_elipse(cx + rx * 0.5, cy - ry * 0.3, rx * 0.62, ry * 0.62, CARNE)
+		for j in int(ry * 1.3):
+			var t := float(j) / (ry * 1.3)
+			var meia := lerpf(rx * 0.95, 1.0, t)
+			_rect(int(cx - meia), int(cy - ry * 0.1 + j), int(meia * 2.0), 1, CARNE)
+		var brilho: Color = [Color("6a1a7a"), Color("ff8bf0"), Color("ffa0f5"), Color("c86bd8")][f]
+		_elipse(cx, cy, 6.0 * esc, 6.5 * esc, CARNE_C)
+		_elipse(cx, cy, 3.2, 3.6, brilho)
+		_px(int(cx), int(cy - 1), PAL["w"])
+		if f >= 1:
+			_linha(int(cx), int(cy), int(cx) - 9, int(cy) + 12, 1, brilho)
+			_linha(int(cx), int(cy), int(cx) + 8, int(cy) + 10, 1, brilho)
+		if f == 2:
+			_linha(int(cx) - 14, int(cy) - 10, int(cx) + 14, int(cy) + 12, 1, brilho)
+			_linha(int(cx) + 14, int(cy) - 10, int(cx) - 12, int(cy) + 12, 1, brilho)
+		if f == 3:
+			_linha(int(cx) - 16, int(cy) - 14, int(cx) + 10, int(cy) + 18, 2, Color("0d0510"))
+			_px(int(cx) + 16, int(cy) + 20, CARNE)
+			_px(int(cx) - 18, int(cy) + 16, CARNE)
+	)
+
+
+## Nivel 04 -- A Arvore que Chora. Copa retorcida, tronco, raizes e um rosto
+## que chora seiva acida. Frame 2 estende um galho; frame 3 abre o rosto.
+func _boss_entrevane() -> void:
+	var MAD := Color("241708")
+	var MAD_E := Color("140c05")
+	var FOLHA := Color("1a2a10")
+	var SEIVA := Color("b6c64a")
+	var SEIVA_C := Color("e8f2a0")
+	_boss("entrevane", 96, 112, func(f: int) -> void:
+		var sway: float = [0.0, 2.0, -1.0, 0.0][f]
+		for e: Array in [[30, 26, 16, 12], [52, 20, 18, 13], [68, 30, 14, 11], [46, 34, 20, 12]]:
+			_elipse(float(e[0]) + sway, e[1], e[2], e[3], MAD)
+		for e: Array in [[38, 24, 10, 7], [58, 26, 9, 6]]:
+			_elipse(float(e[0]) + sway, e[1], e[2], e[3], FOLHA)
+		for j in range(38, 100):
+			var t := float(j - 38) / 62.0
+			var meia := lerpf(11.0, 15.0, t)
+			var cx := 48.0 + sway * (1.0 - t)
+			_rect(int(cx - meia), j, int(meia * 2.0), 1, MAD)
+		_linha(48, 44, 47, 98, 2, MAD_E)
+		_linha(38, 98, 22, 111, 4, MAD_E)
+		_linha(58, 98, 74, 111, 4, MAD_E)
+		_linha(48, 98, 48, 111, 4, MAD_E)
+		if f == 2:
+			_linha(60, 58, 92, 52, 4, MAD)
+			_linha(74, 55, 88, 48, 2, SEIVA)
+		else:
+			_linha(58, 60, 70, 54, 4, MAD)
+		var ry := 10.0 if f < 3 else 12.0
+		_elipse(46 + sway, 60, 8.0, ry, MAD_E)
+		if f == 3:
+			_elipse(46, 58, 5.5, 7.0, Color("3a2a10"))
+			_px(44, 56, SEIVA_C)
+			_px(48, 56, SEIVA_C)
+		else:
+			_px(43 + int(sway), 57, MAD_E)
+			_px(49 + int(sway), 57, MAD_E)
+		var n := 4 if f == 3 else 2
+		for d in n:
+			_linha(43 + d * 3, 64, 43 + d * 3, 64 + (18 if f == 3 else 9), 1, SEIVA)
+		if f == 3:
+			_elipse(46, 62, 4, 4, SEIVA_C)
+	)
+
+
+## Nivel 01 -- O Caminho das Raizes Mortas. Ghorak: tronco, osso e raizes,
+## nucleo purpura no peito. Frame 2 ergue os bracos; frame 3 abre o peito.
+func _boss_ghorak_anim() -> void:
+	_boss("ghorak", 104, 116, func(f: int) -> void:
+		var bracos_cima := f == 2
+		_linha(34, 84, 24, 114, 12, PAL["t"])
+		_linha(70, 84, 80, 114, 12, PAL["t"])
+		_linha(50, 88, 46, 114, 9, PAL["T"])
+		_linha(54, 88, 60, 114, 9, PAL["T"])
+		if bracos_cima:
+			_linha(24, 44, 8, 18, 10, PAL["t"])
+			_linha(80, 44, 96, 18, 10, PAL["t"])
+			_elipse(8, 16, 9, 8, PAL["t"])
+			_elipse(96, 16, 9, 8, PAL["t"])
+		else:
+			_elipse(12, 52, 10, 9, PAL["t"])
+			_elipse(92, 52, 10, 9, PAL["t"])
+		_elipse(20, 34, 15, 14, PAL["G"])
+		_elipse(84, 34, 15, 14, PAL["G"])
+		_elipse(52, 48, 27, 37, PAL["t"])
+		_elipse(52, 46, 21, 29, PAL["T"])
+		_linha(41, 16, 37, 74, 2, PAL["t"])
+		_linha(63, 18, 67, 74, 2, PAL["t"])
+		var rn: float = [6.0, 5.0, 8.0, 12.0][f]
+		_elipse(52, 46, 13, 14, PAL["x"])
+		_elipse(52, 46, rn * 0.55 + 3.0, rn * 0.6 + 3.0, PAL["M"])
+		_elipse(52, 46, rn * 0.5, rn * 0.55, PAL["m"])
+		_px(52, 45, PAL["w"])
+		if f >= 2:
+			_px(51, 47, PAL["w"])
+			_px(53, 47, PAL["w"])
+		_linha(40, 40, 40, 58, 2, PAL["b"])
+		_linha(64, 40, 64, 58, 2, PAL["b"])
+		_elipse(52, 18, 13, 10, PAL["G"])
+		_elipse(52, 20, 6, 5, PAL["g"] if f != 2 else PAL["m"])
+		_px(50, 19, PAL["w"])
+		_px(54, 19, PAL["w"])
+	)
+
+
+## Nivel 02 -- Pantano dos Sussurros. Morvanna: chapeu largo, manto
+## esfarrapado, fios de bruma em vez de pernas. Frame 2 ergue maos
+## espectrais; frame 3 desce e a cara acende magenta.
+func _boss_morvanna() -> void:
+	var MANTO := Color("18202a")
+	var MANTO_C := Color("2c3b48")
+	var BRUMA := Color("4a7a58")
+	var VERDE := Color("5fd48a")
+	_boss("morvanna", 84, 104, func(f: int) -> void:
+		var desce := 6 if f == 3 else 0
+		for d in 5:
+			var x := 26 + d * 8
+			_linha(x, 66 + desce, x + (d - 2), 96, 2, BRUMA)
+		for j in range(24 + desce, 74 + desce):
+			var t := float(j - 24 - desce) / 50.0
+			var meia := lerpf(9.0, 22.0, t)
+			_rect(int(42 - meia), j, int(meia * 2.0), 1, MANTO)
+		_linha(34, 60 + desce, 33, 74 + desce, 1, MANTO_C)
+		_linha(50, 58 + desce, 52, 74 + desce, 1, MANTO_C)
+		_linha(42, 62 + desce, 42, 74 + desce, 1, MANTO_C)
+		_linha(20, 24 + desce, 64, 24 + desce, 4, MANTO)
+		_linha(42, 24 + desce, 34, 2 + desce, 5, MANTO)
+		_px(33, 2 + desce, MANTO_C)
+		_elipse(42, 30 + desce, 6, 6, Color("101814"))
+		var olho: Color = VERDE if f != 3 else PAL["m"]
+		_px(40, 30 + desce, olho)
+		_px(44, 30 + desce, olho)
+		if f == 2:
+			for hx: int in [24, 60]:
+				var dx: int = 4 if hx < 42 else -4
+				_linha(hx, 40, hx + dx, 20, 3, BRUMA)
+				_linha(hx + dx, 20, hx + int(dx / 2.0), 12, 2, VERDE)
+		if f == 3:
+			_elipse(42, 46 + desce, 5, 6, PAL["M"])
+			_elipse(42, 46 + desce, 2.5, 3, PAL["m"])
+			_px(42, 45 + desce, PAL["w"])
+	)
+
+
+## Nivel 03 -- Ninho da Viuva Negra. A Rainha Aracnidea: abdomen com marca
+## purpura, cefalotorax, 8 patas, rosto humano. Frame 2 ergue as patas da
+## frente; frame 3 acende o rosto humano.
+func _boss_rainha() -> void:
+	var CORPO := Color("1b0f22")
+	var CORPO_C := Color("2a1533")
+	var PATA := Color("120a16")
+	_boss("rainha", 104, 76, func(f: int) -> void:
+		var cx := 52
+		for s: int in [-1, 1]:
+			for p: int in 4:
+				var ax: int = cx + s * 12
+				var ay: int = 40
+				var bx: int = cx + s * (30 + p * 6)
+				var by: int = 34 + p * 2 + (8 if p != 0 else 0)
+				if f == 2 and p == 0:
+					by = 8
+					bx = cx + s * 20
+				if f == 1:
+					by += 3
+				_linha(ax, ay, (ax + bx) / 2, ay - 6, 3, PATA)
+				_linha((ax + bx) / 2, ay - 6, bx, by, 3, PATA)
+		_elipse(cx, 44, 18, 15, CORPO)
+		_elipse(cx, 44, 16, 13, CORPO_C)
+		_linha(cx, 36, cx, 52, 4, Color("6a1f7d"))
+		_px(cx, 44, PAL["m"])
+		_elipse(cx, 26, 12, 10, CORPO)
+		var cara: Color = Color("7a2b52") if f != 3 else Color("ffd0e6")
+		_elipse(cx, 25, 7, 8, cara)
+		var olho: Color = Color("2a1020") if f != 3 else PAL["m"]
+		_px(cx - 2, 24, olho)
+		_px(cx + 2, 24, olho)
+		_linha(cx - 2, 29, cx + 2, 29, 1, Color("2a1020"))
+		if f == 2:
+			_linha(cx - 4, 34, cx - 6, 40, 2, Color("d8c0d0"))
+			_linha(cx + 4, 34, cx + 6, 40, 2, Color("d8c0d0"))
+	)

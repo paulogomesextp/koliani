@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dsprce2wjdkr6"
-path="res://.godot/imported/chefe_entrevane.svg-a29a061393cf7e629f4235843d5b3089.ctex"
+uid="uid://77e8b8rtp1iw"
+path="res://.godot/imported/coracao.png-408096b5bf4d557cec383870140fc996.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/chefe_entrevane.svg"
-dest_files=["res://.godot/imported/chefe_entrevane.svg-a29a061393cf7e629f4235843d5b3089.ctex"]
+source_file="res://assets/sprites/pixel/bosses/coracao.png"
+dest_files=["res://.godot/imported/coracao.png-408096b5bf4d557cec383870140fc996.ctex"]
 
 [params]
 
@@ -38,6 +38,3 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
-svg/scale=1.0
-editor/scale_with_editor_scale=false
-editor/convert_colors_with_editor_theme=false

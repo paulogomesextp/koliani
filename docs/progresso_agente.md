@@ -90,6 +90,21 @@ vem a seguir.
    rítmico ("batimento", nível 05).
 5. Depois: regiões II→VI, 1 chefe por nível, sempre a herdar de `ChefeBase`.
 
+## Arte -- chefes em pixel-art (2026-08-30)
+
+Os 5 chefes da região I passaram de SVG (`Sprite/Corpo` + `personagem.gdshader`)
+para **pixel-art animado**. `tools/gerar_sprites.gd` ganhou `_boss(nome, fw,
+fh, desenhar)` + `_boss_coracao/_entrevane/_ghorak_anim/_morvanna/_rainha`:
+cada chefe é uma **tira horizontal de 4 frames** em
+`assets/sprites/pixel/bosses/<nome>.png` (0/1 idle, 2 telegrafo/ataque,
+3 exposto), temática vinda do nome do nível. As cenas `Chefe*.tscn` usam
+`Sprite2D` com `hframes = 4` (sem shader -- contorno/sombra "baked"); os
+scripts trocam `_corpo.frame` no `_piscar()` (telegrafo -> 2) e no
+`_mostrar_nucleo()` (exposto -> 3); o Coração usa também 1 (sístole) e
+mapeia 0/3 à fase. SVGs dos chefes apagados. Regenerar:
+`godot --headless --script res://tools/gerar_sprites.gd` (PREVIEW=1 p/
+`bosses/_preview_*`, gitignored) + `--import`.
+
 ## Regras que não mudam
 
 Commits pequenos; `tests/run_tests.gd` a sair `OK` e export Web a

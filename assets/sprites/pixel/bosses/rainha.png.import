@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://xyd2nqm5gigq"
-path="res://.godot/imported/chefe_coracao_putrefacto.svg-e802513729c66e47b6c54477f6b8469a.ctex"
+uid="uid://b1vrc6t0jhufn"
+path="res://.godot/imported/rainha.png-63377f62acf54d062b8548745d644b37.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/chefe_coracao_putrefacto.svg"
-dest_files=["res://.godot/imported/chefe_coracao_putrefacto.svg-e802513729c66e47b6c54477f6b8469a.ctex"]
+source_file="res://assets/sprites/pixel/bosses/rainha.png"
+dest_files=["res://.godot/imported/rainha.png-63377f62acf54d062b8548745d644b37.ctex"]
 
 [params]
 
@@ -38,6 +38,3 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
-svg/scale=1.0
-editor/scale_with_editor_scale=false
-editor/convert_colors_with_editor_theme=false

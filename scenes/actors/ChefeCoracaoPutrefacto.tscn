@@ -1,25 +1,13 @@
-[gd_scene load_steps=8 format=3 uid="uid://bkolianichefecoracao05"]
+[gd_scene load_steps=6 format=3 uid="uid://bkolianichefecoracao05"]
 
 ; Região I / nível 05 -- O Coração Putrefacto. Coração púrpura preso em
-; raízes e cadáveres, a flutuar no centro da arena. Sprite
-; assets/sprites/chefe_coracao_putrefacto.svg + Nucleo (só à vista na
-; sístole). Script chefe_coracao_putrefacto.gd (herda ChefeBase). Não se
-; desloca -- pulsa; toda a luta anda ao ritmo da batida.
+; raízes e cadáveres, a flutuar no centro da arena. Sprite pixel-art
+; animado (tira de 4 frames: 0 diástole, 1 sístole, 2 fase 2, 3 fase 3)
+; assets/sprites/pixel/bosses/coracao.png -- o script troca `frame`.
+; Nucleo = overlay do ponto fraco (só na sístole). chefe_coracao_putrefacto.gd.
 
 [ext_resource type="Script" path="res://scripts/chefe_coracao_putrefacto.gd" id="1_chefe"]
-[ext_resource type="Texture2D" path="res://assets/sprites/chefe_coracao_putrefacto.svg" id="2_tex"]
-[ext_resource type="Shader" path="res://assets/shaders/personagem.gdshader" id="3_sh"]
-
-[sub_resource type="ShaderMaterial" id="mat_c"]
-resource_local_to_scene = true
-shader = ExtResource("3_sh")
-shader_parameter/flash = 0.0
-shader_parameter/flash_cor = Color(1, 1, 1, 1)
-shader_parameter/rim_cor = Color(0.85, 0.4, 0.95, 1)
-shader_parameter/rim_forca = 0.8
-shader_parameter/rim_dir = Vector2(-1, -0.55)
-shader_parameter/rim_espessura = 1.5
-shader_parameter/interior = 0.25
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/bosses/coracao.png" id="2_tex"]
 
 [sub_resource type="RectangleShape2D" id="rs_body"]
 size = Vector2(60, 58)
@@ -52,10 +40,11 @@ cor_rim = Color(0.85, 0.4, 0.95, 1)
 [node name="Sprite" type="Node2D" parent="."]
 
 [node name="Corpo" type="Sprite2D" parent="Sprite"]
+texture_filter = 1
 position = Vector2(0, -2)
 scale = Vector2(1.4, 1.4)
 texture = ExtResource("2_tex")
-material = SubResource("mat_c")
+hframes = 4
 
 [node name="LuzCoracao" type="PointLight2D" parent="Sprite"]
 texture = SubResource("tex_luz")

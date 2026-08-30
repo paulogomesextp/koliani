@@ -1,23 +1,12 @@
-[gd_scene load_steps=8 format=3 uid="uid://bkolianichefeghorak01"]
+[gd_scene load_steps=6 format=3 uid="uid://bkolianichefeghorak01"]
 
 ; Regiao I / nivel 01 -- Ghorak, o Guardiao Raiz.
-; Sprite SVG assets/sprites/chefe_ghorak.svg + nucleo purpura (o ponto
-; fraco) montado como no. Script chefe_ghorak.gd (herda ChefeBase).
+; Sprite pixel-art animado (tira de 4 frames: 0/1 idle, 2 bracos erguidos
+; (baque), 3 peito aberto) assets/sprites/pixel/bosses/ghorak.png -- o
+; script troca `frame`. Nucleo = overlay do ponto fraco. chefe_ghorak.gd.
 
 [ext_resource type="Script" path="res://scripts/chefe_ghorak.gd" id="1_chefe"]
-[ext_resource type="Texture2D" uid="uid://876iqyii7h4o" path="res://assets/sprites/chefe_ghorak.svg" id="2_tex"]
-[ext_resource type="Shader" path="res://assets/shaders/personagem.gdshader" id="3_sh"]
-
-[sub_resource type="ShaderMaterial" id="mat_g"]
-resource_local_to_scene = true
-shader = ExtResource("3_sh")
-shader_parameter/flash = 0.0
-shader_parameter/flash_cor = Color(1, 1, 1, 1)
-shader_parameter/rim_cor = Color(0.55, 0.95, 0.4, 1)
-shader_parameter/rim_forca = 0.7
-shader_parameter/rim_dir = Vector2(-1, -0.55)
-shader_parameter/rim_espessura = 1.5
-shader_parameter/interior = 0.2
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/bosses/ghorak.png" id="2_tex"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_body"]
 size = Vector2(58, 88)
@@ -50,9 +39,10 @@ cor_rim = Color(0.55, 0.95, 0.4, 1)
 [node name="Sprite" type="Node2D" parent="."]
 
 [node name="Corpo" type="Sprite2D" parent="Sprite"]
+texture_filter = 1
 position = Vector2(0, -2)
 texture = ExtResource("2_tex")
-material = SubResource("mat_g")
+hframes = 4
 
 [node name="LuzOlhos" type="PointLight2D" parent="Sprite"]
 position = Vector2(0, -34)

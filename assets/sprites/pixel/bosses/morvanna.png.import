@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://876iqyii7h4o"
-path="res://.godot/imported/chefe_ghorak.svg-1d7d13668d49e4fccebbb0cd494b47ee.ctex"
+uid="uid://c28dvh0ew54e"
+path="res://.godot/imported/morvanna.png-4a6c3b71bf71af159aadb6ab28b34de2.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/chefe_ghorak.svg"
-dest_files=["res://.godot/imported/chefe_ghorak.svg-1d7d13668d49e4fccebbb0cd494b47ee.ctex"]
+source_file="res://assets/sprites/pixel/bosses/morvanna.png"
+dest_files=["res://.godot/imported/morvanna.png-4a6c3b71bf71af159aadb6ab28b34de2.ctex"]
 
 [params]
 
@@ -38,6 +38,3 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
-svg/scale=1.0
-editor/scale_with_editor_scale=false
-editor/convert_colors_with_editor_theme=false
