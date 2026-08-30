@@ -146,6 +146,11 @@ const PISTAS := {
 		"titulo": "clue.vila_retrato_sem_cara.title",
 		"texto": "clue.vila_retrato_sem_cara.body",
 	},
+	"mercado_gancho_vazio": {
+		"mundo": "world.city",
+		"titulo": "clue.mercado_gancho_vazio.title",
+		"texto": "clue.mercado_gancho_vazio.body",
+	},
 	"castelo_aurora_livre": {
 		"mundo": "world.castle",
 		"titulo": "clue.castelo_aurora_livre.title",

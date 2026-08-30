@@ -66,6 +66,7 @@ func _initialize() -> void:
 	_boss_naga()     # regiao IV / nivel 19
 	_boss_olho()     # regiao IV / nivel 20
 	_boss_prefeito() # regiao V / nivel 21
+	_boss_acougueiro() # regiao V / nivel 22
 	print("OK -- sprites pixel-art em ", DIR)
 	quit(0)
 
@@ -1298,4 +1299,62 @@ func _boss_prefeito() -> void:
 			_linha(int(cx) + 16, 52, int(cx) + 16, 88, 2, Color("3a2c1e"))
 			_elipse(cx + 16, 50, 3, 3, OURO)
 		_linha(int(cx) - 9, 44, int(cx) - 15, 64, 4, CASACA_C)
+	)
+
+
+## Nivel 22 -- Mercado da Carne. O Acougueiro Real: gigante de avental de
+## couro manchado, dois cutelos, mascara de malha. Frame 2 = cutelos
+## erguidos (telegrafo); frame 3 = cutelos cravados no chao, ventre a
+## mostra (exposto).
+func _boss_acougueiro() -> void:
+	var CARNE := Color("7a3b3b")
+	var CARNE_C := Color("9c5050")
+	var COURO := Color("5a4326")
+	var COURO_C := Color("7a5c36")
+	var ACO := Color("b8bcc8")
+	var NUCLEO := Color("ff5cc0")
+	_boss("acougueiro", 120, 116, func(f: int) -> void:
+		var erguido := f == 2
+		var cravado := f == 3
+		var cx := 60.0
+		# pernas
+		_rect(int(cx) - 16, 92, 14, 22, CARNE)
+		_rect(int(cx) + 4, 92, 14, 22, CARNE)
+		_rect(int(cx) - 20, 112, 20, 4, COURO)
+		_rect(int(cx) + 2, 112, 20, 4, COURO)
+		# tronco enorme
+		_elipse(cx, 56, 30, 32, CARNE)
+		_elipse(cx, 54, 22, 24, CARNE_C)
+		# avental de couro
+		for j in range(44, 96):
+			var t := float(j - 44) / 52.0
+			var meia := lerpf(14.0, 22.0, t)
+			_rect(int(cx - meia), j, int(meia * 2.0), 1, COURO if j % 4 else COURO_C)
+		# manchas
+		_px(int(cx) - 6, 60, CARNE); _px(int(cx) + 8, 72, CARNE); _px(int(cx) - 12, 80, CARNE)
+		# ventre / nucleo
+		var g: float = [0.9, 0.95, 1.05, 1.5][f]
+		_elipse(cx, 66, 5.0 * g, 6.0 * g, NUCLEO if cravado else CARNE_C)
+		if cravado:
+			_elipse(cx, 66, 2.2, 2.6, PAL["w"])
+		# cabeca (mascara de malha, sem tracos)
+		_elipse(cx, 22, 12, 12, COURO_C)
+		for mx in range(-8, 9, 4):
+			_linha(int(cx) + mx, 14, int(cx) + mx, 30, 1, COURO)
+		# bracos + cutelos
+		if erguido:
+			_linha(int(cx) - 22, 44, int(cx) - 34, 8, 7, CARNE)
+			_linha(int(cx) + 22, 44, int(cx) + 34, 8, 7, CARNE)
+			_rect(int(cx) - 44, -6, 18, 16, ACO)
+			_rect(int(cx) + 26, -6, 18, 16, ACO)
+		elif cravado:
+			_linha(int(cx) - 22, 46, int(cx) - 30, 88, 7, CARNE)
+			_linha(int(cx) + 22, 46, int(cx) + 30, 88, 7, CARNE)
+			_rect(int(cx) - 40, 84, 16, 14, ACO)
+			_rect(int(cx) + 24, 84, 16, 14, ACO)
+		else:
+			_linha(int(cx) - 22, 46, int(cx) - 38, 72, 7, CARNE)
+			_linha(int(cx) + 22, 46, int(cx) + 38, 72, 7, CARNE)
+			_rect(int(cx) - 48, 66, 16, 14, ACO)
+			_rect(int(cx) + 32, 66, 16, 14, ACO)
 	)
