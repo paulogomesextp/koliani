@@ -1,0 +1,43 @@
+[gd_scene load_steps=4 format=3 uid="uid://bkolianigotaacida04"]
+
+; Lágrima ácida (ver scripts/gota_acida.gd). Pende de um galho: incha, cai
+; e deixa uma poça que magoa. `automatico = true` goteja em ciclo (perigo
+; de cenário); a Entrevane pousa-a sobre a Koliani e chama `cair()`.
+
+[ext_resource type="Script" path="res://scripts/gota_acida.gd" id="1_gota"]
+
+[sub_resource type="Gradient" id="grad_luz"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="tex_luz"]
+gradient = SubResource("grad_luz")
+width = 96
+height = 96
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[node name="GotaAcida" type="Area2D"]
+collision_layer = 0
+collision_mask = 2
+script = ExtResource("1_gota")
+
+[node name="Fonte" type="Node2D" parent="."]
+
+[node name="Bolha" type="Polygon2D" parent="Fonte"]
+color = Color(0.78, 0.86, 0.32, 1)
+polygon = PackedVector2Array(0, -10, 6, 0, 4, 8, -4, 8, -6, 0)
+
+[node name="Brilho" type="Line2D" parent="Fonte"]
+points = PackedVector2Array(-2, -6, 1, 2)
+width = 2.0
+default_color = Color(0.95, 1, 0.7, 0.8)
+begin_cap_mode = 2
+end_cap_mode = 2
+
+[node name="Luz" type="PointLight2D" parent="Fonte"]
+texture = SubResource("tex_luz")
+energy = 0.5
+color = Color(0.82, 0.9, 0.4, 1)
+scale = Vector2(0.4, 0.55)

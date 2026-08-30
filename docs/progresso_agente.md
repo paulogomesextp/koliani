@@ -12,9 +12,10 @@ vem a seguir.
 | 0 | `Floresta_Putrefata.tscn` | I Floresta | Ghorak | jogável (antigo "M1") |
 | 1 | `Pantano_dos_Sussurros.tscn` | I Floresta | Morvanna | **novo 2026-08-30** |
 | 2 | `Ninho_da_Viuva_Negra.tscn` | I Floresta | Rainha Aracnídea | **novo 2026-08-30** |
-| 3 | `Prisao_dos_Condenados.tscn` | II Prisão | Carcereiro | jogável (antigo "M2") |
-| 4 | `Torres_Esquecidas.tscn` | III Torres | Uivo/Vento | jogável (antigo "M3") |
-| 5 | `Castelo_de_Zeriko.tscn` | VI Castelo | Zeriko | jogável (final) |
+| 3 | `A_Arvore_que_Chora.tscn` | I Floresta | Entrevane | **novo 2026-08-30** |
+| 4 | `Prisao_dos_Condenados.tscn` | II Prisão | Carcereiro | jogável (antigo "M2") |
+| 5 | `Torres_Esquecidas.tscn` | III Torres | Uivo/Vento | jogável (antigo "M3") |
+| 6 | `Castelo_de_Zeriko.tscn` | VI Castelo | Zeriko | jogável (final) |
 
 > **Nota de save:** inserir níveis no meio de `NIVEIS` desloca os índices.
 > Saves de playtest antigos ficam a apontar para o nível errado — fazer
@@ -34,6 +35,11 @@ vem a seguir.
   em `koliani.gd`: `_preso` bloqueia andar/saltar). `permanente=true` =
   teia fixa do cenário; a Rainha Aracnídea chama `lancar()`.
   `scripts/teia_prende.gd` + cena.
+- `GotaAcida` — lágrima de seiva ácida (`scripts/gota_acida.gd` + cena).
+  Pende de um galho, incha (telegrafo), cai e deixa uma POÇA que magoa por
+  `dur_poca`. `automatico=true` goteja em ciclo (perigo de cenário); a
+  Entrevane pousa-a sobre a Koliani e chama `cair()`. O escudo bloqueia
+  (a gota vem de cima -> empurrão 0).
 - `Plataforma`, `Espinhos`, `Serra`, `Fogo`, `ParedeFragil` — já existiam.
   Nota: `Plataforma` ignora `cor_base/cor_topo` para o NinePatch de terreno,
   por isso as "plataformas de teia" ainda parecem relva — trocar por tiles
@@ -60,15 +66,25 @@ vem a seguir.
 - Pista nova `ninho_teia_com_cabelo` (diário + i18n × 6).
 - `koliani.gd`: novo `_preso` / `prender(segundos)` — preso numa teia não
   anda nem salta. Escudo erguido protege.
+- **Nível 04 — A Árvore que Chora** (região I): sobe-se o tronco por galhos
+  (alguns no grupo "plataformas_arvore"), com `GotaAcida` a gotejar do
+  cimo e a deixar poças ácidas; serra + espinhos. Chefe **Entrevane, a
+  Árvore Amaldiçoada** (`chefe_entrevane.gd`): enraizada, varre galhos na
+  horizontal, chora cortinas de seiva ácida e faz raízes irromper
+  (`RaizPerigo`). Ponto fraco = o rosto que chora, só EXPOSTO depois de
+  cada ataque (dano a dobrar). Fase 2 < 50%: telégrafos curtos, goteja
+  sem parar, mais raízes/galhos, parte um par de galhos da arena.
+- Pista nova `arvore_lagrima_no_tronco` (diário + i18n × 6).
 
 ## A seguir (por `docs/niveis.md`, região I)
 
 1. ~~Nível 03 — Ninho da Viúva Negra + Rainha Aracnídea~~ **feito**. Ainda
    não jogado a sério — afinar dano/ritmo/tamanho do chefe no playtest.
-2. Nível 04 — A Árvore que Chora + chefe **Entrevane** (subir pelo corpo
-   do chefe enquanto ele ataca com galhos).
+2. ~~Nível 04 — A Árvore que Chora + chefe **Entrevane**~~ **feito**. Falta
+   afinar no playtest; a ideia de "subir pelo corpo do chefe" ficou como
+   combate ao pé dele (janela EXPOSTA) — refinar depois.
 3. Nível 05 — Coração da Floresta + chefe **Coração Putrefacto** (arena
-   rítmica: muda a cada "batimento"; 3 fases).
+   rítmica: muda a cada "batimento"; 3 fases). Fecha a região I.
 4. Mecânicas ainda por fazer: plataforma móvel de correntes (região II),
    vento (III), gravidade variável (III), luz↔escuridão (IV), cenário
    rítmico ("batimento", nível 05).

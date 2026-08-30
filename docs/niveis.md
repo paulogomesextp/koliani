@@ -10,11 +10,18 @@
 > chefe próprio) script de chefe + sprite. Ordem de ataque sugerida no fim.
 >
 > **Feito até agora (2026‑08‑30):**
-> - Região I / nível 02 **Pântano dos Sussurros** jogável: chefe
->   **Morvanna** (`chefe_morvanna.gd` + `ChefeMorvanna.tscn`), mecânicas
->   partilhadas **`AguaVenenosa`** (morte instantânea) e
->   **`PlataformaFlutuante`** (baloiça/deriva, "apagável" pela Morvanna).
->   Pista `pantano_bilhete_na_agua`.
+> - Região I / níveis 02‑04 jogáveis (`EstadoJogo.NIVEIS` = 7 entradas;
+>   floresta = `[0,1,2,3]`):
+>   - **02 Pântano dos Sussurros** — chefe **Morvanna**; `AguaVenenosa`
+>     (morte instantânea) + `PlataformaFlutuante`. Pista
+>     `pantano_bilhete_na_agua`.
+>   - **03 Ninho da Viúva Negra** — chefe **Rainha Aracnídea**;
+>     `TeiaPrende` (prende a Koliani). Pista `ninho_teia_com_cabelo`.
+>   - **04 A Árvore que Chora** — chefe **Entrevane** (`chefe_entrevane.gd`
+>     + `ChefeEntrevane.tscn`); mecânica partilhada **`GotaAcida`**
+>     (lágrima de seiva ácida: goteja, cai, deixa poça). Pista
+>     `arvore_lagrima_no_tronco`.
+> - Saves antigos ficam deslocados (índices mudaram) -> **NEW GAME**.
 >
 > **(2026‑08‑29):**
 > - `EstadoJogo.REGIOES` — camada de dados das 6 regiões + `concluidos`

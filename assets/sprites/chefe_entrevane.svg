@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="88" height="104" viewBox="0 0 88 104">
+  <defs>
+    <radialGradient id="seiva" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#e8f2a0" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#4a5a1e" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <!-- copa retorcida -->
+  <path d="M20 30 C8 22 6 8 14 2 C22 -2 30 6 34 10 C40 2 52 0 58 6 C66 2 78 8 78 20 C82 30 74 40 64 40 C66 50 56 56 48 52 C44 60 30 60 26 52 C16 54 10 44 14 36 C12 34 16 30 20 30 Z"
+        fill="#1a1108"/>
+  <path d="M24 28 C16 22 16 12 22 8 C30 12 30 20 34 22 C40 14 50 12 54 16 C62 12 70 16 70 24 C72 32 64 38 58 36"
+        fill="#241708" opacity="0.7"/>
+  <!-- tronco -->
+  <path d="M36 40 C34 56 32 72 30 90 L58 90 C56 72 54 56 52 40 C48 44 40 44 36 40 Z" fill="#171009"/>
+  <path d="M42 44 C41 60 40 76 39 90 L49 90 C48 76 47 60 46 44 Z" fill="#0e0905" opacity="0.8"/>
+  <!-- raízes na base -->
+  <path d="M30 90 C22 92 14 98 8 102 M30 90 C28 96 26 100 24 103 M58 90 C66 92 74 98 80 102 M58 90 C60 96 62 100 64 103 M44 90 L44 103"
+        stroke="#120c06" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <!-- rosto que chora (na casca) -->
+  <ellipse cx="44" cy="58" rx="9" ry="11" fill="url(#seiva)"/>
+  <path d="M40 54 Q42 52 44 54 M44 54 Q46 52 48 54" stroke="#0c0a04" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+  <path d="M40 64 Q44 68 48 64" stroke="#0c0a04" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+  <!-- lágrimas de seiva -->
+  <path d="M40 62 C39 68 39 74 40 80" stroke="#b6c64a" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.85"/>
+  <path d="M48 62 C49 67 49 72 48 77" stroke="#b6c64a" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.7"/>
+  <!-- segundo rosto, mais acima e menor -->
+  <ellipse cx="30" cy="34" rx="4.5" ry="5.5" fill="#2a1c0c"/>
+  <ellipse cx="29" cy="33" rx="1.1" ry="1.5" fill="#0c0a04"/>
+  <ellipse cx="32" cy="33" rx="1.1" ry="1.5" fill="#0c0a04"/>
+</svg>

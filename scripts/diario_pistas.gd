@@ -31,6 +31,11 @@ const PISTAS := {
 		"titulo": "clue.ninho_teia_com_cabelo.title",
 		"texto": "clue.ninho_teia_com_cabelo.body",
 	},
+	"arvore_lagrima_no_tronco": {
+		"mundo": "world.forest",
+		"titulo": "clue.arvore_lagrima_no_tronco.title",
+		"texto": "clue.arvore_lagrima_no_tronco.body",
+	},
 	"prisao_carta_na_cela": {
 		"mundo": "world.prison",
 		"titulo": "clue.prisao_carta_na_cela.title",
