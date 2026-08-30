@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3 uid="uid://bkolianicascamasmorra01"]
+
+; Casca de masmorra reutilizavel -- tecto + paredes + fundo em tiles do
+; 0x72 DungeonTileset II (CC0). Fecha um nivel de campo aberto. Ver
+; scripts/casca_masmorra.gd para os @export (largura/altura/topo/esquerda).
+
+[ext_resource type="Script" path="res://scripts/casca_masmorra.gd" id="1_casca"]
+
+[node name="CascaMasmorra" type="Node2D"]
+script = ExtResource("1_casca")

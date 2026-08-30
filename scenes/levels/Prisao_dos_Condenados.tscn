@@ -1,9 +1,9 @@
-[gd_scene load_steps=19 format=3 uid="uid://bkolianiprisao01"]
+[gd_scene load_steps=20 format=3 uid="uid://bkolianiprisao01"]
 
 ; Mundo 2 -- Prisao dos Condenados.
-; Masmorra, correntes, celas; azul-frio. A Koliani ja tem salto duplo (do
-; mundo 1), por isso o nivel pede-o: fossos e uma subida longa. Greybox --
-; ColorRect + Atmosfera.tscn recolorida.
+; Masmorra FECHADA (CascaMasmorra: tecto + paredes + fundo em tiles 0x72
+; CC0), correntes, celas; pedra fria. A Koliani ja tem salto duplo (do
+; mundo 1), por isso o nivel pede-o: fossos e uma subida longa.
 
 [ext_resource type="PackedScene" uid="uid://bkolianiactor01" path="res://scenes/actors/Koliani.tscn" id="1_kol"]
 [ext_resource type="PackedScene" uid="uid://bdemoniobase01" path="res://scenes/actors/DemonioBase.tscn" id="2_dem"]
@@ -15,6 +15,7 @@
 [ext_resource type="PackedScene" uid="uid://bkolianiatmosfera01" path="res://scenes/fx/Atmosfera.tscn" id="8_atm"]
 [ext_resource type="PackedScene" uid="uid://bkolianiplataforma01" path="res://scenes/actors/Plataforma.tscn" id="9_pl"]
 [ext_resource type="PackedScene" uid="uid://bkolianifogo01" path="res://scenes/actors/Fogo.tscn" id="10_fogo"]
+[ext_resource type="PackedScene" uid="uid://bkolianicascamasmorra01" path="res://scenes/actors/CascaMasmorra.tscn" id="11_casca"]
 
 [sub_resource type="RectangleShape2D" id="rs_chao_i"]
 size = Vector2(900, 48)
@@ -53,15 +54,22 @@ fill_to = Vector2(1, 0.5)
 script = ExtResource("7_niv")
 
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
-cor_ambiente = Color(0.55, 0.66, 0.8, 1)
-cor_fundo = Color(0.03, 0.055, 0.09, 1)
-cor_silhueta = Color(0.06, 0.11, 0.17, 1)
-cor_luz = Color(0.3, 0.7, 0.95, 1)
-cor_poeira = Color(0.6, 0.85, 1, 1)
+cor_ambiente = Color(0.62, 0.58, 0.66, 1)
+cor_fundo = Color(0.045, 0.04, 0.06, 1)
+cor_silhueta = Color(0.1, 0.09, 0.14, 1)
+cor_luz = Color(0.55, 0.4, 0.72, 1)
+cor_poeira = Color(0.72, 0.62, 0.82, 1)
 densidade_poeira = 1.3
 bioma = "prisao"
 largura_nivel = 3200.0
 fundo_pack = "corredores"
+
+[node name="Casca" parent="." instance=ExtResource("11_casca")]
+largura = 4150.0
+altura = 580.0
+topo = 150.0
+esquerda = -140.0
+chao_y = 740.0
 
 [node name="ChaoInicio" parent="." instance=ExtResource("9_pl")]
 position = Vector2(400, 660)
