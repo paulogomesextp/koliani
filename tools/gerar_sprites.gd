@@ -42,7 +42,9 @@ func _initialize() -> void:
 	DirAccess.make_dir_recursive_absolute(abs_dir)
 	DirAccess.make_dir_recursive_absolute(abs_dir + "/bosses")
 	DirAccess.make_dir_recursive_absolute(abs_dir + "/gear")
+	DirAccess.make_dir_recursive_absolute(abs_dir + "/koliani")
 	_koliani()
+	_koliani_anim()   # tiras de animacao (idle/run/jump/attack/crouch/wallslide/djump)
 	_ghorak()
 	_demonio()
 	_armas()      # tira de 15 armas para a Koliani segurar
@@ -342,6 +344,226 @@ func _koliani() -> void:
 	_px(29, 38, PAL["w"])                # faisca na ponta
 
 	_guardar("koliani")
+
+
+## --- Koliani ANIMADA (baseada na folha de referencia do Paulo) ---------
+## Tiras horizontais, 40x52 por frame, virada a' DIREITA. Estilo: sem
+## capuz -- bandana, cabelo curto, capa roxa esfarrapada atras, top sem
+## mangas + cintos, botas altas, lamina roxa acesa e fumos/fantasmas roxos.
+
+const KPAL := {
+	"o":  Color("1a1720"),  # contorno
+	"d":  Color("2b2733"),  # escuro (roupa)
+	"D":  Color("3b3547"),  # roupa clara
+	"cp": Color("46345f"),  # capa
+	"cP": Color("6b4a8f"),  # capa realce
+	"m":  Color("b94fd6"),  # magenta halo
+	"M":  Color("7a3f9e"),  # magenta medio
+	"w":  Color("f2e6ff"),  # brilho
+	"k":  Color("cda484"),  # pele
+	"s":  Color("8a6b52"),  # pele sombra
+	"h":  Color("2a2230"),  # cabelo
+	"H":  Color("593a4c"),  # cabelo streak
+	"g":  Color("7b7682"),  # metal (pauldron / fivelas)
+	"c":  Color("d8ccb6"),  # creme (bandana clara / detalhes)
+	"b":  Color("241c14"),  # bota
+}
+
+
+func _koliani_anim() -> void:
+	var FW := 40
+	var FH := 52
+	# nome -> Array de "poses" (dicionarios). Cada pose = 1 frame.
+	var tiras := {
+		"idle":      _poses_idle(),
+		"run":       _poses_run(),
+		"jump":      _poses_jump(),
+		"fall":      _poses_fall(),
+		"attack":    _poses_attack(),
+		"crouch":    _poses_crouch(),
+		"wallslide": _poses_wall(),
+		"djump":     _poses_djump(),
+	}
+	for nome: String in tiras:
+		var poses: Array = tiras[nome]
+		_novo(FW * poses.size(), FH)
+		for i in poses.size():
+			_ox = i * FW
+			_kol_pose(poses[i], FW, FH)
+		_ox = 0
+		_guardar("koliani/%s" % nome)
+
+
+func _poses_idle() -> Array:
+	var a := []
+	var resps := [0, -1, 0, 1]
+	for k in 4:
+		a.append({"passo": 0.0, "lean": 0.0, "braco": 0.55, "capa": 0.3 + 0.08 * float(k % 2),
+			"agacha": 0.0, "sobe": int(resps[k]), "wisps": 1})
+	return a
+
+
+func _poses_run() -> Array:
+	var a := []
+	for k in 6:
+		var ph := sin(TAU * float(k) / 6.0)
+		a.append({"passo": ph, "lean": 3.0, "braco": 0.35 + 0.3 * cos(TAU * float(k) / 6.0),
+			"capa": 0.75 + 0.15 * ph, "agacha": 0.0, "sobe": -1 if k % 3 == 1 else 0, "wisps": 2})
+	return a
+
+
+func _poses_jump() -> Array:
+	return [
+		{"passo": -0.6, "lean": 2.0, "braco": -0.2, "capa": 0.95, "agacha": 0.15, "sobe": 0, "wisps": 2},
+		{"passo": -0.9, "lean": 2.0, "braco": 0.0, "capa": 1.1, "agacha": 0.1, "sobe": -1, "wisps": 2},
+	]
+
+
+func _poses_fall() -> Array:
+	return [
+		{"passo": 0.7, "lean": 1.0, "braco": 0.3, "capa": 1.15, "agacha": 0.0, "sobe": 0, "wisps": 2},
+		{"passo": 0.9, "lean": 1.0, "braco": 0.5, "capa": 1.0, "agacha": 0.0, "sobe": 1, "wisps": 1},
+	]
+
+
+func _poses_attack() -> Array:
+	var a := []
+	for k in 4:
+		var b := lerpf(-0.9, 1.1, float(k) / 3.0)
+		a.append({"passo": 0.15 * float(k), "lean": 2.0 + float(k), "braco": b,
+			"capa": 0.6 + 0.15 * float(k), "agacha": 0.05, "sobe": 0,
+			"wisps": 3, "slash": clampf(float(k) / 3.0, 0.0, 1.0)})
+	return a
+
+
+func _poses_crouch() -> Array:
+	return [
+		{"passo": 0.0, "lean": 3.0, "braco": 0.7, "capa": 0.35, "agacha": 0.9, "sobe": 0, "wisps": 1},
+		{"passo": 0.0, "lean": 3.5, "braco": 0.75, "capa": 0.4, "agacha": 1.0, "sobe": 0, "wisps": 1},
+	]
+
+
+func _poses_wall() -> Array:
+	var a := []
+	for k in 2:
+		a.append({"passo": -0.3, "lean": 0.0, "braco": 0.2, "capa": -0.6,
+			"agacha": 0.25, "sobe": k, "wisps": 1, "parede": true})
+	return a
+
+
+func _poses_djump() -> Array:
+	var a := []
+	for k in 4:
+		a.append({"passo": -0.5 + 0.3 * float(k), "lean": 1.0, "braco": -0.4 + 0.5 * float(k),
+			"capa": 1.2, "agacha": 0.1, "sobe": -1 if k < 2 else 0, "wisps": 4,
+			"swirl": clampf(1.0 - float(k) / 3.0, 0.0, 1.0)})
+	return a
+
+
+## Desenha uma Koliani no frame corrente (usa `_ox`). Origem do frame no
+## canto superior-esquerdo; pes ~y=FH-3.
+func _kol_pose(p: Dictionary, fw: int, fh: int) -> void:
+	var cx := fw / 2 + int(p.get("lean", 0.0) * 0.0)   # centro
+	var pes := fh - 3
+	var ag: float = p.get("agacha", 0.0)
+	var sobe: int = int(p.get("sobe", 0))
+	var lean: float = p.get("lean", 0.0)
+	var passo: float = p.get("passo", 0.0)
+	var braco: float = p.get("braco", 0.5)
+	var capa: float = p.get("capa", 0.4)
+	var parede: bool = p.get("parede", false)
+	var wisps: int = int(p.get("wisps", 0))
+
+	# alturas comprimidas pelo agachar
+	var h_perna := int(lerpf(15.0, 7.0, ag))
+	var h_tronco := int(lerpf(14.0, 10.0, ag))
+	var y_quadril := pes - h_perna + sobe
+	var y_ombro := y_quadril - h_tronco
+	var y_cabeca := y_ombro - 6
+	var head_x := cx + int(lean * 0.5) + (2 if parede else 0)
+
+	# --- CAPA esfarrapada (atras) -- desenha primeiro ---
+	var sway := int(capa * 8.0)
+	for j in range(y_ombro, pes + 2):
+		var f := float(j - y_ombro) / float(maxi(1, pes + 2 - y_ombro))
+		var larg := int(lerpf(6.0, 11.0, f))
+		var bx := cx - 3 - int(f * sway) - (int(f * -10.0) if parede else 0)
+		# orla esfarrapada: recorta uns dentes
+		var corte := 0
+		if j > pes - 6:
+			corte = int(2.0 + 2.0 * sin(float(j) * 1.7 + _ox))
+		_rect(bx - larg + corte, j, larg, 1, KPAL["cp"])
+		if j % 3 == 0:
+			_px(bx - larg + corte, j, KPAL["cP"])
+	# ganchos de capa nos ombros
+	_rect(cx - 4, y_ombro - 1, 9, 3, KPAL["cp"])
+
+	# --- PERNAS + BOTAS ---
+	var passo_px := int(passo * 4.0)
+	# perna de tras
+	_rect(cx - 4 - passo_px, y_quadril, 4, h_perna - 4, KPAL["d"])
+	_rect(cx - 5 - passo_px, y_quadril + h_perna - 5, 5, 5, KPAL["b"])
+	# perna da frente
+	_rect(cx + 1 + passo_px, y_quadril, 5, h_perna - 4, KPAL["d"])
+	_rect(cx + 1 + passo_px, y_quadril + h_perna - 5, 6, 5, KPAL["b"])
+	_px(cx + 6 + passo_px, y_quadril + h_perna - 2, KPAL["g"])   # fivela da bota
+
+	# --- TRONCO (top sem mangas) + cinto ---
+	for j in range(y_ombro, y_quadril + 1):
+		var f := float(j - y_ombro) / float(maxi(1, y_quadril - y_ombro))
+		var meia := lerpf(5.0, 4.0, f)
+		var tx := cx + int(lean * (1.0 - f) * 0.4)
+		_rect(int(tx - meia), j, int(meia * 2.0), 1, KPAL["d"])
+	_rect(cx - 5, y_quadril - 3, 11, 2, KPAL["D"])       # cinto
+	_px(cx, y_quadril - 2, KPAL["g"])                    # fivela
+	# pauldron (ombro da frente)
+	_rect(cx + 3, y_ombro - 1, 4, 4, KPAL["g"])
+	_px(cx + 6, y_ombro, KPAL["c"])
+
+	# --- CABECA + BANDANA + CABELO ---
+	_elipse(head_x, y_cabeca, 5.5, 6.0, KPAL["h"])       # cabelo (base)
+	_elipse(head_x + 1, y_cabeca + 1, 4.2, 4.6, KPAL["k"])  # cara
+	_rect(head_x - 4, y_cabeca - 4, 9, 3, KPAL["h"])     # cabelo topo
+	_linha(head_x - 5, y_cabeca + 2, head_x - 6, y_cabeca + 8, 3, KPAL["h"])  # madeixa lateral
+	_px(head_x - 6, y_cabeca + 6, KPAL["H"])
+	_rect(head_x - 4, y_cabeca - 1, 9, 2, KPAL["d"])     # bandana
+	_px(head_x - 4, y_cabeca, KPAL["c"])
+	_px(head_x + 3, y_cabeca + 1, KPAL["m"])             # olho magenta
+
+	# --- BRACO (mao vazia -- a arma equipada e' um sprite a' parte) ---
+	var bang := lerpf(-1.2, 0.9, (braco + 1.0) * 0.5)
+	var mao := Vector2(head_x + cos(bang) * 11.0, y_ombro + 6 + sin(bang) * 9.0)
+	_linha(cx + 3, y_ombro + 3, int(mao.x), int(mao.y), 3, KPAL["d"])
+	_elipse(mao.x, mao.y, 2.4, 2.4, KPAL["k"])
+	_px(int(mao.x), int(mao.y), KPAL["m"])   # brilho roxo na mao
+
+	# --- SLASH da magia (so' no attack) ---
+	if p.has("slash"):
+		var s: float = p["slash"]
+		var c0 := mao + Vector2(6, -2)
+		for t in 9:
+			var ang := lerpf(-1.4, 0.9, s) - 0.8 + t * 0.18
+			var pp := c0 + Vector2(cos(ang), sin(ang)) * (10.0 + 3.0 * s)
+			_px(int(pp.x), int(pp.y), KPAL["m"])
+			_px(int(pp.x), int(pp.y) + 1, KPAL["M"])
+
+	# --- SWIRL do salto duplo ---
+	if p.has("swirl"):
+		var sw: float = p["swirl"]
+		var c := Vector2(cx, y_quadril - 2)
+		for t in 22:
+			var ang := TAU * float(t) / 22.0 + sw * 5.0
+			var rad := 10.0 + 5.0 * sin(sw * PI)
+			var pp := c + Vector2(cos(ang), sin(ang) * 0.8) * rad
+			_px(int(pp.x), int(pp.y), KPAL["m"] if t % 2 == 0 else KPAL["M"])
+
+	# --- FUMOS / FANTASMAS roxos atras ---
+	for k in wisps:
+		var wx := cx - 8 - k * 5 - sway
+		var wy := y_ombro + 3 + k * 6 + int(sin(float(_ox) * 0.1 + k) * 2.0)
+		_elipse(wx, wy, 3.0 - k * 0.4, 2.4, KPAL["M"])
+		_px(wx - 1, wy + 2, KPAL["cp"])
+		_px(wx + 1, wy + 2, KPAL["cp"])   # "pernas" do fantasminha
 
 
 ## Realca o bordo superior e o bordo direito (frente) da silhueta com `cor`,

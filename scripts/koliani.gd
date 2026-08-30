@@ -59,7 +59,7 @@ const TEX_IMPACTO := preload("res://assets/sprites/impacto.svg")
 
 @onready var _hitbox: Area2D = $HitboxAtaque
 @onready var _sprite: Node2D = $Sprite
-@onready var _corpo: Sprite2D = $Sprite/Corpo
+@onready var _corpo: AnimatedSprite2D = $Sprite/Corpo
 @onready var _arma: Sprite2D = $Sprite/Arma
 @onready var _rastro: Line2D = $Sprite/Rastro
 @onready var _escudo: Node2D = $Sprite/Escudo
@@ -87,6 +87,10 @@ var _preso := 0.0
 ## breve travão depois do salto de parede para não voltar a colar logo.
 var _escalando := false
 var _parede_lock := 0.0
+## Agachada (segura S no chão, parada). Só bloqueia o andar -- visual.
+var _agachado := false
+## Conta-decrescente para mostrar a animação do salto duplo.
+var _djump_t := 0.0
 ## Segundos que ainda "flutua" (Região I / Coração Putrefacto, fase 2): a
 ## batida do coração alivia a gravidade -- a queda cai a menos de metade.
 var _leve := 0.0
@@ -122,7 +126,7 @@ func _ready() -> void:
 		_hitbox.monitoring = false
 		_hitbox.body_entered.connect(_ao_acertar_corpo)
 	if _corpo:
-		_mat = _corpo.material as ShaderMaterial
+		_montar_frames()
 	vida = _vida_max()  # nível novo começa cheio (inclui bónus de armadura)
 	vida_mudou.emit(vida, _vida_max())
 	energia_mudou.emit(_energia, ENERGIA_MAX)
@@ -130,9 +134,47 @@ func _ready() -> void:
 	EstadoJogo.equipamento_mudou.connect(func(_t: String, _i: String) -> void: _aplicar_equipamento())
 
 
-## Mostra a arma equipada na mão (frame da tira `gear/armas`) e dá uma
-## tinta ao corpo conforme a armadura. Sem arma -> mão vazia; sem armadura
-## -> sem tinta.
+## Constrói os SpriteFrames da Koliani a partir das tiras geradas em
+## `tools/gerar_sprites.gd` (assets/sprites/pixel/koliani/*.png). Cada tira
+## é horizontal, 40 px por frame, virada à direita.
+const _KOLI_ANIMS := {
+	"idle":      [4, 6.0, true],
+	"run":       [6, 12.0, true],
+	"jump":      [2, 8.0, false],
+	"fall":      [2, 8.0, true],
+	"attack":    [4, 22.0, false],
+	"crouch":    [2, 6.0, true],
+	"wallslide": [2, 8.0, true],
+	"djump":     [4, 18.0, false],
+}
+
+func _montar_frames() -> void:
+	if _corpo.sprite_frames != null:
+		return
+	var sf := SpriteFrames.new()
+	sf.remove_animation("default")
+	for nome: String in _KOLI_ANIMS:
+		var cfg: Array = _KOLI_ANIMS[nome]
+		sf.add_animation(nome)
+		sf.set_animation_speed(nome, cfg[1])
+		sf.set_animation_loop(nome, cfg[2])
+		var tex: Texture2D = load("res://assets/sprites/pixel/koliani/%s.png" % nome)
+		if tex == null:
+			continue
+		var n: int = cfg[0]
+		var fw := tex.get_width() / maxi(1, n)
+		for i in n:
+			var at := AtlasTexture.new()
+			at.atlas = tex
+			at.region = Rect2(i * fw, 0, fw, tex.get_height())
+			sf.add_frame(nome, at)
+	_corpo.sprite_frames = sf
+	_corpo.play("idle")
+
+
+## Mostra a arma equipada na mão. As tiras da Koliani já trazem a lâmina
+## roxa da personagem, por isso a `Arma` extra só aparece se houver uma
+## arma equipada (fica por cima da mão).
 func _aplicar_equipamento() -> void:
 	if _arma:
 		var wi := Equipamento.indice_arma(EstadoJogo.arma_equipada)
@@ -140,8 +182,7 @@ func _aplicar_equipamento() -> void:
 		if wi >= 0:
 			_arma.frame = wi
 	if _corpo:
-		var ai := Equipamento.indice_armadura(EstadoJogo.armadura_equipada)
-		_corpo.modulate = Color.WHITE if ai < 0 else Color.WHITE.lerp(Equipamento.cor_armadura(ai), 0.35)
+		_corpo.modulate = _tint_armadura()
 
 
 func _physics_process(dt: float) -> void:
@@ -151,6 +192,7 @@ func _physics_process(dt: float) -> void:
 	_lancar_restante = maxf(0.0, _lancar_restante - dt)
 	_preso = maxf(0.0, _preso - dt)
 	_parede_lock = maxf(0.0, _parede_lock - dt)
+	_djump_t = maxf(0.0, _djump_t - dt)
 	_leve = maxf(0.0, _leve - dt)
 	if _inverso_restante > 0.0:
 		_inverso_restante -= dt
@@ -165,6 +207,13 @@ func _physics_process(dt: float) -> void:
 	var dir := Input.get_axis("mover_esquerda", "mover_direita") * _inverso
 	if dir != 0.0 and _rolar_restante <= 0.0:
 		_olha_para = signf(dir)  # o flip visual é feito em _animar()
+
+	# agachar: segura S no chão, sem andar nem estar noutra ação -> não anda
+	_agachado = is_on_floor() and Input.is_action_pressed("mirar_baixo") \
+		and dir == 0.0 and _ataque_restante <= 0.0 and _rolar_restante <= 0.0 \
+		and _dash_restante <= 0.0 and not _defendendo
+	if _agachado:
+		dir = 0.0
 
 	# teia no chão: NÃO prende -- só abranda muito (anda-se sempre para fora,
 	# devagar). O `_preso` decai sozinho no _physics_process e está limitado
@@ -266,6 +315,8 @@ func _physics_process(dt: float) -> void:
 		velocity = _mov.velocidade
 		if _mov.saltos_dados > saltos_antes:
 			Som.toca("salto_duplo" if _mov.saltos_dados >= 2 else "salto", -10.0)
+			if _mov.saltos_dados >= 2:
+				_djump_t = 0.45  # mostra a animação do salto duplo
 
 	# batida do Coração Putrefacto (fase 2): gravidade aliviada -- a Koliani
 	# fica "leve" e a queda abranda para lhe dar tempo no ar
@@ -304,6 +355,50 @@ func _physics_process(dt: float) -> void:
 
 func _process(dt: float) -> void:
 	_animar(dt)
+	_atualizar_anim()
+
+
+## Escolhe a animação do corpo conforme o estado (visual apenas).
+func _atualizar_anim() -> void:
+	if _corpo == null or _corpo.sprite_frames == null:
+		return
+	var a := "idle"
+	if _escalando:
+		a = "wallslide"
+	elif _ataque_restante > 0.0:
+		a = "attack"
+	elif _agachado:
+		a = "crouch"
+	elif not is_on_floor():
+		if _djump_t > 0.0:
+			a = "djump"
+		elif velocity.y < -20.0:
+			a = "jump"
+		else:
+			a = "fall"
+	elif absf(velocity.x) > 24.0:
+		a = "run"
+	if _corpo.animation != a:
+		_corpo.play(a)
+	elif not _corpo.is_playing():
+		_corpo.play(a)
+
+	# a arma acompanha grosso modo a pose: balanço no ataque, recolhida no ar
+	if _arma and _arma.visible:
+		var rot := 0.0
+		var off := Vector2(10, 3)
+		if a == "attack":
+			var f := clampf(1.0 - _ataque_restante / DUR_ATAQUE, 0.0, 1.0)
+			rot = lerpf(-1.3, 0.7, f)
+			off = Vector2(9, 1)
+		elif a == "wallslide":
+			rot = 0.5
+			off = Vector2(6, 6)
+		elif a == "jump" or a == "djump":
+			rot = -0.5
+			off = Vector2(7, 0)
+		_arma.rotation = rot
+		_arma.position = off
 
 
 ## Animação procedural do sprite: flip, squash/stretch, lean, pop de
@@ -383,11 +478,18 @@ func _animar_rastro(dt: float) -> void:
 
 
 func _flash_branco() -> void:
-	if _mat == null:
+	if _corpo == null:
 		return
-	_mat.set_shader_parameter("flash", 1.0)
+	var base := _tint_armadura()
+	_corpo.modulate = Color(2.4, 2.4, 2.4)
 	var t := create_tween()
-	t.tween_method(func(v: float): _mat.set_shader_parameter("flash", v), 1.0, 0.0, 0.16)
+	t.tween_property(_corpo, "modulate", base, 0.16)
+
+
+## Cor de base do corpo (tinta da armadura ou branco).
+func _tint_armadura() -> Color:
+	var ai: int = Equipamento.indice_armadura(EstadoJogo.armadura_equipada)
+	return Color.WHITE if ai < 0 else Color.WHITE.lerp(Equipamento.cor_armadura(ai), 0.5)
 
 
 func _abanar(forca: float) -> void:

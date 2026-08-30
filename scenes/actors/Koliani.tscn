@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://bkolianiactor01"]
+[gd_scene load_steps=10 format=3 uid="uid://bkolianiactor01"]
 
 ; Koliani -- sprite SVG + shader de personagem (rim light + flash) e
 ; animacao PROCEDURAL feita em koliani.gd (squash/stretch, lean, pop de
@@ -7,7 +7,6 @@
 
 [ext_resource type="Script" path="res://scripts/koliani.gd" id="1_kol"]
 [ext_resource type="Script" path="res://scripts/camera_tremor.gd" id="2_cam"]
-[ext_resource type="Texture2D" uid="uid://cxh2j8jap0lc4" path="res://assets/sprites/pixel/koliani.png" id="3_tex"]
 [ext_resource type="Shader" path="res://assets/shaders/personagem.gdshader" id="4_sh"]
 [ext_resource type="Texture2D" uid="uid://dq08033qahrj6" path="res://assets/sprites/pixel/gear/armas.png" id="5_armas"]
 
@@ -61,15 +60,15 @@ end_cap_mode = 2
 joint_mode = 2
 visible = false
 
-[node name="Corpo" type="Sprite2D" parent="Sprite"]
-position = Vector2(-2, -3)
-texture = ExtResource("3_tex")
-material = SubResource("mat_kol")
+[node name="Corpo" type="AnimatedSprite2D" parent="Sprite"]
+texture_filter = 1
+position = Vector2(0, -2)
+animation = &"idle"
 
 [node name="Arma" type="Sprite2D" parent="Sprite"]
 texture_filter = 1
-position = Vector2(6, -2)
-scale = Vector2(0.82, 0.82)
+position = Vector2(10, 3)
+scale = Vector2(1.05, 1.05)
 texture = ExtResource("5_armas")
 hframes = 15
 visible = false
