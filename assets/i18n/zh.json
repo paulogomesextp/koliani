@@ -11,7 +11,7 @@
 	"menu.confirm_suffix": "  —  确认",
 	"menu.warn_new_game": "新游戏会清除你已保存的进度。",
 	"menu.warn_hardcore": "硬核模式会清除进度，并为每关开启时间限制。",
-	"menu.dev_mode": "PAULITOS JENSATH DEV MODE",
+	"menu.dev_mode": "DEVELOPER MODE",
 	"dev.test_level": "测试其他关卡",
 	"dev.title": "开发模式 — 选择关卡",
 	"dev.close": "关闭",

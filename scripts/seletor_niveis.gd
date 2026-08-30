@@ -8,7 +8,7 @@ extends Control
 ## Reutilizável:
 ##   - `MapaMundo` (modo normal): `configurar(indice, true)` -- respeita os
 ##     bloqueios; níveis por alcançar não entram.
-##   - `DevBarra` (PAULITOS JENSATH DEV): `configurar(indice, false)` -- pode
+##   - `DevBarra` (DEVELOPER MODE): `configurar(indice, false)` -- pode
 ##     saltar para qualquer nível.
 ##
 ## Sinais: `escolhido(indice)` quando se confirma um nível jogável;

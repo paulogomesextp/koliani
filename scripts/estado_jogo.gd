@@ -129,7 +129,7 @@ var hardcore_tempo_restante: float = -1.0
 ## ficheiro de save real ao instanciar o estado fora do jogo.
 var modo_teste: bool = false
 
-## Modo de testes do Paulo ("PAULITOS JENSATH DEV MODE"): habilidades todas,
+## Modo de testes do Paulo ("DEVELOPER MODE"): habilidades todas,
 ## energia infinita e sem perder vida (ver koliani.gd). NÃO é gravado no
 ## save -- vive só nesta sessão e o save real fica intacto.
 var modo_dev: bool = false

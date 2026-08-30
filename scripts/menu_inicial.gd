@@ -17,7 +17,7 @@ extends Control
 ##   --jogar / --foto[=...]   salta o menu e arranca já em Main.tscn
 ##   --nivel=N                salta o menu e arranca no mundo N (1..4)
 ##   --hardcore               salta o menu e arranca uma campanha hardcore
-##   --devmode                salta o menu e arranca em PAULITOS JENSATH DEV MODE
+##   --devmode                salta o menu e arranca em DEVELOPER MODE
 
 const CENA_JOGO := "res://scenes/Main.tscn"
 const CENA_MAPA := "res://scenes/ui/MapaMundo.tscn"
@@ -143,7 +143,7 @@ func _abrir_opcoes() -> void:
 	add_child(CENA_OPCOES.instantiate())
 
 
-## "PAULITOS JENSATH DEV MODE": sandbox de testes (habilidades todas, energia
+## "DEVELOPER MODE": sandbox de testes (habilidades todas, energia
 ## infinita, sem perder vida) a partir do nível 1. Não mexe no save real; a
 ## barra "TESTAR OUTRO NÍVEL" (dev_barra.gd) troca de nível dentro do jogo.
 func _ao_dev_mode() -> void:

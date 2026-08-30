@@ -522,7 +522,7 @@ func teste_estado_regioes_e_conclusao() -> void:
 	e.free()
 
 
-## "PAULITOS JENSATH DEV MODE": liga o sandbox (todas as habilidades, muitas
+## "DEVELOPER MODE": liga o sandbox (todas as habilidades, muitas
 ## vidas, nível 1), NÃO grava no disco, e `reiniciar_campanha()` desliga-o.
 func teste_estado_modo_dev() -> void:
 	var e := _novo_estado()

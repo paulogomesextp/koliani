@@ -1,5 +1,5 @@
 extends CanvasLayer
-## Barra de topo do "PAULITOS JENSATH DEV MODE". Só existe quando
+## Barra de topo do "DEVELOPER MODE". Só existe quando
 ## `EstadoJogo.modo_dev` está ligado (o `main.gd` só a instancia nesse
 ## caso). Mostra um botão "TESTAR OUTRO NÍVEL" no cimo do ecrã; carregar
 ## abre o carrossel `SeletorNiveis` com todos os níveis da campanha (sem

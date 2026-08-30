@@ -11,7 +11,7 @@
 	"menu.confirm_suffix": "  —  confirmer",
 	"menu.warn_new_game": "NOUVELLE PARTIE efface ta progression sauvegardée.",
 	"menu.warn_hardcore": "MODE HARDCORE efface ta progression et active une limite de temps par monde.",
-	"menu.dev_mode": "PAULITOS JENSATH DEV MODE",
+	"menu.dev_mode": "DEVELOPER MODE",
 	"dev.test_level": "TESTER UN AUTRE NIVEAU",
 	"dev.title": "MODE DEV — choisir un niveau",
 	"dev.close": "Fermer",
