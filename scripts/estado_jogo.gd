@@ -18,7 +18,7 @@ const HABILIDADES_TODAS := ["salto_duplo", "dash_aereo", "partir_paredes", "escu
 ## Modo hardcore: tempo (segundos) para completar cada mundo. Ao esgotar ->
 ## Game Over e a campanha recomeça do mundo 1. Números de partida -- afinar
 ## com o jogo a correr.
-const TEMPO_HARDCORE := [90.0, 110.0, 115.0, 115.0, 120.0, 120.0, 130.0, 125.0, 135.0, 150.0, 130.0, 120.0, 135.0, 150.0]
+const TEMPO_HARDCORE := [90.0, 110.0, 115.0, 115.0, 120.0, 120.0, 130.0, 125.0, 135.0, 150.0, 130.0, 120.0, 135.0, 140.0, 150.0]
 
 ## Sequencia fixa de mundos ate ao Zeriko (platformer por niveis, nao
 ## roguelite). O agente "gaming" acrescenta/renomeia niveis aqui a medida
@@ -37,6 +37,7 @@ const NIVEIS := [
 	"res://scenes/levels/Torre_dos_Sinos.tscn",
 	"res://scenes/levels/Torres_Esquecidas.tscn",
 	"res://scenes/levels/Torre_da_Tempestade.tscn",
+	"res://scenes/levels/Observatorio_Lunar.tscn",
 	"res://scenes/levels/Castelo_de_Zeriko.tscn",
 ]
 # "res://scenes/levels/Level_Test.tscn" fica no repo como sala de treino,
@@ -50,10 +51,10 @@ const NIVEIS := [
 const REGIOES := [
 	{"id": "floresta", "nome": "Floresta Putrefacta", "niveis": [0, 1, 2, 3, 4]},
 	{"id": "prisao", "nome": "Prisao dos Condenados", "niveis": [5, 6, 7, 8, 9]},
-	{"id": "torres", "nome": "Torres Esquecidas", "niveis": [10, 11, 12]},
+	{"id": "torres", "nome": "Torres Esquecidas", "niveis": [10, 11, 12, 13]},
 	{"id": "catacumbas", "nome": "Catacumbas do Abismo", "niveis": []},
 	{"id": "cidade", "nome": "Cidade Corrompida", "niveis": []},
-	{"id": "castelo", "nome": "Castelo de Zeriko", "niveis": [13]},
+	{"id": "castelo", "nome": "Castelo de Zeriko", "niveis": [14]},
 ]
 
 signal vidas_mudaram(vidas: int)

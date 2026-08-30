@@ -34,7 +34,7 @@ class Estado:
 
 ## `saltos_max` = quantos saltos a Koliani pode encadear no ar antes de
 ## voltar a tocar no chão (1 = normal, 2 = salto duplo).
-static func passo(e: Estado, direcao: float, saltar_premido: bool, saltar_a_segurar: bool, no_chao: bool, dt: float, saltos_max: int = 1) -> Estado:
+static func passo(e: Estado, direcao: float, saltar_premido: bool, saltar_a_segurar: bool, no_chao: bool, dt: float, saltos_max: int = 1, grav_escala: float = 1.0) -> Estado:
 	# temporizadores
 	if no_chao:
 		e.coyote_restante = COYOTE
@@ -65,9 +65,9 @@ static func passo(e: Estado, direcao: float, saltar_premido: bool, saltar_a_segu
 		e.coyote_restante = 0.0
 		e.saltos_dados += 1
 
-	# gravidade
+	# gravidade (grav_escala < 1 = "gravidade lunar" do Observatório, nível 14)
 	if not no_chao:
-		e.velocidade.y = minf(VEL_MAX_QUEDA, e.velocidade.y + GRAVIDADE * dt)
+		e.velocidade.y = minf(VEL_MAX_QUEDA, e.velocidade.y + GRAVIDADE * grav_escala * dt)
 
 	# corte de salto
 	if e.velocidade.y < 0.0 and not saltar_a_segurar:

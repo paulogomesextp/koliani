@@ -58,6 +58,7 @@ func _initialize() -> void:
 	_boss_primeiro() # regiao II / nivel 10
 	_boss_sino()     # regiao III / nivel 11
 	_boss_voltaris() # regiao III / nivel 13
+	_boss_sacerdotisa() # regiao III / nivel 14
 	print("OK -- sprites pixel-art em ", DIR)
 	quit(0)
 
@@ -863,4 +864,54 @@ func _boss_voltaris() -> void:
 			_elipse(cx + 22, 10, 6, 6, ORBE)
 			_elipse(cx + 22, 10, 2.5, 2.5, PAL["w"])
 		_linha(int(cx) - 8, 34, int(cx) - 16, 56, 4, MANTO_C)
+	)
+
+
+## Nivel 14 -- Observatorio Lunar. A Sacerdotisa Lunar: manto palido comprido,
+## toucado em crescente, maos erguidas para a lua. Frame 2 = bracos ao alto,
+## brilho lunar (telegrafo); frame 3 = ajoelhada, disco lunar das costas
+## aberto (exposto). Prata/branco + violeta.
+func _boss_sacerdotisa() -> void:
+	var MANTO := Color("cfd2e6")
+	var MANTO_S := Color("9498b8")
+	var VIOLETA := Color("8a6fd8")
+	var LUAR := Color("f2f0ff")
+	var PELE := Color("d9c3b0")
+	_boss("sacerdotisa", 76, 110, func(f: int) -> void:
+		var ajoelha := f == 3
+		var cx := 38.0
+		var pe := 104 if not ajoelha else 96
+		# manto comprido (cai reto; ao ajoelhar alarga em baixo)
+		for j in range(30, pe):
+			var t := float(j - 30) / float(pe - 30)
+			var meia := lerpf(8.0, 16.0 if not ajoelha else 22.0, t)
+			_rect(int(cx - meia), j, int(meia * 2.0), 1, MANTO if j % 4 else MANTO_S)
+		# faixa violeta na cintura
+		_rect(int(cx) - 12, 54, 24, 3, VIOLETA)
+		# disco lunar das costas
+		if ajoelha:
+			_elipse(cx - 2, 44, 12, 13, LUAR)
+			_elipse(cx + 3, 42, 9, 10, MANTO)   # "fase" -> crescente
+			_elipse(cx - 2, 44, 4, 4, VIOLETA)
+		else:
+			_elipse(cx + 10, 40, 7, 8, Color(LUAR.r, LUAR.g, LUAR.b, 0.5))
+		# cabeca + toucado em crescente
+		_elipse(cx, 22, 7, 8, MANTO)
+		_rect(int(cx) - 3, 20, 6, 5, PELE)
+		_linha(int(cx) - 9, 14, int(cx), 6, 2, LUAR)
+		_linha(int(cx), 6, int(cx) + 9, 14, 2, LUAR)
+		_px(int(cx) - 2, 21, VIOLETA); _px(int(cx) + 2, 21, VIOLETA)
+		# bracos
+		if f == 2:
+			_linha(int(cx) - 7, 34, int(cx) - 16, 10, 4, MANTO)
+			_linha(int(cx) + 7, 34, int(cx) + 16, 10, 4, MANTO)
+			_elipse(cx - 16, 8, 3, 3, LUAR)
+			_elipse(cx + 16, 8, 3, 3, LUAR)
+			_elipse(cx, 2, 10, 6, Color(LUAR.r, LUAR.g, LUAR.b, 0.5))
+		elif ajoelha:
+			_linha(int(cx) - 7, 36, int(cx) - 12, 52, 4, MANTO)
+			_linha(int(cx) + 7, 36, int(cx) + 12, 52, 4, MANTO)
+		else:
+			_linha(int(cx) - 7, 34, int(cx) - 12, 56, 4, MANTO)
+			_linha(int(cx) + 7, 34, int(cx) + 12, 56, 4, MANTO)
 	)

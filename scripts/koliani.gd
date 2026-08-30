@@ -66,6 +66,10 @@ var _preso := 0.0
 ## Segundos que ainda "flutua" (Região I / Coração Putrefacto, fase 2): a
 ## batida do coração alivia a gravidade -- a queda cai a menos de metade.
 var _leve := 0.0
+## Escala da gravidade (1 = normal). O Observatório Lunar (nível 14) mete
+## zonas de "gravidade lunar" (< 1) e a Sacerdotisa mexe nisto durante a
+## luta. Reposto a 1 por `definir_grav_escala(1.0)` ao sair da zona.
+var _grav_escala := 1.0
 
 # animação procedural (visual, corre em _process)
 var _mat: ShaderMaterial
@@ -111,7 +115,7 @@ func _physics_process(dt: float) -> void:
 	if _preso > 0.0:
 		velocity.x = move_toward(velocity.x, 0.0, Movimento.ACEL_CHAO * 2.0 * dt)
 		if not is_on_floor():
-			velocity.y = minf(Movimento.VEL_MAX_QUEDA, velocity.y + Movimento.GRAVIDADE * dt)
+			velocity.y = minf(Movimento.VEL_MAX_QUEDA, velocity.y + Movimento.GRAVIDADE * _grav_escala * dt)
 		else:
 			velocity.y = 0.0
 		move_and_slide()
@@ -146,7 +150,7 @@ func _physics_process(dt: float) -> void:
 		_rolar_restante -= dt
 		velocity.x = _olha_para * VEL_ROLAR
 		if not is_on_floor():
-			velocity.y = minf(Movimento.VEL_MAX_QUEDA, velocity.y + Movimento.GRAVIDADE * dt)
+			velocity.y = minf(Movimento.VEL_MAX_QUEDA, velocity.y + Movimento.GRAVIDADE * _grav_escala * dt)
 	elif _dash_restante > 0.0:
 		_dash_restante -= dt
 		velocity.x = _olha_para * VEL_DASH
@@ -157,7 +161,7 @@ func _physics_process(dt: float) -> void:
 		if is_on_floor():
 			velocity.y = 0.0
 		else:
-			velocity.y = minf(Movimento.VEL_MAX_QUEDA, velocity.y + Movimento.GRAVIDADE * dt)
+			velocity.y = minf(Movimento.VEL_MAX_QUEDA, velocity.y + Movimento.GRAVIDADE * _grav_escala * dt)
 		_mov.velocidade = velocity
 	elif Input.is_action_just_pressed("rolar") and Movimento.pode_rolar(
 			_rolar_recarga, is_on_floor(), _rolar_restante, _dash_restante):
@@ -177,7 +181,7 @@ func _physics_process(dt: float) -> void:
 			_mov, dir,
 			Input.is_action_just_pressed("saltar"),
 			Input.is_action_pressed("saltar"),
-			is_on_floor(), dt, saltos_max,
+			is_on_floor(), dt, saltos_max, _grav_escala,
 		)
 		velocity = _mov.velocidade
 		if _mov.saltos_dados > saltos_antes:
@@ -402,6 +406,13 @@ func prender(segundos: float) -> void:
 ## Putrefacto, fase 2). Não a impede de andar/saltar -- só a faz cair devagar.
 func flutuar(segundos: float) -> void:
 	_leve = maxf(_leve, segundos)
+
+
+## Define a escala da gravidade (Observatório Lunar, nível 14). 1 = normal,
+## ~0.4 = "gravidade lunar" (salto alto, queda lenta). As `ZonaGravidade`
+## chamam isto ao entrar/sair; a Sacerdotisa mexe nisto durante a luta.
+func definir_grav_escala(v: float) -> void:
+	_grav_escala = clampf(v, 0.2, 1.5)
 
 
 func receber_dano(quantidade: int, dir_empurrao: float = 0.0) -> void:

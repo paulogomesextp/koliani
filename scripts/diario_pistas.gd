@@ -91,6 +91,11 @@ const PISTAS := {
 		"titulo": "clue.torres_lanterna_de_zeriko.title",
 		"texto": "clue.torres_lanterna_de_zeriko.body",
 	},
+	"lunar_carta_da_sacerdotisa": {
+		"mundo": "world.towers",
+		"titulo": "clue.lunar_carta_da_sacerdotisa.title",
+		"texto": "clue.lunar_carta_da_sacerdotisa.body",
+	},
 	"torres_sussurro_da_mae": {
 		"mundo": "world.towers",
 		"titulo": "clue.torres_sussurro_da_mae.title",
