@@ -41,9 +41,11 @@ func _initialize() -> void:
 	var abs_dir := ProjectSettings.globalize_path(DIR)
 	DirAccess.make_dir_recursive_absolute(abs_dir)
 	DirAccess.make_dir_recursive_absolute(abs_dir + "/bosses")
+	DirAccess.make_dir_recursive_absolute(abs_dir + "/gear")
 	_koliani()
 	_ghorak()
 	_demonio()
+	_armas()  # tira de 15 armas para a Koliani segurar
 	# chefes da regiao I em pixel-art animado (tiras horizontais de 4 frames:
 	# 0 idle A, 1 idle B, 2 telegrafo/ataque, 3 exposto). A tematica vem do
 	# nome do nivel -- ver docs/niveis.md.
@@ -78,6 +80,49 @@ func _initialize() -> void:
 	_boss_zeriko()   # nivel 30 -- final
 	print("OK -- sprites pixel-art em ", DIR)
 	quit(0)
+
+
+## --- armas (tira de 15 frames de 18x26) -----------------------------
+
+## Cada arma = cabo diagonal + cabeça conforme o "tipo". A Koliani segura
+## isto na mão (ver Koliani.tscn / koliani.gd). Placeholder no espírito do
+## resto -- troca-se pelo `region_rect`/`hframes` de um pack CC0 depois.
+func _armas() -> void:
+	# [tipo, cor_cabo, cor_lâmina]  tipo: 0 espada 1 foice 2 garra
+	#   3 espeto 4 martelo 5 orbe
+	var recs := [
+		[0, "s", "W"], [1, "s", "g"], [2, "x", "m"], [3, "T", "g"], [4, "s", "b"],
+		[5, "s", "m"], [4, "b", "b"], [3, "W", "W"], [1, "b", "w"], [2, "b", "w"],
+		[4, "b", "P"], [0, "s", "m"], [0, "x", "M"], [1, "x", "w"], [0, "o", "m"],
+	]
+	var fw := 18
+	var fh := 26
+	_novo(fw * recs.size(), fh)
+	for i in recs.size():
+		_ox = i * fw
+		var tipo: int = recs[i][0]
+		var cabo: Color = PAL[recs[i][1]]
+		var lam: Color = PAL[recs[i][2]]
+		_linha(4, 22, 9, 13, 2, cabo)  # cabo comum
+		match tipo:
+			0:  # espada
+				_linha(9, 13, 15, 3, 3, lam)
+				_rect(7, 12, 5, 2, cabo)  # guarda
+			1:  # foice
+				_linha(9, 12, 13, 6, 2, lam)
+				_linha(13, 6, 8, 3, 2, lam)
+			2:  # garra
+				for k in 3:
+					_linha(9, 13 - k * 2, 14, 6 - k * 3, 2, lam)
+			3:  # espeto
+				_linha(9, 13, 16, 2, 2, lam)
+			4:  # martelo
+				_linha(9, 13, 12, 8, 3, cabo)
+				_rect(9, 3, 7, 6, lam)
+			5:  # orbe
+				_linha(9, 13, 11, 8, 2, cabo)
+				_elipse(12, 6, 4, 4, lam)
+	_guardar("gear/armas")
 
 
 ## --- utilitarios de desenho ------------------------------------------

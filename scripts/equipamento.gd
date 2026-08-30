@@ -67,6 +67,32 @@ static func armadura(id: String) -> Dictionary:
 	return {}
 
 
+## Índice (0-based) do item na sua lista, ou -1. Serve para o `frame` da
+## tira de sprites e para as cores por tier.
+static func indice_arma(id: String) -> int:
+	for i in ARMAS.size():
+		if ARMAS[i]["id"] == id:
+			return i
+	return -1
+
+
+static func indice_armadura(id: String) -> int:
+	for i in ARMADURAS.size():
+		if ARMADURAS[i]["id"] == id:
+			return i
+	return -1
+
+
+## Cor da arma i -- de aço frio a magenta (anel do HUD, brilho).
+static func cor_arma(i: int) -> Color:
+	return Color(0.62, 0.62, 0.68).lerp(Color(0.95, 0.25, 0.9), clampf(float(i) / 14.0, 0.0, 1.0))
+
+
+## Tinta subtil da armadura i aplicada ao corpo da Koliani.
+static func cor_armadura(i: int) -> Color:
+	return Color(0.78, 0.73, 0.64).lerp(Color(0.5, 0.45, 0.95), clampf(float(i) / 14.0, 0.0, 1.0))
+
+
 ## Recompensa por acabar o nível `indice` (0-based). Devolve
 ## `{ tipo: "arma"|"armadura", id: String }` ou `{}` se fora de alcance.
 static func recompensa_do_nivel(indice: int) -> Dictionary:

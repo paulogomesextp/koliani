@@ -35,6 +35,34 @@ pista i18n×6 + `TEMPO_HARDCORE`. `Castelo_de_Zeriko.tscn` / `zeriko.gd` /
   região; Zeriko 240s). **Ainda "a olho"** — telégrafos, cadências e dano
   por projétil de cada chefe ficam para o playtest do Paulo.
 
+## Sessão de polish 2026-08-30 (noite, cont.) — pedidos do Paulo
+
+- **Monstros/chefes maiores.** `DemonioBase` sprite 0.42→0.86 + colisões;
+  `ChefeBase.escala_visual` (@export por cena, 1.2→2.0). Vida EFETIVA dos
+  chefes está no `vida = N` de cada `Chefe*.tscn` (não no `maxi()` do
+  script) — os 30 `.tscn` foram para a curva Ghorak 250 → ZERIKO 1200.
+- **Barra de vida do chefe** ao fundo do ecrã (`controlos_toque.gd`):
+  `ChefeBase` emite `combate_iniciado` / `vida_mudou`.
+- **Armas & armaduras.** `scripts/equipamento.gd` (15+15, dados puros).
+  Acabar nível ímpar → arma seguinte; par → armadura seguinte. `EstadoJogo`
+  guarda posse/equipado + `conceder_recompensa`/`equipar_*`/`ciclar_arma`
+  + helpers `dano_ataque`/`vida_bonus_armadura`/`reducao_armadura` (tudo no
+  save). `koliani.gd` usa-os (golpe/projétil/vida máx/redução).
+  - Menu: 2 botões na Pausa → `SeletorEquip.tscn` (grelha 15, bloqueado =
+    cinza + "Nv N", toque equipa).
+  - HUD novo: vida (vermelho) + energia (azul) no canto inferior-esquerdo
+    + disco redondo da arma (iniciais como ícone placeholder; toque/tecla
+    E ciclam). Barra do chefe subiu p/ não chocar.
+  - Sprite: `Koliani/Sprite/Arma` (Sprite2D `hframes=15`, tira
+    `assets/sprites/pixel/gear/armas.png` gerada em `gerar_sprites.gd::
+    _armas()`); `frame` = índice da arma. Armadura = tinta 35% no `Corpo`
+    (`Equipamento.cor_armadura`). **Placeholder** — trocar por pack CC0
+    depois (só o `texture=`/`region` das cenas).
+  - Ação de input nova `trocar_arma` (tecla E) em project.godot.
+- **NB project.godot** tinha sido truncado a 0 bytes num commit anterior
+  (bug de `open(w).write(read())` em Python — trunca antes de ler);
+  restaurado de 129a999.
+
 **O QUE FALTA:**
 1. **Playtest fino.** Telégrafos/cadências/dano-por-ataque dos 30 chefes
    continuam por afinar em jogo. A curva de vida e o hardcore são um 1.º

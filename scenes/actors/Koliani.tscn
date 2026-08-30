@@ -9,6 +9,7 @@
 [ext_resource type="Script" path="res://scripts/camera_tremor.gd" id="2_cam"]
 [ext_resource type="Texture2D" uid="uid://cxh2j8jap0lc4" path="res://assets/sprites/pixel/koliani.png" id="3_tex"]
 [ext_resource type="Shader" path="res://assets/shaders/personagem.gdshader" id="4_sh"]
+[ext_resource type="Texture2D" uid="uid://dq08033qahrj6" path="res://assets/sprites/pixel/gear/armas.png" id="5_armas"]
 
 [sub_resource type="ShaderMaterial" id="mat_kol"]
 resource_local_to_scene = true
@@ -64,6 +65,14 @@ visible = false
 position = Vector2(-2, -3)
 texture = ExtResource("3_tex")
 material = SubResource("mat_kol")
+
+[node name="Arma" type="Sprite2D" parent="Sprite"]
+texture_filter = 1
+position = Vector2(6, -2)
+scale = Vector2(0.82, 0.82)
+texture = ExtResource("5_armas")
+hframes = 15
+visible = false
 
 [node name="LuzLamina" type="PointLight2D" parent="Sprite"]
 position = Vector2(-18, 0)

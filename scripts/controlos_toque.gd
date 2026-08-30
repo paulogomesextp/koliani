@@ -105,6 +105,10 @@ func _atualizar_disco_arma() -> void:
 		_arma_disco.modulate.a = 0.6
 		return
 	_arma_disco.modulate.a = 1.0
+	var wi := Equipamento.indice_arma(EstadoJogo.arma_equipada)
+	var sb := _arma_disco.get_theme_stylebox("panel") as StyleBoxFlat
+	if sb and wi >= 0:
+		sb.border_color = Equipamento.cor_arma(wi)
 	var nome := Textos.t(Equipamento.arma(EstadoJogo.arma_equipada).get("nome", ""))
 	# iniciais da arma (placeholder até haver ícone pixel)
 	var ini := ""

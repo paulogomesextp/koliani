@@ -52,6 +52,7 @@ const TEX_IMPACTO := preload("res://assets/sprites/impacto.svg")
 @onready var _hitbox: Area2D = $HitboxAtaque
 @onready var _sprite: Node2D = $Sprite
 @onready var _corpo: Sprite2D = $Sprite/Corpo
+@onready var _arma: Sprite2D = $Sprite/Arma
 @onready var _rastro: Line2D = $Sprite/Rastro
 @onready var _escudo: Node2D = $Sprite/Escudo
 @onready var _camera: Camera2D = $Camera2D
@@ -113,6 +114,22 @@ func _ready() -> void:
 	vida = _vida_max()  # nível novo começa cheio (inclui bónus de armadura)
 	vida_mudou.emit(vida, _vida_max())
 	energia_mudou.emit(_energia, ENERGIA_MAX)
+	_aplicar_equipamento()
+	EstadoJogo.equipamento_mudou.connect(func(_t: String, _i: String) -> void: _aplicar_equipamento())
+
+
+## Mostra a arma equipada na mão (frame da tira `gear/armas`) e dá uma
+## tinta ao corpo conforme a armadura. Sem arma -> mão vazia; sem armadura
+## -> sem tinta.
+func _aplicar_equipamento() -> void:
+	if _arma:
+		var wi := Equipamento.indice_arma(EstadoJogo.arma_equipada)
+		_arma.visible = wi >= 0
+		if wi >= 0:
+			_arma.frame = wi
+	if _corpo:
+		var ai := Equipamento.indice_armadura(EstadoJogo.armadura_equipada)
+		_corpo.modulate = Color.WHITE if ai < 0 else Color.WHITE.lerp(Equipamento.cor_armadura(ai), 0.35)
 
 
 func _physics_process(dt: float) -> void:
