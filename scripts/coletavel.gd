@@ -124,10 +124,16 @@ func _process(dt: float) -> void:
 func _ao_entrar(corpo: Node) -> void:
 	if not (corpo is Koliani):
 		return
+	var pista_nova := pista_id != "" and not EstadoJogo.pistas.has(pista_id)
 	if pista_id != "":
 		EstadoJogo.registar_pista(pista_id)
 	if habilidade_id != "":
 		EstadoJogo.desbloquear_habilidade(habilidade_id)
 	Som.toca("apanhar", -6.0)
 	apanhado.emit(pista_id, habilidade_id)
+	# pista nova -> mostra o texto num balão de fala (como os chefes-história):
+	# o título da pista é "quem fala", o corpo é o texto.
+	if pista_nova and DiarioPistas.PISTAS.has(pista_id):
+		var p: Dictionary = DiarioPistas.PISTAS[pista_id]
+		Dialogo.correr([{ "quem": p["titulo"], "texto": p["texto"] }])
 	queue_free()
