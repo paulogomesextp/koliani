@@ -8,6 +8,34 @@ tem cena + chefe (herda `ChefeBase`) + `_boss_*` em `gerar_sprites.gd` +
 pista i18n×6 + `TEMPO_HARDCORE`. `Castelo_de_Zeriko.tscn` / `zeriko.gd` /
 `Zeriko.tscn` ficaram como **legado** (fora da campanha).
 
+## Sessão 2026-08-30 (cont. 2) — packs CC0 novos do Paulo
+
+- **Armas reais.** As 15 lâminas da Koliani vêm agora do pack CC0
+  `thewisehedgehog` (`incoming/thewisehedgehog/File (1).png`, grelha 6×5 de
+  32×32). `tools/extrair_armas.gd` escolhe 15 células → `gear/armas.png`
+  (15×32×32) e amostra a cor dominante de cada → `Equipamento.COR_ARMA`.
+  Todo o brilho do golpe (`_cor_golpe`) segue essa cor. `_armas()` de
+  `gerar_sprites.gd` fica como fallback (já não é chamado).
+- **Plataformas góticas.** `tools/gerar_tiles_goticos.gd` faz
+  `tiles/pedra_gotica_block.png` (96×96 9-slice) da calçada seamless CC0 do
+  pack `piiixl`, recolor de cripta + luar magenta. `plataforma.gd` usa-o em
+  todas as regiões de pedra.
+- **Inventário `incoming/` (30 ago, ainda a crescer):** `thewisehedgehog`
+  (armas — USADO), `piiixl/seamless patterns` (texturas — USADO),
+  `bdragon1727/Effect and Bullet 16x16` (fx Fire/Green/**Purple**/Water
+  16×16 — bom p/ projéteis por cor), `codemanu` (20 spritesheets de magia
+  800²+ — fireball/nebula/vortex/phantom), `glionox` (~1000 items 16×16),
+  `anokolisa` "Legacy Fantasy" (tiles+char+mobs floresta), `zerie` Tiny RPG
+  (Soldier/Orc/Demon 100×100), `luizmelo` EvilWizard2 + Monsters v1.2/1.3
+  (agora com projéteis), `ninjikin` Water+, `free-game-assets` (4 fundos
+  parallax 576×324), `codemanu`. **Licenças de `thewisehedgehog` e `piiixl`
+  por confirmar em `incoming/LICENSES.md`.**
+- **A SEGUIR (Paulo continua a largar assets):** afinar pose/escala da arma
+  na mão em jogo; usar `bdragon1727` Purple/Fire/Green nos projéteis
+  (`ProjetilKoliani`, `BolaFogo`, tiros dos chefes) conforme a cor;
+  `codemanu` para o Kamehameha / novas magias; ver `anokolisa`/`glionox`
+  para props.
+
 ## Sessão 2026-08-30 (cont.) — feedback do Paulo: VFX, equipamento, longevidade
 
 - **Golpe de espada com raio de luz.** `koliani.gd` `_flash_golpe()`: a
