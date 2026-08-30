@@ -24,6 +24,10 @@ var _chefe_barra: ProgressBar
 var _chefe_fim := false
 var _chefe_tween: Tween
 
+## Disco da arma atual (canto inferior-esquerdo, sobre as barras).
+var _arma_disco: Panel
+var _arma_label: Label
+
 
 func _ready() -> void:
 	if _toque:
@@ -49,6 +53,81 @@ func _ready() -> void:
 		chefe.derrotado.connect(_ao_chefe_derrotado)
 		chefe.tree_exited.connect(_ao_chefe_derrotado)
 
+	_montar_disco_arma()
+	EstadoJogo.equipamento_mudou.connect(func(_t: String, _i: String) -> void: _atualizar_disco_arma())
+	EstadoJogo.equipamento_ganho.connect(_ao_equipamento_ganho)
+	Textos.idioma_mudou.connect(func(_l: String) -> void: _atualizar_disco_arma())
+	_atualizar_disco_arma()
+
+
+# --- disco da arma atual + troca ------------------------------------
+
+func _montar_disco_arma() -> void:
+	_arma_disco = Panel.new()
+	_arma_disco.custom_minimum_size = Vector2(64, 64)
+	_arma_disco.size = Vector2(64, 64)
+	_arma_disco.anchor_top = 1.0
+	_arma_disco.anchor_bottom = 1.0
+	_arma_disco.offset_left = 20.0
+	_arma_disco.offset_right = 84.0
+	_arma_disco.offset_top = -84.0
+	_arma_disco.offset_bottom = -20.0
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0.06, 0.04, 0.09, 0.96)
+	sb.set_corner_radius_all(32)
+	sb.set_border_width_all(3)
+	sb.border_color = Color(0.85, 0.4, 0.82, 0.95)
+	sb.shadow_color = Color(0, 0, 0, 0.5)
+	sb.shadow_size = 8
+	_arma_disco.add_theme_stylebox_override("panel", sb)
+	add_child(_arma_disco)
+
+	_arma_label = Label.new()
+	_arma_label.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_arma_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_arma_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_arma_label.autowrap_mode = TextServer.AUTOWRAP_OFF
+	_arma_label.add_theme_font_size_override("font_size", 22)
+	_arma_label.add_theme_color_override("font_color", Color(1, 0.9, 0.98))
+	_arma_disco.add_child(_arma_label)
+
+	_arma_disco.gui_input.connect(func(e: InputEvent) -> void:
+		if e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT:
+			_trocar_arma())
+
+
+func _atualizar_disco_arma() -> void:
+	if _arma_disco == null:
+		return
+	# sem arma -> disco discreto (punhos)
+	if EstadoJogo.arma_equipada == "":
+		_arma_label.text = "✊"
+		_arma_disco.modulate.a = 0.6
+		return
+	_arma_disco.modulate.a = 1.0
+	var nome := Textos.t(Equipamento.arma(EstadoJogo.arma_equipada).get("nome", ""))
+	# iniciais da arma (placeholder até haver ícone pixel)
+	var ini := ""
+	for palavra in nome.split(" ", false):
+		if palavra.length() > 0 and palavra[0].to_upper() != palavra[0].to_lower():
+			ini += palavra[0].to_upper()
+		if ini.length() >= 2:
+			break
+	_arma_label.text = ini if ini != "" else nome.substr(0, 2)
+
+
+func _trocar_arma() -> void:
+	if EstadoJogo.armas.size() < 2:
+		return
+	EstadoJogo.ciclar_arma(1)
+	Som.toca("apanhar", -14.0, 1.15)
+
+
+func _ao_equipamento_ganho(tipo: String, id: String) -> void:
+	var item: Dictionary = Equipamento.arma(id) if tipo == "arma" else Equipamento.armadura(id)
+	var nome := Textos.t(item.get("nome", id))
+	_aviso(Textos.tf("hud.gear_weapon" if tipo == "arma" else "hud.gear_armor", [nome]))
+
 
 # --- barra de vida do chefe ------------------------------------------
 
@@ -59,10 +138,10 @@ func _montar_barra_chefe() -> void:
 	_chefe_caixa.anchor_right = 0.5
 	_chefe_caixa.anchor_top = 1.0
 	_chefe_caixa.anchor_bottom = 1.0
-	_chefe_caixa.offset_left = -420.0
-	_chefe_caixa.offset_right = 420.0
-	_chefe_caixa.offset_top = -66.0
-	_chefe_caixa.offset_bottom = -14.0
+	_chefe_caixa.offset_left = -380.0
+	_chefe_caixa.offset_right = 380.0
+	_chefe_caixa.offset_top = -104.0
+	_chefe_caixa.offset_bottom = -52.0
 	_chefe_caixa.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_chefe_caixa.modulate.a = 0.0
 	_chefe_caixa.visible = false
@@ -139,6 +218,8 @@ func _ao_chefe_derrotado() -> void:
 func _input(evento: InputEvent) -> void:
 	if evento is InputEventScreenTouch and _toque and not _toque.visible:
 		_toque.visible = true
+	if evento.is_action_pressed("trocar_arma") and not get_tree().paused:
+		_trocar_arma()
 
 
 func _atualizar_barra_vida(atual: int, maximo: int) -> void:
