@@ -1,0 +1,202 @@
+[gd_scene load_steps=14 format=3 uid="uid://bkolianitorreventos12"]
+
+; Região III / nível 12 -- Torre dos Ventos.
+; Correntes de ar ascendentes (`CorrenteAr`) para alcançar as plataformas
+; suspensas altas. Arena aberta no cimo com Aerion, o Cavaleiro Alado --
+; nunca pousa; lanças, tornados que empurram, mergulhos.
+
+[ext_resource type="PackedScene" uid="uid://bkolianiactor01" path="res://scenes/actors/Koliani.tscn" id="1_kol"]
+[ext_resource type="PackedScene" uid="uid://bdemoniobase01" path="res://scenes/actors/DemonioBase.tscn" id="2_dem"]
+[ext_resource type="PackedScene" uid="uid://bkolianicoletavel01" path="res://scenes/actors/Coletavel.tscn" id="3_col"]
+[ext_resource type="PackedScene" uid="uid://bkolianiporta01" path="res://scenes/actors/Porta.tscn" id="4_porta"]
+[ext_resource type="Script" path="res://scripts/checkpoint.gd" id="5_chk"]
+[ext_resource type="PackedScene" uid="uid://bkolianichefeaerion12" path="res://scenes/actors/ChefeAerion.tscn" id="6_chefe"]
+[ext_resource type="Script" path="res://scripts/nivel_com_chefe.gd" id="7_niv"]
+[ext_resource type="PackedScene" uid="uid://bkolianiatmosfera01" path="res://scenes/fx/Atmosfera.tscn" id="8_atm"]
+[ext_resource type="PackedScene" uid="uid://bkolianiplataforma01" path="res://scenes/actors/Plataforma.tscn" id="9_pl"]
+[ext_resource type="PackedScene" uid="uid://bkolianicorrentear12" path="res://scenes/actors/CorrenteAr.tscn" id="10_ca"]
+[ext_resource type="PackedScene" uid="uid://bkolianiserra01" path="res://scenes/actors/Serra.tscn" id="11_serra"]
+
+[sub_resource type="RectangleShape2D" id="rs_chk"]
+size = Vector2(40, 80)
+
+[sub_resource type="Gradient" id="grad_luz"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="tex_luz"]
+gradient = SubResource("grad_luz")
+width = 256
+height = 256
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[node name="Torre_dos_Ventos" type="Node2D"]
+script = ExtResource("7_niv")
+
+[node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
+cor_ambiente = Color(0.78, 0.66, 0.5, 1)
+cor_fundo = Color(0.09, 0.07, 0.09, 1)
+cor_silhueta = Color(0.16, 0.11, 0.13, 1)
+cor_luz = Color(1, 0.78, 0.5, 1)
+cor_poeira = Color(1, 0.86, 0.62, 1)
+densidade_poeira = 2
+bioma = "torres"
+largura_nivel = 3400.0
+luzes_horizonte = true
+fundo_pack = "montanhas"
+
+[node name="ChaoInicio" parent="." instance=ExtResource("9_pl")]
+position = Vector2(400, 660)
+tamanho = Vector2(560, 48)
+altura_visual = 96.0
+
+[node name="PlatSusp1" parent="." instance=ExtResource("9_pl")]
+position = Vector2(850, 380)
+tamanho = Vector2(150, 22)
+altura_visual = 24.0
+
+[node name="PlatSusp2" parent="." instance=ExtResource("9_pl")]
+position = Vector2(1150, 300)
+tamanho = Vector2(150, 22)
+altura_visual = 24.0
+
+[node name="PlatSusp3" parent="." instance=ExtResource("9_pl")]
+position = Vector2(1450, 380)
+tamanho = Vector2(150, 22)
+altura_visual = 24.0
+
+[node name="ChaoMeio" parent="." instance=ExtResource("9_pl")]
+position = Vector2(1800, 560)
+tamanho = Vector2(320, 44)
+altura_visual = 72.0
+
+[node name="PlatSusp4" parent="." instance=ExtResource("9_pl")]
+position = Vector2(2200, 320)
+tamanho = Vector2(150, 22)
+altura_visual = 24.0
+
+[node name="ChaoArena" parent="." instance=ExtResource("9_pl")]
+position = Vector2(2820, 660)
+tamanho = Vector2(920, 48)
+altura_visual = 96.0
+
+[node name="Corrente1" parent="." instance=ExtResource("10_ca")]
+position = Vector2(880, 520)
+
+[node name="Corrente2" parent="." instance=ExtResource("10_ca")]
+position = Vector2(1300, 460)
+
+[node name="Corrente3" parent="." instance=ExtResource("10_ca")]
+position = Vector2(2120, 480)
+
+[node name="SerraSusp" parent="." instance=ExtResource("11_serra")]
+position = Vector2(1450, 300)
+percurso = Vector2(220, 0)
+tempo = 1.9
+
+[node name="LuzInicio" type="PointLight2D" parent="."]
+position = Vector2(400, 600)
+texture = SubResource("tex_luz")
+energy = 0.5
+color = Color(1, 0.78, 0.5, 1)
+scale = Vector2(1.9, 1.1)
+
+[node name="LuzArena" type="PointLight2D" parent="."]
+position = Vector2(2820, 600)
+texture = SubResource("tex_luz")
+energy = 0.55
+color = Color(1, 0.78, 0.5, 1)
+scale = Vector2(2.6, 1.5)
+
+[node name="Koliani" parent="." instance=ExtResource("1_kol")]
+position = Vector2(150, 560)
+
+[node name="Demonio1" parent="." instance=ExtResource("2_dem")]
+especie = "olho"
+position = Vector2(850, 340)
+alcance_patrulha = 200.0
+
+[node name="Demonio2" parent="." instance=ExtResource("2_dem")]
+especie = "goblin"
+position = Vector2(1800, 520)
+alcance_patrulha = 120.0
+
+[node name="Demonio3" parent="." instance=ExtResource("2_dem")]
+especie = "olho"
+position = Vector2(2900, 540)
+alcance_patrulha = 240.0
+
+[node name="Chefe" parent="." instance=ExtResource("6_chefe")]
+position = Vector2(2820, 420)
+
+[node name="ColPena" parent="." instance=ExtResource("3_col")]
+position = Vector2(1150, 256)
+pista_id = "ventos_pena_marcada"
+
+[node name="CheckInicio" type="Area2D" parent="."]
+position = Vector2(380, 588)
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("5_chk")
+
+[node name="Visual" type="ColorRect" parent="CheckInicio"]
+offset_left = -5.0
+offset_top = -42.0
+offset_right = 5.0
+offset_bottom = 40.0
+color = Color(0.36, 0.28, 0.55, 1)
+
+[node name="Luz" type="Node2D" parent="CheckInicio"]
+visible = false
+
+[node name="Brilho" type="ColorRect" parent="CheckInicio/Luz"]
+offset_left = -20.0
+offset_top = -54.0
+offset_right = 20.0
+offset_bottom = 44.0
+color = Color(0.85, 0.31, 0.83, 0.32)
+
+[node name="PointLight2D" type="PointLight2D" parent="CheckInicio/Luz"]
+texture = SubResource("tex_luz")
+energy = 1.1
+color = Color(0.93, 0.4, 0.9, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckInicio"]
+shape = SubResource("rs_chk")
+
+[node name="CheckArena" type="Area2D" parent="."]
+position = Vector2(2560, 588)
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("5_chk")
+
+[node name="Visual" type="ColorRect" parent="CheckArena"]
+offset_left = -5.0
+offset_top = -42.0
+offset_right = 5.0
+offset_bottom = 40.0
+color = Color(0.36, 0.28, 0.55, 1)
+
+[node name="Luz" type="Node2D" parent="CheckArena"]
+visible = false
+
+[node name="Brilho" type="ColorRect" parent="CheckArena/Luz"]
+offset_left = -20.0
+offset_top = -54.0
+offset_right = 20.0
+offset_bottom = 44.0
+color = Color(0.85, 0.31, 0.83, 0.32)
+
+[node name="PointLight2D" type="PointLight2D" parent="CheckArena/Luz"]
+texture = SubResource("tex_luz")
+energy = 1.1
+color = Color(0.93, 0.4, 0.9, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckArena"]
+shape = SubResource("rs_chk")
+
+[node name="Porta" parent="." instance=ExtResource("4_porta")]
+position = Vector2(3180, 586)
+pista_ao_atravessar = ""

@@ -57,6 +57,7 @@ func _initialize() -> void:
 	_boss_irmaos()   # regiao II / nivel 09
 	_boss_primeiro() # regiao II / nivel 10
 	_boss_sino()     # regiao III / nivel 11
+	_boss_aerion()   # regiao III / nivel 12
 	_boss_voltaris() # regiao III / nivel 13
 	_boss_sacerdotisa() # regiao III / nivel 14
 	_boss_vyrak()    # regiao III / nivel 15
@@ -1862,4 +1863,63 @@ func _boss_zeriko() -> void:
 				for a3 in 4:
 					var an3 := PI * (0.2 + 0.2 * a3)
 					_linha(int(cx), 40, int(cx + cos(an3) * 30.0), int(40 - sin(an3) * 20.0), 2, MAGENTA)
+	)
+
+
+## Nivel 12 -- Torre dos Ventos. Aerion, o Cavaleiro Alado: armadura leve,
+## grandes asas de pena, uma lanca. Nunca pousa. Frame 2 = asas recolhidas
+## / lanca em riste (telegrafo); frame 3 = asas abertas de par em par,
+## peito a mostra (exposto).
+func _boss_aerion() -> void:
+	var ACO := Color("6a7488")
+	var ACO_C := Color("9aa4b8")
+	var ASA := Color("dfe6f2")
+	var ASA_S := Color("aab4c8")
+	var AZUL := Color("6fd0ff")
+	_boss("aerion", 96, 100, func(f: int) -> void:
+		var abertas := f == 3
+		var recolhe := f == 2
+		var cx := 48.0
+		# asas (atras do corpo)
+		if abertas:
+			for wy in range(-4, 5, 2):
+				_linha(int(cx) - 8, 46 + wy, int(cx) - 42, 30 + wy, 3, ASA if wy % 4 else ASA_S)
+				_linha(int(cx) + 8, 46 + wy, int(cx) + 42, 30 + wy, 3, ASA if wy % 4 else ASA_S)
+			_elipse(cx - 40, 30, 8, 16, ASA)
+			_elipse(cx + 40, 30, 8, 16, ASA)
+		elif recolhe:
+			_linha(int(cx) - 8, 44, int(cx) - 20, 20, 4, ASA_S)
+			_linha(int(cx) + 8, 44, int(cx) + 20, 20, 4, ASA_S)
+		else:
+			_linha(int(cx) - 8, 44, int(cx) - 30, 34, 4, ASA)
+			_linha(int(cx) - 8, 48, int(cx) - 28, 48, 3, ASA_S)
+			_linha(int(cx) + 8, 44, int(cx) + 30, 34, 4, ASA)
+			_linha(int(cx) + 8, 48, int(cx) + 28, 48, 3, ASA_S)
+		# tronco / peitoral
+		_elipse(cx, 48, 12, 16, ACO)
+		_elipse(cx, 46, 8, 12, ACO_C)
+		# nucleo do peito
+		var g: float = [0.9, 0.95, 1.05, 1.5][f]
+		_elipse(cx, 46, 3.5 * g, 4.5 * g, AZUL)
+		if abertas:
+			_px(int(cx), 45, PAL["w"])
+		# pernas (dobradas, nunca pousa)
+		_linha(int(cx) - 6, 62, int(cx) - 10, 78, 3, ACO)
+		_linha(int(cx) + 6, 62, int(cx) + 10, 78, 3, ACO)
+		# cabeca / elmo alado
+		_elipse(cx, 24, 8, 9, ACO)
+		_rect(int(cx) - 5, 24, 10, 2, Color("0a0a10"))
+		_linha(int(cx) - 6, 18, int(cx) - 12, 12, 2, ASA)
+		_linha(int(cx) + 6, 18, int(cx) + 12, 12, 2, ASA)
+		_px(int(cx) - 2, 23, AZUL); _px(int(cx) + 2, 23, AZUL)
+		# braco + lanca
+		if recolhe:
+			_linha(int(cx) + 8, 40, int(cx) + 16, 20, 3, ACO_C)
+			_linha(int(cx) + 12, 30, int(cx) + 44, 4, 2, ACO_C)  # lanca em riste
+			_px(int(cx) + 44, 4, PAL["w"])
+		else:
+			_linha(int(cx) + 8, 42, int(cx) + 18, 58, 3, ACO_C)
+			_linha(int(cx) + 14, 50, int(cx) + 20, 82, 2, ACO_C)  # lanca para baixo
+			_px(int(cx) + 20, 82, AZUL)
+		_linha(int(cx) - 8, 42, int(cx) - 16, 56, 3, ACO_C)
 	)

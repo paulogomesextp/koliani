@@ -74,6 +74,11 @@ var _grav_escala := 1.0
 ## Abismo (nível 20) inverte-os por uns segundos com `inverter_controlos()`.
 var _inverso := 1.0
 var _inverso_restante := 0.0
+## Corrente de ar (Torre dos Ventos, nível 12): `CorrenteAr` chama
+## `soprar_para_cima()` a cada frame enquanto a Koliani lá está.
+var _vento_restante := 0.0
+var _vento_forca := 0.0
+var _vento_alvo := 0.0
 
 # animação procedural (visual, corre em _process)
 var _mat: ShaderMaterial
@@ -199,6 +204,12 @@ func _physics_process(dt: float) -> void:
 	# fica "leve" e a queda abranda para lhe dar tempo no ar
 	if _leve > 0.0 and velocity.y > 0.0:
 		velocity.y *= 0.4
+
+	# corrente de ar (Torre dos Ventos, nível 12): empurra para cima até
+	# uma velocidade de subida-alvo enquanto estiver dentro.
+	if _vento_restante > 0.0:
+		_vento_restante -= dt
+		velocity.y = maxf(velocity.y - _vento_forca * dt, -_vento_alvo)
 
 	var vel_queda := velocity.y
 	move_and_slide()
@@ -427,6 +438,15 @@ func definir_grav_escala(v: float) -> void:
 func inverter_controlos(segundos: float) -> void:
 	_inverso = -1.0
 	_inverso_restante = maxf(_inverso_restante, segundos)
+
+
+## Corrente de ar a empurrar para cima (Torre dos Ventos, nível 12). A
+## `CorrenteAr` chama isto a cada frame enquanto a Koliani lá está;
+## `forca` = aceleração, `alvo` = velocidade máxima de subida.
+func soprar_para_cima(forca: float, alvo: float) -> void:
+	_vento_forca = forca
+	_vento_alvo = alvo
+	_vento_restante = 0.12  # renova-se enquanto a área a alimentar
 
 
 func receber_dano(quantidade: int, dir_empurrao: float = 0.0) -> void:

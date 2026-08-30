@@ -35,7 +35,7 @@ const NIVEIS := [
 	"res://scenes/levels/Ala_dos_Mortos.tscn",
 	"res://scenes/levels/A_Cela_Zero.tscn",
 	"res://scenes/levels/Torre_dos_Sinos.tscn",
-	"res://scenes/levels/Torres_Esquecidas.tscn",
+	"res://scenes/levels/Torre_dos_Ventos.tscn",
 	"res://scenes/levels/Torre_da_Tempestade.tscn",
 	"res://scenes/levels/Observatorio_Lunar.tscn",
 	"res://scenes/levels/O_Pico_Esquecido.tscn",
