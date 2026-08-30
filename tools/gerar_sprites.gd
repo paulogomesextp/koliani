@@ -67,6 +67,7 @@ func _initialize() -> void:
 	_boss_olho()     # regiao IV / nivel 20
 	_boss_prefeito() # regiao V / nivel 21
 	_boss_acougueiro() # regiao V / nivel 22
+	_boss_maquinista() # regiao V / nivel 23
 	print("OK -- sprites pixel-art em ", DIR)
 	quit(0)
 
@@ -1357,4 +1358,63 @@ func _boss_acougueiro() -> void:
 			_linha(int(cx) + 22, 46, int(cx) + 38, 72, 7, CARNE)
 			_rect(int(cx) - 48, 66, 16, 14, ACO)
 			_rect(int(cx) + 32, 66, 16, 14, ACO)
+	)
+
+
+## Nivel 23 -- Trem dos Mortos. O Maquinista Infernal: atarracado, casaco
+## pesado de fuligem, bone com oculos de latao, pa de carvao, uma fornalha
+## as costas. Frame 2 = pa erguida (telegrafo); frame 3 = curvado a atear,
+## porta da fornalha das costas aberta -- nucleo (exposto).
+func _boss_maquinista() -> void:
+	var CASACO := Color("22201c")
+	var CASACO_C := Color("39352c")
+	var LATAO := Color("b98c3a")
+	var ACO := Color("8b8f9a")
+	var BRASA := Color("ff7a1e")
+	var BRASA_C := Color("ffd85a")
+	_boss("maquinista", 84, 108, func(f: int) -> void:
+		var pa_cima := f == 2
+		var curva := f == 3
+		var cx := 40.0 + (6.0 if curva else 0.0)
+		# fornalha as costas (esquerda)
+		_rect(8, 44, 18, 30, CASACO_C)
+		_rect(10, 48, 14, 22, Color("120a08"))
+		var g: float = [0.9, 0.95, 1.05, 1.5][f]
+		_elipse(17, 58, 5.0 * g, 6.0 * g, BRASA if not curva else BRASA_C)
+		if curva:
+			_elipse(17, 58, 2.0, 2.4, PAL["w"])
+		_linha(20, 40, 24, 20, 3, CASACO)  # cano do fumeiro
+		# pernas
+		_rect(int(cx) - 12, 84, 10, 22, CASACO)
+		_rect(int(cx) + 2, 84, 10, 22, CASACO)
+		_rect(int(cx) - 14, 104, 14, 3, Color("0a0a0c"))
+		_rect(int(cx), 104, 14, 3, Color("0a0a0c"))
+		# tronco (curvado no frame 3)
+		var ty := 40 if not curva else 46
+		_elipse(cx, ty + 14, 16, 18, CASACO)
+		for j in range(ty, ty + 40):
+			var t := float(j - ty) / 40.0
+			var meia := lerpf(12.0, 15.0, t)
+			_rect(int(cx - meia), j, int(meia * 2.0), 1, CASACO if j % 4 else CASACO_C)
+		# cabeca + bone + oculos
+		var ch := ty - 12 if not curva else ty - 6
+		_elipse(cx, ch, 9, 9, CASACO_C)
+		_rect(int(cx) - 10, ch - 8, 20, 4, CASACO)   # pala do bone
+		_elipse(cx - 3, ch, 3, 3, LATAO)
+		_elipse(cx + 3, ch, 3, 3, LATAO)
+		_px(int(cx) - 3, int(ch), BRASA); _px(int(cx) + 3, int(ch), BRASA)
+		# bracos + pa
+		if pa_cima:
+			_linha(int(cx) + 10, ty + 2, int(cx) + 20, ty - 26, 5, CASACO_C)
+			_linha(int(cx) + 20, ty - 26, int(cx) + 30, ty - 44, 2, Color("3a2c1e"))
+			_rect(int(cx) + 24, ty - 54, 16, 12, ACO)
+		elif curva:
+			_linha(int(cx) + 8, ty + 4, int(cx) + 22, ty + 30, 5, CASACO_C)
+			_linha(int(cx) + 20, ty + 20, int(cx) + 30, ty + 42, 2, Color("3a2c1e"))
+			_rect(int(cx) + 26, ty + 40, 16, 12, ACO)
+		else:
+			_linha(int(cx) + 8, ty + 4, int(cx) + 24, ty + 20, 5, CASACO_C)
+			_linha(int(cx) + 18, ty + 12, int(cx) + 34, ty + 34, 2, Color("3a2c1e"))
+			_rect(int(cx) + 30, ty + 30, 16, 12, ACO)
+		_linha(int(cx) - 10, ty + 4, int(cx) - 16, ty + 26, 5, CASACO_C)
 	)

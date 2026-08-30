@@ -1,0 +1,193 @@
+[gd_scene load_steps=14 format=3 uid="uid://bkolianitremmortos23"]
+
+; Região V / nível 23 -- Trem dos Mortos.
+; Corre-se de vagão em vagão (Plataforma no grupo "vagoes_trem", com vãos
+; entre eles), passa-se um túnel (Espinhos como teto baixo -- rola-se por
+; baixo), morcegos ("olho") por cima dos vãos. O fundo "montanhas" passa
+; depressa a fingir o comboio em andamento. Último vagão: O Maquinista
+; Infernal -- na fase 2 os vagões sacodem ("o próprio trem ataca").
+
+[ext_resource type="PackedScene" uid="uid://bkolianiactor01" path="res://scenes/actors/Koliani.tscn" id="1_kol"]
+[ext_resource type="PackedScene" uid="uid://bdemoniobase01" path="res://scenes/actors/DemonioBase.tscn" id="2_dem"]
+[ext_resource type="PackedScene" uid="uid://bkolianicoletavel01" path="res://scenes/actors/Coletavel.tscn" id="3_col"]
+[ext_resource type="PackedScene" uid="uid://bkolianiporta01" path="res://scenes/actors/Porta.tscn" id="4_porta"]
+[ext_resource type="Script" path="res://scripts/checkpoint.gd" id="5_chk"]
+[ext_resource type="PackedScene" uid="uid://bkolianichefemaquinista23" path="res://scenes/actors/ChefeMaquinistaInfernal.tscn" id="6_chefe"]
+[ext_resource type="Script" path="res://scripts/nivel_com_chefe.gd" id="7_niv"]
+[ext_resource type="PackedScene" uid="uid://bkolianiatmosfera01" path="res://scenes/fx/Atmosfera.tscn" id="8_atm"]
+[ext_resource type="PackedScene" uid="uid://bkolianiplataforma01" path="res://scenes/actors/Plataforma.tscn" id="9_pl"]
+[ext_resource type="PackedScene" uid="uid://bkolianiespinhos01" path="res://scenes/actors/Espinhos.tscn" id="10_esp"]
+[ext_resource type="PackedScene" uid="uid://bkolianiserra01" path="res://scenes/actors/Serra.tscn" id="11_serra"]
+
+[sub_resource type="RectangleShape2D" id="rs_chk"]
+size = Vector2(40, 80)
+
+[sub_resource type="Gradient" id="grad_luz"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="tex_luz"]
+gradient = SubResource("grad_luz")
+width = 256
+height = 256
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[node name="Trem_dos_Mortos" type="Node2D"]
+script = ExtResource("7_niv")
+
+[node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
+cor_ambiente = Color(0.5, 0.42, 0.5, 1)
+cor_fundo = Color(0.05, 0.04, 0.07, 1)
+cor_silhueta = Color(0.1, 0.08, 0.13, 1)
+cor_luz = Color(1, 0.55, 0.4, 1)
+cor_poeira = Color(1, 0.7, 0.6, 1)
+densidade_poeira = 2.4
+bioma = "cidade"
+largura_nivel = 3600.0
+luzes_horizonte = true
+fundo_pack = "montanhas"
+
+[node name="Vagao1" parent="." instance=ExtResource("9_pl") groups=["vagoes_trem"]]
+position = Vector2(440, 660)
+tamanho = Vector2(500, 44)
+altura_visual = 90.0
+
+[node name="Vagao2" parent="." instance=ExtResource("9_pl") groups=["vagoes_trem"]]
+position = Vector2(1020, 660)
+tamanho = Vector2(420, 44)
+altura_visual = 90.0
+
+[node name="Vagao3" parent="." instance=ExtResource("9_pl") groups=["vagoes_trem"]]
+position = Vector2(1560, 640)
+tamanho = Vector2(400, 44)
+altura_visual = 86.0
+
+[node name="Vagao4" parent="." instance=ExtResource("9_pl") groups=["vagoes_trem"]]
+position = Vector2(2080, 660)
+tamanho = Vector2(400, 44)
+altura_visual = 90.0
+
+[node name="VagaoArena" parent="." instance=ExtResource("9_pl") groups=["vagoes_trem"]]
+position = Vector2(2980, 660)
+tamanho = Vector2(820, 44)
+altura_visual = 96.0
+
+[node name="TunelTeto1" parent="." instance=ExtResource("10_esp")]
+position = Vector2(1420, 486)
+largura = 12
+rotation = 3.14159
+
+[node name="TunelTeto2" parent="." instance=ExtResource("10_esp")]
+position = Vector2(1620, 486)
+largura = 12
+rotation = 3.14159
+
+[node name="SerraVao" parent="." instance=ExtResource("11_serra")]
+position = Vector2(1780, 560)
+percurso = Vector2(0, 150)
+tempo = 1.8
+
+[node name="LuzArena" type="PointLight2D" parent="."]
+position = Vector2(2980, 600)
+texture = SubResource("tex_luz")
+energy = 0.55
+color = Color(1, 0.55, 0.3, 1)
+scale = Vector2(2.6, 1.5)
+
+[node name="Koliani" parent="." instance=ExtResource("1_kol")]
+position = Vector2(240, 560)
+
+[node name="Morcego1" parent="." instance=ExtResource("2_dem")]
+especie = "olho"
+position = Vector2(900, 480)
+alcance_patrulha = 200.0
+
+[node name="Morcego2" parent="." instance=ExtResource("2_dem")]
+especie = "olho"
+position = Vector2(1960, 470)
+alcance_patrulha = 220.0
+
+[node name="Saltador1" parent="." instance=ExtResource("2_dem")]
+especie = "goblin"
+position = Vector2(1080, 604)
+alcance_patrulha = 180.0
+
+[node name="Saltador2" parent="." instance=ExtResource("2_dem")]
+especie = "goblin"
+position = Vector2(2120, 604)
+alcance_patrulha = 200.0
+
+[node name="Chefe" parent="." instance=ExtResource("6_chefe")]
+position = Vector2(3060, 556)
+
+[node name="ColBilhete" parent="." instance=ExtResource("3_col")]
+position = Vector2(1020, 560)
+pista_id = "trem_bilhete_so_ida"
+
+[node name="CheckVagao2" type="Area2D" parent="."]
+position = Vector2(900, 588)
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("5_chk")
+
+[node name="Visual" type="ColorRect" parent="CheckVagao2"]
+offset_left = -5.0
+offset_top = -42.0
+offset_right = 5.0
+offset_bottom = 40.0
+color = Color(0.36, 0.28, 0.55, 1)
+
+[node name="Luz" type="Node2D" parent="CheckVagao2"]
+visible = false
+
+[node name="Brilho" type="ColorRect" parent="CheckVagao2/Luz"]
+offset_left = -20.0
+offset_top = -54.0
+offset_right = 20.0
+offset_bottom = 44.0
+color = Color(0.85, 0.31, 0.83, 0.32)
+
+[node name="PointLight2D" type="PointLight2D" parent="CheckVagao2/Luz"]
+texture = SubResource("tex_luz")
+energy = 1.1
+color = Color(0.93, 0.4, 0.9, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckVagao2"]
+shape = SubResource("rs_chk")
+
+[node name="CheckArena" type="Area2D" parent="."]
+position = Vector2(2720, 588)
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("5_chk")
+
+[node name="Visual" type="ColorRect" parent="CheckArena"]
+offset_left = -5.0
+offset_top = -42.0
+offset_right = 5.0
+offset_bottom = 40.0
+color = Color(0.36, 0.28, 0.55, 1)
+
+[node name="Luz" type="Node2D" parent="CheckArena"]
+visible = false
+
+[node name="Brilho" type="ColorRect" parent="CheckArena/Luz"]
+offset_left = -20.0
+offset_top = -54.0
+offset_right = 20.0
+offset_bottom = 44.0
+color = Color(0.85, 0.31, 0.83, 0.32)
+
+[node name="PointLight2D" type="PointLight2D" parent="CheckArena/Luz"]
+texture = SubResource("tex_luz")
+energy = 1.1
+color = Color(0.93, 0.4, 0.9, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckArena"]
+shape = SubResource("rs_chk")
+
+[node name="Porta" parent="." instance=ExtResource("4_porta")]
+position = Vector2(3400, 586)
+pista_ao_atravessar = ""

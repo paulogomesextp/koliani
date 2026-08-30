@@ -151,6 +151,11 @@ const PISTAS := {
 		"titulo": "clue.mercado_gancho_vazio.title",
 		"texto": "clue.mercado_gancho_vazio.body",
 	},
+	"trem_bilhete_so_ida": {
+		"mundo": "world.city",
+		"titulo": "clue.trem_bilhete_so_ida.title",
+		"texto": "clue.trem_bilhete_so_ida.body",
+	},
 	"castelo_aurora_livre": {
 		"mundo": "world.castle",
 		"titulo": "clue.castelo_aurora_livre.title",
