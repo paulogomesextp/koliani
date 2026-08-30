@@ -45,7 +45,8 @@ func _initialize() -> void:
 	_koliani()
 	_ghorak()
 	_demonio()
-	_armas()  # tira de 15 armas para a Koliani segurar
+	_armas()      # tira de 15 armas para a Koliani segurar
+	_armaduras()  # tira de 15 armaduras (icones do menu)
 	# chefes da regiao I em pixel-art animado (tiras horizontais de 4 frames:
 	# 0 idle A, 1 idle B, 2 telegrafo/ataque, 3 exposto). A tematica vem do
 	# nome do nivel -- ver docs/niveis.md.
@@ -123,6 +124,47 @@ func _armas() -> void:
 				_linha(9, 13, 11, 8, 2, cabo)
 				_elipse(12, 6, 4, 4, lam)
 	_guardar("gear/armas")
+
+
+## Tira de 15 armaduras (18x26) -- ícones do menu (fundo dos cartões).
+## tipo: 0 trapos 1 couro 2 capa 3 túnica 4 placas 5 vestido
+func _armaduras() -> void:
+	var recs := [
+		[0, "s"], [1, "s"], [2, "h"], [3, "T"], [4, "W"],
+		[4, "m"], [2, "b"], [4, "W"], [2, "W"], [4, "b"],
+		[4, "b"], [1, "s"], [3, "M"], [5, "m"], [4, "w"],
+	]
+	var fw := 18
+	var fh := 26
+	_novo(fw * recs.size(), fh)
+	for i in recs.size():
+		_ox = i * fw
+		var tipo: int = recs[i][0]
+		var c: Color = PAL[recs[i][1]]
+		var cd := c.darkened(0.35)
+		_rect(5, 6, 8, 12, c)          # torso
+		_rect(4, 7, 1, 8, cd)
+		_rect(13, 7, 1, 8, cd)
+		match tipo:
+			0:
+				_rect(6, 18, 5, 2, c)
+				_px(5, 19, cd)
+				_px(12, 20, cd)
+			1:
+				_rect(4, 13, 10, 2, cd)
+			2:
+				_rect(3, 5, 12, 3, c)
+				_rect(6, 18, 6, 5, cd)
+			3:
+				_rect(5, 18, 8, 5, c)
+			4:
+				_rect(3, 5, 3, 4, c)
+				_rect(12, 5, 3, 4, c)
+				_rect(7, 8, 4, 2, c.lightened(0.3))
+			5:
+				for k in 6:
+					_rect(maxi(5 - k / 2, 2), 18 + k, 8 + k, 1, c)
+	_guardar("gear/armaduras")
 
 
 ## --- utilitarios de desenho ------------------------------------------

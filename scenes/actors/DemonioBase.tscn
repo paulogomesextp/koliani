@@ -34,11 +34,11 @@ script = ExtResource("1_dem")
 
 [node name="Anim" type="AnimatedSprite2D" parent="Sprite"]
 texture_filter = 1
-position = Vector2(0, -64)
-scale = Vector2(0.86, 0.86)
+position = Vector2(0, -22)
+scale = Vector2(0.82, 0.82)
 
 [node name="LuzOlho" type="PointLight2D" parent="Sprite"]
-position = Vector2(4, -10)
+position = Vector2(4, -40)
 texture = SubResource("GradientTexture2D_luz")
 energy = 0.9
 color = Color(0.6, 0.95, 0.55, 1)

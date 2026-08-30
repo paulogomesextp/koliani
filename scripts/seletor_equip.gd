@@ -11,6 +11,9 @@ signal fechado
 
 const COR_ARMA := Color(0.95, 0.55, 0.45)
 const COR_ARMADURA := Color(0.5, 0.7, 0.95)
+const TIRA_ARMAS := preload("res://assets/sprites/pixel/gear/armas.png")
+const TIRA_ARMADURAS := preload("res://assets/sprites/pixel/gear/armaduras.png")
+const CELULA := Vector2(18, 26)
 
 var _tipo := "arma"
 var _grelha: GridContainer
@@ -130,6 +133,24 @@ func _fazer_cartao(item: Dictionary) -> Control:
 		sb.border_color = _cor
 	for e in ["normal", "hover", "pressed", "focus", "disabled"]:
 		b.add_theme_stylebox_override(e, sb)
+
+	# imagem do item como fundo do cartão (esbatida; cinza se ainda bloqueada)
+	var idx := Equipamento.indice_arma(id) if _tipo == "arma" else Equipamento.indice_armadura(id)
+	var fundo_img := TextureRect.new()
+	var at := AtlasTexture.new()
+	at.atlas = TIRA_ARMAS if _tipo == "arma" else TIRA_ARMADURAS
+	at.region = Rect2(idx * CELULA.x, 0, CELULA.x, CELULA.y)
+	fundo_img.texture = at
+	fundo_img.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	fundo_img.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	fundo_img.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	fundo_img.set_anchors_preset(Control.PRESET_FULL_RECT)
+	fundo_img.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	if tem:
+		fundo_img.modulate = Color(1, 1, 1, 0.5)
+	else:
+		fundo_img.modulate = Color(0.4, 0.4, 0.45, 0.32)  # dessaturado + escuro
+	b.add_child(fundo_img)
 
 	var col := VBoxContainer.new()
 	col.add_theme_constant_override("separation", 4)
