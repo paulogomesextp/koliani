@@ -19,7 +19,7 @@ const RECUO_LATERAL := 240.0
 
 enum Fase { DORME, DECIDE, LANCAS_TEL, LANCAS, TORNADO_TEL, TORNADO, INVESTIDA_TEL, INVESTIDA, EXPOSTO }
 
-@export var dist_deteta := 720.0
+@export var dist_deteta := 520.0
 @export var altura_voo := 210.0
 @export var dur_tel := 0.9
 @export var dur_exposto := 2.0
@@ -72,8 +72,13 @@ func _physics_process(dt: float) -> void:
 	if not _fase2 and not _ja_derrotado and vida <= int(_vida_max * 0.5):
 		_entrar_fase2()
 
-	if _fase not in [Fase.INVESTIDA]:
-		# paira ao LADO da Koliani, não em cima dela
+	if _fase == Fase.DORME:
+		# adormecido: fica junto à arena (paira ao de leve no sítio onde foi
+		# posto), NÃO persegue a Koliani pelo nível fora
+		global_position.x = lerpf(global_position.x, _origem.x, clampf(dt * 2.0, 0.0, 1.0))
+		global_position.y = _chao_cache - altura_voo + sin(_pulso * 1.4) * 8.0
+	elif _fase != Fase.INVESTIDA:
+		# em combate: paira ao LADO da Koliani, não em cima dela
 		var kx := _x_koliani()
 		var lado := signf(global_position.x - kx)
 		if lado == 0.0:
