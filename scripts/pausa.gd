@@ -10,18 +10,25 @@ extends CanvasLayer
 
 const CENA_MENU := "res://scenes/ui/MenuInicial.tscn"
 const CENA_MAPA := "res://scenes/ui/MapaMundo.tscn"
+const CENA_OPCOES := preload("res://scenes/ui/Opcoes.tscn")
 
 @onready var _titulo: Label = $Painel/Coluna/Titulo
 @onready var _continuar: Button = $Painel/Coluna/Continuar
+@onready var _opcoes_btn: Button = $Painel/Coluna/Opcoes
 @onready var _mapa: Button = $Painel/Coluna/Mapa
 @onready var _recomecar: Button = $Painel/Coluna/Recomecar
 @onready var _menu: Button = $Painel/Coluna/Menu
+
+## Instância do ecrã de Opções sobreposto (ou null). Enquanto existe, é ele
+## que trata o Esc -- o menu de pausa por baixo fica congelado.
+var _opcoes_inst: Control = null
 
 
 func _ready() -> void:
 	visible = false
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_continuar.pressed.connect(_fechar)
+	_opcoes_btn.pressed.connect(_abrir_opcoes)
 	_mapa.pressed.connect(_ao_mapa)
 	_recomecar.pressed.connect(_ao_recomecar)
 	_menu.pressed.connect(_ao_menu)
@@ -36,6 +43,7 @@ func _ready() -> void:
 func _traduzir() -> void:
 	_titulo.text = Textos.t("pause.title")
 	_continuar.text = Textos.t("pause.resume")
+	_opcoes_btn.text = Textos.t("pause.options")
 	_mapa.text = Textos.t("pause.level_map")
 	_recomecar.text = Textos.t("pause.restart_checkpoint")
 	_menu.text = Textos.t("pause.main_menu")
@@ -46,6 +54,10 @@ func _process(_dt: float) -> void:
 	# HUD, que sinaliza a ação sem gerar um InputEvent que propague.
 	# Se o ecrã de equipamento (HUD) estiver aberto, é ele que trata o Esc.
 	if get_tree().paused and not visible:
+		return
+	# Com as Opções sobrepostas, o Esc fecha-as a elas (opcoes_menu.gd), não
+	# o menu de pausa.
+	if _opcoes_inst != null:
 		return
 	var alternar := Input.is_action_just_pressed("pausa")
 	if visible:
@@ -64,6 +76,26 @@ func _abrir() -> void:
 func _fechar() -> void:
 	visible = false
 	get_tree().paused = false
+
+
+## Sobrepõe o ecrã de Opções ao menu de pausa. Não mexe em
+## `get_tree().paused` nem troca de cena -- o nível fica todo em memória, o
+## progresso não se perde. Fecha em BACK/Esc (tratado pelo próprio Opcoes).
+func _abrir_opcoes() -> void:
+	if _opcoes_inst != null:
+		return
+	_opcoes_inst = CENA_OPCOES.instantiate()
+	_opcoes_inst.process_mode = Node.PROCESS_MODE_ALWAYS  # funciona em pausa
+	_opcoes_inst.tree_exited.connect(_ao_fechar_opcoes)
+	add_child(_opcoes_inst)
+	$Painel.visible = false  # o Fundo do próprio Opcoes já escurece o ecrã
+
+
+func _ao_fechar_opcoes() -> void:
+	_opcoes_inst = null
+	if visible:
+		$Painel.visible = true
+		_continuar.grab_focus()
 
 
 func _ao_recomecar() -> void:

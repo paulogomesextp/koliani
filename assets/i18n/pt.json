@@ -25,6 +25,7 @@
 
 	"pause.title": "PAUSA",
 	"pause.resume": "Continuar",
+	"pause.options": "Opções",
 	"pause.level_map": "Mapa de níveis",
 	"pause.restart_checkpoint": "Recomeçar no checkpoint",
 	"pause.main_menu": "Menu principal",

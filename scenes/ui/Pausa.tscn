@@ -60,6 +60,10 @@ layout_mode = 2
 layout_mode = 2
 text = "Continuar"
 
+[node name="Opcoes" type="Button" parent="Painel/Coluna"]
+layout_mode = 2
+text = "Options"
+
 [node name="Mapa" type="Button" parent="Painel/Coluna"]
 layout_mode = 2
 text = "Mapa de níveis"
