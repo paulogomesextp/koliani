@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://bkolianiplataquebra01"]
+
+; Mecanica de percurso -- visual/colisao em codigo. Ver scripts/plataforma_quebra.gd
+
+[ext_resource type="Script" path="res://scripts/plataforma_quebra.gd" id="1_s"]
+
+[node name="PlataformaQuebra" type="StaticBody2D"]
+script = ExtResource("1_s")

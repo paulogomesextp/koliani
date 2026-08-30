@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://bkolianitrampolim01"]
+
+; Mecanica de percurso -- visual/colisao em codigo. Ver scripts/trampolim.gd
+
+[ext_resource type="Script" path="res://scripts/trampolim.gd" id="1_s"]
+
+[node name="Trampolim" type="Area2D"]
+script = ExtResource("1_s")

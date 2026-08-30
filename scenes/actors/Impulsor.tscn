@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://bkolianiimpulsor01"]
+
+; Mecanica de percurso -- visual/colisao em codigo. Ver scripts/impulsor.gd
+
+[ext_resource type="Script" path="res://scripts/impulsor.gd" id="1_s"]
+
+[node name="Impulsor" type="Area2D"]
+script = ExtResource("1_s")

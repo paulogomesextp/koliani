@@ -849,6 +849,12 @@ func conceder_iframes(segundos: float) -> void:
 	_invulneravel = maxf(_invulneravel, segundos)
 
 
+## Devolve os saltos do ar (um `Trampolim` chama isto -- depois do ressalto
+## ainda se pode fazer o salto duplo).
+func devolver_saltos_ar() -> void:
+	_mov.saltos_dados = 0
+
+
 ## Define a escala da gravidade (Observatório Lunar, nível 14). 1 = normal,
 ## ~0.4 = "gravidade lunar" (salto alto, queda lenta). As `ZonaGravidade`
 ## chamam isto ao entrar/sair; a Sacerdotisa mexe nisto durante a luta.
