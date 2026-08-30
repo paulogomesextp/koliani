@@ -35,6 +35,9 @@ const RECARGA_ROLAR := 0.45
 ## no ar e a segurar na direção dela, agarra-se; W/S sobe/desce; saltar dá
 ## impulso para fora (não gasta o salto do ar). Sem limite de tempo.
 const VEL_ESCALAR := 135.0
+## Escorrega sempre por uma parede a que se agarra (px/s para baixo). Não se
+## fica fixo -- ↑ trava/sobe, ↓ acelera a descida.
+const VEL_DESLIZE_PAREDE := 55.0
 const WALLJUMP := Vector2(330.0, -430.0)
 const DUR_ATAQUE := 0.18
 const I_FRAMES := 0.6
@@ -185,8 +188,10 @@ func _physics_process(dt: float) -> void:
 		var n := get_wall_normal()
 		_olha_para = -signf(n.x)  # virada para a parede
 		velocity.x = -n.x * 40.0  # cola-se
+		# escorrega SEMPRE pela parede abaixo -- não se fica fixo. ↑ trava e
+		# sobe, ↓ desce mais depressa.
 		var vsub := Input.get_action_strength("mirar_baixo") - Input.get_action_strength("mirar_cima")
-		velocity.y = vsub * VEL_ESCALAR
+		velocity.y = clampf(VEL_DESLIZE_PAREDE + vsub * VEL_ESCALAR, -VEL_ESCALAR, VEL_ESCALAR * 1.5)
 		if Input.is_action_just_pressed("saltar"):
 			velocity = Vector2(n.x * WALLJUMP.x, WALLJUMP.y)
 			_escalando = false

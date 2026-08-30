@@ -94,6 +94,37 @@ func _ready() -> void:
 	if _anim:
 		_montar_frames()
 		_anim.play("idle")
+		_calibrar_pes()
+
+
+## Espécies que voam -- não se alinham os pés ao chão.
+const ESPECIES_VOAM := ["olho"]
+
+## Alinha os PÉS do sprite com a linha de chão da colisão. Mede os pixels
+## opacos do frame idle (há muito espaço transparente à volta do bicho na
+## tira de 150x150), por isso é robusto para todas as espécies e escalas.
+func _calibrar_pes() -> void:
+	if _anim == null or _anim.sprite_frames == null or especie in ESPECIES_VOAM:
+		return
+	if not _anim.sprite_frames.has_animation("idle"):
+		return
+	var tex := _anim.sprite_frames.get_frame_texture("idle", 0)
+	if tex == null:
+		return
+	var img := tex.get_image()
+	if img == null:
+		return
+	var r := img.get_used_rect()
+	if r.size.y <= 0:
+		return
+	# distância do CENTRO do frame aos pés, já com a escala aplicada
+	var pes_do_centro := (float(r.position.y + r.size.y) - float(img.get_height()) * 0.5) * _anim.scale.y
+	# linha de chão = fundo da caixa de colisão do corpo
+	var col := get_node_or_null("CollisionShape2D") as CollisionShape2D
+	if col == null or not (col.shape is RectangleShape2D):
+		return
+	var chao_y := col.position.y + (col.shape as RectangleShape2D).size.y * 0.5
+	_anim.position.y = chao_y - pes_do_centro + 2.0  # +2 = enterra ligeiramente
 
 
 ## Monta os SpriteFrames a partir das tiras da espécie escolhida.

@@ -48,3 +48,6 @@ assets/sprites/incoming/ansimuz-parallax/*
 !assets/sprites/incoming/chierit/_LARGAR_AQUI.md
 !assets/sprites/incoming/0x72-dungeon-ii/_LARGAR_AQUI.md
 !assets/sprites/incoming/ansimuz-parallax/_LARGAR_AQUI.md
+tools/_bot.gd
+tools/_bot.tscn
+tools/_bot.gd.uid

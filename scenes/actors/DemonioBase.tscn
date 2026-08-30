@@ -35,7 +35,7 @@ script = ExtResource("1_dem")
 [node name="Anim" type="AnimatedSprite2D" parent="Sprite"]
 texture_filter = 1
 position = Vector2(0, -22)
-scale = Vector2(0.82, 0.82)
+scale = Vector2(1.25, 1.25)
 
 [node name="LuzOlho" type="PointLight2D" parent="Sprite"]
 position = Vector2(4, -40)
