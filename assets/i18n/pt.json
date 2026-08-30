@@ -286,5 +286,7 @@
 	"gear.a.vestido_do_eclipse": "Vestido do Eclipse",
 	"gear.a.egide_de_aurora": "Égide de Aurora",
 
-	"sel.reward": "Prémio: %s"
+	"sel.reward": "Prémio: %s",
+
+	"hud.ability.escalar_paredes": "Escalar Paredes"
 }

@@ -10,6 +10,7 @@ const NOME_HABILIDADE := {
 	"partir_paredes": "hud.ability.partir_paredes",
 	"escudo": "hud.ability.escudo",
 	"projetil": "hud.ability.projetil",
+	"escalar_paredes": "hud.ability.escalar_paredes",
 }
 
 @onready var _barra_vida: ProgressBar = $Vida/Barra

@@ -31,6 +31,11 @@ const RECARGA_DASH := 0.55
 const VEL_ROLAR := 360.0
 const DUR_ROLAR := 0.30
 const RECARGA_ROLAR := 0.45
+## Escalar paredes (habilidade "escalar_paredes"): encostada a uma parede
+## no ar e a segurar na direção dela, agarra-se; W/S sobe/desce; saltar dá
+## impulso para fora (não gasta o salto do ar). Sem limite de tempo.
+const VEL_ESCALAR := 135.0
+const WALLJUMP := Vector2(330.0, -430.0)
 const DUR_ATAQUE := 0.18
 const I_FRAMES := 0.6
 ## Defesa (habilidade "escudo"): anda-se devagar de escudo erguido; um
@@ -75,6 +80,10 @@ var _lancar_restante := 0.0
 ## Segundos que ainda está preso numa teia (Região III / Rainha Aracnídea):
 ## enquanto > 0 não anda nem salta -- só se sacode até se soltar.
 var _preso := 0.0
+## Agarrada a uma parede (habilidade "escalar_paredes"). `_parede_lock` é um
+## breve travão depois do salto de parede para não voltar a colar logo.
+var _escalando := false
+var _parede_lock := 0.0
 ## Segundos que ainda "flutua" (Região I / Coração Putrefacto, fase 2): a
 ## batida do coração alivia a gravidade -- a queda cai a menos de metade.
 var _leve := 0.0
@@ -138,6 +147,7 @@ func _physics_process(dt: float) -> void:
 	_invulneravel = maxf(0.0, _invulneravel - dt)
 	_lancar_restante = maxf(0.0, _lancar_restante - dt)
 	_preso = maxf(0.0, _preso - dt)
+	_parede_lock = maxf(0.0, _parede_lock - dt)
 	_leve = maxf(0.0, _leve - dt)
 	if _inverso_restante > 0.0:
 		_inverso_restante -= dt
@@ -158,6 +168,35 @@ func _physics_process(dt: float) -> void:
 	# a `MAX_PRESO`, por isso uma teia permanente nunca deixa a Koliani presa.
 	if _preso > 0.0:
 		dir *= 0.34
+
+	# escalar paredes: encostada a uma parede no ar, a segurar na direção dela
+	if EstadoJogo.tem_habilidade("escalar_paredes") and _parede_lock <= 0.0 \
+			and not is_on_floor() and is_on_wall_only() \
+			and _dash_restante <= 0.0 and _rolar_restante <= 0.0:
+		var nx := signf(get_wall_normal().x)
+		if not _escalando and dir != 0.0 and signf(dir) == -nx:
+			_escalando = true
+		elif _escalando and dir != 0.0 and signf(dir) == nx:
+			_escalando = false  # largou para o lado oposto
+	else:
+		_escalando = false
+
+	if _escalando:
+		var n := get_wall_normal()
+		_olha_para = -signf(n.x)  # virada para a parede
+		velocity.x = -n.x * 40.0  # cola-se
+		var vsub := Input.get_action_strength("mirar_baixo") - Input.get_action_strength("mirar_cima")
+		velocity.y = vsub * VEL_ESCALAR
+		if Input.is_action_just_pressed("saltar"):
+			velocity = Vector2(n.x * WALLJUMP.x, WALLJUMP.y)
+			_escalando = false
+			_parede_lock = 0.28
+			_mov.saltos_dados = 0  # o salto de parede não gasta o salto do ar
+			Som.toca("salto", -10.0)
+		move_and_slide()
+		_mov.velocidade = velocity
+		_estava_no_chao = false
+		return
 
 	# defesa: só com a habilidade "escudo", em pé, e não a meio de outra ação
 	_defendendo = EstadoJogo.tem_habilidade("escudo") \
@@ -290,6 +329,9 @@ func _animar(dt: float) -> void:
 	elif _dash_restante > 0.0:
 		escala = Vector2(1.32, 0.78)
 		_sprite.rotation = lerp_angle(_sprite.rotation, 0.0, dt * 18.0)
+	elif _escalando:
+		escala = Vector2(0.86, 1.14)  # esticada contra a parede
+		_sprite.rotation = lerp_angle(_sprite.rotation, _olha_para * 0.14, dt * 14.0)
 	else:
 		_sprite.rotation = lerp_angle(_sprite.rotation, rot_alvo, dt * 12.0)
 		if not no_chao:

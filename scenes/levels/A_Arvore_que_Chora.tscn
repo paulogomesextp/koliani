@@ -203,6 +203,10 @@ position = Vector2(3120, 588)
 position = Vector2(1300, 168)
 pista_id = "arvore_lagrima_no_tronco"
 
+[node name="ColEscalar" parent="." instance=ExtResource("3_col")]
+position = Vector2(640, 540)
+habilidade_id = "escalar_paredes"
+
 [node name="Checkpoint" type="Area2D" parent="."]
 position = Vector2(380, 588)
 collision_layer = 16

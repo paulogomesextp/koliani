@@ -18,7 +18,7 @@ const _EQUIP := preload("res://scripts/equipamento.gd")
 const VIDAS_INICIAIS := 3
 
 ## Todas as habilidades da campanha (o modo dev desbloqueia-as de uma vez).
-const HABILIDADES_TODAS := ["salto_duplo", "dash_aereo", "partir_paredes", "escudo", "projetil"]
+const HABILIDADES_TODAS := ["salto_duplo", "dash_aereo", "partir_paredes", "escudo", "projetil", "escalar_paredes"]
 
 ## Modo hardcore: tempo (segundos) para completar cada NÍVEL. Ao esgotar ->
 ## Game Over e a campanha recomeça do nível 1. Uma entrada por nível (mesma

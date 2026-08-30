@@ -286,5 +286,7 @@
 	"gear.a.vestido_do_eclipse": "Eclipse Gown",
 	"gear.a.egide_de_aurora": "Aurora's Aegis",
 
-	"sel.reward": "Reward: %s"
+	"sel.reward": "Reward: %s",
+
+	"hud.ability.escalar_paredes": "Wall Climb"
 }

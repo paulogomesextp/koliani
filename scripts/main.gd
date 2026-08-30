@@ -74,9 +74,9 @@ func _unhandled_input(evento: InputEvent) -> void:
 				await get_tree().create_timer(0.35).timeout
 				get_tree().change_scene_to_file("res://scenes/Main.tscn")
 		KEY_F5:
-			for h in ["salto_duplo", "dash_aereo", "partir_paredes", "escudo", "projetil"]:
+			for h in EstadoJogo.HABILIDADES_TODAS:
 				EstadoJogo.desbloquear_habilidade(h)
-			_toast_debug("habilidades todas (salto duplo, dash aereo, partir paredes, escudo, projetil)")
+			_toast_debug("habilidades todas")
 		KEY_F6:
 			EstadoJogo.vidas += 3
 			EstadoJogo.vidas_mudaram.emit(EstadoJogo.vidas)
