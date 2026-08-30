@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3 uid="uid://bkolianisalalabirinto01"]
+
+; Camara-labirinto fechada (paredes + 2 alavancas encadeadas + porta na
+; saida + serras/espinhos). Tudo construido em codigo (ver sala_labirinto.gd).
+; Origem = ponto de entrada (canto inferior-esquerdo, ao nivel do chao).
+
+[ext_resource type="Script" path="res://scripts/sala_labirinto.gd" id="1_sl"]
+
+[node name="SalaLabirinto" type="Node2D"]
+script = ExtResource("1_sl")

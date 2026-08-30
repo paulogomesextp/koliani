@@ -93,16 +93,27 @@ Ronda longa de pedidos enquanto o Paulo jogava. Feito e com push
   do nível → "níveis mais longos que crescem com o número". Aditivo, não
   toca na geometria feita à mão. `corredor = false` na cena desliga.
 
-### DÚVIDAS PARA O PAULO (responder quando voltar)
-1. **Corredor de aproximação**: aplicado a todos os níveis. Confirmar
-   comprimento/dificuldade (`comprimento_base`/`por_nivel`/`comprimento_max`
-   em `gerador_corredor.gd`) e se queres que ALGUNS níveis não o tenham.
-2. **Escalar paredes**: afinar `VEL_ESCALAR` / `WALLJUMP` no playtest.
-   Onde pôr secções que EXIJAM a habilidade (gating)?
-3. **Níveis-labirinto à mão**: o corredor procedural não é um labirinto a
-   sério com becos/alavancas encadeadas. Fazer isso é nível-a-nível à mão
-   — dizer se queres e por que regiões começar.
-4. **Alavanca**: é "toca para mudar" (sem botão de ação). OK?
+### PROSSEGUIDO (o Paulo disse "concordo com tudo, procede como achares")
+
+- **`SalaLabirinto`** (`sala_labirinto.gd` + `SalaLabirinto.tscn`): câmara
+  fechada paramétrica -- casca (chão/tecto/paredes) + caminho em Z com 2
+  paredes internas (salta por cima / passa por baixo, SEMPRE há rota sem
+  escalar) + **2 alavancas encadeadas** em alcovas separadas (uma em cima,
+  uma atrás de espinhos) + `PortaTrancada` na saída que só abre com AS
+  DUAS + serras. `largura`/`altura`/`dificuldade`/`id`/`especie_inimigo`.
+- **`GeradorCorredor`** passa a **encaixar uma `SalaLabirinto` no corredor
+  a partir do nível 3** (`id = labirinto_<idx>`, tamanho/dificuldade
+  crescem com o nível). Níveis 1-2 ficam com a porta-alavanca simples.
+  Os segmentos por baixo da sala não recebem perigos avulsos.
+
+Resultado: cada nível 3-29 tem agora, no acesso ao chefe, um mini-labirinto
+real com alavancas encadeadas. Smoke dos 30 OK.
+
+### AINDA POR AFINAR (playtest do Paulo)
+- Fluxo das `SalaLabirinto` embebidas (só testei a sala isolada + smoke).
+- `VEL_ESCALAR` / `WALLJUMP` do escalar paredes; onde exigir a habilidade.
+- Comprimento/dificuldade do corredor (`gerador_corredor.gd`).
+- Se algum nível não deve ter corredor/sala (`corredor = false` na cena).
 
 ## O QUE FALTA (antigo):
 1. **Playtest fino.** Telégrafos/cadências/dano-por-ataque dos 30 chefes

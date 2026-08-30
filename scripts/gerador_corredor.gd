@@ -23,6 +23,7 @@ const ALAVANCA := preload("res://scenes/actors/Alavanca.tscn")
 const PORTA_T := preload("res://scenes/actors/PortaTrancada.tscn")
 const SERRA := preload("res://scenes/actors/Serra.tscn")
 const CHECKPOINT := preload("res://scripts/checkpoint.gd")
+const SALA := preload("res://scenes/actors/SalaLabirinto.tscn")
 
 
 func _ready() -> void:
@@ -71,8 +72,28 @@ func _construir() -> void:
 		ck.set_script(CHECKPOINT)
 		add_child(ck)
 
+	# --- sala-labirinto encaixada no corredor (a partir do nível 3) --------
+	# ocupa uma faixa do corredor; os segmentos por baixo dela não recebem
+	# perigos avulsos (a sala já os traz).
+	var sala_x0 := INF
+	var sala_x1 := -INF
+	if idx >= 2:
+		var sw: float = clampf(comp * 0.5, 700.0, 1500.0)
+		sala_x0 = x0 + comp * 0.42
+		sala_x1 = sala_x0 + sw
+		var sala := SALA.instantiate()
+		sala.largura = sw
+		sala.altura = 320.0 + 130.0 * dif
+		sala.dificuldade = dif
+		sala.id = "labirinto_%d" % idx
+		sala.especie_inimigo = esp
+		sala.position = Vector2(sala_x0, chao_y)
+		add_child(sala)
+
 	for i in n_seg:
 		var sx := x0 + float(i) * SEG + SEG * 0.5
+		if sx > sala_x0 - 40.0 and sx < sala_x1 + 40.0:
+			continue  # não empilhar perigos onde está a sala
 		var r := rng.randf()
 		# parede vertical -- SEMPRE saltável (~55-100 px); o escalar_paredes
 		# só a torna trivial. A dificuldade vem da densidade, não da altura.
@@ -111,25 +132,24 @@ func _construir() -> void:
 			d.alcance_patrulha = rng.randf_range(80.0, 170.0)
 			add_child(d)
 
-	# porta trancada + alavanca (a partir do nível 3). A alavanca ENTRA
-	# PRIMEIRO na árvore para a porta a encontrar no grupo ao ligar-se.
-	if idx >= 2:
+	# níveis 1-2 (sem sala): uma porta-alavanca simples a meio do corredor
+	if idx < 2 and n_seg >= 3:
 		var px := x0 + comp * 0.6
 		var lid := "corredor_%d" % idx
 		var poleiro := PLAT.instantiate()
-		add_child(poleiro)
 		poleiro.position = Vector2(px - 150.0, chao_y - 74.0)
 		poleiro.tamanho = Vector2(110.0, 18.0)
+		add_child(poleiro)
 		var al := ALAVANCA.instantiate()
-		add_child(al)
 		al.id = lid
 		al.so_liga = true
 		al.position = Vector2(px - 150.0, chao_y - 88.0)
+		add_child(al)
 		var pt := PORTA_T.instantiate()
-		add_child(pt)
 		pt.id = lid
-		pt.tamanho = Vector2(24.0, 156.0)
-		pt.position = Vector2(px, chao_y - 78.0)
+		pt.tamanho = Vector2(24.0, 150.0)
+		pt.position = Vector2(px, chao_y - 75.0)
+		add_child(pt)
 
 
 func _especie_do_nivel() -> String:
