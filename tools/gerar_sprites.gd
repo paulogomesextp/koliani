@@ -72,6 +72,7 @@ func _initialize() -> void:
 	_boss_noiva()    # regiao V / nivel 25
 	_boss_capitao()  # regiao VI / nivel 26
 	_boss_koliani_sombria() # regiao VI / nivel 27
+	_boss_devorador() # regiao VI / nivel 28
 	print("OK -- sprites pixel-art em ", DIR)
 	quit(0)
 
@@ -1653,4 +1654,64 @@ func _boss_koliani_sombria() -> void:
 			_linha(int(cx) + 12, 28, int(cx) + 22, 36, 2, MAGENTA)
 			_px(int(cx) + 22, 36, PAL["w"])
 		_linha(int(cx) - 6, 22, int(cx) - 12, 32, 3, CAPA_C)
+	)
+
+
+## Nivel 28 -- Banquete dos Imortais. O Rei Devorador: obeso, coroa
+## entortada, babete, um garfo enorme. Frame 2 = garfo em riste
+## (telegrafo); frame 3 = arrota empanturrado, barriga a mostra (exposto).
+func _boss_devorador() -> void:
+	var MANTO := Color("5a1230")
+	var MANTO_C := Color("822046")
+	var BARRIGA := Color("c98f6a")
+	var BABETE := Color("d8d0c0")
+	var OURO := Color("d9b64a")
+	var NUCLEO := Color("ff5cc0")
+	_boss("devorador", 108, 112, func(f: int) -> void:
+		var garfo_cima := f == 2
+		var arrota := f == 3
+		var cx := 54.0
+		# pernas curtas
+		_rect(int(cx) - 16, 96, 12, 16, MANTO)
+		_rect(int(cx) + 4, 96, 12, 16, MANTO)
+		_rect(int(cx) - 18, 110, 16, 4, MANTO_C)
+		_rect(int(cx) + 2, 110, 16, 4, MANTO_C)
+		# barrigao
+		_elipse(cx, 62, 30, 30, MANTO)
+		_elipse(cx, 66, 22, 22, BARRIGA)
+		# babete
+		for j in range(40, 66):
+			var t := float(j - 40) / 26.0
+			var meia := lerpf(10.0, 20.0, t)
+			_rect(int(cx - meia), j, int(meia * 2.0), 1, BABETE)
+		_px(int(cx) - 8, 54, MANTO); _px(int(cx) + 10, 60, MANTO)  # nodoas
+		# nucleo (umbigo/barriga)
+		var g: float = [0.9, 0.95, 1.05, 1.6][f]
+		_elipse(cx, 70, 4.5 * g, 5.0 * g, NUCLEO)
+		if arrota:
+			_elipse(cx, 70, 2.0, 2.2, PAL["w"])
+		# cabeca + coroa entortada
+		var ch := 22
+		_elipse(cx, ch, 12, 11, BARRIGA)
+		if arrota:
+			_rect(int(cx) - 5, ch + 2, 10, 4, Color("3a1a10"))  # boca aberta
+		else:
+			_rect(int(cx) - 4, ch + 3, 8, 1, Color("3a1a10"))
+		_px(int(cx) - 4, ch - 1, Color("2a1408")); _px(int(cx) + 4, ch - 1, Color("2a1408"))
+		for k in 4:
+			_linha(int(cx) - 8 + k * 5, ch - 10, int(cx) - 8 + k * 5, ch - 16, 1, OURO)
+		_rect(int(cx) - 10, ch - 11, 20, 2, OURO)
+		_px(int(cx) + 9, ch - 15, OURO)  # coroa torta
+		# bracos + garfo
+		if garfo_cima:
+			_linha(int(cx) + 22, 52, int(cx) + 36, 12, 6, MANTO_C)
+			_linha(int(cx) + 36, 12, int(cx) + 40, -8, 2, Color("9aa0b0"))
+			for p in 3:
+				_linha(int(cx) + 36 + p * 3, -8, int(cx) + 36 + p * 3, -18, 1, Color("9aa0b0"))
+		else:
+			_linha(int(cx) + 22, 54, int(cx) + 40, 74, 6, MANTO_C)
+			_linha(int(cx) + 38, 66, int(cx) + 40, 40, 2, Color("9aa0b0"))
+			for p in 3:
+				_linha(int(cx) + 38 + p * 2, 40, int(cx) + 38 + p * 2, 32, 1, Color("9aa0b0"))
+		_linha(int(cx) - 22, 54, int(cx) - 36, 72, 6, MANTO_C)
 	)

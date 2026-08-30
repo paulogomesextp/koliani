@@ -51,6 +51,7 @@ const NIVEIS := [
 	"res://scenes/levels/Praca_do_Eclipse.tscn",
 	"res://scenes/levels/Portoes_de_Zeriko.tscn",
 	"res://scenes/levels/Salao_dos_Espelhos.tscn",
+	"res://scenes/levels/Banquete_dos_Imortais.tscn",
 	"res://scenes/levels/Castelo_de_Zeriko.tscn",
 ]
 # "res://scenes/levels/Level_Test.tscn" fica no repo como sala de treino,
@@ -67,7 +68,7 @@ const REGIOES := [
 	{"id": "torres", "nome": "Torres Esquecidas", "niveis": [10, 11, 12, 13, 14]},
 	{"id": "catacumbas", "nome": "Catacumbas do Abismo", "niveis": [15, 16, 17, 18, 19]},
 	{"id": "cidade", "nome": "Cidade Corrompida", "niveis": [20, 21, 22, 23, 24]},
-	{"id": "castelo", "nome": "Castelo de Zeriko", "niveis": [25, 26, 27]},
+	{"id": "castelo", "nome": "Castelo de Zeriko", "niveis": [25, 26, 27, 28]},
 ]
 
 signal vidas_mudaram(vidas: int)

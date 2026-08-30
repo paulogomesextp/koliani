@@ -181,6 +181,11 @@ const PISTAS := {
 		"titulo": "clue.espelhos_o_que_ve.title",
 		"texto": "clue.espelhos_o_que_ve.body",
 	},
+	"banquete_o_lugar_vazio": {
+		"mundo": "world.castle",
+		"titulo": "clue.banquete_o_lugar_vazio.title",
+		"texto": "clue.banquete_o_lugar_vazio.body",
+	},
 	"castelo_aurora_livre": {
 		"mundo": "world.castle",
 		"titulo": "clue.castelo_aurora_livre.title",
