@@ -1,0 +1,235 @@
+[gd_scene load_steps=15 format=3 uid="uid://bkolianicoracaofloresta05"]
+
+; Região I / nível 05 -- Coração da Floresta (finale da região).
+; O cenário anda ao ritmo da "batida da floresta": `PlataformaRitmada`
+; aparece/desaparece em contratempo (é preciso ler o ritmo para atravessar
+; o fosso). Na arena, o chefe -- O Coração Putrefacto -- flutua no centro:
+; F1 raízes + projéteis, F2 a batida alivia a gravidade da Koliani, F3 a
+; arena desmorona (parte as `PlataformaRitmada` do grupo "plataformas_coracao").
+
+[ext_resource type="PackedScene" uid="uid://bkolianiactor01" path="res://scenes/actors/Koliani.tscn" id="1_kol"]
+[ext_resource type="PackedScene" uid="uid://bdemoniobase01" path="res://scenes/actors/DemonioBase.tscn" id="2_dem"]
+[ext_resource type="PackedScene" uid="uid://bkolianicoletavel01" path="res://scenes/actors/Coletavel.tscn" id="3_col"]
+[ext_resource type="PackedScene" uid="uid://bkolianiporta01" path="res://scenes/actors/Porta.tscn" id="4_porta"]
+[ext_resource type="Script" path="res://scripts/checkpoint.gd" id="5_chk"]
+[ext_resource type="PackedScene" uid="uid://bkolianichefecoracao05" path="res://scenes/actors/ChefeCoracaoPutrefacto.tscn" id="6_chefe"]
+[ext_resource type="Script" path="res://scripts/nivel_com_chefe.gd" id="7_niv"]
+[ext_resource type="PackedScene" uid="uid://bkolianiatmosfera01" path="res://scenes/fx/Atmosfera.tscn" id="8_atm"]
+[ext_resource type="PackedScene" uid="uid://bkolianiplataforma01" path="res://scenes/actors/Plataforma.tscn" id="9_pl"]
+[ext_resource type="PackedScene" uid="uid://bkolianiplatritmada05" path="res://scenes/actors/PlataformaRitmada.tscn" id="10_plr"]
+[ext_resource type="PackedScene" uid="uid://bkolianiserra01" path="res://scenes/actors/Serra.tscn" id="11_serra"]
+
+[sub_resource type="RectangleShape2D" id="rs_chk"]
+size = Vector2(40, 80)
+
+[sub_resource type="Gradient" id="grad_luz"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="tex_luz"]
+gradient = SubResource("grad_luz")
+width = 256
+height = 256
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[node name="Coracao_da_Floresta" type="Node2D"]
+script = ExtResource("7_niv")
+
+[node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
+cor_ambiente = Color(0.44, 0.4, 0.5, 1)
+cor_fundo = Color(0.05, 0.03, 0.06, 1)
+cor_silhueta = Color(0.09, 0.06, 0.11, 1)
+cor_luz = Color(0.8, 0.4, 0.85, 1)
+cor_poeira = Color(0.85, 0.6, 0.9, 1)
+densidade_poeira = 2.0
+bioma = "floresta"
+largura_nivel = 3300.0
+
+[node name="ChaoInicio" parent="." instance=ExtResource("9_pl")]
+position = Vector2(320, 660)
+tamanho = Vector2(620, 48)
+altura_visual = 92.0
+
+[node name="ChaoMeio" parent="." instance=ExtResource("9_pl")]
+position = Vector2(1700, 648)
+tamanho = Vector2(360, 44)
+altura_visual = 78.0
+
+[node name="ChaoArena" parent="." instance=ExtResource("9_pl")]
+position = Vector2(2860, 660)
+tamanho = Vector2(940, 48)
+altura_visual = 92.0
+
+[node name="Passo1" parent="." instance=ExtResource("10_plr")]
+position = Vector2(800, 560)
+periodo = 2.0
+fase = 0.0
+
+[node name="Passo2" parent="." instance=ExtResource("10_plr")]
+position = Vector2(970, 512)
+periodo = 2.0
+fase = 0.5
+
+[node name="Passo3" parent="." instance=ExtResource("10_plr")]
+position = Vector2(1140, 556)
+periodo = 2.0
+fase = 0.0
+
+[node name="Passo4" parent="." instance=ExtResource("10_plr")]
+position = Vector2(1310, 512)
+periodo = 2.0
+fase = 0.5
+
+[node name="Passo5" parent="." instance=ExtResource("10_plr")]
+position = Vector2(1480, 560)
+periodo = 2.0
+fase = 0.0
+
+[node name="Passo6" parent="." instance=ExtResource("10_plr")]
+position = Vector2(2000, 560)
+periodo = 2.0
+fase = 0.5
+
+[node name="Passo7" parent="." instance=ExtResource("10_plr")]
+position = Vector2(2180, 500)
+periodo = 2.0
+fase = 0.0
+
+[node name="Passo8" parent="." instance=ExtResource("10_plr")]
+position = Vector2(2360, 552)
+periodo = 2.0
+fase = 0.5
+
+[node name="ArenaPasso1" parent="." instance=ExtResource("10_plr") groups=["plataformas_coracao"]]
+position = Vector2(2660, 512)
+tamanho = Vector2(160, 24)
+periodo = 2.0
+fase = 0.0
+
+[node name="ArenaPasso2" parent="." instance=ExtResource("10_plr") groups=["plataformas_coracao"]]
+position = Vector2(2950, 476)
+tamanho = Vector2(160, 24)
+periodo = 2.0
+fase = 0.5
+
+[node name="ArenaPasso3" parent="." instance=ExtResource("10_plr") groups=["plataformas_coracao"]]
+position = Vector2(3200, 520)
+tamanho = Vector2(160, 24)
+periodo = 2.0
+fase = 0.0
+
+[node name="SerraCoracao" parent="." instance=ExtResource("11_serra")]
+position = Vector2(1700, 470)
+percurso = Vector2(0, -150)
+tempo = 1.4
+
+[node name="LuzCoracao1" type="PointLight2D" parent="."]
+position = Vector2(320, 610)
+texture = SubResource("tex_luz")
+energy = 0.55
+color = Color(0.8, 0.42, 0.88, 1)
+scale = Vector2(1.8, 1.1)
+
+[node name="LuzCoracao2" type="PointLight2D" parent="."]
+position = Vector2(1700, 600)
+texture = SubResource("tex_luz")
+energy = 0.5
+color = Color(0.82, 0.44, 0.9, 1)
+scale = Vector2(1.4, 1.1)
+
+[node name="LuzCoracao3" type="PointLight2D" parent="."]
+position = Vector2(2950, 560)
+texture = SubResource("tex_luz")
+energy = 0.6
+color = Color(0.9, 0.4, 0.95, 1)
+scale = Vector2(2.0, 1.2)
+
+[node name="Koliani" parent="." instance=ExtResource("1_kol")]
+position = Vector2(150, 560)
+
+[node name="Demonio1" parent="." instance=ExtResource("2_dem")]
+position = Vector2(460, 604)
+alcance_patrulha = 170.0
+
+[node name="Demonio2" parent="." instance=ExtResource("2_dem")]
+position = Vector2(1700, 592)
+alcance_patrulha = 130.0
+
+[node name="Demonio3" parent="." instance=ExtResource("2_dem")]
+position = Vector2(2900, 604)
+alcance_patrulha = 220.0
+
+[node name="Chefe" parent="." instance=ExtResource("6_chefe")]
+position = Vector2(2960, 476)
+
+[node name="ColBatida" parent="." instance=ExtResource("3_col")]
+position = Vector2(2180, 452)
+pista_id = "coracao_batida_no_chao"
+
+[node name="Checkpoint" type="Area2D" parent="."]
+position = Vector2(380, 588)
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("5_chk")
+
+[node name="Visual" type="ColorRect" parent="Checkpoint"]
+offset_left = -5.0
+offset_top = -42.0
+offset_right = 5.0
+offset_bottom = 40.0
+color = Color(0.36, 0.28, 0.55, 1)
+
+[node name="Luz" type="Node2D" parent="Checkpoint"]
+visible = false
+
+[node name="Brilho" type="ColorRect" parent="Checkpoint/Luz"]
+offset_left = -20.0
+offset_top = -54.0
+offset_right = 20.0
+offset_bottom = 44.0
+color = Color(0.85, 0.31, 0.83, 0.32)
+
+[node name="PointLight2D" type="PointLight2D" parent="Checkpoint/Luz"]
+texture = SubResource("tex_luz")
+energy = 1.1
+color = Color(0.93, 0.4, 0.9, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Checkpoint"]
+shape = SubResource("rs_chk")
+
+[node name="CheckArena" type="Area2D" parent="."]
+position = Vector2(2560, 588)
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("5_chk")
+
+[node name="Visual" type="ColorRect" parent="CheckArena"]
+offset_left = -5.0
+offset_top = -42.0
+offset_right = 5.0
+offset_bottom = 40.0
+color = Color(0.36, 0.28, 0.55, 1)
+
+[node name="Luz" type="Node2D" parent="CheckArena"]
+visible = false
+
+[node name="Brilho" type="ColorRect" parent="CheckArena/Luz"]
+offset_left = -20.0
+offset_top = -54.0
+offset_right = 20.0
+offset_bottom = 44.0
+color = Color(0.85, 0.31, 0.83, 0.32)
+
+[node name="PointLight2D" type="PointLight2D" parent="CheckArena/Luz"]
+texture = SubResource("tex_luz")
+energy = 1.1
+color = Color(0.93, 0.4, 0.9, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckArena"]
+shape = SubResource("rs_chk")
+
+[node name="Porta" parent="." instance=ExtResource("4_porta")]
+position = Vector2(3320, 586)
+pista_ao_atravessar = ""

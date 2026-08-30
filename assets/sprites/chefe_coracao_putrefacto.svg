@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96">
+  <defs>
+    <radialGradient id="nucleoCor" cx="50%" cy="45%" r="55%">
+      <stop offset="0%" stop-color="#ffd9fb" stop-opacity="1"/>
+      <stop offset="55%" stop-color="#b028c8" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#3a0a45" stop-opacity="0.2"/>
+    </radialGradient>
+  </defs>
+  <!-- emaranhado de raizes / veias em volta -->
+  <path d="M48 12 C30 8 14 16 10 34 C6 50 16 66 30 78 M48 12 C66 8 82 16 86 34 C90 50 80 66 66 78 M20 30 C34 40 34 56 24 70 M76 30 C62 40 62 56 72 70 M48 84 C42 76 42 64 48 56 C54 64 54 76 48 84"
+        stroke="#1a0a1e" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <path d="M22 26 C36 34 40 50 34 66 M74 26 C60 34 56 50 62 66"
+        stroke="#3a1140" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.7"/>
+  <!-- cadaveres presos (silhuetas pequenas) -->
+  <path d="M18 60 q3 -8 8 -6 q-1 6 -4 9 z M78 58 q-3 -8 -8 -6 q1 6 4 9 z" fill="#0e0510" opacity="0.9"/>
+  <!-- coracao putrefacto -->
+  <path d="M48 30 C42 20 28 20 24 32 C20 44 30 56 48 70 C66 56 76 44 72 32 C68 20 54 20 48 30 Z"
+        fill="#2a0c33"/>
+  <path d="M48 34 C44 27 34 26 31 35 C28 44 36 53 48 63 C60 53 68 44 65 35 C62 26 52 27 48 34 Z"
+        fill="url(#nucleoCor)"/>
+  <!-- fendas purpura no coracao -->
+  <path d="M48 36 L45 48 L50 52 L46 62" stroke="#ffbdf4" stroke-width="1.6" fill="none" opacity="0.8"/>
+  <path d="M40 40 C43 44 43 50 40 54" stroke="#7a1a8f" stroke-width="1.4" fill="none" opacity="0.7"/>
+  <path d="M56 40 C53 44 53 50 56 54" stroke="#7a1a8f" stroke-width="1.4" fill="none" opacity="0.7"/>
+</svg>

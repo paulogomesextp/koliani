@@ -36,6 +36,11 @@ const PISTAS := {
 		"titulo": "clue.arvore_lagrima_no_tronco.title",
 		"texto": "clue.arvore_lagrima_no_tronco.body",
 	},
+	"coracao_batida_no_chao": {
+		"mundo": "world.forest",
+		"titulo": "clue.coracao_batida_no_chao.title",
+		"texto": "clue.coracao_batida_no_chao.body",
+	},
 	"prisao_carta_na_cela": {
 		"mundo": "world.prison",
 		"titulo": "clue.prisao_carta_na_cela.title",
