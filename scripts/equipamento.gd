@@ -83,8 +83,33 @@ static func indice_armadura(id: String) -> int:
 	return -1
 
 
-## Cor da arma i -- de aço frio a magenta (anel do HUD, brilho).
+## Cor dominante de cada lâmina da tira `gear/armas.png` (extraída do pack
+## `thewisehedgehog` por `tools/extrair_armas.gd`). O brilho e os efeitos do
+## golpe (`koliani.gd::_cor_golpe`) seguem esta cor -- cada arma acende com
+## a sua.
+const COR_ARMA: Array[Color] = [
+	Color(0.53, 0.55, 0.46),  # 0  lâmina gasta      -- aço esverdeado
+	Color(0.55, 0.69, 0.48),  # 1  foice do pântano  -- verde
+	Color(0.72, 0.28, 0.30),  # 2  garra da viúva    -- sangue
+	Color(0.49, 0.64, 0.30),  # 3  espinho da árvore -- verde-seiva
+	Color(0.45, 0.48, 0.58),  # 4  martelo carcereiro-- aço frio
+	Color(0.95, 0.52, 0.20),  # 5  forjaluz          -- brasa
+	Color(0.90, 0.72, 0.36),  # 6  badalo de bronze  -- ouro
+	Color(0.24, 0.70, 0.85),  # 7  lança tempestade  -- relâmpago ciano
+	Color(0.26, 0.56, 0.80),  # 8  crescente lunar   -- azul-luar
+	Color(0.80, 0.82, 0.88),  # 9  presa de Vyrak    -- osso claro
+	Color(0.85, 0.40, 0.66),  # 10 cetro de osso     -- coral magenta
+	Color(0.78, 0.80, 0.86),  # 11 cutelo real       -- aço-névoa
+	Color(0.62, 0.42, 0.85),  # 12 gládio púrpura    -- roxo
+	Color(0.86, 0.88, 0.96),  # 13 fio do eclipse    -- branco-asa
+	Color(0.70, 0.45, 0.95),  # 14 estilhaço Zeriko  -- prisma roxo
+]
+
+## Cor da arma i -- da tira real (`COR_ARMA`), com um toque de brilho.
+## Fora de alcance cai numa rampa aço->magenta.
 static func cor_arma(i: int) -> Color:
+	if i >= 0 and i < COR_ARMA.size():
+		return (COR_ARMA[i] as Color).lerp(Color(1, 1, 1), 0.1)
 	return Color(0.62, 0.62, 0.68).lerp(Color(0.95, 0.25, 0.9), clampf(float(i) / 14.0, 0.0, 1.0))
 
 

@@ -47,7 +47,9 @@ func _initialize() -> void:
 	_koliani_anim()   # tiras de animacao (idle/run/jump/attack/crouch/wallslide/djump)
 	_ghorak()
 	_demonio()
-	_armas()      # tira de 15 armas para a Koliani segurar
+	# a tira de armas vem agora do pack CC0 `thewisehedgehog` via
+	# `tools/extrair_armas.gd` (nao regenerar aqui). `_armas()` fica como
+	# fallback procedural.
 	_armaduras()  # tira de 15 armaduras (icones do menu)
 	# chefes da regiao I em pixel-art animado (tiras horizontais de 4 frames:
 	# 0 idle A, 1 idle B, 2 telegrafo/ataque, 3 exposto). A tematica vem do

@@ -434,19 +434,21 @@ func _atualizar_anim() -> void:
 		_corpo.play(a)
 
 	# a arma acompanha grosso modo a pose: balanço no ataque, recolhida no ar
+	# a Arma tem `offset` a pôr o punho na origem do nó -> roda pelo punho.
+	# As lâminas da tira já apontam para cima-frente; rotation 0 = "em guarda".
 	if _arma and _arma.visible:
 		var rot := 0.0
-		var off := Vector2(10, 3)
+		var off := Vector2(11, 1)
 		if a == "attack":
 			var f := clampf(1.0 - _ataque_restante / DUR_ATAQUE, 0.0, 1.0)
-			rot = lerpf(-1.3, 0.7, f)
-			off = Vector2(9, 1)
+			rot = lerpf(-0.95, 0.85, f)
+			off = Vector2(10, 0)
 		elif a == "wallslide":
-			rot = 0.5
-			off = Vector2(6, 6)
+			rot = 0.6
+			off = Vector2(7, 5)
 		elif a == "jump" or a == "djump":
-			rot = -0.5
-			off = Vector2(7, 0)
+			rot = -0.55
+			off = Vector2(8, -1)
 		_arma.rotation = rot
 		_arma.position = off
 

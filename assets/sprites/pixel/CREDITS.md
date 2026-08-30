@@ -49,3 +49,11 @@ A personagem principal (Koliani) é original do projeto
   Mountain Dusk.
 
 CC0 não exige atribuição; fica aqui à mesma por cortesia.
+
+## thewisehedgehog — pack de armas pixel-art
+- https://thewisehedgehog.itch.io/  (URL exato + licença POR CONFIRMAR pelo Paulo em incoming/LICENSES.md)
+- Uso: as 15 lâminas que a Koliani segura (`assets/sprites/pixel/gear/armas.png`,
+  15 frames de 32x32) — extraídas da grelha 6x5 de `File (1).png` por
+  `tools/extrair_armas.gd`. A cor dominante de cada lâmina alimenta
+  `Equipamento.COR_ARMA`, e o brilho/efeitos do golpe (`koliani.gd`) seguem
+  essa cor.
