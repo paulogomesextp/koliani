@@ -89,6 +89,10 @@ var _ataque_restante := 0.0
 var _invulneravel := 0.0
 var _estava_no_chao := true
 var _defendendo := false
+## true a partir da 1.ª chamada a `_morrer()` -- evita mortes a dobrar
+## (fosso + armadilha no mesmo frame, chefe a acertar num cadáver) que
+## empilhavam transições e deixavam o ecrã preso a preto.
+var _a_morrer := false
 var _energia := ENERGIA_MAX
 var _lancar_restante := 0.0
 ## Carga do Kamehameha: segundos com "lancar" em baixo nesta pressão.
@@ -840,6 +844,9 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0) -> void:
 
 
 func _morrer() -> void:
+	if _a_morrer:
+		return
+	_a_morrer = true
 	Engine.time_scale = 1.0  # não deixar um hitstop pendente a segurar o tempo
 	set_physics_process(false)
 	morreu.emit()

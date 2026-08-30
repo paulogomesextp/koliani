@@ -4,6 +4,7 @@ extends CanvasLayer
 ## (troca/recarrega a cena) e volta a clarear.
 
 var _rect: ColorRect
+var _tween: Tween
 
 
 func _ready() -> void:
@@ -17,7 +18,12 @@ func _ready() -> void:
 
 
 func fechar_e(acao: Callable, dur := 0.22) -> void:
-	var t := create_tween()
-	t.tween_property(_rect, "color:a", 1.0, dur)
-	t.tween_callback(acao)
-	t.tween_property(_rect, "color:a", 0.0, dur)
+	# já há uma transição a decorrer -> ignora (a acção dela trata do
+	# recarregar/trocar de cena). Sem isto, mortes rápidas empilhavam tweens
+	# no mesmo ColorRect e ele ficava preso a preto.
+	if _tween and _tween.is_valid():
+		return
+	_tween = create_tween()
+	_tween.tween_property(_rect, "color:a", 1.0, dur)
+	_tween.tween_callback(acao)
+	_tween.tween_property(_rect, "color:a", 0.0, dur)

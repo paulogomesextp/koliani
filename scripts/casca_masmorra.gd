@@ -27,6 +27,14 @@ const CEL := 16 * ESCALA          # 32 px por célula no mundo
 ## por baixo de tudo, para não se ver o vazio).
 @export var chao := true
 @export var chao_y := 720.0
+## Água morta a cobrir o fundo (só quando `chao`): cair num fosso = morte
+## instantânea e reaparecer no checkpoint, em vez de ficar preso no chão da
+## Casca. A superfície fica logo acima do `chao_y`, bem abaixo de qualquer
+## plataforma jogável.
+@export var agua := true
+@export var agua_cor := Color(0.15, 0.3, 0.36, 0.62)
+
+const CENA_AGUA := preload("res://scenes/actors/AguaVenenosa.tscn")
 
 # coords no atlas do masmorra.tres (col, row)
 const T_PAREDE := Vector2i(2, 1)   # wall_mid
@@ -96,6 +104,21 @@ func _construir() -> void:
 	if chao:
 		_parede("ChaoFundo", Vector2(esquerda + largura * 0.5, chao_y + esp * 0.5),
 			Vector2(largura + esp * 2.0, esp))
+
+	# água morta logo por cima do chão da Casca -- cair num fosso mata em vez
+	# de deixar a Koliani presa no fundo
+	if chao and agua and not Engine.is_editor_hint():
+		# superfície ~40 px acima do chão da Casca (fica bem abaixo de
+		# qualquer plataforma jogável mas apanha quem caia no fosso ANTES de
+		# assentar no chão da Casca)
+		var ag := CENA_AGUA.instantiate()
+		ag.name = "AguaFundo"
+		ag.largura = largura + esp * 2.0
+		ag.altura = 240.0
+		ag.cor = agua_cor
+		ag.position = Vector2(esquerda + largura * 0.5, chao_y + 80.0)
+		ag.z_index = -1
+		add_child(ag)
 
 
 ## Recua a parede esquerda de colisão (e estica o chão de fundo + pinta
