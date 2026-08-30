@@ -346,10 +346,22 @@ func ativar_modo_dev() -> void:
 	checkpoint = Vector2.ZERO
 	hardcore_tempo_restante = -1.0
 	habilidades.assign(HABILIDADES_TODAS)
+	# modo dev: também todo o equipamento desbloqueado (a arma/armadura mais
+	# fortes equipadas)
+	armas.clear()
+	for a in _EQUIP.ARMAS:
+		armas.append(a["id"])
+	armaduras.clear()
+	for a in _EQUIP.ARMADURAS:
+		armaduras.append(a["id"])
+	arma_equipada = _EQUIP.ARMAS[_EQUIP.ARMAS.size() - 1]["id"]
+	armadura_equipada = _EQUIP.ARMADURAS[_EQUIP.ARMADURAS.size() - 1]["id"]
 	# pistas/concluidos ficam como estão -- não interessam ao sandbox
 	vidas_mudaram.emit(vidas)
 	for h in HABILIDADES_TODAS:
 		habilidade_desbloqueada.emit(h)
+	equipamento_mudou.emit("arma", arma_equipada)
+	equipamento_mudou.emit("armadura", armadura_equipada)
 
 
 func reiniciar_campanha() -> void:

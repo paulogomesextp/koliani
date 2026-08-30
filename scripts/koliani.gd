@@ -153,17 +153,11 @@ func _physics_process(dt: float) -> void:
 	if dir != 0.0 and _rolar_restante <= 0.0:
 		_olha_para = signf(dir)  # o flip visual é feito em _animar()
 
-	# preso numa teia: não anda nem salta; fica a cair no sítio até soltar
+	# teia no chão: NÃO prende -- só abranda muito (anda-se sempre para fora,
+	# devagar). O `_preso` decai sozinho no _physics_process e está limitado
+	# a `MAX_PRESO`, por isso uma teia permanente nunca deixa a Koliani presa.
 	if _preso > 0.0:
-		velocity.x = move_toward(velocity.x, 0.0, Movimento.ACEL_CHAO * 2.0 * dt)
-		if not is_on_floor():
-			velocity.y = minf(Movimento.VEL_MAX_QUEDA, velocity.y + Movimento.GRAVIDADE * _grav_escala * dt)
-		else:
-			velocity.y = 0.0
-		move_and_slide()
-		_mov.velocidade = velocity
-		_estava_no_chao = is_on_floor()
-		return
+		dir *= 0.34
 
 	# defesa: só com a habilidade "escudo", em pé, e não a meio de outra ação
 	_defendendo = EstadoJogo.tem_habilidade("escudo") \
@@ -442,12 +436,15 @@ func _ao_bloquear() -> void:
 		_faiscas.restart()
 
 
-## Prende a Koliani numa teia por `segundos` (não anda nem salta). O escudo
-## erguido protege-a de ficar presa.
+## Teia no chão: abranda a Koliani por `segundos` (não a prende). Limitado a
+## `MAX_PRESO` para uma teia permanente nunca a segurar de vez. O escudo
+## erguido protege-a.
+const MAX_PRESO := 1.2
+
 func prender(segundos: float) -> void:
 	if _defendendo:
 		return
-	_preso = maxf(_preso, segundos)
+	_preso = clampf(maxf(_preso, segundos), 0.0, MAX_PRESO)
 
 
 ## Alivia a gravidade da Koliani por `segundos` (batida do Coração

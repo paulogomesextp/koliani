@@ -28,6 +28,12 @@ var _chefe_tween: Tween
 var _arma_disco: Panel
 var _arma_label: Label
 
+## Botões WEAPONS / ARMOR por cima da barra de vida + o ecrã que abrem.
+const CENA_SELETOR_EQUIP := preload("res://scenes/ui/SeletorEquip.tscn")
+var _btn_armas: Button
+var _btn_armaduras: Button
+var _seletor_equip: SeletorEquip
+
 
 func _ready() -> void:
 	if _toque:
@@ -54,10 +60,70 @@ func _ready() -> void:
 		chefe.tree_exited.connect(_ao_chefe_derrotado)
 
 	_montar_disco_arma()
+	_montar_botoes_equip()
 	EstadoJogo.equipamento_mudou.connect(func(_t: String, _i: String) -> void: _atualizar_disco_arma())
 	EstadoJogo.equipamento_ganho.connect(_ao_equipamento_ganho)
-	Textos.idioma_mudou.connect(func(_l: String) -> void: _atualizar_disco_arma())
+	Textos.idioma_mudou.connect(func(_l: String) -> void: _traduzir_equip())
 	_atualizar_disco_arma()
+	_traduzir_equip()
+
+
+## Dois botões pequenos (WEAPONS / ARMOR) por cima da barra de vida.
+func _montar_botoes_equip() -> void:
+	_btn_armas = _fazer_botao_equip("arma")
+	_btn_armaduras = _fazer_botao_equip("armadura")
+	add_child(_btn_armas)
+	add_child(_btn_armaduras)
+
+
+func _fazer_botao_equip(tipo: String) -> Button:
+	var b := Button.new()
+	b.name = "Btn_" + tipo
+	b.focus_mode = Control.FOCUS_NONE
+	b.anchor_left = 0.0
+	b.anchor_right = 0.0
+	b.anchor_top = 1.0
+	b.anchor_bottom = 1.0
+	b.offset_left = 92.0 if tipo == "arma" else 192.0
+	b.offset_right = b.offset_left + 96.0
+	b.offset_top = -110.0
+	b.offset_bottom = -86.0
+	b.add_theme_font_size_override("font_size", 11)
+	b.add_theme_color_override("font_color", Color(1, 0.88, 0.98))
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0.08, 0.05, 0.11, 0.92)
+	sb.set_corner_radius_all(4)
+	sb.set_border_width_all(1)
+	sb.border_color = Color(0.85, 0.4, 0.82, 0.9)
+	for e in ["normal", "hover", "pressed", "focus"]:
+		b.add_theme_stylebox_override(e, sb)
+	b.pressed.connect(_abrir_equip.bind(tipo))
+	return b
+
+
+func _traduzir_equip() -> void:
+	if _btn_armas:
+		_btn_armas.text = Textos.t("gear.menu.weapons")
+	if _btn_armaduras:
+		_btn_armaduras.text = Textos.t("gear.menu.armor")
+	_atualizar_disco_arma()
+
+
+func _abrir_equip(tipo: String) -> void:
+	if _seletor_equip and is_instance_valid(_seletor_equip):
+		return
+	_seletor_equip = CENA_SELETOR_EQUIP.instantiate()
+	add_child(_seletor_equip)
+	_seletor_equip.configurar(tipo)
+	_seletor_equip.fechado.connect(_fechar_equip)
+	get_tree().paused = true
+
+
+func _fechar_equip() -> void:
+	if _seletor_equip and is_instance_valid(_seletor_equip):
+		_seletor_equip.queue_free()
+	_seletor_equip = null
+	get_tree().paused = false
 
 
 # --- disco da arma atual + troca ------------------------------------
