@@ -15,8 +15,10 @@ extends Node
 ## Não recomeça a cama se já estiver a tocar a faixa certa, para não
 ## cortar entre recargas de cena. Tudo encaminha para o bus "Music".
 
-const CAMINHO := "res://assets/audio/ambiente.wav"
-const CAMINHO_MENU := "res://assets/audio/menu.wav"
+## Camas fornecidas pelo Paulo (OneCinematicStudio -- ver
+## assets/audio/CREDITS.md).
+const CAMINHO := "res://assets/audio/bg_niveis.mp3"       # "Shadow of the Forsaken"
+const CAMINHO_MENU := "res://assets/audio/bg_menu.mp3"    # "The Alchemist's Library"
 const CAMINHO_BOSS := "res://assets/audio/boss.wav"
 const CAMINHO_ASSOMBRACAO := "res://assets/audio/assombracao.wav"
 
@@ -63,9 +65,9 @@ func menu() -> void:
 ## Cama de exploração de um mundo (pitch por bioma). O combate de chefe
 ## troca para `boss()` por cima disto; ao morrer/recarregar a cena volta-se
 ## aqui até o combate recomeçar.
-func ambiente(indice_nivel: int) -> void:
-	var pitch: float = PITCH_BIOMA[clampi(indice_nivel, 0, PITCH_BIOMA.size() - 1)]
-	_tocar(CAMINHO, pitch, VOL_CAMA, true)
+func ambiente(_indice_nivel: int) -> void:
+	# faixa composta -- toca-se ao natural (sem pitch por bioma)
+	_tocar(CAMINHO, 1.0, VOL_CAMA, true)
 
 
 ## Música de chefe -- chamada por `chefe_base.gd` quando o **combate
@@ -110,6 +112,8 @@ func _carregar_loop(caminho: String) -> AudioStream:
 		st.loop_mode = AudioStreamWAV.LOOP_FORWARD
 		st.loop_begin = 0
 		st.loop_end = int(round(st.get_length() * st.mix_rate))
+	elif st is AudioStreamMP3 or st is AudioStreamOggVorbis:
+		st.loop = true
 	return st
 
 
