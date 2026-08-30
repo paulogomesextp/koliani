@@ -76,7 +76,8 @@ scenes/levels/   4 mundos jogáveis + Level_Test
 scenes/actors/   Koliani, DemonioBase, chefes, Plataforma, Coletavel,
                  Porta, armadilhas (Espinhos/Serra/Fogo), RaizPerigo...
 scenes/ui/       MenuInicial (main_scene), HUD, Pausa, Diario, Opcoes,
-                 MapaMundo (overworld estilo Mario, modo normal)
+                 MapaMundo + SeletorNiveis (carrossel de niveis c/ nome
+                 do chefe; usado no modo normal e na DevBarra)
 scenes/fx/       Atmosfera.tscn (modulate + parallax + luzes + vinheta;
                  recolor por `bioma`/@export; raiz no grupo "atmosfera")
 scripts/         1 script por ator; movimento.gd/tremor.gd = lógica pura

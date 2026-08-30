@@ -105,6 +105,8 @@ assets/shaders/                    -- personagem (rim+flash), plataforma (pedra)
   ui/Diario.tscn                   -- painel do diario de pistas (instanciado pelo main.gd)
   ui/Pausa.tscn                    -- menu de pausa (instanciado pelo main.gd)
   ui/MenuInicial.tscn              -- ecra inicial / titulo (main_scene do projeto)
+  ui/MapaMundo.tscn                -- escolha de nivel no modo normal (shell + SeletorNiveis)
+  ui/SeletorNiveis.tscn            -- carrossel cover-flow: nome do nivel + chefe + estado; MapaMundo e DevBarra
   ui/Opcoes.tscn                   -- ecra de Opcoes (som + idioma), sobreposto ao menu inicial
 
 tests/run_tests.gd     -- corredor headless proprio (movimento + estado_jogo)

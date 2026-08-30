@@ -36,6 +36,7 @@ func _correr_tudo() -> void:
 	teste_diario_tem_todas_as_pistas_dos_niveis()
 	teste_i18n_en_tem_as_chaves_das_pistas()
 	teste_i18n_ficheiros_validos()
+	teste_catalogo_campanha()
 	teste_estado_tres_mortes_sem_vidas()
 	teste_estado_pistas_sem_duplicados()
 	teste_estado_habilidade_sem_duplicados()
@@ -214,6 +215,40 @@ func teste_i18n_en_tem_as_chaves_das_pistas() -> void:
 		var p: Dictionary = DiarioPistas.PISTAS[id]
 		for campo in ["mundo", "titulo", "texto"]:
 			_ok(en.has(p[campo]), "en.json sem a chave '%s' (pista %s)" % [p[campo], id])
+
+
+## O catálogo da campanha (nomes de nível/chefe para o carrossel de escolha)
+## acompanha `EstadoJogo.NIVEIS`: uma chave de chefe por nível, todas bem
+## formadas e únicas, e o en.json tem os textos de todas as chaves que o
+## carrossel usa (level.n##, boss.* e sel.*).
+func teste_catalogo_campanha() -> void:
+	var e := _novo_estado()
+	var n: int = e.NIVEIS.size()
+	e.free()
+	_ok(CatalogoCampanha.CHEFE_KEY.size() == n,
+		"CatalogoCampanha.CHEFE_KEY devia ter uma entrada por nível (%d)" % n)
+	var vistas := {}
+	for k in CatalogoCampanha.CHEFE_KEY:
+		_ok(k.begins_with("boss."), "chave de chefe mal formada: '%s'" % k)
+		_ok(not vistas.has(k), "chave de chefe repetida: '%s'" % k)
+		vistas[k] = true
+
+	var f := FileAccess.open("res://assets/i18n/en.json", FileAccess.READ)
+	_ok(f != null, "en.json devia existir")
+	if f == null:
+		return
+	var en: Variant = JSON.parse_string(f.get_as_text())
+	f.close()
+	if not (en is Dictionary):
+		_ok(false, "en.json devia ser um objecto")
+		return
+	for k in CatalogoCampanha.CHEFE_KEY:
+		_ok(en.has(k), "en.json sem o nome do chefe '%s'" % k)
+	for i in n:
+		var lk := CatalogoCampanha.chave_nivel(i)
+		_ok(en.has(lk), "en.json sem o nome do nível '%s'" % lk)
+	for k in ["sel.play", "sel.back", "sel.locked", "sel.cleared", "sel.boss", "sel.count", "sel.hint"]:
+		_ok(en.has(k), "en.json sem a chave do carrossel '%s'" % k)
 
 
 ## Todos os idiomas existem, são JSON válido e têm exatamente o mesmo
