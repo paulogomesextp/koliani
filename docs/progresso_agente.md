@@ -482,3 +482,66 @@ finale merece cuidado; ha 5 chefes, um deles 4 fases).
 Grupos usados por chefes: "estatuas_naga", "plat_falsas", "acougue_moveis",
 "vagoes_trem", "mesa_banquete", "plataformas_pico", "plataformas_execucoes",
 "lava_fornalha", "sino_alterna"/"vitral_luz"/"vitral_luz_b".
+
+---
+
+## Sessao 2026-08-30 (noite) -- kit de combate + arranque das masmorras
+
+### Feito e com push
+- **Menu de pausa**: atalho **Options** (sobrepoe o ecra de Opcoes sem
+  mexer em `paused`/cena -> nao perde o nivel). `788ed86`.
+- **Tiro ranged**: ILIMITADO (sem custo de Energia), da 1/3 do dano do
+  golpe. Visual roxo esbranquicado + aura roxa luminosa
+  (`ProjetilKoliani.tscn`). `_lancar_projetil()` em `koliani.gd`.
+- **Kamehameha roxo** (nova skill, gate na habilidade "projetil"):
+  segurar `lancar` ~0.4s e largar -> rajada perfurante
+  (`KamehamehaKoliani.tscn`/`kamehameha_koliani.gd`). Custa 33% da
+  Energia (3 seguidas), `REGEN_ENERGIA` 22->12/s + `RECARGA_KAMEHAMEHA`
+  -> nao spamavel. Luz de carga na mao (`$Sprite/LuzCarga`).
+  `magia_lancada` passou a disparar SO no Kamehameha (plataformas
+  espectrais do n09). Barra de Energia do HUD -> roxa.
+  `hud.ability.projetil` -> "Kamehameha Roxo" x6. `dcb22b6`.
+- **Escudo** (`Koliani.tscn` no `Sprite/Escudo`): losango cru ->
+  escudo *heater* (placa metal escuro + `Borda` Line2D + `Boss`/umbo +
+  cruz `EmblemaV/H` + `Glow`). So o `Glow` pulsa (era a placa toda).
+- **Masmorra -- BASE**: `0x72 DungeonTileset II` (CC0) copiado p/
+  `assets/sprites/pixel/tiles/dungeon_0x72.png` (+ `_tile_list.txt`).
+  `tools/gerar_tileset_masmorra.gd` -> `assets/tiles/masmorra.tres`
+  (21 tiles: chao/paredes/tecto com colisao quadrada na camada fisica
+  0 = "mundo"/bit 1; estandartes/buracos/escadas sem colisao).
+  `CREDITS.md` atualizado. `53830de`.
+
+### A FAZER (decisoes do Paulo nesta sessao -- opcoes ambiciosas)
+1. **Regioes II (Prisao, idx 5-9) e IV (Catacumbas, idx 15-19) -> caverna/
+   masmorra FECHADA com layouts a serio (tecto, corredores apertados,
+   pocos verticais) via TileMap.** Padrao a criar no nivel-piloto:
+   - `TileMapLayer` novo com `tile_set = assets/tiles/masmorra.tres`,
+     `Y_SORT`/`z_index` abaixo dos atores; escala do node p/ casar 16px
+     com a metrica do jogo (a Koliani mede ~44px de alto -> tile a
+     `scale 2` = 32px, 1.4 tiles; ver `RectangleShape2D_body` = 20x44).
+   - Manter os `Node2D` de gameplay (Koliani spawn, `Porta`, `Checkpoint`,
+     `ChefeX`, coletaveis, armadilhas, `nivel_com_chefe.gd`) -- so a
+     GEOMETRIA (chao/paredes/ColorRect de fundo) passa a tiles.
+   - `Atmosfera` recolorida p/ pedra/cripta + `fundo_pack` = "corredores"
+     (Prisao) / falta pack proprio p/ catacumbas (usar "corredores" ou
+     "rochoso"). Ver `atmosfera.gd::PACKS`.
+   - **Cuidado**: nao mexer nos X/Y de `Checkpoint`, `gatilho_intro` do
+     chefe, nem da `Porta` -- reconstruir a geometria A VOLTA deles.
+     Correr `--script tests/run_tests.gd` + smoke de cada cena + o bot
+     `tools/_bot.tscn` (gitignored) por nivel depois de converter.
+   - `corredor`/`SalaLabirinto` do `GeradorCorredor` continua a prepender
+     -- decidir se os niveis-masmorra levam `corredor = false` (a sala
+     labirinto ja da a "masmorra"; ver EM PAUSA no fim).
+2. **Koliani -- apurar o gerador por codigo** (`tools/gerar_sprites.gd`
+   `_kol_pose`/`KPAL`/`_poses_*`) p/ o guia do Paulo (bandana, cabelo
+   curto side-swept, top s/ mangas + pauldron, capa roxa esfarrapada,
+   botas altas, lamina roxa, fumos roxos). Ja esta perto -- e loop de
+   PREVIEW=1 (`godot --headless --script res://tools/gerar_sprites.gd`,
+   grava `assets/sprites/pixel/koliani/_preview_*` x8; a pasta
+   `_preview_koliani` tem de existir) + olhar + afinar contraste/leitura.
+3. Depois: continuar a melhorar mapas/conceitos/lutas/monstros dos
+   restantes por `docs/niveis.md`, 1 mecanica distinta por mapa. Assets
+   CC0 uteis por vasculhar em `assets/sprites/incoming/`: `chierit`
+   (Minotaur/Slime/Frost Guardian), `clembod` Bringer of Death,
+   `ansimuz` Hell-Hound, gothicvania church/town tilesets, ansimuz
+   caverns/cold-corridors parallax, kenney pixel-platformer.
