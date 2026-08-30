@@ -70,6 +70,10 @@ var _leve := 0.0
 ## zonas de "gravidade lunar" (< 1) e a Sacerdotisa mexe nisto durante a
 ## luta. Reposto a 1 por `definir_grav_escala(1.0)` ao sair da zona.
 var _grav_escala := 1.0
+## Multiplicador do input horizontal (-1 = controlos invertidos). O Olho do
+## Abismo (nível 20) inverte-os por uns segundos com `inverter_controlos()`.
+var _inverso := 1.0
+var _inverso_restante := 0.0
 
 # animação procedural (visual, corre em _process)
 var _mat: ShaderMaterial
@@ -101,13 +105,17 @@ func _physics_process(dt: float) -> void:
 	_lancar_restante = maxf(0.0, _lancar_restante - dt)
 	_preso = maxf(0.0, _preso - dt)
 	_leve = maxf(0.0, _leve - dt)
+	if _inverso_restante > 0.0:
+		_inverso_restante -= dt
+		if _inverso_restante <= 0.0:
+			_inverso = 1.0
 
 	# a barra de Energia regenera-se sozinha depois de usada
 	if _energia < ENERGIA_MAX:
 		_energia = minf(ENERGIA_MAX, _energia + REGEN_ENERGIA * dt)
 		energia_mudou.emit(_energia, ENERGIA_MAX)
 
-	var dir := Input.get_axis("mover_esquerda", "mover_direita")
+	var dir := Input.get_axis("mover_esquerda", "mover_direita") * _inverso
 	if dir != 0.0 and _rolar_restante <= 0.0:
 		_olha_para = signf(dir)  # o flip visual é feito em _animar()
 
@@ -413,6 +421,12 @@ func flutuar(segundos: float) -> void:
 ## chamam isto ao entrar/sair; a Sacerdotisa mexe nisto durante a luta.
 func definir_grav_escala(v: float) -> void:
 	_grav_escala = clampf(v, 0.2, 1.5)
+
+
+## Inverte os controlos horizontais por `segundos` (O Olho do Abismo, nível 20).
+func inverter_controlos(segundos: float) -> void:
+	_inverso = -1.0
+	_inverso_restante = maxf(_inverso_restante, segundos)
 
 
 func receber_dano(quantidade: int, dir_empurrao: float = 0.0) -> void:

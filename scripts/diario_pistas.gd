@@ -131,6 +131,16 @@ const PISTAS := {
 		"titulo": "clue.serpente_idolo_partido.title",
 		"texto": "clue.serpente_idolo_partido.body",
 	},
+	"abismo_o_que_esta_la_em_baixo": {
+		"mundo": "world.catacombs",
+		"titulo": "clue.abismo_o_que_esta_la_em_baixo.title",
+		"texto": "clue.abismo_o_que_esta_la_em_baixo.body",
+	},
+	"abismo_saida_para_a_cidade": {
+		"mundo": "world.catacombs",
+		"titulo": "clue.abismo_saida_para_a_cidade.title",
+		"texto": "clue.abismo_saida_para_a_cidade.body",
+	},
 	"castelo_aurora_livre": {
 		"mundo": "world.castle",
 		"titulo": "clue.castelo_aurora_livre.title",

@@ -64,6 +64,7 @@ func _initialize() -> void:
 	_boss_colosso()  # regiao IV / nivel 17
 	_boss_freira()   # regiao IV / nivel 18
 	_boss_naga()     # regiao IV / nivel 19
+	_boss_olho()     # regiao IV / nivel 20
 	print("OK -- sprites pixel-art em ", DIR)
 	quit(0)
 
@@ -1196,4 +1197,50 @@ func _boss_naga() -> void:
 		if f == 3:
 			_linha(int(cx), ch + 5, int(cx) - 3, ch + 12, 1, Color("b0304a"))
 			_linha(int(cx), ch + 5, int(cx) + 3, ch + 12, 1, Color("b0304a"))
+	)
+
+
+## Nivel 20 -- O Abismo. O Olho do Abismo: um olho flutuante sem corpo,
+## esclera palida, iris purpura, tentaculos de sombra curtos. Frame 2 =
+## carrega o laser (iris contraida, brilho); frame 3 = fechado a recarregar
+## (palpebra por cima, iris a mostra na fenda -- exposto).
+func _boss_olho() -> void:
+	var ESCLERA := Color("cdd0dc")
+	var ESCLERA_S := Color("8f93a6")
+	var IRIS := Color("6a2a8a")
+	var IRIS_C := Color("b45cff")
+	var SOMBRA := Color("14101c")
+	_boss("olho", 96, 96, func(f: int) -> void:
+		var carrega := f == 2
+		var fechado := f == 3
+		var cx := 48.0
+		var cy := 48.0
+		# tentaculos de sombra
+		for a in 8:
+			var ang := TAU * float(a) / 8.0
+			_linha(int(cx), int(cy), int(cx + cos(ang) * 40.0), int(cy + sin(ang) * 40.0), 3, SOMBRA)
+		# globo
+		_elipse(cx, cy, 30, 28, ESCLERA)
+		_elipse(cx - 8, cy - 6, 16, 14, Color(1, 1, 1, 0.0))
+		for j in range(int(cy) + 8, int(cy) + 28):
+			_rect(int(cx) - 26, j, 52, 1, ESCLERA_S)
+		# veias
+		_linha(int(cx) - 20, int(cy) - 14, int(cx) - 8, int(cy) - 2, 1, Color("b04a5a"))
+		_linha(int(cx) + 22, int(cy) + 10, int(cx) + 8, int(cy) + 2, 1, Color("b04a5a"))
+		if fechado:
+			# palpebra por cima, fenda estreita
+			_rect(int(cx) - 30, int(cy) - 28, 60, 26, SOMBRA)
+			_rect(int(cx) - 22, int(cy) - 3, 44, 6, IRIS)
+			_rect(int(cx) - 6, int(cy) - 2, 12, 4, IRIS_C)
+			_px(int(cx), int(cy), PAL["w"])
+		else:
+			var ir := 12.0 if not carrega else 7.0
+			_elipse(cx, cy, ir, ir, IRIS)
+			_elipse(cx, cy, ir * 0.5, ir * 0.5, IRIS_C)
+			_elipse(cx, cy, 2.5, 2.5, SOMBRA)
+			_px(int(cx) - 3, int(cy) - 3, PAL["w"])
+			if carrega:
+				for d in 4:
+					var ang2 := TAU * float(d) / 4.0 + 0.4
+					_linha(int(cx), int(cy), int(cx + cos(ang2) * 16.0), int(cy + sin(ang2) * 16.0), 1, IRIS_C)
 	)
