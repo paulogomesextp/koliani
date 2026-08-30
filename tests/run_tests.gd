@@ -40,6 +40,7 @@ func _correr_tudo() -> void:
 	teste_equipamento_dados()
 	teste_equipamento_estado()
 	teste_estado_tres_mortes_sem_vidas()
+	teste_estado_reiniciar_run()
 	teste_estado_pistas_sem_duplicados()
 	teste_estado_habilidade_sem_duplicados()
 	teste_estado_nivel_atual_e_caminho_valido()
@@ -380,6 +381,30 @@ func teste_estado_tres_mortes_sem_vidas() -> void:
 	e.perder_vida()
 	_ok(e.sem_vidas(), "3 vidas perdidas deviam deixar sem_vidas() verdadeiro")
 	e.free()
+
+
+## Modo normal: gastar as vidas todas recomeça o nível actual com vidas
+## cheias, mas mantém o progresso (níveis feitos, habilidades, pistas).
+func teste_estado_reiniciar_run() -> void:
+	var e := _novo_estado()
+	e.marcar_nivel_concluido(0)          # chefe do nível 1 morto
+	e.indice_nivel = 1                   # a jogar o nível 2
+	e.desbloquear_habilidade("dash_aereo")
+	e.definir_checkpoint(Vector2(500, 200))
+	e.perder_vida(); e.perder_vida(); e.perder_vida()
+	e.reiniciar_run()
+	_ok(e.vidas == e.VIDAS_INICIAIS, "reiniciar_run repõe as vidas")
+	_ok(e.indice_nivel == 1, "reiniciar_run mantém o nível actual (2)")
+	_ok(e.checkpoint == Vector2.ZERO, "reiniciar_run recomeça o nível do início")
+	_ok(0 in e.concluidos, "reiniciar_run não apaga níveis concluídos")
+	_ok(e.tem_habilidade("dash_aereo"), "reiniciar_run não apaga habilidades")
+	# defensivo: sem nada concluído, não fica à frente do progresso
+	var f := _novo_estado()
+	f.indice_nivel = 4
+	f.reiniciar_run()
+	_ok(f.indice_nivel == 0, "sem chefe morto, reiniciar_run volta ao nível 1")
+	e.free()
+	f.free()
 
 
 func teste_estado_pistas_sem_duplicados() -> void:

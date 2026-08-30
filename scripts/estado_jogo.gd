@@ -372,6 +372,23 @@ func ativar_modo_dev() -> void:
 	equipamento_mudou.emit("armadura", armadura_equipada)
 
 
+## Modo normal: gastaram-se as vidas todas, MAS o progresso fica. Volta-se
+## ao início do nível actual (o seguinte ao último chefe morto) com as
+## vidas cheias -- habilidades, pistas, níveis concluídos e equipamento
+## mantêm-se. (No hardcore isto não corre: aí 3 vidas = fim do run.)
+func reiniciar_run() -> void:
+	vidas = VIDAS_INICIAIS
+	checkpoint = Vector2.ZERO
+	hardcore_tempo_restante = -1.0  # nova tentativa -> relógio do nível cheio
+	# nunca à frente do progresso: nível a seguir ao último chefe derrotado
+	var teto := -1
+	for i in concluidos:
+		teto = maxi(teto, i)
+	indice_nivel = clampi(indice_nivel, 0, mini(teto + 1, NIVEIS.size() - 1))
+	vidas_mudaram.emit(vidas)
+	guardar()
+
+
 func reiniciar_campanha() -> void:
 	modo_dev = false
 	vidas = VIDAS_INICIAIS

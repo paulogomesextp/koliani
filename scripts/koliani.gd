@@ -845,5 +845,7 @@ func _morrer() -> void:
 			# hardcore: 3 vidas gastas = fim do run -> cartão GAME OVER (com voz)
 			GameOver.mostrar(get_tree(), "lives")
 			return
-		EstadoJogo.reiniciar_campanha()
+		# modo normal: vidas cheias e recomeça o nível actual, mas o
+		# progresso (níveis concluídos, habilidades, pistas, equipamento) fica
+		EstadoJogo.reiniciar_run()
 	Transicao.fechar_e(get_tree().reload_current_scene)
