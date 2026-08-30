@@ -1,0 +1,249 @@
+[gd_scene load_steps=15 format=3 uid="uid://bkolianitorresinos11"]
+
+; Região III / nível 11 -- Torre dos Sinos (abre as Torres Esquecidas).
+; Bater nos sinos (`SinoTorre` -- golpe ou projétil) muda o cenário: as
+; plataformas do grupo "sino_alterna" trocam de estado (as sólidas somem,
+; as fantasma ficam sólidas) e os inimigos comuns gelam uns segundos. A
+; passagem para a arena só se faz erguendo o caminho alto com o sino.
+; Arena no topo com O Sino Vivo -- a criatura presa no sino, ataques por som.
+
+[ext_resource type="PackedScene" uid="uid://bkolianiactor01" path="res://scenes/actors/Koliani.tscn" id="1_kol"]
+[ext_resource type="PackedScene" uid="uid://bdemoniobase01" path="res://scenes/actors/DemonioBase.tscn" id="2_dem"]
+[ext_resource type="PackedScene" uid="uid://bkolianicoletavel01" path="res://scenes/actors/Coletavel.tscn" id="3_col"]
+[ext_resource type="PackedScene" uid="uid://bkolianiporta01" path="res://scenes/actors/Porta.tscn" id="4_porta"]
+[ext_resource type="Script" path="res://scripts/checkpoint.gd" id="5_chk"]
+[ext_resource type="PackedScene" uid="uid://bkolianichefesino11" path="res://scenes/actors/ChefeSinoVivo.tscn" id="6_chefe"]
+[ext_resource type="Script" path="res://scripts/nivel_com_chefe.gd" id="7_niv"]
+[ext_resource type="PackedScene" uid="uid://bkolianiatmosfera01" path="res://scenes/fx/Atmosfera.tscn" id="8_atm"]
+[ext_resource type="PackedScene" uid="uid://bkolianiplataforma01" path="res://scenes/actors/Plataforma.tscn" id="9_pl"]
+[ext_resource type="PackedScene" uid="uid://bkolianisinotorre11" path="res://scenes/actors/SinoTorre.tscn" id="10_sino"]
+[ext_resource type="PackedScene" uid="uid://bkolianiserra01" path="res://scenes/actors/Serra.tscn" id="11_serra"]
+
+[sub_resource type="RectangleShape2D" id="rs_chk"]
+size = Vector2(40, 80)
+
+[sub_resource type="Gradient" id="grad_luz"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="tex_luz"]
+gradient = SubResource("grad_luz")
+width = 256
+height = 256
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[node name="Torre_dos_Sinos" type="Node2D"]
+script = ExtResource("7_niv")
+
+[node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
+cor_ambiente = Color(0.78, 0.62, 0.45, 1)
+cor_fundo = Color(0.09, 0.06, 0.08, 1)
+cor_silhueta = Color(0.16, 0.1, 0.12, 1)
+cor_luz = Color(1, 0.74, 0.42, 1)
+cor_poeira = Color(1, 0.82, 0.55, 1)
+densidade_poeira = 1.5
+bioma = "torres"
+largura_nivel = 3500.0
+luzes_horizonte = true
+fundo_pack = "montanhas"
+
+[node name="ChaoInicio" parent="." instance=ExtResource("9_pl")]
+position = Vector2(400, 660)
+tamanho = Vector2(560, 48)
+altura_visual = 96.0
+
+[node name="ChaoMeio" parent="." instance=ExtResource("9_pl")]
+position = Vector2(1200, 644)
+tamanho = Vector2(360, 44)
+altura_visual = 80.0
+
+[node name="ChaoPreArena" parent="." instance=ExtResource("9_pl")]
+position = Vector2(2120, 612)
+tamanho = Vector2(320, 40)
+altura_visual = 72.0
+
+[node name="SubidaA" parent="." instance=ExtResource("9_pl")]
+position = Vector2(2420, 520)
+tamanho = Vector2(140, 22)
+altura_visual = 28.0
+
+[node name="SubidaB" parent="." instance=ExtResource("9_pl")]
+position = Vector2(2620, 430)
+tamanho = Vector2(140, 22)
+altura_visual = 28.0
+
+[node name="ChaoArena" parent="." instance=ExtResource("9_pl")]
+position = Vector2(3060, 660)
+tamanho = Vector2(760, 48)
+altura_visual = 96.0
+
+[node name="AltA1" parent="." instance=ExtResource("9_pl") groups=["sino_alterna"]]
+position = Vector2(1440, 566)
+tamanho = Vector2(150, 22)
+altura_visual = 26.0
+
+[node name="AltA2" parent="." instance=ExtResource("9_pl") groups=["sino_alterna"]]
+position = Vector2(1640, 566)
+tamanho = Vector2(150, 22)
+altura_visual = 26.0
+
+[node name="AltA3" parent="." instance=ExtResource("9_pl") groups=["sino_alterna"]]
+position = Vector2(1840, 566)
+tamanho = Vector2(150, 22)
+altura_visual = 26.0
+
+[node name="AltB1" parent="." instance=ExtResource("9_pl") groups=["sino_alterna"]]
+position = Vector2(1460, 444)
+tamanho = Vector2(150, 22)
+altura_visual = 26.0
+
+[node name="Visual" parent="AltB1" index="0"]
+modulate = Color(1, 1, 1, 0.16)
+
+[node name="Col" parent="AltB1" index="1"]
+disabled = true
+
+[node name="AltB2" parent="." instance=ExtResource("9_pl") groups=["sino_alterna"]]
+position = Vector2(1660, 400)
+tamanho = Vector2(150, 22)
+altura_visual = 26.0
+
+[node name="Visual" parent="AltB2" index="0"]
+modulate = Color(1, 1, 1, 0.16)
+
+[node name="Col" parent="AltB2" index="1"]
+disabled = true
+
+[node name="AltB3" parent="." instance=ExtResource("9_pl") groups=["sino_alterna"]]
+position = Vector2(1860, 452)
+tamanho = Vector2(150, 22)
+altura_visual = 26.0
+
+[node name="Visual" parent="AltB3" index="0"]
+modulate = Color(1, 1, 1, 0.16)
+
+[node name="Col" parent="AltB3" index="1"]
+disabled = true
+
+[node name="SinoInicio" parent="." instance=ExtResource("10_sino")]
+position = Vector2(560, 470)
+so_congela = true
+
+[node name="SinoToggle" parent="." instance=ExtResource("10_sino")]
+position = Vector2(1180, 476)
+
+[node name="SinoArena" parent="." instance=ExtResource("10_sino")]
+position = Vector2(2060, 470)
+so_congela = true
+
+[node name="SerraBaixa" parent="." instance=ExtResource("11_serra")]
+position = Vector2(1640, 520)
+percurso = Vector2(360, 0)
+tempo = 2.0
+
+[node name="LuzInicio" type="PointLight2D" parent="."]
+position = Vector2(400, 600)
+texture = SubResource("tex_luz")
+energy = 0.5
+color = Color(1, 0.74, 0.42, 1)
+scale = Vector2(1.9, 1.1)
+
+[node name="LuzArena" type="PointLight2D" parent="."]
+position = Vector2(3060, 600)
+texture = SubResource("tex_luz")
+energy = 0.6
+color = Color(1, 0.72, 0.4, 1)
+scale = Vector2(2.4, 1.4)
+
+[node name="Koliani" parent="." instance=ExtResource("1_kol")]
+position = Vector2(150, 560)
+
+[node name="Demonio1" parent="." instance=ExtResource("2_dem")]
+especie = "goblin"
+position = Vector2(520, 604)
+alcance_patrulha = 200.0
+
+[node name="Demonio2" parent="." instance=ExtResource("2_dem")]
+especie = "goblin"
+position = Vector2(1200, 588)
+alcance_patrulha = 120.0
+
+[node name="Demonio3" parent="." instance=ExtResource("2_dem")]
+especie = "esqueleto"
+position = Vector2(2120, 556)
+alcance_patrulha = 160.0
+
+[node name="Chefe" parent="." instance=ExtResource("6_chefe")]
+position = Vector2(3060, 470)
+
+[node name="ColBadalada" parent="." instance=ExtResource("3_col")]
+position = Vector2(1860, 404)
+pista_id = "sinos_badalada_familiar"
+
+[node name="CheckInicio" type="Area2D" parent="."]
+position = Vector2(380, 588)
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("5_chk")
+
+[node name="Visual" type="ColorRect" parent="CheckInicio"]
+offset_left = -5.0
+offset_top = -42.0
+offset_right = 5.0
+offset_bottom = 40.0
+color = Color(0.36, 0.28, 0.55, 1)
+
+[node name="Luz" type="Node2D" parent="CheckInicio"]
+visible = false
+
+[node name="Brilho" type="ColorRect" parent="CheckInicio/Luz"]
+offset_left = -20.0
+offset_top = -54.0
+offset_right = 20.0
+offset_bottom = 44.0
+color = Color(0.85, 0.31, 0.83, 0.32)
+
+[node name="PointLight2D" type="PointLight2D" parent="CheckInicio/Luz"]
+texture = SubResource("tex_luz")
+energy = 1.1
+color = Color(0.93, 0.4, 0.9, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckInicio"]
+shape = SubResource("rs_chk")
+
+[node name="CheckArena" type="Area2D" parent="."]
+position = Vector2(2600, 588)
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("5_chk")
+
+[node name="Visual" type="ColorRect" parent="CheckArena"]
+offset_left = -5.0
+offset_top = -42.0
+offset_right = 5.0
+offset_bottom = 40.0
+color = Color(0.36, 0.28, 0.55, 1)
+
+[node name="Luz" type="Node2D" parent="CheckArena"]
+visible = false
+
+[node name="Brilho" type="ColorRect" parent="CheckArena/Luz"]
+offset_left = -20.0
+offset_top = -54.0
+offset_right = 20.0
+offset_bottom = 44.0
+color = Color(0.85, 0.31, 0.83, 0.32)
+
+[node name="PointLight2D" type="PointLight2D" parent="CheckArena/Luz"]
+texture = SubResource("tex_luz")
+energy = 1.1
+color = Color(0.93, 0.4, 0.9, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckArena"]
+shape = SubResource("rs_chk")
+
+[node name="Porta" parent="." instance=ExtResource("4_porta")]
+position = Vector2(3380, 586)
+pista_ao_atravessar = ""

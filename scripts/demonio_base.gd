@@ -49,6 +49,19 @@ var anticipacao := 0.0
 ## decai a zero). Não afeta a física -- só o "juice".
 var _flinch := 0.0
 var _flinch_dir := 1.0
+## Segundos que ainda está congelado (Torre dos Sinos: a badalada gela os
+## inimigos comuns). Enquanto > 0 não patrulha nem persegue.
+var _congelado := 0.0
+
+
+## Gela este inimigo por `segundos` (a badalada do Sino, nível 11). Idempotente
+## no sentido de ficar sempre com o maior tempo pendente.
+func congelar(segundos: float) -> void:
+	if _morto:
+		return
+	_congelado = maxf(_congelado, segundos)
+	if _corpo:
+		_corpo.modulate = Color(0.7, 0.85, 1.2)
 
 
 ## Os chefes (ChefeBase) sobrepõem isto para NÃO levarem a escala de mundo
@@ -143,6 +156,15 @@ func _atualizar_anim() -> void:
 
 func _physics_process(dt: float) -> void:
 	if _morto:
+		return
+	if _congelado > 0.0:
+		_congelado -= dt
+		velocity.x = 0.0
+		if not is_on_floor():
+			velocity.y += GRAVIDADE * dt
+		move_and_slide()
+		if _congelado <= 0.0 and _corpo:
+			_corpo.modulate = Color(1, 1, 1)
 		return
 	velocity.x = _direcao * velocidade
 	if not is_on_floor():

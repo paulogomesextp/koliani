@@ -1,0 +1,89 @@
+[gd_scene load_steps=6 format=3 uid="uid://bkolianichefesino11"]
+
+; Região III / nível 11 -- O Sino Vivo. Tira pixel-art de 4 frames
+; (0/1 a baloiçar, 2 baloiçado de lado (telegrafo), 3 boca aberta --
+; rosto/badalo aceso (exposto)) em assets/sprites/pixel/bosses/sino.png.
+; O script gere a rotação (pêndulo) e a posição (QUEDA). Núcleo = badalo.
+; Script chefe_sino_vivo.gd (herda ChefeBase).
+
+[ext_resource type="Script" path="res://scripts/chefe_sino_vivo.gd" id="1_chefe"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/bosses/sino.png" id="2_tex"]
+
+[sub_resource type="RectangleShape2D" id="rs_body"]
+size = Vector2(68, 76)
+
+[sub_resource type="RectangleShape2D" id="rs_contacto"]
+size = Vector2(80, 84)
+
+[sub_resource type="Gradient" id="grad_luz"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="tex_luz"]
+gradient = SubResource("grad_luz")
+width = 256
+height = 256
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[node name="ChefeSinoVivo" type="CharacterBody2D" groups=["inimigos"]]
+collision_layer = 4
+collision_mask = 1
+script = ExtResource("1_chefe")
+vida = 400
+dano_contacto = 18
+alcance_patrulha = 0.0
+cor_estilhacos = Color(0.66, 0.55, 0.24, 1)
+cor_rim = Color(1, 0.92, 0.7, 1)
+
+[node name="Sprite" type="Node2D" parent="."]
+
+[node name="Corpo" type="Sprite2D" parent="Sprite"]
+texture_filter = 1
+position = Vector2(0, -6)
+texture = ExtResource("2_tex")
+hframes = 4
+
+[node name="LuzBadalo" type="PointLight2D" parent="Sprite"]
+position = Vector2(0, 24)
+texture = SubResource("tex_luz")
+energy = 0.5
+color = Color(0.85, 0.9, 1, 1)
+scale = Vector2(0.9, 0.9)
+
+[node name="Nucleo" type="Node2D" parent="Sprite"]
+position = Vector2(0, 20)
+scale = Vector2(0.4, 0.4)
+
+[node name="Brilho" type="Sprite2D" parent="Sprite/Nucleo"]
+visible = false
+texture = SubResource("tex_luz")
+modulate = Color(0.82, 0.88, 1, 0.9)
+scale = Vector2(0.34, 0.34)
+
+[node name="Diamante" type="Polygon2D" parent="Sprite/Nucleo"]
+color = Color(0.82, 0.88, 1, 1)
+polygon = PackedVector2Array(-8, 0, 0, -12, 8, 0, 0, 12)
+
+[node name="Cerne" type="Polygon2D" parent="Sprite/Nucleo"]
+color = Color(1, 1, 1, 1)
+polygon = PackedVector2Array(-3.5, 0, 0, -6, 3.5, 0, 0, 6)
+
+[node name="Luz" type="PointLight2D" parent="Sprite/Nucleo"]
+texture = SubResource("tex_luz")
+energy = 0.12
+color = Color(0.85, 0.9, 1, 1)
+scale = Vector2(0.6, 0.6)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 0)
+shape = SubResource("rs_body")
+
+[node name="AreaContacto" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AreaContacto"]
+position = Vector2(0, -4)
+shape = SubResource("rs_contacto")

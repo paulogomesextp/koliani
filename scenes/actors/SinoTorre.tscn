@@ -1,0 +1,70 @@
+[gd_scene load_steps=4 format=3 uid="uid://bkolianisinotorre11"]
+
+; Sino da Torre dos Sinos (ver scripts/sino_torre.gd). Bater-lhe (golpe ou
+; projétil) alterna as plataformas do grupo "sino_alterna" e gela os
+; inimigos comuns. Pendurar no alto de um vão.
+
+[ext_resource type="Script" path="res://scripts/sino_torre.gd" id="1_sino"]
+
+[sub_resource type="RectangleShape2D" id="rs_sino"]
+size = Vector2(56, 60)
+
+[sub_resource type="Gradient" id="grad_luz"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(1, 1, 1, 0.7, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="tex_luz"]
+gradient = SubResource("grad_luz")
+width = 128
+height = 128
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[node name="SinoTorre" type="StaticBody2D"]
+collision_layer = 4
+collision_mask = 0
+
+[node name="Suporte" type="Line2D" parent="."]
+points = PackedVector2Array(-30, -46, 30, -46)
+width = 4.0
+default_color = Color(0.2, 0.21, 0.26, 1)
+
+[node name="Corda" type="Line2D" parent="."]
+points = PackedVector2Array(0, -46, 0, -30)
+width = 2.0
+default_color = Color(0.36, 0.3, 0.22, 1)
+
+[node name="Corpo" type="Polygon2D" parent="."]
+color = Color(0.72, 0.62, 0.3, 1)
+polygon = PackedVector2Array(-24, -28, 24, -28, 30, 22, 20, 30, -20, 30, -30, 22)
+
+[node name="Aro" type="Polygon2D" parent="."]
+color = Color(0.5, 0.42, 0.18, 1)
+polygon = PackedVector2Array(-32, 24, 32, 24, 30, 32, -30, 32)
+
+[node name="Brilho" type="Line2D" parent="."]
+points = PackedVector2Array(-18, -22, -22, 18)
+width = 3.0
+default_color = Color(1, 0.95, 0.7, 0.6)
+
+[node name="Badalo" type="Node2D" parent="."]
+
+[node name="Peca" type="Polygon2D" parent="Badalo"]
+color = Color(0.22, 0.22, 0.27, 1)
+polygon = PackedVector2Array(-4, 0, 4, 0, 3, 34, -3, 34)
+
+[node name="Bola" type="Polygon2D" parent="Badalo"]
+position = Vector2(0, 34)
+color = Color(0.28, 0.28, 0.33, 1)
+polygon = PackedVector2Array(-6, -6, 6, -6, 6, 6, -6, 6)
+
+[node name="Luz" type="PointLight2D" parent="."]
+texture = SubResource("tex_luz")
+energy = 0.5
+color = Color(1, 0.92, 0.7, 1)
+scale = Vector2(1.1, 1.1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 2)
+shape = SubResource("rs_sino")

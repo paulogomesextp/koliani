@@ -76,6 +76,11 @@ const PISTAS := {
 		"titulo": "clue.prisao_grito_nas_correntes.title",
 		"texto": "clue.prisao_grito_nas_correntes.body",
 	},
+	"sinos_badalada_familiar": {
+		"mundo": "world.towers",
+		"titulo": "clue.sinos_badalada_familiar.title",
+		"texto": "clue.sinos_badalada_familiar.body",
+	},
 	"torres_lanterna_de_zeriko": {
 		"mundo": "world.towers",
 		"titulo": "clue.torres_lanterna_de_zeriko.title",

@@ -56,6 +56,7 @@ func _initialize() -> void:
 	_boss_dama()     # regiao II / nivel 08
 	_boss_irmaos()   # regiao II / nivel 09
 	_boss_primeiro() # regiao II / nivel 10
+	_boss_sino()     # regiao III / nivel 11
 	print("OK -- sprites pixel-art em ", DIR)
 	quit(0)
 
@@ -758,4 +759,55 @@ func _boss_primeiro() -> void:
 			for a in 4:
 				var ang := TAU * float(a) / 4.0 + 0.4
 				_linha(int(cx), 44, int(cx + cos(ang) * 12.0), int(44 + sin(ang) * 12.0), 1, ENERGIA)
+	)
+
+
+## Nivel 11 -- Torre dos Sinos. O Sino Vivo: sino de bronze colossal com um
+## rosto preso na boca. Frame 2 = baloicado de lado (telegrafo);
+## frame 3 = boca aberta, rosto/badalo aceso (exposto).
+func _boss_sino() -> void:
+	var BRONZE := Color("7a6326")
+	var BRONZE_C := Color("a88c3c")
+	var BRONZE_E := Color("463a17")
+	var SOM := Color("cdd6ff")
+	var ROSTO := Color("2a2410")
+	_boss("sino", 100, 104, func(f: int) -> void:
+		var tilt: float = [0.0, 2.0, -6.0, 0.0][f]
+		var cx := 50.0 + tilt
+		# suporte / eixo
+		_rect(20, 6, 60, 4, BRONZE_E)
+		_linha(int(cx), 10, int(cx), 20, 2, BRONZE_E)
+		# corpo do sino (trapezio bojudo)
+		for j in range(18, 82):
+			var t := float(j - 18) / 64.0
+			var meia := lerpf(10.0, 34.0, pow(t, 0.8))
+			var c := 50.0 + tilt * t
+			_rect(int(c - meia), j, int(meia * 2.0), 1, BRONZE if j % 5 else BRONZE_C)
+		# aro da boca
+		_rect(int(cx) - 38, 80, 76, 8, BRONZE_E)
+		_rect(int(cx) - 38, 78, 76, 3, BRONZE_C)
+		# brilho num flanco
+		_linha(int(cx) - 22, 30, int(cx) - 28, 70, 3, Color(1, 0.95, 0.7, 0.5))
+		# rosto preso na boca
+		var abrir := f == 3
+		var ry := 12.0 if abrir else 7.0
+		_elipse(cx, 74, 12.0, ry, ROSTO)
+		if abrir:
+			_elipse(cx, 74, 8.0, 9.0, Color("120e06"))
+			_px(int(cx) - 4, 71, SOM); _px(int(cx) + 4, 71, SOM)
+			# badalo aceso
+			_elipse(cx, 66, 4.0, 5.0, SOM)
+			_rect(int(cx) - 1, 52, 2, 12, BRONZE_E)
+		else:
+			_px(int(cx) - 4, 73, SOM); _px(int(cx) + 4, 73, SOM)
+			_rect(int(cx) - 1, 50, 2, 22, BRONZE_E)  # badalo dentro
+			_elipse(cx, 74, 3.5, 3.5, BRONZE_E)
+		# fendas (frame 2/3 = fase avancada no visual)
+		if f >= 2:
+			_linha(int(cx) + 10, 26, int(cx) + 4, 60, 1, BRONZE_E)
+			_linha(int(cx) - 14, 34, int(cx) - 8, 66, 1, BRONZE_E)
+		# ondas de som no telegrafo
+		if f == 2:
+			for r in [16, 22, 28]:
+				_linha(int(cx) - 40 - r, 40, int(cx) - 40 - r, 60, 1, SOM)
 	)
