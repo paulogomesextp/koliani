@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=3 uid="uid://bkolianibolafogo01"]
+
+; Projetil de fogo cuspido pela Torreta. Visual e colisao em codigo.
+; Ver scripts/bola_fogo.gd (@export velocidade / dano / duracao).
+
+[ext_resource type="Script" path="res://scripts/bola_fogo.gd" id="1_bola"]
+
+[node name="BolaFogo" type="Area2D"]
+script = ExtResource("1_bola")

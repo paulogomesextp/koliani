@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3 uid="uid://bkolianitorreta01"]
+
+; Mob de parede que manda fogo: telegrafa e cospe uma BolaFogo em ciclo.
+; Visual/colisao em codigo. Ver scripts/torreta.gd
+; (@export direcao / intervalo / telegrafo / fase / dano / vel_bola).
+
+[ext_resource type="Script" path="res://scripts/torreta.gd" id="1_torreta"]
+
+[node name="Torreta" type="Node2D"]
+script = ExtResource("1_torreta")
