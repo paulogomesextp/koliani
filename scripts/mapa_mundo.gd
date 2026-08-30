@@ -213,12 +213,30 @@ func _atualizar(instantaneo: bool) -> void:
 	for i in _nos.size():
 		var n: Dictionary = _nos[i]
 		_estilo_no(n["btn"], n["regiao"], n["indice"], n["jogavel"], i == _sel)
-	var destino: Vector2 = _nos_pai.position + no["pos"] + Vector2(0, -84)
-	if instantaneo:
-		_token.position = destino - _token.size * Vector2(0.5, 0.0)
+
+	# pan horizontal: mantém o nó escolhido perto do centro do ecrã. Com 30
+	# níveis o caminho é uma faixa muito mais larga que o ecrã, por isso é
+	# preciso rolar (o `_construir` só o centrava quando cabia todo).
+	var ecra_x := get_viewport_rect().size.x
+	var largura := ESPACO_X * maxf(1.0, float(_nos.size() - 1))
+	var no_pos: Vector2 = no["pos"]
+	var pan_x: float = ecra_x * 0.5 - no_pos.x
+	if largura > ecra_x - 160.0:
+		pan_x = clampf(pan_x, ecra_x - 120.0 - largura, 120.0)
 	else:
-		var t := create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-		t.tween_property(_token, "position", destino - _token.size * Vector2(0.5, 0.0), 0.22)
+		pan_x = maxf(40.0, (ecra_x - largura) * 0.5) - 120.0
+	var pan := Vector2(pan_x, _nos_pai.position.y)
+
+	var destino: Vector2 = pan + no_pos + Vector2(0, -84) - _token.size * Vector2(0.5, 0.0)
+	if instantaneo:
+		_nos_pai.position = pan
+		_linha.position = pan
+		_token.position = destino
+	else:
+		var t := create_tween().set_parallel(true).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		t.tween_property(_nos_pai, "position", pan, 0.22)
+		t.tween_property(_linha, "position", pan, 0.22)
+		t.tween_property(_token, "position", destino, 0.22)
 	_jogar.disabled = not no["jogavel"]
 	_atualizar_titulo(no)
 
