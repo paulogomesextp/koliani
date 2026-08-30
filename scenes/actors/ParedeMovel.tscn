@@ -1,0 +1,29 @@
+[gd_scene load_steps=2 format=3 uid="uid://bkolianiparedemovel19"]
+
+; Parede que desliza (ver scripts/parede_movel.gd). `tamanho`, `curso`,
+; `periodo` e `fase` afinam o vaivém. Bloqueia como parede.
+
+[ext_resource type="Script" path="res://scripts/parede_movel.gd" id="1_pm"]
+
+[sub_resource type="RectangleShape2D" id="rs_pm"]
+size = Vector2(28, 180)
+
+[node name="ParedeMovel" type="AnimatableBody2D"]
+collision_layer = 1
+collision_mask = 0
+script = ExtResource("1_pm")
+
+[node name="Visual" type="ColorRect" parent="."]
+offset_left = -14.0
+offset_top = -90.0
+offset_right = 14.0
+offset_bottom = 90.0
+color = Color(0.2, 0.24, 0.2, 1)
+
+[node name="Faixa" type="Line2D" parent="Visual"]
+points = PackedVector2Array(-14, -40, 14, -40, 14, 40, -14, 40)
+width = 2.0
+default_color = Color(0.4, 0.55, 0.4, 0.5)
+
+[node name="Col" type="CollisionShape2D" parent="."]
+shape = SubResource("rs_pm")

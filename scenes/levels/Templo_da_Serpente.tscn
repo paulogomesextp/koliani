@@ -1,12 +1,12 @@
-[gd_scene load_steps=16 format=3 uid="uid://bkolianitemploserpente19"]
+[gd_scene load_steps=17 format=3 uid="uid://bkolianitemploserpente19"]
 
 ; Região IV / nível 19 -- Templo da Serpente.
-; Passagens secretas (`ParedeFragil` -- escondem a pista e um atalho; o
-; caminho principal está sempre aberto), lâminas (`Serra`) e Espinhos.
-; NOTA: as "paredes móveis" do design ficam para um passe futuro. Arena com
-; Naga Zeraph -- meio-serpente que cospe veneno, levanta cobras, faz poças
-; de veneno no chão e TROCA de lugar com as estátuas do grupo
-; "estatuas_naga".
+; Paredes móveis (`ParedeMovel` -- deslizam em vaivém, cronometra-se a
+; passagem) e passagens secretas (`ParedeFragil` -- escondem a pista e um
+; atalho; o caminho principal está sempre aberto), lâminas (`Serra`) e
+; Espinhos. Arena com Naga Zeraph -- meio-serpente que cospe veneno,
+; levanta cobras, faz poças de veneno no chão e TROCA de lugar com as
+; estátuas do grupo "estatuas_naga".
 
 [ext_resource type="PackedScene" uid="uid://bkolianiactor01" path="res://scenes/actors/Koliani.tscn" id="1_kol"]
 [ext_resource type="PackedScene" uid="uid://bdemoniobase01" path="res://scenes/actors/DemonioBase.tscn" id="2_dem"]
@@ -20,6 +20,7 @@
 [ext_resource type="PackedScene" uid="uid://bkolianiparedefragil01" path="res://scenes/actors/ParedeFragil.tscn" id="10_pf"]
 [ext_resource type="PackedScene" uid="uid://bkolianiserra01" path="res://scenes/actors/Serra.tscn" id="11_serra"]
 [ext_resource type="PackedScene" uid="uid://bkolianiespinhos01" path="res://scenes/actors/Espinhos.tscn" id="12_esp"]
+[ext_resource type="PackedScene" uid="uid://bkolianiparedemovel19" path="res://scenes/actors/ParedeMovel.tscn" id="13_pm"]
 
 [sub_resource type="RectangleShape2D" id="rs_chk"]
 size = Vector2(40, 80)
@@ -100,6 +101,19 @@ tempo = 2.0
 [node name="EspinhosMeio" parent="." instance=ExtResource("12_esp")]
 position = Vector2(1360, 616)
 largura = 8
+
+[node name="ParedeMovel1" parent="." instance=ExtResource("13_pm")]
+position = Vector2(1120, 560)
+tamanho = Vector2(28, 180)
+curso = Vector2(0, -190)
+periodo = 3.0
+
+[node name="ParedeMovel2" parent="." instance=ExtResource("13_pm")]
+position = Vector2(1720, 560)
+tamanho = Vector2(28, 180)
+curso = Vector2(-180, 0)
+periodo = 3.4
+fase = 0.5
 
 [node name="Estatua1" type="Node2D" parent="." groups=["estatuas_naga"]]
 position = Vector2(2440, 596)
