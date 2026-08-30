@@ -8,6 +8,34 @@ tem cena + chefe (herda `ChefeBase`) + `_boss_*` em `gerar_sprites.gd` +
 pista i18n×6 + `TEMPO_HARDCORE`. `Castelo_de_Zeriko.tscn` / `zeriko.gd` /
 `Zeriko.tscn` ficaram como **legado** (fora da campanha).
 
+## Sessão 2026-08-30 (cont.) — feedback do Paulo: VFX, equipamento, longevidade
+
+- **Golpe de espada com raio de luz.** `koliani.gd` `_flash_golpe()`: a
+  cada ataque, `LuzGolpe` (PointLight2D novo) dá um clarão à frente
+  (ilumina o cenário) + dois arcos aditivos que varrem com a lâmina (halo
+  da cor da arma + núcleo branco-quente). Rastro mais largo e tingido pelo
+  tier. `_cor_golpe()` = aço-frio → magenta por `Equipamento.cor_arma`.
+- **Armas/armaduras mais ricas.** `gerar_sprites.gd` `_armas()`/
+  `_armaduras()` reescritas com `_tier()` (rampa 3 paragens) — lâmina
+  sombreada + fio + faísca, silhuetas de armadura por tipo.
+- **Armadura visível no boneco.** `Koliani.tscn` `Sprite/Armadura`:
+  peitoral + pauldrons + cinto + trim em Polygon2D (herdam a animação
+  procedural). `koliani.gd::_aplicar_visual_armadura()` recolore por tier.
+- **Gauntlet de aproximação (longevidade ×N).** `gerador_corredor.gd`
+  reescrito: sequência de CÂMARAS (muros+degrau, porta+alavanca, serras,
+  guilhotinas, fogo+`Torreta`, prensas). ~3280 px (nível 5) → 7200 px
+  (nível 29) antes da geometria feita à mão. Anti-softlock: chão contínuo,
+  muros baixos com degrau, hazards só magoam (recolhem/ciclam), alavanca
+  no chão. `CascaMasmorra.abrir_esquerda()` recua a parede da masmorra →
+  `corredor` reativado nas regiões II/IV. Mecânica nova **`Torreta`** +
+  **`BolaFogo`** (mob de parede que cospe fogo). `koliani.gd`: wall-grab
+  só quando não sobe depressa (`velocity.y > -60`). `tools/bot_gauntlet.gd`
+  deteta bloqueios.
+- **AINDA POR AFINAR (playtest):** números dos hazards do gauntlet
+  (períodos/danos/densidade), se algum nível deve ter `corredor = false`,
+  leitura das placas de armadura nos tiers baixos, tamanho do arco do
+  golpe.
+
 ## Sessão de polish 2026-08-30 (noite) — feito
 
 - **Legado apagado.** `Torres_Esquecidas.tscn`+`ChefeVento`+`chefe_vento.gd`
