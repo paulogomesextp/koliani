@@ -34,6 +34,10 @@ const CENA_SELETOR_EQUIP := preload("res://scenes/ui/SeletorEquip.tscn")
 var _btn_armas: Button
 var _btn_armaduras: Button
 var _seletor_equip: SeletorEquip
+## Selo "UPGRADE AVAILABLE" por cima do botão WEAPONS / ARMOR quando há no
+## inventário algo melhor do que o que está equipado.
+var _selo_arma: Label
+var _selo_armadura: Label
 
 ## Legenda dos controlos, no topo do ecrã (só sem ecrã táctil -- em táctil
 ## os botões de toque já bastam). Cada linha: [chave i18n, ação no InputMap].
@@ -45,7 +49,6 @@ const LEGENDA_CONTROLOS := [
 	["hud.controls.roll", "rolar"],
 	["hud.controls.guard", "defender"],
 	["hud.controls.throw", "lancar"],
-	["hud.controls.swap", "trocar_arma"],
 	["hud.controls.pause", "pausa"],
 ]
 var _legenda_caixa: HBoxContainer
@@ -78,11 +81,17 @@ func _ready() -> void:
 
 	_montar_disco_arma()
 	_montar_botoes_equip()
-	EstadoJogo.equipamento_mudou.connect(func(_t: String, _i: String) -> void: _atualizar_disco_arma())
+	_montar_selos_upgrade()
+	EstadoJogo.equipamento_mudou.connect(func(_t: String, _i: String) -> void:
+		_atualizar_disco_arma()
+		_atualizar_selos_upgrade())
 	EstadoJogo.equipamento_ganho.connect(_ao_equipamento_ganho)
-	Textos.idioma_mudou.connect(func(_l: String) -> void: _traduzir_equip())
+	Textos.idioma_mudou.connect(func(_l: String) -> void:
+		_traduzir_equip()
+		_atualizar_selos_upgrade())
 	_atualizar_disco_arma()
 	_traduzir_equip()
+	_atualizar_selos_upgrade()
 
 	_montar_legenda_controlos()
 	_montar_cabecalho_nivel()
@@ -122,6 +131,75 @@ func _fazer_botao_equip(tipo: String) -> Button:
 		b.add_theme_stylebox_override(e, sb)
 	b.pressed.connect(_abrir_equip.bind(tipo))
 	return b
+
+
+## --- selo "UPGRADE AVAILABLE" -------------------------------------
+
+func _montar_selos_upgrade() -> void:
+	_selo_arma = _fazer_selo(92.0)
+	_selo_armadura = _fazer_selo(192.0)
+	add_child(_selo_arma)
+	add_child(_selo_armadura)
+
+
+func _fazer_selo(x: float) -> Label:
+	var l := Label.new()
+	l.anchor_top = 1.0
+	l.anchor_bottom = 1.0
+	l.offset_left = x - 2.0
+	l.offset_right = x + 94.0
+	l.offset_top = -134.0
+	l.offset_bottom = -114.0
+	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	l.add_theme_font_size_override("font_size", 9)
+	l.add_theme_color_override("font_color", Color(0.15, 0.05, 0.02))
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(1.0, 0.82, 0.3, 0.95)
+	sb.set_corner_radius_all(4)
+	sb.content_margin_top = 2
+	sb.content_margin_bottom = 2
+	l.add_theme_stylebox_override("normal", sb)
+	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	l.visible = false
+	return l
+
+
+## Há no inventário uma arma/armadura melhor (índice mais alto na lista de
+## poder) do que a equipada?
+func _ha_upgrade(tipo: String) -> bool:
+	if tipo == "arma":
+		var eq := Equipamento.indice_arma(EstadoJogo.arma_equipada)
+		for id in EstadoJogo.armas:
+			if Equipamento.indice_arma(id) > eq:
+				return true
+	else:
+		var eq := Equipamento.indice_armadura(EstadoJogo.armadura_equipada)
+		for id in EstadoJogo.armaduras:
+			if Equipamento.indice_armadura(id) > eq:
+				return true
+	return false
+
+
+func _atualizar_selos_upgrade() -> void:
+	for par in [[_selo_arma, "arma"], [_selo_armadura, "armadura"]]:
+		var l: Label = par[0]
+		if l == null:
+			continue
+		l.text = Textos.t("hud.upgrade_available")
+		var mostra := _ha_upgrade(par[1])
+		if mostra and not l.visible:
+			l.visible = true
+			l.modulate.a = 0.0
+			var t := l.create_tween().set_loops()
+			t.tween_property(l, "modulate:a", 1.0, 0.5)
+			t.tween_property(l, "modulate:a", 0.55, 0.5)
+			l.set_meta("tw", t)
+		elif not mostra and l.visible:
+			l.visible = false
+			var tw = l.get_meta("tw", null)
+			if tw and is_instance_valid(tw):
+				tw.kill()
 
 
 func _traduzir_equip() -> void:
@@ -179,10 +257,7 @@ func _montar_disco_arma() -> void:
 	_arma_label.add_theme_font_size_override("font_size", 22)
 	_arma_label.add_theme_color_override("font_color", Color(1, 0.9, 0.98))
 	_arma_disco.add_child(_arma_label)
-
-	_arma_disco.gui_input.connect(func(e: InputEvent) -> void:
-		if e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT:
-			_trocar_arma())
+	# o disco só mostra a arma equipada -- trocar de arma faz-se no menu WEAPONS
 
 
 func _atualizar_disco_arma() -> void:
@@ -209,17 +284,11 @@ func _atualizar_disco_arma() -> void:
 	_arma_label.text = ini if ini != "" else nome.substr(0, 2)
 
 
-func _trocar_arma() -> void:
-	if EstadoJogo.armas.size() < 2:
-		return
-	EstadoJogo.ciclar_arma(1)
-	Som.toca("apanhar", -14.0, 1.15)
-
-
 func _ao_equipamento_ganho(tipo: String, id: String) -> void:
 	var item: Dictionary = Equipamento.arma(id) if tipo == "arma" else Equipamento.armadura(id)
 	var nome := Textos.t(item.get("nome", id))
 	_aviso(Textos.tf("hud.gear_weapon" if tipo == "arma" else "hud.gear_armor", [nome]))
+	_atualizar_selos_upgrade()
 
 
 # --- barra de vida do chefe ------------------------------------------
@@ -432,8 +501,6 @@ func _linha_cab(txt: String, tam: int, cor: Color, pequeno: bool) -> Label:
 func _input(evento: InputEvent) -> void:
 	if evento is InputEventScreenTouch and _toque and not _toque.visible:
 		_toque.visible = true
-	if evento.is_action_pressed("trocar_arma") and not get_tree().paused:
-		_trocar_arma()
 
 
 func _atualizar_barra_vida(atual: int, maximo: int) -> void:

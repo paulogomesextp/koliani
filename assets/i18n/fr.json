@@ -39,6 +39,7 @@
 	"hud.new_ability": "Nouvelle capacité : %s",
 	"hud.clue_found": "Indice trouvé  (%d)",
 	"hud.advanced": "Passage au Niveau %d",
+	"hud.upgrade_available": "Amélioration dispo",
 	"hud.controls.title": "Commandes",
 	"hud.controls.move": "Bouger",
 	"hud.controls.jump": "Sauter ×2",

@@ -39,6 +39,7 @@
 	"hud.new_ability": "Nova habilidade: %s",
 	"hud.clue_found": "Pista encontrada  (%d)",
 	"hud.advanced": "Avançou para o Nível %d",
+	"hud.upgrade_available": "Upgrade Disponível",
 	"hud.controls.title": "Controlos",
 	"hud.controls.move": "Mover",
 	"hud.controls.jump": "Saltar ×2",
