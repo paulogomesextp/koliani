@@ -284,5 +284,7 @@
 	"gear.a.avental_do_acougueiro": "Butcher's Apron",
 	"gear.a.batina_purpura": "Purple Cassock",
 	"gear.a.vestido_do_eclipse": "Eclipse Gown",
-	"gear.a.egide_de_aurora": "Aurora's Aegis"
+	"gear.a.egide_de_aurora": "Aurora's Aegis",
+
+	"sel.reward": "Reward: %s"
 }

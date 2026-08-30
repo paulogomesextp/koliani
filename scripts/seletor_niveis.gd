@@ -29,6 +29,15 @@ const COR_REGIAO := [
 	Color(0.96, 0.66, 0.32), Color(0.62, 0.55, 0.72),
 	Color(0.82, 0.40, 0.52), Color(0.88, 0.34, 0.80),
 ]
+## arte de fundo por região (o `back.png` do bioma) -- preview no cartão.
+const FUNDO_REGIAO := [
+	"res://assets/sprites/pixel/backgrounds/floresta/middle.png",
+	"res://assets/sprites/pixel/backgrounds/corredores/middle.png",
+	"res://assets/sprites/pixel/backgrounds/montanhas/trees.png",
+	"res://assets/sprites/pixel/backgrounds/rochoso/middle.png",
+	"res://assets/sprites/pixel/backgrounds/corredores/near.png",
+	"res://assets/sprites/pixel/backgrounds/rochoso/near.png",
+]
 
 const CARTAO := Vector2(336, 300)
 const PASSO := 372.0          # cartão + intervalo
@@ -103,6 +112,18 @@ func _fazer_cartao(indice: int) -> Dictionary:
 	raiz.size = CARTAO
 	raiz.pivot_offset = CARTAO * 0.5
 	raiz.mouse_filter = Control.MOUSE_FILTER_STOP
+	raiz.clip_contents = true
+
+	# preview: arte do bioma da região, esbatida e tingida com a cor da região
+	if regiao >= 0 and regiao < FUNDO_REGIAO.size() and ResourceLoader.exists(FUNDO_REGIAO[regiao]):
+		var arte := TextureRect.new()
+		arte.texture = load(FUNDO_REGIAO[regiao])
+		arte.set_anchors_preset(Control.PRESET_FULL_RECT)
+		arte.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		arte.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+		arte.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		arte.modulate = Color(base.r, base.g, base.b, 0.7)
+		raiz.add_child(arte)
 
 	var painel := PanelContainer.new()
 	painel.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -110,7 +131,7 @@ func _fazer_cartao(indice: int) -> Dictionary:
 	raiz.add_child(painel)
 
 	var sb := StyleBoxFlat.new()
-	sb.bg_color = Color(0.08, 0.06, 0.12, 0.96)
+	sb.bg_color = Color(0.08, 0.06, 0.12, 0.6)
 	sb.set_corner_radius_all(16)
 	sb.set_border_width_all(3)
 	sb.border_color = base
@@ -169,6 +190,15 @@ func _fazer_cartao(indice: int) -> Dictionary:
 	chefe.add_theme_color_override("font_color", Color(0.86, 0.66, 0.92))
 	col.add_child(chefe)
 
+	var premio := Label.new()
+	premio.name = "Premio"
+	premio.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	premio.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	premio.custom_minimum_size = Vector2(CARTAO.x - 40, 0)
+	premio.add_theme_font_size_override("font_size", 13)
+	premio.add_theme_color_override("font_color", Color(0.98, 0.86, 0.55))
+	col.add_child(premio)
+
 	var pill := Label.new()
 	pill.name = "Pill"
 	pill.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -180,7 +210,7 @@ func _fazer_cartao(indice: int) -> Dictionary:
 	return {
 		"raiz": raiz, "indice": indice, "jogavel": true,
 		"regiao": faixa_reg, "numero": num, "nome": nome,
-		"chefe": chefe, "pill": pill, "base": base,
+		"chefe": chefe, "premio": premio, "pill": pill, "base": base,
 	}
 
 
@@ -290,6 +320,7 @@ func _reconstruir_estilos() -> void:
 		(c["numero"] as Label).text = Textos.tf("sel.count", [idx + 1, EstadoJogo.NIVEIS.size()])
 		(c["nome"] as Label).text = _nome_nivel(idx)
 		(c["chefe"] as Label).text = Textos.tf("sel.boss", [_nome_chefe(idx)])
+		(c["premio"] as Label).text = _texto_premio(idx)
 		var pill := c["pill"] as Label
 		if EstadoJogo.nivel_esta_concluido(idx):
 			pill.text = Textos.t("sel.cleared")
@@ -362,6 +393,17 @@ func _nome_nivel(indice: int) -> String:
 func _nome_chefe(indice: int) -> String:
 	var chave := CatalogoCampanha.chave_chefe(indice)
 	return Textos.t(chave) if chave != "" else ""
+
+
+## "Prémio: 🗡 Foice do Pântano" -- a arma/armadura que se ganha ao acabar
+## este nível.
+func _texto_premio(indice: int) -> String:
+	var r: Dictionary = Equipamento.recompensa_do_nivel(indice)
+	if r.is_empty():
+		return ""
+	var it: Dictionary = Equipamento.arma(r["id"]) if r["tipo"] == "arma" else Equipamento.armadura(r["id"])
+	var icone := "🗡" if r["tipo"] == "arma" else "🛡"
+	return Textos.tf("sel.reward", ["%s %s" % [icone, Textos.t(it.get("nome", ""))]])
 
 
 # --- navegação -------------------------------------------------------

@@ -284,5 +284,7 @@
 	"gear.a.avental_do_acougueiro": "Avental do Açougueiro",
 	"gear.a.batina_purpura": "Batina Púrpura",
 	"gear.a.vestido_do_eclipse": "Vestido do Eclipse",
-	"gear.a.egide_de_aurora": "Égide de Aurora"
+	"gear.a.egide_de_aurora": "Égide de Aurora",
+
+	"sel.reward": "Prémio: %s"
 }
