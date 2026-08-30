@@ -12,17 +12,20 @@ extends ChefeBase
 ## Fase 2 (< 50% vida): três tornados, salvas de lanças em leque, mergulho
 ## duplo e mais rápido.
 
-const LANCA_VEL := 300.0
+const LANCA_VEL := 240.0
+## O Aerion não fica em cima da Koliani -- mantém este recuo lateral para ela
+## ter espaço para ler os ataques e desviar.
+const RECUO_LATERAL := 240.0
 
 enum Fase { DORME, DECIDE, LANCAS_TEL, LANCAS, TORNADO_TEL, TORNADO, INVESTIDA_TEL, INVESTIDA, EXPOSTO }
 
 @export var dist_deteta := 720.0
 @export var altura_voo := 210.0
-@export var dur_tel := 0.75
-@export var dur_exposto := 1.4
-@export var dano_lanca := 15
-@export var dano_tornado := 12
-@export var dano_investida := 20
+@export var dur_tel := 0.9
+@export var dur_exposto := 2.0
+@export var dano_lanca := 9
+@export var dano_tornado := 8
+@export var dano_investida := 13
 
 var _fase: Fase = Fase.DORME
 var _t := 0.0
@@ -44,7 +47,7 @@ var _mira_lancas := Vector2.ZERO
 
 func _ready() -> void:
 	super._ready()
-	vida = maxi(vida, 485)
+	vida = maxi(vida, 360)
 	_vida_max = vida
 	velocidade = 0.0
 	alcance_patrulha = 0.0
@@ -70,8 +73,13 @@ func _physics_process(dt: float) -> void:
 		_entrar_fase2()
 
 	if _fase not in [Fase.INVESTIDA]:
-		var alvo := Vector2(_x_koliani(), _chao_cache - altura_voo)
-		global_position = global_position.lerp(alvo, clampf(dt * 1.6, 0.0, 1.0))
+		# paira ao LADO da Koliani, não em cima dela
+		var kx := _x_koliani()
+		var lado := signf(global_position.x - kx)
+		if lado == 0.0:
+			lado = 1.0
+		var alvo := Vector2(kx + lado * RECUO_LATERAL, _chao_cache - altura_voo)
+		global_position = global_position.lerp(alvo, clampf(dt * 1.4, 0.0, 1.0))
 	_encarar_koliani()
 
 	match _fase:
@@ -125,11 +133,7 @@ func _physics_process(dt: float) -> void:
 			if k and global_position.distance_to(k.global_position) <= 60.0:
 				k.receber_dano(int(round(dano_investida * (1.1 if _fase2 else 1.0))), signf(k.global_position.x - global_position.x))
 			if _t >= 0.5:
-				if _fase2 and _ciclos % 2 == 0:
-					_ciclos += 1
-					_ir(Fase.INVESTIDA_TEL)
-				else:
-					_ir(Fase.EXPOSTO)
+				_ir(Fase.EXPOSTO)   # sem mergulho duplo na fase 2
 		Fase.EXPOSTO:
 			if not _exposto:
 				_exposto = true
@@ -204,10 +208,10 @@ func _tornados() -> void:
 	var pai := get_parent()
 	if pai == null:
 		return
-	var n := 3 if _fase2 else 2
+	var n := 2 if _fase2 else 1
 	for i in n:
 		var lado := -1.0 if i % 2 == 0 else 1.0
-		_tornado(lado, i * 0.2)
+		_tornado(lado, i * 0.35)
 
 
 func _tornado(dir: float, atraso: float) -> void:
@@ -233,12 +237,12 @@ func _tornado(dir: float, atraso: float) -> void:
 		if b is Koliani:
 			b.receber_dano(dano, dir)
 			if b.has_method("soprar_para_cima"):
-				b.soprar_para_cima(1200.0, 160.0))
+				b.soprar_para_cima(650.0, 110.0))
 	var t := tor.create_tween()
 	t.tween_interval(atraso)
 	t.tween_callback(func() -> void: tor.monitoring = true)
-	t.tween_property(tor, "global_position:x", x0 + dir * 1200.0, 1.6)
-	t.parallel().tween_method(func(v: float) -> void: poly.rotation = v, 0.0, TAU * 4.0, 1.6)
+	t.tween_property(tor, "global_position:x", x0 + dir * 1200.0, 2.4)
+	t.parallel().tween_method(func(v: float) -> void: poly.rotation = v, 0.0, TAU * 4.0, 2.4)
 	t.tween_property(poly, "modulate:a", 0.0, 0.2)
 	t.tween_callback(tor.queue_free)
 
@@ -249,8 +253,8 @@ func _entrar_fase2() -> void:
 	_fase2 = true
 	Som.toca("chefe_cai", -8.0, 0.7)
 	_abanar_camera(7.0)
-	dur_tel *= 0.78
-	dur_exposto *= 0.88
+	dur_tel *= 0.9
+	dur_exposto *= 0.95
 
 
 ## --- núcleo / dano -------------------------------------------------
