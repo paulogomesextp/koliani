@@ -61,6 +61,7 @@ func _initialize() -> void:
 	_boss_sacerdotisa() # regiao III / nivel 14
 	_boss_vyrak()    # regiao III / nivel 15
 	_boss_rei_ossario() # regiao IV / nivel 16
+	_boss_colosso()  # regiao IV / nivel 17
 	print("OK -- sprites pixel-art em ", DIR)
 	quit(0)
 
@@ -1038,4 +1039,56 @@ func _boss_rei_ossario() -> void:
 		else:
 			_linha(int(rx) + 6, int(ry) + 6, int(rx) + 18, int(ry) + 22, 4, OSSO_S)
 			_linha(int(rx) + 14, int(ry) + 14, int(rx) + 30, int(ry) + 30, 2, OSSO)
+	)
+
+
+## Nivel 17 -- Galeria dos Ossos. O Colosso Osseo: gigante de centenas de
+## esqueletos amontoados, macico. Frame 0/1 idle; frame 2 = braco-arma
+## erguido (telegrafo); frame 3 = peito aberto, aglomerado de cranios
+## aceso (exposto).
+func _boss_colosso() -> void:
+	var OSSO := Color("d6cfb4")
+	var OSSO_S := Color("948c6f")
+	var OSSO_E := Color("57503b")
+	var NUCLEO := Color("aef0d0")
+	_boss("colosso", 116, 116, func(f: int) -> void:
+		var braco_cima := f == 2
+		var cx := 58.0
+		# pernas macicas de ossos amontoados
+		for lx in [40, 76]:
+			for j in range(88, 114):
+				var meia := 8.0 + 2.0 * sin(j * 0.7 + lx)
+				_rect(int(lx - meia), j, int(meia * 2.0), 1, OSSO if j % 3 else OSSO_S)
+		_rect(30, 112, 24, 4, OSSO_E)
+		_rect(66, 112, 24, 4, OSSO_E)
+		# tronco -- massa de ossos
+		for j in range(34, 92):
+			var t := float(j - 34) / 58.0
+			var meia := lerpf(24.0, 18.0, t)
+			for i in range(int(cx - meia), int(cx + meia), 3):
+				_px(i, j, OSSO if (i + j) % 5 else OSSO_S)
+		_elipse(cx, 60, 22, 26, Color(OSSO_S.r, OSSO_S.g, OSSO_S.b, 0.0))
+		# ombros / cabeca (cranio grande no topo)
+		_elipse(cx, 22, 14, 13, OSSO)
+		_rect(int(cx) - 7, 22, 14, 4, OSSO_E)
+		_px(int(cx) - 4, 20, NUCLEO); _px(int(cx) + 4, 20, NUCLEO)
+		# braco esquerdo (osso)
+		_linha(int(cx) - 18, 40, int(cx) - 34, 74, 8, OSSO_S)
+		_elipse(cx - 36, 78, 7, 7, OSSO)
+		# braco-arma direito
+		if braco_cima:
+			_linha(int(cx) + 18, 40, int(cx) + 34, 8, 8, OSSO_S)
+			_rect(int(cx) + 26, 0, 22, 14, OSSO)      # maco de ossos
+			_linha(int(cx) + 30, 2, int(cx) + 44, 12, 2, OSSO_E)
+		else:
+			_linha(int(cx) + 18, 42, int(cx) + 40, 70, 8, OSSO_S)
+			_linha(int(cx) + 34, 60, int(cx) + 58, 84, 3, OSSO)  # foice/lanca em repouso
+		# nucleo do peito (aglomerado de cranios)
+		var g: float = [0.9, 0.95, 1.05, 1.5][f]
+		for d in 5:
+			var ang := TAU * float(d) / 5.0
+			_elipse(cx + cos(ang) * 6.0 * g, 58 + sin(ang) * 6.0 * g, 3.0 * g, 3.0 * g, NUCLEO if f == 3 else OSSO_S)
+		_elipse(cx, 58, 3.5 * g, 3.5 * g, NUCLEO)
+		if f == 3:
+			_elipse(cx, 58, 1.8, 1.8, PAL["w"])
 	)

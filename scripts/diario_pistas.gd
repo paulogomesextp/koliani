@@ -116,6 +116,11 @@ const PISTAS := {
 		"titulo": "clue.catacumbas_coroa_partida.title",
 		"texto": "clue.catacumbas_coroa_partida.body",
 	},
+	"ossos_placa_do_colosso": {
+		"mundo": "world.catacombs",
+		"titulo": "clue.ossos_placa_do_colosso.title",
+		"texto": "clue.ossos_placa_do_colosso.body",
+	},
 	"castelo_aurora_livre": {
 		"mundo": "world.castle",
 		"titulo": "clue.castelo_aurora_livre.title",
