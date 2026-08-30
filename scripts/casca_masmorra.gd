@@ -98,6 +98,42 @@ func _construir() -> void:
 			Vector2(largura + esp * 2.0, esp))
 
 
+## Recua a parede esquerda de colisão (e estica o chão de fundo + pinta
+## tecto/chão em tiles) até `novo_x`, para dar lugar a um gauntlet
+## prependido pelo `GeradorCorredor`. Chamado no _ready dele.
+func abrir_esquerda(novo_x: float) -> void:
+	if novo_x >= esquerda:
+		return
+	var b := maxi(1, borda_tiles)
+	var esp := float(b) * CEL
+
+	var pe := get_node_or_null("ParedeEsq") as StaticBody2D
+	if pe:
+		pe.position.x = novo_x - esp * 0.5
+
+	if chao:
+		var cf := get_node_or_null("ChaoFundo") as StaticBody2D
+		if cf and cf.get_child_count() > 0:
+			var cs := cf.get_child(0) as CollisionShape2D
+			if cs and cs.shape is RectangleShape2D:
+				var rs: RectangleShape2D = cs.shape
+				var dir_x := esquerda + largura + esp
+				rs.size.x = dir_x - (novo_x - esp)
+				cf.position.x = (novo_x - esp + dir_x) * 0.5
+
+	var tml := get_node_or_null("Tiles") as TileMapLayer
+	if tml:
+		var cx0 := int(floor((novo_x - esquerda) / CEL)) - b
+		var y0 := int(floor((chao_y - topo) / CEL))
+		for cx in range(cx0, 0):
+			tml.set_cell(Vector2i(cx, -1), 0, T_TOPO)
+			tml.set_cell(Vector2i(cx, -2), 0, T_PAREDE)
+			if chao:
+				tml.set_cell(Vector2i(cx, y0), 0, T_TOPO)
+				for cy in range(y0 + 1, y0 + 1 + b):
+					tml.set_cell(Vector2i(cx, cy), 0, T_FLOOR)
+
+
 func _parede(nome: String, centro: Vector2, tam: Vector2) -> void:
 	var sb := StaticBody2D.new()
 	sb.name = nome

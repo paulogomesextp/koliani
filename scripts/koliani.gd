@@ -278,7 +278,9 @@ func _physics_process(dt: float) -> void:
 			and not is_on_floor() and is_on_wall_only() \
 			and _dash_restante <= 0.0 and _rolar_restante <= 0.0:
 		var nx := signf(get_wall_normal().x)
-		if not _escalando and dir != 0.0 and signf(dir) == -nx:
+		# só agarra quando NÃO está a subir depressa -- assim um salto por
+		# cima de um obstáculo baixo não fica preso a colar-se à parede.
+		if not _escalando and dir != 0.0 and signf(dir) == -nx and velocity.y > -60.0:
 			_escalando = true
 		elif _escalando and dir != 0.0 and signf(dir) == nx:
 			_escalando = false  # largou para o lado oposto

@@ -36,7 +36,6 @@ fill_to = Vector2(1, 0.5)
 
 [node name="A_Cela_Zero" type="Node2D"]
 script = ExtResource("7_niv")
-corredor = false
 
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
 cor_ambiente = Color(0.46, 0.44, 0.58, 1)

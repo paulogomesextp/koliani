@@ -38,7 +38,6 @@ fill_to = Vector2(1, 0.5)
 
 [node name="Ala_dos_Mortos" type="Node2D"]
 script = ExtResource("7_niv")
-corredor = false
 
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
 cor_ambiente = Color(0.5, 0.6, 0.6, 1)
