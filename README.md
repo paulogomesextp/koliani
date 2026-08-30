@@ -53,18 +53,17 @@ scripts/
   koliani.gd           -- CharacterBody2D: liga movimento.gd + dash + ataque + dano + morte + salto duplo
   demonio_base.gd      -- inimigo base (patrulha + dano por contacto); classe-pai dos demonios
   chefe_base.gd        -- base dos chefes (herda DemonioBase): sinal "derrotado", telegrafo, contacto forte
-  chefe_floresta.gd    -- chefe M1 -- Raiz-que-Anda: investida horizontal
-  chefe_carcereiro.gd  -- chefe M2 -- Carcereiro: salto + onda de choque rasteira
-  chefe_vento.gd       -- chefe M3 -- Uivo: voa, paira, mira e mergulha
-  zeriko.gd            -- chefe M4 -- Zeriko: teleporta e dispara projeteis; 2.a fase < 50% vida
+  chefe_floresta.gd    -- chefe do nivel 1 -- Ghorak: investida horizontal
+  chefe_carcereiro.gd  -- chefe da regiao II -- Carcereiro: salto + onda de choque rasteira
+  chefe_zeriko_final.gd-- chefe final (nivel 30) -- ZERIKO: 4 formas (Mago/Rei/Coisa/O que resta)
+  chefe_*.gd           -- um script por chefe de nivel (30 no total); todos herdam ChefeBase
   relogio_hardcore.gd  -- modo hardcore: conta o tempo do mundo; a zero -> game_over.gd
   game_over.gd         -- cartao "GAME OVER" do hardcore; recomeca a campanha do mundo 1
-  projetil_zeriko.gd   -- bola de energia do Zeriko (Area2D em linha reta)
+  projetil_zeriko.gd   -- bola de energia purpura (Area2D em linha reta); usada pelo Zeriko e pelo Coracao Putrefacto
   parede_fragil.gd     -- StaticBody2D: parte-se a golpe se a Koliani tiver "partir_paredes"
-  nivel_com_chefe.gd   -- no raiz de M1-M3: sela a porta ate o no "Chefe" cair
-  nivel_castelo.gd     -- no raiz de M4: sem porta -- ao "derrotado" do Zeriko arranca a cena final
-  cena_final.gd        -- cena narrativa (libertacao da Aurora); no fim volta ao menu inicial
-  fim_campanha.gd      -- (legado) cartao de fim usado pela porta quando nao ha proximo nivel; volta ao menu
+  nivel_com_chefe.gd   -- no raiz dos niveis com chefe: sela a porta ate o no "Chefe" cair
+  cena_final.gd        -- cena narrativa (libertacao da Aurora); no fim volta ao menu inicial (por ligar ao nivel 30)
+  fim_campanha.gd      -- cartao de fim usado pela porta do nivel 30 (provisorio); volta ao menu
   atmosfera.gd         -- montagem de ambiente reutilizavel (CanvasModulate + parallax + vinheta + luzes), cores por @export
   coletavel.gd         -- Area2D: apanhar => regista pista / desbloqueia habilidade; nao reaparece
   porta.gd             -- Area2D: avanca para o mundo seguinte / termina a campanha
@@ -89,15 +88,14 @@ scripts/
 
 scenes/
   Main.tscn                        -- main_scene (ver project.godot)
-  levels/Floresta_Putrefata.tscn   -- MUNDO 1: verde-podre, fosso c/ salto duplo, da salto_duplo
-  levels/Prisao_dos_Condenados.tscn-- MUNDO 2: azul-frio, subida longa, da dash_aereo
-  levels/Torres_Esquecidas.tscn    -- MUNDO 3: roxo, saltos sobre o vazio, da partir_paredes (+ ParedeFragil)
-  levels/Castelo_de_Zeriko.tscn    -- MUNDO 4: magenta, arena do Zeriko, sem porta -> cena final da Aurora
+  levels/*.tscn                    -- 30 niveis da campanha (ver EstadoJogo.NIVEIS / REGIOES), 1 chefe cada
+  levels/Floresta_Putrefata.tscn   -- nivel 1: verde-podre, fosso c/ salto duplo, da salto_duplo
+  levels/O_Trono_de_Zeriko.tscn    -- nivel 30: arena final, ZERIKO (4 formas); porta -> fim da campanha
   levels/Level_Test.tscn           -- sala de treino (fora da campanha)
   actors/Koliani.tscn              -- placeholder ColorRect (silhueta key art) + lamina c/ PointLight2D + particulas
   actors/DemonioBase.tscn          -- placeholder ColorRect + olho c/ PointLight2D + area de contacto
-  actors/ChefeFloresta.tscn / ChefeCarcereiro.tscn / ChefeVento.tscn / Zeriko.tscn -- chefes M1..M4
-  actors/ProjetilZeriko.tscn       -- projetil do chefe final
+  actors/Chefe*.tscn               -- uma cena por chefe (30); Sprite2D hframes=4 -> pixel-art
+  actors/ProjetilZeriko.tscn       -- projetil purpura (Zeriko + Coracao Putrefacto)
   actors/Coletavel.tscn            -- gema magenta c/ PointLight2D (pista / habilidade)
   actors/ParedeFragil.tscn         -- parede rachada que se parte a golpe (c/ habilidade)
   actors/Plataforma.tscn           -- plataforma "chunky" (shader de pedra/tijolo procedural)
@@ -111,7 +109,7 @@ assets/shaders/                    -- personagem (rim+flash), plataforma (pedra)
 
 tests/run_tests.gd     -- corredor headless proprio (movimento + estado_jogo)
 docs/                  -- historia.md, design.md (bibliografia viva)
-assets/sprites/*.svg   -- arte SVG original (Koliani, demonios, 4 chefes, gema, porta, impacto)
+assets/sprites/pixel/  -- pixel-art (packs CC0 + gerada em tools/gerar_sprites.gd); bosses/ = tiras de 4 frames
 assets/shaders/*.gdshader -- personagem, plataforma, grade
 assets/audio/*.wav     -- SFX + musica SINTETIZADOS (tools/gerar_audio.py; sem licenca de terceiros)
 assets/                -- branding/, fonts/, tiles/ -- SO CC0/gratis (ou nosso)
