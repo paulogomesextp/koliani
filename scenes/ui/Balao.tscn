@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=3 uid="uid://bkolianibalao01"]
+
+; Balão de fala das cenas de história. Tudo é construído em runtime por
+; balao.gd -- instanciar via Dialogo.correr(falas).
+
+[ext_resource type="Script" path="res://scripts/balao.gd" id="1_balao"]
+
+[node name="Balao" type="CanvasLayer"]
+script = ExtResource("1_balao")

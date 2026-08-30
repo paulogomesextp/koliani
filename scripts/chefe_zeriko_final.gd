@@ -55,6 +55,14 @@ func _ready() -> void:
 	_base = global_position
 	_chao_cache = _chao_y(_base.x)
 	_mostrar_nucleo(false)
+	falas_intro = [
+		{ "quem": "boss.zeriko", "texto": "dlg.zeriko.intro.1" },
+		{ "quem": "boss.zeriko", "texto": "dlg.zeriko.intro.2" },
+	]
+	falas_fim = [
+		{ "quem": "boss.zeriko", "texto": "dlg.zeriko.win.1" },
+		{ "quem": "boss.zeriko", "texto": "dlg.zeriko.win.2" },
+	]
 
 
 func _process(dt: float) -> void:

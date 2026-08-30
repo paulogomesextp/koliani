@@ -67,7 +67,10 @@ and Pigs, Kenney). `default_texture_filter = Nearest`.
 
 `EstadoJogo` (vidas/nível/checkpoint/habilidades/pistas/hardcore/save),
 `Textos` (i18n), `Opcoes` (volumes + idioma), `Som` (SFX pool, bus "SFX"),
-`Musica` (camas por bioma, bus "Music"), `Transicao` (fade entre cenas).
+`Musica` (camas por bioma, bus "Music"), `Transicao` (fade entre cenas),
+`Dialogo` (`await Dialogo.correr(falas)` -> balão de fala moderno; falas
+`{quem,texto}` por chave i18n; usado pelos chefes-história via
+`ChefeBase.falas_intro` / `falas_fim`).
 
 ## Estrutura (resumo — detalhe no README)
 

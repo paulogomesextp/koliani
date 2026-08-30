@@ -48,6 +48,13 @@ func _ready() -> void:
 	alcance_patrulha = 0.0
 	_alvo_y = _origem.y
 	_mostrar_nucleo(false)
+	falas_intro = [
+		{ "quem": "boss.noiva_do_eclipse", "texto": "dlg.noiva.intro.1" },
+		{ "quem": "boss.noiva_do_eclipse", "texto": "dlg.noiva.intro.2" },
+	]
+	falas_fim = [
+		{ "quem": "boss.noiva_do_eclipse", "texto": "dlg.noiva.win.1" },
+	]
 
 
 func _process(dt: float) -> void:

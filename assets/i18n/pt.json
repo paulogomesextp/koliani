@@ -224,5 +224,21 @@
 	"boss.koliani_sombria": "Koliani Sombria",
 	"boss.rei_devorador": "O Rei Devorador",
 	"boss.arauto_de_zeriko": "O Arauto de Zeriko",
-	"boss.zeriko": "ZERIKO"
+	"boss.zeriko": "ZERIKO",
+
+	"dlg.tap": "toca para continuar  ▸",
+	"dlg.speaker.koliani": "Koliani",
+	"dlg.primeiro.intro.1": "Vim buscar um irmão. Cheguei ao trono. Voltei atrás no último degrau.",
+	"dlg.primeiro.intro.2": "Todos os que chegam aqui, eu ponho à prova. Mostra-me que continuavas a andar.",
+	"dlg.primeiro.win.1": "Ela não hesitou à porta. Tu também não. Vai.",
+	"dlg.noiva.intro.1": "Esperei no altar até o sol se apagar. Ele nunca veio.",
+	"dlg.noiva.intro.2": "Se eu não posso ter o meu dia, ninguém atravessa esta praça com esperança no peito.",
+	"dlg.noiva.win.1": "...A tua mãe tinha esse mesmo olhar. Segue. O véu já é cinza.",
+	"dlg.arauto.intro.1": "Eu falo por Zeriko. A qual deles queres morrer?",
+	"dlg.arauto.intro.2": "Cavaleiro, demónio, ou a fome por baixo -- escolhe, e eu visto-a.",
+	"dlg.arauto.win.1": "Ele nunca foi um só. Só a sala, e o quanto dela acreditas.",
+	"dlg.zeriko.intro.1": "És a terceira do teu sangue a estar aqui. Aos outros dois, guardo-os.",
+	"dlg.zeriko.intro.2": "A Aurora está atrás daquela porta. Vem abri-la.",
+	"dlg.zeriko.win.1": "A sala... não está a aguentar...",
+	"dlg.zeriko.win.2": "Ela já tinha ido. Eu estava a segurar uma porta num quarto vazio."
 }

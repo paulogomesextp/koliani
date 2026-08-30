@@ -11,6 +11,17 @@ extends DemonioBase
 
 signal derrotado
 
+## Falas de história (só os chefes-narrativa preenchem, no seu `_ready`).
+## Cada entrada: `{ "quem": <chave i18n>, "texto": <chave i18n> }`. A INTRO
+## corre quando a Koliani entra na arena (antes do combate); a de FIM corre
+## quando o chefe cai, antes de a porta abrir. Ver `Dialogo` / `Balao`.
+var falas_intro: Array = []
+var falas_fim: Array = []
+## Distância (px) a que a Koliani dispara a intro.
+var gatilho_intro := 330.0
+var _intro_feita := false
+var _fim_em_curso := false
+
 var _koliani: Node2D
 ## Fica > 0 durante um golpe forte do chefe (o contacto magoa mais).
 var _ataque_forte := 0.0
@@ -40,6 +51,28 @@ func _process(dt: float) -> void:
 	# bloqueado porque a porta nunca abre.
 	if not _ja_derrotado and global_position.y - _origem.y > 520.0:
 		_cair_derrotado()
+		return
+	# intro de história: a Koliani chegou perto -> corre as falas antes da luta
+	if not _intro_feita and not _ja_derrotado and not falas_intro.is_empty():
+		var k := _obter_koliani()
+		if k and global_position.distance_to(k.global_position) < gatilho_intro:
+			_intro_feita = true
+			_correr_intro()
+
+
+func _correr_intro() -> void:
+	await Dialogo.correr(_com_alvo(falas_intro))
+	provocar()  # a música de chefe entra ao acabar a conversa
+
+
+## Copia as falas metendo `self` como alvo da cauda do balão.
+func _com_alvo(falas: Array) -> Array:
+	var saida: Array = []
+	for f: Dictionary in falas:
+		var g := (f as Dictionary).duplicate()
+		g["alvo"] = self
+		saida.append(g)
+	return saida
 
 
 ## Marca o início do combate: troca para a música de chefe. Idempotente --
@@ -106,10 +139,28 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0) -> void:
 	global_position.x += dir_empurrao * 3.0
 	if vida <= 0:
 		_ja_derrotado = true
-		Som.toca("chefe_cai", -6.0)
-		Som.toca("conquista", -4.0)  # som de "conquista", distinto de matar um inimigo
-		derrotado.emit()
-		soltar_estilhacos()
-		queue_free()
+		if not falas_fim.is_empty():
+			_cair_com_falas()
+		else:
+			Som.toca("chefe_cai", -6.0)
+			Som.toca("conquista", -4.0)  # "conquista", distinto de matar um inimigo
+			derrotado.emit()
+			soltar_estilhacos()
+			queue_free()
 	else:
 		piscar_dano()
+
+
+## Morte dos chefes-história: congela o chefe, diz as últimas falas e só
+## depois abre a porta.
+func _cair_com_falas() -> void:
+	if _fim_em_curso:
+		return
+	_fim_em_curso = true
+	set_physics_process(false)
+	Som.toca("chefe_cai", -6.0)
+	await Dialogo.correr(_com_alvo(falas_fim))
+	Som.toca("conquista", -4.0)
+	derrotado.emit()
+	soltar_estilhacos()
+	queue_free()

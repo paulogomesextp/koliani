@@ -26,6 +26,7 @@ Opcoes="*res://scripts/opcoes.gd"
 Som="*res://scripts/som.gd"
 Musica="*res://scripts/musica.gd"
 Transicao="*res://scripts/transicao.gd"
+Dialogo="*res://scripts/dialogo.gd"
 
 [display]
 

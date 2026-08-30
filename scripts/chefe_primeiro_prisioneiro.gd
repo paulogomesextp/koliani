@@ -56,6 +56,13 @@ func _ready() -> void:
 	alcance_patrulha = 0.0
 	_base_x = global_position.x
 	_mostrar_nucleo(false)
+	falas_intro = [
+		{ "quem": "boss.primeiro_prisioneiro", "texto": "dlg.primeiro.intro.1" },
+		{ "quem": "boss.primeiro_prisioneiro", "texto": "dlg.primeiro.intro.2" },
+	]
+	falas_fim = [
+		{ "quem": "boss.primeiro_prisioneiro", "texto": "dlg.primeiro.win.1" },
+	]
 	call_deferred("_ligar_a_koliani")
 
 

@@ -52,6 +52,13 @@ func _ready() -> void:
 	alcance_patrulha = 0.0
 	_base_x = global_position.x
 	_mostrar_nucleo(false)
+	falas_intro = [
+		{ "quem": "boss.arauto_de_zeriko", "texto": "dlg.arauto.intro.1" },
+		{ "quem": "boss.arauto_de_zeriko", "texto": "dlg.arauto.intro.2" },
+	]
+	falas_fim = [
+		{ "quem": "boss.arauto_de_zeriko", "texto": "dlg.arauto.win.1" },
+	]
 
 
 func _process(dt: float) -> void:

@@ -224,5 +224,21 @@
 	"boss.koliani_sombria": "Shadow Koliani",
 	"boss.rei_devorador": "The Devourer King",
 	"boss.arauto_de_zeriko": "The Herald of Zeriko",
-	"boss.zeriko": "ZERIKO"
+	"boss.zeriko": "ZERIKO",
+
+	"dlg.tap": "tap to continue  ▸",
+	"dlg.speaker.koliani": "Koliani",
+	"dlg.primeiro.intro.1": "I came for a brother. I reached the throne. I turned at the last step.",
+	"dlg.primeiro.intro.2": "Everyone who gets this far, I test. Show me you would keep walking.",
+	"dlg.primeiro.win.1": "She did not flinch at the door. Neither did you. Go.",
+	"dlg.noiva.intro.1": "I waited at the altar until the sun went out. He never came.",
+	"dlg.noiva.intro.2": "If I cannot have my day, no one crosses this square with hope in their chest.",
+	"dlg.noiva.win.1": "...Your mother wore that same look. Go on. The veil is already ash.",
+	"dlg.arauto.intro.1": "I speak for Zeriko. Which of him would you like to die to?",
+	"dlg.arauto.intro.2": "Knight, demon, or the hunger underneath -- pick, and I will wear it.",
+	"dlg.arauto.win.1": "He was never one. Only the room, and how much of it you believe.",
+	"dlg.zeriko.intro.1": "You are the third of your blood to stand here. The other two I keep.",
+	"dlg.zeriko.intro.2": "Aurora is behind that door. Come and open it.",
+	"dlg.zeriko.win.1": "The room... it is not holding...",
+	"dlg.zeriko.win.2": "She was already gone. I was holding a door on an empty room."
 }
