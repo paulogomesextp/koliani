@@ -54,7 +54,7 @@ var _stomp_x := 0.0
 
 func _ready() -> void:
 	super._ready()
-	vida = maxi(vida, 460)
+	vida = maxi(vida, 540)
 	_vida_max = vida
 	velocidade = 0.0
 	alcance_patrulha = 0.0
@@ -365,13 +365,13 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0) -> void:
 	if _ja_derrotado:
 		return
 	provocar()
-	if not _exposto:
-		Som.toca("bloqueio", -9.0, 0.7)
-		if _sprite:
-			_sprite.modulate = Color(1.2, 1.2, 1.35)
-			create_tween().tween_property(_sprite, "modulate", Color(1, 1, 1), 0.12)
-		return
-	super.receber_dano(int(round(quantidade * 2.0)), dir_empurrao)
+	# leva SEMPRE dano. Exposto (janela EXPOSTO / pisão no chão) = a dobrar;
+	# fora disso o manto espectral só abranda um pouco.
+	var mult := 2.0 if _exposto else 0.85
+	super.receber_dano(int(round(quantidade * mult)), dir_empurrao)
+	if not _exposto and _sprite:
+		_sprite.modulate = Color(1.2, 1.2, 1.35)
+		create_tween().tween_property(_sprite, "modulate", Color(1, 1, 1), 0.1)
 
 
 ## --- utilitários --------------------------------------------------
