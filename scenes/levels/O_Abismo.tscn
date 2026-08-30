@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://bkolianioabismo20"]
+[gd_scene load_steps=17 format=3 uid="uid://bkolianioabismo20"]
 
 ; Região IV / nível 20 -- O Abismo (fecha as Catacumbas do Abismo).
 ; Quase sem luz: `LuzSeguidora` cola uma luz fraca à Koliani e o ambiente
@@ -18,6 +18,7 @@
 [ext_resource type="PackedScene" uid="uid://bkolianiluzseg20" path="res://scenes/actors/LuzSeguidora.tscn" id="10_ls"]
 [ext_resource type="PackedScene" uid="uid://bkolianiserra01" path="res://scenes/actors/Serra.tscn" id="11_serra"]
 [ext_resource type="PackedScene" uid="uid://bkolianiespinhos01" path="res://scenes/actors/Espinhos.tscn" id="12_esp"]
+[ext_resource type="PackedScene" uid="uid://bkolianicascamasmorra01" path="res://scenes/actors/CascaMasmorra.tscn" id="90_casca"]
 
 [sub_resource type="RectangleShape2D" id="rs_chk"]
 size = Vector2(40, 80)
@@ -36,6 +37,7 @@ fill_to = Vector2(1, 0.5)
 
 [node name="O_Abismo" type="Node2D"]
 script = ExtResource("7_niv")
+corredor = false
 
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
 cor_ambiente = Color(0.14, 0.13, 0.18, 1)
@@ -48,6 +50,13 @@ bioma = "catacumbas"
 largura_nivel = 3100.0
 luzes_horizonte = false
 fundo_pack = "corredores"
+
+[node name="Casca" parent="." instance=ExtResource("90_casca")]
+largura = 3550.0
+altura = 560.0
+topo = 150.0
+esquerda = -140.0
+chao_y = 730.0
 
 [node name="LuzSeguidora" parent="." instance=ExtResource("10_ls")]
 
