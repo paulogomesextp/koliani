@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://bkolianicemiterio16"]
+[gd_scene load_steps=16 format=3 uid="uid://bkolianicemiterio16"]
 
 ; Região IV / nível 16 -- Cemitério dos Reis (abre as Catacumbas do Abismo).
 ; Túmulos que funcionam como elevadores (`TumuloElevador`): sobem enquanto
@@ -17,6 +17,7 @@
 [ext_resource type="PackedScene" uid="uid://bkolianiplataforma01" path="res://scenes/actors/Plataforma.tscn" id="9_pl"]
 [ext_resource type="PackedScene" uid="uid://bkolianitumuloelev16" path="res://scenes/actors/TumuloElevador.tscn" id="10_te"]
 [ext_resource type="PackedScene" uid="uid://bkolianiespinhos01" path="res://scenes/actors/Espinhos.tscn" id="11_esp"]
+[ext_resource type="PackedScene" uid="uid://bkolianicascamasmorra01" path="res://scenes/actors/CascaMasmorra.tscn" id="90_casca"]
 
 [sub_resource type="RectangleShape2D" id="rs_chk"]
 size = Vector2(40, 80)
@@ -35,6 +36,7 @@ fill_to = Vector2(1, 0.5)
 
 [node name="Cemiterio_dos_Reis" type="Node2D"]
 script = ExtResource("7_niv")
+corredor = false
 
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
 cor_ambiente = Color(0.55, 0.6, 0.52, 1)
@@ -47,6 +49,13 @@ bioma = "catacumbas"
 largura_nivel = 3300.0
 luzes_horizonte = true
 fundo_pack = "corredores"
+
+[node name="Casca" parent="." instance=ExtResource("90_casca")]
+largura = 3750.0
+altura = 600.0
+topo = 150.0
+esquerda = -140.0
+chao_y = 770.0
 
 [node name="ChaoInicio" parent="." instance=ExtResource("9_pl")]
 position = Vector2(380, 660)
