@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://bkolianicelazero10"]
+[gd_scene load_steps=16 format=3 uid="uid://bkolianicelazero10"]
 
 ; Região II / nível 10 -- A Cela Zero (fecha a Prisão dos Condenados).
 ; Labirinto VERTICAL: sobe-se por plataformas em ziguezague, com ramos
@@ -17,6 +17,7 @@
 [ext_resource type="PackedScene" uid="uid://bkolianiplataforma01" path="res://scenes/actors/Plataforma.tscn" id="9_pl"]
 [ext_resource type="PackedScene" uid="uid://bkolianiespinhos01" path="res://scenes/actors/Espinhos.tscn" id="10_esp"]
 [ext_resource type="PackedScene" uid="uid://bkolianiserra01" path="res://scenes/actors/Serra.tscn" id="11_serra"]
+[ext_resource type="PackedScene" uid="uid://bkolianicascamasmorra01" path="res://scenes/actors/CascaMasmorra.tscn" id="90_casca"]
 
 [sub_resource type="RectangleShape2D" id="rs_chk"]
 size = Vector2(40, 80)
@@ -35,6 +36,7 @@ fill_to = Vector2(1, 0.5)
 
 [node name="A_Cela_Zero" type="Node2D"]
 script = ExtResource("7_niv")
+corredor = false
 
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
 cor_ambiente = Color(0.46, 0.44, 0.58, 1)
@@ -47,6 +49,13 @@ bioma = "prisao"
 largura_nivel = 1500.0
 luzes_horizonte = false
 fundo_pack = "corredores"
+
+[node name="Casca" parent="." instance=ExtResource("90_casca")]
+largura = 1500.0
+altura = 1120.0
+topo = -90.0
+esquerda = -160.0
+chao_y = 1010.0
 
 [node name="ChaoFundo" parent="." instance=ExtResource("9_pl")]
 position = Vector2(520, 940)
