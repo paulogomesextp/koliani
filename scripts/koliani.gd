@@ -353,8 +353,9 @@ func _physics_process(dt: float) -> void:
 		_dash_recarga = RECARGA_DASH
 		_invulneravel = maxf(_invulneravel, DUR_DASH)
 	else:
-		# salto duplo: habilidade permanente ganha ao longo da campanha
-		var saltos_max := 2 if EstadoJogo.tem_habilidade("salto_duplo") else 1
+		# salto duplo: intrínseco à Koliani desde o nível 1 (deixou de ser um
+		# requisito de habilidade -- ver EstadoJogo.HABILIDADES_INICIAIS)
+		var saltos_max := 2
 		var saltos_antes := _mov.saltos_dados
 		_mov = Movimento.passo(
 			_mov, dir,

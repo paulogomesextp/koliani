@@ -19,6 +19,11 @@ const VIDAS_INICIAIS := 3
 
 ## Todas as habilidades da campanha (o modo dev desbloqueia-as de uma vez).
 const HABILIDADES_TODAS := ["salto_duplo", "dash_aereo", "partir_paredes", "escudo", "projetil", "escalar_paredes"]
+## Habilidades que a Koliani já tem no arranque da campanha (nível 1). O
+## salto duplo deixou de ser um Coletavel a caçar: é básico desde o início
+## (ver koliani.gd). Garantido em `reiniciar_campanha()` e ao carregar saves
+## antigos que ainda não o tinham.
+const HABILIDADES_INICIAIS: Array[String] = ["salto_duplo"]
 
 ## Modo hardcore: tempo (segundos) para completar cada NÍVEL. Ao esgotar ->
 ## Game Over e a campanha recomeça do nível 1. Uma entrada por nível (mesma
@@ -102,7 +107,7 @@ var indice_nivel: int = 0
 ## Posicao do ultimo checkpoint tocado no nivel atual (Vector2.ZERO = usar
 ## o ponto de spawn do proprio nivel).
 var checkpoint: Vector2 = Vector2.ZERO
-var habilidades: Array[String] = []
+var habilidades: Array[String] = HABILIDADES_INICIAIS.duplicate()
 var pistas: Array[String] = []
 ## Equipamento ganho ao longo da campanha (ids de `Equipamento.ARMAS` /
 ## `.ARMADURAS`). `*_equipada` = o que está a ser usado ("" = nada).
@@ -330,8 +335,11 @@ func sem_vidas() -> bool:
 ## do save em `_ready`, por isso basta olhar para os campos. Usado pelo
 ## menu inicial para decidir se mostra o "LOAD GAME".
 func ha_progresso() -> bool:
+	# as habilidades iniciais (salto duplo) não contam como progresso
+	var habilidade_ganha := habilidades.any(
+		func(h: String) -> bool: return h not in HABILIDADES_INICIAIS)
 	return indice_nivel > 0 or checkpoint != Vector2.ZERO \
-		or not habilidades.is_empty() or not pistas.is_empty()
+		or habilidade_ganha or not pistas.is_empty()
 
 
 ## Liga o modo de testes: sandbox limpo em memória (nível 1, todas as
@@ -369,7 +377,7 @@ func reiniciar_campanha() -> void:
 	vidas = VIDAS_INICIAIS
 	indice_nivel = 0
 	checkpoint = Vector2.ZERO
-	habilidades.clear()
+	habilidades.assign(HABILIDADES_INICIAIS)
 	pistas.clear()
 	concluidos.clear()
 	armas.clear()
@@ -435,6 +443,11 @@ func de_dicionario(d: Dictionary) -> void:
 	var c: Array = d.get("checkpoint", [0, 0])
 	checkpoint = Vector2(c[0], c[1]) if c.size() == 2 else Vector2.ZERO
 	habilidades.assign(d.get("habilidades", []))
+	# saves antigos (feitos antes de o salto duplo passar a básico) podem não
+	# ter as habilidades iniciais -- garante-as sempre
+	for h in HABILIDADES_INICIAIS:
+		if h not in habilidades:
+			habilidades.append(h)
 	pistas.assign(d.get("pistas", []))
 	armas.assign(d.get("armas", []))
 	armaduras.assign(d.get("armaduras", []))

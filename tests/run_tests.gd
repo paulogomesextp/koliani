@@ -432,7 +432,7 @@ func teste_estado_save_ida_e_volta() -> void:
 func teste_estado_ha_progresso() -> void:
 	var e := _novo_estado()  # reiniciar_campanha() já gravou um save limpo
 	_ok(not e.ha_progresso(), "arranque limpo não devia contar como progresso")
-	e.desbloquear_habilidade("salto_duplo")
+	e.desbloquear_habilidade("dash_aereo")  # o salto duplo é inicial, não conta
 	_ok(e.ha_progresso(), "com uma habilidade desbloqueada já há progresso")
 	e.reiniciar_campanha()
 	_ok(not e.ha_progresso(), "reiniciar a campanha volta a 'sem progresso'")

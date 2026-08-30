@@ -35,6 +35,21 @@ var _btn_armas: Button
 var _btn_armaduras: Button
 var _seletor_equip: SeletorEquip
 
+## Legenda dos controlos, no topo do ecrã (só sem ecrã táctil -- em táctil
+## os botões de toque já bastam). Cada linha: [chave i18n, ação no InputMap].
+const LEGENDA_CONTROLOS := [
+	["hud.controls.move", "mover_direita"],
+	["hud.controls.jump", "saltar"],
+	["hud.controls.attack", "atacar"],
+	["hud.controls.dash", "dash"],
+	["hud.controls.roll", "rolar"],
+	["hud.controls.guard", "defender"],
+	["hud.controls.throw", "lancar"],
+	["hud.controls.swap", "trocar_arma"],
+	["hud.controls.pause", "pausa"],
+]
+var _legenda_caixa: HBoxContainer
+
 
 func _ready() -> void:
 	if _toque:
@@ -67,6 +82,9 @@ func _ready() -> void:
 	Textos.idioma_mudou.connect(func(_l: String) -> void: _traduzir_equip())
 	_atualizar_disco_arma()
 	_traduzir_equip()
+
+	_montar_legenda_controlos()
+	Textos.idioma_mudou.connect(func(_l: String) -> void: _encher_legenda())
 
 
 ## Dois botões pequenos (WEAPONS / ARMOR) por cima da barra de vida.
@@ -284,6 +302,84 @@ func _ao_chefe_derrotado() -> void:
 	t.tween_property(_chefe_barra, "value", 0.0, 0.2)
 	t.parallel().tween_property(_chefe_caixa, "modulate:a", 0.0, 0.5)
 	t.tween_callback(func() -> void: _chefe_caixa.visible = false)
+
+
+# --- legenda dos controlos (topo do ecrã) --------------------------
+
+func _montar_legenda_controlos() -> void:
+	# em ecrã táctil os botões de toque já mostram tudo
+	if DisplayServer.is_touchscreen_available():
+		return
+	var faixa := Control.new()
+	faixa.name = "LegendaControlos"
+	faixa.anchor_right = 1.0
+	faixa.offset_top = 6.0
+	faixa.offset_bottom = 34.0
+	faixa.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(faixa)
+
+	_legenda_caixa = HBoxContainer.new()
+	_legenda_caixa.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_legenda_caixa.alignment = BoxContainer.ALIGNMENT_CENTER
+	_legenda_caixa.add_theme_constant_override("separation", 12)
+	_legenda_caixa.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	faixa.add_child(_legenda_caixa)
+	_encher_legenda()
+
+
+func _encher_legenda() -> void:
+	if _legenda_caixa == null:
+		return
+	for c in _legenda_caixa.get_children():
+		c.queue_free()
+	for par: Array in LEGENDA_CONTROLOS:
+		_legenda_caixa.add_child(_item_legenda(Textos.t(par[0]), _tecla_de(par[0], par[1])))
+
+
+## Um par "tecla + rótulo" da legenda.
+func _item_legenda(rotulo: String, tecla: String) -> Control:
+	var it := HBoxContainer.new()
+	it.add_theme_constant_override("separation", 4)
+	it.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+	var chip := Label.new()
+	chip.text = tecla
+	chip.add_theme_font_size_override("font_size", 12)
+	chip.add_theme_color_override("font_color", Color(0.08, 0.04, 0.1))
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0.85, 0.78, 0.92, 0.92)
+	sb.set_corner_radius_all(3)
+	sb.content_margin_left = 5
+	sb.content_margin_right = 5
+	sb.content_margin_top = 1
+	sb.content_margin_bottom = 1
+	chip.add_theme_stylebox_override("normal", sb)
+	it.add_child(chip)
+
+	var txt := Label.new()
+	txt.text = rotulo
+	txt.add_theme_font_size_override("font_size", 12)
+	txt.add_theme_color_override("font_color", Color(0.92, 0.86, 0.98))
+	txt.add_theme_color_override("font_outline_color", Color(0.03, 0.01, 0.05))
+	txt.add_theme_constant_override("outline_size", 3)
+	it.add_child(txt)
+	return it
+
+
+## Nome curto da tecla ligada a uma ação (lê o InputMap, por isso segue
+## remapeamentos). "move" mostra o par esquerda/direita.
+func _tecla_de(chave_rotulo: String, accao: String) -> String:
+	if chave_rotulo == "hud.controls.move":
+		return "%s / %s" % [_primeira_tecla("mover_esquerda"), _primeira_tecla("mover_direita")]
+	return _primeira_tecla(accao)
+
+
+func _primeira_tecla(accao: String) -> String:
+	for ev in InputMap.action_get_events(accao):
+		if ev is InputEventKey:
+			var kc: int = ev.physical_keycode if ev.physical_keycode != 0 else ev.keycode
+			return OS.get_keycode_string(kc as Key)
+	return "—"
 
 
 func _input(evento: InputEvent) -> void:
