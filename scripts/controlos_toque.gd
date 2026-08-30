@@ -17,6 +17,13 @@ const NOME_HABILIDADE := {
 @onready var _label_vidas: Label = $Vidas/Label
 @onready var _toque: Control = $Toque
 
+## Barra de vida do chefe (construída em runtime, ao fundo do ecrã).
+var _chefe_caixa: Control
+var _chefe_nome: Label
+var _chefe_barra: ProgressBar
+var _chefe_fim := false
+var _chefe_tween: Tween
+
 
 func _ready() -> void:
 	if _toque:
@@ -33,6 +40,100 @@ func _ready() -> void:
 		koliani.vida_mudou.connect(_atualizar_barra_vida)
 	if koliani and koliani.has_signal("energia_mudou"):
 		koliani.energia_mudou.connect(_atualizar_energia)
+
+	_montar_barra_chefe()
+	var chefe := get_tree().get_first_node_in_group("chefes")
+	if chefe and chefe.has_signal("combate_iniciado"):
+		chefe.combate_iniciado.connect(_ao_combate_chefe)
+		chefe.vida_mudou.connect(_atualizar_barra_chefe)
+		chefe.derrotado.connect(_ao_chefe_derrotado)
+		chefe.tree_exited.connect(_ao_chefe_derrotado)
+
+
+# --- barra de vida do chefe ------------------------------------------
+
+func _montar_barra_chefe() -> void:
+	_chefe_caixa = Control.new()
+	_chefe_caixa.name = "BarraChefe"
+	_chefe_caixa.anchor_left = 0.5
+	_chefe_caixa.anchor_right = 0.5
+	_chefe_caixa.anchor_top = 1.0
+	_chefe_caixa.anchor_bottom = 1.0
+	_chefe_caixa.offset_left = -420.0
+	_chefe_caixa.offset_right = 420.0
+	_chefe_caixa.offset_top = -66.0
+	_chefe_caixa.offset_bottom = -14.0
+	_chefe_caixa.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_chefe_caixa.modulate.a = 0.0
+	_chefe_caixa.visible = false
+	add_child(_chefe_caixa)
+
+	_chefe_nome = Label.new()
+	_chefe_nome.anchor_right = 1.0
+	_chefe_nome.offset_bottom = 22.0
+	_chefe_nome.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_chefe_nome.add_theme_font_size_override("font_size", 16)
+	_chefe_nome.add_theme_color_override("font_color", Color(0.98, 0.86, 0.86))
+	_chefe_nome.add_theme_color_override("font_outline_color", Color(0.05, 0.01, 0.02))
+	_chefe_nome.add_theme_constant_override("outline_size", 5)
+	_chefe_caixa.add_child(_chefe_nome)
+
+	_chefe_barra = ProgressBar.new()
+	_chefe_barra.anchor_right = 1.0
+	_chefe_barra.offset_top = 24.0
+	_chefe_barra.offset_bottom = 46.0
+	_chefe_barra.show_percentage = false
+	_chefe_barra.min_value = 0.0
+	_chefe_barra.max_value = 1.0
+	_chefe_barra.value = 1.0
+	var fundo := StyleBoxFlat.new()
+	fundo.bg_color = Color(0.05, 0.05, 0.06, 0.92)   # calha escura neutra
+	fundo.set_corner_radius_all(3)
+	fundo.set_border_width_all(2)
+	fundo.border_color = Color(0.32, 0.06, 0.09, 0.95)
+	_chefe_barra.add_theme_stylebox_override("background", fundo)
+	var cheio := StyleBoxFlat.new()
+	cheio.bg_color = Color(0.46, 0.04, 0.07)         # vermelho escuro
+	cheio.set_corner_radius_all(3)
+	cheio.border_width_top = 2
+	cheio.border_color = Color(0.75, 0.12, 0.16, 0.9)  # aresta viva por cima
+	_chefe_barra.add_theme_stylebox_override("fill", cheio)
+	_chefe_caixa.add_child(_chefe_barra)
+
+
+func _ao_combate_chefe(chefe: Node) -> void:
+	var nome := ""
+	var i: int = EstadoJogo.indice_nivel
+	if i >= 0 and i < CatalogoCampanha.CHEFE_KEY.size():
+		nome = Textos.t(CatalogoCampanha.CHEFE_KEY[i])
+	if _chefe_nome:
+		_chefe_nome.text = nome.to_upper()
+	if _chefe_caixa:
+		_chefe_caixa.visible = true
+		var t := create_tween()
+		t.tween_property(_chefe_caixa, "modulate:a", 1.0, 0.4)
+
+
+func _atualizar_barra_chefe(atual: int, maximo: int) -> void:
+	if not _chefe_barra or _chefe_fim:
+		return
+	var alvo: float = clampf(float(atual) / float(maxi(maximo, 1)), 0.0, 1.0)
+	if _chefe_tween and _chefe_tween.is_valid():
+		_chefe_tween.kill()
+	_chefe_tween = create_tween().set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	_chefe_tween.tween_property(_chefe_barra, "value", alvo, 0.25)
+
+
+func _ao_chefe_derrotado() -> void:
+	if _chefe_fim or not _chefe_caixa or not _chefe_caixa.visible:
+		return
+	_chefe_fim = true
+	if _chefe_tween and _chefe_tween.is_valid():
+		_chefe_tween.kill()
+	var t := create_tween()
+	t.tween_property(_chefe_barra, "value", 0.0, 0.2)
+	t.parallel().tween_property(_chefe_caixa, "modulate:a", 0.0, 0.5)
+	t.tween_callback(func() -> void: _chefe_caixa.visible = false)
 
 
 func _input(evento: InputEvent) -> void:

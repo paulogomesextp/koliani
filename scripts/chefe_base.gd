@@ -10,6 +10,15 @@ extends DemonioBase
 ## chefes.
 
 signal derrotado
+## O combate começou a sério (1.ª vez que `provocar()` corre). O HUD usa
+## para mostrar a barra de vida do chefe.
+signal combate_iniciado(chefe: ChefeBase)
+## Vida do chefe mudou (após levar dano). `maximo` = vida no início da luta.
+signal vida_mudou(atual: int, maximo: int)
+
+## Vida no arranque da luta (capturada na 1.ª `provocar()`/dano, já depois
+## de o chefe concreto ter definido a sua vida no `_ready`).
+var _vida_maxima := 0
 
 ## Falas de história (só os chefes-narrativa preenchem, no seu `_ready`).
 ## Cada entrada: `{ "quem": <chave i18n>, "texto": <chave i18n> }`. A INTRO
@@ -84,7 +93,17 @@ func provocar() -> void:
 	if _musica_boss or _ja_derrotado:
 		return
 	_musica_boss = true
+	_garantir_vida_maxima()
 	Musica.boss()
+	combate_iniciado.emit(self)
+	vida_mudou.emit(vida, _vida_maxima)
+
+
+## Regista a vida-cheia da luta (uma vez). Chamado quando o combate começa
+## ou ao 1.º dano -- nessa altura o `_ready` do chefe concreto já correu.
+func _garantir_vida_maxima() -> void:
+	if _vida_maxima <= 0:
+		_vida_maxima = maxi(vida, 1)
 
 
 func _cair_derrotado() -> void:
@@ -135,9 +154,11 @@ func _ao_tocar(corpo: Node) -> void:
 func receber_dano(quantidade: int, dir_empurrao: float = 0.0) -> void:
 	if _ja_derrotado:
 		return
+	_garantir_vida_maxima()
 	provocar()  # levou o primeiro golpe = combate a sério
 	vida -= quantidade
 	global_position.x += dir_empurrao * 3.0
+	vida_mudou.emit(maxi(vida, 0), _vida_maxima)
 	if vida <= 0:
 		_ja_derrotado = true
 		if not falas_fim.is_empty():
