@@ -1,5 +1,68 @@
 # Progresso do agente `gaming` — campanha dos 30 níveis
 
+## Sessão 2026-08-31 — JORNADA (níveis grandes, boss no fim) + pedidos playtest
+
+**v0.6.26.** Feedback do Paulo: "jogo mecanicamente simples; níveis
+pequenos; quero 5 min de obstáculos até ao boss; boss SEMPRE no fim".
+
+### Jornada de aproximação (`scripts/gerador_corredor.gd`, reescrito)
+- Prepende um **percurso longo e temático** à esquerda do spawn: 17k–34k px
+  (cresce com o nível), 15–30 câmaras, checkpoint por câmara. A Koliani
+  nasce no início; o nível feito à mão + a arena do chefe passam a ser a
+  **reta final**. `nivel_com_chefe.gd`: `corredor = true` por omissão em
+  TODOS os níveis (menos o nº 30, o trono).
+- **Câmaras** (pool por região em `POOL_REGIAO`): `muros`, `serras`,
+  `fossos` (salto), `gruta` (tecto baixo + `PedraQueda`), `pedras`
+  (corredor de estalactites em ciclo), `pendulos` (`PenduloLamina`),
+  `guilhotinas`, `vento` (`CorrenteAr`), `fogo` (jatos + `Torreta`),
+  `prensa` (`ParedeMovel`), `portal` (fosso de espinhos com 2 rotas:
+  plataformas/pêndulo OU par de `Portal` de teleporte).
+- **Anti-softlock por construção**: chão raso contínuo em toda a extensão
+  (cair não mata nem prende), muros ≤ 58 px (+ degrau), nada bloqueia a
+  passagem, SEM portas/alavancas no gerador, portais só levam ao parceiro.
+  `VisibleOnScreenEnabler2D` por câmara (desligado em headless) para 30
+  câmaras não pesarem no telemóvel.
+- **Âncora estável**: `EstadoJogo.jornada_ancora_para(idx, calc)` guarda o
+  ponto de spawn original em memória (não no save) para a geometria da
+  jornada sair IGUAL a cada morte/recarga. `nivel_com_chefe._enter_tree`
+  captura `entrada_fresca` (checkpoint == ZERO) antes de a Koliani mexer
+  no checkpoint implícito.
+- Mecânicas novas reutilizáveis: **`Portal`** (`portal.gd` + `.tscn`,
+  grupo "portais", `id`/`destino_id`/`so_saida`), **`PenduloLamina`**,
+  **`PedraQueda`**. `Koliani.conceder_iframes()` (o Portal usa).
+- `TEMPO_HARDCORE` subido para a nova travessia (300 s → 720 s).
+- `tools/verifica_jornada.gd` — confirma a jornada nos 30 níveis headless
+  (todos OK: koliani reposicionada ~17–34k px à esquerda do chefe).
+- **POR PLAYTESTAR**: números dos perigos (períodos/dano/densidade), se
+  algum nível deve ter `corredor = false`, softlock real (o bot
+  `bot_gauntlet.gd` acusou uma paragem longa no nível 0 — heurística
+  crua, mas rever). O visual dos perigos está afinado para ameaçar quem
+  CORRE (serras a `_chao_y-34`, pêndulos à altura do peito).
+
+### Outros pedidos do playtest (mesma sessão)
+- **GAME OVER** (ecrã + som) retirado — `game_over.gd::mostrar()` só
+  recomeça a campanha em silêncio. Entrada `"game_over"` fora de `som.gd`.
+- **Dano da espada e dos tiros a DOBRAR**: `DANO_BASE` 25→50,
+  `Koliani.DANO_ATAQUE` 25→50, `Equipamento.ARMAS[].dano` ×2 (curva
+  mantida). Kamehameha e projétil seguem `_dano_golpe()`.
+- **Comando**: R2 (axis 5) passou de `lancar` para `defender` (Escudo).
+- **Coletável de habilidade**: faixa brilhante **"SKILL"** (Label +
+  estandarte + glow) em vez da seta ↑. Coletável só-pista já nem aparece.
+- **Sistema de PISTAS retirado do jogo**: `Coletavel` ignora `pista_id` e
+  só age em `habilidade_id`; Diário fora do HUD (`main.gd` não o
+  instancia) e sem tecla (`diario` input vazio); sem balão ao apanhar.
+  Infra (`EstadoJogo.pistas`, `DiarioPistas`, i18n `pista.*`, testes
+  `teste_diario_*`) fica **dormente** — não foi apagada.
+- **Hardcore com save próprio**: `progresso.json` (normal) vs
+  `progresso_hardcore.json`. `EstadoJogo.caminho_save()` escolhe pelo
+  `hardcore`; menu retoma/começa hardcore sem tocar no save normal e ao
+  voltar ao menu recarrega o normal. Caveira pixel-art (ícone em código)
+  a seguir a "HARDCORE MODE".
+- **A DECIDIR (Paulo)**: bosses "deixam de levar dano" — é a mecânica do
+  `Nucleo` exposto (janela EXPOSTA a seguir a cada ataque, dano ×2, ver
+  `chefe_ghorak.gd::receber_dano`). Manter e telegrafar melhor? Reduzir a
+  armadura? Tirar de vez? Toca nos 30 chefes.
+
 ## ESTADO: CAMPANHA COMPLETA — 30/30 níveis, 30 chefes (v0.5.0, 2026-08-30)
 
 As **6 regiões** estão construídas de ponta a ponta. `EstadoJogo.NIVEIS`
