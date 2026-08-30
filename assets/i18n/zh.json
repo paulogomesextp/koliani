@@ -21,6 +21,7 @@
 
 	"pause.title": "暂停",
 	"pause.resume": "继续",
+	"pause.level_map": "关卡地图",
 	"pause.restart_checkpoint": "从存档点重新开始",
 	"pause.main_menu": "主菜单",
 	"pause.quit": "退出游戏",

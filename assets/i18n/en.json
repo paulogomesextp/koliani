@@ -21,6 +21,7 @@
 
 	"pause.title": "PAUSED",
 	"pause.resume": "Resume",
+	"pause.level_map": "Level map",
 	"pause.restart_checkpoint": "Restart at checkpoint",
 	"pause.main_menu": "Main menu",
 	"pause.quit": "Quit game",
