@@ -253,3 +253,71 @@ iluminadas) - 19 ??? - 20 ??? (ver a biblia). bioma "catacumbas"
   thrash), nao uma arena movel real.
 - Numeros (vida/dano/tempos) de todos os chefes 08..15 por afinar com
   playtest -- foram postos "a olho".
+
+---
+
+## Sessao autonoma 2026-08-30 (continuacao) -- niveis 16..25
+
+**Regioes I, II, III, IV e V COMPLETAS -- 25/30 niveis.** `EstadoJogo.NIVEIS`
+= 26. Indices: floresta [0-4], prisao [5-9], torres [10-14],
+catacumbas [15-19], cidade [20-24], castelo [25] (so' Castelo_de_Zeriko,
+placeholder do M4 antigo).
+
+### Regiao IV -- Catacumbas do Abismo (fechada)
+- 16 Cemiterio dos Reis / Rei Ossario -- mecanica `TumuloElevador`
+  (AnimatableBody sobe c/ peso em cima; `auto`=vaivem). Chefe montado
+  que carga; fase 2 desmonta e combate a pe.
+- 17 Galeria dos Ossos / Colosso Osseo -- `ParedeFragil` p/ secrets. Chefe
+  quase imovel, 4 armas; `_remodelar()` a cada 75/50/25% (armas novas +
+  encolhe, aos 50% 2 caes).
+- 18 Cripta das Mil Velas / Freira Negra -- mecanicas `Vela` (acesa/apagada;
+  reacende ao tocar) + `PlataformaLuz` (so' solida com Vela acesa perto).
+  Chefe desce a apagar velas (unica janela EXPOSTA). Fase 2: sopro apaga
+  todas.
+- 19 Templo da Serpente / Naga Zeraph -- "paredes moveis" NAO feitas (nota
+  na cena); ParedeFragil + estatuas (grupo "estatuas_naga" p/ a TROCA).
+  Chefe: cuspe/cobras/poca de veneno/troca com estatua.
+- 20 O Abismo / Olho do Abismo -- `LuzSeguidora` (luz fraca cola a Koliani)
+  + `Koliani.inverter_controlos`. Chefe: laser em varredura, `plat_falsas`
+  que apaga, clones, inversao.
+
+### Regiao V -- Cidade Corrompida (fechada)
+- 21 Vila dos Sem-Rosto / Prefeito Sem-Rosto -- `DemonioBase.dormente` +
+  `raio_acorda` (inimigos de emboscada). Chefe: DECOYS (copias identicas),
+  bengala, decretos.
+- 22 Mercado da Carne / Acougueiro Real -- PlataformaCorrente + caixas +
+  carrinho (PlataformaFlutuante). Chefe: 2 cutelos; CADA golpe que leva
+  sobe/baixa uma "acougue_moveis" (arena muda).
+- 23 Trem dos Mortos / Maquinista Infernal -- vagoes (grupo "vagoes_trem")
+  com vaos + tunel (Espinhos rodados). NOTA: o trem nao anda de facto.
+  Chefe: pa/brasas, vapor, apito; fase 2 "o trem ataca" (brasas +
+  vagoes sacodem).
+- 24 Catedral da Corrupcao / Bispo Purpura -- mecanica `Vitral` (parede
+  colorida na layer 5; golpe/projetil parte-a -> plataformas do
+  `grupo_luz` ficam solidas). Chefe: cruzes explosivas, maos, anjos.
+- 25 Praca do Eclipse / Noiva do Eclipse -- `eclipse_tint.gd` + 2
+  conjuntos de PlataformaRitmada (realidade/corrupcao). Chefe emocional:
+  aneis, eclipse+nova, convidados; fase 2 o veu queima e ela deixa de
+  magoar ao toque. Pistas fecham o arco da mae.
+
+### A SEGUIR -- Regiao VI: Castelo de Zeriko (niveis 26..30)
+Por `docs/niveis.md`: 26 Portoes / Capitao Negro (rapido, "joga como
+player") - 27 Salao dos Espelhos / Koliani Sombria (espelho da Koliani) -
+28 Banquete dos Imortais / Rei Devorador (come inimigos p/ curar) -
+29 Torre do Coracao Negro / Arauto de Zeriko (3 formas) - 30 O TRONO /
+ZERIKO (4 fases, boss final). O `Castelo_de_Zeriko.tscn` atual e' o
+placeholder do M4 -- fica como nivel 30 ou reconstroi-se. bioma "castelo"
+(magenta). **Deixado para revisao do Paulo + sessao dedicada** (o
+finale merece cuidado; ha 5 chefes, um deles 4 fases).
+
+### Divida tecnica acumulada (alem da de cima)
+- Niveis-luta sem mecanica de traversia propria (15 Vyrak) e mecanicas
+  aproximadas: 19 "paredes moveis", 23 "trem que anda", Vyrak F3 "arena
+  em cima do dragao".
+- **Sem sistema de dialogo** -- as falas dos chefes (Primeiro Prisioneiro,
+  Noiva, e sobretudo Zeriko) estao todas nas pistas do diario. Isto vai
+  fazer falta a serio na regiao VI.
+- Numeros (vida/dano/tempos) de TODOS os chefes 08..25 postos "a olho" --
+  precisam de playtest.
+- `tools/shot_plataforma.gd` nao produziu PNG nesta sessao (parece
+  precisar de GPU/display) -- verificacao foi so' por smoke headless.
