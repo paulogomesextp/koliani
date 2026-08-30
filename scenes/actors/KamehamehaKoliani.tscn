@@ -1,0 +1,63 @@
+[gd_scene load_steps=5 format=3 uid="uid://bkolianikameha01"]
+
+; Kamehameha roxo da Koliani (habilidade "projetil"). Rajada esticada tipo
+; feixe que ATRAVESSA inimigos e so se parte contra o cenario ou ao fim do
+; tempo. collision_mask = 5 -> "mundo" (1) + "inimigos" (4);
+; collision_layer = 0 (nao e solido, so deteta). Custo/energia em koliani.gd.
+
+[ext_resource type="Script" path="res://scripts/kamehameha_koliani.gd" id="1_kame"]
+
+[sub_resource type="RectangleShape2D" id="rs_kame"]
+size = Vector2(96, 26)
+
+[sub_resource type="Gradient" id="grad_luz"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="tex_luz"]
+gradient = SubResource("grad_luz")
+width = 192
+height = 192
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[node name="KamehamehaKoliani" type="Area2D"]
+collision_layer = 0
+collision_mask = 5
+script = ExtResource("1_kame")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("rs_kame")
+
+[node name="Luz" type="PointLight2D" parent="."]
+texture = SubResource("tex_luz")
+energy = 3.0
+color = Color(0.6, 0.32, 1, 1)
+scale = Vector2(1.7, 1.4)
+
+[node name="AuraExterna" type="Polygon2D" parent="."]
+show_behind_parent = true
+color = Color(0.5, 0.28, 1, 0.2)
+polygon = PackedVector2Array(-60, 0, -30, -22, 40, -18, 62, 0, 40, 18, -30, 22)
+
+[node name="Feixe" type="Polygon2D" parent="."]
+color = Color(0.68, 0.4, 1, 0.85)
+polygon = PackedVector2Array(-52, 0, -30, -13, 34, -12, 52, 0, 34, 12, -30, 13)
+
+[node name="Nucleo" type="Polygon2D" parent="."]
+color = Color(0.94, 0.88, 1, 1)
+polygon = PackedVector2Array(-48, 0, -26, -6, 40, -5, 50, 0, 40, 5, -26, 6)
+
+[node name="Rasto" type="CPUParticles2D" parent="."]
+amount = 22
+lifetime = 0.4
+local_coords = false
+direction = Vector2(-1, 0)
+spread = 34.0
+gravity = Vector2(0, 0)
+initial_velocity_min = 60.0
+initial_velocity_max = 200.0
+scale_amount_min = 2.0
+scale_amount_max = 4.5
+color = Color(0.72, 0.45, 1, 0.9)

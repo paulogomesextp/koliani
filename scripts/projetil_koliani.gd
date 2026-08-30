@@ -11,6 +11,9 @@ const TEX_IMPACTO := preload("res://assets/sprites/impacto.svg")
 var dano := 25
 var _dir := Vector2.RIGHT
 var _tempo_de_vida := 2.2
+var _t := 0.0
+
+@onready var _luz: PointLight2D = $Luz
 
 
 ## `direcao` é um dos 8 vetores (cima/baixo/lados/diagonais); `dano_` vem
@@ -27,6 +30,9 @@ func _ready() -> void:
 
 func _physics_process(dt: float) -> void:
 	global_position += _dir * VELOCIDADE * dt
+	_t += dt
+	if _luz:
+		_luz.energy = 1.8 + 0.4 * sin(_t * 20.0)  # a aura roxa "respira"
 	_tempo_de_vida -= dt
 	if _tempo_de_vida <= 0.0:
 		queue_free()

@@ -45,14 +45,20 @@ const I_FRAMES := 0.6
 ## ataque que venha de frente é bloqueado (sem dano) com um som subtil.
 const VEL_DEFESA := 70.0
 const BLOQUEIO_IFRAMES := 0.14
-## Projétil mágico (habilidade "projetil"): lança em 8 direções, bate igual
-## à espada. Gasta uma fração da barra de Energia, que regenera com o
-## tempo. 3 disparos antes de esvaziar (33% cada).
-const ENERGIA_MAX := 99.0
-const CUSTO_PROJETIL := 33.0
-const REGEN_ENERGIA := 22.0   # por segundo (barra cheia em ~4.5 s)
+## Tiro mágico (toque curto em "lancar"): lança em 8 direções, ILIMITADO,
+## dá um terço do dano do ataque básico. Não gasta Energia.
 const DUR_LANCAR := 0.16
 const PROJETIL_MAGICO := preload("res://scenes/actors/ProjetilKoliani.tscn")
+## Kamehameha roxo (habilidade "projetil"): segura-se "lancar" ~0.4 s e
+## larga-se -> rajada roxa que atravessa inimigos. Cada rajada gasta 33% da
+## barra de Energia (3 seguidas), que regenera continuamente mas devagar
+## (não dá para spamar).
+const ENERGIA_MAX := 99.0
+const CUSTO_KAMEHAMEHA := 33.0
+const CARGA_KAMEHAMEHA := 0.4     # segundos com o botão em baixo até carregar
+const RECARGA_KAMEHAMEHA := 0.45  # gap mínimo entre rajadas
+const REGEN_ENERGIA := 12.0       # por segundo (barra cheia em ~8 s)
+const KAMEHAMEHA := preload("res://scenes/actors/KamehamehaKoliani.tscn")
 ## Abaixo deste Y considera-se que caiu no vazio (fosso sem fundo).
 const Y_MORTE := 1200.0
 const TEX_IMPACTO := preload("res://assets/sprites/impacto.svg")
@@ -63,6 +69,8 @@ const TEX_IMPACTO := preload("res://assets/sprites/impacto.svg")
 @onready var _arma: Sprite2D = $Sprite/Arma
 @onready var _rastro: Line2D = $Sprite/Rastro
 @onready var _escudo: Node2D = $Sprite/Escudo
+@onready var _escudo_glow: CanvasItem = $Sprite/Escudo/Glow
+@onready var _luz_carga: PointLight2D = $Sprite/LuzCarga
 @onready var _camera: Camera2D = $Camera2D
 @onready var _faiscas: CPUParticles2D = $FaiscasAtaque
 @onready var _po: CPUParticles2D = $PoAterragem
@@ -80,6 +88,11 @@ var _estava_no_chao := true
 var _defendendo := false
 var _energia := ENERGIA_MAX
 var _lancar_restante := 0.0
+## Carga do Kamehameha: segundos com "lancar" em baixo nesta pressão.
+var _lancar_seg := 0.0
+## Já disparou o Kamehameha nesta pressão (não repete até largar).
+var _hold_kame := false
+var _kame_recarga := 0.0
 ## Segundos que ainda está preso numa teia (Região III / Rainha Aracnídea):
 ## enquanto > 0 não anda nem salta -- só se sacode até se soltar.
 var _preso := 0.0
@@ -190,6 +203,7 @@ func _physics_process(dt: float) -> void:
 	_rolar_recarga = maxf(0.0, _rolar_recarga - dt)
 	_invulneravel = maxf(0.0, _invulneravel - dt)
 	_lancar_restante = maxf(0.0, _lancar_restante - dt)
+	_kame_recarga = maxf(0.0, _kame_recarga - dt)
 	_preso = maxf(0.0, _preso - dt)
 	_parede_lock = maxf(0.0, _parede_lock - dt)
 	_djump_t = maxf(0.0, _djump_t - dt)
@@ -266,13 +280,9 @@ func _physics_process(dt: float) -> void:
 	elif not _defendendo and _rolar_restante <= 0.0 and Input.is_action_just_pressed("atacar"):
 		_iniciar_ataque()
 
-	# projétil mágico -- 8 direções, custa 33% da Energia, bate igual à espada
-	if not _defendendo and _lancar_restante <= 0.0 \
-			and _rolar_restante <= 0.0 and _dash_restante <= 0.0 \
-			and EstadoJogo.tem_habilidade("projetil") \
-			and Input.is_action_just_pressed("lancar") \
-			and _energia >= CUSTO_PROJETIL:
-		_lancar_projetil()
+	# "lancar": toque curto = tiro mágico ilimitado; segurar ~0.4 s e largar =
+	# Kamehameha roxo (habilidade "projetil", gasta 33% da Energia).
+	_tratar_lancar(dt)
 
 	# estados exclusivos de movimento: rolamento > dash > movimento normal
 	if _rolar_restante > 0.0:
@@ -415,8 +425,17 @@ func _animar(dt: float) -> void:
 			_escudo.visible = _defendendo
 			if _defendendo:
 				_escudo.scale = Vector2.ONE
-		if _defendendo:
-			_escudo.modulate.a = 0.82 + 0.18 * (0.5 + 0.5 * sin(_anim_t * 7.0))
+		if _defendendo and _escudo_glow:
+			# só o brilho pulsa -- a placa de metal fica opaca
+			_escudo_glow.modulate.a = 0.5 + 0.4 * (0.5 + 0.5 * sin(_anim_t * 7.0))
+
+	# luz de carga do Kamehameha: cresce enquanto se segura "lancar"
+	if _luz_carga:
+		var carga := clampf(_lancar_seg / CARGA_KAMEHAMEHA, 0.0, 1.0) if _lancar_seg > 0.0 \
+			and EstadoJogo.tem_habilidade("projetil") else 0.0
+		_luz_carga.energy = 3.2 * carga
+		var pronto := 1.0 + (0.12 * sin(_anim_t * 24.0) if carga >= 1.0 else 0.0)
+		_luz_carga.scale = Vector2(0.28, 0.28) * (0.6 + 0.8 * carga) * pronto
 
 	var no_chao := is_on_floor()
 	var vx := absf(velocity.x)
@@ -515,12 +534,35 @@ func _iniciar_ataque() -> void:
 		_hitbox.monitoring = true
 
 
-## Lança um projétil mágico numa das 8 direções (mira = eixos de movimento
-## + W/S; sem mira, para onde está virada). Já validado que há Energia.
+## Gere o botão "lancar": segurar carrega o Kamehameha, largar cedo dispara
+## o tiro mágico normal. Bloqueado a defender/rolar/dar dash.
+func _tratar_lancar(dt: float) -> void:
+	if _defendendo or _rolar_restante > 0.0 or _dash_restante > 0.0:
+		_lancar_seg = 0.0
+		_hold_kame = false
+		return
+
+	if Input.is_action_pressed("lancar"):
+		_lancar_seg += dt
+		# carregou o suficiente -> dispara a rajada (uma vez por pressão)
+		if not _hold_kame and _lancar_seg >= CARGA_KAMEHAMEHA \
+				and _kame_recarga <= 0.0 \
+				and EstadoJogo.tem_habilidade("projetil") \
+				and (_energia >= CUSTO_KAMEHAMEHA or EstadoJogo.modo_dev):
+			_lancar_kamehameha()
+			_hold_kame = true
+
+	if Input.is_action_just_released("lancar"):
+		# toque curto (não chegou a carregar) -> tiro mágico normal
+		if not _hold_kame and _lancar_seg < CARGA_KAMEHAMEHA and _lancar_restante <= 0.0:
+			_lancar_projetil()
+		_lancar_seg = 0.0
+		_hold_kame = false
+
+
+## Lança um tiro mágico numa das 8 direções (mira = eixos de movimento + W/S;
+## sem mira, para onde está virada). Ilimitado, dá 1/3 do dano do golpe.
 func _lancar_projetil() -> void:
-	if not EstadoJogo.modo_dev:  # modo dev: energia infinita
-		_energia -= CUSTO_PROJETIL
-	energia_mudou.emit(_energia, ENERGIA_MAX)
 	_lancar_restante = DUR_LANCAR
 	_pop = 1.0
 	var ax := Input.get_action_strength("mover_direita") - Input.get_action_strength("mover_esquerda")
@@ -529,9 +571,37 @@ func _lancar_projetil() -> void:
 	var p := PROJETIL_MAGICO.instantiate()
 	get_parent().add_child(p)
 	p.global_position = global_position + aim * 20.0 + Vector2(0.0, -4.0)
-	p.lancar(aim, _dano_golpe())
-	Som.toca("projetil", -12.0, 1.25)
-	magia_lancada.emit()
+	p.lancar(aim, maxi(1, roundi(_dano_golpe() / 3.0)))
+	Som.toca("projetil", -13.0, 1.35)
+	if _faiscas:
+		_faiscas.position.x = absf(_faiscas.position.x) * signf(aim.x if aim.x != 0.0 else _olha_para)
+		_faiscas.restart()
+
+
+## Dano da rajada Kamehameha (a olho: 3x o golpe básico).
+func _dano_kamehameha() -> int:
+	return _dano_golpe() * 3
+
+
+## Dispara o Kamehameha roxo. Já validado: tem a habilidade, há Energia e
+## não está em recarga.
+func _lancar_kamehameha() -> void:
+	if not EstadoJogo.modo_dev:  # modo dev: energia infinita
+		_energia = maxf(0.0, _energia - CUSTO_KAMEHAMEHA)
+	energia_mudou.emit(_energia, ENERGIA_MAX)
+	_kame_recarga = RECARGA_KAMEHAMEHA
+	_lancar_restante = DUR_LANCAR
+	_pop = 1.0
+	var ax := Input.get_action_strength("mover_direita") - Input.get_action_strength("mover_esquerda")
+	var ay := Input.get_action_strength("mirar_baixo") - Input.get_action_strength("mirar_cima")
+	var aim := Movimento.direcao_mira(ax, ay, _olha_para)
+	var p := KAMEHAMEHA.instantiate()
+	get_parent().add_child(p)
+	p.global_position = global_position + aim * 26.0 + Vector2(0.0, -4.0)
+	p.lancar(aim, _dano_kamehameha())
+	Som.toca("onda", -4.0, 0.85)
+	_abanar(6.0)
+	magia_lancada.emit()  # a magia "a sério" materializa as plataformas espectrais
 	if _faiscas:
 		_faiscas.position.x = absf(_faiscas.position.x) * signf(aim.x if aim.x != 0.0 else _olha_para)
 		_faiscas.restart()
