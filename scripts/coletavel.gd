@@ -1,19 +1,19 @@
 class_name Coletavel
 extends Area2D
-## Item apanhável no mundo: quando a Koliani lhe toca, regista uma pista
-## sobre a mãe e/ou desbloqueia uma habilidade permanente, e desaparece.
+## Item apanhável no mundo: quando a Koliani lhe toca, desbloqueia uma
+## habilidade permanente e desaparece, mostrando uma FAIXA "SKILL" por cima.
 ##
-## Visual construído em código conforme o que dá:
-##   * habilidade nova -> SETA PARA CIMA brilhante (upgrade).
-##   * pista / dica     -> LÂMPADA brilhante.
+## O sistema de PISTAS foi retirado do jogo a pedido do Paulo (ago 2026):
+## um coletável que só dava pista (`habilidade_id` vazio) já nem aparece.
+## `pista_id` fica no `@export` só para as cenas antigas não darem erro.
 ##
-## Se já tinha sido apanhado numa sessão anterior (a pista/habilidade já
-## está em `EstadoJogo`), nem chega a aparecer -- evita apanhar duas vezes
-## o mesmo objeto ao voltar a entrar no nível.
+## Se a habilidade já foi obtida numa sessão anterior, nem chega a aparecer
+## -- evita apanhar duas vezes o mesmo objeto ao reentrar no nível.
 
 signal apanhado(pista_id: String, habilidade_id: String)
 
-## Id da pista a registar (vazio = não regista pista).
+## Mantido por compatibilidade com as cenas antigas -- IGNORADO (o Diário
+## de pistas saiu do jogo).
 @export var pista_id := ""
 ## Id da habilidade a desbloquear (ex.: "salto_duplo"; vazio = nenhuma).
 @export var habilidade_id := ""
@@ -32,14 +32,12 @@ func _ready() -> void:
 	_montar_visual()
 
 
-## Verdadeiro só se este coletável não tem nada de novo para dar.
+## Verdadeiro se este coletável não tem NADA de novo para dar. Sem
+## habilidade a desbloquear (ex.: era só uma pista) -> nunca aparece.
 func _ja_obtido() -> bool:
-	var falta_pista := pista_id != "" and not EstadoJogo.pistas.has(pista_id)
-	var falta_habilidade := habilidade_id != "" and not EstadoJogo.tem_habilidade(habilidade_id)
-	if falta_pista or falta_habilidade:
-		return false
-	# nada por dar (ou o coletável está mal configurado, sem ids)
-	return true
+	if habilidade_id == "":
+		return true
+	return EstadoJogo.tem_habilidade(habilidade_id)
 
 
 # --- visual ---------------------------------------------------------
@@ -49,12 +47,8 @@ func _montar_visual() -> void:
 		return
 	for c in _visual.get_children():
 		c.queue_free()
-	if habilidade_id != "":
-		_seta_upgrade()
-		_pintar_luz(Color(0.55, 1.0, 0.85), 1.7)
-	else:
-		_lampada()
-		_pintar_luz(Color(1.0, 0.88, 0.45), 1.35)
+	_faixa_skill()
+	_pintar_luz(Color(0.55, 1.0, 0.85), 1.9)
 
 
 func _pintar_luz(cor: Color, energia: float) -> void:
@@ -72,43 +66,58 @@ func _poly(pts: PackedVector2Array, cor: Color, z := 0) -> Polygon2D:
 	return p
 
 
-## Seta grossa a apontar para cima (upgrade).
-func _seta_upgrade() -> void:
-	var contorno := PackedVector2Array([
-		Vector2(0, -14), Vector2(10, -1), Vector2(4.5, -1), Vector2(4.5, 13),
-		Vector2(-4.5, 13), Vector2(-4.5, -1), Vector2(-10, -1),
-	])
-	_poly(contorno, Color(0.05, 0.12, 0.10), 0)
-	var dentro := PackedVector2Array()
-	for v in contorno:
-		dentro.append(v * 0.72)
-	_poly(dentro, Color(0.6, 1.0, 0.85), 1)
-	_poly(PackedVector2Array([Vector2(0, -9), Vector2(3.5, -3), Vector2(-3.5, -3)]),
-		Color(0.95, 1.0, 0.98), 2)
+## Faixa brilhante a dizer "SKILL" por cima do coletável (habilidade nova).
+func _faixa_skill() -> void:
+	var aditivo := CanvasItemMaterial.new()
+	aditivo.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
 
+	# gema pequena na base -- dá "corpo" ao coletável ao nível do chão
+	var gema := PackedVector2Array([
+		Vector2(0, -6), Vector2(5, 2), Vector2(0, 9), Vector2(-5, 2)])
+	_poly(gema, Color(0.05, 0.12, 0.10), 0)
+	var gema_in := PackedVector2Array()
+	for v in gema:
+		gema_in.append(v * 0.66)
+	_poly(gema_in, Color(0.7, 1.0, 0.9), 1)
 
-## Lâmpada (pista / dica).
-func _lampada() -> void:
-	var bulbo := PackedVector2Array()
-	for i in 14:
-		var a := TAU * float(i) / 14.0
-		bulbo.append(Vector2(cos(a) * 9.0, sin(a) * 9.0 - 3.0))
-	_poly(bulbo, Color(0.05, 0.05, 0.03), 0)
-	var bulbo_in := PackedVector2Array()
-	for v in bulbo:
-		bulbo_in.append(v * 0.82 + Vector2(0, -0.5))
-	_poly(bulbo_in, Color(1.0, 0.92, 0.55), 1)
-	# rosca / base
-	_poly(PackedVector2Array([
-		Vector2(-4, 5), Vector2(4, 5), Vector2(3.5, 10), Vector2(-3.5, 10),
-	]), Color(0.7, 0.62, 0.4), 1)
-	_poly(PackedVector2Array([
-		Vector2(-3, 10), Vector2(3, 10), Vector2(2.5, 13), Vector2(-2.5, 13),
-	]), Color(0.45, 0.4, 0.28), 1)
-	# brilho
-	_poly(PackedVector2Array([
-		Vector2(-3, -6), Vector2(1, -8), Vector2(-1, -2), Vector2(-4, -1),
-	]), Color(1.0, 1.0, 0.9), 2)
+	# faixa / estandarte
+	var faixa := Node2D.new()
+	faixa.name = "Faixa"
+	faixa.position = Vector2(0, -30)
+	_visual.add_child(faixa)
+
+	var glow := Polygon2D.new()
+	glow.polygon = PackedVector2Array([
+		Vector2(-34, -14), Vector2(34, -14), Vector2(40, 0), Vector2(34, 14),
+		Vector2(-34, 14), Vector2(-40, 0)])
+	glow.color = Color(0.35, 1.0, 0.8, 0.28)
+	glow.material = aditivo
+	faixa.add_child(glow)
+
+	var placa := Polygon2D.new()
+	placa.polygon = PackedVector2Array([
+		Vector2(-30, -11), Vector2(30, -11), Vector2(36, 0), Vector2(30, 11),
+		Vector2(-30, 11), Vector2(-36, 0)])
+	placa.color = Color(0.08, 0.05, 0.12, 0.92)
+	faixa.add_child(placa)
+	var borda := Line2D.new()
+	borda.points = placa.polygon
+	borda.closed = true
+	borda.width = 2.0
+	borda.default_color = Color(0.5, 1.0, 0.85)
+	faixa.add_child(borda)
+
+	var lbl := Label.new()
+	lbl.text = "SKILL"
+	lbl.add_theme_font_size_override("font_size", 15)
+	lbl.add_theme_color_override("font_color", Color(0.75, 1.0, 0.95))
+	lbl.add_theme_color_override("font_outline_color", Color(0.05, 0.02, 0.1))
+	lbl.add_theme_constant_override("outline_size", 5)
+	lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	lbl.size = Vector2(72, 24)
+	lbl.position = Vector2(-36, -13)
+	faixa.add_child(lbl)
 
 
 func _process(dt: float) -> void:
@@ -118,22 +127,17 @@ func _process(dt: float) -> void:
 		var s := 1.0 + 0.06 * sin(_t * 4.0)
 		_visual.scale = Vector2(s, s)
 	if _luz:
-		_luz.energy = (1.7 if habilidade_id != "" else 1.35) * (0.85 + 0.15 * sin(_t * 5.0))
+		_luz.energy = 1.9 * (0.85 + 0.15 * sin(_t * 5.0))
+	var faixa := _visual.get_node_or_null("Faixa") if _visual else null
+	if faixa:
+		faixa.scale = Vector2.ONE * (1.0 + 0.05 * sin(_t * 4.0))
 
 
 func _ao_entrar(corpo: Node) -> void:
 	if not (corpo is Koliani):
 		return
-	var pista_nova := pista_id != "" and not EstadoJogo.pistas.has(pista_id)
-	if pista_id != "":
-		EstadoJogo.registar_pista(pista_id)
 	if habilidade_id != "":
 		EstadoJogo.desbloquear_habilidade(habilidade_id)
 	Som.toca("apanhar", -6.0)
 	apanhado.emit(pista_id, habilidade_id)
-	# pista nova -> mostra o texto num balão de fala (como os chefes-história):
-	# o título da pista é "quem fala", o corpo é o texto.
-	if pista_nova and DiarioPistas.PISTAS.has(pista_id):
-		var p: Dictionary = DiarioPistas.PISTAS[pista_id]
-		Dialogo.correr([{ "quem": p["titulo"], "texto": p["texto"] }])
 	queue_free()

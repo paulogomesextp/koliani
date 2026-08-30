@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3 uid="uid://bkolianipendulolamina01"]
+
+; Lamina pendular presa ao tecto -- varre um arco e obriga a cronometrar o
+; salto. Visual/colisao em codigo. Ver scripts/pendulo_lamina.gd
+; (@export comprimento / amplitude_graus / periodo / fase / dano).
+
+[ext_resource type="Script" path="res://scripts/pendulo_lamina.gd" id="1_pend"]
+
+[node name="PenduloLamina" type="Node2D"]
+script = ExtResource("1_pend")

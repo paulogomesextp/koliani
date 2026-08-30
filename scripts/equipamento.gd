@@ -15,22 +15,24 @@ extends RefCounted
 ## `tools/gerar_sprites.gd`).
 
 ## id -> { nome: chave i18n, dano: int, nivel: int (nível que a desbloqueia, 1-based) }
+# NB: dano das armas DUPLICADO a pedido do Paulo (ago 2026) -- a espada
+# e os tiros passaram a bater o dobro. Curva mantida (não-decrescente).
 const ARMAS: Array[Dictionary] = [
-	{ "id": "lamina_gasta",         "nome": "gear.w.lamina_gasta",         "dano": 24, "nivel": 1 },
-	{ "id": "foice_do_pantano",     "nome": "gear.w.foice_do_pantano",     "dano": 27, "nivel": 3 },
-	{ "id": "garra_da_viuva",       "nome": "gear.w.garra_da_viuva",       "dano": 30, "nivel": 5 },
-	{ "id": "espinho_da_arvore",    "nome": "gear.w.espinho_da_arvore",    "dano": 33, "nivel": 7 },
-	{ "id": "martelo_do_carcereiro","nome": "gear.w.martelo_do_carcereiro","dano": 37, "nivel": 9 },
-	{ "id": "forjaluz",             "nome": "gear.w.forjaluz",             "dano": 40, "nivel": 11 },
-	{ "id": "badalo_de_bronze",     "nome": "gear.w.badalo_de_bronze",     "dano": 43, "nivel": 13 },
-	{ "id": "lanca_da_tempestade",  "nome": "gear.w.lanca_da_tempestade",  "dano": 46, "nivel": 15 },
-	{ "id": "crescente_lunar",      "nome": "gear.w.crescente_lunar",      "dano": 49, "nivel": 17 },
-	{ "id": "presa_de_vyrak",       "nome": "gear.w.presa_de_vyrak",       "dano": 52, "nivel": 19 },
-	{ "id": "cetro_de_osso",        "nome": "gear.w.cetro_de_osso",        "dano": 54, "nivel": 21 },
-	{ "id": "cutelo_real",          "nome": "gear.w.cutelo_real",          "dano": 56, "nivel": 23 },
-	{ "id": "gladio_purpura",       "nome": "gear.w.gladio_purpura",       "dano": 58, "nivel": 25 },
-	{ "id": "fio_do_eclipse",       "nome": "gear.w.fio_do_eclipse",       "dano": 60, "nivel": 27 },
-	{ "id": "estilhaco_de_zeriko",  "nome": "gear.w.estilhaco_de_zeriko",  "dano": 64, "nivel": 29 },
+	{ "id": "lamina_gasta",         "nome": "gear.w.lamina_gasta",         "dano": 48, "nivel": 1 },
+	{ "id": "foice_do_pantano",     "nome": "gear.w.foice_do_pantano",     "dano": 54, "nivel": 3 },
+	{ "id": "garra_da_viuva",       "nome": "gear.w.garra_da_viuva",       "dano": 60, "nivel": 5 },
+	{ "id": "espinho_da_arvore",    "nome": "gear.w.espinho_da_arvore",    "dano": 66, "nivel": 7 },
+	{ "id": "martelo_do_carcereiro","nome": "gear.w.martelo_do_carcereiro","dano": 74, "nivel": 9 },
+	{ "id": "forjaluz",             "nome": "gear.w.forjaluz",             "dano": 80, "nivel": 11 },
+	{ "id": "badalo_de_bronze",     "nome": "gear.w.badalo_de_bronze",     "dano": 86, "nivel": 13 },
+	{ "id": "lanca_da_tempestade",  "nome": "gear.w.lanca_da_tempestade",  "dano": 92, "nivel": 15 },
+	{ "id": "crescente_lunar",      "nome": "gear.w.crescente_lunar",      "dano": 98, "nivel": 17 },
+	{ "id": "presa_de_vyrak",       "nome": "gear.w.presa_de_vyrak",       "dano": 104, "nivel": 19 },
+	{ "id": "cetro_de_osso",        "nome": "gear.w.cetro_de_osso",        "dano": 108, "nivel": 21 },
+	{ "id": "cutelo_real",          "nome": "gear.w.cutelo_real",          "dano": 112, "nivel": 23 },
+	{ "id": "gladio_purpura",       "nome": "gear.w.gladio_purpura",       "dano": 116, "nivel": 25 },
+	{ "id": "fio_do_eclipse",       "nome": "gear.w.fio_do_eclipse",       "dano": 120, "nivel": 27 },
+	{ "id": "estilhaco_de_zeriko",  "nome": "gear.w.estilhaco_de_zeriko",  "dano": 128, "nivel": 29 },
 ]
 
 ## id -> { nome, vida_bonus: int, reducao: float 0..1, nivel: int }

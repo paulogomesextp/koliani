@@ -145,12 +145,6 @@ shape = SubResource("RectangleShape2D_botao")
 visibility_mode = 1
 action = &"lancar"
 
-[node name="Diario" type="TouchScreenButton" parent="Toque"]
-position = Vector2(1180, 24)
-shape = SubResource("RectangleShape2D_botao")
-visibility_mode = 1
-action = &"diario"
-
 [node name="Pausa" type="TouchScreenButton" parent="Toque"]
 position = Vector2(1180, 140)
 shape = SubResource("RectangleShape2D_botao")

@@ -30,13 +30,16 @@ const HABILIDADES_INICIAIS: Array[String] = ["salto_duplo"]
 ## ordem de `NIVEIS`), a subir por região e com folga extra nos níveis-fim
 ## de região; o nível 30 (Zeriko, 4 formas) leva o dobro. Ainda "a olho" --
 ## afinar com o jogo a correr.
+# NB: subido MUITO (ago 2026) -- os níveis passaram a ter uma JORNADA de
+# aproximação longa (vários minutos de obstáculos + checkpoints) antes do
+# chefe. Cada valor = travessia-alvo + margem para a luta. Ainda "a olho".
 const TEMPO_HARDCORE := [
-	95.0, 105.0, 110.0, 115.0, 130.0,      # I   Floresta
-	120.0, 125.0, 130.0, 135.0, 150.0,     # II  Prisão
-	135.0, 140.0, 145.0, 150.0, 170.0,     # III Torres
-	150.0, 155.0, 160.0, 165.0, 185.0,     # IV  Catacumbas
-	165.0, 170.0, 175.0, 180.0, 200.0,     # V   Cidade
-	180.0, 185.0, 190.0, 195.0, 240.0,     # VI  Castelo (+ Zeriko)
+	300.0, 315.0, 330.0, 345.0, 380.0,     # I   Floresta
+	360.0, 375.0, 390.0, 405.0, 440.0,     # II  Prisão
+	405.0, 420.0, 435.0, 450.0, 490.0,     # III Torres
+	450.0, 465.0, 480.0, 495.0, 540.0,     # IV  Catacumbas
+	495.0, 510.0, 525.0, 540.0, 585.0,     # V   Cidade
+	540.0, 555.0, 570.0, 585.0, 720.0,     # VI  Castelo (+ Zeriko)
 ]
 
 ## Sequencia fixa de mundos ate ao Zeriko (platformer por niveis, nao
@@ -100,7 +103,8 @@ signal equipamento_ganho(tipo: String, id: String)
 signal equipamento_mudou(tipo: String, id: String)
 
 ## Dano do ataque corpo-a-corpo sem arma equipada (punhos/lâmina base).
-const DANO_BASE := 25
+## Dano-base DUPLICADO a pedido do Paulo (ago 2026) -- espada e tiros o dobro.
+const DANO_BASE := 50
 
 var vidas: int = VIDAS_INICIAIS
 var indice_nivel: int = 0
@@ -133,6 +137,28 @@ var hardcore_tempo_restante: float = -1.0
 ## Posto a true pelos testes (ver tests/run_tests.gd) para NÃO tocar no
 ## ficheiro de save real ao instanciar o estado fora do jogo.
 var modo_teste: bool = false
+
+## Âncora da JORNADA de aproximação do nível atual (ver `gerador_corredor.gd`):
+## o ponto onde a Koliani nasceria SEM jornada. Fica em memória (não é
+## gravada) para a jornada se reconstruir igual a cada morte/recarga -- se
+## fosse recalculada da posição atual da Koliani, um respawn num checkpoint
+## a meio partia a geometria. Limpa-se ao mudar de nível.
+var _jornada_ancora: Vector2 = Vector2.ZERO
+var _jornada_ancora_idx: int = -1
+
+
+## Devolve a âncora da jornada para o nível `idx`, calculando-a uma vez
+## (na 1.ª entrada fresca) com `calcular` e reutilizando-a nas recargas.
+func jornada_ancora_para(idx: int, calcular: Callable) -> Vector2:
+	if _jornada_ancora_idx != idx:
+		_jornada_ancora = calcular.call()
+		_jornada_ancora_idx = idx
+	return _jornada_ancora
+
+
+func _limpar_jornada_ancora() -> void:
+	_jornada_ancora = Vector2.ZERO
+	_jornada_ancora_idx = -1
 
 ## Modo de testes do Paulo ("DEVELOPER MODE"): habilidades todas,
 ## energia infinita e sem perder vida (ver koliani.gd). NÃO é gravado no
@@ -172,6 +198,7 @@ func avancar_nivel() -> void:
 		checkpoint = Vector2.ZERO
 		hardcore_tempo_restante = -1.0  # mundo novo = relógio cheio
 		anunciar_avanco = true
+		_limpar_jornada_ancora()
 		guardar()
 
 
@@ -360,6 +387,7 @@ func ativar_modo_dev() -> void:
 	indice_nivel = 0
 	checkpoint = Vector2.ZERO
 	hardcore_tempo_restante = -1.0
+	_limpar_jornada_ancora()
 	habilidades.assign(HABILIDADES_TODAS)
 	# modo dev: também todo o equipamento desbloqueado (a arma/armadura mais
 	# fortes equipadas)
@@ -387,6 +415,7 @@ func reiniciar_run() -> void:
 	vidas = VIDAS_INICIAIS
 	checkpoint = Vector2.ZERO
 	hardcore_tempo_restante = -1.0  # nova tentativa -> relógio do nível cheio
+	_limpar_jornada_ancora()
 	# nunca à frente do progresso: nível a seguir ao último chefe derrotado
 	var teto := -1
 	for i in concluidos:
@@ -409,6 +438,7 @@ func reiniciar_campanha() -> void:
 	arma_equipada = ""
 	armadura_equipada = ""
 	hardcore_tempo_restante = -1.0  # NB: `hardcore` (o modo) fica como está
+	_limpar_jornada_ancora()
 	vidas_mudaram.emit(vidas)
 	guardar()
 

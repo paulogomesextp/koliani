@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=3 uid="uid://bkolianipedraqueda01"]
+
+; Estalactite / pedra que se solta do tecto quando a Koliani passa por
+; baixo (ou em ciclo, se `automatico`). Visual/colisao em codigo.
+; Ver scripts/pedra_queda.gd
+; (@export chao_y / raio_gatilho / dano / aviso / automatico / periodo / tam).
+
+[ext_resource type="Script" path="res://scripts/pedra_queda.gd" id="1_pedra"]
+
+[node name="PedraQueda" type="Node2D"]
+script = ExtResource("1_pedra")

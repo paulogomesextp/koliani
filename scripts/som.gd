@@ -21,7 +21,6 @@ const CAMINHOS := {
 	"investida": "res://assets/audio/investida.wav",
 	"onda": "res://assets/audio/onda.wav",
 	"bloqueio": "res://assets/audio/bloqueio.wav",
-	"game_over": "res://assets/audio/game_over.wav",
 	"demonio_ataque": "res://assets/audio/demonio_ataque.wav",
 	"conquista": "res://assets/audio/conquista.wav",
 }

@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3 uid="uid://bkolianiportal01"]
+
+; Portal de teleporte -- toca-se e a Koliani sai no portal parceiro
+; (`id` == `destino_id`). Visual/colisao em codigo. Ver scripts/portal.gd
+; (@export id / destino_id / so_saida / cor / raio).
+
+[ext_resource type="Script" path="res://scripts/portal.gd" id="1_portal"]
+
+[node name="Portal" type="Area2D"]
+script = ExtResource("1_portal")

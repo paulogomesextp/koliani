@@ -6,7 +6,6 @@ extends Node2D
 ## voltar a esta cena (é o que a Porta faz).
 
 const CENA_HUD := preload("res://scenes/ui/HUD.tscn")
-const CENA_DIARIO := preload("res://scenes/ui/Diario.tscn")
 const CENA_PAUSA := preload("res://scenes/ui/Pausa.tscn")
 const CENA_DEV_BARRA := preload("res://scenes/ui/DevBarra.tscn")
 const RELOGIO_HARDCORE := preload("res://scripts/relogio_hardcore.gd")
@@ -30,7 +29,8 @@ func _ready() -> void:
 		porta.fim_da_campanha.connect(_ao_fim_da_campanha)
 
 	add_child(CENA_HUD.instantiate())
-	add_child(CENA_DIARIO.instantiate())
+	# O Diário de pistas foi retirado do jogo a pedido do Paulo (ago 2026).
+	# `scenes/ui/Diario.tscn` / `scripts/diario*.gd` ficam no repo, dormentes.
 	add_child(CENA_PAUSA.instantiate())
 	if EstadoJogo.modo_dev:
 		add_child(CENA_DEV_BARRA.instantiate())

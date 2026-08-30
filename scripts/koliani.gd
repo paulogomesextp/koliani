@@ -14,7 +14,8 @@ signal magia_lancada
 
 const VIDA_MAXIMA := 100
 ## Dano corpo-a-corpo SEM arma equipada (ver EstadoJogo.dano_ataque()).
-const DANO_ATAQUE := 25
+## Duplicado a pedido do Paulo (ago 2026) -- espada e tiros o dobro.
+const DANO_ATAQUE := 50
 
 
 ## Vida máxima efetiva = base + bónus da armadura equipada.
@@ -840,6 +841,12 @@ func prender(segundos: float) -> void:
 ## Putrefacto, fase 2). Não a impede de andar/saltar -- só a faz cair devagar.
 func flutuar(segundos: float) -> void:
 	_leve = maxf(_leve, segundos)
+
+
+## Curto período de invulnerabilidade concedido por fora (ex.: `Portal` ao
+## teleportar -- evita levar dano no frame de chegada).
+func conceder_iframes(segundos: float) -> void:
+	_invulneravel = maxf(_invulneravel, segundos)
 
 
 ## Define a escala da gravidade (Observatório Lunar, nível 14). 1 = normal,
