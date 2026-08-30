@@ -2,12 +2,27 @@ extends Node2D
 ## Script para o nó raiz de um mundo com chefe: a `Porta` para o mundo
 ## seguinte fica selada (`monitoring = false` + tom escuro) até o nó
 ## `Chefe` emitir `derrotado`. Se não houver `Chefe`, a porta abre já.
+##
+## Também prepende um CORREDOR DE APROXIMAÇÃO (ver `gerador_corredor.gd`),
+## que faz o nível crescer com o seu número. Pôr `corredor = false` na cena
+## para o desligar (o último nível não o tem).
+
+const GERADOR := preload("res://scripts/gerador_corredor.gd")
+
+## Prepende o corredor de aproximação escalável.
+@export var corredor := true
 
 @onready var _porta: Area2D = $Porta
 @onready var _chefe: Node = get_node_or_null("Chefe")
 
 
 func _ready() -> void:
+	if corredor and EstadoJogo.indice_nivel < EstadoJogo.NIVEIS.size() - 1:
+		var g := Node2D.new()
+		g.name = "CorredorAproximacao"
+		g.set_script(GERADOR)
+		add_child(g)
+
 	if _porta == null:
 		return
 	if _chefe and _chefe.has_signal("derrotado"):

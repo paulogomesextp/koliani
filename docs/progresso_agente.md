@@ -63,7 +63,48 @@ pista i18n×6 + `TEMPO_HARDCORE`. `Castelo_de_Zeriko.tscn` / `zeriko.gd` /
   (bug de `open(w).write(read())` em Python — trunca antes de ler);
   restaurado de 129a999.
 
-**O QUE FALTA:**
+## Sessão autónoma 2026-08-30 (tarde/noite) — feedback do playtest do Paulo
+
+Ronda longa de pedidos enquanto o Paulo jogava. Feito e com push
+(v0.5.13 → v0.5.20):
+
+- **Coletáveis/checkpoints** com visual próprio (código): habilidade →
+  seta ↑ brilhante; pista → lâmpada; checkpoint → gema verde-platina
+  fosca que acende ao tocar. Apanhar uma pista corre o balão de fala
+  (`Dialogo`) com o texto.
+- **Menu equipamento**: imagem do item como fundo do cartão
+  (`gear/armas.png` + `gear/armaduras.png`, `AtlasTexture`); botões
+  WEAPONS/ARMOR passaram do menu de Pausa para o **HUD** (por cima da
+  vida). Modo DEV desbloqueia todas as armas/armaduras.
+- **HUD** refeito: vida (vermelho) + energia (azul) no canto
+  inferior-esquerdo + disco redondo da arma (tecla E / toque cicla).
+- **Seletor de níveis**: fundo com arte do bioma + linha "Reward: <item>".
+- **Goblins não flutuam** (offset do sprite corrigido). **Teia** deixa de
+  prender — só abranda.
+- **Habilidade nova `escalar_paredes`** (agarrar + subir/descer + salto de
+  parede): `koliani.gd`, em `HABILIDADES_TODAS`, coletável no nível 04.
+- **Mecânica `Alavanca` → `PortaTrancada`** (`id` liga os dois; grupo
+  "alavancas"). Paredes verticais = `Plataforma` alta (já servia).
+- **`GeradorCorredor`** (`gerador_corredor.gd` + `nivel_com_chefe.gd`):
+  prepende um **corredor de aproximação** a TODOS os níveis (menos o
+  último). Chão contínuo + paredes ≤100px + espinhos + inimigos (espécie
+  copiada do nível) + porta-alavanca a partir do nível 3. Comprimento
+  `620 + 140·idx` (máx 4200) e densidade de perigos crescem com o número
+  do nível → "níveis mais longos que crescem com o número". Aditivo, não
+  toca na geometria feita à mão. `corredor = false` na cena desliga.
+
+### DÚVIDAS PARA O PAULO (responder quando voltar)
+1. **Corredor de aproximação**: aplicado a todos os níveis. Confirmar
+   comprimento/dificuldade (`comprimento_base`/`por_nivel`/`comprimento_max`
+   em `gerador_corredor.gd`) e se queres que ALGUNS níveis não o tenham.
+2. **Escalar paredes**: afinar `VEL_ESCALAR` / `WALLJUMP` no playtest.
+   Onde pôr secções que EXIJAM a habilidade (gating)?
+3. **Níveis-labirinto à mão**: o corredor procedural não é um labirinto a
+   sério com becos/alavancas encadeadas. Fazer isso é nível-a-nível à mão
+   — dizer se queres e por que regiões começar.
+4. **Alavanca**: é "toca para mudar" (sem botão de ação). OK?
+
+## O QUE FALTA (antigo):
 1. **Playtest fino.** Telégrafos/cadências/dano-por-ataque dos 30 chefes
    continuam por afinar em jogo. A curva de vida e o hardcore são um 1.º
    palpite coerente, não o número final.
