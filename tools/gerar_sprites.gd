@@ -73,6 +73,7 @@ func _initialize() -> void:
 	_boss_capitao()  # regiao VI / nivel 26
 	_boss_koliani_sombria() # regiao VI / nivel 27
 	_boss_devorador() # regiao VI / nivel 28
+	_boss_arauto()   # regiao VI / nivel 29
 	print("OK -- sprites pixel-art em ", DIR)
 	quit(0)
 
@@ -1714,4 +1715,75 @@ func _boss_devorador() -> void:
 			for p in 3:
 				_linha(int(cx) + 38 + p * 2, 40, int(cx) + 38 + p * 2, 32, 1, Color("9aa0b0"))
 		_linha(int(cx) - 22, 54, int(cx) - 36, 72, 6, MANTO_C)
+	)
+
+
+## Nivel 29 -- Torre do Coracao Negro. O Arauto de Zeriko, 3 formas numa
+## luta. Frame 0 = CAVALEIRO (armadura + espada); frame 1 = DEMONIO (cornos,
+## garras, farrapos) -- serve tambem a forma ENTIDADE; frame 2 = bracos ao
+## alto (telegrafo); frame 3 = nucleo magenta em brasa (exposto).
+func _boss_arauto() -> void:
+	var ACO := Color("2a2734")
+	var ACO_C := Color("454150")
+	var PELE := Color("3a1236")
+	var PELE_C := Color("6a2050")
+	var MAGENTA := Color("ff45ef")
+	var MAG_ESC := Color("b023cf")
+	var GUME := Color("d8c4ff")
+	_boss("arauto", 88, 116, func(f: int) -> void:
+		var cavaleiro := f == 0
+		var bracos := f == 2
+		var expo := f == 3
+		var cx := 44.0
+		# pernas
+		var perna: Color = ACO if cavaleiro else PELE
+		_rect(int(cx) - 13, 90, 11, 24, perna)
+		_rect(int(cx) + 2, 90, 11, 24, perna)
+		_rect(int(cx) - 15, 112, 14, 4, ACO_C if cavaleiro else PELE_C)
+		_rect(int(cx) + 1, 112, 14, 4, ACO_C if cavaleiro else PELE_C)
+		# tronco
+		_elipse(cx, 54, 18, 22, ACO if cavaleiro else PELE)
+		_elipse(cx, 52, 12, 16, ACO_C if cavaleiro else PELE_C)
+		if not cavaleiro:
+			# farrapos de armadura
+			for d in range(-14, 15, 7):
+				_px(int(cx) + d, 74, ACO)
+		# nucleo magenta no peito (sempre)
+		var g: float = [0.85, 1.0, 1.0, 1.6][f]
+		_elipse(cx, 52, 4.0 * g, 5.0 * g, MAGENTA if expo else MAG_ESC)
+		if expo:
+			_elipse(cx, 52, 1.8, 2.0, PAL["w"])
+			for a in 6:
+				var ang := TAU * float(a) / 6.0
+				_linha(int(cx), 52, int(cx + cos(ang) * 14.0), int(52 + sin(ang) * 14.0), 1, MAGENTA)
+		# cabeca
+		if cavaleiro:
+			_elipse(cx, 22, 10, 11, ACO)
+			_rect(int(cx) - 6, 22, 12, 2, Color("0a0a10"))
+			_linha(int(cx), 12, int(cx), 4, 2, MAGENTA)
+		else:
+			_elipse(cx, 22, 10, 11, PELE)
+			_linha(int(cx) - 8, 14, int(cx) - 14, 2, 3, PELE_C)  # cornos
+			_linha(int(cx) + 8, 14, int(cx) + 14, 2, 3, PELE_C)
+			_px(int(cx) - 3, 21, MAGENTA); _px(int(cx) + 3, 21, MAGENTA)
+		# bracos
+		if cavaleiro:
+			if bracos:
+				_linha(int(cx) + 12, 40, int(cx) + 24, 8, 5, ACO_C)
+			else:
+				_linha(int(cx) + 12, 40, int(cx) + 20, 26, 5, ACO_C)
+				_linha(int(cx) + 18, 30, int(cx) + 20, -8, 3, Color("c8ccdc"))
+				_linha(int(cx) + 20, 30, int(cx) + 22, -8, 1, GUME)
+			_linha(int(cx) - 12, 40, int(cx) - 22, 58, 5, ACO_C)
+		else:
+			var by := 8 if bracos else 30
+			_linha(int(cx) + 12, 40, int(cx) + 26, by, 5, PELE_C)
+			_linha(int(cx) - 12, 40, int(cx) - 26, by, 5, PELE_C)
+			for cl in range(3):
+				_linha(int(cx) + 26 + cl * 2, by, int(cx) + 30 + cl * 3, by - 8, 1, MAGENTA)
+				_linha(int(cx) - 26 - cl * 2, by, int(cx) - 30 - cl * 3, by - 8, 1, MAGENTA)
+		# forma entidade: aura por baixo (so no frame 3 fica obvio)
+		if expo and not cavaleiro:
+			for d in 6:
+				_px(int(cx) - 15 + d * 6, 100, MAGENTA)
 	)

@@ -186,6 +186,11 @@ const PISTAS := {
 		"titulo": "clue.banquete_o_lugar_vazio.title",
 		"texto": "clue.banquete_o_lugar_vazio.body",
 	},
+	"coracao_o_arauto": {
+		"mundo": "world.castle",
+		"titulo": "clue.coracao_o_arauto.title",
+		"texto": "clue.coracao_o_arauto.body",
+	},
 	"castelo_aurora_livre": {
 		"mundo": "world.castle",
 		"titulo": "clue.castelo_aurora_livre.title",
