@@ -52,6 +52,7 @@ func _initialize() -> void:
 	_boss_ghorak_anim()
 	_boss_morvanna()
 	_boss_rainha()
+	_boss_ignivar()  # regiao II / nivel 07
 	print("OK -- sprites pixel-art em ", DIR)
 	quit(0)
 
@@ -538,4 +539,60 @@ func _boss_rainha() -> void:
 		if f == 2:
 			_linha(cx - 4, 34, cx - 6, 40, 2, Color("d8c0d0"))
 			_linha(cx + 4, 34, cx + 6, 40, 2, Color("d8c0d0"))
+	)
+
+
+## Nivel 07 -- Fornalha dos Pecadores. Ignivar, o Ferreiro Maldito: massa
+## de escoria e ferro, avental de couro, um braco em martelo, nucleo de
+## forja aceso no peito. Frame 2 ergue o martelo (baque); frame 3 volta-se
+## e a forja das costas abre-se (exposto).
+func _boss_ignivar() -> void:
+	var FERRO := Color("2a2530")
+	var FERRO_C := Color("46414f")
+	var COURO := Color("3a2415")
+	var BRASA := Color("ff7a1e")
+	var BRASA_C := Color("ffd85a")
+	_boss("ignivar", 104, 116, func(f: int) -> void:
+		var martelo_cima := f == 2
+		# pernas / pes de ferro
+		_rect(36, 92, 12, 22, FERRO)
+		_rect(56, 92, 12, 22, FERRO)
+		_rect(32, 110, 18, 5, FERRO_C)
+		_rect(54, 110, 18, 5, FERRO_C)
+		# tronco (massa de escoria)
+		_elipse(52, 56, 26, 30, FERRO)
+		_elipse(52, 54, 20, 24, FERRO_C)
+		# avental de couro
+		for j in range(46, 92):
+			var t := float(j - 46) / 46.0
+			var meia := lerpf(10.0, 17.0, t)
+			_rect(int(52 - meia), j, int(meia * 2.0), 1, COURO)
+		# nucleo de forja no peito
+		var g: float = [1.0, 1.25, 1.1, 1.0][f]
+		_elipse(52, 52, 6.0 * g, 7.0 * g, BRASA)
+		_elipse(52, 52, 3.0, 3.5, BRASA_C)
+		_px(52, 51, PAL["w"])
+		# cabeca (elmo baixo, sem rosto, fenda acesa)
+		_elipse(52, 24, 11, 10, FERRO)
+		_rect(46, 24, 12, 2, BRASA)
+		# braco normal (esquerda)
+		_linha(30, 44, 22, 70, 7, FERRO)
+		_elipse(22, 72, 6, 6, FERRO_C)
+		# braco-martelo (direita) -- erguido no frame 2
+		if martelo_cima:
+			_linha(74, 44, 88, 14, 8, FERRO)
+			_rect(78, 2, 22, 16, FERRO_C)  # cabeca do martelo
+			_rect(80, 4, 8, 5, BRASA)
+		else:
+			_linha(74, 46, 86, 72, 8, FERRO)
+			_rect(80, 66, 20, 14, FERRO_C)
+			_px(88, 72, BRASA)
+		# frame 3: forja das costas a' vista + faíscas
+		if f == 3:
+			_elipse(52, 58, 9, 11, Color("120a08"))
+			_elipse(52, 58, 5, 6, BRASA)
+			_elipse(52, 58, 2.5, 3, BRASA_C)
+			_px(40, 44, BRASA_C)
+			_px(64, 48, BRASA)
+			_px(58, 40, BRASA_C)
 	)

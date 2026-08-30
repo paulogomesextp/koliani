@@ -1,0 +1,28 @@
+[gd_scene load_steps=2 format=3 uid="uid://bkolianiplatcorrente06"]
+
+; Plataforma pendurada por corrente (ver scripts/plataforma_corrente.gd).
+; Instanciar, pôr `modo` (pendulo/vertical/horizontal), `amplitude`,
+; `periodo`, `comprimento`, `largura`. A âncora fica `comprimento` px acima
+; da posição inicial. Mecânica partilhada da Região II.
+
+[ext_resource type="Script" path="res://scripts/plataforma_corrente.gd" id="1_pc"]
+
+[node name="PlataformaCorrente" type="AnimatableBody2D"]
+collision_layer = 1
+collision_mask = 0
+sync_to_physics = true
+script = ExtResource("1_pc")
+
+[node name="Corrente" type="Line2D" parent="."]
+points = PackedVector2Array(0, -150, 0, -8)
+width = 3.0
+default_color = Color(0.3, 0.31, 0.36, 1)
+begin_cap_mode = 2
+end_cap_mode = 2
+
+[node name="Visual" type="Polygon2D" parent="."]
+color = Color(0.32, 0.34, 0.4, 1)
+polygon = PackedVector2Array(-65, -9, 65, -9, 58, 14, -58, 14)
+
+[node name="Col" type="CollisionShape2D" parent="."]
+position = Vector2(0, 3)

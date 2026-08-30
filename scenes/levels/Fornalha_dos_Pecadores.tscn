@@ -1,0 +1,259 @@
+[gd_scene load_steps=17 format=3 uid="uid://bkolianifornalha07"]
+
+; Região II / nível 07 -- Fornalha dos Pecadores.
+; Fábrica infernal: poças de lava (AguaVenenosa recolorida, morte
+; instantânea) atravessadas por PlataformaCorrente (pêndulo / monta-cargas),
+; fogo e serra. Arena final com o chefe Ignivar, o Ferreiro Maldito -- na
+; fase 2 as poças do grupo "lava_fornalha" crescem ("derrete a arena").
+
+[ext_resource type="PackedScene" uid="uid://bkolianiactor01" path="res://scenes/actors/Koliani.tscn" id="1_kol"]
+[ext_resource type="PackedScene" uid="uid://bdemoniobase01" path="res://scenes/actors/DemonioBase.tscn" id="2_dem"]
+[ext_resource type="PackedScene" uid="uid://bkolianicoletavel01" path="res://scenes/actors/Coletavel.tscn" id="3_col"]
+[ext_resource type="PackedScene" uid="uid://bkolianiporta01" path="res://scenes/actors/Porta.tscn" id="4_porta"]
+[ext_resource type="Script" path="res://scripts/checkpoint.gd" id="5_chk"]
+[ext_resource type="PackedScene" uid="uid://bkolianichefeignivar07" path="res://scenes/actors/ChefeIgnivar.tscn" id="6_chefe"]
+[ext_resource type="Script" path="res://scripts/nivel_com_chefe.gd" id="7_niv"]
+[ext_resource type="PackedScene" uid="uid://bkolianiatmosfera01" path="res://scenes/fx/Atmosfera.tscn" id="8_atm"]
+[ext_resource type="PackedScene" uid="uid://bkolianiplataforma01" path="res://scenes/actors/Plataforma.tscn" id="9_pl"]
+[ext_resource type="PackedScene" uid="uid://bkolianiaguavenenosa01" path="res://scenes/actors/AguaVenenosa.tscn" id="10_lava"]
+[ext_resource type="PackedScene" uid="uid://bkolianiplatcorrente06" path="res://scenes/actors/PlataformaCorrente.tscn" id="11_pc"]
+[ext_resource type="PackedScene" uid="uid://bkolianifogo01" path="res://scenes/actors/Fogo.tscn" id="12_fogo"]
+[ext_resource type="PackedScene" uid="uid://bkolianiserra01" path="res://scenes/actors/Serra.tscn" id="13_serra"]
+
+[sub_resource type="RectangleShape2D" id="rs_chk"]
+size = Vector2(40, 80)
+
+[sub_resource type="Gradient" id="grad_luz"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="tex_luz"]
+gradient = SubResource("grad_luz")
+width = 256
+height = 256
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[node name="Fornalha_dos_Pecadores" type="Node2D"]
+script = ExtResource("7_niv")
+
+[node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
+cor_ambiente = Color(0.7, 0.5, 0.42, 1)
+cor_fundo = Color(0.08, 0.03, 0.02, 1)
+cor_silhueta = Color(0.14, 0.06, 0.04, 1)
+cor_luz = Color(1, 0.55, 0.25, 1)
+cor_poeira = Color(1, 0.7, 0.4, 1)
+densidade_poeira = 2.2
+bioma = "prisao"
+largura_nivel = 3400.0
+
+[node name="ChaoInicio" parent="." instance=ExtResource("9_pl")]
+position = Vector2(340, 660)
+tamanho = Vector2(620, 48)
+altura_visual = 92.0
+
+[node name="ChaoMeio" parent="." instance=ExtResource("9_pl")]
+position = Vector2(1520, 620)
+tamanho = Vector2(380, 44)
+altura_visual = 78.0
+
+[node name="ChaoArena" parent="." instance=ExtResource("9_pl")]
+position = Vector2(2900, 660)
+tamanho = Vector2(940, 48)
+altura_visual = 92.0
+
+[node name="Lava1" parent="." instance=ExtResource("10_lava")]
+position = Vector2(1160, 770)
+largura = 760.0
+altura = 240.0
+cor = Color(1, 0.42, 0.12, 0.92)
+
+[node name="Lava2" parent="." instance=ExtResource("10_lava")]
+position = Vector2(2280, 770)
+largura = 700.0
+altura = 240.0
+cor = Color(1, 0.42, 0.12, 0.92)
+
+[node name="LavaArenaE" parent="." instance=ExtResource("10_lava") groups=["lava_fornalha"]]
+position = Vector2(2520, 720)
+largura = 180.0
+altura = 150.0
+cor = Color(1, 0.46, 0.14, 0.92)
+
+[node name="LavaArenaD" parent="." instance=ExtResource("10_lava") groups=["lava_fornalha"]]
+position = Vector2(3320, 720)
+largura = 180.0
+altura = 150.0
+cor = Color(1, 0.46, 0.14, 0.92)
+
+[node name="Corrente1" parent="." instance=ExtResource("11_pc")]
+position = Vector2(900, 560)
+modo = "pendulo"
+amplitude = 30.0
+periodo = 2.8
+comprimento = 150.0
+largura = 120.0
+
+[node name="Corrente2" parent="." instance=ExtResource("11_pc")]
+position = Vector2(1160, 520)
+modo = "vertical"
+amplitude = 90.0
+periodo = 2.6
+comprimento = 170.0
+largura = 120.0
+
+[node name="Corrente3" parent="." instance=ExtResource("11_pc")]
+position = Vector2(1400, 560)
+modo = "pendulo"
+amplitude = 34.0
+periodo = 3.0
+fase = 1.2
+comprimento = 150.0
+largura = 120.0
+
+[node name="Corrente4" parent="." instance=ExtResource("11_pc")]
+position = Vector2(1820, 540)
+modo = "horizontal"
+amplitude = 130.0
+periodo = 3.4
+comprimento = 150.0
+largura = 130.0
+
+[node name="Corrente5" parent="." instance=ExtResource("11_pc")]
+position = Vector2(2120, 520)
+modo = "vertical"
+amplitude = 100.0
+periodo = 2.4
+fase = 0.8
+comprimento = 180.0
+largura = 120.0
+
+[node name="Corrente6" parent="." instance=ExtResource("11_pc")]
+position = Vector2(2420, 560)
+modo = "pendulo"
+amplitude = 32.0
+periodo = 2.8
+comprimento = 150.0
+largura = 130.0
+
+[node name="FogoA" parent="." instance=ExtResource("12_fogo")]
+position = Vector2(560, 636)
+
+[node name="FogoB" parent="." instance=ExtResource("12_fogo")]
+position = Vector2(1520, 596)
+fase = 1.0
+
+[node name="SerraForja" parent="." instance=ExtResource("13_serra")]
+position = Vector2(1160, 430)
+percurso = Vector2(220, 0)
+tempo = 1.8
+
+[node name="LuzForja1" type="PointLight2D" parent="."]
+position = Vector2(340, 610)
+texture = SubResource("tex_luz")
+energy = 0.6
+color = Color(1, 0.55, 0.25, 1)
+scale = Vector2(1.9, 1.1)
+
+[node name="LuzForja2" type="PointLight2D" parent="."]
+position = Vector2(1160, 640)
+texture = SubResource("tex_luz")
+energy = 0.7
+color = Color(1, 0.5, 0.2, 1)
+scale = Vector2(2.4, 1.3)
+
+[node name="LuzForja3" type="PointLight2D" parent="."]
+position = Vector2(2900, 600)
+texture = SubResource("tex_luz")
+energy = 0.7
+color = Color(1, 0.52, 0.22, 1)
+scale = Vector2(2.2, 1.3)
+
+[node name="Koliani" parent="." instance=ExtResource("1_kol")]
+position = Vector2(150, 560)
+
+[node name="Demonio1" parent="." instance=ExtResource("2_dem")]
+position = Vector2(500, 604)
+alcance_patrulha = 180.0
+
+[node name="Demonio2" parent="." instance=ExtResource("2_dem")]
+position = Vector2(1520, 564)
+alcance_patrulha = 130.0
+
+[node name="Demonio3" parent="." instance=ExtResource("2_dem")]
+position = Vector2(3050, 604)
+alcance_patrulha = 220.0
+
+[node name="Chefe" parent="." instance=ExtResource("6_chefe")]
+position = Vector2(2980, 588)
+
+[node name="ColMarca" parent="." instance=ExtResource("3_col")]
+position = Vector2(1820, 470)
+pista_id = "fornalha_marca_do_ferreiro"
+
+[node name="CheckInicio" type="Area2D" parent="."]
+position = Vector2(380, 588)
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("5_chk")
+
+[node name="Visual" type="ColorRect" parent="CheckInicio"]
+offset_left = -5.0
+offset_top = -42.0
+offset_right = 5.0
+offset_bottom = 40.0
+color = Color(0.36, 0.28, 0.55, 1)
+
+[node name="Luz" type="Node2D" parent="CheckInicio"]
+visible = false
+
+[node name="Brilho" type="ColorRect" parent="CheckInicio/Luz"]
+offset_left = -20.0
+offset_top = -54.0
+offset_right = 20.0
+offset_bottom = 44.0
+color = Color(0.85, 0.31, 0.83, 0.32)
+
+[node name="PointLight2D" type="PointLight2D" parent="CheckInicio/Luz"]
+texture = SubResource("tex_luz")
+energy = 1.1
+color = Color(0.93, 0.4, 0.9, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckInicio"]
+shape = SubResource("rs_chk")
+
+[node name="CheckArena" type="Area2D" parent="."]
+position = Vector2(2660, 588)
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("5_chk")
+
+[node name="Visual" type="ColorRect" parent="CheckArena"]
+offset_left = -5.0
+offset_top = -42.0
+offset_right = 5.0
+offset_bottom = 40.0
+color = Color(0.36, 0.28, 0.55, 1)
+
+[node name="Luz" type="Node2D" parent="CheckArena"]
+visible = false
+
+[node name="Brilho" type="ColorRect" parent="CheckArena/Luz"]
+offset_left = -20.0
+offset_top = -54.0
+offset_right = 20.0
+offset_bottom = 44.0
+color = Color(0.85, 0.31, 0.83, 0.32)
+
+[node name="PointLight2D" type="PointLight2D" parent="CheckArena/Luz"]
+texture = SubResource("tex_luz")
+energy = 1.1
+color = Color(0.93, 0.4, 0.9, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckArena"]
+shape = SubResource("rs_chk")
+
+[node name="Porta" parent="." instance=ExtResource("4_porta")]
+position = Vector2(3360, 586)
+pista_ao_atravessar = ""

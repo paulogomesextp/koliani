@@ -90,6 +90,31 @@ vem a seguir.
    rítmico ("batimento", nível 05).
 5. Depois: regiões II→VI, 1 chefe por nível, sempre a herdar de `ChefeBase`.
 
+## Região II -- Prisão dos Condenados (2026-08-30, em curso)
+
+- Mecânica partilhada **`PlataformaCorrente`** (`scripts/plataforma_corrente.gd`
+  + cena): `AnimatableBody2D` + `sync_to_physics`, pendurada por uma corrente
+  (Line2D da âncora à plataforma). `modo` = "pendulo" / "vertical" /
+  "horizontal", `amplitude`/`periodo`/`fase`/`comprimento`/`largura`. Grupo
+  "plataformas_correntes"; `travar(seg)` / `soltar()` (o Carcereiro há-de
+  usar).
+- **Nível 07 — Fornalha dos Pecadores** (`Fornalha_dos_Pecadores.tscn`):
+  poças de lava (`AguaVenenosa` recolorida a laranja, morte instantânea)
+  cruzadas por `PlataformaCorrente`, fogo + serra. Arena com o chefe
+  **Ignivar, o Ferreiro Maldito** (`chefe_ignivar.gd`): MARTELO (baque ->
+  onda rasteira), FORJA (lâmina em brasa na horizontal), BRASAS (reutiliza
+  `GotaAcida` a laranja: chove brasas). Ponto fraco = a forja das costas,
+  só EXPOSTO a seguir a cada ataque (dano x2, frame 3). Fase 2 < 50%:
+  "derrete a arena" -> as poças do grupo "lava_fornalha" crescem, telégrafos
+  curtos, mais brasas.
+- Pista nova `fornalha_marca_do_ferreiro` (diário + i18n × 6).
+- `EstadoJogo.NIVEIS` = 9; prisão `[5, 6]`. Chefe Ignivar em pixel-art
+  (`_boss_ignivar` em `gerar_sprites.gd`).
+- **A seguir (região II):** níveis 08 Corredor das Execuções / Dama da
+  Guilhotina, 09 Ala dos Mortos / Irmãos Condenados, 10 A Cela Zero /
+  Primeiro Prisioneiro. Falta pôr `PlataformaCorrente` no nível 06 (Prisão)
+  para o "correntes como plataformas móveis" do design.
+
 ## Arte -- chefes em pixel-art (2026-08-30)
 
 Os 5 chefes da região I passaram de SVG (`Sprite/Corpo` + `personagem.gdshader`)
