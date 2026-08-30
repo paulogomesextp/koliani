@@ -50,6 +50,13 @@ func _ready() -> void:
 		else:
 			EstadoJogo.reiniciar_campanha()
 
+	# voltar ao menu depois de uma sessão HARDCORE: a vista do menu
+	# (LOAD / NEW GAME) é a do modo normal -- volta ao save normal (o do
+	# hardcore fica no seu próprio ficheiro, intacto).
+	if EstadoJogo.hardcore:
+		EstadoJogo.hardcore = false
+		EstadoJogo.carregar()
+
 	if _tratar_atalhos_dev():
 		return
 
@@ -66,7 +73,44 @@ func _ready() -> void:
 
 	Textos.idioma_mudou.connect(func(_l: String) -> void: _traduzir())
 	_traduzir()
+	# caveira a seguir a "HARDCORE MODE" (a fonte do jogo não tem o glifo ☠,
+	# por isso é um ícone desenhado em código, alinhado à direita do texto)
+	_hardcore.icon = _tex_caveira()
+	_hardcore.icon_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	_hardcore.expand_icon = false
+	_hardcore.add_theme_constant_override("h_separation", 10)
 	(_load if EstadoJogo.ha_progresso() else _novo).grab_focus()
+
+
+## Caveira pixel-art minúscula (bone + 2 órbitas + nariz + dentes) para o
+## botão do modo hardcore.
+func _tex_caveira() -> ImageTexture:
+	var img := Image.create(18, 18, false, Image.FORMAT_RGBA8)
+	img.fill(Color(0, 0, 0, 0))
+	var osso := Color(0.94, 0.92, 0.84)
+	var buraco := Color(0.05, 0.02, 0.07)
+	# crânio
+	for y in range(1, 12):
+		for x in range(2, 16):
+			var canto := (y <= 1 and (x < 4 or x > 13)) \
+				or (x <= 2 and y > 9) or (x >= 15 and y > 9)
+			if not canto:
+				img.set_pixel(x, y, osso)
+	# maxilar + dentes
+	for y in range(12, 17):
+		for x in range(4, 14):
+			if y < 14 or x % 2 == 0:
+				img.set_pixel(x, y, osso)
+	# órbitas
+	for y in range(4, 8):
+		for x in range(4, 8):
+			img.set_pixel(x, y, buraco)
+		for x in range(10, 14):
+			img.set_pixel(x, y, buraco)
+	# nariz
+	for p in [Vector2i(9, 8), Vector2i(8, 10), Vector2i(9, 10), Vector2i(10, 10), Vector2i(9, 9)]:
+		img.set_pixel(p.x, p.y, buraco)
+	return ImageTexture.create_from_image(img)
 
 
 ## (Re)escreve todo o texto do menu no idioma atual.
@@ -159,11 +203,17 @@ func _ao_novo() -> void:
 	_comecar_campanha(false)
 
 
+## HARDCORE MODE: campanha com tempo limite por mundo, num SAVE PRÓPRIO
+## (`progresso_hardcore.json`) -- não toca no progresso do modo normal.
+## Se já houver uma campanha hardcore a meio, retoma-a; senão começa nova.
 func _ao_hardcore() -> void:
-	if _precisa_confirmar("hardcore"):
-		_armar("hardcore", _hardcore, Textos.t("menu.warn_hardcore"))
-		return
-	_comecar_campanha(true)
+	_repor_botoes()
+	EstadoJogo.hardcore = true
+	if FileAccess.file_exists(EstadoJogo.CAMINHO_SAVE_HARDCORE):
+		EstadoJogo.carregar()
+	else:
+		EstadoJogo.reiniciar_campanha()
+	_entrar_campanha()
 
 
 ## Há um save por cima e este botão ainda não foi confirmado?
