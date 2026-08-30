@@ -57,7 +57,7 @@ func _process(dt: float) -> void:
 		# pulsar constante do coração (bombeia mais forte quando exposto)
 		var amp := 0.05 if not _nucleo_exposto else 0.14
 		var p := 1.0 + amp * sin(_pulso * (PI * 2.0 / periodo_batida) * (2.0 if _nucleo_exposto else 1.0))
-		_sprite.scale = Vector2(p, p)
+		_sprite.scale = Vector2(_direcao * escala_visual * p, escala_visual * p)
 	if _nucleo and _nucleo_exposto:
 		var q := 1.0 + 0.18 * sin(_pulso * 12.0)
 		_nucleo.scale = Vector2(q, q)

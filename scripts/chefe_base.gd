@@ -10,6 +10,12 @@ extends DemonioBase
 ## chefes.
 
 signal derrotado
+
+## Escala visual do chefe (o `Sprite` inteiro, incluindo o `Nucleo`). Cada
+## `Chefe*.tscn` põe a sua -- dá variedade de tamanho entre chefes e faz
+## todos ficarem maiores que a Koliani. NÃO mexe na `AreaContacto`.
+@export var escala_visual := 1.3
+
 ## O combate começou a sério (1.ª vez que `provocar()` corre). O HUD usa
 ## para mostrar a barra de vida do chefe.
 signal combate_iniciado(chefe: ChefeBase)
@@ -52,6 +58,8 @@ func _ready() -> void:
 	# suave pelos 30 níveis: ~x1.0 no nível 1 -> ~x1.9 no nível 30). A
 	# vida-base é definida por cada chefe concreto no seu _ready.
 	dano_contacto = int(round(dano_contacto * (1.0 + 0.03 * float(clampi(EstadoJogo.indice_nivel, 0, 29)))))
+	if _sprite:
+		_sprite.scale = Vector2(_direcao * escala_visual, escala_visual)
 
 
 func _process(dt: float) -> void:
@@ -134,7 +142,7 @@ func _dir_para_koliani() -> float:
 func _encarar_koliani() -> void:
 	_direcao = _dir_para_koliani()
 	if _sprite:
-		_sprite.scale.x = _direcao
+		_sprite.scale = Vector2(_direcao * escala_visual, escala_visual)
 
 
 func _piscar(ligado: bool) -> void:

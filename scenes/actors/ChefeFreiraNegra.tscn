@@ -31,6 +31,7 @@ fill_to = Vector2(1, 0.5)
 collision_layer = 4
 collision_mask = 1
 script = ExtResource("1_chefe")
+escala_visual = 1.35
 vida = 610
 dano_contacto = 16
 alcance_patrulha = 0.0
