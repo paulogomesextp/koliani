@@ -48,9 +48,9 @@ hframes = 4
 [node name="LuzForja" type="PointLight2D" parent="Sprite"]
 position = Vector2(0, -6)
 texture = SubResource("tex_luz")
-energy = 0.7
-color = Color(1, 0.5, 0.18, 1)
-scale = Vector2(1.1, 1.1)
+energy = 0.42
+color = Color(1, 0.55, 0.25, 1)
+scale = Vector2(0.8, 0.8)
 
 [node name="Nucleo" type="Node2D" parent="Sprite"]
 position = Vector2(0, -8)

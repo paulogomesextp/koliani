@@ -12,6 +12,9 @@ extends Armadilha
 @export var altura := 120.0 : set = _set_altura
 ## Cor da superfície (a metade de cima é mais clara).
 @export var cor := Color(0.3, 0.62, 0.36, 0.9) : set = _set_cor
+## Variante "lava": brasas a subir + superfície mais quente/luminosa
+## (Fornalha dos Pecadores). Sem isto é a poça de veneno normal.
+@export var brasas := false
 
 var _forma: CollisionShape2D
 var _sup: Polygon2D
@@ -20,13 +23,41 @@ var _luz: PointLight2D
 var _t := 0.0
 
 
+var _brasas_no: CPUParticles2D
+
+
 func _pronto() -> void:
 	dano = 999  # >= vida máxima da Koliani -> _morrer()
 	_forma = $CollisionShape2D
 	_sup = $Superficie
 	_rim = get_node_or_null("Rebordo")
 	_luz = get_node_or_null("Luz")
+	if brasas:
+		_montar_brasas()
 	_reconstruir()
+
+
+## Brasas que sobem da lava (só na variante `brasas`).
+func _montar_brasas() -> void:
+	_brasas_no = CPUParticles2D.new()
+	_brasas_no.amount = 34
+	_brasas_no.lifetime = 2.6
+	_brasas_no.local_coords = false
+	_brasas_no.direction = Vector2(0, -1)
+	_brasas_no.spread = 18.0
+	_brasas_no.gravity = Vector2(0, -46)
+	_brasas_no.initial_velocity_min = 20.0
+	_brasas_no.initial_velocity_max = 70.0
+	_brasas_no.scale_amount_min = 1.5
+	_brasas_no.scale_amount_max = 3.5
+	_brasas_no.color = Color(1.0, 0.6, 0.2, 0.9)
+	var ramp := Gradient.new()
+	ramp.offsets = PackedFloat32Array([0.0, 0.5, 1.0])
+	ramp.colors = PackedColorArray([
+		Color(1.0, 0.85, 0.4, 0.0), Color(1.0, 0.55, 0.15, 0.9), Color(0.5, 0.1, 0.05, 0.0),
+	])
+	_brasas_no.color_ramp = ramp
+	add_child(_brasas_no)
 
 
 func _process(dt: float) -> void:
@@ -76,17 +107,26 @@ func _reconstruir() -> void:
 		Vector2(hw, hh), Vector2(-hw, hh),
 	])
 	_sup.color = cor
-	# gradiente simples: topo aceso (veneno luminoso), fundo mais escuro
-	_sup.vertex_colors = PackedColorArray([
-		cor.lightened(0.45), cor.lightened(0.45),
-		cor.darkened(0.25), cor.darkened(0.25),
-	])
+	# gradiente: topo aceso, fundo escuro. Na variante lava sobe-se menos o
+	# brilho (senão vira um bloco luminoso).
+	var topo := cor.lightened(0.28) if brasas else cor.lightened(0.45)
+	var fundo := cor.darkened(0.5) if brasas else cor.darkened(0.3)
+	_sup.vertex_colors = PackedColorArray([topo, topo, fundo, fundo])
 	# rebordo aceso na linha de água -- deixa o perigo bem visível no escuro
 	if _rim:
 		_rim.polygon = PackedVector2Array([
 			Vector2(-hw, -hh - 3.0), Vector2(hw, -hh - 3.0),
 			Vector2(hw, -hh + 5.0), Vector2(-hw, -hh + 5.0),
 		])
-		_rim.color = Color(cor.lightened(0.6).r, cor.lightened(0.6).g, cor.lightened(0.6).b, 0.9)
+		var rc := cor.lightened(0.4) if brasas else cor.lightened(0.6)
+		_rim.color = Color(rc.r, rc.g, rc.b, 0.55 if brasas else 0.9)
 	if _luz:
 		_luz.position = Vector2(0.0, -hh)
+		if brasas:
+			_luz.energy = 0.9
+			_luz.color = Color(1.0, 0.5, 0.18)
+			_luz.scale = Vector2(clampf(largura / 150.0, 1.6, 5.0), 1.8)
+	if _brasas_no:
+		_brasas_no.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
+		_brasas_no.emission_rect_extents = Vector2(hw, 6.0)
+		_brasas_no.position = Vector2(0.0, -hh)

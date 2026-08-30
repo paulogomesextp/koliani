@@ -230,12 +230,16 @@ func _entrar_fase2() -> void:
 	_abanar_camera(7.0)
 	dur_tel *= 0.72
 	dur_exposto *= 0.85
-	# derrete a arena: as poças de lava crescem
+	# "derrete a arena": a lava do grupo "lava_fornalha" SOBE até ao nível
+	# do chão e alarga -- fica perigosa mesmo por baixo dos pés.
 	for p in get_tree().get_nodes_in_group("lava_fornalha"):
-		if is_instance_valid(p) and "largura" in p:
-			p.largura = p.largura * 1.5
-			if "altura" in p:
-				p.altura = p.altura + 40.0
+		if not is_instance_valid(p):
+			continue
+		var tw := (p as Node).create_tween()
+		tw.tween_property(p, "position:y", (p as Node2D).position.y - 175.0, 1.4) \
+			.set_trans(Tween.TRANS_SINE)
+		if "largura" in p:
+			p.largura = p.largura * 1.35
 
 
 ## --- núcleo / dano -------------------------------------------------

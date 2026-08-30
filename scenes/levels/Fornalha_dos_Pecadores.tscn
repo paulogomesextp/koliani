@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3 uid="uid://bkolianifornalha07"]
+[gd_scene load_steps=18 format=3 uid="uid://bkolianifornalha07"]
 
 ; Região II / nível 07 -- Fornalha dos Pecadores.
 ; Fábrica infernal: poças de lava (AguaVenenosa recolorida, morte
@@ -19,6 +19,7 @@
 [ext_resource type="PackedScene" uid="uid://bkolianiplatcorrente06" path="res://scenes/actors/PlataformaCorrente.tscn" id="11_pc"]
 [ext_resource type="PackedScene" uid="uid://bkolianifogo01" path="res://scenes/actors/Fogo.tscn" id="12_fogo"]
 [ext_resource type="PackedScene" uid="uid://bkolianiserra01" path="res://scenes/actors/Serra.tscn" id="13_serra"]
+[ext_resource type="PackedScene" uid="uid://bkolianipassarela01" path="res://scenes/fx/Passarela.tscn" id="14_pass"]
 
 [sub_resource type="RectangleShape2D" id="rs_chk"]
 size = Vector2(40, 80)
@@ -47,6 +48,7 @@ cor_poeira = Color(1, 0.7, 0.4, 1)
 densidade_poeira = 2.2
 bioma = "prisao"
 largura_nivel = 3400.0
+luzes_horizonte = true
 
 [node name="ChaoInicio" parent="." instance=ExtResource("9_pl")]
 position = Vector2(340, 660)
@@ -63,29 +65,55 @@ position = Vector2(2900, 660)
 tamanho = Vector2(940, 48)
 altura_visual = 92.0
 
+[node name="PassarelaInicio" parent="." instance=ExtResource("14_pass")]
+position = Vector2(340, 676)
+vao = 640.0
+profundidade = 300.0
+
+[node name="PassarelaMeio" parent="." instance=ExtResource("14_pass")]
+position = Vector2(1520, 638)
+vao = 400.0
+profundidade = 340.0
+
+[node name="PassarelaArena" parent="." instance=ExtResource("14_pass")]
+position = Vector2(2900, 676)
+vao = 960.0
+profundidade = 300.0
+
+[node name="LavaLago" parent="." instance=ExtResource("10_lava")]
+position = Vector2(1700, 1160)
+largura = 5600.0
+altura = 420.0
+cor = Color(0.9, 0.36, 0.1, 0.95)
+brasas = true
+
 [node name="Lava1" parent="." instance=ExtResource("10_lava")]
 position = Vector2(1160, 770)
 largura = 760.0
 altura = 240.0
 cor = Color(1, 0.42, 0.12, 0.92)
+brasas = true
 
 [node name="Lava2" parent="." instance=ExtResource("10_lava")]
 position = Vector2(2280, 770)
 largura = 700.0
 altura = 240.0
 cor = Color(1, 0.42, 0.12, 0.92)
+brasas = true
 
 [node name="LavaArenaE" parent="." instance=ExtResource("10_lava") groups=["lava_fornalha"]]
-position = Vector2(2520, 720)
-largura = 180.0
+position = Vector2(2560, 858)
+largura = 260.0
 altura = 150.0
-cor = Color(1, 0.46, 0.14, 0.92)
+cor = Color(0.95, 0.4, 0.12, 0.92)
+brasas = true
 
 [node name="LavaArenaD" parent="." instance=ExtResource("10_lava") groups=["lava_fornalha"]]
-position = Vector2(3320, 720)
-largura = 180.0
+position = Vector2(3320, 858)
+largura = 260.0
 altura = 150.0
-cor = Color(1, 0.46, 0.14, 0.92)
+cor = Color(0.95, 0.4, 0.12, 0.92)
+brasas = true
 
 [node name="Corrente1" parent="." instance=ExtResource("11_pc")]
 position = Vector2(900, 560)

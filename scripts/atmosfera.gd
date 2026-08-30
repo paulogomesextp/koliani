@@ -24,6 +24,9 @@ extends Node2D
 ## Até onde gerar cenário de fundo (o nível mais largo anda pelos ~3400).
 @export var largura_nivel := 3400.0
 @export var seed_ambiente := 0
+## Faixa de brilho quente no horizonte + pontos de luz a tremeluzir nas
+## ruínas (tochas ao longe). Ligar em biomas com fogo/lava (Fornalha).
+@export var luzes_horizonte := false
 
 const CHAO := 900.0  # base das silhuetas, bem abaixo do chão jogável
 
@@ -97,6 +100,9 @@ func _gerar_parallax() -> void:
 
 	_faixa_rasteira(rng)
 
+	if luzes_horizonte:
+		_brilho_horizonte(rng)
+
 
 ## Substitui o "slab" liso do fundo por um degradé vertical (horizonte com
 ## um toque da cor de luz do bioma em cima, quase preto em baixo).
@@ -143,6 +149,50 @@ func _faixa_rasteira(rng: RandomNumberGenerator) -> void:
 		p.position = Vector2(x, 0.0)
 		layer.add_child(p)
 		x += rng.randf_range(60.0, 150.0)
+
+
+## Faixa de brilho quente colada ao horizonte + tochas distantes a
+## tremeluzir entre as ruínas. Aditivo (Polygon2D + Light2D leves).
+func _brilho_horizonte(rng: RandomNumberGenerator) -> void:
+	var longe := get_node_or_null("Parallax/Longe") as Node2D
+	var meio := get_node_or_null("Parallax/Meio") as Node2D
+	if longe == null:
+		return
+	# banda de calor ao longo da linha do horizonte
+	var banda := Polygon2D.new()
+	banda.name = "BrilhoHorizonte"
+	var y := CHAO - 40.0
+	banda.polygon = PackedVector2Array([
+		Vector2(-1400.0, y - 220.0), Vector2(largura_nivel + 900.0, y - 220.0),
+		Vector2(largura_nivel + 900.0, y + 40.0), Vector2(-1400.0, y + 40.0),
+	])
+	var quente := Color(cor_luz.r, cor_luz.g * 0.7, cor_luz.b * 0.4, 1.0)
+	banda.vertex_colors = PackedColorArray([
+		Color(quente.r, quente.g, quente.b, 0.0), Color(quente.r, quente.g, quente.b, 0.0),
+		Color(quente.r, quente.g, quente.b, 0.5), Color(quente.r, quente.g, quente.b, 0.5),
+	])
+	longe.add_child(banda)
+	longe.move_child(banda, 1)
+	# tochas distantes (pontos aditivos que tremeluzem)
+	var alvo := meio if meio else longe
+	var x := -400.0
+	while x < largura_nivel + 300.0:
+		var ty := CHAO - rng.randf_range(120.0, 380.0)
+		var ponto := Polygon2D.new()
+		var r := rng.randf_range(5.0, 11.0)
+		var circ := PackedVector2Array()
+		for i in 10:
+			var a := TAU * float(i) / 10.0
+			circ.append(Vector2(cos(a) * r, sin(a) * r))
+		ponto.polygon = circ
+		ponto.color = Color(1.0, 0.62, 0.28, rng.randf_range(0.5, 0.85))
+		ponto.position = Vector2(x + rng.randf_range(-60.0, 60.0), ty)
+		alvo.add_child(ponto)
+		var tw := ponto.create_tween().set_loops()
+		var base_a := ponto.color.a
+		tw.tween_property(ponto, "modulate:a", 0.35, rng.randf_range(0.5, 1.1))
+		tw.tween_property(ponto, "modulate:a", 1.0, rng.randf_range(0.5, 1.1))
+		x += rng.randf_range(260.0, 520.0)
 
 
 ## --- kits de silhueta por bioma --------------------------------------

@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=3 uid="uid://bkolianipassarela01"]
+
+; Estrutura de passarela de madeira/ferro sob um vão de plataformas (ver
+; scripts/passarela.gd). Decorativa -- sem colisão. Pôr `vao`, `passo_poste`,
+; `profundidade` e as cores; z_index negativo para ficar por trás.
+
+[ext_resource type="Script" path="res://scripts/passarela.gd" id="1_pass"]
+
+[node name="Passarela" type="Node2D"]
+z_index = -1
+script = ExtResource("1_pass")
