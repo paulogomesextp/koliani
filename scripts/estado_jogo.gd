@@ -10,6 +10,11 @@ extends Node
 
 const CAMINHO_SAVE := "user://progresso.json"
 
+## Tabela do equipamento. `preload` por caminho (e não o nome global
+## `Equipamento`) porque este autoload é o 1.º a arrancar -- não pode
+## depender do registo de classes globais ainda estar pronto.
+const _EQUIP := preload("res://scripts/equipamento.gd")
+
 const VIDAS_INICIAIS := 3
 
 ## Todas as habilidades da campanha (o modo dev desbloqueia-as de uma vez).
@@ -84,6 +89,13 @@ const REGIOES := [
 signal vidas_mudaram(vidas: int)
 signal pista_encontrada(id: String, total: int)
 signal habilidade_desbloqueada(id: String)
+## Ganhou-se um equipamento ao acabar um nível (`tipo` = "arma"|"armadura").
+signal equipamento_ganho(tipo: String, id: String)
+## Trocou-se a arma ou a armadura equipada.
+signal equipamento_mudou(tipo: String, id: String)
+
+## Dano do ataque corpo-a-corpo sem arma equipada (punhos/lâmina base).
+const DANO_BASE := 25
 
 var vidas: int = VIDAS_INICIAIS
 var indice_nivel: int = 0
@@ -92,6 +104,12 @@ var indice_nivel: int = 0
 var checkpoint: Vector2 = Vector2.ZERO
 var habilidades: Array[String] = []
 var pistas: Array[String] = []
+## Equipamento ganho ao longo da campanha (ids de `Equipamento.ARMAS` /
+## `.ARMADURAS`). `*_equipada` = o que está a ser usado ("" = nada).
+var armas: Array[String] = []
+var armaduras: Array[String] = []
+var arma_equipada: String = ""
+var armadura_equipada: String = ""
 ## Indices de `NIVEIS` ja concluidos (Porta atravessada). Sobrevive ao save;
 ## `reiniciar_campanha()` limpa. E' o que o mapa de regioes usa para marcar
 ## niveis/regioes como feitos.
@@ -152,7 +170,91 @@ func marcar_nivel_concluido(indice: int) -> void:
 		return
 	concluidos.append(indice)
 	concluidos.sort()
+	conceder_recompensa(indice)
 	guardar()
+
+
+## --- Equipamento (armas / armaduras) -------------------------------------
+
+## Dá o equipamento por acabar o nível `indice` (0-based). Equipa-o já se o
+## slot estiver vazio ou se for melhor que o atual. Idempotente por id.
+func conceder_recompensa(indice: int) -> void:
+	var r: Dictionary = _EQUIP.recompensa_do_nivel(indice)
+	if r.is_empty():
+		return
+	var id: String = r["id"]
+	if r["tipo"] == "arma":
+		if id in armas:
+			return
+		armas.append(id)
+		var atual: Dictionary = _EQUIP.arma(arma_equipada)
+		var nova: Dictionary = _EQUIP.arma(id)
+		if arma_equipada == "" or int(nova.get("dano", 0)) >= int(atual.get("dano", 0)):
+			arma_equipada = id
+			equipamento_mudou.emit("arma", id)
+	else:
+		if id in armaduras:
+			return
+		armaduras.append(id)
+		var atual2: Dictionary = _EQUIP.armadura(armadura_equipada)
+		var nova2: Dictionary = _EQUIP.armadura(id)
+		if armadura_equipada == "" or int(nova2.get("vida_bonus", 0)) >= int(atual2.get("vida_bonus", 0)):
+			armadura_equipada = id
+			equipamento_mudou.emit("armadura", id)
+	equipamento_ganho.emit(r["tipo"], id)
+	guardar()
+
+
+func tem_arma(id: String) -> bool:
+	return id in armas
+
+
+func tem_armadura(id: String) -> bool:
+	return id in armaduras
+
+
+func equipar_arma(id: String) -> void:
+	if id in armas and id != arma_equipada:
+		arma_equipada = id
+		equipamento_mudou.emit("arma", id)
+		guardar()
+
+
+func equipar_armadura(id: String) -> void:
+	if id in armaduras and id != armadura_equipada:
+		armadura_equipada = id
+		equipamento_mudou.emit("armadura", id)
+		guardar()
+
+
+## Arma seguinte / anterior na lista das que já se têm (troca em jogo).
+func ciclar_arma(passo: int) -> void:
+	if armas.size() < 2:
+		return
+	var ordem: Array[String] = []
+	for a in _EQUIP.ARMAS:
+		if a["id"] in armas:
+			ordem.append(a["id"])
+	var i := ordem.find(arma_equipada)
+	if i < 0:
+		i = 0
+	equipar_arma(ordem[(i + passo + ordem.size()) % ordem.size()])
+
+
+## Dano do ataque corpo-a-corpo (arma equipada ou base).
+func dano_ataque() -> int:
+	var a: Dictionary = _EQUIP.arma(arma_equipada)
+	return int(a.get("dano", DANO_BASE)) if not a.is_empty() else DANO_BASE
+
+
+## Vida máxima extra dada pela armadura equipada.
+func vida_bonus_armadura() -> int:
+	return int(_EQUIP.armadura(armadura_equipada).get("vida_bonus", 0))
+
+
+## Fração (0..1) de dano recebido que a armadura equipada corta.
+func reducao_armadura() -> float:
+	return float(_EQUIP.armadura(armadura_equipada).get("reducao", 0.0))
 
 
 func nivel_esta_concluido(indice: int) -> bool:
@@ -258,6 +360,10 @@ func reiniciar_campanha() -> void:
 	habilidades.clear()
 	pistas.clear()
 	concluidos.clear()
+	armas.clear()
+	armaduras.clear()
+	arma_equipada = ""
+	armadura_equipada = ""
 	hardcore_tempo_restante = -1.0  # NB: `hardcore` (o modo) fica como está
 	vidas_mudaram.emit(vidas)
 	guardar()
@@ -302,6 +408,10 @@ func para_dicionario() -> Dictionary:
 		"habilidades": habilidades,
 		"pistas": pistas,
 		"concluidos": concluidos,
+		"armas": armas,
+		"armaduras": armaduras,
+		"arma_equipada": arma_equipada,
+		"armadura_equipada": armadura_equipada,
 		"hardcore": hardcore,
 		"hardcore_tempo_restante": hardcore_tempo_restante,
 	}
@@ -314,6 +424,10 @@ func de_dicionario(d: Dictionary) -> void:
 	checkpoint = Vector2(c[0], c[1]) if c.size() == 2 else Vector2.ZERO
 	habilidades.assign(d.get("habilidades", []))
 	pistas.assign(d.get("pistas", []))
+	armas.assign(d.get("armas", []))
+	armaduras.assign(d.get("armaduras", []))
+	arma_equipada = str(d.get("arma_equipada", ""))
+	armadura_equipada = str(d.get("armadura_equipada", ""))
 	# JSON traz os índices como float -> converter para int
 	var cs: Array = d.get("concluidos", [])
 	concluidos.clear()

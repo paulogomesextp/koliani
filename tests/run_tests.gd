@@ -37,6 +37,8 @@ func _correr_tudo() -> void:
 	teste_i18n_en_tem_as_chaves_das_pistas()
 	teste_i18n_ficheiros_validos()
 	teste_catalogo_campanha()
+	teste_equipamento_dados()
+	teste_equipamento_estado()
 	teste_estado_tres_mortes_sem_vidas()
 	teste_estado_pistas_sem_duplicados()
 	teste_estado_habilidade_sem_duplicados()
@@ -249,6 +251,85 @@ func teste_catalogo_campanha() -> void:
 		_ok(en.has(lk), "en.json sem o nome do nível '%s'" % lk)
 	for k in ["sel.play", "sel.back", "sel.locked", "sel.cleared", "sel.boss", "sel.count", "sel.hint"]:
 		_ok(en.has(k), "en.json sem a chave do carrossel '%s'" % k)
+
+
+## Equipamento: 15 armas + 15 armaduras; os níveis de desbloqueio alternam
+## (arma nos ímpares, armadura nos pares); `recompensa_do_nivel` mapeia o
+## índice do nível para o item certo; e o en.json tem os nomes todos.
+func teste_equipamento_dados() -> void:
+	_ok(Equipamento.ARMAS.size() == 15, "deviam ser 15 armas")
+	_ok(Equipamento.ARMADURAS.size() == 15, "deviam ser 15 armaduras")
+	for i in Equipamento.ARMAS.size():
+		_ok(int(Equipamento.ARMAS[i]["nivel"]) == 2 * i + 1,
+			"a arma %d devia desbloquear no nível %d" % [i, 2 * i + 1])
+		_ok(int(Equipamento.ARMADURAS[i]["nivel"]) == 2 * i + 2,
+			"a armadura %d devia desbloquear no nível %d" % [i, 2 * i + 2])
+		# dano das armas sobe; vida_bonus das armaduras sobe
+		if i > 0:
+			_ok(int(Equipamento.ARMAS[i]["dano"]) >= int(Equipamento.ARMAS[i - 1]["dano"]),
+				"o dano das armas devia ser não-decrescente")
+			_ok(int(Equipamento.ARMADURAS[i]["vida_bonus"]) >= int(Equipamento.ARMADURAS[i - 1]["vida_bonus"]),
+				"o vida_bonus das armaduras devia ser não-decrescente")
+
+	var r0 := Equipamento.recompensa_do_nivel(0)
+	_ok(r0.get("tipo") == "arma" and r0.get("id") == Equipamento.ARMAS[0]["id"],
+		"acabar o nível 1 (idx 0) dá a 1.ª arma")
+	var r1 := Equipamento.recompensa_do_nivel(1)
+	_ok(r1.get("tipo") == "armadura" and r1.get("id") == Equipamento.ARMADURAS[0]["id"],
+		"acabar o nível 2 (idx 1) dá a 1.ª armadura")
+	var r28 := Equipamento.recompensa_do_nivel(28)
+	_ok(r28.get("tipo") == "arma" and r28.get("id") == Equipamento.ARMAS[14]["id"],
+		"acabar o nível 29 (idx 28) dá a 15.ª arma")
+	var r29 := Equipamento.recompensa_do_nivel(29)
+	_ok(r29.get("tipo") == "armadura" and r29.get("id") == Equipamento.ARMADURAS[14]["id"],
+		"acabar o nível 30 (idx 29) dá a 15.ª armadura")
+	_ok(Equipamento.recompensa_do_nivel(99).is_empty(), "índice fora de alcance não dá nada")
+
+	var f := FileAccess.open("res://assets/i18n/en.json", FileAccess.READ)
+	if f == null:
+		_ok(false, "en.json devia existir")
+		return
+	var en: Variant = JSON.parse_string(f.get_as_text())
+	f.close()
+	for a in Equipamento.ARMAS:
+		_ok(en.has(a["nome"]), "en.json sem o nome da arma '%s'" % a["nome"])
+	for a in Equipamento.ARMADURAS:
+		_ok(en.has(a["nome"]), "en.json sem o nome da armadura '%s'" % a["nome"])
+	for k in ["gear.menu.weapons", "gear.menu.armor", "gear.locked", "gear.equip", "gear.equipped"]:
+		_ok(en.has(k), "en.json sem a chave de menu '%s'" % k)
+
+
+## EstadoJogo: acabar um nível concede o equipamento e equipa-o; os helpers
+## de stat refletem o equipado; `reiniciar_campanha` limpa; o save
+## sobrevive ao ida-e-volta.
+func teste_equipamento_estado() -> void:
+	var e := _novo_estado()
+	_ok(e.armas.is_empty() and e.armaduras.is_empty(), "arranque limpo: sem equipamento")
+	_ok(e.dano_ataque() == e.DANO_BASE, "sem arma -> dano base")
+	_ok(e.vida_bonus_armadura() == 0 and is_equal_approx(e.reducao_armadura(), 0.0),
+		"sem armadura -> sem bónus")
+
+	e.marcar_nivel_concluido(0)  # nível 1 -> 1.ª arma, equipada
+	_ok(e.armas.size() == 1, "acabar o nível 1 dá 1 arma")
+	_ok(e.arma_equipada == Equipamento.ARMAS[0]["id"], "a arma nova é equipada logo")
+	_ok(e.dano_ataque() == int(Equipamento.ARMAS[0]["dano"]), "dano_ataque segue a arma equipada")
+
+	e.marcar_nivel_concluido(1)  # nível 2 -> 1.ª armadura
+	_ok(e.armaduras.size() == 1, "acabar o nível 2 dá 1 armadura")
+	_ok(e.armadura_equipada == Equipamento.ARMADURAS[0]["id"], "armadura nova equipada")
+
+	e.marcar_nivel_concluido(0)  # repetir não duplica
+	_ok(e.armas.size() == 1, "reconcluir o nível não duplica o prémio")
+
+	var copia := _novo_estado()
+	copia.de_dicionario(e.para_dicionario())
+	_ok(copia.armas == e.armas and copia.armaduras == e.armaduras, "equipamento sobrevive ao save")
+	_ok(copia.arma_equipada == e.arma_equipada, "arma equipada sobrevive ao save")
+
+	e.reiniciar_campanha()
+	_ok(e.armas.is_empty() and e.arma_equipada == "", "reiniciar_campanha limpa o equipamento")
+	e.free()
+	copia.free()
 
 
 ## Todos os idiomas existem, são JSON válido e têm exatamente o mesmo

@@ -13,7 +13,18 @@ signal energia_mudou(atual: float, maximo: float)
 signal magia_lancada
 
 const VIDA_MAXIMA := 100
+## Dano corpo-a-corpo SEM arma equipada (ver EstadoJogo.dano_ataque()).
 const DANO_ATAQUE := 25
+
+
+## Vida máxima efetiva = base + bónus da armadura equipada.
+func _vida_max() -> int:
+	return VIDA_MAXIMA + EstadoJogo.vida_bonus_armadura()
+
+
+## Dano do golpe = arma equipada, ou a base se não houver arma.
+func _dano_golpe() -> int:
+	return EstadoJogo.dano_ataque()
 const VEL_DASH := 620.0
 const DUR_DASH := 0.16
 const RECARGA_DASH := 0.55
@@ -99,7 +110,8 @@ func _ready() -> void:
 		_hitbox.body_entered.connect(_ao_acertar_corpo)
 	if _corpo:
 		_mat = _corpo.material as ShaderMaterial
-	vida_mudou.emit(vida, VIDA_MAXIMA)
+	vida = _vida_max()  # nível novo começa cheio (inclui bónus de armadura)
+	vida_mudou.emit(vida, _vida_max())
 	energia_mudou.emit(_energia, ENERGIA_MAX)
 
 
@@ -357,7 +369,7 @@ func _lancar_projetil() -> void:
 	var p := PROJETIL_MAGICO.instantiate()
 	get_parent().add_child(p)
 	p.global_position = global_position + aim * 20.0 + Vector2(0.0, -4.0)
-	p.lancar(aim, DANO_ATAQUE)
+	p.lancar(aim, _dano_golpe())
 	Som.toca("projetil", -12.0, 1.25)
 	magia_lancada.emit()
 	if _faiscas:
@@ -367,7 +379,7 @@ func _lancar_projetil() -> void:
 
 func _ao_acertar_corpo(corpo: Node) -> void:
 	if corpo.has_method("receber_dano"):
-		corpo.receber_dano(DANO_ATAQUE, sign(_olha_para))
+		corpo.receber_dano(_dano_golpe(), sign(_olha_para))
 		if _faiscas:
 			_faiscas.position.x = absf(_faiscas.position.x) * _olha_para
 			_faiscas.restart()
@@ -457,9 +469,10 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0) -> void:
 	if _defendendo and _bloqueia(dir_empurrao):
 		_ao_bloquear()
 		return
-	vida = maxi(0, vida - quantidade)
+	var real := int(round(quantidade * (1.0 - EstadoJogo.reducao_armadura())))
+	vida = maxi(0, vida - maxi(1, real))
 	_invulneravel = I_FRAMES
-	vida_mudou.emit(vida, VIDA_MAXIMA)
+	vida_mudou.emit(vida, _vida_max())
 	_flash_branco()
 	_abanar(8.0)
 	_hitstop(0.07)
