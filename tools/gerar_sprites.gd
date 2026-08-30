@@ -74,6 +74,7 @@ func _initialize() -> void:
 	_boss_koliani_sombria() # regiao VI / nivel 27
 	_boss_devorador() # regiao VI / nivel 28
 	_boss_arauto()   # regiao VI / nivel 29
+	_boss_zeriko()   # nivel 30 -- final
 	print("OK -- sprites pixel-art em ", DIR)
 	quit(0)
 
@@ -1786,4 +1787,79 @@ func _boss_arauto() -> void:
 		if expo and not cavaleiro:
 			for d in 6:
 				_px(int(cx) - 15 + d * 6, 100, MAGENTA)
+	)
+
+
+## Nivel 30 -- O TRONO DE ZERIKO. ZERIKO, o chefe final, 4 formas. Frame 0 =
+## O MAGO / O REI (manto, coroa, cajado); frame 1 = A COISA DO ABISMO
+## (massa de sombra, um olho grande, tentaculos) -- serve tambem O QUE
+## RESTA; frame 2 = bracos abertos, magia a juntar (telegrafo); frame 3 =
+## nucleo magenta em brasa, forma desfeita em cacos (exposto).
+func _boss_zeriko() -> void:
+	var MANTO := Color("140a1e")
+	var MANTO_C := Color("2a1440")
+	var SOMBRA := Color("0c0714")
+	var OURO := Color("d9b64a")
+	var MAGENTA := Color("ff45ef")
+	var MAG_ESC := Color("b023cf")
+	var OLHO := Color("ffe0ff")
+	_boss("zeriko", 96, 120, func(f: int) -> void:
+		var mago := f == 0
+		var bracos := f == 2
+		var expo := f == 3
+		var cx := 48.0
+		if mago:
+			# manto comprido em trono
+			for j in range(30, 112):
+				var t := float(j - 30) / 82.0
+				var meia := lerpf(10.0, 30.0, pow(t, 0.85))
+				_rect(int(cx - meia), j, int(meia * 2.0), 1, MANTO if j % 4 else MANTO_C)
+			# galao dourado
+			for j in range(38, 104):
+				_px(int(cx), j, OURO)
+			# nucleo no peito
+			var g0: float = 1.0 if not expo else 1.6
+			_elipse(cx, 50, 5.0 * g0, 6.0 * g0, MAGENTA if expo else MAG_ESC)
+			# cabeca + coroa
+			_elipse(cx, 22, 8, 9, Color("2a2028"))
+			_px(int(cx) - 3, 21, MAGENTA); _px(int(cx) + 3, 21, MAGENTA)
+			for k in 5:
+				_linha(int(cx) - 8 + k * 4, 12, int(cx) - 8 + k * 4, 6, 1, OURO)
+			_rect(int(cx) - 9, 12, 18, 2, OURO)
+			# bracos + cajado
+			if bracos:
+				_linha(int(cx) - 8, 34, int(cx) - 20, 8, 4, MANTO_C)
+				_linha(int(cx) + 8, 34, int(cx) + 20, 8, 4, MANTO_C)
+				_elipse(cx - 20, 6, 3, 3, MAGENTA)
+				_elipse(cx + 20, 6, 3, 3, MAGENTA)
+			else:
+				_linha(int(cx) + 8, 34, int(cx) + 18, 58, 4, MANTO_C)
+				_linha(int(cx) + 16, 12, int(cx) + 16, 74, 2, Color("3a2c1e"))
+				_elipse(cx + 16, 10, 5, 5, MAGENTA)
+				_elipse(cx + 16, 10, 2, 2, OLHO)
+				_linha(int(cx) - 8, 34, int(cx) - 16, 56, 4, MANTO_C)
+		else:
+			# A COISA DO ABISMO: massa de sombra com tentaculos e um olho
+			_elipse(cx, 60, 30, 34, SOMBRA)
+			for a in 8:
+				var ang := TAU * float(a) / 8.0
+				_linha(int(cx), 60, int(cx + cos(ang) * 42.0), int(60 + sin(ang) * 42.0), 3, MANTO_C)
+			# olho grande
+			var er := 12.0 if not expo else 7.0
+			_elipse(cx, 52, 16, 13, OLHO)
+			_elipse(cx, 52, er, er, MAG_ESC)
+			_elipse(cx, 52, er * 0.5, er * 0.5, MAGENTA)
+			_elipse(cx, 52, 2.0, 2.0, SOMBRA)
+			_px(int(cx) - 3, 49, PAL["w"])
+			# nucleo (fica na "boca" por baixo do olho)
+			var g1: float = 1.0 if not expo else 1.6
+			_elipse(cx, 74, 4.0 * g1, 5.0 * g1, MAGENTA if expo else MAG_ESC)
+			if expo:
+				for a2 in 6:
+					var an := TAU * float(a2) / 6.0
+					_linha(int(cx), 74, int(cx + cos(an) * 16.0), int(74 + sin(an) * 16.0), 1, MAGENTA)
+			if bracos:
+				for a3 in 4:
+					var an3 := PI * (0.2 + 0.2 * a3)
+					_linha(int(cx), 40, int(cx + cos(an3) * 30.0), int(40 - sin(an3) * 20.0), 2, MAGENTA)
 	)

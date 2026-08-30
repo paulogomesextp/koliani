@@ -53,7 +53,7 @@ const NIVEIS := [
 	"res://scenes/levels/Salao_dos_Espelhos.tscn",
 	"res://scenes/levels/Banquete_dos_Imortais.tscn",
 	"res://scenes/levels/Torre_do_Coracao_Negro.tscn",
-	"res://scenes/levels/Castelo_de_Zeriko.tscn",
+	"res://scenes/levels/O_Trono_de_Zeriko.tscn",
 ]
 # "res://scenes/levels/Level_Test.tscn" fica no repo como sala de treino,
 # fora da campanha (correr a cena diretamente no editor).

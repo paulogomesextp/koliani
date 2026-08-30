@@ -1,0 +1,187 @@
+[gd_scene load_steps=14 format=3 uid="uid://bkolianiotrono30"]
+
+; Nível 30 -- O TRONO DE ZERIKO (fim da campanha).
+; A realidade desmorona: a sala do trono mistura elementos dos 29 níveis
+; -- correntes (PlataformaCorrente), plataformas que pulsam
+; (PlataformaRitmada), ossos, e magia púrpura por todo o lado. Arena
+; enorme com ZERIKO -- o chefe final, 4 formas
+; (Mago -> Rei -> Coisa do Abismo -> O que resta).
+
+[ext_resource type="PackedScene" uid="uid://bkolianiactor01" path="res://scenes/actors/Koliani.tscn" id="1_kol"]
+[ext_resource type="PackedScene" uid="uid://bdemoniobase01" path="res://scenes/actors/DemonioBase.tscn" id="2_dem"]
+[ext_resource type="PackedScene" uid="uid://bkolianicoletavel01" path="res://scenes/actors/Coletavel.tscn" id="3_col"]
+[ext_resource type="PackedScene" uid="uid://bkolianiporta01" path="res://scenes/actors/Porta.tscn" id="4_porta"]
+[ext_resource type="Script" path="res://scripts/checkpoint.gd" id="5_chk"]
+[ext_resource type="PackedScene" uid="uid://bkolianichefezerikofinal30" path="res://scenes/actors/ChefeZerikoFinal.tscn" id="6_chefe"]
+[ext_resource type="Script" path="res://scripts/nivel_com_chefe.gd" id="7_niv"]
+[ext_resource type="PackedScene" uid="uid://bkolianiatmosfera01" path="res://scenes/fx/Atmosfera.tscn" id="8_atm"]
+[ext_resource type="PackedScene" uid="uid://bkolianiplataforma01" path="res://scenes/actors/Plataforma.tscn" id="9_pl"]
+[ext_resource type="PackedScene" uid="uid://bkolianiplatcorrente06" path="res://scenes/actors/PlataformaCorrente.tscn" id="10_pc"]
+[ext_resource type="PackedScene" uid="uid://bkolianiplatritmada05" path="res://scenes/actors/PlataformaRitmada.tscn" id="11_plr"]
+
+[sub_resource type="RectangleShape2D" id="rs_chk"]
+size = Vector2(40, 80)
+
+[sub_resource type="Gradient" id="grad_luz"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="tex_luz"]
+gradient = SubResource("grad_luz")
+width = 256
+height = 256
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[node name="O_Trono_de_Zeriko" type="Node2D"]
+script = ExtResource("7_niv")
+
+[node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
+cor_ambiente = Color(0.52, 0.32, 0.56, 1)
+cor_fundo = Color(0.05, 0.02, 0.09, 1)
+cor_silhueta = Color(0.11, 0.05, 0.15, 1)
+cor_luz = Color(1, 0.3, 0.95, 1)
+cor_poeira = Color(1, 0.45, 0.95, 1)
+densidade_poeira = 2.4
+bioma = "castelo"
+largura_nivel = 3000.0
+luzes_horizonte = true
+fundo_pack = "corredores"
+
+[node name="ChaoInicio" parent="." instance=ExtResource("9_pl")]
+position = Vector2(430, 660)
+tamanho = Vector2(620, 48)
+altura_visual = 100.0
+
+[node name="Corrente1" parent="." instance=ExtResource("10_pc")]
+position = Vector2(880, 560)
+modo = "pendulo"
+amplitude = 34.0
+periodo = 2.6
+comprimento = 150.0
+largura = 120.0
+
+[node name="Corrente2" parent="." instance=ExtResource("10_pc")]
+position = Vector2(1120, 540)
+modo = "vertical"
+amplitude = 90.0
+periodo = 2.6
+comprimento = 160.0
+largura = 120.0
+
+[node name="PlrA" parent="." instance=ExtResource("11_plr")]
+position = Vector2(1360, 560)
+tamanho = Vector2(150, 22)
+periodo = 2.2
+comeca_solida = true
+
+[node name="ChaoArena" parent="." instance=ExtResource("9_pl")]
+position = Vector2(2100, 660)
+tamanho = Vector2(1500, 48)
+altura_visual = 120.0
+
+[node name="Trono" type="Polygon2D" parent="."]
+position = Vector2(2100, 500)
+color = Color(0.14, 0.06, 0.18, 1)
+polygon = PackedVector2Array(-70, 120, -70, -110, -40, -110, -40, 40, 40, 40, 40, -110, 70, -110, 70, 120)
+
+[node name="TronoBrilho" type="PointLight2D" parent="Trono"]
+position = Vector2(0, -20)
+texture = SubResource("tex_luz")
+energy = 0.7
+color = Color(1, 0.3, 0.95, 1)
+scale = Vector2(2.2, 2.6)
+
+[node name="LuzInicio" type="PointLight2D" parent="."]
+position = Vector2(430, 600)
+texture = SubResource("tex_luz")
+energy = 0.5
+color = Color(1, 0.3, 0.95, 1)
+scale = Vector2(1.9, 1.1)
+
+[node name="Koliani" parent="." instance=ExtResource("1_kol")]
+position = Vector2(150, 560)
+
+[node name="Demonio1" parent="." instance=ExtResource("2_dem")]
+especie = "esqueleto"
+position = Vector2(560, 604)
+alcance_patrulha = 200.0
+
+[node name="Demonio2" parent="." instance=ExtResource("2_dem")]
+especie = "esqueleto"
+position = Vector2(1360, 520)
+alcance_patrulha = 120.0
+
+[node name="Chefe" parent="." instance=ExtResource("6_chefe")]
+position = Vector2(2100, 420)
+
+[node name="ColTrono" parent="." instance=ExtResource("3_col")]
+position = Vector2(1000, 560)
+pista_id = "trono_o_que_sobra"
+
+[node name="CheckInicio" type="Area2D" parent="."]
+position = Vector2(410, 588)
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("5_chk")
+
+[node name="Visual" type="ColorRect" parent="CheckInicio"]
+offset_left = -5.0
+offset_top = -42.0
+offset_right = 5.0
+offset_bottom = 40.0
+color = Color(0.36, 0.28, 0.55, 1)
+
+[node name="Luz" type="Node2D" parent="CheckInicio"]
+visible = false
+
+[node name="Brilho" type="ColorRect" parent="CheckInicio/Luz"]
+offset_left = -20.0
+offset_top = -54.0
+offset_right = 20.0
+offset_bottom = 44.0
+color = Color(0.85, 0.31, 0.83, 0.32)
+
+[node name="PointLight2D" type="PointLight2D" parent="CheckInicio/Luz"]
+texture = SubResource("tex_luz")
+energy = 1.1
+color = Color(0.93, 0.4, 0.9, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckInicio"]
+shape = SubResource("rs_chk")
+
+[node name="CheckArena" type="Area2D" parent="."]
+position = Vector2(1560, 588)
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("5_chk")
+
+[node name="Visual" type="ColorRect" parent="CheckArena"]
+offset_left = -5.0
+offset_top = -42.0
+offset_right = 5.0
+offset_bottom = 40.0
+color = Color(0.36, 0.28, 0.55, 1)
+
+[node name="Luz" type="Node2D" parent="CheckArena"]
+visible = false
+
+[node name="Brilho" type="ColorRect" parent="CheckArena/Luz"]
+offset_left = -20.0
+offset_top = -54.0
+offset_right = 20.0
+offset_bottom = 44.0
+color = Color(0.85, 0.31, 0.83, 0.32)
+
+[node name="PointLight2D" type="PointLight2D" parent="CheckArena/Luz"]
+texture = SubResource("tex_luz")
+energy = 1.1
+color = Color(0.93, 0.4, 0.9, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckArena"]
+shape = SubResource("rs_chk")
+
+[node name="Porta" parent="." instance=ExtResource("4_porta")]
+position = Vector2(2760, 586)
+pista_ao_atravessar = "castelo_aurora_livre"

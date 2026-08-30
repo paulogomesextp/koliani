@@ -191,6 +191,11 @@ const PISTAS := {
 		"titulo": "clue.coracao_o_arauto.title",
 		"texto": "clue.coracao_o_arauto.body",
 	},
+	"trono_o_que_sobra": {
+		"mundo": "world.castle",
+		"titulo": "clue.trono_o_que_sobra.title",
+		"texto": "clue.trono_o_que_sobra.body",
+	},
 	"castelo_aurora_livre": {
 		"mundo": "world.castle",
 		"titulo": "clue.castelo_aurora_livre.title",

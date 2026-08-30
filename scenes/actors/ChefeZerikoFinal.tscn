@@ -1,0 +1,88 @@
+[gd_scene load_steps=6 format=3 uid="uid://bkolianichefezerikofinal30"]
+
+; Nível 30 -- ZERIKO, chefe final. Tira pixel-art de 4 frames (0 MAGO/REI,
+; 1 COISA DO ABISMO / O QUE RESTA, 2 telegrafo, 3 exposto -- núcleo
+; magenta) em assets/sprites/pixel/bosses/zeriko.png. 4 fases numa luta.
+; Script chefe_zeriko_final.gd (herda ChefeBase).
+
+[ext_resource type="Script" path="res://scripts/chefe_zeriko_final.gd" id="1_chefe"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/bosses/zeriko.png" id="2_tex"]
+
+[sub_resource type="RectangleShape2D" id="rs_body"]
+size = Vector2(52, 108)
+
+[sub_resource type="RectangleShape2D" id="rs_contacto"]
+size = Vector2(68, 112)
+
+[sub_resource type="Gradient" id="grad_luz"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="tex_luz"]
+gradient = SubResource("grad_luz")
+width = 256
+height = 256
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[node name="ChefeZerikoFinal" type="CharacterBody2D" groups=["inimigos"]]
+collision_layer = 4
+collision_mask = 1
+script = ExtResource("1_chefe")
+vida = 900
+dano_contacto = 20
+alcance_patrulha = 0.0
+cor_estilhacos = Color(0.5, 0.25, 0.7, 1)
+cor_rim = Color(1, 0.4, 0.95, 1)
+
+[node name="Sprite" type="Node2D" parent="."]
+
+[node name="Corpo" type="Sprite2D" parent="Sprite"]
+texture_filter = 1
+position = Vector2(0, -10)
+texture = ExtResource("2_tex")
+hframes = 4
+
+[node name="LuzNucleo" type="PointLight2D" parent="Sprite"]
+position = Vector2(0, -6)
+texture = SubResource("tex_luz")
+energy = 0.5
+color = Color(1, 0.35, 0.95, 1)
+scale = Vector2(1.1, 1.1)
+
+[node name="Nucleo" type="Node2D" parent="Sprite"]
+position = Vector2(0, -6)
+scale = Vector2(0.4, 0.4)
+
+[node name="Brilho" type="Sprite2D" parent="Sprite/Nucleo"]
+visible = false
+texture = SubResource("tex_luz")
+modulate = Color(1, 0.35, 0.95, 0.9)
+scale = Vector2(0.4, 0.4)
+
+[node name="Diamante" type="Polygon2D" parent="Sprite/Nucleo"]
+color = Color(1, 0.27, 0.94, 1)
+polygon = PackedVector2Array(-10, 0, 0, -14, 10, 0, 0, 14)
+
+[node name="Cerne" type="Polygon2D" parent="Sprite/Nucleo"]
+color = Color(1, 0.94, 1, 1)
+polygon = PackedVector2Array(-4, 0, 0, -7, 4, 0, 0, 7)
+
+[node name="Luz" type="PointLight2D" parent="Sprite/Nucleo"]
+texture = SubResource("tex_luz")
+energy = 0.14
+color = Color(1, 0.35, 0.95, 1)
+scale = Vector2(0.8, 0.8)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 0)
+shape = SubResource("rs_body")
+
+[node name="AreaContacto" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AreaContacto"]
+position = Vector2(0, -4)
+shape = SubResource("rs_contacto")
