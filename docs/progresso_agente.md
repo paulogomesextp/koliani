@@ -532,6 +532,20 @@ Grupos usados por chefes: "estatuas_naga", "plat_falsas", "acougue_moveis",
    - `corredor`/`SalaLabirinto` do `GeradorCorredor` continua a prepender
      -- decidir se os niveis-masmorra levam `corredor = false` (a sala
      labirinto ja da a "masmorra"; ver EM PAUSA no fim).
+   - **FEITO (arranque):** `scripts/casca_masmorra.gd` +
+     `scenes/actors/CascaMasmorra.tscn` -- componente reutilizavel que
+     fecha um nivel (tecto + paredes + chao de seguranca em tiles do
+     `masmorra.tres`, `TileMapLayer` x2 z=-2, colisao por `StaticBody2D`).
+     `@export largura/altura/topo/esquerda/borda_tiles/chao/chao_y`.
+     **Piloto: Prisao dos Condenados** ja o usa (Casca 4150x580 topo y150)
+     + Atmosfera recolorida a pedra. `f3cb159`. FALTA: rework da GEOMETRIA
+     interior nivel-a-nivel (corredores apertados, pocos verticais, muros
+     internos) -- precisa de screenshot por nivel (`tools/shot_plataforma.gd`
+     em modo `--window` FUNCIONA; headless as vezes crasha a' saida sem
+     gravar). Replicar a Casca nos niveis 6-9 e 15-19.
+   - Koliani apurada mais perto do guia (`d0ec161`): rim violeta, pernas
+     sem vao branco, contraste. Continuar o loop PREVIEW=1 se preciso.
+
 2. **Koliani -- apurar o gerador por codigo** (`tools/gerar_sprites.gd`
    `_kol_pose`/`KPAL`/`_poses_*`) p/ o guia do Paulo (bandana, cabelo
    curto side-swept, top s/ mangas + pauldron, capa roxa esfarrapada,
