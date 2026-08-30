@@ -111,6 +111,11 @@ const PISTAS := {
 		"titulo": "clue.pico_torres_para_tras.title",
 		"texto": "clue.pico_torres_para_tras.body",
 	},
+	"catacumbas_coroa_partida": {
+		"mundo": "world.catacombs",
+		"titulo": "clue.catacumbas_coroa_partida.title",
+		"texto": "clue.catacumbas_coroa_partida.body",
+	},
 	"castelo_aurora_livre": {
 		"mundo": "world.castle",
 		"titulo": "clue.castelo_aurora_livre.title",

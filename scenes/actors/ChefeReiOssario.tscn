@@ -1,0 +1,88 @@
+[gd_scene load_steps=6 format=3 uid="uid://bkolianichefereiossario16"]
+
+; Região IV / nível 16 -- O Rei Ossário. Tira pixel-art de 4 frames
+; (0 montado, 1 a pé (fase 2), 2 lança em riste (telegrafo), 3 rei
+; descaído -- núcleo violeta (exposto)) em
+; assets/sprites/pixel/bosses/rei_ossario.png. Script chefe_rei_ossario.gd.
+
+[ext_resource type="Script" path="res://scripts/chefe_rei_ossario.gd" id="1_chefe"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/bosses/rei_ossario.png" id="2_tex"]
+
+[sub_resource type="RectangleShape2D" id="rs_body"]
+size = Vector2(64, 92)
+
+[sub_resource type="RectangleShape2D" id="rs_contacto"]
+size = Vector2(104, 96)
+
+[sub_resource type="Gradient" id="grad_luz"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="tex_luz"]
+gradient = SubResource("grad_luz")
+width = 256
+height = 256
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[node name="ChefeReiOssario" type="CharacterBody2D" groups=["inimigos"]]
+collision_layer = 4
+collision_mask = 1
+script = ExtResource("1_chefe")
+vida = 500
+dano_contacto = 22
+alcance_patrulha = 0.0
+cor_estilhacos = Color(0.82, 0.8, 0.64, 1)
+cor_rim = Color(0.7, 0.5, 1, 1)
+
+[node name="Sprite" type="Node2D" parent="."]
+
+[node name="Corpo" type="Sprite2D" parent="Sprite"]
+texture_filter = 1
+position = Vector2(0, -8)
+texture = ExtResource("2_tex")
+hframes = 4
+
+[node name="LuzNucleo" type="PointLight2D" parent="Sprite"]
+position = Vector2(2, -18)
+texture = SubResource("tex_luz")
+energy = 0.55
+color = Color(0.66, 0.42, 1, 1)
+scale = Vector2(0.9, 0.9)
+
+[node name="Nucleo" type="Node2D" parent="Sprite"]
+position = Vector2(2, -18)
+scale = Vector2(0.4, 0.4)
+
+[node name="Brilho" type="Sprite2D" parent="Sprite/Nucleo"]
+visible = false
+texture = SubResource("tex_luz")
+modulate = Color(0.66, 0.42, 1, 0.9)
+scale = Vector2(0.34, 0.34)
+
+[node name="Diamante" type="Polygon2D" parent="Sprite/Nucleo"]
+color = Color(0.6, 0.36, 1, 1)
+polygon = PackedVector2Array(-8, 0, 0, -12, 8, 0, 0, 12)
+
+[node name="Cerne" type="Polygon2D" parent="Sprite/Nucleo"]
+color = Color(0.96, 0.92, 1, 1)
+polygon = PackedVector2Array(-3.5, 0, 0, -6, 3.5, 0, 0, 6)
+
+[node name="Luz" type="PointLight2D" parent="Sprite/Nucleo"]
+texture = SubResource("tex_luz")
+energy = 0.12
+color = Color(0.66, 0.42, 1, 1)
+scale = Vector2(0.6, 0.6)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 0)
+shape = SubResource("rs_body")
+
+[node name="AreaContacto" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AreaContacto"]
+position = Vector2(0, -4)
+shape = SubResource("rs_contacto")

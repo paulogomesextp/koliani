@@ -1,0 +1,31 @@
+[gd_scene load_steps=2 format=3 uid="uid://bkolianitumuloelev16"]
+
+; Laje de túmulo que sobe enquanto a Koliani está em cima e volta quando
+; ela sai (ver scripts/tumulo_elevador.gd). `curso` = deslocamento; `auto`
+; = vaivém contínuo. Pôr no fundo do poço.
+
+[ext_resource type="Script" path="res://scripts/tumulo_elevador.gd" id="1_te"]
+
+[node name="TumuloElevador" type="AnimatableBody2D"]
+collision_layer = 1
+collision_mask = 0
+script = ExtResource("1_te")
+
+[node name="Visual" type="Polygon2D" parent="."]
+color = Color(0.32, 0.35, 0.3, 1)
+polygon = PackedVector2Array(-75, -12, 75, -12, 69, 18, -69, 18)
+
+[node name="Runa" type="Line2D" parent="."]
+points = PackedVector2Array(-16, 2, 0, -6, 16, 2)
+width = 2.0
+default_color = Color(0.55, 0.7, 0.5, 0.7)
+
+[node name="Col" type="CollisionShape2D" parent="."]
+position = Vector2(0, 5)
+
+[node name="Deteta" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 2
+
+[node name="Forma" type="CollisionShape2D" parent="Deteta"]
+position = Vector2(0, -18)

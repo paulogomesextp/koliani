@@ -60,6 +60,7 @@ func _initialize() -> void:
 	_boss_voltaris() # regiao III / nivel 13
 	_boss_sacerdotisa() # regiao III / nivel 14
 	_boss_vyrak()    # regiao III / nivel 15
+	_boss_rei_ossario() # regiao IV / nivel 16
 	print("OK -- sprites pixel-art em ", DIR)
 	quit(0)
 
@@ -977,4 +978,64 @@ func _boss_vyrak() -> void:
 				_linha(cx + 30 + cl * 2, 58, cx + 36 + cl * 3, 50, 1, GUME)
 		else:
 			_linha(cx + 12, 76, cx + 26, 92, 4, SOMBRA_C)
+	)
+
+
+## Nivel 16 -- Cemiterio dos Reis. O Rei Ossario: rei morto-vivo coroado
+## num cavalo esqueletico. Frame 0 = montado; frame 1 = a pe (cavalo caido)
+## p/ a fase 2; frame 2 = lanca/espada em riste (telegrafo); frame 3 = rei
+## descaido na sela / nucleo violeta do peito (exposto).
+func _boss_rei_ossario() -> void:
+	var OSSO := Color("d8d2ba")
+	var OSSO_S := Color("9c9578")
+	var OURO := Color("d9b64a")
+	var CAPA := Color("3a2036")
+	var NUCLEO := Color("9a5cff")
+	_boss("rei_ossario", 120, 100, func(f: int) -> void:
+		var a_pe := f == 1
+		var cx := 60.0
+		if not a_pe:
+			# cavalo esqueletico (perfil, virado a direita)
+			_linha(24, 78, 34, 58, 5, OSSO)      # anca tras
+			_linha(86, 74, 92, 56, 5, OSSO)      # peito frente
+			for lx in [22, 40, 80, 96]:
+				_linha(lx, 78, lx + 2, 96, 3, OSSO_S)   # patas
+			_linha(34, 58, 88, 56, 7, OSSO)      # espinha
+			_linha(88, 56, 104, 40, 5, OSSO)     # pescoco
+			_elipse(106, 34, 8, 6, OSSO)         # cabeca do cavalo
+			_linha(30, 60, 18, 72, 3, OSSO_S)    # cauda de ossos
+			_px(110, 33, NUCLEO); _px(110, 36, NUCLEO)  # olhos acesos
+		else:
+			# cavalo caido (linha baixa de ossos)
+			for bx in range(26, 96, 8):
+				_px(bx, 92, OSSO_S); _px(bx + 2, 93, OSSO_S)
+			_elipse(30, 90, 6, 4, OSSO_S)
+		# rei (sobre a sela, ou de pe se a_pe)
+		var rx := 58.0 if not a_pe else 60.0
+		var ry := 30.0 if not a_pe else 56.0
+		# corpo / capa
+		for j in range(int(ry), int(ry) + (34 if a_pe else 30)):
+			var t := float(j - ry) / 30.0
+			var meia := lerpf(8.0, 12.0, t)
+			_rect(int(rx - meia), j, int(meia * 2.0), 1, CAPA if j % 3 else OSSO_S)
+		# peitoral de osso + nucleo
+		_elipse(rx, ry + 10, 9, 10, OSSO)
+		var g: float = [1.0, 1.0, 1.15, 1.5][f]
+		_elipse(rx + 1, ry + 10, 4.5 * g, 5.0 * g, NUCLEO)
+		_elipse(rx + 1, ry + 10, 2.0, 2.2, PAL["w"])
+		# cabeca + coroa
+		var ch := ry - 6.0 if f != 3 else ry - 2.0
+		_elipse(rx, ch, 6, 7, OSSO)
+		_px(int(rx) - 2, int(ch), NUCLEO); _px(int(rx) + 2, int(ch), NUCLEO)
+		for k in 5:
+			_linha(int(rx) - 6 + k * 3, int(ch) - 6, int(rx) - 6 + k * 3, int(ch) - 11, 1, OURO)
+		_rect(int(rx) - 7, int(ch) - 7, 14, 2, OURO)
+		# braco + arma
+		if f == 2:
+			_linha(int(rx) + 6, int(ry) + 4, int(rx) + 30, int(ry) - 4, 4, OSSO_S)
+			_linha(int(rx) + 20, int(ry), int(rx) + 52, int(ry) - 8, 2, OSSO)  # lanca
+			_px(int(rx) + 52, int(ry) - 8, PAL["w"])
+		else:
+			_linha(int(rx) + 6, int(ry) + 6, int(rx) + 18, int(ry) + 22, 4, OSSO_S)
+			_linha(int(rx) + 14, int(ry) + 14, int(rx) + 30, int(ry) + 30, 2, OSSO)
 	)
