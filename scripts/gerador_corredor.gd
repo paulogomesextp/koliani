@@ -21,6 +21,8 @@ const ESPINHOS := preload("res://scenes/actors/Espinhos.tscn")
 const DEMONIO := preload("res://scenes/actors/DemonioBase.tscn")
 const ALAVANCA := preload("res://scenes/actors/Alavanca.tscn")
 const PORTA_T := preload("res://scenes/actors/PortaTrancada.tscn")
+const SERRA := preload("res://scenes/actors/Serra.tscn")
+const CHECKPOINT := preload("res://scripts/checkpoint.gd")
 
 
 func _ready() -> void:
@@ -54,29 +56,60 @@ func _construir() -> void:
 	if EstadoJogo.checkpoint == Vector2.ZERO:
 		(kol as Node2D).global_position = Vector2(x0 + 70.0, chao_y - 60.0)
 
+	# checkpoint a meio do corredor -- morrer no corredor não volta ao início
+	if n_seg >= 3:
+		var ck := Area2D.new()
+		ck.name = "CorredorCheck"
+		ck.collision_layer = 16
+		ck.collision_mask = 2
+		ck.position = Vector2(x0 + comp * 0.5, chao_y - 45.0)
+		var cf := CollisionShape2D.new()
+		var rc := RectangleShape2D.new()
+		rc.size = Vector2(40.0, 90.0)
+		cf.shape = rc
+		ck.add_child(cf)
+		ck.set_script(CHECKPOINT)
+		add_child(ck)
+
 	for i in n_seg:
 		var sx := x0 + float(i) * SEG + SEG * 0.5
 		var r := rng.randf()
 		# parede vertical -- SEMPRE saltável (~55-100 px); o escalar_paredes
 		# só a torna trivial. A dificuldade vem da densidade, não da altura.
-		if r < 0.30 + 0.20 * dif:
+		if r < 0.28 + 0.18 * dif:
 			var alt := rng.randf_range(55.0, 100.0)
 			var w := PLAT.instantiate()
-			add_child(w)
 			w.position = Vector2(sx, chao_y - alt * 0.5)
 			w.tamanho = Vector2(44.0, alt)
-		elif r < 0.52 + 0.16 * dif:
+			add_child(w)
+		elif r < 0.48 + 0.14 * dif:
 			var e := ESPINHOS.instantiate()
-			add_child(e)
 			e.position = Vector2(sx, chao_y - 2.0)
 			e.largura = clampi(4 + int(3.0 * dif), 4, 7)
 			e.dano = 14 + int(10.0 * dif)
-		if i > 0 and rng.randf() < 0.32 + 0.45 * dif:
+			add_child(e)
+		elif r < 0.62 + 0.16 * dif and i > 0:
+			# rota elevada: 3 plataformas por cima (atalho opcional)
+			for j in 3:
+				var p := PLAT.instantiate()
+				p.position = Vector2(sx - 90.0 + j * 90.0, chao_y - 120.0 - (10.0 if j == 1 else 0.0))
+				p.tamanho = Vector2(74.0, 18.0)
+				add_child(p)
+
+		# serra num troço vertical (níveis mais avançados)
+		if dif > 0.28 and rng.randf() < 0.12 + 0.2 * dif:
+			var s := SERRA.instantiate()
+			s.position = Vector2(sx, chao_y - 70.0)
+			s.percurso = Vector2(0.0, -110.0)
+			s.tempo = randf_range(1.2, 2.0)
+			add_child(s)
+
+		if i > 0 and rng.randf() < 0.3 + 0.42 * dif:
 			var d := DEMONIO.instantiate()
-			add_child(d)
 			d.especie = esp
 			d.position = Vector2(sx + rng.randf_range(-60.0, 60.0), chao_y - 44.0)
 			d.alcance_patrulha = rng.randf_range(80.0, 170.0)
+			add_child(d)
 
 	# porta trancada + alavanca (a partir do nível 3). A alavanca ENTRA
 	# PRIMEIRO na árvore para a porta a encontrar no grupo ao ligar-se.
