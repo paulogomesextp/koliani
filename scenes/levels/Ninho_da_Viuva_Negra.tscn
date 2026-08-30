@@ -1,0 +1,247 @@
+[gd_scene load_steps=16 format=3 uid="uid://bkolianininhoviuva03"]
+
+; Região I / nível 03 -- Ninho da Viúva Negra.
+; A floresta vira teia: plataformas pálidas de seda, manchas de teia
+; pegajosa (TeiaPrende) que prendem a Koliani, serra e espinhos. Chefe:
+; A Rainha Aracnídea (cospe teia, põe ovos que eclodem, arremete; na fase
+; 2 parte plataformas da arena -- grupo "plataformas_ninho").
+
+[ext_resource type="PackedScene" uid="uid://bkolianiactor01" path="res://scenes/actors/Koliani.tscn" id="1_kol"]
+[ext_resource type="PackedScene" uid="uid://bdemoniobase01" path="res://scenes/actors/DemonioBase.tscn" id="2_dem"]
+[ext_resource type="PackedScene" uid="uid://bkolianicoletavel01" path="res://scenes/actors/Coletavel.tscn" id="3_col"]
+[ext_resource type="PackedScene" uid="uid://bkolianiporta01" path="res://scenes/actors/Porta.tscn" id="4_porta"]
+[ext_resource type="Script" path="res://scripts/checkpoint.gd" id="5_chk"]
+[ext_resource type="PackedScene" uid="uid://bkolianichefearanha03" path="res://scenes/actors/ChefeRainhaAracnidea.tscn" id="6_chefe"]
+[ext_resource type="Script" path="res://scripts/nivel_com_chefe.gd" id="7_niv"]
+[ext_resource type="PackedScene" uid="uid://bkolianiatmosfera01" path="res://scenes/fx/Atmosfera.tscn" id="8_atm"]
+[ext_resource type="PackedScene" uid="uid://bkolianiplataforma01" path="res://scenes/actors/Plataforma.tscn" id="9_pl"]
+[ext_resource type="PackedScene" uid="uid://bkolianiserra01" path="res://scenes/actors/Serra.tscn" id="10_serra"]
+[ext_resource type="PackedScene" uid="uid://bkolianiespinhos01" path="res://scenes/actors/Espinhos.tscn" id="11_esp"]
+[ext_resource type="PackedScene" uid="uid://bkolianiteiaprende01" path="res://scenes/actors/TeiaPrende.tscn" id="12_teia"]
+
+[sub_resource type="RectangleShape2D" id="rs_chk"]
+size = Vector2(40, 80)
+
+[sub_resource type="Gradient" id="grad_luz"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="tex_luz"]
+gradient = SubResource("grad_luz")
+width = 256
+height = 256
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[node name="Ninho_da_Viuva_Negra" type="Node2D"]
+script = ExtResource("7_niv")
+
+[node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
+cor_ambiente = Color(0.56, 0.58, 0.66, 1)
+cor_fundo = Color(0.04, 0.04, 0.06, 1)
+cor_silhueta = Color(0.09, 0.09, 0.12, 1)
+cor_luz = Color(0.7, 0.75, 0.9, 1)
+cor_poeira = Color(0.85, 0.88, 0.98, 1)
+densidade_poeira = 1.7
+bioma = "floresta"
+largura_nivel = 3300.0
+
+[node name="ChaoInicio" parent="." instance=ExtResource("9_pl")]
+position = Vector2(320, 660)
+tamanho = Vector2(660, 48)
+altura_visual = 92.0
+cor_base = Color(0.14, 0.14, 0.17, 1)
+cor_topo = Color(0.4, 0.4, 0.47, 1)
+
+[node name="ChaoMeio" parent="." instance=ExtResource("9_pl")]
+position = Vector2(1640, 620)
+tamanho = Vector2(440, 44)
+altura_visual = 80.0
+cor_base = Color(0.14, 0.14, 0.17, 1)
+cor_topo = Color(0.4, 0.4, 0.47, 1)
+
+[node name="ChaoArena" parent="." instance=ExtResource("9_pl")]
+position = Vector2(2820, 660)
+tamanho = Vector2(840, 48)
+altura_visual = 92.0
+cor_base = Color(0.14, 0.14, 0.17, 1)
+cor_topo = Color(0.4, 0.4, 0.47, 1)
+
+[node name="Teia1" parent="." instance=ExtResource("9_pl")]
+position = Vector2(760, 540)
+tamanho = Vector2(150, 22)
+altura_visual = 28.0
+cor_base = Color(0.55, 0.58, 0.66, 1)
+cor_topo = Color(0.82, 0.85, 0.95, 1)
+
+[node name="Teia2" parent="." instance=ExtResource("9_pl")]
+position = Vector2(1000, 430)
+tamanho = Vector2(150, 22)
+altura_visual = 28.0
+cor_base = Color(0.55, 0.58, 0.66, 1)
+cor_topo = Color(0.82, 0.85, 0.95, 1)
+
+[node name="Teia3" parent="." instance=ExtResource("9_pl")]
+position = Vector2(1260, 500)
+tamanho = Vector2(150, 22)
+altura_visual = 28.0
+cor_base = Color(0.55, 0.58, 0.66, 1)
+cor_topo = Color(0.82, 0.85, 0.95, 1)
+
+[node name="Teia4" parent="." instance=ExtResource("9_pl")]
+position = Vector2(2180, 520)
+tamanho = Vector2(150, 22)
+altura_visual = 28.0
+cor_base = Color(0.55, 0.58, 0.66, 1)
+cor_topo = Color(0.82, 0.85, 0.95, 1)
+
+[node name="Teia5" parent="." instance=ExtResource("9_pl")]
+position = Vector2(2440, 430)
+tamanho = Vector2(150, 22)
+altura_visual = 28.0
+cor_base = Color(0.55, 0.58, 0.66, 1)
+cor_topo = Color(0.82, 0.85, 0.95, 1)
+
+[node name="ArenaTeia1" parent="." instance=ExtResource("9_pl") groups=["plataformas_ninho"]]
+position = Vector2(2650, 500)
+tamanho = Vector2(150, 22)
+altura_visual = 28.0
+cor_base = Color(0.55, 0.58, 0.66, 1)
+cor_topo = Color(0.82, 0.85, 0.95, 1)
+
+[node name="ArenaTeia2" parent="." instance=ExtResource("9_pl") groups=["plataformas_ninho"]]
+position = Vector2(3000, 500)
+tamanho = Vector2(150, 22)
+altura_visual = 28.0
+cor_base = Color(0.55, 0.58, 0.66, 1)
+cor_topo = Color(0.82, 0.85, 0.95, 1)
+
+[node name="TeiaChao1" parent="." instance=ExtResource("12_teia")]
+position = Vector2(520, 636)
+permanente = true
+largura = 130.0
+
+[node name="TeiaChao2" parent="." instance=ExtResource("12_teia")]
+position = Vector2(1660, 596)
+permanente = true
+largura = 120.0
+
+[node name="EspinhosNinho" parent="." instance=ExtResource("11_esp")]
+position = Vector2(2760, 636)
+largura = 5
+dano = 16
+
+[node name="SerraNinho" parent="." instance=ExtResource("10_serra")]
+position = Vector2(1130, 470)
+percurso = Vector2(0, -150)
+tempo = 1.4
+
+[node name="LuzNinho1" type="PointLight2D" parent="."]
+position = Vector2(320, 615)
+texture = SubResource("tex_luz")
+energy = 0.55
+color = Color(0.7, 0.75, 0.92, 1)
+scale = Vector2(1.7, 1.1)
+
+[node name="LuzNinho2" type="PointLight2D" parent="."]
+position = Vector2(1640, 585)
+texture = SubResource("tex_luz")
+energy = 0.5
+color = Color(0.72, 0.77, 0.94, 1)
+scale = Vector2(1.5, 1.1)
+
+[node name="LuzNinho3" type="PointLight2D" parent="."]
+position = Vector2(2820, 610)
+texture = SubResource("tex_luz")
+energy = 0.55
+color = Color(0.72, 0.77, 0.94, 1)
+scale = Vector2(1.8, 1.1)
+
+[node name="Koliani" parent="." instance=ExtResource("1_kol")]
+position = Vector2(150, 560)
+
+[node name="Demonio1" parent="." instance=ExtResource("2_dem")]
+position = Vector2(420, 604)
+alcance_patrulha = 160.0
+
+[node name="Demonio2" parent="." instance=ExtResource("2_dem")]
+position = Vector2(1640, 566)
+alcance_patrulha = 140.0
+
+[node name="Demonio3" parent="." instance=ExtResource("2_dem")]
+position = Vector2(2740, 604)
+alcance_patrulha = 200.0
+
+[node name="Chefe" parent="." instance=ExtResource("6_chefe")]
+position = Vector2(3020, 596)
+
+[node name="ColTeia" parent="." instance=ExtResource("3_col")]
+position = Vector2(1000, 388)
+pista_id = "ninho_teia_com_cabelo"
+
+[node name="Checkpoint" type="Area2D" parent="."]
+position = Vector2(360, 588)
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("5_chk")
+
+[node name="Visual" type="ColorRect" parent="Checkpoint"]
+offset_left = -5.0
+offset_top = -42.0
+offset_right = 5.0
+offset_bottom = 40.0
+color = Color(0.36, 0.28, 0.55, 1)
+
+[node name="Luz" type="Node2D" parent="Checkpoint"]
+visible = false
+
+[node name="Brilho" type="ColorRect" parent="Checkpoint/Luz"]
+offset_left = -20.0
+offset_top = -54.0
+offset_right = 20.0
+offset_bottom = 44.0
+color = Color(0.85, 0.31, 0.83, 0.32)
+
+[node name="PointLight2D" type="PointLight2D" parent="Checkpoint/Luz"]
+texture = SubResource("tex_luz")
+energy = 1.1
+color = Color(0.93, 0.4, 0.9, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Checkpoint"]
+shape = SubResource("rs_chk")
+
+[node name="CheckArena" type="Area2D" parent="."]
+position = Vector2(2560, 588)
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("5_chk")
+
+[node name="Visual" type="ColorRect" parent="CheckArena"]
+offset_left = -5.0
+offset_top = -42.0
+offset_right = 5.0
+offset_bottom = 40.0
+color = Color(0.36, 0.28, 0.55, 1)
+
+[node name="Luz" type="Node2D" parent="CheckArena"]
+visible = false
+
+[node name="Brilho" type="ColorRect" parent="CheckArena/Luz"]
+offset_left = -20.0
+offset_top = -54.0
+offset_right = 20.0
+offset_bottom = 44.0
+color = Color(0.85, 0.31, 0.83, 0.32)
+
+[node name="PointLight2D" type="PointLight2D" parent="CheckArena/Luz"]
+texture = SubResource("tex_luz")
+energy = 1.1
+color = Color(0.93, 0.4, 0.9, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckArena"]
+shape = SubResource("rs_chk")
+
+[node name="Porta" parent="." instance=ExtResource("4_porta")]
+position = Vector2(3180, 586)
+pista_ao_atravessar = ""

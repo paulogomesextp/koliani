@@ -26,6 +26,11 @@ const PISTAS := {
 		"titulo": "clue.pantano_bilhete_na_agua.title",
 		"texto": "clue.pantano_bilhete_na_agua.body",
 	},
+	"ninho_teia_com_cabelo": {
+		"mundo": "world.forest",
+		"titulo": "clue.ninho_teia_com_cabelo.title",
+		"texto": "clue.ninho_teia_com_cabelo.body",
+	},
 	"prisao_carta_na_cela": {
 		"mundo": "world.prison",
 		"titulo": "clue.prisao_carta_na_cela.title",

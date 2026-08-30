@@ -15,7 +15,7 @@ const VIDAS_INICIAIS := 3
 ## Modo hardcore: tempo (segundos) para completar cada mundo. Ao esgotar ->
 ## Game Over e a campanha recomeça do mundo 1. Números de partida -- afinar
 ## com o jogo a correr.
-const TEMPO_HARDCORE := [90.0, 110.0, 120.0, 120.0, 150.0]
+const TEMPO_HARDCORE := [90.0, 110.0, 115.0, 120.0, 120.0, 150.0]
 
 ## Sequencia fixa de mundos ate ao Zeriko (platformer por niveis, nao
 ## roguelite). O agente "gaming" acrescenta/renomeia niveis aqui a medida
@@ -23,6 +23,7 @@ const TEMPO_HARDCORE := [90.0, 110.0, 120.0, 120.0, 150.0]
 const NIVEIS := [
 	"res://scenes/levels/Floresta_Putrefata.tscn",
 	"res://scenes/levels/Pantano_dos_Sussurros.tscn",
+	"res://scenes/levels/Ninho_da_Viuva_Negra.tscn",
 	"res://scenes/levels/Prisao_dos_Condenados.tscn",
 	"res://scenes/levels/Torres_Esquecidas.tscn",
 	"res://scenes/levels/Castelo_de_Zeriko.tscn",
@@ -36,12 +37,12 @@ const NIVEIS := [
 ## construir -- o agente vai enchendo `NIVEIS` e estes indices a medida que
 ## desenha os niveis. A ordem aqui E a ordem das regioes na campanha.
 const REGIOES := [
-	{"id": "floresta", "nome": "Floresta Putrefacta", "niveis": [0, 1]},
-	{"id": "prisao", "nome": "Prisao dos Condenados", "niveis": [2]},
-	{"id": "torres", "nome": "Torres Esquecidas", "niveis": [3]},
+	{"id": "floresta", "nome": "Floresta Putrefacta", "niveis": [0, 1, 2]},
+	{"id": "prisao", "nome": "Prisao dos Condenados", "niveis": [3]},
+	{"id": "torres", "nome": "Torres Esquecidas", "niveis": [4]},
 	{"id": "catacumbas", "nome": "Catacumbas do Abismo", "niveis": []},
 	{"id": "cidade", "nome": "Cidade Corrompida", "niveis": []},
-	{"id": "castelo", "nome": "Castelo de Zeriko", "niveis": [4]},
+	{"id": "castelo", "nome": "Castelo de Zeriko", "niveis": [5]},
 ]
 
 signal vidas_mudaram(vidas: int)

@@ -10,10 +10,11 @@ vem a seguir.
 | idx | cena | região | chefe | estado |
 |-----|------|--------|-------|--------|
 | 0 | `Floresta_Putrefata.tscn` | I Floresta | Ghorak | jogável (antigo "M1") |
-| 1 | `Pantano_dos_Sussurros.tscn` | I Floresta | Morvanna | **novo (esta sessão)** |
-| 2 | `Prisao_dos_Condenados.tscn` | II Prisão | Carcereiro | jogável (antigo "M2") |
-| 3 | `Torres_Esquecidas.tscn` | III Torres | Uivo/Vento | jogável (antigo "M3") |
-| 4 | `Castelo_de_Zeriko.tscn` | VI Castelo | Zeriko | jogável (final) |
+| 1 | `Pantano_dos_Sussurros.tscn` | I Floresta | Morvanna | **novo 2026-08-30** |
+| 2 | `Ninho_da_Viuva_Negra.tscn` | I Floresta | Rainha Aracnídea | **novo 2026-08-30** |
+| 3 | `Prisao_dos_Condenados.tscn` | II Prisão | Carcereiro | jogável (antigo "M2") |
+| 4 | `Torres_Esquecidas.tscn` | III Torres | Uivo/Vento | jogável (antigo "M3") |
+| 5 | `Castelo_de_Zeriko.tscn` | VI Castelo | Zeriko | jogável (final) |
 
 > **Nota de save:** inserir níveis no meio de `NIVEIS` desloca os índices.
 > Saves de playtest antigos ficam a apontar para o nível errado — fazer
@@ -24,11 +25,20 @@ vem a seguir.
 
 - `RaizPerigo` — espinho de raiz que telegrafa/irrompe/recolhe (região I).
 - `AguaVenenosa` — poça de morte instantânea (`scripts/agua_venenosa.gd`,
-  cena `scenes/actors/AguaVenenosa.tscn`). `largura`/`altura` em px.
+  cena `scenes/actors/AguaVenenosa.tscn`). `largura`/`altura` em px, rebordo
+  aceso + luz na linha de água.
 - `PlataformaFlutuante` — plataforma que baloiça (seno) e opcionalmente
   deriva; `AnimatableBody2D` com `sync_to_physics`, carrega a Koliani.
-  `scripts/plataforma_flutuante.gd` + `scenes/actors/PlataformaFlutuante.tscn`.
+  Grupo "plataformas_flutuantes"; `desvanecer()`/`reaparecer()`.
+- `TeiaPrende` — mancha de teia que PRENDE a Koliani (`Koliani.prender`, novo
+  em `koliani.gd`: `_preso` bloqueia andar/saltar). `permanente=true` =
+  teia fixa do cenário; a Rainha Aracnídea chama `lancar()`.
+  `scripts/teia_prende.gd` + cena.
 - `Plataforma`, `Espinhos`, `Serra`, `Fogo`, `ParedeFragil` — já existiam.
+  Nota: `Plataforma` ignora `cor_base/cor_topo` para o NinePatch de terreno,
+  por isso as "plataformas de teia" ainda parecem relva — trocar por tiles
+  de seda no passe pixel-art.
+- `tools/shot_plataforma.gd` ganhou 5.º arg opcional `koliani_y`.
 
 ## Feito nesta linha de trabalho
 
@@ -40,13 +50,23 @@ vem a seguir.
   mais curtos, mais mãos, apaga mais tempo. Ponto fraco = quando desce
   para "provocar" (estado EXPOSTA) leva dano a dobrar.
 - Pista nova `pantano_bilhete_na_agua` (diário + i18n × 6).
+- **Nível 03 — Ninho da Viúva Negra** (região I): plataformas de seda,
+  manchas de teia `TeiaPrende` que prendem a Koliani, `Serra` + `Espinhos`.
+  Chefe **A Rainha Aracnídea** (`chefe_rainha_aracnidea.gd`): cospe teia
+  onde a Koliani está, põe ovos que eclodem em aranhas pequenas, arremete.
+  Ponto fraco = o rosto humano, só EXPOSTO depois de cada ataque (dano a
+  dobrar). Fase 2 < 50%: telégrafos curtos, mais ovos, parte as plataformas
+  do grupo "plataformas_ninho".
+- Pista nova `ninho_teia_com_cabelo` (diário + i18n × 6).
+- `koliani.gd`: novo `_preso` / `prender(segundos)` — preso numa teia não
+  anda nem salta. Escudo erguido protege.
 
 ## A seguir (por `docs/niveis.md`, região I)
 
-1. Nível 03 — Ninho da Viúva Negra + chefe **Rainha Aracnídea** (teias
-   como plataformas/paredes; ovos que geram aranhas pequenas).
+1. ~~Nível 03 — Ninho da Viúva Negra + Rainha Aracnídea~~ **feito**. Ainda
+   não jogado a sério — afinar dano/ritmo/tamanho do chefe no playtest.
 2. Nível 04 — A Árvore que Chora + chefe **Entrevane** (subir pelo corpo
-   do chefe enquanto ele ataga com galhos).
+   do chefe enquanto ele ataca com galhos).
 3. Nível 05 — Coração da Floresta + chefe **Coração Putrefacto** (arena
    rítmica: muda a cada "batimento"; 3 fases).
 4. Mecânicas ainda por fazer: plataforma móvel de correntes (região II),

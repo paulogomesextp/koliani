@@ -57,6 +57,9 @@ var _estava_no_chao := true
 var _defendendo := false
 var _energia := ENERGIA_MAX
 var _lancar_restante := 0.0
+## Segundos que ainda está preso numa teia (Região III / Rainha Aracnídea):
+## enquanto > 0 não anda nem salta -- só se sacode até se soltar.
+var _preso := 0.0
 
 # animação procedural (visual, corre em _process)
 var _mat: ShaderMaterial
@@ -82,6 +85,7 @@ func _physics_process(dt: float) -> void:
 	_rolar_recarga = maxf(0.0, _rolar_recarga - dt)
 	_invulneravel = maxf(0.0, _invulneravel - dt)
 	_lancar_restante = maxf(0.0, _lancar_restante - dt)
+	_preso = maxf(0.0, _preso - dt)
 
 	# a barra de Energia regenera-se sozinha depois de usada
 	if _energia < ENERGIA_MAX:
@@ -91,6 +95,18 @@ func _physics_process(dt: float) -> void:
 	var dir := Input.get_axis("mover_esquerda", "mover_direita")
 	if dir != 0.0 and _rolar_restante <= 0.0:
 		_olha_para = signf(dir)  # o flip visual é feito em _animar()
+
+	# preso numa teia: não anda nem salta; fica a cair no sítio até soltar
+	if _preso > 0.0:
+		velocity.x = move_toward(velocity.x, 0.0, Movimento.ACEL_CHAO * 2.0 * dt)
+		if not is_on_floor():
+			velocity.y = minf(Movimento.VEL_MAX_QUEDA, velocity.y + Movimento.GRAVIDADE * dt)
+		else:
+			velocity.y = 0.0
+		move_and_slide()
+		_mov.velocidade = velocity
+		_estava_no_chao = is_on_floor()
+		return
 
 	# defesa: só com a habilidade "escudo", em pé, e não a meio de outra ação
 	_defendendo = EstadoJogo.tem_habilidade("escudo") \
@@ -350,6 +366,14 @@ func _ao_bloquear() -> void:
 	if _faiscas:
 		_faiscas.position.x = absf(_faiscas.position.x) * _olha_para
 		_faiscas.restart()
+
+
+## Prende a Koliani numa teia por `segundos` (não anda nem salta). O escudo
+## erguido protege-a de ficar presa.
+func prender(segundos: float) -> void:
+	if _defendendo:
+		return
+	_preso = maxf(_preso, segundos)
 
 
 func receber_dano(quantidade: int, dir_empurrao: float = 0.0) -> void:
