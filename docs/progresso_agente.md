@@ -172,3 +172,84 @@ mapeia 0/3 à fase. SVGs dos chefes apagados. Regenerar:
 Commits pequenos; `tests/run_tests.gd` a sair `OK` e export Web a
 funcionar antes de cada commit; `push` para `master`. Texto do jogo só via
 `Textos.t()` + os 6 JSON. Assets só CC0. Nunca mexer em `git config`.
+
+---
+
+## Sessao autonoma 2026-08-30 (madrugada) -- niveis 08..15
+
+Continuada a campanha pelo `docs/niveis.md` a partir do nivel 08. Padrao
+mantido (cena + chefe herda ChefeBase, ponto fraco = Nucleo so na janela
+EXPOSTA dano x2, `_boss_*` em gerar_sprites.gd tira 4 frames, pista i18n x6,
+entrada em NIVEIS/REGIOES/TEMPO_HARDCORE, bump `config/version`, tests +
+smoke + push). **Regioes I, II e III COMPLETAS -- 15/30 niveis.**
+
+`EstadoJogo.NIVEIS` = 16. Indices: floresta [0-4], prisao [5-9],
+torres [10-14], catacumbas [] , cidade [] , castelo [15].
+> Inserir niveis no meio desloca indices -- **NEW GAME** depois de puxar.
+
+### Regiao II -- Prisao dos Condenados (fechada)
+- **08 Corredor das Execucoes / Dama da Guilhotina** (`e1704a2` etc.):
+  mecanica `Guilhotina` (guilhotina.gd, ja esbocada -- so' se tirou um
+  onready orfao). Chefe teleporta (esvai o Sprite), laminas giratorias,
+  faz cair as `guilhotinas_arena`, corte rasteiro. Fase 2 sobe as
+  `plataformas_execucoes`. Pista `execucoes_lista_de_nomes`.
+- **09 Ala dos Mortos / Os Irmaos Condenados**: mecanica
+  `PlataformaEspectral` (so' solida uns segundos apos `Koliani.magia_lancada`
+  -- sinal novo). Chefe = 2 fantasmas ligados por corrente (Line2D); o
+  IRMAO LONGE e' um Node2D criado em runtime. Aos 50% o longe morre e o
+  perto absorve a alma (fase 2, dardos em leque). Pista `mortos_irmao_mais_novo`.
+- **10 A Cela Zero / O Primeiro Prisioneiro**: 1.o nivel VERTICAL (a
+  camara ja segue nos 2 eixos). Chefe duelista que luta como a Koliani
+  (combo/dash/GUARDA que apara de frente) e a IMITA (devolve dardo apos
+  `magia_lancada`); fase 2 = energia purpura, teleporta, leque, "reforma".
+  Pistas `cela_zero_o_primeiro` + `cela_zero_porta_aberta`.
+  **DIALOGOS da luta ainda sem sistema de texto -- ficam pela pista.**
+
+### Regiao III -- Torres Esquecidas (fechada)
+- **11 Torre dos Sinos / O Sino Vivo**: mecanica `SinoTorre` (bater =
+  golpe/projetil): alterna plataformas do grupo `alterna_grupo` (default
+  "sino_alterna") e gela inimigos comuns (`DemonioBase.congelar` novo).
+  `so_congela` = sino que so' gela. Chefe = sino de bronze pendular:
+  badalada (anel rasteiro), grito (crescentes; fase 2 = 360), QUEDA
+  (despenca-se, fica preso EXPOSTO). Pista `sinos_badalada_familiar`.
+- **12 Torre dos Ventos** -- **NAO construida**: o slot e' servido pela
+  `Torres_Esquecidas.tscn` antiga (chefe_vento). Reconstruir como Aerion
+  quando houver tempo.
+- **13 Torre da Tempestade / Voltaris**: mecanicas `RaioTempestade`
+  (descarga vertical, `automatico` = padrao previsivel) + `ParaRaios`
+  (bater arma-o; a descarga seguinte por perto desvia-se e volta contra
+  o chefe via `receber_dano_ignorando_guarda`). Chefe teleporta, invoca
+  raios + clones eletricos; o para-raios atordoa-o. Pista
+  `tempestade_cajado_de_osso`.
+- **14 Observatorio Lunar / A Sacerdotisa Lunar**: gravidade variavel --
+  `Koliani.definir_grav_escala` + `_grav_escala`; `Movimento.passo` ganhou
+  8.o arg `grav_escala` (default 1.0). Mecanica `ZonaGravidade` (bolsa de
+  gravidade lunar). Chefe: luas falsas (crescentes que curvam), MARE
+  LUNAR (alivia a gravidade da Koliani + chuva de METEOROS). Repoe a
+  gravidade ao morrer/sair. Pista `lunar_carta_da_sacerdotisa`.
+- **15 O Pico Esquecido / Vyrak, o Dragao das Sombras**: nivel-luta (sem
+  mecanica de traversia). Chefe 3 fases: F1 no pico (garra/sopro) -> F2
+  parte o cume (grupo "plataformas_pico" cai) e VOA (passagens + bolas +
+  cauda) -> F3 despenca-se, nucleo EXPOSTO ate ao fim, garra/cauda/NOVA.
+  A "arena em cima do dragao" literal fica p/ polir. Pistas
+  `pico_escama_de_vyrak` + `pico_torres_para_tras`.
+
+### A SEGUIR -- Regiao IV: Catacumbas do Abismo (niveis 16..20)
+Por `docs/niveis.md`: 16 Cemiterio dos Reis / Rei Ossario (tumulos =
+elevadores) - 17 Galeria dos Ossos / Colosso Osseo (paredes destrutiveis)
+- 18 Cripta das Mil Velas / Freira Negra (plataformas so' quando
+iluminadas) - 19 ??? - 20 ??? (ver a biblia). bioma "catacumbas"
+(Plataforma ja recolore pedra a bone-green); fundo: falta pack proprio
+(usar "rochoso" ou "corredores" por agora). Inimigos: esqueleto.
+
+### Divida tecnica / a rever
+- **Nivel 06 (Prisao)**: falta pOr `PlataformaCorrente` para o
+  "correntes como plataformas moveis" do design.
+- **Nivel 12 (Torre dos Ventos / Aerion)**: por construir.
+- **Sistema de dialogo**: varios chefes (sobretudo O Primeiro Prisioneiro
+  e, no fim, Zeriko) pedem falas em cena. Nao ha runtime de texto/caixa
+  de dialogo -- so' pistas do diario. Decisao do Paulo.
+- **Vyrak F3**: "luta em cima do dragao" e' aproximada (nucleo exposto +
+  thrash), nao uma arena movel real.
+- Numeros (vida/dano/tempos) de todos os chefes 08..15 por afinar com
+  playtest -- foram postos "a olho".
