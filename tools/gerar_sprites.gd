@@ -59,6 +59,7 @@ func _initialize() -> void:
 	_boss_sino()     # regiao III / nivel 11
 	_boss_voltaris() # regiao III / nivel 13
 	_boss_sacerdotisa() # regiao III / nivel 14
+	_boss_vyrak()    # regiao III / nivel 15
 	print("OK -- sprites pixel-art em ", DIR)
 	quit(0)
 
@@ -914,4 +915,66 @@ func _boss_sacerdotisa() -> void:
 		else:
 			_linha(int(cx) - 7, 34, int(cx) - 12, 56, 4, MANTO)
 			_linha(int(cx) + 7, 34, int(cx) + 12, 56, 4, MANTO)
+	)
+
+
+## Nivel 15 -- O Pico Esquecido. Vyrak, o Dragao das Sombras: corpo escuro,
+## asas membranosas, cabeca com cornos, nucleo violeta no peito. Frame 2 =
+## asa/garra erguida (telegrafo); frame 3 = cabeca baixa a rugir, nucleo
+## em brasa (exposto).
+func _boss_vyrak() -> void:
+	var SOMBRA := Color("1c1622")
+	var SOMBRA_C := Color("2e2440")
+	var MEMBRANA := Color("3a2450")
+	var NUCLEO := Color("b06bff")
+	var GUME := Color("d8c4ff")
+	_boss("vyrak", 128, 108, func(f: int) -> void:
+		var asa_cima := f == 2
+		var cabeca_baixa := f == 3
+		var cx := 64.0
+		# cauda enrolada atras (esquerda)
+		_linha(20, 84, 6, 60, 6, SOMBRA)
+		_linha(6, 60, 14, 44, 4, SOMBRA)
+		# ancas / pernas
+		_elipse(44, 78, 12, 13, SOMBRA)
+		_rect(36, 88, 9, 16, SOMBRA)
+		_rect(50, 90, 9, 14, SOMBRA)
+		# tronco
+		_elipse(cx, 62, 22, 20, SOMBRA)
+		_elipse(cx, 60, 15, 14, SOMBRA_C)
+		# asa (atras do tronco)
+		if asa_cima:
+			_linha(cx - 6, 50, cx - 30, 8, 5, SOMBRA)
+			for wv in [[-30, 8, -6, 26], [-24, 12, 0, 30], [-16, 16, 8, 34]]:
+				_linha(cx + wv[0], wv[1] + 0, cx + wv[2], wv[3] + 0, 3, MEMBRANA)
+		else:
+			_linha(cx - 6, 52, cx - 22, 30, 5, SOMBRA)
+			for wv in [[-22, 30, -2, 44], [-14, 32, 8, 48]]:
+				_linha(cx + wv[0], wv[1], cx + wv[2], wv[3], 3, MEMBRANA)
+		# nucleo do peito
+		var g: float = [1.0, 1.2, 1.1, 1.45][f]
+		_elipse(cx + 6, 60, 6.0 * g, 7.0 * g, NUCLEO)
+		_elipse(cx + 6, 60, 2.6, 3.0, PAL["w"])
+		# pescoco + cabeca
+		if cabeca_baixa:
+			_linha(cx + 16, 52, cx + 40, 78, 7, SOMBRA)
+			_elipse(cx + 46, 82, 12, 9, SOMBRA)
+			_linha(cx + 40, 74, cx + 34, 66, 3, GUME)  # corno
+			_linha(cx + 50, 74, cx + 46, 64, 3, GUME)
+			_rect(int(cx) + 40, 84, 14, 2, NUCLEO)     # boca a rugir
+			_px(int(cx) + 44, 79, NUCLEO)
+		else:
+			_linha(cx + 14, 50, cx + 34, 30, 7, SOMBRA)
+			_elipse(cx + 40, 26, 12, 10, SOMBRA)
+			_linha(cx + 44, 18, cx + 40, 8, 3, GUME)
+			_linha(cx + 52, 20, cx + 50, 10, 3, GUME)
+			_px(int(cx) + 44, 26, NUCLEO)
+			_px(int(cx) + 48, 27, NUCLEO)
+		# garra da frente
+		if asa_cima or cabeca_baixa:
+			_linha(cx + 12, 74, cx + 30, 58, 4, SOMBRA_C)
+			for cl in range(3):
+				_linha(cx + 30 + cl * 2, 58, cx + 36 + cl * 3, 50, 1, GUME)
+		else:
+			_linha(cx + 12, 76, cx + 26, 92, 4, SOMBRA_C)
 	)

@@ -1,0 +1,203 @@
+[gd_scene load_steps=14 format=3 uid="uid://bkolianipico15"]
+
+; Região III / nível 15 -- O Pico Esquecido (fecha as Torres Esquecidas).
+; Sobe-se o pico por plataformas em ziguezague até ao cume. Lá em cima,
+; Vyrak, o Dragão das Sombras, em três fases: no pico -> parte o cume (as
+; plataformas do grupo "plataformas_pico" caem) e voa -> despenca-se
+; meio-abatido e a Koliani acaba com ele de perto. Sem mecânica de
+; traversia própria -- é a luta que fecha a região.
+
+[ext_resource type="PackedScene" uid="uid://bkolianiactor01" path="res://scenes/actors/Koliani.tscn" id="1_kol"]
+[ext_resource type="PackedScene" uid="uid://bdemoniobase01" path="res://scenes/actors/DemonioBase.tscn" id="2_dem"]
+[ext_resource type="PackedScene" uid="uid://bkolianicoletavel01" path="res://scenes/actors/Coletavel.tscn" id="3_col"]
+[ext_resource type="PackedScene" uid="uid://bkolianiporta01" path="res://scenes/actors/Porta.tscn" id="4_porta"]
+[ext_resource type="Script" path="res://scripts/checkpoint.gd" id="5_chk"]
+[ext_resource type="PackedScene" uid="uid://bkolianichefevyrak15" path="res://scenes/actors/ChefeVyrak.tscn" id="6_chefe"]
+[ext_resource type="Script" path="res://scripts/nivel_com_chefe.gd" id="7_niv"]
+[ext_resource type="PackedScene" uid="uid://bkolianiatmosfera01" path="res://scenes/fx/Atmosfera.tscn" id="8_atm"]
+[ext_resource type="PackedScene" uid="uid://bkolianiplataforma01" path="res://scenes/actors/Plataforma.tscn" id="9_pl"]
+[ext_resource type="PackedScene" uid="uid://bkolianiespinhos01" path="res://scenes/actors/Espinhos.tscn" id="10_esp"]
+
+[sub_resource type="RectangleShape2D" id="rs_chk"]
+size = Vector2(40, 80)
+
+[sub_resource type="Gradient" id="grad_luz"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="tex_luz"]
+gradient = SubResource("grad_luz")
+width = 256
+height = 256
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[node name="O_Pico_Esquecido" type="Node2D"]
+script = ExtResource("7_niv")
+
+[node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
+cor_ambiente = Color(0.58, 0.5, 0.7, 1)
+cor_fundo = Color(0.05, 0.04, 0.09, 1)
+cor_silhueta = Color(0.1, 0.08, 0.16, 1)
+cor_luz = Color(0.72, 0.5, 1, 1)
+cor_poeira = Color(0.78, 0.6, 1, 1)
+densidade_poeira = 1.8
+bioma = "torres"
+largura_nivel = 2700.0
+luzes_horizonte = true
+fundo_pack = "montanhas"
+
+[node name="ChaoBase" parent="." instance=ExtResource("9_pl")]
+position = Vector2(400, 660)
+tamanho = Vector2(520, 48)
+altura_visual = 100.0
+
+[node name="P1" parent="." instance=ExtResource("9_pl")]
+position = Vector2(780, 566)
+tamanho = Vector2(150, 22)
+altura_visual = 26.0
+
+[node name="P2" parent="." instance=ExtResource("9_pl")]
+position = Vector2(560, 470)
+tamanho = Vector2(150, 22)
+altura_visual = 26.0
+
+[node name="P3" parent="." instance=ExtResource("9_pl")]
+position = Vector2(840, 388)
+tamanho = Vector2(150, 22)
+altura_visual = 26.0
+
+[node name="P4" parent="." instance=ExtResource("9_pl")]
+position = Vector2(600, 300)
+tamanho = Vector2(150, 22)
+altura_visual = 26.0
+
+[node name="P5" parent="." instance=ExtResource("9_pl")]
+position = Vector2(880, 224)
+tamanho = Vector2(150, 22)
+altura_visual = 26.0
+
+[node name="CumeDeck" parent="." instance=ExtResource("9_pl")]
+position = Vector2(1550, 190)
+tamanho = Vector2(920, 44)
+altura_visual = 120.0
+
+[node name="PicoA" parent="." instance=ExtResource("9_pl") groups=["plataformas_pico"]]
+position = Vector2(1250, 96)
+tamanho = Vector2(150, 22)
+altura_visual = 26.0
+
+[node name="PicoB" parent="." instance=ExtResource("9_pl") groups=["plataformas_pico"]]
+position = Vector2(1850, 96)
+tamanho = Vector2(150, 22)
+altura_visual = 26.0
+
+[node name="PicoC" parent="." instance=ExtResource("9_pl") groups=["plataformas_pico"]]
+position = Vector2(1550, 20)
+tamanho = Vector2(160, 22)
+altura_visual = 26.0
+
+[node name="EspinhosP3" parent="." instance=ExtResource("10_esp")]
+position = Vector2(810, 366)
+largura = 6
+
+[node name="LuzBase" type="PointLight2D" parent="."]
+position = Vector2(400, 600)
+texture = SubResource("tex_luz")
+energy = 0.45
+color = Color(0.72, 0.5, 1, 1)
+scale = Vector2(1.9, 1.1)
+
+[node name="LuzCume" type="PointLight2D" parent="."]
+position = Vector2(1550, 130)
+texture = SubResource("tex_luz")
+energy = 0.6
+color = Color(0.72, 0.48, 1, 1)
+scale = Vector2(2.8, 1.6)
+
+[node name="Koliani" parent="." instance=ExtResource("1_kol")]
+position = Vector2(150, 560)
+
+[node name="Demonio1" parent="." instance=ExtResource("2_dem")]
+especie = "goblin"
+position = Vector2(520, 604)
+alcance_patrulha = 200.0
+
+[node name="Demonio2" parent="." instance=ExtResource("2_dem")]
+especie = "olho"
+position = Vector2(600, 260)
+alcance_patrulha = 160.0
+
+[node name="Chefe" parent="." instance=ExtResource("6_chefe")]
+position = Vector2(1560, 128)
+
+[node name="ColEscama" parent="." instance=ExtResource("3_col")]
+position = Vector2(600, 262)
+pista_id = "pico_escama_de_vyrak"
+
+[node name="CheckBase" type="Area2D" parent="."]
+position = Vector2(300, 588)
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("5_chk")
+
+[node name="Visual" type="ColorRect" parent="CheckBase"]
+offset_left = -5.0
+offset_top = -42.0
+offset_right = 5.0
+offset_bottom = 40.0
+color = Color(0.36, 0.28, 0.55, 1)
+
+[node name="Luz" type="Node2D" parent="CheckBase"]
+visible = false
+
+[node name="Brilho" type="ColorRect" parent="CheckBase/Luz"]
+offset_left = -20.0
+offset_top = -54.0
+offset_right = 20.0
+offset_bottom = 44.0
+color = Color(0.85, 0.31, 0.83, 0.32)
+
+[node name="PointLight2D" type="PointLight2D" parent="CheckBase/Luz"]
+texture = SubResource("tex_luz")
+energy = 1.1
+color = Color(0.93, 0.4, 0.9, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckBase"]
+shape = SubResource("rs_chk")
+
+[node name="CheckCume" type="Area2D" parent="."]
+position = Vector2(1180, 118)
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("5_chk")
+
+[node name="Visual" type="ColorRect" parent="CheckCume"]
+offset_left = -5.0
+offset_top = -42.0
+offset_right = 5.0
+offset_bottom = 40.0
+color = Color(0.36, 0.28, 0.55, 1)
+
+[node name="Luz" type="Node2D" parent="CheckCume"]
+visible = false
+
+[node name="Brilho" type="ColorRect" parent="CheckCume/Luz"]
+offset_left = -20.0
+offset_top = -54.0
+offset_right = 20.0
+offset_bottom = 44.0
+color = Color(0.85, 0.31, 0.83, 0.32)
+
+[node name="PointLight2D" type="PointLight2D" parent="CheckCume/Luz"]
+texture = SubResource("tex_luz")
+energy = 1.1
+color = Color(0.93, 0.4, 0.9, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckCume"]
+shape = SubResource("rs_chk")
+
+[node name="Porta" parent="." instance=ExtResource("4_porta")]
+position = Vector2(1950, 116)
+pista_ao_atravessar = "pico_torres_para_tras"

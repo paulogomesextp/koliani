@@ -101,6 +101,16 @@ const PISTAS := {
 		"titulo": "clue.torres_sussurro_da_mae.title",
 		"texto": "clue.torres_sussurro_da_mae.body",
 	},
+	"pico_escama_de_vyrak": {
+		"mundo": "world.towers",
+		"titulo": "clue.pico_escama_de_vyrak.title",
+		"texto": "clue.pico_escama_de_vyrak.body",
+	},
+	"pico_torres_para_tras": {
+		"mundo": "world.towers",
+		"titulo": "clue.pico_torres_para_tras.title",
+		"texto": "clue.pico_torres_para_tras.body",
+	},
 	"castelo_aurora_livre": {
 		"mundo": "world.castle",
 		"titulo": "clue.castelo_aurora_livre.title",
