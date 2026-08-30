@@ -255,10 +255,23 @@ func _saw_rede(par: Node2D, cx0: float) -> void:
 	par.add_child(s)
 
 
+## Espécies (arte LuizMelo CC0) que aparecem na jornada de cada região --
+## mais variedade do que só a do nível.
+const ESP_REGIAO := {
+	0: ["goblin", "mushroom"],
+	1: ["esqueleto", "goblin"],
+	2: ["olho", "goblin"],
+	3: ["esqueleto", "olho"],
+	4: ["goblin", "esqueleto"],
+	5: ["olho", "esqueleto", "goblin"],
+}
+
+
 func _inimigos(par: Node2D, cx0: float, quantos: int, y := -46.0) -> void:
-	for i in clampi(quantos, 0, 3):
+	var especies: Array = ESP_REGIAO.get(_regiao, [_esp])
+	for i in clampi(quantos, 0, 4):
 		var d := DEMONIO.instantiate()
-		d.especie = _esp
+		d.especie = _esp if _rng.randf() < 0.4 else especies[_rng.randi() % especies.size()]
 		d.position = Vector2(cx0 + _rng.randf_range(260.0, LARG - 300.0), _chao_y + y)
 		d.alcance_patrulha = _rng.randf_range(80.0, 170.0)
 		par.add_child(d)

@@ -1,5 +1,35 @@
 # Progresso do agente `gaming` — campanha dos 30 níveis
 
+## Sessão 2026-08-31 (cont.) — JORNADA 2.0: câmaras de plataformas a sério
+
+Feedback do Paulo: "os níveis continuam pequenos, quero MUITO mais
+plataformas e mecânicas, vá buscar assets e mude completamente os mapas".
+
+- **`gerador_corredor.gd` reescrito outra vez** — o percurso deixa de ser
+  "corredor com perigos" e passa a ser a maior parte do nível: câmaras
+  **multi-nível** cheias de plataformas, reutilizando TODAS as mecânicas de
+  plataforma do jogo (`PlataformaFlutuante`, `PlataformaRitmada`,
+  `PlataformaCorrente`, `TumuloElevador`, `ZonaGravidade`, `CorrenteAr`) +
+  3 novas.
+- **Mecânicas novas**: `PlataformaQuebra` (esboroa ao pisar),
+  `Trampolim` (atira para cima + `Koliani.devolver_saltos_ar()`),
+  `Impulsor` (rajada horizontal por um vão). Cenas code-only +
+  `scenes/actors/*.tscn`.
+- **Câmaras** (`POOL_REGIAO`): escadaria, saltos_altos, ritmadas,
+  trampolins, correntes_v, elevadores, quebra_ponte, torre_vento, impulso,
+  gravidade + as de perigo (serras/guilhotinas/fogo/pendulos/gruta/prensa/
+  pedras/portal) agora com **rota alta** de plataformas por cima.
+- Anti-softlock mantido: chão raso contínuo por baixo (as plataformas são o
+  desafio, o chão é a rede), última câmara = corredor liso + **ponte no
+  seam** (liga a qualquer altura de chão do nível feito à mão).
+- Variedade de inimigos na jornada por região (`ESP_REGIAO`, arte LuizMelo
+  já existente).
+- `LARG` 1100→1250, `comprimento_max` 33k→34k. `verifica_jornada` + testes
+  + smoke de 3 níveis OK. v0.6.29+.
+- **Assets CC0 por integrar (próximo passo)**: `bdragon1727` bullets nos
+  projéteis, `glionox` props na decoração, `szadiart`/`free-game-assets`
+  parallax. Estão em `assets/sprites/incoming/` (fora do git).
+
 ## Sessão 2026-08-31 — JORNADA (níveis grandes, boss no fim) + pedidos playtest
 
 **v0.6.26.** Feedback do Paulo: "jogo mecanicamente simples; níveis
