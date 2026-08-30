@@ -431,7 +431,10 @@ func _gui_input(evento: InputEvent) -> void:
 
 
 func _unhandled_input(evento: InputEvent) -> void:
-	if not visible:
+	# `visible` sozinho não chega: dentro da DevBarra o painel-pai está
+	# escondido mas este nó continua com visible=true -> J/atacar trocava
+	# de nível com o painel fechado.
+	if not is_visible_in_tree():
 		return
 	if evento.is_action_pressed("mover_direita") or evento.is_action_pressed("ui_right"):
 		_mover(1)
