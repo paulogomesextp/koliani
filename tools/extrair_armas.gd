@@ -36,7 +36,12 @@ func _init() -> void:
 		var c := idx % cols
 		var r := int(idx / cols)
 		var reg := Rect2i(c * CEL, r * CEL, CEL, CEL)
-		out.blit_rect(src, reg, Vector2i(i * CEL, 0))
+		# as lâminas do pack apontam para CIMA-ESQUERDA (pega em baixo-direita);
+		# a Koliani vira-se para a DIREITA -> espelha para a pega ficar na mão
+		# e a lâmina apontar para cima-frente.
+		var cel := src.get_region(reg)
+		cel.flip_x()
+		out.blit_rect(cel, Rect2i(0, 0, CEL, CEL), Vector2i(i * CEL, 0))
 		linha_cores.append(_cor_str(src, reg))
 
 	var err := out.save_png(ProjectSettings.globalize_path(DESTINO))
