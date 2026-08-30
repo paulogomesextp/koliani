@@ -8,6 +8,9 @@ extends CharacterBody2D
 signal morreu
 signal vida_mudou(atual: int, maximo: int)
 signal energia_mudou(atual: float, maximo: float)
+## Emitido sempre que lança o projétil mágico -- a Ala dos Mortos (nível 09)
+## usa-o para materializar as plataformas espectrais.
+signal magia_lancada
 
 const VIDA_MAXIMA := 100
 const DANO_ATAQUE := 25
@@ -333,6 +336,7 @@ func _lancar_projetil() -> void:
 	p.global_position = global_position + aim * 20.0 + Vector2(0.0, -4.0)
 	p.lancar(aim, DANO_ATAQUE)
 	Som.toca("projetil", -12.0, 1.25)
+	magia_lancada.emit()
 	if _faiscas:
 		_faiscas.position.x = absf(_faiscas.position.x) * signf(aim.x if aim.x != 0.0 else _olha_para)
 		_faiscas.restart()

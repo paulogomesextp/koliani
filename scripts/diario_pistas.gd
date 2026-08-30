@@ -51,6 +51,11 @@ const PISTAS := {
 		"titulo": "clue.execucoes_lista_de_nomes.title",
 		"texto": "clue.execucoes_lista_de_nomes.body",
 	},
+	"mortos_irmao_mais_novo": {
+		"mundo": "world.prison",
+		"titulo": "clue.mortos_irmao_mais_novo.title",
+		"texto": "clue.mortos_irmao_mais_novo.body",
+	},
 	"prisao_carta_na_cela": {
 		"mundo": "world.prison",
 		"titulo": "clue.prisao_carta_na_cela.title",

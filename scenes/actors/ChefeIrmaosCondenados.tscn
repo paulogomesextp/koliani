@@ -1,0 +1,89 @@
+[gd_scene load_steps=6 format=3 uid="uid://bkolianichefeirmaos09"]
+
+; Região II / nível 09 -- Os Irmãos Condenados. O corpo deste nó é o IRMÃO
+; PERTO; o script cria em runtime o IRMÃO LONGE (mesmo sprite, tom mais
+; frio) e a corrente entre os dois. Tira pixel-art de 4 frames
+; (0/1 pairar, 2 encolher p/ arremesso, 3 peito aberto -- núcleo de alma)
+; em assets/sprites/pixel/bosses/irmaos.png. Script chefe_irmaos_condenados.gd.
+
+[ext_resource type="Script" path="res://scripts/chefe_irmaos_condenados.gd" id="1_chefe"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/bosses/irmaos.png" id="2_tex"]
+
+[sub_resource type="RectangleShape2D" id="rs_body"]
+size = Vector2(44, 88)
+
+[sub_resource type="RectangleShape2D" id="rs_contacto"]
+size = Vector2(58, 96)
+
+[sub_resource type="Gradient" id="grad_luz"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="tex_luz"]
+gradient = SubResource("grad_luz")
+width = 256
+height = 256
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[node name="ChefeIrmaosCondenados" type="CharacterBody2D" groups=["inimigos"]]
+collision_layer = 4
+collision_mask = 1
+script = ExtResource("1_chefe")
+vida = 420
+dano_contacto = 18
+alcance_patrulha = 0.0
+cor_estilhacos = Color(0.5, 0.95, 0.78, 1)
+cor_rim = Color(0.5, 1, 0.8, 1)
+
+[node name="Sprite" type="Node2D" parent="."]
+
+[node name="Corpo" type="Sprite2D" parent="Sprite"]
+texture_filter = 1
+position = Vector2(0, -6)
+texture = ExtResource("2_tex")
+hframes = 4
+
+[node name="LuzAlma" type="PointLight2D" parent="Sprite"]
+position = Vector2(0, -14)
+texture = SubResource("tex_luz")
+energy = 0.7
+color = Color(0.5, 1, 0.8, 1)
+scale = Vector2(1, 0.95)
+
+[node name="Nucleo" type="Node2D" parent="Sprite"]
+position = Vector2(0, -16)
+scale = Vector2(0.4, 0.4)
+
+[node name="Brilho" type="Sprite2D" parent="Sprite/Nucleo"]
+visible = false
+texture = SubResource("tex_luz")
+modulate = Color(0.5, 1, 0.8, 0.9)
+scale = Vector2(0.32, 0.32)
+
+[node name="Diamante" type="Polygon2D" parent="Sprite/Nucleo"]
+color = Color(0.5, 0.95, 0.78, 1)
+polygon = PackedVector2Array(-8, 0, 0, -12, 8, 0, 0, 12)
+
+[node name="Cerne" type="Polygon2D" parent="Sprite/Nucleo"]
+color = Color(0.9, 1, 0.95, 1)
+polygon = PackedVector2Array(-3.5, 0, 0, -6, 3.5, 0, 0, 6)
+
+[node name="Luz" type="PointLight2D" parent="Sprite/Nucleo"]
+texture = SubResource("tex_luz")
+energy = 0.12
+color = Color(0.5, 1, 0.8, 1)
+scale = Vector2(0.6, 0.6)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 0)
+shape = SubResource("rs_body")
+
+[node name="AreaContacto" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AreaContacto"]
+position = Vector2(0, -4)
+shape = SubResource("rs_contacto")

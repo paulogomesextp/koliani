@@ -54,6 +54,7 @@ func _initialize() -> void:
 	_boss_rainha()
 	_boss_ignivar()  # regiao II / nivel 07
 	_boss_dama()     # regiao II / nivel 08
+	_boss_irmaos()   # regiao II / nivel 09
 	print("OK -- sprites pixel-art em ", DIR)
 	quit(0)
 
@@ -646,4 +647,58 @@ func _boss_dama() -> void:
 			_linha(int(cx) + 16, 54, int(cx) + 40, 78, 7, ACO)
 			_linha(int(cx) + 18, 52, int(cx) + 42, 76, 2, ACO_C)
 		_linha(int(cx) - 8, 32, int(cx) - 16, 58, 4, MANTO_C)
+	)
+
+
+## Nivel 09 -- Ala dos Mortos. Os Irmaos Condenados: fantasma de forcado,
+## tunica rasgada, pulsos agrilhoados com um coto de corrente, capuz oco.
+## Verde-ciano de alma (distingue-se do azul da Dama). Frame 2 encolhe-se
+## para o arremesso; frame 3 abre o peito -- caixa toracica + nucleo de alma.
+func _boss_irmaos() -> void:
+	var PANO := Color("1b2420")
+	var PANO_C := Color("2c3a33")
+	var ALMA := Color("7ff0c8")
+	var OSSO := Color("cfd8c4")
+	var FERRO := Color("5a6b66")
+	_boss("irmaos", 88, 104, func(f: int) -> void:
+		var crouch := f == 2
+		var cx := 44.0
+		var topo := 30 if crouch else 22
+		# tunica: ombros -> orla que se esfiapa
+		for j in range(topo, 90):
+			var t := float(j - topo) / float(90 - topo)
+			var meia := lerpf(9.0, 20.0, t)
+			_rect(int(cx - meia), j, int(meia * 2.0), 1, PANO if j % 3 else PANO_C)
+		for d in 6:
+			var fx := int(cx - 16 + d * 6)
+			_linha(fx, 88, fx + (d % 2) * 2 - 1, 88 + 6 + (d % 3) * 4, 1, ALMA)
+		# aura fria de um lado
+		for j in range(topo + 4, 82):
+			if j % 2 == 0:
+				_px(int(cx - lerpf(8.0, 17.0, float(j - topo) / 52.0)), j, Color(ALMA.r, ALMA.g, ALMA.b, 0.10))
+		# capuz oco
+		_elipse(cx, topo - 8, 10, 11, PANO)
+		if f == 3:
+			_elipse(cx, topo - 7, 6.5, 7.5, OSSO)
+			_px(int(cx) - 3, topo - 8, ALMA)
+			_px(int(cx) + 3, topo - 8, ALMA)
+			# peito aberto: costelas + nucleo
+			for r in 3:
+				_linha(int(cx) - 8, 44 + r * 5, int(cx) + 8, 44 + r * 5, 1, OSSO)
+			_elipse(cx, 50, 5.0, 6.0, ALMA)
+			_elipse(cx, 50, 2.2, 2.6, PAL["w"])
+		else:
+			_rect(int(cx) - 4, topo - 10, 8, 5, Color("06090a"))
+			_px(int(cx) - 3, topo - 8, ALMA)
+			_px(int(cx) + 3, topo - 8, ALMA)
+		# bracos + grilhetas
+		var by := 40 if not crouch else 46
+		_linha(int(cx) - 8, topo + 6, int(cx) - 16, by, 4, PANO_C)
+		_linha(int(cx) + 8, topo + 6, int(cx) + 16, by, 4, PANO_C)
+		_rect(int(cx) - 20, by, 6, 4, FERRO)
+		_rect(int(cx) + 14, by, 6, 4, FERRO)
+		# coto de corrente pendurado do pulso da frente
+		for k in 3:
+			_px(int(cx) + 17, by + 4 + k * 3, FERRO)
+			_px(int(cx) + 18, by + 5 + k * 3, FERRO)
 	)
