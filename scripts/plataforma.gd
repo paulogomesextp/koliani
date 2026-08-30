@@ -11,17 +11,19 @@ extends StaticBody2D
 ## Patch de relva/terra (Pixel Adventure 1, 16x16) e de pedra/tijolo
 ## (Kings and Pigs, 32x32). Sao 9-slices -- o miolo repete-se.
 const TEX_FLORESTA := preload("res://assets/sprites/pixel/tiles/floresta_block.png")
-const TEX_PEDRA := preload("res://assets/sprites/pixel/tiles/pedra_block.png")
+## Pedra-cripta gótica (calçada CC0 `piiixl` recolorida a frio + rebordo de
+## luar magenta), gerada por `tools/gerar_tiles_goticos.gd`.
+const TEX_PEDRA := preload("res://assets/sprites/pixel/tiles/pedra_gotica_block.png")
 
 ## bioma -> [textura, margem_esq, margem_topo, margem_dir, margem_baixo, tom]
-## O `tom` recolore o patch de pedra por regiao (a relva fica como esta).
+## O `tom` recolore o patch por regiao -- tons frios e fantasmagoricos.
 const BIOMAS := {
-	"floresta":   [TEX_FLORESTA, 5, 15, 5, 6, Color(1, 1, 1)],
-	"prisao":     [TEX_PEDRA, 11, 11, 11, 11, Color(0.62, 0.8, 0.98)],
-	"torres":     [TEX_PEDRA, 11, 11, 11, 11, Color(1.1, 0.88, 0.6)],
-	"catacumbas": [TEX_PEDRA, 11, 11, 11, 11, Color(0.82, 0.86, 0.66)],
-	"cidade":     [TEX_PEDRA, 11, 11, 11, 11, Color(0.95, 0.66, 0.62)],
-	"castelo":    [TEX_PEDRA, 11, 11, 11, 11, Color(0.95, 0.6, 1.0)],
+	"floresta":   [TEX_FLORESTA, 5, 15, 5, 6, Color(0.82, 0.86, 0.82)],
+	"prisao":     [TEX_PEDRA, 11, 11, 11, 11, Color(0.82, 0.82, 1.02)],
+	"torres":     [TEX_PEDRA, 11, 11, 11, 11, Color(0.95, 0.90, 1.0)],
+	"catacumbas": [TEX_PEDRA, 11, 11, 11, 11, Color(0.78, 0.90, 0.86)],
+	"cidade":     [TEX_PEDRA, 11, 11, 11, 11, Color(1.0, 0.78, 0.95)],
+	"castelo":    [TEX_PEDRA, 11, 11, 11, 11, Color(1.05, 0.70, 1.1)],
 }
 
 @export var tamanho := Vector2(200.0, 40.0) : set = _set_tamanho

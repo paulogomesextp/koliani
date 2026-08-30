@@ -57,3 +57,12 @@ CC0 não exige atribuição; fica aqui à mesma por cortesia.
   `tools/extrair_armas.gd`. A cor dominante de cada lâmina alimenta
   `Equipamento.COR_ARMA`, e o brilho/efeitos do golpe (`koliani.gd`) seguem
   essa cor.
+
+## piiixl — "Seamless Patterns" (16x16)
+- https://piiixl.itch.io/  (URL exato + licença POR CONFIRMAR pelo Paulo em incoming/LICENSES.md)
+- Uso: a calçada azul-escura (célula 0,0 da sheet) é a base do bloco de
+  terreno gótico das plataformas
+  (`assets/sprites/pixel/tiles/pedra_gotica_block.png`, 96x96 9-slice),
+  recolorida a frio + rebordo de luar magenta por
+  `tools/gerar_tiles_goticos.gd`. Substitui o `pedra_block.png` antigo em
+  todas as regiões de pedra (`scripts/plataforma.gd`).
