@@ -48,7 +48,7 @@ var _chao_cache := 0.0
 
 func _ready() -> void:
 	super._ready()
-	vida = maxi(vida, 300)
+	vida = maxi(vida, 275)
 	_vida_max = vida
 	_alvo_y = _origem.y
 	_mostrar_nucleo(false)

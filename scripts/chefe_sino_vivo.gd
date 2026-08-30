@@ -41,7 +41,7 @@ var _alvo_queda := 0.0
 
 func _ready() -> void:
 	super._ready()
-	vida = maxi(vida, 400)
+	vida = maxi(vida, 460)
 	_vida_max = vida
 	velocidade = 0.0
 	alcance_patrulha = 0.0

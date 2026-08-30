@@ -15,10 +15,19 @@ const VIDAS_INICIAIS := 3
 ## Todas as habilidades da campanha (o modo dev desbloqueia-as de uma vez).
 const HABILIDADES_TODAS := ["salto_duplo", "dash_aereo", "partir_paredes", "escudo", "projetil"]
 
-## Modo hardcore: tempo (segundos) para completar cada mundo. Ao esgotar ->
-## Game Over e a campanha recomeça do mundo 1. Números de partida -- afinar
-## com o jogo a correr.
-const TEMPO_HARDCORE := [90.0, 110.0, 115.0, 115.0, 120.0, 120.0, 130.0, 125.0, 135.0, 150.0, 130.0, 120.0, 135.0, 140.0, 160.0, 135.0, 150.0, 150.0, 140.0, 145.0, 150.0, 130.0, 150.0, 140.0, 150.0, 155.0]
+## Modo hardcore: tempo (segundos) para completar cada NÍVEL. Ao esgotar ->
+## Game Over e a campanha recomeça do nível 1. Uma entrada por nível (mesma
+## ordem de `NIVEIS`), a subir por região e com folga extra nos níveis-fim
+## de região; o nível 30 (Zeriko, 4 formas) leva o dobro. Ainda "a olho" --
+## afinar com o jogo a correr.
+const TEMPO_HARDCORE := [
+	95.0, 105.0, 110.0, 115.0, 130.0,      # I   Floresta
+	120.0, 125.0, 130.0, 135.0, 150.0,     # II  Prisão
+	135.0, 140.0, 145.0, 150.0, 170.0,     # III Torres
+	150.0, 155.0, 160.0, 165.0, 185.0,     # IV  Catacumbas
+	165.0, 170.0, 175.0, 180.0, 200.0,     # V   Cidade
+	180.0, 185.0, 190.0, 195.0, 240.0,     # VI  Castelo (+ Zeriko)
+]
 
 ## Sequencia fixa de mundos ate ao Zeriko (platformer por niveis, nao
 ## roguelite). O agente "gaming" acrescenta/renomeia niveis aqui a medida

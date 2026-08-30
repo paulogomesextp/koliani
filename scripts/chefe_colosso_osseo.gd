@@ -42,7 +42,7 @@ var _proximo_limiar := 0.75
 
 func _ready() -> void:
 	super._ready()
-	vida = maxi(vida, 640)
+	vida = maxi(vida, 585)
 	_vida_max = vida
 	velocidade = 0.0
 	alcance_patrulha = 0.0

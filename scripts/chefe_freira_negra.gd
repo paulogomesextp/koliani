@@ -39,7 +39,7 @@ var _vela_alvo: Node = null
 
 func _ready() -> void:
 	super._ready()
-	vida = maxi(vida, 380)
+	vida = maxi(vida, 610)
 	_vida_max = vida
 	velocidade = 0.0
 	alcance_patrulha = 0.0

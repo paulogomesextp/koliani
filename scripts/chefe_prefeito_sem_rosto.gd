@@ -40,7 +40,7 @@ var _decoys: Array[Node2D] = []
 
 func _ready() -> void:
 	super._ready()
-	vida = maxi(vida, 420)
+	vida = maxi(vida, 660)
 	_vida_max = vida
 	velocidade = 0.0
 	alcance_patrulha = 0.0

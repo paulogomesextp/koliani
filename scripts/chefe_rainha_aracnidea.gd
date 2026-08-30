@@ -38,7 +38,7 @@ var _vida_max := 380
 
 func _ready() -> void:
 	super._ready()
-	vida = maxi(vida, 380)
+	vida = maxi(vida, 300)
 	_vida_max = vida
 	velocidade = vel_passo
 	alcance_patrulha = maxf(alcance_patrulha, 140.0)

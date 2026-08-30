@@ -48,7 +48,7 @@ var _feixe_area: Area2D
 
 func _ready() -> void:
 	super._ready()
-	vida = maxi(vida, 900)
+	vida = maxi(vida, 1200)
 	_vida_max = vida
 	velocidade = 0.0
 	alcance_patrulha = 0.0

@@ -40,7 +40,7 @@ var _inv_para := Vector2.ZERO
 
 func _ready() -> void:
 	super._ready()
-	vida = maxi(vida, 400)
+	vida = maxi(vida, 485)
 	_vida_max = vida
 	velocidade = 0.0
 	alcance_patrulha = 0.0

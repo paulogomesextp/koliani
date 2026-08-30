@@ -41,7 +41,7 @@ var _mergulho_alvo := 0.0
 
 func _ready() -> void:
 	super._ready()
-	vida = maxi(vida, 480)
+	vida = maxi(vida, 780)
 	_vida_max = vida
 	velocidade = 0.0
 	alcance_patrulha = 0.0

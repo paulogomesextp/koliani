@@ -23,7 +23,7 @@ var _onda_feita := false
 
 func _ready() -> void:
 	super._ready()
-	vida = maxi(vida, 300)
+	vida = maxi(vida, 380)
 
 
 func _physics_process(dt: float) -> void:

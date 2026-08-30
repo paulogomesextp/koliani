@@ -40,7 +40,7 @@ var _brasas_acc := 0.0
 
 func _ready() -> void:
 	super._ready()
-	vida = maxi(vida, 500)
+	vida = maxi(vida, 720)
 	_vida_max = vida
 	velocidade = 0.0
 	alcance_patrulha = 0.0

@@ -46,7 +46,7 @@ var _inv_dir := 1.0
 
 func _ready() -> void:
 	super._ready()
-	vida = maxi(vida, 640)
+	vida = maxi(vida, 900)
 	_vida_max = vida
 	velocidade = 0.0
 	alcance_patrulha = 0.0

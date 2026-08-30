@@ -39,9 +39,10 @@ func _e_chefe() -> bool:
 func _ready() -> void:
 	super._ready()
 	add_to_group("chefes")
-	# chefe mais perigoso ao contacto nos mundos mais avançados (a vida-base
-	# é definida por cada chefe concreto no seu _ready)
-	dano_contacto = int(round(dano_contacto * (1.0 + 0.09 * float(clampi(EstadoJogo.indice_nivel, 0, 3)))))
+	# chefe mais perigoso ao contacto à medida que a campanha avança (rampa
+	# suave pelos 30 níveis: ~x1.0 no nível 1 -> ~x1.9 no nível 30). A
+	# vida-base é definida por cada chefe concreto no seu _ready.
+	dano_contacto = int(round(dano_contacto * (1.0 + 0.03 * float(clampi(EstadoJogo.indice_nivel, 0, 29)))))
 
 
 func _process(dt: float) -> void:

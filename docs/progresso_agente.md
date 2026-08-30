@@ -8,21 +8,45 @@ tem cena + chefe (herda `ChefeBase`) + `_boss_*` em `gerar_sprites.gd` +
 pista i18n×6 + `TEMPO_HARDCORE`. `Castelo_de_Zeriko.tscn` / `zeriko.gd` /
 `Zeriko.tscn` ficaram como **legado** (fora da campanha).
 
-**O QUE FALTA (não é construção nova — é polish):**
-1. **Playtest + afinar números.** Vida/dano/telégrafos/tempos de TODOS os
-   30 chefes foram postos "a olho". Idem `TEMPO_HARDCORE`.
-2. **Sistema de diálogo.** Não existe. As falas de chefes-história
-   (Primeiro Prisioneiro, Noiva do Eclipse, Arauto, Zeriko) estão só nas
-   pistas do diário. É a maior lacuna — decisão do Paulo.
-3. **Mecânicas aproximadas** (assinaladas nos comentários das cenas):
-   nível 12 "Torre dos Ventos / Aerion" nunca foi construído (o slot é
-   servido pela `Torres_Esquecidas.tscn` antiga); nível 19 "paredes
-   móveis"; nível 23 "trem que anda de facto"; Vyrak (15) F3 "arena em
-   cima do dragão"; nível 15 é nível-luta sem traversia própria.
-4. **Ecrã de mapa/menu por regiões** — a camada de dados (`REGIOES`)
-   existe; a UI (`MapaMundo`) pode não listar as 25 regiões novas bem.
-5. **`tools/shot_plataforma.gd`** não gerou PNG em headless nesta
-   máquina (parece precisar de GPU) — verificação foi só por smoke.
+## Sessão de polish 2026-08-30 (noite) — feito
+
+- **Legado apagado.** `Torres_Esquecidas.tscn`+`ChefeVento`+`chefe_vento.gd`
+  e `Castelo_de_Zeriko.tscn`+`Zeriko.tscn`+`zeriko.gd`+`nivel_castelo.gd`
+  saíram do repo (já substituídos pelos níveis 12 e 30). `ProjetilZeriko`
+  fica (Zeriko final + Coração Putrefacto). `cena_final.gd` fica (narrativa
+  a religar ao fim do nível 30).
+- **Carrossel de escolha de nível.** `SeletorNiveis.tscn`/`.gd` (cover-flow:
+  cartão central + 2 vizinhos, faixa da região, N/30, nome do nível,
+  "Chefe: X", CONCLUÍDO/TRANCADO; setas/teclado/roda/arrasto). Substitui a
+  lista vertical que passava o ecrã. Usado no **MapaMundo** (respeita
+  bloqueios) e na **DevBarra** (livre). Dados: `catalogo_campanha.gd`
+  (`CHEFE_KEY` ×30) + 60 chaves i18n (`level.n00..29`, `boss.<slug>`) +
+  `sel.*`. Teste `teste_catalogo_campanha`.
+- **Balão de fala.** Autoload `Dialogo` + `Balao.tscn`/`.gd` (borda magenta,
+  cauda ao orador, typewriter, "toca para continuar", congela a árvore).
+  `ChefeBase.falas_intro`/`falas_fim` (opt-in): intro dispara a
+  `gatilho_intro` px, fim antes de a porta abrir. Ligados: Primeiro
+  Prisioneiro, Noiva do Eclipse, Arauto, ZERIKO. 15 chaves `dlg.*` ×6.
+- **Passagem aos números (1.ª).** Curva de vida monótona por região
+  (Ghorak 250 → Zeriko 1200; ver `hp` no git). `ChefeBase` deixa de ter o
+  multiplicador de dano de contacto travado nos 4 mundos — agora rampa
+  suave pelos 30 níveis (`0.03*idx`, ~x1.0 → ~x1.9). `TEMPO_HARDCORE`
+  reescrito com 30 entradas a subir por região (+ folga nos fins de
+  região; Zeriko 240s). **Ainda "a olho"** — telégrafos, cadências e dano
+  por projétil de cada chefe ficam para o playtest do Paulo.
+
+**O QUE FALTA:**
+1. **Playtest fino.** Telégrafos/cadências/dano-por-ataque dos 30 chefes
+   continuam por afinar em jogo. A curva de vida e o hardcore são um 1.º
+   palpite coerente, não o número final.
+2. **Mecânicas aproximadas** (assinaladas nos comentários das cenas):
+   nível 19 "paredes móveis" (agora `ParedeMovel`, rever); nível 23 "trem
+   que anda de facto" (é a Koliani a correr + parallax); Vyrak (15) F3
+   "arena em cima do dragão"; nível 15 é nível-luta sem traversia própria.
+3. **`cena_final.gd`** (6 linhas, `final.line1..6`) por religar ao fim do
+   nível 30 no lugar do provisório `fim_campanha.gd`.
+4. **Screenshots headless FUNCIONAM** nesta máquina (RTX 5070) — ver o
+   padrão no git desta sessão (SceneTree que instancia a cena + `--script`).
 
 ## COMO RETOMAR (para continuar o polish)
 
