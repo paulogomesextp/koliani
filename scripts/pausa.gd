@@ -49,7 +49,10 @@ func _traduzir() -> void:
 	_menu.text = Textos.t("pause.main_menu")
 
 
-func _process(_dt: float) -> void:
+var _cd := 0.0
+
+
+func _process(dt: float) -> void:
 	# em _process (não em _input) para apanhar também o TouchScreenButton do
 	# HUD, que sinaliza a ação sem gerar um InputEvent que propague.
 	# Se o ecrã de equipamento (HUD) estiver aberto, é ele que trata o Esc.
@@ -58,6 +61,11 @@ func _process(_dt: float) -> void:
 	# Com as Opções sobrepostas, o Esc fecha-as a elas (opcoes_menu.gd), não
 	# o menu de pausa.
 	if _opcoes_inst != null:
+		return
+	# tempo morto após abrir/fechar -- um botão START "ressaltado" no comando
+	# não fica a abrir e fechar o menu vezes sem conta (parecia um freeze)
+	_cd = maxf(0.0, _cd - dt)
+	if _cd > 0.0:
 		return
 	var alternar := Input.is_action_just_pressed("pausa")
 	if visible:
@@ -68,12 +76,14 @@ func _process(_dt: float) -> void:
 
 
 func _abrir() -> void:
+	_cd = 0.35
 	visible = true
 	get_tree().paused = true
 	_continuar.grab_focus()
 
 
 func _fechar() -> void:
+	_cd = 0.35
 	visible = false
 	get_tree().paused = false
 

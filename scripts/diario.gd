@@ -28,9 +28,15 @@ func _traduzir() -> void:
 		_reconstruir()
 
 
-func _process(_dt: float) -> void:
+var _cd := 0.0
+
+
+func _process(dt: float) -> void:
 	# em _process (não em _input) para apanhar também o TouchScreenButton do
 	# HUD, que sinaliza a ação sem gerar um InputEvent que propague
+	_cd = maxf(0.0, _cd - dt)
+	if _cd > 0.0:
+		return
 	if Input.is_action_just_pressed("diario"):
 		_alternar()
 	elif visible and Input.is_action_just_pressed("ui_cancel"):
@@ -46,12 +52,14 @@ func _alternar() -> void:
 
 
 func _abrir() -> void:
+	_cd = 0.35
 	_reconstruir()
 	visible = true
 	get_tree().paused = true
 
 
 func _fechar() -> void:
+	_cd = 0.35
 	visible = false
 	get_tree().paused = false
 

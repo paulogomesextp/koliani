@@ -14,6 +14,8 @@ const FIM_CAMPANHA := preload("res://scripts/fim_campanha.gd")
 
 
 func _ready() -> void:
+	Engine.time_scale = 1.0  # rede de segurança: nunca começar um nível "congelado"
+	get_tree().paused = false
 	Musica.ambiente(EstadoJogo.indice_nivel)
 	var caminho := EstadoJogo.caminho_nivel_atual()
 	var cena_nivel: PackedScene = load(caminho)

@@ -611,8 +611,11 @@ func _hitstop(segundos: float) -> void:
 	if Engine.time_scale < 0.5:
 		return
 	Engine.time_scale = 0.0
-	await get_tree().create_timer(segundos, true, false, true).timeout
-	Engine.time_scale = 1.0
+	# NÃO usar `await` aqui: se a Koliani for libertada (reload de cena) a
+	# meio, a corrotina morre e o time_scale ficava preso em 0 = freeze.
+	# O timer vive na árvore e o Callable não segura `self`.
+	get_tree().create_timer(segundos, true, false, true).timeout.connect(
+		func() -> void: Engine.time_scale = 1.0)
 
 
 func _iniciar_ataque() -> void:
