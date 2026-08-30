@@ -14,6 +14,11 @@ const GRAVIDADE := 1400.0
 ## A que distância à frente se testa se ainda há chão (evita cair da
 ## plataforma na patrulha / na perseguição).
 @export var margem_borda := 20.0
+## Inimigo de emboscada (Vila dos Sem-Rosto, nível 21): fica quieto e
+## inofensivo até a Koliani chegar a `raio_acorda` px -- aí "revela-se"
+## (estremece) e passa a patrulhar/atacar como um demónio normal.
+@export var dormente := false
+@export var raio_acorda := 120.0
 ## Cor do rasto de partículas quando morre.
 @export var cor_estilhacos := Color(0.7, 0.25, 0.45)
 ## Cor da luz de recorte (rim) do sprite -- normalmente o tom do bioma.
@@ -157,6 +162,15 @@ func _atualizar_anim() -> void:
 func _physics_process(dt: float) -> void:
 	if _morto:
 		return
+	if dormente:
+		velocity.x = 0.0
+		if not is_on_floor():
+			velocity.y += GRAVIDADE * dt
+		move_and_slide()
+		var k := get_tree().get_first_node_in_group("koliani")
+		if k and global_position.distance_to((k as Node2D).global_position) <= raio_acorda:
+			_revelar()
+		return
 	if _congelado > 0.0:
 		_congelado -= dt
 		velocity.x = 0.0
@@ -176,6 +190,22 @@ func _physics_process(dt: float) -> void:
 		_virar()
 
 
+## Um inimigo de emboscada (`dormente`) "acorda": estremece e passa a
+## comportar-se como um demónio normal. Idempotente.
+func _revelar() -> void:
+	if not dormente:
+		return
+	dormente = false
+	anticipacao = 1.0
+	_flinch = 1.0
+	Som.toca("demonio_ataque", -10.0, 1.2)
+	if _sprite:
+		var t := _sprite.create_tween()
+		t.tween_property(_sprite, "rotation", 0.25, 0.05)
+		t.tween_property(_sprite, "rotation", -0.2, 0.06)
+		t.tween_property(_sprite, "rotation", 0.0, 0.08)
+
+
 func _virar() -> void:
 	_direcao *= -1.0
 	if _sprite:
@@ -192,7 +222,7 @@ func ha_chao_a_frente(dir: float) -> bool:
 
 
 func _ao_tocar(corpo: Node) -> void:
-	if _morto:
+	if _morto or dormente:
 		return
 	if corpo is Koliani:
 		corpo.receber_dano(dano_contacto, signf(corpo.global_position.x - global_position.x))

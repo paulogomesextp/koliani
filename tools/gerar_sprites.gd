@@ -65,6 +65,7 @@ func _initialize() -> void:
 	_boss_freira()   # regiao IV / nivel 18
 	_boss_naga()     # regiao IV / nivel 19
 	_boss_olho()     # regiao IV / nivel 20
+	_boss_prefeito() # regiao V / nivel 21
 	print("OK -- sprites pixel-art em ", DIR)
 	quit(0)
 
@@ -1243,4 +1244,58 @@ func _boss_olho() -> void:
 				for d in 4:
 					var ang2 := TAU * float(d) / 4.0 + 0.4
 					_linha(int(cx), int(cy), int(cx + cos(ang2) * 16.0), int(cy + sin(ang2) * 16.0), 1, IRIS_C)
+	)
+
+
+## Nivel 21 -- Vila dos Sem-Rosto. O Prefeito Sem-Rosto: casaca vermelha,
+## cartola, faixa de gala, bengala -- e uma cara LISA sem tracos. Frame 2 =
+## bengala erguida (telegrafo); frame 3 = a cara lisa abre-se num vazio
+## violeta (exposto).
+func _boss_prefeito() -> void:
+	var CASACA := Color("6a1f2a")
+	var CASACA_C := Color("8c3340")
+	var CARTOLA := Color("14121a")
+	var OURO := Color("d9b64a")
+	var CARA := Color("d8cbb6")
+	var VAZIO := Color("7a2ea8")
+	_boss("prefeito", 68, 108, func(f: int) -> void:
+		var bengala_cima := f == 2
+		var abre := f == 3
+		var cx := 34.0
+		# pernas / calcas escuras
+		_rect(int(cx) - 10, 84, 8, 22, CARTOLA)
+		_rect(int(cx) + 2, 84, 8, 22, CARTOLA)
+		_rect(int(cx) - 12, 104, 12, 3, Color("0a0a10"))
+		_rect(int(cx), 104, 12, 3, Color("0a0a10"))
+		# casaca
+		for j in range(38, 90):
+			var t := float(j - 38) / 52.0
+			var meia := lerpf(11.0, 15.0, t)
+			_rect(int(cx - meia), j, int(meia * 2.0), 1, CASACA if j % 4 else CASACA_C)
+		# faixa de gala (diagonal dourada)
+		for j in range(40, 78):
+			_px(int(cx) - 10 + (j - 40) / 2, j, OURO)
+			_px(int(cx) - 9 + (j - 40) / 2, j, OURO)
+		# botoes
+		for by in [46, 54, 62, 70]:
+			_px(int(cx) + 1, by, OURO)
+		# cabeca lisa + cartola
+		_elipse(cx, 24, 8, 9, CARA)
+		if abre:
+			_elipse(cx, 25, 5.0, 6.0, VAZIO)
+			_elipse(cx, 25, 2.2, 2.6, PAL["w"])
+		# cartola
+		_rect(int(cx) - 11, 12, 22, 3, CARTOLA)  # aba
+		_rect(int(cx) - 7, 0, 14, 12, CARTOLA)   # copa
+		_rect(int(cx) - 7, 4, 14, 2, CASACA)     # fita
+		# bracos + bengala
+		if bengala_cima:
+			_linha(int(cx) + 9, 42, int(cx) + 18, 16, 4, CASACA_C)
+			_linha(int(cx) + 18, 16, int(cx) + 22, -4, 2, Color("3a2c1e"))
+			_elipse(cx + 22, -6, 3, 3, OURO)
+		else:
+			_linha(int(cx) + 9, 44, int(cx) + 16, 66, 4, CASACA_C)
+			_linha(int(cx) + 16, 52, int(cx) + 16, 88, 2, Color("3a2c1e"))
+			_elipse(cx + 16, 50, 3, 3, OURO)
+		_linha(int(cx) - 9, 44, int(cx) - 15, 64, 4, CASACA_C)
 	)

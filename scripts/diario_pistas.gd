@@ -141,6 +141,11 @@ const PISTAS := {
 		"titulo": "clue.abismo_saida_para_a_cidade.title",
 		"texto": "clue.abismo_saida_para_a_cidade.body",
 	},
+	"vila_retrato_sem_cara": {
+		"mundo": "world.city",
+		"titulo": "clue.vila_retrato_sem_cara.title",
+		"texto": "clue.vila_retrato_sem_cara.body",
+	},
 	"castelo_aurora_livre": {
 		"mundo": "world.castle",
 		"titulo": "clue.castelo_aurora_livre.title",

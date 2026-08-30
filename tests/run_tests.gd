@@ -386,14 +386,16 @@ func teste_estado_regioes_e_conclusao() -> void:
 		e.marcar_nivel_concluido(idx)
 	_ok(e.regiao_esta_concluida(r0), "concluir todos os níveis da região marca-a como concluída")
 
-	# uma região sem níveis definidos nunca conta como concluída
+	# uma região sem níveis definidos nunca conta como concluída. Quando a
+	# campanha já está toda distribuída (nenhuma região vazia) esta parte
+	# não se aplica -- só se verifica se ainda houver alguma por construir.
 	var vazia := -1
 	for r in e.REGIOES.size():
 		if (e.REGIOES[r]["niveis"] as Array).is_empty():
 			vazia = r
 			break
-	_ok(vazia >= 0, "há pelo menos uma região ainda por construir")
-	_ok(not e.regiao_esta_concluida(vazia), "região sem níveis não está concluída")
+	if vazia >= 0:
+		_ok(not e.regiao_esta_concluida(vazia), "região sem níveis não está concluída")
 
 	# avancar_nivel marca o nível de partida
 	e.reiniciar_campanha()
