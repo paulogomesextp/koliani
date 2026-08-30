@@ -8,6 +8,7 @@ extends Node2D
 const CENA_HUD := preload("res://scenes/ui/HUD.tscn")
 const CENA_DIARIO := preload("res://scenes/ui/Diario.tscn")
 const CENA_PAUSA := preload("res://scenes/ui/Pausa.tscn")
+const CENA_DEV_BARRA := preload("res://scenes/ui/DevBarra.tscn")
 const RELOGIO_HARDCORE := preload("res://scripts/relogio_hardcore.gd")
 const FIM_CAMPANHA := preload("res://scripts/fim_campanha.gd")
 
@@ -29,6 +30,8 @@ func _ready() -> void:
 	add_child(CENA_HUD.instantiate())
 	add_child(CENA_DIARIO.instantiate())
 	add_child(CENA_PAUSA.instantiate())
+	if EstadoJogo.modo_dev:
+		add_child(CENA_DEV_BARRA.instantiate())
 
 	if EstadoJogo.hardcore:
 		var relogio := CanvasLayer.new()

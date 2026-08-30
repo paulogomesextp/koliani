@@ -11,6 +11,10 @@
 	"menu.confirm_suffix": "  —  confirmar",
 	"menu.warn_new_game": "NOVO JOGO apaga o progresso guardado.",
 	"menu.warn_hardcore": "MODO HARDCORE apaga o progresso e liga um tempo limite por mundo.",
+	"menu.dev_mode": "PAULITOS JENSATH DEV MODE",
+	"dev.test_level": "TESTAR OUTRO NÍVEL",
+	"dev.title": "MODO DEV — escolher nível",
+	"dev.close": "Fechar",
 
 	"options.title": "OPÇÕES",
 	"options.sound": "SOM",

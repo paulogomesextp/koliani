@@ -17,6 +17,7 @@ extends Control
 ##   --jogar / --foto[=...]   salta o menu e arranca já em Main.tscn
 ##   --nivel=N                salta o menu e arranca no mundo N (1..4)
 ##   --hardcore               salta o menu e arranca uma campanha hardcore
+##   --devmode                salta o menu e arranca em PAULITOS JENSATH DEV MODE
 
 const CENA_JOGO := "res://scenes/Main.tscn"
 const CENA_MAPA := "res://scenes/ui/MapaMundo.tscn"
@@ -28,6 +29,7 @@ const CENA_OPCOES := preload("res://scenes/ui/Opcoes.tscn")
 @onready var _load: Button = $Centro/LoadGame
 @onready var _hardcore: Button = $Centro/Hardcore
 @onready var _opcoes: Button = $Centro/Opcoes
+@onready var _dev: Button = $Centro/DevMode
 @onready var _aviso: Label = $Centro/Aviso
 @onready var _sair: Button = $Centro/Sair
 @onready var _versao: Label = $Versao
@@ -38,6 +40,15 @@ var _armado := ""
 
 func _ready() -> void:
 	_versao.text = "v" + str(ProjectSettings.get_setting("application/config/version", "0.0.0"))
+
+	# voltar ao menu sai do "DEV MODE" -- recarrega o save real do disco
+	# (o sandbox de dev nunca é gravado, por isso o progresso fica intacto).
+	if EstadoJogo.modo_dev:
+		EstadoJogo.modo_dev = false
+		if FileAccess.file_exists(EstadoJogo.CAMINHO_SAVE):
+			EstadoJogo.carregar()
+		else:
+			EstadoJogo.reiniciar_campanha()
 
 	if _tratar_atalhos_dev():
 		return
@@ -50,6 +61,7 @@ func _ready() -> void:
 	_load.pressed.connect(_entrar_campanha)
 	_hardcore.pressed.connect(_ao_hardcore)
 	_opcoes.pressed.connect(_abrir_opcoes)
+	_dev.pressed.connect(_ao_dev_mode)
 	_sair.pressed.connect(func() -> void: get_tree().quit())
 
 	Textos.idioma_mudou.connect(func(_l: String) -> void: _traduzir())
@@ -63,6 +75,7 @@ func _traduzir() -> void:
 	_novo.text = Textos.t("menu.new_game")
 	_hardcore.text = Textos.t("menu.hardcore")
 	_opcoes.text = Textos.t("menu.options")
+	_dev.text = Textos.t("menu.dev_mode")
 	_sair.text = Textos.t("menu.quit")
 
 	var ha := EstadoJogo.ha_progresso()
@@ -86,6 +99,7 @@ func _traduzir() -> void:
 func _tratar_atalhos_dev() -> bool:
 	var saltar := false
 	var hardcore := false
+	var devmode := false
 	var nivel := -1
 	for a in OS.get_cmdline_user_args():
 		if a == "--jogar" or a.begins_with("--foto"):
@@ -93,6 +107,9 @@ func _tratar_atalhos_dev() -> bool:
 		elif a == "--hardcore":
 			saltar = true
 			hardcore = true
+		elif a == "--devmode":
+			saltar = true
+			devmode = true
 		elif a.begins_with("--nivel="):
 			saltar = true
 			nivel = int(a.get_slice("=", 1)) - 1
@@ -101,6 +118,8 @@ func _tratar_atalhos_dev() -> bool:
 	if hardcore:
 		EstadoJogo.hardcore = true
 		EstadoJogo.reiniciar_campanha()
+	if devmode:
+		EstadoJogo.ativar_modo_dev()
 	if nivel >= 0:
 		EstadoJogo.indice_nivel = clampi(nivel, 0, EstadoJogo.NIVEIS.size() - 1)
 		EstadoJogo.checkpoint = Vector2.ZERO
@@ -122,6 +141,15 @@ func _deriva_arte() -> void:
 func _abrir_opcoes() -> void:
 	_repor_botoes()
 	add_child(CENA_OPCOES.instantiate())
+
+
+## "PAULITOS JENSATH DEV MODE": sandbox de testes (habilidades todas, energia
+## infinita, sem perder vida) a partir do nível 1. Não mexe no save real; a
+## barra "TESTAR OUTRO NÍVEL" (dev_barra.gd) troca de nível dentro do jogo.
+func _ao_dev_mode() -> void:
+	_repor_botoes()
+	EstadoJogo.ativar_modo_dev()
+	_ir_jogar()
 
 
 func _ao_novo() -> void:

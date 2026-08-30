@@ -11,6 +11,10 @@
 	"menu.confirm_suffix": "  —  confirm",
 	"menu.warn_new_game": "NEW GAME erases your saved progress.",
 	"menu.warn_hardcore": "HARDCORE MODE erases your progress and turns on a time limit per world.",
+	"menu.dev_mode": "PAULITOS JENSATH DEV MODE",
+	"dev.test_level": "TEST ANOTHER LEVEL",
+	"dev.title": "DEV MODE — pick a level",
+	"dev.close": "Close",
 
 	"options.title": "OPTIONS",
 	"options.sound": "SOUND",

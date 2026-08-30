@@ -11,6 +11,10 @@
 	"menu.confirm_suffix": "  —  bestätigen",
 	"menu.warn_new_game": "NEUES SPIEL löscht deinen gespeicherten Fortschritt.",
 	"menu.warn_hardcore": "HARDCORE-MODUS löscht deinen Fortschritt und aktiviert ein Zeitlimit pro Welt.",
+	"menu.dev_mode": "PAULITOS JENSATH DEV MODE",
+	"dev.test_level": "ANDERE EBENE TESTEN",
+	"dev.title": "DEV-MODUS — Ebene wählen",
+	"dev.close": "Schließen",
 
 	"options.title": "OPTIONEN",
 	"options.sound": "TON",

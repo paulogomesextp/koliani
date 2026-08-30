@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3 uid="uid://bkolianidevbarra01"]
+
+; Barra de topo do "PAULITOS JENSATH DEV MODE" (ver scripts/dev_barra.gd).
+; Botão "TESTAR OUTRO NÍVEL" + lista de níveis. Só o main.gd a instancia,
+; e só quando EstadoJogo.modo_dev está ligado.
+
+[ext_resource type="Script" path="res://scripts/dev_barra.gd" id="1_dev"]
+
+[node name="DevBarra" type="CanvasLayer"]
+script = ExtResource("1_dev")

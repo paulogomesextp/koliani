@@ -12,6 +12,9 @@ const CAMINHO_SAVE := "user://progresso.json"
 
 const VIDAS_INICIAIS := 3
 
+## Todas as habilidades da campanha (o modo dev desbloqueia-as de uma vez).
+const HABILIDADES_TODAS := ["salto_duplo", "dash_aereo", "partir_paredes", "escudo", "projetil"]
+
 ## Modo hardcore: tempo (segundos) para completar cada mundo. Ao esgotar ->
 ## Game Over e a campanha recomeça do mundo 1. Números de partida -- afinar
 ## com o jogo a correr.
@@ -75,6 +78,11 @@ var hardcore_tempo_restante: float = -1.0
 ## Posto a true pelos testes (ver tests/run_tests.gd) para NÃO tocar no
 ## ficheiro de save real ao instanciar o estado fora do jogo.
 var modo_teste: bool = false
+
+## Modo de testes do Paulo ("PAULITOS JENSATH DEV MODE"): habilidades todas,
+## energia infinita e sem perder vida (ver koliani.gd). NÃO é gravado no
+## save -- vive só nesta sessão e o save real fica intacto.
+var modo_dev: bool = false
 
 
 func _ready() -> void:
@@ -192,7 +200,26 @@ func ha_progresso() -> bool:
 		or not habilidades.is_empty() or not pistas.is_empty()
 
 
+## Liga o modo de testes: sandbox limpo em memória (nível 1, todas as
+## habilidades, muitas vidas) SEM tocar no ficheiro de save -- ao sair do
+## jogo o progresso real continua lá. `koliani.gd` lê `modo_dev` para dar
+## energia infinita e ignorar dano.
+func ativar_modo_dev() -> void:
+	modo_dev = true
+	hardcore = false
+	vidas = 99
+	indice_nivel = 0
+	checkpoint = Vector2.ZERO
+	hardcore_tempo_restante = -1.0
+	habilidades.assign(HABILIDADES_TODAS)
+	# pistas/concluidos ficam como estão -- não interessam ao sandbox
+	vidas_mudaram.emit(vidas)
+	for h in HABILIDADES_TODAS:
+		habilidade_desbloqueada.emit(h)
+
+
 func reiniciar_campanha() -> void:
+	modo_dev = false
 	vidas = VIDAS_INICIAIS
 	indice_nivel = 0
 	checkpoint = Vector2.ZERO

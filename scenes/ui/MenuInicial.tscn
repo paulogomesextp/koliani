@@ -165,6 +165,15 @@ theme_override_styles/focus = SubResource("sb_botao_hover")
 theme_override_styles/pressed = SubResource("sb_botao_hover")
 text = "OPTIONS"
 
+[node name="DevMode" type="Button" parent="Centro"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.4, 1)
+theme_override_styles/normal = SubResource("sb_botao")
+theme_override_styles/hover = SubResource("sb_botao_hover")
+theme_override_styles/focus = SubResource("sb_botao_hover")
+theme_override_styles/pressed = SubResource("sb_botao_hover")
+text = "PAULITOS JENSATH DEV MODE"
+
 [node name="Aviso" type="Label" parent="Centro"]
 layout_mode = 2
 horizontal_alignment = 1

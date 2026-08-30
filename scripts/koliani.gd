@@ -60,17 +60,24 @@ var _lancar_restante := 0.0
 ## Segundos que ainda está preso numa teia (Região III / Rainha Aracnídea):
 ## enquanto > 0 não anda nem salta -- só se sacode até se soltar.
 var _preso := 0.0
+## Segundos que ainda "flutua" (Região I / Coração Putrefacto, fase 2): a
+## batida do coração alivia a gravidade -- a queda cai a menos de metade.
+var _leve := 0.0
 
 # animação procedural (visual, corre em _process)
 var _mat: ShaderMaterial
 var _anim_t := 0.0
 var _squash := 0.0   # impulso da aterragem
 var _pop := 0.0      # impulso do ataque
+## Onde a Koliani nasceu neste nível (spawn ou checkpoint). No modo dev,
+## cair num fosso repõe-a aqui em vez de a matar.
+var _pos_inicial := Vector2.ZERO
 
 
 func _ready() -> void:
 	if EstadoJogo.checkpoint != Vector2.ZERO:
 		global_position = EstadoJogo.checkpoint
+	_pos_inicial = global_position
 	if _hitbox:
 		_hitbox.monitoring = false
 		_hitbox.body_entered.connect(_ao_acertar_corpo)
@@ -86,6 +93,7 @@ func _physics_process(dt: float) -> void:
 	_invulneravel = maxf(0.0, _invulneravel - dt)
 	_lancar_restante = maxf(0.0, _lancar_restante - dt)
 	_preso = maxf(0.0, _preso - dt)
+	_leve = maxf(0.0, _leve - dt)
 
 	# a barra de Energia regenera-se sozinha depois de usada
 	if _energia < ENERGIA_MAX:
@@ -172,6 +180,11 @@ func _physics_process(dt: float) -> void:
 		if _mov.saltos_dados > saltos_antes:
 			Som.toca("salto_duplo" if _mov.saltos_dados >= 2 else "salto", -10.0)
 
+	# batida do Coração Putrefacto (fase 2): gravidade aliviada -- a Koliani
+	# fica "leve" e a queda abranda para lhe dar tempo no ar
+	if _leve > 0.0 and velocity.y > 0.0:
+		velocity.y *= 0.4
+
 	var vel_queda := velocity.y
 	move_and_slide()
 	_mov.velocidade = velocity
@@ -189,7 +202,11 @@ func _physics_process(dt: float) -> void:
 
 	# caiu num fosso sem fundo -> conta como morte (reaparece no checkpoint)
 	if global_position.y > Y_MORTE and vida > 0:
-		receber_dano(vida)
+		if EstadoJogo.modo_dev:
+			global_position = _pos_inicial if _pos_inicial != Vector2.ZERO else global_position
+			velocity = Vector2.ZERO
+		else:
+			receber_dano(vida)
 
 
 func _process(dt: float) -> void:
@@ -303,7 +320,8 @@ func _iniciar_ataque() -> void:
 ## Lança um projétil mágico numa das 8 direções (mira = eixos de movimento
 ## + W/S; sem mira, para onde está virada). Já validado que há Energia.
 func _lancar_projetil() -> void:
-	_energia -= CUSTO_PROJETIL
+	if not EstadoJogo.modo_dev:  # modo dev: energia infinita
+		_energia -= CUSTO_PROJETIL
 	energia_mudou.emit(_energia, ENERGIA_MAX)
 	_lancar_restante = DUR_LANCAR
 	_pop = 1.0
@@ -376,8 +394,16 @@ func prender(segundos: float) -> void:
 	_preso = maxf(_preso, segundos)
 
 
+## Alivia a gravidade da Koliani por `segundos` (batida do Coração
+## Putrefacto, fase 2). Não a impede de andar/saltar -- só a faz cair devagar.
+func flutuar(segundos: float) -> void:
+	_leve = maxf(_leve, segundos)
+
+
 func receber_dano(quantidade: int, dir_empurrao: float = 0.0) -> void:
 	if _invulneravel > 0.0:
+		return
+	if EstadoJogo.modo_dev:  # modo de testes: não perde vida
 		return
 	if _defendendo and _bloqueia(dir_empurrao):
 		_ao_bloquear()

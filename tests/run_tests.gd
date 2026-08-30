@@ -45,6 +45,7 @@ func _correr_tudo() -> void:
 	teste_estado_hardcore()
 	teste_estado_regioes_e_conclusao()
 	teste_estado_mapa_desbloqueio()
+	teste_estado_modo_dev()
 
 	if _falhas.is_empty():
 		print("OK -- todos os testes passaram")
@@ -400,6 +401,22 @@ func teste_estado_regioes_e_conclusao() -> void:
 	e.avancar_nivel()
 	_ok(e.nivel_esta_concluido(0), "avancar_nivel marca o nível de onde se sai")
 	_ok(e.indice_nivel == 1, "avancar_nivel avançou para o nível 1")
+	e.free()
+
+
+## "PAULITOS JENSATH DEV MODE": liga o sandbox (todas as habilidades, muitas
+## vidas, nível 1), NÃO grava no disco, e `reiniciar_campanha()` desliga-o.
+func teste_estado_modo_dev() -> void:
+	var e := _novo_estado()
+	_ok(not e.modo_dev, "arranque normal não está em modo dev")
+	e.ativar_modo_dev()
+	_ok(e.modo_dev, "ativar_modo_dev liga a flag")
+	_ok(e.indice_nivel == 0, "modo dev arranca no nível 1")
+	for h in e.HABILIDADES_TODAS:
+		_ok(e.tem_habilidade(h), "modo dev desbloqueia a habilidade '%s'" % h)
+	_ok(e.vidas >= 3, "modo dev dá vidas de sobra")
+	e.reiniciar_campanha()
+	_ok(not e.modo_dev, "reiniciar_campanha desliga o modo dev")
 	e.free()
 
 
