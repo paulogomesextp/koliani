@@ -51,7 +51,7 @@ densidade_poeira = 1.6
 bioma = "catacumbas"
 largura_nivel = 3200.0
 luzes_horizonte = true
-fundo_pack = "corredores"
+fundo_pack = "caverna"
 
 [node name="Casca" parent="." instance=ExtResource("90_casca")]
 largura = 3650.0

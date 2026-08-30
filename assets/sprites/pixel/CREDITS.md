@@ -43,10 +43,14 @@ A personagem principal (Koliani) é original do projeto
 ## Ansimuz (Luis Zuno) — packs "GothicVania" / parallax
 - https://ansimuz.itch.io/ · https://opengameart.org/users/ansimuz
 - Licença: CC0 / domínio público ("free to use, personal or commercial")
-- Uso: fundos parallax pixel-art por nível
-  (`assets/sprites/pixel/backgrounds/{floresta,pantano,corredores,rochoso,montanhas}/`)
-  — Parallax Forest v2, Gothicvania Swamp, Cold Corridors, Rocky Pass,
-  Mountain Dusk.
+- Uso: fundos parallax pixel-art por região
+  (`assets/sprites/pixel/backgrounds/{floresta,pantano,corredores,rochoso,montanhas,prisao,caverna}/`):
+  Parallax Forest v2 (R1 `floresta`), Gothicvania Swamp (R1 pântano
+  `pantano`), Mountain Dusk (R3 `montanhas`), Caverns (R4 `caverna`),
+  Rocky Pass (R5 `rochoso`). Cold Corridors serve as duas regiões de
+  masmorra: `prisao` (R2, graduada a azul-cobalto pela Atmosfera) e
+  `corredores` (R6 castelo, graduada a violeta/magenta) — mesma
+  arquitectura, ambientes diferentes.
 
 CC0 não exige atribuição; fica aqui à mesma por cortesia.
 
@@ -60,9 +64,12 @@ CC0 não exige atribuição; fica aqui à mesma por cortesia.
 
 ## piiixl — "Seamless Patterns" (16x16)
 - https://piiixl.itch.io/  (URL exato + licença POR CONFIRMAR pelo Paulo em incoming/LICENSES.md)
-- Uso: a calçada azul-escura (célula 0,0 da sheet) é a base do bloco de
-  terreno gótico das plataformas
-  (`assets/sprites/pixel/tiles/pedra_gotica_block.png`, 96x96 9-slice),
-  recolorida a frio + rebordo de luar magenta por
-  `tools/gerar_tiles_goticos.gd`. Substitui o `pedra_block.png` antigo em
-  todas as regiões de pedra (`scripts/plataforma.gd`).
+- Uso: base dos blocos de terreno das plataformas (96x96, 9-slice). A
+  calçada azul-escura (célula 0,0) → `pedra_gotica_block.png` via
+  `tools/gerar_tiles_goticos.gd`. E 5 outras células "seamless" (pedra /
+  tijolo, pouca cor) → um bloco POR REGIÃO
+  (`{prisao,torres,catacumbas,cidade,castelo}_block.png`) via
+  `tools/gerar_tiles_zonas.gd`: o padrão da célula entra só como relevo, a
+  cor é a da zona, e todas levam a mesma aresta de luar + fio magenta +
+  musgo fantasma. `scripts/plataforma.gd` escolhe pelo `bioma`.
+  (`floresta` continua com relva do Pixel Adventure.)

@@ -47,7 +47,7 @@ densidade_poeira = 2.4
 bioma = "cidade"
 largura_nivel = 3600.0
 luzes_horizonte = true
-fundo_pack = "montanhas"
+fundo_pack = "rochoso"
 
 [node name="Vagao1" parent="." instance=ExtResource("9_pl") groups=["vagoes_trem"]]
 position = Vector2(440, 660)

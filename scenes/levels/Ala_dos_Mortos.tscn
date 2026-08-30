@@ -49,7 +49,7 @@ densidade_poeira = 1.8
 bioma = "prisao"
 largura_nivel = 3500.0
 luzes_horizonte = true
-fundo_pack = "corredores"
+fundo_pack = "prisao"
 
 [node name="Casca" parent="." instance=ExtResource("90_casca")]
 largura = 4000.0

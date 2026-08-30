@@ -8,22 +8,27 @@ extends StaticBody2D
 ## O bioma nao se poe plataforma a plataforma: le-se do no do grupo
 ## "atmosfera" (o raiz de Atmosfera.tscn). Sem esse no, cai em "floresta".
 
-## Patch de relva/terra (Pixel Adventure 1, 16x16) e de pedra/tijolo
-## (Kings and Pigs, 32x32). Sao 9-slices -- o miolo repete-se.
+## Cada regiao tem o seu bloco de terreno pixel-art (9-slice, o miolo
+## repete-se). `floresta` = relva/terra (Pixel Adventure 1, 16x16). As
+## outras 5 sao geradas por `tools/gerar_tiles_zonas.gd` a partir da folha
+## "seamless" CC0 do `piiixl` -- padrao distinto por zona, mas todas com a
+## mesma identidade (aresta de luar + fio magenta + musgo fantasma).
 const TEX_FLORESTA := preload("res://assets/sprites/pixel/tiles/floresta_block.png")
-## Pedra-cripta gótica (calçada CC0 `piiixl` recolorida a frio + rebordo de
-## luar magenta), gerada por `tools/gerar_tiles_goticos.gd`.
-const TEX_PEDRA := preload("res://assets/sprites/pixel/tiles/pedra_gotica_block.png")
+const TEX_PRISAO := preload("res://assets/sprites/pixel/tiles/prisao_block.png")
+const TEX_TORRES := preload("res://assets/sprites/pixel/tiles/torres_block.png")
+const TEX_CATACUMBAS := preload("res://assets/sprites/pixel/tiles/catacumbas_block.png")
+const TEX_CIDADE := preload("res://assets/sprites/pixel/tiles/cidade_block.png")
+const TEX_CASTELO := preload("res://assets/sprites/pixel/tiles/castelo_block.png")
 
 ## bioma -> [textura, margem_esq, margem_topo, margem_dir, margem_baixo, tom]
-## O `tom` recolore o patch por regiao -- tons frios e fantasmagoricos.
+## A cor ja vem no PNG; o `tom` so faz ajustes finos por regiao.
 const BIOMAS := {
 	"floresta":   [TEX_FLORESTA, 5, 15, 5, 6, Color(0.82, 0.86, 0.82)],
-	"prisao":     [TEX_PEDRA, 11, 11, 11, 11, Color(0.82, 0.82, 1.02)],
-	"torres":     [TEX_PEDRA, 11, 11, 11, 11, Color(0.95, 0.90, 1.0)],
-	"catacumbas": [TEX_PEDRA, 11, 11, 11, 11, Color(0.78, 0.90, 0.86)],
-	"cidade":     [TEX_PEDRA, 11, 11, 11, 11, Color(1.0, 0.78, 0.95)],
-	"castelo":    [TEX_PEDRA, 11, 11, 11, 11, Color(1.05, 0.70, 1.1)],
+	"prisao":     [TEX_PRISAO, 12, 12, 12, 12, Color(1, 1, 1)],
+	"torres":     [TEX_TORRES, 12, 12, 12, 12, Color(1, 1, 1)],
+	"catacumbas": [TEX_CATACUMBAS, 12, 12, 12, 12, Color(1, 1, 1)],
+	"cidade":     [TEX_CIDADE, 12, 12, 12, 12, Color(1, 1, 1)],
+	"castelo":    [TEX_CASTELO, 12, 12, 12, 12, Color(1, 1, 1)],
 }
 
 @export var tamanho := Vector2(200.0, 40.0) : set = _set_tamanho

@@ -49,7 +49,7 @@ densidade_poeira = 1.5
 bioma = "cidade"
 largura_nivel = 3100.0
 luzes_horizonte = true
-fundo_pack = "corredores"
+fundo_pack = "rochoso"
 
 [node name="EclipseTint" type="Node" parent="."]
 script = ExtResource("11_tint")

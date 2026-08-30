@@ -82,8 +82,8 @@ altura = 260.0
 cor = Color(0.32, 0.66, 0.4, 0.9)
 
 [node name="PlatFlut1" parent="." instance=ExtResource("12_pf")]
-position = Vector2(940, 600)
-largura = 150.0
+position = Vector2(890, 600)
+largura = 210.0
 balanco = 10.0
 fase = 0.0
 

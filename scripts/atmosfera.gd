@@ -57,6 +57,19 @@ const PACKS := {
 		["middle.png", "Meio", 885.0, 4.2],
 		["near.png", "Perto", 915.0, 4.2],
 	],
+	# Região II -- Prisão dos Condenados (ansimuz "Cold Corridors", CC0).
+	"prisao": [
+		["back.png", "Fundo", 900.0, 4.4],
+		["far.png", "Longe", 915.0, 4.4],
+		["middle.png", "Meio", 940.0, 4.2],
+		["near.png", "Perto", 980.0, 4.0],
+	],
+	# Região IV -- Catacumbas do Abismo (ansimuz "Caverns", CC0).
+	"caverna": [
+		["background.png", "Fundo", 940.0, 4.6],
+		["back-walls.png", "Longe", 980.0, 3.4],
+		["back-walls.png", "Meio", 1080.0, 2.6],
+	],
 	"rochoso": [
 		["back.png", "Fundo", 850.0, 3.8],
 		["middle.png", "Meio", 895.0, 4.0],
