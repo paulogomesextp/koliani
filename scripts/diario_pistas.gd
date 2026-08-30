@@ -176,6 +176,11 @@ const PISTAS := {
 		"titulo": "clue.portoes_estandarte_rasgado.title",
 		"texto": "clue.portoes_estandarte_rasgado.body",
 	},
+	"espelhos_o_que_ve": {
+		"mundo": "world.castle",
+		"titulo": "clue.espelhos_o_que_ve.title",
+		"texto": "clue.espelhos_o_que_ve.body",
+	},
 	"castelo_aurora_livre": {
 		"mundo": "world.castle",
 		"titulo": "clue.castelo_aurora_livre.title",

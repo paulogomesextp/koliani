@@ -1,0 +1,89 @@
+[gd_scene load_steps=6 format=3 uid="uid://bkolianichefesombria27"]
+
+; Região VI / nível 27 -- Koliani Sombria. Tira pixel-art de 4 frames
+; (0/1 idle, 2 adaga erguida (telegrafo), 3 capuz para trás -- coração
+; magenta (exposto)) em assets/sprites/pixel/bosses/koliani_sombria.png.
+; Script chefe_koliani_sombria.gd (herda ChefeBase).
+
+[ext_resource type="Script" path="res://scripts/chefe_koliani_sombria.gd" id="1_chefe"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/bosses/koliani_sombria.png" id="2_tex"]
+
+[sub_resource type="RectangleShape2D" id="rs_body"]
+size = Vector2(28, 60)
+
+[sub_resource type="RectangleShape2D" id="rs_contacto"]
+size = Vector2(38, 64)
+
+[sub_resource type="Gradient" id="grad_luz"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="tex_luz"]
+gradient = SubResource("grad_luz")
+width = 256
+height = 256
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[node name="ChefeKolianiSombria" type="CharacterBody2D" groups=["inimigos"]]
+collision_layer = 4
+collision_mask = 1
+script = ExtResource("1_chefe")
+vida = 440
+dano_contacto = 16
+alcance_patrulha = 0.0
+cor_estilhacos = Color(0.5, 0.3, 0.7, 1)
+cor_rim = Color(1, 0.4, 0.95, 1)
+
+[node name="Sprite" type="Node2D" parent="."]
+
+[node name="Corpo" type="Sprite2D" parent="Sprite"]
+texture_filter = 1
+position = Vector2(0, -4)
+texture = ExtResource("2_tex")
+hframes = 4
+scale = Vector2(1.6, 1.6)
+
+[node name="LuzCoracao" type="PointLight2D" parent="Sprite"]
+position = Vector2(0, -8)
+texture = SubResource("tex_luz")
+energy = 0.4
+color = Color(1, 0.35, 0.95, 1)
+scale = Vector2(0.6, 0.6)
+
+[node name="Nucleo" type="Node2D" parent="Sprite"]
+position = Vector2(0, -8)
+scale = Vector2(0.4, 0.4)
+
+[node name="Brilho" type="Sprite2D" parent="Sprite/Nucleo"]
+visible = false
+texture = SubResource("tex_luz")
+modulate = Color(1, 0.35, 0.95, 0.9)
+scale = Vector2(0.3, 0.3)
+
+[node name="Diamante" type="Polygon2D" parent="Sprite/Nucleo"]
+color = Color(1, 0.27, 0.94, 1)
+polygon = PackedVector2Array(-7, 0, 0, -10, 7, 0, 0, 10)
+
+[node name="Cerne" type="Polygon2D" parent="Sprite/Nucleo"]
+color = Color(1, 0.9, 1, 1)
+polygon = PackedVector2Array(-3, 0, 0, -5, 3, 0, 0, 5)
+
+[node name="Luz" type="PointLight2D" parent="Sprite/Nucleo"]
+texture = SubResource("tex_luz")
+energy = 0.12
+color = Color(1, 0.35, 0.95, 1)
+scale = Vector2(0.5, 0.5)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 0)
+shape = SubResource("rs_body")
+
+[node name="AreaContacto" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AreaContacto"]
+position = Vector2(0, -4)
+shape = SubResource("rs_contacto")

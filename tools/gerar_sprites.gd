@@ -71,6 +71,7 @@ func _initialize() -> void:
 	_boss_bispo()    # regiao V / nivel 24
 	_boss_noiva()    # regiao V / nivel 25
 	_boss_capitao()  # regiao VI / nivel 26
+	_boss_koliani_sombria() # regiao VI / nivel 27
 	print("OK -- sprites pixel-art em ", DIR)
 	quit(0)
 
@@ -1591,4 +1592,65 @@ func _boss_capitao() -> void:
 			_linha(int(cx) - 12, 40, int(cx) - 24, 56, 5, PLACA_C)
 			_rect(int(cx) - 40, 40, 16, 34, ESCUDO)
 			_elipse(cx - 32, 56, 3, 3, MAGENTA)
+	)
+
+
+## Nivel 27 -- Salao dos Espelhos. Koliani Sombria: o reflexo da Koliani,
+## capa e capuz em sombra, adaga e coracao a magenta. Frame 2 = adaga
+## erguida (telegrafo); frame 3 = capuz para tras, coracao magenta a
+## mostra (exposto).
+func _boss_koliani_sombria() -> void:
+	var CAPA := Color("1a1524")
+	var CAPA_C := Color("2c2338")
+	var TUNICA := Color("3a2b58")
+	var MAGENTA := Color("ff45ef")
+	var MAG_ESC := Color("b023cf")
+	var PELE_S := Color("6a5570")
+	_boss("koliani_sombria", 44, 68, func(f: int) -> void:
+		var adaga_cima := f == 2
+		var expo := f == 3
+		var cx := 22.0
+		# capa: trapezio
+		for j in range(20, 54):
+			var t := float(j - 20) / 34.0
+			var meia := lerpf(7.0, 13.0, t)
+			_rect(int(cx - meia), j, int(meia * 2.0), 1, CAPA if j % 3 else CAPA_C)
+		# painel da tunica
+		for j in range(22, 48):
+			var t := float(j - 22) / 26.0
+			var meia := lerpf(3.0, 4.5, t)
+			_rect(int(round(cx - meia)), j, int(round(meia * 2.0)), 1, TUNICA)
+		# coracao magenta
+		var g: float = [0.9, 1.0, 1.05, 1.6][f]
+		_elipse(cx, 34, 3.0 * g, 3.4 * g, MAGENTA if expo else MAG_ESC)
+		if expo:
+			_px(int(cx), 33, PAL["w"])
+		# pernas
+		_rect(int(cx) - 6, 52, 5, 12, CAPA)
+		_rect(int(cx) + 1, 52, 5, 12, CAPA)
+		_rect(int(cx) - 7, 62, 7, 2, CAPA_C)
+		_rect(int(cx), 62, 7, 2, CAPA_C)
+		# cabeca / capuz
+		if expo:
+			_elipse(cx, 12, 5, 6, PELE_S)
+			_px(int(cx) - 2, 11, MAGENTA); _px(int(cx) + 2, 11, MAGENTA)
+			_linha(int(cx) - 5, 8, int(cx) - 10, 2, 2, CAPA)  # capuz para tras
+			_linha(int(cx) + 5, 8, int(cx) + 10, 2, 2, CAPA)
+		else:
+			_elipse(cx, 11, 6.5, 7, CAPA)
+			_linha(int(cx) - 1, 3, int(cx) + 4, 7, 3, CAPA)
+			_rect(int(cx) - 1, 10, 4, 4, Color("06060a"))
+			_px(int(cx), 12, MAGENTA); _px(int(cx) + 2, 12, MAGENTA)
+		# gola
+		_rect(int(cx) - 7, 16, 14, 3, CAPA)
+		# braco + adaga
+		if adaga_cima:
+			_linha(int(cx) + 6, 22, int(cx) + 12, 4, 3, CAPA_C)
+			_linha(int(cx) + 12, 4, int(cx) + 14, -8, 2, MAGENTA)
+			_px(int(cx) + 14, -8, PAL["w"])
+		else:
+			_linha(int(cx) + 6, 22, int(cx) + 14, 32, 3, CAPA_C)
+			_linha(int(cx) + 12, 28, int(cx) + 22, 36, 2, MAGENTA)
+			_px(int(cx) + 22, 36, PAL["w"])
+		_linha(int(cx) - 6, 22, int(cx) - 12, 32, 3, CAPA_C)
 	)

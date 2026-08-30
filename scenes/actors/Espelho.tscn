@@ -1,0 +1,31 @@
+[gd_scene load_steps=3 format=3 uid="uid://bkolianiespelho27"]
+
+; Espelho partível (ver scripts/espelho.gd). Inteiro bloqueia; um
+; golpe/projétil parte-o, abre passagem e solta um reflexo (sombra da
+; Koliani). Na layer 5 (mundo+4).
+
+[ext_resource type="Script" path="res://scripts/espelho.gd" id="1_e"]
+
+[sub_resource type="RectangleShape2D" id="rs_e"]
+size = Vector2(24, 180)
+
+[node name="Espelho" type="StaticBody2D"]
+collision_layer = 5
+collision_mask = 0
+script = ExtResource("1_e")
+
+[node name="Moldura" type="Polygon2D" parent="."]
+color = Color(0.28, 0.2, 0.12, 1)
+polygon = PackedVector2Array(-16, -94, 16, -94, 16, 94, -16, 94)
+
+[node name="Corpo" type="Polygon2D" parent="."]
+color = Color(0.55, 0.58, 0.72, 0.85)
+polygon = PackedVector2Array(-11, -88, 11, -88, 11, 88, -11, 88)
+
+[node name="Reflexo" type="Line2D" parent="Corpo"]
+points = PackedVector2Array(-8, -70, 6, -20, -6, 40, 4, 82)
+width = 3.0
+default_color = Color(0.85, 0.88, 1, 0.5)
+
+[node name="Col" type="CollisionShape2D" parent="."]
+shape = SubResource("rs_e")

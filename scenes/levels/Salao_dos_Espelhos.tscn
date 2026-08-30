@@ -1,0 +1,184 @@
+[gd_scene load_steps=15 format=3 uid="uid://bkolianisalaoespelhos27"]
+
+; Região VI / nível 27 -- Salão dos Espelhos.
+; `Espelho` bloqueiam a passagem; um golpe/projétil parte-os e solta um
+; reflexo (sombra da Koliani) que a persegue. Arena com Koliani Sombria --
+; os mesmos movimentos, versões sombrias das habilidades, tudo púrpura.
+
+[ext_resource type="PackedScene" uid="uid://bkolianiactor01" path="res://scenes/actors/Koliani.tscn" id="1_kol"]
+[ext_resource type="PackedScene" uid="uid://bdemoniobase01" path="res://scenes/actors/DemonioBase.tscn" id="2_dem"]
+[ext_resource type="PackedScene" uid="uid://bkolianicoletavel01" path="res://scenes/actors/Coletavel.tscn" id="3_col"]
+[ext_resource type="PackedScene" uid="uid://bkolianiporta01" path="res://scenes/actors/Porta.tscn" id="4_porta"]
+[ext_resource type="Script" path="res://scripts/checkpoint.gd" id="5_chk"]
+[ext_resource type="PackedScene" uid="uid://bkolianichefesombria27" path="res://scenes/actors/ChefeKolianiSombria.tscn" id="6_chefe"]
+[ext_resource type="Script" path="res://scripts/nivel_com_chefe.gd" id="7_niv"]
+[ext_resource type="PackedScene" uid="uid://bkolianiatmosfera01" path="res://scenes/fx/Atmosfera.tscn" id="8_atm"]
+[ext_resource type="PackedScene" uid="uid://bkolianiplataforma01" path="res://scenes/actors/Plataforma.tscn" id="9_pl"]
+[ext_resource type="PackedScene" uid="uid://bkolianiespelho27" path="res://scenes/actors/Espelho.tscn" id="10_esp"]
+[ext_resource type="PackedScene" uid="uid://bkolianiserra01" path="res://scenes/actors/Serra.tscn" id="11_serra"]
+
+[sub_resource type="RectangleShape2D" id="rs_chk"]
+size = Vector2(40, 80)
+
+[sub_resource type="Gradient" id="grad_luz"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="tex_luz"]
+gradient = SubResource("grad_luz")
+width = 256
+height = 256
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[node name="Salao_dos_Espelhos" type="Node2D"]
+script = ExtResource("7_niv")
+
+[node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
+cor_ambiente = Color(0.58, 0.46, 0.64, 1)
+cor_fundo = Color(0.06, 0.04, 0.09, 1)
+cor_silhueta = Color(0.12, 0.07, 0.15, 1)
+cor_luz = Color(1, 0.45, 0.95, 1)
+cor_poeira = Color(1, 0.6, 0.95, 1)
+densidade_poeira = 1.6
+bioma = "castelo"
+largura_nivel = 3200.0
+luzes_horizonte = true
+fundo_pack = "corredores"
+
+[node name="ChaoInicio" parent="." instance=ExtResource("9_pl")]
+position = Vector2(420, 660)
+tamanho = Vector2(600, 48)
+altura_visual = 96.0
+
+[node name="Plat1" parent="." instance=ExtResource("9_pl")]
+position = Vector2(1120, 560)
+tamanho = Vector2(160, 22)
+altura_visual = 26.0
+
+[node name="ChaoMeio" parent="." instance=ExtResource("9_pl")]
+position = Vector2(1560, 660)
+tamanho = Vector2(420, 48)
+altura_visual = 90.0
+
+[node name="Plat2" parent="." instance=ExtResource("9_pl")]
+position = Vector2(2100, 560)
+tamanho = Vector2(160, 22)
+altura_visual = 26.0
+
+[node name="ChaoArena" parent="." instance=ExtResource("9_pl")]
+position = Vector2(2760, 660)
+tamanho = Vector2(920, 48)
+altura_visual = 96.0
+
+[node name="Espelho1" parent="." instance=ExtResource("10_esp")]
+position = Vector2(900, 556)
+
+[node name="Espelho2" parent="." instance=ExtResource("10_esp")]
+position = Vector2(1980, 556)
+
+[node name="SerraMeio" parent="." instance=ExtResource("11_serra")]
+position = Vector2(1560, 560)
+percurso = Vector2(320, 0)
+tempo = 1.9
+
+[node name="LuzInicio" type="PointLight2D" parent="."]
+position = Vector2(420, 600)
+texture = SubResource("tex_luz")
+energy = 0.5
+color = Color(1, 0.45, 0.95, 1)
+scale = Vector2(1.9, 1.1)
+
+[node name="LuzArena" type="PointLight2D" parent="."]
+position = Vector2(2760, 600)
+texture = SubResource("tex_luz")
+energy = 0.55
+color = Color(1, 0.45, 0.95, 1)
+scale = Vector2(2.6, 1.5)
+
+[node name="Koliani" parent="." instance=ExtResource("1_kol")]
+position = Vector2(150, 560)
+
+[node name="Demonio1" parent="." instance=ExtResource("2_dem")]
+especie = "esqueleto"
+position = Vector2(560, 604)
+alcance_patrulha = 200.0
+
+[node name="Demonio2" parent="." instance=ExtResource("2_dem")]
+especie = "esqueleto"
+position = Vector2(1560, 604)
+alcance_patrulha = 160.0
+
+[node name="Chefe" parent="." instance=ExtResource("6_chefe")]
+position = Vector2(2760, 552)
+
+[node name="ColRetratoQuebrado" parent="." instance=ExtResource("3_col")]
+position = Vector2(1560, 500)
+pista_id = "espelhos_o_que_ve"
+
+[node name="CheckInicio" type="Area2D" parent="."]
+position = Vector2(400, 588)
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("5_chk")
+
+[node name="Visual" type="ColorRect" parent="CheckInicio"]
+offset_left = -5.0
+offset_top = -42.0
+offset_right = 5.0
+offset_bottom = 40.0
+color = Color(0.36, 0.28, 0.55, 1)
+
+[node name="Luz" type="Node2D" parent="CheckInicio"]
+visible = false
+
+[node name="Brilho" type="ColorRect" parent="CheckInicio/Luz"]
+offset_left = -20.0
+offset_top = -54.0
+offset_right = 20.0
+offset_bottom = 44.0
+color = Color(0.85, 0.31, 0.83, 0.32)
+
+[node name="PointLight2D" type="PointLight2D" parent="CheckInicio/Luz"]
+texture = SubResource("tex_luz")
+energy = 1.1
+color = Color(0.93, 0.4, 0.9, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckInicio"]
+shape = SubResource("rs_chk")
+
+[node name="CheckArena" type="Area2D" parent="."]
+position = Vector2(2450, 588)
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("5_chk")
+
+[node name="Visual" type="ColorRect" parent="CheckArena"]
+offset_left = -5.0
+offset_top = -42.0
+offset_right = 5.0
+offset_bottom = 40.0
+color = Color(0.36, 0.28, 0.55, 1)
+
+[node name="Luz" type="Node2D" parent="CheckArena"]
+visible = false
+
+[node name="Brilho" type="ColorRect" parent="CheckArena/Luz"]
+offset_left = -20.0
+offset_top = -54.0
+offset_right = 20.0
+offset_bottom = 44.0
+color = Color(0.85, 0.31, 0.83, 0.32)
+
+[node name="PointLight2D" type="PointLight2D" parent="CheckArena/Luz"]
+texture = SubResource("tex_luz")
+energy = 1.1
+color = Color(0.93, 0.4, 0.9, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckArena"]
+shape = SubResource("rs_chk")
+
+[node name="Porta" parent="." instance=ExtResource("4_porta")]
+position = Vector2(3100, 586)
+pista_ao_atravessar = ""
