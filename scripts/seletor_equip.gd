@@ -99,6 +99,26 @@ func _preencher() -> void:
 	var lista: Array = Equipamento.ARMAS if _tipo == "arma" else Equipamento.ARMADURAS
 	for item: Dictionary in lista:
 		_grelha.add_child(_fazer_cartao(item))
+	# comando/teclado: pôr o foco num cartão para dar para navegar sem rato
+	call_deferred("_focar_cartao")
+
+
+func _focar_cartao() -> void:
+	if _grelha == null:
+		return
+	var equip := EstadoJogo.arma_equipada if _tipo == "arma" else EstadoJogo.armadura_equipada
+	var primeiro: Control = null
+	for c in _grelha.get_children():
+		var b := c as Button
+		if b == null or b.disabled or b.focus_mode == Control.FOCUS_NONE:
+			continue
+		if primeiro == null:
+			primeiro = b
+		if str(b.get_meta("id", "")) == equip:
+			b.grab_focus()
+			return
+	if primeiro:
+		primeiro.grab_focus()
 
 
 func _fazer_cartao(item: Dictionary) -> Control:
@@ -107,7 +127,8 @@ func _fazer_cartao(item: Dictionary) -> Control:
 	var equipada: bool = (EstadoJogo.arma_equipada if _tipo == "arma" else EstadoJogo.armadura_equipada) == id
 
 	var b := Button.new()
-	b.focus_mode = Control.FOCUS_NONE
+	b.focus_mode = Control.FOCUS_ALL if tem else Control.FOCUS_NONE
+	b.set_meta("id", id)
 	b.custom_minimum_size = Vector2(196, 116)
 	b.disabled = not tem
 	b.clip_text = false

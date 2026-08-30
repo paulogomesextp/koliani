@@ -41,6 +41,9 @@ const VEL_DESLIZE_PAREDE := 55.0
 const WALLJUMP := Vector2(330.0, -430.0)
 const DUR_ATAQUE := 0.18
 const I_FRAMES := 0.6
+## Ressalto ao cair em cima de um inimigo (Mario-style). Um pouco menos que
+## um salto normal (FORCA_SALTO 470).
+const STOMP_RESSALTO := 430.0
 ## Defesa (habilidade "escudo"): anda-se devagar de escudo erguido; um
 ## ataque que venha de frente é bloqueado (sem dano) com um som subtil.
 const VEL_DEFESA := 70.0
@@ -87,6 +90,7 @@ var _rolar_restante := 0.0
 var _rolar_recarga := 0.0
 var _ataque_restante := 0.0
 var _invulneravel := 0.0
+var _stomp_cd := 0.0
 var _estava_no_chao := true
 var _defendendo := false
 ## true a partir da 1.ª chamada a `_morrer()` -- evita mortes a dobrar
@@ -394,6 +398,33 @@ func _physics_process(dt: float) -> void:
 			velocity.y = maxf(velocity.y - _vento_forca * dt, -_vento_alvo)
 	elif _vento_restante > 0.0:
 		_vento_restante -= dt
+
+	# cair em cima de um inimigo = golpe de espada normal + ressalto
+	_stomp_cd = maxf(0.0, _stomp_cd - dt)
+	if _stomp_cd <= 0.0 and velocity.y > 90.0 and not is_on_floor() and _dash_restante <= 0.0:
+		var pes := global_position.y + 22.0
+		for e in get_tree().get_nodes_in_group("inimigos"):
+			if not is_instance_valid(e) or (e as Node).is_in_group("chefes") \
+					or not (e as Node).has_method("receber_dano"):
+				continue
+			if "vida" in e and e.vida <= 0:
+				continue
+			var ep: Vector2 = (e as Node2D).global_position
+			if absf(ep.x - global_position.x) > 30.0:
+				continue
+			if global_position.y > ep.y - 4.0 or pes < ep.y - 30.0 or pes > ep.y + 18.0:
+				continue
+			e.receber_dano(_dano_golpe(), 0.0)
+			velocity.y = -STOMP_RESSALTO
+			_mov.saltos_dados = mini(_mov.saltos_dados, 1)  # devolve um salto de ar
+			_invulneravel = maxf(_invulneravel, 0.25)
+			_stomp_cd = 0.3
+			_pop = 1.0
+			_abanar(2.4)
+			_hitstop(0.05)
+			Som.toca("ataque", -12.0)
+			_pop_impacto(ep)
+			break
 
 	var vel_queda := velocity.y
 	move_and_slide()
