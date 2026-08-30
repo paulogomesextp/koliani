@@ -55,6 +55,7 @@ func _initialize() -> void:
 	_boss_ignivar()  # regiao II / nivel 07
 	_boss_dama()     # regiao II / nivel 08
 	_boss_irmaos()   # regiao II / nivel 09
+	_boss_primeiro() # regiao II / nivel 10
 	print("OK -- sprites pixel-art em ", DIR)
 	quit(0)
 
@@ -701,4 +702,60 @@ func _boss_irmaos() -> void:
 		for k in 3:
 			_px(int(cx) + 17, by + 4 + k * 3, FERRO)
 			_px(int(cx) + 18, by + 5 + k * 3, FERRO)
+	)
+
+
+## Nivel 10 -- A Cela Zero. O Primeiro Prisioneiro: heroi antigo em armadura
+## amolgada, sobreveste rasgada, elmo fechado, uma espada reta como a da
+## Koliani (gume aceso a magenta). Frame 2 = espada erguida / guarda;
+## frame 3 = guarda quebrada, nucleo de energia purpura no peito (fase 2).
+func _boss_primeiro() -> void:
+	var ACO := Color("3b3f4a")
+	var ACO_C := Color("585d6b")
+	var PANO := Color("4a2140")
+	var GUME := Color("ff45ef")
+	var ENERGIA := Color("c86bff")
+	_boss("primeiro", 76, 104, func(f: int) -> void:
+		var cx := 38.0
+		var guarda := f == 2
+		# pernas
+		_rect(int(cx) - 12, 82, 9, 20, ACO)
+		_rect(int(cx) + 3, 82, 9, 20, ACO)
+		_rect(int(cx) - 14, 100, 13, 4, ACO_C)
+		_rect(int(cx) + 1, 100, 13, 4, ACO_C)
+		# sobreveste rasgada
+		for j in range(44, 84):
+			var t := float(j - 44) / 40.0
+			var meia := lerpf(9.0, 15.0, t)
+			_rect(int(cx - meia), j, int(meia * 2.0), 1, PANO if j % 4 else ACO)
+		_px(int(cx) - 13, 82, PANO); _px(int(cx) + 12, 80, PANO)
+		# tronco / peitoral
+		_elipse(cx, 44, 15, 17, ACO)
+		_elipse(cx, 42, 10, 12, ACO_C)
+		# elmo
+		_elipse(cx, 22, 9, 10, ACO)
+		_rect(int(cx) - 6, 21, 12, 2, Color("14161c"))  # visor
+		_linha(int(cx), 12, int(cx), 8, 2, ACO_C)       # crista
+		# braco de tras
+		_linha(int(cx) - 10, 36, int(cx) - 18, 56, 5, ACO)
+		# braco da espada + lamina
+		if guarda:
+			# espada erguida na vertical, a aparar
+			_linha(int(cx) + 10, 36, int(cx) + 16, 20, 5, ACO)
+			_rect(int(cx) + 13, -6, 5, 30, Color("c8ccdc"))
+			_linha(int(cx) + 15, -6, int(cx) + 15, 22, 1, GUME)
+			_rect(int(cx) + 9, 22, 14, 3, ACO_C)  # guarda-mao
+		else:
+			_linha(int(cx) + 10, 38, int(cx) + 24, 54, 5, ACO)
+			# lamina baixa na diagonal, como a da Koliani
+			_linha(int(cx) + 20, 50, int(cx) + 44, 74, 4, Color("c8ccdc"))
+			_linha(int(cx) + 22, 49, int(cx) + 46, 73, 1, GUME)
+			_rect(int(cx) + 17, 47, 10, 3, ACO_C)
+		# nucleo de energia (fase 2 / exposto)
+		if f == 3:
+			_elipse(cx, 44, 6.0, 7.0, ENERGIA)
+			_elipse(cx, 44, 2.6, 3.0, PAL["w"])
+			for a in 4:
+				var ang := TAU * float(a) / 4.0 + 0.4
+				_linha(int(cx), 44, int(cx + cos(ang) * 12.0), int(44 + sin(ang) * 12.0), 1, ENERGIA)
 	)

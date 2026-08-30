@@ -56,6 +56,16 @@ const PISTAS := {
 		"titulo": "clue.mortos_irmao_mais_novo.title",
 		"texto": "clue.mortos_irmao_mais_novo.body",
 	},
+	"cela_zero_o_primeiro": {
+		"mundo": "world.prison",
+		"titulo": "clue.cela_zero_o_primeiro.title",
+		"texto": "clue.cela_zero_o_primeiro.body",
+	},
+	"cela_zero_porta_aberta": {
+		"mundo": "world.prison",
+		"titulo": "clue.cela_zero_porta_aberta.title",
+		"texto": "clue.cela_zero_porta_aberta.body",
+	},
 	"prisao_carta_na_cela": {
 		"mundo": "world.prison",
 		"titulo": "clue.prisao_carta_na_cela.title",
