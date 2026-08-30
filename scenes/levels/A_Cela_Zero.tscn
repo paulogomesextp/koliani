@@ -91,6 +91,12 @@ position = Vector2(790, 540)
 tamanho = Vector2(150, 22)
 altura_visual = 28.0
 
+; degrau intermédio: partia o salto enorme P5 -> P6 (400px) em dois
+[node name="P5b" parent="." instance=ExtResource("9_pl")]
+position = Vector2(575, 486)
+tamanho = Vector2(150, 22)
+altura_visual = 28.0
+
 [node name="P6" parent="." instance=ExtResource("9_pl")]
 position = Vector2(390, 462)
 tamanho = Vector2(160, 22)
