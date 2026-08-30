@@ -67,6 +67,7 @@ cor_poeira = Color(1, 0.82, 0.55, 1)
 densidade_poeira = 1.4
 bioma = "torres"
 largura_nivel = 3200.0
+fundo_pack = "montanhas"
 
 [node name="TorreA" parent="." instance=ExtResource("10_pl")]
 position = Vector2(300, 520)

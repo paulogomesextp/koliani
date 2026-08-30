@@ -45,6 +45,7 @@ cor_poeira = Color(1, 0.6, 0.95, 1)
 densidade_poeira = 1.3
 bioma = "castelo"
 largura_nivel = 3600.0
+fundo_pack = "corredores"
 
 [node name="ChaoAntes" parent="." instance=ExtResource("7_pl")]
 position = Vector2(-280, 640)

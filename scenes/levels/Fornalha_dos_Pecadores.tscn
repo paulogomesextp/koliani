@@ -49,6 +49,7 @@ densidade_poeira = 2.2
 bioma = "prisao"
 largura_nivel = 3400.0
 luzes_horizonte = true
+fundo_pack = "rochoso"
 
 [node name="ChaoInicio" parent="." instance=ExtResource("9_pl")]
 position = Vector2(340, 660)

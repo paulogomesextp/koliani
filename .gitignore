@@ -33,3 +33,18 @@ assets/sprites/pixel/**/_preview_*
 # lixo de zips do macOS
 __MACOSX/
 .DS_Store
+
+# packs em bruto largados em incoming/ (grandes) -- so' se comita o que se
+# copia p/ assets/sprites/pixel/. Mantem-se so' o _LARGAR_AQUI.md de cada.
+assets/sprites/incoming/gothicvania/*
+assets/sprites/incoming/luizmelo/*
+assets/sprites/incoming/clembod/*
+assets/sprites/incoming/chierit/*
+assets/sprites/incoming/0x72-dungeon-ii/*
+assets/sprites/incoming/ansimuz-parallax/*
+!assets/sprites/incoming/gothicvania/_LARGAR_AQUI.md
+!assets/sprites/incoming/luizmelo/_LARGAR_AQUI.md
+!assets/sprites/incoming/clembod/_LARGAR_AQUI.md
+!assets/sprites/incoming/chierit/_LARGAR_AQUI.md
+!assets/sprites/incoming/0x72-dungeon-ii/_LARGAR_AQUI.md
+!assets/sprites/incoming/ansimuz-parallax/_LARGAR_AQUI.md

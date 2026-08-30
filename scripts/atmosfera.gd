@@ -21,6 +21,10 @@ extends Node2D
 ## Forma das silhuetas: floresta | prisao | torres | catacumbas | cidade |
 ## castelo. Qualquer outro valor cai em "floresta".
 @export var bioma := "floresta"
+## Nome de uma pasta em `assets/sprites/pixel/backgrounds/` (packs CC0
+## Ansimuz). Se preenchido, o fundo passam a ser as CAMADAS pixel-art desse
+## pack em vez das silhuetas geradas por código. Ver `PACKS`.
+@export var fundo_pack := ""
 ## Até onde gerar cenário de fundo (o nível mais largo anda pelos ~3400).
 @export var largura_nivel := 3400.0
 @export var seed_ambiente := 0
@@ -29,6 +33,42 @@ extends Node2D
 @export var luzes_horizonte := false
 
 const CHAO := 900.0  # base das silhuetas, bem abaixo do chão jogável
+
+const BG_DIR := "res://assets/sprites/pixel/backgrounds"
+
+## Packs de fundo pixel-art (Ansimuz, CC0). Cada entrada:
+##   [ficheiro, camada_parallax, y_da_base(px), escala]
+## camada: "Fundo" (mais lenta) -> "Longe" -> "Meio" -> "Perto" (mais rápida)
+const PACKS := {
+	"floresta": [
+		["back.png", "Fundo", 900.0, 3.8],
+		["middle.png", "Longe", 1180.0, 3.6],
+		["front.png", "Meio", 1250.0, 3.8],
+	],
+	"pantano": [
+		["back.png", "Fundo", 900.0, 4.0],
+		["mid1.png", "Longe", 890.0, 3.6],
+		["mid2.png", "Meio", 905.0, 3.6],
+		["trees.png", "Perto", 950.0, 3.8],
+	],
+	"corredores": [
+		["back.png", "Fundo", 860.0, 4.2],
+		["far.png", "Longe", 870.0, 4.2],
+		["middle.png", "Meio", 885.0, 4.2],
+		["near.png", "Perto", 915.0, 4.2],
+	],
+	"rochoso": [
+		["back.png", "Fundo", 850.0, 3.8],
+		["middle.png", "Meio", 895.0, 4.0],
+		["near.png", "Perto", 945.0, 4.2],
+	],
+	"montanhas": [
+		["sky.png", "Fundo", 300.0, 6.0],
+		["far.png", "Longe", 840.0, 4.6],
+		["mid.png", "Meio", 880.0, 4.4],
+		["trees.png", "Perto", 940.0, 4.4],
+	],
+}
 
 var _poeira: CPUParticles2D
 
@@ -66,6 +106,13 @@ func _gerar_parallax() -> void:
 	rng.seed = hash("%d|%s" % [seed_ambiente, bioma])
 
 	_fundo_em_gradiente()
+
+	# pack pixel-art: camadas reais em vez das silhuetas geradas
+	if fundo_pack != "" and PACKS.has(fundo_pack):
+		_montar_fundo_pack(rng)
+		if luzes_horizonte:
+			_brilho_horizonte(rng)
+		return
 
 	# nome da camada -> [escurecer, passo_x, h_min, h_max, alpha]
 	var camadas := {
@@ -149,6 +196,36 @@ func _faixa_rasteira(rng: RandomNumberGenerator) -> void:
 		p.position = Vector2(x, 0.0)
 		layer.add_child(p)
 		x += rng.randf_range(60.0, 150.0)
+
+
+## Constrói o fundo a partir de um pack pixel-art (`fundo_pack`): para cada
+## camada, repete a textura na horizontal ao longo do nível, dentro da
+## `ParallaxLayer` certa (o motion_scale da cena dá a profundidade).
+func _montar_fundo_pack(_rng: RandomNumberGenerator) -> void:
+	for item: Array in PACKS[fundo_pack]:
+		var tex: Texture2D = load("%s/%s/%s" % [BG_DIR, fundo_pack, item[0]])
+		if tex == null:
+			continue
+		var layer := get_node_or_null("Parallax/%s" % item[1]) as Node2D
+		if layer == null:
+			continue
+		# fora as silhuetas geradas desta camada (deixa sky/bruma/gradiente)
+		for n in layer.get_children():
+			if not (n.name in ["Fundo", "Bruma", "GradFundo"]):
+				n.free()
+		var esc: float = item[3]
+		var y_base: float = item[2]
+		var tw := float(tex.get_width()) * esc
+		var th := float(tex.get_height()) * esc
+		var x := -3000.0
+		while x < largura_nivel + 3000.0:
+			var spr := Sprite2D.new()
+			spr.texture = tex
+			spr.centered = false
+			spr.scale = Vector2(esc, esc)
+			spr.position = Vector2(x, y_base - th)
+			layer.add_child(spr)
+			x += tw - 1.0  # -1px de sobreposição para esconder a costura
 
 
 ## Faixa de brilho quente colada ao horizonte + tochas distantes a
