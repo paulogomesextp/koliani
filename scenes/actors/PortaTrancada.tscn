@@ -1,0 +1,13 @@
+[gd_scene load_steps=2 format=3 uid="uid://bkolianiportatrancada01"]
+
+; Grade trancada: bloqueia ate' as Alavanca do mesmo id. Forma da colisao
+; e barras sao geradas em codigo (ver porta_trancada.gd) a partir de `tamanho`.
+
+[ext_resource type="Script" path="res://scripts/porta_trancada.gd" id="1_pt"]
+
+[node name="PortaTrancada" type="StaticBody2D"]
+collision_layer = 1
+collision_mask = 0
+script = ExtResource("1_pt")
+
+[node name="Col" type="CollisionShape2D" parent="."]

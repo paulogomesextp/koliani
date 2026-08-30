@@ -1,0 +1,18 @@
+[gd_scene load_steps=3 format=3 uid="uid://bkolianialavanca01"]
+
+; Alavanca: a Koliani toca e muda o estado das PortaTrancada com o mesmo
+; id. Visual construido em codigo (ver alavanca.gd).
+
+[ext_resource type="Script" path="res://scripts/alavanca.gd" id="1_alav"]
+
+[sub_resource type="RectangleShape2D" id="rs_alav"]
+size = Vector2(28, 44)
+
+[node name="Alavanca" type="Area2D" groups=["alavancas"]]
+collision_layer = 0
+collision_mask = 2
+script = ExtResource("1_alav")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -4)
+shape = SubResource("rs_alav")
