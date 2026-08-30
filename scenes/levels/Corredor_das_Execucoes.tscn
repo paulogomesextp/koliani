@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://bkolianiexecucoes08"]
+[gd_scene load_steps=17 format=3 uid="uid://bkolianiexecucoes08"]
 
 ; Região II / nível 08 -- Corredor das Execuções.
 ; Corredor da prisão cheio de guilhotinas (Guilhotina, automáticas ao longo
@@ -20,6 +20,7 @@
 [ext_resource type="PackedScene" uid="uid://bkolianiplatritmada05" path="res://scenes/actors/PlataformaRitmada.tscn" id="10_plr"]
 [ext_resource type="PackedScene" uid="uid://bkolianiguilhotina08" path="res://scenes/actors/Guilhotina.tscn" id="11_gui"]
 [ext_resource type="PackedScene" uid="uid://bkolianiserra01" path="res://scenes/actors/Serra.tscn" id="12_serra"]
+[ext_resource type="PackedScene" uid="uid://bkolianicascamasmorra01" path="res://scenes/actors/CascaMasmorra.tscn" id="90_casca"]
 
 [sub_resource type="RectangleShape2D" id="rs_chk"]
 size = Vector2(40, 80)
@@ -38,6 +39,7 @@ fill_to = Vector2(1, 0.5)
 
 [node name="Corredor_das_Execucoes" type="Node2D"]
 script = ExtResource("7_niv")
+corredor = false
 
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
 cor_ambiente = Color(0.55, 0.62, 0.72, 1)
@@ -50,6 +52,13 @@ bioma = "prisao"
 largura_nivel = 3600.0
 luzes_horizonte = true
 fundo_pack = "corredores"
+
+[node name="Casca" parent="." instance=ExtResource("90_casca")]
+largura = 4000.0
+altura = 580.0
+topo = 150.0
+esquerda = -140.0
+chao_y = 740.0
 
 [node name="ChaoInicio" parent="." instance=ExtResource("9_pl")]
 position = Vector2(430, 660)
