@@ -9,7 +9,14 @@
 > `EstadoJogo.NIVEIS`, pistas no `DiarioPistas` + i18n, e (quando tiver
 > chefe próprio) script de chefe + sprite. Ordem de ataque sugerida no fim.
 >
-> **Feito até agora (2026‑08‑29):**
+> **Feito até agora (2026‑08‑30):**
+> - Região I / nível 02 **Pântano dos Sussurros** jogável: chefe
+>   **Morvanna** (`chefe_morvanna.gd` + `ChefeMorvanna.tscn`), mecânicas
+>   partilhadas **`AguaVenenosa`** (morte instantânea) e
+>   **`PlataformaFlutuante`** (baloiça/deriva, "apagável" pela Morvanna).
+>   Pista `pantano_bilhete_na_agua`.
+>
+> **(2026‑08‑29):**
 > - `EstadoJogo.REGIOES` — camada de dados das 6 regiões + `concluidos`
 >   (estado de conclusão por nível, gravado no save). Falta a UI (mapa).
 > - Região I / nível 01: chefe **Ghorak** (`chefe_ghorak.gd` +

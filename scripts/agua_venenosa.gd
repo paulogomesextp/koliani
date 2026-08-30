@@ -11,10 +11,12 @@ extends Armadilha
 @export var largura := 320.0 : set = _set_largura
 @export var altura := 120.0 : set = _set_altura
 ## Cor da superfície (a metade de cima é mais clara).
-@export var cor := Color(0.28, 0.52, 0.32, 0.72) : set = _set_cor
+@export var cor := Color(0.3, 0.62, 0.36, 0.9) : set = _set_cor
 
 var _forma: CollisionShape2D
 var _sup: Polygon2D
+var _rim: Polygon2D
+var _luz: PointLight2D
 var _t := 0.0
 
 
@@ -22,6 +24,8 @@ func _pronto() -> void:
 	dano = 999  # >= vida máxima da Koliani -> _morrer()
 	_forma = $CollisionShape2D
 	_sup = $Superficie
+	_rim = get_node_or_null("Rebordo")
+	_luz = get_node_or_null("Luz")
 	_reconstruir()
 
 
@@ -30,8 +34,14 @@ func _process(dt: float) -> void:
 		return
 	_t += dt
 	# ondulação lenta da superfície (só visual)
-	_sup.position.y = sin(_t * 1.6) * 2.0
-	_sup.color.a = cor.a * (0.85 + 0.15 * sin(_t * 2.3))
+	var onda := sin(_t * 1.6) * 2.0
+	_sup.position.y = onda
+	_sup.color.a = cor.a * (0.9 + 0.1 * sin(_t * 2.3))
+	if _rim:
+		_rim.position.y = onda
+		_rim.modulate.a = 0.6 + 0.4 * sin(_t * 2.0 + 1.0)
+	if _luz:
+		_luz.energy = 0.7 + 0.15 * sin(_t * 2.6)
 
 
 func _set_largura(v: float) -> void:
@@ -66,8 +76,17 @@ func _reconstruir() -> void:
 		Vector2(hw, hh), Vector2(-hw, hh),
 	])
 	_sup.color = cor
-	# gradiente simples: topo mais claro, fundo quase opaco
+	# gradiente simples: topo aceso (veneno luminoso), fundo mais escuro
 	_sup.vertex_colors = PackedColorArray([
-		cor.lightened(0.25), cor.lightened(0.25),
-		cor.darkened(0.35), cor.darkened(0.35),
+		cor.lightened(0.45), cor.lightened(0.45),
+		cor.darkened(0.25), cor.darkened(0.25),
 	])
+	# rebordo aceso na linha de água -- deixa o perigo bem visível no escuro
+	if _rim:
+		_rim.polygon = PackedVector2Array([
+			Vector2(-hw, -hh - 3.0), Vector2(hw, -hh - 3.0),
+			Vector2(hw, -hh + 5.0), Vector2(-hw, -hh + 5.0),
+		])
+		_rim.color = Color(cor.lightened(0.6).r, cor.lightened(0.6).g, cor.lightened(0.6).b, 0.9)
+	if _luz:
+		_luz.position = Vector2(0.0, -hh)

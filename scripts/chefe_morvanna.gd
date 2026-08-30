@@ -18,8 +18,11 @@ const CLONE := preload("res://scenes/actors/DemonioBase.tscn")
 enum Fase { DORME, DECIDE, MAOS_TEL, MAOS, CLONES_TEL, CLONES, APAGA_TEL, APAGA, EXPOSTA }
 
 @export var dist_deteta := 460.0
-@export var altura_voo := 150.0
-@export var altura_exposta := 26.0
+## Altura a que paira (px acima do chão da arena) fora da janela de dano.
+@export var altura_voo := 210.0
+## Altura a que desce no estado EXPOSTA -- baixa o suficiente para a Koliani
+## a acertar com um salto+ataque.
+@export var altura_exposta := 88.0
 @export var balanco := 12.0
 @export var dur_tel := 0.62
 @export var dur_maos := 0.7
@@ -36,6 +39,9 @@ var _exposta := false
 var _ciclos := 0
 var _alvo_y := 0.0
 var _vida_max := 300
+## Y do chão da arena por baixo da Morvanna (raycast uma vez, ela quase não
+## se desloca em x). As alturas de voo/EXPOSTA são relativas a isto.
+var _chao_cache := 0.0
 
 @onready var _nucleo: Node2D = get_node_or_null("Sprite/Nucleo")
 
@@ -64,6 +70,9 @@ func _physics_process(dt: float) -> void:
 	if not _fase2 and not _ja_derrotado and vida <= int(_vida_max * 0.5):
 		_entrar_fase2()
 
+	if _chao_cache <= 0.0:
+		_chao_cache = _chao_y(global_position.x)
+
 	# glide suave até à altura-alvo do estado atual
 	var y := global_position.y
 	global_position.y = lerpf(y, _alvo_y, clampf(dt * 4.0, 0.0, 1.0))
@@ -71,12 +80,12 @@ func _physics_process(dt: float) -> void:
 
 	match _fase:
 		Fase.DORME:
-			_alvo_y = _origem.y - altura_voo
+			_alvo_y = _chao_cache - altura_voo
 			if _ve_koliani():
 				provocar()
 				_ir(Fase.DECIDE)
 		Fase.DECIDE:
-			_alvo_y = _origem.y - altura_voo
+			_alvo_y = _chao_cache - altura_voo
 			if _t >= 0.35:
 				_escolher()
 		Fase.MAOS_TEL:
@@ -110,7 +119,7 @@ func _physics_process(dt: float) -> void:
 			if _t >= 0.5:
 				_ir(Fase.EXPOSTA)
 		Fase.EXPOSTA:
-			_alvo_y = _origem.y - altura_exposta
+			_alvo_y = _chao_cache - altura_exposta
 			if not _exposta:
 				_exposta = true
 				_mostrar_nucleo(true)

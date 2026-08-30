@@ -72,13 +72,13 @@ cor_topo = Color(0.3, 0.5, 0.26, 1)
 position = Vector2(1160, 780)
 largura = 800.0
 altura = 260.0
-cor = Color(0.24, 0.5, 0.3, 0.74)
+cor = Color(0.32, 0.66, 0.4, 0.9)
 
 [node name="Agua2" parent="." instance=ExtResource("11_agua")]
 position = Vector2(2380, 780)
 largura = 720.0
 altura = 260.0
-cor = Color(0.24, 0.5, 0.3, 0.74)
+cor = Color(0.32, 0.66, 0.4, 0.9)
 
 [node name="PlatFlut1" parent="." instance=ExtResource("12_pf")]
 position = Vector2(940, 600)
