@@ -17,15 +17,21 @@ const LANCA_VEL := 240.0
 ## ter espaço para ler os ataques e desviar.
 const RECUO_LATERAL := 240.0
 
-enum Fase { DORME, DECIDE, LANCAS_TEL, LANCAS, TORNADO_TEL, TORNADO, INVESTIDA_TEL, INVESTIDA, EXPOSTO }
+enum Fase { DORME, DECIDE, LANCAS_TEL, LANCAS, TORNADO_TEL, TORNADO, INVESTIDA_TEL, INVESTIDA, STOMP_TEL, STOMP, EXPOSTO }
 
 @export var dist_deteta := 520.0
 @export var altura_voo := 210.0
 @export var dur_tel := 0.9
 @export var dur_exposto := 2.0
+## STOMP: de dois em dois ciclos o Aerion desce a pique, dá um pisão (duas
+## ondas de choque rasteiras que se saltam) e FICA no chão, vulnerável,
+## `dur_stomp` segundos -- a janela grande para lhe acertar.
+@export var dur_stomp := 3.0
+@export var stomp_vel := 1500.0
 @export var dano_lanca := 9
 @export var dano_tornado := 8
 @export var dano_investida := 13
+@export var dano_stomp := 14
 
 var _fase: Fase = Fase.DORME
 var _t := 0.0
@@ -41,13 +47,14 @@ var _inv_para := Vector2.ZERO
 ## lanças vão para AQUI, não para a posição actual, por isso correr durante
 ## o aviso desvia-as de verdade.
 var _mira_lancas := Vector2.ZERO
+var _stomp_x := 0.0
 
 @onready var _nucleo: Node2D = get_node_or_null("Sprite/Nucleo")
 
 
 func _ready() -> void:
 	super._ready()
-	vida = maxi(vida, 360)
+	vida = maxi(vida, 460)
 	_vida_max = vida
 	velocidade = 0.0
 	alcance_patrulha = 0.0
@@ -77,7 +84,7 @@ func _physics_process(dt: float) -> void:
 		# posto), NÃO persegue a Koliani pelo nível fora
 		global_position.x = lerpf(global_position.x, _origem.x, clampf(dt * 2.0, 0.0, 1.0))
 		global_position.y = _chao_cache - altura_voo + sin(_pulso * 1.4) * 8.0
-	elif _fase != Fase.INVESTIDA:
+	elif _fase not in [Fase.INVESTIDA, Fase.STOMP_TEL, Fase.STOMP]:
 		# em combate: paira ao LADO da Koliani, não em cima dela
 		var kx := _x_koliani()
 		var lado := signf(global_position.x - kx)
@@ -94,10 +101,13 @@ func _physics_process(dt: float) -> void:
 				_ir(Fase.DECIDE)
 		Fase.DECIDE:
 			if _t >= 0.28:
-				match _ciclos % 3:
-					0: _ir(Fase.LANCAS_TEL)
-					1: _ir(Fase.TORNADO_TEL)
-					_: _ir(Fase.INVESTIDA_TEL)
+				if _ciclos % 2 == 1:
+					_ir(Fase.STOMP_TEL)   # pisão de dois em dois ciclos
+				else:
+					match (_ciclos / 2) % 3:
+						0: _ir(Fase.LANCAS_TEL)
+						1: _ir(Fase.TORNADO_TEL)
+						_: _ir(Fase.INVESTIDA_TEL)
 		Fase.LANCAS_TEL:
 			if _t < dt:
 				var kl := _obter_koliani()
@@ -139,6 +149,33 @@ func _physics_process(dt: float) -> void:
 				k.receber_dano(int(round(dano_investida * (1.1 if _fase2 else 1.0))), signf(k.global_position.x - global_position.x))
 			if _t >= 0.5:
 				_ir(Fase.EXPOSTO)   # sem mergulho duplo na fase 2
+		Fase.STOMP_TEL:
+			var kx3 := _x_koliani()
+			global_position.x = lerpf(global_position.x, kx3, clampf(dt * 3.5, 0.0, 1.0))
+			global_position.y = lerpf(global_position.y, _chao_cache - altura_voo - 20.0, clampf(dt * 3.5, 0.0, 1.0))
+			_piscar(true)
+			if _t >= dur_tel * 1.1:
+				_piscar(false)
+				_stomp_x = global_position.x
+				Som.toca("investida", -5.0, 0.7)
+				_ir(Fase.STOMP)
+		Fase.STOMP:
+			if not _exposto and global_position.y < _chao_cache - 46.0:
+				global_position.x = _stomp_x
+				global_position.y = minf(global_position.y + stomp_vel * dt, _chao_cache - 44.0)
+			elif not _exposto:
+				global_position = Vector2(_stomp_x, _chao_cache - 44.0)
+				_stomp_impacto()
+				_exposto = true
+				_mostrar_nucleo(true)
+				_t = 0.0
+			else:
+				global_position = Vector2(_stomp_x, _chao_cache - 44.0)
+				if _t >= dur_stomp:
+					_exposto = false
+					_mostrar_nucleo(false)
+					_ciclos += 1
+					_ir(Fase.DECIDE)
 		Fase.EXPOSTO:
 			if not _exposto:
 				_exposto = true
@@ -250,6 +287,45 @@ func _tornado(dir: float, atraso: float) -> void:
 	t.parallel().tween_method(func(v: float) -> void: poly.rotation = v, 0.0, TAU * 4.0, 2.4)
 	t.tween_property(poly, "modulate:a", 0.0, 0.2)
 	t.tween_callback(tor.queue_free)
+
+
+## --- pisão (STOMP) -------------------------------------------------
+
+func _stomp_impacto() -> void:
+	Som.toca("chefe_cai", -3.0, 0.85)
+	_abanar_camera(10.0)
+	_onda_stomp(-1.0)
+	_onda_stomp(1.0)
+
+
+## Onda de choque rasteira que corre pelo chão a partir do ponto do pisão.
+## Salta-se. Aparece dos dois lados.
+func _onda_stomp(dir: float) -> void:
+	var pai := get_parent()
+	if pai == null:
+		return
+	var o := Area2D.new()
+	o.collision_layer = 0
+	o.collision_mask = 2
+	o.global_position = Vector2(_stomp_x + dir * 44.0, _chao_cache - 22.0)
+	pai.add_child(o)
+	var forma := CollisionShape2D.new()
+	var rs := RectangleShape2D.new()
+	rs.size = Vector2(56, 42)
+	forma.shape = rs
+	o.add_child(forma)
+	var poly := Polygon2D.new()
+	poly.color = Color(0.82, 0.9, 1.0, 0.6)
+	poly.polygon = PackedVector2Array([Vector2(-28, 21), Vector2(-16, -21), Vector2(16, -21), Vector2(28, 21)])
+	o.add_child(poly)
+	var dano := dano_stomp
+	o.body_entered.connect(func(b: Node) -> void:
+		if b is Koliani:
+			b.receber_dano(dano, dir))
+	var t := o.create_tween()
+	t.tween_property(o, "global_position:x", _stomp_x + dir * 640.0, 0.55)
+	t.parallel().tween_property(poly, "modulate:a", 0.0, 0.55)
+	t.tween_callback(o.queue_free)
 
 
 ## --- fase 2 --------------------------------------------------------

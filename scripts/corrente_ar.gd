@@ -5,8 +5,8 @@ extends Area2D
 ## velocidade-alvo (`Koliani.soprar_para_cima`) -- serve para alcançar
 ## plataformas suspensas altas. Mecânica partilhada e reutilizável.
 
-@export var forca := 1600.0
-@export var vel_alvo := 240.0
+@export var forca := 3200.0
+@export var vel_alvo := 520.0
 
 @onready var _poeira: CPUParticles2D = get_node_or_null("Poeira")
 

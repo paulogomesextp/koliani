@@ -382,11 +382,18 @@ func _physics_process(dt: float) -> void:
 	if _leve > 0.0 and velocity.y > 0.0:
 		velocity.y *= 0.4
 
-	# corrente de ar (Torre dos Ventos, nível 12): empurra para cima até
-	# uma velocidade de subida-alvo enquanto estiver dentro.
-	if _vento_restante > 0.0:
+	# corrente de ar (Torre dos Ventos, nível 12): sobe depressa enquanto lá
+	# estiver E no ar. Se estiver POUSADA numa plataforma dentro da corrente,
+	# o vento não a levanta -- assim o salto/duplo salto funcionam normal.
+	# Segurar "baixo" (mirar_baixo) deixa descer contra o vento.
+	if _vento_restante > 0.0 and not is_on_floor():
 		_vento_restante -= dt
-		velocity.y = maxf(velocity.y - _vento_forca * dt, -_vento_alvo)
+		if Input.is_action_pressed("mirar_baixo"):
+			velocity.y = minf(velocity.y + _vento_forca * 0.7 * dt, _vento_alvo * 0.85)
+		else:
+			velocity.y = maxf(velocity.y - _vento_forca * dt, -_vento_alvo)
+	elif _vento_restante > 0.0:
+		_vento_restante -= dt
 
 	var vel_queda := velocity.y
 	move_and_slide()
