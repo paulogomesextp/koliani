@@ -23,9 +23,13 @@ página do itch/Kenney). O agente usa isto para gerar `assets/sprites/pixel/CRED
 # Packs Dark / Fantasmagórico (preencher ao largar os ficheiros)
 
 ## gothicvania
-- URL(s): (colar as páginas OpenGameArt de cada pack GothicVania usado)
-- Licença: CC0 — https://creativecommons.org/publicdomain/zero/1.0/
-- Autor: Ansimuz (Luis Zuno)
+- Packs presentes:
+  - `gothicvania church files/` — GothicVania Church Pack
+    - `public-license.txt` (incluído): "Public domain and free to use on
+      whatever you want, personal or commercial. Credit is not required
+      but appreciated." (= CC0 na prática)
+- Licença: CC0 / domínio público — https://creativecommons.org/publicdomain/zero/1.0/
+- Autor: Luis Zuno (@ansimuz) · música de demo: Pascal Belisle (não usada)
 
 ## luizmelo
 - URL(s): https://itch.io/profile/luizmelo  (colar cada pack usado)
