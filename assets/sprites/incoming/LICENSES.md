@@ -17,3 +17,37 @@ página do itch/Kenney). O agente usa isto para gerar `assets/sprites/pixel/CRED
 - URL: https://kenney.nl/assets/pixel-platformer
 - Licença: https://creativecommons.org/publicdomain/zero/1.0/
 - Autor: Kenney
+
+---
+
+# Packs Dark / Fantasmagórico (preencher ao largar os ficheiros)
+
+## gothicvania
+- URL(s): (colar as páginas OpenGameArt de cada pack GothicVania usado)
+- Licença: CC0 — https://creativecommons.org/publicdomain/zero/1.0/
+- Autor: Ansimuz (Luis Zuno)
+
+## luizmelo
+- URL(s): https://itch.io/profile/luizmelo  (colar cada pack usado)
+- Licença: CC0 — https://creativecommons.org/publicdomain/zero/1.0/
+- Autor: LuizMelo
+
+## clembod
+- URL(s): https://clembod.itch.io/  (colar cada pack usado)
+- Licença: (colar o texto exacto da página — grátis, uso comercial, creditar)
+- Autor: Clembod  → creditar em CREDITS.md
+
+## chierit
+- URL(s): https://chierit.itch.io/  (colar cada boss usado)
+- Licença: CC-BY 4.0 — https://creativecommons.org/licenses/by/4.0/
+- Autor: chierit  → creditar em CREDITS.md
+
+## 0x72-dungeon-ii
+- URL: https://0x72.itch.io/dungeontileset-ii
+- Licença: CC0 — https://creativecommons.org/publicdomain/zero/1.0/
+- Autor: 0x72
+
+## ansimuz-parallax
+- URL(s): https://ansimuz.itch.io/  (colar cada pack de parallax usado)
+- Licença: (colar o texto exacto da página)
+- Autor: Ansimuz (Luis Zuno)

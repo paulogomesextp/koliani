@@ -12,7 +12,21 @@ agente pega nisto, organiza para `assets/sprites/pixel/`, configura o import
 | `kings-and-pigs/` | Kings and Pigs (Pixel Frog, CC0) | https://pixelfrog-assets.itch.io/kings-and-pigs | regiões escuras: calabouço, tochas, portas, inimigos |
 | `kenney-pixel-platformer/` | Pixel Platformer (Kenney, CC0) — opcional | https://kenney.nl/assets/pixel-platformer | tiles / props de preenchimento |
 
-> Pixel Adventure 2 é pago — fora.
+### Dark / Fantasmagórico (a descarregar — ver `docs/assets_cc0.md`)
+
+| Pasta | Pack | Licença | Para quê |
+|---|---|---|---|
+| `gothicvania/` | Ansimuz GothicVania (via **OpenGameArt**) | CC0 | tilesets + parallax + inimigos das regiões escuras |
+| `luizmelo/` | LuizMelo — Monsters Creatures Fantasy, etc. | CC0 | inimigos comuns animados (troca o "Pig") |
+| `clembod/` | Clembod — Bringer of Death, etc. | grátis / creditar | chefe pixel-art de tema Morte |
+| `chierit/` | chierit — Boss Minotaur/Golem/Slime… | CC-BY 4.0 | chefes das regiões II→VI |
+| `0x72-dungeon-ii/` | 0x72 — DungeonTileset II | CC0 | calabouço: tiles, tochas, dezenas de bichos |
+| `ansimuz-parallax/` | Ansimuz — Gothic Parallax Backgrounds | grátis | camadas reais para o `Atmosfera` |
+
+Cada pasta tem um `_LARGAR_AQUI.md` com os links exactos.
+
+> Pixel Adventure 2 é pago — fora. Packs "free" da CraftPix **não** entram
+> (licença proíbe redistribuir num repo público).
 
 Podes acrescentar outras pastas se trouxeres mais packs.
 
