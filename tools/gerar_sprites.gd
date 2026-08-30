@@ -63,6 +63,7 @@ func _initialize() -> void:
 	_boss_rei_ossario() # regiao IV / nivel 16
 	_boss_colosso()  # regiao IV / nivel 17
 	_boss_freira()   # regiao IV / nivel 18
+	_boss_naga()     # regiao IV / nivel 19
 	print("OK -- sprites pixel-art em ", DIR)
 	quit(0)
 
@@ -1144,4 +1145,55 @@ func _boss_freira() -> void:
 			_linha(int(cx) + 12, 46, int(cx) + 12, 66, 2, Color("3a2c1e"))
 			_elipse(cx + 12, 68, 3, 3, Color("57503b"))
 		_linha(int(cx) - 7, 34, int(cx) - 13, 56, 4, HABITO_C)
+	)
+
+
+## Nivel 19 -- Templo da Serpente. Naga Zeraph: cauda de serpente enrolada,
+## torso de mulher, capelo de cobra. Frame 2 = ergue-se de boca aberta a
+## cuspir (telegrafo); frame 3 = ergue-se por completo, ventre/nucleo a
+## mostra (exposta).
+func _boss_naga() -> void:
+	var ESC := Color("2b6b3a")
+	var ESC_C := Color("4a9a55")
+	var ESC_E := Color("173e22")
+	var PELE := Color("c9a884")
+	var OURO := Color("d9b64a")
+	var NUCLEO := Color("9a5cff")
+	_boss("naga", 84, 112, func(f: int) -> void:
+		var ergue := f >= 2
+		var cx := 42.0
+		# cauda enrolada (base)
+		for r in range(3):
+			var ry := 96 - r * 8
+			_elipse(cx + (r - 1) * 10, ry, 22 - r * 3, 8, ESC if r % 2 else ESC_C)
+		_linha(int(cx) + 18, 92, int(cx) + 30, 84, 4, ESC_C)
+		# torso (mais erguido nos frames 2/3)
+		var ty0 := 40 if not ergue else 24
+		for j in range(ty0, 88):
+			var t := float(j - ty0) / float(88 - ty0)
+			var meia := lerpf(7.0, 12.0, t)
+			_rect(int(cx - meia), j, int(meia * 2.0), 1, ESC if j % 4 else PELE)
+		# ventre claro + nucleo
+		var g: float = [0.9, 0.95, 1.1, 1.5][f]
+		_elipse(cx, ty0 + 20, 5.0 * g, 6.0 * g, NUCLEO if f == 3 else PELE)
+		if f == 3:
+			_elipse(cx, ty0 + 20, 2.2, 2.6, PAL["w"])
+		# ombros / bracos
+		_linha(int(cx) - 7, ty0 + 4, int(cx) - 16, ty0 + 24, 4, ESC_C)
+		_linha(int(cx) + 7, ty0 + 4, int(cx) + 16, ty0 + 24, 4, ESC_C)
+		# cabeca + capelo de cobra
+		var ch := ty0 - 8
+		_elipse(cx, ch, 7, 8, PELE)
+		_elipse(cx - 11, ch + 1, 5, 8, ESC)     # aba esq do capelo
+		_elipse(cx + 11, ch + 1, 5, 8, ESC)     # aba dir
+		_rect(int(cx) - 8, ch - 8, 16, 3, OURO) # diadema
+		_px(int(cx) - 2, ch, NUCLEO); _px(int(cx) + 2, ch, NUCLEO)
+		if f == 2:
+			_rect(int(cx) - 3, ch + 4, 6, 4, Color("120a08"))  # boca aberta
+			for d in 3:
+				_px(int(cx) - 8 + d * 8, ch + 8 + d, Color("5a8a3a"))  # cuspe a sair
+		# lingua bifida no frame 3
+		if f == 3:
+			_linha(int(cx), ch + 5, int(cx) - 3, ch + 12, 1, Color("b0304a"))
+			_linha(int(cx), ch + 5, int(cx) + 3, ch + 12, 1, Color("b0304a"))
 	)

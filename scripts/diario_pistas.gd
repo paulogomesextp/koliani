@@ -126,6 +126,11 @@ const PISTAS := {
 		"titulo": "clue.velas_rosario_da_freira.title",
 		"texto": "clue.velas_rosario_da_freira.body",
 	},
+	"serpente_idolo_partido": {
+		"mundo": "world.catacombs",
+		"titulo": "clue.serpente_idolo_partido.title",
+		"texto": "clue.serpente_idolo_partido.body",
+	},
 	"castelo_aurora_livre": {
 		"mundo": "world.castle",
 		"titulo": "clue.castelo_aurora_livre.title",
