@@ -352,21 +352,23 @@ func _koliani() -> void:
 ## mangas + cintos, botas altas, lamina roxa acesa e fumos/fantasmas roxos.
 
 const KPAL := {
-	"o":  Color("1a1720"),  # contorno
-	"d":  Color("2b2733"),  # escuro (roupa)
-	"D":  Color("3b3547"),  # roupa clara
-	"cp": Color("46345f"),  # capa
-	"cP": Color("6b4a8f"),  # capa realce
-	"m":  Color("b94fd6"),  # magenta halo
-	"M":  Color("7a3f9e"),  # magenta medio
-	"w":  Color("f2e6ff"),  # brilho
-	"k":  Color("cda484"),  # pele
-	"s":  Color("8a6b52"),  # pele sombra
-	"h":  Color("2a2230"),  # cabelo
-	"H":  Color("593a4c"),  # cabelo streak
-	"g":  Color("7b7682"),  # metal (pauldron / fivelas)
-	"c":  Color("d8ccb6"),  # creme (bandana clara / detalhes)
-	"b":  Color("241c14"),  # bota
+	"o":  Color("15121c"),  # contorno
+	"d":  Color("29252f"),  # escuro (roupa)
+	"D":  Color("3a3446"),  # roupa clara
+	"cp": Color("42335a"),  # capa
+	"cP": Color("62468a"),  # capa realce
+	"m":  Color("a24ec4"),  # magenta halo
+	"M":  Color("6c3d94"),  # magenta medio
+	"w":  Color("efe3ff"),  # brilho
+	"k":  Color("cda486"),  # pele
+	"s":  Color("8f6d54"),  # pele sombra
+	"h":  Color("241d2c"),  # cabelo
+	"H":  Color("5a3648"),  # cabelo streak (vinho)
+	"g":  Color("7d7883"),  # metal (pauldron / fivelas)
+	"G":  Color("a7a2ad"),  # metal claro
+	"c":  Color("d7cbb4"),  # creme (bandana / detalhes)
+	"b":  Color("221b14"),  # bota
+	"B":  Color("3a2e22"),  # bota cuff
 }
 
 
@@ -475,65 +477,86 @@ func _kol_pose(p: Dictionary, fw: int, fh: int) -> void:
 	var wisps: int = int(p.get("wisps", 0))
 
 	# alturas comprimidas pelo agachar
-	var h_perna := int(lerpf(15.0, 7.0, ag))
-	var h_tronco := int(lerpf(14.0, 10.0, ag))
+	var h_perna := int(lerpf(15.0, 8.0, ag))
+	var h_tronco := int(lerpf(13.0, 10.0, ag))
 	var y_quadril := pes - h_perna + sobe
 	var y_ombro := y_quadril - h_tronco
-	var y_cabeca := y_ombro - 6
+	var y_cabeca := y_ombro - 7
 	var head_x := cx + int(lean * 0.5) + (2 if parede else 0)
 
-	# --- CAPA esfarrapada (atras) -- desenha primeiro ---
-	var sway := int(capa * 8.0)
-	for j in range(y_ombro, pes + 2):
-		var f := float(j - y_ombro) / float(maxi(1, pes + 2 - y_ombro))
-		var larg := int(lerpf(6.0, 11.0, f))
-		var bx := cx - 3 - int(f * sway) - (int(f * -10.0) if parede else 0)
-		# orla esfarrapada: recorta uns dentes
-		var corte := 0
-		if j > pes - 6:
-			corte = int(2.0 + 2.0 * sin(float(j) * 1.7 + _ox))
-		_rect(bx - larg + corte, j, larg, 1, KPAL["cp"])
-		if j % 3 == 0:
-			_px(bx - larg + corte, j, KPAL["cP"])
-	# ganchos de capa nos ombros
-	_rect(cx - 4, y_ombro - 1, 9, 3, KPAL["cp"])
+	# --- CAPA ESFARRAPADA (atras, desenha primeiro) ---
+	var sway := int(capa * 9.0)
+	var topo_capa := y_ombro - 1
+	for j in range(topo_capa, pes + 4):
+		var f := float(j - topo_capa) / float(maxi(1, pes + 4 - topo_capa))
+		var larg := int(lerpf(5.0, 13.0, f * f))          # abre para baixo
+		var bx := cx - 2 - int(f * sway)
+		if parede:
+			bx = cx + 4 + int(f * 9.0)                    # cola-se à parede (esq)
+		# orla rasgada: dentes que variam com a coluna e o frame
+		var rag := 0
+		if f > 0.62:
+			rag = int(3.0 * maxf(0.0, sin(float(j) * 1.7 + float(_ox) * 0.4)))
+		_rect(bx - larg, j, larg - rag, 1, KPAL["cp"])    # recorta pela esquerda
+		if j % 4 == 0:
+			_px(bx - 1, j, KPAL["cP"])                    # dobra clara (bordo dir)
+		if j == topo_capa:
+			_px(bx - larg, j, KPAL["M"])
+	# capa que passa pelo ombro para a frente (gola)
+	_rect(cx - 5, y_ombro - 2, 11, 3, KPAL["cp"])
+	_px(cx + 4, y_ombro - 1, KPAL["cP"])
 
-	# --- PERNAS + BOTAS ---
+	# --- PERNAS + BOTAS ALTAS ---
 	var passo_px := int(passo * 4.0)
-	# perna de tras
-	_rect(cx - 4 - passo_px, y_quadril, 4, h_perna - 4, KPAL["d"])
-	_rect(cx - 5 - passo_px, y_quadril + h_perna - 5, 5, 5, KPAL["b"])
-	# perna da frente
-	_rect(cx + 1 + passo_px, y_quadril, 5, h_perna - 4, KPAL["d"])
-	_rect(cx + 1 + passo_px, y_quadril + h_perna - 5, 6, 5, KPAL["b"])
-	_px(cx + 6 + passo_px, y_quadril + h_perna - 2, KPAL["g"])   # fivela da bota
+	_rect(cx - 5, y_quadril - 1, 11, 4, KPAL["d"])   # anca (nunca deixa vao)
+	for lado: int in [-1, 1]:
+		var lx: int = cx + (-4 if lado < 0 else 1) + lado * passo_px
+		var lw: int = 4 if lado < 0 else 5
+		var lcima := int(h_perna * 0.55)
+		_rect(lx, y_quadril, lw, lcima, KPAL["d"])                 # coxa
+		_rect(lx, y_quadril + lcima, lw + 1, h_perna - lcima, KPAL["b"])  # bota
+		_rect(lx, y_quadril + lcima, lw + 1, 1, KPAL["B"])         # cuff da bota
+		_px(lx + lw, y_quadril + h_perna - 3, KPAL["g"])          # fivela lateral
+	_rect(cx - 3, y_quadril + h_perna - 1, 8 + passo_px, 1, KPAL["b"])  # solas
 
-	# --- TRONCO (top sem mangas) + cinto ---
+	# --- TRONCO (top sem mangas) + cintos ---
 	for j in range(y_ombro, y_quadril + 1):
 		var f := float(j - y_ombro) / float(maxi(1, y_quadril - y_ombro))
 		var meia := lerpf(5.0, 4.0, f)
 		var tx := cx + int(lean * (1.0 - f) * 0.4)
 		_rect(int(tx - meia), j, int(meia * 2.0), 1, KPAL["d"])
-	_rect(cx - 5, y_quadril - 3, 11, 2, KPAL["D"])       # cinto
-	_px(cx, y_quadril - 2, KPAL["g"])                    # fivela
-	# pauldron (ombro da frente)
-	_rect(cx + 3, y_ombro - 1, 4, 4, KPAL["g"])
-	_px(cx + 6, y_ombro, KPAL["c"])
+	_rect(cx - 5, y_quadril - 3, 11, 2, KPAL["D"])       # cinto da cintura
+	_px(cx, y_quadril - 2, KPAL["G"])                    # fivela
+	_linha(cx - 5, y_quadril - 4, cx + 4, y_quadril + 1, 1, KPAL["D"])  # bandoleira
+	_px(cx + 3, y_quadril - 5, KPAL["g"])
+	# PAULDRON em duas placas
+	_rect(cx + 2, y_ombro - 2, 6, 3, KPAL["g"])
+	_rect(cx + 3, y_ombro + 1, 4, 2, KPAL["g"])
+	_px(cx + 7, y_ombro - 1, KPAL["G"])
+	_px(cx + 2, y_ombro - 2, KPAL["G"])
 
-	# --- CABECA + BANDANA + CABELO ---
-	_elipse(head_x, y_cabeca, 5.5, 6.0, KPAL["h"])       # cabelo (base)
-	_elipse(head_x + 1, y_cabeca + 1, 4.2, 4.6, KPAL["k"])  # cara
-	_rect(head_x - 4, y_cabeca - 4, 9, 3, KPAL["h"])     # cabelo topo
-	_linha(head_x - 5, y_cabeca + 2, head_x - 6, y_cabeca + 8, 3, KPAL["h"])  # madeixa lateral
-	_px(head_x - 6, y_cabeca + 6, KPAL["H"])
-	_rect(head_x - 4, y_cabeca - 1, 9, 2, KPAL["d"])     # bandana
-	_px(head_x - 4, y_cabeca, KPAL["c"])
-	_px(head_x + 3, y_cabeca + 1, KPAL["m"])             # olho magenta
+	# --- CABECA + CABELO CURTO + BANDANA ---
+	_elipse(head_x - 1, y_cabeca, 6.0, 6.4, KPAL["h"])      # massa de cabelo atras
+	_elipse(head_x + 1, y_cabeca + 1, 4.4, 4.8, KPAL["k"])  # cara
+	_px(head_x + 4, y_cabeca + 2, KPAL["s"])                # sombra da bochecha
+	_rect(head_x - 3, y_cabeca - 5, 8, 3, KPAL["h"])        # franja/topo
+	_px(head_x + 3, y_cabeca - 3, KPAL["h"])                # ponta da franja p/ a cara
+	# madeixa lateral + streak vinho
+	_linha(head_x - 6, y_cabeca, head_x - 7, y_cabeca + 9, 3, KPAL["h"])
+	_px(head_x - 7, y_cabeca + 4, KPAL["H"]); _px(head_x - 6, y_cabeca + 7, KPAL["H"])
+	# bandana fina + duas pontas atras
+	_rect(head_x - 4, y_cabeca - 2, 9, 1, KPAL["c"])
+	_px(head_x + 4, y_cabeca - 2, KPAL["s"])
+	_linha(head_x - 5, y_cabeca - 1, head_x - 9 - int(capa * 3.0), y_cabeca + 2, 1, KPAL["c"])
+	_linha(head_x - 5, y_cabeca + 1, head_x - 8 - int(capa * 3.0), y_cabeca + 5, 1, KPAL["H"])
+	_px(head_x + 3, y_cabeca + 1, KPAL["m"])                # olho magenta aceso
+	_px(head_x + 4, y_cabeca + 1, KPAL["w"])
 
 	# --- BRACO (mao vazia -- a arma equipada e' um sprite a' parte) ---
 	var bang := lerpf(-1.2, 0.9, (braco + 1.0) * 0.5)
 	var mao := Vector2(head_x + cos(bang) * 11.0, y_ombro + 6 + sin(bang) * 9.0)
 	_linha(cx + 3, y_ombro + 3, int(mao.x), int(mao.y), 3, KPAL["d"])
+	_px(int(lerpf(cx + 3, mao.x, 0.5)), int(lerpf(y_ombro + 3, mao.y, 0.5)), KPAL["D"])  # cotovelo
 	_elipse(mao.x, mao.y, 2.4, 2.4, KPAL["k"])
 	_px(int(mao.x), int(mao.y), KPAL["m"])   # brilho roxo na mao
 
@@ -557,13 +580,19 @@ func _kol_pose(p: Dictionary, fw: int, fh: int) -> void:
 			var pp := c + Vector2(cos(ang), sin(ang) * 0.8) * rad
 			_px(int(pp.x), int(pp.y), KPAL["m"] if t % 2 == 0 else KPAL["M"])
 
-	# --- FUMOS / FANTASMAS roxos atras ---
+	# --- FANTASMINHAS roxos a arrastar atras ---
 	for k in wisps:
-		var wx := cx - 8 - k * 5 - sway
-		var wy := y_ombro + 3 + k * 6 + int(sin(float(_ox) * 0.1 + k) * 2.0)
-		_elipse(wx, wy, 3.0 - k * 0.4, 2.4, KPAL["M"])
-		_px(wx - 1, wy + 2, KPAL["cp"])
-		_px(wx + 1, wy + 2, KPAL["cp"])   # "pernas" do fantasminha
+		var wx := cx - 9 - k * 6 - int(sway * 0.6)
+		var wy := y_ombro - 2 + k * 7 + int(sin(float(_ox) * 0.7 + k * 1.3) * 3.0)
+		var r := 2.6 - k * 0.35
+		_elipse(wx, wy, r, r * 0.85, KPAL["M"])          # cabeca do fantasma
+		_px(wx, wy - int(r), KPAL["m"])                   # topo aceso
+		# cauda ondulada
+		_px(wx - 1, wy + int(r), KPAL["cp"])
+		_px(wx + 1, wy + int(r) + 1, KPAL["cp"])
+		_px(wx, wy + int(r) + 2, KPAL["M"])
+		# olhos
+		_px(wx - 1, wy, KPAL["w"]); _px(wx + 1, wy, KPAL["w"])
 
 
 ## Realca o bordo superior e o bordo direito (frente) da silhueta com `cor`,
