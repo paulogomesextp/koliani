@@ -91,10 +91,11 @@ position = Vector2(790, 540)
 tamanho = Vector2(150, 22)
 altura_visual = 28.0
 
-; degrau intermédio: partia o salto enorme P5 -> P6 (400px) em dois
+; degrau para a aproximação ao chefe: liga a P6 à P7/P8 (o zigue-zague do
+; topo tinha saltos de ~370px grandes de mais)
 [node name="P5b" parent="." instance=ExtResource("9_pl")]
-position = Vector2(575, 486)
-tamanho = Vector2(150, 22)
+position = Vector2(500, 380)
+tamanho = Vector2(180, 22)
 altura_visual = 28.0
 
 [node name="P6" parent="." instance=ExtResource("9_pl")]

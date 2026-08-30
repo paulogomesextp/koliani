@@ -214,7 +214,7 @@ color = Color(0.93, 0.4, 0.9, 1)
 shape = SubResource("rs_chk")
 
 [node name="CheckArena" type="Area2D" parent="."]
-position = Vector2(2600, 588)
+position = Vector2(2620, 396)
 collision_layer = 16
 collision_mask = 2
 script = ExtResource("5_chk")
