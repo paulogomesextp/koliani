@@ -1,9 +1,9 @@
-[gd_scene load_steps=14 format=3 uid="uid://bkolianitorreventos12"]
+[gd_scene load_steps=13 format=3 uid="uid://bkolianitorreventos12"]
 
 ; Região III / nível 12 -- Torre dos Ventos.
-; Correntes de ar ascendentes (`CorrenteAr`) para alcançar as plataformas
-; suspensas altas. Arena aberta no cimo com Aerion, o Cavaleiro Alado --
-; nunca pousa; lanças, tornados que empurram, mergulhos.
+; Subida por plataformas suspensas em escada (a mecânica das correntes de
+; ar foi removida -- a rever). Arena aberta no cimo com Aerion, o Cavaleiro
+; Alado -- nunca pousa; lanças, tornados que empurram, mergulhos, pisão.
 
 [ext_resource type="PackedScene" uid="uid://bkolianiactor01" path="res://scenes/actors/Koliani.tscn" id="1_kol"]
 [ext_resource type="PackedScene" uid="uid://bdemoniobase01" path="res://scenes/actors/DemonioBase.tscn" id="2_dem"]
@@ -14,7 +14,6 @@
 [ext_resource type="Script" path="res://scripts/nivel_com_chefe.gd" id="7_niv"]
 [ext_resource type="PackedScene" uid="uid://bkolianiatmosfera01" path="res://scenes/fx/Atmosfera.tscn" id="8_atm"]
 [ext_resource type="PackedScene" uid="uid://bkolianiplataforma01" path="res://scenes/actors/Plataforma.tscn" id="9_pl"]
-[ext_resource type="PackedScene" uid="uid://bkolianicorrentear12" path="res://scenes/actors/CorrenteAr.tscn" id="10_ca"]
 [ext_resource type="PackedScene" uid="uid://bkolianiserra01" path="res://scenes/actors/Serra.tscn" id="11_serra"]
 
 [sub_resource type="RectangleShape2D" id="rs_chk"]
@@ -53,18 +52,18 @@ tamanho = Vector2(560, 48)
 altura_visual = 96.0
 
 [node name="PlatSusp1" parent="." instance=ExtResource("9_pl")]
-position = Vector2(850, 380)
-tamanho = Vector2(150, 22)
+position = Vector2(850, 520)
+tamanho = Vector2(160, 22)
 altura_visual = 24.0
 
 [node name="PlatSusp2" parent="." instance=ExtResource("9_pl")]
-position = Vector2(1150, 300)
-tamanho = Vector2(150, 22)
+position = Vector2(1150, 400)
+tamanho = Vector2(160, 22)
 altura_visual = 24.0
 
 [node name="PlatSusp3" parent="." instance=ExtResource("9_pl")]
-position = Vector2(1450, 380)
-tamanho = Vector2(150, 22)
+position = Vector2(1450, 320)
+tamanho = Vector2(160, 22)
 altura_visual = 24.0
 
 [node name="ChaoMeio" parent="." instance=ExtResource("9_pl")]
@@ -73,8 +72,8 @@ tamanho = Vector2(320, 44)
 altura_visual = 72.0
 
 [node name="PlatSusp4" parent="." instance=ExtResource("9_pl")]
-position = Vector2(2200, 320)
-tamanho = Vector2(150, 22)
+position = Vector2(2200, 430)
+tamanho = Vector2(160, 22)
 altura_visual = 24.0
 
 [node name="ChaoArena" parent="." instance=ExtResource("9_pl")]
@@ -82,17 +81,8 @@ position = Vector2(2820, 660)
 tamanho = Vector2(920, 48)
 altura_visual = 96.0
 
-[node name="Corrente1" parent="." instance=ExtResource("10_ca")]
-position = Vector2(880, 520)
-
-[node name="Corrente2" parent="." instance=ExtResource("10_ca")]
-position = Vector2(1300, 460)
-
-[node name="Corrente3" parent="." instance=ExtResource("10_ca")]
-position = Vector2(2120, 480)
-
 [node name="SerraSusp" parent="." instance=ExtResource("11_serra")]
-position = Vector2(1450, 300)
+position = Vector2(1150, 250)
 percurso = Vector2(220, 0)
 tempo = 1.9
 
@@ -115,8 +105,8 @@ position = Vector2(150, 560)
 
 [node name="Demonio1" parent="." instance=ExtResource("2_dem")]
 especie = "olho"
-position = Vector2(850, 340)
-alcance_patrulha = 200.0
+position = Vector2(850, 486)
+alcance_patrulha = 140.0
 
 [node name="Demonio2" parent="." instance=ExtResource("2_dem")]
 especie = "goblin"
@@ -132,7 +122,7 @@ alcance_patrulha = 240.0
 position = Vector2(2820, 420)
 
 [node name="ColPena" parent="." instance=ExtResource("3_col")]
-position = Vector2(1150, 256)
+position = Vector2(1150, 356)
 pista_id = "ventos_pena_marcada"
 
 [node name="CheckInicio" type="Area2D" parent="."]
