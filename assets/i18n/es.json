@@ -38,6 +38,7 @@
 	"hud.ability.projetil": "Kamehameha Púrpura",
 	"hud.new_ability": "Nueva habilidad: %s",
 	"hud.clue_found": "Pista encontrada  (%d)",
+	"hud.advanced": "Avanzaste al Nivel %d",
 	"hud.controls.title": "Controles",
 	"hud.controls.move": "Mover",
 	"hud.controls.jump": "Saltar ×2",

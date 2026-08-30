@@ -38,6 +38,11 @@ func _ready() -> void:
 		relogio.set_script(RELOGIO_HARDCORE)
 		add_child(relogio)
 
+	# acabou de passar de nível (a Porta chamou `avancar_nivel`)
+	if EstadoJogo.anunciar_avanco:
+		EstadoJogo.anunciar_avanco = false
+		_anunciar_avanco()
+
 	# `godot --path . -- --foto[=ficheiro]`: tira uma captura e sai (dev).
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--foto"):
@@ -86,6 +91,37 @@ func _unhandled_input(evento: InputEvent) -> void:
 			_toast_debug("save apagado -- recomecar")
 			await get_tree().create_timer(0.35).timeout
 			get_tree().change_scene_to_file("res://scenes/Main.tscn")
+
+
+## Banner grande "Avançou para o Nível N" ao entrar num nível novo por ter
+## atravessado a Porta. Aparece, aguenta ~1.6 s e esvai-se.
+func _anunciar_avanco() -> void:
+	var camada := CanvasLayer.new()
+	camada.layer = 40
+	camada.process_mode = Node.PROCESS_MODE_ALWAYS
+	add_child(camada)
+
+	var l := Label.new()
+	l.text = Textos.tf("hud.advanced", [EstadoJogo.indice_nivel + 1])
+	l.set_anchors_preset(Control.PRESET_FULL_RECT)
+	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	l.add_theme_font_size_override("font_size", 60)
+	l.add_theme_color_override("font_color", Color(1, 0.93, 1))
+	l.add_theme_color_override("font_outline_color", Color(0.24, 0.03, 0.3))
+	l.add_theme_constant_override("outline_size", 12)
+	l.modulate.a = 0.0
+	l.scale = Vector2(0.92, 0.92)
+	l.pivot_offset = Vector2(640, 360)
+	camada.add_child(l)
+
+	var t := create_tween()
+	t.tween_property(l, "modulate:a", 1.0, 0.3)
+	t.parallel().tween_property(l, "scale", Vector2.ONE, 0.35) \
+		.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	t.tween_interval(1.5)
+	t.tween_property(l, "modulate:a", 0.0, 0.6)
+	t.tween_callback(camada.queue_free)
 
 
 func _toast_debug(txt: String) -> void:

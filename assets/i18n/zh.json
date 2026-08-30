@@ -38,6 +38,7 @@
 	"hud.ability.projetil": "紫色龟派气功",
 	"hud.new_ability": "新能力：%s",
 	"hud.clue_found": "找到线索  (%d)",
+	"hud.advanced": "进入第 %d 关",
 	"hud.controls.title": "操作",
 	"hud.controls.move": "移动",
 	"hud.controls.jump": "跳跃 ×2",

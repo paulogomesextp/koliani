@@ -159,12 +159,19 @@ func tempo_hardcore_nivel() -> float:
 	return TEMPO_HARDCORE[clampi(indice_nivel, 0, TEMPO_HARDCORE.size() - 1)]
 
 
+## Posto a true quando `avancar_nivel()` salta mesmo de nível; a cena de
+## jogo lê-o uma vez (banner "Avançou para o Nível N") e limpa. Não é
+## gravado -- vive só entre a Porta e o `_ready` do nível seguinte.
+var anunciar_avanco := false
+
+
 func avancar_nivel() -> void:
 	marcar_nivel_concluido(indice_nivel)
 	if ha_proximo_nivel():
 		indice_nivel += 1
 		checkpoint = Vector2.ZERO
 		hardcore_tempo_restante = -1.0  # mundo novo = relógio cheio
+		anunciar_avanco = true
 		guardar()
 
 

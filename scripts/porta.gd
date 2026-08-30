@@ -1,15 +1,13 @@
 class_name Porta
 extends Area2D
-## Porta de fim de nível. Marca o nível como concluído e:
-##   * modo normal   -> volta ao Mapa do Mundo para escolher o próximo nível
-##                      (ou dispara `fim_da_campanha` na última porta com a
-##                      campanha toda feita);
-##   * modo hardcore  -> segue linear, mundo a mundo, sem passar pelo mapa.
+## Porta de fim de nível. Marca o nível como concluído e SEGUE DIRETO para o
+## nível seguinte (com banner "Avançou para o Nível N" ao entrar). Na última
+## porta, com a campanha toda feita, dispara `fim_da_campanha`. O Mapa do
+## Mundo continua acessível pelo menu de pausa e pelo menu inicial.
 
 signal fim_da_campanha
 
 const CENA_JOGO := "res://scenes/Main.tscn"
-const CENA_MAPA := "res://scenes/ui/MapaMundo.tscn"
 
 @export var pista_ao_atravessar := ""  # id opcional de pista sobre a mãe
 
@@ -43,15 +41,10 @@ func _ao_entrar(corpo: Node) -> void:
 	var i := EstadoJogo.indice_nivel
 	EstadoJogo.marcar_nivel_concluido(i)
 
-	if EstadoJogo.hardcore:
-		if EstadoJogo.ha_proximo_nivel():
-			EstadoJogo.avancar_nivel()
-			get_tree().change_scene_to_file(CENA_JOGO)
-		else:
-			fim_da_campanha.emit()
-		return
-
-	if i >= EstadoJogo.NIVEIS.size() - 1 and EstadoJogo.campanha_concluida():
-		fim_da_campanha.emit()
+	# normal e hardcore: seguem linear para o nível seguinte, sem passar
+	# pelo mapa. Só a última porta (campanha feita) é que termina o jogo.
+	if EstadoJogo.ha_proximo_nivel():
+		EstadoJogo.avancar_nivel()
+		get_tree().change_scene_to_file(CENA_JOGO)
 	else:
-		get_tree().change_scene_to_file(CENA_MAPA)
+		fim_da_campanha.emit()

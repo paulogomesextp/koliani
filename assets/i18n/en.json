@@ -38,6 +38,7 @@
 	"hud.ability.projetil": "Purple Kamehameha",
 	"hud.new_ability": "New ability: %s",
 	"hud.clue_found": "Clue found  (%d)",
+	"hud.advanced": "Advanced to Level %d",
 	"hud.controls.title": "Controls",
 	"hud.controls.move": "Move",
 	"hud.controls.jump": "Jump ×2",

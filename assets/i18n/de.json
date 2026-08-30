@@ -38,6 +38,7 @@
 	"hud.ability.projetil": "Lila-Kamehameha",
 	"hud.new_ability": "Neue Fähigkeit: %s",
 	"hud.clue_found": "Hinweis gefunden  (%d)",
+	"hud.advanced": "Weiter zu Level %d",
 	"hud.controls.title": "Steuerung",
 	"hud.controls.move": "Bewegen",
 	"hud.controls.jump": "Springen ×2",

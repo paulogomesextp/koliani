@@ -428,9 +428,10 @@ func teste_estado_nivel_atual_e_caminho_valido() -> void:
 	var e := _novo_estado()
 	var caminho: String = e.caminho_nivel_atual()
 	_ok(caminho.begins_with("res://"), "caminho do nivel atual devia comecar por res://")
+	_ok(not e.anunciar_avanco, "arranque limpo nao anuncia avanco de nivel")
 	e.avancar_nivel()  # so avanca se houver proximo; nao pode ir fora dos limites
-	_ok(e.indice_nivel >= 0 and e.indice_nivel < e.NIVEIS.size(),
-		"indice_nivel devia manter-se dentro dos limites de NIVEIS")
+	_ok(e.indice_nivel == 1, "avancar_nivel do nivel 1 leva ao nivel 2")
+	_ok(e.anunciar_avanco, "avancar_nivel arma o banner 'Avancou para o Nivel N'")
 	e.free()
 
 
