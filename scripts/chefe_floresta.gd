@@ -22,6 +22,7 @@ func _ready() -> void:
 	super._ready()
 	vida = maxi(vida, 250)
 	velocidade *= 0.6
+	usa_escudo_boss = false  # leva dano sempre -- sem janela blindada
 
 
 func _physics_process(dt: float) -> void:

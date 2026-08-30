@@ -46,6 +46,19 @@ var _ja_derrotado := false
 ## música só volta a mudar quando a luta recomeça de facto.
 var _musica_boss := false
 
+## Escudo brilhante da cor do chefe que aparece enquanto ele está BLINDADO
+## (fora da janela EXPOSTA). A maioria dos chefes só leva dano na janela a
+## seguir a cada ataque -- este escudo torna isso legível. `usa_escudo_boss
+## = false` no `_ready` de um chefe que leve dano SEMPRE (Carcereiro,
+## Ghorak-da-Floresta).
+var usa_escudo_boss := true
+## Segundos desde o último golpe que ENTROU (reduziu vida). Enquanto > 0 o
+## chefe está na janela EXPOSTA -> escudo escondido.
+var _dano_recente := 0.0
+var _escudo_boss: Node2D
+var _escudo_t := 0.0
+var _ajuste_janela_feito := false
+
 
 func _e_chefe() -> bool:
 	return true
@@ -60,10 +73,103 @@ func _ready() -> void:
 	dano_contacto = int(round(dano_contacto * (1.0 + 0.03 * float(clampi(EstadoJogo.indice_nivel, 0, 29)))))
 	if _sprite:
 		_sprite.scale = Vector2(_direcao * escala_visual, escala_visual)
+	call_deferred("_preparar_escudo_boss")
+
+
+## Feito em deferred: o `_ready` do chefe concreto já correu e definiu a
+## `dur_exposto`/`dur_exposta` -- aqui ALARGA-SE essa janela (menos tempo
+## blindado, pedido do Paulo) e monta-se o escudo da cor do chefe.
+func _preparar_escudo_boss() -> void:
+	for nome in ["dur_exposto", "dur_exposta"]:
+		if nome in self:
+			var v: float = get(nome)
+			if v > 0.0:
+				set(nome, v * 1.6)
+	if usa_escudo_boss:
+		_montar_escudo_boss()
+
+
+func _montar_escudo_boss() -> void:
+	if _escudo_boss != null:
+		return
+	var cor: Color = cor_rim
+	cor.a = 1.0
+	var r := 78.0 * maxf(0.8, escala_visual)
+	var aditivo := CanvasItemMaterial.new()
+	aditivo.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
+
+	_escudo_boss = Node2D.new()
+	_escudo_boss.name = "EscudoBoss"
+	_escudo_boss.z_index = 6
+	_escudo_boss.visible = false
+	if _sprite:
+		_escudo_boss.position = _sprite.position
+	add_child(_escudo_boss)
+
+	var disco := Polygon2D.new()
+	disco.name = "Disco"
+	disco.polygon = _circulo_pts(r, 30)
+	disco.color = Color(cor.r, cor.g, cor.b, 0.10)
+	disco.material = aditivo
+	_escudo_boss.add_child(disco)
+
+	var aro := Line2D.new()
+	aro.name = "Aro"
+	aro.points = _circulo_pts(r, 40)
+	aro.closed = true
+	aro.width = 4.0
+	aro.default_color = Color(cor.r, cor.g, cor.b, 0.9)
+	aro.joint_mode = Line2D.LINE_JOINT_ROUND
+	aro.material = aditivo
+	_escudo_boss.add_child(aro)
+
+	var aro2 := Line2D.new()
+	aro2.name = "Aro2"
+	aro2.points = _circulo_pts(r * 0.86, 40)
+	aro2.closed = true
+	aro2.width = 2.0
+	aro2.default_color = Color(1, 1, 1, 0.5)
+	aro2.material = aditivo
+	_escudo_boss.add_child(aro2)
+
+	var luz := PointLight2D.new()
+	luz.name = "Luz"
+	luz.texture = _tex_luz_escudo()
+	luz.color = cor
+	luz.energy = 0.9
+	luz.scale = Vector2(r / 90.0, r / 90.0)
+	_escudo_boss.add_child(luz)
+
+
+func _circulo_pts(raio: float, n: int) -> PackedVector2Array:
+	var pts := PackedVector2Array()
+	for i in n:
+		var a := TAU * float(i) / float(n)
+		pts.append(Vector2(cos(a) * raio, sin(a) * raio))
+	return pts
+
+
+static var _TEX_LUZ_ESC: GradientTexture2D
+
+func _tex_luz_escudo() -> GradientTexture2D:
+	if _TEX_LUZ_ESC == null:
+		var g := Gradient.new()
+		g.offsets = PackedFloat32Array([0.0, 1.0])
+		g.colors = PackedColorArray([Color(1, 1, 1, 0.9), Color(1, 1, 1, 0)])
+		_TEX_LUZ_ESC = GradientTexture2D.new()
+		_TEX_LUZ_ESC.gradient = g
+		_TEX_LUZ_ESC.width = 220
+		_TEX_LUZ_ESC.height = 220
+		_TEX_LUZ_ESC.fill = GradientTexture2D.FILL_RADIAL
+		_TEX_LUZ_ESC.fill_from = Vector2(0.5, 0.5)
+		_TEX_LUZ_ESC.fill_to = Vector2(1.0, 0.5)
+	return _TEX_LUZ_ESC
 
 
 func _process(dt: float) -> void:
 	super._process(dt)
+	_dano_recente = maxf(0.0, _dano_recente - dt)
+	_atualizar_escudo_boss(dt)
 	# rede de segurança: se o chefe se atirar para fora do mapa (investida
 	# num fosso, etc.), conta como derrotado -- senão o nível fica
 	# bloqueado porque a porta nunca abre.
@@ -76,6 +182,32 @@ func _process(dt: float) -> void:
 		if k and global_position.distance_to(k.global_position) < gatilho_intro:
 			_intro_feita = true
 			_correr_intro()
+
+
+## O escudo aparece durante o combate SEMPRE que o chefe não levou dano nos
+## últimos instantes (= está blindado, fora da janela EXPOSTA). Some quando
+## um golpe entra.
+func _atualizar_escudo_boss(dt: float) -> void:
+	if _escudo_boss == null:
+		return
+	var mostrar := _musica_boss and not _ja_derrotado and not _fim_em_curso \
+		and _dano_recente <= 0.0
+	if mostrar != _escudo_boss.visible:
+		_escudo_boss.visible = mostrar
+	if not mostrar:
+		return
+	_escudo_t += dt
+	var pulso := 1.0 + 0.06 * sin(_escudo_t * 7.0)
+	_escudo_boss.scale = Vector2(pulso, pulso)
+	var aro := _escudo_boss.get_node_or_null("Aro") as Line2D
+	if aro:
+		aro.rotation = _escudo_t * 0.8
+	var aro2 := _escudo_boss.get_node_or_null("Aro2") as Line2D
+	if aro2:
+		aro2.rotation = -_escudo_t * 1.3
+	var luz := _escudo_boss.get_node_or_null("Luz") as PointLight2D
+	if luz:
+		luz.energy = 0.8 + 0.35 * (0.5 + 0.5 * sin(_escudo_t * 6.0))
 
 
 func _correr_intro() -> void:
@@ -173,6 +305,7 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0) -> void:
 	_garantir_vida_maxima()
 	provocar()  # levou o primeiro golpe = combate a sério
 	vida -= quantidade
+	_dano_recente = 0.85  # golpe entrou -> janela EXPOSTA -> esconde o escudo
 	global_position.x += dir_empurrao * 3.0
 	vida_mudou.emit(maxi(vida, 0), _vida_maxima)
 	if vida <= 0:

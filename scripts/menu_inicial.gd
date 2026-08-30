@@ -203,16 +203,14 @@ func _ao_novo() -> void:
 	_comecar_campanha(false)
 
 
-## HARDCORE MODE: campanha com tempo limite por mundo, num SAVE PRÓPRIO
-## (`progresso_hardcore.json`) -- não toca no progresso do modo normal.
-## Se já houver uma campanha hardcore a meio, retoma-a; senão começa nova.
+## HARDCORE MODE: campanha com tempo limite por mundo. NÃO tem save -- é
+## sempre do zero e perder é game over (é esse o conceito). Como não grava,
+## também nunca toca no progresso do modo normal, por isso já não precisa
+## de confirmação.
 func _ao_hardcore() -> void:
 	_repor_botoes()
 	EstadoJogo.hardcore = true
-	if FileAccess.file_exists(EstadoJogo.CAMINHO_SAVE_HARDCORE):
-		EstadoJogo.carregar()
-	else:
-		EstadoJogo.reiniciar_campanha()
+	EstadoJogo.reiniciar_campanha()
 	_entrar_campanha()
 
 

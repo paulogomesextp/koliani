@@ -8,16 +8,10 @@ extends Node
 ##
 ## Save simples em JSON em `user://progresso.json`. Sem servidor.
 
-## O modo NORMAL e o HARDCORE guardam em ficheiros SEPARADOS -- jogar
-## hardcore deixou de apagar o progresso do modo normal (pedido do Paulo,
-## ago 2026). `caminho_save()` escolhe conforme o modo activo.
+## O modo HARDCORE **não persiste** (é esse o conceito -- perder = recomeçar
+## tudo, game over). Só o modo normal grava, e num ficheiro que o hardcore
+## nunca toca. Ver `guardar()`/`carregar()`.
 const CAMINHO_SAVE := "user://progresso.json"
-const CAMINHO_SAVE_HARDCORE := "user://progresso_hardcore.json"
-
-
-## Ficheiro de save do modo activo.
-func caminho_save() -> String:
-	return CAMINHO_SAVE_HARDCORE if hardcore else CAMINHO_SAVE
 
 ## Tabela do equipamento. `preload` por caminho (e não o nome global
 ## `Equipamento`) porque este autoload é o 1.º a arrancar -- não pode
@@ -526,24 +520,22 @@ func de_dicionario(d: Dictionary) -> void:
 
 
 func guardar() -> void:
-	if modo_teste:
+	if modo_teste or hardcore:  # hardcore não persiste -- perder = recomeçar tudo
 		return
-	var caminho := caminho_save()
-	var f := FileAccess.open(caminho, FileAccess.WRITE)
+	var f := FileAccess.open(CAMINHO_SAVE, FileAccess.WRITE)
 	if f == null:
-		push_warning("Nao consegui gravar o progresso em %s" % caminho)
+		push_warning("Nao consegui gravar o progresso em %s" % CAMINHO_SAVE)
 		return
 	f.store_string(JSON.stringify(para_dicionario(), "\t"))
 	f.close()
 
 
 func carregar() -> void:
-	if modo_teste:
+	if modo_teste or hardcore:
 		return
-	var caminho := caminho_save()
-	if not FileAccess.file_exists(caminho):
+	if not FileAccess.file_exists(CAMINHO_SAVE):
 		return
-	var f := FileAccess.open(caminho, FileAccess.READ)
+	var f := FileAccess.open(CAMINHO_SAVE, FileAccess.READ)
 	if f == null:
 		return
 	var dados: Variant = JSON.parse_string(f.get_as_text())
