@@ -73,6 +73,7 @@ const TEX_IMPACTO := preload("res://assets/sprites/impacto.svg")
 @onready var _luz_carga: PointLight2D = $Sprite/LuzCarga
 @onready var _luz_golpe: PointLight2D = $Sprite/LuzGolpe
 @onready var _luz_lamina: PointLight2D = $Sprite/LuzLamina
+@onready var _armadura: Node2D = $Sprite/Armadura
 @onready var _camera: Camera2D = $Camera2D
 @onready var _faiscas: CPUParticles2D = $FaiscasAtaque
 @onready var _po: CPUParticles2D = $PoAterragem
@@ -202,6 +203,37 @@ func _aplicar_equipamento() -> void:
 		_rastro.modulate = _cor_golpe()
 	if _corpo:
 		_corpo.modulate = _tint_armadura()
+	_aplicar_visual_armadura()
+
+
+## Recolore (e "engorda") as placas de armadura vetoriais que vivem sob o
+## `Sprite` -- herdam o squash/stretch/flip da animação procedural.
+func _aplicar_visual_armadura() -> void:
+	if _armadura == null:
+		return
+	var ai := Equipamento.indice_armadura(EstadoJogo.armadura_equipada)
+	_armadura.visible = ai >= 0
+	if ai < 0:
+		return
+	var base := Equipamento.cor_armadura(ai)
+	var esc := base.darkened(0.34)
+	var clr := base.lerp(Color.WHITE, 0.45)
+	var t := float(ai) / 14.0
+	_pinta(_armadura.get_node_or_null("Peito"), Color(base.r, base.g, base.b, 0.93))
+	_pinta(_armadura.get_node_or_null("OmbroEsq"), Color(clr.r, clr.g, clr.b, 0.96))
+	_pinta(_armadura.get_node_or_null("OmbroDir"), Color(clr.r, clr.g, clr.b, 0.96))
+	_pinta(_armadura.get_node_or_null("Cinto"), Color(esc.r, esc.g, esc.b, 0.96))
+	var trim := _armadura.get_node_or_null("Trim")
+	if trim:
+		var tc := clr.lerp(Color.WHITE, 0.4)
+		trim.default_color = Color(tc.r, tc.g, tc.b, 0.55)
+	var bulk := 1.0 + 0.16 * t
+	_armadura.scale = Vector2(bulk, bulk)
+
+
+func _pinta(n: Node, c: Color) -> void:
+	if n and "color" in n:
+		n.color = c
 
 
 func _physics_process(dt: float) -> void:
@@ -515,7 +547,7 @@ func _flash_branco() -> void:
 ## Cor de base do corpo (tinta da armadura ou branco).
 func _tint_armadura() -> Color:
 	var ai: int = Equipamento.indice_armadura(EstadoJogo.armadura_equipada)
-	return Color.WHITE if ai < 0 else Color.WHITE.lerp(Equipamento.cor_armadura(ai), 0.5)
+	return Color.WHITE if ai < 0 else Color.WHITE.lerp(Equipamento.cor_armadura(ai), 0.62)
 
 
 func _abanar(forca: float) -> void:
