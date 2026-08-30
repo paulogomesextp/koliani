@@ -53,15 +53,20 @@ pequenos; quero 5 min de obstáculos até ao boss; boss SEMPRE no fim".
   instancia) e sem tecla (`diario` input vazio); sem balão ao apanhar.
   Infra (`EstadoJogo.pistas`, `DiarioPistas`, i18n `pista.*`, testes
   `teste_diario_*`) fica **dormente** — não foi apagada.
-- **Hardcore com save próprio**: `progresso.json` (normal) vs
-  `progresso_hardcore.json`. `EstadoJogo.caminho_save()` escolhe pelo
-  `hardcore`; menu retoma/começa hardcore sem tocar no save normal e ao
-  voltar ao menu recarrega o normal. Caveira pixel-art (ícone em código)
-  a seguir a "HARDCORE MODE".
-- **A DECIDIR (Paulo)**: bosses "deixam de levar dano" — é a mecânica do
-  `Nucleo` exposto (janela EXPOSTA a seguir a cada ataque, dano ×2, ver
-  `chefe_ghorak.gd::receber_dano`). Manter e telegrafar melhor? Reduzir a
-  armadura? Tirar de vez? Toca nos 30 chefes.
+- **Hardcore sem save** (v0.6.27, decisão final do Paulo): `guardar()`/
+  `carregar()` são no-op quando `hardcore` — perder = recomeçar tudo, é
+  game over (é esse o conceito). O save do modo normal fica sempre
+  intacto porque o hardcore nunca lhe toca. Menu: HARDCORE MODE começa
+  sempre do zero, sem confirmação. Caveira pixel-art (ícone em código) a
+  seguir a "HARDCORE MODE".
+- **Bosses "deixam de levar dano"** (v0.6.27): manteve-se a mecânica do
+  núcleo exposto, mas (a) `ChefeBase` desenha um **escudo brilhante da cor
+  do chefe** (`cor_rim`) enquanto ele está BLINDADO — some ~0.85 s a cada
+  golpe que entra; `usa_escudo_boss = false` no Carcereiro e chefe_floresta
+  (levam dano sempre); (b) `_preparar_escudo_boss()` alarga
+  `dur_exposto`/`dur_exposta` ×1.6 em todos os chefes (menos tempo
+  blindado). Heurística: `_dano_recente` (não há hook por-chefe do estado
+  exposto; os 3 nomes são `_exposto`/`_exposta`/`_nucleo_exposto`).
 
 ## ESTADO: CAMPANHA COMPLETA — 30/30 níveis, 30 chefes (v0.5.0, 2026-08-30)
 
