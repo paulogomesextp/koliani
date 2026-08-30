@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3 uid="uid://bkolianifornalha07"]
+[gd_scene load_steps=19 format=3 uid="uid://bkolianifornalha07"]
 
 ; Região II / nível 07 -- Fornalha dos Pecadores.
 ; Fábrica infernal: poças de lava (AguaVenenosa recolorida, morte
@@ -20,6 +20,7 @@
 [ext_resource type="PackedScene" uid="uid://bkolianifogo01" path="res://scenes/actors/Fogo.tscn" id="12_fogo"]
 [ext_resource type="PackedScene" uid="uid://bkolianiserra01" path="res://scenes/actors/Serra.tscn" id="13_serra"]
 [ext_resource type="PackedScene" uid="uid://bkolianipassarela01" path="res://scenes/fx/Passarela.tscn" id="14_pass"]
+[ext_resource type="PackedScene" uid="uid://bkolianicascamasmorra01" path="res://scenes/actors/CascaMasmorra.tscn" id="90_casca"]
 
 [sub_resource type="RectangleShape2D" id="rs_chk"]
 size = Vector2(40, 80)
@@ -38,6 +39,7 @@ fill_to = Vector2(1, 0.5)
 
 [node name="Fornalha_dos_Pecadores" type="Node2D"]
 script = ExtResource("7_niv")
+corredor = false
 
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
 cor_ambiente = Color(0.7, 0.5, 0.42, 1)
@@ -50,6 +52,13 @@ bioma = "prisao"
 largura_nivel = 3400.0
 luzes_horizonte = true
 fundo_pack = "rochoso"
+
+[node name="Casca" parent="." instance=ExtResource("90_casca")]
+largura = 4050.0
+altura = 1300.0
+topo = 150.0
+esquerda = -140.0
+chao_y = 1400.0
 
 [node name="ChaoInicio" parent="." instance=ExtResource("9_pl")]
 position = Vector2(340, 660)
