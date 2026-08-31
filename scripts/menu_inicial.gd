@@ -79,7 +79,55 @@ func _ready() -> void:
 	_hardcore.icon_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	_hardcore.expand_icon = false
 	_hardcore.add_theme_constant_override("h_separation", 10)
-	(_load if EstadoJogo.ha_progresso() else _novo).grab_focus()
+	var principal := _load if EstadoJogo.ha_progresso() else _novo
+	_destacar_botao_principal(principal)
+	_preparar_hover_animado()
+	principal.grab_focus()
+
+
+## Dá destaque visual (mais saturado, com glow) ao botão de ação principal
+## do momento -- LOAD GAME se há progresso, senão NEW GAME.
+func _destacar_botao_principal(botao: Button) -> void:
+	var normal := StyleBoxFlat.new()
+	normal.bg_color = Color(0.17, 0.06, 0.21, 0.95)
+	normal.set_border_width_all(2)
+	normal.border_width_top = 3
+	normal.border_color = Color(0.85, 0.35, 0.85, 0.85)
+	normal.set_corner_radius_all(10)
+	normal.shadow_color = Color(0.75, 0.25, 0.75, 0.35)
+	normal.shadow_size = 10
+	normal.content_margin_left = 22.0
+	normal.content_margin_right = 22.0
+	normal.content_margin_top = 15.0
+	normal.content_margin_bottom = 15.0
+
+	var hover := normal.duplicate() as StyleBoxFlat
+	hover.bg_color = Color(0.34, 0.15, 0.4, 0.98)
+	hover.border_color = Color(1, 0.55, 0.95, 1)
+	hover.shadow_size = 18
+	hover.shadow_color = Color(0.95, 0.4, 0.9, 0.55)
+
+	botao.add_theme_stylebox_override("normal", normal)
+	botao.add_theme_stylebox_override("hover", hover)
+	botao.add_theme_stylebox_override("focus", hover)
+	botao.add_theme_stylebox_override("pressed", hover)
+	botao.add_theme_font_size_override("font_size", 22)
+
+
+## Pequena resposta de escala ao passar/focar o rato em cada botão --
+## substitui a mudança de cor estática por algo com mais vida.
+func _preparar_hover_animado() -> void:
+	for b: Button in [_novo, _load, _hardcore, _opcoes, _dev, _sair]:
+		b.resized.connect(func() -> void: b.pivot_offset = b.size / 2.0)
+		b.mouse_entered.connect(func() -> void: _animar_escala(b, 1.035))
+		b.mouse_exited.connect(func() -> void: _animar_escala(b, 1.0))
+		b.focus_entered.connect(func() -> void: _animar_escala(b, 1.035))
+		b.focus_exited.connect(func() -> void: _animar_escala(b, 1.0))
+
+
+func _animar_escala(botao: Button, alvo: float) -> void:
+	var t := create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_BACK)
+	t.tween_property(botao, "scale", Vector2(alvo, alvo), 0.18)
 
 
 ## Caveira pixel-art minúscula (bone + 2 órbitas + nariz + dentes) para o
