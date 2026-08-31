@@ -6,6 +6,7 @@ export_presets.cfg.bak
 
 # Editor do Godot (binarios locais, nao versionar)
 /Godot/
+/jogar.local.bat
 
 # Import cache
 *.import.bak
