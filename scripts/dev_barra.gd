@@ -25,6 +25,20 @@ func _ready() -> void:
 	_traduzir()
 
 
+## Comando: o botão SELECT (Back/View) abre/fecha o "TESTAR OUTRO NÍVEL"
+## -- só no developer mode (a barra só existe aí).
+func _input(evento: InputEvent) -> void:
+	if not (evento is InputEventJoypadButton) or not evento.pressed or evento.echo:
+		return
+	if (evento as InputEventJoypadButton).button_index != JOY_BUTTON_BACK:
+		return
+	get_viewport().set_input_as_handled()
+	if _painel and _painel.visible:
+		_fechar()
+	else:
+		_abrir()
+
+
 func _montar_botao_topo() -> void:
 	var b := Button.new()
 	b.name = "BotaoTopo"
