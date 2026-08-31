@@ -53,6 +53,26 @@ Parallax mais rico por bioma (cidade/castelo com Gothicvania town/church);
 efeitos bdragon1727 Purple nos projéteis + Kamehameha; codemanu na morte
 dos chefes; tilesets kenney/szadiart nas plataformas; props glionox.
 
+### A SEGUIR (UI) — pedido do Paulo (31 ago, fim de sessão)
+**Melhorar o menu de escolha de níveis** (`scenes/ui/SeletorNiveis.tscn` /
+`seletor_niveis.gd`) — "está muito básico". É a porta de entrada da campanha
+(30 níveis / 6 regiões), usado no `MapaMundo` e na `dev_barra.gd`. Tratar como
+tarefa de UI a sério: fundo/retrato do chefe por bioma (assets CC0 em
+`incoming/`, não desenhar por código), transições, leitura de progresso por
+região, recompensa do nível. O `MapaMundo` também precisa de passe.
+
+### Arranque preparado mas NÃO aplicado — efeitos roxos nos projéteis
+Folha `assets/sprites/incoming/bdragon1727/Effect and Bullet 16x16/Purple
+Effect and Bullet 16x16.png` (576×208, 36×13 células de 16px). Frames já
+escolhidos: **orbe a girar** = linha 0, cols 30–35 (6 frames) para o corpo do
+`ProjetilKoliani`; **anel de impacto** = linha 5, cols 14–17 (4 frames) para o
+estoiro do projétil e do Kamehameha (escalado). Plano: `tools/extrair_efeitos_
+roxos.gd` → `assets/sprites/pixel/fx/{bala_roxa,impacto_roxo}.png`; trocar os
+`Polygon2D` procedurais de `ProjetilKoliani.tscn`/`KamehamehaKoliani.tscn` por
+`Sprite2D` com `hframes`; manter a `PointLight2D`; `_estoirar()` instancia a
+tira de impacto em vez de `impacto.svg`. Creditar em
+`assets/sprites/pixel/CREDITS.md`.
+
 ## Sessão 2026-08-31 (cont.) — JORNADA 2.0: câmaras de plataformas a sério
 
 Feedback do Paulo: "os níveis continuam pequenos, quero MUITO mais
