@@ -4,6 +4,9 @@
 /build/
 export_presets.cfg.bak
 
+# Editor do Godot (binarios locais, nao versionar)
+/Godot/
+
 # Import cache
 *.import.bak
 
