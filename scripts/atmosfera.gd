@@ -27,6 +27,11 @@ extends Node2D
 @export var fundo_pack := ""
 ## Até onde gerar cenário de fundo (o nível mais largo anda pelos ~3400).
 @export var largura_nivel := 3400.0
+## Até onde gerar cenário de fundo para a ESQUERDA (x negativo). A JORNADA de
+## aproximação (gerador_corredor.gd) pode começar dezenas de milhares de
+## pixels antes da área "clássica" do nível -- sem isto o fundo só cobre a
+## margem original e a jornada fica vazia (preta).
+@export var extensao_esquerda := -1400.0
 @export var seed_ambiente := 0
 ## Faixa de brilho quente no horizonte + pontos de luz a tremeluzir nas
 ## ruínas (tochas ao longe). Ligar em biomas com fogo/lava (Fornalha).
@@ -84,6 +89,8 @@ const PACKS := {
 }
 
 var _poeira: CPUParticles2D
+var _ceu_layer: ParallaxLayer
+var _ceu_tex: Sprite2D
 
 
 func _ready() -> void:
@@ -91,6 +98,7 @@ func _ready() -> void:
 	if modulacao:
 		modulacao.color = cor_ambiente
 
+	_montar_ceu()
 	_gerar_parallax()
 
 	var raios := get_node_or_null("Raios")
@@ -114,11 +122,39 @@ func _process(_dt: float) -> void:
 
 ## --- geração do cenário de fundo ---------------------------------------
 
+## Chamado pelo `gerador_corredor.gd` quando a JORNADA de aproximação
+## estica o nível bem além da `largura_nivel`/`extensao_esquerda` originais
+## -- sem isto o fundo fica só desenhado na área "clássica" do nível e a
+## jornada (que pode começar dezenas de milhares de pixels antes) fica sem
+## fundo (vazio/preto).
+func atualizar_extensao(nova_largura: float, nova_esquerda: float) -> void:
+	var mudou := false
+	if nova_largura > largura_nivel:
+		largura_nivel = nova_largura
+		mudou = true
+	if nova_esquerda < extensao_esquerda:
+		extensao_esquerda = nova_esquerda
+		mudou = true
+	if mudou:
+		_gerar_parallax()
+
+
+## Remove tudo o que `_gerar_parallax` já gerou antes (marcado com o meta
+## "gerado"), para a função poder ser chamada de novo em segurança.
+func _limpar_gerado() -> void:
+	for caminho in ["Parallax/Fundo", "Parallax/Longe", "Parallax/Meio", "Parallax/Perto"]:
+		var layer := get_node_or_null(caminho) as Node2D
+		if layer == null:
+			continue
+		for n in layer.get_children():
+			if n.has_meta("gerado"):
+				n.free()
+
+
 func _gerar_parallax() -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = hash("%d|%s" % [seed_ambiente, bioma])
-
-	_fundo_em_gradiente()
+	_limpar_gerado()
 
 	# pack pixel-art: camadas reais em vez das silhuetas geradas
 	if fundo_pack != "" and PACKS.has(fundo_pack):
@@ -139,14 +175,14 @@ func _gerar_parallax() -> void:
 		if layer == null:
 			continue
 		for n in layer.get_children():
-			if n.name == "Fundo" or n.name == "Bruma" or n.name == "GradFundo":
+			if n.name in ["Fundo", "Bruma"]:
 				continue
 			n.free()
 		var cfg: Array = camadas[caminho]
 		var cor: Color = cor_silhueta.darkened(cfg[0]).lerp(cor_fundo, 0.12)
 		var perto := caminho.ends_with("Perto")
 		var passo: float = cfg[1]
-		var x := -700.0
+		var x := extensao_esquerda
 		while x < largura_nivel + 400.0:
 			var h := rng.randf_range(cfg[2], cfg[3])
 			var larg := rng.randf_range(passo * 0.7, passo * 1.5)
@@ -155,6 +191,7 @@ func _gerar_parallax() -> void:
 				p2.polygon = poly
 				p2.color = Color(cor.r, cor.g, cor.b, cfg[4])
 				p2.position = Vector2(x, 0.0)
+				p2.set_meta("gerado", true)
 				layer.add_child(p2)
 			x += rng.randf_range(passo * 0.55, passo * 1.1)
 
@@ -164,28 +201,47 @@ func _gerar_parallax() -> void:
 		_brilho_horizonte(rng)
 
 
-## Substitui o "slab" liso do fundo por um degradé vertical (horizonte com
-## um toque da cor de luz do bioma em cima, quase preto em baixo).
-func _fundo_em_gradiente() -> void:
-	var layer := get_node_or_null("Parallax/Fundo") as Node2D
-	if layer == null:
+## Fundo do "céu" (gradiente vertical) fixo relativamente à CÂMARA (não ao
+## mundo): uma `ParallaxLayer` com `motion_scale = 0` dentro do próprio
+## `ParallaxBackground` -- não dá para usar um `CanvasLayer` normal aqui
+## porque o `ParallaxBackground` tem prioridade de desenho especial e fica
+## sempre atrás de QUALQUER `CanvasLayer`, mesmo com layer muito negativo.
+## As silhuetas/sprites das outras camadas continuam a dar sensação de
+## profundidade normalmente, mas o céu em si não pode depender de
+## coordenadas do mundo: a JORNADA de aproximação (gerador_corredor.gd) pode
+## levar a câmara a dezenas de milhares de pixels da origem, distância a que
+## o parallax tradicional (motion_scale baixo na camada "Fundo") deixa de
+## cobrir a área visível -- o cenário "foge" da câmara em vez de a
+## acompanhar, e o resultado era um buraco preto no ecrã.
+func _montar_ceu() -> void:
+	var parallax := get_node_or_null("Parallax") as ParallaxBackground
+	if parallax == null:
 		return
+	if _ceu_layer == null:
+		_ceu_layer = ParallaxLayer.new()
+		_ceu_layer.name = "Ceu"
+		_ceu_layer.motion_scale = Vector2.ZERO
+		parallax.add_child(_ceu_layer)
+		parallax.move_child(_ceu_layer, 0)  # primeiro filho -> desenhado atrás dos outros
+		_ceu_tex = Sprite2D.new()
+		_ceu_tex.centered = true
+		_ceu_tex.scale = Vector2(1000.0, 8.0)  # cobre qualquer zoom/resolução razoável
+		_ceu_layer.add_child(_ceu_tex)
+
 	var base := get_node_or_null("Parallax/Fundo/Fundo") as ColorRect
 	if base:
-		base.color = cor_fundo.darkened(0.35)
-	var g := Polygon2D.new()
-	g.name = "GradFundo"
-	var x0 := -1400.0
-	var x1 := largura_nivel + 900.0
-	g.polygon = PackedVector2Array([
-		Vector2(x0, -700), Vector2(x1, -700),
-		Vector2(x1, 1150), Vector2(x0, 1150),
-	])
-	var topo := cor_fundo.lerp(cor_luz, 0.16)
-	var fundo := cor_fundo.darkened(0.4)
-	g.vertex_colors = PackedColorArray([topo, topo, fundo, fundo])
-	layer.add_child(g)
-	layer.move_child(g, 0)
+		base.visible = false  # o novo céu substitui este "slab" placeholder
+
+	var grad := Gradient.new()
+	grad.colors = PackedColorArray([cor_fundo.lerp(cor_luz, 0.16), cor_fundo.darkened(0.4)])
+	var tex := GradientTexture2D.new()
+	tex.gradient = grad
+	tex.width = 4
+	tex.height = 512
+	tex.fill = GradientTexture2D.FILL_LINEAR
+	tex.fill_from = Vector2(0.0, 0.0)
+	tex.fill_to = Vector2(0.0, 1.0)
+	_ceu_tex.texture = tex
 
 
 ## Banda de mato/entulho colada ao fundo do ecrã, em qualquer bioma, para a
@@ -195,7 +251,7 @@ func _faixa_rasteira(rng: RandomNumberGenerator) -> void:
 	if layer == null:
 		return
 	var cor := cor_silhueta.darkened(0.62).lerp(cor_fundo, 0.1)
-	var x := -700.0
+	var x := extensao_esquerda
 	while x < largura_nivel + 400.0:
 		var w := rng.randf_range(70.0, 190.0)
 		var hh := rng.randf_range(34.0, 104.0)
@@ -207,38 +263,42 @@ func _faixa_rasteira(rng: RandomNumberGenerator) -> void:
 		])
 		p.color = Color(cor.r, cor.g, cor.b, 0.7)
 		p.position = Vector2(x, 0.0)
+		p.set_meta("gerado", true)
 		layer.add_child(p)
 		x += rng.randf_range(60.0, 150.0)
 
 
-## Constrói o fundo a partir de um pack pixel-art (`fundo_pack`): para cada
-## camada, repete a textura na horizontal ao longo do nível, dentro da
-## `ParallaxLayer` certa (o motion_scale da cena dá a profundidade).
+## Constrói o fundo a partir de um pack pixel-art (`fundo_pack`): a textura
+## repete-se horizontalmente por `ParallaxLayer.motion_mirroring` (nativo do
+## Godot) em vez de gerar cópias manuais -- o mirroring cobre corretamente
+## qualquer distância que a câmara alcance (incluindo a JORNADA de
+## aproximação, que pode ir a dezenas de milhares de pixels da origem, onde
+## posicionar cópias "à mão" ao longo de x0..x1 deixa de bater certo com a
+## posição real na tela por causa do motion_scale baixo desta camada).
 func _montar_fundo_pack(_rng: RandomNumberGenerator) -> void:
 	for item: Array in PACKS[fundo_pack]:
 		var tex: Texture2D = load("%s/%s/%s" % [BG_DIR, fundo_pack, item[0]])
 		if tex == null:
 			continue
-		var layer := get_node_or_null("Parallax/%s" % item[1]) as Node2D
+		var layer := get_node_or_null("Parallax/%s" % item[1]) as ParallaxLayer
 		if layer == null:
 			continue
-		# fora as silhuetas geradas desta camada (deixa sky/bruma/gradiente)
+		# fora as silhuetas geradas desta camada (deixa sky/bruma)
 		for n in layer.get_children():
-			if not (n.name in ["Fundo", "Bruma", "GradFundo"]):
+			if not (n.name in ["Fundo", "Bruma"]):
 				n.free()
 		var esc: float = item[3]
 		var y_base: float = item[2]
 		var tw := float(tex.get_width()) * esc
 		var th := float(tex.get_height()) * esc
-		var x := -3000.0
-		while x < largura_nivel + 3000.0:
-			var spr := Sprite2D.new()
-			spr.texture = tex
-			spr.centered = false
-			spr.scale = Vector2(esc, esc)
-			spr.position = Vector2(x, y_base - th)
-			layer.add_child(spr)
-			x += tw - 1.0  # -1px de sobreposição para esconder a costura
+		var spr := Sprite2D.new()
+		spr.texture = tex
+		spr.centered = false
+		spr.scale = Vector2(esc, esc)
+		spr.position = Vector2(0.0, y_base - th)
+		spr.set_meta("gerado", true)
+		layer.add_child(spr)
+		layer.motion_mirroring = Vector2(tw, 0.0)
 
 
 ## Faixa de brilho quente colada ao horizonte + tochas distantes a
@@ -253,19 +313,20 @@ func _brilho_horizonte(rng: RandomNumberGenerator) -> void:
 	banda.name = "BrilhoHorizonte"
 	var y := CHAO - 40.0
 	banda.polygon = PackedVector2Array([
-		Vector2(-1400.0, y - 220.0), Vector2(largura_nivel + 900.0, y - 220.0),
-		Vector2(largura_nivel + 900.0, y + 40.0), Vector2(-1400.0, y + 40.0),
+		Vector2(extensao_esquerda, y - 220.0), Vector2(largura_nivel + 900.0, y - 220.0),
+		Vector2(largura_nivel + 900.0, y + 40.0), Vector2(extensao_esquerda, y + 40.0),
 	])
 	var quente := Color(cor_luz.r, cor_luz.g * 0.7, cor_luz.b * 0.4, 1.0)
 	banda.vertex_colors = PackedColorArray([
 		Color(quente.r, quente.g, quente.b, 0.0), Color(quente.r, quente.g, quente.b, 0.0),
 		Color(quente.r, quente.g, quente.b, 0.5), Color(quente.r, quente.g, quente.b, 0.5),
 	])
+	banda.set_meta("gerado", true)
 	longe.add_child(banda)
 	longe.move_child(banda, 1)
 	# tochas distantes (pontos aditivos que tremeluzem)
 	var alvo := meio if meio else longe
-	var x := -400.0
+	var x := extensao_esquerda + 1000.0
 	while x < largura_nivel + 300.0:
 		var ty := CHAO - rng.randf_range(120.0, 380.0)
 		var ponto := Polygon2D.new()
@@ -277,6 +338,7 @@ func _brilho_horizonte(rng: RandomNumberGenerator) -> void:
 		ponto.polygon = circ
 		ponto.color = Color(1.0, 0.62, 0.28, rng.randf_range(0.5, 0.85))
 		ponto.position = Vector2(x + rng.randf_range(-60.0, 60.0), ty)
+		ponto.set_meta("gerado", true)
 		alvo.add_child(ponto)
 		var tw := ponto.create_tween().set_loops()
 		var base_a := ponto.color.a

@@ -120,8 +120,9 @@ func _construir() -> void:
 		casca.abrir_esquerda(x0 - 160.0)
 
 	var atm := get_tree().get_first_node_in_group("atmosfera")
-	if atm and "largura_nivel" in atm:
-		atm.largura_nivel = maxf(atm.largura_nivel, comp + 3200.0)
+	if atm and atm.has_method("atualizar_extensao"):
+		var largura_atual: float = atm.get("largura_nivel")
+		atm.atualizar_extensao(maxf(largura_atual, comp + 3200.0), x0 - 400.0)
 
 	# --- espinha de plataformas --------------------------------------
 	var pool: Array = POOL_REGIAO.get(_regiao, POOL_REGIAO[0])
