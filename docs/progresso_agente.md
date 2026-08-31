@@ -53,13 +53,24 @@ Parallax mais rico por bioma (cidade/castelo com Gothicvania town/church);
 efeitos bdragon1727 Purple nos projéteis + Kamehameha; codemanu na morte
 dos chefes; tilesets kenney/szadiart nas plataformas; props glionox.
 
-### A SEGUIR (UI) — pedido do Paulo (31 ago, fim de sessão)
-**Melhorar o menu de escolha de níveis** (`scenes/ui/SeletorNiveis.tscn` /
-`seletor_niveis.gd`) — "está muito básico". É a porta de entrada da campanha
-(30 níveis / 6 regiões), usado no `MapaMundo` e na `dev_barra.gd`. Tratar como
-tarefa de UI a sério: fundo/retrato do chefe por bioma (assets CC0 em
-`incoming/`, não desenhar por código), transições, leitura de progresso por
-região, recompensa do nível. O `MapaMundo` também precisa de passe.
+### UI moderna — pedido do Paulo (31 ago), feito por outra sessão (Luís, 31 ago)
+Menu de escolha de níveis + resto dos ecrãs de UI já não estão "muito
+básicos": `MenuInicial`, `SeletorNiveis`, `Pausa`, `Opcoes`, `Diario` e
+`MapaMundo` ganharam glow/profundidade nos painéis e botões, hover animado
+(escala), destaque claro na ação principal de cada ecrã (LOAD/NEW GAME,
+Continuar, idioma ativo, PLAY) e sliders de volume na paleta roxa.
+
+No `SeletorNiveis` especificamente: cada cartão mostra agora o retrato do
+chefe (frame de repouso das tiras já existentes em
+`assets/sprites/pixel/bosses/*.png` — não desenhado por código) e a badge de
+região passou a incluir o progresso ("Rotting Forest · 0/5"). O Carcereiro
+(nível 6) ainda não tem retrato porque ainda usa o SVG antigo, não a
+pixel-art — fica sem imagem no cartão até ganhar sprite novo.
+
+**Ainda por fazer** do pedido original: transições mais elaboradas ao trocar
+de cartão/ecrã (o que há é a animação cover-flow existente, nada novo aqui),
+e um "passe" mais profundo ao `MapaMundo` (por agora só ganhou o mesmo
+tratamento de título com glow — layout continua simples).
 
 ### Arranque preparado mas NÃO aplicado — efeitos roxos nos projéteis
 Folha `assets/sprites/incoming/bdragon1727/Effect and Bullet 16x16/Purple
