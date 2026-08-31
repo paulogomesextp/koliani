@@ -15,8 +15,16 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	if _fechar_btn:
 		_fechar_btn.pressed.connect(_fechar)
+		_fechar_btn.resized.connect(func() -> void: _fechar_btn.pivot_offset = _fechar_btn.size / 2.0)
+		_fechar_btn.mouse_entered.connect(func() -> void: _animar_escala(_fechar_btn, 1.05))
+		_fechar_btn.mouse_exited.connect(func() -> void: _animar_escala(_fechar_btn, 1.0))
 	Textos.idioma_mudou.connect(func(_l: String) -> void: _traduzir())
 	_traduzir()
+
+
+func _animar_escala(botao: Button, alvo: float) -> void:
+	var t := create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_BACK)
+	t.tween_property(botao, "scale", Vector2(alvo, alvo), 0.16)
 
 
 func _traduzir() -> void:

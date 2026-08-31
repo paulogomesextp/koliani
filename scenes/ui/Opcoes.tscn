@@ -1,4 +1,4 @@
-[gd_scene load_steps=3 format=3 uid="uid://bkolianiopcoes01"]
+[gd_scene load_steps=5 format=3 uid="uid://bkolianiopcoes01"]
 
 [ext_resource type="Script" path="res://scripts/opcoes_menu.gd" id="1_op"]
 
@@ -7,16 +7,54 @@ content_margin_left = 40.0
 content_margin_top = 32.0
 content_margin_right = 40.0
 content_margin_bottom = 32.0
-bg_color = Color(0.06, 0.04, 0.09, 0.99)
+bg_color = Color(0.055, 0.035, 0.085, 0.98)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
-border_color = Color(0.6, 0.22, 0.6, 0.9)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
+border_color = Color(0.65, 0.28, 0.65, 0.85)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+shadow_color = Color(0.5, 0.15, 0.55, 0.35)
+shadow_size = 20
+
+[sub_resource type="StyleBoxFlat" id="sb_botao"]
+content_margin_left = 20.0
+content_margin_top = 11.0
+content_margin_right = 20.0
+content_margin_bottom = 11.0
+bg_color = Color(0.065, 0.04, 0.095, 0.88)
+border_width_left = 1
+border_width_top = 2
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.55, 0.22, 0.55, 0.55)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+shadow_color = Color(0.4, 0.14, 0.5, 0.2)
+shadow_size = 4
+
+[sub_resource type="StyleBoxFlat" id="sb_botao_hover"]
+content_margin_left = 20.0
+content_margin_top = 11.0
+content_margin_right = 20.0
+content_margin_bottom = 11.0
+bg_color = Color(0.24, 0.11, 0.29, 0.96)
+border_width_left = 1
+border_width_top = 2
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.95, 0.45, 0.88, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+shadow_color = Color(0.85, 0.35, 0.85, 0.4)
+shadow_size = 9
 
 [node name="Opcoes" type="Control"]
 layout_mode = 3
@@ -117,4 +155,8 @@ layout_mode = 2
 
 [node name="Voltar" type="Button" parent="Painel/Coluna"]
 layout_mode = 2
+theme_override_styles/normal = SubResource("sb_botao")
+theme_override_styles/hover = SubResource("sb_botao_hover")
+theme_override_styles/focus = SubResource("sb_botao_hover")
+theme_override_styles/pressed = SubResource("sb_botao_hover")
 text = "BACK"

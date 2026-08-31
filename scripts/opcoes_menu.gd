@@ -29,6 +29,8 @@ func _ready() -> void:
 	_sld_efeitos.max_value = 1.0
 	_sld_efeitos.step = 0.05
 	_sld_efeitos.value = Opcoes.vol_efeitos
+	_estilizar_slider(_sld_musica)
+	_estilizar_slider(_sld_efeitos)
 
 	_sld_musica.value_changed.connect(func(v: float) -> void: Opcoes.definir_musica(v))
 	_sld_efeitos.value_changed.connect(func(v: float) -> void: Opcoes.definir_efeitos(v))
@@ -45,7 +47,41 @@ func _ready() -> void:
 	_voltar.pressed.connect(_fechar)
 	Textos.idioma_mudou.connect(func(_l: String) -> void: _traduzir())
 	_traduzir()
+	_preparar_hover_animado()
 	_voltar.grab_focus()
+
+
+## Trilho/agarrador do slider na paleta roxa em vez do cinzento por omissão.
+func _estilizar_slider(s: HSlider) -> void:
+	var fundo := StyleBoxFlat.new()
+	fundo.bg_color = Color(0.1, 0.07, 0.13, 0.9)
+	fundo.set_corner_radius_all(6)
+	fundo.content_margin_top = 6
+	fundo.content_margin_bottom = 6
+	fundo.set_border_width_all(1)
+	fundo.border_color = Color(0.5, 0.3, 0.5, 0.5)
+	var preenchido := fundo.duplicate() as StyleBoxFlat
+	preenchido.bg_color = Color(0.6, 0.28, 0.65, 0.85)
+	preenchido.border_color = Color(0.9, 0.5, 0.9, 0.7)
+	s.add_theme_stylebox_override("slider", fundo)
+	s.add_theme_stylebox_override("grabber_area", preenchido)
+	s.add_theme_stylebox_override("grabber_area_highlight", preenchido)
+
+
+## Resposta de escala ao passar/focar o rato -- consistente com os outros ecrãs.
+func _preparar_hover_animado() -> void:
+	var todos: Array[Button] = [_voltar]
+	for loc: String in _botoes_idioma:
+		todos.append(_botoes_idioma[loc] as Button)
+	for b in todos:
+		b.resized.connect(func() -> void: b.pivot_offset = b.size / 2.0)
+		b.mouse_entered.connect(func() -> void: _animar_escala(b, 1.05))
+		b.mouse_exited.connect(func() -> void: _animar_escala(b, 1.0))
+
+
+func _animar_escala(botao: Button, alvo: float) -> void:
+	var t := create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_BACK)
+	t.tween_property(botao, "scale", Vector2(alvo, alvo), 0.16)
 
 
 func _unhandled_input(evento: InputEvent) -> void:
@@ -64,8 +100,39 @@ func _traduzir() -> void:
 	# realça o idioma atual
 	for loc: String in _botoes_idioma:
 		var b: Button = _botoes_idioma[loc]
-		b.disabled = (loc == Textos.idioma())
+		b.disabled = false
 		b.text = Textos.NOMES[loc]
+		_estilo_idioma(b, loc == Textos.idioma())
+
+
+## Botão de idioma: estilo neutro por omissão, com glow quando é o ativo
+## (substitui o "disabled" cinzento por omissão, que destoava do tema).
+func _estilo_idioma(b: Button, ativo: bool) -> void:
+	var normal := StyleBoxFlat.new()
+	normal.set_corner_radius_all(8)
+	normal.content_margin_left = 14.0
+	normal.content_margin_right = 14.0
+	normal.content_margin_top = 8.0
+	normal.content_margin_bottom = 8.0
+	if ativo:
+		normal.bg_color = Color(0.28, 0.12, 0.34, 0.98)
+		normal.set_border_width_all(2)
+		normal.border_color = Color(0.95, 0.5, 0.92, 0.95)
+		normal.shadow_color = Color(0.85, 0.35, 0.85, 0.4)
+		normal.shadow_size = 10
+	else:
+		normal.bg_color = Color(0.065, 0.04, 0.095, 0.85)
+		normal.set_border_width_all(1)
+		normal.border_color = Color(0.5, 0.3, 0.5, 0.5)
+	var hover := normal.duplicate() as StyleBoxFlat
+	if not ativo:
+		hover.bg_color = Color(0.2, 0.1, 0.24, 0.95)
+		hover.border_color = Color(0.85, 0.45, 0.85, 0.85)
+	for e in ["normal", "focus"]:
+		b.add_theme_stylebox_override(e, normal)
+	for e in ["hover", "pressed"]:
+		b.add_theme_stylebox_override(e, hover)
+	b.add_theme_color_override("font_color", Color(1, 0.92, 1) if ativo else Color(0.85, 0.8, 0.9))
 
 
 func _escolher_idioma(loc: String) -> void:

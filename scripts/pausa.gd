@@ -38,6 +38,42 @@ func _ready() -> void:
 	_recomecar.visible = hardcore
 	Textos.idioma_mudou.connect(func(_l: String) -> void: _traduzir())
 	_traduzir()
+	_destacar_continuar()
+	for b: Button in [_continuar, _opcoes_btn, _mapa, _recomecar, _menu]:
+		b.resized.connect(func() -> void: b.pivot_offset = b.size / 2.0)
+		b.mouse_entered.connect(func() -> void: _animar_escala(b, 1.03))
+		b.mouse_exited.connect(func() -> void: _animar_escala(b, 1.0))
+		b.focus_entered.connect(func() -> void: _animar_escala(b, 1.03))
+		b.focus_exited.connect(func() -> void: _animar_escala(b, 1.0))
+
+
+func _animar_escala(botao: Button, alvo: float) -> void:
+	var t := create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_BACK)
+	t.tween_property(botao, "scale", Vector2(alvo, alvo), 0.16)
+
+
+## Continuar é a ação mais comum -- ganha um estilo mais saturado/com glow.
+func _destacar_continuar() -> void:
+	var normal := StyleBoxFlat.new()
+	normal.bg_color = Color(0.17, 0.06, 0.21, 0.95)
+	normal.set_border_width_all(2)
+	normal.border_width_top = 3
+	normal.border_color = Color(0.85, 0.35, 0.85, 0.85)
+	normal.set_corner_radius_all(8)
+	normal.shadow_color = Color(0.75, 0.25, 0.75, 0.35)
+	normal.shadow_size = 8
+	normal.content_margin_left = 20.0
+	normal.content_margin_right = 20.0
+	normal.content_margin_top = 13.0
+	normal.content_margin_bottom = 13.0
+	var hover := normal.duplicate() as StyleBoxFlat
+	hover.bg_color = Color(0.32, 0.14, 0.38, 0.98)
+	hover.border_color = Color(1, 0.55, 0.95, 1)
+	hover.shadow_size = 14
+	_continuar.add_theme_stylebox_override("normal", normal)
+	_continuar.add_theme_stylebox_override("hover", hover)
+	_continuar.add_theme_stylebox_override("focus", hover)
+	_continuar.add_theme_stylebox_override("pressed", hover)
 
 
 func _traduzir() -> void:
