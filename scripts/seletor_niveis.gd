@@ -133,14 +133,23 @@ func _fazer_cartao(indice: int) -> Dictionary:
 	var sb := StyleBoxFlat.new()
 	sb.bg_color = Color(0.08, 0.06, 0.12, 0.6)
 	sb.set_corner_radius_all(16)
-	sb.set_border_width_all(3)
-	sb.border_color = base
+	sb.set_border_width_all(2)
+	sb.border_color = Color(base.r, base.g, base.b, 0.55)
 	sb.shadow_color = Color(0, 0, 0, 0.5)
-	sb.shadow_size = 12
+	sb.shadow_size = 10
 	sb.content_margin_left = 20
 	sb.content_margin_right = 20
 	sb.content_margin_top = 18
 	sb.content_margin_bottom = 18
+
+	# estilo do cartão em destaque (o do meio, selecionado) -- borda mais
+	# viva, fundo mais saturado e glow colorido em vez da sombra neutra.
+	var sb_sel := sb.duplicate() as StyleBoxFlat
+	sb_sel.bg_color = Color(0.1, 0.07, 0.15, 0.8).lerp(base, 0.14)
+	sb_sel.set_border_width_all(3)
+	sb_sel.border_color = base.lightened(0.2)
+	sb_sel.shadow_color = Color(base.r, base.g, base.b, 0.55)
+	sb_sel.shadow_size = 26
 	painel.add_theme_stylebox_override("panel", sb)
 
 	var col := VBoxContainer.new()
@@ -211,6 +220,7 @@ func _fazer_cartao(indice: int) -> Dictionary:
 		"raiz": raiz, "indice": indice, "jogavel": true,
 		"regiao": faixa_reg, "numero": num, "nome": nome,
 		"chefe": chefe, "premio": premio, "pill": pill, "base": base,
+		"painel": painel, "sb_normal": sb, "sb_sel": sb_sel, "em_destaque": false,
 	}
 
 
@@ -219,14 +229,23 @@ func _montar_seta(txt: String, dir: int, esquerda: bool) -> void:
 	b.text = txt
 	b.focus_mode = Control.FOCUS_NONE
 	b.add_theme_font_size_override("font_size", 40)
-	b.add_theme_color_override("font_color", Color(0.95, 0.85, 1))
+	b.add_theme_color_override("font_color", Color(0.97, 0.9, 1))
 	var sb := StyleBoxFlat.new()
 	sb.bg_color = Color(0.1, 0.06, 0.14, 0.85)
 	sb.set_corner_radius_all(36)
 	sb.set_border_width_all(2)
-	sb.border_color = Color(0.7, 0.45, 0.8, 0.8)
-	for e in ["normal", "hover", "pressed", "focus"]:
-		b.add_theme_stylebox_override(e, sb)
+	sb.border_color = Color(0.7, 0.45, 0.8, 0.75)
+	sb.shadow_color = Color(0.6, 0.3, 0.7, 0.25)
+	sb.shadow_size = 6
+	var sb_hover := sb.duplicate() as StyleBoxFlat
+	sb_hover.bg_color = Color(0.24, 0.12, 0.28, 0.95)
+	sb_hover.border_color = Color(0.95, 0.55, 0.92, 1)
+	sb_hover.shadow_color = Color(0.9, 0.4, 0.85, 0.5)
+	sb_hover.shadow_size = 14
+	b.add_theme_stylebox_override("normal", sb)
+	b.add_theme_stylebox_override("hover", sb_hover)
+	b.add_theme_stylebox_override("pressed", sb_hover)
+	b.add_theme_stylebox_override("focus", sb_hover)
 	b.anchor_top = 0.5
 	b.anchor_bottom = 0.5
 	b.offset_top = -36.0
@@ -241,8 +260,16 @@ func _montar_seta(txt: String, dir: int, esquerda: bool) -> void:
 		b.anchor_right = 1.0
 		b.offset_left = -86.0
 		b.offset_right = -14.0
+	b.pivot_offset = Vector2(36, 36)
+	b.mouse_entered.connect(func() -> void: _animar_escala(b, 1.1))
+	b.mouse_exited.connect(func() -> void: _animar_escala(b, 1.0))
 	b.pressed.connect(_mover.bind(dir))
 	add_child(b)
+
+
+func _animar_escala(no: Control, alvo: float) -> void:
+	var t := create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_BACK)
+	t.tween_property(no, "scale", Vector2(alvo, alvo), 0.15)
 
 
 func _montar_rodape() -> void:
@@ -263,7 +290,7 @@ func _montar_rodape() -> void:
 	voltar.name = "Voltar"
 	voltar.focus_mode = Control.FOCUS_NONE
 	voltar.custom_minimum_size = Vector2(150, 44)
-	_estilo_botao_rodape(voltar)
+	_estilo_botao_rodape(voltar, false)
 	voltar.pressed.connect(func() -> void: cancelado.emit())
 	barra.add_child(voltar)
 
@@ -271,7 +298,7 @@ func _montar_rodape() -> void:
 	_jogar.name = "Jogar"
 	_jogar.focus_mode = Control.FOCUS_NONE
 	_jogar.custom_minimum_size = Vector2(150, 44)
-	_estilo_botao_rodape(_jogar)
+	_estilo_botao_rodape(_jogar, true)
 	_jogar.pressed.connect(_confirmar)
 	barra.add_child(_jogar)
 
@@ -291,20 +318,39 @@ func _montar_rodape() -> void:
 	add_child(_dica)
 
 
-func _estilo_botao_rodape(b: Button) -> void:
-	b.add_theme_font_size_override("font_size", 16)
-	b.add_theme_color_override("font_color", Color(1, 0.88, 0.98))
+func _estilo_botao_rodape(b: Button, principal: bool) -> void:
+	b.add_theme_font_size_override("font_size", 16 if not principal else 17)
+	b.add_theme_color_override("font_color", Color(1, 0.9, 1))
 	var sb := StyleBoxFlat.new()
-	sb.bg_color = Color(0.12, 0.06, 0.16, 0.94)
-	sb.set_corner_radius_all(6)
-	sb.set_border_width_all(2)
-	sb.border_color = Color(0.85, 0.4, 0.82, 1)
-	sb.content_margin_left = 16
-	sb.content_margin_right = 16
-	sb.content_margin_top = 8
-	sb.content_margin_bottom = 8
-	for e in ["normal", "hover", "pressed", "focus", "disabled"]:
+	sb.set_corner_radius_all(8)
+	sb.content_margin_left = 18
+	sb.content_margin_right = 18
+	sb.content_margin_top = 9
+	sb.content_margin_bottom = 9
+	if principal:
+		sb.bg_color = Color(0.2, 0.08, 0.24, 0.96)
+		sb.set_border_width_all(2)
+		sb.border_color = Color(0.95, 0.5, 0.92, 0.95)
+		sb.shadow_color = Color(0.85, 0.35, 0.85, 0.4)
+		sb.shadow_size = 12
+	else:
+		sb.bg_color = Color(0.1, 0.07, 0.13, 0.85)
+		sb.set_border_width_all(1)
+		sb.border_color = Color(0.6, 0.45, 0.62, 0.6)
+	var sb_hover := sb.duplicate() as StyleBoxFlat
+	if principal:
+		sb_hover.bg_color = Color(0.32, 0.13, 0.36, 1)
+		sb_hover.shadow_size = 20
+	else:
+		sb_hover.bg_color = Color(0.2, 0.13, 0.24, 0.95)
+		sb_hover.border_color = Color(0.9, 0.55, 0.88, 0.9)
+	for e in ["normal", "focus", "disabled"]:
 		b.add_theme_stylebox_override(e, sb)
+	for e in ["hover", "pressed"]:
+		b.add_theme_stylebox_override(e, sb_hover)
+	b.pivot_offset = b.custom_minimum_size / 2.0
+	b.mouse_entered.connect(func() -> void: _animar_escala(b, 1.05))
+	b.mouse_exited.connect(func() -> void: _animar_escala(b, 1.0))
 
 
 # --- estado / layout ---------------------------------------------------
@@ -324,12 +370,26 @@ func _reconstruir_estilos() -> void:
 		var pill := c["pill"] as Label
 		if EstadoJogo.nivel_esta_concluido(idx):
 			pill.text = Textos.t("sel.cleared")
-			pill.add_theme_color_override("font_color", Color(0.6, 1, 0.7))
+			_estilo_pill(pill, Color(0.4, 0.85, 0.5))
 		elif not jog:
 			pill.text = Textos.t("sel.locked")
-			pill.add_theme_color_override("font_color", Color(0.9, 0.5, 0.5))
+			_estilo_pill(pill, Color(0.85, 0.4, 0.42))
 		else:
 			pill.text = ""
+			pill.remove_theme_stylebox_override("normal")
+
+
+## Dá ao "Cleared" / "Locked" um fundo em badge em vez de só texto colorido.
+func _estilo_pill(pill: Label, cor: Color) -> void:
+	pill.add_theme_color_override("font_color", Color(0.05, 0.04, 0.06))
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = cor
+	sb.set_corner_radius_all(8)
+	sb.content_margin_left = 10
+	sb.content_margin_right = 10
+	sb.content_margin_top = 2
+	sb.content_margin_bottom = 2
+	pill.add_theme_stylebox_override("normal", sb)
 
 
 func _reposicionar(instantaneo: bool) -> void:
@@ -350,6 +410,11 @@ func _reposicionar(instantaneo: bool) -> void:
 			alpha = 0.0
 		if not _cartoes[i]["jogavel"]:
 			alpha *= 0.6
+		var destaque := dist == 0
+		if destaque != _cartoes[i]["em_destaque"]:
+			_cartoes[i]["em_destaque"] = destaque
+			var painel := _cartoes[i]["painel"] as PanelContainer
+			painel.add_theme_stylebox_override("panel", _cartoes[i]["sb_sel"] if destaque else _cartoes[i]["sb_normal"])
 		raiz.mouse_filter = Control.MOUSE_FILTER_STOP if dist <= 1 else Control.MOUSE_FILTER_IGNORE
 		if instantaneo:
 			raiz.position = alvo_pos
