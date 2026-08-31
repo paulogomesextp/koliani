@@ -165,6 +165,10 @@ func _construir() -> void:
 		# inimigo ocasional na plataforma
 		if _rng.randf() < 0.13 + 0.1 * _dif:
 			_inimigo_em(par, Vector2(x, y - 30.0))
+		# decoração
+		_decorar(par, x, y)
+		if passos % 6 == 0:
+			_coluna_fundo(par, x + _rng.randf_range(-120.0, 120.0))
 
 		# --- câmara de flavour de tempos a tempos ---
 		passos += 1
@@ -257,6 +261,43 @@ func _perigo_no_vao(par: Node2D, x: float, y: float) -> void:
 			f.dur_ativa = 1.0 + 0.4 * _dif
 			f.fase = _rng.randf() * 1.5
 			par.add_child(f)
+
+
+## Props decorativos (0x72 DungeonTileset II, CC0) -- ["ficheiro", escala].
+const PROPS_CHAO := [
+	["crate.png", 3.2], ["skull.png", 3.0],
+	["wall_banner_red.png", 3.4], ["wall_banner_blue.png", 3.4],
+]
+const PROP_COLUNA := preload("res://assets/sprites/pixel/props/column.png")
+
+
+## Prop pequeno pousado numa plataforma da espinha.
+func _decorar(par: Node2D, x: float, y: float) -> void:
+	if _rng.randf() > 0.3:
+		return
+	var d: Array = PROPS_CHAO[_rng.randi() % PROPS_CHAO.size()]
+	var tex: Texture2D = load("res://assets/sprites/pixel/props/%s" % d[0])
+	if tex == null:
+		return
+	var s := Sprite2D.new()
+	s.texture = tex
+	s.scale = Vector2(d[1], d[1]) * _rng.randf_range(0.85, 1.15)
+	s.z_index = -1
+	s.position = Vector2(x + _rng.randf_range(-24.0, 24.0),
+		y - 9.0 - tex.get_height() * s.scale.y * 0.5)
+	par.add_child(s)
+
+
+## Coluna alta a subir do líquido, atrás dos atores (profundidade).
+func _coluna_fundo(par: Node2D, x: float) -> void:
+	var s := Sprite2D.new()
+	s.texture = PROP_COLUNA
+	var esc := _rng.randf_range(3.5, 6.0)
+	s.scale = Vector2(esc, esc)
+	s.z_index = -3
+	s.modulate = Color(0.6, 0.6, 0.7, 0.85)
+	s.position = Vector2(x, _chao_y - PROP_COLUNA.get_height() * esc * 0.5 + 40.0)
+	par.add_child(s)
 
 
 func _inimigo_em(par: Node2D, pos: Vector2) -> void:

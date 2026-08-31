@@ -32,6 +32,13 @@ A personagem principal (Koliani) é original do projeto
   `assets/tiles/masmorra.tres` (TileSet gerado por `tools/gerar_tileset_masmorra.gd`)
   usado nas regiões II (Prisão) e IV (Catacumbas). `dungeon_0x72_tile_list.txt`
   é a lista de coordenadas do pack (nome x y w h).
+- **Monstros da Jornada** (`tools/extrair_monstros_0x72.gd` →
+  `assets/sprites/pixel/enemies/{imp,chort,orc,xamane,demonio_grande,ogro,`
+  `abobora,wogol,necromante,lodo}/`): frames `<nome>_idle/run_anim_fN`
+  ampliados nearest para a altura dos outros inimigos. `DemonioBase.especie`.
+- **Props decorativos** (`assets/sprites/pixel/props/`: column, crate, skull,
+  wall_banner_red/blue, floor_ladder) — o `gerador_corredor.gd` espalha-os
+  pelas plataformas e no fundo da jornada.
 
 ## LuizMelo — "Monsters Creatures Fantasy"
 - https://luizmelo.itch.io/monsters-creatures-fantasy
