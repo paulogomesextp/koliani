@@ -39,7 +39,19 @@ const FUNDO_REGIAO := [
 	"res://assets/sprites/pixel/backgrounds/rochoso/near.png",
 ]
 
-const CARTAO := Vector2(336, 300)
+## Nome do ficheiro do retrato do chefe (assets/sprites/pixel/bosses/<x>.png,
+## tira de 4 frames -- usa-se o frame 0) por índice de nível. "" = ainda sem
+## pixel-art (fica só com o preview do bioma).
+const RETRATO_CHEFE := [
+	"ghorak", "morvanna", "rainha", "entrevane", "coracao",
+	"", "ignivar", "dama", "irmaos", "primeiro",
+	"sino", "aerion", "voltaris", "sacerdotisa", "vyrak",
+	"rei_ossario", "colosso", "freira", "naga", "olho",
+	"prefeito", "acougueiro", "maquinista", "bispo", "noiva",
+	"capitao", "koliani_sombria", "devorador", "arauto", "zeriko",
+]
+
+const CARTAO := Vector2(336, 392)
 const PASSO := 372.0          # cartão + intervalo
 const DUR := 0.26
 
@@ -122,7 +134,7 @@ func _fazer_cartao(indice: int) -> Dictionary:
 		arte.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		arte.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 		arte.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		arte.modulate = Color(base.r, base.g, base.b, 0.7)
+		arte.modulate = Color(base.r * 0.5, base.g * 0.5, base.b * 0.5, 0.4)
 		raiz.add_child(arte)
 
 	var painel := PanelContainer.new()
@@ -179,6 +191,18 @@ func _fazer_cartao(indice: int) -> Dictionary:
 	num.add_theme_color_override("font_color", base.lightened(0.15))
 	col.add_child(num)
 
+	var retrato_tex := _retrato_chefe(indice)
+	if retrato_tex:
+		var retrato := TextureRect.new()
+		retrato.name = "Retrato"
+		retrato.texture = retrato_tex
+		retrato.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		retrato.custom_minimum_size = Vector2(120, 120)
+		retrato.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		retrato.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		retrato.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		col.add_child(retrato)
+
 	var nome := Label.new()
 	nome.name = "Nome"
 	nome.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -222,6 +246,24 @@ func _fazer_cartao(indice: int) -> Dictionary:
 		"chefe": chefe, "premio": premio, "pill": pill, "base": base,
 		"painel": painel, "sb_normal": sb, "sb_sel": sb_sel, "em_destaque": false,
 	}
+
+
+## Frame 0 (repouso) da tira pixel-art de 4 frames do chefe do nível
+## `indice`, ou null se ainda não houver retrato pixel-art para ele.
+func _retrato_chefe(indice: int) -> Texture2D:
+	if indice < 0 or indice >= RETRATO_CHEFE.size():
+		return null
+	var slug: String = RETRATO_CHEFE[indice]
+	if slug == "":
+		return null
+	var caminho := "res://assets/sprites/pixel/bosses/%s.png" % slug
+	if not ResourceLoader.exists(caminho):
+		return null
+	var folha: Texture2D = load(caminho)
+	var atlas := AtlasTexture.new()
+	atlas.atlas = folha
+	atlas.region = Rect2(0, 0, folha.get_width() / 4.0, folha.get_height())
+	return atlas
 
 
 func _montar_seta(txt: String, dir: int, esquerda: bool) -> void:
@@ -362,7 +404,8 @@ func _reconstruir_estilos() -> void:
 		c["jogavel"] = jog
 		var regiao := EstadoJogo.regiao_do_nivel(idx)
 		var reg_id: String = EstadoJogo.REGIOES[regiao]["id"] if regiao >= 0 else "?"
-		(c["regiao"] as Label).text = Textos.t(WORLD_KEY.get(reg_id, "world.unknown"))
+		var nome_regiao := Textos.t(WORLD_KEY.get(reg_id, "world.unknown"))
+		(c["regiao"] as Label).text = "%s  ·  %s" % [nome_regiao, _progresso_regiao(regiao)]
 		(c["numero"] as Label).text = Textos.tf("sel.count", [idx + 1, EstadoJogo.NIVEIS.size()])
 		(c["nome"] as Label).text = _nome_nivel(idx)
 		(c["chefe"] as Label).text = Textos.tf("sel.boss", [_nome_chefe(idx)])
@@ -377,6 +420,18 @@ func _reconstruir_estilos() -> void:
 		else:
 			pill.text = ""
 			pill.remove_theme_stylebox_override("normal")
+
+
+## "2 / 5" -- quantos níveis da região já estão concluídos, sobre o total.
+func _progresso_regiao(regiao: int) -> String:
+	if regiao < 0 or regiao >= EstadoJogo.REGIOES.size():
+		return ""
+	var niveis: Array = EstadoJogo.REGIOES[regiao]["niveis"]
+	var feitos := 0
+	for n in niveis:
+		if EstadoJogo.nivel_esta_concluido(n):
+			feitos += 1
+	return "%d / %d" % [feitos, niveis.size()]
 
 
 ## Dá ao "Cleared" / "Locked" um fundo em badge em vez de só texto colorido.
