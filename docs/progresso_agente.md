@@ -1,5 +1,58 @@
 # Progresso do agente `gaming` — campanha dos 30 níveis
 
+## Sessão 2026-08-31 (cont. 3) — JORNADA 3.0: chão MORTAL + assets
+
+Feedback do Paulo: (1) os níveis tinham quase todos uma plataforma
+contínua para andar em frente — pôr líquido mortal e obrigar a saltar;
+(2) mapas muito abertos, quer túneis / subir-descer; (3) **analisar TODOS
+os assets em `incoming/` e usá-los para melhorar o VISUAL**.
+
+### `docs/assets_incoming.md` (novo) — catálogo completo
+`tools/catalogar_assets.gd` varre os 19 packs CC0 em `incoming/` e regista
+o tamanho real de cada PNG. Destaques por usar: **parallax** (ansimuz
+Cold Corridors/Caverns/Magic Cliffs/Rocky Pass/Mountain Dusk/Gothicvania
+Swamp+Church+Town, szadiart bg1-4, free-game-assets bg1-4+Clouds,
+parallax_forest_pack v1/v2, underwater-fantasy); **monstros** (0x72 ~20
+criaturas, luizmelo, zerie Orc/Soldier/Demon/Blood, chierit
+FrostGuardian/DemonSlime/Minotaur bosses, clembod BringerOfDeath, ansimuz
+HellHound/Ghost/Spider, gothicvania burning-ghoul/wizard/angel,
+kings-and-pigs); **efeitos** (bdragon1727 Fire/Green/**Purple**/Water
+bullets 16×16 + Free/Part 16-36 explosões; codemanu 20 folhas de magia
+600-1100px; gothicvania fireball/enemy-death); **tilesets** (kenney 180
+tiles, szadiart mainlev_build, 0x72, anokolisa HighForest, gothicvania);
+**traps** pixel-adventure (RockHead, SpikeHead, SpikedBall, Trampoline,
+FallingPlatform, Fan); **props** (0x72 column/crate/skull, glionox 1244
+items 16×16, gothicvania town props).
+
+### Jornada 3.0 (`gerador_corredor.gd`, v0.7.0)
+- **Chão = líquido MORTAL** em toda a extensão (`AguaVenenosa` dano 999 →
+  morte → checkpoint), cor por região: água podre (floresta), ácido
+  (prisão/cidade), trevas (torres/catacumbas), **LAVA + brasas** (castelo).
+- Por cima, **espinha de plataformas** pequenas e espaçadas, sobe/desce,
+  com perigos nos vãos. Cair = morte.
+- Anti-softlock sem rede: cada plataforma ao alcance de salto da anterior
+  (Δx ≤ 196, subida ≤ 100); móveis com deriva pequena; ~40-65 checkpoints
+  por nível; última câmara = passadeira sólida que encosta ao nível.
+- 15 câmaras de flavour à volta da espinha (saltos ziguezague, serras/
+  pêndulos/guilhotinas/fogo em corredor, rítmicas, trampolins, correntes,
+  elevadores, ponte que esboroa, coluna de vento, gravidade lunar, rajada,
+  túnel de gruta desce/sobe, par de portais).
+
+### +10 monstros (0x72, v0.7.1)
+`tools/extrair_monstros_0x72.gd` → `enemies/{imp,chort,orc,xamane,`
+`demonio_grande,ogro,abobora,wogol,necromante,lodo}/` (frames ampliados
+nearest). `DemonioBase.ESPECIES`/`@export_enum` alargados; `ESP_REGIAO`
+da jornada usa um leque diferente por região.
+
+### Props (0x72, v0.7.2)
+`assets/sprites/pixel/props/` (column/crate/skull/estandartes); o gerador
+espalha-os pelas plataformas + colunas altas a subir do líquido no fundo.
+
+### A SEGUIR (visual)
+Parallax mais rico por bioma (cidade/castelo com Gothicvania town/church);
+efeitos bdragon1727 Purple nos projéteis + Kamehameha; codemanu na morte
+dos chefes; tilesets kenney/szadiart nas plataformas; props glionox.
+
 ## Sessão 2026-08-31 (cont.) — JORNADA 2.0: câmaras de plataformas a sério
 
 Feedback do Paulo: "os níveis continuam pequenos, quero MUITO mais
