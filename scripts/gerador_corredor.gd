@@ -268,12 +268,12 @@ func _inimigo_em(par: Node2D, pos: Vector2) -> void:
 
 
 const ESP_REGIAO := {
-	0: ["goblin", "mushroom"],
-	1: ["esqueleto", "goblin"],
-	2: ["olho", "goblin"],
-	3: ["esqueleto", "olho"],
-	4: ["goblin", "esqueleto"],
-	5: ["olho", "esqueleto", "goblin"],
+	0: ["goblin", "mushroom", "lodo", "imp"],
+	1: ["esqueleto", "chort", "orc", "imp"],
+	2: ["olho", "xamane", "wogol", "imp"],
+	3: ["esqueleto", "necromante", "chort", "ogro"],
+	4: ["orc", "abobora", "xamane", "goblin"],
+	5: ["demonio_grande", "ogro", "chort", "olho"],
 }
 
 func _especie_aleatoria() -> String:

@@ -25,14 +25,28 @@ const GRAVIDADE := 1400.0
 @export var cor_rim := Color(0.95, 0.5, 0.72)
 ## Que monstro pixel-art usar (pack CC0 LuizMelo "Monsters Creatures
 ## Fantasy"). Pastas em `assets/sprites/pixel/enemies/<especie>/`.
-@export_enum("goblin", "mushroom", "esqueleto", "olho") var especie := "goblin"
+@export_enum("goblin", "mushroom", "esqueleto", "olho",
+	"imp", "chort", "orc", "xamane", "demonio_grande", "ogro",
+	"abobora", "wogol", "necromante", "lodo") var especie := "goblin"
 
-## Frames por animação de cada espécie (tiras horizontais de 150x150).
+## Frames por animação de cada espécie. luizmelo (goblin/mushroom/esqueleto/
+## olho) = tiras 150x150. Os restantes vêm do 0x72 DungeonTileset II (CC0),
+## extraídos por `tools/extrair_monstros_0x72.gd` (4 frames por anim).
 const ESPECIES := {
 	"goblin":    {"idle": 4, "run": 8, "hit": 4, "dead": 4},
 	"mushroom":  {"idle": 4, "run": 8, "hit": 4, "dead": 4},
 	"esqueleto": {"idle": 4, "run": 4, "hit": 4, "dead": 4},
 	"olho":      {"idle": 8, "run": 8, "hit": 4, "dead": 4},
+	"imp":            {"idle": 4, "run": 4, "hit": 4, "dead": 4},
+	"chort":          {"idle": 4, "run": 4, "hit": 4, "dead": 4},
+	"orc":            {"idle": 4, "run": 4, "hit": 4, "dead": 4},
+	"xamane":         {"idle": 4, "run": 4, "hit": 4, "dead": 4},
+	"demonio_grande": {"idle": 4, "run": 4, "hit": 4, "dead": 4},
+	"ogro":           {"idle": 4, "run": 4, "hit": 4, "dead": 4},
+	"abobora":        {"idle": 4, "run": 4, "hit": 4, "dead": 4},
+	"wogol":          {"idle": 4, "run": 4, "hit": 4, "dead": 4},
+	"necromante":     {"idle": 4, "run": 4, "hit": 4, "dead": 4},
+	"lodo":           {"idle": 4, "run": 4, "hit": 4, "dead": 4},
 }
 
 @onready var _origem := global_position
