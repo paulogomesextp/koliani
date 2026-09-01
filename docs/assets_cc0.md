@@ -108,3 +108,26 @@ Servem os chefes da campanha (`docs/niveis.md`). CC-BY = pôr "nome" em
    (encaixa em qualquer nível de tema Morte).
 4. **Ansimuz — Gothic Parallax Backgrounds** (itch, grátis) — fundos em
    camadas para pôr no `Atmosfera`.
+
+---
+
+## O que está em `incoming/` e AINDA NÃO foi usado (1 set 2026)
+
+Depois da Fase 3 e da troca de 6 chefes, sobra isto por aproveitar. Está
+tudo já em disco — não é preciso descarregar nada.
+
+| pack | o que tem | ideia de uso |
+|------|-----------|--------------|
+| **codemanu** (`*_spritesheet.png`) | 20 folhas de VFX 100x100 (weaponhit, magicspell, vortex, phantom, fire, protectioncircle…), **domínio público, sem crédito obrigatório** | vortex → `Portal`; magicspell → Kamehameha; protectioncircle → escudo do chefe; weaponhit → alternativa lisa ao anel do golpe |
+| **chierit — Frost Guardian** | golem de gelo 192x128, muito bom | falta um chefe que case (o Ghorak levou o mesmo golem recolorido); ver `docs/niveis.md` antes de escolher |
+| **free-game-assets** | 4 fundos + nuvens em camadas | céus alternativos (Torres / Cidade) |
+| **anokolisa — Legacy Fantasy High Forest** | tileset + fundo de floresta | região I, se o pântano cansar |
+| **zerie** (Tiny RPG 01/02) | Soldier, Orc, Demon_A, Blood Monster | **baixa resolução** (boneco de ~25 px dentro de 100x100) — fica blocado ao lado do resto; usar só se for de propósito |
+| **ninjikin / szadiart / glionox / piiixl (resto)** | props e tiles | preenchimento |
+| **bdragon1727** | efeitos 16x16 (já se usou o anel do impacto) | balas, brilhos, explosões pequenas |
+
+Ferramentas que já fazem este tipo de trabalho (copiar e adaptar a tabela lá
+de dentro, em vez de escrever tudo de novo):
+`tools/extrair_inimigos_pack.gd`, `tools/extrair_chefes_packs.gd`,
+`tools/extrair_efeitos.gd`, `tools/gerar_fundos_igreja.gd`,
+`tools/importar_rig_cavaleiro.gd`.
