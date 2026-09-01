@@ -498,18 +498,18 @@ func _f_poco(par: Node2D, x: float, y: float) -> Vector2:
 	return Vector2(x, cy)
 
 
-## Pilares: colunas MUITO altas a sair do líquido, com plataforma no cimo;
-## salta-se de topo em topo com o vazio lá em baixo.
+## Pilares: colunas altas (SÓ VISUAIS -- nunca colidem, senão cortavam o
+## caminho) com uma plataforma SÓLIDA no cimo; salta-se de topo em topo com
+## o vazio lá em baixo.
 func _f_pilares(par: Node2D, x: float, y: float) -> Vector2:
 	var n := 3 + _rng.randi() % 3
 	var cy := y
 	for i in n:
-		x += _rng.randf_range(150.0, 186.0)
+		x += _rng.randf_range(150.0, 184.0)
 		cy = clampf(cy - _rng.randf_range(-96.0, SUBIDA_MAX), _teto_y + 40.0, _chao_y - 150.0)
-		var alt: float = _chao_y - cy + 30.0
-		_plat(par, Vector2(x, cy + alt * 0.5), Vector2(30.0, alt))  # a coluna
-		_plat(par, Vector2(x, cy), Vector2(_rng.randf_range(64.0, 90.0), 16.0))  # o topo
-		if i > 0 and _rng.randf() < 0.28 + 0.4 * _dif:
+		_coluna_fundo(par, x)  # o "pilar" é só um sprite de fundo, não bloqueia
+		_plat(par, Vector2(x, cy), Vector2(_rng.randf_range(74.0, 100.0), 16.0))  # o topo (sólido)
+		if i > 0 and _rng.randf() < 0.24 + 0.36 * _dif:
 			_perigo_no_vao(par, x, cy)
 		if i % 2 == 0:
 			_checkpoint(x, cy)
