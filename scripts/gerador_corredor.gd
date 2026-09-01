@@ -596,11 +596,15 @@ func _f_espinhos(par: Node2D, x: float, y: float) -> Vector2:
 		sp.largura = 6
 		sp.position = Vector2(lx, by)
 		par.add_child(sp)
-	# calha ALTA -- plataformas limpas (o caminho justo)
+	# calha ALTA -- plataformas limpas (o caminho justo). Sobe em degraus
+	# que respeitam SUBIDA_MAX (o 1.º salto a partir da boca não pode ser
+	# mais que um salto+duplo) até uma altura de cruzeiro sobre os espinhos.
 	var hx := x
-	var hy: float = maxf(_teto_y + 40.0, cy - _rng.randf_range(150.0, 180.0))
+	var hy := cy
+	var hy_alvo: float = maxf(_teto_y + 40.0, cy - _rng.randf_range(150.0, 180.0))
 	for _i in n:
 		hx += _rng.randf_range(150.0, 176.0)
+		hy = maxf(hy_alvo, hy - SUBIDA_MAX)
 		_plat(par, Vector2(hx, hy), Vector2(84.0, 15.0))
 	# reencontro
 	var jx: float = maxf(lx, hx) + _rng.randf_range(150.0, 176.0)
