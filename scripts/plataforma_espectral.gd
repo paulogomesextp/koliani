@@ -51,7 +51,9 @@ func _process(dt: float) -> void:
 		return
 	var vis := get_node_or_null("Visual") as CanvasItem
 	if vis and _restante <= aviso:
-		vis.modulate.a = 0.35 + 0.55 * absf(sin(Time.get_ticks_msec() * 0.02))
+		var pulso := absf(sin(Time.get_ticks_msec() * 0.02))
+		var a := 0.35 + 0.55 * pulso
+		vis.modulate = Color(1, 1, 1, a).lerp(Color(1.0, 0.4, 0.12, a), 0.4 + 0.4 * pulso)
 
 
 func _ao_lancar_magia() -> void:

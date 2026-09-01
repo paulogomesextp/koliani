@@ -112,5 +112,12 @@ func _piscar_se_perto_da_troca() -> void:
 	var restante := _dur_solida() - _t_no_ciclo() if _solida_agora \
 		else _ciclo() - _t_no_ciclo()
 	if restante <= aviso:
+		var pulso := absf(sin(Time.get_ticks_msec() * 0.02))
 		var base := 1.0 if _solida_agora else 0.16
-		vis.modulate.a = base + 0.5 * absf(sin(Time.get_ticks_msec() * 0.02))
+		var a := base + 0.5 * pulso
+		# aviso QUENTE só quando está prestes a DESAPARECER debaixo dos pés
+		# (o perigo real -- ficar sólida não precisa de aviso).
+		vis.modulate = Color(1, 1, 1, a).lerp(Color(1.0, 0.4, 0.12, a), 0.4 + 0.4 * pulso) \
+			if _solida_agora else Color(1, 1, 1, a)
+	else:
+		vis.modulate = Color(1, 1, 1, vis.modulate.a)

@@ -9,7 +9,7 @@ extends StaticBody2D
 
 @export var tamanho := Vector2(90.0, 18.0) : set = _set_tamanho
 ## Segundos a estremecer antes de cair.
-@export var atraso := 0.45
+@export var atraso := 0.6
 ## Segundos até voltar a formar-se.
 @export var respawn := 2.6
 
@@ -93,8 +93,13 @@ func _process(dt: float) -> void:
 	match _estado:
 		TREME:
 			_t += dt
-			position = _base + Vector2(randf_range(-2.0, 2.0), randf_range(-1.0, 1.0))
+			var aviso := clampf(_t / atraso, 0.0, 1.0)
+			var trepidar := 1.0 + aviso * 2.0  # o abanão cresce -- lê-se "vai cair"
+			position = _base + Vector2(randf_range(-2.0, 2.0), randf_range(-1.0, 1.0)) * trepidar
+			if _vis:
+				_vis.color = Color(0.32, 0.29, 0.34).lerp(Color(0.95, 0.35, 0.12), aviso)
 			if _borda:
+				_borda.default_color = Color(0.5, 0.42, 0.5).lerp(Color(1.0, 0.5, 0.2), aviso)
 				_borda.default_color.a = 0.7 + 0.3 * sin(_t * 40.0)
 			if _t >= atraso:
 				_estado = IDA
@@ -115,6 +120,8 @@ func _process(dt: float) -> void:
 				position = _base
 				modulate.a = 1.0
 				visible = true
+				if _vis:
+					_vis.color = Color(0.32, 0.29, 0.34)
 				if _borda:
-					_borda.default_color.a = 0.7
+					_borda.default_color = Color(0.5, 0.42, 0.5, 0.7)
 				_col.set_deferred("disabled", false)

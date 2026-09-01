@@ -53,10 +53,11 @@ const BORDA_MANTLE := Vector2(150.0, -430.0)  # impulso ao subir para a platafor
 const DUR_ATAQUE := 0.18
 const I_FRAMES := 0.6
 ## Ressalto ao cair em cima de um inimigo (Mario-style): o pulo automático a
-## seguir ao "pisão". `STOMP_RESSALTO` é o pulo normal; se estiver a segurar
-## o botão de saltar no momento do impacto, dá o pulo alto (encadear pisões).
-const STOMP_RESSALTO := 520.0
-const STOMP_RESSALTO_ALTO := 680.0
+## seguir ao "pisão" é sempre um SALTO NORMAL (mesma força de `saltar`),
+## partindo da altura a que o golpe acertou -- previsível, encadeia saltos
+## de ar (ver `_mov.saltos_dados = 0` a seguir) sem dar mais altura que um
+## salto a sério.
+const STOMP_RESSALTO := Movimento.FORCA_SALTO
 ## Defesa (habilidade "escudo"): anda-se devagar de escudo erguido; um
 ## ataque que venha de frente é bloqueado (sem dano) com um som subtil.
 const VEL_DEFESA := 70.0
@@ -613,8 +614,7 @@ func _physics_process(dt: float) -> void:
 			if global_position.y > ep.y + 6.0 or pes < ep.y - 52.0 or pes > ep.y + 30.0:
 				continue
 			e.receber_dano(_dano_golpe(), 0.0)
-			var alto := Input.is_action_pressed("saltar")
-			velocity.y = -(STOMP_RESSALTO_ALTO if alto else STOMP_RESSALTO)
+			velocity.y = -STOMP_RESSALTO
 			_mov.saltos_dados = 0  # o ressalto devolve os saltos de ar todos
 			_invulneravel = maxf(_invulneravel, 0.3)
 			_stomp_cd = 0.22
@@ -639,7 +639,7 @@ func _physics_process(dt: float) -> void:
 		rq.exclude = [self]
 		var ph := esp.intersect_ray(rq)
 		if not ph.is_empty() and (ph["collider"] as Node).is_in_group("pogavel"):
-			velocity.y = -(STOMP_RESSALTO_ALTO if Input.is_action_pressed("saltar") else STOMP_RESSALTO)
+			velocity.y = -STOMP_RESSALTO
 			_mov.saltos_dados = 0
 			_invulneravel = maxf(_invulneravel, 0.35)
 			_stomp_cd = 0.22
