@@ -25,6 +25,11 @@ o kit todo (FLYMODE na tecla F):
 | **um monstro "cara" por nível** | percorrer 2-3 níveis seguidos | dá mesmo a sensação de que cada nível tem o seu bicho? |
 | **3 chefes com sprites novos** | 7 Ignivar · 17 Colosso Ósseo · 24 Bispo Púrpura · 27 Koliani Sombria | tamanho face à Koliani, se as 4 poses (normal / dano / núcleo à mostra) se leem |
 
+**Atalho para ver tudo de uma vez**: a sala de treino
+`scenes/levels/Level_Test.tscn` (F6 no editor) tem agora um de cada monstro
+novo, o escudeiro e o cuspidor, espinhos para o pogo, uma serra, a fogueira
+do checkpoint e a porta -- sem ter de percorrer a jornada.
+
 Screenshots sem jogar:
 
 - `tools/shot_dev_nivel.gd` — vários PNG ao longo da jornada de UM nível
