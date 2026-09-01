@@ -25,6 +25,21 @@ até ao N30.
 - Testes headless verdes; smoke a 4 níveis (N1/N11/N20/N25) OK. **Falta
   playtestar com o jogo a correr e afinar os números.**
 
+Feedback seguinte do Paulo (mesma sessão):
+
+- **Trampolins não funcionavam** (`trampolim.gd` + `koliani.gd`): o
+  `Trampolim` mexia em `k.velocity.y` a partir de `body_entered`, mas o
+  `Movimento.passo()` reescreve `velocity` do `_mov.velocidade` interno a
+  cada frame → o impulso morria e a Koliani ficava pousada. Novo
+  `Koliani.aplicar_impulso()` sincroniza os dois. E o `Trampolim` deixou
+  de usar `body_entered` (só dispara à entrada) — passa a sondar
+  `get_overlapping_bodies()` em `_physics_process`, por isso também salta
+  quem lá anda por cima ou lá fica.
+- **Checkpoints a menos** (`gerador_corredor.gd`): havia 20–40 por nível
+  (um a cada ~2 plataformas). `_checkpoint()` agora só cria se estiver a
+  ≥ `DIST_CHECKPOINT` (4000 px) do anterior; início e pré-chefe são
+  `forcar=true`. Resultado ~3 (níveis curtos) a ~10 (N30) — ~90% menos.
+
 ## Sessão 2026-08-31 (cont. 3) — JORNADA 3.0: chão MORTAL + assets
 
 Feedback do Paulo: (1) os níveis tinham quase todos uma plataforma
