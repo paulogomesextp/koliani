@@ -61,11 +61,15 @@ func _checa(idx: int, raiz: Node) -> int:
 	var mau := []
 	if alvo_x != INF and kx > alvo_x - 3000.0:
 		mau.append("Koliani a x=%.0f, perto de mais do alvo x=%.0f" % [kx, alvo_x])
-	if checks < 6:
-		mau.append("so' %d checkpoints" % checks)
-	var dist := (alvo_x - kx) if alvo_x != INF else 0.0
+	# checkpoints: desde a reducao de 1 set 2026 (`DIST_CHECKPOINT` 4000 px +
+	# inicio/pre-chefe forcados) sao poucos de proposito -- ~3 nos niveis
+	# curtos a ~15 no N30. Esperado ~ 2 + jornada/4000, com folga.
+	var dist_j := (alvo_x - kx) if alvo_x != INF else 0.0
+	var min_checks: int = maxi(3, int(dist_j / 6000.0) + 1)
+	if checks < min_checks:
+		mau.append("so' %d checkpoints (esperava >= %d p/ %.0fpx)" % [checks, min_checks, dist_j])
 	var linha := "  [%2d] %-26s  koliani_x=%.0f  alvo_x=%.0f  jornada=%.0fpx  checks=%d" % [
-		idx, raiz.name, kx, alvo_x, dist, checks]
+		idx, raiz.name, kx, alvo_x, dist_j, checks]
 	if mau.is_empty():
 		print(linha + "  OK")
 		return 0
