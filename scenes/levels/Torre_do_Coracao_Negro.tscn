@@ -46,9 +46,9 @@ bioma = "castelo"
 largura_nivel = 2200.0
 luzes_horizonte = false
 fundo_pack = "corredores"
-tinta_fundo = Color(0.92, 0.66, 1.12, 1)
-neblina_fundo = 0.36
-dessaturar_fundo = 0.44
+tinta_fundo = Color(1.1, 0.72, 1.1, 1)
+neblina_fundo = 0.34
+dessaturar_fundo = 0.66
 
 [node name="ChaoBase" parent="." instance=ExtResource("9_pl")]
 position = Vector2(440, 660)
