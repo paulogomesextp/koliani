@@ -91,6 +91,12 @@ var _esp := "goblin"
 var _rng := RandomNumberGenerator.new()
 var _cont_i := 0
 
+## Espaço mínimo (px) entre checkpoints da jornada. Antes havia um a cada
+## ~2 plataformas (~380 px) -- eram MUITOS. Passa a haver um a cada ~4000 px
+## (~90% menos); o do início e o de antes do chefe são sempre postos.
+const DIST_CHECKPOINT := 4000.0
+var _ultimo_check_x := -1.0e9
+
 
 func _ready() -> void:
 	call_deferred("_construir")
@@ -155,7 +161,7 @@ func _construir() -> void:
 			kol.velocity = Vector2.ZERO
 		kol.set("_pos_inicial", inicio)
 		EstadoJogo.definir_checkpoint(inicio)
-	_checkpoint(x + 40.0, y)
+	_checkpoint(x + 40.0, y, true)
 	x += 240.0
 
 	var passos := 0
@@ -213,7 +219,7 @@ func _construir() -> void:
 	passar.position = Vector2((x + ancora.x + 200.0) * 0.5, yf + 30.0)
 	passar.tamanho = Vector2(ancora.x + 400.0 - x + 200.0, 44.0)
 	passar.altura_visual = 110.0
-	_checkpoint(x + 60.0, yf)
+	_checkpoint(x + 60.0, yf, true)  # sempre um antes do chefe
 	_inimigo_em(par, Vector2(x + 240.0, yf - 30.0))
 
 
@@ -354,7 +360,11 @@ func _especie_aleatoria() -> String:
 	return _esp if _rng.randf() < 0.35 else lista[_rng.randi() % lista.size()]
 
 
-func _checkpoint(x: float, y: float) -> void:
+## `forcar` ignora o espaçamento mínimo (início da jornada e antes do chefe).
+func _checkpoint(x: float, y: float, forcar := false) -> void:
+	if not forcar and absf(x - _ultimo_check_x) < DIST_CHECKPOINT:
+		return
+	_ultimo_check_x = x
 	var ck := Area2D.new()
 	ck.name = "JornadaCheck_%d" % roundi(x)
 	ck.collision_layer = 16
