@@ -61,6 +61,9 @@ entrada/saída declaradas em altura, regra de ouro `SUBIDA_MAX`).
   a correr/rolar, não a saltar. (~12%, acto 2, dif > 0.28)
 - [x] **`_f_cripta`** — sala com parede interior baixa (saltar por cima ou
   rota alta) + pedras que caem + checkpoint. (~8%, 16% na região Catacumbas)
+- [x] **`_f_crossfire`** — lanço recto com torretas montadas nos dois lados
+  a cuspir fogo horizontal a alturas alternadas; leitura de padrão, não
+  salto difícil. Pool das regiões Prisão/Cidade/Castelo, `TIER` 0.4.
 - [ ] mais "tons" de peça: alcove-segredo / atalho
 - [ ] atalhos: 1-2 `Portal` "de retorno" por jornada (teletransporte)
 - [ ] (talvez) mover as peças mais estáveis para `scenes/rooms/*.tscn`

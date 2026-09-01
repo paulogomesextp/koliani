@@ -1,5 +1,26 @@
 # Progresso do agente `gaming` — campanha dos 30 níveis
 
+## Sessão 2026-09-01 (noite, autónoma) — câmara "fogo cruzado"
+
+Continuação da reformulação Dead Cells (Fase 2, variedade de câmaras) sem
+o Paulo à frente. Ecrãs desligados durante a sessão.
+
+- **`_f_crossfire`** (`gerador_corredor.gd`): novo "tom" de câmara. Lanço
+  recto de plataformas pouco onduladas com uma `Torreta` por passo,
+  alternando de lado (esq/dir), a cuspir `BolaFogo` na horizontal a
+  alturas ligeiramente acima/abaixo da linha de salto → o feixe cruza o
+  caminho. É leitura de padrão / timing dos tiros, não plataforma difícil.
+  `intervalo`/`telegrafo`/`dano`/`vel_bola` escalam com `_dif`. Saída
+  sólida limpa + checkpoints a cada 2 passos. Marca `_pos_intenso` (entra
+  um `_f_descanso` a seguir).
+- Entrou nas pools das regiões **Prisão (1)**, **Cidade (4)** e
+  **Castelo (5)**; `TIER_FLAVOUR["crossfire"] = 0.4` (só do ~Nível 13 em
+  diante, na prática só se vê em Cidade/Castelo).
+- Testes headless verdes; smoke a 5 níveis (Vila/Praça do Eclipse/Portões
+  de Zeriko/Prisão/Floresta) sem erros de script. **Falta playtestar o
+  feel** (ritmo dos tiros, se o fogo cruzado lê bem, dano).
+- Entrega **v0.8.7**.
+
 ## Sessão 2026-09-01 — curva de dificuldade + pisão
 
 Pedido do Paulo: (1) pisar inimigos = dano de espada + pulo automático;

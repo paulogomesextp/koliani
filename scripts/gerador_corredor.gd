@@ -64,11 +64,11 @@ const LIQUIDO := {
 ## Tipos de "flavour" de câmara (o que se semeia à volta da espinha).
 const POOL_REGIAO := {
 	0: ["saltos", "serras", "pendulos", "ritmo", "trampolim", "gruta", "portal"],
-	1: ["saltos", "correntes", "elevador", "quebra", "guilhotinas", "serras", "portal"],
+	1: ["saltos", "correntes", "elevador", "quebra", "guilhotinas", "serras", "portal", "crossfire"],
 	2: ["vento", "saltos", "gravidade", "pendulos", "trampolim", "ritmo", "portal"],
 	3: ["gruta", "pedras", "elevador", "quebra", "guilhotinas", "pendulos", "portal"],
-	4: ["saltos", "impulso", "serras", "fogo", "trampolim", "guilhotinas", "portal"],
-	5: ["pendulos", "fogo", "guilhotinas", "ritmo", "quebra", "gravidade", "portal"],
+	4: ["saltos", "impulso", "serras", "fogo", "trampolim", "guilhotinas", "portal", "crossfire"],
+	5: ["pendulos", "fogo", "guilhotinas", "ritmo", "quebra", "gravidade", "portal", "crossfire"],
 }
 
 ## `_dif` mínimo para cada tipo de câmara entrar na pool. Assim o Nível 1
@@ -79,6 +79,7 @@ const TIER_FLAVOUR := {
 	"ritmo": 0.12, "portal": 0.12, "correntes": 0.16, "elevador": 0.18,
 	"gravidade": 0.34, "serras": 0.36, "vento": 0.42, "pendulos": 0.46,
 	"impulso": 0.5, "guilhotinas": 0.58, "quebra": 0.62, "fogo": 0.66,
+	"crossfire": 0.4,
 }
 ## Fallback quando a região ainda não libertou nada (níveis muito baixos).
 const FLAVOUR_SUAVE := ["saltos", "gruta", "trampolim"]
@@ -297,7 +298,7 @@ func _construir() -> void:
 				f = pool[_rng.randi() % pool.size()]
 				if f == ant_flavour:
 					f = pool[(_rng.randi() + 1) % pool.size()]
-				_pos_intenso = f in ["guilhotinas", "serras", "pendulos", "fogo", "quebra"]
+				_pos_intenso = f in ["guilhotinas", "serras", "pendulos", "fogo", "quebra", "crossfire"]
 			ant_flavour = f
 			var res := _flavour(par, f, x, y)
 			x = res.x
@@ -526,7 +527,45 @@ func _flavour(par: Node2D, tipo: String, x: float, y: float) -> Vector2:
 		"arena": return _f_arena(par, x, y)
 		"corredor": return _f_corredor(par, x, y)
 		"cripta": return _f_cripta(par, x, y)
+		"crossfire": return _f_crossfire(par, x, y)
 	return Vector2(x + 180.0, y)
+
+
+## FOGO CRUZADO: lanço recto de plataformas com torretas montadas em ambos
+## os lados a cuspir fogo horizontal ATRAVÉS do caminho, a alturas
+## alternadas. Passa-se salto a salto no intervalo dos tiros -- é leitura de
+## padrão, não plataforma difícil. Ritmo Dead Cells: pressão à distância.
+func _f_crossfire(par: Node2D, x: float, y: float) -> Vector2:
+	var cy: float = clampf(y, _teto_y + 160.0, _chao_y - 150.0)
+	var n := 4 + int(_dif * 3.0)
+	var x_ini := x
+	for i in n:
+		x += _rng.randf_range(150.0, 178.0)
+		# a espinha desta câmara ondula pouco (o desafio é o fogo, não o salto)
+		cy = clampf(cy + _rng.randf_range(-26.0, 26.0), _teto_y + 150.0, _chao_y - 130.0)
+		_plat(par, Vector2(x, cy), Vector2(84.0, 16.0))
+		# uma torreta por passo, a alternar de lado; dispara na horizontal,
+		# a uma altura ligeiramente acima/abaixo da plataforma -> o feixe
+		# cruza a linha de salto.
+		var esq := i % 2 == 0
+		var tr := TORRETA.instantiate()
+		tr.direcao = Vector2(1.0 if esq else -1.0, 0.0)
+		tr.intervalo = 2.7 - 0.8 * _dif
+		tr.telegrafo = 0.6 - 0.18 * _dif
+		tr.dano = 6 + int(16.0 * _dif)
+		tr.vel_bola = 210.0 + 70.0 * _dif
+		tr.fase = 0.5 * float(i)
+		tr.position = Vector2(x + (-118.0 if esq else 118.0),
+			cy - 30.0 + (18.0 if i % 4 < 2 else -34.0))
+		par.add_child(tr)
+		if i % 2 == 0:
+			_checkpoint(x, cy)
+	# saída sólida e limpa (para não cair logo a seguir ao último feixe)
+	x += _rng.randf_range(150.0, 180.0)
+	_plat(par, Vector2(x, cy), Vector2(104.0, 18.0))
+	_checkpoint(x, cy)
+	_coluna_fundo(par, (x_ini + x) * 0.5)
+	return Vector2(x, cy)
 
 
 ## CRIPTA: sala fechada com uma parede interior baixa a saltar por cima (ou
