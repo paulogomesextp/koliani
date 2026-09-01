@@ -112,7 +112,7 @@ position = Vector2(850, 486)
 alcance_patrulha = 140.0
 
 [node name="Demonio2" parent="." instance=ExtResource("2_dem")]
-especie = "goblin"
+especie = "xamane"
 position = Vector2(1800, 520)
 alcance_patrulha = 120.0
 

@@ -103,22 +103,22 @@ scale = Vector2(2.6, 1.5)
 position = Vector2(240, 560)
 
 [node name="Morcego1" parent="." instance=ExtResource("2_dem")]
-especie = "olho"
+especie = "abutre"
 position = Vector2(900, 480)
 alcance_patrulha = 200.0
 
 [node name="Morcego2" parent="." instance=ExtResource("2_dem")]
-especie = "olho"
+especie = "abutre"
 position = Vector2(1960, 470)
 alcance_patrulha = 220.0
 
 [node name="Saltador1" parent="." instance=ExtResource("2_dem")]
-especie = "goblin"
+especie = "mastim"
 position = Vector2(1080, 604)
 alcance_patrulha = 180.0
 
 [node name="Saltador2" parent="." instance=ExtResource("2_dem")]
-especie = "goblin"
+especie = "orc"
 position = Vector2(2120, 604)
 alcance_patrulha = 200.0
 

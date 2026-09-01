@@ -111,22 +111,22 @@ scale = Vector2(2.6, 1.5)
 position = Vector2(150, 560)
 
 [node name="Cav1" parent="." instance=ExtResource("2_dem")]
-especie = "esqueleto"
+especie = "demonio_grande"
 position = Vector2(560, 604)
 alcance_patrulha = 200.0
 
 [node name="Cav2" parent="." instance=ExtResource("2_dem")]
-especie = "esqueleto"
+especie = "ogro"
 position = Vector2(1560, 604)
 alcance_patrulha = 180.0
 
 [node name="Cav3" parent="." instance=ExtResource("2_dem")]
-especie = "esqueleto"
+especie = "chort"
 position = Vector2(1720, 604)
 alcance_patrulha = 180.0
 
 [node name="Cav4" parent="." instance=ExtResource("2_dem")]
-especie = "esqueleto"
+especie = "raptor"
 position = Vector2(2860, 604)
 alcance_patrulha = 240.0
 

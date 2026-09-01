@@ -40,6 +40,14 @@ A personagem principal (Koliani) é original do projeto
   wall_banner_red/blue, floor_ladder) — o `gerador_corredor.gd` espalha-os
   pelas plataformas e no fundo da jornada.
 
+## Ansimuz — "Enemies Pack"
+- https://ansimuz.itch.io/ · licença pública do pack (ver
+  `incoming/enemies-pack/.../public-license.pdf`)
+- Uso: 5 inimigos novos em `assets/sprites/pixel/enemies/{besouro,raptor,`
+  `mastim,gosma,abutre}/`, extraídos por `tools/extrair_inimigos_pack.gd`
+  (o pack só traz walk/idle: o `hit` reaproveita o idle e o `dead` é gerado,
+  o bicho achata-se e desvanece). O `abutre` voa, como o `olho`.
+
 ## LuizMelo — "Monsters Creatures Fantasy"
 - https://luizmelo.itch.io/monsters-creatures-fantasy
 - Licença: CC0 1.0

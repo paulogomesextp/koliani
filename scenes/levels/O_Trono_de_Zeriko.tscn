@@ -107,12 +107,12 @@ scale = Vector2(1.9, 1.1)
 position = Vector2(150, 560)
 
 [node name="Demonio1" parent="." instance=ExtResource("2_dem")]
-especie = "esqueleto"
+especie = "demonio_grande"
 position = Vector2(560, 604)
 alcance_patrulha = 200.0
 
 [node name="Demonio2" parent="." instance=ExtResource("2_dem")]
-especie = "esqueleto"
+especie = "ogro"
 position = Vector2(1360, 520)
 alcance_patrulha = 120.0
 

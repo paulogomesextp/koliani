@@ -58,7 +58,8 @@ var _dive_dir := Vector2.ZERO
 ## Fantasy"). Pastas em `assets/sprites/pixel/enemies/<especie>/`.
 @export_enum("goblin", "mushroom", "esqueleto", "olho",
 	"imp", "chort", "orc", "xamane", "demonio_grande", "ogro",
-	"abobora", "wogol", "necromante", "lodo") var especie := "goblin"
+	"abobora", "wogol", "necromante", "lodo",
+	"besouro", "raptor", "mastim", "gosma", "abutre") var especie := "goblin"
 
 ## Frames por animação de cada espécie. luizmelo (goblin/mushroom/esqueleto/
 ## olho) = tiras 150x150. Os restantes vêm do 0x72 DungeonTileset II (CC0),
@@ -78,6 +79,13 @@ const ESPECIES := {
 	"wogol":          {"idle": 4, "run": 4, "hit": 4, "dead": 4},
 	"necromante":     {"idle": 4, "run": 4, "hit": 4, "dead": 4},
 	"lodo":           {"idle": 4, "run": 4, "hit": 4, "dead": 4},
+	# pack CC0 ansimuz "Enemies Pack" (tools/extrair_inimigos_pack.gd). O
+	# `hit` é o idle (o pisca do dano é do shader) e o `dead` é gerado.
+	"besouro":        {"idle": 4, "run": 4, "hit": 4, "dead": 4},
+	"raptor":         {"idle": 4, "run": 7, "hit": 4, "dead": 4},
+	"mastim":         {"idle": 6, "run": 4, "hit": 6, "dead": 4},
+	"gosma":          {"idle": 8, "run": 7, "hit": 8, "dead": 4},
+	"abutre":         {"idle": 4, "run": 4, "hit": 4, "dead": 4},
 }
 
 @onready var _origem := global_position
@@ -151,7 +159,7 @@ func _ready() -> void:
 
 
 ## Espécies que voam -- não se alinham os pés ao chão.
-const ESPECIES_VOAM := ["olho"]
+const ESPECIES_VOAM := ["olho", "abutre"]
 
 ## Alinha os PÉS do sprite com a linha de chão da colisão. Mede os pixels
 ## opacos do frame idle (há muito espaço transparente à volta do bicho na

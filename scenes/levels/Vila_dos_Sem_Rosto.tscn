@@ -103,33 +103,33 @@ scale = Vector2(2.6, 1.5)
 position = Vector2(150, 560)
 
 [node name="Aldeao1" parent="." instance=ExtResource("2_dem")]
-especie = "goblin"
+especie = "abobora"
 position = Vector2(620, 604)
 dormente = true
 raio_acorda = 150.0
 alcance_patrulha = 160.0
 
 [node name="Aldeao2" parent="." instance=ExtResource("2_dem")]
-especie = "goblin"
+especie = "orc"
 position = Vector2(1300, 604)
 dormente = true
 raio_acorda = 140.0
 alcance_patrulha = 160.0
 
 [node name="Aldeao3" parent="." instance=ExtResource("2_dem")]
-especie = "mushroom"
+especie = "xamane"
 position = Vector2(1700, 604)
 dormente = true
 raio_acorda = 150.0
 alcance_patrulha = 160.0
 
 [node name="Demonio1" parent="." instance=ExtResource("2_dem")]
-especie = "goblin"
+especie = "raptor"
 position = Vector2(1900, 604)
 alcance_patrulha = 200.0
 
 [node name="Demonio2" parent="." instance=ExtResource("2_dem")]
-especie = "goblin"
+especie = "mastim"
 position = Vector2(2760, 604)
 alcance_patrulha = 240.0
 

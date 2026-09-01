@@ -481,9 +481,9 @@ func _inimigo_em(par: Node2D, pos: Vector2) -> void:
 	d.alcance_patrulha = _rng.randf_range(40.0, 90.0)
 	# comportamento próprio -- cada bicho uma ameaça (pegada Dead Cells)
 	var r := _rng.randf()
-	if d.especie == "olho":
+	if d.especie == "olho" or d.especie == "abutre":
 		if _dif > 0.08 and r < 0.7:
-			d.comportamento = "voador"   # o olho voa e mergulha
+			d.comportamento = "voador"   # o olho e o abutre voam e mergulham
 	elif _dif > 0.15 and r < 0.18 + 0.26 * _dif:
 		var opcoes := ["saltador", "carga"]
 		if _dif > 0.22:
@@ -500,17 +500,34 @@ func _inimigo_em(par: Node2D, pos: Vector2) -> void:
 
 
 const ESP_REGIAO := {
-	0: ["goblin", "mushroom", "lodo", "imp"],
-	1: ["esqueleto", "chort", "orc", "imp"],
-	2: ["olho", "xamane", "wogol", "imp"],
-	3: ["esqueleto", "necromante", "chort", "ogro"],
-	4: ["orc", "abobora", "xamane", "goblin"],
-	5: ["demonio_grande", "ogro", "chort", "olho"],
+	0: ["goblin", "mushroom", "lodo", "besouro", "gosma"],
+	1: ["esqueleto", "chort", "orc", "imp", "mastim"],
+	2: ["xamane", "wogol", "olho", "abutre", "imp"],
+	3: ["esqueleto", "necromante", "chort", "ogro", "gosma"],
+	4: ["orc", "abobora", "xamane", "raptor", "mastim"],
+	5: ["demonio_grande", "ogro", "chort", "olho", "raptor"],
 }
 
+## A "cara" de cada NÍVEL (pedido do Paulo: não repetir o mesmo monstro em
+## todos os níveis). Dentro de uma região não há assinaturas repetidas, e as
+## 19 espécies aparecem todas ao longo da campanha. É o bicho que mais se vê
+## na jornada desse nível; o resto vem da pool da região.
+const ESP_ASSINATURA := [
+	"goblin", "mushroom", "besouro", "gosma", "lodo",              # I  Floresta
+	"esqueleto", "imp", "chort", "mastim", "orc",                  # II Prisão
+	"xamane", "abutre", "olho", "wogol", "imp",                    # III Torres
+	"necromante", "esqueleto", "gosma", "wogol", "ogro",           # IV Catacumbas
+	"abobora", "orc", "mastim", "raptor", "xamane",                # V  Cidade
+	"demonio_grande", "chort", "raptor", "ogro", "olho",           # VI Castelo
+]
+
+
 func _especie_aleatoria() -> String:
-	var lista: Array = ESP_REGIAO.get(_regiao, [_esp])
-	return _esp if _rng.randf() < 0.35 else lista[_rng.randi() % lista.size()]
+	var assinatura: String = ESP_ASSINATURA[clampi(_idx, 0, ESP_ASSINATURA.size() - 1)]
+	if _rng.randf() < 0.45:
+		return assinatura
+	var lista: Array = ESP_REGIAO.get(_regiao, [assinatura])
+	return lista[_rng.randi() % lista.size()]
 
 
 ## `forcar` ignora o espaçamento mínimo (início da jornada e antes do chefe).
