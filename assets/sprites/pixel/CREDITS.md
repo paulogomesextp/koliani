@@ -61,6 +61,19 @@ A personagem principal (Koliani) é original do projeto
 
 CC0 não exige atribuição; fica aqui à mesma por cortesia.
 
+## @Jump_Button — "Knight_player 1.4"  ← RIG ACTUAL DA KOLIANI
+- Pack do autor @Jump_Button (Twitter). Frames de 100x64, uma tira por
+  animação. **Licença (Read_me.txt do pack)**: uso pessoal e comercial
+  permitido, **crédito OBRIGATÓRIO no uso comercial**; não revender nem
+  reproduzir a imagem para lucro; o autor proíbe expressamente usar a arte
+  para treino de IA/ML, NFT ou blockchain. Não é CC0 — o Paulo tem de
+  confirmar que aceita estes termos antes de publicar o jogo.
+- Uso: `assets/sprites/pixel/koliani_cavaleiro/` (15 estados: idle, run,
+  jump, fall, attack, crouch, wallslide, djump, roll, dash, hurt, defesa,
+  borda, aterrar, morte), importado e recolorido para a paleta da Koliani
+  (vermelhos -> magenta, metal -> violeta frio) por
+  `tools/importar_rig_cavaleiro.gd`. Ligado por `koliani.gd::RIG`.
+
 ## thewisehedgehog — pack de armas pixel-art
 - https://thewisehedgehog.itch.io/  (URL exato + licença POR CONFIRMAR pelo Paulo em incoming/LICENSES.md)
 - Uso: as 15 lâminas que a Koliani segura (`assets/sprites/pixel/gear/armas.png`,

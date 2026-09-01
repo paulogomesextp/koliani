@@ -103,6 +103,10 @@ var _rolar_restante := 0.0
 var _rolar_recarga := 0.0
 var _ataque_restante := 0.0
 var _invulneravel := 0.0
+## Contadores só visuais (o rig "cavaleiro" tem desenho para eles).
+var _hurt_t := 0.0
+var _aterrar_t := 0.0
+var _no_ar_antes := false
 var _stomp_cd := 0.0
 var _estava_no_chao := true
 var _defendendo := false
@@ -183,12 +187,17 @@ func _ready() -> void:
 	EstadoJogo.equipamento_mudou.connect(func(_t: String, _i: String) -> void: _aplicar_equipamento())
 
 
-## Rig do sprite: "codigo" = tiras geradas por `tools/gerar_sprites.gd`
-## (a Koliani atual, roxa e on-model). "gothic" = rig Ansimuz "Gothicvania
-## Church" (CC0) recolorido, em `koliani_gothic/` -- experiência da fase 4,
-## DESLIGADA a pedido do Paulo (ficou escura/pequena; fica na gaveta,
-## reativa-se pondo "gothic" + `tools/importar_rig_koliani.py`).
-const RIG := "codigo"
+## Rig do sprite:
+##   "cavaleiro" -- pack "Knight_player 1.4" (@Jump_Button), graduado para a
+##      paleta da Koliani por `tools/importar_rig_cavaleiro.gd`. É o rig ATUAL
+##      (pedido do Paulo, 1 set 2026): cavaleira de faixa na testa, armadura,
+##      espada e escudo, com animações a sério para TODOS os estados (rolar,
+##      dash, dano, defesa, borda, aterrar, morte).
+##   "codigo" -- tiras geradas por `tools/gerar_sprites.gd` (a Koliani roxa
+##      desenhada por código; fica como alternativa).
+##   "gothic" -- rig Ansimuz "Gothicvania Church", experiência da fase 4
+##      DESLIGADA a pedido do Paulo (ficou escura/pequena).
+const RIG := "cavaleiro"
 
 ## [n_frames, fps, loop] por estado. Cada tira é horizontal, virada à direita.
 const _KOLI_ANIMS := {
@@ -213,12 +222,53 @@ const _KOLI_ANIMS_GOTHIC := {
 	"djump":     [2, 12.0, false],
 }
 
+## Rig "cavaleiro": frames de 100x64. Os estados a mais (roll/dash/hurt/
+## defesa/borda/aterrar/morte) só existem neste rig -- o `_atualizar_anim`
+## pergunta sempre `has_animation` antes de os usar.
+const _KOLI_ANIMS_CAVALEIRO := {
+	"idle":      [4, 6.0, true],
+	"run":       [7, 12.0, true],
+	"jump":      [6, 14.0, false],
+	"fall":      [3, 8.0, true],
+	"attack":    [6, 24.0, false],
+	"crouch":    [3, 6.0, true],
+	"wallslide": [2, 8.0, true],
+	"djump":     [10, 24.0, false],
+	"roll":      [10, 26.0, false],
+	"dash":      [4, 18.0, false],
+	"hurt":      [4, 16.0, false],
+	"defesa":    [4, 6.0, true],
+	"borda":     [3, 6.0, true],
+	"aterrar":   [4, 20.0, false],
+	"morte":     [5, 9.0, false],
+}
+## Escala/desvio do rig "cavaleiro": o frame tem 64 px de alto com os pés na
+## base, e o corpo da Koliani mede 44 px (ver `RectangleShape2D_body`).
+const CAV_ESCALA := 0.8
+const CAV_OFFSET_Y := -2.0
+
+
 func _montar_frames() -> void:
 	if _corpo.sprite_frames != null:
 		return
 	var gothic := RIG == "gothic"
-	var anims: Dictionary = _KOLI_ANIMS_GOTHIC if gothic else _KOLI_ANIMS
-	var dir_tiras := "koliani_gothic" if gothic else "koliani"
+	var cavaleiro := RIG == "cavaleiro"
+	var anims: Dictionary = _KOLI_ANIMS
+	var dir_tiras := "koliani"
+	if gothic:
+		anims = _KOLI_ANIMS_GOTHIC
+		dir_tiras = "koliani_gothic"
+	elif cavaleiro:
+		anims = _KOLI_ANIMS_CAVALEIRO
+		dir_tiras = "koliani_cavaleiro"
+	if cavaleiro:
+		_corpo.scale = Vector2(CAV_ESCALA, CAV_ESCALA)
+		_corpo.offset = Vector2(0.0, CAV_OFFSET_Y)
+		if _armadura:
+			_armadura.visible = false  # o rig já traz armadura
+		# a espada e o escudo já estão desenhados nos frames
+		if _luz_lamina:
+			_luz_lamina.enabled = false
 	if gothic:
 		_corpo.scale = Vector2(1.05, 1.05)
 		_corpo.offset = Vector2(0.0, 4.0)  # baixa o sprite -> pés no chão
@@ -255,7 +305,8 @@ func _montar_frames() -> void:
 func _aplicar_equipamento() -> void:
 	if _arma:
 		var wi := Equipamento.indice_arma(EstadoJogo.arma_equipada)
-		_arma.visible = wi >= 0 and RIG != "gothic"  # o rig já empunha a lâmina
+		# nos rigs prontos a lâmina já está desenhada no frame
+		_arma.visible = wi >= 0 and RIG == "codigo"
 		if wi >= 0:
 			_arma.frame = wi
 	if _luz_lamina:
@@ -272,8 +323,8 @@ func _aplicar_equipamento() -> void:
 func _aplicar_visual_armadura() -> void:
 	if _armadura == null:
 		return
-	if RIG == "gothic":
-		_armadura.visible = false  # o rig já traz roupa própria
+	if RIG != "codigo":
+		_armadura.visible = false  # os rigs prontos já trazem roupa própria
 		return
 	var ai := Equipamento.indice_armadura(EstadoJogo.armadura_equipada)
 	_armadura.visible = ai >= 0
@@ -304,6 +355,15 @@ func _physics_process(dt: float) -> void:
 	_dash_recarga = maxf(0.0, _dash_recarga - dt)
 	_rolar_recarga = maxf(0.0, _rolar_recarga - dt)
 	_invulneravel = maxf(0.0, _invulneravel - dt)
+	_hurt_t = maxf(0.0, _hurt_t - dt)
+	_aterrar_t = maxf(0.0, _aterrar_t - dt)
+	# aterragem: só depois de ter estado mesmo no ar
+	if is_on_floor():
+		if _no_ar_antes:
+			_aterrar_t = 0.16
+		_no_ar_antes = false
+	elif velocity.y > 120.0:
+		_no_ar_antes = true
 	_lancar_restante = maxf(0.0, _lancar_restante - dt)
 	_kame_recarga = maxf(0.0, _kame_recarga - dt)
 	_preso = maxf(0.0, _preso - dt)
@@ -653,11 +713,24 @@ func _process(dt: float) -> void:
 func _atualizar_anim() -> void:
 	if _corpo == null or _corpo.sprite_frames == null:
 		return
+	var sf := _corpo.sprite_frames
 	var a := "idle"
-	if _escalando or _borda:
+	if _a_morrer and sf.has_animation("morte"):
+		a = "morte"
+	elif _hurt_t > 0.0 and sf.has_animation("hurt"):
+		a = "hurt"
+	elif _rolar_restante > 0.0 and sf.has_animation("roll"):
+		a = "roll"
+	elif _dash_restante > 0.0 and sf.has_animation("dash"):
+		a = "dash"
+	elif _borda and sf.has_animation("borda"):
+		a = "borda"
+	elif _escalando or _borda:
 		a = "wallslide"
 	elif _ataque_restante > 0.0:
 		a = "attack"
+	elif _defendendo and sf.has_animation("defesa"):
+		a = "defesa"
 	elif _agachado:
 		a = "crouch"
 	elif not is_on_floor():
@@ -667,6 +740,8 @@ func _atualizar_anim() -> void:
 			a = "jump"
 		else:
 			a = "fall"
+	elif _aterrar_t > 0.0 and sf.has_animation("aterrar"):
+		a = "aterrar"
 	elif absf(velocity.x) > 24.0:
 		a = "run"
 	if _corpo.animation != a:
@@ -703,7 +778,8 @@ func _animar(dt: float) -> void:
 	_squash = move_toward(_squash, 0.0, dt * 5.0)
 	_pop = move_toward(_pop, 0.0, dt * 7.0)
 
-	if _escudo:
+	# o rig "cavaleiro" já tem escudo desenhado nos frames da defesa
+	if _escudo and RIG == "codigo":
 		if _defendendo != _escudo.visible:
 			_escudo.visible = _defendendo
 			if _defendendo:
@@ -1117,6 +1193,7 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0) -> void:
 	var real := int(round(quantidade * (1.0 - EstadoJogo.reducao_armadura())))
 	vida = maxi(0, vida - maxi(1, real))
 	_invulneravel = I_FRAMES
+	_hurt_t = 0.24
 	vida_mudou.emit(vida, _vida_max())
 	_flash_branco()
 	_abanar(8.0)
