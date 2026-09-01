@@ -66,6 +66,12 @@ var _arrastar_base := 0.0
 var _arrastando := false
 var _pronto := false
 
+## Barra de progresso da campanha + pastilhas de região (atalho de zona) --
+## construídas em `_montar_topo`, atualizadas em `_reconstruir_estilos`.
+var _prog_fill: ColorRect
+var _prog_label: Label
+var _regiao_pills: Array[Button] = []
+
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -109,6 +115,7 @@ func _montar() -> void:
 	_montar_seta("‹", -1, true)
 	_montar_seta("›", 1, false)
 	_montar_rodape()
+	_montar_topo()
 	_pronto = true
 	_reconstruir_estilos()
 	_reposicionar(true)
@@ -360,6 +367,111 @@ func _montar_rodape() -> void:
 	add_child(_dica)
 
 
+## Cabeçalho moderno por cima do carrossel: pastilhas de região (atalho de
+## zona -- salta logo para lá em vez de percorrer nível a nível) + barra
+## fina com o progresso total da campanha.
+func _montar_topo() -> void:
+	var pastilhas := HBoxContainer.new()
+	pastilhas.name = "Pastilhas"
+	pastilhas.anchor_left = 0.5
+	pastilhas.anchor_right = 0.5
+	pastilhas.anchor_top = 0.0
+	pastilhas.anchor_bottom = 0.0
+	pastilhas.offset_top = 84.0
+	pastilhas.offset_bottom = 114.0
+	pastilhas.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	pastilhas.alignment = BoxContainer.ALIGNMENT_CENTER
+	pastilhas.add_theme_constant_override("separation", 8)
+	pastilhas.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(pastilhas)
+
+	for r in EstadoJogo.REGIOES.size():
+		var cor: Color = COR_REGIAO[r] if r < COR_REGIAO.size() else Color(0.7, 0.7, 0.7)
+		var b := Button.new()
+		b.name = "Regiao%d" % r
+		b.focus_mode = Control.FOCUS_NONE
+		b.custom_minimum_size = Vector2(30, 30)
+		b.text = "%d" % (r + 1)
+		b.add_theme_font_size_override("font_size", 13)
+		b.mouse_filter = Control.MOUSE_FILTER_STOP
+		var sb := StyleBoxFlat.new()
+		sb.bg_color = Color(cor.r, cor.g, cor.b, 0.22)
+		sb.set_corner_radius_all(15)
+		sb.set_border_width_all(2)
+		sb.border_color = Color(cor.r, cor.g, cor.b, 0.55)
+		var sb_ativa := sb.duplicate() as StyleBoxFlat
+		sb_ativa.bg_color = cor
+		sb_ativa.border_color = cor.lightened(0.3)
+		b.add_theme_stylebox_override("normal", sb)
+		b.add_theme_stylebox_override("hover", sb_ativa)
+		b.add_theme_stylebox_override("pressed", sb_ativa)
+		b.add_theme_stylebox_override("focus", sb)
+		b.set_meta("sb_normal", sb)
+		b.set_meta("sb_ativa", sb_ativa)
+		b.pressed.connect(_ir_para_regiao.bind(r))
+		pastilhas.add_child(b)
+		_regiao_pills.append(b)
+
+	var faixa_prog := Control.new()
+	faixa_prog.name = "Progresso"
+	faixa_prog.anchor_left = 0.5
+	faixa_prog.anchor_right = 0.5
+	faixa_prog.anchor_top = 0.0
+	faixa_prog.anchor_bottom = 0.0
+	faixa_prog.offset_left = -110.0
+	faixa_prog.offset_right = 110.0
+	faixa_prog.offset_top = 122.0
+	faixa_prog.offset_bottom = 132.0
+	faixa_prog.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(faixa_prog)
+
+	var trilho := ColorRect.new()
+	trilho.color = Color(1, 1, 1, 0.12)
+	trilho.set_anchors_preset(Control.PRESET_FULL_RECT)
+	faixa_prog.add_child(trilho)
+
+	_prog_fill = ColorRect.new()
+	_prog_fill.color = Color(0.95, 0.5, 0.92, 0.9)
+	_prog_fill.anchor_top = 0.0
+	_prog_fill.anchor_bottom = 1.0
+	_prog_fill.anchor_left = 0.0
+	_prog_fill.anchor_right = 0.0
+	faixa_prog.add_child(_prog_fill)
+
+	_prog_label = Label.new()
+	_prog_label.anchor_left = 0.5
+	_prog_label.anchor_right = 0.5
+	_prog_label.anchor_top = 0.0
+	_prog_label.anchor_bottom = 0.0
+	_prog_label.offset_left = -80.0
+	_prog_label.offset_right = 80.0
+	_prog_label.offset_top = 136.0
+	_prog_label.offset_bottom = 152.0
+	_prog_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_prog_label.add_theme_font_size_override("font_size", 12)
+	_prog_label.add_theme_color_override("font_color", Color(0.8, 0.76, 0.86, 0.85))
+	_prog_label.add_theme_color_override("font_outline_color", Color(0.02, 0.01, 0.03))
+	_prog_label.add_theme_constant_override("outline_size", 3)
+	add_child(_prog_label)
+
+
+## Pastilha de região premida -- salta para o 1.º nível alcançável dessa
+## região (ou o 1.º da região, em modo dev / sem bloqueios).
+func _ir_para_regiao(regiao: int) -> void:
+	if regiao < 0 or regiao >= EstadoJogo.REGIOES.size():
+		return
+	var niveis: Array = EstadoJogo.REGIOES[regiao]["niveis"]
+	if niveis.is_empty():
+		return
+	var alvo: int = niveis[0]
+	if _respeitar_bloqueio:
+		for n in niveis:
+			if EstadoJogo.nivel_desbloqueado(n):
+				alvo = n
+	Som.toca("apanhar", -17.0, 1.2)
+	_ir_para(alvo)
+
+
 func _estilo_botao_rodape(b: Button, principal: bool) -> void:
 	b.add_theme_font_size_override("font_size", 16 if not principal else 17)
 	b.add_theme_color_override("font_color", Color(1, 0.9, 1))
@@ -420,6 +532,26 @@ func _reconstruir_estilos() -> void:
 		else:
 			pill.text = ""
 			pill.remove_theme_stylebox_override("normal")
+	_atualizar_topo()
+
+
+## Atualiza a barra de progresso total + a pastilha de região em destaque
+## (a do nível selecionado no carrossel).
+func _atualizar_topo() -> void:
+	var total := EstadoJogo.NIVEIS.size()
+	var feitos := 0
+	for i in total:
+		if EstadoJogo.nivel_esta_concluido(i):
+			feitos += 1
+	if _prog_fill:
+		_prog_fill.anchor_right = clampf(float(feitos) / maxf(1.0, float(total)), 0.0, 1.0)
+	if _prog_label:
+		_prog_label.text = Textos.tf("sel.count", [feitos, total])
+	var regiao_atual := EstadoJogo.regiao_do_nivel(_sel)
+	for r in _regiao_pills.size():
+		var b := _regiao_pills[r]
+		var ativa := r == regiao_atual
+		b.add_theme_stylebox_override("normal", b.get_meta("sb_ativa") if ativa else b.get_meta("sb_normal"))
 
 
 ## "2 / 5" -- quantos níveis da região já estão concluídos, sobre o total.
@@ -535,6 +667,7 @@ func _mover(dir: int) -> void:
 	_sel = novo
 	Som.toca("apanhar", -17.0, 1.3)
 	_reposicionar(false)
+	_atualizar_topo()
 
 
 func _ir_para(indice: int) -> void:
@@ -544,6 +677,7 @@ func _ir_para(indice: int) -> void:
 	_sel = novo
 	Som.toca("apanhar", -17.0, 1.25)
 	_reposicionar(false)
+	_atualizar_topo()
 
 
 func _confirmar() -> void:
