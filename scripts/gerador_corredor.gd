@@ -84,6 +84,19 @@ const TIER_FLAVOUR := {
 ## Fallback quando a região ainda não libertou nada (níveis muito baixos).
 const FLAVOUR_SUAVE := ["saltos", "gruta", "trampolim"]
 
+## TODAS as câmaras que `_flavour()` sabe construir. Tem de conter todos os
+## valores de `POOL_REGIAO`, `ASSINATURA` e `FLAVOUR_SUAVE` -- um teste em
+## `tests/run_tests.gd` garante isso (foi assim que "pedras" andou a gerar
+## um vão morto silencioso durante semanas). As câmaras "torre"/"poco"/
+## "pilares"/"descanso"/"forquilha"/"arena"/"corredor"/"cripta" também
+## entram aqui embora sejam escolhidas por outro caminho no `_construir`.
+const CAMARAS_FLAVOUR := [
+	"saltos", "serras", "pendulos", "ritmo", "trampolim", "gruta", "quebra",
+	"correntes", "elevador", "vento", "gravidade", "guilhotinas", "fogo",
+	"impulso", "portal", "torre", "poco", "pilares", "descanso", "forquilha",
+	"arena", "corredor", "cripta", "crossfire", "ferry", "pedras", "espinhos",
+]
+
 ## Câmara "assinatura" de cada região -- no acto do meio da jornada aparece
 ## com mais frequência para o bioma ter identidade própria (se a dificuldade
 ## já a libertou). Índice = região.
