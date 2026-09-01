@@ -54,6 +54,16 @@ Feedback seguinte do Paulo (mesma sessão):
   livre (setas/WASD, `VEL_VOO` 560), `collision_mask=0` → atravessa tudo,
   sem gravidade nem dano de fosso. Desligar = cai à plataforma. Para
   testar zonas distantes sem jogar o nível todo.
+- **Reformulação "pegada Dead Cells"** (decidido c/ Paulo, ver
+  `docs/reformulacao_deadcells.md`): passe de feel+arte, mantém a campanha.
+  - Fase 1 feel (`koliani.gd`): **agarrar borda/mantle** (`_detetar_borda`),
+    **wall-jump básico** (não precisa de `escalar_paredes`), **roll-cancel**
+    (rolar corta o recovery do ataque), **pogo** em Serra/Espinhos (grupo
+    `"pogavel"` + layer 6, raycast p/ baixo, i-frames apanham o toque).
+    Falta afinar números (precisa playtest).
+  - Fase 2 jornada (`gerador_corredor.gd`): **ritmo tensão/alívio** —
+    `_f_descanso` (plataforma larga limpa + checkpoint) a seguir a câmaras
+    puxadas e a cada 4.ª; **`_f_forquilha`** (caminho abre em 2 e reúne).
 
 ## Sessão 2026-08-31 (cont. 3) — JORNADA 3.0: chão MORTAL + assets
 
