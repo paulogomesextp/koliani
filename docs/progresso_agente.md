@@ -2,6 +2,24 @@
 
 ## Sessão 2026-09-01 (noite, autónoma) — variedade Dead Cells
 
+### ❓ Pendente — precisa de decisão do Paulo
+1. **Histórico git com ~180 MB de packs em bruto** (ver o aviso ⚠️
+   abaixo). Deixo como está ou queres que eu faça `git filter-repo` +
+   `push --force` ao `master`? (parte o clone do Jensath — combinem).
+2. **Fase 5 / "essência"**: a Fase 2 tem a peça `alcove-segredo`
+   bloqueada porque não há moeda nem sítio onde a gastar. Queres
+   essência (contador no HUD) já, e o *sink* é o quê? — banca de cura
+   entre níveis / trocar as 2 skills / melhorar arma. Sem isto, salto
+   esta peça.
+3. **Pogo na Guilhotina / PenduloLamina** (Fase 1, marcado "Falta"):
+   ressaltar em cima de uma lâmina de guilhotina a cair ou de uma foice
+   a baloiçar é *possível* mas pode dar mais frustração que "tech". Queres
+   mesmo? Se sim, só nas lâminas paradas/retraídas ou também em movimento?
+4. **Playtest dos números** de tudo o que entrou v0.8.7→v0.8.11 (câmaras
+   novas + `cuspidor`) — está tudo "a olho". Precisa de ti a jogar.
+
+### Batch entregue esta noite
+
 Continuação da reformulação Dead Cells (Fase 2 câmaras + Fase 2b inimigos)
 sem o Paulo à frente. Ecrãs desligados durante a sessão.
 
