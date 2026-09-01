@@ -64,7 +64,12 @@ entrada/saída declaradas em altura, regra de ouro `SUBIDA_MAX`).
 - [x] **`_f_crossfire`** — lanço recto com torretas montadas nos dois lados
   a cuspir fogo horizontal a alturas alternadas; leitura de padrão, não
   salto difícil. Pool das regiões Prisão/Cidade/Castelo, `TIER` 0.4.
-- [ ] mais "tons" de peça: alcove-segredo / atalho
+- [x] **`_f_ferry`** — fosso largo (620-880 px) sobre o líquido atravessado
+  por uma plataforma-balsa (`TumuloElevador` horizontal, `auto`); passa-se
+  em pé a desviar de 2 lâminas penduladas. Pool das regiões Torres/
+  Catacumbas/Castelo, `TIER` 0.3. O beat "a viagem".
+- [ ] mais "tons" de peça: alcove-segredo / atalho (precisa do sistema de
+  recompensa — ver Fase 5; deixado para o Paulo decidir o "sink")
 - [ ] atalhos: 1-2 `Portal` "de retorno" por jornada (teletransporte)
 - [ ] (talvez) mover as peças mais estáveis para `scenes/rooms/*.tscn`
 

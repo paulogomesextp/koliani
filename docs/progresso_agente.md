@@ -17,6 +17,19 @@ sem o Paulo à frente. Ecrãs desligados durante a sessão.
   a partir de `_dif > 0.22` (a par de saltador/carga/trepador/escudeiro).
 - **Falta playtestar**: alcance, cadência, se o projétil lê bem, dano.
 
+### Câmara "ferry / a travessia" (v0.8.9)
+- **`_f_ferry`** (`gerador_corredor.gd`): fosso largo (`vao` 620-880 px +
+  `220·_dif`) sobre o líquido, atravessado por UMA plataforma-balsa —
+  `TumuloElevador` com `curso = Vector2(vao, 0)`, `auto = true`,
+  `velocidade` 96 + 30·`_dif`. Duas `PenduloLamina` a 34%/70% do vão
+  (blade a ~24 px acima do deck → desviar em pé, agachar não chega).
+  Cais de embarque + cais de desembarque sólido + checkpoint forçado.
+- Pools de **Torres (2)**, **Catacumbas (3)** e **Castelo (5)**;
+  `TIER_FLAVOUR["ferry"] = 0.3`. Sem risco de softlock (a balsa faz
+  vaivém → volta sempre ao cais).
+- Smoke a 5 níveis OK. **Falta playtestar**: velocidade da balsa, se as
+  lâminas ficam a uma altura justa, largura do vão.
+
 ### Câmara "fogo cruzado" (v0.8.7)
 
 - **`_f_crossfire`** (`gerador_corredor.gd`): novo "tom" de câmara. Lanço
