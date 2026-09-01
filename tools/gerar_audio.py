@@ -653,6 +653,127 @@ def selo():
     escrever("selo.wav", buf, 0.5)
 
 
+# --------------------------------------------------------------------------
+# 9) LEVAR DANO (Koliani) -- baque seco e curto, distinto do ataque
+# --------------------------------------------------------------------------
+def dano():
+    """A Koliani leva dano: baque grave curto + estalido seco no ataque.
+    Nada agudo/metalico -- não pode soar ao "investida" dos chefes nem ao
+    disparo de uma armadilha, senão confunde-se com "o chefe a atacar"."""
+    random.seed(6102)
+    dur = 0.3
+    N = int(dur * FS)
+    buf = [0.0] * N
+    for n in range(N):
+        t = n / FS
+        f = 150.0 * math.exp(-t * 18.0) + 42.0
+        buf[n] += math.sin(2 * math.pi * f * t) * math.exp(-t * 16.0) * 0.8
+    rr = Reson()
+    for n in range(int(0.05 * FS)):
+        t = n / FS
+        s = rr.passo(random.uniform(-1, 1), 950.0, 550.0)
+        buf[n] += s * math.exp(-t * 55.0) * 0.45
+    escrever("dano.wav", buf, 0.88)
+
+
+# --------------------------------------------------------------------------
+# 10) INVESTIDA (chefes/armadilhas) -- ataque especial, "whoosh" + impacto
+# --------------------------------------------------------------------------
+def investida():
+    """Investida/ataque especial dos chefes (e das armadilhas que a
+    reaproveitam): corte de ar + impacto surdo no fim. Usada a pitch
+    variável (0.5-1.7) por cada chefe -- tem de ler como "o chefe ataca",
+    não como "eu levo dano" (esse é o `dano.wav`, mais seco e sem o
+    whoosh)."""
+    random.seed(7301)
+    dur = 0.48
+    N = int(dur * FS)
+    buf = [0.0] * N
+    rr = Reson()
+    lp = 0.0
+    for n in range(N):
+        t = n / FS
+        p = t / dur
+        x = random.uniform(-1, 1)
+        lp += 0.12 * (x - lp)
+        fc = 1900.0 - 1350.0 * p
+        s = rr.passo(lp, max(280.0, fc), 380.0)
+        env = math.sin(math.pi * min(1.0, p / 0.55)) ** 0.6 * math.exp(-p * 1.2)
+        buf[n] += s * env * 0.85
+    t0 = int(0.28 * FS)
+    for n in range(t0, N):
+        t = (n - t0) / FS
+        f = 110.0 * math.exp(-t * 10.0) + 40.0
+        buf[n] += math.sin(2 * math.pi * f * t) * math.exp(-t * 9.0) * 0.5
+    escrever("investida.wav", buf, 0.88)
+
+
+# --------------------------------------------------------------------------
+# 11) CHEFE CAI (derrota) -- colapso pesado; a fanfarra fica para conquista.wav
+# --------------------------------------------------------------------------
+def chefe_cai():
+    """Chefe derrotado: colapso grave em dois baques + estilhaços curtos.
+    Sem nada agudo/festivo aqui -- isso é o `conquista.wav`, que toca logo
+    a seguir; este é só o peso da queda."""
+    random.seed(8407)
+    dur = 0.85
+    N = int(dur * FS)
+    buf = [0.0] * N
+    for t0, amp, f0 in [(0.0, 0.9, 58.0), (0.16, 0.55, 44.0)]:
+        n0 = int(t0 * FS)
+        for n in range(n0, N):
+            t = (n - n0) / FS
+            f = f0 * math.exp(-t * 6.0) + 22.0
+            buf[n] += math.sin(2 * math.pi * f * t) * math.exp(-t * 5.5) * amp
+    for _ in range(14):
+        tc = random.uniform(0.02, 0.45)
+        rc = Reson()
+        for n in range(int(tc * FS), min(N, int((tc + 0.05) * FS))):
+            tt = n / FS - tc
+            s = rc.passo(random.uniform(-1, 1), random.uniform(1800.0, 3600.0), 500.0)
+            buf[n] += s * math.exp(-tt * 90.0) * 0.32
+    escrever("chefe_cai.wav", buf, 0.88)
+
+
+# --------------------------------------------------------------------------
+# 12) TRANSIÇÃO DE NÍVEL (porta no fim do nível) -- "whoosh" de portal
+# --------------------------------------------------------------------------
+def transicao():
+    """Avançar para o próximo nível através da porta: sopro de portal
+    moderno (ruído filtrado a subir + brilho a entrar), sem nada áspero
+    ou repetitivo -- substitui a antiga porta a ranger, ouvida em cada
+    nível e por isso repetitiva/irritante."""
+    random.seed(5501)
+    dur = 0.6
+    N = int(dur * FS)
+    buf = [0.0] * N
+    rr = Reson()
+    lp = 0.0
+    for n in range(N):
+        t = n / FS
+        p = t / dur
+        x = random.uniform(-1, 1)
+        lp += 0.09 * (x - lp)
+        fc = 260.0 + 2600.0 * (p ** 1.6)
+        s = rr.passo(lp, fc, 260.0 + 500.0 * p)
+        env = math.sin(math.pi * min(1.0, p / 0.85)) ** 0.7
+        buf[n] += s * env * 0.6
+    for n in range(N):
+        t = n / FS
+        p = t / dur
+        if p < 0.25:
+            continue
+        pp = (p - 0.25) / 0.75
+        f = 720.0 + 1400.0 * pp
+        env = math.sin(math.pi * pp) * 0.16
+        buf[n] += math.sin(2 * math.pi * f * t) * env
+        buf[n] += math.sin(2 * math.pi * f * 1.5 * t) * env * 0.4
+    fo = int(0.08 * FS)
+    for n in range(N - fo, N):
+        buf[n] *= max(0.0, (N - n) / fo)
+    escrever("transicao.wav", buf, 0.55)
+
+
 if __name__ == "__main__":
     game_over_voz()
     menu_loop()
@@ -666,3 +787,7 @@ if __name__ == "__main__":
     acerto()
     tiro()
     selo()
+    dano()
+    investida()
+    chefe_cai()
+    transicao()

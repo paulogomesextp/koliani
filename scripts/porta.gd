@@ -37,7 +37,7 @@ func _ao_entrar(corpo: Node) -> void:
 		return
 	if pista_ao_atravessar != "":
 		EstadoJogo.registar_pista(pista_ao_atravessar)
-	Som.toca("porta", -3.0)
+	Som.toca("transicao", -3.0)
 	var i := EstadoJogo.indice_nivel
 	EstadoJogo.marcar_nivel_concluido(i)
 
