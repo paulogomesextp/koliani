@@ -112,6 +112,9 @@ assets/shaders/                    -- personagem (rim+flash), plataforma (pedra)
 tests/run_tests.gd     -- corredor headless proprio (movimento + estado_jogo)
 docs/                  -- historia.md, design.md (bibliografia viva)
 assets/sprites/pixel/  -- pixel-art (packs CC0 + gerada em tools/gerar_sprites.gd); bosses/ = tiras de 4 frames
+  koliani_cavaleiro/               -- RIG ACTUAL da Koliani (pack Knight_player; ver CREDITS)
+  enemies/<especie>/               -- 19 monstros (idle/run/hit/dead); DemonioBase.especie
+  backgrounds/<pack>/              -- camadas de parallax por regiao (Atmosfera.PACKS)
 assets/shaders/*.gdshader -- personagem, plataforma, grade
 assets/audio/*.wav     -- SFX + musica SINTETIZADOS (tools/gerar_audio.py; sem licenca de terceiros)
 assets/                -- branding/, fonts/, tiles/ -- SO CC0/gratis (ou nosso)
@@ -119,9 +122,13 @@ assets/                -- branding/, fonts/, tiles/ -- SO CC0/gratis (ou nosso)
 .claude/agents/gaming.md  -- o agente responsavel por este jogo
 ```
 
-> **Personagens já usam sprites SVG** (`assets/sprites/`, desenhados por
-> nós). Plataformas e parallax ainda são `ColorRect`. Nada pago sem
-> perguntar ao Paulo.
+> **Arte (estado a 1 set 2026)**: tudo pixel-art. A Koliani usa o rig
+> `koliani_cavaleiro` (pack Knight_player, **não é CC0** -- ver
+> `assets/sprites/pixel/CREDITS.md`); os fundos são packs CC0 por região,
+> passados pelo `assets/shaders/fundo_bioma.gdshader` (desatura + tinta da
+> região) para casarem com o `key_art`; as plataformas têm um bloco de
+> terreno por região. O que falta afinar está em `docs/testar.md`. Nada pago
+> sem perguntar ao Paulo.
 
 ## CI / builds
 
