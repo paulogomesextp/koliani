@@ -13,7 +13,10 @@ extends StaticBody2D
 ## outras 5 sao geradas por `tools/gerar_tiles_zonas.gd` a partir da folha
 ## "seamless" CC0 do `piiixl` -- padrao distinto por zona, mas todas com a
 ## mesma identidade (aresta de luar + fio magenta + musgo fantasma).
-const TEX_FLORESTA := preload("res://assets/sprites/pixel/tiles/floresta_block.png")
+## A regiao I passou a pedra terrosa com musgo (gerada como as outras) --
+## a relva do Pixel Adventure destoava do pantano gotico da Fase 3. O
+## `floresta_block.png` antigo continua no repo, sem uso.
+const TEX_FLORESTA := preload("res://assets/sprites/pixel/tiles/floresta_gotica_block.png")
 const TEX_PRISAO := preload("res://assets/sprites/pixel/tiles/prisao_block.png")
 const TEX_TORRES := preload("res://assets/sprites/pixel/tiles/torres_block.png")
 const TEX_CATACUMBAS := preload("res://assets/sprites/pixel/tiles/catacumbas_block.png")
@@ -23,7 +26,7 @@ const TEX_CASTELO := preload("res://assets/sprites/pixel/tiles/castelo_block.png
 ## bioma -> [textura, margem_esq, margem_topo, margem_dir, margem_baixo, tom]
 ## A cor ja vem no PNG; o `tom` so faz ajustes finos por regiao.
 const BIOMAS := {
-	"floresta":   [TEX_FLORESTA, 5, 15, 5, 6, Color(0.82, 0.86, 0.82)],
+	"floresta":   [TEX_FLORESTA, 12, 12, 12, 12, Color(1, 1, 1)],
 	"prisao":     [TEX_PRISAO, 12, 12, 12, 12, Color(1, 1, 1)],
 	"torres":     [TEX_TORRES, 12, 12, 12, 12, Color(1, 1, 1)],
 	"catacumbas": [TEX_CATACUMBAS, 12, 12, 12, 12, Color(1, 1, 1)],

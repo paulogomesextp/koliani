@@ -6,8 +6,9 @@ extends SceneTree
 ## celulas de 16px). Cada regiao apanha uma celula-base distinta (as 5 mais
 ## diferentes umas das outras) e leva um recolor proprio -- mas TODAS
 ## partilham a mesma identidade: aresta de luar + fio magenta no topo +
-## flecos "fantasma" (tema do key_art). A `floresta` fica de fora: usa o
-## `floresta_block.png` (relva Pixel Adventure) que ja e' distinto.
+## flecos "fantasma" (tema do key_art). A regiao I tambem entrou (1 set
+## 2026) como `floresta_gotica`: a relva do Pixel Adventure destoava do
+## pantano gotico da Fase 3. O `floresta_block.png` antigo fica no repo.
 ##
 ##   godot --headless --script res://tools/gerar_tiles_zonas.gd
 ##   (PREVIEW=1 grava tambem _preview_zonas.png com os 5 blocos lado a lado)
@@ -28,6 +29,12 @@ const ZONAS := {
 	"catacumbas": [Color(0.37, 0.45, 0.40), Color(0.58, 0.95, 0.74), 0.11],
 	"cidade":     [Color(0.49, 0.34, 0.49), Color(1.00, 0.58, 0.94), 0.09],
 	"castelo":    [Color(0.48, 0.33, 0.62), Color(0.92, 0.52, 1.00), 0.05],
+	# A regiao I usava a relva/terra do Pixel Adventure -- desenho de banda
+	# desenhada, aos berros ao pe' do pantano gotico da Fase 3. Esta e' a
+	# mesma pedra das outras zonas, so' que terrosa e com muito musgo.
+	# (fica no fim: a ordem do dicionario decide que celula-base leva cada
+	# zona, e nao quero mexer nas 5 que ja' estao.)
+	"floresta_gotica": [Color(0.32, 0.36, 0.28), Color(0.56, 0.96, 0.62), 0.12],
 }
 
 
