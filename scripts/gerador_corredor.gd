@@ -65,10 +65,10 @@ const LIQUIDO := {
 const POOL_REGIAO := {
 	0: ["saltos", "serras", "pendulos", "ritmo", "trampolim", "gruta", "portal"],
 	1: ["saltos", "correntes", "elevador", "quebra", "guilhotinas", "serras", "portal", "crossfire"],
-	2: ["vento", "saltos", "gravidade", "pendulos", "trampolim", "ritmo", "portal"],
-	3: ["gruta", "pedras", "elevador", "quebra", "guilhotinas", "pendulos", "portal"],
+	2: ["vento", "saltos", "gravidade", "pendulos", "trampolim", "ritmo", "portal", "ferry"],
+	3: ["gruta", "pedras", "elevador", "quebra", "guilhotinas", "pendulos", "portal", "ferry"],
 	4: ["saltos", "impulso", "serras", "fogo", "trampolim", "guilhotinas", "portal", "crossfire"],
-	5: ["pendulos", "fogo", "guilhotinas", "ritmo", "quebra", "gravidade", "portal", "crossfire"],
+	5: ["pendulos", "fogo", "guilhotinas", "ritmo", "quebra", "gravidade", "portal", "crossfire", "ferry"],
 }
 
 ## `_dif` mínimo para cada tipo de câmara entrar na pool. Assim o Nível 1
@@ -79,7 +79,7 @@ const TIER_FLAVOUR := {
 	"ritmo": 0.12, "portal": 0.12, "correntes": 0.16, "elevador": 0.18,
 	"gravidade": 0.34, "serras": 0.36, "vento": 0.42, "pendulos": 0.46,
 	"impulso": 0.5, "guilhotinas": 0.58, "quebra": 0.62, "fogo": 0.66,
-	"crossfire": 0.4,
+	"crossfire": 0.4, "ferry": 0.3,
 }
 ## Fallback quando a região ainda não libertou nada (níveis muito baixos).
 const FLAVOUR_SUAVE := ["saltos", "gruta", "trampolim"]
@@ -298,7 +298,7 @@ func _construir() -> void:
 				f = pool[_rng.randi() % pool.size()]
 				if f == ant_flavour:
 					f = pool[(_rng.randi() + 1) % pool.size()]
-				_pos_intenso = f in ["guilhotinas", "serras", "pendulos", "fogo", "quebra", "crossfire"]
+				_pos_intenso = f in ["guilhotinas", "serras", "pendulos", "fogo", "quebra", "crossfire", "ferry"]
 			ant_flavour = f
 			var res := _flavour(par, f, x, y)
 			x = res.x
@@ -530,7 +530,45 @@ func _flavour(par: Node2D, tipo: String, x: float, y: float) -> Vector2:
 		"corredor": return _f_corredor(par, x, y)
 		"cripta": return _f_cripta(par, x, y)
 		"crossfire": return _f_crossfire(par, x, y)
+		"ferry": return _f_ferry(par, x, y)
 	return Vector2(x + 180.0, y)
+
+
+## FERRY: um fosso largo sobre o líquido atravessado por UMA plataforma que
+## anda sempre de um lado ao outro (`TumuloElevador` com curso horizontal).
+## Salta-se para cima dela, atravessa-se em pé a desviar de 2 lâminas
+## penduradas a meio, e sai-se do outro lado. O beat "a viagem".
+func _f_ferry(par: Node2D, x: float, y: float) -> Vector2:
+	var cy: float = clampf(y, _teto_y + 200.0, _chao_y - 140.0)
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(96.0, 16.0))                 # cais de embarque
+	var vao := _rng.randf_range(620.0, 880.0) + 220.0 * _dif
+	# a balsa
+	var tu := TUMULO.instantiate()
+	tu.auto = true
+	tu.curso = Vector2(vao, 0.0)
+	tu.velocidade = 96.0 + 30.0 * _dif
+	tu.largura = 128.0
+	tu.position = Vector2(x + 90.0, cy)
+	par.add_child(tu)
+	# 2 lâminas penduradas a meio do fosso (desviar em pé, agachar não chega)
+	for f in 2:
+		var px := x + 90.0 + vao * lerpf(0.34, 0.7, float(f))
+		var comp := _rng.randf_range(160.0, 210.0)
+		var pe := PENDULO.instantiate()
+		pe.comprimento = comp
+		pe.periodo = _rng.randf_range(1.9, 2.6) - 0.3 * _dif
+		pe.amplitude_graus = 44.0 + 18.0 * _dif
+		pe.dano = 8 + int(18.0 * _dif)
+		pe.fase = 0.5 * float(f)
+		pe.position = Vector2(px, cy - comp - 24.0)
+		par.add_child(pe)
+	_coluna_fundo(par, x + 90.0 + vao * 0.5)
+	# cais de desembarque -- sólido e largo
+	x += 90.0 + vao + _rng.randf_range(60.0, 96.0)
+	_plat(par, Vector2(x, cy), Vector2(130.0, 18.0))
+	_checkpoint(x, cy, true)
+	return Vector2(x, cy)
 
 
 ## FOGO CRUZADO: lanço recto de plataformas com torretas montadas em ambos
