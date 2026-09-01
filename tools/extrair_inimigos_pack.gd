@@ -17,11 +17,11 @@ const SAIDA := "res://assets/sprites/pixel/enemies"
 ## especie -> [pasta_walk, prefixo_walk, n_walk, pasta_idle, prefixo_idle,
 ##             n_idle, altura_alvo]
 const MONSTROS := {
-	"besouro": ["Bettle", "bettle", 4, "", "", 0, 54],
-	"raptor": ["Dino", "dino", 7, "Dino-Idle", "dino-idle", 4, 72],
-	"mastim": ["Dog", "dog", 4, "Dog-idle", "dog-idlet", 6, 62],
-	"gosma": ["Slimer", "slimer", 7, "Slimer-Idle", "slimer-idle", 8, 68],
-	"abutre": ["Vulture", "vulture", 4, "Vulture-Idle", "vulture-idle", 4, 64],
+	"besouro": ["Bettle", "bettle", 4, "", "", 0, 48],
+	"raptor": ["Dino", "dino", 7, "Dino-Idle", "dino-idle", 4, 62],
+	"mastim": ["Dog", "dog", 4, "Dog-idle", "dog-idlet", 6, 56],
+	"gosma": ["Slimer", "slimer", 7, "Slimer-Idle", "slimer-idle", 8, 60],
+	"abutre": ["Vulture", "vulture", 4, "Vulture-Idle", "vulture-idle", 4, 58],
 }
 
 
