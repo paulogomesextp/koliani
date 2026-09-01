@@ -287,6 +287,9 @@ func _construir() -> void:
 			elif prog >= 0.28 and prog < 0.82 and _dif > 0.28 and _rng.randf() < 0.12:
 				f = "corredor"          # gauntlet apertado
 				_pos_intenso = true
+			elif prog < 0.82 and _rng.randf() < (0.16 if _regiao == 3 else 0.08):
+				f = "cripta"            # sala com obstáculo interior + pedras
+				_pos_intenso = true
 			elif _dif > 0.18 and _rng.randf() < 0.2:
 				f = "forquilha"
 				_pos_intenso = true
@@ -522,7 +525,32 @@ func _flavour(par: Node2D, tipo: String, x: float, y: float) -> Vector2:
 		"forquilha": return _f_forquilha(par, x, y)
 		"arena": return _f_arena(par, x, y)
 		"corredor": return _f_corredor(par, x, y)
+		"cripta": return _f_cripta(par, x, y)
 	return Vector2(x + 180.0, y)
+
+
+## CRIPTA: sala fechada com uma parede interior baixa a saltar por cima (ou
+## contornar pela plataforma alta) + pedras que caem. Navegação vertical curta.
+func _f_cripta(par: Node2D, x: float, y: float) -> Vector2:
+	var cy: float = clampf(y, _teto_y + 150.0, _chao_y - 96.0)
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x + 130.0, cy), Vector2(280.0, 22.0), 42.0)          # chão da sala
+	_plat(par, Vector2(x + 130.0, cy - 40.0), Vector2(24.0, 64.0))          # parede interior baixa
+	_plat(par, Vector2(x + 130.0, cy - 104.0), Vector2(92.0, 16.0))         # rota alta alternativa
+	for i in 2:
+		var pd := PEDRA.instantiate()
+		pd.chao_y = cy - 8.0
+		pd.dano = 8 + int(16.0 * _dif)
+		pd.raio_gatilho = 78.0
+		pd.position = Vector2(x + 70.0 + 120.0 * float(i), cy - 130.0)
+		par.add_child(pd)
+	_checkpoint(x + 40.0, cy, true)
+	if _dif > 0.2:
+		_inimigo_em(par, Vector2(x + 224.0, cy - 30.0))
+	x += 280.0 + _rng.randf_range(150.0, 176.0)
+	var ny: float = maxf(_teto_y + 40.0, cy - _rng.randf_range(-30.0, SUBIDA_MAX))
+	_plat(par, Vector2(x, ny), Vector2(100.0, 18.0))
+	return Vector2(x, ny)
 
 
 ## ARENA de combate: chão sólido largo por cima do líquido, vários inimigos

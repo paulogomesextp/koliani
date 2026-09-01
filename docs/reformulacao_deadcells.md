@@ -59,7 +59,9 @@ entrada/saída declaradas em altura, regra de ouro `SUBIDA_MAX`).
   comportamentos variados + checkpoint. "Limpa a sala." (~13%, actos 1-2)
 - [x] **`_f_corredor`** — tecto baixo + serras em calha no ritmo; passa-se
   a correr/rolar, não a saltar. (~12%, acto 2, dif > 0.28)
-- [ ] mais "tons" de peça: gruta-labirinto, alcove-segredo / atalho
+- [x] **`_f_cripta`** — sala com parede interior baixa (saltar por cima ou
+  rota alta) + pedras que caem + checkpoint. (~8%, 16% na região Catacumbas)
+- [ ] mais "tons" de peça: alcove-segredo / atalho
 - [ ] atalhos: 1-2 `Portal` "de retorno" por jornada (teletransporte)
 - [ ] (talvez) mover as peças mais estáveis para `scenes/rooms/*.tscn`
 
@@ -79,7 +81,11 @@ entrada/saída declaradas em altura, regra de ouro `SUBIDA_MAX`).
 - [x] **trepador** (dif > 0.3): agarrado ao tecto (sprite invertido);
   solta-se e cai quando a Koliani passa por baixo, depois anda como
   patrulha. O gerador põe-no ~120-170 px acima da plataforma.
-- [ ] telegrafos mais legíveis (usar mais o campo `anticipacao`).
+- [x] **telegrafos legíveis** (`_telegrafo`): antes de qualquer investida o
+  inimigo pisca forte (branco-quente) + estremece. `carga` já tinha
+  wind-up; `saltador` (agacha 0.26 s) e `voador` (trava no ar 0.3 s) ganham
+  wind-up + som de aviso. `_saltando`/`_mergulho` protegem o arco/picada
+  de a patrulha os pisar.
 
 ## Fase 3 — Arte de ambiente por região
 

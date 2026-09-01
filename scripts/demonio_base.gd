@@ -38,6 +38,11 @@ var _windup := 0.0
 var _carga := 0.0
 var _mergulho := 0.0
 var _t_hover := 0.0
+## Telegrafo (pegada Dead Cells): pisca a AVISAR antes de qualquer investida.
+var _telegrafo := 0.0
+## Salto do "saltador" a decorrer -- enquanto > 0 a patrulha não pisa a vel.
+var _saltando := 0.0
+var _dive_dir := Vector2.ZERO
 ## Cor do rasto de partículas quando morre.
 @export var cor_estilhacos := Color(0.7, 0.25, 0.45)
 ## Cor da luz de recorte (rim) do sprite -- normalmente o tom do bioma.
@@ -201,6 +206,16 @@ func _add_tira(sf: SpriteFrames, nome: String, tex: Texture2D, n: int, fps: floa
 func _process(dt: float) -> void:
 	if _anim:
 		_atualizar_anim()
+		# telegrafo: pisca forte (branco-quente) enquanto vai atacar
+		if _telegrafo > 0.0 and not _morto:
+			var p := 0.5 + 0.5 * sin(Time.get_ticks_msec() * 0.045)
+			_anim.modulate = Color(1, 1, 1).lerp(Color(2.6, 1.6, 1.4), p)
+			if _sprite:
+				_sprite.rotation = sin(Time.get_ticks_msec() * 0.09) * 0.06
+		elif not _morto and _congelado <= 0.0:
+			_anim.modulate = _anim.modulate.lerp(Color(1, 1, 1), dt * 4.0)
+			if _sprite and absf(_sprite.rotation) > 0.001:
+				_sprite.rotation = lerp_angle(_sprite.rotation, 0.0, dt * 10.0)
 		return
 	if _corpo == null:
 		return
@@ -253,6 +268,7 @@ func _physics_process(dt: float) -> void:
 			_corpo.modulate = Color(1, 1, 1)
 		return
 	_acao_cd = maxf(0.0, _acao_cd - dt)
+	_telegrafo = maxf(0.0, _telegrafo - dt)
 
 	# --- comportamentos especiais ---------------------------------------
 	if comportamento == "carga":
@@ -282,20 +298,42 @@ func _physics_process(dt: float) -> void:
 			if _sprite:
 				_sprite.scale.x = _direcao
 			_windup = TELEGRAFO_CARGA
+			_telegrafo = TELEGRAFO_CARGA
 			anticipacao = 1.0
 			velocity.x = 0.0
+			Som.toca("demonio_ataque", -14.0, 0.7)
 			return
 	elif comportamento == "saltador":
+		if _saltando > 0.0:  # no ar -- deixa a gravidade fazer o arco
+			_saltando -= dt
+			if not is_on_floor():
+				velocity.y += GRAVIDADE * dt
+			move_and_slide()
+			if is_on_floor() and _saltando < 0.45:
+				_saltando = 0.0
+			return
+		if _windup > 0.0:  # agacha-se a avisar
+			_windup -= dt
+			velocity.x = 0.0
+			if not is_on_floor():
+				velocity.y += GRAVIDADE * dt
+			move_and_slide()
+			if _windup <= 0.0:
+				velocity = Vector2(_direcao * 175.0, -430.0)
+				_saltando = 0.75
+				Som.toca("demonio_ataque", -9.0, 1.0)
+				move_and_slide()
+			return
 		if _acao_cd <= 0.0 and is_on_floor():
 			var alvo_s := _dir_koliani_perto(230.0)
 			if alvo_s != 0.0:
 				_direcao = alvo_s
 				if _sprite:
 					_sprite.scale.x = _direcao
-				velocity = Vector2(_direcao * 170.0, -430.0)
+				_windup = 0.26
+				_telegrafo = 0.26
 				anticipacao = 1.0
 				_acao_cd = randf_range(1.5, 2.6)
-				move_and_slide()
 				return
 	elif comportamento == "voador":
 		# sem gravidade: paira à volta da origem e mergulha na Koliani
@@ -306,17 +344,27 @@ func _physics_process(dt: float) -> void:
 				_mergulho = 0.0
 				_acao_cd = randf_range(1.3, 2.3)
 			return
+		if _windup > 0.0:  # trava no ar a avisar, depois mergulha
+			_windup -= dt
+			velocity = velocity.lerp(Vector2.ZERO, 0.2)
+			move_and_slide()
+			if _windup <= 0.0:
+				velocity = _dive_dir * VEL_MERGULHO
+				_mergulho = 0.6
+				Som.toca("demonio_ataque", -8.0, 1.1)
+				move_and_slide()
+			return
 		var kv := get_tree().get_first_node_in_group("koliani")
 		if kv and _acao_cd <= 0.0:
 			var d: Vector2 = (kv as Node2D).global_position - global_position
 			if d.length() < 300.0:
-				velocity = d.normalized() * VEL_MERGULHO
-				_mergulho = 0.6
+				_dive_dir = d.normalized()
+				_windup = 0.3
+				_telegrafo = 0.3
 				anticipacao = 1.0
 				if _sprite:
 					_sprite.scale.x = signf(d.x) if d.x != 0.0 else _sprite.scale.x
-				Som.toca("demonio_ataque", -8.0, 1.1)
-				move_and_slide()
+				_acao_cd = randf_range(1.3, 2.3)
 				return
 		_t_hover += dt
 		var pouso := _origem + Vector2(sin(_t_hover * 1.4) * 62.0, sin(_t_hover * 2.1) * 24.0)
