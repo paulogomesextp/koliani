@@ -447,6 +447,8 @@ func _inimigo_em(par: Node2D, pos: Vector2) -> void:
 			d.comportamento = "voador"   # o olho voa e mergulha
 	elif _dif > 0.15 and r < 0.18 + 0.26 * _dif:
 		var opcoes := ["saltador", "carga"]
+		if _dif > 0.22:
+			opcoes.append("cuspidor")
 		if _dif > 0.3:
 			opcoes.append("trepador")
 		if _dif > 0.35:

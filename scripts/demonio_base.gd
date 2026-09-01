@@ -28,11 +28,18 @@ const GRAVIDADE := 1400.0
 ##                o pisão ou um golpe pelas costas o magoam)
 ##   trepador  -- agarrado ao tecto acima; solta-se e cai quando a Koliani
 ##                passa por baixo, depois anda como patrulha
-@export_enum("patrulha", "saltador", "carga", "voador", "escudeiro", "trepador") var comportamento := "patrulha"
+##   cuspidor  -- patrulha; à distância, pára, telegrafa e COSPE um projétil
+##                (BolaFogo) na direção da Koliani; recua a atacar de longe
+@export_enum("patrulha", "saltador", "carga", "voador", "escudeiro", "trepador", "cuspidor") var comportamento := "patrulha"
 const DUR_CARGA := 0.55
 const MULT_CARGA := 3.4
 const TELEGRAFO_CARGA := 0.42
 const VEL_MERGULHO := 460.0
+## cuspidor: alcance horizontal, wind-up e recarga do cuspo.
+const ALC_CUSPIR := 440.0
+const TELEGRAFO_CUSPIR := 0.5
+const VEL_CUSPO := 300.0
+const PROJETIL_CUSPO := preload("res://scenes/actors/BolaFogo.tscn")
 var _acao_cd := 0.0
 var _windup := 0.0
 var _carga := 0.0
@@ -389,6 +396,38 @@ func _physics_process(dt: float) -> void:
 		velocity = Vector2.ZERO
 		move_and_slide()
 		return
+	elif comportamento == "cuspidor":
+		if _windup > 0.0:  # plantado a avisar, depois cospe
+			_windup -= dt
+			velocity.x = 0.0
+			if not is_on_floor():
+				velocity.y += GRAVIDADE * dt
+			move_and_slide()
+			if _windup <= 0.0:
+				var b := PROJETIL_CUSPO.instantiate()
+				b.velocidade = _dive_dir * VEL_CUSPO
+				b.dano = maxi(1, int(round(dano_contacto * 0.9)))
+				get_parent().add_child(b)
+				b.global_position = global_position + _dive_dir * 16.0
+				Som.toca("projetil", -13.0, 0.9)
+				_acao_cd = randf_range(1.8, 2.8)
+			return
+		if _acao_cd <= 0.0 and is_on_floor():
+			var kk := get_tree().get_first_node_in_group("koliani")
+			if kk:
+				var d: Vector2 = (kk as Node2D).global_position - global_position
+				if absf(d.x) < ALC_CUSPIR and absf(d.y) < 170.0 and absf(d.x) > 60.0:
+					_direcao = signf(d.x)
+					if _sprite:
+						_sprite.scale.x = _direcao
+					# mira ligeiramente achatada (mais legível de desviar)
+					_dive_dir = Vector2(d.x, d.y * 0.5).normalized()
+					_windup = TELEGRAFO_CUSPIR
+					_telegrafo = TELEGRAFO_CUSPIR
+					anticipacao = 1.0
+					velocity.x = 0.0
+					Som.toca("demonio_ataque", -15.0, 0.7)
+					return
 
 	# --- patrulha normal ----------------------------------------------
 	velocity.x = _direcao * velocidade
