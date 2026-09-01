@@ -548,6 +548,111 @@ def bloqueio():
     escrever("bloqueio.wav", buf, 0.55)
 
 
+# --------------------------------------------------------------------------
+# 8) COMBATE  (espada, acerto, tiro) e 9) SELO DE CHECKPOINT
+#
+# Refeitos a pedido do Paulo (1 set 2026): os antigos eram agudos, sempre
+# iguais e a tocar a 0.85 de pico -- ao fim de dois minutos de jogo davam
+# cabo dos ouvidos. Referencia: Dead Cells -- os golpes sao CURTOS, com
+# corpo grave e ar por cima (nada de "bip"), e o checkpoint e' um sino
+# quente, nao um "ping" brilhante. Quem varia o tom em cada golpe e' o
+# `koliani.gd` (Som.toca com pitch aleatorio), para nao cansar.
+# --------------------------------------------------------------------------
+def espada():
+    """Golpe: sopro de ar a descer de tom + corpo grave curto."""
+    random.seed(4101)
+    dur = 0.15
+    N = int(dur * FS)
+    buf = [0.0] * N
+    ar = Reson()
+    for n in range(N):
+        p = n / N
+        # o "silvo" desce de 1900 para 550 Hz -> le-se como lamina a passar
+        # (mais grave do que o instinto pede: o agudo e' que cansa)
+        f = 1900.0 - 1350.0 * p
+        ruido = random.uniform(-1.0, 1.0)
+        s = ar.passo(ruido, f, 650.0) * 0.9
+        # corpo: o peso do golpe (fica por baixo, quase nao se "ouve" sozinho)
+        corpo = math.sin(2 * math.pi * (150.0 - 60.0 * p) * (n / FS))
+        s += corpo * 0.5 * math.exp(-p * 16.0)
+        env = min(1.0, p / 0.05) * math.exp(-p * 9.0)
+        buf[n] = math.tanh(s * env * 1.3)
+    # passa-baixo final: tira o "chiado" que ficava por cima do silvo
+    lp = 0.0
+    for n in range(N):
+        lp += 0.30 * (buf[n] - lp)
+        buf[n] = lp
+    escrever("ataque.wav", buf, 0.55)
+
+
+def acerto():
+    """Acerto na carne: pancada grave + estalo curto, sem cauda metalica."""
+    random.seed(4102)
+    dur = 0.18
+    N = int(dur * FS)
+    buf = [0.0] * N
+    crunch, metal = Reson(), Reson()
+    fase = 0.0
+    for n in range(N):
+        p = n / N
+        f = 125.0 * (1.0 - 0.55 * p) + 45.0     # pancada que "afunda"
+        fase += f / FS
+        s = math.sin(2 * math.pi * fase) * math.exp(-p * 15.0)
+        ruido = random.uniform(-1.0, 1.0)
+        s += crunch.passo(ruido, 1100.0 - 400.0 * p, 900.0) * 0.55 * math.exp(-p * 26.0)
+        s += metal.passo(ruido, 2600.0, 400.0) * 0.14 * math.exp(-p * 20.0)
+        buf[n] = math.tanh(s * 1.5)
+    escrever("acerto.wav", buf, 0.7)
+
+
+def tiro():
+    """Tiro roxo: sopro curto e MOLE (dispara-se sem parar -> tem de ser
+    discreto), com um corpo a descer de tom."""
+    random.seed(4103)
+    dur = 0.14
+    N = int(dur * FS)
+    buf = [0.0] * N
+    ar = Reson()
+    lp = 0.0
+    fase = 0.0
+    for n in range(N):
+        p = n / N
+        f = 330.0 - 170.0 * p
+        fase += f / FS
+        s = math.sin(2 * math.pi * fase) * 0.7 * math.exp(-p * 13.0)
+        s += ar.passo(random.uniform(-1.0, 1.0), 1000.0 - 650.0 * p, 500.0) * 0.5
+        lp += 0.25 * (s - lp)                   # tira o brilho de cima
+        env = min(1.0, p / 0.04) * math.exp(-p * 11.0)
+        buf[n] = lp * env
+    escrever("projetil.wav", buf, 0.42)
+
+
+def selo():
+    """Checkpoint: sino QUENTE de duas notas (sol -> do), ataque suave e
+    cauda longa. O antigo era um ping agudo e seco."""
+    random.seed(4104)
+    dur = 1.1
+    N = int(dur * FS)
+    buf = [0.0] * N
+    # (freq, atraso, peso) -- duas notas + um sub que da' corpo
+    notas = [(392.0, 0.0, 1.0), (587.33, 0.16, 0.85), (196.0, 0.0, 0.5)]
+    for freq, atraso, peso in notas:
+        n0 = int(atraso * FS)
+        for n in range(n0, N):
+            t = (n - n0) / FS
+            env = min(1.0, t / 0.012) * math.exp(-t * 3.0)
+            s = math.sin(2 * math.pi * freq * t)
+            s += 0.28 * math.sin(2 * math.pi * freq * 2.0 * t) * math.exp(-t * 5.5)
+            s += 0.12 * math.sin(2 * math.pi * freq * 3.01 * t) * math.exp(-t * 8.0)
+            buf[n] += s * env * peso
+    # passa-baixo: nada de arestas agudas
+    lp = 0.0
+    for n in range(N):
+        lp += 0.22 * (buf[n] - lp)
+        buf[n] = lp
+    escrever("selo.wav", buf, 0.5)
+
+
 if __name__ == "__main__":
     game_over_voz()
     menu_loop()
@@ -557,3 +662,7 @@ if __name__ == "__main__":
     saltos()
     conquista()
     bloqueio()
+    espada()
+    acerto()
+    tiro()
+    selo()

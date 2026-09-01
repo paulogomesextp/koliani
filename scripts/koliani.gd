@@ -622,7 +622,7 @@ func _physics_process(dt: float) -> void:
 			_squash = maxf(_squash, 0.5)
 			_abanar(3.0)
 			_hitstop(0.05)
-			Som.toca("ataque", -12.0)
+			Som.toca("ataque", -12.0, randf_range(0.92, 1.09))
 			_pop_impacto(ep)
 			break
 
@@ -647,7 +647,7 @@ func _physics_process(dt: float) -> void:
 			_squash = maxf(_squash, 0.5)
 			_abanar(3.0)
 			_hitstop(0.05)
-			Som.toca("acerto", -10.0)
+			Som.toca("acerto", -10.0, randf_range(0.94, 1.07))
 			_pop_impacto(global_position + Vector2(0.0, 24.0))
 
 	var vel_queda := velocity.y
@@ -893,7 +893,7 @@ func _hitstop(segundos: float) -> void:
 func _iniciar_ataque() -> void:
 	_ataque_restante = DUR_ATAQUE
 	_pop = 1.0
-	Som.toca("ataque", -13.0)
+	Som.toca("ataque", -13.0, randf_range(0.92, 1.09))
 	_flash_golpe()
 	if _hitbox:
 		_hitbox.scale.x = _olha_para
@@ -1014,7 +1014,7 @@ func _lancar_projetil() -> void:
 	get_parent().add_child(p)
 	p.global_position = global_position + aim * 20.0 + Vector2(0.0, -4.0)
 	p.lancar(aim, maxi(1, roundi(_dano_golpe() / 3.0)))
-	Som.toca("projetil", -13.0, 1.35)
+	Som.toca("projetil", -13.0, randf_range(1.22, 1.42))
 	if _faiscas:
 		_faiscas.position.x = absf(_faiscas.position.x) * signf(aim.x if aim.x != 0.0 else _olha_para)
 		_faiscas.restart()
@@ -1058,7 +1058,7 @@ func _ao_acertar_corpo(corpo: Node) -> void:
 		_pop_impacto((corpo as Node2D).global_position if corpo is Node2D else global_position)
 		_abanar(4.5)
 		_hitstop(0.06)
-		Som.toca("acerto", -8.0)
+		Som.toca("acerto", -8.0, randf_range(0.94, 1.07))
 
 
 ## "Frame de impacto" -- clarão branco que estica e desaparece depressa.
