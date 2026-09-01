@@ -48,12 +48,27 @@ A personagem principal (Koliani) é original do projeto
   (o pack só traz walk/idle: o `hit` reaproveita o idle e o `dead` é gerado,
   o bicho achata-se e desvanece). O `abutre` voa, como o `olho`.
 
+## clembod — "Bringer of Death"
+- https://clembod.itch.io/ — grátis com uso comercial; **crédito pedido pelo
+  autor** (texto exacto por colar em `incoming/LICENSES.md`).
+- Uso: o **Colosso Ósseo** (nível 17) — `bosses/colosso.png`, 4 poses
+  montadas por `tools/extrair_chefes_packs.gd`.
+
+## chierit — "boss demon slime" (versão FREE)
+- https://chierit.itch.io/ — **CC-BY 4.0** (obriga a creditar).
+- Uso: o **Ignivar** (nível 7) — `bosses/ignivar.png`. Apesar do nome do
+  pack, o sprite é um demónio de fogo com espadão, que é exactamente o
+  chefe da Fornalha dos Pecadores.
+
 ## LuizMelo — "Monsters Creatures Fantasy"
 - https://luizmelo.itch.io/monsters-creatures-fantasy
 - Licença: CC0 1.0
 - Uso: inimigos comuns pixel-art animados
   (`assets/sprites/pixel/enemies/{goblin,mushroom,esqueleto,olho}/`) —
   Goblin, Mushroom, Skeleton, Flying Eye. `DemonioBase.especie` escolhe.
+- Também o pack **Evil Wizard 2** (mesmo autor, CC0): é o **Bispo
+  Púrpura** (nível 24) — `bosses/bispo.png`, via
+  `tools/extrair_chefes_packs.gd`.
 
 ## Ansimuz (Luis Zuno) — packs "GothicVania" / parallax
 - https://ansimuz.itch.io/ · https://opengameart.org/users/ansimuz

@@ -59,7 +59,8 @@ func _initialize() -> void:
 	_boss_ghorak_anim()
 	_boss_morvanna()
 	_boss_rainha()
-	_boss_ignivar()  # regiao II / nivel 07
+	# _boss_ignivar()  -- DESLIGADO: o Ignivar passou ao demonio de fogo do
+	# pack chierit (tools/extrair_chefes_packs.gd).
 	_boss_dama()     # regiao II / nivel 08
 	_boss_irmaos()   # regiao II / nivel 09
 	_boss_primeiro() # regiao II / nivel 10
@@ -69,17 +70,21 @@ func _initialize() -> void:
 	_boss_sacerdotisa() # regiao III / nivel 14
 	_boss_vyrak()    # regiao III / nivel 15
 	_boss_rei_ossario() # regiao IV / nivel 16
-	_boss_colosso()  # regiao IV / nivel 17
+	# _boss_colosso()  -- DESLIGADO: o Colosso Osseo passou a usar o pack
+	# clembod "Bringer of Death" (ver tools/extrair_chefes_packs.gd). Correr
+	# isto por cima voltaria a por o desenho antigo.
 	_boss_freira()   # regiao IV / nivel 18
 	_boss_naga()     # regiao IV / nivel 19
 	_boss_olho()     # regiao IV / nivel 20
 	_boss_prefeito() # regiao V / nivel 21
 	_boss_acougueiro() # regiao V / nivel 22
 	_boss_maquinista() # regiao V / nivel 23
-	_boss_bispo()    # regiao V / nivel 24
+	# _boss_bispo()    -- DESLIGADO: o Bispo Purpura passou ao pack luizmelo
+	# "Evil Wizard 2" (tools/extrair_chefes_packs.gd).
 	_boss_noiva()    # regiao V / nivel 25
 	_boss_capitao()  # regiao VI / nivel 26
-	_boss_koliani_sombria() # regiao VI / nivel 27
+	# _boss_koliani_sombria() -- DESLIGADO: a Sombria e' agora o espelho do rig
+	# da Koliani (tools/importar_rig_cavaleiro.gd).
 	_boss_devorador() # regiao VI / nivel 28
 	_boss_arauto()   # regiao VI / nivel 29
 	_boss_zeriko()   # nivel 30 -- final
