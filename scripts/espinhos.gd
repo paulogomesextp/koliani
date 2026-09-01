@@ -13,6 +13,8 @@ const TILE := 16
 
 
 func _pronto() -> void:
+	add_to_group("pogavel")          # a Koliani pode ressaltar em cima (pogo)
+	set_collision_layer_value(6, true)
 	_aplicar()
 
 

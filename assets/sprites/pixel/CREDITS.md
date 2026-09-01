@@ -80,3 +80,12 @@ CC0 não exige atribuição; fica aqui à mesma por cortesia.
   cor é a da zona, e todas levam a mesma aresta de luar + fio magenta +
   musgo fantasma. `scripts/plataforma.gd` escolhe pelo `bioma`.
   (`floresta` continua com relva do Pixel Adventure.)
+
+## Ansimuz — "Gothicvania Church" (rig da Koliani, EXPERIMENTAL)
+- https://ansimuz.itch.io/gothic-vania-church-pack  (CC0 — confirmar em incoming/LICENSES.md)
+- Uso: rig de animação do jogador (idle/walk/jump/fall/punch/crouch, tiras
+  82x60) recolorido para o luar roxo do key_art (duotone indigo→roxo→
+  lavanda) por `tools/importar_rig_koliani.py` → `assets/sprites/pixel/
+  koliani_gothic/*.png`. Ligado por `koliani.gd` `RIG = "gothic"`
+  (`RIG = "codigo"` volta ao sprite gerado por `tools/gerar_sprites.gd`).
+  Mesma família de arte dos parallax Ansimuz já usados nos fundos.

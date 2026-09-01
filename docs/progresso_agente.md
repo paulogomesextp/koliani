@@ -1,5 +1,210 @@
 # Progresso do agente `gaming` — campanha dos 30 níveis
 
+## Sessão 2026-09-01 (noite, autónoma) — variedade Dead Cells
+
+### ❓ Pendente — precisa de decisão do Paulo
+1. **Histórico git com ~180 MB de packs em bruto** (ver o aviso ⚠️
+   abaixo). Deixo como está ou queres que eu faça `git filter-repo` +
+   `push --force` ao `master`? (parte o clone do Jensath — combinem).
+2. **Fase 5 / "essência"**: a Fase 2 tem a peça `alcove-segredo`
+   bloqueada porque não há moeda nem sítio onde a gastar. Queres
+   essência (contador no HUD) já, e o *sink* é o quê? — banca de cura
+   entre níveis / trocar as 2 skills / melhorar arma. Sem isto, salto
+   esta peça.
+3. **Pogo na Guilhotina / PenduloLamina** (Fase 1, marcado "Falta"):
+   ressaltar em cima de uma lâmina de guilhotina a cair ou de uma foice
+   a baloiçar é *possível* mas pode dar mais frustração que "tech". Queres
+   mesmo? Se sim, só nas lâminas paradas/retraídas ou também em movimento?
+4. **Playtest dos números** de tudo o que entrou v0.8.7→v0.8.11 (câmaras
+   novas + `cuspidor`) — está tudo "a olho". Precisa de ti a jogar.
+
+### 🎮 Onde ver / testar as câmaras novas (v0.8.13)
+
+Arranca já no nível certo, com kit todo + FLYMODE (tecla F):
+```
+& "C:\Users\paulo\Desktop\Godot_v4.7.2-stable_win64.exe" . -- --devmode --nivel=N
+```
+
+| câmara | níveis (`--nivel=`) | o que confirmar |
+|--------|--------------------|-----------------|
+| `_f_crossfire` | 21, 23, 27, 29 | ritmo dos tiros dá para passar a saltar; o feixe lê-se |
+| `_f_ferry` | 12, 13, 15, 27 | velocidade da balsa; as 2 lâminas a meio ficam justas? |
+| `_f_pedras` | 16, 18, 19, 20 | densidade das quedas; aviso (tremor) chega a tempo |
+| `_f_espinhos` | 10 | a calha baixa dá para atravessar aos ressaltos (pogo)? a calha alta chega bem? |
+| `cuspidor` (inimigo) | qualquer ≥ 8, mais denso 15+ | alcance/cadência do cuspo; dano do projétil |
+
+O `_f_espinhos` só calha 1× nos seeds actuais (nível 10, "A Cela Zero") —
+se gostares dele digo ao gerador para o puxar mais nas Catacumbas.
+
+Mapa completo das câmaras por nível:
+`MAPA_CAMARAS=1 godot --headless --script res://tools/verifica_jornada.gd | grep "^CAMARA"`
+
+### Batch entregue esta noite
+
+Continuação da reformulação Dead Cells (Fase 2 câmaras + Fase 2b inimigos)
+sem o Paulo à frente. Ecrãs desligados durante a sessão.
+
+**Entregas:** v0.8.7 `_f_crossfire` · v0.8.8 `cuspidor` · v0.8.9 `_f_ferry`
+· v0.8.10 `_f_pedras` (+ bug) · v0.8.11/12 `_f_espinhos` · **v0.8.13: as
+câmaras novas passam a aparecer mesmo** (a selecção engolia-as — ver
+abaixo). Tudo com testes headless + `verifica_jornada.gd` (30 níveis)
+verdes. **Todos os números por playtestar.**
+
+### ⚠️ Erro meu: `git add -A` apanhou os packs em bruto (v0.8.7..v0.8.11)
+- Os 5 commits de playtest usaram `git add -A` e arrastaram ~5026
+  ficheiros / ~180 MB de `assets/sprites/incoming/` (10 packs que o Paulo
+  largou: anokolisa, bdragon1727, codemanu, free-game-assets, glionox,
+  ninjikin, piiixl, szadiart, thewisehedgehog, zerie). Só tinham
+  `.gdignore`, não `.gitignore`.
+- **Corrigido** (`0ec3745`): `git rm --cached` das 10 pastas (ficheiros
+  ficam em disco) + regra no `.gitignore` para cada. O conjunto de
+  ficheiros tracked ficou EXACTAMENTE como estava antes da sessão (o pack
+  `kenney-pixel-platformer`, CC0, continua versionado).
+- **PENDENTE p/ o Paulo:** os blobs continuam no histórico (9e5791f→).
+  Limpar precisa de `git filter-repo` + `push --force` ao `master` — mexe
+  no remote e parte o clone do Jensath. Decisão do Paulo.
+- A partir daqui, nesta sessão: **nada de `git add -A`**, só paths
+  explícitos.
+
+### Inimigo "cuspidor" (v0.8.8)
+- `demonio_base.gd`: novo `comportamento = "cuspidor"`. Patrulha e, à
+  distância (`ALC_CUSPIR` 440 px, |dy| < 170, |dx| > 60), planta-se,
+  telegrafa (`_windup` 0.5 s + pisca) e instancia uma `BolaFogo`
+  (`PROJETIL_CUSPO`) na direção da Koliani, com a mira achatada em y
+  (`Vector2(dx, dy*0.5).normalized()`) para ser mais legível de desviar.
+  Dano do projétil = `dano_contacto * 0.9`. Recarga 1.8-2.8 s; entre
+  cuspos anda como patrulha.
+- `gerador_corredor.gd` `_inimigo_em`: entra nas opções de comportamento
+  a partir de `_dif > 0.22` (a par de saltador/carga/trepador/escudeiro).
+- **Falta playtestar**: alcance, cadência, se o projétil lê bem, dano.
+
+### Câmara `_f_espinhos` — a forquilha do pogo (v0.8.11)
+- Forquilha (abre em 2, reúne): calha BAIXA = tapete de `Espinhos`
+  ("pogavel"), atravessa-se aos ressaltos com o **pogo** da Fase 1, com
+  uma `_plat` por baixo de cada tira (falhar o pogo = dano + queda curta,
+  não é o líquido); calha ALTA = fila de plataformas limpas, o caminho
+  justo. Reúne num `_plat` sólido + checkpoint.
+- Aproveita o `const ESPINHOS` que estava preloaded e sem uso.
+- Pools **Prisão (1)** e **Catacumbas (3)**; `TIER 0.36`.
+- **Falta playtestar**: espaçamento dos espinhos p/ o ritmo de pogo dar
+  certo; se a calha alta chega bem ao reencontro.
+
+### Bug + câmara `_f_pedras` (v0.8.10)
+- A pool da região 3 (Catacumbas) listava `"pedras"` desde sempre, mas o
+  `match` de `_flavour` **não tinha** `"pedras"` → caía no `return
+  Vector2(x + 180.0, y)` (no-op): um vão morto de 180 px sem câmara, ~1
+  em cada 8 câmaras geradas por pool nas Catacumbas.
+- Novo `_f_pedras`: beiral sem tecto, `n` = 5 + 3·`_dif` degraus, uma
+  `PedraQueda` por degrau — 1 em cada 3 `automatico` (ciclo/ritmo), as
+  outras `raio_gatilho` 82. Sem tecto baixo (≠ `gruta`) nem parede
+  interior (≠ `cripta`). Checkpoints a cada 2. `_pos_intenso`.
+- NB descoberto nesta sessão: **nenhum nível tem `corredor = false`** — a
+  abordagem "Casca + dungeon selada" das regiões II/IV foi revertida; a
+  JORNADA corre em todos os níveis 1-29.
+
+### Câmara "ferry / a travessia" (v0.8.9)
+- **`_f_ferry`** (`gerador_corredor.gd`): fosso largo (`vao` 620-880 px +
+  `220·_dif`) sobre o líquido, atravessado por UMA plataforma-balsa —
+  `TumuloElevador` com `curso = Vector2(vao, 0)`, `auto = true`,
+  `velocidade` 96 + 30·`_dif`. Duas `PenduloLamina` a 34%/70% do vão
+  (blade a ~24 px acima do deck → desviar em pé, agachar não chega).
+  Cais de embarque + cais de desembarque sólido + checkpoint forçado.
+- Pools de **Torres (2)**, **Catacumbas (3)** e **Castelo (5)**;
+  `TIER_FLAVOUR["ferry"] = 0.3`. Sem risco de softlock (a balsa faz
+  vaivém → volta sempre ao cais).
+- Smoke a 5 níveis OK. **Falta playtestar**: velocidade da balsa, se as
+  lâminas ficam a uma altura justa, largura do vão.
+
+### Câmara "fogo cruzado" (v0.8.7)
+
+- **`_f_crossfire`** (`gerador_corredor.gd`): novo "tom" de câmara. Lanço
+  recto de plataformas pouco onduladas com uma `Torreta` por passo,
+  alternando de lado (esq/dir), a cuspir `BolaFogo` na horizontal a
+  alturas ligeiramente acima/abaixo da linha de salto → o feixe cruza o
+  caminho. É leitura de padrão / timing dos tiros, não plataforma difícil.
+  `intervalo`/`telegrafo`/`dano`/`vel_bola` escalam com `_dif`. Saída
+  sólida limpa + checkpoints a cada 2 passos. Marca `_pos_intenso` (entra
+  um `_f_descanso` a seguir).
+- Entrou nas pools das regiões **Prisão (1)**, **Cidade (4)** e
+  **Castelo (5)**; `TIER_FLAVOUR["crossfire"] = 0.4` (só do ~Nível 13 em
+  diante, na prática só se vê em Cidade/Castelo).
+- Testes headless verdes; smoke a 5 níveis (Vila/Praça do Eclipse/Portões
+  de Zeriko/Prisão/Floresta) sem erros de script. **Falta playtestar o
+  feel** (ritmo dos tiros, se o fogo cruzado lê bem, dano).
+- Entrega **v0.8.7**.
+
+## Sessão 2026-09-01 — curva de dificuldade + pisão
+
+Pedido do Paulo: (1) pisar inimigos = dano de espada + pulo automático;
+(2) os níveis ficaram duros demais — dificuldade **básica no N1** a subir
+até ao N30.
+
+- **Pisão** (`koliani.gd`): já existia mas a janela era apertada e o
+  ressalto fraco. Agora janela generosa (±46 px, banda vertical larga,
+  gatilho a `velocity.y > 40`), ressalto forte (`STOMP_RESSALTO` 520 /
+  `STOMP_RESSALTO_ALTO` 680 a segurar saltar) e **devolve os saltos de ar
+  todos** → encadeia pisões.
+- **Dificuldade** — tudo escala com `_dif = indice_nivel / 29`, quase a
+  zero no N1:
+  - `gerador_corredor.gd`: comprimento 6200 (N1) → ~32000 (N30); câmaras
+    de flavour por **`TIER_FLAVOUR`** (N1 só saltos/gruta/trampolim);
+    espaçamento das câmaras ~13 passos (N1) → ~4 (N30); perigo-no-vão
+    `5%+50%·_dif`, inimigos `5%+22%·_dif`; plataformas móveis só
+    `_dif > 0.33`; armadilhas com base de dano mais baixa e `_dif` mais
+    íngreme. Seed passou a `jornada4|`.
+  - `demonio_base.gd`: escala nos 30 níveis (antes parava no 4). N1 ≈
+    ×0.8 vida / ×0.65 dano, N30 ≈ ×1.4.
+  - `estado_jogo.gd`: `TEMPO_HARDCORE` reperfilado (170 s N1 → 640 s N30).
+- Testes headless verdes; smoke a 4 níveis (N1/N11/N20/N25) OK. **Falta
+  playtestar com o jogo a correr e afinar os números.**
+
+Feedback seguinte do Paulo (mesma sessão):
+
+- **Trampolins não funcionavam** (`trampolim.gd` + `koliani.gd`): o
+  `Trampolim` mexia em `k.velocity.y` a partir de `body_entered`, mas o
+  `Movimento.passo()` reescreve `velocity` do `_mov.velocidade` interno a
+  cada frame → o impulso morria e a Koliani ficava pousada. Novo
+  `Koliani.aplicar_impulso()` sincroniza os dois. E o `Trampolim` deixou
+  de usar `body_entered` (só dispara à entrada) — passa a sondar
+  `get_overlapping_bodies()` em `_physics_process`, por isso também salta
+  quem lá anda por cima ou lá fica.
+- **Checkpoints a menos** (`gerador_corredor.gd`): havia 20–40 por nível
+  (um a cada ~2 plataformas). `_checkpoint()` agora só cria se estiver a
+  ≥ `DIST_CHECKPOINT` (4000 px) do anterior; início e pré-chefe são
+  `forcar=true`. Resultado ~3 (níveis curtos) a ~10 (N30) — ~90% menos.
+- **Jornada 4.0 — verticalidade** (`gerador_corredor.gd`): a espinha era
+  uma fita quase horizontal. Agora `_teto_y = _chao_y - lerp(640,1320)`
+  (cresce c/ dificuldade); a espinha caminha para uma ALTITUDE-ALVO que
+  vagueia por toda a banda; de 2 em 2-3 câmaras entra uma VERTICAL:
+  `_f_torre` (subida ziguezague +700..1200), `_f_poco` (desce rente ao
+  líquido, sobe pela parede oposta), `_f_pilares` (colunas **só visuais**
+  + topos sólidos). Regra de ouro mantida: subida ≤ `SUBIDA_MAX` 104 px.
+  **Bug corrigido logo a seguir**: as colunas de `_f_pilares` eram sólidas
+  e cortavam passadeiras → "parede que não deixa passar". Passaram a ser
+  sprites de fundo.
+- **FLYMODE** (`koliani.gd` `alternar_voo()` + `dev_barra.gd`): botão só em
+  DEVELOPER MODE (canto inf. esq., por cima das barras) + tecla F. Voa
+  livre (setas/WASD, `VEL_VOO` 560), `collision_mask=0` → atravessa tudo,
+  sem gravidade nem dano de fosso. Desligar = cai à plataforma. Para
+  testar zonas distantes sem jogar o nível todo.
+- **Reformulação "pegada Dead Cells"** (decidido c/ Paulo, ver
+  `docs/reformulacao_deadcells.md`): passe de feel+arte, mantém a campanha.
+  - Fase 1 feel (`koliani.gd`): **agarrar borda/mantle** (`_detetar_borda`),
+    **wall-jump básico** (não precisa de `escalar_paredes`), **roll-cancel**
+    (rolar corta o recovery do ataque), **pogo** em Serra/Espinhos (grupo
+    `"pogavel"` + layer 6, raycast p/ baixo, i-frames apanham o toque).
+    Falta afinar números (precisa playtest).
+  - Fase 2 jornada (`gerador_corredor.gd`): **ritmo tensão/alívio** —
+    `_f_descanso` (plataforma larga limpa + checkpoint) a seguir a câmaras
+    puxadas e a cada 4.ª; **`_f_forquilha`** (caminho abre em 2 e reúne);
+    **3 actos** (`prog`/`intens`: intro suave → meio a apertar → alívio
+    pré-chefe) + **`ASSINATURA`** de região (câmara-cara do bioma no meio).
+  - Fase 2b inimigos (`demonio_base.gd` `comportamento`): saltador, carga,
+    **voador** (olho: paira + mergulha), **escudeiro** (bloqueia de frente).
+  - Fase 4 rig da Koliani: **tentada e revertida** (ficou escura/pequena);
+    `RIG = "codigo"`, infra do rig gothic fica na gaveta.
+  - Entregas v0.8.0 → v0.8.4 (bump por entrega).
+
 ## Sessão 2026-08-31 (cont. 3) — JORNADA 3.0: chão MORTAL + assets
 
 Feedback do Paulo: (1) os níveis tinham quase todos uma plataforma

@@ -26,6 +26,8 @@ func _vida_max() -> int:
 ## Dano do golpe = arma equipada, ou a base se não houver arma.
 func _dano_golpe() -> int:
 	return EstadoJogo.dano_ataque()
+## Velocidade do FLYMODE (só DEVELOPER MODE -- ver `alternar_voo`).
+const VEL_VOO := 560.0
 const VEL_DASH := 620.0
 const DUR_DASH := 0.16
 const RECARGA_DASH := 0.55
@@ -40,11 +42,21 @@ const VEL_ESCALAR := 135.0
 ## fica fixo -- ↑ trava/sobe, ↓ acelera a descida.
 const VEL_DESLIZE_PAREDE := 55.0
 const WALLJUMP := Vector2(330.0, -430.0)
+## Agarrar a borda (básico, sempre disponível -- pegada Dead Cells): a cair
+## rente ao rebordo de uma plataforma, a Koliani agarra-se e fica pendurada.
+## Saltar / ↑ = sobe para cima da plataforma; ↓ = larga. Perdoa saltos por
+## um triz nas torres da jornada.
+const BORDA_ALCANCE := 24.0       # quão à frente se sente a parede
+const BORDA_PEITO := -30.0        # altura do sensor "há parede à frente"
+const BORDA_CABECA := -60.0       # altura do sensor "está livre por cima do rebordo"
+const BORDA_MANTLE := Vector2(150.0, -430.0)  # impulso ao subir para a plataforma
 const DUR_ATAQUE := 0.18
 const I_FRAMES := 0.6
-## Ressalto ao cair em cima de um inimigo (Mario-style). Um pouco menos que
-## um salto normal (FORCA_SALTO 470).
-const STOMP_RESSALTO := 430.0
+## Ressalto ao cair em cima de um inimigo (Mario-style): o pulo automático a
+## seguir ao "pisão". `STOMP_RESSALTO` é o pulo normal; se estiver a segurar
+## o botão de saltar no momento do impacto, dá o pulo alto (encadear pisões).
+const STOMP_RESSALTO := 520.0
+const STOMP_RESSALTO_ALTO := 680.0
 ## Defesa (habilidade "escudo"): anda-se devagar de escudo erguido; um
 ## ataque que venha de frente é bloqueado (sem dano) com um som subtil.
 const VEL_DEFESA := 70.0
@@ -99,6 +111,9 @@ var _defendendo := false
 ## empilhavam transições e deixavam o ecrã preso a preto.
 var _a_morrer := false
 var _energia := ENERGIA_MAX
+## FLYMODE ligado (só DEVELOPER MODE). Enquanto true: voo livre, atravessa
+## paredes, sem gravidade nem dano de fosso.
+var _voando := false
 var _lancar_restante := 0.0
 ## Carga do Kamehameha: segundos com "lancar" em baixo nesta pressão.
 var _lancar_seg := 0.0
@@ -112,6 +127,11 @@ var _preso := 0.0
 ## breve travão depois do salto de parede para não voltar a colar logo.
 var _escalando := false
 var _parede_lock := 0.0
+## Pendurada num rebordo (agarrar a borda). `_borda_lock` = pequeno travão
+## depois de largar/subir para não voltar a agarrar logo.
+var _borda := false
+var _borda_lock := 0.0
+var _borda_lado := 1.0
 ## Agachada (segura S no chão, parada). Só bloqueia o andar -- visual.
 var _agachado := false
 ## Conta-decrescente para mostrar a animação do salto duplo.
@@ -163,9 +183,14 @@ func _ready() -> void:
 	EstadoJogo.equipamento_mudou.connect(func(_t: String, _i: String) -> void: _aplicar_equipamento())
 
 
-## Constrói os SpriteFrames da Koliani a partir das tiras geradas em
-## `tools/gerar_sprites.gd` (assets/sprites/pixel/koliani/*.png). Cada tira
-## é horizontal, 40 px por frame, virada à direita.
+## Rig do sprite: "codigo" = tiras geradas por `tools/gerar_sprites.gd`
+## (a Koliani atual, roxa e on-model). "gothic" = rig Ansimuz "Gothicvania
+## Church" (CC0) recolorido, em `koliani_gothic/` -- experiência da fase 4,
+## DESLIGADA a pedido do Paulo (ficou escura/pequena; fica na gaveta,
+## reativa-se pondo "gothic" + `tools/importar_rig_koliani.py`).
+const RIG := "codigo"
+
+## [n_frames, fps, loop] por estado. Cada tira é horizontal, virada à direita.
 const _KOLI_ANIMS := {
 	"idle":      [4, 6.0, true],
 	"run":       [6, 12.0, true],
@@ -176,18 +201,41 @@ const _KOLI_ANIMS := {
 	"wallslide": [2, 8.0, true],
 	"djump":     [4, 18.0, false],
 }
+## Contagens do rig "gothic" (Punch tem 6 frames, jump só 2).
+const _KOLI_ANIMS_GOTHIC := {
+	"idle":      [4, 7.0, true],
+	"run":       [6, 13.0, true],
+	"jump":      [2, 8.0, false],
+	"fall":      [2, 8.0, true],
+	"attack":    [6, 26.0, false],
+	"crouch":    [2, 6.0, true],
+	"wallslide": [2, 8.0, true],
+	"djump":     [2, 12.0, false],
+}
 
 func _montar_frames() -> void:
 	if _corpo.sprite_frames != null:
 		return
+	var gothic := RIG == "gothic"
+	var anims: Dictionary = _KOLI_ANIMS_GOTHIC if gothic else _KOLI_ANIMS
+	var dir_tiras := "koliani_gothic" if gothic else "koliani"
+	if gothic:
+		_corpo.scale = Vector2(1.05, 1.05)
+		_corpo.offset = Vector2(0.0, 4.0)  # baixa o sprite -> pés no chão
+		if _armadura:
+			_armadura.visible = false  # o rig já traz roupa
+		# o rig não tem "lâmina que brilha" -- desliga o glow que fica preso
+		# ao sprite (o clarão do GOLPE continua a disparar nos acertos)
+		if _luz_lamina:
+			_luz_lamina.enabled = false
 	var sf := SpriteFrames.new()
 	sf.remove_animation("default")
-	for nome: String in _KOLI_ANIMS:
-		var cfg: Array = _KOLI_ANIMS[nome]
+	for nome: String in anims:
+		var cfg: Array = anims[nome]
 		sf.add_animation(nome)
 		sf.set_animation_speed(nome, cfg[1])
 		sf.set_animation_loop(nome, cfg[2])
-		var tex: Texture2D = load("res://assets/sprites/pixel/koliani/%s.png" % nome)
+		var tex: Texture2D = load("res://assets/sprites/pixel/%s/%s.png" % [dir_tiras, nome])
 		if tex == null:
 			continue
 		var n: int = cfg[0]
@@ -207,7 +255,7 @@ func _montar_frames() -> void:
 func _aplicar_equipamento() -> void:
 	if _arma:
 		var wi := Equipamento.indice_arma(EstadoJogo.arma_equipada)
-		_arma.visible = wi >= 0
+		_arma.visible = wi >= 0 and RIG != "gothic"  # o rig já empunha a lâmina
 		if wi >= 0:
 			_arma.frame = wi
 	if _luz_lamina:
@@ -223,6 +271,9 @@ func _aplicar_equipamento() -> void:
 ## `Sprite` -- herdam o squash/stretch/flip da animação procedural.
 func _aplicar_visual_armadura() -> void:
 	if _armadura == null:
+		return
+	if RIG == "gothic":
+		_armadura.visible = false  # o rig já traz roupa própria
 		return
 	var ai := Equipamento.indice_armadura(EstadoJogo.armadura_equipada)
 	_armadura.visible = ai >= 0
@@ -257,6 +308,7 @@ func _physics_process(dt: float) -> void:
 	_kame_recarga = maxf(0.0, _kame_recarga - dt)
 	_preso = maxf(0.0, _preso - dt)
 	_parede_lock = maxf(0.0, _parede_lock - dt)
+	_borda_lock = maxf(0.0, _borda_lock - dt)
 	_djump_t = maxf(0.0, _djump_t - dt)
 	_leve = maxf(0.0, _leve - dt)
 	if _inverso_restante > 0.0:
@@ -268,6 +320,21 @@ func _physics_process(dt: float) -> void:
 	if _energia < ENERGIA_MAX:
 		_energia = minf(ENERGIA_MAX, _energia + REGEN_ENERGIA * dt)
 		energia_mudou.emit(_energia, ENERGIA_MAX)
+
+	# FLYMODE (só DEVELOPER MODE, botão na DevBarra): voa livre e atravessa
+	# tudo. Sem `move_and_slide` -> zero colisão. Ao desligar cai à plataforma.
+	if _voando:
+		var vx := Input.get_axis("mover_esquerda", "mover_direita")
+		var vy := Input.get_axis("mirar_cima", "mirar_baixo")
+		var v := Vector2(vx, vy)
+		if v.length() > 1.0:
+			v = v.normalized()
+		velocity = v * VEL_VOO
+		if vx != 0.0:
+			_olha_para = signf(vx)
+		move_and_slide()  # collision_mask = 0 enquanto voa -> atravessa tudo
+		_mov.velocidade = velocity
+		return
 
 	var dir := Input.get_axis("mover_esquerda", "mover_direita") * _inverso
 	if dir != 0.0 and _rolar_restante <= 0.0:
@@ -319,6 +386,65 @@ func _physics_process(dt: float) -> void:
 		_estava_no_chao = false
 		return
 
+	# --- agarrar a borda (básico) -----------------------------------------
+	# a cair (ou quase parada no ar) rente ao rebordo de uma plataforma:
+	# agarra-se. Não corre se estiver a escalar, a rolar, a dar dash, ou
+	# logo a seguir a largar/subir.
+	if not _borda and _borda_lock <= 0.0 and not is_on_floor() \
+			and _rolar_restante <= 0.0 and _dash_restante <= 0.0 \
+			and _ataque_restante <= 0.0 and _preso <= 0.0 \
+			and velocity.y > -30.0:
+		var lado := signf(dir) if dir != 0.0 else _olha_para
+		var lip_y := _detetar_borda(lado)
+		if not is_nan(lip_y):
+			_borda = true
+			_borda_lado = lado
+			global_position.y = lip_y + 34.0  # mãos ao nível do rebordo
+			velocity = Vector2.ZERO
+			_mov.saltos_dados = 0
+			Som.toca("aterrar", -16.0)
+
+	if _borda:
+		_olha_para = _borda_lado
+		velocity = Vector2.ZERO
+		if Input.is_action_just_pressed("saltar") or Input.is_action_just_pressed("mirar_cima"):
+			# sobe para cima da plataforma
+			velocity = Vector2(_borda_lado * BORDA_MANTLE.x, BORDA_MANTLE.y)
+			_mov.velocidade = velocity
+			_mov.saltos_dados = 0
+			_borda = false
+			_borda_lock = 0.25
+			Som.toca("salto", -10.0)
+		elif Input.is_action_pressed("mirar_baixo") \
+				or (dir != 0.0 and signf(dir) == -_borda_lado):
+			_borda = false
+			_borda_lock = 0.22
+		move_and_slide()
+		_mov.velocidade = velocity
+		_estava_no_chao = false
+		return
+
+	# wall-jump básico (sempre, não precisa da habilidade "escalar_paredes"):
+	# no ar, encostada a uma parede e a segurar CONTRA ela -> chuta para
+	# fora. Não gasta o salto do ar. Perde para o escalar quando este está
+	# ativo (esse já saiu acima com `return`).
+	if not is_on_floor() and is_on_wall_only() and _parede_lock <= 0.0 \
+			and not _escalando and _dash_restante <= 0.0 and _rolar_restante <= 0.0 \
+			and velocity.y > -140.0 and dir != 0.0 \
+			and signf(dir) == -signf(get_wall_normal().x) \
+			and Input.is_action_just_pressed("saltar"):
+		var wn := get_wall_normal()
+		velocity = Vector2(wn.x * WALLJUMP.x, WALLJUMP.y)
+		_parede_lock = 0.24
+		_mov.saltos_dados = 0  # o chute de parede não gasta o salto do ar
+		_mov.velocidade = velocity
+		_olha_para = signf(wn.x)
+		Som.toca("salto", -9.0)
+		move_and_slide()
+		_mov.velocidade = velocity
+		_estava_no_chao = false
+		return
+
 	# defesa: só com a habilidade "escudo", em pé, e não a meio de outra ação
 	_defendendo = EstadoJogo.tem_habilidade("escudo") \
 		and Input.is_action_pressed("defender") \
@@ -360,6 +486,12 @@ func _physics_process(dt: float) -> void:
 		_rolar_restante = DUR_ROLAR
 		_rolar_recarga = RECARGA_ROLAR
 		_invulneravel = maxf(_invulneravel, DUR_ROLAR)
+		# roll-cancel (pegada Dead Cells): o rolamento corta o recovery do
+		# ataque -> encadeia-se ataque -> rolar -> ataque sem esperar
+		if _ataque_restante > 0.0:
+			_ataque_restante = 0.0
+			if _hitbox:
+				_hitbox.monitoring = false
 	elif Input.is_action_just_pressed("dash") and _dash_recarga <= 0.0 and (
 			is_on_floor() or EstadoJogo.tem_habilidade("dash_aereo")):
 		_dash_restante = DUR_DASH
@@ -400,10 +532,13 @@ func _physics_process(dt: float) -> void:
 	elif _vento_restante > 0.0:
 		_vento_restante -= dt
 
-	# cair em cima de um inimigo = golpe de espada normal + ressalto
+	# cair em cima de um inimigo = golpe de espada + pulo automático (estilo
+	# Mario). Janela GENEROSA: basta vir a descer e apanhar o bicho grosso
+	# modo por cima -- serve para inimigos de vários tamanhos. Encadeia:
+	# cada pisão devolve os saltos de ar todos.
 	_stomp_cd = maxf(0.0, _stomp_cd - dt)
-	if _stomp_cd <= 0.0 and velocity.y > 90.0 and not is_on_floor() and _dash_restante <= 0.0:
-		var pes := global_position.y + 22.0
+	if _stomp_cd <= 0.0 and velocity.y > 40.0 and not is_on_floor() and _dash_restante <= 0.0:
+		var pes := global_position.y + 24.0
 		for e in get_tree().get_nodes_in_group("inimigos"):
 			if not is_instance_valid(e) or (e as Node).is_in_group("chefes") \
 					or not (e as Node).has_method("receber_dano"):
@@ -411,21 +546,49 @@ func _physics_process(dt: float) -> void:
 			if "vida" in e and e.vida <= 0:
 				continue
 			var ep: Vector2 = (e as Node2D).global_position
-			if absf(ep.x - global_position.x) > 30.0:
+			if absf(ep.x - global_position.x) > 46.0:
 				continue
-			if global_position.y > ep.y - 4.0 or pes < ep.y - 30.0 or pes > ep.y + 18.0:
+			# centro da Koliani acima do centro do inimigo e os pés dela na
+			# banda do topo dele (larga, apanha bichos altos e baixos)
+			if global_position.y > ep.y + 6.0 or pes < ep.y - 52.0 or pes > ep.y + 30.0:
 				continue
 			e.receber_dano(_dano_golpe(), 0.0)
-			velocity.y = -STOMP_RESSALTO
-			_mov.saltos_dados = mini(_mov.saltos_dados, 1)  # devolve um salto de ar
-			_invulneravel = maxf(_invulneravel, 0.25)
-			_stomp_cd = 0.3
+			var alto := Input.is_action_pressed("saltar")
+			velocity.y = -(STOMP_RESSALTO_ALTO if alto else STOMP_RESSALTO)
+			_mov.saltos_dados = 0  # o ressalto devolve os saltos de ar todos
+			_invulneravel = maxf(_invulneravel, 0.3)
+			_stomp_cd = 0.22
 			_pop = 1.0
-			_abanar(2.4)
+			_squash = maxf(_squash, 0.5)
+			_abanar(3.0)
 			_hitstop(0.05)
 			Som.toca("ataque", -12.0)
 			_pop_impacto(ep)
 			break
+
+	# pogo: cair em cima de uma serra / espinhos (grupo "pogavel", layer 6)
+	# -> ressalta em vez de levar o golpe (os i-frames apanham o toque desse
+	# frame). Só a descer a sério e pela parte de cima.
+	if _stomp_cd <= 0.0 and velocity.y > 90.0 and not is_on_floor() and _dash_restante <= 0.0:
+		var esp := get_world_2d().direct_space_state
+		var rq := PhysicsRayQueryParameters2D.create(
+			global_position + Vector2(0.0, 16.0), global_position + Vector2(0.0, 46.0), 1 << 5)
+		rq.collide_with_areas = true
+		rq.collide_with_bodies = false
+		rq.hit_from_inside = true
+		rq.exclude = [self]
+		var ph := esp.intersect_ray(rq)
+		if not ph.is_empty() and (ph["collider"] as Node).is_in_group("pogavel"):
+			velocity.y = -(STOMP_RESSALTO_ALTO if Input.is_action_pressed("saltar") else STOMP_RESSALTO)
+			_mov.saltos_dados = 0
+			_invulneravel = maxf(_invulneravel, 0.35)
+			_stomp_cd = 0.22
+			_pop = 1.0
+			_squash = maxf(_squash, 0.5)
+			_abanar(3.0)
+			_hitstop(0.05)
+			Som.toca("acerto", -10.0)
+			_pop_impacto(global_position + Vector2(0.0, 24.0))
 
 	var vel_queda := velocity.y
 	move_and_slide()
@@ -443,12 +606,42 @@ func _physics_process(dt: float) -> void:
 	_estava_no_chao = no_chao
 
 	# caiu num fosso sem fundo -> conta como morte (reaparece no checkpoint)
-	if global_position.y > Y_MORTE and vida > 0:
+	if global_position.y > Y_MORTE and vida > 0 and not _voando:
 		if EstadoJogo.modo_dev:
 			global_position = _pos_inicial if _pos_inicial != Vector2.ZERO else global_position
 			velocity = Vector2.ZERO
 		else:
 			receber_dano(vida)
+
+
+## Há um rebordo agarrável no lado `lado` (-1 esq / +1 dir)? Devolve o Y do
+## topo da plataforma, ou NAN se não houver. Dois sensores: parede à frente
+## à altura do peito E espaço livre à frente à altura da cabeça (= é mesmo
+## um rebordo, não uma parede alta). Depois varre para baixo para achar o topo.
+func _detetar_borda(lado: float) -> float:
+	var espaco := get_world_2d().direct_space_state
+	var qp := PhysicsRayQueryParameters2D.create(
+		global_position + Vector2(0.0, BORDA_PEITO),
+		global_position + Vector2(lado * BORDA_ALCANCE, BORDA_PEITO), 1)
+	qp.exclude = [self]
+	var peito := espaco.intersect_ray(qp)
+	if peito.is_empty():
+		return NAN
+	var qc := PhysicsRayQueryParameters2D.create(
+		global_position + Vector2(0.0, BORDA_CABECA),
+		global_position + Vector2(lado * BORDA_ALCANCE, BORDA_CABECA), 1)
+	qc.exclude = [self]
+	if not espaco.intersect_ray(qc).is_empty():
+		return NAN  # a parede continua acima -> não é um rebordo
+	var x_face: float = peito["position"].x + lado * 3.0
+	var qd := PhysicsRayQueryParameters2D.create(
+		Vector2(x_face, global_position.y + BORDA_CABECA),
+		Vector2(x_face, global_position.y + BORDA_PEITO + 8.0), 1)
+	qd.exclude = [self]
+	var topo := espaco.intersect_ray(qd)
+	if topo.is_empty():
+		return NAN
+	return topo["position"].y
 
 
 func _process(dt: float) -> void:
@@ -461,7 +654,7 @@ func _atualizar_anim() -> void:
 	if _corpo == null or _corpo.sprite_frames == null:
 		return
 	var a := "idle"
-	if _escalando:
+	if _escalando or _borda:
 		a = "wallslide"
 	elif _ataque_restante > 0.0:
 		a = "attack"
@@ -598,6 +791,8 @@ func _flash_branco() -> void:
 
 ## Cor de base do corpo (tinta da armadura ou branco).
 func _tint_armadura() -> Color:
+	if RIG == "gothic":
+		return Color.WHITE  # o rig já vem recolorido -- não pintar por cima
 	var ai: int = Equipamento.indice_armadura(EstadoJogo.armadura_equipada)
 	return Color.WHITE if ai < 0 else Color.WHITE.lerp(Equipamento.cor_armadura(ai), 0.62)
 
@@ -853,6 +1048,40 @@ func conceder_iframes(segundos: float) -> void:
 ## ainda se pode fazer o salto duplo).
 func devolver_saltos_ar() -> void:
 	_mov.saltos_dados = 0
+
+
+## FLYMODE (DevBarra, só DEVELOPER MODE). Alterna voo livre: atravessa
+## paredes, sem gravidade. Ao desligar, a gravidade normal volta e a Koliani
+## cai até à plataforma mais próxima. Devolve o novo estado.
+var _mask_guardada := 0
+
+func alternar_voo() -> bool:
+	if not EstadoJogo.modo_dev:
+		return false
+	_voando = not _voando
+	velocity = Vector2.ZERO
+	if _voando:
+		_mask_guardada = collision_mask
+		collision_mask = 0  # não colide com nada -> atravessa paredes
+	else:
+		collision_mask = _mask_guardada if _mask_guardada != 0 else collision_mask
+		_mov.velocidade = Vector2.ZERO
+		_mov.saltos_dados = 0
+	Som.toca("salto_duplo" if _voando else "aterrar", -12.0)
+	return _voando
+
+
+## Impulso vindo de fora (Trampolim, Impulsor...). TEM de passar por aqui e
+## não só mexer em `velocity`: o `Movimento.passo()` reescreve `velocity` a
+## partir do `_mov.velocidade` a cada frame, por isso é preciso sincronizar
+## os dois (senão o impulso é descartado no frame seguinte).
+func aplicar_impulso(v: Vector2, manter_x := false) -> void:
+	velocity.y = v.y
+	if not manter_x:
+		velocity.x = v.x
+	_mov.velocidade = velocity
+	_mov.saltos_dados = 0
+	_estava_no_chao = false
 
 
 ## Define a escala da gravidade (Observatório Lunar, nível 14). 1 = normal,

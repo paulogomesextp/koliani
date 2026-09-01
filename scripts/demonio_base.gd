@@ -19,6 +19,37 @@ const GRAVIDADE := 1400.0
 ## (estremece) e passa a patrulhar/atacar como um demónio normal.
 @export var dormente := false
 @export var raio_acorda := 120.0
+## Comportamento (pegada Dead Cells -- cada bicho tem uma ameaça própria):
+##   patrulha  -- anda de um lado para o outro (o de sempre)
+##   saltador  -- patrulha e, quando a Koliani está perto, salta em arco nela
+##   carga     -- patrulha, telegrafa (estremece, pára) e arranca a alta vel.
+##   voador    -- sem gravidade, paira à volta da origem e MERGULHA na Koliani
+##   escudeiro -- patrulha; golpes de FRENTE são bloqueados pelo escudo (só
+##                o pisão ou um golpe pelas costas o magoam)
+##   trepador  -- agarrado ao tecto acima; solta-se e cai quando a Koliani
+##                passa por baixo, depois anda como patrulha
+##   cuspidor  -- patrulha; à distância, pára, telegrafa e COSPE um projétil
+##                (BolaFogo) na direção da Koliani; recua a atacar de longe
+@export_enum("patrulha", "saltador", "carga", "voador", "escudeiro", "trepador", "cuspidor") var comportamento := "patrulha"
+const DUR_CARGA := 0.55
+const MULT_CARGA := 3.4
+const TELEGRAFO_CARGA := 0.42
+const VEL_MERGULHO := 460.0
+## cuspidor: alcance horizontal, wind-up e recarga do cuspo.
+const ALC_CUSPIR := 440.0
+const TELEGRAFO_CUSPIR := 0.5
+const VEL_CUSPO := 300.0
+const PROJETIL_CUSPO := preload("res://scenes/actors/BolaFogo.tscn")
+var _acao_cd := 0.0
+var _windup := 0.0
+var _carga := 0.0
+var _mergulho := 0.0
+var _t_hover := 0.0
+## Telegrafo (pegada Dead Cells): pisca a AVISAR antes de qualquer investida.
+var _telegrafo := 0.0
+## Salto do "saltador" a decorrer -- enquanto > 0 a patrulha não pisa a vel.
+var _saltando := 0.0
+var _dive_dir := Vector2.ZERO
 ## Cor do rasto de partículas quando morre.
 @export var cor_estilhacos := Color(0.7, 0.25, 0.45)
 ## Cor da luz de recorte (rim) do sprite -- normalmente o tom do bioma.
@@ -90,13 +121,21 @@ func _e_chefe() -> bool:
 
 
 func _ready() -> void:
-	# dificuldade a subir por mundo: demónios comuns ficam mais duros e
-	# mais perigosos a cada nível da campanha (mundo 1 = x1.0 ... mundo 4 ~ x1.39)
+	# dificuldade a subir ao longo de TODA a campanha, e devagar: o Nível 1
+	# tem demónios MAIS FRACOS que o valor base (o jogo estava a começar
+	# demasiado duro) e o Nível 30 fica ~x1.4. Curva linear em `indice_nivel`.
 	if not _e_chefe():
-		var m := 1.0 + 0.13 * float(clampi(EstadoJogo.indice_nivel, 0, 3))
-		vida = int(round(vida * m))
-		dano_contacto = int(round(dano_contacto * m))
-		velocidade *= 1.0 + 0.06 * float(clampi(EstadoJogo.indice_nivel, 0, 3))
+		var f := float(clampi(EstadoJogo.indice_nivel, 0, 29)) / 29.0
+		vida = maxi(1, int(round(vida * (0.8 + 0.6 * f))))
+		dano_contacto = maxi(1, int(round(dano_contacto * (0.65 + 0.75 * f))))
+		velocidade *= 0.88 + 0.34 * f
+
+	if comportamento != "patrulha":
+		_acao_cd = randf_range(0.6, 1.8)
+	if comportamento == "escudeiro":
+		velocidade *= 0.7  # o escudo pesa
+	if comportamento == "trepador" and _sprite:
+		_sprite.scale.y = -1.0  # de cabeça para baixo, colado ao tecto
 
 	if _area_contacto:
 		_area_contacto.body_entered.connect(_ao_tocar)
@@ -174,6 +213,16 @@ func _add_tira(sf: SpriteFrames, nome: String, tex: Texture2D, n: int, fps: floa
 func _process(dt: float) -> void:
 	if _anim:
 		_atualizar_anim()
+		# telegrafo: pisca forte (branco-quente) enquanto vai atacar
+		if _telegrafo > 0.0 and not _morto:
+			var p := 0.5 + 0.5 * sin(Time.get_ticks_msec() * 0.045)
+			_anim.modulate = Color(1, 1, 1).lerp(Color(2.6, 1.6, 1.4), p)
+			if _sprite:
+				_sprite.rotation = sin(Time.get_ticks_msec() * 0.09) * 0.06
+		elif not _morto and _congelado <= 0.0:
+			_anim.modulate = _anim.modulate.lerp(Color(1, 1, 1), dt * 4.0)
+			if _sprite and absf(_sprite.rotation) > 0.001:
+				_sprite.rotation = lerp_angle(_sprite.rotation, 0.0, dt * 10.0)
 		return
 	if _corpo == null:
 		return
@@ -225,6 +274,162 @@ func _physics_process(dt: float) -> void:
 		if _congelado <= 0.0 and _corpo:
 			_corpo.modulate = Color(1, 1, 1)
 		return
+	_acao_cd = maxf(0.0, _acao_cd - dt)
+	_telegrafo = maxf(0.0, _telegrafo - dt)
+
+	# --- comportamentos especiais ---------------------------------------
+	if comportamento == "carga":
+		if _windup > 0.0:  # telegrafo: pára e estremece antes de arrancar
+			_windup -= dt
+			velocity.x = 0.0
+			if not is_on_floor():
+				velocity.y += GRAVIDADE * dt
+			move_and_slide()
+			if _windup <= 0.0:
+				_carga = DUR_CARGA
+				Som.toca("demonio_ataque", -8.0, 0.85)
+			return
+		if _carga > 0.0:  # arranque comprometido -- não vira nem trava
+			_carga -= dt
+			velocity.x = _direcao * velocidade * MULT_CARGA
+			if not is_on_floor():
+				velocity.y += GRAVIDADE * dt
+			move_and_slide()
+			if is_on_wall():
+				_carga = 0.0
+				_acao_cd = randf_range(1.8, 3.0)
+			return
+		var alvo_c := _dir_koliani_perto(320.0)
+		if alvo_c != 0.0 and _acao_cd <= 0.0 and is_on_floor():
+			_direcao = alvo_c
+			if _sprite:
+				_sprite.scale.x = _direcao
+			_windup = TELEGRAFO_CARGA
+			_telegrafo = TELEGRAFO_CARGA
+			anticipacao = 1.0
+			velocity.x = 0.0
+			Som.toca("demonio_ataque", -14.0, 0.7)
+			return
+	elif comportamento == "saltador":
+		if _saltando > 0.0:  # no ar -- deixa a gravidade fazer o arco
+			_saltando -= dt
+			if not is_on_floor():
+				velocity.y += GRAVIDADE * dt
+			move_and_slide()
+			if is_on_floor() and _saltando < 0.45:
+				_saltando = 0.0
+			return
+		if _windup > 0.0:  # agacha-se a avisar
+			_windup -= dt
+			velocity.x = 0.0
+			if not is_on_floor():
+				velocity.y += GRAVIDADE * dt
+			move_and_slide()
+			if _windup <= 0.0:
+				velocity = Vector2(_direcao * 175.0, -430.0)
+				_saltando = 0.75
+				Som.toca("demonio_ataque", -9.0, 1.0)
+				move_and_slide()
+			return
+		if _acao_cd <= 0.0 and is_on_floor():
+			var alvo_s := _dir_koliani_perto(230.0)
+			if alvo_s != 0.0:
+				_direcao = alvo_s
+				if _sprite:
+					_sprite.scale.x = _direcao
+				_windup = 0.26
+				_telegrafo = 0.26
+				anticipacao = 1.0
+				_acao_cd = randf_range(1.5, 2.6)
+				return
+	elif comportamento == "voador":
+		# sem gravidade: paira à volta da origem e mergulha na Koliani
+		if _mergulho > 0.0:  # em picada -- direção fixada no arranque
+			_mergulho -= dt
+			move_and_slide()
+			if _mergulho <= 0.0 or is_on_wall() or is_on_floor():
+				_mergulho = 0.0
+				_acao_cd = randf_range(1.3, 2.3)
+			return
+		if _windup > 0.0:  # trava no ar a avisar, depois mergulha
+			_windup -= dt
+			velocity = velocity.lerp(Vector2.ZERO, 0.2)
+			move_and_slide()
+			if _windup <= 0.0:
+				velocity = _dive_dir * VEL_MERGULHO
+				_mergulho = 0.6
+				Som.toca("demonio_ataque", -8.0, 1.1)
+				move_and_slide()
+			return
+		var kv := get_tree().get_first_node_in_group("koliani")
+		if kv and _acao_cd <= 0.0:
+			var d: Vector2 = (kv as Node2D).global_position - global_position
+			if d.length() < 300.0:
+				_dive_dir = d.normalized()
+				_windup = 0.3
+				_telegrafo = 0.3
+				anticipacao = 1.0
+				if _sprite:
+					_sprite.scale.x = signf(d.x) if d.x != 0.0 else _sprite.scale.x
+				_acao_cd = randf_range(1.3, 2.3)
+				return
+		_t_hover += dt
+		var pouso := _origem + Vector2(sin(_t_hover * 1.4) * 62.0, sin(_t_hover * 2.1) * 24.0)
+		velocity = (pouso - global_position) * 3.0
+		move_and_slide()
+		return
+	elif comportamento == "trepador":
+		# agarrado ao tecto/parede acima; solta-se quando a Koliani passa por
+		# baixo e depois comporta-se como patrulha (cai e anda)
+		var kc := get_tree().get_first_node_in_group("koliani")
+		if kc:
+			var d: Vector2 = (kc as Node2D).global_position - global_position
+			if absf(d.x) < 100.0 and d.y > 24.0:
+				comportamento = "patrulha"
+				if _sprite:
+					_sprite.scale.y = 1.0
+				velocity = Vector2(0.0, 240.0)
+				anticipacao = 1.0
+				Som.toca("demonio_ataque", -9.0, 0.9)
+				move_and_slide()
+				return
+		velocity = Vector2.ZERO
+		move_and_slide()
+		return
+	elif comportamento == "cuspidor":
+		if _windup > 0.0:  # plantado a avisar, depois cospe
+			_windup -= dt
+			velocity.x = 0.0
+			if not is_on_floor():
+				velocity.y += GRAVIDADE * dt
+			move_and_slide()
+			if _windup <= 0.0:
+				var b := PROJETIL_CUSPO.instantiate()
+				b.velocidade = _dive_dir * VEL_CUSPO
+				b.dano = maxi(1, int(round(dano_contacto * 0.9)))
+				get_parent().add_child(b)
+				b.global_position = global_position + _dive_dir * 16.0
+				Som.toca("projetil", -13.0, 0.9)
+				_acao_cd = randf_range(1.8, 2.8)
+			return
+		if _acao_cd <= 0.0 and is_on_floor():
+			var kk := get_tree().get_first_node_in_group("koliani")
+			if kk:
+				var d: Vector2 = (kk as Node2D).global_position - global_position
+				if absf(d.x) < ALC_CUSPIR and absf(d.y) < 170.0 and absf(d.x) > 60.0:
+					_direcao = signf(d.x)
+					if _sprite:
+						_sprite.scale.x = _direcao
+					# mira ligeiramente achatada (mais legível de desviar)
+					_dive_dir = Vector2(d.x, d.y * 0.5).normalized()
+					_windup = TELEGRAFO_CUSPIR
+					_telegrafo = TELEGRAFO_CUSPIR
+					anticipacao = 1.0
+					velocity.x = 0.0
+					Som.toca("demonio_ataque", -15.0, 0.7)
+					return
+
+	# --- patrulha normal ----------------------------------------------
 	velocity.x = _direcao * velocidade
 	if not is_on_floor():
 		velocity.y += GRAVIDADE * dt
@@ -257,6 +462,18 @@ func _virar() -> void:
 		_sprite.scale.x = _direcao
 
 
+## Direção horizontal (-1/+1) para a Koliani, se ela estiver a <= `alcance`
+## px na horizontal e não muito abaixo. 0 = fora de alcance / sem alvo.
+func _dir_koliani_perto(alcance: float) -> float:
+	var k := get_tree().get_first_node_in_group("koliani")
+	if k == null:
+		return 0.0
+	var d: Vector2 = (k as Node2D).global_position - global_position
+	if absf(d.x) > alcance or d.y > 120.0:
+		return 0.0
+	return signf(d.x) if d.x != 0.0 else _direcao
+
+
 ## Há chão logo a seguir à beira, na direção `dir`? (raycast para baixo)
 func ha_chao_a_frente(dir: float) -> bool:
 	var espaco := get_world_2d().direct_space_state
@@ -277,6 +494,16 @@ func _ao_tocar(corpo: Node) -> void:
 
 func receber_dano(quantidade: int, dir_empurrao: float = 0.0) -> void:
 	if _morto:
+		return
+	# escudeiro: golpe de FRENTE (o empurrão atira-o para trás, contra o
+	# sentido em que está virado) bate no escudo -- só "clinc". Pisão
+	# (dir_empurrao 0) e golpes pelas costas passam.
+	if comportamento == "escudeiro" and dir_empurrao != 0.0 \
+			and signf(dir_empurrao) == -_direcao:
+		Som.toca("bloqueio", -12.0, randf_range(0.85, 0.95))
+		_flinch = 0.4
+		_flinch_dir = signf(dir_empurrao)
+		anticipacao = 0.6
 		return
 	vida -= quantidade
 	global_position.x += dir_empurrao * 8.0
