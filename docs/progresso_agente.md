@@ -63,7 +63,14 @@ Feedback seguinte do Paulo (mesma sessão):
     Falta afinar números (precisa playtest).
   - Fase 2 jornada (`gerador_corredor.gd`): **ritmo tensão/alívio** —
     `_f_descanso` (plataforma larga limpa + checkpoint) a seguir a câmaras
-    puxadas e a cada 4.ª; **`_f_forquilha`** (caminho abre em 2 e reúne).
+    puxadas e a cada 4.ª; **`_f_forquilha`** (caminho abre em 2 e reúne);
+    **3 actos** (`prog`/`intens`: intro suave → meio a apertar → alívio
+    pré-chefe) + **`ASSINATURA`** de região (câmara-cara do bioma no meio).
+  - Fase 2b inimigos (`demonio_base.gd` `comportamento`): saltador, carga,
+    **voador** (olho: paira + mergulha), **escudeiro** (bloqueia de frente).
+  - Fase 4 rig da Koliani: **tentada e revertida** (ficou escura/pequena);
+    `RIG = "codigo"`, infra do rig gothic fica na gaveta.
+  - Entregas v0.8.0 → v0.8.4 (bump por entrega).
 
 ## Sessão 2026-08-31 (cont. 3) — JORNADA 3.0: chão MORTAL + assets
 
