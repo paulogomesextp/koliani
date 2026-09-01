@@ -66,11 +66,11 @@ func _poly(pts: PackedVector2Array, cor: Color, z := 0) -> Polygon2D:
 	return p
 
 
-## Faixa brilhante a dizer "SKILL" por cima do coletável (habilidade nova).
+## Gema do coletável (habilidade nova). Já teve uma faixa/placa "SKILL" a
+## flutuar por cima -- o Paulo achou que lia como uma caixa solta em cima
+## das plataformas e pediu para tirar; fica só a gema, com o brilho da luz
+## a dizer "isto apanha-se".
 func _faixa_skill() -> void:
-	var aditivo := CanvasItemMaterial.new()
-	aditivo.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
-
 	# gema pequena na base -- dá "corpo" ao coletável ao nível do chão
 	var gema := PackedVector2Array([
 		Vector2(0, -6), Vector2(5, 2), Vector2(0, 9), Vector2(-5, 2)])
@@ -79,45 +79,6 @@ func _faixa_skill() -> void:
 	for v in gema:
 		gema_in.append(v * 0.66)
 	_poly(gema_in, Color(0.7, 1.0, 0.9), 1)
-
-	# faixa / estandarte
-	var faixa := Node2D.new()
-	faixa.name = "Faixa"
-	faixa.position = Vector2(0, -30)
-	_visual.add_child(faixa)
-
-	var glow := Polygon2D.new()
-	glow.polygon = PackedVector2Array([
-		Vector2(-34, -14), Vector2(34, -14), Vector2(40, 0), Vector2(34, 14),
-		Vector2(-34, 14), Vector2(-40, 0)])
-	glow.color = Color(0.35, 1.0, 0.8, 0.28)
-	glow.material = aditivo
-	faixa.add_child(glow)
-
-	var placa := Polygon2D.new()
-	placa.polygon = PackedVector2Array([
-		Vector2(-30, -11), Vector2(30, -11), Vector2(36, 0), Vector2(30, 11),
-		Vector2(-30, 11), Vector2(-36, 0)])
-	placa.color = Color(0.08, 0.05, 0.12, 0.92)
-	faixa.add_child(placa)
-	var borda := Line2D.new()
-	borda.points = placa.polygon
-	borda.closed = true
-	borda.width = 2.0
-	borda.default_color = Color(0.5, 1.0, 0.85)
-	faixa.add_child(borda)
-
-	var lbl := Label.new()
-	lbl.text = "SKILL"
-	lbl.add_theme_font_size_override("font_size", 15)
-	lbl.add_theme_color_override("font_color", Color(0.75, 1.0, 0.95))
-	lbl.add_theme_color_override("font_outline_color", Color(0.05, 0.02, 0.1))
-	lbl.add_theme_constant_override("outline_size", 5)
-	lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	lbl.size = Vector2(72, 24)
-	lbl.position = Vector2(-36, -13)
-	faixa.add_child(lbl)
 
 
 func _process(dt: float) -> void:
