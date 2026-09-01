@@ -131,11 +131,14 @@ func _construir() -> void:
 	agua.position = Vector2((x0 + ancora.x) * 0.5, _chao_y + 230.0)
 	add_child(agua)
 
-	# parede de fundo (não se sai pela esquerda) -- alta, acima do líquido
+	# parede de fundo (não se sai pela esquerda). LARGA, ESCURA e encostada à
+	# plataforma de partida, para ler como "fim do mundo" e não como uma
+	# parede a partir/trepar com espaço do outro lado.
 	var fundo := PLAT.instantiate()
 	add_child(fundo)
-	fundo.position = Vector2(x0 - 40.0, _chao_y - 300.0)
-	fundo.tamanho = Vector2(80.0, 720.0)
+	fundo.tamanho = Vector2(200.0, 900.0)
+	fundo.position = Vector2(x0 - 60.0, _chao_y - 300.0)
+	fundo.modulate = Color(0.32, 0.32, 0.4)
 
 	var casca := get_parent().get_node_or_null("Casca")
 	if casca and casca.has_method("abrir_esquerda"):
