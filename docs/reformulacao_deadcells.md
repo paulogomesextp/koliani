@@ -51,6 +51,19 @@ entrada/saída declaradas em altura, regra de ouro `SUBIDA_MAX`).
 - [ ] atalhos: 1-2 `Portal` "de retorno" por jornada (teletransporte)
 - [ ] (talvez) mover as peças mais estáveis para `scenes/rooms/*.tscn`
 
+## Fase 2b — Inimigos com ameaça própria (combate Dead Cells)
+
+- [x] `DemonioBase.comportamento` (`@export_enum`): **saltador** (salta em
+  arco na direção da Koliani quando perto) e **carga** (telegrafa — pára e
+  estremece — e arranca a 3.4× a velocidade, sem virar; recupera na
+  parede). O gerador atribui-os a partir de `_dif > 0.15` (não nos
+  voadores). Método `_dir_koliani_perto(alcance)` (o nome `_dir_para_koliani`
+  já existe no `ChefeBase`). **Falta playtest** dos números.
+- [ ] **voador-mergulhador** (para a espécie "olho"): hover sinusoidal +
+  picada em diagonal.
+- [ ] **trepador de parede/tecto** que se deixa cair.
+- [ ] **escudeiro** que bloqueia de frente (obriga a pisar / atacar por trás).
+
 ## Fase 3 — Arte de ambiente por região
 
 Fontes já em `assets/sprites/incoming/` (nada para descarregar):
