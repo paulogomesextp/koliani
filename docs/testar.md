@@ -23,6 +23,7 @@ o kit todo (FLYMODE na tecla F):
 | **líquido mortal mais escuro** | qualquer | ainda se lê como perigo? |
 | **5 monstros novos** | 3 besouro · 9 mastim · 12 abutre · 18 gosma · 24 raptor | escala, velocidade, e se o abutre a mergulhar é justo |
 | **um monstro "cara" por nível** | percorrer 2-3 níveis seguidos | dá mesmo a sensação de que cada nível tem o seu bicho? |
+| **3 chefes com sprites novos** | 7 Ignivar · 17 Colosso Ósseo · 24 Bispo Púrpura · 27 Koliani Sombria | tamanho face à Koliani, se as 4 poses (normal / dano / núcleo à mostra) se leem |
 
 Screenshots sem jogar:
 

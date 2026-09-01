@@ -24,6 +24,38 @@ Lote de pedidos do Paulo nesta sessão, por ordem de entrega:
    fundos, escala/alinhamento do rig novo, volume dos sons novos, densidade
    das espécies novas.
 
+### Continuação da mesma sessão (v0.9.5 → v0.9.10)
+
+| versão | o quê |
+|--------|-------|
+| v0.9.5 | arco do golpe curto (o rig já desenha o corte) + líquido mortal escuro |
+| v0.9.6 | níveis de igreja acesos + tabela de playtest em `docs/testar.md` |
+| v0.9.7 | a **Koliani Sombria** (nível 27) passa a ser o espelho do rig novo |
+| v0.9.8 | bichos novos à escala da Koliani |
+| v0.9.9 | **folha de contacto** dos 30 níveis + acertos de paleta que ela mostrou |
+| v0.9.10 | **3 chefes** com sprites de pack a sério |
+
+- `tools/folha_de_contacto.gd` — um retrato de cada um dos 30 níveis numa
+  grelha 6x5. Foi assim que se viu, tudo junto, que as Catacumbas estavam
+  quase pretas, que a Fornalha e a Ala tinham ficado lavadas e que a Cidade
+  lia como pôr-do-sol rosa em vez de luar. **Vale a pena correr sempre que
+  se mexe em paletas.**
+- `tools/extrair_chefes_packs.gd` — monta a folha de 4 frames dos chefes a
+  partir de packs prontos, sem tocar nas mecânicas (o contrato é sempre
+  `hframes = 4` com 0 normal / 1 alternativa / 2 a piscar / 3 núcleo à
+  mostra). Já feitos: **Colosso Ósseo** (clembod "Bringer of Death"),
+  **Bispo Púrpura** (luizmelo "Evil Wizard 2") e **Ignivar** (chierit
+  "boss demon slime", que é um demónio de fogo). As funções velhas em
+  `gerar_sprites.gd` ficaram desligadas para não voltarem a escrever por
+  cima.
+- **Sobra no `incoming/` um boss por usar**: o **Frost Guardian** (chierit,
+  golem de gelo, 192x128, óptimo desenho). Não foi aplicado porque nenhum
+  dos 27 chefes restantes casa com ele sem trair o conceito escrito em
+  `docs/niveis.md` (o Carcereiro, por exemplo, tem uma CHAVE no lugar da
+  cabeça). Fica à espera de decisão do Paulo.
+- 3 testes novos em `tests/run_tests.gd` (rig, espécies, packs de fundo) —
+  detalhe no commit `4b81405`.
+
 ### Rig novo da Koliani (v0.9.1)
 - `tools/importar_rig_cavaleiro.gd` corta as tiras de 100x64 do pack e
   gradua a paleta (vermelhos → magenta, metal → violeta frio) →
