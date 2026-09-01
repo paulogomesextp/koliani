@@ -24,6 +24,11 @@ const MAPA := {
 	"jump": "Jump_KG_1.png",
 	"fall": "Fall_KG_1.png",
 	"attack": "Attack_KG_1.png",
+	# combo de espada (2.o/3.o/4.o hit) -- o pack traz 4 tiras de ataque
+	# distintas, cada uma com o seu numero de frames
+	"attack2": "Attack_KG_2.png",
+	"attack3": "Attack_KG_3.png",
+	"attack4": "Attack_KG_4.png",
 	"crouch": "Crouching_Idle_KG_1.png",
 	"wallslide": "Wallside_KG_1.png",
 	# o "salto duplo" fica a cambalhota do pack -- lê-se logo como 2.º salto

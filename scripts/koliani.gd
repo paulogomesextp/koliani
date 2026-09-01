@@ -51,6 +51,17 @@ const BORDA_PEITO := -30.0        # altura do sensor "há parede à frente"
 const BORDA_CABECA := -60.0       # altura do sensor "está livre por cima do rebordo"
 const BORDA_MANTLE := Vector2(150.0, -430.0)  # impulso ao subir para a plataforma
 const DUR_ATAQUE := 0.18
+## Combo de espada (só rig "cavaleiro", que tem 4 tiras de ataque
+## distintas): Single -> Double -> Triple -> Quadruple. Encadeia-se
+## carregando em "atacar" outra vez dentro da `JANELA_COMBO` a seguir ao
+## golpe atual (input bufferizado se carregar a meio do golpe); passado
+## esse tempo sem novo golpe, o combo cai de volta ao 1.º hit.
+const NUM_COMBO := 4
+const JANELA_COMBO := 0.42
+## Duração de cada golpe do combo, a acompanhar o comprimento real de cada
+## tira (attack/attack2/attack3/attack4) -- senão a animação era cortada a
+## meio antes de terminar, sobretudo o 3.º hit (9 frames, o mais longo).
+const DUR_COMBO := [0.18, 0.2, 0.3, 0.19]
 const I_FRAMES := 0.6
 ## Ressalto ao cair em cima de um inimigo (Mario-style): o pulo automático a
 ## seguir ao "pisão" é sempre um SALTO NORMAL (mesma força de `saltar`),
@@ -103,6 +114,16 @@ var _dash_recarga := 0.0
 var _rolar_restante := 0.0
 var _rolar_recarga := 0.0
 var _ataque_restante := 0.0
+## Duração do golpe atual (varia por passo do combo -- ver `DUR_COMBO`).
+var _ataque_dur := DUR_ATAQUE
+## Passo do combo de espada (0 = 1.º hit "Single" .. 3 = 4.º "Quadruple").
+var _combo_passo := 0
+## Janela ainda aberta para o próximo golpe encadear no combo -- ao chegar
+## a 0 sem novo golpe, o combo cai de volta ao 1.º hit.
+var _combo_janela := 0.0
+## Carregou em "atacar" a meio do golpe atual -- o próximo golpe do combo
+## dispara assim que este acabar (não se perde o input).
+var _combo_pedido := false
 var _invulneravel := 0.0
 ## Contadores só visuais (o rig "cavaleiro" tem desenho para eles).
 var _hurt_t := 0.0
@@ -232,6 +253,11 @@ const _KOLI_ANIMS_CAVALEIRO := {
 	"jump":      [6, 14.0, false],
 	"fall":      [3, 8.0, true],
 	"attack":    [6, 24.0, false],
+	## combo de espada -- 2.º/3.º/4.º hit, cada um com a sua tira própria
+	## (Attack_KG_2/3/4 do pack, ver `_iniciar_ataque`/`_anim_ataque`).
+	"attack2":   [6, 24.0, false],
+	"attack3":   [9, 26.0, false],
+	"attack4":   [5, 22.0, false],
 	"crouch":    [3, 6.0, true],
 	"wallslide": [2, 8.0, true],
 	"djump":     [10, 24.0, false],
@@ -512,13 +538,25 @@ func _physics_process(dt: float) -> void:
 		and _rolar_restante <= 0.0 and _dash_restante <= 0.0 and _ataque_restante <= 0.0 \
 		and is_on_floor()
 
-	# ataque leve -- bloqueado enquanto rola ou defende
+	# ataque leve -- bloqueado enquanto rola ou defende. Combo: um novo
+	# golpe a meio do atual fica bufferizado (`_combo_pedido`) e dispara
+	# assim que este acabar, em vez de se perder.
+	if not _defendendo and _rolar_restante <= 0.0 and Input.is_action_just_pressed("atacar"):
+		if _ataque_restante > 0.0:
+			_combo_pedido = true
+		else:
+			_iniciar_ataque()
 	if _ataque_restante > 0.0:
 		_ataque_restante -= dt
 		if _ataque_restante <= 0.0 and _hitbox:
 			_hitbox.monitoring = false
-	elif not _defendendo and _rolar_restante <= 0.0 and Input.is_action_just_pressed("atacar"):
-		_iniciar_ataque()
+			if _combo_pedido:
+				_combo_pedido = false
+				_iniciar_ataque()
+	elif _combo_janela > 0.0:
+		_combo_janela -= dt
+		if _combo_janela <= 0.0:
+			_combo_passo = 0
 
 	# "lancar": toque curto = tiro mágico ilimitado; segurar ~0.4 s e largar =
 	# Kamehameha roxo (habilidade "projetil", gasta 33% da Energia).
@@ -728,7 +766,7 @@ func _atualizar_anim() -> void:
 	elif _escalando or _borda:
 		a = "wallslide"
 	elif _ataque_restante > 0.0:
-		a = "attack"
+		a = _anim_ataque()
 	elif _defendendo and sf.has_animation("defesa"):
 		a = "defesa"
 	elif _agachado:
@@ -755,8 +793,8 @@ func _atualizar_anim() -> void:
 	if _arma and _arma.visible:
 		var rot := -0.15
 		var off := Vector2(10, -5)
-		if a == "attack":
-			var f := clampf(1.0 - _ataque_restante / DUR_ATAQUE, 0.0, 1.0)
+		if a.begins_with("attack"):
+			var f := clampf(1.0 - _ataque_restante / maxf(_ataque_dur, 0.001), 0.0, 1.0)
 			rot = lerpf(-1.1, 0.8, f)
 			off = Vector2(9, -5)
 		elif a == "wallslide":
@@ -840,7 +878,7 @@ func _animar_rastro(dt: float) -> void:
 		_rastro.visible = true
 		_rastro.modulate.a = 1.0
 		_rastro.width = 18.0
-		var p := clampf(1.0 - _ataque_restante / DUR_ATAQUE, 0.0, 1.0)
+		var p := clampf(1.0 - _ataque_restante / maxf(_ataque_dur, 0.001), 0.0, 1.0)
 		var pts := PackedVector2Array()
 		for i in 9:
 			var f := p - i * 0.05
@@ -897,13 +935,32 @@ func _hitstop(segundos: float) -> void:
 
 
 func _iniciar_ataque() -> void:
-	_ataque_restante = DUR_ATAQUE
+	# encadeia o combo se ainda estamos na janela do golpe anterior;
+	# senão volta ao 1.º hit ("Single").
+	_combo_passo = (_combo_passo + 1) % NUM_COMBO if _combo_janela > 0.0 else 0
+	_ataque_dur = DUR_COMBO[_combo_passo] if RIG == "cavaleiro" else DUR_ATAQUE
+	_ataque_restante = _ataque_dur
+	_combo_janela = _ataque_dur + JANELA_COMBO
 	_pop = 1.0
 	Som.toca("ataque", -13.0, randf_range(0.92, 1.09))
 	_flash_golpe()
+	if _combo_passo == NUM_COMBO - 1:
+		_abanar(4.0)  # remate do combo ("Quadruple") -- um pouco mais de peso
+		_hitstop(0.05)
 	if _hitbox:
 		_hitbox.scale.x = _olha_para
 		_hitbox.monitoring = true
+
+
+## Nome da animação do golpe atual do combo ("attack".."attack4"). Cai
+## sempre em "attack" se o rig não tiver as tiras extra (só o "cavaleiro").
+func _anim_ataque() -> String:
+	if _combo_passo <= 0:
+		return "attack"
+	var nome := "attack%d" % (_combo_passo + 1)
+	if _corpo and _corpo.sprite_frames and _corpo.sprite_frames.has_animation(nome):
+		return nome
+	return "attack"
 
 
 ## Cor do golpe -- aço frio -> magenta conforme o tier da arma equipada.
@@ -1204,6 +1261,8 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0) -> void:
 	vida = maxi(0, vida - maxi(1, real))
 	_invulneravel = I_FRAMES
 	_hurt_t = 0.24
+	_combo_janela = 0.0  # levar um golpe corta o combo -- o proximo ataque volta ao 1.o hit
+	_combo_passo = 0
 	vida_mudou.emit(vida, _vida_max())
 	_flash_branco()
 	_abanar(8.0)

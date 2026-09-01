@@ -97,10 +97,11 @@ CC0 não exige atribuição; fica aqui à mesma por cortesia.
   reproduzir a imagem para lucro; o autor proíbe expressamente usar a arte
   para treino de IA/ML, NFT ou blockchain. Não é CC0 — o Paulo tem de
   confirmar que aceita estes termos antes de publicar o jogo.
-- Uso: `assets/sprites/pixel/koliani_cavaleiro/` (15 estados: idle, run,
-  jump, fall, attack, crouch, wallslide, djump, roll, dash, hurt, defesa,
-  borda, aterrar, morte), importado e recolorido para a paleta da Koliani
-  (vermelhos -> magenta, metal -> violeta frio) por
+- Uso: `assets/sprites/pixel/koliani_cavaleiro/` (18 estados: idle, run,
+  jump, fall, attack/attack2/attack3/attack4 (combo de 4 golpes, cada um
+  com a sua tira do pack), crouch, wallslide, djump, roll, dash, hurt,
+  defesa, borda, aterrar, morte), importado e recolorido para a paleta da
+  Koliani (vermelhos -> magenta, metal -> violeta frio) por
   `tools/importar_rig_cavaleiro.gd`. Ligado por `koliani.gd::RIG`.
 
 ## thewisehedgehog — pack de armas pixel-art

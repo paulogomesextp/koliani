@@ -23,6 +23,7 @@ Tudo é nosso (sem licença de terceiros). Puro Python (sem numpy).
 import math
 import os
 import random
+import zlib
 import struct
 import wave
 
@@ -436,7 +437,9 @@ def demonio_ataque():
 def _salto(nome, f0c, f1c, brilho, ganho):
     """'Whoop' curto e suave: seno com glissando ascendente + sopro de ar
     muito filtrado. Nada de dente-de-serra/quadrada."""
-    random.seed(hash(nome) & 0xffff)
+    # nao usar o hash() nativo de strings: e' salgado por processo
+    # (PYTHONHASHSEED) e dava um .wav diferente a cada corrida do script.
+    random.seed(zlib.crc32(nome.encode()) & 0xffff)
     dur = 0.12
     N = int(dur * FS)
     buf = [0.0] * N
