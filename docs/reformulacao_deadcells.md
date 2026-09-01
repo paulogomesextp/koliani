@@ -55,8 +55,11 @@ entrada/saída declaradas em altura, regra de ouro `SUBIDA_MAX`).
   câmara ser a "cara" do bioma (Floresta=trampolim, Prisão=guilhotinas,
   Torres=vento, Catacumbas=gruta, Cidade=impulso, Castelo=fogo), se a
   dificuldade já a libertou.
-- [ ] mais "tons" de peça: gruta-labirinto, arena de combate fechada,
-  alcove-segredo (recompensa fora do caminho), corredor apertado
+- [x] **`_f_arena`** — chão largo sobre o líquido + 3-6 inimigos de
+  comportamentos variados + checkpoint. "Limpa a sala." (~13%, actos 1-2)
+- [x] **`_f_corredor`** — tecto baixo + serras em calha no ritmo; passa-se
+  a correr/rolar, não a saltar. (~12%, acto 2, dif > 0.28)
+- [ ] mais "tons" de peça: gruta-labirinto, alcove-segredo / atalho
 - [ ] atalhos: 1-2 `Portal` "de retorno" por jornada (teletransporte)
 - [ ] (talvez) mover as peças mais estáveis para `scenes/rooms/*.tscn`
 
@@ -73,7 +76,9 @@ entrada/saída declaradas em altura, regra de ouro `SUBIDA_MAX`).
   recupera na parede/chão).
 - [x] **escudeiro** (dif > 0.35): golpe de FRENTE bate no escudo (só
   "clinc"); pisão e golpes pelas costas passam. Anda mais devagar.
-- [ ] **trepador de parede/tecto** que se deixa cair.
+- [x] **trepador** (dif > 0.3): agarrado ao tecto (sprite invertido);
+  solta-se e cai quando a Koliani passa por baixo, depois anda como
+  patrulha. O gerador põe-no ~120-170 px acima da plataforma.
 - [ ] telegrafos mais legíveis (usar mais o campo `anticipacao`).
 
 ## Fase 3 — Arte de ambiente por região

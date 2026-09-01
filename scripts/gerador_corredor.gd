@@ -281,6 +281,12 @@ func _construir() -> void:
 					and _rng.randf() < 0.3:
 				f = sig                 # ACTO 2: a assinatura do bioma
 				_pos_intenso = sig in ["guilhotinas", "fogo"]
+			elif prog < 0.82 and _dif > 0.12 and _rng.randf() < 0.13:
+				f = "arena"             # limpar a sala
+				_pos_intenso = true
+			elif prog >= 0.28 and prog < 0.82 and _dif > 0.28 and _rng.randf() < 0.12:
+				f = "corredor"          # gauntlet apertado
+				_pos_intenso = true
 			elif _dif > 0.18 and _rng.randf() < 0.2:
 				f = "forquilha"
 				_pos_intenso = true
@@ -437,9 +443,14 @@ func _inimigo_em(par: Node2D, pos: Vector2) -> void:
 			d.comportamento = "voador"   # o olho voa e mergulha
 	elif _dif > 0.15 and r < 0.18 + 0.26 * _dif:
 		var opcoes := ["saltador", "carga"]
+		if _dif > 0.3:
+			opcoes.append("trepador")
 		if _dif > 0.35:
 			opcoes.append("escudeiro")
-		d.comportamento = opcoes[_rng.randi() % opcoes.size()]
+		var esc: String = opcoes[_rng.randi() % opcoes.size()]
+		d.comportamento = esc
+		if esc == "trepador":
+			d.position.y -= _rng.randf_range(120.0, 170.0)  # colado mais acima
 	par.add_child(d)
 
 
@@ -509,7 +520,49 @@ func _flavour(par: Node2D, tipo: String, x: float, y: float) -> Vector2:
 		"pilares": return _f_pilares(par, x, y)
 		"descanso": return _f_descanso(par, x, y)
 		"forquilha": return _f_forquilha(par, x, y)
+		"arena": return _f_arena(par, x, y)
+		"corredor": return _f_corredor(par, x, y)
 	return Vector2(x + 180.0, y)
+
+
+## ARENA de combate: chão sólido largo por cima do líquido, vários inimigos
+## (comportamentos variados), checkpoint. "Limpa a sala" -- ritmo Dead Cells.
+func _f_arena(par: Node2D, x: float, y: float) -> Vector2:
+	var cy: float = clampf(y, _teto_y + 120.0, _chao_y - 88.0)
+	x += _rng.randf_range(150.0, 178.0)
+	var larg := _rng.randf_range(430.0, 560.0)
+	_plat(par, Vector2(x + larg * 0.5, cy), Vector2(larg, 26.0), 48.0)
+	_coluna_fundo(par, x + 40.0)
+	_coluna_fundo(par, x + larg - 40.0)
+	_checkpoint(x + 44.0, cy, true)
+	var n := 3 + int(_dif * 3.0)
+	for i in n:
+		var ex := x + 80.0 + (larg - 160.0) * (float(i) / float(maxi(1, n - 1)))
+		_inimigo_em(par, Vector2(ex, cy - 30.0))
+	x += larg + _rng.randf_range(148.0, 176.0)
+	var ny: float = maxf(_teto_y + 40.0, cy - _rng.randf_range(-40.0, SUBIDA_MAX))
+	_plat(par, Vector2(x, ny), Vector2(104.0, 18.0))
+	_checkpoint(x, ny)
+	return Vector2(x, ny)
+
+
+## CORREDOR apertado: tecto baixo (bater com a cabeça se saltar) + serras em
+## calha no ritmo. Passa-se a correr/rolar, não a saltar.
+func _f_corredor(par: Node2D, x: float, y: float) -> Vector2:
+	var cy: float = clampf(y, _chao_y - 260.0, _chao_y - 120.0)
+	var n := 4 + int(_dif * 3.0)
+	for i in n:
+		x += _rng.randf_range(150.0, 176.0)
+		_plat(par, Vector2(x, cy), Vector2(96.0, 16.0))
+		_plat(par, Vector2(x, cy - 96.0), Vector2(120.0, 22.0))   # tecto baixo
+		var s := SERRA.instantiate()
+		s.position = Vector2(x - 84.0, cy - _rng.randf_range(40.0, 62.0))
+		s.percurso = Vector2(150.0, 0.0)
+		s.tempo = _rng.randf_range(1.1, 1.7)
+		par.add_child(s)
+		if i % 2 == 0:
+			_checkpoint(x, cy)
+	return Vector2(x, cy)
 
 
 ## --- ritmo: alívio e bifurcação -----------------------------------------

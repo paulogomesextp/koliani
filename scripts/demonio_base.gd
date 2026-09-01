@@ -26,7 +26,9 @@ const GRAVIDADE := 1400.0
 ##   voador    -- sem gravidade, paira à volta da origem e MERGULHA na Koliani
 ##   escudeiro -- patrulha; golpes de FRENTE são bloqueados pelo escudo (só
 ##                o pisão ou um golpe pelas costas o magoam)
-@export_enum("patrulha", "saltador", "carga", "voador", "escudeiro") var comportamento := "patrulha"
+##   trepador  -- agarrado ao tecto acima; solta-se e cai quando a Koliani
+##                passa por baixo, depois anda como patrulha
+@export_enum("patrulha", "saltador", "carga", "voador", "escudeiro", "trepador") var comportamento := "patrulha"
 const DUR_CARGA := 0.55
 const MULT_CARGA := 3.4
 const TELEGRAFO_CARGA := 0.42
@@ -120,6 +122,8 @@ func _ready() -> void:
 		_acao_cd = randf_range(0.6, 1.8)
 	if comportamento == "escudeiro":
 		velocidade *= 0.7  # o escudo pesa
+	if comportamento == "trepador" and _sprite:
+		_sprite.scale.y = -1.0  # de cabeça para baixo, colado ao tecto
 
 	if _area_contacto:
 		_area_contacto.body_entered.connect(_ao_tocar)
@@ -317,6 +321,24 @@ func _physics_process(dt: float) -> void:
 		_t_hover += dt
 		var pouso := _origem + Vector2(sin(_t_hover * 1.4) * 62.0, sin(_t_hover * 2.1) * 24.0)
 		velocity = (pouso - global_position) * 3.0
+		move_and_slide()
+		return
+	elif comportamento == "trepador":
+		# agarrado ao tecto/parede acima; solta-se quando a Koliani passa por
+		# baixo e depois comporta-se como patrulha (cai e anda)
+		var kc := get_tree().get_first_node_in_group("koliani")
+		if kc:
+			var d: Vector2 = (kc as Node2D).global_position - global_position
+			if absf(d.x) < 100.0 and d.y > 24.0:
+				comportamento = "patrulha"
+				if _sprite:
+					_sprite.scale.y = 1.0
+				velocity = Vector2(0.0, 240.0)
+				anticipacao = 1.0
+				Som.toca("demonio_ataque", -9.0, 0.9)
+				move_and_slide()
+				return
+		velocity = Vector2.ZERO
 		move_and_slide()
 		return
 
