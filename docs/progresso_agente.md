@@ -1,5 +1,30 @@
 # Progresso do agente `gaming` — campanha dos 30 níveis
 
+## Sessão 2026-09-01 — curva de dificuldade + pisão
+
+Pedido do Paulo: (1) pisar inimigos = dano de espada + pulo automático;
+(2) os níveis ficaram duros demais — dificuldade **básica no N1** a subir
+até ao N30.
+
+- **Pisão** (`koliani.gd`): já existia mas a janela era apertada e o
+  ressalto fraco. Agora janela generosa (±46 px, banda vertical larga,
+  gatilho a `velocity.y > 40`), ressalto forte (`STOMP_RESSALTO` 520 /
+  `STOMP_RESSALTO_ALTO` 680 a segurar saltar) e **devolve os saltos de ar
+  todos** → encadeia pisões.
+- **Dificuldade** — tudo escala com `_dif = indice_nivel / 29`, quase a
+  zero no N1:
+  - `gerador_corredor.gd`: comprimento 6200 (N1) → ~32000 (N30); câmaras
+    de flavour por **`TIER_FLAVOUR`** (N1 só saltos/gruta/trampolim);
+    espaçamento das câmaras ~13 passos (N1) → ~4 (N30); perigo-no-vão
+    `5%+50%·_dif`, inimigos `5%+22%·_dif`; plataformas móveis só
+    `_dif > 0.33`; armadilhas com base de dano mais baixa e `_dif` mais
+    íngreme. Seed passou a `jornada4|`.
+  - `demonio_base.gd`: escala nos 30 níveis (antes parava no 4). N1 ≈
+    ×0.8 vida / ×0.65 dano, N30 ≈ ×1.4.
+  - `estado_jogo.gd`: `TEMPO_HARDCORE` reperfilado (170 s N1 → 640 s N30).
+- Testes headless verdes; smoke a 4 níveis (N1/N11/N20/N25) OK. **Falta
+  playtestar com o jogo a correr e afinar os números.**
+
 ## Sessão 2026-08-31 (cont. 3) — JORNADA 3.0: chão MORTAL + assets
 
 Feedback do Paulo: (1) os níveis tinham quase todos uma plataforma
