@@ -1,5 +1,33 @@
 # Como testar o Koliani (Paulo)
 
+## O que há de novo para playtestar (v0.9.0 → v0.9.6, 1 set 2026)
+
+Tudo o que entrou nesta leva está por afinar — os números são todos "a
+olho", conferidos só em screenshots headless. Arranca já no nível certo com
+o kit todo (FLYMODE na tecla F):
+
+```
+& "C:\Users\paulo\Desktop\Godot_v4.7.2-stable_win64.exe" . -- --devmode --nivel=N
+```
+
+| o quê | onde ver (`--nivel=`) | o que confirmar |
+|-------|----------------------|-----------------|
+| **rig novo da Koliani** (Knight_player) | qualquer | escala e pés nos declives; leitura da silhueta; se as animações novas (rolar, dash, dano, defesa, agarrar a borda, aterrar, morte) entram na altura certa |
+| **sons** de espada / tiro / acerto | qualquer | já não irritam ao fim de dois minutos? volume face à música? |
+| **som do checkpoint** + **fogueira** | qualquer (a jornada põe vários) | a fogueira lê-se como "ponto de regresso"? acende bem ao tocar? |
+| **fundo da cidade** (pack novo) | 21, 22, 23, 25 | é o fundo que mais se parece com o key_art — confirmar que não puxa a atenção para longe da acção |
+| **fundo de igreja** (pack novo) | 7, 9, 18, 24, 27, 28, **30** | escuro de mais? claro de mais? (o Trono é o melhor exemplo) |
+| **pântano** na região I | 1, 3 | substituiu o pôr-do-sol laranja do parallax_forest |
+| **desaturação/tinta dos packs** | 6, 10 | o Cold Corridors deixou de ser azul-néon e o Mountain Dusk deixou de ter falésias vermelhas |
+| **pedra gótica na região I** | 1..5 | acabou a relva de banda desenhada |
+| **líquido mortal mais escuro** | qualquer | ainda se lê como perigo? |
+| **5 monstros novos** | 3 besouro · 9 mastim · 12 abutre · 18 gosma · 24 raptor | escala, velocidade, e se o abutre a mergulhar é justo |
+| **um monstro "cara" por nível** | percorrer 2-3 níveis seguidos | dá mesmo a sensação de que cada nível tem o seu bicho? |
+
+Screenshots por região sem jogar: `tools/shot_dev_nivel.gd`
+(`--screen 1 --script ... -- <idx> <prefixo> <n_shots> <passo_x> <zoom>`;
+o zoom real do jogo é 1.4).
+
 ## Atalho no Ambiente de Trabalho
 
 **"Koliani (testar)"** &mdash; duplo-clique abre o jogo **com o código
