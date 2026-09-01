@@ -1,9 +1,23 @@
 # Progresso do agente `gaming` — campanha dos 30 níveis
 
-## Sessão 2026-09-01 (noite, autónoma) — câmara "fogo cruzado"
+## Sessão 2026-09-01 (noite, autónoma) — variedade Dead Cells
 
-Continuação da reformulação Dead Cells (Fase 2, variedade de câmaras) sem
-o Paulo à frente. Ecrãs desligados durante a sessão.
+Continuação da reformulação Dead Cells (Fase 2 câmaras + Fase 2b inimigos)
+sem o Paulo à frente. Ecrãs desligados durante a sessão.
+
+### Inimigo "cuspidor" (v0.8.8)
+- `demonio_base.gd`: novo `comportamento = "cuspidor"`. Patrulha e, à
+  distância (`ALC_CUSPIR` 440 px, |dy| < 170, |dx| > 60), planta-se,
+  telegrafa (`_windup` 0.5 s + pisca) e instancia uma `BolaFogo`
+  (`PROJETIL_CUSPO`) na direção da Koliani, com a mira achatada em y
+  (`Vector2(dx, dy*0.5).normalized()`) para ser mais legível de desviar.
+  Dano do projétil = `dano_contacto * 0.9`. Recarga 1.8-2.8 s; entre
+  cuspos anda como patrulha.
+- `gerador_corredor.gd` `_inimigo_em`: entra nas opções de comportamento
+  a partir de `_dif > 0.22` (a par de saltador/carga/trepador/escudeiro).
+- **Falta playtestar**: alcance, cadência, se o projétil lê bem, dano.
+
+### Câmara "fogo cruzado" (v0.8.7)
 
 - **`_f_crossfire`** (`gerador_corredor.gd`): novo "tom" de câmara. Lanço
   recto de plataformas pouco onduladas com uma `Torreta` por passo,

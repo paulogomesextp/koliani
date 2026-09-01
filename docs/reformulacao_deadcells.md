@@ -84,6 +84,10 @@ entrada/saída declaradas em altura, regra de ouro `SUBIDA_MAX`).
 - [x] **trepador** (dif > 0.3): agarrado ao tecto (sprite invertido);
   solta-se e cai quando a Koliani passa por baixo, depois anda como
   patrulha. O gerador põe-no ~120-170 px acima da plataforma.
+- [x] **cuspidor** (dif > 0.22): patrulha e, à distância (≤ 440 px, dy <
+  170), planta-se, telegrafa (wind-up 0.5 s) e cospe uma `BolaFogo` na
+  direção da Koliani com a mira achatada no y; recarga 1.8-2.8 s.
+  Pressão à distância que obriga a fechar distância ou a desviar.
 - [x] **telegrafos legíveis** (`_telegrafo`): antes de qualquer investida o
   inimigo pisca forte (branco-quente) + estremece. `carga` já tinha
   wind-up; `saltador` (agacha 0.26 s) e `voador` (trava no ar 0.3 s) ganham
