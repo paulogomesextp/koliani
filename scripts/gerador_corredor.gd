@@ -396,6 +396,10 @@ func _inimigo_em(par: Node2D, pos: Vector2) -> void:
 	d.especie = _especie_aleatoria()
 	d.position = pos
 	d.alcance_patrulha = _rng.randf_range(40.0, 90.0)
+	# comportamentos especiais a partir de dificuldade média (não nos voadores)
+	if _dif > 0.15 and d.especie != "olho" \
+			and _rng.randf() < 0.16 + 0.24 * _dif:
+		d.comportamento = "saltador" if _rng.randf() < 0.55 else "carga"
 	par.add_child(d)
 
 

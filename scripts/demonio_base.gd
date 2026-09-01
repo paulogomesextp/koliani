@@ -19,6 +19,19 @@ const GRAVIDADE := 1400.0
 ## (estremece) e passa a patrulhar/atacar como um demónio normal.
 @export var dormente := false
 @export var raio_acorda := 120.0
+## Comportamento (pegada Dead Cells -- cada bicho tem uma ameaça própria):
+##   patrulha -- anda de um lado para o outro (o de sempre)
+##   saltador -- patrulha e, quando a Koliani está perto, dá um salto em
+##               arco na direção dela
+##   carga    -- patrulha e, quando a Koliani está perto, telegrafa
+##               (estremece, pára) e depois arranca a alta velocidade
+@export_enum("patrulha", "saltador", "carga") var comportamento := "patrulha"
+const DUR_CARGA := 0.55
+const MULT_CARGA := 3.4
+const TELEGRAFO_CARGA := 0.42
+var _acao_cd := 0.0
+var _windup := 0.0
+var _carga := 0.0
 ## Cor do rasto de partículas quando morre.
 @export var cor_estilhacos := Color(0.7, 0.25, 0.45)
 ## Cor da luz de recorte (rim) do sprite -- normalmente o tom do bioma.
@@ -98,6 +111,9 @@ func _ready() -> void:
 		vida = maxi(1, int(round(vida * (0.8 + 0.6 * f))))
 		dano_contacto = maxi(1, int(round(dano_contacto * (0.65 + 0.75 * f))))
 		velocidade *= 0.88 + 0.34 * f
+
+	if comportamento != "patrulha":
+		_acao_cd = randf_range(0.6, 1.8)
 
 	if _area_contacto:
 		_area_contacto.body_entered.connect(_ao_tocar)
@@ -226,6 +242,53 @@ func _physics_process(dt: float) -> void:
 		if _congelado <= 0.0 and _corpo:
 			_corpo.modulate = Color(1, 1, 1)
 		return
+	_acao_cd = maxf(0.0, _acao_cd - dt)
+
+	# --- comportamentos especiais ---------------------------------------
+	if comportamento == "carga":
+		if _windup > 0.0:  # telegrafo: pára e estremece antes de arrancar
+			_windup -= dt
+			velocity.x = 0.0
+			if not is_on_floor():
+				velocity.y += GRAVIDADE * dt
+			move_and_slide()
+			if _windup <= 0.0:
+				_carga = DUR_CARGA
+				Som.toca("demonio_ataque", -8.0, 0.85)
+			return
+		if _carga > 0.0:  # arranque comprometido -- não vira nem trava
+			_carga -= dt
+			velocity.x = _direcao * velocidade * MULT_CARGA
+			if not is_on_floor():
+				velocity.y += GRAVIDADE * dt
+			move_and_slide()
+			if is_on_wall():
+				_carga = 0.0
+				_acao_cd = randf_range(1.8, 3.0)
+			return
+		var alvo_c := _dir_koliani_perto(320.0)
+		if alvo_c != 0.0 and _acao_cd <= 0.0 and is_on_floor():
+			_direcao = alvo_c
+			if _sprite:
+				_sprite.scale.x = _direcao
+			_windup = TELEGRAFO_CARGA
+			anticipacao = 1.0
+			velocity.x = 0.0
+			return
+	elif comportamento == "saltador":
+		if _acao_cd <= 0.0 and is_on_floor():
+			var alvo_s := _dir_koliani_perto(230.0)
+			if alvo_s != 0.0:
+				_direcao = alvo_s
+				if _sprite:
+					_sprite.scale.x = _direcao
+				velocity = Vector2(_direcao * 170.0, -430.0)
+				anticipacao = 1.0
+				_acao_cd = randf_range(1.5, 2.6)
+				move_and_slide()
+				return
+
+	# --- patrulha normal ----------------------------------------------
 	velocity.x = _direcao * velocidade
 	if not is_on_floor():
 		velocity.y += GRAVIDADE * dt
@@ -256,6 +319,18 @@ func _virar() -> void:
 	_direcao *= -1.0
 	if _sprite:
 		_sprite.scale.x = _direcao
+
+
+## Direção horizontal (-1/+1) para a Koliani, se ela estiver a <= `alcance`
+## px na horizontal e não muito abaixo. 0 = fora de alcance / sem alvo.
+func _dir_koliani_perto(alcance: float) -> float:
+	var k := get_tree().get_first_node_in_group("koliani")
+	if k == null:
+		return 0.0
+	var d: Vector2 = (k as Node2D).global_position - global_position
+	if absf(d.x) > alcance or d.y > 120.0:
+		return 0.0
+	return signf(d.x) if d.x != 0.0 else _direcao
 
 
 ## Há chão logo a seguir à beira, na direção `dir`? (raycast para baixo)
