@@ -17,6 +17,19 @@ sem o Paulo à frente. Ecrãs desligados durante a sessão.
   a partir de `_dif > 0.22` (a par de saltador/carga/trepador/escudeiro).
 - **Falta playtestar**: alcance, cadência, se o projétil lê bem, dano.
 
+### Bug + câmara `_f_pedras` (v0.8.10)
+- A pool da região 3 (Catacumbas) listava `"pedras"` desde sempre, mas o
+  `match` de `_flavour` **não tinha** `"pedras"` → caía no `return
+  Vector2(x + 180.0, y)` (no-op): um vão morto de 180 px sem câmara, ~1
+  em cada 8 câmaras geradas por pool nas Catacumbas.
+- Novo `_f_pedras`: beiral sem tecto, `n` = 5 + 3·`_dif` degraus, uma
+  `PedraQueda` por degrau — 1 em cada 3 `automatico` (ciclo/ritmo), as
+  outras `raio_gatilho` 82. Sem tecto baixo (≠ `gruta`) nem parede
+  interior (≠ `cripta`). Checkpoints a cada 2. `_pos_intenso`.
+- NB descoberto nesta sessão: **nenhum nível tem `corredor = false`** — a
+  abordagem "Casca + dungeon selada" das regiões II/IV foi revertida; a
+  JORNADA corre em todos os níveis 1-29.
+
 ### Câmara "ferry / a travessia" (v0.8.9)
 - **`_f_ferry`** (`gerador_corredor.gd`): fosso largo (`vao` 620-880 px +
   `220·_dif`) sobre o líquido, atravessado por UMA plataforma-balsa —

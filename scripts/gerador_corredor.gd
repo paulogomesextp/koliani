@@ -532,7 +532,10 @@ func _flavour(par: Node2D, tipo: String, x: float, y: float) -> Vector2:
 		"crossfire": return _f_crossfire(par, x, y)
 		"ferry": return _f_ferry(par, x, y)
 		"pedras": return _f_pedras(par, x, y)
-	return Vector2(x + 180.0, y)
+	# tipo sem handler -> não deve acontecer (pool/assinatura mal configurada).
+	# Avisa em vez de gerar um vão morto silencioso e cai num `descanso`.
+	push_warning("GeradorCorredor: câmara '%s' sem _f_ correspondente" % tipo)
+	return _f_descanso(par, x, y)
 
 
 ## FERRY: um fosso largo sobre o líquido atravessado por UMA plataforma que
