@@ -298,7 +298,7 @@ func _construir() -> void:
 				f = pool[_rng.randi() % pool.size()]
 				if f == ant_flavour:
 					f = pool[(_rng.randi() + 1) % pool.size()]
-				_pos_intenso = f in ["guilhotinas", "serras", "pendulos", "fogo", "quebra", "crossfire", "ferry"]
+				_pos_intenso = f in ["guilhotinas", "serras", "pendulos", "fogo", "quebra", "crossfire", "ferry", "pedras"]
 			ant_flavour = f
 			var res := _flavour(par, f, x, y)
 			x = res.x
@@ -531,6 +531,7 @@ func _flavour(par: Node2D, tipo: String, x: float, y: float) -> Vector2:
 		"cripta": return _f_cripta(par, x, y)
 		"crossfire": return _f_crossfire(par, x, y)
 		"ferry": return _f_ferry(par, x, y)
+		"pedras": return _f_pedras(par, x, y)
 	return Vector2(x + 180.0, y)
 
 
@@ -568,6 +569,38 @@ func _f_ferry(par: Node2D, x: float, y: float) -> Vector2:
 	x += 90.0 + vao + _rng.randf_range(60.0, 96.0)
 	_plat(par, Vector2(x, cy), Vector2(130.0, 18.0))
 	_checkpoint(x, cy, true)
+	return Vector2(x, cy)
+
+
+## PEDRAS (assinatura das Catacumbas): corre-se por um beiral sem tecto a
+## desviar de uma saraivada de pedras que caem -- umas por proximidade,
+## outras em ciclo (ritmo). Nada de tecto baixo (isso é a `gruta`) nem
+## parede interior (isso é a `cripta`): é só movimento em frente e leitura
+## das que já tremem.
+func _f_pedras(par: Node2D, x: float, y: float) -> Vector2:
+	var cy: float = clampf(y, _teto_y + 150.0, _chao_y - 100.0)
+	var n := 5 + int(_dif * 3.0)
+	for i in n:
+		x += _rng.randf_range(150.0, 178.0)
+		cy = clampf(cy + _rng.randf_range(-30.0, 30.0), _teto_y + 120.0, _chao_y - 90.0)
+		_plat(par, Vector2(x, cy), Vector2(92.0, 16.0))
+		var pd := PEDRA.instantiate()
+		pd.chao_y = cy - 8.0
+		pd.dano = 8 + int(18.0 * _dif)
+		if i % 3 == 1:
+			pd.automatico = true                       # uma em cada três em ciclo
+			pd.periodo = _rng.randf_range(2.4, 3.4) - 0.5 * _dif
+			pd.fase = _rng.randf() * 2.0
+		else:
+			pd.raio_gatilho = 82.0                     # as outras por proximidade
+		pd.aviso = 0.6 - 0.2 * _dif
+		pd.position = Vector2(x + _rng.randf_range(-16.0, 16.0), cy - _rng.randf_range(150.0, 220.0))
+		par.add_child(pd)
+		if i % 2 == 0:
+			_checkpoint(x, cy)
+	x += _rng.randf_range(150.0, 178.0)
+	_plat(par, Vector2(x, cy), Vector2(104.0, 18.0))
+	_checkpoint(x, cy)
 	return Vector2(x, cy)
 
 
