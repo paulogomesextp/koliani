@@ -18,16 +18,20 @@
   `_borda*`): a cair rente a um rebordo, agarra-se; saltar/↑ sobe, ↓ larga.
   Perdoa saltos por um triz nas torres da jornada. **Falta playtest** dos
   números (`BORDA_*`, `BORDA_MANTLE`).
-- [ ] **Roll-cancel**: iniciar rolamento cancela o recovery do ataque e a
-  lag de aterragem. `Movimento.pode_rolar` + estados de `koliani.gd`.
-- [ ] **Pogo com a espada**: ataque para baixo no ar → ressalta ao acertar
-  em inimigos **e** em serras/espinhos/guilhotinas (NÃO no líquido mortal).
-  Precisa de um grupo `"pogavel"` nos hazards (serra/espinhos/guilhotina/
-  pendulo/fogo). Reaproveita o bloco do stomp.
-- [ ] **Coyote nas paredes + wall-jump puro** (sem precisar da habilidade
-  `escalar_paredes` para o chute básico).
+- [x] **Roll-cancel**: iniciar rolamento corta o recovery do ataque
+  (`koliani.gd`, ramo do `rolar`). Encadeia ataque→rolar→ataque.
+- [x] **Pogo em hazards**: a cair em cima de uma `Serra`/`Espinhos` (grupo
+  `"pogavel"` + layer 6), a Koliani ressalta em vez de levar o golpe
+  (raycast para baixo dos pés; i-frames apanham o toque). **Falta**
+  estender a `Guilhotina`/`PenduloLamina` (geometria da lâmina fora do
+  root — precisa detetar pela Area2D da lâmina). Líquido mortal nunca é
+  `"pogavel"`.
+- [x] **Wall-jump básico** (`koliani.gd`): no ar, encostada a uma parede e
+  a segurar contra ela, `saltar` chuta para fora (`WALLJUMP`), sem gastar
+  o salto do ar. Não precisa de `escalar_paredes`.
 - [ ] Afinar aceleração/atrito para o "nunca pára" (rever `movimento.gd`
-  `ACEL_AR`/`ACEL_CHAO`, corte de salto).
+  `ACEL_AR`/`ACEL_CHAO`, corte de salto). **Falta playtest** dos números
+  do agarrar-borda / wall-jump / pogo.
 
 ## Fase 2 — Jornada montada de salas feitas à mão
 

@@ -393,6 +393,27 @@ func _physics_process(dt: float) -> void:
 		_estava_no_chao = false
 		return
 
+	# wall-jump básico (sempre, não precisa da habilidade "escalar_paredes"):
+	# no ar, encostada a uma parede e a segurar CONTRA ela -> chuta para
+	# fora. Não gasta o salto do ar. Perde para o escalar quando este está
+	# ativo (esse já saiu acima com `return`).
+	if not is_on_floor() and is_on_wall_only() and _parede_lock <= 0.0 \
+			and not _escalando and _dash_restante <= 0.0 and _rolar_restante <= 0.0 \
+			and velocity.y > -140.0 and dir != 0.0 \
+			and signf(dir) == -signf(get_wall_normal().x) \
+			and Input.is_action_just_pressed("saltar"):
+		var wn := get_wall_normal()
+		velocity = Vector2(wn.x * WALLJUMP.x, WALLJUMP.y)
+		_parede_lock = 0.24
+		_mov.saltos_dados = 0  # o chute de parede não gasta o salto do ar
+		_mov.velocidade = velocity
+		_olha_para = signf(wn.x)
+		Som.toca("salto", -9.0)
+		move_and_slide()
+		_mov.velocidade = velocity
+		_estava_no_chao = false
+		return
+
 	# defesa: só com a habilidade "escudo", em pé, e não a meio de outra ação
 	_defendendo = EstadoJogo.tem_habilidade("escudo") \
 		and Input.is_action_pressed("defender") \
@@ -434,6 +455,12 @@ func _physics_process(dt: float) -> void:
 		_rolar_restante = DUR_ROLAR
 		_rolar_recarga = RECARGA_ROLAR
 		_invulneravel = maxf(_invulneravel, DUR_ROLAR)
+		# roll-cancel (pegada Dead Cells): o rolamento corta o recovery do
+		# ataque -> encadeia-se ataque -> rolar -> ataque sem esperar
+		if _ataque_restante > 0.0:
+			_ataque_restante = 0.0
+			if _hitbox:
+				_hitbox.monitoring = false
 	elif Input.is_action_just_pressed("dash") and _dash_recarga <= 0.0 and (
 			is_on_floor() or EstadoJogo.tem_habilidade("dash_aereo")):
 		_dash_restante = DUR_DASH
@@ -507,6 +534,30 @@ func _physics_process(dt: float) -> void:
 			Som.toca("ataque", -12.0)
 			_pop_impacto(ep)
 			break
+
+	# pogo: cair em cima de uma serra / espinhos (grupo "pogavel", layer 6)
+	# -> ressalta em vez de levar o golpe (os i-frames apanham o toque desse
+	# frame). Só a descer a sério e pela parte de cima.
+	if _stomp_cd <= 0.0 and velocity.y > 90.0 and not is_on_floor() and _dash_restante <= 0.0:
+		var esp := get_world_2d().direct_space_state
+		var rq := PhysicsRayQueryParameters2D.create(
+			global_position + Vector2(0.0, 16.0), global_position + Vector2(0.0, 46.0), 1 << 5)
+		rq.collide_with_areas = true
+		rq.collide_with_bodies = false
+		rq.hit_from_inside = true
+		rq.exclude = [self]
+		var ph := esp.intersect_ray(rq)
+		if not ph.is_empty() and (ph["collider"] as Node).is_in_group("pogavel"):
+			velocity.y = -(STOMP_RESSALTO_ALTO if Input.is_action_pressed("saltar") else STOMP_RESSALTO)
+			_mov.saltos_dados = 0
+			_invulneravel = maxf(_invulneravel, 0.35)
+			_stomp_cd = 0.22
+			_pop = 1.0
+			_squash = maxf(_squash, 0.5)
+			_abanar(3.0)
+			_hitstop(0.05)
+			Som.toca("acerto", -10.0)
+			_pop_impacto(global_position + Vector2(0.0, 24.0))
 
 	var vel_queda := velocity.y
 	move_and_slide()

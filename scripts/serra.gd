@@ -14,6 +14,8 @@ const FRAMES := 8
 
 func _pronto() -> void:
 	dano = maxi(dano, 22)
+	add_to_group("pogavel")          # a Koliani pode ressaltar em cima (pogo)
+	set_collision_layer_value(6, true)
 	_montar_anim()
 	if percurso != Vector2.ZERO and tempo > 0.0:
 		var base := position
