@@ -5,6 +5,27 @@
 Continuação da reformulação Dead Cells (Fase 2 câmaras + Fase 2b inimigos)
 sem o Paulo à frente. Ecrãs desligados durante a sessão.
 
+**Entregas:** v0.8.7 `_f_crossfire` · v0.8.8 `cuspidor` · v0.8.9 `_f_ferry`
+· v0.8.10 `_f_pedras` (+ bug) · v0.8.11 `_f_espinhos`. Tudo com testes
+headless + `verifica_jornada.gd` (30 níveis) verdes. **Todos os números
+por playtestar.**
+
+### ⚠️ Erro meu: `git add -A` apanhou os packs em bruto (v0.8.7..v0.8.11)
+- Os 5 commits de playtest usaram `git add -A` e arrastaram ~5026
+  ficheiros / ~180 MB de `assets/sprites/incoming/` (10 packs que o Paulo
+  largou: anokolisa, bdragon1727, codemanu, free-game-assets, glionox,
+  ninjikin, piiixl, szadiart, thewisehedgehog, zerie). Só tinham
+  `.gdignore`, não `.gitignore`.
+- **Corrigido** (`0ec3745`): `git rm --cached` das 10 pastas (ficheiros
+  ficam em disco) + regra no `.gitignore` para cada. O conjunto de
+  ficheiros tracked ficou EXACTAMENTE como estava antes da sessão (o pack
+  `kenney-pixel-platformer`, CC0, continua versionado).
+- **PENDENTE p/ o Paulo:** os blobs continuam no histórico (9e5791f→).
+  Limpar precisa de `git filter-repo` + `push --force` ao `master` — mexe
+  no remote e parte o clone do Jensath. Decisão do Paulo.
+- A partir daqui, nesta sessão: **nada de `git add -A`**, só paths
+  explícitos.
+
 ### Inimigo "cuspidor" (v0.8.8)
 - `demonio_base.gd`: novo `comportamento = "cuspidor"`. Patrulha e, à
   distância (`ALC_CUSPIR` 440 px, |dy| < 170, |dx| > 60), planta-se,
