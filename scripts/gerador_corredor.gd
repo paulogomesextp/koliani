@@ -16,12 +16,13 @@ extends Node2D
 ##  - a última câmara é uma passadeira sólida lisa que encosta ao nível.
 ## `corredor = false` na cena raiz desliga (o último nível nunca o tem).
 
-# Curva de dificuldade (ago 2026): o jogo estava DEMASIADO duro logo no
-# Nível 1. Agora a jornada arranca curta e suave e cresce até ao Nível 30 --
-# comprimento, densidade de perigos/inimigos e o LEQUE de câmaras (ver
-# `TIER_FLAVOUR`) escalam todos com `_dif` (= indice_nivel / 29).
-@export var comprimento_base := 6200.0
-@export var por_nivel := 880.0
+# Curva de dificuldade (1 set 2026, 2.ª passagem): o Nível 1 ainda ia dos
+# 6200px -- longo demais para um nível "básico, ~1 minuto" como o Paulo
+# pediu. Desce para 1800px (uns 10-15s só de travessia da jornada, mais a
+# sala clássica a seguir) e cresce mais depressa por nível para o topo da
+# campanha continuar com o mesmo fôlego de antes.
+@export var comprimento_base := 1800.0
+@export var por_nivel := 1050.0
 @export var comprimento_max := 32000.0
 @export var especie_inimigo := ""
 @export var entrada_fresca := true
