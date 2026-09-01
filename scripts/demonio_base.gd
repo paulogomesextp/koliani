@@ -20,18 +20,22 @@ const GRAVIDADE := 1400.0
 @export var dormente := false
 @export var raio_acorda := 120.0
 ## Comportamento (pegada Dead Cells -- cada bicho tem uma ameaça própria):
-##   patrulha -- anda de um lado para o outro (o de sempre)
-##   saltador -- patrulha e, quando a Koliani está perto, dá um salto em
-##               arco na direção dela
-##   carga    -- patrulha e, quando a Koliani está perto, telegrafa
-##               (estremece, pára) e depois arranca a alta velocidade
-@export_enum("patrulha", "saltador", "carga") var comportamento := "patrulha"
+##   patrulha  -- anda de um lado para o outro (o de sempre)
+##   saltador  -- patrulha e, quando a Koliani está perto, salta em arco nela
+##   carga     -- patrulha, telegrafa (estremece, pára) e arranca a alta vel.
+##   voador    -- sem gravidade, paira à volta da origem e MERGULHA na Koliani
+##   escudeiro -- patrulha; golpes de FRENTE são bloqueados pelo escudo (só
+##                o pisão ou um golpe pelas costas o magoam)
+@export_enum("patrulha", "saltador", "carga", "voador", "escudeiro") var comportamento := "patrulha"
 const DUR_CARGA := 0.55
 const MULT_CARGA := 3.4
 const TELEGRAFO_CARGA := 0.42
+const VEL_MERGULHO := 460.0
 var _acao_cd := 0.0
 var _windup := 0.0
 var _carga := 0.0
+var _mergulho := 0.0
+var _t_hover := 0.0
 ## Cor do rasto de partículas quando morre.
 @export var cor_estilhacos := Color(0.7, 0.25, 0.45)
 ## Cor da luz de recorte (rim) do sprite -- normalmente o tom do bioma.
@@ -114,6 +118,8 @@ func _ready() -> void:
 
 	if comportamento != "patrulha":
 		_acao_cd = randf_range(0.6, 1.8)
+	if comportamento == "escudeiro":
+		velocidade *= 0.7  # o escudo pesa
 
 	if _area_contacto:
 		_area_contacto.body_entered.connect(_ao_tocar)
@@ -287,6 +293,32 @@ func _physics_process(dt: float) -> void:
 				_acao_cd = randf_range(1.5, 2.6)
 				move_and_slide()
 				return
+	elif comportamento == "voador":
+		# sem gravidade: paira à volta da origem e mergulha na Koliani
+		if _mergulho > 0.0:  # em picada -- direção fixada no arranque
+			_mergulho -= dt
+			move_and_slide()
+			if _mergulho <= 0.0 or is_on_wall() or is_on_floor():
+				_mergulho = 0.0
+				_acao_cd = randf_range(1.3, 2.3)
+			return
+		var kv := get_tree().get_first_node_in_group("koliani")
+		if kv and _acao_cd <= 0.0:
+			var d: Vector2 = (kv as Node2D).global_position - global_position
+			if d.length() < 300.0:
+				velocity = d.normalized() * VEL_MERGULHO
+				_mergulho = 0.6
+				anticipacao = 1.0
+				if _sprite:
+					_sprite.scale.x = signf(d.x) if d.x != 0.0 else _sprite.scale.x
+				Som.toca("demonio_ataque", -8.0, 1.1)
+				move_and_slide()
+				return
+		_t_hover += dt
+		var pouso := _origem + Vector2(sin(_t_hover * 1.4) * 62.0, sin(_t_hover * 2.1) * 24.0)
+		velocity = (pouso - global_position) * 3.0
+		move_and_slide()
+		return
 
 	# --- patrulha normal ----------------------------------------------
 	velocity.x = _direcao * velocidade
@@ -353,6 +385,16 @@ func _ao_tocar(corpo: Node) -> void:
 
 func receber_dano(quantidade: int, dir_empurrao: float = 0.0) -> void:
 	if _morto:
+		return
+	# escudeiro: golpe de FRENTE (o empurrão atira-o para trás, contra o
+	# sentido em que está virado) bate no escudo -- só "clinc". Pisão
+	# (dir_empurrao 0) e golpes pelas costas passam.
+	if comportamento == "escudeiro" and dir_empurrao != 0.0 \
+			and signf(dir_empurrao) == -_direcao:
+		Som.toca("bloqueio", -12.0, randf_range(0.85, 0.95))
+		_flinch = 0.4
+		_flinch_dir = signf(dir_empurrao)
+		anticipacao = 0.6
 		return
 	vida -= quantidade
 	global_position.x += dir_empurrao * 8.0

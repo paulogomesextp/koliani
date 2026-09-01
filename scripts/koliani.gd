@@ -183,11 +183,12 @@ func _ready() -> void:
 	EstadoJogo.equipamento_mudou.connect(func(_t: String, _i: String) -> void: _aplicar_equipamento())
 
 
-## Rig do sprite: "codigo" = tiras geradas por `tools/gerar_sprites.gd`;
-## "gothic" = rig Ansimuz "Gothicvania Church" (CC0) recolorido para o
-## luar roxo por `tools/importar_rig_koliani.py` (pasta `koliani_gothic/`).
-## Experimental -- reformulação "pegada Dead Cells", fase 4.
-const RIG := "gothic"
+## Rig do sprite: "codigo" = tiras geradas por `tools/gerar_sprites.gd`
+## (a Koliani atual, roxa e on-model). "gothic" = rig Ansimuz "Gothicvania
+## Church" (CC0) recolorido, em `koliani_gothic/` -- experiência da fase 4,
+## DESLIGADA a pedido do Paulo (ficou escura/pequena; fica na gaveta,
+## reativa-se pondo "gothic" + `tools/importar_rig_koliani.py`).
+const RIG := "codigo"
 
 ## [n_frames, fps, loop] por estado. Cada tira é horizontal, virada à direita.
 const _KOLI_ANIMS := {
