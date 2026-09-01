@@ -887,12 +887,18 @@ func devolver_saltos_ar() -> void:
 ## FLYMODE (DevBarra, só DEVELOPER MODE). Alterna voo livre: atravessa
 ## paredes, sem gravidade. Ao desligar, a gravidade normal volta e a Koliani
 ## cai até à plataforma mais próxima. Devolve o novo estado.
+var _mask_guardada := 0
+
 func alternar_voo() -> bool:
 	if not EstadoJogo.modo_dev:
 		return false
 	_voando = not _voando
 	velocity = Vector2.ZERO
-	if not _voando:
+	if _voando:
+		_mask_guardada = collision_mask
+		collision_mask = 0  # não colide com nada -> atravessa paredes
+	else:
+		collision_mask = _mask_guardada if _mask_guardada != 0 else collision_mask
 		_mov.velocidade = Vector2.ZERO
 		_mov.saltos_dados = 0
 	Som.toca("salto_duplo" if _voando else "aterrar", -12.0)
