@@ -42,6 +42,14 @@ const VEL_ESCALAR := 135.0
 ## fica fixo -- ↑ trava/sobe, ↓ acelera a descida.
 const VEL_DESLIZE_PAREDE := 55.0
 const WALLJUMP := Vector2(330.0, -430.0)
+## Agarrar a borda (básico, sempre disponível -- pegada Dead Cells): a cair
+## rente ao rebordo de uma plataforma, a Koliani agarra-se e fica pendurada.
+## Saltar / ↑ = sobe para cima da plataforma; ↓ = larga. Perdoa saltos por
+## um triz nas torres da jornada.
+const BORDA_ALCANCE := 24.0       # quão à frente se sente a parede
+const BORDA_PEITO := -30.0        # altura do sensor "há parede à frente"
+const BORDA_CABECA := -60.0       # altura do sensor "está livre por cima do rebordo"
+const BORDA_MANTLE := Vector2(150.0, -430.0)  # impulso ao subir para a plataforma
 const DUR_ATAQUE := 0.18
 const I_FRAMES := 0.6
 ## Ressalto ao cair em cima de um inimigo (Mario-style): o pulo automático a
@@ -119,6 +127,11 @@ var _preso := 0.0
 ## breve travão depois do salto de parede para não voltar a colar logo.
 var _escalando := false
 var _parede_lock := 0.0
+## Pendurada num rebordo (agarrar a borda). `_borda_lock` = pequeno travão
+## depois de largar/subir para não voltar a agarrar logo.
+var _borda := false
+var _borda_lock := 0.0
+var _borda_lado := 1.0
 ## Agachada (segura S no chão, parada). Só bloqueia o andar -- visual.
 var _agachado := false
 ## Conta-decrescente para mostrar a animação do salto duplo.
@@ -264,6 +277,7 @@ func _physics_process(dt: float) -> void:
 	_kame_recarga = maxf(0.0, _kame_recarga - dt)
 	_preso = maxf(0.0, _preso - dt)
 	_parede_lock = maxf(0.0, _parede_lock - dt)
+	_borda_lock = maxf(0.0, _borda_lock - dt)
 	_djump_t = maxf(0.0, _djump_t - dt)
 	_leve = maxf(0.0, _leve - dt)
 	if _inverso_restante > 0.0:
@@ -336,6 +350,44 @@ func _physics_process(dt: float) -> void:
 			_parede_lock = 0.28
 			_mov.saltos_dados = 0  # o salto de parede não gasta o salto do ar
 			Som.toca("salto", -10.0)
+		move_and_slide()
+		_mov.velocidade = velocity
+		_estava_no_chao = false
+		return
+
+	# --- agarrar a borda (básico) -----------------------------------------
+	# a cair (ou quase parada no ar) rente ao rebordo de uma plataforma:
+	# agarra-se. Não corre se estiver a escalar, a rolar, a dar dash, ou
+	# logo a seguir a largar/subir.
+	if not _borda and _borda_lock <= 0.0 and not is_on_floor() \
+			and _rolar_restante <= 0.0 and _dash_restante <= 0.0 \
+			and _ataque_restante <= 0.0 and _preso <= 0.0 \
+			and velocity.y > -30.0:
+		var lado := signf(dir) if dir != 0.0 else _olha_para
+		var lip_y := _detetar_borda(lado)
+		if not is_nan(lip_y):
+			_borda = true
+			_borda_lado = lado
+			global_position.y = lip_y + 34.0  # mãos ao nível do rebordo
+			velocity = Vector2.ZERO
+			_mov.saltos_dados = 0
+			Som.toca("aterrar", -16.0)
+
+	if _borda:
+		_olha_para = _borda_lado
+		velocity = Vector2.ZERO
+		if Input.is_action_just_pressed("saltar") or Input.is_action_just_pressed("mirar_cima"):
+			# sobe para cima da plataforma
+			velocity = Vector2(_borda_lado * BORDA_MANTLE.x, BORDA_MANTLE.y)
+			_mov.velocidade = velocity
+			_mov.saltos_dados = 0
+			_borda = false
+			_borda_lock = 0.25
+			Som.toca("salto", -10.0)
+		elif Input.is_action_pressed("mirar_baixo") \
+				or (dir != 0.0 and signf(dir) == -_borda_lado):
+			_borda = false
+			_borda_lock = 0.22
 		move_and_slide()
 		_mov.velocidade = velocity
 		_estava_no_chao = false
@@ -480,6 +532,36 @@ func _physics_process(dt: float) -> void:
 			receber_dano(vida)
 
 
+## Há um rebordo agarrável no lado `lado` (-1 esq / +1 dir)? Devolve o Y do
+## topo da plataforma, ou NAN se não houver. Dois sensores: parede à frente
+## à altura do peito E espaço livre à frente à altura da cabeça (= é mesmo
+## um rebordo, não uma parede alta). Depois varre para baixo para achar o topo.
+func _detetar_borda(lado: float) -> float:
+	var espaco := get_world_2d().direct_space_state
+	var qp := PhysicsRayQueryParameters2D.create(
+		global_position + Vector2(0.0, BORDA_PEITO),
+		global_position + Vector2(lado * BORDA_ALCANCE, BORDA_PEITO), 1)
+	qp.exclude = [self]
+	var peito := espaco.intersect_ray(qp)
+	if peito.is_empty():
+		return NAN
+	var qc := PhysicsRayQueryParameters2D.create(
+		global_position + Vector2(0.0, BORDA_CABECA),
+		global_position + Vector2(lado * BORDA_ALCANCE, BORDA_CABECA), 1)
+	qc.exclude = [self]
+	if not espaco.intersect_ray(qc).is_empty():
+		return NAN  # a parede continua acima -> não é um rebordo
+	var x_face: float = peito["position"].x + lado * 3.0
+	var qd := PhysicsRayQueryParameters2D.create(
+		Vector2(x_face, global_position.y + BORDA_CABECA),
+		Vector2(x_face, global_position.y + BORDA_PEITO + 8.0), 1)
+	qd.exclude = [self]
+	var topo := espaco.intersect_ray(qd)
+	if topo.is_empty():
+		return NAN
+	return topo["position"].y
+
+
 func _process(dt: float) -> void:
 	_animar(dt)
 	_atualizar_anim()
@@ -490,7 +572,7 @@ func _atualizar_anim() -> void:
 	if _corpo == null or _corpo.sprite_frames == null:
 		return
 	var a := "idle"
-	if _escalando:
+	if _escalando or _borda:
 		a = "wallslide"
 	elif _ataque_restante > 0.0:
 		a = "attack"
