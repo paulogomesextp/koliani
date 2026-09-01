@@ -50,8 +50,8 @@ bioma = "cidade"
 largura_nivel = 3100.0
 luzes_horizonte = true
 fundo_pack = "cidade"
-tinta_fundo = Color(1.02, 0.72, 1.1, 1)
-neblina_fundo = 0.28
+tinta_fundo = Color(0.88, 0.66, 1.06, 1)
+neblina_fundo = 0.34
 dessaturar_fundo = 0.34
 
 [node name="EclipseTint" type="Node" parent="."]

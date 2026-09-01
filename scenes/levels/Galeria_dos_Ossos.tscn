@@ -50,8 +50,8 @@ bioma = "catacumbas"
 largura_nivel = 3300.0
 luzes_horizonte = true
 fundo_pack = "caverna"
-tinta_fundo = Color(0.8, 0.72, 1.02, 1)
-neblina_fundo = 0.42
+tinta_fundo = Color(1.4, 1.35, 1.6, 1)
+neblina_fundo = 0.28
 dessaturar_fundo = 0.4
 
 [node name="Casca" parent="." instance=ExtResource("90_casca")]

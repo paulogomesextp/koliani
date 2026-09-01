@@ -48,8 +48,8 @@ bioma = "cidade"
 largura_nivel = 3600.0
 luzes_horizonte = true
 fundo_pack = "cidade"
-tinta_fundo = Color(0.88, 0.78, 1.06, 1)
-neblina_fundo = 0.36
+tinta_fundo = Color(0.76, 0.64, 1.0, 1)
+neblina_fundo = 0.4
 dessaturar_fundo = 0.34
 
 [node name="Vagao1" parent="." instance=ExtResource("9_pl") groups=["vagoes_trem"]]

@@ -24,9 +24,20 @@ o kit todo (FLYMODE na tecla F):
 | **5 monstros novos** | 3 besouro · 9 mastim · 12 abutre · 18 gosma · 24 raptor | escala, velocidade, e se o abutre a mergulhar é justo |
 | **um monstro "cara" por nível** | percorrer 2-3 níveis seguidos | dá mesmo a sensação de que cada nível tem o seu bicho? |
 
-Screenshots por região sem jogar: `tools/shot_dev_nivel.gd`
-(`--screen 1 --script ... -- <idx> <prefixo> <n_shots> <passo_x> <zoom>`;
-o zoom real do jogo é 1.4).
+Screenshots sem jogar:
+
+- `tools/shot_dev_nivel.gd` — vários PNG ao longo da jornada de UM nível
+  (`--screen 1 --script ... -- <idx> <prefixo> <n_shots> <passo_x> <zoom>`;
+  o zoom real do jogo é 1.4).
+- `tools/folha_de_contacto.gd` — **um retrato de cada um dos 30 níveis numa
+  grelha 6x5** (uma linha por região). É a maneira mais rápida de ver se uma
+  região ficou escura de mais ou se um fundo destoa:
+
+```
+& "C:\Users\paulo\Desktop\Godot_v4.7.2-stable_win64.exe" --screen 1 --resolution 1280x720 --script res://tools/folha_de_contacto.gd -- folha.png 1.4 2400
+```
+
+  Leva ~2 min e precisa de janela (não corre em `--headless`).
 
 ## Atalho no Ambiente de Trabalho
 

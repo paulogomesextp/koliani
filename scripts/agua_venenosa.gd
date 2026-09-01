@@ -20,6 +20,9 @@ var _forma: CollisionShape2D
 var _sup: Polygon2D
 var _rim: Polygon2D
 var _luz: PointLight2D
+## Energia de repouso da luz da linha de água (o `_process` pulsa à volta
+## dela). Fica aqui porque muda com a variante `brasas`.
+var _luz_base := 0.45
 var _t := 0.0
 
 
@@ -72,7 +75,7 @@ func _process(dt: float) -> void:
 		_rim.position.y = onda
 		_rim.modulate.a = 0.6 + 0.4 * sin(_t * 2.0 + 1.0)
 	if _luz:
-		_luz.energy = 0.7 + 0.15 * sin(_t * 2.6)
+		_luz.energy = _luz_base * (1.0 + 0.2 * sin(_t * 2.6))
 
 
 func _set_largura(v: float) -> void:
@@ -122,8 +125,13 @@ func _reconstruir() -> void:
 		_rim.color = Color(rc.r, rc.g, rc.b, 0.55 if brasas else 0.9)
 	if _luz:
 		_luz.position = Vector2(0.0, -hh)
+		# a luz da linha de agua toma a COR DO LIQUIDO (vinha sempre verde do
+		# .tscn) e fica fraca -- serve para marcar a superficie, nao para
+		# pintar o fundo do ecra
+		_luz.color = cor.lightened(0.35)
+		_luz_base = 0.45
 		if brasas:
-			_luz.energy = 0.9
+			_luz_base = 0.9
 			_luz.color = Color(1.0, 0.5, 0.18)
 			_luz.scale = Vector2(clampf(largura / 150.0, 1.6, 5.0), 1.8)
 	if _brasas_no:
