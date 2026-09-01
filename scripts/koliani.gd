@@ -864,6 +864,19 @@ func devolver_saltos_ar() -> void:
 	_mov.saltos_dados = 0
 
 
+## Impulso vindo de fora (Trampolim, Impulsor...). TEM de passar por aqui e
+## não só mexer em `velocity`: o `Movimento.passo()` reescreve `velocity` a
+## partir do `_mov.velocidade` a cada frame, por isso é preciso sincronizar
+## os dois (senão o impulso é descartado no frame seguinte).
+func aplicar_impulso(v: Vector2, manter_x := false) -> void:
+	velocity.y = v.y
+	if not manter_x:
+		velocity.x = v.x
+	_mov.velocidade = velocity
+	_mov.saltos_dados = 0
+	_estava_no_chao = false
+
+
 ## Define a escala da gravidade (Observatório Lunar, nível 14). 1 = normal,
 ## ~0.4 = "gravidade lunar" (salto alto, queda lenta). As `ZonaGravidade`
 ## chamam isto ao entrar/sair; a Sacerdotisa mexe nisto durante a luta.

@@ -21,7 +21,10 @@ func _ready() -> void:
 	add_to_group("trampolins")
 	collision_layer = 0
 	collision_mask = 2
-	body_entered.connect(_ao_tocar)
+	monitoring = true
+	# NB: já não se liga a `body_entered` -- ver `_physics_process`. O sinal
+	# só dispara à ENTRADA; se a Koliani andasse para cima do trampolim e lá
+	# ficasse pousada (ou reentrasse durante o cooldown), nunca mais saltava.
 	if get_node_or_null("Col") == null:
 		var cs := CollisionShape2D.new()
 		cs.name = "Col"
@@ -56,21 +59,31 @@ func _montar() -> void:
 
 
 func _process(dt: float) -> void:
-	_cd = maxf(0.0, _cd - dt)
 	if _almofada:
 		# recolhe depressa depois do impacto, volta devagar
 		_almofada.position.y = move_toward(_almofada.position.y, _base_y, dt * 60.0)
 
 
-func _ao_tocar(corpo: Node) -> void:
-	if _cd > 0.0 or not (corpo is Koliani):
+## Sondagem por frame (em vez de `body_entered`): se a Koliani estiver em
+## cima -- a cair, a andar ou pousada -- e não a subir já depressa, atira-a.
+func _physics_process(dt: float) -> void:
+	_cd = maxf(0.0, _cd - dt)
+	if _cd > 0.0:
 		return
-	var k := corpo as Node2D
-	# só se vier de cima / a cair (não a subir já depressa)
+	for corpo in get_overlapping_bodies():
+		if corpo is Koliani:
+			_saltar(corpo as Node2D)
+			break
+
+
+func _saltar(k: Node2D) -> void:
+	# não interrompe quem já vai a subir depressa (evita "engolir" um salto)
 	if "velocity" in k and k.velocity.y < -60.0:
 		return
 	_cd = 0.25
-	if "velocity" in k:
+	if k.has_method("aplicar_impulso"):
+		k.aplicar_impulso(Vector2(horizontal, -impulso), horizontal == 0.0)
+	elif "velocity" in k:
 		k.velocity.y = -impulso
 		if horizontal != 0.0:
 			k.velocity.x = horizontal
