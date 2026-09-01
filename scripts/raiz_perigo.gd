@@ -65,7 +65,6 @@ func _irromper() -> void:
 	if _racha:
 		_racha.visible = false
 	_visual.visible = true
-	Som.toca("investida", -13.0, 1.5)
 	monitoring = true
 	var t := create_tween()
 	t.tween_property(_visual, "scale:y", 1.0, 0.12).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)

@@ -68,4 +68,3 @@ func _aplicar_estado(solida: bool) -> void:
 	if vis:
 		create_tween().tween_property(vis, "modulate:a", 1.0 if solida else alpha_fantasma, 0.12)
 	if solida:
-		Som.toca("selo", -20.0, 1.5)

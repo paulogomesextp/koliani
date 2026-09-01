@@ -154,7 +154,6 @@ func _esfarelar() -> void:
 	if _poeira:
 		_poeira.position = to_local(Vector2(global_position.x, chao_y))
 		_poeira.restart()
-	Som.toca("aterrar", -14.0, 0.7)
 
 
 func _repor() -> void:

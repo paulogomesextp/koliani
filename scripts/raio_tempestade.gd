@@ -70,7 +70,6 @@ func cair(atraso: float = -1.0) -> void:
 		_ocupado = false
 		return
 
-	Som.toca("onda", -4.0, 1.6)
 	_bolt.visible = true
 	_bolt.modulate.a = 1.0
 	_area.monitoring = true

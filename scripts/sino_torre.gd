@@ -44,8 +44,6 @@ func receber_dano(_quantidade: int = 0, _dir: float = 0.0) -> void:
 
 
 func tocar() -> void:
-	Som.toca("selo", -6.0, 0.65)
-	Som.toca("onda", -12.0, 0.5)
 	if _badalo:
 		var t := create_tween()
 		t.tween_property(_badalo, "rotation", 0.5, 0.06)

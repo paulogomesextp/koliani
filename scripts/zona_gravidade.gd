@@ -18,7 +18,6 @@ func _ready() -> void:
 func _ao_entrar(corpo: Node) -> void:
 	if corpo is Koliani and corpo.has_method("definir_grav_escala"):
 		corpo.definir_grav_escala(escala)
-		Som.toca("selo", -20.0, 1.8)
 
 
 func _ao_sair(corpo: Node) -> void:

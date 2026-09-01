@@ -62,7 +62,8 @@ func _ciclo() -> void:
 		_anim.play("on")
 		ativa = true
 		_luz.energy = 1.1
-		Som.toca("investida", -16.0, 1.7)
+		# sem som -- so' os efeitos do character/bosses/musica tocam (o
+		# jato repetia "investida" a cada ciclo e soava a dano constante).
 		_ferir_presentes()
 		await get_tree().create_timer(dur_ativa).timeout
 		ativa = false

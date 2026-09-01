@@ -30,7 +30,6 @@ func _process(dt: float) -> void:
 
 func receber_dano(_quantidade: int = 0, _dir: float = 0.0) -> void:
 	_armado = dur_armado
-	Som.toca("bloqueio", -10.0, 1.4)
 
 
 func esta_armado() -> bool:
@@ -42,7 +41,6 @@ func descarregar_no_chefe() -> void:
 	_armado = 0.0
 	if _ponta:
 		_ponta.modulate = Color(1, 1, 1)
-	Som.toca("onda", -4.0, 1.4)
 	var chefe := _chefe_mais_perto()
 	if chefe == null:
 		return

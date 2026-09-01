@@ -25,7 +25,6 @@ func receber_dano(_quantidade: int = 0, _dir: float = 0.0) -> void:
 	if _partido:
 		return
 	_partido = true
-	Som.toca("bloqueio", -5.0, 0.7)
 	var cam := get_viewport().get_camera_2d()
 	if cam and cam.has_method("bater"):
 		cam.bater(4.0)

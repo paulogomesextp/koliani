@@ -91,4 +91,3 @@ func _disparar() -> void:
 	b.dano = dano
 	get_parent().add_child(b)
 	b.global_position = global_position + dir * 12.0
-	Som.toca("projetil", -16.0, 0.8)

@@ -23,6 +23,7 @@ const CAMINHOS := {
 	"bloqueio": "res://assets/audio/bloqueio.wav",
 	"demonio_ataque": "res://assets/audio/demonio_ataque.wav",
 	"conquista": "res://assets/audio/conquista.wav",
+	"transicao": "res://assets/audio/transicao.wav",
 }
 const VOZES := 8
 

@@ -89,7 +89,6 @@ func _aplicar_estado(solida: bool, imediato: bool) -> void:
 		else:
 			create_tween().tween_property(vis, "modulate:a", alvo, 0.12)
 	if not imediato:
-		Som.toca("selo" if solida else "onda", -22.0, 1.6 if solida else 1.2)
 
 
 ## A arena desmorona (Coração Putrefacto, fase 3): a plataforma parte-se de
@@ -100,7 +99,6 @@ func desmoronar() -> void:
 	_caiu = true
 	if _col:
 		_col.set_deferred("disabled", true)
-	Som.toca("onda", -14.0, 0.8)
 	var t := create_tween()
 	t.tween_property(self, "modulate:a", 0.0, 0.35)
 	t.parallel().tween_property(self, "position:y", position.y + 40.0, 0.35)

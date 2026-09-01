@@ -88,7 +88,6 @@ func _largar() -> void:
 	var pai := get_parent()
 	if pai == null:
 		return
-	Som.toca("projetil", -16.0, 1.4)
 	var origem := global_position
 	var destino_y := _chao_y(origem.x)
 
@@ -144,7 +143,6 @@ func _largar() -> void:
 func _salpicar(pai: Node, pos: Vector2) -> void:
 	if not is_instance_valid(pai):
 		return
-	Som.toca("onda", -20.0, 1.7)
 	var poca := Area2D.new()
 	poca.collision_layer = 0
 	poca.collision_mask = 2

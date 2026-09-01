@@ -188,6 +188,14 @@ func _construir() -> void:
 	var casca := get_parent().get_node_or_null("Casca")
 	if casca and casca.has_method("abrir_esquerda"):
 		casca.abrir_esquerda(x0 - 160.0)
+		# masmorra FECHADA: o tecto (`topo`) e' uma parede solida fixa, que
+		# nada aqui em cima sabia -- a jornada podia mandar a espinha de
+		# plataformas mais alto do que a sala permite, e o tecto bloqueava
+		# o caminho por completo (bug: "parede a impedir de subir", nivel
+		# incompletavel). Reaperta a banda vertical à altura real da sala.
+		var topo_casca: Variant = casca.get("topo")
+		if topo_casca != null:
+			_teto_y = maxf(_teto_y, float(topo_casca) + 110.0)
 
 	var atm := get_tree().get_first_node_in_group("atmosfera")
 	if atm and atm.has_method("atualizar_extensao"):

@@ -63,7 +63,6 @@ func cair(atraso_: float = -1.0) -> void:
 	_lamina.position.x = 0.0
 
 	# queda
-	Som.toca("investida", -6.0, 0.8)
 	monitoring = true
 	var t := create_tween()
 	t.tween_property(_lamina, "position:y", _y0 + altura_queda, 0.09) \
