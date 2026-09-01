@@ -61,9 +61,73 @@ func _init() -> void:
 			continue
 		print("%-10s %s  %d frames" % [estado, caminho, img.get_width() / LARG])
 		preview.append(img)
+	_sombria()
 	if OS.get_environment("PREVIEW") == "1":
 		_preview(preview)
 	quit()
+
+
+## A KOLIANI SOMBRIA (chefe do nível 27) é o espelho da Koliani -- tem de
+## usar o MESMO rig, senão o "espelho" deixa de se ler. Monta as 4 poses que
+## `chefe_koliani_sombria.gd` usa (0 = parada, 1 = variação, 2 = golpe,
+## 3 = exposta) numa folha de 4 frames, em sombra violeta com rebordo
+## magenta e olhos acesos.
+func _sombria() -> void:
+	var poses := [
+		["Idle_KG_1.png", 0], ["Idle_KG_1.png", 2],
+		["Attack_KG_1.png", 2], ["Hurt_KG_1.png", 1],
+	]
+	var folha := Image.create(LARG * poses.size(), ALT, false, Image.FORMAT_RGBA8)
+	folha.fill(Color(0, 0, 0, 0))
+	for i in poses.size():
+		var par: Array = poses[i]
+		var src := Image.load_from_file("%s/%s" % [FONTE, par[0]])
+		if src == null:
+			push_error("não abriu " + par[0])
+			return
+		var f := src.get_region(Rect2i(int(par[1]) * LARG, 0, LARG, ALT))
+		_ensombrar(f)
+		folha.blit_rect(f, Rect2i(0, 0, LARG, ALT), Vector2i(i * LARG, 0))
+	var caminho := "res://assets/sprites/pixel/bosses/koliani_sombria.png"
+	if folha.save_png(caminho) != OK:
+		push_error("não gravou " + caminho)
+		return
+	print("sombria   %s  (%d frames)" % [caminho, poses.size()])
+
+
+## Sombra da Koliani: o corpo afunda para violeta quase preto, a silhueta
+## ganha um fio magenta e o que era claro (olhos, gume) fica aceso.
+func _ensombrar(img: Image) -> void:
+	var w := img.get_width()
+	var h := img.get_height()
+	var orig := img.duplicate() as Image
+	for y in h:
+		for x in w:
+			var c := orig.get_pixel(x, y)
+			if c.a <= 0.0:
+				continue
+			var lum := maxf(c.r, maxf(c.g, c.b))
+			var sombra := Color(0.10 + lum * 0.22, 0.04 + lum * 0.06,
+				0.16 + lum * 0.30, c.a)
+			if lum > 0.86:  # olhos / gume / brilhos -> magenta aceso
+				sombra = Color(1.0, 0.45, 0.95, c.a)
+			img.set_pixel(x, y, sombra)
+	# fio magenta na silhueta (pixel opaco com vizinho transparente)
+	for y in h:
+		for x in w:
+			if orig.get_pixel(x, y).a <= 0.0:
+				continue
+			var borda := false
+			for d: Vector2i in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
+				var p := Vector2i(x + d.x, y + d.y)
+				if p.x < 0 or p.y < 0 or p.x >= w or p.y >= h:
+					borda = true
+					break
+				if orig.get_pixel(p.x, p.y).a <= 0.0:
+					borda = true
+					break
+			if borda:
+				img.set_pixel(x, y, img.get_pixel(x, y).lerp(Color(1.0, 0.3, 0.9), 0.7))
 
 
 ## Vermelhos -> magenta; cinzentos do metal -> violeta frio. Guarda o tom da
