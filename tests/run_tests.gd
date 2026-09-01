@@ -50,6 +50,9 @@ func _correr_tudo() -> void:
 	teste_estado_regioes_e_conclusao()
 	teste_estado_mapa_desbloqueio()
 	teste_estado_modo_dev()
+	teste_rig_da_koliani_tem_as_tiras_todas()
+	teste_especies_dos_inimigos_existem()
+	teste_packs_de_fundo_existem()
 
 	if _falhas.is_empty():
 		print("OK -- todos os testes passaram")
@@ -590,3 +593,202 @@ func teste_estado_mapa_desbloqueio() -> void:
 	_ok(e.campanha_concluida(), "marcar todos os níveis conclui a campanha")
 	_ok(e.nivel_desbloqueado(e.NIVEIS.size() - 1), "com tudo feito, o último nível é jogável")
 	e.free()
+
+
+# --- Assets: rig da Koliani, especies dos inimigos, packs de fundo ----------
+# Estes testes leem os .gd como TEXTO em vez de os `preload`: em modo
+# `--script` os autoloads (EstadoJogo) nao existem, e `koliani.gd` /
+# `demonio_base.gd` / `checkpoint.gd` referem-nos, logo nem compilam aqui.
+# O que interessa e' apanhar o erro tipico: mudar um nome ou um numero de
+# frames numa tabela e a tira deixar de bater certo com o PNG.
+
+## Le um ficheiro de codigo do repo (ou "" se nao existir).
+func _fonte(caminho: String) -> String:
+	if not FileAccess.file_exists(caminho):
+		_ok(false, "falta o ficheiro %s" % caminho)
+		return ""
+	return FileAccess.get_file_as_string(caminho)
+
+
+## Todos os pares "estado": [n_frames, ...] de um bloco `const NOME := {...}`.
+func _tabela_frames(fonte: String, nome_const: String) -> Dictionary:
+	var out := {}
+	var i := fonte.find("const %s :=" % nome_const)
+	if i < 0:
+		return out
+	var fim := fonte.find("\n}", i)
+	var bloco := fonte.substr(i, maxi(0, fim - i))
+	var re := RegEx.new()
+	re.compile('"([a-z_]+)":\\s*\\[(\\d+),')
+	for m in re.search_all(bloco):
+		out[m.get_string(1)] = int(m.get_string(2))
+	return out
+
+
+## Confirma que a tira existe e que a largura da' um numero INTEIRO de
+## frames; devolve a largura de UM frame (0 se falhou). Quem chama compara as
+## larguras entre animacoes: todas as tiras do mesmo rig/especie tem de ter
+## o frame do mesmo tamanho -- e' o que apanha um numero de frames errado
+## (400 px tanto da' 4 frames de 100 como 5 de 80).
+func _tira_bate_certo(caminho: String, n: int, quem: String) -> int:
+	if not FileAccess.file_exists(caminho):
+		_ok(false, "%s: falta a tira %s" % [quem, caminho])
+		return 0
+	var img := Image.load_from_file(caminho)
+	if img == null:
+		_ok(false, "%s: nao abriu %s" % [quem, caminho])
+		return 0
+	if n <= 0 or img.get_width() % n != 0:
+		_ok(false, "%s: %s tem %d px de largura, que nao da' %d frames certos"
+			% [quem, caminho.get_file(), img.get_width(), n])
+		return 0
+	return img.get_width() / n
+
+
+func teste_rig_da_koliani_tem_as_tiras_todas() -> void:
+	var src := _fonte("res://scripts/koliani.gd")
+	if src == "":
+		return
+	var re := RegEx.new()
+	re.compile('const RIG := "([a-z]+)"')
+	var m := re.search(src)
+	_ok(m != null, "koliani.gd: nao encontrei `const RIG`")
+	if m == null:
+		return
+	var rig := m.get_string(1)
+	var tabela := {"codigo": "_KOLI_ANIMS", "gothic": "_KOLI_ANIMS_GOTHIC",
+		"cavaleiro": "_KOLI_ANIMS_CAVALEIRO"}
+	var pasta := {"codigo": "koliani", "gothic": "koliani_gothic",
+		"cavaleiro": "koliani_cavaleiro"}
+	_ok(tabela.has(rig), "koliani.gd: RIG '%s' nao tem tabela de animacoes" % rig)
+	if not tabela.has(rig):
+		return
+	var anims := _tabela_frames(src, tabela[rig])
+	_ok(not anims.is_empty(), "koliani.gd: tabela %s vazia" % tabela[rig])
+	# os estados que o `_atualizar_anim` usa sempre, em qualquer rig
+	for obrigatorio in ["idle", "run", "jump", "fall", "attack"]:
+		_ok(anims.has(obrigatorio),
+			"rig '%s' nao tem o estado '%s'" % [rig, obrigatorio])
+	var largura := 0
+	for estado: String in anims:
+		var fw := _tira_bate_certo(
+			"res://assets/sprites/pixel/%s/%s.png" % [pasta[rig], estado],
+			int(anims[estado]), "rig '%s'" % rig)
+		if fw <= 0:
+			continue
+		if largura == 0:
+			largura = fw
+		else:
+			_ok(fw == largura,
+				"rig '%s': o frame de '%s' tem %d px e os outros tem %d -- o numero de frames na tabela esta' errado"
+					% [rig, estado, fw, largura])
+
+
+func teste_especies_dos_inimigos_existem() -> void:
+	var src := _fonte("res://scripts/demonio_base.gd")
+	if src == "":
+		return
+	# ESPECIES := { "nome": {"idle": 4, "run": 8, "hit": 4, "dead": 4}, ... }
+	var re := RegEx.new()
+	re.compile('"([a-z_]+)":\\s*\\{"idle": (\\d+), "run": (\\d+), "hit": (\\d+), "dead": (\\d+)\\}')
+	var especies := {}
+	for m in re.search_all(src):
+		especies[m.get_string(1)] = {
+			"idle": int(m.get_string(2)), "run": int(m.get_string(3)),
+			"hit": int(m.get_string(4)), "dead": int(m.get_string(5)),
+		}
+	_ok(especies.size() >= 14, "demonio_base.gd: so' li %d especies" % especies.size())
+	for esp: String in especies:
+		var cfg: Dictionary = especies[esp]
+		var largura := 0
+		for anim: String in cfg:
+			var fw := _tira_bate_certo(
+				"res://assets/sprites/pixel/enemies/%s/%s.png" % [esp, anim],
+				int(cfg[anim]), "especie '%s'" % esp)
+			if fw <= 0:
+				continue
+			if largura == 0:
+				largura = fw
+			else:
+				_ok(fw == largura,
+					"especie '%s': o frame de '%s' tem %d px e os outros tem %d -- contagem de frames errada"
+						% [esp, anim, fw, largura])
+
+	# o gerador so' pode pedir especies que existam
+	var ger := _fonte("res://scripts/gerador_corredor.gd")
+	if ger == "":
+		return
+	var i := ger.find("const ESP_ASSINATURA :=")
+	var fim := ger.find("]", i)
+	var bloco := ger.substr(i, maxi(0, fim - i))
+	var rn := RegEx.new()
+	rn.compile('"([a-z_]+)"')
+	var assinaturas: Array[String] = []
+	for m in rn.search_all(bloco):
+		assinaturas.append(m.get_string(1))
+	_ok(assinaturas.size() == 30,
+		"ESP_ASSINATURA tem %d entradas (deviam ser 30)" % assinaturas.size())
+	for esp in assinaturas:
+		_ok(especies.has(esp), "ESP_ASSINATURA pede a especie '%s', que nao existe" % esp)
+	# dentro da mesma regiao (5 niveis) nao ha assinaturas repetidas -- e' o
+	# pedido do Paulo: "nao repetir o mesmo monstro em cada nivel"
+	for r in range(0, assinaturas.size() / 5):
+		var fatia := assinaturas.slice(r * 5, r * 5 + 5)
+		var unicos := {}
+		for e in fatia:
+			unicos[e] = true
+		_ok(unicos.size() == fatia.size(),
+			"regiao %d repete uma assinatura: %s" % [r + 1, str(fatia)])
+
+	var j := ger.find("const ESP_REGIAO :=")
+	var fim2 := ger.find("\n}", j)
+	for m in rn.search_all(ger.substr(j, maxi(0, fim2 - j))):
+		_ok(especies.has(m.get_string(1)),
+			"ESP_REGIAO pede a especie '%s', que nao existe" % m.get_string(1))
+
+
+func teste_packs_de_fundo_existem() -> void:
+	var src := _fonte("res://scripts/atmosfera.gd")
+	if src == "":
+		return
+	var i := src.find("const PACKS :=")
+	var fim := src.find("\n}", i)
+	var bloco := src.substr(i, maxi(0, fim - i))
+	# "pack": [ ["ficheiro.png", "Camada", y, esc], ... ]
+	var packs: Array[String] = []
+	var pack_atual := ""
+	var re_pack := RegEx.new()
+	re_pack.compile('^\\t"([a-z_]+)":')
+	var re_lin := RegEx.new()
+	re_lin.compile('\\["([\\w\\-.]+\\.png)", "(\\w+)"')
+	for linha in bloco.split("\n"):
+		var mp := re_pack.search(linha)
+		if mp:
+			pack_atual = mp.get_string(1)
+			packs.append(pack_atual)
+			continue
+		var ml := re_lin.search(linha)
+		if ml and pack_atual != "":
+			var caminho := "res://assets/sprites/pixel/backgrounds/%s/%s" \
+				% [pack_atual, ml.get_string(1)]
+			_ok(FileAccess.file_exists(caminho),
+				"pack '%s': falta %s" % [pack_atual, caminho])
+			_ok(ml.get_string(2) in ["Fundo", "Longe", "Meio", "Perto"],
+				"pack '%s': camada '%s' nao existe no Parallax"
+					% [pack_atual, ml.get_string(2)])
+	_ok(packs.size() >= 7, "atmosfera.gd: so' li %d packs" % packs.size())
+
+	# nenhum nivel pode pedir um pack que nao esta na tabela
+	var dir := DirAccess.open("res://scenes/levels")
+	if dir == null:
+		return
+	var re_uso := RegEx.new()
+	re_uso.compile('fundo_pack = "([a-z_]+)"')
+	for f in dir.get_files():
+		if not f.ends_with(".tscn"):
+			continue
+		var cena := FileAccess.get_file_as_string("res://scenes/levels/%s" % f)
+		var mu := re_uso.search(cena)
+		if mu:
+			_ok(mu.get_string(1) in packs,
+				"%s pede o fundo_pack '%s', que nao existe" % [f, mu.get_string(1)])
