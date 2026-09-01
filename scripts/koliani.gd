@@ -183,9 +183,13 @@ func _ready() -> void:
 	EstadoJogo.equipamento_mudou.connect(func(_t: String, _i: String) -> void: _aplicar_equipamento())
 
 
-## Constrói os SpriteFrames da Koliani a partir das tiras geradas em
-## `tools/gerar_sprites.gd` (assets/sprites/pixel/koliani/*.png). Cada tira
-## é horizontal, 40 px por frame, virada à direita.
+## Rig do sprite: "codigo" = tiras geradas por `tools/gerar_sprites.gd`;
+## "gothic" = rig Ansimuz "Gothicvania Church" (CC0) recolorido para o
+## luar roxo por `tools/importar_rig_koliani.py` (pasta `koliani_gothic/`).
+## Experimental -- reformulação "pegada Dead Cells", fase 4.
+const RIG := "gothic"
+
+## [n_frames, fps, loop] por estado. Cada tira é horizontal, virada à direita.
 const _KOLI_ANIMS := {
 	"idle":      [4, 6.0, true],
 	"run":       [6, 12.0, true],
@@ -196,18 +200,41 @@ const _KOLI_ANIMS := {
 	"wallslide": [2, 8.0, true],
 	"djump":     [4, 18.0, false],
 }
+## Contagens do rig "gothic" (Punch tem 6 frames, jump só 2).
+const _KOLI_ANIMS_GOTHIC := {
+	"idle":      [4, 7.0, true],
+	"run":       [6, 13.0, true],
+	"jump":      [2, 8.0, false],
+	"fall":      [2, 8.0, true],
+	"attack":    [6, 26.0, false],
+	"crouch":    [2, 6.0, true],
+	"wallslide": [2, 8.0, true],
+	"djump":     [2, 12.0, false],
+}
 
 func _montar_frames() -> void:
 	if _corpo.sprite_frames != null:
 		return
+	var gothic := RIG == "gothic"
+	var anims: Dictionary = _KOLI_ANIMS_GOTHIC if gothic else _KOLI_ANIMS
+	var dir_tiras := "koliani_gothic" if gothic else "koliani"
+	if gothic:
+		_corpo.scale = Vector2(1.05, 1.05)
+		_corpo.offset = Vector2(0.0, 4.0)  # baixa o sprite -> pés no chão
+		if _armadura:
+			_armadura.visible = false  # o rig já traz roupa
+		# o rig não tem "lâmina que brilha" -- desliga o glow que fica preso
+		# ao sprite (o clarão do GOLPE continua a disparar nos acertos)
+		if _luz_lamina:
+			_luz_lamina.enabled = false
 	var sf := SpriteFrames.new()
 	sf.remove_animation("default")
-	for nome: String in _KOLI_ANIMS:
-		var cfg: Array = _KOLI_ANIMS[nome]
+	for nome: String in anims:
+		var cfg: Array = anims[nome]
 		sf.add_animation(nome)
 		sf.set_animation_speed(nome, cfg[1])
 		sf.set_animation_loop(nome, cfg[2])
-		var tex: Texture2D = load("res://assets/sprites/pixel/koliani/%s.png" % nome)
+		var tex: Texture2D = load("res://assets/sprites/pixel/%s/%s.png" % [dir_tiras, nome])
 		if tex == null:
 			continue
 		var n: int = cfg[0]
@@ -227,7 +254,7 @@ func _montar_frames() -> void:
 func _aplicar_equipamento() -> void:
 	if _arma:
 		var wi := Equipamento.indice_arma(EstadoJogo.arma_equipada)
-		_arma.visible = wi >= 0
+		_arma.visible = wi >= 0 and RIG != "gothic"  # o rig já empunha a lâmina
 		if wi >= 0:
 			_arma.frame = wi
 	if _luz_lamina:
@@ -243,6 +270,9 @@ func _aplicar_equipamento() -> void:
 ## `Sprite` -- herdam o squash/stretch/flip da animação procedural.
 func _aplicar_visual_armadura() -> void:
 	if _armadura == null:
+		return
+	if RIG == "gothic":
+		_armadura.visible = false  # o rig já traz roupa própria
 		return
 	var ai := Equipamento.indice_armadura(EstadoJogo.armadura_equipada)
 	_armadura.visible = ai >= 0
@@ -760,6 +790,8 @@ func _flash_branco() -> void:
 
 ## Cor de base do corpo (tinta da armadura ou branco).
 func _tint_armadura() -> Color:
+	if RIG == "gothic":
+		return Color.WHITE  # o rig já vem recolorido -- não pintar por cima
 	var ai: int = Equipamento.indice_armadura(EstadoJogo.armadura_equipada)
 	return Color.WHITE if ai < 0 else Color.WHITE.lerp(Equipamento.cor_armadura(ai), 0.62)
 
