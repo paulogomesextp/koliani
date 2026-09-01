@@ -90,13 +90,14 @@ func _e_chefe() -> bool:
 
 
 func _ready() -> void:
-	# dificuldade a subir por mundo: demónios comuns ficam mais duros e
-	# mais perigosos a cada nível da campanha (mundo 1 = x1.0 ... mundo 4 ~ x1.39)
+	# dificuldade a subir ao longo de TODA a campanha, e devagar: o Nível 1
+	# tem demónios MAIS FRACOS que o valor base (o jogo estava a começar
+	# demasiado duro) e o Nível 30 fica ~x1.4. Curva linear em `indice_nivel`.
 	if not _e_chefe():
-		var m := 1.0 + 0.13 * float(clampi(EstadoJogo.indice_nivel, 0, 3))
-		vida = int(round(vida * m))
-		dano_contacto = int(round(dano_contacto * m))
-		velocidade *= 1.0 + 0.06 * float(clampi(EstadoJogo.indice_nivel, 0, 3))
+		var f := float(clampi(EstadoJogo.indice_nivel, 0, 29)) / 29.0
+		vida = maxi(1, int(round(vida * (0.8 + 0.6 * f))))
+		dano_contacto = maxi(1, int(round(dano_contacto * (0.65 + 0.75 * f))))
+		velocidade *= 0.88 + 0.34 * f
 
 	if _area_contacto:
 		_area_contacto.body_entered.connect(_ao_tocar)

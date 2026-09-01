@@ -16,9 +16,13 @@ extends Node2D
 ##  - a última câmara é uma passadeira sólida lisa que encosta ao nível.
 ## `corredor = false` na cena raiz desliga (o último nível nunca o tem).
 
-@export var comprimento_base := 15000.0
-@export var por_nivel := 620.0
-@export var comprimento_max := 33000.0
+# Curva de dificuldade (ago 2026): o jogo estava DEMASIADO duro logo no
+# Nível 1. Agora a jornada arranca curta e suave e cresce até ao Nível 30 --
+# comprimento, densidade de perigos/inimigos e o LEQUE de câmaras (ver
+# `TIER_FLAVOUR`) escalam todos com `_dif` (= indice_nivel / 29).
+@export var comprimento_base := 6200.0
+@export var por_nivel := 880.0
+@export var comprimento_max := 32000.0
 @export var especie_inimigo := ""
 @export var entrada_fresca := true
 @export var otimizar_visibilidade := true
@@ -67,6 +71,18 @@ const POOL_REGIAO := {
 	5: ["pendulos", "fogo", "guilhotinas", "ritmo", "quebra", "gravidade", "portal"],
 }
 
+## `_dif` mínimo para cada tipo de câmara entrar na pool. Assim o Nível 1
+## (dif 0) só vê câmaras de saltos/gruta/trampolim e a coisa vai apertando
+## até ao Nível 30 (dif 1), que tem tudo.
+const TIER_FLAVOUR := {
+	"saltos": 0.0, "gruta": 0.0, "trampolim": 0.0,
+	"ritmo": 0.12, "portal": 0.12, "correntes": 0.16, "elevador": 0.18,
+	"gravidade": 0.34, "serras": 0.36, "vento": 0.42, "pendulos": 0.46,
+	"impulso": 0.5, "guilhotinas": 0.58, "quebra": 0.62, "fogo": 0.66,
+}
+## Fallback quando a região ainda não libertou nada (níveis muito baixos).
+const FLAVOUR_SUAVE := ["saltos", "gruta", "trampolim"]
+
 var _chao_y := 0.0     # topo do líquido mortal
 var _idx := 0
 var _dif := 0.0
@@ -87,7 +103,7 @@ func _construir() -> void:
 	_idx = EstadoJogo.indice_nivel
 	_dif = clampf(float(_idx) / 29.0, 0.0, 1.0)
 	_regiao = maxi(0, EstadoJogo.regiao_atual())
-	_rng.seed = hash("jornada3|%d" % _idx)
+	_rng.seed = hash("jornada4|%d" % _idx)
 	_esp = especie_inimigo if especie_inimigo != "" else _especie_do_nivel()
 
 	var ancora: Vector2 = EstadoJogo.jornada_ancora_para(
@@ -125,7 +141,7 @@ func _construir() -> void:
 		atm.atualizar_extensao(maxf(largura_atual, comp + 3200.0), x0 - 400.0)
 
 	# --- espinha de plataformas --------------------------------------
-	var pool: Array = POOL_REGIAO.get(_regiao, POOL_REGIAO[0])
+	var pool: Array = _pool_permitida()
 	var x := x0 + 40.0
 	var y := _chao_y - 150.0
 
@@ -144,7 +160,10 @@ func _construir() -> void:
 
 	var passos := 0
 	var ant_flavour := ""
-	var prox_flavour := 5 + _rng.randi() % 3
+	# quão longe ficam as câmaras de flavour umas das outras (passos da
+	# espinha): muito espaçadas no Nível 1, coladas no Nível 30.
+	var espaco_flavour := int(round(lerpf(13.0, 4.0, _dif)))
+	var prox_flavour := espaco_flavour + _rng.randi() % 3
 	while x < ancora.x - 900.0:
 		if passos % 10 == 0:
 			par = _novo_container(x)
@@ -152,19 +171,19 @@ func _construir() -> void:
 		var subir := _rng.randf_range(-150.0, 100.0)
 		y = clampf(y - subir, _chao_y - 500.0, _chao_y - 66.0)
 		var w := _rng.randf_range(66.0, 100.0)
-		var movel := _dif > 0.25 and _rng.randf() < 0.14
+		var movel := _dif > 0.33 and _rng.randf() < 0.04 + 0.12 * _dif
 		if movel:
 			_plat_movel_spine(par, Vector2(x, y), w)
 		else:
 			_plat(par, Vector2(x, y), Vector2(w, 18.0))
-		# perigo no vão a seguir (não bloqueia a aterragem)
-		if passos > 0 and _rng.randf() < 0.34 + 0.25 * _dif:
+		# perigo no vão a seguir (não bloqueia a aterragem) -- raro no início
+		if passos > 0 and _rng.randf() < 0.05 + 0.5 * _dif:
 			_perigo_no_vao(par, x, y)
 		# checkpoint a cada 2 plataformas
 		if passos % 2 == 0:
 			_checkpoint(x, y)
 		# inimigo ocasional na plataforma
-		if _rng.randf() < 0.13 + 0.1 * _dif:
+		if _rng.randf() < 0.05 + 0.22 * _dif:
 			_inimigo_em(par, Vector2(x, y - 30.0))
 		# decoração
 		_decorar(par, x, y)
@@ -174,7 +193,7 @@ func _construir() -> void:
 		# --- câmara de flavour de tempos a tempos ---
 		passos += 1
 		if passos >= prox_flavour:
-			prox_flavour = passos + 5 + _rng.randi() % 4
+			prox_flavour = passos + espaco_flavour + _rng.randi() % 3
 			var f: String = pool[_rng.randi() % pool.size()]
 			if f == ant_flavour:
 				f = pool[(_rng.randi() + 1) % pool.size()]
@@ -199,6 +218,18 @@ func _construir() -> void:
 
 
 # --- infra --------------------------------------------------------------
+
+## A pool de flavour da região atual, filtrada pelo que a dificuldade já
+## libertou (`TIER_FLAVOUR`). Se a região ainda não tem nada disponível
+## (níveis baixos numa região "dura"), cai nas câmaras suaves.
+func _pool_permitida() -> Array:
+	var base: Array = POOL_REGIAO.get(_regiao, POOL_REGIAO[0])
+	var out: Array = []
+	for f: String in base:
+		if _dif + 0.0001 >= float(TIER_FLAVOUR.get(f, 0.0)):
+			out.append(f)
+	return out if out.size() >= 2 else FLAVOUR_SUAVE.duplicate()
+
 
 func _novo_container(x: float) -> Node2D:
 	_cont_i += 1
@@ -243,23 +274,23 @@ func _perigo_no_vao(par: Node2D, x: float, y: float) -> void:
 			var pe := PENDULO.instantiate()
 			var comp := _rng.randf_range(150.0, 210.0)
 			pe.comprimento = comp
-			pe.periodo = _rng.randf_range(1.7, 2.5) - 0.25 * _dif
-			pe.amplitude_graus = 52.0 + 16.0 * _dif
-			pe.dano = 20 + int(14.0 * _dif)
+			pe.periodo = _rng.randf_range(1.9, 2.7) - 0.35 * _dif
+			pe.amplitude_graus = 46.0 + 20.0 * _dif
+			pe.dano = 8 + int(20.0 * _dif)
 			pe.fase = _rng.randf()
 			pe.position = Vector2(x + 95.0, y - comp - 30.0)
 			par.add_child(pe)
 		1:
 			var s := SERRA.instantiate()
 			s.position = Vector2(x + 95.0, y - 20.0)
-			s.percurso = Vector2(0.0, -_rng.randf_range(90.0, 150.0))
-			s.tempo = _rng.randf_range(1.0, 1.6)
+			s.percurso = Vector2(0.0, -_rng.randf_range(80.0, 130.0 + 40.0 * _dif))
+			s.tempo = _rng.randf_range(1.1, 1.7)
 			par.add_child(s)
 		2:
 			var f := FOGO.instantiate()
 			f.position = Vector2(x + 95.0, y + 6.0)
-			f.intervalo = 1.8 - 0.4 * _dif
-			f.dur_ativa = 1.0 + 0.4 * _dif
+			f.intervalo = 2.3 - 0.6 * _dif
+			f.dur_ativa = 0.8 + 0.5 * _dif
 			f.fase = _rng.randf() * 1.5
 			par.add_child(f)
 
@@ -377,7 +408,7 @@ func _f_saltos(par: Node2D, x: float, y: float) -> Vector2:
 		x += _rng.randf_range(158.0, 190.0)
 		var d := _rng.randf_range(-140.0, 96.0)
 		cy = clampf(cy - d, _chao_y - 470.0, _chao_y - 70.0)
-		var quebra := i > 0 and i < n - 1 and _rng.randf() < 0.3
+		var quebra := i > 0 and i < n - 1 and _rng.randf() < 0.12 + 0.28 * _dif
 		if quebra:
 			var q := PLAT_QUEBRA.instantiate()
 			q.tamanho = Vector2(78.0, 16.0)
@@ -385,7 +416,7 @@ func _f_saltos(par: Node2D, x: float, y: float) -> Vector2:
 			par.add_child(q)
 		else:
 			_plat(par, Vector2(x, cy), Vector2(_rng.randf_range(64.0, 88.0), 16.0))
-		if _rng.randf() < 0.4:
+		if _rng.randf() < 0.08 + 0.42 * _dif:
 			_perigo_no_vao(par, x, cy)
 		if i % 2 == 0:
 			_checkpoint(x, cy)
@@ -419,9 +450,9 @@ func _f_pendulos(par: Node2D, x: float, y: float) -> Vector2:
 		var comp := _rng.randf_range(170.0, 230.0)
 		var pe := PENDULO.instantiate()
 		pe.comprimento = comp
-		pe.periodo = _rng.randf_range(1.6, 2.4) - 0.2 * _dif
-		pe.amplitude_graus = 54.0 + 16.0 * _dif
-		pe.dano = 20 + int(14.0 * _dif)
+		pe.periodo = _rng.randf_range(1.8, 2.6) - 0.3 * _dif
+		pe.amplitude_graus = 48.0 + 18.0 * _dif
+		pe.dano = 8 + int(20.0 * _dif)
 		pe.fase = float(i) / float(n)
 		pe.position = Vector2(x + 82.0, cy - comp - 26.0)
 		par.add_child(pe)
@@ -485,7 +516,7 @@ func _f_gruta(par: Node2D, x: float, y: float) -> Vector2:
 		_plat(par, Vector2(x, cy - 88.0), Vector2(120.0, 24.0))  # tecto
 		var pd := PEDRA.instantiate()
 		pd.chao_y = _chao_y
-		pd.dano = 20 + int(12.0 * _dif)
+		pd.dano = 8 + int(18.0 * _dif)
 		pd.raio_gatilho = 70.0
 		pd.position = Vector2(x, cy - 78.0)
 		par.add_child(pd)
@@ -506,7 +537,7 @@ func _f_quebra(par: Node2D, x: float, y: float) -> Vector2:
 		cy = clampf(cy - _rng.randf_range(-70.0, 60.0), _chao_y - 380.0, _chao_y - 110.0)
 		var q := PLAT_QUEBRA.instantiate()
 		q.tamanho = Vector2(92.0, 16.0)
-		q.atraso = 0.5 - 0.16 * _dif
+		q.atraso = 0.72 - 0.3 * _dif
 		q.position = Vector2(x, cy)
 		par.add_child(q)
 	x += _rng.randf_range(150.0, 176.0)
@@ -604,10 +635,10 @@ func _f_guilhotinas(par: Node2D, x: float, y: float) -> Vector2:
 		var g := GUILHOTINA.instantiate()
 		g.automatico = true
 		g.periodo = _rng.randf_range(2.0, 2.8) - 0.4 * _dif
-		g.atraso = 0.55 - 0.18 * _dif
+		g.atraso = 0.72 - 0.28 * _dif
 		g.fase = 0.5 * float(i)
 		g.altura_queda = 190.0
-		g.dano = 22 + int(12.0 * _dif)
+		g.dano = 10 + int(20.0 * _dif)
 		g.position = Vector2(x + 90.0, cy - 210.0)
 		par.add_child(g)
 		if i % 2 == 0:
@@ -630,8 +661,8 @@ func _f_fogo(par: Node2D, x: float, y: float) -> Vector2:
 		if i == n / 2:
 			var tr := TORRETA.instantiate()
 			tr.direcao = Vector2(-1.0, 0.0)
-			tr.intervalo = 2.4 - 0.5 * _dif
-			tr.dano = 16 + int(10.0 * _dif)
+			tr.intervalo = 2.9 - 0.7 * _dif
+			tr.dano = 6 + int(16.0 * _dif)
 			tr.position = Vector2(x + 120.0, cy - 40.0)
 			par.add_child(tr)
 		if i % 2 == 0:
@@ -673,7 +704,7 @@ func _f_portal(par: Node2D, x: float, y: float) -> Vector2:
 	for i in 3:
 		x += _rng.randf_range(168.0, 190.0)
 		_plat(par, Vector2(x, cy - _rng.randf_range(-30.0, 40.0)), Vector2(70.0, 14.0))
-		if _rng.randf() < 0.6:
+		if _rng.randf() < 0.1 + 0.5 * _dif:
 			_perigo_no_vao(par, x, cy)
 	x += _rng.randf_range(168.0, 190.0)
 	_plat(par, Vector2(x, cy), Vector2(100.0, 16.0))
