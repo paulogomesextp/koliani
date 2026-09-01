@@ -42,9 +42,11 @@ const VEL_DESLIZE_PAREDE := 55.0
 const WALLJUMP := Vector2(330.0, -430.0)
 const DUR_ATAQUE := 0.18
 const I_FRAMES := 0.6
-## Ressalto ao cair em cima de um inimigo (Mario-style). Um pouco menos que
-## um salto normal (FORCA_SALTO 470).
-const STOMP_RESSALTO := 430.0
+## Ressalto ao cair em cima de um inimigo (Mario-style): o pulo automático a
+## seguir ao "pisão". `STOMP_RESSALTO` é o pulo normal; se estiver a segurar
+## o botão de saltar no momento do impacto, dá o pulo alto (encadear pisões).
+const STOMP_RESSALTO := 520.0
+const STOMP_RESSALTO_ALTO := 680.0
 ## Defesa (habilidade "escudo"): anda-se devagar de escudo erguido; um
 ## ataque que venha de frente é bloqueado (sem dano) com um som subtil.
 const VEL_DEFESA := 70.0
@@ -400,10 +402,13 @@ func _physics_process(dt: float) -> void:
 	elif _vento_restante > 0.0:
 		_vento_restante -= dt
 
-	# cair em cima de um inimigo = golpe de espada normal + ressalto
+	# cair em cima de um inimigo = golpe de espada + pulo automático (estilo
+	# Mario). Janela GENEROSA: basta vir a descer e apanhar o bicho grosso
+	# modo por cima -- serve para inimigos de vários tamanhos. Encadeia:
+	# cada pisão devolve os saltos de ar todos.
 	_stomp_cd = maxf(0.0, _stomp_cd - dt)
-	if _stomp_cd <= 0.0 and velocity.y > 90.0 and not is_on_floor() and _dash_restante <= 0.0:
-		var pes := global_position.y + 22.0
+	if _stomp_cd <= 0.0 and velocity.y > 40.0 and not is_on_floor() and _dash_restante <= 0.0:
+		var pes := global_position.y + 24.0
 		for e in get_tree().get_nodes_in_group("inimigos"):
 			if not is_instance_valid(e) or (e as Node).is_in_group("chefes") \
 					or not (e as Node).has_method("receber_dano"):
@@ -411,17 +416,21 @@ func _physics_process(dt: float) -> void:
 			if "vida" in e and e.vida <= 0:
 				continue
 			var ep: Vector2 = (e as Node2D).global_position
-			if absf(ep.x - global_position.x) > 30.0:
+			if absf(ep.x - global_position.x) > 46.0:
 				continue
-			if global_position.y > ep.y - 4.0 or pes < ep.y - 30.0 or pes > ep.y + 18.0:
+			# centro da Koliani acima do centro do inimigo e os pés dela na
+			# banda do topo dele (larga, apanha bichos altos e baixos)
+			if global_position.y > ep.y + 6.0 or pes < ep.y - 52.0 or pes > ep.y + 30.0:
 				continue
 			e.receber_dano(_dano_golpe(), 0.0)
-			velocity.y = -STOMP_RESSALTO
-			_mov.saltos_dados = mini(_mov.saltos_dados, 1)  # devolve um salto de ar
-			_invulneravel = maxf(_invulneravel, 0.25)
-			_stomp_cd = 0.3
+			var alto := Input.is_action_pressed("saltar")
+			velocity.y = -(STOMP_RESSALTO_ALTO if alto else STOMP_RESSALTO)
+			_mov.saltos_dados = 0  # o ressalto devolve os saltos de ar todos
+			_invulneravel = maxf(_invulneravel, 0.3)
+			_stomp_cd = 0.22
 			_pop = 1.0
-			_abanar(2.4)
+			_squash = maxf(_squash, 0.5)
+			_abanar(3.0)
 			_hitstop(0.05)
 			Som.toca("ataque", -12.0)
 			_pop_impacto(ep)
