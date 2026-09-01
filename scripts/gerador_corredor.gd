@@ -83,6 +83,18 @@ const TIER_FLAVOUR := {
 ## Fallback quando a região ainda não libertou nada (níveis muito baixos).
 const FLAVOUR_SUAVE := ["saltos", "gruta", "trampolim"]
 
+## Câmara "assinatura" de cada região -- no acto do meio da jornada aparece
+## com mais frequência para o bioma ter identidade própria (se a dificuldade
+## já a libertou). Índice = região.
+const ASSINATURA := {
+	0: "trampolim",    # Floresta -- ricochete
+	1: "guilhotinas",  # Prisão -- execuções
+	2: "vento",        # Torres -- correntes de ar
+	3: "gruta",        # Catacumbas -- túneis escuros
+	4: "impulso",      # Cidade -- máquinas
+	5: "fogo",         # Castelo -- lava
+}
+
 var _chao_y := 0.0     # topo do líquido mortal
 var _idx := 0
 var _dif := 0.0
@@ -198,6 +210,18 @@ func _construir() -> void:
 	while x < ancora.x - 900.0:
 		if passos % 10 == 0:
 			par = _novo_container(x)
+		# --- estrutura em 3 ACTOS (arco de um bioma tipo Dead Cells) -------
+		# prog = 0 (início da jornada) .. 1 (encosta ao nível). `intens`
+		# escala a densidade de perigos/inimigos: intro suave -> meio a
+		# apertar -> alívio antes da rampa final para o chefe.
+		var prog := clampf((x - x0) / maxf(1.0, comp), 0.0, 1.0)
+		var intens := 1.0
+		if prog < 0.28:
+			intens = lerpf(0.35, 1.0, prog / 0.28)
+		elif prog < 0.82:
+			intens = lerpf(1.0, 1.28, (prog - 0.28) / 0.54)
+		else:
+			intens = 0.5
 		# nova altitude-alvo de tempos a tempos
 		if passos >= passos_alvo:
 			passos_alvo = passos + 4 + _rng.randi() % 5
@@ -208,7 +232,7 @@ func _construir() -> void:
 			-SUBIDA_MAX, 300.0)
 		y = clampf(y + passo_y, _teto_y, _chao_y - 66.0)
 		var w := _rng.randf_range(60.0, 94.0)
-		var movel := _dif > 0.33 and _rng.randf() < 0.04 + 0.12 * _dif
+		var movel := _dif > 0.33 and _rng.randf() < (0.04 + 0.12 * _dif) * intens
 		if movel:
 			_plat_movel_spine(par, Vector2(x, y), w)
 		else:
@@ -217,14 +241,14 @@ func _construir() -> void:
 		if _rng.randf() < 0.12 and y - 210.0 > _teto_y:
 			_plat(par, Vector2(x + _rng.randf_range(-28.0, 28.0),
 				y - _rng.randf_range(150.0, 205.0)), Vector2(_rng.randf_range(56.0, 82.0), 16.0))
-		# perigo no vão a seguir (não bloqueia a aterragem) -- raro no início
-		if passos > 0 and _rng.randf() < 0.05 + 0.5 * _dif:
+		# perigo no vão a seguir (não bloqueia a aterragem)
+		if passos > 0 and _rng.randf() < (0.05 + 0.5 * _dif) * intens:
 			_perigo_no_vao(par, x, y)
 		# checkpoint a cada 2 plataformas
 		if passos % 2 == 0:
 			_checkpoint(x, y)
 		# inimigo ocasional na plataforma
-		if _rng.randf() < 0.05 + 0.22 * _dif:
+		if _rng.randf() < (0.05 + 0.22 * _dif) * intens:
 			_inimigo_em(par, Vector2(x, y - 30.0))
 		# decoração
 		_decorar(par, x, y)
@@ -238,7 +262,12 @@ func _construir() -> void:
 			var f: String
 			_camaras += 1
 			flavs_ate_vertical -= 1
-			if _pos_intenso:
+			var sig: String = ASSINATURA.get(_regiao, "")
+			if prog > 0.82:
+				# ACTO 3: alívio antes da rampa final -> quase só descansos
+				f = "descanso" if _rng.randf() < 0.8 else pool[_rng.randi() % pool.size()]
+				_pos_intenso = false
+			elif _pos_intenso:
 				f = "descanso"          # logo a seguir a uma câmara puxada -> respira
 				_pos_intenso = false
 			elif flavs_ate_vertical <= 0:
@@ -247,6 +276,11 @@ func _construir() -> void:
 				_pos_intenso = true
 			elif _camaras % 4 == 0:
 				f = "descanso"
+			elif prog >= 0.28 and prog <= 0.82 and sig != "" \
+					and _dif + 0.0001 >= float(TIER_FLAVOUR.get(sig, 9.0)) \
+					and _rng.randf() < 0.3:
+				f = sig                 # ACTO 2: a assinatura do bioma
+				_pos_intenso = sig in ["guilhotinas", "fogo"]
 			elif _dif > 0.18 and _rng.randf() < 0.2:
 				f = "forquilha"
 				_pos_intenso = true

@@ -46,6 +46,15 @@ entrada/saída declaradas em altura, regra de ouro `SUBIDA_MAX`).
 - [x] **`_f_forquilha`**: o caminho abre em dois — rota ALTA curta com
   perigos, rota BAIXA longa e segura — e volta a juntar-se. Ambas as
   pontas alcançam o reencontro (de cima desce-se, de baixo ≤ 1 salto).
+- [x] **Estrutura em 3 actos** (arco de bioma tipo Dead Cells): `prog`
+  (0→1 pela jornada) + `intens` — intro suave (`prog<0.28`, ×0.35→1) →
+  meio a apertar (`0.28–0.82`, ×1→1.28) → alívio antes da rampa do chefe
+  (`prog>0.82`, ×0.5, quase só `descanso`). `intens` escala perigos,
+  inimigos e plataformas móveis.
+- [x] **Assinatura de região** (`ASSINATURA`): no acto do meio, ~30% de a
+  câmara ser a "cara" do bioma (Floresta=trampolim, Prisão=guilhotinas,
+  Torres=vento, Catacumbas=gruta, Cidade=impulso, Castelo=fogo), se a
+  dificuldade já a libertou.
 - [ ] mais "tons" de peça: gruta-labirinto, arena de combate fechada,
   alcove-segredo (recompensa fora do caminho), corredor apertado
 - [ ] atalhos: 1-2 `Portal` "de retorno" por jornada (teletransporte)
@@ -59,10 +68,13 @@ entrada/saída declaradas em altura, regra de ouro `SUBIDA_MAX`).
   parede). O gerador atribui-os a partir de `_dif > 0.15` (não nos
   voadores). Método `_dir_koliani_perto(alcance)` (o nome `_dir_para_koliani`
   já existe no `ChefeBase`). **Falta playtest** dos números.
-- [ ] **voador-mergulhador** (para a espécie "olho"): hover sinusoidal +
-  picada em diagonal.
+- [x] **voador** (aplicado aos "olho" pelo gerador): sem gravidade, paira à
+  volta da origem e MERGULHA na Koliani (direção fixada no arranque,
+  recupera na parede/chão).
+- [x] **escudeiro** (dif > 0.35): golpe de FRENTE bate no escudo (só
+  "clinc"); pisão e golpes pelas costas passam. Anda mais devagar.
 - [ ] **trepador de parede/tecto** que se deixa cair.
-- [ ] **escudeiro** que bloqueia de frente (obriga a pisar / atacar por trás).
+- [ ] telegrafos mais legíveis (usar mais o campo `anticipacao`).
 
 ## Fase 3 — Arte de ambiente por região
 
