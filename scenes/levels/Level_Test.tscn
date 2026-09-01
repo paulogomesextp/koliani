@@ -1,15 +1,20 @@
 [gd_scene load_steps=9 format=3 uid="uid://bkolianileveltest"]
 
+; SALA DE TREINO (fora da campanha -- `EstadoJogo.NIVEIS` não a inclui).
+; Serve para ver o que é novo sem ter de jogar a jornada toda: um de cada
+; monstro do pack novo, dois comportamentos (escudeiro e cuspidor), espinhos
+; para experimentar o pogo, uma serra, a fogueira do checkpoint e a porta.
+; Correr com F6 no editor, ou:
+;   godot . --  (e escolher no menu) / godot res://scenes/levels/Level_Test.tscn
+
 [ext_resource type="PackedScene" uid="uid://bkolianiactor01" path="res://scenes/actors/Koliani.tscn" id="1_kol"]
 [ext_resource type="PackedScene" uid="uid://bdemoniobase01" path="res://scenes/actors/DemonioBase.tscn" id="2_dem"]
 [ext_resource type="Script" path="res://scripts/porta.gd" id="3_porta"]
 [ext_resource type="Script" path="res://scripts/checkpoint.gd" id="4_chk"]
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_chao"]
-size = Vector2(1400, 48)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_plat"]
-size = Vector2(220, 32)
+[ext_resource type="PackedScene" path="res://scenes/actors/Plataforma.tscn" id="5_plat"]
+[ext_resource type="PackedScene" path="res://scenes/fx/Atmosfera.tscn" id="6_atm"]
+[ext_resource type="PackedScene" path="res://scenes/actors/Espinhos.tscn" id="7_esp"]
+[ext_resource type="PackedScene" path="res://scenes/actors/Serra.tscn" id="8_serra"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_porta"]
 size = Vector2(48, 96)
@@ -19,79 +24,82 @@ size = Vector2(40, 80)
 
 [node name="Level_Test" type="Node2D"]
 
-[node name="Chao" type="StaticBody2D" parent="."]
+[node name="Atmosfera" parent="." instance=ExtResource("6_atm")]
+cor_ambiente = Color(0.66, 0.64, 0.74, 1)
+cor_fundo = Color(0.04, 0.04, 0.07, 1)
+cor_luz = Color(0.8, 0.6, 1, 1)
+cor_poeira = Color(0.86, 0.8, 1, 1)
+bioma = "catacumbas"
+largura_nivel = 1500.0
+extensao_esquerda = -300.0
+fundo_pack = "caverna"
+tinta_fundo = Color(1.35, 1.25, 1.6, 1)
+neblina_fundo = 0.26
+dessaturar_fundo = 0.4
+
+[node name="Chao" parent="." instance=ExtResource("5_plat")]
 position = Vector2(640, 660)
-collision_layer = 1
-collision_mask = 0
+tamanho = Vector2(1400, 48)
+altura_visual = 120.0
 
-[node name="Visual" type="ColorRect" parent="Chao"]
-offset_left = -700.0
-offset_top = -24.0
-offset_right = 700.0
-offset_bottom = 24.0
-color = Color(0.129412, 0.0862745, 0.184314, 1)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Chao"]
-shape = SubResource("RectangleShape2D_chao")
-
-[node name="Plataforma1" type="StaticBody2D" parent="."]
+[node name="Plataforma1" parent="." instance=ExtResource("5_plat")]
 position = Vector2(420, 520)
-collision_layer = 1
-collision_mask = 0
+tamanho = Vector2(220, 32)
 
-[node name="Visual" type="ColorRect" parent="Plataforma1"]
-offset_left = -110.0
-offset_top = -16.0
-offset_right = 110.0
-offset_bottom = 16.0
-color = Color(0.152941, 0.101961, 0.219608, 1)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Plataforma1"]
-shape = SubResource("RectangleShape2D_plat")
-
-[node name="Plataforma2" type="StaticBody2D" parent="."]
+[node name="Plataforma2" parent="." instance=ExtResource("5_plat")]
 position = Vector2(800, 420)
-collision_layer = 1
-collision_mask = 0
-
-[node name="Visual" type="ColorRect" parent="Plataforma2"]
-offset_left = -110.0
-offset_top = -16.0
-offset_right = 110.0
-offset_bottom = 16.0
-color = Color(0.152941, 0.101961, 0.219608, 1)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Plataforma2"]
-shape = SubResource("RectangleShape2D_plat")
+tamanho = Vector2(220, 32)
 
 [node name="Koliani" parent="." instance=ExtResource("1_kol")]
 position = Vector2(180, 560)
 
-[node name="DemonioBase" parent="." instance=ExtResource("2_dem")]
-position = Vector2(700, 600)
+; --- um de cada monstro do pack novo (ansimuz "Enemies Pack") -------------
+[node name="Besouro" parent="." instance=ExtResource("2_dem")]
+position = Vector2(560, 610)
+especie = "besouro"
+
+[node name="Mastim" parent="." instance=ExtResource("2_dem")]
+position = Vector2(700, 606)
+especie = "mastim"
+comportamento = "carga"
+
+[node name="Gosma" parent="." instance=ExtResource("2_dem")]
+position = Vector2(860, 606)
+especie = "gosma"
+comportamento = "saltador"
+
+[node name="Raptor" parent="." instance=ExtResource("2_dem")]
+position = Vector2(1010, 604)
+especie = "raptor"
+
+[node name="Abutre" parent="." instance=ExtResource("2_dem")]
+position = Vector2(900, 300)
+especie = "abutre"
+comportamento = "voador"
+
+; --- dois comportamentos que valem a pena ver ao pé um do outro ----------
+[node name="Escudeiro" parent="." instance=ExtResource("2_dem")]
+position = Vector2(1120, 606)
+especie = "orc"
+comportamento = "escudeiro"
+
+[node name="Cuspidor" parent="." instance=ExtResource("2_dem")]
+position = Vector2(1250, 606)
+especie = "xamane"
+comportamento = "cuspidor"
+
+; --- perigos: espinhos (o pogo faz ressaltar) e uma serra ----------------
+[node name="Espinhos" parent="." instance=ExtResource("7_esp")]
+position = Vector2(300, 624)
+
+[node name="Serra" parent="." instance=ExtResource("8_serra")]
+position = Vector2(800, 380)
 
 [node name="Checkpoint" type="Area2D" parent="."]
 position = Vector2(420, 470)
 collision_layer = 16
 collision_mask = 2
 script = ExtResource("4_chk")
-
-[node name="Visual" type="ColorRect" parent="Checkpoint"]
-offset_left = -6.0
-offset_top = -40.0
-offset_right = 6.0
-offset_bottom = 40.0
-color = Color(0.4, 0.301961, 0.6, 1)
-
-[node name="Luz" type="Node2D" parent="Checkpoint"]
-visible = false
-
-[node name="Brilho" type="ColorRect" parent="Checkpoint/Luz"]
-offset_left = -18.0
-offset_top = -52.0
-offset_right = 18.0
-offset_bottom = 44.0
-color = Color(0.85098, 0.309804, 0.831373, 0.34902)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Checkpoint"]
 shape = SubResource("RectangleShape2D_chk")
