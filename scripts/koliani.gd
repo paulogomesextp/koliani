@@ -1063,19 +1063,21 @@ func _ao_acertar_corpo(corpo: Node) -> void:
 		Som.toca("acerto", -8.0, randf_range(0.94, 1.07))
 
 
-## "Frame de impacto" -- clarão branco que estica e desaparece depressa.
+## "Frame de impacto": o anel pixel-art (`Impacto`) a abrir no ponto do
+## acerto, com a cor da arma, mais o clarão antigo por baixo a dar o flash.
 func _pop_impacto(pos: Vector2) -> void:
+	Impacto.rebentar(self, pos, _cor_golpe().lerp(Color(1, 1, 1), 0.45), 2.2)
 	var s := Sprite2D.new()
 	s.texture = TEX_IMPACTO
 	s.global_position = pos
 	s.rotation = randf() * TAU
-	s.scale = Vector2(0.3, 0.3)
-	s.z_index = 40
+	s.scale = Vector2(0.25, 0.25)
+	s.z_index = 39
 	get_parent().add_child(s)
 	var t := s.create_tween()
 	t.set_parallel(true)
-	t.tween_property(s, "scale", Vector2(1.7, 1.7), 0.16).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	t.tween_property(s, "modulate:a", 0.0, 0.16)
+	t.tween_property(s, "scale", Vector2(1.2, 1.2), 0.13).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	t.tween_property(s, "modulate:a", 0.0, 0.13)
 	t.chain().tween_callback(s.queue_free)
 
 

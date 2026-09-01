@@ -111,6 +111,13 @@ CC0 não exige atribuição; fica aqui à mesma por cortesia.
   `Equipamento.COR_ARMA`, e o brilho/efeitos do golpe (`koliani.gd`) seguem
   essa cor.
 
+## bdragon1727 — "Effect and Bullet 16x16"
+- https://bdragon1727.itch.io/  (URL exacto + licença POR CONFIRMAR pelo
+  Paulo em `incoming/LICENSES.md`)
+- Uso: `assets/sprites/pixel/fx/impacto_roxo.png` — o anel que abre no ponto
+  do golpe (`scripts/impacto.gd`), tirado da folha roxa por
+  `tools/extrair_efeitos.gd` (linha 5, colunas 14-17).
+
 ## piiixl — "Seamless Patterns" (16x16)
 - https://piiixl.itch.io/  (URL exato + licença POR CONFIRMAR pelo Paulo em incoming/LICENSES.md)
 - Uso: base dos blocos de terreno das plataformas (96x96, 9-slice). A
