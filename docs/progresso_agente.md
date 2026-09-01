@@ -1,5 +1,64 @@
 # Progresso do agente `gaming` — campanha dos 30 níveis
 
+## Sessão 2026-09-01 (tarde/noite) — Fase 3, rig novo, som e inimigos
+
+Lote de pedidos do Paulo nesta sessão, por ordem de entrega:
+
+| versão | o quê |
+|--------|-------|
+| v0.9.0 | **Fase 3** — arte de ambiente por região (ver secção própria abaixo) |
+| v0.9.1 | **rig novo da Koliani** (pack "Knight_player 1.4", @Jump_Button) |
+| v0.9.2 | **sons** de espada/tiro/acerto/checkpoint refeitos + **fogueira** nos checkpoints |
+| v0.9.3 | **+5 inimigos** (Enemies Pack, ansimuz) + uma espécie "cara" POR NÍVEL |
+| v0.9.4 | região I com pedra gótica em vez da relva de banda desenhada |
+
+### ❓ Pendente — decisão do Paulo (ficou por responder; segui em frente)
+1. **Licença do pack Knight_player**: NÃO é CC0. O `Read_me.txt` exige
+   crédito no uso comercial, proíbe revenda e **proíbe expressamente usar a
+   arte para treino de IA/ML e NFT**. Está creditado em `CREDITS.md`, mas é
+   o Paulo que tem de decidir se aceita estes termos para o jogo.
+2. As 4 perguntas da sessão anterior continuam abertas (histórico git com
+   ~180 MB de packs, "essência"/Fase 5, pogo nas guilhotinas, playtest dos
+   números v0.8.7→v0.8.13).
+3. **Tudo o que entrou nesta sessão está por playtestar** — tintas dos
+   fundos, escala/alinhamento do rig novo, volume dos sons novos, densidade
+   das espécies novas.
+
+### Rig novo da Koliani (v0.9.1)
+- `tools/importar_rig_cavaleiro.gd` corta as tiras de 100x64 do pack e
+  gradua a paleta (vermelhos → magenta, metal → violeta frio) →
+  `assets/sprites/pixel/koliani_cavaleiro/`. `koliani.gd::RIG = "cavaleiro"`.
+- O pack tinha desenho para estados que a Koliani só tinha em código: agora
+  há animação própria para **rolar, dash, dano, defesa, agarrar a borda,
+  aterrar e morte**. `_atualizar_anim` pergunta `has_animation` antes de as
+  usar, por isso os rigs "codigo"/"gothic" continuam a funcionar.
+- Como o rig traz armadura, espada e escudo desenhados, as placas
+  vectoriais / a `Arma` / o `Escudo` de código ficam escondidos (só o rig
+  "codigo" os mostra). Escala 0.8 + offset -2 põem os pés na linha do chão.
+
+### Som (v0.9.2)
+- `tools/gerar_audio.py`: novas funções `espada()`, `acerto()`, `tiro()`,
+  `selo()`. Os antigos eram agudos, sempre iguais e a 0.85 de pico.
+  Agora: silvo grave que desce (ataque), pancada que afunda (acerto), sopro
+  mole (tiro) e um sino quente de duas notas com cauda de 1.1 s (checkpoint).
+  Picos 0.42–0.70 e `koliani.gd` varia o tom a cada golpe/tiro.
+
+### Fogueira nos checkpoints (v0.9.2)
+- `scripts/checkpoint.gd`: o losango azul deu lugar a uma fogueira (pedras,
+  três achas, chama e brasas em partículas, halo amarelo a bruxulear).
+  Apagada é lenha fria; ao tocar pega fogo com uma labareda. Um raio para
+  baixo pousa-a no chão (o nó do checkpoint anda 46 px acima da plataforma)
+  e fica atrás da Koliani (`z_index = -1`).
+
+### Inimigos (v0.9.3)
+- `tools/extrair_inimigos_pack.gd`: **besouro, raptor, mastim, gosma,
+  abutre**. O pack só traz walk/idle → o `hit` reaproveita o idle e o `dead`
+  é gerado (achata + desvanece). O abutre voa.
+- `ESP_ASSINATURA` no `gerador_corredor.gd`: **uma espécie "cara" por
+  nível** (30), sem repetidas dentro da região; a jornada tira 45% dos
+  bichos daí e o resto da pool da região. Os 75 inimigos desenhados à mão
+  nas cenas seguem a mesma variação (eram todos goblin/esqueleto/mushroom).
+
 ## Sessão 2026-09-01 (tarde) — FASE 3: arte de ambiente por região (v0.9.0)
 
 Pedido do Paulo: "avança com a Fase 3". Passe de fundos + paleta nas 6

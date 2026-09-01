@@ -145,15 +145,22 @@ creditar em `CREDITS.md`.
 - [ ] **falta playtestar**: as tintas/desaturações são todas "a olho" em
   screenshots headless (`tools/shot_dev_nivel.gd`).
 
-## Fase 4 — Rig da Koliani
+## Fase 4 — Rig da Koliani  ✅ (1 set 2026, v0.9.1)
 
-- [ ] adotar sheet do **Magic Cliffs** (idle/run/jump/fall/attack/
-  jump-attack/crouch-attack/hurt/death, 128x96) OU Gothicvania church
-- [ ] recolorir para a Koliani (bandana, capa roxa esfarrapada, lâmina
-  roxa, fumos roxos) — shader de paleta
-- [ ] ligar a `koliani.gd` `_KOLI_ANIMS` (mapear estados novos: borda,
-  pogo)
-- [ ] afinar hitbox/pés à nova métrica
+O Paulo trouxe o pack **"Knight_player 1.4"** (@Jump_Button) — cavaleira de
+faixa na testa, armadura, espada e escudo. Ficou esse em vez do Magic
+Cliffs. **Licença NÃO é CC0** (ver `CREDITS.md`): crédito obrigatório no uso
+comercial e o autor proíbe treino de IA/NFT.
+
+- [x] adotar o sheet (tiras de 100x64, 15 estados)
+- [x] recolorir para a Koliani (vermelhos → magenta, metal → violeta frio),
+  em `tools/importar_rig_cavaleiro.gd`
+- [x] ligar a `koliani.gd` (`RIG = "cavaleiro"`, `_KOLI_ANIMS_CAVALEIRO`) e
+  **acrescentar os estados que faltavam**: roll, dash, hurt, defesa, borda,
+  aterrar, morte
+- [x] afinar pés/escala (0.8 + offset -2 sobre a colisão de 20x44)
+- [ ] **falta playtest**: escala, alinhamento nos declives, se a leitura da
+  silhueta aguenta a 1.4 de zoom
 
 ## Fase 5 — Economia / loadout (leve, não roguelite)
 
