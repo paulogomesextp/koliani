@@ -68,6 +68,16 @@ entrada/saída declaradas em altura, regra de ouro `SUBIDA_MAX`).
   por uma plataforma-balsa (`TumuloElevador` horizontal, `auto`); passa-se
   em pé a desviar de 2 lâminas penduladas. Pool das regiões Torres/
   Catacumbas/Castelo, `TIER` 0.3. O beat "a viagem".
+- [x] **`_f_pedras`** — beiral sem tecto sob uma saraivada de `PedraQueda`
+  (1/3 em ciclo, resto por proximidade). Estava listada na pool das
+  Catacumbas mas sem handler → gerava um vão morto; agora é câmara a
+  sério. `TIER` 0.0 (só região 3).
+- [x] **`_f_espinhos`** — forquilha: calha baixa = tapete de `Espinhos`
+  ("pogavel", atravessa-se aos ressaltos com o pogo da Fase 1); calha alta
+  = plataformas limpas (caminho justo). Pool Prisão/Catacumbas, `TIER`
+  0.36. Mostra a mecânica de pogo.
+- [x] guard em `_flavour()`: tipo sem `_f_` → `push_warning` + `_f_descanso`
+  (era um `Vector2(x+180,y)` silencioso).
 - [ ] mais "tons" de peça: alcove-segredo / atalho (precisa do sistema de
   recompensa — ver Fase 5; deixado para o Paulo decidir o "sink")
 - [ ] atalhos: 1-2 `Portal` "de retorno" por jornada (teletransporte)

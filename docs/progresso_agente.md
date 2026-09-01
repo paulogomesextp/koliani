@@ -17,6 +17,17 @@ sem o Paulo à frente. Ecrãs desligados durante a sessão.
   a partir de `_dif > 0.22` (a par de saltador/carga/trepador/escudeiro).
 - **Falta playtestar**: alcance, cadência, se o projétil lê bem, dano.
 
+### Câmara `_f_espinhos` — a forquilha do pogo (v0.8.11)
+- Forquilha (abre em 2, reúne): calha BAIXA = tapete de `Espinhos`
+  ("pogavel"), atravessa-se aos ressaltos com o **pogo** da Fase 1, com
+  uma `_plat` por baixo de cada tira (falhar o pogo = dano + queda curta,
+  não é o líquido); calha ALTA = fila de plataformas limpas, o caminho
+  justo. Reúne num `_plat` sólido + checkpoint.
+- Aproveita o `const ESPINHOS` que estava preloaded e sem uso.
+- Pools **Prisão (1)** e **Catacumbas (3)**; `TIER 0.36`.
+- **Falta playtestar**: espaçamento dos espinhos p/ o ritmo de pogo dar
+  certo; se a calha alta chega bem ao reencontro.
+
 ### Bug + câmara `_f_pedras` (v0.8.10)
 - A pool da região 3 (Catacumbas) listava `"pedras"` desde sempre, mas o
   `match` de `_flavour` **não tinha** `"pedras"` → caía no `return
