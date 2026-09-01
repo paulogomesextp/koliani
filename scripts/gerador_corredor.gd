@@ -97,6 +97,15 @@ var _cont_i := 0
 const DIST_CHECKPOINT := 4000.0
 var _ultimo_check_x := -1.0e9
 
+## Subida máxima (px) de um degrau para o seguinte -- um salto + duplo salto
+## da Koliani. Nenhuma plataforma da jornada fica mais alta que isto face à
+## anterior (descer é livre). Descer/cair pode ser muito mais.
+const SUBIDA_MAX := 104.0
+## Topo da banda vertical jogável (definido em `_construir`). Quanto maior a
+## dificuldade, mais alto -> jornadas com torres e poços a sério, não só uma
+## fita de plataformas quase em linha.
+var _teto_y := 0.0
+
 
 func _ready() -> void:
 	call_deferred("_construir")
@@ -115,6 +124,7 @@ func _construir() -> void:
 	var ancora: Vector2 = EstadoJogo.jornada_ancora_para(
 		_idx, func() -> Vector2: return (kol as Node2D).global_position)
 	_chao_y = ancora.y + 92.0
+	_teto_y = _chao_y - lerpf(640.0, 1320.0, _dif)
 
 	var comp: float = clampf(comprimento_base + por_nivel * float(_idx),
 		comprimento_base, comprimento_max)
@@ -173,18 +183,35 @@ func _construir() -> void:
 	# espinha): muito espaçadas no Nível 1, coladas no Nível 30.
 	var espaco_flavour := int(round(lerpf(13.0, 4.0, _dif)))
 	var prox_flavour := espaco_flavour + _rng.randi() % 3
+	# de 2 em 2/3 câmaras força-se uma VERTICAL (torre/poço/pilares)
+	var flavs_ate_vertical := 2
+	# altitude-alvo que vagueia por toda a banda vertical -> a espinha sobe e
+	# desce em vagas longas em vez de ondular sempre à mesma altura
+	var banda := _chao_y - _teto_y
+	var alvo_y := _chao_y - _rng.randf_range(140.0, banda * 0.85)
+	var passos_alvo := 4 + _rng.randi() % 4
 	while x < ancora.x - 900.0:
 		if passos % 10 == 0:
 			par = _novo_container(x)
-		# --- passo da espinha (sempre alcançável) ---
-		var subir := _rng.randf_range(-150.0, 100.0)
-		y = clampf(y - subir, _chao_y - 500.0, _chao_y - 66.0)
-		var w := _rng.randf_range(66.0, 100.0)
+		# nova altitude-alvo de tempos a tempos
+		if passos >= passos_alvo:
+			passos_alvo = passos + 4 + _rng.randi() % 5
+			alvo_y = _chao_y - _rng.randf_range(140.0, banda * 0.92)
+		# --- passo da espinha: caminha para a altitude-alvo, mas NUNCA sobe
+		#     mais que um salto de cada vez (descer/cair pode ser muito mais) ---
+		var passo_y := clampf((alvo_y - y) * 0.5 + _rng.randf_range(-32.0, 32.0),
+			-SUBIDA_MAX, 300.0)
+		y = clampf(y + passo_y, _teto_y, _chao_y - 66.0)
+		var w := _rng.randf_range(60.0, 94.0)
 		var movel := _dif > 0.33 and _rng.randf() < 0.04 + 0.12 * _dif
 		if movel:
 			_plat_movel_spine(par, Vector2(x, y), w)
 		else:
 			_plat(par, Vector2(x, y), Vector2(w, 18.0))
+		# 2.º piso: às vezes uma plataforma logo por cima = rota alternativa
+		if _rng.randf() < 0.12 and y - 210.0 > _teto_y:
+			_plat(par, Vector2(x + _rng.randf_range(-28.0, 28.0),
+				y - _rng.randf_range(150.0, 205.0)), Vector2(_rng.randf_range(56.0, 82.0), 16.0))
 		# perigo no vão a seguir (não bloqueia a aterragem) -- raro no início
 		if passos > 0 and _rng.randf() < 0.05 + 0.5 * _dif:
 			_perigo_no_vao(par, x, y)
@@ -203,16 +230,23 @@ func _construir() -> void:
 		passos += 1
 		if passos >= prox_flavour:
 			prox_flavour = passos + espaco_flavour + _rng.randi() % 3
-			var f: String = pool[_rng.randi() % pool.size()]
-			if f == ant_flavour:
-				f = pool[(_rng.randi() + 1) % pool.size()]
+			var f: String
+			flavs_ate_vertical -= 1
+			if flavs_ate_vertical <= 0:
+				flavs_ate_vertical = 2 + _rng.randi() % 2
+				f = ["torre", "poco", "pilares"][_rng.randi() % 3]
+			else:
+				f = pool[_rng.randi() % pool.size()]
+				if f == ant_flavour:
+					f = pool[(_rng.randi() + 1) % pool.size()]
 			ant_flavour = f
 			var res := _flavour(par, f, x, y)
 			x = res.x
 			y = res.y
+			alvo_y = y  # a espinha continua da altura onde a câmara acabou
 			continue
 
-		x += _rng.randf_range(150.0, 196.0)
+		x += _rng.randf_range(148.0, 188.0)
 
 	# --- passadeira final sólida até ao nível feito à mão ---
 	par = _novo_container(x)
@@ -248,7 +282,7 @@ func _novo_container(x: float) -> Node2D:
 	if otimizar_visibilidade and DisplayServer.get_name() != "headless":
 		var en := VisibleOnScreenEnabler2D.new()
 		en.process_mode = Node.PROCESS_MODE_ALWAYS
-		en.rect = Rect2(x - 900.0, _chao_y - 1000.0, 3000.0, 1500.0)
+		en.rect = Rect2(x - 1100.0, _chao_y - 1800.0, 3400.0, 2500.0)
 		c.add_child(en)
 	return c
 
@@ -410,7 +444,76 @@ func _flavour(par: Node2D, tipo: String, x: float, y: float) -> Vector2:
 		"fogo": return _f_fogo(par, x, y)
 		"impulso": return _f_impulso(par, x, y)
 		"portal": return _f_portal(par, x, y)
+		"torre": return _f_torre(par, x, y)
+		"poco": return _f_poco(par, x, y)
+		"pilares": return _f_pilares(par, x, y)
 	return Vector2(x + 180.0, y)
+
+
+## --- câmaras VERTICAIS (dão altura a sério à jornada) ---------------------
+
+## Torre: subida em ziguezague apertado que ganha MUITA altura (net
+## +700..+1200). Δx pequeno, Δy = sempre <= um salto.
+func _f_torre(par: Node2D, x: float, y: float) -> Vector2:
+	var n := 7 + int(_dif * 5.0)
+	var cy := y
+	for i in n:
+		x += _rng.randf_range(62.0, 106.0)
+		cy = maxf(_teto_y, cy - _rng.randf_range(84.0, SUBIDA_MAX))
+		_plat(par, Vector2(x, cy), Vector2(_rng.randf_range(58.0, 80.0), 16.0))
+		if i > 0 and i < n - 1 and _rng.randf() < 0.16 + 0.4 * _dif:
+			_perigo_no_vao(par, x, cy)
+		if i % 3 == 0:
+			_coluna_fundo(par, x + _rng.randf_range(-90.0, 90.0))
+		if cy <= _teto_y + 12.0:
+			break
+	_checkpoint(x, cy)
+	x += _rng.randf_range(140.0, 178.0)
+	_plat(par, Vector2(x, cy), Vector2(104.0, 18.0))  # varanda do topo
+	return Vector2(x, cy)
+
+
+## Poço: desce por um funil até rente ao líquido mortal, checkpoint no
+## fundo, e volta a subir pela parede oposta. Tenso.
+func _f_poco(par: Node2D, x: float, y: float) -> Vector2:
+	var fundo_y := _chao_y - 82.0
+	var cy := y
+	for _i in 4:
+		x += _rng.randf_range(118.0, 156.0)
+		cy = minf(fundo_y, cy + _rng.randf_range(150.0, 240.0))
+		_plat(par, Vector2(x, cy), Vector2(_rng.randf_range(70.0, 96.0), 16.0))
+	_checkpoint(x, cy)
+	if _rng.randf() < 0.5 + 0.4 * _dif:
+		_perigo_no_vao(par, x, cy)
+	var alvo := maxf(_teto_y + 120.0, y - _rng.randf_range(140.0, 380.0))
+	for _i in 6:
+		x += _rng.randf_range(70.0, 116.0)
+		cy = maxf(alvo, cy - _rng.randf_range(86.0, SUBIDA_MAX))
+		_plat(par, Vector2(x, cy), Vector2(_rng.randf_range(58.0, 80.0), 16.0))
+		if cy <= alvo + 6.0:
+			break
+	x += _rng.randf_range(148.0, 182.0)
+	_plat(par, Vector2(x, cy), Vector2(100.0, 18.0))
+	_checkpoint(x, cy)
+	return Vector2(x, cy)
+
+
+## Pilares: colunas MUITO altas a sair do líquido, com plataforma no cimo;
+## salta-se de topo em topo com o vazio lá em baixo.
+func _f_pilares(par: Node2D, x: float, y: float) -> Vector2:
+	var n := 3 + _rng.randi() % 3
+	var cy := y
+	for i in n:
+		x += _rng.randf_range(150.0, 186.0)
+		cy = clampf(cy - _rng.randf_range(-96.0, SUBIDA_MAX), _teto_y + 40.0, _chao_y - 150.0)
+		var alt: float = _chao_y - cy + 30.0
+		_plat(par, Vector2(x, cy + alt * 0.5), Vector2(30.0, alt))  # a coluna
+		_plat(par, Vector2(x, cy), Vector2(_rng.randf_range(64.0, 90.0), 16.0))  # o topo
+		if i > 0 and _rng.randf() < 0.28 + 0.4 * _dif:
+			_perigo_no_vao(par, x, cy)
+		if i % 2 == 0:
+			_checkpoint(x, cy)
+	return Vector2(x, cy)
 
 
 ## Salta-plataformas em ziguezague apertado (sobe e desce muito).
