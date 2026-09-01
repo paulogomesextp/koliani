@@ -534,6 +534,9 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0) -> void:
 func _morrer_anim() -> void:
 	_morto = true
 	velocity = Vector2.ZERO
+	# "pop" de morte: o mesmo anel do acerto, maior e na cor do rim do bioma
+	Impacto.rebentar(self, global_position + Vector2(0.0, -10.0),
+		cor_rim.lerp(Color(1, 1, 1), 0.35), 3.4)
 	if _area_contacto:
 		_area_contacto.set_deferred("monitoring", false)
 	set_deferred("collision_layer", 0)
