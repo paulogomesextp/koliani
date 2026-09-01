@@ -109,8 +109,8 @@ func _reconstruir() -> void:
 	_sup.color = cor
 	# gradiente: topo aceso, fundo escuro. Na variante lava sobe-se menos o
 	# brilho (senão vira um bloco luminoso).
-	var topo := cor.lightened(0.28) if brasas else cor.lightened(0.45)
-	var fundo := cor.darkened(0.5) if brasas else cor.darkened(0.3)
+	var topo := cor.lightened(0.2) if brasas else cor.darkened(0.2)
+	var fundo := cor.darkened(0.62) if brasas else cor.darkened(0.7)
 	_sup.vertex_colors = PackedColorArray([topo, topo, fundo, fundo])
 	# rebordo aceso na linha de água -- deixa o perigo bem visível no escuro
 	if _rim:

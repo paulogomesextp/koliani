@@ -51,7 +51,7 @@ A personagem principal (Koliani) é original do projeto
 - https://ansimuz.itch.io/ · https://opengameart.org/users/ansimuz
 - Licença: CC0 / domínio público ("free to use, personal or commercial")
 - Uso: fundos parallax pixel-art por região
-  (`assets/sprites/pixel/backgrounds/{floresta,pantano,corredores,rochoso,montanhas,prisao,caverna}/`):
+  (`assets/sprites/pixel/backgrounds/{floresta,pantano,corredores,rochoso,montanhas,prisao,caverna,cidade,igreja}/`):
   Parallax Forest v2 (R1 `floresta`), Gothicvania Swamp (R1 pântano
   `pantano`), Mountain Dusk (R3 `montanhas`), Caverns (R4 `caverna`),
   Rocky Pass (R5 `rochoso`). Cold Corridors serve as duas regiões de

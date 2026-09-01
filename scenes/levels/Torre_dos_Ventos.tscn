@@ -35,16 +35,19 @@ fill_to = Vector2(1, 0.5)
 script = ExtResource("7_niv")
 
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
-cor_ambiente = Color(0.78, 0.66, 0.5, 1)
-cor_fundo = Color(0.09, 0.07, 0.09, 1)
+cor_ambiente = Color(0.76, 0.72, 0.7, 1)
+cor_fundo = Color(0.07, 0.06, 0.09, 1)
 cor_silhueta = Color(0.16, 0.11, 0.13, 1)
-cor_luz = Color(1, 0.78, 0.5, 1)
-cor_poeira = Color(1, 0.86, 0.62, 1)
+cor_luz = Color(1.0, 0.82, 0.6, 1)
+cor_poeira = Color(1.0, 0.88, 0.76, 1)
 densidade_poeira = 2
 bioma = "torres"
 largura_nivel = 3400.0
 luzes_horizonte = true
 fundo_pack = "montanhas"
+tinta_fundo = Color(0.54, 0.6, 0.96, 1)
+neblina_fundo = 0.48
+dessaturar_fundo = 0.58
 
 [node name="ChaoInicio" parent="." instance=ExtResource("9_pl")]
 position = Vector2(400, 660)

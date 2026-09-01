@@ -40,16 +40,19 @@ fill_to = Vector2(1, 0.5)
 script = ExtResource("7_niv")
 
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
-cor_ambiente = Color(0.7, 0.66, 0.78, 1)
-cor_fundo = Color(0.06, 0.05, 0.09, 1)
+cor_ambiente = Color(0.72, 0.62, 0.86, 1)
+cor_fundo = Color(0.06, 0.05, 0.1, 1)
 cor_silhueta = Color(0.11, 0.09, 0.15, 1)
-cor_luz = Color(0.8, 0.55, 1, 1)
-cor_poeira = Color(0.85, 0.7, 1, 1)
+cor_luz = Color(0.86, 0.54, 1.0, 1)
+cor_poeira = Color(0.9, 0.74, 1.0, 1)
 densidade_poeira = 1.5
 bioma = "cidade"
 largura_nivel = 3100.0
 luzes_horizonte = true
-fundo_pack = "rochoso"
+fundo_pack = "cidade"
+tinta_fundo = Color(1.02, 0.72, 1.1, 1)
+neblina_fundo = 0.28
+dessaturar_fundo = 0.34
 
 [node name="EclipseTint" type="Node" parent="."]
 script = ExtResource("11_tint")

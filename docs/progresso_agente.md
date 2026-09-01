@@ -1,5 +1,49 @@
 # Progresso do agente `gaming` — campanha dos 30 níveis
 
+## Sessão 2026-09-01 (tarde) — FASE 3: arte de ambiente por região (v0.9.0)
+
+Pedido do Paulo: "avança com a Fase 3". Passe de fundos + paleta nas 6
+regiões (ver `docs/reformulacao_deadcells.md`).
+
+### Packs de fundo novos (CC0, ansimuz)
+- **`cidade`** = GothicVania **Town** (`ceu.png` + `vila.png`) — a região V
+  usava `rochoso` (serra rochosa do Rocky Pass) numa CIDADE. É o pack que
+  mais se parece com o `key_art`.
+- **`igreja`** = GothicVania **Church**, montado por
+  `tools/gerar_fundos_igreja.gd`: a folha `backgrounds.png` (5 painéis
+  soltos sobre a mesma base #272638) vira `parede.png` (faixa de nave SEM
+  COSTURA — janela ogival, nicho de tocha, altar, túmulo) e `pilares.png`
+  (pilar de crânios recortado por inundação a partir do rebordo + tapa-
+  buracos). Usado no Trono/Salão/Banquete (VI), Fornalha e Ala dos Mortos
+  (II), Cripta das Mil Velas (IV) e Catedral (V).
+- **`caverna/tumulos.png`** — túmulo com gárgula + pilar em primeiro plano
+  nas Catacumbas (a gruta sozinha era só rocha).
+- Região I: a Floresta Putrefacta e o Ninho passam a `pantano` (Gothicvania
+  Swamp) — o pôr-do-sol laranja do parallax_forest não lê como floresta
+  podre.
+
+### Gradação por bioma (`atmosfera.gd`)
+- `tinta_fundo` (cor por que se multiplica o pack), `neblina_fundo`
+  (profundidade atmosférica: as camadas mais longe diluem-se em
+  `cor_fundo`) e **`dessaturar_fundo`** +
+  `assets/shaders/fundo_bioma.gdshader` — desatura o pack ANTES de o
+  pintar. Sem isto o Cold Corridors fica azul-NÉON e o Mountain Dusk fica
+  com falésias VERMELHAS: multiplicar por uma tinta escurece mas não
+  desatura. Com 0.58-0.62 + tinta violeta, a prisão vira pedra fria e as
+  torres viram serra ao luar.
+- Passe de paleta nos 30 níveis (`cor_ambiente`/`cor_fundo`/`cor_luz`/
+  `cor_poeira`): luar frio + magenta do key_art por região, e os ambientes
+  que estavam escuros de mais (O Abismo a 0.14) levantados.
+- `agua_venenosa.gd`: o líquido mortal deixa de ser um bloco chapado de cor
+  (ocupa 1/3 do ecrã na jornada) — superfície escura + linha de água acesa.
+
+### Como ver
+`tools/shot_dev_nivel.gd` (`--screen 1 ... -- <idx> <prefixo> <n> <passo>
+<zoom>`) grava vários PNG ao longo da jornada; o zoom real do jogo é 1.4.
+
+**Falta playtestar**: as tintas e desaturações estão todas "a olho" em
+screenshots headless.
+
 ## Sessão 2026-09-01 (noite, autónoma) — variedade Dead Cells
 
 ### ❓ Pendente — precisa de decisão do Paulo

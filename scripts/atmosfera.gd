@@ -25,6 +25,20 @@ extends Node2D
 ## Ansimuz). Se preenchido, o fundo passam a ser as CAMADAS pixel-art desse
 ## pack em vez das silhuetas geradas por código. Ver `PACKS`.
 @export var fundo_pack := ""
+## Gradação do pack: cor por que as camadas do `fundo_pack` são multiplicadas.
+## Os packs CC0 vêm cada um com a sua paleta (a vila é rosada, os corredores
+## são cinzentos); isto puxa-os para o tom da região e para o luar/magenta do
+## `key_art`, e deixa o MESMO pack servir duas regiões com ar diferente.
+## Branco = o pack fica como veio.
+@export var tinta_fundo := Color(1, 1, 1)
+## Profundidade atmosférica: quanto é que as camadas mais LONGE se diluem em
+## `cor_fundo`. 0 = todas as camadas com a mesma força.
+@export_range(0.0, 1.0) var neblina_fundo := 0.0
+## Quanta COR PRÓPRIA se tira ao pack antes de o pintar com a `tinta_fundo`.
+## Multiplicar um pack azul-néon por uma tinta quente só o escurece; para o
+## Cold Corridors virar pedra de masmorra e o Mountain Dusk virar serra ao
+## luar é preciso desaturar primeiro (`assets/shaders/fundo_bioma.gdshader`).
+@export_range(0.0, 1.0) var dessaturar_fundo := 0.0
 ## Até onde gerar cenário de fundo (o nível mais largo anda pelos ~3400).
 @export var largura_nivel := 3400.0
 ## Até onde gerar cenário de fundo para a ESQUERDA (x negativo). A JORNADA de
@@ -40,6 +54,7 @@ extends Node2D
 const CHAO := 900.0  # base das silhuetas, bem abaixo do chão jogável
 
 const BG_DIR := "res://assets/sprites/pixel/backgrounds"
+const SHADER_FUNDO := preload("res://assets/shaders/fundo_bioma.gdshader")
 
 ## Packs de fundo pixel-art (Ansimuz, CC0). Cada entrada:
 ##   [ficheiro, camada_parallax, y_da_base(px), escala]
@@ -69,11 +84,29 @@ const PACKS := {
 		["middle.png", "Meio", 940.0, 4.2],
 		["near.png", "Perto", 980.0, 4.0],
 	],
-	# Região IV -- Catacumbas do Abismo (ansimuz "Caverns", CC0).
+	# Região IV -- Catacumbas do Abismo (ansimuz "Caverns", CC0) + túmulos e
+	# pilar da "Gothicvania Church" em primeiro plano (a gruta sozinha era só
+	# rocha; os túmulos é que dizem "catacumbas").
 	"caverna": [
 		["background.png", "Fundo", 940.0, 4.6],
 		["back-walls.png", "Longe", 980.0, 3.4],
 		["back-walls.png", "Meio", 1080.0, 2.6],
+		["tumulos.png", "Perto", 1010.0, 3.0],
+	],
+	# Região V -- Cidade Corrompida (ansimuz "Gothicvania Town", CC0): céu de
+	# nuvens sobre serra + silhueta da vila gótica com janelas acesas. É o
+	# pack que mais se parece com o `key_art`.
+	"cidade": [
+		["ceu.png", "Fundo", 900.0, 3.2],
+		["vila.png", "Longe", 1000.0, 2.4],
+	],
+	# Interior gótico -- nave de igreja (ansimuz "Gothicvania Church", CC0,
+	# montada por `tools/gerar_fundos_igreja.gd`). Região VI (castelo) e a
+	# Fornalha da região II.
+	"igreja": [
+		["parede.png", "Fundo", 930.0, 4.6],
+		["pilares.png", "Longe", 965.0, 3.6],
+		["pilares.png", "Meio", 1025.0, 2.6],
 	],
 	"rochoso": [
 		["back.png", "Fundo", 850.0, 3.8],
@@ -296,9 +329,33 @@ func _montar_fundo_pack(_rng: RandomNumberGenerator) -> void:
 		spr.centered = false
 		spr.scale = Vector2(esc, esc)
 		spr.position = Vector2(0.0, y_base - th)
+		# A gradação da camada entra pelo shader (desatura o pack ANTES de o
+		# pintar); sem desaturação basta o `modulate`, que é mais barato.
+		var cor := _gradacao(item[1])
+		if dessaturar_fundo > 0.0:
+			var mat := ShaderMaterial.new()
+			mat.shader = SHADER_FUNDO
+			mat.set_shader_parameter("dessaturar", dessaturar_fundo)
+			mat.set_shader_parameter("tinta", cor)
+			spr.material = mat
+		else:
+			spr.modulate = cor
 		spr.set_meta("gerado", true)
 		layer.add_child(spr)
 		layer.motion_mirroring = Vector2(tw, 0.0)
+
+
+## Quanto cada camada do parallax está "longe" (1 = fundo, 0 = colada à
+## acção) -- alimenta a profundidade atmosférica de `_gradacao`.
+const PROFUNDIDADE := {"Fundo": 1.0, "Longe": 0.62, "Meio": 0.32, "Perto": 0.0}
+
+
+## Cor por que se multiplica a camada `camada` de um `fundo_pack`: a tinta da
+## região, diluída em `cor_fundo` conforme a profundidade -- o que está longe
+## perde-se no ar, o que está perto fica com a cor cheia.
+func _gradacao(camada: String) -> Color:
+	var prof: float = PROFUNDIDADE.get(camada, 0.5)
+	return tinta_fundo.lerp(cor_fundo, neblina_fundo * prof)
 
 
 ## Faixa de brilho quente colada ao horizonte + tochas distantes a

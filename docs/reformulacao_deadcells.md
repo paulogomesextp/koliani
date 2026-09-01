@@ -117,13 +117,33 @@ Caverns / Rocky Pass / Mountain Dusk**, **Magic Cliffs** gamekit,
 **LuizMelo** inimigos. Copiar o usado para `assets/sprites/pixel/` e
 creditar em `CREDITS.md`.
 
-- [ ] I Floresta → Gothicvania Swamp + parallax_forest
-- [ ] II Prisão → gothicvania church + Cold Corridors
-- [ ] III Torres → Mountain Dusk + Rocky Pass
-- [ ] IV Catacumbas → Caverns + church
-- [ ] V Cidade → Gothicvania town
-- [ ] VI Castelo → church (escuro) + brasas
-- [ ] `Atmosfera.tscn` recolor por bioma para casar com o key_art
+- [x] I Floresta → Gothicvania **Swamp** (`pantano`) na Floresta Putrefacta
+  e no Ninho (o pôr-do-sol laranja do parallax_forest não lê como floresta
+  podre); `floresta` fica na Árvore que Chora e no Coração.
+- [x] II Prisão → Cold Corridors (`prisao`) + **church** (`igreja`) na
+  Fornalha e na Ala dos Mortos.
+- [x] III Torres → Mountain Dusk (`montanhas`) + Rocky Pass (`rochoso`) no
+  Pico Esquecido.
+- [x] IV Catacumbas → Caverns + **church**: `caverna` ganhou a camada
+  `tumulos.png` (túmulo com gárgula + pilar de crânios) em primeiro plano;
+  a Cripta das Mil Velas passa a `igreja` inteira.
+- [x] V Cidade → **Gothicvania town** (`cidade`: céu de nuvens + silhueta da
+  vila com janelas acesas). Era `rochoso` -- serra rochosa numa cidade. A
+  Catedral da Corrupção usa `igreja`.
+- [x] VI Castelo → `corredores` (Portões, Torre do Coração) + `igreja`
+  (Salão dos Espelhos, Banquete, **Trono**) com tinta magenta.
+- [x] recolor por bioma: `tinta_fundo` + `neblina_fundo` (profundidade
+  atmosférica) + `dessaturar_fundo` em `atmosfera.gd`
+  (`assets/shaders/fundo_bioma.gdshader`). Desatura o pack ANTES de o
+  pintar -- é o que tira o azul-néon ao Cold Corridors e o vermelho às
+  falésias do Mountain Dusk. Passe de paleta (`cor_ambiente`/`cor_fundo`/
+  `cor_luz`/`cor_poeira`) nos 30 níveis: luar frio + magenta do key_art, e
+  os ambientes que estavam escuros de mais (O Abismo a 0.14) levantados.
+- [x] líquido mortal (`agua_venenosa.gd`): superfície escura com a linha de
+  água acesa em vez de um bloco chapado de cor -- ocupa um terço do ecrã na
+  jornada.
+- [ ] **falta playtestar**: as tintas/desaturações são todas "a olho" em
+  screenshots headless (`tools/shot_dev_nivel.gd`).
 
 ## Fase 4 — Rig da Koliani
 
