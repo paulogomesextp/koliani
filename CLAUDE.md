@@ -36,6 +36,17 @@ Verificação visual: `tools/shot_plataforma.gd` (`--script ... -- <cena>
   `Co-Authored-By: Claude Sonnet 5 <noreply@anthropic.com>`
 - Remote: `github.com/paulogomesextp/koliani` (público).
 
+## Colaboração entre sessões
+
+Projeto trabalhado por duas pessoas (Paulo e Luís/Jensath), cada uma com a
+sua sessão de agente. Na **primeira interação de cada dia** (data diferente
+da última vez que se mexeu no repo nesta máquina), antes de avançar com o
+pedido: correr `git fetch origin master` e `git log origin/master
+--since="1 day ago" --pretty=format:"%h | %ad | %an | %s" --date=format:"%Y-%m-%d
+%H:%M"` para ver se o outro colaborador fez commits recentes. Se houver,
+resumir ao utilizador (o quê, não só a lista em bruto) antes de continuar —
+evita trabalho duplicado ou conflito com o que o outro já mudou.
+
 ## Regras do projeto
 
 - **Código, comentários e logs em português.**
