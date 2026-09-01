@@ -26,6 +26,8 @@ func _vida_max() -> int:
 ## Dano do golpe = arma equipada, ou a base se não houver arma.
 func _dano_golpe() -> int:
 	return EstadoJogo.dano_ataque()
+## Velocidade do FLYMODE (só DEVELOPER MODE -- ver `alternar_voo`).
+const VEL_VOO := 560.0
 const VEL_DASH := 620.0
 const DUR_DASH := 0.16
 const RECARGA_DASH := 0.55
@@ -101,6 +103,9 @@ var _defendendo := false
 ## empilhavam transições e deixavam o ecrã preso a preto.
 var _a_morrer := false
 var _energia := ENERGIA_MAX
+## FLYMODE ligado (só DEVELOPER MODE). Enquanto true: voo livre, atravessa
+## paredes, sem gravidade nem dano de fosso.
+var _voando := false
 var _lancar_restante := 0.0
 ## Carga do Kamehameha: segundos com "lancar" em baixo nesta pressão.
 var _lancar_seg := 0.0
@@ -270,6 +275,21 @@ func _physics_process(dt: float) -> void:
 	if _energia < ENERGIA_MAX:
 		_energia = minf(ENERGIA_MAX, _energia + REGEN_ENERGIA * dt)
 		energia_mudou.emit(_energia, ENERGIA_MAX)
+
+	# FLYMODE (só DEVELOPER MODE, botão na DevBarra): voa livre e atravessa
+	# tudo. Sem `move_and_slide` -> zero colisão. Ao desligar cai à plataforma.
+	if _voando:
+		var vx := Input.get_axis("mover_esquerda", "mover_direita")
+		var vy := Input.get_axis("mirar_cima", "mirar_baixo")
+		var v := Vector2(vx, vy)
+		if v.length() > 1.0:
+			v = v.normalized()
+		velocity = v * VEL_VOO
+		if vx != 0.0:
+			_olha_para = signf(vx)
+		move_and_slide()  # collision_mask = 0 enquanto voa -> atravessa tudo
+		_mov.velocidade = velocity
+		return
 
 	var dir := Input.get_axis("mover_esquerda", "mover_direita") * _inverso
 	if dir != 0.0 and _rolar_restante <= 0.0:
@@ -452,7 +472,7 @@ func _physics_process(dt: float) -> void:
 	_estava_no_chao = no_chao
 
 	# caiu num fosso sem fundo -> conta como morte (reaparece no checkpoint)
-	if global_position.y > Y_MORTE and vida > 0:
+	if global_position.y > Y_MORTE and vida > 0 and not _voando:
 		if EstadoJogo.modo_dev:
 			global_position = _pos_inicial if _pos_inicial != Vector2.ZERO else global_position
 			velocity = Vector2.ZERO
@@ -862,6 +882,21 @@ func conceder_iframes(segundos: float) -> void:
 ## ainda se pode fazer o salto duplo).
 func devolver_saltos_ar() -> void:
 	_mov.saltos_dados = 0
+
+
+## FLYMODE (DevBarra, só DEVELOPER MODE). Alterna voo livre: atravessa
+## paredes, sem gravidade. Ao desligar, a gravidade normal volta e a Koliani
+## cai até à plataforma mais próxima. Devolve o novo estado.
+func alternar_voo() -> bool:
+	if not EstadoJogo.modo_dev:
+		return false
+	_voando = not _voando
+	velocity = Vector2.ZERO
+	if not _voando:
+		_mov.velocidade = Vector2.ZERO
+		_mov.saltos_dados = 0
+	Som.toca("salto_duplo" if _voando else "aterrar", -12.0)
+	return _voando
 
 
 ## Impulso vindo de fora (Trampolim, Impulsor...). TEM de passar por aqui e
