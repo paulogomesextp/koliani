@@ -88,7 +88,6 @@ func _aplicar_estado(solida: bool, imediato: bool) -> void:
 			vis.modulate.a = alvo
 		else:
 			create_tween().tween_property(vis, "modulate:a", alvo, 0.12)
-	if not imediato:
 
 
 ## A arena desmorona (Coração Putrefacto, fase 3): a plataforma parte-se de

@@ -132,6 +132,21 @@ func _montar_visual() -> void:
 	_luz.scale = Vector2(0.9, 0.9)
 	_base.add_child(_luz)
 
+	# --- rótulo "CHECKPOINT" -- mesma fonte do "SKILL" dos coletáveis
+	# (ver `coletavel.gd::_faixa_skill`), a metade do tamanho.
+	var rotulo := Label.new()
+	rotulo.text = "CHECKPOINT"
+	rotulo.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	rotulo.add_theme_font_size_override("font_size", 8)
+	rotulo.add_theme_color_override("font_color", Color(1.0, 0.84, 0.55))
+	rotulo.add_theme_color_override("font_outline_color", Color(0.04, 0.02, 0.0))
+	rotulo.add_theme_constant_override("outline_size", 3)
+	rotulo.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	rotulo.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	rotulo.size = Vector2(90, 14)
+	rotulo.position = Vector2(-45.0, -36.0)
+	_base.add_child(rotulo)
+
 
 ## A fogueira tem de assentar no CHÃO, não ficar a pairar: o nó do
 ## checkpoint anda 46 px acima da plataforma (ver `gerador_corredor.gd`) e

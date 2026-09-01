@@ -67,4 +67,3 @@ func _aplicar_estado(solida: bool) -> void:
 	var vis := get_node_or_null("Visual") as CanvasItem
 	if vis:
 		create_tween().tween_property(vis, "modulate:a", 1.0 if solida else alpha_fantasma, 0.12)
-	if solida:
