@@ -52,13 +52,17 @@ const CHECKPOINT := preload("res://scripts/checkpoint.gd")
 ## Líquido mortal por região: [cor, brasas]. floresta=água podre, prisão=ácido,
 ## torres=??? (usa trevas), catacumbas=trevas, cidade=ácido citrino,
 ## castelo=lava.
+## Cor do "chão mortal" por região. Ocupa um terço do ecrã na jornada, por
+## isso NÃO pode ser tinta chapada e berrante: os tons ficam escuros e
+## dessaturados (a linha de água acesa do `AguaVenenosa` é que dá a leitura
+## do perigo) e puxados para o luar/magenta do key_art.
 const LIQUIDO := {
-	0: [Color(0.24, 0.5, 0.2, 0.92), false],     # água podre
-	1: [Color(0.5, 0.85, 0.2, 0.9), false],      # ácido
+	0: [Color(0.13, 0.28, 0.15, 0.94), false],   # água podre
+	1: [Color(0.26, 0.42, 0.14, 0.93), false],   # ácido
 	2: [Color(0.06, 0.05, 0.12, 0.96), false],   # trevas / vazio
 	3: [Color(0.05, 0.03, 0.09, 0.97), false],   # trevas do abismo
-	4: [Color(0.72, 0.85, 0.15, 0.9), false],    # ácido citrino
-	5: [Color(1.0, 0.42, 0.1, 0.92), true],      # lava
+	4: [Color(0.34, 0.40, 0.12, 0.93), false],   # ácido citrino
+	5: [Color(0.62, 0.22, 0.08, 0.94), true],    # lava
 }
 
 ## Tipos de "flavour" de câmara (o que se semeia à volta da espinha).

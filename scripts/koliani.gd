@@ -942,16 +942,18 @@ func _flash_golpe() -> void:
 		_luz_golpe.color = cor
 		_luz_golpe.energy = 0.0
 		var tl := _luz_golpe.create_tween()
-		tl.tween_property(_luz_golpe, "energy", 3.2, 0.04).set_ease(Tween.EASE_OUT)
+		tl.tween_property(_luz_golpe, "energy", 2.1, 0.04).set_ease(Tween.EASE_OUT)
 		tl.tween_property(_luz_golpe, "energy", 0.0, DUR_ATAQUE + 0.12).set_ease(Tween.EASE_IN)
 
 	if _sprite == null:
 		return
-	# halo largo (cor da arma) + núcleo fino (branco-quente), ambos aditivos
-	_arco_luz(_pontos_arco(14.0, 52.0, deg_to_rad(-130.0), deg_to_rad(46.0)),
-		Color(cor.r, cor.g, cor.b, 0.0), 0.55, 1.5)
-	_arco_luz(_pontos_arco(30.0, 44.0, deg_to_rad(-120.0), deg_to_rad(40.0)),
-		Color(quente.r, quente.g, quente.b, 0.0), 0.95, 1.28)
+	# halo largo (cor da arma) + núcleo fino (branco-quente), ambos aditivos.
+	# CURTOS de propósito: o rig "cavaleiro" já desenha o corte no frame, e o
+	# arco antigo (raio 52 x1.5) tapava metade da personagem.
+	_arco_luz(_pontos_arco(18.0, 40.0, deg_to_rad(-112.0), deg_to_rad(36.0)),
+		Color(cor.r, cor.g, cor.b, 0.0), 0.34, 1.22)
+	_arco_luz(_pontos_arco(27.0, 36.0, deg_to_rad(-104.0), deg_to_rad(32.0)),
+		Color(quente.r, quente.g, quente.b, 0.0), 0.55, 1.1)
 	_abanar(1.8)
 
 
