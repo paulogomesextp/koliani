@@ -33,19 +33,23 @@
   `ACEL_AR`/`ACEL_CHAO`, corte de salto). **Falta playtest** dos números
   do agarrar-borda / wall-jump / pogo.
 
-## Fase 2 — Jornada montada de salas feitas à mão
+## Fase 2 — Jornada montada de peças (ritmo + ramificação)
 
-`gerador_corredor.gd` deixa de "desenhar" geometria e passa a **montar
-peças** (`res://scenes/rooms/*.tscn`): cada peça é um troço desenhado à mão
-com entrada/saída marcadas (`Marker2D` "entrada"/"saida_*"), tags de bioma
-e de dificuldade, e slots de inimigo/hazard/decoração. O gerador escolhe
-peças compatíveis e encaixa-as (como o Dead Cells). Mantém-se a regra de
-ouro (subida ≤ `SUBIDA_MAX`), o líquido mortal por baixo, o boss no fim.
+Em vez de reescrever tudo para `.tscn` à mão, o `gerador_corredor.gd`
+evoluiu para **encadear "câmaras" tipo peça** (funções `_f_*` com
+entrada/saída declaradas em altura, regra de ouro `SUBIDA_MAX`).
 
-- [ ] esquema da peça (`RoomChunk` script + convenção de markers)
-- [ ] ~8-12 peças por "tom" (corredor, torre, poço, arena-pausa, segredo)
-- [ ] gerador: grafo de encaixe + validação de alcance headless
+- [x] **Ritmo tensão/alívio** (`_camaras`, `_pos_intenso`): a seguir a uma
+  câmara puxada (vertical, guilhotinas, serras, fogo, quebra) entra sempre
+  um `_f_descanso` — plataforma larga e LIMPA + checkpoint + vista. Também
+  força descanso a cada 4.ª câmara.
+- [x] **`_f_forquilha`**: o caminho abre em dois — rota ALTA curta com
+  perigos, rota BAIXA longa e segura — e volta a juntar-se. Ambas as
+  pontas alcançam o reencontro (de cima desce-se, de baixo ≤ 1 salto).
+- [ ] mais "tons" de peça: gruta-labirinto, arena de combate fechada,
+  alcove-segredo (recompensa fora do caminho), corredor apertado
 - [ ] atalhos: 1-2 `Portal` "de retorno" por jornada (teletransporte)
+- [ ] (talvez) mover as peças mais estáveis para `scenes/rooms/*.tscn`
 
 ## Fase 3 — Arte de ambiente por região
 

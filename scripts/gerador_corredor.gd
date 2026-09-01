@@ -97,6 +97,11 @@ var _cont_i := 0
 const DIST_CHECKPOINT := 4000.0
 var _ultimo_check_x := -1.0e9
 
+## Ritmo (pegada Dead Cells): alterna câmaras de TENSÃO (gauntlets, torres)
+## com câmaras de ALÍVIO (`descanso` -- plataforma larga limpa + checkpoint).
+var _camaras := 0
+var _pos_intenso := false
+
 ## Subida máxima (px) de um degrau para o seguinte -- um salto + duplo salto
 ## da Koliani. Nenhuma plataforma da jornada fica mais alta que isto face à
 ## anterior (descer é livre). Descer/cair pode ser muito mais.
@@ -226,19 +231,30 @@ func _construir() -> void:
 		if passos % 6 == 0:
 			_coluna_fundo(par, x + _rng.randf_range(-120.0, 120.0))
 
-		# --- câmara de flavour de tempos a tempos ---
+		# --- câmara de tempos a tempos: alterna TENSÃO e ALÍVIO ---
 		passos += 1
 		if passos >= prox_flavour:
 			prox_flavour = passos + espaco_flavour + _rng.randi() % 3
 			var f: String
+			_camaras += 1
 			flavs_ate_vertical -= 1
-			if flavs_ate_vertical <= 0:
+			if _pos_intenso:
+				f = "descanso"          # logo a seguir a uma câmara puxada -> respira
+				_pos_intenso = false
+			elif flavs_ate_vertical <= 0:
 				flavs_ate_vertical = 2 + _rng.randi() % 2
 				f = ["torre", "poco", "pilares"][_rng.randi() % 3]
+				_pos_intenso = true
+			elif _camaras % 4 == 0:
+				f = "descanso"
+			elif _dif > 0.18 and _rng.randf() < 0.2:
+				f = "forquilha"
+				_pos_intenso = true
 			else:
 				f = pool[_rng.randi() % pool.size()]
 				if f == ant_flavour:
 					f = pool[(_rng.randi() + 1) % pool.size()]
+				_pos_intenso = f in ["guilhotinas", "serras", "pendulos", "fogo", "quebra"]
 			ant_flavour = f
 			var res := _flavour(par, f, x, y)
 			x = res.x
@@ -447,7 +463,48 @@ func _flavour(par: Node2D, tipo: String, x: float, y: float) -> Vector2:
 		"torre": return _f_torre(par, x, y)
 		"poco": return _f_poco(par, x, y)
 		"pilares": return _f_pilares(par, x, y)
+		"descanso": return _f_descanso(par, x, y)
+		"forquilha": return _f_forquilha(par, x, y)
 	return Vector2(x + 180.0, y)
+
+
+## --- ritmo: alívio e bifurcação -----------------------------------------
+
+## ALÍVIO: plataforma larga e LIMPA (zero perigos), checkpoint garantido e
+## um pouco de vista (colunas ao fundo). O respiro entre gauntlets.
+func _f_descanso(par: Node2D, x: float, y: float) -> Vector2:
+	var cy: float = clampf(y, _teto_y + 90.0, _chao_y - 88.0)
+	x += _rng.randf_range(150.0, 182.0)
+	_plat(par, Vector2(x + 150.0, cy), Vector2(330.0, 24.0), 44.0)
+	_checkpoint(x + 40.0, cy, true)
+	_coluna_fundo(par, x + 70.0)
+	_coluna_fundo(par, x + 240.0)
+	x += 330.0
+	return Vector2(x, cy)
+
+
+## FORQUILHA: o caminho abre em dois e volta a juntar-se. Rota ALTA curta e
+## com perigos; rota BAIXA mais longa e segura. Ambas as pontas alcançam o
+## reencontro (de cima desce-se; de baixo é <= um salto).
+func _f_forquilha(par: Node2D, x: float, y: float) -> Vector2:
+	var passo := _rng.randf_range(156.0, 176.0)
+	var n := 3
+	_plat(par, Vector2(x + 60.0, y), Vector2(120.0, 18.0))  # partida à altura da espinha
+	var bx := x + 60.0
+	var hy := y
+	for i in n:
+		hy = maxf(_teto_y + 40.0, hy - _rng.randf_range(72.0, SUBIDA_MAX))
+		_plat(par, Vector2(bx + passo * float(i + 1), hy), Vector2(72.0, 15.0))
+		if i < n - 1 and _rng.randf() < 0.5 + 0.3 * _dif:
+			_perigo_no_vao(par, bx + passo * float(i + 1), hy)
+	var ly: float = minf(y + 190.0, _chao_y - 82.0)
+	for i in n:
+		_plat(par, Vector2(bx + passo * float(i + 1), ly), Vector2(90.0, 16.0))
+	var jx := bx + passo * float(n + 1)
+	var jy: float = clampf(hy + 90.0, ly - 96.0, ly - 40.0)
+	_plat(par, Vector2(jx, jy), Vector2(130.0, 18.0))
+	_checkpoint(jx, jy)
+	return Vector2(jx, jy)
 
 
 ## --- câmaras VERTICAIS (dão altura a sério à jornada) ---------------------
