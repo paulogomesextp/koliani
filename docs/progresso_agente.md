@@ -18,15 +18,37 @@
 4. **Playtest dos números** de tudo o que entrou v0.8.7→v0.8.11 (câmaras
    novas + `cuspidor`) — está tudo "a olho". Precisa de ti a jogar.
 
+### 🎮 Onde ver / testar as câmaras novas (v0.8.13)
+
+Arranca já no nível certo, com kit todo + FLYMODE (tecla F):
+```
+& "C:\Users\paulo\Desktop\Godot_v4.7.2-stable_win64.exe" . -- --devmode --nivel=N
+```
+
+| câmara | níveis (`--nivel=`) | o que confirmar |
+|--------|--------------------|-----------------|
+| `_f_crossfire` | 21, 23, 27, 29 | ritmo dos tiros dá para passar a saltar; o feixe lê-se |
+| `_f_ferry` | 12, 13, 15, 27 | velocidade da balsa; as 2 lâminas a meio ficam justas? |
+| `_f_pedras` | 16, 18, 19, 20 | densidade das quedas; aviso (tremor) chega a tempo |
+| `_f_espinhos` | 10 | a calha baixa dá para atravessar aos ressaltos (pogo)? a calha alta chega bem? |
+| `cuspidor` (inimigo) | qualquer ≥ 8, mais denso 15+ | alcance/cadência do cuspo; dano do projétil |
+
+O `_f_espinhos` só calha 1× nos seeds actuais (nível 10, "A Cela Zero") —
+se gostares dele digo ao gerador para o puxar mais nas Catacumbas.
+
+Mapa completo das câmaras por nível:
+`MAPA_CAMARAS=1 godot --headless --script res://tools/verifica_jornada.gd | grep "^CAMARA"`
+
 ### Batch entregue esta noite
 
 Continuação da reformulação Dead Cells (Fase 2 câmaras + Fase 2b inimigos)
 sem o Paulo à frente. Ecrãs desligados durante a sessão.
 
 **Entregas:** v0.8.7 `_f_crossfire` · v0.8.8 `cuspidor` · v0.8.9 `_f_ferry`
-· v0.8.10 `_f_pedras` (+ bug) · v0.8.11 `_f_espinhos`. Tudo com testes
-headless + `verifica_jornada.gd` (30 níveis) verdes. **Todos os números
-por playtestar.**
+· v0.8.10 `_f_pedras` (+ bug) · v0.8.11/12 `_f_espinhos` · **v0.8.13: as
+câmaras novas passam a aparecer mesmo** (a selecção engolia-as — ver
+abaixo). Tudo com testes headless + `verifica_jornada.gd` (30 níveis)
+verdes. **Todos os números por playtestar.**
 
 ### ⚠️ Erro meu: `git add -A` apanhou os packs em bruto (v0.8.7..v0.8.11)
 - Os 5 commits de playtest usaram `git add -A` e arrastaram ~5026
