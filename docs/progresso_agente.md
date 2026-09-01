@@ -39,6 +39,21 @@ Feedback seguinte do Paulo (mesma sessão):
   (um a cada ~2 plataformas). `_checkpoint()` agora só cria se estiver a
   ≥ `DIST_CHECKPOINT` (4000 px) do anterior; início e pré-chefe são
   `forcar=true`. Resultado ~3 (níveis curtos) a ~10 (N30) — ~90% menos.
+- **Jornada 4.0 — verticalidade** (`gerador_corredor.gd`): a espinha era
+  uma fita quase horizontal. Agora `_teto_y = _chao_y - lerp(640,1320)`
+  (cresce c/ dificuldade); a espinha caminha para uma ALTITUDE-ALVO que
+  vagueia por toda a banda; de 2 em 2-3 câmaras entra uma VERTICAL:
+  `_f_torre` (subida ziguezague +700..1200), `_f_poco` (desce rente ao
+  líquido, sobe pela parede oposta), `_f_pilares` (colunas **só visuais**
+  + topos sólidos). Regra de ouro mantida: subida ≤ `SUBIDA_MAX` 104 px.
+  **Bug corrigido logo a seguir**: as colunas de `_f_pilares` eram sólidas
+  e cortavam passadeiras → "parede que não deixa passar". Passaram a ser
+  sprites de fundo.
+- **FLYMODE** (`koliani.gd` `alternar_voo()` + `dev_barra.gd`): botão só em
+  DEVELOPER MODE (canto inf. esq., por cima das barras) + tecla F. Voa
+  livre (setas/WASD, `VEL_VOO` 560), `collision_mask=0` → atravessa tudo,
+  sem gravidade nem dano de fosso. Desligar = cai à plataforma. Para
+  testar zonas distantes sem jogar o nível todo.
 
 ## Sessão 2026-08-31 (cont. 3) — JORNADA 3.0: chão MORTAL + assets
 
