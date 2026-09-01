@@ -47,8 +47,8 @@ bioma = "castelo"
 largura_nivel = 3000.0
 luzes_horizonte = true
 fundo_pack = "igreja"
-tinta_fundo = Color(1.06, 0.76, 0.98, 1)
-neblina_fundo = 0.32
+tinta_fundo = Color(1.6, 1.1, 1.45, 1)
+neblina_fundo = 0.22
 dessaturar_fundo = 0.44
 
 [node name="ChaoInicio" parent="." instance=ExtResource("9_pl")]

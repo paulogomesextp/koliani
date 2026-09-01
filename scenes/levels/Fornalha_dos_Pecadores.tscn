@@ -51,8 +51,8 @@ bioma = "prisao"
 largura_nivel = 3400.0
 luzes_horizonte = true
 fundo_pack = "igreja"
-tinta_fundo = Color(1.18, 0.74, 0.62, 1)
-neblina_fundo = 0.3
+tinta_fundo = Color(1.95, 1.2, 0.9, 1)
+neblina_fundo = 0.18
 dessaturar_fundo = 0.62
 
 [node name="Casca" parent="." instance=ExtResource("90_casca")]
