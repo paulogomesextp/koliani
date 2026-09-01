@@ -33,6 +33,34 @@ const BOSSES := {
 			["res://assets/sprites/incoming/luizmelo/EVil Wizard 2/Sprites/Death.png", 1],
 		],
 	},
+	# O Olho do Abismo (nivel 20) <- luizmelo "Flying eye" (CC0), o mesmo bicho
+	# que ja' serve de inimigo comum "olho", mas em tamanho de CHEFE: e'
+	# literalmente o mesmo monstro crescido, o que e' bom para a historia da
+	# regiao (o abismo esta' cheio de olhos pequenos).
+	"olho": {
+		"altura": 96,
+		"tiras": true,
+		"larg_tira": 150,
+		"poses": [
+			["res://assets/sprites/incoming/luizmelo/Monsters_Creatures_Fantasy/Flying eye/Flight.png", 0],
+			["res://assets/sprites/incoming/luizmelo/Monsters_Creatures_Fantasy/Flying eye/Flight.png", 4],
+			["res://assets/sprites/incoming/luizmelo/Monsters_Creatures_Fantasy/Flying eye/Take Hit.png", 1],
+			["res://assets/sprites/incoming/luizmelo/Monsters_Creatures_Fantasy/Flying eye/Attack.png", 5],
+		],
+	},
+	# Ghorak, o Guardiao Raiz (nivel 1) <- chierit "Frost Guardian": e' um
+	# golem com NUCLEO NO PEITO, que e' exactamente a fraqueza escrita em
+	# docs/niveis.md. O gelo e' recolorido para casca, musgo e nucleo roxo.
+	"ghorak": {
+		"altura": 116,
+		"recolor": "raiz",
+		"poses": [
+			"res://assets/sprites/incoming/chierit/Frost_Guardian_FREE_v1.0/PNG files/idle/idle_1.png",
+			"res://assets/sprites/incoming/chierit/Frost_Guardian_FREE_v1.0/PNG files/idle/idle_5.png",
+			"res://assets/sprites/incoming/chierit/Frost_Guardian_FREE_v1.0/PNG files/take_hit/take_hit_2.png",
+			"res://assets/sprites/incoming/chierit/Frost_Guardian_FREE_v1.0/PNG files/1_atk/1_atk_6.png",
+		],
+	},
 	# Ignivar (Fornalha dos Pecadores) <- chierit "boss demon slime": apesar do
 	# nome do pack, é um DEMÓNIO DE FOGO com espadão e chifres em chama.
 	"ignivar": {
@@ -42,7 +70,8 @@ const BOSSES := {
 	},
 }
 
-## Largura de um frame das tiras do luizmelo (2000 px / 8 frames).
+## Largura por omissão de um frame nas tiras (o Evil Wizard tem 250; o
+## `larg_tira` de cada chefe sobrepõe-se a isto).
 const TIRA_LARG := 250
 
 
@@ -52,10 +81,13 @@ func _init() -> void:
 		var alt: int = cfg["altura"]
 		var imgs: Array[Image] = []
 		for pose in cfg["poses"]:
-			var img := _pose(pose, cfg.get("tiras", false), cfg.get("grelha", []))
+			var img := _pose(pose, cfg.get("tiras", false), cfg.get("grelha", []),
+				int(cfg.get("larg_tira", TIRA_LARG)))
 			if img == null:
 				push_error("%s: não abriu %s" % [nome, str(pose)])
 				return
+			if cfg.get("recolor", "") == "raiz":
+				_recolor_raiz(img)
 			imgs.append(_ajustar(img, alt))
 		var cw := 0
 		for i in imgs:
@@ -78,7 +110,7 @@ func _init() -> void:
 
 ## Uma pose: um ficheiro inteiro, [tira, índice] ou [coluna, linha] numa
 ## folha em grelha (`grelha` = [ficheiro, largura_celula, altura_celula]).
-func _pose(pose: Variant, tiras: bool, grelha: Array) -> Image:
+func _pose(pose: Variant, tiras: bool, grelha: Array, larg_tira: int) -> Image:
 	if not grelha.is_empty():
 		var folha := Image.load_from_file(grelha[0])
 		if folha == null:
@@ -95,11 +127,37 @@ func _pose(pose: Variant, tiras: bool, grelha: Array) -> Image:
 		var tira := Image.load_from_file(par[0])
 		if tira == null:
 			return null
-		var x := int(par[1]) * TIRA_LARG
-		if x + TIRA_LARG > tira.get_width():
+		var x := int(par[1]) * larg_tira
+		if x + larg_tira > tira.get_width():
 			return null
-		return tira.get_region(Rect2i(x, 0, TIRA_LARG, tira.get_height()))
+		return tira.get_region(Rect2i(x, 0, larg_tira, tira.get_height()))
 	return Image.load_from_file(pose)
+
+
+## Recolor "raiz": o gelo do Frost Guardian vira casca e musgo, e o núcleo
+## quente do peito vira ROXO -- é a fraqueza do Ghorak (`docs/niveis.md`).
+## A luminância do pixel original é que manda na rampa, por isso o volume e
+## as sombras do desenho ficam iguais.
+func _recolor_raiz(img: Image) -> void:
+	const CASCA := Color(0.20, 0.15, 0.11)
+	const MUSGO := Color(0.44, 0.55, 0.30)
+	const SECO := Color(0.72, 0.72, 0.52)
+	const NUCLEO := Color(0.85, 0.35, 1.0)
+	for y in img.get_height():
+		for x in img.get_width():
+			var c := img.get_pixel(x, y)
+			if c.a <= 0.0:
+				continue
+			var lum := c.r * 0.3 + c.g * 0.59 + c.b * 0.11
+			# núcleo/brasa: os pixels QUENTES (vermelho por cima do azul)
+			if c.r > c.b * 1.15 and c.r > 0.45:
+				var f := clampf((c.r - 0.35) / 0.65, 0.0, 1.0)
+				img.set_pixel(x, y, NUCLEO.lerp(Color(1, 0.9, 1), f * 0.6))
+				continue
+			var cor := CASCA.lerp(MUSGO, clampf(lum * 1.6, 0.0, 1.0))
+			if lum > 0.62:
+				cor = MUSGO.lerp(SECO, clampf((lum - 0.62) / 0.38, 0.0, 1.0))
+			img.set_pixel(x, y, Color(cor.r, cor.g, cor.b, c.a))
 
 
 ## Corta o ar à volta, redimensiona (nearest) para a altura-alvo e devolve o

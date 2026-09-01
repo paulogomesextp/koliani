@@ -59,6 +59,10 @@ A personagem principal (Koliani) é original do projeto
 - Uso: o **Ignivar** (nível 7) — `bosses/ignivar.png`. Apesar do nome do
   pack, o sprite é um demónio de fogo com espadão, que é exactamente o
   chefe da Fornalha dos Pecadores.
+- E o **Ghorak** (nível 1) — `bosses/ghorak.png`, a partir do **Frost
+  Guardian** do mesmo autor, recolorido para casca/musgo com núcleo roxo
+  (o Ghorak é "guerreiro de tronco, ossos e raízes, com núcleo púrpura no
+  peito" — e o golem do pack já tem o núcleo no peito).
 
 ## LuizMelo — "Monsters Creatures Fantasy"
 - https://luizmelo.itch.io/monsters-creatures-fantasy
@@ -69,6 +73,8 @@ A personagem principal (Koliani) é original do projeto
 - Também o pack **Evil Wizard 2** (mesmo autor, CC0): é o **Bispo
   Púrpura** (nível 24) — `bosses/bispo.png`, via
   `tools/extrair_chefes_packs.gd`.
+- E o **Olho do Abismo** (nível 20) — `bosses/olho.png` — é o mesmo "Flying
+  eye" dos inimigos comuns, em tamanho de chefe.
 
 ## Ansimuz (Luis Zuno) — packs "GothicVania" / parallax
 - https://ansimuz.itch.io/ · https://opengameart.org/users/ansimuz

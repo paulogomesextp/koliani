@@ -56,7 +56,9 @@ func _initialize() -> void:
 	# nome do nivel -- ver docs/niveis.md.
 	_boss_coracao()
 	_boss_entrevane()
-	_boss_ghorak_anim()
+	# _boss_ghorak_anim()  -- DESLIGADO: o Ghorak passou ao Frost Guardian
+	# (chierit) recolorido para casca/musgo com nucleo roxo
+	# (tools/extrair_chefes_packs.gd).
 	_boss_morvanna()
 	_boss_rainha()
 	# _boss_ignivar()  -- DESLIGADO: o Ignivar passou ao demonio de fogo do
@@ -75,7 +77,8 @@ func _initialize() -> void:
 	# isto por cima voltaria a por o desenho antigo.
 	_boss_freira()   # regiao IV / nivel 18
 	_boss_naga()     # regiao IV / nivel 19
-	_boss_olho()     # regiao IV / nivel 20
+	# _boss_olho()  -- DESLIGADO: o Olho do Abismo passou ao "Flying eye" do
+	# luizmelo em tamanho de chefe (tools/extrair_chefes_packs.gd).
 	_boss_prefeito() # regiao V / nivel 21
 	_boss_acougueiro() # regiao V / nivel 22
 	_boss_maquinista() # regiao V / nivel 23
