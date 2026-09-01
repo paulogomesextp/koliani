@@ -64,9 +64,9 @@ const LIQUIDO := {
 ## Tipos de "flavour" de câmara (o que se semeia à volta da espinha).
 const POOL_REGIAO := {
 	0: ["saltos", "serras", "pendulos", "ritmo", "trampolim", "gruta", "portal"],
-	1: ["saltos", "correntes", "elevador", "quebra", "guilhotinas", "serras", "portal", "crossfire"],
+	1: ["saltos", "correntes", "elevador", "quebra", "guilhotinas", "serras", "portal", "crossfire", "espinhos"],
 	2: ["vento", "saltos", "gravidade", "pendulos", "trampolim", "ritmo", "portal", "ferry"],
-	3: ["gruta", "pedras", "elevador", "quebra", "guilhotinas", "pendulos", "portal", "ferry"],
+	3: ["gruta", "pedras", "elevador", "quebra", "guilhotinas", "pendulos", "portal", "ferry", "espinhos"],
 	4: ["saltos", "impulso", "serras", "fogo", "trampolim", "guilhotinas", "portal", "crossfire"],
 	5: ["pendulos", "fogo", "guilhotinas", "ritmo", "quebra", "gravidade", "portal", "crossfire", "ferry"],
 }
@@ -79,7 +79,7 @@ const TIER_FLAVOUR := {
 	"ritmo": 0.12, "portal": 0.12, "correntes": 0.16, "elevador": 0.18,
 	"gravidade": 0.34, "serras": 0.36, "vento": 0.42, "pendulos": 0.46,
 	"impulso": 0.5, "guilhotinas": 0.58, "quebra": 0.62, "fogo": 0.66,
-	"crossfire": 0.4, "ferry": 0.3,
+	"crossfire": 0.4, "ferry": 0.3, "espinhos": 0.36,
 }
 ## Fallback quando a região ainda não libertou nada (níveis muito baixos).
 const FLAVOUR_SUAVE := ["saltos", "gruta", "trampolim"]
@@ -298,7 +298,7 @@ func _construir() -> void:
 				f = pool[_rng.randi() % pool.size()]
 				if f == ant_flavour:
 					f = pool[(_rng.randi() + 1) % pool.size()]
-				_pos_intenso = f in ["guilhotinas", "serras", "pendulos", "fogo", "quebra", "crossfire", "ferry", "pedras"]
+				_pos_intenso = f in ["guilhotinas", "serras", "pendulos", "fogo", "quebra", "crossfire", "ferry", "pedras", "espinhos"]
 			ant_flavour = f
 			var res := _flavour(par, f, x, y)
 			x = res.x
@@ -532,6 +532,7 @@ func _flavour(par: Node2D, tipo: String, x: float, y: float) -> Vector2:
 		"crossfire": return _f_crossfire(par, x, y)
 		"ferry": return _f_ferry(par, x, y)
 		"pedras": return _f_pedras(par, x, y)
+		"espinhos": return _f_espinhos(par, x, y)
 	# tipo sem handler -> não deve acontecer (pool/assinatura mal configurada).
 	# Avisa em vez de gerar um vão morto silencioso e cai num `descanso`.
 	push_warning("GeradorCorredor: câmara '%s' sem _f_ correspondente" % tipo)
@@ -573,6 +574,39 @@ func _f_ferry(par: Node2D, x: float, y: float) -> Vector2:
 	_plat(par, Vector2(x, cy), Vector2(130.0, 18.0))
 	_checkpoint(x, cy, true)
 	return Vector2(x, cy)
+
+
+## ESPINHOS: o caminho abre em duas calhas até se voltar a juntar. A calha
+## BAIXA é um tapete de espinhos (`Espinhos`, grupo "pogavel") -- quem
+## domina o POGO (Fase 1) atravessa aos ressaltos; a calha ALTA é uma fila
+## de plataformas limpas, o caminho justo. Falhar o pogo custa vida + uma
+## queda curta para a plataforma por baixo dos espinhos (não é o líquido).
+func _f_espinhos(par: Node2D, x: float, y: float) -> Vector2:
+	var cy: float = clampf(y, _teto_y + 220.0, _chao_y - 150.0)
+	var n := 4 + int(_dif * 2.0)
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(104.0, 16.0))          # boca da forquilha
+	# calha BAIXA -- tapete de espinhos com uma plataforma por baixo de cada
+	var lx := x
+	var by := cy + 66.0
+	for _i in n:
+		lx += _rng.randf_range(122.0, 150.0)
+		_plat(par, Vector2(lx, by), Vector2(98.0, 14.0))
+		var sp := ESPINHOS.instantiate()
+		sp.largura = 6
+		sp.position = Vector2(lx, by)
+		par.add_child(sp)
+	# calha ALTA -- plataformas limpas (o caminho justo)
+	var hx := x
+	var hy: float = maxf(_teto_y + 40.0, cy - _rng.randf_range(150.0, 180.0))
+	for _i in n:
+		hx += _rng.randf_range(150.0, 176.0)
+		_plat(par, Vector2(hx, hy), Vector2(84.0, 15.0))
+	# reencontro
+	var jx: float = maxf(lx, hx) + _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(jx, cy), Vector2(126.0, 18.0))
+	_checkpoint(jx, cy, true)
+	return Vector2(jx, cy)
 
 
 ## PEDRAS (assinatura das Catacumbas): corre-se por um beiral sem tecto a
