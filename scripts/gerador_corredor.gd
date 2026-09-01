@@ -79,7 +79,7 @@ const TIER_FLAVOUR := {
 	"ritmo": 0.12, "portal": 0.12, "correntes": 0.16, "elevador": 0.18,
 	"gravidade": 0.34, "serras": 0.36, "vento": 0.42, "pendulos": 0.46,
 	"impulso": 0.5, "guilhotinas": 0.58, "quebra": 0.62, "fogo": 0.66,
-	"crossfire": 0.4, "ferry": 0.3, "espinhos": 0.36,
+	"crossfire": 0.4, "ferry": 0.3, "espinhos": 0.28,
 }
 ## Fallback quando a região ainda não libertou nada (níveis muito baixos).
 const FLAVOUR_SUAVE := ["saltos", "gruta", "trampolim"]
@@ -290,6 +290,13 @@ func _construir() -> void:
 				_pos_intenso = true
 			elif _camaras % 4 == 0:
 				f = "descanso"
+			# câmaras "tom" novas (crossfire/ferry/pedras/espinhos) -- ramo
+			# próprio e ALTO na cadeia: a pool uniforme e os ramos de
+			# arena/torre/descanso engoliam-nas quase sempre. `pool` já vem
+			# filtrado por região+tier em `_pool_permitida()`.
+			elif prog < 0.82 and _tem_tom_novo(pool) and _rng.randf() < 0.32:
+				f = _escolher_tom_novo(pool)
+				_pos_intenso = true
 			elif prog >= 0.28 and prog <= 0.82 and sig != "" \
 					and _dif + 0.0001 >= float(TIER_FLAVOUR.get(sig, 9.0)) \
 					and _rng.randf() < 0.3:
@@ -345,6 +352,25 @@ func _pool_permitida() -> Array:
 		if _dif + 0.0001 >= float(TIER_FLAVOUR.get(f, 0.0)):
 			out.append(f)
 	return out if out.size() >= 2 else FLAVOUR_SUAVE.duplicate()
+
+
+## Câmaras "tom" recentes que compensam ter um ramo próprio na seleção
+## (senão nunca calhavam). Só as que a região tem na pool.
+const TONS_NOVOS := ["crossfire", "ferry", "pedras", "espinhos"]
+
+func _tem_tom_novo(pool: Array) -> bool:
+	for t in TONS_NOVOS:
+		if t in pool:
+			return true
+	return false
+
+
+func _escolher_tom_novo(pool: Array) -> String:
+	var opc: Array = []
+	for t in TONS_NOVOS:
+		if t in pool:
+			opc.append(t)
+	return opc[_rng.randi() % opc.size()]
 
 
 func _novo_container(x: float) -> Node2D:
@@ -518,6 +544,10 @@ func _especie_do_nivel() -> String:
 ## (x, y) da última que ela própria pôs -- a espinha continua daí.
 
 func _flavour(par: Node2D, tipo: String, x: float, y: float) -> Vector2:
+	# diagnóstico: `MAPA_CAMARAS=1 godot ...` lista as câmaras geradas em cada
+	# nível (usado por tools/mapa_camaras.gd para saber onde ver cada uma).
+	if OS.has_environment("MAPA_CAMARAS"):
+		print("CAMARA idx=%d tipo=%s x=%.0f" % [_idx, tipo, x])
 	match tipo:
 		"saltos": return _f_saltos(par, x, y)
 		"serras": return _f_serras(par, x, y)
