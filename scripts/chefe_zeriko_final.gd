@@ -270,6 +270,7 @@ func _meteoro() -> void:
 	var pai := get_parent()
 	if pai == null:
 		return
+	Som.toca("meteoro", -5.0, 1.0)
 	var x := _x_koliani() + randf_range(-180.0, 180.0)
 	var chao := _chao_y(x)
 	var m := Area2D.new()
@@ -370,6 +371,7 @@ func _tentaculos() -> void:
 
 
 func _preparar_olho() -> void:
+	Som.toca("olho_carregar", -6.0, 0.9)
 	var k := _obter_koliani()
 	var alvo := k.global_position if k else global_position + Vector2(200, 60)
 	var meio := (alvo - global_position).angle()
@@ -486,7 +488,7 @@ func _teleportar(afasta: float) -> void:
 func _mudar(n: int) -> void:
 	_forma = n
 	Som.toca("chefe_cai", -4.0, 0.6)
-	Som.toca("onda", -5.0, 0.5)
+	Som.toca("mudar_forma", -5.0, 0.5)
 	_abanar_camera(12.0)
 	dur_tel *= 0.88
 	dur_exposto *= 0.92

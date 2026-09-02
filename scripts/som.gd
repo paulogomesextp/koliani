@@ -39,6 +39,9 @@ const CAMINHOS := {
 	"engrenagem": "res://assets/audio/engrenagem.wav",
 	"lamina_cair": "res://assets/audio/lamina_cair.wav",
 	"feixe_vil": "res://assets/audio/feixe_vil.wav",
+	"meteoro": "res://assets/audio/meteoro.wav",
+	"mudar_forma": "res://assets/audio/mudar_forma.wav",
+	"olho_carregar": "res://assets/audio/olho_carregar.wav",
 }
 const VOZES := 8
 

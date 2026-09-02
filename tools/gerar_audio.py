@@ -1217,6 +1217,101 @@ def feixe_vil():
     escrever("feixe_vil.wav", buf, 0.82)
 
 
+def meteoro():
+    """Zeriko F1 -- chuva de meteoros púrpura (antes só caíam em silêncio):
+    assobio a descer + chiar de magia + baque roxo no fim."""
+    random.seed(31014)
+    dur = 0.55
+    N = int(dur * FS)
+    buf = [0.0] * N
+    fase = 0.0
+    ar = Reson()
+    lp = 0.0
+    for n in range(N):
+        p = n / N
+        f = 1800.0 * math.exp(-p * 2.6) + 260.0        # assobio que despenha
+        fase += f / FS
+        s = math.sin(2 * math.pi * fase) * 0.55
+        x = random.uniform(-1, 1)
+        lp += 0.10 * (x - lp)
+        s += ar.passo(lp, 2200.0 - 1400.0 * p, 900.0) * 0.4    # ar rasgado
+        # chiar de magia: parcial agudo tremido
+        s += math.sin(2 * math.pi * f * 3.01 * (n / FS)) * 0.12 * math.exp(-p * 3.0) \
+            * (0.6 + 0.4 * math.sin(2 * math.pi * 40.0 * (n / FS)))
+        env = min(1.0, p / 0.02) * (1.0 - 0.3 * p)
+        buf[n] += s * env
+    _impacto(buf, 0.42, 0.7, 96.0, 12.0)
+    for n in range(N):
+        buf[n] = math.tanh(buf[n] * 1.35)
+    escrever("meteoro.wav", buf, 0.78)
+
+
+def mudar_forma():
+    """Zeriko / Arauto -- transição de forma: rumor grave a SUBIR de tom,
+    coro desafinado a inchar e um rasgão no pico (o momento em que a coisa
+    troca de cara). Fica por cima do `chefe_cai` que parte a armadura."""
+    random.seed(31015)
+    dur = 0.72
+    N = int(dur * FS)
+    buf = [0.0] * N
+    lp = 0.0
+    for n in range(N):
+        t = n / FS
+        p = t / dur
+        # sub a subir 45 -> 130 Hz
+        fsub = 45.0 + 85.0 * (p ** 1.4)
+        buf[n] += math.sin(2 * math.pi * fsub * t) * 0.5 * (0.3 + 0.7 * p)
+        # coro desafinado a inchar
+        coro = 0.0
+        for k, semi in enumerate((-5, 0, 1, 6)):     # cluster de 2a menor = "errado"
+            f = 130.0 * (2.0 ** (semi / 12.0)) * (1.0 + 0.006 * k)
+            coro += math.sin(2 * math.pi * f * t + k * 1.9)
+        buf[n] += coro * 0.10 * (p ** 1.2)
+        # sopro que cresce (reverse-swell)
+        x = random.uniform(-1, 1)
+        lp += 0.05 * (x - lp)
+        buf[n] += lp * 0.35 * (p ** 2.0)
+    # rasgão no pico
+    t0 = int(0.62 * dur * FS)
+    rc = Reson()
+    for n in range(t0, N):
+        tt = (n - t0) / FS
+        s = rc.passo(random.uniform(-1, 1), 1400.0 - 6000.0 * tt, 1200.0)
+        buf[n] += s * math.exp(-tt * 22.0) * 0.6
+    fo = int(0.1 * FS)
+    for n in range(N - fo, N):
+        buf[n] *= (N - n) / fo
+    for n in range(N):
+        buf[n] = math.tanh(buf[n] * 1.3)
+    escrever("mudar_forma.wav", buf, 0.82)
+
+
+def olho_carregar():
+    """Telégrafo do olho / laser (Zeriko F3, Olho do Abismo) -- antes o
+    aviso era mudo. Zunido sombrio a subir de tom com um brilho a ganhar
+    corpo; SEM impacto (é só o carregar, o disparo é o `feixe_vil`)."""
+    random.seed(31016)
+    dur = 0.5
+    N = int(dur * FS)
+    buf = [0.0] * N
+    for n in range(N):
+        t = n / FS
+        p = t / dur
+        g = 120.0 + 220.0 * (p ** 1.3)
+        s = math.sin(2 * math.pi * g * t) + math.sin(2 * math.pi * g * 1.008 * t)
+        s *= 0.35
+        # brilho agudo a entrar na 2a metade
+        if p > 0.4:
+            pp = (p - 0.4) / 0.6
+            s += math.sin(2 * math.pi * (1600.0 + 1800.0 * pp) * t) * 0.12 * pp
+        trem = 0.8 + 0.2 * math.sin(2 * math.pi * 9.0 * t)
+        env = (p ** 0.8) * (1.0 if p < 0.92 else (1.0 - p) / 0.08)
+        buf[n] += s * env * trem
+    for n in range(N):
+        buf[n] = math.tanh(buf[n] * 1.3)
+    escrever("olho_carregar.wav", buf, 0.6)
+
+
 if __name__ == "__main__":
     game_over_voz()
     menu_loop()
@@ -1249,3 +1344,6 @@ if __name__ == "__main__":
     engrenagem()
     lamina_cair()
     feixe_vil()
+    meteoro()
+    mudar_forma()
+    olho_carregar()

@@ -366,7 +366,7 @@ func _nova() -> void:
 func _mudar_forma(n: int) -> void:
 	_forma = n
 	Som.toca("chefe_cai", -5.0, 0.7)
-	Som.toca("onda", -6.0, 0.6)
+	Som.toca("mudar_forma", -6.0, 0.6)
 	_abanar_camera(10.0)
 	dur_tel *= 0.85
 	dur_exposto *= 0.9

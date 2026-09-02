@@ -37,8 +37,27 @@ para o arquétipo certo (continua a variar pitch/volume por instância):
 Testes headless verdes + smoke da Floresta Putrefacta sem erros de
 script. **Por playtestar**: se os timbres lêem bem em jogo e se algum
 está alto/baixo de mais (tudo "a olho", sem poder ouvir os `.wav` aqui).
-O passo seguinte de #2 seria dar som a CADA ataque individual (não só ao
-arquétipo) dos chefes-marco.
+
+### v0.9.18 — som próprio nos momentos-marco dos chefes-história
+
+Passe fino nos 4 chefes com diálogo (Primeiro Prisioneiro, Noiva do
+Eclipse, Arauto, Zeriko). Fecha dois **buracos** (ataques que não tinham
+som nenhum) e dá voz própria às transições de forma:
+
+- **`meteoro`** — a chuva de meteoros do Zeriko (F1) caía em SILÊNCIO;
+  agora assobia ao despenhar-se + baque roxo (`_meteoro`).
+- **`olho_carregar`** — o telégrafo do olho/laser (Zeriko F3 `_preparar_
+  olho`, Olho do Abismo `_preparar_laser`) era mudo; agora um zunido
+  sombrio a subir avisa antes do varrimento. O disparo continua a ser o
+  `feixe_vil`.
+- **`mudar_forma`** — as transições de forma (Zeriko ×3, Arauto ×2)
+  usavam `chefe_cai` + `onda` genérico; agora é um rumor a subir + coro
+  desafinado + rasgão no pico, por cima do `chefe_cai` que parte a
+  armadura.
+
+Continua por fazer: som a cada ataque comum individual (o `_golpe` do
+Prisioneiro é de propósito o `demonio_ataque` leve — "luta como a
+Koliani").
 
 ## Sessão 2026-09-01 (tarde/noite) — Fase 3, rig novo, som e inimigos
 

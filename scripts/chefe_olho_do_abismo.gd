@@ -159,6 +159,7 @@ func _ve_koliani() -> bool:
 ## --- laser ---------------------------------------------------------
 
 func _preparar_laser() -> void:
+	Som.toca("olho_carregar", -7.0, 1.0)
 	var k := _obter_koliani()
 	var alvo := k.global_position if k else global_position + Vector2(_direcao * 200, 60)
 	var meio := (alvo - global_position).angle()
