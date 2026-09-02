@@ -1,8 +1,12 @@
 class_name BolaFogo
 extends Area2D
 ## Projétil de fogo -- viaja em linha reta e magoa a Koliani por contacto.
-## Cuspido pela `Torreta` (mob de parede que "manda fogo"). Visual todo em
-## código: núcleo branco-quente + halo laranja + luz + rasto curto.
+## Cuspido pela `Torreta` (mob de parede que "manda fogo"). Corpo = vórtice
+## de fogo a girar (bdragon1727 "Free Effect and Bullet 16x16", folha
+## laranja -> `assets/sprites/pixel/fx/bola_fogo.png`) + luz.
+
+const TIRA := preload("res://assets/sprites/pixel/fx/bola_fogo.png")
+const FRAMES := 6
 
 @export var velocidade := Vector2(240.0, 0.0)
 @export var dano := 16
@@ -10,8 +14,7 @@ extends Area2D
 @export var duracao := 3.2
 
 var _t := 0.0
-var _nucleo: Polygon2D
-var _halo: Polygon2D
+var _corpo: Sprite2D
 var _luz: PointLight2D
 
 
@@ -28,18 +31,15 @@ func _ready() -> void:
 
 
 func _montar_visual() -> void:
-	_halo = Polygon2D.new()
-	_halo.polygon = _circulo(9.0)
-	_halo.color = Color(1.0, 0.5, 0.15, 0.5)
+	_corpo = Sprite2D.new()
+	_corpo.texture = TIRA
+	_corpo.hframes = FRAMES
+	_corpo.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	var m := CanvasItemMaterial.new()
 	m.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
-	_halo.material = m
-	add_child(_halo)
-
-	_nucleo = Polygon2D.new()
-	_nucleo.polygon = _circulo(4.5)
-	_nucleo.color = Color(1.0, 0.92, 0.7, 1.0)
-	add_child(_nucleo)
+	_corpo.material = m
+	_corpo.scale = Vector2(1.6, 1.6)
+	add_child(_corpo)
 
 	_luz = PointLight2D.new()
 	_luz.texture = _tex_luz()
@@ -47,14 +47,6 @@ func _montar_visual() -> void:
 	_luz.energy = 1.6
 	_luz.scale = Vector2(0.5, 0.5)
 	add_child(_luz)
-
-
-func _circulo(r: float) -> PackedVector2Array:
-	var pts := PackedVector2Array()
-	for i in 12:
-		var a := TAU * float(i) / 12.0
-		pts.append(Vector2(cos(a), sin(a)) * r)
-	return pts
 
 
 static var _TEX: GradientTexture2D
@@ -77,9 +69,8 @@ func _tex_luz() -> GradientTexture2D:
 func _physics_process(dt: float) -> void:
 	position += velocidade * dt
 	_t += dt
-	if _nucleo:
-		var p := 0.85 + 0.15 * sin(_t * 40.0)
-		_nucleo.scale = Vector2(p, p)
+	if _corpo:
+		_corpo.frame = int(_t * 22.0) % FRAMES
 	if _t >= duracao:
 		_apagar()
 
@@ -93,9 +84,10 @@ func _ao_tocar(corpo: Node) -> void:
 func _apagar() -> void:
 	set_physics_process(false)
 	monitoring = false
+	Impacto.rebentar(self, global_position, Color(1.0, 0.6, 0.3), 1.4)
 	var t := create_tween()
 	t.set_parallel(true)
-	if _nucleo:
-		t.tween_property(_nucleo, "scale", Vector2(2.2, 2.2), 0.12)
+	if _corpo:
+		t.tween_property(_corpo, "scale", Vector2(2.4, 2.4), 0.12)
 	t.tween_property(self, "modulate:a", 0.0, 0.12)
 	t.chain().tween_callback(queue_free)

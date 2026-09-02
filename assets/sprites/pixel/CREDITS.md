@@ -123,8 +123,11 @@ CC0 não exige atribuição; fica aqui à mesma por cortesia.
   - `assets/sprites/pixel/fx/impacto_roxo.png` — anel que abre no ponto do
     golpe (`scripts/impacto.gd`); linha 5, colunas 14-17.
   - `assets/sprites/pixel/fx/bala_roxa.png` — orbe roxo a girar (loop de 6
-    frames); linha 0, colunas 30-35. Corpo do `ProjetilKoliani` e cabeça do
-    `KamehamehaKoliani` (substitui os `Polygon2D` procedurais).
+    frames); linha 0, colunas 30-35. Corpo do `ProjetilKoliani`, cabeça do
+    `KamehamehaKoliani` e `ProjetilZeriko` (substitui `Polygon2D`/`ColorRect`).
+  - `assets/sprites/pixel/fx/bola_fogo.png` — o mesmo vórtice na folha
+    laranja (`Fire Effect and Bullet 16x16.png`); corpo da `BolaFogo`
+    (Torreta / cuspidor).
 
 ## piiixl — "Seamless Patterns" (16x16)
 - https://piiixl.itch.io/  (URL exato + licença POR CONFIRMAR pelo Paulo em incoming/LICENSES.md)

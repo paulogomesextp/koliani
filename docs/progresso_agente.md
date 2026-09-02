@@ -1,6 +1,22 @@
 # Progresso do agente `gaming` — campanha dos 30 níveis
 
-## Sessão 2026-09-02 — VFX roxo dos projéteis (v0.9.19)
+## Sessão 2026-09-02 — VFX roxo dos projéteis (v0.9.19 → v0.9.20)
+
+**v0.9.20** — mesmo tratamento aos projéteis dos INIMIGOS (a Koliani
+disparava pixel-art, mas os tiros que voltavam eram polígonos):
+
+- `tools/extrair_efeitos.gd` passa a ler as duas folhas do pack (roxa +
+  laranja); nova tira **`bola_fogo.png`** (vórtice de fogo a girar, 6
+  frames — folha laranja, linha 0, cols 30-35).
+- **`BolaFogo`** (Torreta / cuspidor): `_montar_visual()` troca o
+  núcleo+halo `Polygon2D` por um `Sprite2D` com a `bola_fogo` (ADD,
+  Nearest); `_apagar()` solta um `Impacto.rebentar` tingido de laranja.
+- **`ProjetilZeriko`**: `Nucleo`/`Halo` `ColorRect` → `Sprite2D` com a
+  `bala_roxa` (reaproveita o sprite do tiro da Koliani, em maior); ganha
+  `_estoirar()` com o anel pixel-art (antes só `queue_free`).
+
+---
+
 
 Pendente antigo, desbloqueado agora que o Paulo confirmou a licença do
 pack **bdragon1727 "Free Effect and Bullet 16x16"** (grátis, "name your

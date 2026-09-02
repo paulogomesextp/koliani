@@ -9,6 +9,9 @@ extends Area2D
 
 var _dir := Vector2.RIGHT
 var _tempo_de_vida := 4.0
+var _t := 0.0
+
+@onready var _corpo: Sprite2D = $Corpo
 
 
 func lancar(direcao: Vector2) -> void:
@@ -21,13 +24,20 @@ func _ready() -> void:
 
 func _physics_process(dt: float) -> void:
 	global_position += _dir * velocidade * dt
-	rotation += dt * 6.0
+	_t += dt
+	if _corpo:
+		_corpo.frame = int(_t * 22.0) % 6
 	_tempo_de_vida -= dt
 	if _tempo_de_vida <= 0.0:
-		queue_free()
+		_estoirar()
 
 
 func _ao_bater(corpo: Node) -> void:
 	if corpo is Koliani:
 		corpo.receber_dano(dano, signf(_dir.x))
+	_estoirar()
+
+
+func _estoirar() -> void:
+	Impacto.rebentar(self, global_position, Color(1, 1, 1), 1.8)
 	queue_free()
