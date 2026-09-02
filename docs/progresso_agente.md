@@ -1,5 +1,42 @@
 # Progresso do agente `gaming` — campanha dos 30 níveis
 
+## Sessão 2026-09-02 (b) — desenvolvimento nível a nível (forma + mecânica)
+
+Arranque do passe "nível por nível" pedido pelo Paulo (ele ausente;
+escolhas: tudo progressivo começando na Região I, até acabar a bateria,
+sem playtest build, `PERFIL` re-derivado).
+
+- **`PERFIL` de forma aplicado (backbone dos 30).** Saiu do parqueado
+  (`docs/parqueado/PERFIL_niveis.patch`) mas com a tabela `const PERFIL`
+  **re-derivada de raiz** contra a ordem real de `EstadoJogo.NIVEIS` +
+  `docs/niveis.md` — os comentários do patch estavam deslizados. Cada
+  nível ganha `{v verticalidade, f foco de câmaras, a abertura da banda}`.
+  Também `FOCO_CAMARAS` + `_camara_do_foco()` e as ligações em
+  `_construir` (`_teto_y *= _abertura`, foco "vertical" dobra torre/poço).
+  A seguir: afinar os pesos com o Paulo ao comando.
+- **`tools/verifica_jornada.gd`** — limiar de nº de checkpoints ainda era
+  o de antes da redução de ~80% da v0.9.16 (29 falhas falsas). Passa a
+  exigir só que a jornada não fique sem nenhum checkpoint.
+- **Mecânicas-assinatura em falta repostas:**
+  - **n1 Floresta Putrefata** — `raiz_perigo.gd` ganhou modo `auto`
+    (cicla telegrafo→irrompe→recolhe sozinha, `intervalo`/`fase`); 6
+    raízes `auto` ao longo do chão da sala ("raízes que crescem e
+    desaparecem").
+  - **n6 Prisão dos Condenados** — +3 `PlataformaCorrente`
+    (vertical/pêndulo/horizontal) como rotas com timing (a gimmick é
+    "correntes como plataformas móveis"; só havia plataformas fixas).
+  - **n12 Torre dos Ventos** — repostas as `CorrenteAr` ascendentes
+    entre os degraus (a cena dizia "removida -- a rever").
+- **Verificação:** `run_tests.gd` verde, `verifica_jornada.gd` TUDO OK
+  (carrega e constrói os 30), folha de contacto das 30 paletas revista
+  (coerentes por região). Screenshots `--window --screen 1`.
+- **Por fazer (bateria):** n23 Trem dos Mortos ainda não "anda" (precisa
+  de sistema próprio de comboio, maior); passe de arte nível-a-nível
+  ainda por decidir direção com o Paulo; afinar números do `PERFIL`.
+- **Nota:** `assets/branding/koliani_ref.png` está corrompido ("Not a PNG
+  file") desde o commit `4145e5c` — o import queixa-se mas não bloqueia.
+  Ficheiro do Paulo, não lhe mexi.
+
 ## Sessão 2026-09-02 — VFX roxo dos projéteis (v0.9.19 → v0.9.21)
 
 **v0.9.21** — rebentamento GRANDE na morte dos chefes. Até aqui um chefe

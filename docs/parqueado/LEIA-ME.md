@@ -1,31 +1,27 @@
 # Trabalho parqueado (retomar quando o Paulo disser)
 
-## `PERFIL_niveis.patch` — redesenho de forma dos 30 níveis
+## `PERFIL_niveis.patch` — redesenho de forma dos 30 níveis  ✅ APLICADO (2 set 2026)
 
-Estado: **feito e a passar nos testes** (`tests/run_tests.gd` verde), mas
-**por verificar visualmente** e o Paulo pediu para não mexer nos níveis
-enquanto playtesta. Ficou parqueado, não commitado no `gerador_corredor.gd`.
+**Já não está parqueado.** Aplicado no commit `niveis: perfil de forma por
+nivel (30 caras)` — mas com a tabela `PERFIL` **re-derivada de raiz** contra
+a ordem real de `EstadoJogo.NIVEIS` e a gimmick de cada nível em
+`docs/niveis.md`. Os comentários da 1.ª versão do patch estavam deslizados
+(idx 1/2 trocados, 10-14 a deslizar, 17/18 trocados, 20/24 errados) e os
+triplos `{v,f,a}` podiam ter sido pensados para o nível errado.
 
-O que o patch faz (só `scripts/gerador_corredor.gd`, sem quebrar
-invariantes anti-softlock — `SUBIDA_MAX`, continuidade da espinha,
-checkpoints):
+O `.patch` fica aqui só como registo histórico. O que entrou no
+`scripts/gerador_corredor.gd`:
 
-- `const PERFIL` — 30 entradas, uma "cara" por nível: verticalidade
-  (`v` -1/0/+1, substitui o ciclo rígido `_idx % 3`), foco de câmaras
-  (`f`: salto / combate / maquina / vertical / gauntlet / misto) e
-  abertura da banda vertical (`a` 0.8 apertado … 1.22 amplo).
-- `const FOCO_CAMARAS` + `_camara_do_foco()` — o foco enviesa a seleção
-  de câmaras (~50% no acto do meio) sem furar região/tier.
-- `_construir` lê o `PERFIL`; `_teto_y` passa a multiplicar por `_abertura`;
-  os níveis de foco "vertical" dobram a cadência de torre/poço/pilares.
+- `const PERFIL` — 30 entradas `{v (verticalidade -1/0/+1), f (foco de
+  câmaras), a (abertura da banda vertical 0.8..1.22)}`, uma "cara" por
+  nível, alinhadas à ordem real dos níveis.
+- `const FOCO_CAMARAS` + `_camara_do_foco()` — o foco enviesa ~50% das
+  câmaras do acto do meio sem furar região/tier.
+- `_construir` lê o `PERFIL`; `_teto_y *= _abertura`; foco "vertical" dobra
+  a cadência de torre/poço/pilares.
 
-Retomar:
-```
-git apply docs/parqueado/PERFIL_niveis.patch
-```
-depois **verificar com screenshots** (`tools/shot_dev_nivel.gd` em
-`--window --screen 1`, um por região) e afinar os pesos antes de commit.
+`tools/verifica_jornada.gd` — o limiar de nº de checkpoints (que dava 29
+falhas falsas desde a v0.9.16) também foi corrigido no mesmo commit.
 
-NB: `tools/verifica_jornada.gd` está a dar 29 FALHAS **desde antes** deste
-patch — o limiar de nº de checkpoints não acompanhou a redução de ~80%
-da v0.9.16. É um bug do próprio tool (não da jornada), a corrigir à parte.
+A seguir (fora deste ficheiro): afinar os pesos `{v,f,a}` com o Paulo ao
+comando, e continuar o passe nível-a-nível (mecânica-assinatura + arte).
