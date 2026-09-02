@@ -1,5 +1,29 @@
 # Progresso do agente `gaming` — campanha dos 30 níveis
 
+## Sessão 2026-09-02 (d) — playtest fixes + passe de arte
+
+Depois do playtest do Paulo ("os níveis parecem-me bem"):
+
+- **3 bugs do playtest** (`85e19bb`): (a) bosses "desativados" — o combate
+  novo chamava `receber_dano(x,dir,critico)` mas os 31 `chefe_*.gd` só
+  tinham 2 args → erro de arg-count → chefe não levava dano. `critico`
+  acrescentado a todas as assinaturas + `chefe_base` aplica x1.5. (b)
+  pisão nos inimigos = pulo automático ALTO (`aplicar_impulso`, 1.4x). (c)
+  fogueiras dos checkpoints assentam sempre na plataforma (`_pousar`
+  reescrito, varre de -80 a +520 e repete em call_deferred).
+- **Elites lêem-se como elites** (`d0ee74a`, `9f14f5c`): DECAL de chão a
+  brilhar sob os pés + barra de vida ao 1.º golpe + rebentamento grande.
+  `@export var elite` em `DemonioBase`, `elite = true` nos 29 nós Elite*.
+- **Tamanho dos inimigos normalizado** (`3bd6762`): `_normalizar_escala()`
+  mede o corpo opaco do idle e ajusta `_anim.scale` p/ ~48 px, seja qual
+  for a fonte (LuizMelo 150px vs 0x72 16px). Antes um goblin era ~2x um
+  chort. Densidade de pixel ainda varia; o TAMANHO deixa de variar.
+- **Líquido mortal escuro** (`3e35c44`): o corpo do líquido (menos a lava)
+  fica escuro/puxado para o vazio -- só a linha de água acesa dá o
+  perigo. Antes o verde do ácido parecia relva.
+- **`atmosfera.gd` `_frente_ambiente()`** (`9f14f5c`): silhuetas finas
+  translúcidas a pender do topo -- profundidade. TENTATIVO, a validar.
+
 ## Sessão 2026-09-02 (c) — REGIÕES NOVAS: os 30 níveis refeitos à mão
 
 O Paulo, depois da comparação franca com o Dead Cells, pediu "faça regiões
