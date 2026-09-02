@@ -103,19 +103,26 @@ func _afinar_dificuldade() -> void:
 	if _ja_derrotado:
 		return
 	var idx := float(clampi(EstadoJogo.indice_nivel, 0, 29))
-	var mult_vida := 2.4 + 0.9 * (idx / 29.0)   # N1 x2.4 -> N30 x3.3
+	# a Koliani acerta ~3x mais sem a janela EXPOSTA -> vida bem para cima
+	var mult_vida := 3.2 + 1.6 * (idx / 29.0)   # N1 x3.2 -> N30 x4.8
 	vida = int(round(vida * mult_vida))
 	_vida_maxima = maxi(vida, 1)
 	# vários chefes usam `_vida_max` para os limiares de fase -- acompanha
 	if "_vida_max" in self:
 		set("_vida_max", vida)
 	vida_mudou.emit(vida, _vida_maxima)
-	# telégrafos e recuperações mais curtos = menos tempo para respirar
-	for nome in ["dur_tel", "dur_telegrafo", "dur_recupera", "dur_baque"]:
+	# telégrafos mais curtos, mas com CHÃO de 0.3s -- têm de continuar a
+	# dar para ler. As recuperações podem descer mais.
+	for nome in ["dur_tel", "dur_telegrafo"]:
 		if nome in self:
 			var v: float = get(nome)
 			if v > 0.05:
-				set(nome, v * 0.82)
+				set(nome, maxf(v * 0.85, 0.3))
+	for nome in ["dur_recupera", "dur_baque"]:
+		if nome in self:
+			var v: float = get(nome)
+			if v > 0.05:
+				set(nome, v * 0.8)
 
 
 var _arena_tentativas := 0
