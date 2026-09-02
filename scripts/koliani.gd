@@ -920,7 +920,7 @@ func _flash_branco() -> void:
 ## (2 set 2026), por isso o over-bright sobe bastante e a tinta da
 ## armadura pesa ainda menos, para ela ler sempre mais clara que o
 ## cenário à volta.
-const _BRILHO_CORPO := Color(1.55, 1.55, 1.6)
+const _BRILHO_CORPO := Color(1.9, 1.85, 2.0)
 
 func _tint_armadura() -> Color:
 	if RIG == "gothic":
