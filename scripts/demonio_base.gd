@@ -300,6 +300,7 @@ func _ready() -> void:
 			_mat.set_shader_parameter("rim_cor", cor_rim)
 	if _anim:
 		_montar_frames()
+		_normalizar_escala()   # todas as espécies ao mesmo tamanho no ecrã
 		_anim.play("idle")
 		_calibrar_pes()
 	if elite:
@@ -308,6 +309,32 @@ func _ready() -> void:
 
 ## Espécies que voam -- não se alinham os pés ao chão.
 const ESPECIES_VOAM := ["olho", "abutre"]
+
+## Altura-alvo (px) do CORPO opaco do inimigo no ecrã -- normaliza as
+## espécies, que vêm de packs com densidades diferentes (LuizMelo 150px vs
+## 0x72 16px). Sem isto um goblin era ~2x um chort. A Koliani mede ~40 px
+## no ecra; os bichos comuns ficam um nada maiores (leem-se como ameaca).
+const ALTURA_ALVO_INIMIGO := 48.0
+
+## Mede o corpo opaco do frame idle e ajusta `_anim.scale` para ele render
+## a ~`ALTURA_ALVO_INIMIGO` px -- todas as espécies ao mesmo tamanho.
+func _normalizar_escala() -> void:
+	if _anim == null or _anim.sprite_frames == null:
+		return
+	if not _anim.sprite_frames.has_animation("idle"):
+		return
+	var tex := _anim.sprite_frames.get_frame_texture("idle", 0)
+	if tex == null:
+		return
+	var img := tex.get_image()
+	if img == null:
+		return
+	var r := img.get_used_rect()
+	if r.size.y <= 4:
+		return
+	var alvo := ALTURA_ALVO_INIMIGO * (0.86 if especie in ESPECIES_VOAM else 1.0)
+	var k := clampf(alvo / float(r.size.y), 0.25, 2.2)
+	_anim.scale = Vector2(k, k)
 
 ## Alinha os PÉS do sprite com a linha de chão da colisão. Mede os pixels
 ## opacos do frame idle (há muito espaço transparente à volta do bicho na
