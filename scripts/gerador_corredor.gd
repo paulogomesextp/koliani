@@ -128,6 +128,14 @@ var _cont_i := 0
 const DIST_CHECKPOINT := 4000.0
 var _ultimo_check_x := -1.0e9
 
+## Perigo-no-vão em RAJADAS de um só tipo (pêndulo OU serra OU fogo), não
+## um sorteio novo a cada vão -- era isso que fazia a jornada sentir-se
+## "tudo misturado sem lógica" a dificuldade alta (um vão de pêndulo, o
+## seguinte de serra, o seguinte de fogo, sem padrão nenhum). Agora cada
+## rajada dura vários vãos seguidos antes de trocar de mecânica.
+var _perigo_tipo := -1
+var _perigo_restante := 0
+
 ## Ritmo (pegada Dead Cells): alterna câmaras de TENSÃO (gauntlets, torres)
 ## com câmaras de ALÍVIO (`descanso` -- plataforma larga limpa + checkpoint).
 var _camaras := 0
@@ -422,9 +430,15 @@ func _plat_movel_spine(par: Node2D, pos: Vector2, w: float) -> void:
 
 
 ## Perigo num vão (pêndulo, serra ou fogo) -- posicionado ENTRE plataformas,
-## acima do líquido, sem tapar a aterragem.
+## acima do líquido, sem tapar a aterragem. Vem em rajadas de um só tipo
+## (ver `_perigo_tipo`/`_perigo_restante`) em vez de sortear tipo novo a
+## cada vão.
 func _perigo_no_vao(par: Node2D, x: float, y: float) -> void:
-	match _rng.randi() % 3:
+	if _perigo_restante <= 0:
+		_perigo_tipo = _rng.randi() % 3
+		_perigo_restante = 3 + _rng.randi() % 3  # rajada de 3-5 vãos seguidos
+	_perigo_restante -= 1
+	match _perigo_tipo:
 		0:
 			var pe := PENDULO.instantiate()
 			var comp := _rng.randf_range(150.0, 210.0)
