@@ -34,6 +34,9 @@ func _ready() -> void:
 			(n as CanvasItem).visible = false
 	_montar_visual()
 	_pousar()
+	# repete no fim do frame -- garante que as plataformas já estão no
+	# espaço de física (senão a fogueira ficava a flutuar em alguns níveis).
+	_pousar.call_deferred()
 	if EstadoJogo.checkpoint.is_equal_approx(global_position):
 		_ativar(true)
 
@@ -156,14 +159,18 @@ func _pousar() -> void:
 	if _base == null:
 		return
 	var espaco := get_world_2d().direct_space_state
-	var params := PhysicsRayQueryParameters2D.create(
-		global_position, global_position + Vector2(0.0, 160.0), 1)
+	# começa BEM acima do nó (apanha checkpoints ligeiramente enterrados na
+	# plataforma) e varre fundo (níveis à mão com alturas variadas).
+	var de := global_position + Vector2(0.0, -80.0)
+	var params := PhysicsRayQueryParameters2D.create(de, de + Vector2(0.0, 520.0), 1)
 	params.collide_with_areas = false
 	var hit := espaco.intersect_ray(params)
-	var queda := 46.0
 	if not hit.is_empty():
-		queda = (hit["position"] as Vector2).y - global_position.y
-	_base.position.y = maxf(0.0, queda) - 16.0
+		# a fogueira (pedras/lenha desenhadas a ~y+16 local) assenta a base
+		# EM CIMA da superfície -- nunca enterrada nem a flutuar.
+		_base.position.y = (hit["position"] as Vector2).y - global_position.y - 15.0
+	else:
+		_base.position.y = 30.0  # sem chão por baixo -- fallback discreto
 
 
 func _escalar(pts: PackedVector2Array, f: float) -> PackedVector2Array:

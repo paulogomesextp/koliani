@@ -371,7 +371,7 @@ func _ao_tocar(corpo: Node) -> void:
 		corpo.receber_dano(dano, signf(corpo.global_position.x - global_position.x))
 
 
-func receber_dano(quantidade: int, dir_empurrao: float = 0.0) -> void:
+func receber_dano(quantidade: int, dir_empurrao: float = 0.0, critico := false) -> void:
 	if _ja_derrotado:
 		return
 	_garantir_vida_maxima()
@@ -388,9 +388,14 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0) -> void:
 			_dano_recente = 0.85  # abre a janela EXPOSTA
 			_mostrar_texto_quebrado()
 		return
-	vida -= quantidade
+	var q := quantidade
+	if critico:
+		# golpe critico no chefe (pos-rolamento / pelas costas / vulneravel)
+		q = int(round(q * 1.5))
+		Impacto.rebentar(self, global_position + Vector2(0.0, -20.0 * maxf(0.8, escala_visual)), Color(1, 1, 1), 3.4)
+	vida -= q
 	_dano_recente = 0.85  # golpe entrou -> janela EXPOSTA -> esconde o escudo
-	global_position.x += dir_empurrao * 3.0
+	global_position.x += dir_empurrao * (4.0 if critico else 3.0)
 	vida_mudou.emit(maxi(vida, 0), _vida_maxima)
 	if vida <= 0:
 		_ja_derrotado = true

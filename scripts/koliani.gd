@@ -66,12 +66,12 @@ const JANELA_COMBO := 0.42
 ## meio antes de terminar, sobretudo o 3.º hit (9 frames, o mais longo).
 const DUR_COMBO := [0.18, 0.2, 0.3, 0.19]
 const I_FRAMES := 0.6
-## Ressalto ao cair em cima de um inimigo (Mario-style): o pulo automático a
-## seguir ao "pisão" é sempre um SALTO NORMAL (mesma força de `saltar`),
-## partindo da altura a que o golpe acertou -- previsível, encadeia saltos
-## de ar (ver `_mov.saltos_dados = 0` a seguir) sem dar mais altura que um
-## salto a sério.
-const STOMP_RESSALTO := Movimento.FORCA_SALTO
+## Ressalto ao cair em cima de um inimigo (Mario-style): pulo AUTOMÁTICO e
+## ALTO -- não é preciso carregar em nada e sobe mais que um salto normal
+## (pedido do Paulo). Vai por `aplicar_impulso` para o "corte de salto" do
+## Movimento não o engolir se o botão não estiver premido. Devolve os
+## saltos de ar (encadeia pisões).
+const STOMP_RESSALTO := Movimento.FORCA_SALTO * 1.4
 ## Defesa (habilidade "escudo"): anda-se devagar de escudo erguido; um
 ## ataque que venha de frente é bloqueado (sem dano) com um som subtil.
 const VEL_DEFESA := 70.0
@@ -668,8 +668,8 @@ func _physics_process(dt: float) -> void:
 				continue
 			var crit_stomp: bool = e.has_method("esta_vulneravel") and e.esta_vulneravel()
 			e.receber_dano(_dano_golpe(), 0.0, crit_stomp)
-			velocity.y = -STOMP_RESSALTO
-			_mov.saltos_dados = 0  # o ressalto devolve os saltos de ar todos
+			# pulo automático ALTO, imune ao corte de salto (ver aplicar_impulso)
+			aplicar_impulso(Vector2(0.0, -STOMP_RESSALTO), true)
 			_invulneravel = maxf(_invulneravel, 0.3)
 			_stomp_cd = 0.22
 			_pop = 1.0
@@ -693,8 +693,7 @@ func _physics_process(dt: float) -> void:
 		rq.exclude = [self]
 		var ph := esp.intersect_ray(rq)
 		if not ph.is_empty() and (ph["collider"] as Node).is_in_group("pogavel"):
-			velocity.y = -STOMP_RESSALTO
-			_mov.saltos_dados = 0
+			aplicar_impulso(Vector2(0.0, -STOMP_RESSALTO), true)
 			_invulneravel = maxf(_invulneravel, 0.35)
 			_stomp_cd = 0.22
 			_pop = 1.0

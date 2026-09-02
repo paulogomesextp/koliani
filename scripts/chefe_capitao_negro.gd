@@ -292,7 +292,7 @@ func _mostrar_nucleo(v: bool) -> void:
 			brilho.visible = v
 
 
-func receber_dano(quantidade: int, dir_empurrao: float = 0.0) -> void:
+func receber_dano(quantidade: int, dir_empurrao: float = 0.0, critico := false) -> void:
 	if _ja_derrotado:
 		return
 	provocar()
@@ -312,7 +312,7 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0) -> void:
 			_sprite.modulate = Color(1.3, 1.2, 1.4)
 			create_tween().tween_property(_sprite, "modulate", Color(1, 1, 1), 0.12)
 		return
-	super.receber_dano(int(round(quantidade * 2.0)), dir_empurrao)
+	super.receber_dano(int(round(quantidade * 2.0)), dir_empurrao, critico)
 
 
 ## --- utilitários --------------------------------------------------
