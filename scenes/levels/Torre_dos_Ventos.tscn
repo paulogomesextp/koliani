@@ -1,9 +1,10 @@
-[gd_scene load_steps=13 format=3 uid="uid://bkolianitorreventos12"]
+[gd_scene load_steps=14 format=3 uid="uid://bkolianitorreventos12"]
 
 ; Região III / nível 12 -- Torre dos Ventos.
-; Subida por plataformas suspensas em escada (a mecânica das correntes de
-; ar foi removida -- a rever). Arena aberta no cimo com Aerion, o Cavaleiro
-; Alado -- nunca pousa; lanças, tornados que empurram, mergulhos, pisão.
+; Subida por plataformas suspensas com CORRENTES DE AR ascendentes
+; (mecanica-assinatura: "correntes de ar para alcancar plataformas
+; distantes") entre os degraus. Arena aberta no cimo com Aerion, o
+; Cavaleiro Alado -- nunca pousa; lancas, tornados, mergulhos, pisao.
 
 [ext_resource type="PackedScene" uid="uid://bkolianiactor01" path="res://scenes/actors/Koliani.tscn" id="1_kol"]
 [ext_resource type="PackedScene" uid="uid://bdemoniobase01" path="res://scenes/actors/DemonioBase.tscn" id="2_dem"]
@@ -15,6 +16,7 @@
 [ext_resource type="PackedScene" uid="uid://bkolianiatmosfera01" path="res://scenes/fx/Atmosfera.tscn" id="8_atm"]
 [ext_resource type="PackedScene" uid="uid://bkolianiplataforma01" path="res://scenes/actors/Plataforma.tscn" id="9_pl"]
 [ext_resource type="PackedScene" uid="uid://bkolianiserra01" path="res://scenes/actors/Serra.tscn" id="11_serra"]
+[ext_resource type="PackedScene" uid="uid://bkolianicorrentear12" path="res://scenes/actors/CorrenteAr.tscn" id="12_ca"]
 
 [sub_resource type="RectangleShape2D" id="rs_chk"]
 size = Vector2(40, 80)
@@ -88,6 +90,19 @@ altura_visual = 96.0
 position = Vector2(1150, 250)
 percurso = Vector2(220, 0)
 tempo = 1.9
+
+; correntes de ar ascendentes entre os degraus da subida (mecanica-assinatura)
+[node name="Ar1" parent="." instance=ExtResource("12_ca")]
+position = Vector2(650, 500)
+
+[node name="Ar2" parent="." instance=ExtResource("12_ca")]
+position = Vector2(1030, 400)
+
+[node name="Ar3" parent="." instance=ExtResource("12_ca")]
+position = Vector2(1350, 330)
+
+[node name="Ar4" parent="." instance=ExtResource("12_ca")]
+position = Vector2(2000, 430)
 
 [node name="LuzInicio" type="PointLight2D" parent="."]
 position = Vector2(400, 600)

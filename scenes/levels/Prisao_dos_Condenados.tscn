@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3 uid="uid://bkolianiprisao01"]
+[gd_scene load_steps=21 format=3 uid="uid://bkolianiprisao01"]
 
 ; Mundo 2 -- Prisao dos Condenados.
 ; Masmorra FECHADA (CascaMasmorra: tecto + paredes + fundo em tiles 0x72
@@ -16,6 +16,7 @@
 [ext_resource type="PackedScene" uid="uid://bkolianiplataforma01" path="res://scenes/actors/Plataforma.tscn" id="9_pl"]
 [ext_resource type="PackedScene" uid="uid://bkolianifogo01" path="res://scenes/actors/Fogo.tscn" id="10_fogo"]
 [ext_resource type="PackedScene" uid="uid://bkolianicascamasmorra01" path="res://scenes/actors/CascaMasmorra.tscn" id="11_casca"]
+[ext_resource type="PackedScene" uid="uid://bkolianiplatcorrente06" path="res://scenes/actors/PlataformaCorrente.tscn" id="12_corr"]
 
 [sub_resource type="RectangleShape2D" id="rs_chao_i"]
 size = Vector2(900, 48)
@@ -150,6 +151,33 @@ tamanho = Vector2(760, 48)
 altura_visual = 92
 cor_base = Color(0.2, 0.24, 0.32, 1)
 cor_topo = Color(0.42, 0.54, 0.68, 1)
+
+; correntes como plataformas moveis -- mecanica-assinatura da regiao II
+; ("correntes como plataformas moveis"). Rotas alternativas: as plataformas
+; fixas continuam la, estas dao um caminho por cima com timing.
+[node name="CorrenteVert" parent="." instance=ExtResource("12_corr")]
+position = Vector2(720, 560)
+modo = "vertical"
+amplitude = 80.0
+periodo = 3.2
+largura = 150.0
+
+[node name="CorrentePend" parent="." instance=ExtResource("12_corr")]
+position = Vector2(1150, 540)
+modo = "pendulo"
+amplitude = 32.0
+periodo = 2.8
+comprimento = 150.0
+fase = 0.9
+largura = 130.0
+
+[node name="CorrenteHoriz" parent="." instance=ExtResource("12_corr")]
+position = Vector2(2300, 312)
+modo = "horizontal"
+amplitude = 120.0
+periodo = 3.4
+fase = 1.6
+largura = 140.0
 
 [node name="FogoA" parent="." instance=ExtResource("10_fogo")]
 position = Vector2(330, 636)
