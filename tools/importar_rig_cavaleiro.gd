@@ -43,10 +43,16 @@ const MAPA := {
 	"morte": "Dying_KG_1.png",
 }
 
-## Gradação para a paleta da Koliani: o vermelho do saiote/faixa vira
-## magenta e o metal arrefece para violeta. Mexe só na cor, não no desenho.
-const MAGENTA := Color(1.0, 0.28, 0.85)
-const FRIO := Color(0.82, 0.80, 1.02)
+## Paleta-alvo = a folha de referência que o Paulo mandou (2 set 2026):
+## guerreira gótica grunge -- base escura NEUTRA + UM roxo-ameixa
+## empoeirado (a capa esfarrapada) + pele quente/tan + realces creme.
+## NADA de magenta berrante nem rebordo néon. Ver
+## `assets/branding/koliani_ref.md` (e `koliani_ref.png` se o Paulo o guardar).
+const REF_CAPA := Color(0.42, 0.30, 0.50)    # roxo-ameixa da capa (SEMPRE escuro)
+const REF_CABELO := Color(0.30, 0.22, 0.17)  # castanho escuro morno (era azul)
+const REF_COURO := Color(0.60, 0.585, 0.63)  # multiplicador p/ couro/metal -> near-black
+const REF_PELE := Color(0.95, 0.88, 0.82)    # multiplicador p/ manter a pele quente
+const REF_REALCE := Color(0.87, 0.81, 0.92)  # branco-lavanda p/ gume/brilhos
 
 
 func _init() -> void:
@@ -136,8 +142,13 @@ func _ensombrar(img: Image) -> void:
 				img.set_pixel(x, y, img.get_pixel(x, y).lerp(Color(1.0, 0.3, 0.9), 0.7))
 
 
-## Vermelhos -> magenta; cinzentos do metal -> violeta frio. Guarda o tom da
-## pele (que também é avermelhada mas muito menos saturada).
+## 1.ª passagem -- troca os MATIZES do rig fonte para os da referência:
+##   cabelo AZUL      -> castanho escuro morno
+##   roupa VERMELHA   -> capa roxo-ameixa (sempre escura)
+##   armadura CINZA   -> couro near-black neutro
+##   pele             -> mantém-se quente/tan
+##   quase-branco     -> creme-lavanda (gume / brilhos)
+## Só cor, o desenho fica igual.
 func _graduar(img: Image) -> void:
 	for y in img.get_height():
 		for x in img.get_width():
@@ -146,78 +157,50 @@ func _graduar(img: Image) -> void:
 				continue
 			var maxc := maxf(c.r, maxf(c.g, c.b))
 			var minc := minf(c.r, minf(c.g, c.b))
+			var lum := c.r * 0.30 + c.g * 0.59 + c.b * 0.11
 			var sat := 0.0 if maxc <= 0.0 else (maxc - minc) / maxc
-			var vermelho := c.r > c.g * 1.5 and c.r > c.b * 1.25 and sat > 0.45
-			var pele := c.r > 0.72 and c.g > 0.55 and c.b > 0.45
-			if vermelho and not pele:
-				# mantém o brilho do pixel, troca-lhe o matiz
-				var lum := maxc
-				c = Color(MAGENTA.r * lum, MAGENTA.g * lum, MAGENTA.b * lum, c.a)
-			elif sat < 0.25:
-				# metal/pedra: arrefecer sem escurecer
-				c = Color(
-					clampf(c.r * FRIO.r, 0.0, 1.0),
-					clampf(c.g * FRIO.g, 0.0, 1.0),
-					clampf(c.b * FRIO.b, 0.0, 1.0), c.a)
+			var pele := c.r > 0.7 and c.g > 0.42 and c.g < c.r and c.b > 0.36 and c.b <= c.g + 0.14
+			var azul := c.b > c.r * 1.12 and c.b >= c.g * 1.02 and sat > 0.2
+			var vermelho := c.r > c.g * 1.35 and c.r > c.b * 1.15 and sat > 0.32
+			if pele:
+				c = Color(clampf(c.r * REF_PELE.r, 0.0, 1.0),
+					clampf(c.g * REF_PELE.g, 0.0, 1.0),
+					clampf(c.b * REF_PELE.b, 0.0, 1.0), c.a)
+			elif maxc > 0.88 and sat < 0.14:
+				# realce quase branco -> creme-lavanda (não deixar branco puro)
+				c = Color(REF_REALCE.r * maxc, REF_REALCE.g * maxc, REF_REALCE.b * maxc, c.a)
+			elif azul:
+				var b := 0.35 + 0.95 * lum          # cabelo azul -> castanho
+				c = Color(REF_CABELO.r * b, REF_CABELO.g * b, REF_CABELO.b * b, c.a)
+			elif vermelho:
+				var b := 0.42 + 0.7 * lum           # roupa vermelha -> ameixa, escura
+				c = Color(REF_CAPA.r * b, REF_CAPA.g * b, REF_CAPA.b * b, c.a)
+			elif sat < 0.3:
+				# couro / metal / cinza -> escurece p/ near-black neutro
+				c = Color(clampf(lum * REF_COURO.r, 0.0, 1.0),
+					clampf(lum * REF_COURO.g, 0.0, 1.0),
+					clampf(lum * REF_COURO.b * 1.05, 0.0, 1.0), c.a)
 			img.set_pixel(x, y, c)
 
 
-## 2.ª passagem "MAIS GÓTICA" (pedido do Paulo, 2 set 2026): a Koliani do
-## `key_art` é uma silhueta escura ao luar -- roxo profundo, sombras quase
-## pretas, magenta só no gume e nos brilhos, pele pálida sem calor. Corre
-## DEPOIS do `_graduar` (que já trocou os matizes); aqui só se baixa a luz,
-## se dessatura o grosso, se afundam as sombras e se acendem as arestas.
-## Toque LEVE -- a Koliani do key_art continua a ler-se (rosto, camadas,
-## rabo-de-cavalo, botas), só que mais escura e ao luar. Não é a Sombria:
-## nada de a esmagar num vulto preto.
-const _GOT_SOMBRA := Color(0.12, 0.09, 0.18)    # p/ onde vão as sombras
-const _GOT_ACESO := Color(1.0, 0.40, 0.92)      # gume / brilhos magenta
-const _GOT_LUM := 0.78                          # multiplicador geral de luz
-const _GOT_DESSAT := 0.35                        # quanto se puxa a cor p/ cinza-violeta
+## 2.ª passagem -- mood grade LEVE: baixa a luz geral e afunda as sombras
+## para um escuro NEUTRO. A referência não tem rebordo néon nem magenta
+## chapado, por isso aqui não se pinta nada -- só se ajusta o valor.
+const _GOT_SOMBRA := Color(0.10, 0.09, 0.13)
+const _GOT_LUM := 0.9
 
 func _goticar(img: Image) -> void:
-	var w := img.get_width()
-	var h := img.get_height()
-	var orig := img.duplicate() as Image
-	for y in h:
-		for x in w:
-			var c := img.get_pixel(x, y)   # já passou pelo _graduar
-			var a := c.a
-			if a <= 0.0:
+	for y in img.get_height():
+		for x in img.get_width():
+			var src := img.get_pixel(x, y)
+			if src.a <= 0.0:
 				continue
-			var lum := c.r * 0.30 + c.g * 0.59 + c.b * 0.11
-			var maxc := maxf(c.r, maxf(c.g, c.b))
-			var minc := minf(c.r, minf(c.g, c.b))
-			var sat := 0.0 if maxc <= 0.0 else (maxc - minc) / maxc
-			if lum > 0.82 and (c.r >= c.b or sat > 0.35):
-				# gume / brilhos -> deixa acender em magenta (não escurece)
-				var t := clampf((lum - 0.82) / 0.18, 0.0, 1.0)
-				var novo := _GOT_ACESO.lerp(Color(1, 1, 1), t)
-				novo.a = a
-				img.set_pixel(x, y, novo)
-				continue
-			# 1) dessatura um pouco para cinza-violeta frio
-			var cinza := Color(lum, lum, lum * 1.12, 1.0)
-			c = c.lerp(cinza, _GOT_DESSAT)
-			# 2) baixa a luz geral e afunda as sombras para violeta escuro
-			c = c * _GOT_LUM
-			var escuro := 1.0 - clampf(lum * 1.3, 0.0, 1.0)   # 1 nas sombras, 0 nos claros
-			c = c.lerp(_GOT_SOMBRA, escuro * 0.55)
-			c.a = a
+			var lum := src.r * 0.30 + src.g * 0.59 + src.b * 0.11
+			var c := src * _GOT_LUM
+			var escuro := 1.0 - clampf(lum * 1.5, 0.0, 1.0)
+			c = c.lerp(_GOT_SOMBRA, escuro * 0.4)
+			c.a = src.a
 			img.set_pixel(x, y, c)
-	# fio magenta ténue na silhueta -- recorta contra os fundos escuros
-	for y in h:
-		for x in w:
-			if orig.get_pixel(x, y).a <= 0.0:
-				continue
-			var borda := false
-			for d: Vector2i in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
-				var p := Vector2i(x + d.x, y + d.y)
-				if p.x < 0 or p.y < 0 or p.x >= w or p.y >= h or orig.get_pixel(p.x, p.y).a <= 0.0:
-					borda = true
-					break
-			if borda:
-				img.set_pixel(x, y, img.get_pixel(x, y).lerp(Color(0.9, 0.32, 0.85), 0.3))
 
 
 ## Folha de contacto x3 com todos os estados empilhados (só para olhar).
