@@ -121,6 +121,10 @@ func _medir_arena() -> void:
 
 
 ## Trava o chefe dentro das bordas da arena. Chamado todo o frame.
+## X: nunca passa das pontas da plataforma. Y: nunca desce abaixo da
+## superfície (bloqueia o "chefe por baixo da plataforma"). Os chefes
+## voadores pairam ACIMA da superfície, por isso o tecto em Y não lhes
+## toca.
 func _prender_na_arena() -> void:
 	if not _arena_ok or _ja_derrotado:
 		return
@@ -132,6 +136,10 @@ func _prender_na_arena() -> void:
 		global_position.x = _arena_dir
 		if velocity.x > 0.0:
 			velocity.x = 0.0
+	if global_position.y > _arena_topo + 6.0:
+		global_position.y = _arena_topo + 6.0
+		if velocity.y > 0.0:
+			velocity.y = 0.0
 
 
 ## Feito em deferred: o `_ready` do chefe concreto já correu e definiu a
