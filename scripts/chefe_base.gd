@@ -315,7 +315,8 @@ func _explodir_derrotado() -> void:
 		var a := TAU * float(k) / 16.0
 		pts.append(Vector2(cos(a), sin(a)) * 60.0)
 	flash.polygon = pts
-	flash.color = Color(1, 1, 1, 0.9)
+	flash.color = cor_rim.lerp(Color(1, 1, 1), 0.7)
+	flash.color.a = 0.9
 	var mat := CanvasItemMaterial.new()
 	mat.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
 	flash.material = mat

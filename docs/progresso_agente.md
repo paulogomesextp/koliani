@@ -11,6 +11,12 @@ morte (dano letal, `_cair_com_falas`, rede de segurança do fosso). Sem
 pack novo — reusa o `impacto_roxo` tingido. `soltar_estilhacos()`
 continua a tratar da poeira.
 
+**v0.9.22** — consistência do feedback de morte: os inimigos comuns SEM
+animação de morte (`_anim == null`, os desenhados só com `_sprite`)
+davam só a poeira; agora levam o mesmo `Impacto.rebentar` da morte com
+animação. E o clarão do rebentamento do chefe passou a ser tingido pela
+`cor_rim` (era branco puro, lia mal).
+
 
 **v0.9.20** — mesmo tratamento aos projéteis dos INIMIGOS (a Koliani
 disparava pixel-art, mas os tiros que voltavam eram polígonos):

@@ -519,6 +519,9 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0) -> void:
 		if _anim:
 			_morrer_anim()
 		else:
+			# mesmo "pop" da morte com animação, para o feedback ser igual
+			Impacto.rebentar(self, global_position + Vector2(0.0, -10.0),
+				cor_rim.lerp(Color(1, 1, 1), 0.35), 3.0)
 			soltar_estilhacos()
 			queue_free()
 	else:
