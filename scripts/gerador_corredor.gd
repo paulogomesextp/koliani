@@ -460,8 +460,8 @@ func _construir() -> void:
 		# inimigo ocasional na plataforma
 		if _rng.randf() < (0.06 + 0.34 * _dif) * intens:
 			_inimigo_em(par, Vector2(x, y - 30.0))
-		# decoração
-		_decorar(par, x, y)
+		# decoração: os props de CHÃO vêm agora da própria Plataforma
+		# (`plataforma.gd::_decorar`, com semente vinda da posição)
 		if passos % 6 == 0:
 			_coluna_fundo(par, x + _rng.randf_range(-120.0, 120.0))
 		# toque de assinatura do nível (gimmick do docs/niveis.md)
@@ -710,30 +710,40 @@ func _perigo_no_vao(par: Node2D, x: float, y: float) -> void:
 			par.add_child(f)
 
 
-## Props decorativos (0x72 DungeonTileset II, CC0) -- ["ficheiro", escala].
-## NB: os `wall_banner_{red,blue}` saíram daqui (2 set 2026) -- são estandartes
-## de PAREDE e ficavam deitados nas plataformas com um ar de "caixa" estranho.
-const PROPS_CHAO := [
-	["crate.png", 3.2], ["skull.png", 3.0],
-]
-const PROP_COLUNA := preload("res://assets/sprites/pixel/props/column.png")
+## Catálogo de decoração da região (`tools/gerar_deco.py`), lido uma vez.
+## Antes daqui saíam sempre os MESMOS três props do 0x72 (caixa, crânio,
+## coluna) em todas as seis regiões -- era metade da razão de a jornada
+## parecer igual do nível 1 ao 30.
+var _deco_cache: Dictionary = {}
 
 
-## Prop pequeno pousado numa plataforma da espinha.
-func _decorar(par: Node2D, x: float, y: float) -> void:
-	if _rng.randf() > 0.3:
-		return
-	var d: Array = PROPS_CHAO[_rng.randi() % PROPS_CHAO.size()]
-	var tex: Texture2D = load("res://assets/sprites/pixel/props/%s" % d[0])
-	if tex == null:
-		return
-	var s := Sprite2D.new()
-	s.texture = tex
-	s.scale = Vector2(d[1], d[1]) * _rng.randf_range(0.85, 1.15)
-	s.z_index = -1
-	s.position = Vector2(x + _rng.randf_range(-24.0, 24.0),
-		y - 9.0 - tex.get_height() * s.scale.y * 0.5)
-	par.add_child(s)
+func _bioma_atual() -> String:
+	var atm := get_tree().get_first_node_in_group("atmosfera")
+	if atm and "bioma" in atm:
+		return String(atm.bioma)
+	return "floresta"
+
+
+## Props da região com o assento `onde` ("chao" ou "parede").
+func _props(onde: String) -> Array:
+	var bioma := _bioma_atual()
+	var chave := "%s|%s" % [bioma, onde]
+	if _deco_cache.has(chave):
+		return _deco_cache[chave]
+	var cat: Dictionary = {}
+	var cam := "res://assets/sprites/pixel/deco/deco.json"
+	if FileAccess.file_exists(cam):
+		var d: Variant = JSON.parse_string(FileAccess.get_file_as_string(cam))
+		if d is Dictionary:
+			cat = d
+	var fora: Array = []
+	var lista: Variant = cat.get(bioma, [])
+	if lista is Array:
+		for p in lista:
+			if p is Dictionary and p.get("onde", "") == onde:
+				fora.append("res://assets/sprites/pixel/deco/%s/%s.png" % [bioma, p["nome"]])
+	_deco_cache[chave] = fora
+	return fora
 
 
 ## Toque de assinatura do nível na jornada (ver `ASSIN_NIVEL`). Só perigos
@@ -780,15 +790,28 @@ func _assinatura_nivel(par: Node2D, x: float, y: float, intens: float) -> void:
 			par.add_child(l)
 
 
-## Coluna alta a subir do líquido, atrás dos atores (profundidade).
+## Volume alto a subir do líquido, atrás dos atores (profundidade): coluna,
+## árvore morta, casario, estátua -- o que a região tiver. Antes era sempre
+## a MESMA coluna do 0x72, em todos os níveis das seis regiões.
 func _coluna_fundo(par: Node2D, x: float) -> void:
+	var lista := _props("parede")
+	if lista.is_empty():
+		return
+	var cam: String = lista[_rng.randi() % lista.size()]
+	var tex: Texture2D = load(cam) if ResourceLoader.exists(cam) else null
+	if tex == null:
+		return
+	# tudo à mesma ALTURA aparente (~260-460 px): os packs vêm a resoluções
+	# muito diferentes e sem isto uma casa ficava do tamanho de uma vela
+	var alvo := _rng.randf_range(260.0, 460.0)
+	var esc: float = clampf(alvo / maxf(1.0, float(tex.get_height())), 0.8, 7.0)
 	var s := Sprite2D.new()
-	s.texture = PROP_COLUNA
-	var esc := _rng.randf_range(3.5, 6.0)
-	s.scale = Vector2(esc, esc)
+	s.texture = tex
+	s.scale = Vector2(esc if _rng.randf() < 0.5 else -esc, esc)
 	s.z_index = -3
-	s.modulate = Color(0.6, 0.6, 0.7, 0.85)
-	s.position = Vector2(x, _chao_y - PROP_COLUNA.get_height() * esc * 0.5 + 40.0)
+	# recuado: mais escuro e mais azul, para ficar mesmo atrás da acção
+	s.modulate = Color(0.58, 0.56, 0.72, _rng.randf_range(0.70, 0.92))
+	s.position = Vector2(x, _chao_y - float(tex.get_height()) * esc * 0.5 + 34.0)
 	par.add_child(s)
 
 

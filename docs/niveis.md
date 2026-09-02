@@ -250,3 +250,11 @@ Região final; cada nível é uma parte do castelo.
 4. Arte: sprites SVG (rim‑lit) no estilo atual; pixel‑art fica como opção
    futura (swap). Núcleos/fraquezas a magenta.
 5. Afinar com playtest (Paulo + amigo) a cada região fechada.
+
+---
+
+## Níveis 31-100
+
+O plano das 14 regiões seguintes (31 a 100) está em
+[`plano_niveis_31_100.md`](plano_niveis_31_100.md) -- guia dado pelo Paulo
+em 3 de setembro de 2026.
