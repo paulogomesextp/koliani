@@ -34,10 +34,13 @@ func _init() -> void:
 func _checa(idx: int, raiz: Node) -> int:
 	var es := root.get_node("/root/EstadoJogo")
 	var ultimo: bool = idx == es.NIVEIS.size() - 1
+	# níveis feitos à mão (`corredor = false`) não prependem a jornada
+	var mao: bool = raiz.get("corredor") == false
 	var ger := raiz.get_node_or_null("CorredorAproximacao")
 	if ger == null:
-		if ultimo:
-			print("  [%2d] %-26s (ultimo -- sem jornada, ok)" % [idx, raiz.name])
+		if ultimo or mao:
+			var etq := "ultimo" if ultimo else "sala a mao"
+			print("  [%2d] %-26s (%s -- sem jornada, ok)" % [idx, raiz.name, etq])
 			return 0
 		print("  [%2d] %-26s SEM CorredorAproximacao" % [idx, raiz.name])
 		return 1
