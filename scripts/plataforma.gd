@@ -43,8 +43,14 @@ const BIOMAS := [
 @export var cor_base := Color(0.15, 0.21, 0.11)
 @export var cor_topo := Color(0.42, 0.62, 0.28)
 
+## Densidade da decoracao: um prop por cada N px de largura. Baixo demais e
+## a plataforma fica uma montra; alto demais e volta a ler-se como uma laje.
+const PASSO_DECO := 270.0
+const MAX_DECO := 5
+
 static var _cache_tex := {}
 static var _grad_sombra: GradientTexture2D = null
+static var _catalogo: Dictionary = {}       # bioma -> [ {nome, onde, w, h} ]
 
 
 func _ready() -> void:
@@ -178,3 +184,66 @@ func _aplicar() -> void:
 	var topo := _tex(bioma, "topo")
 	if topo:
 		vis.add_child(_mosaico(topo, Vector2(x0, y0 - SUPERFICIE), Vector2(largura, 32.0), Vector2(dx, 0)))
+
+	# 6. o que POUSA em cima -- cogumelos, lapides, caixotes, cristais...
+	_decorar(vis, bioma, largura, y0, rng)
+
+
+## Catalogo de props da regiao (`tools/gerar_deco.py`), lido uma vez.
+static func _props(bioma: String) -> Array:
+	if _catalogo.is_empty():
+		var cam := "res://assets/sprites/pixel/deco/deco.json"
+		if FileAccess.file_exists(cam):
+			var d: Variant = JSON.parse_string(FileAccess.get_file_as_string(cam))
+			if d is Dictionary:
+				_catalogo = d
+		if _catalogo.is_empty():
+			_catalogo = {"_": []}     # marca como "ja' tentei", nao volta ao disco
+	var l: Variant = _catalogo.get(bioma, [])
+	return l if l is Array else []
+
+
+## Espalha props de chao pela superficie da plataforma.
+##
+## O objectivo nao e' encher: e' que duas plataformas nunca tenham a mesma
+## coisa em cima. Por isso a semente vem da posicao (ver `_semente`) e cada
+## prop leva escala e espelho proprios.
+func _decorar(vis: Node, bioma: String, largura: float, y0: float, rng: RandomNumberGenerator) -> void:
+	if largura < 110.0:
+		return
+	var cat := _props(bioma)
+	var chao: Array = []
+	for p in cat:
+		if p is Dictionary and p.get("onde", "") == "chao":
+			chao.append(p)
+	if chao.is_empty():
+		return
+
+	var quantos: int = mini(MAX_DECO, int(largura / PASSO_DECO))
+	if quantos <= 0:
+		quantos = 1 if rng.randf() < 0.55 else 0     # ledges curtas: as vezes
+	var margem := 30.0
+	var util := largura - margem * 2.0
+	if util <= 0.0:
+		return
+
+	for i in quantos:
+		var p: Dictionary = chao[rng.randi() % chao.size()]
+		var cam := "res://assets/sprites/pixel/deco/%s/%s.png" % [bioma, p["nome"]]
+		var tex: Texture2D = load(cam) if ResourceLoader.exists(cam) else null
+		if tex == null:
+			continue
+		var s := Sprite2D.new()
+		s.texture = tex
+		s.centered = false
+		var e := rng.randf_range(0.86, 1.14)
+		s.scale = Vector2(e if rng.randf() < 0.5 else -e, e)
+		# a faixa de cada prop, com folga, para nao se empilharem todos a meio
+		var faixa := util / float(maxi(1, quantos))
+		var cx := -largura * 0.5 + margem + faixa * (float(i) + rng.randf_range(0.15, 0.85))
+		# enterra 3 px na capa: os props nunca devem parecer colados por cima
+		s.position = Vector2(cx, y0 - tex.get_height() * e + 3.0)
+		if s.scale.x < 0.0:
+			s.position.x += tex.get_width() * e
+		s.z_index = -1                 # atras da Koliani e dos inimigos
+		vis.add_child(s)

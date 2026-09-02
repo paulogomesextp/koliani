@@ -40,18 +40,19 @@ fill_to = Vector2(1, 0.5)
 script = ExtResource("7_niv")
 
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
-cor_ambiente = Color(0.7, 0.78, 0.74, 1)
-cor_fundo = Color(0.03, 0.05, 0.06, 1)
-cor_silhueta = Color(0.08, 0.13, 0.07, 1)
-cor_luz = Color(0.6, 1.0, 0.72, 1)
-cor_poeira = Color(0.72, 1.0, 0.86, 1)
+cor_ambiente = Color(0.86, 0.92, 0.86, 1)
+cor_fundo = Color(0.05, 0.09, 0.09, 1)
+cor_silhueta = Color(0.09, 0.15, 0.09, 1)
+cor_luz = Color(0.62, 1, 0.72, 1)
+cor_poeira = Color(0.72, 1, 0.86, 1)
 densidade_poeira = 1.5
 bioma = "floresta"
 largura_nivel = 3800.0
 fundo_pack = "floresta"
-tinta_fundo = Color(0.8, 0.88, 1.05, 1)
-neblina_fundo = 0.34
-dessaturar_fundo = 0.3
+tinta_fundo = Color(0.82, 0.94, 1.02, 1)
+neblina_fundo = 0.3
+dessaturar_fundo = 0.26
+seed_ambiente = 1000
 
 ; --- pantano mortal por baixo de todo o nivel -------------------------
 [node name="PantanoMortal" parent="." instance=ExtResource("12_agua")]

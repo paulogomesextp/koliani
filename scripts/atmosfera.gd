@@ -116,6 +116,36 @@ const PACKS := {
 		["middle.png", "Meio", 895.0, 4.0],
 		["near.png", "Perto", 945.0, 4.2],
 	],
+	# --- packs de 3 set 2026 (OpenGameArt, CC0) -------------------------
+	# Cada região tinha UM pack para os seus 5 níveis: cinco vezes a mesma
+	# serra. Estes são o material para cada nível ter o seu céu.
+	#
+	# "luar" -- lua de sangue nas nuvens sobre um cemitério (GothicVania
+	# Cemetery). É o `key_art` feito pixel-art: é o fundo mais on-theme que
+	# o jogo tem. O `ceu.png` é largo de propósito -- a lua aparece UMA vez
+	# na tira (ver `tools/gerar_fundos.py`).
+	"luar": [
+		["ceu.png", "Fundo", 900.0, 3.4],
+		["serra.png", "Longe", 935.0, 3.4],
+		["campo.png", "Perto", 990.0, 3.2],
+	],
+	# "vilanoite" -- o vale com a vila acesa lá em baixo (Night Town).
+	"vilanoite": [
+		["ceu.png", "Fundo", 900.0, 4.4],
+		["serra.png", "Longe", 920.0, 4.0],
+		["casario.png", "Meio", 940.0, 3.6],
+		["vila.png", "Perto", 990.0, 3.2],
+	],
+	# "horror" -- nuvens baixas sobre a vila da colina (Gothic Horror).
+	"horror": [
+		["nuvens.png", "Fundo", 880.0, 4.4],
+		["vila.png", "Longe", 965.0, 3.6],
+	],
+	# "castelo_velho" -- salão gótico com o vitral aceso (Old Dark Castle).
+	"castelo_velho": [
+		["salao.png", "Fundo", 940.0, 3.4],
+		["nave.png", "Meio", 1035.0, 2.4],
+	],
 	"montanhas": [
 		["sky.png", "Fundo", 300.0, 6.0],
 		["far.png", "Longe", 840.0, 4.6],

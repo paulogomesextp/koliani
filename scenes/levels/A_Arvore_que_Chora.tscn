@@ -42,18 +42,19 @@ fill_to = Vector2(1, 0.5)
 script = ExtResource("7_niv")
 
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
-cor_ambiente = Color(0.7, 0.78, 0.66, 1)
-cor_fundo = Color(0.03, 0.05, 0.04, 1)
-cor_silhueta = Color(0.08, 0.12, 0.06, 1)
-cor_luz = Color(0.7, 0.96, 0.62, 1)
-cor_poeira = Color(0.82, 1.0, 0.7, 1)
+cor_ambiente = Color(0.9, 0.88, 0.92, 1)
+cor_fundo = Color(0.09, 0.04, 0.11, 1)
+cor_silhueta = Color(0.1, 0.06, 0.12, 1)
+cor_luz = Color(1, 0.44, 0.86, 1)
+cor_poeira = Color(1, 0.72, 0.92, 1)
 densidade_poeira = 1.6
 bioma = "floresta"
 largura_nivel = 3800.0
-fundo_pack = "pantano"
-tinta_fundo = Color(0.82, 0.94, 0.9, 1)
-neblina_fundo = 0.38
-dessaturar_fundo = 0.3
+fundo_pack = "luar"
+tinta_fundo = Color(1, 0.86, 1, 1)
+neblina_fundo = 0.22
+dessaturar_fundo = 0.1
+seed_ambiente = 1111
 
 ; --- poca acida por baixo de todo o nivel -----------------------------
 [node name="PocaAcida" parent="." instance=ExtResource("11_agua")]

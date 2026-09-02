@@ -1,0 +1,416 @@
+{
+ "floresta": [
+  {
+   "nome": "cogumelo_g",
+   "onde": "chao",
+   "w": 49,
+   "h": 76
+  },
+  {
+   "nome": "cogumelo_p",
+   "onde": "chao",
+   "w": 22,
+   "h": 49
+  },
+  {
+   "nome": "cogumelo_m",
+   "onde": "chao",
+   "w": 51,
+   "h": 76
+  },
+  {
+   "nome": "flores",
+   "onde": "chao",
+   "w": 43,
+   "h": 51
+  },
+  {
+   "nome": "lavanda",
+   "onde": "chao",
+   "w": 22,
+   "h": 76
+  },
+  {
+   "nome": "erva",
+   "onde": "chao",
+   "w": 27,
+   "h": 52
+  },
+  {
+   "nome": "nenufar",
+   "onde": "chao",
+   "w": 51,
+   "h": 41
+  },
+  {
+   "nome": "pedra_musgo",
+   "onde": "chao",
+   "w": 82,
+   "h": 93
+  },
+  {
+   "nome": "tronco",
+   "onde": "parede",
+   "w": 67,
+   "h": 201
+  },
+  {
+   "nome": "arbusto_g",
+   "onde": "parede",
+   "w": 91,
+   "h": 78
+  },
+  {
+   "nome": "arbusto_p",
+   "onde": "chao",
+   "w": 40,
+   "h": 34
+  },
+  {
+   "nome": "arvore_morta",
+   "onde": "parede",
+   "w": 182,
+   "h": 128
+  },
+  {
+   "nome": "arvore_morta2",
+   "onde": "parede",
+   "w": 193,
+   "h": 187
+  }
+ ],
+ "prisao": [
+  {
+   "nome": "caixa",
+   "onde": "chao",
+   "w": 42,
+   "h": 60
+  },
+  {
+   "nome": "cranio",
+   "onde": "chao",
+   "w": 18,
+   "h": 18
+  },
+  {
+   "nome": "escada",
+   "onde": "parede",
+   "w": 48,
+   "h": 48
+  },
+  {
+   "nome": "estandarte",
+   "onde": "parede",
+   "w": 48,
+   "h": 48
+  },
+  {
+   "nome": "coluna",
+   "onde": "parede",
+   "w": 48,
+   "h": 105
+  },
+  {
+   "nome": "caixote",
+   "onde": "chao",
+   "w": 89,
+   "h": 67
+  },
+  {
+   "nome": "caixote2",
+   "onde": "chao",
+   "w": 89,
+   "h": 67
+  },
+  {
+   "nome": "pilar",
+   "onde": "parede",
+   "w": 44,
+   "h": 268
+  },
+  {
+   "nome": "pilar2",
+   "onde": "parede",
+   "w": 44,
+   "h": 112
+  },
+  {
+   "nome": "tabua",
+   "onde": "parede",
+   "w": 219,
+   "h": 22
+  },
+  {
+   "nome": "barril",
+   "onde": "chao",
+   "w": 24,
+   "h": 30
+  },
+  {
+   "nome": "pilha_caixas",
+   "onde": "chao",
+   "w": 73,
+   "h": 68
+  }
+ ],
+ "torres": [
+  {
+   "nome": "balaustrada",
+   "onde": "parede",
+   "w": 96,
+   "h": 57
+  },
+  {
+   "nome": "velas",
+   "onde": "parede",
+   "w": 38,
+   "h": 76
+  },
+  {
+   "nome": "tocha",
+   "onde": "parede",
+   "w": 38,
+   "h": 62
+  },
+  {
+   "nome": "janela_gotica",
+   "onde": "parede",
+   "w": 38,
+   "h": 76
+  },
+  {
+   "nome": "coluna_igreja",
+   "onde": "parede",
+   "w": 136,
+   "h": 228
+  },
+  {
+   "nome": "pedra_talhada",
+   "onde": "chao",
+   "w": 38,
+   "h": 38
+  },
+  {
+   "nome": "cruz",
+   "onde": "chao",
+   "w": 27,
+   "h": 40
+  },
+  {
+   "nome": "lapide",
+   "onde": "chao",
+   "w": 21,
+   "h": 37
+  }
+ ],
+ "catacumbas": [
+  {
+   "nome": "lapide_a",
+   "onde": "chao",
+   "w": 25,
+   "h": 44
+  },
+  {
+   "nome": "lapide_b",
+   "onde": "chao",
+   "w": 32,
+   "h": 39
+  },
+  {
+   "nome": "cruz_a",
+   "onde": "chao",
+   "w": 32,
+   "h": 48
+  },
+  {
+   "nome": "cruz_b",
+   "onde": "chao",
+   "w": 22,
+   "h": 45
+  },
+  {
+   "nome": "ceifeiro",
+   "onde": "parede",
+   "w": 69,
+   "h": 82
+  },
+  {
+   "nome": "arvore_ossos",
+   "onde": "parede",
+   "w": 166,
+   "h": 117
+  },
+  {
+   "nome": "cristal_g",
+   "onde": "chao",
+   "w": 52,
+   "h": 56
+  },
+  {
+   "nome": "cristal_p",
+   "onde": "chao",
+   "w": 32,
+   "h": 64
+  },
+  {
+   "nome": "cristal_teto",
+   "onde": "parede",
+   "w": 64,
+   "h": 96
+  },
+  {
+   "nome": "ossada",
+   "onde": "chao",
+   "w": 96,
+   "h": 96
+  },
+  {
+   "nome": "lanterna",
+   "onde": "chao",
+   "w": 84,
+   "h": 64
+  },
+  {
+   "nome": "cranio_c",
+   "onde": "chao",
+   "w": 18,
+   "h": 18
+  }
+ ],
+ "cidade": [
+  {
+   "nome": "barril",
+   "onde": "chao",
+   "w": 28,
+   "h": 36
+  },
+  {
+   "nome": "caixa",
+   "onde": "chao",
+   "w": 46,
+   "h": 42
+  },
+  {
+   "nome": "pilha_caixas",
+   "onde": "chao",
+   "w": 87,
+   "h": 81
+  },
+  {
+   "nome": "poco",
+   "onde": "chao",
+   "w": 71,
+   "h": 71
+  },
+  {
+   "nome": "carroca",
+   "onde": "chao",
+   "w": 102,
+   "h": 82
+  },
+  {
+   "nome": "candeeiro",
+   "onde": "parede",
+   "w": 38,
+   "h": 118
+  },
+  {
+   "nome": "tabuleta",
+   "onde": "parede",
+   "w": 38,
+   "h": 48
+  },
+  {
+   "nome": "casa_a",
+   "onde": "parede",
+   "w": 167,
+   "h": 181
+  },
+  {
+   "nome": "casa_b",
+   "onde": "parede",
+   "w": 207,
+   "h": 244
+  },
+  {
+   "nome": "janela_vila",
+   "onde": "parede",
+   "w": 38,
+   "h": 76
+  },
+  {
+   "nome": "porta_vila",
+   "onde": "parede",
+   "w": 38,
+   "h": 115
+  }
+ ],
+ "castelo": [
+  {
+   "nome": "porta_negra",
+   "onde": "parede",
+   "w": 41,
+   "h": 83
+  },
+  {
+   "nome": "nicho",
+   "onde": "parede",
+   "w": 62,
+   "h": 62
+  },
+  {
+   "nome": "tocha_muro",
+   "onde": "parede",
+   "w": 41,
+   "h": 28
+  },
+  {
+   "nome": "fresta",
+   "onde": "parede",
+   "w": 41,
+   "h": 83
+  },
+  {
+   "nome": "velas_c",
+   "onde": "parede",
+   "w": 38,
+   "h": 76
+  },
+  {
+   "nome": "balaustrada_c",
+   "onde": "parede",
+   "w": 96,
+   "h": 57
+  },
+  {
+   "nome": "estandarte_r",
+   "onde": "parede",
+   "w": 48,
+   "h": 48
+  },
+  {
+   "nome": "coluna_c",
+   "onde": "parede",
+   "w": 48,
+   "h": 105
+  },
+  {
+   "nome": "cranio_t",
+   "onde": "chao",
+   "w": 18,
+   "h": 18
+  },
+  {
+   "nome": "caixa_c",
+   "onde": "chao",
+   "w": 42,
+   "h": 60
+  },
+  {
+   "nome": "lapide_c",
+   "onde": "chao",
+   "w": 20,
+   "h": 41
+  }
+ ]
+}

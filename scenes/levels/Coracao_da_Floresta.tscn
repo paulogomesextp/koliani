@@ -40,18 +40,19 @@ fill_to = Vector2(1, 0.5)
 script = ExtResource("7_niv")
 
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
-cor_ambiente = Color(0.72, 0.7, 0.76, 1)
-cor_fundo = Color(0.04, 0.03, 0.05, 1)
-cor_silhueta = Color(0.1, 0.08, 0.1, 1)
-cor_luz = Color(0.92, 0.44, 1.0, 1)
-cor_poeira = Color(1.0, 0.7, 0.95, 1)
-densidade_poeira = 2.0
+cor_ambiente = Color(0.82, 0.88, 0.84, 1)
+cor_fundo = Color(0.08, 0.05, 0.1, 1)
+cor_silhueta = Color(0.1, 0.14, 0.09, 1)
+cor_luz = Color(0.94, 0.42, 1, 1)
+cor_poeira = Color(0.9, 0.66, 1, 1)
+densidade_poeira = 2
 bioma = "floresta"
 largura_nivel = 3400.0
-fundo_pack = "floresta"
-tinta_fundo = Color(0.88, 0.76, 1.05, 1)
-neblina_fundo = 0.36
-dessaturar_fundo = 0.34
+fundo_pack = "pantano"
+tinta_fundo = Color(0.9, 0.84, 1.06, 1)
+neblina_fundo = 0.44
+dessaturar_fundo = 0.36
+seed_ambiente = 1148
 
 [node name="Podridao" parent="." instance=ExtResource("11_agua")]
 position = Vector2(1650, 970)

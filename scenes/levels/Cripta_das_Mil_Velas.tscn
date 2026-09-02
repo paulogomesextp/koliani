@@ -38,18 +38,20 @@ fill_to = Vector2(1, 0.5)
 script = ExtResource("7_niv")
 
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
-cor_ambiente = Color(0.708, 0.651, 0.708, 1)
-cor_fundo = Color(0.086, 0.086, 0.115, 1)
-cor_silhueta = Color(0.153, 0.136, 0.17, 1)
-cor_luz = Color(1.0, 0.8, 0.52, 1)
-cor_poeira = Color(1.0, 0.9, 0.72, 1)
-densidade_poeira = 1.7
+cor_ambiente = Color(0.98, 0.9, 0.8, 1)
+cor_fundo = Color(0.1, 0.06, 0.07, 1)
+cor_silhueta = Color(0.15, 0.1, 0.09, 1)
+cor_luz = Color(1, 0.8, 0.48, 1)
+cor_poeira = Color(1, 0.9, 0.62, 1)
+densidade_poeira = 2.1
 bioma = "catacumbas"
 largura_nivel = 3200.0
-fundo_pack = "caverna"
-tinta_fundo = Color(1.0, 0.86, 0.62, 1)
-neblina_fundo = 0.36
+fundo_pack = "igreja"
+tinta_fundo = Color(1.1, 0.86, 0.8, 1)
+neblina_fundo = 0.3
 dessaturar_fundo = 0.3
+seed_ambiente = 1629
+luzes_horizonte = true
 
 [node name="Trevas" parent="." instance=ExtResource("12_trevas")]
 position = Vector2(1600, 990)

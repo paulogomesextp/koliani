@@ -42,18 +42,19 @@ fill_to = Vector2(1, 0.5)
 script = ExtResource("7_niv")
 
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
-cor_ambiente = Color(0.72, 0.66, 0.8, 1)
-cor_fundo = Color(0.04, 0.03, 0.06, 1)
-cor_silhueta = Color(0.1, 0.08, 0.12, 1)
-cor_luz = Color(0.86, 0.58, 1.0, 1)
-cor_poeira = Color(0.9, 0.82, 1.0, 1)
-densidade_poeira = 1.6
+cor_ambiente = Color(0.84, 0.8, 0.9, 1)
+cor_fundo = Color(0.07, 0.05, 0.1, 1)
+cor_silhueta = Color(0.11, 0.08, 0.15, 1)
+cor_luz = Color(0.86, 0.56, 1, 1)
+cor_poeira = Color(0.92, 0.72, 1, 1)
+densidade_poeira = 1.8
 bioma = "floresta"
 largura_nivel = 3800.0
-fundo_pack = "floresta"
-tinta_fundo = Color(0.86, 0.8, 1.05, 1)
-neblina_fundo = 0.4
-dessaturar_fundo = 0.32
+fundo_pack = "caverna"
+tinta_fundo = Color(0.94, 0.78, 1.08, 1)
+neblina_fundo = 0.38
+dessaturar_fundo = 0.3
+seed_ambiente = 1074
 
 ; --- fosso de teia por baixo de todo o nivel --------------------------
 [node name="FossoTeia" parent="." instance=ExtResource("11_agua")]
