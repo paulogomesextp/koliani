@@ -562,41 +562,51 @@ def bloqueio():
 # `koliani.gd` (Som.toca com pitch aleatorio), para nao cansar.
 # --------------------------------------------------------------------------
 def espada():
-    """Golpe de espada: silvo de lamina a cortar o ar (desce de tom) + um
-    'ting' metalico curto de aco + corpo grave. Le'-se claramente como
-    ESPADA, sem ser o agudo estridente que cansa."""
+    """Golpe de espada de METAL: transiente de aco (ruido de banda larga
+    curtissimo) + anel INARMONICO de parciais altas (o 'shraaang' que soa a
+    lamina de metal, nao a pau) com caudas de decaimento diferentes +
+    silvo de ar por baixo + corpo grave. Sem passa-baixo a matar o brilho."""
     random.seed(4101)
-    dur = 0.20
+    dur = 0.30
     N = int(dur * FS)
     buf = [0.0] * N
     ar = Reson()
+    hp = Reson()
+    # parciais inarmonicas (razoes nao inteiras -> "metal", nao "corda")
+    parciais = [
+        (1840.0, 7.0,  1.00),
+        (2735.0, 9.0,  0.72),
+        (3960.0, 12.0, 0.55),
+        (5280.0, 16.0, 0.38),
+        (7100.0, 22.0, 0.24),
+    ]
     for n in range(N):
         t = n / FS
         p = n / N
-        # 1) silvo de ar: ruido filtrado a descer de 2100 -> 500 Hz
-        f = 2100.0 - 1600.0 * (p ** 0.85)
-        ruido = random.uniform(-1.0, 1.0)
-        s = ar.passo(ruido, f, 700.0) * 0.85
-        # 2) corpo grave: o peso do golpe
-        corpo = math.sin(2 * math.pi * (170.0 - 70.0 * p) * t)
-        s += corpo * 0.55 * math.exp(-p * 14.0)
-        # 3) 'ting' de aco: duas parciais altas afinadas, decai depressa,
-        #    so' entra na primeira metade do golpe (o momento do corte)
-        if p < 0.5:
-            q = p / 0.5
-            ting = math.sin(2 * math.pi * 3100.0 * t) + 0.6 * math.sin(2 * math.pi * 4650.0 * t)
-            s += ting * 0.16 * math.exp(-q * 9.0)
-        env = min(1.0, p / 0.04) * math.exp(-p * 8.0)
-        buf[n] = math.tanh(s * env * 1.35)
-    # passa-baixo suave: tira o chiado mais aspero por cima do silvo
+        s = 0.0
+        # 1) transiente de aco: ruido de banda alta nos primeiros ~12 ms
+        if p < 0.06:
+            q = p / 0.06
+            s += hp.passo(random.uniform(-1, 1), 4200.0, 3200.0) * 0.7 * (1.0 - q)
+        # 2) anel inarmonico -- cada parcial com o seu decaimento
+        for (fr, dec, amp) in parciais:
+            s += math.sin(2 * math.pi * fr * t) * amp * 0.16 * math.exp(-p * dec)
+        # 3) silvo de ar: ruido filtrado a descer de 2200 -> 650 Hz
+        f = 2200.0 - 1550.0 * (p ** 0.8)
+        s += ar.passo(random.uniform(-1, 1), f, 750.0) * 0.55 * math.exp(-p * 4.0)
+        # 4) corpo grave curto -- o peso
+        s += math.sin(2 * math.pi * (165.0 - 65.0 * p) * t) * 0.5 * math.exp(-p * 15.0)
+        env = min(1.0, p / 0.006) * math.exp(-p * 6.0)
+        buf[n] = math.tanh(s * env * 1.25)
+    # passa-baixo MUITO ligeiro so' para tirar o mais aspero (mantem metal)
     lp = 0.0
     for n in range(N):
-        lp += 0.42 * (buf[n] - lp)
+        lp += 0.72 * (buf[n] - lp)
         buf[n] = lp
-    fo = int(0.02 * FS)
+    fo = int(0.03 * FS)
     for n in range(N - fo, N):
         buf[n] *= max(0.0, (N - n) / fo)
-    escrever("ataque.wav", buf, 0.7)
+    escrever("ataque.wav", buf, 0.72)
 
 
 def lancar():

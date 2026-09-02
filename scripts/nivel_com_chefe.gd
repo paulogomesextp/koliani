@@ -23,6 +23,15 @@ const DIST_MAX_ANTES_CHEFE := 260.0
 ## Prepende a jornada de aproximação (grande, cresce com o número do nível).
 @export var corredor := true
 
+## Nos níveis feitos à mão (`corredor = false`): alonga as plataformas de
+## chão largas conforme o número do nível -- N1 fica igual, e vai crescendo
+## até ~1.8x no N30. Só estica para a direita e nunca invade a plataforma
+## seguinte nem a sala do chefe (não mexe em saltos verticais nem em
+## plataformas pequenas de precisão).
+@export var alongar_plataformas := true
+## Esticão máximo no último nível (N1 = 1.0, N30 = 1.0 + isto).
+@export var alongar_ampl := 0.8
+
 ## Entrada "fresca" no nível (não é um respawn num checkpoint a meio). É
 ## capturado em `_enter_tree`, ANTES de a Koliani correr o seu `_ready` (que
 ## define um checkpoint implícito no ponto de spawn) -- só assim se
@@ -44,6 +53,9 @@ func _ready() -> void:
 		g.set_script(GERADOR)
 		g.set("entrada_fresca", _entrada_fresca)
 		add_child(g)
+
+	if alongar_plataformas and not corredor:
+		_alongar_nivel()
 
 	_reduzir_checkpoints.call_deferred()
 
@@ -135,3 +147,72 @@ func _reduzir_checkpoints() -> void:
 	for c in meus:
 		if not manter.has(c):
 			c.queue_free()
+
+
+## Alonga as plataformas de CHÃO largas conforme o número do nível. Só
+## estica para a direita, com folga para a plataforma seguinte e para a
+## sala do chefe. Não toca em plataformas pequenas nem em plataformas
+## acima da faixa do chão (saltos verticais ficam iguais).
+func _alongar_nivel() -> void:
+	var idx := EstadoJogo.indice_nivel
+	if idx <= 0:
+		return
+	var fator := 1.0 + alongar_ampl * (float(idx) / 29.0)
+	if fator <= 1.01:
+		return
+
+	var lim_dir := INF
+	if _chefe and _chefe is Node2D:
+		lim_dir = (_chefe as Node2D).position.x - 240.0
+
+	var largas: Array[Node2D] = []
+	var todas: Array[Node2D] = []
+	for c in get_children():
+		if not (c is Node2D) or not ("tamanho" in c):
+			continue
+		var no := c as Node2D
+		todas.append(no)
+		var t: Vector2 = no.tamanho
+		if t.x >= 240.0 and t.x >= t.y * 3.0:
+			largas.append(no)
+	if largas.is_empty():
+		return
+
+	# faixa do chão = perto da plataforma larga mais em baixo (y maior)
+	var y_chao := -INF
+	for p in largas:
+		y_chao = maxf(y_chao, p.position.y)
+
+	largas.sort_custom(func(a, b): return a.position.x < b.position.x)
+	var n := 0
+	for p in largas:
+		if p.position.y < y_chao - 130.0:
+			continue
+		var w: float = p.tamanho.x
+		var esq: float = p.position.x - w * 0.5
+		var dir_ini: float = p.position.x + w * 0.5
+		if esq >= lim_dir:
+			continue
+		# cresce no máximo +50% / +400px -- nunca o suficiente para tapar
+		# uma poça mortal ou um vão grande a seguir.
+		var alvo_dir: float = minf(esq + w * fator, lim_dir)
+		alvo_dir = minf(alvo_dir, minf(esq + w * 1.5, esq + w + 400.0))
+		# não crescer para lá do início de OUTRA plataforma de CHÃO larga à
+		# nossa direita (mesma faixa de altura). Passar por baixo de uma
+		# plataforma pequena de precisão é permitido -- só dá mais chão.
+		for o in largas:
+			if o == p:
+				continue
+			if absf(o.position.y - p.position.y) >= 100.0:
+				continue
+			var o_esq: float = o.position.x - o.tamanho.x * 0.5
+			if o_esq > esq + 40.0:
+				alvo_dir = minf(alvo_dir, maxf(dir_ini, o_esq - 30.0))
+		var nova_w: float = alvo_dir - esq
+		if nova_w <= w + 10.0:
+			continue
+		p.tamanho = Vector2(nova_w, p.tamanho.y)
+		p.position.x = esq + nova_w * 0.5
+		n += 1
+	if n > 0:
+		print("[nivel %d] %d plataformas de chao alongadas (fator %.2f)" % [idx + 1, n, fator])
