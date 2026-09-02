@@ -154,7 +154,7 @@ func _ve_koliani() -> bool:
 ## --- ataques ---------------------------------------------------------
 
 func _baque() -> void:
-	Som.toca("onda", -5.0)
+	Som.toca("esmagar", -5.0)
 	_abanar_camera(5.0)
 	var k := _obter_koliani()
 	if k and absf(_vetor_para_koliani().x) <= raio_onda and k.is_on_floor():
@@ -166,7 +166,7 @@ func _forjar_lamina() -> void:
 	var pai := get_parent()
 	if pai == null:
 		return
-	Som.toca("investida", -8.0, 1.4)
+	Som.toca("chama", -8.0, 1.4)
 	var dir := _dir_para_koliani()
 	var lamina := Area2D.new()
 	lamina.collision_layer = 0
@@ -205,7 +205,7 @@ func _forjar_lamina() -> void:
 
 
 func _lancar_brasas() -> void:
-	Som.toca("projetil", -9.0, 0.8)
+	Som.toca("chama", -9.0, 0.8)
 	var pai := get_parent()
 	if pai == null:
 		return

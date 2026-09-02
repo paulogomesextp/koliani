@@ -152,7 +152,7 @@ func _ve_koliani() -> bool:
 ## --- ataques ---------------------------------------------------------
 
 func _varrer_galho() -> void:
-	Som.toca("investida", -8.0, 0.9)
+	Som.toca("golpe_pesado", -8.0, 0.9)
 	_abanar_camera(3.0)
 	var k := _obter_koliani()
 	var alturas := [-40.0]
@@ -209,7 +209,7 @@ func _lancar_galho(y: float) -> void:
 
 
 func _chorar() -> void:
-	Som.toca("onda", -12.0, 0.8)
+	Som.toca("grito", -12.0, 0.8)
 	var n := 5 if _fase2 else 3
 	var alvo := _x_koliani()
 	for i in n:
@@ -230,7 +230,7 @@ func _gota_em(x: float, dy: float, atraso: float) -> void:
 
 
 func _raizes() -> void:
-	Som.toca("investida", -8.0, 1.3)
+	Som.toca("esmagar", -8.0, 1.3)
 	_abanar_camera(4.0)
 	var origem := global_position.x
 	var alvo := _x_koliani()

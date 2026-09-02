@@ -133,7 +133,7 @@ func _ve_koliani() -> bool:
 ## --- ataques ---------------------------------------------------------
 
 func _cutelada() -> void:
-	Som.toca("onda", -5.0, 0.7)
+	Som.toca("golpe_pesado", -5.0, 0.7)
 	_abanar_camera(6.0)
 	_linha_choque(1.0)
 	_linha_choque(-1.0)
@@ -171,7 +171,7 @@ func _linha_choque(dir: float) -> void:
 
 
 func _arremessar() -> void:
-	Som.toca("chefe_magia", -6.0, 1.2)
+	Som.toca("projetil", -6.0, 1.2)
 	var n := 2 if _fase2 else 1
 	for i in n:
 		_cutelo_bumerangue(i * 0.12)
@@ -210,7 +210,7 @@ func _cutelo_bumerangue(atraso: float) -> void:
 
 
 func _gancho() -> void:
-	Som.toca("investida", -6.0, 0.7)
+	Som.toca("golpe_pesado", -6.0, 0.7)
 	var pai := get_parent()
 	if pai == null:
 		return

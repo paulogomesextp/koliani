@@ -809,6 +809,414 @@ def chefe_magia():
     escrever("chefe_magia.wav", buf, 0.85)
 
 
+# ==========================================================================
+# 14) SONS DE HABILIDADE POR CHEFE  (pedido do Paulo, 2 set 2026)
+#
+# Até agora quase todos os 30 chefes partilhavam `investida` (corpo a corpo)
+# e `chefe_magia` (distância), só variando o pitch. Aqui está uma família de
+# timbres POR ARQUÉTIPO DE ATAQUE -- baque no chão, lâmina pesada, garra,
+# fogo, gelo, praga, raio, invocação, grito -- mais três ASSINATURAS de
+# chefe (o Sino Vivo, o Maquinista, a Dama Guilhotina) e um feixe próprio
+# para o Zeriko / Olho do Abismo. Cada `scripts/chefe_*.gd` mapeia agora as
+# suas habilidades para o arquétipo certo (continua a variar pitch/volume
+# por instância, para dois chefes do mesmo arquétipo não soarem idênticos).
+#
+# Regra de estilo herdada dos sons de combate: CURTOS, corpo grave + ar por
+# cima, nada de "bip" agudo, `tanh` a amaciar o pico.
+# ==========================================================================
+def _impacto(buf, t0, amp, f0, decai):
+    """Baque grave curto somado ao buffer a partir de `t0` s."""
+    n0 = int(t0 * FS)
+    for n in range(n0, len(buf)):
+        t = (n - n0) / FS
+        f = f0 * math.exp(-t * 9.0) + 24.0
+        buf[n] += math.sin(2 * math.pi * f * t) * math.exp(-t * decai) * amp
+
+
+def esmagar():
+    """Baque no chão / pisão de chefe: sub que afunda + estalo de terra +
+    cauda curta de rumor. Substitui os muitos `onda` que eram, na verdade,
+    o chefe a bater no solo (Ghorak, Colosso, Carcereiro, Capitão...)."""
+    random.seed(31001)
+    dur = 0.5
+    N = int(dur * FS)
+    buf = [0.0] * N
+    _impacto(buf, 0.0, 0.95, 82.0, 7.5)
+    # estalo de terra: ruído filtrado em banda, cai depressa
+    rr = Reson()
+    for n in range(int(0.09 * FS)):
+        t = n / FS
+        s = rr.passo(random.uniform(-1, 1), 720.0 - 2600.0 * t, 900.0)
+        buf[n] += s * math.exp(-t * 42.0) * 0.5
+    # rumor: ruído grave que treme e esvai
+    lp = 0.0
+    for n in range(N):
+        t = n / FS
+        x = random.uniform(-1, 1)
+        lp += 0.03 * (x - lp)
+        buf[n] += lp * math.exp(-t * 6.0) * 0.35 * (0.7 + 0.3 * math.sin(2 * math.pi * 30.0 * t))
+    for n in range(N):
+        buf[n] = math.tanh(buf[n] * 1.4)
+    escrever("esmagar.wav", buf, 0.9)
+
+
+def golpe_pesado():
+    """Lâmina de duas mãos / gadanha / cutelo: sopro de ar LENTO e grave a
+    descer + impacto surdo no fim. Distinto do `ataque` leve da Koliani."""
+    random.seed(31002)
+    dur = 0.4
+    N = int(dur * FS)
+    buf = [0.0] * N
+    ar = Reson()
+    lp = 0.0
+    for n in range(N):
+        p = n / N
+        x = random.uniform(-1, 1)
+        lp += 0.10 * (x - lp)
+        f = 1200.0 - 950.0 * p          # mais grave que o golpe leve (1900->550)
+        s = ar.passo(lp, max(220.0, f), 520.0)
+        env = math.sin(math.pi * min(1.0, p / 0.62)) ** 0.7 * math.exp(-p * 1.6)
+        buf[n] += s * env * 0.8
+    _impacto(buf, 0.24, 0.6, 120.0, 11.0)
+    for n in range(N):
+        buf[n] = math.tanh(buf[n] * 1.3)
+    escrever("golpe_pesado.wav", buf, 0.85)
+
+
+def garra():
+    """Garra / cauda / rajada de talhes: três silvos curtos e agudos,
+    escalonados, a fechar depressa (aranha, dragão, Koliani Sombria)."""
+    random.seed(31003)
+    dur = 0.34
+    N = int(dur * FS)
+    buf = [0.0] * N
+    for k, t0 in enumerate((0.0, 0.045, 0.092)):
+        ar = Reson()
+        lp = 0.0
+        n0 = int(t0 * FS)
+        for n in range(n0, min(N, n0 + int(0.13 * FS))):
+            p = (n - n0) / (0.13 * FS)
+            x = random.uniform(-1, 1)
+            lp += 0.16 * (x - lp)
+            f = 2600.0 - 1500.0 * p - k * 180.0
+            s = ar.passo(lp, max(500.0, f), 700.0)
+            env = min(1.0, p / 0.04) * math.exp(-p * 12.0)
+            buf[n] += s * env * (0.9 - 0.12 * k)
+    for n in range(N):
+        buf[n] = math.tanh(buf[n] * 1.25)
+    escrever("garra.wav", buf, 0.62)
+
+
+def chama():
+    """Golfada de fogo / ignição de projétil: roar grave + crepitar
+    aleatório + ar quente por cima. Ignivar, Arauto, Vyrak, Coração."""
+    random.seed(31004)
+    dur = 0.5
+    N = int(dur * FS)
+    buf = [0.0] * N
+    roar, ar = Reson(), Reson()
+    lp = 0.0
+    for n in range(N):
+        t = n / FS
+        p = t / dur
+        x = random.uniform(-1, 1)
+        lp += 0.09 * (x - lp)
+        s = roar.passo(lp, 240.0 + 90.0 * math.sin(2 * math.pi * 18.0 * t), 260.0) * 0.9
+        s += ar.passo(x, 1400.0 - 500.0 * p, 1100.0) * 0.35
+        env = math.sin(math.pi * min(1.0, p / 0.7)) ** 0.6 * math.exp(-p * 1.1)
+        buf[n] += s * env
+    # crepitar: cliques esparsos
+    for _ in range(22):
+        tc = random.uniform(0.02, dur - 0.03)
+        rc = Reson()
+        for n in range(int(tc * FS), min(N, int((tc + 0.02) * FS))):
+            tt = n / FS - tc
+            buf[n] += rc.passo(random.uniform(-1, 1), random.uniform(1600, 3400), 600.0) \
+                * math.exp(-tt * 130.0) * 0.3
+    for n in range(N):
+        buf[n] = math.tanh(buf[n] * 1.3)
+    escrever("chama.wav", buf, 0.8)
+
+
+def gelo():
+    """Estilhaço de gelo / maré lunar: cristal vítreo a descer + campainhas
+    agudas curtas (Sacerdotisa Lunar, Aerion frio, Morvanna)."""
+    random.seed(31005)
+    dur = 0.44
+    N = int(dur * FS)
+    buf = [0.0] * N
+    r1, r2, r3 = Reson(), Reson(), Reson()
+    for n in range(N):
+        p = n / N
+        exc = random.uniform(-1, 1) * math.exp(-p * 55.0)
+        s = r1.passo(exc, 2600.0, 120.0)
+        s += 0.7 * r2.passo(exc, 4300.0, 190.0)
+        s += 0.4 * r3.passo(exc, 6400.0, 300.0)
+        env = min(1.0, p / 0.004) * math.exp(-p * 9.0)
+        buf[n] += s * env
+    # cristal a descer (sine glissando) + tinir na cauda
+    fase = 0.0
+    for n in range(N):
+        p = n / N
+        f = 3200.0 - 2100.0 * (p ** 0.5)
+        fase += f / FS
+        buf[n] += math.sin(2 * math.pi * fase) * 0.3 * math.exp(-p * 6.0)
+    for _ in range(9):
+        tc = random.uniform(0.05, dur - 0.02)
+        fc = random.uniform(3800, 7200)
+        for n in range(int(tc * FS), min(N, int((tc + 0.05) * FS))):
+            tt = n / FS - tc
+            buf[n] += math.sin(2 * math.pi * fc * tt) * 0.12 * math.exp(-tt * 40.0)
+    hp, ain = 0.0, 0.0
+    ahp = math.exp(-2 * math.pi * 600 / FS)
+    for n in range(N):
+        x = buf[n]
+        hp = ahp * (hp + x - ain)
+        ain = x
+        buf[n] = math.tanh(hp * 1.3)
+    escrever("gelo.wav", buf, 0.62)
+
+
+def praga():
+    """Cuspo de veneno / esporos / poça: assopro molhado com borbulhar
+    lento + gorgolejo grave (Rainha Aracnídea, Naga, Freira, Coração)."""
+    random.seed(31006)
+    dur = 0.46
+    N = int(dur * FS)
+    buf = [0.0] * N
+    banda, gorg = Reson(), Reson()
+    lp = 0.0
+    fase = 0.0
+    for n in range(N):
+        t = n / FS
+        p = t / dur
+        x = random.uniform(-1, 1)
+        lp += 0.07 * (x - lp)
+        borb = 0.5 + 0.5 * math.sin(2 * math.pi * 26.0 * t + 2.0 * math.sin(2 * math.pi * 5.0 * t))
+        s = banda.passo(lp, 780.0 - 300.0 * p, 520.0) * (0.5 + 0.5 * borb)
+        fase += (150.0 - 60.0 * p) / FS
+        s += gorg.passo(math.sin(2 * math.pi * fase), 320.0, 180.0) * 0.6 * math.exp(-p * 2.4)
+        env = min(1.0, p / 0.03) * math.exp(-p * 2.6)
+        buf[n] += s * env
+    for n in range(N):
+        buf[n] = math.tanh(buf[n] * 1.35)
+    escrever("praga.wav", buf, 0.66)
+
+
+def raio():
+    """Raio / descarga eléctrica: estalo branco seco + zunido a 90 Hz que
+    esvai + assobio agudo a descer (Voltaris)."""
+    random.seed(31007)
+    dur = 0.36
+    N = int(dur * FS)
+    buf = [0.0] * N
+    r1, r2 = Reson(), Reson()
+    for n in range(N):
+        t = n / FS
+        p = t / dur
+        # estalo: ruído muito agudo nos primeiros ms
+        exc = random.uniform(-1, 1)
+        s = r1.passo(exc * math.exp(-p * 30.0), 3200.0, 1400.0) * 0.8
+        # zunido eléctrico: AM dura a ~90 Hz sobre banda média
+        buzz = (1.0 if math.sin(2 * math.pi * 90.0 * t) > 0 else -1.0)
+        s += r2.passo(buzz * exc * 0.3, 1500.0, 500.0) * 0.5 * math.exp(-p * 6.0)
+        # assobio a descer
+        s += math.sin(2 * math.pi * (4200.0 - 3400.0 * p) * t) * 0.18 * math.exp(-p * 7.0)
+        env = min(1.0, p / 0.002) * math.exp(-p * 4.5)
+        buf[n] += s * env
+    _impacto(buf, 0.0, 0.35, 70.0, 16.0)
+    for n in range(N):
+        buf[n] = math.tanh(buf[n] * 1.5)
+    escrever("raio.wav", buf, 0.72)
+
+
+def invocar():
+    """Invocação / abrir fenda: rumor grave + coro de sines desafinados a
+    subir e a florir (todos os chefes que largam clones/servos/cobras)."""
+    random.seed(31008)
+    dur = 0.6
+    N = int(dur * FS)
+    buf = [0.0] * N
+    lp = 0.0
+    for n in range(N):
+        t = n / FS
+        p = t / dur
+        x = random.uniform(-1, 1)
+        lp += 0.02 * (x - lp)
+        buf[n] += lp * 0.4 * math.exp(-p * 1.6)          # rumor
+        p2 = p ** 1.3
+        coro = 0.0
+        for k, semi in enumerate((-12, -5, 0, 4)):
+            f = 110.0 * (2.0 ** (semi / 12.0)) * (1.0 + 0.35 * p2) * (1.0 + 0.004 * k)
+            coro += math.sin(2 * math.pi * f * t + k * 1.3)
+        env = math.sin(math.pi * min(1.0, p / 0.9)) ** 1.1
+        buf[n] += coro * 0.12 * env
+    # florir agudo no fim
+    for n in range(N):
+        t = n / FS
+        p = t / dur
+        if p < 0.55:
+            continue
+        pp = (p - 0.55) / 0.45
+        buf[n] += math.sin(2 * math.pi * (1400.0 + 1800.0 * pp) * t) * 0.08 * math.sin(math.pi * pp)
+    for n in range(N):
+        buf[n] = math.tanh(buf[n] * 1.25)
+    escrever("invocar.wav", buf, 0.78)
+
+
+def grito():
+    """Grito / uivo / lamento de chefe (buff, mudança de fase, vento):
+    duas vozes desafinadas que sobem e descem por um formante, com ar e
+    tremolo (Noiva do Eclipse, Morvanna, Entrevane, Aerion)."""
+    random.seed(31009)
+    dur = 0.55
+    N = int(dur * FS)
+    buf = [0.0] * N
+    fmt = Reson()
+    lp = 0.0
+    for n in range(N):
+        t = n / FS
+        p = t / dur
+        gliss = 300.0 + 420.0 * math.sin(math.pi * p) + 30.0 * math.sin(2 * math.pi * 6.0 * t)
+        src = math.sin(2 * math.pi * gliss * t) + math.sin(2 * math.pi * gliss * 1.012 * t)
+        x = random.uniform(-1, 1)
+        lp += 0.08 * (x - lp)
+        src += lp * 0.4
+        s = fmt.passo(src, 780.0 + 300.0 * math.sin(math.pi * p), 110.0)
+        trem = 0.78 + 0.22 * math.sin(2 * math.pi * 7.5 * t)
+        env = math.sin(math.pi * min(1.0, p / 0.85)) ** 0.7
+        buf[n] += s * env * trem * 0.7
+    for n in range(N):
+        buf[n] = math.tanh(buf[n] * 1.3)
+    escrever("grito.wav", buf, 0.74)
+
+
+def sino_ataque():
+    """ASSINATURA do Sino Vivo: badalada de bronze grave, parciais
+    inarmónicos e cauda a ressoar -- tudo o que ele faz "toca"."""
+    random.seed(31010)
+    dur = 0.95
+    N = int(dur * FS)
+    buf = [0.0] * N
+    f0 = 165.0
+    for parcial, peso, dec in ((1.0, 1.0, 3.0), (2.76, 0.6, 4.2), (5.40, 0.34, 6.5),
+                               (8.93, 0.18, 9.0)):
+        for n in range(N):
+            t = n / FS
+            env = min(1.0, t / 0.006) * math.exp(-t * dec)
+            buf[n] += math.sin(2 * math.pi * f0 * parcial * t) * env * peso
+    _impacto(buf, 0.0, 0.5, 60.0, 6.0)
+    # batida metálica no ataque
+    rc = Reson()
+    for n in range(int(0.03 * FS)):
+        t = n / FS
+        buf[n] += rc.passo(random.uniform(-1, 1), 2400.0, 800.0) * math.exp(-t * 90.0) * 0.4
+    for n in range(N):
+        buf[n] = math.tanh(buf[n] * 0.9)
+    escrever("sino_ataque.wav", buf, 0.82)
+
+
+def engrenagem():
+    """ASSINATURA do Maquinista Infernal: engrenagens a ranger (cliques
+    ritmados), vapor por cima e um motor grave por baixo."""
+    random.seed(31011)
+    dur = 0.5
+    N = int(dur * FS)
+    buf = [0.0] * N
+    # motor
+    fase = 0.0
+    for n in range(N):
+        t = n / FS
+        p = t / dur
+        fase += (92.0 + 10.0 * math.sin(2 * math.pi * 7.0 * t)) / FS
+        saw = 2.0 * (fase % 1.0) - 1.0
+        buf[n] += saw * 0.28 * math.exp(-p * 1.8)
+    # ratchet: cliques metálicos a ~34 Hz
+    passo = FS / 34.0
+    k = 0
+    while k * passo < N:
+        tc = k * passo / FS + random.uniform(-0.002, 0.002)
+        rc = Reson()
+        for n in range(int(tc * FS), min(N, int((tc + 0.03) * FS))):
+            tt = n / FS - tc
+            buf[n] += rc.passo(random.uniform(-1, 1), 1800.0 + 400.0 * (k % 3), 500.0) \
+                * math.exp(-tt * 70.0) * 0.5
+        k += 1
+    # vapor: ruído passa-alto a esvair
+    hp, ain = 0.0, 0.0
+    ahp = math.exp(-2 * math.pi * 2600 / FS)
+    for n in range(N):
+        t = n / FS
+        x = random.uniform(-1, 1)
+        hp = ahp * (hp + x - ain)
+        ain = x
+        buf[n] += hp * 0.3 * math.exp(-(t / dur) * 2.2)
+    for n in range(N):
+        buf[n] = math.tanh(buf[n] * 1.3)
+    escrever("engrenagem.wav", buf, 0.72)
+
+
+def lamina_cair():
+    """ASSINATURA da Dama Guilhotina: silvo metálico a acelerar + SCHWING
+    agudo + baque pesado da lâmina a assentar."""
+    random.seed(31012)
+    dur = 0.42
+    N = int(dur * FS)
+    buf = [0.0] * N
+    ar = Reson()
+    lp = 0.0
+    for n in range(N):
+        p = n / N
+        x = random.uniform(-1, 1)
+        lp += 0.12 * (x - lp)
+        f = 600.0 + 2600.0 * (p ** 1.8)     # acelera para cima
+        s = ar.passo(lp, f, 400.0)
+        env = (p ** 0.7) * (p < 0.62)
+        buf[n] += s * env * 0.6
+    # schwing: ping brilhante no instante do corte
+    t0 = int(0.6 * dur * FS)
+    r1, r2 = Reson(), Reson()
+    for n in range(t0, N):
+        tt = (n - t0) / FS
+        exc = random.uniform(-1, 1) * math.exp(-tt * 120.0)
+        s = r1.passo(exc, 3100.0, 130.0) + 0.6 * r2.passo(exc, 5200.0, 240.0)
+        buf[n] += s * math.exp(-tt * 16.0) * 0.7
+    _impacto(buf, 0.62 * dur, 0.7, 95.0, 13.0)
+    for n in range(N):
+        buf[n] = math.tanh(buf[n] * 1.35)
+    escrever("lamina_cair.wav", buf, 0.8)
+
+
+def feixe_vil():
+    """Feixe do Zeriko / Olho do Abismo: carregar grave e sombrio + feixe
+    longo com ondulação lenta (mais ameaçador que o `chefe_magia` comum)."""
+    random.seed(31013)
+    dur = 0.62
+    N = int(dur * FS)
+    buf = [0.0] * N
+    # carregar: cintilação BAIXA a ganhar corpo
+    for n in range(int(0.34 * FS)):
+        t = n / FS
+        p = t / 0.34
+        f = 460.0 + 1200.0 * (p ** 1.5)
+        env = (p ** 1.8) * 0.34
+        buf[n] += math.sin(2 * math.pi * f * t) * env
+        buf[n] += math.sin(2 * math.pi * f * 0.5 * t) * env * 0.5     # sub-oitava = "vil"
+    # feixe: ruído grave com AM lenta + sub
+    t0 = int(0.34 * FS)
+    rr = Reson()
+    for n in range(t0, N):
+        t = (n - t0) / FS
+        wob = 0.7 + 0.3 * math.sin(2 * math.pi * 11.0 * t)
+        fc = 520.0 * math.exp(-t * 5.0) + 150.0
+        s = rr.passo(random.uniform(-1, 1) * 0.6, fc, 240.0) * wob
+        buf[n] += s * math.exp(-t * 4.5) * 0.9
+        buf[n] += math.sin(2 * math.pi * fc * 0.5 * t) * math.exp(-t * 6.0) * 0.4
+    for n in range(N):
+        buf[n] = math.tanh(buf[n] * 1.3)
+    escrever("feixe_vil.wav", buf, 0.82)
+
+
 if __name__ == "__main__":
     game_over_voz()
     menu_loop()
@@ -827,3 +1235,17 @@ if __name__ == "__main__":
     chefe_cai()
     transicao()
     chefe_magia()
+    # sons de habilidade por chefe (2 set 2026)
+    esmagar()
+    golpe_pesado()
+    garra()
+    chama()
+    gelo()
+    praga()
+    raio()
+    invocar()
+    grito()
+    sino_ataque()
+    engrenagem()
+    lamina_cair()
+    feixe_vil()

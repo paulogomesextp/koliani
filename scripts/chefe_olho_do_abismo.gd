@@ -179,7 +179,7 @@ func _preparar_laser() -> void:
 
 
 func _disparar_laser() -> void:
-	Som.toca("chefe_magia", -5.0, 0.5)
+	Som.toca("feixe_vil", -5.0, 0.5)
 	_abanar_camera(3.0)
 	if _feixe:
 		_feixe.width = 8.0
@@ -245,7 +245,7 @@ func _apagar_falsas() -> void:
 
 
 func _largar_clones() -> void:
-	Som.toca("projetil", -9.0, 0.7)
+	Som.toca("invocar", -9.0, 0.7)
 	var pai := get_parent()
 	if pai == null:
 		return

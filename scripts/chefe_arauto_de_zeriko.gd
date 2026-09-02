@@ -257,7 +257,7 @@ func _ve_koliani() -> bool:
 ## --- ataques comuns ------------------------------------------------
 
 func _golpe_frontal(dano: int, alcance := 82.0) -> void:
-	Som.toca("demonio_ataque", -8.0, 1.1)
+	Som.toca("golpe_pesado", -8.0, 1.1)
 	var k := _obter_koliani()
 	if k == null:
 		return
@@ -267,7 +267,7 @@ func _golpe_frontal(dano: int, alcance := 82.0) -> void:
 
 
 func _sopro_fogo() -> void:
-	Som.toca("onda", -6.0, 0.7)
+	Som.toca("chama", -6.0, 0.7)
 	var pai := get_parent()
 	if pai == null:
 		return
@@ -331,7 +331,7 @@ func _dardo(dir: Vector2) -> void:
 
 
 func _nova() -> void:
-	Som.toca("onda", -4.0, 0.8)
+	Som.toca("grito", -4.0, 0.8)
 	_abanar_camera(7.0)
 	var pai := get_parent()
 	if pai == null:

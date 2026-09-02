@@ -139,7 +139,7 @@ func _ve_koliani() -> bool:
 ## --- ataques ---------------------------------------------------------
 
 func _pa_de_carvao() -> void:
-	Som.toca("investida", -6.0, 0.8)
+	Som.toca("engrenagem", -6.0, 0.8)
 	var dir := _dir_para_koliani()
 	# arco corpo-a-corpo
 	var k := _obter_koliani()
@@ -165,7 +165,7 @@ func _pa_de_carvao() -> void:
 
 
 func _vapor() -> void:
-	Som.toca("onda", -6.0, 1.4)
+	Som.toca("engrenagem", -6.0, 1.4)
 	var pai := get_parent()
 	if pai == null:
 		return

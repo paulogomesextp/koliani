@@ -178,7 +178,7 @@ func _teleportar() -> void:
 ## --- ataques ---------------------------------------------------------
 
 func _lancar_laminas() -> void:
-	Som.toca("chefe_magia", -8.0, 1.3)
+	Som.toca("lamina_cair", -8.0, 1.3)
 	var pai := get_parent()
 	if pai == null:
 		return
@@ -234,7 +234,7 @@ func _lamina(dir: float, y: float, atraso: float) -> void:
 
 
 func _cair_guilhotinas() -> void:
-	Som.toca("onda", -6.0, 0.8)
+	Som.toca("lamina_cair", -6.0, 0.8)
 	_abanar_camera(4.0)
 	var gs := get_tree().get_nodes_in_group("guilhotinas_arena")
 	var i := 0
@@ -246,7 +246,7 @@ func _cair_guilhotinas() -> void:
 
 
 func _corte() -> void:
-	Som.toca("investida", -6.0, 0.7)
+	Som.toca("lamina_cair", -6.0, 0.7)
 	_abanar_camera(3.0)
 	var dir := _dir_para_koliani()
 	var pai := get_parent()

@@ -187,7 +187,7 @@ func _decretos() -> void:
 
 
 func _largar_decoys() -> void:
-	Som.toca("onda", -10.0, 1.5)
+	Som.toca("invocar", -10.0, 1.5)
 	_limpar_decoys()
 	var pai := get_parent()
 	if pai == null:

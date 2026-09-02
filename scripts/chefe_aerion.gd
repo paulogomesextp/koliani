@@ -203,7 +203,7 @@ func _ve_koliani() -> bool:
 ## --- ataques ---------------------------------------------------------
 
 func _lancas() -> void:
-	Som.toca("chefe_magia", -8.0, 1.3)
+	Som.toca("gelo", -8.0, 1.3)
 	# aponta para onde a Koliani ESTAVA no início do telégrafo -> correr
 	# durante o aviso desvia mesmo
 	var base := (_mira_lancas - global_position).normalized()
@@ -246,7 +246,7 @@ func _lanca(dir: Vector2) -> void:
 
 
 func _tornados() -> void:
-	Som.toca("onda", -7.0, 1.4)
+	Som.toca("grito", -7.0, 1.4)
 	var pai := get_parent()
 	if pai == null:
 		return

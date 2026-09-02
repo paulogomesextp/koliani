@@ -166,7 +166,7 @@ func _ve_koliani() -> bool:
 ## --- ataques ---------------------------------------------------------
 
 func _baque() -> void:
-	Som.toca("onda", -5.0, 0.8)
+	Som.toca("esmagar", -5.0, 0.8)
 	_abanar_camera(6.0)
 	var k := _obter_koliani()
 	if k and absf(_vetor_para_koliani().x) <= raio_onda and k.is_on_floor():
@@ -175,7 +175,7 @@ func _baque() -> void:
 
 
 func _gadanha() -> void:
-	Som.toca("investida", -6.0, 0.7)
+	Som.toca("golpe_pesado", -6.0, 0.7)
 	var pai := get_parent()
 	if pai == null:
 		return
@@ -209,7 +209,7 @@ func _gadanha() -> void:
 
 
 func _lanca() -> void:
-	Som.toca("chefe_magia", -6.0, 1.1)
+	Som.toca("projetil", -6.0, 1.1)
 	var pai := get_parent()
 	if pai == null:
 		return

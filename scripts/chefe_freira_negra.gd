@@ -178,7 +178,7 @@ func _vela_acesa_mais_perto() -> Node:
 ## --- ataques ---------------------------------------------------------
 
 func _velas_negras() -> void:
-	Som.toca("projetil", -9.0, 0.6)
+	Som.toca("chama", -9.0, 0.6)
 	var pai := get_parent()
 	if pai == null:
 		return
@@ -229,7 +229,7 @@ func _chama_negra(dir: Vector2) -> void:
 
 
 func _procissao() -> void:
-	Som.toca("demonio_ataque", -9.0, 0.6)
+	Som.toca("invocar", -9.0, 0.6)
 	var pai := get_parent()
 	if pai == null:
 		return
@@ -253,7 +253,7 @@ func _procissao() -> void:
 
 
 func _soprar_tudo() -> void:
-	Som.toca("onda", -8.0, 0.6)
+	Som.toca("grito", -8.0, 0.6)
 	_abanar_camera(5.0)
 	for v in get_tree().get_nodes_in_group("velas"):
 		if is_instance_valid(v) and v.acesa:

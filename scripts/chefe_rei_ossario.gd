@@ -209,7 +209,7 @@ func _ve_koliani() -> bool:
 ## --- ataques ---------------------------------------------------------
 
 func _lancas() -> void:
-	Som.toca("chefe_magia", -8.0, 1.3)
+	Som.toca("projetil", -8.0, 1.3)
 	var pai := get_parent()
 	if pai == null:
 		return
@@ -248,7 +248,7 @@ func _lanca(dir: Vector2) -> void:
 
 
 func _convocar(n: int) -> void:
-	Som.toca("demonio_ataque", -8.0, 0.6)
+	Som.toca("invocar", -8.0, 0.6)
 	var pai := get_parent()
 	if pai == null:
 		return
@@ -270,7 +270,7 @@ func _convocar(n: int) -> void:
 
 
 func _golpe_frontal(dano: int) -> void:
-	Som.toca("demonio_ataque", -7.0, 1.0)
+	Som.toca("golpe_pesado", -7.0, 1.0)
 	var k := _obter_koliani()
 	if k == null:
 		return
@@ -280,7 +280,7 @@ func _golpe_frontal(dano: int) -> void:
 
 
 func _muro_de_ossos() -> void:
-	Som.toca("onda", -6.0, 0.7)
+	Som.toca("esmagar", -6.0, 0.7)
 	_abanar_camera(4.0)
 	var pai := get_parent()
 	if pai == null:

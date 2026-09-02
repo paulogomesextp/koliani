@@ -314,7 +314,7 @@ func _dardo(de: Vector2, dir: Vector2) -> void:
 func _virar_energia() -> void:
 	_fase2 = true
 	Som.toca("chefe_cai", -6.0, 0.8)
-	Som.toca("onda", -8.0, 0.7)
+	Som.toca("grito", -8.0, 0.7)
 	_abanar_camera(9.0)
 	dur_tel *= 0.72
 	dur_exposta *= 0.85

@@ -176,7 +176,7 @@ func _ve_koliani() -> bool:
 ## --- ataques -------------------------------------------------------
 
 func _raizes() -> void:
-	Som.toca("investida", -9.0, 1.2)
+	Som.toca("praga", -9.0, 1.2)
 	var origem := global_position.x
 	var alvo := _x_koliani()
 	var n := 3 if _nivel == 1 else 4
@@ -199,7 +199,7 @@ func _salva_dirigida() -> void:
 	var k := _obter_koliani()
 	if k == null:
 		return
-	Som.toca("projetil", -9.0, 0.9)
+	Som.toca("praga", -9.0, 0.9)
 	var base := (k.global_position - global_position).normalized()
 	var n := 3 if _nivel == 1 else 5
 	for i in n:
@@ -208,7 +208,7 @@ func _salva_dirigida() -> void:
 
 
 func _leque_radial() -> void:
-	Som.toca("projetil", -8.0, 0.7)
+	Som.toca("praga", -8.0, 0.7)
 	var n := 8 if _nivel == 2 else 12
 	for i in n:
 		_tiro(Vector2.RIGHT.rotated(TAU * float(i) / float(n)))

@@ -229,7 +229,7 @@ func _ve_koliani() -> bool:
 ## --- ataques ---------------------------------------------------------
 
 func _golpe_frontal(dano: int, alcance := 82.0) -> void:
-	Som.toca("demonio_ataque", -8.0, 1.15)
+	Som.toca("golpe_pesado", -8.0, 1.15)
 	var k := _obter_koliani()
 	if k == null:
 		return

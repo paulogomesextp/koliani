@@ -25,6 +25,20 @@ const CAMINHOS := {
 	"conquista": "res://assets/audio/conquista.wav",
 	"transicao": "res://assets/audio/transicao.wav",
 	"chefe_magia": "res://assets/audio/chefe_magia.wav",
+	# sons de habilidade por chefe (2 set 2026) -- ver tools/gerar_audio.py
+	"esmagar": "res://assets/audio/esmagar.wav",
+	"golpe_pesado": "res://assets/audio/golpe_pesado.wav",
+	"garra": "res://assets/audio/garra.wav",
+	"chama": "res://assets/audio/chama.wav",
+	"gelo": "res://assets/audio/gelo.wav",
+	"praga": "res://assets/audio/praga.wav",
+	"raio": "res://assets/audio/raio.wav",
+	"invocar": "res://assets/audio/invocar.wav",
+	"grito": "res://assets/audio/grito.wav",
+	"sino_ataque": "res://assets/audio/sino_ataque.wav",
+	"engrenagem": "res://assets/audio/engrenagem.wav",
+	"lamina_cair": "res://assets/audio/lamina_cair.wav",
+	"feixe_vil": "res://assets/audio/feixe_vil.wav",
 }
 const VOZES := 8
 

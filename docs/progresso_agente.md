@@ -1,5 +1,45 @@
 # Progresso do agente `gaming` — campanha dos 30 níveis
 
+## Sessão 2026-09-02 — sons de habilidade por chefe (v0.9.17)
+
+Pendente #2 da sessão anterior: até aqui quase todos os 30 chefes
+partilhavam `investida` / `chefe_magia` / `onda` / `demonio_ataque`, só
+mudando o pitch. Agora há uma família de timbres **por arquétipo de
+ataque** em `tools/gerar_audio.py` (13 `.wav` novos), registados em
+`scripts/som.gd`, e cada `scripts/chefe_*.gd` mapeia as suas habilidades
+para o arquétipo certo (continua a variar pitch/volume por instância):
+
+- **baque no chão** `esmagar` — Ghorak, Carcereiro, Colosso, Rei Ossário
+  (muro), Capitão (racha), Bispo (mãos), Vyrak (nova/torre), Zeriko
+  (trono/nova), Entrevane (raízes)…
+- **lâmina pesada** `golpe_pesado` — golpes frontais lentos de Colosso,
+  Rei Ossário, Capitão, Rei Devorador, Açougueiro (cutelada/gancho),
+  Arauto, Koliani Sombria, Zeriko F4, Entrevane, Vyrak (cauda)
+- **garra / talhes** `garra` — Rainha Aracnídea, Vyrak (garra + golpe)
+- **fogo** `chama` — Ignivar (brasas/lâmina), Arauto (sopro), Vyrak
+  (sopro), Freira Negra (velas), Coração? não (ver praga)
+- **gelo / lua** `gelo` — Sacerdotisa Lunar (luas + maré), Aerion (lanças)
+- **praga / veneno** `praga` — Rainha Aracnídea (cuspo), Naga (cuspo +
+  poça), Ghorak (semear), Coração Putrefacto (raízes + salvas), Freira?
+- **raio** `raio` — Voltaris (surge, teleporte, invocar raios)
+- **invocação** `invocar` — todos os chefes que largam clones/servos/
+  cobras/anjos/convidados/cavaleiros (Rei Ossário, Freira, Bispo, Noiva,
+  Rei Devorador, Voltaris, Morvanna, Naga, Olho do Abismo, Zeriko F2)
+- **grito / uivo** `grito` — Noiva do Eclipse, Morvanna, Entrevane
+  (choro), Aerion (tornados), Freira (soprar), Arauto (nova), mudanças
+  de fase do Primeiro Prisioneiro e do Capitão Negro
+- **assinaturas**: `sino_ataque` (Sino Vivo — tudo o que ele faz toca),
+  `engrenagem` (Maquinista — pá de carvão + vapor), `lamina_cair` (Dama
+  Guilhotina — lâminas + guilhotinas + corte)
+- **feixe próprio** `feixe_vil` — Olho do Abismo (laser) e Zeriko
+  (salva F1 + olho F3), mais sombrio que o `chefe_magia` comum
+
+Testes headless verdes + smoke da Floresta Putrefacta sem erros de
+script. **Por playtestar**: se os timbres lêem bem em jogo e se algum
+está alto/baixo de mais (tudo "a olho", sem poder ouvir os `.wav` aqui).
+O passo seguinte de #2 seria dar som a CADA ataque individual (não só ao
+arquétipo) dos chefes-marco.
+
 ## Sessão 2026-09-01 (tarde/noite) — Fase 3, rig novo, som e inimigos
 
 Lote de pedidos do Paulo nesta sessão, por ordem de entrega:

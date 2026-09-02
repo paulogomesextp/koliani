@@ -90,7 +90,7 @@ func _physics_process(dt: float) -> void:
 		Fase.SURGE:
 			if _t < dt:
 				_esvair(false)
-				Som.toca("onda", -8.0, 1.5)
+				Som.toca("raio", -8.0, 1.5)
 			if _t >= 0.22:
 				_ir(_prox)
 		Fase.RAIOS_TEL:
@@ -147,7 +147,7 @@ func _ve_koliani() -> bool:
 func _esvair(a_sair: bool) -> void:
 	if _sprite == null:
 		return
-	Som.toca("projetil", -12.0, 0.5 if a_sair else 0.9)
+	Som.toca("raio", -12.0, 0.5 if a_sair else 0.9)
 	create_tween().tween_property(_sprite, "modulate:a", 0.1 if a_sair else 1.0, 0.18)
 
 
@@ -165,7 +165,7 @@ func _invocar_raios() -> void:
 	var pai := get_parent()
 	if pai == null:
 		return
-	Som.toca("chefe_magia", -8.0, 1.4)
+	Som.toca("raio", -8.0, 1.4)
 	var n := 4 if _fase2 else 3
 	var passo := 90.0 if _fase2 else 130.0
 	var alvo := _x_koliani()
@@ -181,7 +181,7 @@ func _invocar_raios() -> void:
 
 
 func _largar_clones() -> void:
-	Som.toca("demonio_ataque", -8.0, 0.7)
+	Som.toca("invocar", -8.0, 0.7)
 	var pai := get_parent()
 	if pai == null:
 		return

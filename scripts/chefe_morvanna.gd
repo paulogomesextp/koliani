@@ -217,7 +217,7 @@ func _invocar_mao(x: float, atraso: float) -> void:
 
 
 func _largar_clones() -> void:
-	Som.toca("demonio_ataque", -8.0, 0.7)
+	Som.toca("invocar", -8.0, 0.7)
 	var pai := get_parent()
 	if pai == null:
 		return
@@ -241,7 +241,7 @@ func _largar_clones() -> void:
 
 
 func _apagar_plataformas() -> void:
-	Som.toca("onda", -7.0, 0.9)
+	Som.toca("grito", -7.0, 0.9)
 	_abanar_camera(4.0)
 	var plats := get_tree().get_nodes_in_group("plataformas_flutuantes")
 	var segundos := dur_apaga * (1.4 if _fase2 else 1.0)

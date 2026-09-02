@@ -175,7 +175,7 @@ func _cruz(x: float, atraso: float) -> void:
 	t.tween_callback(func() -> void:
 		c.monitoring = true
 		_abanar_camera(3.0)
-		Som.toca("onda", -7.0, 1.1)
+		Som.toca("esmagar", -7.0, 1.1)
 		for b in c.get_overlapping_bodies():
 			if b is Koliani:
 				b.receber_dano(dano, signf(b.global_position.x - c.global_position.x)))
@@ -232,7 +232,7 @@ func _mao(x: float, atraso: float) -> void:
 
 
 func _anjos() -> void:
-	Som.toca("demonio_ataque", -8.0, 0.6)
+	Som.toca("invocar", -8.0, 0.6)
 	var pai := get_parent()
 	if pai == null:
 		return

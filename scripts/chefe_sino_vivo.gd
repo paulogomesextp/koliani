@@ -98,7 +98,7 @@ func _physics_process(dt: float) -> void:
 			global_position = global_position.lerp(alvo, clampf(dt * 3.5, 0.0, 1.0))
 			if _t >= 0.55:
 				_alvo_queda = _chao_cache - 30.0
-				Som.toca("investida", -6.0, 0.6)
+				Som.toca("sino_ataque", -6.0, 0.6)
 				_ir(Fase.QUEDA_CAI)
 		Fase.QUEDA_CAI:
 			global_position.y = move_toward(global_position.y, _alvo_queda, 1500.0 * dt)
@@ -140,8 +140,7 @@ func _ve_koliani() -> bool:
 ## --- ataques ---------------------------------------------------------
 
 func _badalada() -> void:
-	Som.toca("selo", -5.0, 0.55)
-	Som.toca("onda", -6.0, 0.6)
+	Som.toca("sino_ataque", -5.0, 0.55)
 	_abanar_camera(5.0)
 	var n := 2 if _fase2 else 1
 	for i in n:
@@ -181,7 +180,7 @@ func _onda_rasteira(dir: float, atraso: float) -> void:
 
 
 func _grito() -> void:
-	Som.toca("projetil", -7.0, 0.6)
+	Som.toca("sino_ataque", -7.0, 0.9)
 	var pai := get_parent()
 	if pai == null:
 		return
@@ -224,7 +223,7 @@ func _crescente(dir: Vector2) -> void:
 
 
 func _baque_radial() -> void:
-	Som.toca("onda", -5.0, 0.7)
+	Som.toca("sino_ataque", -5.0, 0.7)
 	_abanar_camera(7.0)
 	var k := _obter_koliani()
 	if k and absf(k.global_position.x - global_position.x) <= 150.0 and k.is_on_floor():

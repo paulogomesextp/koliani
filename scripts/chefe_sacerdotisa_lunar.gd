@@ -139,7 +139,7 @@ func _ve_koliani() -> bool:
 ## --- ataques ---------------------------------------------------------
 
 func _lancar_luas() -> void:
-	Som.toca("projetil", -8.0, 0.7)
+	Som.toca("gelo", -8.0, 0.7)
 	var n := 4 if _fase2 else 2
 	var base := _dir_para_koliani_vec()
 	for i in n:
@@ -191,7 +191,7 @@ func _crescente(dir: Vector2) -> void:
 
 
 func _mare_lunar() -> void:
-	Som.toca("onda", -8.0, 0.5)
+	Som.toca("gelo", -8.0, 0.5)
 	_abanar_camera(4.0)
 	var k := _obter_koliani()
 	if k and k.has_method("definir_grav_escala"):

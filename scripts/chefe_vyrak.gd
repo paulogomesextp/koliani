@@ -92,7 +92,7 @@ func _physics_process(dt: float) -> void:
 			_piscar(true)
 			if _t >= dur_tel:
 				_piscar(false)
-				Som.toca("investida", -7.0, 0.8)
+				Som.toca("garra", -7.0, 0.8)
 				_ataque_forte = 0.4
 				_ir(Fase.GARRA)
 		Fase.GARRA:
@@ -233,7 +233,7 @@ func _ve_koliani() -> bool:
 ## --- ataques ---------------------------------------------------------
 
 func _golpe_frontal(dano: int, alcance_x: float, alcance_y: float) -> void:
-	Som.toca("demonio_ataque", -7.0, 0.8)
+	Som.toca("garra", -7.0, 0.8)
 	var k := _obter_koliani()
 	if k == null:
 		return
@@ -243,7 +243,7 @@ func _golpe_frontal(dano: int, alcance_x: float, alcance_y: float) -> void:
 
 
 func _sopro() -> void:
-	Som.toca("onda", -6.0, 0.7)
+	Som.toca("chama", -6.0, 0.7)
 	var pai := get_parent()
 	if pai == null:
 		return
@@ -274,7 +274,7 @@ func _sopro() -> void:
 
 
 func _cauda() -> void:
-	Som.toca("investida", -6.0, 0.6)
+	Som.toca("golpe_pesado", -6.0, 0.6)
 	_abanar_camera(5.0)
 	var pai := get_parent()
 	if pai == null:
@@ -336,7 +336,7 @@ func _bola_para_baixo() -> void:
 
 
 func _nova() -> void:
-	Som.toca("onda", -5.0, 0.9)
+	Som.toca("esmagar", -5.0, 0.9)
 	_abanar_camera(6.0)
 	var pai := get_parent()
 	if pai == null:
@@ -371,7 +371,7 @@ func _nova() -> void:
 
 func _partir_a_torre() -> void:
 	Som.toca("chefe_cai", -6.0, 0.7)
-	Som.toca("onda", -5.0, 0.6)
+	Som.toca("esmagar", -5.0, 0.6)
 	_abanar_camera(10.0)
 	for p in get_tree().get_nodes_in_group("plataformas_pico"):
 		if not is_instance_valid(p):

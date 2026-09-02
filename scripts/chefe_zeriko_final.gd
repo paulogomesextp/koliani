@@ -250,7 +250,7 @@ func _ve_koliani() -> bool:
 ## --- F1 ----------------------------------------------------------
 
 func _salva() -> void:
-	Som.toca("projetil", -6.0, 0.8)
+	Som.toca("feixe_vil", -6.0, 0.8)
 	var pai := get_parent()
 	if pai == null:
 		return
@@ -314,7 +314,7 @@ func _meteoro() -> void:
 ## --- F2 ----------------------------------------------------------
 
 func _cavaleiros() -> void:
-	Som.toca("demonio_ataque", -8.0, 0.6)
+	Som.toca("invocar", -8.0, 0.6)
 	var pai := get_parent()
 	if pai == null:
 		return
@@ -331,7 +331,7 @@ func _cavaleiros() -> void:
 
 
 func _trono_de_garras() -> void:
-	Som.toca("onda", -6.0, 0.7)
+	Som.toca("esmagar", -6.0, 0.7)
 	_abanar_camera(6.0)
 	var pai := get_parent()
 	if pai == null:
@@ -384,7 +384,7 @@ func _preparar_olho() -> void:
 
 
 func _disparar_olho() -> void:
-	Som.toca("chefe_magia", -4.0, 0.9)
+	Som.toca("feixe_vil", -4.0, 0.9)
 	_abanar_camera(4.0)
 	if _feixe:
 		_feixe.width = 9.0
@@ -426,7 +426,7 @@ func _terminar_olho() -> void:
 ## --- F4 ----------------------------------------------------------
 
 func _golpe_magia() -> void:
-	Som.toca("demonio_ataque", -6.0, 1.3)
+	Som.toca("golpe_pesado", -6.0, 1.3)
 	var k := _obter_koliani()
 	if k == null:
 		return
@@ -436,7 +436,7 @@ func _golpe_magia() -> void:
 
 
 func _nova_final() -> void:
-	Som.toca("onda", -3.0, 0.7)
+	Som.toca("esmagar", -3.0, 0.7)
 	_abanar_camera(9.0)
 	var pai := get_parent()
 	if pai == null:

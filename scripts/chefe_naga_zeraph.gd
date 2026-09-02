@@ -148,7 +148,7 @@ func _ve_koliani() -> bool:
 ## --- ataques ---------------------------------------------------------
 
 func _cuspir() -> void:
-	Som.toca("projetil", -8.0, 0.7)
+	Som.toca("praga", -8.0, 0.7)
 	var base := _vetor_para_koliani().normalized()
 	if base.length() < 0.5:
 		base = Vector2(_direcao, -0.1).normalized()
@@ -191,7 +191,7 @@ func _jacto(dir: Vector2) -> void:
 
 
 func _levantar_cobras() -> void:
-	Som.toca("demonio_ataque", -8.0, 0.7)
+	Som.toca("invocar", -8.0, 0.7)
 	var pai := get_parent()
 	if pai == null:
 		return
@@ -230,7 +230,7 @@ func _trocar_com_estatua() -> void:
 
 
 func _poca_veneno() -> void:
-	Som.toca("onda", -7.0, 0.6)
+	Som.toca("praga", -7.0, 0.6)
 	var pai := get_parent()
 	if pai == null:
 		return

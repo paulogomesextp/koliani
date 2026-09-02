@@ -178,7 +178,7 @@ func _presa_perto() -> Node:
 ## --- ataques ---------------------------------------------------------
 
 func _garfo() -> void:
-	Som.toca("demonio_ataque", -7.0, 0.8)
+	Som.toca("golpe_pesado", -7.0, 0.8)
 	var k := _obter_koliani()
 	if k == null:
 		return
@@ -231,7 +231,7 @@ func _prato(dir: Vector2) -> void:
 
 
 func _servos() -> void:
-	Som.toca("demonio_ataque", -9.0, 0.6)
+	Som.toca("invocar", -9.0, 0.6)
 	var pai := get_parent()
 	if pai == null:
 		return

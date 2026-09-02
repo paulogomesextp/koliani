@@ -107,7 +107,7 @@ func _physics_process(dt: float) -> void:
 				_ir(Fase.ECLIPSE_ESCURO)
 		Fase.ECLIPSE_ESCURO:
 			if _t < dt:
-				Som.toca("onda", -10.0, 0.5)
+				Som.toca("grito", -10.0, 0.5)
 				_abanar_camera(2.0)
 			if _t >= (0.5 if not _fase2 else 0.35):
 				_nova()
@@ -196,7 +196,7 @@ func _anel(dir: Vector2) -> void:
 
 
 func _nova() -> void:
-	Som.toca("onda", -4.0, 0.8)
+	Som.toca("grito", -4.0, 0.8)
 	_abanar_camera(7.0)
 	var pai := get_parent()
 	if pai == null:
@@ -229,7 +229,7 @@ func _nova() -> void:
 
 
 func _convidados() -> void:
-	Som.toca("demonio_ataque", -9.0, 0.6)
+	Som.toca("invocar", -9.0, 0.6)
 	var pai := get_parent()
 	if pai == null:
 		return

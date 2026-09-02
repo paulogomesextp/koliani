@@ -140,7 +140,7 @@ func _ve_koliani() -> bool:
 ## --- ataques ---------------------------------------------------------
 
 func _baque() -> void:
-	Som.toca("onda", -5.0)
+	Som.toca("esmagar", -5.0)
 	_abanar_camera(5.0)
 	var k := _obter_koliani()
 	if k and absf((k.global_position - global_position).x) <= raio_onda and k.is_on_floor():
@@ -152,7 +152,7 @@ func _baque() -> void:
 
 
 func _semear() -> void:
-	Som.toca("chefe_magia", -8.0)
+	Som.toca("praga", -8.0)
 	var origem := global_position.x
 	var alvo := _x_koliani() + signf(_x_koliani() - origem) * 44.0
 	var passos := 5 if _fase2 else 4
