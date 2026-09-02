@@ -179,17 +179,13 @@ altura_visual = 26.0
 cor_base = Color(0.17, 0.25, 0.11, 1)
 cor_topo = Color(0.42, 0.64, 0.29, 1)
 
-; alcova secreta -- acima e atras da Alta3
+; poleiro alto opcional -- acima e atras da Alta3 (vista, posicao)
 [node name="Alcova" parent="." instance=ExtResource("9_pl")]
 position = Vector2(2060, 336)
 tamanho = Vector2(150, 16)
 altura_visual = 22.0
 cor_base = Color(0.14, 0.2, 0.09, 1)
 cor_topo = Color(0.34, 0.5, 0.24, 1)
-
-[node name="ColSegredo" parent="." instance=ExtResource("3_col")]
-position = Vector2(2060, 302)
-habilidade_id = "escudo"
 
 [node name="Alta4" parent="." instance=ExtResource("9_pl")]
 position = Vector2(2360, 500)
@@ -239,6 +235,11 @@ tamanho = Vector2(200, 24)
 altura_visual = 44.0
 cor_base = Color(0.16, 0.24, 0.1, 1)
 cor_topo = Color(0.42, 0.64, 0.29, 1)
+
+; recompensa do nivel -- no ponto de reencontro (ninguem falha)
+[node name="ColEscudo" parent="." instance=ExtResource("3_col")]
+position = Vector2(2600, 520)
+habilidade_id = "escudo"
 
 [node name="RaizAgarra3" parent="." instance=ExtResource("10_raiz")]
 position = Vector2(2600, 544)
