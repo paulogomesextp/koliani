@@ -192,6 +192,7 @@ func _gerar_parallax() -> void:
 	# pack pixel-art: camadas reais em vez das silhuetas geradas
 	if fundo_pack != "" and PACKS.has(fundo_pack):
 		_montar_fundo_pack(rng)
+		_frente_ambiente(rng)
 		if luzes_horizonte:
 			_brilho_horizonte(rng)
 		return
@@ -229,6 +230,7 @@ func _gerar_parallax() -> void:
 			x += rng.randf_range(passo * 0.55, passo * 1.1)
 
 	_faixa_rasteira(rng)
+	_frente_ambiente(rng)
 
 	if luzes_horizonte:
 		_brilho_horizonte(rng)
@@ -275,6 +277,48 @@ func _montar_ceu() -> void:
 	tex.fill_from = Vector2(0.0, 0.0)
 	tex.fill_to = Vector2(0.0, 1.0)
 	_ceu_tex.texture = tex
+
+
+## FRENTE: silhuetas escuras que pendem do topo do ecrã para dentro da cena
+## (raízes/correntes/estalactites/estandartes conforme o bioma). A Koliani
+## passa POR TRÁS delas -- dão enquadramento e profundidade sem tapar a
+## leitura (alpha baixo). Camada própria, fixa ao mundo, z alto.
+func _frente_ambiente(rng: RandomNumberGenerator) -> void:
+	var frente := get_node_or_null("FrenteAmbiente") as Node2D
+	if frente == null:
+		frente = Node2D.new()
+		frente.name = "FrenteAmbiente"
+		frente.z_index = 4
+		add_child(frente)
+	for n in frente.get_children():
+		n.free()
+	# alguns biomas são céu aberto -- pouca ou nenhuma frente
+	var densidade := {"floresta": 620.0, "prisao": 720.0, "catacumbas": 620.0,
+		"cidade": 820.0, "castelo": 680.0, "torres": 1600.0}.get(bioma, 820.0)
+	var cor := cor_silhueta.darkened(0.2).lerp(cor_fundo, 0.1)
+	var x := extensao_esquerda + rng.randf_range(0.0, densidade)
+	while x < largura_nivel + 200.0:
+		var comp := rng.randf_range(170.0, 400.0)   # quão fundo desce
+		var larg := rng.randf_range(9.0, 24.0)
+		var topo := rng.randf_range(-60.0, 70.0)
+		var p := Polygon2D.new()
+		var pts := PackedVector2Array()
+		var segs := 7 + rng.randi() % 5
+		# lado esquerdo a descer em ziguezague, lado direito a subir
+		for i in segs + 1:
+			var t := float(i) / float(segs)
+			var wob := sin(t * 6.0 + rng.randf() * 6.28) * larg * 0.5
+			pts.append(Vector2(-larg * 0.5 + wob, topo + t * comp))
+		for i in range(segs, -1, -1):
+			var t := float(i) / float(segs)
+			var wob := sin(t * 6.0 + rng.randf() * 6.28) * larg * 0.5
+			pts.append(Vector2(larg * 0.5 + wob, topo + t * comp))
+		p.polygon = pts
+		p.color = Color(cor.r, cor.g, cor.b, rng.randf_range(0.16, 0.3))
+		p.position = Vector2(x, 0.0)
+		p.set_meta("gerado", true)
+		frente.add_child(p)
+		x += rng.randf_range(densidade * 0.6, densidade * 1.4)
 
 
 ## Banda de mato/entulho colada ao fundo do ecrã, em qualquer bioma, para a

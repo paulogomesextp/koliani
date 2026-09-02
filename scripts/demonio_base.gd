@@ -769,44 +769,55 @@ func _morrer_anim() -> void:
 	queue_free()
 
 
-## Monta o visual de ELITE: aura a pulsar atrás do sprite + barra de vida
-## fina por cima da cabeça (só aparece ao 1.º golpe) + rim mais aceso.
+## Monta o visual de ELITE: DECAL de chão a brilhar (à Dead Cells) + barra
+## de vida fina por cima da cabeça (só aparece ao 1.º golpe) + rim aceso.
 func _montar_elite() -> void:
 	_elite_vmax = maxi(vida, 1)
 	var alvo: Node2D = _sprite if _sprite else self
 	var cor := cor_rim
 	cor.a = 1.0
-
-	_aura = Node2D.new()
-	_aura.name = "AuraElite"
-	_aura.z_index = -2
-	alvo.add_child(_aura)
 	var aditivo := CanvasItemMaterial.new()
 	aditivo.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
+
+	# altura real do bicho no ecrã (para dimensionar decal + barra)
+	var alt_px := 44.0
+	if _anim and _anim.sprite_frames and _anim.sprite_frames.has_animation("idle"):
+		var tx := _anim.sprite_frames.get_frame_texture("idle", 0)
+		if tx:
+			var im := tx.get_image()
+			if im:
+				var rr := im.get_used_rect()
+				if rr.size.y > 4:
+					alt_px = float(rr.size.y) * _anim.scale.y
+
+	# --- decal de chão: elipse achatada a brilhar sob os pés ---
+	_aura = Node2D.new()
+	_aura.name = "DecalElite"
+	_aura.z_index = -1
+	alvo.add_child(_aura)
+	var raio := clampf(alt_px * 0.5, 18.0, 34.0)
+	var elipse := PackedVector2Array()
+	for i in 24:
+		var a := TAU * float(i) / 24.0
+		elipse.append(Vector2(cos(a) * raio * 1.4, sin(a) * raio * 0.34))
 	var disco := Polygon2D.new()
-	var pts := PackedVector2Array()
-	for i in 28:
-		var a := TAU * float(i) / 28.0
-		pts.append(Vector2(cos(a), sin(a)) * 38.0)
-	disco.polygon = pts
-	disco.color = Color(cor.r, cor.g, cor.b, 0.11)
+	disco.polygon = elipse
+	disco.color = Color(cor.r, cor.g, cor.b, 0.22)
 	disco.material = aditivo
-	disco.position = Vector2(0.0, -16.0)
 	_aura.add_child(disco)
 	var aro := Line2D.new()
-	aro.points = pts
+	aro.points = elipse
 	aro.closed = true
 	aro.width = 2.0
-	aro.default_color = Color(cor.r, cor.g, cor.b, 0.5)
+	aro.default_color = Color(cor.r, cor.g, cor.b, 0.55)
 	aro.material = aditivo
-	aro.position = Vector2(0.0, -16.0)
 	_aura.add_child(aro)
 
 	_barra = Node2D.new()
 	_barra.name = "BarraElite"
 	_barra.z_index = 20
 	_barra.visible = false
-	_barra.position = Vector2(0.0, -58.0)
+	_barra.position = Vector2(0.0, -alt_px - 14.0)
 	alvo.add_child(_barra)
 	var bg := ColorRect.new()
 	bg.size = Vector2(52.0, 6.0)
