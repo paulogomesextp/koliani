@@ -506,9 +506,10 @@ func _perigo_no_vao(par: Node2D, x: float, y: float) -> void:
 
 
 ## Props decorativos (0x72 DungeonTileset II, CC0) -- ["ficheiro", escala].
+## NB: os `wall_banner_{red,blue}` saíram daqui (2 set 2026) -- são estandartes
+## de PAREDE e ficavam deitados nas plataformas com um ar de "caixa" estranho.
 const PROPS_CHAO := [
 	["crate.png", 3.2], ["skull.png", 3.0],
-	["wall_banner_red.png", 3.4], ["wall_banner_blue.png", 3.4],
 ]
 const PROP_COLUNA := preload("res://assets/sprites/pixel/props/column.png")
 
