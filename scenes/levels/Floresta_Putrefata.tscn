@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://bkolianiflorestaput01"]
+[gd_scene load_steps=16 format=3 uid="uid://bkolianiflorestaput01"]
 
 ; REGIAO I / nivel 1 -- O Caminho das Raizes Mortas.
 ; Nivel FEITO A MAO (corredor = false) -- sem a jornada procedural. Salas
@@ -19,6 +19,7 @@
 [ext_resource type="PackedScene" uid="uid://bkolianiraizperigo01" path="res://scenes/actors/RaizPerigo.tscn" id="10_raiz"]
 [ext_resource type="PackedScene" uid="uid://bkolianiplatritmada05" path="res://scenes/actors/PlataformaRitmada.tscn" id="11_ritmo"]
 [ext_resource type="PackedScene" uid="uid://bkolianiaguavenenosa01" path="res://scenes/actors/AguaVenenosa.tscn" id="12_agua"]
+[ext_resource type="PackedScene" uid="uid://bkolianiessencia01" path="res://scenes/actors/Essencia.tscn" id="99_ess"]
 
 [sub_resource type="RectangleShape2D" id="rs_chk"]
 size = Vector2(44, 96)
@@ -332,6 +333,11 @@ script = ExtResource("5_chk")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CheckReencontro"]
 shape = SubResource("rs_chk")
+
+[node name="CacheEssencia" parent="." instance=ExtResource("99_ess")]
+position = Vector2(2060, 302)
+valor = 26
+espalhar = false
 
 [node name="Porta" parent="." instance=ExtResource("4_porta")]
 position = Vector2(3470, 626)

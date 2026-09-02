@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://bkolianigaleriaossos17"]
+[gd_scene load_steps=13 format=3 uid="uid://bkolianigaleriaossos17"]
 
 ; REGIAO IV / nivel 17 -- Galeria dos Ossos.
 ; Nivel FEITO A MAO (corredor = false). Corredores de osso apertados.
@@ -17,6 +17,7 @@
 [ext_resource type="PackedScene" uid="uid://bkolianiplataforma01" path="res://scenes/actors/Plataforma.tscn" id="9_pl"]
 [ext_resource type="PackedScene" uid="uid://bkolianiparedefragil01" path="res://scenes/actors/ParedeFragil.tscn" id="10_fragil"]
 [ext_resource type="PackedScene" uid="uid://bkolianiaguavenenosa01" path="res://scenes/actors/AguaVenenosa.tscn" id="11_trevas"]
+[ext_resource type="PackedScene" uid="uid://bkolianiessencia01" path="res://scenes/actors/Essencia.tscn" id="99_ess"]
 
 [sub_resource type="RectangleShape2D" id="rs_chk"]
 size = Vector2(44, 96)
@@ -227,6 +228,11 @@ script = ExtResource("5_chk")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CheckReencontro"]
 shape = SubResource("rs_chk")
+
+[node name="CacheEssencia" parent="." instance=ExtResource("99_ess")]
+position = Vector2(980, 566)
+valor = 44
+espalhar = false
 
 [node name="Porta" parent="." instance=ExtResource("4_porta")]
 position = Vector2(2820, 626)

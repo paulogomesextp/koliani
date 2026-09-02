@@ -1,6 +1,5 @@
 {
 	"game.subtitle": "Traverse les mondes fantomatiques. Libère Aurora.",
-
 	"menu.new_game": "NOUVELLE PARTIE",
 	"menu.load_game": "CHARGER",
 	"menu.load_world": "CHARGER  —  Monde %d",
@@ -15,14 +14,12 @@
 	"dev.test_level": "TESTER UN AUTRE NIVEAU",
 	"dev.title": "MODE DEV — choisir un niveau",
 	"dev.close": "Fermer",
-
 	"options.title": "OPTIONS",
 	"options.sound": "SON",
 	"options.music": "Musique",
 	"options.effects": "Effets",
 	"options.language": "LANGUE",
 	"options.back": "RETOUR",
-
 	"pause.title": "PAUSE",
 	"pause.resume": "Reprendre",
 	"pause.options": "Options",
@@ -30,7 +27,6 @@
 	"pause.restart_checkpoint": "Reprendre au point de contrôle",
 	"pause.main_menu": "Menu principal",
 	"pause.quit": "Quitter le jeu",
-
 	"hud.ability.salto_duplo": "Double saut",
 	"hud.ability.dash_aereo": "Dash aérien",
 	"hud.ability.partir_paredes": "Briser les murs",
@@ -50,19 +46,16 @@
 	"hud.controls.throw": "Lancer",
 	"hud.controls.swap": "Changer d'arme",
 	"hud.controls.pause": "Pause",
-
 	"journal.title": "Journal — indices sur maman",
 	"journal.counter": "%d / %d indices",
 	"journal.close": "Fermer (Échap)",
 	"journal.empty": "Tu n'as encore trouvé aucun indice.\nCherche dans les mondes.",
 	"journal.unwritten": "(indice pas encore écrit)",
-
 	"gameover.title": "GAME OVER",
 	"gameover.reason.time": "Le temps est écoulé.",
 	"gameover.reason.lives": "Plus de vies.",
 	"gameover.restart_note": "La campagne recommence depuis le début.",
 	"gameover.prompt": "(sauter / attaquer)",
-
 	"final.line1": "Zeriko tombe. La lanterne-cage se brise sur le sol de pierre.",
 	"final.line2": "La lumière qui était enfermée à l'intérieur se lève. Elle prend des épaules, des mains, un visage fatigué.",
 	"final.line3": "« Aurora. » Le nom échappe à Koliani avant qu'elle n'y pense.",
@@ -71,10 +64,8 @@
 	"final.line6": "— fin —",
 	"final.prompt": "(sauter / attaquer)",
 	"final.prompt_last": "(sauter / attaquer : retour au menu)",
-
 	"endcard.text": "La dernière porte cède.\nKoliani retrouve sa mère.\n\n— fin de ce qui existe pour l'instant —",
 	"endcard.prompt": "(sauter / attaquer : retour au menu)",
-
 	"world.forest": "Forêt Putréfiée",
 	"world.prison": "Prison des Damnés",
 	"world.towers": "Tours Oubliées",
@@ -82,7 +73,6 @@
 	"world.unknown": "?",
 	"world.catacombs": "Catacombes de l'Abîme",
 	"world.city": "Cité Corrompue",
-
 	"map.title": "CARTE DU MONDE",
 	"map.play": "JOUER",
 	"map.back": "‹ Menu",
@@ -91,7 +81,6 @@
 	"map.locked": "verrouillé",
 	"map.soon": "bientôt disponible",
 	"map.hint": "←  →  choisir      ·      saut / attaque : jouer",
-
 	"clue.floresta_sinal_da_porta.title": "L'odeur sur la porte",
 	"clue.floresta_sinal_da_porta.body": "La porte sent encore son soufre. Elle est passée par ici — et pas seule.",
 	"clue.floresta_carta_rasgada.title": "Une demi-lettre",
@@ -170,7 +159,6 @@
 	"clue.torres_sussurro_da_mae.body": "Derrière le mur fissuré, gravé à la hâte : « Il me garde pour la fin, Kol. Arrive avant ça. »",
 	"clue.castelo_aurora_livre.title": "Aurora",
 	"clue.castelo_aurora_livre.body": "La lanterne-cage s'est brisée. Maman — Aurora — est libre. Elles sortent ensemble par la dernière porte.",
-
 	"sel.play": "PLAY",
 	"sel.back": "‹ Back",
 	"sel.locked": "LOCKED",
@@ -238,7 +226,6 @@
 	"boss.rei_devorador": "The Devourer King",
 	"boss.arauto_de_zeriko": "The Herald of Zeriko",
 	"boss.zeriko": "ZERIKO",
-
 	"dlg.tap": "tap to continue  ▸",
 	"dlg.speaker.koliani": "Koliani",
 	"dlg.primeiro.intro.1": "I came for a brother. I reached the throne. I turned at the last step.",
@@ -254,7 +241,6 @@
 	"dlg.zeriko.intro.2": "Aurora is behind that door. Come and open it.",
 	"dlg.zeriko.win.1": "The room... it is not holding...",
 	"dlg.zeriko.win.2": "She was already gone. I was holding a door on an empty room.",
-
 	"gear.menu.weapons": "WEAPONS",
 	"gear.menu.armor": "ARMOR",
 	"gear.title.weapons": "WEAPONS",
@@ -298,11 +284,25 @@
 	"gear.a.batina_purpura": "Purple Cassock",
 	"gear.a.vestido_do_eclipse": "Eclipse Gown",
 	"gear.a.egide_de_aurora": "Aurora's Aegis",
-
 	"sel.reward": "Reward: %s",
-
 	"chefe.escudo_cargas": "CHARGES DU BOUCLIER : %d",
 	"chefe.escudo_partido": "BOUCLIER BRISÉ",
-
-	"hud.ability.escalar_paredes": "Wall Climb"
+	"hud.ability.escalar_paredes": "Wall Climb",
+	"sel.title": "CHOISIR NIVEAU",
+	"shrine.title": "SANCTUAIRE",
+	"shrine.open": "✦ Sanctuaire",
+	"shrine.buy": "AMÉLIORER",
+	"shrine.max": "AU MAXIMUM",
+	"shrine.vitalidade": "Vitalité",
+	"shrine.forca": "Force",
+	"shrine.foco": "Concentration",
+	"shrine.agilidade": "Agilité",
+	"shrine.furia": "Furie",
+	"shrine.escudo_runico": "Bouclier Runique",
+	"shrine.vitalidade.ef": "+20 santé max par rang",
+	"shrine.forca.ef": "+12% dégâts par rang",
+	"shrine.foco.ef": "+28% régén. d'Énergie par rang",
+	"shrine.agilidade.ef": "+0.06 s d'i-frames de roulade par rang",
+	"shrine.furia.ef": "+0.22 au multiplicateur de critique par rang",
+	"shrine.escudo_runico.ef": "+1 charge de blocage du bouclier par rang"
 }

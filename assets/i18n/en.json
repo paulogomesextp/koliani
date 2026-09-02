@@ -1,6 +1,5 @@
 {
 	"game.subtitle": "Cross the ghostly worlds. Free Aurora.",
-
 	"menu.new_game": "NEW GAME",
 	"menu.load_game": "LOAD GAME",
 	"menu.load_world": "LOAD GAME  —  World %d",
@@ -15,14 +14,12 @@
 	"dev.test_level": "TEST ANOTHER LEVEL",
 	"dev.title": "DEV MODE — pick a level",
 	"dev.close": "Close",
-
 	"options.title": "OPTIONS",
 	"options.sound": "SOUND",
 	"options.music": "Music",
 	"options.effects": "Effects",
 	"options.language": "LANGUAGE",
 	"options.back": "BACK",
-
 	"pause.title": "PAUSED",
 	"pause.resume": "Resume",
 	"pause.options": "Options",
@@ -30,7 +27,6 @@
 	"pause.restart_checkpoint": "Restart at checkpoint",
 	"pause.main_menu": "Main menu",
 	"pause.quit": "Quit game",
-
 	"hud.ability.salto_duplo": "Double jump",
 	"hud.ability.dash_aereo": "Air dash",
 	"hud.ability.partir_paredes": "Wall breaking",
@@ -50,19 +46,16 @@
 	"hud.controls.throw": "Throw",
 	"hud.controls.swap": "Swap weapon",
 	"hud.controls.pause": "Pause",
-
 	"journal.title": "Journal — clues about mother",
 	"journal.counter": "%d / %d clues",
 	"journal.close": "Close (Esc)",
 	"journal.empty": "You haven't found any clues yet.\nSearch the worlds.",
 	"journal.unwritten": "(clue not written yet)",
-
 	"gameover.title": "GAME OVER",
 	"gameover.reason.time": "Time's up.",
 	"gameover.reason.lives": "Out of lives.",
 	"gameover.restart_note": "The campaign restarts from the beginning.",
 	"gameover.prompt": "(jump / attack)",
-
 	"final.line1": "Zeriko falls. The cage-lantern shatters on the stone floor.",
 	"final.line2": "The light trapped inside rises. It takes on shoulders, hands, a tired face.",
 	"final.line3": "\"Aurora.\" The name leaves Koliani before she thinks it.",
@@ -71,10 +64,8 @@
 	"final.line6": "— the end —",
 	"final.prompt": "(jump / attack)",
 	"final.prompt_last": "(jump / attack: back to menu)",
-
 	"endcard.text": "The last door gives way.\nKoliani finds her mother.\n\n— the end of what exists for now —",
 	"endcard.prompt": "(jump / attack: back to menu)",
-
 	"world.forest": "Rotting Forest",
 	"world.prison": "Prison of the Damned",
 	"world.towers": "Forgotten Towers",
@@ -82,7 +73,6 @@
 	"world.unknown": "?",
 	"world.catacombs": "Catacombs of the Abyss",
 	"world.city": "Corrupted City",
-
 	"map.title": "WORLD MAP",
 	"map.play": "PLAY",
 	"map.back": "‹ Menu",
@@ -91,7 +81,6 @@
 	"map.locked": "locked",
 	"map.soon": "coming soon",
 	"map.hint": "←  →  choose      ·      jump / attack: play",
-
 	"clue.floresta_sinal_da_porta.title": "The smell on the door",
 	"clue.floresta_sinal_da_porta.body": "The door still smells of his sulphur. She came through here — and not alone.",
 	"clue.floresta_carta_rasgada.title": "Half a letter",
@@ -170,7 +159,6 @@
 	"clue.torres_sussurro_da_mae.body": "Behind the cracked wall, scratched in haste: \"He's saving me for last, Kol. Get there before that.\"",
 	"clue.castelo_aurora_livre.title": "Aurora",
 	"clue.castelo_aurora_livre.body": "The cage-lantern is shattered. Mother — Aurora — is free. They leave together through the last door.",
-
 	"sel.play": "PLAY",
 	"sel.back": "‹ Back",
 	"sel.locked": "LOCKED",
@@ -238,7 +226,6 @@
 	"boss.rei_devorador": "The Devourer King",
 	"boss.arauto_de_zeriko": "The Herald of Zeriko",
 	"boss.zeriko": "ZERIKO",
-
 	"dlg.tap": "tap to continue  ▸",
 	"dlg.speaker.koliani": "Koliani",
 	"dlg.primeiro.intro.1": "I came for a brother. I reached the throne. I turned at the last step.",
@@ -254,7 +241,6 @@
 	"dlg.zeriko.intro.2": "Aurora is behind that door. Come and open it.",
 	"dlg.zeriko.win.1": "The room... it is not holding...",
 	"dlg.zeriko.win.2": "She was already gone. I was holding a door on an empty room.",
-
 	"gear.menu.weapons": "WEAPONS",
 	"gear.menu.armor": "ARMOR",
 	"gear.title.weapons": "WEAPONS",
@@ -298,11 +284,25 @@
 	"gear.a.batina_purpura": "Purple Cassock",
 	"gear.a.vestido_do_eclipse": "Eclipse Gown",
 	"gear.a.egide_de_aurora": "Aurora's Aegis",
-
 	"sel.reward": "Reward: %s",
-
 	"chefe.escudo_cargas": "SHIELD CHARGES: %d",
 	"chefe.escudo_partido": "BROKEN SHIELD",
-
-	"hud.ability.escalar_paredes": "Wall Climb"
+	"hud.ability.escalar_paredes": "Wall Climb",
+	"sel.title": "SELECT LEVEL",
+	"shrine.title": "SANCTUARY",
+	"shrine.open": "✦ Sanctuary",
+	"shrine.buy": "UPGRADE",
+	"shrine.max": "MAXED",
+	"shrine.vitalidade": "Vitality",
+	"shrine.forca": "Strength",
+	"shrine.foco": "Focus",
+	"shrine.agilidade": "Agility",
+	"shrine.furia": "Fury",
+	"shrine.escudo_runico": "Runic Shield",
+	"shrine.vitalidade.ef": "+20 max health per rank",
+	"shrine.forca.ef": "+12% damage per rank",
+	"shrine.foco.ef": "+28% Energy regen per rank",
+	"shrine.agilidade.ef": "+0.06s roll i-frames per rank",
+	"shrine.furia.ef": "+0.22 crit multiplier per rank",
+	"shrine.escudo_runico.ef": "+1 shield block charge per rank"
 }

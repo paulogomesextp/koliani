@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://bkolianininho03"]
+[gd_scene load_steps=15 format=3 uid="uid://bkolianininho03"]
 
 ; REGIAO I / nivel 3 -- Ninho da Viuva Negra.
 ; Nivel FEITO A MAO (corredor = false) e VERTICAL: sobe-se um poco de teia
@@ -19,6 +19,7 @@
 [ext_resource type="PackedScene" uid="uid://bkolianiteiaprende01" path="res://scenes/actors/TeiaPrende.tscn" id="10_teia"]
 [ext_resource type="PackedScene" uid="uid://bkolianiaguavenenosa01" path="res://scenes/actors/AguaVenenosa.tscn" id="11_agua"]
 [ext_resource type="PackedScene" uid="uid://bkolianiplatritmada05" path="res://scenes/actors/PlataformaRitmada.tscn" id="12_ritmo"]
+[ext_resource type="PackedScene" uid="uid://bkolianiessencia01" path="res://scenes/actors/Essencia.tscn" id="99_ess"]
 
 [sub_resource type="RectangleShape2D" id="rs_chk"]
 size = Vector2(44, 96)
@@ -240,6 +241,11 @@ script = ExtResource("5_chk")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CheckMeio"]
 shape = SubResource("rs_chk")
+
+[node name="CacheEssencia" parent="." instance=ExtResource("99_ess")]
+position = Vector2(1140, 346)
+valor = 34
+espalhar = false
 
 [node name="Porta" parent="." instance=ExtResource("4_porta")]
 position = Vector2(1000, 176)

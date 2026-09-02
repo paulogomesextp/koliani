@@ -1,6 +1,5 @@
 {
 	"game.subtitle": "Cruza los mundos fantasmales. Libera a Aurora.",
-
 	"menu.new_game": "NUEVA PARTIDA",
 	"menu.load_game": "CARGAR PARTIDA",
 	"menu.load_world": "CARGAR PARTIDA  —  Mundo %d",
@@ -15,14 +14,12 @@
 	"dev.test_level": "PROBAR OTRO NIVEL",
 	"dev.title": "MODO DEV — elegir nivel",
 	"dev.close": "Cerrar",
-
 	"options.title": "OPCIONES",
 	"options.sound": "SONIDO",
 	"options.music": "Música",
 	"options.effects": "Efectos",
 	"options.language": "IDIOMA",
 	"options.back": "VOLVER",
-
 	"pause.title": "PAUSA",
 	"pause.resume": "Continuar",
 	"pause.options": "Opciones",
@@ -30,7 +27,6 @@
 	"pause.restart_checkpoint": "Reiniciar en el punto de control",
 	"pause.main_menu": "Menú principal",
 	"pause.quit": "Salir del juego",
-
 	"hud.ability.salto_duplo": "Doble salto",
 	"hud.ability.dash_aereo": "Impulso aéreo",
 	"hud.ability.partir_paredes": "Romper muros",
@@ -50,19 +46,16 @@
 	"hud.controls.throw": "Lanzar",
 	"hud.controls.swap": "Cambiar arma",
 	"hud.controls.pause": "Pausa",
-
 	"journal.title": "Diario — pistas sobre mamá",
 	"journal.counter": "%d / %d pistas",
 	"journal.close": "Cerrar (Esc)",
 	"journal.empty": "Aún no has encontrado ninguna pista.\nBusca por los mundos.",
 	"journal.unwritten": "(pista sin escribir)",
-
 	"gameover.title": "GAME OVER",
 	"gameover.reason.time": "Se acabó el tiempo.",
 	"gameover.reason.lives": "Sin vidas.",
 	"gameover.restart_note": "La campaña se reinicia desde el principio.",
 	"gameover.prompt": "(saltar / atacar)",
-
 	"final.line1": "Zeriko cae. La linterna-jaula se hace añicos contra el suelo de piedra.",
 	"final.line2": "La luz que estaba atrapada dentro se levanta. Toma hombros, manos, un rostro cansado.",
 	"final.line3": "«Aurora.» El nombre sale de Koliani antes de pensarlo.",
@@ -71,10 +64,8 @@
 	"final.line6": "— fin —",
 	"final.prompt": "(saltar / atacar)",
 	"final.prompt_last": "(saltar / atacar: volver al menú)",
-
 	"endcard.text": "La última puerta cede.\nKoliani encuentra a su madre.\n\n— fin de lo que existe por ahora —",
 	"endcard.prompt": "(saltar / atacar: volver al menú)",
-
 	"world.forest": "Bosque Putrefacto",
 	"world.prison": "Prisión de los Condenados",
 	"world.towers": "Torres Olvidadas",
@@ -82,7 +73,6 @@
 	"world.unknown": "?",
 	"world.catacombs": "Catacumbas del Abismo",
 	"world.city": "Ciudad Corrompida",
-
 	"map.title": "MAPA DEL MUNDO",
 	"map.play": "JUGAR",
 	"map.back": "‹ Menú",
@@ -91,7 +81,6 @@
 	"map.locked": "bloqueado",
 	"map.soon": "próximamente",
 	"map.hint": "←  →  elegir      ·      saltar / atacar: jugar",
-
 	"clue.floresta_sinal_da_porta.title": "El olor en la puerta",
 	"clue.floresta_sinal_da_porta.body": "La puerta todavía huele a su azufre. Ella pasó por aquí, y no sola.",
 	"clue.floresta_carta_rasgada.title": "Media carta",
@@ -170,7 +159,6 @@
 	"clue.torres_sussurro_da_mae.body": "Tras el muro agrietado, grabado con prisa: «Me guarda para el final, Kol. Llega antes de eso.»",
 	"clue.castelo_aurora_livre.title": "Aurora",
 	"clue.castelo_aurora_livre.body": "La linterna-jaula se ha roto. Mamá — Aurora — está libre. Salen juntas por la última puerta.",
-
 	"sel.play": "PLAY",
 	"sel.back": "‹ Back",
 	"sel.locked": "LOCKED",
@@ -238,7 +226,6 @@
 	"boss.rei_devorador": "The Devourer King",
 	"boss.arauto_de_zeriko": "The Herald of Zeriko",
 	"boss.zeriko": "ZERIKO",
-
 	"dlg.tap": "tap to continue  ▸",
 	"dlg.speaker.koliani": "Koliani",
 	"dlg.primeiro.intro.1": "I came for a brother. I reached the throne. I turned at the last step.",
@@ -254,7 +241,6 @@
 	"dlg.zeriko.intro.2": "Aurora is behind that door. Come and open it.",
 	"dlg.zeriko.win.1": "The room... it is not holding...",
 	"dlg.zeriko.win.2": "She was already gone. I was holding a door on an empty room.",
-
 	"gear.menu.weapons": "WEAPONS",
 	"gear.menu.armor": "ARMOR",
 	"gear.title.weapons": "WEAPONS",
@@ -298,11 +284,25 @@
 	"gear.a.batina_purpura": "Purple Cassock",
 	"gear.a.vestido_do_eclipse": "Eclipse Gown",
 	"gear.a.egide_de_aurora": "Aurora's Aegis",
-
 	"sel.reward": "Reward: %s",
-
 	"chefe.escudo_cargas": "CARGAS DEL ESCUDO: %d",
 	"chefe.escudo_partido": "ESCUDO ROTO",
-
-	"hud.ability.escalar_paredes": "Wall Climb"
+	"hud.ability.escalar_paredes": "Wall Climb",
+	"sel.title": "ELEGIR NIVEL",
+	"shrine.title": "SANTUARIO",
+	"shrine.open": "✦ Santuario",
+	"shrine.buy": "MEJORAR",
+	"shrine.max": "AL MÁXIMO",
+	"shrine.vitalidade": "Vitalidad",
+	"shrine.forca": "Fuerza",
+	"shrine.foco": "Enfoque",
+	"shrine.agilidade": "Agilidad",
+	"shrine.furia": "Furia",
+	"shrine.escudo_runico": "Escudo Rúnico",
+	"shrine.vitalidade.ef": "+20 vida máxima por rango",
+	"shrine.forca.ef": "+12% daño por rango",
+	"shrine.foco.ef": "+28% regen. de Energía por rango",
+	"shrine.agilidade.ef": "+0.06 s de i-frames al rodar por rango",
+	"shrine.furia.ef": "+0.22 al multiplicador de crítico por rango",
+	"shrine.escudo_runico.ef": "+1 carga de bloqueo de escudo por rango"
 }

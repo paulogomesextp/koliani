@@ -1,6 +1,5 @@
 {
 	"game.subtitle": "穿越幽灵般的世界。解救奥罗拉。",
-
 	"menu.new_game": "新游戏",
 	"menu.load_game": "读取游戏",
 	"menu.load_world": "读取游戏  —  第 %d 关",
@@ -15,14 +14,12 @@
 	"dev.test_level": "测试其他关卡",
 	"dev.title": "开发模式 — 选择关卡",
 	"dev.close": "关闭",
-
 	"options.title": "选项",
 	"options.sound": "声音",
 	"options.music": "音乐",
 	"options.effects": "音效",
 	"options.language": "语言",
 	"options.back": "返回",
-
 	"pause.title": "暂停",
 	"pause.resume": "继续",
 	"pause.options": "选项",
@@ -30,7 +27,6 @@
 	"pause.restart_checkpoint": "从存档点重新开始",
 	"pause.main_menu": "主菜单",
 	"pause.quit": "退出游戏",
-
 	"hud.ability.salto_duplo": "二段跳",
 	"hud.ability.dash_aereo": "空中冲刺",
 	"hud.ability.partir_paredes": "破墙",
@@ -50,19 +46,16 @@
 	"hud.controls.throw": "投掷",
 	"hud.controls.swap": "换武器",
 	"hud.controls.pause": "暂停",
-
 	"journal.title": "日记 — 关于母亲的线索",
 	"journal.counter": "%d / %d 条线索",
 	"journal.close": "关闭 (Esc)",
 	"journal.empty": "你还没有找到任何线索。\n在各个世界里寻找。",
 	"journal.unwritten": "（线索尚未写下）",
-
 	"gameover.title": "GAME OVER",
 	"gameover.reason.time": "时间到了。",
 	"gameover.reason.lives": "生命耗尽。",
 	"gameover.restart_note": "战役将从头开始。",
 	"gameover.prompt": "（跳跃 / 攻击）",
-
 	"final.line1": "泽里科倒下了。笼灯在石地上摔得粉碎。",
 	"final.line2": "被困在里面的光升起。它长出了肩膀、双手，还有一张疲惫的脸。",
 	"final.line3": "“奥罗拉。”这个名字在科莉亚妮想到之前就脱口而出。",
@@ -71,10 +64,8 @@
 	"final.line6": "— 完 —",
 	"final.prompt": "（跳跃 / 攻击）",
 	"final.prompt_last": "（跳跃 / 攻击：返回菜单）",
-
 	"endcard.text": "最后一扇门让开了。\n科莉亚妮找到了母亲。\n\n— 目前的故事到此为止 —",
 	"endcard.prompt": "（跳跃 / 攻击：返回菜单）",
-
 	"world.forest": "腐烂森林",
 	"world.prison": "罪人监狱",
 	"world.towers": "被遗忘之塔",
@@ -82,7 +73,6 @@
 	"world.unknown": "?",
 	"world.catacombs": "深渊地下墓穴",
 	"world.city": "堕落之城",
-
 	"map.title": "世界地图",
 	"map.play": "开始",
 	"map.back": "‹ 菜单",
@@ -91,7 +81,6 @@
 	"map.locked": "未解锁",
 	"map.soon": "敬请期待",
 	"map.hint": "←  →  选择      ·      跳跃 / 攻击：开始",
-
 	"clue.floresta_sinal_da_porta.title": "门上的气味",
 	"clue.floresta_sinal_da_porta.body": "门上仍有他的硫磺味。她从这里经过——而且不是一个人。",
 	"clue.floresta_carta_rasgada.title": "半封信",
@@ -170,7 +159,6 @@
 	"clue.torres_sussurro_da_mae.body": "在裂开的墙后，匆忙刻下：“他把我留到最后，科尔。在那之前赶到。”",
 	"clue.castelo_aurora_livre.title": "奥罗拉",
 	"clue.castelo_aurora_livre.body": "笼灯碎了。母亲——奥罗拉——自由了。她们一起走出最后一扇门。",
-
 	"sel.play": "PLAY",
 	"sel.back": "‹ Back",
 	"sel.locked": "LOCKED",
@@ -238,7 +226,6 @@
 	"boss.rei_devorador": "The Devourer King",
 	"boss.arauto_de_zeriko": "The Herald of Zeriko",
 	"boss.zeriko": "ZERIKO",
-
 	"dlg.tap": "tap to continue  ▸",
 	"dlg.speaker.koliani": "Koliani",
 	"dlg.primeiro.intro.1": "I came for a brother. I reached the throne. I turned at the last step.",
@@ -254,7 +241,6 @@
 	"dlg.zeriko.intro.2": "Aurora is behind that door. Come and open it.",
 	"dlg.zeriko.win.1": "The room... it is not holding...",
 	"dlg.zeriko.win.2": "She was already gone. I was holding a door on an empty room.",
-
 	"gear.menu.weapons": "WEAPONS",
 	"gear.menu.armor": "ARMOR",
 	"gear.title.weapons": "WEAPONS",
@@ -298,11 +284,25 @@
 	"gear.a.batina_purpura": "Purple Cassock",
 	"gear.a.vestido_do_eclipse": "Eclipse Gown",
 	"gear.a.egide_de_aurora": "Aurora's Aegis",
-
 	"sel.reward": "Reward: %s",
-
 	"chefe.escudo_cargas": "护盾层数：%d",
 	"chefe.escudo_partido": "护盾破碎",
-
-	"hud.ability.escalar_paredes": "Wall Climb"
+	"hud.ability.escalar_paredes": "Wall Climb",
+	"sel.title": "选择关卡",
+	"shrine.title": "圣所",
+	"shrine.open": "✦ 圣所",
+	"shrine.buy": "升级",
+	"shrine.max": "已满级",
+	"shrine.vitalidade": "生命",
+	"shrine.forca": "力量",
+	"shrine.foco": "专注",
+	"shrine.agilidade": "敏捷",
+	"shrine.furia": "狂怒",
+	"shrine.escudo_runico": "符文盾",
+	"shrine.vitalidade.ef": "每级 +20 最大生命",
+	"shrine.forca.ef": "每级 +12% 伤害",
+	"shrine.foco.ef": "每级 +28% 能量恢复",
+	"shrine.agilidade.ef": "每级翻滚 +0.06 秒无敌帧",
+	"shrine.furia.ef": "每级 +0.22 暴击倍率",
+	"shrine.escudo_runico.ef": "每级 +1 盾牌格挡次数"
 }

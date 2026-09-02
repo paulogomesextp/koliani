@@ -1,6 +1,5 @@
 {
 	"game.subtitle": "Durchquere die geisterhaften Welten. Befreie Aurora.",
-
 	"menu.new_game": "NEUES SPIEL",
 	"menu.load_game": "SPIEL LADEN",
 	"menu.load_world": "SPIEL LADEN  —  Welt %d",
@@ -15,14 +14,12 @@
 	"dev.test_level": "ANDERE EBENE TESTEN",
 	"dev.title": "DEV-MODUS — Ebene wählen",
 	"dev.close": "Schließen",
-
 	"options.title": "OPTIONEN",
 	"options.sound": "TON",
 	"options.music": "Musik",
 	"options.effects": "Effekte",
 	"options.language": "SPRACHE",
 	"options.back": "ZURÜCK",
-
 	"pause.title": "PAUSE",
 	"pause.resume": "Fortsetzen",
 	"pause.options": "Optionen",
@@ -30,7 +27,6 @@
 	"pause.restart_checkpoint": "Am Kontrollpunkt neu starten",
 	"pause.main_menu": "Hauptmenü",
 	"pause.quit": "Spiel beenden",
-
 	"hud.ability.salto_duplo": "Doppelsprung",
 	"hud.ability.dash_aereo": "Luft-Dash",
 	"hud.ability.partir_paredes": "Wände brechen",
@@ -50,19 +46,16 @@
 	"hud.controls.throw": "Werfen",
 	"hud.controls.swap": "Waffe wechseln",
 	"hud.controls.pause": "Pause",
-
 	"journal.title": "Tagebuch — Hinweise über Mutter",
 	"journal.counter": "%d / %d Hinweise",
 	"journal.close": "Schließen (Esc)",
 	"journal.empty": "Du hast noch keine Hinweise gefunden.\nDurchsuche die Welten.",
 	"journal.unwritten": "(Hinweis noch nicht geschrieben)",
-
 	"gameover.title": "GAME OVER",
 	"gameover.reason.time": "Die Zeit ist um.",
 	"gameover.reason.lives": "Keine Leben mehr.",
 	"gameover.restart_note": "Die Kampagne beginnt von vorn.",
 	"gameover.prompt": "(springen / angreifen)",
-
 	"final.line1": "Zeriko fällt. Die Käfig-Laterne zerschellt auf dem Steinboden.",
 	"final.line2": "Das Licht, das darin gefangen war, erhebt sich. Es bekommt Schultern, Hände, ein müdes Gesicht.",
 	"final.line3": "„Aurora.“ Der Name entfährt Koliani, bevor sie ihn denkt.",
@@ -71,10 +64,8 @@
 	"final.line6": "— Ende —",
 	"final.prompt": "(springen / angreifen)",
 	"final.prompt_last": "(springen / angreifen: zurück zum Menü)",
-
 	"endcard.text": "Die letzte Tür gibt nach.\nKoliani findet ihre Mutter.\n\n— das Ende dessen, was vorerst existiert —",
 	"endcard.prompt": "(springen / angreifen: zurück zum Menü)",
-
 	"world.forest": "Fauliger Wald",
 	"world.prison": "Kerker der Verdammten",
 	"world.towers": "Vergessene Türme",
@@ -82,7 +73,6 @@
 	"world.unknown": "?",
 	"world.catacombs": "Katakomben des Abgrunds",
 	"world.city": "Verdorbene Stadt",
-
 	"map.title": "WELTKARTE",
 	"map.play": "SPIELEN",
 	"map.back": "‹ Menü",
@@ -91,7 +81,6 @@
 	"map.locked": "gesperrt",
 	"map.soon": "bald verfügbar",
 	"map.hint": "←  →  wählen      ·      Sprung / Angriff: spielen",
-
 	"clue.floresta_sinal_da_porta.title": "Der Geruch an der Tür",
 	"clue.floresta_sinal_da_porta.body": "Die Tür riecht noch nach seinem Schwefel. Sie ist hier durchgegangen — und nicht allein.",
 	"clue.floresta_carta_rasgada.title": "Ein halber Brief",
@@ -170,7 +159,6 @@
 	"clue.torres_sussurro_da_mae.body": "Hinter der rissigen Wand, hastig eingeritzt: „Er hebt mich für zuletzt auf, Kol. Sei vorher da.“",
 	"clue.castelo_aurora_livre.title": "Aurora",
 	"clue.castelo_aurora_livre.body": "Die Käfig-Laterne ist zersprungen. Mutter — Aurora — ist frei. Sie gehen zusammen durch die letzte Tür.",
-
 	"sel.play": "PLAY",
 	"sel.back": "‹ Back",
 	"sel.locked": "LOCKED",
@@ -238,7 +226,6 @@
 	"boss.rei_devorador": "The Devourer King",
 	"boss.arauto_de_zeriko": "The Herald of Zeriko",
 	"boss.zeriko": "ZERIKO",
-
 	"dlg.tap": "tap to continue  ▸",
 	"dlg.speaker.koliani": "Koliani",
 	"dlg.primeiro.intro.1": "I came for a brother. I reached the throne. I turned at the last step.",
@@ -254,7 +241,6 @@
 	"dlg.zeriko.intro.2": "Aurora is behind that door. Come and open it.",
 	"dlg.zeriko.win.1": "The room... it is not holding...",
 	"dlg.zeriko.win.2": "She was already gone. I was holding a door on an empty room.",
-
 	"gear.menu.weapons": "WEAPONS",
 	"gear.menu.armor": "ARMOR",
 	"gear.title.weapons": "WEAPONS",
@@ -298,11 +284,25 @@
 	"gear.a.batina_purpura": "Purple Cassock",
 	"gear.a.vestido_do_eclipse": "Eclipse Gown",
 	"gear.a.egide_de_aurora": "Aurora's Aegis",
-
 	"sel.reward": "Reward: %s",
-
 	"chefe.escudo_cargas": "SCHILDLADUNGEN: %d",
 	"chefe.escudo_partido": "SCHILD ZERSTÖRT",
-
-	"hud.ability.escalar_paredes": "Wall Climb"
+	"hud.ability.escalar_paredes": "Wall Climb",
+	"sel.title": "LEVEL WÄHLEN",
+	"shrine.title": "HEILIGTUM",
+	"shrine.open": "✦ Heiligtum",
+	"shrine.buy": "VERBESSERN",
+	"shrine.max": "MAXIMUM",
+	"shrine.vitalidade": "Vitalität",
+	"shrine.forca": "Stärke",
+	"shrine.foco": "Fokus",
+	"shrine.agilidade": "Beweglichkeit",
+	"shrine.furia": "Wut",
+	"shrine.escudo_runico": "Runenschild",
+	"shrine.vitalidade.ef": "+20 max. Leben pro Stufe",
+	"shrine.forca.ef": "+12% Schaden pro Stufe",
+	"shrine.foco.ef": "+28% Energie-Regen pro Stufe",
+	"shrine.agilidade.ef": "+0,06 s Rollen-i-Frames pro Stufe",
+	"shrine.furia.ef": "+0,22 Krit-Multiplikator pro Stufe",
+	"shrine.escudo_runico.ef": "+1 Schildblock-Ladung pro Stufe"
 }
