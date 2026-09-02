@@ -23,6 +23,16 @@ func _init() -> void:
 	var cena: PackedScene = load(args[0])
 	if cena == null:
 		print("SEM CENA ", args[0]); quit(2); return
+	# o `_alongar_nivel` do nivel_com_chefe.gd estica o nivel conforme o
+	# `EstadoJogo.indice_nivel` -- sem isto herdava-se o indice do save da
+	# maquina e verificava-se o nivel esticado como se fosse o N30.
+	var estado: Node = root.get_node_or_null("EstadoJogo")
+	if estado:
+		var i := int(estado.NIVEIS.find(args[0]))
+		estado.indice_nivel = maxi(i, 0)
+		estado.checkpoint = Vector2.ZERO
+		if i < 0:
+			print("(aviso: cena fora de EstadoJogo.NIVEIS -- a verificar como N1)")
 	var raiz := cena.instantiate()
 	root.add_child(raiz)
 	for _i in 8:

@@ -1,11 +1,13 @@
-[gd_scene load_steps=15 format=3 uid="uid://bkolianininho03"]
+[gd_scene load_steps=17 format=3 uid="uid://bkolianininho03"]
 
 ; REGIAO I / nivel 3 -- Ninho da Viuva Negra.
-; Nivel FEITO A MAO (corredor = false) e VERTICAL: sobe-se um poco de teia
-; em ziguezague. Bifurcacao no meio (poco esquerdo / poco direito com a
-; alcova secreta). Elite: besouro TREPADOR (cai de cima como uma aranha).
-; Teias pegajosas (TeiaPrende) atrasam enquanto o bicho fecha. Fosso de
-; teia mortal em baixo. Chefe: A Rainha Aracnidea, no cimo.
+; Nivel FEITO A MAO (corredor = false), a' escala dos vizinhos (~3600 px).
+; ACTO 1: passadicos por cima do fosso de teia. ACTO 2: O POCO -- subida em
+; ziguezague por fios de teia (PlataformaRitmada) com teias pegajosas
+; (TeiaPrende) a atrasar; no cimo espera o elite besouro TREPADOR.
+; ACTO 3: bifurcacao -- DOSSEL (por cima, rapido, com a alcova secreta) ou
+; CHAO DO NINHO (larga-se do poco, mais seguro mas cheio de teias e bichos).
+; Reencontro com a recompensa e, no fim, a arena da Rainha Aracnidea.
 
 [ext_resource type="PackedScene" uid="uid://bkolianiactor01" path="res://scenes/actors/Koliani.tscn" id="1_kol"]
 [ext_resource type="PackedScene" uid="uid://bdemoniobase01" path="res://scenes/actors/DemonioBase.tscn" id="2_dem"]
@@ -48,89 +50,98 @@ cor_luz = Color(0.86, 0.58, 1.0, 1)
 cor_poeira = Color(0.9, 0.82, 1.0, 1)
 densidade_poeira = 1.6
 bioma = "floresta"
-largura_nivel = 2800.0
+largura_nivel = 3800.0
 fundo_pack = "floresta"
 tinta_fundo = Color(0.86, 0.8, 1.05, 1)
 neblina_fundo = 0.4
 dessaturar_fundo = 0.32
 
+; --- fosso de teia por baixo de todo o nivel --------------------------
 [node name="FossoTeia" parent="." instance=ExtResource("11_agua")]
-position = Vector2(650, 1080)
-largura = 3200.0
+position = Vector2(1850, 930)
+largura = 4200.0
 altura = 320.0
 cor = Color(0.28, 0.2, 0.4, 0.94)
 
-; ===================  subida em ziguezague  ======================
+; =====================  ACTO 1 -- passadicos  ========================
 [node name="ChaoInicio" parent="." instance=ExtResource("9_pl")]
-position = Vector2(320, 880)
-tamanho = Vector2(460, 70)
+position = Vector2(300, 700)
+tamanho = Vector2(520, 70)
 altura_visual = 120.0
 cor_base = Color(0.18, 0.15, 0.2, 1)
 cor_topo = Color(0.44, 0.4, 0.5, 1)
 
+[node name="Passo1" parent="." instance=ExtResource("9_pl")]
+position = Vector2(640, 650)
+tamanho = Vector2(150, 22)
+altura_visual = 40.0
+cor_base = Color(0.2, 0.18, 0.24, 1)
+cor_topo = Color(0.5, 0.46, 0.58, 1)
+
+[node name="TeiaPasso1" parent="." instance=ExtResource("10_teia")]
+position = Vector2(640, 636)
+permanente = true
+largura = 110.0
+dur_preso = 0.45
+
+[node name="Passo2" parent="." instance=ExtResource("9_pl")]
+position = Vector2(870, 610)
+tamanho = Vector2(150, 22)
+altura_visual = 40.0
+cor_base = Color(0.2, 0.18, 0.24, 1)
+cor_topo = Color(0.5, 0.46, 0.58, 1)
+
+[node name="BesouroPasso" parent="." instance=ExtResource("2_dem")]
+position = Vector2(870, 586)
+especie = "besouro"
+alcance_patrulha = 70.0
+
+[node name="Passo3" parent="." instance=ExtResource("9_pl")]
+position = Vector2(1090, 650)
+tamanho = Vector2(150, 22)
+altura_visual = 40.0
+cor_base = Color(0.2, 0.18, 0.24, 1)
+cor_topo = Color(0.5, 0.46, 0.58, 1)
+
+; =====================  ACTO 2 -- O POCO  ============================
+[node name="ChaoPoco" parent="." instance=ExtResource("9_pl")]
+position = Vector2(1300, 700)
+tamanho = Vector2(340, 70)
+altura_visual = 120.0
+cor_base = Color(0.18, 0.15, 0.2, 1)
+cor_topo = Color(0.46, 0.42, 0.54, 1)
+
 [node name="W1" parent="." instance=ExtResource("9_pl")]
-position = Vector2(560, 800)
+position = Vector2(1230, 590)
 tamanho = Vector2(140, 20)
 altura_visual = 30.0
 cor_base = Color(0.2, 0.18, 0.24, 1)
 cor_topo = Color(0.5, 0.46, 0.58, 1)
 
 [node name="W2" parent="." instance=ExtResource("9_pl")]
-position = Vector2(770, 720)
-tamanho = Vector2(150, 20)
-altura_visual = 30.0
-cor_base = Color(0.2, 0.18, 0.24, 1)
-cor_topo = Color(0.5, 0.46, 0.58, 1)
-
-[node name="W3" parent="." instance=ExtResource("9_pl")]
-position = Vector2(560, 640)
+position = Vector2(1480, 510)
 tamanho = Vector2(140, 20)
 altura_visual = 30.0
 cor_base = Color(0.2, 0.18, 0.24, 1)
 cor_topo = Color(0.5, 0.46, 0.58, 1)
 
-[node name="TeiaW3" parent="." instance=ExtResource("10_teia")]
-position = Vector2(560, 626)
+[node name="TeiaW2" parent="." instance=ExtResource("10_teia")]
+position = Vector2(1480, 496)
 permanente = true
 largura = 110.0
 dur_preso = 0.5
 
-[node name="W4" parent="." instance=ExtResource("9_pl")]
-position = Vector2(780, 560)
-tamanho = Vector2(150, 20)
+[node name="W3" parent="." instance=ExtResource("9_pl")]
+position = Vector2(1230, 430)
+tamanho = Vector2(140, 20)
 altura_visual = 30.0
 cor_base = Color(0.2, 0.18, 0.24, 1)
 cor_topo = Color(0.5, 0.46, 0.58, 1)
 
-[node name="MeioLedge" parent="." instance=ExtResource("9_pl")]
-position = Vector2(560, 480)
-tamanho = Vector2(200, 26)
-altura_visual = 44.0
-cor_base = Color(0.18, 0.15, 0.2, 1)
-cor_topo = Color(0.46, 0.42, 0.54, 1)
-
-[node name="EliteTrepador" parent="." instance=ExtResource("2_dem")]
-position = Vector2(560, 300)
-scale = Vector2(1.4, 1.4)
-elite = true
-especie = "besouro"
-vida = 155
-dano_contacto = 20
-comportamento = "trepador"
-cor_rim = Color(0.86, 0.5, 1.0, 1)
-
-; ===================  BIFURCACAO vertical  =======================
-; -- poco ESQUERDO --
-[node name="L1" parent="." instance=ExtResource("9_pl")]
-position = Vector2(400, 400)
+; fio de teia que aparece e some -- mecanica-assinatura do poco
+[node name="FioTeia" parent="." instance=ExtResource("12_ritmo")]
+position = Vector2(1480, 350)
 tamanho = Vector2(130, 18)
-altura_visual = 26.0
-cor_base = Color(0.2, 0.18, 0.24, 1)
-cor_topo = Color(0.5, 0.46, 0.58, 1)
-
-[node name="L2" parent="." instance=ExtResource("12_ritmo")]
-position = Vector2(560, 320)
-tamanho = Vector2(120, 18)
 altura_visual = 24.0
 periodo = 2.4
 solida_seg = 3.0
@@ -139,93 +150,235 @@ fase = 0.0
 cor_base = Color(0.22, 0.14, 0.28, 1)
 cor_topo = Color(0.56, 0.36, 0.66, 1)
 
-[node name="L3" parent="." instance=ExtResource("9_pl")]
-position = Vector2(420, 240)
+[node name="CimoPoco" parent="." instance=ExtResource("9_pl")]
+position = Vector2(1240, 300)
+tamanho = Vector2(200, 26)
+altura_visual = 44.0
+cor_base = Color(0.18, 0.15, 0.2, 1)
+cor_topo = Color(0.46, 0.42, 0.54, 1)
+
+; ELITE -- besouro trepador, cai de cima como uma aranha
+[node name="EliteTrepador" parent="." instance=ExtResource("2_dem")]
+position = Vector2(1240, 240)
+scale = Vector2(1.4, 1.4)
+elite = true
+especie = "besouro"
+vida = 155
+dano_contacto = 20
+comportamento = "trepador"
+cor_rim = Color(0.86, 0.5, 1.0, 1)
+
+; =====================  ACTO 3 -- BIFURCACAO  ========================
+; -- DOSSEL (por cima, rapido, com a alcova secreta) --
+[node name="D1" parent="." instance=ExtResource("9_pl")]
+position = Vector2(1600, 330)
 tamanho = Vector2(140, 18)
 altura_visual = 26.0
 cor_base = Color(0.2, 0.18, 0.24, 1)
 cor_topo = Color(0.5, 0.46, 0.58, 1)
 
-; -- poco DIREITO --
-[node name="R1" parent="." instance=ExtResource("9_pl")]
-position = Vector2(820, 420)
-tamanho = Vector2(130, 18)
-altura_visual = 26.0
-cor_base = Color(0.2, 0.18, 0.24, 1)
-cor_topo = Color(0.5, 0.46, 0.58, 1)
-
-[node name="R2" parent="." instance=ExtResource("9_pl")]
-position = Vector2(980, 340)
-tamanho = Vector2(130, 18)
-altura_visual = 26.0
-cor_base = Color(0.2, 0.18, 0.24, 1)
-cor_topo = Color(0.5, 0.46, 0.58, 1)
-
-[node name="R3" parent="." instance=ExtResource("9_pl")]
-position = Vector2(860, 260)
+[node name="D2" parent="." instance=ExtResource("9_pl")]
+position = Vector2(1830, 300)
 tamanho = Vector2(140, 18)
 altura_visual = 26.0
 cor_base = Color(0.2, 0.18, 0.24, 1)
 cor_topo = Color(0.5, 0.46, 0.58, 1)
 
-; -- poleiro opcional (fora do poco direito) --
-[node name="AlcovaSec" parent="." instance=ExtResource("9_pl")]
-position = Vector2(1140, 380)
-tamanho = Vector2(130, 16)
+[node name="TeiaD2" parent="." instance=ExtResource("10_teia")]
+position = Vector2(1830, 286)
+permanente = true
+largura = 100.0
+dur_preso = 0.45
+
+; poleiro secreto -- acima da linha do dossel
+[node name="AlcovaDossel" parent="." instance=ExtResource("9_pl")]
+position = Vector2(2020, 250)
+tamanho = Vector2(160, 16)
 altura_visual = 22.0
 cor_base = Color(0.16, 0.13, 0.18, 1)
 cor_topo = Color(0.4, 0.36, 0.48, 1)
 
-; ===================  cimo -- sala do chefe  =====================
+[node name="D3" parent="." instance=ExtResource("9_pl")]
+position = Vector2(2240, 300)
+tamanho = Vector2(140, 18)
+altura_visual = 26.0
+cor_base = Color(0.2, 0.18, 0.24, 1)
+cor_topo = Color(0.5, 0.46, 0.58, 1)
+
+[node name="BesouroDossel" parent="." instance=ExtResource("2_dem")]
+position = Vector2(2240, 276)
+especie = "besouro"
+comportamento = "trepador"
+alcance_patrulha = 60.0
+
+[node name="D4" parent="." instance=ExtResource("9_pl")]
+position = Vector2(2450, 360)
+tamanho = Vector2(140, 18)
+altura_visual = 26.0
+cor_base = Color(0.2, 0.18, 0.24, 1)
+cor_topo = Color(0.5, 0.46, 0.58, 1)
+
+[node name="D5" parent="." instance=ExtResource("9_pl")]
+position = Vector2(2640, 430)
+tamanho = Vector2(150, 20)
+altura_visual = 30.0
+cor_base = Color(0.2, 0.18, 0.24, 1)
+cor_topo = Color(0.5, 0.46, 0.58, 1)
+
+; -- fios do meio: so' se chega a eles POR CIMA (do dossel). Enchem o vao
+; entre as duas rotas e servem de atalho para descer ao chao do ninho.
+[node name="M1" parent="." instance=ExtResource("9_pl")]
+position = Vector2(1930, 520)
+tamanho = Vector2(120, 18)
+altura_visual = 24.0
+cor_base = Color(0.19, 0.16, 0.22, 1)
+cor_topo = Color(0.46, 0.42, 0.55, 1)
+
+[node name="M2" parent="." instance=ExtResource("9_pl")]
+position = Vector2(2150, 500)
+tamanho = Vector2(120, 18)
+altura_visual = 24.0
+cor_base = Color(0.19, 0.16, 0.22, 1)
+cor_topo = Color(0.46, 0.42, 0.55, 1)
+
+[node name="TeiaM2" parent="." instance=ExtResource("10_teia")]
+position = Vector2(2150, 486)
+permanente = true
+largura = 100.0
+dur_preso = 0.45
+
+[node name="M3" parent="." instance=ExtResource("9_pl")]
+position = Vector2(2360, 540)
+tamanho = Vector2(120, 18)
+altura_visual = 24.0
+cor_base = Color(0.19, 0.16, 0.22, 1)
+cor_topo = Color(0.46, 0.42, 0.55, 1)
+
+; -- CHAO DO NINHO (larga-se do poco; teias e bichos, mas terreno solido) --
+[node name="N1" parent="." instance=ExtResource("9_pl")]
+position = Vector2(1800, 660)
+tamanho = Vector2(160, 22)
+altura_visual = 40.0
+cor_base = Color(0.17, 0.14, 0.19, 1)
+cor_topo = Color(0.42, 0.38, 0.5, 1)
+
+[node name="TeiaN1" parent="." instance=ExtResource("10_teia")]
+position = Vector2(1800, 646)
+permanente = true
+largura = 120.0
+dur_preso = 0.55
+
+[node name="N2" parent="." instance=ExtResource("9_pl")]
+position = Vector2(2020, 690)
+tamanho = Vector2(150, 22)
+altura_visual = 40.0
+cor_base = Color(0.17, 0.14, 0.19, 1)
+cor_topo = Color(0.42, 0.38, 0.5, 1)
+
+[node name="BesouroNinho" parent="." instance=ExtResource("2_dem")]
+position = Vector2(2020, 666)
+especie = "besouro"
+alcance_patrulha = 80.0
+
+[node name="N3" parent="." instance=ExtResource("9_pl")]
+position = Vector2(2240, 655)
+tamanho = Vector2(150, 22)
+altura_visual = 40.0
+cor_base = Color(0.17, 0.14, 0.19, 1)
+cor_topo = Color(0.42, 0.38, 0.5, 1)
+
+[node name="N4" parent="." instance=ExtResource("9_pl")]
+position = Vector2(2460, 690)
+tamanho = Vector2(150, 22)
+altura_visual = 40.0
+cor_base = Color(0.17, 0.14, 0.19, 1)
+cor_topo = Color(0.42, 0.38, 0.5, 1)
+
+[node name="TeiaN4" parent="." instance=ExtResource("10_teia")]
+position = Vector2(2460, 676)
+permanente = true
+largura = 120.0
+dur_preso = 0.55
+
+[node name="N5" parent="." instance=ExtResource("9_pl")]
+position = Vector2(2650, 645)
+tamanho = Vector2(150, 22)
+altura_visual = 40.0
+cor_base = Color(0.17, 0.14, 0.19, 1)
+cor_topo = Color(0.42, 0.38, 0.5, 1)
+
+; -- reencontro das duas rotas --
+[node name="Reencontro" parent="." instance=ExtResource("9_pl")]
+position = Vector2(2860, 600)
+tamanho = Vector2(220, 26)
+altura_visual = 44.0
+cor_base = Color(0.18, 0.15, 0.2, 1)
+cor_topo = Color(0.46, 0.42, 0.54, 1)
+
+; recompensa do nivel -- no caminho critico, ninguem a falha
+[node name="ColEscalar" parent="." instance=ExtResource("3_col")]
+position = Vector2(2860, 566)
+pista_id = "ninho_teia_com_cabelo"
+habilidade_id = "escalar_paredes"
+
+; =====================  BOSS  =======================================
+[node name="SubidaChefe" parent="." instance=ExtResource("9_pl")]
+position = Vector2(3060, 660)
+tamanho = Vector2(150, 22)
+altura_visual = 40.0
+cor_base = Color(0.18, 0.15, 0.2, 1)
+cor_topo = Color(0.46, 0.42, 0.54, 1)
+
 [node name="ChaoChefe" parent="." instance=ExtResource("9_pl")]
-position = Vector2(720, 210)
-tamanho = Vector2(640, 60)
-altura_visual = 110.0
+position = Vector2(3400, 700)
+tamanho = Vector2(660, 70)
+altura_visual = 120.0
 cor_base = Color(0.18, 0.15, 0.2, 1)
 cor_topo = Color(0.46, 0.42, 0.54, 1)
 
 [node name="TeiaChefe" parent="." instance=ExtResource("10_teia")]
-position = Vector2(560, 174)
+position = Vector2(3250, 664)
 permanente = true
 largura = 130.0
 dur_preso = 0.6
 
-; recompensa do nivel -- no cimo, onde as duas rotas reencontram
-[node name="ColEscalar" parent="." instance=ExtResource("3_col")]
-position = Vector2(640, 176)
-pista_id = "ninho_teia_com_cabelo"
-habilidade_id = "escalar_paredes"
-
 [node name="Chefe" parent="." instance=ExtResource("6_chefe")]
-position = Vector2(820, 132)
+position = Vector2(3400, 624)
 
-; ===================  luzes / checkpoints / porta  ==============
-[node name="LuzBaixo" type="PointLight2D" parent="."]
-position = Vector2(320, 820)
+; =====================  luzes / checkpoints / porta  ================
+[node name="LuzInicio" type="PointLight2D" parent="."]
+position = Vector2(260, 640)
 texture = SubResource("tex_luz")
 energy = 0.55
 color = Color(0.7, 0.45, 0.95, 1)
 scale = Vector2(1.8, 1.3)
 
-[node name="LuzMeio" type="PointLight2D" parent="."]
-position = Vector2(560, 440)
+[node name="LuzPoco" type="PointLight2D" parent="."]
+position = Vector2(1320, 500)
 texture = SubResource("tex_luz")
 energy = 0.5
 color = Color(0.75, 0.5, 1.0, 1)
-scale = Vector2(1.7, 1.3)
+scale = Vector2(1.9, 1.6)
+
+[node name="LuzNinho" type="PointLight2D" parent="."]
+position = Vector2(2240, 640)
+texture = SubResource("tex_luz")
+energy = 0.45
+color = Color(0.72, 0.48, 0.98, 1)
+scale = Vector2(1.7, 1.2)
 
 [node name="LuzChefe" type="PointLight2D" parent="."]
-position = Vector2(760, 190)
+position = Vector2(3400, 630)
 texture = SubResource("tex_luz")
 energy = 0.6
 color = Color(0.85, 0.55, 1.0, 1)
 scale = Vector2(2.6, 1.6)
 
 [node name="Koliani" parent="." instance=ExtResource("1_kol")]
-position = Vector2(180, 800)
+position = Vector2(150, 620)
 
 [node name="CheckInicio" type="Area2D" parent="."]
-position = Vector2(440, 816)
+position = Vector2(430, 636)
 collision_layer = 16
 collision_mask = 2
 script = ExtResource("5_chk")
@@ -233,20 +386,29 @@ script = ExtResource("5_chk")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CheckInicio"]
 shape = SubResource("rs_chk")
 
-[node name="CheckMeio" type="Area2D" parent="."]
-position = Vector2(560, 416)
+[node name="CheckPoco" type="Area2D" parent="."]
+position = Vector2(1300, 636)
 collision_layer = 16
 collision_mask = 2
 script = ExtResource("5_chk")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckMeio"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckPoco"]
+shape = SubResource("rs_chk")
+
+[node name="CheckReencontro" type="Area2D" parent="."]
+position = Vector2(2860, 572)
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("5_chk")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckReencontro"]
 shape = SubResource("rs_chk")
 
 [node name="CacheEssencia" parent="." instance=ExtResource("99_ess")]
-position = Vector2(1140, 346)
+position = Vector2(2020, 216)
 valor = 34
 espalhar = false
 
 [node name="Porta" parent="." instance=ExtResource("4_porta")]
-position = Vector2(1000, 176)
+position = Vector2(3640, 626)
 pista_ao_atravessar = ""

@@ -60,10 +60,13 @@ const SHADER_FUNDO := preload("res://assets/shaders/fundo_bioma.gdshader")
 ##   [ficheiro, camada_parallax, y_da_base(px), escala]
 ## camada: "Fundo" (mais lenta) -> "Longe" -> "Meio" -> "Perto" (mais rápida)
 const PACKS := {
+	# NB: as camadas de arvores tinham a base em y=1180/1250 -- quase toda a
+	# mata caia ABAIXO do chao jogavel (~700) e a floresta lia-se como um
+	# lavado escuro. Subidas para a mesma faixa dos outros packs (~900-980).
 	"floresta": [
 		["back.png", "Fundo", 900.0, 3.8],
-		["middle.png", "Longe", 1180.0, 3.6],
-		["front.png", "Meio", 1250.0, 3.8],
+		["middle.png", "Longe", 880.0, 3.6],
+		["front.png", "Meio", 930.0, 3.8],
 	],
 	"pantano": [
 		["back.png", "Fundo", 900.0, 4.0],
