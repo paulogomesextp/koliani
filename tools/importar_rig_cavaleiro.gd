@@ -59,6 +59,7 @@ func _init() -> void:
 			push_error("não abriu " + origem)
 			continue
 		_graduar(img)
+		_goticar(img)
 		var caminho := "%s/%s.png" % [DESTINO, estado]
 		var erro := img.save_png(caminho)
 		if erro != OK:
@@ -159,6 +160,64 @@ func _graduar(img: Image) -> void:
 					clampf(c.g * FRIO.g, 0.0, 1.0),
 					clampf(c.b * FRIO.b, 0.0, 1.0), c.a)
 			img.set_pixel(x, y, c)
+
+
+## 2.ª passagem "MAIS GÓTICA" (pedido do Paulo, 2 set 2026): a Koliani do
+## `key_art` é uma silhueta escura ao luar -- roxo profundo, sombras quase
+## pretas, magenta só no gume e nos brilhos, pele pálida sem calor. Corre
+## DEPOIS do `_graduar` (que já trocou os matizes); aqui só se baixa a luz,
+## se dessatura o grosso, se afundam as sombras e se acendem as arestas.
+## Toque LEVE -- a Koliani do key_art continua a ler-se (rosto, camadas,
+## rabo-de-cavalo, botas), só que mais escura e ao luar. Não é a Sombria:
+## nada de a esmagar num vulto preto.
+const _GOT_SOMBRA := Color(0.12, 0.09, 0.18)    # p/ onde vão as sombras
+const _GOT_ACESO := Color(1.0, 0.40, 0.92)      # gume / brilhos magenta
+const _GOT_LUM := 0.78                          # multiplicador geral de luz
+const _GOT_DESSAT := 0.35                        # quanto se puxa a cor p/ cinza-violeta
+
+func _goticar(img: Image) -> void:
+	var w := img.get_width()
+	var h := img.get_height()
+	var orig := img.duplicate() as Image
+	for y in h:
+		for x in w:
+			var c := img.get_pixel(x, y)   # já passou pelo _graduar
+			var a := c.a
+			if a <= 0.0:
+				continue
+			var lum := c.r * 0.30 + c.g * 0.59 + c.b * 0.11
+			var maxc := maxf(c.r, maxf(c.g, c.b))
+			var minc := minf(c.r, minf(c.g, c.b))
+			var sat := 0.0 if maxc <= 0.0 else (maxc - minc) / maxc
+			if lum > 0.82 and (c.r >= c.b or sat > 0.35):
+				# gume / brilhos -> deixa acender em magenta (não escurece)
+				var t := clampf((lum - 0.82) / 0.18, 0.0, 1.0)
+				var novo := _GOT_ACESO.lerp(Color(1, 1, 1), t)
+				novo.a = a
+				img.set_pixel(x, y, novo)
+				continue
+			# 1) dessatura um pouco para cinza-violeta frio
+			var cinza := Color(lum, lum, lum * 1.12, 1.0)
+			c = c.lerp(cinza, _GOT_DESSAT)
+			# 2) baixa a luz geral e afunda as sombras para violeta escuro
+			c = c * _GOT_LUM
+			var escuro := 1.0 - clampf(lum * 1.3, 0.0, 1.0)   # 1 nas sombras, 0 nos claros
+			c = c.lerp(_GOT_SOMBRA, escuro * 0.55)
+			c.a = a
+			img.set_pixel(x, y, c)
+	# fio magenta ténue na silhueta -- recorta contra os fundos escuros
+	for y in h:
+		for x in w:
+			if orig.get_pixel(x, y).a <= 0.0:
+				continue
+			var borda := false
+			for d: Vector2i in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
+				var p := Vector2i(x + d.x, y + d.y)
+				if p.x < 0 or p.y < 0 or p.x >= w or p.y >= h or orig.get_pixel(p.x, p.y).a <= 0.0:
+					borda = true
+					break
+			if borda:
+				img.set_pixel(x, y, img.get_pixel(x, y).lerp(Color(0.9, 0.32, 0.85), 0.3))
 
 
 ## Folha de contacto x3 com todos os estados empilhados (só para olhar).
