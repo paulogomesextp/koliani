@@ -71,3 +71,36 @@ página do itch/Kenney). O agente usa isto para gerar `assets/sprites/pixel/CRED
 - Confirmado pelo Paulo em 2 set 2026 (usar; contribuir se o jogo for
   vendido). Usado: só a folha roxa, frames extraídos e recoloridos para
   `assets/sprites/pixel/fx/` (não é redistribuição do pack).
+
+---
+
+# Packs descarregados pelo agente (3 set 2026) -- `incoming/_dl/`
+
+Todos do OpenGameArt, todos de DOMINIO PUBLICO / CC0. Descarregados com
+autorizacao expressa do Paulo ("assets free, adiciona-os ao jogo").
+
+## gothicvania-cemetery-files_1.zip  -> `_dl/gothicvania-cemetery-files_1/`
+- URL: https://opengameart.org/content/gothicvania-cemetery-pack
+- Autor: Luis Zuno (@ansimuz)
+- Licenca: CC0 -- "Public domain and free to use on whatever you want,
+  personal or commercial. Credit is not required but appreciated."
+- Conteudo usado: arvores mortas, lapides, cruzes, estatua do ceifeiro,
+  arbustos, silhueta do cemiterio.
+
+## gothicvania patreon collection.zip  -> `_dl/gothicvania_patreon/`
+- URL: https://opengameart.org/content/gothicvania-patreons-collection
+- Autor: Luis Zuno (@ansimuz) · Licenca: CC0
+- Conteudo usado: **Old Dark Castle interior tileset** (material da regiao
+  VI), Gothic Castle tileset/fundo, Gothic Horror tiles/town/clouds,
+  night-town-background (7 camadas de parallax).
+
+## opp3_cave_tiles.zip  -> `_dl/opp3_cave_tiles/`
+- URL: https://opengameart.org/content/opp2017-cave-and-mine-cart
+- Autor: Open Pixel Project · Licenca: dominio publico ("free to use,
+  modify, sell, for any purpose, they are in the public domain!")
+- Conteudo: rocha de gruta, cristais, cogumelos, lava, objectos.
+
+## bridge_expansion_pack_1_files.zip  -> `_dl/bridge_expansion/`
+- URL: https://opengameart.org/content/gothicvania-bridge-expansion-pack-1
+- Autor: Luis Zuno (@ansimuz) · Licenca: CC0
+- Conteudo: castelo tileavel, casa, arvore (props de fundo).

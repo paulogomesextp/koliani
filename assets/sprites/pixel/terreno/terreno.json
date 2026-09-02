@@ -1,0 +1,86 @@
+{
+ "floresta": {
+  "superficie": 8,
+  "fonte": "anokolisa",
+  "escura": [
+   14,
+   19,
+   8
+  ],
+  "rim": [
+   0.58,
+   1.0,
+   0.7
+  ]
+ },
+ "prisao": {
+  "superficie": 8,
+  "fonte": "kingspigs",
+  "escura": [
+   21,
+   23,
+   40
+  ],
+  "rim": [
+   0.66,
+   0.82,
+   1.0
+  ]
+ },
+ "torres": {
+  "superficie": 8,
+  "fonte": "church",
+  "escura": [
+   16,
+   10,
+   30
+  ],
+  "rim": [
+   0.9,
+   0.94,
+   1.0
+  ]
+ },
+ "catacumbas": {
+  "superficie": 8,
+  "fonte": "szadi",
+  "escura": [
+   22,
+   12,
+   10
+  ],
+  "rim": [
+   0.92,
+   0.72,
+   0.8
+  ]
+ },
+ "cidade": {
+  "superficie": 8,
+  "fonte": "town",
+  "escura": [
+   23,
+   14,
+   31
+  ],
+  "rim": [
+   1.0,
+   0.62,
+   0.92
+  ]
+ },
+ "castelo": {
+  "superficie": 8,
+  "fonte": "oldcastle",
+  "escura": [
+   10,
+   15,
+   18
+  ],
+  "rim": [
+   0.94,
+   0.6,
+   1.0
+  ]
+ }
+}

@@ -1,8 +1,9 @@
 [gd_scene load_steps=3 format=3 uid="uid://bkolianiplataforma01"]
 
-; Plataforma reutilizavel. Instanciar e por "tamanho"; o visual (NinePatchRect
-; com um patch de terreno pixel-art por bioma) e a colisao ajustam-se
-; sozinhos. O bioma le-se do no do grupo "atmosfera". Ver scripts/plataforma.gd.
+; Plataforma reutilizavel. Instanciar e por "tamanho"; o visual (terreno em
+; camadas -- capa/corpo/sombra/lados/franja, material proprio por regiao) e a
+; colisao montam-se sozinhos dentro do no "Visual". O bioma le-se do no do
+; grupo "atmosfera". Ver scripts/plataforma.gd e tools/gerar_terreno.py.
 
 [ext_resource type="Script" path="res://scripts/plataforma.gd" id="1_pl"]
 
@@ -14,11 +15,7 @@ collision_layer = 1
 collision_mask = 0
 script = ExtResource("1_pl")
 
-[node name="Visual" type="NinePatchRect" parent="."]
-offset_left = -100.0
-offset_top = -20.0
-offset_right = 100.0
-offset_bottom = 20.0
+[node name="Visual" type="Node2D" parent="."]
 
 [node name="Col" type="CollisionShape2D" parent="."]
 shape = SubResource("rs_pl")
