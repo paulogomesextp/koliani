@@ -97,11 +97,16 @@ func configurar(indice_inicial: int, respeitar_bloqueio: bool) -> void:
 		_reconstruir_estilos()
 		_reposicionar(true)
 		_traduzir()
+		_atualizar_fundo()
 
 
 # --- construção ----------------------------------------------------------
 
+var _fundo_arte: TextureRect
+
 func _montar() -> void:
+	_montar_fundo()
+
 	_faixa = Control.new()
 	_faixa.name = "Faixa"
 	_faixa.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -120,138 +125,167 @@ func _montar() -> void:
 	_reconstruir_estilos()
 	_reposicionar(true)
 	_traduzir()
+	_atualizar_fundo()
 
+
+const ART_FRAC := 0.60   # fração do cartão ocupada pela arte/retrato
 
 func _fazer_cartao(indice: int) -> Dictionary:
 	var regiao := EstadoJogo.regiao_do_nivel(indice)
 	var base: Color = COR_REGIAO[regiao] if regiao >= 0 and regiao < COR_REGIAO.size() else Color(0.6, 0.6, 0.7)
+	var art_h := CARTAO.y * ART_FRAC
 
 	var raiz := Control.new()
 	raiz.custom_minimum_size = CARTAO
 	raiz.size = CARTAO
 	raiz.pivot_offset = CARTAO * 0.5
 	raiz.mouse_filter = Control.MOUSE_FILTER_STOP
-	raiz.clip_contents = true
 
-	# preview: arte do bioma da região, esbatida e tingida com a cor da região
-	if regiao >= 0 and regiao < FUNDO_REGIAO.size() and ResourceLoader.exists(FUNDO_REGIAO[regiao]):
-		var arte := TextureRect.new()
-		arte.texture = load(FUNDO_REGIAO[regiao])
-		arte.set_anchors_preset(Control.PRESET_FULL_RECT)
-		arte.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		arte.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
-		arte.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		arte.modulate = Color(base.r * 0.5, base.g * 0.5, base.b * 0.5, 0.4)
-		raiz.add_child(arte)
-
-	var painel := PanelContainer.new()
+	# --- moldura do cartão (fundo + borda + sombra) -----------------------
+	var painel := Panel.new()
 	painel.set_anchors_preset(Control.PRESET_FULL_RECT)
 	painel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	raiz.add_child(painel)
-
 	var sb := StyleBoxFlat.new()
-	sb.bg_color = Color(0.08, 0.06, 0.12, 0.6)
-	sb.set_corner_radius_all(16)
+	sb.bg_color = Color(0.07, 0.05, 0.1, 0.98)
+	sb.set_corner_radius_all(18)
 	sb.set_border_width_all(2)
-	sb.border_color = Color(base.r, base.g, base.b, 0.55)
-	sb.shadow_color = Color(0, 0, 0, 0.5)
-	sb.shadow_size = 10
-	sb.content_margin_left = 20
-	sb.content_margin_right = 20
-	sb.content_margin_top = 18
-	sb.content_margin_bottom = 18
-
-	# estilo do cartão em destaque (o do meio, selecionado) -- borda mais
-	# viva, fundo mais saturado e glow colorido em vez da sombra neutra.
+	sb.border_color = Color(base.r, base.g, base.b, 0.4)
+	sb.shadow_color = Color(0, 0, 0, 0.55)
+	sb.shadow_size = 16
+	sb.shadow_offset = Vector2(0, 8)
 	var sb_sel := sb.duplicate() as StyleBoxFlat
-	sb_sel.bg_color = Color(0.1, 0.07, 0.15, 0.8).lerp(base, 0.14)
 	sb_sel.set_border_width_all(3)
-	sb_sel.border_color = base.lightened(0.2)
-	sb_sel.shadow_color = Color(base.r, base.g, base.b, 0.55)
-	sb_sel.shadow_size = 26
+	sb_sel.border_color = base.lightened(0.15)
+	sb_sel.shadow_color = Color(base.r, base.g, base.b, 0.42)
+	sb_sel.shadow_size = 22
+	sb_sel.shadow_offset = Vector2.ZERO
 	painel.add_theme_stylebox_override("panel", sb)
 
-	var col := VBoxContainer.new()
-	col.add_theme_constant_override("separation", 12)
-	col.alignment = BoxContainer.ALIGNMENT_CENTER
-	painel.add_child(col)
+	# --- zona de arte (topo) --------------------------------------------
+	var clip := Control.new()
+	clip.clip_contents = true
+	clip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	clip.position = Vector2(3, 3)
+	clip.size = Vector2(CARTAO.x - 6, art_h)
+	raiz.add_child(clip)
 
-	var faixa_reg := Label.new()
-	faixa_reg.name = "Regiao"
-	faixa_reg.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	faixa_reg.add_theme_font_size_override("font_size", 14)
-	faixa_reg.add_theme_color_override("font_color", Color(0.06, 0.04, 0.08))
-	var sbr := StyleBoxFlat.new()
-	sbr.bg_color = base
-	sbr.set_corner_radius_all(6)
-	sbr.content_margin_left = 12
-	sbr.content_margin_right = 12
-	sbr.content_margin_top = 3
-	sbr.content_margin_bottom = 3
-	faixa_reg.add_theme_stylebox_override("normal", sbr)
-	col.add_child(faixa_reg)
+	var arte := TextureRect.new()
+	arte.name = "Arte"
+	if regiao >= 0 and regiao < FUNDO_REGIAO.size() and ResourceLoader.exists(FUNDO_REGIAO[regiao]):
+		arte.texture = load(FUNDO_REGIAO[regiao])
+	arte.set_anchors_preset(Control.PRESET_FULL_RECT)
+	arte.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	arte.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	arte.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	arte.modulate = Color(0.62, 0.62, 0.7)   # side; o destaque acende
+	clip.add_child(arte)
 
-	var num := Label.new()
-	num.name = "Numero"
-	num.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	num.add_theme_font_size_override("font_size", 15)
-	num.add_theme_color_override("font_color", base.lightened(0.15))
-	col.add_child(num)
+	# scrim de baixo -> texto legível por cima da arte
+	var scrim := TextureRect.new()
+	scrim.set_anchors_preset(Control.PRESET_FULL_RECT)
+	scrim.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var g := Gradient.new()
+	g.offsets = PackedFloat32Array([0.0, 0.55, 1.0])
+	g.colors = PackedColorArray([Color(0.05, 0.04, 0.09, 0.0),
+		Color(0.06, 0.04, 0.1, 0.55), Color(0.06, 0.04, 0.1, 0.98)])
+	var gt := GradientTexture2D.new()
+	gt.gradient = g
+	gt.fill_from = Vector2(0.5, 0.0)
+	gt.fill_to = Vector2(0.5, 1.0)
+	scrim.texture = gt
+	scrim.stretch_mode = TextureRect.STRETCH_SCALE
+	clip.add_child(scrim)
 
+	# retrato do chefe -- grande, sobre a arte
 	var retrato_tex := _retrato_chefe(indice)
 	if retrato_tex:
 		var retrato := TextureRect.new()
 		retrato.name = "Retrato"
 		retrato.texture = retrato_tex
 		retrato.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-		retrato.custom_minimum_size = Vector2(120, 120)
-		retrato.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-		retrato.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		retrato.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		col.add_child(retrato)
+		retrato.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		var rs := art_h * 1.15
+		retrato.size = Vector2(rs, rs)
+		retrato.position = Vector2((CARTAO.x - 6 - rs) * 0.5, art_h - rs + art_h * 0.16)
+		retrato.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		clip.add_child(retrato)
+
+	# --- badge do número (canto sup. esq.) -----------------------------
+	var badge := Label.new()
+	badge.name = "Numero"
+	badge.text = "%02d" % (indice + 1)
+	badge.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	badge.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	badge.size = Vector2(46, 30)
+	badge.position = Vector2(12, 12)
+	badge.add_theme_font_size_override("font_size", 16)
+	badge.add_theme_color_override("font_color", Color(0.06, 0.04, 0.08))
+	var sbb := StyleBoxFlat.new()
+	sbb.bg_color = base
+	sbb.set_corner_radius_all(8)
+	badge.add_theme_stylebox_override("normal", sbb)
+	raiz.add_child(badge)
+
+	# --- fita de estado (canto sup. dir.) -----------------------------
+	var pill := Label.new()
+	pill.name = "Pill"
+	pill.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	pill.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	pill.add_theme_font_size_override("font_size", 12)
+	pill.size = Vector2(120, 26)
+	pill.position = Vector2(CARTAO.x - 12 - 120, 14)
+	pill.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	raiz.add_child(pill)
+
+	# --- band de info (fundo) ----------------------------------------
+	var info := VBoxContainer.new()
+	info.add_theme_constant_override("separation", 6)
+	info.position = Vector2(20, art_h + 4)
+	info.size = Vector2(CARTAO.x - 40, CARTAO.y - art_h - 20)
+	info.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+	var faixa_reg := Label.new()
+	faixa_reg.name = "Regiao"
+	faixa_reg.add_theme_font_size_override("font_size", 12)
+	faixa_reg.add_theme_color_override("font_color", base.lightened(0.25))
+	info.add_child(faixa_reg)
 
 	var nome := Label.new()
 	nome.name = "Nome"
-	nome.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	nome.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	nome.custom_minimum_size = Vector2(CARTAO.x - 40, 0)
-	nome.add_theme_font_size_override("font_size", 27)
-	nome.add_theme_color_override("font_color", Color(0.97, 0.94, 1))
+	nome.add_theme_font_size_override("font_size", 25)
+	nome.add_theme_color_override("font_color", Color(0.98, 0.95, 1))
 	nome.add_theme_color_override("font_outline_color", Color(0.02, 0.01, 0.03))
-	nome.add_theme_constant_override("outline_size", 5)
-	col.add_child(nome)
+	nome.add_theme_constant_override("outline_size", 4)
+	info.add_child(nome)
 
 	var chefe := Label.new()
 	chefe.name = "Chefe"
-	chefe.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	chefe.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	chefe.custom_minimum_size = Vector2(CARTAO.x - 40, 0)
-	chefe.add_theme_font_size_override("font_size", 16)
-	chefe.add_theme_color_override("font_color", Color(0.86, 0.66, 0.92))
-	col.add_child(chefe)
+	chefe.add_theme_font_size_override("font_size", 15)
+	chefe.add_theme_color_override("font_color", Color(0.84, 0.64, 0.92))
+	info.add_child(chefe)
 
 	var premio := Label.new()
 	premio.name = "Premio"
-	premio.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	premio.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	premio.custom_minimum_size = Vector2(CARTAO.x - 40, 0)
 	premio.add_theme_font_size_override("font_size", 13)
 	premio.add_theme_color_override("font_color", Color(0.98, 0.86, 0.55))
-	col.add_child(premio)
-
-	var pill := Label.new()
-	pill.name = "Pill"
-	pill.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	pill.add_theme_font_size_override("font_size", 13)
-	col.add_child(pill)
+	info.add_child(premio)
+	raiz.add_child(info)
 
 	raiz.gui_input.connect(_cartao_input.bind(indice))
 
 	return {
 		"raiz": raiz, "indice": indice, "jogavel": true,
-		"regiao": faixa_reg, "numero": num, "nome": nome,
+		"regiao": faixa_reg, "numero": badge, "nome": nome,
 		"chefe": chefe, "premio": premio, "pill": pill, "base": base,
-		"painel": painel, "sb_normal": sb, "sb_sel": sb_sel, "em_destaque": false,
+		"arte": arte, "painel": painel, "sb_normal": sb, "sb_sel": sb_sel, "em_destaque": false,
 	}
 
 
@@ -367,10 +401,80 @@ func _montar_rodape() -> void:
 	add_child(_dica)
 
 
+## Fundo do ecrã: a arte da região atual, muito escura, + gradiente + um
+## painel base para o carrossel nunca ficar sobre o preto puro.
+func _montar_fundo() -> void:
+	var base := ColorRect.new()
+	base.set_anchors_preset(Control.PRESET_FULL_RECT)
+	base.color = Color(0.04, 0.03, 0.06)
+	base.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(base)
+
+	_fundo_arte = TextureRect.new()
+	_fundo_arte.name = "FundoArte"
+	_fundo_arte.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_fundo_arte.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_fundo_arte.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	_fundo_arte.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_fundo_arte.modulate = Color(0.28, 0.28, 0.34, 1.0)
+	add_child(_fundo_arte)
+
+	var grad := TextureRect.new()
+	grad.set_anchors_preset(Control.PRESET_FULL_RECT)
+	grad.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var g := Gradient.new()
+	g.offsets = PackedFloat32Array([0.0, 0.45, 1.0])
+	g.colors = PackedColorArray([Color(0.03, 0.02, 0.05, 0.35),
+		Color(0.04, 0.03, 0.07, 0.72), Color(0.02, 0.02, 0.04, 0.95)])
+	var gt := GradientTexture2D.new()
+	gt.gradient = g
+	gt.fill_from = Vector2(0.5, 0.0)
+	gt.fill_to = Vector2(0.5, 1.0)
+	grad.texture = gt
+	grad.stretch_mode = TextureRect.STRETCH_SCALE
+	add_child(grad)
+
+
+func _atualizar_fundo() -> void:
+	if _fundo_arte == null:
+		return
+	var regiao := EstadoJogo.regiao_do_nivel(_sel)
+	if regiao < 0 or regiao >= FUNDO_REGIAO.size() or not ResourceLoader.exists(FUNDO_REGIAO[regiao]):
+		return
+	var nova := load(FUNDO_REGIAO[regiao]) as Texture2D
+	if _fundo_arte.texture == nova:
+		return
+	var cor: Color = COR_REGIAO[regiao] if regiao < COR_REGIAO.size() else Color(0.3, 0.3, 0.36)
+	var alvo := Color(cor.r * 0.4 + 0.1, cor.g * 0.4 + 0.1, cor.b * 0.4 + 0.1, 1.0)
+	var t := create_tween()
+	t.tween_property(_fundo_arte, "modulate:a", 0.0, 0.12)
+	t.tween_callback(func() -> void: _fundo_arte.texture = nova)
+	t.tween_property(_fundo_arte, "modulate", alvo, 0.28)
+
+
 ## Cabeçalho moderno por cima do carrossel: pastilhas de região (atalho de
 ## zona -- salta logo para lá em vez de percorrer nível a nível) + barra
 ## fina com o progresso total da campanha.
 func _montar_topo() -> void:
+	var titulo := Label.new()
+	titulo.name = "Titulo"
+	titulo.anchor_left = 0.5
+	titulo.anchor_right = 0.5
+	titulo.anchor_top = 0.0
+	titulo.anchor_bottom = 0.0
+	titulo.offset_left = -300.0
+	titulo.offset_right = 300.0
+	titulo.offset_top = 32.0
+	titulo.offset_bottom = 72.0
+	titulo.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	titulo.add_theme_font_size_override("font_size", 26)
+	titulo.add_theme_color_override("font_color", Color(0.96, 0.92, 1.0))
+	titulo.add_theme_color_override("font_outline_color", Color(0.02, 0.01, 0.03))
+	titulo.add_theme_constant_override("outline_size", 5)
+	titulo.text = Textos.t("sel.title") if Textos.t("sel.title") != "sel.title" else "ESCOLHER NÍVEL"
+	titulo.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(titulo)
+
 	var pastilhas := HBoxContainer.new()
 	pastilhas.name = "Pastilhas"
 	pastilhas.anchor_left = 0.5
@@ -517,21 +621,25 @@ func _reconstruir_estilos() -> void:
 		var regiao := EstadoJogo.regiao_do_nivel(idx)
 		var reg_id: String = EstadoJogo.REGIOES[regiao]["id"] if regiao >= 0 else "?"
 		var nome_regiao := Textos.t(WORLD_KEY.get(reg_id, "world.unknown"))
-		(c["regiao"] as Label).text = "%s  ·  %s" % [nome_regiao, _progresso_regiao(regiao)]
-		(c["numero"] as Label).text = Textos.tf("sel.count", [idx + 1, EstadoJogo.NIVEIS.size()])
+		(c["regiao"] as Label).text = "%s  ·  %s" % [nome_regiao.to_upper(), _progresso_regiao(regiao)]
+		(c["numero"] as Label).text = "%02d" % (idx + 1)
 		(c["nome"] as Label).text = _nome_nivel(idx)
 		(c["chefe"] as Label).text = Textos.tf("sel.boss", [_nome_chefe(idx)])
 		(c["premio"] as Label).text = _texto_premio(idx)
 		var pill := c["pill"] as Label
+		var painel := c["painel"] as Panel
+		painel.modulate = Color(1, 1, 1)
 		if EstadoJogo.nivel_esta_concluido(idx):
-			pill.text = Textos.t("sel.cleared")
-			_estilo_pill(pill, Color(0.4, 0.85, 0.5))
+			pill.text = "✓ " + Textos.t("sel.cleared")
+			pill.visible = true
+			_estilo_pill(pill, Color(0.38, 0.82, 0.5))
 		elif not jog:
-			pill.text = Textos.t("sel.locked")
-			_estilo_pill(pill, Color(0.85, 0.4, 0.42))
+			pill.text = "🔒 " + Textos.t("sel.locked")
+			pill.visible = true
+			_estilo_pill(pill, Color(0.5, 0.5, 0.56))
+			painel.modulate = Color(0.72, 0.7, 0.78)   # cartão trancado esbatido
 		else:
-			pill.text = ""
-			pill.remove_theme_stylebox_override("normal")
+			pill.visible = false
 	_atualizar_topo()
 
 
@@ -566,16 +674,16 @@ func _progresso_regiao(regiao: int) -> String:
 	return "%d / %d" % [feitos, niveis.size()]
 
 
-## Dá ao "Cleared" / "Locked" um fundo em badge em vez de só texto colorido.
+## Fita de estado no canto do cartão (CONCLUÍDO / TRANCADO).
 func _estilo_pill(pill: Label, cor: Color) -> void:
 	pill.add_theme_color_override("font_color", Color(0.05, 0.04, 0.06))
+	pill.add_theme_color_override("font_outline_color", Color(1, 1, 1, 0.25))
+	pill.add_theme_constant_override("outline_size", 0)
 	var sb := StyleBoxFlat.new()
 	sb.bg_color = cor
-	sb.set_corner_radius_all(8)
-	sb.content_margin_left = 10
-	sb.content_margin_right = 10
-	sb.content_margin_top = 2
-	sb.content_margin_bottom = 2
+	sb.set_corner_radius_all(7)
+	sb.shadow_color = Color(0, 0, 0, 0.4)
+	sb.shadow_size = 6
 	pill.add_theme_stylebox_override("normal", sb)
 
 
@@ -589,19 +697,25 @@ func _reposicionar(instantaneo: bool) -> void:
 		var dist: int = absi(i - _sel)
 		var escala := 1.0
 		var alpha := 1.0
+		var dy := 0.0
 		if dist == 1:
-			escala = 0.84
-			alpha = 0.68
+			escala = 0.82
+			alpha = 0.55
+			dy = 16.0
 		elif dist >= 2:
-			escala = 0.72
+			escala = 0.7
 			alpha = 0.0
-		if not _cartoes[i]["jogavel"]:
-			alpha *= 0.6
+			dy = 24.0
+		alvo_pos.y += dy
 		var destaque := dist == 0
 		if destaque != _cartoes[i]["em_destaque"]:
 			_cartoes[i]["em_destaque"] = destaque
-			var painel := _cartoes[i]["painel"] as PanelContainer
+			var painel := _cartoes[i]["painel"] as Panel
 			painel.add_theme_stylebox_override("panel", _cartoes[i]["sb_sel"] if destaque else _cartoes[i]["sb_normal"])
+			var arte := _cartoes[i].get("arte") as TextureRect
+			if arte:
+				var t2 := create_tween()
+				t2.tween_property(arte, "modulate", Color(1, 1, 1) if destaque else Color(0.62, 0.62, 0.7), 0.2)
 		raiz.mouse_filter = Control.MOUSE_FILTER_STOP if dist <= 1 else Control.MOUSE_FILTER_IGNORE
 		if instantaneo:
 			raiz.position = alvo_pos
@@ -668,6 +782,7 @@ func _mover(dir: int) -> void:
 	Som.toca("apanhar", -17.0, 1.3)
 	_reposicionar(false)
 	_atualizar_topo()
+	_atualizar_fundo()
 
 
 func _ir_para(indice: int) -> void:
@@ -678,6 +793,7 @@ func _ir_para(indice: int) -> void:
 	Som.toca("apanhar", -17.0, 1.25)
 	_reposicionar(false)
 	_atualizar_topo()
+	_atualizar_fundo()
 
 
 func _confirmar() -> void:
