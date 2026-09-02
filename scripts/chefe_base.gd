@@ -281,7 +281,56 @@ func _cair_derrotado() -> void:
 	Som.toca("chefe_cai", -6.0)
 	Som.toca("conquista", -4.0)  # som de "conquista", distinto de matar um inimigo
 	derrotado.emit()
+	_explodir_derrotado()
+	soltar_estilhacos()
 	queue_free()
+
+
+## Rebentamento GRANDE quando o chefe cai: 3 anéis pixel-art escalonados da
+## cor do chefe + um clarão aditivo + tremor de câmara. O `soltar_estilhacos`
+## (herdado do DemonioBase) só larga a poeira -- é o mesmo de um goblin, e um
+## chefe merece mais. Tudo instanciado na cena (o chefe faz `queue_free` a
+## seguir), sem referências a `self`.
+func _explodir_derrotado() -> void:
+	var cena := get_tree().current_scene
+	if cena == null or not cena.is_inside_tree():
+		return
+	var base := global_position + Vector2(0.0, -30.0 * maxf(0.8, escala_visual))
+	var tinta: Color = cor_rim.lerp(Color(1, 1, 1), 0.4)
+	for i in 3:
+		var desloc := Vector2(randf_range(-26.0, 26.0), randf_range(-22.0, 14.0))
+		var esc := 3.6 + i * 1.2
+		if i == 0:
+			Impacto.rebentar(cena, base, tinta, esc)
+		else:
+			var pos := base + desloc
+			get_tree().create_timer(i * 0.09).timeout.connect(
+				func() -> void:
+					if is_instance_valid(cena) and cena.is_inside_tree():
+						Impacto.rebentar(cena, pos, tinta, esc))
+	# clarão: disco aditivo que incha e some
+	var flash := Polygon2D.new()
+	var pts := PackedVector2Array()
+	for k in 16:
+		var a := TAU * float(k) / 16.0
+		pts.append(Vector2(cos(a), sin(a)) * 60.0)
+	flash.polygon = pts
+	flash.color = Color(1, 1, 1, 0.9)
+	var mat := CanvasItemMaterial.new()
+	mat.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
+	flash.material = mat
+	flash.global_position = base
+	flash.z_index = 45
+	flash.scale = Vector2(0.3, 0.3)
+	cena.add_child(flash)
+	var t := flash.create_tween()
+	t.set_parallel(true)
+	t.tween_property(flash, "scale", Vector2(3.4, 3.4), 0.3).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	t.tween_property(flash, "modulate:a", 0.0, 0.3)
+	t.chain().tween_callback(flash.queue_free)
+	var cam := get_viewport().get_camera_2d()
+	if cam and cam.has_method("bater"):
+		cam.bater(9.0)
 
 
 func _obter_koliani() -> Node2D:
@@ -351,6 +400,7 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0) -> void:
 			Som.toca("chefe_cai", -6.0)
 			Som.toca("conquista", -4.0)  # "conquista", distinto de matar um inimigo
 			derrotado.emit()
+			_explodir_derrotado()
 			soltar_estilhacos()
 			queue_free()
 	else:
@@ -394,5 +444,6 @@ func _cair_com_falas() -> void:
 	await Dialogo.correr(_com_alvo(falas_fim))
 	Som.toca("conquista", -4.0)
 	derrotado.emit()
+	_explodir_derrotado()
 	soltar_estilhacos()
 	queue_free()

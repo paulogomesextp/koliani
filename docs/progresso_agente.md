@@ -1,6 +1,16 @@
 # Progresso do agente `gaming` — campanha dos 30 níveis
 
-## Sessão 2026-09-02 — VFX roxo dos projéteis (v0.9.19 → v0.9.20)
+## Sessão 2026-09-02 — VFX roxo dos projéteis (v0.9.19 → v0.9.21)
+
+**v0.9.21** — rebentamento GRANDE na morte dos chefes. Até aqui um chefe
+ao cair largava o mesmo `soltar_estilhacos()` (16 partículas) de um
+goblin. Novo `ChefeBase._explodir_derrotado()`: 3 anéis `Impacto.rebentar`
+escalonados (0 / 0.09 / 0.18 s) da **cor do chefe** (`cor_rim`), um clarão
+aditivo que incha e some, e `cam.bater(9)`. Ligado aos 3 caminhos de
+morte (dano letal, `_cair_com_falas`, rede de segurança do fosso). Sem
+pack novo — reusa o `impacto_roxo` tingido. `soltar_estilhacos()`
+continua a tratar da poeira.
+
 
 **v0.9.20** — mesmo tratamento aos projéteis dos INIMIGOS (a Koliani
 disparava pixel-art, mas os tiros que voltavam eram polígonos):
