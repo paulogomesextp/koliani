@@ -22,7 +22,7 @@ const TIRO := preload("res://scenes/actors/ProjetilZeriko.tscn")
 enum Fase { DORME, ENTRE, RAIZES_TEL, RAIZES, TIROS_TEL, TIROS }
 
 @export var periodo_batida := 2.0
-@export var dur_exposta := 0.5
+@export var dur_exposta := 0.72
 @export var dur_tel := 0.55
 @export var dano_raiz := 18
 @export var dano_tiro := 15
