@@ -150,6 +150,16 @@ const SUBIDA_MAX := 104.0
 ## fita de plataformas quase em linha.
 var _teto_y := 0.0
 
+## Tendência vertical da jornada deste nível (pedido do Paulo: nem todos os
+## níveis a subir sempre) -- alterna de forma PREVISÍVEL pelos 30 níveis em
+## vez de à sorte (senão podiam calhar vários seguidos da mesma):
+## -1 desce (começa perto do topo, vagueia para baixo), 0 quase horizontal
+## (banda estreita a meio), +1 sobe (começa perto do chão, vagueia para
+## cima). Só afeta a Jornada -- a sala clássica no fim é desenhada à mão, e
+## a "passadeira final" (ver fim de `_construir`) traz sempre a espinha de
+## volta perto do chão antes de lá chegar, seja qual for a tendência.
+var _tendencia := 0
+
 
 func _ready() -> void:
 	call_deferred("_construir")
@@ -164,6 +174,7 @@ func _construir() -> void:
 	_regiao = maxi(0, EstadoJogo.regiao_atual())
 	_rng.seed = hash("jornada4|%d" % _idx)
 	_esp = especie_inimigo if especie_inimigo != "" else _especie_do_nivel()
+	_tendencia = (_idx % 3) - 1
 
 	var ancora: Vector2 = EstadoJogo.jornada_ancora_para(
 		_idx, func() -> Vector2: return (kol as Node2D).global_position)
@@ -215,6 +226,10 @@ func _construir() -> void:
 	var pool: Array = _pool_permitida()
 	var x := x0 + 40.0
 	var y := _chao_y - 150.0
+	if _tendencia == -1:
+		y = _teto_y + 160.0    # nível "a descer" -- começa lá em cima
+	elif _tendencia == 1:
+		y = _chao_y - 90.0     # nível "a subir" -- começa mesmo perto do chão
 
 	# plataforma de partida (larga) + Koliani em cima
 	var par := _novo_container(x)
@@ -240,7 +255,7 @@ func _construir() -> void:
 	# altitude-alvo que vagueia por toda a banda vertical -> a espinha sobe e
 	# desce em vagas longas em vez de ondular sempre à mesma altura
 	var banda := _chao_y - _teto_y
-	var alvo_y := _chao_y - _rng.randf_range(140.0, banda * 0.85)
+	var alvo_y := _novo_alvo_y(banda)
 	var passos_alvo := 4 + _rng.randi() % 4
 	while x < ancora.x - 900.0:
 		if passos % 10 == 0:
@@ -260,7 +275,7 @@ func _construir() -> void:
 		# nova altitude-alvo de tempos a tempos
 		if passos >= passos_alvo:
 			passos_alvo = passos + 4 + _rng.randi() % 5
-			alvo_y = _chao_y - _rng.randf_range(140.0, banda * 0.92)
+			alvo_y = _novo_alvo_y(banda)
 		# --- passo da espinha: caminha para a altitude-alvo, mas NUNCA sobe
 		#     mais que um salto de cada vez (descer/cair pode ser muito mais) ---
 		var passo_y := clampf((alvo_y - y) * 0.5 + _rng.randf_range(-32.0, 32.0),
@@ -374,6 +389,20 @@ func _construir() -> void:
 
 
 # --- infra --------------------------------------------------------------
+
+## Nova altitude-alvo para a espinha ir vagueando, respeitando a
+## `_tendencia` deste nível: -1 puxa para perto do chão (nível "a
+## descer"), +1 puxa para perto do teto (nível "a subir"), 0 fica numa
+## banda estreita a meio (nível quase horizontal).
+func _novo_alvo_y(banda: float) -> float:
+	match _tendencia:
+		1:
+			return _chao_y - _rng.randf_range(banda * 0.55, banda * 0.92)
+		-1:
+			return _chao_y - _rng.randf_range(140.0, banda * 0.42)
+		_:
+			return _chao_y - _rng.randf_range(banda * 0.32, banda * 0.52)
+
 
 ## A pool de flavour da região atual, filtrada pelo que a dificuldade já
 ## libertou (`TIER_FLAVOUR`). Se a região ainda não tem nada disponível
