@@ -58,6 +58,8 @@ assets/sprites/incoming/thewisehedgehog/**
 assets/sprites/incoming/zerie/**
 assets/sprites/incoming/knight-player/**
 assets/sprites/incoming/enemies-pack/**
+# packs que o AGENTE descarregou (OpenGameArt, CC0) -- ver incoming/LICENSES.md
+assets/sprites/incoming/_dl/**
 !assets/sprites/incoming/gothicvania/_LARGAR_AQUI.md
 !assets/sprites/incoming/luizmelo/_LARGAR_AQUI.md
 !assets/sprites/incoming/clembod/_LARGAR_AQUI.md
