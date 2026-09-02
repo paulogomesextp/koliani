@@ -912,18 +912,21 @@ func _flash_branco() -> void:
 	t.tween_property(_corpo, "modulate", base, 0.16)
 
 
-## Cor de base do corpo (tinta da armadura ou branco), com um leve
-## sobre-brilho: a tinta a 0.62 puxava a Koliani para tons muito abatidos
-## (a armadura vai de bege-poeira a roxo escuro) e ela desaparecia contra o
-## cenário gótico escuro. Menos peso na tinta + um pouco de "over-bright"
-## (>1.0) para ela apanhar o bloom da `Atmosfera` e destacar-se.
-const _BRILHO_CORPO := Color(1.16, 1.16, 1.18)
+## Cor de base do corpo (tinta da armadura ou branco), com sobre-brilho.
+## Isto multiplica-se pelo `CanvasModulate` da Atmosfera (cor_ambiente do
+## nível, tipicamente ~0.55-0.75 por canal, ainda mais baixo nos níveis de
+## propósito escuro) -- um leve >1.0 aqui não chega para compensar isso;
+## o Paulo continuou a achar a Koliani escura mesmo depois da 1.ª correção
+## (2 set 2026), por isso o over-bright sobe bastante e a tinta da
+## armadura pesa ainda menos, para ela ler sempre mais clara que o
+## cenário à volta.
+const _BRILHO_CORPO := Color(1.55, 1.55, 1.6)
 
 func _tint_armadura() -> Color:
 	if RIG == "gothic":
 		return Color.WHITE  # o rig já vem recolorido -- não pintar por cima
 	var ai: int = Equipamento.indice_armadura(EstadoJogo.armadura_equipada)
-	return _BRILHO_CORPO if ai < 0 else _BRILHO_CORPO.lerp(Equipamento.cor_armadura(ai), 0.38)
+	return _BRILHO_CORPO if ai < 0 else _BRILHO_CORPO.lerp(Equipamento.cor_armadura(ai), 0.3)
 
 
 func _abanar(forca: float) -> void:
