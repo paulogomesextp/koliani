@@ -19,6 +19,10 @@ extends Armadilha
 var _forma: CollisionShape2D
 var _sup: Polygon2D
 var _rim: Polygon2D
+## Faixa de degradê logo abaixo da linha de água: leva a cor do perigo a
+## esbater-se no escuro. Sem ela, um fosso alto (o "Vazio" das torres, o
+## abismo das catacumbas) lia-se como um retângulo preto chapado.
+var _faixa: Polygon2D
 var _luz: PointLight2D
 ## Energia de repouso da luz da linha de água (o `_process` pulsa à volta
 ## dela). Fica aqui porque muda com a variante `brasas`.
@@ -35,6 +39,11 @@ func _pronto() -> void:
 	_sup = $Superficie
 	_rim = get_node_or_null("Rebordo")
 	_luz = get_node_or_null("Luz")
+	if not brasas:
+		_faixa = Polygon2D.new()
+		_faixa.name = "Faixa"
+		add_child(_faixa)
+		move_child(_faixa, _sup.get_index() + 1)  # entre a Superficie e o Rebordo
 	if brasas:
 		_montar_brasas()
 	else:
@@ -149,6 +158,24 @@ func _reconstruir() -> void:
 		_sup.vertex_colors = PackedColorArray([
 			escuro.lightened(0.12), escuro.lightened(0.12),
 			escuro.darkened(0.55), escuro.darkened(0.55)])
+	# faixa de degradê por baixo da linha de água: a cor do perigo esbate-se
+	# no escuro em vez de o fosso ser um retângulo preto chapado. Quanto mais
+	# fundo o fosso, mais alta a faixa (até 260px).
+	if _faixa:
+		# poça rasa (ácido de fundo de nível) -> degradê discreto, senão o
+		# verde volta a ler-se como relva. Fosso fundo (o "Vazio" das torres,
+		# o abismo) -> degradê forte, para não ser um preto chapado.
+		var fundura: float = clampf(altura / 420.0, 0.3, 1.0)
+		var fh: float = clampf(altura * 0.55, 90.0, 300.0)
+		_faixa.polygon = PackedVector2Array([
+			Vector2(-hw, -hh), Vector2(hw, -hh),
+			Vector2(hw, -hh + fh), Vector2(-hw, -hh + fh),
+		])
+		var topo := cor.lightened(0.1 + 0.25 * fundura)
+		topo.a = 0.4 + 0.45 * fundura
+		var baixo := Color(topo.r, topo.g, topo.b, 0.0)
+		_faixa.color = Color(1, 1, 1, 1)
+		_faixa.vertex_colors = PackedColorArray([topo, topo, baixo, baixo])
 	# rebordo aceso na linha de água -- deixa o perigo bem visível no escuro
 	if _rim:
 		_rim.polygon = PackedVector2Array([
