@@ -149,10 +149,11 @@ func _reduzir_checkpoints() -> void:
 			c.queue_free()
 
 
-## Alonga as plataformas de CHÃO largas conforme o número do nível. Só
-## estica para a direita, com folga para a plataforma seguinte e para a
-## sala do chefe. Não toca em plataformas pequenas nem em plataformas
-## acima da faixa do chão (saltos verticais ficam iguais).
+## Faz o nível MAIS COMPRIDO conforme o número do nível (N1 igual, cresce
+## até ~+`alongar_ampl` no N30). Alarga as plataformas de CHÃO da faixa
+## baixa e EMPURRA tudo o que vem a seguir pela mesma medida -- os vãos
+## entre plataformas ficam iguais (saltos idênticos), o nível é que se
+## estica. Poças/casca/atmosfera acompanham.
 func _alongar_nivel() -> void:
 	var idx := EstadoJogo.indice_nivel
 	if idx <= 0:
@@ -163,10 +164,10 @@ func _alongar_nivel() -> void:
 
 	var lim_dir := INF
 	if _chefe and _chefe is Node2D:
-		lim_dir = (_chefe as Node2D).position.x - 240.0
+		lim_dir = (_chefe as Node2D).position.x - 200.0
 
-	var largas: Array[Node2D] = []
 	var todas: Array[Node2D] = []
+	var chao_largo: Array[Node2D] = []
 	for c in get_children():
 		if not (c is Node2D) or not ("tamanho" in c):
 			continue
@@ -174,45 +175,87 @@ func _alongar_nivel() -> void:
 		todas.append(no)
 		var t: Vector2 = no.tamanho
 		if t.x >= 240.0 and t.x >= t.y * 3.0:
-			largas.append(no)
-	if largas.is_empty():
+			chao_largo.append(no)
+	if chao_largo.is_empty():
 		return
-
-	# faixa do chão = perto da plataforma larga mais em baixo (y maior)
 	var y_chao := -INF
-	for p in largas:
+	for p in chao_largo:
 		y_chao = maxf(y_chao, p.position.y)
 
-	largas.sort_custom(func(a, b): return a.position.x < b.position.x)
-	var n := 0
-	for p in largas:
+	# segmentos de esticão: (borda_direita_original, delta, plataforma). Só
+	# plataformas de chão da faixa baixa, antes da sala do chefe, e com um
+	# VÃO real (>=40px) a seguir na mesma faixa -- um encosto de plataformas
+	# (ex.: carruagens de comboio) não se estica.
+	var segs: Array = []
+	for p in chao_largo:
 		if p.position.y < y_chao - 130.0:
 			continue
 		var w: float = p.tamanho.x
-		var esq: float = p.position.x - w * 0.5
-		var dir_ini: float = p.position.x + w * 0.5
-		if esq >= lim_dir:
+		var borda_dir: float = p.position.x + w * 0.5
+		if borda_dir - w >= lim_dir:
 			continue
-		# cresce no máximo +50% / +400px -- nunca o suficiente para tapar
-		# uma poça mortal ou um vão grande a seguir.
-		var alvo_dir: float = minf(esq + w * fator, lim_dir)
-		alvo_dir = minf(alvo_dir, minf(esq + w * 1.5, esq + w + 400.0))
-		# não crescer para lá do início de OUTRA plataforma de CHÃO larga à
-		# nossa direita (mesma faixa de altura). Passar por baixo de uma
-		# plataforma pequena de precisão é permitido -- só dá mais chão.
-		for o in largas:
-			if o == p:
+		var p_esq: float = borda_dir - w
+		var folga := INF
+		var encostada := false
+		for o in todas:
+			if o == p or absf(o.position.y - p.position.y) >= 60.0:
 				continue
-			if absf(o.position.y - p.position.y) >= 100.0:
-				continue
-			var o_esq: float = o.position.x - o.tamanho.x * 0.5
-			if o_esq > esq + 40.0:
-				alvo_dir = minf(alvo_dir, maxf(dir_ini, o_esq - 30.0))
-		var nova_w: float = alvo_dir - esq
-		if nova_w <= w + 10.0:
+			var ow: float = o.tamanho.x
+			var o_esq: float = o.position.x - ow * 0.5
+			var o_dir: float = o.position.x + ow * 0.5
+			# sobrepõe/toca o intervalo desta plataforma (mais 8px à direita)?
+			if o_dir > p_esq + 4.0 and o_esq < borda_dir + 8.0:
+				encostada = true
+				break
+			if o_esq >= borda_dir:
+				folga = minf(folga, o_esq - borda_dir)
+		if encostada or folga < 40.0:
 			continue
-		p.tamanho = Vector2(nova_w, p.tamanho.y)
-		p.position.x = esq + nova_w * 0.5
-		n += 1
-	if n > 0:
-		print("[nivel %d] %d plataformas de chao alongadas (fator %.2f)" % [idx + 1, n, fator])
+		var delta: float = minf(w * (fator - 1.0), 420.0)
+		if delta < 8.0:
+			continue
+		segs.append([borda_dir, delta, p])
+	if segs.is_empty():
+		return
+	segs.sort_custom(func(a, b): return a[0] < b[0])
+
+	var desloc := func(x: float) -> float:
+		var s := 0.0
+		for seg in segs:
+			if seg[0] <= x + 0.5:
+				s += seg[1]
+		return s
+
+	# aplica: cada filho Node2D desloca em x pela soma dos deltas à sua
+	# esquerda; as plataformas esticadas também ganham largura (para a
+	# direita, borda esquerda fixa).
+	var esticadas := {}
+	for seg in segs:
+		esticadas[seg[2]] = seg[1]
+	for c in get_children():
+		if not (c is Node2D):
+			continue
+		var no := c as Node2D
+		if esticadas.has(no):
+			var w: float = no.tamanho.x
+			var esq: float = no.position.x - w * 0.5
+			var d_antes: float = desloc.call(esq - 1.0)
+			var nova_w: float = w + esticadas[no]
+			no.tamanho = Vector2(nova_w, no.tamanho.y)
+			no.position.x = esq + d_antes + nova_w * 0.5
+		else:
+			no.position.x += desloc.call(no.position.x)
+
+	var total: float = desloc.call(INF)
+	# poças mortais / casca / atmosfera acompanham o novo comprimento
+	for c in get_children():
+		if "largura" in c and ("brasas" in c or "cor" in c):     # AguaVenenosa
+			c.largura += total
+		elif "largura" in c and c.has_method("_construir"):      # CascaMasmorra
+			c.largura += total
+			c._construir()
+	var atm := get_node_or_null("Atmosfera")
+	if atm and atm.has_method("atualizar_extensao"):
+		atm.atualizar_extensao(atm.largura_nivel + total + 200.0, atm.extensao_esquerda)
+
+	print("[nivel %d] esticado +%.0f px (fator %.2f, %d segmentos)" % [idx + 1, total, fator, segs.size()])
