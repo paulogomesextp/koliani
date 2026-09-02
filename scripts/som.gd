@@ -24,6 +24,7 @@ const CAMINHOS := {
 	"demonio_ataque": "res://assets/audio/demonio_ataque.wav",
 	"conquista": "res://assets/audio/conquista.wav",
 	"transicao": "res://assets/audio/transicao.wav",
+	"carrossel": "res://assets/audio/carrossel.wav",
 	"chefe_magia": "res://assets/audio/chefe_magia.wav",
 	# sons de habilidade por chefe (2 set 2026) -- ver tools/gerar_audio.py
 	"esmagar": "res://assets/audio/esmagar.wav",

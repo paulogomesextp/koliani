@@ -1312,7 +1312,39 @@ def olho_carregar():
     escrever("olho_carregar.wav", buf, 0.6)
 
 
+# --------------------------------------------------------------------------
+# NAVEGAR NO CARROSSEL DE NÍVEIS -- "tick" suave e quente
+# --------------------------------------------------------------------------
+def carrossel():
+    """Trocar de nível no carrossel do SeletorNiveis. Toque curto, mate e
+    grave (tipo marimba abafada) -- pensado para tocar em rajada quando se
+    percorre a lista depressa, sem picar o ouvido. Substitui o 'apanhar'
+    agudo que era irritante em repetição."""
+    dur = 0.14
+    N = int(dur * FS)
+    buf = [0.0] * N
+    f0 = 340.0
+    lp = 0.0
+    for n in range(N):
+        t = n / FS
+        p = t / dur
+        f = f0 * (1.0 - 0.06 * p)                 # ligeiríssima queda de tom
+        s = math.sin(2 * math.pi * f * t)
+        s += 0.28 * math.sin(2 * math.pi * f * 2.0 * t) * math.exp(-p * 6.0)
+        s += 0.10 * math.sin(2 * math.pi * f * 3.01 * t) * math.exp(-p * 12.0)
+        # ataque muito curto + decaimento exponencial rápido
+        ataque = min(1.0, t / 0.004)
+        env = ataque * math.exp(-t * 34.0)
+        lp += 0.35 * (s * env - lp)               # abafa os agudos
+        buf[n] += lp
+    fo = int(0.02 * FS)
+    for n in range(N - fo, N):
+        buf[n] *= max(0.0, (N - n) / fo)
+    escrever("carrossel.wav", buf, 0.5)
+
+
 if __name__ == "__main__":
+    carrossel()
     game_over_voz()
     menu_loop()
     boss_loop()

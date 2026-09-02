@@ -806,7 +806,7 @@ func _mover(dir: int) -> void:
 	if novo == _sel:
 		return
 	_sel = novo
-	Som.toca("apanhar", -17.0, 1.3)
+	Som.toca("carrossel", -12.0, randf_range(0.97, 1.05))
 	_reposicionar(false)
 	_atualizar_topo()
 	_atualizar_fundo()
@@ -817,7 +817,7 @@ func _ir_para(indice: int) -> void:
 	if novo == _sel:
 		return
 	_sel = novo
-	Som.toca("apanhar", -17.0, 1.25)
+	Som.toca("carrossel", -12.0, randf_range(0.97, 1.05))
 	_reposicionar(false)
 	_atualizar_topo()
 	_atualizar_fundo()
