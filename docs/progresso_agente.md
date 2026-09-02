@@ -1,5 +1,23 @@
 # Progresso do agente `gaming` — campanha dos 30 níveis
 
+## Sessão 2026-09-02 (e) — menu profissional + economia/progressão
+
+- **`SeletorNiveis` redesenhado** (`2574471`): cartões em camadas (arte do
+  bioma + retrato grande do chefe + scrim + band de info), fundo de ecrã
+  com a arte da região (cross-fade), título, destaque/laterais com
+  profundidade. Lógica intacta.
+- **Economia (Essência) + Melhorias + Santuário** (`c960ce0`, `dcbbb31`):
+  moeda que NÃO se perde na morte (jogo por níveis), 6 melhorias
+  permanentes (`melhorias.gd`), ecrã Santuário (botão "✦ Santuário" no
+  rodapé do SeletorNiveis). Essência larga de inimigos (escala c/ região)
+  e chefes (~70-150) + caches nas alcovas de 4 níveis. Bónus aplicados em
+  `EstadoJogo.dano_ataque/vida_bonus_armadura` + regen Energia + i-frames
+  do roll + multiplicador de crítico. HUD com contador. i18n nos 6
+  idiomas. Teste de economia verde.
+- **A fazer**: playtestar o loop largar-apanhar-gastar; afinar custos/
+  ganhos; entrada do Santuário na Pausa (para gastar a meio do run);
+  alguns chefes precisam de afinação (feedback do Paulo).
+
 ## Sessão 2026-09-02 (d) — playtest fixes + passe de arte
 
 Depois do playtest do Paulo ("os níveis parecem-me bem"):
