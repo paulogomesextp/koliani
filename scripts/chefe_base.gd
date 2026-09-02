@@ -46,14 +46,12 @@ var _ja_derrotado := false
 ## música só volta a mudar quando a luta recomeça de facto.
 var _musica_boss := false
 
-## Escudo brilhante da cor do chefe que aparece enquanto ele está BLINDADO
-## (fora da janela EXPOSTA). Bloqueia dano A SÉRIO enquanto tiver cargas
-## (pedido do Paulo, 2 set 2026): cada golpe que acerte com o escudo em pé
-## gasta uma carga sem tirar vida; à última carga o escudo parte-se de vez
-## (mostra "BROKEN SHIELD") e abre-se a janela EXPOSTA, onde os golpes
-## tiram vida a sério. `usa_escudo_boss = false` no `_ready` de um chefe
-## que leve dano SEMPRE (Carcereiro, Ghorak-da-Floresta).
-var usa_escudo_boss := true
+## MECÂNICA DE ESCUDOS RETIRADA (pedido do Paulo, 2 set 2026): os chefes
+## deixaram de ter escudo de cargas E janela EXPOSTA -- levam dano SEMPRE,
+## têm mais vida e batem mais forte. `usa_escudo_boss` fica a `false` e o
+## código do escudo por baixo nunca corre (mantido só para não partir
+## referências). Cada `chefe_*.gd` já não trava o `receber_dano`.
+var usa_escudo_boss := false
 ## Golpes que o escudo aguenta por ciclo antes de partir. Modesto de
 ## propósito -- é para dar ritmo ao combate, não tornar os chefes esponja.
 const CARGAS_ESCUDO := 2
@@ -87,14 +85,37 @@ func _e_chefe() -> bool:
 func _ready() -> void:
 	super._ready()
 	add_to_group("chefes")
-	# chefe mais perigoso ao contacto à medida que a campanha avança (rampa
-	# suave pelos 30 níveis: ~x1.0 no nível 1 -> ~x1.9 no nível 30). A
-	# vida-base é definida por cada chefe concreto no seu _ready.
-	dano_contacto = int(round(dano_contacto * (1.0 + 0.03 * float(clampi(EstadoJogo.indice_nivel, 0, 29)))))
+	# Sem escudos, os chefes levam dano o tempo todo -> batem MUITO mais
+	# forte ao contacto (x1.4 no N1 -> x2.8 no N30). A vida-base sai de
+	# cada chefe concreto; o multiplicador de vida entra em _afinar_dificuldade.
+	dano_contacto = int(round(dano_contacto * (1.4 + 0.05 * float(clampi(EstadoJogo.indice_nivel, 0, 29)))))
 	if _sprite:
 		_sprite.scale = Vector2(_direcao * escala_visual, escala_visual)
 	call_deferred("_preparar_escudo_boss")
 	call_deferred("_medir_arena")
+	call_deferred("_afinar_dificuldade")
+
+
+## Corre depois do `_ready` do chefe concreto (que define `vida`). Sem a
+## janela EXPOSTA a Koliani acerta ~3x mais vezes -> a vida sobe muito para
+## a luta não acabar num instante, e os telégrafos/recuperações encurtam.
+func _afinar_dificuldade() -> void:
+	if _ja_derrotado:
+		return
+	var idx := float(clampi(EstadoJogo.indice_nivel, 0, 29))
+	var mult_vida := 2.4 + 0.9 * (idx / 29.0)   # N1 x2.4 -> N30 x3.3
+	vida = int(round(vida * mult_vida))
+	_vida_maxima = maxi(vida, 1)
+	# vários chefes usam `_vida_max` para os limiares de fase -- acompanha
+	if "_vida_max" in self:
+		set("_vida_max", vida)
+	vida_mudou.emit(vida, _vida_maxima)
+	# telégrafos e recuperações mais curtos = menos tempo para respirar
+	for nome in ["dur_tel", "dur_telegrafo", "dur_recupera", "dur_baque"]:
+		if nome in self:
+			var v: float = get(nome)
+			if v > 0.05:
+				set(nome, v * 0.82)
 
 
 var _arena_tentativas := 0

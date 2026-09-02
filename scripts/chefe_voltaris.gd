@@ -241,15 +241,7 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0, critico := false) 
 	if _ja_derrotado:
 		return
 	provocar()
-	if not _exposto:
-		Som.toca("bloqueio", -9.0, 0.7)
-		if _sprite:
-			var m := _sprite.modulate
-			_sprite.modulate = Color(0.7, 0.9, 1.2, m.a)
-			create_tween().tween_property(_sprite, "modulate", Color(1, 1, 1, m.a), 0.12)
-		_raspao(quantidade, dir_empurrao)
-		return
-	super.receber_dano(int(round(quantidade * 2.0)), dir_empurrao, critico)
+	super.receber_dano(quantidade, dir_empurrao, critico)
 
 
 ## Chamado pelo `ParaRaios`: passa a guarda e atordoa.

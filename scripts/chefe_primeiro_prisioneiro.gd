@@ -365,22 +365,7 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0, critico := false) 
 	if _ja_derrotado:
 		return
 	provocar()
-	# GUARDA: apara os golpes de frente
-	if _fase == Fase.GUARDA and signf(dir_empurrao) == -_direcao:
-		Som.toca("bloqueio", -7.0, 1.0)
-		if _sprite:
-			_sprite.modulate = Color(1.4, 1.4, 1.6)
-			create_tween().tween_property(_sprite, "modulate", Color(1, 1, 1), 0.12)
-		return
-	if not _exposta:
-		Som.toca("bloqueio", -9.0, 0.8)
-		if _sprite:
-			var m := _sprite.modulate
-			_sprite.modulate = Color(1.3, 1.1, 1.4, m.a)
-			create_tween().tween_property(_sprite, "modulate", Color(1, 1, 1, m.a), 0.12)
-		_raspao(quantidade, dir_empurrao)
-		return
-	super.receber_dano(int(round(quantidade * 2.0)), dir_empurrao, critico)
+	super.receber_dano(quantidade, dir_empurrao, critico)
 
 
 ## --- utilitários --------------------------------------------------

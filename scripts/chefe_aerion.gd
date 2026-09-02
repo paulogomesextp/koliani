@@ -364,13 +364,7 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0, critico := false) 
 	if _ja_derrotado:
 		return
 	provocar()
-	# leva SEMPRE dano. Exposto (janela EXPOSTO / pisão no chão) = a dobrar;
-	# fora disso o manto espectral só abranda um pouco.
-	var mult := 2.0 if _exposto else 0.85
-	super.receber_dano(int(round(quantidade * mult)), dir_empurrao, critico)
-	if not _exposto and _sprite:
-		_sprite.modulate = Color(1.2, 1.2, 1.35)
-		create_tween().tween_property(_sprite, "modulate", Color(1, 1, 1), 0.1)
+	super.receber_dano(quantidade, dir_empurrao, critico)
 
 
 ## --- utilitários --------------------------------------------------

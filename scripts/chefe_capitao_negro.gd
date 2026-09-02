@@ -295,24 +295,7 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0, critico := false) 
 	if _ja_derrotado:
 		return
 	provocar()
-	if _fase == Fase.GUARDA and signf(dir_empurrao) == -_direcao:
-		Som.toca("bloqueio", -6.0, 1.0)
-		if _sprite:
-			_sprite.modulate = Color(1.5, 1.5, 1.7)
-			create_tween().tween_property(_sprite, "modulate", Color(1, 1, 1), 0.12)
-		# contra-ataque curto
-		var k := _obter_koliani()
-		if k and absf(_vetor_para_koliani().x) <= 90.0:
-			k.receber_dano(10, -_direcao)
-		return
-	if not _exposto:
-		Som.toca("bloqueio", -9.0, 0.6)
-		if _sprite:
-			_sprite.modulate = Color(1.3, 1.2, 1.4)
-			create_tween().tween_property(_sprite, "modulate", Color(1, 1, 1), 0.12)
-		_raspao(quantidade, dir_empurrao)
-		return
-	super.receber_dano(int(round(quantidade * 2.0)), dir_empurrao, critico)
+	super.receber_dano(quantidade, dir_empurrao, critico)
 
 
 ## --- utilitários --------------------------------------------------

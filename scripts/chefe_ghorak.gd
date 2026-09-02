@@ -234,17 +234,7 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0, critico := false) 
 	if _ja_derrotado:
 		return
 	provocar()
-	if not _nucleo_exposto:
-		# casca de raiz e osso -- o golpe nao passa
-		Som.toca("bloqueio", -9.0, 0.65)
-		global_position.x += dir_empurrao * 1.0
-		if _sprite:
-			_sprite.modulate = Color(0.62, 0.72, 0.6)
-			create_tween().tween_property(_sprite, "modulate", Color(1, 1, 1), 0.12)
-		_raspao(quantidade, dir_empurrao)
-		return
-	# nucleo a' vista -> dano a dobrar (recompensa a paciencia)
-	super.receber_dano(int(round(quantidade * 2.0)), dir_empurrao, critico)
+	super.receber_dano(quantidade, dir_empurrao, critico)
 
 
 ## --- utilitarios --------------------------------------------------

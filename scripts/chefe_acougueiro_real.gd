@@ -296,16 +296,7 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0, critico := false) 
 	if _ja_derrotado:
 		return
 	provocar()
-	if not _exposto:
-		Som.toca("bloqueio", -9.0, 0.5)
-		if _sprite:
-			_sprite.modulate = Color(1.2, 1.0, 1.0)
-			create_tween().tween_property(_sprite, "modulate", Color(1, 1, 1), 0.12)
-		_raspao(quantidade, dir_empurrao)
-		return
-	super.receber_dano(int(round(quantidade * 2.0)), dir_empurrao, critico)
-	if not _ja_derrotado:
-		_remexer_arena()  # cada golpe muda a arquitetura da arena
+	super.receber_dano(quantidade, dir_empurrao, critico)
 
 
 ## --- utilitários --------------------------------------------------
