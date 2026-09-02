@@ -27,7 +27,6 @@ var _baques_seguidos := 0
 func _ready() -> void:
 	super._ready()
 	vida = maxi(vida, 540)
-	usa_escudo_boss = false  # leva dano sempre -- sem janela blindada
 
 
 func _physics_process(dt: float) -> void:

@@ -48,21 +48,8 @@ var _musica_boss := false
 
 ## MECÂNICA DE ESCUDOS RETIRADA (pedido do Paulo, 2 set 2026): os chefes
 ## deixaram de ter escudo de cargas E janela EXPOSTA -- levam dano SEMPRE,
-## têm mais vida e batem mais forte. `usa_escudo_boss` fica a `false` e o
-## código do escudo por baixo nunca corre (mantido só para não partir
-## referências). Cada `chefe_*.gd` já não trava o `receber_dano`.
-var usa_escudo_boss := false
-## Golpes que o escudo aguenta por ciclo antes de partir. Modesto de
-## propósito -- é para dar ritmo ao combate, não tornar os chefes esponja.
-const CARGAS_ESCUDO := 2
-var _cargas_restantes := 0
-var _texto_cargas: Label
-## Segundos desde o último golpe que ENTROU (reduziu vida). Enquanto > 0 o
-## chefe está na janela EXPOSTA -> escudo escondido.
-var _dano_recente := 0.0
-var _escudo_boss: Node2D
-var _escudo_t := 0.0
-var _ajuste_janela_feito := false
+## têm mais vida e batem mais forte (ver `_afinar_dificuldade`). Todo o
+## código do escudo foi apagado; não repor.
 
 ## --- prisão à arena -------------------------------------------------
 ## O chefe nunca deve cair da plataforma principal (nem a andar, nem
@@ -91,7 +78,7 @@ func _ready() -> void:
 	dano_contacto = int(round(dano_contacto * (1.4 + 0.05 * float(clampi(EstadoJogo.indice_nivel, 0, 29)))))
 	if _sprite:
 		_sprite.scale = Vector2(_direcao * escala_visual, escala_visual)
-	call_deferred("_preparar_escudo_boss")
+	call_deferred("_encurtar_fase_exposto")
 	call_deferred("_medir_arena")
 	call_deferred("_afinar_dificuldade")
 
@@ -196,109 +183,17 @@ func _prender_na_arena() -> void:
 ## EXPOSTA (escudos retirados), a fase EXPOSTO das máquinas de estado é só
 ## um respiro entre ataques -- encurta-se para o chefe não ficar parado
 ## sem fazer nada.
-func _preparar_escudo_boss() -> void:
+func _encurtar_fase_exposto() -> void:
 	for nome in ["dur_exposto", "dur_exposta"]:
 		if nome in self:
 			var v: float = get(nome)
 			if v > 0.0:
 				set(nome, maxf(v * 0.55, 0.35))
-	if usa_escudo_boss:
-		_montar_escudo_boss()
 
-
-func _montar_escudo_boss() -> void:
-	if _escudo_boss != null:
-		return
-	var cor: Color = cor_rim
-	cor.a = 1.0
-	var r := 78.0 * maxf(0.8, escala_visual)
-	var aditivo := CanvasItemMaterial.new()
-	aditivo.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
-
-	_escudo_boss = Node2D.new()
-	_escudo_boss.name = "EscudoBoss"
-	_escudo_boss.z_index = 6
-	_escudo_boss.visible = false
-	if _sprite:
-		_escudo_boss.position = _sprite.position
-	add_child(_escudo_boss)
-
-	var disco := Polygon2D.new()
-	disco.name = "Disco"
-	disco.polygon = _circulo_pts(r, 30)
-	disco.color = Color(cor.r, cor.g, cor.b, 0.10)
-	disco.material = aditivo
-	_escudo_boss.add_child(disco)
-
-	var aro := Line2D.new()
-	aro.name = "Aro"
-	aro.points = _circulo_pts(r, 40)
-	aro.closed = true
-	aro.width = 4.0
-	aro.default_color = Color(cor.r, cor.g, cor.b, 0.9)
-	aro.joint_mode = Line2D.LINE_JOINT_ROUND
-	aro.material = aditivo
-	_escudo_boss.add_child(aro)
-
-	var aro2 := Line2D.new()
-	aro2.name = "Aro2"
-	aro2.points = _circulo_pts(r * 0.86, 40)
-	aro2.closed = true
-	aro2.width = 2.0
-	aro2.default_color = Color(1, 1, 1, 0.5)
-	aro2.material = aditivo
-	_escudo_boss.add_child(aro2)
-
-	var luz := PointLight2D.new()
-	luz.name = "Luz"
-	luz.texture = _tex_luz_escudo()
-	luz.color = cor
-	luz.energy = 0.9
-	luz.scale = Vector2(r / 90.0, r / 90.0)
-	_escudo_boss.add_child(luz)
-
-	_texto_cargas = Label.new()
-	_texto_cargas.name = "TextoCargas"
-	_texto_cargas.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_texto_cargas.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	_texto_cargas.add_theme_font_size_override("font_size", 14)
-	_texto_cargas.add_theme_color_override("font_color", cor.lightened(0.5))
-	_texto_cargas.add_theme_color_override("font_outline_color", Color(0.02, 0.01, 0.03))
-	_texto_cargas.add_theme_constant_override("outline_size", 4)
-	_texto_cargas.size = Vector2(200.0, 24.0)
-	_texto_cargas.position = Vector2(-100.0, -r - 26.0)
-	_escudo_boss.add_child(_texto_cargas)
-
-
-func _circulo_pts(raio: float, n: int) -> PackedVector2Array:
-	var pts := PackedVector2Array()
-	for i in n:
-		var a := TAU * float(i) / float(n)
-		pts.append(Vector2(cos(a) * raio, sin(a) * raio))
-	return pts
-
-
-static var _TEX_LUZ_ESC: GradientTexture2D
-
-func _tex_luz_escudo() -> GradientTexture2D:
-	if _TEX_LUZ_ESC == null:
-		var g := Gradient.new()
-		g.offsets = PackedFloat32Array([0.0, 1.0])
-		g.colors = PackedColorArray([Color(1, 1, 1, 0.9), Color(1, 1, 1, 0)])
-		_TEX_LUZ_ESC = GradientTexture2D.new()
-		_TEX_LUZ_ESC.gradient = g
-		_TEX_LUZ_ESC.width = 220
-		_TEX_LUZ_ESC.height = 220
-		_TEX_LUZ_ESC.fill = GradientTexture2D.FILL_RADIAL
-		_TEX_LUZ_ESC.fill_from = Vector2(0.5, 0.5)
-		_TEX_LUZ_ESC.fill_to = Vector2(1.0, 0.5)
-	return _TEX_LUZ_ESC
 
 
 func _process(dt: float) -> void:
 	super._process(dt)
-	_dano_recente = maxf(0.0, _dano_recente - dt)
-	_atualizar_escudo_boss(dt)
 	if is_on_floor():
 		_tocou_chao = true
 	if not _arena_ok:
@@ -316,35 +211,6 @@ func _process(dt: float) -> void:
 		if k and global_position.distance_to(k.global_position) < gatilho_intro:
 			_intro_feita = true
 			_correr_intro()
-
-
-## O escudo aparece durante o combate SEMPRE que o chefe não levou dano nos
-## últimos instantes (= está blindado, fora da janela EXPOSTA). Some quando
-## um golpe entra.
-func _atualizar_escudo_boss(dt: float) -> void:
-	if _escudo_boss == null:
-		return
-	var mostrar := _musica_boss and not _ja_derrotado and not _fim_em_curso \
-		and _dano_recente <= 0.0
-	if mostrar != _escudo_boss.visible:
-		_escudo_boss.visible = mostrar
-		if mostrar:
-			_cargas_restantes = CARGAS_ESCUDO  # escudo volta a carregar
-			_atualizar_texto_cargas()
-	if not mostrar:
-		return
-	_escudo_t += dt
-	var pulso := 1.0 + 0.06 * sin(_escudo_t * 7.0)
-	_escudo_boss.scale = Vector2(pulso, pulso)
-	var aro := _escudo_boss.get_node_or_null("Aro") as Line2D
-	if aro:
-		aro.rotation = _escudo_t * 0.8
-	var aro2 := _escudo_boss.get_node_or_null("Aro2") as Line2D
-	if aro2:
-		aro2.rotation = -_escudo_t * 1.3
-	var luz := _escudo_boss.get_node_or_null("Luz") as PointLight2D
-	if luz:
-		luz.energy = 0.8 + 0.35 * (0.5 + 0.5 * sin(_escudo_t * 6.0))
 
 
 func _correr_intro() -> void:
@@ -505,25 +371,12 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0, critico := false) 
 		return
 	_garantir_vida_maxima()
 	provocar()  # levou o primeiro golpe = combate a sério
-	# escudo de pé com cargas: bloqueia o golpe por completo (sem tirar
-	# vida) em vez de abrir logo a janela EXPOSTA. À última carga parte-se.
-	if usa_escudo_boss and _escudo_boss and _escudo_boss.visible and _cargas_restantes > 0:
-		_cargas_restantes -= 1
-		_atualizar_texto_cargas()
-		global_position.x += dir_empurrao * 1.5
-		Som.toca("bloqueio", -8.0, 0.85)
-		if _cargas_restantes <= 0:
-			_escudo_boss.visible = false
-			_dano_recente = 0.85  # abre a janela EXPOSTA
-			_mostrar_texto_quebrado()
-		return
 	var q := quantidade
 	if critico:
 		# golpe critico no chefe (pos-rolamento / pelas costas / vulneravel)
 		q = int(round(q * (1.5 + EstadoJogo.bonus("crit_mult"))))  # melhoria "furia"
 		Impacto.rebentar(self, global_position + Vector2(0.0, -20.0 * maxf(0.8, escala_visual)), Color(1, 1, 1), 3.4)
 	vida -= q
-	_dano_recente = 0.85  # golpe entrou -> janela EXPOSTA -> esconde o escudo
 	global_position.x += dir_empurrao * (4.0 if critico else 3.0)
 	vida_mudou.emit(maxi(vida, 0), _vida_maxima)
 	if vida <= 0:
@@ -540,67 +393,6 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0, critico := false) 
 			queue_free()
 	else:
 		piscar_dano()
-
-
-## Dano de RASPÃO: o golpe apanhou o chefe fora da janela EXPOSTA (blindado).
-## Em vez de "não passa nada", tira uma fatia pequena da vida -- o escudo
-## sente-se a gastar quando insistimos, sem estragar a leitura (não abre a
-## janela EXPOSTA nem esconde o escudo). Chamado pelos chefes concretos no
-## ramo de bloqueio do `receber_dano`.
-var _raspao_acc := 0.0
-
-func _raspao(quantidade: int, dir_empurrao: float = 0.0) -> void:
-	if _ja_derrotado:
-		return
-	_garantir_vida_maxima()
-	var q: int = maxi(2, int(round(quantidade * 0.32)))
-	vida -= q
-	global_position.x += dir_empurrao * 1.0
-	# fogo sustentado (inclui o Throw): ao fim de ~10% da vida em raspões,
-	# o escudo cambaleia e leva uma fatia a sério -- premeia insistir.
-	_raspao_acc += q
-	if _raspao_acc >= _vida_maxima * 0.10:
-		_raspao_acc = 0.0
-		vida -= maxi(3, int(round(_vida_maxima * 0.05)))
-		_dano_recente = maxf(_dano_recente, 0.35)
-		piscar_dano()
-		Som.toca("acerto", -6.0, 0.9)
-		Impacto.rebentar(self, global_position + Vector2(0.0, -20.0 * maxf(0.8, escala_visual)), Color(1, 1, 1), 2.6)
-	elif _escudo_boss and _escudo_boss.visible:
-		var aro := _escudo_boss.get_node_or_null("Aro") as Line2D
-		if aro:
-			var c := aro.default_color
-			aro.default_color = Color(1, 1, 1, 1)
-			create_tween().tween_property(aro, "default_color", c, 0.14)
-	vida_mudou.emit(maxi(vida, 0), _vida_maxima)
-	if vida <= 0:
-		receber_dano(1, dir_empurrao)  # deixa o fluxo normal tratar da morte
-
-
-func _atualizar_texto_cargas() -> void:
-	if _texto_cargas:
-		_texto_cargas.text = Textos.tf("chefe.escudo_cargas", [_cargas_restantes])
-
-
-## Aviso a vermelho no instante em que o escudo parte -- some sozinho.
-func _mostrar_texto_quebrado() -> void:
-	var lbl := Label.new()
-	lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	lbl.add_theme_font_size_override("font_size", 18)
-	lbl.add_theme_color_override("font_color", Color(1.0, 0.22, 0.22))
-	lbl.add_theme_color_override("font_outline_color", Color(0.05, 0.0, 0.0))
-	lbl.add_theme_constant_override("outline_size", 5)
-	lbl.text = Textos.t("chefe.escudo_partido")
-	lbl.size = Vector2(240.0, 28.0)
-	var base: Vector2 = _sprite.position if _sprite else Vector2.ZERO
-	lbl.position = base + Vector2(-120.0, -120.0 * maxf(0.8, escala_visual))
-	lbl.z_index = 7
-	add_child(lbl)
-	var t := create_tween()
-	t.tween_interval(0.7)
-	t.tween_property(lbl, "modulate:a", 0.0, 0.5)
-	t.tween_callback(lbl.queue_free)
 
 
 ## Morte dos chefes-história: congela o chefe, diz as últimas falas e só
