@@ -48,6 +48,10 @@ const PLAT_QUEBRA := preload("res://scenes/actors/PlataformaQuebra.tscn")
 const TRAMPOLIM := preload("res://scenes/actors/Trampolim.tscn")
 const IMPULSOR := preload("res://scenes/actors/Impulsor.tscn")
 const AGUA := preload("res://scenes/actors/AguaVenenosa.tscn")
+const RAIZ := preload("res://scenes/actors/RaizPerigo.tscn")
+const TEIA := preload("res://scenes/actors/TeiaPrende.tscn")
+const GOTA := preload("res://scenes/actors/GotaAcida.tscn")
+const RAIO := preload("res://scenes/actors/RaioTempestade.tscn")
 const CHECKPOINT := preload("res://scripts/checkpoint.gd")
 
 ## Líquido mortal por região: [cor, brasas]. floresta=água podre, prisão=ácido,
@@ -112,6 +116,18 @@ const ASSINATURA := {
 	3: "gruta",        # Catacumbas -- túneis escuros
 	4: "impulso",      # Cidade -- máquinas
 	5: "fogo",         # Castelo -- lava
+}
+
+## Toque de assinatura do NÍVEL (a gimmick do `docs/niveis.md`) espalhado
+## pela jornada -- só nos níveis onde há um perigo TELEGRAFADO que NÃO
+## bloqueia nem obriga a nada (a rota da espinha é exatamente a mesma).
+## Frequência baixa, escala com `intens`. Afinar/desligar aqui ao playtest;
+## nível sem entrada = só forma (`PERFIL`) + assinatura de região.
+const ASSIN_NIVEL := {
+	0: "raizes",   # n1  Caminho das Raízes -- raízes que irrompem do chão
+	2: "teias",    # n3  Ninho da Viúva Negra -- teias que prendem
+	3: "acido",    # n4  A Árvore que Chora -- lágrimas ácidas a pingar
+	12: "raio",    # n13 Torre da Tempestade -- raios em coluna, padrão previsível
 }
 
 ## PERFIL DE FORMA por nível (redesenho pedido pelo Paulo, 2 set 2026): cada
@@ -390,6 +406,9 @@ func _construir() -> void:
 		_decorar(par, x, y)
 		if passos % 6 == 0:
 			_coluna_fundo(par, x + _rng.randf_range(-120.0, 120.0))
+		# toque de assinatura do nível (gimmick do docs/niveis.md)
+		if passos > 1:
+			_assinatura_nivel(par, x, y, intens)
 
 		# --- câmara de tempos a tempos: alterna TENSÃO e ALÍVIO ---
 		passos += 1
@@ -635,6 +654,50 @@ func _decorar(par: Node2D, x: float, y: float) -> void:
 	par.add_child(s)
 
 
+## Toque de assinatura do nível na jornada (ver `ASSIN_NIVEL`). Só perigos
+## telegrafados que NÃO bloqueiam nem obrigam a nada -- a espinha continua
+## a ser a rota, isto é tempero por cima. ~10-22% das plataformas.
+func _assinatura_nivel(par: Node2D, x: float, y: float, intens: float) -> void:
+	var tipo: String = ASSIN_NIVEL.get(_idx, "")
+	if tipo == "":
+		return
+	if _rng.randf() > 0.10 + 0.10 * clampf(intens, 0.0, 1.2):
+		return
+	match tipo:
+		"raizes":
+			var r := RAIZ.instantiate()
+			r.auto = true
+			r.intervalo = _rng.randf_range(2.2, 3.2)
+			r.fase = _rng.randf() * 2.4
+			r.dano = 9 + int(7.0 * _dif)
+			r.position = Vector2(x + _rng.randf_range(-32.0, 32.0), y)
+			par.add_child(r)
+		"teias":
+			var t := TEIA.instantiate()
+			t.permanente = true
+			t.largura = _rng.randf_range(84.0, 122.0)
+			t.dur_preso = 0.55
+			t.position = Vector2(x + _rng.randf_range(-18.0, 18.0), y - 6.0)
+			par.add_child(t)
+		"acido":
+			var g := GOTA.instantiate()
+			g.automatico = true
+			g.intervalo = _rng.randf_range(2.4, 3.6)
+			g.dano = 9 + int(8.0 * _dif)
+			g.altura_queda = 240.0
+			g.position = Vector2(x + _rng.randf_range(-26.0, 26.0),
+				y - _rng.randf_range(140.0, 220.0))
+			par.add_child(g)
+		"raio":
+			var l := RAIO.instantiate()
+			l.automatico = true
+			l.periodo = _rng.randf_range(2.6, 3.8)
+			l.fase = _rng.randf() * 2.4
+			l.dano = 15 + int(11.0 * _dif)
+			l.position = Vector2(x + _rng.randf_range(-12.0, 12.0), y)
+			par.add_child(l)
+
+
 ## Coluna alta a subir do líquido, atrás dos atores (profundidade).
 func _coluna_fundo(par: Node2D, x: float) -> void:
 	var s := Sprite2D.new()
@@ -652,6 +715,10 @@ func _inimigo_em(par: Node2D, pos: Vector2) -> void:
 	d.especie = _especie_aleatoria()
 	d.position = pos
 	d.alcance_patrulha = _rng.randf_range(40.0, 90.0)
+	# n21 Vila dos Sem-Rosto (gimmick: "alguns NPCs são inimigos disfarçados")
+	# -- metade dos bichos da jornada ficam dormentes e só se revelam de perto.
+	if _idx == 20 and _rng.randf() < 0.5:
+		d.dormente = true
 	# comportamento próprio -- cada bicho uma ameaça (pegada Dead Cells)
 	var r := _rng.randf()
 	if d.especie == "olho" or d.especie == "abutre":
