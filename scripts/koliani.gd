@@ -706,7 +706,12 @@ func _physics_process(dt: float) -> void:
 	# caiu num fosso sem fundo -> conta como morte (reaparece no checkpoint)
 	if global_position.y > Y_MORTE and vida > 0 and not _voando:
 		if EstadoJogo.modo_dev:
-			global_position = _pos_inicial if _pos_inicial != Vector2.ZERO else global_position
+			# `_pos_inicial` é só a posição em que a CENA carregou -- fica
+			# desatualizada assim que se toca num checkpoint mais à frente
+			# (era por isso que em modo dev não se reaparecia no checkpoint
+			# tocado). `EstadoJogo.checkpoint` é que está sempre atual.
+			var alvo := EstadoJogo.checkpoint if EstadoJogo.checkpoint != Vector2.ZERO else _pos_inicial
+			global_position = alvo if alvo != Vector2.ZERO else global_position
 			velocity = Vector2.ZERO
 		else:
 			receber_dano(vida)
