@@ -112,6 +112,9 @@ var _olha_para := 1.0
 var _dash_restante := 0.0
 var _dash_recarga := 0.0
 var _rolar_restante := 0.0
+## Janela em que um impulso externo (trampolim, impulsor) fica imune ao
+## "corte de salto" do Movimento -- ver `aplicar_impulso`.
+var _impulso_externo_t := 0.0
 var _rolar_recarga := 0.0
 var _ataque_restante := 0.0
 ## Duração do golpe atual (varia por passo do combo -- ver `DUR_COMBO`).
@@ -382,6 +385,7 @@ func _physics_process(dt: float) -> void:
 	_dash_recarga = maxf(0.0, _dash_recarga - dt)
 	_rolar_recarga = maxf(0.0, _rolar_recarga - dt)
 	_invulneravel = maxf(0.0, _invulneravel - dt)
+	_impulso_externo_t = maxf(0.0, _impulso_externo_t - dt)
 	_hurt_t = maxf(0.0, _hurt_t - dt)
 	_aterrar_t = maxf(0.0, _aterrar_t - dt)
 	# aterragem: só depois de ter estado mesmo no ar
@@ -604,7 +608,7 @@ func _physics_process(dt: float) -> void:
 		_mov = Movimento.passo(
 			_mov, dir,
 			Input.is_action_just_pressed("saltar"),
-			Input.is_action_pressed("saltar"),
+			Input.is_action_pressed("saltar") or _impulso_externo_t > 0.0,
 			is_on_floor(), dt, saltos_max, _grav_escala,
 		)
 		velocity = _mov.velocidade
@@ -1222,13 +1226,19 @@ func alternar_voo() -> bool:
 ## Impulso vindo de fora (Trampolim, Impulsor...). TEM de passar por aqui e
 ## não só mexer em `velocity`: o `Movimento.passo()` reescreve `velocity` a
 ## partir do `_mov.velocidade` a cada frame, por isso é preciso sincronizar
-## os dois (senão o impulso é descartado no frame seguinte).
+## os dois (senão o impulso é descartado no frame seguinte). Também arma
+## `_impulso_externo_t`: sem isso, o "corte de salto" do `Movimento.passo()`
+## (que reduz a velocidade vertical sempre que não se segura o botão de
+## saltar) via-abaixo o impulso quase por completo já no frame a seguir --
+## o trampolim mal se notava (o Paulo reportou "continua sem funcionar").
 func aplicar_impulso(v: Vector2, manter_x := false) -> void:
 	velocity.y = v.y
 	if not manter_x:
 		velocity.x = v.x
 	_mov.velocidade = velocity
 	_mov.saltos_dados = 0
+	if v.y < 0.0:
+		_impulso_externo_t = 0.4
 	_estava_no_chao = false
 
 

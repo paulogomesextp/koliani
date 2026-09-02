@@ -1069,7 +1069,7 @@ func _f_trampolim(par: Node2D, x: float, y: float) -> Vector2:
 		cy = clampf(cy + 40.0, _chao_y - 200.0, _chao_y - 70.0)  # desce um pouco
 		_plat(par, Vector2(x, cy), Vector2(84.0, 16.0))
 		var tr := TRAMPOLIM.instantiate()
-		tr.impulso = 680.0 + 30.0 * float(i)
+		tr.impulso = 800.0 + 15.0 * float(i)  # ~1.5x a altura do duplo salto
 		tr.position = Vector2(x, cy - 18.0)
 		par.add_child(tr)
 		# plataforma alta de aterragem

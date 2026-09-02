@@ -6,8 +6,10 @@ extends Area2D
 ##
 ## @export impulso / horizontal
 
-## Velocidade vertical dada (px/s). Salto normal da Koliani = 470.
-@export var impulso := 780.0
+## Velocidade vertical dada (px/s). Salto normal da Koliani = 470; duplo
+## salto (os dois saltos encadeados, a segurar o botão) chega a ~158px de
+## altura -- este valor dá ~1.5x essa altura (pedido do Paulo).
+@export var impulso := 815.0
 ## Empurrão horizontal opcional (para atirar na diagonal para uma plataforma).
 @export var horizontal := 0.0
 
