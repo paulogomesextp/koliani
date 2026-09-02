@@ -1,7 +1,7 @@
 [gd_scene load_steps=13 format=3 uid="uid://bkolianicoracaonegro29"]
 
 ; REGIAO VI / nivel 29 -- Torre do Coracao Negro.
-; Nivel FEITO A MAO (corredor = false) e VERTICAL. Plataformas MAGICAS que
+; Sala final FEITA A MAO (a JORNADA, que cresce com o nivel, vem antes) e VERTICAL. Plataformas MAGICAS que
 ; PULSAM entre solidas e fantasma (PlataformaRitmada + PlataformaEspectral)
 ; com ancoras solidas. Bifurcacao: poço esquerdo / direito. Elite: ogro de
 ; carga. LAVA por baixo. Chefe: O Arauto de Zeriko (3 formas).
@@ -36,7 +36,6 @@ fill_to = Vector2(1, 0.5)
 
 [node name="Torre_do_Coracao_Negro" type="Node2D"]
 script = ExtResource("7_niv")
-corredor = false
 
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
 cor_ambiente = Color(0.58, 0.4, 0.62, 1)

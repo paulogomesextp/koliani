@@ -24,6 +24,7 @@ fill_to = Vector2(1, 0.5)
 [node name="SinoTorre" type="StaticBody2D"]
 collision_layer = 4
 collision_mask = 0
+script = ExtResource("1_sino")
 
 [node name="Suporte" type="Line2D" parent="."]
 points = PackedVector2Array(-30, -46, 30, -46)

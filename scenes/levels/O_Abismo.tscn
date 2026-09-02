@@ -1,7 +1,7 @@
 [gd_scene load_steps=12 format=3 uid="uid://bkolianiabismo20"]
 
 ; REGIAO IV / nivel 20 -- O Abismo (chefe da regiao).
-; Nivel FEITO A MAO (corredor = false). Quase sem luz -- so' a LuzSeguidora
+; Sala final FEITA A MAO (a JORNADA, que cresce com o nivel, vem antes). Quase sem luz -- so' a LuzSeguidora
 ; a recortar o caminho. GRANDE QUEDA a meio (a descida ao abismo).
 ; Bifurcacao: cornija esquerda / direita antes do salto. Elite: ogro de
 ; carga. Vazio total por baixo. Chefe: O Olho do Abismo (inverte comandos).
@@ -35,7 +35,6 @@ fill_to = Vector2(1, 0.5)
 
 [node name="O_Abismo" type="Node2D"]
 script = ExtResource("7_niv")
-corredor = false
 
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
 cor_ambiente = Color(0.416, 0.364, 0.571, 1)

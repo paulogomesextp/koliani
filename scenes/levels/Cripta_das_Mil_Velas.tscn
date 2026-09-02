@@ -1,7 +1,7 @@
 [gd_scene load_steps=13 format=3 uid="uid://bkolianicripta18"]
 
 ; REGIAO IV / nivel 18 -- Cripta das Mil Velas.
-; Nivel FEITO A MAO (corredor = false). Luz e escuridao: plataformas que
+; Sala final FEITA A MAO (a JORNADA, que cresce com o nivel, vem antes). Luz e escuridao: plataformas que
 ; so' existem quando ILUMINADAS (PlataformaLuz, mantidas acesas por Velas).
 ; Bifurcacao: fila de velas norte / sul. Elite: gosma saltador. Trevas por
 ; baixo. Chefe: A Freira Negra.
@@ -36,7 +36,6 @@ fill_to = Vector2(1, 0.5)
 
 [node name="Cripta_das_Mil_Velas" type="Node2D"]
 script = ExtResource("7_niv")
-corredor = false
 
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
 cor_ambiente = Color(0.708, 0.651, 0.708, 1)

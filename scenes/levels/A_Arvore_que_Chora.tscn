@@ -1,7 +1,7 @@
 [gd_scene load_steps=17 format=3 uid="uid://bkolianiarvore04"]
 
 ; REGIAO I / nivel 4 -- A Arvore que Chora.
-; Nivel FEITO A MAO (corredor = false), a' escala dos vizinhos (~3600 px).
+; Sala final FEITA A MAO (a JORNADA, que cresce com o nivel, vem antes), a' escala dos vizinhos (~3600 px).
 ; ACTO 1: raizes mortas a' superficie, com raizes que irrompem (RaizPerigo).
 ; ACTO 2: O TRONCO -- subida em ziguezague pela casca, guardada em baixo
 ; pelo elite gosma SALTADOR. ACTO 3: bifurcacao -- RAMOS EXTERIORES (por
@@ -40,7 +40,6 @@ fill_to = Vector2(1, 0.5)
 
 [node name="A_Arvore_que_Chora" type="Node2D"]
 script = ExtResource("7_niv")
-corredor = false
 
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
 cor_ambiente = Color(0.7, 0.78, 0.66, 1)

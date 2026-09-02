@@ -1,7 +1,7 @@
 [gd_scene load_steps=12 format=3 uid="uid://bkolianimercado22"]
 
 ; REGIAO V / nivel 22 -- Mercado da Carne.
-; Nivel FEITO A MAO (corredor = false). Ganchos e carrinhos: plataformas de
+; Sala final FEITA A MAO (a JORNADA, que cresce com o nivel, vem antes). Ganchos e carrinhos: plataformas de
 ; CORRENTE (PlataformaCorrente) entre bancas solidas. Bifurcacao: ganchos
 ; de cima / bancas de baixo. Elite: orc de carga. Acido citrino por baixo.
 ; Chefe: O Acougueiro Real.
@@ -35,7 +35,6 @@ fill_to = Vector2(1, 0.5)
 
 [node name="Mercado_da_Carne" type="Node2D"]
 script = ExtResource("7_niv")
-corredor = false
 
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
 cor_ambiente = Color(0.7, 0.5, 0.56, 1)

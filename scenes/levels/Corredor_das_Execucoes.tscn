@@ -1,7 +1,7 @@
 [gd_scene load_steps=15 format=3 uid="uid://bkolianiexecucoes08"]
 
 ; REGIAO II / nivel 8 -- Corredor das Execucoes.
-; Nivel FEITO A MAO (corredor = false). GAUNTLET: um corredor de guilhotinas
+; Sala final FEITA A MAO (a JORNADA, que cresce com o nivel, vem antes). GAUNTLET: um corredor de guilhotinas
 ; automaticas, laminas (serras) e plataformas que se desfazem (PlataformaQuebra)
 ; sobre acido. Mini-bifurcacao a meio (salto alto por cima de uma guilhotina
 ; / passar por baixo). Elite: chort de carga. Chefe: A Dama da Guilhotina.
@@ -38,7 +38,6 @@ fill_to = Vector2(1, 0.5)
 
 [node name="Corredor_das_Execucoes" type="Node2D"]
 script = ExtResource("7_niv")
-corredor = false
 
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
 cor_ambiente = Color(0.66, 0.66, 0.8, 1)

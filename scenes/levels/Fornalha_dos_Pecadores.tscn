@@ -1,7 +1,7 @@
 [gd_scene load_steps=14 format=3 uid="uid://bkolianifornalha07"]
 
 ; REGIAO II / nivel 7 -- Fornalha dos Pecadores.
-; Nivel FEITO A MAO (corredor = false). Fabrica infernal: LAVA em baixo
+; Sala final FEITA A MAO (a JORNADA, que cresce com o nivel, vem antes). Fabrica infernal: LAVA em baixo
 ; (morte), plataformas moveis por cima, jatos de fogo. Bifurcacao: correntes
 ; a subir pela chamine / passadico lateral com serras. Elite: imp cuspidor.
 ; Chefe: Ignivar, o Ferreiro Maldito.
@@ -38,7 +38,6 @@ fill_to = Vector2(1, 0.5)
 
 [node name="Fornalha_dos_Pecadores" type="Node2D"]
 script = ExtResource("7_niv")
-corredor = false
 
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
 cor_ambiente = Color(0.78, 0.66, 0.6, 1)

@@ -1,7 +1,7 @@
 [gd_scene load_steps=15 format=3 uid="uid://bkolianicoracao05"]
 
 ; REGIAO I / nivel 5 -- Coracao da Floresta (chefe da regiao).
-; Nivel FEITO A MAO (corredor = false). Travessia sobre plataformas
+; Sala final FEITA A MAO (a JORNADA, que cresce com o nivel, vem antes). Travessia sobre plataformas
 ; "batimento" (PlataformaRitmada em sincronia) com ancoras solidas pelo
 ; meio. Bifurcacao: POCO DE GRAVIDADE LUNAR (saltos enormes) / rota solida
 ; segura. Elite: lodo de CARGA. Poca de podridao em baixo (morte). Chefe:
@@ -38,7 +38,6 @@ fill_to = Vector2(1, 0.5)
 
 [node name="Coracao_da_Floresta" type="Node2D"]
 script = ExtResource("7_niv")
-corredor = false
 
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
 cor_ambiente = Color(0.72, 0.7, 0.76, 1)

@@ -1,7 +1,7 @@
 [gd_scene load_steps=12 format=3 uid="uid://bkolianipracaeclipse25"]
 
 ; REGIAO V / nivel 25 -- Praca do Eclipse (chefe da regiao).
-; Nivel FEITO A MAO (corredor = false). O cenario ALTERNA entre realidade
+; Sala final FEITA A MAO (a JORNADA, que cresce com o nivel, vem antes). O cenario ALTERNA entre realidade
 ; e corrupcao: plataformas "batimento" (PlataformaRitmada em sincronia)
 ; com ancoras solidas pelo meio. Bifurcacao: passeio norte / sul. Elite:
 ; xamane cuspidor. Acido citrino por baixo. Chefe: A Noiva do Eclipse.
@@ -35,7 +35,6 @@ fill_to = Vector2(1, 0.5)
 
 [node name="Praca_do_Eclipse" type="Node2D"]
 script = ExtResource("7_niv")
-corredor = false
 
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
 cor_ambiente = Color(0.66, 0.56, 0.76, 1)

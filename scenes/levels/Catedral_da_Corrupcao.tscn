@@ -1,7 +1,7 @@
 [gd_scene load_steps=12 format=3 uid="uid://bkolianicatedral24"]
 
 ; REGIAO V / nivel 24 -- Catedral da Corrupcao.
-; Nivel FEITO A MAO (corredor = false). Naves de combate; VITRAIS
+; Sala final FEITA A MAO (a JORNADA, que cresce com o nivel, vem antes). Naves de combate; VITRAIS
 ; (destrutiveis, mudam a luz) nas paredes de fundo. Bifurcacao: galeria
 ; alta / nave baixa. Elite: raptor de carga. Acido citrino por baixo.
 ; Chefe: O Bispo Purpura.
@@ -35,7 +35,6 @@ fill_to = Vector2(1, 0.5)
 
 [node name="Catedral_da_Corrupcao" type="Node2D"]
 script = ExtResource("7_niv")
-corredor = false
 
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
 cor_ambiente = Color(0.56, 0.48, 0.72, 1)

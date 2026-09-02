@@ -1,7 +1,7 @@
 [gd_scene load_steps=12 format=3 uid="uid://bkolianiportoeszeriko26"]
 
 ; REGIAO VI / nivel 26 -- Portoes de Zeriko.
-; Nivel FEITO A MAO (corredor = false). Muralha do castelo: combate contra
+; Sala final FEITA A MAO (a JORNADA, que cresce com o nivel, vem antes). Muralha do castelo: combate contra
 ; cavaleiros corrompidos. Bifurcacao: adarve alto / patio baixo. Elite:
 ; demonio_grande de carga. LAVA por baixo = morte. Chefe: O Capitao Negro
 ; (luta como personagem jogavel, rapido).
@@ -35,7 +35,6 @@ fill_to = Vector2(1, 0.5)
 
 [node name="Portoes_de_Zeriko" type="Node2D"]
 script = ExtResource("7_niv")
-corredor = false
 
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
 cor_ambiente = Color(0.66, 0.5, 0.68, 1)

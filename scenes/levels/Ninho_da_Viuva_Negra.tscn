@@ -1,7 +1,7 @@
 [gd_scene load_steps=17 format=3 uid="uid://bkolianininho03"]
 
 ; REGIAO I / nivel 3 -- Ninho da Viuva Negra.
-; Nivel FEITO A MAO (corredor = false), a' escala dos vizinhos (~3600 px).
+; Sala final FEITA A MAO (a JORNADA, que cresce com o nivel, vem antes), a' escala dos vizinhos (~3600 px).
 ; ACTO 1: passadicos por cima do fosso de teia. ACTO 2: O POCO -- subida em
 ; ziguezague por fios de teia (PlataformaRitmada) com teias pegajosas
 ; (TeiaPrende) a atrasar; no cimo espera o elite besouro TREPADOR.
@@ -40,7 +40,6 @@ fill_to = Vector2(1, 0.5)
 
 [node name="Ninho_da_Viuva_Negra" type="Node2D"]
 script = ExtResource("7_niv")
-corredor = false
 
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
 cor_ambiente = Color(0.72, 0.66, 0.8, 1)

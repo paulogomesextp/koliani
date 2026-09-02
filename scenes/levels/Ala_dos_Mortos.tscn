@@ -1,7 +1,7 @@
 [gd_scene load_steps=13 format=3 uid="uid://bkolianialamortos09"]
 
 ; REGIAO II / nivel 9 -- Ala dos Mortos.
-; Nivel FEITO A MAO (corredor = false). Plataformas ESPECTRAIS que piscam
+; Sala final FEITA A MAO (a JORNADA, que cresce com o nivel, vem antes). Plataformas ESPECTRAIS que piscam
 ; entre solidas e fantasma (PlataformaEspectral) intercaladas com ancoras
 ; solidas. Bifurcacao: fila espectral rapida (timing) / passadico solido
 ; longo. Elite: mastim (cao) de carga. Chefe: Os Irmaos Condenados.
@@ -36,7 +36,6 @@ fill_to = Vector2(1, 0.5)
 
 [node name="Ala_dos_Mortos" type="Node2D"]
 script = ExtResource("7_niv")
-corredor = false
 
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
 cor_ambiente = Color(0.62, 0.7, 0.72, 1)

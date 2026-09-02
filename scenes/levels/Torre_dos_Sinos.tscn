@@ -1,7 +1,7 @@
 [gd_scene load_steps=12 format=3 uid="uid://bkolianitorresinos11"]
 
 ; REGIAO III / nivel 11 -- Torre dos Sinos.
-; Nivel FEITO A MAO (corredor = false) e VERTICAL: sobe-se a torre. Sinos
+; Sala final FEITA A MAO (a JORNADA, que cresce com o nivel, vem antes) e VERTICAL: sobe-se a torre. Sinos
 ; (SinoTorre) que se tocam para CONGELAR os inimigos e ganhar a subida.
 ; Bifurcacao: escadaria oeste / escadaria este. Elite: xamane cuspidor.
 ; Vazio (trevas) em baixo -- cair = morte. Chefe: O Sino Vivo.
@@ -35,7 +35,6 @@ fill_to = Vector2(1, 0.5)
 
 [node name="Torre_dos_Sinos" type="Node2D"]
 script = ExtResource("7_niv")
-corredor = false
 
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
 cor_ambiente = Color(0.78, 0.74, 0.72, 1)

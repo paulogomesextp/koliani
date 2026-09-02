@@ -34,6 +34,11 @@ func _init() -> void:
 		if i < 0:
 			print("(aviso: cena fora de EstadoJogo.NIVEIS -- a verificar como N1)")
 	var raiz := cena.instantiate()
+	# esta ferramenta verifica a SALA FEITA À MÃO -- desliga a jornada
+	# procedural, que traz plataformas móveis que o crivo estático não
+	# modela (dariam órfãs falsas).
+	if "corredor" in raiz:
+		raiz.corredor = false
 	root.add_child(raiz)
 	for _i in 8:
 		await process_frame

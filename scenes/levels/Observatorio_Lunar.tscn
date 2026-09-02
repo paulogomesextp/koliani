@@ -1,7 +1,7 @@
 [gd_scene load_steps=12 format=3 uid="uid://bkolianiobservatorio14"]
 
 ; REGIAO III / nivel 14 -- Observatorio Lunar.
-; Nivel FEITO A MAO (corredor = false) e VERTICAL. Bolsas de GRAVIDADE
+; Sala final FEITA A MAO (a JORNADA, que cresce com o nivel, vem antes) e VERTICAL. Bolsas de GRAVIDADE
 ; LUNAR (ZonaGravidade) onde a Koliani salta altissimo e cai devagar --
 ; usam-se para vencer os grandes vaos verticais. Bifurcacao: coluna lunar
 ; oeste / degraus este. Elite: wogol de carga. Vazio em baixo. Chefe: A
@@ -36,7 +36,6 @@ fill_to = Vector2(1, 0.5)
 
 [node name="Observatorio_Lunar" type="Node2D"]
 script = ExtResource("7_niv")
-corredor = false
 
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
 cor_ambiente = Color(0.82, 0.84, 0.9, 1)

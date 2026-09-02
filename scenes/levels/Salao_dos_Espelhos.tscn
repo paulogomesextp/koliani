@@ -1,7 +1,7 @@
 [gd_scene load_steps=12 format=3 uid="uid://bkolianisalaoespelhos27"]
 
 ; REGIAO VI / nivel 27 -- Salao dos Espelhos.
-; Nivel FEITO A MAO (corredor = false). Espelhos (Espelho) nas paredes que
+; Sala final FEITA A MAO (a JORNADA, que cresce com o nivel, vem antes). Espelhos (Espelho) nas paredes que
 ; soltam KOLIANIS SOMBRIAS quando partidos. Bifurcacao: galeria alta / salao
 ; baixo. Elite: chort de carga. LAVA por baixo. Chefe: Koliani Sombria.
 
@@ -34,7 +34,6 @@ fill_to = Vector2(1, 0.5)
 
 [node name="Salao_dos_Espelhos" type="Node2D"]
 script = ExtResource("7_niv")
-corredor = false
 
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
 cor_ambiente = Color(0.7, 0.56, 0.72, 1)

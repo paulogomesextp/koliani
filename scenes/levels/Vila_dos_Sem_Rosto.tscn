@@ -1,7 +1,7 @@
 [gd_scene load_steps=11 format=3 uid="uid://bkolianivilasemrosto21"]
 
 ; REGIAO V / nivel 21 -- Vila dos Sem-Rosto.
-; Nivel FEITO A MAO (corredor = false). Ruas da vila corrompida: alguns
+; Sala final FEITA A MAO (a JORNADA, que cresce com o nivel, vem antes). Ruas da vila corrompida: alguns
 ; "aldeoes" sao inimigos DORMENTES que so' se revelam de perto. Bifurcacao:
 ; telhados / rua. Elite: abobora de carga (disfarcada). Acido citrino por
 ; baixo. Chefe: O Prefeito Sem-Rosto.
@@ -34,7 +34,6 @@ fill_to = Vector2(1, 0.5)
 
 [node name="Vila_dos_Sem_Rosto" type="Node2D"]
 script = ExtResource("7_niv")
-corredor = false
 
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
 cor_ambiente = Color(0.68, 0.58, 0.78, 1)

@@ -1,7 +1,7 @@
 [gd_scene load_steps=15 format=3 uid="uid://bkolianipantano02"]
 
 ; REGIAO I / nivel 2 -- Pantano dos Sussurros.
-; Nivel FEITO A MAO (corredor = false). Arquipelago de ilhas sobre agua
+; Sala final FEITA A MAO (a JORNADA, que cresce com o nivel, vem antes). Arquipelago de ilhas sobre agua
 ; venenosa (morte). Bifurcacao: linha alta solida / linha baixa rente a'
 ; agua com plataformas flutuantes a driftar. Alcova secreta LA EM BAIXO
 ; (larga-se de proposito para a apanhar). Elite: cogumelo cuspidor no
@@ -38,7 +38,6 @@ fill_to = Vector2(1, 0.5)
 
 [node name="Pantano_dos_Sussurros" type="Node2D"]
 script = ExtResource("7_niv")
-corredor = false
 
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
 cor_ambiente = Color(0.66, 0.78, 0.72, 1)

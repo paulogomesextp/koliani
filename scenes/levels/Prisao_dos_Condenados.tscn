@@ -1,7 +1,7 @@
 [gd_scene load_steps=14 format=3 uid="uid://bkolianiprisao01"]
 
 ; REGIAO II / nivel 6 -- Portao dos Condenados.
-; Nivel FEITO A MAO (corredor = false). Masmorra FECHADA (CascaMasmorra).
+; Sala final FEITA A MAO (a JORNADA, que cresce com o nivel, vem antes). Masmorra FECHADA (CascaMasmorra).
 ; Correntes como PLATAFORMAS MOVEIS (PlataformaCorrente) entre blocos de
 ; celas solidos. Bifurcacao: passadico de cima / fila de celas em baixo.
 ; Elite: esqueleto de carga. Poca de acido no fundo. Chefe: O Carcereiro
@@ -38,7 +38,6 @@ fill_to = Vector2(1, 0.5)
 
 [node name="Prisao_dos_Condenados" type="Node2D"]
 script = ExtResource("7_niv")
-corredor = false
 
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
 cor_ambiente = Color(0.66, 0.66, 0.82, 1)

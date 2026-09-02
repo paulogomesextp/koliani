@@ -1,7 +1,7 @@
 [gd_scene load_steps=12 format=3 uid="uid://bkolianitemploserpente19"]
 
 ; REGIAO IV / nivel 19 -- Templo da Serpente.
-; Nivel FEITO A MAO (corredor = false). PAREDES MOVEIS (ParedeMovel) que
+; Sala final FEITA A MAO (a JORNADA, que cresce com o nivel, vem antes). PAREDES MOVEIS (ParedeMovel) que
 ; deslizam pelo corredor -- passa-se ao lado no tempo certo. Bifurcacao:
 ; passagem alta / passagem baixa. Elite: wogol de carga. Trevas por baixo.
 ; Chefe: Naga Zeraph.
@@ -35,7 +35,6 @@ fill_to = Vector2(1, 0.5)
 
 [node name="Templo_da_Serpente" type="Node2D"]
 script = ExtResource("7_niv")
-corredor = false
 
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
 cor_ambiente = Color(0.821, 0.963, 0.793, 1)

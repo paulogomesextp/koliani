@@ -1,7 +1,7 @@
 [gd_scene load_steps=13 format=3 uid="uid://bkolianitorretempestade13"]
 
 ; REGIAO III / nivel 13 -- Torre da Tempestade.
-; Nivel FEITO A MAO (corredor = false) e VERTICAL. RAIOS (RaioTempestade
+; Sala final FEITA A MAO (a JORNADA, que cresce com o nivel, vem antes) e VERTICAL. RAIOS (RaioTempestade
 ; automatico) caem em colunas com padrao previsivel sobre a subida; ha
 ; PARA-RAIOS para armar e desviar. Bifurcacao: rampa oeste / rampa este.
 ; Elite: olho voador. Vazio em baixo. Chefe: Voltaris.
@@ -36,7 +36,6 @@ fill_to = Vector2(1, 0.5)
 
 [node name="Torre_da_Tempestade" type="Node2D"]
 script = ExtResource("7_niv")
-corredor = false
 
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
 cor_ambiente = Color(0.72, 0.76, 0.82, 1)

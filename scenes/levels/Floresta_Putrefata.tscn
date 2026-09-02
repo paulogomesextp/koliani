@@ -1,7 +1,7 @@
 [gd_scene load_steps=16 format=3 uid="uid://bkolianiflorestaput01"]
 
 ; REGIAO I / nivel 1 -- O Caminho das Raizes Mortas.
-; Nivel FEITO A MAO (corredor = false) -- sem a jornada procedural. Salas
+; Sala final FEITA A MAO (a JORNADA, que cresce com o nivel, vem antes). Salas
 ; ligadas, uma bifurcacao (linha alta rapida com segredo / linha baixa
 ; segura), um elite a meio, o pantano mortal por baixo. Mecanica-assinatura
 ; da regiao: raizes que crescem e somem (PlataformaRitmada) + raizes que
@@ -38,7 +38,6 @@ fill_to = Vector2(1, 0.5)
 
 [node name="Floresta_Putrefata" type="Node2D"]
 script = ExtResource("7_niv")
-corredor = false
 
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
 cor_ambiente = Color(0.7, 0.78, 0.74, 1)

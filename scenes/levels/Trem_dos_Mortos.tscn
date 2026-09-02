@@ -1,7 +1,7 @@
 [gd_scene load_steps=12 format=3 uid="uid://bkolianitremmortos23"]
 
 ; REGIAO V / nivel 23 -- Trem dos Mortos.
-; Nivel FEITO A MAO (corredor = false). Corre-se sobre um comboio: VAGOES
+; Sala final FEITA A MAO (a JORNADA, que cresce com o nivel, vem antes). Corre-se sobre um comboio: VAGOES
 ; solidos ligados por ELOS que deslizam de lado (TumuloElevador auto
 ; horizontal) -- salta-se de vagao para vagao no meio do movimento.
 ; Bifurcacao: tejadilho dos vagoes / entre-vagoes. Elite: mastim de carga.
@@ -36,7 +36,6 @@ fill_to = Vector2(1, 0.5)
 
 [node name="Trem_dos_Mortos" type="Node2D"]
 script = ExtResource("7_niv")
-corredor = false
 
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
 cor_ambiente = Color(0.6, 0.5, 0.68, 1)

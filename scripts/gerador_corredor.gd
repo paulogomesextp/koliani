@@ -21,9 +21,9 @@ extends Node2D
 # pediu. Desce para 1800px (uns 10-15s só de travessia da jornada, mais a
 # sala clássica a seguir) e cresce mais depressa por nível para o topo da
 # campanha continuar com o mesmo fôlego de antes.
-@export var comprimento_base := 1800.0
-@export var por_nivel := 1050.0
-@export var comprimento_max := 32000.0
+@export var comprimento_base := 2600.0
+@export var por_nivel := 1250.0
+@export var comprimento_max := 40000.0
 @export var especie_inimigo := ""
 @export var entrada_fresca := true
 @export var otimizar_visibilidade := true
@@ -53,6 +53,18 @@ const TEIA := preload("res://scenes/actors/TeiaPrende.tscn")
 const GOTA := preload("res://scenes/actors/GotaAcida.tscn")
 const RAIO := preload("res://scenes/actors/RaioTempestade.tscn")
 const CHECKPOINT := preload("res://scripts/checkpoint.gd")
+# --- peças de PUZZLE (2 set 2026): o Paulo pediu "muito mais mecânicas
+# diferentes, puzzles". Estas são as que já existiam nos níveis à mão e que
+# a jornada nunca tinha usado.
+const ALAVANCA := preload("res://scenes/actors/Alavanca.tscn")
+const PORTA_TRANCADA := preload("res://scenes/actors/PortaTrancada.tscn")
+const PAREDE_FRAGIL := preload("res://scenes/actors/ParedeFragil.tscn")
+const PAREDE_MOVEL := preload("res://scenes/actors/ParedeMovel.tscn")
+const SINO := preload("res://scenes/actors/SinoTorre.tscn")
+const VELA := preload("res://scenes/actors/Vela.tscn")
+const PLAT_LUZ := preload("res://scenes/actors/PlataformaLuz.tscn")
+const ESPELHO := preload("res://scenes/actors/Espelho.tscn")
+const ESSENCIA := preload("res://scenes/actors/Essencia.tscn")
 
 ## Líquido mortal por região: [cor, brasas]. floresta=água podre, prisão=ácido,
 ## torres=??? (usa trevas), catacumbas=trevas, cidade=ácido citrino,
@@ -72,12 +84,19 @@ const LIQUIDO := {
 
 ## Tipos de "flavour" de câmara (o que se semeia à volta da espinha).
 const POOL_REGIAO := {
-	0: ["saltos", "serras", "pendulos", "ritmo", "trampolim", "gruta", "portal"],
-	1: ["saltos", "correntes", "elevador", "quebra", "guilhotinas", "serras", "portal", "crossfire", "espinhos"],
-	2: ["vento", "saltos", "gravidade", "pendulos", "trampolim", "ritmo", "portal", "ferry"],
-	3: ["gruta", "pedras", "elevador", "quebra", "guilhotinas", "pendulos", "portal", "ferry", "espinhos"],
-	4: ["saltos", "impulso", "serras", "fogo", "trampolim", "guilhotinas", "portal", "crossfire"],
-	5: ["pendulos", "fogo", "guilhotinas", "ritmo", "quebra", "gravidade", "portal", "crossfire", "ferry"],
+	0: ["saltos", "serras", "pendulos", "ritmo", "trampolim", "gruta", "portal",
+		"alavanca", "segredo"],
+	1: ["saltos", "correntes", "elevador", "quebra", "guilhotinas", "serras", "portal",
+		"crossfire", "espinhos", "alavanca", "prensa", "velas", "segredo"],
+	2: ["vento", "saltos", "gravidade", "pendulos", "trampolim", "ritmo", "portal",
+		"ferry", "sinos", "alavanca", "segredo"],
+	3: ["gruta", "pedras", "elevador", "quebra", "guilhotinas", "pendulos", "portal",
+		"ferry", "espinhos", "velas", "prensa", "alavanca", "segredo", "sinos"],
+	4: ["saltos", "impulso", "serras", "fogo", "trampolim", "guilhotinas", "portal",
+		"crossfire", "prensa", "alavanca", "espelhos", "segredo"],
+	5: ["pendulos", "fogo", "guilhotinas", "ritmo", "quebra", "gravidade", "portal",
+		"crossfire", "ferry", "espelhos", "sinos", "prensa", "alavanca", "segredo",
+		"velas"],
 }
 
 ## `_dif` mínimo para cada tipo de câmara entrar na pool. Assim o Nível 1
@@ -89,6 +108,19 @@ const TIER_FLAVOUR := {
 	"gravidade": 0.34, "serras": 0.36, "vento": 0.42, "pendulos": 0.46,
 	"impulso": 0.5, "guilhotinas": 0.58, "quebra": 0.62, "fogo": 0.66,
 	"crossfire": 0.4, "ferry": 0.3, "espinhos": 0.28,
+	# puzzles (o "abre-caminho" de cada um é sempre alcançável do lado de cá)
+	"alavanca": 0.08,   # interruptor -> grade
+	"segredo": 0.14,    # parede rachada com um cofre atrás (pede `partir_paredes`)
+	"velas": 0.24,      # acender a vela -> as plataformas de luz existem
+	"sinos": 0.3,       # badalada -> a ponte fantasma fica sólida
+	"prensa": 0.44,     # paredes que varrem o corredor
+	"espelhos": 0.55,   # espelhos que bloqueiam e largam reflexos
+}
+
+## Câmaras que não vivem na pool de nenhuma região (são escolhidas por outro
+## ramo do `_construir`), mas que o forçador de VARIEDADE também pode puxar.
+const TIER_EXTRA := {
+	"cripta": 0.08, "arena": 0.12, "forquilha": 0.18, "corredor": 0.28,
 }
 ## Fallback quando a região ainda não libertou nada (níveis muito baixos).
 const FLAVOUR_SUAVE := ["saltos", "gruta", "trampolim"]
@@ -104,6 +136,7 @@ const CAMARAS_FLAVOUR := [
 	"correntes", "elevador", "vento", "gravidade", "guilhotinas", "fogo",
 	"impulso", "portal", "torre", "poco", "pilares", "descanso", "forquilha",
 	"arena", "corredor", "cripta", "crossfire", "ferry", "pedras", "espinhos",
+	"alavanca", "velas", "sinos", "prensa", "espelhos", "segredo",
 ]
 
 ## Câmara "assinatura" de cada região -- no acto do meio da jornada aparece
@@ -188,11 +221,21 @@ const PERFIL := [
 ## Que câmaras conta cada foco. Cruzado depois com região+tier em
 ## `_camara_do_foco` -- o foco só enviesa, nunca fura as regras.
 const FOCO_CAMARAS := {
-	"salto": ["saltos", "trampolim", "forquilha"],
-	"combate": ["arena", "cripta"],
-	"maquina": ["elevador", "correntes", "impulso", "ritmo", "quebra", "gravidade"],
-	"gauntlet": ["corredor", "serras", "guilhotinas", "fogo", "pendulos", "crossfire", "espinhos"],
+	"salto": ["saltos", "trampolim", "forquilha", "velas"],
+	"combate": ["arena", "cripta", "espelhos"],
+	"maquina": ["elevador", "correntes", "impulso", "ritmo", "quebra", "gravidade",
+		"prensa", "alavanca", "sinos"],
+	"gauntlet": ["corredor", "serras", "guilhotinas", "fogo", "pendulos", "crossfire",
+		"espinhos", "prensa"],
 }
+
+## Câmaras que puxam pelo jogador -- a seguir a uma destas vem sempre um
+## `descanso` (o ritmo tensão/alívio da pegada Dead Cells).
+const INTENSAS := [
+	"guilhotinas", "serras", "pendulos", "fogo", "quebra", "crossfire", "ferry",
+	"pedras", "espinhos", "corredor", "arena", "prensa", "espelhos", "sinos",
+]
+
 
 var _chao_y := 0.0     # topo do líquido mortal
 var _idx := 0
@@ -205,7 +248,7 @@ var _cont_i := 0
 ## Espaço mínimo (px) entre checkpoints da jornada. Antes havia um a cada
 ## ~2 plataformas (~380 px) -- eram MUITOS. Passa a haver um a cada ~4000 px
 ## (~90% menos); o do início e o de antes do chefe são sempre postos.
-const DIST_CHECKPOINT := 4000.0
+const DIST_CHECKPOINT := 3000.0
 var _ultimo_check_x := -1.0e9
 
 ## Perigo-no-vão em RAJADAS de um só tipo (pêndulo OU serra OU fogo), não
@@ -220,6 +263,21 @@ var _perigo_restante := 0
 ## com câmaras de ALÍVIO (`descanso` -- plataforma larga limpa + checkpoint).
 var _camaras := 0
 var _pos_intenso := false
+
+## VARIEDADE DE MECÂNICAS (pedido do Paulo, 2 set 2026: "meta muito mais
+## mecânicas diferentes por nível"). Guarda os tipos de câmara já usados
+## NESTE nível; de `CICLO_VARIEDADE` em `CICLO_VARIEDADE` câmaras força-se
+## uma que ainda não apareceu. Como a jornada cresce com o número do nível,
+## um nível tardio tem câmaras que cheguem para esgotar a pool da região --
+## ou seja, quanto mais alto o nível, mais mecânicas DIFERENTES se veem.
+var _tipos_usados := {}
+## Câmaras que faltam até se voltar a FORÇAR uma mecânica nova. É uma
+## contagem decrescente e não `_camaras % N` -- com o módulo, os níveis de
+## foco "vertical" (que enchem as câmaras pares com torres/poços e as
+## ímpares com descansos) ficavam presos na paridade errada e nunca
+## chegavam a estrear mecânica nenhuma.
+var _falta_nova := 0
+const CICLO_VARIEDADE := 2
 
 ## Subida máxima (px) de um degrau para o seguinte -- um salto + duplo salto
 ## da Koliani. Nenhuma plataforma da jornada fica mais alta que isto face à
@@ -336,7 +394,7 @@ func _construir() -> void:
 	var ant_flavour := ""
 	# quão longe ficam as câmaras de flavour umas das outras (passos da
 	# espinha): muito espaçadas no Nível 1, coladas no Nível 30.
-	var espaco_flavour := int(round(lerpf(13.0, 4.0, _dif)))
+	var espaco_flavour := int(round(lerpf(7.0, 3.4, _dif)))
 	var prox_flavour := espaco_flavour + _rng.randi() % 3
 	# de 2 em 2/3 câmaras força-se uma VERTICAL (torre/poço/pilares); os
 	# níveis de foco "vertical" (ver PERFIL) fazem-no com o dobro da cadência
@@ -400,7 +458,7 @@ func _construir() -> void:
 		if passos % 2 == 0:
 			_checkpoint(x, y)
 		# inimigo ocasional na plataforma
-		if _rng.randf() < (0.05 + 0.22 * _dif) * intens:
+		if _rng.randf() < (0.06 + 0.34 * _dif) * intens:
 			_inimigo_em(par, Vector2(x, y - 30.0))
 		# decoração
 		_decorar(par, x, y)
@@ -419,6 +477,11 @@ func _construir() -> void:
 			flavs_ate_vertical -= 1
 			var sig: String = ASSINATURA.get(_regiao, "")
 			var foco_f: String = _camara_do_foco()
+			# de X em X câmaras, uma MECÂNICA AINDA NÃO VISTA neste nível
+			var nova: String = ""
+			_falta_nova -= 1
+			if prog < 0.82 and _falta_nova <= 0:
+				nova = _camara_nova(pool)
 			if prog > 0.82:
 				# ACTO 3: alívio antes da rampa final -> quase só descansos
 				f = "descanso" if _rng.randf() < 0.8 else pool[_rng.randi() % pool.size()]
@@ -426,6 +489,10 @@ func _construir() -> void:
 			elif _pos_intenso:
 				f = "descanso"          # logo a seguir a uma câmara puxada -> respira
 				_pos_intenso = false
+			elif nova != "":
+				f = nova                # mecânica NOVA antes de repetir as velhas
+				_falta_nova = CICLO_VARIEDADE
+				_pos_intenso = f in INTENSAS
 			elif flavs_ate_vertical <= 0:
 				flavs_ate_vertical = passo_vert + _rng.randi() % 2
 				f = ["torre", "poco", "pilares"][_rng.randi() % 3]
@@ -435,7 +502,7 @@ func _construir() -> void:
 			# combate / máquinas / gauntlet) em vez de sair tudo à sorte.
 			elif foco_f != "" and prog >= 0.16 and prog <= 0.84 and _rng.randf() < 0.5:
 				f = foco_f
-				_pos_intenso = f in ["guilhotinas", "serras", "pendulos", "fogo", "quebra", "crossfire", "espinhos", "corredor", "arena"]
+				_pos_intenso = f in INTENSAS
 			elif _camaras % 4 == 0:
 				f = "descanso"
 			# câmaras "tom" novas (crossfire/ferry/pedras/espinhos) -- ramo
@@ -466,8 +533,9 @@ func _construir() -> void:
 				f = pool[_rng.randi() % pool.size()]
 				if f == ant_flavour:
 					f = pool[(_rng.randi() + 1) % pool.size()]
-				_pos_intenso = f in ["guilhotinas", "serras", "pendulos", "fogo", "quebra", "crossfire", "ferry", "pedras", "espinhos"]
+				_pos_intenso = f in INTENSAS
 			ant_flavour = f
+			_tipos_usados[f] = true
 			var res := _flavour(par, f, x, y)
 			x = res.x
 			y = res.y
@@ -525,6 +593,20 @@ func _tem_tom_novo(pool: Array) -> bool:
 		if t in pool:
 			return true
 	return false
+
+
+## Uma câmara que ainda NÃO apareceu neste nível (pool da região já filtrada
+## por tier + as câmaras "extra" que não vivem em pool nenhuma). `""` quando
+## já se viu tudo o que este nível pode dar -- aí a seleção normal segue.
+func _camara_nova(pool: Array) -> String:
+	var opc: Array = []
+	for c: String in pool:
+		if not _tipos_usados.has(c):
+			opc.append(c)
+	for c: String in TIER_EXTRA:
+		if not _tipos_usados.has(c) and _dif + 0.0001 >= float(TIER_EXTRA[c]):
+			opc.append(c)
+	return opc[_rng.randi() % opc.size()] if not opc.is_empty() else ""
 
 
 func _escolher_tom_novo(pool: Array) -> String:
@@ -710,11 +792,22 @@ func _coluna_fundo(par: Node2D, x: float) -> void:
 	par.add_child(s)
 
 
-func _inimigo_em(par: Node2D, pos: Vector2) -> void:
+func _inimigo_em(par: Node2D, pos: Vector2, elite := false) -> void:
 	var d := DEMONIO.instantiate()
 	d.especie = _especie_aleatoria()
 	d.position = pos
 	d.alcance_patrulha = _rng.randf_range(40.0, 90.0)
+	# ELITE de arena (curva de dificuldade): a partir do meio da campanha as
+	# salas de combate da jornada trazem um bicho grande que aguenta e bate.
+	if elite:
+		d.elite = true
+		d.scale = Vector2(1.35, 1.35)
+		d.vida = 90 + int(140.0 * _dif)
+		d.dano_contacto = 12 + int(14.0 * _dif)
+		d.comportamento = "carga" if _rng.randf() < 0.5 else "saltador"
+		d.alcance_patrulha = 120.0
+		par.add_child(d)
+		return
 	# n21 Vila dos Sem-Rosto (gimmick: "alguns NPCs são inimigos disfarçados")
 	# -- metade dos bichos da jornada ficam dormentes e só se revelam de perto.
 	if _idx == 20 and _rng.randf() < 0.5:
@@ -833,6 +926,12 @@ func _flavour(par: Node2D, tipo: String, x: float, y: float) -> Vector2:
 		"ferry": return _f_ferry(par, x, y)
 		"pedras": return _f_pedras(par, x, y)
 		"espinhos": return _f_espinhos(par, x, y)
+		"alavanca": return _f_alavanca(par, x, y)
+		"velas": return _f_velas(par, x, y)
+		"sinos": return _f_sinos(par, x, y)
+		"prensa": return _f_prensa(par, x, y)
+		"espelhos": return _f_espelhos(par, x, y)
+		"segredo": return _f_segredo(par, x, y)
 	# tipo sem handler -> não deve acontecer (pool/assinatura mal configurada).
 	# Avisa em vez de gerar um vão morto silencioso e cai num `descanso`.
 	push_warning("GeradorCorredor: câmara '%s' sem _f_ correspondente" % tipo)
@@ -1016,10 +1115,11 @@ func _f_arena(par: Node2D, x: float, y: float) -> Vector2:
 	_coluna_fundo(par, x + 40.0)
 	_coluna_fundo(par, x + larg - 40.0)
 	_checkpoint(x + 44.0, cy, true)
-	var n := 3 + int(_dif * 3.0)
+	var n := 3 + int(_dif * 4.0)
 	for i in n:
 		var ex := x + 80.0 + (larg - 160.0) * (float(i) / float(maxi(1, n - 1)))
-		_inimigo_em(par, Vector2(ex, cy - 30.0))
+		# a partir do meio da campanha, um dos bichos da arena é ELITE
+		_inimigo_em(par, Vector2(ex, cy - 30.0), _dif > 0.42 and i == n / 2)
 	x += larg + _rng.randf_range(148.0, 176.0)
 	var ny: float = maxf(_teto_y + 40.0, cy - _rng.randf_range(-40.0, SUBIDA_MAX))
 	_plat(par, Vector2(x, ny), Vector2(104.0, 18.0))
@@ -1467,3 +1567,222 @@ func _f_portal(par: Node2D, x: float, y: float) -> Vector2:
 	par.add_child(pb)
 	_checkpoint(x, cy)
 	return Vector2(x, cy)
+
+
+# =====================  CÂMARAS DE PUZZLE  ==============================
+# (2 set 2026 -- o Paulo pediu "muito mais mecânicas diferentes, puzzles".)
+# Regra de ouro de todas: a maneira de abrir caminho está SEMPRE do lado de
+# cá do obstáculo e não se gasta -- a jornada não tem chão de rede, um
+# puzzle que se pudesse "queimar" seria um softlock.
+
+
+## PORTÃO E INTERRUPTOR: uma grade tranca o átrio e a alavanca que a abre
+## está num poleiro do lado de cá. `so_liga` = uma vez aberta fica aberta.
+## A ombreira por cima da grade fica a mais de um salto duplo do poleiro,
+## senão saltava-se o portão por cima e não valia nada.
+func _f_alavanca(par: Node2D, x: float, y: float) -> Vector2:
+	if _chao_y - 96.0 - _teto_y < 460.0:
+		return _f_descanso(par, x, y)          # sem pé-direito para a grade
+	var cy: float = clampf(y, _teto_y + 400.0, _chao_y - 96.0)
+	var alt: float = clampf(cy - _teto_y - 60.0, 300.0, 360.0)
+	x += _rng.randf_range(150.0, 176.0)
+	var id := "jorn_%d_%d" % [_idx, _cont_i]
+	var topo := cy - 12.0
+	_plat(par, Vector2(x + 160.0, cy), Vector2(350.0, 24.0), 46.0)
+	_checkpoint(x + 40.0, cy, true)
+	_plat(par, Vector2(x + 60.0, cy - 112.0), Vector2(120.0, 16.0))
+	var al := ALAVANCA.instantiate()
+	al.id = id
+	al.so_liga = true
+	al.position = Vector2(x + 60.0, cy - 142.0)
+	par.add_child(al)   # ANTES da grade -- a porta liga-se às alavancas que
+	                    # já estiverem na árvore quando ela entrar
+	var pt := PORTA_TRANCADA.instantiate()
+	pt.id = id
+	pt.tamanho = Vector2(26.0, alt)
+	pt.position = Vector2(x + 300.0, topo - alt * 0.5)
+	par.add_child(pt)
+	_plat(par, Vector2(x + 300.0, topo - alt - 34.0), Vector2(210.0, 30.0))
+	_coluna_fundo(par, x + 170.0)
+	if _dif > 0.4:
+		_inimigo_em(par, Vector2(x + 210.0, cy - 30.0))
+	x += 340.0 + _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(130.0, 18.0))
+	_checkpoint(x, cy)
+	return Vector2(x, cy)
+
+
+## ACENDER A VELA: as `PlataformaLuz` só são sólidas enquanto houver uma
+## `Vela` acesa dentro do raio. A câmara ensina primeiro (vela acesa +
+## plataforma sólida) e só depois pede (vela APAGADA num poleiro sólido,
+## ponte apagada por cima do líquido; tocar-lhe acende-a e a ponte aparece).
+## O raio de cada plataforma é medido para a vela do puzzle -- a vela do
+## exemplo fica longe de mais para as manter acesas de borla.
+func _f_velas(par: Node2D, x: float, y: float) -> Vector2:
+	var cy: float = clampf(y, _teto_y + 150.0, _chao_y - 96.0)
+	x += _rng.randf_range(150.0, 176.0)
+	# --- exemplo: vela acesa, plataforma de luz sólida ---
+	_plat(par, Vector2(x, cy), Vector2(150.0, 18.0))
+	_checkpoint(x, cy, true)
+	_vela_em(par, Vector2(x + 46.0, cy - 54.0), true)
+	x += _rng.randf_range(152.0, 172.0)
+	_plat_luz(par, Vector2(x, cy - 24.0), Vector2(120.0, 16.0), 250.0)
+	# --- o puzzle: vela apagada + ponte apagada ---
+	x += _rng.randf_range(152.0, 172.0)
+	_plat(par, Vector2(x, cy), Vector2(160.0, 18.0))
+	var vx := x + 52.0
+	_vela_em(par, Vector2(vx, cy - 54.0), false)
+	var n := 3 + int(_dif * 2.0)
+	for i in n:
+		x += _rng.randf_range(150.0, 168.0)
+		var py := cy - 26.0 - 14.0 * float(i % 2)
+		_plat_luz(par, Vector2(x, py), Vector2(104.0, 16.0), absf(x - vx) + 60.0)
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(140.0, 18.0))
+	_checkpoint(x, cy)
+	return Vector2(x, cy)
+
+
+## BADALADA: a ponte por cima do vão está FANTASMA (atravessa-se, não se
+## pisa). O sino fica na plataforma de entrada, ao alcance do golpe ou do
+## tiro -- badalada, a ponte fica sólida (e os bichos gelam). Pode tocar-se
+## as vezes que forem precisas.
+func _f_sinos(par: Node2D, x: float, y: float) -> Vector2:
+	var cy: float = clampf(y, _teto_y + 200.0, _chao_y - 96.0)
+	x += _rng.randf_range(150.0, 176.0)
+	var grupo := "sino_jorn_%d_%d" % [_idx, _cont_i]
+	_plat(par, Vector2(x, cy), Vector2(180.0, 20.0), 40.0)
+	_checkpoint(x, cy, true)
+	var si := SINO.instantiate()
+	si.alterna_grupo = grupo
+	si.congelar_inimigos = 2.6
+	si.position = Vector2(x + 44.0, cy - 60.0)
+	par.add_child(si)
+	var n := 3 + int(_dif * 3.0)
+	for i in n:
+		x += _rng.randf_range(150.0, 170.0)
+		var py := cy - 30.0 - 16.0 * float(i % 2)
+		_plat_fantasma(par, Vector2(x, py), Vector2(104.0, 16.0), grupo)
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(140.0, 18.0))
+	_checkpoint(x, cy)
+	return Vector2(x, cy)
+
+
+## PRENSAS: um salão comprido varrido por paredes que deslizam de um lado ao
+## outro, desfasadas. Não esmagam contra tecto nenhum (não há tecto) -- ou se
+## espera o buraco, ou se salta a parede; quem se deixa empurrar cai ao
+## líquido. Espinhos no chão a meio para o tempo não ser de borla.
+func _f_prensa(par: Node2D, x: float, y: float) -> Vector2:
+	var cy: float = clampf(y, _teto_y + 240.0, _chao_y - 96.0)
+	x += _rng.randf_range(150.0, 176.0)
+	var larg: float = 480.0 + 160.0 * _dif
+	_plat(par, Vector2(x + larg * 0.5, cy), Vector2(larg, 24.0), 46.0)
+	_checkpoint(x + 44.0, cy, true)
+	var n := 2 + int(_dif * 2.4)
+	for i in n:
+		var px := x + larg * ((float(i) + 0.7) / float(n + 1))
+		var pm := PAREDE_MOVEL.instantiate()
+		pm.tamanho = Vector2(26.0, 160.0)
+		pm.curso = Vector2(larg / float(n + 1) * 0.9, 0.0)
+		pm.periodo = 3.4 - 1.1 * _dif
+		pm.fase = fmod(0.37 * float(i) + 0.2, 1.0)
+		pm.position = Vector2(px, cy - 92.0)
+		par.add_child(pm)
+		if i > 0 and _dif > 0.5:
+			var esp := ESPINHOS.instantiate()
+			esp.largura = 2
+			esp.position = Vector2(px - 40.0, cy - 12.0)
+			par.add_child(esp)
+	_coluna_fundo(par, x + larg * 0.5)
+	x += larg + _rng.randf_range(148.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(130.0, 18.0))
+	_checkpoint(x, cy)
+	return Vector2(x, cy)
+
+
+## ESPELHOS: o corredor está tapado por espelhos altos. Cada um parte-se com
+## um golpe (ou um tiro) e larga um reflexo -- avança-se a partir vidro e a
+## despachar sombras. Sempre partíveis, nunca dependem de habilidade.
+func _f_espelhos(par: Node2D, x: float, y: float) -> Vector2:
+	var cy: float = clampf(y, _teto_y + 200.0, _chao_y - 96.0)
+	x += _rng.randf_range(150.0, 176.0)
+	var n := 2 + int(_dif * 2.0)
+	var larg: float = 200.0 + 150.0 * float(n)
+	_plat(par, Vector2(x + larg * 0.5, cy), Vector2(larg, 24.0), 46.0)
+	_checkpoint(x + 44.0, cy, true)
+	for i in n:
+		var es := ESPELHO.instantiate()
+		es.vida_reflexo = 22 + int(30.0 * _dif)
+		es.dano_reflexo = 10 + int(12.0 * _dif)
+		es.position = Vector2(x + 150.0 + 150.0 * float(i), cy - 102.0)
+		par.add_child(es)
+	_coluna_fundo(par, x + larg - 40.0)
+	x += larg + _rng.randf_range(148.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(130.0, 18.0))
+	_checkpoint(x, cy)
+	return Vector2(x, cy)
+
+
+## PAREDE RACHADA: a espinha passa a direito por baixo; encostada ao fim do
+## salão há uma alcova selada por uma `ParedeFragil` com essência lá dentro.
+## Só se abre com a habilidade "partir_paredes" (nível 4) -- e por isso NUNCA
+## está no caminho, é só recompensa para quem repara e já a tem.
+func _f_segredo(par: Node2D, x: float, y: float) -> Vector2:
+	var cy: float = clampf(y, _teto_y + 240.0, _chao_y - 96.0)
+	x += _rng.randf_range(150.0, 176.0)
+	var larg := 400.0
+	_plat(par, Vector2(x + larg * 0.5, cy), Vector2(larg, 24.0), 46.0)
+	_checkpoint(x + 44.0, cy, true)
+	# alcova: tecto + parede do fundo, tapada à entrada pela parede rachada
+	var ax := x + larg - 110.0
+	_plat(par, Vector2(ax + 30.0, cy - 190.0), Vector2(210.0, 20.0))
+	_plat(par, Vector2(ax + 130.0, cy - 96.0), Vector2(24.0, 168.0))
+	var pf := PAREDE_FRAGIL.instantiate()
+	pf.position = Vector2(ax - 60.0, cy - 92.0)
+	par.add_child(pf)
+	var es := ESSENCIA.instantiate()
+	es.valor = 20 + int(38.0 * _dif)
+	es.espalhar = false
+	es.position = Vector2(ax + 40.0, cy - 46.0)
+	par.add_child(es)
+	if _dif > 0.35:
+		_inimigo_em(par, Vector2(x + 120.0, cy - 30.0))
+	x += larg + _rng.randf_range(148.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(130.0, 18.0))
+	_checkpoint(x, cy)
+	return Vector2(x, cy)
+
+
+## --- peças das câmaras de puzzle ---------------------------------------
+
+func _vela_em(par: Node2D, pos: Vector2, acesa: bool) -> void:
+	var v := VELA.instantiate()
+	v.acesa = acesa
+	v.position = pos
+	par.add_child(v)
+
+
+## Plataforma que só é sólida com uma vela acesa a menos de `raio`.
+func _plat_luz(par: Node2D, pos: Vector2, tam: Vector2, raio: float) -> void:
+	var p := PLAT_LUZ.instantiate()
+	p.raio_luz = raio
+	p.position = pos
+	p.tamanho = tam
+	par.add_child(p)
+
+
+## Plataforma normal que ENTRA fantasma (atravessa-se) e fica sólida à
+## primeira badalada do sino do mesmo `grupo` -- ver `SinoTorre._alternar`.
+func _plat_fantasma(par: Node2D, pos: Vector2, tam: Vector2, grupo: String) -> void:
+	var p := PLAT.instantiate()
+	p.position = pos
+	p.tamanho = tam
+	par.add_child(p)
+	p.add_to_group(grupo)
+	var col := p.get_node_or_null("Col") as CollisionShape2D
+	if col:
+		col.set_deferred("disabled", true)
+	var vis := p.get_node_or_null("Visual") as CanvasItem
+	if vis:
+		vis.modulate.a = 0.16

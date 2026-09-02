@@ -1,7 +1,7 @@
 [gd_scene load_steps=12 format=3 uid="uid://bkolianitorreventos12"]
 
 ; REGIAO III / nivel 12 -- Torre dos Ventos.
-; Nivel FEITO A MAO (corredor = false) e VERTICAL. CORRENTES DE AR
+; Sala final FEITA A MAO (a JORNADA, que cresce com o nivel, vem antes) e VERTICAL. CORRENTES DE AR
 ; ascendentes (CorrenteAr) entre os degraus -- sobem-se ao sabor do vento.
 ; Bifurcacao: coluna de ar oeste / degraus este. Elite: abutre voador.
 ; Vazio em baixo. Chefe: Aerion, o Cavaleiro Alado.
@@ -35,7 +35,6 @@ fill_to = Vector2(1, 0.5)
 
 [node name="Torre_dos_Ventos" type="Node2D"]
 script = ExtResource("7_niv")
-corredor = false
 
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
 cor_ambiente = Color(0.78, 0.76, 0.74, 1)

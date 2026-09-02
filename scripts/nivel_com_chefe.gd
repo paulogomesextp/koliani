@@ -11,11 +11,11 @@ extends Node2D
 const GERADOR := preload("res://scripts/gerador_corredor.gd")
 const CHECKPOINT_SCRIPT := preload("res://scripts/checkpoint.gd")
 
-## Fração de checkpoints a manter (pedido do Paulo, 2 set 2026: havia
-## checkpoints a mais). Os que sobrevivem ficam espaçados por distância
-## IGUAL ao longo do nível (não pelos primeiros N), sempre com o do
-## início e um mesmo antes da sala do chefe.
-const FRACAO_CHECKPOINTS := 0.2
+## Espaço mínimo (px) entre checkpoints que sobrevivem à limpeza. O Paulo
+## queixou-se de haver checkpoints a mais; a resposta é ESPAÇÁ-LOS, não
+## cortar uma percentagem -- assim vale para uma sala de 3000px e para uma
+## jornada de 40000px na mesma.
+const ESPACO_CHECKPOINT := 2600.0
 ## Se o checkpoint mais próximo do chefe ficar mais longe que isto,
 ## acrescenta-se um novo mesmo antes da sala.
 const DIST_MAX_ANTES_CHEFE := 260.0
@@ -77,13 +77,11 @@ func _abrir() -> void:
 	_selar(false)
 
 
-## Corta o número de checkpoints do nível para ~`FRACAO_CHECKPOINTS` do
-## total (jornada + sala clássica juntas), mantendo sempre o do início e
-## garantindo um mesmo antes da sala do chefe -- os que sobrevivem ficam
-## espaçados por distância igual ao longo do nível, não pelos primeiros.
-## Corre depois de dois frames para dar tempo à Jornada (que gera os seus
-## próprios checkpoints em `_construir`, chamada com `call_deferred` no
-## `_ready` dela) de já ter acabado.
+## Corta os checkpoints do nível para um a cada `ESPACO_CHECKPOINT` (jornada
+## + sala clássica juntas), mantendo sempre o do início, o do fim e um mesmo
+## antes da sala do chefe. Corre depois de dois frames para dar tempo à
+## Jornada (que gera os seus próprios checkpoints em `_construir`, chamada
+## com `call_deferred` no `_ready` dela) de já ter acabado.
 func _reduzir_checkpoints() -> void:
 	await get_tree().process_frame
 	await get_tree().process_frame
@@ -122,28 +120,21 @@ func _reduzir_checkpoints() -> void:
 
 	if meus.size() <= 2:
 		return
-	var alvo := maxi(2, ceili(meus.size() * FRACAO_CHECKPOINTS))
-	if alvo >= meus.size():
-		return
+	# Espaçamento por DISTÂNCIA, não por fração (2 set 2026): com a Jornada
+	# outra vez ligada os níveis vão dos ~6000px (N1) aos ~40000px (N30) --
+	# ficar com 20% dos checkpoints deixava um nível de 37000px com dois, e
+	# cada morte custava minutos. Agora guarda-se o primeiro, o último e um
+	# a cada `ESPACO_CHECKPOINT`; numa sala curta feita à mão isto continua
+	# a dar dois ou três, como o Paulo pediu.
 	var manter := {}
 	manter[meus[0]] = true
 	manter[meus[-1]] = true
-	var x0: float = meus[0].global_position.x
-	var span: float = meus[-1].global_position.x - x0
-	if span > 0.0:
-		for i in range(1, alvo - 1):
-			var alvo_x: float = x0 + span * float(i) / float(alvo - 1)
-			var melhor: Node2D = null
-			var melhor_d := INF
-			for c in meus:
-				if manter.has(c):
-					continue
-				var d := absf(c.global_position.x - alvo_x)
-				if d < melhor_d:
-					melhor_d = d
-					melhor = c
-			if melhor:
-				manter[melhor] = true
+	var ultimo_x: float = meus[0].global_position.x
+	for i in range(1, meus.size() - 1):
+		var cx: float = meus[i].global_position.x
+		if cx - ultimo_x >= ESPACO_CHECKPOINT:
+			manter[meus[i]] = true
+			ultimo_x = cx
 	for c in meus:
 		if not manter.has(c):
 			c.queue_free()

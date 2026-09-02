@@ -1,7 +1,7 @@
 [gd_scene load_steps=11 format=3 uid="uid://bkolianipico15"]
 
 ; REGIAO III / nivel 15 -- O Pico Esquecido (chefe da regiao).
-; Nivel FEITO A MAO (corredor = false). Subida curta e exposta ate' ao
+; Sala final FEITA A MAO (a JORNADA, que cresce com o nivel, vem antes). Subida curta e exposta ate' ao
 ; CUME -- arena ampla. Bifurcacao: cornija oeste / cornija este. Elite:
 ; imp cuspidor. Vazio em baixo. Chefe: Vyrak, o Dragao das Sombras (3 fases).
 
@@ -33,7 +33,6 @@ fill_to = Vector2(1, 0.5)
 
 [node name="O_Pico_Esquecido" type="Node2D"]
 script = ExtResource("7_niv")
-corredor = false
 
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
 cor_ambiente = Color(0.76, 0.72, 0.8, 1)

@@ -1,7 +1,7 @@
 [gd_scene load_steps=13 format=3 uid="uid://bkolianigaleriaossos17"]
 
 ; REGIAO IV / nivel 17 -- Galeria dos Ossos.
-; Nivel FEITO A MAO (corredor = false). Corredores de osso apertados.
+; Sala final FEITA A MAO (a JORNADA, que cresce com o nivel, vem antes). Corredores de osso apertados.
 ; PAREDES FRAGEIS (ParedeFragil) escondem uma alcova lateral (precisa de
 ; "partir_paredes"). Bifurcacao: nave alta / cripta baixa. Elite: esqueleto
 ; de carga. Trevas por baixo. Chefe: O Colosso Osseo.
@@ -36,7 +36,6 @@ fill_to = Vector2(1, 0.5)
 
 [node name="Galeria_dos_Ossos" type="Node2D"]
 script = ExtResource("7_niv")
-corredor = false
 
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
 cor_ambiente = Color(0.877, 0.935, 0.877, 1)

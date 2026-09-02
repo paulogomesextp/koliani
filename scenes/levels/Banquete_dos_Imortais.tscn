@@ -1,7 +1,7 @@
 [gd_scene load_steps=11 format=3 uid="uid://bkolianibanquete28"]
 
 ; REGIAO VI / nivel 28 -- Banquete dos Imortais.
-; Nivel FEITO A MAO (corredor = false). A arena e' uma MESA DE JANTAR
+; Sala final FEITA A MAO (a JORNADA, que cresce com o nivel, vem antes). A arena e' uma MESA DE JANTAR
 ; gigante: pratos e travessas (plataformas largas e baixas) sobre a lava.
 ; Bifurcacao: candelabros de cima / toalha de baixo. Elite: raptor de
 ; carga. LAVA por baixo. Chefe: O Rei Devorador (come inimigos para curar).
@@ -34,7 +34,6 @@ fill_to = Vector2(1, 0.5)
 
 [node name="Banquete_dos_Imortais" type="Node2D"]
 script = ExtResource("7_niv")
-corredor = false
 
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
 cor_ambiente = Color(0.68, 0.52, 0.66, 1)
