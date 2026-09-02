@@ -44,7 +44,11 @@ func _init() -> void:
 	var k := get_first_node_in_group("koliani") as Node2D
 	if k == null:
 		print("sem koliani"); quit(1); return
-	var alvo := _procurar(get_root(), String(CLASSES.get(peca, "Alavanca")), peca == "vela")
+	var alvo: Node2D = null
+	if peca == "chefe":
+		alvo = get_first_node_in_group("chefes") as Node2D
+	else:
+		alvo = _procurar(get_root(), String(CLASSES.get(peca, "Alavanca")), peca == "vela")
 	if alvo == null:
 		print("nao ha nenhuma peca '%s' no nivel %d" % [peca, idx + 1]); quit(1); return
 

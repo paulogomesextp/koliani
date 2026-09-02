@@ -65,6 +65,17 @@ const JANELA_COMBO := 0.42
 ## tira (attack/attack2/attack3/attack4) -- senão a animação era cortada a
 ## meio antes de terminar, sobretudo o 3.º hit (9 frames, o mais longo).
 const DUR_COMBO := [0.18, 0.2, 0.3, 0.19]
+## AVANÇO do golpe (pedido do Paulo, set 2026: "o combo parado no mesmo
+## sítio não tem piada"). Cada golpe do combo dá um passo em frente na
+## direção para onde se olha -- curto nos três primeiros, comprido no
+## remate. Velocidade inicial (px/s) e duração (s) por passo: a
+## velocidade decai linearmente, por isso o passo mede ~`vel * dur / 2`
+## px, mais o deslize da desaceleração normal a seguir -- medido no
+## `Level_Test`: 23, 29, 34 e 64 px. No AR vale metade, para não atirar
+## a Koliani para fora das plataformas a meio de um combo.
+const AVANCO_VEL := [330.0, 370.0, 390.0, 540.0]
+const AVANCO_DUR := [0.13, 0.13, 0.16, 0.18]
+const AVANCO_NO_AR := 0.5
 const I_FRAMES := 0.6
 ## Ressalto ao cair em cima de um inimigo (Mario-style): pulo AUTOMÁTICO e
 ## ALTO -- não é preciso carregar em nada e sobe mais que um salto normal
@@ -120,6 +131,10 @@ var _pos_roll_t := 0.0
 ## Smear do golpe (0..1.4): estica o sprite no sentido do golpe e dá um
 ## micro-avanço, decai a zero. Só visual.
 var _atk_smear := 0.0
+## Avanço do golpe a decorrer (ver `AVANCO_VEL`).
+var _avanco_restante := 0.0
+var _avanco_dur := 0.0
+var _avanco_vel := 0.0
 ## Janela em que um impulso externo (trampolim, impulsor) fica imune ao
 ## "corte de salto" do Movimento -- ver `aplicar_impulso`.
 var _impulso_externo_t := 0.0
@@ -604,6 +619,7 @@ func _physics_process(dt: float) -> void:
 		# ataque -> encadeia-se ataque -> rolar -> ataque sem esperar
 		if _ataque_restante > 0.0:
 			_ataque_restante = 0.0
+			_avanco_restante = 0.0
 			if _hitbox:
 				_hitbox.monitoring = false
 	elif Input.is_action_just_pressed("dash") and _dash_recarga <= 0.0 and (
@@ -707,6 +723,17 @@ func _physics_process(dt: float) -> void:
 			_hitstop(0.05)
 			Som.toca("acerto", -10.0, randf_range(0.94, 1.07))
 			_pop_impacto(global_position + Vector2(0.0, 24.0))
+
+	# passo em frente do golpe: empurra SEMPRE para a frente e nunca trava
+	# quem já vai mais depressa (correr a atacar continua a correr).
+	if _avanco_restante > 0.0:
+		_avanco_restante -= dt
+		var f := clampf(_avanco_restante / maxf(_avanco_dur, 0.001), 0.0, 1.0)
+		var empurrao := _olha_para * _avanco_vel * f
+		if _olha_para > 0.0:
+			velocity.x = maxf(velocity.x, empurrao)
+		else:
+			velocity.x = minf(velocity.x, empurrao)
 
 	var vel_queda := velocity.y
 	move_and_slide()
@@ -980,6 +1007,11 @@ func _iniciar_ataque() -> void:
 	_ataque_restante = _ataque_dur
 	_combo_janela = _ataque_dur + JANELA_COMBO
 	_pop = 1.0
+	# passo em frente: o golpe "pisa" para onde se olha (ver `AVANCO_VEL`).
+	var i_av: int = clampi(_combo_passo, 0, AVANCO_VEL.size() - 1)
+	_avanco_vel = AVANCO_VEL[i_av] * (1.0 if is_on_floor() else AVANCO_NO_AR)
+	_avanco_dur = AVANCO_DUR[i_av]
+	_avanco_restante = _avanco_dur
 	# smear direcional + micro-avanço no golpe (pegada Dead Cells: "pisar" o
 	# golpe). Só visual -- não mexe na física. O remate do combo puxa mais.
 	_atk_smear = 1.4 if _combo_passo == NUM_COMBO - 1 else 1.0
