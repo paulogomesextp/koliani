@@ -15,6 +15,12 @@ extends Area2D
 @export var dur_ativa := 1.0
 ## Altura do espinho (cresce para cima a partir da base).
 @export var altura := 78.0
+## MODO CENARIO (nivel 1 -- "raizes que crescem e desaparecem"): em vez de
+## esperar por `avisar()`, cicla sozinha para sempre. `intervalo` = pausa
+## recolhida entre irrupcoes; `fase` desencontra uma fila de raizes.
+@export var auto := false
+@export var intervalo := 2.6
+@export var fase := 0.0
 
 @onready var _forma: CollisionShape2D = $CollisionShape2D
 @onready var _visual: Node2D = $Visual
@@ -29,10 +35,47 @@ func _ready() -> void:
 	_visual.scale.y = 0.0
 	_visual.visible = false
 	body_entered.connect(_ao_tocar)
+	if auto:
+		_iniciado = true
+		_loop_auto()
+		return
 	# rede de seguranca: se ninguem chamar avisar(), desaparece
 	get_tree().create_timer(6.0).timeout.connect(func():
 		if not _iniciado:
 			queue_free())
+
+
+## MODO CENARIO: telegrafo -> irrompe -> recolhe -> pausa, em ciclo eterno.
+func _loop_auto() -> void:
+	if fase > 0.0:
+		await get_tree().create_timer(fase).timeout
+	while is_instance_valid(self):
+		_pulsar_racha()
+		await get_tree().create_timer(atraso).timeout
+		if not is_instance_valid(self):
+			return
+		if _racha:
+			_racha.visible = false
+		_visual.visible = true
+		monitoring = true
+		var tc := create_tween()
+		tc.tween_property(_visual, "scale:y", 1.0, 0.12).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		await tc.finished
+		if not is_instance_valid(self):
+			return
+		for c in get_overlapping_bodies():
+			_ao_tocar(c)
+		await get_tree().create_timer(dur_ativa).timeout
+		if not is_instance_valid(self):
+			return
+		monitoring = false
+		var tr := create_tween()
+		tr.tween_property(_visual, "scale:y", 0.0, 0.2).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+		await tr.finished
+		if not is_instance_valid(self):
+			return
+		_visual.visible = false
+		await get_tree().create_timer(intervalo).timeout
 
 
 ## Arranca o ciclo telegrafo -> irrompe -> recolhe. `empurrao` e' o sentido

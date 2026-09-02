@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3 uid="uid://bkolianiflorestaput01"]
+[gd_scene load_steps=21 format=3 uid="uid://bkolianiflorestaput01"]
 
 ; Mundo 1 -- Floresta Putrefata.
 ; Floresta morta, nevoa, raizes; verde-podre com brilho poison-green.
@@ -18,6 +18,7 @@
 [ext_resource type="PackedScene" uid="uid://bkolianiplataforma01" path="res://scenes/actors/Plataforma.tscn" id="9_pl"]
 [ext_resource type="PackedScene" uid="uid://bkolianiespinhos01" path="res://scenes/actors/Espinhos.tscn" id="10_esp"]
 [ext_resource type="PackedScene" uid="uid://bkolianiserra01" path="res://scenes/actors/Serra.tscn" id="11_serra"]
+[ext_resource type="PackedScene" uid="uid://bkolianiraizperigo01" path="res://scenes/actors/RaizPerigo.tscn" id="12_raiz"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_chk"]
 size = Vector2(40, 80)
@@ -135,6 +136,51 @@ dano = 16
 position = Vector2(1770, 430)
 percurso = Vector2(0, -120)
 tempo = 1.3
+
+; raizes que irrompem sozinhas do chao (mecanica-assinatura da regiao I --
+; "raizes que crescem e desaparecem"). Fases desencontradas para irromperem
+; em vaga, nao todas juntas.
+[node name="Raiz1" parent="." instance=ExtResource("12_raiz")]
+position = Vector2(560, 636)
+auto = true
+intervalo = 2.4
+fase = 0.0
+dano = 12
+
+[node name="Raiz2" parent="." instance=ExtResource("12_raiz")]
+position = Vector2(800, 636)
+auto = true
+intervalo = 2.8
+fase = 1.3
+dano = 12
+
+[node name="Raiz3" parent="." instance=ExtResource("12_raiz")]
+position = Vector2(1320, 636)
+auto = true
+intervalo = 2.5
+fase = 0.7
+dano = 14
+
+[node name="Raiz4" parent="." instance=ExtResource("12_raiz")]
+position = Vector2(1600, 636)
+auto = true
+intervalo = 3.0
+fase = 1.9
+dano = 14
+
+[node name="Raiz5" parent="." instance=ExtResource("12_raiz")]
+position = Vector2(2320, 636)
+auto = true
+intervalo = 2.3
+fase = 0.4
+dano = 16
+
+[node name="Raiz6" parent="." instance=ExtResource("12_raiz")]
+position = Vector2(2600, 636)
+auto = true
+intervalo = 2.7
+fase = 1.5
+dano = 16
 
 [node name="LuzPantano1" type="PointLight2D" parent="."]
 position = Vector2(250, 630)
