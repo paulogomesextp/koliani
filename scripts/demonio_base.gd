@@ -238,6 +238,8 @@ func _atualizar_tom_estado() -> void:
 		e = "fogo"
 	elif _sangrando > 0.0:
 		e = "sangue"
+	elif _atordoado > 0.0:
+		e = "atordoado"
 	if e == _tom_estado:
 		return
 	_tom_estado = e
@@ -248,6 +250,7 @@ func _atualizar_tom_estado() -> void:
 		"gelo": alvo.modulate = Color(0.7, 0.85, 1.2)
 		"fogo": alvo.modulate = Color(1.3, 0.72, 0.5)
 		"sangue": alvo.modulate = Color(1.16, 0.82, 0.86)
+		"atordoado": alvo.modulate = Color(1.25, 1.2, 0.7)
 		_: alvo.modulate = Color(1, 1, 1)
 
 
@@ -435,8 +438,15 @@ func _physics_process(dt: float) -> void:
 				velocity.y += GRAVIDADE * dt
 			move_and_slide()
 			if is_on_wall():
+				# bateu na parede: CAMBALEIA -> janela de castigo (crítico)
 				_carga = 0.0
 				_acao_cd = randf_range(1.8, 3.0)
+				atordoar(0.85)
+				Som.toca("bloqueio", -10.0, 0.7)
+			elif _carga <= 0.0:
+				# investida falhou: recuo curto, ainda dá para rematar
+				_acao_cd = randf_range(1.2, 2.0)
+				atordoar(0.4)
 			return
 		var alvo_c := _dir_koliani_perto(320.0)
 		if alvo_c != 0.0 and _acao_cd <= 0.0 and is_on_floor():
@@ -457,6 +467,7 @@ func _physics_process(dt: float) -> void:
 			move_and_slide()
 			if is_on_floor() and _saltando < 0.45:
 				_saltando = 0.0
+				atordoar(0.32)  # aterra desengonçado -> janela curta de castigo
 			return
 		if _windup > 0.0:  # agacha-se a avisar
 			_windup -= dt
@@ -489,6 +500,7 @@ func _physics_process(dt: float) -> void:
 			if _mergulho <= 0.0 or is_on_wall() or is_on_floor():
 				_mergulho = 0.0
 				_acao_cd = randf_range(1.3, 2.3)
+				atordoar(0.5)  # fim da picada -> paira tonto (janela de castigo)
 			return
 		if _windup > 0.0:  # trava no ar a avisar, depois mergulha
 			_windup -= dt
@@ -550,6 +562,7 @@ func _physics_process(dt: float) -> void:
 				b.global_position = global_position + _dive_dir * 16.0
 				Som.toca("projetil", -13.0, 0.9)
 				_acao_cd = randf_range(1.8, 2.8)
+				atordoar(0.35)  # recuo do cuspo -> janela curta de castigo
 			return
 		if _acao_cd <= 0.0 and is_on_floor():
 			var kk := get_tree().get_first_node_in_group("koliani")
