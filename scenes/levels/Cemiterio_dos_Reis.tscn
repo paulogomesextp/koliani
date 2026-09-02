@@ -103,6 +103,7 @@ cor_topo = Color(0.42, 0.48, 0.46, 1)
 [node name="EliteNecro" parent="." instance=ExtResource("2_dem")]
 position = Vector2(1280, 696)
 scale = Vector2(1.4, 1.4)
+elite = true
 especie = "necromante"
 vida = 185
 dano_contacto = 24

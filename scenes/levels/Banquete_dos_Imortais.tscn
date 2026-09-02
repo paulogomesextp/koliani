@@ -96,6 +96,7 @@ cor_topo = Color(0.54, 0.42, 0.5, 1)
 [node name="EliteRaptor" parent="." instance=ExtResource("2_dem")]
 position = Vector2(1500, 636)
 scale = Vector2(1.45, 1.45)
+elite = true
 especie = "raptor"
 vida = 210
 dano_contacto = 27

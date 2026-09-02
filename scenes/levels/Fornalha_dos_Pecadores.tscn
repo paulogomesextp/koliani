@@ -115,6 +115,7 @@ cor_topo = Color(0.46, 0.3, 0.2, 1)
 [node name="EliteImp" parent="." instance=ExtResource("2_dem")]
 position = Vector2(1360, 716)
 scale = Vector2(1.35, 1.35)
+elite = true
 especie = "imp"
 vida = 160
 dano_contacto = 22

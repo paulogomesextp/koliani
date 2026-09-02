@@ -111,6 +111,7 @@ cor_topo = Color(0.46, 0.42, 0.54, 1)
 [node name="EliteTrepador" parent="." instance=ExtResource("2_dem")]
 position = Vector2(560, 300)
 scale = Vector2(1.4, 1.4)
+elite = true
 especie = "besouro"
 vida = 155
 dano_contacto = 20

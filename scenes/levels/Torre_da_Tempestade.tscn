@@ -114,6 +114,7 @@ position = Vector2(760, 556)
 [node name="EliteOlho" parent="." instance=ExtResource("2_dem")]
 position = Vector2(620, 440)
 scale = Vector2(1.35, 1.35)
+elite = true
 especie = "olho"
 vida = 155
 dano_contacto = 22

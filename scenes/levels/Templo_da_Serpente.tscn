@@ -101,6 +101,7 @@ cor_topo = Color(0.4, 0.5, 0.38, 1)
 [node name="EliteWogol" parent="." instance=ExtResource("2_dem")]
 position = Vector2(1300, 636)
 scale = Vector2(1.45, 1.45)
+elite = true
 especie = "wogol"
 vida = 195
 dano_contacto = 26

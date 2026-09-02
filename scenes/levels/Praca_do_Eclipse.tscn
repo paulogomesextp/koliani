@@ -117,6 +117,7 @@ cor_topo = Color(0.5, 0.42, 0.6, 1)
 [node name="EliteXamane" parent="." instance=ExtResource("2_dem")]
 position = Vector2(1460, 636)
 scale = Vector2(1.45, 1.45)
+elite = true
 especie = "xamane"
 vida = 205
 dano_contacto = 26

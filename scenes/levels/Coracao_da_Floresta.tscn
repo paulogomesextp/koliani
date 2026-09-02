@@ -140,6 +140,7 @@ cor_topo = Color(0.38, 0.56, 0.28, 1)
 [node name="EliteLodo" parent="." instance=ExtResource("2_dem")]
 position = Vector2(1700, 636)
 scale = Vector2(1.45, 1.45)
+elite = true
 especie = "lodo"
 vida = 170
 dano_contacto = 22

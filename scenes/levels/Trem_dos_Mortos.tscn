@@ -105,6 +105,7 @@ cor_topo = Color(0.5, 0.42, 0.6, 1)
 [node name="EliteMastim" parent="." instance=ExtResource("2_dem")]
 position = Vector2(1480, 636)
 scale = Vector2(1.4, 1.4)
+elite = true
 especie = "mastim"
 vida = 195
 dano_contacto = 25

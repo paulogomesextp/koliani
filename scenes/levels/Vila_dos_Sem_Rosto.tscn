@@ -107,6 +107,7 @@ cor_topo = Color(0.5, 0.42, 0.56, 1)
 [node name="EliteAbobora" parent="." instance=ExtResource("2_dem")]
 position = Vector2(1380, 636)
 scale = Vector2(1.4, 1.4)
+elite = true
 especie = "abobora"
 vida = 195
 dano_contacto = 25

@@ -99,6 +99,7 @@ cor_topo = Color(0.52, 0.48, 0.5, 1)
 [node name="EliteAbutre" parent="." instance=ExtResource("2_dem")]
 position = Vector2(760, 430)
 scale = Vector2(1.35, 1.35)
+elite = true
 especie = "abutre"
 vida = 150
 dano_contacto = 22

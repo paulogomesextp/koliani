@@ -98,6 +98,7 @@ cor_topo = Color(0.46, 0.36, 0.22, 1)
 [node name="EliteSaltador" parent="." instance=ExtResource("2_dem")]
 position = Vector2(420, 496)
 scale = Vector2(1.4, 1.4)
+elite = true
 especie = "gosma"
 vida = 150
 dano_contacto = 19

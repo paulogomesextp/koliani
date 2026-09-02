@@ -123,6 +123,7 @@ cor_topo = Color(0.4, 0.52, 0.66, 1)
 [node name="EliteEsqueleto" parent="." instance=ExtResource("2_dem")]
 position = Vector2(1420, 636)
 scale = Vector2(1.4, 1.4)
+elite = true
 especie = "esqueleto"
 vida = 165
 dano_contacto = 22

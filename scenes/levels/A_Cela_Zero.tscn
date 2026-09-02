@@ -104,6 +104,7 @@ cor_topo = Color(0.42, 0.54, 0.68, 1)
 [node name="EliteOrc" parent="." instance=ExtResource("2_dem")]
 position = Vector2(660, 512)
 scale = Vector2(1.45, 1.45)
+elite = true
 especie = "orc"
 vida = 175
 dano_contacto = 24

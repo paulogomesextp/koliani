@@ -90,6 +90,7 @@ cor_topo = Color(0.32, 0.26, 0.42, 1)
 [node name="EliteOgro" parent="." instance=ExtResource("2_dem")]
 position = Vector2(1060, 536)
 scale = Vector2(1.5, 1.5)
+elite = true
 especie = "ogro"
 vida = 205
 dano_contacto = 28

@@ -106,6 +106,7 @@ cor_topo = Color(0.34, 0.54, 0.3, 1)
 [node name="EliteCuspidor" parent="." instance=ExtResource("2_dem")]
 position = Vector2(1560, 636)
 scale = Vector2(1.35, 1.35)
+elite = true
 especie = "mushroom"
 vida = 150
 dano_contacto = 18

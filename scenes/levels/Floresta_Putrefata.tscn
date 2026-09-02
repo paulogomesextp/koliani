@@ -149,6 +149,7 @@ dano = 12
 [node name="EliteGoblin" parent="." instance=ExtResource("2_dem")]
 position = Vector2(1430, 636)
 scale = Vector2(1.4, 1.4)
+elite = true
 especie = "goblin"
 vida = 140
 dano_contacto = 20

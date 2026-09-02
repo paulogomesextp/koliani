@@ -54,6 +54,9 @@ var _dive_dir := Vector2.ZERO
 @export var cor_estilhacos := Color(0.7, 0.25, 0.45)
 ## Cor da luz de recorte (rim) do sprite -- normalmente o tom do bioma.
 @export var cor_rim := Color(0.95, 0.5, 0.72)
+## ELITE (1 por nível na campanha à mão): aura a pulsar + barra de vida por
+## cima da cabeça + rebentamento maior na morte. Lê-se como "este é o grande".
+@export var elite := false
 ## Que monstro pixel-art usar (pack CC0 LuizMelo "Monsters Creatures
 ## Fantasy"). Pastas em `assets/sprites/pixel/enemies/<especie>/`.
 @export_enum("goblin", "mushroom", "esqueleto", "olho",
@@ -123,6 +126,13 @@ const ALASTRA_RAIO := 48.0
 var _queimando := 0.0
 var _queima_dano := 3
 var _queima_cd := 0.0
+
+## --- elite (aura + barra de vida) --------------------------------------
+var _elite_vmax := 0
+var _aura: Node2D
+var _barra: Node2D
+var _barra_fill: ColorRect
+var _aura_t := 0.0
 var _sangrando := 0.0
 var _sangra_dano := 4
 var _sangra_cd := 0.0
@@ -180,7 +190,11 @@ func _dano_periodico(q: int) -> void:
 		return
 	vida -= maxi(1, q)
 	piscar_dano()
+	if elite:
+		_atualizar_barra_elite()
 	if vida <= 0:
+		if elite:
+			_pop_morte_elite()
 		if _anim:
 			_morrer_anim()
 		else:
@@ -288,6 +302,8 @@ func _ready() -> void:
 		_montar_frames()
 		_anim.play("idle")
 		_calibrar_pes()
+	if elite:
+		_montar_elite()
 
 
 ## Espécies que voam -- não se alinham os pés ao chão.
@@ -351,6 +367,8 @@ func _add_tira(sf: SpriteFrames, nome: String, tex: Texture2D, n: int, fps: floa
 
 
 func _process(dt: float) -> void:
+	if elite and not _morto:
+		_pulsar_aura(dt)
 	if _anim:
 		_atualizar_anim()
 		# telegrafo: pisca forte (branco-quente) enquanto vai atacar
@@ -674,6 +692,8 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0, critico := false) 
 	vida -= q
 	global_position.x += dir_empurrao * (12.0 if critico else 8.0)
 	if vida <= 0:
+		if elite:
+			_pop_morte_elite()
 		if _anim:
 			_morrer_anim()
 		else:
@@ -691,6 +711,19 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0, critico := false) 
 		if _anim:
 			_anim.play("hit")
 		piscar_dano()
+		if elite:
+			_atualizar_barra_elite()
+
+
+## Rebentamento GRANDE quando um elite cai (2 anéis da cor do rim + clarão).
+func _pop_morte_elite() -> void:
+	var cena := get_tree().current_scene
+	if cena == null:
+		return
+	var tinta: Color = cor_rim.lerp(Color(1, 1, 1), 0.4)
+	for i in 2:
+		Impacto.rebentar(cena, global_position + Vector2(randf_range(-18.0, 18.0), -14.0 - i * 8.0),
+			tinta, 4.2 + i * 1.4)
 
 
 ## Toca a animação de morte e só então solta estilhaços e liberta-se.
@@ -707,6 +740,78 @@ func _morrer_anim() -> void:
 	await _anim.animation_finished
 	soltar_estilhacos()
 	queue_free()
+
+
+## Monta o visual de ELITE: aura a pulsar atrás do sprite + barra de vida
+## fina por cima da cabeça (só aparece ao 1.º golpe) + rim mais aceso.
+func _montar_elite() -> void:
+	_elite_vmax = maxi(vida, 1)
+	var alvo: Node2D = _sprite if _sprite else self
+	var cor := cor_rim
+	cor.a = 1.0
+
+	_aura = Node2D.new()
+	_aura.name = "AuraElite"
+	_aura.z_index = -2
+	alvo.add_child(_aura)
+	var aditivo := CanvasItemMaterial.new()
+	aditivo.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
+	var disco := Polygon2D.new()
+	var pts := PackedVector2Array()
+	for i in 28:
+		var a := TAU * float(i) / 28.0
+		pts.append(Vector2(cos(a), sin(a)) * 38.0)
+	disco.polygon = pts
+	disco.color = Color(cor.r, cor.g, cor.b, 0.11)
+	disco.material = aditivo
+	disco.position = Vector2(0.0, -16.0)
+	_aura.add_child(disco)
+	var aro := Line2D.new()
+	aro.points = pts
+	aro.closed = true
+	aro.width = 2.0
+	aro.default_color = Color(cor.r, cor.g, cor.b, 0.5)
+	aro.material = aditivo
+	aro.position = Vector2(0.0, -16.0)
+	_aura.add_child(aro)
+
+	_barra = Node2D.new()
+	_barra.name = "BarraElite"
+	_barra.z_index = 20
+	_barra.visible = false
+	_barra.position = Vector2(0.0, -58.0)
+	alvo.add_child(_barra)
+	var bg := ColorRect.new()
+	bg.size = Vector2(52.0, 6.0)
+	bg.position = Vector2(-26.0, 0.0)
+	bg.color = Color(0.05, 0.03, 0.06, 0.85)
+	_barra.add_child(bg)
+	_barra_fill = ColorRect.new()
+	_barra_fill.size = Vector2(48.0, 4.0)
+	_barra_fill.position = Vector2(-24.0, 1.0)
+	_barra_fill.color = cor.lightened(0.15)
+	_barra.add_child(_barra_fill)
+
+	if _mat:
+		_mat.set_shader_parameter("rim_cor", cor.lightened(0.25))
+
+
+func _atualizar_barra_elite() -> void:
+	if _barra == null or _barra_fill == null:
+		return
+	_barra.visible = true
+	var f := clampf(float(vida) / float(maxi(_elite_vmax, 1)), 0.0, 1.0)
+	_barra_fill.size.x = 48.0 * f
+	_barra_fill.color = Color(1.0, 0.4, 0.35) if f < 0.35 else cor_rim.lightened(0.15)
+
+
+func _pulsar_aura(dt: float) -> void:
+	if _aura == null:
+		return
+	_aura_t += dt
+	var p := 1.0 + 0.12 * sin(_aura_t * 5.0)
+	_aura.scale = Vector2(p, p)
+	_aura.modulate.a = 0.7 + 0.3 * (0.5 + 0.5 * sin(_aura_t * 5.0))
 
 
 ## Flash branco curto ao levar dano (feedback de acerto).

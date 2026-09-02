@@ -98,6 +98,7 @@ cor_topo = Color(0.48, 0.36, 0.52, 1)
 [node name="EliteChort" parent="." instance=ExtResource("2_dem")]
 position = Vector2(1380, 636)
 scale = Vector2(1.45, 1.45)
+elite = true
 especie = "chort"
 vida = 210
 dano_contacto = 27
