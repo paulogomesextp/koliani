@@ -135,12 +135,20 @@ func _reconstruir() -> void:
 		Vector2(-hw, -hh), Vector2(hw, -hh),
 		Vector2(hw, hh), Vector2(-hw, hh),
 	])
-	_sup.color = cor
-	# gradiente: topo aceso, fundo escuro. Na variante lava sobe-se menos o
-	# brilho (senão vira um bloco luminoso).
-	var topo := cor.lightened(0.2) if brasas else cor.darkened(0.2)
-	var fundo := cor.darkened(0.62) if brasas else cor.darkened(0.7)
-	_sup.vertex_colors = PackedColorArray([topo, topo, fundo, fundo])
+	# CORPO do líquido: fica ESCURO e dessaturado (senão o verde do ácido
+	# lia-se como relva). Só a linha de água (`_rim`) é que dá o perigo.
+	# A lava é a exceção -- essa brilha mesmo.
+	if brasas:
+		_sup.color = cor
+		_sup.vertex_colors = PackedColorArray([
+			cor.lightened(0.2), cor.lightened(0.2), cor.darkened(0.62), cor.darkened(0.62)])
+	else:
+		var escuro := Color(cor.r, cor.g, cor.b).darkened(0.5)
+		escuro = escuro.lerp(Color(0.05, 0.05, 0.08), 0.35)  # puxa para o vazio
+		_sup.color = escuro
+		_sup.vertex_colors = PackedColorArray([
+			escuro.lightened(0.12), escuro.lightened(0.12),
+			escuro.darkened(0.55), escuro.darkened(0.55)])
 	# rebordo aceso na linha de água -- deixa o perigo bem visível no escuro
 	if _rim:
 		_rim.polygon = PackedVector2Array([
