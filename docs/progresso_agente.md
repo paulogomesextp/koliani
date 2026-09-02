@@ -27,12 +27,21 @@ sem playtest build, `PERFIL` re-derivado).
     "correntes como plataformas móveis"; só havia plataformas fixas).
   - **n12 Torre dos Ventos** — repostas as `CorrenteAr` ascendentes
     entre os degraus (a cena dizia "removida -- a rever").
+- **Toque de assinatura na jornada** (`ASSIN_NIVEL` + `_assinatura_nivel`
+  em `gerador_corredor.gd`): nos níveis com um perigo telegrafado que não
+  bloqueia, espalha a gimmick por ~10-22% das plataformas da espinha —
+  n1 `RaizPerigo` auto, n3 `TeiaPrende` permanente, n4 `GotaAcida` auto,
+  n13 `RaioTempestade` auto, n21 metade dos inimigos `dormente`. Tudo
+  numa função + tabela, fácil de afinar/esvaziar ao playtest.
 - **Verificação:** `run_tests.gd` verde, `verifica_jornada.gd` TUDO OK
   (carrega e constrói os 30), folha de contacto das 30 paletas revista
-  (coerentes por região). Screenshots `--window --screen 1`.
-- **Por fazer (bateria):** n23 Trem dos Mortos ainda não "anda" (precisa
-  de sistema próprio de comboio, maior); passe de arte nível-a-nível
-  ainda por decidir direção com o Paulo; afinar números do `PERFIL`.
+  (coerentes por região). Screenshots `--window --screen 1` (o
+  `shot_dev_nivel.gd` teleporta a Koliani para vãos → apanha-a a cair,
+  bom para atmosfera/paleta, mau para ver layout).
+- **Por fazer (bateria):** afinar os números do `PERFIL` e do
+  `ASSIN_NIVEL` com o Paulo ao comando; passe de arte nível-a-nível
+  (falta decidir direção); assinatura na jornada para mais níveis (só os
+  seguros telegrafados é que entraram); n28 Banquete sem set-dressing.
 - **Nota:** `assets/branding/koliani_ref.png` está corrompido ("Not a PNG
   file") desde o commit `4145e5c` — o import queixa-se mas não bloqueia.
   Ficheiro do Paulo, não lhe mexi.
