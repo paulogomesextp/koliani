@@ -17,6 +17,7 @@ const CAMINHO_SAVE := "user://progresso.json"
 ## `Equipamento`) porque este autoload é o 1.º a arrancar -- não pode
 ## depender do registo de classes globais ainda estar pronto.
 const _EQUIP := preload("res://scripts/equipamento.gd")
+const _MELHORIAS := preload("res://scripts/melhorias.gd")
 
 const VIDAS_INICIAIS := 3
 
@@ -103,6 +104,9 @@ signal vidas_mudaram(vidas: int)
 signal pista_encontrada(id: String, total: int)
 signal habilidade_desbloqueada(id: String)
 ## Ganhou-se um equipamento ao acabar um nível (`tipo` = "arma"|"armadura").
+## Economia: total de essência mudou / uma melhoria subiu de rank.
+signal essencia_mudou(total: int)
+signal melhoria_comprada(id: String, rank: int)
 signal equipamento_ganho(tipo: String, id: String)
 ## Trocou-se a arma ou a armadura equipada.
 signal equipamento_mudou(tipo: String, id: String)
@@ -128,6 +132,15 @@ var armadura_equipada: String = ""
 ## `reiniciar_campanha()` limpa. E' o que o mapa de regioes usa para marcar
 ## niveis/regioes como feitos.
 var concluidos: Array[int] = []
+
+## --- ECONOMIA -------------------------------------------------------------
+## Essência: moeda mágica largada por inimigos + em caches nas alcovas dos
+## níveis. Gasta-se no Santuário em MELHORIAS permanentes (`melhorias.gd`).
+## NÃO se perde na morte (jogo por níveis). `reiniciar_campanha()` zera.
+var essencia: int = 0
+## id da melhoria -> rank atual (int, 0..Melhorias.max_rank).
+var melhorias: Dictionary = {}
+
 ## Campanha a decorrer em modo hardcore (tempo limite por mundo). Fica
 ## gravada no save -- um LOAD GAME retoma no mesmo modo. O menu inicial é
 ## que a liga/desliga; `reiniciar_campanha()` de propósito NÃO lhe mexe
@@ -288,12 +301,13 @@ func ciclar_arma(passo: int) -> void:
 ## Dano do ataque corpo-a-corpo (arma equipada ou base).
 func dano_ataque() -> int:
 	var a: Dictionary = _EQUIP.arma(arma_equipada)
-	return int(a.get("dano", DANO_BASE)) if not a.is_empty() else DANO_BASE
+	var base: int = int(a.get("dano", DANO_BASE)) if not a.is_empty() else DANO_BASE
+	return maxi(1, int(round(base * (1.0 + bonus("dano_mult")))))  # melhoria "forca"
 
 
-## Vida máxima extra dada pela armadura equipada.
+## Vida máxima extra dada pela armadura equipada + melhoria "vitalidade".
 func vida_bonus_armadura() -> int:
-	return int(_EQUIP.armadura(armadura_equipada).get("vida_bonus", 0))
+	return int(_EQUIP.armadura(armadura_equipada).get("vida_bonus", 0)) + int(bonus("vida_max"))
 
 
 ## Fração (0..1) de dano recebido que a armadura equipada corta.
@@ -442,6 +456,8 @@ func reiniciar_campanha() -> void:
 	armaduras.clear()
 	arma_equipada = ""
 	armadura_equipada = ""
+	essencia = 0
+	melhorias.clear()
 	hardcore_tempo_restante = -1.0  # NB: `hardcore` (o modo) fica como está
 	_limpar_jornada_ancora()
 	vidas_mudaram.emit(vidas)
@@ -477,6 +493,54 @@ func registar_pista(id: String) -> void:
 	guardar()
 
 
+## --- Economia / Melhorias ---------------------------------------------
+
+func ganhar_essencia(n: int) -> void:
+	if n <= 0:
+		return
+	essencia += n
+	essencia_mudou.emit(essencia)
+	guardar()
+
+
+func rank_melhoria(id: String) -> int:
+	return int(melhorias.get(id, 0))
+
+
+## Custo da próxima subida de rank de `id`. -1 = no máximo.
+func custo_melhoria(id: String) -> int:
+	return _MELHORIAS.custo(id, rank_melhoria(id))
+
+
+func pode_comprar_melhoria(id: String) -> bool:
+	var c := custo_melhoria(id)
+	return c >= 0 and essencia >= c
+
+
+## Compra 1 rank da melhoria `id`. Devolve true se comprou.
+func comprar_melhoria(id: String) -> bool:
+	if not pode_comprar_melhoria(id):
+		return false
+	essencia -= custo_melhoria(id)
+	melhorias[id] = rank_melhoria(id) + 1
+	essencia_mudou.emit(essencia)
+	melhoria_comprada.emit(id, melhorias[id])
+	guardar()
+	return true
+
+
+## Soma o efeito de TODAS as melhorias cujo `efeito` é `chave`. A Koliani
+## chama isto para os bónus: "vida_max", "dano_mult", "regen_energia",
+## "iframes_roll", "crit_mult", "escudo_cargas".
+func bonus(chave: String) -> float:
+	var total := 0.0
+	for id: String in melhorias:
+		var cfg: Dictionary = _MELHORIAS.CATALOGO.get(id, {})
+		if cfg.get("efeito", "") == chave:
+			total += _MELHORIAS.efeito_total(id, int(melhorias[id]))
+	return total
+
+
 ## --- Persistencia ------------------------------------------------------
 
 func para_dicionario() -> Dictionary:
@@ -493,6 +557,8 @@ func para_dicionario() -> Dictionary:
 		"armadura_equipada": armadura_equipada,
 		"hardcore": hardcore,
 		"hardcore_tempo_restante": hardcore_tempo_restante,
+		"essencia": essencia,
+		"melhorias": melhorias.duplicate(),
 	}
 
 
@@ -519,6 +585,11 @@ func de_dicionario(d: Dictionary) -> void:
 		concluidos.append(int(ci))
 	hardcore = bool(d.get("hardcore", false))
 	hardcore_tempo_restante = float(d.get("hardcore_tempo_restante", -1.0))
+	essencia = int(d.get("essencia", 0))
+	melhorias.clear()
+	var ms: Dictionary = d.get("melhorias", {})
+	for k in ms:
+		melhorias[str(k)] = int(ms[k])
 
 
 func guardar() -> void:

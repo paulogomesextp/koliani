@@ -40,6 +40,7 @@ const ALC_CUSPIR := 440.0
 const TELEGRAFO_CUSPIR := 0.5
 const VEL_CUSPO := 300.0
 const PROJETIL_CUSPO := preload("res://scenes/actors/BolaFogo.tscn")
+const ESSENCIA := preload("res://scenes/actors/Essencia.tscn")
 var _acao_cd := 0.0
 var _windup := 0.0
 var _carga := 0.0
@@ -198,6 +199,7 @@ func _dano_periodico(q: int) -> void:
 		if _anim:
 			_morrer_anim()
 		else:
+			_soltar_essencia()
 			Impacto.rebentar(self, global_position + Vector2(0.0, -10.0),
 				cor_rim.lerp(Color(1, 1, 1), 0.35), 3.0)
 			soltar_estilhacos()
@@ -709,7 +711,7 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0, critico := false) 
 		return
 	var q := quantidade
 	if critico:
-		q = int(round(q * CRIT_MULT))
+		q = int(round(q * (CRIT_MULT + EstadoJogo.bonus("crit_mult"))))  # melhoria "furia"
 		# gelo + crítico = ESTILHAÇA: bónus e limpa o congelamento
 		if _congelado > 0.0:
 			q += int(round(quantidade * 0.6))
@@ -724,6 +726,7 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0, critico := false) 
 		if _anim:
 			_morrer_anim()
 		else:
+			_soltar_essencia()
 			# mesmo "pop" da morte com animação, para o feedback ser igual
 			Impacto.rebentar(self, global_position + Vector2(0.0, -10.0),
 				cor_rim.lerp(Color(1, 1, 1), 0.35), 3.0)
@@ -742,6 +745,26 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0, critico := false) 
 			_atualizar_barra_elite()
 
 
+## Larga ESSÊNCIA ao morrer. Comum: pouca (escala com a região). Elite:
+## um monte. Os motes vão para a cena (sobrevivem ao `queue_free` do bicho).
+func _soltar_essencia() -> void:
+	if _e_chefe():
+		return  # os chefes tratam disto no ChefeBase
+	var cena := get_tree().current_scene
+	if cena == null or not cena.is_inside_tree():
+		return
+	var reg := float(clampi(EstadoJogo.indice_nivel, 0, 29)) / 29.0
+	var total: int = (14 + int(reg * 22.0)) if elite else (1 + (1 if randf() < 0.5 + reg * 0.4 else 0) + int(reg * 2.0))
+	if total <= 0:
+		return
+	var n := 1 if total <= 2 else clampi(total / 4, 2, 6)
+	for i in n:
+		var m := ESSENCIA.instantiate()
+		m.valor = maxi(1, total / n + (1 if i < total % n else 0))
+		m.global_position = global_position + Vector2(randf_range(-10.0, 10.0), -14.0)
+		cena.add_child(m)
+
+
 ## Rebentamento GRANDE quando um elite cai (2 anéis da cor do rim + clarão).
 func _pop_morte_elite() -> void:
 	var cena := get_tree().current_scene
@@ -757,6 +780,7 @@ func _pop_morte_elite() -> void:
 func _morrer_anim() -> void:
 	_morto = true
 	velocity = Vector2.ZERO
+	_soltar_essencia()
 	# "pop" de morte: o mesmo anel do acerto, maior e na cor do rim do bioma
 	Impacto.rebentar(self, global_position + Vector2(0.0, -10.0),
 		cor_rim.lerp(Color(1, 1, 1), 0.35), 3.4)

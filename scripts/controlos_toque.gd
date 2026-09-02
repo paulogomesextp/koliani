@@ -93,6 +93,10 @@ func _ready() -> void:
 	_traduzir_equip()
 	_atualizar_selos_upgrade()
 
+	_montar_contador_essencia()
+	EstadoJogo.essencia_mudou.connect(_atualizar_essencia)
+	_atualizar_essencia(EstadoJogo.essencia)
+
 	_montar_legenda_controlos()
 	_montar_cabecalho_nivel()
 	Textos.idioma_mudou.connect(func(_l: String) -> void:
@@ -378,6 +382,56 @@ func _ao_chefe_derrotado() -> void:
 
 
 # --- legenda dos controlos (topo do ecrã) --------------------------
+
+## Contador de ESSÊNCIA no canto sup. direito (✦ 1234). Pisa e treme quando
+## sobe.
+var _ess_label: Label
+
+func _montar_contador_essencia() -> void:
+	var caixa := PanelContainer.new()
+	caixa.name = "Essencia"
+	caixa.anchor_left = 1.0
+	caixa.anchor_right = 1.0
+	caixa.anchor_top = 0.0
+	caixa.anchor_bottom = 0.0
+	caixa.offset_left = -168.0
+	caixa.offset_right = -18.0
+	caixa.offset_top = 16.0
+	caixa.offset_bottom = 48.0
+	caixa.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	caixa.pivot_offset = Vector2(75, 16)
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0.08, 0.04, 0.1, 0.78)
+	sb.set_corner_radius_all(9)
+	sb.set_border_width_all(1)
+	sb.border_color = Color(1.0, 0.5, 0.95, 0.5)
+	sb.content_margin_left = 12
+	sb.content_margin_right = 14
+	sb.content_margin_top = 3
+	sb.content_margin_bottom = 3
+	caixa.add_theme_stylebox_override("panel", sb)
+	add_child(caixa)
+
+	_ess_label = Label.new()
+	_ess_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	_ess_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_ess_label.add_theme_font_size_override("font_size", 18)
+	_ess_label.add_theme_color_override("font_color", Color(1.0, 0.86, 1.0))
+	_ess_label.add_theme_color_override("font_outline_color", Color(0.05, 0.01, 0.06))
+	_ess_label.add_theme_constant_override("outline_size", 4)
+	caixa.add_child(_ess_label)
+
+
+func _atualizar_essencia(total: int) -> void:
+	if _ess_label == null:
+		return
+	_ess_label.text = "✦ %d" % total
+	var caixa := _ess_label.get_parent() as Control
+	if caixa:
+		var t := create_tween()
+		t.tween_property(caixa, "scale", Vector2(1.14, 1.14), 0.06)
+		t.tween_property(caixa, "scale", Vector2.ONE, 0.12).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+
 
 func _montar_legenda_controlos() -> void:
 	# em ecrã táctil os botões de toque já mostram tudo

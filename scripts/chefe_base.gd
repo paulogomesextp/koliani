@@ -275,6 +275,19 @@ func _restaurar_musica() -> void:
 		Musica.ambiente(EstadoJogo.indice_nivel)
 
 
+## Grande recompensa de ESSÊNCIA ao cair o chefe (~70..150, escala com o
+## nível). Espalha 6-9 motes.
+func _soltar_essencia_chefe(cena: Node) -> void:
+	var reg := float(clampi(EstadoJogo.indice_nivel, 0, 29)) / 29.0
+	var total := 70 + int(reg * 90.0)
+	var n := 7 + (EstadoJogo.indice_nivel % 3)
+	for i in n:
+		var m := ESSENCIA.instantiate()
+		m.valor = maxi(1, total / n + (1 if i < total % n else 0))
+		m.global_position = global_position + Vector2(randf_range(-40.0, 40.0), -30.0)
+		cena.add_child(m)
+
+
 func _cair_derrotado() -> void:
 	_ja_derrotado = true
 	_restaurar_musica()
@@ -295,6 +308,7 @@ func _explodir_derrotado() -> void:
 	var cena := get_tree().current_scene
 	if cena == null or not cena.is_inside_tree():
 		return
+	_soltar_essencia_chefe(cena)
 	var base := global_position + Vector2(0.0, -30.0 * maxf(0.8, escala_visual))
 	var tinta: Color = cor_rim.lerp(Color(1, 1, 1), 0.4)
 	for i in 3:
@@ -391,7 +405,7 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0, critico := false) 
 	var q := quantidade
 	if critico:
 		# golpe critico no chefe (pos-rolamento / pelas costas / vulneravel)
-		q = int(round(q * 1.5))
+		q = int(round(q * (1.5 + EstadoJogo.bonus("crit_mult"))))  # melhoria "furia"
 		Impacto.rebentar(self, global_position + Vector2(0.0, -20.0 * maxf(0.8, escala_visual)), Color(1, 1, 1), 3.4)
 	vida -= q
 	_dano_recente = 0.85  # golpe entrou -> janela EXPOSTA -> esconde o escudo

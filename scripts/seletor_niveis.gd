@@ -355,32 +355,59 @@ func _animar_escala(no: Control, alvo: float) -> void:
 	t.tween_property(no, "scale", Vector2(alvo, alvo), 0.15)
 
 
+const SANTUARIO_CENA := preload("res://scenes/ui/Santuario.tscn")
+var _santuario: Control
+
+func _abrir_santuario() -> void:
+	if _santuario != null:
+		return
+	Som.toca("porta", -10.0, 1.1)
+	_santuario = SANTUARIO_CENA.instantiate()
+	_santuario.z_index = 100
+	add_child(_santuario)
+	_santuario.fechado.connect(func() -> void:
+		if is_instance_valid(_santuario):
+			_santuario.queue_free()
+		_santuario = null
+		_reconstruir_estilos())   # ex.: cores/estados podem depender de melhorias
+
+
 func _montar_rodape() -> void:
 	var barra := HBoxContainer.new()
 	barra.anchor_left = 0.5
 	barra.anchor_right = 0.5
 	barra.anchor_top = 1.0
 	barra.anchor_bottom = 1.0
-	barra.offset_left = -170.0
-	barra.offset_right = 170.0
+	barra.offset_left = -280.0
+	barra.offset_right = 280.0
 	barra.offset_top = -86.0
 	barra.offset_bottom = -42.0
 	barra.alignment = BoxContainer.ALIGNMENT_CENTER
-	barra.add_theme_constant_override("separation", 24)
+	barra.add_theme_constant_override("separation", 18)
 	add_child(barra)
 
 	var voltar := Button.new()
 	voltar.name = "Voltar"
 	voltar.focus_mode = Control.FOCUS_NONE
-	voltar.custom_minimum_size = Vector2(150, 44)
+	voltar.custom_minimum_size = Vector2(140, 44)
 	_estilo_botao_rodape(voltar, false)
 	voltar.pressed.connect(func() -> void: cancelado.emit())
 	barra.add_child(voltar)
 
+	var santuario := Button.new()
+	santuario.name = "Santuario"
+	santuario.focus_mode = Control.FOCUS_NONE
+	santuario.custom_minimum_size = Vector2(160, 44)
+	_estilo_botao_rodape(santuario, false)
+	var chave_sant := Textos.t("shrine.open")
+	santuario.text = chave_sant if chave_sant != "shrine.open" else "✦ Santuário"
+	santuario.pressed.connect(_abrir_santuario)
+	barra.add_child(santuario)
+
 	_jogar = Button.new()
 	_jogar.name = "Jogar"
 	_jogar.focus_mode = Control.FOCUS_NONE
-	_jogar.custom_minimum_size = Vector2(150, 44)
+	_jogar.custom_minimum_size = Vector2(140, 44)
 	_estilo_botao_rodape(_jogar, true)
 	_jogar.pressed.connect(_confirmar)
 	barra.add_child(_jogar)

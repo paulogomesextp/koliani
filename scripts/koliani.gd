@@ -418,7 +418,7 @@ func _physics_process(dt: float) -> void:
 
 	# a barra de Energia regenera-se sozinha depois de usada
 	if _energia < ENERGIA_MAX:
-		_energia = minf(ENERGIA_MAX, _energia + REGEN_ENERGIA * dt)
+		_energia = minf(ENERGIA_MAX, _energia + REGEN_ENERGIA * (1.0 + EstadoJogo.bonus("regen_energia")) * dt)  # melhoria "foco"
 		energia_mudou.emit(_energia, ENERGIA_MAX)
 
 	# FLYMODE (só DEVELOPER MODE, botão na DevBarra): voa livre e atravessa
@@ -599,7 +599,7 @@ func _physics_process(dt: float) -> void:
 			_rolar_recarga, is_on_floor(), _rolar_restante, _dash_restante):
 		_rolar_restante = DUR_ROLAR
 		_rolar_recarga = RECARGA_ROLAR
-		_invulneravel = maxf(_invulneravel, DUR_ROLAR)
+		_invulneravel = maxf(_invulneravel, DUR_ROLAR + EstadoJogo.bonus("iframes_roll"))  # melhoria "agilidade"
 		# roll-cancel (pegada Dead Cells): o rolamento corta o recovery do
 		# ataque -> encadeia-se ataque -> rolar -> ataque sem esperar
 		if _ataque_restante > 0.0:
