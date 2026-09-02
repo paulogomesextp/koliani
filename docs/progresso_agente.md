@@ -1,5 +1,43 @@
 # Progresso do agente `gaming` — campanha dos 30 níveis
 
+## Sessão 2026-09-02 (f) — maratona de playtest do Paulo (v0.9.28→v0.9.33)
+
+O Paulo jogou e foi largando pedidos; feitos por lotes:
+
+- **Picos verdes da Região I** (`raiz_perigo.gd`): telegrafo a sério —
+  marca no chão que acende/cresce toda a janela (0.9s), luz, farrapos,
+  pulso rápido antes de irromper. Mecânica igual.
+- **Música dos chefes** só ao 1.º golpe trocado (removido o `provocar()`
+  das máquinas de estado; fica o do `chefe_base` — contacto ou 1.º dano).
+- **Chefes presos à arena** (`chefe_base._medir_arena`/`_prender_na_arena`):
+  clamp X às bordas da plataforma de chão + tecto em Y (não descem por
+  baixo). Corrige L12/L20 e o "caem e morrem".
+- **Hits BLINDADOS nos chefes** deixam de ser zero (`_raspao`): ~32% +
+  cambaleada a cada ~10% de vida acumulada. Vale p/ espada, tiro e Throw.
+  28 chefes com o hook antes do `return` do ramo bloqueado (sed).
+- **Pisão num chefe** = dano (raspão/normal), nunca dano de contacto.
+- **L20**: removida a inversão de controlos do Olho do Abismo
+  (`inverter_controlos` → no-op; ataque passa a largar mais clones).
+- **L6/L7 mais duros**: Carcereiro +vida/agressão + combo de baque;
+  Ignivar +vida, telégrafos/janela curtos, fase 2 aos 62%.
+- **Sons**: `ataque.wav` refeito 2× (parciais inarmónicas + transiente de
+  aço — "espada de metal"); `lancar.wav` NOVO para o Throw; pisão =
+  `acerto`; salto dos inimigos = "hop"; `demonio_ataque` −4-5 dB;
+  `carrossel.wav` NOVO (tick suave no SeletorNiveis).
+- **Plataformas de chão a escalar** (`nivel_com_chefe._alongar_nivel`):
+  estica só o chão largo p/ a direita, até +50%/+400px, por índice (N1
+  igual → ~1.8× no N30). Não tapa poças nem mexe em saltos verticais.
+  Kill switch `alongar_plataformas`.
+- **Santuário no menu de Pausa** (entre Options e Mapa; overlay, i18n
+  `pause.shrine`).
+- Fix: `atmosfera.gd:296` inferia Variant (`.get()`) e rebentava o parse
+  em contextos estritos.
+
+**Pendente / a confirmar pelo Paulo**: afinação fina dos números dos
+chefes; se as plataformas devem esticar mais (subir `alongar_ampl`);
+**CI do APK Android falha desde o run 264** (pré-sessão, não bloqueia o
+Release Windows — logs precisam de admin p/ diagnosticar).
+
 ## Sessão 2026-09-02 (e) — menu profissional + economia/progressão
 
 - **`SeletorNiveis` redesenhado** (`2574471`): cartões em camadas (arte do
