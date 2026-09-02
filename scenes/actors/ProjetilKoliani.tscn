@@ -1,10 +1,13 @@
-[gd_scene load_steps=5 format=3 uid="uid://bkolianiprojkoliani01"]
+[gd_scene load_steps=7 format=3 uid="uid://bkolianiprojkoliani01"]
 
 ; Projétil mágico da Koliani (habilidade "projetil"). Bate igual à espada e
 ; parte-se contra inimigos ou cenário. collision_mask = 5 -> "mundo" (1) +
 ; "inimigos" (4); collision_layer = 0 (não é sólido, só deteta).
+; Corpo = orbe roxo a girar (bdragon1727 "Free Effect and Bullet 16x16",
+; folha roxa linha 0 col 30-35 -> assets/sprites/pixel/fx/bala_roxa.png).
 
 [ext_resource type="Script" path="res://scripts/projetil_koliani.gd" id="1_proj"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/fx/bala_roxa.png" id="2_bala"]
 
 [sub_resource type="CircleShape2D" id="cs_proj"]
 radius = 9.0
@@ -21,6 +24,9 @@ fill = 1
 fill_from = Vector2(0.5, 0.5)
 fill_to = Vector2(1, 0.5)
 
+[sub_resource type="CanvasItemMaterial" id="mat_add"]
+blend_mode = 1
+
 [node name="ProjetilKoliani" type="Area2D"]
 collision_layer = 0
 collision_mask = 5
@@ -33,18 +39,10 @@ shape = SubResource("cs_proj")
 texture = SubResource("tex_luz")
 energy = 2.0
 color = Color(0.62, 0.34, 1, 1)
-scale = Vector2(1, 1)
 
-[node name="AuraExterna" type="Polygon2D" parent="."]
-show_behind_parent = true
-color = Color(0.55, 0.3, 1, 0.22)
-polygon = PackedVector2Array(-22, 0, -6, -13, 20, 0, -6, 13)
-
-[node name="Halo" type="Polygon2D" parent="."]
-show_behind_parent = true
-color = Color(0.7, 0.42, 1, 0.5)
-polygon = PackedVector2Array(-18, 0, -4, -10, 17, 0, -4, 10)
-
-[node name="Nucleo" type="Polygon2D" parent="."]
-color = Color(0.92, 0.86, 1, 1)
-polygon = PackedVector2Array(-9, 0, -2, -4, 9, 0, -2, 4)
+[node name="Corpo" type="Sprite2D" parent="."]
+texture_filter = 1
+material = SubResource("mat_add")
+texture = ExtResource("2_bala")
+hframes = 6
+scale = Vector2(2.4, 2.4)

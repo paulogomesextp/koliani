@@ -2,9 +2,12 @@ extends SceneTree
 ## Extrai tiras de EFEITO do pack bdragon1727 "Effect and Bullet 16x16"
 ## (folha roxa, grelha de 16x16) para `assets/sprites/pixel/fx/`.
 ##
-## Por agora só o impacto do golpe: um anel que abre a partir do ponto do
-## acerto -- o "pop" que faltava aos golpes (as faíscas de partículas
-## sozinhas não marcam o momento).
+##   * impacto_roxo -- anel que abre a partir do ponto do acerto (o "pop"
+##     que faltava aos golpes; as faíscas de partículas sozinhas não
+##     marcam o momento). Usado por `scripts/impacto.gd`.
+##   * bala_roxa -- orbe de energia a girar, 6 frames em loop, para o CORPO
+##     do `ProjetilKoliani` e a cabeça do `KamehamehaKoliani` (substitui os
+##     Polygon2D procedurais).
 ##
 ##   godot --headless --script res://tools/extrair_efeitos.gd
 
@@ -17,6 +20,8 @@ const TIRAS := {
 	# linha 5, colunas 14..17: ponto -> disco -> anel -> anel largo (o anel a
 	# abrir do ponto do acerto)
 	"impacto_roxo": [5, 14, 4],
+	# linha 0, colunas 30..35: vórtice roxo a girar (loop) -- corpo do tiro
+	"bala_roxa": [0, 30, 6],
 }
 
 

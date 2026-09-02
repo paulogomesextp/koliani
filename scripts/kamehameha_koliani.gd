@@ -5,7 +5,6 @@ extends Area2D
 ## contra o cenário ou ao fim do tempo. Custo/energia gerido em `koliani.gd`.
 
 const VELOCIDADE := 900.0
-const TEX_IMPACTO := preload("res://assets/sprites/impacto.svg")
 
 var dano := 75
 var _dir := Vector2.RIGHT
@@ -15,6 +14,7 @@ var _t := 0.0
 var _atingidos: Dictionary = {}
 
 @onready var _luz: PointLight2D = $Luz
+@onready var _cabeca: Sprite2D = $Cabeca
 
 
 ## `direcao` é um dos 8 vetores; `dano_` vem do `Koliani._dano_kamehameha()`.
@@ -33,6 +33,9 @@ func _physics_process(dt: float) -> void:
 	_t += dt
 	if _luz:
 		_luz.energy = 2.7 + 0.6 * sin(_t * 26.0)
+	if _cabeca:
+		_cabeca.frame = int(_t * 26.0) % 6
+		_cabeca.rotation = -rotation
 	_tempo_de_vida -= dt
 	if _tempo_de_vida <= 0.0:
 		_estoirar()
@@ -54,19 +57,5 @@ func _ao_bater(corpo: Node) -> void:
 
 
 func _estoirar() -> void:
-	var s := Sprite2D.new()
-	s.texture = TEX_IMPACTO
-	s.global_position = global_position
-	s.rotation = randf() * TAU
-	s.scale = Vector2(0.4, 0.4)
-	s.modulate = Color(0.8, 0.6, 1.0)
-	s.z_index = 40
-	var pai := get_parent()
-	if pai:
-		pai.add_child(s)
-		var t := s.create_tween()
-		t.set_parallel(true)
-		t.tween_property(s, "scale", Vector2(2.2, 2.2), 0.18).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-		t.tween_property(s, "modulate:a", 0.0, 0.18)
-		t.chain().tween_callback(s.queue_free)
+	Impacto.rebentar(self, global_position, Color(1, 1, 1), 2.8)
 	queue_free()

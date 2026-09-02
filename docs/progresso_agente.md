@@ -1,5 +1,31 @@
 # Progresso do agente `gaming` — campanha dos 30 níveis
 
+## Sessão 2026-09-02 — VFX roxo dos projéteis (v0.9.19)
+
+Pendente antigo, desbloqueado agora que o Paulo confirmou a licença do
+pack **bdragon1727 "Free Effect and Bullet 16x16"** (grátis, "name your
+own price"; uso comercial pede contribuição voluntária; não revender).
+Termos registados em `assets/sprites/incoming/LICENSES.md` +
+`assets/sprites/pixel/CREDITS.md` (deixou de estar "POR CONFIRMAR").
+
+- `tools/extrair_efeitos.gd`: além do `impacto_roxo` já existente, extrai
+  agora **`bala_roxa.png`** — orbe roxo a girar, 6 frames em loop (folha
+  roxa, linha 0, colunas 30-35).
+- **`ProjetilKoliani.tscn`**: os 3 `Polygon2D` procedurais
+  (AuraExterna/Halo/Nucleo) deram lugar a um `Sprite2D` "Corpo" com a
+  `bala_roxa` (hframes=6, ADD, Nearest). `projetil_koliani.gd` cicla o
+  frame (`_t*20 % 6`) e o `_estoirar()` passou a usar
+  `Impacto.rebentar(...)` (o anel pixel-art) em vez do `impacto.svg`.
+- **`KamehamehaKoliani.tscn`**: o feixe (`Polygon2D`) fica; ganhou uma
+  **cabeça** `Sprite2D` com a `bala_roxa` (escala 3, ADD) a puxar a
+  rajada. `_estoirar()` também passou ao `Impacto.rebentar` (escala 2.8).
+- `impacto.svg` continua a ser usado pelo `koliani.gd` (flash do golpe) —
+  não foi mexido.
+
+Testes headless verdes + smoke da sala de treino (`Level_Test`) sem erros
+de script. **Por playtestar**: tamanho/brilho do orbe em jogo (scale 2.4
+no tiro, 3.0 no kamehameha, tudo "a olho").
+
 ## Sessão 2026-09-02 — sons de habilidade por chefe (v0.9.17)
 
 Pendente #2 da sessão anterior: até aqui quase todos os 30 chefes

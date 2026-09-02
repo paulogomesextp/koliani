@@ -55,3 +55,19 @@ página do itch/Kenney). O agente usa isto para gerar `assets/sprites/pixel/CRED
 - URL(s): https://ansimuz.itch.io/  (colar cada pack de parallax usado)
 - Licença: (colar o texto exacto da página)
 - Autor: Ansimuz (Luis Zuno)
+
+## bdragon1727 — "Free Effect and Bullet 16x16"
+- URL: https://bdragon1727.itch.io/free-effect-and-bullet-16x16
+- Autor: BDragon1727
+- Preço: Free ("name your own price")
+- Licença (texto da página, 2 set 2026):
+  - "Free to use on non-commercial games, please leave comments and reviews
+    that help motivate me."
+  - "If you will be using on a commercial game, please contribute (any value)."
+  - "Modify as desired."
+  - "You cannot do: Resell / redistribute this asset."
+  - Sem exigência explícita de crédito (mas creditado em CREDITS.md).
+  - Sem restrição a treino de IA / NFT.
+- Confirmado pelo Paulo em 2 set 2026 (usar; contribuir se o jogo for
+  vendido). Usado: só a folha roxa, frames extraídos e recoloridos para
+  `assets/sprites/pixel/fx/` (não é redistribuição do pack).

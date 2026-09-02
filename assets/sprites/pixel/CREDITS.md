@@ -112,12 +112,19 @@ CC0 não exige atribuição; fica aqui à mesma por cortesia.
   `Equipamento.COR_ARMA`, e o brilho/efeitos do golpe (`koliani.gd`) seguem
   essa cor.
 
-## bdragon1727 — "Effect and Bullet 16x16"
-- https://bdragon1727.itch.io/  (URL exacto + licença POR CONFIRMAR pelo
-  Paulo em `incoming/LICENSES.md`)
-- Uso: `assets/sprites/pixel/fx/impacto_roxo.png` — o anel que abre no ponto
-  do golpe (`scripts/impacto.gd`), tirado da folha roxa por
-  `tools/extrair_efeitos.gd` (linha 5, colunas 14-17).
+## bdragon1727 — "Free Effect and Bullet 16x16"
+- https://bdragon1727.itch.io/free-effect-and-bullet-16x16
+- Licença: grátis ("name your own price"). Uso não-comercial livre; uso
+  comercial pede contribuição voluntária de qualquer valor. Modificar
+  permitido. NÃO revender/redistribuir o pack. Texto completo em
+  `assets/sprites/incoming/LICENSES.md`. (Confirmado pelo Paulo, 2 set 2026.)
+- Uso (folha roxa, `Purple Effect and Bullet 16x16.png`, grelha 16x16,
+  extraída por `tools/extrair_efeitos.gd`):
+  - `assets/sprites/pixel/fx/impacto_roxo.png` — anel que abre no ponto do
+    golpe (`scripts/impacto.gd`); linha 5, colunas 14-17.
+  - `assets/sprites/pixel/fx/bala_roxa.png` — orbe roxo a girar (loop de 6
+    frames); linha 0, colunas 30-35. Corpo do `ProjetilKoliani` e cabeça do
+    `KamehamehaKoliani` (substitui os `Polygon2D` procedurais).
 
 ## piiixl — "Seamless Patterns" (16x16)
 - https://piiixl.itch.io/  (URL exato + licença POR CONFIRMAR pelo Paulo em incoming/LICENSES.md)
