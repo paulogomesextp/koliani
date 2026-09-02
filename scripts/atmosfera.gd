@@ -293,7 +293,7 @@ func _frente_ambiente(rng: RandomNumberGenerator) -> void:
 	for n in frente.get_children():
 		n.free()
 	# alguns biomas são céu aberto -- pouca ou nenhuma frente
-	var densidade := {"floresta": 620.0, "prisao": 720.0, "catacumbas": 620.0,
+	var densidade: float = {"floresta": 620.0, "prisao": 720.0, "catacumbas": 620.0,
 		"cidade": 820.0, "castelo": 680.0, "torres": 1600.0}.get(bioma, 820.0)
 	var cor := cor_silhueta.darkened(0.2).lerp(cor_fundo, 0.1)
 	var x := extensao_esquerda + rng.randf_range(0.0, densidade)

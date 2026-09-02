@@ -8,22 +8,25 @@ extends ChefeBase
 enum Fase { APROXIMA, TELEGRAFO, SALTO, IMPACTO, RECUPERA }
 
 @export var dist_parar := 150.0
-@export var vel_aproxima := 55.0
-@export var dur_telegrafo := 0.6
-@export var forca_salto := 360.0
-@export var raio_onda := 250.0
-@export var dano_onda := 24
-@export var dur_impacto := 0.28
-@export var dur_recupera := 0.85
+@export var vel_aproxima := 84.0
+@export var dur_telegrafo := 0.42
+@export var forca_salto := 430.0
+@export var raio_onda := 300.0
+@export var dano_onda := 30
+@export var dur_impacto := 0.26
+@export var dur_recupera := 0.5
+## Hipótese de encadear um 2.º baque em vez de recuperar (combo pesado).
+@export var hip_duplo_baque := 0.45
 
 var _fase: Fase = Fase.APROXIMA
 var _t := 0.0
 var _onda_feita := false
+var _baques_seguidos := 0
 
 
 func _ready() -> void:
 	super._ready()
-	vida = maxi(vida, 380)
+	vida = maxi(vida, 540)
 	usa_escudo_boss = false  # leva dano sempre -- sem janela blindada
 
 
@@ -61,7 +64,16 @@ func _physics_process(dt: float) -> void:
 				_onda_feita = true
 				_onda()
 			if _t >= dur_impacto:
-				_ir_para(Fase.RECUPERA)
+				# combo pesado: às vezes salta outra vez em cima da Koliani
+				# antes de recuperar (máximo 2 baques seguidos)
+				if _baques_seguidos < 2 and randf() < hip_duplo_baque:
+					_baques_seguidos += 1
+					_encarar_koliani()
+					velocity.y = -forca_salto * 0.92
+					_ir_para(Fase.SALTO)
+				else:
+					_baques_seguidos = 0
+					_ir_para(Fase.RECUPERA)
 		Fase.RECUPERA:
 			velocity.x = move_toward(velocity.x, 0.0, 600.0 * dt)
 			_cair(dt)

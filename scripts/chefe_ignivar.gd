@@ -10,7 +10,7 @@ extends ChefeBase
 ##     `GotaAcida` recolorida a laranja: gota + poça que magoa).
 ## A seguir a cada ataque volta-se para a forja: a fenda das costas abre-se
 ## (EXPOSTO) -- única janela de dano, a dobrar.
-## Fase 2 (< 50% vida): "derrete a arena" -- alarga as poças de lava do
+## Fase 2 (< 62% vida): "derrete a arena" -- alarga as poças de lava do
 ## grupo "lava_fornalha", telégrafos mais curtos, mais brasas.
 
 const BRASA := preload("res://scenes/actors/GotaAcida.tscn")
@@ -18,14 +18,14 @@ const BRASA := preload("res://scenes/actors/GotaAcida.tscn")
 enum Fase { DORME, DECIDE, MARTELO_TEL, MARTELO_BAQUE, FORJA_TEL, FORJA, BRASAS_TEL, BRASAS, EXPOSTO }
 
 @export var dist_deteta := 440.0
-@export var dur_tel := 0.6
+@export var dur_tel := 0.42
 @export var dur_baque := 0.34
-@export var dur_exposto := 1.35
+@export var dur_exposto := 0.9
 @export var raio_onda := 300.0
-@export var dano_onda := 22
-@export var dano_lamina := 16
-@export var dano_brasa := 16
-@export var vel_lamina := 460.0
+@export var dano_onda := 28
+@export var dano_lamina := 22
+@export var dano_brasa := 20
+@export var vel_lamina := 560.0
 
 var _fase: Fase = Fase.DORME
 var _t := 0.0
@@ -42,7 +42,7 @@ var _chao_cache := 0.0
 
 func _ready() -> void:
 	super._ready()
-	vida = maxi(vida, 400)
+	vida = maxi(vida, 560)
 	_vida_max = vida
 	velocidade = 0.0
 	alcance_patrulha = 0.0
@@ -61,7 +61,7 @@ func _physics_process(dt: float) -> void:
 	_ataque_forte = maxf(0.0, _ataque_forte - dt)
 	if _chao_cache <= 0.0:
 		_chao_cache = _chao_y(global_position.x)
-	if not _fase2 and not _ja_derrotado and vida <= int(_vida_max * 0.5):
+	if not _fase2 and not _ja_derrotado and vida <= int(_vida_max * 0.62):
 		_entrar_fase2()
 
 	match _fase:
@@ -208,7 +208,7 @@ func _lancar_brasas() -> void:
 	var pai := get_parent()
 	if pai == null:
 		return
-	var n := 5 if _fase2 else 3
+	var n := 6 if _fase2 else 4
 	var alvo := _x_koliani()
 	for i in n:
 		var x := alvo + (i - (n - 1) * 0.5) * 88.0 + randf_range(-16.0, 16.0)
