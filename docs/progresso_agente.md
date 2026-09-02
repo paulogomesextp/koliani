@@ -1,5 +1,22 @@
 # Progresso do agente `gaming` — campanha dos 30 níveis
 
+## Sessão 2026-09-02 (g) — sem escudos + níveis mais longos (v0.9.34→v0.9.36)
+
+- **`_alongar_nivel` reescrito** (`f127d55`): agora alarga as plataformas
+  de chão isoladas E empurra tudo o resto pela mesma medida → os vãos
+  ficam iguais, o nível estica. 26/28 níveis esticam, zero sobreposições
+  novas (varrimento). Não toca em encostos (comboio) nem verticais.
+- **Arena dos chefes** (`73660f5`): `_medir_arena` re-tenta em `_process`
+  (Aerion/Olho do Abismo ficavam sem prisão); tecto Y só p/ chefes de chão.
+- **Curva de vida alisada** (`a322725`) — depois substituída pelo passe
+  seguinte.
+- **MECÂNICA DE ESCUDOS RETIRADA** (`090cc98`, `71d3e30`, v0.9.35/36):
+  sem escudo de cargas, sem janela EXPOSTA. 29 `chefe_*.gd` com
+  `receber_dano` mínimo. `ChefeBase._afinar_dificuldade`: vida ×3.2→×4.8,
+  telegrafos ×0.85 (chão 0.3s), recuperações ×0.8; dano de contacto
+  ×1.4→×2.8. TTK real ~12s (N1) → ~75s (N30). Código do escudo fica inerte
+  (`usa_escudo_boss=false`), `_raspao` órfão.
+
 ## Sessão 2026-09-02 (f) — maratona de playtest do Paulo (v0.9.28→v0.9.33)
 
 O Paulo jogou e foi largando pedidos; feitos por lotes:
