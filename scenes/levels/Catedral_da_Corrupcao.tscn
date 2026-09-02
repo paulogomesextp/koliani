@@ -1,10 +1,10 @@
-[gd_scene load_steps=16 format=3 uid="uid://bkolianicatedral24"]
+[gd_scene load_steps=12 format=3 uid="uid://bkolianicatedral24"]
 
-; Região V / nível 24 -- Catedral da Corrupção.
-; Vitrais (`Vitral`) bloqueiam a nave; um golpe/projétil parte-os e a luz
-; entra -- as plataformas fantasma do grupo do vitral (`grupo_luz`) ficam
-; sólidas e dá para atravessar. Arena com O Bispo Púrpura -- cruzes
-; explosivas, mãos espectrais e anjos corrompidos.
+; REGIAO V / nivel 24 -- Catedral da Corrupcao.
+; Nivel FEITO A MAO (corredor = false). Naves de combate; VITRAIS
+; (destrutiveis, mudam a luz) nas paredes de fundo. Bifurcacao: galeria
+; alta / nave baixa. Elite: raptor de carga. Acido citrino por baixo.
+; Chefe: O Bispo Purpura.
 
 [ext_resource type="PackedScene" uid="uid://bkolianiactor01" path="res://scenes/actors/Koliani.tscn" id="1_kol"]
 [ext_resource type="PackedScene" uid="uid://bdemoniobase01" path="res://scenes/actors/DemonioBase.tscn" id="2_dem"]
@@ -15,12 +15,11 @@
 [ext_resource type="Script" path="res://scripts/nivel_com_chefe.gd" id="7_niv"]
 [ext_resource type="PackedScene" uid="uid://bkolianiatmosfera01" path="res://scenes/fx/Atmosfera.tscn" id="8_atm"]
 [ext_resource type="PackedScene" uid="uid://bkolianiplataforma01" path="res://scenes/actors/Plataforma.tscn" id="9_pl"]
-[ext_resource type="PackedScene" uid="uid://bkolianivitral24" path="res://scenes/actors/Vitral.tscn" id="10_vit"]
-[ext_resource type="PackedScene" uid="uid://bkolianiserra01" path="res://scenes/actors/Serra.tscn" id="11_serra"]
-[ext_resource type="PackedScene" uid="uid://bkolianiespinhos01" path="res://scenes/actors/Espinhos.tscn" id="12_esp"]
+[ext_resource type="PackedScene" uid="uid://bkolianivitral24" path="res://scenes/actors/Vitral.tscn" id="10_vitral"]
+[ext_resource type="PackedScene" uid="uid://bkolianiaguavenenosa01" path="res://scenes/actors/AguaVenenosa.tscn" id="11_acido"]
 
 [sub_resource type="RectangleShape2D" id="rs_chk"]
-size = Vector2(40, 80)
+size = Vector2(44, 96)
 
 [sub_resource type="Gradient" id="grad_luz"]
 offsets = PackedFloat32Array(0, 1)
@@ -36,221 +35,188 @@ fill_to = Vector2(1, 0.5)
 
 [node name="Catedral_da_Corrupcao" type="Node2D"]
 script = ExtResource("7_niv")
+corredor = false
 
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
 cor_ambiente = Color(0.56, 0.48, 0.72, 1)
 cor_fundo = Color(0.05, 0.04, 0.09, 1)
 cor_silhueta = Color(0.1, 0.08, 0.15, 1)
 cor_luz = Color(0.8, 0.48, 1.0, 1)
-cor_poeira = Color(0.84, 0.68, 1.0, 1)
-densidade_poeira = 1.6
+cor_poeira = Color(0.9, 0.7, 1.0, 1)
+densidade_poeira = 1.4
 bioma = "cidade"
-largura_nivel = 3300.0
+largura_nivel = 3400.0
 luzes_horizonte = true
 fundo_pack = "igreja"
-tinta_fundo = Color(1.45, 1.1, 1.6, 1)
-neblina_fundo = 0.22
-dessaturar_fundo = 0.34
+tinta_fundo = Color(0.82, 0.6, 1.0, 1)
+neblina_fundo = 0.4
+dessaturar_fundo = 0.36
+
+[node name="Acido" parent="." instance=ExtResource("11_acido")]
+position = Vector2(1700, 980)
+largura = 3900.0
+altura = 340.0
+cor = Color(0.34, 0.4, 0.12, 0.93)
 
 [node name="ChaoInicio" parent="." instance=ExtResource("9_pl")]
-position = Vector2(420, 660)
-tamanho = Vector2(600, 48)
-altura_visual = 96.0
+position = Vector2(300, 700)
+tamanho = Vector2(460, 60)
+altura_visual = 110.0
+cor_base = Color(0.22, 0.18, 0.28, 1)
+cor_topo = Color(0.46, 0.38, 0.56, 1)
+
+[node name="VitralA" parent="." instance=ExtResource("10_vitral")]
+position = Vector2(620, 560)
+grupo_luz = "vitral_a"
+
+[node name="N1" parent="." instance=ExtResource("9_pl")]
+position = Vector2(600, 670)
+tamanho = Vector2(160, 22)
+altura_visual = 32.0
+cor_base = Color(0.22, 0.18, 0.28, 1)
+cor_topo = Color(0.44, 0.36, 0.54, 1)
+
+[node name="N2" parent="." instance=ExtResource("9_pl")]
+position = Vector2(840, 640)
+tamanho = Vector2(160, 22)
+altura_visual = 32.0
+cor_base = Color(0.22, 0.18, 0.28, 1)
+cor_topo = Color(0.44, 0.36, 0.54, 1)
+
+[node name="N3" parent="." instance=ExtResource("9_pl")]
+position = Vector2(1080, 660)
+tamanho = Vector2(160, 22)
+altura_visual = 32.0
+cor_base = Color(0.22, 0.18, 0.28, 1)
+cor_topo = Color(0.44, 0.36, 0.54, 1)
 
 [node name="ChaoMeio" parent="." instance=ExtResource("9_pl")]
-position = Vector2(1600, 660)
-tamanho = Vector2(360, 44)
-altura_visual = 80.0
+position = Vector2(1380, 700)
+tamanho = Vector2(360, 60)
+altura_visual = 110.0
+cor_base = Color(0.22, 0.18, 0.28, 1)
+cor_topo = Color(0.44, 0.36, 0.54, 1)
 
-[node name="ChaoArena" parent="." instance=ExtResource("9_pl")]
-position = Vector2(2760, 660)
-tamanho = Vector2(920, 48)
-altura_visual = 96.0
-
-[node name="Vitral1" parent="." instance=ExtResource("10_vit")]
-position = Vector2(880, 560)
-
-[node name="VitLuzA1" parent="." instance=ExtResource("9_pl") groups=["vitral_luz"]]
-position = Vector2(1060, 580)
-tamanho = Vector2(150, 22)
-altura_visual = 26.0
-
-[node name="Visual" parent="VitLuzA1" index="0"]
-modulate = Color(1, 1, 1, 0.12)
-
-[node name="Col" parent="VitLuzA1" index="1"]
-disabled = true
-
-[node name="VitLuzA2" parent="." instance=ExtResource("9_pl") groups=["vitral_luz"]]
-position = Vector2(1250, 540)
-tamanho = Vector2(150, 22)
-altura_visual = 26.0
-
-[node name="Visual" parent="VitLuzA2" index="0"]
-modulate = Color(1, 1, 1, 0.12)
-
-[node name="Col" parent="VitLuzA2" index="1"]
-disabled = true
-
-[node name="VitLuzA3" parent="." instance=ExtResource("9_pl") groups=["vitral_luz"]]
-position = Vector2(1440, 580)
-tamanho = Vector2(150, 22)
-altura_visual = 26.0
-
-[node name="Visual" parent="VitLuzA3" index="0"]
-modulate = Color(1, 1, 1, 0.12)
-
-[node name="Col" parent="VitLuzA3" index="1"]
-disabled = true
-
-[node name="Vitral2" parent="." instance=ExtResource("10_vit")]
-position = Vector2(1980, 560)
-grupo_luz = "vitral_luz_b"
-cor_luz = Color(1, 0.7, 0.4, 1)
-
-[node name="VitLuzB1" parent="." instance=ExtResource("9_pl") groups=["vitral_luz_b"]]
-position = Vector2(2160, 580)
-tamanho = Vector2(150, 22)
-altura_visual = 26.0
-
-[node name="Visual" parent="VitLuzB1" index="0"]
-modulate = Color(1, 1, 1, 0.12)
-
-[node name="Col" parent="VitLuzB1" index="1"]
-disabled = true
-
-[node name="VitLuzB2" parent="." instance=ExtResource("9_pl") groups=["vitral_luz_b"]]
-position = Vector2(2350, 540)
-tamanho = Vector2(150, 22)
-altura_visual = 26.0
-
-[node name="Visual" parent="VitLuzB2" index="0"]
-modulate = Color(1, 1, 1, 0.12)
-
-[node name="Col" parent="VitLuzB2" index="1"]
-disabled = true
-
-[node name="VitLuzB3" parent="." instance=ExtResource("9_pl") groups=["vitral_luz_b"]]
-position = Vector2(2540, 580)
-tamanho = Vector2(150, 22)
-altura_visual = 26.0
-
-[node name="Visual" parent="VitLuzB3" index="0"]
-modulate = Color(1, 1, 1, 0.12)
-
-[node name="Col" parent="VitLuzB3" index="1"]
-disabled = true
-
-[node name="SerraNave" parent="." instance=ExtResource("11_serra")]
-position = Vector2(1600, 560)
-percurso = Vector2(280, 0)
-tempo = 2.0
-
-[node name="EspinhosVao" parent="." instance=ExtResource("12_esp")]
-position = Vector2(1780, 616)
-largura = 8
-
-[node name="LuzInicio" type="PointLight2D" parent="."]
-position = Vector2(420, 600)
-texture = SubResource("tex_luz")
-energy = 0.45
-color = Color(0.75, 0.45, 1, 1)
-scale = Vector2(1.9, 1.1)
-
-[node name="LuzArena" type="PointLight2D" parent="."]
-position = Vector2(2760, 600)
-texture = SubResource("tex_luz")
-energy = 0.55
-color = Color(0.75, 0.45, 1, 1)
-scale = Vector2(2.6, 1.5)
-
-[node name="Koliani" parent="." instance=ExtResource("1_kol")]
-position = Vector2(150, 560)
-
-[node name="Demonio1" parent="." instance=ExtResource("2_dem")]
-especie = "olho"
-position = Vector2(560, 560)
-alcance_patrulha = 200.0
-
-[node name="Demonio2" parent="." instance=ExtResource("2_dem")]
+[node name="EliteRaptor" parent="." instance=ExtResource("2_dem")]
+position = Vector2(1380, 636)
+scale = Vector2(1.4, 1.4)
 especie = "raptor"
-position = Vector2(1600, 604)
+vida = 195
+dano_contacto = 25
+comportamento = "carga"
 alcance_patrulha = 140.0
+cor_rim = Color(0.8, 0.5, 1.0, 1)
 
-[node name="Demonio3" parent="." instance=ExtResource("2_dem")]
-especie = "olho"
-position = Vector2(2900, 540)
-alcance_patrulha = 240.0
+; -- BIFURCACAO: GALERIA alta / NAVE baixa --
+[node name="Gal1" parent="." instance=ExtResource("9_pl")]
+position = Vector2(1600, 600)
+tamanho = Vector2(150, 20)
+altura_visual = 26.0
+cor_base = Color(0.22, 0.18, 0.28, 1)
+cor_topo = Color(0.44, 0.36, 0.54, 1)
+
+[node name="Gal2" parent="." instance=ExtResource("9_pl")]
+position = Vector2(1800, 550)
+tamanho = Vector2(150, 20)
+altura_visual = 26.0
+cor_base = Color(0.22, 0.18, 0.28, 1)
+cor_topo = Color(0.44, 0.36, 0.54, 1)
+
+[node name="VitralB" parent="." instance=ExtResource("10_vitral")]
+position = Vector2(1900, 440)
+grupo_luz = "vitral_b"
+
+[node name="Gal3" parent="." instance=ExtResource("9_pl")]
+position = Vector2(2000, 580)
+tamanho = Vector2(150, 20)
+altura_visual = 26.0
+cor_base = Color(0.22, 0.18, 0.28, 1)
+cor_topo = Color(0.44, 0.36, 0.54, 1)
+
+[node name="Nav1" parent="." instance=ExtResource("9_pl")]
+position = Vector2(1620, 720)
+tamanho = Vector2(160, 20)
+altura_visual = 30.0
+cor_base = Color(0.22, 0.18, 0.28, 1)
+cor_topo = Color(0.44, 0.36, 0.54, 1)
+
+[node name="Nav2" parent="." instance=ExtResource("9_pl")]
+position = Vector2(1840, 720)
+tamanho = Vector2(160, 20)
+altura_visual = 30.0
+cor_base = Color(0.22, 0.18, 0.28, 1)
+cor_topo = Color(0.44, 0.36, 0.54, 1)
+
+[node name="GoblinNav" parent="." instance=ExtResource("2_dem")]
+position = Vector2(1840, 694)
+especie = "xamane"
+alcance_patrulha = 80.0
+
+[node name="Nav3" parent="." instance=ExtResource("9_pl")]
+position = Vector2(2060, 700)
+tamanho = Vector2(160, 20)
+altura_visual = 30.0
+cor_base = Color(0.22, 0.18, 0.28, 1)
+cor_topo = Color(0.44, 0.36, 0.54, 1)
+
+[node name="Reencontro" parent="." instance=ExtResource("9_pl")]
+position = Vector2(2280, 640)
+tamanho = Vector2(200, 24)
+altura_visual = 40.0
+cor_base = Color(0.22, 0.18, 0.28, 1)
+cor_topo = Color(0.46, 0.38, 0.56, 1)
+
+[node name="ColProjetil" parent="." instance=ExtResource("3_col")]
+position = Vector2(2280, 604)
+habilidade_id = "projetil"
+
+[node name="ChaoChefe" parent="." instance=ExtResource("9_pl")]
+position = Vector2(2720, 700)
+tamanho = Vector2(560, 60)
+altura_visual = 110.0
+cor_base = Color(0.22, 0.18, 0.28, 1)
+cor_topo = Color(0.44, 0.36, 0.54, 1)
 
 [node name="Chefe" parent="." instance=ExtResource("6_chefe")]
-position = Vector2(2800, 400)
+position = Vector2(2840, 624)
 
-[node name="ColLivro" parent="." instance=ExtResource("3_col")]
-position = Vector2(1250, 500)
-pista_id = "catedral_registo_de_almas"
+[node name="LuzChefe" type="PointLight2D" parent="."]
+position = Vector2(2720, 620)
+texture = SubResource("tex_luz")
+energy = 0.6
+color = Color(0.8, 0.5, 1.0, 1)
+scale = Vector2(2.9, 1.7)
+
+[node name="Koliani" parent="." instance=ExtResource("1_kol")]
+position = Vector2(150, 620)
 
 [node name="CheckInicio" type="Area2D" parent="."]
-position = Vector2(400, 588)
+position = Vector2(420, 636)
 collision_layer = 16
 collision_mask = 2
 script = ExtResource("5_chk")
-
-[node name="Visual" type="ColorRect" parent="CheckInicio"]
-offset_left = -5.0
-offset_top = -42.0
-offset_right = 5.0
-offset_bottom = 40.0
-color = Color(0.36, 0.28, 0.55, 1)
-
-[node name="Luz" type="Node2D" parent="CheckInicio"]
-visible = false
-
-[node name="Brilho" type="ColorRect" parent="CheckInicio/Luz"]
-offset_left = -20.0
-offset_top = -54.0
-offset_right = 20.0
-offset_bottom = 44.0
-color = Color(0.85, 0.31, 0.83, 0.32)
-
-[node name="PointLight2D" type="PointLight2D" parent="CheckInicio/Luz"]
-texture = SubResource("tex_luz")
-energy = 1.1
-color = Color(0.93, 0.4, 0.9, 1)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CheckInicio"]
 shape = SubResource("rs_chk")
 
-[node name="CheckArena" type="Area2D" parent="."]
-position = Vector2(2500, 588)
+[node name="CheckMeio" type="Area2D" parent="."]
+position = Vector2(1380, 636)
 collision_layer = 16
 collision_mask = 2
 script = ExtResource("5_chk")
 
-[node name="Visual" type="ColorRect" parent="CheckArena"]
-offset_left = -5.0
-offset_top = -42.0
-offset_right = 5.0
-offset_bottom = 40.0
-color = Color(0.36, 0.28, 0.55, 1)
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckMeio"]
+shape = SubResource("rs_chk")
 
-[node name="Luz" type="Node2D" parent="CheckArena"]
-visible = false
+[node name="CheckReencontro" type="Area2D" parent="."]
+position = Vector2(2280, 612)
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("5_chk")
 
-[node name="Brilho" type="ColorRect" parent="CheckArena/Luz"]
-offset_left = -20.0
-offset_top = -54.0
-offset_right = 20.0
-offset_bottom = 44.0
-color = Color(0.85, 0.31, 0.83, 0.32)
-
-[node name="PointLight2D" type="PointLight2D" parent="CheckArena/Luz"]
-texture = SubResource("tex_luz")
-energy = 1.1
-color = Color(0.93, 0.4, 0.9, 1)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckArena"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckReencontro"]
 shape = SubResource("rs_chk")
 
 [node name="Porta" parent="." instance=ExtResource("4_porta")]
-position = Vector2(3200, 586)
+position = Vector2(2980, 626)
 pista_ao_atravessar = ""

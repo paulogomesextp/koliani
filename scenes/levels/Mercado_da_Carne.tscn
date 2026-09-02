@@ -1,10 +1,10 @@
-[gd_scene load_steps=16 format=3 uid="uid://bkolianimercadocarne22"]
+[gd_scene load_steps=12 format=3 uid="uid://bkolianimercado22"]
 
-; Região V / nível 22 -- Mercado da Carne.
-; Plataformas de corrente (`PlataformaCorrente`), caixas (`Plataforma`
-; empilhadas) e um carrinho (`PlataformaFlutuante` com deriva). Arena com
-; O Açougueiro Real -- dois cutelos; CADA golpe que ele leva sobe/baixa
-; uma plataforma do grupo "acougue_moveis" (a arena muda enquanto se luta).
+; REGIAO V / nivel 22 -- Mercado da Carne.
+; Nivel FEITO A MAO (corredor = false). Ganchos e carrinhos: plataformas de
+; CORRENTE (PlataformaCorrente) entre bancas solidas. Bifurcacao: ganchos
+; de cima / bancas de baixo. Elite: orc de carga. Acido citrino por baixo.
+; Chefe: O Acougueiro Real.
 
 [ext_resource type="PackedScene" uid="uid://bkolianiactor01" path="res://scenes/actors/Koliani.tscn" id="1_kol"]
 [ext_resource type="PackedScene" uid="uid://bdemoniobase01" path="res://scenes/actors/DemonioBase.tscn" id="2_dem"]
@@ -15,12 +15,11 @@
 [ext_resource type="Script" path="res://scripts/nivel_com_chefe.gd" id="7_niv"]
 [ext_resource type="PackedScene" uid="uid://bkolianiatmosfera01" path="res://scenes/fx/Atmosfera.tscn" id="8_atm"]
 [ext_resource type="PackedScene" uid="uid://bkolianiplataforma01" path="res://scenes/actors/Plataforma.tscn" id="9_pl"]
-[ext_resource type="PackedScene" uid="uid://bkolianiplatcorrente06" path="res://scenes/actors/PlataformaCorrente.tscn" id="10_pc"]
-[ext_resource type="PackedScene" uid="uid://bkolianiplatflutuante01" path="res://scenes/actors/PlataformaFlutuante.tscn" id="11_pf"]
-[ext_resource type="PackedScene" uid="uid://bkolianiserra01" path="res://scenes/actors/Serra.tscn" id="12_serra"]
+[ext_resource type="PackedScene" uid="uid://bkolianiplatcorrente06" path="res://scenes/actors/PlataformaCorrente.tscn" id="10_corr"]
+[ext_resource type="PackedScene" uid="uid://bkolianiaguavenenosa01" path="res://scenes/actors/AguaVenenosa.tscn" id="11_acido"]
 
 [sub_resource type="RectangleShape2D" id="rs_chk"]
-size = Vector2(40, 80)
+size = Vector2(44, 96)
 
 [sub_resource type="Gradient" id="grad_luz"]
 offsets = PackedFloat32Array(0, 1)
@@ -36,200 +35,195 @@ fill_to = Vector2(1, 0.5)
 
 [node name="Mercado_da_Carne" type="Node2D"]
 script = ExtResource("7_niv")
+corredor = false
 
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
-cor_ambiente = Color(0.7, 0.52, 0.64, 1)
-cor_fundo = Color(0.06, 0.035, 0.06, 1)
-cor_silhueta = Color(0.13, 0.07, 0.08, 1)
+cor_ambiente = Color(0.7, 0.5, 0.56, 1)
+cor_fundo = Color(0.05, 0.03, 0.04, 1)
+cor_silhueta = Color(0.13, 0.08, 0.1, 1)
 cor_luz = Color(1.0, 0.48, 0.56, 1)
-cor_poeira = Color(1.0, 0.66, 0.72, 1)
-densidade_poeira = 1.7
+cor_poeira = Color(1.0, 0.68, 0.74, 1)
+densidade_poeira = 1.6
 bioma = "cidade"
-largura_nivel = 3200.0
-luzes_horizonte = true
+largura_nivel = 3400.0
 fundo_pack = "igreja"
-tinta_fundo = Color(0.86, 0.62, 0.92, 1)
-neblina_fundo = 0.38
+tinta_fundo = Color(1.0, 0.66, 0.72, 1)
+neblina_fundo = 0.36
 dessaturar_fundo = 0.34
 
+[node name="Acido" parent="." instance=ExtResource("11_acido")]
+position = Vector2(1700, 980)
+largura = 3900.0
+altura = 340.0
+cor = Color(0.34, 0.4, 0.12, 0.93)
+
 [node name="ChaoInicio" parent="." instance=ExtResource("9_pl")]
-position = Vector2(400, 660)
-tamanho = Vector2(560, 48)
-altura_visual = 96.0
+position = Vector2(300, 700)
+tamanho = Vector2(440, 60)
+altura_visual = 110.0
+cor_base = Color(0.28, 0.2, 0.24, 1)
+cor_topo = Color(0.56, 0.42, 0.46, 1)
 
-[node name="Caixa1" parent="." instance=ExtResource("9_pl")]
-position = Vector2(760, 596)
-tamanho = Vector2(90, 90)
-altura_visual = 90.0
+[node name="Banca1" parent="." instance=ExtResource("9_pl")]
+position = Vector2(580, 660)
+tamanho = Vector2(150, 22)
+altura_visual = 32.0
+cor_base = Color(0.28, 0.2, 0.24, 1)
+cor_topo = Color(0.54, 0.4, 0.44, 1)
 
-[node name="Caixa2" parent="." instance=ExtResource("9_pl")]
-position = Vector2(860, 540)
-tamanho = Vector2(90, 90)
-altura_visual = 90.0
+[node name="Gancho1" parent="." instance=ExtResource("10_corr")]
+position = Vector2(760, 610)
+modo = "pendulo"
+amplitude = 30.0
+periodo = 2.6
+comprimento = 140.0
+largura = 120.0
+
+[node name="Banca2" parent="." instance=ExtResource("9_pl")]
+position = Vector2(920, 660)
+tamanho = Vector2(150, 22)
+altura_visual = 32.0
+cor_base = Color(0.28, 0.2, 0.24, 1)
+cor_topo = Color(0.54, 0.4, 0.44, 1)
+
+[node name="Gancho2" parent="." instance=ExtResource("10_corr")]
+position = Vector2(1100, 620)
+modo = "vertical"
+amplitude = 60.0
+periodo = 3.0
+fase = 0.5
+largura = 120.0
+
+[node name="Banca3" parent="." instance=ExtResource("9_pl")]
+position = Vector2(1240, 660)
+tamanho = Vector2(150, 22)
+altura_visual = 32.0
+cor_base = Color(0.28, 0.2, 0.24, 1)
+cor_topo = Color(0.54, 0.4, 0.44, 1)
 
 [node name="ChaoMeio" parent="." instance=ExtResource("9_pl")]
+position = Vector2(1520, 700)
+tamanho = Vector2(340, 60)
+altura_visual = 110.0
+cor_base = Color(0.28, 0.2, 0.24, 1)
+cor_topo = Color(0.54, 0.4, 0.44, 1)
+
+[node name="EliteOrc" parent="." instance=ExtResource("2_dem")]
 position = Vector2(1520, 636)
-tamanho = Vector2(360, 44)
-altura_visual = 80.0
-
-[node name="ChaoArena" parent="." instance=ExtResource("9_pl")]
-position = Vector2(2660, 660)
-tamanho = Vector2(940, 48)
-altura_visual = 96.0
-
-[node name="Corrente1" parent="." instance=ExtResource("10_pc")]
-position = Vector2(1080, 540)
-modo = "pendulo"
-amplitude = 34.0
-periodo = 2.8
-comprimento = 150.0
-largura = 120.0
-
-[node name="Corrente2" parent="." instance=ExtResource("10_pc")]
-position = Vector2(1300, 520)
-modo = "vertical"
-amplitude = 90.0
-periodo = 2.6
-comprimento = 170.0
-largura = 120.0
-
-[node name="Corrente3" parent="." instance=ExtResource("10_pc")]
-position = Vector2(1900, 540)
-modo = "pendulo"
-amplitude = 34.0
-periodo = 3.0
-fase = 1.0
-comprimento = 150.0
-largura = 120.0
-
-[node name="Carrinho" parent="." instance=ExtResource("11_pf")]
-position = Vector2(2100, 600)
-largura = 150.0
-balanco = 6.0
-deriva = 220.0
-periodo_deriva = 4.6
-
-[node name="SerraMeio" parent="." instance=ExtResource("12_serra")]
-position = Vector2(1520, 560)
-percurso = Vector2(300, 0)
-tempo = 2.0
-
-[node name="MovelA" parent="." instance=ExtResource("9_pl") groups=["acougue_moveis"]]
-position = Vector2(2420, 560)
-tamanho = Vector2(160, 22)
-altura_visual = 26.0
-
-[node name="MovelB" parent="." instance=ExtResource("9_pl") groups=["acougue_moveis"]]
-position = Vector2(2680, 520)
-tamanho = Vector2(160, 22)
-altura_visual = 26.0
-
-[node name="MovelC" parent="." instance=ExtResource("9_pl") groups=["acougue_moveis"]]
-position = Vector2(2940, 560)
-tamanho = Vector2(160, 22)
-altura_visual = 26.0
-
-[node name="LuzInicio" type="PointLight2D" parent="."]
-position = Vector2(400, 600)
-texture = SubResource("tex_luz")
-energy = 0.5
-color = Color(1, 0.5, 0.45, 1)
-scale = Vector2(1.9, 1.1)
-
-[node name="LuzArena" type="PointLight2D" parent="."]
-position = Vector2(2660, 600)
-texture = SubResource("tex_luz")
-energy = 0.55
-color = Color(1, 0.5, 0.45, 1)
-scale = Vector2(2.6, 1.5)
-
-[node name="Koliani" parent="." instance=ExtResource("1_kol")]
-position = Vector2(150, 560)
-
-[node name="Demonio1" parent="." instance=ExtResource("2_dem")]
+scale = Vector2(1.45, 1.45)
 especie = "orc"
-position = Vector2(520, 604)
-alcance_patrulha = 200.0
+vida = 200
+dano_contacto = 26
+comportamento = "carga"
+alcance_patrulha = 120.0
+cor_rim = Color(1.0, 0.5, 0.58, 1)
 
-[node name="Demonio2" parent="." instance=ExtResource("2_dem")]
-especie = "abobora"
-position = Vector2(1520, 588)
-alcance_patrulha = 140.0
+; -- BIFURCACAO: GANCHOS de cima / BANCAS de baixo --
+[node name="Cima1" parent="." instance=ExtResource("9_pl")]
+position = Vector2(1740, 600)
+tamanho = Vector2(140, 20)
+altura_visual = 26.0
+cor_base = Color(0.28, 0.2, 0.24, 1)
+cor_topo = Color(0.54, 0.4, 0.44, 1)
 
-[node name="Demonio3" parent="." instance=ExtResource("2_dem")]
-especie = "xamane"
-position = Vector2(2780, 604)
-alcance_patrulha = 240.0
+[node name="GanchoAlto" parent="." instance=ExtResource("10_corr")]
+position = Vector2(1920, 560)
+modo = "horizontal"
+amplitude = 90.0
+periodo = 3.2
+largura = 120.0
+
+[node name="Cima2" parent="." instance=ExtResource("9_pl")]
+position = Vector2(2100, 580)
+tamanho = Vector2(140, 20)
+altura_visual = 26.0
+cor_base = Color(0.28, 0.2, 0.24, 1)
+cor_topo = Color(0.54, 0.4, 0.44, 1)
+
+[node name="Baixo1" parent="." instance=ExtResource("9_pl")]
+position = Vector2(1760, 720)
+tamanho = Vector2(150, 20)
+altura_visual = 30.0
+cor_base = Color(0.28, 0.2, 0.24, 1)
+cor_topo = Color(0.54, 0.4, 0.44, 1)
+
+[node name="Baixo2" parent="." instance=ExtResource("9_pl")]
+position = Vector2(1960, 720)
+tamanho = Vector2(150, 20)
+altura_visual = 30.0
+cor_base = Color(0.28, 0.2, 0.24, 1)
+cor_topo = Color(0.54, 0.4, 0.44, 1)
+
+[node name="GoblinBaixo" parent="." instance=ExtResource("2_dem")]
+position = Vector2(1960, 694)
+especie = "raptor"
+alcance_patrulha = 80.0
+
+[node name="Baixo3" parent="." instance=ExtResource("9_pl")]
+position = Vector2(2160, 700)
+tamanho = Vector2(150, 20)
+altura_visual = 30.0
+cor_base = Color(0.28, 0.2, 0.24, 1)
+cor_topo = Color(0.54, 0.4, 0.44, 1)
+
+[node name="Reencontro" parent="." instance=ExtResource("9_pl")]
+position = Vector2(2360, 640)
+tamanho = Vector2(200, 24)
+altura_visual = 40.0
+cor_base = Color(0.28, 0.2, 0.24, 1)
+cor_topo = Color(0.56, 0.42, 0.46, 1)
+
+[node name="ColProjetil" parent="." instance=ExtResource("3_col")]
+position = Vector2(2360, 604)
+habilidade_id = "projetil"
+
+[node name="ChaoChefe" parent="." instance=ExtResource("9_pl")]
+position = Vector2(2800, 700)
+tamanho = Vector2(560, 60)
+altura_visual = 110.0
+cor_base = Color(0.28, 0.2, 0.24, 1)
+cor_topo = Color(0.54, 0.4, 0.44, 1)
 
 [node name="Chefe" parent="." instance=ExtResource("6_chefe")]
-position = Vector2(2660, 552)
+position = Vector2(2920, 624)
 
-[node name="ColGancho" parent="." instance=ExtResource("3_col")]
-position = Vector2(1300, 460)
-pista_id = "mercado_gancho_vazio"
+[node name="LuzChefe" type="PointLight2D" parent="."]
+position = Vector2(2800, 620)
+texture = SubResource("tex_luz")
+energy = 0.6
+color = Color(1.0, 0.52, 0.6, 1)
+scale = Vector2(2.9, 1.7)
+
+[node name="Koliani" parent="." instance=ExtResource("1_kol")]
+position = Vector2(150, 620)
 
 [node name="CheckInicio" type="Area2D" parent="."]
-position = Vector2(380, 588)
+position = Vector2(420, 636)
 collision_layer = 16
 collision_mask = 2
 script = ExtResource("5_chk")
-
-[node name="Visual" type="ColorRect" parent="CheckInicio"]
-offset_left = -5.0
-offset_top = -42.0
-offset_right = 5.0
-offset_bottom = 40.0
-color = Color(0.36, 0.28, 0.55, 1)
-
-[node name="Luz" type="Node2D" parent="CheckInicio"]
-visible = false
-
-[node name="Brilho" type="ColorRect" parent="CheckInicio/Luz"]
-offset_left = -20.0
-offset_top = -54.0
-offset_right = 20.0
-offset_bottom = 44.0
-color = Color(0.85, 0.31, 0.83, 0.32)
-
-[node name="PointLight2D" type="PointLight2D" parent="CheckInicio/Luz"]
-texture = SubResource("tex_luz")
-energy = 1.1
-color = Color(0.93, 0.4, 0.9, 1)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CheckInicio"]
 shape = SubResource("rs_chk")
 
-[node name="CheckArena" type="Area2D" parent="."]
-position = Vector2(2400, 588)
+[node name="CheckMeio" type="Area2D" parent="."]
+position = Vector2(1520, 636)
 collision_layer = 16
 collision_mask = 2
 script = ExtResource("5_chk")
 
-[node name="Visual" type="ColorRect" parent="CheckArena"]
-offset_left = -5.0
-offset_top = -42.0
-offset_right = 5.0
-offset_bottom = 40.0
-color = Color(0.36, 0.28, 0.55, 1)
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckMeio"]
+shape = SubResource("rs_chk")
 
-[node name="Luz" type="Node2D" parent="CheckArena"]
-visible = false
+[node name="CheckReencontro" type="Area2D" parent="."]
+position = Vector2(2360, 612)
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("5_chk")
 
-[node name="Brilho" type="ColorRect" parent="CheckArena/Luz"]
-offset_left = -20.0
-offset_top = -54.0
-offset_right = 20.0
-offset_bottom = 44.0
-color = Color(0.85, 0.31, 0.83, 0.32)
-
-[node name="PointLight2D" type="PointLight2D" parent="CheckArena/Luz"]
-texture = SubResource("tex_luz")
-energy = 1.1
-color = Color(0.93, 0.4, 0.9, 1)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckArena"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckReencontro"]
 shape = SubResource("rs_chk")
 
 [node name="Porta" parent="." instance=ExtResource("4_porta")]
-position = Vector2(3120, 586)
+position = Vector2(3060, 626)
 pista_ao_atravessar = ""
