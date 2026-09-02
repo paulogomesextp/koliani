@@ -301,5 +301,8 @@
 
 	"sel.reward": "Prémio: %s",
 
+	"chefe.escudo_cargas": "CARGAS DO ESCUDO: %d",
+	"chefe.escudo_partido": "ESCUDO PARTIDO",
+
 	"hud.ability.escalar_paredes": "Escalar Paredes"
 }

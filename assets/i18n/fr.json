@@ -301,5 +301,8 @@
 
 	"sel.reward": "Reward: %s",
 
+	"chefe.escudo_cargas": "CHARGES DU BOUCLIER : %d",
+	"chefe.escudo_partido": "BOUCLIER BRISÉ",
+
 	"hud.ability.escalar_paredes": "Wall Climb"
 }

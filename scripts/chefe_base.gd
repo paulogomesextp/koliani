@@ -47,11 +47,18 @@ var _ja_derrotado := false
 var _musica_boss := false
 
 ## Escudo brilhante da cor do chefe que aparece enquanto ele está BLINDADO
-## (fora da janela EXPOSTA). A maioria dos chefes só leva dano na janela a
-## seguir a cada ataque -- este escudo torna isso legível. `usa_escudo_boss
-## = false` no `_ready` de um chefe que leve dano SEMPRE (Carcereiro,
-## Ghorak-da-Floresta).
+## (fora da janela EXPOSTA). Bloqueia dano A SÉRIO enquanto tiver cargas
+## (pedido do Paulo, 2 set 2026): cada golpe que acerte com o escudo em pé
+## gasta uma carga sem tirar vida; à última carga o escudo parte-se de vez
+## (mostra "BROKEN SHIELD") e abre-se a janela EXPOSTA, onde os golpes
+## tiram vida a sério. `usa_escudo_boss = false` no `_ready` de um chefe
+## que leve dano SEMPRE (Carcereiro, Ghorak-da-Floresta).
 var usa_escudo_boss := true
+## Golpes que o escudo aguenta por ciclo antes de partir. Modesto de
+## propósito -- é para dar ritmo ao combate, não tornar os chefes esponja.
+const CARGAS_ESCUDO := 2
+var _cargas_restantes := 0
+var _texto_cargas: Label
 ## Segundos desde o último golpe que ENTROU (reduziu vida). Enquanto > 0 o
 ## chefe está na janela EXPOSTA -> escudo escondido.
 var _dano_recente := 0.0
@@ -140,6 +147,18 @@ func _montar_escudo_boss() -> void:
 	luz.scale = Vector2(r / 90.0, r / 90.0)
 	_escudo_boss.add_child(luz)
 
+	_texto_cargas = Label.new()
+	_texto_cargas.name = "TextoCargas"
+	_texto_cargas.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_texto_cargas.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_texto_cargas.add_theme_font_size_override("font_size", 14)
+	_texto_cargas.add_theme_color_override("font_color", cor.lightened(0.5))
+	_texto_cargas.add_theme_color_override("font_outline_color", Color(0.02, 0.01, 0.03))
+	_texto_cargas.add_theme_constant_override("outline_size", 4)
+	_texto_cargas.size = Vector2(200.0, 24.0)
+	_texto_cargas.position = Vector2(-100.0, -r - 26.0)
+	_escudo_boss.add_child(_texto_cargas)
+
 
 func _circulo_pts(raio: float, n: int) -> PackedVector2Array:
 	var pts := PackedVector2Array()
@@ -194,6 +213,9 @@ func _atualizar_escudo_boss(dt: float) -> void:
 		and _dano_recente <= 0.0
 	if mostrar != _escudo_boss.visible:
 		_escudo_boss.visible = mostrar
+		if mostrar:
+			_cargas_restantes = CARGAS_ESCUDO  # escudo volta a carregar
+			_atualizar_texto_cargas()
 	if not mostrar:
 		return
 	_escudo_t += dt
@@ -304,6 +326,18 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0) -> void:
 		return
 	_garantir_vida_maxima()
 	provocar()  # levou o primeiro golpe = combate a sério
+	# escudo de pé com cargas: bloqueia o golpe por completo (sem tirar
+	# vida) em vez de abrir logo a janela EXPOSTA. À última carga parte-se.
+	if usa_escudo_boss and _escudo_boss and _escudo_boss.visible and _cargas_restantes > 0:
+		_cargas_restantes -= 1
+		_atualizar_texto_cargas()
+		global_position.x += dir_empurrao * 1.5
+		Som.toca("bloqueio", -8.0, 0.85)
+		if _cargas_restantes <= 0:
+			_escudo_boss.visible = false
+			_dano_recente = 0.85  # abre a janela EXPOSTA
+			_mostrar_texto_quebrado()
+		return
 	vida -= quantidade
 	_dano_recente = 0.85  # golpe entrou -> janela EXPOSTA -> esconde o escudo
 	global_position.x += dir_empurrao * 3.0
@@ -321,6 +355,32 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0) -> void:
 			queue_free()
 	else:
 		piscar_dano()
+
+
+func _atualizar_texto_cargas() -> void:
+	if _texto_cargas:
+		_texto_cargas.text = Textos.tf("chefe.escudo_cargas", [_cargas_restantes])
+
+
+## Aviso a vermelho no instante em que o escudo parte -- some sozinho.
+func _mostrar_texto_quebrado() -> void:
+	var lbl := Label.new()
+	lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	lbl.add_theme_font_size_override("font_size", 18)
+	lbl.add_theme_color_override("font_color", Color(1.0, 0.22, 0.22))
+	lbl.add_theme_color_override("font_outline_color", Color(0.05, 0.0, 0.0))
+	lbl.add_theme_constant_override("outline_size", 5)
+	lbl.text = Textos.t("chefe.escudo_partido")
+	lbl.size = Vector2(240.0, 28.0)
+	var base: Vector2 = _sprite.position if _sprite else Vector2.ZERO
+	lbl.position = base + Vector2(-120.0, -120.0 * maxf(0.8, escala_visual))
+	lbl.z_index = 7
+	add_child(lbl)
+	var t := create_tween()
+	t.tween_interval(0.7)
+	t.tween_property(lbl, "modulate:a", 0.0, 0.5)
+	t.tween_callback(lbl.queue_free)
 
 
 ## Morte dos chefes-história: congela o chefe, diz as últimas falas e só

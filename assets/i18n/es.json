@@ -301,5 +301,8 @@
 
 	"sel.reward": "Reward: %s",
 
+	"chefe.escudo_cargas": "CARGAS DEL ESCUDO: %d",
+	"chefe.escudo_partido": "ESCUDO ROTO",
+
 	"hud.ability.escalar_paredes": "Wall Climb"
 }

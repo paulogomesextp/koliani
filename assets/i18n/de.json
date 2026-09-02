@@ -301,5 +301,8 @@
 
 	"sel.reward": "Reward: %s",
 
+	"chefe.escudo_cargas": "SCHILDLADUNGEN: %d",
+	"chefe.escudo_partido": "SCHILD ZERSTÖRT",
+
 	"hud.ability.escalar_paredes": "Wall Climb"
 }

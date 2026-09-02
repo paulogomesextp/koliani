@@ -301,5 +301,8 @@
 
 	"sel.reward": "Reward: %s",
 
+	"chefe.escudo_cargas": "护盾层数：%d",
+	"chefe.escudo_partido": "护盾破碎",
+
 	"hud.ability.escalar_paredes": "Wall Climb"
 }
