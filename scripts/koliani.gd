@@ -1297,10 +1297,11 @@ func definir_grav_escala(v: float) -> void:
 	_grav_escala = clampf(v, 0.2, 1.5)
 
 
-## Inverte os controlos horizontais por `segundos` (O Olho do Abismo, nível 20).
-func inverter_controlos(segundos: float) -> void:
-	_inverso = -1.0
-	_inverso_restante = maxf(_inverso_restante, segundos)
+## RETIRADO (pedido do Paulo): a inversão de controlos do Olho do Abismo
+## (nível 20) dava a sensação de "o boneco anda ao contrário / perde os
+## movimentos". Fica como no-op para não partir quem a chama.
+func inverter_controlos(_segundos: float) -> void:
+	pass
 
 
 ## Corrente de ar a empurrar para cima (Torre dos Ventos, nível 12). A

@@ -282,12 +282,13 @@ func _largar_clones() -> void:
 		t.tween_callback(c.queue_free)
 
 
+## RETIRADO a inversão de controlos (pedido do Paulo: dava a sensação de o
+## boneco andar ao contrário). Em vez disso, o Olho volta a largar clones
+## -- mantém a pressão do ataque sem mexer nos comandos.
 func _inverter() -> void:
 	Som.toca("bloqueio", -6.0, 0.5)
 	_abanar_camera(4.0)
-	var k := _obter_koliani()
-	if k and k.has_method("inverter_controlos"):
-		k.inverter_controlos(seg_inverso * (1.4 if _fase2 else 1.0))
+	_largar_clones()
 
 
 ## --- fase 2 --------------------------------------------------------
