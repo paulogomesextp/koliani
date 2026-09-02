@@ -293,6 +293,7 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0, critico := false) 
 		if _sprite:
 			_sprite.modulate = Color(0.6, 0.8, 0.7)
 			create_tween().tween_property(_sprite, "modulate", Color(1, 1, 1), 0.12)
+		_raspao(quantidade, dir_empurrao)
 		return
 	super.receber_dano(int(round(quantidade * 2.0)), dir_empurrao, critico)
 

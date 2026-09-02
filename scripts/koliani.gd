@@ -654,23 +654,27 @@ func _physics_process(dt: float) -> void:
 	if _stomp_cd <= 0.0 and velocity.y > 40.0 and not is_on_floor() and _dash_restante <= 0.0:
 		var pes := global_position.y + 24.0
 		for e in get_tree().get_nodes_in_group("inimigos"):
-			if not is_instance_valid(e) or (e as Node).is_in_group("chefes") \
-					or not (e as Node).has_method("receber_dano"):
+			if not is_instance_valid(e) or not (e as Node).has_method("receber_dano"):
 				continue
 			if "vida" in e and e.vida <= 0:
 				continue
+			var chefe: bool = (e as Node).is_in_group("chefes")
 			var ep: Vector2 = (e as Node2D).global_position
-			if absf(ep.x - global_position.x) > 46.0:
+			# chefes são maiores: banda de aceitação mais alta e mais larga
+			var larg := 62.0 if chefe else 46.0
+			var alto := 210.0 if chefe else 52.0
+			if absf(ep.x - global_position.x) > larg:
 				continue
-			# centro da Koliani acima do centro do inimigo e os pés dela na
-			# banda do topo dele (larga, apanha bichos altos e baixos)
-			if global_position.y > ep.y + 6.0 or pes < ep.y - 52.0 or pes > ep.y + 30.0:
+			# a Koliani vem a descer por cima e os pés dela na banda do topo
+			if global_position.y > ep.y + 6.0 or pes < ep.y - alto or pes > ep.y + 30.0:
 				continue
 			var crit_stomp: bool = e.has_method("esta_vulneravel") and e.esta_vulneravel()
+			# pisar um chefe = dano (raspão/normal, tratado pelo receber_dano
+			# dele), NUNCA leva dano de contacto -- ressalta sempre.
 			e.receber_dano(_dano_golpe(), 0.0, crit_stomp)
 			# pulo automático ALTO, imune ao corte de salto (ver aplicar_impulso)
 			aplicar_impulso(Vector2(0.0, -STOMP_RESSALTO), true)
-			_invulneravel = maxf(_invulneravel, 0.3)
+			_invulneravel = maxf(_invulneravel, 0.4 if chefe else 0.3)
 			_stomp_cd = 0.22
 			_pop = 1.0
 			_squash = maxf(_squash, 0.5)

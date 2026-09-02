@@ -479,6 +479,41 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0, critico := false) 
 		piscar_dano()
 
 
+## Dano de RASPÃO: o golpe apanhou o chefe fora da janela EXPOSTA (blindado).
+## Em vez de "não passa nada", tira uma fatia pequena da vida -- o escudo
+## sente-se a gastar quando insistimos, sem estragar a leitura (não abre a
+## janela EXPOSTA nem esconde o escudo). Chamado pelos chefes concretos no
+## ramo de bloqueio do `receber_dano`.
+var _raspao_acc := 0.0
+
+func _raspao(quantidade: int, dir_empurrao: float = 0.0) -> void:
+	if _ja_derrotado:
+		return
+	_garantir_vida_maxima()
+	var q: int = maxi(2, int(round(quantidade * 0.32)))
+	vida -= q
+	global_position.x += dir_empurrao * 1.0
+	# fogo sustentado (inclui o Throw): ao fim de ~10% da vida em raspões,
+	# o escudo cambaleia e leva uma fatia a sério -- premeia insistir.
+	_raspao_acc += q
+	if _raspao_acc >= _vida_maxima * 0.10:
+		_raspao_acc = 0.0
+		vida -= maxi(3, int(round(_vida_maxima * 0.05)))
+		_dano_recente = maxf(_dano_recente, 0.35)
+		piscar_dano()
+		Som.toca("acerto", -6.0, 0.9)
+		Impacto.rebentar(self, global_position + Vector2(0.0, -20.0 * maxf(0.8, escala_visual)), Color(1, 1, 1), 2.6)
+	elif _escudo_boss and _escudo_boss.visible:
+		var aro := _escudo_boss.get_node_or_null("Aro") as Line2D
+		if aro:
+			var c := aro.default_color
+			aro.default_color = Color(1, 1, 1, 1)
+			create_tween().tween_property(aro, "default_color", c, 0.14)
+	vida_mudou.emit(maxi(vida, 0), _vida_maxima)
+	if vida <= 0:
+		receber_dano(1, dir_empurrao)  # deixa o fluxo normal tratar da morte
+
+
 func _atualizar_texto_cargas() -> void:
 	if _texto_cargas:
 		_texto_cargas.text = Textos.tf("chefe.escudo_cargas", [_cargas_restantes])
