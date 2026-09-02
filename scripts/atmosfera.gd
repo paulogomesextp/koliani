@@ -389,12 +389,53 @@ func _montar_fundo_pack(_rng: RandomNumberGenerator) -> void:
 			spr.modulate = cor
 		spr.set_meta("gerado", true)
 		layer.add_child(spr)
+		# BANDA POR CIMA (3 set 2026 -- bug do "ecrã preto" no nível 7): a
+		# imagem do pack tem altura fixa e acaba a direito. Numa sala alta
+		# (`CascaMasmorra`) ou quando um chefe atira a Koliani ao ar, a câmara
+		# sobe acima desse topo e o ecrã ficava quase todo PRETO -- o céu
+		# destes biomas é escuríssimo de propósito, mas contava-se que nunca
+		# se visse. Uma banda alta em degradé continua a parede/mata para
+		# cima até se perder no fundo. Só na camada mais funda (as outras
+		# ficariam sobrepostas e a escurecer o dobro).
+		if item[1] == "Fundo":
+			_banda_acima(layer, tw, y_base - th, cor)
 		# mirroring nos dois eixos: a Jornada pode levar a câmara muito mais
 		# alto/baixo do que a imagem cobre (ela só tem `th` de altura) --
 		# sem repetir no eixo Y, sobrava um vão por cima/baixo que nunca se
 		# preenchia, seja qual for a posição da câmara (motion_scale.y=0
 		# trava a camada no ecrã, mas não alarga a imagem).
 		layer.motion_mirroring = Vector2(tw, th)
+
+
+## Banda em degradé por cima do topo de um pack de fundo: começa na cor da
+## camada (encosta à imagem sem costura) e esbate-se para `cor_fundo` lá em
+## cima. Sem isto o desenho acabava a direito e o que estivesse acima era
+## céu quase preto (ver `_montar_fundo_pack`).
+const ALTURA_BANDA := 2400.0
+
+func _banda_acima(layer: Node, largura: float, topo_y: float, cor: Color) -> void:
+	var g := Gradient.new()
+	g.offsets = PackedFloat32Array([0.0, 1.0])
+	# A `cor` é a TINTA que vai ao shader, não o que o pack acaba por
+	# desenhar (que leva desaturação e neblina por cima) -- puxá-la para o
+	# `cor_fundo` evita a banda ficar uma laje clara ao lado da imagem.
+	g.colors = PackedColorArray([cor_fundo.darkened(0.2), cor_fundo.lerp(cor, 0.3)])
+	var t := GradientTexture2D.new()
+	t.gradient = g
+	t.width = 4
+	t.height = 256
+	t.fill = GradientTexture2D.FILL_LINEAR
+	t.fill_from = Vector2(0.0, 0.0)
+	t.fill_to = Vector2(0.0, 1.0)
+	var b := Sprite2D.new()
+	b.texture = t
+	b.centered = false
+	b.scale = Vector2(maxf(largura, 1.0) / 4.0, ALTURA_BANDA / 256.0)
+	b.position = Vector2(0.0, topo_y - ALTURA_BANDA + 2.0)  # 2px de sobreposição
+	b.z_index = -1
+	b.set_meta("gerado", true)
+	layer.add_child(b)
+	layer.move_child(b, 0)
 
 
 ## Quanto cada camada do parallax está "longe" (1 = fundo, 0 = colada à

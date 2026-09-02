@@ -674,23 +674,26 @@ func _physics_process(dt: float) -> void:
 				continue
 			if "vida" in e and e.vida <= 0:
 				continue
-			var chefe: bool = (e as Node).is_in_group("chefes")
+			# CHEFES NÃO SE PISAM (pedido do Paulo, 3 set 2026): nem dano, nem
+			# ressalto. A banda de aceitação deles era generosa (210 px de
+			# altura) e saltar-lhes para cima era a maneira mais barata de os
+			# despachar -- ainda por cima atirava a Koliani ecrã acima, para
+			# fora do cenário desenhado. A luta de chefe faz-se com espada e
+			# tiro; encostar-se a um custa dano de contacto, como a qualquer
+			# outro bicho.
+			if (e as Node).is_in_group("chefes"):
+				continue
 			var ep: Vector2 = (e as Node2D).global_position
-			# chefes são maiores: banda de aceitação mais alta e mais larga
-			var larg := 62.0 if chefe else 46.0
-			var alto := 210.0 if chefe else 52.0
-			if absf(ep.x - global_position.x) > larg:
+			if absf(ep.x - global_position.x) > 46.0:
 				continue
 			# a Koliani vem a descer por cima e os pés dela na banda do topo
-			if global_position.y > ep.y + 6.0 or pes < ep.y - alto or pes > ep.y + 30.0:
+			if global_position.y > ep.y + 6.0 or pes < ep.y - 52.0 or pes > ep.y + 30.0:
 				continue
 			var crit_stomp: bool = e.has_method("esta_vulneravel") and e.esta_vulneravel()
-			# pisar um chefe = dano (raspão/normal, tratado pelo receber_dano
-			# dele), NUNCA leva dano de contacto -- ressalta sempre.
 			e.receber_dano(_dano_golpe(), 0.0, crit_stomp)
 			# pulo automático ALTO, imune ao corte de salto (ver aplicar_impulso)
 			aplicar_impulso(Vector2(0.0, -STOMP_RESSALTO), true)
-			_invulneravel = maxf(_invulneravel, 0.4 if chefe else 0.3)
+			_invulneravel = maxf(_invulneravel, 0.3)
 			_stomp_cd = 0.22
 			_pop = 1.0
 			_squash = maxf(_squash, 0.5)

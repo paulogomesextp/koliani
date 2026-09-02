@@ -48,6 +48,10 @@ func _init() -> void:
 			chefe.provocar()
 		if chefe.has_method("receber_dano"):
 			chefe.receber_dano(40, 1.0)
+		# FASE 2 já: é aí que os chefes largam os efeitos grandes
+		if chefe.has_method("_entrar_fase2"):
+			chefe.call("_entrar_fase2")
+			print("fase2 forcada")
 
 	for s in n:
 		if andar:
