@@ -114,6 +114,70 @@ const ASSINATURA := {
 	5: "fogo",         # Castelo -- lava
 }
 
+## PERFIL DE FORMA por nível (redesenho pedido pelo Paulo, 2 set 2026): cada
+## um dos 30 níveis tem uma "cara" própria em vez de todos correrem iguais
+## com só a tendência vertical a alternar em ciclo `_idx % 3`. Cada entrada:
+##   v -- verticalidade: -1 desce / 0 horizontal / +1 sobe
+##   f -- foco de câmaras (enviesa a seleção, sem quebrar região/tier):
+##        "salto"    plataformas e vãos (saltos/trampolim/forquilha)
+##        "combate"  arenas e criptas cheias de inimigos
+##        "maquina"  plataformas móveis (elevador/correntes/impulso/ritmo/quebra)
+##        "vertical" torres e poços com mais frequência
+##        "gauntlet" corredores de perigo (serras/guilhotinas/fogo/pêndulos/crossfire)
+##        "misto"    sem enviesamento (a seleção normal)
+##   a -- abertura da banda vertical: 0.8 apertado / 1.0 normal / 1.22 amplo
+## O arco de cada região: intro suave -> aperta -> nível do chefe mais duro.
+## Os comentários seguem a ordem REAL de `EstadoJogo.NIVEIS` (re-derivado
+## 2 set 2026 -- a 1.ª versão do patch tinha os nomes deslizados). Cada
+## triplo foi escolhido pela gimmick do nível em `docs/niveis.md`.
+const PERFIL := [
+	# --- Região I  Floresta Putrefacta (0-4) : introdução, suave ----------
+	{"v": 0, "f": "salto", "a": 1.15},    # 0  Caminho das Raízes -- tutorial de salto
+	{"v": 0, "f": "salto", "a": 1.1},     # 1  Pântano dos Sussurros -- ilhas sobre água mortal
+	{"v": 1, "f": "vertical", "a": 1.15}, # 2  Ninho da Viúva Negra -- teia vertical
+	{"v": 1, "f": "vertical", "a": 1.05}, # 3  A Árvore que Chora -- labirinto no tronco
+	{"v": 0, "f": "maquina", "a": 0.9},   # 4  Coração da Floresta (chefe) -- cenário rítmico
+	# --- Região II  Prisão dos Condenados (5-9) : apertado, execuções -----
+	{"v": 0, "f": "maquina", "a": 0.95},  # 5  Portão dos Condenados -- correntes móveis
+	{"v": -1, "f": "maquina", "a": 0.85}, # 6  Fornalha dos Pecadores -- plataformas sobre lava
+	{"v": 0, "f": "gauntlet", "a": 0.8},  # 7  Corredor das Execuções -- guilhotinas e lâminas
+	{"v": 0, "f": "combate", "a": 0.9},   # 8  Ala dos Mortos -- irmãos fantasma
+	{"v": 1, "f": "vertical", "a": 0.95}, # 9  A Cela Zero (chefe) -- labirinto vertical
+	# --- Região III  Torres Esquecidas (10-14) : verticalidade, banda ampla
+	{"v": 1, "f": "maquina", "a": 1.15},  # 10 Torre dos Sinos -- plataformas que mudam
+	{"v": 1, "f": "salto", "a": 1.22},    # 11 Torre dos Ventos -- correntes de ar, saltos longos
+	{"v": 1, "f": "gauntlet", "a": 1.15}, # 12 Torre da Tempestade -- raios em padrão
+	{"v": 1, "f": "maquina", "a": 1.22},  # 13 Observatório Lunar -- gravidade variável
+	{"v": 1, "f": "combate", "a": 1.0},   # 14 O Pico Esquecido (chefe) -- Vyrak
+	# --- Região IV  Catacumbas do Abismo (15-19) : túneis apertados, a descer
+	{"v": -1, "f": "maquina", "a": 0.9},  # 15 Cemitério dos Reis -- túmulos elevadores
+	{"v": 0, "f": "gauntlet", "a": 0.8},  # 16 Galeria dos Ossos -- corredores de osso
+	{"v": -1, "f": "combate", "a": 0.85}, # 17 Cripta das Mil Velas -- luz e escuridão
+	{"v": 0, "f": "maquina", "a": 0.95},  # 18 Templo da Serpente -- paredes móveis
+	{"v": -1, "f": "vertical", "a": 1.22},# 19 O Abismo (chefe) -- grande queda no escuro
+	# --- Região V  Cidade Corrompida (20-24) : máquinas, ritmo urbano ----
+	{"v": 0, "f": "combate", "a": 1.0},   # 20 Vila dos Sem-Rosto -- inimigos disfarçados
+	{"v": 1, "f": "maquina", "a": 1.0},   # 21 Mercado da Carne -- correntes, caixas, carrinhos
+	{"v": 0, "f": "gauntlet", "a": 1.0},  # 22 Trem dos Mortos -- corrida sobre o comboio
+	{"v": 1, "f": "combate", "a": 1.05},  # 23 Catedral da Corrupção -- Bispo Púrpura
+	{"v": 0, "f": "maquina", "a": 0.95},  # 24 Praça do Eclipse (chefe) -- realidade/corrupção
+	# --- Região VI  Castelo de Zeriko (25-29) : tudo, clímax -------------
+	{"v": 0, "f": "gauntlet", "a": 0.85}, # 25 Portões de Zeriko -- corredor de cavaleiros
+	{"v": 0, "f": "combate", "a": 0.95},  # 26 Salão dos Espelhos -- Kolianis sombrias
+	{"v": 0, "f": "salto", "a": 1.0},     # 27 Banquete dos Imortais -- mesa gigante
+	{"v": 1, "f": "vertical", "a": 1.15}, # 28 Torre do Coração Negro -- plataformas que pulsam
+	{"v": 0, "f": "misto", "a": 1.0},     # 29 O Trono de Zeriko (sem jornada)
+]
+
+## Que câmaras conta cada foco. Cruzado depois com região+tier em
+## `_camara_do_foco` -- o foco só enviesa, nunca fura as regras.
+const FOCO_CAMARAS := {
+	"salto": ["saltos", "trampolim", "forquilha"],
+	"combate": ["arena", "cripta"],
+	"maquina": ["elevador", "correntes", "impulso", "ritmo", "quebra", "gravidade"],
+	"gauntlet": ["corredor", "serras", "guilhotinas", "fogo", "pendulos", "crossfire", "espinhos"],
+}
+
 var _chao_y := 0.0     # topo do líquido mortal
 var _idx := 0
 var _dif := 0.0
@@ -159,6 +223,9 @@ var _teto_y := 0.0
 ## a "passadeira final" (ver fim de `_construir`) traz sempre a espinha de
 ## volta perto do chão antes de lá chegar, seja qual for a tendência.
 var _tendencia := 0
+## Foco de câmaras e abertura da banda vertical deste nível (ver `PERFIL`).
+var _foco := "misto"
+var _abertura := 1.0
 
 
 func _ready() -> void:
@@ -174,12 +241,17 @@ func _construir() -> void:
 	_regiao = maxi(0, EstadoJogo.regiao_atual())
 	_rng.seed = hash("jornada4|%d" % _idx)
 	_esp = especie_inimigo if especie_inimigo != "" else _especie_do_nivel()
-	_tendencia = (_idx % 3) - 1
+	# PERFIL DE FORMA deste nível (redesenho 2 set 2026): tendência vertical,
+	# foco de câmaras e abertura da banda -- cada nível com a sua "cara".
+	var perf: Dictionary = PERFIL[clampi(_idx, 0, PERFIL.size() - 1)]
+	_tendencia = int(perf.get("v", 0))
+	_foco = String(perf.get("f", "misto"))
+	_abertura = float(perf.get("a", 1.0))
 
 	var ancora: Vector2 = EstadoJogo.jornada_ancora_para(
 		_idx, func() -> Vector2: return (kol as Node2D).global_position)
 	_chao_y = ancora.y + 92.0
-	_teto_y = _chao_y - lerpf(640.0, 1320.0, _dif)
+	_teto_y = _chao_y - lerpf(640.0, 1320.0, _dif) * _abertura
 
 	var comp: float = clampf(comprimento_base + por_nivel * float(_idx),
 		comprimento_base, comprimento_max)
@@ -250,8 +322,10 @@ func _construir() -> void:
 	# espinha): muito espaçadas no Nível 1, coladas no Nível 30.
 	var espaco_flavour := int(round(lerpf(13.0, 4.0, _dif)))
 	var prox_flavour := espaco_flavour + _rng.randi() % 3
-	# de 2 em 2/3 câmaras força-se uma VERTICAL (torre/poço/pilares)
-	var flavs_ate_vertical := 2
+	# de 2 em 2/3 câmaras força-se uma VERTICAL (torre/poço/pilares); os
+	# níveis de foco "vertical" (ver PERFIL) fazem-no com o dobro da cadência
+	var passo_vert := 1 if _foco == "vertical" else 2
+	var flavs_ate_vertical := passo_vert
 	# altitude-alvo que vagueia por toda a banda vertical -> a espinha sobe e
 	# desce em vagas longas em vez de ondular sempre à mesma altura
 	var banda := _chao_y - _teto_y
@@ -325,6 +399,7 @@ func _construir() -> void:
 			_camaras += 1
 			flavs_ate_vertical -= 1
 			var sig: String = ASSINATURA.get(_regiao, "")
+			var foco_f: String = _camara_do_foco()
 			if prog > 0.82:
 				# ACTO 3: alívio antes da rampa final -> quase só descansos
 				f = "descanso" if _rng.randf() < 0.8 else pool[_rng.randi() % pool.size()]
@@ -333,9 +408,15 @@ func _construir() -> void:
 				f = "descanso"          # logo a seguir a uma câmara puxada -> respira
 				_pos_intenso = false
 			elif flavs_ate_vertical <= 0:
-				flavs_ate_vertical = 2 + _rng.randi() % 2
+				flavs_ate_vertical = passo_vert + _rng.randi() % 2
 				f = ["torre", "poco", "pilares"][_rng.randi() % 3]
 				_pos_intenso = true
+			# FOCO do nível (ver PERFIL): no acto do meio, ~metade das câmaras
+			# são da família do foco -> o nível ganha uma "cara" (plataformas /
+			# combate / máquinas / gauntlet) em vez de sair tudo à sorte.
+			elif foco_f != "" and prog >= 0.16 and prog <= 0.84 and _rng.randf() < 0.5:
+				f = foco_f
+				_pos_intenso = f in ["guilhotinas", "serras", "pendulos", "fogo", "quebra", "crossfire", "espinhos", "corredor", "arena"]
 			elif _camaras % 4 == 0:
 				f = "descanso"
 			# câmaras "tom" novas (crossfire/ferry/pedras/espinhos) -- ramo
@@ -433,6 +514,29 @@ func _escolher_tom_novo(pool: Array) -> String:
 		if t in pool:
 			opc.append(t)
 	return opc[_rng.randi() % opc.size()]
+
+
+## Uma câmara da família do FOCO deste nível (ver `PERFIL`), já cruzada com
+## a região e o tier. `""` = a família ainda não tem nada disponível ->
+## a seleção normal decide. "vertical" trata-se pela cadência das câmaras
+## torre/poço/pilares, não por aqui.
+func _camara_do_foco() -> String:
+	if _foco == "misto" or _foco == "vertical":
+		return ""
+	var pool: Array = _pool_permitida()
+	var opc: Array = []
+	for c: String in FOCO_CAMARAS.get(_foco, []):
+		if c in pool:
+			opc.append(c)                       # câmara da região, já libertada
+		elif c == "arena":
+			opc.append(c)                       # sempre construível
+		elif c == "cripta" and _dif > 0.08:
+			opc.append(c)
+		elif c == "corredor" and _dif > 0.28:
+			opc.append(c)
+		elif c == "forquilha" and _dif > 0.18:
+			opc.append(c)
+	return opc[_rng.randi() % opc.size()] if not opc.is_empty() else ""
 
 
 func _novo_container(x: float) -> Node2D:

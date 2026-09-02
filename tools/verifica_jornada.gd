@@ -61,11 +61,14 @@ func _checa(idx: int, raiz: Node) -> int:
 	var mau := []
 	if alvo_x != INF and kx > alvo_x - 3000.0:
 		mau.append("Koliani a x=%.0f, perto de mais do alvo x=%.0f" % [kx, alvo_x])
-	# checkpoints: desde a reducao de 1 set 2026 (`DIST_CHECKPOINT` 4000 px +
-	# inicio/pre-chefe forcados) sao poucos de proposito -- ~3 nos niveis
-	# curtos a ~15 no N30. Esperado ~ 2 + jornada/4000, com folga.
+	# checkpoints: desde a v0.9.16 (`DIST_CHECKPOINT` 4000 px na jornada +
+	# `_reduzir_checkpoints` a manter so' ~20%, sempre o do inicio e um perto
+	# do chefe) os `JornadaCheck_*` que sobram como filhos do gerador sao
+	# MESMO poucos de proposito -- 1 nos niveis curtos, 2-3 no N30 (o de
+	# perto do chefe fica muitas vezes com a Porta/sala, fora deste no'). O
+	# invariante que ainda importa: a jornada nao pode ficar SEM nenhum.
 	var dist_j := (alvo_x - kx) if alvo_x != INF else 0.0
-	var min_checks: int = maxi(3, int(dist_j / 6000.0) + 1)
+	var min_checks: int = maxi(1, int(dist_j / 14000.0))
 	if checks < min_checks:
 		mau.append("so' %d checkpoints (esperava >= %d p/ %.0fpx)" % [checks, min_checks, dist_j])
 	var linha := "  [%2d] %-26s  koliani_x=%.0f  alvo_x=%.0f  jornada=%.0fpx  checks=%d" % [
