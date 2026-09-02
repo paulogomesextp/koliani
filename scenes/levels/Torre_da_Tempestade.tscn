@@ -1,12 +1,10 @@
-[gd_scene load_steps=15 format=3 uid="uid://bkolianitorretempestade13"]
+[gd_scene load_steps=13 format=3 uid="uid://bkolianitorretempestade13"]
 
-; Região III / nível 13 -- Torre da Tempestade.
-; Descargas verticais (`RaioTempestade`, automáticas) caem em padrão
-; previsível ao longo do caminho -- lê-se o ritmo e passa-se entre elas.
-; Na arena há dois `ParaRaios`: bater-lhes ARMA-os e a descarga seguinte
-; desvia-se para lá e volta contra Voltaris (dano mesmo com a guarda
-; fechada, e atordoa-o). Chefe: Voltaris, o Mago Morto-Vivo -- teleporta,
-; invoca raios e clones elétricos.
+; REGIAO III / nivel 13 -- Torre da Tempestade.
+; Nivel FEITO A MAO (corredor = false) e VERTICAL. RAIOS (RaioTempestade
+; automatico) caem em colunas com padrao previsivel sobre a subida; ha
+; PARA-RAIOS para armar e desviar. Bifurcacao: rampa oeste / rampa este.
+; Elite: olho voador. Vazio em baixo. Chefe: Voltaris.
 
 [ext_resource type="PackedScene" uid="uid://bkolianiactor01" path="res://scenes/actors/Koliani.tscn" id="1_kol"]
 [ext_resource type="PackedScene" uid="uid://bdemoniobase01" path="res://scenes/actors/DemonioBase.tscn" id="2_dem"]
@@ -18,10 +16,11 @@
 [ext_resource type="PackedScene" uid="uid://bkolianiatmosfera01" path="res://scenes/fx/Atmosfera.tscn" id="8_atm"]
 [ext_resource type="PackedScene" uid="uid://bkolianiplataforma01" path="res://scenes/actors/Plataforma.tscn" id="9_pl"]
 [ext_resource type="PackedScene" uid="uid://bkolianiraiotemp13" path="res://scenes/actors/RaioTempestade.tscn" id="10_raio"]
-[ext_resource type="PackedScene" uid="uid://bkolianipararaios13" path="res://scenes/actors/ParaRaios.tscn" id="11_pr"]
+[ext_resource type="PackedScene" uid="uid://bkolianipararaios13" path="res://scenes/actors/ParaRaios.tscn" id="11_para"]
+[ext_resource type="PackedScene" uid="uid://bkolianiaguavenenosa01" path="res://scenes/actors/AguaVenenosa.tscn" id="12_vazio"]
 
 [sub_resource type="RectangleShape2D" id="rs_chk"]
-size = Vector2(40, 80)
+size = Vector2(44, 96)
 
 [sub_resource type="Gradient" id="grad_luz"]
 offsets = PackedFloat32Array(0, 1)
@@ -37,200 +36,188 @@ fill_to = Vector2(1, 0.5)
 
 [node name="Torre_da_Tempestade" type="Node2D"]
 script = ExtResource("7_niv")
+corredor = false
 
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
-cor_ambiente = Color(0.66, 0.7, 0.88, 1)
-cor_fundo = Color(0.04, 0.05, 0.1, 1)
-cor_silhueta = Color(0.1, 0.11, 0.16, 1)
+cor_ambiente = Color(0.72, 0.76, 0.82, 1)
+cor_fundo = Color(0.05, 0.05, 0.09, 1)
+cor_silhueta = Color(0.11, 0.11, 0.16, 1)
 cor_luz = Color(0.72, 0.88, 1.0, 1)
-cor_poeira = Color(0.8, 0.9, 1.0, 1)
-densidade_poeira = 2
+cor_poeira = Color(0.82, 0.9, 1.0, 1)
+densidade_poeira = 1.8
 bioma = "torres"
-largura_nivel = 3500.0
+largura_nivel = 2600.0
 luzes_horizonte = true
 fundo_pack = "rochoso"
-tinta_fundo = Color(0.46, 0.58, 1.02, 1)
+tinta_fundo = Color(0.58, 0.66, 1.0, 1)
 neblina_fundo = 0.52
-dessaturar_fundo = 0.58
+dessaturar_fundo = 0.5
+
+[node name="Vazio" parent="." instance=ExtResource("12_vazio")]
+position = Vector2(650, 1120)
+largura = 3000.0
+altura = 340.0
+cor = Color(0.06, 0.05, 0.12, 0.96)
 
 [node name="ChaoInicio" parent="." instance=ExtResource("9_pl")]
-position = Vector2(400, 660)
-tamanho = Vector2(560, 48)
-altura_visual = 96.0
+position = Vector2(340, 900)
+tamanho = Vector2(460, 60)
+altura_visual = 110.0
+cor_base = Color(0.22, 0.22, 0.28, 1)
+cor_topo = Color(0.48, 0.5, 0.6, 1)
 
-[node name="Plat1" parent="." instance=ExtResource("9_pl")]
-position = Vector2(820, 604)
+[node name="T1" parent="." instance=ExtResource("9_pl")]
+position = Vector2(580, 820)
 tamanho = Vector2(150, 22)
-altura_visual = 26.0
+altura_visual = 32.0
+cor_base = Color(0.22, 0.22, 0.28, 1)
+cor_topo = Color(0.48, 0.5, 0.6, 1)
 
-[node name="Plat2" parent="." instance=ExtResource("9_pl")]
-position = Vector2(1020, 560)
-tamanho = Vector2(150, 22)
-altura_visual = 26.0
-
-[node name="Plat3" parent="." instance=ExtResource("9_pl")]
-position = Vector2(1220, 604)
-tamanho = Vector2(150, 22)
-altura_visual = 26.0
-
-[node name="ChaoMeio" parent="." instance=ExtResource("9_pl")]
-position = Vector2(1560, 644)
-tamanho = Vector2(360, 44)
-altura_visual = 80.0
-
-[node name="Plat4" parent="." instance=ExtResource("9_pl")]
-position = Vector2(1940, 588)
-tamanho = Vector2(150, 22)
-altura_visual = 26.0
-
-[node name="Plat5" parent="." instance=ExtResource("9_pl")]
-position = Vector2(2160, 620)
-tamanho = Vector2(150, 22)
-altura_visual = 26.0
-
-[node name="ChaoArena" parent="." instance=ExtResource("9_pl")]
-position = Vector2(2960, 660)
-tamanho = Vector2(880, 48)
-altura_visual = 96.0
-
-[node name="Raio1" parent="." instance=ExtResource("10_raio")]
-position = Vector2(820, 592)
+[node name="RaioT1" parent="." instance=ExtResource("10_raio")]
+position = Vector2(580, 820)
 automatico = true
 periodo = 3.0
 fase = 0.0
+dano = 20
 
-[node name="Raio2" parent="." instance=ExtResource("10_raio")]
-position = Vector2(1020, 548)
+[node name="T2" parent="." instance=ExtResource("9_pl")]
+position = Vector2(800, 740)
+tamanho = Vector2(150, 22)
+altura_visual = 32.0
+cor_base = Color(0.22, 0.22, 0.28, 1)
+cor_topo = Color(0.48, 0.5, 0.6, 1)
+
+[node name="T3" parent="." instance=ExtResource("9_pl")]
+position = Vector2(600, 660)
+tamanho = Vector2(150, 22)
+altura_visual = 32.0
+cor_base = Color(0.22, 0.22, 0.28, 1)
+cor_topo = Color(0.48, 0.5, 0.6, 1)
+
+[node name="RaioT3" parent="." instance=ExtResource("10_raio")]
+position = Vector2(600, 660)
 automatico = true
 periodo = 3.0
-fase = 1.0
+fase = 1.5
+dano = 20
 
-[node name="Raio3" parent="." instance=ExtResource("10_raio")]
-position = Vector2(1220, 592)
+[node name="CentroLedge" parent="." instance=ExtResource("9_pl")]
+position = Vector2(680, 580)
+tamanho = Vector2(240, 26)
+altura_visual = 40.0
+cor_base = Color(0.22, 0.22, 0.28, 1)
+cor_topo = Color(0.48, 0.5, 0.6, 1)
+
+[node name="ParaMeio" parent="." instance=ExtResource("11_para")]
+position = Vector2(760, 556)
+
+[node name="EliteOlho" parent="." instance=ExtResource("2_dem")]
+position = Vector2(620, 440)
+scale = Vector2(1.35, 1.35)
+especie = "olho"
+vida = 155
+dano_contacto = 22
+comportamento = "voador"
+cor_rim = Color(0.7, 0.85, 1.0, 1)
+
+; -- BIFURCACAO --
+[node name="RO1" parent="." instance=ExtResource("9_pl")]
+position = Vector2(490, 490)
+tamanho = Vector2(120, 18)
+altura_visual = 22.0
+cor_base = Color(0.22, 0.22, 0.28, 1)
+cor_topo = Color(0.48, 0.5, 0.6, 1)
+
+[node name="RO2" parent="." instance=ExtResource("9_pl")]
+position = Vector2(560, 400)
+tamanho = Vector2(120, 18)
+altura_visual = 22.0
+cor_base = Color(0.22, 0.22, 0.28, 1)
+cor_topo = Color(0.48, 0.5, 0.6, 1)
+
+[node name="RO3" parent="." instance=ExtResource("9_pl")]
+position = Vector2(450, 320)
+tamanho = Vector2(120, 18)
+altura_visual = 22.0
+cor_base = Color(0.22, 0.22, 0.28, 1)
+cor_topo = Color(0.48, 0.5, 0.6, 1)
+
+[node name="RE1" parent="." instance=ExtResource("9_pl")]
+position = Vector2(850, 500)
+tamanho = Vector2(120, 18)
+altura_visual = 22.0
+cor_base = Color(0.22, 0.22, 0.28, 1)
+cor_topo = Color(0.48, 0.5, 0.6, 1)
+
+[node name="RaioRE" parent="." instance=ExtResource("10_raio")]
+position = Vector2(970, 430)
 automatico = true
-periodo = 3.0
-fase = 2.0
+periodo = 2.6
+fase = 0.8
+dano = 22
 
-[node name="Raio4" parent="." instance=ExtResource("10_raio")]
-position = Vector2(1560, 622)
-automatico = true
-periodo = 3.4
-fase = 0.6
+[node name="RE2" parent="." instance=ExtResource("9_pl")]
+position = Vector2(970, 430)
+tamanho = Vector2(120, 18)
+altura_visual = 22.0
+cor_base = Color(0.22, 0.22, 0.28, 1)
+cor_topo = Color(0.48, 0.5, 0.6, 1)
 
-[node name="Raio5" parent="." instance=ExtResource("10_raio")]
-position = Vector2(1940, 576)
-automatico = true
-periodo = 3.2
-fase = 1.4
+[node name="RE3" parent="." instance=ExtResource("9_pl")]
+position = Vector2(850, 350)
+tamanho = Vector2(120, 18)
+altura_visual = 22.0
+cor_base = Color(0.22, 0.22, 0.28, 1)
+cor_topo = Color(0.48, 0.5, 0.6, 1)
 
-[node name="Raio6" parent="." instance=ExtResource("10_raio")]
-position = Vector2(2160, 608)
-automatico = true
-periodo = 3.2
-fase = 2.6
+[node name="ChaoChefe" parent="." instance=ExtResource("9_pl")]
+position = Vector2(660, 270)
+tamanho = Vector2(560, 60)
+altura_visual = 100.0
+cor_base = Color(0.22, 0.22, 0.28, 1)
+cor_topo = Color(0.48, 0.5, 0.6, 1)
 
-[node name="ParaRaiosE" parent="." instance=ExtResource("11_pr")]
-position = Vector2(2660, 614)
-
-[node name="ParaRaiosD" parent="." instance=ExtResource("11_pr")]
-position = Vector2(3180, 614)
-
-[node name="LuzInicio" type="PointLight2D" parent="."]
-position = Vector2(400, 600)
-texture = SubResource("tex_luz")
-energy = 0.45
-color = Color(0.7, 0.86, 1, 1)
-scale = Vector2(1.9, 1.1)
-
-[node name="LuzArena" type="PointLight2D" parent="."]
-position = Vector2(2960, 600)
-texture = SubResource("tex_luz")
-energy = 0.55
-color = Color(0.7, 0.86, 1, 1)
-scale = Vector2(2.4, 1.4)
-
-[node name="Koliani" parent="." instance=ExtResource("1_kol")]
-position = Vector2(150, 560)
-
-[node name="Demonio1" parent="." instance=ExtResource("2_dem")]
-especie = "xamane"
-position = Vector2(520, 604)
-alcance_patrulha = 200.0
-
-[node name="Demonio2" parent="." instance=ExtResource("2_dem")]
-especie = "wogol"
-position = Vector2(1560, 588)
-alcance_patrulha = 120.0
+[node name="ParaChefe" parent="." instance=ExtResource("11_para")]
+position = Vector2(560, 236)
 
 [node name="Chefe" parent="." instance=ExtResource("6_chefe")]
-position = Vector2(2960, 460)
+position = Vector2(780, 194)
 
-[node name="ColCajado" parent="." instance=ExtResource("3_col")]
-position = Vector2(1940, 540)
-pista_id = "tempestade_cajado_de_osso"
+[node name="LuzBaixo" type="PointLight2D" parent="."]
+position = Vector2(340, 840)
+texture = SubResource("tex_luz")
+energy = 0.55
+color = Color(0.68, 0.82, 1.0, 1)
+scale = Vector2(2.0, 1.3)
+
+[node name="LuzChefe" type="PointLight2D" parent="."]
+position = Vector2(660, 250)
+texture = SubResource("tex_luz")
+energy = 0.65
+color = Color(0.75, 0.88, 1.0, 1)
+scale = Vector2(2.9, 1.7)
+
+[node name="Koliani" parent="." instance=ExtResource("1_kol")]
+position = Vector2(200, 830)
 
 [node name="CheckInicio" type="Area2D" parent="."]
-position = Vector2(380, 588)
+position = Vector2(460, 836)
 collision_layer = 16
 collision_mask = 2
 script = ExtResource("5_chk")
-
-[node name="Visual" type="ColorRect" parent="CheckInicio"]
-offset_left = -5.0
-offset_top = -42.0
-offset_right = 5.0
-offset_bottom = 40.0
-color = Color(0.36, 0.28, 0.55, 1)
-
-[node name="Luz" type="Node2D" parent="CheckInicio"]
-visible = false
-
-[node name="Brilho" type="ColorRect" parent="CheckInicio/Luz"]
-offset_left = -20.0
-offset_top = -54.0
-offset_right = 20.0
-offset_bottom = 44.0
-color = Color(0.85, 0.31, 0.83, 0.32)
-
-[node name="PointLight2D" type="PointLight2D" parent="CheckInicio/Luz"]
-texture = SubResource("tex_luz")
-energy = 1.1
-color = Color(0.93, 0.4, 0.9, 1)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CheckInicio"]
 shape = SubResource("rs_chk")
 
-[node name="CheckArena" type="Area2D" parent="."]
-position = Vector2(2560, 588)
+[node name="CheckMeio" type="Area2D" parent="."]
+position = Vector2(680, 516)
 collision_layer = 16
 collision_mask = 2
 script = ExtResource("5_chk")
 
-[node name="Visual" type="ColorRect" parent="CheckArena"]
-offset_left = -5.0
-offset_top = -42.0
-offset_right = 5.0
-offset_bottom = 40.0
-color = Color(0.36, 0.28, 0.55, 1)
-
-[node name="Luz" type="Node2D" parent="CheckArena"]
-visible = false
-
-[node name="Brilho" type="ColorRect" parent="CheckArena/Luz"]
-offset_left = -20.0
-offset_top = -54.0
-offset_right = 20.0
-offset_bottom = 44.0
-color = Color(0.85, 0.31, 0.83, 0.32)
-
-[node name="PointLight2D" type="PointLight2D" parent="CheckArena/Luz"]
-texture = SubResource("tex_luz")
-energy = 1.1
-color = Color(0.93, 0.4, 0.9, 1)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckArena"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckMeio"]
 shape = SubResource("rs_chk")
 
 [node name="Porta" parent="." instance=ExtResource("4_porta")]
-position = Vector2(3380, 586)
+position = Vector2(900, 246)
 pista_ao_atravessar = ""

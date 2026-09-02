@@ -1,11 +1,9 @@
-[gd_scene load_steps=14 format=3 uid="uid://bkolianipico15"]
+[gd_scene load_steps=11 format=3 uid="uid://bkolianipico15"]
 
-; Região III / nível 15 -- O Pico Esquecido (fecha as Torres Esquecidas).
-; Sobe-se o pico por plataformas em ziguezague até ao cume. Lá em cima,
-; Vyrak, o Dragão das Sombras, em três fases: no pico -> parte o cume (as
-; plataformas do grupo "plataformas_pico" caem) e voa -> despenca-se
-; meio-abatido e a Koliani acaba com ele de perto. Sem mecânica de
-; traversia própria -- é a luta que fecha a região.
+; REGIAO III / nivel 15 -- O Pico Esquecido (chefe da regiao).
+; Nivel FEITO A MAO (corredor = false). Subida curta e exposta ate' ao
+; CUME -- arena ampla. Bifurcacao: cornija oeste / cornija este. Elite:
+; imp cuspidor. Vazio em baixo. Chefe: Vyrak, o Dragao das Sombras (3 fases).
 
 [ext_resource type="PackedScene" uid="uid://bkolianiactor01" path="res://scenes/actors/Koliani.tscn" id="1_kol"]
 [ext_resource type="PackedScene" uid="uid://bdemoniobase01" path="res://scenes/actors/DemonioBase.tscn" id="2_dem"]
@@ -16,10 +14,10 @@
 [ext_resource type="Script" path="res://scripts/nivel_com_chefe.gd" id="7_niv"]
 [ext_resource type="PackedScene" uid="uid://bkolianiatmosfera01" path="res://scenes/fx/Atmosfera.tscn" id="8_atm"]
 [ext_resource type="PackedScene" uid="uid://bkolianiplataforma01" path="res://scenes/actors/Plataforma.tscn" id="9_pl"]
-[ext_resource type="PackedScene" uid="uid://bkolianiespinhos01" path="res://scenes/actors/Espinhos.tscn" id="10_esp"]
+[ext_resource type="PackedScene" uid="uid://bkolianiaguavenenosa01" path="res://scenes/actors/AguaVenenosa.tscn" id="10_vazio"]
 
 [sub_resource type="RectangleShape2D" id="rs_chk"]
-size = Vector2(40, 80)
+size = Vector2(44, 96)
 
 [sub_resource type="Gradient" id="grad_luz"]
 offsets = PackedFloat32Array(0, 1)
@@ -35,172 +33,146 @@ fill_to = Vector2(1, 0.5)
 
 [node name="O_Pico_Esquecido" type="Node2D"]
 script = ExtResource("7_niv")
+corredor = false
 
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
-cor_ambiente = Color(0.64, 0.58, 0.8, 1)
-cor_fundo = Color(0.05, 0.04, 0.1, 1)
-cor_silhueta = Color(0.1, 0.08, 0.16, 1)
-cor_luz = Color(0.76, 0.54, 1.0, 1)
-cor_poeira = Color(0.82, 0.76, 1.0, 1)
+cor_ambiente = Color(0.76, 0.72, 0.8, 1)
+cor_fundo = Color(0.05, 0.05, 0.09, 1)
+cor_silhueta = Color(0.12, 0.1, 0.15, 1)
+cor_luz = Color(0.78, 0.55, 1.0, 1)
+cor_poeira = Color(0.86, 0.78, 1.0, 1)
 densidade_poeira = 1.8
 bioma = "torres"
-largura_nivel = 2700.0
+largura_nivel = 2600.0
 luzes_horizonte = true
 fundo_pack = "rochoso"
-tinta_fundo = Color(0.62, 0.58, 0.96, 1)
-neblina_fundo = 0.48
-dessaturar_fundo = 0.58
+tinta_fundo = Color(0.6, 0.6, 1.0, 1)
+neblina_fundo = 0.5
+dessaturar_fundo = 0.5
 
-[node name="ChaoBase" parent="." instance=ExtResource("9_pl")]
-position = Vector2(400, 660)
-tamanho = Vector2(520, 48)
-altura_visual = 100.0
+[node name="Vazio" parent="." instance=ExtResource("10_vazio")]
+position = Vector2(650, 1120)
+largura = 3000.0
+altura = 340.0
+cor = Color(0.06, 0.05, 0.12, 0.96)
+
+[node name="ChaoInicio" parent="." instance=ExtResource("9_pl")]
+position = Vector2(340, 880)
+tamanho = Vector2(460, 60)
+altura_visual = 110.0
+cor_base = Color(0.24, 0.2, 0.28, 1)
+cor_topo = Color(0.5, 0.42, 0.56, 1)
 
 [node name="P1" parent="." instance=ExtResource("9_pl")]
-position = Vector2(780, 566)
-tamanho = Vector2(150, 22)
-altura_visual = 26.0
+position = Vector2(600, 790)
+tamanho = Vector2(160, 24)
+altura_visual = 34.0
+cor_base = Color(0.24, 0.2, 0.28, 1)
+cor_topo = Color(0.5, 0.42, 0.56, 1)
 
 [node name="P2" parent="." instance=ExtResource("9_pl")]
-position = Vector2(560, 470)
-tamanho = Vector2(150, 22)
-altura_visual = 26.0
+position = Vector2(800, 700)
+tamanho = Vector2(160, 24)
+altura_visual = 34.0
+cor_base = Color(0.24, 0.2, 0.28, 1)
+cor_topo = Color(0.5, 0.42, 0.56, 1)
 
-[node name="P3" parent="." instance=ExtResource("9_pl")]
-position = Vector2(840, 388)
-tamanho = Vector2(150, 22)
-altura_visual = 26.0
+[node name="CentroLedge" parent="." instance=ExtResource("9_pl")]
+position = Vector2(640, 610)
+tamanho = Vector2(240, 26)
+altura_visual = 42.0
+cor_base = Color(0.24, 0.2, 0.28, 1)
+cor_topo = Color(0.5, 0.42, 0.56, 1)
 
-[node name="P4" parent="." instance=ExtResource("9_pl")]
-position = Vector2(600, 300)
-tamanho = Vector2(150, 22)
-altura_visual = 26.0
-
-[node name="P5" parent="." instance=ExtResource("9_pl")]
-position = Vector2(880, 224)
-tamanho = Vector2(150, 22)
-altura_visual = 26.0
-
-[node name="CumeDeck" parent="." instance=ExtResource("9_pl")]
-position = Vector2(1550, 190)
-tamanho = Vector2(920, 44)
-altura_visual = 120.0
-
-[node name="PicoA" parent="." instance=ExtResource("9_pl") groups=["plataformas_pico"]]
-position = Vector2(1250, 96)
-tamanho = Vector2(150, 22)
-altura_visual = 26.0
-
-[node name="PicoB" parent="." instance=ExtResource("9_pl") groups=["plataformas_pico"]]
-position = Vector2(1850, 96)
-tamanho = Vector2(150, 22)
-altura_visual = 26.0
-
-[node name="PicoC" parent="." instance=ExtResource("9_pl") groups=["plataformas_pico"]]
-position = Vector2(1550, 20)
-tamanho = Vector2(160, 22)
-altura_visual = 26.0
-
-[node name="EspinhosP3" parent="." instance=ExtResource("10_esp")]
-position = Vector2(810, 366)
-largura = 6
-
-[node name="LuzBase" type="PointLight2D" parent="."]
-position = Vector2(400, 600)
-texture = SubResource("tex_luz")
-energy = 0.45
-color = Color(0.72, 0.5, 1, 1)
-scale = Vector2(1.9, 1.1)
-
-[node name="LuzCume" type="PointLight2D" parent="."]
-position = Vector2(1550, 130)
-texture = SubResource("tex_luz")
-energy = 0.6
-color = Color(0.72, 0.48, 1, 1)
-scale = Vector2(2.8, 1.6)
-
-[node name="Koliani" parent="." instance=ExtResource("1_kol")]
-position = Vector2(150, 560)
-
-[node name="Demonio1" parent="." instance=ExtResource("2_dem")]
+[node name="EliteImp" parent="." instance=ExtResource("2_dem")]
+position = Vector2(640, 542)
+scale = Vector2(1.4, 1.4)
 especie = "imp"
-position = Vector2(520, 604)
-alcance_patrulha = 200.0
+vida = 180
+dano_contacto = 26
+comportamento = "cuspidor"
+alcance_patrulha = 60.0
+cor_rim = Color(0.8, 0.55, 1.0, 1)
 
-[node name="Demonio2" parent="." instance=ExtResource("2_dem")]
-especie = "abutre"
-position = Vector2(600, 260)
-alcance_patrulha = 160.0
+; -- BIFURCACAO: cornija O / cornija E --
+[node name="CO1" parent="." instance=ExtResource("9_pl")]
+position = Vector2(460, 520)
+tamanho = Vector2(150, 20)
+altura_visual = 26.0
+cor_base = Color(0.24, 0.2, 0.28, 1)
+cor_topo = Color(0.5, 0.42, 0.56, 1)
+
+[node name="CO2" parent="." instance=ExtResource("9_pl")]
+position = Vector2(490, 420)
+tamanho = Vector2(150, 20)
+altura_visual = 26.0
+cor_base = Color(0.24, 0.2, 0.28, 1)
+cor_topo = Color(0.5, 0.42, 0.56, 1)
+
+[node name="CE1" parent="." instance=ExtResource("9_pl")]
+position = Vector2(820, 520)
+tamanho = Vector2(150, 20)
+altura_visual = 26.0
+cor_base = Color(0.24, 0.2, 0.28, 1)
+cor_topo = Color(0.5, 0.42, 0.56, 1)
+
+[node name="CE2" parent="." instance=ExtResource("9_pl")]
+position = Vector2(800, 420)
+tamanho = Vector2(150, 20)
+altura_visual = 26.0
+cor_base = Color(0.24, 0.2, 0.28, 1)
+cor_topo = Color(0.5, 0.42, 0.56, 1)
+
+; ===================  CUME -- arena de Vyrak  =============
+[node name="Cume" parent="." instance=ExtResource("9_pl")]
+position = Vector2(650, 350)
+tamanho = Vector2(720, 64)
+altura_visual = 110.0
+cor_base = Color(0.24, 0.2, 0.28, 1)
+cor_topo = Color(0.5, 0.42, 0.56, 1)
+
+[node name="ColProjetil" parent="." instance=ExtResource("3_col")]
+position = Vector2(430, 306)
+habilidade_id = "projetil"
 
 [node name="Chefe" parent="." instance=ExtResource("6_chefe")]
-position = Vector2(1560, 128)
+position = Vector2(760, 268)
 
-[node name="ColEscama" parent="." instance=ExtResource("3_col")]
-position = Vector2(600, 262)
-pista_id = "pico_escama_de_vyrak"
+[node name="LuzBaixo" type="PointLight2D" parent="."]
+position = Vector2(340, 820)
+texture = SubResource("tex_luz")
+energy = 0.55
+color = Color(0.7, 0.5, 1.0, 1)
+scale = Vector2(2.0, 1.3)
 
-[node name="CheckBase" type="Area2D" parent="."]
-position = Vector2(300, 588)
+[node name="LuzCume" type="PointLight2D" parent="."]
+position = Vector2(650, 330)
+texture = SubResource("tex_luz")
+energy = 0.7
+color = Color(0.8, 0.58, 1.0, 1)
+scale = Vector2(3.2, 1.8)
+
+[node name="Koliani" parent="." instance=ExtResource("1_kol")]
+position = Vector2(200, 810)
+
+[node name="CheckInicio" type="Area2D" parent="."]
+position = Vector2(460, 816)
 collision_layer = 16
 collision_mask = 2
 script = ExtResource("5_chk")
 
-[node name="Visual" type="ColorRect" parent="CheckBase"]
-offset_left = -5.0
-offset_top = -42.0
-offset_right = 5.0
-offset_bottom = 40.0
-color = Color(0.36, 0.28, 0.55, 1)
-
-[node name="Luz" type="Node2D" parent="CheckBase"]
-visible = false
-
-[node name="Brilho" type="ColorRect" parent="CheckBase/Luz"]
-offset_left = -20.0
-offset_top = -54.0
-offset_right = 20.0
-offset_bottom = 44.0
-color = Color(0.85, 0.31, 0.83, 0.32)
-
-[node name="PointLight2D" type="PointLight2D" parent="CheckBase/Luz"]
-texture = SubResource("tex_luz")
-energy = 1.1
-color = Color(0.93, 0.4, 0.9, 1)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckBase"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckInicio"]
 shape = SubResource("rs_chk")
 
-[node name="CheckCume" type="Area2D" parent="."]
-position = Vector2(1180, 118)
+[node name="CheckMeio" type="Area2D" parent="."]
+position = Vector2(640, 546)
 collision_layer = 16
 collision_mask = 2
 script = ExtResource("5_chk")
 
-[node name="Visual" type="ColorRect" parent="CheckCume"]
-offset_left = -5.0
-offset_top = -42.0
-offset_right = 5.0
-offset_bottom = 40.0
-color = Color(0.36, 0.28, 0.55, 1)
-
-[node name="Luz" type="Node2D" parent="CheckCume"]
-visible = false
-
-[node name="Brilho" type="ColorRect" parent="CheckCume/Luz"]
-offset_left = -20.0
-offset_top = -54.0
-offset_right = 20.0
-offset_bottom = 44.0
-color = Color(0.85, 0.31, 0.83, 0.32)
-
-[node name="PointLight2D" type="PointLight2D" parent="CheckCume/Luz"]
-texture = SubResource("tex_luz")
-energy = 1.1
-color = Color(0.93, 0.4, 0.9, 1)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckCume"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckMeio"]
 shape = SubResource("rs_chk")
 
 [node name="Porta" parent="." instance=ExtResource("4_porta")]
-position = Vector2(1950, 116)
-pista_ao_atravessar = "pico_torres_para_tras"
+position = Vector2(960, 326)
+pista_ao_atravessar = ""

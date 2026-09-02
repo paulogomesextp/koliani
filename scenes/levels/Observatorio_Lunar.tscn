@@ -1,10 +1,11 @@
-[gd_scene load_steps=15 format=3 uid="uid://bkolianiobservatorio14"]
+[gd_scene load_steps=12 format=3 uid="uid://bkolianiobservatorio14"]
 
-; Região III / nível 14 -- Observatório Lunar.
-; Bolsas de "gravidade lunar" (`ZonaGravidade`): lá dentro a Koliani salta
-; alto e cai devagar -- é assim que se cruzam os vãos largos entre as
-; plataformas suspensas. Arena no cimo com A Sacerdotisa Lunar, que alivia
-; a gravidade da Koliani (MARÉ LUNAR) enquanto chove meteoros púrpura.
+; REGIAO III / nivel 14 -- Observatorio Lunar.
+; Nivel FEITO A MAO (corredor = false) e VERTICAL. Bolsas de GRAVIDADE
+; LUNAR (ZonaGravidade) onde a Koliani salta altissimo e cai devagar --
+; usam-se para vencer os grandes vaos verticais. Bifurcacao: coluna lunar
+; oeste / degraus este. Elite: wogol de carga. Vazio em baixo. Chefe: A
+; Sacerdotisa Lunar.
 
 [ext_resource type="PackedScene" uid="uid://bkolianiactor01" path="res://scenes/actors/Koliani.tscn" id="1_kol"]
 [ext_resource type="PackedScene" uid="uid://bdemoniobase01" path="res://scenes/actors/DemonioBase.tscn" id="2_dem"]
@@ -15,11 +16,11 @@
 [ext_resource type="Script" path="res://scripts/nivel_com_chefe.gd" id="7_niv"]
 [ext_resource type="PackedScene" uid="uid://bkolianiatmosfera01" path="res://scenes/fx/Atmosfera.tscn" id="8_atm"]
 [ext_resource type="PackedScene" uid="uid://bkolianiplataforma01" path="res://scenes/actors/Plataforma.tscn" id="9_pl"]
-[ext_resource type="PackedScene" uid="uid://bkolianizonagrav14" path="res://scenes/actors/ZonaGravidade.tscn" id="10_zg"]
-[ext_resource type="PackedScene" uid="uid://bkolianiespinhos01" path="res://scenes/actors/Espinhos.tscn" id="11_esp"]
+[ext_resource type="PackedScene" uid="uid://bkolianizonagrav14" path="res://scenes/actors/ZonaGravidade.tscn" id="10_grav"]
+[ext_resource type="PackedScene" uid="uid://bkolianiaguavenenosa01" path="res://scenes/actors/AguaVenenosa.tscn" id="11_vazio"]
 
 [sub_resource type="RectangleShape2D" id="rs_chk"]
-size = Vector2(40, 80)
+size = Vector2(44, 96)
 
 [sub_resource type="Gradient" id="grad_luz"]
 offsets = PackedFloat32Array(0, 1)
@@ -35,166 +36,169 @@ fill_to = Vector2(1, 0.5)
 
 [node name="Observatorio_Lunar" type="Node2D"]
 script = ExtResource("7_niv")
+corredor = false
 
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
-cor_ambiente = Color(0.7, 0.72, 0.92, 1)
-cor_fundo = Color(0.04, 0.05, 0.11, 1)
-cor_silhueta = Color(0.09, 0.1, 0.18, 1)
+cor_ambiente = Color(0.82, 0.84, 0.9, 1)
+cor_fundo = Color(0.05, 0.06, 0.1, 1)
+cor_silhueta = Color(0.12, 0.13, 0.2, 1)
 cor_luz = Color(0.86, 0.88, 1.0, 1)
-cor_poeira = Color(0.88, 0.92, 1.0, 1)
+cor_poeira = Color(0.9, 0.92, 1.0, 1)
 densidade_poeira = 1.7
 bioma = "torres"
-largura_nivel = 3500.0
-luzes_horizonte = true
+largura_nivel = 2600.0
 fundo_pack = "montanhas"
-tinta_fundo = Color(0.5, 0.64, 1.06, 1)
+tinta_fundo = Color(0.62, 0.68, 1.0, 1)
 neblina_fundo = 0.46
-dessaturar_fundo = 0.58
+dessaturar_fundo = 0.5
+
+[node name="Vazio" parent="." instance=ExtResource("11_vazio")]
+position = Vector2(650, 1120)
+largura = 3000.0
+altura = 340.0
+cor = Color(0.05, 0.04, 0.11, 0.97)
 
 [node name="ChaoInicio" parent="." instance=ExtResource("9_pl")]
-position = Vector2(380, 660)
-tamanho = Vector2(520, 48)
-altura_visual = 96.0
+position = Vector2(340, 900)
+tamanho = Vector2(460, 60)
+altura_visual = 110.0
+cor_base = Color(0.24, 0.25, 0.32, 1)
+cor_topo = Color(0.52, 0.54, 0.66, 1)
 
-[node name="PlatAlta1" parent="." instance=ExtResource("9_pl")]
-position = Vector2(1060, 470)
-tamanho = Vector2(170, 22)
-altura_visual = 26.0
+[node name="M1" parent="." instance=ExtResource("9_pl")]
+position = Vector2(580, 820)
+tamanho = Vector2(140, 22)
+altura_visual = 30.0
+cor_base = Color(0.24, 0.25, 0.32, 1)
+cor_topo = Color(0.52, 0.54, 0.66, 1)
 
-[node name="PlatAlta2" parent="." instance=ExtResource("9_pl")]
-position = Vector2(1440, 400)
-tamanho = Vector2(170, 22)
-altura_visual = 26.0
+[node name="M2" parent="." instance=ExtResource("9_pl")]
+position = Vector2(780, 740)
+tamanho = Vector2(140, 22)
+altura_visual = 30.0
+cor_base = Color(0.24, 0.25, 0.32, 1)
+cor_topo = Color(0.52, 0.54, 0.66, 1)
 
-[node name="ChaoMeio" parent="." instance=ExtResource("9_pl")]
-position = Vector2(1820, 560)
-tamanho = Vector2(300, 40)
-altura_visual = 72.0
+[node name="M3" parent="." instance=ExtResource("9_pl")]
+position = Vector2(600, 660)
+tamanho = Vector2(140, 22)
+altura_visual = 30.0
+cor_base = Color(0.24, 0.25, 0.32, 1)
+cor_topo = Color(0.52, 0.54, 0.66, 1)
 
-[node name="PlatAlta3" parent="." instance=ExtResource("9_pl")]
-position = Vector2(2180, 440)
-tamanho = Vector2(170, 22)
-altura_visual = 26.0
+[node name="CentroLedge" parent="." instance=ExtResource("9_pl")]
+position = Vector2(680, 580)
+tamanho = Vector2(240, 26)
+altura_visual = 40.0
+cor_base = Color(0.24, 0.25, 0.32, 1)
+cor_topo = Color(0.52, 0.54, 0.66, 1)
 
-[node name="ChaoArena" parent="." instance=ExtResource("9_pl")]
-position = Vector2(2960, 660)
-tamanho = Vector2(880, 48)
-altura_visual = 96.0
-
-[node name="Zona1" parent="." instance=ExtResource("10_zg")]
-position = Vector2(830, 500)
-
-[node name="Zona2" parent="." instance=ExtResource("10_zg")]
-position = Vector2(1250, 440)
-
-[node name="Zona3" parent="." instance=ExtResource("10_zg")]
-position = Vector2(2000, 470)
-
-[node name="EspinhosMeio" parent="." instance=ExtResource("11_esp")]
-position = Vector2(1780, 542)
-largura = 8
-
-[node name="LuzInicio" type="PointLight2D" parent="."]
-position = Vector2(380, 600)
-texture = SubResource("tex_luz")
-energy = 0.45
-color = Color(0.82, 0.84, 1, 1)
-scale = Vector2(1.9, 1.1)
-
-[node name="LuzArena" type="PointLight2D" parent="."]
-position = Vector2(2960, 600)
-texture = SubResource("tex_luz")
-energy = 0.55
-color = Color(0.82, 0.84, 1, 1)
-scale = Vector2(2.4, 1.4)
-
-[node name="Koliani" parent="." instance=ExtResource("1_kol")]
-position = Vector2(150, 560)
-
-[node name="Demonio1" parent="." instance=ExtResource("2_dem")]
-especie = "olho"
-position = Vector2(500, 560)
-alcance_patrulha = 220.0
-
-[node name="Demonio2" parent="." instance=ExtResource("2_dem")]
+[node name="EliteWogol" parent="." instance=ExtResource("2_dem")]
+position = Vector2(680, 512)
+scale = Vector2(1.4, 1.4)
 especie = "wogol"
-position = Vector2(1820, 520)
+vida = 170
+dano_contacto = 24
+comportamento = "carga"
 alcance_patrulha = 120.0
+cor_rim = Color(0.8, 0.85, 1.0, 1)
 
-[node name="Demonio3" parent="." instance=ExtResource("2_dem")]
-especie = "olho"
-position = Vector2(3080, 540)
-alcance_patrulha = 240.0
+; -- BIFURCACAO: coluna lunar O / degraus E --
+[node name="GravOeste" parent="." instance=ExtResource("10_grav")]
+position = Vector2(500, 380)
+escala = 0.38
+
+[node name="GO1" parent="." instance=ExtResource("9_pl")]
+position = Vector2(490, 490)
+tamanho = Vector2(120, 18)
+altura_visual = 22.0
+cor_base = Color(0.24, 0.25, 0.32, 1)
+cor_topo = Color(0.52, 0.54, 0.66, 1)
+
+[node name="GO2" parent="." instance=ExtResource("9_pl")]
+position = Vector2(560, 390)
+tamanho = Vector2(120, 18)
+altura_visual = 22.0
+cor_base = Color(0.24, 0.25, 0.32, 1)
+cor_topo = Color(0.52, 0.54, 0.66, 1)
+
+[node name="GO3" parent="." instance=ExtResource("9_pl")]
+position = Vector2(450, 300)
+tamanho = Vector2(120, 18)
+altura_visual = 22.0
+cor_base = Color(0.24, 0.25, 0.32, 1)
+cor_topo = Color(0.52, 0.54, 0.66, 1)
+
+[node name="GE1" parent="." instance=ExtResource("9_pl")]
+position = Vector2(850, 500)
+tamanho = Vector2(120, 18)
+altura_visual = 22.0
+cor_base = Color(0.24, 0.25, 0.32, 1)
+cor_topo = Color(0.52, 0.54, 0.66, 1)
+
+[node name="GE2" parent="." instance=ExtResource("9_pl")]
+position = Vector2(970, 420)
+tamanho = Vector2(120, 18)
+altura_visual = 22.0
+cor_base = Color(0.24, 0.25, 0.32, 1)
+cor_topo = Color(0.52, 0.54, 0.66, 1)
+
+[node name="GE3" parent="." instance=ExtResource("9_pl")]
+position = Vector2(850, 340)
+tamanho = Vector2(120, 18)
+altura_visual = 22.0
+cor_base = Color(0.24, 0.25, 0.32, 1)
+cor_topo = Color(0.52, 0.54, 0.66, 1)
+
+[node name="ChaoChefe" parent="." instance=ExtResource("9_pl")]
+position = Vector2(660, 260)
+tamanho = Vector2(560, 60)
+altura_visual = 100.0
+cor_base = Color(0.24, 0.25, 0.32, 1)
+cor_topo = Color(0.52, 0.54, 0.66, 1)
+
+[node name="ColProjetil" parent="." instance=ExtResource("3_col")]
+position = Vector2(660, 224)
+habilidade_id = "projetil"
 
 [node name="Chefe" parent="." instance=ExtResource("6_chefe")]
-position = Vector2(2960, 400)
+position = Vector2(780, 184)
 
-[node name="ColCarta" parent="." instance=ExtResource("3_col")]
-position = Vector2(2180, 396)
-pista_id = "lunar_carta_da_sacerdotisa"
+[node name="LuzBaixo" type="PointLight2D" parent="."]
+position = Vector2(340, 840)
+texture = SubResource("tex_luz")
+energy = 0.55
+color = Color(0.8, 0.84, 1.0, 1)
+scale = Vector2(2.0, 1.3)
+
+[node name="LuzChefe" type="PointLight2D" parent="."]
+position = Vector2(660, 240)
+texture = SubResource("tex_luz")
+energy = 0.65
+color = Color(0.86, 0.9, 1.0, 1)
+scale = Vector2(2.9, 1.7)
+
+[node name="Koliani" parent="." instance=ExtResource("1_kol")]
+position = Vector2(200, 830)
 
 [node name="CheckInicio" type="Area2D" parent="."]
-position = Vector2(360, 588)
+position = Vector2(460, 836)
 collision_layer = 16
 collision_mask = 2
 script = ExtResource("5_chk")
-
-[node name="Visual" type="ColorRect" parent="CheckInicio"]
-offset_left = -5.0
-offset_top = -42.0
-offset_right = 5.0
-offset_bottom = 40.0
-color = Color(0.36, 0.28, 0.55, 1)
-
-[node name="Luz" type="Node2D" parent="CheckInicio"]
-visible = false
-
-[node name="Brilho" type="ColorRect" parent="CheckInicio/Luz"]
-offset_left = -20.0
-offset_top = -54.0
-offset_right = 20.0
-offset_bottom = 44.0
-color = Color(0.85, 0.31, 0.83, 0.32)
-
-[node name="PointLight2D" type="PointLight2D" parent="CheckInicio/Luz"]
-texture = SubResource("tex_luz")
-energy = 1.1
-color = Color(0.93, 0.4, 0.9, 1)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CheckInicio"]
 shape = SubResource("rs_chk")
 
-[node name="CheckArena" type="Area2D" parent="."]
-position = Vector2(2600, 588)
+[node name="CheckMeio" type="Area2D" parent="."]
+position = Vector2(680, 516)
 collision_layer = 16
 collision_mask = 2
 script = ExtResource("5_chk")
 
-[node name="Visual" type="ColorRect" parent="CheckArena"]
-offset_left = -5.0
-offset_top = -42.0
-offset_right = 5.0
-offset_bottom = 40.0
-color = Color(0.36, 0.28, 0.55, 1)
-
-[node name="Luz" type="Node2D" parent="CheckArena"]
-visible = false
-
-[node name="Brilho" type="ColorRect" parent="CheckArena/Luz"]
-offset_left = -20.0
-offset_top = -54.0
-offset_right = 20.0
-offset_bottom = 44.0
-color = Color(0.85, 0.31, 0.83, 0.32)
-
-[node name="PointLight2D" type="PointLight2D" parent="CheckArena/Luz"]
-texture = SubResource("tex_luz")
-energy = 1.1
-color = Color(0.93, 0.4, 0.9, 1)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckArena"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckMeio"]
 shape = SubResource("rs_chk")
 
 [node name="Porta" parent="." instance=ExtResource("4_porta")]
-position = Vector2(3380, 586)
+position = Vector2(900, 236)
 pista_ao_atravessar = ""
