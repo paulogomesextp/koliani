@@ -75,6 +75,9 @@ var _arena_ok := false
 var _arena_esq := 0.0
 var _arena_dir := 0.0
 var _arena_topo := 0.0
+## O tecto em Y só vale para chefes que ANDAM no chão -- um chefe voador
+## nunca toca o chão e não deve ser puxado para baixo da superfície.
+var _tocou_chao := false
 
 
 func _e_chefe() -> bool:
@@ -94,30 +97,49 @@ func _ready() -> void:
 	call_deferred("_medir_arena")
 
 
+var _arena_tentativas := 0
+
 ## Raio para baixo a partir da origem do chefe: acha a plataforma de chão e
-## guarda as bordas esquerda/direita (menos uma margem) e o topo. Se não
-## encontrar nada com `tamanho` (ex.: chão feito de tiles), fica sem prisão.
+## guarda as bordas esquerda/direita (menos uma margem) e o topo. É
+## re-tentado em `_process` enquanto falhar (as colisões podem ainda não
+## estar no espaço físico no 1.º frame). Sem plataforma com `tamanho`
+## (chão de tiles), cai num limite à volta da origem -- melhor do que nada.
 func _medir_arena() -> void:
-	if not preso_a_arena:
+	if not preso_a_arena or _arena_ok:
 		return
+	_arena_tentativas += 1
 	var mundo := get_world_2d()
 	if mundo == null:
 		return
-	var de := _origem + Vector2(0.0, -30.0)
-	var q := PhysicsRayQueryParameters2D.create(de, de + Vector2(0.0, 640.0), collision_mask | 1)
-	q.exclude = [self]
-	var hit := mundo.direct_space_state.intersect_ray(q)
-	if hit.is_empty():
-		return
-	var chao := hit.get("collider") as Node2D
-	if chao == null or not ("tamanho" in chao):
-		return
-	var meia: float = (chao.tamanho.x as float) * 0.5
 	var margem: float = 34.0 * maxf(0.8, escala_visual)
-	_arena_esq = chao.global_position.x - meia + margem
-	_arena_dir = chao.global_position.x + meia - margem
-	_arena_topo = (hit["position"].y as float)
-	_arena_ok = _arena_dir > _arena_esq
+	var de := _origem + Vector2(0.0, -40.0)
+	# só a camada 1 (chão/plataformas) -- evita medir a Koliani ou triggers
+	var q := PhysicsRayQueryParameters2D.create(de, de + Vector2(0.0, 1400.0), 1)
+	q.exclude = [self]
+	q.collide_with_areas = false
+	var hit := mundo.direct_space_state.intersect_ray(q)
+	var chao: Node2D = hit.get("collider") as Node2D if not hit.is_empty() else null
+	if chao != null and ("tamanho" in chao):
+		var meia: float = (chao.tamanho.x as float) * 0.5
+		_arena_esq = chao.global_position.x - meia + margem
+		_arena_dir = chao.global_position.x + meia - margem
+		_arena_topo = (hit["position"].y as float)
+		_arena_ok = _arena_dir > _arena_esq
+		return
+	if not hit.is_empty():
+		# há chão mas sem `tamanho` (tiles): limite largo à volta da origem
+		_arena_esq = _origem.x - 460.0
+		_arena_dir = _origem.x + 460.0
+		_arena_topo = (hit["position"].y as float)
+		_arena_ok = true
+		return
+	# ainda sem chão -- desiste ao fim de umas tentativas: prende só o X à
+	# volta da origem, sem tecto em Y (pode ser um chefe que voa livremente).
+	if _arena_tentativas >= 20:
+		_arena_esq = _origem.x - 480.0
+		_arena_dir = _origem.x + 480.0
+		_arena_topo = INF
+		_arena_ok = true
 
 
 ## Trava o chefe dentro das bordas da arena. Chamado todo o frame.
@@ -136,7 +158,7 @@ func _prender_na_arena() -> void:
 		global_position.x = _arena_dir
 		if velocity.x > 0.0:
 			velocity.x = 0.0
-	if global_position.y > _arena_topo + 6.0:
+	if _tocou_chao and _arena_topo != INF and global_position.y > _arena_topo + 6.0:
 		global_position.y = _arena_topo + 6.0
 		if velocity.y > 0.0:
 			velocity.y = 0.0
@@ -248,6 +270,10 @@ func _process(dt: float) -> void:
 	super._process(dt)
 	_dano_recente = maxf(0.0, _dano_recente - dt)
 	_atualizar_escudo_boss(dt)
+	if is_on_floor():
+		_tocou_chao = true
+	if not _arena_ok:
+		_medir_arena()
 	_prender_na_arena()
 	# rede de segurança: se mesmo assim o chefe acabar fora do mapa (fosso
 	# sem plataforma medida, etc.), conta como derrotado -- senão o nível
