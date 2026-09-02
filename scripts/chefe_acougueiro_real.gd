@@ -171,7 +171,7 @@ func _linha_choque(dir: float) -> void:
 
 
 func _arremessar() -> void:
-	Som.toca("investida", -6.0, 1.2)
+	Som.toca("chefe_magia", -6.0, 1.2)
 	var n := 2 if _fase2 else 1
 	for i in n:
 		_cutelo_bumerangue(i * 0.12)

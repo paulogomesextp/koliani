@@ -384,7 +384,7 @@ func _preparar_olho() -> void:
 
 
 func _disparar_olho() -> void:
-	Som.toca("investida", -4.0, 0.5)
+	Som.toca("chefe_magia", -4.0, 0.9)
 	_abanar_camera(4.0)
 	if _feixe:
 		_feixe.width = 9.0

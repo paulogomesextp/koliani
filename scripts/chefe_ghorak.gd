@@ -152,7 +152,7 @@ func _baque() -> void:
 
 
 func _semear() -> void:
-	Som.toca("investida", -8.0)
+	Som.toca("chefe_magia", -8.0)
 	var origem := global_position.x
 	var alvo := _x_koliani() + signf(_x_koliani() - origem) * 44.0
 	var passos := 5 if _fase2 else 4

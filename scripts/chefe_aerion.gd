@@ -203,7 +203,7 @@ func _ve_koliani() -> bool:
 ## --- ataques ---------------------------------------------------------
 
 func _lancas() -> void:
-	Som.toca("investida", -8.0, 1.3)
+	Som.toca("chefe_magia", -8.0, 1.3)
 	# aponta para onde a Koliani ESTAVA no início do telégrafo -> correr
 	# durante o aviso desvia mesmo
 	var base := (_mira_lancas - global_position).normalized()

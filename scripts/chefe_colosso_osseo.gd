@@ -209,7 +209,7 @@ func _gadanha() -> void:
 
 
 func _lanca() -> void:
-	Som.toca("investida", -6.0, 1.1)
+	Som.toca("chefe_magia", -6.0, 1.1)
 	var pai := get_parent()
 	if pai == null:
 		return

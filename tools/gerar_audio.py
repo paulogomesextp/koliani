@@ -777,6 +777,38 @@ def transicao():
     escrever("transicao.wav", buf, 0.55)
 
 
+# --------------------------------------------------------------------------
+# 13) MAGIA DE CHEFE -- ataque à distância (feixe/projétil mágico)
+# --------------------------------------------------------------------------
+def chefe_magia():
+    """Ataque mágico à distância dos chefes (ex.: o raio do olho do
+    Zeriko): um "carregar" agudo em cintilação ascendente + o disparo
+    grave a seguir -- lê-se como magia, distinto do "investida" (corpo a
+    corpo)."""
+    random.seed(9102)
+    dur = 0.55
+    N = int(dur * FS)
+    buf = [0.0] * N
+    # carregar: cintilação a subir de frequência, ganha corpo até disparar
+    for n in range(int(0.32 * FS)):
+        t = n / FS
+        p = t / 0.32
+        f = 900.0 + 2600.0 * (p ** 1.4)
+        env = (p ** 1.6) * 0.3
+        buf[n] += math.sin(2 * math.pi * f * t) * env
+        buf[n] += math.sin(2 * math.pi * f * 1.5 * t) * env * 0.4
+    # disparo: feixe curto e grave, sai no instante em que a cintilação atinge o topo
+    t0 = int(0.32 * FS)
+    rr = Reson()
+    for n in range(t0, N):
+        t = (n - t0) / FS
+        fc = 700.0 * math.exp(-t * 8.0) + 180.0
+        s = rr.passo(random.uniform(-1, 1) * 0.6, fc, 260.0)
+        buf[n] += s * math.exp(-t * 7.0) * 0.9
+        buf[n] += math.sin(2 * math.pi * fc * t) * math.exp(-t * 9.0) * 0.35
+    escrever("chefe_magia.wav", buf, 0.85)
+
+
 if __name__ == "__main__":
     game_over_voz()
     menu_loop()
@@ -794,3 +826,4 @@ if __name__ == "__main__":
     investida()
     chefe_cai()
     transicao()
+    chefe_magia()

@@ -134,7 +134,7 @@ func _ve_koliani() -> bool:
 ## --- ataques ---------------------------------------------------------
 
 func _cruzes() -> void:
-	Som.toca("investida", -7.0, 0.7)
+	Som.toca("chefe_magia", -7.0, 0.7)
 	var pai := get_parent()
 	if pai == null:
 		return
@@ -185,7 +185,7 @@ func _cruz(x: float, atraso: float) -> void:
 
 
 func _maos() -> void:
-	Som.toca("investida", -8.0, 1.4)
+	Som.toca("chefe_magia", -8.0, 1.4)
 	var pai := get_parent()
 	if pai == null:
 		return

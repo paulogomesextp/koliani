@@ -178,7 +178,7 @@ func _teleportar() -> void:
 ## --- ataques ---------------------------------------------------------
 
 func _lancar_laminas() -> void:
-	Som.toca("investida", -8.0, 1.3)
+	Som.toca("chefe_magia", -8.0, 1.3)
 	var pai := get_parent()
 	if pai == null:
 		return

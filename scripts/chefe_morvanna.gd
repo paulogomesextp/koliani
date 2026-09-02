@@ -157,7 +157,7 @@ func _ve_koliani() -> bool:
 ## --- ataques ---------------------------------------------------------
 
 func _lancar_maos() -> void:
-	Som.toca("investida", -8.0, 1.5)
+	Som.toca("chefe_magia", -8.0, 1.5)
 	_abanar_camera(3.0)
 	var n := 3 if _fase2 else 2
 	var alvo := _x_koliani()

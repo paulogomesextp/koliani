@@ -179,7 +179,7 @@ func _preparar_laser() -> void:
 
 
 func _disparar_laser() -> void:
-	Som.toca("investida", -5.0, 0.5)
+	Som.toca("chefe_magia", -5.0, 0.5)
 	_abanar_camera(3.0)
 	if _feixe:
 		_feixe.width = 8.0

@@ -209,7 +209,7 @@ func _ve_koliani() -> bool:
 ## --- ataques ---------------------------------------------------------
 
 func _lancas() -> void:
-	Som.toca("investida", -8.0, 1.3)
+	Som.toca("chefe_magia", -8.0, 1.3)
 	var pai := get_parent()
 	if pai == null:
 		return

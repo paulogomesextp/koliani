@@ -165,7 +165,7 @@ func _invocar_raios() -> void:
 	var pai := get_parent()
 	if pai == null:
 		return
-	Som.toca("investida", -8.0, 1.4)
+	Som.toca("chefe_magia", -8.0, 1.4)
 	var n := 4 if _fase2 else 3
 	var passo := 90.0 if _fase2 else 130.0
 	var alvo := _x_koliani()

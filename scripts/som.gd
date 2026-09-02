@@ -24,6 +24,7 @@ const CAMINHOS := {
 	"demonio_ataque": "res://assets/audio/demonio_ataque.wav",
 	"conquista": "res://assets/audio/conquista.wav",
 	"transicao": "res://assets/audio/transicao.wav",
+	"chefe_magia": "res://assets/audio/chefe_magia.wav",
 }
 const VOZES := 8
 
