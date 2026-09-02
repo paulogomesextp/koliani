@@ -192,15 +192,16 @@ func _prender_na_arena() -> void:
 			velocity.y = 0.0
 
 
-## Feito em deferred: o `_ready` do chefe concreto já correu e definiu a
-## `dur_exposto`/`dur_exposta` -- aqui ALARGA-SE essa janela (menos tempo
-## blindado, pedido do Paulo) e monta-se o escudo da cor do chefe.
+## Feito em deferred: o `_ready` do chefe concreto já correu. Sem a janela
+## EXPOSTA (escudos retirados), a fase EXPOSTO das máquinas de estado é só
+## um respiro entre ataques -- encurta-se para o chefe não ficar parado
+## sem fazer nada.
 func _preparar_escudo_boss() -> void:
 	for nome in ["dur_exposto", "dur_exposta"]:
 		if nome in self:
 			var v: float = get(nome)
 			if v > 0.0:
-				set(nome, v * 1.6)
+				set(nome, maxf(v * 0.55, 0.35))
 	if usa_escudo_boss:
 		_montar_escudo_boss()
 
