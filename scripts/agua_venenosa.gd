@@ -37,6 +37,8 @@ func _pronto() -> void:
 	_luz = get_node_or_null("Luz")
 	if brasas:
 		_montar_brasas()
+	else:
+		_montar_bruma()
 	_reconstruir()
 
 
@@ -58,6 +60,30 @@ func _montar_brasas() -> void:
 	ramp.offsets = PackedFloat32Array([0.0, 0.5, 1.0])
 	ramp.colors = PackedColorArray([
 		Color(1.0, 0.85, 0.4, 0.0), Color(1.0, 0.55, 0.15, 0.9), Color(0.5, 0.1, 0.05, 0.0),
+	])
+	_brasas_no.color_ramp = ramp
+	add_child(_brasas_no)
+
+
+## Bruma tóxica lenta a subir da linha de água (variante veneno/ácido). Dá
+## vida à superfície -- sem isto lê-se como um retângulo pintado.
+func _montar_bruma() -> void:
+	_brasas_no = CPUParticles2D.new()
+	_brasas_no.amount = 30
+	_brasas_no.lifetime = 3.4
+	_brasas_no.local_coords = false
+	_brasas_no.direction = Vector2(0, -1)
+	_brasas_no.spread = 26.0
+	_brasas_no.gravity = Vector2(0, -16)
+	_brasas_no.initial_velocity_min = 8.0
+	_brasas_no.initial_velocity_max = 26.0
+	_brasas_no.scale_amount_min = 2.5
+	_brasas_no.scale_amount_max = 6.0
+	var c := cor.lightened(0.3)
+	var ramp := Gradient.new()
+	ramp.offsets = PackedFloat32Array([0.0, 0.35, 1.0])
+	ramp.colors = PackedColorArray([
+		Color(c.r, c.g, c.b, 0.0), Color(c.r, c.g, c.b, 0.42), Color(c.r, c.g, c.b, 0.0),
 	])
 	_brasas_no.color_ramp = ramp
 	add_child(_brasas_no)
@@ -118,11 +144,11 @@ func _reconstruir() -> void:
 	# rebordo aceso na linha de água -- deixa o perigo bem visível no escuro
 	if _rim:
 		_rim.polygon = PackedVector2Array([
-			Vector2(-hw, -hh - 3.0), Vector2(hw, -hh - 3.0),
-			Vector2(hw, -hh + 5.0), Vector2(-hw, -hh + 5.0),
+			Vector2(-hw, -hh - 4.0), Vector2(hw, -hh - 4.0),
+			Vector2(hw, -hh + 7.0), Vector2(-hw, -hh + 7.0),
 		])
-		var rc := cor.lightened(0.4) if brasas else cor.lightened(0.6)
-		_rim.color = Color(rc.r, rc.g, rc.b, 0.55 if brasas else 0.9)
+		var rc := cor.lightened(0.4) if brasas else cor.lightened(0.7)
+		_rim.color = Color(rc.r, rc.g, rc.b, 0.55 if brasas else 1.0)
 	if _luz:
 		_luz.position = Vector2(0.0, -hh)
 		# a luz da linha de agua toma a COR DO LIQUIDO (vinha sempre verde do

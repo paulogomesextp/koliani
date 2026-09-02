@@ -117,6 +117,9 @@ var _dash_recarga := 0.0
 var _rolar_restante := 0.0
 ## Conta-decrescente da janela pós-rolamento (ver `POS_ROLL_JANELA`).
 var _pos_roll_t := 0.0
+## Smear do golpe (0..1.4): estica o sprite no sentido do golpe e dá um
+## micro-avanço, decai a zero. Só visual.
+var _atk_smear := 0.0
 ## Janela em que um impulso externo (trampolim, impulsor) fica imune ao
 ## "corte de salto" do Movimento -- ver `aplicar_impulso`.
 var _impulso_externo_t := 0.0
@@ -833,6 +836,7 @@ func _animar(dt: float) -> void:
 	_anim_t += dt
 	_squash = move_toward(_squash, 0.0, dt * 5.0)
 	_pop = move_toward(_pop, 0.0, dt * 7.0)
+	_atk_smear = move_toward(_atk_smear, 0.0, dt * 6.5)
 
 	# o rig "cavaleiro" já tem escudo desenhado nos frames da defesa
 	if _escudo and RIG == "codigo":
@@ -884,6 +888,15 @@ func _animar(dt: float) -> void:
 
 	escala.x += _squash * 0.32 + _pop * 0.10
 	escala.y += -_squash * 0.32 + _pop * 0.18
+	# smear do golpe: estica na horizontal, comprime na vertical, inclina e
+	# avança um nada no sentido do golpe (pega Dead Cells -- "pisar" o golpe)
+	if _atk_smear > 0.001:
+		escala.x += _atk_smear * 0.30
+		escala.y -= _atk_smear * 0.16
+		_sprite.position.x = _olha_para * _atk_smear * 6.5
+		_sprite.rotation = lerp_angle(_sprite.rotation, -_olha_para * 0.16, minf(1.0, dt * 22.0))
+	else:
+		_sprite.position.x = move_toward(_sprite.position.x, 0.0, dt * 90.0)
 	_sprite.scale = Vector2(escala.x * _olha_para, escala.y)
 
 	_animar_rastro(dt)
@@ -963,6 +976,9 @@ func _iniciar_ataque() -> void:
 	_ataque_restante = _ataque_dur
 	_combo_janela = _ataque_dur + JANELA_COMBO
 	_pop = 1.0
+	# smear direcional + micro-avanço no golpe (pegada Dead Cells: "pisar" o
+	# golpe). Só visual -- não mexe na física. O remate do combo puxa mais.
+	_atk_smear = 1.4 if _combo_passo == NUM_COMBO - 1 else 1.0
 	Som.toca("ataque", -13.0, randf_range(0.92, 1.09))
 	_flash_golpe()
 	if _combo_passo == NUM_COMBO - 1:
