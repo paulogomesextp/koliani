@@ -34,6 +34,9 @@ const RECARGA_DASH := 0.55
 const VEL_ROLAR := 360.0
 const DUR_ROLAR := 0.30
 const RECARGA_ROLAR := 0.45
+## Janela logo a seguir a um rolamento em que o próximo golpe é CRÍTICO
+## (pegada Dead Cells: rolar por dentro do inimigo e rematar).
+const POS_ROLL_JANELA := 0.28
 ## Escalar paredes (habilidade "escalar_paredes"): encostada a uma parede
 ## no ar e a segurar na direção dela, agarra-se; W/S sobe/desce; saltar dá
 ## impulso para fora (não gasta o salto do ar). Sem limite de tempo.
@@ -112,6 +115,8 @@ var _olha_para := 1.0
 var _dash_restante := 0.0
 var _dash_recarga := 0.0
 var _rolar_restante := 0.0
+## Conta-decrescente da janela pós-rolamento (ver `POS_ROLL_JANELA`).
+var _pos_roll_t := 0.0
 ## Janela em que um impulso externo (trampolim, impulsor) fica imune ao
 ## "corte de salto" do Movimento -- ver `aplicar_impulso`.
 var _impulso_externo_t := 0.0
@@ -384,6 +389,7 @@ func _pinta(n: Node, c: Color) -> void:
 func _physics_process(dt: float) -> void:
 	_dash_recarga = maxf(0.0, _dash_recarga - dt)
 	_rolar_recarga = maxf(0.0, _rolar_recarga - dt)
+	_pos_roll_t = maxf(0.0, _pos_roll_t - dt)
 	_invulneravel = maxf(0.0, _invulneravel - dt)
 	_impulso_externo_t = maxf(0.0, _impulso_externo_t - dt)
 	_hurt_t = maxf(0.0, _hurt_t - dt)
@@ -569,6 +575,8 @@ func _physics_process(dt: float) -> void:
 	# estados exclusivos de movimento: rolamento > dash > movimento normal
 	if _rolar_restante > 0.0:
 		_rolar_restante -= dt
+		if _rolar_restante <= 0.0:
+			_pos_roll_t = POS_ROLL_JANELA   # abre a janela de crítico pós-rolamento
 		velocity.x = _olha_para * VEL_ROLAR
 		if not is_on_floor():
 			velocity.y = minf(Movimento.VEL_MAX_QUEDA, velocity.y + Movimento.GRAVIDADE * _grav_escala * dt)
@@ -655,15 +663,16 @@ func _physics_process(dt: float) -> void:
 			# banda do topo dele (larga, apanha bichos altos e baixos)
 			if global_position.y > ep.y + 6.0 or pes < ep.y - 52.0 or pes > ep.y + 30.0:
 				continue
-			e.receber_dano(_dano_golpe(), 0.0)
+			var crit_stomp: bool = e.has_method("esta_vulneravel") and e.esta_vulneravel()
+			e.receber_dano(_dano_golpe(), 0.0, crit_stomp)
 			velocity.y = -STOMP_RESSALTO
 			_mov.saltos_dados = 0  # o ressalto devolve os saltos de ar todos
 			_invulneravel = maxf(_invulneravel, 0.3)
 			_stomp_cd = 0.22
 			_pop = 1.0
 			_squash = maxf(_squash, 0.5)
-			_abanar(3.0)
-			_hitstop(0.05)
+			_abanar(4.5 if crit_stomp else 3.0)
+			_hitstop(0.09 if crit_stomp else 0.05)
 			Som.toca("ataque", -12.0, randf_range(0.92, 1.09))
 			_pop_impacto(ep)
 			break
@@ -1128,14 +1137,30 @@ func _lancar_kamehameha() -> void:
 
 func _ao_acertar_corpo(corpo: Node) -> void:
 	if corpo.has_method("receber_dano"):
-		corpo.receber_dano(_dano_golpe(), sign(_olha_para))
+		# CRÍTICO (pegada Dead Cells): inimigo vulnerável (gelo/fogo/sangue/
+		# atordoado), golpe logo a seguir a um rolamento, ou golpe pelas costas.
+		var crit := false
+		if corpo.has_method("esta_vulneravel") and corpo.esta_vulneravel():
+			crit = true
+		elif _pos_roll_t > 0.0:
+			crit = true
+		elif corpo is Node2D and corpo.get("_direcao") != null \
+				and signf(global_position.x - (corpo as Node2D).global_position.x) == -float(corpo._direcao):
+			crit = true
+		corpo.receber_dano(_dano_golpe(), sign(_olha_para), crit)
+		# remate do combo (4.º golpe) -> deixa o inimigo a SANGRAR
+		if _combo_passo >= NUM_COMBO - 1 and corpo.has_method("sangrar"):
+			corpo.sangrar(2.6, maxi(3, roundi(_dano_golpe() * 0.16)))
 		if _faiscas:
 			_faiscas.position.x = absf(_faiscas.position.x) * _olha_para
 			_faiscas.restart()
 		_pop_impacto((corpo as Node2D).global_position if corpo is Node2D else global_position)
-		_abanar(4.5)
-		_hitstop(0.06)
-		Som.toca("acerto", -8.0, randf_range(0.94, 1.07))
+		_abanar(8.0 if crit else 4.5)
+		_hitstop(0.11 if crit else 0.05 + 0.015 * float(_combo_passo))
+		if crit:
+			Som.toca("acerto", -5.0, randf_range(1.18, 1.32))
+		else:
+			Som.toca("acerto", -8.0, randf_range(0.94, 1.07))
 
 
 ## "Frame de impacto": o anel pixel-art (`Impacto`) a abrir no ponto do

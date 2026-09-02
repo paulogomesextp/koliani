@@ -44,6 +44,9 @@ func _physics_process(dt: float) -> void:
 func _ao_bater(corpo: Node) -> void:
 	if corpo.has_method("receber_dano") and not (corpo is Koliani):
 		corpo.receber_dano(dano, signf(_dir.x) if _dir.x != 0.0 else 0.0)
+		# o tiro mágico DEIXA A ARDER -> abre janela de crítico para a espada
+		if corpo.has_method("queimar"):
+			corpo.queimar(2.0, maxi(2, roundi(dano * 0.14)))
 		Som.toca("acerto", -9.0)
 	_estoirar()
 

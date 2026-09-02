@@ -50,6 +50,8 @@ func _ao_bater(corpo: Node) -> void:
 			return
 		_atingidos[corpo] = true
 		corpo.receber_dano(dano, signf(_dir.x) if _dir.x != 0.0 else 0.0)
+		if corpo.has_method("queimar"):
+			corpo.queimar(2.6, maxi(3, roundi(dano * 0.1)))
 		Som.toca("acerto", -6.0)
 		return
 	# cenário -> parte-se

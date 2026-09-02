@@ -111,6 +111,23 @@ var _flinch_dir := 1.0
 ## inimigos comuns). Enquanto > 0 não patrulha nem persegue.
 var _congelado := 0.0
 
+## --- Estados de dano ao longo do tempo (pegada Dead Cells) --------------
+## QUEIMADURA: dano por tick e ALASTRA a inimigos próximos. SANGRAMENTO:
+## dano por tick que ACELERA enquanto o inimigo se mexe. ATORDOAMENTO:
+## paralisa como o gelo mas sem o tom azul. Qualquer um deixa o inimigo
+## VULNERÁVEL -> os golpes da Koliani nele contam como CRÍTICOS.
+const QUEIMA_INTERVALO := 0.5
+const SANGRA_INTERVALO := 0.7
+const SANGRA_INTERVALO_MOV := 0.34   # a mexer-se, sangra quase a dobrar
+const ALASTRA_RAIO := 48.0
+var _queimando := 0.0
+var _queima_dano := 3
+var _queima_cd := 0.0
+var _sangrando := 0.0
+var _sangra_dano := 4
+var _sangra_cd := 0.0
+var _atordoado := 0.0
+
 
 ## Gela este inimigo por `segundos` (a badalada do Sino, nível 11). Idempotente
 ## no sentido de ficar sempre com o maior tempo pendente.
@@ -120,6 +137,118 @@ func congelar(segundos: float) -> void:
 	_congelado = maxf(_congelado, segundos)
 	if _corpo:
 		_corpo.modulate = Color(0.7, 0.85, 1.2)
+
+
+## Põe este inimigo a arder: `dano_tick` a cada `QUEIMA_INTERVALO`, durante
+## `segundos`. A chama alastra a quem estiver a `ALASTRA_RAIO`.
+func queimar(segundos: float, dano_tick := 3) -> void:
+	if _morto:
+		return
+	_queimando = maxf(_queimando, segundos)
+	_queima_dano = maxi(_queima_dano, dano_tick)
+
+
+## Sangramento: `dano_tick` por tick, mais depressa enquanto ele anda.
+func sangrar(segundos: float, dano_tick := 4) -> void:
+	if _morto:
+		return
+	_sangrando = maxf(_sangrando, segundos)
+	_sangra_dano = maxi(_sangra_dano, dano_tick)
+
+
+## Atordoa: paralisa `segundos` (como o gelo, sem o tom azul).
+func atordoar(segundos: float) -> void:
+	if _morto:
+		return
+	_atordoado = maxf(_atordoado, segundos)
+
+
+func esta_a_arder() -> bool:
+	return _queimando > 0.0
+
+
+## true se um golpe da Koliani neste inimigo deve contar como CRÍTICO
+## (gelado / a arder / a sangrar / atordoado) -- a "janela" da pegada Dead Cells.
+func esta_vulneravel() -> bool:
+	return not _morto and (_congelado > 0.0 or _queimando > 0.0 \
+		or _sangrando > 0.0 or _atordoado > 0.0)
+
+
+## Dano que NÃO empurra nem re-telegrafa -- só corrói a vida (DoT).
+func _dano_periodico(q: int) -> void:
+	if _morto:
+		return
+	vida -= maxi(1, q)
+	piscar_dano()
+	if vida <= 0:
+		if _anim:
+			_morrer_anim()
+		else:
+			Impacto.rebentar(self, global_position + Vector2(0.0, -10.0),
+				cor_rim.lerp(Color(1, 1, 1), 0.35), 3.0)
+			soltar_estilhacos()
+			queue_free()
+
+
+## Corre os DoT (queimadura/sangramento) e gere o tom da pele conforme o
+## estado dominante. Chamado no topo do `_physics_process`.
+func _tick_status(dt: float) -> void:
+	if _morto:
+		return
+	if _queimando > 0.0:
+		_queimando -= dt
+		_queima_cd -= dt
+		if _queima_cd <= 0.0:
+			_queima_cd = QUEIMA_INTERVALO
+			Impacto.rebentar(self, global_position + Vector2(randf_range(-8.0, 8.0), -15.0),
+				Color(1.0, 0.55, 0.18), 1.0)
+			if _queimando > 0.35:
+				for outro in get_tree().get_nodes_in_group("inimigos"):
+					if outro == self or not is_instance_valid(outro):
+						continue
+					if outro.has_method("esta_a_arder") and not outro.esta_a_arder() \
+							and outro.has_method("queimar") \
+							and global_position.distance_to((outro as Node2D).global_position) <= ALASTRA_RAIO:
+						outro.queimar(_queimando * 0.7, _queima_dano)
+			_dano_periodico(_queima_dano)
+			if _morto:
+				return
+	if _sangrando > 0.0:
+		_sangrando -= dt
+		_sangra_cd -= dt
+		if _sangra_cd <= 0.0:
+			_sangra_cd = SANGRA_INTERVALO_MOV if absf(velocity.x) > 12.0 else SANGRA_INTERVALO
+			Impacto.rebentar(self, global_position + Vector2(0.0, -6.0), Color(0.82, 0.06, 0.14), 0.85)
+			_dano_periodico(_sangra_dano)
+			if _morto:
+				return
+	_atualizar_tom_estado()
+
+
+var _tom_estado := ""
+
+## Tom da pele conforme o estado dominante: gelo > queimadura > sangramento.
+## Aplica no sprite desenhado (`_corpo`) ou no de pack (`_anim`), o que existir.
+## Só escreve quando o estado MUDA -- não pisa o flash branco de `piscar_dano`.
+func _atualizar_tom_estado() -> void:
+	var e := ""
+	if _congelado > 0.0:
+		e = "gelo"
+	elif _queimando > 0.0:
+		e = "fogo"
+	elif _sangrando > 0.0:
+		e = "sangue"
+	if e == _tom_estado:
+		return
+	_tom_estado = e
+	var alvo: CanvasItem = _corpo if _corpo != null else _anim
+	if alvo == null:
+		return
+	match e:
+		"gelo": alvo.modulate = Color(0.7, 0.85, 1.2)
+		"fogo": alvo.modulate = Color(1.3, 0.72, 0.5)
+		"sangue": alvo.modulate = Color(1.16, 0.82, 0.86)
+		_: alvo.modulate = Color(1, 1, 1)
 
 
 ## Os chefes (ChefeBase) sobrepõem isto para NÃO levarem a escala de mundo
@@ -273,14 +402,16 @@ func _physics_process(dt: float) -> void:
 		if k and global_position.distance_to((k as Node2D).global_position) <= raio_acorda:
 			_revelar()
 		return
-	if _congelado > 0.0:
-		_congelado -= dt
+	_tick_status(dt)
+	if _morto:  # um DoT pode tê-lo morto
+		return
+	if _congelado > 0.0 or _atordoado > 0.0:
+		_congelado = maxf(0.0, _congelado - dt)
+		_atordoado = maxf(0.0, _atordoado - dt)
 		velocity.x = 0.0
 		if not is_on_floor():
 			velocity.y += GRAVIDADE * dt
 		move_and_slide()
-		if _congelado <= 0.0 and _corpo:
-			_corpo.modulate = Color(1, 1, 1)
 		return
 	_acao_cd = maxf(0.0, _acao_cd - dt)
 	_telegrafo = maxf(0.0, _telegrafo - dt)
@@ -500,21 +631,35 @@ func _ao_tocar(corpo: Node) -> void:
 		anticipacao = 1.0  # dá um "bote" visual no ataque
 
 
-func receber_dano(quantidade: int, dir_empurrao: float = 0.0) -> void:
+## Multiplicador de dano de um golpe CRÍTICO (inimigo vulnerável, golpe
+## pelas costas ou logo a seguir a um rolamento -- ver `Koliani`).
+const CRIT_MULT := 1.7
+
+func receber_dano(quantidade: int, dir_empurrao: float = 0.0, critico := false) -> void:
 	if _morto:
 		return
 	# escudeiro: golpe de FRENTE (o empurrão atira-o para trás, contra o
 	# sentido em que está virado) bate no escudo -- só "clinc". Pisão
-	# (dir_empurrao 0) e golpes pelas costas passam.
-	if comportamento == "escudeiro" and dir_empurrao != 0.0 \
+	# (dir_empurrao 0) e golpes pelas costas passam. Um CRÍTICO (costas /
+	# pós-rolamento / vulnerável) fura o escudo.
+	if comportamento == "escudeiro" and not critico and dir_empurrao != 0.0 \
 			and signf(dir_empurrao) == -_direcao:
 		Som.toca("bloqueio", -12.0, randf_range(0.85, 0.95))
 		_flinch = 0.4
 		_flinch_dir = signf(dir_empurrao)
 		anticipacao = 0.6
 		return
-	vida -= quantidade
-	global_position.x += dir_empurrao * 8.0
+	var q := quantidade
+	if critico:
+		q = int(round(q * CRIT_MULT))
+		# gelo + crítico = ESTILHAÇA: bónus e limpa o congelamento
+		if _congelado > 0.0:
+			q += int(round(quantidade * 0.6))
+			_congelado = 0.0
+			_tom_estado = ""
+		Impacto.rebentar(self, global_position + Vector2(0.0, -12.0), Color(1, 1, 1), 3.2)
+	vida -= q
+	global_position.x += dir_empurrao * (12.0 if critico else 8.0)
 	if vida <= 0:
 		if _anim:
 			_morrer_anim()
@@ -527,7 +672,9 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0) -> void:
 	else:
 		if dir_empurrao != 0.0:
 			_flinch_dir = signf(dir_empurrao)
-		_flinch = 1.0
+		_flinch = 1.5 if critico else 1.0
+		if critico:
+			atordoar(0.18)  # micro-stun no crítico -> dá para encadear
 		if _anim:
 			_anim.play("hit")
 		piscar_dano()
