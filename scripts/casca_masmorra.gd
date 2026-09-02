@@ -149,6 +149,15 @@ func abrir_esquerda(novo_x: float) -> void:
 		var cx0 := int(floor((novo_x - esquerda) / CEL)) - b
 		var y0 := int(floor((chao_y - topo) / CEL))
 		for cx in range(cx0, 0):
+			# limpa a coluna TODA primeiro: estas colunas (cx<0) tinham a
+			# parede esquerda ORIGINAL pintada do tecto ao chão em
+			# `_construir()`; só repintar as bandas do tecto/chão a seguir
+			# deixava o MEIO da parede antiga por tirar -- em masmorras
+			# altas (ex.: Fornalha dos Pecadores) isso bloqueava a sala a
+			# meio, mesmo com a colisão `ParedeEsq` já deslocada (o
+			# tileset tem colisão própria por tile).
+			for cy in range(-b, y0 + 1 + b):
+				tml.erase_cell(Vector2i(cx, cy))
 			tml.set_cell(Vector2i(cx, -1), 0, T_TOPO)
 			tml.set_cell(Vector2i(cx, -2), 0, T_PAREDE)
 			if chao:
