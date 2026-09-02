@@ -76,7 +76,6 @@ func _physics_process(dt: float) -> void:
 		Fase.DORME:
 			global_position.y = lerpf(global_position.y, _chao_cache - altura_voo, clampf(dt * 3.0, 0.0, 1.0))
 			if _ve_koliani():
-				provocar()
 				_ir(Fase.DECIDE)
 		Fase.DECIDE:
 			if _t >= 0.28:

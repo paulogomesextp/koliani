@@ -103,7 +103,6 @@ func _physics_process(dt: float) -> void:
 		Fase.DORME:
 			_encarar_koliani()
 			if _ve_koliani():
-				provocar()
 				_ir(Fase.DECIDE)
 		Fase.DECIDE:
 			velocity.x = move_toward(velocity.x, 0.0, 900.0 * dt)

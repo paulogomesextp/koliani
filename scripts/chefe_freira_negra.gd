@@ -71,7 +71,6 @@ func _physics_process(dt: float) -> void:
 		Fase.DORME:
 			_alvo = Vector2(global_position.x, _chao_cache - altura_voo)
 			if _ve_koliani():
-				provocar()
 				_ir(Fase.DECIDE)
 		Fase.DECIDE:
 			_alvo = Vector2(_x_koliani(), _chao_cache - altura_voo)

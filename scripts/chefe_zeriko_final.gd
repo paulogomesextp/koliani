@@ -93,7 +93,6 @@ func _physics_process(dt: float) -> void:
 	match _fase:
 		Fase.DORME:
 			if _ve_koliani():
-				provocar()
 				_ir(Fase.D1)
 		# ---------- F1 O MAGO ----------
 		Fase.D1:

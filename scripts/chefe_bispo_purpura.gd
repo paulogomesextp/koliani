@@ -70,7 +70,6 @@ func _physics_process(dt: float) -> void:
 		Fase.DORME:
 			_alvo_y = _chao_cache - altura_voo
 			if _ve_koliani():
-				provocar()
 				_ir(Fase.DECIDE)
 		Fase.DECIDE:
 			_alvo_y = _chao_cache - altura_voo

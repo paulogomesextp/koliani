@@ -66,6 +66,16 @@ var _escudo_boss: Node2D
 var _escudo_t := 0.0
 var _ajuste_janela_feito := false
 
+## --- prisão à arena -------------------------------------------------
+## O chefe nunca deve cair da plataforma principal (nem a andar, nem
+## empurrado por um golpe, nem numa investida). Mede-se a plataforma por
+## baixo do chefe no arranque e trava-se o X a essas bordas durante a luta.
+@export var preso_a_arena := true
+var _arena_ok := false
+var _arena_esq := 0.0
+var _arena_dir := 0.0
+var _arena_topo := 0.0
+
 
 func _e_chefe() -> bool:
 	return true
@@ -81,6 +91,47 @@ func _ready() -> void:
 	if _sprite:
 		_sprite.scale = Vector2(_direcao * escala_visual, escala_visual)
 	call_deferred("_preparar_escudo_boss")
+	call_deferred("_medir_arena")
+
+
+## Raio para baixo a partir da origem do chefe: acha a plataforma de chão e
+## guarda as bordas esquerda/direita (menos uma margem) e o topo. Se não
+## encontrar nada com `tamanho` (ex.: chão feito de tiles), fica sem prisão.
+func _medir_arena() -> void:
+	if not preso_a_arena:
+		return
+	var mundo := get_world_2d()
+	if mundo == null:
+		return
+	var de := _origem + Vector2(0.0, -30.0)
+	var q := PhysicsRayQueryParameters2D.create(de, de + Vector2(0.0, 640.0), collision_mask | 1)
+	q.exclude = [self]
+	var hit := mundo.direct_space_state.intersect_ray(q)
+	if hit.is_empty():
+		return
+	var chao := hit.get("collider") as Node2D
+	if chao == null or not ("tamanho" in chao):
+		return
+	var meia: float = (chao.tamanho.x as float) * 0.5
+	var margem: float = 34.0 * maxf(0.8, escala_visual)
+	_arena_esq = chao.global_position.x - meia + margem
+	_arena_dir = chao.global_position.x + meia - margem
+	_arena_topo = (hit["position"].y as float)
+	_arena_ok = _arena_dir > _arena_esq
+
+
+## Trava o chefe dentro das bordas da arena. Chamado todo o frame.
+func _prender_na_arena() -> void:
+	if not _arena_ok or _ja_derrotado:
+		return
+	if global_position.x < _arena_esq:
+		global_position.x = _arena_esq
+		if velocity.x < 0.0:
+			velocity.x = 0.0
+	elif global_position.x > _arena_dir:
+		global_position.x = _arena_dir
+		if velocity.x > 0.0:
+			velocity.x = 0.0
 
 
 ## Feito em deferred: o `_ready` do chefe concreto já correu e definiu a
@@ -189,9 +240,10 @@ func _process(dt: float) -> void:
 	super._process(dt)
 	_dano_recente = maxf(0.0, _dano_recente - dt)
 	_atualizar_escudo_boss(dt)
-	# rede de segurança: se o chefe se atirar para fora do mapa (investida
-	# num fosso, etc.), conta como derrotado -- senão o nível fica
-	# bloqueado porque a porta nunca abre.
+	_prender_na_arena()
+	# rede de segurança: se mesmo assim o chefe acabar fora do mapa (fosso
+	# sem plataforma medida, etc.), conta como derrotado -- senão o nível
+	# fica bloqueado porque a porta nunca abre.
 	if not _ja_derrotado and global_position.y - _origem.y > 520.0:
 		_cair_derrotado()
 		return

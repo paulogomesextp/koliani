@@ -70,7 +70,6 @@ func _physics_process(dt: float) -> void:
 		Fase.DORME:
 			_encarar_koliani()
 			if _ve_koliani():
-				provocar()
 				_ir(Fase.DECIDE)
 		Fase.DECIDE:
 			_encarar_koliani()

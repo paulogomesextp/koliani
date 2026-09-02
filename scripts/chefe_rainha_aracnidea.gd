@@ -62,7 +62,6 @@ func _physics_process(dt: float) -> void:
 		Fase.DORME:
 			super._physics_process(dt)  # patrulha (DemonioBase)
 			if _ve_koliani():
-				provocar()
 				_ir(Fase.DECIDE)
 		Fase.DECIDE:
 			_travar(dt)

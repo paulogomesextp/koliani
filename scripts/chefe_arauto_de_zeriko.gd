@@ -93,7 +93,6 @@ func _physics_process(dt: float) -> void:
 		Fase.DORME:
 			_encarar_koliani()
 			if _ve_koliani():
-				provocar()
 				_ir(Fase.D1)
 		# ---------- F1 CAVALEIRO ----------
 		Fase.D1:

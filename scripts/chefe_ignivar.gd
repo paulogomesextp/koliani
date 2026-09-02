@@ -70,7 +70,6 @@ func _physics_process(dt: float) -> void:
 				velocity.y += GRAVIDADE * dt
 				move_and_slide()
 			if _ve_koliani():
-				provocar()
 				_ir(Fase.DECIDE)
 		Fase.DECIDE:
 			_encarar_koliani()

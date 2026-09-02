@@ -75,7 +75,6 @@ func _physics_process(dt: float) -> void:
 	match _fase:
 		Fase.DORME:
 			if _ve_koliani():
-				provocar()
 				_ir(Fase.DECIDE)
 		Fase.DECIDE:
 			if _t >= 0.3:

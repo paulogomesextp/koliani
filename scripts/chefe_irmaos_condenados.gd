@@ -157,7 +157,6 @@ func _physics_process(dt: float) -> void:
 			global_position.y = lerpf(global_position.y, alvo_y, clampf(dt * 3.0, 0.0, 1.0))
 			_encarar_koliani()
 			if _ve_koliani():
-				provocar()
 				_ir(Fase.DECIDE)
 		Fase.DECIDE, Fase.DECIDE2:
 			global_position.x = lerpf(global_position.x, _base_x, clampf(dt * 3.0, 0.0, 1.0))

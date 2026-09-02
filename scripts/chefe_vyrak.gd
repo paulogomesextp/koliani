@@ -80,7 +80,6 @@ func _physics_process(dt: float) -> void:
 			global_position.y = lerpf(global_position.y, _chao_cache - 40.0, clampf(dt * 3.0, 0.0, 1.0))
 			_encarar_koliani()
 			if _ve_koliani():
-				provocar()
 				_ir(Fase.DECIDE)
 		Fase.DECIDE:
 			_encarar_koliani()

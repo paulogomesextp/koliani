@@ -69,7 +69,6 @@ func _physics_process(dt: float) -> void:
 	match _fase:
 		Fase.DORME:
 			if _ve_koliani():
-				provocar()
 				_ir(Fase.DECIDE)
 		Fase.DECIDE:
 			global_position = global_position.lerp(_base, clampf(dt * 4.0, 0.0, 1.0))

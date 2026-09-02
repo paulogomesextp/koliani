@@ -39,7 +39,6 @@ func _physics_process(dt: float) -> void:
 			_cair(dt)
 			move_and_slide()
 			if absf(dx) <= dist_parar and is_on_floor() and _t > 0.5:
-				provocar()  # a alcance -> música de combate
 				_ir_para(Fase.TELEGRAFO)
 		Fase.TELEGRAFO:
 			velocity.x = 0.0

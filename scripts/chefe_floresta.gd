@@ -30,7 +30,6 @@ func _physics_process(dt: float) -> void:
 		Fase.PATRULHA:
 			super._physics_process(dt)
 			if _ve_koliani():
-				provocar()  # detetou a Koliani -> música de combate
 				_ir_para(Fase.TELEGRAFO)
 		Fase.TELEGRAFO:
 			_travar(dt)
