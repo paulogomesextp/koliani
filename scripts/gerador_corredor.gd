@@ -266,12 +266,24 @@ func _construir() -> void:
 		var passo_y := clampf((alvo_y - y) * 0.5 + _rng.randf_range(-32.0, 32.0),
 			-SUBIDA_MAX, 300.0)
 		y = clampf(y + passo_y, _teto_y, _chao_y - 66.0)
-		var w := _rng.randf_range(60.0, 94.0)
+		# plataformas mais largas e ligadas (pedido do Paulo, 2 set 2026):
+		# menos "saltar de pedra em pedra minúscula", mais chão que dá para
+		# pousar -- o desafio vem de mecânicas (perigo no vão, espinhos por
+		# cima), não da precisão do salto em si.
+		var w := _rng.randf_range(100.0, 160.0)
 		var movel := _dif > 0.33 and _rng.randf() < (0.04 + 0.12 * _dif) * intens
 		if movel:
 			_plat_movel_spine(par, Vector2(x, y), w)
 		else:
 			_plat(par, Vector2(x, y), Vector2(w, 18.0))
+			# chão plano mas mecanicamente exigente: espinhos numa ponta,
+			# sempre com espaço livre do outro lado para pousar/pogar.
+			if w > 130.0 and _rng.randf() < (0.08 + 0.22 * _dif) * intens:
+				var esp := ESPINHOS.instantiate()
+				esp.largura = 2
+				var lado := -1.0 if _rng.randf() < 0.5 else 1.0
+				esp.position = Vector2(x + lado * (w * 0.5 - 20.0), y)
+				par.add_child(esp)
 		# 2.º piso: às vezes uma plataforma logo por cima = rota alternativa
 		if _rng.randf() < 0.12 and y - 210.0 > _teto_y:
 			_plat(par, Vector2(x + _rng.randf_range(-28.0, 28.0),
