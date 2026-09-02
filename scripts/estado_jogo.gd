@@ -32,16 +32,19 @@ const HABILIDADES_INICIAIS: Array[String] = ["salto_duplo"]
 ## Game Over e a campanha recomeça do nível 1. Uma entrada por nível (mesma
 ## ordem de `NIVEIS`), a subir por região e com folga extra nos níveis-fim
 ## de região; o nível 30 (Zeriko, 4 formas) leva o mais tempo. Ainda "a olho".
-# NB (ago 2026): descido e reperfilado -- a JORNADA de aproximação passou a
-# arrancar CURTA no nível 1 e a crescer até ao 30 (ver `gerador_corredor.gd`),
-# por isso os tempos acompanham. Cada valor = travessia-alvo + margem p/ a luta.
+# NB (2 set 2026): reperfilado outra vez -- `comprimento_base` da Jornada
+# desceu de 6200 para 1800 (nível 1 "básico, ~1 minuto") e `por_nivel` subiu
+# de 880 para 1050 (para o nível 30 continuar a chegar perto do
+# comprimento_max de antes). Estes valores escalam pela MESMA proporção
+# (comprimento novo / antigo, nível a nível) em vez de reinventar as
+# margens -- mantém a forma já afinada, só corrige o comprimento.
 const TEMPO_HARDCORE := [
-	170.0, 185.0, 200.0, 215.0, 250.0,     # I   Floresta
-	220.0, 235.0, 250.0, 265.0, 300.0,     # II  Prisão
-	270.0, 285.0, 300.0, 315.0, 355.0,     # III Torres
-	320.0, 335.0, 350.0, 365.0, 410.0,     # IV  Catacumbas
-	370.0, 385.0, 400.0, 415.0, 460.0,     # V   Cidade
-	420.0, 435.0, 450.0, 465.0, 640.0,     # VI  Castelo (+ Zeriko)
+	49.0, 74.0, 98.0, 120.0, 154.0,        # I   Floresta
+	146.0, 166.0, 185.0, 204.0, 239.0,     # II  Prisão
+	221.0, 240.0, 258.0, 276.0, 316.0,     # III Torres
+	289.0, 307.0, 325.0, 343.0, 389.0,     # IV  Catacumbas
+	354.0, 372.0, 390.0, 407.0, 455.0,     # V   Cidade
+	418.0, 435.0, 453.0, 470.0, 646.0,     # VI  Castelo (+ Zeriko)
 ]
 
 ## Sequencia fixa de mundos ate ao Zeriko (platformer por niveis, nao
