@@ -25,6 +25,7 @@ var _luz: PointLight2D
 
 
 func _ready() -> void:
+	add_to_group("checkpoints")
 	body_entered.connect(_ao_entrar)
 	# esconde o visual antigo que vinha da cena do nível (poste + brilho)
 	for nome in ["Visual", "Luz", "Brilho"]:
