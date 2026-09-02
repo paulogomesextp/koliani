@@ -562,30 +562,71 @@ def bloqueio():
 # `koliani.gd` (Som.toca com pitch aleatorio), para nao cansar.
 # --------------------------------------------------------------------------
 def espada():
-    """Golpe: sopro de ar a descer de tom + corpo grave curto."""
+    """Golpe de espada: silvo de lamina a cortar o ar (desce de tom) + um
+    'ting' metalico curto de aco + corpo grave. Le'-se claramente como
+    ESPADA, sem ser o agudo estridente que cansa."""
     random.seed(4101)
-    dur = 0.15
+    dur = 0.20
     N = int(dur * FS)
     buf = [0.0] * N
     ar = Reson()
     for n in range(N):
+        t = n / FS
         p = n / N
-        # o "silvo" desce de 1900 para 550 Hz -> le-se como lamina a passar
-        # (mais grave do que o instinto pede: o agudo e' que cansa)
-        f = 1900.0 - 1350.0 * p
+        # 1) silvo de ar: ruido filtrado a descer de 2100 -> 500 Hz
+        f = 2100.0 - 1600.0 * (p ** 0.85)
         ruido = random.uniform(-1.0, 1.0)
-        s = ar.passo(ruido, f, 650.0) * 0.9
-        # corpo: o peso do golpe (fica por baixo, quase nao se "ouve" sozinho)
-        corpo = math.sin(2 * math.pi * (150.0 - 60.0 * p) * (n / FS))
-        s += corpo * 0.5 * math.exp(-p * 16.0)
-        env = min(1.0, p / 0.05) * math.exp(-p * 9.0)
-        buf[n] = math.tanh(s * env * 1.3)
-    # passa-baixo final: tira o "chiado" que ficava por cima do silvo
+        s = ar.passo(ruido, f, 700.0) * 0.85
+        # 2) corpo grave: o peso do golpe
+        corpo = math.sin(2 * math.pi * (170.0 - 70.0 * p) * t)
+        s += corpo * 0.55 * math.exp(-p * 14.0)
+        # 3) 'ting' de aco: duas parciais altas afinadas, decai depressa,
+        #    so' entra na primeira metade do golpe (o momento do corte)
+        if p < 0.5:
+            q = p / 0.5
+            ting = math.sin(2 * math.pi * 3100.0 * t) + 0.6 * math.sin(2 * math.pi * 4650.0 * t)
+            s += ting * 0.16 * math.exp(-q * 9.0)
+        env = min(1.0, p / 0.04) * math.exp(-p * 8.0)
+        buf[n] = math.tanh(s * env * 1.35)
+    # passa-baixo suave: tira o chiado mais aspero por cima do silvo
     lp = 0.0
     for n in range(N):
-        lp += 0.30 * (buf[n] - lp)
+        lp += 0.42 * (buf[n] - lp)
         buf[n] = lp
-    escrever("ataque.wav", buf, 0.55)
+    fo = int(0.02 * FS)
+    for n in range(N - fo, N):
+        buf[n] *= max(0.0, (N - n) / fo)
+    escrever("ataque.wav", buf, 0.7)
+
+
+def lancar():
+    """Lancamento de projetil magico (ataque Throw): estalo de 'release' +
+    zunido roxo a SUBIR de tom que se afasta. Curto, com corpo -- da' a
+    sensacao de atirar, nao de 'plink'."""
+    random.seed(4108)
+    dur = 0.24
+    N = int(dur * FS)
+    buf = [0.0] * N
+    rr = Reson()
+    for n in range(N):
+        t = n / FS
+        p = n / N
+        # zunido que SOBE (475 -> 1500 Hz) e some ao afastar-se
+        f = 475.0 + 1025.0 * (p ** 1.4)
+        s = math.sin(2 * math.pi * f * t) + 0.5 * math.sin(2 * math.pi * f * 1.5 * t)
+        s *= 0.32 * (1.0 - 0.6 * p)
+        # estalo seco do 'release' nos primeiros 25 ms (ruido filtrado)
+        if p < 0.12:
+            q = p / 0.12
+            s += rr.passo(random.uniform(-1, 1), 1800.0, 1200.0) * 0.5 * (1.0 - q)
+        # corpo grave curto -- o empurrao
+        s += math.sin(2 * math.pi * (140.0 - 40.0 * p) * t) * 0.4 * math.exp(-p * 18.0)
+        env = min(1.0, p / 0.02) * math.exp(-p * 5.5)
+        buf[n] = math.tanh(s * env * 1.3)
+    fo = int(0.03 * FS)
+    for n in range(N - fo, N):
+        buf[n] *= max(0.0, (N - n) / fo)
+    escrever("lancar.wav", buf, 0.55)
 
 
 def acerto():
@@ -1345,6 +1386,7 @@ def carrossel():
 
 if __name__ == "__main__":
     carrossel()
+    lancar()
     game_over_voz()
     menu_loop()
     boss_loop()

@@ -476,7 +476,7 @@ func _physics_process(dt: float) -> void:
 			move_and_slide()
 			if _windup <= 0.0:
 				_carga = DUR_CARGA
-				Som.toca("demonio_ataque", -8.0, 0.85)
+				Som.toca("demonio_ataque", -13.0, 0.8)
 			return
 		if _carga > 0.0:  # arranque comprometido -- não vira nem trava
 			_carga -= dt
@@ -525,7 +525,7 @@ func _physics_process(dt: float) -> void:
 			if _windup <= 0.0:
 				velocity = Vector2(_direcao * 175.0, -430.0)
 				_saltando = 0.75
-				Som.toca("demonio_ataque", -9.0, 1.0)
+				Som.toca("salto", -20.0, 0.68)
 				move_and_slide()
 			return
 		if _acao_cd <= 0.0 and is_on_floor():
@@ -556,7 +556,7 @@ func _physics_process(dt: float) -> void:
 			if _windup <= 0.0:
 				velocity = _dive_dir * VEL_MERGULHO
 				_mergulho = 0.6
-				Som.toca("demonio_ataque", -8.0, 1.1)
+				Som.toca("demonio_ataque", -13.0, 1.05)
 				move_and_slide()
 			return
 		var kv := get_tree().get_first_node_in_group("koliani")
@@ -588,7 +588,7 @@ func _physics_process(dt: float) -> void:
 					_sprite.scale.y = 1.0
 				velocity = Vector2(0.0, 240.0)
 				anticipacao = 1.0
-				Som.toca("demonio_ataque", -9.0, 0.9)
+				Som.toca("demonio_ataque", -14.0, 0.9)
 				move_and_slide()
 				return
 		velocity = Vector2.ZERO
@@ -647,7 +647,7 @@ func _revelar() -> void:
 	dormente = false
 	anticipacao = 1.0
 	_flinch = 1.0
-	Som.toca("demonio_ataque", -10.0, 1.2)
+	Som.toca("demonio_ataque", -13.0, 1.15)
 	if _sprite:
 		var t := _sprite.create_tween()
 		t.tween_property(_sprite, "rotation", 0.25, 0.05)
@@ -687,7 +687,7 @@ func _ao_tocar(corpo: Node) -> void:
 		return
 	if corpo is Koliani:
 		corpo.receber_dano(dano_contacto, signf(corpo.global_position.x - global_position.x))
-		Som.toca("demonio_ataque", -10.0, randf_range(0.9, 1.15))
+		Som.toca("demonio_ataque", -15.0, randf_range(0.92, 1.08))
 		anticipacao = 1.0  # dá um "bote" visual no ataque
 
 

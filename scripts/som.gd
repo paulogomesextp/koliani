@@ -10,6 +10,7 @@ const CAMINHOS := {
 	"salto": "res://assets/audio/salto.wav",
 	"salto_duplo": "res://assets/audio/salto_duplo.wav",
 	"ataque": "res://assets/audio/ataque.wav",
+	"lancar": "res://assets/audio/lancar.wav",
 	"acerto": "res://assets/audio/acerto.wav",
 	"dano": "res://assets/audio/dano.wav",
 	"aterrar": "res://assets/audio/aterrar.wav",

@@ -676,7 +676,8 @@ func _physics_process(dt: float) -> void:
 			_squash = maxf(_squash, 0.5)
 			_abanar(4.5 if crit_stomp else 3.0)
 			_hitstop(0.09 if crit_stomp else 0.05)
-			Som.toca("ataque", -12.0, randf_range(0.92, 1.09))
+			# pisão na carne: pancada surda, sem o silvo da espada
+			Som.toca("acerto", -10.0, randf_range(0.82, 0.94))
 			_pop_impacto(ep)
 			break
 
@@ -978,7 +979,7 @@ func _iniciar_ataque() -> void:
 	# smear direcional + micro-avanço no golpe (pegada Dead Cells: "pisar" o
 	# golpe). Só visual -- não mexe na física. O remate do combo puxa mais.
 	_atk_smear = 1.4 if _combo_passo == NUM_COMBO - 1 else 1.0
-	Som.toca("ataque", -13.0, randf_range(0.92, 1.09))
+	Som.toca("ataque", -6.0, randf_range(0.95, 1.06))
 	_flash_golpe()
 	if _combo_passo == NUM_COMBO - 1:
 		_abanar(4.0)  # remate do combo ("Quadruple") -- um pouco mais de peso
@@ -1115,7 +1116,7 @@ func _lancar_projetil() -> void:
 	get_parent().add_child(p)
 	p.global_position = global_position + aim * 20.0 + Vector2(0.0, -4.0)
 	p.lancar(aim, maxi(1, roundi(_dano_golpe() / 3.0)))
-	Som.toca("projetil", -13.0, randf_range(1.22, 1.42))
+	Som.toca("lancar", -9.0, randf_range(0.96, 1.08))
 	if _faiscas:
 		_faiscas.position.x = absf(_faiscas.position.x) * signf(aim.x if aim.x != 0.0 else _olha_para)
 		_faiscas.restart()
