@@ -342,7 +342,12 @@ func _montar_fundo_pack(_rng: RandomNumberGenerator) -> void:
 			spr.modulate = cor
 		spr.set_meta("gerado", true)
 		layer.add_child(spr)
-		layer.motion_mirroring = Vector2(tw, 0.0)
+		# mirroring nos dois eixos: a Jornada pode levar a câmara muito mais
+		# alto/baixo do que a imagem cobre (ela só tem `th` de altura) --
+		# sem repetir no eixo Y, sobrava um vão por cima/baixo que nunca se
+		# preenchia, seja qual for a posição da câmara (motion_scale.y=0
+		# trava a camada no ecrã, mas não alarga a imagem).
+		layer.motion_mirroring = Vector2(tw, th)
 
 
 ## Quanto cada camada do parallax está "longe" (1 = fundo, 0 = colada à
