@@ -1,5 +1,38 @@
 # Progresso do agente `gaming` — campanha dos 30 níveis
 
+## Sessão 2026-09-02 (c) — REGIÕES NOVAS: os 30 níveis refeitos à mão
+
+O Paulo, depois da comparação franca com o Dead Cells, pediu "faça regiões
+completamente novas". Feito: **os 29 níveis rejogáveis (I-VI, menos o Trono
+n30 que já era arena à mão) passam a `corredor = false`** — sem a jornada
+procedural. Cada nível é agora uma **sala desenhada**:
+
+- Bifurcação (rota alta/rápida vs baixa/segura, ou esq/dir num poço).
+- 1 ELITE por nível (DemonioBase escalado 1.4-1.5×, vida ~140-240,
+  comportamento próprio) na ledge central, a trancar a passagem.
+- Mecânica-assinatura da região tecida pela sala (raízes, teias, gotas,
+  correntes, guilhotinas, espectrais, sinos, vento, raios, gravidade,
+  túmulos-elevador, velas, paredes móveis, vitrais, espelhos, batimento…).
+- Poça mortal por baixo de tudo (água podre / ácido / lava / trevas /
+  vazio conforme a região) — cair = morte + fogueira mais próxima.
+- Recompensa de habilidade no **caminho crítico** (ninguém falha):
+  escudo/dash_aereo/escalar_paredes/partir_paredes/projetil.
+- Chefes e Portas mantidos.
+
+**Verificação:** `tools/verifica_alcance.gd` (NOVO) — crivo estático que
+instancia a cena, faz o grafo "dá para saltar de A para B" (vão ≤210,
+subida ≤118) e diz se a Porta é alcançável + lista órfãs. Todos os 30
+passam (porta alcançável, 0 órfãs). `run_tests` verde; `verifica_jornada`
+reconhece `corredor = false` e dá TUDO OK.
+
+Commits: `regiao I..VI: os N niveis refeitos a mao` (6 commits) +
+`combate: nucleo pegada Dead Cells` + `juice: smear no golpe`.
+
+**A SEGUIR (precisa do Paulo ao comando):** playtestar os 30 e afinar
+espaçamentos/dificuldade; passe de arte por região (mismatch de resolução
+rig/fundos/props ainda por decidir); as `PlataformaRitmada`/`Espectral`/
+`ParedeMovel` foram postas com timing "a olho".
+
 ## Sessão 2026-09-02 (b) — desenvolvimento nível a nível (forma + mecânica)
 
 Arranque do passe "nível por nível" pedido pelo Paulo (ele ausente;
