@@ -11,10 +11,12 @@ extends CanvasLayer
 const CENA_MENU := "res://scenes/ui/MenuInicial.tscn"
 const CENA_MAPA := "res://scenes/ui/MapaMundo.tscn"
 const CENA_OPCOES := preload("res://scenes/ui/Opcoes.tscn")
+const CENA_SANTUARIO := preload("res://scenes/ui/Santuario.tscn")
 
 @onready var _titulo: Label = $Painel/Coluna/Titulo
 @onready var _continuar: Button = $Painel/Coluna/Continuar
 @onready var _opcoes_btn: Button = $Painel/Coluna/Opcoes
+@onready var _santuario_btn: Button = $Painel/Coluna/Santuario
 @onready var _mapa: Button = $Painel/Coluna/Mapa
 @onready var _recomecar: Button = $Painel/Coluna/Recomecar
 @onready var _menu: Button = $Painel/Coluna/Menu
@@ -22,6 +24,8 @@ const CENA_OPCOES := preload("res://scenes/ui/Opcoes.tscn")
 ## Instância do ecrã de Opções sobreposto (ou null). Enquanto existe, é ele
 ## que trata o Esc -- o menu de pausa por baixo fica congelado.
 var _opcoes_inst: Control = null
+## Idem para o Santuário (melhorias permanentes).
+var _santuario_inst: Control = null
 
 
 func _ready() -> void:
@@ -29,6 +33,7 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_continuar.pressed.connect(_fechar)
 	_opcoes_btn.pressed.connect(_abrir_opcoes)
+	_santuario_btn.pressed.connect(_abrir_santuario)
 	_mapa.pressed.connect(_ao_mapa)
 	_recomecar.pressed.connect(_ao_recomecar)
 	_menu.pressed.connect(_ao_menu)
@@ -39,7 +44,7 @@ func _ready() -> void:
 	Textos.idioma_mudou.connect(func(_l: String) -> void: _traduzir())
 	_traduzir()
 	_destacar_continuar()
-	for b: Button in [_continuar, _opcoes_btn, _mapa, _recomecar, _menu]:
+	for b: Button in [_continuar, _opcoes_btn, _santuario_btn, _mapa, _recomecar, _menu]:
 		b.resized.connect(func() -> void: b.pivot_offset = b.size / 2.0)
 		b.mouse_entered.connect(func() -> void: _animar_escala(b, 1.03))
 		b.mouse_exited.connect(func() -> void: _animar_escala(b, 1.0))
@@ -80,6 +85,7 @@ func _traduzir() -> void:
 	_titulo.text = Textos.t("pause.title")
 	_continuar.text = Textos.t("pause.resume")
 	_opcoes_btn.text = Textos.t("pause.options")
+	_santuario_btn.text = Textos.t("pause.shrine")
 	_mapa.text = Textos.t("pause.level_map")
 	_recomecar.text = Textos.t("pause.restart_checkpoint")
 	_menu.text = Textos.t("pause.main_menu")
@@ -96,7 +102,7 @@ func _process(dt: float) -> void:
 		return
 	# Com as Opções sobrepostas, o Esc fecha-as a elas (opcoes_menu.gd), não
 	# o menu de pausa.
-	if _opcoes_inst != null:
+	if _opcoes_inst != null or _santuario_inst != null:
 		return
 	# tempo morto após abrir/fechar -- um botão START "ressaltado" no comando
 	# não fica a abrir e fechar o menu vezes sem conta (parecia um freeze)
@@ -142,6 +148,29 @@ func _ao_fechar_opcoes() -> void:
 	if visible:
 		$Painel.visible = true
 		_continuar.grab_focus()
+
+
+## Sobrepõe o SANTUÁRIO (melhorias permanentes) ao menu de pausa. Como as
+## Opções: não mexe na pausa nem troca de cena.
+func _abrir_santuario() -> void:
+	if _santuario_inst != null:
+		return
+	_santuario_inst = CENA_SANTUARIO.instantiate()
+	_santuario_inst.process_mode = Node.PROCESS_MODE_ALWAYS
+	if _santuario_inst.has_signal("fechado"):
+		_santuario_inst.fechado.connect(func() -> void:
+			if is_instance_valid(_santuario_inst):
+				_santuario_inst.queue_free())
+	_santuario_inst.tree_exited.connect(_ao_fechar_santuario)
+	add_child(_santuario_inst)
+	$Painel.visible = false
+
+
+func _ao_fechar_santuario() -> void:
+	_santuario_inst = null
+	if visible:
+		$Painel.visible = true
+		_santuario_btn.grab_focus()
 
 
 func _ao_recomecar() -> void:
