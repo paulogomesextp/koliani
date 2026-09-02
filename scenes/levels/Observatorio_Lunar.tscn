@@ -44,13 +44,13 @@ cor_fundo = Color(0.05, 0.06, 0.1, 1)
 cor_silhueta = Color(0.12, 0.13, 0.2, 1)
 cor_luz = Color(0.86, 0.88, 1.0, 1)
 cor_poeira = Color(0.9, 0.92, 1.0, 1)
-densidade_poeira = 1.7
+densidade_poeira = 1.8
 bioma = "torres"
 largura_nivel = 2600.0
 fundo_pack = "montanhas"
 tinta_fundo = Color(0.62, 0.68, 1.0, 1)
-neblina_fundo = 0.46
-dessaturar_fundo = 0.5
+neblina_fundo = 0.34
+dessaturar_fundo = 0.28
 
 [node name="Vazio" parent="." instance=ExtResource("11_vazio")]
 position = Vector2(650, 1120)

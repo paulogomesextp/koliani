@@ -50,8 +50,8 @@ largura_nivel = 2600.0
 luzes_horizonte = true
 fundo_pack = "rochoso"
 tinta_fundo = Color(0.58, 0.66, 1.0, 1)
-neblina_fundo = 0.52
-dessaturar_fundo = 0.5
+neblina_fundo = 0.34
+dessaturar_fundo = 0.28
 
 [node name="Vazio" parent="." instance=ExtResource("12_vazio")]
 position = Vector2(650, 1120)

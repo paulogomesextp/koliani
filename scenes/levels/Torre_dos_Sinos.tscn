@@ -39,7 +39,7 @@ corredor = false
 
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
 cor_ambiente = Color(0.78, 0.74, 0.72, 1)
-cor_fundo = Color(0.05, 0.05, 0.08, 1)
+cor_fundo = Color(0.053, 0.053, 0.085, 1)
 cor_silhueta = Color(0.13, 0.1, 0.12, 1)
 cor_luz = Color(1.0, 0.74, 0.48, 1)
 cor_poeira = Color(1.0, 0.86, 0.7, 1)
@@ -49,8 +49,8 @@ largura_nivel = 2600.0
 luzes_horizonte = true
 fundo_pack = "rochoso"
 tinta_fundo = Color(0.6, 0.62, 0.95, 1)
-neblina_fundo = 0.5
-dessaturar_fundo = 0.58
+neblina_fundo = 0.34
+dessaturar_fundo = 0.28
 
 [node name="Vazio" parent="." instance=ExtResource("11_vazio")]
 position = Vector2(650, 1120)

@@ -49,8 +49,8 @@ largura_nivel = 2600.0
 luzes_horizonte = true
 fundo_pack = "montanhas"
 tinta_fundo = Color(0.54, 0.6, 0.96, 1)
-neblina_fundo = 0.48
-dessaturar_fundo = 0.55
+neblina_fundo = 0.34
+dessaturar_fundo = 0.28
 
 [node name="Vazio" parent="." instance=ExtResource("11_vazio")]
 position = Vector2(650, 1120)
