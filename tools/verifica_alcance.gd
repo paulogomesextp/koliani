@@ -100,7 +100,8 @@ func _recolher(no: Node, out: Array) -> void:
 		if e:
 			s = e.resource_path
 		if s.ends_with("plataforma.gd") or s.ends_with("plataforma_ritmada.gd") \
-				or s.ends_with("plataforma_quebra.gd") or s.ends_with("plataforma_espectral.gd"):
+				or s.ends_with("plataforma_quebra.gd") or s.ends_with("plataforma_espectral.gd") \
+				or s.ends_with("plataforma_luz.gd"):
 			var tv: Variant = f.get("tamanho")
 			var tam: Vector2 = tv if tv != null else Vector2(200, 40)
 			var p := f as Node2D
