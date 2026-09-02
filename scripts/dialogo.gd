@@ -8,8 +8,9 @@ extends Node
 ##   ])
 ##
 ## Cada fala é `{ "quem": <chave i18n>, "texto": <chave i18n> }` e pode ter
-## `"alvo": Node2D` para a cauda do balão apontar a esse nó. `pausar` (por
-## omissão true) congela a árvore enquanto o balão está no ecrã.
+## `"alvo": Node2D` para a cauda do balão apontar a esse nó. O balão NÃO
+## pára o jogo -- flutua sobre o orador e avança sozinho (o `pausar` fica
+## por compatibilidade; é ignorado).
 
 const CENA_BALAO := preload("res://scenes/ui/Balao.tscn")
 
@@ -18,7 +19,7 @@ const CENA_BALAO := preload("res://scenes/ui/Balao.tscn")
 var ativo := false
 
 
-func correr(falas: Array, pausar := true) -> void:
+func correr(falas: Array, pausar := false) -> void:
 	if falas.is_empty():
 		return
 	ativo = true
