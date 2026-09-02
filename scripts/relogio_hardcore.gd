@@ -49,8 +49,14 @@ func _process(dt: float) -> void:
 	_atualizar()
 	if _restante <= 0.0:
 		_acabou = true
-		EstadoJogo.hardcore_tempo_restante = -1.0  # o próximo run começa cheio
-		GameOver.mostrar(get_tree(), "time")
+		# pedido do Paulo (2 set 2026): esgotar o tempo já não manda a
+		# campanha toda de volta ao nível 1 -- recomeça só o nível atual
+		# (vidas cheias, relógio cheio, checkpoint no início), mantendo o
+		# equipamento/progresso ganho. A "3 vidas gastas" continua a
+		# reiniciar a campanha toda (ver koliani.gd::_morrer) -- só o
+		# tempo esgotado é que ficou mais brando.
+		EstadoJogo.reiniciar_run()
+		Transicao.fechar_e(get_tree().reload_current_scene)
 
 
 func _atualizar() -> void:
