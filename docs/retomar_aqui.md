@@ -1,124 +1,166 @@
-# Retomar aqui — 3 de setembro de 2026 (fim da sessão da noite)
+# Retomar aqui — 4 de setembro de 2026
 
-> **LEIA PRIMEIRO.** Versão actual: **v0.12.0**, tudo em `origin/master`.
-> A parte de baixo ("O QUE FALTA") são **dois pedidos do Paulo por fazer** —
-> é por aí que se retoma.
-
----
-
-# ⚠ O QUE FALTA (pedidos do Paulo, 3 set 2026)
-
-Ele pediu quatro coisas. **Duas ficaram feitas** (a cadência do equipamento
-e o retrato do chefe no carrossel — ver abaixo). **Estas duas não:**
-
-## A) A Koliani tem de MOSTRAR o que está equipado
-
-> *"Tente fazer como modelo da koliani no início do projeto, substituir a
-> arma do modelo actual pelo asset da arma que estiver equipada, e a
-> armadura igual ou pelo menos alterar a cor do modelo quando equiparmos
-> outra armadura."*
-
-Hoje **não mostra nada**: `koliani.gd::_aplicar_equipamento()` (~linha 406)
-faz `_arma.visible = wi >= 0 and RIG == "codigo"`, e `RIG` é `"cavaleiro"`
-desde que o Paulo escolheu esse rig. O mesmo em `_aplicar_visual_armadura()`
-(~linha 423): `if RIG != "codigo": _armadura.visible = false`. Ou seja, os
-dois nós existem e funcionam — só estão desligados no rig actual, porque as
-tiras do "cavaleiro" já trazem espada e roupa desenhadas.
-
-O que já está pronto para isto:
-
-- `$Sprite/Arma` (Sprite2D, `hframes = 20`, tira
-  `assets/sprites/pixel/gear/armas.png`) — o `frame` é
-  `Equipamento.indice_arma(id)`. O nó já roda pelo punho (`offset` põe o
-  punho na origem, ver `koliani.gd` ~linha 894).
-- `$Sprite/Armadura` (peito/ombros/cinto/trim vectoriais) — recolorido por
-  `Equipamento.cor_armadura(i)`.
-- `Equipamento.cor_arma(i)` já alimenta o brilho do golpe, o rastro e a luz
-  da lâmina, e **isso já funciona** no rig actual.
-
-**Onde está a dificuldade** (é o que fez a sessão anterior desligar isto):
-a lâmina do rig "cavaleiro" está **pintada dentro de cada frame**, em
-posições diferentes por frame e por estado. Pôr o `Arma` por cima dá duas
-espadas. As saídas possíveis, por ordem de esforço:
-
-1. **Só a cor** (o "pelo menos" do pedido) — tingir o `Corpo` com
-   `_tint_armadura()` (já existe e já é chamado) e dar mais peso à cor da
-   arma no rim/brilho. É meia hora e cumpre metade do pedido.
-2. **Apagar a lâmina do rig e desenhar a arma por cima** — passar
-   `tools/importar_rig_koliani.py` a limpar os pixéis da espada nos frames
-   (ela é sempre a mesma cor) e ligar o nó `Arma` com uma tabela de
-   posição/rotação **por estado e por frame**. É o que dá o resultado que o
-   Paulo quer, e é meio dia de trabalho.
-3. **Voltar ao `RIG = "codigo"`** (o modelo do início do projecto, que ele
-   citou) — aí tudo isto já funciona, mas perde-se a Koliani que ele
-   escolheu. **Não fazer sem lhe perguntar.**
-
-Recomendação: fazer o 1 já, mostrar, e perguntar-lhe se quer o 2.
-
-## B) Menus de arma e de armadura em CARROSSEL
-
-> *"Nos menus de arma e de escudo, fazer como selecção de níveis em
-> carrossel, e dar uma preview da koliani com essa arma ou equipamento
-> equipado e os stats que cada um dá."*
-
-Hoje `scripts/seletor_equip.gd` (231 linhas) é uma **grelha 5x3 de
-cartões**. Tem de passar a carrossel como o `SeletorNiveis`.
-
-- **Modelo a copiar:** `scripts/seletor_niveis.gd` — `_montar_seta`,
-  `_mover`, `_reposicionar`, `_atualizar_topo`, `CARTAO`/`PASSO`/`DUR`, o
-  som `"carrossel"`, e as pastilhas de região no topo (aqui seriam
-  pastilhas de tier, ou nada).
-- **A preview da Koliani** é a parte nova. O mais barato que dá bom
-  resultado: um `AnimatedSprite2D` com as tiras do rig actual (ver
-  `koliani.gd::_montar_frames`, tabela `_KOLI_ANIMS_CAVALEIRO`) a tocar
-  `idle`, com o `Arma` por cima a mostrar `frame = indice_arma` e o
-  `modulate` do corpo a `Equipamento.cor_armadura(i)`. **Depende do ponto
-  A**: se A ficar só na cor, a preview mostra a cor; se A fizer a arma a
-  sério, a preview usa o mesmo código.
-- **Os stats já estão calculados** e já aparecem nos cartões de hoje
-  (`gear.stat.dmg`, `gear.stat.hp`, `gear.stat.armor`) — é só passá-los
-  para o cartão grande, e vale a pena mostrar também a **diferença** para o
-  que está equipado (+12 dano, −3% armadura), que é o que faz decidir.
-- Cuidado: **a armadura indexa a tira por `Equipamento.celula_armadura(id)`
-  e NÃO pela posição na lista** (a tira tem as 15 originais, só 10 estão em
-  jogo). Já está corrigido no ficheiro actual — não voltar a trocar.
+> **LEIA PRIMEIRO.** O topo é a **fila de pedidos do Paulo por fazer**; o
+> fundo é o que já ficou feito nesta sessão.
 
 ---
 
-# O que se fez nesta sessão
+# ⚠ FILA DO PAULO (por ordem que ele deu)
 
-## 1. Chefes animados — o ponto 6 da lista antiga está FECHADO
+## FEITO nesta sessão
 
-**29 de 30 chefes de 1-30 têm rig animado, cada um com a sua silhueta.**
-Falta só a Koliani Sombria (n27), de propósito.
+- ✅ **Koliani mostra o equipamento** (arma/armadura) — por troca de paleta.
+- ✅ **Menus de arma/armadura em carrossel**, com preview e stats/diferenças.
+- ✅ **PRIORIDADE: o rig "Shadowblade" (arte dele) é a Koliani principal.**
 
-- **`tools/baixar_packs_itch.py` (novo)** — descarrega packs **gratuitos**
-  do itch.io. Só *name-your-own-price* a $0; pago é saltado, **não compra
-  nada**. O endpoint do ficheiro é
-  `POST /<slug>/file/<id>?source=game_download` na **raiz do subdomínio**
-  (não debaixo do `/download/<chave>`), com `Referer` +
-  `X-Requested-With`. Usa `urllib` porque **o `curl -X POST` para fora é
-  bloqueado pelo classificador do harness**.
-- Trouxe 18 packs CC0 do LuizMelo e 8 grátis do chierit. **34 rigs** no
-  catálogo (eram 9). Tabela rig→chefe→pack→licença em
-  `assets/sprites/pixel/CREDITS.md`.
-- `ChefeBase.LARGURA_ALVO_CHEFE` (110) é o tecto de largura: um rig largo e
-  baixo escalado só pela altura saía mais largo que a plataforma da arena.
-- **`teste_rigs_dos_chefes`** é a rede de segurança — um `rig` mal escrito
-  não rebenta, só deixa a folha estática, e passava despercebido.
+## POR FAZER — pedidos "secundários" (ele próprio classificou assim)
 
-**Duas escolhas para o Paulo confirmar**: o **Sino Vivo** (n11) é um
-**baú-mímico** e o **Vyrak** (n15) é um **morcego gigante**.
+Ele disse: *"meta os pedidos que fiz como secundários e dê prioridade a
+meter o asset shadowblade"*. O Shadowblade está feito; **isto é a fila.**
 
-## 2. A campanha tem 100 níveis e 20 regiões
+### 1. Bug — softlock no primeiro portal
+> *"Quando apanhamos o primeiro portal, onde nascemos após apanhar o portal
+> é entre 2 plataformas e a Koliani fica presa."*
 
-`docs/plano_niveis_31_100.md` está **todo montado**. Cada região nova é uma
-linha por nível na tabela de `tools/gerar_niveis_31_100.py`; o trabalho a
-sério é dar-lhe uma **cor que nenhuma das outras 19 tenha** (os 14 packs de
-fundo estão gastos desde a VI, portanto a identidade vem toda da tinta e do
-`amb`).
+É o pior da lista (tranca o jogador). Ver `scenes/actors/Portal.tscn` /
+o script do portal e onde o `gerador_corredor.gd` põe o destino. O ponto de
+saída tem de ser validado contra a geometria — há já
+`tools/verifica_alcance.gd` para medir alcance, e o mesmo raciocínio serve
+para "há chão por baixo e espaço por cima".
 
-**Ordem obrigatória do pipeline** — enganei-me nisto duas vezes:
+### 2. Sons
+> *"Faça um set de sons para a koliani quando faz animações, ataques, etc.
+> Faça com que os mobs façam sons também apropriados ao tipo de monstro."*
+> *"Continuo sem gostar do som da espada, dos mísseis."*
+
+`tools/gerar_audio.py` sintetiza os `.wav`; os SFX reais CC0 estão
+creditados em `assets/audio/CREDITS.md`. A espada e os mísseis já foram
+refeitos duas vezes e ele continua a não gostar — desta vez ir buscar
+samples reais em vez de sintetizar.
+
+### 3. Música
+> *"A música do Nível 32 é esquisita e tem vários cortes, troque."*
+> *"Adorei o final da música do Nível 38, se conseguir mais músicas assim
+> com tom de rock perfeito."*
+
+Duas coisas: **substituir a do 32** e **usar a do fim do 38 como
+referência** (rock) para as próximas. Ver `Musica` (autoload) e as camas por
+bioma.
+
+### 4. Projéteis e aura
+> *"Não gosto do estilo do projétil dos mísseis, mude o recurso e coloque
+> roxo com brilho."*
+> *"Faça uma aura roxa brilhante à volta da Koliani."*
+
+Os VFX de projétil vêm do pack bdragon1727 (licença OK). A aura: já existe
+`Sprite/LuzAura` (PointLight2D) no `Koliani.tscn` — é ligá-la e afiná-la.
+
+### 5. Escuridão dos mapas
+> *"O jogo está um bocado escuro no geral, coloque candeeiros ou lâmpadas a
+> acompanhar os níveis, algo que dê alguma luminosidade aos mapas."*
+
+Candeeiros/tochas como decoração **com luz própria** ao longo do percurso.
+`tools/gerar_deco.py` faz os props; a luz por nível vem de
+`tools/afinar_atmosfera.py`. **Atenção à ordem do pipeline** (ver abaixo).
+
+### 6. Escudo
+> *"Tente meter um escudo melhor e quando usamos o escudo fazer um escudo de
+> energia roxo brilhante em volta do escudo normal."*
+
+`Sprite/Escudo` no `Koliani.tscn` (polígonos vectoriais) — hoje só aparece
+no rig "codigo". Com o Shadowblade é preciso decidir onde encaixa.
+
+### 7. UI
+> *"Melhore o UI, o Indicador de Nível, etc, vá buscar assets free."*
+
+Luz verde permanente para descarregar assets grátis (`tools/baixar_packs_itch.py`).
+
+### 8. Vidas
+> *"Aumente a quantidade inicial de vidas para 5, e cada vez que passamos num
+> nível aumente 1 vida."*
+
+`EstadoJogo` (vidas). Pedido simples — provavelmente o mais rápido da lista.
+
+### 9. MECÂNICAS — o pedido grande
+> *"Joguei até Nível 37 e acho que o jogo tem poucas mecânicas, analise
+> outros jogos e faça muito mais mecânicas. E mude o raciocínio: em vez de
+> ir adicionando mais mecânicas e ir misturando e pôr mais quantidades em
+> níveis mais altos, tente pôr uma mecânica nova a cada nível, e aumente a
+> dificuldade das mecânicas à medida que o nível aumenta."*
+
+**Uma mecânica nova por nível, 100 níveis.** É uma reformulação de design,
+não um patch: hoje há ~12 mecânicas que se repetem e se misturam. Vale a
+pena escrever um `docs/mecanicas_por_nivel.md` (tabela nível→mecânica→
+parâmetro de dificuldade) ANTES de codar, e mostrar-lha.
+
+---
+
+# O que se fez nesta sessão (4 set 2026)
+
+## 1. A Koliani mostra o que tem vestido — `44fa613`
+
+O rig traz a lâmina e as placas pintadas dentro de cada frame, em sítios
+diferentes por frame; pôr o nó `Arma` por cima dava duas espadas (foi por
+isso que a sessão anterior o desligou). **A saída foi trocar a PALETA**:
+o rig usa duas rampas de cinzento separadas — os médios são o fio da lâmina
+e o rasto do golpe, os escuros são as placas do peito/ombros/saia.
+`assets/shaders/equipamento.gdshader` reescreve cada rampa na cor do item
+guardando a posição na rampa (o sombreado sobrevive), nos 18 estados e sem
+tabelas de posição. `tools/verificar_paleta_rig.py` é a rede de segurança.
+
+> ⚠ **Isto está escrito para o rig "cavaleiro"** (`RIGS_COM_PALETA` em
+> `koliani.gd`). Com o Shadowblade activo **o shader já não apanha nada** —
+> as rampas dele são outras. Falta ler as rampas do Shadowblade (a lâmina é
+> roxa e brilha) e acrescentá-las, senão o pedido do equipamento regride.
+
+## 2. Menus de equipamento em carrossel — `dcfaa93`
+
+Mesma forma do `SeletorNiveis`: um cartão por item, setas, arrastar, som
+"carrossel", e a **Koliani dentro do cartão** a usar o item. Além dos
+números vai a **diferença** para o equipado ("+20 DMG", verde/vermelho).
+Corrigido de caminho: as duas tiras não têm a mesma célula (`armas.png` é
+640×32 = 20 lâminas de 32×32, `armaduras.png` é 270×26 = 15 de 18×26) e os
+cartões cortavam as duas a 18×26 — as armas saíam em pedaços.
+`tools/shot_equip.gd` fotografa o ecrã (**precisa de janela**).
+
+## 3. O rig Shadowblade — `40dea83`
+
+**O atlas não se corta pela grelha do `.tres`.** Foi recortado de uma
+imagem de apresentação e ficou com: passo entre figuras diferente por
+estado (o `idle` anda de 128 em 128, o `run` de ~153); linhas horizontais do
+fundo a atravessar a folha, que **colavam as figuras** umas às outras; as
+paredes de pedra dos frames de encostar; e figuras descentradas.
+
+`tools/importar_rig_shadowblade.py` limpa isso e procura as figuras por
+componentes ligados. **A linha 2 do atlas (o `attack`) tem cortes à mão** —
+o rasto do golpe liga tudo e nem a análise pelas pernas separa, porque o
+chão da imagem de origem também ficou desenhado. São 33 figuras (o `.tres`
+dizia 34: o `crouch` só tem duas poses).
+
+**O que o atlas NÃO tem** (para uma versão futura que o Paulo faça): `roll`,
+`dash`, `hurt`, `defesa`, `borda`, `aterrar`, `morte` e os golpes 2/3/4 do
+combo. O jogo aguenta (`_atualizar_anim` pergunta `has_animation`), mas cada
+tira nova entra só por acrescentar uma linha ao `ORDEM` da ferramenta.
+
+---
+
+# Pendente de antes (não perder de vista)
+
+1. **Playtestar.** 100 níveis e 34 rigs de chefe nunca foram jogados de fio
+   a pavio. `tools/testar_chefe.gd` e `tools/folha_de_contacto.gd` (**as
+   duas precisam de janela**: `--window --screen 1`).
+2. **A curva do 2.º acto** (níveis 31+) espalha-se por 70 níveis; os pontos
+   de partida (dificuldade 0.72, 14000 px) continuam a ser palpite.
+3. **O nível 100 não é um chefe normal**: é um duelo de espada, sem poderes,
+   sem HUD e sem barra de vida. Está montado como `ChefeGenerico` até ser
+   feito a sério.
+4. **Arte própria das regiões novas** — `gerar_terreno.py` só conhece 6
+   biomas de terreno.
+5. **Sino Vivo (n11) é um baú-mímico e Vyrak (n15) um morcego gigante** —
+   escolhas por confirmar com o Paulo.
+6. CI do APK Android falha desde o run 264.
+
+# Ordem obrigatória do pipeline dos níveis
 
 ```bash
 python tools/gerar_niveis_31_100.py     # escreve os .tscn (e RETRATO_CHEFE)
@@ -126,72 +168,20 @@ python tools/gerar_niveis_31_100.py     # escreve os .tscn (e RETRATO_CHEFE)
 python tools/afinar_atmosfera.py        # só DEPOIS: reescreve o bloco Atmosfera
 ```
 
-Ao contrário, o gerador apaga a atmosfera afinada e a região fica com as
-cores por omissão.
-
-## 3. Equipamento: 1 arma / 5 níveis, 1 armadura / 10 (pedido do Paulo)
-
-- **20 armas** (níveis 5, 10, ... 100) e **10 armaduras** (10, 20, ... 100).
-  Nos múltiplos de 10 caem as duas.
-- `recompensa_do_nivel` → **`recompensas_do_nivel`**, que devolve uma
-  **lista** (era o que impedia um nível de dar as duas coisas).
-- +5 armas do pós-Zeriko (Maré Escarlate, Brasa do Inferno, Fio do Vazio,
-  Juramento de Guerra, **Última Lâmina** — branca, a do duelo do nível 100).
-  `tools/extrair_armas.gd` corta 20 lâminas em vez de 15.
-- As armaduras passaram de 15 para 10; as 5 que saíram continuam com a arte
-  na tira, e por isso a armadura ganhou o campo **`celula`**, que **não é**
-  o índice na lista.
-
-## 4. Retrato do chefe no carrossel dos níveis 31-100 (pedido do Paulo)
-
-Não apareciam porque o `_retrato_chefe` só olhava para
-`assets/sprites/pixel/bosses/` (as folhas estáticas antigas). Agora tenta
-três sítios por ordem — `bosses_anim/<rig>/idle.png`,
-`enemies/<especie>/idle.png` (os **guardiões** são elites de espécie
-comum), `bosses/<slug>.png` — e vai buscar o número de frames ao catálogo
-de cada um. A cauda da tabela (31-100) é **gerada** por
-`gerar_niveis_31_100.py::retratos()`, portanto mantém-se em sincronia
-sozinha. Os 30 primeiros passaram a apontar ao **rig** em vez da folha
-estática: o carrossel mostrava um boneco e o jogo outro.
-
----
-
-# Pendente de antes (não perder de vista)
-
-1. **Playtestar.** 100 níveis e 34 rigs de chefe nunca foram jogados de fio
-   a pavio. `tools/testar_chefe.gd -- <idx0> <prefixo> [n] [seg] [zoom]
-   [recuo]` e `tools/folha_de_contacto.gd` (**as duas precisam de janela**:
-   `--window --screen 1`).
-2. **A curva do 2.º acto** (níveis 31+) espalha-se por 70 níveis; os pontos
-   de partida (dificuldade 0.72, 14000 px) continuam a ser palpite.
-3. **O nível 100 não é um chefe normal** no plano: é um duelo de espada,
-   sem poderes, sem HUD e sem barra de vida. Está montado como
-   `ChefeGenerico` de INVESTIDA até ser feito a sério.
-4. **Arte própria das regiões novas** — `gerar_terreno.py` só conhece 6
-   biomas de terreno.
+Ao contrário, o gerador apaga a atmosfera afinada.
 
 # Gotchas desta máquina (não voltar a descobrir)
 
 - **Screenshots não saem em `--headless`** (renderer dummy). Usar
-  `--window --screen 1` — janela real no 2.º monitor, sem roubar o ecrã
-  principal ao Paulo.
-- `ERROR: There is no animation with name 'idle'` aparece em **todos** os
-  níveis em `--headless`, incluindo o 1 — é do renderer dummy, não é
-  regressão.
-- A folha de contacto dos 100 níveis demora >2 min: correr em background.
-- No `tests/run_tests.gd` **não tocar em `ChefeBase.`/`EstadoJogo.`
-  directamente**: em `--script` os autoloads não existem. Ler as constantes
-  da FONTE (`_constante_float`).
-- Heredocs de Python com `\n` dentro de strings pelo Bash tool corrompem
-  ficheiros — escrever o script para o scratchpad e correr o ficheiro.
+  `--window --screen 1` — janela real no 2.º monitor.
+- Em `--script` os autoloads **não existem como identificador**; buscá-los
+  pela árvore (`get_root().get_node("/root/EstadoJogo")`), como fazem o
+  `folha_de_contacto.gd` e o `shot_equip.gd`.
+- `ERROR: There is no animation with name 'idle'` aparece em todos os níveis
+  em `--headless` — é do renderer dummy, não é regressão.
+- **Heredocs longos pelo Bash tool corrompem-se** — escrever o ficheiro com
+  a ferramenta de escrita, ou pôr o script no scratchpad e correr o ficheiro.
+- Os `.json` de i18n **não estão por ordem alfabética** (a ordem agrupa por
+  ecrã) — não os re-ordenar ao acrescentar chaves.
 - `ffmpeg` existe via `pip install --user imageio-ffmpeg`.
-
-# Histórico mais antigo
-
-A lista de 6 pontos do Paulo (Koliani pixel-art, ressalto do pisão, sons
-reais, 20+20 músicas, chefes animados) está **completa** — ver o histórico
-git e `assets/audio/CREDITS.md` / `assets/sprites/pixel/CREDITS.md` para as
-fontes e licenças. **Nota de licença que não se apaga**: o rig "cavaleiro"
-da Koliani vem do pack Knight_player, que proíbe uso por IA no seu
-`Read_me.txt`; o Paulo viu o aviso e confirmou que quer esta Koliani na
-mesma. **Não voltar a apagar esses assets sem falar com ele primeiro.**
+- **NUNCA `git add -A`** — o `incoming/` tem packs enormes.
