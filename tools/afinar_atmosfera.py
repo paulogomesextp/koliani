@@ -17,13 +17,14 @@ dentro de uma: e' a mudanca de regiao que o jogador tem de sentir. A
 variedade dentro da regiao passa a vir da tinta/luz-chave, que continua a
 ser diferente em cada um dos 30 niveis.
 
-  I   floresta, pantano          IV  caverna
-  II  prisao                     V   vilanoite, cidade, horror
+  I   floresta, pantano          IV  caverna, gruta
+  II  prisao, masmorra           V   vilanoite, cidade, horror
   III montanhas, rochoso         VI  castelo_velho, igreja, luar
 
 O pack `corredores` era uma copia byte a byte do `prisao` (dois nomes para
-a mesma imagem) e foi apagado. As Regioes II e IV ficam com um pack so' --
-faltam-lhes fundos proprios ainda por construir.
+a mesma imagem) e foi apagado. A II e a IV ficaram com um pack so', e por
+isso ganharam `masmorra` e `gruta`, montados de material CC0 que ja' estava
+descarregado e por usar (ver `tools/gerar_fundos.py`).
 
 Reescreve o bloco de propriedades do no `Atmosfera` de cada
 `scenes/levels/*.tscn`. So' mexe nas chaves da tabela -- `bioma`,
@@ -67,9 +68,9 @@ TABELA = [
     ("Coracao_da_Floresta",    "pantano",       (.82,.88,.84), (.08,.05,.10), (.10,.14,.09), (.94,.42,1.0),  (.90,.66,1.0), 2.0, (.90,.84,1.06), .44, .36, False),
     # ---- II Prisao dos Condenados -----------------------------------
     ("Prisao_dos_Condenados",  "prisao",        (.80,.84,.96), (.04,.06,.12), (.07,.09,.16), (.60,.68,1.0),  (.72,.84,1.0), 1.2, (.70,.82,1.14), .44, .56, False),
-    ("Fornalha_dos_Pecadores", "prisao",        (.98,.86,.78), (.13,.05,.04), (.18,.08,.06), (1.0,.58,.26),  (1.0,.76,.44), 2.4, (1.14,.72,.62), .28, .44, True),
+    ("Fornalha_dos_Pecadores", "masmorra",        (.98,.86,.78), (.13,.05,.04), (.18,.08,.06), (1.0,.58,.26),  (1.0,.76,.44), 2.4, (1.14,.72,.62), .28, .44, True),
     ("Corredor_das_Execucoes", "prisao",    (.82,.88,.98), (.04,.07,.11), (.07,.11,.16), (.62,.84,1.0),  (.78,.92,1.0), 1.0, (.72,.90,1.16), .38, .58, False),
-    ("Ala_dos_Mortos",         "prisao", (.84,.92,.90), (.04,.09,.09), (.06,.13,.12), (.48,1.0,.86),  (.66,1.0,.92), 1.8, (.80,1.04,1.00), .40, .28, False),
+    ("Ala_dos_Mortos",         "masmorra", (.84,.92,.90), (.04,.09,.09), (.06,.13,.12), (.48,1.0,.86),  (.66,1.0,.92), 1.8, (.80,1.04,1.00), .40, .28, False),
     ("A_Cela_Zero",            "prisao",        (.76,.76,.94), (.05,.04,.11), (.08,.07,.15), (.74,.44,1.0),  (.82,.62,1.0), 1.4, (.78,.70,1.20), .50, .60, False),
     # ---- III Torres --------------------------------------------------
     ("Torre_dos_Sinos",        "montanhas",     (.96,.90,.86), (.09,.07,.11), (.14,.11,.14), (1.0,.74,.46),  (1.0,.88,.68), 1.1, (1.06,.90,.94), .30, .22, True),
@@ -79,10 +80,10 @@ TABELA = [
     ("O_Pico_Esquecido",       "montanhas",     (.90,.90,.98), (.06,.06,.13), (.10,.11,.19), (.78,.58,1.0),  (.88,.78,1.0), 2.0, (.86,.86,1.16), .40, .30, False),
     # ---- IV Catacumbas ----------------------------------------------
     ("Cemiterio_dos_Reis",     "caverna",          (.88,.88,.92), (.07,.04,.10), (.11,.09,.13), (.86,.70,.78),  (.96,.88,.90), 1.4, (1.00,.84,.96), .26, .14, False),
-    ("Galeria_dos_Ossos",      "caverna",       (.90,.88,.84), (.07,.06,.07), (.13,.12,.10), (.92,.86,.66),  (1.0,.96,.80), 1.6, (1.04,.94,.86), .34, .26, False),
+    ("Galeria_dos_Ossos",      "gruta",       (.90,.88,.84), (.07,.06,.07), (.13,.12,.10), (.92,.86,.66),  (1.0,.96,.80), 1.6, (1.04,.94,.86), .34, .26, False),
     ("Cripta_das_Mil_Velas",   "caverna",        (.98,.90,.80), (.10,.06,.07), (.15,.10,.09), (1.0,.80,.48),  (1.0,.90,.62), 2.1, (1.10,.86,.80), .30, .30, True),
-    ("Templo_da_Serpente",     "caverna", (.84,.92,.84), (.04,.09,.07), (.07,.14,.10), (.56,.92,.50),  (.72,1.0,.66), 1.7, (.78,1.06,.86), .38, .22, False),
-    ("O_Abismo",               "caverna",       (.76,.74,.92), (.04,.03,.10), (.07,.06,.14), (.52,.34,.88),  (.70,.56,1.0), 2.4, (.72,.64,1.18), .52, .34, False),
+    ("Templo_da_Serpente",     "gruta", (.84,.92,.84), (.04,.09,.07), (.07,.14,.10), (.56,.92,.50),  (.72,1.0,.66), 1.7, (.78,1.06,.86), .38, .22, False),
+    ("O_Abismo",               "gruta",       (.76,.74,.92), (.04,.03,.10), (.07,.06,.14), (.52,.34,.88),  (.70,.56,1.0), 2.4, (.72,.64,1.18), .52, .34, False),
     # ---- V  Cidade Corrompida ---------------------------------------
     ("Vila_dos_Sem_Rosto",     "vilanoite",     (.94,.86,.90), (.09,.05,.10), (.13,.09,.14), (1.0,.62,.72),  (1.0,.82,.88), 1.3, (1.06,.84,.98), .28, .18, True),
     ("Mercado_da_Carne",       "cidade",        (.96,.82,.86), (.11,.04,.07), (.16,.07,.10), (1.0,.46,.54),  (1.0,.70,.74), 1.9, (1.12,.74,.86), .32, .30, False),

@@ -81,6 +81,22 @@ const PACKS := {
 		["middle.png", "Meio", 940.0, 4.2],
 		["near.png", "Perto", 980.0, 4.0],
 	],
+	# Região II -- 2.º fundo (ansimuz "Gothic Castle", CC0). A região tinha
+	# UM pack para os cinco níveis. Esta folha estava por usar e traz o que
+	# falta a uma prisão: o portão gradeado, o pilar de ossos, a arcada de
+	# pedra. A folha é um mostruário de dez peças soltas, não uma tira de
+	# parallax -- quem as monta lado a lado é `tools/gerar_fundos.py`.
+	# A escala e' MUITO menor do que a dos outros packs (3.0 contra 4.6): as
+	# pecas desta folha sao motivos (portao, gargula, escadaria), nao um
+	# padrao de parede. A 4.6 um motivo de 80 px ocupava 368 e via-se um por
+	# ecra, perdido no escuro; a 3.0 passam varios e le'-se como um corredor
+	# de celas. O corredor (`celas`) e' que vai ao fundo, porque e' o unico
+	# que e' mesmo uma PAREDE continua -- os outros tem vaos.
+	"masmorra": [
+		["parede.png", "Fundo", 980.0, 3.0],
+		["celas.png", "Longe", 1010.0, 2.4],
+		["arcada.png", "Meio", 1045.0, 2.2],
+	],
 	# Região IV -- Catacumbas do Abismo (ansimuz "Caverns", CC0) + túmulos e
 	# pilar da "Gothicvania Church" em primeiro plano (a gruta sozinha era só
 	# rocha; os túmulos é que dizem "catacumbas").
@@ -89,6 +105,16 @@ const PACKS := {
 		["back-walls.png", "Longe", 980.0, 3.4],
 		["back-walls.png", "Meio", 1080.0, 2.6],
 		["tumulos.png", "Perto", 1010.0, 3.0],
+	],
+	# Região IV -- 2.º fundo (Szadi art "Fantasy Caves", CC0, o mesmo pack
+	# que já dá o terreno da região): cinco camadas de parallax PRONTAS,
+	# 960x480, que nunca tinham sido usadas. A camada "Perto" traz o tecto
+	# e o chão na mesma imagem, com o meio transparente.
+	"gruta": [
+		["back.png", "Fundo", 940.0, 1.9],
+		["rocha.png", "Longe", 975.0, 1.6],
+		["boca.png", "Meio", 1030.0, 1.3],
+		["estalactites.png", "Perto", 1010.0, 1.5],
 	],
 	# Região V -- Cidade Corrompida (ansimuz "Gothicvania Town", CC0): céu de
 	# nuvens sobre serra + silhueta da vila gótica com janelas acesas. É o

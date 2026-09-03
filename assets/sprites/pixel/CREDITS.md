@@ -92,6 +92,19 @@ ficheiro. Os restantes sprites pixel-art vêm de packs CC0:
   como a prisão. O pack duplicado foi apagado e cada região passou a ter
   packs só seus — ver `tools/afinar_atmosfera.py`.
 
+- **ansimuz — GothicVania *Gothic Castle*** (patreon collection):
+  `backgrounds/masmorra/` — o 2.º fundo da R2. A folha
+  `gothic-castle-background.png` não é uma tira de parallax, é um
+  mostruário de dez peças soltas (escadaria com lustre, janela gótica,
+  gárgula, alcova, pilar de ossos, portão gradeado, arcada, paredes de
+  tijolo). O `tools/gerar_fundos.py` monta-as em fiadas e empilha duas
+  numa parede alta. É desenhada quase a preto (luminância média ~11,
+  contra 26–46 do resto da família) — leva um realce de gama 1.8 na
+  geração, senão dava ecrã preto no jogo.
+- **Szadi art — *Fantasy Caves*** (o mesmo pack que dá o terreno da R4):
+  `backgrounds/gruta/` — quatro das cinco camadas de parallax 960×480 que
+  vinham no pack e nunca tinham sido usadas. 2.º fundo da R4.
+
 CC0 não exige atribuição; fica aqui à mesma por cortesia.
 
 ## @Jump_Button — "Knight_player 1.4"  ← RIG ACTUAL DA KOLIANI
