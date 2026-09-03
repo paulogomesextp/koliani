@@ -53,6 +53,7 @@ func _correr_tudo() -> void:
 	teste_rig_da_koliani_tem_as_tiras_todas()
 	teste_especies_dos_inimigos_existem()
 	teste_packs_de_fundo_existem()
+	teste_rigs_dos_chefes()
 
 	if _falhas.is_empty():
 		print("OK -- todos os testes passaram")
@@ -807,3 +808,111 @@ func teste_packs_de_fundo_existem() -> void:
 		if mu:
 			_ok(mu.get_string(1) in packs,
 				"%s pede o fundo_pack '%s', que nao existe" % [f, mu.get_string(1)])
+
+
+## Cada cena de chefe que declara um `rig` tem mesmo esse rig em disco, com
+## as cinco tiras, o numero de frames certo e um tamanho que se le' como
+## chefe no ecra.
+##
+## Porque e' que isto existe: a 3 set 2026 vinte chefes trocaram de boneco
+## de uma so' vez (`tools/importar_chefes_animados.py` + 20 packs novos).
+## Um `rig` mal escrito na cena nao rebenta -- o `ChefeBase._montar_rig` so'
+## avisa e deixa o chefe com a folha estatica antiga, que e' exactamente o
+## problema que se estava a resolver. E um rig LARGO e baixo, escalado so'
+## pela altura, sai mais largo que a plataforma da arena.
+func teste_rigs_dos_chefes() -> void:
+	var cat: Variant = JSON.parse_string(
+		_fonte("res://assets/sprites/pixel/bosses_anim/rigs.json"))
+	_ok(cat is Dictionary and not (cat as Dictionary).is_empty(),
+		"bosses_anim/rigs.json devia ser um catálogo com rigs")
+	if not (cat is Dictionary):
+		return
+
+	var re_rig := RegEx.new()
+	re_rig.compile('(?m)^rig = "([a-z_]+)"')
+	var re_esc := RegEx.new()
+	re_esc.compile('(?m)^escala_visual = ([0-9.]+)')
+
+	# Os dois tectos vêm do `chefe_base.gd` -- lidos da FONTE, não do
+	# `ChefeBase.` directo: em `--script` os autoloads (`Som`, `EstadoJogo`)
+	# não existem, e tocar na classe puxava a cadeia toda e enchia o log de
+	# "Compile Error: Identifier not found".
+	var fonte_cb := _fonte("res://scripts/chefe_base.gd")
+	var alvo_h := _constante_float(fonte_cb, "ALTURA_ALVO_CHEFE")
+	var alvo_w := _constante_float(fonte_cb, "LARGURA_ALVO_CHEFE")
+	_ok(alvo_h > 0.0 and alvo_w > 0.0,
+		"chefe_base.gd: não li ALTURA_ALVO_CHEFE/LARGURA_ALVO_CHEFE")
+	if alvo_h <= 0.0 or alvo_w <= 0.0:
+		return
+
+	var dir := DirAccess.open("res://scenes/actors")
+	_ok(dir != null, "não abri res://scenes/actors")
+	if dir == null:
+		return
+	var com_rig := 0
+	for f in dir.get_files():
+		if not f.begins_with("Chefe") or not f.ends_with(".tscn"):
+			continue
+		var src := _fonte("res://scenes/actors/%s" % f)
+		var m := re_rig.search(src)
+		if m == null:
+			continue                      # sem rig: folha estática, tudo bem
+		com_rig += 1
+		var rig := m.get_string(1)
+		_ok(cat.has(rig), "%s: rig '%s' não existe em rigs.json" % [f, rig])
+		if not cat.has(rig):
+			continue
+		_ok(src.contains('[node name="Anim" type="AnimatedSprite2D" parent="Sprite"]'),
+			"%s: declara rig mas não tem o nó Sprite/Anim que o recebe" % f)
+
+		# as cinco tiras, e o frame do mesmo tamanho em todas
+		var cfg: Dictionary = cat[rig]
+		var estados: Dictionary = cfg.get("estados", {})
+		_ok(estados.has("idle"), "%s: rig '%s' sem 'idle'" % [f, rig])
+		var larg_frame := 0
+		for estado: String in estados:
+			var w := _tira_bate_certo(
+				"res://assets/sprites/pixel/bosses_anim/%s/%s.png" % [rig, estado],
+				int(estados[estado]), "%s/%s" % [rig, estado])
+			if w <= 0:
+				continue
+			if larg_frame == 0:
+				larg_frame = w
+			_ok(w == larg_frame,
+				"%s/%s: frame de %d px, mas o resto do rig tem %d"
+					% [rig, estado, w, larg_frame])
+
+		# tamanho no ecrã: o mesmo cálculo do `DemonioBase._normalizar_escala`
+		# (altura-alvo com tecto de largura) vezes o `escala_visual` da cena.
+		var img := Image.load_from_file(
+			"res://assets/sprites/pixel/bosses_anim/%s/idle.png" % rig)
+		if img == null or larg_frame <= 0:
+			continue
+		var frame := img.get_region(Rect2i(0, 0, larg_frame, img.get_height()))
+		var r := frame.get_used_rect()
+		if r.size.y <= 0 or r.size.x <= 0:
+			_ok(false, "%s: o frame idle do rig '%s' está vazio" % [f, rig])
+			continue
+		var me := re_esc.search(src)
+		var esc := float(me.get_string(1)) if me else 1.3
+		var k: float = minf(alvo_h / float(r.size.y), alvo_w / float(r.size.x))
+		var largura := r.size.x * k * esc
+		var altura := r.size.y * k * esc
+		# A banda vem dos nove rigs que já cá estavam antes de 3 set 2026:
+		# o mais pequeno media 52x125 e o maior 150x200. Fora disto o chefe
+		# ou não se lê como chefe, ou não cabe na plataforma da arena.
+		_ok(largura <= 175.0,
+			"%s: rig '%s' sai com %d px de largo (máx 175) -- baixar escala_visual"
+				% [f, rig, int(largura)])
+		_ok(altura >= 75.0,
+			"%s: rig '%s' sai com %d px de alto (mín 75) -- lê-se como bicho comum"
+				% [f, rig, int(altura)])
+	_ok(com_rig >= 29, "esperava >= 29 chefes com rig animado, contei %d" % com_rig)
+
+
+## `const NOME := 123.0` de um ficheiro .gd, ou 0.0 se não estiver lá.
+func _constante_float(fonte: String, nome: String) -> float:
+	var re := RegEx.new()
+	re.compile("const %s := ([0-9.]+)" % nome)
+	var m := re.search(fonte)
+	return float(m.get_string(1)) if m else 0.0
