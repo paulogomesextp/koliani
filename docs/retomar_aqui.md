@@ -47,32 +47,52 @@ regiões novas. É a fonte de verdade acima do nível 30.
 
 ## A FAZER — por onde continuar
 
-### A. Níveis 31–100 (a seguir)
-Ordem proposta, cada passo é commitável por si:
+### A. Níveis 31–100 — ARRANCOU (v0.10.0)
 
-1. **Arte das 14 regiões novas.** Já há packs para regrar: o sistema de
-   graduação (`tinta`/`dessat`/`escuro`/`rim` em `gerar_terreno.py` e
-   `gerar_deco.py`) foi feito precisamente para o mesmo material ler
-   diferente. Falta escolher células/paletas por região. Packs novos já
-   descarregados em `assets/sprites/incoming/_dl/` (todos CC0, licenças em
-   `incoming/LICENSES.md`): cemetery, patreon collection (old dark castle,
-   gothic horror, night town), opp3 cave, bridge expansion, glax.
-   Em falta mesmo: gelo, deserto, steampunk, submarino.
-2. **Camada de dados**: `EstadoJogo.NIVEIS` 30 → 100, `EstadoJogo.REGIOES`
-   6 → 20, `CatalogoCampanha.CHEFE_KEY` → 100.
-3. **Chefe genérico**: hoje cada chefe tem script próprio (29 deles).
-   Para 70 é preciso um `chefe_generico.gd` com arquétipos (investida /
-   atirador / saltador / invocador / feixe) + fases, configurado por cena.
-4. **Gerador de níveis**: as cenas 31-100 podem sair de uma tabela — com
-   `corredor = true` o `gerador_corredor.gd` constrói a jornada toda e a
-   cena só precisa da arena do chefe, porta, spawn e atmosfera.
-5. **i18n**: `level.n30`..`level.n99` + 70 chaves `boss.*` nos **seis**
-   `assets/i18n/*.json` (o `en.json` é a fonte de verdade e os testes
-   exigem as mesmas chaves em todos).
+A **Região VII (31–35, Terras Queimadas) está feita e a jogar**, de ponta a
+ponta. Foi de propósito uma fatia vertical: uma região inteira a funcionar
+prova a tubagem toda, e as 13 restantes são a mesma coisa repetida.
 
-> Aviso honesto para dar ao Paulo: 70 níveis por esta via ficam **jornadas
-> procedurais temáticas com chefe**, não 70 salas desenhadas à mão como as
-> 29 actuais. Desenhar à mão é trabalho de várias sessões por região.
+O que ficou construído e serve para as outras 13:
+
+| Peça | O quê |
+| --- | --- |
+| `scripts/chefe_generico.gd` | uma máquina de estados, 5 arquétipos (INVESTIDA / ATIRADOR / SALTADOR / INVOCADOR / FEIXE). Um chefe novo = uma cena + `@export`s |
+| `tools/testar_chefe_generico.gd` | bancada dos arquétipos — como os 70 partilham o script, um arquétipo partido parte-os a todos |
+| `tools/gerar_niveis_31_100.py` | as cenas saem de uma tabela: 1 linha por nível |
+| `_dificuldade()` / `_comprimento()` | o **2.º acto** — a região nova recomeça mais abaixo e volta a subir (a curva antiga era para 30 níveis e punha o nível 31 no máximo dos dois) |
+
+**Para acrescentar a Região VIII (36–40) — a receita:**
+
+1. `tools/gerar_niveis_31_100.py`: 5 linhas em `NIVEIS` (ficheiro, índice,
+   bioma emprestado, arquétipo, vida, cor, sprite de chefe emprestado).
+2. `scripts/gerador_corredor.gd`: `LIQUIDO[7]`, `POOL_REGIAO[7]`,
+   `ASSINATURA[7]`, `ESP_REGIAO[7]`, +5 em `ESP_ASSINATURA`, +5 em `PERFIL`.
+3. `scripts/estado_jogo.gd`: +5 em `NIVEIS`, +1 em `REGIOES`.
+4. `scripts/catalogo_campanha.gd`: +5 em `CHEFE_KEY`.
+5. `assets/i18n/*.json`: +10 chaves nos **seis** ficheiros.
+6. `tools/afinar_atmosfera.py`: +5 linhas, e correr o tool.
+7. `godot --headless --import`, a suite, `verifica_jornada`, folha de contacto.
+
+**Decisões que ficam por tomar (precisam do Paulo):**
+
+- **Os dois pontos de partida do 2.º acto** — 0.72 de dificuldade e
+  14000 px de jornada para o primeiro nível da região nova. São palpite
+  fundamentado (a dureza do nível ~21, o comprimento do ~10). Só a jogar
+  se sabe.
+- **Arte.** Os 70 chefes usam sprites emprestados dos 29 de 1–30, e os
+  fundos são reaproveitados: a regra "um pack nunca em duas regiões" vale
+  para as seis primeiras, que consomem os doze packs que existem. Da VII em
+  diante a identidade vem toda da tinta. 14 regiões × ~2 packs é o trabalho
+  de arte que falta, e é o que separa isto de parecer conteúdo a sério.
+- **A nota de design do próprio Paulo** no plano: *"eu evitaria que todos
+  fossem obrigatoriamente nível → boss"*. A tabela do plano dá um chefe a
+  cada nível de 31 a 95, e foi essa que se seguiu. Se a ideia dos
+  70–75 normais + 15 especiais + 10 chefes principais é para valer, é
+  decidir antes de construir as 13 regiões que faltam.
+- **O último nível da lista nunca tem jornada** (`indice < NIVEIS.size()-1`
+  no `nivel_com_chefe.gd`). Hoje isso é o nível 35, que por isso é só a
+  arena do chefe. Resolve-se sozinho quando a Região VIII entrar.
 
 ### B. Arte — FEITA a 3 set (v0.9.44)
 Os três pontos que estavam aqui ficaram fechados:
