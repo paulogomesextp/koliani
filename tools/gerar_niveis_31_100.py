@@ -145,6 +145,54 @@ NIVEIS = [
     # o CHEFE da regiao: A Maquina-Rei
     ("Coracao_da_Maquina", 59, "castelo", "chefe", 0, 1280, (0.45, 0.88, 1.00),
      "lamina_metal", "O coracao mecanico da cidade. A Maquina-Rei."),
+    # --- XIII  CEU PARTIDO (61-65) -- para cima, sem chao ---------------
+    ("Ilhas_Flutuantes", 60, "torres", "guardiao", 0, 1320, (0.62, 0.70, 1.00),
+     "abutre", "Plataformas suspensas no vazio. Guardiao: o guarda-nuvens."),
+    ("Templo_do_Trovao", 61, "castelo", "guardiao", 0, 1360, (0.80, 0.86, 1.00),
+     "xamane", "Raios sem parar. Guardiao: o servo do trovao."),
+    ("Cidade_dos_Anjos_Mortos", 62, "cidade", "guardiao", 0, 1400, (0.92, 0.90, 1.00),
+     "wogol", "Anjos corrompidos em patrulha. Guardiao: um deles."),
+    ("Lua_Quebrada", 63, "torres", "guardiao", 0, 1440, (0.74, 0.80, 1.00),
+     "olho", "Pedacos da lua a atravessar. Guardiao: um olho lunar."),
+    # o CHEFE da regiao: O Astronomo
+    ("O_Fim_do_Ceu", 64, "torres", "chefe", 4, 1500, (0.56, 0.68, 1.00),
+     "cristal", "Sem chao: so' plataformas magicas. O Astronomo."),
+    # --- XIV  REINO DOS SONHOS (66-70) -- a realidade deixa de valer ----
+    ("Vila_dos_Sonhos", 65, "cidade", "guardiao", 0, 1540, (0.92, 0.66, 0.96),
+     "abobora", "Os NPCs somem quando se olha para o lado. Guardiao: um."),
+    ("Mundo_Invertido", 66, "castelo", "guardiao", 0, 1580, (0.80, 0.60, 1.00),
+     "wogol", "Tudo de cabeca para baixo. Guardiao: o reflexo."),
+    ("Quarto_das_Criancas_Mortas", 67, "cidade", "guardiao", 0, 1620, (1.00, 0.72, 0.86),
+     "gosma", "Cenario inocente, muito sombrio. Guardiao: a boneca."),
+    ("Pesadelo", 68, "catacumbas", "guardiao", 0, 1660, (0.70, 0.40, 0.94),
+     "mushroom", "Feito dos medos dela. Guardiao: um medo com forma."),
+    # o CHEFE da regiao: A Outra Koliani -- espelho do rig de cavaleiro
+    ("A_Mente", 69, "torres", "chefe", 0, 1720, (0.86, 0.56, 1.00),
+     "cavaleiro_negro", "Dentro da propria mente. A Outra Koliani."),
+    # --- XV  CIDADE DOS MORTOS (71-75) ---------------------------------
+    ("Avenida_dos_Mortos", 70, "cidade", "guardiao", 0, 1760, (0.72, 0.92, 0.80),
+     "esqueleto", "Milhares de fantasmas a atravessar. Guardiao: um deles."),
+    ("Cemiterio_Infinito", 71, "catacumbas", "guardiao", 0, 1800, (0.66, 0.88, 0.76),
+     "necromante", "Cada lapide e' alguem que ela nao salvou."),
+    ("Catedral_Fantasma", 72, "castelo", "guardiao", 0, 1840, (0.84, 0.96, 0.88),
+     "wogol", "A igreja existe em duas dimensoes. Guardiao: o santo."),
+    ("Palacio_dos_Reis_Mortos", 73, "castelo", "guardiao", 0, 1880, (0.94, 0.90, 0.62),
+     "chort", "Os antigos reis voltam. Guardiao: o primeiro deles."),
+    # o CHEFE da regiao: a propria Morte -- o `ceifeiro` sempre foi para aqui
+    ("Trono_da_Morte", 74, "catacumbas", "chefe", 2, 1940, (0.60, 0.96, 0.72),
+     "ceifeiro", "A arena desaparece durante a luta. A propria Morte."),
+    # --- XVI  MAR VERMELHO (76-80) -- o oceano da corrupcao -------------
+    ("Margem_do_Sangue", 75, "prisao", "guardiao", 0, 1980, (1.00, 0.30, 0.32),
+     "lodo", "A mare e' de sangue. Guardiao: o afogado."),
+    ("Serpentes_do_Mar", 76, "catacumbas", "guardiao", 0, 2020, (1.00, 0.24, 0.28),
+     "raptor", "Serpentes por baixo da agua. Guardiao: uma vermelha."),
+    ("Navio_da_Condenacao", 77, "castelo", "guardiao", 0, 2060, (0.96, 0.36, 0.34),
+     "esqueleto", "O nivel inteiro num navio fantasma. Guardiao: o almirante."),
+    ("Fortaleza_Kraken", 78, "torres", "guardiao", 0, 2100, (0.90, 0.28, 0.40),
+     "gosma", "Fortaleza construida sobre um monstro. Guardiao: um tentaculo."),
+    # o CHEFE da regiao: O Mar -- uma massa de liquido vivo
+    ("Coracao_Vermelho", 79, "catacumbas", "chefe", 1, 2180, (1.00, 0.20, 0.26),
+     "demonio_lodo", "O oceano e' uma criatura viva. O Mar."),
 ]
 
 MODELO_CHEFE = '''[gd_scene load_steps=8 format=3 uid="uid://bkoliani{uid}"]
@@ -329,6 +377,26 @@ TITULOS = {
     "Fabrica_dos_Homunculos": "Fabrica dos Homunculos",
     "Torre_Electrica": "Torre Electrica",
     "Coracao_da_Maquina": "Coracao da Maquina",
+    "Ilhas_Flutuantes": "Ilhas Flutuantes",
+    "Templo_do_Trovao": "Templo do Trovao",
+    "Cidade_dos_Anjos_Mortos": "Cidade dos Anjos Mortos",
+    "Lua_Quebrada": "Lua Quebrada",
+    "O_Fim_do_Ceu": "O Fim do Ceu",
+    "Vila_dos_Sonhos": "Vila dos Sonhos",
+    "Mundo_Invertido": "Mundo Invertido",
+    "Quarto_das_Criancas_Mortas": "Quarto das Criancas Mortas",
+    "Pesadelo": "Pesadelo",
+    "A_Mente": "A Mente",
+    "Avenida_dos_Mortos": "Avenida dos Mortos",
+    "Cemiterio_Infinito": "Cemiterio Infinito",
+    "Catedral_Fantasma": "Catedral Fantasma",
+    "Palacio_dos_Reis_Mortos": "Palacio dos Reis Mortos",
+    "Trono_da_Morte": "Trono da Morte",
+    "Margem_do_Sangue": "Margem do Sangue",
+    "Serpentes_do_Mar": "Serpentes do Mar",
+    "Navio_da_Condenacao": "Navio da Condenacao",
+    "Fortaleza_Kraken": "Fortaleza Kraken",
+    "Coracao_Vermelho": "Coracao Vermelho",
 }
 
 # Liquido mortal da arena do chefe, por REGIAO (indice0 // 5). Sem isto o
@@ -341,6 +409,10 @@ LIQUIDO_REGIAO = {
     9: ((0.42, 0.32, 0.16, 0.94), "false"),   # X areia movedica
     10: ((0.16, 0.34, 0.14, 0.94), "false"),  # XI seiva das plantas
     11: ((0.10, 0.22, 0.30, 0.95), "false"),  # XII oleo de maquina
+    12: ((0.08, 0.09, 0.20, 0.90), "false"),  # XIII o vazio por baixo do ceu
+    13: ((0.30, 0.16, 0.34, 0.92), "false"),  # XIV a nevoa dos sonhos
+    14: ((0.13, 0.18, 0.15, 0.94), "false"),  # XV a bruma das campas
+    15: ((0.42, 0.05, 0.09, 0.96), "false"),  # XVI o mar de sangue
 }
 
 

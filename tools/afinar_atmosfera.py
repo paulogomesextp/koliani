@@ -164,6 +164,41 @@ TABELA = [
     ("Fabrica_dos_Homunculos", "cidade",        (.80,.98,1.14), (.07,.13,.20), (.11,.19,.28), (.70,.95,1.0),  (.86,.98,1.0), 4.0, (.76,1.00,1.28), .30, .62, False),
     ("Torre_Electrica",        "rochoso",       (.68,.92,1.22), (.04,.10,.20), (.08,.16,.29), (.50,.92,1.0),  (.68,.96,1.0), 4.8, (.60,.94,1.40), .38, .70, False),
     ("Coracao_da_Maquina",     "castelo_velho", (.64,.90,1.24), (.03,.08,.17), (.07,.14,.25), (.45,.88,1.0),  (.62,.94,1.0), 4.2, (.56,.92,1.42), .42, .72, False),
+    # ---- XIII  Ceu Partido (61-65) ----------------------------------
+    # Indigo de noite alta com estrelas. A regiao mais ESCURA de fundo e a
+    # mais CLARA de luz-chave ao mesmo tempo: e' o contraste que faz o
+    # "estar acima das nuvens". O po' e' poeira de estrelas -- muito denso.
+    ("Ilhas_Flutuantes",       "montanhas",     (.82,.84,1.14), (.06,.07,.20), (.11,.13,.28), (.62,.70,1.0),  (.84,.88,1.0), 5.4, (.72,.78,1.34), .44, .60, False),
+    ("Templo_do_Trovao",       "rochoso",       (.92,.94,1.16), (.09,.10,.22), (.14,.16,.30), (.80,.86,1.0),  (.94,.96,1.0), 4.6, (.86,.90,1.30), .38, .56, False),
+    ("Cidade_dos_Anjos_Mortos","igreja",        (.98,.97,1.12), (.11,.12,.24), (.17,.18,.32), (.92,.90,1.0),  (1.0,.98,1.0), 4.0, (.96,.94,1.24), .34, .52, True),
+    ("Lua_Quebrada",           "luar",          (.88,.90,1.18), (.07,.08,.21), (.12,.14,.29), (.74,.80,1.0),  (.90,.92,1.0), 5.0, (.80,.84,1.36), .42, .64, False),
+    ("O_Fim_do_Ceu",           "horror",        (.78,.82,1.20), (.04,.05,.18), (.08,.10,.26), (.56,.68,1.0),  (.78,.84,1.0), 5.8, (.66,.74,1.40), .50, .68, False),
+    # ---- XIV  Reino dos Sonhos (66-70) ------------------------------
+    # Pastel LILAS. Nao e' o magenta do Zeriko (esse e' saturado e duro):
+    # aqui a cor esta' lavada, como uma fotografia velha. E' a unica regiao
+    # em que a neblina e' alta E o po' e' claro -- tudo parece longe.
+    ("Vila_dos_Sonhos",        "vilanoite",     (1.04,.86,1.10), (.16,.10,.20), (.22,.15,.27), (.92,.66,.96),  (1.0,.86,1.0), 4.2, (1.12,.82,1.20), .52, .54, False),
+    ("Mundo_Invertido",        "cidade",        (.96,.82,1.16), (.13,.09,.22), (.19,.14,.29), (.80,.60,1.0),  (.94,.80,1.0), 4.6, (1.00,.78,1.28), .56, .58, False),
+    ("Quarto_das_Criancas_Mortas","pantano",    (1.10,.90,1.06), (.19,.12,.19), (.25,.17,.25), (1.0,.72,.86),  (1.0,.90,.96), 3.8, (1.20,.88,1.10), .48, .50, False),
+    ("Pesadelo",               "gruta",         (.88,.70,1.14), (.10,.05,.19), (.15,.09,.25), (.70,.40,.94),  (.86,.64,1.0), 5.0, (.90,.62,1.30), .60, .62, False),
+    ("A_Mente",                "masmorra",      (1.00,.80,1.18), (.14,.08,.23), (.20,.13,.30), (.86,.56,1.0),  (.98,.78,1.0), 4.4, (1.06,.74,1.32), .54, .56, True),
+    # ---- XV  Cidade dos Mortos (71-75) ------------------------------
+    # Verde-osso: cinzento com um resto de verde, a cor de vela apagada.
+    # E' o negativo da XI (verde vivo) -- a mesma familia de cor, sem vida.
+    ("Avenida_dos_Mortos",     "prisao",        (.86,1.00,.90), (.08,.12,.10), (.13,.18,.15), (.72,.92,.80),  (.88,1.0,.92), 4.4, (.80,1.04,.88), .40, .64, False),
+    ("Cemiterio_Infinito",     "castelo_velho", (.82,.98,.88), (.06,.10,.08), (.11,.16,.13), (.66,.88,.76),  (.84,.98,.88), 4.8, (.74,1.00,.84), .46, .68, False),
+    ("Catedral_Fantasma",      "igreja",        (.92,1.02,.94), (.10,.14,.12), (.16,.21,.18), (.84,.96,.88),  (.94,1.0,.96), 4.0, (.88,1.06,.92), .36, .60, True),
+    ("Palacio_dos_Reis_Mortos","caverna",       (.98,1.00,.84), (.12,.13,.08), (.18,.19,.13), (.94,.90,.62),  (1.0,.98,.76), 3.6, (1.02,1.00,.74), .34, .58, True),
+    ("Trono_da_Morte",         "floresta",      (.78,.98,.84), (.04,.08,.06), (.09,.14,.11), (.60,.96,.72),  (.80,1.0,.84), 5.2, (.68,1.02,.78), .50, .70, False),
+    # ---- XVI  Mar Vermelho (76-80) ----------------------------------
+    # Vermelho a serio -- nao ha' nada assim em nenhuma outra regiao. O
+    # verde e o azul vao ao chao no `amb`, e o horizonte quente esta'
+    # ligado nos cinco: o mar inteiro brilha.
+    ("Margem_do_Sangue",       "pantano",       (1.22,.62,.62), (.24,.04,.06), (.31,.07,.09), (1.0,.30,.32),  (1.0,.60,.58), 4.2, (1.34,.52,.52), .32, .66, True),
+    ("Serpentes_do_Mar",       "gruta",         (1.24,.56,.58), (.20,.03,.05), (.27,.06,.08), (1.0,.24,.28),  (1.0,.54,.54), 4.6, (1.38,.46,.48), .38, .70, True),
+    ("Navio_da_Condenacao",    "prisao",        (1.18,.66,.64), (.22,.05,.06), (.29,.08,.10), (.96,.36,.34),  (1.0,.66,.60), 4.0, (1.30,.58,.54), .34, .62, True),
+    ("Fortaleza_Kraken",       "cidade",        (1.16,.60,.68), (.19,.04,.08), (.26,.07,.12), (.90,.28,.40),  (1.0,.58,.66), 4.4, (1.28,.50,.62), .36, .68, True),
+    ("Coracao_Vermelho",       "horror",        (1.28,.50,.54), (.26,.02,.05), (.33,.05,.08), (1.0,.20,.26),  (1.0,.50,.52), 5.0, (1.42,.40,.44), .42, .72, True),
 ]
 
 CHAVES = [

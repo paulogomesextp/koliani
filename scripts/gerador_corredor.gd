@@ -87,6 +87,10 @@ const LIQUIDO := {
 	9: [Color(0.42, 0.32, 0.16, 0.94), false],   # X areia movedica do deserto
 	10: [Color(0.16, 0.34, 0.14, 0.94), false],  # XI seiva das plantas dos Jardins
 	11: [Color(0.10, 0.22, 0.30, 0.95), false],  # XII oleo de maquina da Cidade
+	12: [Color(0.08, 0.09, 0.20, 0.90), false],  # XIII o vazio por baixo do Ceu Partido
+	13: [Color(0.30, 0.16, 0.34, 0.92), false],  # XIV a nevoa dos Sonhos
+	14: [Color(0.13, 0.18, 0.15, 0.94), false],  # XV a bruma das campas
+	15: [Color(0.42, 0.05, 0.09, 0.96), false],  # XVI o Mar Vermelho
 }
 
 ## Tipos de "flavour" de câmara (o que se semeia à volta da espinha).
@@ -135,6 +139,23 @@ const POOL_REGIAO := {
 	# as câmaras de máquina ao mesmo tempo.
 	11: ["correntes", "elevador", "impulso", "ritmo", "prensa", "serras",
 		"guilhotinas", "crossfire", "quebra", "portal", "alavanca", "segredo"],
+	# XIII Ceu Partido: não há chão -- só o que passa. `ferry` de
+	# assinatura (as ilhas que se movem), mais `vento` e `gravidade`.
+	12: ["ferry", "vento", "gravidade", "saltos", "trampolim", "elevador",
+		"pendulos", "ritmo", "portal", "alavanca", "segredo"],
+	# XIV Reino dos Sonhos: a regra é não haver regra. `portal` de
+	# assinatura -- entra-se aqui e sai-se noutro sítio.
+	13: ["portal", "espelhos", "gravidade", "quebra", "velas", "saltos",
+		"pendulos", "ritmo", "gruta", "alavanca", "segredo"],
+	# XV Cidade dos Mortos: `sinos` de assinatura -- a badalada torna
+	# sólida a ponte fantasma, que é a mecânica-imagem da região inteira.
+	14: ["sinos", "velas", "gruta", "pendulos",
+		"guilhotinas", "espinhos", "ferry", "elevador", "portal",
+		"alavanca", "segredo"],
+	# XVI Mar Vermelho: a maré. `ritmo` de assinatura -- tudo aqui sobe e
+	# desce a compasso.
+	15: ["ritmo", "ferry", "quebra", "gravidade", "pendulos", "espinhos",
+		"crossfire", "serras", "portal", "alavanca", "segredo"],
 }
 
 ## `_dif` mínimo para cada tipo de câmara entrar na pool. Assim o Nível 1
@@ -193,6 +214,10 @@ const ASSINATURA := {
 	9: "crossfire",    # Deserto -- as estatuas que disparam
 	10: "pendulos",    # Jardins do Rei -- as trepadeiras
 	11: "correntes",   # Cidade das Maquinas -- as correias
+	12: "ferry",       # Ceu Partido -- as ilhas que passam
+	13: "portal",      # Reino dos Sonhos -- entra aqui, sai ali
+	14: "sinos",       # Cidade dos Mortos -- a ponte fantasma
+	15: "ritmo",       # Mar Vermelho -- a mare
 }
 
 ## Toque de assinatura do NÍVEL (a gimmick do `docs/niveis.md`) espalhado
@@ -296,6 +321,30 @@ const PERFIL := [
 	{"v": 0, "f": "combate", "a": 0.9},   # 57 Fabrica dos Homunculos -- em serie
 	{"v": 1, "f": "vertical", "a": 1.15}, # 58 Torre Electrica -- subida
 	{"v": -1, "f": "maquina", "a": 0.95}, # 59 Coracao da Maquina -- por dentro
+	# --- Regiao XIII  Ceu Partido (60-64) : nao ha' chao ----------------
+	{"v": 1, "f": "salto", "a": 1.3},     # 60 Ilhas Flutuantes -- vaos largos
+	{"v": 1, "f": "gauntlet", "a": 1.1},  # 61 Templo do Trovao
+	{"v": 0, "f": "combate", "a": 1.0},   # 62 Cidade dos Anjos Mortos
+	{"v": 1, "f": "salto", "a": 1.25},    # 63 Lua Quebrada -- fragmentos
+	{"v": 1, "f": "salto", "a": 1.35},    # 64 O Fim do Ceu -- so' plataformas
+	# --- Regiao XIV  Reino dos Sonhos (65-69) : sem regras --------------
+	{"v": 0, "f": "maquina", "a": 0.9},   # 65 Vila dos Sonhos
+	{"v": -1, "f": "salto", "a": 1.1},    # 66 Mundo Invertido
+	{"v": 0, "f": "combate", "a": 0.75},  # 67 Quarto das Criancas -- apertado
+	{"v": -1, "f": "gauntlet", "a": 0.95},# 68 Pesadelo
+	{"v": 1, "f": "vertical", "a": 1.15}, # 69 A Mente -- subir por dentro
+	# --- Regiao XV  Cidade dos Mortos (70-74) --------------------------
+	{"v": 0, "f": "gauntlet", "a": 1.2},  # 70 Avenida dos Mortos -- avenida
+	{"v": 0, "f": "maquina", "a": 1.25},  # 71 Cemiterio Infinito -- sem fim
+	{"v": 1, "f": "vertical", "a": 1.0},  # 72 Catedral Fantasma -- naves altas
+	{"v": 0, "f": "combate", "a": 0.9},   # 73 Palacio dos Reis Mortos
+	{"v": -1, "f": "combate", "a": 0.8},  # 74 Trono da Morte -- fecha-se
+	# --- Regiao XVI  Mar Vermelho (75-79) : a mare ---------------------
+	{"v": 0, "f": "salto", "a": 1.15},    # 75 Margem do Sangue
+	{"v": -1, "f": "gauntlet", "a": 1.05},# 76 Serpentes do Mar
+	{"v": 0, "f": "maquina", "a": 1.1},   # 77 Navio da Condenacao -- conves
+	{"v": 1, "f": "vertical", "a": 1.0},  # 78 Fortaleza Kraken
+	{"v": -1, "f": "combate", "a": 0.85}, # 79 Coracao Vermelho -- por dentro
 ]
 
 ## Que câmaras conta cada foco. Cruzado depois com região+tier em
@@ -1015,6 +1064,10 @@ const ESP_REGIAO := {
 	9: ["raptor", "besouro", "ogro", "necromante", "abobora"],
 	10: ["mushroom", "goblin", "lodo", "gosma", "olho"],
 	11: ["besouro", "wogol", "chort", "esqueleto", "imp"],
+	12: ["abutre", "olho", "xamane", "wogol", "imp"],
+	13: ["abobora", "wogol", "gosma", "mushroom", "olho"],
+	14: ["esqueleto", "necromante", "wogol", "chort", "abobora"],
+	15: ["lodo", "gosma", "raptor", "esqueleto", "olho"],
 }
 
 ## A "cara" de cada NÍVEL (pedido do Paulo: não repetir o mesmo monstro em
@@ -1034,6 +1087,10 @@ const ESP_ASSINATURA := [
 	"raptor", "ogro", "besouro", "necromante", "xamane",           # X Deserto dos Esquecidos
 	"mushroom", "goblin", "olho", "lodo", "gosma",                 # XI Jardins do Rei
 	"besouro", "esqueleto", "wogol", "chort", "imp",               # XII Cidade das Maquinas
+	"abutre", "xamane", "wogol", "olho", "imp",                    # XIII Ceu Partido
+	"abobora", "wogol", "gosma", "mushroom", "olho",               # XIV Reino dos Sonhos
+	"esqueleto", "necromante", "wogol", "chort", "abobora",        # XV Cidade dos Mortos
+	"lodo", "raptor", "esqueleto", "gosma", "olho",                # XVI Mar Vermelho
 ]
 
 

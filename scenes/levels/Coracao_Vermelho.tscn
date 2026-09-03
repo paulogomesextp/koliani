@@ -1,0 +1,79 @@
+[gd_scene load_steps=8 format=3 uid="uid://bkolianicoracaovermelho80"]
+
+; REGIAO 16 / nivel 80 -- Coracao Vermelho.
+; O oceano e' uma criatura viva. O Mar.
+;
+; CENA GERADA por `tools/gerar_niveis_31_100.py` -- NAO editar a' mao: o
+; proximo `python tools/gerar_niveis_31_100.py` apaga o que aqui se puser.
+; A JORNADA (`corredor = true`, `gerador_corredor.gd`) constroi tudo o que
+; vem antes desta sala; aqui so' esta' a arena do chefe.
+; O bloco `Atmosfera` e' reescrito por `tools/afinar_atmosfera.py`.
+
+[ext_resource type="PackedScene" uid="uid://bkolianiactor01" path="res://scenes/actors/Koliani.tscn" id="1_kol"]
+[ext_resource type="PackedScene" uid="uid://bkolianiporta01" path="res://scenes/actors/Porta.tscn" id="2_porta"]
+[ext_resource type="Script" path="res://scripts/checkpoint.gd" id="3_chk"]
+[ext_resource type="PackedScene" uid="uid://bkolianichefegenerico01" path="res://scenes/actors/ChefeGenerico.tscn" id="4_chefe"]
+[ext_resource type="Script" path="res://scripts/nivel_com_chefe.gd" id="5_niv"]
+[ext_resource type="PackedScene" uid="uid://bkolianiatmosfera01" path="res://scenes/fx/Atmosfera.tscn" id="6_atm"]
+[ext_resource type="PackedScene" uid="uid://bkolianiplataforma01" path="res://scenes/actors/Plataforma.tscn" id="7_pl"]
+[ext_resource type="PackedScene" uid="uid://bkolianiaguavenenosa01" path="res://scenes/actors/AguaVenenosa.tscn" id="8_liq"]
+
+[sub_resource type="RectangleShape2D" id="rs_chk"]
+size = Vector2(44, 96)
+
+[node name="Coracao_Vermelho" type="Node2D"]
+script = ExtResource("5_niv")
+
+[node name="Atmosfera" parent="." instance=ExtResource("6_atm")]
+cor_ambiente = Color(1.28, 0.5, 0.54, 1)
+cor_fundo = Color(0.26, 0.02, 0.05, 1)
+cor_silhueta = Color(0.33, 0.05, 0.08, 1)
+cor_luz = Color(1, 0.2, 0.26, 1)
+cor_poeira = Color(1, 0.5, 0.52, 1)
+densidade_poeira = 5
+bioma = "catacumbas"
+largura_nivel = 1800.0
+fundo_pack = "horror"
+tinta_fundo = Color(1.42, 0.4, 0.44, 1)
+neblina_fundo = 0.42
+dessaturar_fundo = 0.72
+seed_ambiente = 3923
+luzes_horizonte = true
+
+[node name="LiquidoMortal" parent="." instance=ExtResource("8_liq")]
+position = Vector2(700, 980)
+largura = 2000.0
+altura = 340.0
+cor = Color(0.42, 0.05, 0.09, 0.96)
+brasas = false
+
+[node name="ChaoChefe" parent="." instance=ExtResource("7_pl")]
+position = Vector2(760, 700)
+tamanho = Vector2(1000, 60)
+altura_visual = 110.0
+
+[node name="Chefe" parent="." instance=ExtResource("4_chefe")]
+position = Vector2(1020, 616)
+arquetipo = 1
+vida = 2180
+cor_rim = Color(1.0, 0.2, 0.26, 1)
+rig = "demonio_lodo"
+tiros_por_salva = 5
+leque_graus = 34.0
+dist_ideal = 300.0
+
+[node name="Koliani" parent="." instance=ExtResource("1_kol")]
+position = Vector2(360, 616)
+
+[node name="CheckInicio" type="Area2D" parent="."]
+position = Vector2(430, 632)
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("3_chk")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckInicio"]
+shape = SubResource("rs_chk")
+
+[node name="Porta" parent="." instance=ExtResource("2_porta")]
+position = Vector2(1210, 622)
+pista_ao_atravessar = ""

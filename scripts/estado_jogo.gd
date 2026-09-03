@@ -113,6 +113,26 @@ const NIVEIS := [
 	"res://scenes/levels/Fabrica_dos_Homunculos.tscn",
 	"res://scenes/levels/Torre_Electrica.tscn",
 	"res://scenes/levels/Coracao_da_Maquina.tscn",
+	"res://scenes/levels/Ilhas_Flutuantes.tscn",
+	"res://scenes/levels/Templo_do_Trovao.tscn",
+	"res://scenes/levels/Cidade_dos_Anjos_Mortos.tscn",
+	"res://scenes/levels/Lua_Quebrada.tscn",
+	"res://scenes/levels/O_Fim_do_Ceu.tscn",
+	"res://scenes/levels/Vila_dos_Sonhos.tscn",
+	"res://scenes/levels/Mundo_Invertido.tscn",
+	"res://scenes/levels/Quarto_das_Criancas_Mortas.tscn",
+	"res://scenes/levels/Pesadelo.tscn",
+	"res://scenes/levels/A_Mente.tscn",
+	"res://scenes/levels/Avenida_dos_Mortos.tscn",
+	"res://scenes/levels/Cemiterio_Infinito.tscn",
+	"res://scenes/levels/Catedral_Fantasma.tscn",
+	"res://scenes/levels/Palacio_dos_Reis_Mortos.tscn",
+	"res://scenes/levels/Trono_da_Morte.tscn",
+	"res://scenes/levels/Margem_do_Sangue.tscn",
+	"res://scenes/levels/Serpentes_do_Mar.tscn",
+	"res://scenes/levels/Navio_da_Condenacao.tscn",
+	"res://scenes/levels/Fortaleza_Kraken.tscn",
+	"res://scenes/levels/Coracao_Vermelho.tscn",
 ]
 # "res://scenes/levels/Level_Test.tscn" fica no repo como sala de treino,
 # fora da campanha (correr a cena diretamente no editor).
@@ -135,6 +155,10 @@ const REGIOES := [
 	{"id": "deserto", "nome": "Deserto dos Esquecidos", "niveis": [45, 46, 47, 48, 49]},
 	{"id": "jardins", "nome": "Jardins do Rei", "niveis": [50, 51, 52, 53, 54]},
 	{"id": "maquinas", "nome": "Cidade das Máquinas", "niveis": [55, 56, 57, 58, 59]},
+	{"id": "ceu", "nome": "Céu Partido", "niveis": [60, 61, 62, 63, 64]},
+	{"id": "sonhos", "nome": "Reino dos Sonhos", "niveis": [65, 66, 67, 68, 69]},
+	{"id": "mortos", "nome": "Cidade dos Mortos", "niveis": [70, 71, 72, 73, 74]},
+	{"id": "mar_vermelho", "nome": "Mar Vermelho", "niveis": [75, 76, 77, 78, 79]},
 ]
 
 signal vidas_mudaram(vidas: int)

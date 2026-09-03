@@ -87,6 +87,30 @@ const CHEFE_KEY: Array[String] = [
 	"guard.homunculo",          # 57 Fabrica dos Homunculos
 	"guard.bobina_viva",        # 58 Torre Electrica
 	"boss.maquina_rei",         # 59 Coracao da Maquina
+	# --- Regiao XIII  Ceu Partido ---
+	"guard.guarda_nuvens",      # 60 Ilhas Flutuantes
+	"guard.servo_do_trovao",    # 61 Templo do Trovao
+	"guard.anjo_corrompido",    # 62 Cidade dos Anjos Mortos
+	"guard.olho_lunar",         # 63 Lua Quebrada
+	"boss.astronomo",           # 64 O Fim do Ceu
+	# --- Regiao XIV  Reino dos Sonhos ---
+	"guard.sonhador",           # 65 Vila dos Sonhos
+	"guard.reflexo",            # 66 Mundo Invertido
+	"guard.boneca",             # 67 Quarto das Criancas Mortas
+	"guard.medo",               # 68 Pesadelo
+	"boss.outra_koliani",       # 69 A Mente
+	# --- Regiao XV  Cidade dos Mortos ---
+	"guard.colecionador",       # 70 Avenida dos Mortos
+	"guard.coveiro",            # 71 Cemiterio Infinito
+	"guard.santo_corrompido",   # 72 Catedral Fantasma
+	"guard.rei_morto",          # 73 Palacio dos Reis Mortos
+	"boss.morte",               # 74 Trono da Morte
+	# --- Regiao XVI  Mar Vermelho ---
+	"guard.afogado_vermelho",   # 75 Margem do Sangue
+	"guard.serpente_vermelha",  # 76 Serpentes do Mar
+	"guard.almirante_morto",    # 77 Navio da Condenacao
+	"guard.tentaculo",          # 78 Fortaleza Kraken
+	"boss.o_mar",               # 79 Coracao Vermelho
 ]
 
 

@@ -99,7 +99,7 @@ Cidade steampunk abandonada.
 | 59 | 🔋 Torre Eléctrica | electricidade percorre plataformas | **O Titã Mecânico** |
 | 60 | 🏭 Coração da Máquina | coração mecânico alimenta a cidade | **A Máquina-Rei** — autómato gigante, várias fases |
 
-## XIII — CÉU PARTIDO (61–65) 🌌
+## XIII — CÉU PARTIDO (61–65) 🌌 ✅ *feita (3 set 2026)*
 
 | # | Nível | Mecânicas | Chefe |
 | --- | --- | --- | --- |
@@ -109,7 +109,7 @@ Cidade steampunk abandonada.
 | 64 | 🌙 Lua Quebrada | atravessa fragmentos da lua | **A Face Lunar** — formada pela própria lua |
 | 65 | 🌌 O Fim do Céu | sem chão; só plataformas mágicas no espaço | **O Astrónomo** — controla planetas, estrelas e gravidade |
 
-## XIV — REINO DOS SONHOS (66–70) 🕯️
+## XIV — REINO DOS SONHOS (66–70) 🕯️ ✅ *feita (3 set 2026)*
 
 A realidade deixa de funcionar normalmente.
 
@@ -121,7 +121,7 @@ A realidade deixa de funcionar normalmente.
 | 69 | 🌑 Pesadelo | cenário feito dos medos da protagonista | **O Medo** — sem forma fixa, muda durante a luta |
 | 70 | 🧠 A Mente | entra na própria mente | **A Outra Koliani** — revela memórias esquecidas |
 
-## XV — CIDADE DOS MORTOS (71–75) 👻
+## XV — CIDADE DOS MORTOS (71–75) 👻 ✅ *feita (3 set 2026)*
 
 | # | Nível | Mecânicas | Chefe |
 | --- | --- | --- | --- |
@@ -131,7 +131,7 @@ A realidade deixa de funcionar normalmente.
 | 74 | 👑 Palácio dos Reis Mortos | os antigos reis voltam à vida | **Os Cinco Reis** — chefe múltiplo |
 | 75 | 💀 Trono da Morte | a arena vai desaparecendo durante a luta | **A própria Morte** — foice gigantesca |
 
-## XVI — MAR VERMELHO (76–80) 🩸
+## XVI — MAR VERMELHO (76–80) 🩸 ✅ *feita (3 set 2026)*
 
 Oceano feito da própria corrupção.
 
