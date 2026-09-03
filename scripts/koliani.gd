@@ -211,6 +211,9 @@ var _vento_alvo := 0.0
 
 # animação procedural (visual, corre em _process)
 var _mat: ShaderMaterial
+## Shader de troca de paleta do rig (arma/armadura) -- ver
+## `_montar_material_equipamento`.
+var _mat_equip: ShaderMaterial
 var _anim_t := 0.0
 var _squash := 0.0   # impulso da aterragem
 var _pop := 0.0      # impulso do ataque
@@ -398,18 +401,50 @@ func _montar_frames() -> void:
 			sf.add_frame(nome, at)
 	_corpo.sprite_frames = sf
 	_corpo.play("idle")
+	_montar_material_equipamento()
 
 
-## Mostra a arma equipada na mão. As tiras da Koliani já trazem a lâmina
-## roxa da personagem, por isso a `Arma` extra só aparece se houver uma
-## arma equipada (fica por cima da mão).
+## Pousa no `Corpo` o shader que troca as duas rampas de cinzento do rig
+## pelas cores da arma/armadura equipadas (ver `equipamento.gdshader`).
+## Só faz sentido nos rigs onde a lâmina e as placas estão pintadas dentro
+## do frame -- no rig "codigo" a arma é um nó à parte e a armadura é
+## vetorial, e aí o shader não tem nada para apanhar.
+const RIGS_COM_PALETA := ["cavaleiro"]
+
+func _montar_material_equipamento() -> void:
+	if _corpo == null or not RIGS_COM_PALETA.has(RIG):
+		return
+	var sh: Shader = load("res://assets/shaders/equipamento.gdshader")
+	if sh == null:
+		return
+	_mat_equip = ShaderMaterial.new()
+	_mat_equip.shader = sh
+	_corpo.material = _mat_equip
+
+
+## Mostra o que está equipado no boneco (pedido do Paulo, 3 set 2026).
+##
+## Dois caminhos, conforme o rig:
+##  - rig "codigo": a `Arma` é um Sprite2D à parte (tira de 20 lâminas) e a
+##    armadura são polígonos vetoriais -- basta ligá-los e recolori-los.
+##  - rigs prontos ("cavaleiro"): a lâmina e as placas estão pintadas DENTRO
+##    de cada frame, em sítios diferentes por frame. Pôr a `Arma` por cima
+##    dava duas espadas; o que funciona é trocar a paleta pelo shader
+##    (`_mat_equip`) -- o fio da lâmina fica da cor da arma e as placas da
+##    cor da armadura, em todos os 18 estados e sem tabelas de posição.
 func _aplicar_equipamento() -> void:
+	var wi := Equipamento.indice_arma(EstadoJogo.arma_equipada)
+	var ai := Equipamento.indice_armadura(EstadoJogo.armadura_equipada)
 	if _arma:
-		var wi := Equipamento.indice_arma(EstadoJogo.arma_equipada)
 		# nos rigs prontos a lâmina já está desenhada no frame
 		_arma.visible = wi >= 0 and RIG == "codigo"
 		if wi >= 0:
 			_arma.frame = wi
+	if _mat_equip:
+		_mat_equip.set_shader_parameter("cor_arma", Equipamento.cor_arma(wi))
+		_mat_equip.set_shader_parameter("peso_arma", 1.0 if wi >= 0 else 0.0)
+		_mat_equip.set_shader_parameter("cor_armadura", Equipamento.cor_armadura(ai))
+		_mat_equip.set_shader_parameter("peso_armadura", 1.0 if ai >= 0 else 0.0)
 	if _luz_lamina:
 		_luz_lamina.color = _cor_golpe()
 	if _rastro:
@@ -1029,6 +1064,10 @@ const _BRILHO_CORPO := Color(1.4, 1.38, 1.5)
 func _tint_armadura() -> Color:
 	if RIG == "gothic":
 		return Color.WHITE  # o rig já vem recolorido -- não pintar por cima
+	if RIGS_COM_PALETA.has(RIG):
+		# a cor da armadura já vai às PLACAS pelo shader; puxá-la também para
+		# o modulate pintava a pele e o cabelo e dava um boneco monocromático.
+		return _BRILHO_CORPO
 	var ai: int = Equipamento.indice_armadura(EstadoJogo.armadura_equipada)
 	return _BRILHO_CORPO if ai < 0 else _BRILHO_CORPO.lerp(Equipamento.cor_armadura(ai), 0.3)
 
