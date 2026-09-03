@@ -53,6 +53,16 @@ const CHEFE_KEY: Array[String] = [
 	"guard.ferreiro",  # 32 A Forja dos Demonios
 	"guard.besta_vulcao",         # 33 Vulcao do Rei Morto
 	"boss.estrela_caida",    # 34 O Ceu em Chamas
+	# --- Regiao VIII  Mar dos Mortos ---
+	# Como na VII: um chefe por regiao (o ultimo) e guardioes nos outros
+	# quatro. Os nomes grandes do plano (Capitao Afogado, Leviata, Rainha
+	# Nereia, o Devorador) ficam por gastar para quando estes niveis
+	# ganharem chefe a serio -- ver docs/plano_niveis_31_100.md.
+	"guard.afogado",         # 35 Porto dos Afogados
+	"guard.gosma_salgada",   # 36 Cidade Submersa
+	"guard.estatua_viva",    # 37 Palacio das Sereias Mortas
+	"guard.lodo_abissal",    # 38 Ossario das Baleias
+	"boss.mae_do_abismo",    # 39 Abismo Oceanico
 ]
 
 

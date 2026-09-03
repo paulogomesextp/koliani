@@ -82,6 +82,7 @@ const LIQUIDO := {
 	5: [Color(0.62, 0.22, 0.08, 0.94), true],    # lava
 	# --- niveis 31-100 (docs/plano_niveis_31_100.md) ---------------------
 	6: [Color(0.74, 0.28, 0.05, 0.95), true],    # VII magma vivo das Terras Queimadas
+	7: [Color(0.03, 0.10, 0.16, 0.96), false],   # VIII agua negra do Mar dos Mortos
 }
 
 ## Tipos de "flavour" de câmara (o que se semeia à volta da espinha).
@@ -103,6 +104,12 @@ const POOL_REGIAO := {
 	# o chao deixa de ser de confianca -- `quebra` e `fogo` sao o tema.
 	6: ["fogo", "quebra", "impulso", "trampolim", "pedras", "crossfire", "portal",
 		"serras", "espinhos", "prensa", "ferry", "alavanca", "segredo"],
+	# VIII Mar dos Mortos: nada assenta. O tema é FLUTUAR -- plataformas
+	# que se movem, gravidade fraca, correntes de ar (aqui, de água). Sem
+	# `fogo` e sem `quebra`: debaixo de água não arde nem se estilhaça.
+	7: ["gravidade", "ferry", "ritmo", "impulso", "trampolim", "elevador",
+		"correntes", "crossfire", "portal", "pendulos", "vento", "alavanca",
+		"segredo"],
 }
 
 ## `_dif` mínimo para cada tipo de câmara entrar na pool. Assim o Nível 1
@@ -156,6 +163,7 @@ const ASSINATURA := {
 	4: "impulso",      # Cidade -- máquinas
 	5: "fogo",         # Castelo -- lava
 	6: "quebra",       # Terras Queimadas -- a madeira arde e cede
+	7: "gravidade",    # Mar dos Mortos -- tudo flutua
 }
 
 ## Toque de assinatura do NÍVEL (a gimmick do `docs/niveis.md`) espalhado
@@ -229,6 +237,12 @@ const PERFIL := [
 	{"v": 0, "f": "maquina", "a": 0.85},  # 32 A Forja dos Demonios -- correias e martelos
 	{"v": 1, "f": "vertical", "a": 1.2},  # 33 Vulcao do Rei Morto -- subida pelo interior
 	{"v": 1, "f": "salto", "a": 1.15},    # 34 O Ceu em Chamas -- pedacos de ceu a cair
+	# --- Regiao VIII  Mar dos Mortos (35-39) : nada assenta -------------
+	{"v": 0, "f": "gauntlet", "a": 1.1},  # 35 Porto dos Afogados -- pontoes a boiar
+	{"v": -1, "f": "salto", "a": 1.25},   # 36 Cidade Submersa -- gravidade fraca
+	{"v": 0, "f": "maquina", "a": 0.95},  # 37 Palacio das Sereias -- a agua sobe e desce
+	{"v": -1, "f": "combate", "a": 0.85}, # 38 Ossario das Baleias -- caverna de ossos
+	{"v": 1, "f": "vertical", "a": 1.0},  # 39 Abismo Oceanico -- descida ao escuro
 ]
 
 ## Que câmaras conta cada foco. Cruzado depois com região+tier em
@@ -943,6 +957,7 @@ const ESP_REGIAO := {
 	4: ["orc", "abobora", "xamane", "raptor", "mastim"],
 	5: ["demonio_grande", "ogro", "chort", "olho", "raptor"],
 	6: ["imp", "chort", "demonio_grande", "abobora", "mastim"],
+	7: ["esqueleto", "gosma", "lodo", "wogol", "olho"],
 }
 
 ## A "cara" de cada NÍVEL (pedido do Paulo: não repetir o mesmo monstro em
@@ -957,6 +972,7 @@ const ESP_ASSINATURA := [
 	"abobora", "orc", "mastim", "raptor", "xamane",                # V  Cidade
 	"demonio_grande", "chort", "raptor", "ogro", "olho",           # VI Castelo
 	"imp", "chort", "mastim", "abobora", "demonio_grande",         # VII Terras Queimadas
+	"esqueleto", "gosma", "olho", "lodo", "wogol",                 # VIII Mar dos Mortos
 ]
 
 

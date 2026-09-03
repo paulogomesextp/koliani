@@ -71,6 +71,22 @@ NIVEIS = [
     # maior que o Zeriko (docs/plano_niveis_31_100.md)
     ("O_Ceu_em_Chamas", 34, "castelo", "chefe", 4, 640, (1.0, 0.72, 0.35),
      "feiticeiro", "Topo do vulcao, o ceu a cair. A Estrela Caida."),
+    # --- VIII  MAR DOS MORTOS (36-40) -- o reino que a agua engoliu ------
+    # Contraponto directo a' VII: onde aquela era brasa e ar seco, esta e'
+    # azul-esverdeado, funda e sem ar. E' a primeira regiao em que o
+    # liquido mortal deixa de ser "lava ou acido" e passa a ser agua negra.
+    ("Porto_dos_Afogados", 35, "prisao", "guardiao", 0, 400, (0.40, 0.90, 0.95),
+     "esqueleto", "Navios partidos e pontoes a boiar. Guardiao: um afogado."),
+    ("Cidade_Submersa", 36, "cidade", "guardiao", 0, 440, (0.32, 0.82, 1.00),
+     "gosma", "Ruas debaixo de agua, gravidade fraca. Guardiao: uma gosma."),
+    ("Palacio_das_Sereias_Mortas", 37, "castelo", "guardiao", 0, 480, (0.50, 0.94, 0.90),
+     "wogol", "Estatuas que se mexem quando a agua sobe. Guardiao: uma delas."),
+    ("Ossario_das_Baleias", 38, "catacumbas", "guardiao", 0, 520, (0.62, 0.96, 0.88),
+     "lodo", "Caverna dentro de um esqueleto de baleia. Guardiao: o lodo."),
+    # o CHEFE da regiao: A Mae do Abismo -- entidade colossal de tentaculos
+    # (docs/plano_niveis_31_100.md)
+    ("Abismo_Oceanico", 39, "catacumbas", "chefe", 3, 720, (0.26, 0.70, 1.00),
+     "horror", "Fundo do mar, quase sem luz. A Mae do Abismo."),
 ]
 
 MODELO_CHEFE = '''[gd_scene load_steps=8 format=3 uid="uid://bkoliani{uid}"]
@@ -107,8 +123,8 @@ largura_nivel = 1800.0
 position = Vector2(700, 980)
 largura = 2000.0
 altura = 340.0
-cor = Color(0.74, 0.28, 0.05, 0.95)
-brasas = true
+cor = Color({liq[0]}, {liq[1]}, {liq[2]}, {liq[3]})
+brasas = {brasas}
 
 [node name="ChaoChefe" parent="." instance=ExtResource("7_pl")]
 position = Vector2(760, 700)
@@ -176,8 +192,8 @@ largura_nivel = 1800.0
 position = Vector2(700, 980)
 largura = 2000.0
 altura = 340.0
-cor = Color(0.74, 0.28, 0.05, 0.95)
-brasas = true
+cor = Color({liq[0]}, {liq[1]}, {liq[2]}, {liq[3]})
+brasas = {brasas}
 
 [node name="ChaoChefe" parent="." instance=ExtResource("7_pl")]
 position = Vector2(760, 700)
@@ -230,6 +246,19 @@ TITULOS = {
     "A_Forja_dos_Demonios": "A Forja dos Demonios",
     "Vulcao_do_Rei_Morto": "Vulcao do Rei Morto",
     "O_Ceu_em_Chamas": "O Ceu em Chamas",
+    "Porto_dos_Afogados": "Porto dos Afogados",
+    "Cidade_Submersa": "Cidade Submersa",
+    "Palacio_das_Sereias_Mortas": "Palacio das Sereias Mortas",
+    "Ossario_das_Baleias": "Ossario das Baleias",
+    "Abismo_Oceanico": "Abismo Oceanico",
+}
+
+# Liquido mortal da arena do chefe, por REGIAO (indice0 // 5). Sem isto o
+# modelo punha lava laranja em todas -- e no Mar dos Mortos a agua negra
+# lida como lava era o erro mais obvio do nivel.
+LIQUIDO_REGIAO = {
+    6: ((0.74, 0.28, 0.05, 0.95), "true"),    # VII magma vivo
+    7: ((0.03, 0.10, 0.16, 0.96), "false"),   # VIII agua negra do abismo
 }
 
 
@@ -250,6 +279,8 @@ def main() -> int:
             rim=rim,
             rig=rig,
             especie=rig,
+            liq=LIQUIDO_REGIAO.get(idx0 // 5, ((0.74, 0.28, 0.05, 0.95), "true"))[0],
+            brasas=LIQUIDO_REGIAO.get(idx0 // 5, ((0, 0, 0, 0), "true"))[1],
             extra=AFINACAO.get(arq, "") if fim == "chefe" else "",
         )
         cam = os.path.join(DEST, ficheiro + ".tscn")

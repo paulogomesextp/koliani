@@ -88,6 +88,11 @@ const NIVEIS := [
 	"res://scenes/levels/A_Forja_dos_Demonios.tscn",
 	"res://scenes/levels/Vulcao_do_Rei_Morto.tscn",
 	"res://scenes/levels/O_Ceu_em_Chamas.tscn",
+	"res://scenes/levels/Porto_dos_Afogados.tscn",
+	"res://scenes/levels/Cidade_Submersa.tscn",
+	"res://scenes/levels/Palacio_das_Sereias_Mortas.tscn",
+	"res://scenes/levels/Ossario_das_Baleias.tscn",
+	"res://scenes/levels/Abismo_Oceanico.tscn",
 ]
 # "res://scenes/levels/Level_Test.tscn" fica no repo como sala de treino,
 # fora da campanha (correr a cena diretamente no editor).
@@ -105,6 +110,7 @@ const REGIOES := [
 	{"id": "cidade", "nome": "Cidade Corrompida", "niveis": [20, 21, 22, 23, 24]},
 	{"id": "castelo", "nome": "Castelo de Zeriko", "niveis": [25, 26, 27, 28, 29]},
 	{"id": "queimadas", "nome": "Terras Queimadas", "niveis": [30, 31, 32, 33, 34]},
+	{"id": "mar", "nome": "Mar dos Mortos", "niveis": [35, 36, 37, 38, 39]},
 ]
 
 signal vidas_mudaram(vidas: int)

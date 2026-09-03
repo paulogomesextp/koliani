@@ -109,6 +109,17 @@ TABELA = [
     ("A_Forja_dos_Demonios",   "masmorra",      (.96,.82,.74), (.14,.06,.05), (.19,.09,.06), (1.0,.62,.24),  (1.0,.74,.38), 2.6, (1.16,.70,.50), .36, .46, True),
     ("Vulcao_do_Rei_Morto",    "rochoso",       (1.0,.76,.62), (.21,.04,.02), (.26,.07,.03), (1.0,.36,.08),  (1.0,.52,.18), 3.8, (1.30,.52,.30), .26, .60, True),
     ("O_Ceu_em_Chamas",        "horror",        (1.0,.88,.76), (.24,.08,.04), (.28,.11,.06), (1.0,.72,.34),  (1.0,.84,.50), 3.2, (1.24,.80,.56), .22, .38, True),
+    # ---- VIII  Mar dos Mortos (36-40) -------------------------------
+    # O contraponto da VII: onde aquela era brasa e ar seco, esta e' agua.
+    # Verde-azulado a descer para azul-tinta no ultimo nivel, po' denso (a
+    # materia em suspensao faz o "debaixo de agua" sem shader nenhum) e
+    # horizonte APAGADO em todos -- no fundo do mar nao ha' brilho quente
+    # ao longe. Packs reaproveitados, como na VII; a identidade e' a tinta.
+    ("Porto_dos_Afogados",     "vilanoite",     (.78,.92,.96), (.03,.09,.14), (.05,.13,.18), (.42,.90,.98),  (.62,.94,1.0), 3.4, (.56,.94,1.10), .40, .44, False),
+    ("Cidade_Submersa",        "cidade",        (.74,.90,.98), (.02,.08,.15), (.04,.12,.20), (.34,.84,1.0),  (.54,.90,1.0), 4.0, (.48,.88,1.16), .46, .50, False),
+    ("Palacio_das_Sereias_Mortas", "igreja",    (.82,.96,.96), (.03,.10,.13), (.06,.15,.18), (.52,.96,.92),  (.72,1.0,.96), 3.0, (.62,1.0,1.04), .36, .40, False),
+    ("Ossario_das_Baleias",    "gruta",         (.86,.96,.92), (.04,.10,.11), (.07,.14,.15), (.64,.98,.90),  (.80,1.0,.92), 3.6, (.72,1.02,.98), .42, .46, False),
+    ("Abismo_Oceanico",        "caverna",       (.62,.80,.98), (.01,.04,.10), (.02,.07,.14), (.26,.70,1.0),  (.44,.80,1.0), 4.4, (.36,.76,1.20), .54, .58, False),
 ]
 
 CHAVES = [

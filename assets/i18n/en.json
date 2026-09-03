@@ -314,5 +314,15 @@
 	"guard.chort_magma": "Magma Chort",
 	"guard.ferreiro": "The Smith",
 	"guard.besta_vulcao": "Beast of the Volcano",
-	"sel.guard": "Guardian: %s"
+	"sel.guard": "Guardian: %s",
+	"level.n35": "Port of the Drowned",
+	"level.n36": "The Sunken City",
+	"level.n37": "Palace of the Dead Sirens",
+	"level.n38": "Whalebone Ossuary",
+	"level.n39": "The Ocean Abyss",
+	"guard.afogado": "The Drowned",
+	"guard.gosma_salgada": "Brine Ooze",
+	"guard.estatua_viva": "Living Statue",
+	"guard.lodo_abissal": "Abyssal Sludge",
+	"boss.mae_do_abismo": "The Mother of the Abyss"
 }

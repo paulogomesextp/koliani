@@ -1,7 +1,7 @@
-[gd_scene load_steps=8 format=3 uid="uid://bkolianioceuemchamas35"]
+[gd_scene load_steps=8 format=3 uid="uid://bkolianiabismooceanico40"]
 
-; REGIAO 7 / nivel 35 -- O Ceu em Chamas.
-; Topo do vulcao, o ceu a cair. A Estrela Caida.
+; REGIAO 8 / nivel 40 -- Abismo Oceanico.
+; Fundo do mar, quase sem luz. A Mae do Abismo.
 ;
 ; CENA GERADA por `tools/gerar_niveis_31_100.py` -- NAO editar a' mao: o
 ; proximo `python tools/gerar_niveis_31_100.py` apaga o que aqui se puser.
@@ -21,31 +21,30 @@
 [sub_resource type="RectangleShape2D" id="rs_chk"]
 size = Vector2(44, 96)
 
-[node name="O_Ceu_em_Chamas" type="Node2D"]
+[node name="Abismo_Oceanico" type="Node2D"]
 script = ExtResource("5_niv")
 
 [node name="Atmosfera" parent="." instance=ExtResource("6_atm")]
-cor_ambiente = Color(1, 0.88, 0.76, 1)
-cor_fundo = Color(0.24, 0.08, 0.04, 1)
-cor_silhueta = Color(0.28, 0.11, 0.06, 1)
-cor_luz = Color(1, 0.72, 0.34, 1)
-cor_poeira = Color(1, 0.84, 0.5, 1)
-densidade_poeira = 3.2
-bioma = "castelo"
+cor_ambiente = Color(0.62, 0.8, 0.98, 1)
+cor_fundo = Color(0.01, 0.04, 0.1, 1)
+cor_silhueta = Color(0.02, 0.07, 0.14, 1)
+cor_luz = Color(0.26, 0.7, 1, 1)
+cor_poeira = Color(0.44, 0.8, 1, 1)
+densidade_poeira = 4.4
+bioma = "catacumbas"
 largura_nivel = 1800.0
-fundo_pack = "horror"
-tinta_fundo = Color(1.24, 0.8, 0.56, 1)
-neblina_fundo = 0.22
-dessaturar_fundo = 0.38
-seed_ambiente = 2258
-luzes_horizonte = true
+fundo_pack = "caverna"
+tinta_fundo = Color(0.36, 0.76, 1.2, 1)
+neblina_fundo = 0.54
+dessaturar_fundo = 0.58
+seed_ambiente = 2443
 
 [node name="LiquidoMortal" parent="." instance=ExtResource("8_liq")]
 position = Vector2(700, 980)
 largura = 2000.0
 altura = 340.0
-cor = Color(0.74, 0.28, 0.05, 0.95)
-brasas = true
+cor = Color(0.03, 0.1, 0.16, 0.96)
+brasas = false
 
 [node name="ChaoChefe" parent="." instance=ExtResource("7_pl")]
 position = Vector2(760, 700)
@@ -54,13 +53,12 @@ altura_visual = 110.0
 
 [node name="Chefe" parent="." instance=ExtResource("4_chefe")]
 position = Vector2(1020, 616)
-arquetipo = 4
-vida = 640
-cor_rim = Color(1.0, 0.72, 0.35, 1)
-rig = "feiticeiro"
-feixe_alcance = 700.0
-dist_ideal = 320.0
-dur_telegrafo = 0.55
+arquetipo = 3
+vida = 720
+cor_rim = Color(0.26, 0.7, 1.0, 1)
+rig = "horror"
+lacaios_por_vez = 2
+dist_ideal = 280.0
 
 [node name="Koliani" parent="." instance=ExtResource("1_kol")]
 position = Vector2(360, 616)

@@ -314,5 +314,15 @@
 	"guard.chort_magma": "Magma-Chort",
 	"guard.ferreiro": "Der Schmied",
 	"guard.besta_vulcao": "Die Bestie des Vulkans",
-	"sel.guard": "Wächter: %s"
+	"sel.guard": "Wächter: %s",
+	"level.n35": "Hafen der Ertrunkenen",
+	"level.n36": "Versunkene Stadt",
+	"level.n37": "Palast der Toten Sirenen",
+	"level.n38": "Walbein-Beinhaus",
+	"level.n39": "Ozeanabgrund",
+	"guard.afogado": "Der Ertrunkene",
+	"guard.gosma_salgada": "Salzschleim",
+	"guard.estatua_viva": "Lebende Statue",
+	"guard.lodo_abissal": "Abyssaler Schlamm",
+	"boss.mae_do_abismo": "Die Mutter des Abgrunds"
 }

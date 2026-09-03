@@ -1,18 +1,18 @@
-[gd_scene load_steps=8 format=3 uid="uid://bkolianioceuemchamas35"]
+[gd_scene load_steps=8 format=3 uid="uid://bkolianiossariodasbaleias39"]
 
-; REGIAO 7 / nivel 35 -- O Ceu em Chamas.
-; Topo do vulcao, o ceu a cair. A Estrela Caida.
+; REGIAO 8 / nivel 39 -- Ossario das Baleias.
+; Caverna dentro de um esqueleto de baleia. Guardiao: o lodo.
 ;
-; CENA GERADA por `tools/gerar_niveis_31_100.py` -- NAO editar a' mao: o
-; proximo `python tools/gerar_niveis_31_100.py` apaga o que aqui se puser.
-; A JORNADA (`corredor = true`, `gerador_corredor.gd`) constroi tudo o que
-; vem antes desta sala; aqui so' esta' a arena do chefe.
+; NIVEL SEM CHEFE. A regiao tem um chefe so' -- o ultimo dos cinco --
+; e este acaba num GUARDIAO (elite) que sela a porta ate' cair.
+;
+; CENA GERADA por `tools/gerar_niveis_31_100.py` -- NAO editar a' mao.
 ; O bloco `Atmosfera` e' reescrito por `tools/afinar_atmosfera.py`.
 
 [ext_resource type="PackedScene" uid="uid://bkolianiactor01" path="res://scenes/actors/Koliani.tscn" id="1_kol"]
 [ext_resource type="PackedScene" uid="uid://bkolianiporta01" path="res://scenes/actors/Porta.tscn" id="2_porta"]
 [ext_resource type="Script" path="res://scripts/checkpoint.gd" id="3_chk"]
-[ext_resource type="PackedScene" uid="uid://bkolianichefegenerico01" path="res://scenes/actors/ChefeGenerico.tscn" id="4_chefe"]
+[ext_resource type="PackedScene" uid="uid://bdemoniobase01" path="res://scenes/actors/DemonioBase.tscn" id="4_dem"]
 [ext_resource type="Script" path="res://scripts/nivel_com_chefe.gd" id="5_niv"]
 [ext_resource type="PackedScene" uid="uid://bkolianiatmosfera01" path="res://scenes/fx/Atmosfera.tscn" id="6_atm"]
 [ext_resource type="PackedScene" uid="uid://bkolianiplataforma01" path="res://scenes/actors/Plataforma.tscn" id="7_pl"]
@@ -21,46 +21,46 @@
 [sub_resource type="RectangleShape2D" id="rs_chk"]
 size = Vector2(44, 96)
 
-[node name="O_Ceu_em_Chamas" type="Node2D"]
+[node name="Ossario_das_Baleias" type="Node2D"]
 script = ExtResource("5_niv")
 
 [node name="Atmosfera" parent="." instance=ExtResource("6_atm")]
-cor_ambiente = Color(1, 0.88, 0.76, 1)
-cor_fundo = Color(0.24, 0.08, 0.04, 1)
-cor_silhueta = Color(0.28, 0.11, 0.06, 1)
-cor_luz = Color(1, 0.72, 0.34, 1)
-cor_poeira = Color(1, 0.84, 0.5, 1)
-densidade_poeira = 3.2
-bioma = "castelo"
+cor_ambiente = Color(0.86, 0.96, 0.92, 1)
+cor_fundo = Color(0.04, 0.1, 0.11, 1)
+cor_silhueta = Color(0.07, 0.14, 0.15, 1)
+cor_luz = Color(0.64, 0.98, 0.9, 1)
+cor_poeira = Color(0.8, 1, 0.92, 1)
+densidade_poeira = 3.6
+bioma = "catacumbas"
 largura_nivel = 1800.0
-fundo_pack = "horror"
-tinta_fundo = Color(1.24, 0.8, 0.56, 1)
-neblina_fundo = 0.22
-dessaturar_fundo = 0.38
-seed_ambiente = 2258
-luzes_horizonte = true
+fundo_pack = "gruta"
+tinta_fundo = Color(0.72, 1.02, 0.98, 1)
+neblina_fundo = 0.42
+dessaturar_fundo = 0.46
+seed_ambiente = 2406
 
 [node name="LiquidoMortal" parent="." instance=ExtResource("8_liq")]
 position = Vector2(700, 980)
 largura = 2000.0
 altura = 340.0
-cor = Color(0.74, 0.28, 0.05, 0.95)
-brasas = true
+cor = Color(0.03, 0.1, 0.16, 0.96)
+brasas = false
 
 [node name="ChaoChefe" parent="." instance=ExtResource("7_pl")]
 position = Vector2(760, 700)
 tamanho = Vector2(1000, 60)
 altura_visual = 110.0
 
-[node name="Chefe" parent="." instance=ExtResource("4_chefe")]
-position = Vector2(1020, 616)
-arquetipo = 4
-vida = 640
-cor_rim = Color(1.0, 0.72, 0.35, 1)
-rig = "feiticeiro"
-feixe_alcance = 700.0
-dist_ideal = 320.0
-dur_telegrafo = 0.55
+[node name="Guardiao" parent="." instance=ExtResource("4_dem")]
+position = Vector2(1020, 630)
+scale = Vector2(1.5, 1.5)
+elite = true
+especie = "lodo"
+vida = 520
+dano_contacto = 26
+comportamento = "carga"
+alcance_patrulha = 150.0
+cor_rim = Color(0.62, 0.96, 0.88, 1)
 
 [node name="Koliani" parent="." instance=ExtResource("1_kol")]
 position = Vector2(360, 616)

@@ -314,5 +314,15 @@
 	"guard.chort_magma": "Chort de Magma",
 	"guard.ferreiro": "El Herrero",
 	"guard.besta_vulcao": "La Bestia del Volcán",
-	"sel.guard": "Guardián: %s"
+	"sel.guard": "Guardián: %s",
+	"level.n35": "Puerto de los Ahogados",
+	"level.n36": "Ciudad Sumergida",
+	"level.n37": "Palacio de las Sirenas Muertas",
+	"level.n38": "Osario de las Ballenas",
+	"level.n39": "Abismo Oceánico",
+	"guard.afogado": "El Ahogado",
+	"guard.gosma_salgada": "Limo Salino",
+	"guard.estatua_viva": "Estatua Viviente",
+	"guard.lodo_abissal": "Fango Abisal",
+	"boss.mae_do_abismo": "La Madre del Abismo"
 }

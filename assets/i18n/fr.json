@@ -314,5 +314,15 @@
 	"guard.chort_magma": "Chort de Magma",
 	"guard.ferreiro": "Le Forgeron",
 	"guard.besta_vulcao": "La Bête du Volcan",
-	"sel.guard": "Gardien : %s"
+	"sel.guard": "Gardien : %s",
+	"level.n35": "Port des Noyés",
+	"level.n36": "Cité Engloutie",
+	"level.n37": "Palais des Sirènes Mortes",
+	"level.n38": "Ossuaire des Baleines",
+	"level.n39": "Abîme Océanique",
+	"guard.afogado": "Le Noyé",
+	"guard.gosma_salgada": "Vase Saumâtre",
+	"guard.estatua_viva": "Statue Vivante",
+	"guard.lodo_abissal": "Boue Abyssale",
+	"boss.mae_do_abismo": "La Mère de l'Abîme"
 }

@@ -314,5 +314,15 @@
 	"guard.chort_magma": "Chort do Magma",
 	"guard.ferreiro": "O Ferreiro",
 	"guard.besta_vulcao": "A Besta do Vulcão",
-	"sel.guard": "Guardião: %s"
+	"sel.guard": "Guardião: %s",
+	"level.n35": "Porto dos Afogados",
+	"level.n36": "Cidade Submersa",
+	"level.n37": "Palácio das Sereias Mortas",
+	"level.n38": "Ossário das Baleias",
+	"level.n39": "Abismo Oceânico",
+	"guard.afogado": "O Afogado",
+	"guard.gosma_salgada": "Gosma Salgada",
+	"guard.estatua_viva": "Estátua Viva",
+	"guard.lodo_abissal": "Lodo Abissal",
+	"boss.mae_do_abismo": "A Mãe do Abismo"
 }
