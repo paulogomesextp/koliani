@@ -74,9 +74,37 @@ Ordem proposta, cada passo é commitável por si:
 > procedurais temáticas com chefe**, não 70 salas desenhadas à mão como as
 > 29 actuais. Desenhar à mão é trabalho de várias sessões por região.
 
-### B. Arte — o que ficou por fazer
-- Props **pendurados** por baixo das plataformas grossas (raízes,
-  correntes, estalactites). Previsto no `plataforma.gd`, não feito.
-- `PASSO_DECO` (densidade dos props de chão) ainda conservador.
-- A "parede de fim do mundo" da jornada (`gerador_corredor.gd`) ainda lê
-  como um bloco escuro; melhorou mas dava para ser rocha a sério.
+### B. Arte — FEITA a 3 set (v0.9.44)
+Os três pontos que estavam aqui ficaram fechados:
+
+- **Props pendurados** — `gerar_deco.py` ganhou a categoria `pendurado`,
+  fontes empilháveis (`("^", fonte, n)`: o elo de corrente 8×8 do Pixel
+  Adventure dá correntes de qualquer comprimento) e a bandeira `vflip`
+  (cristal do chão virado = estalactite; árvore morta virada = raiz).
+  29 props, 4 a 8 por região. O `plataforma.gd` monta-os com
+  `z_index = -2` para o ponto de agarre ficar escondido atrás da franja.
+  A espinha da jornada é toda de degraus de 18 px — e é de lá que se vê o
+  fundo — por isso os degraus finos levam **um só** prop, curto (≤120 px)
+  e estreito (≤45% do degrau).
+- **`PASSO_DECO`** de 270/5 para 190/9.
+- **Parede de "fim do mundo"** — quatro lascas escalonadas em ALTURA e não
+  só em profundidade (uma lasca atrás de outra mais alta não se vê de
+  todo). O "pé" mantém a pegada da antiga, portanto continua a barrar a
+  saída pela esquerda; `verifica_jornada` passa nos 30 níveis.
+
+Pelo caminho: o `shot_plataforma.gd` aceitava só X ≥ 0 e descartava em
+silêncio qualquer pedido para ir à jornada, que vive toda em X negativo.
+
+**Nada disto foi jogado** — foi verificado por screenshot (`--window
+--screen 1`, os `--headless` não gravam nesta máquina) e pelos
+verificadores. Falta o teu olho: em particular se a densidade de props
+não ficou uma montra, e se as estalactites das catacumbas não lêem como
+pano pendurado.
+
+### B2. Arte — o que continua por fazer
+- Ruído conhecido, **anterior a esta sessão**: cada nível carregado cospe
+  `There is no animation with name 'idle'`. É a cena da Koliani a pôr
+  `animation = "idle"` antes de o `_montar_frames` atribuir os
+  `sprite_frames` — inofensivo, mas suja o output dos tools.
+- Faltam ainda os 16 estados derivados da Koliani nova (só `idle` e `run`
+  são frames desenhados) — ver secção 2 acima.
