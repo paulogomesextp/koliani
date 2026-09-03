@@ -253,7 +253,7 @@ func _ready() -> void:
 ##      (cabelo lavanda, manto azul, botas vermelhas). Só veio `idle` e
 ##      `walk`; os outros 16 estados são derivados desses frames por
 ##      `tools/importar_rig_koliani_nova.py`.
-const RIG := "nova"
+const RIG := "cavaleiro"
 
 ## [n_frames, fps, loop] por estado. Cada tira é horizontal, virada à direita.
 const _KOLI_ANIMS := {

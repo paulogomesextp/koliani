@@ -107,18 +107,22 @@ ficheiro. Os restantes sprites pixel-art vêm de packs CC0:
 
 CC0 não exige atribuição; fica aqui à mesma por cortesia.
 
-## @Jump_Button — "Knight_player 1.4"  ← RETIRADO (3 set 2026)
-- Pack do autor @Jump_Button (Twitter). **Licença (Read_me.txt do pack)**
-  proíbe expressamente qualquer uso por "AI (...) AI/ML Training (...)
+## @Jump_Button — "Knight_player 1.4"  ← RIG ACTUAL DA KOLIANI
+- Pack do autor @Jump_Button (Twitter). **Licença (Read_me.txt do pack)**:
+  uso pessoal e comercial permitido, crédito obrigatório no uso comercial;
+  **proíbe expressamente qualquer uso por "AI (...) AI/ML Training (...)
   Such usage is completely prohibited and may result in legal action if
-  necessary." Não é CC0. O Paulo confirmou: trocar por um pack CC0
-  verdadeiro em vez de arriscar o termo.
-- Os `.png` derivados (`assets/sprites/pixel/koliani_cavaleiro/`) foram
-  **removidos do repo** (`3c1dd48`+). `koliani.gd::RIG` já não passa por
-  `"cavaleiro"` (fica `"nova"`); `tools/importar_rig_cavaleiro.gd` fica
-  como código morto/histórico — não voltar a correr. O pack em si continua
-  só no disco do Paulo (`assets/sprites/incoming/`, `.gdignore`, nunca foi
-  redistribuído no GitHub).
+  necessary."** Não é CC0.
+- Uso: `assets/sprites/pixel/koliani_cavaleiro/` (18 estados), importado e
+  recolorido por `tools/importar_rig_cavaleiro.gd`. Ligado por
+  `koliani.gd::RIG`.
+- **Histórico (3 set 2026):** por causa da cláusula acima, os `.png`
+  derivados foram removidos do repo (`3c1dd48`) e `RIG` passou a `"nova"`.
+  O Paulo viu os dois lado a lado (esta Koliani vs. as alternativas CC0
+  encontradas nessa sessão) e **confirmou expressamente que quer esta na
+  mesma**, aceitando o risco de licença por agora — foi reposta no mesmo
+  dia. Não voltar a apagar sem falar com ele primeiro; se algum dia for
+  preciso mesmo trocar, é decisão dele.
 
 ## thewisehedgehog — pack de armas pixel-art
 - https://thewisehedgehog.itch.io/  (URL exato + licença POR CONFIRMAR pelo Paulo em incoming/LICENSES.md)
