@@ -46,11 +46,13 @@ func _pronto() -> void:
 	_sup = $Superficie
 	_rim = get_node_or_null("Rebordo")
 	_luz = get_node_or_null("Luz")
-	if not brasas:
-		_faixa = Polygon2D.new()
-		_faixa.name = "Faixa"
-		add_child(_faixa)
-		move_child(_faixa, _sup.get_index() + 1)  # entre a Superficie e o Rebordo
+	# O halo por baixo da linha de agua serve as DUAS variantes (3 set 2026):
+	# a lava tambem tinha 300 px de laranja chapado a tomar um quarto do
+	# ecra. Agora o corpo e' escuro nas duas e o halo e' curto.
+	_faixa = Polygon2D.new()
+	_faixa.name = "Faixa"
+	add_child(_faixa)
+	move_child(_faixa, _sup.get_index() + 1)      # entre a Superficie e o Rebordo
 	if brasas:
 		_montar_brasas()
 	else:
@@ -189,9 +191,11 @@ func _reconstruir() -> void:
 	var c_topo: Color
 	var c_baixo: Color
 	if brasas:
-		c_topo = cor.lightened(0.2)
-		c_baixo = cor.darkened(0.72)
-		_sup.color = cor
+		var brasa := Color(cor.r, cor.g, cor.b).darkened(0.55)
+		brasa = brasa.lerp(Color(0.06, 0.02, 0.02), 0.35)
+		c_topo = brasa.lightened(0.14)
+		c_baixo = brasa.darkened(0.72)
+		_sup.color = brasa
 	else:
 		var escuro := Color(cor.r, cor.g, cor.b).darkened(0.62)
 		escuro = escuro.lerp(Color(0.03, 0.03, 0.05), 0.5)   # puxa para o vazio
