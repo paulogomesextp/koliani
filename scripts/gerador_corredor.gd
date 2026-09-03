@@ -342,18 +342,44 @@ func _construir() -> void:
 	agua.position = Vector2((x0 + ancora.x) * 0.5, _chao_y + 230.0)
 	add_child(agua)
 
-	# parede de fundo (não se sai pela esquerda). LARGA, ESCURA e encostada à
-	# plataforma de partida, para ler como "fim do mundo" e não como uma
-	# parede a partir/trepar com espaço do outro lado.
-	var fundo := PLAT.instantiate()
-	add_child(fundo)
-	# Encostada a' plataforma de partida e a descer para o liquido: e' o
-	# "fim do mundo", nao uma torre. Tem de ficar BAIXA (o topo pouco acima
-	# do chao) -- a versao alta lia-se como um retangulo preto a tapar um
-	# terco do ecra. A cor puxa ao roxo do fundo para recuar de plano.
-	fundo.tamanho = Vector2(260.0, 760.0)
-	fundo.position = Vector2(x0 - 110.0, _chao_y - 150.0)
-	fundo.modulate = Color(0.34, 0.30, 0.46)
+	# parede de fundo (não se sai pela esquerda). É o "fim do mundo": tem de
+	# ler como maciço de rocha, não como uma parede a partir/trepar com
+	# espaço do outro lado, e não como a laje escura chapada que era até
+	# aqui -- um único retângulo de 260x760 com um `modulate` roxo.
+	#
+	# O que a faz ler como rocha é a SILHUETA: três lajes encavalitadas, de
+	# larguras e alturas diferentes e com o topo em degrau, cada uma com o
+	# terreno da região (que já traz capa/franja/lados próprios). Quanto
+	# mais atrás, mais escura e mais dessaturada -- é a perspectiva aérea
+	# que separa os planos.
+	#
+	# O escalonamento tem de ser em ALTURA e não só em profundidade: uma lasca
+	# atrás de outra mais alta não se vê de todo. Cada uma pára onde a
+	# seguinte começa, portanto a face recua um degrau de cada vez à medida
+	# que sobe -- é isso que se vê da plataforma de partida, e não os topos
+	# (esses ficam sempre fora do ecrã, e ainda bem: é o fim do mundo).
+	#
+	# O "pé" mantém a pegada da parede antiga (aresta direita encostada à
+	# plataforma de partida, topo bem acima dela): o degrau não pode abrir
+	# buraco por onde se saia do nível pela esquerda.
+	#
+	#   lasca = (aresta direita, largura, topo em Y, tom)
+	var base_y := _chao_y + 320.0        # todas afundam no líquido
+	var lascas := [
+		[x0 + 20.0, 200.0, _chao_y - 300.0, Color(0.58, 0.54, 0.70)],
+		[x0 - 10.0, 210.0, _chao_y - 620.0, Color(0.44, 0.40, 0.57)],
+		[x0 - 140.0, 220.0, _chao_y - 780.0, Color(0.33, 0.29, 0.45)],
+		[x0 - 270.0, 240.0, _chao_y - 920.0, Color(0.24, 0.21, 0.34)],
+	]
+	for i in lascas.size():
+		var l: Array = lascas[i]
+		var topo_y: float = l[2]
+		var lasca := PLAT.instantiate()
+		add_child(lasca)
+		lasca.tamanho = Vector2(l[1], base_y - topo_y)
+		lasca.position = Vector2(l[0] - l[1] * 0.5, (topo_y + base_y) * 0.5)
+		lasca.modulate = l[3]
+		lasca.z_index = -3 - i        # atrás da acção e umas das outras
 
 	var casca := get_parent().get_node_or_null("Casca")
 	if casca and casca.has_method("abrir_esquerda"):

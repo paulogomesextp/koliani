@@ -180,6 +180,22 @@ licenças. Todos de domínio público / CC0.
   (`deco/catacumbas/`).
 - **ansimuz — GothicVania Bridge Expansion**: props de fundo.
 
+### O que PENDE por baixo das plataformas (`onde: "pendurado"`)
+Acrescentado a 3 set 2026. Muito disto é material já creditado acima, virado
+ao contrário (`vflip` no `gerar_deco.py`) — um cristal do chão de cabeça para
+baixo é uma estalactite, uma árvore morta virada é uma raiz a furar a abóbada:
+- **Pixel Frog — Pixel Adventure 1**: o elo de corrente 8×8
+  (`Traps/Platforms/Chain.png`), empilhado para dar correntes de qualquer
+  comprimento — nas seis regiões.
+- **anokolisa — Legacy Fantasy High Forest**: colmeias e folhagem
+  (`deco/floresta/`).
+- **Pixel Frog — Kings & Pigs**: a flâmula de `Decorations (32x32)`
+  (`deco/{torres,castelo}/`).
+- **ansimuz — GothicVania Town**: o candeeiro de rua virado, que dá o lampião
+  de tecto (`deco/{torres,cidade,castelo}/`).
+- **Open Pixel Project — OPP2017 Cave**: os aglomerados de cristal virados =
+  estalactites (`deco/catacumbas/`).
+
 ## Terreno por região (`assets/sprites/pixel/terreno/`)
 Gerado por `tools/gerar_terreno.py`: capa + corpo + franja + corte lateral,
 **um pack diferente por região** — anokolisa *Legacy Fantasy* (floresta),

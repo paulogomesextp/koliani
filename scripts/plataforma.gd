@@ -15,6 +15,9 @@ extends StaticBody2D
 ##   Sombra -- degrade que enterra o fundo da plataforma no escuro
 ##   Lados  -- o corte lateral lascado
 ##   Franja -- a rocha a esfarelar-se por baixo
+##   Pendura -- o que PENDE por baixo: raizes, correntes, estalactites. Sem
+##              isto toda a plataforma acaba a direito e le'-se como uma laje
+##              a flutuar; e' o que mais aproxima a silhueta de Dead Cells.
 ##
 ## Tudo isto vive dentro do no `Visual` (Node2D), porque meia duzia de
 ## scripts (plataforma_ritmada/espectral/luz, gerador_corredor, vitral...)
@@ -45,8 +48,28 @@ const BIOMAS := [
 
 ## Densidade da decoracao: um prop por cada N px de largura. Baixo demais e
 ## a plataforma fica uma montra; alto demais e volta a ler-se como uma laje.
-const PASSO_DECO := 270.0
-const MAX_DECO := 5
+## (270/5 deixava as plataformas de chao -- que vao a 2000+ px -- com cinco
+## props perdidos numa extensao enorme.)
+const PASSO_DECO := 190.0
+const MAX_DECO := 9
+
+## O mesmo para o que pende por baixo, mas bem mais espacado: uma cortina de
+## correntes de lado a lado seria ruido.
+const PASSO_PENDURA := 360.0
+const MAX_PENDURA := 3
+## A espinha da jornada e' toda de degraus de 18 px, e e' precisamente dela
+## que se ve' o fundo por baixo -- e' onde a pendura mais faz falta. Mas de um
+## degrau fino nao pende uma corrente de 12 elos: so' pecas curtas, uma de
+## cada vez.
+const PENDURA_ALT_MIN := 16.0
+## Acima disto a plataforma tem corpo a serio (slab de chao, lasca de rocha).
+const PENDURA_ALT_GROSSA := 34.0
+## Altura maxima (px) de um prop pendurado num degrau fino.
+const PENDURA_H_MAX_FINA := 120.0
+## E' preciso limitar tambem a LARGURA: uma estalactite de 115 px debaixo de
+## um degrau de 140 le'-se como um pano pendurado, nao como pedra. Fracao
+## maxima da largura do degrau que o prop pode ocupar.
+const PENDURA_W_MAX_FRAC := 0.45
 
 static var _cache_tex := {}
 static var _grad_sombra: GradientTexture2D = null
@@ -188,6 +211,19 @@ func _aplicar() -> void:
 	# 6. o que POUSA em cima -- cogumelos, lapides, caixotes, cristais...
 	_decorar(vis, bioma, largura, y0, rng)
 
+	# 7. o que PENDE por baixo -- raizes, correntes, estalactites
+	if alt >= PENDURA_ALT_MIN:
+		_pendurar(vis, bioma, largura, y0 + alt, alt >= PENDURA_ALT_GROSSA, rng)
+
+
+## Os props da regiao que assentam num sitio ("chao" / "parede" / "pendurado").
+static func _props_de(bioma: String, onde: String) -> Array:
+	var r: Array = []
+	for p in _props(bioma):
+		if p is Dictionary and p.get("onde", "") == onde:
+			r.append(p)
+	return r
+
 
 ## Catalogo de props da regiao (`tools/gerar_deco.py`), lido uma vez.
 static func _props(bioma: String) -> Array:
@@ -211,11 +247,7 @@ static func _props(bioma: String) -> Array:
 func _decorar(vis: Node, bioma: String, largura: float, y0: float, rng: RandomNumberGenerator) -> void:
 	if largura < 110.0:
 		return
-	var cat := _props(bioma)
-	var chao: Array = []
-	for p in cat:
-		if p is Dictionary and p.get("onde", "") == "chao":
-			chao.append(p)
+	var chao := _props_de(bioma, "chao")
 	if chao.is_empty():
 		return
 
@@ -246,4 +278,65 @@ func _decorar(vis: Node, bioma: String, largura: float, y0: float, rng: RandomNu
 		if s.scale.x < 0.0:
 			s.position.x += tex.get_width() * e
 		s.z_index = -1                 # atras da Koliani e dos inimigos
+		vis.add_child(s)
+
+
+## Pendura props por baixo da plataforma (`y_base` = o fundo do visual).
+##
+## Ao contrario dos de chao, estes entram ATRAS do terreno (`z_index = -2`):
+## o topo do prop fica escondido pela franja, e portanto nunca se ve' onde e'
+## que ele foi colado. E' o que faz a raiz parecer nascer de dentro da rocha
+## em vez de estar pousada na aresta.
+func _pendurar(vis: Node, bioma: String, largura: float, y_base: float,
+		grossa: bool, rng: RandomNumberGenerator) -> void:
+	if largura < 90.0:
+		return
+	var lista := _props_de(bioma, "pendurado")
+	if not grossa:
+		# degrau fino: so' pecas curtas E estreitas (musgo, colmeia, corrente
+		# pequena) -- uma estalactite de 300 px a sair de uma tabua de 18 nao
+		# cola, e uma de 115 debaixo de um degrau de 140 tapa-o todo
+		var w_max := largura * PENDURA_W_MAX_FRAC
+		var curtos: Array = []
+		for p in lista:
+			if float(p.get("h", 999.0)) <= PENDURA_H_MAX_FINA 					and float(p.get("w", 999.0)) <= w_max:
+				curtos.append(p)
+		lista = curtos
+	if lista.is_empty():
+		return
+
+	var quantos: int = mini(MAX_PENDURA, int(largura / PASSO_PENDURA))
+	if not grossa:
+		# nos degraus e' um toque, nao uma cortina: no maximo um, e nem sempre
+		quantos = 1 if rng.randf() < 0.5 else 0
+	elif quantos <= 0:
+		quantos = 1 if rng.randf() < 0.4 else 0     # plataformas curtas: as vezes
+	if quantos <= 0:
+		return
+
+	var margem := 44.0 if grossa else 20.0
+	var util := largura - margem * 2.0
+	if util <= 0.0:
+		return
+	var faixa := util / float(quantos)
+
+	for i in quantos:
+		var p: Dictionary = lista[rng.randi() % lista.size()]
+		var cam := "res://assets/sprites/pixel/deco/%s/%s.png" % [bioma, p["nome"]]
+		var tex: Texture2D = load(cam) if ResourceLoader.exists(cam) else null
+		if tex == null:
+			continue
+		var s := Sprite2D.new()
+		s.texture = tex
+		s.centered = false
+		var e := rng.randf_range(0.80, 1.20) if grossa else rng.randf_range(0.55, 0.85)
+		s.scale = Vector2(e if rng.randf() < 0.5 else -e, e)
+		var cx := -largura * 0.5 + margem + faixa * (float(i) + rng.randf_range(0.1, 0.9))
+		# enterra na franja -- o ponto de agarre nunca fica a' vista. Num
+		# degrau fino ha' menos onde enterrar.
+		var fundura := rng.randf_range(10.0, 22.0) if grossa else rng.randf_range(5.0, 10.0)
+		s.position = Vector2(cx, y_base - fundura)
+		if s.scale.x < 0.0:
+			s.position.x += tex.get_width() * e
+		s.z_index = -2                 # ATRAS do terreno e dos actores
 		vis.add_child(s)

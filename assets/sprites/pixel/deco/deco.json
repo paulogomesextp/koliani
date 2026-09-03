@@ -77,6 +77,30 @@
    "onde": "parede",
    "w": 193,
    "h": 187
+  },
+  {
+   "nome": "colmeia",
+   "onde": "pendurado",
+   "w": 48,
+   "h": 58
+  },
+  {
+   "nome": "colmeia_p",
+   "onde": "pendurado",
+   "w": 24,
+   "h": 31
+  },
+  {
+   "nome": "folhagem",
+   "onde": "pendurado",
+   "w": 55,
+   "h": 76
+  },
+  {
+   "nome": "raiz",
+   "onde": "pendurado",
+   "w": 22,
+   "h": 89
   }
  ],
  "prisao": [
@@ -151,6 +175,30 @@
    "onde": "chao",
    "w": 73,
    "h": 68
+  },
+  {
+   "nome": "corrente",
+   "onde": "pendurado",
+   "w": 12,
+   "h": 84
+  },
+  {
+   "nome": "corrente_l",
+   "onde": "pendurado",
+   "w": 12,
+   "h": 156
+  },
+  {
+   "nome": "corrente_m",
+   "onde": "pendurado",
+   "w": 12,
+   "h": 48
+  },
+  {
+   "nome": "raiz_fenda",
+   "onde": "pendurado",
+   "w": 123,
+   "h": 118
   }
  ],
  "torres": [
@@ -201,6 +249,30 @@
    "onde": "chao",
    "w": 21,
    "h": 37
+  },
+  {
+   "nome": "lampiao_t",
+   "onde": "pendurado",
+   "w": 31,
+   "h": 97
+  },
+  {
+   "nome": "corrente_t",
+   "onde": "pendurado",
+   "w": 10,
+   "h": 93
+  },
+  {
+   "nome": "corrente_t2",
+   "onde": "pendurado",
+   "w": 10,
+   "h": 52
+  },
+  {
+   "nome": "flamula",
+   "onde": "pendurado",
+   "w": 31,
+   "h": 106
   }
  ],
  "catacumbas": [
@@ -275,6 +347,54 @@
    "onde": "chao",
    "w": 18,
    "h": 18
+  },
+  {
+   "nome": "estalactite_g",
+   "onde": "pendurado",
+   "w": 57,
+   "h": 111
+  },
+  {
+   "nome": "estalactite_m",
+   "onde": "pendurado",
+   "w": 70,
+   "h": 115
+  },
+  {
+   "nome": "estalactite_p",
+   "onde": "pendurado",
+   "w": 76,
+   "h": 102
+  },
+  {
+   "nome": "cristal_pendente",
+   "onde": "pendurado",
+   "w": 94,
+   "h": 102
+  },
+  {
+   "nome": "raiz_ossos",
+   "onde": "pendurado",
+   "w": 132,
+   "h": 93
+  },
+  {
+   "nome": "estalactite_f",
+   "onde": "pendurado",
+   "w": 28,
+   "h": 113
+  },
+  {
+   "nome": "estalactite_f2",
+   "onde": "pendurado",
+   "w": 28,
+   "h": 115
+  },
+  {
+   "nome": "corrente_cat",
+   "onde": "pendurado",
+   "w": 10,
+   "h": 83
   }
  ],
  "cidade": [
@@ -343,6 +463,30 @@
    "onde": "parede",
    "w": 38,
    "h": 115
+  },
+  {
+   "nome": "tabuleta_p",
+   "onde": "pendurado",
+   "w": 38,
+   "h": 48
+  },
+  {
+   "nome": "lampiao",
+   "onde": "pendurado",
+   "w": 31,
+   "h": 97
+  },
+  {
+   "nome": "corrente_c",
+   "onde": "pendurado",
+   "w": 10,
+   "h": 62
+  },
+  {
+   "nome": "corrente_c2",
+   "onde": "pendurado",
+   "w": 10,
+   "h": 104
   }
  ],
  "castelo": [
@@ -411,6 +555,36 @@
    "onde": "chao",
    "w": 20,
    "h": 41
+  },
+  {
+   "nome": "corrente_ca",
+   "onde": "pendurado",
+   "w": 12,
+   "h": 132
+  },
+  {
+   "nome": "corrente_ca2",
+   "onde": "pendurado",
+   "w": 12,
+   "h": 72
+  },
+  {
+   "nome": "flamula_c",
+   "onde": "pendurado",
+   "w": 33,
+   "h": 115
+  },
+  {
+   "nome": "flamula_c2",
+   "onde": "pendurado",
+   "w": 46,
+   "h": 160
+  },
+  {
+   "nome": "lampiao_ca",
+   "onde": "pendurado",
+   "w": 35,
+   "h": 108
   }
  ]
 }

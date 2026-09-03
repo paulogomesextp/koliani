@@ -10,8 +10,11 @@ catalogo proprio, tirado dos packs que ja' lhe dao o terreno.
 Saida: `assets/sprites/pixel/deco/<regiao>/<nome>.png` + `deco.json` com,
 por regiao, a lista de props e onde e' que cada um assenta:
 
-  chao    -- pousa EM CIMA de uma plataforma (pedras, caixas, lapides...)
-  parede  -- fica NO FUNDO, atras da accao (colunas, arcos, arvores, casas)
+  chao      -- pousa EM CIMA de uma plataforma (pedras, caixas, lapides...)
+  parede    -- fica NO FUNDO, atras da accao (colunas, arcos, arvores, casas)
+  pendurado -- PENDE POR BAIXO das plataformas grossas (raizes, correntes,
+               estalactites, estandartes). E' o que tira o ar de "laje a
+               flutuar" -- em Dead Cells nenhum bloco acaba a direito.
 
   python tools/gerar_deco.py            # grava tudo
   python tools/gerar_deco.py --preview  # + _preview_deco.png
@@ -48,14 +51,24 @@ FOLHAS = {
     "cristal": (os.path.join(OPP3, "tiles", "cave", "tile_cave_bg_crystal.png"), 16),
     "caveobj": (os.path.join(OPP3, "tiles", "cave", "tile_cave_bg_objects.png"), 16),
     "szadi": (os.path.join(INC, "szadiart", "mainlev_build.png"), 32),
+    "caverock": (os.path.join(OPP3, "tiles", "cave", "tile_cave_bg_rock.png"), 16),
 }
 
-# Um prop = (nome, onde, fonte, corte, escala)
+# Um prop = (nome, onde, fonte, escala[, bandeiras])
 #   fonte: "@caminho"                 -> ficheiro inteiro
 #          ("folha", cx0,cy0,cx1,cy1) -> celulas [cx0..cx1] x [cy0..cy1]
-#   onde:  "chao" | "parede"
+#          ("^", fonte, n)            -> a fonte empilhada n vezes na vertical
+#                                        (um elo de corrente vira uma corrente)
+#   onde:  "chao" | "parede" | "pendurado"
 #   escala: multiplicador (os packs estao a resolucoes diferentes)
+#   bandeiras: "vflip" -> vira ao contrario. Um cristal do chao de cabeca
+#              para baixo e' uma estalactite; um tufo de erva e' musgo a
+#              pender. Poupa packs que nao trazem pecas de tecto.
 P = os.path.join
+
+# Um elo de corrente 8x8 do Pixel Adventure 1 -- empilhado da' a corrente
+# do comprimento que se quiser.
+ELO = "@" + P(INC, "pixel-adventure-1", "Free", "Traps", "Platforms", "Chain.png")
 
 DECO: dict[str, list] = {
     # I -- Floresta Putrefacta ------------------------------------------
@@ -73,6 +86,12 @@ DECO: dict[str, list] = {
         ("arbusto_p", "chao", "@" + P(CEMI, "sliced-objects", "bush-small.png"), 1.2),
         ("arvore_morta", "parede", "@" + P(CEMI, "sliced-objects", "tree-1.png"), 1.1),
         ("arvore_morta2", "parede", "@" + P(CEMI, "sliced-objects", "tree-3.png"), 1.1),
+        # a pender: colmeias, folhagem virada e uma raiz (o tronco de pernas
+        # para o ar le'-se como raiz a sair do fundo da plataforma)
+        ("colmeia", "pendurado", ("anokolisa", 12, 6, 13, 8), 1.5),
+        ("colmeia_p", "pendurado", ("anokolisa", 12, 2, 12, 3), 1.5),
+        ("folhagem", "pendurado", ("anoarv", 13, 13, 15, 16), 1.2, "vflip"),
+        ("raiz", "pendurado", ("anokolisa", 10, 0, 10, 3), 1.4, "vflip"),
     ],
     # II -- Prisao dos Condenados ---------------------------------------
     "prisao": [
@@ -90,6 +109,11 @@ DECO: dict[str, list] = {
         ("tabua", "parede", ("szadi", 24, 1, 28, 1), 1.4),
         ("barril", "chao", "@" + P(TOWN, "props-sliced", "barrel.png"), 1.0),
         ("pilha_caixas", "chao", "@" + P(TOWN, "props-sliced", "crate-stack.png"), 1.0),
+        # a pender: correntes de comprimentos diferentes + tabua e estandarte
+        ("corrente", "pendurado", ("^", ELO, 7), 3.0),
+        ("corrente_l", "pendurado", ("^", ELO, 13), 3.0),
+        ("corrente_m", "pendurado", ("^", ELO, 4), 3.0),
+        ("raiz_fenda", "pendurado", "@" + P(CEMI, "sliced-objects", "tree-3.png"), 0.7, "vflip"),
     ],
     # III -- Torres ------------------------------------------------------
     "torres": [
@@ -101,6 +125,11 @@ DECO: dict[str, list] = {
         ("pedra_talhada", "chao", ("church", 12, 10, 13, 11), 1.2),
         ("cruz", "chao", "@" + P(CEMI, "sliced-objects", "stone-2.png"), 1.0),
         ("lapide", "chao", "@" + P(CEMI, "sliced-objects", "stone-1.png"), 1.0),
+        # a pender: arcadas da igreja por baixo do passadico + correntes
+        ("lampiao_t", "pendurado", "@" + P(TOWN, "props-sliced", "street-lamp.png"), 0.9, "vflip"),
+        ("corrente_t", "pendurado", ("^", ELO, 9), 2.6),
+        ("corrente_t2", "pendurado", ("^", ELO, 5), 2.6),
+        ("flamula", "pendurado", ("kpdeco", 1, 1, 1, 3), 1.2),
     ],
     # IV -- Catacumbas ---------------------------------------------------
     "catacumbas": [
@@ -116,6 +145,18 @@ DECO: dict[str, list] = {
         ("ossada", "chao", ("caveobj", 0, 3, 2, 5), 2.0),
         ("lanterna", "chao", ("caveobj", 0, 6, 2, 8), 2.0),
         ("cranio_c", "chao", "@" + P(RAIZ, "assets", "sprites", "pixel", "props", "skull.png"), 3.0),
+        # a pender: os cristais do chao virados sao estalactites; a orla de
+        # baixo da massa de rocha da' a pedra a esfarelar-se
+        ("estalactite_g", "pendurado", ("cristal", 3, 0, 4, 3), 1.8, "vflip"),
+        ("estalactite_m", "pendurado", ("cristal", 7, 0, 9, 3), 1.8, "vflip"),
+        ("estalactite_p", "pendurado", ("cristal", 11, 0, 13, 3), 1.6, "vflip"),
+        ("cristal_pendente", "pendurado", ("cristal", 26, 0, 29, 3), 1.6, "vflip"),
+        ("raiz_ossos", "pendurado", "@" + P(CEMI, "sliced-objects", "tree-2.png"), 0.8, "vflip"),
+        # aglomerados de uma coluna so': os degraus finos da jornada tem 140 px
+        # de largo e nao aguentam uma estalactite de 115
+        ("estalactite_f", "pendurado", ("cristal", 8, 0, 8, 3), 1.8, "vflip"),
+        ("estalactite_f2", "pendurado", ("cristal", 12, 0, 12, 3), 1.8, "vflip"),
+        ("corrente_cat", "pendurado", ("^", ELO, 8), 2.6),
     ],
     # V -- Cidade Corrompida ---------------------------------------------
     "cidade": [
@@ -130,6 +171,12 @@ DECO: dict[str, list] = {
         ("casa_b", "parede", "@" + P(TOWN, "props-sliced", "house-b.png"), 1.0),
         ("janela_vila", "parede", ("town", 10, 1, 11, 4), 1.2),
         ("porta_vila", "parede", ("town", 17, 5, 18, 10), 1.2),
+        # a pender: tabuletas e o candeeiro de rua virado (vira lampiao de
+        # tecto), mais vigas e correntes por baixo dos passadicos
+        ("tabuleta_p", "pendurado", "@" + P(TOWN, "props-sliced", "sign.png"), 1.1),
+        ("lampiao", "pendurado", "@" + P(TOWN, "props-sliced", "street-lamp.png"), 0.9, "vflip"),
+        ("corrente_c", "pendurado", ("^", ELO, 6), 2.6),
+        ("corrente_c2", "pendurado", ("^", ELO, 10), 2.6),
     ],
     # VI -- Castelo de Zeriko --------------------------------------------
     "castelo": [
@@ -144,6 +191,12 @@ DECO: dict[str, list] = {
         ("cranio_t", "chao", "@" + P(RAIZ, "assets", "sprites", "pixel", "props", "skull.png"), 3.0),
         ("caixa_c", "chao", "@" + P(RAIZ, "assets", "sprites", "pixel", "props", "crate.png"), 3.0),
         ("lapide_c", "chao", "@" + P(CEMI, "sliced-objects", "stone-4.png"), 1.1),
+        # a pender: correntes compridas e panos -- e' a assinatura do castelo
+        ("corrente_ca", "pendurado", ("^", ELO, 11), 3.0),
+        ("corrente_ca2", "pendurado", ("^", ELO, 6), 3.0),
+        ("flamula_c", "pendurado", ("kpdeco", 1, 1, 1, 3), 1.3),
+        ("flamula_c2", "pendurado", ("kpdeco", 1, 1, 1, 3), 1.8),
+        ("lampiao_ca", "pendurado", "@" + P(TOWN, "props-sliced", "street-lamp.png"), 1.0, "vflip"),
     ],
 }
 
@@ -200,6 +253,14 @@ def recorta(fonte) -> Image.Image:
         if not os.path.exists(cam):
             raise FileNotFoundError(cam)
         return Image.open(cam).convert("RGBA")
+    if fonte[0] == "^":                      # empilhar n vezes na vertical
+        _, dentro, n = fonte
+        um = apara(recorta(dentro))
+        w, h = um.size
+        pilha = Image.new("RGBA", (w, h * n), (0, 0, 0, 0))
+        for i in range(n):
+            pilha.alpha_composite(um, (0, i * h))
+        return pilha
     nome, cx0, cy0, cx1, cy1 = fonte
     im, t = folha(nome)
     return im.crop((cx0 * t, cy0 * t, (cx1 + 1) * t, (cy1 + 1) * t))
@@ -215,7 +276,9 @@ def main() -> int:
         pasta = os.path.join(DEST, reg)
         os.makedirs(pasta, exist_ok=True)
         lista = []
-        for nome, onde, fonte, esc in props:
+        for prop in props:
+            nome, onde, fonte, esc = prop[0], prop[1], prop[2], prop[3]
+            bandeiras = prop[4] if len(prop) > 4 else ""
             try:
                 im = apara(recorta(fonte))
             except (FileNotFoundError, KeyError) as e:
@@ -224,18 +287,21 @@ def main() -> int:
             if im.size[0] == 0 or im.size[1] == 0:
                 print("  ! %s/%s vazio" % (reg, nome))
                 continue
+            if "vflip" in bandeiras:
+                im = im.transpose(Image.FLIP_TOP_BOTTOM)
             if esc != 1.0:
                 im = im.resize((max(1, int(im.size[0] * esc)), max(1, int(im.size[1] * esc))), Image.NEAREST)
             im = graduar(im, TOM[reg])
             im.save(os.path.join(pasta, nome + ".png"))
             lista.append({"nome": nome, "onde": onde, "w": im.size[0], "h": im.size[1]})
             if quero_previa:
-                previas.append((reg, nome, im))
+                previas.append((reg, nome, onde, im))
         meta[reg] = lista
-        print("  %-11s %2d props (%d chao / %d parede)" % (
+        print("  %-11s %2d props (%d chao / %d parede / %d pendurado)" % (
             reg, len(lista),
             sum(1 for p in lista if p["onde"] == "chao"),
-            sum(1 for p in lista if p["onde"] == "parede")))
+            sum(1 for p in lista if p["onde"] == "parede"),
+            sum(1 for p in lista if p["onde"] == "pendurado")))
 
     with open(os.path.join(DEST, "deco.json"), "w", encoding="utf-8") as f:
         json.dump(meta, f, indent=1, ensure_ascii=False)
@@ -249,12 +315,14 @@ def _previa(previas) -> None:
     COL, CEL = 8, 160
     linhas = (len(previas) + COL - 1) // COL
     folha_im = Image.new("RGBA", (COL * CEL, linhas * CEL), (18, 15, 24, 255))
-    for i, (_reg, _nome, im) in enumerate(previas):
+    for i, (_reg, _nome, onde, im) in enumerate(previas):
         cx, cy = (i % COL) * CEL, (i // COL) * CEL
         e = min(1.0, (CEL - 16) / max(im.size))
         if e < 1.0:
             im = im.resize((max(1, int(im.size[0] * e)), max(1, int(im.size[1] * e))), Image.NEAREST)
-        folha_im.alpha_composite(im, (cx + (CEL - im.size[0]) // 2, cy + CEL - 8 - im.size[1]))
+        # os pendurados leem-se agarrados ao tecto da celula, como no jogo
+        topo = cy + 8 if onde == "pendurado" else cy + CEL - 8 - im.size[1]
+        folha_im.alpha_composite(im, (cx + (CEL - im.size[0]) // 2, topo))
     saida = os.path.join(DEST, "_preview_deco.png")
     folha_im.convert("RGB").save(saida)
     print("previa ->", saida)
