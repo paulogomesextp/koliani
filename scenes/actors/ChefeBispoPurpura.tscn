@@ -52,6 +52,7 @@ hframes = 4
 [node name="Anim" type="AnimatedSprite2D" parent="Sprite"]
 visible = false
 texture_filter = 1
+
 [node name="LuzRelicario" type="PointLight2D" parent="Sprite"]
 position = Vector2(0, -14)
 texture = SubResource("tex_luz")

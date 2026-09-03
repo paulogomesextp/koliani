@@ -36,6 +36,13 @@ const ESTADO_ANIM := {
 ## como um inimigo grande. A 100 fica com ~2x.
 const ALTURA_ALVO_CHEFE := 100.0
 
+## Tecto de LARGURA do corpo do chefe no ecrã. Sem ele, um rig largo e
+## baixo (o morcego de asas abertas do Vyrak, o baú-mímico do Sino Vivo, o
+## verme do Naga) era esticado até 100 px de alto e passava a 160 de largo
+## -- mais largo que a plataforma da arena. 110 é a largura do rig mais
+## largo que já cá estava (o minotauro), portanto nenhum chefe antigo muda.
+const LARGURA_ALVO_CHEFE := 110.0
+
 static var _cache_rigs: Dictionary = {}
 
 ## Escala visual do chefe (o `Sprite` inteiro, incluindo o `Nucleo`). Cada
@@ -98,6 +105,10 @@ func _e_chefe() -> bool:
 
 func _altura_alvo() -> float:
 	return ALTURA_ALVO_CHEFE
+
+
+func _largura_alvo() -> float:
+	return LARGURA_ALVO_CHEFE
 
 
 ## Catálogo dos rigs (`rigs.json`), lido uma vez por sessão.

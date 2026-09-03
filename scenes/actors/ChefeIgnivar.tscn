@@ -31,7 +31,8 @@ fill_to = Vector2(1, 0.5)
 collision_layer = 4
 collision_mask = 1
 script = ExtResource("1_chefe")
-escala_visual = 1.4
+rig = "cavaleiro_fogo"
+escala_visual = 1.25
 vida = 400
 dano_contacto = 20
 alcance_patrulha = 0.0
@@ -45,6 +46,13 @@ texture_filter = 1
 position = Vector2(0, -6)
 texture = ExtResource("2_tex")
 hframes = 4
+
+
+; RIG ANIMADO -- n7 Fornalha -- cavaleiro de fogo. Fica vazio: o `ChefeBase._montar_rig` enche-o
+; de `bosses_anim/cavaleiro_fogo` e esconde o `Corpo` acima.
+[node name="Anim" type="AnimatedSprite2D" parent="Sprite"]
+visible = false
+texture_filter = 1
 
 [node name="LuzForja" type="PointLight2D" parent="Sprite"]
 position = Vector2(0, -6)

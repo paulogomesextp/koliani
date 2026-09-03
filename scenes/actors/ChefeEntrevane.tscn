@@ -31,7 +31,8 @@ fill_to = Vector2(1, 0.5)
 collision_layer = 4
 collision_mask = 1
 script = ExtResource("1_chefe")
-escala_visual = 1.7
+rig = "folha"
+escala_visual = 1.25
 vida = 320
 dano_contacto = 18
 alcance_patrulha = 0.0
@@ -46,6 +47,13 @@ position = Vector2(0, -14)
 scale = Vector2(1.5, 1.5)
 texture = ExtResource("2_tex")
 hframes = 4
+
+
+; RIG ANIMADO -- n4 A Arvore que Chora -- elemental de folha. Fica vazio: o `ChefeBase._montar_rig` enche-o
+; de `bosses_anim/folha` e esconde o `Corpo` acima.
+[node name="Anim" type="AnimatedSprite2D" parent="Sprite"]
+visible = false
+texture_filter = 1
 
 [node name="LuzCopa" type="PointLight2D" parent="Sprite"]
 position = Vector2(0, -70)

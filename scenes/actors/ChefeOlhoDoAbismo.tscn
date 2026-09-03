@@ -30,7 +30,8 @@ fill_to = Vector2(1, 0.5)
 collision_layer = 4
 collision_mask = 1
 script = ExtResource("1_chefe")
-escala_visual = 1.7
+rig = "olho_voador"
+escala_visual = 1.25
 vida = 700
 dano_contacto = 16
 alcance_patrulha = 0.0
@@ -44,6 +45,13 @@ texture_filter = 1
 position = Vector2(0, 0)
 texture = ExtResource("2_tex")
 hframes = 4
+
+
+; RIG ANIMADO -- n20 O Abismo -- olho voador (agora ANIMA). Fica vazio: o `ChefeBase._montar_rig` enche-o
+; de `bosses_anim/olho_voador` e esconde o `Corpo` acima.
+[node name="Anim" type="AnimatedSprite2D" parent="Sprite"]
+visible = false
+texture_filter = 1
 
 [node name="LuzIris" type="PointLight2D" parent="Sprite"]
 texture = SubResource("tex_luz")

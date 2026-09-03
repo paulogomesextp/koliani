@@ -317,6 +317,13 @@ func _altura_alvo() -> float:
 	return ALTURA_ALVO_INIMIGO * (0.86 if especie in ESPECIES_VOAM else 1.0)
 
 
+## Largura máxima do corpo no ecrã, ou 0 = sem tecto. Os bichos comuns não
+## precisam (vêm todos de packs de silhueta parecida); os chefes sim -- ver
+## `ChefeBase.LARGURA_ALVO_CHEFE`.
+func _largura_alvo() -> float:
+	return 0.0
+
+
 ## Espécies que voam -- não se alinham os pés ao chão.
 const ESPECIES_VOAM := ["olho", "abutre"]
 
@@ -343,8 +350,15 @@ func _normalizar_escala() -> void:
 	if r.size.y <= 4:
 		return
 	var alvo := _altura_alvo()
-	var k := clampf(alvo / float(r.size.y), 0.25, 3.2)
-	_anim.scale = Vector2(k, k)
+	var k := alvo / float(r.size.y)
+	# Bichos LARGOS (o morcego de asas abertas, o baú-mímico, o verme) não
+	# podem ser escalados só pela altura: um boneco de 160x68 posto a 100
+	# de alto passa a 235 de largo e enche o ecrã. Com um tecto de largura,
+	# o que manda é a dimensão maior.
+	var larg := _largura_alvo()
+	if larg > 0.0 and r.size.x > 0:
+		k = minf(k, larg / float(r.size.x))
+	_anim.scale = Vector2(clampf(k, 0.25, 3.2), clampf(k, 0.25, 3.2))
 
 ## Alinha os PÉS do sprite com a linha de chão da colisão. Mede os pixels
 ## opacos do frame idle (há muito espaço transparente à volta do bicho na

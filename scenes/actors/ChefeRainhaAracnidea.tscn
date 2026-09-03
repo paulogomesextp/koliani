@@ -31,7 +31,8 @@ fill_to = Vector2(1, 0.5)
 collision_layer = 4
 collision_mask = 1
 script = ExtResource("1_chefe")
-escala_visual = 1.5
+rig = "horror"
+escala_visual = 1.4
 vida = 300
 dano_contacto = 18
 alcance_patrulha = 160.0
@@ -46,6 +47,13 @@ position = Vector2(0, -6)
 scale = Vector2(1.35, 1.35)
 texture = ExtResource("2_tex")
 hframes = 4
+
+
+; RIG ANIMADO -- n3 Ninho -- horror de muitos membros. Fica vazio: o `ChefeBase._montar_rig` enche-o
+; de `bosses_anim/horror` e esconde o `Corpo` acima.
+[node name="Anim" type="AnimatedSprite2D" parent="Sprite"]
+visible = false
+texture_filter = 1
 
 [node name="LuzOlhos" type="PointLight2D" parent="Sprite"]
 position = Vector2(0, -20)

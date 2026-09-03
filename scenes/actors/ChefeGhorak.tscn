@@ -52,6 +52,7 @@ hframes = 4
 [node name="Anim" type="AnimatedSprite2D" parent="Sprite"]
 visible = false
 texture_filter = 1
+
 [node name="LuzOlhos" type="PointLight2D" parent="Sprite"]
 position = Vector2(0, -34)
 texture = SubResource("GradientTexture2D_luz")

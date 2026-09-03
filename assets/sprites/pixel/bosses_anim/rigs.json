@@ -161,5 +161,385 @@
    "hurt": 10.0,
    "death": 10.0
   }
+ },
+ "rei_ossario": {
+  "w": 198,
+  "h": 113,
+  "pes_y": 113,
+  "estados": {
+   "idle": 6,
+   "walk": 8,
+   "attack": 6,
+   "hurt": 4,
+   "death": 11
+  },
+  "fps": {
+   "idle": 8.0,
+   "walk": 12.0,
+   "attack": 12.0,
+   "hurt": 12.0,
+   "death": 10.0
+  }
+ },
+ "rei_devorador": {
+  "w": 227,
+  "h": 140,
+  "pes_y": 140,
+  "estados": {
+   "idle": 8,
+   "walk": 8,
+   "attack": 4,
+   "hurt": 4,
+   "death": 6
+  },
+  "fps": {
+   "idle": 8.0,
+   "walk": 12.0,
+   "attack": 12.0,
+   "hurt": 12.0,
+   "death": 10.0
+  }
+ },
+ "noiva": {
+  "w": 232,
+  "h": 173,
+  "pes_y": 173,
+  "estados": {
+   "idle": 8,
+   "walk": 8,
+   "attack": 5,
+   "hurt": 3,
+   "death": 8
+  },
+  "fps": {
+   "idle": 8.0,
+   "walk": 12.0,
+   "attack": 14.0,
+   "hurt": 12.0,
+   "death": 10.0
+  }
+ },
+ "sacerdotisa": {
+  "w": 205,
+  "h": 139,
+  "pes_y": 139,
+  "estados": {
+   "idle": 10,
+   "walk": 8,
+   "attack": 6,
+   "hurt": 3,
+   "death": 10
+  },
+  "fps": {
+   "idle": 8.0,
+   "walk": 12.0,
+   "attack": 14.0,
+   "hurt": 12.0,
+   "death": 10.0
+  }
+ },
+ "bruxa": {
+  "w": 217,
+  "h": 176,
+  "pes_y": 176,
+  "estados": {
+   "idle": 6,
+   "walk": 8,
+   "attack": 8,
+   "hurt": 4,
+   "death": 7
+  },
+  "fps": {
+   "idle": 8.0,
+   "walk": 12.0,
+   "attack": 14.0,
+   "hurt": 12.0,
+   "death": 10.0
+  }
+ },
+ "arauto": {
+  "w": 185,
+  "h": 139,
+  "pes_y": 139,
+  "estados": {
+   "idle": 10,
+   "walk": 8,
+   "attack": 13,
+   "hurt": 3,
+   "death": 18
+  },
+  "fps": {
+   "idle": 9.0,
+   "walk": 12.0,
+   "attack": 15.0,
+   "hurt": 12.0,
+   "death": 12.0
+  }
+ },
+ "feiticeiro_sombrio": {
+  "w": 181,
+  "h": 133,
+  "pes_y": 133,
+  "estados": {
+   "idle": 8,
+   "walk": 8,
+   "attack": 8,
+   "hurt": 4,
+   "death": 5
+  },
+  "fps": {
+   "idle": 8.0,
+   "walk": 10.0,
+   "attack": 13.0,
+   "hurt": 12.0,
+   "death": 10.0
+  }
+ },
+ "serpente": {
+  "w": 191,
+  "h": 134,
+  "pes_y": 134,
+  "estados": {
+   "idle": 9,
+   "walk": 9,
+   "attack": 16,
+   "hurt": 3,
+   "death": 8
+  },
+  "fps": {
+   "idle": 8.0,
+   "walk": 10.0,
+   "attack": 16.0,
+   "hurt": 12.0,
+   "death": 10.0
+  }
+ },
+ "prisioneiro": {
+  "w": 213,
+  "h": 171,
+  "pes_y": 171,
+  "estados": {
+   "idle": 6,
+   "walk": 8,
+   "attack": 4,
+   "hurt": 3,
+   "death": 9
+  },
+  "fps": {
+   "idle": 8.0,
+   "walk": 12.0,
+   "attack": 13.0,
+   "hurt": 12.0,
+   "death": 10.0
+  }
+ },
+ "carniceiro": {
+  "w": 262,
+  "h": 150,
+  "pes_y": 150,
+  "estados": {
+   "idle": 8,
+   "walk": 8,
+   "attack": 4,
+   "hurt": 4,
+   "death": 6
+  },
+  "fps": {
+   "idle": 8.0,
+   "walk": 12.0,
+   "attack": 13.0,
+   "hurt": 12.0,
+   "death": 10.0
+  }
+ },
+ "lanceiro": {
+  "w": 312,
+  "h": 144,
+  "pes_y": 144,
+  "estados": {
+   "idle": 10,
+   "walk": 6,
+   "attack": 4,
+   "hurt": 3,
+   "death": 9
+  },
+  "fps": {
+   "idle": 8.0,
+   "walk": 12.0,
+   "attack": 13.0,
+   "hurt": 12.0,
+   "death": 10.0
+  }
+ },
+ "monge": {
+  "w": 264,
+  "h": 148,
+  "pes_y": 148,
+  "estados": {
+   "idle": 8,
+   "walk": 8,
+   "attack": 6,
+   "hurt": 4,
+   "death": 6
+  },
+  "fps": {
+   "idle": 8.0,
+   "walk": 12.0,
+   "attack": 14.0,
+   "hurt": 12.0,
+   "death": 10.0
+  }
+ },
+ "monge_celeste": {
+  "w": 341,
+  "h": 218,
+  "pes_y": 218,
+  "estados": {
+   "idle": 10,
+   "walk": 8,
+   "attack": 7,
+   "hurt": 3,
+   "death": 11
+  },
+  "fps": {
+   "idle": 8.0,
+   "walk": 12.0,
+   "attack": 14.0,
+   "hurt": 12.0,
+   "death": 10.0
+  }
+ },
+ "colosso": {
+  "w": 283,
+  "h": 146,
+  "pes_y": 146,
+  "estados": {
+   "idle": 10,
+   "walk": 8,
+   "attack": 7,
+   "hurt": 3,
+   "death": 7
+  },
+  "fps": {
+   "idle": 8.0,
+   "walk": 12.0,
+   "attack": 12.0,
+   "hurt": 12.0,
+   "death": 10.0
+  }
+ },
+ "mimico": {
+  "w": 257,
+  "h": 164,
+  "pes_y": 164,
+  "estados": {
+   "idle": 9,
+   "walk": 6,
+   "attack": 14,
+   "hurt": 3,
+   "death": 6
+  },
+  "fps": {
+   "idle": 8.0,
+   "walk": 10.0,
+   "attack": 14.0,
+   "hurt": 12.0,
+   "death": 10.0
+  }
+ },
+ "alado": {
+  "w": 146,
+  "h": 112,
+  "pes_y": 112,
+  "estados": {
+   "idle": 11,
+   "walk": 11,
+   "attack": 11,
+   "hurt": 3,
+   "death": 4
+  },
+  "fps": {
+   "idle": 12.0,
+   "walk": 14.0,
+   "attack": 14.0,
+   "hurt": 12.0,
+   "death": 10.0
+  }
+ },
+ "olho_voador": {
+  "w": 189,
+  "h": 138,
+  "pes_y": 111,
+  "estados": {
+   "idle": 8,
+   "walk": 8,
+   "attack": 8,
+   "hurt": 4,
+   "death": 4
+  },
+  "fps": {
+   "idle": 10.0,
+   "walk": 12.0,
+   "attack": 14.0,
+   "hurt": 12.0,
+   "death": 10.0
+  }
+ },
+ "horror": {
+  "w": 234,
+  "h": 117,
+  "pes_y": 117,
+  "estados": {
+   "idle": 15,
+   "walk": 12,
+   "attack": 7,
+   "hurt": 5,
+   "death": 11
+  },
+  "fps": {
+   "idle": 8.0,
+   "walk": 10.0,
+   "attack": 14.0,
+   "hurt": 12.0,
+   "death": 10.0
+  }
+ },
+ "folha": {
+  "w": 288,
+  "h": 127,
+  "pes_y": 127,
+  "estados": {
+   "idle": 12,
+   "walk": 10,
+   "attack": 10,
+   "hurt": 6,
+   "death": 19
+  },
+  "fps": {
+   "idle": 8.0,
+   "walk": 12.0,
+   "attack": 14.0,
+   "hurt": 12.0,
+   "death": 10.0
+  }
+ },
+ "cavaleiro_fogo": {
+  "w": 298,
+  "h": 211,
+  "pes_y": 211,
+  "estados": {
+   "idle": 8,
+   "walk": 8,
+   "attack": 11,
+   "hurt": 6,
+   "death": 13
+  },
+  "fps": {
+   "idle": 8.0,
+   "walk": 12.0,
+   "attack": 14.0,
+   "hurt": 12.0,
+   "death": 10.0
+  }
  }
 }

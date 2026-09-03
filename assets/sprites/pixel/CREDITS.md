@@ -9,33 +9,68 @@ ficheiro. Os restantes sprites pixel-art vêm de packs CC0:
 Até 3 set nenhum chefe animava de verdade (4 poses estáticas, ver secções
 abaixo). `tools/importar_chefes_animados.py` corta os packs em 5 tiras
 (idle/walk/attack/hurt/death); `ChefeBase.rig` liga cada chefe. Estado:
-**9 de 30 chefes principais têm rig animado** — os outros continuam com a
-folha de 4 poses antiga.
+**29 de 30 chefes da campanha 1-30 têm rig animado**. O que falta é só a
+**Koliani Sombria** (nível 27) — e de propósito: ela é o espelho da
+Koliani e usa o rig da própria heroína.
 
-| rig | pack | chefe(s) |
+Cada chefe tem uma silhueta DIFERENTE — nenhum pack serve dois chefes.
+Foi para isso que se foram buscar mais 20 packs (ver a nota do LuizMelo
+mais abaixo) em vez de recolorir o mesmo cavaleiro vinte vezes.
+
+| rig | pack | chefe (nível) |
 | --- | --- | --- |
-| `ceifeiro` | clembod "Bringer of Death" (grátis, crédito pedido) | Colosso Ósseo |
-| `demonio_lodo` | chierit "boss demon slime" FREE (CC-BY 4.0) | Coração Putrefacto |
-| `guardiao_gelo` | chierit "Frost Guardian" FREE (CC-BY 4.0) | Carcereiro |
-| `minotauro` | chierit "mino" FREE (CC-BY 4.0) | Ghorak |
-| `feiticeiro` | LuizMelo "Evil Wizard 2" (CC0) | Bispo Púrpura |
-| `verdugo` | Kronovi- "Boss: Undead Executioner" | Dama da Guilhotina |
-| `golem_pedra` | Kronovi- "Boss: Mecha-Stone Golem" | Maquinista Infernal |
-| `arqueiro` | Kronovi- "Archer Hero" | Voltaris |
-| `cavaleiro_negro` | Kronovi- "Wandering Knight 2D Character" | Capitão Negro |
+| `minotauro` | chierit "mino" FREE (CC-BY 4.0) | Ghorak (1) |
+| `bruxa` | LuizMelo "Wizard Pack" (CC0) | Morvanna (2) |
+| `horror` | chierit "Free Cthulu" (CC-BY 4.0) | Rainha Aracnídea (3) |
+| `folha` | chierit "Elementals Leaf Ranger" FREE (CC-BY 4.0) | Entrevane (4) |
+| `demonio_lodo` | chierit "boss demon slime" FREE (CC-BY 4.0) | Coração Putrefacto (5) |
+| `guardiao_gelo` | chierit "Frost Guardian" FREE (CC-BY 4.0) | Carcereiro (6) |
+| `cavaleiro_fogo` | chierit "Elementals Fire Knight" FREE (CC-BY 4.0) | Ignivar (7) |
+| `verdugo` | Kronovi- "Boss: Undead Executioner" | Dama da Guilhotina (8) |
+| `monge` | LuizMelo "Martial Hero" (CC0) | Irmãos Condenados (9) |
+| `prisioneiro` | LuizMelo "Medieval Warrior Pack" (CC0) | Primeiro Prisioneiro (10) |
+| `mimico` | LuizMelo "Monsters Creatures Fantasy 2" (CC0) | Sino Vivo (11) |
+| `monge_celeste` | LuizMelo "Martial Hero 3" (CC0) | Aerion (12) |
+| `arqueiro` | Kronovi- "Archer Hero" | Voltaris (13) |
+| `sacerdotisa` | LuizMelo "Huntress 2" (CC0) | Sacerdotisa Lunar (14) |
+| `alado` | LuizMelo "Monsters Creatures Fantasy 2" (CC0) | Vyrak (15) |
+| `rei_ossario` | LuizMelo "Medieval King Pack" (CC0) | Rei Ossário (16) |
+| `ceifeiro` | clembod "Bringer of Death" (grátis, crédito pedido) | Colosso Ósseo (17) |
+| `feiticeiro_sombrio` | LuizMelo "Evil Wizard" (CC0) | Freira Negra (18) |
+| `serpente` | LuizMelo "Fire Worm" (CC0) | Naga Zeraph (19) |
+| `olho_voador` | LuizMelo "Monsters Creatures Fantasy" (CC0) | Olho do Abismo (20) |
+| `lanceiro` | LuizMelo "Medieval Warrior Pack 3" (CC0) | Prefeito Sem Rosto (21) |
+| `carniceiro` | LuizMelo "Medieval Warrior Pack 2" (CC0) | Açougueiro Real (22) |
+| `golem_pedra` | Kronovi- "Boss: Mecha-Stone Golem" | Maquinista Infernal (23) |
+| `feiticeiro` | LuizMelo "Evil Wizard 2" (CC0) | Bispo Púrpura (24) |
+| `noiva` | LuizMelo "Huntress" (CC0) | Noiva do Eclipse (25) |
+| `cavaleiro_negro` | Kronovi- "Wandering Knight 2D Character" | Capitão Negro (26) |
+| `rei_devorador` | LuizMelo "Medieval King Pack 2" (CC0) | Rei Devorador (28) |
+| `arauto` | LuizMelo "Evil Wizard 3" (CC0) | Arauto de Zeriko (29) |
+| `colosso` | LuizMelo "Fantasy Warrior" (CC0) | Zeriko (30) |
 
-**Kronovi- (darkpixel-kronovi.itch.io)** — os 4 packs novos, gratuitos
-("pay what you want", $0 aceite). Termos (iguais nas páginas dos packs):
-*"You are free to edit the sprite once you downloaded it and you can use
-it for commercial and non-commercial use, credits are not required but
-always deeply appreciated. Redistributing and reselling the sprite are
+**LuizMelo (luizmelo.itch.io)** — **CC0 1.0**, o mesmo autor do "Evil
+Wizard 2" que já se usava. É a fonte da maioria dos rigs novos: são ~20
+packs gratuitos no mesmo traço e na mesma densidade de pixel, o que faz
+com que 15 chefes diferentes continuem a ler-se como o MESMO jogo. Todos
+vieram por `tools/baixar_packs_itch.py` (só descarrega packs gratuitos;
+recusa-se a tocar nos pagos). Crédito não é exigido — fica aqui à mesma.
+
+**chierit (chierit.itch.io)** — **CC-BY 4.0**, crédito OBRIGATÓRIO.
+
+**Kronovi- (darkpixel-kronovi.itch.io)** — 4 packs gratuitos ("pay what
+you want", $0 aceite). Termos (iguais nas páginas dos packs): *"You are
+free to edit the sprite once you downloaded it and you can use it for
+commercial and non-commercial use, credits are not required but always
+deeply appreciated. Redistributing and reselling the sprite are
 restricted."* Sem cláusula anti-IA (ao contrário do Knight_player — ver
 "Koliani (rig actual)"). Detalhe em
-`assets/sprites/incoming/kronovi/LICENSE.txt`. **Por fazer**: os outros
-21 chefes de 1-30 continuam sem rig animado; o "Wandering Knight" é o
-pack mais versátil dos quatro (idle/death/running/jump/fall/crouch/dash/3
-tipos de ataque numa folha só) e serve de base para mais chefes-guerreiro
-por recolor, sem precisar de mais downloads.
+`assets/sprites/incoming/kronovi/LICENSE.txt`.
+
+**Duas escolhas para rever com o Paulo**: o Sino Vivo (11) é um
+**baú-mímico** — não havia nada gratuito com cara de sino, e um objecto
+que pende do tecto e morde faz o trabalho; o Vyrak (15) é um **morcego
+gigante** em vez de um dragão. Ambos ficam à espera de um pack melhor.
 
 ## Pixel Frog — "Kings and Pigs"
 - https://pixelfrog-assets.itch.io/kings-and-pigs

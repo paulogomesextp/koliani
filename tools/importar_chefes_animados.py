@@ -136,20 +136,184 @@ RIGS = {
                     "death": "#SPRITESHEET.png:100:1"},
         "fps": {"idle": 6.0, "walk": 12.0, "attack": 14.0, "hurt": 10.0, "death": 10.0},
     },
+    # --- LuizMelo, CC0 (3 set 2026) -------------------------------------
+    # Packs gratuitos do mesmo autor do "Evil Wizard 2" que ja' usavamos,
+    # trazidos por `tools/baixar_packs_itch.py`. Sao todos tiras
+    # horizontais de celula fixa: a contagem de frames sai da propria folha
+    # (ver `celula_comum`), por isso os specs nao levam `:n`.
+    #
+    # E' isto que fecha o "cada chefe com a SUA silhueta": em vez de
+    # recolorir o mesmo cavaleiro 20 vezes, cada chefe tem um boneco
+    # diferente, no mesmo estilo e na mesma escala.
+    "rei_ossario": {
+        "base": "luizmelo/medieval-king-pack/Medieval King Pack",
+        "estados": {"idle": "@Idle.png", "walk": "@Run.png",
+                    "attack": "@Attack_1.png", "hurt": "@Hit.png",
+                    "death": "@Death.png"},
+        "fps": {"idle": 8.0, "walk": 12.0, "attack": 12.0, "hurt": 12.0, "death": 10.0},
+    },
+    "rei_devorador": {
+        "base": "luizmelo/medieval-king-pack-2/Medieval King Pack 2/Sprites",
+        "estados": {"idle": "@Idle.png", "walk": "@Run.png",
+                    "attack": "@Attack1.png", "hurt": "@Take Hit.png",
+                    "death": "@Death.png"},
+        "fps": {"idle": 8.0, "walk": 12.0, "attack": 12.0, "hurt": 12.0, "death": 10.0},
+    },
+    "noiva": {
+        "base": "luizmelo/huntress/Huntress/Sprites",
+        "estados": {"idle": "@Idle.png", "walk": "@Run.png",
+                    "attack": "@Attack1.png", "hurt": "@Take hit.png",
+                    "death": "@Death.png"},
+        "fps": {"idle": 8.0, "walk": 12.0, "attack": 14.0, "hurt": 12.0, "death": 10.0},
+    },
+    "sacerdotisa": {
+        "base": "luizmelo/huntress-2/Huntress 2/Sprites/Character",
+        "estados": {"idle": "@Idle.png", "walk": "@Run.png",
+                    "attack": "@Attack.png", "hurt": "@Get Hit.png",
+                    "death": "@Death.png"},
+        "fps": {"idle": 8.0, "walk": 12.0, "attack": 14.0, "hurt": 12.0, "death": 10.0},
+    },
+    "bruxa": {
+        "base": "luizmelo/wizard-pack/Wizard Pack",
+        "estados": {"idle": "@Idle.png", "walk": "@Run.png",
+                    "attack": "@Attack1.png", "hurt": "@Hit.png",
+                    "death": "@Death.png"},
+        "fps": {"idle": 8.0, "walk": 12.0, "attack": 14.0, "hurt": 12.0, "death": 10.0},
+    },
+    "arauto": {
+        "base": "luizmelo/evil-wizard-3/Evil Wizard 3/Sprites",
+        "estados": {"idle": "@Idle.png", "walk": "@Run.png",
+                    "attack": "@Attack.png", "hurt": "@Get hit.png",
+                    "death": "@Death.png"},
+        "fps": {"idle": 9.0, "walk": 12.0, "attack": 15.0, "hurt": 12.0, "death": 12.0},
+    },
+    "feiticeiro_sombrio": {
+        "base": "luizmelo/evil-wizard/Evil Wizard/Sprites",
+        "estados": {"idle": "@Idle.png", "walk": "@Move.png",
+                    "attack": "@Attack.png", "hurt": "@Take Hit.png",
+                    "death": "@Death.png"},
+        "fps": {"idle": 8.0, "walk": 10.0, "attack": 13.0, "hurt": 12.0, "death": 10.0},
+    },
+    # Verme de fogo -- serve o chefe-serpente (Naga Zeraph). Nao tem pernas:
+    # o "walk" e' o proprio rastejar.
+    "serpente": {
+        "base": "luizmelo/fire-worm/Fire Worm/Sprites/Worm",
+        "estados": {"idle": "@Idle.png", "walk": "@Walk.png",
+                    "attack": "@Attack.png", "hurt": "@Get Hit.png",
+                    "death": "@Death.png"},
+        "fps": {"idle": 8.0, "walk": 10.0, "attack": 16.0, "hurt": 12.0, "death": 10.0},
+    },
+    "prisioneiro": {
+        "base": "luizmelo/medieval-warrior-pack/Medieval Warrior Pack",
+        "estados": {"idle": "@Idle.png", "walk": "@Run.png",
+                    "attack": "@Attack1.png", "hurt": "@Hit.png",
+                    "death": "@Death.png"},
+        "fps": {"idle": 8.0, "walk": 12.0, "attack": 13.0, "hurt": 12.0, "death": 10.0},
+    },
+    "carniceiro": {
+        "base": "luizmelo/medieval-warrior-pack-2/Medieval Warrior Pack 2/Sprites",
+        "estados": {"idle": "@Idle.png", "walk": "@Run.png",
+                    "attack": "@Attack1.png", "hurt": "@Take Hit.png",
+                    "death": "@Death.png"},
+        "fps": {"idle": 8.0, "walk": 12.0, "attack": 13.0, "hurt": 12.0, "death": 10.0},
+    },
+    "lanceiro": {
+        "base": "luizmelo/medieval-warrior-pack-3/Medieval Warrior Pack 3/Sprites",
+        "estados": {"idle": "@Idle.png", "walk": "@Run.png",
+                    "attack": "@Attack1.png", "hurt": "@Get Hit.png",
+                    "death": "@Death.png"},
+        "fps": {"idle": 8.0, "walk": 12.0, "attack": 13.0, "hurt": 12.0, "death": 10.0},
+    },
+    "monge": {
+        "base": "luizmelo/martial-hero/Martial Hero/Sprites",
+        "estados": {"idle": "@Idle.png", "walk": "@Run.png",
+                    "attack": "@Attack1.png", "hurt": "@Take Hit.png",
+                    "death": "@Death.png"},
+        "fps": {"idle": 8.0, "walk": 12.0, "attack": 14.0, "hurt": 12.0, "death": 10.0},
+    },
+    "monge_celeste": {
+        "base": "luizmelo/martial-hero-3/Martial Hero 3/Sprite",
+        "estados": {"idle": "@Idle.png", "walk": "@Run.png",
+                    "attack": "@Attack1.png", "hurt": "@Take Hit.png",
+                    "death": "@Death.png"},
+        "fps": {"idle": 8.0, "walk": 12.0, "attack": 14.0, "hurt": 12.0, "death": 10.0},
+    },
+    "colosso": {
+        "base": "luizmelo/fantasy-warrior/Fantasy Warrior/Sprites",
+        "estados": {"idle": "@Idle.png", "walk": "@Run.png",
+                    "attack": "@Attack1.png", "hurt": "@Take hit.png",
+                    "death": "@Death.png"},
+        "fps": {"idle": 8.0, "walk": 12.0, "attack": 12.0, "hurt": 12.0, "death": 10.0},
+    },
+    # Bau-mimico -- o unico "monstro-objecto" gratuito que apareceu; e' o
+    # que faz sentido para o Sino Vivo (um objecto que ganha vida e morde).
+    "mimico": {
+        "base": "luizmelo/monsters-creatures-fantasy-2/Monsters Creatures Fantasy 2/Mimic",
+        "estados": {"idle": "@idle_transformed.png", "walk": "@walk.png",
+                    "attack": "@attack_1.png", "hurt": "@hurt.png",
+                    "death": "@death.png"},
+        "fps": {"idle": 8.0, "walk": 10.0, "attack": 14.0, "hurt": 12.0, "death": 10.0},
+    },
+    # Morcego gigante -- o `fly` serve de idle E de walk (nao pousa).
+    "alado": {
+        "base": "luizmelo/monsters-creatures-fantasy-2/Monsters Creatures Fantasy 2/Bat",
+        "estados": {"idle": "@fly.png", "walk": "@fly.png",
+                    "attack": "@attack.png", "hurt": "@hurt.png",
+                    "death": "@death.png"},
+        "fps": {"idle": 12.0, "walk": 14.0, "attack": 14.0, "hurt": 12.0, "death": 10.0},
+    },
+    # Olho voador -- ja' estava no repo desde 1 set, mas so' como folha de
+    # 4 POSES (`tools/extrair_chefes_packs.gd`). Aqui anima a serio.
+    "olho_voador": {
+        "base": "luizmelo/Monsters_Creatures_Fantasy/Flying eye",
+        "estados": {"idle": "@Flight.png", "walk": "@Flight.png",
+                    "attack": "@Attack.png", "hurt": "@Take Hit.png",
+                    "death": "@Death.png"},
+        "fps": {"idle": 10.0, "walk": 12.0, "attack": 14.0, "hurt": 12.0, "death": 10.0},
+    },
+    # --- chierit, CC-BY 4.0 (creditar) ----------------------------------
+    # Horror de tentaculos -- a Rainha Aracnidea (nivel 3). Nao e' uma
+    # aranha, mas e' a unica coisa gratuita com muitos membros e postura de
+    # bicho grande de ninho.
+    "horror": {
+        "base": "chierit/free-cthulu/free_cthulu/animations/PNG",
+        "estados": {"idle": "idle", "walk": "walk", "attack": "1atk",
+                    "hurt": "hurt", "death": "death"},
+        "fps": {"idle": 8.0, "walk": 10.0, "attack": 14.0, "hurt": 12.0, "death": 10.0},
+    },
+    # Elemental de folha -- o Entrevane (a arvore que chora, nivel 4).
+    "folha": {
+        "base": "chierit/elementals-leaf-ranger/Elementals_Leaf_ranger_Free_v1.0/animations/PNG",
+        "estados": {"idle": "idle", "walk": "run", "attack": "1_atk",
+                    "hurt": "take_hit", "death": "death"},
+        "fps": {"idle": 8.0, "walk": 12.0, "attack": 14.0, "hurt": 12.0, "death": 10.0},
+    },
+    # Cavaleiro de fogo -- o Ignivar (Fornalha dos Pecadores, nivel 7).
+    "cavaleiro_fogo": {
+        "base": "chierit/elementals-fire-knight/Elementals_fire_knight_FREE_v1.1/png/fire_knight",
+        "estados": {"idle": "01_idle", "walk": "02_run", "attack": "05_1_atk",
+                    "hurt": "10_take_hit", "death": "11_death"},
+        "fps": {"idle": 8.0, "walk": 12.0, "attack": 14.0, "hurt": 12.0, "death": 10.0},
+    },
 }
 
 
-def frames(base: str, spec: str) -> list[Image.Image]:
+def frames(base: str, spec: str, cel_auto: int = 0) -> list[Image.Image]:
     """Frames de um estado: pasta de PNGs soltos, tira `@ficheiro:n`, ou
     grelha `#ficheiro:celula[:linha]` (célula quadrada; sem `:linha` varre
     a folha toda em row-major e só usa as células com conteúdo -- é o que
     os packs "Kronovi-" precisam, cada estado empilhado em N linhas de uma
     folha só)."""
     if spec.startswith("@"):
-        nome, n = spec[1:].rsplit(":", 1)
+        nome = spec[1:]
+        cel = cel_auto
+        if ":" in nome:
+            nome, n = nome.rsplit(":", 1)
+            cel = -int(n)                    # negativo = "sao N frames"
         im = Image.open(os.path.join(base, nome)).convert("RGBA")
-        w = im.size[0] // int(n)
-        return [im.crop((i * w, 0, (i + 1) * w, im.size[1])) for i in range(int(n))]
+        w = -(im.size[0] // cel) if cel < 0 else (cel or im.size[1])
+        return [im.crop((i * w, 0, (i + 1) * w, im.size[1]))
+                for i in range(max(1, im.size[0] // w))]
     if spec.startswith("#"):
         partes = spec[1:].split(":")
         nome, cel = partes[0], int(partes[1])
@@ -170,6 +334,42 @@ def frames(base: str, spec: str) -> list[Image.Image]:
     fs = sorted(glob.glob(os.path.join(base, spec, "*.png")),
                 key=lambda c: _ordem(os.path.basename(c)))
     return [Image.open(f).convert("RGBA") for f in fs]
+
+
+def celula_comum(base: str, specs: dict) -> int:
+    """Largura da célula das tiras `@ficheiro.png` sem contagem.
+
+    Os packs do LuizMelo vêm como tiras horizontais de célula fixa, mas o
+    número de frames muda de estado para estado e não vem escrito em lado
+    nenhum. O máximo divisor comum das larguras das folhas do MESMO rig dá
+    a célula (a menos de um múltiplo, se todas as contagens forem pares --
+    daí o corte pela altura no fim: uma célula nunca é 2x mais larga que
+    alta nestes packs)."""
+    larguras, alturas = [], []
+    for spec in specs.values():
+        if not spec.startswith("@") or ":" in spec:
+            continue
+        cam = os.path.join(base, spec[1:])
+        if not os.path.isfile(cam):
+            continue
+        w, h = Image.open(cam).size
+        larguras.append(w)
+        alturas.append(h)
+    if not larguras:
+        return 0
+    g = larguras[0]
+    for w in larguras[1:]:
+        g = _mdc(g, w)
+    alto = max(alturas)
+    while g > alto * 1.6 and g % 2 == 0:
+        g //= 2
+    return g
+
+
+def _mdc(a: int, b: int) -> int:
+    while b:
+        a, b = b, a % b
+    return a
 
 
 def _ordem(nome: str) -> tuple:
@@ -207,7 +407,8 @@ def main() -> int:
         if not os.path.isdir(base):
             print("  ! %s saltado (falta %s)" % (rig, cfg["base"]))
             continue
-        por_estado = {e: frames(base, s) for e, s in cfg["estados"].items()}
+        cel = celula_comum(base, cfg["estados"])
+        por_estado = {e: frames(base, s, cel) for e, s in cfg["estados"].items()}
         todos = [im for lista in por_estado.values() for im in lista]
         if not todos:
             print("  ! %s sem frames" % rig)

@@ -60,6 +60,7 @@ material = SubResource("mat_b")
 [node name="Anim" type="AnimatedSprite2D" parent="Sprite"]
 visible = false
 texture_filter = 1
+
 [node name="LuzOlhos" type="PointLight2D" parent="Sprite"]
 position = Vector2(0, -10)
 texture = SubResource("tex_luz")

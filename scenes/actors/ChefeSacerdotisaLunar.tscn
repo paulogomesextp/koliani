@@ -31,6 +31,7 @@ fill_to = Vector2(1, 0.5)
 collision_layer = 4
 collision_mask = 1
 script = ExtResource("1_chefe")
+rig = "sacerdotisa"
 escala_visual = 1.4
 vida = 540
 dano_contacto = 16
@@ -45,6 +46,13 @@ texture_filter = 1
 position = Vector2(0, -6)
 texture = ExtResource("2_tex")
 hframes = 4
+
+
+; RIG ANIMADO -- n14 Observatorio -- arqueira de manto. Fica vazio: o `ChefeBase._montar_rig` enche-o
+; de `bosses_anim/sacerdotisa` e esconde o `Corpo` acima.
+[node name="Anim" type="AnimatedSprite2D" parent="Sprite"]
+visible = false
+texture_filter = 1
 
 [node name="Luas" type="Node2D" parent="Sprite"]
 position = Vector2(0, -24)

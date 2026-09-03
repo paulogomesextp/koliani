@@ -30,6 +30,7 @@ fill_to = Vector2(1, 0.5)
 collision_layer = 4
 collision_mask = 1
 script = ExtResource("1_chefe")
+rig = "carniceiro"
 escala_visual = 1.6
 vida = 690
 dano_contacto = 22
@@ -44,6 +45,13 @@ texture_filter = 1
 position = Vector2(0, -8)
 texture = ExtResource("2_tex")
 hframes = 4
+
+
+; RIG ANIMADO -- n22 Mercado da Carne -- bruto de cutelo. Fica vazio: o `ChefeBase._montar_rig` enche-o
+; de `bosses_anim/carniceiro` e esconde o `Corpo` acima.
+[node name="Anim" type="AnimatedSprite2D" parent="Sprite"]
+visible = false
+texture_filter = 1
 
 [node name="LuzNucleo" type="PointLight2D" parent="Sprite"]
 position = Vector2(0, 0)

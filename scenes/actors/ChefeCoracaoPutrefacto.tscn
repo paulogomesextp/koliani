@@ -54,6 +54,7 @@ hframes = 4
 [node name="Anim" type="AnimatedSprite2D" parent="Sprite"]
 visible = false
 texture_filter = 1
+
 [node name="LuzCoracao" type="PointLight2D" parent="Sprite"]
 texture = SubResource("tex_luz")
 energy = 0.9
