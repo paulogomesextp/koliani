@@ -1,0 +1,78 @@
+[gd_scene load_steps=8 format=3 uid="uid://bkolianitronoinfernal85"]
+
+; REGIAO 17 / nivel 85 -- Trono Infernal.
+; Ate' os demonios temem a entidade. O Rei dos Demonios.
+;
+; CENA GERADA por `tools/gerar_niveis_31_100.py` -- NAO editar a' mao: o
+; proximo `python tools/gerar_niveis_31_100.py` apaga o que aqui se puser.
+; A JORNADA (`corredor = true`, `gerador_corredor.gd`) constroi tudo o que
+; vem antes desta sala; aqui so' esta' a arena do chefe.
+; O bloco `Atmosfera` e' reescrito por `tools/afinar_atmosfera.py`.
+
+[ext_resource type="PackedScene" uid="uid://bkolianiactor01" path="res://scenes/actors/Koliani.tscn" id="1_kol"]
+[ext_resource type="PackedScene" uid="uid://bkolianiporta01" path="res://scenes/actors/Porta.tscn" id="2_porta"]
+[ext_resource type="Script" path="res://scripts/checkpoint.gd" id="3_chk"]
+[ext_resource type="PackedScene" uid="uid://bkolianichefegenerico01" path="res://scenes/actors/ChefeGenerico.tscn" id="4_chefe"]
+[ext_resource type="Script" path="res://scripts/nivel_com_chefe.gd" id="5_niv"]
+[ext_resource type="PackedScene" uid="uid://bkolianiatmosfera01" path="res://scenes/fx/Atmosfera.tscn" id="6_atm"]
+[ext_resource type="PackedScene" uid="uid://bkolianiplataforma01" path="res://scenes/actors/Plataforma.tscn" id="7_pl"]
+[ext_resource type="PackedScene" uid="uid://bkolianiaguavenenosa01" path="res://scenes/actors/AguaVenenosa.tscn" id="8_liq"]
+
+[sub_resource type="RectangleShape2D" id="rs_chk"]
+size = Vector2(44, 96)
+
+[node name="Trono_Infernal" type="Node2D"]
+script = ExtResource("5_niv")
+
+[node name="Atmosfera" parent="." instance=ExtResource("6_atm")]
+cor_ambiente = Color(1.26, 0.68, 0.4, 1)
+cor_fundo = Color(0.11, 0.01, 0, 1)
+cor_silhueta = Color(0.17, 0.03, 0.01, 1)
+cor_luz = Color(1, 0.38, 0.06, 1)
+cor_poeira = Color(1, 0.6, 0.18, 1)
+densidade_poeira = 4.2
+bioma = "castelo"
+largura_nivel = 1800.0
+fundo_pack = "horror"
+tinta_fundo = Color(1.4, 0.5, 0.18, 1)
+neblina_fundo = 0.32
+dessaturar_fundo = 0.76
+seed_ambiente = 4108
+luzes_horizonte = true
+
+[node name="LiquidoMortal" parent="." instance=ExtResource("8_liq")]
+position = Vector2(700, 980)
+largura = 2000.0
+altura = 340.0
+cor = Color(0.55, 0.1, 0.02, 0.96)
+brasas = true
+
+[node name="ChaoChefe" parent="." instance=ExtResource("7_pl")]
+position = Vector2(760, 700)
+tamanho = Vector2(1000, 60)
+altura_visual = 110.0
+
+[node name="Chefe" parent="." instance=ExtResource("4_chefe")]
+position = Vector2(1020, 616)
+arquetipo = 0
+vida = 2420
+cor_rim = Color(1.0, 0.38, 0.06, 1)
+rig = "cavaleiro_fogo"
+investidas_seguidas = 2
+dur_recupera = 0.7
+
+[node name="Koliani" parent="." instance=ExtResource("1_kol")]
+position = Vector2(360, 616)
+
+[node name="CheckInicio" type="Area2D" parent="."]
+position = Vector2(430, 632)
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("3_chk")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckInicio"]
+shape = SubResource("rs_chk")
+
+[node name="Porta" parent="." instance=ExtResource("2_porta")]
+position = Vector2(1210, 622)
+pista_ao_atravessar = ""

@@ -133,6 +133,26 @@ const NIVEIS := [
 	"res://scenes/levels/Navio_da_Condenacao.tscn",
 	"res://scenes/levels/Fortaleza_Kraken.tscn",
 	"res://scenes/levels/Coracao_Vermelho.tscn",
+	"res://scenes/levels/Portao_Infernal.tscn",
+	"res://scenes/levels/Cidade_dos_Demonios.tscn",
+	"res://scenes/levels/Rio_das_Almas.tscn",
+	"res://scenes/levels/Palacio_de_Sangue.tscn",
+	"res://scenes/levels/Trono_Infernal.tscn",
+	"res://scenes/levels/Primeiro_Vazio.tscn",
+	"res://scenes/levels/Segundo_Vazio.tscn",
+	"res://scenes/levels/Labirinto_Impossivel.tscn",
+	"res://scenes/levels/A_Coisa_Atras_do_Mundo.tscn",
+	"res://scenes/levels/Centro_do_Vazio.tscn",
+	"res://scenes/levels/Campo_de_Batalha.tscn",
+	"res://scenes/levels/Ceu_em_Guerra.tscn",
+	"res://scenes/levels/Cerco_ao_Castelo.tscn",
+	"res://scenes/levels/Torre_da_Corrupcao.tscn",
+	"res://scenes/levels/Os_Cem_Guerreiros.tscn",
+	"res://scenes/levels/O_Reino_Antes_da_Corrupcao.tscn",
+	"res://scenes/levels/O_Primeiro_Castelo.tscn",
+	"res://scenes/levels/O_Coracao_de_Zeriko.tscn",
+	"res://scenes/levels/O_Fim_de_Tudo.tscn",
+	"res://scenes/levels/O_Ultimo_Salto.tscn",
 ]
 # "res://scenes/levels/Level_Test.tscn" fica no repo como sala de treino,
 # fora da campanha (correr a cena diretamente no editor).
@@ -159,6 +179,10 @@ const REGIOES := [
 	{"id": "sonhos", "nome": "Reino dos Sonhos", "niveis": [65, 66, 67, 68, 69]},
 	{"id": "mortos", "nome": "Cidade dos Mortos", "niveis": [70, 71, 72, 73, 74]},
 	{"id": "mar_vermelho", "nome": "Mar Vermelho", "niveis": [75, 76, 77, 78, 79]},
+	{"id": "inferno", "nome": "Inferno", "niveis": [80, 81, 82, 83, 84]},
+	{"id": "vazio", "nome": "O Vazio", "niveis": [85, 86, 87, 88, 89]},
+	{"id": "guerra", "nome": "Guerra dos Reinos", "niveis": [90, 91, 92, 93, 94]},
+	{"id": "ultimo", "nome": "O Último Caminho", "niveis": [95, 96, 97, 98, 99]},
 ]
 
 signal vidas_mudaram(vidas: int)

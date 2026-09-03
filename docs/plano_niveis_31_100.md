@@ -143,7 +143,7 @@ Oceano feito da própria corrupção.
 | 79 | 🐙 Fortaleza Kraken (fortaleza construída sobre um monstro marinho) | **Kraken** |
 | 80 | 🌊 Coração Vermelho (o oceano é uma criatura viva) | **O Mar** — dos maiores chefes do jogo |
 
-## XVII — INFERNO (81–85) 🔥
+## XVII — INFERNO (81–85) 🔥 ✅ *feita (3 set 2026)*
 
 | # | Nível | Chefe |
 | --- | --- | --- |
@@ -153,7 +153,7 @@ Oceano feito da própria corrupção.
 | 84 | 🩸 Palácio de Sangue | **Princesa Demónio** |
 | 85 | 👹 Trono Infernal | **Rei dos Demónios** — revela que os demónios também temem a entidade púrpura |
 
-## XVIII — O VAZIO (86–90) 🕳️
+## XVIII — O VAZIO (86–90) 🕳️ ✅ *feita (3 set 2026)*
 
 **Deve ser completamente diferente do resto**: sem chão permanente, sem
 céu, sem regras.
@@ -166,7 +166,7 @@ céu, sem regras.
 | 89 | 👁️ A Coisa Atrás do Mundo | — | **O Observador** — não luta directamente, manipula o cenário |
 | 90 | 🌑 Centro do Vazio | — | **A Entidade** — a verdadeira responsável pela corrupção |
 
-## XIX — GUERRA DOS REINOS (91–95) ⚔️
+## XIX — GUERRA DOS REINOS (91–95) ⚔️ ✅ *feita (3 set 2026)*
 
 As regiões que a Koliani atravessou convergem para uma última batalha.
 
@@ -178,7 +178,7 @@ As regiões que a Koliani atravessou convergem para uma última batalha.
 | 94 | 🔮 Torre da Corrupção | **O Arauto Final** — ataques inspirados em todos os chefes anteriores |
 | 95 | ⚔️ Os Cem Guerreiros (nível de resistência) | **O Campeão** — tem todas as habilidades da protagonista |
 
-## XX — O ÚLTIMO CAMINHO (96–100) 🌅
+## XX — O ÚLTIMO CAMINHO (96–100) 🌅 ✅ *feita (3 set 2026)*
 
 | # | Nível | Chefe |
 | --- | --- | --- |

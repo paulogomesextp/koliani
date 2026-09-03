@@ -193,6 +193,65 @@ NIVEIS = [
     # o CHEFE da regiao: O Mar -- uma massa de liquido vivo
     ("Coracao_Vermelho", 79, "catacumbas", "chefe", 1, 2180, (1.00, 0.20, 0.26),
      "demonio_lodo", "O oceano e' uma criatura viva. O Mar."),
+    # --- XVII  INFERNO (81-85) -----------------------------------------
+    ("Portao_Infernal", 80, "castelo", "guardiao", 0, 2220, (1.00, 0.52, 0.10),
+     "imp", "A porta do inferno. Guardiao: a sentinela."),
+    ("Cidade_dos_Demonios", 81, "cidade", "guardiao", 0, 2260, (1.00, 0.44, 0.08),
+     "chort", "Uma cidade inteira de demonios. Guardiao: o duque."),
+    ("Rio_das_Almas", 82, "catacumbas", "guardiao", 0, 2300, (1.00, 0.60, 0.16),
+     "wogol", "Correntes por cima de um rio de almas. Guardiao: o barqueiro."),
+    ("Palacio_de_Sangue", 83, "castelo", "guardiao", 0, 2340, (1.00, 0.34, 0.14),
+     "demonio_grande", "Palacio de sangue seco. Guardiao: a princesa."),
+    # o CHEFE da regiao: o Rei dos Demonios -- e' ele que revela que ate' os
+    # demonios temem a entidade purpura
+    ("Trono_Infernal", 84, "castelo", "chefe", 0, 2420, (1.00, 0.38, 0.06),
+     "cavaleiro_fogo", "Ate' os demonios temem a entidade. O Rei dos Demonios."),
+    # --- XVIII  O VAZIO (86-90) -- sem chao, sem ceu, sem regras --------
+    # A regiao tem de ser DIFERENTE de tudo. E' a unica quase sem cor: o
+    # `des` sobe a 0.95 e mata a cor propria do pack -- fica silhueta e uma
+    # unica luz branco-violeta.
+    ("Primeiro_Vazio", 85, "torres", "guardiao", 0, 2460, (0.86, 0.80, 1.00),
+     "gosma", "As plataformas so' aparecem por perto. Guardiao: a Sombra."),
+    ("Segundo_Vazio", 86, "torres", "guardiao", 0, 2500, (0.90, 0.86, 1.00),
+     "olho", "Os inimigos somem e voltam. Guardiao: o Nada."),
+    ("Labirinto_Impossivel", 87, "catacumbas", "guardiao", 0, 2540, (0.82, 0.76, 1.00),
+     "wogol", "Entra-se a' esquerda e sai-se a' direita, noutro sitio."),
+    ("A_Coisa_Atras_do_Mundo", 88, "torres", "guardiao", 0, 2580, (0.94, 0.90, 1.00),
+     "xamane", "Nao luta: mexe no cenario. Guardiao: o Observador."),
+    # o CHEFE da regiao: A Entidade -- a verdadeira responsavel pela corrupcao
+    ("Centro_do_Vazio", 89, "catacumbas", "chefe", 3, 2680, (0.78, 0.70, 1.00),
+     "horror", "A verdadeira responsavel pela corrupcao. A Entidade."),
+    # --- XIX  GUERRA DOS REINOS (91-95) --------------------------------
+    ("Campo_de_Batalha", 90, "cidade", "guardiao", 0, 2720, (1.00, 0.74, 0.44),
+     "orc", "Humanos, mortos-vivos e monstros ao mesmo tempo."),
+    ("Ceu_em_Guerra", 91, "torres", "guardiao", 0, 2760, (1.00, 0.68, 0.38),
+     "abutre", "Dragoes ao fundo. Guardiao: um primordial."),
+    ("Cerco_ao_Castelo", 92, "castelo", "guardiao", 0, 2800, (0.96, 0.78, 0.50),
+     "ogro", "Os exercitos combatem la' fora. Guardiao: o ultimo cavaleiro."),
+    ("Torre_da_Corrupcao", 93, "torres", "guardiao", 0, 2840, (0.92, 0.60, 0.90),
+     "necromante", "Ataques de todos os chefes anteriores. Guardiao: o arauto."),
+    # o CHEFE da regiao: O Campeao -- tem todas as habilidades DELA
+    ("Os_Cem_Guerreiros", 94, "castelo", "chefe", 0, 2940, (1.00, 0.70, 0.32),
+     "assassino_vento", "Nivel de resistencia. O Campeao."),
+    # --- XX  O ULTIMO CAMINHO (96-100) ---------------------------------
+    # A unica regiao com QUATRO chefes: o final nao pode ser guardioes.
+    # E a unica em que cada nivel tem a sua cor propria -- sao memorias,
+    # nao um sitio.
+    ("O_Reino_Antes_da_Corrupcao", 95, "floresta", "guardiao", 0, 2980, (1.00, 0.92, 0.60),
+     "goblin", "Nivel nostalgico: os mortos reaparecem. Guardiao: Zeriko jovem."),
+    ("O_Primeiro_Castelo", 96, "castelo", "chefe", 3, 3020, (1.00, 0.86, 0.52),
+     "rei_ossario", "A origem da magia purpura. O Primeiro Rei."),
+    ("O_Coracao_de_Zeriko", 97, "catacumbas", "chefe", 0, 3120, (1.00, 0.24, 0.62),
+     "colosso", "Dentro da alma dele. Zeriko Absoluto."),
+    ("O_Fim_de_Tudo", 98, "torres", "chefe", 4, 3260, (1.00, 0.30, 1.00),
+     "horror", "O mundo inteiro a desaparecer. A Entidade Purpura."),
+    # NOTA: o nivel 100 do plano NAO e' um chefe normal -- e' um duelo de
+    # espada, sem poderes, sem HUD e sem barra de vida
+    # (docs/plano_niveis_31_100.md). Ate' esse duelo estar feito a serio,
+    # fica aqui como um chefe INVESTIDA com o rig de cavaleiro: e' o Zeriko
+    # como HOMEM, nao como rei nem como demonio.
+    ("O_Ultimo_Salto", 99, "floresta", "chefe", 0, 3400, (1.00, 0.94, 0.86),
+     "cavaleiro_negro", "Espada contra espada. Zeriko, apenas um homem."),
 ]
 
 MODELO_CHEFE = '''[gd_scene load_steps=8 format=3 uid="uid://bkoliani{uid}"]
@@ -397,6 +456,26 @@ TITULOS = {
     "Navio_da_Condenacao": "Navio da Condenacao",
     "Fortaleza_Kraken": "Fortaleza Kraken",
     "Coracao_Vermelho": "Coracao Vermelho",
+    "Portao_Infernal": "Portao Infernal",
+    "Cidade_dos_Demonios": "Cidade dos Demonios",
+    "Rio_das_Almas": "Rio das Almas",
+    "Palacio_de_Sangue": "Palacio de Sangue",
+    "Trono_Infernal": "Trono Infernal",
+    "Primeiro_Vazio": "Primeiro Vazio",
+    "Segundo_Vazio": "Segundo Vazio",
+    "Labirinto_Impossivel": "Labirinto Impossivel",
+    "A_Coisa_Atras_do_Mundo": "A Coisa Atras do Mundo",
+    "Centro_do_Vazio": "Centro do Vazio",
+    "Campo_de_Batalha": "Campo de Batalha",
+    "Ceu_em_Guerra": "Ceu em Guerra",
+    "Cerco_ao_Castelo": "Cerco ao Castelo",
+    "Torre_da_Corrupcao": "Torre da Corrupcao",
+    "Os_Cem_Guerreiros": "Os Cem Guerreiros",
+    "O_Reino_Antes_da_Corrupcao": "O Reino Antes da Corrupcao",
+    "O_Primeiro_Castelo": "O Primeiro Castelo",
+    "O_Coracao_de_Zeriko": "O Coracao de Zeriko",
+    "O_Fim_de_Tudo": "O Fim de Tudo",
+    "O_Ultimo_Salto": "O Ultimo Salto",
 }
 
 # Liquido mortal da arena do chefe, por REGIAO (indice0 // 5). Sem isto o
@@ -413,6 +492,10 @@ LIQUIDO_REGIAO = {
     13: ((0.30, 0.16, 0.34, 0.92), "false"),  # XIV a nevoa dos sonhos
     14: ((0.13, 0.18, 0.15, 0.94), "false"),  # XV a bruma das campas
     15: ((0.42, 0.05, 0.09, 0.96), "false"),  # XVI o mar de sangue
+    16: ((0.55, 0.10, 0.02, 0.96), "true"),   # XVII a lava do inferno
+    17: ((0.05, 0.04, 0.09, 0.88), "false"),  # XVIII o proprio vazio
+    18: ((0.24, 0.14, 0.08, 0.94), "false"),  # XIX a lama da guerra
+    19: ((0.34, 0.10, 0.34, 0.94), "false"),  # XX o que resta da magia
 }
 
 

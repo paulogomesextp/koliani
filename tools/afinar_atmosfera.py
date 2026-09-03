@@ -199,6 +199,46 @@ TABELA = [
     ("Navio_da_Condenacao",    "prisao",        (1.18,.66,.64), (.22,.05,.06), (.29,.08,.10), (.96,.36,.34),  (1.0,.66,.60), 4.0, (1.30,.58,.54), .34, .62, True),
     ("Fortaleza_Kraken",       "cidade",        (1.16,.60,.68), (.19,.04,.08), (.26,.07,.12), (.90,.28,.40),  (1.0,.58,.66), 4.4, (1.28,.50,.62), .36, .68, True),
     ("Coracao_Vermelho",       "horror",        (1.28,.50,.54), (.26,.02,.05), (.33,.05,.08), (1.0,.20,.26),  (1.0,.50,.52), 5.0, (1.42,.40,.44), .42, .72, True),
+    # ---- XVII  Inferno (81-85) --------------------------------------
+    # Tambem e' laranja, como a VII, mas por outra razao: a VII e' laranja
+    # MEDIO em tudo (o reino a arder ao longe); esta e' PRETA com nucleos
+    # brancos de fogo. O fundo vai quase a zero e a luz-chave quase a um --
+    # e' o contraste, nao a cor, que faz o inferno.
+    ("Portao_Infernal",        "castelo_velho", (1.16,.78,.52), (.07,.02,.01), (.13,.04,.02), (1.0,.52,.10),  (1.0,.70,.26), 4.0, (1.30,.62,.28), .30, .70, True),
+    ("Cidade_dos_Demonios",    "vilanoite",     (1.20,.72,.46), (.09,.02,.01), (.15,.04,.02), (1.0,.44,.08),  (1.0,.64,.22), 4.4, (1.34,.54,.22), .28, .72, True),
+    ("Rio_das_Almas",          "caverna",       (1.12,.82,.58), (.06,.03,.02), (.11,.05,.03), (1.0,.60,.16),  (1.0,.76,.34), 4.8, (1.26,.70,.34), .36, .68, True),
+    ("Palacio_de_Sangue",      "igreja",        (1.22,.66,.48), (.10,.01,.03), (.16,.03,.05), (1.0,.34,.14),  (1.0,.58,.28), 3.8, (1.36,.48,.26), .26, .74, True),
+    ("Trono_Infernal",         "horror",        (1.26,.68,.40), (.11,.01,.00), (.17,.03,.01), (1.0,.38,.06),  (1.0,.60,.18), 4.2, (1.40,.50,.18), .32, .76, True),
+    # ---- XVIII  O Vazio (86-90) -------------------------------------
+    # A unica regiao QUASE SEM COR do jogo. `des` a 0.95 mata a cor propria
+    # do pack e sobra silhueta; a tinta e' cinzenta, a luz-chave e' um
+    # branco-violeta so'. Nada de horizonte -- nao ha' longe, aqui.
+    ("Primeiro_Vazio",         "rochoso",       (.90,.88,1.00), (.03,.02,.05), (.06,.05,.09), (.86,.80,1.0),  (.94,.92,1.0), 2.4, (.90,.88,1.06), .58, .95, False),
+    ("Segundo_Vazio",          "montanhas",     (.92,.90,1.00), (.02,.02,.04), (.05,.04,.08), (.90,.86,1.0),  (.96,.94,1.0), 2.0, (.92,.90,1.04), .62, .95, False),
+    ("Labirinto_Impossivel",   "masmorra",      (.88,.86,1.00), (.03,.03,.06), (.07,.06,.10), (.82,.76,1.0),  (.92,.90,1.0), 2.8, (.88,.86,1.08), .56, .95, False),
+    ("A_Coisa_Atras_do_Mundo", "gruta",         (.94,.92,1.00), (.02,.02,.05), (.05,.05,.09), (.94,.90,1.0),  (.98,.96,1.0), 2.2, (.94,.92,1.05), .64, .95, False),
+    ("Centro_do_Vazio",        "horror",        (.86,.82,1.00), (.01,.01,.03), (.04,.03,.07), (.78,.70,1.0),  (.90,.86,1.0), 3.0, (.86,.82,1.10), .68, .95, False),
+    # ---- XIX  Guerra dos Reinos (91-95) -----------------------------
+    # Fumo e aco: castanho-cinzento dessaturado com AMBAR so' no horizonte.
+    # E' o que a separa do Inferno, que e' preto-e-fogo: aqui ha' luz do
+    # dia, so' que passada por fumo. A Torre da Corrupcao (94) sai da
+    # paleta para magenta -- e' o aviso de que o Zeriko volta.
+    ("Campo_de_Batalha",       "cidade",        (1.06,.94,.78), (.20,.15,.10), (.27,.21,.15), (1.0,.74,.44),  (1.0,.88,.66), 5.4, (1.14,.98,.74), .40, .62, True),
+    ("Ceu_em_Guerra",          "montanhas",     (1.04,.92,.76), (.22,.17,.12), (.29,.23,.17), (1.0,.68,.38),  (1.0,.84,.60), 5.0, (1.12,.96,.70), .44, .64, True),
+    ("Cerco_ao_Castelo",       "castelo_velho", (1.02,.94,.82), (.18,.14,.10), (.25,.20,.15), (.96,.78,.50),  (1.0,.90,.70), 4.6, (1.10,1.00,.80), .38, .60, True),
+    ("Torre_da_Corrupcao",     "horror",        (1.00,.80,1.06), (.16,.08,.20), (.22,.13,.27), (.92,.60,.90),  (1.0,.78,.96), 4.2, (1.06,.76,1.16), .42, .58, False),
+    ("Os_Cem_Guerreiros",      "rochoso",       (1.08,.92,.72), (.19,.14,.09), (.26,.20,.14), (1.0,.70,.32),  (1.0,.86,.58), 5.2, (1.16,.96,.66), .36, .66, True),
+    # ---- XX  O Ultimo Caminho (96-100) ------------------------------
+    # A unica regiao em que cada nivel tem a SUA cor: sao memorias, nao um
+    # sitio. 96 e' o dourado do reino antes de tudo (o unico nivel quente e
+    # feliz do jogo inteiro), 97 e' pedra ao sol, 98 e' carmim por dentro do
+    # Zeriko, 99 e' o magenta a rebentar, e 100 e' a madrugada -- luz alta,
+    # quase sem cor, o oposto exacto do nivel 1.
+    ("O_Reino_Antes_da_Corrupcao","floresta",   (1.10,1.06,.82), (.30,.26,.14), (.38,.33,.19), (1.0,.92,.60),  (1.0,.98,.78), 3.4, (1.18,1.12,.78), .24, .48, True),
+    ("O_Primeiro_Castelo",     "montanhas",     (1.08,1.00,.82), (.26,.22,.14), (.34,.29,.19), (1.0,.86,.52),  (1.0,.94,.74), 3.8, (1.16,1.06,.78), .28, .52, True),
+    ("O_Coracao_de_Zeriko",    "caverna",       (1.14,.62,.86), (.18,.03,.09), (.25,.06,.14), (1.0,.24,.62),  (1.0,.56,.80), 4.6, (1.28,.52,.86), .40, .66, False),
+    ("O_Fim_de_Tudo",          "horror",        (1.16,.70,1.16), (.16,.04,.18), (.23,.08,.25), (1.0,.30,1.0),  (1.0,.64,1.0), 5.6, (1.30,.62,1.30), .46, .60, True),
+    ("O_Ultimo_Salto",         "luar",          (1.10,1.08,1.04), (.44,.42,.44), (.54,.52,.55), (1.0,.94,.86),  (1.0,.98,.96), 3.0, (1.16,1.14,1.12), .18, .82, True),
 ]
 
 CHAVES = [

@@ -91,6 +91,10 @@ const LIQUIDO := {
 	13: [Color(0.30, 0.16, 0.34, 0.92), false],  # XIV a nevoa dos Sonhos
 	14: [Color(0.13, 0.18, 0.15, 0.94), false],  # XV a bruma das campas
 	15: [Color(0.42, 0.05, 0.09, 0.96), false],  # XVI o Mar Vermelho
+	16: [Color(0.55, 0.10, 0.02, 0.96), true],   # XVII a lava do Inferno
+	17: [Color(0.05, 0.04, 0.09, 0.88), false],  # XVIII o proprio Vazio
+	18: [Color(0.24, 0.14, 0.08, 0.94), false],  # XIX a lama da Guerra
+	19: [Color(0.34, 0.10, 0.34, 0.94), false],  # XX o que resta da magia
 }
 
 ## Tipos de "flavour" de câmara (o que se semeia à volta da espinha).
@@ -156,6 +160,23 @@ const POOL_REGIAO := {
 	# desce a compasso.
 	15: ["ritmo", "ferry", "quebra", "gravidade", "pendulos", "espinhos",
 		"crossfire", "serras", "portal", "alavanca", "segredo"],
+	# XVII Inferno: paredes que esmagam. `prensa` de assinatura -- e é a
+	# única região onde o `fogo` volta com tudo desde o Castelo (nível 30).
+	16: ["prensa", "fogo", "guilhotinas", "serras", "espinhos", "crossfire",
+		"pedras", "quebra", "portal", "alavanca", "segredo"],
+	# XVIII O Vazio: nada é permanente. `elevador` de assinatura -- o chão
+	# que aparece e desaparece. Pool curta de propósito: a região tem de
+	# se sentir VAZIA, e uma pool grande enche a jornada de coisas.
+	17: ["elevador", "gravidade", "portal", "espelhos", "saltos", "quebra",
+		"alavanca", "segredo"],
+	# XIX Guerra dos Reinos: cerco. `pedras` de assinatura (o que as
+	# catapultas mandam) mais tudo o que fere -- é a região mais densa.
+	18: ["pedras", "crossfire", "espinhos", "serras", "guilhotinas", "prensa",
+		"fogo", "correntes", "ferry", "portal", "alavanca", "segredo"],
+	# XX O Ultimo Caminho: `velas` de assinatura -- acender uma luz para o
+	# caminho aparecer é a imagem da região inteira (são memórias).
+	19: ["velas", "sinos", "espelhos", "saltos", "trampolim", "gruta",
+		"ritmo", "portal", "alavanca", "segredo"],
 }
 
 ## `_dif` mínimo para cada tipo de câmara entrar na pool. Assim o Nível 1
@@ -218,6 +239,10 @@ const ASSINATURA := {
 	13: "portal",      # Reino dos Sonhos -- entra aqui, sai ali
 	14: "sinos",       # Cidade dos Mortos -- a ponte fantasma
 	15: "ritmo",       # Mar Vermelho -- a mare
+	16: "prensa",      # Inferno -- as paredes que esmagam
+	17: "elevador",    # O Vazio -- o chao que aparece e desaparece
+	18: "pedras",      # Guerra dos Reinos -- o cerco
+	19: "velas",       # O Ultimo Caminho -- acender a memoria
 }
 
 ## Toque de assinatura do NÍVEL (a gimmick do `docs/niveis.md`) espalhado
@@ -345,6 +370,30 @@ const PERFIL := [
 	{"v": 0, "f": "maquina", "a": 1.1},   # 77 Navio da Condenacao -- conves
 	{"v": 1, "f": "vertical", "a": 1.0},  # 78 Fortaleza Kraken
 	{"v": -1, "f": "combate", "a": 0.85}, # 79 Coracao Vermelho -- por dentro
+	# --- Regiao XVII  Inferno (80-84) ----------------------------------
+	{"v": 0, "f": "gauntlet", "a": 1.0},  # 80 Portao Infernal
+	{"v": 0, "f": "combate", "a": 1.1},   # 81 Cidade dos Demonios
+	{"v": -1, "f": "maquina", "a": 1.05}, # 82 Rio das Almas -- correntes
+	{"v": 1, "f": "combate", "a": 0.9},   # 83 Palacio de Sangue
+	{"v": 0, "f": "gauntlet", "a": 0.85}, # 84 Trono Infernal
+	# --- Regiao XVIII  O Vazio (85-89) : nada e' permanente ------------
+	{"v": 1, "f": "salto", "a": 1.4},     # 85 Primeiro Vazio -- vaos enormes
+	{"v": -1, "f": "salto", "a": 1.35},   # 86 Segundo Vazio
+	{"v": 0, "f": "maquina", "a": 0.7},   # 87 Labirinto Impossivel -- apertado
+	{"v": 1, "f": "salto", "a": 1.3},     # 88 A Coisa Atras do Mundo
+	{"v": -1, "f": "combate", "a": 0.9},  # 89 Centro do Vazio
+	# --- Regiao XIX  Guerra dos Reinos (90-94) : cerco -----------------
+	{"v": 0, "f": "gauntlet", "a": 1.35}, # 90 Campo de Batalha -- o mais aberto
+	{"v": 1, "f": "salto", "a": 1.2},     # 91 Ceu em Guerra
+	{"v": 1, "f": "vertical", "a": 1.05}, # 92 Cerco ao Castelo -- muralha
+	{"v": 1, "f": "vertical", "a": 1.1},  # 93 Torre da Corrupcao
+	{"v": 0, "f": "combate", "a": 0.8},   # 94 Os Cem Guerreiros -- resistencia
+	# --- Regiao XX  O Ultimo Caminho (95-99) : memorias ----------------
+	{"v": 0, "f": "salto", "a": 1.1},     # 95 O Reino Antes da Corrupcao
+	{"v": 1, "f": "vertical", "a": 1.0},  # 96 O Primeiro Castelo
+	{"v": -1, "f": "combate", "a": 0.85}, # 97 O Coracao de Zeriko
+	{"v": 1, "f": "salto", "a": 1.25},    # 98 O Fim de Tudo -- tudo a cair
+	{"v": 0, "f": "combate", "a": 0.7},   # 99 O Ultimo Salto -- so' os dois
 ]
 
 ## Que câmaras conta cada foco. Cruzado depois com região+tier em
@@ -1068,6 +1117,10 @@ const ESP_REGIAO := {
 	13: ["abobora", "wogol", "gosma", "mushroom", "olho"],
 	14: ["esqueleto", "necromante", "wogol", "chort", "abobora"],
 	15: ["lodo", "gosma", "raptor", "esqueleto", "olho"],
+	16: ["imp", "chort", "demonio_grande", "wogol", "ogro"],
+	17: ["gosma", "olho", "wogol", "xamane", "lodo"],
+	18: ["orc", "ogro", "abutre", "necromante", "esqueleto"],
+	19: ["goblin", "esqueleto", "chort", "demonio_grande", "olho"],
 }
 
 ## A "cara" de cada NÍVEL (pedido do Paulo: não repetir o mesmo monstro em
@@ -1091,6 +1144,10 @@ const ESP_ASSINATURA := [
 	"abobora", "wogol", "gosma", "mushroom", "olho",               # XIV Reino dos Sonhos
 	"esqueleto", "necromante", "wogol", "chort", "abobora",        # XV Cidade dos Mortos
 	"lodo", "raptor", "esqueleto", "gosma", "olho",                # XVI Mar Vermelho
+	"imp", "chort", "wogol", "demonio_grande", "ogro",             # XVII Inferno
+	"gosma", "olho", "wogol", "xamane", "lodo",                    # XVIII O Vazio
+	"orc", "abutre", "ogro", "necromante", "esqueleto",            # XIX Guerra dos Reinos
+	"goblin", "esqueleto", "chort", "demonio_grande", "olho",      # XX O Ultimo Caminho
 ]
 
 

@@ -111,6 +111,30 @@ const CHEFE_KEY: Array[String] = [
 	"guard.almirante_morto",    # 77 Navio da Condenacao
 	"guard.tentaculo",          # 78 Fortaleza Kraken
 	"boss.o_mar",               # 79 Coracao Vermelho
+	# --- Regiao XVII  Inferno ---
+	"guard.sentinela_inferno",  # 80 Portao Infernal
+	"guard.duque_infernal",     # 81 Cidade dos Demonios
+	"guard.barqueiro",          # 82 Rio das Almas
+	"guard.princesa_demonio",   # 83 Palacio de Sangue
+	"boss.rei_demonios",        # 84 Trono Infernal
+	# --- Regiao XVIII  O Vazio ---
+	"guard.sombra",             # 85 Primeiro Vazio
+	"guard.nada",               # 86 Segundo Vazio
+	"guard.paradoxo",           # 87 Labirinto Impossivel
+	"guard.observador",         # 88 A Coisa Atras do Mundo
+	"boss.entidade",            # 89 Centro do Vazio
+	# --- Regiao XIX  Guerra dos Reinos ---
+	"guard.general_caos",       # 90 Campo de Batalha
+	"guard.dragao_primordial",  # 91 Ceu em Guerra
+	"guard.ultimo_cavaleiro",   # 92 Cerco ao Castelo
+	"guard.arauto_final",       # 93 Torre da Corrupcao
+	"boss.campeao",             # 94 Os Cem Guerreiros
+	# --- Regiao XX  O Ultimo Caminho (quatro chefes: e' o final) ---
+	"guard.zeriko_jovem",       # 95 O Reino Antes da Corrupcao
+	"boss.primeiro_rei",        # 96 O Primeiro Castelo
+	"boss.zeriko_absoluto",     # 97 O Coracao de Zeriko
+	"boss.entidade_purpura",    # 98 O Fim de Tudo
+	"boss.zeriko_homem",        # 99 O Ultimo Salto
 ]
 
 
