@@ -3,6 +3,17 @@
 
     python tools/gerar_audio.py
 
+⚠ 3 set 2026: a maioria dos SFX de combate/mobs (ataque, acerto, dano,
+investida, grito, chefe_cai, chama, gelo, raio, etc.) foi TROCADA por
+samples CC0 reais do OpenGameArt (ver `assets/audio/CREDITS.md` e
+`scripts/som.gd`) -- pedido do Paulo para soar menos "arcade". Este tool
+continua a existir e a funcionar, mas **não corras estas funções por cima
+dos ficheiros novos**: `scripts/som.gd` aponta para `.ogg`/`.mp3` nesses
+casos, por isso escrever o `.wav` antigo aqui só cria um ficheiro órfão
+(inofensivo, mas lixo). Só continuam a vir daqui: `game_over.wav`,
+`menu.wav`, `boss.wav`, `assombracao.wav` (camas/vozes, sem equivalente
+real ainda encontrado).
+
   - game_over.wav       voz de "GAME OVER" estilo speaker de arcada (síntese
                         de formantes, grave, com grão e cauda de reverb)
   - menu.wav            tema do menu inicial: lento, pad + melodia esparsa
