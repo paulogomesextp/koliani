@@ -434,7 +434,7 @@ func _aplicar_visual_armadura() -> void:
 	var base := Equipamento.cor_armadura(ai)
 	var esc := base.darkened(0.34)
 	var clr := base.lerp(Color.WHITE, 0.45)
-	var t := float(ai) / 14.0
+	var t := float(ai) / 9.0   # 10 armaduras (era 15)
 	_pinta(_armadura.get_node_or_null("Peito"), Color(base.r, base.g, base.b, 0.93))
 	_pinta(_armadura.get_node_or_null("OmbroEsq"), Color(clr.r, clr.g, clr.b, 0.96))
 	_pinta(_armadura.get_node_or_null("OmbroDir"), Color(clr.r, clr.g, clr.b, 0.96))

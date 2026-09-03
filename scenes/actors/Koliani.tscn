@@ -97,7 +97,7 @@ position = Vector2(11, 1)
 offset = Vector2(10, -10)
 scale = Vector2(0.8, 0.8)
 texture = ExtResource("5_armas")
-hframes = 15
+hframes = 20
 visible = false
 
 [node name="LuzLamina" type="PointLight2D" parent="Sprite"]
