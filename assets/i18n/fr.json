@@ -324,5 +324,15 @@
 	"guard.gosma_salgada": "Vase Saumâtre",
 	"guard.estatua_viva": "Statue Vivante",
 	"guard.lodo_abissal": "Boue Abyssale",
-	"boss.mae_do_abismo": "La Mère de l'Abîme"
+	"boss.mae_do_abismo": "La Mère de l'Abîme",
+	"level.n40": "Forêt Gelée",
+	"level.n41": "Montagne des Vents",
+	"level.n42": "Cavernes de Cristal",
+	"level.n43": "Château Gelé",
+	"level.n44": "Cœur de l'Hiver",
+	"guard.cao_de_gelo": "Molosse de Givre",
+	"guard.abutre_ventania": "Vautour des Bourrasques",
+	"guard.besouro_cristal": "Scarabée de Cristal",
+	"guard.sentinela_gelada": "Sentinelle Gelée",
+	"boss.ymiria": "Ymiria, la Déesse de l'Hiver"
 }

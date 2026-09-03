@@ -87,6 +87,21 @@ NIVEIS = [
     # (docs/plano_niveis_31_100.md)
     ("Abismo_Oceanico", 39, "catacumbas", "chefe", 3, 720, (0.26, 0.70, 1.00),
      "horror", "Fundo do mar, quase sem luz. A Mae do Abismo."),
+    # --- IX  REINO DO GELO (41-45) -- o branco depois do azul-tinta ------
+    # A VIII era funda e escura; esta e' o contrario: neve, muita luz e
+    # pouca cor. E' a primeira regiao CLARA do jogo -- depois de trinta e
+    # cinco niveis de noite, a mudanca sente-se so' por isso.
+    ("Floresta_Congelada", 40, "torres", "guardiao", 0, 560, (0.72, 0.94, 1.00),
+     "mastim", "Mata gelada, chao escorregadio. Guardiao: um cao de gelo."),
+    ("Montanha_dos_Ventos", 41, "torres", "guardiao", 0, 600, (0.80, 0.96, 1.00),
+     "abutre", "Subida a pique com vento. Guardiao: o abutre da ventania."),
+    ("Cavernas_Cristalinas", 42, "catacumbas", "guardiao", 0, 640, (0.66, 0.90, 1.00),
+     "besouro", "Cristais como plataformas. Guardiao: um besouro de cristal."),
+    ("Castelo_Congelado", 43, "castelo", "guardiao", 0, 680, (0.86, 0.98, 1.00),
+     "esqueleto", "Castelo parado no tempo. Guardiao: uma sentinela gelada."),
+    # o CHEFE da regiao: Ymiria, a Deusa do Inverno
+    ("Coracao_do_Inverno", 44, "torres", "chefe", 4, 800, (0.62, 0.88, 1.00),
+     "sacerdotisa_gelo", "Centro da montanha. Ymiria, a Deusa do Inverno."),
 ]
 
 MODELO_CHEFE = '''[gd_scene load_steps=8 format=3 uid="uid://bkoliani{uid}"]
@@ -251,6 +266,11 @@ TITULOS = {
     "Palacio_das_Sereias_Mortas": "Palacio das Sereias Mortas",
     "Ossario_das_Baleias": "Ossario das Baleias",
     "Abismo_Oceanico": "Abismo Oceanico",
+    "Floresta_Congelada": "Floresta Congelada",
+    "Montanha_dos_Ventos": "Montanha dos Ventos",
+    "Cavernas_Cristalinas": "Cavernas Cristalinas",
+    "Castelo_Congelado": "Castelo Congelado",
+    "Coracao_do_Inverno": "Coracao do Inverno",
 }
 
 # Liquido mortal da arena do chefe, por REGIAO (indice0 // 5). Sem isto o
@@ -259,6 +279,7 @@ TITULOS = {
 LIQUIDO_REGIAO = {
     6: ((0.74, 0.28, 0.05, 0.95), "true"),    # VII magma vivo
     7: ((0.03, 0.10, 0.16, 0.96), "false"),   # VIII agua negra do abismo
+    8: ((0.30, 0.52, 0.66, 0.92), "false"),   # IX agua gelada por baixo do gelo
 }
 
 

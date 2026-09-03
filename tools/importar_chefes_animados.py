@@ -295,6 +295,41 @@ RIGS = {
                     "hurt": "10_take_hit", "death": "11_death"},
         "fps": {"idle": 8.0, "walk": 12.0, "attack": 14.0, "hurt": 12.0, "death": 10.0},
     },
+    # --- chierit "Elementals", os gratuitos da serie (CC-BY 4.0) --------
+    # Cinco humanoides elementais no mesmo traco do Fire Knight e do Leaf
+    # Ranger que ja' ca' estavam. Servem as regioes de 41 em diante, onde
+    # cada tema (gelo, deserto, jardim, maquinas) pede um chefe proprio e
+    # nao ha' packs de chefe a mais para gastar.
+    "sacerdotisa_gelo": {
+        "base": "chierit/elementals-water-priestess/Elementals_water_priestess_FREE_v1.1/png",
+        "estados": {"idle": "01_idle", "walk": "02_walk", "attack": "07_1_atk",
+                    "hurt": "13_take_hit", "death": "14_death"},
+        "fps": {"idle": 8.0, "walk": 12.0, "attack": 14.0, "hurt": 12.0, "death": 12.0},
+    },
+    "cristal": {
+        "base": "chierit/elementals-crystal-mauler/Elementals_Crystal_Mauler_Free_v1.0/animations/PNG",
+        "estados": {"idle": "idle", "walk": "run", "attack": "1_atk",
+                    "hurt": "take_hit", "death": "death"},
+        "fps": {"idle": 8.0, "walk": 12.0, "attack": 13.0, "hurt": 12.0, "death": 10.0},
+    },
+    "assassino_vento": {
+        "base": "chierit/elementals-wind-hashashin/elementals_wind_hashashin_FREE_v1.1/PNG",
+        "estados": {"idle": "idle", "walk": "run", "attack": "1_atk",
+                    "hurt": "take_hit", "death": "death"},
+        "fps": {"idle": 8.0, "walk": 13.0, "attack": 16.0, "hurt": 12.0, "death": 10.0},
+    },
+    "lamina_metal": {
+        "base": "chierit/elementals-metal-bladekeeper/Elementals_metal_bladekeeper_FREE_v1.1/PNG animations",
+        "estados": {"idle": "01_idle", "walk": "02_run", "attack": "07_1_atk",
+                    "hurt": "12_take_hit", "death": "13_death"},
+        "fps": {"idle": 8.0, "walk": 12.0, "attack": 14.0, "hurt": 12.0, "death": 10.0},
+    },
+    "monge_terra": {
+        "base": "chierit/elementals-ground-monk/Elementals_ground_monk_FREE_v1.3/png",
+        "estados": {"idle": "idle", "walk": "run", "attack": "1_atk",
+                    "hurt": "take_hit", "death": "death"},
+        "fps": {"idle": 8.0, "walk": 12.0, "attack": 14.0, "hurt": 12.0, "death": 10.0},
+    },
 }
 
 

@@ -120,6 +120,18 @@ TABELA = [
     ("Palacio_das_Sereias_Mortas", "igreja",    (.82,.96,.96), (.03,.10,.13), (.06,.15,.18), (.52,.96,.92),  (.72,1.0,.96), 3.0, (.62,1.0,1.04), .36, .40, False),
     ("Ossario_das_Baleias",    "gruta",         (.86,.96,.92), (.04,.10,.11), (.07,.14,.15), (.64,.98,.90),  (.80,1.0,.92), 3.6, (.72,1.02,.98), .42, .46, False),
     ("Abismo_Oceanico",        "caverna",       (.62,.80,.98), (.01,.04,.10), (.02,.07,.14), (.26,.70,1.0),  (.44,.80,1.0), 4.4, (.36,.76,1.20), .54, .58, False),
+    # ---- IX  Reino do Gelo (41-45) ----------------------------------
+    # A PRIMEIRA regiao clara do jogo. Depois de trinta e cinco niveis de
+    # noite, o `amb` sobe para perto de 1 e o `des` sobe muito (a neve e'
+    # branca: tira-se quase toda a cor propria do pack antes de tintar).
+    # O po' denso faz de NEVE a cair. Horizonte apagado em todos menos no
+    # ultimo, onde um brilho frio no fundo faz de aurora.
+    # Packs: nenhum destes cinco e' usado pela VII nem pela VIII.
+    ("Floresta_Congelada",     "pantano",       (.84,.97,1.22), (.34,.42,.56), (.46,.54,.68), (.80,.96,1.0),  (.96,1.0,1.0), 4.6, (1.06,1.16,1.38), .22, .74, False),
+    ("Montanha_dos_Ventos",    "montanhas",     (.88,1.0,1.24), (.42,.50,.64), (.54,.62,.76), (.88,.98,1.0),  (1.0,1.0,1.0), 5.0, (1.12,1.20,1.36), .18, .70, False),
+    ("Cavernas_Cristalinas",   "prisao",        (.80,.95,1.24), (.26,.34,.50), (.36,.45,.62), (.72,.92,1.0),  (.90,.98,1.0), 4.2, (1.00,1.12,1.42), .26, .78, False),
+    ("Castelo_Congelado",      "castelo_velho", (.86,.99,1.26), (.38,.46,.60), (.50,.58,.72), (.92,1.0,1.0),  (1.0,1.0,1.0), 3.8, (1.10,1.18,1.34), .20, .72, False),
+    ("Coracao_do_Inverno",     "luar",          (.78,.93,1.26), (.22,.30,.48), (.32,.41,.60), (.70,.90,1.0),  (.92,.99,1.0), 5.2, (1.02,1.14,1.44), .28, .76, True),
 ]
 
 CHAVES = [

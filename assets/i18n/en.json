@@ -324,5 +324,15 @@
 	"guard.gosma_salgada": "Brine Ooze",
 	"guard.estatua_viva": "Living Statue",
 	"guard.lodo_abissal": "Abyssal Sludge",
-	"boss.mae_do_abismo": "The Mother of the Abyss"
+	"boss.mae_do_abismo": "The Mother of the Abyss",
+	"level.n40": "The Frozen Forest",
+	"level.n41": "Mountain of Winds",
+	"level.n42": "Crystal Caverns",
+	"level.n43": "The Frozen Castle",
+	"level.n44": "Heart of Winter",
+	"guard.cao_de_gelo": "Frost Hound",
+	"guard.abutre_ventania": "Gale Vulture",
+	"guard.besouro_cristal": "Crystal Beetle",
+	"guard.sentinela_gelada": "Frozen Sentinel",
+	"boss.ymiria": "Ymiria, Goddess of Winter"
 }

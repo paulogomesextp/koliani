@@ -58,6 +58,23 @@ recusa-se a tocar nos pagos). Crédito não é exigido — fica aqui à mesma.
 
 **chierit (chierit.itch.io)** — **CC-BY 4.0**, crédito OBRIGATÓRIO.
 
+Da série "Elementals" do chierit vieram mais cinco rigs (os gratuitos da
+série; os outros são pagos e ficaram de fora). Servem as regiões novas dos
+níveis 41-100, onde cada tema pede um chefe próprio e já não há packs de
+chefe a sobrar:
+
+| rig | pack | onde |
+| --- | --- | --- |
+| `sacerdotisa_gelo` | Elementals Water Priestess FREE | **Ymiria** (n45) |
+| `cristal` | Elementals Crystal Mauler FREE | reservado |
+| `assassino_vento` | Elementals Wind Hashashin FREE | reservado |
+| `lamina_metal` | Elementals Metal Bladekeeper FREE | reservado |
+| `monge_terra` | Elementals Ground Monk FREE | reservado |
+
+"Reservado" = está gerado e pronto, à espera da região que o pede
+(`docs/plano_niveis_31_100.md`). São ~40 KB cada; tê-los prontos faz de
+uma região nova um trabalho de tabela em vez de uma caça a packs.
+
 **Kronovi- (darkpixel-kronovi.itch.io)** — 4 packs gratuitos ("pay what
 you want", $0 aceite). Termos (iguais nas páginas dos packs): *"You are
 free to edit the sprite once you downloaded it and you can use it for

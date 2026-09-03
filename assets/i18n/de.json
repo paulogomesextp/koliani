@@ -324,5 +324,15 @@
 	"guard.gosma_salgada": "Salzschleim",
 	"guard.estatua_viva": "Lebende Statue",
 	"guard.lodo_abissal": "Abyssaler Schlamm",
-	"boss.mae_do_abismo": "Die Mutter des Abgrunds"
+	"boss.mae_do_abismo": "Die Mutter des Abgrunds",
+	"level.n40": "Gefrorener Wald",
+	"level.n41": "Berg der Winde",
+	"level.n42": "Kristallhöhlen",
+	"level.n43": "Gefrorenes Schloss",
+	"level.n44": "Herz des Winters",
+	"guard.cao_de_gelo": "Frosthund",
+	"guard.abutre_ventania": "Sturmgeier",
+	"guard.besouro_cristal": "Kristallkäfer",
+	"guard.sentinela_gelada": "Gefrorene Wache",
+	"boss.ymiria": "Ymiria, die Göttin des Winters"
 }

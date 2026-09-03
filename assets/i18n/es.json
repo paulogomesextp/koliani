@@ -324,5 +324,15 @@
 	"guard.gosma_salgada": "Limo Salino",
 	"guard.estatua_viva": "Estatua Viviente",
 	"guard.lodo_abissal": "Fango Abisal",
-	"boss.mae_do_abismo": "La Madre del Abismo"
+	"boss.mae_do_abismo": "La Madre del Abismo",
+	"level.n40": "Bosque Congelado",
+	"level.n41": "Montaña de los Vientos",
+	"level.n42": "Cavernas de Cristal",
+	"level.n43": "Castillo Congelado",
+	"level.n44": "Corazón del Invierno",
+	"guard.cao_de_gelo": "Sabueso de Hielo",
+	"guard.abutre_ventania": "Buitre del Vendaval",
+	"guard.besouro_cristal": "Escarabajo de Cristal",
+	"guard.sentinela_gelada": "Centinela Helado",
+	"boss.ymiria": "Ymiria, la Diosa del Invierno"
 }

@@ -324,5 +324,15 @@
 	"guard.gosma_salgada": "Gosma Salgada",
 	"guard.estatua_viva": "Estátua Viva",
 	"guard.lodo_abissal": "Lodo Abissal",
-	"boss.mae_do_abismo": "A Mãe do Abismo"
+	"boss.mae_do_abismo": "A Mãe do Abismo",
+	"level.n40": "Floresta Congelada",
+	"level.n41": "Montanha dos Ventos",
+	"level.n42": "Cavernas Cristalinas",
+	"level.n43": "Castelo Congelado",
+	"level.n44": "Coração do Inverno",
+	"guard.cao_de_gelo": "Cão de Gelo",
+	"guard.abutre_ventania": "Abutre da Ventania",
+	"guard.besouro_cristal": "Besouro de Cristal",
+	"guard.sentinela_gelada": "Sentinela Gelada",
+	"boss.ymiria": "Ymiria, a Deusa do Inverno"
 }

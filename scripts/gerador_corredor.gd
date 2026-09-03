@@ -83,6 +83,7 @@ const LIQUIDO := {
 	# --- niveis 31-100 (docs/plano_niveis_31_100.md) ---------------------
 	6: [Color(0.74, 0.28, 0.05, 0.95), true],    # VII magma vivo das Terras Queimadas
 	7: [Color(0.03, 0.10, 0.16, 0.96), false],   # VIII agua negra do Mar dos Mortos
+	8: [Color(0.30, 0.52, 0.66, 0.92), false],   # IX agua gelada por baixo do gelo
 }
 
 ## Tipos de "flavour" de câmara (o que se semeia à volta da espinha).
@@ -110,6 +111,11 @@ const POOL_REGIAO := {
 	7: ["gravidade", "ferry", "ritmo", "impulso", "trampolim", "elevador",
 		"correntes", "crossfire", "portal", "pendulos", "vento", "alavanca",
 		"segredo"],
+	# IX Reino do Gelo: o gelo PARTE-SE e o vento EMPURRA. `espelhos` é a
+	# assinatura -- os cristais das cavernas -- e `pedras` são estalactites
+	# de gelo a cair. Sem `fogo` (não há nada a arder numa montanha de neve).
+	8: ["vento", "quebra", "espelhos", "pedras", "saltos", "trampolim",
+		"elevador", "espinhos", "crossfire", "portal", "alavanca", "segredo"],
 }
 
 ## `_dif` mínimo para cada tipo de câmara entrar na pool. Assim o Nível 1
@@ -164,6 +170,7 @@ const ASSINATURA := {
 	5: "fogo",         # Castelo -- lava
 	6: "quebra",       # Terras Queimadas -- a madeira arde e cede
 	7: "gravidade",    # Mar dos Mortos -- tudo flutua
+	8: "espelhos",     # Reino do Gelo -- os cristais
 }
 
 ## Toque de assinatura do NÍVEL (a gimmick do `docs/niveis.md`) espalhado
@@ -243,6 +250,12 @@ const PERFIL := [
 	{"v": 0, "f": "maquina", "a": 0.95},  # 37 Palacio das Sereias -- a agua sobe e desce
 	{"v": -1, "f": "combate", "a": 0.85}, # 38 Ossario das Baleias -- caverna de ossos
 	{"v": 1, "f": "vertical", "a": 1.0},  # 39 Abismo Oceanico -- descida ao escuro
+	# --- Regiao IX  Reino do Gelo (40-44) : o chao parte-se -------------
+	{"v": 0, "f": "gauntlet", "a": 1.05}, # 40 Floresta Congelada -- mata gelada
+	{"v": 1, "f": "vertical", "a": 1.2},  # 41 Montanha dos Ventos -- subida a pique
+	{"v": -1, "f": "salto", "a": 0.9},    # 42 Cavernas Cristalinas -- cristais
+	{"v": 0, "f": "combate", "a": 1.0},   # 43 Castelo Congelado -- parado no tempo
+	{"v": 1, "f": "maquina", "a": 1.1},   # 44 Coracao do Inverno -- a montanha por dentro
 ]
 
 ## Que câmaras conta cada foco. Cruzado depois com região+tier em
@@ -958,6 +971,7 @@ const ESP_REGIAO := {
 	5: ["demonio_grande", "ogro", "chort", "olho", "raptor"],
 	6: ["imp", "chort", "demonio_grande", "abobora", "mastim"],
 	7: ["esqueleto", "gosma", "lodo", "wogol", "olho"],
+	8: ["mastim", "abutre", "besouro", "esqueleto", "raptor"],
 }
 
 ## A "cara" de cada NÍVEL (pedido do Paulo: não repetir o mesmo monstro em
@@ -973,6 +987,7 @@ const ESP_ASSINATURA := [
 	"demonio_grande", "chort", "raptor", "ogro", "olho",           # VI Castelo
 	"imp", "chort", "mastim", "abobora", "demonio_grande",         # VII Terras Queimadas
 	"esqueleto", "gosma", "olho", "lodo", "wogol",                 # VIII Mar dos Mortos
+	"mastim", "abutre", "besouro", "esqueleto", "raptor",          # IX Reino do Gelo
 ]
 
 
