@@ -1,0 +1,93 @@
+{
+ "ceifeiro": {
+  "w": 280,
+  "h": 170,
+  "pes_y": 170,
+  "estados": {
+   "idle": 8,
+   "walk": 8,
+   "attack": 10,
+   "hurt": 3,
+   "death": 10
+  },
+  "fps": {
+   "idle": 8.0,
+   "walk": 10.0,
+   "attack": 14.0,
+   "hurt": 12.0,
+   "death": 10.0
+  }
+ },
+ "demonio_lodo": {
+  "w": 220,
+  "h": 130,
+  "pes_y": 130,
+  "estados": {
+   "idle": 6,
+   "walk": 12,
+   "attack": 15,
+   "hurt": 5,
+   "death": 22
+  },
+  "fps": {
+   "idle": 8.0,
+   "walk": 12.0,
+   "attack": 16.0,
+   "hurt": 12.0,
+   "death": 14.0
+  }
+ },
+ "guardiao_gelo": {
+  "w": 224,
+  "h": 117,
+  "pes_y": 113,
+  "estados": {
+   "idle": 6,
+   "walk": 10,
+   "attack": 14,
+   "hurt": 7,
+   "death": 16
+  },
+  "fps": {
+   "idle": 8.0,
+   "walk": 11.0,
+   "attack": 15.0,
+   "hurt": 12.0,
+   "death": 12.0
+  }
+ },
+ "minotauro": {
+  "w": 212,
+  "h": 126,
+  "pes_y": 123,
+  "estados": {
+   "idle": 16,
+   "walk": 12,
+   "attack": 16
+  },
+  "fps": {
+   "idle": 10.0,
+   "walk": 12.0,
+   "attack": 16.0
+  }
+ },
+ "feiticeiro": {
+  "w": 174,
+  "h": 152,
+  "pes_y": 152,
+  "estados": {
+   "idle": 8,
+   "walk": 8,
+   "attack": 8,
+   "hurt": 3,
+   "death": 7
+  },
+  "fps": {
+   "idle": 8.0,
+   "walk": 12.0,
+   "attack": 14.0,
+   "hurt": 12.0,
+   "death": 10.0
+  }
+ }
+}

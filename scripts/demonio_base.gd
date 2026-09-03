@@ -309,6 +309,14 @@ func _ready() -> void:
 		_montar_elite()
 
 
+## Altura a que o corpo opaco deve ficar. Os chefes reescrevem-na (ver
+## `ChefeBase.ALTURA_ALVO_CHEFE`): um chefe com 48 px lia-se como um bicho
+## comum, e a normalização foi feita justamente para os bichos comuns
+## ficarem todos do mesmo tamanho.
+func _altura_alvo() -> float:
+	return ALTURA_ALVO_INIMIGO * (0.86 if especie in ESPECIES_VOAM else 1.0)
+
+
 ## Espécies que voam -- não se alinham os pés ao chão.
 const ESPECIES_VOAM := ["olho", "abutre"]
 
@@ -334,8 +342,8 @@ func _normalizar_escala() -> void:
 	var r := img.get_used_rect()
 	if r.size.y <= 4:
 		return
-	var alvo := ALTURA_ALVO_INIMIGO * (0.86 if especie in ESPECIES_VOAM else 1.0)
-	var k := clampf(alvo / float(r.size.y), 0.25, 2.2)
+	var alvo := _altura_alvo()
+	var k := clampf(alvo / float(r.size.y), 0.25, 3.2)
 	_anim.scale = Vector2(k, k)
 
 ## Alinha os PÉS do sprite com a linha de chão da colisão. Mede os pixels
@@ -433,7 +441,7 @@ func _process(dt: float) -> void:
 func _atualizar_anim() -> void:
 	if _morto:
 		return
-	if _anim.animation == "hit" and _anim.is_playing():
+	if _anim.animation in ["hit", "attack"] and _anim.is_playing():
 		return
 	var alvo := "run" if absf(velocity.x) > 6.0 else "idle"
 	if _anim.animation != alvo:

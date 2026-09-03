@@ -44,6 +44,13 @@ textura = ExtResource("2_tex")
 texture = ExtResource("2_tex")
 material = SubResource("mat_g")
 
+; RIG ANIMADO: fica vazio e escondido; o `ChefeBase._montar_rig` enche-o a
+; partir de `bosses_anim/<rig>` quando a cena que instancia poe `rig`.
+; Sem `rig`, e' o `Corpo` acima que se ve' (folha estatica de 4 poses).
+[node name="Anim" type="AnimatedSprite2D" parent="Sprite"]
+visible = false
+texture_filter = 1
+
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("rs_body")
 

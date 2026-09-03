@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://bkolianiriodemagma32"]
+[gd_scene load_steps=8 format=3 uid="uid://bkolianiriodemagma32"]
 
 ; REGIAO 7 / nivel 32 -- Rio de Magma.
 ; Rio de lava e pedra vulcanica. Magmora, serpente de magma.
@@ -17,7 +17,6 @@
 [ext_resource type="PackedScene" uid="uid://bkolianiatmosfera01" path="res://scenes/fx/Atmosfera.tscn" id="6_atm"]
 [ext_resource type="PackedScene" uid="uid://bkolianiplataforma01" path="res://scenes/actors/Plataforma.tscn" id="7_pl"]
 [ext_resource type="PackedScene" uid="uid://bkolianiaguavenenosa01" path="res://scenes/actors/AguaVenenosa.tscn" id="8_liq"]
-[ext_resource type="Texture2D" path="res://assets/sprites/pixel/bosses/naga.png" id="9_tex"]
 
 [sub_resource type="RectangleShape2D" id="rs_chk"]
 size = Vector2(44, 96)
@@ -26,20 +25,8 @@ size = Vector2(44, 96)
 script = ExtResource("5_niv")
 
 [node name="Atmosfera" parent="." instance=ExtResource("6_atm")]
-cor_ambiente = Color(1, 0.8, 0.66, 1)
-cor_fundo = Color(0.19, 0.05, 0.02, 1)
-cor_silhueta = Color(0.24, 0.08, 0.03, 1)
-cor_luz = Color(1, 0.42, 0.1, 1)
-cor_poeira = Color(1, 0.58, 0.22, 1)
-densidade_poeira = 3.4
 bioma = "catacumbas"
 largura_nivel = 1800.0
-fundo_pack = "caverna"
-tinta_fundo = Color(1.26, 0.58, 0.34, 1)
-neblina_fundo = 0.3
-dessaturar_fundo = 0.56
-seed_ambiente = 2147
-luzes_horizonte = true
 
 [node name="LiquidoMortal" parent="." instance=ExtResource("8_liq")]
 position = Vector2(700, 980)
@@ -58,7 +45,7 @@ position = Vector2(1020, 616)
 arquetipo = 0
 vida = 500
 cor_rim = Color(1.0, 0.36, 0.1, 1)
-textura = ExtResource("9_tex")
+rig = "demonio_lodo"
 investidas_seguidas = 2
 dur_recupera = 0.7
 

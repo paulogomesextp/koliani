@@ -11,6 +11,33 @@ extends DemonioBase
 
 signal derrotado
 
+## --- RIG ANIMADO (3 set 2026) ----------------------------------------
+## Até aqui NENHUM chefe animava. O `tools/extrair_chefes_packs.gd` monta
+## uma folha de quatro frames que são POSES -- normal / alternativa / a
+## piscar / núcleo à mostra -- e o chefe salta entre elas. Ao lado de uma
+## Koliani com 18 estados e de inimigos comuns já animados (o `_anim` do
+## `DemonioBase`), os chefes liam-se como bonecos parados.
+##
+## Pôr aqui o nome de um rig de `assets/sprites/pixel/bosses_anim/rigs.json`
+## (feito por `tools/importar_chefes_animados.py`) liga a animação a sério.
+## Vazio = folha estática de sempre, portanto os chefes que ainda não têm
+## rig não mudam absolutamente nada.
+@export var rig := ""
+
+const DIR_RIGS := "res://assets/sprites/pixel/bosses_anim"
+## Nome do estado no pack -> nome que o `DemonioBase._atualizar_anim` usa.
+const ESTADO_ANIM := {
+	"idle": "idle", "walk": "run", "hurt": "hit", "death": "dead",
+	"attack": "attack",
+}
+## Altura do corpo do chefe no ecrã, antes de `escala_visual` (~1.3), que
+## o multiplica. Os bichos comuns vão a 48 e a Koliani mede ~40: a 82 o
+## chefe saía com 1,4x a Koliani e no ecrã não se lia como chefe, lia-se
+## como um inimigo grande. A 100 fica com ~2x.
+const ALTURA_ALVO_CHEFE := 100.0
+
+static var _cache_rigs: Dictionary = {}
+
 ## Escala visual do chefe (o `Sprite` inteiro, incluindo o `Nucleo`). Cada
 ## `Chefe*.tscn` põe a sua -- dá variedade de tamanho entre chefes e faz
 ## todos ficarem maiores que a Koliani. NÃO mexe na `AreaContacto`.
@@ -69,8 +96,90 @@ func _e_chefe() -> bool:
 	return true
 
 
+func _altura_alvo() -> float:
+	return ALTURA_ALVO_CHEFE
+
+
+## Catálogo dos rigs (`rigs.json`), lido uma vez por sessão.
+static func _rigs() -> Dictionary:
+	if _cache_rigs.is_empty():
+		var cam := "%s/rigs.json" % DIR_RIGS
+		if FileAccess.file_exists(cam):
+			var d: Variant = JSON.parse_string(FileAccess.get_file_as_string(cam))
+			if d is Dictionary:
+				_cache_rigs = d
+		if _cache_rigs.is_empty():
+			_cache_rigs = {"_": {}}    # marca como "já tentei"
+	return _cache_rigs
+
+
+## Monta os `SpriteFrames` do rig no nó `Sprite/Anim` e esconde a folha
+## estática. Sem `rig`, sem nó `Anim` ou sem entrada no catálogo, não toca
+## em nada -- o chefe continua exactamente como estava.
+func _montar_rig() -> void:
+	if rig == "":
+		return
+	var anim := get_node_or_null("Sprite/Anim") as AnimatedSprite2D
+	if anim == null:
+		push_warning("chefe com rig '%s' mas sem nó Sprite/Anim" % rig)
+		return
+	var cfg: Variant = _rigs().get(rig, null)
+	if not (cfg is Dictionary):
+		push_warning("rig de chefe desconhecido: '%s'" % rig)
+		return
+	var estados: Dictionary = (cfg as Dictionary).get("estados", {})
+	var fps: Dictionary = (cfg as Dictionary).get("fps", {})
+	var sf := SpriteFrames.new()
+	sf.remove_animation("default")
+	for estado: String in estados:
+		var tex: Texture2D = load("%s/%s/%s.png" % [DIR_RIGS, rig, estado])
+		if tex == null:
+			continue
+		var nome: String = ESTADO_ANIM.get(estado, estado)
+		# idle/run em ciclo; ataque, dano e morte tocam uma vez
+		_add_tira(sf, nome, tex, int(estados[estado]),
+			float(fps.get(estado, 10.0)), nome in ["idle", "run"])
+	# packs incompletos (o Minotauro grátis não traz dano nem morte): em vez
+	# de deixar o chefe preso num frame, o estado em falta reusa o idle
+	if sf.has_animation("idle"):
+		for falta: String in ["run", "hit", "dead", "attack"]:
+			if sf.has_animation(falta):
+				continue
+			sf.add_animation(falta)
+			sf.set_animation_speed(falta, 8.0)
+			sf.set_animation_loop(falta, true)
+			for i in sf.get_frame_count("idle"):
+				sf.add_frame(falta, sf.get_frame_texture("idle", i))
+	anim.sprite_frames = sf
+	anim.visible = true
+	var corpo := get_node_or_null("Sprite/Corpo") as Sprite2D
+	if corpo:
+		corpo.visible = false
+		# o rim/flash vivia no material da folha estática -- passa para o rig
+		if corpo.material is ShaderMaterial:
+			anim.material = (corpo.material as ShaderMaterial).duplicate()
+
+
+## Toca a animação de ataque, se o rig a tiver. Os chefes com máquina de
+## estados própria chamam isto no momento do golpe.
+func atacar_anim() -> void:
+	var anim := get_node_or_null("Sprite/Anim") as AnimatedSprite2D
+	if anim and anim.sprite_frames and anim.sprite_frames.has_animation("attack"):
+		anim.play("attack")
+
+
 func _ready() -> void:
+	# ANTES do super: o `DemonioBase._ready` chama `_montar_frames`, que só
+	# não faz nada se os `sprite_frames` já lá estiverem.
+	_montar_rig()
 	super._ready()
+	# `DemonioBase._ready` aponta o `_mat` (flash de dano, cor do rim) ao
+	# material da folha estática -- que o rig acabou de esconder. Sem isto
+	# o chefe animado deixava de piscar ao levar dano.
+	var _a := get_node_or_null("Sprite/Anim") as AnimatedSprite2D
+	if rig != "" and _a and _a.material is ShaderMaterial:
+		_mat = _a.material
+		_mat.set_shader_parameter("rim_cor", cor_rim)
 	add_to_group("chefes")
 	# Sem escudos, os chefes levam dano o tempo todo -> batem MUITO mais
 	# forte ao contacto (x1.4 no N1 -> x2.8 no N30). A vida-base sai de
@@ -392,6 +501,9 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0, critico := false) 
 			soltar_estilhacos()
 			queue_free()
 	else:
+		var anim := get_node_or_null("Sprite/Anim") as AnimatedSprite2D
+		if anim and anim.sprite_frames and anim.sprite_frames.has_animation("hit"):
+			anim.play("hit")
 		piscar_dano()
 
 

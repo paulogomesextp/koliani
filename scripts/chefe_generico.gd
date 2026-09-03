@@ -237,6 +237,7 @@ func _durante_acao(dt: float, g: float) -> void:
 
 
 func _agir() -> void:
+	atacar_anim()          # se o chefe tiver rig, é agora que ele golpeia
 	match arquetipo:
 		Arquetipo.INVESTIDA:
 			_ataque_forte = 0.45          # o contacto magoa mais na investida
@@ -314,7 +315,9 @@ func _onda_de_choque() -> void:
 
 func _invocar() -> void:
 	Som.toca("invocar", -7.0)
-	_lacaios = _lacaios.filter(func(n: Node) -> bool: return is_instance_valid(n))
+	# `filter()` devolve um `Array` sem tipo -- atribui-lo a um `Array[Node]`
+	# rebenta em runtime ("Trying to assign an array of type Array").
+	_lacaios.assign(_lacaios.filter(func(n: Node) -> bool: return is_instance_valid(n)))
 	var pai := get_parent()
 	if pai == null:
 		return

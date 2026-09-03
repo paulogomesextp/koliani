@@ -42,23 +42,27 @@ DEST = os.path.join(RAIZ, "scenes", "levels")
 #               identidade vem da tinta/luz do `afinar_atmosfera.py`.
 #   arquetipo-- indice em `ChefeGenerico.Arquetipo`:
 #               0 INVESTIDA  1 ATIRADOR  2 SALTADOR  3 INVOCADOR  4 FEIXE
-#   sprite   -- arte emprestada de um dos 29 chefes de 1-30 (placeholder
-#               assumido: os 70 chefes novos nao tem arte)
+#   rig      -- rig ANIMADO de `bosses_anim/rigs.json`
+#               (`tools/importar_chefes_animados.py`). Ate' 3 set 2026
+#               nenhum chefe do jogo animava: a folha antiga sao quatro
+#               POSES, nao uma animacao. So' ha' cinco rigs -- os packs
+#               gratuitos que estavam no repo -- portanto a regiao VII usa
+#               os cinco e as regioes seguintes precisam de packs novos.
 NIVEIS = [
     # --- VII  TERRAS QUEIMADAS (31-35) -- a magia purpura queima o reino --
     ("Estrada_das_Cinzas", 30, "floresta", 0, 460, (1.0, 0.45, 0.15),
-     "ignivar", "Floresta a arder: o chao cede. Vulkar, o Cavaleiro das Cinzas."),
+     "ceifeiro", "Floresta a arder: o chao cede. Vulkar, o Cavaleiro das Cinzas."),
     ("Rio_de_Magma", 31, "catacumbas", 0, 500, (1.0, 0.36, 0.10),
-     "naga", "Rio de lava e pedra vulcanica. Magmora, serpente de magma."),
+     "demonio_lodo", "Rio de lava e pedra vulcanica. Magmora, serpente de magma."),
     ("A_Forja_dos_Demonios", 32, "castelo", 3, 540, (1.0, 0.55, 0.20),
-     "maquinista", "Correias, martelos e metal derretido. O Mestre da Forja."),
+     "minotauro", "Correias, martelos e metal derretido. O Mestre da Forja."),
     ("Vulcao_do_Rei_Morto", 33, "catacumbas", 1, 580, (1.0, 0.30, 0.12),
-     "vyrak", "Subida pelo interior do vulcao. Dragorak, o Rei de Lava."),
+     "guardiao_gelo", "Subida pelo interior do vulcao. Dragorak, o Rei de Lava."),
     ("O_Ceu_em_Chamas", 34, "castelo", 4, 640, (1.0, 0.72, 0.35),
-     "arauto", "Topo do vulcao, o ceu a cair. A Estrela Caida."),
+     "feiticeiro", "Topo do vulcao, o ceu a cair. A Estrela Caida."),
 ]
 
-MODELO = '''[gd_scene load_steps=9 format=3 uid="uid://bkoliani{uid}"]
+MODELO = '''[gd_scene load_steps=8 format=3 uid="uid://bkoliani{uid}"]
 
 ; REGIAO {regiao_num} / nivel {n} -- {titulo}.
 ; {nota}
@@ -77,7 +81,6 @@ MODELO = '''[gd_scene load_steps=9 format=3 uid="uid://bkoliani{uid}"]
 [ext_resource type="PackedScene" uid="uid://bkolianiatmosfera01" path="res://scenes/fx/Atmosfera.tscn" id="6_atm"]
 [ext_resource type="PackedScene" uid="uid://bkolianiplataforma01" path="res://scenes/actors/Plataforma.tscn" id="7_pl"]
 [ext_resource type="PackedScene" uid="uid://bkolianiaguavenenosa01" path="res://scenes/actors/AguaVenenosa.tscn" id="8_liq"]
-[ext_resource type="Texture2D" path="res://assets/sprites/pixel/bosses/{sprite}.png" id="9_tex"]
 
 [sub_resource type="RectangleShape2D" id="rs_chk"]
 size = Vector2(44, 96)
@@ -106,7 +109,7 @@ position = Vector2(1020, 616)
 arquetipo = {arquetipo}
 vida = {vida}
 cor_rim = Color({rim[0]}, {rim[1]}, {rim[2]}, 1)
-textura = ExtResource("9_tex")
+rig = "{rig}"
 {extra}
 [node name="Koliani" parent="." instance=ExtResource("1_kol")]
 position = Vector2(360, 616)
@@ -147,7 +150,7 @@ TITULOS = {
 
 def main() -> int:
     seco = "--dry-run" in sys.argv
-    for ficheiro, idx0, bioma, arq, vida, rim, sprite, nota in NIVEIS:
+    for ficheiro, idx0, bioma, arq, vida, rim, rig, nota in NIVEIS:
         n = idx0 + 1
         texto = MODELO.format(
             uid=ficheiro.lower().replace("_", "") + str(n),
@@ -160,12 +163,12 @@ def main() -> int:
             arquetipo=arq,
             vida=vida,
             rim=rim,
-            sprite=sprite,
+            rig=rig,
             extra=AFINACAO.get(arq, ""),
         )
         cam = os.path.join(DEST, ficheiro + ".tscn")
-        print("  %-24s n%-3d arquetipo=%d vida=%d %s" % (
-            ficheiro, n, arq, vida, "(dry-run)" if seco else ""))
+        print("  %-24s n%-3d arquetipo=%d vida=%-4d rig=%-14s %s" % (
+            ficheiro, n, arq, vida, rig, "(dry-run)" if seco else ""))
         if not seco:
             with open(cam, "w", encoding="utf-8", newline="\n") as f:
                 f.write(texto)
