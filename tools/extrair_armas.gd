@@ -1,5 +1,5 @@
 extends SceneTree
-## Extrai 15 lâminas do pack CC0 `thewisehedgehog` (grelha 6x5 de 32x32 em
+## Extrai 20 lâminas do pack CC0 `thewisehedgehog` (grelha 6x5 de 32x32 em
 ## `assets/sprites/incoming/thewisehedgehog/File (1).png`) para a tira que a
 ## Koliani segura -- `assets/sprites/pixel/gear/armas.png` (15 frames de
 ## 32x32). Também imprime a COR dominante de cada lâmina, para colar em
@@ -14,9 +14,13 @@ const FONTE := "res://assets/sprites/incoming/thewisehedgehog/File (1).png"
 const DESTINO := "res://assets/sprites/pixel/gear/armas.png"
 const CEL := 32
 
-## Índice na grelha (linha*6 + coluna) da lâmina de cada uma das 15 armas
-## de `Equipamento.ARMAS`, por ordem.
-const SEL := [17, 20, 9, 2, 18, 4, 29, 12, 5, 21, 7, 28, 15, 19, 6]
+## Índice na grelha (linha*6 + coluna) da lâmina de cada uma das 20 armas
+## de `Equipamento.ARMAS`, por ordem. As cinco últimas entraram a 3 set
+## 2026, quando a campanha passou a 100 níveis e as armas a uma cada cinco:
+## são as do pós-Zeriko -- maré escarlate, brasa, vazio, guerra e a lâmina
+## branca do último duelo.
+const SEL := [17, 20, 9, 2, 18, 4, 29, 12, 5, 21, 7, 28, 15, 19, 6,
+	26, 0, 11, 13, 14]
 
 
 func _init() -> void:

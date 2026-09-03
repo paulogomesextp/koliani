@@ -320,14 +320,24 @@ func marcar_nivel_concluido(indice: int) -> void:
 
 ## Dá o equipamento por acabar o nível `indice` (0-based). Equipa-o já se o
 ## slot estiver vazio ou se for melhor que o atual. Idempotente por id.
+##
+## Desde 3 set 2026 um nível pode dar DOIS prémios (nos múltiplos de 10 cai
+## uma arma e uma armadura) -- ver `Equipamento.recompensas_do_nivel`.
 func conceder_recompensa(indice: int) -> void:
-	var r: Dictionary = _EQUIP.recompensa_do_nivel(indice)
-	if r.is_empty():
-		return
+	var houve := false
+	for r: Dictionary in _EQUIP.recompensas_do_nivel(indice):
+		if _conceder_um(r):
+			houve = true
+	if houve:
+		guardar()
+
+
+## Um prémio. Devolve `true` se era novo (e portanto vale a pena gravar).
+func _conceder_um(r: Dictionary) -> bool:
 	var id: String = r["id"]
 	if r["tipo"] == "arma":
 		if id in armas:
-			return
+			return false
 		armas.append(id)
 		var atual: Dictionary = _EQUIP.arma(arma_equipada)
 		var nova: Dictionary = _EQUIP.arma(id)
@@ -336,7 +346,7 @@ func conceder_recompensa(indice: int) -> void:
 			equipamento_mudou.emit("arma", id)
 	else:
 		if id in armaduras:
-			return
+			return false
 		armaduras.append(id)
 		var atual2: Dictionary = _EQUIP.armadura(armadura_equipada)
 		var nova2: Dictionary = _EQUIP.armadura(id)
@@ -344,7 +354,7 @@ func conceder_recompensa(indice: int) -> void:
 			armadura_equipada = id
 			equipamento_mudou.emit("armadura", id)
 	equipamento_ganho.emit(r["tipo"], id)
-	guardar()
+	return true
 
 
 func tem_arma(id: String) -> bool:

@@ -261,37 +261,49 @@ func teste_catalogo_campanha() -> void:
 		_ok(en.has(k), "en.json sem a chave do carrossel '%s'" % k)
 
 
-## Equipamento: 15 armas + 15 armaduras; os níveis de desbloqueio alternam
-## (arma nos ímpares, armadura nos pares); `recompensa_do_nivel` mapeia o
-## índice do nível para o item certo; e o en.json tem os nomes todos.
+## Equipamento: 20 armas (uma por cada 5 níveis) + 10 armaduras (uma por
+## cada 10); as curvas sobem sempre; `recompensas_do_nivel` mapeia o índice
+## do nível para o item certo -- e dá DOIS nos múltiplos de 10; e o en.json
+## tem os nomes todos.
 func teste_equipamento_dados() -> void:
-	_ok(Equipamento.ARMAS.size() == 15, "deviam ser 15 armas")
-	_ok(Equipamento.ARMADURAS.size() == 15, "deviam ser 15 armaduras")
+	_ok(Equipamento.ARMAS.size() == 20, "deviam ser 20 armas")
+	_ok(Equipamento.ARMADURAS.size() == 10, "deviam ser 10 armaduras")
 	for i in Equipamento.ARMAS.size():
-		_ok(int(Equipamento.ARMAS[i]["nivel"]) == 2 * i + 1,
-			"a arma %d devia desbloquear no nível %d" % [i, 2 * i + 1])
-		_ok(int(Equipamento.ARMADURAS[i]["nivel"]) == 2 * i + 2,
-			"a armadura %d devia desbloquear no nível %d" % [i, 2 * i + 2])
-		# dano das armas sobe; vida_bonus das armaduras sobe
+		_ok(int(Equipamento.ARMAS[i]["nivel"]) == Equipamento.NIVEIS_POR_ARMA * (i + 1),
+			"a arma %d devia desbloquear no nível %d" % [i, Equipamento.NIVEIS_POR_ARMA * (i + 1)])
 		if i > 0:
 			_ok(int(Equipamento.ARMAS[i]["dano"]) >= int(Equipamento.ARMAS[i - 1]["dano"]),
 				"o dano das armas devia ser não-decrescente")
+	for i in Equipamento.ARMADURAS.size():
+		_ok(int(Equipamento.ARMADURAS[i]["nivel"]) == Equipamento.NIVEIS_POR_ARMADURA * (i + 1),
+			"a armadura %d devia desbloquear no nível %d" % [i, Equipamento.NIVEIS_POR_ARMADURA * (i + 1)])
+		# a célula da tira tem de existir (a tira tem 15 frames)
+		var cel := int(Equipamento.ARMADURAS[i]["celula"])
+		_ok(cel >= 0 and cel < 15, "a armadura %d aponta para a célula %d, fora da tira" % [i, cel])
+		if i > 0:
 			_ok(int(Equipamento.ARMADURAS[i]["vida_bonus"]) >= int(Equipamento.ARMADURAS[i - 1]["vida_bonus"]),
 				"o vida_bonus das armaduras devia ser não-decrescente")
+			_ok(float(Equipamento.ARMADURAS[i]["reducao"]) >= float(Equipamento.ARMADURAS[i - 1]["reducao"]),
+				"a redução das armaduras devia ser não-decrescente")
+	# o último de cada tipo cai no nível 100: a campanha inteira está coberta
+	_ok(int(Equipamento.ARMAS[19]["nivel"]) == 100, "a última arma é do nível 100")
+	_ok(int(Equipamento.ARMADURAS[9]["nivel"]) == 100, "a última armadura é do nível 100")
 
-	var r0 := Equipamento.recompensa_do_nivel(0)
-	_ok(r0.get("tipo") == "arma" and r0.get("id") == Equipamento.ARMAS[0]["id"],
-		"acabar o nível 1 (idx 0) dá a 1.ª arma")
-	var r1 := Equipamento.recompensa_do_nivel(1)
-	_ok(r1.get("tipo") == "armadura" and r1.get("id") == Equipamento.ARMADURAS[0]["id"],
-		"acabar o nível 2 (idx 1) dá a 1.ª armadura")
-	var r28 := Equipamento.recompensa_do_nivel(28)
-	_ok(r28.get("tipo") == "arma" and r28.get("id") == Equipamento.ARMAS[14]["id"],
-		"acabar o nível 29 (idx 28) dá a 15.ª arma")
-	var r29 := Equipamento.recompensa_do_nivel(29)
-	_ok(r29.get("tipo") == "armadura" and r29.get("id") == Equipamento.ARMADURAS[14]["id"],
-		"acabar o nível 30 (idx 29) dá a 15.ª armadura")
-	_ok(Equipamento.recompensa_do_nivel(99).is_empty(), "índice fora de alcance não dá nada")
+	_ok(Equipamento.recompensas_do_nivel(0).is_empty(), "o nível 1 não dá equipamento")
+	_ok(Equipamento.recompensas_do_nivel(3).is_empty(), "o nível 4 não dá equipamento")
+	var r4 := Equipamento.recompensas_do_nivel(4)      # nível 5
+	_ok(r4.size() == 1 and r4[0]["tipo"] == "arma" and r4[0]["id"] == Equipamento.ARMAS[0]["id"],
+		"acabar o nível 5 dá só a 1.ª arma")
+	var r9 := Equipamento.recompensas_do_nivel(9)      # nível 10
+	_ok(r9.size() == 2, "acabar o nível 10 dá DOIS prémios (arma + armadura)")
+	if r9.size() == 2:
+		_ok(r9[0]["id"] == Equipamento.ARMAS[1]["id"], "o nível 10 dá a 2.ª arma")
+		_ok(r9[1]["id"] == Equipamento.ARMADURAS[0]["id"], "o nível 10 dá a 1.ª armadura")
+	var r99 := Equipamento.recompensas_do_nivel(99)    # nível 100
+	_ok(r99.size() == 2 and r99[0]["id"] == Equipamento.ARMAS[19]["id"]
+		and r99[1]["id"] == Equipamento.ARMADURAS[9]["id"],
+		"acabar o nível 100 dá a última arma e a última armadura")
+	_ok(Equipamento.recompensas_do_nivel(200).is_empty(), "índice fora de alcance não dá nada")
 
 	var f := FileAccess.open("res://assets/i18n/en.json", FileAccess.READ)
 	if f == null:
@@ -317,17 +329,22 @@ func teste_equipamento_estado() -> void:
 	_ok(e.vida_bonus_armadura() == 0 and is_equal_approx(e.reducao_armadura(), 0.0),
 		"sem armadura -> sem bónus")
 
-	e.marcar_nivel_concluido(0)  # nível 1 -> 1.ª arma, equipada
-	_ok(e.armas.size() == 1, "acabar o nível 1 dá 1 arma")
+	e.marcar_nivel_concluido(0)  # nível 1 -> nada (a cadência é de 5 em 5)
+	_ok(e.armas.is_empty() and e.armaduras.is_empty(),
+		"acabar o nível 1 já não dá equipamento")
+
+	e.marcar_nivel_concluido(4)  # nível 5 -> 1.ª arma, equipada
+	_ok(e.armas.size() == 1, "acabar o nível 5 dá 1 arma")
 	_ok(e.arma_equipada == Equipamento.ARMAS[0]["id"], "a arma nova é equipada logo")
 	_ok(e.dano_ataque() == int(Equipamento.ARMAS[0]["dano"]), "dano_ataque segue a arma equipada")
 
-	e.marcar_nivel_concluido(1)  # nível 2 -> 1.ª armadura
-	_ok(e.armaduras.size() == 1, "acabar o nível 2 dá 1 armadura")
+	e.marcar_nivel_concluido(9)  # nível 10 -> 2.ª arma E 1.ª armadura
+	_ok(e.armas.size() == 2, "acabar o nível 10 dá também a arma seguinte")
+	_ok(e.armaduras.size() == 1, "acabar o nível 10 dá a 1.ª armadura")
 	_ok(e.armadura_equipada == Equipamento.ARMADURAS[0]["id"], "armadura nova equipada")
 
-	e.marcar_nivel_concluido(0)  # repetir não duplica
-	_ok(e.armas.size() == 1, "reconcluir o nível não duplica o prémio")
+	e.marcar_nivel_concluido(4)  # repetir não duplica
+	_ok(e.armas.size() == 2, "reconcluir o nível não duplica o prémio")
 
 	var copia := _novo_estado()
 	copia.de_dicionario(e.para_dicionario())

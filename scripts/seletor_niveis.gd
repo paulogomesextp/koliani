@@ -789,15 +789,18 @@ func _nome_chefe(indice: int) -> String:
 	return Textos.t(chave) if chave != "" else ""
 
 
-## "Prémio: 🗡 Foice do Pântano" -- a arma/armadura que se ganha ao acabar
-## este nível.
+## "Prémio: 🗡 Foice do Pântano" -- o que se ganha ao acabar este nível.
+## Nos múltiplos de 10 são DOIS (arma + armadura), separados por " · ".
 func _texto_premio(indice: int) -> String:
-	var r: Dictionary = Equipamento.recompensa_do_nivel(indice)
-	if r.is_empty():
+	var rs: Array[Dictionary] = Equipamento.recompensas_do_nivel(indice)
+	if rs.is_empty():
 		return ""
-	var it: Dictionary = Equipamento.arma(r["id"]) if r["tipo"] == "arma" else Equipamento.armadura(r["id"])
-	var icone := "🗡" if r["tipo"] == "arma" else "🛡"
-	return Textos.tf("sel.reward", ["%s %s" % [icone, Textos.t(it.get("nome", ""))]])
+	var partes: Array[String] = []
+	for r: Dictionary in rs:
+		var it: Dictionary = Equipamento.arma(r["id"]) if r["tipo"] == "arma" else Equipamento.armadura(r["id"])
+		partes.append("%s %s" % ["🗡" if r["tipo"] == "arma" else "🛡",
+			Textos.t(it.get("nome", ""))])
+	return Textos.tf("sel.reward", ["  ·  ".join(partes)])
 
 
 # --- navegação -------------------------------------------------------

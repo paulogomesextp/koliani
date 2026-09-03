@@ -156,7 +156,9 @@ func _fazer_cartao(item: Dictionary) -> Control:
 		b.add_theme_stylebox_override(e, sb)
 
 	# imagem do item como fundo do cartão (esbatida; cinza se ainda bloqueada)
-	var idx := Equipamento.indice_arma(id) if _tipo == "arma" else Equipamento.indice_armadura(id)
+	# NB: a arma indexa a tira pela posição na lista; a armadura NÃO -- a
+	# tira tem as 15 originais e só 10 estão em jogo (ver `celula_armadura`).
+	var idx := Equipamento.indice_arma(id) if _tipo == "arma" else Equipamento.celula_armadura(id)
 	var fundo_img := TextureRect.new()
 	var at := AtlasTexture.new()
 	at.atlas = TIRA_ARMAS if _tipo == "arma" else TIRA_ARMADURAS
