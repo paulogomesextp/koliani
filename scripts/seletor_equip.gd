@@ -36,10 +36,10 @@ const DUR := 0.26
 const ART_FRAC := 0.62        # fração do cartão ocupada pela preview
 
 ## Preview da Koliani: o rig actual, só o `idle`.
-const PREVIEW_TIRA := "res://assets/sprites/pixel/koliani_cavaleiro/idle.png"
+const PREVIEW_TIRA := "res://assets/sprites/pixel/koliani_shadowblade/idle.png"
 const PREVIEW_FRAMES := 4
 const PREVIEW_FPS := 6.0
-const PREVIEW_ESCALA := 3.0
+const PREVIEW_ESCALA := 2.6
 
 var _tipo := "arma"
 var _cor: Color

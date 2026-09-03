@@ -192,7 +192,28 @@ gigante** em vez de um dragão. Ambos ficam à espera de um pack melhor.
 
 CC0 não exige atribuição; fica aqui à mesma por cortesia.
 
-## @Jump_Button — "Knight_player 1.4"  ← RIG ACTUAL DA KOLIANI
+## Paulo Gomes — "Shadowblade"  ← RIG ACTUAL DA KOLIANI (4 set 2026)
+- **Arte original do Paulo**, feita de raiz para este jogo ("criei de raiz
+  para ter várias ações"). Sem licença de terceiros: é dele. Isto resolve
+  de caminho o problema de licença do rig anterior (ver a secção seguinte).
+- Fonte: `assets/sprites/incoming/shadowblade/shadowblade_hero_atlas.png`
+  (1024×800). Uso: `assets/sprites/pixel/koliani_shadowblade/` (8 estados),
+  recortado por `tools/importar_rig_shadowblade.py`. Ligado por
+  `koliani.gd::RIG`.
+- **O atlas não se corta pela grelha** que vem no `.tres` do pack: o passo
+  entre figuras muda de estado para estado, e sobraram do fundo da imagem de
+  apresentação umas linhas horizontais (que colavam as figuras umas às
+  outras) e as paredes de pedra dos frames de encostar. A ferramenta limpa
+  tudo isso e procura as figuras por componentes ligados — ver o cabeçalho
+  dela e `docs/img/rig_shadowblade.png`.
+- **O que falta no atlas** (para uma versão futura): não há `roll`, `dash`,
+  `hurt`, `defesa`, `borda`, `aterrar`, `morte` nem os golpes 2/3/4 do
+  combo, o `crouch` só tem 2 poses (o `.tres` diz 3) e não há `fall` (é
+  derivado do fim do `jump`). O jogo aguenta — `_atualizar_anim` pergunta
+  `has_animation` antes de usar cada um — mas cada tira nova que o Paulo
+  fizer entra só por acrescentar uma linha ao `ORDEM` da ferramenta.
+
+## @Jump_Button — "Knight_player 1.4"  ← rig anterior (aposentado a 4 set 2026)
 - Pack do autor @Jump_Button (Twitter). **Licença (Read_me.txt do pack)**:
   uso pessoal e comercial permitido, crédito obrigatório no uso comercial;
   **proíbe expressamente qualquer uso por "AI (...) AI/ML Training (...)
@@ -208,6 +229,10 @@ CC0 não exige atribuição; fica aqui à mesma por cortesia.
   mesma**, aceitando o risco de licença por agora — foi reposta no mesmo
   dia. Não voltar a apagar sem falar com ele primeiro; se algum dia for
   preciso mesmo trocar, é decisão dele.
+- **4 set 2026:** deixou de ser o rig activo — o Paulo trouxe a arte dele
+  ("Shadowblade", secção acima) e pediu-a como Koliani principal. As tiras
+  ficam no repo porque `koliani.gd` ainda sabe montá-las (`RIG =
+  "cavaleiro"`), mas o jogo já não as usa.
 
 ## thewisehedgehog — pack de armas pixel-art
 - https://thewisehedgehog.itch.io/  (URL exato + licença POR CONFIRMAR pelo Paulo em incoming/LICENSES.md)

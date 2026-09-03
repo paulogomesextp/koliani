@@ -252,11 +252,16 @@ func _ready() -> void:
 ##      desenhada por código; fica como alternativa).
 ##   "gothic" -- rig Ansimuz "Gothicvania Church", experiência da fase 4
 ##      DESLIGADA a pedido do Paulo (ficou escura/pequena).
-##   "nova" -- ACTUAL (3 set 2026): a pixel-art que o Paulo desenhou
+##   "shadowblade" -- ACTUAL (4 set 2026): a arte que o Paulo fez de raiz
+##      ("criei de raiz para ter várias ações"). Vive em
+##      `assets/sprites/incoming/shadowblade/`; `tools/importar_rig_shadowblade.py`
+##      limpa-a e recorta-a para `assets/sprites/pixel/koliani_shadowblade/`.
+##      É a única sem problema de licença -- é do Paulo.
+##   "nova" -- a pixel-art que o Paulo desenhou
 ##      (cabelo lavanda, manto azul, botas vermelhas). Só veio `idle` e
 ##      `walk`; os outros 16 estados são derivados desses frames por
 ##      `tools/importar_rig_koliani_nova.py`.
-const RIG := "cavaleiro"
+const RIG := "shadowblade"
 
 ## [n_frames, fps, loop] por estado. Cada tira é horizontal, virada à direita.
 const _KOLI_ANIMS := {
@@ -311,6 +316,30 @@ const _KOLI_ANIMS_CAVALEIRO := {
 const CAV_ESCALA := 0.8
 const CAV_OFFSET_Y := -2.0
 
+## Rig "shadowblade" -- a arte do Paulo (4 set 2026). Frames de 52x64, com a
+## personagem a medir ~59 px e os pés na base (a tira já sai reduzida do
+## `importar_rig_shadowblade.py`, por isso o jogo desenha-a a 1:1).
+##
+## O atlas tem SETE estados; os outros onze que o rig "cavaleiro" tinha
+## (roll/dash/hurt/defesa/borda/aterrar/morte e o combo attack2/3/4) não
+## existem -- `_atualizar_anim` pergunta sempre `has_animation` antes de os
+## usar, portanto caem no estado mais próximo em vez de rebentar. O `crouch`
+## só tem 2 poses e o `fall` é derivado do fim do `jump`.
+const _KOLI_ANIMS_SHADOW := {
+	"idle":      [4, 6.0, true],
+	"run":       [6, 12.0, true],
+	"jump":      [7, 12.0, false],
+	"fall":      [2, 7.0, true],
+	"attack":    [6, 20.0, false],
+	"crouch":    [2, 6.0, true],
+	"wallslide": [3, 8.0, true],
+	"djump":     [5, 18.0, false],
+}
+## Os pés estão em y=62 do frame de 64 (30 px abaixo do centro) e a colisão
+## mede 44 de alto (base 22 abaixo da origem): -8 põe os pés no chão.
+const SHADOW_ESCALA := 1.0
+const SHADOW_OFFSET_Y := -8.0
+
 ## Rig "nova" -- a arte do Paulo. Frames de 72x72 com os pés em y=68
 ## (`tools/importar_rig_koliani_nova.py`). O `idle` tem 10 frames e o `run`
 ## 12 (a passada original tinha 24, ficou de dois em dois).
@@ -347,6 +376,7 @@ func _montar_frames() -> void:
 	var gothic := RIG == "gothic"
 	var cavaleiro := RIG == "cavaleiro"
 	var nova := RIG == "nova"
+	var shadow := RIG == "shadowblade"
 	var anims: Dictionary = _KOLI_ANIMS
 	var dir_tiras := "koliani"
 	if gothic:
@@ -358,6 +388,16 @@ func _montar_frames() -> void:
 	elif nova:
 		anims = _KOLI_ANIMS_NOVA
 		dir_tiras = "koliani_nova"
+	elif shadow:
+		anims = _KOLI_ANIMS_SHADOW
+		dir_tiras = "koliani_shadowblade"
+	if shadow:
+		_corpo.scale = Vector2(SHADOW_ESCALA, SHADOW_ESCALA)
+		_corpo.offset = Vector2(0.0, SHADOW_OFFSET_Y)
+		if _armadura:
+			_armadura.visible = false   # a arte ja' traz o fato todo
+		if _luz_lamina:
+			_luz_lamina.enabled = true  # a lamina e' roxa e brilha: acompanha
 	if nova:
 		_corpo.scale = Vector2(NOVA_ESCALA, NOVA_ESCALA)
 		_corpo.offset = Vector2(0.0, NOVA_OFFSET_Y)
@@ -1060,10 +1100,17 @@ func _flash_branco() -> void:
 ## armadura pesa ainda menos, para ela ler sempre mais clara que o
 ## cenário à volta.
 const _BRILHO_CORPO := Color(1.4, 1.38, 1.5)
+## O rig "shadowblade" (a arte do Paulo) já é desenhado com contraste alto e
+## a lâmina dele brilha sozinha: com o over-bright de cima a personagem saía
+## rosa-choque e perdia o roxo escuro. Este é o mínimo que ainda a destaca do
+## cenário sem lhe queimar a paleta.
+const _BRILHO_SHADOW := Color(1.12, 1.10, 1.18)
 
 func _tint_armadura() -> Color:
 	if RIG == "gothic":
 		return Color.WHITE  # o rig já vem recolorido -- não pintar por cima
+	if RIG == "shadowblade":
+		return _BRILHO_SHADOW
 	if RIGS_COM_PALETA.has(RIG):
 		# a cor da armadura já vai às PLACAS pelo shader; puxá-la também para
 		# o modulate pintava a pele e o cabelo e dava um boneco monocromático.
