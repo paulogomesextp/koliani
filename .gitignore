@@ -58,6 +58,7 @@ assets/sprites/incoming/thewisehedgehog/**
 assets/sprites/incoming/zerie/**
 assets/sprites/incoming/knight-player/**
 assets/sprites/incoming/enemies-pack/**
+assets/sprites/incoming/kronovi/**
 # packs que o AGENTE descarregou (OpenGameArt, CC0) -- ver incoming/LICENSES.md
 assets/sprites/incoming/_dl/**
 !assets/sprites/incoming/gothicvania/_LARGAR_AQUI.md
@@ -66,6 +67,7 @@ assets/sprites/incoming/_dl/**
 !assets/sprites/incoming/chierit/_LARGAR_AQUI.md
 !assets/sprites/incoming/0x72-dungeon-ii/_LARGAR_AQUI.md
 !assets/sprites/incoming/ansimuz-parallax/_LARGAR_AQUI.md
+!assets/sprites/incoming/kronovi/LICENSE.txt
 tools/_bot.gd
 tools/_bot.tscn
 tools/_bot.gd.uid

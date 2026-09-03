@@ -85,16 +85,88 @@ RIGS = {
                     "death": "@Death.png:7"},
         "fps": {"idle": 8.0, "walk": 12.0, "attack": 14.0, "hurt": 12.0, "death": 10.0},
     },
+    # Verdugo -- Kronovi- "Boss: Undead Executioner" (itch.io, gratuito,
+    # sem clausula anti-IA -- ver assets/sprites/incoming/kronovi/LICENSE.txt).
+    # Silhueta escura de chapeu pontiagudo com foice; e' o executor da Dama
+    # da Guilhotina. "idle2" (8 frames) serve de walk -- o pack nao anda,
+    # so' flutua, e a variacao ja' da' movimento.
+    "verdugo": {
+        "base": "kronovi/undead_executioner/png",
+        "estados": {"idle": "#idle.png:100", "walk": "#idle2.png:100",
+                    "attack": "#attacking.png:100", "death": "#death.png:100"},
+        "fps": {"idle": 6.0, "walk": 8.0, "attack": 14.0, "death": 10.0},
+    },
+    # Golem-de-pedra -- Kronovi- "Boss: Mecha-Stone Golem". Uma so' folha
+    # 1000x1000 em grelha 100x100; cada estado e' uma LINHA (0-indexed).
+    "golem_pedra": {
+        "base": "kronovi/mecha_golem",
+        "estados": {"idle": "#Character_sheet.png:100:0",
+                    "walk": "#Character_sheet.png:100:1",
+                    "attack": "#Character_sheet.png:100:2",
+                    "hurt": "#Character_sheet.png:100:3",
+                    "death": "#Character_sheet.png:100:6"},
+        "fps": {"idle": 6.0, "walk": 8.0, "attack": 10.0, "hurt": 10.0, "death": 8.0},
+    },
+    # Arqueiro-encapuzado -- Kronovi- "Archer Hero". Celula 64x64; varias
+    # folhas, uma por estado (algumas com 2+ linhas -- fica tudo em fila).
+    # Nota: "Normal Attack.png" e "death.png" tem uma legenda ("Loop
+    # Attack" / "death") desenhada NA PROPRIA folha, numa linha fina no
+    # meio -- ficam de fora das linhas listadas, senao aparece texto a
+    # piscar entre os frames.
+    "arqueiro": {
+        "base": "kronovi/archer_hero",
+        "estados": {"idle": "#Idle and running.png:64:0",
+                    "walk": "#Idle and running.png:64:1",
+                    "attack": "#Normal Attack.png:64:0,1,3",
+                    "death": "#death.png:64:1,2"},
+        "fps": {"idle": 6.0, "walk": 12.0, "attack": 14.0, "death": 10.0},
+    },
+    # Cavaleiro-errante -- Kronovi- "Wandering Knight". O mais completo dos
+    # quatro (idle/death/running/jump/fall/crouch/dash/3 ataques numa so'
+    # folha 1000x1200, grelha 100x100 -- ver GUIDE.png do pack). Serve de
+    # base para VARIOS chefes humanos por recolor (so' 1 usado por agora,
+    # `cavaleiro_negro` -- falta repetir a entrada com paletas diferentes
+    # para os outros chefes-guerreiro).
+    "cavaleiro_negro": {
+        "base": "kronovi/wandering_knight",
+        "estados": {"idle": "#SPRITESHEET.png:100:0",
+                    "walk": "#SPRITESHEET.png:100:3",
+                    "attack": "#SPRITESHEET.png:100:8",
+                    "hurt": "#SPRITESHEET.png:100:5",
+                    "death": "#SPRITESHEET.png:100:1"},
+        "fps": {"idle": 6.0, "walk": 12.0, "attack": 14.0, "hurt": 10.0, "death": 10.0},
+    },
 }
 
 
 def frames(base: str, spec: str) -> list[Image.Image]:
-    """Frames de um estado: pasta de PNGs soltos ou tira `@ficheiro:n`."""
+    """Frames de um estado: pasta de PNGs soltos, tira `@ficheiro:n`, ou
+    grelha `#ficheiro:celula[:linha]` (célula quadrada; sem `:linha` varre
+    a folha toda em row-major e só usa as células com conteúdo -- é o que
+    os packs "Kronovi-" precisam, cada estado empilhado em N linhas de uma
+    folha só)."""
     if spec.startswith("@"):
         nome, n = spec[1:].rsplit(":", 1)
         im = Image.open(os.path.join(base, nome)).convert("RGBA")
         w = im.size[0] // int(n)
         return [im.crop((i * w, 0, (i + 1) * w, im.size[1])) for i in range(int(n))]
+    if spec.startswith("#"):
+        partes = spec[1:].split(":")
+        nome, cel = partes[0], int(partes[1])
+        im = Image.open(os.path.join(base, nome)).convert("RGBA")
+        w, h = im.size
+        cols, rows = w // cel, h // cel
+        # sem ":linha(s)" -> varre a folha toda; "n" -> so' essa linha;
+        # "n,m,o" -> so' essas (uma folha pode ter uma legenda tipo "Loop
+        # Attack" numa linha no meio -- essa fica de fora).
+        linhas = [int(x) for x in partes[2].split(",")] if len(partes) > 2 else range(rows)
+        out = []
+        for r in linhas:
+            for c in range(cols):
+                corte = im.crop((c * cel, r * cel, (c + 1) * cel, (r + 1) * cel))
+                if corte.getbbox() is not None:
+                    out.append(corte)
+        return out
     fs = sorted(glob.glob(os.path.join(base, spec, "*.png")),
                 key=lambda c: _ordem(os.path.basename(c)))
     return [Image.open(f).convert("RGBA") for f in fs]

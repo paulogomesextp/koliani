@@ -89,5 +89,77 @@
    "hurt": 12.0,
    "death": 10.0
   }
+ },
+ "verdugo": {
+  "w": 141,
+  "h": 128,
+  "pes_y": 126,
+  "estados": {
+   "idle": 4,
+   "walk": 8,
+   "attack": 13,
+   "death": 18
+  },
+  "fps": {
+   "idle": 6.0,
+   "walk": 8.0,
+   "attack": 14.0,
+   "death": 10.0
+  }
+ },
+ "golem_pedra": {
+  "w": 168,
+  "h": 121,
+  "pes_y": 111,
+  "estados": {
+   "idle": 4,
+   "walk": 8,
+   "attack": 9,
+   "hurt": 8,
+   "death": 10
+  },
+  "fps": {
+   "idle": 6.0,
+   "walk": 8.0,
+   "attack": 10.0,
+   "hurt": 10.0,
+   "death": 8.0
+  }
+ },
+ "arqueiro": {
+  "w": 123,
+  "h": 159,
+  "pes_y": 156,
+  "estados": {
+   "idle": 2,
+   "walk": 8,
+   "attack": 17,
+   "death": 10
+  },
+  "fps": {
+   "idle": 6.0,
+   "walk": 12.0,
+   "attack": 14.0,
+   "death": 10.0
+  }
+ },
+ "cavaleiro_negro": {
+  "w": 152,
+  "h": 111,
+  "pes_y": 111,
+  "estados": {
+   "idle": 8,
+   "walk": 10,
+   "attack": 9,
+   "hurt": 4,
+   "death": 10
+  },
+  "fps": {
+   "idle": 6.0,
+   "walk": 12.0,
+   "attack": 14.0,
+   "hurt": 10.0,
+   "death": 10.0
+  }
  }
 }

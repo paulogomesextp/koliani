@@ -30,6 +30,7 @@ fill_to = Vector2(1, 0.5)
 collision_layer = 4
 collision_mask = 1
 script = ExtResource("1_chefe")
+rig = "golem_pedra"
 escala_visual = 1.45
 vida = 720
 dano_contacto = 20
@@ -44,6 +45,13 @@ texture_filter = 1
 position = Vector2(0, -6)
 texture = ExtResource("2_tex")
 hframes = 4
+
+; RIG ANIMADO (regiao V -- golem/maquina, braco-laser). Vazio: o
+; `ChefeBase._montar_rig` enche-o de `bosses_anim/golem_pedra` e esconde
+; o `Corpo` acima.
+[node name="Anim" type="AnimatedSprite2D" parent="Sprite"]
+visible = false
+texture_filter = 1
 
 [node name="LuzFornalha" type="PointLight2D" parent="Sprite"]
 position = Vector2(-20, 4)

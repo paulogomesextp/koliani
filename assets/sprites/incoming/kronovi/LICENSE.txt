@@ -1,0 +1,16 @@
+Packs de Kronovi- (darkpixel-kronovi.itch.io), descarregados 3 set 2026:
+- Boss: Undead Executioner (undead_executioner/)
+- Boss: Mecha-Stone Golem (mecha_golem/)
+- Wandering Knight 2D Character (wandering_knight/)
+- Archer Hero (archer_hero/)
+
+Termos (da pagina de cada pack, "Undead Executioner" e "Mecha-Stone Golem"):
+"You are free to edit the sprite once you downloaded it and you can use
+it for commercial and non-commercial use, credits are not required but
+always deeply appreciated. Redistributing and reselling the sprite are
+restricted."
+
+Gratuitos ("pay what you want", $0 aceite), sem clausula anti-IA (ao
+contrario do Knight_player). Nao redistribuir os ficheiros originais --
+so' os derivados (tiras recortadas/escaladas) que o
+tools/importar_chefes_animados.py gera para assets/sprites/pixel/bosses_anim/.

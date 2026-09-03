@@ -30,6 +30,7 @@ fill_to = Vector2(1, 0.5)
 collision_layer = 4
 collision_mask = 1
 script = ExtResource("1_chefe")
+rig = "arqueiro"
 escala_visual = 1.35
 vida = 510
 dano_contacto = 16
@@ -44,6 +45,13 @@ texture_filter = 1
 position = Vector2(0, -6)
 texture = ExtResource("2_tex")
 hframes = 4
+
+; RIG ANIMADO (mago morto-vivo -- encapuzado, a` distancia). Vazio: o
+; `ChefeBase._montar_rig` enche-o de `bosses_anim/arqueiro` e esconde o
+; `Corpo` acima.
+[node name="Anim" type="AnimatedSprite2D" parent="Sprite"]
+visible = false
+texture_filter = 1
 
 [node name="LuzOrbe" type="PointLight2D" parent="Sprite"]
 position = Vector2(18, -40)

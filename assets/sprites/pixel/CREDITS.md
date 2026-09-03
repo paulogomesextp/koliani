@@ -4,6 +4,39 @@ A personagem principal (Koliani) é **arte original do Paulo** (pixel-art
 desenhada à mão, 3 set 2026) — ver "Koliani (rig actual)" no fim deste
 ficheiro. Os restantes sprites pixel-art vêm de packs CC0:
 
+## Chefes ANIMADOS (`assets/sprites/pixel/bosses_anim/`, 3 set 2026)
+
+Até 3 set nenhum chefe animava de verdade (4 poses estáticas, ver secções
+abaixo). `tools/importar_chefes_animados.py` corta os packs em 5 tiras
+(idle/walk/attack/hurt/death); `ChefeBase.rig` liga cada chefe. Estado:
+**9 de 30 chefes principais têm rig animado** — os outros continuam com a
+folha de 4 poses antiga.
+
+| rig | pack | chefe(s) |
+| --- | --- | --- |
+| `ceifeiro` | clembod "Bringer of Death" (grátis, crédito pedido) | Colosso Ósseo |
+| `demonio_lodo` | chierit "boss demon slime" FREE (CC-BY 4.0) | Coração Putrefacto |
+| `guardiao_gelo` | chierit "Frost Guardian" FREE (CC-BY 4.0) | Carcereiro |
+| `minotauro` | chierit "mino" FREE (CC-BY 4.0) | Ghorak |
+| `feiticeiro` | LuizMelo "Evil Wizard 2" (CC0) | Bispo Púrpura |
+| `verdugo` | Kronovi- "Boss: Undead Executioner" | Dama da Guilhotina |
+| `golem_pedra` | Kronovi- "Boss: Mecha-Stone Golem" | Maquinista Infernal |
+| `arqueiro` | Kronovi- "Archer Hero" | Voltaris |
+| `cavaleiro_negro` | Kronovi- "Wandering Knight 2D Character" | Capitão Negro |
+
+**Kronovi- (darkpixel-kronovi.itch.io)** — os 4 packs novos, gratuitos
+("pay what you want", $0 aceite). Termos (iguais nas páginas dos packs):
+*"You are free to edit the sprite once you downloaded it and you can use
+it for commercial and non-commercial use, credits are not required but
+always deeply appreciated. Redistributing and reselling the sprite are
+restricted."* Sem cláusula anti-IA (ao contrário do Knight_player — ver
+"Koliani (rig actual)"). Detalhe em
+`assets/sprites/incoming/kronovi/LICENSE.txt`. **Por fazer**: os outros
+21 chefes de 1-30 continuam sem rig animado; o "Wandering Knight" é o
+pack mais versátil dos quatro (idle/death/running/jump/fall/crouch/dash/3
+tipos de ataque numa folha só) e serve de base para mais chefes-guerreiro
+por recolor, sem precisar de mais downloads.
+
 ## Pixel Frog — "Kings and Pigs"
 - https://pixelfrog-assets.itch.io/kings-and-pigs
 - Licença: CC0 1.0 (https://creativecommons.org/publicdomain/zero/1.0/)
