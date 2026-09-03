@@ -213,13 +213,13 @@ func _reconstruir() -> void:
 		# tinha 300 px de altura e alfa até 0.85, e numa poça larga tomava um
 		# terço do ecrã. Agora é curto e discreto: quem dá o aviso é a linha.
 		var fundura: float = clampf(altura / 420.0, 0.3, 1.0)
-		var fh: float = clampf(altura * 0.30, 56.0, 130.0)
+		var fh: float = clampf(altura * 0.18, 40.0, 82.0)
 		_faixa.polygon = PackedVector2Array([
 			Vector2(-hw, -hh), Vector2(hw, -hh),
 			Vector2(hw, -hh + fh), Vector2(-hw, -hh + fh),
 		])
 		var t_cor := cor.lightened(0.15 + 0.2 * fundura)
-		t_cor.a = 0.16 + 0.16 * fundura
+		t_cor.a = 0.10 + 0.12 * fundura
 		var baixo := Color(t_cor.r, t_cor.g, t_cor.b, 0.0)
 		_faixa.color = Color(1, 1, 1, 1)
 		_faixa.vertex_colors = PackedColorArray([t_cor, t_cor, baixo, baixo])

@@ -245,7 +245,11 @@ func _ready() -> void:
 ##      desenhada por código; fica como alternativa).
 ##   "gothic" -- rig Ansimuz "Gothicvania Church", experiência da fase 4
 ##      DESLIGADA a pedido do Paulo (ficou escura/pequena).
-const RIG := "cavaleiro"
+##   "nova" -- ACTUAL (3 set 2026): a pixel-art que o Paulo desenhou
+##      (cabelo lavanda, manto azul, botas vermelhas). Só veio `idle` e
+##      `walk`; os outros 16 estados são derivados desses frames por
+##      `tools/importar_rig_koliani_nova.py`.
+const RIG := "nova"
 
 ## [n_frames, fps, loop] por estado. Cada tira é horizontal, virada à direita.
 const _KOLI_ANIMS := {
@@ -300,12 +304,42 @@ const _KOLI_ANIMS_CAVALEIRO := {
 const CAV_ESCALA := 0.8
 const CAV_OFFSET_Y := -2.0
 
+## Rig "nova" -- a arte do Paulo. Frames de 72x72 com os pés em y=68
+## (`tools/importar_rig_koliani_nova.py`). O `idle` tem 10 frames e o `run`
+## 12 (a passada original tinha 24, ficou de dois em dois).
+const _KOLI_ANIMS_NOVA := {
+	"idle":      [10, 8.0, true],
+	"run":       [12, 16.0, true],
+	"jump":      [3, 12.0, false],
+	"fall":      [3, 8.0, true],
+	"attack":    [5, 22.0, false],
+	"attack2":   [5, 22.0, false],
+	"attack3":   [6, 24.0, false],
+	"attack4":   [5, 20.0, false],
+	"crouch":    [2, 6.0, true],
+	"wallslide": [2, 8.0, true],
+	"djump":     [8, 22.0, false],
+	"roll":      [6, 20.0, false],
+	"dash":      [3, 16.0, false],
+	"hurt":      [3, 14.0, false],
+	"defesa":    [2, 5.0, true],
+	"borda":     [2, 5.0, true],
+	"aterrar":   [4, 20.0, false],
+	"morte":     [6, 9.0, false],
+}
+## O frame tem 72 px de alto com os pés em y=68 (32 px abaixo do centro) e o
+## corpo da Koliani mede 44 px: 0.86 de escala e -6.4 de desvio põem os pés
+## exactamente na base da colisão.
+const NOVA_ESCALA := 0.86
+const NOVA_OFFSET_Y := -6.4
+
 
 func _montar_frames() -> void:
 	if _corpo.sprite_frames != null:
 		return
 	var gothic := RIG == "gothic"
 	var cavaleiro := RIG == "cavaleiro"
+	var nova := RIG == "nova"
 	var anims: Dictionary = _KOLI_ANIMS
 	var dir_tiras := "koliani"
 	if gothic:
@@ -314,6 +348,16 @@ func _montar_frames() -> void:
 	elif cavaleiro:
 		anims = _KOLI_ANIMS_CAVALEIRO
 		dir_tiras = "koliani_cavaleiro"
+	elif nova:
+		anims = _KOLI_ANIMS_NOVA
+		dir_tiras = "koliani_nova"
+	if nova:
+		_corpo.scale = Vector2(NOVA_ESCALA, NOVA_ESCALA)
+		_corpo.offset = Vector2(0.0, NOVA_OFFSET_Y)
+		if _armadura:
+			_armadura.visible = false   # a arte já traz o manto
+		if _luz_lamina:
+			_luz_lamina.enabled = false  # o clarão do golpe já vem no frame
 	if cavaleiro:
 		_corpo.scale = Vector2(CAV_ESCALA, CAV_ESCALA)
 		_corpo.offset = Vector2(0.0, CAV_OFFSET_Y)
@@ -1006,7 +1050,9 @@ func _iniciar_ataque() -> void:
 	# encadeia o combo se ainda estamos na janela do golpe anterior;
 	# senão volta ao 1.º hit ("Single").
 	_combo_passo = (_combo_passo + 1) % NUM_COMBO if _combo_janela > 0.0 else 0
-	_ataque_dur = DUR_COMBO[_combo_passo] if RIG == "cavaleiro" else DUR_ATAQUE
+	# o combo de 4 golpes existe nos rigs com tiras `attack2/3/4`
+	var tem_combo := RIG == "cavaleiro" or RIG == "nova"
+	_ataque_dur = DUR_COMBO[_combo_passo] if tem_combo else DUR_ATAQUE
 	_ataque_restante = _ataque_dur
 	_combo_janela = _ataque_dur + JANELA_COMBO
 	_pop = 1.0

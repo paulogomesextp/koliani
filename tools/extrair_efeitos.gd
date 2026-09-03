@@ -8,6 +8,10 @@ extends SceneTree
 ##     `ProjetilKoliani`, cabeça do `KamehamehaKoliani`, `ProjetilZeriko`.
 ##   * bola_fogo -- o mesmo vórtice na folha laranja -- corpo da `BolaFogo`
 ##     (Torreta / cuspidor).
+##   * impacto_azul / bala_azul -- os mesmos cortes na folha "Water"
+##     (3 set 2026). Com o rig novo da Koliani (manto azul) os tiros roxos
+##     deixaram de casar com a personagem; os projécteis dela passaram a
+##     azul e o roxo ficou para o Zeriko e para o Kamehameha.
 ##
 ##   godot --headless --script res://tools/extrair_efeitos.gd
 
@@ -22,6 +26,8 @@ const TIRAS := {
 	# linha 0, colunas 30..35: vórtice a girar (loop) -- corpo dos tiros
 	"bala_roxa": ["Purple", 0, 30, 6],
 	"bola_fogo": ["Fire", 0, 30, 6],
+	"impacto_azul": ["Water", 5, 14, 4],
+	"bala_azul": ["Water", 0, 30, 6],
 }
 
 

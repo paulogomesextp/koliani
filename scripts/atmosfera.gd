@@ -208,7 +208,8 @@ func atualizar_extensao(nova_largura: float, nova_esquerda: float) -> void:
 ## Remove tudo o que `_gerar_parallax` já gerou antes (marcado com o meta
 ## "gerado"), para a função poder ser chamada de novo em segurança.
 func _limpar_gerado() -> void:
-	for caminho in ["Parallax/Fundo", "Parallax/Longe", "Parallax/Meio", "Parallax/Perto"]:
+	for caminho in ["Parallax/Fundo", "Parallax/Longe", "Parallax/Meio",
+			"Parallax/Perto", "Parallax/PropsRegiao"]:
 		var layer := get_node_or_null(caminho) as Node2D
 		if layer == null:
 			continue
@@ -225,6 +226,7 @@ func _gerar_parallax() -> void:
 	# pack pixel-art: camadas reais em vez das silhuetas geradas
 	if fundo_pack != "" and PACKS.has(fundo_pack):
 		_montar_fundo_pack(rng)
+		_props_regiao(rng)
 		_frente_ambiente(rng)
 		if luzes_horizonte:
 			_brilho_horizonte(rng)
@@ -263,6 +265,7 @@ func _gerar_parallax() -> void:
 			x += rng.randf_range(passo * 0.55, passo * 1.1)
 
 	_faixa_rasteira(rng)
+	_props_regiao(rng)
 	_frente_ambiente(rng)
 
 	if luzes_horizonte:
@@ -354,6 +357,83 @@ func _frente_ambiente(rng: RandomNumberGenerator) -> void:
 		x += rng.randf_range(densidade * 0.6, densidade * 1.4)
 
 
+## PROPS DA REGIÃO no fundo: árvores mortas, casario, estátuas, colunas,
+## janelas -- o catálogo de `tools/gerar_deco.py`, espalhado ao longo do
+## nível na camada "Perto" do parallax.
+##
+## Sem isto, as 29 salas feitas à mão só tinham o pack de fundo (uma serra,
+## uma parede) e as plataformas: nada entre os dois planos. É a camada que
+## faz a sala parecer um sítio e não um diagrama. Só a JORNADA tinha algo
+## parecido (`gerador_corredor::_coluna_fundo`), e era sempre a mesma coluna.
+func _props_regiao(rng: RandomNumberGenerator) -> void:
+	var parallax := get_node_or_null("Parallax") as ParallaxBackground
+	if parallax == null:
+		return
+	var lista := _catalogo_parede()
+	if lista.is_empty():
+		return
+
+	# Camada PRÓPRIA, sem `motion_mirroring`. Os props não podem ir para a
+	# "Perto": essa repete-se nos dois eixos (para o pack de fundo nunca
+	# deixar buracos) e as estátuas/árvores apareciam numa grelha, a mesma
+	# árvore de 200 em 200 px na horizontal E na vertical.
+	var layer := parallax.get_node_or_null("PropsRegiao") as ParallaxLayer
+	if layer == null:
+		layer = ParallaxLayer.new()
+		layer.name = "PropsRegiao"
+		parallax.add_child(layer)
+	layer.motion_scale = Vector2(0.85, 0.8)   # o mesmo plano da "Perto"
+	for n in layer.get_children():
+		n.free()
+
+	# assentam na linha de chão do pack (não na do jogo): são cenário para
+	# lá da zona jogável, e assim nunca ficam a flutuar nem enterrados
+	var chao := 985.0
+	if fundo_pack != "" and PACKS.has(fundo_pack):
+		for item: Array in PACKS[fundo_pack]:
+			if item[1] == "Perto":
+				chao = float(item[2])
+
+	var x := extensao_esquerda + rng.randf_range(0.0, 500.0)
+	while x < largura_nivel + 400.0:
+		var cam: String = lista[rng.randi() % lista.size()]
+		var tex: Texture2D = load(cam) if ResourceLoader.exists(cam) else null
+		if tex:
+			# altura aparente constante: os packs vêm a resoluções muito
+			# diferentes e sem isto uma vela ficava do tamanho de uma casa
+			var alvo := rng.randf_range(200.0, 420.0)
+			var esc: float = clampf(alvo / maxf(1.0, float(tex.get_height())), 0.7, 6.0)
+			var s := Sprite2D.new()
+			s.texture = tex
+			s.centered = false
+			s.scale = Vector2(esc if rng.randf() < 0.5 else -esc, esc)
+			s.position = Vector2(x, chao - float(tex.get_height()) * esc)
+			if s.scale.x < 0.0:
+				s.position.x += float(tex.get_width()) * esc
+			s.modulate = _gradacao("Perto").darkened(rng.randf_range(0.0, 0.25))
+			s.modulate.a = rng.randf_range(0.75, 0.96)
+			s.set_meta("gerado", true)
+			layer.add_child(s)
+		x += rng.randf_range(420.0, 1100.0)
+
+
+## Lista de props "parede" da região (`assets/sprites/pixel/deco/deco.json`).
+func _catalogo_parede() -> Array:
+	var cam := "res://assets/sprites/pixel/deco/deco.json"
+	if not FileAccess.file_exists(cam):
+		return []
+	var d: Variant = JSON.parse_string(FileAccess.get_file_as_string(cam))
+	if not (d is Dictionary):
+		return []
+	var fora: Array = []
+	var lista: Variant = (d as Dictionary).get(bioma, [])
+	if lista is Array:
+		for p in lista:
+			if p is Dictionary and p.get("onde", "") == "parede":
+				fora.append("res://assets/sprites/pixel/deco/%s/%s.png" % [bioma, p["nome"]])
+	return fora
+
+
 ## Banda de mato/entulho colada ao fundo do ecrã, em qualquer bioma, para a
 ## base nunca ficar pelada.
 func _faixa_rasteira(rng: RandomNumberGenerator) -> void:
@@ -428,13 +508,20 @@ func _montar_fundo_pack(_rng: RandomNumberGenerator) -> void:
 		# cima até se perder no fundo. Só na camada mais funda (as outras
 		# ficariam sobrepostas e a escurecer o dobro).
 		if item[1] == "Fundo":
-			_banda_acima(layer, tw, y_base - th, cor)
-		# mirroring nos dois eixos: a Jornada pode levar a câmara muito mais
-		# alto/baixo do que a imagem cobre (ela só tem `th` de altura) --
-		# sem repetir no eixo Y, sobrava um vão por cima/baixo que nunca se
-		# preenchia, seja qual for a posição da câmara (motion_scale.y=0
-		# trava a camada no ecrã, mas não alarga a imagem).
-		layer.motion_mirroring = Vector2(tw, th)
+			_banda_acima(layer, tw, y_base - th, cor, tex)
+			_banda_abaixo(layer, tw, y_base, cor)
+		# Repetição: SEMPRE na horizontal (o nível é muito mais largo do que
+		# a imagem). Na vertical só a camada mais funda, e essa leva também a
+		# `_banda_acima` -- é a que não pode deixar buraco, porque atrás dela
+		# só há o céu quase preto (era o bug do "ecrã preto" do nível 7).
+		#
+		# NENHUMA repete na vertical (3 set 2026): a repetir no eixo Y, o topo
+		# escuro da imagem encostava ao fundo claro da cópia de cima e
+		# desenhava uma costura recta a meio do céu sempre que a câmara subia
+		# -- via-se a caixa da textura. Quem tapa o vão acima/abaixo são as
+		# bandas em degradé (só na camada mais funda; as outras podem ficar
+		# transparentes, porque atrás delas está sempre essa).
+		layer.motion_mirroring = Vector2(tw, 0.0)
 
 
 ## Banda em degradé por cima do topo de um pack de fundo: começa na cor da
@@ -442,14 +529,75 @@ func _montar_fundo_pack(_rng: RandomNumberGenerator) -> void:
 ## cima. Sem isto o desenho acabava a direito e o que estivesse acima era
 ## céu quase preto (ver `_montar_fundo_pack`).
 const ALTURA_BANDA := 2400.0
+## Quanto e' que a banda entra pela imagem dentro, a esbater-se.
+const SOBREPOR := 180.0
 
-func _banda_acima(layer: Node, largura: float, topo_y: float, cor: Color) -> void:
+func _banda_acima(layer: Node, largura: float, topo_y: float, cor: Color,
+		tex: Texture2D = null) -> void:
+	var g := Gradient.new()
+	# A cor de encosto e' a da 1.a linha da imagem (senao ha' um degrau recto
+	# a meio do ceu no sitio onde a banda acaba), e mesmo assim a banda ENTRA
+	# 180 px pela imagem dentro a esbater-se: uma linha de encontro entre duas
+	# cores proximas continua a ler-se, um degrade de 180 px nao.
+	var encosto := cor_fundo.lerp(cor, 0.3)
+	var topo_img: Variant = _cor_topo(tex)
+	if topo_img != null:
+		encosto = (topo_img as Color) * cor
+	g.offsets = PackedFloat32Array([0.0, 0.90, 1.0])
+	g.colors = PackedColorArray([
+		cor_fundo.darkened(0.2),
+		encosto,
+		Color(encosto.r, encosto.g, encosto.b, 0.0),
+	])
+	var t := GradientTexture2D.new()
+	t.gradient = g
+	t.width = 4
+	t.height = 256
+	t.fill = GradientTexture2D.FILL_LINEAR
+	t.fill_from = Vector2(0.0, 0.0)
+	t.fill_to = Vector2(0.0, 1.0)
+	var b := Sprite2D.new()
+	b.texture = t
+	b.centered = false
+	var alt := ALTURA_BANDA + SOBREPOR
+	b.scale = Vector2(maxf(largura, 1.0) / 4.0, alt / 256.0)
+	b.position = Vector2(0.0, topo_y - ALTURA_BANDA)
+	b.z_index = 1                     # POR CIMA da imagem, para a esbater
+	b.set_meta("gerado", true)
+	layer.add_child(b)
+
+
+## Cor media da primeira linha visivel de uma textura de fundo (ou null se
+## nao der para ler). Serve para as bandas encostarem sem degrau.
+func _cor_topo(tex: Texture2D) -> Variant:
+	if tex == null:
+		return null
+	var img := tex.get_image()
+	if img == null or img.get_width() == 0:
+		return null
+	var soma := Color(0, 0, 0)
+	var n := 0
+	var passo: int = maxi(1, img.get_width() / 48)
+	for y in mini(3, img.get_height()):
+		var x := 0
+		while x < img.get_width():
+			var p := img.get_pixel(x, y)
+			if p.a > 0.5:
+				soma += Color(p.r, p.g, p.b)
+				n += 1
+			x += passo
+	if n == 0:
+		return null
+	return Color(soma.r / n, soma.g / n, soma.b / n)
+
+
+## Gémea da `_banda_acima`, para baixo: continua o pack até se perder no
+## escuro. Sem ela, um fosso fundo (o Vazio das torres, o Abismo) deixava
+## ver o vão por baixo da imagem quando a câmara descia.
+func _banda_abaixo(layer: Node, largura: float, base_y: float, cor: Color) -> void:
 	var g := Gradient.new()
 	g.offsets = PackedFloat32Array([0.0, 1.0])
-	# A `cor` é a TINTA que vai ao shader, não o que o pack acaba por
-	# desenhar (que leva desaturação e neblina por cima) -- puxá-la para o
-	# `cor_fundo` evita a banda ficar uma laje clara ao lado da imagem.
-	g.colors = PackedColorArray([cor_fundo.darkened(0.2), cor_fundo.lerp(cor, 0.3)])
+	g.colors = PackedColorArray([cor_fundo.lerp(cor, 0.22), Color(0.01, 0.01, 0.02)])
 	var t := GradientTexture2D.new()
 	t.gradient = g
 	t.width = 4
@@ -461,7 +609,7 @@ func _banda_acima(layer: Node, largura: float, topo_y: float, cor: Color) -> voi
 	b.texture = t
 	b.centered = false
 	b.scale = Vector2(maxf(largura, 1.0) / 4.0, ALTURA_BANDA / 256.0)
-	b.position = Vector2(0.0, topo_y - ALTURA_BANDA + 2.0)  # 2px de sobreposição
+	b.position = Vector2(0.0, base_y - 2.0)
 	b.z_index = -1
 	b.set_meta("gerado", true)
 	layer.add_child(b)

@@ -347,9 +347,13 @@ func _construir() -> void:
 	# parede a partir/trepar com espaço do outro lado.
 	var fundo := PLAT.instantiate()
 	add_child(fundo)
-	fundo.tamanho = Vector2(200.0, 900.0)
-	fundo.position = Vector2(x0 - 60.0, _chao_y - 300.0)
-	fundo.modulate = Color(0.32, 0.32, 0.4)
+	# Encostada a' plataforma de partida e a descer para o liquido: e' o
+	# "fim do mundo", nao uma torre. Tem de ficar BAIXA (o topo pouco acima
+	# do chao) -- a versao alta lia-se como um retangulo preto a tapar um
+	# terco do ecra. A cor puxa ao roxo do fundo para recuar de plano.
+	fundo.tamanho = Vector2(260.0, 760.0)
+	fundo.position = Vector2(x0 - 110.0, _chao_y - 150.0)
+	fundo.modulate = Color(0.34, 0.30, 0.46)
 
 	var casca := get_parent().get_node_or_null("Casca")
 	if casca and casca.has_method("abrir_esquerda"):

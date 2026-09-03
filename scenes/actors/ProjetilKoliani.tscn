@@ -3,11 +3,13 @@
 ; Projétil mágico da Koliani (habilidade "projetil"). Bate igual à espada e
 ; parte-se contra inimigos ou cenário. collision_mask = 5 -> "mundo" (1) +
 ; "inimigos" (4); collision_layer = 0 (não é sólido, só deteta).
-; Corpo = orbe roxo a girar (bdragon1727 "Free Effect and Bullet 16x16",
-; folha roxa linha 0 col 30-35 -> assets/sprites/pixel/fx/bala_roxa.png).
+; Corpo = orbe AZUL a girar (bdragon1727 "Free Effect and Bullet 16x16",
+; folha Water linha 0 col 30-35 -> assets/sprites/pixel/fx/bala_azul.png).
+; Azul, e nao roxo, para casar com o manto da Koliani (rig "nova", 3 set
+; 2026); o roxo ficou para os projecteis do Zeriko.
 
 [ext_resource type="Script" path="res://scripts/projetil_koliani.gd" id="1_proj"]
-[ext_resource type="Texture2D" path="res://assets/sprites/pixel/fx/bala_roxa.png" id="2_bala"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/fx/bala_azul.png" id="2_bala"]
 
 [sub_resource type="CircleShape2D" id="cs_proj"]
 radius = 9.0
@@ -38,7 +40,7 @@ shape = SubResource("cs_proj")
 [node name="Luz" type="PointLight2D" parent="."]
 texture = SubResource("tex_luz")
 energy = 2.0
-color = Color(0.62, 0.34, 1, 1)
+color = Color(0.32, 0.6, 1, 1)
 
 [node name="Corpo" type="Sprite2D" parent="."]
 texture_filter = 1

@@ -1,7 +1,8 @@
 # Créditos de arte — packs externos
 
-A personagem principal (Koliani) é original do projeto
-(`tools/gerar_sprites.gd`). Os restantes sprites pixel-art vêm de packs CC0:
+A personagem principal (Koliani) é **arte original do Paulo** (pixel-art
+desenhada à mão, 3 set 2026) — ver "Koliani (rig actual)" no fim deste
+ficheiro. Os restantes sprites pixel-art vêm de packs CC0:
 
 ## Pixel Frog — "Kings and Pigs"
 - https://pixelfrog-assets.itch.io/kings-and-pigs
@@ -149,3 +150,39 @@ CC0 não exige atribuição; fica aqui à mesma por cortesia.
   koliani_gothic/*.png`. Ligado por `koliani.gd` `RIG = "gothic"`
   (`RIG = "codigo"` volta ao sprite gerado por `tools/gerar_sprites.gd`).
   Mesma família de arte dos parallax Ansimuz já usados nos fundos.
+
+## Koliani (rig actual) — arte original do Paulo
+- Fonte: `C:/Users/paulo/Desktop/newkoliani/` (ficheiros `.aseprite` +
+  folhas `idle` 10x46x55 e `walk` 24x45x58). Não é de nenhum pack.
+- Uso: `assets/sprites/pixel/koliani_nova/` — 18 estados montados por
+  `tools/importar_rig_koliani_nova.py`. **Só o `idle` e o `run` são frames
+  desenhados**; os outros 16 (salto, queda, rolamento, dash, agachar,
+  parede, borda, aterrar, defesa, dano, morte, salto duplo e os 4 golpes do
+  combo) são DERIVADOS desses por transformação — inclinar, achatar, rodar,
+  rasto — mais um arco de espada azul desenhado por código nos ataques.
+  Substituir por frames a sério assim que existirem.
+- A paleta dela manda no resto: o azul do manto (`#0321bc`) é o azul dos
+  projécteis (`fx/bala_azul.png`, `fx/impacto_azul.png`, folha "Water" do
+  bdragon1727) — antes eram roxos e deixaram de casar com a personagem.
+
+## Packs CC0 de 3 set 2026 (OpenGameArt) — terreno, decoração e fundos
+Ver `assets/sprites/incoming/LICENSES.md` para os URLs e o texto das
+licenças. Todos de domínio público / CC0.
+- **ansimuz — GothicVania Cemetery**: árvores mortas, lápides, cruzes,
+  estátua do ceifeiro, arbustos (`deco/{floresta,torres,catacumbas}/`) e o
+  fundo `backgrounds/luar/` (lua de sangue nas nuvens — o `key_art` em
+  pixel).
+- **ansimuz — GothicVania Patreon Collection**: *Old Dark Castle interior*
+  (material de terreno da região VI + fundo `backgrounds/castelo_velho/`),
+  *Gothic Horror* (`backgrounds/horror/`), *Night Town*
+  (`backgrounds/vilanoite/`).
+- **Open Pixel Project — OPP2017 Cave**: cristais, ossadas, lanterna
+  (`deco/catacumbas/`).
+- **ansimuz — GothicVania Bridge Expansion**: props de fundo.
+
+## Terreno por região (`assets/sprites/pixel/terreno/`)
+Gerado por `tools/gerar_terreno.py`: capa + corpo + franja + corte lateral,
+**um pack diferente por região** — anokolisa *Legacy Fantasy* (floresta),
+Pixel Frog *Kings & Pigs* (prisão), ansimuz *GothicVania Church* (torres),
+Szadi art *Fantasy Caves* (catacumbas), ansimuz *GothicVania Town*
+(cidade), ansimuz *Old Dark Castle* (castelo).

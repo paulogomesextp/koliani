@@ -1,14 +1,15 @@
 [gd_scene load_steps=7 format=3 uid="uid://bkolianikameha01"]
 
-; Kamehameha roxo da Koliani (habilidade "projetil"). Rajada esticada tipo
+; Kamehameha AZUL da Koliani (habilidade "projetil"). Rajada esticada tipo
 ; feixe que ATRAVESSA inimigos e so se parte contra o cenario ou ao fim do
 ; tempo. collision_mask = 5 -> "mundo" (1) + "inimigos" (4);
 ; collision_layer = 0 (nao e solido, so deteta). Custo/energia em koliani.gd.
-; Cabeca = orbe roxo a girar (bdragon1727 "Free Effect and Bullet 16x16")
-; a puxar o feixe -> assets/sprites/pixel/fx/bala_roxa.png.
+; Cabeca = orbe azul a girar (bdragon1727 "Free Effect and Bullet 16x16",
+; folha Water) a puxar o feixe -> assets/sprites/pixel/fx/bala_azul.png.
+; Azul desde 3 set 2026, para casar com o manto do rig novo da Koliani.
 
 [ext_resource type="Script" path="res://scripts/kamehameha_koliani.gd" id="1_kame"]
-[ext_resource type="Texture2D" path="res://assets/sprites/pixel/fx/bala_roxa.png" id="2_bala"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/fx/bala_azul.png" id="2_bala"]
 
 [sub_resource type="RectangleShape2D" id="rs_kame"]
 size = Vector2(96, 26)
@@ -39,20 +40,20 @@ shape = SubResource("rs_kame")
 [node name="Luz" type="PointLight2D" parent="."]
 texture = SubResource("tex_luz")
 energy = 3.0
-color = Color(0.6, 0.32, 1, 1)
+color = Color(0.32, 0.6, 1, 1)
 scale = Vector2(1.7, 1.4)
 
 [node name="AuraExterna" type="Polygon2D" parent="."]
 show_behind_parent = true
-color = Color(0.5, 0.28, 1, 0.2)
+color = Color(0.24, 0.5, 1, 0.2)
 polygon = PackedVector2Array(-60, 0, -30, -22, 40, -18, 62, 0, 40, 18, -30, 22)
 
 [node name="Feixe" type="Polygon2D" parent="."]
-color = Color(0.68, 0.4, 1, 0.85)
+color = Color(0.38, 0.66, 1, 0.85)
 polygon = PackedVector2Array(-52, 0, -30, -13, 34, -12, 52, 0, 34, 12, -30, 13)
 
 [node name="Nucleo" type="Polygon2D" parent="."]
-color = Color(0.94, 0.88, 1, 1)
+color = Color(0.88, 0.96, 1, 1)
 polygon = PackedVector2Array(-48, 0, -26, -6, 40, -5, 50, 0, 40, 5, -26, 6)
 
 [node name="Cabeca" type="Sprite2D" parent="."]
@@ -74,4 +75,4 @@ initial_velocity_min = 60.0
 initial_velocity_max = 200.0
 scale_amount_min = 2.0
 scale_amount_max = 4.5
-color = Color(0.72, 0.45, 1, 0.9)
+color = Color(0.42, 0.7, 1, 0.9)

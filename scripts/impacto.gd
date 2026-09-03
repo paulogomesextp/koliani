@@ -1,6 +1,6 @@
 class_name Impacto
 extends AnimatedSprite2D
-## Estalo visual de um acerto: um anel roxo que abre no ponto do golpe e
+## Estalo visual de um acerto: um anel azul que abre no ponto do golpe e
 ## desaparece. Instancia-se, põe-se em `global_position` e trata de si --
 ## toca a animação uma vez e liberta-se.
 ##
@@ -9,7 +9,10 @@ extends AnimatedSprite2D
 ##
 ## Uso: `Impacto.rebentar(self, pos)` (ou `pos, cor, escala`).
 
-const TIRA := preload("res://assets/sprites/pixel/fx/impacto_roxo.png")
+## Azul desde 3 set 2026: com o rig novo da Koliani (manto azul) o anel
+## roxo deixou de casar com quem da' o golpe. A folha roxa continua no repo
+## para os inimigos/Zeriko.
+const TIRA := preload("res://assets/sprites/pixel/fx/impacto_azul.png")
 const FRAMES := 4
 const FPS := 26.0
 

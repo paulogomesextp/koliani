@@ -657,9 +657,9 @@ func teste_rig_da_koliani_tem_as_tiras_todas() -> void:
 		return
 	var rig := m.get_string(1)
 	var tabela := {"codigo": "_KOLI_ANIMS", "gothic": "_KOLI_ANIMS_GOTHIC",
-		"cavaleiro": "_KOLI_ANIMS_CAVALEIRO"}
+		"cavaleiro": "_KOLI_ANIMS_CAVALEIRO", "nova": "_KOLI_ANIMS_NOVA"}
 	var pasta := {"codigo": "koliani", "gothic": "koliani_gothic",
-		"cavaleiro": "koliani_cavaleiro"}
+		"cavaleiro": "koliani_cavaleiro", "nova": "koliani_nova"}
 	_ok(tabela.has(rig), "koliani.gd: RIG '%s' nao tem tabela de animacoes" % rig)
 	if not tabela.has(rig):
 		return
