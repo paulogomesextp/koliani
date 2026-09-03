@@ -1,7 +1,119 @@
-# Retomar aqui — 3 de setembro de 2026
+# Retomar aqui — 3 de setembro de 2026 (fim da sessão longa)
 
-Ponto de situação no fim da sessão de arte. Tudo o que está descrito como
-FEITO está commitado e no `origin/master` (até `15061cb`).
+> **LEIA PRIMEIRO.** O Paulo deu uma lista nova a meio da sessão e ela tem
+> prioridade sobre tudo o resto. Está por fazer quase toda.
+
+## ⚠ A LISTA DO PAULO (3 set, prioridade máxima)
+
+Por ordem. Só o ponto 2 está feito.
+
+### 1. Substituir a KOLIANI pelo modelo pixel-art novo — BLOQUEADO
+O Paulo anexou no chat uma folha de referência da Koliani nova e pediu:
+*"substitua a Koliani por este modelo pixel art que tenho em anexo (procure
+assets o mais próximos disto se não conseguir replicar a 100%, e adapte
+para ficar o mais parecido possível e com esses movimentos)"*.
+
+**A imagem NÃO ficou em disco** — só existia na conversa, e com o `/clear`
+perde-se. **Pedir ao Paulo para a gravar** em
+`assets/branding/koliani_ref_nova.png` (ou no Desktop) antes de começar.
+
+O que a folha mostra, para se saber o que procurar:
+- **Personagem**: cabelo roxo-escuro em rabo-de-cavalo, cachecol/capa
+  vermelho-escuro esvoaçante, roupa preta/cinza-escura com cintos e
+  braçadeiras, botas escuras, **espada recta a brilhar magenta**.
+- **Paleta** (a folha traz a barra): roxos escuros, vermelhos-tijolo,
+  castanhos, cinzas, e dois magentas vivos para o brilho da lâmina.
+- **Animações da folha**: `idle` 4 frames · `run` 5 · `jump` 7 ·
+  `attack` 5 (com arco magenta e um golpe de estocada com rasto) ·
+  `crouch` 3 · `wall slide` 3 · `double jump` 5 (com um rebentamento
+  magenta por baixo).
+
+Estado actual: `koliani.gd` tem `RIG = "nova"` (arte do Paulo em
+`C:/Users/paulo/Desktop/newkoliani/`, só `idle` 10 e `walk` 24 desenhados;
+os outros 16 estados são derivados). O rig novo entra por
+`tools/importar_rig_koliani_nova.py`.
+
+### 2. Ressalto do pisão a metade — FEITO
+`STOMP_RESSALTO` de 1.4x para 0.7x o salto normal (commit `6abcee0`).
+
+### 3. Sons mais realistas — POR FAZER
+*"Mude todos os sons de mobs, animações (saltos, hits espada, tiros,
+bosses) para algo mais realista, está tudo muito modo arcade ainda."*
+Hoje **todos** os sons são sintetizados por `tools/gerar_audio.py` (sem
+dependências, sem licenças) — é por isso que soam a arcade. A resposta é
+trocar por samples reais CC0. Ver a nota das fontes mais abaixo.
+
+### 4. 20 músicas de nível, em ciclo — POR FAZER
+*"Só existe uma música de fundo nos níveis, coloque 20 músicas épicas de
+jogos e vá metendo 1 em cada nível; ao chegar ao nível 21 a lista
+reinicia."* Ou seja `faixa = indice_nivel % 20`.
+
+### 5. 20 músicas de chefe, em ciclo — POR FAZER
+O mesmo para `Musica.boss()`.
+
+### 6. Só depois disto, voltar aos CHEFES (ver secção mais abaixo).
+
+---
+
+## Notas de investigação já feita (para não se repetir)
+
+**Música e sons — de onde os tirar.** O Paulo autorizou descarregar sem
+perguntar de cada vez (só o que é *pago* é que se pergunta).
+
+- **Pixabay está BLOQUEADO ao `curl`** (devolve uma página de desafio de
+  5 kB). Foi de lá que vieram as três faixas actuais, mas manualmente.
+- **OpenGameArt FUNCIONA** e tem exactamente o que falta. Colheita de
+  candidatos (deu 170 na sessão passada):
+
+  ```
+  https://opengameart.org/art-search-advanced?keys=<termo>&field_art_type_tid[]=12&sort_by=count&sort_order=DESC
+  ```
+  e na página do item, `<a href="/content/<slug>">Título</a>`.
+  Termos que deram bom resultado: `epic orchestral`, `boss battle`,
+  `epic battle`, `dark fantasy`, `orchestral loop`, `cinematic`,
+  `dungeon`, `gothic`, `medieval battle`, `adventure theme`.
+  Para sons: mesmo sítio com `field_art_type_tid[]=13` (Sound Effects).
+- Numa página de item o que interessa sai assim:
+  - ficheiros: `https://opengameart.org/sites/default/files/<nome>.(ogg|mp3|wav)`
+  - licença: um `<div class='license-name'>CC-BY 3.0</div>`
+  - título: o `<title>` da página.
+  **Preferir `.ogg` > `.mp3` e fugir do `.wav`** (enormes).
+
+**⚠ Peso no repositório.** `assets/audio` tem 20 MB e o `.git` já vai em
+103 MB. Quarenta faixas a ~4 MB seriam +160 MB. **Não há `ffmpeg` nesta
+máquina**, portanto não dá para reencodar — a escolha tem de ser por
+faixas já pequenas (loops curtos em `.ogg`). Se não der para manter o
+total abaixo de ~50 MB, falar com o Paulo antes de commitar.
+
+**Licenças.** OpenGameArt mistura CC0, CC-BY, CC-BY-SA e GPL. Registar
+cada uma em `assets/audio/CREDITS.md` — as CC-BY exigem atribuição.
+
+**itch.io dá para automatizar** (foi preciso para os packs de chefe):
+```bash
+TOK=$(curl -sL -c jar.txt "<url do pack>" | grep -oE 'name="csrf_token" value="[^"]*"' | head -1 | sed 's/.*value="//;s/"//')
+curl -s -b jar.txt -X POST "<url do pack>/download_url"   -H "Content-Type: application/json" -H "Referer: <url do pack>"   --data "{\"csrf_token\":\"$TOK\"}"
+```
+Devolve `{"url": "..."}` com o link directo.
+
+---
+
+## Onde ficaram os CHEFES (retomar aqui depois da lista acima)
+
+Feito e no `master`: os chefes passaram a ANIMAR (`ChefeBase.rig` +
+`tools/importar_chefes_animados.py`, 5 rigs de packs gratuitos que já
+estavam no repo); 5 chefes de 1-30 já os usam; e entraram os GUARDIÕES
+(nem todo o nível tem chefe — um chefe por região, guardião nos outros
+quatro).
+
+**Estava a meio de descarregar dois packs de chefe do itch.io** quando a
+lista nova chegou — nenhum ficheiro foi escrito, portanto não há lixo:
+- [Boss: Undead Executioner](https://darkpixel-kronovi.itch.io/undead-executioner) — 57 kB, 6 animações
+- [Boss: Mecha-Stone Golem](https://darkpixel-kronovi.itch.io/mecha-golem-free) — 103 kB, 8 animações
+
+Ambos comerciais OK, sem redistribuir. O comando do `download_url` está
+na secção acima. Faltam rigs para os outros 24 chefes de 1-30.
+
+---
 
 ## FEITO nesta sessão
 
