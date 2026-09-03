@@ -88,7 +88,12 @@ scripts/
 
 scenes/
   Main.tscn                        -- main_scene (ver project.godot)
-  levels/*.tscn                    -- 30 niveis da campanha (ver EstadoJogo.NIVEIS / REGIOES), 1 chefe cada
+  levels/*.tscn                    -- 100 niveis da campanha (ver EstadoJogo.NIVEIS / REGIOES).
+                                      1-30 sao salas desenhadas a' mao; 31-100 sao jornadas
+                                      procedurais tematicas (tools/gerar_niveis_31_100.py).
+                                      Um CHEFE por regiao; guardiao (elite que sela a porta)
+                                      nos outros quatro niveis -- excepto na regiao XX, o final,
+                                      que tem quatro chefes
   levels/Floresta_Putrefata.tscn   -- nivel 1: verde-podre, fosso c/ salto duplo, da salto_duplo
   levels/O_Trono_de_Zeriko.tscn    -- nivel 30: arena final, ZERIKO (4 formas); porta -> fim da campanha
   levels/Level_Test.tscn           -- sala de treino (fora da campanha)
@@ -262,10 +267,14 @@ Ver **`docs/testar.md`**: como correr o jogo, controlos, atalhos de debug
 
 ## Decisões de direção (Paulo)
 
-- **Campanha alvo: 30 níveis em 6 regiões** com chefe próprio cada um --
-  plano completo em [`docs/niveis.md`](docs/niveis.md). Hoje jogam-se 4
-  (uma amostra por região I/II/III/VI). Chefes "realistas" e mecânicas
-  novas: **arte e design a cargo do agente**, estilo SVG rim-lit.
+- **Campanha: 100 níveis em 20 regiões** (3 set 2026). Os 30 primeiros são
+  o plano original ([`docs/niveis.md`](docs/niveis.md)) -- salas desenhadas
+  à mão, um chefe por nível. Os 70 seguintes seguem
+  [`docs/plano_niveis_31_100.md`](docs/plano_niveis_31_100.md): jornadas
+  procedurais temáticas com **um chefe por região** e guardiões nos outros
+  quatro níveis (pedido do Paulo: "não precisa ter um boss todos os
+  níveis"). Chefes "realistas" e mecânicas novas: **arte e design a cargo
+  do agente**.
 - Chefes distintos por mundo · mãe = **Aurora** · final = **luta + cena
   narrativa** · música = **B** (drone + melodia esparsa).
 - **Estilo de arte:** manter **vetorial** (SVG rim-lit). Pixel-art fica

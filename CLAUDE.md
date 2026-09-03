@@ -1,7 +1,8 @@
 # CLAUDE.md — Koliani
 
 Platformer de ação para telemóvel (Godot 4.7.2, GDScript). A **Koliani**
-atravessa 6 regiões para libertar a mãe (**Aurora**) do demónio **Zeriko**.
+atravessa 20 regiões (100 níveis) para libertar a mãe (**Aurora**) do
+demónio **Zeriko** -- e depois para lá dele.
 Não é roguelite — é por níveis, com história e progresso guardado.
 Contexto completo: [`README.md`](README.md), [`docs/`](docs/) (`design.md`,
 `historia.md`, `niveis.md`, `testar.md`). **Ponto de retoma da última
@@ -67,8 +68,11 @@ Terreno, decoração e fundos são **gerados por ferramentas** — mexer nos
 tools e regerar, nunca nos PNGs nem no nó `Atmosfera` dos `.tscn` à mão:
 `tools/gerar_terreno.py` (material por região), `tools/gerar_deco.py`
 (props), `tools/gerar_fundos.py` (packs de parallax),
-`tools/afinar_atmosfera.py` (o ar de cada um dos 30 níveis).
-`tools/folha_de_contacto.gd` mostra os 30 níveis de relance (precisa de
+`tools/afinar_atmosfera.py` (o ar de cada um dos 100 níveis),
+`tools/gerar_niveis_31_100.py` (as cenas dos níveis 31-100, por tabela --
+correr SEMPRE antes do `afinar_atmosfera.py`, que ele reescreve o bloco
+`Atmosfera`), `tools/baixar_packs_itch.py` (packs gratuitos do itch.io).
+`tools/folha_de_contacto.gd` mostra os 100 níveis de relance (precisa de
 janela: `--screen 1`).
 
 Alvo visual: **o mais próximo possível de Dead Cells**, com a temática de
@@ -95,7 +99,7 @@ and Pigs, Kenney). `default_texture_filter = Nearest`.
 ## Estrutura (resumo — detalhe no README)
 
 ```
-scenes/levels/   4 mundos jogáveis + Level_Test
+scenes/levels/   100 níveis + Level_Test (sala de treino)
 scenes/actors/   Koliani, DemonioBase, chefes, Plataforma, Coletavel,
                  Porta, armadilhas (Espinhos/Serra/Fogo), RaizPerigo...
 scenes/ui/       MenuInicial (main_scene), HUD, Pausa, Diario, Opcoes,
