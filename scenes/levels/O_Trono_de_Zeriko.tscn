@@ -36,6 +36,7 @@ fill_to = Vector2(1, 0.5)
 
 [node name="O_Trono_de_Zeriko" type="Node2D"]
 script = ExtResource("7_niv")
+corredor = false
 
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
 cor_ambiente = Color(0.98, 0.8, 1, 1)

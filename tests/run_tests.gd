@@ -510,10 +510,20 @@ func teste_estado_hardcore() -> void:
 ## e `avancar_nivel()` vai marcando o nível de onde se sai.
 func teste_estado_regioes_e_conclusao() -> void:
 	var e := _novo_estado()
-	_ok(e.REGIOES.size() == 6, "a campanha-alvo tem 6 regiões (docs/niveis.md)")
-	# todo o nível de NIVEIS tem de estar nalguma região
+	# A campanha cresce (6 regiões nos níveis 1-30, 20 no plano dos 31-100),
+	# por isso o teste não fixa o NÚMERO: o que tem de valer sempre é que as
+	# regiões cubram todos os níveis, uma vez cada.
+	_ok(e.REGIOES.size() >= 6, "a campanha tem pelo menos as 6 regiões de docs/niveis.md")
+	var vistos := {}
+	for r in e.REGIOES.size():
+		for i: int in e.REGIOES[r]["niveis"]:
+			_ok(not vistos.has(i),
+				"o nível %d está em duas regiões (%s e %d)" % [i, str(vistos.get(i, -1)), r])
+			vistos[i] = r
 	for i in e.NIVEIS.size():
 		_ok(e.regiao_do_nivel(i) >= 0, "o nível %d devia pertencer a uma região" % i)
+	_ok(vistos.size() == e.NIVEIS.size(),
+		"as regiões cobrem %d níveis mas NIVEIS tem %d" % [vistos.size(), e.NIVEIS.size()])
 
 	_ok(not e.nivel_esta_concluido(0), "arranque limpo: nada concluído")
 	_ok(not e.regiao_esta_concluida(0), "arranque limpo: nenhuma região concluída")
@@ -726,8 +736,10 @@ func teste_especies_dos_inimigos_existem() -> void:
 	var assinaturas: Array[String] = []
 	for m in rn.search_all(bloco):
 		assinaturas.append(m.get_string(1))
-	_ok(assinaturas.size() == 30,
-		"ESP_ASSINATURA tem %d entradas (deviam ser 30)" % assinaturas.size())
+	var n_niveis: int = _novo_estado().NIVEIS.size()
+	_ok(assinaturas.size() == n_niveis,
+		"ESP_ASSINATURA tem %d entradas (deviam ser %d, uma por nível)"
+			% [assinaturas.size(), n_niveis])
 	for esp in assinaturas:
 		_ok(especies.has(esp), "ESP_ASSINATURA pede a especie '%s', que nao existe" % esp)
 	# dentro da mesma regiao (5 niveis) nao ha assinaturas repetidas -- e' o

@@ -303,5 +303,15 @@
 	"shrine.foco.ef": "每级 +28% 能量恢复",
 	"shrine.agilidade.ef": "每级翻滚 +0.06 秒无敌帧",
 	"shrine.furia.ef": "每级 +0.22 暴击倍率",
-	"shrine.escudo_runico.ef": "每级 +1 盾牌格挡次数"
+	"shrine.escudo_runico.ef": "每级 +1 盾牌格挡次数",
+	"level.n30": "灰烬之路",
+	"level.n31": "岩浆之河",
+	"level.n32": "恶魔锻炉",
+	"level.n33": "亡王火山",
+	"level.n34": "燃烧的天空",
+	"boss.vulkar": "灰烬骑士 瓦尔卡",
+	"boss.magmora": "玛格莫拉",
+	"boss.mestre_da_forja": "锻炉大师",
+	"boss.dragorak": "熔岩之王 德拉戈拉克",
+	"boss.estrela_caida": "陨落之星"
 }

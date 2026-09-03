@@ -96,6 +96,19 @@ TABELA = [
     ("Banquete_dos_Imortais",  "igreja",        (.96,.84,.92), (.10,.04,.10), (.15,.07,.14), (1.0,.56,.88),  (1.0,.78,.96), 1.8, (1.08,.78,1.04), .32, .28, True),
     ("Torre_do_Coracao_Negro", "castelo_velho",    (.86,.74,.96), (.06,.02,.12), (.10,.05,.17), (1.0,.36,.96),  (1.0,.64,1.0), 2.2, (.92,.64,1.20), .46, .36, False),
     ("O_Trono_de_Zeriko",      "luar",          (.98,.80,1.0), (.11,.02,.13), (.16,.05,.18), (1.0,.32,1.0),  (1.0,.62,1.0), 2.0, (1.10,.68,1.14), .16, .08, True),
+    # ---- VII  Terras Queimadas (31-35) ------------------------------
+    # A regiao onde o reino arde. Nao ha' packs de fundo por atribuir --
+    # a regra "um pack nunca em duas regioes" vale para as seis regioes de
+    # 1-30, que consomem os doze packs que existem. Da' VII em diante os
+    # packs SAO reaproveitados, e a identidade da regiao tem de vir toda da
+    # tinta e da luz-chave: laranja/brasa em todos os cinco, contra o
+    # verde/azul/violeta de tudo o que veio antes. Enquanto nao houver arte
+    # propria (14 regioes x ~2 packs), e' o melhor que se consegue.
+    ("Estrada_das_Cinzas",     "floresta",      (.98,.84,.72), (.16,.06,.03), (.20,.09,.05), (1.0,.52,.18),  (1.0,.66,.30), 3.0, (1.20,.66,.42), .34, .52, True),
+    ("Rio_de_Magma",           "caverna",       (1.0,.80,.66), (.19,.05,.02), (.24,.08,.03), (1.0,.42,.10),  (1.0,.58,.22), 3.4, (1.26,.58,.34), .30, .56, True),
+    ("A_Forja_dos_Demonios",   "masmorra",      (.96,.82,.74), (.14,.06,.05), (.19,.09,.06), (1.0,.62,.24),  (1.0,.74,.38), 2.6, (1.16,.70,.50), .36, .46, True),
+    ("Vulcao_do_Rei_Morto",    "rochoso",       (1.0,.76,.62), (.21,.04,.02), (.26,.07,.03), (1.0,.36,.08),  (1.0,.52,.18), 3.8, (1.30,.52,.30), .26, .60, True),
+    ("O_Ceu_em_Chamas",        "horror",        (1.0,.88,.76), (.24,.08,.04), (.28,.11,.06), (1.0,.72,.34),  (1.0,.84,.50), 3.2, (1.24,.80,.56), .22, .38, True),
 ]
 
 CHAVES = [

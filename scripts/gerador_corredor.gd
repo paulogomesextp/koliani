@@ -80,6 +80,8 @@ const LIQUIDO := {
 	3: [Color(0.05, 0.03, 0.09, 0.97), false],   # trevas do abismo
 	4: [Color(0.34, 0.40, 0.12, 0.93), false],   # ácido citrino
 	5: [Color(0.62, 0.22, 0.08, 0.94), true],    # lava
+	# --- niveis 31-100 (docs/plano_niveis_31_100.md) ---------------------
+	6: [Color(0.74, 0.28, 0.05, 0.95), true],    # VII magma vivo das Terras Queimadas
 }
 
 ## Tipos de "flavour" de câmara (o que se semeia à volta da espinha).
@@ -97,6 +99,10 @@ const POOL_REGIAO := {
 	5: ["pendulos", "fogo", "guilhotinas", "ritmo", "quebra", "gravidade", "portal",
 		"crossfire", "ferry", "espelhos", "sinos", "prensa", "alavanca", "segredo",
 		"velas"],
+	# VII Terras Queimadas: tudo o que arde, cede ou lanca. A regiao onde
+	# o chao deixa de ser de confianca -- `quebra` e `fogo` sao o tema.
+	6: ["fogo", "quebra", "impulso", "trampolim", "pedras", "crossfire", "portal",
+		"serras", "espinhos", "prensa", "ferry", "alavanca", "segredo"],
 }
 
 ## `_dif` mínimo para cada tipo de câmara entrar na pool. Assim o Nível 1
@@ -149,6 +155,7 @@ const ASSINATURA := {
 	3: "gruta",        # Catacumbas -- túneis escuros
 	4: "impulso",      # Cidade -- máquinas
 	5: "fogo",         # Castelo -- lava
+	6: "quebra",       # Terras Queimadas -- a madeira arde e cede
 }
 
 ## Toque de assinatura do NÍVEL (a gimmick do `docs/niveis.md`) espalhado
@@ -216,6 +223,12 @@ const PERFIL := [
 	{"v": 0, "f": "salto", "a": 1.0},     # 27 Banquete dos Imortais -- mesa gigante
 	{"v": 1, "f": "vertical", "a": 1.15}, # 28 Torre do Coração Negro -- plataformas que pulsam
 	{"v": 0, "f": "misto", "a": 1.0},     # 29 O Trono de Zeriko (sem jornada)
+	# --- Regiao VII  Terras Queimadas (30-34) : o chao arde e cede -------
+	{"v": 0, "f": "gauntlet", "a": 1.0},  # 30 Estrada das Cinzas -- floresta a arder
+	{"v": -1, "f": "maquina", "a": 0.9},  # 31 Rio de Magma -- a lava sobe e desce
+	{"v": 0, "f": "maquina", "a": 0.85},  # 32 A Forja dos Demonios -- correias e martelos
+	{"v": 1, "f": "vertical", "a": 1.2},  # 33 Vulcao do Rei Morto -- subida pelo interior
+	{"v": 1, "f": "salto", "a": 1.15},    # 34 O Ceu em Chamas -- pedacos de ceu a cair
 ]
 
 ## Que câmaras conta cada foco. Cruzado depois com região+tier em
@@ -302,6 +315,44 @@ var _foco := "misto"
 var _abertura := 1.0
 
 
+## SEGUNDO ACTO (níveis 31-100, `docs/plano_niveis_31_100.md`).
+##
+## A curva de dificuldade e a de comprimento foram escritas para uma
+## campanha de 30 níveis: `_idx / 29` e `base + 1250 * _idx` limitados a 1.0
+## e a 40000 px. Assim que a campanha passou dos 30, TODOS os níveis novos
+## nasciam já no máximo dos dois -- o nível 31, logo a seguir a derrotar o
+## Zeriko e a entrar numa região nova, era tão longo e tão duro como o
+## nível 30, e os 70 seguintes eram iguais entre si.
+##
+## A resposta é a de qualquer jogo por actos: a região nova RECOMEÇA mais
+## abaixo e volta a subir, mais alto do que o acto anterior. Os níveis 1-30
+## não mudam um único valor -- é tudo `_idx > 29`.
+##
+## Os dois pontos de partida (0.72 de dificuldade, 14000 px) são um palpite
+## fundamentado: 0.72 é a dureza do nível ~21 e 14000 px o comprimento do
+## nível ~10. Falta playtestar e afinar.
+const ATO2_INICIO := 30
+const ATO2_DIF_INICIAL := 0.72
+const ATO2_COMP_INICIAL := 14000.0
+
+
+func _dificuldade(idx: int) -> float:
+	if idx < ATO2_INICIO:
+		return clampf(float(idx) / 29.0, 0.0, 1.0)
+	var n := float(EstadoJogo.NIVEIS.size() - 1 - ATO2_INICIO)
+	var t: float = 0.0 if n <= 0.0 else clampf(float(idx - ATO2_INICIO) / n, 0.0, 1.0)
+	return ATO2_DIF_INICIAL + (1.0 - ATO2_DIF_INICIAL) * t
+
+
+func _comprimento(idx: int) -> float:
+	if idx < ATO2_INICIO:
+		return clampf(comprimento_base + por_nivel * float(idx),
+			comprimento_base, comprimento_max)
+	var n := float(EstadoJogo.NIVEIS.size() - 1 - ATO2_INICIO)
+	var t: float = 0.0 if n <= 0.0 else clampf(float(idx - ATO2_INICIO) / n, 0.0, 1.0)
+	return ATO2_COMP_INICIAL + (comprimento_max - ATO2_COMP_INICIAL) * t
+
+
 func _ready() -> void:
 	call_deferred("_construir")
 
@@ -311,7 +362,7 @@ func _construir() -> void:
 	if kol == null:
 		return
 	_idx = EstadoJogo.indice_nivel
-	_dif = clampf(float(_idx) / 29.0, 0.0, 1.0)
+	_dif = _dificuldade(_idx)
 	_regiao = maxi(0, EstadoJogo.regiao_atual())
 	_rng.seed = hash("jornada4|%d" % _idx)
 	_esp = especie_inimigo if especie_inimigo != "" else _especie_do_nivel()
@@ -327,8 +378,7 @@ func _construir() -> void:
 	_chao_y = ancora.y + 92.0
 	_teto_y = _chao_y - lerpf(640.0, 1320.0, _dif) * _abertura
 
-	var comp: float = clampf(comprimento_base + por_nivel * float(_idx),
-		comprimento_base, comprimento_max)
+	var comp: float = _comprimento(_idx)
 	var x0 := ancora.x - comp
 
 	# --- líquido mortal em toda a extensão -----------------------------
@@ -892,6 +942,7 @@ const ESP_REGIAO := {
 	3: ["esqueleto", "necromante", "chort", "ogro", "gosma"],
 	4: ["orc", "abobora", "xamane", "raptor", "mastim"],
 	5: ["demonio_grande", "ogro", "chort", "olho", "raptor"],
+	6: ["imp", "chort", "demonio_grande", "abobora", "mastim"],
 }
 
 ## A "cara" de cada NÍVEL (pedido do Paulo: não repetir o mesmo monstro em
@@ -905,6 +956,7 @@ const ESP_ASSINATURA := [
 	"necromante", "esqueleto", "gosma", "wogol", "ogro",           # IV Catacumbas
 	"abobora", "orc", "mastim", "raptor", "xamane",                # V  Cidade
 	"demonio_grande", "chort", "raptor", "ogro", "olho",           # VI Castelo
+	"imp", "chort", "mastim", "abobora", "demonio_grande",         # VII Terras Queimadas
 ]
 
 

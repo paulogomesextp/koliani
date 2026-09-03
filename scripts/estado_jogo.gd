@@ -82,6 +82,12 @@ const NIVEIS := [
 	"res://scenes/levels/Banquete_dos_Imortais.tscn",
 	"res://scenes/levels/Torre_do_Coracao_Negro.tscn",
 	"res://scenes/levels/O_Trono_de_Zeriko.tscn",
+	# --- niveis 31-100 (docs/plano_niveis_31_100.md) ---------------------
+	"res://scenes/levels/Estrada_das_Cinzas.tscn",
+	"res://scenes/levels/Rio_de_Magma.tscn",
+	"res://scenes/levels/A_Forja_dos_Demonios.tscn",
+	"res://scenes/levels/Vulcao_do_Rei_Morto.tscn",
+	"res://scenes/levels/O_Ceu_em_Chamas.tscn",
 ]
 # "res://scenes/levels/Level_Test.tscn" fica no repo como sala de treino,
 # fora da campanha (correr a cena diretamente no editor).
@@ -98,6 +104,7 @@ const REGIOES := [
 	{"id": "catacumbas", "nome": "Catacumbas do Abismo", "niveis": [15, 16, 17, 18, 19]},
 	{"id": "cidade", "nome": "Cidade Corrompida", "niveis": [20, 21, 22, 23, 24]},
 	{"id": "castelo", "nome": "Castelo de Zeriko", "niveis": [25, 26, 27, 28, 29]},
+	{"id": "queimadas", "nome": "Terras Queimadas", "niveis": [30, 31, 32, 33, 34]},
 ]
 
 signal vidas_mudaram(vidas: int)

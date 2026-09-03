@@ -303,5 +303,15 @@
 	"shrine.foco.ef": "+28% regeneração de Energia por nível",
 	"shrine.agilidade.ef": "+0.06 s de i-frames no rolamento por nível",
 	"shrine.furia.ef": "+0.22 ao multiplicador de crítico por nível",
-	"shrine.escudo_runico.ef": "+1 carga de bloqueio do escudo por nível"
+	"shrine.escudo_runico.ef": "+1 carga de bloqueio do escudo por nível",
+	"level.n30": "Estrada das Cinzas",
+	"level.n31": "Rio de Magma",
+	"level.n32": "A Forja dos Demónios",
+	"level.n33": "Vulcão do Rei Morto",
+	"level.n34": "O Céu em Chamas",
+	"boss.vulkar": "Vulkar, o Cavaleiro das Cinzas",
+	"boss.magmora": "Magmora",
+	"boss.mestre_da_forja": "O Mestre da Forja",
+	"boss.dragorak": "Dragorak, o Rei de Lava",
+	"boss.estrela_caida": "A Estrela Caída"
 }

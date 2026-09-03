@@ -303,5 +303,15 @@
 	"shrine.foco.ef": "+28% Energy regen per rank",
 	"shrine.agilidade.ef": "+0.06s roll i-frames per rank",
 	"shrine.furia.ef": "+0.22 crit multiplier per rank",
-	"shrine.escudo_runico.ef": "+1 shield block charge per rank"
+	"shrine.escudo_runico.ef": "+1 shield block charge per rank",
+	"level.n30": "Road of Ashes",
+	"level.n31": "River of Magma",
+	"level.n32": "The Forge of Demons",
+	"level.n33": "Volcano of the Dead King",
+	"level.n34": "The Burning Sky",
+	"boss.vulkar": "Vulkar, the Ash Knight",
+	"boss.magmora": "Magmora",
+	"boss.mestre_da_forja": "The Forge Master",
+	"boss.dragorak": "Dragorak, the Lava King",
+	"boss.estrela_caida": "The Fallen Star"
 }

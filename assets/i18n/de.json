@@ -303,5 +303,15 @@
 	"shrine.foco.ef": "+28% Energie-Regen pro Stufe",
 	"shrine.agilidade.ef": "+0,06 s Rollen-i-Frames pro Stufe",
 	"shrine.furia.ef": "+0,22 Krit-Multiplikator pro Stufe",
-	"shrine.escudo_runico.ef": "+1 Schildblock-Ladung pro Stufe"
+	"shrine.escudo_runico.ef": "+1 Schildblock-Ladung pro Stufe",
+	"level.n30": "Straße der Asche",
+	"level.n31": "Magmafluss",
+	"level.n32": "Die Schmiede der Dämonen",
+	"level.n33": "Vulkan des Toten Königs",
+	"level.n34": "Der brennende Himmel",
+	"boss.vulkar": "Vulkar, der Aschenritter",
+	"boss.magmora": "Magmora",
+	"boss.mestre_da_forja": "Der Schmiedemeister",
+	"boss.dragorak": "Dragorak, der Lavakönig",
+	"boss.estrela_caida": "Der Gefallene Stern"
 }

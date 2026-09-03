@@ -42,10 +42,16 @@ const CHEFE_KEY: Array[String] = [
 	"boss.rei_devorador",        # 27 Banquete dos Imortais
 	"boss.arauto_de_zeriko",     # 28 Torre do Coração Negro
 	"boss.zeriko",               # 29 O Trono de Zeriko
+	# --- Regiao VII  Terras Queimadas ---
+	"boss.vulkar",           # 30 Estrada das Cinzas
+	"boss.magmora",          # 31 Rio de Magma
+	"boss.mestre_da_forja",  # 32 A Forja dos Demonios
+	"boss.dragorak",         # 33 Vulcao do Rei Morto
+	"boss.estrela_caida",    # 34 O Ceu em Chamas
 ]
 
 
-## Chave i18n do nome do nível `indice` (`level.n00`..`level.n29`).
+## Chave i18n do nome do nível `indice` (`level.n00`..`level.n99`).
 static func chave_nivel(indice: int) -> String:
 	return "level.n%02d" % indice
 

@@ -303,5 +303,15 @@
 	"shrine.foco.ef": "+28% régén. d'Énergie par rang",
 	"shrine.agilidade.ef": "+0.06 s d'i-frames de roulade par rang",
 	"shrine.furia.ef": "+0.22 au multiplicateur de critique par rang",
-	"shrine.escudo_runico.ef": "+1 charge de blocage du bouclier par rang"
+	"shrine.escudo_runico.ef": "+1 charge de blocage du bouclier par rang",
+	"level.n30": "Route des Cendres",
+	"level.n31": "Rivière de Magma",
+	"level.n32": "La Forge des Démons",
+	"level.n33": "Volcan du Roi Mort",
+	"level.n34": "Le Ciel en Flammes",
+	"boss.vulkar": "Vulkar, le Chevalier de Cendre",
+	"boss.magmora": "Magmora",
+	"boss.mestre_da_forja": "Le Maître de la Forge",
+	"boss.dragorak": "Dragorak, le Roi de Lave",
+	"boss.estrela_caida": "L'Étoile Déchue"
 }

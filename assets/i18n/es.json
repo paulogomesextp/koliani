@@ -303,5 +303,15 @@
 	"shrine.foco.ef": "+28% regen. de Energía por rango",
 	"shrine.agilidade.ef": "+0.06 s de i-frames al rodar por rango",
 	"shrine.furia.ef": "+0.22 al multiplicador de crítico por rango",
-	"shrine.escudo_runico.ef": "+1 carga de bloqueo de escudo por rango"
+	"shrine.escudo_runico.ef": "+1 carga de bloqueo de escudo por rango",
+	"level.n30": "Camino de Cenizas",
+	"level.n31": "Río de Magma",
+	"level.n32": "La Forja de los Demonios",
+	"level.n33": "Volcán del Rey Muerto",
+	"level.n34": "El Cielo en Llamas",
+	"boss.vulkar": "Vulkar, el Caballero de Ceniza",
+	"boss.magmora": "Magmora",
+	"boss.mestre_da_forja": "El Maestro de la Forja",
+	"boss.dragorak": "Dragorak, el Rey de Lava",
+	"boss.estrela_caida": "La Estrella Caída"
 }
