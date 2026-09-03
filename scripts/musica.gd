@@ -4,10 +4,12 @@ extends Node
 ## a Koliani se aproxima.
 ##
 ## - Menu: `menu.wav` (lento, tema próprio).
-## - Mundos 1-4: `ambiente.wav`, pitch por bioma (o mundo 4 arranca numa
-##   cama mais grave -- a aproximação ao Zeriko, ainda sem combate).
-## - Chefe (qualquer mundo): `boss.wav` -- mais rápida, mais alta e
-##   fantasmagórica. Só entra quando o **combate começa** (o chefe deteta a
+## - Níveis: 20 faixas em `assets/audio/musica/niveis/` (`indice_nivel % 20`,
+##   pedido do Paulo a 3 set 2026 -- antes só havia uma faixa `bg_niveis.mp3`
+##   para os 30+ níveis). O nível 21 volta à faixa do nível 1.
+## - Chefe (qualquer mundo): 20 faixas em `assets/audio/musica/chefes/`
+##   (mesmo `indice_nivel % 20`, para o chefe de cada nível ter sempre a
+##   mesma faixa). Só entra quando o **combate começa** (o chefe deteta a
 ##   Koliani / troca o primeiro golpe), NÃO só por o ver. Cada chefe chama
 ##   `Musica.boss()` via `ChefeBase.provocar()`.
 ## - Por baixo (exceto no chefe): `assombracao.wav` -- casa assombrada.
@@ -15,12 +17,20 @@ extends Node
 ## Não recomeça a cama se já estiver a tocar a faixa certa, para não
 ## cortar entre recargas de cena. Tudo encaminha para o bus "Music".
 
-## Camas fornecidas pelo Paulo (OneCinematicStudio -- ver
-## assets/audio/CREDITS.md).
+## Cama do menu, fornecida pelo Paulo (OneCinematicStudio -- ver
+## assets/audio/CREDITS.md). `CAMINHO`/`CAMINHO_BOSS` (únicas, antigas)
+## ficam de reserva -- usadas se por algum motivo as 20 faixas não
+## existirem (fresh checkout antes do `--import`, por ex.).
 const CAMINHO := "res://assets/audio/bg_niveis.mp3"       # "Shadow of the Forsaken"
 const CAMINHO_MENU := "res://assets/audio/bg_menu.mp3"    # "The Alchemist's Library"
 const CAMINHO_BOSS := "res://assets/audio/bg_boss.mp3"    # "Final Battle II" (Nyxaurora)
 const CAMINHO_ASSOMBRACAO := "res://assets/audio/assombracao.wav"
+
+## 20 faixas de nível / 20 de chefe, em ciclo (ver assets/audio/CREDITS.md
+## para a fonte de cada uma -- todas CC0/CC-BY do OpenGameArt).
+const N_FAIXAS := 20
+const PASTA_NIVEIS := "res://assets/audio/musica/niveis/nivel_%02d.ogg"
+const PASTA_CHEFES := "res://assets/audio/musica/chefes/boss_%02d.ogg"
 
 ## Pitch por índice de mundo (0..3): floresta, prisão, torres, castelo.
 ## O castelo (mundo 4) arranca mais grave -- é a caminhada até ao Zeriko;
@@ -62,18 +72,26 @@ func menu() -> void:
 	_tocar(CAMINHO_MENU, 1.0, VOL_CAMA, true)
 
 
-## Cama de exploração de um mundo (pitch por bioma). O combate de chefe
-## troca para `boss()` por cima disto; ao morrer/recarregar a cena volta-se
-## aqui até o combate recomeçar.
-func ambiente(_indice_nivel: int) -> void:
-	# faixa composta -- toca-se ao natural (sem pitch por bioma)
-	_tocar(CAMINHO, 1.0, VOL_CAMA, true)
+## Cama de exploração de um mundo: uma das 20 faixas de nível, em ciclo
+## (`indice_nivel % N_FAIXAS`). O combate de chefe troca para `boss()` por
+## cima disto; ao morrer/recarregar a cena volta-se aqui até o combate
+## recomeçar.
+func ambiente(indice_nivel: int) -> void:
+	var caminho := PASTA_NIVEIS % ((indice_nivel % N_FAIXAS) + 1)
+	if not ResourceLoader.exists(caminho):
+		caminho = CAMINHO  # reserva: fresh checkout antes do --import
+	_tocar(caminho, 1.0, VOL_CAMA, true)
 
 
 ## Música de chefe -- chamada por `chefe_base.gd` quando o **combate
-## começa** (o chefe deteta a Koliani ou troca-se o primeiro golpe).
+## começa** (o chefe deteta a Koliani ou troca-se o primeiro golpe). Usa o
+## mesmo índice de nível que `ambiente()`, por isso o chefe de cada nível
+## tem sempre a mesma faixa.
 func boss() -> void:
-	_tocar(CAMINHO_BOSS, 1.0, VOL_BOSS, false)
+	var caminho := PASTA_CHEFES % ((EstadoJogo.indice_nivel % N_FAIXAS) + 1)
+	if not ResourceLoader.exists(caminho):
+		caminho = CAMINHO_BOSS  # reserva: fresh checkout antes do --import
+	_tocar(caminho, 1.0, VOL_BOSS, false)
 
 
 func parar() -> void:
