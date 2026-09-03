@@ -5,8 +5,25 @@
 Ate' aqui cada regiao alternava entre DOIS fundos (A B A B A) e os cinco
 niveis partilhavam a graduacao -- por isso e' que "parecia tudo igual"
 mesmo depois de mudar de nivel. Aqui ha' uma linha por nivel: pack de
-fundo, luz-chave, ceu, neblina, po'. Treze packs, e nunca o mesmo em dois
-niveis seguidos.
+fundo, luz-chave, ceu, neblina, po'.
+
+REGRA (3 set 2026): **um pack NUNCA aparece em duas regioes**. A primeira
+versao espalhou os treze packs por variedade dentro de cada regiao, e o
+resultado foi o contrario do pretendido -- o `luar` acabou em 5 das 6
+regioes, o `igreja` em 4, e a Regiao VI (o Castelo de Zeriko, o climax)
+nao tinha fundo nenhum so' dela: usava as paredes da prisao em dois dos
+seus cinco niveis. Identidade ENTRE regioes vale mais do que variedade
+dentro de uma: e' a mudanca de regiao que o jogador tem de sentir. A
+variedade dentro da regiao passa a vir da tinta/luz-chave, que continua a
+ser diferente em cada um dos 30 niveis.
+
+  I   floresta, pantano          IV  caverna
+  II  prisao                     V   vilanoite, cidade, horror
+  III montanhas, rochoso         VI  castelo_velho, igreja, luar
+
+O pack `corredores` era uma copia byte a byte do `prisao` (dois nomes para
+a mesma imagem) e foi apagado. As Regioes II e IV ficam com um pack so' --
+faltam-lhes fundos proprios ainda por construir.
 
 Reescreve o bloco de propriedades do no `Atmosfera` de cada
 `scenes/levels/*.tscn`. So' mexe nas chaves da tabela -- `bioma`,
@@ -45,38 +62,38 @@ TABELA = [
     # ---- I  Floresta Putrefacta -------------------------------------
     ("Floresta_Putrefata",     "floresta",      (.86,.92,.86), (.05,.09,.09), (.09,.15,.09), (.62,1.0,.72), (.72,1.0,.86), 1.5, (.82,.94,1.02), .30, .26, False),
     ("Pantano_dos_Sussurros",  "pantano",       (.80,.90,.84), (.05,.10,.09), (.07,.14,.11), (.46,.92,.76), (.62,1.0,.88), 2.2, (.76,1.00,.96), .50, .24, False),
-    ("Ninho_da_Viuva_Negra",   "caverna",       (.84,.80,.90), (.07,.05,.10), (.11,.08,.15), (.86,.56,1.0), (.92,.72,1.0), 1.8, (.94,.78,1.08), .38, .30, False),
-    ("A_Arvore_que_Chora",     "luar",          (.90,.88,.92), (.09,.04,.11), (.10,.06,.12), (1.0,.44,.86),  (1.0,.72,.92), 1.6, (1.00,.86,1.00), .22, .10, False),
+    ("Ninho_da_Viuva_Negra",   "floresta",       (.84,.80,.90), (.07,.05,.10), (.11,.08,.15), (.86,.56,1.0), (.92,.72,1.0), 1.8, (.94,.78,1.08), .38, .30, False),
+    ("A_Arvore_que_Chora",     "pantano",          (.90,.88,.92), (.09,.04,.11), (.10,.06,.12), (1.0,.44,.86),  (1.0,.72,.92), 1.6, (1.00,.86,1.00), .22, .10, False),
     ("Coracao_da_Floresta",    "pantano",       (.82,.88,.84), (.08,.05,.10), (.10,.14,.09), (.94,.42,1.0),  (.90,.66,1.0), 2.0, (.90,.84,1.06), .44, .36, False),
     # ---- II Prisao dos Condenados -----------------------------------
     ("Prisao_dos_Condenados",  "prisao",        (.80,.84,.96), (.04,.06,.12), (.07,.09,.16), (.60,.68,1.0),  (.72,.84,1.0), 1.2, (.70,.82,1.14), .44, .56, False),
-    ("Fornalha_dos_Pecadores", "igreja",        (.98,.86,.78), (.13,.05,.04), (.18,.08,.06), (1.0,.58,.26),  (1.0,.76,.44), 2.4, (1.14,.72,.62), .28, .44, True),
-    ("Corredor_das_Execucoes", "corredores",    (.82,.88,.98), (.04,.07,.11), (.07,.11,.16), (.62,.84,1.0),  (.78,.92,1.0), 1.0, (.72,.90,1.16), .38, .58, False),
-    ("Ala_dos_Mortos",         "castelo_velho", (.84,.92,.90), (.04,.09,.09), (.06,.13,.12), (.48,1.0,.86),  (.66,1.0,.92), 1.8, (.80,1.04,1.00), .40, .28, False),
+    ("Fornalha_dos_Pecadores", "prisao",        (.98,.86,.78), (.13,.05,.04), (.18,.08,.06), (1.0,.58,.26),  (1.0,.76,.44), 2.4, (1.14,.72,.62), .28, .44, True),
+    ("Corredor_das_Execucoes", "prisao",    (.82,.88,.98), (.04,.07,.11), (.07,.11,.16), (.62,.84,1.0),  (.78,.92,1.0), 1.0, (.72,.90,1.16), .38, .58, False),
+    ("Ala_dos_Mortos",         "prisao", (.84,.92,.90), (.04,.09,.09), (.06,.13,.12), (.48,1.0,.86),  (.66,1.0,.92), 1.8, (.80,1.04,1.00), .40, .28, False),
     ("A_Cela_Zero",            "prisao",        (.76,.76,.94), (.05,.04,.11), (.08,.07,.15), (.74,.44,1.0),  (.82,.62,1.0), 1.4, (.78,.70,1.20), .50, .60, False),
     # ---- III Torres --------------------------------------------------
     ("Torre_dos_Sinos",        "montanhas",     (.96,.90,.86), (.09,.07,.11), (.14,.11,.14), (1.0,.74,.46),  (1.0,.88,.68), 1.1, (1.06,.90,.94), .30, .22, True),
     ("Torre_dos_Ventos",       "rochoso",       (.92,.92,.96), (.06,.07,.12), (.10,.12,.18), (.96,.86,.64),  (1.0,.96,.84), 1.9, (.94,.94,1.06), .34, .26, False),
-    ("Torre_da_Tempestade",    "horror",        (.86,.90,1.0), (.04,.06,.13), (.07,.10,.18), (.70,.88,1.0),  (.80,.94,1.0), 2.3, (.74,.88,1.20), .46, .34, False),
-    ("Observatorio_Lunar",     "luar",          (.94,.94,1.0), (.07,.06,.14), (.10,.10,.18), (.88,.90,1.0),  (.94,.96,1.0), 1.3, (.90,.92,1.14), .18, .16, False),
+    ("Torre_da_Tempestade",    "montanhas",        (.86,.90,1.0), (.04,.06,.13), (.07,.10,.18), (.70,.88,1.0),  (.80,.94,1.0), 2.3, (.74,.88,1.20), .46, .34, False),
+    ("Observatorio_Lunar",     "rochoso",          (.94,.94,1.0), (.07,.06,.14), (.10,.10,.18), (.88,.90,1.0),  (.94,.96,1.0), 1.3, (.90,.92,1.14), .18, .16, False),
     ("O_Pico_Esquecido",       "montanhas",     (.90,.90,.98), (.06,.06,.13), (.10,.11,.19), (.78,.58,1.0),  (.88,.78,1.0), 2.0, (.86,.86,1.16), .40, .30, False),
     # ---- IV Catacumbas ----------------------------------------------
-    ("Cemiterio_dos_Reis",     "luar",          (.88,.88,.92), (.07,.04,.10), (.11,.09,.13), (.86,.70,.78),  (.96,.88,.90), 1.4, (1.00,.84,.96), .26, .14, False),
+    ("Cemiterio_dos_Reis",     "caverna",          (.88,.88,.92), (.07,.04,.10), (.11,.09,.13), (.86,.70,.78),  (.96,.88,.90), 1.4, (1.00,.84,.96), .26, .14, False),
     ("Galeria_dos_Ossos",      "caverna",       (.90,.88,.84), (.07,.06,.07), (.13,.12,.10), (.92,.86,.66),  (1.0,.96,.80), 1.6, (1.04,.94,.86), .34, .26, False),
-    ("Cripta_das_Mil_Velas",   "igreja",        (.98,.90,.80), (.10,.06,.07), (.15,.10,.09), (1.0,.80,.48),  (1.0,.90,.62), 2.1, (1.10,.86,.80), .30, .30, True),
-    ("Templo_da_Serpente",     "castelo_velho", (.84,.92,.84), (.04,.09,.07), (.07,.14,.10), (.56,.92,.50),  (.72,1.0,.66), 1.7, (.78,1.06,.86), .38, .22, False),
+    ("Cripta_das_Mil_Velas",   "caverna",        (.98,.90,.80), (.10,.06,.07), (.15,.10,.09), (1.0,.80,.48),  (1.0,.90,.62), 2.1, (1.10,.86,.80), .30, .30, True),
+    ("Templo_da_Serpente",     "caverna", (.84,.92,.84), (.04,.09,.07), (.07,.14,.10), (.56,.92,.50),  (.72,1.0,.66), 1.7, (.78,1.06,.86), .38, .22, False),
     ("O_Abismo",               "caverna",       (.76,.74,.92), (.04,.03,.10), (.07,.06,.14), (.52,.34,.88),  (.70,.56,1.0), 2.4, (.72,.64,1.18), .52, .34, False),
     # ---- V  Cidade Corrompida ---------------------------------------
     ("Vila_dos_Sem_Rosto",     "vilanoite",     (.94,.86,.90), (.09,.05,.10), (.13,.09,.14), (1.0,.62,.72),  (1.0,.82,.88), 1.3, (1.06,.84,.98), .28, .18, True),
     ("Mercado_da_Carne",       "cidade",        (.96,.82,.86), (.11,.04,.07), (.16,.07,.10), (1.0,.46,.54),  (1.0,.70,.74), 1.9, (1.12,.74,.86), .32, .30, False),
     ("Trem_dos_Mortos",        "horror",        (.92,.84,.86), (.08,.05,.08), (.12,.08,.11), (1.0,.58,.50),  (1.0,.78,.70), 2.5, (1.08,.80,.88), .44, .28, True),
-    ("Catedral_da_Corrupcao",  "igreja",        (.90,.82,.98), (.07,.04,.12), (.11,.07,.17), (.80,.46,1.0),  (.90,.68,1.0), 1.5, (.94,.76,1.16), .36, .32, False),
-    ("Praca_do_Eclipse",       "luar",          (.92,.82,.96), (.09,.03,.12), (.13,.06,.16), (.88,.52,1.0),  (.96,.72,1.0), 1.4, (1.02,.76,1.10), .24, .12, False),
+    ("Catedral_da_Corrupcao",  "vilanoite",        (.90,.82,.98), (.07,.04,.12), (.11,.07,.17), (.80,.46,1.0),  (.90,.68,1.0), 1.5, (.94,.76,1.16), .36, .32, False),
+    ("Praca_do_Eclipse",       "cidade",          (.92,.82,.96), (.09,.03,.12), (.13,.06,.16), (.88,.52,1.0),  (.96,.72,1.0), 1.4, (1.02,.76,1.10), .24, .12, False),
     # ---- VI Castelo de Zeriko ---------------------------------------
-    ("Portoes_de_Zeriko",      "corredores",    (.90,.80,.96), (.08,.03,.12), (.12,.06,.17), (1.0,.44,.96),  (1.0,.70,1.0), 1.6, (1.00,.72,1.16), .34, .34, True),
+    ("Portoes_de_Zeriko",      "luar",    (.90,.80,.96), (.08,.03,.12), (.12,.06,.17), (1.0,.44,.96),  (1.0,.70,1.0), 1.6, (1.00,.72,1.16), .34, .34, True),
     ("Salao_dos_Espelhos",     "castelo_velho", (.92,.86,.98), (.06,.05,.13), (.10,.09,.18), (1.0,.52,.96),  (1.0,.78,1.0), 1.2, (.96,.80,1.18), .28, .20, False),
     ("Banquete_dos_Imortais",  "igreja",        (.96,.84,.92), (.10,.04,.10), (.15,.07,.14), (1.0,.56,.88),  (1.0,.78,.96), 1.8, (1.08,.78,1.04), .32, .28, True),
-    ("Torre_do_Coracao_Negro", "corredores",    (.86,.74,.96), (.06,.02,.12), (.10,.05,.17), (1.0,.36,.96),  (1.0,.64,1.0), 2.2, (.92,.64,1.20), .46, .36, False),
+    ("Torre_do_Coracao_Negro", "castelo_velho",    (.86,.74,.96), (.06,.02,.12), (.10,.05,.17), (1.0,.36,.96),  (1.0,.64,1.0), 2.2, (.92,.64,1.20), .46, .36, False),
     ("O_Trono_de_Zeriko",      "luar",          (.98,.80,1.0), (.11,.02,.13), (.16,.05,.18), (1.0,.32,1.0),  (1.0,.62,1.0), 2.0, (1.10,.68,1.14), .16, .08, True),
 ]
 

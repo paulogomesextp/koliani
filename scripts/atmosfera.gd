@@ -74,12 +74,6 @@ const PACKS := {
 		["mid2.png", "Meio", 905.0, 3.6],
 		["trees.png", "Perto", 950.0, 3.8],
 	],
-	"corredores": [
-		["back.png", "Fundo", 860.0, 4.2],
-		["far.png", "Longe", 870.0, 4.2],
-		["middle.png", "Meio", 885.0, 4.2],
-		["near.png", "Perto", 915.0, 4.2],
-	],
 	# Região II -- Prisão dos Condenados (ansimuz "Cold Corridors", CC0).
 	"prisao": [
 		["back.png", "Fundo", 900.0, 4.4],

@@ -32,10 +32,10 @@ const COR_REGIAO := [
 ## arte de fundo por região (o `back.png` do bioma) -- preview no cartão.
 const FUNDO_REGIAO := [
 	"res://assets/sprites/pixel/backgrounds/floresta/middle.png",
-	"res://assets/sprites/pixel/backgrounds/corredores/middle.png",
+	"res://assets/sprites/pixel/backgrounds/prisao/middle.png",
 	"res://assets/sprites/pixel/backgrounds/montanhas/trees.png",
 	"res://assets/sprites/pixel/backgrounds/rochoso/middle.png",
-	"res://assets/sprites/pixel/backgrounds/corredores/near.png",
+	"res://assets/sprites/pixel/backgrounds/prisao/near.png",
 	"res://assets/sprites/pixel/backgrounds/rochoso/near.png",
 ]
 

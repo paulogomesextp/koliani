@@ -81,13 +81,16 @@ ficheiro. Os restantes sprites pixel-art vêm de packs CC0:
 - https://ansimuz.itch.io/ · https://opengameart.org/users/ansimuz
 - Licença: CC0 / domínio público ("free to use, personal or commercial")
 - Uso: fundos parallax pixel-art por região
-  (`assets/sprites/pixel/backgrounds/{floresta,pantano,corredores,rochoso,montanhas,prisao,caverna,cidade,igreja}/`):
+  (`assets/sprites/pixel/backgrounds/{floresta,pantano,rochoso,montanhas,prisao,caverna,cidade,igreja}/`):
   Parallax Forest v2 (R1 `floresta`), Gothicvania Swamp (R1 pântano
   `pantano`), Mountain Dusk (R3 `montanhas`), Caverns (R4 `caverna`),
-  Rocky Pass (R5 `rochoso`). Cold Corridors serve as duas regiões de
-  masmorra: `prisao` (R2, graduada a azul-cobalto pela Atmosfera) e
-  `corredores` (R6 castelo, graduada a violeta/magenta) — mesma
-  arquitectura, ambientes diferentes.
+  Rocky Pass (R3 `rochoso`), Cold Corridors (R2 `prisao`).
+
+  Até 3 set 2026 o Cold Corridors estava copiado byte a byte para um
+  segundo nome, `corredores`, para servir a R6 (castelo) graduado a
+  violeta. Não pegava: na folha de contacto o castelo continuava a ler-se
+  como a prisão. O pack duplicado foi apagado e cada região passou a ter
+  packs só seus — ver `tools/afinar_atmosfera.py`.
 
 CC0 não exige atribuição; fica aqui à mesma por cortesia.
 
