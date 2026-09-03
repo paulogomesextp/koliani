@@ -31,7 +31,7 @@ segredos e finais alternativos** ao longo dos 100 níveis.
 
 ---
 
-## VII — AS TERRAS QUEIMADAS (31–35) 🌘
+## VII — AS TERRAS QUEIMADAS (31–35) 🌘 ✅ *feita (3 set 2026)*
 
 Depois da derrota de Zeriko, a magia púrpura começa a destruir o reino.
 
@@ -43,7 +43,7 @@ Depois da derrota de Zeriko, a magia púrpura começa a destruir o reino.
 | 34 | 🌋 Vulcão do Rei Morto | subida vertical pelo interior do vulcão | **Dragorak, o Rei de Lava** — rei transformado em dragão; fase 2 o vulcão entra em erupção |
 | 35 | ☄️ O Céu em Chamas | topo do vulcão, pedaços do céu a cair | **A Estrela Caída** — entidade cósmica corrompida; 1.º chefe a sugerir que a ameaça é maior que Zeriko |
 
-## VIII — MAR DOS MORTOS (36–40) 🌊
+## VIII — MAR DOS MORTOS (36–40) 🌊 ✅ *feita (3 set 2026)*
 
 A corrupção fez o mar recuar, revelando uma civilização esquecida.
 

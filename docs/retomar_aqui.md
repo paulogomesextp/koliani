@@ -1,114 +1,156 @@
-# Retomar aqui — 3 de setembro de 2026 (sessão da tarde, depois do /clear)
+# Retomar aqui — 3 de setembro de 2026 (sessão da noite)
 
-> **LEIA PRIMEIRO.** Continuação da lista do Paulo (ver histórico git para
-> a versão completa anterior). Progresso desta sessão no topo.
+> **LEIA PRIMEIRO.** O que mudou nesta sessão está no topo; o histórico
+> anterior fica por baixo, encurtado. Versão actual: **v0.11.3**.
 
-## ⚠ A LISTA DO PAULO — estado actual
+## O que se fez nesta sessão
 
-1. **Substituir a Koliani pelo modelo pixel-art novo** — ✅ **resolvido
-   (de forma diferente do pedido original)**. O Paulo reenviou a folha de
-   referência (gravada em `assets/branding/koliani_ref_nova.png`), mas
-   depois de ver os candidatos CC0 que encontrei (nenhum bate perto o
-   suficiente — ver "Investigação da arte" abaixo) **pediu para voltar ao
-   rig "cavaleiro"** que já existia há 48h (Knight_player recolorido,
-   cabelo comprido à mostra, sem elmo — visualmente o mais próximo que já
-   tivemos da referência). `koliani.gd::RIG` voltou a `"cavaleiro"`
-   (commit `1b0497e`, v0.10.3). **Decisão consciente sobre a licença**: o
-   pack Knight_player proíbe uso por IA no seu `Read_me.txt`; o Paulo viu
-   o aviso e confirmou expressamente que quer esta Koliani na mesma,
-   aceitando o risco por agora. **Não voltar a apagar os assets sem falar
-   com ele primeiro.**
-2. Ressalto do pisão a metade — ✅ feito (sessão anterior, `6abcee0`).
-3. **Sons mais realistas** — ✅ **feito** (`3c1dd48`, v0.10.2). Os 35 SFX
-   de combate/mobs/UI (`scripts/som.gd`) foram trocados por samples CC0
-   reais do OpenGameArt — ver `assets/audio/CREDITS.md` para a lista de
-   packs/autores. Só as **camas** (`menu.wav`, `boss.wav`, `ambiente.wav`,
-   `assombracao.wav`, `game_over.wav`) continuam sintetizadas por
-   `tools/gerar_audio.py` — sem equivalente real encontrado ainda.
-4. **20 músicas de nível, em ciclo** — ✅ **feito** (`518a0a8`, v0.11.0).
-   `Musica.ambiente()` escolhe `nivel_01..20.ogg` por `indice_nivel % 20`.
-5. **20 músicas de chefe, em ciclo** — ✅ **feito**, mesmo commit.
-   `Musica.boss()` escolhe `boss_01..20.ogg` pelo mesmo índice (o chefe de
-   cada nível tem sempre a mesma faixa). Fonte de tudo e nota técnica do
-   `ffmpeg` (instalado só para a sessão, não fica dependência) na secção
-   "Música" abaixo.
-6. **Chefes — arrancou** (`520e45c`, v0.11.1). 4 rigs animados novos, do
-   Kronovi- (itch.io, gratuito, sem cláusula anti-IA): `verdugo` (Dama da
-   Guilhotina), `golem_pedra` (Maquinista Infernal), `arqueiro` (Voltaris),
-   `cavaleiro_negro` (Capitão Negro). **9 de 30 chefes principais têm rig
-   animado — faltam 21.** Detalhe/licenças em
-   `assets/sprites/pixel/CREDITS.md` (secção "Chefes ANIMADOS").
+### 1. Chefes animados — o ponto 6 do Paulo está FECHADO
 
-**A lista de 6 pontos do Paulo está completa na primeira passagem.** O
-ponto 6 é o único que ainda tem trabalho por fazer (21 chefes).
+Faltavam 21 dos 30 chefes sem rig animado. A receita que a sessão anterior
+deixou escrita era **recolorir o "Wandering Knight" vinte vezes**. Não foi
+por aí: **cada chefe tem agora a sua própria silhueta**.
+
+- **`tools/baixar_packs_itch.py` (novo)** — descarrega packs **gratuitos**
+  do itch.io. Só *name-your-own-price* a $0; se o pack for pago diz
+  `sem link (pack pago?)` e passa à frente — **não compra nada**. Fluxo:
+  `GET /<jogo>/purchase` → `POST /<jogo>/download_url` →
+  `POST /<jogo>/file/<id>?source=game_download`. O endpoint do ficheiro é
+  na RAIZ do subdomínio, **não** debaixo do `/download/<chave>` da página
+  (foi a parte que custou a acertar — está comentada no ficheiro).
+- Trouxe **18 packs CC0 do LuizMelo** (o autor do "Evil Wizard 2" que já se
+  usava, logo o mesmo traço e a mesma densidade de pixel) e **3 gratuitos
+  do chierit**. ~15 dos packs do LuizMelo eram pagos — ficaram de fora.
+- **`tools/importar_chefes_animados.py`**: as tiras `@ficheiro.png` deixam
+  de precisar da contagem de frames. A célula sai do **máximo divisor
+  comum das larguras das folhas do mesmo rig** (`celula_comum`). Sem isto
+  era preciso contar os frames de ~100 folhas à mão.
+- **29 rigs** na tabela `RIGS` (eram 9). 20 cenas de chefe ganharam
+  `rig = "..."` + o nó `Sprite/Anim`.
+- `DemonioBase._normalizar_escala` ganhou **tecto de largura**
+  (`ChefeBase.LARGURA_ALVO_CHEFE = 110`): um rig largo e baixo (o morcego,
+  o baú-mímico, o verme) esticado até 100 px de alto ficava com 160+ de
+  largo — mais largo que a plataforma da arena. Nenhum chefe antigo muda
+  (o mais largo que cá estava tinha 105).
+- `escala_visual` reafinado em 9 cenas: as escalas antigas tinham sido
+  medidas para folhas estáticas estreitas.
+
+**Estado: 29 de 30.** Fica de fora, de propósito, a **Koliani Sombria**
+(n27) — é o espelho da Koliani e usa o rig da própria heroína.
+
+Tabela completa rig→chefe→pack→licença: `assets/sprites/pixel/CREDITS.md`.
+
+**Duas escolhas para o Paulo confirmar** (estão escritas no CREDITS
+também): o **Sino Vivo** (n11) é um **baú-mímico** — não há nada gratuito
+com cara de sino, e um objecto que pende do tecto e morde faz o trabalho;
+o **Vyrak** (n15) é um **morcego gigante** em vez de um dragão. Ambos
+ficam à espera de um pack melhor.
+
+### 2. Região VIII — Mar dos Mortos (níveis 36-40)
+
+A campanha passa de 35 para 40 níveis, com a mesma tubagem que a Região
+VII estreou (uma linha por nível na tabela de `gerar_niveis_31_100.py`).
+
+    36 Porto dos Afogados          guardião: O Afogado
+    37 Cidade Submersa             guardião: Gosma Salgada
+    38 Palácio das Sereias Mortas  guardião: Estátua Viva
+    39 Ossário das Baleias         guardião: Lodo Abissal
+    40 Abismo Oceânico             CHEFE: A Mãe do Abismo  (INVOCADOR)
+
+É o contraponto directo da VII, e isso está escrito em todas as peças:
+`POOL_REGIAO[7]` sem `fogo` nem `quebra` (debaixo de água não arde nem se
+estilhaça) e com `gravidade` de assinatura — o tema é **flutuar**;
+`LIQUIDO[7]` é água negra, a primeira região em que o chão mortal não é
+quente; a atmosfera desce de verde-azulado para azul-tinta, com pó denso
+(a matéria em suspensão faz o "debaixo de água" sem shader nenhum) e
+horizonte apagado nos cinco.
+
+Dois bugs apanhados pelo caminho:
+
+- **O modelo do gerador chapava lava laranja em todas as regiões** — o
+  líquido da arena do chefe estava escrito à mão no template. Passa a sair
+  de `LIQUIDO_REGIAO`. Sem isto o Abismo Oceânico tinha um fosso de magma.
+- **A Região VII estava sem a atmosfera afinada.** Os cinco `.tscn` tinham
+  sido gerados *depois* de `afinar_atmosfera.py` correr, e o gerador
+  reescreve o bloco `Atmosfera` — os cinco estavam com as cores por
+  omissão. **Ordem certa: `gerar_niveis_31_100.py` → `--headless --import`
+  → `afinar_atmosfera.py`.** Nunca ao contrário.
+
+## O que fazer a seguir
+
+1. **Playtestar os chefes novos.** 20 chefes trocaram de boneco de uma vez
+   e só se viram 12 em screenshot. Pontos a olhar: o chefe fica dentro da
+   arena? assenta no chão? o tamanho lê-se como chefe e não como bicho
+   grande? (`tools/testar_chefe.gd -- <idx0> <prefixo> [n] [seg] [zoom]
+   [recuo]`, **precisa de janela**: `--window --screen 1`).
+2. **Regiões IX-XX (41-100)** — a IX (Reino do Gelo) é a próxima. A receita
+   está nesta sessão e na anterior; são ~30 min por região agora.
+3. **Arte própria das regiões novas.** Da VII em diante os packs de fundo
+   são reaproveitados e a identidade vem toda da tinta. `gerar_terreno.py`
+   só conhece 6 biomas — as regiões novas pedem emprestado.
+4. **Playtestar a curva do 2.º acto** (níveis 31+). Os dois pontos de
+   partida (dificuldade 0.72, 14000 px) continuam a ser palpite.
+
+## Gotchas desta máquina (não voltar a descobrir)
+
+- **Screenshots não saem em `--headless`** (renderer dummy). Usar
+  `--window --screen 1` — janela real no 2.º monitor, sem roubar o ecrã
+  principal ao Paulo.
+- `ERROR: There is no animation with name 'idle'` aparece em **todos** os
+  níveis em `--headless`, incluindo o 1 — é do renderer dummy, não é
+  regressão. Não perseguir.
+- O `curl -X POST` para fora é bloqueado pelo classificador; a descarga de
+  packs faz-se pelo `tools/baixar_packs_itch.py` (urllib).
+- `ffmpeg` existe via `pip install --user imageio-ffmpeg` (ferramenta
+  local, não é dependência do projecto).
+
+---
+
+# Histórico anterior (2 e 3 de setembro)
+
+## A lista de 6 pontos do Paulo — COMPLETA
+
+1. **Koliani pixel-art nova** — resolvido de forma diferente do pedido: o
+   Paulo escolheu voltar ao rig **"cavaleiro"** (Knight_player recolorido).
+   **Decisão consciente sobre a licença**: o pack proíbe uso por IA no seu
+   `Read_me.txt`; o Paulo viu o aviso e confirmou que quer esta Koliani na
+   mesma. **Não voltar a apagar os assets sem falar com ele primeiro.**
+2. Ressalto do pisão a metade — feito.
+3. **Sons mais realistas** — 35 SFX de combate/mobs/UI trocados por samples
+   CC0 reais do OpenGameArt (`assets/audio/CREDITS.md`). Só as **camas**
+   (`menu`, `boss`, `ambiente`, `assombracao`, `game_over`) continuam
+   sintetizadas por `tools/gerar_audio.py` — o cabeçalho desse ficheiro diz
+   quais as chaves que ele já **não** deve gerar.
+4. **20 músicas de nível, em ciclo** — `Musica.ambiente()` escolhe
+   `nivel_01..20.ogg` por `indice_nivel % 20`.
+5. **20 músicas de chefe, em ciclo** — `Musica.boss()` pelo mesmo índice.
+6. **Chefes animados** — fechado nesta sessão (ver topo).
 
 ## Investigação da arte da Koliani (para não repetir)
 
-Andei à procura de um pack **pixel-art genuíno e CC0** parecido com a
-referência (assassina sem capacete, cabelo à mostra, cachecol/capa
-vermelho-escura, espada recta brilhante magenta). Nada bateu perto o
-suficiente:
+Procurou-se um pack pixel-art CC0 parecido com a referência (assassina sem
+capacete, cabelo à mostra, cachecol vermelho-escuro, espada recta magenta).
+Nada bateu: **Knight Hero Platformer** (CC0) tem elmo fechado e escudo;
+**Ninja Adventure** (CC0) é top-down, sem jump/wall-slide; **Ninja Girl**
+(CC0) é vector cartoon, destoa do pixel-art; o rig **gothic** (Ansimuz) é
+um monge de braços cruzados sem espada. Se algum dia for mesmo preciso
+trocar o Knight_player, a próxima tentativa deve ser **compor**
+(photobash: cabeça/cabelo de um pack sem elmo sobre o corpo do Knight
+Hero) em vez de só recolorir.
 
-- **Knight Hero Platformer Animation Pack** (CC0, pixivan,
-  `opengameart.org/content/knight-hero-platformer-animation-pack`) —
-  platformer completo (idle/walk/run/jump/fall/roll/combo de 3
-  golpes/hit), mas vem com **elmo fechado e escudo redondo**. Recolori
-  para a paleta magenta/roxo/vermelho como teste (o escudo lê bem como
-  brilho de energia) mas a silhueta continua "cavaleiro com elmo", não
-  "assassina de cabelo à mostra". Ficou descartado.
-- **Ninja Adventure Asset Pack** (Pixel-Boy, CC0,
-  `github.com/pixel-boy/NinjaAdventure`) — tem skins ninja em várias
-  cores, mas é **top-down** (Zelda-like); não tem jump/wall
-  slide/double jump porque esses movimentos só existem em plataforma
-  lateral. Não aproveitável como esqueleto de movimento.
-- **Ninja Girl - Free Sprite** (CC0, pzuh) — é "vector cartoon" (traço
-  suave, não pixel-art), destoa do resto do jogo (`Nearest` filter,
-  pixel-art puro).
-- **rig "gothic"** (Ansimuz GothicVania Church, CC0, já no repo) — monge
-  roxo de braços cruzados, sem espada visível. Mostrei ao Paulo, não
-  escolheu.
-- Não encontrei nada de graça com "cabelo comprido + capa/cachecol +
-  espada recta + sem capacete" pronto a usar — é um nicho muito
-  específico. Se algum dia for preciso mesmo trocar o Knight_player, a
-  próxima tentativa deveria ser **compor** (photobash: pegar cabeça/cabelo
-  de um pack sem elmo e colar sobre o corpo do Knight Hero) em vez de só
-  recolorir — mais trabalho, resultado incerto.
+## Música e som — de onde vieram (para expandir)
 
-## Sons — de onde vieram (para expandir mais tarde)
+OpenGameArt (`field_art_type_tid[]=12` para música). Packs mais rentáveis:
+`Essentials Pack for Fantasy Games — LOOP BOX #3` (17 das 20 faixas de
+nível), `JRPG Pack 5 (Action)` + `Action Music Pack` (13 das 20 de chefe).
+SFX: `RPG Sound Pack` (artisticdude), `80 CC0 RPG SFX` + `80 CC0 creature
+SFX` + `40 CC0 water/splash/slime SFX` (rubberduck), `20 Sword Sound
+Effects` + `10 Impact/Shield Blocks` (StarNinjas). Lista completa por
+chave: `assets/audio/CREDITS.md`.
 
-Todos os 35 SFX novos são **CC0** do OpenGameArt (nenhum exige
-atribuição). Os packs mais rentáveis (cobriram a maioria sozinhos):
-`RPG Sound Pack` (artisticdude), `80 CC0 RPG SFX` + `80 CC0 creature SFX`
-+ `40 CC0 water/splash/slime SFX` (rubberduck), `20 Sword Sound Effects` +
-`10 Impact/Shield Blocks` (StarNinjas). Lista completa com o ficheiro
-exacto por chave: `assets/audio/CREDITS.md`.
-
-**Notas técnicas:**
-- `scripts/som.gd::CAMINHOS` agora mistura `.wav`/`.ogg`/`.mp3` por chave
-  (Godot 4 importa os três nativamente) — não presumir que é sempre
-  `.wav`.
-- `tools/gerar_audio.py` **continua a existir mas não deve gerar** as
-  chaves que já foram trocadas por samples reais (o cabeçalho do ficheiro
-  lista quais) — corrê-lo por inteiro cria `.wav` órfãos ao lado dos
-  `.ogg`/`.mp3` novos (inofensivo, mas lixo).
-
-## Música — de onde vieram as 40 faixas (pontos 4 e 5, para expandir mais tarde)
-
-Mesma técnica dos SFX (OpenGameArt, `field_art_type_tid[]=12` para
-música). Packs mais rentáveis: `Essentials Pack for Fantasy Games — LOOP
-BOX #3` (Of Far Different Nature, CC-BY 4.0, deu 17 das 20 faixas de
-nível), `JRPG Pack 5 (Action)` + `Action Music Pack` (deram 13 das 20 de
-chefe). Lista completa por faixa: `assets/audio/CREDITS.md`.
-
-**Peso resolvido com `ffmpeg`**: `assets/audio` já tinha ~26 MB dos SFX;
-40 faixas de música em qualidade original teriam sido +120-160 MB. A
-sessão anterior achava que não havia `ffmpeg` nesta máquina — **há, só
-não estava instalado**: `pip install --user imageio-ffmpeg` traz um
-binário portátil (não fica como dependência do projecto, é só uma
-ferramenta local desta máquina — se for preciso noutra, repetir o
-`pip install`). Cada faixa foi cortada a ~70-80s com fade-out de 3s e
-recodificada a 64kbps mono (`libvorbis`) — as 40 faixas ficaram em 16 MB
-no total. Se precisares de reprocessar mais faixas, o comando é:
+**Peso resolvido com `ffmpeg`** — 40 faixas em qualidade original seriam
++120-160 MB; cortadas a ~75s com fade-out de 3s e recodificadas a 64kbps
+mono (`libvorbis`) ficaram em 16 MB:
 
 ```bash
 FFMPEG=$(python3 -c "import imageio_ffmpeg; print(imageio_ffmpeg.get_ffmpeg_exe())")
@@ -116,44 +158,6 @@ FFMPEG=$(python3 -c "import imageio_ffmpeg; print(imageio_ffmpeg.get_ffmpeg_exe(
   -ac 1 -ar 44100 -c:a libvorbis -b:a 64k saida.ogg
 ```
 
-Pixabay continua bloqueado ao `curl`. OpenGameArt funciona bem (foi a
-fonte de tudo nesta sessão, sons e música).
-
-## Chefes animados — como continuar (ponto 6, 21 de 30 por fazer)
-
-`tools/importar_chefes_animados.py` tem 9 entradas na tabela `RIGS`; os
-últimos 4 (`verdugo`, `golem_pedra`, `arqueiro`, `cavaleiro_negro`) usam o
-novo modo de leitura `#ficheiro.png:celula[:linhas]` (grelha automática
-por bounding-box, para folhas com vários estados empilhados numa imagem
-só — foi o que os packs do Kronovi- precisaram). **Cuidado**: se um pack
-tiver uma legenda desenhada NA imagem (aconteceu no Archer Hero, "Loop
-Attack"/"death" em letra fina), essa linha aparece como frame de texto a
-piscar — filtrar com `:linhas` explícito (ver o comentário no rig
-`arqueiro`).
-
-**Caminho mais rápido para os 21 que faltam**: o pack "Wandering Knight"
-(`cavaleiro_negro`) é o mais completo dos quatro novos —
-idle/death/running/jump/fall/crouch/dash/3-tipos-de-ataque numa folha só,
-1000×1200, grelha 100×100 (mapa completo no `GUIDE.png` do pack, em
-`assets/sprites/incoming/kronovi/wandering_knight/`). Dá para repetir a
-entrada `cavaleiro_negro` na tabela `RIGS` com um `GRADE` de recolor por
-cima (como `tools/importar_rig_cavaleiro.gd` faz) e ligar a mais
-chefes-guerreiro sem precisar de mais downloads — é provavelmente a
-forma mais rápida de fechar boa parte dos 21.
-
-Para os chefes NÃO-humanoides (Entrevane a árvore, Vyrak o dragão, Sino
-Vivo, Naga Zeraph, Rainha Aracnídea, Olho do Abismo já tem rig estático
-próprio...) nenhum dos 4 packs novos serve — é preciso ir buscar mais
-candidatos temáticos ao OpenGameArt/itch.io por chefe.
-
-**Testar a posição da arena**: `tools/shot_plataforma.gd -- <cena> <png>
-2 <koliani_x>` só aceita X (não Y) — em níveis verticais (torres) a
-câmara pode não chegar à altura do chefe mesmo com o X certo. Achar o X
-(e Y, se for preciso adaptar o tool) com
-`grep -n "position = Vector2" scenes/levels/<Nivel>.tscn` à volta do nó
-`[node name="Chefe" ... instance=...]`.
-
-## Pendente há mais tempo (ver histórico para detalhe)
-
-Níveis 31-100 (só a Região VII feita), arte por região das 14 regiões
-novas (31-100) por fazer.
+`scripts/som.gd::CAMINHOS` mistura `.wav`/`.ogg`/`.mp3` por chave — não
+presumir que é sempre `.wav`. Pixabay continua bloqueado ao `curl`;
+OpenGameArt e itch.io funcionam.
