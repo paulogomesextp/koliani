@@ -8,7 +8,11 @@ extends SceneTree
 ##       <saida.png> [zoom] [avanco_x]
 ##
 ## `avanco_x` = quanto se anda para dentro da jornada antes do retrato
-## (por omissão 2400 px, já longe da plataforma de partida).
+## (por omissão 2400 px, já longe da plataforma de partida). A Koliani é
+## POUSADA na plataforma mais próxima desse X: até 3 set 2026 era só um
+## `position.x += avanco`, e como a espinha da jornada é feita de degraus
+## muito espaçados, em cerca de um terço dos níveis ela calhava num vão,
+## caía os 0,6 s até ao retrato e a célula saía com ela sozinha no vazio.
 ## NB: precisa de janela (não corre em --headless).
 
 const COLS := 5     # 5 níveis por região
@@ -44,8 +48,9 @@ func _init() -> void:
 			if cam:
 				cam.zoom = Vector2(zoom, zoom)
 				cam.position_smoothing_enabled = false
-			k.global_position.x += avanco
-			k.global_position.y -= 40.0
+			var alvo_x: float = k.global_position.x + avanco
+			var pouso: Vector2 = _pouso_perto(get_root(), alvo_x)
+			k.global_position = pouso if pouso != Vector2.INF 				else Vector2(alvo_x, k.global_position.y - 40.0)
 			if "velocity" in k:
 				k.velocity = Vector2.ZERO
 			for _j in 16:
@@ -61,3 +66,26 @@ func _init() -> void:
 	folha.save_png(saida)
 	print("folha -> ", saida)
 	quit()
+
+
+## Ponto de pouso mais perto de `alvo_x`: o topo da plataforma cujo centro
+## está mais próximo. `Vector2.INF` se não houver nenhuma.
+static func _pouso_perto(raiz: Node, alvo_x: float) -> Vector2:
+	var melhor := Vector2.INF
+	var dist := INF
+	for p in _plataformas(raiz):
+		var d: float = absf(p.global_position.x - alvo_x)
+		if d < dist:
+			dist = d
+			var tam: Vector2 = p.get("tamanho")
+			melhor = Vector2(p.global_position.x, p.global_position.y - tam.y * 0.5 - 40.0)
+	return melhor
+
+
+static func _plataformas(n: Node, fora: Array[Node2D] = []) -> Array[Node2D]:
+	var sc: Variant = n.get_script()
+	if sc is Script and String((sc as Script).resource_path).ends_with("plataforma.gd"):
+		fora.append(n as Node2D)
+	for f in n.get_children():
+		_plataformas(f, fora)
+	return fora
