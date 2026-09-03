@@ -25,9 +25,16 @@
    packs/autores. Só as **camas** (`menu.wav`, `boss.wav`, `ambiente.wav`,
    `assombracao.wav`, `game_over.wav`) continuam sintetizadas por
    `tools/gerar_audio.py` — sem equivalente real encontrado ainda.
-4. **20 músicas de nível, em ciclo** — por fazer. `faixa = indice_nivel % 20`.
-5. **20 músicas de chefe, em ciclo** — por fazer. Mesma ideia para `Musica.boss()`.
-6. Só depois disto, voltar aos CHEFES (rigs animados — faltam 24 de 30).
+4. **20 músicas de nível, em ciclo** — ✅ **feito** (`518a0a8`, v0.11.0).
+   `Musica.ambiente()` escolhe `nivel_01..20.ogg` por `indice_nivel % 20`.
+5. **20 músicas de chefe, em ciclo** — ✅ **feito**, mesmo commit.
+   `Musica.boss()` escolhe `boss_01..20.ogg` pelo mesmo índice (o chefe de
+   cada nível tem sempre a mesma faixa). Fonte de tudo e nota técnica do
+   `ffmpeg` (instalado só para a sessão, não fica dependência) na secção
+   "Música" abaixo.
+6. **Por fazer a seguir**: voltar aos CHEFES (rigs animados — faltam 24 de 30).
+
+**A lista de 5 pontos do Paulo está completa.** Falta só o ponto 6.
 
 ## Investigação da arte da Koliani (para não repetir)
 
@@ -79,23 +86,36 @@ exacto por chave: `assets/audio/CREDITS.md`.
   lista quais) — corrê-lo por inteiro cria `.wav` órfãos ao lado dos
   `.ogg`/`.mp3` novos (inofensivo, mas lixo).
 
-## A FAZER — por onde continuar
+## Música — de onde vieram as 40 faixas (pontos 4 e 5, para expandir mais tarde)
 
-### Próximo: músicas de nível e de chefe em ciclo (pontos 4 e 5 da lista)
+Mesma técnica dos SFX (OpenGameArt, `field_art_type_tid[]=12` para
+música). Packs mais rentáveis: `Essentials Pack for Fantasy Games — LOOP
+BOX #3` (Of Far Different Nature, CC-BY 4.0, deu 17 das 20 faixas de
+nível), `JRPG Pack 5 (Action)` + `Action Music Pack` (deram 13 das 20 de
+chefe). Lista completa por faixa: `assets/audio/CREDITS.md`.
 
-Mesma técnica de scraping que os SFX (OpenGameArt, `field_art_type_tid[]=12`
-para música, termos como `epic orchestral`, `boss battle`, `dark fantasy`,
-`dungeon`, `gothic`). **Cuidado com o peso**: `assets/audio` já tem ~26 MB
-depois dos SFX novos; 40 faixas de música a ~3-4 MB cada seriam +120-160 MB
-no repo. **Não há `ffmpeg` nesta máquina** — a escolha tem de recair sobre
-faixas já pequenas (loops curtos `.ogg`), ou perguntar ao Paulo se aceita
-o repo crescer muito, ou hospedar as músicas fora do git (ex.: descarregar
-em runtime — mais trabalho de infra).
+**Peso resolvido com `ffmpeg`**: `assets/audio` já tinha ~26 MB dos SFX;
+40 faixas de música em qualidade original teriam sido +120-160 MB. A
+sessão anterior achava que não havia `ffmpeg` nesta máquina — **há, só
+não estava instalado**: `pip install --user imageio-ffmpeg` traz um
+binário portátil (não fica como dependência do projecto, é só uma
+ferramenta local desta máquina — se for preciso noutra, repetir o
+`pip install`). Cada faixa foi cortada a ~70-80s com fade-out de 3s e
+recodificada a 64kbps mono (`libvorbis`) — as 40 faixas ficaram em 16 MB
+no total. Se precisares de reprocessar mais faixas, o comando é:
+
+```bash
+FFMPEG=$(python3 -c "import imageio_ffmpeg; print(imageio_ffmpeg.get_ffmpeg_exe())")
+"$FFMPEG" -y -i entrada.ogg -t 75 -af "afade=t=out:st=72:d=3" \
+  -ac 1 -ar 44100 -c:a libvorbis -b:a 64k saida.ogg
+```
 
 Pixabay continua bloqueado ao `curl`. OpenGameArt funciona bem (foi a
-fonte de tudo nesta sessão).
+fonte de tudo nesta sessão, sons e música).
 
-### Depois: voltar aos CHEFES
+## A FAZER — por onde continuar
+
+### Próximo: voltar aos CHEFES (ponto 6 da lista)
 
 Faltam rigs animados para 24 dos 30 chefes de 1-30 (5 já têm, ver sessão
 anterior). Candidatos por descarregar do itch.io (nenhum ficheiro escrito
