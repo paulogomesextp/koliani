@@ -75,6 +75,18 @@ const CHEFE_KEY: Array[String] = [
 	"guard.escorpiao_areia",    # 47 Vale dos Escorpioes
 	"guard.mumia",              # 48 Cidade Enterrada
 	"boss.deus_esquecido",      # 49 Piramide Negra
+	# --- Regiao XI  Jardins do Rei ---
+	"guard.roseira_viva",       # 50 Jardim das Rosas Negras
+	"guard.jardineiro_perdido", # 51 Labirinto Verde
+	"guard.alma_errante",       # 52 Jardim das Almas
+	"guard.trepadeira",         # 53 Estufa Maldita
+	"boss.rei_botanico",        # 54 Arvore do Rei
+	# --- Regiao XII  Cidade das Maquinas ---
+	"guard.automato",           # 55 Distrito das Engrenagens
+	"guard.foguista",           # 56 Linha 13
+	"guard.homunculo",          # 57 Fabrica dos Homunculos
+	"guard.bobina_viva",        # 58 Torre Electrica
+	"boss.maquina_rei",         # 59 Coracao da Maquina
 ]
 
 

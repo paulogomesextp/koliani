@@ -75,7 +75,7 @@ A corrupção fez o mar recuar, revelando uma civilização esquecida.
 | 49 | 🌪️ Cidade Enterrada | cidade quase toda coberta de areia | **O Faraó Vazio** — controla dezenas de múmias |
 | 50 | 👁️ Pirâmide Negra | artefacto ligado à magia púrpura | **O Deus Esquecido** — 1.º chefe verdadeiramente sobrenatural |
 
-## XI — JARDINS DO REI (51–55) 🌿
+## XI — JARDINS DO REI (51–55) 🌿 ✅ *feita (3 set 2026)*
 
 Região aparentemente bonita, mas completamente artificial.
 
@@ -87,7 +87,7 @@ Região aparentemente bonita, mas completamente artificial.
 | 54 | 🪴 Estufa Maldita | plantas gigantes ocupam o cenário | **A Flor Carnívora** |
 | 55 | 🌳 Árvore do Rei | árvore colossal criada artificialmente | **O Rei Botânico** — pode revelar que a natureza está consciente |
 
-## XII — CIDADE DAS MÁQUINAS (56–60) ⚙️
+## XII — CIDADE DAS MÁQUINAS (56–60) ⚙️ ✅ *feita (3 set 2026)*
 
 Cidade steampunk abandonada.
 

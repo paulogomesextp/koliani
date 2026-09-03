@@ -85,6 +85,8 @@ const LIQUIDO := {
 	7: [Color(0.03, 0.10, 0.16, 0.96), false],   # VIII agua negra do Mar dos Mortos
 	8: [Color(0.30, 0.52, 0.66, 0.92), false],   # IX agua gelada por baixo do gelo
 	9: [Color(0.42, 0.32, 0.16, 0.94), false],   # X areia movedica do deserto
+	10: [Color(0.16, 0.34, 0.14, 0.94), false],  # XI seiva das plantas dos Jardins
+	11: [Color(0.10, 0.22, 0.30, 0.95), false],  # XII oleo de maquina da Cidade
 }
 
 ## Tipos de "flavour" de câmara (o que se semeia à volta da espinha).
@@ -123,6 +125,16 @@ const POOL_REGIAO := {
 	# parado, o que mata é o que está construído.
 	9: ["crossfire", "espinhos", "serras", "prensa", "pedras", "guilhotinas",
 		"saltos", "gruta", "ferry", "portal", "alavanca", "segredo"],
+	# XI Jardins do Rei: tudo BALANÇA -- trepadeiras, ramos, pontes de
+	# folhagem. `pendulos` de assinatura. Nada de maquinaria: este jardim
+	# foi plantado, não construído.
+	10: ["pendulos", "trampolim", "saltos", "ritmo", "velas", "espinhos",
+		"ferry", "gruta", "portal", "alavanca", "segredo"],
+	# XII Cidade das Maquinas: o oposto. Nada balança -- tudo ANDA, com
+	# `correntes` de assinatura (as correias). É a única região com todas
+	# as câmaras de máquina ao mesmo tempo.
+	11: ["correntes", "elevador", "impulso", "ritmo", "prensa", "serras",
+		"guilhotinas", "crossfire", "quebra", "portal", "alavanca", "segredo"],
 }
 
 ## `_dif` mínimo para cada tipo de câmara entrar na pool. Assim o Nível 1
@@ -179,6 +191,8 @@ const ASSINATURA := {
 	7: "gravidade",    # Mar dos Mortos -- tudo flutua
 	8: "espelhos",     # Reino do Gelo -- os cristais
 	9: "crossfire",    # Deserto -- as estatuas que disparam
+	10: "pendulos",    # Jardins do Rei -- as trepadeiras
+	11: "correntes",   # Cidade das Maquinas -- as correias
 }
 
 ## Toque de assinatura do NÍVEL (a gimmick do `docs/niveis.md`) espalhado
@@ -270,6 +284,18 @@ const PERFIL := [
 	{"v": -1, "f": "salto", "a": 1.1},    # 47 Vale dos Escorpioes -- sobre o vazio
 	{"v": 0, "f": "maquina", "a": 0.95},  # 48 Cidade Enterrada -- ruinas tapadas
 	{"v": 1, "f": "combate", "a": 0.85},  # 49 Piramide Negra -- camaras apertadas
+	# --- Regiao XI  Jardins do Rei (50-54) : tudo balanca ---------------
+	{"v": 0, "f": "gauntlet", "a": 1.05}, # 50 Jardim das Rosas Negras
+	{"v": 0, "f": "maquina", "a": 0.8},   # 51 Labirinto Verde -- sebes apertadas
+	{"v": 1, "f": "salto", "a": 1.15},    # 52 Jardim das Almas -- copas altas
+	{"v": -1, "f": "combate", "a": 0.9},  # 53 Estufa Maldita -- por dentro do vidro
+	{"v": 1, "f": "vertical", "a": 1.2},  # 54 Arvore do Rei -- subir a arvore
+	# --- Regiao XII  Cidade das Maquinas (55-59) : tudo anda ------------
+	{"v": 0, "f": "maquina", "a": 1.0},   # 55 Distrito das Engrenagens
+	{"v": 0, "f": "gauntlet", "a": 1.3},  # 56 Linha 13 -- perseguicao, o mais longo
+	{"v": 0, "f": "combate", "a": 0.9},   # 57 Fabrica dos Homunculos -- em serie
+	{"v": 1, "f": "vertical", "a": 1.15}, # 58 Torre Electrica -- subida
+	{"v": -1, "f": "maquina", "a": 0.95}, # 59 Coracao da Maquina -- por dentro
 ]
 
 ## Que câmaras conta cada foco. Cruzado depois com região+tier em
@@ -987,6 +1013,8 @@ const ESP_REGIAO := {
 	7: ["esqueleto", "gosma", "lodo", "wogol", "olho"],
 	8: ["mastim", "abutre", "besouro", "esqueleto", "raptor"],
 	9: ["raptor", "besouro", "ogro", "necromante", "abobora"],
+	10: ["mushroom", "goblin", "lodo", "gosma", "olho"],
+	11: ["besouro", "wogol", "chort", "esqueleto", "imp"],
 }
 
 ## A "cara" de cada NÍVEL (pedido do Paulo: não repetir o mesmo monstro em
@@ -1004,6 +1032,8 @@ const ESP_ASSINATURA := [
 	"esqueleto", "gosma", "olho", "lodo", "wogol",                 # VIII Mar dos Mortos
 	"mastim", "abutre", "besouro", "esqueleto", "raptor",          # IX Reino do Gelo
 	"raptor", "ogro", "besouro", "necromante", "xamane",           # X Deserto dos Esquecidos
+	"mushroom", "goblin", "olho", "lodo", "gosma",                 # XI Jardins do Rei
+	"besouro", "esqueleto", "wogol", "chort", "imp",               # XII Cidade das Maquinas
 ]
 
 

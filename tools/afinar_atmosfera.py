@@ -144,6 +144,26 @@ TABELA = [
     ("Vale_dos_Escorpioes",    "montanhas",     (1.22,1.00,.66), (.48,.35,.20), (.58,.44,.27), (1.0,.78,.36),  (1.0,.88,.56), 4.4, (1.36,1.06,.62), .22, .88, True),
     ("Cidade_Enterrada",       "cidade",        (1.16,1.00,.74), (.44,.34,.22), (.54,.43,.30), (1.0,.84,.50),  (1.0,.92,.68), 4.0, (1.28,1.08,.74), .24, .64, True),
     ("Piramide_Negra",         "horror",        (1.02,.80,1.10), (.18,.10,.24), (.26,.16,.33), (.86,.56,1.0),  (.96,.72,1.0), 3.4, (1.14,.78,1.28), .34, .58, False),
+    # ---- XI  Jardins do Rei (51-55) ---------------------------------
+    # Verde CULTIVADO -- nao a floresta doente da Regiao I, que era
+    # amarelo-doente: aqui a cor e' saudavel, quase bonita, e e' isso que
+    # faz medo. O `amb` puxa o verde acima de 1; o po' e' polen.
+    # O primeiro nivel sai da paleta a vermelho (as rosas negras) e o
+    # ultimo abre para dourado (a arvore ao sol).
+    ("Jardim_das_Rosas_Negras","floresta",      (.96,.88,.94), (.16,.05,.10), (.22,.08,.14), (.90,.30,.52),  (1.0,.60,.74), 3.6, (1.06,.66,.80), .30, .52, False),
+    ("Labirinto_Verde",        "pantano",       (.86,1.14,.88), (.06,.16,.08), (.10,.23,.12), (.52,.95,.50),  (.76,1.0,.70), 4.2, (.72,1.24,.72), .26, .56, False),
+    ("Jardim_das_Almas",       "gruta",         (.94,1.10,.92), (.10,.18,.14), (.15,.25,.20), (.80,.95,.62),  (.92,1.0,.78), 5.0, (.90,1.18,.82), .34, .60, True),
+    ("Estufa_Maldita",         "igreja",        (.88,1.16,.86), (.08,.19,.09), (.13,.26,.14), (.62,.98,.44),  (.84,1.0,.66), 4.6, (.76,1.28,.66), .28, .62, False),
+    ("Arvore_do_Rei",          "luar",          (1.04,1.10,.82), (.16,.20,.08), (.23,.28,.13), (.70,1.0,.48),  (1.0,1.0,.62), 4.0, (1.02,1.20,.62), .24, .58, True),
+    # ---- XII  Cidade das Maquinas (56-60) ---------------------------
+    # A regiao mais FRIA de cor do jogo inteiro, e de proposito: vem logo
+    # a seguir ao verde vivo dos Jardins. Aco azul, electricidade ciano,
+    # zero verde e zero laranja. Sem horizonte quente -- aqui nao ha' sol.
+    ("Distrito_das_Engrenagens","masmorra",     (.72,.94,1.18), (.05,.11,.18), (.09,.17,.26), (.55,.85,1.0),  (.72,.94,1.0), 3.8, (.66,.96,1.34), .32, .66, False),
+    ("Linha_13",               "prisao",        (.76,.96,1.16), (.06,.12,.19), (.10,.18,.27), (.60,.90,1.0),  (.78,.96,1.0), 4.4, (.70,.98,1.30), .36, .64, False),
+    ("Fabrica_dos_Homunculos", "cidade",        (.80,.98,1.14), (.07,.13,.20), (.11,.19,.28), (.70,.95,1.0),  (.86,.98,1.0), 4.0, (.76,1.00,1.28), .30, .62, False),
+    ("Torre_Electrica",        "rochoso",       (.68,.92,1.22), (.04,.10,.20), (.08,.16,.29), (.50,.92,1.0),  (.68,.96,1.0), 4.8, (.60,.94,1.40), .38, .70, False),
+    ("Coracao_da_Maquina",     "castelo_velho", (.64,.90,1.24), (.03,.08,.17), (.07,.14,.25), (.45,.88,1.0),  (.62,.94,1.0), 4.2, (.56,.92,1.42), .42, .72, False),
 ]
 
 CHAVES = [

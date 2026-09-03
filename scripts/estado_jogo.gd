@@ -103,6 +103,16 @@ const NIVEIS := [
 	"res://scenes/levels/Vale_dos_Escorpioes.tscn",
 	"res://scenes/levels/Cidade_Enterrada.tscn",
 	"res://scenes/levels/Piramide_Negra.tscn",
+	"res://scenes/levels/Jardim_das_Rosas_Negras.tscn",
+	"res://scenes/levels/Labirinto_Verde.tscn",
+	"res://scenes/levels/Jardim_das_Almas.tscn",
+	"res://scenes/levels/Estufa_Maldita.tscn",
+	"res://scenes/levels/Arvore_do_Rei.tscn",
+	"res://scenes/levels/Distrito_das_Engrenagens.tscn",
+	"res://scenes/levels/Linha_13.tscn",
+	"res://scenes/levels/Fabrica_dos_Homunculos.tscn",
+	"res://scenes/levels/Torre_Electrica.tscn",
+	"res://scenes/levels/Coracao_da_Maquina.tscn",
 ]
 # "res://scenes/levels/Level_Test.tscn" fica no repo como sala de treino,
 # fora da campanha (correr a cena diretamente no editor).
@@ -123,6 +133,8 @@ const REGIOES := [
 	{"id": "mar", "nome": "Mar dos Mortos", "niveis": [35, 36, 37, 38, 39]},
 	{"id": "gelo", "nome": "Reino do Gelo", "niveis": [40, 41, 42, 43, 44]},
 	{"id": "deserto", "nome": "Deserto dos Esquecidos", "niveis": [45, 46, 47, 48, 49]},
+	{"id": "jardins", "nome": "Jardins do Rei", "niveis": [50, 51, 52, 53, 54]},
+	{"id": "maquinas", "nome": "Cidade das Máquinas", "niveis": [55, 56, 57, 58, 59]},
 ]
 
 signal vidas_mudaram(vidas: int)

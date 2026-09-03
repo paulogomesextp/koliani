@@ -117,6 +117,34 @@ NIVEIS = [
     # sobrenatural (docs/plano_niveis_31_100.md)
     ("Piramide_Negra", 49, "catacumbas", "chefe", 2, 880, (0.86, 0.62, 1.00),
      "monge_terra", "Artefacto ligado a' magia purpura. O Deus Esquecido."),
+    # --- XI  JARDINS DO REI (51-55) -- o verde depois do ocre -----------
+    # Um jardim CULTIVADO: nada aqui e' selvagem, tudo foi plantado por
+    # alguem. E' a regiao que sugere que a natureza esta' consciente.
+    ("Jardim_das_Rosas_Negras", 50, "floresta", "guardiao", 0, 900, (0.90, 0.30, 0.52),
+     "mushroom", "As rosas atacam. Guardiao: uma roseira viva."),
+    ("Labirinto_Verde", 51, "floresta", "guardiao", 0, 940, (0.52, 0.95, 0.50),
+     "goblin", "Sebes que mudam de sitio. Guardiao: o jardineiro perdido."),
+    ("Jardim_das_Almas", 52, "torres", "guardiao", 0, 980, (0.80, 0.95, 0.62),
+     "olho", "Borboletas que carregam almas. Guardiao: uma alma errante."),
+    ("Estufa_Maldita", 53, "cidade", "guardiao", 0, 1020, (0.62, 0.98, 0.44),
+     "lodo", "Plantas gigantes por dentro do vidro. Guardiao: a trepadeira."),
+    # o CHEFE da regiao: O Rei Botanico
+    ("Arvore_do_Rei", 54, "floresta", "chefe", 3, 1060, (0.70, 1.00, 0.48),
+     "folha", "Arvore colossal, feita e nao nascida. O Rei Botanico."),
+    # --- XII  CIDADE DAS MAQUINAS (56-60) -- aco frio -------------------
+    # O contrario da XI em tudo: nada vivo, nada quente. Aco azul e
+    # electricidade -- e' a regiao mais fria de cor do jogo inteiro.
+    ("Distrito_das_Engrenagens", 55, "cidade", "guardiao", 0, 1100, (0.55, 0.85, 1.00),
+     "besouro", "Engrenagens do tamanho de casas. Guardiao: um automato."),
+    ("Linha_13", 56, "castelo", "guardiao", 0, 1140, (0.60, 0.90, 1.00),
+     "esqueleto", "Perseguicao num comboio. Guardiao: o foguista."),
+    ("Fabrica_dos_Homunculos", 57, "cidade", "guardiao", 0, 1180, (0.70, 0.95, 1.00),
+     "wogol", "Criaturas artificiais em serie. Guardiao: um homunculo."),
+    ("Torre_Electrica", 58, "torres", "guardiao", 0, 1220, (0.50, 0.92, 1.00),
+     "chort", "A corrente percorre as plataformas. Guardiao: a bobina viva."),
+    # o CHEFE da regiao: A Maquina-Rei
+    ("Coracao_da_Maquina", 59, "castelo", "chefe", 0, 1280, (0.45, 0.88, 1.00),
+     "lamina_metal", "O coracao mecanico da cidade. A Maquina-Rei."),
 ]
 
 MODELO_CHEFE = '''[gd_scene load_steps=8 format=3 uid="uid://bkoliani{uid}"]
@@ -291,6 +319,16 @@ TITULOS = {
     "Vale_dos_Escorpioes": "Vale dos Escorpioes",
     "Cidade_Enterrada": "Cidade Enterrada",
     "Piramide_Negra": "Piramide Negra",
+    "Jardim_das_Rosas_Negras": "Jardim das Rosas Negras",
+    "Labirinto_Verde": "Labirinto Verde",
+    "Jardim_das_Almas": "Jardim das Almas",
+    "Estufa_Maldita": "Estufa Maldita",
+    "Arvore_do_Rei": "Arvore do Rei",
+    "Distrito_das_Engrenagens": "Distrito das Engrenagens",
+    "Linha_13": "Linha 13",
+    "Fabrica_dos_Homunculos": "Fabrica dos Homunculos",
+    "Torre_Electrica": "Torre Electrica",
+    "Coracao_da_Maquina": "Coracao da Maquina",
 }
 
 # Liquido mortal da arena do chefe, por REGIAO (indice0 // 5). Sem isto o
@@ -301,6 +339,8 @@ LIQUIDO_REGIAO = {
     7: ((0.03, 0.10, 0.16, 0.96), "false"),   # VIII agua negra do abismo
     8: ((0.30, 0.52, 0.66, 0.92), "false"),   # IX agua gelada por baixo do gelo
     9: ((0.42, 0.32, 0.16, 0.94), "false"),   # X areia movedica
+    10: ((0.16, 0.34, 0.14, 0.94), "false"),  # XI seiva das plantas
+    11: ((0.10, 0.22, 0.30, 0.95), "false"),  # XII oleo de maquina
 }
 
 

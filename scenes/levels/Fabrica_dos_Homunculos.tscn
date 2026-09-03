@@ -1,0 +1,79 @@
+[gd_scene load_steps=8 format=3 uid="uid://bkolianifabricadoshomunculos58"]
+
+; REGIAO 12 / nivel 58 -- Fabrica dos Homunculos.
+; Criaturas artificiais em serie. Guardiao: um homunculo.
+;
+; NIVEL SEM CHEFE. A regiao tem um chefe so' -- o ultimo dos cinco --
+; e este acaba num GUARDIAO (elite) que sela a porta ate' cair.
+;
+; CENA GERADA por `tools/gerar_niveis_31_100.py` -- NAO editar a' mao.
+; O bloco `Atmosfera` e' reescrito por `tools/afinar_atmosfera.py`.
+
+[ext_resource type="PackedScene" uid="uid://bkolianiactor01" path="res://scenes/actors/Koliani.tscn" id="1_kol"]
+[ext_resource type="PackedScene" uid="uid://bkolianiporta01" path="res://scenes/actors/Porta.tscn" id="2_porta"]
+[ext_resource type="Script" path="res://scripts/checkpoint.gd" id="3_chk"]
+[ext_resource type="PackedScene" uid="uid://bdemoniobase01" path="res://scenes/actors/DemonioBase.tscn" id="4_dem"]
+[ext_resource type="Script" path="res://scripts/nivel_com_chefe.gd" id="5_niv"]
+[ext_resource type="PackedScene" uid="uid://bkolianiatmosfera01" path="res://scenes/fx/Atmosfera.tscn" id="6_atm"]
+[ext_resource type="PackedScene" uid="uid://bkolianiplataforma01" path="res://scenes/actors/Plataforma.tscn" id="7_pl"]
+[ext_resource type="PackedScene" uid="uid://bkolianiaguavenenosa01" path="res://scenes/actors/AguaVenenosa.tscn" id="8_liq"]
+
+[sub_resource type="RectangleShape2D" id="rs_chk"]
+size = Vector2(44, 96)
+
+[node name="Fabrica_dos_Homunculos" type="Node2D"]
+script = ExtResource("5_niv")
+
+[node name="Atmosfera" parent="." instance=ExtResource("6_atm")]
+cor_ambiente = Color(0.8, 0.98, 1.14, 1)
+cor_fundo = Color(0.07, 0.13, 0.2, 1)
+cor_silhueta = Color(0.11, 0.19, 0.28, 1)
+cor_luz = Color(0.7, 0.95, 1, 1)
+cor_poeira = Color(0.86, 0.98, 1, 1)
+densidade_poeira = 4
+bioma = "cidade"
+largura_nivel = 1800.0
+fundo_pack = "cidade"
+tinta_fundo = Color(0.76, 1, 1.28, 1)
+neblina_fundo = 0.3
+dessaturar_fundo = 0.62
+seed_ambiente = 3109
+
+[node name="LiquidoMortal" parent="." instance=ExtResource("8_liq")]
+position = Vector2(700, 980)
+largura = 2000.0
+altura = 340.0
+cor = Color(0.1, 0.22, 0.3, 0.95)
+brasas = false
+
+[node name="ChaoChefe" parent="." instance=ExtResource("7_pl")]
+position = Vector2(760, 700)
+tamanho = Vector2(1000, 60)
+altura_visual = 110.0
+
+[node name="Guardiao" parent="." instance=ExtResource("4_dem")]
+position = Vector2(1020, 630)
+scale = Vector2(1.5, 1.5)
+elite = true
+especie = "wogol"
+vida = 1180
+dano_contacto = 26
+comportamento = "carga"
+alcance_patrulha = 150.0
+cor_rim = Color(0.7, 0.95, 1.0, 1)
+
+[node name="Koliani" parent="." instance=ExtResource("1_kol")]
+position = Vector2(360, 616)
+
+[node name="CheckInicio" type="Area2D" parent="."]
+position = Vector2(430, 632)
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("3_chk")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckInicio"]
+shape = SubResource("rs_chk")
+
+[node name="Porta" parent="." instance=ExtResource("2_porta")]
+position = Vector2(1210, 622)
+pista_ao_atravessar = ""
