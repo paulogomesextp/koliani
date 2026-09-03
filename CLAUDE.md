@@ -4,7 +4,8 @@ Platformer de ação para telemóvel (Godot 4.7.2, GDScript). A **Koliani**
 atravessa 6 regiões para libertar a mãe (**Aurora**) do demónio **Zeriko**.
 Não é roguelite — é por níveis, com história e progresso guardado.
 Contexto completo: [`README.md`](README.md), [`docs/`](docs/) (`design.md`,
-`historia.md`, `niveis.md`, `testar.md`).
+`historia.md`, `niveis.md`, `testar.md`). **Ponto de retoma da última
+sessão: [`docs/retomar_aqui.md`](docs/retomar_aqui.md)** — ler primeiro.
 
 ## Correr o Godot
 
@@ -61,6 +62,14 @@ evita trabalho duplicado ou conflito com o que o outro já mudou.
 - Mobile-first: landscape, toque, 60fps. Manter o export Web a funcionar.
 
 ## Arte
+
+Terreno, decoração e fundos são **gerados por ferramentas** — mexer nos
+tools e regerar, nunca nos PNGs nem no nó `Atmosfera` dos `.tscn` à mão:
+`tools/gerar_terreno.py` (material por região), `tools/gerar_deco.py`
+(props), `tools/gerar_fundos.py` (packs de parallax),
+`tools/afinar_atmosfera.py` (o ar de cada um dos 30 níveis).
+`tools/folha_de_contacto.gd` mostra os 30 níveis de relance (precisa de
+janela: `--screen 1`).
 
 Alvo visual: **o mais próximo possível de Dead Cells**, com a temática de
 `assets/branding/key_art.png` (gótico, luar, brilho magenta/roxo). O jogo
