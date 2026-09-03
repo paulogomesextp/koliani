@@ -43,12 +43,29 @@ const FUNDO_REGIAO := [
 ## tira de 4 frames -- usa-se o frame 0) por índice de nível. "" = ainda sem
 ## pixel-art (fica só com o preview do bioma).
 const RETRATO_CHEFE := [
-	"ghorak", "morvanna", "rainha", "entrevane", "coracao",
-	"", "ignivar", "dama", "irmaos", "primeiro",
-	"sino", "aerion", "voltaris", "sacerdotisa", "vyrak",
-	"rei_ossario", "colosso", "freira", "naga", "olho",
-	"prefeito", "acougueiro", "maquinista", "bispo", "noiva",
-	"capitao", "koliani_sombria", "devorador", "arauto", "zeriko",
+	"minotauro", "bruxa", "horror", "folha", "demonio_lodo",              # 1-5
+	"guardiao_gelo", "cavaleiro_fogo", "verdugo", "monge", "prisioneiro", # 6-10
+	"mimico", "monge_celeste", "arqueiro", "sacerdotisa", "alado",        # 11-15
+	"rei_ossario", "ceifeiro", "feiticeiro_sombrio", "serpente", "olho_voador", # 16-20
+	"lanceiro", "carniceiro", "golem_pedra", "feiticeiro", "noiva",       # 21-25
+	"cavaleiro_negro", "koliani_sombria", "rei_devorador", "arauto", "colosso", # 26-30
+	# --- niveis 31-100 -- GERADO por tools/gerar_niveis_31_100.py --------
+	# Rig animado (bosses_anim/) nos chefes, especie (enemies/) nos
+	# guardioes; o `_retrato_chefe` tenta as duas pastas.
+	"imp", "chort", "ogro", "demonio_grande", "feiticeiro",   # 31-35
+	"esqueleto", "gosma", "wogol", "lodo", "horror",   # 36-40
+	"mastim", "abutre", "besouro", "esqueleto", "sacerdotisa_gelo",   # 41-45
+	"raptor", "ogro", "besouro", "necromante", "monge_terra",   # 46-50
+	"mushroom", "goblin", "olho", "lodo", "folha",   # 51-55
+	"besouro", "esqueleto", "wogol", "chort", "lamina_metal",   # 56-60
+	"abutre", "xamane", "wogol", "olho", "cristal",   # 61-65
+	"abobora", "wogol", "gosma", "mushroom", "cavaleiro_negro",   # 66-70
+	"esqueleto", "necromante", "wogol", "chort", "ceifeiro",   # 71-75
+	"lodo", "raptor", "esqueleto", "gosma", "demonio_lodo",   # 76-80
+	"imp", "chort", "wogol", "demonio_grande", "cavaleiro_fogo",   # 81-85
+	"gosma", "olho", "wogol", "xamane", "horror",   # 86-90
+	"orc", "abutre", "ogro", "necromante", "assassino_vento",   # 91-95
+	"goblin", "rei_ossario", "colosso", "horror", "cavaleiro_negro",   # 96-100
 ]
 
 const CARTAO := Vector2(336, 392)
@@ -289,21 +306,55 @@ func _fazer_cartao(indice: int) -> Dictionary:
 	}
 
 
-## Frame 0 (repouso) da tira pixel-art de 4 frames do chefe do nível
-## `indice`, ou null se ainda não houver retrato pixel-art para ele.
+## Frame 0 (repouso) do retrato do chefe/guardião do nível `indice`, ou
+## null se não houver.
+##
+## Há TRÊS sítios onde o boneco pode viver, e o nome sozinho não diz qual --
+## por isso tentam-se os três por ordem (3 set 2026: até aqui só se olhava
+## para o primeiro, e os níveis 31-100 ficavam sem retrato nenhum):
+##
+##   1. `bosses_anim/<rig>/idle.png`   -- rig animado (a maioria hoje)
+##   2. `enemies/<especie>/idle.png`   -- os GUARDIÕES dos níveis 31-100
+##      não são chefes: são elites de uma espécie comum
+##   3. `bosses/<slug>.png`            -- as folhas estáticas de 4 poses
+##      dos primeiros chefes, que ainda não passaram a rig
+##
+## O número de frames da tira muda conforme o sítio, e cortar com o número
+## errado dá meio boneco -- daí ir buscá-lo ao catálogo de cada um.
 func _retrato_chefe(indice: int) -> Texture2D:
 	if indice < 0 or indice >= RETRATO_CHEFE.size():
 		return null
 	var slug: String = RETRATO_CHEFE[indice]
 	if slug == "":
 		return null
-	var caminho := "res://assets/sprites/pixel/bosses/%s.png" % slug
-	if not ResourceLoader.exists(caminho):
-		return null
+
+	var cam := "res://assets/sprites/pixel/bosses_anim/%s/idle.png" % slug
+	if ResourceLoader.exists(cam):
+		var cfg: Variant = ChefeBase._rigs().get(slug, null)
+		var n := 1
+		if cfg is Dictionary:
+			n = int(((cfg as Dictionary).get("estados", {}) as Dictionary).get("idle", 1))
+		return _frame0(cam, maxi(1, n))
+
+	cam = "res://assets/sprites/pixel/enemies/%s/idle.png" % slug
+	if ResourceLoader.exists(cam):
+		var esp: Dictionary = DemonioBase.ESPECIES.get(slug, {})
+		return _frame0(cam, maxi(1, int(esp.get("idle", 4))))
+
+	cam = "res://assets/sprites/pixel/bosses/%s.png" % slug
+	if ResourceLoader.exists(cam):
+		return _frame0(cam, 4)
+	return null
+
+
+## Primeiro frame de uma tira horizontal de `n` frames.
+func _frame0(caminho: String, n: int) -> Texture2D:
 	var folha: Texture2D = load(caminho)
+	if folha == null:
+		return null
 	var atlas := AtlasTexture.new()
 	atlas.atlas = folha
-	atlas.region = Rect2(0, 0, folha.get_width() / 4.0, folha.get_height())
+	atlas.region = Rect2(0, 0, folha.get_width() / float(n), folha.get_height())
 	return atlas
 
 

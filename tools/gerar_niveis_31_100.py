@@ -28,6 +28,7 @@ Depois de correr: `godot --headless --import` e
 
 from __future__ import annotations
 
+import io
 import os
 import sys
 
@@ -499,6 +500,51 @@ LIQUIDO_REGIAO = {
 }
 
 
+SELETOR = os.path.join(RAIZ, "scripts", "seletor_niveis.gd")
+
+
+def retratos() -> None:
+    """Escreve a cauda de `SeletorNiveis.RETRATO_CHEFE` (niveis 31-100).
+
+    O carrossel mostra o boneco do chefe/guardiao de cada nivel. Ate' 3 set
+    2026 a tabela tinha 30 entradas escritas a' mao e os niveis 31-100
+    apareciam sem retrato nenhum. Passa a sair daqui: e' esta tabela que
+    sabe que rig/especie tem cada nivel, portanto e' aqui que a lista se
+    mantem sozinha em sincronia -- troca-se o chefe de um nivel e o retrato
+    do carrossel segue atras.
+
+    Escreve so' a CAUDA: as 30 primeiras entradas sao dos niveis 1-30, que
+    nao vem desta tabela, e ficam intactas.
+    """
+    marca = "const RETRATO_CHEFE := ["
+    fim_marca = "\n]\n"
+    s = io.open(SELETOR, encoding="utf-8").read()
+    i = s.index(marca)
+    j = s.index(fim_marca, i)
+    manual = []
+    aspas = 0
+    for linha in s[i + len(marca):j].split("\n"):
+        if not linha.strip() or linha.strip().startswith("#"):
+            continue
+        manual.append(linha)
+        aspas += linha.count('"')
+        if aspas >= 60:          # 30 slugs = 60 aspas: acabaram os 1-30
+            break
+
+    linhas = [marca] + manual + [
+        "\t# --- niveis 31-100 -- GERADO por tools/gerar_niveis_31_100.py --------",
+        "\t# Rig animado (bosses_anim/) nos chefes, especie (enemies/) nos",
+        "\t# guardioes; o `_retrato_chefe` tenta as duas pastas.",
+    ]
+    for k in range(0, len(NIVEIS), 5):
+        fatia = NIVEIS[k:k + 5]
+        linhas.append("\t" + " ".join('"%s",' % n[7] for n in fatia)
+                      + "   # %d-%d" % (fatia[0][1] + 1, fatia[-1][1] + 1))
+    io.open(SELETOR, "w", encoding="utf-8", newline="\n").write(
+        s[:i] + "\n".join(linhas) + s[j:])
+    print("  RETRATO_CHEFE: +%d retratos (niveis 31-100)" % len(NIVEIS))
+
+
 def main() -> int:
     seco = "--dry-run" in sys.argv
     for ficheiro, idx0, bioma, fim, arq, vida, rim, rig, nota in NIVEIS:
@@ -526,6 +572,8 @@ def main() -> int:
         if not seco:
             with open(cam, "w", encoding="utf-8", newline="\n") as f:
                 f.write(texto)
+    if not seco:
+        retratos()
     print("%d niveis" % len(NIVEIS))
     return 0
 
