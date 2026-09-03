@@ -55,7 +55,7 @@ A corrupção fez o mar recuar, revelando uma civilização esquecida.
 | 39 | 🐋 Ossário das Baleias | caverna dentro de restos de criaturas marinhas gigantes | **O Devorador** — criatura subterrânea que vive dentro dos ossos |
 | 40 | 🌑 Abismo Oceânico | quase sem luz | **A Mãe do Abismo** — entidade colossal, vários olhos e tentáculos |
 
-## IX — REINO DO GELO (41–45) ❄️
+## IX — REINO DO GELO (41–45) ❄️ ✅ *feita (3 set 2026)*
 
 | # | Nível | Mecânicas | Chefe |
 | --- | --- | --- | --- |
