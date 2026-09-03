@@ -77,12 +77,16 @@ const AVANCO_VEL := [330.0, 370.0, 390.0, 540.0]
 const AVANCO_DUR := [0.13, 0.13, 0.16, 0.18]
 const AVANCO_NO_AR := 0.5
 const I_FRAMES := 0.6
-## Ressalto ao cair em cima de um inimigo (Mario-style): pulo AUTOMÁTICO e
-## ALTO -- não é preciso carregar em nada e sobe mais que um salto normal
-## (pedido do Paulo). Vai por `aplicar_impulso` para o "corte de salto" do
-## Movimento não o engolir se o botão não estiver premido. Devolve os
-## saltos de ar (encadeia pisões).
-const STOMP_RESSALTO := Movimento.FORCA_SALTO * 1.4
+## Ressalto ao cair em cima de um inimigo (Mario-style): pulo AUTOMÁTICO --
+## não é preciso carregar em nada. Vai por `aplicar_impulso` para o "corte
+## de salto" do Movimento não o engolir se o botão não estiver premido, e
+## devolve os saltos de ar (encadeia pisões).
+##
+## Esteve a 1.4x o salto normal e atirava a Koliani muito acima do cenário
+## desenhado; o Paulo pediu METADE (3 set 2026). A 0.7x fica abaixo de um
+## salto normal: chega para encadear pisões e para se afastar do bicho,
+## sem perder o ecrã de vista.
+const STOMP_RESSALTO := Movimento.FORCA_SALTO * 0.7
 ## Defesa (habilidade "escudo"): anda-se devagar de escudo erguido; um
 ## ataque que venha de frente é bloqueado (sem dano) com um som subtil.
 const VEL_DEFESA := 70.0
