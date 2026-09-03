@@ -107,19 +107,18 @@ ficheiro. Os restantes sprites pixel-art vêm de packs CC0:
 
 CC0 não exige atribuição; fica aqui à mesma por cortesia.
 
-## @Jump_Button — "Knight_player 1.4"  ← RIG ACTUAL DA KOLIANI
-- Pack do autor @Jump_Button (Twitter). Frames de 100x64, uma tira por
-  animação. **Licença (Read_me.txt do pack)**: uso pessoal e comercial
-  permitido, **crédito OBRIGATÓRIO no uso comercial**; não revender nem
-  reproduzir a imagem para lucro; o autor proíbe expressamente usar a arte
-  para treino de IA/ML, NFT ou blockchain. Não é CC0 — o Paulo tem de
-  confirmar que aceita estes termos antes de publicar o jogo.
-- Uso: `assets/sprites/pixel/koliani_cavaleiro/` (18 estados: idle, run,
-  jump, fall, attack/attack2/attack3/attack4 (combo de 4 golpes, cada um
-  com a sua tira do pack), crouch, wallslide, djump, roll, dash, hurt,
-  defesa, borda, aterrar, morte), importado e recolorido para a paleta da
-  Koliani (vermelhos -> magenta, metal -> violeta frio) por
-  `tools/importar_rig_cavaleiro.gd`. Ligado por `koliani.gd::RIG`.
+## @Jump_Button — "Knight_player 1.4"  ← RETIRADO (3 set 2026)
+- Pack do autor @Jump_Button (Twitter). **Licença (Read_me.txt do pack)**
+  proíbe expressamente qualquer uso por "AI (...) AI/ML Training (...)
+  Such usage is completely prohibited and may result in legal action if
+  necessary." Não é CC0. O Paulo confirmou: trocar por um pack CC0
+  verdadeiro em vez de arriscar o termo.
+- Os `.png` derivados (`assets/sprites/pixel/koliani_cavaleiro/`) foram
+  **removidos do repo** (`3c1dd48`+). `koliani.gd::RIG` já não passa por
+  `"cavaleiro"` (fica `"nova"`); `tools/importar_rig_cavaleiro.gd` fica
+  como código morto/histórico — não voltar a correr. O pack em si continua
+  só no disco do Paulo (`assets/sprites/incoming/`, `.gdignore`, nunca foi
+  redistribuído no GitHub).
 
 ## thewisehedgehog — pack de armas pixel-art
 - https://thewisehedgehog.itch.io/  (URL exato + licença POR CONFIRMAR pelo Paulo em incoming/LICENSES.md)

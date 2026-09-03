@@ -1,4 +1,14 @@
 extends SceneTree
+## ⚠ DESATIVADO (3 set 2026) -- NÃO CORRER.
+## O pack "Knight_player 1.4" (@Jump_Button) proíbe expressamente uso por
+## IA no seu Read_me.txt ("Do NOT use any of my work for AI (...) Such
+## usage is completely prohibited"). O Paulo confirmou trocar por um pack
+## CC0 verdadeiro; os `.png` que este tool gerava já foram removidos do
+## repo (ver `assets/sprites/pixel/CREDITS.md`). Fica só como registo --
+## se algum dia for preciso reimportar outra coisa, escrever um tool novo
+## a apontar para um pack CC0, não reactivar este.
+##
+## --- texto original (histórico) ---
 ## Importa o rig da Koliani a partir do pack "Knight_player 1.4"
 ## (@Jump_Button, em `incoming/knight-player/`): tiras de 100x64 por
 ## animação -> `assets/sprites/pixel/koliani_cavaleiro/<estado>.png`, com o
