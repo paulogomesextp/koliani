@@ -32,9 +32,15 @@
    cada nível tem sempre a mesma faixa). Fonte de tudo e nota técnica do
    `ffmpeg` (instalado só para a sessão, não fica dependência) na secção
    "Música" abaixo.
-6. **Por fazer a seguir**: voltar aos CHEFES (rigs animados — faltam 24 de 30).
+6. **Chefes — arrancou** (`520e45c`, v0.11.1). 4 rigs animados novos, do
+   Kronovi- (itch.io, gratuito, sem cláusula anti-IA): `verdugo` (Dama da
+   Guilhotina), `golem_pedra` (Maquinista Infernal), `arqueiro` (Voltaris),
+   `cavaleiro_negro` (Capitão Negro). **9 de 30 chefes principais têm rig
+   animado — faltam 21.** Detalhe/licenças em
+   `assets/sprites/pixel/CREDITS.md` (secção "Chefes ANIMADOS").
 
-**A lista de 5 pontos do Paulo está completa.** Falta só o ponto 6.
+**A lista de 6 pontos do Paulo está completa na primeira passagem.** O
+ponto 6 é o único que ainda tem trabalho por fazer (21 chefes).
 
 ## Investigação da arte da Koliani (para não repetir)
 
@@ -113,16 +119,41 @@ FFMPEG=$(python3 -c "import imageio_ffmpeg; print(imageio_ffmpeg.get_ffmpeg_exe(
 Pixabay continua bloqueado ao `curl`. OpenGameArt funciona bem (foi a
 fonte de tudo nesta sessão, sons e música).
 
-## A FAZER — por onde continuar
+## Chefes animados — como continuar (ponto 6, 21 de 30 por fazer)
 
-### Próximo: voltar aos CHEFES (ponto 6 da lista)
+`tools/importar_chefes_animados.py` tem 9 entradas na tabela `RIGS`; os
+últimos 4 (`verdugo`, `golem_pedra`, `arqueiro`, `cavaleiro_negro`) usam o
+novo modo de leitura `#ficheiro.png:celula[:linhas]` (grelha automática
+por bounding-box, para folhas com vários estados empilhados numa imagem
+só — foi o que os packs do Kronovi- precisaram). **Cuidado**: se um pack
+tiver uma legenda desenhada NA imagem (aconteceu no Archer Hero, "Loop
+Attack"/"death" em letra fina), essa linha aparece como frame de texto a
+piscar — filtrar com `:linhas` explícito (ver o comentário no rig
+`arqueiro`).
 
-Faltam rigs animados para 24 dos 30 chefes de 1-30 (5 já têm, ver sessão
-anterior). Candidatos por descarregar do itch.io (nenhum ficheiro escrito
-ainda): *Boss: Undead Executioner*, *Boss: Mecha-Stone Golem* — ambos
-`darkpixel-kronovi.itch.io`, comerciais OK sem redistribuir.
+**Caminho mais rápido para os 21 que faltam**: o pack "Wandering Knight"
+(`cavaleiro_negro`) é o mais completo dos quatro novos —
+idle/death/running/jump/fall/crouch/dash/3-tipos-de-ataque numa folha só,
+1000×1200, grelha 100×100 (mapa completo no `GUIDE.png` do pack, em
+`assets/sprites/incoming/kronovi/wandering_knight/`). Dá para repetir a
+entrada `cavaleiro_negro` na tabela `RIGS` com um `GRADE` de recolor por
+cima (como `tools/importar_rig_cavaleiro.gd` faz) e ligar a mais
+chefes-guerreiro sem precisar de mais downloads — é provavelmente a
+forma mais rápida de fechar boa parte dos 21.
 
-### Pendente há mais tempo (ver histórico para detalhe)
+Para os chefes NÃO-humanoides (Entrevane a árvore, Vyrak o dragão, Sino
+Vivo, Naga Zeraph, Rainha Aracnídea, Olho do Abismo já tem rig estático
+próprio...) nenhum dos 4 packs novos serve — é preciso ir buscar mais
+candidatos temáticos ao OpenGameArt/itch.io por chefe.
 
-Níveis 31-100 (só a Região VII feita), 24 chefes por animar, arte por
-região das 14 regiões novas (31-100) por fazer.
+**Testar a posição da arena**: `tools/shot_plataforma.gd -- <cena> <png>
+2 <koliani_x>` só aceita X (não Y) — em níveis verticais (torres) a
+câmara pode não chegar à altura do chefe mesmo com o X certo. Achar o X
+(e Y, se for preciso adaptar o tool) com
+`grep -n "position = Vector2" scenes/levels/<Nivel>.tscn` à volta do nó
+`[node name="Chefe" ... instance=...]`.
+
+## Pendente há mais tempo (ver histórico para detalhe)
+
+Níveis 31-100 (só a Região VII feita), arte por região das 14 regiões
+novas (31-100) por fazer.
