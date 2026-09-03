@@ -31,6 +31,7 @@ fill_to = Vector2(1, 0.5)
 collision_layer = 4
 collision_mask = 1
 script = ExtResource("1_chefe")
+rig = "demonio_lodo"
 escala_visual = 1.7
 vida = 360
 dano_contacto = 18
@@ -47,6 +48,12 @@ scale = Vector2(1.4, 1.4)
 texture = ExtResource("2_tex")
 hframes = 4
 
+
+; RIG ANIMADO (n5  Coracao da Floresta -- massa de podridao). Vazio: o `ChefeBase._montar_rig`
+; enche-o de `bosses_anim/demonio_lodo` e esconde o `Corpo` acima.
+[node name="Anim" type="AnimatedSprite2D" parent="Sprite"]
+visible = false
+texture_filter = 1
 [node name="LuzCoracao" type="PointLight2D" parent="Sprite"]
 texture = SubResource("tex_luz")
 energy = 0.9

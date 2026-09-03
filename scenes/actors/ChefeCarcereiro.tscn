@@ -40,6 +40,7 @@ fill_to = Vector2(1, 0.5)
 collision_layer = 4
 collision_mask = 1
 script = ExtResource("1_carc")
+rig = "guardiao_gelo"
 escala_visual = 1.3
 vida = 380
 dano_contacto = 16
@@ -53,6 +54,12 @@ position = Vector2(0, 0)
 texture = ExtResource("2_tex")
 material = SubResource("mat_b")
 
+
+; RIG ANIMADO (n6  Prisao -- pesado, salta e esmaga). Vazio: o `ChefeBase._montar_rig`
+; enche-o de `bosses_anim/guardiao_gelo` e esconde o `Corpo` acima.
+[node name="Anim" type="AnimatedSprite2D" parent="Sprite"]
+visible = false
+texture_filter = 1
 [node name="LuzOlhos" type="PointLight2D" parent="Sprite"]
 position = Vector2(0, -10)
 texture = SubResource("tex_luz")

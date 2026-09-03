@@ -30,6 +30,7 @@ fill_to = Vector2(1, 0.5)
 collision_layer = 4
 collision_mask = 1
 script = ExtResource("1_chefe")
+rig = "minotauro"
 escala_visual = 1.2
 vida = 250
 dano_contacto = 20
@@ -45,6 +46,12 @@ position = Vector2(0, -2)
 texture = ExtResource("2_tex")
 hframes = 4
 
+
+; RIG ANIMADO (n1  Floresta -- bruto que investe). Vazio: o `ChefeBase._montar_rig`
+; enche-o de `bosses_anim/minotauro` e esconde o `Corpo` acima.
+[node name="Anim" type="AnimatedSprite2D" parent="Sprite"]
+visible = false
+texture_filter = 1
 [node name="LuzOlhos" type="PointLight2D" parent="Sprite"]
 position = Vector2(0, -34)
 texture = SubResource("GradientTexture2D_luz")
