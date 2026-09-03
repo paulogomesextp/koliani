@@ -84,6 +84,7 @@ const LIQUIDO := {
 	6: [Color(0.74, 0.28, 0.05, 0.95), true],    # VII magma vivo das Terras Queimadas
 	7: [Color(0.03, 0.10, 0.16, 0.96), false],   # VIII agua negra do Mar dos Mortos
 	8: [Color(0.30, 0.52, 0.66, 0.92), false],   # IX agua gelada por baixo do gelo
+	9: [Color(0.42, 0.32, 0.16, 0.94), false],   # X areia movedica do deserto
 }
 
 ## Tipos de "flavour" de câmara (o que se semeia à volta da espinha).
@@ -116,6 +117,12 @@ const POOL_REGIAO := {
 	# de gelo a cair. Sem `fogo` (não há nada a arder numa montanha de neve).
 	8: ["vento", "quebra", "espelhos", "pedras", "saltos", "trampolim",
 		"elevador", "espinhos", "crossfire", "portal", "alavanca", "segredo"],
+	# X Deserto dos Esquecidos: templos cheios de ARMADILHAS. `crossfire`
+	# é a assinatura (as estátuas que disparam do plano) e `pedras` são as
+	# dunas que desabam. Sem `gravidade` e sem `vento` -- aqui o ar está
+	# parado, o que mata é o que está construído.
+	9: ["crossfire", "espinhos", "serras", "prensa", "pedras", "guilhotinas",
+		"saltos", "gruta", "ferry", "portal", "alavanca", "segredo"],
 }
 
 ## `_dif` mínimo para cada tipo de câmara entrar na pool. Assim o Nível 1
@@ -171,6 +178,7 @@ const ASSINATURA := {
 	6: "quebra",       # Terras Queimadas -- a madeira arde e cede
 	7: "gravidade",    # Mar dos Mortos -- tudo flutua
 	8: "espelhos",     # Reino do Gelo -- os cristais
+	9: "crossfire",    # Deserto -- as estatuas que disparam
 }
 
 ## Toque de assinatura do NÍVEL (a gimmick do `docs/niveis.md`) espalhado
@@ -256,6 +264,12 @@ const PERFIL := [
 	{"v": -1, "f": "salto", "a": 0.9},    # 42 Cavernas Cristalinas -- cristais
 	{"v": 0, "f": "combate", "a": 1.0},   # 43 Castelo Congelado -- parado no tempo
 	{"v": 1, "f": "maquina", "a": 1.1},   # 44 Coracao do Inverno -- a montanha por dentro
+	# --- Regiao X  Deserto dos Esquecidos (45-49) : armadilhas ----------
+	{"v": 0, "f": "gauntlet", "a": 1.2},  # 45 Mar de Areia -- dunas abertas
+	{"v": 0, "f": "gauntlet", "a": 0.9},  # 46 Templo Sem Nome -- corredor de armadilhas
+	{"v": -1, "f": "salto", "a": 1.1},    # 47 Vale dos Escorpioes -- sobre o vazio
+	{"v": 0, "f": "maquina", "a": 0.95},  # 48 Cidade Enterrada -- ruinas tapadas
+	{"v": 1, "f": "combate", "a": 0.85},  # 49 Piramide Negra -- camaras apertadas
 ]
 
 ## Que câmaras conta cada foco. Cruzado depois com região+tier em
@@ -972,6 +986,7 @@ const ESP_REGIAO := {
 	6: ["imp", "chort", "demonio_grande", "abobora", "mastim"],
 	7: ["esqueleto", "gosma", "lodo", "wogol", "olho"],
 	8: ["mastim", "abutre", "besouro", "esqueleto", "raptor"],
+	9: ["raptor", "besouro", "ogro", "necromante", "abobora"],
 }
 
 ## A "cara" de cada NÍVEL (pedido do Paulo: não repetir o mesmo monstro em
@@ -988,6 +1003,7 @@ const ESP_ASSINATURA := [
 	"imp", "chort", "mastim", "abobora", "demonio_grande",         # VII Terras Queimadas
 	"esqueleto", "gosma", "olho", "lodo", "wogol",                 # VIII Mar dos Mortos
 	"mastim", "abutre", "besouro", "esqueleto", "raptor",          # IX Reino do Gelo
+	"raptor", "ogro", "besouro", "necromante", "xamane",           # X Deserto dos Esquecidos
 ]
 
 

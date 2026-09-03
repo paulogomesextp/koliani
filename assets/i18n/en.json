@@ -334,5 +334,15 @@
 	"guard.abutre_ventania": "Gale Vulture",
 	"guard.besouro_cristal": "Crystal Beetle",
 	"guard.sentinela_gelada": "Frozen Sentinel",
-	"boss.ymiria": "Ymiria, Goddess of Winter"
+	"boss.ymiria": "Ymiria, Goddess of Winter",
+	"level.n45": "Sea of Sand",
+	"level.n46": "The Nameless Temple",
+	"level.n47": "Valley of Scorpions",
+	"level.n48": "The Buried City",
+	"level.n49": "The Black Pyramid",
+	"guard.lagarto_dunas": "Dune Lizard",
+	"guard.colosso_arenito": "Sandstone Colossus",
+	"guard.escorpiao_areia": "Sand Scorpion",
+	"guard.mumia": "The Mummy",
+	"boss.deus_esquecido": "The Forgotten God"
 }

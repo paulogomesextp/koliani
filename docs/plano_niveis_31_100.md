@@ -65,7 +65,7 @@ A corrupção fez o mar recuar, revelando uma civilização esquecida.
 | 44 | 🏰 Castelo Congelado | castelo congelado no tempo | **A Rainha de Gelo** — congela a Koliani temporariamente |
 | 45 | 🌨️ Coração do Inverno | centro da montanha | **Ymiria, a Deusa do Inverno** — a arena muda entre gelo, neve e tempestade |
 
-## X — DESERTO DOS ESQUECIDOS (46–50) 🏜️
+## X — DESERTO DOS ESQUECIDOS (46–50) 🏜️ ✅ *feita (3 set 2026)*
 
 | # | Nível | Mecânicas | Chefe |
 | --- | --- | --- | --- |

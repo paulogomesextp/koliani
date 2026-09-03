@@ -102,6 +102,21 @@ NIVEIS = [
     # o CHEFE da regiao: Ymiria, a Deusa do Inverno
     ("Coracao_do_Inverno", 44, "torres", "chefe", 4, 800, (0.62, 0.88, 1.00),
      "sacerdotisa_gelo", "Centro da montanha. Ymiria, a Deusa do Inverno."),
+    # --- X  DESERTO DOS ESQUECIDOS (46-50) -- o calor SECO --------------
+    # A IX era branca e fria; esta e' a mesma luz alta, mas quente. Nao se
+    # confunde com a VII (que e' escura com brasa): aqui e' DIA.
+    ("Mar_de_Areia", 45, "torres", "guardiao", 0, 720, (1.00, 0.82, 0.42),
+     "raptor", "Dunas que se movem. Guardiao: um lagarto das dunas."),
+    ("Templo_Sem_Nome", 46, "catacumbas", "guardiao", 0, 760, (0.96, 0.78, 0.38),
+     "ogro", "Armadilhas e estatuas que disparam. Guardiao: um colosso."),
+    ("Vale_dos_Escorpioes", 47, "torres", "guardiao", 0, 800, (1.00, 0.74, 0.30),
+     "besouro", "Plataformas sobre cavernas fundas. Guardiao: um escorpiao."),
+    ("Cidade_Enterrada", 48, "cidade", "guardiao", 0, 840, (0.94, 0.80, 0.46),
+     "necromante", "Cidade quase toda tapada de areia. Guardiao: uma mumia."),
+    # o CHEFE da regiao: O Deus Esquecido -- o 1.o chefe verdadeiramente
+    # sobrenatural (docs/plano_niveis_31_100.md)
+    ("Piramide_Negra", 49, "catacumbas", "chefe", 2, 880, (0.86, 0.62, 1.00),
+     "monge_terra", "Artefacto ligado a' magia purpura. O Deus Esquecido."),
 ]
 
 MODELO_CHEFE = '''[gd_scene load_steps=8 format=3 uid="uid://bkoliani{uid}"]
@@ -271,6 +286,11 @@ TITULOS = {
     "Cavernas_Cristalinas": "Cavernas Cristalinas",
     "Castelo_Congelado": "Castelo Congelado",
     "Coracao_do_Inverno": "Coracao do Inverno",
+    "Mar_de_Areia": "Mar de Areia",
+    "Templo_Sem_Nome": "Templo Sem Nome",
+    "Vale_dos_Escorpioes": "Vale dos Escorpioes",
+    "Cidade_Enterrada": "Cidade Enterrada",
+    "Piramide_Negra": "Piramide Negra",
 }
 
 # Liquido mortal da arena do chefe, por REGIAO (indice0 // 5). Sem isto o
@@ -280,6 +300,7 @@ LIQUIDO_REGIAO = {
     6: ((0.74, 0.28, 0.05, 0.95), "true"),    # VII magma vivo
     7: ((0.03, 0.10, 0.16, 0.96), "false"),   # VIII agua negra do abismo
     8: ((0.30, 0.52, 0.66, 0.92), "false"),   # IX agua gelada por baixo do gelo
+    9: ((0.42, 0.32, 0.16, 0.94), "false"),   # X areia movedica
 }
 
 

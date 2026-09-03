@@ -334,5 +334,15 @@
 	"guard.abutre_ventania": "Sturmgeier",
 	"guard.besouro_cristal": "Kristallkäfer",
 	"guard.sentinela_gelada": "Gefrorene Wache",
-	"boss.ymiria": "Ymiria, die Göttin des Winters"
+	"boss.ymiria": "Ymiria, die Göttin des Winters",
+	"level.n45": "Sandmeer",
+	"level.n46": "Namenloser Tempel",
+	"level.n47": "Tal der Skorpione",
+	"level.n48": "Versunkene Sandstadt",
+	"level.n49": "Schwarze Pyramide",
+	"guard.lagarto_dunas": "Dünenechse",
+	"guard.colosso_arenito": "Sandsteinkoloss",
+	"guard.escorpiao_areia": "Sandskorpion",
+	"guard.mumia": "Die Mumie",
+	"boss.deus_esquecido": "Der Vergessene Gott"
 }

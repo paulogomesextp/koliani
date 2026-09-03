@@ -69,6 +69,12 @@ const CHEFE_KEY: Array[String] = [
 	"guard.besouro_cristal",    # 42 Cavernas Cristalinas
 	"guard.sentinela_gelada",   # 43 Castelo Congelado
 	"boss.ymiria",              # 44 Coracao do Inverno
+	# --- Regiao X  Deserto dos Esquecidos ---
+	"guard.lagarto_dunas",      # 45 Mar de Areia
+	"guard.colosso_arenito",    # 46 Templo Sem Nome
+	"guard.escorpiao_areia",    # 47 Vale dos Escorpioes
+	"guard.mumia",              # 48 Cidade Enterrada
+	"boss.deus_esquecido",      # 49 Piramide Negra
 ]
 
 

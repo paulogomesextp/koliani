@@ -334,5 +334,15 @@
 	"guard.abutre_ventania": "Vautour des Bourrasques",
 	"guard.besouro_cristal": "Scarabée de Cristal",
 	"guard.sentinela_gelada": "Sentinelle Gelée",
-	"boss.ymiria": "Ymiria, la Déesse de l'Hiver"
+	"boss.ymiria": "Ymiria, la Déesse de l'Hiver",
+	"level.n45": "Mer de Sable",
+	"level.n46": "Temple Sans Nom",
+	"level.n47": "Vallée des Scorpions",
+	"level.n48": "Cité Ensevelie",
+	"level.n49": "Pyramide Noire",
+	"guard.lagarto_dunas": "Lézard des Dunes",
+	"guard.colosso_arenito": "Colosse de Grès",
+	"guard.escorpiao_areia": "Scorpion des Sables",
+	"guard.mumia": "La Momie",
+	"boss.deus_esquecido": "Le Dieu Oublié"
 }

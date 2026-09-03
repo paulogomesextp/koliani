@@ -334,5 +334,15 @@
 	"guard.abutre_ventania": "Buitre del Vendaval",
 	"guard.besouro_cristal": "Escarabajo de Cristal",
 	"guard.sentinela_gelada": "Centinela Helado",
-	"boss.ymiria": "Ymiria, la Diosa del Invierno"
+	"boss.ymiria": "Ymiria, la Diosa del Invierno",
+	"level.n45": "Mar de Arena",
+	"level.n46": "Templo Sin Nombre",
+	"level.n47": "Valle de los Escorpiones",
+	"level.n48": "Ciudad Enterrada",
+	"level.n49": "Pirámide Negra",
+	"guard.lagarto_dunas": "Lagarto de las Dunas",
+	"guard.colosso_arenito": "Coloso de Arenisca",
+	"guard.escorpiao_areia": "Escorpión de Arena",
+	"guard.mumia": "La Momia",
+	"boss.deus_esquecido": "El Dios Olvidado"
 }

@@ -132,6 +132,18 @@ TABELA = [
     ("Cavernas_Cristalinas",   "prisao",        (.80,.95,1.24), (.26,.34,.50), (.36,.45,.62), (.72,.92,1.0),  (.90,.98,1.0), 4.2, (1.00,1.12,1.42), .26, .78, False),
     ("Castelo_Congelado",      "castelo_velho", (.86,.99,1.26), (.38,.46,.60), (.50,.58,.72), (.92,1.0,1.0),  (1.0,1.0,1.0), 3.8, (1.10,1.18,1.34), .20, .72, False),
     ("Coracao_do_Inverno",     "luar",          (.78,.93,1.26), (.22,.30,.48), (.32,.41,.60), (.70,.90,1.0),  (.92,.99,1.0), 5.2, (1.02,1.14,1.44), .28, .76, True),
+    # ---- X  Deserto dos Esquecidos (46-50) --------------------------
+    # A IX era clara e FRIA; esta e' a mesma luz alta, mas QUENTE. Nao se
+    # confunde com a VII (escura, com brasa a arder ao longe): aqui e' dia
+    # aberto -- ceu de areia, `amb` puxado ao vermelho e ao amarelo, e o
+    # horizonte quente ligado em todos (o calor a tremer ao longe).
+    # A Piramide Negra sai da paleta de proposito: e' onde a magia purpura
+    # do Zeriko volta a aparecer, e o roxo no meio do ocre e' o aviso.
+    ("Mar_de_Areia",           "rochoso",       (1.20,1.02,.72), (.52,.40,.24), (.62,.50,.32), (1.0,.86,.48),  (1.0,.92,.66), 4.8, (1.32,1.10,.72), .20, .68, True),
+    ("Templo_Sem_Nome",        "masmorra",      (1.14,.98,.72), (.40,.30,.19), (.50,.39,.26), (1.0,.82,.44),  (1.0,.90,.62), 3.6, (1.26,1.04,.70), .26, .62, True),
+    ("Vale_dos_Escorpioes",    "montanhas",     (1.22,1.00,.66), (.48,.35,.20), (.58,.44,.27), (1.0,.78,.36),  (1.0,.88,.56), 4.4, (1.36,1.06,.62), .22, .88, True),
+    ("Cidade_Enterrada",       "cidade",        (1.16,1.00,.74), (.44,.34,.22), (.54,.43,.30), (1.0,.84,.50),  (1.0,.92,.68), 4.0, (1.28,1.08,.74), .24, .64, True),
+    ("Piramide_Negra",         "horror",        (1.02,.80,1.10), (.18,.10,.24), (.26,.16,.33), (.86,.56,1.0),  (.96,.72,1.0), 3.4, (1.14,.78,1.28), .34, .58, False),
 ]
 
 CHAVES = [
