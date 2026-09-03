@@ -23,11 +23,19 @@ static func rebentar(onde: Node, pos: Vector2, cor := Color(1, 1, 1),
 		escala := 2.4) -> void:
 	if onde == null or not onde.is_inside_tree():
 		return
+	# `current_scene` e' nulo em bancadas de teste (`--script` monta a arvore
+	# a' mao, sem cena corrente) -- sem este recurso ao pai, cada acerto
+	# enchia o log de "add_child on a null value".
+	var destino: Node = onde.get_tree().current_scene
+	if destino == null:
+		destino = onde.get_parent()
+	if destino == null:
+		return
 	var fx := Impacto.new()
 	fx.global_position = pos
 	fx.modulate = cor
 	fx.scale = Vector2(escala, escala)
-	onde.get_tree().current_scene.add_child(fx)
+	destino.add_child(fx)
 	fx.global_position = pos
 
 
