@@ -309,9 +309,10 @@
 	"level.n32": "Die Schmiede der Dämonen",
 	"level.n33": "Vulkan des Toten Königs",
 	"level.n34": "Der brennende Himmel",
-	"boss.vulkar": "Vulkar, der Aschenritter",
-	"boss.magmora": "Magmora",
-	"boss.mestre_da_forja": "Der Schmiedemeister",
-	"boss.dragorak": "Dragorak, der Lavakönig",
-	"boss.estrela_caida": "Der Gefallene Stern"
+	"boss.estrela_caida": "Der Gefallene Stern",
+	"guard.imp_cinzas": "Aschenkobold",
+	"guard.chort_magma": "Magma-Chort",
+	"guard.ferreiro": "Der Schmied",
+	"guard.besta_vulcao": "Die Bestie des Vulkans",
+	"sel.guard": "Wächter: %s"
 }

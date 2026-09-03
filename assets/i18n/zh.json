@@ -309,9 +309,10 @@
 	"level.n32": "恶魔锻炉",
 	"level.n33": "亡王火山",
 	"level.n34": "燃烧的天空",
-	"boss.vulkar": "灰烬骑士 瓦尔卡",
-	"boss.magmora": "玛格莫拉",
-	"boss.mestre_da_forja": "锻炉大师",
-	"boss.dragorak": "熔岩之王 德拉戈拉克",
-	"boss.estrela_caida": "陨落之星"
+	"boss.estrela_caida": "陨落之星",
+	"guard.imp_cinzas": "灰烬小鬼",
+	"guard.chort_magma": "岩浆恶鬼",
+	"guard.ferreiro": "铁匠",
+	"guard.besta_vulcao": "火山之兽",
+	"sel.guard": "守卫：%s"
 }

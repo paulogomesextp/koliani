@@ -40,6 +40,12 @@ var _entrada_fresca := true
 
 @onready var _porta: Area2D = $Porta
 @onready var _chefe: Node = get_node_or_null("Chefe")
+## NÍVEL SEM CHEFE (pedido do Paulo, 3 set 2026: "não precisa ter um boss
+## todos os níveis"). Em vez de um chefe, o nível pode acabar num
+## GUARDIÃO -- um elite que sela a porta até cair. Dá um clímax ao nível
+## sem gastar um chefe: a campanha 31-100 passa a ter um chefe por REGIÃO
+## (o último dos cinco) e guardiões nos outros quatro.
+@onready var _guardiao: Node = get_node_or_null("Guardiao")
 
 
 func _enter_tree() -> void:
@@ -64,6 +70,10 @@ func _ready() -> void:
 	if _chefe and _chefe.has_signal("derrotado"):
 		_selar(true)
 		_chefe.derrotado.connect(_abrir)
+	elif _guardiao:
+		# o guardião não tem sinal próprio: morrer é sair da árvore
+		_selar(true)
+		_guardiao.tree_exited.connect(_abrir)
 	else:
 		_selar(false)
 

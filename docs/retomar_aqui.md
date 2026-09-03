@@ -74,6 +74,23 @@ O que ficou construído e serve para as outras 13:
 6. `tools/afinar_atmosfera.py`: +5 linhas, e correr o tool.
 7. `godot --headless --import`, a suite, `verifica_jornada`, folha de contacto.
 
+**Estrutura decidida (3 set, a mando do Paulo):** *"não precisa ter um
+boss todos os níveis"*. Da Região VII em diante cada região de 5 tem **um
+chefe — o último** — e **guardiões** nos outros quatro: um elite que sela a
+porta até cair (`nivel_com_chefe.gd` liga-se ao `tree_exited` do nó
+`Guardiao`). Dá clímax ao nível sem gastar um chefe, e são 14 chefes novos
+em vez de 70 — cada um pode ser trabalhado a sério. Os níveis 1–30 ficam
+como estão (têm chefe todos, e estão playtestados). No carrossel, um nível
+de guardião diz "Guardião: X" (`sel.guard`) em vez de "Chefe: X"; a chave
+i18n é `guard.*` em vez de `boss.*`, e o `CatalogoCampanha.tem_chefe()`
+distingue-os.
+
+**Chefes animados (3 set):** até aqui NENHUM chefe animava — a folha do
+`extrair_chefes_packs.gd` são quatro POSES. Agora há
+`tools/importar_chefes_animados.py` e cinco rigs (idle/walk/attack/hurt/
+death) de packs gratuitos que já estavam no repo. Cinco chefes de 1–30 já
+os usam. **Faltam rigs para os outros 24** — ver a lista de packs abaixo.
+
 **Decisões que ficam por tomar (precisam do Paulo):**
 
 - **Os dois pontos de partida do 2.º acto** — 0.72 de dificuldade e

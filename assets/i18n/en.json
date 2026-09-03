@@ -309,9 +309,10 @@
 	"level.n32": "The Forge of Demons",
 	"level.n33": "Volcano of the Dead King",
 	"level.n34": "The Burning Sky",
-	"boss.vulkar": "Vulkar, the Ash Knight",
-	"boss.magmora": "Magmora",
-	"boss.mestre_da_forja": "The Forge Master",
-	"boss.dragorak": "Dragorak, the Lava King",
-	"boss.estrela_caida": "The Fallen Star"
+	"boss.estrela_caida": "The Fallen Star",
+	"guard.imp_cinzas": "Ash Imp",
+	"guard.chort_magma": "Magma Chort",
+	"guard.ferreiro": "The Smith",
+	"guard.besta_vulcao": "Beast of the Volcano",
+	"sel.guard": "Guardian: %s"
 }

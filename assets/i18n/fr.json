@@ -309,9 +309,10 @@
 	"level.n32": "La Forge des Démons",
 	"level.n33": "Volcan du Roi Mort",
 	"level.n34": "Le Ciel en Flammes",
-	"boss.vulkar": "Vulkar, le Chevalier de Cendre",
-	"boss.magmora": "Magmora",
-	"boss.mestre_da_forja": "Le Maître de la Forge",
-	"boss.dragorak": "Dragorak, le Roi de Lave",
-	"boss.estrela_caida": "L'Étoile Déchue"
+	"boss.estrela_caida": "L'Étoile Déchue",
+	"guard.imp_cinzas": "Diablotin de Cendre",
+	"guard.chort_magma": "Chort de Magma",
+	"guard.ferreiro": "Le Forgeron",
+	"guard.besta_vulcao": "La Bête du Volcan",
+	"sel.guard": "Gardien : %s"
 }

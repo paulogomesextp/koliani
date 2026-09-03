@@ -309,9 +309,10 @@
 	"level.n32": "A Forja dos Demónios",
 	"level.n33": "Vulcão do Rei Morto",
 	"level.n34": "O Céu em Chamas",
-	"boss.vulkar": "Vulkar, o Cavaleiro das Cinzas",
-	"boss.magmora": "Magmora",
-	"boss.mestre_da_forja": "O Mestre da Forja",
-	"boss.dragorak": "Dragorak, o Rei de Lava",
-	"boss.estrela_caida": "A Estrela Caída"
+	"boss.estrela_caida": "A Estrela Caída",
+	"guard.imp_cinzas": "Diabrete das Cinzas",
+	"guard.chort_magma": "Chort do Magma",
+	"guard.ferreiro": "O Ferreiro",
+	"guard.besta_vulcao": "A Besta do Vulcão",
+	"sel.guard": "Guardião: %s"
 }

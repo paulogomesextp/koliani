@@ -1,18 +1,18 @@
 [gd_scene load_steps=8 format=3 uid="uid://bkolianivulcaodoreimorto34"]
 
 ; REGIAO 7 / nivel 34 -- Vulcao do Rei Morto.
-; Subida pelo interior do vulcao. Dragorak, o Rei de Lava.
+; Subida pelo interior do vulcao. Guardiao: a besta do vulcao.
 ;
-; CENA GERADA por `tools/gerar_niveis_31_100.py` -- NAO editar a' mao: o
-; proximo `python tools/gerar_niveis_31_100.py` apaga o que aqui se puser.
-; A JORNADA (`corredor = true`, `gerador_corredor.gd`) constroi tudo o que
-; vem antes desta sala; aqui so' esta' a arena do chefe.
+; NIVEL SEM CHEFE. A regiao tem um chefe so' -- o ultimo dos cinco --
+; e este acaba num GUARDIAO (elite) que sela a porta ate' cair.
+;
+; CENA GERADA por `tools/gerar_niveis_31_100.py` -- NAO editar a' mao.
 ; O bloco `Atmosfera` e' reescrito por `tools/afinar_atmosfera.py`.
 
 [ext_resource type="PackedScene" uid="uid://bkolianiactor01" path="res://scenes/actors/Koliani.tscn" id="1_kol"]
 [ext_resource type="PackedScene" uid="uid://bkolianiporta01" path="res://scenes/actors/Porta.tscn" id="2_porta"]
 [ext_resource type="Script" path="res://scripts/checkpoint.gd" id="3_chk"]
-[ext_resource type="PackedScene" uid="uid://bkolianichefegenerico01" path="res://scenes/actors/ChefeGenerico.tscn" id="4_chefe"]
+[ext_resource type="PackedScene" uid="uid://bdemoniobase01" path="res://scenes/actors/DemonioBase.tscn" id="4_dem"]
 [ext_resource type="Script" path="res://scripts/nivel_com_chefe.gd" id="5_niv"]
 [ext_resource type="PackedScene" uid="uid://bkolianiatmosfera01" path="res://scenes/fx/Atmosfera.tscn" id="6_atm"]
 [ext_resource type="PackedScene" uid="uid://bkolianiplataforma01" path="res://scenes/actors/Plataforma.tscn" id="7_pl"]
@@ -40,15 +40,16 @@ position = Vector2(760, 700)
 tamanho = Vector2(1000, 60)
 altura_visual = 110.0
 
-[node name="Chefe" parent="." instance=ExtResource("4_chefe")]
-position = Vector2(1020, 616)
-arquetipo = 1
-vida = 580
+[node name="Guardiao" parent="." instance=ExtResource("4_dem")]
+position = Vector2(1020, 630)
+scale = Vector2(1.5, 1.5)
+elite = true
+especie = "demonio_grande"
+vida = 380
+dano_contacto = 26
+comportamento = "carga"
+alcance_patrulha = 150.0
 cor_rim = Color(1.0, 0.3, 0.12, 1)
-rig = "guardiao_gelo"
-tiros_por_salva = 5
-leque_graus = 34.0
-dist_ideal = 300.0
 
 [node name="Koliani" parent="." instance=ExtResource("1_kol")]
 position = Vector2(360, 616)

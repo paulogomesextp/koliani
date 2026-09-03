@@ -309,9 +309,10 @@
 	"level.n32": "La Forja de los Demonios",
 	"level.n33": "Volcán del Rey Muerto",
 	"level.n34": "El Cielo en Llamas",
-	"boss.vulkar": "Vulkar, el Caballero de Ceniza",
-	"boss.magmora": "Magmora",
-	"boss.mestre_da_forja": "El Maestro de la Forja",
-	"boss.dragorak": "Dragorak, el Rey de Lava",
-	"boss.estrela_caida": "La Estrella Caída"
+	"boss.estrela_caida": "La Estrella Caída",
+	"guard.imp_cinzas": "Diablillo de Ceniza",
+	"guard.chort_magma": "Chort de Magma",
+	"guard.ferreiro": "El Herrero",
+	"guard.besta_vulcao": "La Bestia del Volcán",
+	"sel.guard": "Guardián: %s"
 }

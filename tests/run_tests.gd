@@ -235,7 +235,10 @@ func teste_catalogo_campanha() -> void:
 		"CatalogoCampanha.CHEFE_KEY devia ter uma entrada por nível (%d)" % n)
 	var vistas := {}
 	for k in CatalogoCampanha.CHEFE_KEY:
-		_ok(k.begins_with("boss."), "chave de chefe mal formada: '%s'" % k)
+		# nem todo o nível acaba num chefe: os que acabam num guardião levam
+		# `guard.*` (ver `CatalogoCampanha.tem_chefe`)
+		_ok(k.begins_with("boss.") or k.begins_with("guard."),
+			"chave de fim de nível mal formada: '%s'" % k)
 		_ok(not vistas.has(k), "chave de chefe repetida: '%s'" % k)
 		vistas[k] = true
 

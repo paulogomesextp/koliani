@@ -11,6 +11,11 @@ extends RefCounted
 ## vive no `seletor_niveis.gd`, que corre sempre dentro de uma cena.
 
 ## Chave i18n do chefe de cada nível (índice = índice em EstadoJogo.NIVEIS).
+##
+## Desde 3 set 2026 nem todo o nível tem chefe (pedido do Paulo). Os que
+## acabam num GUARDIÃO -- um elite que sela a porta -- levam uma chave
+## `guard.*` em vez de `boss.*`; o carrossel usa isso para dizer
+## "Guardião: X" em vez de "Chefe: X".
 const CHEFE_KEY: Array[String] = [
 	"boss.ghorak",               # 00 Floresta Putrefacta
 	"boss.morvanna",             # 01 Pântano dos Sussurros
@@ -43,10 +48,10 @@ const CHEFE_KEY: Array[String] = [
 	"boss.arauto_de_zeriko",     # 28 Torre do Coração Negro
 	"boss.zeriko",               # 29 O Trono de Zeriko
 	# --- Regiao VII  Terras Queimadas ---
-	"boss.vulkar",           # 30 Estrada das Cinzas
-	"boss.magmora",          # 31 Rio de Magma
-	"boss.mestre_da_forja",  # 32 A Forja dos Demonios
-	"boss.dragorak",         # 33 Vulcao do Rei Morto
+	"guard.imp_cinzas",           # 30 Estrada das Cinzas
+	"guard.chort_magma",          # 31 Rio de Magma
+	"guard.ferreiro",  # 32 A Forja dos Demonios
+	"guard.besta_vulcao",         # 33 Vulcao do Rei Morto
 	"boss.estrela_caida",    # 34 O Ceu em Chamas
 ]
 
@@ -56,8 +61,13 @@ static func chave_nivel(indice: int) -> String:
 	return "level.n%02d" % indice
 
 
-## Chave i18n do nome do chefe do nível `indice`, ou "" fora de alcance.
+## Chave i18n do nome do chefe (ou guardião) do nível, ou "" fora de alcance.
 static func chave_chefe(indice: int) -> String:
 	if indice < 0 or indice >= CHEFE_KEY.size():
 		return ""
 	return CHEFE_KEY[indice]
+
+
+## O nível `indice` acaba num CHEFE (true) ou num guardião (false)?
+static func tem_chefe(indice: int) -> bool:
+	return chave_chefe(indice).begins_with("boss.")

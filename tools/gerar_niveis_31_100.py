@@ -48,21 +48,32 @@ DEST = os.path.join(RAIZ, "scenes", "levels")
 #               POSES, nao uma animacao. So' ha' cinco rigs -- os packs
 #               gratuitos que estavam no repo -- portanto a regiao VII usa
 #               os cinco e as regioes seguintes precisam de packs novos.
+#   fim      -- como acaba o nivel:
+#               "chefe"    -> ChefeGenerico + porta selada ate' ele cair
+#               "guardiao" -> um ELITE sela a porta. Pedido do Paulo
+#                  ("nao precisa ter um boss todos os niveis"): a campanha
+#                  31-100 tem UM chefe por regiao, o ultimo dos cinco, e
+#                  guardioes nos outros quatro. Da' clima'x ao nivel sem
+#                  gastar um chefe, e sao 14 chefes novos em vez de 70 --
+#                  cada um pode ser trabalhado a serio.
+#   especie  -- so' para "guardiao": a especie do elite (DemonioBase)
 NIVEIS = [
     # --- VII  TERRAS QUEIMADAS (31-35) -- a magia purpura queima o reino --
-    ("Estrada_das_Cinzas", 30, "floresta", 0, 460, (1.0, 0.45, 0.15),
-     "ceifeiro", "Floresta a arder: o chao cede. Vulkar, o Cavaleiro das Cinzas."),
-    ("Rio_de_Magma", 31, "catacumbas", 0, 500, (1.0, 0.36, 0.10),
-     "demonio_lodo", "Rio de lava e pedra vulcanica. Magmora, serpente de magma."),
-    ("A_Forja_dos_Demonios", 32, "castelo", 3, 540, (1.0, 0.55, 0.20),
-     "minotauro", "Correias, martelos e metal derretido. O Mestre da Forja."),
-    ("Vulcao_do_Rei_Morto", 33, "catacumbas", 1, 580, (1.0, 0.30, 0.12),
-     "guardiao_gelo", "Subida pelo interior do vulcao. Dragorak, o Rei de Lava."),
-    ("O_Ceu_em_Chamas", 34, "castelo", 4, 640, (1.0, 0.72, 0.35),
+    ("Estrada_das_Cinzas", 30, "floresta", "guardiao", 0, 260, (1.0, 0.45, 0.15),
+     "imp", "Floresta a arder: o chao cede. Guardiao: um imp de cinzas."),
+    ("Rio_de_Magma", 31, "catacumbas", "guardiao", 0, 300, (1.0, 0.36, 0.10),
+     "chort", "Rio de lava e pedra vulcanica. Guardiao: um chort do magma."),
+    ("A_Forja_dos_Demonios", 32, "castelo", "guardiao", 0, 340, (1.0, 0.55, 0.20),
+     "ogro", "Correias, martelos e metal derretido. Guardiao: o ferreiro."),
+    ("Vulcao_do_Rei_Morto", 33, "catacumbas", "guardiao", 0, 380, (1.0, 0.30, 0.12),
+     "demonio_grande", "Subida pelo interior do vulcao. Guardiao: a besta do vulcao."),
+    # o CHEFE da regiao: A Estrela Caida, 1.o a sugerir que a ameaca e'
+    # maior que o Zeriko (docs/plano_niveis_31_100.md)
+    ("O_Ceu_em_Chamas", 34, "castelo", "chefe", 4, 640, (1.0, 0.72, 0.35),
      "feiticeiro", "Topo do vulcao, o ceu a cair. A Estrela Caida."),
 ]
 
-MODELO = '''[gd_scene load_steps=8 format=3 uid="uid://bkoliani{uid}"]
+MODELO_CHEFE = '''[gd_scene load_steps=8 format=3 uid="uid://bkoliani{uid}"]
 
 ; REGIAO {regiao_num} / nivel {n} -- {titulo}.
 ; {nota}
@@ -128,6 +139,80 @@ position = Vector2(1210, 622)
 pista_ao_atravessar = ""
 '''
 
+# Nivel SEM chefe: acaba num GUARDIAO -- um elite do `DemonioBase` que sela
+# a porta ate' cair. O `nivel_com_chefe.gd` liga-se ao `tree_exited` do no'
+# chamado `Guardiao`.
+MODELO_GUARDIAO = '''[gd_scene load_steps=8 format=3 uid="uid://bkoliani{uid}"]
+
+; REGIAO {regiao_num} / nivel {n} -- {titulo}.
+; {nota}
+;
+; NIVEL SEM CHEFE. A regiao tem um chefe so' -- o ultimo dos cinco --
+; e este acaba num GUARDIAO (elite) que sela a porta ate' cair.
+;
+; CENA GERADA por `tools/gerar_niveis_31_100.py` -- NAO editar a' mao.
+; O bloco `Atmosfera` e' reescrito por `tools/afinar_atmosfera.py`.
+
+[ext_resource type="PackedScene" uid="uid://bkolianiactor01" path="res://scenes/actors/Koliani.tscn" id="1_kol"]
+[ext_resource type="PackedScene" uid="uid://bkolianiporta01" path="res://scenes/actors/Porta.tscn" id="2_porta"]
+[ext_resource type="Script" path="res://scripts/checkpoint.gd" id="3_chk"]
+[ext_resource type="PackedScene" uid="uid://bdemoniobase01" path="res://scenes/actors/DemonioBase.tscn" id="4_dem"]
+[ext_resource type="Script" path="res://scripts/nivel_com_chefe.gd" id="5_niv"]
+[ext_resource type="PackedScene" uid="uid://bkolianiatmosfera01" path="res://scenes/fx/Atmosfera.tscn" id="6_atm"]
+[ext_resource type="PackedScene" uid="uid://bkolianiplataforma01" path="res://scenes/actors/Plataforma.tscn" id="7_pl"]
+[ext_resource type="PackedScene" uid="uid://bkolianiaguavenenosa01" path="res://scenes/actors/AguaVenenosa.tscn" id="8_liq"]
+
+[sub_resource type="RectangleShape2D" id="rs_chk"]
+size = Vector2(44, 96)
+
+[node name="{ficheiro}" type="Node2D"]
+script = ExtResource("5_niv")
+
+[node name="Atmosfera" parent="." instance=ExtResource("6_atm")]
+bioma = "{bioma}"
+largura_nivel = 1800.0
+
+[node name="LiquidoMortal" parent="." instance=ExtResource("8_liq")]
+position = Vector2(700, 980)
+largura = 2000.0
+altura = 340.0
+cor = Color(0.74, 0.28, 0.05, 0.95)
+brasas = true
+
+[node name="ChaoChefe" parent="." instance=ExtResource("7_pl")]
+position = Vector2(760, 700)
+tamanho = Vector2(1000, 60)
+altura_visual = 110.0
+
+[node name="Guardiao" parent="." instance=ExtResource("4_dem")]
+position = Vector2(1020, 630)
+scale = Vector2(1.5, 1.5)
+elite = true
+especie = "{especie}"
+vida = {vida}
+dano_contacto = 26
+comportamento = "carga"
+alcance_patrulha = 150.0
+cor_rim = Color({rim[0]}, {rim[1]}, {rim[2]}, 1)
+
+[node name="Koliani" parent="." instance=ExtResource("1_kol")]
+position = Vector2(360, 616)
+
+[node name="CheckInicio" type="Area2D" parent="."]
+position = Vector2(430, 632)
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("3_chk")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckInicio"]
+shape = SubResource("rs_chk")
+
+[node name="Porta" parent="." instance=ExtResource("2_porta")]
+position = Vector2(1210, 622)
+pista_ao_atravessar = ""
+'''
+
+
 # Numeros por arquetipo que fazem cada um ler como o chefe que o plano
 # descreve. Sem isto os cinco arquetipos sairiam todos com o ritmo por
 # omissao e os 70 chefes sentir-se-iam iguais.
@@ -150,9 +235,9 @@ TITULOS = {
 
 def main() -> int:
     seco = "--dry-run" in sys.argv
-    for ficheiro, idx0, bioma, arq, vida, rim, rig, nota in NIVEIS:
+    for ficheiro, idx0, bioma, fim, arq, vida, rim, rig, nota in NIVEIS:
         n = idx0 + 1
-        texto = MODELO.format(
+        texto = (MODELO_CHEFE if fim == "chefe" else MODELO_GUARDIAO).format(
             uid=ficheiro.lower().replace("_", "") + str(n),
             regiao_num=(idx0 // 5) + 1,
             n=n,
@@ -164,11 +249,12 @@ def main() -> int:
             vida=vida,
             rim=rim,
             rig=rig,
-            extra=AFINACAO.get(arq, ""),
+            especie=rig,
+            extra=AFINACAO.get(arq, "") if fim == "chefe" else "",
         )
         cam = os.path.join(DEST, ficheiro + ".tscn")
-        print("  %-24s n%-3d arquetipo=%d vida=%-4d rig=%-14s %s" % (
-            ficheiro, n, arq, vida, rig, "(dry-run)" if seco else ""))
+        print("  %-24s n%-3d %-8s vida=%-4d %-14s %s" % (
+            ficheiro, n, fim, vida, rig, "(dry-run)" if seco else ""))
         if not seco:
             with open(cam, "w", encoding="utf-8", newline="\n") as f:
                 f.write(texto)

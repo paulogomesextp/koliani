@@ -651,7 +651,8 @@ func _reconstruir_estilos() -> void:
 		(c["regiao"] as Label).text = "%s  ·  %s" % [nome_regiao.to_upper(), _progresso_regiao(regiao)]
 		(c["numero"] as Label).text = "%02d" % (idx + 1)
 		(c["nome"] as Label).text = _nome_nivel(idx)
-		(c["chefe"] as Label).text = Textos.tf("sel.boss", [_nome_chefe(idx)])
+		var rotulo := "sel.boss" if CatalogoCampanha.tem_chefe(idx) else "sel.guard"
+		(c["chefe"] as Label).text = Textos.tf(rotulo, [_nome_chefe(idx)])
 		(c["premio"] as Label).text = _texto_premio(idx)
 		var pill := c["pill"] as Label
 		var painel := c["painel"] as Panel
