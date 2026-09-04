@@ -5,9 +5,12 @@ name: CI
 # telemovel e um .exe para o playtester, sem depender do PC do Paulo estar
 # ligado (mesma filosofia do deploy do jogo do jardim).
 #
-# O build Windows e ainda publicado no Release "win-latest" (tag rolante):
-# assim o playtester tem sempre um link fixo com a versao mais recente --
-# https://github.com/paulogomesextp/koliani/releases/tag/win-latest
+# Os artifacts do Actions so' se descarregam com sessao iniciada, por isso o
+# que interessa sai por tres portas PUBLICAS:
+#   - Release "win-latest"     -> o .zip do Windows (link fixo, playtester)
+#   - Release "android-latest" -> o APK de debug (link fixo, telemovel)
+#   - GitHub Pages             -> o build Web (a saida para iOS: a Apple nao
+#                                 tem caminho nativo gratis)
 #
 # NOTA: a primeira execucao real pode precisar de afinacao (versao exata da
 # imagem godot-ci, nome do preset, sdk Android). Ajustar aqui conforme os
@@ -19,9 +22,12 @@ on:
   pull_request:
   workflow_dispatch:
 
-# Necessario para o job "windows" criar/atualizar o Release "win-latest".
+# `contents: write` -> os jobs "windows"/"android" criarem e actualizarem os
+# Releases de tag rolante. `pages` + `id-token` -> publicar o build Web.
 permissions:
   contents: write
+  pages: write
+  id-token: write
 
 env:
   GODOT_CI_IMAGE: barichello/godot-ci:4.7.2
@@ -80,6 +86,51 @@ jobs:
             -keypass android -keystore debug.keystore -storepass android \
             -dname "CN=Android Debug,O=Android,C=US" -validity 9999 \
             -deststoretype pkcs12
+      # Mesmo com `gradle_build/use_gradle_build=false` o export precisa do
+      # SDK: e' de la' que sai o `apksigner` que assina o pacote
+      # (`package/signed=true` no preset). E o Godot 4 NAO le o `ANDROID_HOME`
+      # na hora do export -- le a definicao `export/android/android_sdk_path`
+      # das EDITOR SETTINGS, que so' existem depois de o editor ter corrido
+      # uma vez. E' isso que este passo garante.
+      - name: Preparar o SDK do Android nas editor settings
+        run: |
+          if [ -z "$ANDROID_HOME" ]; then
+            export ANDROID_HOME="${ANDROID_SDK_ROOT:-/usr/lib/android-sdk}"
+          fi
+          export ANDROID_SDK_ROOT="$ANDROID_HOME"
+          echo "ANDROID_HOME=$ANDROID_HOME" >> "$GITHUB_ENV"
+          echo "ANDROID_SDK_ROOT=$ANDROID_HOME" >> "$GITHUB_ENV"
+          godot --headless --editor --quit >/dev/null 2>&1 || true
+          cfg=$(find ~/.config/godot -name 'editor_settings-*.tres' 2>/dev/null | head -1)
+          if [ -n "$cfg" ]; then
+            grep -v 'export/android/android_sdk_path' "$cfg" > "$cfg.novo"
+            echo "export/android/android_sdk_path = \"$ANDROID_HOME\"" >> "$cfg.novo"
+            mv "$cfg.novo" "$cfg"
+            echo "--- editor settings: $cfg ---"
+            grep -n 'android' "$cfg" || true
+          else
+            echo "AVISO: o editor nao deixou editor_settings-*.tres"
+          fi
+      # Os logs dos Actions deste repo pedem sessao iniciada para se lerem,
+      # mas as ANOTACOES sao publicas -- e' por elas que o diagnostico e o erro
+      # chegam ca' fora. Sem isto o unico sinal do lado de fora era
+      # "Process completed with exit code 1".
+      - name: Diagnostico do ambiente Android
+        run: |
+          {
+            echo "ANDROID_HOME=${ANDROID_HOME:-(vazio)}"
+            echo "ANDROID_SDK_ROOT=${ANDROID_SDK_ROOT:-(vazio)}"
+            echo "JAVA_HOME=${JAVA_HOME:-(vazio)}"
+            java -version 2>&1 | head -2
+            echo "-- build-tools --"
+            ls "${ANDROID_HOME:-/usr/lib/android-sdk}/build-tools" 2>&1 | head -5
+            echo "-- apksigner --"
+            find / -maxdepth 7 -name 'apksigner*' 2>/dev/null | head -3
+            echo "-- templates android --"
+            ls ~/.local/share/godot/export_templates/*/ 2>/dev/null | grep -i android | head -5
+          } > diag.txt 2>&1
+          cat diag.txt
+          sed 's/^/::warning::/' diag.txt
       - name: Importar recursos
         run: godot --headless --import || true
       - name: Export APK
@@ -89,11 +140,36 @@ jobs:
           GODOT_ANDROID_KEYSTORE_DEBUG_PASSWORD: android
         run: |
           mkdir -p build/android
-          godot --headless --export-debug "Android" build/android/koliani.apk
+          set +e
+          godot --headless -v --export-debug "Android" build/android/koliani.apk > apk.log 2>&1
+          rc=$?
+          set -e
+          cat apk.log
+          if [ "$rc" -ne 0 ]; then
+            tail -n 25 apk.log | sed 's/^/::error::/'
+          fi
+          exit "$rc"
       - uses: actions/upload-artifact@v4
         with:
           name: koliani-android
           path: build/android/koliani.apk
+      # Tag rolante, a par do "win-latest": o Paulo instala sempre do mesmo
+      # link, sem ter de andar a cacar artifacts (que pedem sessao iniciada).
+      - name: Publicar no Release "android-latest"
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: android-latest
+          name: Koliani -- APK Android mais recente
+          make_latest: false
+          files: build/android/koliani.apk
+          body: |
+            Build automatica do commit `${{ github.sha }}` (run #${{ github.run_number }}).
+
+            **Como instalar:** descarrega `koliani.apk` no telemovel e abre-o.
+            O Android pede para permitir "instalar apps desconhecidas" ao
+            browser -> permitir -> instalar. E' um APK de DEBUG assinado com
+            uma chave de debug: serve para jogar, nao para a Play Store.
 
   windows:
     name: Build Windows (release)
@@ -139,3 +215,38 @@ jobs:
             O progresso fica guardado em
             `%APPDATA%\Godot\app_userdata\Koliani\progresso.json` -- apagar esse
             ficheiro recomeca o jogo do zero.
+
+  # O build Web ja' era exportado mas ficava so' como artifact, que pede sessao
+  # iniciada para se descarregar. Passa a ser PUBLICADO no GitHub Pages -- e' o
+  # unico caminho gratis para o iPhone (a Apple nao tem alternativa nativa: o
+  # Apple ID gratis expira ao fim de 7 dias e exige um Mac, e a TestFlight
+  # exige os 99 EUR/ano).
+  pages:
+    name: Publicar o Web no GitHub Pages
+    runs-on: ubuntu-latest
+    needs: web
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    # So' um deploy de Pages de cada vez -- e' este JOB que se serializa, nao
+    # o workflow todo (a nivel de workflow, um push novo cancelava tambem os
+    # testes e os builds do run anterior).
+    concurrency:
+      group: pages
+      cancel-in-progress: true
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: koliani-web
+          path: build/web
+      # `enablement: true` liga o Pages sozinho na primeira vez, em vez de
+      # obrigar a ir mexer nas definicoes do repo a mao.
+      - uses: actions/configure-pages@v5
+        with:
+          enablement: true
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/web
+      - id: deploy
+        uses: actions/deploy-pages@v4
