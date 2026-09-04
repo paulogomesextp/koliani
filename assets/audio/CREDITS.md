@@ -36,33 +36,82 @@ registado por transparência.
 
 Ficheiros entregues pelo Paulo; licença/uso à responsabilidade dele.
 
-## Música de níveis e de chefe — 20+20 em ciclo (3 set 2026)
+## Música de níveis e de chefe — 20+20 em ciclo (refeitas a 4 set 2026)
 
 Pedido do Paulo: "20 músicas de nível, em ciclo" e "20 de chefe" em vez de
 uma faixa só a repetir por todos os níveis. `Musica.ambiente()`/`boss()`
-escolhem por `indice_nivel % 20` (`scripts/musica.gd`). Todas do
-OpenGameArt, **CC-BY** (creditar) ou **CC0**; nenhuma é CC-BY-SA. Cada
-faixa foi cortada a ~70-80s com fade-out e recodificada a 64kbps mono
-(`ffmpeg`, sem dependências no repo) para caber no orçamento de espaço —
-o original de cada uma costuma ser mais longo, ver o link se quiseres a
-versão completa.
+escolhem por `indice_nivel % 20` (`scripts/musica.gd`).
 
-`assets/audio/musica/niveis/nivel_01..20.ogg`:
+**Refeitas de raiz a 4 set 2026** por `tools/preparar_musica.py`, depois de
+o Paulo se queixar de que "a música do Nível 32 é esquisita e tem vários
+cortes" e de que "os níveis 1 e 2 têm a mesma música". A medição mostrou o
+porquê: as faixas tocam **em ciclo**, e 8 das 20 de nível e 10 das 20 de
+chefe tinham **fade-out** — de X em X segundos a música desaparecia e
+voltava a entrar a todo o volume. Além disso 7 faixas de nível eram trocos
+curtos de mais (a do nível 1 tinha **7,6 segundos** — era um jingle de
+vitória, não uma cama; a do nível 2 tinha 8,0 s e vinha do mesmo álbum,
+daí soarem iguais).
 
-| Pack | Autor | Licença | Faixas usadas (nº = índice) |
+Agora cada faixa **fecha sobre si própria**: corta-se o troço útil, cruza-se
+a cauda por cima da cabeça e iguala-se o volume a -16 LUFS. A regra é
+verificável — `python tools/preparar_musica.py --verificar` sai != 0 se
+alguma faixa for curta de mais ou tiver um degrau audível na costura.
+
+Também a pedido dele ("adorei o final da música do Nível 38, se conseguir
+mais músicas assim com tom de rock perfeito"), entraram **6 faixas de
+rock/metal CC0 do autor [nene](https://opengameart.org/users/nene)** na
+rotação dos níveis e mais 3 na dos chefes. A faixa que ele gostou fica
+onde estava (`nivel_18` = nível 38); só se lhe tirou o fade final.
+
+Todas do OpenGameArt, **CC0** ou **CC-BY** (creditar); nenhuma é CC-BY-SA.
+Codificadas em ogg mono a 64 kbps.
+
+### `assets/audio/musica/niveis/nivel_01..20.ogg`
+
+| Ficheiro | Faixa e autor | Licença | Página |
 | --- | --- | --- | --- |
-| [Essentials Pack for Fantasy Games — LOOP BOX #3](https://opengameart.org/content/essentials-pack-for-fantasy-games-loop-box-3-orchestral-soundtracks-for-rpgs-and-adventures) | Of Far Different Nature | CC-BY 4.0 | 01 Victory Stats · 02 Funny March · 03 Pavane [short] · 04 Ship In A Storm · 05 Obscurium · 06 Hurry! · 07 Underground Town · 08 Horny [v2] · 09 Pavane · 10 Eastern Treasures · 11 Adventure Begins · 12 Zwischenwelt · 13 Epic Departure [v2] · 14 Flow · 15 Throne Room [v2] · 16 In Darkness [v2] · 17 Clash |
-| [Free Music Pack](https://opengameart.org/content/free-music-pack) | Alexander Ehlers (subm. tricksntraps) | CC0 | 18 Waking the devil · 19 Great mission · 20 Spacetime |
+| `nivel_01.ogg` | Unchained Destiny [Rock] -- nene, CC0 | CC0 | https://opengameart.org/content/unchained-destiny-rock |
+| `nivel_02.ogg` | Fight for Better Future [Rock/Metal] -- nene, CC0 | CC0 | https://opengameart.org/content/fight-for-better-future-rockmetal |
+| `nivel_03.ogg` | Adventure Begins -- Of Far Different Nature | CC-BY 4.0 | https://opengameart.org/content/essentials-pack-for-fantasy-games-loop-box-3-orchestral-soundtracks-for-rpgs-and-adventures |
+| `nivel_04.ogg` | Boss Battle #9 [Metal] -- nene, CC0 | CC0 | https://opengameart.org/content/boss-battle-9-metal |
+| `nivel_05.ogg` | Doomed -- Alexander Ehlers | CC0 | https://opengameart.org/content/free-music-pack |
+| `nivel_06.ogg` | Twists -- Alexander Ehlers | CC0 | https://opengameart.org/content/free-music-pack |
+| `nivel_07.ogg` | Warped -- Alexander Ehlers | CC0 | https://opengameart.org/content/free-music-pack |
+| `nivel_08.ogg` | Horny [v2] -- Of Far Different Nature | CC-BY 4.0 | https://opengameart.org/content/essentials-pack-for-fantasy-games-loop-box-3-orchestral-soundtracks-for-rpgs-and-adventures |
+| `nivel_09.ogg` | Pavane -- Of Far Different Nature | CC-BY 4.0 | https://opengameart.org/content/essentials-pack-for-fantasy-games-loop-box-3-orchestral-soundtracks-for-rpgs-and-adventures |
+| `nivel_10.ogg` | Eastern Treasures -- Of Far Different Nature (tinha fade-in) | CC-BY 4.0 | https://opengameart.org/content/essentials-pack-for-fantasy-games-loop-box-3-orchestral-soundtracks-for-rpgs-and-adventures |
+| `nivel_11.ogg` | Boss Battle #8 [Metal] -- nene, CC0 | CC0 | https://opengameart.org/content/boss-battle-8-metal |
+| `nivel_12.ogg` | Once More [Metal] -- nene, CC0 (NIVEL 32: troca pedida pelo Paulo) | CC0 | https://opengameart.org/content/once-more-metal |
+| `nivel_13.ogg` | Epic Departure [v2] -- Of Far Different Nature | CC-BY 4.0 | https://opengameart.org/content/essentials-pack-for-fantasy-games-loop-box-3-orchestral-soundtracks-for-rpgs-and-adventures |
+| `nivel_14.ogg` | Flow -- Of Far Different Nature | CC-BY 4.0 | https://opengameart.org/content/essentials-pack-for-fantasy-games-loop-box-3-orchestral-soundtracks-for-rpgs-and-adventures |
+| `nivel_15.ogg` | Throne Room [v2] -- Of Far Different Nature | CC-BY 4.0 | https://opengameart.org/content/essentials-pack-for-fantasy-games-loop-box-3-orchestral-soundtracks-for-rpgs-and-adventures |
+| `nivel_16.ogg` | In Darkness [v2] -- Of Far Different Nature | CC-BY 4.0 | https://opengameart.org/content/essentials-pack-for-fantasy-games-loop-box-3-orchestral-soundtracks-for-rpgs-and-adventures |
+| `nivel_17.ogg` | Flags -- Alexander Ehlers | CC0 | https://opengameart.org/content/free-music-pack |
+| `nivel_18.ogg` | Waking the devil -- Alexander Ehlers (NIVEL 38: a preferida do Paulo) | CC0 | https://opengameart.org/content/free-music-pack |
+| `nivel_19.ogg` | Great mission -- Alexander Ehlers | CC0 | https://opengameart.org/content/free-music-pack |
+| `nivel_20.ogg` | Spacetime -- Alexander Ehlers | CC0 | https://opengameart.org/content/free-music-pack |
 
-`assets/audio/musica/chefes/boss_01..20.ogg`:
+### `assets/audio/musica/chefes/boss_01..20.ogg`
 
-| Pack | Autor | Licença | Faixas usadas |
+| Ficheiro | Faixa e autor | Licença | Página |
 | --- | --- | --- | --- |
-| [JRPG Pack 5 (Action)](https://opengameart.org/content/jrpg-pack-5-action) | Juhani Junkala (subm. subspaceaudio) | CC0 | 01 Preparing For Battle · 02 Encounter With The Witches · 03 Army Approaching |
-| [Action Music Pack](https://opengameart.org/content/action-music-pack) | marcelofg55 | CC-BY 3.0 | 04-08 (versões "Loop") + 09-13 (versões completas) de Lethal Injection, Battle of the Void, Flaming Soul, Black Rock, Desolation |
-| [Battle Theme A](https://opengameart.org/content/battle-theme-a) / [B](https://opengameart.org/content/battle-theme-b-for-rpg) | cynicmusic | CC0 | 14, 15 |
-| [Fast fight / battle music](https://opengameart.org/content/fast-fight-battle-music) | bonsaiheldin | CC0 | 16 |
-| [Gods Forbid](https://opengameart.org/content/gods-forbid) | centurionofwar | CC0 | 17 |
-| [Light battle theme](https://opengameart.org/content/light-battle-theme) | Alexandr Zhelanov | CC-BY 4.0 | 18 |
-| [Wasteland Showdown](https://opengameart.org/content/wasteland-showdown-battle-music) | matthew-pablo | CC-BY 3.0 | 19 |
-| [Rise of spirit](https://opengameart.org/content/rise-of-spirit) | Alexandr Zhelanov | CC-BY 3.0 | 20 |
+| `boss_01.ogg` | Preparing For Battle -- Juhani Junkala | CC0 | https://opengameart.org/content/jrpg-pack-5-action |
+| `boss_02.ogg` | Encounter With The Witches -- Juhani Junkala | CC0 | https://opengameart.org/content/jrpg-pack-5-action |
+| `boss_03.ogg` | Army Approaching -- Juhani Junkala | CC0 | https://opengameart.org/content/jrpg-pack-5-action |
+| `boss_04.ogg` | Lethal Injection (Loop) -- marcelofg55 | CC-BY 3.0 | https://opengameart.org/content/action-music-pack |
+| `boss_05.ogg` | Battle of the Void (Loop) -- marcelofg55 | CC-BY 3.0 | https://opengameart.org/content/action-music-pack |
+| `boss_06.ogg` | Flaming Soul (Loop) -- marcelofg55 | CC-BY 3.0 | https://opengameart.org/content/action-music-pack |
+| `boss_07.ogg` | Black Rock (Loop) -- marcelofg55 | CC-BY 3.0 | https://opengameart.org/content/action-music-pack |
+| `boss_08.ogg` | Desolation (Loop) -- marcelofg55 | CC-BY 3.0 | https://opengameart.org/content/action-music-pack |
+| `boss_09.ogg` | Boss Battle #2 [Symphonic Metal] -- nene, CC0 | CC0 | https://opengameart.org/content/boss-battle-2-symphonic-metal |
+| `boss_10.ogg` | Boss Battle 10 [Metal] -- nene, CC0 | CC0 | https://opengameart.org/content/boss-battle-10-metal |
+| `boss_11.ogg` | Short Theme [Rock/Metal] V2 -- nene, CC0 | CC0 | https://opengameart.org/content/short-theme-rockmetal |
+| `boss_12.ogg` | Heart of Machine -- Alexandr Zhelanov | CC-BY 3.0 | https://opengameart.org/content/heart-of-machine |
+| `boss_13.ogg` | It's Our Battle -- Alexandr Zhelanov | CC-BY 3.0 | https://opengameart.org/content/its-our-battle |
+| `boss_14.ogg` | Battle Theme A -- cynicmusic | CC0 | https://opengameart.org/content/battle-theme-a |
+| `boss_15.ogg` | Battle Theme B -- cynicmusic | CC0 | https://opengameart.org/content/battle-theme-b-for-rpg |
+| `boss_16.ogg` | Vilified -- matthew-pablo | CC-BY 3.0 | https://opengameart.org/content/vilified |
+| `boss_17.ogg` | Gods Forbid -- centurionofwar | CC0 | https://opengameart.org/content/gods-forbid |
+| `boss_18.ogg` | Light battle theme -- Alexandr Zhelanov | CC-BY 4.0 | https://opengameart.org/content/light-battle-theme |
+| `boss_19.ogg` | Wasteland Showdown -- matthew-pablo | CC-BY 3.0 | https://opengameart.org/content/wasteland-showdown-battle-music |
+| `boss_20.ogg` | Rise of spirit -- Alexandr Zhelanov | CC-BY 3.0 | https://opengameart.org/content/rise-of-spirit |

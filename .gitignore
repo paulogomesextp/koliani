@@ -78,3 +78,8 @@ assets/sprites/incoming/_dl/**
 tools/_bot.gd
 tools/_bot.tscn
 tools/_bot.gd.uid
+
+# fontes de musica em bruto que o AGENTE descarregou (OpenGameArt) --
+# dezenas de MB; so se comitam as camas ja cortadas em assets/audio/musica/.
+# Reconstroi-se com `python tools/preparar_musica.py --descarregar`.
+assets/audio/incoming/**

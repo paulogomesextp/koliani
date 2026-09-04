@@ -54,6 +54,7 @@ func _correr_tudo() -> void:
 	teste_especies_dos_inimigos_existem()
 	teste_packs_de_fundo_existem()
 	teste_rigs_dos_chefes()
+	teste_camas_de_musica()
 
 	if _falhas.is_empty():
 		print("OK -- todos os testes passaram")
@@ -935,3 +936,30 @@ func _constante_float(fonte: String, nome: String) -> float:
 	re.compile("const %s := ([0-9.]+)" % nome)
 	var m := re.search(fonte)
 	return float(m.get_string(1)) if m else 0.0
+
+## As camas de musica tocam SEMPRE em ciclo (`musica.gd` poe `loop = true`).
+## Uma faixa curta de mais da' nas vistas por repetir de 8 em 8 segundos, e
+## uma faixa com fade-out desaparece e volta a entrar a cada volta -- foi
+## disso que o Paulo se queixou a 4 set 2026. As 40 sao construidas por
+## `tools/preparar_musica.py`, que tem um `--verificar` que mede tambem o
+## degrau na costura; aqui garante-se o que se consegue medir de dentro do
+## Godot: que existem todas e que nenhuma e' curta de mais.
+func teste_camas_de_musica() -> void:
+	const DUR_MINIMA := 28.0
+	var moldes := {
+		"res://assets/audio/musica/niveis/nivel_%02d.ogg": "nivel",
+		"res://assets/audio/musica/chefes/boss_%02d.ogg": "chefe",
+	}
+	for molde: String in moldes:
+		for i in range(1, 21):
+			var c: String = molde % i
+			if not ResourceLoader.exists(c):
+				_ok(false, "falta a cama %s" % c)
+				continue
+			var st: AudioStream = load(c)
+			if st == null:
+				_ok(false, "%s nao carrega como AudioStream" % c)
+				continue
+			_ok(st.get_length() >= DUR_MINIMA,
+				"%s tem %.1f s (minimo %.0f) -- em ciclo isso repete de mais"
+					% [c, st.get_length(), DUR_MINIMA])
