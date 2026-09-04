@@ -7,7 +7,10 @@ extends RefCounted
 ## câmara. A amplitude cai a um ritmo fixo até zero.
 
 const FREQUENCIA := 32.0   # oscilações por segundo
-const DECAIMENTO := 42.0   # píxeis de amplitude perdidos por segundo
+## 42 -> 70 a 4 set 2026: a 42 px/s um abanao de 4,5 px durava 107 ms, mais
+## do que o intervalo entre golpes de um combo -- os tremores encavalitavam
+## e o ecra nunca assentava. A 70 px/s cada um morre antes do seguinte.
+const DECAIMENTO := 70.0   # píxeis de amplitude perdidos por segundo
 
 var _amplitude := 0.0
 var _tempo := 0.0

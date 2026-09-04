@@ -65,6 +65,31 @@ const JANELA_COMBO := 0.42
 ## tira (attack/attack2/attack3/attack4) -- senão a animação era cortada a
 ## meio antes de terminar, sobretudo o 3.º hit (9 frames, o mais longo).
 const DUR_COMBO := [0.18, 0.2, 0.3, 0.19]
+
+## PESO DO IMPACTO -- reafinado a 4 set 2026.
+##
+## O Paulo: "quando a Koliani ataca com espada o ecra treme e gera frame
+## drop". Nao era impressao. O `_hitstop` poe `Engine.time_scale = 0.0`,
+## ou seja PARA o jogo: cada acerto parava 50 ms (crit 110 ms), o remate
+## do combo parava mais 50 ms **no balanco**, e o proprio `_flash_golpe`
+## ja' abanava a camara 1,8 px sem sequer acertar em nada. Num combo de
+## quatro acertos dava ~340 ms de jogo parado dentro de 1,5 s -- 23% do
+## tempo. Somado ao tremor, que durava mais do que o intervalo entre
+## golpes, o resultado le^-se exactamente como engasgo.
+##
+## Regra nova: **o balanco nao mexe na camara nem para o tempo**. So' a
+## LIGACAO tem peso, e o peso e' curto -- um frame no golpe normal, e
+## reserva-se o resto para o que e' raro (remate, critico, levar dano).
+const HITSTOP_GOLPE := 0.02        # ~1 frame a 60 fps
+const HITSTOP_REMATE := 0.045      # 4.o golpe do combo
+const HITSTOP_CRIT := 0.06
+const HITSTOP_PISAO := 0.03
+const HITSTOP_DANO := 0.05
+const TREMOR_GOLPE := 2.0
+const TREMOR_REMATE := 3.2
+const TREMOR_CRIT := 4.5
+const TREMOR_PISAO := 2.2
+const TREMOR_DANO := 5.0
 ## AVANÇO do golpe (pedido do Paulo, set 2026: "o combo parado no mesmo
 ## sítio não tem piada"). Cada golpe do combo dá um passo em frente na
 ## direção para onde se olha -- curto nos três primeiros, comprido no
@@ -340,8 +365,11 @@ const CAV_OFFSET_Y := -2.0
 const _KOLI_ANIMS_SHADOW := {
 	"idle":      [4, 6.0, true],
 	"run":       [5, 13.0, true],
-	"jump":      [3, 14.0, false],
-	"fall":      [2, 7.0, true],
+	## 3 -> 2 e 2 -> 1 a 4 set 2026: duas das poses aereas do atlas estao
+	## SEM CABECA (o recorte de origem cortou-lhes o tronco de cima) e a meio
+	## do salto via-se um tronco decapitado -- ver `importar_rig_shadowblade.py`.
+	"jump":      [2, 11.0, false],
+	"fall":      [1, 7.0, true],
 	"aterrar":   [2, 16.0, false],
 	## combo de espada -- cada golpe tem a sua pose (corte descendente, arco
 	## por cima, estocada com raio, investida rasteira). Antes eram os seis
@@ -839,8 +867,8 @@ func _physics_process(dt: float) -> void:
 			_stomp_cd = 0.22
 			_pop = 1.0
 			_squash = maxf(_squash, 0.5)
-			_abanar(4.5 if crit_stomp else 3.0)
-			_hitstop(0.09 if crit_stomp else 0.05)
+			_abanar(TREMOR_CRIT if crit_stomp else TREMOR_PISAO)
+			_hitstop(HITSTOP_CRIT if crit_stomp else HITSTOP_PISAO)
 			# pisão na carne: pancada surda, sem o silvo da espada
 			Som.toca("acerto", -10.0, randf_range(0.82, 0.94))
 			_pop_impacto(ep)
@@ -864,8 +892,8 @@ func _physics_process(dt: float) -> void:
 			_stomp_cd = 0.22
 			_pop = 1.0
 			_squash = maxf(_squash, 0.5)
-			_abanar(3.0)
-			_hitstop(0.05)
+			_abanar(TREMOR_PISAO)
+			_hitstop(HITSTOP_PISAO)
 			Som.toca("acerto", -10.0, randf_range(0.94, 1.07))
 			_pop_impacto(global_position + Vector2(0.0, 24.0))
 
@@ -1165,9 +1193,8 @@ func _iniciar_ataque() -> void:
 	_avanco_restante = _avanco_dur
 	Som.toca("ataque", -6.0, randf_range(0.95, 1.06))
 	_flash_golpe()
-	if _combo_passo == NUM_COMBO - 1:
-		_abanar(4.0)  # remate do combo ("Quadruple") -- um pouco mais de peso
-		_hitstop(0.05)
+	# NB: o balanco do remate ja' nao abana nem para o tempo -- o peso do
+	# combo esta' todo na LIGACAO (ver `TREMOR_REMATE`/`HITSTOP_REMATE`).
 	if _hitbox:
 		_hitbox.scale.x = _olha_para
 		_hitbox.monitoring = true
@@ -1208,7 +1235,6 @@ func _flash_golpe() -> void:
 	var tl := _luz_golpe.create_tween()
 	tl.tween_property(_luz_golpe, "energy", 0.55, 0.05).set_ease(Tween.EASE_OUT)
 	tl.tween_property(_luz_golpe, "energy", 0.0, DUR_ATAQUE + 0.08).set_ease(Tween.EASE_IN)
-	_abanar(1.8)
 
 
 ## Gere o botão "lancar": segurar carrega o Kamehameha, largar cedo dispara
@@ -1304,8 +1330,9 @@ func _ao_acertar_corpo(corpo: Node) -> void:
 			_faiscas.position.x = absf(_faiscas.position.x) * _olha_para
 			_faiscas.restart()
 		_pop_impacto((corpo as Node2D).global_position if corpo is Node2D else global_position)
-		_abanar(8.0 if crit else 4.5)
-		_hitstop(0.11 if crit else 0.05 + 0.015 * float(_combo_passo))
+		var remate := _combo_passo >= NUM_COMBO - 1
+		_abanar(TREMOR_CRIT if crit else (TREMOR_REMATE if remate else TREMOR_GOLPE))
+		_hitstop(HITSTOP_CRIT if crit else (HITSTOP_REMATE if remate else HITSTOP_GOLPE))
 		if crit:
 			Som.toca("acerto", -5.0, randf_range(1.18, 1.32))
 		else:
@@ -1458,8 +1485,8 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0) -> void:
 	_combo_passo = 0
 	vida_mudou.emit(vida, _vida_max())
 	_flash_branco()
-	_abanar(8.0)
-	_hitstop(0.07)
+	_abanar(TREMOR_DANO)
+	_hitstop(HITSTOP_DANO)
 	Som.toca("dano", -7.0)
 	if vida <= 0:
 		_morrer()

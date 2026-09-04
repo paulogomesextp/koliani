@@ -69,6 +69,28 @@ PAREDE_COLUNA = 152
 BORDA_TRANSBORDO = 30
 ## ... e um pedaco solto a mais do que isto do corpo tambem se deita fora.
 LONGE = 46
+## Sobra minuscula e desencostada: menos de `RESTO_MIN` pixeis e a mais de
+## `RESTO_DIST` do corpo. Sao restos do cartaz, nao faiscas da lamina.
+RESTO_MIN = 14
+RESTO_DIST = 8
+## Um pedaco solto que ENCOSTE ao topo da celula e esteja a mais disto do
+## corpo vem da fila de cima ou de uma guia do cartaz.
+RESTO_DIST_TOPO = 12
+## Um "risco" do fundo do atlas dentro de uma celula: atravessa pelo menos
+## este vao (em px) e enche menos do que esta fraccao dele. Ver `apagar_riscos`.
+RISCO_VAO = 45
+RISCO_DENSIDADE = 0.8
+## ... e quantas linhas dessas ainda contam como faixa de fundo. `INTERVALO`
+## e' quantas linhas CHEIAS se toleram no meio da faixa -- sao os sitios onde
+## ela passa por tras do boneco.
+RISCO_BANDA = 18
+RISCO_INTERVALO = 6
+## Faixa de fundo chapada (ver `apagar_faixas`): enche esta fraccao da
+## largura da celula, apaga-se ate' `MARGEM` linhas para cada lado, e so' o
+## que estiver a menos de `TOL` da cor dominante da faixa.
+RISCO_CHEIA = 0.92
+RISCO_MARGEM = 10
+RISCO_TOL = 8
 
 # --- saida -----------------------------------------------------------------
 
@@ -125,34 +147,46 @@ FRAMES: dict[str, tuple] = {
     "run4": (1, 0, 121, CH, 0, 0),       # impulso
     "run5": (1, 121, 241, CH, 0, 0),     # lamina de fora, passada larga
     # --- salto: subida, queda, aterragem ------------------------------
-    "sobe1": (1, 384, 512, AR, 0, 0),
-    "sobe2": (1, 512, 640, AR, 0, 0),
-    "apice": (1, 640, 768, AR, 0, 0),
-    "cai1":  (1, 768, 896, AR, 0, 0),
-    "cai2":  (1, 896, 1024, AR, 0, 0),
-    "impulso": (1, 256, 384, NADA, 0, 0),   # agachar antes de largar do chao
-    "pousa":   (2, 0, 128, NADA, 0, 0),     # joelho no chao
+    # A fila do salto tem o MESMO defeito da corrida: as poses nao estao na
+    # grelha de 128. Medindo o perfil de colunas da banda 1, os centros das
+    # figuras estao a 326, 459, 588, 720, 862 e 988 -- passo de ~135 px, nao
+    # 128. Com as janelas antigas o `cai1` e o `cai2` saiam 30 px ao lado:
+    # apareciam SEM CABECA e com um pedaco da pose seguinte colado. Era isso
+    # que o Paulo via -- "quando a Koliani salta conseguimos ver alguns
+    # frames acima da cabeca dela". As janelas abaixo estao centradas nos
+    # centros medidos.
+    "sobe1": (1, 395, 523, AR, 0, 0),
+    "sobe2": (1, 524, 652, AR, 0, 0),
+    # As poses centradas em 720 e 862 NAO SE USAM: no atlas estao mesmo sem
+    # cabeca -- o recorte de origem cortou-lhes o tronco de cima e nao ha'
+    # nada por cima na fila anterior (confirmado a olho e a medir). Eram
+    # elas que davam o "vemos alguns frames acima da cabeca dela": a meio do
+    # salto aparecia um tronco decapitado. A queda passa a usar so' a ultima
+    # pose da fila, que esta' inteira.
+    "cai2":  (1, 930, 1024, AR, 0, 0),
+    "impulso": (1, 262, 390, NADA, 0, 0),   # agachar antes de largar do chao
+    "pousa":   (2, 16, 144, NADA, 0, 0),     # joelho no chao
     # --- espada -------------------------------------------------------
     "atk_arma":   (2, 896, 1024, NADA, 0, 0),   # lamina atras, a carregar
     "atk_baixo":  (2, 128, 256, NADA, 0, 0),    # corte descendente
     # a janela vai 12 px para a direita da celula: o arco roxo passa a
     # ponta para a celula seguinte e assim nao fica cortado a direito
     "atk_arco":   (2, 268, 396, NADA, 0, 0),    # arco roxo por cima
-    "atk_estoca": (2, 384, 512, NADA, 0, 0),    # estocada de punho
-    "atk_calma":  (2, 640, 768, NADA, 0, 0),    # recolher
+    "atk_estoca": (2, 397, 525, NADA, 0, 0),    # estocada de punho
+    "atk_calma":  (2, 618, 746, NADA, 0, 0),    # recolher
     "atk_frente": (2, 768, 896, NADA, 0, 0),    # remate, lamina a' frente
     "atk_rasteira": (3, 0, 128, NADA, 0, 0),    # investida baixa
     # --- agachar ------------------------------------------------------
     "agacha": (3, 128, 256, NADA, 0, 0),
     # --- parede (a pedra ja' foi apagada por `apagar_paredes`) ---------
-    "parede1": (3, 256, 384, CH, 0, -4),
-    "parede2": (3, 384, 512, CH, 0, -4),
+    "parede1": (3, 235, 363, CH, 0, -4),
+    "parede2": (3, 362, 490, CH, 0, -4),
     "parede3": (3, 512, 640, CH, 0, -4),
     # --- salto duplo --------------------------------------------------
-    "dj1": (3, 640, 768, AR, 0, 0),
-    "dj2": (3, 768, 896, NADA, 0, 0),   # o rebentamento roxo nasce nos pes
-    "dj3": (3, 896, 1024, AR, 0, 0),
-    "dj4": (4, 0, 128, AR, 0, 0),
+    "dj1": (3, 634, 762, AR, 0, 0),
+    "dj2": (3, 754, 882, NADA, 0, 0),   # o rebentamento roxo nasce nos pes
+    "dj3": (3, 871, 999, AR, 0, 0),
+    "dj4": (4, 0, 113, AR, 0, 0),
     "dj5": (4, 128, 256, NADA, 0, 0),
 }
 
@@ -172,8 +206,11 @@ RAIO_DESLOC = -16
 ESTADOS: dict[str, list] = {
     "idle":      ["idle1", "idle2", "idle3", "idle4"],
     "run":       ["run1", "run2", "run3", "run4", "run5"],
-    "jump":      ["sobe1", "sobe2", "apice"],
-    "fall":      ["cai1", "cai2"],
+    "jump":      ["sobe1", "sobe2"],
+    # a `cai2` (a ultima pose da fila do salto) fica na margem do atlas e
+    # sai com o lado direito cortado a direito; a pose de queda da fila do
+    # salto duplo esta' inteira, e e' essa que se usa.
+    "fall":      ["dj3"],
     "aterrar":   ["pousa", "impulso"],
     # combo de espada -- quatro golpes VISIVELMENTE diferentes
     "attack":    ["atk_arma", "atk_baixo", "atk_frente"],       # corte descendente
@@ -338,15 +375,162 @@ def limpar_celula(quadro: Image.Image) -> Image.Image:
                 + max(0, corpo["y0"] - c["y1"], c["y0"] - corpo["y1"])
             if dist >= LONGE:
                 continue
+            # sobras minusculas e desencostadas do corpo sao restos do
+            # cartaz de origem, nao faiscas da lamina (essas nascem coladas
+            # a' figura).
+            if c["n"] < RESTO_MIN and dist >= RESTO_DIST:
+                continue
+            # ... e o que ENCOSTA AO TOPO da celula longe do corpo vem da
+            # fila de cima ou de uma guia do cartaz. Eram os pontinhos que
+            # se viam por cima da cabeca no golpe (ver `apagar_faixas`).
+            # So' vale para pedacos soltos: as poses de salto tambem tocam
+            # no topo, mas essas SAO o corpo e nunca chegam aqui.
+            if c["y0"] <= 0 and dist >= RESTO_DIST_TOPO:
+                continue
         for x, y in c["pontos"]:
             dst[x, y] = src[x, y]
     return limpo
 
 
+def apagar_faixas(quadro: Image.Image) -> int:
+    """Apaga as FAIXAS de fundo que atravessam a celula de lado a lado.
+
+    A imagem de apresentacao de onde este atlas foi recortado tem uma faixa
+    azul-escura a atravessar algumas filas -- uma divisoria do cartaz,
+    desenhada POR TRAS das figuras. Nas celulas do `pousa` e do `atk_arco`
+    ela sobrevive a tudo o resto (nao atravessa a folha toda, por isso o
+    `apagar_linhas` nao a apanha; encosta 'a figura, por isso o
+    `limpar_celula` tambem nao) e em jogo ve^-se uma barra ao lado da
+    cabeca. Foi o que o Paulo apanhou (4 set 2026).
+
+    A faixa distingue-se por duas coisas: enche a LARGURA TODA da celula
+    (`RISCO_CHEIA`) -- nenhuma pose enche 128 de 128 colunas -- e e' de uma
+    cor CHAPADA. Por isso mede-se a cor dominante nessas linhas e apaga-se
+    so' o que for dessa cor, com folga (`RISCO_TOL`), umas linhas para cada
+    lado. O cabelo e o manto, que estao desenhados POR CIMA da faixa, tem
+    outras cores e ficam intactos -- e' por isso que se apaga pela cor e
+    nao pela linha inteira.
+    """
+    import collections
+
+    px = quadro.load()
+    w, h = quadro.size
+    cheias = [y for y in range(h)
+              if sum(1 for x in range(w) if px[x, y][3] > LIM_ALFA) >= w * RISCO_CHEIA]
+    if not cheias:
+        return 0
+    cor = collections.Counter()
+    for y in cheias:
+        for x in range(w):
+            if px[x, y][3] > LIM_ALFA:
+                cor[px[x, y][:3]] += 1
+    dominante = cor.most_common(1)[0][0]
+
+    fora = 0
+    for y in range(max(0, min(cheias) - RISCO_MARGEM),
+                   min(h, max(cheias) + RISCO_MARGEM + 1)):
+        for x in range(w):
+            p = px[x, y]
+            if p[3] <= LIM_ALFA:
+                continue
+            if all(abs(p[i] - dominante[i]) <= RISCO_TOL for i in range(3)):
+                px[x, y] = (0, 0, 0, 0)
+                fora += 1
+    return fora
+
+
+def apagar_riscos(quadro: Image.Image) -> int:
+    """Apaga as BANDAS horizontais do fundo que ficaram dentro da celula.
+
+    O `apagar_linhas` so' apanha linhas que atravessem a folha quase toda
+    (`LIMIAR_LINHA`). A imagem de apresentacao de onde este atlas foi
+    recortado tem tambem guias LOCAIS -- linhas de chao por baixo de um
+    grupo de poses, faixas entre filas -- que so' cobrem algumas celulas e
+    que sao grossas (medi 8 px na celula do `pousa`). Quando uma delas
+    encosta 'a figura passa a fazer parte do maior componente e nem o
+    `limpar_celula` a deita fora. Em jogo aparecem como uma barra ao lado
+    da cabeca no `aterrar` e um tracejado por cima da cabeca no `attack2`
+    -- foi o que o Paulo apanhou a jogar (4 set 2026): "quando a Koliani
+    salta conseguimos ver alguns frames acima da cabeca dela".
+
+    O metodo: juntam-se as linhas seguidas que atravessam um VAO largo da
+    celula e que sao ESPARSAS nesse vao (`RISCO_VAO`/`RISCO_DENSIDADE`).
+    Se o bloco for FINO (ate' `RISCO_BANDA` linhas) e' candidato a fundo --
+    mas apaga-se coluna a coluna, e so' onde a coluna nao tenha desenho
+    logo acima nem logo abaixo do bloco. Assim a faixa desaparece do vazio
+    e a parte que passa POR TRAS do boneco fica, sem lhe abrir um buraco.
+    """
+    px = quadro.load()
+    w, h = quadro.size
+
+    def esparsa(y: int) -> bool:
+        xs = [x for x in range(w) if px[x, y][3] > LIM_ALFA]
+        if len(xs) < 5:
+            return False
+        vao = xs[-1] - xs[0] + 1
+        return vao >= RISCO_VAO and len(xs) <= vao * RISCO_DENSIDADE
+
+    fora = 0
+    y = 0
+    while y < h:
+        if not esparsa(y):
+            y += 1
+            continue
+        # junta as linhas esparsas seguidas, TOLERANDO pequenos intervalos:
+        # onde a guia passa por tras do boneco a linha fica cheia, e sem
+        # esta tolerancia a faixa era partida em bocados e escapava.
+        y0 = y1 = y
+        k = y + 1
+        while k < h and k - y1 <= RISCO_INTERVALO:
+            if esparsa(k):
+                y1 = k
+            k += 1
+        y = y1 + 1
+        if y1 - y0 + 1 > RISCO_BANDA:
+            continue          # bloco grosso: ja' e' desenho, nao e' guia
+        for x in range(w):
+            if not any(px[x, yy][3] > LIM_ALFA for yy in range(y0, y1 + 1)):
+                continue
+            acima = any(px[x, yy][3] > LIM_ALFA
+                        for yy in range(max(0, y0 - 5), y0))
+            abaixo = any(px[x, yy][3] > LIM_ALFA
+                         for yy in range(y1 + 1, min(h, y1 + 6)))
+            if acima or abaixo:
+                continue      # o boneco passa por aqui -- nao lhe tocar
+            for yy in range(y0, y1 + 1):
+                if px[x, yy][3] > 0:
+                    px[x, yy] = (0, 0, 0, 0)
+                    fora += 1
+    return fora
+
+
+def apagar_faixas_da_grelha(im: Image.Image) -> int:
+    """Corre o `apagar_faixas` uma vez por celula DA GRELHA do atlas.
+
+    Tem de ser pela grelha e nao pela janela de cada frame: a faixa
+    reconhece-se por encher a largura toda da celula, e as janelas
+    recentradas (a fila do salto, a da corrida) nao coincidem com a grelha
+    -- feito por janela, a mesma faixa era apanhada num frame e escapava no
+    do lado. Feito aqui, e' apagada de uma vez para toda a folha.
+    """
+    fora = 0
+    for banda in range(LINHAS):
+        for col in range(COLS):
+            cx, cy = col * CEL_W, banda * CEL_H
+            cel = im.crop((cx, cy, cx + CEL_W, cy + CEL_H))
+            n = apagar_faixas(cel)
+            if n:
+                im.paste(cel, (cx, cy))
+                fora += n
+    return fora
+
+
 def recortar(im: Image.Image, janela: tuple) -> Image.Image:
     """Uma janela do atlas, ja' limpa, na largura que tiver."""
     banda, x0, x1 = janela
-    return limpar_celula(im.crop((x0, banda * CEL_H, x1, (banda + 1) * CEL_H)))
+    q = im.crop((x0, banda * CEL_H, x1, (banda + 1) * CEL_H))
+    apagar_riscos(q)          # guias tracejadas coladas a' figura
+    return limpar_celula(q)
 
 
 ## A ancora horizontal e' a **mediana do tronco** -- a coluna que parte ao
@@ -459,6 +643,7 @@ def main() -> None:
     ys = linhas_de_fundo(im)
     print("linhas de fundo apagadas: %d linhas, %d pixeis" % (len(ys), apagar_linhas(im, ys)))
     print("paredes de pedra apagadas: %d pixeis" % apagar_paredes(im))
+    print("faixas do cartaz apagadas: %d pixeis" % apagar_faixas_da_grelha(im))
 
     tiras = montar(im)
     for nome in tiras:
