@@ -126,8 +126,8 @@ jobs:
             ls "${ANDROID_HOME:-/usr/lib/android-sdk}/build-tools" 2>&1 | head -5
             echo "-- apksigner --"
             find / -maxdepth 7 -name 'apksigner*' 2>/dev/null | head -3
-            echo "-- templates android --"
-            ls ~/.local/share/godot/export_templates/*/ 2>/dev/null | grep -i android | head -5
+            echo "-- templates instalados --"
+            ls -R ~/.local/share/godot/export_templates/ 2>&1 | head -40
           } > diag.txt 2>&1
           cat diag.txt
           sed 's/^/::warning::/' diag.txt
@@ -141,12 +141,17 @@ jobs:
         run: |
           mkdir -p build/android
           set +e
-          godot --headless -v --export-debug "Android" build/android/koliani.apk > apk.log 2>&1
+          godot --headless --export-debug "Android" build/android/koliani.apk > apk.log 2>&1
           rc=$?
           set -e
           cat apk.log
           if [ "$rc" -ne 0 ]; then
-            tail -n 25 apk.log | sed 's/^/::error::/'
+            # `-v` enchia o log de "Loading resource:" e o `tail` so' apanhava
+            # esse ruido -- o erro fica MUITO acima. Filtra-se pelas linhas
+            # que interessam e so' depois se mostra o fim.
+            grep -aiE 'error|fail|cannot|unable|missing|invalid|not found|no export|template|keystore|apksigner|sdk' apk.log               | tail -n 15 | sed 's/^/::error::/'
+            echo "::error::--- fim do log (exit $rc) ---"
+            tail -n 6 apk.log | sed 's/^/::error::/'
           fi
           exit "$rc"
       - uses: actions/upload-artifact@v4
@@ -225,6 +230,13 @@ jobs:
     name: Publicar o Web no GitHub Pages
     runs-on: ubuntu-latest
     needs: web
+    # PENDENTE DO PAULO: o `GITHUB_TOKEN` NAO consegue criar o site de Pages
+    # ("Resource not accessible by integration" -- e' uma limitacao conhecida
+    # do `configure-pages` com o token por omissao). E' preciso ir uma vez a
+    #   Settings -> Pages -> Build and deployment -> Source: GitHub Actions
+    # e a partir dai este job passa a funcionar sozinho. Ate' la' fica
+    # `continue-on-error` para nao pintar o CI de vermelho a cada push.
+    continue-on-error: true
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     # So' um deploy de Pages de cada vez -- e' este JOB que se serializa, nao
     # o workflow todo (a nivel de workflow, um push novo cancelava tambem os
@@ -242,9 +254,14 @@ jobs:
           path: build/web
       # `enablement: true` liga o Pages sozinho na primeira vez, em vez de
       # obrigar a ir mexer nas definicoes do repo a mao.
-      - uses: actions/configure-pages@v5
-        with:
-          enablement: true
+      - id: cfg
+        uses: actions/configure-pages@v5
+        continue-on-error: true
+      - name: Avisar se o Pages ainda nao esta ligado
+        if: steps.cfg.outcome != 'success'
+        run: |
+          echo "::warning::O GitHub Pages ainda nao esta ligado neste repo. Settings -> Pages -> Source: GitHub Actions. Depois disso este job publica sozinho."
+          exit 1
       - uses: actions/upload-pages-artifact@v3
         with:
           path: build/web
