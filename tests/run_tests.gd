@@ -55,6 +55,7 @@ func _correr_tudo() -> void:
 	teste_packs_de_fundo_existem()
 	teste_rigs_dos_chefes()
 	teste_camas_de_musica()
+	teste_sfx_existem()
 
 	if _falhas.is_empty():
 		print("OK -- todos os testes passaram")
@@ -963,3 +964,17 @@ func teste_camas_de_musica() -> void:
 			_ok(st.get_length() >= DUR_MINIMA,
 				"%s tem %.1f s (minimo %.0f) -- em ciclo isso repete de mais"
 					% [c, st.get_length(), DUR_MINIMA])
+
+
+## Todos os caminhos declarados em `Som.CAMINHOS` tem de existir. E' uma
+## rede barata que apanha o caso classico: trocar a amostra de um som e
+## mudar-lhe a extensao (o `ataque` passou de .wav a .ogg a 4 set 2026) e
+## esquecer o outro lado -- o jogo nao estoira, simplesmente fica MUDO
+## nesse som, que e' pior de apanhar.
+func teste_sfx_existem() -> void:
+	var caminhos: Dictionary = Som.CAMINHOS
+	_ok(not caminhos.is_empty(), "Som.CAMINHOS esta' vazio")
+	for nome: String in caminhos:
+		var c: String = caminhos[nome]
+		_ok(ResourceLoader.exists(c),
+			"Som: o efeito '%s' aponta para %s, que nao existe" % [nome, c])

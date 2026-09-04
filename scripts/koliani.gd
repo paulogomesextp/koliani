@@ -33,6 +33,15 @@ const DUR_DASH := 0.16
 const RECARGA_DASH := 0.55
 const VEL_ROLAR := 360.0
 const DUR_ROLAR := 0.30
+
+## PASSOS e RASPAR NA PAREDE (4 set 2026, pedido do Paulo: "faca um set de
+## sons para a koliani quando faz animacoes"). A cadencia dos passos
+## ACOMPANHA a velocidade -- a andar devagar sao mais espacados, a correr
+## sao mais juntos -- senao soa a metronomo. As tres amostras `passo1..3`
+## sorteiam-se e ainda levam pitch aleatorio por cima.
+const INTERVALO_PASSO := 0.32
+const VEL_PASSO_REF := Movimento.VEL_CORRIDA
+const INTERVALO_PAREDE := 0.22
 const RECARGA_ROLAR := 0.45
 ## Janela logo a seguir a um rolamento em que o próximo golpe é CRÍTICO
 ## (pegada Dead Cells: rolar por dentro do inimigo e rematar).
@@ -154,6 +163,9 @@ var _olha_para := 1.0
 var _dash_restante := 0.0
 var _dash_recarga := 0.0
 var _rolar_restante := 0.0
+## contadores dos sons ciclicos (passos, raspar na parede)
+var _passo_t := 0.0
+var _parede_t := 0.0
 ## Conta-decrescente da janela pós-rolamento (ver `POS_ROLL_JANELA`).
 var _pos_roll_t := 0.0
 ## Avanço do golpe a decorrer (ver `AVANCO_VEL`).
@@ -596,6 +608,7 @@ func _physics_process(dt: float) -> void:
 	_borda_lock = maxf(0.0, _borda_lock - dt)
 	_djump_t = maxf(0.0, _djump_t - dt)
 	_leve = maxf(0.0, _leve - dt)
+	_sons_de_movimento(dt)
 	if _inverso_restante > 0.0:
 		_inverso_restante -= dt
 		if _inverso_restante <= 0.0:
@@ -687,7 +700,7 @@ func _physics_process(dt: float) -> void:
 			global_position.y = lip_y + 34.0  # mãos ao nível do rebordo
 			velocity = Vector2.ZERO
 			_mov.saltos_dados = 0
-			Som.toca("aterrar", -16.0)
+			Som.toca("agarrar", -14.0, randf_range(0.96, 1.06))
 
 	if _borda:
 		_olha_para = _borda_lado
@@ -784,6 +797,7 @@ func _physics_process(dt: float) -> void:
 			_rolar_recarga, is_on_floor(), _rolar_restante, _dash_restante):
 		_rolar_restante = DUR_ROLAR
 		_rolar_recarga = RECARGA_ROLAR
+		Som.toca("rolamento", -13.0, randf_range(0.95, 1.06))
 		_invulneravel = maxf(_invulneravel, DUR_ROLAR + EstadoJogo.bonus("iframes_roll"))  # melhoria "agilidade"
 		# roll-cancel (pegada Dead Cells): o rolamento corta o recovery do
 		# ataque -> encadeia-se ataque -> rolar -> ataque sem esperar
@@ -796,6 +810,7 @@ func _physics_process(dt: float) -> void:
 			is_on_floor() or EstadoJogo.tem_habilidade("dash_aereo")):
 		_dash_restante = DUR_DASH
 		_dash_recarga = RECARGA_DASH
+		Som.toca("dash", -11.0, randf_range(0.97, 1.05))
 		_invulneravel = maxf(_invulneravel, DUR_DASH)
 	else:
 		# salto duplo: intrínseco à Koliani desde o nível 1 (deixou de ser um
@@ -1191,7 +1206,11 @@ func _iniciar_ataque() -> void:
 	_avanco_vel = AVANCO_VEL[i_av] * (1.0 if is_on_floor() else AVANCO_NO_AR)
 	_avanco_dur = AVANCO_DUR[i_av]
 	_avanco_restante = _avanco_dur
-	Som.toca("ataque", -6.0, randf_range(0.95, 1.06))
+	# o remate do combo tem som proprio (mais fundo, com peso de metal)
+	if _combo_passo == NUM_COMBO - 1:
+		Som.toca("ataque_forte", -5.0, randf_range(0.96, 1.04))
+	else:
+		Som.toca("ataque", -6.0, randf_range(0.95, 1.06))
 	_flash_golpe()
 	# NB: o balanco do remate ja' nao abana nem para o tempo -- o peso do
 	# combo esta' todo na LIGACAO (ver `TREMOR_REMATE`/`HITSTOP_REMATE`).
@@ -1492,10 +1511,31 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0) -> void:
 		_morrer()
 
 
+## Passos e raspar na parede. Sao os unicos sons dela em CICLO, por isso
+## vivem aqui em vez de num sitio de evento.
+func _sons_de_movimento(dt: float) -> void:
+	if is_on_floor() and absf(velocity.x) > 40.0 and _rolar_restante <= 0.0 			and _dash_restante <= 0.0 and not _defendendo and not _a_morrer:
+		_passo_t -= dt * (absf(velocity.x) / VEL_PASSO_REF)
+		if _passo_t <= 0.0:
+			_passo_t = INTERVALO_PASSO
+			Som.toca("passo%d" % (randi() % 3 + 1), -24.0, randf_range(0.9, 1.12))
+	else:
+		_passo_t = 0.0   # parada, o proximo passo sai logo ao arrancar
+
+	if _escalando:
+		_parede_t -= dt
+		if _parede_t <= 0.0:
+			_parede_t = INTERVALO_PAREDE
+			Som.toca("parede", -22.0, randf_range(0.94, 1.09))
+	else:
+		_parede_t = 0.0
+
+
 func _morrer() -> void:
 	if _a_morrer:
 		return
 	_a_morrer = true
+	Som.toca("morte_koliani", -6.0)
 	Engine.time_scale = 1.0  # não deixar um hitstop pendente a segurar o tempo
 	set_physics_process(false)
 	morreu.emit()

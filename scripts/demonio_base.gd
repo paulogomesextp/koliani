@@ -327,6 +327,31 @@ func _largura_alvo() -> float:
 ## Espécies que voam -- não se alinham os pés ao chão.
 const ESPECIES_VOAM := ["olho", "abutre"]
 
+## A que FAMILIA de som pertence cada espécie (4 set 2026, pedido do Paulo:
+## "faça com que os mobs façam sons apropriados ao tipo de monstro"). Até
+## aqui as 19 espécies partilhavam `demonio_ataque`/`garra`/`grito`/`praga`,
+## por isso um esqueleto e uma gosma rosnavam igual. As amostras de cada
+## família são construídas por `tools/preparar_sfx.py` (todas CC0).
+const FAMILIA_SOM := {
+	"goblin": "humano", "orc": "humano", "imp": "humano",
+	"chort": "humano", "wogol": "humano",
+	"esqueleto": "morto", "necromante": "morto",
+	"gosma": "gosma", "lodo": "gosma", "mushroom": "gosma",
+	"mastim": "besta", "raptor": "besta",
+	"besouro": "insecto",
+	"olho": "voador", "abutre": "voador",
+	"demonio_grande": "grande", "ogro": "grande",
+	"xamane": "grande", "abobora": "grande",
+}
+
+
+## Toca `ataque`/`dano`/`morte` na voz da família desta espécie. Se por
+## alguma razão a amostra não existir, o `Som` ignora e não se ouve nada --
+## melhor isso do que voltar ao rosnado único de antes.
+func _voz(que: String, volume := -13.0, pitch := 1.0) -> void:
+	var fam: String = FAMILIA_SOM.get(especie, "humano")
+	Som.toca("mob_%s_%s" % [fam, que], volume, pitch * randf_range(0.94, 1.07))
+
 ## Altura-alvo (px) do CORPO opaco do inimigo no ecrã -- normaliza as
 ## espécies, que vêm de packs com densidades diferentes (LuizMelo 150px vs
 ## 0x72 16px). Sem isto um goblin era ~2x um chort. A Koliani mede ~40 px
@@ -498,7 +523,7 @@ func _physics_process(dt: float) -> void:
 			move_and_slide()
 			if _windup <= 0.0:
 				_carga = DUR_CARGA
-				Som.toca("demonio_ataque", -13.0, 0.8)
+				_voz("ataque", -13.0, 0.8)
 			return
 		if _carga > 0.0:  # arranque comprometido -- não vira nem trava
 			_carga -= dt
@@ -526,7 +551,7 @@ func _physics_process(dt: float) -> void:
 			_telegrafo = TELEGRAFO_CARGA
 			anticipacao = 1.0
 			velocity.x = 0.0
-			Som.toca("demonio_ataque", -14.0, 0.7)
+			_voz("ataque", -14.0, 0.7)
 			return
 	elif comportamento == "saltador":
 		if _saltando > 0.0:  # no ar -- deixa a gravidade fazer o arco
@@ -578,7 +603,7 @@ func _physics_process(dt: float) -> void:
 			if _windup <= 0.0:
 				velocity = _dive_dir * VEL_MERGULHO
 				_mergulho = 0.6
-				Som.toca("demonio_ataque", -13.0, 1.05)
+				_voz("ataque", -13.0, 1.05)
 				move_and_slide()
 			return
 		var kv := get_tree().get_first_node_in_group("koliani")
@@ -610,7 +635,7 @@ func _physics_process(dt: float) -> void:
 					_sprite.scale.y = 1.0
 				velocity = Vector2(0.0, 240.0)
 				anticipacao = 1.0
-				Som.toca("demonio_ataque", -14.0, 0.9)
+				_voz("ataque", -14.0, 0.9)
 				move_and_slide()
 				return
 		velocity = Vector2.ZERO
@@ -647,7 +672,7 @@ func _physics_process(dt: float) -> void:
 					_telegrafo = TELEGRAFO_CUSPIR
 					anticipacao = 1.0
 					velocity.x = 0.0
-					Som.toca("demonio_ataque", -15.0, 0.7)
+					_voz("ataque", -15.0, 0.7)
 					return
 
 	# --- patrulha normal ----------------------------------------------
@@ -669,7 +694,7 @@ func _revelar() -> void:
 	dormente = false
 	anticipacao = 1.0
 	_flinch = 1.0
-	Som.toca("demonio_ataque", -13.0, 1.15)
+	_voz("ataque", -13.0, 1.15)
 	if _sprite:
 		var t := _sprite.create_tween()
 		t.tween_property(_sprite, "rotation", 0.25, 0.05)
@@ -709,7 +734,7 @@ func _ao_tocar(corpo: Node) -> void:
 		return
 	if corpo is Koliani:
 		corpo.receber_dano(dano_contacto, signf(corpo.global_position.x - global_position.x))
-		Som.toca("demonio_ataque", -15.0, randf_range(0.92, 1.08))
+		_voz("ataque", -15.0)
 		anticipacao = 1.0  # dá um "bote" visual no ataque
 
 
@@ -731,6 +756,7 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0, critico := false) 
 		_flinch_dir = signf(dir_empurrao)
 		anticipacao = 0.6
 		return
+	_voz("dano", -16.0, 1.15 if critico else 1.0)
 	var q := quantidade
 	if critico:
 		q = int(round(q * (CRIT_MULT + EstadoJogo.bonus("crit_mult"))))  # melhoria "furia"
@@ -801,6 +827,7 @@ func _pop_morte_elite() -> void:
 ## Toca a animação de morte e só então solta estilhaços e liberta-se.
 func _morrer_anim() -> void:
 	_morto = true
+	_voz("morte", -11.0)
 	velocity = Vector2.ZERO
 	_soltar_essencia()
 	# "pop" de morte: o mesmo anel do acerto, maior e na cor do rim do bioma

@@ -11,7 +11,7 @@ extends Node
 const CAMINHOS := {
 	"salto": "res://assets/audio/salto.wav",
 	"salto_duplo": "res://assets/audio/salto_duplo.wav",
-	"ataque": "res://assets/audio/ataque.wav",
+	"ataque": "res://assets/audio/ataque.ogg",
 	"lancar": "res://assets/audio/lancar.ogg",
 	"acerto": "res://assets/audio/acerto.ogg",
 	"dano": "res://assets/audio/dano.ogg",
@@ -46,6 +46,42 @@ const CAMINHOS := {
 	"meteoro": "res://assets/audio/meteoro.wav",
 	"mudar_forma": "res://assets/audio/mudar_forma.wav",
 	"olho_carregar": "res://assets/audio/olho_carregar.wav",
+	# --- a Koliani a mexer-se (4 set 2026) --------------------------------
+	# "Faca um set de sons para a koliani quando faz animacoes, ataques,
+	# etc." -- pedido do Paulo. Construidos por `tools/preparar_sfx.py`.
+	"passo1": "res://assets/audio/passo1.ogg",
+	"passo2": "res://assets/audio/passo2.ogg",
+	"passo3": "res://assets/audio/passo3.ogg",
+	"rolamento": "res://assets/audio/rolamento.ogg",
+	"dash": "res://assets/audio/dash.ogg",
+	"parede": "res://assets/audio/parede.ogg",
+	"agarrar": "res://assets/audio/agarrar.ogg",
+	"morte_koliani": "res://assets/audio/morte_koliani.ogg",
+	"ataque_forte": "res://assets/audio/ataque_forte.ogg",
+	# --- monstros, por ARQUETIPO ------------------------------------------
+	# "Faca com que os mobs facam sons apropriados ao tipo de monstro."
+	# As 19 especies mapeiam-se em sete familias -- ver `demonio_base.gd`.
+	"mob_humano_ataque": "res://assets/audio/mob_humano_ataque.ogg",
+	"mob_humano_dano": "res://assets/audio/mob_humano_dano.ogg",
+	"mob_humano_morte": "res://assets/audio/mob_humano_morte.ogg",
+	"mob_morto_ataque": "res://assets/audio/mob_morto_ataque.ogg",
+	"mob_morto_dano": "res://assets/audio/mob_morto_dano.ogg",
+	"mob_morto_morte": "res://assets/audio/mob_morto_morte.ogg",
+	"mob_gosma_ataque": "res://assets/audio/mob_gosma_ataque.ogg",
+	"mob_gosma_dano": "res://assets/audio/mob_gosma_dano.ogg",
+	"mob_gosma_morte": "res://assets/audio/mob_gosma_morte.ogg",
+	"mob_besta_ataque": "res://assets/audio/mob_besta_ataque.ogg",
+	"mob_besta_dano": "res://assets/audio/mob_besta_dano.ogg",
+	"mob_besta_morte": "res://assets/audio/mob_besta_morte.ogg",
+	"mob_insecto_ataque": "res://assets/audio/mob_insecto_ataque.ogg",
+	"mob_insecto_dano": "res://assets/audio/mob_insecto_dano.ogg",
+	"mob_insecto_morte": "res://assets/audio/mob_insecto_morte.ogg",
+	"mob_voador_ataque": "res://assets/audio/mob_voador_ataque.ogg",
+	"mob_voador_dano": "res://assets/audio/mob_voador_dano.ogg",
+	"mob_voador_morte": "res://assets/audio/mob_voador_morte.ogg",
+	"mob_grande_ataque": "res://assets/audio/mob_grande_ataque.ogg",
+	"mob_grande_dano": "res://assets/audio/mob_grande_dano.ogg",
+	"mob_grande_morte": "res://assets/audio/mob_grande_morte.ogg",
 }
 const VOZES := 8
 

@@ -24,6 +24,35 @@ registado por transparência.
 | [Hyper-Ultra-Fanfare](https://opengameart.org/content/hyper-ultra-fanfare) | zane-little-music | `conquista` |
 | RPG Sound Pack — `NPC/shade/shade3.wav` | artisticdude | `mudar_forma` |
 
+## SFX construídos por ferramenta (CC0 — 4 set 2026)
+
+Pedido do Paulo: *"faça um set de sons para a Koliani quando faz animações,
+ataques, etc. Faça com que os mobs façam sons também apropriados ao tipo de
+monstro"* e *"continuo sem gostar do som da espada, dos mísseis"*.
+
+Estes são construídos por **`tools/preparar_sfx.py`**, não copiados à mão.
+A diferença que interessa: os sons de acção são feitos em **camadas**. Um
+golpe de espada a sério são duas coisas ao mesmo tempo — o ar a abrir e o
+metal a cantar, com ~30 ms entre elas — e uma amostra solta nunca dá isso
+(foi por aí que as duas tentativas anteriores falharam). A ferramenta
+mistura as camadas, alinha-as, apara o silêncio da frente, corta o rabo que
+arrasta e iguala o pico de todos a -2 dBFS.
+
+Sons novos: `passo1..3`, `rolamento`, `dash`, `parede` (deslizar),
+`agarrar` (borda), `morte_koliani`, `ataque_forte` (remate do combo), e
+**sons por família de monstro** — `mob_<família>_<ataque|dano|morte>` para
+humano, morto, gosma, besta, insecto, voador e grande. As 19 espécies
+mapeiam-se nas sete famílias em `demonio_base.gd::FAMILIA_SOM`; antes
+partilhavam todas os mesmos quatro rosnados. Refeitos: `ataque` e `lancar`.
+
+| Pack | Autor | Licença |
+| --- | --- | --- |
+| [passos](https://opengameart.org/content/different-steps-on-wood-stone-leaves-gravel-and-mud) | TinyWorlds | CC0 |
+| [monstros](https://opengameart.org/content/monster-sound-effects-pack) | Ogrebane | CC0 |
+| [criaturas2](https://opengameart.org/content/80-cc0-creture-sfx-2) | rubberduck | CC0 |
+| [sfx100_2](https://opengameart.org/content/100-cc0-sfx-2) | rubberduck | CC0 |
+| [kenney](https://opengameart.org/content/50-rpg-sound-effects) | Kenney | CC0 |
+
 ## Música de fundo -- tema do menu (fornecida pelo Paulo)
 
 - **`bg_menu.mp3`** — "The Alchemist's Library · Mysterious Dark Academia &
