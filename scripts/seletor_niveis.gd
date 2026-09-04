@@ -17,27 +17,44 @@ extends Control
 signal escolhido(indice: int)
 signal cancelado
 
-## chave i18n do nome de cada região (mesmo mapa que o MapaMundo)
-const WORLD_KEY := {
-	"floresta": "world.forest", "prisao": "world.prison",
-	"torres": "world.towers", "catacumbas": "world.catacombs",
-	"cidade": "world.city", "castelo": "world.castle",
-}
-## cor de cada região (ordem de EstadoJogo.REGIOES) -- puxada do key art
-const COR_REGIAO := [
-	Color(0.46, 0.78, 0.34), Color(0.34, 0.74, 0.85),
-	Color(0.96, 0.66, 0.32), Color(0.62, 0.55, 0.72),
-	Color(0.82, 0.40, 0.52), Color(0.88, 0.34, 0.80),
-]
-## arte de fundo por região (o `back.png` do bioma) -- preview no cartão.
+## A chave i18n e a cor de cada região vivem em `EstadoJogo.REGIOES` (campos
+## `chave` e `cor`) -- eram tabelas locais de 6 entradas que ficaram para
+## trás quando a campanha passou a 20 regiões: da 7.ª em diante o carrossel
+## dizia "?" e pintava tudo de cinzento.
+
+## Arte de fundo por região -- preview no cartão. Uma camada do pack de
+## parallax que o primeiro nível da região usa (`fundo_pack` no `.tscn`).
+## Regiões que partilham pack levam camadas diferentes; a tinta da região
+## acaba de as separar.
 const FUNDO_REGIAO := [
-	"res://assets/sprites/pixel/backgrounds/floresta/middle.png",
-	"res://assets/sprites/pixel/backgrounds/prisao/middle.png",
-	"res://assets/sprites/pixel/backgrounds/montanhas/trees.png",
-	"res://assets/sprites/pixel/backgrounds/rochoso/middle.png",
-	"res://assets/sprites/pixel/backgrounds/prisao/near.png",
-	"res://assets/sprites/pixel/backgrounds/rochoso/near.png",
+	"res://assets/sprites/pixel/backgrounds/floresta/middle.png",   # 01 Floresta
+	"res://assets/sprites/pixel/backgrounds/prisao/middle.png",     # 02 Prisão
+	"res://assets/sprites/pixel/backgrounds/montanhas/trees.png",   # 03 Torres
+	"res://assets/sprites/pixel/backgrounds/caverna/back-walls.png",# 04 Catacumbas
+	"res://assets/sprites/pixel/backgrounds/vilanoite/casario.png", # 05 Cidade
+	"res://assets/sprites/pixel/backgrounds/luar/serra.png",        # 06 Castelo
+	"res://assets/sprites/pixel/backgrounds/floresta/front.png",    # 07 Queimadas
+	"res://assets/sprites/pixel/backgrounds/vilanoite/vila.png",    # 08 Mar dos Mortos
+	"res://assets/sprites/pixel/backgrounds/pantano/mid1.png",      # 09 Gelo
+	"res://assets/sprites/pixel/backgrounds/rochoso/middle.png",    # 10 Deserto
+	"res://assets/sprites/pixel/backgrounds/floresta/back.png",     # 11 Jardins
+	"res://assets/sprites/pixel/backgrounds/masmorra/celas.png",    # 12 Máquinas
+	"res://assets/sprites/pixel/backgrounds/montanhas/far.png",     # 13 Céu Partido
+	"res://assets/sprites/pixel/backgrounds/vilanoite/serra.png",   # 14 Sonhos
+	"res://assets/sprites/pixel/backgrounds/prisao/near.png",       # 15 Cidade dos Mortos
+	"res://assets/sprites/pixel/backgrounds/pantano/trees.png",     # 16 Mar Vermelho
+	"res://assets/sprites/pixel/backgrounds/castelo_velho/salao.png",# 17 Inferno
+	"res://assets/sprites/pixel/backgrounds/rochoso/near.png",      # 18 O Vazio
+	"res://assets/sprites/pixel/backgrounds/cidade/vila.png",       # 19 Guerra
+	"res://assets/sprites/pixel/backgrounds/luar/campo.png",        # 20 Último Caminho
 ]
+
+
+## Cor da região `r` (ordem de `EstadoJogo.REGIOES`).
+func cor_regiao(r: int) -> Color:
+	if r < 0 or r >= EstadoJogo.REGIOES.size():
+		return Color(0.7, 0.7, 0.7)
+	return EstadoJogo.REGIOES[r].get("cor", Color(0.7, 0.7, 0.7))
 
 ## Nome do ficheiro do retrato do chefe (assets/sprites/pixel/bosses/<x>.png,
 ## tira de 4 frames -- usa-se o frame 0) por índice de nível. "" = ainda sem
@@ -149,7 +166,7 @@ const ART_FRAC := 0.60   # fração do cartão ocupada pela arte/retrato
 
 func _fazer_cartao(indice: int) -> Dictionary:
 	var regiao := EstadoJogo.regiao_do_nivel(indice)
-	var base: Color = COR_REGIAO[regiao] if regiao >= 0 and regiao < COR_REGIAO.size() else Color(0.6, 0.6, 0.7)
+	var base := cor_regiao(regiao)
 	var art_h := CARTAO.y * ART_FRAC
 
 	var raiz := Control.new()
@@ -522,7 +539,7 @@ func _atualizar_fundo() -> void:
 	var nova := load(FUNDO_REGIAO[regiao]) as Texture2D
 	if _fundo_arte.texture == nova:
 		return
-	var cor: Color = COR_REGIAO[regiao] if regiao < COR_REGIAO.size() else Color(0.3, 0.3, 0.36)
+	var cor := cor_regiao(regiao)
 	var alvo := Color(cor.r * 0.4 + 0.1, cor.g * 0.4 + 0.1, cor.b * 0.4 + 0.1, 1.0)
 	var t := create_tween()
 	t.tween_property(_fundo_arte, "modulate:a", 0.0, 0.12)
@@ -568,7 +585,7 @@ func _montar_topo() -> void:
 	add_child(pastilhas)
 
 	for r in EstadoJogo.REGIOES.size():
-		var cor: Color = COR_REGIAO[r] if r < COR_REGIAO.size() else Color(0.7, 0.7, 0.7)
+		var cor := cor_regiao(r)
 		var b := Button.new()
 		b.name = "Regiao%d" % r
 		b.focus_mode = Control.FOCUS_NONE
@@ -697,8 +714,7 @@ func _reconstruir_estilos() -> void:
 		var jog := (not _respeitar_bloqueio) or EstadoJogo.nivel_desbloqueado(idx)
 		c["jogavel"] = jog
 		var regiao := EstadoJogo.regiao_do_nivel(idx)
-		var reg_id: String = EstadoJogo.REGIOES[regiao]["id"] if regiao >= 0 else "?"
-		var nome_regiao := Textos.t(WORLD_KEY.get(reg_id, "world.unknown"))
+		var nome_regiao := Textos.t(EstadoJogo.chave_regiao_do_nivel(idx))
 		(c["regiao"] as Label).text = "%s  ·  %s" % [nome_regiao.to_upper(), _progresso_regiao(regiao)]
 		(c["numero"] as Label).text = "%02d" % (idx + 1)
 		(c["nome"] as Label).text = _nome_nivel(idx)

@@ -57,6 +57,8 @@ func _correr_tudo() -> void:
 	teste_rigs_dos_chefes()
 	teste_camas_de_musica()
 	teste_sfx_existem()
+	teste_regioes_tem_nome_e_cor()
+	teste_pecas_de_ui_existem()
 
 	if _falhas.is_empty():
 		print("OK -- todos os testes passaram")
@@ -658,6 +660,16 @@ func teste_estado_mapa_desbloqueio() -> void:
 # frames numa tabela e a tira deixar de bater certo com o PNG.
 
 ## Le um ficheiro de codigo do repo (ou "" se nao existir).
+## Um dos `assets/i18n/*.json` como Dictionary (vazio se não der).
+func _json_i18n(loc: String) -> Dictionary:
+	var caminho := "res://assets/i18n/%s.json" % loc
+	if not FileAccess.file_exists(caminho):
+		_ok(false, "falta o ficheiro %s" % caminho)
+		return {}
+	var d: Variant = JSON.parse_string(FileAccess.get_file_as_string(caminho))
+	return d if d is Dictionary else {}
+
+
 func _fonte(caminho: String) -> String:
 	if not FileAccess.file_exists(caminho):
 		_ok(false, "falta o ficheiro %s" % caminho)
@@ -804,6 +816,60 @@ func teste_especies_dos_inimigos_existem() -> void:
 	for m in rn.search_all(ger.substr(j, maxi(0, fim2 - j))):
 		_ok(especies.has(m.get_string(1)),
 			"ESP_REGIAO pede a especie '%s', que nao existe" % m.get_string(1))
+
+
+## Cada região da campanha tem NOME traduzível e cor próprias, e o carrossel
+## tem uma arte de fundo para todas.
+##
+## Foi assim que as 14 regiões novas (a 7.ª em diante) andaram a aparecer
+## como "?" cinzento no ecrã de escolha de nível: as tabelas do
+## `seletor_niveis.gd` tinham ficado com 6 entradas quando a campanha passou
+## a 20. Agora o nome e a cor vivem em `EstadoJogo.REGIOES` e isto guarda-os.
+func teste_regioes_tem_nome_e_cor() -> void:
+	var e := _novo_estado()
+	var en := _json_i18n("en")
+	var chaves := {}
+	for r in e.REGIOES.size():
+		var reg: Dictionary = e.REGIOES[r]
+		_ok(reg.has("chave"), "a região %d (%s) não tem chave i18n" % [r, reg.get("id", "?")])
+		_ok(reg.has("cor"), "a região %d (%s) não tem cor" % [r, reg.get("id", "?")])
+		var k: String = reg.get("chave", "")
+		_ok(k.begins_with("world."), "a chave da região %d devia ser world.* (é '%s')" % [r, k])
+		_ok(en.has(k), "en.json sem a chave da região %d ('%s')" % [r, k])
+		_ok(not chaves.has(k), "duas regiões com a mesma chave '%s'" % k)
+		chaves[k] = true
+		_ok(e.chave_regiao_do_nivel(reg["niveis"][0]) == k,
+			"chave_regiao_do_nivel não devolve '%s' para a região %d" % [k, r])
+	# uma arte de fundo por região, e o ficheiro tem de existir
+	var fundos: Array = SeletorNiveis.FUNDO_REGIAO
+	_ok(fundos.size() == e.REGIOES.size(),
+		"FUNDO_REGIAO tem %d entradas para %d regiões" % [fundos.size(), e.REGIOES.size()])
+	for i in mini(fundos.size(), e.REGIOES.size()):
+		_ok(ResourceLoader.exists(fundos[i]),
+			"região %d: falta a arte de fundo %s" % [i, fundos[i]])
+	# o passo dentro da região (o "3 / 5" do cabeçalho da HUD)
+	var passo: Array[int] = e.passo_na_regiao(e.REGIOES[0]["niveis"][2])
+	_ok(passo == [3, 5], "passo_na_regiao devia dar [3, 5], deu %s" % str(passo))
+
+
+## As peças da interface (`assets/ui/`) estão geradas e importadas. Se
+## faltarem, a HUD cai nas caixas lisas de recurso e ninguém dá por isso até
+## ver o jogo -- correr `python tools/gerar_ui.py` e reimportar.
+func teste_pecas_de_ui_existem() -> void:
+	var pecas := [
+		"painel_pedra", "painel_placa", "painel_chefe", "calha", "selo",
+		"enchimento", "ico_caveira", "ico_losango", "ico_coracao",
+	]
+	for p: String in pecas:
+		_ok(ResourceLoader.exists("res://assets/ui/%s.png" % p),
+			"falta a peça de UI '%s' (correr tools/gerar_ui.py)" % p)
+	# o enchimento tem de ser MAIS ALTO do que a barra mais alta da HUD --
+	# esticado para além da textura, o Godot não desenha barra nenhuma
+	var tex := load("res://assets/ui/enchimento.png") as Texture2D
+	if tex:
+		_ok(tex.get_height() >= UI.ALTURA_MAX_BARRA,
+			"o enchimento tem %d px de altura, precisa de %d"
+			% [tex.get_height(), UI.ALTURA_MAX_BARRA])
 
 
 func teste_packs_de_fundo_existem() -> void:

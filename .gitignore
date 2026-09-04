@@ -33,6 +33,7 @@ __pycache__/
 *.pyc
 assets/sprites/pixel/_preview_*
 assets/sprites/pixel/**/_preview_*
+assets/ui/_preview_*
 
 # lixo de zips do macOS
 __MACOSX/

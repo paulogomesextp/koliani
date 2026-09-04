@@ -164,32 +164,38 @@ const NIVEIS := [
 # "res://scenes/levels/Level_Test.tscn" fica no repo como sala de treino,
 # fora da campanha (correr a cena diretamente no editor).
 
-## As 6 regioes da campanha-alvo (plano completo em `docs/niveis.md`). Cada
-## regiao agrupa indices de `NIVEIS`; o menu/mapa passa a listar regioes e o
-## seu estado de conclusao. Uma regiao com `niveis` vazio ainda esta por
-## construir -- o agente vai enchendo `NIVEIS` e estes indices a medida que
-## desenha os niveis. A ordem aqui E a ordem das regioes na campanha.
+## As 20 regioes da campanha (5 niveis cada; plano em `docs/niveis.md` e
+## `docs/plano_niveis_31_100.md`). Cada regiao agrupa indices de `NIVEIS`;
+## o mapa, o carrossel e o cabecalho da HUD leem esta tabela. A ordem aqui
+## E a ordem das regioes na campanha.
+##
+##   chave -- chave i18n do nome (`world.*` nos 6 assets/i18n/*.json). O
+##            campo `nome` e' so' para as ferramentas e para os logs: o que
+##            o jogador ve' vem sempre da chave.
+##   cor   -- a cor do luar da regiao (o `cor_luz` do seu primeiro nivel).
+##            Serve as pastilhas do carrossel e o cabecalho da HUD, para
+##            cada regiao ter a sua cor mesmo antes de se ver o cenario.
 const REGIOES := [
-	{"id": "floresta", "nome": "Floresta Putrefacta", "niveis": [0, 1, 2, 3, 4]},
-	{"id": "prisao", "nome": "Prisao dos Condenados", "niveis": [5, 6, 7, 8, 9]},
-	{"id": "torres", "nome": "Torres Esquecidas", "niveis": [10, 11, 12, 13, 14]},
-	{"id": "catacumbas", "nome": "Catacumbas do Abismo", "niveis": [15, 16, 17, 18, 19]},
-	{"id": "cidade", "nome": "Cidade Corrompida", "niveis": [20, 21, 22, 23, 24]},
-	{"id": "castelo", "nome": "Castelo de Zeriko", "niveis": [25, 26, 27, 28, 29]},
-	{"id": "queimadas", "nome": "Terras Queimadas", "niveis": [30, 31, 32, 33, 34]},
-	{"id": "mar", "nome": "Mar dos Mortos", "niveis": [35, 36, 37, 38, 39]},
-	{"id": "gelo", "nome": "Reino do Gelo", "niveis": [40, 41, 42, 43, 44]},
-	{"id": "deserto", "nome": "Deserto dos Esquecidos", "niveis": [45, 46, 47, 48, 49]},
-	{"id": "jardins", "nome": "Jardins do Rei", "niveis": [50, 51, 52, 53, 54]},
-	{"id": "maquinas", "nome": "Cidade das Máquinas", "niveis": [55, 56, 57, 58, 59]},
-	{"id": "ceu", "nome": "Céu Partido", "niveis": [60, 61, 62, 63, 64]},
-	{"id": "sonhos", "nome": "Reino dos Sonhos", "niveis": [65, 66, 67, 68, 69]},
-	{"id": "mortos", "nome": "Cidade dos Mortos", "niveis": [70, 71, 72, 73, 74]},
-	{"id": "mar_vermelho", "nome": "Mar Vermelho", "niveis": [75, 76, 77, 78, 79]},
-	{"id": "inferno", "nome": "Inferno", "niveis": [80, 81, 82, 83, 84]},
-	{"id": "vazio", "nome": "O Vazio", "niveis": [85, 86, 87, 88, 89]},
-	{"id": "guerra", "nome": "Guerra dos Reinos", "niveis": [90, 91, 92, 93, 94]},
-	{"id": "ultimo", "nome": "O Último Caminho", "niveis": [95, 96, 97, 98, 99]},
+	{"id": "floresta", "nome": "Floresta Putrefacta", "niveis": [0, 1, 2, 3, 4], "chave": "world.forest", "cor": Color(0.62, 1.00, 0.72)},
+	{"id": "prisao", "nome": "Prisao dos Condenados", "niveis": [5, 6, 7, 8, 9], "chave": "world.prison", "cor": Color(0.60, 0.68, 1.00)},
+	{"id": "torres", "nome": "Torres Esquecidas", "niveis": [10, 11, 12, 13, 14], "chave": "world.towers", "cor": Color(1.00, 0.74, 0.46)},
+	{"id": "catacumbas", "nome": "Catacumbas do Abismo", "niveis": [15, 16, 17, 18, 19], "chave": "world.catacombs", "cor": Color(0.86, 0.70, 0.78)},
+	{"id": "cidade", "nome": "Cidade Corrompida", "niveis": [20, 21, 22, 23, 24], "chave": "world.city", "cor": Color(1.00, 0.62, 0.72)},
+	{"id": "castelo", "nome": "Castelo de Zeriko", "niveis": [25, 26, 27, 28, 29], "chave": "world.castle", "cor": Color(1.00, 0.44, 0.96)},
+	{"id": "queimadas", "nome": "Terras Queimadas", "niveis": [30, 31, 32, 33, 34], "chave": "world.burned", "cor": Color(1.00, 0.52, 0.18)},
+	{"id": "mar", "nome": "Mar dos Mortos", "niveis": [35, 36, 37, 38, 39], "chave": "world.deadsea", "cor": Color(0.42, 0.90, 0.98)},
+	{"id": "gelo", "nome": "Reino do Gelo", "niveis": [40, 41, 42, 43, 44], "chave": "world.ice", "cor": Color(0.80, 0.96, 1.00)},
+	{"id": "deserto", "nome": "Deserto dos Esquecidos", "niveis": [45, 46, 47, 48, 49], "chave": "world.desert", "cor": Color(1.00, 0.86, 0.48)},
+	{"id": "jardins", "nome": "Jardins do Rei", "niveis": [50, 51, 52, 53, 54], "chave": "world.gardens", "cor": Color(0.90, 0.30, 0.52)},
+	{"id": "maquinas", "nome": "Cidade das Máquinas", "niveis": [55, 56, 57, 58, 59], "chave": "world.machines", "cor": Color(0.55, 0.85, 1.00)},
+	{"id": "ceu", "nome": "Céu Partido", "niveis": [60, 61, 62, 63, 64], "chave": "world.sky", "cor": Color(0.62, 0.70, 1.00)},
+	{"id": "sonhos", "nome": "Reino dos Sonhos", "niveis": [65, 66, 67, 68, 69], "chave": "world.dreams", "cor": Color(0.92, 0.66, 0.96)},
+	{"id": "mortos", "nome": "Cidade dos Mortos", "niveis": [70, 71, 72, 73, 74], "chave": "world.deadcity", "cor": Color(0.72, 0.92, 0.80)},
+	{"id": "mar_vermelho", "nome": "Mar Vermelho", "niveis": [75, 76, 77, 78, 79], "chave": "world.redsea", "cor": Color(1.00, 0.30, 0.32)},
+	{"id": "inferno", "nome": "Inferno", "niveis": [80, 81, 82, 83, 84], "chave": "world.hell", "cor": Color(1.00, 0.52, 0.10)},
+	{"id": "vazio", "nome": "O Vazio", "niveis": [85, 86, 87, 88, 89], "chave": "world.void", "cor": Color(0.86, 0.80, 1.00)},
+	{"id": "guerra", "nome": "Guerra dos Reinos", "niveis": [90, 91, 92, 93, 94], "chave": "world.war", "cor": Color(1.00, 0.74, 0.44)},
+	{"id": "ultimo", "nome": "O Último Caminho", "niveis": [95, 96, 97, 98, 99], "chave": "world.lastroad", "cor": Color(1.00, 0.92, 0.60)},
 ]
 
 signal vidas_mudaram(vidas: int)
@@ -437,6 +443,33 @@ func regiao_do_nivel(indice: int) -> int:
 ## Região do nível que está a ser jogado agora.
 func regiao_atual() -> int:
 	return regiao_do_nivel(indice_nivel)
+
+
+## Chave i18n do nome da região do nível `indice` (`world.unknown` se o
+## nível estiver fora das regiões -- p.ex. a sala de treino).
+func chave_regiao_do_nivel(indice: int) -> String:
+	var r := regiao_do_nivel(indice)
+	if r < 0:
+		return "world.unknown"
+	return REGIOES[r].get("chave", "world.unknown")
+
+
+## Cor do luar da região do nível `indice` (branco fora das regiões).
+func cor_regiao_do_nivel(indice: int) -> Color:
+	var r := regiao_do_nivel(indice)
+	if r < 0:
+		return Color.WHITE
+	return REGIOES[r].get("cor", Color.WHITE)
+
+
+## Posição do nível `indice` dentro da sua região: [n, total] com n a começar
+## em 1. Fora das regiões devolve [0, 0].
+func passo_na_regiao(indice: int) -> Array[int]:
+	var r := regiao_do_nivel(indice)
+	if r < 0:
+		return [0, 0]
+	var niveis: Array = REGIOES[r]["niveis"]
+	return [niveis.find(indice) + 1, niveis.size()]
 
 
 ## Um nível é jogável no mapa se for o primeiro, se a campanha linear já lá

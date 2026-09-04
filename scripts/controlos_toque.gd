@@ -71,6 +71,7 @@ func _ready() -> void:
 	if koliani and koliani.has_signal("energia_mudou"):
 		koliani.energia_mudou.connect(_atualizar_energia)
 
+	_vestir_barras()
 	_montar_barra_chefe()
 	var chefe := get_tree().get_first_node_in_group("chefes")
 	if chefe and chefe.has_signal("combate_iniciado"):
@@ -104,6 +105,27 @@ func _ready() -> void:
 		_encher_cabecalho_nivel())
 
 
+## Troca as caixas lisas das barras de Vida/Energia pela calha e pelo
+## enchimento de pixel-art (`assets/ui/`), e põe um coração à frente da vida
+## e outro no contador de vidas. As barras em si (posição, tamanho, sinais)
+## continuam a vir do `HUD.tscn`.
+func _vestir_barras() -> void:
+	if _barra_vida:
+		UI.vestir_barra(_barra_vida, UI.COR_VIDA)
+	if _barra_energia:
+		UI.vestir_barra(_barra_energia, UI.COR_ENERGIA)
+
+	# o contador de vidas passa de "x3" a "♥ x3". O coração fica ao lado do
+	# número, DENTRO da caixa `Vidas` -- à esquerda dela está o disco da arma,
+	# e um ícone posto para fora ficava por baixo do disco.
+	if _label_vidas:
+		var ic := UI.icone("ico_coracao", 18)
+		ic.name = "IconeVidas"
+		ic.position = Vector2(0, 3)
+		_label_vidas.get_parent().add_child(ic)
+		_label_vidas.position.x = 28
+
+
 ## Dois botões pequenos (WEAPONS / ARMOR) por cima da barra de vida.
 func _montar_botoes_equip() -> void:
 	_btn_armas = _fazer_botao_equip("arma")
@@ -122,17 +144,17 @@ func _fazer_botao_equip(tipo: String) -> Button:
 	b.anchor_bottom = 1.0
 	b.offset_left = 92.0 if tipo == "arma" else 192.0
 	b.offset_right = b.offset_left + 96.0
-	b.offset_top = -110.0
-	b.offset_bottom = -86.0
+	b.offset_top = -116.0
+	b.offset_bottom = -92.0
 	b.add_theme_font_size_override("font_size", 11)
 	b.add_theme_color_override("font_color", Color(1, 0.88, 0.98))
-	var sb := StyleBoxFlat.new()
-	sb.bg_color = Color(0.08, 0.05, 0.11, 0.92)
-	sb.set_corner_radius_all(4)
-	sb.set_border_width_all(1)
-	sb.border_color = Color(0.85, 0.4, 0.82, 0.9)
-	for e in ["normal", "hover", "pressed", "focus"]:
-		b.add_theme_stylebox_override(e, sb)
+	b.add_theme_color_override("font_hover_color", Color(1, 0.96, 1))
+	b.add_theme_color_override("font_pressed_color", Color(1, 0.8, 0.96))
+	# a mesma pedra da HUD, mais acesa quando o rato lá está
+	b.add_theme_stylebox_override("normal", UI.painel("painel_pedra", Color(1, 0.9, 1, 0.94), 3.0))
+	b.add_theme_stylebox_override("hover", UI.painel("painel_placa", Color(1, 0.9, 1), 3.0))
+	b.add_theme_stylebox_override("pressed", UI.painel("painel_placa", Color(0.8, 0.6, 0.9), 3.0))
+	b.add_theme_stylebox_override("focus", UI.painel("painel_pedra", Color(1, 0.9, 1, 0.94), 3.0))
 	b.pressed.connect(_abrir_equip.bind(tipo))
 	return b
 
@@ -152,8 +174,8 @@ func _fazer_selo(x: float) -> Label:
 	l.anchor_bottom = 1.0
 	l.offset_left = x - 2.0
 	l.offset_right = x + 94.0
-	l.offset_top = -134.0
-	l.offset_bottom = -114.0
+	l.offset_top = -140.0
+	l.offset_bottom = -120.0
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	l.add_theme_font_size_override("font_size", 9)
@@ -304,46 +326,53 @@ func _montar_barra_chefe() -> void:
 	_chefe_caixa.anchor_right = 0.5
 	_chefe_caixa.anchor_top = 1.0
 	_chefe_caixa.anchor_bottom = 1.0
-	_chefe_caixa.offset_left = -380.0
-	_chefe_caixa.offset_right = 380.0
-	_chefe_caixa.offset_top = -104.0
-	_chefe_caixa.offset_bottom = -52.0
+	# 600 de largura (era 760): a 760 a placa passava por cima da barra de
+	# vida e dos botoes WEAPONS/ARMOR, que vivem no mesmo canto.
+	_chefe_caixa.offset_left = -300.0
+	_chefe_caixa.offset_right = 300.0
+	# a placa cresceu: leva a caveira + o nome numa linha e a barra noutra
+	_chefe_caixa.offset_top = -124.0
+	_chefe_caixa.offset_bottom = -44.0
 	_chefe_caixa.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_chefe_caixa.modulate.a = 0.0
 	_chefe_caixa.visible = false
 	add_child(_chefe_caixa)
 
+	# placa de pedra tocada a sangue por trás de tudo (`UI.painel`)
+	var placa := PanelContainer.new()
+	placa.set_anchors_preset(Control.PRESET_FULL_RECT)
+	placa.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	placa.add_theme_stylebox_override("panel", UI.painel("painel_chefe", Color(1, 1, 1, 0.96), 8.0))
+	_chefe_caixa.add_child(placa)
+
+	var col := VBoxContainer.new()
+	col.add_theme_constant_override("separation", 3)
+	col.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	placa.add_child(col)
+
+	var titulo := HBoxContainer.new()
+	titulo.alignment = BoxContainer.ALIGNMENT_CENTER
+	titulo.add_theme_constant_override("separation", 7)
+	titulo.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	col.add_child(titulo)
+	titulo.add_child(UI.icone("ico_caveira", 16, Color(1, 0.8, 0.8)))
+
 	_chefe_nome = Label.new()
-	_chefe_nome.anchor_right = 1.0
-	_chefe_nome.offset_bottom = 22.0
 	_chefe_nome.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_chefe_nome.add_theme_font_size_override("font_size", 16)
 	_chefe_nome.add_theme_color_override("font_color", Color(0.98, 0.86, 0.86))
 	_chefe_nome.add_theme_color_override("font_outline_color", Color(0.05, 0.01, 0.02))
 	_chefe_nome.add_theme_constant_override("outline_size", 5)
-	_chefe_caixa.add_child(_chefe_nome)
+	titulo.add_child(_chefe_nome)
 
 	_chefe_barra = ProgressBar.new()
-	_chefe_barra.anchor_right = 1.0
-	_chefe_barra.offset_top = 24.0
-	_chefe_barra.offset_bottom = 46.0
+	_chefe_barra.custom_minimum_size = Vector2(0, 26)
 	_chefe_barra.show_percentage = false
 	_chefe_barra.min_value = 0.0
 	_chefe_barra.max_value = 1.0
 	_chefe_barra.value = 1.0
-	var fundo := StyleBoxFlat.new()
-	fundo.bg_color = Color(0.05, 0.05, 0.06, 0.92)   # calha escura neutra
-	fundo.set_corner_radius_all(3)
-	fundo.set_border_width_all(2)
-	fundo.border_color = Color(0.32, 0.06, 0.09, 0.95)
-	_chefe_barra.add_theme_stylebox_override("background", fundo)
-	var cheio := StyleBoxFlat.new()
-	cheio.bg_color = Color(0.46, 0.04, 0.07)         # vermelho escuro
-	cheio.set_corner_radius_all(3)
-	cheio.border_width_top = 2
-	cheio.border_color = Color(0.75, 0.12, 0.16, 0.9)  # aresta viva por cima
-	_chefe_barra.add_theme_stylebox_override("fill", cheio)
-	_chefe_caixa.add_child(_chefe_barra)
+	col.add_child(_chefe_barra)
+	UI.vestir_barra(_chefe_barra, UI.COR_CHEFE)
 
 
 func _ao_combate_chefe(chefe: Node) -> void:
@@ -394,23 +423,22 @@ func _montar_contador_essencia() -> void:
 	caixa.anchor_right = 1.0
 	caixa.anchor_top = 0.0
 	caixa.anchor_bottom = 0.0
-	caixa.offset_left = -168.0
+	caixa.offset_left = -176.0
 	caixa.offset_right = -18.0
 	caixa.offset_top = 16.0
-	caixa.offset_bottom = 48.0
+	caixa.offset_bottom = 54.0
 	caixa.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	caixa.pivot_offset = Vector2(75, 16)
-	var sb := StyleBoxFlat.new()
-	sb.bg_color = Color(0.08, 0.04, 0.1, 0.78)
-	sb.set_corner_radius_all(9)
-	sb.set_border_width_all(1)
-	sb.border_color = Color(1.0, 0.5, 0.95, 0.5)
-	sb.content_margin_left = 12
-	sb.content_margin_right = 14
-	sb.content_margin_top = 3
-	sb.content_margin_bottom = 3
-	caixa.add_theme_stylebox_override("panel", sb)
+	caixa.pivot_offset = Vector2(79, 19)
+	caixa.add_theme_stylebox_override("panel", UI.painel(
+		"painel_pedra", Color(1.0, 0.86, 1.0, 0.94), 6.0))
 	add_child(caixa)
+
+	var linha := HBoxContainer.new()
+	linha.alignment = BoxContainer.ALIGNMENT_CENTER
+	linha.add_theme_constant_override("separation", 8)
+	linha.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	caixa.add_child(linha)
+	linha.add_child(UI.icone("ico_losango", 18))
 
 	_ess_label = Label.new()
 	_ess_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
@@ -419,14 +447,14 @@ func _montar_contador_essencia() -> void:
 	_ess_label.add_theme_color_override("font_color", Color(1.0, 0.86, 1.0))
 	_ess_label.add_theme_color_override("font_outline_color", Color(0.05, 0.01, 0.06))
 	_ess_label.add_theme_constant_override("outline_size", 4)
-	caixa.add_child(_ess_label)
+	linha.add_child(_ess_label)
 
 
 func _atualizar_essencia(total: int) -> void:
 	if _ess_label == null:
 		return
-	_ess_label.text = "✦ %d" % total
-	var caixa := _ess_label.get_parent() as Control
+	_ess_label.text = "%d" % total
+	var caixa := _ess_label.get_parent().get_parent() as Control
 	if caixa:
 		var t := create_tween()
 		t.tween_property(caixa, "scale", Vector2(1.14, 1.14), 0.06)
@@ -510,13 +538,27 @@ func _primeira_tecla(accao: String) -> String:
 
 
 # --- cabeçalho do nível (canto superior esquerdo) -----------------
+#
+# É o INDICADOR DE NÍVEL. Eram três `Label` soltas sobre o cenário -- com um
+# fundo claro por trás não se liam, e não diziam onde é que o jogador estava
+# na campanha. Agora é uma placa de pedra (`UI.painel`) com:
+#
+#   selo   -- o número do nível, na cor da região
+#   linha  -- nome da região + a que passo dela vai (3 / 5)
+#   linha  -- nome do nível
+#   linha  -- ☠ chefe (ou guardião) que sela a porta
+#   pastilhas -- um traço por nível da região, o de agora aceso
+#
+# A cor da região (`EstadoJogo.REGIOES[r].cor`) tinge a placa toda: cada uma
+# das 20 regiões tem o seu tom, e nota-se a passagem de uma para a outra.
+
+var _cab_pastilhas: HBoxContainer
 
 func _montar_cabecalho_nivel() -> void:
 	_cab_nivel = VBoxContainer.new()
 	_cab_nivel.name = "CabecalhoNivel"
 	_cab_nivel.set_anchors_preset(Control.PRESET_TOP_LEFT)
 	_cab_nivel.position = Vector2(12.0, 8.0)
-	_cab_nivel.custom_minimum_size = Vector2(420.0, 0.0)
 	_cab_nivel.add_theme_constant_override("separation", 1)
 	_cab_nivel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_cab_nivel)
@@ -527,23 +569,82 @@ func _encher_cabecalho_nivel() -> void:
 	if _cab_nivel == null:
 		return
 	for c in _cab_nivel.get_children():
+		_cab_nivel.remove_child(c)
 		c.queue_free()
 	var i: int = EstadoJogo.indice_nivel
-	# nº do nível + nome
-	_cab_nivel.add_child(_linha_cab(
-		Textos.tf("map.level", [i + 1]), 13, Color(0.78, 0.7, 0.86), true))
-	_cab_nivel.add_child(_linha_cab(
-		Textos.t(CatalogoCampanha.chave_nivel(i)), 17, Color(1, 0.95, 1), false))
-	# nome do chefe, se houver
+	var cor := EstadoJogo.cor_regiao_do_nivel(i)
+	var passo: Array[int] = EstadoJogo.passo_na_regiao(i)
+
+	# a placa: pedra tingida com a cor da região, mas escura -- é fundo de
+	# texto, não pode competir com o cenário
+	var placa := PanelContainer.new()
+	placa.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	placa.add_theme_stylebox_override("panel", UI.painel(
+		"painel_placa", Color(cor.r * 0.5 + 0.2, cor.g * 0.5 + 0.2, cor.b * 0.5 + 0.2, 0.94), 8.0))
+	_cab_nivel.add_child(placa)
+
+	var linha := HBoxContainer.new()
+	linha.add_theme_constant_override("separation", 10)
+	placa.add_child(linha)
+
+	# selo com o número do nível
+	var selo := PanelContainer.new()
+	selo.custom_minimum_size = Vector2(52, 52)
+	selo.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	selo.add_theme_stylebox_override("panel", UI.painel("selo", cor * 0.7, 2.0))
+	linha.add_child(selo)
+	var num := Label.new()
+	num.text = "%02d" % (i + 1)
+	num.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	num.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	num.add_theme_font_size_override("font_size", 24)
+	num.add_theme_color_override("font_color", Color(1, 0.97, 1))
+	num.add_theme_color_override("font_outline_color", Color(0.04, 0.01, 0.06))
+	num.add_theme_constant_override("outline_size", 5)
+	selo.add_child(num)
+
+	var col := VBoxContainer.new()
+	col.add_theme_constant_override("separation", 0)
+	col.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	linha.add_child(col)
+
+	# região + passo dentro dela
+	var cabecalho := Textos.t(EstadoJogo.chave_regiao_do_nivel(i)).to_upper()
+	if passo[1] > 0:
+		cabecalho += "   ·   " + Textos.tf("hud.region_step", [passo[0], passo[1]])
+	col.add_child(_linha_cab(cabecalho, 12, cor.lerp(Color.WHITE, 0.35), false))
+	# nome do nível
+	col.add_child(_linha_cab(Textos.t(CatalogoCampanha.chave_nivel(i)), 18,
+		Color(1, 0.96, 1), false))
+	# chefe (ou guardião), com caveira à frente
 	var ck := CatalogoCampanha.chave_chefe(i)
 	if ck != "":
-		_cab_nivel.add_child(_linha_cab(
-			Textos.tf("sel.boss", [Textos.t(ck)]), 13, Color(0.98, 0.7, 0.72), true))
+		var lc := HBoxContainer.new()
+		lc.add_theme_constant_override("separation", 5)
+		lc.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		lc.add_child(UI.icone("ico_caveira", 13, Color(1, 0.72, 0.74)))
+		var rotulo := "sel.boss" if CatalogoCampanha.tem_chefe(i) else "sel.guard"
+		lc.add_child(_linha_cab(Textos.tf(rotulo, [Textos.t(ck)]), 12,
+			Color(0.98, 0.72, 0.74), false))
+		col.add_child(lc)
+
+	# pastilhas: um traço por nível da região
+	_cab_pastilhas = HBoxContainer.new()
+	_cab_pastilhas.add_theme_constant_override("separation", 4)
+	_cab_pastilhas.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	col.add_child(_cab_pastilhas)
+	for n in passo[1]:
+		var p := ColorRect.new()
+		p.custom_minimum_size = Vector2(18, 4)
+		var feito := n < passo[0] - 1
+		p.color = cor if n == passo[0] - 1 else (
+			cor * 0.55 if feito else Color(0.24, 0.2, 0.3, 0.9))
+		_cab_pastilhas.add_child(p)
 
 
-func _linha_cab(txt: String, tam: int, cor: Color, pequeno: bool) -> Label:
+func _linha_cab(txt: String, tam: int, cor: Color, maiusculas := false) -> Label:
 	var l := Label.new()
-	l.text = txt if not pequeno else txt.to_upper()
+	l.text = txt.to_upper() if maiusculas else txt
 	l.add_theme_font_size_override("font_size", tam)
 	l.add_theme_color_override("font_color", cor)
 	l.add_theme_color_override("font_outline_color", Color(0.03, 0.01, 0.05))
@@ -561,12 +662,14 @@ func _atualizar_barra_vida(atual: int, maximo: int) -> void:
 	if _barra_vida:
 		_barra_vida.max_value = maximo
 		_barra_vida.value = atual
+		UI.ajustar_barra(_barra_vida)
 
 
 func _atualizar_energia(atual: float, maximo: float) -> void:
 	if _barra_energia:
 		_barra_energia.max_value = maximo
 		_barra_energia.value = atual
+		UI.ajustar_barra(_barra_energia)
 
 
 func _atualizar_vidas(vidas: int) -> void:
@@ -591,12 +694,11 @@ func _aviso(txt: String) -> void:
 	var larg := get_viewport().get_visible_rect().size.x
 	l.position = Vector2(larg * 0.5 - 130.0, 68.0)
 	l.add_theme_color_override("font_color", Color(1, 0.92, 1))
+	l.add_theme_color_override("font_outline_color", Color(0.05, 0.01, 0.06))
+	l.add_theme_constant_override("outline_size", 4)
 	l.add_theme_font_size_override("font_size", 20)
-	var sb := StyleBoxFlat.new()
-	sb.bg_color = Color(0.55, 0.18, 0.5, 0.9)
-	sb.set_corner_radius_all(5)
-	sb.set_content_margin_all(6)
-	l.add_theme_stylebox_override("normal", sb)
+	l.add_theme_stylebox_override("normal", UI.painel(
+		"painel_placa", Color(1.0, 0.62, 1.0), 8.0))
 	add_child(l)
 	var t := l.create_tween()
 	t.tween_interval(1.8)

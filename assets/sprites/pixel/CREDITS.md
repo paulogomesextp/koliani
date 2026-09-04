@@ -368,3 +368,24 @@ packs de onde já vêm fundos do jogo:
   (poste gótico de três lanternas, 35x108).
 - **Cold Corridors** — `Assets/Torch/torch-sheet.png` -> `props/tocha.png`
   (chama de parede, 4 frames).
+
+## Kit da interface (4 set 2026)
+A HUD não tinha arte nenhuma — era `Label` + `StyleBoxFlat` desenhados por
+código. O kit vem do mesmo pack que já dá o terreno da floresta, portanto a
+licença já estava resolvida:
+- **anokolisa — Legacy Fantasy High Forest 2.3**, `HUD/Base-01.png` (432x304):
+  painel de pergaminho (nine-patch 64x64 + o selo de 16x16), painel de
+  madeira, e o bloco de ícones (caveira, coroa, engrenagem, relógio, casa,
+  pausa, setas, ✕, +, !, losango).
+
+`tools/gerar_ui.py` **recolore** as peças em vez de as copiar: o kit é de
+fantasia clara (pergaminho bege, verde/azul/amarelo) e o jogo é gótico de
+luar com brilho magenta. Mede a luminância de cada pixel e mapeia-a numa
+rampa de 5 tons da paleta nova — o desenho (moldura, relevo, granulado)
+fica todo, só muda a cor. Um `modulate` no Godot não servia: multiplica, e
+sobre bege claro devolve sempre pastel. Sai tudo a 3x (NEAREST) porque uma
+`NinePatchRect` não escala os cantos.
+
+O **coração** e o **enchimento das barras** são arte própria, feita na mesma
+ferramenta: o kit não traz coração nenhum, e os enchimentos dele têm 2 e 4 px
+de altura (um fio, num ecrã de 720).
