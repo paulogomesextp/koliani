@@ -33,21 +33,83 @@ Blocos, por ordem de ataque:
 4. **Infra** — ~~**APK ANDROID FEITO**~~: compilou pela primeira vez
    (run #332) e está no Release **`android-latest`**. Falta só o **switch do
    Pages, que só o Paulo pode dar** — ver "Bloco 4" mais abaixo.
-5. **UI, vidas, mecânicas** — ⬅ *é aqui que a próxima sessão pega.*
-   ~~vidas a começar em 5 e +1 por nível~~ **FEITO** (`9b8a78e`).
-   ~~a tabela das mecânicas~~ **ESCRITA, à espera da aprovação dele**
-   (`docs/mecanicas_por_nivel.md` + página abaixo). **Nada disso se coda
-   antes de ele responder.** Falta a UI + indicador de nível.
-6. **Assets e licenças** — portal da Frostwindz: **cancelar a mudança ou
-   achar um equivalente grátis**. Licença do pack das balas: **ignorar**
-   (decisão dele).
-7. **Trabalho de fundo** — playtest (ele já testou a maior parte e vai dar
-   feedback); **chefes com arte própria fiel ao lore, um por nível**; curva
-   do 2.º acto; nível 100 = duelo de espada sem poderes; arte própria das 14
-   regiões novas; Sino Vivo + Vyrak; menu de selecção de níveis;
-   SalaLabirinto.
+5. **UI, vidas, mecânicas** — ~~vidas~~ **FEITO** (`9b8a78e`);
+   ~~UI + indicador de nível~~ **FEITO** (`20d3d38`, ver mais abaixo);
+   a tabela das mecânicas **ESCRITA, à espera da aprovação dele**
+   (`docs/mecanicas_por_nivel.md`). **Nada disso se coda antes de ele
+   responder.** O bloco fica só à espera dessa resposta.
+6. ~~**Assets e licenças**~~ — **FECHADO** (`41f9f85`): o portal passou a
+   sair do pack de **domínio público** do CodeManu (o da Frostwindz, pago,
+   sai de vez). Licença do pack das balas: **ignorar** (decisão dele).
+7. ⬅ *é aqui que a próxima sessão pega* — **trabalho de fundo** (ver o
+   bloco 7 mais abaixo). O primeiro da fila é o **menu de selecção de
+   níveis**: as 14 regiões já têm nome/cor/arte, falta o passe de pedra nos
+   cartões, agora que há `scripts/ui.gd`.
+   O resto do bloco 7: **chefes com arte própria fiel ao lore, um por
+   nível**; curva do 2.º acto; arte própria das 14 regiões novas; Sino Vivo
+   + Vyrak; SalaLabirinto. (Playtest e nível 100 ele já arrumou no painel.)
 8. **Afinar** os números postos "a olho" + o glow roxo da espada, que passa
    nos testes mas nunca foi visto em jogo.
+
+---
+
+# BLOCO 5 (b) — UI e indicador de nível — **FEITO** (4 set 2026, `20d3d38`)
+
+Não foi preciso descarregar nada: o kit certo já estava no repo, do mesmo
+pack **anokolisa** que dá o terreno da floresta (`HUD/Base-01.png`).
+
+- **`tools/gerar_ui.py`** — recorta e **RECOLORE** as peças para a paleta
+  gótica: mede a luminância de cada pixel e mapeia-a numa rampa de 5 tons.
+  Um `modulate` não servia (multiplica; sobre bege claro dá sempre pastel).
+  Sai tudo a **3x NEAREST** porque uma `NinePatchRect` não escala os cantos.
+  O **coração** e o **enchimento das barras** são arte própria — o kit não
+  traz coração e os enchimentos dele têm 2-4 px de altura.
+- **`scripts/ui.gd`** (`class_name UI`) — fábrica de painéis, calhas, barras
+  e ícones.
+- **Cabeçalho de nível** (é o "indicador de nível"): placa de pedra tingida
+  com a cor da região, selo com o número, região + passo (3/5), nome do
+  nível, caveira + chefe, e pastilhas de progresso na região.
+- Barra do chefe numa placa de sangue com caveira, contador de essência com
+  losango, botões WEAPONS/ARMOR e o aviso do topo na mesma pedra.
+- Bancada: **`tools/shot_hud.gd`** (precisa de janela; `-- <nivel> <png>
+  [chefe]`). Limpa o checkpoint de propósito — sem isso a Koliani nascia
+  dentro do líquido mortal do save anterior e o PNG saía com a vida a zero.
+
+> ⚠ **GOTCHA que custou uma tarde.** O enchimento das barras **não pode ser
+> a stylebox "fill"**: com uma `StyleBoxTexture` ali, a barra ficava EM
+> BRANCO conforme a altura — a de Energia (18 px) desenhava, a de Vida
+> (26 px) não desenhava nada, nem em `STRETCH` nem em `TILE`, e uma
+> `StyleBoxFlat` no mesmo sítio desenhava sempre. É um `NinePatchRect`
+> FILHO, que o `UI.ajustar_barra()` redimensiona.
+
+## O buraco que apareceu pelo caminho: 14 regiões sem nome
+
+As tabelas de região do `seletor_niveis.gd` (`WORLD_KEY`, `COR_REGIAO`,
+`FUNDO_REGIAO`) tinham ficado com **6 entradas** quando a campanha passou a
+**20 regiões** — da 7.ª em diante o carrossel dizia **"?"** e pintava tudo
+de cinzento. O nome (chave i18n) e a cor passam a viver em
+`EstadoJogo.REGIOES` (campos `chave` e `cor`, tirados do `cor_luz` do 1.º
+nível de cada região), +14 nomes nos 6 idiomas, e `FUNDO_REGIAO` tem agora
+uma arte por região. Testes novos: `teste_regioes_tem_nome_e_cor` e
+`teste_pecas_de_ui_existem`.
+
+---
+
+# BLOCO 6 (assets e licenças) — **FECHADO** (4 set 2026, `41f9f85`)
+
+O equivalente grátis do portal da Frostwindz já estava em disco: o **"Pixel
+FX Pack" do CodeManu/DavitMasia é DOMÍNIO PÚBLICO** ("no credit required",
+diz o `README.txt` do pack) e traz um vórtice de partículas de 64 frames.
+`tools/gerar_fx_portal_balas.py` recolore-o para o magenta da casa
+(`props/portal.png`, 32 frames de 64x64) e o `scripts/portal.gd` corre-o a
+18 fps — o miolo era um oval `Polygon2D` a rodar dentro de um `Line2D`, que
+se lia como feito por código. O portal de **saída** anda ao contrário e mais
+devagar, para se distinguir do de entrada sem legenda. Se a tira faltar, o
+desenho por código volta.
+
+> No painel de prioridades os itens do **bloco 3** (aura, candeeiros,
+> escudo) ainda aparecem como POR FAZER, embora estejam feitos desde a
+> sessão anterior — são os interruptores dele, não lhes toquei.
 
 ---
 
