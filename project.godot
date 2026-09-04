@@ -155,5 +155,11 @@ ui_cancel={
 textures/canvas_textures/default_texture_filter=0
 renderer/rendering_method="mobile"
 environment/defaults/default_clear_color=Color(0.05, 0.03, 0.08, 1)
+; OBRIGATORIO para o export de Android -- sem isto o Godot recusa-se:
+;   "ETC2/ASTC texture compression is required for Android export".
+; Foi este o ultimo passo que faltava ao job do APK (4 set 2026). Custa uma
+; variante comprimida a mais por textura no `.godot` (que nao vai para o git)
+; e um `--import` mais demorado.
+textures/vram_compression/import_etc2_astc=true
 
 
