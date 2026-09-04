@@ -20,10 +20,16 @@
 
 Blocos, por ordem de ataque:
 
-1. ~~**Softlock do portal**~~ — **FEITO** (`712137f`), ver abaixo.
-2. **Som e música** — ⬅ *é aqui que a próxima sessão pega.* Ver o
-   levantamento já feito, logo a seguir a esta lista.
-3. **Projécteis, luz e escudo** — aura roxa à volta dela
+1. ~~**Softlock do portal**~~ — **FEITO** (`712137f`).
+   Junto com ele, os dois bugs que ele apanhou a jogar a 4 set: o ecrã a
+   engasgar no golpe de espada e os frames soltos por cima da cabeça dela
+   no salto — **os dois FEITOS**, ver mais abaixo.
+2. ~~**Som e música**~~ — **FEITO** (4 set 2026): as 40 camas refeitas para
+   fecharem sobre si próprias + rock CC0; set de sons novo para a Koliani;
+   voz própria por família de monstro; espada e mísseis em camadas. Detalhe
+   logo a seguir a esta lista.
+3. **Projécteis, luz e escudo** — ⬅ *é aqui que a próxima sessão pega.*
+   Aura roxa à volta dela
    (`Koliani.tscn → Sprite/LuzAura`, já existe, é ligar); laser roxo do
    Wenrexa nos projécteis (ver ponto 0 abaixo); candeeiros/tochas com luz
    própria ao longo dos níveis; escudo melhor + escudo de energia roxo.
@@ -50,50 +56,101 @@ Blocos, por ordem de ataque:
 
 ---
 
-# BLOCO 2 (som) — levantamento já feito, começar por aqui
+# BLOCO 2 (som e música) — **FECHADO** (4 set 2026)
 
-## Correcção a uma nota antiga: os SFX **já não são sintetizados**
+Os quatro pedidos dele sobre som estão feitos. A ordem passa ao **bloco 3
+(projécteis, aura, luz e escudo)**.
 
-`assets/audio/CREDITS.md` regista que a 3 set 2026 os SFX de combate, mobs e
-UI foram trocados por **samples reais CC0 do OpenGameArt**. A espada
-(`ataque`) vem do pack *20 Sword Sound Effects* do StarNinjas; o `lancar`
-vem dos *80 CC0 RPG SFX* do rubberduck. Só as **camas** (`ambiente`, `menu`,
-`boss`, `assombracao`, `game_over`) continuam sintetizadas por
-`tools/gerar_audio.py`.
+## Música — o defeito era sistémico, não eram duas faixas
 
-**Portanto o problema não é "sintetizado vs. real" — é a ESCOLHA da
-amostra.** Não perder tempo a sintetizar nem a "ir buscar samples reais":
-já são reais. É preciso ouvir alternativas e escolher melhor, com o Paulo a
-decidir, para `ataque` (espada) e para os mísseis (`lancar` / `projetil`).
-O mapa nome→ficheiro está em `scripts/som.gd`.
+Ele queixou-se de que *"a música do Nível 32 é esquisita e tem vários
+cortes"* e de que *"a do nível 1 e a do 2 são iguais"*. Medi antes de mexer
+e o problema era maior:
 
-## A música do Nível 32: identificada
+- as camas tocam **sempre em ciclo** (`musica.gd` põe `loop = true`), mas
+  **8 das 20 de nível e 10 das 20 de chefe tinham fade-out**. De X em X
+  segundos a música desaparecia e voltava a entrar a todo o volume — é esse
+  o "corte". A do nível 32 (`Zwischenwelt`) caía 19,5 dB e dava a volta de
+  47 em 47 s;
+- **7 faixas de nível eram curtas de mais**. A do nível 1 tinha **7,6
+  segundos** (era o jingle *Victory Stats*, não uma cama) e a do 2 tinha
+  8,0 s, do mesmo álbum — daí soarem iguais.
 
-`scripts/musica.gd` escolhe a faixa por `indice_nivel % 20` (20 faixas de
-nível + 20 de chefe, em ciclo — pedido dele a 3 set). Logo:
+`tools/preparar_musica.py` reconstrói as 40 de raiz: corta o troço útil,
+**cruza a cauda por cima da cabeça** para o fim ligar ao início sem salto, e
+iguala tudo a -16 LUFS com ganho fixo. Entraram **6 faixas de rock/metal
+CC0 do autor [nene](https://opengameart.org/users/nene)** nos níveis e 3 nos
+chefes (o pedido do "tom de rock"); a que ele adorou (nível 38) fica onde
+estava, só sem o fade final. As linhas 09-13 dos chefes eram os mesmos cinco
+temas das 04-08 noutra versão — passam a ser cinco temas distintos.
 
-| Nível | índice | `% 20` | ficheiro | faixa |
-| --- | --- | --- | --- | --- |
-| 32 | 31 | 11 | `musica/niveis/nivel_12.ogg` | *Zwischenwelt* — Of Far Different Nature (CC-BY 4.0) |
-| 38 | 37 | 17 | `musica/niveis/nivel_18.ogg` | *Waking the devil* — Alexander Ehlers (**CC0**) |
+> Gotcha guardado: o `acrossfade` do ffmpeg, quando a cauda tem exactamente
+> a duração do cruzamento, **há faixas em que não devolve nada** (apanhado
+> no `boss_03`). Por isso o cruzamento é feito em Python, no `.wav`.
 
-- **A trocar** é a `nivel_12.ogg`. O "tem vários cortes" de que ele se
-  queixa é coerente com o processo: todas as faixas foram **cortadas a
-  ~70-80 s com fade-out e recodificadas a 64 kbps mono** para caber no
-  orçamento de espaço — nessa a emenda do loop deve estar audível. Vale a
-  pena confirmar se o defeito é do corte (recortar melhor) ou da faixa
-  (substituir de vez).
-- **A referência de tom rock** que ele adorou é a `nivel_18.ogg`. Boa
-  notícia: é **CC0** e vem do [Free Music Pack](https://opengameart.org/content/free-music-pack)
-  do Alexander Ehlers, que tem mais material no mesmo registo — é por aí
-  que se procuram as próximas.
+## SFX — sons novos e uma VOZ por família de monstro
 
-## O resto do pedido dele, por fazer
+`tools/preparar_sfx.py` (novo). Duas coisas que mudam de método:
 
-- Set de sons para as **animações** dela (passos, salto, rolamento,
-  aterrar), não só ataques.
-- Sons **por espécie de monstro** — hoje há `demonio_ataque`, `garra`,
-  `grito`, `praga` partilhados por todos.
+- **Sons que não existiam**: passos (três amostras sorteadas, cadência a
+  acompanhar a velocidade), rolamento, dash, raspar na parede, agarrar a
+  borda, morte, e som próprio para o remate do combo.
+- **Sons por FAMÍLIA de monstro**: as 19 espécies partilhavam quatro
+  rosnados. Agora há sete famílias (humano, morto, gosma, besta, insecto,
+  voador, grande), cada uma com ataque/dano/morte — tabela `FAMILIA_SOM` em
+  `demonio_base.gd`.
+- **A espada e os mísseis em CAMADAS.** Já tinham sido trocados duas vezes
+  por *outra amostra solta*, e era aí que falhava: uma amostra solta nunca
+  soa a golpe de jogo. O golpe passa a ser ar + metal com 30 ms entre eles;
+  o tiro é sopro grave + zumbido metálico.
+
+**Se ele continuar a não gostar da espada**, a receita é uma linha do
+`SONS["ataque"]` em `tools/preparar_sfx.py` — trocar as camadas, correr a
+ferramenta e importar. Os packs já estão todos em disco.
+
+Redes de segurança novas: `preparar_musica.py --verificar` (mede o degrau
+na costura de cada cama), `teste_camas_de_musica` e `teste_sfx_existem` na
+suite.
+
+---
+
+# FEITO — os dois bugs que ele apanhou a jogar (4 set 2026)
+
+## "Quando ataca com espada o ecrã treme e gera frame drop"
+
+Não era impressão. O `_hitstop` põe `Engine.time_scale = 0.0`, ou seja
+**pára o jogo**, e estava espalhado por sítios onde não devia: o balanço do
+4.º golpe parava 50 ms e abanava a câmara **sem ter acertado em nada**, o
+`_flash_golpe` abanava mais 1,8 px em todos os balanços, e cada acerto
+parava 50 ms (crítico 110 ms). Num combo de quatro acertos dava **~340 ms
+de jogo parado dentro de 1,5 s — 23% do tempo**. E o `Tremor`, a 42 px/s,
+durava 107 ms: os abanões encavalitavam-se.
+
+Regra nova, em constantes com nome (`HITSTOP_*` / `TREMOR_*` no
+`koliani.gd`): **o balanço não mexe na câmara nem pára o tempo**; só a
+ligação tem peso, e o peso é curto. `Tremor.DECAIMENTO` 42 → 70.
+
+## "Quando salta vemos alguns frames acima da cabeça dela"
+
+Duas causas, as duas medidas:
+
+1. O atlas do Shadowblade foi recortado de uma imagem de apresentação e
+   trouxe as **guias do cartaz**: uma faixa azul-escura chapada (cor
+   `(22,25,38)`) a atravessar células inteiras, desenhada *por trás* das
+   figuras, e guias tracejadas mais finas. Como encostam à figura, nem o
+   `apagar_linhas` nem o `limpar_celula` as apanhavam. Entraram
+   `apagar_faixas` (apaga **pela cor dominante**, para o cabelo desenhado
+   por cima sobreviver) e `apagar_riscos`, mais duas regras no
+   `limpar_celula`.
+2. **A fila do salto não está na grelha de 128** — o mesmo defeito da
+   corrida. Os centros medidos estão a 326, 459, 588, 720, 862 e 988: passo
+   de ~135. E duas dessas poses (720 e 862) estão mesmo **sem cabeça** no
+   atlas — o recorte de origem cortou-as. Eram elas que apareciam a meio do
+   salto. Saíram da tabela; `jump` fica com as duas poses inteiras e a
+   queda passa a usar a pose de queda da fila do salto duplo.
+
+Conferido com `tools/RigKoliani.tscn` e com uma varredura das 13 tiras:
+**zero componentes soltos acima da cabeça em qualquer frame**.
 
 ---
 
