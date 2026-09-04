@@ -1,55 +1,93 @@
-# Retomar aqui — 4 de setembro de 2026
+# Retomar aqui — 5 de setembro de 2026
 
 > **LEIA PRIMEIRO.** O topo é a **fila de pedidos do Paulo por fazer**; o
-> fundo é o que já ficou feito nesta sessão.
+> fundo é o que já ficou feito nas sessões anteriores.
 
 ---
 
-# ⚠ COMECAR AQUI — a ordem que o Paulo deu (4 set 2026)
+# ⚠ A PRÓXIMA PARAGEM — arte própria dos chefes (bloco 7, item 1)
 
-**Painel de prioridades (é a fonte de verdade da ordem):**
+**Painel de prioridades (fonte de verdade da ordem):**
 <https://claude.ai/code/artifact/875b9e60-ef1b-4866-ad8f-d273169da411>
 
-> **Regra dele: todo o pedido novo entra nessa página.** O estado de cada
-> linha (estado/bloco/ordem) vive no `db` do artifact, não no HTML — o HTML
-> só tem o catálogo `ITENS`. Acrescentar uma entrada e republicar **não**
-> estraga a organização dele. O ficheiro-fonte da página vive no scratchpad
-> da sessão que a publicou: numa sessão nova, ler o artifact
-> (`Artifact action:"read"` com o URL), gravar em ficheiro, e só depois
-> editar e republicar com o mesmo `url`.
+No `db` do painel o bloco 7 está assim (ordem dele): **0 `bosses-lore`**,
+1 `curva-acto2`, 2 `nivel-100` (fora), 4 `arte-regioes`, 5 `sino-vyrak`,
+6 `seletor-niveis`, 7 `sala-labirinto`. Ou seja: o primeiro da fila é a
+**arte própria dos chefes**, não o menu de seleção — o ponto de retoma
+antigo dizia o contrário, o painel manda.
 
-Blocos, por ordem de ataque:
+## O que foi feito na sessão de 4/5 set (`7795d03`)
 
-1. ~~**Softlock do portal**~~ — **FEITO** (`712137f`).
-   Junto com ele, os dois bugs que ele apanhou a jogar a 4 set: o ecrã a
-   engasgar no golpe de espada e os frames soltos por cima da cabeça dela
-   no salto — **os dois FEITOS**, ver mais abaixo.
-2. ~~**Som e música**~~ — **FEITO** (4 set 2026): as 40 camas refeitas para
-   fecharem sobre si próprias + rock CC0; set de sons novo para a Koliani;
-   voz própria por família de monstro; espada e mísseis em camadas. Detalhe
-   logo a seguir a esta lista.
-3. ~~**Projécteis, luz e escudo**~~ — **FEITO** (`2b3dae9`, `8bf1898`).
-   Detalhe logo a seguir a esta lista.
-4. **Infra** — ~~**APK ANDROID FEITO**~~: compilou pela primeira vez
-   (run #332) e está no Release **`android-latest`**. Falta só o **switch do
-   Pages, que só o Paulo pode dar** — ver "Bloco 4" mais abaixo.
-5. **UI, vidas, mecânicas** — ~~vidas~~ **FEITO** (`9b8a78e`);
-   ~~UI + indicador de nível~~ **FEITO** (`20d3d38`, ver mais abaixo);
-   a tabela das mecânicas **ESCRITA, à espera da aprovação dele**
-   (`docs/mecanicas_por_nivel.md`). **Nada disso se coda antes de ele
-   responder.** O bloco fica só à espera dessa resposta.
-6. ~~**Assets e licenças**~~ — **FECHADO** (`41f9f85`): o portal passou a
-   sair do pack de **domínio público** do CodeManu (o da Frostwindz, pago,
-   sai de vez). Licença do pack das balas: **ignorar** (decisão dele).
-7. ⬅ *é aqui que a próxima sessão pega* — **trabalho de fundo** (ver o
-   bloco 7 mais abaixo). O primeiro da fila é o **menu de selecção de
-   níveis**: as 14 regiões já têm nome/cor/arte, falta o passe de pedra nos
-   cartões, agora que há `scripts/ui.gd`.
-   O resto do bloco 7: **chefes com arte própria fiel ao lore, um por
-   nível**; curva do 2.º acto; arte própria das 14 regiões novas; Sino Vivo
-   + Vyrak; SalaLabirinto. (Playtest e nível 100 ele já arrumou no painel.)
-8. **Afinar** os números postos "a olho" + o glow roxo da espada, que passa
-   nos testes mas nunca foi visto em jogo.
+Os 29 chefes animados vestiam **sprites de packs emprestados**
+(`tools/importar_chefes_animados.py`). Não traduzem o lore: o Ghorak —
+guardião de tronco e raízes com núcleo roxo no peito — andava com o corpo
+de um **minotauro**; o Sino Vivo era um **baú-mímico**; a Rainha Aracnídea
+um "horror" genérico. Ficou montado o **motor para desenhar os 30 de raiz**:
+
+| ficheiro | o que é |
+|---|---|
+| `tools/chefes_desenho.py` | motor. Tudo é **polígono** (até as elipses) — roda de graça e o PIL preenche sem antialiasing, portanto sai pixel-art limpa. Contorno de 1 px, **risco interno por peça** e luz de topo. Desenha-se pequeno (corpo ~56 px) e sobe-se **x2 NEAREST** |
+| `tools/chefes_corpos.py` | os **7 planos de corpo**: humanoide, flutuante, aracnídeo, serpente, alado, quadrúpede, objeto. Cada peça leva uma `tag` |
+| `tools/chefes_gaits.py` | o "andar" de cada plano — `idle/walk/attack/hurt/death`. O ataque reparte-se em **recuo (telegrafo) · golpe · recuperar**, com o telegrafo a ocupar quase metade dos frames |
+| `tools/gerar_chefes_anim.py` | os chefes propriamente ditos + as ajudas de adereço (`nucleo`, `cranio`, `capuz`, `chifres`, `foice`, `martelo`, `espada`, `cajado`, `coroa`, `chama`, `veios`) |
+
+```bash
+python tools/gerar_chefes_anim.py --preview   # + folha de contacto
+python tools/gerar_chefes_anim.py ghorak      # só um, para iterar
+"...Godot..._console.exe" --headless --import
+```
+
+Sai no **mesmo contrato dos rigs de pack** (uma tira por estado +
+`rigs.json`), por isso o `scripts/chefe_base.gd` não muda.
+
+**Feita a Região I (5 chefes):** `ghorak`, `morvanna`, `rainha_aracnidea`,
+`entrevane`, `coracao_putrefacto`. Os testes passam.
+
+> ⚠ **As cenas ainda NÃO apontam para os rigs novos.** O jogo continua
+> exactamente como estava. A troca (`rig = "minotauro"` → `rig = "ghorak"`
+> em `scenes/actors/Chefe*.tscn`) fica para quando a arte estiver toda
+> pronta e vista em jogo — meio caminho seria uma regressão visível.
+
+## Próximos passos, por ordem
+
+1. **Afinar os dois que ficaram fracos:** a **Morvanna** está magra demais
+   (lê-se como um pau com chapéu) e as **patas da Rainha Aracnídea** quase
+   não se veem — o ângulo de repouso em `_PATAS_BASE`
+   (`tools/chefes_corpos.py`) precisa de abrir mais e o abdómen de subir.
+   O Ghorak e o Entrevane já estão no ponto; usar o Ghorak como régua.
+2. **Desenhar os 24 que faltam** (regiões II a VI). O plano de corpo de
+   cada um já está escolhido: Carcereiro humanoide com **chave no lugar da
+   cabeça**; Ignivar ferreiro com martelo; Dama da Guilhotina flutuante
+   encapuzada; Irmãos Condenados = fantasma + segundo fantasma preso por
+   corrente; Primeiro Prisioneiro humanoide com espada igual à da Koliani;
+   Sino Vivo plano `objeto`; Aerion flutuante **com asas** (o gait
+   `flutuante` já anima as juntas opcionais `asa_t`/`asa_f`); Voltaris mago
+   morto-vivo; Sacerdotisa Lunar com disco de lua; Vyrak plano `alado`;
+   Rei Ossário plano `quadrupede`; Colosso Ósseo humanoide colossal de
+   ossos; Freira Negra com velas; Naga Zeraph plano `serpente`; Olho do
+   Abismo = só um olho com tentáculos (`tirar` o corpo todo); Prefeito
+   sem cara; Açougueiro com dois cutelos; Maquinista com fornalha no peito;
+   Bispo com mitra; Noiva do Eclipse; Capitão Negro; Koliani Sombria (a
+   silhueta dela em roxo); Rei Devorador; Arauto de Zeriko; Zeriko.
+3. **Só depois:** trocar o `rig = ` das 29 `scenes/actors/Chefe*.tscn`,
+   apontar os arquétipos dos níveis 31-100 (`ChefeGenerico`) aos rigs
+   novos, e creditar em `assets/sprites/pixel/CREDITS.md` como **arte
+   própria (CC0 nossa)**.
+
+## Lições que custaram tempo (não voltar a descobrir)
+
+- **Sem risco interno por peça o boneco cola-se numa mancha só.** Braços,
+  tronco e pernas do mesmo tom deixam de se distinguir. O `desenhar()` faz
+  agora `outline=escurecer(cor, 0.45)` em cada polígono.
+- **A cabeça genérica do corpo tem `z` alto e fica por cima do capuz.** Por
+  isso as peças têm `tag` e há `tirar(pecas, "cabeca", "pescoco")`.
+- **O núcleo roxo tem de ser PEQUENO.** À primeira saiu do tamanho de uma
+  cabeça e o chefe passou a ler-se como "boneco com uma bola roxa".
+- **O osso não pode ficar no tom cheio**: era a coisa mais clara do sprite
+  e roubava o olho ao núcleo. Vai sempre `escurecer(osso, ~0.4)`.
+- O jogo normaliza o chefe pela **caixa útil do frame `idle`**
+  (`_normalizar_escala`), não pela célula — logo o ar à volta na tira não
+  faz mal nenhum.
 
 ---
 
