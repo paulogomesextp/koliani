@@ -23,6 +23,12 @@ extends Area2D
 @export var raio := 22.0
 
 const RECARGA := 0.9
+## Quanto e' que a chegada sobe acima do centro do portal parceiro. Eram 6 px
+## -- com o corpo dela (20x44 centrado) sobravam 4 px acima da plataforma, e
+## bastava o nivel andar um nada para ela nascer dentro do chao.
+const SUBIDA := 20.0
+## Quantos passos de 10 px se procura em volta antes de desistir.
+const PASSOS_LIVRES := 12
 
 var _t := 0.0
 var _cd := 0.0
@@ -149,7 +155,7 @@ func _ao_entrar(corpo: Node) -> void:
 	_cd = RECARGA
 	alvo._cd = RECARGA  # o parceiro tambem arrefece -> sem ping-pong imediato
 	var k := corpo as Node2D
-	k.global_position = alvo.global_position + Vector2(0.0, -6.0)
+	k.global_position = _lugar_livre(k, alvo.global_position + Vector2(0.0, -SUBIDA))
 	if "velocity" in k:
 		k.velocity = Vector2(k.velocity.x * 0.4, minf(k.velocity.y, 0.0))
 	if k.has_method("conceder_iframes"):
@@ -157,6 +163,47 @@ func _ao_entrar(corpo: Node) -> void:
 	_fx(global_position)
 	alvo._fx(alvo.global_position)
 	Som.toca("onda", -12.0, 1.6)
+
+
+## O ponto onde ela pode MESMO aterrar. Se o destino cru estiver dentro do
+## cenario, procura-se o livre mais proximo -- primeiro a subir, depois de
+## lado. Sem isto bastava um portal semeado rente a uma plataforma para a
+## entalar: era o softlock que o Paulo apanhou no primeiro portal (4 set
+## 2026). Se nada estiver livre devolve-se o ponto cru -- e' melhor cair do
+## que ficar preso, e a fisica trata do resto.
+func _lugar_livre(k: Node2D, base: Vector2) -> Vector2:
+	var forma := _forma_do_corpo(k)
+	if forma == null or not _ocupado(k, forma, base):
+		return base
+	for passo in PASSOS_LIVRES:
+		var d := 10.0 * float(passo + 1)
+		for desvio: Vector2 in [
+				Vector2(0.0, -d),
+				Vector2(-d * 0.6, -d), Vector2(d * 0.6, -d),
+				Vector2(-d, 0.0), Vector2(d, 0.0)]:
+			if not _ocupado(k, forma, base + desvio):
+				return base + desvio
+	return base
+
+
+## A forma de colisao do corpo dela (o primeiro `CollisionShape2D` filho).
+func _forma_do_corpo(k: Node2D) -> Shape2D:
+	for f in k.get_children():
+		if f is CollisionShape2D and (f as CollisionShape2D).shape != null:
+			return (f as CollisionShape2D).shape
+	return null
+
+
+## Ha' cenario solido (camada 1) a ocupar `pos`?
+func _ocupado(k: Node2D, forma: Shape2D, pos: Vector2) -> bool:
+	var espaco := k.get_world_2d().direct_space_state
+	var q := PhysicsShapeQueryParameters2D.new()
+	q.shape = forma
+	q.transform = Transform2D(0.0, pos)
+	q.collision_mask = 1          # so' o mundo solido
+	q.collide_with_areas = false
+	q.exclude = [k.get_rid()] if k is CollisionObject2D else []
+	return not espaco.intersect_shape(q, 1).is_empty()
 
 
 func _parceiro() -> Portal:
