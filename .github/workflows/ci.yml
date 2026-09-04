@@ -130,7 +130,12 @@ jobs:
             ls -R ~/.local/share/godot/export_templates/ 2>&1 | head -40
           } > diag.txt 2>&1
           cat diag.txt
-          sed 's/^/::warning::/' diag.txt
+          # UMA anotacao com tudo la' dentro: o GitHub so' cria as PRIMEIRAS
+          # DEZ anotacoes de cada nivel por passo, e uma linha por anotacao
+          # fazia o essencial cair fora. `%0A` e' o escape de newline dos
+          # comandos de workflow.
+          msg=$(sed 's/%/%25/g' diag.txt | awk '{printf "%s%%0A", $0}')
+          echo "::warning title=Ambiente Android::$msg"
       - name: Importar recursos
         run: godot --headless --import || true
       - name: Export APK
@@ -146,12 +151,14 @@ jobs:
           set -e
           cat apk.log
           if [ "$rc" -ne 0 ]; then
-            # `-v` enchia o log de "Loading resource:" e o `tail` so' apanhava
-            # esse ruido -- o erro fica MUITO acima. Filtra-se pelas linhas
-            # que interessam e so' depois se mostra o fim.
-            grep -aiE 'error|fail|cannot|unable|missing|invalid|not found|no export|template|keystore|apksigner|sdk' apk.log               | tail -n 15 | sed 's/^/::error::/'
-            echo "::error::--- fim do log (exit $rc) ---"
-            tail -n 6 apk.log | sed 's/^/::error::/'
+            # O "Unable to load fontconfig" repete-se e nao e' o problema
+            # (headless nao tem fontes); fora com ele para nao gastar espaco.
+            # E tudo vai numa ANOTACAO SO': o GitHub so' cria as primeiras dez
+            # anotacoes de cada nivel por passo, e uma-linha-por-anotacao
+            # fazia o essencial cair fora.
+            msg=$(grep -av 'Unable to load fontconfig' apk.log | tail -n 50 |
+                  sed 's/%/%25/g' | awk '{printf "%s%%0A", $0}')
+            echo "::error title=Export do APK (exit $rc)::$msg"
           fi
           exit "$rc"
       - uses: actions/upload-artifact@v4
