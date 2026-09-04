@@ -23,6 +23,15 @@ func _init() -> void:
 	var modo: String = args[1] if args.size() > 1 else "escudo"
 
 	await process_frame
+	# O `EstadoJogo` guarda o checkpoint entre sessoes. Depois de correr
+	# qualquer ferramenta que carregue um nivel a serio, fica la' um ponto
+	# que pertence a OUTRO nivel -- e a Koliani nasce no vazio da sala de
+	# treino e morre antes de a screenshot sair ("Trying to cast a freed
+	# object"). Limpa-se, que isto e' uma bancada.
+	var ej := root.get_node_or_null("EstadoJogo")
+	if ej:
+		ej.set("checkpoint", Vector2.ZERO)
+		ej.set("indice_nivel", 0)
 	change_scene_to_file(NIVEL)
 	await process_frame
 	await process_frame
@@ -48,6 +57,13 @@ func _init() -> void:
 		kame.lancar(Vector2.RIGHT, 10)
 		kame.set_physics_process(false)
 	else:
+		# Esperar pelo CHAO. Ela cai ao entrar no nivel e a defesa so' vale
+		# com os pes assentes -- premir cedo de mais nao levanta escudo
+		# nenhum, e a screenshot sai sem cupula por essa razao e nao por bug.
+		var voltas := 0
+		while voltas < 240 and is_instance_valid(k) 				and not (k as CharacterBody2D).is_on_floor():
+			voltas += 1
+			await process_frame
 		# `_defendendo` e' recalculado do input TODOS os frames -- por-lhe a
 		# bandeira a' mao nao serve de nada. Preme-se a accao a serio.
 		Input.action_press("defender")
