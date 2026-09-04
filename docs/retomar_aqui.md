@@ -1,35 +1,83 @@
 # Retomar aqui — 5 de setembro de 2026
 
-> **LEIA PRIMEIRO.** O topo é a **fila de pedidos do Paulo por fazer**; o
-> fundo é o que já ficou feito nas sessões anteriores.
+> **LEIA PRIMEIRO.** O topo é a **fila de pedidos do Paulo por fazer**.
 
 ---
 
-# ⚠ A PRÓXIMA PARAGEM — arte própria dos chefes (bloco 7, item 1)
+# ⚠ PEDIDOS NOVOS DO PAULO (5 set 2026) — ainda NÃO feitos
 
-**Painel de prioridades (fonte de verdade da ordem):**
-<https://claude.ai/code/artifact/875b9e60-ef1b-4866-ad8f-d273169da411>
+Estes três chegaram no fim da sessão e **ainda não estão na página de
+prioridades** — pô-los lá é o primeiro passo da próxima sessão.
 
-No `db` do painel o bloco 7 está assim (ordem dele): **0 `bosses-lore`**,
-1 `curva-acto2`, 2 `nivel-100` (fora), 4 `arte-regioes`, 5 `sino-vyrak`,
-6 `seletor-niveis`, 7 `sala-labirinto`. Ou seja: o primeiro da fila é a
-**arte própria dos chefes**, não o menu de seleção — o ponto de retoma
-antigo dizia o contrário, o painel manda.
+### A. Botão de ação na página de prioridades ⬅ *fazer primeiro*
 
-## O que foi feito na sessão de 4/5 set (`7795d03`)
+> "Na lista de prioridades quero que crie um **botão de ação** e é por aí
+> que podemos organizar que pedido se faz 1º, 2º, 3º etc."
 
-Os 29 chefes animados vestiam **sprites de packs emprestados**
-(`tools/importar_chefes_animados.py`). Não traduzem o lore: o Ghorak —
-guardião de tronco e raízes com núcleo roxo no peito — andava com o corpo
-de um **minotauro**; o Sino Vivo era um **baú-mímico**; a Rainha Aracnídea
-um "horror" genérico. Ficou montado o **motor para desenhar os 30 de raiz**:
+O painel (<https://claude.ai/code/artifact/875b9e60-ef1b-4866-ad8f-d273169da411>)
+já guarda `ordem` no `db` de cada item, mas **não há maneira de ele mexer
+nessa ordem pela página**. É isso que ele está a pedir: um controlo por
+linha (setas ↑/↓ ou um campo de posição) que escreva o `ordem` novo no `db`.
+Ver a regra em [[pagina-prioridades-koliani]]: o estado vive no `db`, o
+HTML só tem o catálogo `ITENS`; republicar não estraga a organização dele.
+
+Para editar a página numa sessão nova: `Artifact action:"read"` com o URL,
+gravar em ficheiro, editar, republicar com o **mesmo `url`**.
+
+### B. Todo o pedido singular entra na lista de prioridades
+
+> "Estes pedidos singulares que vou fazendo vá adicionando sempre à lista
+> de prioridades."
+
+Regra permanente. **Incluindo estes três.**
+
+### C. Música do chefe no último checkpoint, não ao primeiro golpe
+
+> "Começar o soundtrack dos bosses assim que apanharmos o último checkpoint
+> que está ao pé deles."
+
+Hoje a música de chefe só entra ao **1.º golpe** (`_musica_boss` em
+`scripts/chefe_base.gd`, mudado na maratona de playtest de 2 set). Ele quer
+que entre mais cedo: quando a Koliani acende a **fogueira/checkpoint mais
+próximo da arena**. Sítios a mexer: `scripts/checkpoint.gd` (saber que é o
+último do nível) e o arranque da cama de chefe no autoload `Musica`.
+
+---
+
+# ⚠ EM CURSO — arte própria dos 100 chefes
+
+**O Paulo aprovou o conceito e alargou o pedido a TODOS os níveis:**
+
+> "Adorei o conceito destes bosses, quero que faça todos assim desde nível
+> 1 a 100!" · "Baseia-se no guia até nível 100 para nomes dos bosses e lore
+> story."
+
+Fontes de lore: [`niveis.md`](niveis.md) (1–30) e
+[`plano_niveis_31_100.md`](plano_niveis_31_100.md) (31–100). São **100
+identidades distintas** (47 `boss.*` + 53 `guard.*` em
+`scripts/catalogo_campanha.gd`) — o guia dá um chefe com nome a cada nível.
+
+## Estado
+
+| | |
+|---|---|
+| **Feitos e afinados** | Região I (5): `ghorak`, `morvanna`, `rainha_aracnidea`, `entrevane`, `coracao_putrefacto` |
+| **Escritos, por ligar à tabela `CHEFES`** | Região II e III (10): `_carcereiro`, `_ignivar`, `_dama_guilhotina`, `_irmaos_condenados`, `_primeiro_prisioneiro`, `_sino_vivo`, `_aerion`, `_voltaris`, `_sacerdotisa_lunar`, `_vyrak` — as funções `extras` já estão em `tools/gerar_chefes_anim.py`, **falta a entrada no dicionário `CHEFES`** (plano de corpo, proporções, paleta) |
+| **Por desenhar** | 85 (regiões IV a XX) |
+
+> ⚠ **As cenas ainda NÃO apontam para os rigs novos.** O jogo está
+> exactamente como estava. A troca do `rig = ` nas 29
+> `scenes/actors/Chefe*.tscn` é só quando estiver tudo pronto — meio
+> caminho seria uma regressão visível.
+
+## As ferramentas
 
 | ficheiro | o que é |
 |---|---|
-| `tools/chefes_desenho.py` | motor. Tudo é **polígono** (até as elipses) — roda de graça e o PIL preenche sem antialiasing, portanto sai pixel-art limpa. Contorno de 1 px, **risco interno por peça** e luz de topo. Desenha-se pequeno (corpo ~56 px) e sobe-se **x2 NEAREST** |
+| `tools/chefes_desenho.py` | motor. Tudo é **polígono** (até as elipses) — roda de graça e o PIL preenche sem antialiasing, portanto sai pixel-art limpa. Contorno de 1 px, **risco interno por peça**, luz de topo. Desenha pequeno (~56 px) e sobe **x2 NEAREST** |
 | `tools/chefes_corpos.py` | os **7 planos de corpo**: humanoide, flutuante, aracnídeo, serpente, alado, quadrúpede, objeto. Cada peça leva uma `tag` |
-| `tools/chefes_gaits.py` | o "andar" de cada plano — `idle/walk/attack/hurt/death`. O ataque reparte-se em **recuo (telegrafo) · golpe · recuperar**, com o telegrafo a ocupar quase metade dos frames |
-| `tools/gerar_chefes_anim.py` | os chefes propriamente ditos + as ajudas de adereço (`nucleo`, `cranio`, `capuz`, `chifres`, `foice`, `martelo`, `espada`, `cajado`, `coroa`, `chama`, `veios`) |
+| `tools/chefes_gaits.py` | o "andar" de cada plano. O ataque reparte-se em **recuo (telegrafo) · golpe · recuperar** |
+| `tools/gerar_chefes_anim.py` | os chefes + as ajudas de adereço: `nucleo`, `cranio`, `capuz`, `elmo`, `mitra`, `chifres`, `asas`, `corrente`, `disco`, `tentaculos`, `foice`, `martelo`, `espada`, `cutelo`, `lanca`, `escudo`, `cajado`, `coroa`, `chapeu_alto`, `cristais`, `engrenagem`, `chama`, `veios` |
 
 ```bash
 python tools/gerar_chefes_anim.py --preview   # + folha de contacto
@@ -37,57 +85,30 @@ python tools/gerar_chefes_anim.py ghorak      # só um, para iterar
 "...Godot..._console.exe" --headless --import
 ```
 
-Sai no **mesmo contrato dos rigs de pack** (uma tira por estado +
-`rigs.json`), por isso o `scripts/chefe_base.gd` não muda.
-
-**Feita a Região I (5 chefes):** `ghorak`, `morvanna`, `rainha_aracnidea`,
-`entrevane`, `coracao_putrefacto`. Os testes passam.
-
-> ⚠ **As cenas ainda NÃO apontam para os rigs novos.** O jogo continua
-> exactamente como estava. A troca (`rig = "minotauro"` → `rig = "ghorak"`
-> em `scenes/actors/Chefe*.tscn`) fica para quando a arte estiver toda
-> pronta e vista em jogo — meio caminho seria uma regressão visível.
-
-## Próximos passos, por ordem
-
-1. **Afinar os dois que ficaram fracos:** a **Morvanna** está magra demais
-   (lê-se como um pau com chapéu) e as **patas da Rainha Aracnídea** quase
-   não se veem — o ângulo de repouso em `_PATAS_BASE`
-   (`tools/chefes_corpos.py`) precisa de abrir mais e o abdómen de subir.
-   O Ghorak e o Entrevane já estão no ponto; usar o Ghorak como régua.
-2. **Desenhar os 24 que faltam** (regiões II a VI). O plano de corpo de
-   cada um já está escolhido: Carcereiro humanoide com **chave no lugar da
-   cabeça**; Ignivar ferreiro com martelo; Dama da Guilhotina flutuante
-   encapuzada; Irmãos Condenados = fantasma + segundo fantasma preso por
-   corrente; Primeiro Prisioneiro humanoide com espada igual à da Koliani;
-   Sino Vivo plano `objeto`; Aerion flutuante **com asas** (o gait
-   `flutuante` já anima as juntas opcionais `asa_t`/`asa_f`); Voltaris mago
-   morto-vivo; Sacerdotisa Lunar com disco de lua; Vyrak plano `alado`;
-   Rei Ossário plano `quadrupede`; Colosso Ósseo humanoide colossal de
-   ossos; Freira Negra com velas; Naga Zeraph plano `serpente`; Olho do
-   Abismo = só um olho com tentáculos (`tirar` o corpo todo); Prefeito
-   sem cara; Açougueiro com dois cutelos; Maquinista com fornalha no peito;
-   Bispo com mitra; Noiva do Eclipse; Capitão Negro; Koliani Sombria (a
-   silhueta dela em roxo); Rei Devorador; Arauto de Zeriko; Zeriko.
-3. **Só depois:** trocar o `rig = ` das 29 `scenes/actors/Chefe*.tscn`,
-   apontar os arquétipos dos níveis 31-100 (`ChefeGenerico`) aos rigs
-   novos, e creditar em `assets/sprites/pixel/CREDITS.md` como **arte
-   própria (CC0 nossa)**.
-
 ## Lições que custaram tempo (não voltar a descobrir)
 
-- **Sem risco interno por peça o boneco cola-se numa mancha só.** Braços,
-  tronco e pernas do mesmo tom deixam de se distinguir. O `desenhar()` faz
-  agora `outline=escurecer(cor, 0.45)` em cada polígono.
-- **A cabeça genérica do corpo tem `z` alto e fica por cima do capuz.** Por
-  isso as peças têm `tag` e há `tirar(pecas, "cabeca", "pescoco")`.
-- **O núcleo roxo tem de ser PEQUENO.** À primeira saiu do tamanho de uma
-  cabeça e o chefe passou a ler-se como "boneco com uma bola roxa".
-- **O osso não pode ficar no tom cheio**: era a coisa mais clara do sprite
-  e roubava o olho ao núcleo. Vai sempre `escurecer(osso, ~0.4)`.
-- O jogo normaliza o chefe pela **caixa útil do frame `idle`**
-  (`_normalizar_escala`), não pela célula — logo o ar à volta na tira não
-  faz mal nenhum.
+- **Sem risco interno por peça o boneco cola-se numa mancha só.** O
+  `desenhar()` faz `outline=escurecer(cor, 0.45)` em cada polígono.
+- **A cabeça genérica tem `z` alto e fica por cima do capuz** → as peças
+  têm `tag` e há `tirar(pecas, "cabeca", "pescoco")` / `pintar(...)`.
+- **Um ângulo de repouso tem de ir para a JUNTA, não só para o desenho.**
+  Foi o bug das patas da aranha: o joelho nascia por baixo da barriga.
+- **O núcleo roxo tem de ser PEQUENO** — à primeira o chefe lia-se como
+  "boneco com uma bola roxa".
+- **O osso nunca vai no tom cheio** (`escurecer(osso, ~0.4)`): era a coisa
+  mais clara do sprite e roubava o olho ao núcleo.
+- Não apagar peças que SÃO o lore (o rosto humano da Rainha Aracnídea).
+- O jogo normaliza o chefe pela **caixa útil do frame `idle`**, não pela
+  célula — logo o ar à volta na tira não faz mal nenhum.
+
+## Ordem de trabalho
+
+1. Os três pedidos novos aí em cima (A, B, C).
+2. Ligar os 10 da Região II/III à tabela `CHEFES` e ver a folha de contacto.
+3. Desenhar as regiões IV a XX (85 chefes), a comitar por região.
+4. Só no fim: trocar o `rig = ` das cenas, apontar os arquétipos dos níveis
+   31-100 e creditar em `assets/sprites/pixel/CREDITS.md` como **arte
+   própria (CC0 nossa)**.
 
 ---
 
