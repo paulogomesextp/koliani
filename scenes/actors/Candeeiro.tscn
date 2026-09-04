@@ -1,0 +1,48 @@
+[gd_scene load_steps=6 format=3 uid="uid://bkolianicandeeiro01"]
+
+; Fonte de luz de cenario (ver scripts/candeeiro.gd). Dois feitios pelo
+; `tipo`: "candeeiro" (poste gotico de tres lanternas, GothicVania Town) e
+; "tocha" (chama de parede animada de 4 frames, Cold Corridors). Os dois
+; recortados por tools/gerar_luzes.py. Nao tem colisao: e' decoracao que
+; ilumina. Quem os espalha pelos niveis e' o nivel_com_chefe.gd::_iluminar.
+; A ORIGEM DO NO E' O PE' (candeeiro) ou o encaixe na parede (tocha).
+
+[ext_resource type="Script" path="res://scripts/candeeiro.gd" id="1_cand"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/props/candeeiro.png" id="2_cand"]
+
+[sub_resource type="Gradient" id="grad_luz"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="tex_luz"]
+gradient = SubResource("grad_luz")
+width = 256
+height = 256
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[sub_resource type="CanvasItemMaterial" id="mat_add"]
+blend_mode = 1
+
+[node name="Candeeiro" type="Node2D"]
+script = ExtResource("1_cand")
+
+[node name="Luz" type="PointLight2D" parent="."]
+position = Vector2(0, -74)
+texture = SubResource("tex_luz")
+energy = 1.0
+color = Color(1, 0.76, 0.45, 1)
+scale = Vector2(1.6, 1.6)
+
+[node name="Corpo" type="Sprite2D" parent="."]
+texture_filter = 1
+texture = ExtResource("2_cand")
+offset = Vector2(0, -54)
+
+[node name="Brilho" type="Sprite2D" parent="."]
+material = SubResource("mat_add")
+position = Vector2(0, -74)
+texture = SubResource("tex_luz")
+modulate = Color(1, 0.76, 0.45, 0.34)
+scale = Vector2(0.11, 0.11)

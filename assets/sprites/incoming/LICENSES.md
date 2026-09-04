@@ -53,6 +53,9 @@ página do itch/Kenney). O agente usa isto para gerar `assets/sprites/pixel/CRED
 
 ## ansimuz-parallax
 - URL(s): https://ansimuz.itch.io/  (colar cada pack de parallax usado)
+- Usado tambem em: `props/tocha.png` (Cold Corridors -> Assets/Torch) e
+  `props/candeeiro.png` (GothicVania Town -> props-sliced/street-lamp.png),
+  recortados por `tools/gerar_luzes.py`.
 - Licença: (colar o texto exacto da página)
 - Autor: Ansimuz (Luis Zuno)
 

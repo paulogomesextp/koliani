@@ -357,3 +357,14 @@ Szadi art *Fantasy Caves* (catacumbas), ansimuz *GothicVania Town*
 O portal animado da **Frostwindz** foi experimentado no mesmo dia mas **não
 entrou** — é pago e a licença proíbe redistribuir os ficheiros, e este repo é
 público. Ver `assets/sprites/incoming/LICENSES.md`.
+
+## Candeeiros e tochas (4 set 2026)
+O Paulo: *"o jogo está um bocado escuro no geral, coloque candeeiros ou
+lâmpadas a acompanhar os níveis"*. Recortados por `tools/gerar_luzes.py`,
+espalhados por `scripts/nivel_com_chefe.gd::_iluminar` e conferidos por
+`tools/verifica_luzes.gd`. Os dois são do Ansimuz (Luis Zuno), os mesmos
+packs de onde já vêm fundos do jogo:
+- **GothicVania Town** — `props-sliced/street-lamp.png` -> `props/candeeiro.png`
+  (poste gótico de três lanternas, 35x108).
+- **Cold Corridors** — `Assets/Torch/torch-sheet.png` -> `props/tocha.png`
+  (chama de parede, 4 frames).
