@@ -13,6 +13,58 @@
 - ✅ **Menus de arma/armadura em carrossel**, com preview e stats/diferenças.
 - ✅ **PRIORIDADE: o rig "Shadowblade" (arte dele) é a Koliani principal.**
 
+## FEITO — o rig Shadowblade a sério (4 set 2026)
+
+Três queixas dele sobre o boneco novo, todas resolvidas:
+
+> *"Parece que tem algum frame drop e duplica kolianis."*
+
+A ferramenta antiga deitava fora a grelha do atlas e procurava as figuras por
+componentes ligados. Como a arte de células vizinhas se toca, saíam **frames
+com duas Kolianis** e frames com meio corpo — e um frame de ataque SEM
+personagem nenhuma (a célula que só tem o raio magenta). É isso que se lê
+como frame drop. Agora `tools/importar_rig_shadowblade.py` usa a grelha real
+(8×5 de 128×160, a mesma do `.tres` que veio no pack), limpa o transbordo do
+vizinho célula a célula e ancora tudo pela **mediana do tronco** + linha do
+chão, sem recentrar figura a figura (era isso que fazia a personagem tremer).
+
+A **linha da corrida** é o caso feio: cada pose está desenhada DUAS VEZES com
+~35 px de desvio e as cópias tapam-se. As cinco janelas de `run1..run5` na
+tabela `FRAMES` foram medidas à mão sobre a cópia que ficou inteira; a 6.ª
+pose fica cortada pela margem do atlas e perde-se. **Se o Paulo reexportar o
+atlas com a linha da corrida espaçada, é só acrescentar uma linha à tabela.**
+
+Do lado do código, `koliani.gd` deixou de deformar o sprite: a animação
+procedural (balanço da corrida, inclinação, "respirar" parado, esticão do
+salto) era feita para o rig vectorial e, num sprite de pixel-art com filtro
+Nearest, escalar/rodar continuamente faz os pixéis saltarem. Fica só o que é
+transitório (squash de aterragem, pop e smear do golpe) — ver `RIG_PIXEL`.
+
+> *"Nos combos de ataque faz sempre a mesma animação."*
+
+A linha de ataque do atlas tem quatro poses diferentes e estavam todas na
+mesma tira. Agora são quatro tiras: `attack` (corte descendente), `attack2`
+(arco roxo por cima), `attack3` (estocada + raio, com o feixe composto por
+cima do corpo) e `attack4` (investida rasteira). O `_iniciar_ataque` já conta
+o rig "shadowblade" como tendo combo.
+
+> *"Pendurada numa parede esquerda aparece agarrada no lado direito."*
+
+As poses de parede foram desenhadas com a parede à ESQUERDA dela, ao
+contrário da convenção "virada à direita" do resto do rig. `_flip_sprite()`
+inverte o espelho quando a animação a desenhar é `wallslide`/`borda`
+(`PAREDE_ESPELHADA`).
+
+Ferramenta nova para conferir: **`tools/RigKoliani.tscn`** — todos os estados
+lado a lado, dentro do jogo, com a linha do chão e a pose de parede
+espelhada.
+
+```bash
+"...Godot..." --window --screen 1 res://tools/RigKoliani.tscn -- user://rig.png
+```
+
+---
+
 ## POR FAZER — pedidos "secundários" (ele próprio classificou assim)
 
 Ele disse: *"meta os pedidos que fiz como secundários e dê prioridade a
@@ -177,8 +229,9 @@ Ao contrário, o gerador apaga a atmosfera afinada.
 - Em `--script` os autoloads **não existem como identificador**; buscá-los
   pela árvore (`get_root().get_node("/root/EstadoJogo")`), como fazem o
   `folha_de_contacto.gd` e o `shot_equip.gd`.
-- `ERROR: There is no animation with name 'idle'` aparece em todos os níveis
-  em `--headless` — é do renderer dummy, não é regressão.
+- `ERROR: There is no animation with name 'idle'` vinha do `Koliani.tscn`, que
+  declarava `animation = &"idle"` num `AnimatedSprite2D` sem `SpriteFrames`
+  (quem os monta é o `_montar_frames`). Removido a 4 set 2026.
 - **Heredocs longos pelo Bash tool corrompem-se** — escrever o ficheiro com
   a ferramenta de escrita, ou pôr o script no scratchpad e correr o ficheiro.
 - Os `.json` de i18n **não estão por ordem alfabética** (a ordem agrupa por

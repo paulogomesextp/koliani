@@ -263,6 +263,22 @@ func _ready() -> void:
 ##      `tools/importar_rig_koliani_nova.py`.
 const RIG := "shadowblade"
 
+## Rigs desenhados frame a frame (tudo menos o "codigo", que é um boneco
+## vectorial montado por código). Neles a animação PROCEDURAL de `_animar`
+## -- o balanço da corrida, a inclinação, o "respirar" parado, o esticão do
+## salto -- é contraproducente: escalar e rodar continuamente um sprite com
+## filtro Nearest faz os pixéis saltarem dentro da figura, e lê-se como
+## tremura ou frame drop. Foi metade da queixa do Paulo (4 set 2026:
+## "parece que tem algum frame drop"). Fica só o que é transitório
+## (squash de aterragem, pop e smear do golpe), que dura décimas de segundo.
+const RIG_PIXEL := RIG != "codigo"
+
+## As poses de PAREDE do rig "shadowblade" foram desenhadas com a parede à
+## ESQUERDA da Koliani -- ao contrário da convenção "virada à direita" que o
+## resto do rig segue. Espelhá-las como as outras punha-a agarrada ao lado
+## errado numa parede esquerda (pedido do Paulo, 4 set 2026).
+const PAREDE_ESPELHADA := RIG == "shadowblade"
+
 ## [n_frames, fps, loop] por estado. Cada tira é horizontal, virada à direita.
 const _KOLI_ANIMS := {
 	"idle":      [4, 6.0, true],
@@ -316,24 +332,33 @@ const _KOLI_ANIMS_CAVALEIRO := {
 const CAV_ESCALA := 0.8
 const CAV_OFFSET_Y := -2.0
 
-## Rig "shadowblade" -- a arte do Paulo (4 set 2026). Frames de 52x64, com a
+## Rig "shadowblade" -- a arte do Paulo (4 set 2026). Frames de 51x64, com a
 ## personagem a medir ~59 px e os pés na base (a tira já sai reduzida do
 ## `importar_rig_shadowblade.py`, por isso o jogo desenha-a a 1:1).
 ##
-## O atlas tem SETE estados; os outros onze que o rig "cavaleiro" tinha
-## (roll/dash/hurt/defesa/borda/aterrar/morte e o combo attack2/3/4) não
-## existem -- `_atualizar_anim` pergunta sempre `has_animation` antes de os
-## usar, portanto caem no estado mais próximo em vez de rebentar. O `crouch`
-## só tem 2 poses e o `fall` é derivado do fim do `jump`.
+## As 34 poses do atlas dão 13 estados (ver `ESTADOS` na ferramenta). O
+## `fps` de cada golpe do combo acompanha o `DUR_COMBO` correspondente, para
+## a animação acabar exactamente com o golpe. Os estados que faltam
+## (roll/dash/hurt/defesa/morte) não existem neste rig -- `_atualizar_anim`
+## pergunta sempre `has_animation` antes de os usar.
 const _KOLI_ANIMS_SHADOW := {
 	"idle":      [4, 6.0, true],
-	"run":       [6, 12.0, true],
-	"jump":      [7, 12.0, false],
+	"run":       [5, 13.0, true],
+	"jump":      [3, 14.0, false],
 	"fall":      [2, 7.0, true],
-	"attack":    [6, 20.0, false],
-	"crouch":    [2, 6.0, true],
+	"aterrar":   [2, 16.0, false],
+	## combo de espada -- cada golpe tem a sua pose (corte descendente, arco
+	## por cima, estocada com raio, investida rasteira). Antes eram os seis
+	## frames da linha de ataque todos na MESMA tira, e por isso o combo
+	## "fazia sempre a mesma animação" (Paulo, 4 set 2026).
+	"attack":    [3, 17.0, false],
+	"attack2":   [3, 15.0, false],
+	"attack3":   [3, 10.0, false],
+	"attack4":   [4, 21.0, false],
+	"crouch":    [1, 6.0, true],
 	"wallslide": [3, 8.0, true],
-	"djump":     [5, 18.0, false],
+	"borda":     [2, 5.0, true],
+	"djump":     [4, 14.0, false],
 }
 ## Os pés estão em y=62 do frame de 64 (30 px abaixo do centro) e a colisão
 ## mede 44 de alto (base 22 abaixo da origem): -8 põe os pés no chão.
@@ -921,8 +946,10 @@ func _detetar_borda(lado: float) -> float:
 
 
 func _process(dt: float) -> void:
-	_animar(dt)
+	# a escolha da tira vem PRIMEIRO: `_animar` precisa de saber que animação
+	# está a ser desenhada para decidir o flip (ver `_flip_sprite`)
 	_atualizar_anim()
+	_animar(dt)
 
 
 ## Escolhe a animação do corpo conforme o estado (visual apenas).
@@ -985,6 +1012,17 @@ func _atualizar_anim() -> void:
 		_arma.position = off
 
 
+## Para que lado o sprite é espelhado. Por omissão é `_olha_para` (as tiras
+## estão viradas à direita), menos nas poses agarradas à parede -- ver
+## `PAREDE_ESPELHADA`. Olha para a animação que está MESMO a ser desenhada,
+## para não inverter a Koliani quando o estado de parede escolhe outra tira.
+func _flip_sprite() -> float:
+	if PAREDE_ESPELHADA and _corpo != null \
+			and (_corpo.animation == &"wallslide" or _corpo.animation == &"borda"):
+		return -_olha_para
+	return _olha_para
+
+
 ## Animação procedural do sprite: flip, squash/stretch, lean, pop de
 ## ataque e rastro da lâmina. Nada disto afeta a física.
 func _animar(dt: float) -> void:
@@ -1024,12 +1062,17 @@ func _animar(dt: float) -> void:
 	elif _dash_restante > 0.0:
 		escala = Vector2(1.32, 0.78)
 		_sprite.rotation = lerp_angle(_sprite.rotation, 0.0, dt * 18.0)
-	elif _escalando:
+	elif _escalando and not RIG_PIXEL:
 		escala = Vector2(0.86, 1.14)  # esticada contra a parede
 		_sprite.rotation = lerp_angle(_sprite.rotation, _olha_para * 0.14, dt * 14.0)
 	else:
 		_sprite.rotation = lerp_angle(_sprite.rotation, rot_alvo, dt * 12.0)
-		if not no_chao:
+		# Num rig de pixel-art nada disto se aplica: a pose de cada estado já
+		# está desenhada, e deformar o sprite por cima só faz os pixéis
+		# saltarem (ver `RIG_PIXEL`).
+		if RIG_PIXEL:
+			pass
+		elif not no_chao:
 			if velocity.y < 0.0:
 				escala = Vector2(0.86, 1.16)
 			else:
@@ -1054,7 +1097,11 @@ func _animar(dt: float) -> void:
 		_sprite.rotation = lerp_angle(_sprite.rotation, -_olha_para * 0.16, minf(1.0, dt * 22.0))
 	else:
 		_sprite.position.x = move_toward(_sprite.position.x, 0.0, dt * 90.0)
-	_sprite.scale = Vector2(escala.x * _olha_para, escala.y)
+	if RIG_PIXEL:
+		# em pixel-art o sprite tem de assentar em pixéis INTEIROS: meio pixel
+		# de desvio faz a personagem cintilar com o filtro Nearest
+		_sprite.position.x = roundf(_sprite.position.x)
+	_sprite.scale = Vector2(escala.x * _flip_sprite(), escala.y)
 
 	_animar_rastro(dt)
 
@@ -1141,7 +1188,7 @@ func _iniciar_ataque() -> void:
 	# senão volta ao 1.º hit ("Single").
 	_combo_passo = (_combo_passo + 1) % NUM_COMBO if _combo_janela > 0.0 else 0
 	# o combo de 4 golpes existe nos rigs com tiras `attack2/3/4`
-	var tem_combo := RIG == "cavaleiro" or RIG == "nova"
+	var tem_combo := RIG == "cavaleiro" or RIG == "nova" or RIG == "shadowblade"
 	_ataque_dur = DUR_COMBO[_combo_passo] if tem_combo else DUR_ATAQUE
 	_ataque_restante = _ataque_dur
 	_combo_janela = _ataque_dur + JANELA_COMBO

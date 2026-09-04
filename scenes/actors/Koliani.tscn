@@ -60,10 +60,12 @@ end_cap_mode = 2
 joint_mode = 2
 visible = false
 
+; sem `animation` nem `sprite_frames`: quem os monta e' o `_montar_frames`
+; do koliani.gd, conforme o RIG escolhido. Declarar `animation = "idle"` aqui
+; so' dava um erro "There is no animation with name 'idle'" ao instanciar.
 [node name="Corpo" type="AnimatedSprite2D" parent="Sprite"]
 texture_filter = 1
 position = Vector2(0, -2)
-animation = &"idle"
 
 [node name="Armadura" type="Node2D" parent="Sprite"]
 visible = false

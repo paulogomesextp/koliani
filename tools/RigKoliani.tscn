@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://brigkoliani001"]
+
+; Folha de contacto do rig da Koliani DENTRO DO JOGO -- ver shot_rig_koliani.gd
+
+[ext_resource type="Script" path="res://tools/shot_rig_koliani.gd" id="1_rig"]
+
+[node name="RigKoliani" type="Node2D"]
+script = ExtResource("1_rig")
