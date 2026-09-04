@@ -21,11 +21,8 @@
 Blocos, por ordem de ataque:
 
 1. ~~**Softlock do portal**~~ — **FEITO** (`712137f`), ver abaixo.
-2. **Som e música** — ⬅ *é aqui que a próxima sessão pega.* Sons da Koliani
-   (animações, ataques) e sons por espécie de monstro; trocar a música do
-   Nível 32 (esquisita, com cortes) e usar o final da do 38 (rock) como
-   referência. A espada e os mísseis já foram sintetizados duas vezes sem
-   agradar — **desta vez ir buscar samples reais CC0**, não sintetizar.
+2. **Som e música** — ⬅ *é aqui que a próxima sessão pega.* Ver o
+   levantamento já feito, logo a seguir a esta lista.
 3. **Projécteis, luz e escudo** — aura roxa à volta dela
    (`Koliani.tscn → Sprite/LuzAura`, já existe, é ligar); laser roxo do
    Wenrexa nos projécteis (ver ponto 0 abaixo); candeeiros/tochas com luz
@@ -50,6 +47,53 @@ Blocos, por ordem de ataque:
    SalaLabirinto.
 8. **Afinar** os números postos "a olho" + o glow roxo da espada, que passa
    nos testes mas nunca foi visto em jogo.
+
+---
+
+# BLOCO 2 (som) — levantamento já feito, começar por aqui
+
+## Correcção a uma nota antiga: os SFX **já não são sintetizados**
+
+`assets/audio/CREDITS.md` regista que a 3 set 2026 os SFX de combate, mobs e
+UI foram trocados por **samples reais CC0 do OpenGameArt**. A espada
+(`ataque`) vem do pack *20 Sword Sound Effects* do StarNinjas; o `lancar`
+vem dos *80 CC0 RPG SFX* do rubberduck. Só as **camas** (`ambiente`, `menu`,
+`boss`, `assombracao`, `game_over`) continuam sintetizadas por
+`tools/gerar_audio.py`.
+
+**Portanto o problema não é "sintetizado vs. real" — é a ESCOLHA da
+amostra.** Não perder tempo a sintetizar nem a "ir buscar samples reais":
+já são reais. É preciso ouvir alternativas e escolher melhor, com o Paulo a
+decidir, para `ataque` (espada) e para os mísseis (`lancar` / `projetil`).
+O mapa nome→ficheiro está em `scripts/som.gd`.
+
+## A música do Nível 32: identificada
+
+`scripts/musica.gd` escolhe a faixa por `indice_nivel % 20` (20 faixas de
+nível + 20 de chefe, em ciclo — pedido dele a 3 set). Logo:
+
+| Nível | índice | `% 20` | ficheiro | faixa |
+| --- | --- | --- | --- | --- |
+| 32 | 31 | 11 | `musica/niveis/nivel_12.ogg` | *Zwischenwelt* — Of Far Different Nature (CC-BY 4.0) |
+| 38 | 37 | 17 | `musica/niveis/nivel_18.ogg` | *Waking the devil* — Alexander Ehlers (**CC0**) |
+
+- **A trocar** é a `nivel_12.ogg`. O "tem vários cortes" de que ele se
+  queixa é coerente com o processo: todas as faixas foram **cortadas a
+  ~70-80 s com fade-out e recodificadas a 64 kbps mono** para caber no
+  orçamento de espaço — nessa a emenda do loop deve estar audível. Vale a
+  pena confirmar se o defeito é do corte (recortar melhor) ou da faixa
+  (substituir de vez).
+- **A referência de tom rock** que ele adorou é a `nivel_18.ogg`. Boa
+  notícia: é **CC0** e vem do [Free Music Pack](https://opengameart.org/content/free-music-pack)
+  do Alexander Ehlers, que tem mais material no mesmo registo — é por aí
+  que se procuram as próximas.
+
+## O resto do pedido dele, por fazer
+
+- Set de sons para as **animações** dela (passos, salto, rolamento,
+  aterrar), não só ataques.
+- Sons **por espécie de monstro** — hoje há `demonio_ataque`, `garra`,
+  `grito`, `praga` partilhados por todos.
 
 ---
 
