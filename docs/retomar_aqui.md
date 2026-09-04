@@ -28,21 +28,16 @@ Blocos, por ordem de ataque:
    fecharem sobre si próprias + rock CC0; set de sons novo para a Koliani;
    voz própria por família de monstro; espada e mísseis em camadas. Detalhe
    logo a seguir a esta lista.
-3. **Projécteis, luz e escudo** — ⬅ *é aqui que a próxima sessão pega.*
-   Aura roxa à volta dela
-   (`Koliani.tscn → Sprite/LuzAura`, já existe, é ligar); laser roxo do
-   Wenrexa nos projécteis (ver ponto 0 abaixo); candeeiros/tochas com luz
-   própria ao longo dos níveis; escudo melhor + escudo de energia roxo.
-4. **Infra** — CI do APK falha desde o run 264. Plano combinado: arranjar o
-   CI, publicar o APK num Release de tag rolante (`android-latest`, a par do
-   `win-latest`), e ligar o **GitHub Pages ao build Web** — o preset "Web"
-   já é exportado pelo CI mas não é publicado em lado nenhum. O iPhone não
-   tem caminho nativo grátis (Apple ID grátis expira em 7 dias e exige Mac;
-   TestFlight exige os 99 €/ano), portanto a Web é a saída para iOS.
-5. **UI, vidas, mecânicas** — UI + indicador de nível; vidas a começar em 5
-   e +1 por nível (o mais rápido de todos, só `EstadoJogo`); e o pedido
-   grande: uma mecânica nova por nível, que **começa pela tabela**
-   `docs/mecanicas_por_nivel.md` para ele aprovar, não por código.
+3. ~~**Projécteis, luz e escudo**~~ — **FEITO** (`2b3dae9`, `8bf1898`).
+   Detalhe logo a seguir a esta lista.
+4. **Infra** — ⬅ *a meio.* Mexido em `718a133`: o APK vai para um Release
+   `android-latest` e o Web para o **GitHub Pages**. O export do APK
+   continua por confirmar — ver "Bloco 4" mais abaixo.
+5. **UI, vidas, mecânicas** — ⬅ *é aqui que a próxima sessão pega.*
+   ~~vidas a começar em 5 e +1 por nível~~ **FEITO** (`9b8a78e`). Falta a
+   UI + indicador de nível; e o pedido grande: uma mecânica nova por nível,
+   que **começa pela tabela** `docs/mecanicas_por_nivel.md` para ele
+   aprovar, não por código.
 6. **Assets e licenças** — portal da Frostwindz: **cancelar a mudança ou
    achar um equivalente grátis**. Licença do pack das balas: **ignorar**
    (decisão dele).
@@ -53,6 +48,114 @@ Blocos, por ordem de ataque:
    SalaLabirinto.
 8. **Afinar** os números postos "a olho" + o glow roxo da espada, que passa
    nos testes mas nunca foi visto em jogo.
+
+---
+
+# BLOCO 3 (projécteis, aura, luz e escudo) — **FECHADO** (4 set 2026)
+
+Os quatro pedidos dele deste bloco estão feitos.
+
+## Laser roxo do Wenrexa — `2b3dae9`
+
+`tools/gerar_fx_laser.py` recorta o pack **Wenrexa "Laser2020"** (CC0, uso
+comercial, sem crédito obrigatório). O tiro dela é o cometa magenta
+(`13.png` -> `fx/laser_roxo.png`) e o Kamehameha é o raio aos ziguezagues
+(`22.png` -> `fx/laser_raio_roxo.png`), que substituiu os três `Polygon2D`
+desenhados à mão — eram a parte que se lia como feita por código.
+
+> ⚠ **A escolha dele não bate certo com os nomes dos ficheiros.** Ficou
+> registado que escolheu "o último da primeira fila da capa" e que era um
+> "cometa magenta de cauda comprida". A capa mostra 10 por linha e os
+> ficheiros também andam de 10 em 10 — mas o **10.º é uma bola AMARELA**.
+> Foi-se pelo conteúdo e pelo pedido escrito ("roxo com brilho"). **Se ele
+> disser que não é este, é uma linha na tabela `LASERS` da ferramenta** —
+> há 66 no pack, e a folha de contacto tira-se com
+> `tools/gerar_fx_laser.py` + um mosaico.
+
+São glows de alta resolução, **não pixel-art**: os nós desenham-nos com
+`texture_filter = 2` (LINEAR). A Nearest sairiam aos degraus. O tiro deixou
+de ter tira de frames — o "vivo" é o pulsar da escala.
+
+## Aura roxa — `2b3dae9`
+
+Duas metades no `Koliani.tscn`: o **`Sprite/Halo`** (degradé radial aditivo,
+por trás do corpo) que se vê, e a **`LuzAura`** que já lá estava — agora
+roxa a sério e com força — que ilumina o cenário. Respiram em conjunto e
+**acendem** quando ela golpeia, dá dash ou lança (`_acender_aura`); o 4.º
+golpe do combo e o Kamehameha são os que mais a fazem estoirar.
+
+## Escudo de energia — `2b3dae9`
+
+O bloco do escudo estava atrás de `RIG == "codigo"`. Com o **Shadowblade**
+activo — que nem tem pose de defesa no atlas — ao carregar em defender **não
+aparecia escudo nenhum**. Passou a `RIG != "cavaleiro"` (esse traz o escudo
+desenhado nos frames). Por cima da placa entra a **cúpula de energia roxa**:
+cresce ao levantar o escudo, respira, e dá um clarão a cada bloqueio.
+
+Bancada: `tools/shot_aura_escudo.gd` (modo `escudo` / `tiro`; **precisa de
+janela**). Gotcha guardado lá dentro: **`_defendendo` é recalculado do input
+todos os frames** — pôr-lhe a bandeira à mão não serve de nada, tem de se
+premir a acção (`Input.action_press("defender")`).
+
+## Candeeiros e tochas — `8bf1898`
+
+Dois props do **Ansimuz**, dos mesmos packs de onde já vêm fundos do jogo,
+recortados por `tools/gerar_luzes.py`: o **poste gótico de três lanternas**
+(GothicVania Town) e a **tocha de parede animada** (Cold Corridors).
+
+A distribuição é feita em **código** (`nivel_com_chefe.gd::_iluminar`) e não
+nos 100 `.tscn`: a maior parte do percurso é a JORNADA, gerada em cada
+arranque — luzes postas na cena não apanhavam nada dela. Varre-se o percurso
+em **colunas de 760 px** e escolhe-se, para cada uma, a plataforma mais
+próxima que sirva.
+
+Só plataformas **estáticas** (o script tem de ser mesmo o `plataforma.gd`):
+numa flutuante ou quebradiça a luz ficava para trás. As **tochas** escolhem-se
+pela grossura **visual** (`altura_visual`) — medidas pela colisão (22-70 px)
+nenhuma plataforma chegava ao limiar e nunca saía nenhuma.
+
+`tools/verifica_luzes.gd` conta as luzes por nível e mede o maior vão sem
+luz. **Medição actual: 100/100 com luz; 98/100 com o maior vão < 3000 px.**
+
+## Vidas — `9b8a78e`
+
+`VIDAS_INICIAIS` 3 -> **5**, e **+1 por nível** passado. No **hardcore não
+cresce** (lá as vidas são o limite do run) e o `reiniciar_run` repõe as
+vidas do ponto onde ele vai (`vidas_de_partida`), não as 5 secas. Tecto de
+99 só para o `x%d` do HUD. **A campanha inteira dá ~105 vidas** — se isso
+amolecer de mais o fim, o sítio para afinar é `VIDAS_POR_NIVEL`.
+
+---
+
+# BLOCO 4 (infra) — a meio, `718a133`
+
+**O job do Android NUNCA passou — nem no run 1.** A nota "falha desde o run
+264" estava errada: conferido pela API do GitHub, com amostras de 25 em 25
+desde o run 1, todas dão `failure`. Não é uma regressão, é uma coisa que
+nunca chegou a funcionar.
+
+**Os logs deste repo pedem sessão iniciada** — de fora só se vê "Process
+completed with exit code 1". As **anotações**, essas, são públicas: o CI
+passou a despejar as últimas 25 linhas do export como `::error::` e o
+ambiente (ANDROID_HOME, java, build-tools, apksigner, templates) como
+`::warning::`. **É por aí que se lê o que se passa, em**
+<https://github.com/paulogomesextp/koliani/actions>.
+
+A aposta para a causa: mesmo com `gradle_build/use_gradle_build=false` o
+export **assina** o pacote (`package/signed=true`) e o `apksigner` vem do
+SDK — e o Godot 4 não lê o `ANDROID_HOME` na hora do export, lê
+`export/android/android_sdk_path` das **editor settings**, que só existem
+depois de o editor ter corrido uma vez. O job passa a correr
+`--editor --quit` e a escrever lá o caminho.
+
+Ao mesmo tempo entraram as duas saídas públicas que faltavam:
+- Release de tag rolante **`android-latest`** com o APK (a par do
+  `win-latest`);
+- **GitHub Pages** com o build Web (`enablement: true` liga o Pages sozinho
+  na primeira vez). É a única via grátis para o iPhone.
+
+**Por confirmar na próxima sessão:** se o run passou. Se não, ler as
+anotações do run — é para isso que lá estão.
 
 ---
 
