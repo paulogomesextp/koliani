@@ -123,11 +123,20 @@ autorizacao expressa do Paulo ("assets free, adiciona-os ao jogo").
   `github.com/paulogomesextp/koliani` for publico, comitar a tira recortada
   era pô-la a descarregar de graca -- o que a clausula 2.1 proibe. A
   `Porta.tscn` fica com o vortice desenhado por codigo (Line2D/Polygon2D).
-- Para o experimentar em local: `python tools/gerar_fx_portal_balas.py` gera
-  `assets/sprites/pixel/props/portal_fim.png` (256x128 -> tira de 7 frames
-  de 64x64). O ficheiro esta' no `.gitignore`, portanto nao escapa sozinho;
-  falta so' apontar a `Porta.tscn` para ele. Se um dia o repo passar a
-  privado (ou houver acordo com a Frostwindz), e' esse o caminho.
+- **FECHADO (4 set 2026): substituido por um equivalente de dominio
+  publico** -- ver `codemanu/` mais abaixo. A ferramenta ja' nao recorta
+  nada da Frostwindz e o `portal_fim.png` deixou de existir; o pack fica em
+  disco caso um dia o repo passe a privado (ou haja acordo com o autor).
+
+## Pixel FX Pack  -> `codemanu/`
+- URL: https://codemanu.itch.io/  · Autores: **CodeManu + DavitMasia**
+- Licenca: **DOMINIO PUBLICO**. O `README.txt` do pack diz textualmente que
+  e' "a public domain asset", uso pessoal e comercial, "no credit required"
+  (mas creditamos na mesma em `assets/sprites/pixel/CREDITS.md`).
+- Conteudo: 20 folhas de efeitos de 800x800 = 8x8 celulas de 100x100.
+- Usado: `13_vortex_spritesheet.png` -> `props/portal.png` (32 dos 64
+  frames, recolorido para magenta e reduzido a 64x64 por frame). E' o
+  PORTAL do jogo, e o substituto gratis do pack da Frostwindz.
 
 ## 500 Bullet 24x24 Free.zip  -> `bullets-500/`  (4 set 2026)
 - Pack gratuito de balas 24x24 (30 folhas de 576x360). O zip **nao traz

@@ -5,13 +5,13 @@
 Dois packs que o Paulo largou em `assets/sprites/incoming/` (ambos
 `.gitignore`d -- so' se comita a tira ja' recortada):
 
-  frostwindz/   "Pixel Art Animated Portal" (comprado; licenca Frostwindz,
-                uso comercial OK, redistribuicao NAO -- ver LICENSES.md).
-                Folha 256x128 = celulas de 64x64, 7 frames uteis.
-                ATENCAO: o `portal_fim.png` que sai daqui esta' no
-                `.gitignore` e NAO e' usado pelo jogo -- o repo e' publico e
-                a clausula 2.1 da licenca nao deixa. Fica para experimentar
-                em local; a `Porta.tscn` continua com o vortice por codigo.
+  codemanu/     "Pixel FX Pack" do CodeManu/DavitMasia -- DOMINIO PUBLICO
+                ("no credit required", ver o README.txt do pack). A folha
+                `13_vortex_spritesheet.png` sao 8x8 frames de 100x100 de um
+                vortice de particulas a rodar. E' o substituto GRATIS do
+                portal da Frostwindz, que era pago e cuja licenca proibe
+                redistribuir os ficheiros num repo publico (ver LICENSES.md).
+                O vermelho do pack e' recolorido para o magenta da casa.
   bullets-500/  "500 Bullet 24x24 Free". Cada folha e' 576x360 = 24x15
                 celulas de 24x24, organizada em TRES blocos de cor de 5
                 linhas; dentro de cada linha ha' tres balas de 8 frames
@@ -22,7 +22,7 @@ Dois packs que o Paulo largou em `assets/sprites/incoming/` (ambos
 
 Saida (tiras horizontais, uma linha de frames, prontas para `hframes`):
 
-  assets/sprites/pixel/props/portal_fim.png   448x64, 7 frames (SO' LOCAL)
+  assets/sprites/pixel/props/portal.png       2048x64, 32 frames
   assets/sprites/pixel/fx/bala_roxa.png       192x24, 8 frames (Koliani)
   assets/sprites/pixel/fx/bala_roxa_grande.png  192x24, 8 frames (Zeriko)
   assets/sprites/pixel/fx/flare_roxo.png      192x24, 8 frames (kamehameha)
@@ -45,7 +45,7 @@ INC = os.path.join(RAIZ, "assets", "sprites", "incoming")
 FX = os.path.join(RAIZ, "assets", "sprites", "pixel", "fx")
 PROPS = os.path.join(RAIZ, "assets", "sprites", "pixel", "props")
 
-PORTAL = os.path.join(INC, "frostwindz", "portal_sheet.png")
+PORTAL = os.path.join(INC, "codemanu", "13_vortex_spritesheet.png")
 BALAS = os.path.join(INC, "bullets-500")
 
 # nome de saida -> (folha, linha 0-14 da folha, grupo de 8 colunas)
@@ -87,14 +87,48 @@ def _gravar(img: Image.Image, caminho: str, preview: bool) -> None:
         fundo.save(os.path.join(pasta, "_preview_" + nome))
 
 
+## Rampa magenta/violeta para o vortice: escuro -> roxo, meio -> magenta,
+## brilho -> rosa quase branco. O pack e' vermelho e o jogo e' de luar roxo.
+RAMPA_PORTAL = [(26, 6, 44), (92, 20, 130), (168, 40, 198), (232, 96, 236),
+                (255, 198, 252)]
+## Quantos dos 64 frames e' que entram na tira (de 2 em 2 -- 32 chegam para o
+## rodopio se ler continuo e a tira fica com metade da largura).
+PASSO_PORTAL = 2
+
+
+def _tingir(img: Image.Image, rampa: list) -> Image.Image:
+    """Troca a cor guardando a forma: luminancia -> tom da `rampa`."""
+    out = Image.new("RGBA", img.size, (0, 0, 0, 0))
+    src, dst = img.load(), out.load()
+    n = len(rampa) - 1
+    for y in range(img.height):
+        for x in range(img.width):
+            r, g, b, a = src[x, y]
+            if a == 0:
+                continue
+            f = (0.299 * r + 0.587 * g + 0.114 * b) / 255.0
+            pos = f * n
+            i = min(int(pos), n - 1)
+            t = pos - i
+            c0, c1 = rampa[i], rampa[i + 1]
+            dst[x, y] = (int(c0[0] + (c1[0] - c0[0]) * t),
+                         int(c0[1] + (c1[1] - c0[1]) * t),
+                         int(c0[2] + (c1[2] - c0[2]) * t), a)
+    return out
+
+
 def gerar_portal(preview: bool) -> None:
     if not os.path.exists(PORTAL):
         print(f"! falta {os.path.relpath(PORTAL, RAIZ)} -- portal saltado")
         return
-    folha = Image.open(PORTAL).convert("RGBA")
-    # 4 colunas x 2 linhas de 64px; o ultimo canto (3,1) esta' vazio
-    cels = [(c, r) for r in range(2) for c in range(4)][:7]
-    _gravar(_tira(folha, 64, cels), os.path.join(PROPS, "portal_fim.png"), preview)
+    folha = _tingir(Image.open(PORTAL).convert("RGBA"), RAMPA_PORTAL)
+    # 8x8 celulas de 100x100, lidas por linhas (a animacao e' continua)
+    cels = [(i % 8, i // 8) for i in range(0, 64, PASSO_PORTAL)]
+    tira = _tira(folha, 100, cels)
+    # 100 -> 64 px por frame: o portal tem ~44 px de altura em jogo, e a
+    # 100 a tira ficava com 3200 px de largura sem se ganhar detalhe
+    tira = tira.resize((64 * len(cels), 64), Image.LANCZOS)
+    _gravar(tira, os.path.join(PROPS, "portal.png"), preview)
 
 
 def gerar_balas(preview: bool) -> None:

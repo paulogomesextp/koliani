@@ -389,3 +389,19 @@ sobre bege claro devolve sempre pastel. Sai tudo a 3x (NEAREST) porque uma
 O **coração** e o **enchimento das barras** são arte própria, feita na mesma
 ferramenta: o kit não traz coração nenhum, e os enchimentos dele têm 2 e 4 px
 de altura (um fio, num ecrã de 720).
+
+## Portal (4 set 2026)
+O portal era um oval `Polygon2D` a rodar dentro de um `Line2D` — lia-se como
+feito por código, a mesma queixa que já tinha tirado o Kamehameha desenhado à
+mão. Passa a ser arte a sério:
+- **CodeManu + DavitMasia — Pixel FX Pack** (domínio público, "no credit
+  required"), `13_vortex_spritesheet.png`: 8×8 frames de 100×100 de um
+  vórtice de partículas. `tools/gerar_fx_portal_balas.py` recolore-o para o
+  magenta da casa (luminância → rampa de 5 tons), fica com 32 frames de
+  64×64 em `props/portal.png`, e o `scripts/portal.gd` corre-os a 18 fps.
+  O portal de SAÍDA anda ao contrário e mais devagar, para se distinguir do
+  de entrada sem precisar de legenda.
+
+Foi este que fechou a questão do **portal da Frostwindz**: aquele era pago e
+a licença proíbe redistribuir os ficheiros num repo público (ver
+`assets/sprites/incoming/LICENSES.md`).

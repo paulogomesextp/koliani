@@ -23,6 +23,12 @@ extends Area2D
 @export var raio := 22.0
 
 const RECARGA := 0.9
+## Arte do vórtice (32 frames numa tira). Ver `tools/gerar_fx_portal_balas.py`.
+const TIRA_VORTICE := "res://assets/sprites/pixel/props/portal.png"
+const FRAMES_VORTICE := 32
+## Frames por segundo do rodopio. O portal de SAÍDA anda ao contrário e mais
+## devagar, para se distinguir do de entrada sem precisar de legenda.
+const FPS_VORTICE := 18.0
 ## Quanto e' que a chegada sobe acima do centro do portal parceiro. Eram 6 px
 ## -- com o corpo dela (20x44 centrado) sobravam 4 px acima da plataforma, e
 ## bastava o nivel andar um nada para ela nascer dentro do chao.
@@ -32,6 +38,10 @@ const PASSOS_LIVRES := 12
 
 var _t := 0.0
 var _cd := 0.0
+## Vórtice: a arte do portal (tira de 32 frames, `assets/.../props/portal.png`).
+## `_nucleo`/`_anel` são o desenho POR CÓDIGO que lá estava e que só entra
+## se a tira faltar (a ferramenta não ter corrido).
+var _vortice: Sprite2D
 var _anel: Line2D
 var _nucleo: Polygon2D
 var _luz: PointLight2D
@@ -66,22 +76,39 @@ func _montar_visual() -> void:
 	halo.material = mat
 	add_child(halo)
 
-	_nucleo = Polygon2D.new()
-	_nucleo.name = "Nucleo"
-	_nucleo.polygon = _oval(raio * 0.55, raio * 1.05)
-	_nucleo.color = Color(cor.r, cor.g, cor.b, 0.5) if not so_saida else Color(cor.r, cor.g, cor.b, 0.32)
-	_nucleo.material = mat
-	add_child(_nucleo)
+	# O miolo do portal: a tira do vórtice. Antes era um oval `Polygon2D` a
+	# rodar dentro de um `Line2D` -- lia-se como feito por código, que é
+	# exactamente a queixa do Paulo. A tira é do pack de FX do CodeManu
+	# (domínio público), recolorida por `tools/gerar_fx_portal_balas.py`.
+	if ResourceLoader.exists(TIRA_VORTICE):
+		_vortice = Sprite2D.new()
+		_vortice.name = "Vortice"
+		_vortice.texture = load(TIRA_VORTICE)
+		_vortice.hframes = FRAMES_VORTICE
+		_vortice.material = mat
+		_vortice.modulate = Color(cor.r, cor.g, cor.b, 1.0 if not so_saida else 0.72)
+		# a arte é redonda (64x64) e o portal é um oval em pé. O rodopio só
+		# ocupa uns 60% do frame (o resto são partículas soltas), por isso a
+		# escala é maior do que o anel -- é o MIOLO que tem de bater certo.
+		_vortice.scale = Vector2(raio * 4.2 / 64.0, raio * 5.0 / 64.0)
+		add_child(_vortice)
+	else:
+		_nucleo = Polygon2D.new()
+		_nucleo.name = "Nucleo"
+		_nucleo.polygon = _oval(raio * 0.55, raio * 1.05)
+		_nucleo.color = Color(cor.r, cor.g, cor.b, 0.5) if not so_saida else Color(cor.r, cor.g, cor.b, 0.32)
+		_nucleo.material = mat
+		add_child(_nucleo)
 
-	_anel = Line2D.new()
-	_anel.name = "Anel"
-	_anel.points = _oval(raio, raio * 1.5)
-	_anel.closed = true
-	_anel.width = 3.0
-	_anel.default_color = cor
-	_anel.joint_mode = Line2D.LINE_JOINT_ROUND
-	_anel.material = mat
-	add_child(_anel)
+		_anel = Line2D.new()
+		_anel.name = "Anel"
+		_anel.points = _oval(raio, raio * 1.5)
+		_anel.closed = true
+		_anel.width = 3.0
+		_anel.default_color = cor
+		_anel.joint_mode = Line2D.LINE_JOINT_ROUND
+		_anel.material = mat
+		add_child(_anel)
 
 	_luz = PointLight2D.new()
 	_luz.texture = _tex_luz()
@@ -136,6 +163,12 @@ func _tex_luz() -> GradientTexture2D:
 func _process(dt: float) -> void:
 	_t += dt
 	_cd = maxf(0.0, _cd - dt)
+	if _vortice:
+		var passo := _t * FPS_VORTICE * (1.0 if not so_saida else -0.7)
+		_vortice.frame = posmod(int(passo), FRAMES_VORTICE)
+		# respira com a mesma cadência de sempre
+		var q := 1.0 + 0.06 * sin(_t * 5.0)
+		_vortice.scale = Vector2(raio * 4.2 / 64.0 * q, raio * 5.0 / 64.0 * q)
 	if _anel:
 		_anel.rotation = _t * (1.6 if not so_saida else -1.0)
 		var p := 1.0 + 0.08 * sin(_t * 5.0)
