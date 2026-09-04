@@ -264,9 +264,14 @@ jobs:
     # So' um deploy de Pages de cada vez -- e' este JOB que se serializa, nao
     # o workflow todo (a nivel de workflow, um push novo cancelava tambem os
     # testes e os builds do run anterior).
+    #
+    # `cancel-in-progress: false` de proposito: com `true`, um push novo
+    # cancelava o job de Pages do run anterior e esse run inteiro passava a
+    # aparecer como **Cancelled** -- mesmo com os tres builds a passar. O
+    # estado do run passava a mentir sobre o que se construiu.
     concurrency:
       group: pages
-      cancel-in-progress: true
+      cancel-in-progress: false
     environment:
       name: github-pages
       url: ${{ steps.deploy.outputs.page_url }}

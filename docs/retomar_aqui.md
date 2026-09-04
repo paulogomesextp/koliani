@@ -30,9 +30,9 @@ Blocos, por ordem de ataque:
    logo a seguir a esta lista.
 3. ~~**Projécteis, luz e escudo**~~ — **FEITO** (`2b3dae9`, `8bf1898`).
    Detalhe logo a seguir a esta lista.
-4. **Infra** — ⬅ *a meio.* Mexido em `718a133`: o APK vai para um Release
-   `android-latest` e o Web para o **GitHub Pages**. O export do APK
-   continua por confirmar — ver "Bloco 4" mais abaixo.
+4. **Infra** — ~~**APK ANDROID FEITO**~~: compilou pela primeira vez
+   (run #332) e está no Release **`android-latest`**. Falta só o **switch do
+   Pages, que só o Paulo pode dar** — ver "Bloco 4" mais abaixo.
 5. **UI, vidas, mecânicas** — ⬅ *é aqui que a próxima sessão pega.*
    ~~vidas a começar em 5 e +1 por nível~~ **FEITO** (`9b8a78e`).
    ~~a tabela das mecânicas~~ **ESCRITA, à espera da aprovação dele**
@@ -127,7 +127,7 @@ amolecer de mais o fim, o sítio para afinar é `VIDAS_POR_NIVEL`.
 
 ---
 
-# BLOCO 4 (infra) — a meio, `718a133`
+# BLOCO 4 (infra) — **O APK ANDROID PASSA**, falta o switch do Pages
 
 **O job do Android NUNCA passou — nem no run 1.** A nota "falha desde o run
 264" estava errada: conferido pela API do GitHub, com amostras de 25 em 25
@@ -141,12 +141,30 @@ ambiente (ANDROID_HOME, java, build-tools, apksigner, templates) como
 `::warning::`. **É por aí que se lê o que se passa, em**
 <https://github.com/paulogomesextp/koliani/actions>.
 
-A aposta para a causa: mesmo com `gradle_build/use_gradle_build=false` o
-export **assina** o pacote (`package/signed=true`) e o `apksigner` vem do
-SDK — e o Godot 4 não lê o `ANDROID_HOME` na hora do export, lê
-`export/android/android_sdk_path` das **editor settings**, que só existem
-depois de o editor ter corrido uma vez. O job passa a correr
-`--editor --quit` e a escrever lá o caminho.
+## O que era, afinal — duas coisas, e nenhuma era o que se suspeitava
+
+Assim que a anotação passou a levar o log inteiro, o Godot disse-o por
+palavras dele, uma de cada vez:
+
+1. **`A valid Java SDK path is required in Editor Settings`.** A imagem
+   `godot-ci` traz o OpenJDK 17 mas com o **`JAVA_HOME` vazio**, e o Godot 4
+   não procura o `javac` no PATH — lê `export/android/java_sdk_path` das
+   editor settings. O job passa a derivar a raiz do JDK do `javac` real e a
+   escrever lá **as duas** definições (Android SDK e Java SDK).
+2. **`ETC2/ASTC texture compression is required for Android export`.**
+   `textures/vram_compression/import_etc2_astc=true` no `project.godot`.
+   Custa uma variante comprimida a mais por textura no `.godot` (que não vai
+   para o git) e um `--import` mais demorado.
+
+**Nada disto era o que se suspeitava.** Os templates de Android estavam
+todos instalados, o `apksigner` estava em `build-tools/33.0.2` e o
+"Could not find version of build tools that matches Target SDK" é só um
+aviso. **A parte difícil foi conseguir LER o erro**, não corrigi-lo.
+
+**Resultado (run #332): APK de 100 MB, no Release
+[`android-latest`](https://github.com/paulogomesextp/koliani/releases/tag/android-latest).**
+Link fixo, a par do `win-latest` — o Paulo descarrega no telemóvel e
+instala.
 
 Ao mesmo tempo entraram as duas saídas públicas que faltavam:
 - Release de tag rolante **`android-latest`** com o APK (a par do
