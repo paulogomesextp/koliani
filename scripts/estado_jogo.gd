@@ -19,7 +19,14 @@ const CAMINHO_SAVE := "user://progresso.json"
 const _EQUIP := preload("res://scripts/equipamento.gd")
 const _MELHORIAS := preload("res://scripts/melhorias.gd")
 
-const VIDAS_INICIAIS := 3
+## Vidas com que se começa a campanha. Pedido do Paulo (4 set 2026): eram 3,
+## passam a 5, e cada nível concluído dá +1 (ver `avancar_nivel`).
+const VIDAS_INICIAIS := 5
+## Vidas ganhas por cada nível concluído.
+const VIDAS_POR_NIVEL := 1
+## Tecto, só para o "x%d" do HUD nunca crescer sem fim -- ao ritmo de +1 por
+## nível, 100 níveis dariam 105 vidas.
+const VIDAS_MAX := 99
 
 ## Todas as habilidades da campanha (o modo dev desbloqueia-as de uma vez).
 const HABILIDADES_TODAS := ["salto_duplo", "dash_aereo", "partir_paredes", "escudo", "projetil", "escalar_paredes"]
@@ -297,6 +304,11 @@ var anunciar_avanco := false
 func avancar_nivel() -> void:
 	marcar_nivel_concluido(indice_nivel)
 	if ha_proximo_nivel():
+		# +1 vida por nível passado (pedido do Paulo). No hardcore não: lá as
+		# vidas são o próprio limite do run.
+		if not hardcore:
+			vidas = mini(VIDAS_MAX, vidas + VIDAS_POR_NIVEL)
+			vidas_mudaram.emit(vidas)
 		indice_nivel += 1
 		checkpoint = Vector2.ZERO
 		hardcore_tempo_restante = -1.0  # mundo novo = relógio cheio
@@ -469,6 +481,12 @@ func regiao_esta_concluida(regiao: int) -> bool:
 
 ## --- Vidas / morte ------------------------------------------------------
 
+## Vidas com que se (re)começa: as iniciais mais uma por cada nível já
+## concluído. Ver `VIDAS_POR_NIVEL`.
+func vidas_de_partida() -> int:
+	return mini(VIDAS_MAX, VIDAS_INICIAIS + concluidos.size() * VIDAS_POR_NIVEL)
+
+
 func perder_vida() -> void:
 	vidas = maxi(0, vidas - 1)
 	vidas_mudaram.emit(vidas)
@@ -524,9 +542,13 @@ func ativar_modo_dev() -> void:
 ## Modo normal: gastaram-se as vidas todas, MAS o progresso fica. Volta-se
 ## ao início do nível actual (o seguinte ao último chefe morto) com as
 ## vidas cheias -- habilidades, pistas, níveis concluídos e equipamento
-## mantêm-se. (No hardcore isto não corre: aí 3 vidas = fim do run.)
+## mantêm-se. (No hardcore isto não corre: lá gastar as vidas é o fim do run.)
+##
+## As vidas voltam ao valor de PARTIDA para o ponto onde ele já vai -- não a
+## 5 secas: com o +1 por nível, mandá-lo de volta às 5 no nível 60 era um
+## castigo que o pedido não pede.
 func reiniciar_run() -> void:
-	vidas = VIDAS_INICIAIS
+	vidas = vidas_de_partida()
 	checkpoint = Vector2.ZERO
 	hardcore_tempo_restante = -1.0  # nova tentativa -> relógio do nível cheio
 	_limpar_jornada_ancora()

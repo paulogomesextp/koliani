@@ -40,6 +40,7 @@ func _correr_tudo() -> void:
 	teste_equipamento_dados()
 	teste_equipamento_estado()
 	teste_estado_tres_mortes_sem_vidas()
+	teste_estado_vida_por_nivel()
 	teste_estado_reiniciar_run()
 	teste_estado_pistas_sem_duplicados()
 	teste_estado_habilidade_sem_duplicados()
@@ -402,11 +403,31 @@ func teste_diario_tem_todas_as_pistas_dos_niveis() -> void:
 
 func teste_estado_tres_mortes_sem_vidas() -> void:
 	var e := _novo_estado()
+	for _i in e.VIDAS_INICIAIS - 1:
+		e.perder_vida()
+	_ok(not e.sem_vidas(), "com uma vida ainda não se está sem vidas")
 	e.perder_vida()
-	e.perder_vida()
-	e.perder_vida()
-	_ok(e.sem_vidas(), "3 vidas perdidas deviam deixar sem_vidas() verdadeiro")
+	_ok(e.sem_vidas(), "gastar as VIDAS_INICIAIS deixa sem_vidas() verdadeiro")
 	e.free()
+
+
+## Pedido do Paulo (4 set 2026): cada nível passado dá +1 vida, e recomeçar
+## o run repõe as vidas do PONTO onde ele vai, não as 5 do início.
+func teste_estado_vida_por_nivel() -> void:
+	var e := _novo_estado()
+	var antes: int = e.vidas
+	e.avancar_nivel()
+	_ok(e.vidas == antes + e.VIDAS_POR_NIVEL, "passar de nível devia dar +1 vida")
+	_ok(e.vidas_de_partida() == e.VIDAS_INICIAIS + e.VIDAS_POR_NIVEL,
+		"vidas_de_partida conta os níveis já concluídos")
+	# no hardcore as vidas são o limite do run -- não crescem
+	var h := _novo_estado()
+	h.hardcore = true
+	var antes_h: int = h.vidas
+	h.avancar_nivel()
+	_ok(h.vidas == antes_h, "no hardcore passar de nível NÃO dá vida")
+	e.free()
+	h.free()
 
 
 ## Modo normal: gastar as vidas todas recomeça o nível actual com vidas
@@ -419,7 +440,8 @@ func teste_estado_reiniciar_run() -> void:
 	e.definir_checkpoint(Vector2(500, 200))
 	e.perder_vida(); e.perder_vida(); e.perder_vida()
 	e.reiniciar_run()
-	_ok(e.vidas == e.VIDAS_INICIAIS, "reiniciar_run repõe as vidas")
+	_ok(e.vidas == e.VIDAS_INICIAIS + e.VIDAS_POR_NIVEL,
+		"reiniciar_run repõe as vidas do ponto onde ele vai (1 nível feito)")
 	_ok(e.indice_nivel == 1, "reiniciar_run mantém o nível actual (2)")
 	_ok(e.checkpoint == Vector2.ZERO, "reiniciar_run recomeça o nível do início")
 	_ok(0 in e.concluidos, "reiniciar_run não apaga níveis concluídos")
