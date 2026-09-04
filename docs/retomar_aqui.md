@@ -189,6 +189,36 @@ próxima sessão pega o log inteiro na anotação e resolve.**
 
 ---
 
+# BLOCO 5 (b) — UI e indicador de nível: o levantamento já está feito
+
+> *"Melhore o UI, o Indicador de Nível, etc, vá buscar assets free."*
+
+**Hoje a HUD não tem arte nenhuma.** É toda `Label` + `StyleBoxFlat` desenhados
+por código no `scripts/controlos_toque.gd`: as barras de vida/energia, a barra
+do chefe (`_ao_combate_chefe`), e o cabeçalho de nível
+(`_encher_cabecalho_nivel`, que é só três Labels — nº do nível, nome, nome do
+chefe).
+
+**Já há um kit de HUD no repo, e do pack certo.** Não é preciso descarregar
+nada:
+
+```
+assets/sprites/incoming/anokolisa/Legacy-Fantasy - High Forest 2.3/HUD/Base-01.png
+```
+
+432×304, e traz: **painéis** (pergaminho e madeira, com moldura própria — dão
+`NinePatchRect` directo), **calhas e enchimentos de barra** em quatro cores +
+as versões finas, e um bloco de **ícones** (pausa, X, +, play, seta, coroa,
+troféu, engrenagem, caveira, relógio, aviso, boneco). É do **mesmo pack
+anokolisa** que já dá o terreno da floresta, portanto a licença já está
+resolvida e creditada.
+
+O que falta é o trabalho: uma ferramenta `tools/gerar_ui.py` a recortar as
+peças, e depois trocar os `StyleBoxFlat` por `NinePatchRect` no
+`controlos_toque.gd`. O cabeçalho de nível é o sítio onde se nota mais.
+
+---
+
 # BLOCO 5 — a tabela das 100 mecânicas está escrita
 
 `docs/mecanicas_por_nivel.md`, e a mesma coisa em página para ele ver no
