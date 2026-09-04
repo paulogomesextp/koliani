@@ -61,6 +61,7 @@ assets/sprites/incoming/enemies-pack/**
 assets/sprites/incoming/kronovi/**
 assets/sprites/incoming/frostwindz/**
 assets/sprites/incoming/bullets-500/**
+assets/sprites/incoming/wenrexa/**
 # a tira recortada do portal da Frostwindz (pack PAGO). O repo e' publico e
 # a licenca dele proibe redistribuir os ficheiros -- so' se gera localmente
 # (`python tools/gerar_fx_portal_balas.py`). Ver incoming/LICENSES.md.

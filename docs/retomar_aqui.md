@@ -7,6 +7,17 @@
 
 # ⚠ POR FAZER — o que ficou pendente (4 set 2026, fim de sessão)
 
+0. **Laser roxo do pack Wenrexa — a meio.** O pack
+   [`wenrexa/laser2020`](https://wenrexa.itch.io/laser2020) é **CC0, grátis,
+   uso comercial, sem crédito obrigatório** e já está descarregado em
+   `assets/sprites/incoming/wenrexa/laser2020/Laser Sprites/` (66 PNGs
+   soltos, `01.png`..`66.png`; o demo Windows foi apagado). O Paulo escolheu
+   **o último da primeira fila da imagem de capa** — a capa mostra 10 por
+   linha, portanto é o **10.º sprite**: o cometa MAGENTA/roxo de cauda
+   comprida. Falta: confirmar que a ordem da capa bate certo com a numeração
+   dos ficheiros, recortar e apontar o projéctil para ele. Isto casa com o
+   pedido nº 4 da fila ("não gosto do estilo do projétil dos mísseis, mude o
+   recurso e coloque roxo com brilho").
 1. **Escolher mecânicas do catálogo.** O Paulo deixou uma lista enorme de
    mecânicas em [`docs/mecanicas_catalogo.md`](mecanicas_catalogo.md)
    (chefes, coletáveis, mobilidade, game feel, plataformas, perigos,
