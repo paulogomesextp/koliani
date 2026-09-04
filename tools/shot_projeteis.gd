@@ -1,28 +1,20 @@
 extends SceneTree
-## Bancada dos PROJECTEIS: poe lado a lado as TRES formas do tiro da Koliani
-## (que ela sorteia a cada disparo), o Kamehameha, a bola do Zeriko e o
-## portal de fim de nivel, sobre fundo escuro, e grava um PNG. Serve para ver
-## a arte sem ter de jogar ate' la'.
+## Bancada dos PROJECTEIS: poe lado a lado o tiro da Koliani, o Kamehameha,
+## a bola do Zeriko e o portal de fim de nivel, sobre fundo escuro, e grava
+## um PNG. Serve para ver a arte sem ter de jogar ate' la'.
 ##
 ##   Godot --window --screen 1 --resolution 1280x720 \
 ##     --script res://tools/shot_projeteis.gd -- <saida.png> [segundos]
 
-## As mesmas tiras do `ProjetilKoliani.FORMAS`, repetidas aqui de propósito:
-## tocar na classe obrigava a compila-la, e ela usa autoloads (`Som`) que nao
-## existem quando o Godot corre com `--script`.
-const FORMAS := [
-	preload("res://assets/sprites/pixel/fx/tiro_dardo.png"),
-	preload("res://assets/sprites/pixel/fx/tiro_seta.png"),
-	preload("res://assets/sprites/pixel/fx/tiro_risco.png"),
-]
-
+## O tiro da Koliani deixou de sortear formas: e' o laser roxo do pack
+## Wenrexa, um so' sprite (ver `ProjetilKoliani.CORPO`). A coluna que ficou
+## a -1 em cada peca era o indice da forma a forcar -- ja' nao serve, mas
+## fica para o caso de voltar a haver variantes.
 const PECAS := [
-	["res://scenes/actors/ProjetilKoliani.tscn", "tiro (dardo)", Vector2(180, 220), 0],
-	["res://scenes/actors/ProjetilKoliani.tscn", "tiro (seta)", Vector2(180, 380), 1],
-	["res://scenes/actors/ProjetilKoliani.tscn", "tiro (risco)", Vector2(180, 540), 2],
-	["res://scenes/actors/KamehamehaKoliani.tscn", "kamehameha", Vector2(660, 250), -1],
-	["res://scenes/actors/ProjetilZeriko.tscn", "bola do Zeriko", Vector2(1070, 250), -1],
-	["res://scenes/actors/Porta.tscn", "portal de fim", Vector2(700, 520), -1],
+	["res://scenes/actors/ProjetilKoliani.tscn", "laser da Koliani", Vector2(230, 220), -1],
+	["res://scenes/actors/KamehamehaKoliani.tscn", "kamehameha", Vector2(660, 400), -1],
+	["res://scenes/actors/ProjetilZeriko.tscn", "bola do Zeriko", Vector2(1070, 220), -1],
+	["res://scenes/actors/Porta.tscn", "portal de fim", Vector2(700, 570), -1],
 ]
 
 
@@ -52,13 +44,6 @@ func _init() -> void:
 		# SO' DEPOIS do add_child -- ao entrar na arvore o GDScript volta a
 		# ligar os callbacks que o script define, e apagava este pedido.
 		no.set_physics_process(false)
-		# o tiro da Koliani sorteia a forma no `_ready`; aqui força-se cada
-		# uma, para as três aparecerem lado a lado
-		var forma: int = peca[3]
-		if forma >= 0:
-			var c := no.get_node_or_null("Corpo") as Sprite2D
-			if c:
-				c.texture = FORMAS[forma]
 		var etiqueta := Label.new()
 		etiqueta.text = peca[1]
 		etiqueta.position = Vector2(-70, 70)

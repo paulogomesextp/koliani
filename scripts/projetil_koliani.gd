@@ -10,23 +10,20 @@ const VELOCIDADE := 540.0
 ## com o tiro (o `Impacto` por omissão é azul, do tempo do rig "nova").
 const COR := Color(0.85, 0.45, 1.0)
 
-## As três formas que o Paulo escolheu no pack "500 Bullet 24x24 Free"
-## (bloco lavanda do `Part 2C`). Cada disparo sorteia uma -- assim uma
-## rajada de tiros não sai toda igual, que era o que dava ar de repetição.
-## São DIRECCIONAIS: apontam para onde vão, logo não se lhes tira a rotação
-## como se fazia ao orbe redondo que estava aqui antes.
-const FORMAS: Array[Texture2D] = [
-	preload("res://assets/sprites/pixel/fx/tiro_dardo.png"),
-	preload("res://assets/sprites/pixel/fx/tiro_seta.png"),
-	preload("res://assets/sprites/pixel/fx/tiro_risco.png"),
-]
-const FRAMES := 8
+## Laser roxo do pack Wenrexa "Laser2020" (CC0). E' um glow de alta
+## resolucao, nao pixel-art: e' desenhado com filtro LINEAR e nao tem frames
+## -- o "vivo" vem do pulsar da escala e da luz, nao de uma tira de animacao.
+## Substituiu as tres formas do pack das balas a pedido do Paulo.
+const CORPO: Texture2D = preload("res://assets/sprites/pixel/fx/laser_roxo.png")
+## Escala de repouso; a cabeca do cometa fica com ~54 px de comprido.
+const ESCALA := 0.75
 
 var dano := 25
 var _dir := Vector2.RIGHT
 var _tempo_de_vida := 2.2
 var _t := 0.0
-## Desfasamento do ciclo de frames, sorteado no `_ready`.
+## Desfasamento do pulsar, sorteado no `_ready`: dois tiros seguidos nao
+## respiram em unissono.
 var _fase := 0.0
 
 @onready var _luz: PointLight2D = $Luz
@@ -43,11 +40,9 @@ func lancar(direcao: Vector2, dano_: int) -> void:
 
 func _ready() -> void:
 	body_entered.connect(_ao_bater)
+	_fase = randf() * TAU
 	if _corpo:
-		_corpo.texture = FORMAS[randi() % FORMAS.size()]
-		_corpo.hframes = FRAMES
-		# arranca num frame ao acaso: dois tiros seguidos não pulsam em uníssono
-		_fase = randf() * TAU
+		_corpo.texture = CORPO
 
 
 func _physics_process(dt: float) -> void:
@@ -56,9 +51,10 @@ func _physics_process(dt: float) -> void:
 	if _luz:
 		_luz.energy = 1.8 + 0.4 * sin(_t * 20.0)  # a aura roxa "respira"
 	if _corpo:
-		# pulsa (o pack faz o dardo encolher a meio do ciclo e voltar);
-		# a rotação é a do nó, que já aponta na direção do tiro
-		_corpo.frame = int(_t * 22.0 + _fase) % FRAMES
+		# o pulsar substitui a tira de frames: a cabeça estica e encolhe ~6%
+		# ao longo do tiro. A rotação é a do nó, que já aponta na direção.
+		var p := 1.0 + 0.06 * sin(_t * 18.0 + _fase)
+		_corpo.scale = Vector2(ESCALA * p, ESCALA / p)
 	_tempo_de_vida -= dt
 	if _tempo_de_vida <= 0.0:
 		queue_free()

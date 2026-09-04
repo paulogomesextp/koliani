@@ -143,12 +143,31 @@ const KAMEHAMEHA := preload("res://scenes/actors/KamehamehaKoliani.tscn")
 const Y_MORTE := 1200.0
 const TEX_IMPACTO := preload("res://assets/sprites/impacto.svg")
 
+## Cúpula de energia roxa à volta do escudo (pedido do Paulo). `ABRIR` é o
+## tempo que leva a crescer até ficar redonda ao levantar o escudo; o resto
+## do tempo respira. Um bloqueio acende-a de rajada (`_cupula_flash`).
+const CUPULA_ABRIR := 0.13
+const CUPULA_ALPHA := 0.26          # cúpula em repouso
+const CUPULA_ALPHA_FLASH := 0.62    # cúpula no instante do bloqueio
+const ARO_ALPHA := 0.62
+
+## Aura roxa à volta da Koliani. Respira devagar e ACENDE quando ela ataca,
+## dá dash ou lança -- é o que a faz parecer carregada de energia em vez de
+## ter só um halo colado. Valores multiplicam o que está no `.tscn`.
+const AURA_ALPHA := 0.5
+const AURA_RESPIRA := 0.16          # amplitude do respirar (fracção)
+const AURA_ENERGIA := 0.85          # `energy` da LuzAura em repouso
+
 @onready var _hitbox: Area2D = $HitboxAtaque
 @onready var _sprite: Node2D = $Sprite
 @onready var _corpo: AnimatedSprite2D = $Sprite/Corpo
 @onready var _arma: Sprite2D = $Sprite/Arma
 @onready var _escudo: Node2D = $Sprite/Escudo
 @onready var _escudo_glow: CanvasItem = $Sprite/Escudo/Glow
+@onready var _escudo_cupula: CanvasItem = $Sprite/Escudo/Cupula
+@onready var _escudo_aro: CanvasItem = $Sprite/Escudo/Aro
+@onready var _halo: CanvasItem = $Sprite/Halo
+@onready var _luz_aura: PointLight2D = $Sprite/LuzAura
 @onready var _luz_carga: PointLight2D = $Sprite/LuzCarga
 @onready var _luz_golpe: PointLight2D = $Sprite/LuzGolpe
 @onready var _luz_lamina: PointLight2D = $Sprite/LuzLamina
@@ -156,6 +175,13 @@ const TEX_IMPACTO := preload("res://assets/sprites/impacto.svg")
 @onready var _camera: Camera2D = $Camera2D
 @onready var _faiscas: CPUParticles2D = $FaiscasAtaque
 @onready var _po: CPUParticles2D = $PoAterragem
+
+## 0..1, sobe a 1 num bloqueio e decai -- acende a cúpula de energia.
+var _cupula_flash := 0.0
+## Tempo com o escudo levantado, para a cúpula abrir em vez de aparecer.
+var _escudo_t := 0.0
+## 0..1, sobe quando ela ataca/dash/lança -- acende a aura.
+var _aura_flash := 0.0
 
 var _mov := Movimento.Estado.new()
 var vida := VIDA_MAXIMA
@@ -810,6 +836,7 @@ func _physics_process(dt: float) -> void:
 			is_on_floor() or EstadoJogo.tem_habilidade("dash_aereo")):
 		_dash_restante = DUR_DASH
 		_dash_recarga = RECARGA_DASH
+		_acender_aura(0.8)
 		Som.toca("dash", -11.0, randf_range(0.97, 1.05))
 		_invulneravel = maxf(_invulneravel, DUR_DASH)
 	else:
@@ -1069,15 +1096,25 @@ func _animar(dt: float) -> void:
 	_squash = move_toward(_squash, 0.0, dt * 5.0)
 	_pop = move_toward(_pop, 0.0, dt * 7.0)
 
-	# o rig "cavaleiro" já tem escudo desenhado nos frames da defesa
-	if _escudo and RIG == "codigo":
+	_cupula_flash = move_toward(_cupula_flash, 0.0, dt * 3.5)
+	_aura_flash = move_toward(_aura_flash, 0.0, dt * 2.6)
+	_animar_aura()
+
+	# O rig "cavaleiro" já traz o escudo desenhado nos frames da defesa. Todos
+	# os outros usam a placa daqui -- e o "shadowblade" nem sequer tem pose de
+	# defesa no atlas, por isso antes disto NÃO aparecia escudo nenhum.
+	if _escudo and RIG != "cavaleiro":
 		if _defendendo != _escudo.visible:
 			_escudo.visible = _defendendo
 			if _defendendo:
 				_escudo.scale = Vector2.ONE
-		if _defendendo and _escudo_glow:
-			# só o brilho pulsa -- a placa de metal fica opaca
-			_escudo_glow.modulate.a = 0.5 + 0.4 * (0.5 + 0.5 * sin(_anim_t * 7.0))
+				_escudo_t = 0.0
+		if _defendendo:
+			_escudo_t += dt
+			if _escudo_glow:
+				# só o brilho pulsa -- a placa de metal fica opaca
+				_escudo_glow.modulate.a = 0.5 + 0.4 * (0.5 + 0.5 * sin(_anim_t * 7.0))
+			_animar_cupula()
 
 	# luz de carga do Kamehameha: cresce enquanto se segura "lancar"
 	if _luz_carga:
@@ -1201,6 +1238,8 @@ func _iniciar_ataque() -> void:
 	_ataque_restante = _ataque_dur
 	_combo_janela = _ataque_dur + JANELA_COMBO
 	_pop = 1.0
+	# a aura acende mais a cada golpe do combo: o 4.º é o que "estoira"
+	_acender_aura(0.42 + 0.19 * _combo_passo)
 	# passo em frente: o golpe "pisa" para onde se olha (ver `AVANCO_VEL`).
 	var i_av: int = clampi(_combo_passo, 0, AVANCO_VEL.size() - 1)
 	_avanco_vel = AVANCO_VEL[i_av] * (1.0 if is_on_floor() else AVANCO_NO_AR)
@@ -1287,6 +1326,7 @@ func _tratar_lancar(dt: float) -> void:
 func _lancar_projetil() -> void:
 	_lancar_restante = DUR_LANCAR
 	_pop = 1.0
+	_acender_aura(0.7)
 	var ax := Input.get_action_strength("mover_direita") - Input.get_action_strength("mover_esquerda")
 	var ay := Input.get_action_strength("mirar_baixo") - Input.get_action_strength("mirar_cima")
 	var aim := Movimento.direcao_mira(ax, ay, _olha_para)
@@ -1314,6 +1354,7 @@ func _lancar_kamehameha() -> void:
 	_kame_recarga = RECARGA_KAMEHAMEHA
 	_lancar_restante = DUR_LANCAR
 	_pop = 1.0
+	_acender_aura(1.0)
 	var ax := Input.get_action_strength("mover_direita") - Input.get_action_strength("mover_esquerda")
 	var ay := Input.get_action_strength("mirar_baixo") - Input.get_action_strength("mirar_cima")
 	var aim := Movimento.direcao_mira(ax, ay, _olha_para)
@@ -1377,6 +1418,40 @@ func _pop_impacto(pos: Vector2) -> void:
 
 
 ## Um golpe é bloqueável se vier de frente. `dir_empurrao` é o sentido em
+## A cúpula de energia roxa: cresce ao levantar o escudo, respira enquanto
+## está de pé e dá um clarão a cada bloqueio.
+func _animar_cupula() -> void:
+	var abrir := clampf(_escudo_t / CUPULA_ABRIR, 0.0, 1.0)
+	# TRANS_BACK à mão: passa de 1.0 e volta, para "estalar" ao abrir
+	var e := abrir * (1.0 + 0.18 * sin(abrir * PI)) * (1.0 + 0.12 * _cupula_flash)
+	var respira := 0.5 + 0.5 * sin(_anim_t * 5.5)
+	if _escudo_cupula:
+		_escudo_cupula.scale = Vector2(e, e * (0.97 + 0.03 * respira))
+		_escudo_cupula.modulate.a = lerpf(CUPULA_ALPHA * (0.75 + 0.25 * respira),
+			CUPULA_ALPHA_FLASH, _cupula_flash) * abrir
+	if _escudo_aro:
+		_escudo_aro.scale = Vector2(e, e * (0.97 + 0.03 * respira))
+		_escudo_aro.modulate.a = minf(1.0,
+			(ARO_ALPHA + 0.28 * respira + 0.38 * _cupula_flash)) * abrir
+
+
+## A aura roxa. Respira sempre e acende com `_aura_flash` (golpe/dash/tiro).
+func _animar_aura() -> void:
+	var respira := 0.5 + 0.5 * sin(_anim_t * 2.3)
+	var f := _aura_flash
+	if _halo:
+		var e := 1.0 + AURA_RESPIRA * respira + 0.35 * f
+		_halo.scale = Vector2(0.62, 0.78) * e
+		_halo.modulate.a = AURA_ALPHA * (0.8 + 0.2 * respira) + 0.4 * f
+	if _luz_aura:
+		_luz_aura.energy = AURA_ENERGIA * (0.85 + 0.15 * respira) + 1.1 * f
+
+
+## Acende a aura (0..1). Chamado quando ela golpeia, faz dash ou lança.
+func _acender_aura(forca := 1.0) -> void:
+	_aura_flash = maxf(_aura_flash, clampf(forca, 0.0, 1.0))
+
+
 ## que o golpe empurra a Koliani (para longe da fonte); ela bloqueia se
 ## estiver virada para a fonte. Sem direção conhecida (0), o escudo vale.
 func _bloqueia(dir_empurrao: float) -> bool:
@@ -1385,6 +1460,7 @@ func _bloqueia(dir_empurrao: float) -> bool:
 
 func _ao_bloquear() -> void:
 	_invulneravel = maxf(_invulneravel, BLOQUEIO_IFRAMES)
+	_cupula_flash = 1.0
 	Som.toca("bloqueio", -15.0, randf_range(0.97, 1.06))
 	_abanar(2.5)
 	if _escudo:

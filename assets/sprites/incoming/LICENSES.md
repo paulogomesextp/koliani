@@ -145,3 +145,11 @@ sempre fora do git (ver `.gitignore`), mas as TIRAS RECORTADAS que se
 comitam em `assets/sprites/pixel/` ficam publicas e descarregaveis. Para os
 packs CC0 isso nao e' problema; para o **portal da Frostwindz** era um
 conflito com a clausula 2.1 da licenca dele -- por isso ficou de fora.
+
+## wenrexa / laser2020
+- URL: https://wenrexa.itch.io/laser2020
+- Licença: CC0 (domínio público). Uso comercial permitido, sem crédito
+  obrigatório, modificação permitida.
+- Autor: Wenrexa
+- Usado em: `fx/laser_roxo.png` (tiro da Koliani) e `fx/laser_raio_roxo.png`
+  (feixe do Kamehameha), recortados por `tools/gerar_fx_laser.py`.

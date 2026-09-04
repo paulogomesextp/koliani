@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://bkolianiactor01"]
+[gd_scene load_steps=12 format=3 uid="uid://bkolianiactor01"]
 
 ; Koliani -- sprite SVG + shader de personagem (rim light + flash) e
 ; animacao PROCEDURAL feita em koliani.gd (squash/stretch, lean, pop de
@@ -39,12 +39,39 @@ fill = 1
 fill_from = Vector2(0.5, 0.5)
 fill_to = Vector2(1, 0.5)
 
+[sub_resource type="CanvasItemMaterial" id="mat_add"]
+blend_mode = 1
+
+[sub_resource type="Gradient" id="Gradient_aura"]
+offsets = PackedFloat32Array(0, 0.55, 1)
+colors = PackedColorArray(1, 1, 1, 0.85, 1, 1, 1, 0.28, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_aura"]
+gradient = SubResource("Gradient_aura")
+width = 128
+height = 128
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
 [node name="Koliani" type="CharacterBody2D" groups=["koliani"]]
 collision_layer = 2
 collision_mask = 1
 script = ExtResource("1_kol")
 
 [node name="Sprite" type="Node2D" parent="."]
+
+; Aura roxa a' volta dela (pedido do Paulo). Duas metades: o `Halo`, que se
+; VE' (degrade' radial aditivo, por tras do corpo), e a `LuzAura`, que
+; ILUMINA o cenario a' volta. As duas respiram em conjunto no
+; `koliani.gd::_animar` e acendem no golpe/dash.
+[node name="Halo" type="Sprite2D" parent="Sprite"]
+show_behind_parent = true
+material = SubResource("mat_add")
+position = Vector2(0, -6)
+texture = SubResource("GradientTexture2D_aura")
+modulate = Color(0.62, 0.24, 1, 0.42)
+scale = Vector2(0.62, 0.78)
 
 ; sem `animation` nem `sprite_frames`: quem os monta e' o `_montar_frames`
 ; do koliani.gd, conforme o RIG escolhido. Declarar `animation = "idle"` aqui
@@ -110,15 +137,31 @@ color = Color(0.62, 0.34, 1, 1)
 scale = Vector2(0.28, 0.28)
 
 [node name="LuzAura" type="PointLight2D" parent="Sprite"]
-position = Vector2(0, -4)
+position = Vector2(0, -6)
 texture = SubResource("GradientTexture2D_luz")
-energy = 0.32
-color = Color(0.8, 0.74, 0.95, 1)
-scale = Vector2(1.1, 1.1)
+energy = 0.85
+color = Color(0.66, 0.3, 1, 1)
+scale = Vector2(1.45, 1.45)
 
 [node name="Escudo" type="Node2D" parent="Sprite"]
 position = Vector2(17, -2)
 visible = false
+
+[node name="Cupula" type="Polygon2D" parent="Sprite/Escudo"]
+show_behind_parent = true
+material = SubResource("mat_add")
+position = Vector2(2, 0)
+color = Color(0.55, 0.2, 1, 1)
+polygon = PackedVector2Array(17, 0, 16.42, 6.47, 14.72, 12.5, 12.02, 17.68, 8.5, 21.65, 4.4, 24.15, 1.041e-15, 25, -4.4, 24.15, -8.5, 21.65, -12.02, 17.68, -14.72, 12.5, -16.42, 6.47, -17, 3.062e-15, -16.42, -6.47, -14.72, -12.5, -12.02, -17.68, -8.5, -21.65, -4.4, -24.15, -3.123e-15, -25, 4.4, -24.15, 8.5, -21.65, 12.02, -17.68, 14.72, -12.5, 16.42, -6.47)
+
+[node name="Aro" type="Line2D" parent="Sprite/Escudo"]
+material = SubResource("mat_add")
+position = Vector2(2, 0)
+points = PackedVector2Array(17, 0, 16.42, 6.47, 14.72, 12.5, 12.02, 17.68, 8.5, 21.65, 4.4, 24.15, 1.041e-15, 25, -4.4, 24.15, -8.5, 21.65, -12.02, 17.68, -14.72, 12.5, -16.42, 6.47, -17, 3.062e-15, -16.42, -6.47, -14.72, -12.5, -12.02, -17.68, -8.5, -21.65, -4.4, -24.15, -3.123e-15, -25, 4.4, -24.15, 8.5, -21.65, 12.02, -17.68, 14.72, -12.5, 16.42, -6.47)
+closed = true
+width = 2.2
+default_color = Color(0.86, 0.45, 1, 1)
+joint_mode = 2
 
 [node name="Glow" type="Polygon2D" parent="Sprite/Escudo"]
 scale = Vector2(1.5, 1.5)

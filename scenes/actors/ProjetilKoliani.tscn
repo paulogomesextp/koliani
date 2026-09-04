@@ -3,13 +3,14 @@
 ; Projétil mágico da Koliani (habilidade "projetil"). Bate igual à espada e
 ; parte-se contra inimigos ou cenário. collision_mask = 5 -> "mundo" (1) +
 ; "inimigos" (4); collision_layer = 0 (não é sólido, só deteta).
-; Corpo = VORTICE ROXO a girar, 8 frames (pack "500 Bullet 24x24 Free",
-; bloco roxo -> assets/sprites/pixel/fx/bala_roxa.png, recortado por
-; tools/gerar_fx_portal_balas.py). Voltou ao roxo em 4 set 2026: o rig
-; "Shadowblade" da Koliani e' escuro/roxo e o azul deixou de lhe casar.
+; Corpo = LASER ROXO do pack Wenrexa "Laser2020" (CC0), recortado por
+; tools/gerar_fx_laser.py -> assets/sprites/pixel/fx/laser_roxo.png. E' um
+; glow de alta resolucao, por isso o Corpo desenha-se com texture_filter = 2
+; (LINEAR): a Nearest o degrade' sairia aos degraus. Nao tem frames -- o
+; "vivo" vem do pulsar da escala, no projetil_koliani.gd.
 
 [ext_resource type="Script" path="res://scripts/projetil_koliani.gd" id="1_proj"]
-[ext_resource type="Texture2D" path="res://assets/sprites/pixel/fx/bala_roxa.png" id="2_bala"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/fx/laser_roxo.png" id="2_bala"]
 
 [sub_resource type="CircleShape2D" id="cs_proj"]
 radius = 9.0
@@ -43,9 +44,8 @@ energy = 2.0
 color = Color(0.85, 0.38, 0.98, 1)
 
 [node name="Corpo" type="Sprite2D" parent="."]
-texture_filter = 1
+texture_filter = 2
 material = SubResource("mat_add")
-modulate = Color(0.78, 0.55, 1, 1)
+modulate = Color(0.92, 0.72, 1, 1)
 texture = ExtResource("2_bala")
-hframes = 8
-scale = Vector2(2.1, 2.1)
+scale = Vector2(0.75, 0.75)

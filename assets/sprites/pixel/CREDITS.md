@@ -341,6 +341,19 @@ Szadi art *Fantasy Caves* (catacumbas), ansimuz *GothicVania Town*
   Zeriko) e `fx/flare_roxo.png` (cabeça do Kamehameha). O `fx/bala_roxa.png`
   ficou como vórtice de reserva. O pack em bruto fica fora do git.
 
+## Lasers roxos — Wenrexa "Laser2020" (4 set 2026)
+- https://wenrexa.itch.io/laser2020 — **CC0**, uso comercial livre, sem
+  crédito obrigatório (creditado à mesma). Autor: Wenrexa.
+- Recortado por `tools/gerar_fx_laser.py`:
+  - `fx/laser_roxo.png` (do `13.png`) — o **tiro da Koliani**. Substituiu as
+    três formas do pack das balas: o Paulo escolheu, na capa do pack, o
+    cometa magenta de cauda comprida.
+  - `fx/laser_raio_roxo.png` (do `22.png`) — o **feixe do Kamehameha**, que
+    antes eram três `Polygon2D` desenhados à mão.
+- São glows de alta resolução, não pixel-art: os nós que os desenham usam
+  `texture_filter = 2` (LINEAR). A Nearest sairiam aos degraus.
+- As tiras `fx/tiro_{dardo,seta,risco}.png` ficam no repo como reserva.
+
 O portal animado da **Frostwindz** foi experimentado no mesmo dia mas **não
 entrou** — é pago e a licença proíbe redistribuir os ficheiros, e este repo é
 público. Ver `assets/sprites/incoming/LICENSES.md`.
