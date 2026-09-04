@@ -3,13 +3,13 @@
 ; Projétil mágico da Koliani (habilidade "projetil"). Bate igual à espada e
 ; parte-se contra inimigos ou cenário. collision_mask = 5 -> "mundo" (1) +
 ; "inimigos" (4); collision_layer = 0 (não é sólido, só deteta).
-; Corpo = orbe AZUL a girar (bdragon1727 "Free Effect and Bullet 16x16",
-; folha Water linha 0 col 30-35 -> assets/sprites/pixel/fx/bala_azul.png).
-; Azul, e nao roxo, para casar com o manto da Koliani (rig "nova", 3 set
-; 2026); o roxo ficou para os projecteis do Zeriko.
+; Corpo = VORTICE ROXO a girar, 8 frames (pack "500 Bullet 24x24 Free",
+; bloco roxo -> assets/sprites/pixel/fx/bala_roxa.png, recortado por
+; tools/gerar_fx_portal_balas.py). Voltou ao roxo em 4 set 2026: o rig
+; "Shadowblade" da Koliani e' escuro/roxo e o azul deixou de lhe casar.
 
 [ext_resource type="Script" path="res://scripts/projetil_koliani.gd" id="1_proj"]
-[ext_resource type="Texture2D" path="res://assets/sprites/pixel/fx/bala_azul.png" id="2_bala"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/fx/bala_roxa.png" id="2_bala"]
 
 [sub_resource type="CircleShape2D" id="cs_proj"]
 radius = 9.0
@@ -40,11 +40,12 @@ shape = SubResource("cs_proj")
 [node name="Luz" type="PointLight2D" parent="."]
 texture = SubResource("tex_luz")
 energy = 2.0
-color = Color(0.32, 0.6, 1, 1)
+color = Color(0.85, 0.38, 0.98, 1)
 
 [node name="Corpo" type="Sprite2D" parent="."]
 texture_filter = 1
 material = SubResource("mat_add")
+modulate = Color(0.78, 0.55, 1, 1)
 texture = ExtResource("2_bala")
-hframes = 6
-scale = Vector2(2.4, 2.4)
+hframes = 8
+scale = Vector2(2.1, 2.1)

@@ -331,3 +331,16 @@ Gerado por `tools/gerar_terreno.py`: capa + corpo + franja + corte lateral,
 Pixel Frog *Kings & Pigs* (prisão), ansimuz *GothicVania Church* (torres),
 Szadi art *Fantasy Caves* (catacumbas), ansimuz *GothicVania Town*
 (cidade), ansimuz *Old Dark Castle* (castelo).
+
+## Balas de energia roxas (4 set 2026)
+- **500 Bullet 24x24 Free** (bloco roxo), recortado por
+  `tools/gerar_fx_portal_balas.py`: as balas de 8 frames —
+  `fx/tiro_dardo.png` / `fx/tiro_seta.png` / `fx/tiro_risco.png` — as três
+  formas que o tiro da Koliani sorteia a cada disparo (bloco lavanda do
+  `Part 2C`, escolhidas pelo Paulo) —, `fx/bala_roxa_grande.png` (bolas do
+  Zeriko) e `fx/flare_roxo.png` (cabeça do Kamehameha). O `fx/bala_roxa.png`
+  ficou como vórtice de reserva. O pack em bruto fica fora do git.
+
+O portal animado da **Frostwindz** foi experimentado no mesmo dia mas **não
+entrou** — é pago e a licença proíbe redistribuir os ficheiros, e este repo é
+público. Ver `assets/sprites/incoming/LICENSES.md`.

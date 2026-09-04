@@ -5,6 +5,49 @@
 
 ---
 
+# ⚠ POR FAZER — o que ficou pendente (4 set 2026, fim de sessão)
+
+1. **Escolher mecânicas do catálogo.** O Paulo deixou uma lista enorme de
+   mecânicas em [`docs/mecanicas_catalogo.md`](mecanicas_catalogo.md)
+   (chefes, coletáveis, mobilidade, game feel, plataformas, perigos,
+   combate, puzzles, estrutura de fase). **Ele define as prioridades** —
+   perguntar antes de implementar seja o que for daí.
+2. **Portal animado do fim de nível: BLOQUEADO por licença.** O pack pago da
+   Frostwindz está em `assets/sprites/incoming/frostwindz/` e o recorte
+   sai com `python tools/gerar_fx_portal_balas.py`, mas a licença dele
+   proíbe redistribuir os ficheiros e este repo é **público** — por isso a
+   `Porta.tscn` ficou com o vórtice desenhado por código. Se o repo passar
+   a privado (ou houver acordo com a Frostwindz), é só apontar a `Porta`
+   para `props/portal_fim.png`. Detalhe em `incoming/LICENSES.md`.
+3. **Licença do pack das balas por confirmar.** O `500 Bullet 24x24 Free`
+   não traz ficheiro de licença nenhum — só PNGs. Confirmar os termos na
+   página do itch.io de onde veio.
+4. **O glow do golpe não foi visto em jogo.** Os testes e o smoke-test
+   passam, mas não se chegou a tirar uma screenshot da Koliani a atacar
+   depois de os efeitos saírem — confirmar que o `COR_GLOW_GOLPE` (roxo
+   escuro, `koliani.gd`) está no ponto certo e não subtil demais.
+5. Continua tudo o que estava pendente das sessões anteriores (ver o resto
+   deste ficheiro e `docs/progresso_agente.md`).
+
+---
+
+# FEITO — tiros de energia novos + espada sem efeitos (4 set 2026)
+
+- Os projécteis da Koliani voltaram ao **roxo** e passaram a usar o pack
+  **"500 Bullet 24x24 Free"**. O tiro básico **sorteia uma de três formas a
+  cada disparo** — dardo, seta e risco, as que o Paulo escolheu (bloco
+  lavanda do `Part 2C`) — e são direccionais: apontam para onde vão.
+  Zeriko ficou com um anel grosso e o Kamehameha com um flare espetado, de
+  propósito com formas diferentes para se ler de quem vem o tiro.
+- **Espada sem efeitos**: saíram os dois arcos de luz que varriam, o rasto
+  em `Line2D` e o smear que esticava o sprite; ficou só um **glow roxo
+  escuro** discreto (`COR_GLOW_GOLPE`). O "pop"/squash que ainda deformava
+  o sprite passou a estar atrás do guarda `RIG_PIXEL`.
+- `tools/gerar_fx_portal_balas.py` faz os recortes;
+  `tools/shot_projeteis.gd` é a bancada para os ver lado a lado.
+
+---
+
 # ⚠ FILA DO PAULO (por ordem que ele deu)
 
 ## FEITO nesta sessão

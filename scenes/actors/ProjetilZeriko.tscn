@@ -1,11 +1,13 @@
 [gd_scene load_steps=6 format=3 uid="uid://bkolianiprojetilzeriko01"]
 
-; Bola de energia que o Zeriko lança. Corpo = vórtice roxo a girar
-; (bdragon1727 "Free Effect and Bullet 16x16" -> bala_roxa.png), o mesmo
-; sprite do tiro da Koliani mas em maior. Ver scripts/projetil_zeriko.gd.
+; Bola de energia que o Zeriko lança. Corpo = anel roxo GROSSO a pulsar,
+; 8 frames (pack "500 Bullet 24x24 Free" -> bala_roxa_grande.png). Forma
+; diferente da do tiro da Koliani (que é um vórtice) de propósito: as duas
+; são roxas, tem de se ler num relance de quem é o tiro que vem aí.
+; Ver scripts/projetil_zeriko.gd.
 
 [ext_resource type="Script" path="res://scripts/projetil_zeriko.gd" id="1_proj"]
-[ext_resource type="Texture2D" path="res://assets/sprites/pixel/fx/bala_roxa.png" id="2_bala"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/fx/bala_roxa_grande.png" id="2_bala"]
 
 [sub_resource type="CircleShape2D" id="cs_proj"]
 radius = 10.0
@@ -42,5 +44,5 @@ color = Color(0.97, 0.4, 0.92, 1)
 texture_filter = 1
 material = SubResource("mat_add")
 texture = ExtResource("2_bala")
-hframes = 6
-scale = Vector2(2.7, 2.7)
+hframes = 8
+scale = Vector2(1.9, 1.9)

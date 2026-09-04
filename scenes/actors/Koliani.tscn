@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://bkolianiactor01"]
+[gd_scene load_steps=9 format=3 uid="uid://bkolianiactor01"]
 
 ; Koliani -- sprite SVG + shader de personagem (rim light + flash) e
 ; animacao PROCEDURAL feita em koliani.gd (squash/stretch, lean, pop de
@@ -39,26 +39,12 @@ fill = 1
 fill_from = Vector2(0.5, 0.5)
 fill_to = Vector2(1, 0.5)
 
-[sub_resource type="Gradient" id="Gradient_rastro"]
-offsets = PackedFloat32Array(0, 0.5, 1)
-colors = PackedColorArray(1, 1, 1, 0, 1, 0.7, 0.98, 0.85, 1, 0.95, 1, 0)
-
 [node name="Koliani" type="CharacterBody2D" groups=["koliani"]]
 collision_layer = 2
 collision_mask = 1
 script = ExtResource("1_kol")
 
 [node name="Sprite" type="Node2D" parent="."]
-
-[node name="Rastro" type="Line2D" parent="Sprite"]
-z_index = -1
-width = 10.0
-default_color = Color(1, 0.8, 0.98, 1)
-gradient = SubResource("Gradient_rastro")
-begin_cap_mode = 2
-end_cap_mode = 2
-joint_mode = 2
-visible = false
 
 ; sem `animation` nem `sprite_frames`: quem os monta e' o `_montar_frames`
 ; do koliani.gd, conforme o RIG escolhido. Declarar `animation = "idle"` aqui

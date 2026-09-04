@@ -113,7 +113,6 @@ const TEX_IMPACTO := preload("res://assets/sprites/impacto.svg")
 @onready var _sprite: Node2D = $Sprite
 @onready var _corpo: AnimatedSprite2D = $Sprite/Corpo
 @onready var _arma: Sprite2D = $Sprite/Arma
-@onready var _rastro: Line2D = $Sprite/Rastro
 @onready var _escudo: Node2D = $Sprite/Escudo
 @onready var _escudo_glow: CanvasItem = $Sprite/Escudo/Glow
 @onready var _luz_carga: PointLight2D = $Sprite/LuzCarga
@@ -132,9 +131,6 @@ var _dash_recarga := 0.0
 var _rolar_restante := 0.0
 ## Conta-decrescente da janela pós-rolamento (ver `POS_ROLL_JANELA`).
 var _pos_roll_t := 0.0
-## Smear do golpe (0..1.4): estica o sprite no sentido do golpe e dá um
-## micro-avanço, decai a zero. Só visual.
-var _atk_smear := 0.0
 ## Avanço do golpe a decorrer (ver `AVANCO_VEL`).
 var _avanco_restante := 0.0
 var _avanco_dur := 0.0
@@ -512,8 +508,6 @@ func _aplicar_equipamento() -> void:
 		_mat_equip.set_shader_parameter("peso_armadura", 1.0 if ai >= 0 else 0.0)
 	if _luz_lamina:
 		_luz_lamina.color = _cor_golpe()
-	if _rastro:
-		_rastro.modulate = _cor_golpe()
 	if _corpo:
 		_corpo.modulate = _tint_armadura()
 	_aplicar_visual_armadura()
@@ -1031,7 +1025,6 @@ func _animar(dt: float) -> void:
 	_anim_t += dt
 	_squash = move_toward(_squash, 0.0, dt * 5.0)
 	_pop = move_toward(_pop, 0.0, dt * 7.0)
-	_atk_smear = move_toward(_atk_smear, 0.0, dt * 6.5)
 
 	# o rig "cavaleiro" já tem escudo desenhado nos frames da defesa
 	if _escudo and RIG == "codigo":
@@ -1086,47 +1079,19 @@ func _animar(dt: float) -> void:
 			var b := sin(_anim_t * 3.0) * 0.02
 			escala = Vector2(1.0 - b, 1.0 + b)
 
-	escala.x += _squash * 0.32 + _pop * 0.10
-	escala.y += -_squash * 0.32 + _pop * 0.18
-	# smear do golpe: estica na horizontal, comprime na vertical, inclina e
-	# avança um nada no sentido do golpe (pega Dead Cells -- "pisar" o golpe)
-	if _atk_smear > 0.001:
-		escala.x += _atk_smear * 0.30
-		escala.y -= _atk_smear * 0.16
-		_sprite.position.x = _olha_para * _atk_smear * 6.5
-		_sprite.rotation = lerp_angle(_sprite.rotation, -_olha_para * 0.16, minf(1.0, dt * 22.0))
-	else:
-		_sprite.position.x = move_toward(_sprite.position.x, 0.0, dt * 90.0)
+	# o "pop" do golpe e o squash da aterragem tambem deformavam o sprite --
+	# e este bloco escapava ao guarda do RIG_PIXEL logo acima. Em pixel-art
+	# nao se estica nada por codigo (ver `RIG_PIXEL`); o pop do ataque saiu de
+	# vez com o resto dos efeitos da espada (pedido do Paulo, 4 set 2026).
+	if not RIG_PIXEL:
+		escala.x += _squash * 0.32 + _pop * 0.10
+		escala.y += -_squash * 0.32 + _pop * 0.18
+	_sprite.position.x = move_toward(_sprite.position.x, 0.0, dt * 90.0)
 	if RIG_PIXEL:
 		# em pixel-art o sprite tem de assentar em pixéis INTEIROS: meio pixel
 		# de desvio faz a personagem cintilar com o filtro Nearest
 		_sprite.position.x = roundf(_sprite.position.x)
 	_sprite.scale = Vector2(escala.x * _flip_sprite(), escala.y)
-
-	_animar_rastro(dt)
-
-
-func _animar_rastro(dt: float) -> void:
-	if _rastro == null:
-		return
-	if _ataque_restante > 0.0:
-		_rastro.visible = true
-		_rastro.modulate.a = 1.0
-		_rastro.width = 18.0
-		var p := clampf(1.0 - _ataque_restante / maxf(_ataque_dur, 0.001), 0.0, 1.0)
-		var pts := PackedVector2Array()
-		for i in 9:
-			var f := p - i * 0.05
-			if f < 0.0:
-				break
-			var ang := lerpf(deg_to_rad(-124.0), deg_to_rad(40.0), f)
-			pts.append(Vector2(cos(ang), sin(ang)) * 34.0 + Vector2(0.0, -4.0))
-		_rastro.points = pts
-	elif _rastro.visible:
-		_rastro.modulate.a = move_toward(_rastro.modulate.a, 0.0, dt * 7.0)
-		if _rastro.modulate.a <= 0.02:
-			_rastro.visible = false
-			_rastro.points = PackedVector2Array()
 
 
 func _flash_branco() -> void:
@@ -1198,9 +1163,6 @@ func _iniciar_ataque() -> void:
 	_avanco_vel = AVANCO_VEL[i_av] * (1.0 if is_on_floor() else AVANCO_NO_AR)
 	_avanco_dur = AVANCO_DUR[i_av]
 	_avanco_restante = _avanco_dur
-	# smear direcional + micro-avanço no golpe (pegada Dead Cells: "pisar" o
-	# golpe). Só visual -- não mexe na física. O remate do combo puxa mais.
-	_atk_smear = 1.4 if _combo_passo == NUM_COMBO - 1 else 1.0
 	Som.toca("ataque", -6.0, randf_range(0.95, 1.06))
 	_flash_golpe()
 	if _combo_passo == NUM_COMBO - 1:
@@ -1230,74 +1192,23 @@ func _cor_golpe() -> Color:
 	return COR_GOLPE_BASE if wi < 0 else Equipamento.cor_arma(wi).lerp(Color.WHITE, 0.4)
 
 
-## Pontos de um arco cheio (crescente) entre dois raios/ângulos, em local.
-func _pontos_arco(r_in: float, r_out: float, a0: float, a1: float) -> PackedVector2Array:
-	var pts := PackedVector2Array()
-	var n := 14
-	for i in n + 1:
-		var a := lerpf(a0, a1, float(i) / float(n))
-		pts.append(Vector2(cos(a), sin(a)) * r_out)
-	for i in n + 1:
-		var a := lerpf(a1, a0, float(i) / float(n))
-		pts.append(Vector2(cos(a), sin(a)) * r_in)
-	return pts
+## Glow do golpe: um brilho ROXO ESCURO, curto e discreto. Pedido do Paulo
+## (4 set 2026): "faça só um leve glow roxo escuro quando ela ataca, algo
+## muito subtil". Daqui saíam antes dois arcos de luz a varrer com a lâmina
+## (`_arco_luz`), um rasto em `Line2D` e um smear que esticava o sprite --
+## tudo isso tapava a arte da personagem, e o rig "Shadowblade" já desenha
+## o corte no próprio frame.
+const COR_GLOW_GOLPE := Color(0.4, 0.13, 0.6)
 
-
-## Material aditivo partilhado -- faz os arcos BRILHAREM em vez de parecerem
-## tinta cinzenta por cima do cenário.
-static var _MAT_ADD: CanvasItemMaterial
-
-func _mat_add() -> CanvasItemMaterial:
-	if _MAT_ADD == null:
-		_MAT_ADD = CanvasItemMaterial.new()
-		_MAT_ADD.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
-	return _MAT_ADD
-
-
-## Efeito do corte: raio de luz que varre com a lâmina (núcleo branco-quente
-## + halo da cor da arma) + clarão que ilumina mesmo o cenário à frente.
 func _flash_golpe() -> void:
-	var cor := _cor_golpe()
-	var quente := cor.lerp(Color(1, 1, 1), 0.6)
-
-	if _luz_golpe:
-		_luz_golpe.color = cor
-		_luz_golpe.energy = 0.0
-		var tl := _luz_golpe.create_tween()
-		tl.tween_property(_luz_golpe, "energy", 2.1, 0.04).set_ease(Tween.EASE_OUT)
-		tl.tween_property(_luz_golpe, "energy", 0.0, DUR_ATAQUE + 0.12).set_ease(Tween.EASE_IN)
-
-	if _sprite == null:
+	if _luz_golpe == null:
 		return
-	# halo largo (cor da arma) + núcleo fino (branco-quente), ambos aditivos.
-	# CURTOS de propósito: o rig "cavaleiro" já desenha o corte no frame, e o
-	# arco antigo (raio 52 x1.5) tapava metade da personagem.
-	_arco_luz(_pontos_arco(18.0, 40.0, deg_to_rad(-112.0), deg_to_rad(36.0)),
-		Color(cor.r, cor.g, cor.b, 0.0), 0.34, 1.22)
-	_arco_luz(_pontos_arco(27.0, 36.0, deg_to_rad(-104.0), deg_to_rad(32.0)),
-		Color(quente.r, quente.g, quente.b, 0.0), 0.55, 1.1)
+	_luz_golpe.color = COR_GLOW_GOLPE
+	_luz_golpe.energy = 0.0
+	var tl := _luz_golpe.create_tween()
+	tl.tween_property(_luz_golpe, "energy", 0.55, 0.05).set_ease(Tween.EASE_OUT)
+	tl.tween_property(_luz_golpe, "energy", 0.0, DUR_ATAQUE + 0.08).set_ease(Tween.EASE_IN)
 	_abanar(1.8)
-
-
-## Um arco que varre para a frente (segue o flip do Sprite) e desaparece.
-func _arco_luz(pts: PackedVector2Array, cor: Color, pico: float, esc: float) -> void:
-	var arco := Polygon2D.new()
-	arco.polygon = pts
-	arco.color = cor
-	arco.material = _mat_add()
-	arco.position = Vector2(9.0, -6.0)
-	arco.rotation = deg_to_rad(-52.0)
-	arco.z_index = 30
-	_sprite.add_child(arco)
-	var t := arco.create_tween()
-	t.set_parallel(true)
-	t.tween_property(arco, "color:a", pico, 0.035).set_ease(Tween.EASE_OUT)
-	t.tween_property(arco, "rotation", deg_to_rad(44.0), DUR_ATAQUE + 0.07) \
-		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-	t.tween_property(arco, "scale", Vector2(esc, esc), DUR_ATAQUE + 0.07) \
-		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	t.chain().tween_property(arco, "color:a", 0.0, 0.08)
-	t.chain().tween_callback(arco.queue_free)
 
 
 ## Gere o botão "lancar": segurar carrega o Kamehameha, largar cedo dispara

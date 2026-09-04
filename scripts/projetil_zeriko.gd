@@ -4,6 +4,9 @@ extends Area2D
 ## ao toque e desfaz-se contra a Koliani, contra o cenário, ou ao fim de
 ## algum tempo.
 
+## Roxo do pack das balas, para o estalo do impacto casar com a bola.
+const COR := Color(0.9, 0.42, 1.0)
+
 @export var velocidade := 300.0
 @export var dano := 16
 
@@ -26,7 +29,7 @@ func _physics_process(dt: float) -> void:
 	global_position += _dir * velocidade * dt
 	_t += dt
 	if _corpo:
-		_corpo.frame = int(_t * 22.0) % 6
+		_corpo.frame = int(_t * 22.0) % 8   # o anel roxo tem 8 frames
 	_tempo_de_vida -= dt
 	if _tempo_de_vida <= 0.0:
 		_estoirar()
@@ -39,5 +42,5 @@ func _ao_bater(corpo: Node) -> void:
 
 
 func _estoirar() -> void:
-	Impacto.rebentar(self, global_position, Color(1, 1, 1), 1.8)
+	Impacto.rebentar(self, global_position, COR, 1.8)
 	queue_free()

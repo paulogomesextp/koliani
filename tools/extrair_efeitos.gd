@@ -4,14 +4,15 @@ extends SceneTree
 ##
 ##   * impacto_roxo -- anel que abre a partir do ponto do acerto (o "pop"
 ##     que faltava aos golpes). Usado por `scripts/impacto.gd`.
-##   * bala_roxa -- vórtice roxo a girar, 6 frames em loop -- corpo do
-##     `ProjetilKoliani`, cabeça do `KamehamehaKoliani`, `ProjetilZeriko`.
-##   * bola_fogo -- o mesmo vórtice na folha laranja -- corpo da `BolaFogo`
-##     (Torreta / cuspidor).
+##   * bola_fogo -- vórtice laranja a girar, 6 frames em loop -- corpo da
+##     `BolaFogo` (Torreta / cuspidor).
 ##   * impacto_azul / bala_azul -- os mesmos cortes na folha "Water"
-##     (3 set 2026). Com o rig novo da Koliani (manto azul) os tiros roxos
-##     deixaram de casar com a personagem; os projécteis dela passaram a
-##     azul e o roxo ficou para o Zeriko e para o Kamehameha.
+##     (3 set 2026), do tempo em que a Koliani tinha o manto azul.
+##
+## As BALAS DE ENERGIA já não saem daqui: desde 4 set 2026 vêm do pack
+## "500 Bullet 24x24 Free" (bloco roxo), recortadas por
+## `tools/gerar_fx_portal_balas.py`. Se este script voltasse a escrever
+## `bala_roxa` esmagava-as -- daí a entrada ter saído da tabela.
 ##
 ##   godot --headless --script res://tools/extrair_efeitos.gd
 
@@ -23,8 +24,7 @@ const CEL := 16
 const TIRAS := {
 	# linha 5, colunas 14..17: ponto -> disco -> anel -> anel largo
 	"impacto_roxo": ["Purple", 5, 14, 4],
-	# linha 0, colunas 30..35: vórtice a girar (loop) -- corpo dos tiros
-	"bala_roxa": ["Purple", 0, 30, 6],
+	# linha 0, colunas 30..35: vórtice a girar (loop)
 	"bola_fogo": ["Fire", 0, 30, 6],
 	"impacto_azul": ["Water", 5, 14, 4],
 	"bala_azul": ["Water", 0, 30, 6],

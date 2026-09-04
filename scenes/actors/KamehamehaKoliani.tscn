@@ -1,15 +1,16 @@
 [gd_scene load_steps=7 format=3 uid="uid://bkolianikameha01"]
 
-; Kamehameha AZUL da Koliani (habilidade "projetil"). Rajada esticada tipo
+; Kamehameha ROXO da Koliani (habilidade "projetil"). Rajada esticada tipo
 ; feixe que ATRAVESSA inimigos e so se parte contra o cenario ou ao fim do
 ; tempo. collision_mask = 5 -> "mundo" (1) + "inimigos" (4);
 ; collision_layer = 0 (nao e solido, so deteta). Custo/energia em koliani.gd.
-; Cabeca = orbe azul a girar (bdragon1727 "Free Effect and Bullet 16x16",
-; folha Water) a puxar o feixe -> assets/sprites/pixel/fx/bala_azul.png.
-; Azul desde 3 set 2026, para casar com o manto do rig novo da Koliani.
+; Cabeca = FLARE ROXO espetado, 8 frames (pack "500 Bullet 24x24 Free",
+; bloco roxo -> assets/sprites/pixel/fx/flare_roxo.png, recortado por
+; tools/gerar_fx_portal_balas.py) a puxar o feixe. Voltou ao roxo em 4 set
+; 2026, com o rig "Shadowblade"; o feixe acompanha a cor da cabeca.
 
 [ext_resource type="Script" path="res://scripts/kamehameha_koliani.gd" id="1_kame"]
-[ext_resource type="Texture2D" path="res://assets/sprites/pixel/fx/bala_azul.png" id="2_bala"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/fx/flare_roxo.png" id="2_bala"]
 
 [sub_resource type="RectangleShape2D" id="rs_kame"]
 size = Vector2(96, 26)
@@ -40,20 +41,20 @@ shape = SubResource("rs_kame")
 [node name="Luz" type="PointLight2D" parent="."]
 texture = SubResource("tex_luz")
 energy = 3.0
-color = Color(0.32, 0.6, 1, 1)
+color = Color(0.85, 0.38, 0.98, 1)
 scale = Vector2(1.7, 1.4)
 
 [node name="AuraExterna" type="Polygon2D" parent="."]
 show_behind_parent = true
-color = Color(0.24, 0.5, 1, 0.2)
+color = Color(0.42, 0.12, 0.85, 0.22)
 polygon = PackedVector2Array(-60, 0, -30, -22, 40, -18, 62, 0, 40, 18, -30, 22)
 
 [node name="Feixe" type="Polygon2D" parent="."]
-color = Color(0.38, 0.66, 1, 0.85)
+color = Color(0.75, 0.28, 0.94, 0.85)
 polygon = PackedVector2Array(-52, 0, -30, -13, 34, -12, 52, 0, 34, 12, -30, 13)
 
 [node name="Nucleo" type="Polygon2D" parent="."]
-color = Color(0.88, 0.96, 1, 1)
+color = Color(1, 0.78, 0.96, 1)
 polygon = PackedVector2Array(-48, 0, -26, -6, 40, -5, 50, 0, 40, 5, -26, 6)
 
 [node name="Cabeca" type="Sprite2D" parent="."]
@@ -61,8 +62,8 @@ texture_filter = 1
 material = SubResource("mat_add")
 position = Vector2(50, 0)
 texture = ExtResource("2_bala")
-hframes = 6
-scale = Vector2(3, 3)
+hframes = 8
+scale = Vector2(2, 2)
 
 [node name="Rasto" type="CPUParticles2D" parent="."]
 amount = 22
@@ -75,4 +76,4 @@ initial_velocity_min = 60.0
 initial_velocity_max = 200.0
 scale_amount_min = 2.0
 scale_amount_max = 4.5
-color = Color(0.42, 0.7, 1, 0.9)
+color = Color(0.94, 0.5, 0.95, 0.9)

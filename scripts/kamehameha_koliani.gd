@@ -5,6 +5,8 @@ extends Area2D
 ## contra o cenário ou ao fim do tempo. Custo/energia gerido em `koliani.gd`.
 
 const VELOCIDADE := 900.0
+## Roxo do pack das balas, para o estalo do impacto casar com o feixe.
+const COR := Color(0.88, 0.5, 1.0)
 
 var dano := 75
 var _dir := Vector2.RIGHT
@@ -34,7 +36,7 @@ func _physics_process(dt: float) -> void:
 	if _luz:
 		_luz.energy = 2.7 + 0.6 * sin(_t * 26.0)
 	if _cabeca:
-		_cabeca.frame = int(_t * 26.0) % 6
+		_cabeca.frame = int(_t * 26.0) % 8   # o flare tem 8 frames
 		_cabeca.rotation = -rotation
 	_tempo_de_vida -= dt
 	if _tempo_de_vida <= 0.0:
@@ -59,5 +61,5 @@ func _ao_bater(corpo: Node) -> void:
 
 
 func _estoirar() -> void:
-	Impacto.rebentar(self, global_position, Color(1, 1, 1), 2.8)
+	Impacto.rebentar(self, global_position, COR, 2.8)
 	queue_free()
