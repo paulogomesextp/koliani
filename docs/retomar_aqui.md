@@ -13,6 +13,20 @@
 - ✅ **Menus de arma/armadura em carrossel**, com preview e stats/diferenças.
 - ✅ **PRIORIDADE: o rig "Shadowblade" (arte dele) é a Koliani principal.**
 
+## FEITO — a faixa "SKILL" de volta, a azul (4 set 2026)
+
+> *"O ícone de ganhar novas skills, meta como estava inicialmente, letras a
+> azul e um brilho a dizer skill."*
+
+A placa tinha sido removida a 2 set (commit `4c78f1c`) porque ele achou que
+lia como uma caixa solta em cima das plataformas. Está reposta em
+`scripts/coletavel.gd::_faixa_skill`, igual à original mas com a paleta
+passada de verde-água para AZUL — as constantes `COR_LETRAS`/`COR_BORDA`/
+`COR_BRILHO`/`COR_LUZ` no topo do ficheiro são o sítio para afinar o tom.
+O brilho continua aditivo, para acender por cima do cenário escuro.
+
+---
+
 ## FEITO — o rig Shadowblade a sério (4 set 2026)
 
 Três queixas dele sobre o boneco novo, todas resolvidas:
