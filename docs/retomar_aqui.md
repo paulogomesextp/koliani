@@ -34,10 +34,10 @@ Blocos, por ordem de ataque:
    `android-latest` e o Web para o **GitHub Pages**. O export do APK
    continua por confirmar — ver "Bloco 4" mais abaixo.
 5. **UI, vidas, mecânicas** — ⬅ *é aqui que a próxima sessão pega.*
-   ~~vidas a começar em 5 e +1 por nível~~ **FEITO** (`9b8a78e`). Falta a
-   UI + indicador de nível; e o pedido grande: uma mecânica nova por nível,
-   que **começa pela tabela** `docs/mecanicas_por_nivel.md` para ele
-   aprovar, não por código.
+   ~~vidas a começar em 5 e +1 por nível~~ **FEITO** (`9b8a78e`).
+   ~~a tabela das mecânicas~~ **ESCRITA, à espera da aprovação dele**
+   (`docs/mecanicas_por_nivel.md` + página abaixo). **Nada disso se coda
+   antes de ele responder.** Falta a UI + indicador de nível.
 6. **Assets e licenças** — portal da Frostwindz: **cancelar a mudança ou
    achar um equivalente grátis**. Licença do pack das balas: **ignorar**
    (decisão dele).
@@ -154,8 +154,62 @@ Ao mesmo tempo entraram as duas saídas públicas que faltavam:
 - **GitHub Pages** com o build Web (`enablement: true` liga o Pages sozinho
   na primeira vez). É a única via grátis para o iPhone.
 
-**Por confirmar na próxima sessão:** se o run passou. Se não, ler as
-anotações do run — é para isso que lá estão.
+### ⚠ UMA COISA QUE SÓ O PAULO PODE FAZER
+
+O `GITHUB_TOKEN` **não consegue criar** o site de Pages (limitação conhecida
+do `configure-pages`; o erro é `Resource not accessible by integration`).
+Basta ir uma vez a **Settings → Pages → Build and deployment → Source:
+GitHub Actions** e a partir daí cada push publica o jogo numa página que abre
+no iPhone. Até lá o job fica `continue-on-error`, para não pintar o CI de
+vermelho a cada push. Já está apontado no painel de prioridades.
+
+### GOTCHA que vale ouro: como depurar este CI de fora
+
+Os **logs** dos Actions deste repo pedem sessão iniciada (`Must have admin
+rights`, mesmo sendo público). As **anotações** não:
+
+```bash
+curl -s "https://api.github.com/repos/paulogomesextp/koliani/actions/runs/<ID>/jobs"
+curl -s "https://api.github.com/repos/paulogomesextp/koliani/check-runs/<JOB_ID>/annotations"
+```
+
+Duas armadilhas que já morderam:
+- **o GitHub só CRIA as primeiras dez anotações de cada nível por passo.**
+  Uma linha por anotação faz o essencial cair fora — manda-se **tudo numa
+  anotação só**, com as quebras em `%0A`;
+- correr o export com `-v` enche o log de `Loading resource:` e o `tail`
+  passa a apanhar só ruído.
+
+**Estado do diagnóstico:** o ambiente do CI está BOM —
+`ANDROID_HOME=/usr/lib/android-sdk`, `apksigner` em `build-tools/33.0.2`,
+OpenJDK 17. Não é SDK nem Java. As linhas reais que já saíram foram
+"Could not find version of build tools that matches Target SDK, using 33.0.2"
+(aviso, não fatal) e "Unable to load fontconfig" (ruído de headless). **A
+próxima sessão pega o log inteiro na anotação e resolve.**
+
+---
+
+# BLOCO 5 — a tabela das 100 mecânicas está escrita
+
+`docs/mecanicas_por_nivel.md`, e a mesma coisa em página para ele ver no
+telemóvel: <https://claude.ai/code/artifact/10c02ed5-c074-4992-9348-841002e59c31>
+
+Cem níveis, cem mecânicas, uma por nível. A regra: **cada nível ESTREIA uma
+mecânica** (mansa, é o tutorial dela sem texto), e **depois ela pode voltar,
+sempre mais dura** — cada uma tem um parâmetro que escala com `_dif`.
+
+O inventário honesto: **38 já existem** (actor ou câmara já no jogo), **17
+são variações** baratas de coisas que existem, **31 são actores novos
+pequenos** e **14 são grandes** (nadar, gancho, gravidade rotativa, a sombra
+com atraso...). A página diz quais são os 14 e diz-lhe que **cortar qualquer
+um deles não parte a promessa**.
+
+**NÃO CODAR NADA DISTO** antes de ele responder às quatro perguntas do fim da
+página. Foi ele que pediu para começar pela tabela.
+
+Quando aprovar, o que muda: a tabela vira `MECANICA_DO_NIVEL` no
+`gerador_corredor.gd` (ao lado do `PERFIL` e do `ASSIN_NIVEL`, que já fazem
+uma versão fraca disto) e o `TIER_FLAVOUR` deixa de mandar na estreia.
 
 ---
 
