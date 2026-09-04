@@ -636,5 +636,100 @@
    "hurt": 12.0,
    "death": 10.0
   }
+ },
+ "ghorak": {
+  "w": 182,
+  "h": 176,
+  "pes_y": 164,
+  "estados": {
+   "idle": 6,
+   "walk": 8,
+   "attack": 10,
+   "hurt": 4,
+   "death": 10
+  },
+  "fps": {
+   "idle": 7.0,
+   "walk": 11.0,
+   "attack": 14.0,
+   "hurt": 12.0,
+   "death": 10.0
+  }
+ },
+ "morvanna": {
+  "w": 194,
+  "h": 236,
+  "pes_y": 200,
+  "estados": {
+   "idle": 6,
+   "walk": 8,
+   "attack": 10,
+   "hurt": 4,
+   "death": 10
+  },
+  "fps": {
+   "idle": 7.0,
+   "walk": 11.0,
+   "attack": 14.0,
+   "hurt": 12.0,
+   "death": 10.0
+  }
+ },
+ "rainha_aracnidea": {
+  "w": 156,
+  "h": 150,
+  "pes_y": 130,
+  "estados": {
+   "idle": 6,
+   "walk": 8,
+   "attack": 10,
+   "hurt": 4,
+   "death": 10
+  },
+  "fps": {
+   "idle": 7.0,
+   "walk": 11.0,
+   "attack": 14.0,
+   "hurt": 12.0,
+   "death": 10.0
+  }
+ },
+ "entrevane": {
+  "w": 214,
+  "h": 222,
+  "pes_y": 186,
+  "estados": {
+   "idle": 6,
+   "walk": 8,
+   "attack": 10,
+   "hurt": 4,
+   "death": 10
+  },
+  "fps": {
+   "idle": 7.0,
+   "walk": 11.0,
+   "attack": 14.0,
+   "hurt": 12.0,
+   "death": 10.0
+  }
+ },
+ "coracao_putrefacto": {
+  "w": 124,
+  "h": 158,
+  "pes_y": 156,
+  "estados": {
+   "idle": 6,
+   "walk": 8,
+   "attack": 10,
+   "hurt": 4,
+   "death": 10
+  },
+  "fps": {
+   "idle": 7.0,
+   "walk": 11.0,
+   "attack": 14.0,
+   "hurt": 12.0,
+   "death": 10.0
+  }
  }
 }
