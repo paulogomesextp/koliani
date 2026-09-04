@@ -5,7 +5,73 @@
 
 ---
 
-# ⚠ POR FAZER — o que ficou pendente (4 set 2026, fim de sessão)
+# ⚠ COMECAR AQUI — a ordem que o Paulo deu (4 set 2026)
+
+**Painel de prioridades (é a fonte de verdade da ordem):**
+<https://claude.ai/code/artifact/875b9e60-ef1b-4866-ad8f-d273169da411>
+
+> **Regra dele: todo o pedido novo entra nessa página.** O estado de cada
+> linha (estado/bloco/ordem) vive no `db` do artifact, não no HTML — o HTML
+> só tem o catálogo `ITENS`. Acrescentar uma entrada e republicar **não**
+> estraga a organização dele. O ficheiro-fonte da página vive no scratchpad
+> da sessão que a publicou: numa sessão nova, ler o artifact
+> (`Artifact action:"read"` com o URL), gravar em ficheiro, e só depois
+> editar e republicar com o mesmo `url`.
+
+Blocos, por ordem de ataque:
+
+1. ~~**Softlock do portal**~~ — **FEITO** (`712137f`), ver abaixo.
+2. **Som e música** — ⬅ *é aqui que a próxima sessão pega.* Sons da Koliani
+   (animações, ataques) e sons por espécie de monstro; trocar a música do
+   Nível 32 (esquisita, com cortes) e usar o final da do 38 (rock) como
+   referência. A espada e os mísseis já foram sintetizados duas vezes sem
+   agradar — **desta vez ir buscar samples reais CC0**, não sintetizar.
+3. **Projécteis, luz e escudo** — aura roxa à volta dela
+   (`Koliani.tscn → Sprite/LuzAura`, já existe, é ligar); laser roxo do
+   Wenrexa nos projécteis (ver ponto 0 abaixo); candeeiros/tochas com luz
+   própria ao longo dos níveis; escudo melhor + escudo de energia roxo.
+4. **Infra** — CI do APK falha desde o run 264. Plano combinado: arranjar o
+   CI, publicar o APK num Release de tag rolante (`android-latest`, a par do
+   `win-latest`), e ligar o **GitHub Pages ao build Web** — o preset "Web"
+   já é exportado pelo CI mas não é publicado em lado nenhum. O iPhone não
+   tem caminho nativo grátis (Apple ID grátis expira em 7 dias e exige Mac;
+   TestFlight exige os 99 €/ano), portanto a Web é a saída para iOS.
+5. **UI, vidas, mecânicas** — UI + indicador de nível; vidas a começar em 5
+   e +1 por nível (o mais rápido de todos, só `EstadoJogo`); e o pedido
+   grande: uma mecânica nova por nível, que **começa pela tabela**
+   `docs/mecanicas_por_nivel.md` para ele aprovar, não por código.
+6. **Assets e licenças** — portal da Frostwindz: **cancelar a mudança ou
+   achar um equivalente grátis**. Licença do pack das balas: **ignorar**
+   (decisão dele).
+7. **Trabalho de fundo** — playtest (ele já testou a maior parte e vai dar
+   feedback); **chefes com arte própria fiel ao lore, um por nível**; curva
+   do 2.º acto; nível 100 = duelo de espada sem poderes; arte própria das 14
+   regiões novas; Sino Vivo + Vyrak; menu de selecção de níveis;
+   SalaLabirinto.
+8. **Afinar** os números postos "a olho" + o glow roxo da espada, que passa
+   nos testes mas nunca foi visto em jogo.
+
+---
+
+# FEITO — softlock do portal (4 set 2026, `712137f`)
+
+Medido, não adivinhado. `tools/verifica_portais.gd` percorre os 100 níveis
+**com o índice real de cada um** — a jornada é semeada com
+`hash("jornada4|idx")`, portanto carregar a cena com índice 0 gera outro
+nível e a medição não vale nada (foi o primeiro erro desta análise).
+Resultado: **7 das 36 chegadas de portal punham o corpo dela (20×44) dentro
+da geometria** — n32, n59, n75, n81, n90, n91, n93. Os spawns de início de
+nível estavam todos bons (0 em 100).
+
+A correcção está no `portal.gd`, onde vale para todos os portais:
+`SUBIDA` 6→20 px (sobravam 4 px acima da plataforma) e `_lugar_livre()`, que
+consulta a forma contra a camada do mundo e procura o livre mais próximo —
+a subir, depois de lado, em passos de 10 px. A ferramenta sai != 0 se alguma
+voltar a entalar.
+
+---
+
+# Pendências antigas que sobrevivem (detalhe)
 
 0. **Laser roxo do pack Wenrexa — a meio.** O pack
    [`wenrexa/laser2020`](https://wenrexa.itch.io/laser2020) é **CC0, grátis,
