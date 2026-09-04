@@ -169,6 +169,118 @@ def espinhos_ombro(pecas: list[Peca], j: str, c, y: float, n: int = 3,
         pecas.append(Peca(j, [(x - 2.6, y), (x + 2.6, y), (x, y - alt)], c, z))
 
 
+def corrente(pecas: list[Peca], j: str, x: float, y: float, n: int, passo: float,
+             c, z: float = 3.8, ang: float = 90.0) -> None:
+    """Fio de elos. As correntes sao a assinatura da Regiao II inteira."""
+    import math as _m
+    dx, dy = _m.cos(_m.radians(ang)) * passo, _m.sin(_m.radians(ang)) * passo
+    for k in range(n):
+        pecas.append(Peca(j, elipse(x + dx * k, y + dy * k, 2.2, 1.6), c, z))
+
+
+def asas(pecas: list[Peca], juntas: Juntas, pai: str, x: float, y: float,
+         comp: float, esp: float, c, penas: bool = True) -> None:
+    """Par de asas num corpo FLUTUANTE. O gait `flutuante` ja' anima as
+    juntas `asa_t`/`asa_f` -- por isso e' que nao ha' um plano de corpo so'
+    para os chefes alados humanoides."""
+    junta(juntas, "asa_t", pai, x - 2.0, y)
+    junta(juntas, "asa_f", pai, x + 2.0, y + 1.0)
+    for nome, z, tom in (("asa_t", -2.6, escurecer(c, 0.34)), ("asa_f", 3.6, c)):
+        if penas:
+            for k in range(4):
+                f = 1.0 - k * 0.16
+                pecas.append(Peca(nome, [(0.0, -2.0 + k * 2.4),
+                                         (-comp * f, -esp * 0.5 + k * 3.0),
+                                         (-comp * f * 0.9, esp * 0.2 + k * 3.0),
+                                         (0.0, 2.0 + k * 2.4)], tom, z + k * 0.01))
+        else:
+            pecas.append(Peca(nome, [(2.0, -esp * 0.35), (-comp, -esp),
+                                     (-comp * 0.9, esp * 0.55), (-comp * 0.45, esp * 0.2),
+                                     (2.0, esp * 0.3)], tom, z))
+
+
+def elmo(pecas: list[Peca], j: str, c, r: float = 8.0, z: float = 2.0,
+         c_olho=MAGENTA, crista=None) -> None:
+    """Elmo fechado com fresta. O truque de sempre: a cara fica escura e o
+    que se le' e' a linha acesa da fresta."""
+    pecas.append(Peca(j, [(-r, -r * 1.1), (r, -r * 1.1), (r * 1.05, r * 0.35),
+                          (r * 0.55, r * 0.95), (-r * 0.55, r * 0.95),
+                          (-r * 1.05, r * 0.35)], c, z))
+    pecas.append(Peca(j, caixa(-r * 0.75, -r * 0.35, r * 0.9, -r * 0.02),
+                      escurecer(c, 0.8), z + 0.05))
+    pecas.append(Peca(j, caixa(-r * 0.55, -r * 0.28, r * 0.7, -r * 0.1),
+                      c_olho, z + 0.1, brilho=True))
+    if crista is not None:
+        pecas.append(Peca(j, [(-r * 0.3, -r * 1.05), (r * 0.3, -r * 1.05),
+                              (r * 0.15, -r * 2.1), (-r * 0.15, -r * 1.9)], crista, z - 0.05))
+
+
+def mitra(pecas: list[Peca], j: str, c, alt: float = 16.0, z: float = 2.5) -> None:
+    pecas.append(Peca(j, [(-6.5, 0.0), (6.5, 0.0), (4.0, -alt * 0.6),
+                          (0.0, -alt), (-4.0, -alt * 0.6)], c, z))
+    pecas.append(Peca(j, caixa(-6.8, -1.5, 6.8, 1.0), clarear(c, 0.22), z + 0.05))
+
+
+def disco(pecas: list[Peca], j: str, x: float, y: float, r: float, c,
+          z: float = -2.0, mordida: bool = False) -> None:
+    """Lua / eclipse / astro atras do chefe. Fica em `z` negativo: e' fundo,
+    nao adereço."""
+    pecas.append(Peca(j, elipse(x, y, r, r, n=28), c, z))
+    if mordida:
+        pecas.append(Peca(j, elipse(x + r * 0.42, y - r * 0.2, r * 0.82, r * 0.82, n=28),
+                          escurecer(c, 0.86), z + 0.05))
+
+
+def tentaculos(pecas: list[Peca], j: str, c, n: int, raio: float, comp: float,
+               a0: float = 40.0, a1: float = 150.0, z: float = -1.0) -> None:
+    for k in range(n):
+        ang = a0 + (a1 - a0) * k / max(1, n - 1)
+        pecas.append(Peca(j, rodar(membro(comp * (0.7 + 0.3 * (k % 2)), 4.5, 1.2), ang),
+                          c, z + k * 0.01))
+
+
+def cutelo(pecas: list[Peca], j: str, cabo, lamina, comp: float = 16.0) -> None:
+    pecas.append(Peca(j, membro(7.0, 3.0), cabo, 4.0))
+    pecas.append(Peca(j, [(-2.0, 7.0), (9.0, 8.0), (10.0, comp + 7.0),
+                          (-3.0, comp + 5.0)], lamina, 4.1))
+
+
+def lanca(pecas: list[Peca], j: str, cabo, ponta, comp: float = 40.0) -> None:
+    pecas.append(Peca(j, membro(comp, 2.6, 2.2), cabo, 4.0))
+    pecas.append(Peca(j, [(-3.5, comp - 2.0), (3.5, comp - 2.0), (0.0, comp + 9.0)],
+                      ponta, 4.1))
+
+
+def escudo(pecas: list[Peca], j: str, c, borda, alt: float = 22.0,
+           larg: float = 15.0, z: float = -1.6) -> None:
+    pecas.append(Peca(j, [(-larg * 0.5, 2.0), (larg * 0.5, 2.0),
+                          (larg * 0.5, alt * 0.6), (0.0, alt),
+                          (-larg * 0.5, alt * 0.6)], c, z))
+    pecas.append(Peca(j, caixa(-larg * 0.14, 3.0, larg * 0.14, alt * 0.8), borda, z + 0.05))
+
+
+def chapeu_alto(pecas: list[Peca], j: str, c, alt: float = 13.0, z: float = 2.4) -> None:
+    pecas.append(Peca(j, caixa(-9.0, -7.0, 9.0, -5.0), c, z))
+    pecas.append(Peca(j, caixa(-5.5, -7.0 - alt, 5.5, -6.0), c, z + 0.05))
+
+
+def cristais(pecas: list[Peca], j: str, c, pontos: list, z: float = 3.6) -> None:
+    """Lascas de cristal/gelo espetadas no corpo."""
+    for x, y, h, ang in pontos:
+        pecas.append(Peca(j, mover(rodar([(-2.6, 0.0), (2.6, 0.0), (0.0, -h)], ang), x, y),
+                          c, z, brilho=False))
+
+
+def engrenagem(pecas: list[Peca], j: str, x: float, y: float, r: float, c,
+               dentes: int = 8, z: float = 0.7) -> None:
+    pecas.append(Peca(j, elipse(x, y, r, r, n=20), c, z))
+    for k in range(dentes):
+        ang = 360.0 * k / dentes
+        pecas.append(Peca(j, mover(rodar(caixa(-1.6, -r - 2.4, 1.6, -r + 0.5), ang), x, y),
+                          c, z))
+    pecas.append(Peca(j, elipse(x, y, r * 0.34, r * 0.34), escurecer(c, 0.6), z + 0.05))
+
+
 def foice(pecas: list[Peca], j: str, cabo, lamina, comp: float = 34.0) -> None:
     pecas.append(Peca(j, membro(comp, 3.0, 2.5), cabo, 4.0))
     pecas.append(Peca(j, [(0.0, comp), (16.0, comp - 4.0), (23.0, comp - 15.0),
@@ -268,31 +380,43 @@ def _morvanna(juntas: Juntas, pecas: list[Peca], pal: dict) -> None:
     # "flutua sobre a agua, invoca maos espectrais, cria clones de lama"
     manto, lodo = pal["corpo"], pal["corpo2"]
     tirar(pecas, "cabeca", "pescoco")
-    junta(juntas, "chapeu", "cabeca", 0.0, -6.0)
-    capuz(pecas, "cabeca", manto, r=8.5)
+    junta(juntas, "chapeu", "cabeca", 0.0, -5.0)
+    # ombros largos por cima do manto: sem isto ela lia-se como um pau com
+    # chapeu -- era a critica justa a' primeira versao
+    pecas.append(Peca("corpo", [(-14.0, -20.0), (14.0, -20.0), (11.0, -8.0),
+                                (-11.0, -8.0)], manto, 0.4))
+    veios(pecas, "cauda1", escurecer(manto, 0.35), -8.0, 2.0, 22.0, n=5, z=-0.45)
+    capuz(pecas, "cabeca", manto, r=9.5)
+    # cabelo esfarrapado a sair do capuz
+    for x, comp in ((-8.0, 16.0), (-6.0, 20.0), (8.0, 13.0)):
+        pecas.append(Peca("cabeca", mover(rodar(membro(comp, 3.5, 1.0), 8.0), x, -2.0),
+                          escurecer(lodo, 0.3), 2.4))
     # chapeu de bruxa tombado para tras -- a silhueta que a identifica de
     # longe, mesmo em pixel-art pequena
-    pecas.append(Peca("chapeu", [(-11.0, 0.0), (11.0, 0.0), (6.0, -3.0),
-                                 (-1.0, -9.0), (-9.0, -21.0), (-4.0, -6.0)],
+    pecas.append(Peca("chapeu", [(-12.0, 0.0), (12.0, 0.0), (6.0, -4.0),
+                                 (-2.0, -11.0), (-12.0, -25.0), (-5.0, -7.0)],
                       escurecer(manto, 0.15), 2.8))
-    pecas.append(Peca("chapeu", caixa(-11.5, -1.5, 11.5, 1.5), lodo, 2.85))
-    olhos(pecas, "cabeca", 1.5, -6.0, 1.6, cor("9dff6b"), sep=3.0)
+    pecas.append(Peca("chapeu", caixa(-13.0, -2.0, 13.0, 1.5), lodo, 2.85))
+    olhos(pecas, "cabeca", 1.5, -6.0, 1.4, cor("9dff6b"), sep=3.2, z=2.9)
     cajado(pecas, "arma", cor("2c2118"), cor("9dff6b"), comp=30.0)
     # pingos de lodo a cair do manto: e' o pantano a acompanha'-la
     for x, y, r in ((-7.0, 6.0, 2.2), (4.0, 10.0, 1.8), (-1.0, 15.0, 1.5)):
         pecas.append(Peca("cauda2", elipse(x, y, r, r * 1.4), lodo, -0.55))
-    nucleo(pecas, "corpo", 1.0, -13.0, 3.4, cor("9dff6b"))
+    nucleo(pecas, "corpo", 1.0, -14.0, 2.8, cor("9dff6b"))
 
 
 def _rainha(juntas: Juntas, pecas: list[Peca], pal: dict) -> None:
     # "aranha colossal com ROSTO HUMANO. Cospe teias; solta ovos"
     quitina, veludo = pal["corpo"], pal["corpo2"]
-    tirar(pecas, "cabeca")
-    # cabelo comprido a cair do rosto humano para cima do cefalotorax
-    pecas.append(Peca("cabeca", [(-7.0, -4.0), (6.0, -6.0), (8.0, 4.0),
-                                 (-2.0, 12.0), (-9.0, 6.0)], pal["detalhe"], 0.9))
-    coroa(pecas, "cabeca", pal["metal"], r=6.5, z=1.4)
-    olhos(pecas, "cabeca", 1.0, -2.0, 1.3, cor("ff2d6f"), sep=2.6, z=1.3)
+    # o rosto humano da base FICA -- e' o lore todo ("aranha colossal com
+    # rosto humano"); o cabelo e' que vai por baixo dele
+    pecas.append(Peca("cabeca", [(-8.0, -6.0), (7.0, -8.0), (9.0, 4.0),
+                                 (-2.0, 14.0), (-10.0, 7.0)], pal["detalhe"], 0.9))
+    # patas da frente num tom mais claro, senao coladas ao abdomen so' se
+    # veem riscos escuros por cima de uma bola escura
+    pintar(pecas, ("pf1", "pf2", "pf3"), clarear(veludo, 0.22))
+    coroa(pecas, "cabeca", pal["metal"], r=6.0, z=1.4)
+    olhos(pecas, "cabeca", 0.5, -3.0, 1.2, cor("ff2d6f"), sep=2.6, z=1.35)
     # os oito olhos de aranha, esses ficam no abdomen -- e' o detalhe que
     # torna o rosto bonito em algo errado
     for x, y in ((-16.0, -12.0), (-11.0, -14.0), (-21.0, -9.0), (-13.0, -8.0)):
@@ -362,6 +486,214 @@ def _coracao(juntas: Juntas, pecas: list[Peca], pal: dict) -> None:
                           MAGENTA_ESC, 1.9))
 
 
+# ── Regiao II -- Prisao dos Condenados ───────────────────────────────────
+
+def _carcereiro(juntas: Juntas, pecas: list[Peca], pal: dict) -> None:
+    # "gigante com uma CHAVE no lugar da cabeca. Correntes como chicotes"
+    ferro, couro = pal["metal"], pal["corpo"]
+    tirar(pecas, "cabeca", "pescoco")
+    # a chave: anel, haste e dentes. Nao ha' cara nenhuma -- e' isso que
+    # faz dele o Carcereiro SEM ROSTO
+    pecas.append(Peca("cabeca", elipse(0.0, -13.0, 7.5, 7.5), ferro, 2.0))
+    pecas.append(Peca("cabeca", elipse(0.0, -13.0, 3.6, 3.6), pal["detalhe"], 2.05))
+    pecas.append(Peca("cabeca", elipse(0.0, -13.0, 2.2, 2.2), MAGENTA, 2.1, brilho=True))
+    pecas.append(Peca("cabeca", caixa(-2.4, -8.0, 2.4, 8.0), ferro, 1.95))
+    pecas.append(Peca("cabeca", caixa(2.2, 1.5, 8.0, 3.6), ferro, 1.95))
+    pecas.append(Peca("cabeca", caixa(2.2, 5.0, 6.0, 7.0), ferro, 1.95))
+    # peitoral de placas e argolas de cela
+    pecas.append(Peca("torso", trapezio(-24.0, 28.0, -8.0, 22.0), ferro, 0.6))
+    for k in range(3):
+        pecas.append(Peca("torso", elipse(-8.0 + k * 8.0, -6.0, 3.0, 3.0), ferro, 0.7))
+    espinhos_ombro(pecas, "torso", ferro, -25.0, n=4, larg=26.0, alt=6.0, z=0.8)
+    veios(pecas, "cauda1", escurecer(couro, 0.4), -6.0, 0.0, 10.0, n=3)
+    # correntes penduradas dos pulsos: sao os chicotes dele
+    corrente(pecas, "cotovelo_t", 0.0, 12.0, 6, 4.0, escurecer(ferro, 0.3), z=-1.6)
+    corrente(pecas, "cotovelo_f", 0.0, 12.0, 7, 4.0, ferro, z=3.7)
+    nucleo(pecas, "torso", 0.0, -16.0, 2.8)
+
+
+def _ignivar(juntas: Juntas, pecas: list[Peca], pal: dict) -> None:
+    # "ferreiro maldito: forja armas durante a luta; martelo cria ondas"
+    ferro, brasa = pal["metal"], cor("ff7a2d")
+    tirar(pecas, "cabeca", "pescoco")
+    # avental de couro do ferreiro, a peca que o identifica
+    pecas.append(Peca("torso", [(-11.0, -18.0), (11.0, -18.0), (13.0, 4.0),
+                                (-13.0, 4.0)], pal["corpo2"], 0.6))
+    veios(pecas, "torso", escurecer(pal["corpo2"], 0.45), -8.0, -14.0, 2.0, n=4, z=0.65)
+    # cabeca: elmo de forja com a viseira acesa a laranja
+    elmo(pecas, "cabeca", ferro, r=8.0, c_olho=brasa)
+    chifres(pecas, "cabeca", ferro, alt=8.0, aber=7.0, z=1.9)
+    # as chamas da forja saem-lhe dos ombros
+    for j, z in (("ombro_t", -1.3), ("ombro_f", 3.5)):
+        pecas.append(Peca(j, elipse(0.0, 0.0, 8.0, 6.5), ferro, z))
+        chama(pecas, j, 0.0, -4.0, 11.0, brasa, z=z + 0.1)
+    martelo(pecas, "arma", cor("3a2a1c"), ferro, comp=24.0)
+    # rachas incandescentes na pele, como metal ao rubro
+    for x, y in ((-6.0, -10.0), (4.0, -14.0), (-2.0, -4.0)):
+        pecas.append(Peca("torso", elipse(x, y, 2.2, 1.2), brasa, 0.9, brilho=True))
+    nucleo(pecas, "torso", 1.0, -22.0, 2.6, brasa)
+
+
+def _dama_guilhotina(juntas: Juntas, pecas: list[Peca], pal: dict) -> None:
+    # "executora fantasma. Teleporta-se; lanca laminas"
+    pano, aco = pal["corpo"], pal["metal"]
+    tirar(pecas, "cabeca", "pescoco")
+    capuz(pecas, "cabeca", escurecer(pano, 0.2), r=8.5)
+    olhos(pecas, "cabeca", 1.5, -6.0, 1.2, cor("ff4d4d"), sep=3.0, z=2.9)
+    # gola alta e a corda do carrasco ao pescoco
+    pecas.append(Peca("corpo", [(-12.0, -20.0), (12.0, -20.0), (8.0, -12.0),
+                                (-8.0, -12.0)], escurecer(pano, 0.3), 1.6))
+    corrente(pecas, "corpo", 6.0, -14.0, 5, 3.2, cor("6b5a3c"), z=1.7)
+    # a lamina da guilhotina: enorme, obliqua, e a assinatura dela
+    pecas.append(Peca("arma", membro(10.0, 3.0), cor("2b2118"), 4.0))
+    pecas.append(Peca("arma", [(-7.0, 10.0), (16.0, 10.0), (16.0, 30.0),
+                               (-7.0, 22.0)], aco, 4.1))
+    pecas.append(Peca("arma", [(-7.0, 22.0), (16.0, 30.0), (16.0, 33.0),
+                               (-7.0, 25.0)], clarear(aco, 0.35), 4.15))
+    nucleo(pecas, "corpo", 1.0, -14.0, 2.6, cor("ff4d4d"))
+
+
+def _irmaos_condenados(juntas: Juntas, pecas: list[Peca], pal: dict) -> None:
+    # "dois fantasmas ligados por CORRENTE (um de perto, outro a' distancia)"
+    espectro = pal["corpo"]
+    tirar(pecas, "cabeca", "pescoco")
+    capuz(pecas, "cabeca", espectro, r=8.0)
+    olhos(pecas, "cabeca", 1.5, -5.5, 1.2, MAGENTA, sep=3.0, z=2.9)
+    # o SEGUNDO irmao, mais pequeno e atras -- e' o chefe todo numa imagem
+    junta(juntas, "irmao", "corpo", -26.0, -6.0)
+    pecas.append(Peca("irmao", [(-9.0, -14.0), (9.0, -14.0), (7.0, 16.0),
+                                (2.0, 10.0), (-3.0, 18.0), (-8.0, 11.0)],
+                      escurecer(espectro, 0.3), -2.4))
+    pecas.append(Peca("irmao", elipse(0.0, -17.0, 6.5, 6.8), escurecer(espectro, 0.2), -2.3))
+    olhos(pecas, "irmao", 0.0, -18.0, 1.1, MAGENTA, sep=2.6, z=-2.2)
+    # a corrente que os prende um ao outro
+    corrente(pecas, "corpo", -4.0, -12.0, 6, 3.6, pal["metal"], z=-2.0, ang=182.0)
+    nucleo(pecas, "corpo", 1.0, -13.0, 2.6)
+
+
+def _primeiro_prisioneiro(juntas: Juntas, pecas: list[Peca], pal: dict) -> None:
+    # "heroi antigo. Espada parecida com a da Koliani; imita ataques dela"
+    trapo, pele = pal["corpo"], pal["pele"]
+    tirar(pecas, "cabeca")
+    # cabeca encovada, cabelo comprido a tapar a cara: foi um heroi, agora
+    # e' um homem que ninguem reconhece
+    pecas.append(Peca("cabeca", elipse(0.0, -4.0, 6.8, 7.2), pele, 2.0))
+    pecas.append(Peca("cabeca", [(-8.0, -10.0), (7.0, -11.0), (8.0, 2.0),
+                                 (-1.0, 10.0), (-9.0, 3.0)], pal["detalhe"], 2.1))
+    olhos(pecas, "cabeca", 1.0, -4.0, 1.2, MAGENTA, sep=2.8, z=2.2)
+    # trapos de prisioneiro por cima do peito
+    pecas.append(Peca("torso", [(-10.0, -20.0), (10.0, -20.0), (8.0, 2.0),
+                                (3.0, -4.0), (-2.0, 4.0), (-9.0, -3.0)],
+                      escurecer(trapo, 0.25), 0.6))
+    # grilhetas nos pulsos, com o resto da corrente partida
+    for j, z in (("cotovelo_t", -1.4), ("cotovelo_f", 3.6)):
+        pecas.append(Peca(j, caixa(-4.0, 9.0, 4.0, 12.0), pal["metal"], z))
+    corrente(pecas, "cotovelo_t", 0.0, 13.0, 3, 3.6, pal["metal"], z=-1.5)
+    # a espada dele e' a irma da da Koliani -- lamina recta, brilho roxo
+    espada(pecas, "arma", cor("2b2118"), clarear(pal["metal"], 0.3), comp=30.0, larg=4.0)
+    nucleo(pecas, "torso", 1.0, -14.0, 2.6)
+
+
+# ── Regiao III -- Torres Esquecidas ──────────────────────────────────────
+
+def _sino_vivo(juntas: Juntas, pecas: list[Peca], pal: dict) -> None:
+    # "criatura presa DENTRO DO SINO; ataques por ondas sonoras"
+    bronze = pal["corpo"]
+    # argola de suspensao no topo -- e' o que diz "sino" e nao "campanula"
+    pecas.append(Peca("corpo", elipse(0.0, -6.0, 5.0, 5.0), pal["corpo2"], -0.1))
+    pecas.append(Peca("corpo", elipse(0.0, -6.0, 2.6, 2.6), CONTORNO, -0.05))
+    # banda de runas a meio do sino
+    pecas.append(Peca("corpo", caixa(-15.0, 14.0, 15.0, 19.0), escurecer(bronze, 0.4), 0.5))
+    for k in range(4):
+        pecas.append(Peca("corpo", caixa(-11.0 + k * 7.0, 15.0, -9.5 + k * 7.0, 18.0),
+                          MAGENTA, 0.55, brilho=True))
+    # a criatura la' dentro: so' os olhos e as maos agarradas ao rebordo
+    olhos(pecas, "cabeca", 0.0, -1.0, 1.4, MAGENTA, sep=3.6, z=0.0)
+    for j, z in (("cotovelo_t", -1.4), ("cotovelo_f", 3.5)):
+        pecas.append(Peca(j, elipse(0.0, 10.0, 4.0, 3.0), pal["pele"], z))
+    # rachas no bronze
+    for x, y, h in ((-9.0, 22.0, 8.0), (7.0, 18.0, 10.0)):
+        pecas.append(Peca("corpo", [(x, y), (x + 2.0, y + h * 0.4), (x - 1.0, y + h)],
+                          escurecer(bronze, 0.55), 0.6))
+
+
+def _aerion(juntas: Juntas, pecas: list[Peca], pal: dict) -> None:
+    # "cavaleiro alado: VOA SEMPRE; cria tornados; atira lancas"
+    aco, penas = pal["metal"], pal.get("asa", pal["corpo2"])
+    tirar(pecas, "cabeca", "pescoco")
+    asas(juntas, pecas, aco, penas) if False else asas(pecas, juntas, "corpo",
+                                                       0.0, -16.0, 30.0, 13.0, penas)
+    elmo(pecas, "cabeca", aco, r=8.0, c_olho=cor("bfe9ff"),
+         crista=clarear(penas, 0.2))
+    # peitoral e capa curta
+    pecas.append(Peca("corpo", trapezio(-22.0, 22.0, -4.0, 15.0), aco, 0.6))
+    pecas.append(Peca("corpo", [(-13.0, -20.0), (13.0, -20.0), (10.0, -2.0),
+                                (-10.0, -2.0)], escurecer(pal["corpo"], 0.15), -0.4))
+    lanca(pecas, "arma", cor("3a2f22"), clarear(aco, 0.35), comp=42.0)
+    nucleo(pecas, "corpo", 1.0, -14.0, 2.6, cor("bfe9ff"))
+
+
+def _voltaris(juntas: Juntas, pecas: list[Peca], pal: dict) -> None:
+    # "mago morto-vivo: teleporta-se; invoca raios; clones electricos"
+    raio = cor("9fd8ff")
+    tirar(pecas, "cabeca", "pescoco")
+    cranio(pecas, "cabeca", pal["pele"], r=6.5, z=2.0, c_olho=raio)
+    capuz(pecas, "cabeca", escurecer(pal["corpo"], 0.25), r=10.0, z=1.8)
+    # gola em bico e o manto esfarrapado
+    pecas.append(Peca("corpo", [(-13.0, -21.0), (13.0, -21.0), (9.0, -10.0),
+                                (-9.0, -10.0)], pal["corpo"], 1.6))
+    veios(pecas, "cauda1", escurecer(pal["corpo2"], 0.4), -9.0, 2.0, 20.0, n=5, z=-0.45)
+    cajado(pecas, "arma", cor("2b2118"), raio, comp=34.0)
+    # faiscas a saltar entre os dedos e o cajado
+    for x, y in ((-9.0, -18.0), (10.0, -12.0), (-4.0, -26.0)):
+        pecas.append(Peca("corpo", [(x, y), (x + 2.5, y + 3.0), (x - 1.0, y + 3.0),
+                                    (x + 1.5, y + 7.0)], raio, 1.9, brilho=True))
+    nucleo(pecas, "corpo", 1.0, -15.0, 2.4, raio)
+
+
+def _sacerdotisa_lunar(juntas: Juntas, pecas: list[Peca], pal: dict) -> None:
+    # "manipula a LUA; cria luas falsas; invoca meteoros purpura"
+    luar = cor("dfe6ff")
+    tirar(pecas, "cabeca", "pescoco")
+    # o disco da lua atras dela: le'-se de longe e e' so' dela
+    disco(pecas, "corpo", 0.0, -22.0, 20.0, escurecer(luar, 0.55), z=-3.0, mordida=True)
+    # veu comprido e diadema
+    pecas.append(Peca("cabeca", elipse(0.0, -4.0, 6.6, 7.0), pal["pele"], 2.0))
+    pecas.append(Peca("cabeca", [(-10.0, -8.0), (10.0, -8.0), (8.0, 20.0),
+                                 (-8.0, 20.0)], pal["corpo"], 1.7))
+    pecas.append(Peca("cabeca", [(-7.0, -9.0), (7.0, -9.0), (0.0, -16.0)], pal["metal"], 2.2))
+    olhos(pecas, "cabeca", 0.5, -4.0, 1.1, luar, sep=2.6, z=2.3)
+    # luas pequenas a orbitar (as "luas falsas")
+    for x, y, r in ((-18.0, -30.0, 3.0), (17.0, -18.0, 2.2), (-14.0, -6.0, 2.0)):
+        pecas.append(Peca("corpo", elipse(x, y, r, r), luar, 3.6, brilho=True))
+    cajado(pecas, "arma", clarear(pal["metal"], 0.2), luar, comp=32.0)
+    nucleo(pecas, "corpo", 1.0, -14.0, 2.4, luar)
+
+
+def _vyrak(juntas: Juntas, pecas: list[Peca], pal: dict) -> None:
+    # "Vyrak, o DRAGAO DAS SOMBRAS. F2 destroi a torre e voa"
+    escama, sombra = pal["corpo"], pal["corpo2"]
+    # crista de espinhos das costas ate' a' cauda
+    for k in range(6):
+        pecas.append(Peca("corpo", [(-14.0 + k * 6.0, -8.0), (-10.0 + k * 6.0, -8.0),
+                                    (-12.0 + k * 6.0, -15.0 + abs(k - 2) * 1.5)],
+                          sombra, 0.6))
+    # chifres e mandibula
+    chifres(pecas, "cabeca", sombra, alt=12.0, aber=4.0, z=1.2)
+    pecas.append(Peca("cabeca", [(4.0, 2.0), (16.0, 3.0), (15.0, 6.5), (4.0, 6.0)],
+                      escama, 1.15))
+    for k in range(3):
+        pecas.append(Peca("cabeca", [(6.0 + k * 3.5, 2.0), (8.0 + k * 3.5, 2.0),
+                                     (7.0 + k * 3.5, 6.0)], pal["pele"], 1.2))
+    pecas.append(Peca("cabeca", elipse(6.0, -1.0, 1.6, 1.1), MAGENTA, 1.3, brilho=True))
+    # garras
+    for j, z in (("perna_t", -1.9), ("perna_f", 2.1)):
+        for ang in (-14.0, 0.0, 14.0):
+            pecas.append(Peca(j, mover(rodar(membro(7.0, 2.6, 1.0), ang), 0.0, 14.0),
+                              pal["pele"], z))
+    nucleo(pecas, "corpo", -4.0, 0.0, 3.0)
+
+
 CHEFES: dict[str, dict] = {
     # ── Regiao I -- Floresta Putrefacta ──────────────────────────────────
     "ghorak": {
@@ -384,8 +716,8 @@ CHEFES: dict[str, dict] = {
     },
     "rainha_aracnidea": {
         "plano": "aracnideo",
-        "par": {"alt": 28.0, "abdomen": 19.0, "cefalo": 12.0, "seg1": 19.0,
-                "seg2": 20.0, "esp_pata": 4.5, "cabeca": 7.0},
+        "par": {"alt": 44.0, "abdomen": 18.0, "cefalo": 12.0, "seg1": 24.0,
+                "seg2": 32.0, "esp_pata": 5.0, "cabeca": 7.5},
         "pal": paleta("1d1526", "2c1f38", "e0cbd6", "3a1326", metal="c8b06a"),
         "cfg": {"amp": 1.0},
         "extras": _rainha,

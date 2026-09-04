@@ -20,6 +20,8 @@ A paleta de um chefe e' um dicionario com estas chaves:
 
 from __future__ import annotations
 
+import math
+
 from chefes_desenho import (CENTRO_X, CHAO_Y, Cor, Peca, caixa, elipse,
                             escurecer, membro, trapezio)
 
@@ -151,9 +153,11 @@ ARACNIDEO = {
 }
 
 # (nome, x na aresta do corpo, angulo de repouso do 1.o segmento)
+# As patas saem MUITO abertas de proposito: fechadas, ficavam escondidas
+# atras do abdomen e a Rainha lia-se como uma bola com cabeca.
 _PATAS_BASE = [
-    ("pa1", -7.0, -58.0), ("pa2", -1.0, -30.0), ("pa3", 5.0, -8.0),
-    ("pf1", -6.0, -50.0), ("pf2", 0.0, -22.0), ("pf3", 6.0, 2.0),
+    ("pa1", -9.0, 152.0), ("pa2", -2.0, 128.0), ("pa3", 5.0, 104.0),
+    ("pf1", -8.0, -152.0), ("pf2", -1.0, -128.0), ("pf3", 6.0, -104.0),
 ]
 
 
@@ -165,9 +169,14 @@ def aracnideo(par: dict, pal: dict) -> tuple[Juntas, list[Peca]]:
         "corpo": ("raiz", (0.0, 0.0)),
         "cabeca": ("corpo", (p["cefalo"] + 2.0, -p["cefalo"] * 0.5)),
     }
-    for nome, x, _ang in _PATAS_BASE:
+    for nome, x, ang in _PATAS_BASE:
         juntas[nome] = ("corpo", (x, -2.0))
-        juntas[nome + "j"] = (nome, (0.0, p["seg1"]))
+        # O "joelho" tem de ficar na PONTA do 1.o segmento ja' rodado. Ao
+        # deixa'-lo em (0, seg1) -- como estava -- o angulo de repouso vivia
+        # so' no desenho e a canela nascia noutro sitio: as patas saiam
+        # todas penduradas por baixo da barriga, como um pente.
+        a = math.radians(ang)
+        juntas[nome + "j"] = (nome, (-p["seg1"] * math.sin(a), p["seg1"] * math.cos(a)))
 
     c, c2 = pal["corpo"], pal["corpo2"]
     pes: list[Peca] = []
@@ -175,12 +184,15 @@ def aracnideo(par: dict, pal: dict) -> tuple[Juntas, list[Peca]]:
     for nome, _x, ang in _PATAS_BASE:
         atras = nome.startswith("pa")
         tom = _atras(c2) if atras else c2
-        z = -3.0 if atras else 2.5
+        # as patas da frente ficam a' frente do corpo mas ATRAS do rosto
+        # humano -- senao passam-lhe por cima da cara
+        z = -3.0 if atras else 0.8
         # a pata sai da junta ja' aberta: e' o angulo de repouso, somado
         # depois pela pose
-        pes.append(Peca(nome, _pata(p["seg1"], p["esp_pata"], ang), tom, z))
-        pes.append(Peca(nome + "j", _pata(p["seg2"], p["esp_pata"] * 0.8, ang + 95.0),
-                        tom, z))
+        pes.append(Peca(nome, _pata(p["seg1"], p["esp_pata"], ang), tom, z, tag=nome))
+        # o 2.o segmento cai quase a direito: e' o "joelho" da aranha
+        pes.append(Peca(nome + "j", _pata(p["seg2"], p["esp_pata"] * 0.8, ang * 0.22),
+                        tom, z, tag=nome))
     pes += [
         Peca("corpo", elipse(-p["abdomen"] * 0.75, -p["abdomen"] * 0.25,
                              p["abdomen"], p["abdomen"] * 0.86), c, 0.0, tag="abdomen"),

@@ -676,9 +676,9 @@
   }
  },
  "rainha_aracnidea": {
-  "w": 156,
-  "h": 150,
-  "pes_y": 130,
+  "w": 224,
+  "h": 180,
+  "pes_y": 170,
   "estados": {
    "idle": 6,
    "walk": 8,
