@@ -342,6 +342,22 @@ tabelas de posição. `tools/verificar_paleta_rig.py` é a rede de segurança.
 > `koliani.gd`). Com o Shadowblade activo **o shader já não apanha nada** —
 > as rampas dele são outras. Falta ler as rampas do Shadowblade (a lâmina é
 > roxa e brilha) e acrescentá-las, senão o pedido do equipamento regride.
+>
+> **Investigado a 4 set (Jensath/Luís) — NÃO é só "ler as rampas".** O
+> `koliani_cavaleiro` foi desenhado (ou preparado) de propósito com duas
+> rampas de cinzento EXCLUSIVAS (nada mais no rig usa essas cores) — é
+> isso que torna a troca de paleta possível. O Shadowblade veio de uma
+> imagem de concept art com sombreado contínuo: amostrei os PNGs por
+> HSV (matiz/saturação) à procura de uma faixa isolável para a lâmina e
+> para a armadura, e **não há separação limpa** — o roxo da lâmina cai na
+> mesma faixa que o cabelo e a capa, e a "armadura" cinzenta nem tem uma
+> zona de baixa saturação que se distinga do resto. Trocar por cor
+> (exata ou por faixa HSV) vai sempre apanhar a personagem toda ou nada.
+> Só resolve com **máscara manual por frame** (marcar à mão os pixéis da
+> lâmina/armadura, ~12-15 frames) ou pedindo para a próxima exportação já
+> vir com a lâmina/armadura numa rampa de cor exclusiva, como no
+> cavaleiro. Por agora fica por implementar — o Luís preferiu aceitar a
+> limitação a fazer a máscara à mão sem confirmar primeiro com o Paulo.
 
 ## 2. Menus de equipamento em carrossel — `dcfaa93`
 
