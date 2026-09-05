@@ -122,12 +122,12 @@ func _init() -> void:
 			var quer := false
 			if no_chao and (vao or parado > 0.25) and salto_t > 0.45:
 				quer = true
-			elif not no_chao and not duplo and vy > 60.0 and sem_chao:
+			elif not no_chao and not duplo and vy > 20.0 and sem_chao:
 				quer = true            # o segundo salto, a meio da queda
 				duplo = true
 			if quer and segurar <= 0.0:
 				Input.action_press("saltar")
-				segurar = 0.34
+				segurar = 0.45
 				salto_t = 0.0
 			# preso a sério: recua meio segundo para ganhar balanço
 			if parado > 1.6 and salto_t > 1.2:
