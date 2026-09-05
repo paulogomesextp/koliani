@@ -692,8 +692,10 @@ func _ao_pista(_id: String, total: int) -> void:
 
 
 ## Segundos que a explicação da mecânica fica no ecrã. Pedido do Paulo:
-## "fica 5 segundos e desaparece".
-const TUTORIAL_SEGUNDOS := 5.0
+## 5 s no primeiro pedido, 10 s no segundo -- a placa passou a aparecer a
+## meio da acção (quando a mecânica entra no ecrã) e a 5 s não dava para a
+## ler sem deixar de jogar.
+const TUTORIAL_SEGUNDOS := 10.0
 ## Largura da placa. Uma linha comprida a meio do ecrã lê-se de relance; um
 ## bloco estreito e alto obriga a parar o jogo para o ler.
 const TUTORIAL_LARGURA := 560.0

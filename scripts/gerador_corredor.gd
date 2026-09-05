@@ -734,6 +734,13 @@ var _tipos_usados := {}
 var _estreia_cam := ""
 var _estreia_por_fazer := 0
 var _estreia_grau := 0
+## X em que a PRIMEIRA câmara da estreia começa a ser construída. É o que o
+## `nivel_com_chefe.gd` usa para só explicar a mecânica quando ela entra no
+## ecrã -- explicá-la à entrada do nível era falar de uma coisa que ainda
+## não se vê. Fica em `INF` se a estreia não chegou a ser colocada (nível
+## sem jornada, ou câmara que a jornada não usou): nesse caso explica-se
+## logo, que é melhor do que nunca.
+var estreia_x := INF
 ## A família de câmara VERTICAL deste nível: "torre", "poco" ou "pilares".
 ## Uma só por nível -- ver o ramo vertical em `_construir`.
 var _vertical_do_nivel := "torre"
@@ -1105,6 +1112,8 @@ func _construir() -> void:
 				_pos_intenso = f in INTENSAS
 			ant_flavour = f
 			_tipos_usados[f] = true
+			if f == _estreia_cam and estreia_x == INF:
+				estreia_x = x
 			var res := _flavour(par, f, x, y)
 			x = res.x
 			y = res.y

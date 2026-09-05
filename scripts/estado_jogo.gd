@@ -204,6 +204,12 @@ signal habilidade_desbloqueada(id: String)
 ## Entrou-se de fresco num nível cuja mecânica ESTREIA aí (ver
 ## `GeradorCorredor.estreia_do_nivel`). A HUD explica-a durante 5 s.
 signal mecanica_estreou(cam: String)
+
+## Mecânicas cuja explicação já foi mostrada. Vive só nesta sessão (não vai
+## para o save): o que ela evita é o texto voltar a aparecer quando se morre
+## e a cena recarrega, que é o caso que acontece a sério. Reabrir o jogo e
+## ver a explicação outra vez não faz mal a ninguém.
+var mecanicas_explicadas := {}
 ## Ganhou-se um equipamento ao acabar um nível (`tipo` = "arma"|"armadura").
 ## Economia: total de essência mudou / uma melhoria subiu de rank.
 signal essencia_mudou(total: int)

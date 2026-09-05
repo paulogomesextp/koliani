@@ -83,6 +83,7 @@ func _ready() -> void:
 		g.set_script(GERADOR)
 		g.set("entrada_fresca", _entrada_fresca)
 		add_child(g)
+		_gerador = g
 
 	if alongar_plataformas and not corredor:
 		_alongar_nivel()
@@ -104,15 +105,67 @@ func _ready() -> void:
 		_selar(false)
 
 
-## Se a mecânica deste nível ESTREIA aqui, avisa a HUD para a explicar.
-## Só numa entrada fresca: quem morreu e voltou ao checkpoint já a viu, e
-## repetir o texto a cada morte seria castigo em cima de castigo.
+## A jornada deste nível, quando há (é dela que sai o `estreia_x`).
+var _gerador: Node2D = null
+## X onde a câmara da estreia começa (do gerador). `INF` = não se sabe.
+var _tut_x := INF
+## A mecânica à espera de ser explicada, "" quando já foi (ou não há).
+var _tut_cam := ""
+
+
+## Se a mecânica deste nível ESTREIA aqui, explica-a -- mas só QUANDO ELA
+## APARECE NO ECRÃ, não à entrada do nível (pedido do Paulo, 5 set 2026:
+## a jornada tem milhares de píxeis antes da câmara da estreia, e explicar
+## ali uma coisa que ainda não se vê não ensina nada).
+##
+## Se a estreia for logo no início, ou se não se souber onde ela ficou
+## (`estreia_x` = INF), o teste da primeira volta dá logo verdadeiro e o
+## texto aparece à entrada -- que é a excepção que ele próprio abriu.
+##
+## Uma vez por mecânica e por sessão: morrer e voltar não repete o texto.
 func _anunciar_mecanica() -> void:
-	if not _entrada_fresca:
-		return
+	# o gerador constrói em `call_deferred`, portanto o `estreia_x` só
+	# existe agora -- lê-lo no `_ready` dava sempre INF, e com INF a placa
+	# aparecia logo à entrada, que é o que isto vem corrigir
+	if _gerador:
+		_tut_x = float(_gerador.get("estreia_x"))
 	var cam := GERADOR.estreia_do_nivel(EstadoJogo.indice_nivel)
-	if cam != "":
-		EstadoJogo.mecanica_estreou.emit(cam)
+	if cam == "" or EstadoJogo.mecanicas_explicadas.has(cam):
+		return
+	_tut_cam = cam
+	set_process(true)
+	_ver_se_ja_se_ve()
+
+
+func _process(_dt: float) -> void:
+	_ver_se_ja_se_ve()
+
+
+## A câmara da estreia já entrou pela direita do ecrã?
+##
+## Mede-se pela KOLIANI e não pela `Camera2D`: no primeiro frame a câmara
+## ainda está em (0,0) -- não saltou para ela --, e o teste dava logo
+## verdadeiro, que era exactamente o bug que isto vem corrigir.
+func _ver_se_ja_se_ve() -> void:
+	if _tut_cam == "":
+		return
+	if _tut_x != INF:
+		var kol := get_tree().get_first_node_in_group("koliani")
+		if kol == null or not (kol is Node2D):
+			return
+		# a largura do mundo que cabe no ecrã depende do zoom (ver
+		# `camera_tremor.gd`, que o sobe nos ecrãs largos do telemóvel)
+		var zoom := 1.0
+		var cam2d := get_viewport().get_camera_2d()
+		if cam2d:
+			zoom = maxf(0.01, cam2d.zoom.x)
+		var meia := get_viewport_rect().size.x * 0.5 / zoom
+		if _tut_x > (kol as Node2D).global_position.x + meia:
+			return
+	EstadoJogo.mecanicas_explicadas[_tut_cam] = true
+	EstadoJogo.mecanica_estreou.emit(_tut_cam)
+	_tut_cam = ""
+	set_process(false)
 
 
 func _selar(selada: bool) -> void:

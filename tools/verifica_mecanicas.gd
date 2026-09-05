@@ -142,6 +142,13 @@ func _init() -> void:
 		if estreia == "":
 			print("  [%2d] %-26s  (sem jornada)" % [idx, raiz.name])
 			raiz.queue_free(); await process_frame; continue
+		# o `estreia_x` e' o que faz a placa do tutorial aparecer quando a
+		# camara entra no ecra'. Se ficar em INF, a placa volta a aparecer a'
+		# entrada do nivel -- que foi a queixa do Paulo.
+		if is_inf(float(ger.get("estreia_x"))):
+			print("  [%2d] %-26s  estreia=%s -- SEM estreia_x (o tutorial ia aparecer a' entrada)"
+				% [idx, raiz.name, estreia])
+			falhas += 1
 		if not ACTORES.has(estreia):
 			sem_tabela.append(estreia)
 			print("  [%2d] %-26s  estreia '%s' -- sem entrada na tabela" % [
