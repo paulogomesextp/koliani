@@ -90,6 +90,10 @@ const SOMBRA := preload("res://scripts/sombra_atrasada.gd")
 const AMEACA := preload("res://scripts/ameaca_que_avanca.gd")
 const ZONA_SEM_PODER := preload("res://scripts/zona_sem_poder.gd")
 const PONTO_GANCHO := preload("res://scripts/ponto_gancho.gd")
+const PLAT_PESO := preload("res://scripts/plataforma_peso.gd")
+const BLOCO := preload("res://scripts/bloco_empurravel.gd")
+const PLACA_PESO := preload("res://scripts/placa_peso.gd")
+const ZONA_AFUNDA := preload("res://scripts/zona_afunda.gd")
 const PLAT_RODA := preload("res://scripts/plataforma_roda.gd")
 const SALA_REESCREVE := preload("res://scripts/sala_reescreve.gd")
 const PLACA_GRAV := preload("res://scripts/placa_gravidade.gd")
@@ -363,7 +367,7 @@ const MECANICA_DO_NIVEL := [
 	{"cam": "raizes", "grau": 1},
 	# --- niveis 56-60  (Regiao 12) ---
 	{"cam": "engrenagens", "grau": 1},
-	{"cam": "elevador", "grau": 1},
+	{"cam": "peso", "grau": 1},  # estreia propria: era o `elevador` do 16 outra vez
 	{"cam": "replicantes", "grau": 1},
 	{"cam": "circuito", "grau": 1},
 	{"cam": "imanes", "grau": 1},
@@ -380,7 +384,7 @@ const MECANICA_DO_NIVEL := [
 	{"cam": "sombra", "grau": 2},
 	{"cam": "mente", "grau": 2},
 	# --- niveis 71-75  (Regiao 15) ---
-	{"cam": "sinos", "grau": 2},
+	{"cam": "caixas", "grau": 2},  # estreia propria: eram os `sinos` do 11 outra vez
 	{"cam": "ciclo", "grau": 2},
 	{"cam": "incorporeo", "grau": 2},
 	{"cam": "mausoleu", "grau": 2},
@@ -402,7 +406,7 @@ const MECANICA_DO_NIVEL := [
 	{"cam": "sem_chao", "grau": 2},
 	{"cam": "gemea", "grau": 2},
 	{"cam": "espectral", "grau": 2},
-	{"cam": "elevador", "grau": 2},
+	{"cam": "atoleiro", "grau": 2},  # estreia propria: era o `elevador` pela TERCEIRA vez
 	# --- niveis 91-95  (Regiao 19) ---
 	{"cam": "catapulta", "grau": 2},
 	{"cam": "salvas", "grau": 2},
@@ -465,6 +469,15 @@ const CAMARAS_FLAVOUR := [
 	"mausoleu", "gemea", "ar", "serpente", "pulsacao", "asas", "sombra",
 	"ameaca", "provacao", "reflexo", "gancho",
 	"engrenagens", "conves", "esporos", "mente", "invertido",
+	# --- estreias novas (5 set 2026, tarde) ----------------------------
+	# Tres linhas do catalogo do Paulo que ainda nao existiam: plataformas
+	# que sobem e descem com o peso dela, caixas que se empurram (com placa
+	# de pressao a fazer de pedestal) e areia que afunda.
+	#
+	# NADA DE ASPAS NOS COMENTARIOS DESTE BLOCO: o teste le' esta lista do
+	# CODIGO-FONTE e apanha qualquer coisa entre aspas -- um comentario com
+	# aspas virava cinco camaras inventadas que nunca estreiam.
+	"peso", "caixas", "atoleiro",
 ]
 
 ## Câmara "assinatura" de cada região -- no acto do meio da jornada aparece
@@ -1632,6 +1645,9 @@ func _flavour(par: Node2D, tipo: String, x: float, y: float) -> Vector2:
 		"ameaca": return _f_ameaca(par, x, y)
 		"provacao": return _f_provacao(par, x, y)
 		"reflexo": return _f_reflexo(par, x, y)
+		"peso": return _f_peso(par, x, y)
+		"caixas": return _f_caixas(par, x, y)
+		"atoleiro": return _f_atoleiro(par, x, y)
 		"gancho": return _f_gancho(par, x, y)
 		"engrenagens": return _f_engrenagens(par, x, y)
 		"conves": return _f_conves(par, x, y)
@@ -4480,6 +4496,96 @@ func _f_conves(par: Node2D, x: float, y: float) -> Vector2:
 ## onde se aterra -- sem lhe tirar as mãos do boneco.
 ##
 ## Os vãos são feitos para o peso normal: nenhuma nuvem é obrigatória.
+
+## PESO (nível 57). Plataformas que descem enquanto ela está em cima e
+## voltam a subir quando sai: não se perde o chão, perde-se ALTURA, e o
+## salto de saída é cada vez mais alto. Estreia própria em vez de repetir o
+## `elevador` do nível 16.
+func _f_peso(par: Node2D, x: float, y: float) -> Vector2:
+	var cy: float = clampf(y, _teto_y + 300.0, _chao_y - 220.0)
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(150.0, 18.0))
+	_checkpoint(x, cy, true)
+	var n := 3 + int(_dif * 2.0)
+	for i in n:
+		x += _rng.randf_range(160.0, 186.0)
+		var pp := PLAT_PESO.new()
+		pp.tamanho = Vector2(116.0, 18.0)
+		# quanto mais fundo o nível, mais depressa foge o chão
+		pp.curso = 70.0 + 40.0 * _dif
+		pp.vel_desce = 40.0 + 22.0 * _dif
+		pp.position = Vector2(x, cy - 20.0 * float(i % 2))
+		par.add_child(pp)
+	x += _rng.randf_range(170.0, 200.0)
+	_plat(par, Vector2(x, cy), Vector2(150.0, 18.0))
+	_checkpoint(x, cy)
+	return Vector2(x, cy)
+
+
+## CAIXAS (nível 71). Uma caixa que se empurra e uma placa de pressão que
+## abre a grade: a placa solta-se assim que ela sai de cima, portanto a
+## caixa não é atalho, é a única maneira. Estreia própria em vez de repetir
+## os `sinos` do nível 11.
+func _f_caixas(par: Node2D, x: float, y: float) -> Vector2:
+	var cy: float = clampf(y, _teto_y + 340.0, _chao_y - 96.0)
+	var alt: float = clampf(cy - _teto_y - 60.0, 200.0, 340.0)
+	x += _rng.randf_range(150.0, 176.0)
+	var id := "caixa_%d_%d" % [_idx, _cont_i]
+	# a plataforma comprida onde tudo isto acontece
+	_plat(par, Vector2(x + 210.0, cy), Vector2(480.0, 24.0), 46.0)
+	_checkpoint(x + 30.0, cy, true)
+
+	var placa := PLACA_PESO.new()
+	placa.id = id
+	placa.position = Vector2(x + 90.0, cy - 12.0)
+	par.add_child(placa)   # ANTES da grade: a porta liga-se ao que já lá está
+
+	var pt := PORTA_TRANCADA.instantiate()
+	pt.id = id
+	pt.tamanho = Vector2(26.0, alt)
+	pt.position = Vector2(x + 400.0, cy - 12.0 - alt * 0.5)
+	par.add_child(pt)
+
+	var caixa := BLOCO.new()
+	caixa.position = Vector2(x + 250.0, cy - 40.0)
+	caixa.limite_x = 520.0
+	par.add_child(caixa)
+
+	x += 470.0 + _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(140.0, 18.0))
+	_checkpoint(x, cy)
+	return Vector2(x, cy)
+
+
+## ATOLEIRO (nível 90). Chão que afunda enquanto ela lá está e lhe rouba
+## aceleração: parar é descer. Estreia própria em vez de repetir o
+## `elevador` pela TERCEIRA vez.
+##
+## Chama-se `atoleiro` e não `areia` porque `areia` já era o poço de
+## gravidade pesada da região IX -- e dois nomes iguais no despacho faziam
+## o segundo nunca ser chamado.
+func _f_atoleiro(par: Node2D, x: float, y: float) -> Vector2:
+	var cy: float = clampf(y, _teto_y + 280.0, _chao_y - 160.0)
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(140.0, 18.0))
+	_checkpoint(x, cy, true)
+	var n := 2 + int(_dif * 2.0)
+	for i in n:
+		x += _rng.randf_range(210.0, 250.0)
+		# a poça de areia, com uma laje firme no fim de cada uma
+		_plat(par, Vector2(x, cy + 40.0), Vector2(220.0, 18.0))
+		var za := ZONA_AFUNDA.new()
+		za.tamanho = Vector2(220.0, 80.0)
+		za.peso = 1.25 + 0.2 * _dif
+		za.position = Vector2(x, cy + 8.0)
+		par.add_child(za)
+		x += _rng.randf_range(150.0, 176.0)
+		_plat(par, Vector2(x, cy - 10.0 * float(i % 2)), Vector2(120.0, 18.0))
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(150.0, 18.0))
+	_checkpoint(x, cy)
+	return Vector2(x, cy)
+
 func _f_esporos(par: Node2D, x: float, y: float) -> Vector2:
 	var cy: float = clampf(y, _teto_y + 280.0, _chao_y - 140.0)
 	x += _rng.randf_range(150.0, 176.0)

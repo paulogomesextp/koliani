@@ -58,6 +58,11 @@ jobs:
       # prova que os ACTORES dela nasceram mesmo dentro do nivel.
       - name: A mecanica de cada nivel existe mesmo
         run: godot --headless --script res://tools/verifica_mecanicas.gd
+      # e existir nao chega: estas tres FAZEM o que dizem?
+      - name: Camaras novas (peso, caixas, atoleiro)
+        run: godot --headless --script res://tools/verifica_camaras_novas.gd
+      - name: Nascer no checkpoint sem ficar preso
+        run: godot --headless --script res://tools/verifica_spawn_livre.gd
 
   web:
     name: Build Web

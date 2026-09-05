@@ -82,13 +82,21 @@ func _process(dt: float) -> void:
 
 
 func _ao_tocar(corpo: Node) -> void:
-	if not (corpo is Koliani) or _cooldown > 0.0:
+	# pelo GRUPO e nao pelo tipo: `is Koliani` arrasta o `koliani.gd`, que
+	# fala com autoloads e por isso nao compila em `--script` -- e quem
+	# herda desta classe deixava de se poder medir em bancada
+	if not (corpo is Node and corpo.is_in_group("koliani")) or _cooldown > 0.0:
 		return
 	if ligada and so_liga:
 		return
 	_cooldown = 0.6
 	ligada = not ligada
-	Som.toca("selo", -10.0, 1.15 if ligada else 0.85)
+	# pelo caminho e nao pelo IDENTIFICADOR: assim a Alavanca (e tudo o que
+	# herda dela, como a `PlacaPeso`) continua a compilar em `--script`, que
+	# e' onde as bancadas correm
+	var som := get_node_or_null("/root/Som")
+	if som and som.has_method("toca"):
+		som.call("toca", "selo", -10.0, 1.15 if ligada else 0.85)
 	_aplicar(false)
 	mudou.emit(ligada)
 
