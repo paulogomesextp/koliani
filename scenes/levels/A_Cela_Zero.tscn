@@ -158,6 +158,34 @@ cor_base = Color(0.2, 0.24, 0.32, 1)
 cor_topo = Color(0.42, 0.54, 0.68, 1)
 
 ; ===================  cimo -- a cela zero  ================
+[node name="SubidaEsq1" parent="." instance=ExtResource("9_pl")]
+position = Vector2(300, 322)
+tamanho = Vector2(110, 18)
+altura_visual = 24.0
+cor_base = Color(0.2, 0.24, 0.32, 1)
+cor_topo = Color(0.42, 0.54, 0.68, 1)
+
+[node name="SubidaEsq2" parent="." instance=ExtResource("9_pl")]
+position = Vector2(244, 250)
+tamanho = Vector2(100, 18)
+altura_visual = 24.0
+cor_base = Color(0.2, 0.24, 0.32, 1)
+cor_topo = Color(0.42, 0.54, 0.68, 1)
+
+[node name="SubidaDir1" parent="." instance=ExtResource("9_pl")]
+position = Vector2(1024, 330)
+tamanho = Vector2(110, 18)
+altura_visual = 24.0
+cor_base = Color(0.2, 0.24, 0.32, 1)
+cor_topo = Color(0.42, 0.54, 0.68, 1)
+
+[node name="SubidaDir2" parent="." instance=ExtResource("9_pl")]
+position = Vector2(1052, 252)
+tamanho = Vector2(100, 18)
+altura_visual = 24.0
+cor_base = Color(0.2, 0.24, 0.32, 1)
+cor_topo = Color(0.42, 0.54, 0.68, 1)
+
 [node name="ChaoChefe" parent="." instance=ExtResource("9_pl")]
 position = Vector2(640, 270)
 tamanho = Vector2(560, 60)
