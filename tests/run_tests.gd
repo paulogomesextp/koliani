@@ -36,6 +36,7 @@ func _correr_tudo() -> void:
 	teste_diario_tem_todas_as_pistas_dos_niveis()
 	teste_i18n_en_tem_as_chaves_das_pistas()
 	teste_i18n_ficheiros_validos()
+	teste_tutorial_mecanica_tem_texto()
 	teste_catalogo_campanha()
 	teste_equipamento_dados()
 	teste_equipamento_estado()
@@ -540,6 +541,59 @@ func teste_i18n_ficheiros_validos() -> void:
 			_ok(d.has(k), "%s.json sem a chave '%s'" % [loc, k])
 		for k: String in d:
 			_ok(chaves_en.has(k), "%s.json tem a chave a mais '%s'" % [loc, k])
+
+
+## TUTORIAL DA MECÂNICA (pedido do Paulo, 5 set 2026: "quando uma mecânica
+## aparece pela primeira vez, aparece uma mensagem a dizer como funciona").
+##
+## A HUD não mostra nada se faltar a chave -- o que é a decisão certa em
+## jogo (melhor sem aviso do que com `mec.gancho.txt` no ecrã) e a errada
+## para quem escreve os níveis: uma mecânica nova ficava calada e ninguém
+## dava por isso. Isto conta-as: cada câmara que ESTREIA em algum nível tem
+## de ter nome e texto no `en.json` (os outros 5 idiomas são garantidos pelo
+## `teste_i18n_ficheiros_validos`, que exige as mesmas chaves em todos).
+##
+## Os textos geram-se com `python tools/gerar_textos_mecanicas.py`.
+func teste_tutorial_mecanica_tem_texto() -> void:
+	var ger := _fonte("res://scripts/gerador_corredor.gd")
+	if ger == "":
+		return
+	var i := ger.find("const MECANICA_DO_NIVEL :=")
+	var fim := ger.find("
+]", i)
+	var bloco := ger.substr(i, maxi(0, fim - i))
+	var rn := RegEx.new()
+	rn.compile('"cam": "([a-z_]+)"')
+	var cams: Array[String] = []
+	for m in rn.search_all(bloco):
+		cams.append(m.get_string(1))
+	var n_niveis: int = _novo_estado().NIVEIS.size()
+	_ok(cams.size() == n_niveis,
+		"MECANICA_DO_NIVEL tem %d entradas (deviam ser %d)" % [cams.size(), n_niveis])
+
+	var en := _json_i18n("en")
+	var vistas := {}
+	for n in cams.size():
+		var cam := cams[n]
+		if vistas.has(cam):
+			# não estreia aqui: é uma repetição, e essas não levam tutorial
+			continue
+		vistas[cam] = n
+		_ok(en.has("mec.%s.nome" % cam),
+			"nível %d: a mecânica '%s' estreia sem nome (mec.%s.nome)" % [n + 1, cam, cam])
+		_ok(en.has("mec.%s.txt" % cam),
+			"nível %d: a mecânica '%s' estreia sem explicação (mec.%s.txt)" % [n + 1, cam, cam])
+
+	# e a estreia que o nível anuncia tem de ser mesmo a primeira vez
+	var g := GeradorCorredor
+	for n in cams.size():
+		var esperado: String = cams[n] if int(vistas.get(cams[n], -1)) == n else ""
+		_ok(g.estreia_do_nivel(n) == esperado,
+			"estreia_do_nivel(%d) devia dar '%s' e deu '%s'"
+				% [n, esperado, g.estreia_do_nivel(n)])
+	_ok(g.estreia_do_nivel(-1) == "", "estreia_do_nivel(-1) devia dar \"\"")
+	_ok(g.estreia_do_nivel(cams.size()) == "",
+		"estreia_do_nivel(fora da tabela) devia dar \"\"")
 
 
 ## Os ids que as cenas de nível usam (Porta.pista_ao_atravessar e

@@ -64,6 +64,7 @@ func _ready() -> void:
 	EstadoJogo.vidas_mudaram.connect(_atualizar_vidas)
 	EstadoJogo.habilidade_desbloqueada.connect(_ao_habilidade)
 	EstadoJogo.pista_encontrada.connect(_ao_pista)
+	EstadoJogo.mecanica_estreou.connect(_ao_mecanica)
 	_atualizar_vidas(EstadoJogo.vidas)
 	var koliani := get_tree().get_first_node_in_group("koliani")
 	if koliani and koliani.has_signal("vida_mudou"):
@@ -688,6 +689,75 @@ func _ao_habilidade(id: String) -> void:
 
 func _ao_pista(_id: String, total: int) -> void:
 	_aviso(Textos.tf("hud.clue_found", [total]))
+
+
+## Segundos que a explicação da mecânica fica no ecrã. Pedido do Paulo:
+## "fica 5 segundos e desaparece".
+const TUTORIAL_SEGUNDOS := 5.0
+## Largura da placa. Uma linha comprida a meio do ecrã lê-se de relance; um
+## bloco estreito e alto obriga a parar o jogo para o ler.
+const TUTORIAL_LARGURA := 560.0
+
+
+## A mecânica deste nível estreia aqui: diz o nome e como funciona.
+##
+## O texto vive nos 6 `assets/i18n` sob `mec.<cam>.nome` / `mec.<cam>.txt`.
+## Uma câmara sem entrada não mostra nada (melhor sem aviso do que com uma
+## chave em bruto no ecrã) -- há um teste a garantir que não falta nenhuma.
+func _ao_mecanica(cam: String) -> void:
+	var chave_nome := "mec.%s.nome" % cam
+	var chave_txt := "mec.%s.txt" % cam
+	var nome := Textos.t(chave_nome)
+	var txt := Textos.t(chave_txt)
+	if nome == chave_nome or txt == chave_txt:
+		push_warning("HUD: mecânica '%s' sem texto de tutorial" % cam)
+		return
+	_placa_tutorial(nome, txt)
+
+
+func _placa_tutorial(nome: String, txt: String) -> void:
+	var caixa := PanelContainer.new()
+	caixa.add_theme_stylebox_override("panel", UI.painel(
+		"painel_placa", Color(1.0, 0.62, 1.0), 10.0))
+	caixa.size = Vector2(TUTORIAL_LARGURA, 0.0)
+	caixa.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+	var col := VBoxContainer.new()
+	col.add_theme_constant_override("separation", 2)
+	caixa.add_child(col)
+
+	var l_nome := Label.new()
+	l_nome.text = nome
+	l_nome.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	l_nome.add_theme_color_override("font_color", Color(1, 0.86, 1))
+	l_nome.add_theme_color_override("font_outline_color", Color(0.05, 0.01, 0.06))
+	l_nome.add_theme_constant_override("outline_size", 4)
+	l_nome.add_theme_font_size_override("font_size", 22)
+	col.add_child(l_nome)
+
+	var l_txt := Label.new()
+	l_txt.text = txt
+	l_txt.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	l_txt.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	l_txt.custom_minimum_size.x = TUTORIAL_LARGURA - 36.0
+	l_txt.add_theme_color_override("font_color", Color(0.94, 0.88, 1))
+	l_txt.add_theme_color_override("font_outline_color", Color(0.05, 0.01, 0.06))
+	l_txt.add_theme_constant_override("outline_size", 3)
+	l_txt.add_theme_font_size_override("font_size", 17)
+	col.add_child(l_txt)
+
+	add_child(caixa)
+	# a altura só é conhecida depois de o texto ser medido
+	await get_tree().process_frame
+	var larg := get_viewport().get_visible_rect().size.x
+	caixa.position = Vector2((larg - TUTORIAL_LARGURA) * 0.5, 78.0)
+
+	caixa.modulate.a = 0.0
+	var t := caixa.create_tween()
+	t.tween_property(caixa, "modulate:a", 1.0, 0.35)
+	t.tween_interval(TUTORIAL_SEGUNDOS - 0.95)
+	t.tween_property(caixa, "modulate:a", 0.0, 0.6)
+	t.tween_callback(caixa.queue_free)
 
 
 func _aviso(txt: String) -> void:

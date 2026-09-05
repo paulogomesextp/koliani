@@ -89,6 +89,7 @@ func _ready() -> void:
 
 	_reduzir_checkpoints.call_deferred()
 	_iluminar.call_deferred()
+	_anunciar_mecanica.call_deferred()
 
 	if _porta == null:
 		return
@@ -101,6 +102,17 @@ func _ready() -> void:
 		_guardiao.tree_exited.connect(_abrir)
 	else:
 		_selar(false)
+
+
+## Se a mecânica deste nível ESTREIA aqui, avisa a HUD para a explicar.
+## Só numa entrada fresca: quem morreu e voltou ao checkpoint já a viu, e
+## repetir o texto a cada morte seria castigo em cima de castigo.
+func _anunciar_mecanica() -> void:
+	if not _entrada_fresca:
+		return
+	var cam := GERADOR.estreia_do_nivel(EstadoJogo.indice_nivel)
+	if cam != "":
+		EstadoJogo.mecanica_estreou.emit(cam)
 
 
 func _selar(selada: bool) -> void:

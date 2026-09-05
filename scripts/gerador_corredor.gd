@@ -436,6 +436,17 @@ static func nivel_de_estreia(cam: String) -> int:
 	return int(_estreia_cache.get(cam, 0))
 
 
+## A câmara que ESTREIA neste nível (0-based), ou "" se o nível repete uma
+## que já apareceu antes. É isto que dá o tutorial: uma mecânica só se
+## explica na primeira vez que o jogador a vê -- nas voltas seguintes já a
+## conhece e o aviso passaria a ruído.
+static func estreia_do_nivel(indice: int) -> String:
+	if indice < 0 or indice >= MECANICA_DO_NIVEL.size():
+		return ""
+	var cam: String = MECANICA_DO_NIVEL[indice]["cam"]
+	return cam if nivel_de_estreia(cam) == indice else ""
+
+
 ## Câmaras que não vivem na pool de nenhuma região (são escolhidas por outro
 ## ramo do `_construir`), mas que o forçador de VARIEDADE também pode puxar.
 const TIER_EXTRA := {

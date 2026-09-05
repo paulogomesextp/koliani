@@ -201,6 +201,9 @@ const REGIOES := [
 signal vidas_mudaram(vidas: int)
 signal pista_encontrada(id: String, total: int)
 signal habilidade_desbloqueada(id: String)
+## Entrou-se de fresco num nível cuja mecânica ESTREIA aí (ver
+## `GeradorCorredor.estreia_do_nivel`). A HUD explica-a durante 5 s.
+signal mecanica_estreou(cam: String)
 ## Ganhou-se um equipamento ao acabar um nível (`tipo` = "arma"|"armadura").
 ## Economia: total de essência mudou / uma melhoria subiu de rank.
 signal essencia_mudou(total: int)
