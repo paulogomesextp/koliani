@@ -138,6 +138,22 @@ fotografava sempre a jornada do nível onde o save tinha ficado. **Uma
 bateria inteira de smoke-tests desta sessão não testou nada por causa
 disso.** Corrigido; o `MAPA_CAMARAS=1` foi o que o denunciou.
 
+## Os 14 "grandes" ficaram em 7 (decidido a 5 set 2026)
+
+O Paulo cortou **Nadar (N37)**, **Gravidade a rodar 90° (N90)** e
+**Perseguidor invisível (N89)**, e aceitou as duas fusões. Detalhe e razões
+em `docs/mecanicas_por_nivel.md`. Sobram, por ordem de tamanho:
+
+1. **Gancho (N53)** — o único grande. **Não se corta**: é a única que muda
+   os 100 níveis e não só o dela.
+2. Inverter a gravidade à vontade (N67) · 3. Ameaça que avança
+   (N29/N42/N65, uma máquina com três caras) · 4. Cenário reescreve-se
+   (N70) · 5. Sombra com atraso (N69) · 6. Planar+Asas (N15/N63, pequeno) ·
+   7. Perder uma habilidade por sala (N98, pequeno).
+
+Se for preciso cortar mais um, o candidato é o **N70** — é o que menos se
+nota a jogar, porque acontece onde já não se está a olhar.
+
 ## O que falta
 
 52 entradas continuam marcadas `# ~` — **provisórias**: repetem uma câmara
