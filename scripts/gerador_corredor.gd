@@ -91,6 +91,7 @@ const AMEACA := preload("res://scripts/ameaca_que_avanca.gd")
 const ZONA_SEM_PODER := preload("res://scripts/zona_sem_poder.gd")
 const PONTO_GANCHO := preload("res://scripts/ponto_gancho.gd")
 const PLAT_RODA := preload("res://scripts/plataforma_roda.gd")
+const SALA_REESCREVE := preload("res://scripts/sala_reescreve.gd")
 
 ## Líquido mortal por região: [cor, brasas]. floresta=água podre, prisão=ácido,
 ## torres=??? (usa trevas), catacumbas=trevas, cidade=ácido citrino,
@@ -188,7 +189,7 @@ const POOL_REGIAO := {
 	# assinatura -- entra-se aqui e sai-se noutro sítio.
 	13: ["portal", "espelhos", "gravidade", "quebra", "velas", "saltos",
 		"pendulos", "ritmo", "gruta", "alavanca", "segredo", "espectral",
-		"sombra",
+		"sombra", "mente",
 		"orbita", "bifurcacao", "vitral"],
 	# XV Cidade dos Mortos: `sinos` de assinatura -- a badalada torna
 	# sólida a ponte fantasma, que é a mecânica-imagem da região inteira.
@@ -357,7 +358,7 @@ const MECANICA_DO_NIVEL := [
 	{"cam": "quebra", "grau": 2},  # ~
 	{"cam": "estatuas", "grau": 2},
 	{"cam": "sombra", "grau": 2},
-	{"cam": "portal", "grau": 2},  # ~
+	{"cam": "mente", "grau": 2},
 	# --- niveis 71-75  (Regiao 15) ---
 	{"cam": "sinos", "grau": 2},
 	{"cam": "ciclo", "grau": 2},
@@ -443,7 +444,7 @@ const CAMARAS_FLAVOUR := [
 	"gelo", "frio", "veneno", "escuro", "areia_no_ar", "ciclo",
 	"mausoleu", "gemea", "ar", "serpente", "pulsacao", "asas", "sombra",
 	"ameaca", "provacao", "reflexo", "gancho",
-	"engrenagens", "conves", "esporos",
+	"engrenagens", "conves", "esporos", "mente",
 ]
 
 ## Câmara "assinatura" de cada região -- no acto do meio da jornada aparece
@@ -1563,6 +1564,7 @@ func _flavour(par: Node2D, tipo: String, x: float, y: float) -> Vector2:
 		"engrenagens": return _f_engrenagens(par, x, y)
 		"conves": return _f_conves(par, x, y)
 		"esporos": return _f_esporos(par, x, y)
+		"mente": return _f_mente(par, x, y)
 	# tipo sem handler -> não deve acontecer (pool/assinatura mal configurada).
 	# Avisa em vez de gerar um vão morto silencioso e cai num `descanso`.
 	push_warning("GeradorCorredor: câmara '%s' sem _f_ correspondente" % tipo)
@@ -4418,6 +4420,56 @@ func _f_esporos(par: Node2D, x: float, y: float) -> Vector2:
 			_checkpoint(x, cy - 18.0)
 	x += _rng.randf_range(150.0, 176.0)
 	_plat(par, Vector2(x, cy), Vector2(140.0, 18.0))
+	_checkpoint(x, cy, true)
+	return Vector2(x, cy)
+
+
+## A MENTE (N70): o cenário reescreve-se atrás dela. A varanda de cima
+## tem três versões e vai trocando -- mas só o que já ficou para trás e
+## longe. Voltar atrás mostra uma sala que não é a que se atravessou.
+##
+## A espinha, essa, **nunca muda**: o caminho crítico é sempre o mesmo, e
+## por isso isto não tranca ninguém. O que se reescreve é a rota opcional
+## de cima -- a que tem a essência --, que é exatamente onde a mecânica se
+## sente: sobe-se por um caminho e desce-se por outro.
+func _f_mente(par: Node2D, x: float, y: float) -> Vector2:
+	var cy: float = clampf(y, _teto_y + 300.0, _chao_y - 140.0)
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(150.0, 18.0))
+	_checkpoint(x, cy, true)
+	var x0 := x
+
+	# a espinha: fixa, sempre igual, sempre atravessável
+	var n := 5 + int(_dif * 2.0)
+	for i in n:
+		x += _rng.randf_range(150.0, 176.0)
+		_plat(par, Vector2(x, cy - 12.0 * float(i % 2)), Vector2(100.0, 16.0))
+
+	# a varanda que se reescreve: três versões da mesma subida
+	var sala := SALA_REESCREVE.new()
+	sala.folga = 340.0
+	sala.intervalo = 2.6 - 0.6 * _dif
+	par.add_child(sala)
+	for v in 3:
+		var versao := Node2D.new()
+		for k in 4:
+			var px := x0 + 200.0 + float(k) * ((x - x0) / 5.0)
+			# cada versão põe os degraus a alturas diferentes -- é a mesma
+			# varanda contada de três maneiras
+			var py := cy - 130.0 - 46.0 * float((k + v) % 3)
+			var p := PLAT.instantiate()
+			p.position = Vector2(px, py)
+			p.tamanho = Vector2(96.0, 15.0)
+			versao.add_child(p)
+		sala.juntar_versao(versao)
+	var es := ESSENCIA.instantiate()
+	es.valor = 26 + int(44.0 * _dif)
+	es.espalhar = false
+	es.position = Vector2(x0 + (x - x0) * 0.5, cy - 230.0)
+	par.add_child(es)
+
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(150.0, 18.0))
 	_checkpoint(x, cy, true)
 	return Vector2(x, cy)
 

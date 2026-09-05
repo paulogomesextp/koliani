@@ -613,6 +613,27 @@ plataforma que roda, N78 convés que inclina, N99 bandeira do nível).
 | **67** | Mundo Invertido | **inverter a gravidade à vontade.** O `_grav_escala` já existe; falta o sinal negativo, o `up_direction` da Koliani e passar por tudo o que lê `velocity.y` (pisão, aterragem, planar, escalar paredes). É uma sessão por si -- e é por isso que ficou para o fim |
 | **70** | A Mente | **o cenário reescreve-se atrás de ti.** O candidato a corte, se for preciso cortar: por definição acontece onde já não se está a olhar |
 
+### A MENTE (N70) — o cenário reescreve-se atrás dela
+
+A varanda de cima tem **três versões** e vai trocando à medida que ela
+avança. Voltar atrás mostra uma sala que não é a que se atravessou.
+
+Três regras, e são todas sobre o mesmo medo:
+
+1. **a espinha nunca se reescreve.** O que muda é a varanda, que é rota
+   opcional -- o caminho crítico é sempre o mesmo, e por isso isto não
+   tranca ninguém. É também onde a mecânica se sente: sobe-se por um
+   caminho e desce-se por outro.
+2. **nunca se troca uma peça a menos de 340 px dela.** Uma plataforma a
+   desaparecer debaixo dos pés não é uma mecânica, é um bug com boa
+   história. A bancada prova as duas metades: com ela perto não reescreve,
+   longe reescreve.
+3. **troca-se com um fade**, nunca de um frame para o outro -- assim lê-se
+   como o mundo a mudar e não como um erro de desenho.
+
+**Provisórias: 2 → 1.** Falta **uma linha em 100**: o N67, inverter a
+gravidade à vontade.
+
 ### E as pools das regiões, que era o buraco maior
 
 As 16 estreias de 5 set (`lava_sobe`, `mare`, `espectral`, …) **não estavam

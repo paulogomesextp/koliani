@@ -20,6 +20,7 @@ const ZONA_SEM_AR := preload("res://scripts/zona_sem_ar.gd")
 const SERPENTE := preload("res://scripts/serpente.gd")
 const SOMBRA := preload("res://scripts/sombra_atrasada.gd")
 const PLAT_RODA := preload("res://scripts/plataforma_roda.gd")
+const SALA_REESCREVE := preload("res://scripts/sala_reescreve.gd")
 const AMEACA := preload("res://scripts/ameaca_que_avanca.gd")
 const ZONA_SEM_PODER := preload("res://scripts/zona_sem_poder.gd")
 ## A Koliani carrega-se em RUNTIME (nao com `preload`): o script dela usa
@@ -278,6 +279,40 @@ var ligada := false
 			"ZonaSemPoder: devolve tambem quando morre com a cena")
 		kp.queue_free()
 		await process_frame
+
+	# --- SALA QUE SE REESCREVE -----------------------------------------
+	# a regra que interessa: NUNCA troca com ela perto. Uma plataforma a
+	# desaparecer debaixo dos pes nao e' mecanica, e' um bug com boa
+	# historia.
+	var sr: Node2D = SALA_REESCREVE.new()
+	sr.folga = 300.0
+	sr.intervalo = 0.2
+	sr.fade = 0.05
+	sr.global_position = Vector2(25000.0, 0.0)
+	_sala.add_child(sr)
+	for v in 2:
+		var versao := Node2D.new()
+		var corpo := StaticBody2D.new()
+		var cs := CollisionShape2D.new()
+		var rf := RectangleShape2D.new()
+		rf.size = Vector2(90.0, 16.0)
+		cs.shape = rf
+		corpo.add_child(cs)
+		corpo.position = Vector2(0.0, -40.0 * float(v))
+		versao.add_child(corpo)
+		sr.call("juntar_versao", versao)
+	var kr := _duble(Vector2(25000.0, 0.0))    # em cima da varanda
+	await _esperar(0.6)
+	_ok(int(sr.get("_atual")) == 0,
+		"SalaReescreve: com ela perto NAO reescreve (versao %d)"
+			% int(sr.get("_atual")))
+	kr.global_position = Vector2(25900.0, 0.0)  # bem longe
+	await _esperar(0.6)
+	_ok(int(sr.get("_atual")) != 0,
+		"SalaReescreve: longe dela, reescreve (versao %d)" % int(sr.get("_atual")))
+	sr.queue_free()
+	kr.queue_free()
+	await process_frame
 
 	# --- PLATAFORMA QUE RODA -------------------------------------------
 	# duas caras da mesma peca: conves a inclinar (amplitude > 0) e
