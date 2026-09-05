@@ -597,6 +597,22 @@ morde.
 N70 o cenário que se reescreve) e quatro pequenas (N54 esporos, N56
 plataforma que roda, N78 convés que inclina, N99 bandeira do nível).
 
+### As quatro pequenas que restavam — e sobram DUAS linhas em 100
+
+| Nível | Câmara | O que muda |
+|---|---|---|
+| 54 Estufa Maldita | `esporos` | nuvens que mexem com o **peso** dela: ora leve (o salto sobe o dobro), ora pesada (mal levanta). O guia dizia "esporos que trocam os controlos", mas a inversão de controlos foi retirada do jogo pelo Paulo -- e com razão: mexer no comando de quem joga é castigo, não mecânica. Mexer no peso muda a mesma conta (quanto se salta, onde se aterra) sem lhe tirar as mãos do boneco. Nenhuma nuvem é obrigatória |
+| 56 Distrito das Engrenagens | `engrenagens` | braços em cruz que dão a volta devagar. É a `orbita` (N61) ao contrário: lá a plataforma anda em círculo e ela vai a bordo; aqui **o chão roda debaixo dela**, e a decisão é quando saltar fora |
+| 78 Navio da Condenação | `conves` | o chão continua debaixo dos pés, só deixa de ser horizontal. Não é o `gelo` (N41), onde ela escorrega porque não trava; aqui trava na mesma, **o chão é que anda**. O ângulo trava nos 26°: acima disso escorregava sempre, e o convés passava de mecânica a escorrega |
+| 99 O Fim de Tudo | — | "tudo desbloqueado, energia sem limite" é uma **bandeira do nível**, não uma câmara: não há nada para construir no cenário, o que muda é ela. Derivado do `indice_nivel`, por isso não chega ao save e não há nada para repor à saída |
+
+**Provisórias: 6 → 2.** Sobram **os dois últimos grandes**:
+
+| | Nível | O que falta |
+|---|---|---|
+| **67** | Mundo Invertido | **inverter a gravidade à vontade.** O `_grav_escala` já existe; falta o sinal negativo, o `up_direction` da Koliani e passar por tudo o que lê `velocity.y` (pisão, aterragem, planar, escalar paredes). É uma sessão por si -- e é por isso que ficou para o fim |
+| **70** | A Mente | **o cenário reescreve-se atrás de ti.** O candidato a corte, se for preciso cortar: por definição acontece onde já não se está a olhar |
+
 ### E as pools das regiões, que era o buraco maior
 
 As 16 estreias de 5 set (`lava_sobe`, `mare`, `espectral`, …) **não estavam

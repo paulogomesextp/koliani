@@ -651,7 +651,19 @@ func devolver_habilidades_todas() -> void:
 	habilidades_suspensas.clear()
 
 
+## NIVEL 99, "O Fim de Tudo" -- o guia pede "tudo desbloqueado, energia sem
+## limite". E' uma bandeira do NIVEL, nao uma camara: nao ha' nada para
+## construir no cenario, o que muda e' ela. Como e' derivado do
+## `indice_nivel`, nao chega ao save e nao ha' nada para repor a' saida.
+const NIVEL_TUDO := 98
+
+func tudo_desbloqueado() -> bool:
+	return modo_dev or indice_nivel == NIVEL_TUDO
+
+
 func tem_habilidade(id: String) -> bool:
+	if tudo_desbloqueado() and id in HABILIDADES_TODAS:
+		return id not in habilidades_suspensas
 	return id in habilidades and id not in habilidades_suspensas
 
 

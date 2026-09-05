@@ -90,6 +90,7 @@ const SOMBRA := preload("res://scripts/sombra_atrasada.gd")
 const AMEACA := preload("res://scripts/ameaca_que_avanca.gd")
 const ZONA_SEM_PODER := preload("res://scripts/zona_sem_poder.gd")
 const PONTO_GANCHO := preload("res://scripts/ponto_gancho.gd")
+const PLAT_RODA := preload("res://scripts/plataforma_roda.gd")
 
 ## Líquido mortal por região: [cor, brasas]. floresta=água podre, prisão=ácido,
 ## torres=??? (usa trevas), catacumbas=trevas, cidade=ácido citrino,
@@ -169,14 +170,14 @@ const POOL_REGIAO := {
 	10: ["pendulos", "trampolim", "saltos", "ritmo", "velas", "espinhos",
 		"ferry", "gruta", "portal", "alavanca", "segredo", "bifurcacao",
 		"gancho",
-		"raizes", "espectral", "chuva", "rosas"],
+		"raizes", "espectral", "chuva", "rosas", "esporos"],
 	# XII Cidade das Maquinas: o oposto. Nada balança -- tudo ANDA, com
 	# `correntes` de assinatura (as correias). É a única região com todas
 	# as câmaras de máquina ao mesmo tempo.
 	11: ["correntes", "elevador", "impulso", "ritmo", "prensa", "serras",
 		"guilhotinas", "crossfire", "quebra", "portal", "alavanca",
 		"segredo", "circuito", "tapete", "placa", "martelos",
-		"replicantes", "imanes"],
+		"replicantes", "imanes", "engrenagens"],
 	# XIII Ceu Partido: não há chão -- só o que passa. `ferry` de
 	# assinatura (as ilhas que se movem), mais `vento` e `gravidade`.
 	12: ["ferry", "vento", "gravidade", "saltos", "trampolim", "elevador",
@@ -199,7 +200,7 @@ const POOL_REGIAO := {
 	# desce a compasso.
 	15: ["ritmo", "ferry", "quebra", "gravidade", "pendulos", "espinhos",
 		"crossfire", "serras", "portal", "alavanca", "segredo", "mare",
-		"serpente", "pulsacao",
+		"serpente", "pulsacao", "conves",
 		"varredura", "tapete", "orbita"],
 	# XVII Inferno: paredes que esmagam. `prensa` de assinatura -- e é a
 	# única região onde o `fogo` volta com tudo desde o Castelo (nível 30).
@@ -337,10 +338,10 @@ const MECANICA_DO_NIVEL := [
 	{"cam": "rosas", "grau": 1},
 	{"cam": "bifurcacao", "grau": 1},
 	{"cam": "gancho", "grau": 1},
-	{"cam": "portal", "grau": 1},  # ~
+	{"cam": "esporos", "grau": 1},
 	{"cam": "raizes", "grau": 1},
 	# --- niveis 56-60  (Regiao 12) ---
-	{"cam": "correntes", "grau": 1},  # ~
+	{"cam": "engrenagens", "grau": 1},
 	{"cam": "elevador", "grau": 1},
 	{"cam": "replicantes", "grau": 1},
 	{"cam": "circuito", "grau": 1},
@@ -366,7 +367,7 @@ const MECANICA_DO_NIVEL := [
 	# --- niveis 76-80  (Regiao 16) ---
 	{"cam": "mare", "grau": 2},
 	{"cam": "serpente", "grau": 2},
-	{"cam": "alavanca", "grau": 2},  # ~
+	{"cam": "conves", "grau": 2},
 	{"cam": "varredura", "grau": 2},
 	{"cam": "pulsacao", "grau": 2},
 	# --- niveis 81-85  (Regiao 17) ---
@@ -391,7 +392,7 @@ const MECANICA_DO_NIVEL := [
 	{"cam": "memoria", "grau": 2},
 	{"cam": "revisao", "grau": 2},
 	{"cam": "provacao", "grau": 2},
-	{"cam": "trampolim", "grau": 2},  # ~
+	{"cam": "trampolim", "grau": 2},
 	{"cam": "velas", "grau": 2},
 ]
 
@@ -442,6 +443,7 @@ const CAMARAS_FLAVOUR := [
 	"gelo", "frio", "veneno", "escuro", "areia_no_ar", "ciclo",
 	"mausoleu", "gemea", "ar", "serpente", "pulsacao", "asas", "sombra",
 	"ameaca", "provacao", "reflexo", "gancho",
+	"engrenagens", "conves", "esporos",
 ]
 
 ## Câmara "assinatura" de cada região -- no acto do meio da jornada aparece
@@ -1558,6 +1560,9 @@ func _flavour(par: Node2D, tipo: String, x: float, y: float) -> Vector2:
 		"provacao": return _f_provacao(par, x, y)
 		"reflexo": return _f_reflexo(par, x, y)
 		"gancho": return _f_gancho(par, x, y)
+		"engrenagens": return _f_engrenagens(par, x, y)
+		"conves": return _f_conves(par, x, y)
+		"esporos": return _f_esporos(par, x, y)
 	# tipo sem handler -> não deve acontecer (pool/assinatura mal configurada).
 	# Avisa em vez de gerar um vão morto silencioso e cai num `descanso`.
 	push_warning("GeradorCorredor: câmara '%s' sem _f_ correspondente" % tipo)
@@ -4313,6 +4318,106 @@ func _f_gancho(par: Node2D, x: float, y: float) -> Vector2:
 		_plat(par, Vector2(x, cy), Vector2(96.0, 16.0))
 	x += _rng.randf_range(150.0, 176.0)
 	_plat(par, Vector2(x, cy), Vector2(150.0, 18.0))
+	_checkpoint(x, cy, true)
+	return Vector2(x, cy)
+
+
+## ENGRENAGENS (N56, Distrito das Engrenagens): braços em cruz que dão a
+## volta devagar. Anda-se em cima do braço enquanto ele está por baixo do
+## horizonte e sai-se antes de ele subir -- é a `orbita` (N61) ao
+## contrário: lá a plataforma anda em círculo e ela vai a bordo; aqui o
+## chão RODA debaixo dela, e a decisão é quando saltar fora.
+##
+## Cada engrenagem tem um poleiro fixo ao lado: nunca é preciso apanhar
+## dois braços seguidos sem chão nenhum pelo meio.
+func _f_engrenagens(par: Node2D, x: float, y: float) -> Vector2:
+	var cy: float = clampf(y, _teto_y + 300.0, _chao_y - 220.0)
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(140.0, 18.0))
+	_checkpoint(x, cy, true)
+	var n := 2 + int(_dif * 2.0)
+	for i in n:
+		x += 260.0
+		var pr := PLAT_RODA.new()
+		pr.amplitude_graus = 0.0                 # volta completa
+		pr.periodo = 5.4 - 1.4 * _dif
+		pr.fase = 0.37 * float(i)
+		pr.comprimento = 200.0
+		pr.bracos = 2
+		pr.position = Vector2(x, cy - 40.0)
+		par.add_child(pr)
+		# o poleiro do lado: o descanso entre duas engrenagens
+		x += 220.0
+		_plat(par, Vector2(x, cy), Vector2(92.0, 16.0))
+		if i % 2 == 1:
+			_checkpoint(x, cy)
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(140.0, 18.0))
+	_checkpoint(x, cy, true)
+	return Vector2(x, cy)
+
+
+## CONVÉS (N78, Navio da Condenação): o chão continua debaixo dos pés, só
+## deixa de ser horizontal. Tomba para um lado e para o outro, e o que se
+## perde é poder ficar quieto -- a Koliani escorrega para o lado baixo, e
+## o lado baixo muda. Não é o `gelo` (N41), onde ela escorrega porque não
+## trava; aqui trava na mesma, o chão é que anda.
+##
+## O ângulo trava nos 26°: acima disso escorregava sempre, e o convés
+## passava de mecânica a escorrega.
+func _f_conves(par: Node2D, x: float, y: float) -> Vector2:
+	var cy: float = clampf(y, _teto_y + 240.0, _chao_y - 150.0)
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(140.0, 18.0))
+	_checkpoint(x, cy, true)
+	var n := 2 + int(_dif * 2.0)
+	for i in n:
+		x += 260.0
+		var pr := PLAT_RODA.new()
+		pr.amplitude_graus = 14.0 + 10.0 * _dif
+		pr.periodo = 3.6 - 1.0 * _dif
+		pr.fase = 0.5 * float(i)
+		pr.comprimento = 260.0
+		pr.position = Vector2(x, cy)
+		par.add_child(pr)
+		if i % 2 == 0 and _dif > 0.4:
+			_inimigo_em(par, Vector2(x, cy - 46.0))
+		x += 200.0
+		_plat(par, Vector2(x, cy), Vector2(88.0, 16.0))
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(140.0, 18.0))
+	_checkpoint(x, cy, true)
+	return Vector2(x, cy)
+
+
+## ESPOROS (N54, Estufa Maldita): nuvens que mexem com o PESO dela. Dentro
+## de uma, a gravidade dela muda -- ora leve (o salto sobe o dobro e a
+## queda demora), ora pesada (mal levanta do chão). O guia dizia "esporos
+## que trocam os controlos", mas a inversão de controlos foi retirada do
+## jogo pelo Paulo, e com razão: mexer no comando de quem joga é castigo,
+## não mecânica. Mexer no PESO muda a mesma conta -- quanto se salta e
+## onde se aterra -- sem lhe tirar as mãos do boneco.
+##
+## Os vãos são feitos para o peso normal: nenhuma nuvem é obrigatória.
+func _f_esporos(par: Node2D, x: float, y: float) -> Vector2:
+	var cy: float = clampf(y, _teto_y + 280.0, _chao_y - 140.0)
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(140.0, 18.0))
+	_checkpoint(x, cy, true)
+	var n := 4 + int(_dif * 2.0)
+	for i in n:
+		var leve := i % 2 == 0
+		var zg := ZONA_GRAV.instantiate()
+		zg.escala = 0.42 if leve else 1.45
+		zg.position = Vector2(x + 90.0, cy - 90.0)
+		par.add_child(zg)
+		_esticar_zona(zg, Vector2(160.0, 240.0))
+		x += _rng.randf_range(150.0, 172.0)
+		_plat(par, Vector2(x, cy - 18.0 * float(i % 2)), Vector2(96.0, 16.0))
+		if i % 2 == 1:
+			_checkpoint(x, cy - 18.0)
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(140.0, 18.0))
 	_checkpoint(x, cy, true)
 	return Vector2(x, cy)
 

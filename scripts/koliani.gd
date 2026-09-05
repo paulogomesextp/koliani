@@ -1457,7 +1457,10 @@ func _dano_kamehameha() -> int:
 ## não está em recarga.
 func _lancar_kamehameha() -> void:
 	if not EstadoJogo.modo_dev:  # modo dev: energia infinita
-		_energia = maxf(0.0, _energia - CUSTO_KAMEHAMEHA)
+		# nivel 99 ("O Fim de Tudo"): a Energia nao se gasta -- e' o unico
+		# nivel do jogo em que ela nao tem de escolher o que usar
+		if not EstadoJogo.tudo_desbloqueado():
+			_energia = maxf(0.0, _energia - CUSTO_KAMEHAMEHA)
 	energia_mudou.emit(_energia, ENERGIA_MAX)
 	_kame_recarga = RECARGA_KAMEHAMEHA
 	_lancar_restante = DUR_LANCAR

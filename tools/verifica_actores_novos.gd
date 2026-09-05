@@ -19,6 +19,7 @@ const ZONA_ESCURIDAO := preload("res://scripts/zona_escuridao.gd")
 const ZONA_SEM_AR := preload("res://scripts/zona_sem_ar.gd")
 const SERPENTE := preload("res://scripts/serpente.gd")
 const SOMBRA := preload("res://scripts/sombra_atrasada.gd")
+const PLAT_RODA := preload("res://scripts/plataforma_roda.gd")
 const AMEACA := preload("res://scripts/ameaca_que_avanca.gd")
 const ZONA_SEM_PODER := preload("res://scripts/zona_sem_poder.gd")
 ## A Koliani carrega-se em RUNTIME (nao com `preload`): o script dela usa
@@ -277,6 +278,49 @@ var ligada := false
 			"ZonaSemPoder: devolve tambem quando morre com a cena")
 		kp.queue_free()
 		await process_frame
+
+	# --- PLATAFORMA QUE RODA -------------------------------------------
+	# duas caras da mesma peca: conves a inclinar (amplitude > 0) e
+	# engrenagem a dar a volta (amplitude = 0). E o limite dos 26 graus
+	# tem de MORDER -- acima disso a Koliani escorregava sempre.
+	var pc: Node2D = PLAT_RODA.new()
+	pc.amplitude_graus = 90.0        # de proposito: tem de ser travado
+	pc.periodo = 1.0
+	pc.global_position = Vector2(21000.0, 0.0)
+	_sala.add_child(pc)
+	await _esperar(0.1)
+	_ok(float(pc.get("amplitude_graus")) <= 26.0,
+		"PlataformaRoda: a inclinacao trava nos 26 graus (%.0f)"
+			% float(pc.get("amplitude_graus")))
+	var picos := 0.0
+	for _i in 24:
+		await create_timer(0.05).timeout
+		picos = maxf(picos, absf(pc.rotation))
+	_ok(picos > 0.2, "PlataformaRoda: o conves inclina mesmo (%.2f rad)" % picos)
+	_ok(picos < deg_to_rad(27.0),
+		"PlataformaRoda: e nunca passa do limite (%.2f rad)" % picos)
+	pc.queue_free()
+
+	var pg2: Node2D = PLAT_RODA.new()
+	pg2.amplitude_graus = 0.0        # engrenagem: volta completa
+	pg2.periodo = 0.6
+	pg2.bracos = 2
+	pg2.global_position = Vector2(23000.0, 0.0)
+	_sala.add_child(pg2)
+	var maxr := 0.0
+	var voltou := false
+	var ant := 0.0
+	for _i in 30:
+		await create_timer(0.05).timeout
+		if pg2.rotation < ant - 0.5:
+			voltou = true          # deu a volta e recomecou
+		ant = pg2.rotation
+		maxr = maxf(maxr, pg2.rotation)
+	_ok(maxr > 2.5 and voltou,
+		"PlataformaRoda: a engrenagem da' a volta INTEIRA (max %.1f rad, voltou=%s)"
+			% [maxr, voltou])
+	pg2.queue_free()
+	await process_frame
 
 	# --- AMEACA QUE AVANCA ---------------------------------------------
 	# tres coisas: espera antes de arrancar, anda a passo constante, e
