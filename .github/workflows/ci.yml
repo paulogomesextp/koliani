@@ -44,6 +44,14 @@ jobs:
         run: godot --headless --import || true
       - name: Correr suite de testes
         run: godot --headless --script res://tests/run_tests.gd
+      # As regras de bicho (divide_em / so_tiro / so_mexe_sem_olhar) vivem no
+      # DemonioBase, e a suite nao o consegue instanciar: em `--script` os
+      # autoloads que ele usa nao existem como IDENTIFICADOR e o teste
+      # passaria em silencio sem medir nada. Este corre a' parte.
+      - name: Regras de bicho
+        run: godot --headless --script res://tools/verifica_regras_bicho.gd
+      - name: As 100 jornadas constroem-se
+        run: godot --headless --script res://tools/verifica_jornada.gd
 
   web:
     name: Build Web

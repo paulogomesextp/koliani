@@ -55,6 +55,22 @@ var _dive_dir := Vector2.ZERO
 @export var cor_estilhacos := Color(0.7, 0.25, 0.45)
 ## Cor da luz de recorte (rim) do sprite -- normalmente o tom do bioma.
 @export var cor_rim := Color(0.95, 0.5, 0.72)
+## --- três regras de bicho (5 set 2026) --------------------------------
+## São as mecânicas de estreia dos níveis 58, 73 e 74. Nenhuma toca no
+## `comportamento`: mudam a REGRA de quem lhe pode tocar, do que ele deixa
+## atrás e de quando se mexe.
+
+## Ao morrer parte-se em `divide_em` cópias mais pequenas -- que já não se
+## dividem (senão a sala enchia-se sozinha). Nível 58, Fábrica dos
+## Homúnculos.
+@export var divide_em := 0
+## INCORPÓREO: a espada e o pisão atravessam-no, só o TIRO lhe toca. Nível
+## 73, Catedral Fantasma. Ver `receber_tiro()`.
+@export var so_tiro := false
+## Só anda quando a Koliani NÃO está virada para ele -- e pára, quieto,
+## quando ela olha. Níveis 68 (brinquedos) e 74 (estátuas).
+@export var so_mexe_sem_olhar := false
+
 ## ELITE (1 por nível na campanha à mão): aura a pulsar + barra de vida por
 ## cima da cabeça + rebentamento maior na morte. Lê-se como "este é o grande".
 @export var elite := false
@@ -99,6 +115,12 @@ const ESPECIES := {
 @onready var _area_contacto: Area2D = $AreaContacto
 
 var _direcao := 1.0
+## O ultimo dano veio de um PROJECTIL? Posto pelo `receber_tiro()` e limpo
+## logo a seguir -- e' o unico sitio onde o `so_tiro` consegue distinguir.
+var _de_longe := false
+## Vida com que nasceu, para as copias do `divide_em` nao herdarem a vida
+## a zero de quem se partiu.
+var _vida_ini := 0
 var _mat: ShaderMaterial
 ## true a partir do momento em que morre (toca a anim de morte e liberta-se).
 var _morto := false
@@ -194,6 +216,7 @@ func _dano_periodico(q: int) -> void:
 	if elite:
 		_atualizar_barra_elite()
 	if vida <= 0:
+		_dividir()
 		if elite:
 			_pop_morte_elite()
 		if _anim:
@@ -286,6 +309,7 @@ func _ready() -> void:
 		dano_contacto = maxi(1, int(round(dano_contacto * (0.65 + 0.75 * f))))
 		velocidade *= 0.88 + 0.34 * f
 
+	_vida_ini = vida
 	if comportamento != "patrulha":
 		_acao_cd = randf_range(0.6, 1.8)
 	if comportamento == "escudeiro":
@@ -510,6 +534,14 @@ func _physics_process(dt: float) -> void:
 			velocity.y += GRAVIDADE * dt
 		move_and_slide()
 		return
+	# ESTÁTUA: quieto enquanto ela olha. Não há aviso nenhum a não ser a
+	# própria posição -- entre dois olhares está sempre mais perto.
+	if so_mexe_sem_olhar and _koliani_a_olhar():
+		velocity.x = 0.0
+		if not is_on_floor():
+			velocity.y += GRAVIDADE * dt
+		move_and_slide()
+		return
 	_acao_cd = maxf(0.0, _acao_cd - dt)
 	_telegrafo = maxf(0.0, _telegrafo - dt)
 
@@ -720,6 +752,22 @@ func _dir_koliani_perto(alcance: float) -> float:
 	return signf(d.x) if d.x != 0.0 else _direcao
 
 
+## A Koliani está virada para este bicho? Sem Koliani na cena conta como
+## "não está a olhar" -- assim o bicho anda, em vez de gelar para sempre.
+func _koliani_a_olhar() -> bool:
+	var k := get_tree().get_first_node_in_group("koliani")
+	if k == null:
+		return false
+	var d: float = (k as Node2D).global_position.x - global_position.x
+	# `_olha_para` e' da Koliani; se o no' do grupo nao a tiver (um duble de
+	# teste, um placeholder), `get()` devolve null -- e `float(null)` REBENTA.
+	var v: Variant = k.get("_olha_para")
+	if typeof(v) != TYPE_FLOAT and typeof(v) != TYPE_INT:
+		return false
+	var olha := float(v)
+	return (olha > 0.0 and d < 0.0) or (olha < 0.0 and d > 0.0)
+
+
 ## Há chão logo a seguir à beira, na direção `dir`? (raycast para baixo)
 func ha_chao_a_frente(dir: float) -> bool:
 	var espaco := get_world_2d().direct_space_state
@@ -745,6 +793,13 @@ const CRIT_MULT := 1.7
 func receber_dano(quantidade: int, dir_empurrao: float = 0.0, critico := false) -> void:
 	if _morto:
 		return
+	# INCORPÓREO: a lâmina passa através. Só o que vem de longe lhe toca --
+	# e o `_de_longe` só é verdade dentro de um `receber_tiro()`.
+	if so_tiro and not _de_longe:
+		Som.toca("bloqueio", -18.0, 1.45)
+		_flinch = 0.22
+		return
+	_de_longe = false
 	# escudeiro: golpe de FRENTE (o empurrão atira-o para trás, contra o
 	# sentido em que está virado) bate no escudo -- só "clinc". Pisão
 	# (dir_empurrao 0) e golpes pelas costas passam. Um CRÍTICO (costas /
@@ -769,6 +824,7 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0, critico := false) 
 	vida -= q
 	global_position.x += dir_empurrao * (12.0 if critico else 8.0)
 	if vida <= 0:
+		_dividir()
 		if elite:
 			_pop_morte_elite()
 		if _anim:
@@ -791,6 +847,46 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0, critico := false) 
 		piscar_dano()
 		if elite:
 			_atualizar_barra_elite()
+
+
+## Parte-se em cópias mais pequenas (nível 58). As filhas nascem com
+## `divide_em = 0` -- uma divisão que se repetisse enchia a sala sozinha e
+## a jornada não tem chão de rede onde uma horda infinita seja justa.
+## Carrega a cena em runtime de propósito: um `preload` da própria cena
+## dentro do script dela é um ciclo de recurso.
+func _dividir() -> void:
+	if divide_em <= 0 or _e_chefe():
+		return
+	var n := divide_em
+	divide_em = 0
+	var cena := load("res://scenes/actors/DemonioBase.tscn") as PackedScene
+	var pai := get_parent()
+	if cena == null or pai == null:
+		return
+	for i in n:
+		var c := cena.instantiate() as DemonioBase
+		if c == null:
+			continue
+		c.especie = especie
+		c.comportamento = comportamento
+		c.vida = maxi(10, int(round(float(_vida_ini) * 0.42)))
+		c.dano_contacto = maxi(4, int(round(float(dano_contacto) * 0.7)))
+		c.velocidade = velocidade * 1.15
+		c.alcance_patrulha = alcance_patrulha
+		c.cor_rim = cor_rim
+		c.scale = scale * 0.68
+		c.global_position = global_position + Vector2(
+			(float(i) - float(n - 1) * 0.5) * 34.0, -6.0)
+		pai.add_child(c)
+
+
+## Entrada de dano de PROJÉCTIL -- existe só por causa do `so_tiro`: é a
+## única maneira de o bicho saber que o que lhe tocou veio de longe.
+## Quem não a chamar continua a bater como sempre (`receber_dano`).
+func receber_tiro(quantidade: int, dir_empurrao := 0.0) -> void:
+	_de_longe = true
+	receber_dano(quantidade, dir_empurrao)
+	_de_longe = false
 
 
 ## Larga ESSÊNCIA ao morrer. Comum: pouca (escala com a região). Elite:

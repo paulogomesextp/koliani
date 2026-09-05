@@ -157,7 +157,8 @@ const POOL_REGIAO := {
 	# as câmaras de máquina ao mesmo tempo.
 	11: ["correntes", "elevador", "impulso", "ritmo", "prensa", "serras",
 		"guilhotinas", "crossfire", "quebra", "portal", "alavanca",
-		"segredo", "circuito", "tapete", "placa", "martelos"],
+		"segredo", "circuito", "tapete", "placa", "martelos",
+		"replicantes"],
 	# XIII Ceu Partido: não há chão -- só o que passa. `ferry` de
 	# assinatura (as ilhas que se movem), mais `vento` e `gravidade`.
 	12: ["ferry", "vento", "gravidade", "saltos", "trampolim", "elevador",
@@ -172,7 +173,7 @@ const POOL_REGIAO := {
 	# sólida a ponte fantasma, que é a mecânica-imagem da região inteira.
 	14: ["sinos", "velas", "gruta", "pendulos", "guilhotinas", "espinhos",
 		"ferry", "elevador", "portal", "alavanca", "segredo", "espectral",
-		"vitral", "bifurcacao", "raizes"],
+		"vitral", "bifurcacao", "raizes", "incorporeo", "estatuas"],
 	# XVI Mar Vermelho: a maré. `ritmo` de assinatura -- tudo aqui sobe e
 	# desce a compasso.
 	15: ["ritmo", "ferry", "quebra", "gravidade", "pendulos", "espinhos",
@@ -187,7 +188,8 @@ const POOL_REGIAO := {
 	# que aparece e desaparece. Pool curta de propósito: a região tem de
 	# se sentir VAZIA, e uma pool grande enche a jornada de coisas.
 	17: ["elevador", "gravidade", "portal", "espelhos", "saltos", "quebra",
-		"alavanca", "segredo", "sem_chao", "espectral", "orbita", "queda"],
+		"alavanca", "segredo", "sem_chao", "espectral", "orbita", "queda",
+		"estatuas"],
 	# XIX Guerra dos Reinos: cerco. `pedras` de assinatura (o que as
 	# catapultas mandam) mais tudo o que fere -- é a região mais densa.
 	18: ["pedras", "crossfire", "espinhos", "serras", "guilhotinas",
@@ -318,29 +320,29 @@ const MECANICA_DO_NIVEL := [
 	# --- niveis 56-60  (Regiao 12) ---
 	{"cam": "correntes", "grau": 1},  # ~
 	{"cam": "elevador", "grau": 1},  # ~
-	{"cam": "guilhotinas", "grau": 1},  # ~
+	{"cam": "replicantes", "grau": 1},
 	{"cam": "circuito", "grau": 1},
 	{"cam": "correntes", "grau": 1},  # ~
 	# --- niveis 61-65  (Regiao 13) ---
 	{"cam": "orbita", "grau": 1},
 	{"cam": "para_raios", "grau": 1},
 	{"cam": "vento", "grau": 1},  # ~
-	{"cam": "grav_baixa", "grau": 2},  # ~
+	{"cam": "grav_baixa", "grau": 2},
 	{"cam": "ferry", "grau": 1},  # ~
 	# --- niveis 66-70  (Regiao 14) ---
 	{"cam": "portal", "grau": 2},  # ~
 	{"cam": "quebra", "grau": 2},  # ~
-	{"cam": "velas", "grau": 2},  # ~
+	{"cam": "estatuas", "grau": 2},
 	{"cam": "ritmo", "grau": 2},  # ~
 	{"cam": "portal", "grau": 2},  # ~
 	# --- niveis 71-75  (Regiao 15) ---
-	{"cam": "sinos", "grau": 2},  # ~
+	{"cam": "sinos", "grau": 2},
 	{"cam": "gruta", "grau": 2},  # ~
-	{"cam": "sinos", "grau": 2},  # ~
+	{"cam": "incorporeo", "grau": 2},
 	{"cam": "guilhotinas", "grau": 2},  # ~
 	{"cam": "sinos", "grau": 2},  # ~
 	# --- niveis 76-80  (Regiao 16) ---
-	{"cam": "espinhos", "grau": 2},  # ~
+	{"cam": "mare", "grau": 2},
 	{"cam": "serras", "grau": 2},  # ~
 	{"cam": "alavanca", "grau": 2},  # ~
 	{"cam": "varredura", "grau": 2},
@@ -355,8 +357,8 @@ const MECANICA_DO_NIVEL := [
 	{"cam": "elevador", "grau": 2},  # ~
 	{"cam": "sem_chao", "grau": 2},
 	{"cam": "elevador", "grau": 2},  # ~
-	{"cam": "espectral", "grau": 2},  # ~
-	{"cam": "elevador", "grau": 2},  # ~
+	{"cam": "espectral", "grau": 2},
+	{"cam": "elevador", "grau": 2},
 	# --- niveis 91-95  (Regiao 19) ---
 	{"cam": "catapulta", "grau": 2},
 	{"cam": "salvas", "grau": 2},
@@ -413,6 +415,7 @@ const CAMARAS_FLAVOUR := [
 	# --- estreias novas (5 set 2026, 3.a passagem) ----------------------
 	"martelos", "bifurcacao", "raizes", "varredura", "prensa_fogo",
 	"correnteza", "sem_chao", "catapulta", "salvas", "assalto", "memoria",
+	"replicantes", "estatuas", "incorporeo",
 ]
 
 ## Câmara "assinatura" de cada região -- no acto do meio da jornada aparece
@@ -609,6 +612,7 @@ const INTENSAS := [
 	"guilhotinas", "serras", "pendulos", "fogo", "quebra", "crossfire", "ferry",
 	"pedras", "espinhos", "corredor", "arena", "prensa", "espelhos", "sinos",
 	"martelos", "raizes", "varredura", "prensa_fogo", "salvas",
+	"replicantes", "estatuas",
 	"catapulta", "assalto", "horda", "anel",
 ]
 
@@ -1501,6 +1505,9 @@ func _flavour(par: Node2D, tipo: String, x: float, y: float) -> Vector2:
 		"salvas": return _f_salvas(par, x, y)
 		"assalto": return _f_assalto(par, x, y)
 		"memoria": return _f_memoria(par, x, y)
+		"replicantes": return _f_replicantes(par, x, y)
+		"estatuas": return _f_estatuas(par, x, y)
+		"incorporeo": return _f_incorporeo(par, x, y)
 	# tipo sem handler -> não deve acontecer (pool/assinatura mal configurada).
 	# Avisa em vez de gerar um vão morto silencioso e cai num `descanso`.
 	push_warning("GeradorCorredor: câmara '%s' sem _f_ correspondente" % tipo)
@@ -3234,6 +3241,113 @@ func _f_memoria(par: Node2D, x: float, y: float) -> Vector2:
 	x = x0 + larg + _rng.randf_range(148.0, 176.0)
 	_plat(par, Vector2(x, cy), Vector2(140.0, 18.0))
 	_checkpoint(x, cy)
+	return Vector2(x, cy)
+
+
+## Um bicho com uma REGRA própria (ver `DemonioBase.divide_em` / `so_tiro`
+## / `so_mexe_sem_olhar`). Não passa pelo `_inimigo_em`: aqui não se quer o
+## sorteio de comportamento, quer-se exatamente esta regra e mais nada.
+func _bicho_regra(par: Node2D, pos: Vector2, regras: Dictionary) -> Node2D:
+	var d := DEMONIO.instantiate()
+	d.especie = _especie_do_nivel()
+	d.position = pos
+	d.alcance_patrulha = _rng.randf_range(50.0, 110.0)
+	d.vida = 34 + int(60.0 * _dif)
+	d.dano_contacto = 8 + int(14.0 * _dif)
+	for k: String in regras:
+		d.set(k, regras[k])
+	par.add_child(d)
+	return d
+
+
+## REPLICANTES (N58, Fábrica dos Homúnculos): cada bicho parte-se em dois
+## mais pequenos e mais rápidos quando morre. A sala é fechada por uma
+## grade e a alavanca está no fim -- não se passa por cima do problema,
+## limpa-se. As filhas já não se dividem: uma divisão em cadeia enchia a
+## sala sozinha, e a jornada não tem chão de rede onde isso fosse justo.
+func _f_replicantes(par: Node2D, x: float, y: float) -> Vector2:
+	var cy: float = clampf(y, _teto_y + 220.0, _chao_y - 150.0)
+	var id := "replic_%d" % _camaras
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(150.0, 18.0))
+	_checkpoint(x, cy, true)
+	var x0 := x
+	var larg := 620.0 + 140.0 * _dif
+	_plat(par, Vector2(x0 + larg * 0.5, cy + 34.0), Vector2(larg, 24.0), 120.0)
+	for i in 3 + int(_dif * 2.0):
+		_bicho_regra(par, Vector2(x0 + 170.0 + float(i) * (larg / 5.0), cy - 40.0),
+			{"divide_em": 2})
+	# tanques de cultura: as varandas de onde eles saem
+	for k in 2:
+		_plat(par, Vector2(x0 + 210.0 + float(k) * 300.0, cy - 150.0),
+			Vector2(118.0, 15.0))
+	var al := ALAVANCA.instantiate()
+	al.id = id
+	al.so_liga = true
+	al.position = Vector2(x0 + larg - 60.0, cy + 20.0)
+	par.add_child(al)
+	var gx := x0 + larg + 90.0
+	var pt := PORTA_TRANCADA.instantiate()
+	pt.id = id
+	pt.tamanho = Vector2(24.0, 150.0)
+	pt.position = Vector2(gx, cy - 42.0)
+	par.add_child(pt)
+	x = gx + _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(140.0, 18.0))
+	_checkpoint(x, cy, true)
+	return Vector2(x, cy)
+
+
+## ESTÁTUAS (N68, Quarto das Crianças Mortas): só se mexem quando ela não
+## está virada para elas. O aviso é a própria posição -- entre dois olhares
+## está sempre mais perto, e quem corre em frente sem olhar para trás chega
+## ao fim com a sala inteira em cima. Metade nasce ATRÁS da entrada: é o
+## que obriga a virar-se, e virar-se é o que pára a sala.
+func _f_estatuas(par: Node2D, x: float, y: float) -> Vector2:
+	var cy: float = clampf(y, _teto_y + 220.0, _chao_y - 150.0)
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(150.0, 18.0))
+	_checkpoint(x, cy, true)
+	var x0 := x
+	var larg := 660.0 + 160.0 * _dif
+	_plat(par, Vector2(x0 + larg * 0.5, cy + 34.0), Vector2(larg, 24.0), 120.0)
+	var n := 3 + int(_dif * 2.0)
+	for i in n:
+		# as pares nascem à frente, as ímpares atrás de onde ela entra
+		var px := x0 - 40.0 - float(i) * 40.0
+		if i % 2 == 0:
+			px = x0 + 200.0 + float(i) * (larg / float(n + 1))
+		_bicho_regra(par, Vector2(px, cy - 40.0),
+			{"so_mexe_sem_olhar": true, "velocidade": 92.0 + 36.0 * _dif})
+	# pedestais vazios: o cenário a dizer que faltam estátuas
+	for k in 3:
+		_plat(par, Vector2(x0 + 180.0 + float(k) * 200.0, cy - 130.0),
+			Vector2(96.0, 15.0))
+	x = x0 + larg + _rng.randf_range(148.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(140.0, 18.0))
+	_checkpoint(x, cy, true)
+	return Vector2(x, cy)
+
+
+## INCORPÓREOS (N73, Catedral Fantasma): a espada atravessa-os. Só o TIRO
+## lhes toca -- e o tiro é ilimitado, portanto isto nunca tranca nada: o
+## que muda é a distância a que se resolve o problema. Ficam sobre o vão,
+## onde a espada nem lá chegava.
+func _f_incorporeo(par: Node2D, x: float, y: float) -> Vector2:
+	var cy: float = clampf(y, _teto_y + 200.0, _chao_y - 130.0)
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(140.0, 18.0))
+	_checkpoint(x, cy, true)
+	var n := 3 + int(_dif * 2.0)
+	for i in n:
+		x += _rng.randf_range(158.0, 184.0)
+		_plat(par, Vector2(x, cy - 14.0 * float(i % 2)), Vector2(92.0, 16.0))
+		_bicho_regra(par, Vector2(x + 78.0, cy - 60.0 - 14.0 * float(i % 2)),
+			{"so_tiro": true, "comportamento": "voador",
+			 "cor_rim": Color(0.62, 0.86, 1.0)})
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(140.0, 18.0))
+	_checkpoint(x, cy, true)
 	return Vector2(x, cy)
 
 

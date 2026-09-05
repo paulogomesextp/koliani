@@ -279,6 +279,44 @@ por isso que saíram todas de uma vez.
 | 94 Torre da Corrupção | `assalto` | a `torre` é uma subida limpa; esta é a mesma subida com as torretas todas do mesmo lado |
 | 96 O Reino Antes da Corrupção | `memoria` | a única câmara **sem perigo nenhum**. Só funciona porque as anteriores ensinaram a desconfiar |
 
+### Segunda leva: três REGRAS de bicho (e cinco linhas mal marcadas)
+
+Estas mexem no `DemonioBase` -- não no `comportamento` (esse continua a
+mandar no andar), mas na regra de quem lhe pode tocar, do que ele deixa
+atrás e de quando se mexe:
+
+| Nível | Câmara | A regra |
+|---|---|---|
+| 58 Fábrica dos Homúnculos | `replicantes` | `divide_em`: morre e parte-se em duas cópias mais pequenas e mais rápidas. **As filhas já não se dividem** -- uma cadeia enchia a sala sozinha, e a jornada não tem chão de rede onde isso fosse justo. A sala é fechada por grade: não se passa por cima do problema |
+| 68 Quarto das Crianças Mortas | `estatuas` | `so_mexe_sem_olhar`: param quando ela olha. Metade nasce **atrás** da entrada -- é o que obriga a virar-se, e virar-se é o que pára a sala |
+| 73 Catedral Fantasma | `incorporeo` | `so_tiro`: a espada e o pisão atravessam-nos, só o tiro lhes toca. Nunca tranca nada (o tiro é ilimitado) -- muda a distância a que o problema se resolve |
+
+> A proposta dizia, para o 58, "replica-se **se não for morto depressa**".
+> Ficou **partir-se ao morrer**: limitado por construção, e um temporizador
+> a criar bichos numa sala fechada é uma espiral, não uma mecânica.
+
+O `so_tiro` obrigou a uma porta nova: `DemonioBase.receber_tiro()`. É a
+única maneira de o bicho saber que o dano veio de longe -- e o
+`projetil_koliani.gd` passa por lá agora (quem não a tiver leva na mesma).
+
+E **cinco linhas estavam marcadas `# ~` sem o serem**: são escolhas, não
+falta de actor. N64 (a `grav_baixa` um grau acima, do corte do "nadar"),
+N71 (a ponte fantasma **é** a `sinos`, assinatura da região XV), N89 e N90
+(os dois cortes do Paulo) -- e o N76, que repetia `espinhos` sem razão
+nenhuma, passa a ter a **maré de sangue** que o guia lhe dá.
+
+**Provisórias: 52 → 33.** Sobreposição: **0.227**.
+
+### Uma bancada nova: `tools/verifica_regras_bicho.gd`
+
+As três regras vivem no `DemonioBase`, e a suite **não o consegue
+instanciar**: em `--script` os autoloads que ele usa não existem como
+identificador. Esta corre à parte (e no CI), e as oito asserções foram
+partidas de propósito antes de passarem -- duas delas apanharam bugs a
+sério: o `float(null)` do `_koliani_a_olhar` quando o nó do grupo não é a
+Koliani, e uma expectativa de vida que ignorava a curva de dificuldade
+aplicada no `_ready`.
+
 ### E as pools das regiões, que era o buraco maior
 
 As 16 estreias de 5 set (`lava_sobe`, `mare`, `espectral`, …) **não estavam

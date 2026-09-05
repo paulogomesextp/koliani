@@ -62,7 +62,14 @@ func _physics_process(dt: float) -> void:
 
 func _ao_bater(corpo: Node) -> void:
 	if corpo.has_method("receber_dano") and not (corpo is Koliani):
-		corpo.receber_dano(dano, signf(_dir.x) if _dir.x != 0.0 else 0.0)
+		# `receber_tiro` em vez de `receber_dano`: é o que diz ao bicho
+		# que isto veio de longe -- os incorpóreos (nível 73) só levam
+		# dano por aqui. Quem não a tiver leva na mesma.
+		var dir := signf(_dir.x) if _dir.x != 0.0 else 0.0
+		if corpo.has_method("receber_tiro"):
+			corpo.receber_tiro(dano, dir)
+		else:
+			corpo.receber_dano(dano, dir)
 		# o tiro mágico DEIXA A ARDER -> abre janela de crítico para a espada
 		if corpo.has_method("queimar"):
 			corpo.queimar(2.0, maxi(2, roundi(dano * 0.14)))
