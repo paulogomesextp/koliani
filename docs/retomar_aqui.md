@@ -1,8 +1,125 @@
-# Retomar aqui — 5 de setembro de 2026
+# Retomar aqui — 5 de setembro de 2026 (sessão da madrugada)
 
 > **LEIA PRIMEIRO.** O topo é a **fila de pedidos do Paulo por fazer**.
 > A ordem é a do painel, que é dele:
 > <https://claude.ai/code/artifact/875b9e60-ef1b-4866-ad8f-d273169da411>
+
+---
+
+# ⇢ COMEÇA AQUI
+
+O pedido em curso é **"uma mecânica nova por nível"** (o Paulo: *"100
+níveis a fazer a mesma coisa e o mesmo padrão cansa o player"*). Passou de
+**52 linhas provisórias para 7**, e das 7 sobram **três grandes** e quatro
+pequenas:
+
+| | Nível | O que falta | Tamanho |
+|---|---|---|---|
+| 1 | **53** Jardim das Almas | **GANCHO** — engatar e balançar | **grande** (o maior de todos; muda os 100 níveis, não só o dele) |
+| 2 | **67** Mundo Invertido | inverter a gravidade à vontade | médio — o `_grav_escala` já existe, falta o sinal negativo + `up_direction` na Koliani |
+| 3 | **70** A Mente | o cenário reescreve-se atrás de ti | médio (o candidato a corte, se for preciso cortar: acontece onde já não se está a olhar) |
+| 4 | **56** Distrito das Engrenagens | plataforma que roda | pequeno-médio — cuidado, um corpo a rodar com ela em cima é física a sério |
+| 5 | **78** Navio da Condenação | convés que inclina | igual ao 56 (mesma peça, meia volta) |
+| 6 | **54** Estufa Maldita | esporos | o guia dizia "trocam os controlos", mas **a inversão de controlos foi retirada do jogo pelo Paulo**. Precisa de outra ideia — o `veneno` (N48) um grau acima é a mais barata e a mais fiel ao tema |
+| 7 | **99** O Fim de Tudo | "tudo desbloqueado, energia sem limite" | é uma **bandeira do nível**, não uma câmara: mexe no `EstadoJogo` à entrada do 99, não no gerador |
+
+**Antes de mexer em qualquer uma delas**, correr as três bancadas — é o que
+diz se alguma coisa se partiu:
+
+```bash
+"...Godot..._console.exe" --headless --script res://tests/run_tests.gd
+"...Godot..._console.exe" --headless --script res://tools/verifica_actores_novos.gd
+"...Godot..._console.exe" --headless --script res://tools/verifica_jornada.gd
+```
+
+---
+
+# A sessão da madrugada de 5 set 2026 — 26 mecânicas novas
+
+**52 provisórias → 7.** Sobreposição média de câmaras entre níveis
+seguidos: **0.275 → 0.218** (menos 21%). Detalhe nível a nível em
+[`mecanicas_por_nivel.md`](mecanicas_por_nivel.md), que ficou com uma
+secção por leva.
+
+## O que entrou
+
+**Câmaras de composição** (actores que já existiam, regra da sala nova):
+`martelos` (33) · `escuro` (40) · `bifurcacao` (52) · `raizes` (55) ·
+`varredura` (79) · `prensa_fogo` (81) · `correnteza` (83) · `sem_chao` (87) ·
+`gemea` (88) · `catapulta` (91) · `salvas` (92) · `assalto` (94) ·
+`memoria` (96) · `revisao` (97) · `pulsacao` (80) · `ciclo` (72) ·
+`mausoleu` (74) · `rosas` (51).
+
+**Actores novos** (todos só script, constroem o próprio corpo):
+`Iman` (60) · `ChaoQuente` (82) · `Ceifa` (75) · `PlataformaOlhar` (86) ·
+`Ariete` (93) · `ZonaGelo` (41) · `ZonaEstado` (45/48) ·
+`ZonaEscuridao` (40/49) · `ZonaSemAr` (38) · `Serpente` (77) ·
+`SombraAtrasada` (69, e o reflexo do 84) · `AmeacaQueAvanca` (65) ·
+`ZonaSemPoder` (98).
+
+**Regras novas de bicho** (`DemonioBase`): `divide_em` (58),
+`so_tiro` (73), `so_mexe_sem_olhar` (68).
+
+**Coisas dela**: `veneno` e `frio` (os primeiros ESTADOS que a apanham a
+ela — os inimigos já tinham), atrito de chão (`acel_escala`, o gelo) e a
+habilidade **planar** (N63), que era um dos "grandes" e afinal são oito
+linhas.
+
+**Quatro dos sete grandes fechados**: planar (63), sombra com atraso (69),
+ameaça que avança (65 — a máquina que funde 29/42/65) e perder uma
+habilidade por sala (98).
+
+## Três bugs a sério que a bancada apanhou
+
+1. **As áreas construídas em código nunca lhe tocavam.** Todas ficavam com
+   a máscara de omissão (layer 1, o mundo) e a Koliani vive na **layer 2**.
+   `Iman`, `ChaoQuente`, `Ceifa`, `ZonaGelo`, `ZonaEstado`, a zona do
+   `Ariete` — e a `CorrenteLateral`, assim desde que nasceu. A verificação
+   das jornadas dizia "TUDO OK" na mesma: os níveis construíam-se, as
+   mecânicas é que não existiriam a jogar. A `Armadilha` já fazia isto
+   certo (`collision_layer = 0`, `collision_mask = 2`) e é o molde.
+2. **`PlataformaOlhar._aplicar(bool)` colidia com o `_aplicar()` da
+   `Plataforma`.** O script não compilava e, outra vez, "TUDO OK".
+3. **As 16 estreias de 5 set não estavam em pool nenhuma** — apareciam uma
+   vez em 100 níveis e nunca mais. As pools das regiões VII-XX eram as
+   mesmas 12 câmaras de sempre, e era isso que fazia o 2.º acto saber ao
+   1.º.
+
+## Armadilhas de bancada (não voltar a descobrir)
+
+- **Medir FRAMES em headless não mede nada.** Os frames correm o mais
+  depressa que conseguem: 30 frames podem ser 30 ms. Esperar TEMPO
+  (`create_timer`), e com folga — a física anda ~10% atrás do relógio.
+- **`await physics_frame` num `SceneTree` em `--script` fica pendurado.**
+  O `process_frame` é que anda.
+- **A Koliani não fica onde a põem**: no `_ready` salta para o checkpoint
+  do save. Sem limpar isso e sem chão por baixo, a bancada mediu a **queda
+  no vazio** e "provou" um veneno que tirava 158 de vida em 1.2 s. Pousada,
+  tira 4.
+- **Um actor que toque num autoload pelo IDENTIFICADOR não se consegue
+  testar** em `--script`. O `ariete.gd` e a `zona_sem_poder.gd` passaram a
+  falar com eles por `/root/<Nome>` e por `get`/`set`/`has_signal` — é o
+  que deixou provar o que mais interessa nesses dois.
+
+## O CI corre mais duas bancadas
+
+`.github/workflows/ci.yml`: a suite, `verifica_regras_bicho.gd`,
+`verifica_actores_novos.gd` (42 asserções) e `verifica_jornada.gd`.
+
+---
+
+# ⚠ Continua por fazer: arte própria dos 100 chefes
+
+Estava a ser o próximo pedido quando o Paulo mandou seguir antes com as
+mecânicas. **Não se lhe tocou nesta sessão.** O passo imediato continua a
+ser ligar os 10 chefes das Regiões II e III à tabela `CHEFES` de
+`tools/gerar_chefes_anim.py` (as funções `extras` já estão escritas; falta
+a entrada no dicionário com plano de corpo, proporções e paleta). Planos de
+corpo já medidos: `_carcereiro`, `_ignivar` e `_primeiro_prisioneiro` são
+**humanoide**; `_dama_guilhotina`, `_irmaos_condenados`, `_voltaris` e
+`_sacerdotisa_lunar` são **flutuante**; `_sino_vivo` é **objeto**;
+`_aerion` é **alado**; `_vyrak` é **quadrupede**. Detalhe na secção "EM
+CURSO — arte própria dos 100 chefes", mais abaixo.
 
 ---
 
@@ -44,22 +161,6 @@ arena se marca (a seguinte está a 1861 px) e acendê-la troca para
 espaça os outros 3000 px, portanto "a mais perto" é de confiança.
 
 ---
-
-# ⇢ AMANHÃ COMEÇA AQUI — chefes com arte própria (os 100)
-
-É o **#2 do painel** e o próximo pedido a atacar (decidido com o Paulo,
-5 set 2026). O passo imediato: **ligar os 10 chefes das Regiões II e III à
-tabela `CHEFES`** de `tools/gerar_chefes_anim.py`. As funções `extras` deles
-já estão escritas (`_carcereiro`, `_ignivar`, `_dama_guilhotina`,
-`_irmaos_condenados`, `_primeiro_prisioneiro`, `_sino_vivo`, `_aerion`,
-`_voltaris`, `_sacerdotisa_lunar`, `_vyrak`) — falta a entrada no dicionário
-`CHEFES` com plano de corpo, proporções e paleta. O detalhe está na secção
-"EM CURSO — arte própria dos 100 chefes", mais abaixo.
-
-Planos de corpo já medidos (poupa a leitura): `_carcereiro`, `_ignivar` e
-`_primeiro_prisioneiro` são **humanoide**; `_dama_guilhotina`,
-`_irmaos_condenados`, `_voltaris` e `_sacerdotisa_lunar` são **flutuante**;
-`_sino_vivo` é **objeto**; `_aerion` é **alado**; `_vyrak` é **quadrupede**.
 
 ---
 
