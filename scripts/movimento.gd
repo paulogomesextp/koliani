@@ -20,6 +20,11 @@ const FORCA_SALTO := 470.0
 const COYOTE := 0.10          # segundos
 const BUFFER_SALTO := 0.12    # segundos
 const CORTE_SALTO := 0.45     # fração da velocidade vertical mantida ao largar
+## PLANAR (habilidade "planar", nível 63): a descer, com o botão de saltar
+## a segurar, a queda fica presa a este tecto em vez do `VEL_MAX_QUEDA`.
+## Não é voar -- é cair devagar, e por isso o vão que se atravessa a planar
+## é sempre para baixo.
+const VEL_PLANAR := 190.0
 
 ## Estado mutável passado de frame para frame.
 class Estado:
@@ -38,7 +43,9 @@ class Estado:
 ## usa a MESMA aceleracao, baixa'-la da' chao ESCORREGADIO: custa a ganhar
 ## velocidade e custa a perde-la (nivel 41, Floresta Congelada). 1.0 = chao
 ## normal. Nunca chega a zero: a 0.25 ainda se muda de sentido, so' demora.
-static func passo(e: Estado, direcao: float, saltar_premido: bool, saltar_a_segurar: bool, no_chao: bool, dt: float, saltos_max: int = 1, grav_escala: float = 1.0, acel_escala: float = 1.0) -> Estado:
+## `planar` = tem a habilidade E está a segurar o botão de saltar. Só vale
+## a DESCER (e depois do corte de salto, senão o corte nunca acontecia).
+static func passo(e: Estado, direcao: float, saltar_premido: bool, saltar_a_segurar: bool, no_chao: bool, dt: float, saltos_max: int = 1, grav_escala: float = 1.0, acel_escala: float = 1.0, planar: bool = false) -> Estado:
 	# temporizadores
 	if no_chao:
 		e.coyote_restante = COYOTE
@@ -76,6 +83,12 @@ static func passo(e: Estado, direcao: float, saltar_premido: bool, saltar_a_segu
 	# corte de salto
 	if e.velocidade.y < 0.0 and not saltar_a_segurar:
 		e.velocidade.y *= CORTE_SALTO
+
+	# planar: a cair, com o botão a segurar, a queda prende-se ao tecto
+	# baixo. Vem DEPOIS do corte de salto de propósito -- ao contrário, o
+	# corte deixava de acontecer no frame em que ela começa a descer.
+	if planar and not no_chao and e.velocidade.y > VEL_PLANAR:
+		e.velocidade.y = VEL_PLANAR
 
 	e.no_chao = no_chao
 	return e

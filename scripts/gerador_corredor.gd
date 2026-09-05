@@ -65,6 +65,7 @@ const VELA := preload("res://scenes/actors/Vela.tscn")
 const PLAT_LUZ := preload("res://scenes/actors/PlataformaLuz.tscn")
 const ESPELHO := preload("res://scenes/actors/Espelho.tscn")
 const ESSENCIA := preload("res://scenes/actors/Essencia.tscn")
+const COLETAVEL := preload("res://scenes/actors/Coletavel.tscn")
 ## Três actores que já estavam no repo e que nenhuma câmara usava -- é de
 ## graça: arte, física e som já feitos, só faltava a sala onde entram.
 const PLAT_ESPECTRAL := preload("res://scenes/actors/PlataformaEspectral.tscn")
@@ -340,7 +341,7 @@ const MECANICA_DO_NIVEL := [
 	# --- niveis 61-65  (Regiao 13) ---
 	{"cam": "orbita", "grau": 1},
 	{"cam": "para_raios", "grau": 1},
-	{"cam": "vento", "grau": 1},  # ~
+	{"cam": "asas", "grau": 1},
 	{"cam": "grav_baixa", "grau": 2},
 	{"cam": "ferry", "grau": 1},  # ~
 	# --- niveis 66-70  (Regiao 14) ---
@@ -432,7 +433,7 @@ const CAMARAS_FLAVOUR := [
 	"replicantes", "estatuas", "incorporeo",
 	"rosas", "imanes", "ceifa", "brasas", "olhar", "ariete", "revisao",
 	"gelo", "frio", "veneno", "escuro", "areia_no_ar", "ciclo",
-	"mausoleu", "gemea", "ar", "serpente", "pulsacao",
+	"mausoleu", "gemea", "ar", "serpente", "pulsacao", "asas",
 ]
 
 ## Câmara "assinatura" de cada região -- no acto do meio da jornada aparece
@@ -1543,6 +1544,7 @@ func _flavour(par: Node2D, tipo: String, x: float, y: float) -> Vector2:
 		"ar": return _f_ar(par, x, y)
 		"serpente": return _f_serpente(par, x, y)
 		"pulsacao": return _f_pulsacao(par, x, y)
+		"asas": return _f_asas(par, x, y)
 	# tipo sem handler -> não deve acontecer (pool/assinatura mal configurada).
 	# Avisa em vez de gerar um vão morto silencioso e cai num `descanso`.
 	push_warning("GeradorCorredor: câmara '%s' sem _f_ correspondente" % tipo)
@@ -4053,6 +4055,42 @@ func _f_pulsacao(par: Node2D, x: float, y: float) -> Vector2:
 	_plat(par, Vector2(x, cy), Vector2(130.0, 18.0))
 	_checkpoint(x, cy)
 	return Vector2(x, cy)
+
+
+## ASAS (N63, Cidade dos Anjos Mortos): a habilidade de PLANAR entra aqui.
+## O coletável está na varanda de entrada e, a partir dele, segurar o
+## salto na descida prende a queda a 190 px/s -- não é voar, é cair
+## devagar, e por isso tudo o que se atravessa a planar é para baixo.
+##
+## A sala ensina-a sem uma linha de texto: há um vão comprido em queda a
+## seguir ao coletável. E não é uma armadilha para quem não o apanhe -- os
+## degraus do lado de baixo atravessam o mesmo vão aos saltos, só que a
+## descer três vezes. Planar é o caminho curto, nunca o único.
+func _f_asas(par: Node2D, x: float, y: float) -> Vector2:
+	var cy: float = clampf(y, _teto_y + 260.0, _chao_y - 320.0)
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(160.0, 20.0))
+	_checkpoint(x, cy, true)
+	var col := COLETAVEL.instantiate()
+	col.habilidade_id = "planar"
+	col.position = Vector2(x + 10.0, cy - 44.0)
+	par.add_child(col)
+	var x0 := x
+
+	# a rota curta: um vão comprido que se atravessa a planar, com a
+	# chegada bem mais em baixo (planar é cair devagar, não voar)
+	var vao := 620.0 + 180.0 * _dif
+	var descida := 250.0
+	# a rota longa: degraus a descer, ao alcance de salto uns dos outros
+	var passos := 4
+	for i in passos:
+		_plat(par, Vector2(x0 + 170.0 + float(i) * (vao / float(passos)),
+			cy + descida * (float(i) + 1.0) / float(passos + 1)),
+			Vector2(92.0, 15.0))
+	x = x0 + vao + _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy + descida), Vector2(150.0, 18.0))
+	_checkpoint(x, cy + descida, true)
+	return Vector2(x, cy + descida)
 
 
 ## Estica uma `ZonaGravidade` para cobrir `tam` (e o Fundo com ela).

@@ -29,7 +29,7 @@ const VIDAS_POR_NIVEL := 1
 const VIDAS_MAX := 99
 
 ## Todas as habilidades da campanha (o modo dev desbloqueia-as de uma vez).
-const HABILIDADES_TODAS := ["salto_duplo", "dash_aereo", "partir_paredes", "escudo", "projetil", "escalar_paredes"]
+const HABILIDADES_TODAS := ["salto_duplo", "dash_aereo", "partir_paredes", "escudo", "projetil", "escalar_paredes", "planar"]
 ## Habilidades que a Koliani já tem no arranque da campanha (nível 1). O
 ## salto duplo deixou de ser um Coletavel a caçar: é básico desde o início
 ## (ver koliani.gd). Garantido em `reiniciar_campanha()` e ao carregar saves

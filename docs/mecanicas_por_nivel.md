@@ -451,6 +451,30 @@ do nível e não uma câmara).
 
 Bancada: 31 asserções.
 
+### O primeiro dos "grandes": PLANAR (N63) — e afinal era pequeno
+
+A proposta punha "Planar (N15) + Asas (N63)" na lista dos 14 grandes e o
+Paulo aceitou a fusão em "uma habilidade em dois graus". Feita, são **oito
+linhas** na lógica pura: a cair, com o botão de saltar a segurar, a queda
+prende-se a `VEL_PLANAR` (190 px/s) em vez do `VEL_MAX_QUEDA` (1100).
+
+Duas decisões que valem a pena guardar:
+
+- **vem depois do corte de salto.** Ao contrário, o corte deixava de
+  acontecer no frame em que ela começa a descer -- e o corte de salto é
+  metade da pegada do salto.
+- **planar é cair devagar, não voar.** Só vale a descer, e por isso tudo o
+  que se atravessa a planar é para baixo. A câmara `asas` (N63) tem o vão
+  em queda a seguir ao coletável, e **os degraus da rota longa atravessam o
+  mesmo vão aos saltos**: planar é o caminho curto, nunca o único -- quem
+  não apanhe a habilidade não fica trancado.
+
+Habilidade nova em `HABILIDADES_TODAS` e nos seis `i18n`. Coberta pela
+suite (`teste_movimento_planar_prende_a_queda`), incluindo a asserção de
+que **não pode cortar o salto**.
+
+**Provisórias: 12 → 11**, e restam **6 grandes**.
+
 ### E as pools das regiões, que era o buraco maior
 
 As 16 estreias de 5 set (`lava_sobe`, `mare`, `espectral`, …) **não estavam

@@ -463,5 +463,6 @@
 	"gear.w.brasa_do_inferno": "Hellember",
 	"gear.w.fio_do_vazio": "Void Edge",
 	"gear.w.juramento_de_guerra": "War Oath",
-	"gear.w.ultima_lamina": "The Last Blade"
+	"gear.w.ultima_lamina": "The Last Blade",
+	"hud.ability.planar": "Glide"
 }

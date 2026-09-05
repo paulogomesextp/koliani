@@ -870,6 +870,10 @@ func _physics_process(dt: float) -> void:
 			Input.is_action_just_pressed("saltar"),
 			Input.is_action_pressed("saltar") or _impulso_externo_t > 0.0,
 			is_on_floor(), dt, saltos_max, _grav_escala, _acel_escala,
+			# PLANAR (nível 63): só com a habilidade, e só a segurar o
+			# botão. O `Movimento` e' que decide se ela ja' esta' a cair.
+			Input.is_action_pressed("saltar")
+				and EstadoJogo.tem_habilidade("planar"),
 		)
 		velocity = _mov.velocidade
 		if _mov.saltos_dados > saltos_antes:

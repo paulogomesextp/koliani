@@ -143,6 +143,26 @@ func teste_movimento_gelo_custa_a_arrancar_e_a_parar() -> void:
 			% volta.velocidade.x)
 
 
+## PLANAR (nivel 63): a cair, com o botao a segurar, a queda prende-se a
+## VEL_PLANAR. Nao e' voar -- ela continua a descer, so' que devagar.
+func teste_movimento_planar_prende_a_queda() -> void:
+	var livre := Movimento.Estado.new()
+	var asa := Movimento.Estado.new()
+	for i in 60:
+		Movimento.passo(livre, 0.0, false, true, false, DT)
+		Movimento.passo(asa, 0.0, false, true, false, DT, 1, 1.0, 1.0, true)
+	_ok(livre.velocidade.y > Movimento.VEL_PLANAR + 50.0,
+		"sem planar a queda devia disparar (%.0f)" % livre.velocidade.y)
+	_ok(is_equal_approx(asa.velocidade.y, Movimento.VEL_PLANAR),
+		"a planar a queda devia ficar presa a VEL_PLANAR (%.0f)" % asa.velocidade.y)
+	_ok(asa.velocidade.y > 0.0, "planar e' cair devagar, nao subir")
+	# e SO' a descer: a subir do salto, o planar nao pode segurar nada
+	var sobe := Movimento.Estado.new()
+	Movimento.passo(sobe, 0.0, false, false, true, DT, 1, 1.0, 1.0, true)
+	Movimento.passo(sobe, 0.0, true, true, false, DT, 1, 1.0, 1.0, true)
+	_ok(sobe.velocidade.y < 0.0, "o planar nao pode cortar o salto")
+
+
 func teste_movimento_salto_duplo() -> void:
 	var e := Movimento.Estado.new()
 	Movimento.passo(e, 0.0, false, false, true, DT, 2)   # 1 frame no chao arma o coyote
