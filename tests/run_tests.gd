@@ -60,6 +60,7 @@ func _correr_tudo() -> void:
 	teste_sfx_existem()
 	teste_regioes_tem_nome_e_cor()
 	teste_pecas_de_ui_existem()
+	teste_mecanica_por_nivel()
 	teste_paineis_nao_trazem_o_vizinho()
 
 	if _falhas.is_empty():
@@ -925,6 +926,84 @@ func _risca_escura(img: Image, fixo: int, de: int, ate: int, vertical: bool) -> 
 		if c.a < 0.9 or c.r > 0.14 or c.g > 0.14 or c.b > 0.14:
 			return false
 	return true
+
+
+## A tabela `MECANICA_DO_NIVEL` e' a promessa de "uma mecanica nova por
+## nivel" (pedido do Paulo, 5 set 2026: "100 niveis a fazer a mesma coisa e
+## o mesmo padrao cansa o player"). O que se guarda aqui:
+##
+##  - ha' 100 entradas, uma por nivel;
+##  - cada `cam` e' uma camara que o `_flavour()` sabe mesmo construir --
+##    uma que ele nao conheca gera um vao morto SILENCIOSO (foi assim que a
+##    camara "pedras" andou semanas a partir niveis sem ninguem dar por ela);
+##  - dois niveis SEGUIDOS nunca estreiam a mesma coisa -- e' exatamente a
+##    sensacao de "isto ja' joguei" que o pedido quer tirar;
+##  - as 32 camaras estreiam todas nos primeiros 32 niveis, cada uma na sua
+##    vez. Sem isto o jogo voltava a abrir tudo de uma vez.
+##
+## Le'-se do CODIGO-FONTE, nao da classe: tocar em `GeradorCorredor` pelo
+## nome obriga a compilar o script, que usa autoloads -- e em `--script` os
+## autoloads nao existem, portanto o teste passaria EM SILENCIO sem medir
+## nada. Mesma armadilha do `verifica_jornada.gd`.
+func teste_mecanica_por_nivel() -> void:
+	var src := _fonte("res://scripts/gerador_corredor.gd")
+	if src == "":
+		return
+	var cams := _lista_de_strings(src, "CAMARAS_FLAVOUR")
+	_ok(not cams.is_empty(), "nao se conseguiu ler CAMARAS_FLAVOUR")
+
+	var i := src.find("const MECANICA_DO_NIVEL :=")
+	_ok(i >= 0, "falta a const MECANICA_DO_NIVEL")
+	if i < 0:
+		return
+	var fim := src.find("\n]", i)
+	var bloco := src.substr(i, fim - i)
+
+	var mec: Array[String] = []
+	var graus: Array[int] = []
+	for linha in bloco.split("\n"):
+		var l := linha.strip_edges()
+		if not l.begins_with("{\"cam\""):
+			continue
+		var a := l.find("\"", 8) + 1
+		var b := l.find("\"", a)
+		mec.append(l.substr(a, b - a))
+		var g := l.find("\"grau\":")
+		graus.append(int(l.substr(g + 8, 2).strip_edges().trim_suffix("}").trim_suffix(",")))
+
+	_ok(mec.size() == 100, "MECANICA_DO_NIVEL tem %d entradas, precisa de 100" % mec.size())
+
+	for k in mec.size():
+		_ok(mec[k] in cams,
+			"nivel %d estreia '%s', que o _flavour() nao sabe construir" % [k + 1, mec[k]])
+		_ok(graus[k] >= 0 and graus[k] <= 2,
+			"nivel %d tem grau %d (so' 0, 1 ou 2)" % [k + 1, graus[k]])
+
+	for k in range(1, mec.size()):
+		_ok(mec[k] != mec[k - 1],
+			"niveis %d e %d estreiam os dois '%s' -- seguidos nao pode"
+				% [k, k + 1, mec[k]])
+
+	# as camaras que vivem nas pools das regioes tem de estrear nos 32
+	# primeiros niveis, uma por nivel
+	var primeiras: Dictionary = {}
+	for k in range(0, 32):
+		primeiras[mec[k]] = true
+	_ok(primeiras.size() == 32,
+		"os primeiros 32 niveis estreiam so' %d camaras distintas" % primeiras.size())
+
+
+## Todas as strings de um bloco `const NOME := [...]`.
+func _lista_de_strings(fonte: String, nome_const: String) -> Array[String]:
+	var out: Array[String] = []
+	var i := fonte.find("const %s :=" % nome_const)
+	if i < 0:
+		return out
+	var fim := fonte.find("\n]", i)
+	for p in fonte.substr(i, fim - i).split("\""):
+		if p.length() > 0 and p == p.to_lower() and not p.contains(","):
+			out.append(p)
+	return out
 
 
 func teste_packs_de_fundo_existem() -> void:

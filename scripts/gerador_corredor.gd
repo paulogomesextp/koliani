@@ -179,23 +179,178 @@ const POOL_REGIAO := {
 		"ritmo", "portal", "alavanca", "segredo"],
 }
 
-## `_dif` mínimo para cada tipo de câmara entrar na pool. Assim o Nível 1
-## (dif 0) só vê câmaras de saltos/gruta/trampolim e a coisa vai apertando
-## até ao Nível 30 (dif 1), que tem tudo.
-const TIER_FLAVOUR := {
-	"saltos": 0.0, "gruta": 0.0, "trampolim": 0.0,
-	"ritmo": 0.12, "portal": 0.12, "correntes": 0.16, "elevador": 0.18,
-	"gravidade": 0.34, "serras": 0.36, "vento": 0.42, "pendulos": 0.46,
-	"impulso": 0.5, "guilhotinas": 0.58, "quebra": 0.62, "fogo": 0.66,
-	"crossfire": 0.4, "ferry": 0.3, "espinhos": 0.28,
-	# puzzles (o "abre-caminho" de cada um é sempre alcançável do lado de cá)
-	"alavanca": 0.08,   # interruptor -> grade
-	"segredo": 0.14,    # parede rachada com um cofre atrás (pede `partir_paredes`)
-	"velas": 0.24,      # acender a vela -> as plataformas de luz existem
-	"sinos": 0.3,       # badalada -> a ponte fantasma fica sólida
-	"prensa": 0.44,     # paredes que varrem o corredor
-	"espelhos": 0.55,   # espelhos que bloqueiam e largam reflexos
-}
+## MECÂNICA DE ESTREIA POR NÍVEL -- pedido do Paulo (5 set 2026):
+##
+##   "o meu objetivo é tornar o jogo mais variado e menos repetitivo, 100
+##    níveis a fazer a mesma coisa e o mesmo padrão cansa o player"
+##
+## O que fazia os 100 níveis saberem ao mesmo NÃO era só faltarem mecânicas:
+## era o SORTEIO. Cada nível tirava câmaras à sorte da pool da sua região --
+## e os 5 níveis de uma região partilham a mesma pool --, com o
+## `TIER_FLAVOUR` a abrir tipos por patamar de dificuldade. Resultado: dois
+## níveis seguidos podiam sair quase iguais, e do 30 em diante (dif = 1)
+## TODOS viam exatamente o mesmo saco.
+##
+## A regra nova, em três linhas:
+##  1. cada nível ESTREIA uma mecânica -- ela entra GARANTIDAMENTE na
+##     jornada desse nível (ver `_estreia_por_fazer`);
+##  2. nenhuma mecânica aparece ANTES do nível onde estreia -- é isto que
+##     substitui o `TIER_FLAVOUR`, e é o que faz o nível 3 não poder sair
+##     igual ao 12;
+##  3. as estreias RECENTES pesam mais na escolha (`_pool_permitida`), para
+##     o nível 60 não voltar a saber ao 20 só porque a essa altura já se
+##     libertou tudo.
+##
+## `grau` é a dureza da estreia, decidida com o Paulo: **mansa até ao nível
+## 30, dura a partir do 2.º acto**. Traduz-se em quantas vezes a mecânica
+## aparece e se se respira a seguir:
+##   0 mansa   -- uma vez, e um `descanso` logo a seguir (é o tutorial dela)
+##   1 normal  -- duas vezes
+##   2 dura    -- três vezes, encadeadas
+##
+## ⚠ As linhas marcadas `# ~` são PROVISÓRIAS: repetem uma câmara que já
+## estreou porque o actor próprio dessa mecânica ainda não existe. São a
+## lista de trabalho -- a proposta completa está em
+## `docs/mecanicas_por_nivel.md`, com os 14 "grandes" que faltam construir.
+## Trocar uma linha `# ~` por uma mecânica nova é o passo seguinte e não
+## mexe em mais nada.
+const MECANICA_DO_NIVEL := [
+	# --- niveis 1-5  (Regiao 1) ---
+	{"cam": "saltos", "grau": 0},
+	{"cam": "gruta", "grau": 0},
+	{"cam": "trampolim", "grau": 0},
+	{"cam": "espinhos", "grau": 0},
+	{"cam": "ritmo", "grau": 1},
+	# --- niveis 6-10  (Regiao 2) ---
+	{"cam": "alavanca", "grau": 0},
+	{"cam": "fogo", "grau": 0},
+	{"cam": "guilhotinas", "grau": 0},
+	{"cam": "arena", "grau": 0},
+	{"cam": "prensa", "grau": 1},
+	# --- niveis 11-15  (Regiao 3) ---
+	{"cam": "sinos", "grau": 0},
+	{"cam": "vento", "grau": 0},
+	{"cam": "serras", "grau": 0},
+	{"cam": "gravidade", "grau": 0},
+	{"cam": "torre", "grau": 1},
+	# --- niveis 16-20  (Regiao 4) ---
+	{"cam": "elevador", "grau": 0},
+	{"cam": "quebra", "grau": 0},
+	{"cam": "velas", "grau": 0},
+	{"cam": "pedras", "grau": 0},
+	{"cam": "poco", "grau": 1},
+	# --- niveis 21-25  (Regiao 5) ---
+	{"cam": "cripta", "grau": 0},
+	{"cam": "pendulos", "grau": 0},
+	{"cam": "ferry", "grau": 0},
+	{"cam": "segredo", "grau": 0},
+	{"cam": "pilares", "grau": 1},
+	# --- niveis 26-30  (Regiao 6) ---
+	{"cam": "crossfire", "grau": 0},
+	{"cam": "espelhos", "grau": 0},
+	{"cam": "forquilha", "grau": 0},
+	{"cam": "impulso", "grau": 0},
+	{"cam": "portal", "grau": 1},
+	# --- niveis 31-35  (Regiao 7) ---
+	{"cam": "correntes", "grau": 1},
+	{"cam": "corredor", "grau": 1},
+	{"cam": "fogo", "grau": 1},  # ~
+	{"cam": "quebra", "grau": 1},  # ~
+	{"cam": "impulso", "grau": 1},  # ~
+	# --- niveis 36-40  (Regiao 8) ---
+	{"cam": "gravidade", "grau": 1},  # ~
+	{"cam": "ferry", "grau": 1},  # ~
+	{"cam": "ritmo", "grau": 1},  # ~
+	{"cam": "trampolim", "grau": 1},  # ~
+	{"cam": "gravidade", "grau": 1},  # ~
+	# --- niveis 41-45  (Regiao 9) ---
+	{"cam": "vento", "grau": 1},  # ~
+	{"cam": "espelhos", "grau": 1},  # ~
+	{"cam": "pedras", "grau": 1},  # ~
+	{"cam": "saltos", "grau": 1},  # ~
+	{"cam": "espelhos", "grau": 1},  # ~
+	# --- niveis 46-50  (Regiao 10) ---
+	{"cam": "crossfire", "grau": 1},  # ~
+	{"cam": "espinhos", "grau": 1},  # ~
+	{"cam": "serras", "grau": 1},  # ~
+	{"cam": "prensa", "grau": 1},  # ~
+	{"cam": "crossfire", "grau": 1},  # ~
+	# --- niveis 51-55  (Regiao 11) ---
+	{"cam": "pendulos", "grau": 1},  # ~
+	{"cam": "velas", "grau": 1},  # ~
+	{"cam": "gruta", "grau": 1},  # ~
+	{"cam": "portal", "grau": 1},  # ~
+	{"cam": "pendulos", "grau": 1},  # ~
+	# --- niveis 56-60  (Regiao 12) ---
+	{"cam": "correntes", "grau": 1},  # ~
+	{"cam": "elevador", "grau": 1},  # ~
+	{"cam": "guilhotinas", "grau": 1},  # ~
+	{"cam": "alavanca", "grau": 1},  # ~
+	{"cam": "correntes", "grau": 1},  # ~
+	# --- niveis 61-65  (Regiao 13) ---
+	{"cam": "segredo", "grau": 1},  # ~
+	{"cam": "ferry", "grau": 1},  # ~
+	{"cam": "vento", "grau": 1},  # ~
+	{"cam": "saltos", "grau": 1},  # ~
+	{"cam": "ferry", "grau": 1},  # ~
+	# --- niveis 66-70  (Regiao 14) ---
+	{"cam": "portal", "grau": 2},  # ~
+	{"cam": "quebra", "grau": 2},  # ~
+	{"cam": "velas", "grau": 2},  # ~
+	{"cam": "ritmo", "grau": 2},  # ~
+	{"cam": "portal", "grau": 2},  # ~
+	# --- niveis 71-75  (Regiao 15) ---
+	{"cam": "sinos", "grau": 2},  # ~
+	{"cam": "gruta", "grau": 2},  # ~
+	{"cam": "sinos", "grau": 2},  # ~
+	{"cam": "guilhotinas", "grau": 2},  # ~
+	{"cam": "sinos", "grau": 2},  # ~
+	# --- niveis 76-80  (Regiao 16) ---
+	{"cam": "espinhos", "grau": 2},  # ~
+	{"cam": "serras", "grau": 2},  # ~
+	{"cam": "alavanca", "grau": 2},  # ~
+	{"cam": "segredo", "grau": 2},  # ~
+	{"cam": "ritmo", "grau": 2},  # ~
+	# --- niveis 81-85  (Regiao 17) ---
+	{"cam": "prensa", "grau": 2},  # ~
+	{"cam": "fogo", "grau": 2},  # ~
+	{"cam": "pedras", "grau": 2},  # ~
+	{"cam": "prensa", "grau": 2},  # ~
+	{"cam": "fogo", "grau": 2},  # ~
+	# --- niveis 86-90  (Regiao 18) ---
+	{"cam": "elevador", "grau": 2},  # ~
+	{"cam": "gravidade", "grau": 2},  # ~
+	{"cam": "elevador", "grau": 2},  # ~
+	{"cam": "espelhos", "grau": 2},  # ~
+	{"cam": "elevador", "grau": 2},  # ~
+	# --- niveis 91-95  (Regiao 19) ---
+	{"cam": "pedras", "grau": 2},  # ~
+	{"cam": "crossfire", "grau": 2},  # ~
+	{"cam": "espinhos", "grau": 2},  # ~
+	{"cam": "serras", "grau": 2},  # ~
+	{"cam": "pedras", "grau": 2},  # ~
+	# --- niveis 96-100  (Regiao 20) ---
+	{"cam": "trampolim", "grau": 2},  # ~
+	{"cam": "velas", "grau": 2},  # ~
+	{"cam": "saltos", "grau": 2},  # ~
+	{"cam": "trampolim", "grau": 2},  # ~
+	{"cam": "velas", "grau": 2},  # ~
+]
+
+
+## Nível (0-based) em que cada câmara ESTREIA. Derivado da tabela, uma vez.
+## Uma câmara que não esteja na tabela (torre/poço/descanso e as `TIER_EXTRA`,
+## que são escolhidas por outros ramos) devolve 0 -- sempre disponível.
+static var _estreia_cache: Dictionary = {}
+
+static func nivel_de_estreia(cam: String) -> int:
+	if _estreia_cache.is_empty():
+		for i in MECANICA_DO_NIVEL.size():
+			var c: String = MECANICA_DO_NIVEL[i]["cam"]
+			if not _estreia_cache.has(c):
+				_estreia_cache[c] = i
+	return int(_estreia_cache.get(cam, 0))
+
 
 ## Câmaras que não vivem na pool de nenhuma região (são escolhidas por outro
 ## ramo do `_construir`), mas que o forçador de VARIEDADE também pode puxar.
@@ -449,6 +604,20 @@ var _pos_intenso := false
 ## um nível tardio tem câmaras que cheguem para esgotar a pool da região --
 ## ou seja, quanto mais alto o nível, mais mecânicas DIFERENTES se veem.
 var _tipos_usados := {}
+## Mecânica que ESTREIA neste nível (ver `MECANICA_DO_NIVEL`) e quantas
+## câmaras dela faltam colocar. Enquanto for > 0 a jornada obriga-se a
+## metê-la -- é isso que faz de cada nível um nível com assunto próprio.
+var _estreia_cam := ""
+var _estreia_por_fazer := 0
+var _estreia_grau := 0
+## A família de câmara VERTICAL deste nível: "torre", "poco" ou "pilares".
+## Uma só por nível -- ver o ramo vertical em `_construir`.
+var _vertical_do_nivel := "torre"
+## A sala ESPECIAL deste nível: "arena", "corredor", "cripta" ou "forquilha".
+## Uma só por nível. `_dif_especial` é o mínimo de dificuldade que ela pede
+## (uma arena de combate no nível 1 não faz sentido).
+var _especial_do_nivel := "forquilha"
+var _dif_especial := 0.0
 ## Câmaras que faltam até se voltar a FORÇAR uma mecânica nova. É uma
 ## contagem decrescente e não `_camaras % N` -- com o módulo, os níveis de
 ## foco "vertical" (que enchem as câmaras pares com torres/poços e as
@@ -537,6 +706,18 @@ func _construir() -> void:
 	_tendencia = int(perf.get("v", 0))
 	_foco = String(perf.get("f", "misto"))
 	_abertura = float(perf.get("a", 1.0))
+	# a mecânica que este nível estreia, e quantas vezes ela aparece
+	var mec: Dictionary = MECANICA_DO_NIVEL[clampi(_idx, 0, MECANICA_DO_NIVEL.size() - 1)]
+	_estreia_cam = String(mec.get("cam", ""))
+	_estreia_grau = int(mec.get("grau", 0))
+	_estreia_por_fazer = 1 + _estreia_grau
+	# a "cara" vertical do nível: torres, poços ou pilares -- nunca os três
+	_vertical_do_nivel = ["torre", "poco", "pilares"][_idx % 3]
+	# a sala especial: ciclo de 4 com passo 2, para não entrar em fase com o
+	# ciclo de 3 das verticais (assim o padrão só se repete de 24 em 24)
+	_especial_do_nivel = ["forquilha", "arena", "cripta", "corredor"][(_idx / 2) % 4]
+	_dif_especial = {"forquilha": 0.18, "arena": 0.12,
+		"cripta": 0.0, "corredor": 0.28}.get(_especial_do_nivel, 0.0)
 
 	var ancora: Vector2 = EstadoJogo.jornada_ancora_para(
 		_idx, func() -> Vector2: return (kol as Node2D).global_position)
@@ -731,6 +912,16 @@ func _construir() -> void:
 				# ACTO 3: alívio antes da rampa final -> quase só descansos
 				f = "descanso" if _rng.randf() < 0.8 else pool[_rng.randi() % pool.size()]
 				_pos_intenso = false
+			# A ESTREIA DO NÍVEL manda: entra no acto do meio e, a partir de
+			# meia jornada, deixa de esperar pela sorte -- senão havia níveis
+			# a acabar sem terem mostrado a sua própria mecânica.
+			elif _estreia_por_fazer > 0 and prog >= 0.18 \
+					and (prog >= 0.5 or _rng.randf() < 0.45):
+				f = _estreia_cam
+				_estreia_por_fazer -= 1
+				# mansa (grau 0) = aparece sozinha e respira-se a seguir;
+				# dura (grau 2) = encadeia-se com o que vier
+				_pos_intenso = _estreia_grau == 0
 			elif _pos_intenso:
 				f = "descanso"          # logo a seguir a uma câmara puxada -> respira
 				_pos_intenso = false
@@ -740,7 +931,11 @@ func _construir() -> void:
 				_pos_intenso = f in INTENSAS
 			elif flavs_ate_vertical <= 0:
 				flavs_ate_vertical = passo_vert + _rng.randi() % 2
-				f = ["torre", "poco", "pilares"][_rng.randi() % 3]
+				# UMA só família vertical por nível (`_vertical_do_nivel`).
+				# Antes sorteava-se entre as três a cada vez, portanto TODOS
+				# os níveis tinham torres E poços E pilares -- era a maior
+				# fatia do que dois níveis seguidos tinham em comum.
+				f = _vertical_do_nivel
 				_pos_intenso = true
 			# FOCO do nível (ver PERFIL): no acto do meio, ~metade das câmaras
 			# são da família do foco -> o nível ganha uma "cara" (plataformas /
@@ -758,21 +953,18 @@ func _construir() -> void:
 				f = _escolher_tom_novo(pool)
 				_pos_intenso = true
 			elif prog >= 0.28 and prog <= 0.82 and sig != "" \
-					and _dif + 0.0001 >= float(TIER_FLAVOUR.get(sig, 9.0)) \
+					and nivel_de_estreia(sig) <= _idx \
 					and _rng.randf() < 0.3:
 				f = sig                 # ACTO 2: a assinatura do bioma
 				_pos_intenso = sig in ["guilhotinas", "fogo"]
-			elif prog < 0.82 and _dif > 0.12 and _rng.randf() < 0.13:
-				f = "arena"             # limpar a sala
-				_pos_intenso = true
-			elif prog >= 0.28 and prog < 0.82 and _dif > 0.28 and _rng.randf() < 0.12:
-				f = "corredor"          # gauntlet apertado
-				_pos_intenso = true
-			elif prog < 0.82 and _rng.randf() < (0.16 if _regiao == 3 else 0.08):
-				f = "cripta"            # sala com obstáculo interior + pedras
-				_pos_intenso = true
-			elif _dif > 0.18 and _rng.randf() < 0.2:
-				f = "forquilha"
+			# UMA sala especial por nível (`_especial_do_nivel`), não as
+			# quatro. Antes sorteava-se arena E corredor E cripta E
+			# forquilha em todos os níveis, portanto todos tinham um pouco
+			# de tudo -- a seguir às verticais, era a maior fatia do que dois
+			# níveis seguidos tinham em comum. As famílias que faltarem a um
+			# nível continuam a entrar pelo FOCO dele (ver `FOCO_CAMARAS`).
+			elif prog < 0.82 and _dif > _dif_especial 					and _rng.randf() < 0.2:
+				f = _especial_do_nivel
 				_pos_intenso = true
 			else:
 				f = pool[_rng.randi() % pool.size()]
@@ -817,15 +1009,26 @@ func _novo_alvo_y(banda: float) -> float:
 			return _chao_y - _rng.randf_range(banda * 0.32, banda * 0.52)
 
 
-## A pool de flavour da região atual, filtrada pelo que a dificuldade já
-## libertou (`TIER_FLAVOUR`). Se a região ainda não tem nada disponível
-## (níveis baixos numa região "dura"), cai nas câmaras suaves.
+## Quantos níveis para trás contam como "estreia recente" -- essas câmaras
+## entram duas vezes na pool, portanto saem com o dobro da probabilidade.
+## É o que impede o nível 60 de saber ao nível 20: a pool cresce, mas o peso
+## anda com o jogador.
+const JANELA_RECENTE := 8
+
+## A pool de flavour da região atual, filtrada pelo que JÁ ESTREOU até este
+## nível (ver `MECANICA_DO_NIVEL`) e com peso extra nas estreias recentes.
+## Se a região ainda não tem nada disponível (níveis baixos numa região
+## "dura"), cai nas câmaras suaves.
 func _pool_permitida() -> Array:
 	var base: Array = POOL_REGIAO.get(_regiao, POOL_REGIAO[0])
 	var out: Array = []
 	for f: String in base:
-		if _dif + 0.0001 >= float(TIER_FLAVOUR.get(f, 0.0)):
-			out.append(f)
+		var e := nivel_de_estreia(f)
+		if e > _idx:
+			continue          # ainda não estreou -- não pode aparecer
+		out.append(f)
+		if _idx - e < JANELA_RECENTE:
+			out.append(f)     # estreia recente: pesa a dobrar
 	return out if out.size() >= 2 else FLAVOUR_SUAVE.duplicate()
 
 
