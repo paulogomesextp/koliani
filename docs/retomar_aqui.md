@@ -101,11 +101,47 @@ de 5 câmaras da pool da região (0.357) e limitar o forçador de variedade à
 sala especial do nível (0.337). As duas cortam tipos DENTRO do nível, e um
 nível mais pobre não é um nível mais distinto.
 
+## Segunda passagem: +16 câmaras (`94e997d`)
+
+Passaram a ser **48 dos 100** com estreia própria. Nenhuma precisou de arte
+nova, e três actores que estavam no repo **sem nenhuma câmara os usar**
+ganharam sala: `Vitral`, `ParaRaios` e `PlataformaEspectral`. Actor novo (só
+script, constrói a própria área como o `Checkpoint`):
+`scripts/corrente_lateral.gd` — a `CorrenteAr` só soprava para cima.
+
+`lava_sobe` · `mare` · `espectral` · `vitral` · `para_raios` · `bombas` ·
+`queda` · `tapete` · `orbita` · `areia` · `grav_baixa` · `placa` ·
+`circuito` · `anel` · `horda` · `chuva`. Sobreposição: **0.276**.
+
+### Dois softlocks meus, apanhados antes de sair
+
+1. O nó de colisão da `ZonaGravidade` chama-se **`CollisionShape2D`**, não
+   "Col". O redimensionamento nunca corria e a bolsa ficava com os 300x300
+   de omissão — na `grav_baixa` isso era fatal, porque os vãos só se
+   atravessam com a gravidade baixa. Há agora um `_esticar_zona()`.
+2. Na `areia` a escada de saída ficava **dentro** da bolsa de 1.5x, onde um
+   salto sobe ~53 px em vez de 79. Passou para fora, com degraus de 60 px.
+
+### ⚠ NÃO verificado: softlocks nas câmaras novas
+
+Um crivo estático de vãos acusou **91 dos 100** níveis — as plataformas
+móveis não se modelam assim, e é a mesma razão pela qual o
+`verifica_alcance.gd` desliga a jornada de propósito. E o
+**`tools/bot_gauntlet.gd` está avariado**: acusa softlock no Nível 1, a
+150 px do spawn. Enquanto assim estiver, nenhuma câmara nova pode ser dada
+como verificada — está no painel como item crítico.
+
+### Armadilha de ferramenta
+
+O `shot_plataforma.gd` não punha o `indice_nivel` a partir da cena, portanto
+fotografava sempre a jornada do nível onde o save tinha ficado. **Uma
+bateria inteira de smoke-tests desta sessão não testou nada por causa
+disso.** Corrigido; o `MAPA_CAMARAS=1` foi o que o denunciou.
+
 ## O que falta
 
-As 32 câmaras que existem estreiam nos níveis 1-32. As entradas marcadas
-`# ~` (níveis 33-100) são **provisórias** — repetem uma câmara porque o
-actor próprio ainda não existe. São a lista de trabalho: trocar uma por uma
+52 entradas continuam marcadas `# ~` — **provisórias**: repetem uma câmara
+porque o actor próprio ainda não existe. São a lista de trabalho: trocar uma por uma
 mecânica nova não mexe em mais nada. Decisões tomadas com ele: não se corta
 nenhum dos 14 "grandes" (agrupa-se Planar+Asas, e Torre-a-desabar/Avalanche/
 Queda numa máquina só); estreia **mansa até ao 30, dura no 2.º acto**;
