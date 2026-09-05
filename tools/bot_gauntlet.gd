@@ -19,8 +19,12 @@ extends SceneTree
 ##     relógio deu a hora -- e ao fim de um segundo e meio recua para
 ##     ganhar balanço, que é o que uma pessoa faz.
 ##
-## Continua a não ser prova de que um nível é bom: é prova de que se
-## atravessa.
+## Continua a não ser prova de que um nível é bom, nem sequer de que é
+## atravessável: é um **indício**. O que ele encontra tem de se ir ver com
+## `tools/ver_zona.gd` antes de lhe chamar softlock -- e o que ele ainda
+## falha, medido a 5 set 2026, são as escadas da espinha com ~173 px de
+## vão e 104 px de subida (o Nível 11 tem uma logo no início). Um jogador
+## faz esse salto; ele não, e por isso um aviso dele não é um veredicto.
 
 func _init() -> void:
 	var args := OS.get_cmdline_user_args()
@@ -58,6 +62,7 @@ func _init() -> void:
 	var mortes := 0
 	var segurar := 0.0
 	var duplo := false
+	var ataque_t := 0.0
 	var relato := 0.0
 	## `BOT_VERBOSE=1` conta onde ela esta' de segundo a segundo -- e' o que
 	## diz a diferenca entre "o nivel tranca" e "o bot nao sabe passar".
@@ -85,7 +90,10 @@ func _init() -> void:
 		var espaco := k.get_world_2d().direct_space_state
 		var vao := false
 		if no_chao:
-			var o1: Vector2 = k.global_position + Vector2(56.0, -10.0)
+			# 34 px e nao 56: saltar cedo demais desperdica meio salto. A
+			# espinha tem vaos de 173 px com 104 px de subida, e esses so'
+			# se fazem a saltar DA BEIRA.
+			var o1: Vector2 = k.global_position + Vector2(34.0, -10.0)
 			var q1 := PhysicsRayQueryParameters2D.create(o1, o1 + Vector2(0.0, 110.0), 1)
 			q1.exclude = [k]
 			vao = espaco.intersect_ray(q1).is_empty()
@@ -126,6 +134,23 @@ func _init() -> void:
 				recuo = 0.45
 				salto_t = 0.0
 
+		# BATER e ATIRAR quando está preso. Há salas em que a passagem se
+		# abre com um golpe (o sino da Torre dos Sinos torna a ponte
+		# sólida; os espelhos partem-se; as paredes frágeis caem) -- e o
+		# bot antigo NUNCA atacava, por isso ficava lá para sempre e
+		# chamava-lhe softlock. Alterna golpe e tiro: um deles chega ao
+		# que estiver longe.
+		ataque_t += dt
+		if parado > 1.0 and ataque_t > 0.5:
+			ataque_t = 0.0
+			if int(t) % 2 == 0:
+				Input.action_press("atacar")
+			else:
+				Input.action_press("lancar")
+		elif ataque_t > 0.12:
+			Input.action_release("atacar")
+			Input.action_release("lancar")
+
 		# dash: só quando está preso no chão. Tentou-se dar-lho no AR para
 		# esticar os saltos e foi PIOR (4256 -> 2051 px de travessia): o
 		# dash zera a velocidade vertical e ela cai a direito no fim dele.
@@ -164,6 +189,8 @@ func _init() -> void:
 	Input.action_release("mover_esquerda")
 	Input.action_release("saltar")
 	Input.action_release("dash")
+	Input.action_release("atacar")
+	Input.action_release("lancar")
 
 	var chegou: bool = melhor_x >= alvo_x - 80.0
 	# SOFTLOCK = o sítio onde parou mais tempo é também onde a corrida
@@ -175,8 +202,10 @@ func _init() -> void:
 		melhor_x - x_ini, t, pior_parado, pior_x,
 		"  (resolvida)" if not preso_no_fim else ""])
 	if preso_no_fim:
-		print("  <<< SOFTLOCK: acabou preso ha' %.1fs em x=%.0f, VIVO e sem sair dali"
+		print("  <<< NAO PASSOU DAQUI: %.1fs parado em x=%.0f, vivo e sem morrer."
 			% [parado, melhor_x])
+		print("   Ver com `tools/ver_zona.gd` antes de lhe chamar softlock -- o bot")
+		print("   ainda falha escadas de ~173 px com 104 px de subida.")
 	elif not chegou and mortes > 0:
 		print("  (nao chegou: morreu %d vezes -- ha' um vao que ele nao faz perto de x=%.0f."
 			% [mortes, melhor_x])
