@@ -1,12 +1,7 @@
-[gd_scene load_steps=4 format=3 uid="uid://bkolianihud01"]
+[gd_scene load_steps=2 format=3 uid="uid://bkolianihud01"]
 
 [ext_resource type="Script" path="res://scripts/controlos_toque.gd" id="1_hud"]
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_botao"]
-size = Vector2(120, 120)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_dpad"]
-size = Vector2(110, 130)
+[ext_resource type="Script" path="res://scripts/controlos_tacteis.gd" id="2_toque"]
 
 [node name="HUD" type="CanvasLayer"]
 layer = 11
@@ -62,57 +57,4 @@ text = "x3"
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-
-[node name="Esquerda" type="TouchScreenButton" parent="Toque"]
-position = Vector2(90, 560)
-shape = SubResource("RectangleShape2D_dpad")
-visibility_mode = 1
-action = &"mover_esquerda"
-
-[node name="Direita" type="TouchScreenButton" parent="Toque"]
-position = Vector2(230, 560)
-shape = SubResource("RectangleShape2D_dpad")
-visibility_mode = 1
-action = &"mover_direita"
-
-[node name="Saltar" type="TouchScreenButton" parent="Toque"]
-position = Vector2(1130, 570)
-shape = SubResource("RectangleShape2D_botao")
-visibility_mode = 1
-action = &"saltar"
-
-[node name="Atacar" type="TouchScreenButton" parent="Toque"]
-position = Vector2(1000, 500)
-shape = SubResource("RectangleShape2D_botao")
-visibility_mode = 1
-action = &"atacar"
-
-[node name="Dash" type="TouchScreenButton" parent="Toque"]
-position = Vector2(1000, 620)
-shape = SubResource("RectangleShape2D_botao")
-visibility_mode = 1
-action = &"dash"
-
-[node name="Rolar" type="TouchScreenButton" parent="Toque"]
-position = Vector2(870, 600)
-shape = SubResource("RectangleShape2D_botao")
-visibility_mode = 1
-action = &"rolar"
-
-[node name="Defender" type="TouchScreenButton" parent="Toque"]
-position = Vector2(870, 470)
-shape = SubResource("RectangleShape2D_botao")
-visibility_mode = 1
-action = &"defender"
-
-[node name="Lancar" type="TouchScreenButton" parent="Toque"]
-position = Vector2(740, 540)
-shape = SubResource("RectangleShape2D_botao")
-visibility_mode = 1
-action = &"lancar"
-
-[node name="Pausa" type="TouchScreenButton" parent="Toque"]
-position = Vector2(1180, 140)
-shape = SubResource("RectangleShape2D_botao")
-visibility_mode = 1
-action = &"pausa"
+script = ExtResource("2_toque")

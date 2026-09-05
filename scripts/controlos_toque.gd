@@ -98,6 +98,7 @@ func _ready() -> void:
 	EstadoJogo.essencia_mudou.connect(_atualizar_essencia)
 	_atualizar_essencia(EstadoJogo.essencia)
 
+	_arrumar_para_toque()
 	_montar_legenda_controlos()
 	_montar_cabecalho_nivel()
 	Textos.idioma_mudou.connect(func(_l: String) -> void:
@@ -656,6 +657,7 @@ func _linha_cab(txt: String, tam: int, cor: Color, maiusculas := false) -> Label
 func _input(evento: InputEvent) -> void:
 	if evento is InputEventScreenTouch and _toque and not _toque.visible:
 		_toque.visible = true
+		_arrumar_para_toque()
 
 
 func _atualizar_barra_vida(atual: int, maximo: int) -> void:
@@ -704,3 +706,25 @@ func _aviso(txt: String) -> void:
 	t.tween_interval(1.8)
 	t.tween_property(l, "modulate:a", 0.0, 0.6)
 	t.tween_callback(l.queue_free)
+
+
+## Com os controlos de toque ligados, o canto de baixo à esquerda é do
+## JOYSTICK -- e era exactamente onde viviam as barras, o disco da arma e os
+## botões de equipamento. Sobem todos acima do aro do stick.
+##
+## Sobem por deslocação e não por âncora nova: estas peças estão todas
+## presas ao fundo (`anchor_top/bottom = 1.0`) com deslocamentos negativos,
+## portanto tirar 230 a cada um mantém a arrumação entre elas.
+const DESVIO_TOQUE := 230.0
+var _desviado := false
+
+
+func _arrumar_para_toque() -> void:
+	if _desviado or _toque == null or not _toque.visible:
+		return
+	_desviado = true
+	for n in [$Vida, $Energia, $Vidas, _arma_disco, _btn_armas, _btn_armaduras,
+			_selo_arma, _selo_armadura]:
+		if n is Control:
+			n.offset_top -= DESVIO_TOQUE
+			n.offset_bottom -= DESVIO_TOQUE
