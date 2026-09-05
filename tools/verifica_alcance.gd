@@ -8,12 +8,16 @@ extends SceneTree
 ##
 ## Regras (aproximadas, a favor da seguranca):
 ##   * vao horizontal entre bordas <= 210 px
+##   * NAO se sobe para cima de uma plataforma estando debaixo dela
 ##   * subida <= 118 px (salto + duplo); descer e' livre ate' 520 px
 ## Nao modela tectos nem plataformas moveis -- e' um crivo de "ilha morta".
 
 const VAO_MAX := 210.0
 const SUBIDA_MAX := 118.0
 const QUEDA_MAX := 520.0
+## Quanto e' que `a` tem de sobrar para fora da sombra de `b` para se
+## poder saltar da ponta em vez de bater com a cabeca na barriga dela.
+const MARGEM_PONTA := 26.0
 
 func _init() -> void:
 	var args := OS.get_cmdline_user_args()
@@ -39,6 +43,14 @@ func _init() -> void:
 	# modela (dariam órfãs falsas).
 	if "corredor" in raiz:
 		raiz.corredor = false
+	# ...mas o `alongar_plataformas` SO' corre quando `corredor` e' falso, e
+	# no jogo a jornada esta' ligada em todos os niveis menos o trono. Ao
+	# desligar a jornada aqui ligava-se o esticao, e o crivo passava a medir
+	# uma sala QUE NINGUEM JOGA -- com o chao do chefe corrido 140 px, o que
+	# tirava a plataforma de cima de cima do poleiro e escondia o bug do
+	# nivel 12 (e antes o do 10).
+	if "alongar_plataformas" in raiz:
+		raiz.alongar_plataformas = false
 	root.add_child(raiz)
 	for _i in 8:
 		await process_frame
@@ -126,6 +138,7 @@ func _recolher(no: Node, out: Array) -> void:
 				"topo": p.global_position.y - tam.y * 0.5,
 				"esq": p.global_position.x - tam.x * 0.5,
 				"dir": p.global_position.x + tam.x * 0.5,
+				"base": p.global_position.y + tam.y * 0.5,
 			})
 		_recolher(f, out)
 
@@ -159,6 +172,19 @@ func _da_para_saltar(a: Dictionary, b: Dictionary) -> bool:
 	var dsub := a_topo - b_topo   # >0 => b esta' ACIMA de a
 	if dsub > SUBIDA_MAX:
 		return false
+	# DEBAIXO DA BARRIGA. Nao se sobe para cima de uma plataforma estando
+	# por baixo dela: o corpo dela e' tecto, e ha' que dar a volta pela
+	# ponta. Sem esta regra o crivo dizia "alcancavel" e os niveis 10 e 12
+	# chegaram ao Paulo com o chefe inacessivel -- as duas vezes com a
+	# mesma forma: um poleiro pequeno debaixo do chao da arena.
+	#
+	# So' se rejeita quando NAO ha' saida: se `a` sobra para fora da sombra
+	# de `b` mais do que `MARGEM_PONTA`, salta-se de la' e a aresta vale.
+	if dsub > 0.0:
+		var sobra_esq := b_esq - a_esq
+		var sobra_dir := a_dir - b_dir
+		if sobra_esq < MARGEM_PONTA and sobra_dir < MARGEM_PONTA:
+			return false
 	if dsub < -QUEDA_MAX:
 		return false
 	return true

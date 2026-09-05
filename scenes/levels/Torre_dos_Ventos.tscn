@@ -151,6 +151,37 @@ altura_visual = 22.0
 cor_base = Color(0.24, 0.22, 0.24, 1)
 cor_topo = Color(0.52, 0.48, 0.5, 1)
 
+; --- degraus para o cimo: o ChaoChefe vai de x=380 a x=940 e e' TECTO
+; para quem sobe por baixo (o AO3 e o AE3 ficam-lhe debaixo da barriga).
+; Estes ficam FORA desse intervalo, dois de cada lado -- como no nivel 10.
+[node name="SubidaOeste1" parent="." instance=ExtResource("9_pl")]
+position = Vector2(310, 322)
+tamanho = Vector2(110, 18)
+altura_visual = 24.0
+cor_base = Color(0.24, 0.22, 0.24, 1)
+cor_topo = Color(0.52, 0.48, 0.5, 1)
+
+[node name="SubidaOeste2" parent="." instance=ExtResource("9_pl")]
+position = Vector2(250, 250)
+tamanho = Vector2(100, 18)
+altura_visual = 24.0
+cor_base = Color(0.24, 0.22, 0.24, 1)
+cor_topo = Color(0.52, 0.48, 0.5, 1)
+
+[node name="SubidaLeste1" parent="." instance=ExtResource("9_pl")]
+position = Vector2(1035, 345)
+tamanho = Vector2(110, 18)
+altura_visual = 24.0
+cor_base = Color(0.24, 0.22, 0.24, 1)
+cor_topo = Color(0.52, 0.48, 0.5, 1)
+
+[node name="SubidaLeste2" parent="." instance=ExtResource("9_pl")]
+position = Vector2(1065, 267)
+tamanho = Vector2(100, 18)
+altura_visual = 24.0
+cor_base = Color(0.24, 0.22, 0.24, 1)
+cor_topo = Color(0.52, 0.48, 0.5, 1)
+
 [node name="ChaoChefe" parent="." instance=ExtResource("9_pl")]
 position = Vector2(660, 270)
 tamanho = Vector2(560, 60)
