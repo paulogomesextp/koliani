@@ -495,6 +495,29 @@ tempo que a sombra leva a chegar lá.
 longa, N67 inverter a gravidade, N70 cenário que se reescreve, N98 perder
 uma habilidade). Bancada: 35 asserções.
 
+### O terceiro "grande": a AMEAÇA QUE AVANÇA (N65)
+
+Uma parede de morte atravessa a sala a passo constante e não se combate:
+ou se anda, ou se leva. É a **máquina que o Paulo aceitou fundir** -- a
+torre a desabar (N29), a avalanche (N42) e a queda longa (N65) eram três
+nomes para a mesma regra, e agora são uma classe com `direcao` e
+`velocidade` a dar-lhe as caras.
+
+Três decisões de segurança, e a primeira é a que interessa:
+
+- **morre no fim do percurso.** Uma ameaça eterna seguia a Koliani pelo
+  resto da jornada e tornava impossível tudo o que viesse a seguir.
+- **não é sólida** e não empurra -- magoa por contacto, com recarga.
+- **arranca com atraso.** Uma parede que já vem a andar quando o ecrã abre
+  não é tensão, é uma morte de graça.
+
+A sala não tem um único sítio onde valha a pena parar (os degraus estão
+sempre à frente, nunca ao lado) e **não leva mais nenhum perigo**: duas
+coisas a matar ao mesmo tempo não se leem.
+
+**Provisórias: 10 → 9.** Restam **4 grandes** (N53 gancho, N67 inverter a
+gravidade, N70 cenário que se reescreve, N98 perder uma habilidade).
+
 ### E as pools das regiões, que era o buraco maior
 
 As 16 estreias de 5 set (`lava_sobe`, `mare`, `espectral`, …) **não estavam

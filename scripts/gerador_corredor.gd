@@ -87,6 +87,7 @@ const ZONA_ESCURIDAO := preload("res://scripts/zona_escuridao.gd")
 const ZONA_SEM_AR := preload("res://scripts/zona_sem_ar.gd")
 const SERPENTE := preload("res://scripts/serpente.gd")
 const SOMBRA := preload("res://scripts/sombra_atrasada.gd")
+const AMEACA := preload("res://scripts/ameaca_que_avanca.gd")
 
 ## Líquido mortal por região: [cor, brasas]. floresta=água podre, prisão=ácido,
 ## torres=??? (usa trevas), catacumbas=trevas, cidade=ácido citrino,
@@ -177,6 +178,7 @@ const POOL_REGIAO := {
 	# assinatura (as ilhas que se movem), mais `vento` e `gravidade`.
 	12: ["ferry", "vento", "gravidade", "saltos", "trampolim", "elevador",
 		"pendulos", "ritmo", "portal", "alavanca", "segredo", "orbita",
+		"ameaca",
 		"para_raios", "grav_baixa", "queda"],
 	# XIV Reino dos Sonhos: a regra é não haver regra. `portal` de
 	# assinatura -- entra-se aqui e sai-se noutro sítio.
@@ -345,7 +347,7 @@ const MECANICA_DO_NIVEL := [
 	{"cam": "para_raios", "grau": 1},
 	{"cam": "asas", "grau": 1},
 	{"cam": "grav_baixa", "grau": 2},
-	{"cam": "ferry", "grau": 1},  # ~
+	{"cam": "ameaca", "grau": 2},
 	# --- niveis 66-70  (Regiao 14) ---
 	{"cam": "portal", "grau": 2},
 	{"cam": "quebra", "grau": 2},  # ~
@@ -436,6 +438,7 @@ const CAMARAS_FLAVOUR := [
 	"rosas", "imanes", "ceifa", "brasas", "olhar", "ariete", "revisao",
 	"gelo", "frio", "veneno", "escuro", "areia_no_ar", "ciclo",
 	"mausoleu", "gemea", "ar", "serpente", "pulsacao", "asas", "sombra",
+	"ameaca",
 ]
 
 ## Câmara "assinatura" de cada região -- no acto do meio da jornada aparece
@@ -1548,6 +1551,7 @@ func _flavour(par: Node2D, tipo: String, x: float, y: float) -> Vector2:
 		"pulsacao": return _f_pulsacao(par, x, y)
 		"asas": return _f_asas(par, x, y)
 		"sombra": return _f_sombra(par, x, y)
+		"ameaca": return _f_ameaca(par, x, y)
 	# tipo sem handler -> não deve acontecer (pool/assinatura mal configurada).
 	# Avisa em vez de gerar um vão morto silencioso e cai num `descanso`.
 	push_warning("GeradorCorredor: câmara '%s' sem _f_ correspondente" % tipo)
@@ -4132,6 +4136,45 @@ func _f_sombra(par: Node2D, x: float, y: float) -> Vector2:
 	_coluna_fundo(par, (x0 + x) * 0.5)
 	x += _rng.randf_range(150.0, 176.0)
 	_plat(par, Vector2(x, cy), Vector2(140.0, 18.0))
+	_checkpoint(x, cy, true)
+	return Vector2(x, cy)
+
+
+## AMEAÇA (N65, O Fim do Céu): uma parede de morte atravessa a sala a
+## passo constante e não se combate -- ou se anda, ou se leva. É a máquina
+## que o Paulo aceitou fundir: a torre a desabar (N29), a avalanche (N42) e
+## a queda longa (N65) eram três nomes para a mesma regra.
+##
+## A sala não tem um único sítio onde valha a pena parar: os degraus estão
+## sempre à frente, nunca ao lado. E a parede **morre no fim do percurso**,
+## para não seguir a Koliani pelo resto da jornada -- uma ameaça eterna
+## tornava impossível tudo o que viesse a seguir.
+func _f_ameaca(par: Node2D, x: float, y: float) -> Vector2:
+	var cy: float = clampf(y, _teto_y + 240.0, _chao_y - 130.0)
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(150.0, 18.0))
+	_checkpoint(x, cy, true)
+	var x0 := x
+	var n := 5 + int(_dif * 3.0)
+	for i in n:
+		x += _rng.randf_range(150.0, 178.0)
+		_plat(par, Vector2(x, cy - 16.0 * float(i % 2)), Vector2(100.0, 16.0))
+		# perigo NENHUM pelo caminho: a parede já é o assunto todo, e duas
+		# coisas a matar ao mesmo tempo não se leem
+	var am := AMEACA.new()
+	am.direcao = Vector2(1.0, 0.0)
+	am.velocidade = 130.0 + 70.0 * _dif
+	am.distancia = x - x0 + 420.0
+	am.espera = 1.4 - 0.4 * _dif
+	am.tamanho = Vector2(90.0, 620.0)
+	am.dano = 18 + int(20.0 * _dif)
+	var liq: Array = LIQUIDO.get(_regiao, LIQUIDO[0])
+	var lc: Color = liq[0]
+	am.cor = Color(lc.r * 0.6 + 0.2, lc.g * 0.4, lc.b * 0.6 + 0.2)
+	am.position = Vector2(x0 - 190.0, cy - 200.0)
+	par.add_child(am)
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(150.0, 18.0))
 	_checkpoint(x, cy, true)
 	return Vector2(x, cy)
 

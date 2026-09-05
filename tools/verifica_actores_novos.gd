@@ -19,6 +19,7 @@ const ZONA_ESCURIDAO := preload("res://scripts/zona_escuridao.gd")
 const ZONA_SEM_AR := preload("res://scripts/zona_sem_ar.gd")
 const SERPENTE := preload("res://scripts/serpente.gd")
 const SOMBRA := preload("res://scripts/sombra_atrasada.gd")
+const AMEACA := preload("res://scripts/ameaca_que_avanca.gd")
 ## A Koliani carrega-se em RUNTIME (nao com `preload`): o script dela usa
 ## autoloads pelo nome e isso nao compila em `--script`.
 const KOLIANI := "res://scenes/actors/Koliani.tscn"
@@ -237,6 +238,26 @@ var ligada := false
 		ze.queue_free()
 		kv.queue_free()
 		await process_frame
+
+	# --- AMEACA QUE AVANCA ---------------------------------------------
+	# tres coisas: espera antes de arrancar, anda a passo constante, e
+	# MORRE no fim do percurso (senao seguia a Koliani pelo resto da
+	# jornada e tornava impossivel tudo o que viesse a seguir)
+	var am: Node2D = AMEACA.new()
+	am.velocidade = 200.0
+	am.distancia = 120.0
+	am.espera = 0.5
+	am.global_position = Vector2(17000.0, 0.0)
+	_sala.add_child(am)
+	var xa: float = am.global_position.x
+	await _esperar(0.25)
+	_ok(is_equal_approx(am.global_position.x, xa),
+		"Ameaca: espera antes de arrancar (%.0f)" % am.global_position.x)
+	await _esperar(0.45)
+	_ok(am.global_position.x > xa + 20.0,
+		"Ameaca: depois anda (%.0f -> %.0f)" % [xa, am.global_position.x])
+	await _esperar(1.0)
+	_ok(not is_instance_valid(am), "Ameaca: MORRE no fim do percurso")
 
 	# --- SOMBRA ATRASADA -----------------------------------------------
 	# ela anda em linha recta; a sombra tem de aparecer ATRAS, na posicao
