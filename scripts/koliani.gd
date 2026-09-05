@@ -278,6 +278,31 @@ var _gancho_comp := 130.0
 ## frame seguinte e nunca saía de lá.
 var _gancho_cd := 0.0
 
+## --- GRAVIDADE INVERTIDA (nível 67, Mundo Invertido) ------------------
+## +1 normal, -1 de pernas para o ar: ela cai para CIMA e anda nos tectos.
+## Não há um segundo caminho de código -- é a mesma conta com um sinal (ver
+## `Movimento.passo`), e o `up_direction` é o que faz o `is_on_floor()`
+## passar a olhar para o tecto.
+var _sinal_grav := 1.0
+
+
+## Velocidade vertical do ponto de vista DELA: positiva = a cair, seja para
+## que lado for. Todo o código que pergunta "está a cair?" usa isto, para a
+## inversão não precisar de cópias.
+func _vy() -> float:
+	return velocity.y * _sinal_grav
+
+
+## Vira a gravidade dela ao contrário (a `PlacaGravidade` chama isto).
+## Devolve o sinal novo. Não guarda nada no save: é um estado de sala.
+func inverter_gravidade() -> float:
+	_sinal_grav = -_sinal_grav
+	up_direction = Vector2(0.0, -_sinal_grav)
+	# quem vira o boneco é o `_animar()` (a escala dele é reescrita todos
+	# os frames); aqui só muda o sinal.
+	Som.toca("gelo", -10.0, 0.8 if _sinal_grav < 0.0 else 1.25)
+	return _sinal_grav
+
 ## --- ESTADOS que a apanham a ela (5 set 2026) -------------------------
 ## Os inimigos ja' tinham queimar/sangrar/atordoar (`DemonioBase`); ela nao
 ## tinha nenhum. Estes dois sao as estreias dos niveis 45 e 48.
@@ -661,7 +686,7 @@ func _physics_process(dt: float) -> void:
 		if _no_ar_antes:
 			_aterrar_t = 0.16
 		_no_ar_antes = false
-	elif velocity.y > 120.0:
+	elif _vy() > 120.0:
 		_no_ar_antes = true
 	_lancar_restante = maxf(0.0, _lancar_restante - dt)
 	_kame_recarga = maxf(0.0, _kame_recarga - dt)
@@ -849,7 +874,8 @@ func _physics_process(dt: float) -> void:
 			_pos_roll_t = POS_ROLL_JANELA   # abre a janela de crítico pós-rolamento
 		velocity.x = _olha_para * VEL_ROLAR
 		if not is_on_floor():
-			velocity.y = minf(Movimento.VEL_MAX_QUEDA, velocity.y + Movimento.GRAVIDADE * _grav_escala * dt)
+			velocity.y = clampf(velocity.y + Movimento.GRAVIDADE * _grav_escala * _sinal_grav * dt,
+				-Movimento.VEL_MAX_QUEDA, Movimento.VEL_MAX_QUEDA)
 	elif _dash_restante > 0.0:
 		_dash_restante -= dt
 		velocity.x = _olha_para * VEL_DASH
@@ -860,7 +886,8 @@ func _physics_process(dt: float) -> void:
 		if is_on_floor():
 			velocity.y = 0.0
 		else:
-			velocity.y = minf(Movimento.VEL_MAX_QUEDA, velocity.y + Movimento.GRAVIDADE * _grav_escala * dt)
+			velocity.y = clampf(velocity.y + Movimento.GRAVIDADE * _grav_escala * _sinal_grav * dt,
+				-Movimento.VEL_MAX_QUEDA, Movimento.VEL_MAX_QUEDA)
 		_mov.velocidade = velocity
 	elif Input.is_action_just_pressed("rolar") and Movimento.pode_rolar(
 			_rolar_recarga, is_on_floor(), _rolar_restante, _dash_restante):
@@ -896,6 +923,7 @@ func _physics_process(dt: float) -> void:
 			# botão. O `Movimento` e' que decide se ela ja' esta' a cair.
 			Input.is_action_pressed("saltar")
 				and EstadoJogo.tem_habilidade("planar"),
+			_sinal_grav,
 		)
 		velocity = _mov.velocidade
 		if _mov.saltos_dados > saltos_antes:
@@ -905,7 +933,7 @@ func _physics_process(dt: float) -> void:
 
 	# batida do Coração Putrefacto (fase 2): gravidade aliviada -- a Koliani
 	# fica "leve" e a queda abranda para lhe dar tempo no ar
-	if _leve > 0.0 and velocity.y > 0.0:
+	if _leve > 0.0 and _vy() > 0.0:
 		velocity.y *= 0.4
 
 	# corrente de ar (Torre dos Ventos, nível 12): sobe depressa enquanto lá
@@ -926,7 +954,7 @@ func _physics_process(dt: float) -> void:
 	# modo por cima -- serve para inimigos de vários tamanhos. Encadeia:
 	# cada pisão devolve os saltos de ar todos.
 	_stomp_cd = maxf(0.0, _stomp_cd - dt)
-	if _stomp_cd <= 0.0 and velocity.y > 40.0 and not is_on_floor() and _dash_restante <= 0.0:
+	if _stomp_cd <= 0.0 and _vy() > 40.0 and not is_on_floor() and _dash_restante <= 0.0:
 		var pes := global_position.y + 24.0
 		for e in get_tree().get_nodes_in_group("inimigos"):
 			if not is_instance_valid(e) or not (e as Node).has_method("receber_dano"):
@@ -966,7 +994,7 @@ func _physics_process(dt: float) -> void:
 	# pogo: cair em cima de uma serra / espinhos (grupo "pogavel", layer 6)
 	# -> ressalta em vez de levar o golpe (os i-frames apanham o toque desse
 	# frame). Só a descer a sério e pela parte de cima.
-	if _stomp_cd <= 0.0 and velocity.y > 90.0 and not is_on_floor() and _dash_restante <= 0.0:
+	if _stomp_cd <= 0.0 and _vy() > 90.0 and not is_on_floor() and _dash_restante <= 0.0:
 		var esp := get_world_2d().direct_space_state
 		var rq := PhysicsRayQueryParameters2D.create(
 			global_position + Vector2(0.0, 16.0), global_position + Vector2(0.0, 46.0), 1 << 5)
@@ -997,7 +1025,7 @@ func _physics_process(dt: float) -> void:
 		else:
 			velocity.x = minf(velocity.x, empurrao)
 
-	var vel_queda := velocity.y
+	var vel_queda := _vy()
 	move_and_slide()
 	_mov.velocidade = velocity
 
@@ -1090,7 +1118,7 @@ func _atualizar_anim() -> void:
 	elif not is_on_floor():
 		if _djump_t > 0.0:
 			a = "djump"
-		elif velocity.y < -20.0:
+		elif _vy() < -20.0:
 			a = "jump"
 		else:
 			a = "fall"
@@ -1218,7 +1246,10 @@ func _animar(dt: float) -> void:
 		# em pixel-art o sprite tem de assentar em pixéis INTEIROS: meio pixel
 		# de desvio faz a personagem cintilar com o filtro Nearest
 		_sprite.position.x = roundf(_sprite.position.x)
-	_sprite.scale = Vector2(escala.x * _flip_sprite(), escala.y)
+	# `* _sinal_grav` no y: com a gravidade invertida (nível 67) o boneco
+	# vira-se com o mundo. Tem de ser AQUI -- esta linha corre todos os
+	# frames e reescrevia a volta que o `inverter_gravidade()` dá.
+	_sprite.scale = Vector2(escala.x * _flip_sprite(), escala.y * _sinal_grav)
 
 
 func _flash_branco() -> void:

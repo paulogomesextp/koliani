@@ -221,6 +221,49 @@ func teste_gancho_largar_atira_pela_tangente() -> void:
 		"theta = 0 devia po-la por baixo da ancora (%.0f, %.0f)" % [p.x, p.y])
 
 
+## GRAVIDADE INVERTIDA (nivel 67): a mesma conta com um sinal. Nao ha' um
+## segundo caminho de codigo -- e' este teste que o garante.
+func teste_movimento_gravidade_invertida() -> void:
+	# a cair: com sinal -1 a velocidade vertical fica NEGATIVA (sobe)
+	var inv := Movimento.Estado.new()
+	for i in 20:
+		Movimento.passo(inv, 0.0, false, false, false, DT, 1, 1.0, 1.0, false, -1.0)
+	_ok(inv.velocidade.y < -100.0,
+		"invertida, devia cair PARA CIMA (vy = %.0f)" % inv.velocidade.y)
+
+	# o salto tambem vira: empurra para BAIXO
+	var salto := Movimento.Estado.new()
+	Movimento.passo(salto, 0.0, false, false, true, DT, 1, 1.0, 1.0, false, -1.0)
+	Movimento.passo(salto, 0.0, true, true, false, DT, 1, 1.0, 1.0, false, -1.0)
+	_ok(salto.velocidade.y > 0.0,
+		"invertida, o salto devia empurrar para baixo (vy = %.0f)" % salto.velocidade.y)
+
+	# o corte de salto continua a valer -- do lado certo
+	var corte := Movimento.Estado.new()
+	Movimento.passo(corte, 0.0, false, false, true, DT, 1, 1.0, 1.0, false, -1.0)
+	Movimento.passo(corte, 0.0, true, true, false, DT, 1, 1.0, 1.0, false, -1.0)
+	var vy_antes := corte.velocidade.y
+	Movimento.passo(corte, 0.0, false, false, false, DT, 1, 1.0, 1.0, false, -1.0)
+	_ok(corte.velocidade.y < vy_antes,
+		"invertida, largar o botao devia cortar o salto (%.0f -> %.0f)"
+			% [vy_antes, corte.velocidade.y])
+
+	# e a queda tem tecto dos dois lados
+	var tecto := Movimento.Estado.new()
+	for i in 400:
+		Movimento.passo(tecto, 0.0, false, false, false, DT, 1, 1.0, 1.0, false, -1.0)
+	_ok(tecto.velocidade.y >= -Movimento.VEL_MAX_QUEDA - 1.0,
+		"invertida, a queda tem de ter tecto (vy = %.0f)" % tecto.velocidade.y)
+
+	# o normal continua exatamente igual (a inversao nao pode mexer nele)
+	var normal := Movimento.Estado.new()
+	for i in 20:
+		Movimento.passo(normal, 0.0, false, false, false, DT)
+	_ok(is_equal_approx(normal.velocidade.y, -inv.velocidade.y),
+		"a inversao devia ser SIMETRICA (%.0f vs %.0f)"
+			% [normal.velocidade.y, inv.velocidade.y])
+
+
 func teste_movimento_salto_duplo() -> void:
 	var e := Movimento.Estado.new()
 	Movimento.passo(e, 0.0, false, false, true, DT, 2)   # 1 frame no chao arma o coyote

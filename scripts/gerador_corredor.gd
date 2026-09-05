@@ -92,6 +92,7 @@ const ZONA_SEM_PODER := preload("res://scripts/zona_sem_poder.gd")
 const PONTO_GANCHO := preload("res://scripts/ponto_gancho.gd")
 const PLAT_RODA := preload("res://scripts/plataforma_roda.gd")
 const SALA_REESCREVE := preload("res://scripts/sala_reescreve.gd")
+const PLACA_GRAV := preload("res://scripts/placa_gravidade.gd")
 
 ## Líquido mortal por região: [cor, brasas]. floresta=água podre, prisão=ácido,
 ## torres=??? (usa trevas), catacumbas=trevas, cidade=ácido citrino,
@@ -355,7 +356,7 @@ const MECANICA_DO_NIVEL := [
 	{"cam": "ameaca", "grau": 2},
 	# --- niveis 66-70  (Regiao 14) ---
 	{"cam": "portal", "grau": 2},
-	{"cam": "quebra", "grau": 2},  # ~
+	{"cam": "invertido", "grau": 2},
 	{"cam": "estatuas", "grau": 2},
 	{"cam": "sombra", "grau": 2},
 	{"cam": "mente", "grau": 2},
@@ -444,7 +445,7 @@ const CAMARAS_FLAVOUR := [
 	"gelo", "frio", "veneno", "escuro", "areia_no_ar", "ciclo",
 	"mausoleu", "gemea", "ar", "serpente", "pulsacao", "asas", "sombra",
 	"ameaca", "provacao", "reflexo", "gancho",
-	"engrenagens", "conves", "esporos", "mente",
+	"engrenagens", "conves", "esporos", "mente", "invertido",
 ]
 
 ## Câmara "assinatura" de cada região -- no acto do meio da jornada aparece
@@ -1565,6 +1566,7 @@ func _flavour(par: Node2D, tipo: String, x: float, y: float) -> Vector2:
 		"conves": return _f_conves(par, x, y)
 		"esporos": return _f_esporos(par, x, y)
 		"mente": return _f_mente(par, x, y)
+		"invertido": return _f_invertido(par, x, y)
 	# tipo sem handler -> não deve acontecer (pool/assinatura mal configurada).
 	# Avisa em vez de gerar um vão morto silencioso e cai num `descanso`.
 	push_warning("GeradorCorredor: câmara '%s' sem _f_ correspondente" % tipo)
@@ -4470,6 +4472,62 @@ func _f_mente(par: Node2D, x: float, y: float) -> Vector2:
 
 	x += _rng.randf_range(150.0, 176.0)
 	_plat(par, Vector2(x, cy), Vector2(150.0, 18.0))
+	_checkpoint(x, cy, true)
+	return Vector2(x, cy)
+
+
+## MUNDO INVERTIDO (N67): placas no chão que viram a gravidade dela ao
+## contrário -- cai para cima e anda nos tectos. O "à vontade" que o guia
+## pede não é um botão novo no comando (num telemóvel seria mais um
+## polegar): são **botões no chão**, e ela escolhe quando os pisa.
+##
+## A sala é um corredor com dois pisos espelhados -- chão e tecto --, e o
+## caminho passa pelos dois: há vãos que só se atravessam por cima e
+## outros que só se atravessam por baixo. As placas ficam sempre à vista,
+## antes do vão que resolvem.
+##
+## E a peça mais importante é a última: uma placa de REPOR à saída. Sair do
+## Mundo Invertido de pernas para o ar partia o resto da jornada, que é
+## toda desenhada para a gravidade normal.
+func _f_invertido(par: Node2D, x: float, y: float) -> Vector2:
+	# precisa de pé-direito para os dois pisos
+	if _chao_y - 120.0 - _teto_y < 520.0:
+		return _f_descanso(par, x, y)
+	var cy: float = clampf(y, _teto_y + 420.0, _chao_y - 120.0)
+	var teto := cy - 340.0
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(150.0, 18.0))
+	_checkpoint(x, cy, true)
+	var x0 := x
+
+	var n := 3 + int(_dif * 2.0)
+	for i in n:
+		# a placa que vira, sempre ANTES do vão que ela resolve
+		var pl := PLACA_GRAV.new()
+		pl.modo = "alterna"
+		pl.position = Vector2(x + 40.0, (cy if i % 2 == 0 else teto) - 22.0)
+		par.add_child(pl)
+		x += 200.0
+		# o piso de baixo e o de cima, espelhados: os vãos de um caem em
+		# cima do chão do outro, e é isso que faz o caminho ziguezaguear
+		# entre os dois
+		if i % 2 == 0:
+			_plat(par, Vector2(x, teto), Vector2(150.0, 18.0))
+		else:
+			_plat(par, Vector2(x, cy), Vector2(150.0, 18.0))
+		x += 170.0
+		_plat(par, Vector2(x, cy if i % 2 == 0 else teto), Vector2(110.0, 16.0))
+		if i % 2 == 1:
+			_checkpoint(x, cy)
+
+	# a saída: chão firme e a placa que a põe outra vez a direito
+	x += _rng.randf_range(160.0, 190.0)
+	_plat(par, Vector2(x, cy), Vector2(190.0, 20.0))
+	var rep := PLACA_GRAV.new()
+	rep.modo = "repor"
+	rep.tamanho = Vector2(180.0, 40.0)
+	rep.position = Vector2(x, cy - 30.0)
+	par.add_child(rep)
 	_checkpoint(x, cy, true)
 	return Vector2(x, cy)
 

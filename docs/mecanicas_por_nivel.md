@@ -634,6 +634,45 @@ Três regras, e são todas sobre o mesmo medo:
 **Provisórias: 2 → 1.** Falta **uma linha em 100**: o N67, inverter a
 gravidade à vontade.
 
+### MUNDO INVERTIDO (N67) — a última. **Zero linhas provisórias em 100.**
+
+Placas no chão que viram a gravidade dela ao contrário: cai para cima e
+anda nos tectos. O "à vontade" que o guia pede **não é um botão novo no
+comando** (num telemóvel seria mais um polegar) -- são botões no CHÃO, e
+ela escolhe quando os pisa.
+
+**Não há um segundo caminho de código.** É a mesma conta com um sinal:
+`Movimento.passo(..., sinal_grav)` multiplica gravidade, salto, corte de
+salto e planar, e o `up_direction` da Koliani é o que faz o
+`is_on_floor()` passar a olhar para o tecto. Na Koliani, tudo o que
+perguntava *"está a cair?"* passou a perguntá-lo a um `_vy()` que já vem
+com o sinal -- aterragem, pisão, pogo, animação, poeira da queda.
+
+A sala é um corredor com **dois pisos espelhados** e o caminho passa pelos
+dois: há vãos que só se atravessam por cima e outros só por baixo. As
+placas ficam sempre à vista, antes do vão que resolvem.
+
+E a peça mais importante é a última: **uma placa de REPOR à saída**. Sair
+do Mundo Invertido de pernas para o ar partia todo o resto da jornada, que
+é desenhada para a gravidade normal. A bancada prova as duas metades (vira,
+e repõe sem voltar a virar), e a suite prova que a inversão é **simétrica**
+-- o movimento normal não muda nem um número.
+
+> ⚠ **O que ficou de fora, de propósito:** escalar paredes e agarrar
+> bordas continuam a assumir a gravidade normal. Não aparecem na câmara do
+> N67, e fazê-los virar era mexer em quatro sítios delicados por uma sala
+> só. Fica escrito para quem lá voltar.
+
+---
+
+## As 100 linhas estão atribuídas
+
+| | |
+|---|---|
+| provisórias no início da sessão | **52** |
+| provisórias agora | **0** |
+| sobreposição média entre níveis seguidos | 0.275 → **0.224** |
+
 ### E as pools das regiões, que era o buraco maior
 
 As 16 estreias de 5 set (`lava_sobe`, `mare`, `espectral`, …) **não estavam

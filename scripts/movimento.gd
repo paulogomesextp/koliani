@@ -45,7 +45,12 @@ class Estado:
 ## normal. Nunca chega a zero: a 0.25 ainda se muda de sentido, so' demora.
 ## `planar` = tem a habilidade E está a segurar o botão de saltar. Só vale
 ## a DESCER (e depois do corte de salto, senão o corte nunca acontecia).
-static func passo(e: Estado, direcao: float, saltar_premido: bool, saltar_a_segurar: bool, no_chao: bool, dt: float, saltos_max: int = 1, grav_escala: float = 1.0, acel_escala: float = 1.0, planar: bool = false) -> Estado:
+## `sinal_grav` = +1 normal, -1 com a gravidade INVERTIDA (nível 67, Mundo
+## Invertido): ela cai para cima e anda nos tectos. Multiplica tudo o que é
+## vertical -- gravidade, salto, corte de salto e planar --, e é por isso
+## que a inversão não precisa de um segundo caminho de código: é a mesma
+## conta com um sinal.
+static func passo(e: Estado, direcao: float, saltar_premido: bool, saltar_a_segurar: bool, no_chao: bool, dt: float, saltos_max: int = 1, grav_escala: float = 1.0, acel_escala: float = 1.0, planar: bool = false, sinal_grav: float = 1.0) -> Estado:
 	# temporizadores
 	if no_chao:
 		e.coyote_restante = COYOTE
@@ -71,24 +76,26 @@ static func passo(e: Estado, direcao: float, saltar_premido: bool, saltar_a_segu
 	var pode_saltar_chao := e.coyote_restante > 0.0 and e.saltos_dados == 0
 	var pode_saltar_ar := e.saltos_dados > 0 and e.saltos_dados < saltos_max
 	if e.buffer_restante > 0.0 and (pode_saltar_chao or pode_saltar_ar):
-		e.velocidade.y = -FORCA_SALTO
+		e.velocidade.y = -FORCA_SALTO * sinal_grav
 		e.buffer_restante = 0.0
 		e.coyote_restante = 0.0
 		e.saltos_dados += 1
 
-	# gravidade (grav_escala < 1 = "gravidade lunar" do Observatório, nível 14)
+	# gravidade (grav_escala < 1 = "gravidade lunar" do Observatório, nível
+	# 14; sinal_grav = -1 = gravidade invertida, nível 67)
 	if not no_chao:
-		e.velocidade.y = minf(VEL_MAX_QUEDA, e.velocidade.y + GRAVIDADE * grav_escala * dt)
+		var v := e.velocidade.y + GRAVIDADE * grav_escala * sinal_grav * dt
+		e.velocidade.y = clampf(v, -VEL_MAX_QUEDA, VEL_MAX_QUEDA)
 
-	# corte de salto
-	if e.velocidade.y < 0.0 and not saltar_a_segurar:
+	# corte de salto (`* sinal_grav` = "a subir", seja qual for o lado)
+	if e.velocidade.y * sinal_grav < 0.0 and not saltar_a_segurar:
 		e.velocidade.y *= CORTE_SALTO
 
 	# planar: a cair, com o botão a segurar, a queda prende-se ao tecto
 	# baixo. Vem DEPOIS do corte de salto de propósito -- ao contrário, o
 	# corte deixava de acontecer no frame em que ela começa a descer.
-	if planar and not no_chao and e.velocidade.y > VEL_PLANAR:
-		e.velocidade.y = VEL_PLANAR
+	if planar and not no_chao and e.velocidade.y * sinal_grav > VEL_PLANAR:
+		e.velocidade.y = VEL_PLANAR * sinal_grav
 
 	e.no_chao = no_chao
 	return e

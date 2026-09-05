@@ -21,6 +21,7 @@ const SERPENTE := preload("res://scripts/serpente.gd")
 const SOMBRA := preload("res://scripts/sombra_atrasada.gd")
 const PLAT_RODA := preload("res://scripts/plataforma_roda.gd")
 const SALA_REESCREVE := preload("res://scripts/sala_reescreve.gd")
+const PLACA_GRAV := preload("res://scripts/placa_gravidade.gd")
 const AMEACA := preload("res://scripts/ameaca_que_avanca.gd")
 const ZONA_SEM_PODER := preload("res://scripts/zona_sem_poder.gd")
 ## A Koliani carrega-se em RUNTIME (nao com `preload`): o script dela usa
@@ -548,6 +549,40 @@ var ligada := false
 		await _esperar(1.2)
 		_ok(is_equal_approx(float(ko.get("_acel_escala")), 1.0),
 			"Koliani: o frio passa sozinho (acel = %.2f)" % float(ko.get("_acel_escala")))
+		# --- GRAVIDADE INVERTIDA (nivel 67) ----------------------------
+		# o que interessa provar: a placa vira, e a placa de REPOR po~e-na
+		# sempre a direito. Sair do Mundo Invertido de pernas para o ar
+		# partia todo o resto da jornada.
+		_ok(is_equal_approx(float(ko.get("_sinal_grav")), 1.0),
+			"Gravidade: comeca a direito")
+		var pa: Node2D = PLACA_GRAV.new()
+		pa.modo = "alterna"
+		pa.tamanho = Vector2(120.0, 60.0)
+		pa.global_position = ko.global_position
+		_sala.add_child(pa)
+		await _esperar(0.3)
+		_ok(float(ko.get("_sinal_grav")) < 0.0,
+			"Gravidade: a placa vira-a (%.0f)" % float(ko.get("_sinal_grav")))
+		_ok(ko.up_direction.y > 0.0,
+			"Gravidade: o `up_direction` vira com ela (%.0f)" % ko.up_direction.y)
+		pa.queue_free()
+		await process_frame
+		var pr: Node2D = PLACA_GRAV.new()
+		pr.modo = "repor"
+		pr.tamanho = Vector2(160.0, 60.0)
+		pr.global_position = ko.global_position
+		_sala.add_child(pr)
+		await _esperar(0.4)
+		_ok(is_equal_approx(float(ko.get("_sinal_grav")), 1.0),
+			"Gravidade: a placa de REPOR po~e-na a direito (%.0f)"
+				% float(ko.get("_sinal_grav")))
+		# e insiste: mesmo que ela ja' la' estivesse, nao a volta a virar
+		await _esperar(0.6)
+		_ok(is_equal_approx(float(ko.get("_sinal_grav")), 1.0),
+			"Gravidade: e a de repor NAO a vira outra vez")
+		pr.queue_free()
+		await process_frame
+
 		# --- GANCHO: o balanco na Koliani a serio ----------------------
 		# `engatar` po~e-na no circulo, `largar_gancho` devolve-lhe
 		# velocidade, e o `_gancho_cd` impede que volte a engatar no frame
