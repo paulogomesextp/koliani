@@ -475,6 +475,26 @@ que **não pode cortar o salto**.
 
 **Provisórias: 12 → 11**, e restam **6 grandes**.
 
+### O segundo "grande": a SOMBRA COM ATRASO (N69)
+
+Grava o caminho dela e anda por ele três segundos depois. **Não decide
+nada -- repete**, e é isso que a separa de um perseguidor: não se despista
+(vai onde ela foi), não se combate (atravessa-se), e a única maneira de a
+manter longe é não voltar atrás. Quem pára apanha a própria decisão de há
+três segundos em cima.
+
+Por construção não pode encurralá-la: só vai a sítios onde ela já esteve.
+E o rasto é uma **fila**, não um histórico -- deita fora tudo o que é mais
+velho do que o atraso, senão uma sala comprida enchia a memória de pontos.
+
+A sala é feita para a mecânica: comprida, de sentido único, com um desvio
+para cima a meio que serve de descanso -- e o descanso custa exatamente o
+tempo que a sombra leva a chegar lá.
+
+**Provisórias: 11 → 10.** Restam **5 grandes** (N53 gancho, N65 queda
+longa, N67 inverter a gravidade, N70 cenário que se reescreve, N98 perder
+uma habilidade). Bancada: 35 asserções.
+
 ### E as pools das regiões, que era o buraco maior
 
 As 16 estreias de 5 set (`lava_sobe`, `mare`, `espectral`, …) **não estavam

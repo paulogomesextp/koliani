@@ -86,6 +86,7 @@ const ZONA_ESTADO := preload("res://scripts/zona_estado.gd")
 const ZONA_ESCURIDAO := preload("res://scripts/zona_escuridao.gd")
 const ZONA_SEM_AR := preload("res://scripts/zona_sem_ar.gd")
 const SERPENTE := preload("res://scripts/serpente.gd")
+const SOMBRA := preload("res://scripts/sombra_atrasada.gd")
 
 ## Líquido mortal por região: [cor, brasas]. floresta=água podre, prisão=ácido,
 ## torres=??? (usa trevas), catacumbas=trevas, cidade=ácido citrino,
@@ -181,6 +182,7 @@ const POOL_REGIAO := {
 	# assinatura -- entra-se aqui e sai-se noutro sítio.
 	13: ["portal", "espelhos", "gravidade", "quebra", "velas", "saltos",
 		"pendulos", "ritmo", "gruta", "alavanca", "segredo", "espectral",
+		"sombra",
 		"orbita", "bifurcacao", "vitral"],
 	# XV Cidade dos Mortos: `sinos` de assinatura -- a badalada torna
 	# sólida a ponte fantasma, que é a mecânica-imagem da região inteira.
@@ -348,7 +350,7 @@ const MECANICA_DO_NIVEL := [
 	{"cam": "portal", "grau": 2},
 	{"cam": "quebra", "grau": 2},  # ~
 	{"cam": "estatuas", "grau": 2},
-	{"cam": "ritmo", "grau": 2},  # ~
+	{"cam": "sombra", "grau": 2},
 	{"cam": "portal", "grau": 2},  # ~
 	# --- niveis 71-75  (Regiao 15) ---
 	{"cam": "sinos", "grau": 2},
@@ -433,7 +435,7 @@ const CAMARAS_FLAVOUR := [
 	"replicantes", "estatuas", "incorporeo",
 	"rosas", "imanes", "ceifa", "brasas", "olhar", "ariete", "revisao",
 	"gelo", "frio", "veneno", "escuro", "areia_no_ar", "ciclo",
-	"mausoleu", "gemea", "ar", "serpente", "pulsacao", "asas",
+	"mausoleu", "gemea", "ar", "serpente", "pulsacao", "asas", "sombra",
 ]
 
 ## Câmara "assinatura" de cada região -- no acto do meio da jornada aparece
@@ -1545,6 +1547,7 @@ func _flavour(par: Node2D, tipo: String, x: float, y: float) -> Vector2:
 		"serpente": return _f_serpente(par, x, y)
 		"pulsacao": return _f_pulsacao(par, x, y)
 		"asas": return _f_asas(par, x, y)
+		"sombra": return _f_sombra(par, x, y)
 	# tipo sem handler -> não deve acontecer (pool/assinatura mal configurada).
 	# Avisa em vez de gerar um vão morto silencioso e cai num `descanso`.
 	push_warning("GeradorCorredor: câmara '%s' sem _f_ correspondente" % tipo)
@@ -4091,6 +4094,46 @@ func _f_asas(par: Node2D, x: float, y: float) -> Vector2:
 	_plat(par, Vector2(x, cy + descida), Vector2(150.0, 18.0))
 	_checkpoint(x, cy + descida, true)
 	return Vector2(x, cy + descida)
+
+
+## SOMBRA (N69, Pesadelo): a sombra dela anda pelo caminho dela, três
+## segundos depois. Não decide nada -- repete. Não se despista e não se
+## combate (atravessa-se), e a única maneira de a manter longe é não voltar
+## atrás: quem pára apanha a própria decisão de há três segundos em cima.
+##
+## A sala é feita para isso: comprida, de sentido único, com um desvio para
+## cima a meio que serve de descanso -- e o descanso custa exatamente o
+## tempo que a sombra leva a chegar lá.
+func _f_sombra(par: Node2D, x: float, y: float) -> Vector2:
+	var cy: float = clampf(y, _teto_y + 240.0, _chao_y - 130.0)
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(150.0, 18.0))
+	_checkpoint(x, cy, true)
+	var x0 := x
+	var so := SOMBRA.new()
+	so.atraso = 3.4 - 1.0 * _dif
+	so.dano = 12 + int(18.0 * _dif)
+	so.position = Vector2(x, cy - 30.0)
+	par.add_child(so)
+
+	var n := 5 + int(_dif * 3.0)
+	for i in n:
+		x += _rng.randf_range(150.0, 176.0)
+		_plat(par, Vector2(x, cy - 14.0 * float(i % 2)), Vector2(100.0, 16.0))
+		# o desvio de descanso, a meio: subir custa tempo, e o tempo é o
+		# que a sombra come
+		if i == n / 2:
+			_plat(par, Vector2(x + 80.0, cy - 120.0), Vector2(110.0, 15.0))
+			var es := ESSENCIA.instantiate()
+			es.valor = 18 + int(30.0 * _dif)
+			es.espalhar = false
+			es.position = Vector2(x + 80.0, cy - 156.0)
+			par.add_child(es)
+	_coluna_fundo(par, (x0 + x) * 0.5)
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(140.0, 18.0))
+	_checkpoint(x, cy, true)
+	return Vector2(x, cy)
 
 
 ## Estica uma `ZonaGravidade` para cobrir `tam` (e o Fundo com ela).

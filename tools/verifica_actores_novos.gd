@@ -18,6 +18,7 @@ const ZONA_GELO := preload("res://scripts/zona_gelo.gd")
 const ZONA_ESCURIDAO := preload("res://scripts/zona_escuridao.gd")
 const ZONA_SEM_AR := preload("res://scripts/zona_sem_ar.gd")
 const SERPENTE := preload("res://scripts/serpente.gd")
+const SOMBRA := preload("res://scripts/sombra_atrasada.gd")
 ## A Koliani carrega-se em RUNTIME (nao com `preload`): o script dela usa
 ## autoloads pelo nome e isso nao compila em `--script`.
 const KOLIANI := "res://scenes/actors/Koliani.tscn"
@@ -236,6 +237,31 @@ var ligada := false
 		ze.queue_free()
 		kv.queue_free()
 		await process_frame
+
+	# --- SOMBRA ATRASADA -----------------------------------------------
+	# ela anda em linha recta; a sombra tem de aparecer ATRAS, na posicao
+	# onde a Koliani estava ha' `atraso` segundos -- nem antes, nem em cima
+	var so: Node2D = SOMBRA.new()
+	so.atraso = 0.6
+	so.global_position = Vector2(15000.0, 0.0)
+	_sala.add_child(so)
+	var ks := _duble(Vector2(15000.0, 0.0))
+	await _esperar(0.2)
+	_ok(not so.visible, "Sombra: nao aparece antes de haver passado")
+	# a marchar para a direita a 300 px/s
+	for _i in 24:
+		await create_timer(0.05).timeout
+		ks.global_position.x += 15.0
+	_ok(so.visible, "Sombra: aparece quando ja' ha' rasto")
+	var dx := ks.global_position.x - so.global_position.x
+	_ok(dx > 100.0 and dx < 260.0,
+		"Sombra: fica ~0.6 s atras dela (%.0f px de 180)" % dx)
+	# e o rasto nao cresce para sempre -- e' uma fila, nao um historico
+	_ok(int(so.get("_rasto").size()) < 200,
+		"Sombra: o rasto e' uma fila (%d pontos)" % int(so.get("_rasto").size()))
+	so.queue_free()
+	ks.queue_free()
+	await process_frame
 
 	# --- SERPENTE ------------------------------------------------------
 	var se: Node2D = SERPENTE.new()
