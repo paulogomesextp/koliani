@@ -67,7 +67,12 @@ RAMPAS = {
 # serve de nine-patch), uma coluna, uma faixa e um quadradinho de 16x16.
 PAINEL_GRANDE = (0, 0, 64, 64)
 PAINEL_SELO = (64, 64, 16, 16)
-PAINEL_MADEIRA = (16, 224, 64, 64)
+# A madeira vem no MESMO arranjo de quatro paineis, mas o quadrado dela e'
+# 48x48, nao 64x64. O recorte antigo (64x64) levava junto a coluna da
+# direita e a faixa de baixo, e no Godot a nine-patch saia AOS BOCADOS --
+# os botoes do rodape do seletor desenhavam-se como tres blocos soltos.
+# Medido pelas divisorias pretas da folha: x = 16 | 64 | 79, y = 224 | 272 | 287.
+PAINEL_MADEIRA = (16, 224, 48, 48)
 
 ICONES = {
     "ico_caveira": (4, 259, 8, 10),

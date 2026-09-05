@@ -102,7 +102,7 @@ var _pronto := false
 
 ## Barra de progresso da campanha + pastilhas de região (atalho de zona) --
 ## construídas em `_montar_topo`, atualizadas em `_reconstruir_estilos`.
-var _prog_fill: ColorRect
+var _prog_fill: Control
 var _prog_label: Label
 var _regiao_pills: Array[Button] = []
 
@@ -163,6 +163,18 @@ func _montar() -> void:
 
 
 const ART_FRAC := 0.60   # fração do cartão ocupada pela arte/retrato
+## Recuo da janela de arte para dentro da moldura. A nine-patch de pedra
+## desenha 30 px de moldura (10 px da folha x3, ver `UI.MARGEM_PAINEL`);
+## a arte entra por dentro dela, senão tapava-a e voltávamos à caixa lisa.
+const MARG_MOLDURA := 24.0
+
+## ALTURA MÍNIMA de qualquer peça vestida com `UI.painel("painel_*")`.
+## A nine-patch dos painéis grandes tem 30 px de moldura de cada lado
+## (`UI.MARGEM_PAINEL`): abaixo de 60 px de altura os cantos sobrepõem-se e
+## a peça sai partida -- os botões do rodapé, a 44 px, desenhavam-se como
+## dois blocos soltos. Peças mais baixas que isto usam o `selo` (15 px de
+## moldura, ver `UI.MARGEM_SELO`), que aguenta até 30 px.
+const ALT_MIN_PAINEL := 64.0
 
 func _fazer_cartao(indice: int) -> Dictionary:
 	var regiao := EstadoJogo.regiao_do_nivel(indice)
@@ -175,33 +187,55 @@ func _fazer_cartao(indice: int) -> Dictionary:
 	raiz.pivot_offset = CARTAO * 0.5
 	raiz.mouse_filter = Control.MOUSE_FILTER_STOP
 
-	# --- moldura do cartão (fundo + borda + sombra) -----------------------
+	# --- moldura do cartão: a PEDRA do kit da HUD (`UI.painel`) ----------
+	# O brilho de selecção vive num nó SEPARADO, por baixo: uma
+	# `StyleBoxTexture` não tem sombra, e era a sombra que fazia o cartão do
+	# meio saltar à frente dos vizinhos.
+	var brilho := Panel.new()
+	brilho.name = "Brilho"
+	brilho.set_anchors_preset(Control.PRESET_FULL_RECT)
+	brilho.offset_left = -8.0
+	brilho.offset_top = -8.0
+	brilho.offset_right = 8.0
+	brilho.offset_bottom = 8.0
+	brilho.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	brilho.modulate.a = 0.0
+	var sbg := StyleBoxFlat.new()
+	sbg.bg_color = Color(0, 0, 0, 0)
+	sbg.shadow_color = Color(base.r, base.g, base.b, 0.28)
+	sbg.shadow_size = 10
+	brilho.add_theme_stylebox_override("panel", sbg)
+	raiz.add_child(brilho)
+
 	var painel := Panel.new()
 	painel.set_anchors_preset(Control.PRESET_FULL_RECT)
 	painel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	raiz.add_child(painel)
-	var sb := StyleBoxFlat.new()
-	sb.bg_color = Color(0.07, 0.05, 0.1, 0.98)
-	sb.set_corner_radius_all(18)
-	sb.set_border_width_all(2)
-	sb.border_color = Color(base.r, base.g, base.b, 0.4)
-	sb.shadow_color = Color(0, 0, 0, 0.55)
-	sb.shadow_size = 16
-	sb.shadow_offset = Vector2(0, 8)
-	var sb_sel := sb.duplicate() as StyleBoxFlat
-	sb_sel.set_border_width_all(3)
-	sb_sel.border_color = base.lightened(0.15)
-	sb_sel.shadow_color = Color(base.r, base.g, base.b, 0.42)
-	sb_sel.shadow_size = 22
-	sb_sel.shadow_offset = Vector2.ZERO
+	# a mesma pedra, tingida com a cor da região: apagada de lado, acesa no
+	# centro -- é a tinta que diz qual é o cartão escolhido, não uma borda
+	var sb := UI.painel("painel_pedra",
+		Color(base.r * 0.26 + 0.13, base.g * 0.26 + 0.13, base.b * 0.26 + 0.15, 0.98))
+	var sb_sel := UI.painel("painel_pedra",
+		Color(base.r * 0.5 + 0.28, base.g * 0.5 + 0.28, base.b * 0.5 + 0.3))
 	painel.add_theme_stylebox_override("panel", sb)
+
+	# interior escuro dentro da moldura: é ele que faz a pedra ler-se como
+	# MOLDURA e não como laje, e é sobre ele que o texto fica legível --
+	# sem isto o nome do nível caía em cima da pedra clara do cartão aceso.
+	var dentro := ColorRect.new()
+	dentro.name = "Dentro"
+	dentro.color = Color(0.05, 0.04, 0.08, 0.96)
+	dentro.position = Vector2(MARG_MOLDURA, MARG_MOLDURA)
+	dentro.size = CARTAO - Vector2(MARG_MOLDURA, MARG_MOLDURA) * 2.0
+	dentro.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	raiz.add_child(dentro)
 
 	# --- zona de arte (topo) --------------------------------------------
 	var clip := Control.new()
 	clip.clip_contents = true
 	clip.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	clip.position = Vector2(3, 3)
-	clip.size = Vector2(CARTAO.x - 6, art_h)
+	clip.position = Vector2(MARG_MOLDURA, MARG_MOLDURA)
+	clip.size = Vector2(CARTAO.x - MARG_MOLDURA * 2.0, art_h)
 	raiz.add_child(clip)
 
 	var arte := TextureRect.new()
@@ -242,42 +276,48 @@ func _fazer_cartao(indice: int) -> Dictionary:
 		retrato.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		var rs := art_h * 1.15
 		retrato.size = Vector2(rs, rs)
-		retrato.position = Vector2((CARTAO.x - 6 - rs) * 0.5, art_h - rs + art_h * 0.16)
+		retrato.position = Vector2((clip.size.x - rs) * 0.5, art_h - rs + art_h * 0.16)
 		retrato.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		clip.add_child(retrato)
 
-	# --- badge do número (canto sup. esq.) -----------------------------
+	# --- selo do número (canto sup. esq.) -- o mesmo selo da HUD ---------
+	var selo := PanelContainer.new()
+	selo.name = "Selo"
+	selo.custom_minimum_size = Vector2(54, 54)
+	selo.size = Vector2(54, 54)
+	selo.position = Vector2(MARG_MOLDURA - 8.0, MARG_MOLDURA - 8.0)
+	selo.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	selo.add_theme_stylebox_override("panel", UI.painel("selo", base * 0.7, 2.0))
+	raiz.add_child(selo)
+
 	var badge := Label.new()
 	badge.name = "Numero"
 	badge.text = "%02d" % (indice + 1)
 	badge.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	badge.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	badge.size = Vector2(46, 30)
-	badge.position = Vector2(12, 12)
-	badge.add_theme_font_size_override("font_size", 16)
-	badge.add_theme_color_override("font_color", Color(0.06, 0.04, 0.08))
-	var sbb := StyleBoxFlat.new()
-	sbb.bg_color = base
-	sbb.set_corner_radius_all(8)
-	badge.add_theme_stylebox_override("normal", sbb)
-	raiz.add_child(badge)
+	badge.add_theme_font_size_override("font_size", 22)
+	badge.add_theme_color_override("font_color", Color(1, 0.97, 1))
+	badge.add_theme_color_override("font_outline_color", Color(0.04, 0.01, 0.06))
+	badge.add_theme_constant_override("outline_size", 5)
+	selo.add_child(badge)
 
 	# --- fita de estado (canto sup. dir.) -----------------------------
 	var pill := Label.new()
 	pill.name = "Pill"
 	pill.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	pill.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	pill.add_theme_font_size_override("font_size", 12)
-	pill.size = Vector2(120, 26)
-	pill.position = Vector2(CARTAO.x - 12 - 120, 14)
+	pill.add_theme_font_size_override("font_size", 13)
+	pill.size = Vector2(140, 40)
+	pill.position = Vector2(CARTAO.x - MARG_MOLDURA - 140.0, MARG_MOLDURA - 2.0)
 	pill.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	raiz.add_child(pill)
 
 	# --- band de info (fundo) ----------------------------------------
 	var info := VBoxContainer.new()
 	info.add_theme_constant_override("separation", 6)
-	info.position = Vector2(20, art_h + 4)
-	info.size = Vector2(CARTAO.x - 40, CARTAO.y - art_h - 20)
+	info.position = Vector2(MARG_MOLDURA + 12.0, art_h + MARG_MOLDURA + 6.0)
+	info.size = Vector2(CARTAO.x - (MARG_MOLDURA + 12.0) * 2.0,
+		CARTAO.y - art_h - MARG_MOLDURA * 2.0 - 6.0)
 	info.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 	var faixa_reg := Label.new()
@@ -289,7 +329,7 @@ func _fazer_cartao(indice: int) -> Dictionary:
 	var nome := Label.new()
 	nome.name = "Nome"
 	nome.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	nome.custom_minimum_size = Vector2(CARTAO.x - 40, 0)
+	nome.custom_minimum_size = Vector2(CARTAO.x - (MARG_MOLDURA + 12.0) * 2.0, 0)
 	nome.add_theme_font_size_override("font_size", 25)
 	nome.add_theme_color_override("font_color", Color(0.98, 0.95, 1))
 	nome.add_theme_color_override("font_outline_color", Color(0.02, 0.01, 0.03))
@@ -299,7 +339,7 @@ func _fazer_cartao(indice: int) -> Dictionary:
 	var chefe := Label.new()
 	chefe.name = "Chefe"
 	chefe.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	chefe.custom_minimum_size = Vector2(CARTAO.x - 40, 0)
+	chefe.custom_minimum_size = Vector2(CARTAO.x - (MARG_MOLDURA + 12.0) * 2.0, 0)
 	chefe.add_theme_font_size_override("font_size", 15)
 	chefe.add_theme_color_override("font_color", Color(0.84, 0.64, 0.92))
 	info.add_child(chefe)
@@ -307,7 +347,7 @@ func _fazer_cartao(indice: int) -> Dictionary:
 	var premio := Label.new()
 	premio.name = "Premio"
 	premio.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	premio.custom_minimum_size = Vector2(CARTAO.x - 40, 0)
+	premio.custom_minimum_size = Vector2(CARTAO.x - (MARG_MOLDURA + 12.0) * 2.0, 0)
 	premio.add_theme_font_size_override("font_size", 13)
 	premio.add_theme_color_override("font_color", Color(0.98, 0.86, 0.55))
 	info.add_child(premio)
@@ -319,7 +359,8 @@ func _fazer_cartao(indice: int) -> Dictionary:
 		"raiz": raiz, "indice": indice, "jogavel": true,
 		"regiao": faixa_reg, "numero": badge, "nome": nome,
 		"chefe": chefe, "premio": premio, "pill": pill, "base": base,
-		"arte": arte, "painel": painel, "sb_normal": sb, "sb_sel": sb_sel, "em_destaque": false,
+		"arte": arte, "painel": painel, "sb_normal": sb, "sb_sel": sb_sel,
+		"brilho": brilho, "em_destaque": false,
 	}
 
 
@@ -375,28 +416,29 @@ func _frame0(caminho: String, n: int) -> Texture2D:
 	return atlas
 
 
+## Seta de navegação: placa de pedra do kit + o ícone de seta do mesmo
+## pack. O `txt` já não se desenha -- fica só como rótulo de acessibilidade
+## (o botão passou a ser gráfico).
 func _montar_seta(txt: String, dir: int, esquerda: bool) -> void:
 	var b := Button.new()
-	b.text = txt
+	b.tooltip_text = txt
 	b.focus_mode = Control.FOCUS_NONE
-	b.add_theme_font_size_override("font_size", 40)
-	b.add_theme_color_override("font_color", Color(0.97, 0.9, 1))
-	var sb := StyleBoxFlat.new()
-	sb.bg_color = Color(0.1, 0.06, 0.14, 0.85)
-	sb.set_corner_radius_all(36)
-	sb.set_border_width_all(2)
-	sb.border_color = Color(0.7, 0.45, 0.8, 0.75)
-	sb.shadow_color = Color(0.6, 0.3, 0.7, 0.25)
-	sb.shadow_size = 6
-	var sb_hover := sb.duplicate() as StyleBoxFlat
-	sb_hover.bg_color = Color(0.24, 0.12, 0.28, 0.95)
-	sb_hover.border_color = Color(0.95, 0.55, 0.92, 1)
-	sb_hover.shadow_color = Color(0.9, 0.4, 0.85, 0.5)
-	sb_hover.shadow_size = 14
+	var sb := UI.painel("painel_pedra", Color(0.86, 0.72, 0.95, 0.94), 0.0)
+	var sb_hover := UI.painel("painel_placa", Color(1.0, 0.72, 1.0), 0.0)
 	b.add_theme_stylebox_override("normal", sb)
 	b.add_theme_stylebox_override("hover", sb_hover)
 	b.add_theme_stylebox_override("pressed", sb_hover)
-	b.add_theme_stylebox_override("focus", sb_hover)
+	b.add_theme_stylebox_override("focus", sb)
+
+	var ic := UI.icone("ico_seta_esq" if esquerda else "ico_seta_dir", 34.0,
+		Color(1, 0.94, 1))
+	# num `CenterContainer` para a seta ficar mesmo no meio da placa sem
+	# depender de o botão já ter tamanho quando isto corre
+	var meio := CenterContainer.new()
+	meio.set_anchors_preset(Control.PRESET_FULL_RECT)
+	meio.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	meio.add_child(ic)
+	b.add_child(meio)
 	b.anchor_top = 0.5
 	b.anchor_bottom = 0.5
 	b.offset_top = -36.0
@@ -448,8 +490,8 @@ func _montar_rodape() -> void:
 	barra.anchor_bottom = 1.0
 	barra.offset_left = -280.0
 	barra.offset_right = 280.0
-	barra.offset_top = -86.0
-	barra.offset_bottom = -42.0
+	barra.offset_top = -104.0
+	barra.offset_bottom = -40.0
 	barra.alignment = BoxContainer.ALIGNMENT_CENTER
 	barra.add_theme_constant_override("separation", 18)
 	add_child(barra)
@@ -457,7 +499,7 @@ func _montar_rodape() -> void:
 	var voltar := Button.new()
 	voltar.name = "Voltar"
 	voltar.focus_mode = Control.FOCUS_NONE
-	voltar.custom_minimum_size = Vector2(140, 44)
+	voltar.custom_minimum_size = Vector2(150, ALT_MIN_PAINEL)
 	_estilo_botao_rodape(voltar, false)
 	voltar.pressed.connect(func() -> void: cancelado.emit())
 	barra.add_child(voltar)
@@ -465,7 +507,7 @@ func _montar_rodape() -> void:
 	var santuario := Button.new()
 	santuario.name = "Santuario"
 	santuario.focus_mode = Control.FOCUS_NONE
-	santuario.custom_minimum_size = Vector2(160, 44)
+	santuario.custom_minimum_size = Vector2(175, ALT_MIN_PAINEL)
 	_estilo_botao_rodape(santuario, false)
 	var chave_sant := Textos.t("shrine.open")
 	santuario.text = chave_sant if chave_sant != "shrine.open" else "✦ Santuário"
@@ -475,7 +517,7 @@ func _montar_rodape() -> void:
 	_jogar = Button.new()
 	_jogar.name = "Jogar"
 	_jogar.focus_mode = Control.FOCUS_NONE
-	_jogar.custom_minimum_size = Vector2(140, 44)
+	_jogar.custom_minimum_size = Vector2(150, ALT_MIN_PAINEL)
 	_estilo_botao_rodape(_jogar, true)
 	_jogar.pressed.connect(_confirmar)
 	barra.add_child(_jogar)
@@ -589,18 +631,21 @@ func _montar_topo() -> void:
 		var b := Button.new()
 		b.name = "Regiao%d" % r
 		b.focus_mode = Control.FOCUS_NONE
-		b.custom_minimum_size = Vector2(30, 30)
+		b.custom_minimum_size = Vector2(32, 32)
 		b.text = "%d" % (r + 1)
 		b.add_theme_font_size_override("font_size", 13)
+		b.add_theme_color_override("font_color", Color(1, 0.97, 1))
+		b.add_theme_color_override("font_outline_color", Color(0.03, 0.01, 0.05))
+		b.add_theme_constant_override("outline_size", 4)
 		b.mouse_filter = Control.MOUSE_FILTER_STOP
-		var sb := StyleBoxFlat.new()
-		sb.bg_color = Color(cor.r, cor.g, cor.b, 0.22)
-		sb.set_corner_radius_all(15)
-		sb.set_border_width_all(2)
-		sb.border_color = Color(cor.r, cor.g, cor.b, 0.55)
-		var sb_ativa := sb.duplicate() as StyleBoxFlat
-		sb_ativa.bg_color = cor
-		sb_ativa.border_color = cor.lightened(0.3)
+		# o mesmo selo do número do cartão, apagado; a região actual acende
+		# a tinta MULTIPLICA a pedra roxa: sem levantar a saturacao as 20
+		# regioes saiam todas do mesmo cinzento-roxo e a pastilha deixava de
+		# dizer em que zona se esta'
+		var forte := Color(cor.r, cor.g, cor.b).lightened(0.15)
+		var sb := UI.painel("selo",
+			Color(forte.r * 0.85, forte.g * 0.85, forte.b * 0.85, 0.85), 0.0)
+		var sb_ativa := UI.painel("selo", forte.lightened(0.55) * 1.6, 0.0)
 		b.add_theme_stylebox_override("normal", sb)
 		b.add_theme_stylebox_override("hover", sb_ativa)
 		b.add_theme_stylebox_override("pressed", sb_ativa)
@@ -619,23 +664,35 @@ func _montar_topo() -> void:
 	faixa_prog.anchor_bottom = 0.0
 	faixa_prog.offset_left = -110.0
 	faixa_prog.offset_right = 110.0
-	faixa_prog.offset_top = 122.0
-	faixa_prog.offset_bottom = 132.0
+	faixa_prog.offset_top = 120.0
+	faixa_prog.offset_bottom = 138.0
 	faixa_prog.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(faixa_prog)
 
-	var trilho := ColorRect.new()
-	trilho.color = Color(1, 1, 1, 0.12)
+	# a mesma calha e o mesmo enchimento das barras da HUD
+	var trilho := Panel.new()
 	trilho.set_anchors_preset(Control.PRESET_FULL_RECT)
+	trilho.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	trilho.add_theme_stylebox_override("panel", UI.calha())
 	faixa_prog.add_child(trilho)
 
-	_prog_fill = ColorRect.new()
-	_prog_fill.color = Color(0.95, 0.5, 0.92, 0.9)
-	_prog_fill.anchor_top = 0.0
-	_prog_fill.anchor_bottom = 1.0
-	_prog_fill.anchor_left = 0.0
-	_prog_fill.anchor_right = 0.0
-	faixa_prog.add_child(_prog_fill)
+	var ench := NinePatchRect.new()
+	ench.texture = UI.textura("enchimento")
+	ench.patch_margin_top = 2 * UI.ESCALA
+	ench.patch_margin_bottom = 2 * UI.ESCALA
+	ench.axis_stretch_horizontal = NinePatchRect.AXIS_STRETCH_MODE_TILE
+	ench.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	ench.modulate = Color(0.95, 0.4, 0.9)
+	ench.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	ench.anchor_top = 0.0
+	ench.anchor_bottom = 1.0
+	ench.anchor_left = 0.0
+	ench.anchor_right = 0.0
+	ench.offset_top = UI.RECUO_BARRA
+	ench.offset_bottom = -UI.RECUO_BARRA
+	ench.offset_left = UI.RECUO_BARRA
+	_prog_fill = ench
+	faixa_prog.add_child(ench)
 
 	_prog_label = Label.new()
 	_prog_label.anchor_left = 0.5
@@ -644,8 +701,8 @@ func _montar_topo() -> void:
 	_prog_label.anchor_bottom = 0.0
 	_prog_label.offset_left = -80.0
 	_prog_label.offset_right = 80.0
-	_prog_label.offset_top = 136.0
-	_prog_label.offset_bottom = 152.0
+	_prog_label.offset_top = 142.0
+	_prog_label.offset_bottom = 158.0
 	_prog_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_prog_label.add_theme_font_size_override("font_size", 12)
 	_prog_label.add_theme_color_override("font_color", Color(0.8, 0.76, 0.86, 0.85))
@@ -674,29 +731,12 @@ func _ir_para_regiao(regiao: int) -> void:
 func _estilo_botao_rodape(b: Button, principal: bool) -> void:
 	b.add_theme_font_size_override("font_size", 16 if not principal else 17)
 	b.add_theme_color_override("font_color", Color(1, 0.9, 1))
-	var sb := StyleBoxFlat.new()
-	sb.set_corner_radius_all(8)
-	sb.content_margin_left = 18
-	sb.content_margin_right = 18
-	sb.content_margin_top = 9
-	sb.content_margin_bottom = 9
-	if principal:
-		sb.bg_color = Color(0.2, 0.08, 0.24, 0.96)
-		sb.set_border_width_all(2)
-		sb.border_color = Color(0.95, 0.5, 0.92, 0.95)
-		sb.shadow_color = Color(0.85, 0.35, 0.85, 0.4)
-		sb.shadow_size = 12
-	else:
-		sb.bg_color = Color(0.1, 0.07, 0.13, 0.85)
-		sb.set_border_width_all(1)
-		sb.border_color = Color(0.6, 0.45, 0.62, 0.6)
-	var sb_hover := sb.duplicate() as StyleBoxFlat
-	if principal:
-		sb_hover.bg_color = Color(0.32, 0.13, 0.36, 1)
-		sb_hover.shadow_size = 20
-	else:
-		sb_hover.bg_color = Color(0.2, 0.13, 0.24, 0.95)
-		sb_hover.border_color = Color(0.9, 0.55, 0.88, 0.9)
+	# o botão principal (JOGAR) é a placa acesa a magenta; os outros são a
+	# madeira apagada -- a hierarquia sai do MATERIAL, não de uma borda
+	var sb := UI.painel("painel_placa", Color(1.0, 0.55, 1.0), 6.0) if principal \
+		else UI.painel("painel_madeira", Color(0.82, 0.72, 0.9, 0.92), 6.0)
+	var sb_hover := UI.painel("painel_placa", Color(1.0, 0.78, 1.0), 6.0) if principal \
+		else UI.painel("painel_placa", Color(0.95, 0.72, 1.0), 6.0)
 	for e in ["normal", "focus", "disabled"]:
 		b.add_theme_stylebox_override(e, sb)
 	for e in ["hover", "pressed"]:
@@ -769,17 +809,17 @@ func _progresso_regiao(regiao: int) -> String:
 	return "%d / %d" % [feitos, niveis.size()]
 
 
-## Fita de estado no canto do cartão (CONCLUÍDO / TRANCADO).
+## Fita de estado no canto do cartão (CONCLUÍDO / TRANCADO). Placa de pedra
+## tingida -- a cor continua a ser o sinal, o material é que passa a ser o
+## mesmo da HUD.
 func _estilo_pill(pill: Label, cor: Color) -> void:
-	pill.add_theme_color_override("font_color", Color(0.05, 0.04, 0.06))
-	pill.add_theme_color_override("font_outline_color", Color(1, 1, 1, 0.25))
-	pill.add_theme_constant_override("outline_size", 0)
-	var sb := StyleBoxFlat.new()
-	sb.bg_color = cor
-	sb.set_corner_radius_all(7)
-	sb.shadow_color = Color(0, 0, 0, 0.4)
-	sb.shadow_size = 6
-	pill.add_theme_stylebox_override("normal", sb)
+	pill.add_theme_color_override("font_color", Color(1, 0.98, 1))
+	pill.add_theme_color_override("font_outline_color", Color(0.04, 0.02, 0.05))
+	pill.add_theme_constant_override("outline_size", 4)
+	# `selo` e não `painel_placa`: a fita tem 40 px e a moldura dos painéis
+	# grandes precisa de 60 (ver `ALT_MIN_PAINEL`).
+	pill.add_theme_stylebox_override("normal", UI.painel("selo",
+		Color(cor.r * 0.75 + 0.08, cor.g * 0.75 + 0.08, cor.b * 0.75 + 0.08), 4.0))
 
 
 func _reposicionar(instantaneo: bool) -> void:
@@ -811,6 +851,9 @@ func _reposicionar(instantaneo: bool) -> void:
 			if arte:
 				var t2 := create_tween()
 				t2.tween_property(arte, "modulate", Color(1, 1, 1) if destaque else Color(0.62, 0.62, 0.7), 0.2)
+			var bril := _cartoes[i].get("brilho") as Control
+			if bril:
+				create_tween().tween_property(bril, "modulate:a", 1.0 if destaque else 0.0, 0.2)
 		raiz.mouse_filter = Control.MOUSE_FILTER_STOP if dist <= 1 else Control.MOUSE_FILTER_IGNORE
 		if instantaneo:
 			raiz.position = alvo_pos

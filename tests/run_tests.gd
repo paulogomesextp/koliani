@@ -60,6 +60,7 @@ func _correr_tudo() -> void:
 	teste_sfx_existem()
 	teste_regioes_tem_nome_e_cor()
 	teste_pecas_de_ui_existem()
+	teste_paineis_nao_trazem_o_vizinho()
 
 	if _falhas.is_empty():
 		print("OK -- todos os testes passaram")
@@ -858,8 +859,9 @@ func teste_regioes_tem_nome_e_cor() -> void:
 ## ver o jogo -- correr `python tools/gerar_ui.py` e reimportar.
 func teste_pecas_de_ui_existem() -> void:
 	var pecas := [
-		"painel_pedra", "painel_placa", "painel_chefe", "calha", "selo",
-		"enchimento", "ico_caveira", "ico_losango", "ico_coracao",
+		"painel_pedra", "painel_placa", "painel_chefe", "painel_madeira",
+		"calha", "selo", "enchimento", "ico_caveira", "ico_losango",
+		"ico_coracao", "ico_seta_esq", "ico_seta_dir",
 	]
 	for p: String in pecas:
 		_ok(ResourceLoader.exists("res://assets/ui/%s.png" % p),
@@ -871,6 +873,58 @@ func teste_pecas_de_ui_existem() -> void:
 		_ok(tex.get_height() >= UI.ALTURA_MAX_BARRA,
 			"o enchimento tem %d px de altura, precisa de %d"
 			% [tex.get_height(), UI.ALTURA_MAX_BARRA])
+
+
+## Um painel de nine-patch tem de ser UM painel, nao um recorte que apanhou
+## o vizinho. Na folha do kit os paineis vem colados uns aos outros,
+## separados por uma risca preta -- e o `painel_madeira` estava recortado a
+## 64x64 quando o quadrado dele e' 48x48, portanto trazia meia coluna e meia
+## faixa do lado. No Godot isso desenha-se AOS BOCADOS: os botoes do rodape
+## do seletor de niveis sairam como tres blocos soltos com buracos no meio.
+##
+## O que se mede: dentro da zona ESTICAVEL da nine-patch (entre as margens)
+## nao pode haver uma coluna nem uma linha inteiramente escura -- e' isso, e
+## so' isso, que uma divisoria entre paineis e'.
+func teste_paineis_nao_trazem_o_vizinho() -> void:
+	# a `calha` fica de fora de proposito: e' o buraco escuro por onde a
+	# barra corre, quase preto de ponta a ponta, e qualquer medida de
+	# "risca escura" acusa-a inteira.
+	for nome: String in ["painel_pedra", "painel_placa", "painel_chefe",
+			"painel_madeira"]:
+		var caminho := "res://assets/ui/%s.png" % nome
+		if not FileAccess.file_exists(caminho):
+			continue   # a falta ja' e' reportada por `teste_pecas_de_ui_existem`
+		var img := Image.load_from_file(caminho)
+		if img == null:
+			_ok(false, "%s: nao abriu" % nome)
+			continue
+		var m := UI.MARGEM_PAINEL
+		var l := img.get_width()
+		var a := img.get_height()
+		if l <= m * 2 or a <= m * 2:
+			_ok(false, "%s tem %dx%d, mais pequeno que as duas margens (%d)"
+				% [nome, l, a, m * 2])
+			continue
+		var maus := 0
+		for x in range(m, l - m):
+			if _risca_escura(img, x, m, a - m, true):
+				maus += 1
+		for y in range(m, a - m):
+			if _risca_escura(img, y, m, l - m, false):
+				maus += 1
+		_ok(maus == 0,
+			"%s tem %d risca(s) a atravessa'-lo no meio -- o recorte apanhou o painel do lado (ver PAINEL_* em tools/gerar_ui.py)"
+				% [nome, maus])
+
+
+## Uma linha/coluna e' "escura" se TODOS os seus pixels no troco medido sao
+## quase pretos e opacos. `horizontal` = false mede uma linha.
+func _risca_escura(img: Image, fixo: int, de: int, ate: int, vertical: bool) -> bool:
+	for i in range(de, ate):
+		var c := img.get_pixel(fixo, i) if vertical else img.get_pixel(i, fixo)
+		if c.a < 0.9 or c.r > 0.14 or c.g > 0.14 or c.b > 0.14:
+			return false
+	return true
 
 
 func teste_packs_de_fundo_existem() -> void:
