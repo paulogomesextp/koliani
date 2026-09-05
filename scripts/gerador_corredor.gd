@@ -647,6 +647,10 @@ const INTENSAS := [
 ]
 
 
+## Só com `MAPA_CAMARAS=1`: [tipo, x] de cada câmara construída neste
+## nível. É o que o `tools/onde_esta_camara.gd` lê para saber onde ir ver.
+var _mapa_camaras: Array = []
+
 var _chao_y := 0.0     # topo do líquido mortal
 var _idx := 0
 var _dif := 0.0
@@ -1474,6 +1478,9 @@ func _flavour(par: Node2D, tipo: String, x: float, y: float) -> Vector2:
 	# nível (usado por tools/mapa_camaras.gd para saber onde ver cada uma).
 	if OS.has_environment("MAPA_CAMARAS"):
 		print("CAMARA idx=%d tipo=%s x=%.0f" % [_idx, tipo, x])
+		# e fica no NO', para o `tools/onde_esta_camara.gd` o poder ler --
+		# um `print` nao se apanha de dentro do Godot
+		_mapa_camaras.append([tipo, x])
 	match tipo:
 		"saltos": return _f_saltos(par, x, y)
 		"serras": return _f_serras(par, x, y)
