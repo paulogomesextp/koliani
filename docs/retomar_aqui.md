@@ -8,37 +8,46 @@
 
 # ⇢ COMEÇA AQUI
 
-O pedido **"uma mecânica nova por nível"** está **implementado**: as 100
-linhas da `MECANICA_DO_NIVEL` têm dona, **zero provisórias** (eram 52 no
-início da sessão). Os sete "grandes" ficaram todos feitos, incluindo o
-gancho e a gravidade invertida.
+**v0.13.0.** A sessão da manhã de 5 set fechou os dois pedidos do
+telemóvel e desenhou mais 15 chefes. Por ordem, o que eu faria a seguir:
 
-**O que falta é JOGAR.** Nada disto foi playtestado -- as três bancadas
-garantem que se constrói e que as regras mordem, não que sabe bem:
+1. **Jogar no telemóvel.** Os controlos de toque são novos de raiz
+   (`scripts/controlos_tacteis.gd`): joystick à esquerda, Projéteis /
+   Espada / Escudo / **Salto** à direita, pausa em cima. **Dash e Rolar
+   ficaram sem botão** — foi o pedido (quatro), mas é a primeira coisa a
+   confirmar a jogar: se houver um vão que só se faz com dash, falta lá um
+   botão. Fotografa-se com `tools/shot_toque.gd` (precisa de janela).
+2. **O bot precisa de saber subir escadas.** A primeira corrida completa
+   dos 100 níveis (`tools/correr_bot_todos.py`, ~1h) deu 65 "não passou
+   dali" — e param todos entre os 496 e os 530 px do spawn, na mesma
+   escada de 104 px de subida por degrau. Não são 65 softlocks; é uma peça
+   só. Detalhe em [`relatorio_bot.md`](relatorio_bot.md). Enquanto ele
+   parar ali, os 100 níveis continuam por verificar a partir dos 500 px.
+3. **Arte dos chefes: faltam 80.** Regiões I a IV feitas (20/100). A
+   seguir são as Regiões V (Cidade Corrompida) e VI (Castelo de Zeriko),
+   que fecham os 30 originais. Receita e armadilhas na secção "EM CURSO"
+   mais abaixo.
+4. **Playtestar as 100 mecânicas**, que continuam sem ser jogadas.
 
-```bash
-"...Godot..._console.exe" --headless --script res://tests/run_tests.gd
-"...Godot..._console.exe" --headless --script res://tools/verifica_actores_novos.gd
-"...Godot..._console.exe" --headless --script res://tools/verifica_jornada.gd
-```
+## O que entrou nesta sessão
 
-Por ordem, o que eu faria a seguir:
-
-1. **Jogar os níveis das mecânicas novas** e afinar números. Os que mais
-   podem estar mal: `gancho` (53) -- a força do balanço e o empurrão ao
-   largar; `invertido` (67) -- o pé-direito da sala e o sítio das placas;
-   `conves` (78) e `engrenagens` (56) -- é a peça mais nova e a única que
-   depende de a Koliani se aguentar num chão a rodar.
-2. **O `tools/bot_gauntlet.gd` continua avariado** (acusa softlock no
-   Nível 1, a 150 px do spawn). Enquanto assim estiver, nenhuma câmara
-   pode ser dada como verificada sem ser à mão. Está no painel como
-   crítico, e agora custa mais: são 26 câmaras novas por verificar.
-3. **Arte própria dos 100 chefes** -- o pedido que estava a seguir na fila
-   (ver mais abaixo).
-
-Duas coisas ficaram de fora **de propósito** e estão escritas: escalar
-paredes e agarrar bordas continuam a assumir a gravidade normal (não
-aparecem na sala do N67), e o `PontoGancho` só engata no ar.
+- **Controlos de toque de raiz.** O que lá estava eram sete
+  `TouchScreenButton` **sem textura nenhuma** em píxeis fixos
+  (`y = 560..620`, só certo a 720 de alto): invisíveis, e fora do sítio em
+  qualquer telemóvel. Multi-toque a sério, evento só marcado como tratado
+  quando é nosso (senão tirava o toque aos botões WEAPONS/ARMOR e ao balão
+  de fala), e larga tudo ao esconder-se.
+- **O zoom do telemóvel.** O `stretch/aspect` é `expand`: a 20:9 o viewport
+  vai a 1600x720 e via-se 25% mais mundo à largura. A câmara
+  (`camera_tremor.gd`) sobe o zoom na mesma proporção. Mexer no `aspect`
+  resolvia o mundo mas tirava ecrã à UI.
+- **15 chefes novos** (Regiões II, III e IV). O nome `rei_ossario` já era
+  de um rig de pack **em uso** no nível 16 — o emprestado passou a
+  `rei_ossario_pack` e a cena aponta para lá, portanto o jogo está
+  exactamente como estava.
+- **A Essência ligava o `monitoring` no `_ready`** e ela nasce dentro do
+  `receber_dano` do bicho, a meio do passo de física: dava "Can't change
+  this state while flushing queries" e a moeda ficava sem área nenhuma.
 
 ---
 
