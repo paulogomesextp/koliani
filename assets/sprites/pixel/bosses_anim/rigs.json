@@ -731,5 +731,195 @@
    "hurt": 12.0,
    "death": 10.0
   }
+ },
+ "carcereiro": {
+  "w": 234,
+  "h": 210,
+  "pes_y": 196,
+  "estados": {
+   "idle": 6,
+   "walk": 8,
+   "attack": 10,
+   "hurt": 4,
+   "death": 10
+  },
+  "fps": {
+   "idle": 7.0,
+   "walk": 11.0,
+   "attack": 14.0,
+   "hurt": 12.0,
+   "death": 10.0
+  }
+ },
+ "ignivar": {
+  "w": 226,
+  "h": 240,
+  "pes_y": 204,
+  "estados": {
+   "idle": 6,
+   "walk": 8,
+   "attack": 10,
+   "hurt": 4,
+   "death": 10
+  },
+  "fps": {
+   "idle": 7.0,
+   "walk": 11.0,
+   "attack": 14.0,
+   "hurt": 12.0,
+   "death": 10.0
+  }
+ },
+ "dama_guilhotina": {
+  "w": 208,
+  "h": 264,
+  "pes_y": 228,
+  "estados": {
+   "idle": 6,
+   "walk": 8,
+   "attack": 10,
+   "hurt": 4,
+   "death": 10
+  },
+  "fps": {
+   "idle": 7.0,
+   "walk": 11.0,
+   "attack": 14.0,
+   "hurt": 12.0,
+   "death": 10.0
+  }
+ },
+ "irmaos_condenados": {
+  "w": 150,
+  "h": 182,
+  "pes_y": 146,
+  "estados": {
+   "idle": 6,
+   "walk": 8,
+   "attack": 10,
+   "hurt": 4,
+   "death": 10
+  },
+  "fps": {
+   "idle": 7.0,
+   "walk": 11.0,
+   "attack": 14.0,
+   "hurt": 12.0,
+   "death": 10.0
+  }
+ },
+ "primeiro_prisioneiro": {
+  "w": 220,
+  "h": 228,
+  "pes_y": 198,
+  "estados": {
+   "idle": 6,
+   "walk": 8,
+   "attack": 10,
+   "hurt": 4,
+   "death": 10
+  },
+  "fps": {
+   "idle": 7.0,
+   "walk": 11.0,
+   "attack": 14.0,
+   "hurt": 12.0,
+   "death": 10.0
+  }
+ },
+ "sino_vivo": {
+  "w": 164,
+  "h": 146,
+  "pes_y": 158,
+  "estados": {
+   "idle": 6,
+   "walk": 8,
+   "attack": 10,
+   "hurt": 4,
+   "death": 10
+  },
+  "fps": {
+   "idle": 7.0,
+   "walk": 11.0,
+   "attack": 14.0,
+   "hurt": 12.0,
+   "death": 10.0
+  }
+ },
+ "aerion": {
+  "w": 284,
+  "h": 298,
+  "pes_y": 262,
+  "estados": {
+   "idle": 6,
+   "walk": 8,
+   "attack": 10,
+   "hurt": 4,
+   "death": 10
+  },
+  "fps": {
+   "idle": 7.0,
+   "walk": 11.0,
+   "attack": 14.0,
+   "hurt": 12.0,
+   "death": 10.0
+  }
+ },
+ "voltaris": {
+  "w": 216,
+  "h": 252,
+  "pes_y": 216,
+  "estados": {
+   "idle": 6,
+   "walk": 8,
+   "attack": 10,
+   "hurt": 4,
+   "death": 10
+  },
+  "fps": {
+   "idle": 7.0,
+   "walk": 11.0,
+   "attack": 14.0,
+   "hurt": 12.0,
+   "death": 10.0
+  }
+ },
+ "sacerdotisa_lunar": {
+  "w": 208,
+  "h": 252,
+  "pes_y": 216,
+  "estados": {
+   "idle": 6,
+   "walk": 8,
+   "attack": 10,
+   "hurt": 4,
+   "death": 10
+  },
+  "fps": {
+   "idle": 7.0,
+   "walk": 11.0,
+   "attack": 14.0,
+   "hurt": 12.0,
+   "death": 10.0
+  }
+ },
+ "vyrak": {
+  "w": 228,
+  "h": 232,
+  "pes_y": 196,
+  "estados": {
+   "idle": 6,
+   "walk": 8,
+   "attack": 10,
+   "hurt": 4,
+   "death": 10
+  },
+  "fps": {
+   "idle": 7.0,
+   "walk": 11.0,
+   "attack": 14.0,
+   "hurt": 12.0,
+   "death": 10.0
+  }
  }
 }

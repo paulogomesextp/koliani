@@ -493,19 +493,26 @@ def _carcereiro(juntas: Juntas, pecas: list[Peca], pal: dict) -> None:
     ferro, couro = pal["metal"], pal["corpo"]
     tirar(pecas, "cabeca", "pescoco")
     # a chave: anel, haste e dentes. Nao ha' cara nenhuma -- e' isso que
-    # faz dele o Carcereiro SEM ROSTO
-    pecas.append(Peca("cabeca", elipse(0.0, -13.0, 7.5, 7.5), ferro, 2.0))
-    pecas.append(Peca("cabeca", elipse(0.0, -13.0, 3.6, 3.6), pal["detalhe"], 2.05))
-    pecas.append(Peca("cabeca", elipse(0.0, -13.0, 2.2, 2.2), MAGENTA, 2.1, brilho=True))
-    pecas.append(Peca("cabeca", caixa(-2.4, -8.0, 2.4, 8.0), ferro, 1.95))
-    pecas.append(Peca("cabeca", caixa(2.2, 1.5, 8.0, 3.6), ferro, 1.95))
-    pecas.append(Peca("cabeca", caixa(2.2, 5.0, 6.0, 7.0), ferro, 1.95))
+    # faz dele o Carcereiro SEM ROSTO.
+    #
+    # A primeira versao lia-se como uma ANTENA: o anel era pequeno, a haste
+    # fina e os dentes ficavam escondidos por tras do peitoral. A chave e'
+    # a identidade dele, portanto e' GRANDE (tao larga como os ombros),
+    # desce ate' ao peito e os dentes saem de lado, onde se veem.
+    pecas.append(Peca("cabeca", elipse(0.0, -17.0, 11.5, 11.5), ferro, 2.0))
+    pecas.append(Peca("cabeca", elipse(0.0, -17.0, 6.0, 6.0), pal["detalhe"], 2.05))
+    pecas.append(Peca("cabeca", elipse(0.0, -17.0, 3.4, 3.4), MAGENTA, 2.1, brilho=True))
+    pecas.append(Peca("cabeca", caixa(-3.4, -8.0, 3.4, 6.0), ferro, 2.15))
+    # dentes: dois, de lado e ACIMA da linha do ombro. Mais abaixo passavam
+    # por tras do peitoral e a chave voltava a ler-se como uma antena.
+    pecas.append(Peca("cabeca", caixa(3.2, -6.5, 13.0, -3.0), ferro, 2.15))
+    pecas.append(Peca("cabeca", caixa(3.2, -1.5, 10.5, 2.0), ferro, 2.15))
     # peitoral de placas e argolas de cela
     pecas.append(Peca("torso", trapezio(-24.0, 28.0, -8.0, 22.0), ferro, 0.6))
     for k in range(3):
         pecas.append(Peca("torso", elipse(-8.0 + k * 8.0, -6.0, 3.0, 3.0), ferro, 0.7))
     espinhos_ombro(pecas, "torso", ferro, -25.0, n=4, larg=26.0, alt=6.0, z=0.8)
-    veios(pecas, "cauda1", escurecer(couro, 0.4), -6.0, 0.0, 10.0, n=3)
+    veios(pecas, "anca", escurecer(couro, 0.4), -6.0, 0.0, 10.0, n=3)
     # correntes penduradas dos pulsos: sao os chicotes dele
     corrente(pecas, "cotovelo_t", 0.0, 12.0, 6, 4.0, escurecer(ferro, 0.3), z=-1.6)
     corrente(pecas, "cotovelo_f", 0.0, 12.0, 7, 4.0, ferro, z=3.7)
@@ -520,13 +527,16 @@ def _ignivar(juntas: Juntas, pecas: list[Peca], pal: dict) -> None:
     pecas.append(Peca("torso", [(-11.0, -18.0), (11.0, -18.0), (13.0, 4.0),
                                 (-13.0, 4.0)], pal["corpo2"], 0.6))
     veios(pecas, "torso", escurecer(pal["corpo2"], 0.45), -8.0, -14.0, 2.0, n=4, z=0.65)
-    # cabeca: elmo de forja com a viseira acesa a laranja
+    # cabeca: elmo de forja com a viseira acesa a laranja. SEM chifres e
+    # com a chama atras da cabeca em vez de nos ombros -- com as duas
+    # coisas o elmo lia-se como uma cara de raposa, orelhas e tudo.
     elmo(pecas, "cabeca", ferro, r=8.0, c_olho=brasa)
-    chifres(pecas, "cabeca", ferro, alt=8.0, aber=7.0, z=1.9)
-    # as chamas da forja saem-lhe dos ombros
+    for x, y, alt in ((-6.0, -7.0, 7.0), (0.0, -9.0, 5.5), (6.5, -6.5, 6.5)):
+        chama(pecas, "cabeca", x, y, alt, brasa, z=1.7)
+    # as pauliteiras dos ombros sao de ferro macico: e' um ferreiro
     for j, z in (("ombro_t", -1.3), ("ombro_f", 3.5)):
-        pecas.append(Peca(j, elipse(0.0, 0.0, 8.0, 6.5), ferro, z))
-        chama(pecas, j, 0.0, -4.0, 11.0, brasa, z=z + 0.1)
+        pecas.append(Peca(j, elipse(0.0, 0.0, 8.5, 7.0), ferro, z))
+        pecas.append(Peca(j, caixa(-6.0, -1.5, 6.0, 1.5), escurecer(ferro, 0.3), z + 0.05))
     martelo(pecas, "arma", cor("3a2a1c"), ferro, comp=24.0)
     # rachas incandescentes na pele, como metal ao rubro
     for x, y in ((-6.0, -10.0), (4.0, -14.0), (-2.0, -4.0)):
@@ -578,8 +588,9 @@ def _primeiro_prisioneiro(juntas: Juntas, pecas: list[Peca], pal: dict) -> None:
     # cabeca encovada, cabelo comprido a tapar a cara: foi um heroi, agora
     # e' um homem que ninguem reconhece
     pecas.append(Peca("cabeca", elipse(0.0, -4.0, 6.8, 7.2), pele, 2.0))
-    pecas.append(Peca("cabeca", [(-8.0, -10.0), (7.0, -11.0), (8.0, 2.0),
-                                 (-1.0, 10.0), (-9.0, 3.0)], pal["detalhe"], 2.1))
+    pecas.append(Peca("cabeca", [(-8.0, -10.0), (7.0, -11.0), (8.5, -3.0),
+                                 (3.0, -6.5), (-3.0, -5.0), (-9.0, -1.0)],
+                      pal["detalhe"], 2.1))
     olhos(pecas, "cabeca", 1.0, -4.0, 1.2, MAGENTA, sep=2.8, z=2.2)
     # trapos de prisioneiro por cima do peito
     pecas.append(Peca("torso", [(-10.0, -20.0), (10.0, -20.0), (8.0, 2.0),
@@ -621,8 +632,7 @@ def _aerion(juntas: Juntas, pecas: list[Peca], pal: dict) -> None:
     # "cavaleiro alado: VOA SEMPRE; cria tornados; atira lancas"
     aco, penas = pal["metal"], pal.get("asa", pal["corpo2"])
     tirar(pecas, "cabeca", "pescoco")
-    asas(juntas, pecas, aco, penas) if False else asas(pecas, juntas, "corpo",
-                                                       0.0, -16.0, 30.0, 13.0, penas)
+    asas(pecas, juntas, "corpo", 0.0, -16.0, 30.0, 13.0, penas)
     elmo(pecas, "cabeca", aco, r=8.0, c_olho=cor("bfe9ff"),
          crista=clarear(penas, 0.2))
     # peitoral e capa curta
@@ -738,6 +748,107 @@ CHEFES: dict[str, dict] = {
         "pal": paleta("34281c", "5c1f3a", "cdbb96", "1b1410", metal="6b5f8f"),
         "cfg": {"ataque": "magia", "amp": 0.9},
         "extras": _coracao,
+    },
+
+    # ── Regiao II -- Prisao dos Condenados ───────────────────────────────
+    "carcereiro": {
+        # gigante: ombros largos, pernas curtas, e a chave por cabeca
+        "plano": "humanoide",
+        "par": {"coxa": 15.0, "canela": 14.0, "esp_perna": 12.0, "torso": 30.0,
+                "ombros": 30.0, "cintura": 18.0, "braco": 16.0, "antebraco": 15.0,
+                "esp_braco": 10.0, "cabeca": 8.0, "pescoco": 2.0},
+        "pal": paleta("3a2f28", "241d1a", "8f8272", "141010", metal="7d7f8c"),
+        "cfg": {"ataque": "golpe", "amp": 0.75},
+        "extras": _carcereiro,
+    },
+    "ignivar": {
+        "plano": "humanoide",
+        "par": {"coxa": 14.0, "canela": 13.0, "esp_perna": 10.0, "torso": 25.0,
+                "ombros": 26.0, "cintura": 16.0, "braco": 14.0, "antebraco": 14.0,
+                "esp_braco": 9.0, "cabeca": 7.0, "pescoco": 2.0},
+        "pal": paleta("2b2119", "6b3a1e", "b07a52", "17110c", metal="8a8a94",
+                      brilho="ff7a2d"),
+        "cfg": {"ataque": "golpe", "amp": 0.95},
+        "extras": _ignivar,
+    },
+    "dama_guilhotina": {
+        "plano": "flutuante",
+        "par": {"voo": 32.0, "torso": 22.0, "ombros": 16.0, "cintura": 10.0,
+                "manto": 30.0, "manto_larg": 19.0, "braco": 12.0, "antebraco": 12.0},
+        "pal": paleta("241e2c", "39121e", "cfc6d6", "120e18", metal="b9c2cc",
+                      brilho="ff4d4d"),
+        "cfg": {"ataque": "golpe", "amp": 1.1},
+        "extras": _dama_guilhotina,
+    },
+    "irmaos_condenados": {
+        # dois de uma vez: o corpo estreita-se para caber o irmao ao lado
+        "plano": "flutuante",
+        "par": {"voo": 30.0, "torso": 20.0, "ombros": 14.0, "cintura": 9.0,
+                "manto": 24.0, "manto_larg": 16.0, "braco": 11.0, "antebraco": 10.0},
+        "pal": paleta("36305a", "241f3d", "b6aee0", "16132a", metal="6d6790"),
+        "cfg": {"ataque": "magia", "amp": 1.05},
+        "extras": _irmaos_condenados,
+    },
+    "primeiro_prisioneiro": {
+        # a silhueta dela, gasta: mesmas proporcoes, ombros mais caidos
+        "plano": "humanoide",
+        "par": {"coxa": 15.0, "canela": 15.0, "esp_perna": 8.0, "torso": 23.0,
+                "ombros": 19.0, "cintura": 12.0, "braco": 13.0, "antebraco": 12.0,
+                "esp_braco": 6.0, "cabeca": 7.0, "pescoco": 3.0},
+        # tons claros de proposito: a versao escura lia-se como uma
+        # mancha preta e ele TEM de se ler como um heroi gasto
+        "pal": paleta("7a6f5c", "50493c", "cdae90", "3a3226", metal="b9b2d6"),
+        "cfg": {"ataque": "golpe", "amp": 1.0},
+        "extras": _primeiro_prisioneiro,
+    },
+
+    # ── Regiao III -- Torres Esquecidas ──────────────────────────────────
+    "sino_vivo": {
+        "plano": "objeto",
+        "par": {"alt": 20.0, "sino_a": 38.0, "sino_l": 36.0, "braco": 12.0,
+                "esp_braco": 5.0, "cabeca": 6.5},
+        "pal": paleta("8a6a2c", "b08a3c", "c9bfae", "20180c", metal="6f5722"),
+        "cfg": {"amp": 1.2},
+        "extras": _sino_vivo,
+    },
+    "aerion": {
+        # VOA SEMPRE -- por isso flutuante e nao humanoide; as asas sao dele
+        "plano": "flutuante",
+        "par": {"voo": 36.0, "torso": 23.0, "ombros": 19.0, "cintura": 12.0,
+                "manto": 18.0, "manto_larg": 17.0, "braco": 13.0, "antebraco": 12.0},
+        "pal": paleta("22304a", "5d7ea8", "cdd8e6", "121a2a", metal="9fb2c8",
+                      brilho="bfe9ff", asa="d8e6f2"),
+        "cfg": {"ataque": "golpe", "amp": 1.15},
+        "extras": _aerion,
+    },
+    "voltaris": {
+        "plano": "flutuante",
+        "par": {"voo": 32.0, "torso": 21.0, "ombros": 16.0, "cintura": 10.0,
+                "manto": 30.0, "manto_larg": 21.0, "braco": 12.0, "antebraco": 11.0},
+        "pal": paleta("1e2a3e", "2c4a63", "d8d2c0", "101823", metal="7f93a8",
+                      brilho="9fd8ff"),
+        "cfg": {"ataque": "magia", "amp": 1.2},
+        "extras": _voltaris,
+    },
+    "sacerdotisa_lunar": {
+        "plano": "flutuante",
+        "par": {"voo": 34.0, "torso": 21.0, "ombros": 15.0, "cintura": 10.0,
+                "manto": 32.0, "manto_larg": 20.0, "braco": 12.0, "antebraco": 11.0},
+        "pal": paleta("2b2648", "3a3468", "e8dcc8", "161335", metal="c9c2e8",
+                      brilho="dfe6ff"),
+        "cfg": {"ataque": "magia", "amp": 1.0},
+        "extras": _sacerdotisa_lunar,
+    },
+    "vyrak": {
+        # dragao: o plano alado da-lhe pescoco, cauda e asas de membrana
+        "plano": "alado",
+        "par": {"voo": 30.0, "corpo_c": 40.0, "corpo_a": 19.0, "pescoco": 16.0,
+                "cabeca": 8.5, "asa1": 30.0, "asa2": 26.0, "asa_esp": 18.0,
+                "cauda": 22.0, "perna": 15.0},
+        "pal": paleta("1a1626", "2e2444", "d8d0e6", "0d0a16", metal="5a4f78",
+                      asa="241d38"),
+        "cfg": {"amp": 1.1},
+        "extras": _vyrak,
     },
 }
 
