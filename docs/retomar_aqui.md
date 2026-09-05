@@ -45,6 +45,36 @@ espaça os outros 3000 px, portanto "a mais perto" é de confiança.
 
 ---
 
+# Seletor de níveis — **FEITO** (5 set 2026, `5909970`)
+
+Era o último ecrã todo desenhado por código. Passa a vestir as peças da
+HUD (`scripts/ui.gd`, pack anokolisa recolorido): cartão em moldura de
+pedra tingida pela região com **interior escuro** por dentro, selo do
+número igual ao do cabeçalho, fitas e pastilhas em `selo`, setas com
+`ico_seta_*`, rodapé de madeira com o JOGAR em placa magenta, e a barra de
+progresso na calha + enchimento das barras.
+
+Bancada nova: `tools/shot_seletor.gd` (precisa de janela, `--screen 1`).
+
+## Duas armadilhas da nine-patch (não voltar a descobrir)
+
+1. **`painel_madeira.png` não era um painel — eram quatro.** Na folha do
+   kit os painéis vêm colados uns aos outros e o quadrado da madeira é
+   **48x48**, não 64x64 como o do pergaminho; o recorte levava meia coluna
+   e meia faixa do lado, e no Godot desenhava-se **aos bocados** (os botões
+   do rodapé saíam como três blocos soltos). Divisórias medidas na folha:
+   `x = 16 | 64 | 79`, `y = 224 | 272 | 287`. Corrigido em
+   `tools/gerar_ui.py`; guardado por `teste_paineis_nao_trazem_o_vizinho`.
+2. **Abaixo de 60 px de altura a nine-patch dos painéis grandes colapsa** —
+   são 30 px de moldura de cada lado (`UI.MARGEM_PAINEL`). Peças mais
+   baixas usam o `selo` (15 px de moldura, aguenta até 30 px).
+
+E uma de desenho: o brilho de selecção teve de sair para um **nó separado
+por baixo** do cartão — uma `StyleBoxTexture` não tem sombra, e era a
+sombra que fazia o cartão do meio saltar à frente dos vizinhos.
+
+---
+
 # ⚠ EM CURSO — arte própria dos 100 chefes
 
 **O Paulo aprovou o conceito e alargou o pedido a TODOS os níveis:**
