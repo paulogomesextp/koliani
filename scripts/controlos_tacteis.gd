@@ -29,11 +29,16 @@ class_name ControlosTacteis
 
 ## Acções, na ordem em que se desenham. `r` é o raio em píxeis a 720 de
 ## altura de viewport; tudo isto é multiplicado pela escala do ecrã.
+##
+## Os TAMANHOS são a ordem de importância que ele deu (5 set 2026):
+## Salto e Investida os maiores, depois os tiros e a espada, e o
+## Escudo o mais pequeno. Não é enfeite: o polegar acerta no grande
+## sem olhar, e é isso que decide o que se faz a correr.
 const BOTOES := [
-	{"accao": "lancar", "r": 46.0, "dx": -168.0, "dy": -138.0, "icone": "projetil"},
-	{"accao": "defender", "r": 46.0, "dx": -34.0, "dy": -152.0, "icone": "escudo"},
-	{"accao": "atacar", "r": 52.0, "dx": -148.0, "dy": -8.0, "icone": "espada"},
-	{"accao": "dash", "r": 44.0, "dx": -268.0, "dy": -56.0, "icone": "dash"},
+	{"accao": "defender", "r": 40.0, "dx": -282.0, "dy": -60.0, "icone": "escudo"},
+	{"accao": "lancar", "r": 50.0, "dx": -190.0, "dy": -170.0, "icone": "projetil"},
+	{"accao": "atacar", "r": 50.0, "dx": -40.0, "dy": -158.0, "icone": "espada"},
+	{"accao": "dash", "r": 60.0, "dx": -158.0, "dy": -34.0, "icone": "dash"},
 	{"accao": "saltar", "r": 70.0, "dx": 0.0, "dy": 0.0, "icone": "salto"},
 ]
 
@@ -148,6 +153,8 @@ func _levantar(index: int) -> bool:
 	if o == "":
 		_premir("mover_esquerda", false)
 		_premir("mover_direita", false)
+		_premir("mirar_cima", false)
+		_premir("mirar_baixo", false)
 		_joy_actual = _joy_base
 	else:
 		_premir(o, false)
@@ -164,6 +171,16 @@ func _mexer_joystick(pos: Vector2) -> void:
 	var morta := _joy_raio * 0.26
 	_premir("mover_direita", d.x > morta)
 	_premir("mover_esquerda", d.x < -morta)
+	# O EIXO DE CIMA/BAIXO É A MIRA. Sem isto, no telemóvel os projéteis só
+	# saíam na horizontal: a mira lê o `mirar_cima`/`mirar_baixo`, que só
+	# estavam no W e no S do teclado -- não havia nada que os carregasse.
+	#
+	# A zona morta vertical é MAIOR do que a horizontal: andar é o que se
+	# faz sempre, e com a mesma folga dos lados o polegar pousado agachava
+	# ou apontava para cima sem se querer.
+	var morta_y := _joy_raio * 0.5
+	_premir("mirar_baixo", d.y > morta_y)
+	_premir("mirar_cima", d.y < -morta_y)
 	queue_redraw()
 
 
@@ -210,13 +227,20 @@ func _draw() -> void:
 	draw_circle(_joy_actual, _joy_raio * 0.42, c_polegar)
 	draw_arc(_joy_actual, _joy_raio * 0.42, 0.0, TAU, 32,
 		C_BORDA_PRESSA if mexido else C_BORDA, 2.5 * _escala, true)
-	# as duas setas do aro dizem para que lado é que isto serve
+	# as setas do aro dizem para que lados é que isto serve. São QUATRO: o
+	# eixo de cima/baixo passou a ser a mira dos tiros, e um controlo que
+	# faz uma coisa sem a mostrar é um controlo que ninguém descobre.
 	for lado in [-1.0, 1.0]:
-		var p := _joy_base + Vector2(lado * _joy_raio * 0.72, 0.0)
 		var a := 8.0 * _escala
+		var ph := _joy_base + Vector2(lado * _joy_raio * 0.72, 0.0)
 		draw_colored_polygon(PackedVector2Array([
-			p + Vector2(lado * a, 0.0), p + Vector2(-lado * a * 0.5, -a * 0.8),
-			p + Vector2(-lado * a * 0.5, a * 0.8)]), C_BORDA)
+			ph + Vector2(lado * a, 0.0), ph + Vector2(-lado * a * 0.5, -a * 0.8),
+			ph + Vector2(-lado * a * 0.5, a * 0.8)]), C_BORDA)
+		# as verticais são mais fracas: mirar é o gesto raro, andar é o de sempre
+		var pv := _joy_base + Vector2(0.0, lado * _joy_raio * 0.72)
+		draw_colored_polygon(PackedVector2Array([
+			pv + Vector2(0.0, lado * a), pv + Vector2(-a * 0.8, -lado * a * 0.5),
+			pv + Vector2(a * 0.8, -lado * a * 0.5)]), Color(C_BORDA, C_BORDA.a * 0.6))
 
 	# pausa: duas barras, o símbolo de sempre
 	draw_circle(_pausa_centro, R_PAUSA * _escala, C_FUNDO)

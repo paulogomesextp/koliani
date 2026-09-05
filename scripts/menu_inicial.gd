@@ -69,10 +69,11 @@ func _ready() -> void:
 	_hardcore.pressed.connect(_ao_hardcore)
 	_opcoes.pressed.connect(_abrir_opcoes)
 	_dev.pressed.connect(_ao_dev_mode)
-	_sair.pressed.connect(func() -> void: get_tree().quit())
+	_sair.pressed.connect(_ao_sair)
 
 	Textos.idioma_mudou.connect(func(_l: String) -> void: _traduzir())
 	_traduzir()
+	_arrumar_sair()
 	# caveira a seguir a "HARDCORE MODE" (a fonte do jogo não tem o glifo ☠,
 	# por isso é um ícone desenhado em código, alinhado à direita do texto)
 	_hardcore.icon = _tex_caveira()
@@ -162,6 +163,35 @@ func _tex_caveira() -> ImageTexture:
 
 
 ## (Re)escreve todo o texto do menu no idioma atual.
+## SAIR. `get_tree().quit()` fecha o executável de Windows e a app de
+## Android -- mas na WEB não faz nada: o Godot corre dentro de um separador
+## e não é ele que manda nele. O Paulo carregou no QUIT do telemóvel e não
+## aconteceu nada.
+##
+## Na web tenta-se o `window.close()`, que o browser SÓ deixa numa janela
+## que não seja um separador normal -- e é esse o caso quando o jogo foi
+## instalado como atalho (a PWA corre em `display-mode: standalone`). Num
+## separador o browser recusa em silêncio, e por isso o botão só aparece
+## quando há alguma hipótese de ele funcionar: um QUIT que nunca faz nada
+## é pior do que não ter QUIT.
+func _ao_sair() -> void:
+	if OS.has_feature("web"):
+		JavaScriptBridge.eval("window.close()", true)
+		return
+	get_tree().quit()
+
+
+## Num separador de browser o QUIT não pode funcionar -- esconde-se. Numa
+## app instalada (PWA) fica, porque aí o `window.close()` é aceite.
+func _arrumar_sair() -> void:
+	if not OS.has_feature("web"):
+		return
+	var instalada: Variant = JavaScriptBridge.eval(
+		"(window.matchMedia && (matchMedia('(display-mode: standalone)').matches"
+		+ " || navigator.standalone === true)) ? 1 : 0", true)
+	_sair.visible = int(instalada) == 1
+
+
 func _traduzir() -> void:
 	_subtitulo.text = Textos.t("game.subtitle")
 	_novo.text = Textos.t("menu.new_game")

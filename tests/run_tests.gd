@@ -618,6 +618,27 @@ func teste_controlos_tacteis_fixos() -> void:
 	c.call("_levantar", 0)
 	_ok(not Input.is_action_pressed("mover_direita"), "não largou o mover_direita")
 
+	# O EIXO DE CIMA/BAIXO É A MIRA. Sem isto os projéteis do telemóvel só
+	# saíam na horizontal: `mirar_cima`/`mirar_baixo` só estavam no W e no S
+	# do teclado, e no telemóvel não há nada que carregue numa tecla.
+	c.call("_pousar", 1, Vector2(base.x + 20.0, base.y - 200.0))
+	_ok(Input.is_action_pressed("mirar_cima"),
+		"empurrar o joystick para CIMA devia apontar para cima")
+	c.call("_levantar", 1)
+	_ok(not Input.is_action_pressed("mirar_cima"), "não largou o mirar_cima")
+
+	# e a zona morta vertical é maior: o polegar pousado não pode agachar
+	c.call("_pousar", 2, Vector2(base.x + 200.0, base.y + 26.0))
+	_ok(Input.is_action_pressed("mover_direita"), "o lado devia ler-se")
+	_ok(not Input.is_action_pressed("mirar_baixo"),
+		"26 px de queda do polegar não podem contar como apontar para baixo")
+	c.call("_levantar", 2)
+
+	# a mira ao meio (diagonal): é isto que dá o tiro a 45 graus
+	var diag := Movimento.direcao_mira(1.0, -1.0, 1.0)
+	_ok(is_equal_approx(diag.x, diag.y * -1.0) and diag.x > 0.6,
+		"direita+cima devia dar 45 graus e deu %s" % diag)
+
 	# o botão do dash existe e carrega mesmo a acção "dash"
 	var accoes := {}
 	for b: Dictionary in ControlosTacteis.BOTOES:
@@ -632,10 +653,13 @@ func teste_controlos_tacteis_fixos() -> void:
 			var si: Array = c.call("_sitio", ControlosTacteis.BOTOES[i])
 			var sj: Array = c.call("_sitio", ControlosTacteis.BOTOES[j])
 			var d: float = (si[0] as Vector2).distance_to(sj[0] as Vector2)
-			_ok(d > float(si[1]) + float(sj[1]),
-				"os botões '%s' e '%s' sobrepõem-se (%.0f px entre centros, %.0f de raios)"
+			# 1.15 é a folga com que o `_pousar` aceita um toque: o que não se pode
+			# tocar são as ÁREAS SENSÍVEIS, não os círculos desenhados
+			var soma := (float(si[1]) + float(sj[1])) * 1.15
+			_ok(d > soma,
+				"os botões '%s' e '%s' sobrepõem-se (%.0f px entre centros, precisam de %.0f)"
 					% [ControlosTacteis.BOTOES[i]["accao"], ControlosTacteis.BOTOES[j]["accao"],
-						d, float(si[1]) + float(sj[1])])
+						d, soma])
 	c.free()
 
 
