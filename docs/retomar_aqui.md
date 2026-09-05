@@ -45,6 +45,89 @@ espaça os outros 3000 px, portanto "a mais perto" é de confiança.
 
 ---
 
+# ⇢ AMANHÃ COMEÇA AQUI — chefes com arte própria (os 100)
+
+É o **#2 do painel** e o próximo pedido a atacar (decidido com o Paulo,
+5 set 2026). O passo imediato: **ligar os 10 chefes das Regiões II e III à
+tabela `CHEFES`** de `tools/gerar_chefes_anim.py`. As funções `extras` deles
+já estão escritas (`_carcereiro`, `_ignivar`, `_dama_guilhotina`,
+`_irmaos_condenados`, `_primeiro_prisioneiro`, `_sino_vivo`, `_aerion`,
+`_voltaris`, `_sacerdotisa_lunar`, `_vyrak`) — falta a entrada no dicionário
+`CHEFES` com plano de corpo, proporções e paleta. O detalhe está na secção
+"EM CURSO — arte própria dos 100 chefes", mais abaixo.
+
+Planos de corpo já medidos (poupa a leitura): `_carcereiro`, `_ignivar` e
+`_primeiro_prisioneiro` são **humanoide**; `_dama_guilhotina`,
+`_irmaos_condenados`, `_voltaris` e `_sacerdotisa_lunar` são **flutuante**;
+`_sino_vivo` é **objeto**; `_aerion` é **alado**; `_vyrak` é **quadrupede**.
+
+---
+
+# Uma mecânica de estreia por nível — **BASE FEITA** (5 set 2026, `9e844ee`)
+
+O Paulo: *"o meu objetivo é tornar o jogo mais variado e menos repetitivo,
+100 níveis a fazer a mesma coisa e o mesmo padrão cansa o player"*, e deu
+luz verde para avançar como eu achasse.
+
+O que fazia os 100 níveis saberem ao mesmo **não era só faltarem
+mecânicas** — eram três coisas, e as três estão medidas:
+
+1. o **sorteio**: cada nível tirava câmaras à sorte da pool da sua região, e
+   os 5 níveis de uma região partilham a pool. Do nível 30 em diante todos
+   viam o mesmo saco;
+2. **todos** os níveis tinham torres E poços E pilares (o ramo vertical
+   dispara de 2 em 2 e sorteava entre as três);
+3. **todos** tinham um pouco de arena, corredor, cripta e forquilha.
+
+Agora: `MECANICA_DO_NIVEL` (100 entradas) — cada nível estreia uma mecânica
+que entra garantidamente, nada aparece antes do nível onde estreia (isto
+substituiu o `TIER_FLAVOUR`), as estreias recentes pesam a dobrar, e cada
+nível tem **uma** família vertical e **uma** sala especial, em ciclos de 3 e
+4 desfasados (o padrão só volta de 24 em 24).
+
+## Medido, não opinado
+
+O `verifica_jornada.gd` calcula agora a sobreposição de Jaccard das câmaras
+entre níveis **seguidos**:
+
+| | |
+|---|---|
+| gerador antigo | **0.372** |
+| + estreia garantida | 0.344 |
+| + uma vertical por nível | **0.288** — 23% menos |
+
+**Duas tentativas que PIORARAM** (não repetir): dar a cada nível um "menu"
+de 5 câmaras da pool da região (0.357) e limitar o forçador de variedade à
+sala especial do nível (0.337). As duas cortam tipos DENTRO do nível, e um
+nível mais pobre não é um nível mais distinto.
+
+## O que falta
+
+As 32 câmaras que existem estreiam nos níveis 1-32. As entradas marcadas
+`# ~` (níveis 33-100) são **provisórias** — repetem uma câmara porque o
+actor próprio ainda não existe. São a lista de trabalho: trocar uma por uma
+mecânica nova não mexe em mais nada. Decisões tomadas com ele: não se corta
+nenhum dos 14 "grandes" (agrupa-se Planar+Asas, e Torre-a-desabar/Avalanche/
+Queda numa máquina só); estreia **mansa até ao 30, dura no 2.º acto**;
+jornada procedural fica. A proposta completa está em
+`docs/mecanicas_por_nivel.md`.
+
+> ⚠ **Número errado que estava na proposta:** ela dizia que 99 níveis eram
+> salas à mão (`corredor = false`). Medido: é **1** (`O_Trono_de_Zeriko`).
+> Por isso a tabela não custou trabalho manual nenhum.
+
+## GOTCHA que custou duas vezes no mesmo dia
+
+Em `--script` **os autoloads não existem como identificador**. Tocar numa
+classe que os use (`GeradorCorredor`, `Checkpoint`) faz o script de teste
+**falhar a compilar EM SILÊNCIO** — o `verifica_jornada` chegou a dizer
+"TUDO OK" tendo verificado 2 níveis em 100, e um teste da suite passou sem
+medir nada. A regra: nas ferramentas `--script` e nos testes, ler do **nó**
+(`ger.get("_estreia_cam")`) ou do **código-fonte** (`_fonte(...)`), nunca da
+classe. E provar sempre que a asserção morde, partindo-a de propósito.
+
+---
+
 # Seletor de níveis — **FEITO** (5 set 2026, `5909970`)
 
 Era o último ecrã todo desenhado por código. Passa a vestir as peças da
