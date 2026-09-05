@@ -16,6 +16,11 @@ const COR_LUZ := Color(1.0, 0.76, 0.32)
 
 var _ativo := false
 var _t := 0.0
+## Esta fogueira é a ÚLTIMA do nível -- a que está ao pé da arena. Acendê-la
+## já arranca a música de combate do chefe. Pedido do Paulo (5 set 2026): a
+## cama de chefe só entrava ao 1.º golpe (`ChefeBase.provocar`) e a tensão
+## chegava tarde; ele quer-a a começar quando vê a fogueira.
+var _ultimo := false
 var _base: Node2D
 var _lenha: Node2D
 var _chama: CPUParticles2D
@@ -37,8 +42,39 @@ func _ready() -> void:
 	# repete no fim do frame -- garante que as plataformas já estão no
 	# espaço de física (senão a fogueira ficava a flutuar em alguns níveis).
 	_pousar.call_deferred()
+	# idem: o chefe só se junta ao grupo "chefes" no `_ready` dele, e o
+	# `main.gd` só põe a cama de ambiente depois dos filhos -- avaliar (e
+	# tocar) mais cedo seria pisado por essa cama.
+	_avaliar_ultimo.call_deferred()
 	if EstadoJogo.checkpoint.is_equal_approx(global_position):
 		_ativar(true)
+
+
+## Decide se esta é a fogueira do chefe: de todas as do nível, a que está
+## mais perto da arena. É de confiança porque o gerador põe SEMPRE um
+## checkpoint mesmo antes do chefe e espaça os outros 3000 px
+## (`gerador_corredor.gd`). Sem chefe no nível não faz nada.
+func _avaliar_ultimo() -> void:
+	if not is_inside_tree():
+		return
+	var chefes := get_tree().get_nodes_in_group("chefes")
+	if chefes.is_empty():
+		return
+	var arena := (chefes[0] as Node2D).global_position
+	var fogueiras: Array[Node2D] = []
+	var pos: Array[Vector2] = []
+	for c in get_tree().get_nodes_in_group("checkpoints"):
+		var n := c as Node2D
+		if n == null:
+			continue
+		fogueiras.append(n)
+		pos.append(n.global_position)
+	var i := Fogueiras.indice_da_do_chefe(pos, arena)
+	_ultimo = i >= 0 and fogueiras[i] == self
+	# recarregou a cena com esta fogueira JÁ acesa (morreu no chefe): a
+	# música de combate volta logo, sem esperar por outro golpe.
+	if _ultimo and _ativo:
+		Musica.boss()
 
 
 func _montar_visual() -> void:
@@ -212,6 +248,8 @@ func _ao_entrar(corpo: Node) -> void:
 		_ativar(false)
 		EstadoJogo.definir_checkpoint(global_position)
 		Som.toca("selo", -12.0)
+		if _ultimo:
+			Musica.boss()
 
 
 func _ativar(instantaneo: bool) -> void:

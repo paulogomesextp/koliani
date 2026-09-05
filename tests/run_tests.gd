@@ -56,6 +56,7 @@ func _correr_tudo() -> void:
 	teste_packs_de_fundo_existem()
 	teste_rigs_dos_chefes()
 	teste_camas_de_musica()
+	teste_fogueira_do_chefe()
 	teste_sfx_existem()
 	teste_regioes_tem_nome_e_cor()
 	teste_pecas_de_ui_existem()
@@ -1052,6 +1053,29 @@ func teste_camas_de_musica() -> void:
 			_ok(st.get_length() >= DUR_MINIMA,
 				"%s tem %.1f s (minimo %.0f) -- em ciclo isso repete de mais"
 					% [c, st.get_length(), DUR_MINIMA])
+
+
+## A cama do chefe passou a arrancar ao acender a fogueira que esta' ao pe'
+## da arena (pedido do Paulo, 5 set 2026) -- antes so' entrava ao 1.o golpe.
+## Quem decide qual e' a fogueira e' `Fogueiras.indice_da_do_chefe`.
+## O que se guarda aqui e' o que da' para partir sem se dar por isso: ganhar
+## a fogueira ERRADA punha musica de combate a meio do nivel.
+func teste_fogueira_do_chefe() -> void:
+	var arena := Vector2(3000.0, 600.0)
+	var pos: Array[Vector2] = [
+		Vector2(40.0, 600.0), Vector2(-4600.0, 520.0),
+		Vector2(1400.0, 636.0), Vector2(2900.0, 610.0),
+	]
+	_ok(Fogueiras.indice_da_do_chefe(pos, arena) == 3,
+		"a fogueira do chefe devia ser a mais perto da arena")
+	# a ordem na arvore nao pode contar -- so' a distancia
+	pos.reverse()
+	_ok(Fogueiras.indice_da_do_chefe(pos, arena) == 0,
+		"a escolha mudou so' por trocar a ordem das fogueiras")
+	# nivel sem fogueiras: -1, e ninguem se marca (nao ha' musica de chefe)
+	var vazio: Array[Vector2] = []
+	_ok(Fogueiras.indice_da_do_chefe(vazio, arena) == -1,
+		"sem fogueiras devia devolver -1")
 
 
 ## Todos os caminhos declarados em `Som.CAMINHOS` tem de existir. E' uma
