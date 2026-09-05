@@ -4,6 +4,12 @@ extends SceneTree
 ##  - o no' `CorredorAproximacao` existe (menos no ultimo nivel);
 ##  - a Koliani foi reposicionada BEM a' esquerda da Porta e do Chefe;
 ##  - a MECANICA DE ESTREIA do nivel (`MECANICA_DO_NIVEL`) entrou mesmo;
+##
+## NAO verifica os vaos DENTRO da jornada. Ja' se tentou: um crivo estatico
+## acusou 91 dos 100 niveis, porque a jornada e' feita de plataformas
+## MOVEIS (flutuantes, tumulos, ritmadas) que um crivo de caixas paradas nao
+## modela -- e' a mesma razao pela qual o `verifica_alcance.gd` desliga a
+## jornada de proposito. Isso so' se prova a jogar (ou com o bot).
 ##  - foram criados varios checkpoints (grupo implicito -- contamos os nos
 ##    `JornadaCheck_*`).
 ## Uso: Godot --headless --script res://tools/verifica_jornada.gd

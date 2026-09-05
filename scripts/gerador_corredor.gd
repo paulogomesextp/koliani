@@ -65,6 +65,14 @@ const VELA := preload("res://scenes/actors/Vela.tscn")
 const PLAT_LUZ := preload("res://scenes/actors/PlataformaLuz.tscn")
 const ESPELHO := preload("res://scenes/actors/Espelho.tscn")
 const ESSENCIA := preload("res://scenes/actors/Essencia.tscn")
+## Três actores que já estavam no repo e que nenhuma câmara usava -- é de
+## graça: arte, física e som já feitos, só faltava a sala onde entram.
+const PLAT_ESPECTRAL := preload("res://scenes/actors/PlataformaEspectral.tscn")
+const VITRAL := preload("res://scenes/actors/Vitral.tscn")
+const PARA_RAIOS := preload("res://scenes/actors/ParaRaios.tscn")
+## Correnteza lateral -- actor novo (5 set 2026). Só script: constrói a
+## própria área, como o `CHECKPOINT`.
+const CORRENTE_LAT := preload("res://scripts/corrente_lateral.gd")
 
 ## Líquido mortal por região: [cor, brasas]. floresta=água podre, prisão=ácido,
 ## torres=??? (usa trevas), catacumbas=trevas, cidade=ácido citrino,
@@ -255,26 +263,26 @@ const MECANICA_DO_NIVEL := [
 	{"cam": "correntes", "grau": 1},
 	{"cam": "corredor", "grau": 1},
 	{"cam": "fogo", "grau": 1},  # ~
-	{"cam": "quebra", "grau": 1},  # ~
-	{"cam": "impulso", "grau": 1},  # ~
+	{"cam": "bombas", "grau": 1},
+	{"cam": "lava_sobe", "grau": 1},
 	# --- niveis 36-40  (Regiao 8) ---
-	{"cam": "gravidade", "grau": 1},  # ~
+	{"cam": "mare", "grau": 1},
 	{"cam": "ferry", "grau": 1},  # ~
 	{"cam": "ritmo", "grau": 1},  # ~
-	{"cam": "trampolim", "grau": 1},  # ~
+	{"cam": "tapete", "grau": 1},
 	{"cam": "gravidade", "grau": 1},  # ~
 	# --- niveis 41-45  (Regiao 9) ---
 	{"cam": "vento", "grau": 1},  # ~
-	{"cam": "espelhos", "grau": 1},  # ~
-	{"cam": "pedras", "grau": 1},  # ~
-	{"cam": "saltos", "grau": 1},  # ~
+	{"cam": "chuva", "grau": 1},
+	{"cam": "vitral", "grau": 1},
+	{"cam": "espectral", "grau": 1},
 	{"cam": "espelhos", "grau": 1},  # ~
 	# --- niveis 46-50  (Regiao 10) ---
-	{"cam": "crossfire", "grau": 1},  # ~
-	{"cam": "espinhos", "grau": 1},  # ~
+	{"cam": "areia", "grau": 1},
+	{"cam": "placa", "grau": 1},
 	{"cam": "serras", "grau": 1},  # ~
 	{"cam": "prensa", "grau": 1},  # ~
-	{"cam": "crossfire", "grau": 1},  # ~
+	{"cam": "queda", "grau": 1},
 	# --- niveis 51-55  (Regiao 11) ---
 	{"cam": "pendulos", "grau": 1},  # ~
 	{"cam": "velas", "grau": 1},  # ~
@@ -285,13 +293,13 @@ const MECANICA_DO_NIVEL := [
 	{"cam": "correntes", "grau": 1},  # ~
 	{"cam": "elevador", "grau": 1},  # ~
 	{"cam": "guilhotinas", "grau": 1},  # ~
-	{"cam": "alavanca", "grau": 1},  # ~
+	{"cam": "circuito", "grau": 1},
 	{"cam": "correntes", "grau": 1},  # ~
 	# --- niveis 61-65  (Regiao 13) ---
-	{"cam": "segredo", "grau": 1},  # ~
-	{"cam": "ferry", "grau": 1},  # ~
+	{"cam": "orbita", "grau": 1},
+	{"cam": "para_raios", "grau": 1},
 	{"cam": "vento", "grau": 1},  # ~
-	{"cam": "saltos", "grau": 1},  # ~
+	{"cam": "grav_baixa", "grau": 1},
 	{"cam": "ferry", "grau": 1},  # ~
 	# --- niveis 66-70  (Regiao 14) ---
 	{"cam": "portal", "grau": 2},  # ~
@@ -316,7 +324,7 @@ const MECANICA_DO_NIVEL := [
 	{"cam": "fogo", "grau": 2},  # ~
 	{"cam": "pedras", "grau": 2},  # ~
 	{"cam": "prensa", "grau": 2},  # ~
-	{"cam": "fogo", "grau": 2},  # ~
+	{"cam": "anel", "grau": 2},
 	# --- niveis 86-90  (Regiao 18) ---
 	{"cam": "elevador", "grau": 2},  # ~
 	{"cam": "gravidade", "grau": 2},  # ~
@@ -328,7 +336,7 @@ const MECANICA_DO_NIVEL := [
 	{"cam": "crossfire", "grau": 2},  # ~
 	{"cam": "espinhos", "grau": 2},  # ~
 	{"cam": "serras", "grau": 2},  # ~
-	{"cam": "pedras", "grau": 2},  # ~
+	{"cam": "horda", "grau": 2},
 	# --- niveis 96-100  (Regiao 20) ---
 	{"cam": "trampolim", "grau": 2},  # ~
 	{"cam": "velas", "grau": 2},  # ~
@@ -372,6 +380,10 @@ const CAMARAS_FLAVOUR := [
 	"impulso", "portal", "torre", "poco", "pilares", "descanso", "forquilha",
 	"arena", "corredor", "cripta", "crossfire", "ferry", "pedras", "espinhos",
 	"alavanca", "velas", "sinos", "prensa", "espelhos", "segredo",
+	# --- estreias novas (5 set 2026) ------------------------------------
+	"lava_sobe", "mare", "espectral", "vitral", "para_raios", "bombas",
+	"queda", "tapete", "orbita", "areia", "grav_baixa", "placa",
+	"circuito", "anel", "horda", "chuva",
 ]
 
 ## Câmara "assinatura" de cada região -- no acto do meio da jornada aparece
@@ -1431,6 +1443,22 @@ func _flavour(par: Node2D, tipo: String, x: float, y: float) -> Vector2:
 		"prensa": return _f_prensa(par, x, y)
 		"espelhos": return _f_espelhos(par, x, y)
 		"segredo": return _f_segredo(par, x, y)
+		"lava_sobe": return _f_lava_sobe(par, x, y)
+		"mare": return _f_mare(par, x, y)
+		"espectral": return _f_espectral(par, x, y)
+		"vitral": return _f_vitral(par, x, y)
+		"para_raios": return _f_para_raios(par, x, y)
+		"bombas": return _f_bombas(par, x, y)
+		"queda": return _f_queda(par, x, y)
+		"tapete": return _f_tapete(par, x, y)
+		"orbita": return _f_orbita(par, x, y)
+		"areia": return _f_areia(par, x, y)
+		"grav_baixa": return _f_grav_baixa(par, x, y)
+		"placa": return _f_placa(par, x, y)
+		"circuito": return _f_circuito(par, x, y)
+		"anel": return _f_anel(par, x, y)
+		"horda": return _f_horda(par, x, y)
+		"chuva": return _f_chuva(par, x, y)
 	# tipo sem handler -> não deve acontecer (pool/assinatura mal configurada).
 	# Avisa em vez de gerar um vão morto silencioso e cai num `descanso`.
 	push_warning("GeradorCorredor: câmara '%s' sem _f_ correspondente" % tipo)
@@ -2285,3 +2313,550 @@ func _plat_fantasma(par: Node2D, pos: Vector2, tam: Vector2, grupo: String) -> v
 	var vis := p.get_node_or_null("Visual") as CanvasItem
 	if vis:
 		vis.modulate.a = 0.16
+
+
+# ── ESTREIAS NOVAS (5 set 2026) ──────────────────────────────────────────
+#
+# Dezasseis camaras construidas so' com pecas que ja' existiam. Cada uma e'
+# a ESTREIA de um nivel (ver `MECANICA_DO_NIVEL`): no nivel dela aparece
+# sozinha e manda no espaco. Nenhuma precisou de arte nova.
+#
+# Regra que todas seguem, como as antigas: recebem (x, y) da espinha,
+# constroem para a DIREITA e devolvem onde a espinha continua. Nunca deixam
+# um vao maior que um salto+duplo -- ver `SUBIDA_MAX` e `tools/verifica_alcance.gd`.
+
+
+## LAVA QUE SOBE: uma subida curta com o liquido mortal a trepar atras. Nao
+## se pode parar. O liquido e' o mesmo `AguaVenenosa` do fundo do nivel, so'
+## que este sobe em ciclo -- e' a diferenca entre "ha' lava ali em baixo" e
+## "a lava vem ai'".
+func _f_lava_sobe(par: Node2D, x: float, y: float) -> Vector2:
+	var n := 4 + int(_dif * 2.0)
+	var base_y: float = clampf(y, _teto_y + 320.0, _chao_y - 120.0)
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, base_y), Vector2(120.0, 18.0))
+	var largura := float(n) * 168.0 + 260.0
+
+	var lava := AGUA.instantiate()
+	lava.largura = largura
+	lava.altura = 300.0
+	var liq: Array = LIQUIDO.get(_regiao, LIQUIDO[0])
+	lava.cor = liq[0]
+	lava.brasas = true
+	lava.position = Vector2(x + largura * 0.5 - 100.0, base_y + 280.0)
+	par.add_child(lava)
+	# sobe ate' tapar a fiada de baixo e volta a descer -- em ciclo, para
+	# quem chegar atrasado apanhar a mare' cheia na mesma
+	var subida: float = 210.0 + 60.0 * _dif
+	var tl := create_tween().set_loops()
+	tl.tween_interval(1.2)
+	tl.tween_property(lava, "position:y", lava.position.y - subida, 2.6) \
+		.set_trans(Tween.TRANS_SINE)
+	tl.tween_interval(0.8)
+	tl.tween_property(lava, "position:y", lava.position.y, 2.0) \
+		.set_trans(Tween.TRANS_SINE)
+
+	var cy := base_y
+	for _i in n:
+		x += _rng.randf_range(150.0, 174.0)
+		cy = maxf(_teto_y + 60.0, cy - _rng.randf_range(58.0, SUBIDA_MAX))
+		_plat(par, Vector2(x, cy), Vector2(96.0, 16.0))
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(130.0, 18.0))
+	_checkpoint(x, cy, true)
+	return Vector2(x, cy)
+
+
+## MARE: o liquido sobe e desce devagar sobre uma fiada BAIXA de
+## plataformas. Ha' sempre caminho -- o que muda e' quando. Ensina a
+## esperar, que e' a coisa que a jornada nunca pedia.
+func _f_mare(par: Node2D, x: float, y: float) -> Vector2:
+	var cy: float = clampf(y, _teto_y + 240.0, _chao_y - 170.0)
+	var n := 4 + int(_dif * 2.0)
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(120.0, 18.0))
+	var x0 := x
+	var by := cy + 96.0
+	for _i in n:
+		x += _rng.randf_range(140.0, 168.0)
+		_plat(par, Vector2(x, by), Vector2(92.0, 15.0))
+	var largura := x - x0 + 300.0
+
+	var mar := AGUA.instantiate()
+	mar.largura = largura
+	mar.altura = 260.0
+	var liq: Array = LIQUIDO.get(_regiao, LIQUIDO[0])
+	mar.cor = liq[0]
+	mar.brasas = liq[1]
+	mar.position = Vector2((x0 + x) * 0.5, by + 190.0)
+	par.add_child(mar)
+	var tm := create_tween().set_loops()
+	tm.tween_property(mar, "position:y", by - 40.0, 3.2).set_trans(Tween.TRANS_SINE)
+	tm.tween_interval(0.6)
+	tm.tween_property(mar, "position:y", mar.position.y, 3.2).set_trans(Tween.TRANS_SINE)
+
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(130.0, 18.0))
+	_checkpoint(x, cy, true)
+	return Vector2(x, cy)
+
+
+## ESPECTRAL: as plataformas so' sao solidas uns segundos depois de pisadas.
+## Usa a `PlataformaEspectral`, que estava no repo sem nenhuma camara a
+## chamar. Nao se pode voltar atras -- e' a travessia so' para a frente.
+func _f_espectral(par: Node2D, x: float, y: float) -> Vector2:
+	var cy: float = clampf(y, _teto_y + 150.0, _chao_y - 150.0)
+	var n := 4 + int(_dif * 3.0)
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(120.0, 18.0))
+	for _i in n:
+		x += _rng.randf_range(142.0, 166.0)
+		cy = clampf(cy + _rng.randf_range(-52.0, 52.0), _teto_y + 90.0, _chao_y - 130.0)
+		var pe := PLAT_ESPECTRAL.instantiate()
+		pe.segundos_solida = lerpf(3.6, 1.9, _dif)
+		pe.aviso = 0.7
+		pe.position = Vector2(x, cy)
+		par.add_child(pe)
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(130.0, 18.0))
+	_checkpoint(x, cy, true)
+	return Vector2(x, cy)
+
+
+## VITRAL: uma parede de vidro colorido corta o caminho e a ponte do outro
+## lado esta' FANTASMA. Partir o vitral deixa entrar a luz e a ponte fica
+## solida. E' o unico sitio da jornada onde ATACAR e' a forma de avancar.
+func _f_vitral(par: Node2D, x: float, y: float) -> Vector2:
+	var cy: float = clampf(y, _teto_y + 200.0, _chao_y - 160.0)
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(150.0, 18.0))
+	var grupo := "vitral_luz_%d" % _camaras
+
+	var vt := VITRAL.instantiate()
+	vt.grupo_luz = grupo
+	vt.cor_luz = _cor_luz_regiao()
+	vt.position = Vector2(x + 118.0, cy - 70.0)
+	par.add_child(vt)
+
+	# a ponte que a luz acende: entra fantasma, fica solida ao partir o vidro
+	var bx := x
+	for _i in 3:
+		bx += _rng.randf_range(146.0, 168.0)
+		_plat_fantasma(par, Vector2(bx, cy - 20.0), Vector2(96.0, 16.0), grupo)
+	# ...e um caminho de recurso por baixo, para o vitral nunca ser um muro:
+	# quem nao perceber que ha' que lhe bater passa por baixo, com espinhos
+	var lx := x
+	for _i in 3:
+		lx += _rng.randf_range(140.0, 162.0)
+		_plat(par, Vector2(lx, cy + 92.0), Vector2(90.0, 14.0))
+		var sp := ESPINHOS.instantiate()
+		sp.largura = 4
+		sp.position = Vector2(lx, cy + 92.0)
+		par.add_child(sp)
+
+	x = maxf(bx, lx) + _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(130.0, 18.0))
+	_checkpoint(x, cy, true)
+	return Vector2(x, cy)
+
+
+## PARA-RAIOS: um corredor com descargas em coluna e uma haste de metal ao
+## meio. Bater na haste ARMA-a e a descarga seguinte vai para la' em vez de
+## ir para a Koliani. Usa o `ParaRaios`, que so' o chefe da tempestade usava.
+func _f_para_raios(par: Node2D, x: float, y: float) -> Vector2:
+	var cy: float = clampf(y, _teto_y + 200.0, _chao_y - 150.0)
+	var n := 3 + int(_dif * 2.0)
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(140.0, 18.0))
+	for i in n:
+		x += _rng.randf_range(152.0, 176.0)
+		_plat(par, Vector2(x, cy), Vector2(104.0, 16.0))
+		var pr := PARA_RAIOS.instantiate()
+		pr.dur_armado = lerpf(4.0, 2.4, _dif)
+		pr.position = Vector2(x, cy - 8.0)
+		par.add_child(pr)
+		var rt := RAIO.instantiate()
+		if "fase" in rt:
+			rt.fase = float(i) * 0.9
+		rt.position = Vector2(x + 74.0, cy - 150.0)
+		par.add_child(rt)
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(130.0, 18.0))
+	_checkpoint(x, cy, true)
+	return Vector2(x, cy)
+
+
+## BOMBAS: chuva de fogo. Torretas viradas para BAIXO no tecto cospem bolas
+## de fogo sobre a travessia -- o perigo vem de cima e anda, ao contrario
+## dos espinhos, que estao sempre no mesmo sitio.
+func _f_bombas(par: Node2D, x: float, y: float) -> Vector2:
+	var cy: float = clampf(y, _teto_y + 260.0, _chao_y - 150.0)
+	var n := 4 + int(_dif * 2.0)
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(120.0, 18.0))
+	for i in n:
+		x += _rng.randf_range(146.0, 172.0)
+		_plat(par, Vector2(x, cy), Vector2(100.0, 16.0))
+		if i % 2 == 0:
+			var t := TORRETA.instantiate()
+			t.direcao = Vector2(0.0, 1.0)
+			t.intervalo = lerpf(3.0, 1.7, _dif)
+			t.telegrafo = 0.6
+			t.fase = float(i) * 0.7
+			t.vel_bola = 190.0
+			t.position = Vector2(x + 40.0, cy - 210.0)
+			par.add_child(t)
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(130.0, 18.0))
+	_checkpoint(x, cy, true)
+	return Vector2(x, cy)
+
+
+## QUEDA: o nivel e' a descida. Uma coluna aberta com beirais alternados e
+## laminas nos vaos -- desce-se de propria vontade e o perigo esta' no
+## caminho, nao no fundo.
+func _f_queda(par: Node2D, x: float, y: float) -> Vector2:
+	var cy: float = clampf(y, _teto_y + 120.0, _teto_y + 260.0)
+	var n := 4 + int(_dif * 2.0)
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(140.0, 18.0))
+	var lado := 1.0
+	for i in n:
+		cy = minf(_chao_y - 130.0, cy + _rng.randf_range(120.0, 165.0))
+		x += 74.0 * lado + _rng.randf_range(30.0, 60.0)
+		_plat(par, Vector2(x, cy), Vector2(112.0, 16.0))
+		if i % 2 == 1:
+			var pd := PENDULO.instantiate()
+			pd.position = Vector2(x + 78.0, cy - 96.0)
+			par.add_child(pd)
+		lado = -lado
+	x += _rng.randf_range(160.0, 190.0)
+	_plat(par, Vector2(x, cy), Vector2(150.0, 20.0))
+	_checkpoint(x, cy, true)
+	return Vector2(x, cy)
+
+
+## TAPETE: um troco comprido com uma CORRENTEZA a empurrar para tras
+## (`CorrenteLateral`, actor novo). Anda-se contra a corrente -- o mesmo
+## salto deixa de chegar onde chegava, e parar e' recuar.
+func _f_tapete(par: Node2D, x: float, y: float) -> Vector2:
+	var cy: float = clampf(y, _teto_y + 150.0, _chao_y - 140.0)
+	var n := 3 + int(_dif * 2.0)
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(120.0, 18.0))
+	var x0 := x
+	for _i in n:
+		x += 168.0
+		_plat(par, Vector2(x, cy), Vector2(160.0, 16.0))
+	# a correnteza por cima do chao todo -- empurra CONTRA a marcha
+	var cl := CorrenteLateral.new()
+	cl.tamanho = Vector2(x - x0 + 120.0, 150.0)
+	cl.empurrao = -lerpf(520.0, 900.0, _dif)
+	cl.position = Vector2((x0 + x) * 0.5, cy - 70.0)
+	par.add_child(cl)
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(130.0, 18.0))
+	_checkpoint(x, cy, true)
+	return Vector2(x, cy)
+
+
+## ORBITA: ilhas que andam em CIRCULO. A `PlataformaFlutuante` ja' sabia
+## balancar (y) e derivar (x); com os dois ao mesmo periodo e um quarto de
+## fase de diferenca, anda em roda. Espera-se pela ilha certa.
+func _f_orbita(par: Node2D, x: float, y: float) -> Vector2:
+	var cy: float = clampf(y, _teto_y + 220.0, _chao_y - 160.0)
+	var n := 3 + int(_dif * 1.5)
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(120.0, 18.0))
+	for i in n:
+		x += _rng.randf_range(180.0, 210.0)
+		var pf := PLAT_FLUT.instantiate()
+		pf.largura = 104.0
+		pf.balanco = 62.0
+		pf.deriva = 62.0
+		pf.periodo = 3.4
+		pf.periodo_deriva = 3.4          # mesmo periodo -> circulo
+		pf.fase = float(i) * 0.6
+		pf.position = Vector2(x, cy)
+		par.add_child(pf)
+	x += _rng.randf_range(180.0, 210.0)
+	_plat(par, Vector2(x, cy), Vector2(130.0, 18.0))
+	_checkpoint(x, cy, true)
+	return Vector2(x, cy)
+
+
+## AREIA: um poco onde se PESA mais -- a `ZonaGravidade` ao contrario (1.5
+## em vez de 0.42). Cai-se depressa e sai-se a custo, com espinhos no fundo
+## a dizer que nao se pode ficar.
+func _f_areia(par: Node2D, x: float, y: float) -> Vector2:
+	var cy: float = clampf(y, _teto_y + 200.0, _chao_y - 220.0)
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(130.0, 18.0))
+	var largura := 300.0 + 90.0 * _dif
+	var fundo := cy + 150.0
+	var poco_x0 := x + 80.0
+	var poco_x1 := poco_x0 + largura
+
+	var zg := ZONA_GRAV.instantiate()
+	zg.escala = 1.5                      # o tecto do `definir_grav_escala`
+	zg.position = Vector2((poco_x0 + poco_x1) * 0.5, cy + 70.0)
+	_esticar_zona(zg, Vector2(largura, 300.0))
+	par.add_child(zg)
+
+	# fundo do poco: pisavel, mas com espinhos -- da' para respirar um
+	# instante e nao da' para ficar
+	var fx := poco_x0 + 30.0
+	while fx < poco_x1 - 60.0:
+		_plat(par, Vector2(fx, fundo), Vector2(96.0, 14.0))
+		var sp := ESPINHOS.instantiate()
+		sp.largura = 5
+		sp.position = Vector2(fx, fundo)
+		par.add_child(sp)
+		fx += 150.0
+
+	# escada de saida JA' FORA da bolsa (a partir de `poco_x1`): a 1.5 de
+	# gravidade um salto sozinho sobe ~53 px, e nao se pode contar com o
+	# salto duplo para sair de um sitio onde e' obrigatorio sair.
+	var sy := fundo
+	var sx: float = maxf(fx, poco_x1)
+	while sy > cy:
+		sx += _rng.randf_range(132.0, 152.0)
+		sy = maxf(cy, sy - 60.0)
+		_plat(par, Vector2(sx, sy), Vector2(100.0, 15.0))
+	x = sx + _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(130.0, 18.0))
+	_checkpoint(x, cy, true)
+	return Vector2(x, cy)
+
+
+## GRAVIDADE BAIXA: uma bolsa onde o salto muda de escala, com vaos que so'
+## se atravessam la' dentro. E' a mesma `ZonaGravidade` do Observatorio, mas
+## aqui e' ela que DESENHA o espaco em vez de ser um enfeite.
+func _f_grav_baixa(par: Node2D, x: float, y: float) -> Vector2:
+	var cy: float = clampf(y, _teto_y + 260.0, _chao_y - 150.0)
+	var n := 3 + int(_dif * 2.0)
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(120.0, 18.0))
+	var x0 := x
+	var largura := float(n) * 250.0 + 200.0
+
+	var zg := ZONA_GRAV.instantiate()
+	zg.escala = 0.25
+	zg.position = Vector2(x0 + largura * 0.5, cy - 40.0)
+	_esticar_zona(zg, Vector2(largura, 520.0))
+	par.add_child(zg)
+
+	# vaos que so' se atravessam LA' DENTRO. 210 px e' o tecto: a 0.25 de
+	# gravidade o salto sobe ~315 px e paira o triplo do tempo, mas o vao
+	# tem de continuar a caber caso a bolsa falhe -- 210 ainda se faz com
+	# salto duplo a gravidade normal.
+	for _i in n:
+		x += _rng.randf_range(190.0, 210.0)
+		cy = clampf(cy - _rng.randf_range(20.0, 90.0), _teto_y + 80.0, _chao_y - 150.0)
+		_plat(par, Vector2(x, cy), Vector2(94.0, 16.0))
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(130.0, 18.0))
+	_checkpoint(x, cy, true)
+	return Vector2(x, cy)
+
+
+## PLACA DE PRESSAO: uma alavanca no chao, no caminho, que FECHA uma grade
+## a' frente (`invertida`). Ensina que nem tudo o que se pode carregar se
+## deve carregar -- e ha' sempre a volta por cima.
+func _f_placa(par: Node2D, x: float, y: float) -> Vector2:
+	var cy: float = clampf(y, _teto_y + 220.0, _chao_y - 150.0)
+	var id := "placa_%d" % _camaras
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(150.0, 18.0))
+
+	x += _rng.randf_range(150.0, 172.0)
+	_plat(par, Vector2(x, cy), Vector2(120.0, 18.0))
+	var al := ALAVANCA.instantiate()
+	al.id = id
+	al.so_liga = true
+	al.position = Vector2(x, cy - 14.0)
+	par.add_child(al)
+
+	var gx := x + _rng.randf_range(300.0, 350.0)
+	var pt := PORTA_TRANCADA.instantiate()
+	pt.id = id
+	pt.invertida = true                  # carregar FECHA
+	pt.tamanho = Vector2(24.0, 150.0)
+	pt.position = Vector2(gx, cy - 76.0)
+	par.add_child(pt)
+	_plat(par, Vector2(gx, cy), Vector2(120.0, 18.0))
+
+	# a volta por cima: quem carregou na placa passa por aqui
+	var hy: float = maxf(_teto_y + 60.0, cy - 150.0)
+	var hx := x
+	for _i in 3:
+		hx += _rng.randf_range(140.0, 164.0)
+		_plat(par, Vector2(hx, hy), Vector2(92.0, 15.0))
+
+	x = maxf(gx, hx) + _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(130.0, 18.0))
+	_checkpoint(x, cy, true)
+	return Vector2(x, cy)
+
+
+## CIRCUITO: tres alavancas, uma grade que so' abre com as TRES. Sao
+## desvios curtos a partir da linha principal -- procura-se, nao se decora.
+func _f_circuito(par: Node2D, x: float, y: float) -> Vector2:
+	var cy: float = clampf(y, _teto_y + 240.0, _chao_y - 150.0)
+	var id := "circuito_%d" % _camaras
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(140.0, 18.0))
+
+	for i in 3:
+		x += _rng.randf_range(160.0, 190.0)
+		var ay := cy - float(i % 2) * 120.0
+		_plat(par, Vector2(x, ay), Vector2(114.0, 16.0))
+		if ay < cy:
+			_plat(par, Vector2(x - 78.0, cy), Vector2(90.0, 15.0))   # degrau
+		var al := ALAVANCA.instantiate()
+		al.id = id
+		al.so_liga = true
+		al.position = Vector2(x, ay - 14.0)
+		par.add_child(al)
+
+	var gx := x + _rng.randf_range(190.0, 230.0)
+	var pt := PORTA_TRANCADA.instantiate()
+	pt.id = id
+	pt.exige_todas = true
+	pt.tamanho = Vector2(24.0, 150.0)
+	pt.position = Vector2(gx, cy - 76.0)
+	par.add_child(pt)
+	_plat(par, Vector2(gx, cy), Vector2(130.0, 18.0))
+	_checkpoint(gx, cy, true)
+	return Vector2(gx, cy)
+
+
+## ANEL: uma arena redonda sobre liquido, sem cantos onde encostar. Luta-se
+## a andar a' roda -- o oposto do corredor, onde se luta de costas para a
+## parede.
+func _f_anel(par: Node2D, x: float, y: float) -> Vector2:
+	var cy: float = clampf(y, _teto_y + 260.0, _chao_y - 180.0)
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(120.0, 18.0))
+	var cx := x + 330.0
+	var raio := 250.0
+
+	var liq: Array = LIQUIDO.get(_regiao, LIQUIDO[0])
+	var lava := AGUA.instantiate()
+	lava.largura = raio * 2.4
+	lava.altura = 240.0
+	lava.cor = liq[0]
+	lava.brasas = true
+	lava.position = Vector2(cx, cy + 190.0)
+	par.add_child(lava)
+
+	# oito ilhas em roda: da' para dar a volta toda sem tocar no liquido
+	var n := 8
+	for i in n:
+		var a := TAU * float(i) / float(n)
+		var px := cx + cos(a) * raio
+		var py := cy + sin(a) * raio * 0.36
+		_plat(par, Vector2(px, py), Vector2(112.0, 16.0))
+	_plat(par, Vector2(cx, cy - 20.0), Vector2(120.0, 16.0))    # ilha do meio
+	for i in 2 + int(_dif * 2.0):
+		var a2 := TAU * float(i) / 3.0
+		_inimigo_em(par, Vector2(cx + cos(a2) * raio * 0.7, cy - 40.0), i == 0)
+
+	x = cx + raio + _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(140.0, 18.0))
+	_checkpoint(x, cy, true)
+	return Vector2(x, cy)
+
+
+## HORDA: a saida esta' trancada e a alavanca que a abre esta' do outro lado
+## da sala. Nao ha' contador -- ha' um caminho, e ele esta' cheio.
+func _f_horda(par: Node2D, x: float, y: float) -> Vector2:
+	var cy: float = clampf(y, _teto_y + 220.0, _chao_y - 150.0)
+	var id := "horda_%d" % _camaras
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(150.0, 18.0))
+	var x0 := x
+
+	var largura := 620.0 + 160.0 * _dif
+	_plat(par, Vector2(x + largura * 0.5, cy + 34.0), Vector2(largura, 24.0), 120.0)
+	for i in 4 + int(_dif * 4.0):
+		_inimigo_em(par, Vector2(x0 + 140.0 + float(i) * (largura / 6.0), cy - 40.0),
+			i % 4 == 0)
+	# duas varandas, para nao ser so' um chao raso
+	for k in 2:
+		_plat(par, Vector2(x0 + 190.0 + float(k) * 300.0, cy - 140.0), Vector2(120.0, 15.0))
+
+	var ax := x0 + largura - 60.0
+	var al := ALAVANCA.instantiate()
+	al.id = id
+	al.so_liga = true
+	al.position = Vector2(ax, cy + 20.0)
+	par.add_child(al)
+
+	var gx := x0 + largura + 90.0
+	var pt := PORTA_TRANCADA.instantiate()
+	pt.id = id
+	pt.tamanho = Vector2(24.0, 150.0)
+	pt.position = Vector2(gx, cy - 42.0)
+	par.add_child(pt)
+
+	x = gx + _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(140.0, 18.0))
+	_checkpoint(x, cy, true)
+	return Vector2(x, cy)
+
+
+## CHUVA: um beiral comprido com o tecto a desfazer-se. As pedras armam-se
+## a' passagem e caem a' frente -- corre-se a ler o tecto, nao o chao.
+func _f_chuva(par: Node2D, x: float, y: float) -> Vector2:
+	var cy: float = clampf(y, _teto_y + 240.0, _chao_y - 140.0)
+	var n := 5 + int(_dif * 4.0)
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(140.0, 18.0))
+	var x0 := x
+	var largura := float(n) * 132.0 + 200.0
+	_plat(par, Vector2(x0 + largura * 0.5, cy + 30.0), Vector2(largura, 22.0), 110.0)
+	for i in n:
+		var px := x0 + 120.0 + float(i) * 132.0 + _rng.randf_range(-24.0, 24.0)
+		var pq := PEDRA.instantiate()
+		pq.chao_y = cy + 18.0
+		pq.raio_gatilho = 150.0
+		pq.position = Vector2(px, cy - _rng.randf_range(210.0, 260.0))
+		par.add_child(pq)
+	x = x0 + largura + _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(140.0, 18.0))
+	_checkpoint(x, cy, true)
+	return Vector2(x, cy)
+
+
+## Estica uma `ZonaGravidade` para cobrir `tam` (e o Fundo com ela).
+##
+## ⚠ O no' de colisao da cena chama-se **CollisionShape2D**, nao "Col" -- a
+## primeira versao destas camaras procurava "Col", nunca redimensionava, e a
+## bolsa ficava com os 300x300 de omissao. Na camara `grav_baixa` isso era
+## um SOFTLOCK: os vaos de 230 px so' se atravessam com a gravidade baixa,
+## e fora da bolsa nao ha' salto que la' chegue.
+func _esticar_zona(zg: Node2D, tam: Vector2) -> void:
+	var col := zg.get_node_or_null("CollisionShape2D") as CollisionShape2D
+	if col:
+		var forma := RectangleShape2D.new()
+		forma.size = tam
+		col.shape = forma
+	var fundo := zg.get_node_or_null("Fundo") as Control
+	if fundo:
+		fundo.size = tam
+		fundo.position = -tam * 0.5
+	var contorno := zg.get_node_or_null("Contorno") as Line2D
+	if contorno:
+		var h := tam * 0.5
+		contorno.points = PackedVector2Array([
+			Vector2(-h.x, -h.y), Vector2(h.x, -h.y),
+			Vector2(h.x, h.y), Vector2(-h.x, h.y), Vector2(-h.x, -h.y)])
+
+
+## Cor de luz da regiao atual -- o vitral tinge-se com ela em vez de ser
+## sempre roxo.
+func _cor_luz_regiao() -> Color:
+	var liq: Array = LIQUIDO.get(_regiao, LIQUIDO[0])
+	var c: Color = liq[0]
+	return Color(c.r * 0.5 + 0.5, c.g * 0.4 + 0.4, c.b * 0.5 + 0.5)

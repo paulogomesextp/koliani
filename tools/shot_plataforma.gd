@@ -17,6 +17,16 @@ func _init() -> void:
 	var kx: float = float(args[3]) if tem_x else 0.0
 	var ky: float = float(args[4]) if tem_y else 0.0
 	await process_frame
+	# O `indice_nivel` tem de vir da CENA pedida, nao do save da maquina: a
+	# jornada e' construida a partir dele, portanto sem isto fotografava-se
+	# sempre a jornada do nivel onde o save ficou parado. (5 set 2026 --
+	# custou uma bateria de smoke-tests que nao testaram nada.)
+	var es := root.get_node_or_null("/root/EstadoJogo")
+	if es:
+		var i := int(es.NIVEIS.find(cena))
+		if i >= 0:
+			es.indice_nivel = i
+		es.checkpoint = Vector2.ZERO
 	change_scene_to_file(cena)
 	await process_frame
 	await process_frame

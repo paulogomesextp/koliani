@@ -984,8 +984,20 @@ func teste_mecanica_por_nivel() -> void:
 			"niveis %d e %d estreiam os dois '%s' -- seguidos nao pode"
 				% [k, k + 1, mec[k]])
 
-	# as camaras que vivem nas pools das regioes tem de estrear nos 32
-	# primeiros niveis, uma por nivel
+	# TODAS as camaras que o jogo sabe construir tem de estrear em algum
+	# nivel -- uma camara que exista e nunca estreie e' trabalho parado.
+	# (o `descanso` fica de fora: e' o alivio entre camaras, nao uma estreia)
+	var estreadas: Dictionary = {}
+	for c in mec:
+		estreadas[c] = true
+	for c: String in cams:
+		if c == "descanso":
+			continue
+		_ok(estreadas.has(c),
+			"a camara '%s' existe mas nunca estreia em nivel nenhum" % c)
+
+	# e os primeiros 32 niveis estreiam 32 coisas diferentes: sem isto o
+	# jogo voltava a abrir tudo de uma vez logo no inicio
 	var primeiras: Dictionary = {}
 	for k in range(0, 32):
 		primeiras[mec[k]] = true
