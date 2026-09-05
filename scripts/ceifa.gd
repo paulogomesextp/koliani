@@ -34,6 +34,10 @@ func _ready() -> void:
 	_area_forma.shape = forma
 	add_child(_area_forma)
 	monitoring = true
+	# A Koliani vive na layer 2 (ver `Armadilha`): sem isto a area ficava
+	# com a mascara de omissao (layer 1, o mundo) e NUNCA a apanhava.
+	collision_layer = 0
+	collision_mask = 2
 
 	_lamina = Node2D.new()
 	_lamina.name = "Lamina"      # a bancada procura-a por nome

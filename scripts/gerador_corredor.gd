@@ -81,6 +81,7 @@ const CEIFA := preload("res://scripts/ceifa.gd")
 const ARIETE := preload("res://scripts/ariete.gd")
 const PLAT_OLHAR := preload("res://scenes/actors/PlataformaOlhar.tscn")
 const ZONA_GELO := preload("res://scripts/zona_gelo.gd")
+const ZONA_ESTADO := preload("res://scripts/zona_estado.gd")
 
 ## Líquido mortal por região: [cor, brasas]. floresta=água podre, prisão=ácido,
 ## torres=??? (usa trevas), catacumbas=trevas, cidade=ácido citrino,
@@ -146,14 +147,14 @@ const POOL_REGIAO := {
 	# de gelo a cair. Sem `fogo` (não há nada a arder numa montanha de neve).
 	8: ["vento", "quebra", "espelhos", "pedras", "saltos", "trampolim",
 		"elevador", "espinhos", "crossfire", "portal", "alavanca", "segredo",
-		"chuva", "vitral", "espectral", "placa", "gelo"],
+		"chuva", "vitral", "espectral", "placa", "gelo", "frio"],
 	# X Deserto dos Esquecidos: templos cheios de ARMADILHAS. `crossfire`
 	# é a assinatura (as estátuas que disparam do plano) e `pedras` são as
 	# dunas que desabam. Sem `gravidade` e sem `vento` -- aqui o ar está
 	# parado, o que mata é o que está construído.
 	9: ["crossfire", "espinhos", "serras", "prensa", "pedras", "guilhotinas",
 		"saltos", "gruta", "ferry", "portal", "alavanca", "segredo", "areia",
-		"placa", "queda", "chuva"],
+		"placa", "queda", "chuva", "veneno"],
 	# XI Jardins do Rei: tudo BALANÇA -- trepadeiras, ramos, pontes de
 	# folhagem. `pendulos` de assinatura. Nada de maquinaria: este jardim
 	# foi plantado, não construído.
@@ -313,11 +314,11 @@ const MECANICA_DO_NIVEL := [
 	{"cam": "chuva", "grau": 1},
 	{"cam": "vitral", "grau": 1},
 	{"cam": "espectral", "grau": 1},
-	{"cam": "espelhos", "grau": 1},  # ~
+	{"cam": "frio", "grau": 1},
 	# --- niveis 46-50  (Regiao 10) ---
 	{"cam": "areia", "grau": 1},
 	{"cam": "placa", "grau": 1},
-	{"cam": "serras", "grau": 1},  # ~
+	{"cam": "veneno", "grau": 1},
 	{"cam": "prensa", "grau": 1},  # ~
 	{"cam": "queda", "grau": 1},
 	# --- niveis 51-55  (Regiao 11) ---
@@ -426,7 +427,7 @@ const CAMARAS_FLAVOUR := [
 	"correnteza", "sem_chao", "catapulta", "salvas", "assalto", "memoria",
 	"replicantes", "estatuas", "incorporeo",
 	"rosas", "imanes", "ceifa", "brasas", "olhar", "ariete", "revisao",
-	"gelo",
+	"gelo", "frio", "veneno",
 ]
 
 ## Câmara "assinatura" de cada região -- no acto do meio da jornada aparece
@@ -1527,6 +1528,8 @@ func _flavour(par: Node2D, tipo: String, x: float, y: float) -> Vector2:
 		"ariete": return _f_ariete(par, x, y)
 		"revisao": return _f_revisao(par, x, y)
 		"gelo": return _f_gelo(par, x, y)
+		"frio": return _f_frio(par, x, y)
+		"veneno": return _f_veneno(par, x, y)
 	# tipo sem handler -> não deve acontecer (pool/assinatura mal configurada).
 	# Avisa em vez de gerar um vão morto silencioso e cai num `descanso`.
 	push_warning("GeradorCorredor: câmara '%s' sem _f_ correspondente" % tipo)
@@ -3623,6 +3626,67 @@ func _f_gelo(par: Node2D, x: float, y: float) -> Vector2:
 	x += _rng.randf_range(150.0, 176.0)
 	_plat(par, Vector2(x, cy), Vector2(140.0, 18.0))
 	_checkpoint(x, cy, true)
+	return Vector2(x, cy)
+
+
+## FRIO (N45, Coração do Inverno): sopros gelados que a deixam lenta uns
+## segundos DEPOIS de sair deles. O `gelo` (N41) é um sítio escorregadio --
+## sai-se de lá e acabou; isto anda com ela, e por isso o que se gere já não
+## é onde se pisa mas quando se atravessa o vão a seguir.
+func _f_frio(par: Node2D, x: float, y: float) -> Vector2:
+	var cy: float = clampf(y, _teto_y + 200.0, _chao_y - 120.0)
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(140.0, 18.0))
+	_checkpoint(x, cy, true)
+	var n := 3 + int(_dif * 2.0)
+	for i in n:
+		var ze := ZONA_ESTADO.new()
+		ze.tipo = "frio"
+		ze.tamanho = Vector2(150.0, 130.0)
+		ze.duracao = 2.4 + 1.4 * _dif
+		ze.escala_frio = 0.42 - 0.14 * _dif
+		ze.position = Vector2(x + 86.0, cy - 62.0)
+		par.add_child(ze)
+		x += _rng.randf_range(158.0, 180.0)
+		_plat(par, Vector2(x, cy - 14.0 * float(i % 2)), Vector2(96.0, 16.0))
+		if i % 2 == 1:
+			_checkpoint(x, cy - 14.0)
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(140.0, 18.0))
+	_checkpoint(x, cy, true)
+	return Vector2(x, cy)
+
+
+## VENENO (N48, Vale dos Escorpiões): as nuvens marcam e o dano vem
+## DEPOIS. É o primeiro perigo do jogo que não se resolve a sair de cima
+## dele -- atravessar a correr custa na mesma --, e por isso o corredor tem
+## uma varanda limpa por cima: o caminho mais longo é o caminho são. As
+## nuvens nunca tapam a espinha toda.
+func _f_veneno(par: Node2D, x: float, y: float) -> Vector2:
+	var cy: float = clampf(y, _teto_y + 260.0, _chao_y - 96.0)
+	x += _rng.randf_range(150.0, 176.0)
+	var n := 3 + int(_dif * 2.0)
+	var larg := 190.0 * float(n) + 200.0
+	_plat(par, Vector2(x + larg * 0.5, cy), Vector2(larg, 24.0), 46.0)
+	_checkpoint(x + 44.0, cy, true)
+	var x0 := x
+	for i in n:
+		var px := x0 + 170.0 + float(i) * 190.0
+		var ze := ZONA_ESTADO.new()
+		ze.tipo = "veneno"
+		ze.tamanho = Vector2(130.0, 110.0)
+		ze.duracao = 3.0 + 2.0 * _dif
+		ze.dano_tick = 3 + int(5.0 * _dif)
+		ze.position = Vector2(px, cy - 56.0)
+		par.add_child(ze)
+		# a varanda limpa: o caminho mais longo e sem veneno
+		_plat(par, Vector2(px - 40.0, cy - 160.0), Vector2(120.0, 15.0))
+		if i % 2 == 0:
+			_inimigo_em(par, Vector2(px + 90.0, cy - 40.0))
+	_coluna_fundo(par, x0 + larg * 0.5)
+	x = x0 + larg + _rng.randf_range(148.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(130.0, 18.0))
+	_checkpoint(x, cy)
 	return Vector2(x, cy)
 
 

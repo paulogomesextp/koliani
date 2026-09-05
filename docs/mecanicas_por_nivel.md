@@ -368,6 +368,41 @@ toda -- há sempre pedra onde se recupera o pé.
 
 **Provisórias: 26 → 25.**
 
+### Quinta leva: os dois primeiros ESTADOS dela (N45 e N48)
+
+Os inimigos já tinham `queimar`/`sangrar`/`atordoar` desde o passe de
+combate. **Ela não tinha nenhum.**
+
+| Nível | Câmara | O estado |
+|---|---|---|
+| 45 Coração do Inverno | `frio` | sopros gelados que a deixam lenta uns segundos **depois** de sair deles. O `gelo` (N41) é um sítio escorregadio -- sai-se de lá e acabou; isto anda com ela, e o que se gere passa a ser *quando* se atravessa o vão a seguir |
+| 48 Vale dos Escorpiões | `veneno` | as nuvens marcam e o dano vem depois. É o primeiro perigo do jogo que **não se resolve a sair de cima dele** -- atravessar a correr custa na mesma. Por isso o corredor tem uma varanda limpa por cima: o caminho mais longo é o caminho são |
+
+O veneno passa à frente dos i-frames e do escudo de propósito: um estado
+que se pudesse bloquear com o escudo levantado não era um estado, era mais
+um golpe. E vê-se -- ela fica esverdeada envenenada, azulada gelada. Vida a
+descer sem nada no ecrã lê-se como bug.
+
+### O bug que a bancada apanhou: **as áreas em código nunca lhe tocavam**
+
+Todas as áreas construídas em código ficavam com a **máscara de omissão**
+(layer 1, o mundo). A Koliani vive na **layer 2**. Ou seja: `Iman`,
+`ChaoQuente`, `Ceifa`, `ZonaGelo`, `ZonaEstado`, a zona de empurro do
+`Ariete` -- e a `CorrenteLateral`, que estava assim desde que nasceu --
+**nunca a teriam apanhado no jogo**. A `Armadilha` já fazia isto certo
+(`collision_layer = 0`, `collision_mask = 2`) e foi o molde.
+
+Nada disto aparecia na verificação das jornadas: os níveis construíam-se
+todos, "TUDO OK", e as mecânicas simplesmente não existiriam a jogar.
+
+E outra armadilha da bancada, para não voltar a descobrir: **a Koliani não
+fica onde a põem** -- no `_ready` salta para o checkpoint guardado no save.
+Sem limpar isso (e sem chão por baixo), o que a primeira versão do teste
+mediu foi a **queda no vazio**: "provou" um veneno a tirar 158 de vida em
+1.2 s. Com ela pousada, tira 4.
+
+**Provisórias: 25 → 23.**
+
 ### E as pools das regiões, que era o buraco maior
 
 As 16 estreias de 5 set (`lava_sobe`, `mare`, `espectral`, …) **não estavam

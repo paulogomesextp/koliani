@@ -24,6 +24,10 @@ func _ready() -> void:
 	forma.size = tamanho
 	col.shape = forma
 	add_child(col)
+	# A Koliani vive na layer 2 (ver `Armadilha`): sem isto a area ficava
+	# com a mascara de omissao (layer 1, o mundo) e NUNCA a apanhava.
+	collision_layer = 0
+	collision_mask = 2
 	body_entered.connect(_ao_entrar)
 	body_exited.connect(_ao_sair)
 	_montar_visual()

@@ -13,6 +13,11 @@ const CHAO_QUENTE := preload("res://scripts/chao_quente.gd")
 const CEIFA := preload("res://scripts/ceifa.gd")
 const ARIETE := preload("res://scripts/ariete.gd")
 const PLAT_OLHAR := preload("res://scenes/actors/PlataformaOlhar.tscn")
+const ZONA_ESTADO := preload("res://scripts/zona_estado.gd")
+const ZONA_GELO := preload("res://scripts/zona_gelo.gd")
+## A Koliani carrega-se em RUNTIME (nao com `preload`): o script dela usa
+## autoloads pelo nome e isso nao compila em `--script`.
+const KOLIANI := "res://scenes/actors/Koliani.tscn"
 ## Nao se preload a `Alavanca`: o script dela usa `Som` pelo nome e em
 ## `--script` isso nao compila. O ariete fala com ela por NOME
 ## (`get`/`set`/`mudou`), portanto um duble chega e prova a mesma coisa.
@@ -38,6 +43,8 @@ func _duble(pos: Vector2) -> CharacterBody2D:
 	gd.reload()
 	var c := CharacterBody2D.new()
 	c.set_script(gd)
+	c.collision_layer = 2      # a layer da Koliani -- e' o que as areas mascaram
+	c.collision_mask = 1
 	var col := CollisionShape2D.new()
 	var f := RectangleShape2D.new()
 	f.size = Vector2(20.0, 40.0)
@@ -183,6 +190,106 @@ var ligada := false
 		"Ariete: com ela atras avanca (%.0f -> %.0f)" % [x_ini, ar.global_position.x])
 	_ok(bool(al.get("ligada")), "Ariete: ao chegar ao fim abre a porta (liga a alavanca)")
 	k4.queue_free()
+
+	# --- ZONA ESTADO ---------------------------------------------------
+	# um duble que so' regista o que lhe chamam: prova que a bolsa MARCA e
+	# que continua a renovar enquanto ela la' esta' dentro
+	var gde := GDScript.new()
+	gde.source_code = "extends CharacterBody2D\nvar env := 0\nvar frio := 0\n" \
+		+ "func envenenar(_s: float, _d: int = 4) -> void:\n\tenv += 1\n" \
+		+ "func congelar_parcial(_s: float, _e: float = 0.35) -> void:\n\tfrio += 1\n"
+	gde.reload()
+	for tipo in ["veneno", "frio"]:
+		var ze: Node2D = ZONA_ESTADO.new()
+		ze.tipo = tipo
+		ze.tamanho = Vector2(200.0, 120.0)
+		ze.global_position = Vector2(5000.0, 0.0)
+		_sala.add_child(ze)
+		var kv := CharacterBody2D.new()
+		kv.set_script(gde)
+		kv.collision_layer = 2
+		kv.collision_mask = 1
+		var cv := CollisionShape2D.new()
+		var fv := RectangleShape2D.new()
+		fv.size = Vector2(20.0, 40.0)
+		cv.shape = fv
+		kv.add_child(cv)
+		kv.global_position = Vector2(5000.0, 0.0)
+		_sala.add_child(kv)
+		await _esperar(1.2)
+		var campo := "env" if tipo == "veneno" else "frio"
+		_ok(int(kv.get(campo)) >= 2,
+			"ZonaEstado(%s): marca e RENOVA enquanto la' esta' (%d vezes)"
+				% [tipo, int(kv.get(campo))])
+		ze.queue_free()
+		kv.queue_free()
+		await process_frame
+
+	# --- OS ESTADOS NA KOLIANI A SERIO ---------------------------------
+	var cena_k := load(KOLIANI) as PackedScene
+	if cena_k == null:
+		_ok(false, "nao se conseguiu carregar a Koliani")
+	else:
+		# Ela nao fica onde a poem: no `_ready` salta para o checkpoint
+		# guardado no save. Sem limpar isso (e sem chao por baixo) o que a
+		# bancada media era a QUEDA NO VAZIO -- a primeira versao "provou"
+		# um veneno que tirava 158 de vida em 1.2 s, e nao era veneno
+		# nenhum.
+		var ej := root.get_node_or_null("/root/EstadoJogo")
+		if ej:
+			ej.set("checkpoint", Vector2.ZERO)
+		var ko: Node2D = cena_k.instantiate()
+		ko.global_position = Vector2(9000.0, 0.0)
+		_sala.add_child(ko)
+		await process_frame
+		await process_frame
+		# o chao vai ter com ela, onde quer que ela tenha ido parar
+		var chao := StaticBody2D.new()
+		var cc := CollisionShape2D.new()
+		var cf := RectangleShape2D.new()
+		cf.size = Vector2(3000.0, 60.0)
+		cc.shape = cf
+		chao.add_child(cc)
+		chao.global_position = ko.global_position + Vector2(400.0, 60.0)
+		_sala.add_child(chao)
+		await _esperar(0.5)
+		_ok(bool(ko.call("is_on_floor")),
+			"a Koliani da bancada tem de estar POUSADA -- senao mede-se a queda")
+		var v0 := int(ko.get("vida"))
+		ko.call("envenenar", 3.0, 5)
+		await _esperar(1.2)
+		var v1 := int(ko.get("vida"))
+		_ok(v1 < v0, "Koliani: o veneno tira vida com o tempo (%d -> %d)" % [v0, v1])
+		# e passa a' frente dos i-frames: um golpe normal deixa-a
+		# invulneravel, e o veneno tem de continuar a morder na mesma
+		ko.call("receber_dano", 1, 0.0)
+		var v2 := int(ko.get("vida"))
+		await _esperar(1.2)
+		_ok(int(ko.get("vida")) < v2,
+			"Koliani: o veneno passa a' frente dos i-frames (%d -> %d)"
+				% [v2, int(ko.get("vida"))])
+		# frio: mexe no atrito e passa sozinho
+		ko.call("congelar_parcial", 0.5, 0.3)
+		await _esperar(0.1)
+		_ok(is_equal_approx(float(ko.get("_acel_escala")), 0.3),
+			"Koliani: o frio abranda (acel = %.2f)" % float(ko.get("_acel_escala")))
+		await _esperar(1.2)
+		_ok(is_equal_approx(float(ko.get("_acel_escala")), 1.0),
+			"Koliani: o frio passa sozinho (acel = %.2f)" % float(ko.get("_acel_escala")))
+		# e a ZonaGelo repoe o atrito a' saida
+		var zg: Node2D = ZONA_GELO.new()
+		zg.tamanho = Vector2(300.0, 120.0)
+		# em cima DELA, onde quer que ela esteja (ver a nota do chao)
+		zg.global_position = ko.global_position
+		_sala.add_child(zg)
+		await _esperar(0.4)
+		_ok(float(ko.get("_acel_escala")) < 0.9,
+			"ZonaGelo: escorrega la' dentro (acel = %.2f)" % float(ko.get("_acel_escala")))
+		ko.global_position += Vector2(900.0, 0.0)
+		await _esperar(0.4)
+		_ok(is_equal_approx(float(ko.get("_acel_escala")), 1.0),
+			"ZonaGelo: a' saida repoe o atrito (acel = %.2f)"
+				% float(ko.get("_acel_escala")))
 
 	print("\n=== ACTORES NOVOS: %s ===" %
 		("TUDO OK" if _falhas == 0 else "%d FALHA(S)" % _falhas))

@@ -39,6 +39,10 @@ func _ready() -> void:
 	_montar_visual()
 
 	var zona := Area2D.new()
+	# a Koliani vive na layer 2 (ver `Armadilha`): com a mascara de omissao
+	# (layer 1, o mundo) a zona nunca a apanhava e o ariete nunca andava.
+	zona.collision_layer = 0
+	zona.collision_mask = 2
 	zona.position = Vector2(-tamanho.x * 0.5 - zona_empurro.x * 0.5, 0.0)
 	var zc := CollisionShape2D.new()
 	var zf := RectangleShape2D.new()

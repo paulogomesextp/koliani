@@ -33,6 +33,10 @@ func _ready() -> void:
 	col.shape = forma
 	add_child(col)
 	monitoring = true
+	# A Koliani vive na layer 2 (ver `Armadilha`): sem isto a area ficava
+	# com a mascara de omissao (layer 1, o mundo) e NUNCA a apanhava.
+	collision_layer = 0
+	collision_mask = 2
 	body_entered.connect(func(c: Node) -> void:
 		if c is CharacterBody2D and not (c in _dentro):
 			_dentro.append(c))

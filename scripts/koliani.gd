@@ -262,6 +262,22 @@ var _grav_escala := 1.0
 ## mesma aceleracao da arrancada, um so' numero da' as duas metades da
 ## sensacao. Reposto a 1 pela `ZonaGelo` a' saida.
 var _acel_escala := 1.0
+
+## --- ESTADOS que a apanham a ela (5 set 2026) -------------------------
+## Os inimigos ja' tinham queimar/sangrar/atordoar (`DemonioBase`); ela nao
+## tinha nenhum. Estes dois sao as estreias dos niveis 45 e 48.
+##
+## VENENO: dano ao longo do tempo. Passa a' frente dos i-frames e do escudo
+## de proposito -- um estado que se pudesse bloquear com o escudo levantado
+## nao era um estado, era mais um golpe.
+var _veneno := 0.0
+var _veneno_tick := 0.0
+var _veneno_dano := 4
+## FRIO: abranda-a durante uns segundos (mexe no mesmo `_acel_escala` do
+## gelo, mas por TEMPO em vez de por sitio).
+var _frio := 0.0
+
+const VENENO_INTERVALO := 0.8
 ## Multiplicador do input horizontal (-1 = controlos invertidos). O Olho do
 ## Abismo (nível 20) inverte-os por uns segundos com `inverter_controlos()`.
 var _inverso := 1.0
@@ -623,6 +639,7 @@ func _physics_process(dt: float) -> void:
 	_invulneravel = maxf(0.0, _invulneravel - dt)
 	_impulso_externo_t = maxf(0.0, _impulso_externo_t - dt)
 	_hurt_t = maxf(0.0, _hurt_t - dt)
+	_tick_estados(dt)
 	_aterrar_t = maxf(0.0, _aterrar_t - dt)
 	# aterragem: só depois de ter estado mesmo no ar
 	if is_on_floor():
@@ -1213,6 +1230,67 @@ func _tint_armadura() -> Color:
 		return _BRILHO_CORPO
 	var ai: int = Equipamento.indice_armadura(EstadoJogo.armadura_equipada)
 	return _BRILHO_CORPO if ai < 0 else _BRILHO_CORPO.lerp(Equipamento.cor_armadura(ai), 0.3)
+
+
+## A tinta de base com o estado por cima: verde envenenada, azul gelada. O
+## estado TEM de se ver -- vida a descer sem nada no ecra' le'-se como bug.
+func _tint_estado() -> Color:
+	var c := _tint_armadura()
+	if _veneno > 0.0:
+		c = c.lerp(Color(0.45, 1.25, 0.5), 0.45)
+	if _frio > 0.0:
+		c = c.lerp(Color(0.55, 0.85, 1.35), 0.4)
+	return c
+
+
+## Faz correr o veneno e o frio. Chamado uma vez por frame de fisica.
+func _tick_estados(dt: float) -> void:
+	var tinha := _veneno > 0.0 or _frio > 0.0
+	if _frio > 0.0:
+		_frio = maxf(0.0, _frio - dt)
+		if _frio <= 0.0:
+			definir_acel_escala(1.0)
+	if _veneno > 0.0:
+		_veneno = maxf(0.0, _veneno - dt)
+		_veneno_tick -= dt
+		if _veneno_tick <= 0.0:
+			_veneno_tick = VENENO_INTERVALO
+			_dano_de_estado(_veneno_dano)
+	if tinha and _corpo:
+		_corpo.modulate = _tint_estado()
+
+
+## Dano de ESTADO: sem i-frames, sem escudo, sem tremor de ecra. O que ele
+## partilha com o dano normal e' a morte -- e a reducao da armadura, que e'
+## do equipamento e vale sempre.
+func _dano_de_estado(q: int) -> void:
+	if EstadoJogo.modo_dev or _a_morrer:
+		return
+	var real := int(round(q * (1.0 - EstadoJogo.reducao_armadura())))
+	vida = maxi(0, vida - maxi(1, real))
+	vida_mudou.emit(vida, _vida_max())
+	if vida <= 0:
+		_morrer()
+
+
+## VENENO (nivel 48, Vale dos Escorpioes). Renova em vez de somar: dez
+## picadas seguidas nao valem dez venenos.
+func envenenar(segundos: float, dano_tick := 4) -> void:
+	if _a_morrer:
+		return
+	_veneno = maxf(_veneno, segundos)
+	_veneno_dano = maxi(_veneno_dano, dano_tick)
+	if _veneno_tick <= 0.0:
+		_veneno_tick = VENENO_INTERVALO
+
+
+## FRIO (nivel 45, Coracao do Inverno): abranda-a por tempo. Usa o mesmo
+## `_acel_escala` do gelo -- sair da nevoa nao chega, e' preciso esperar.
+func congelar_parcial(segundos: float, escala := 0.35) -> void:
+	if _a_morrer:
+		return
+	_frio = maxf(_frio, segundos)
+	definir_acel_escala(escala)
 
 
 func _abanar(forca: float) -> void:
