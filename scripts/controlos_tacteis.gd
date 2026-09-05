@@ -56,6 +56,13 @@ const C_BORDA_PRESSA := Color(1.0, 0.55, 0.98, 0.95)
 ## desenho.
 const ZONA_JOYSTICK := 0.44
 
+## Até que distância da BORDA de um botão é que um toque falhado ainda
+## conta como sendo dele (pedido do Paulo, 5 set 2026). A pausa fica de
+## fora desta rede de propósito: apanhar-se uma pausa sem se querer
+## interrompe o jogo, e um erro que pára tudo é pior do que um toque
+## perdido.
+const APANHA_MAX := 96.0
+
 ## O botão de pausa não é um dos quatro: é o menu. Fica pequeno e longe do
 ## polegar, no canto de cima -- mas TEM de existir, num telemóvel não há ESC.
 const R_PAUSA := 30.0
@@ -172,6 +179,28 @@ func _pousar(index: int, pos: Vector2) -> bool:
 		# que a direcção se mede sempre a partir do MESMO centro, o que
 		# desenhado no aro.
 		_mexer_joystick(pos)
+		return true
+	# FALHOU POR POUCO -> vale o mais perto. Num telemovel o dedo tapa o
+	# botao que quer carregar, e por isso quem falha nao sabe que falhou:
+	# fica a carregar no vidro a achar que o jogo nao responde.
+	#
+	# Mede-se a` BORDA do botao e nao ao centro, senao os pequenos (Escudo,
+	# Espada) roubavam os toques aos grandes que estao ao lado -- estar a 90
+	# px do centro de um botao de 40 e' bem mais longe do que estar a 90 do
+	# centro de um de 70.
+	var melhor := -1
+	var melhor_d := APANHA_MAX * _escala
+	for k in BOTOES.size():
+		var s2 := _sitio(BOTOES[k])
+		var d: float = pos.distance_to(s2[0]) - float(s2[1]) * 1.15
+		if d < melhor_d:
+			melhor_d = d
+			melhor = k
+	if melhor >= 0:
+		var accao := str(BOTOES[melhor]["accao"])
+		_dedos[index] = accao
+		_premir(accao, true)
+		queue_redraw()
 		return true
 	return false
 

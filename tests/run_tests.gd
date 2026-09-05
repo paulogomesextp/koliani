@@ -670,6 +670,25 @@ func teste_controlos_tacteis_fixos() -> void:
 		for ev in InputMap.action_get_events(accao):
 			_ok(not (ev is InputEventMouseButton),
 				"'%s' ainda dispara com o rato -- no telemovel isso e' tocar no ecra" % accao)
+	# FALHAR UM BOTAO POR POUCO vale o mais perto (pedido dele: num telemovel
+	# o dedo TAPA o botao, e quem falha nao sabe que falhou).
+	var s_salto: Array = c.call("_sitio", ControlosTacteis.BOTOES[4])
+	var centro_salto: Vector2 = s_salto[0]
+	var r_salto: float = s_salto[1]
+	# 50 px para fora da borda: falhou, mas e' claramente o Salto
+	c.call("_pousar", 3, centro_salto + Vector2(r_salto + 50.0, 0.0))
+	_ok(Input.is_action_pressed("saltar"),
+		"falhar o Salto por 50 px devia contar como Salto")
+	c.call("_levantar", 3)
+
+	# mas o meio do ecra nao pertence a botao nenhum
+	var longe2 := Vector2(c.size.x * 0.62, c.size.y * 0.25)
+	_ok(not bool(c.call("_pousar", 4, longe2)),
+		"um toque no meio do ecra nao pode carregar num botao")
+	for accao in ["saltar", "dash", "lancar", "atacar", "defender"]:
+		_ok(not Input.is_action_pressed(accao),
+			"o toque no meio do ecra carregou em '%s'" % accao)
+
 	c.free()
 
 
