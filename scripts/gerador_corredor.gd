@@ -371,7 +371,7 @@ const MECANICA_DO_NIVEL := [
 	{"cam": "prensa_fogo", "grau": 2},
 	{"cam": "brasas", "grau": 2},
 	{"cam": "correnteza", "grau": 2},
-	{"cam": "prensa", "grau": 2},  # ~
+	{"cam": "reflexo", "grau": 2},
 	{"cam": "anel", "grau": 2},
 	# --- niveis 86-90  (Regiao 18) ---
 	{"cam": "olhar", "grau": 2},
@@ -439,7 +439,7 @@ const CAMARAS_FLAVOUR := [
 	"rosas", "imanes", "ceifa", "brasas", "olhar", "ariete", "revisao",
 	"gelo", "frio", "veneno", "escuro", "areia_no_ar", "ciclo",
 	"mausoleu", "gemea", "ar", "serpente", "pulsacao", "asas", "sombra",
-	"ameaca", "provacao",
+	"ameaca", "provacao", "reflexo",
 ]
 
 ## Câmara "assinatura" de cada região -- no acto do meio da jornada aparece
@@ -1554,6 +1554,7 @@ func _flavour(par: Node2D, tipo: String, x: float, y: float) -> Vector2:
 		"sombra": return _f_sombra(par, x, y)
 		"ameaca": return _f_ameaca(par, x, y)
 		"provacao": return _f_provacao(par, x, y)
+		"reflexo": return _f_reflexo(par, x, y)
 	# tipo sem handler -> não deve acontecer (pool/assinatura mal configurada).
 	# Avisa em vez de gerar um vão morto silencioso e cai num `descanso`.
 	push_warning("GeradorCorredor: câmara '%s' sem _f_ correspondente" % tipo)
@@ -4226,6 +4227,53 @@ func _f_provacao(par: Node2D, x: float, y: float) -> Vector2:
 		x += _rng.randf_range(150.0, 176.0)
 		_plat(par, Vector2(x, cy), Vector2(140.0, 18.0))
 		_checkpoint(x, cy, true)
+	return Vector2(x, cy)
+
+
+## REFLEXO (N84, Palácio de Sangue): o espelho não parte -- ataca. A
+## figura do outro lado é ELA, agora, ao contrário: anda para a esquerda
+## quando ela anda para a direita, e encontram-se sempre a meio.
+##
+## É a mesma peça da `sombra` (N69) a fazer a mecânica contrária: a sombra
+## é o passado dela e foge-se dela para a frente; o reflexo é o presente
+## espelhado, e fugir para a frente é exatamente o que o traz mais perto.
+## O único jeito de o despistar é parar de o encarar -- ir pelo lado de
+## cima, que é para isso que a varanda ali está.
+func _f_reflexo(par: Node2D, x: float, y: float) -> Vector2:
+	var cy: float = clampf(y, _teto_y + 240.0, _chao_y - 130.0)
+	x += _rng.randf_range(150.0, 176.0)
+	var larg := 660.0 + 120.0 * _dif
+	_plat(par, Vector2(x + larg * 0.5, cy), Vector2(larg, 24.0), 46.0)
+	_checkpoint(x + 44.0, cy, true)
+	var x0 := x
+	var eixo := x0 + larg * 0.5
+
+	# o espelho: uma coluna alta e fina no eixo, só visual
+	var vidro := ColorRect.new()
+	vidro.color = Color(0.75, 0.82, 0.95, 0.16)
+	vidro.size = Vector2(10.0, 320.0)
+	vidro.position = Vector2(eixo - 5.0, cy - 320.0)
+	vidro.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	par.add_child(vidro)
+
+	var re := SOMBRA.new()
+	re.espelhar = true
+	re.eixo_x = eixo
+	re.dano = 14 + int(20.0 * _dif)
+	re.recarga = 1.2 - 0.3 * _dif
+	re.cor = Color(0.52, 0.06, 0.16)
+	re.position = Vector2(eixo, cy - 30.0)
+	par.add_child(re)
+
+	# a varanda: o caminho por cima, o único sítio onde ele não chega ao
+	# mesmo tempo que ela
+	for k in 3:
+		_plat(par, Vector2(x0 + 170.0 + float(k) * 180.0, cy - 150.0),
+			Vector2(110.0, 15.0))
+	_coluna_fundo(par, x0 + 60.0)
+	x = x0 + larg + _rng.randf_range(148.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(140.0, 18.0))
+	_checkpoint(x, cy, true)
 	return Vector2(x, cy)
 
 

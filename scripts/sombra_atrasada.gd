@@ -21,6 +21,12 @@ extends Area2D
 ## Segundos entre dois toques -- sem isto, um encontrão custava a vida toda.
 @export var recarga := 1.1
 @export var raio := 16.0
+## REFLEXO (nível 84, Palácio de Sangue): em vez de a seguir com atraso,
+## espelha-a em tempo real em torno de `eixo_x` (coordenada global). O
+## atraso deixa de contar. É a mesma peça a fazer a mecânica contrária:
+## a sombra é o passado dela, o reflexo é o presente ao contrário.
+@export var espelhar := false
+@export var eixo_x := 0.0
 @export var cor := Color(0.36, 0.10, 0.46)
 
 var _rasto: Array[Vector2] = []
@@ -90,6 +96,16 @@ func _physics_process(dt: float) -> void:
 		_rasto.remove_at(0)
 		_t_rasto.remove_at(0)
 
+	if espelhar:
+		# o reflexo não tem passado: é ela, agora, do outro lado do eixo
+		visible = true
+		global_position = Vector2(2.0 * eixo_x - _alvo.global_position.x,
+			_alvo.global_position.y)
+		if _corpo:
+			_corpo.scale.x = -1.0
+		_morder()
+		return
+
 	var alvo_t := _t - atraso
 	if _t_rasto.is_empty() or alvo_t < _t_rasto[0]:
 		return                    # ainda não há passado suficiente
@@ -98,6 +114,12 @@ func _physics_process(dt: float) -> void:
 	while i < _t_rasto.size() - 1 and _t_rasto[i + 1] < alvo_t:
 		i += 1
 	global_position = _rasto[i]
+	_morder()
+
+
+## Magoa quem estiver em cima, com recarga -- sem ela um encontrão custava
+## a vida toda.
+func _morder() -> void:
 	if _cd > 0.0:
 		return
 	for c in get_overlapping_bodies():

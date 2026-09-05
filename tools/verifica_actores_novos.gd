@@ -320,6 +320,25 @@ var ligada := false
 	_ok(int(so.get("_rasto").size()) < 200,
 		"Sombra: o rasto e' uma fila (%d pontos)" % int(so.get("_rasto").size()))
 	so.queue_free()
+	await process_frame
+	# e a MESMA peca em modo reflexo: sem passado nenhum, espelhada no eixo
+	var re: Node2D = SOMBRA.new()
+	re.espelhar = true
+	re.eixo_x = ks.global_position.x + 200.0
+	re.global_position = Vector2(re.eixo_x, 0.0)
+	_sala.add_child(re)
+	await _esperar(0.3)
+	_ok(is_equal_approx(re.global_position.x,
+			2.0 * re.eixo_x - ks.global_position.x),
+		"Reflexo: fica do outro lado do eixo (%.0f, eixo %.0f, ela %.0f)"
+			% [re.global_position.x, re.eixo_x, ks.global_position.x])
+	var antes_x: float = re.global_position.x
+	ks.global_position.x += 120.0
+	await _esperar(0.2)
+	_ok(re.global_position.x < antes_x - 100.0,
+		"Reflexo: ela para a direita, ele para a esquerda (%.0f -> %.0f)"
+			% [antes_x, re.global_position.x])
+	re.queue_free()
 	ks.queue_free()
 	await process_frame
 

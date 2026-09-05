@@ -542,6 +542,21 @@ Duas regras que a tornam justa:
 **Provisórias: 9 → 8.** Restam **3 grandes**: N53 (gancho), N67 (inverter a
 gravidade à vontade) e N70 (o cenário reescreve-se atrás de ti).
 
+### O REFLEXO HOSTIL (N84) — a mesma peça a fazer o contrário
+
+O espelho não parte: ataca. A figura do outro lado é **ela, agora, ao
+contrário** -- anda para a esquerda quando ela anda para a direita, e
+encontram-se sempre a meio.
+
+É a `SombraAtrasada` com um interruptor (`espelhar` + `eixo_x`), e vale a
+pena dizer porquê: a sombra é o **passado** dela e foge-se dela para a
+frente; o reflexo é o **presente espelhado**, e fugir para a frente é
+exatamente o que o traz mais perto. Duas mecânicas opostas na mesma peça.
+O único jeito de o despistar é sair da linha -- ir pela varanda de cima,
+que é para isso que ela ali está.
+
+**Provisórias: 8 → 7.** Bancada: 42 asserções.
+
 ### E as pools das regiões, que era o buraco maior
 
 As 16 estreias de 5 set (`lava_sobe`, `mare`, `espectral`, …) **não estavam
