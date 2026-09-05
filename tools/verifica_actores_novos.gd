@@ -16,6 +16,8 @@ const PLAT_OLHAR := preload("res://scenes/actors/PlataformaOlhar.tscn")
 const ZONA_ESTADO := preload("res://scripts/zona_estado.gd")
 const ZONA_GELO := preload("res://scripts/zona_gelo.gd")
 const ZONA_ESCURIDAO := preload("res://scripts/zona_escuridao.gd")
+const ZONA_SEM_AR := preload("res://scripts/zona_sem_ar.gd")
+const SERPENTE := preload("res://scripts/serpente.gd")
 ## A Koliani carrega-se em RUNTIME (nao com `preload`): o script dela usa
 ## autoloads pelo nome e isso nao compila em `--script`.
 const KOLIANI := "res://scenes/actors/Koliani.tscn"
@@ -234,6 +236,59 @@ var ligada := false
 		ze.queue_free()
 		kv.queue_free()
 		await process_frame
+
+	# --- SERPENTE ------------------------------------------------------
+	var se: Node2D = SERPENTE.new()
+	se.curso = 400.0
+	se.periodo = 0.6
+	se.aneis = 4
+	se.global_position = Vector2(11000.0, 0.0)
+	_sala.add_child(se)
+	await _esperar(0.1)
+	var cabeca := se.get_child(0) as Node2D
+	var sx: Array[float] = []
+	for _i in 30:
+		await create_timer(0.05).timeout
+		if cabeca:
+			sx.append(cabeca.position.x)
+	var smin: float = sx.min() if not sx.is_empty() else 0.0
+	var smax: float = sx.max() if not sx.is_empty() else 0.0
+	_ok(smin < -120.0 and smax > 120.0,
+		"Serpente: a cabeca atravessa a sala (%.0f .. %.0f de 200)" % [smin, smax])
+	# e a cauda vem ATRAS -- nao esta' toda no mesmo sitio
+	var cauda := se.get_child(3) as Node2D
+	_ok(cauda != null and absf(cauda.position.x - cabeca.position.x) > 10.0,
+		"Serpente: a cauda segue a cabeca com atraso")
+	se.queue_free()
+	await process_frame
+
+	# --- ZONA SEM AR ---------------------------------------------------
+	var za: Node2D = ZONA_SEM_AR.new()
+	za.tamanho = Vector2(400.0, 300.0)
+	za.folego = 0.4
+	za.intervalo = 0.2
+	za.dano = 3
+	za.global_position = Vector2(13000.0, 0.0)
+	_sala.add_child(za)
+	var kar := _duble(Vector2(13000.0, 0.0))
+	await _esperar(1.2)
+	_ok(int(kar.get("levou")) > 0,
+		"ZonaSemAr: sem ar, afoga-se (levou %d)" % int(kar.get("levou")))
+	# uma bolsa de ar por perto e o folego enche-se: para de perder vida
+	var bolha := Node2D.new()
+	bolha.add_to_group("ar")
+	bolha.global_position = kar.global_position
+	_sala.add_child(bolha)
+	await _esperar(0.4)
+	var antes_ar := int(kar.get("levou"))
+	await _esperar(1.2)
+	_ok(int(kar.get("levou")) == antes_ar,
+		"ZonaSemAr: em cima da bolsa de ar nao perde vida (%d -> %d)"
+			% [antes_ar, int(kar.get("levou"))])
+	za.queue_free()
+	kar.queue_free()
+	bolha.queue_free()
+	await process_frame
 
 	# --- ZONA ESCURIDAO ------------------------------------------------
 	# o veu vive numa CanvasLayer que NASCE a' entrada e MORRE a' saida --

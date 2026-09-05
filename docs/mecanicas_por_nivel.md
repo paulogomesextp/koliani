@@ -433,6 +433,24 @@ sequer tem jornada).
 
 **Provisórias: 20 → 15.**
 
+### Oitava leva: o relógio dela, a curva e o compasso único
+
+| Nível | Câmara | O que muda |
+|---|---|---|
+| 38 Palácio das Sereias Mortas | `ar` | o relógio passa a ser **dela**: não há ciclo para ler no cenário, há fôlego, e ele acaba. As bolsas de ar enchem-no -- e é a distância entre elas que faz a sala, por isso são poucas, estão sempre à vista, e nunca no caminho curto. Há barra por cima dela: ficar sem ar sem contador à vista lê-se como dano vindo do nada |
+| 77 Serpentes do Mar | `serpente` | um obstáculo **comprido** em movimento contínuo. Tudo o resto que magoa é um ponto (serra), uma linha (guilhotina) ou uma parede (prensa); esta é uma curva que atravessa a sala e nunca está duas vezes no mesmo sítio. Não se decora, lê-se -- e por isso o convés é largo e limpo |
+| 80 Coração Vermelho | `pulsacao` | a sala inteira num **só compasso**: guilhotinas, jactos e raízes partilham o `periodo` e as fases são frações dele. Depois do `martelos` (contratempo) e do `salvas` (todos ao mesmo tempo), é a terceira maneira de usar o tempo -- aprende-se a batida uma vez e serve para a sala toda |
+
+**Provisórias: 15 → 12** -- e das 12 que restam, **7 são os "grandes"**
+(N53 gancho, N63 asas, N65 queda longa, N67 inverter a gravidade, N69
+sombra com atraso, N70 cenário que se reescreve, N98 perder uma
+habilidade). As outras cinco: N54 (esporos -- a inversão de controlos foi
+retirada do jogo pelo Paulo), N56 (plataforma que roda), N78 (convés que
+inclina), N84 (reflexo hostil) e N99 (tudo desbloqueado, que é uma bandeira
+do nível e não uma câmara).
+
+Bancada: 31 asserções.
+
 ### E as pools das regiões, que era o buraco maior
 
 As 16 estreias de 5 set (`lava_sobe`, `mare`, `espectral`, …) **não estavam

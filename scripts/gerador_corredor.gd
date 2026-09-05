@@ -83,6 +83,8 @@ const PLAT_OLHAR := preload("res://scenes/actors/PlataformaOlhar.tscn")
 const ZONA_GELO := preload("res://scripts/zona_gelo.gd")
 const ZONA_ESTADO := preload("res://scripts/zona_estado.gd")
 const ZONA_ESCURIDAO := preload("res://scripts/zona_escuridao.gd")
+const ZONA_SEM_AR := preload("res://scripts/zona_sem_ar.gd")
+const SERPENTE := preload("res://scripts/serpente.gd")
 
 ## Líquido mortal por região: [cor, brasas]. floresta=água podre, prisão=ácido,
 ## torres=??? (usa trevas), catacumbas=trevas, cidade=ácido citrino,
@@ -142,7 +144,7 @@ const POOL_REGIAO := {
 	# `fogo` e sem `quebra`: debaixo de água não arde nem se estilhaça.
 	7: ["gravidade", "ferry", "ritmo", "impulso", "trampolim", "elevador",
 		"correntes", "crossfire", "portal", "pendulos", "vento", "alavanca",
-		"segredo", "mare", "grav_baixa", "tapete", "escuro"],
+		"segredo", "mare", "grav_baixa", "tapete", "escuro", "ar"],
 	# IX Reino do Gelo: o gelo PARTE-SE e o vento EMPURRA. `espelhos` é a
 	# assinatura -- os cristais das cavernas -- e `pedras` são estalactites
 	# de gelo a cair. Sem `fogo` (não há nada a arder numa montanha de neve).
@@ -189,6 +191,7 @@ const POOL_REGIAO := {
 	# desce a compasso.
 	15: ["ritmo", "ferry", "quebra", "gravidade", "pendulos", "espinhos",
 		"crossfire", "serras", "portal", "alavanca", "segredo", "mare",
+		"serpente", "pulsacao",
 		"varredura", "tapete", "orbita"],
 	# XVII Inferno: paredes que esmagam. `prensa` de assinatura -- e é a
 	# única região onde o `fogo` volta com tudo desde o Castelo (nível 30).
@@ -307,7 +310,7 @@ const MECANICA_DO_NIVEL := [
 	# --- niveis 36-40  (Regiao 8) ---
 	{"cam": "mare", "grau": 1},
 	{"cam": "grav_baixa", "grau": 1},
-	{"cam": "ritmo", "grau": 1},  # ~
+	{"cam": "ar", "grau": 1},
 	{"cam": "tapete", "grau": 1},
 	{"cam": "escuro", "grau": 1},
 	# --- niveis 41-45  (Regiao 9) ---
@@ -354,10 +357,10 @@ const MECANICA_DO_NIVEL := [
 	{"cam": "ceifa", "grau": 2},
 	# --- niveis 76-80  (Regiao 16) ---
 	{"cam": "mare", "grau": 2},
-	{"cam": "serras", "grau": 2},  # ~
+	{"cam": "serpente", "grau": 2},
 	{"cam": "alavanca", "grau": 2},  # ~
 	{"cam": "varredura", "grau": 2},
-	{"cam": "ritmo", "grau": 2},  # ~
+	{"cam": "pulsacao", "grau": 2},
 	# --- niveis 81-85  (Regiao 17) ---
 	{"cam": "prensa_fogo", "grau": 2},
 	{"cam": "brasas", "grau": 2},
@@ -429,7 +432,7 @@ const CAMARAS_FLAVOUR := [
 	"replicantes", "estatuas", "incorporeo",
 	"rosas", "imanes", "ceifa", "brasas", "olhar", "ariete", "revisao",
 	"gelo", "frio", "veneno", "escuro", "areia_no_ar", "ciclo",
-	"mausoleu", "gemea",
+	"mausoleu", "gemea", "ar", "serpente", "pulsacao",
 ]
 
 ## Câmara "assinatura" de cada região -- no acto do meio da jornada aparece
@@ -1537,6 +1540,9 @@ func _flavour(par: Node2D, tipo: String, x: float, y: float) -> Vector2:
 		"ciclo": return _f_ciclo(par, x, y)
 		"mausoleu": return _f_mausoleu(par, x, y)
 		"gemea": return _f_gemea(par, x, y)
+		"ar": return _f_ar(par, x, y)
+		"serpente": return _f_serpente(par, x, y)
+		"pulsacao": return _f_pulsacao(par, x, y)
 	# tipo sem handler -> não deve acontecer (pool/assinatura mal configurada).
 	# Avisa em vez de gerar um vão morto silencioso e cai num `descanso`.
 	push_warning("GeradorCorredor: câmara '%s' sem _f_ correspondente" % tipo)
@@ -3899,6 +3905,153 @@ func _f_gemea(par: Node2D, x: float, y: float) -> Vector2:
 	x += _rng.randf_range(150.0, 176.0)
 	_plat(par, Vector2(x, cy), Vector2(140.0, 18.0))
 	_checkpoint(x, cy, true)
+	return Vector2(x, cy)
+
+
+## AR (N38, Palácio das Sereias Mortas): o relógio passa a ser DELA. Não
+## há ciclo nenhum para ler no cenário -- há fôlego, e ele acaba. As
+## bolsas de ar enchem-no outra vez, e é a distância entre elas que faz a
+## sala: por isso são poucas, estão sempre à vista e nunca no caminho
+## curto.
+##
+## Uma travessia falhada custa vida e nunca a passagem: a zona não bloqueia
+## nada e sair é sempre possível.
+func _f_ar(par: Node2D, x: float, y: float) -> Vector2:
+	var cy: float = clampf(y, _teto_y + 220.0, _chao_y - 140.0)
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(140.0, 18.0))
+	_checkpoint(x, cy, true)
+	var x0 := x
+	var n := 4 + int(_dif * 2.0)
+	for i in n:
+		x += _rng.randf_range(150.0, 176.0)
+		_plat(par, Vector2(x, cy - 16.0 * float(i % 2)), Vector2(96.0, 16.0))
+		# as bolsas: uma a cada duas plataformas, sempre num desvio para
+		# cima -- o caminho curto é o que fica sem ar
+		if i % 2 == 1:
+			var bolha := Node2D.new()
+			bolha.add_to_group("ar")
+			bolha.position = Vector2(x, cy - 118.0)
+			par.add_child(bolha)
+			_plat(par, Vector2(x, cy - 100.0), Vector2(80.0, 14.0))
+			var luz := PointLight2D.new()
+			luz.texture = _tex_bolha()
+			luz.energy = 0.9
+			luz.color = Color(0.55, 0.88, 1.0)
+			luz.position = Vector2(x, cy - 118.0)
+			par.add_child(luz)
+	var za := ZONA_SEM_AR.new()
+	za.tamanho = Vector2(x - x0 + 200.0, 420.0)
+	za.folego = 6.0 - 2.0 * _dif
+	za.dano = 6 + int(10.0 * _dif)
+	za.position = Vector2((x0 + x) * 0.5, cy - 100.0)
+	par.add_child(za)
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(140.0, 18.0))
+	_checkpoint(x, cy, true)
+	return Vector2(x, cy)
+
+
+## Gradiente redondo para a luz das bolsas de ar.
+func _tex_bolha() -> Texture2D:
+	var g := Gradient.new()
+	g.offsets = PackedFloat32Array([0.0, 1.0])
+	g.colors = PackedColorArray([Color(1, 1, 1, 1), Color(1, 1, 1, 0)])
+	var t := GradientTexture2D.new()
+	t.gradient = g
+	t.fill = GradientTexture2D.FILL_RADIAL
+	t.fill_from = Vector2(0.5, 0.5)
+	t.fill_to = Vector2(1.0, 0.5)
+	t.width = 160
+	t.height = 160
+	return t
+
+
+## SERPENTE (N77, Serpentes do Mar): um obstáculo COMPRIDO em movimento
+## contínuo. Tudo o resto que magoa nesta jornada é um ponto (serra), uma
+## linha (guilhotina) ou uma parede (prensa); esta é uma curva que
+## atravessa a sala e que nunca está duas vezes no mesmo sítio. Não se
+## decora, lê-se -- e por isso o convés é largo e limpo: o problema é ela.
+func _f_serpente(par: Node2D, x: float, y: float) -> Vector2:
+	var cy: float = clampf(y, _teto_y + 260.0, _chao_y - 150.0)
+	x += _rng.randf_range(150.0, 176.0)
+	var larg := 660.0 + 140.0 * _dif
+	_plat(par, Vector2(x + larg * 0.5, cy), Vector2(larg, 24.0), 46.0)
+	_checkpoint(x + 44.0, cy, true)
+	var x0 := x
+	var se := SERPENTE.new()
+	se.curso = larg - 60.0
+	se.onda = 96.0
+	se.periodo = 4.4 - 1.2 * _dif
+	se.aneis = 6 + int(_dif * 3.0)
+	se.dano = 14 + int(20.0 * _dif)
+	var liq: Array = LIQUIDO.get(_regiao, LIQUIDO[0])
+	var lc: Color = liq[0]
+	se.cor = Color(lc.r * 0.5 + 0.25, lc.g * 0.5 + 0.35, lc.b * 0.5 + 0.3)
+	se.position = Vector2(x0 + larg * 0.5, cy - 96.0)
+	par.add_child(se)
+	# dois recifes: o único sítio onde a onda dela passa por baixo
+	for k in 2:
+		_plat(par, Vector2(x0 + 210.0 + float(k) * 260.0, cy - 130.0),
+			Vector2(104.0, 15.0))
+	_coluna_fundo(par, x0 + larg * 0.5)
+	x = x0 + larg + _rng.randf_range(148.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(140.0, 18.0))
+	_checkpoint(x, cy)
+	return Vector2(x, cy)
+
+
+## PULSAÇÃO (N80, Coração Vermelho): a sala inteira tem UM compasso. As
+## guilhotinas, os jactos e as raízes desta câmara partilham todos o mesmo
+## `periodo` e as fases são frações dele -- não há dois relógios, há um.
+## Depois do `martelos` (linha em contratempo) e do `salvas` (todos ao
+## mesmo tempo), esta é a terceira maneira de usar o tempo: tudo em fase,
+## mas cada coisa no seu tempo do compasso. Aprende-se a batida uma vez e
+## serve para a sala toda.
+func _f_pulsacao(par: Node2D, x: float, y: float) -> Vector2:
+	var cy: float = clampf(y, _teto_y + 280.0, _chao_y - 96.0)
+	x += _rng.randf_range(150.0, 176.0)
+	var n := 4 + int(_dif * 2.0)
+	var larg := 170.0 * float(n) + 200.0
+	_plat(par, Vector2(x + larg * 0.5, cy), Vector2(larg, 24.0), 46.0)
+	_checkpoint(x + 44.0, cy, true)
+	var x0 := x
+	var batida := 2.6 - 0.8 * _dif     # O compasso. Um só, para a sala toda.
+	for i in n:
+		var px := x0 + 150.0 + float(i) * 170.0
+		match i % 3:
+			0:
+				var g := GUILHOTINA.instantiate()
+				g.automatico = true
+				g.periodo = batida
+				g.atraso = 0.5
+				g.fase = batida * 0.0
+				g.altura_queda = 200.0
+				g.dano = 12 + int(18.0 * _dif)
+				g.position = Vector2(px, cy - 215.0)
+				par.add_child(g)
+			1:
+				var f := FOGO.instantiate()
+				f.intervalo = batida
+				f.dur_ativa = batida * 0.35
+				f.fase = batida * (1.0 / 3.0)
+				f.position = Vector2(px, cy + 4.0)
+				par.add_child(f)
+			2:
+				var r := RAIZ.instantiate()
+				r.auto = true
+				r.intervalo = batida
+				r.fase = batida * (2.0 / 3.0)
+				r.atraso = 0.5
+				r.dur_ativa = batida * 0.4
+				r.altura = 96.0
+				r.dano = 10 + int(16.0 * _dif)
+				r.position = Vector2(px, cy - 12.0)
+				par.add_child(r)
+	_coluna_fundo(par, x0 + larg * 0.5)
+	x = x0 + larg + _rng.randf_range(148.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(130.0, 18.0))
+	_checkpoint(x, cy)
 	return Vector2(x, cy)
 
 
