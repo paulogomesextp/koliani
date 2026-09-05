@@ -1,46 +1,47 @@
 # Retomar aqui — 5 de setembro de 2026
 
 > **LEIA PRIMEIRO.** O topo é a **fila de pedidos do Paulo por fazer**.
+> A ordem é a do painel, que é dele:
+> <https://claude.ai/code/artifact/875b9e60-ef1b-4866-ad8f-d273169da411>
 
 ---
 
-# ⚠ PEDIDOS NOVOS DO PAULO (5 set 2026) — ainda NÃO feitos
+# Os três pedidos de 5 set 2026 — **FECHADOS**
 
-Estes três chegaram no fim da sessão e **ainda não estão na página de
-prioridades** — pô-los lá é o primeiro passo da próxima sessão.
+### A. Botão de ação na página de prioridades — FEITO
 
-### A. Botão de ação na página de prioridades ⬅ *fazer primeiro*
+Os blocos saíram. O painel é uma lista só, numerada 1, 2, 3…, e esse número
+**é** a ordem de desenvolvimento: por linha há um botão de pôr em primeiro,
+setas de um degrau e um campo onde se escreve a posição. O que fica *feito*
+ou *fora* desce para o fim e deixa de gastar número.
 
-> "Na lista de prioridades quero que crie um **botão de ação** e é por aí
-> que podemos organizar que pedido se faz 1º, 2º, 3º etc."
+### B. Todo o pedido singular entra na lista — FEITO, e é regra
 
-O painel (<https://claude.ai/code/artifact/875b9e60-ef1b-4866-ad8f-d273169da411>)
-já guarda `ordem` no `db` de cada item, mas **não há maneira de ele mexer
-nessa ordem pela página**. É isso que ele está a pedir: um controlo por
-linha (setas ↑/↓ ou um campo de posição) que escreva o `ordem` novo no `db`.
-Ver a regra em [[pagina-prioridades-koliani]]: o estado vive no `db`, o
-HTML só tem o catálogo `ITENS`; republicar não estraga a organização dele.
+Regra permanente, ver [[pagina-prioridades-koliani]]. E **actualizar o
+painel a cada pedido que se fecha**, não no fim da sessão.
 
-Para editar a página numa sessão nova: `Artifact action:"read"` com o URL,
-gravar em ficheiro, editar, republicar com o **mesmo `url`**.
+### C. Música do chefe no último checkpoint — FEITO (`9ea1576`)
 
-### B. Todo o pedido singular entra na lista de prioridades
+A fogueira mais perto da arena marca-se como a do chefe e chama
+`Musica.boss()` ao ser acesa; antes a cama de combate só entrava ao 1.º
+golpe (`ChefeBase.provocar`). Se a cena recarregar com essa fogueira **já**
+acesa (morreu no chefe), a música volta logo.
 
-> "Estes pedidos singulares que vou fazendo vá adicionando sempre à lista
-> de prioridades."
+Duas coisas que custaram e não vale a pena redescobrir:
 
-Regra permanente. **Incluindo estes três.**
+- a decisão corre no **fim do frame** (`call_deferred`). O chefe só entra no
+  grupo `chefes` no `_ready` dele, e o `main.gd` só põe a cama de ambiente
+  depois dos filhos — tocar mais cedo era pisado por ela.
+- a escolha da fogueira vive em **`scripts/fogueiras.gd`**, lógica pura sem
+  autoloads. Dentro do `checkpoint.gd` o corredor de testes não a conseguia
+  carregar (em `--script` não há `EstadoJogo`) e o teste **passava em
+  silêncio sem verificar nada** — só se deu por isso ao partir a asserção
+  de propósito.
 
-### C. Música do chefe no último checkpoint, não ao primeiro golpe
-
-> "Começar o soundtrack dos bosses assim que apanharmos o último checkpoint
-> que está ao pé deles."
-
-Hoje a música de chefe só entra ao **1.º golpe** (`_musica_boss` em
-`scripts/chefe_base.gd`, mudado na maratona de playtest de 2 set). Ele quer
-que entre mais cedo: quando a Koliani acende a **fogueira/checkpoint mais
-próximo da arena**. Sítios a mexer: `scripts/checkpoint.gd` (saber que é o
-último do nível) e o arranque da cama de chefe no autoload `Musica`.
+Medido na Floresta Putrefata: das 4 fogueiras só a que está a 220 px da
+arena se marca (a seguinte está a 1861 px) e acendê-la troca para
+`boss_05.ogg`. O gerador põe sempre um checkpoint mesmo antes do chefe e
+espaça os outros 3000 px, portanto "a mais perto" é de confiança.
 
 ---
 
