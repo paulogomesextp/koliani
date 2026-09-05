@@ -124,6 +124,36 @@ cor_base = Color(0.24, 0.2, 0.28, 1)
 cor_topo = Color(0.5, 0.42, 0.56, 1)
 
 ; ===================  CUME -- arena de Vyrak  =============
+; --- degraus para o cimo: o Cume vai de x=290 a x=1010 e e' TECTO
+; para quem sobe por baixo. Estes ficam FORA desse intervalo.
+[node name="SubidaOeste1" parent="." instance=ExtResource("9_pl")]
+position = Vector2(220, 400)
+tamanho = Vector2(110, 18)
+altura_visual = 24.0
+cor_base = Color(0.24, 0.2, 0.28, 1)
+cor_topo = Color(0.5, 0.42, 0.56, 1)
+
+[node name="SubidaOeste2" parent="." instance=ExtResource("9_pl")]
+position = Vector2(160, 328)
+tamanho = Vector2(100, 18)
+altura_visual = 24.0
+cor_base = Color(0.24, 0.2, 0.28, 1)
+cor_topo = Color(0.5, 0.42, 0.56, 1)
+
+[node name="SubidaLeste1" parent="." instance=ExtResource("9_pl")]
+position = Vector2(1105, 423)
+tamanho = Vector2(110, 18)
+altura_visual = 24.0
+cor_base = Color(0.24, 0.2, 0.28, 1)
+cor_topo = Color(0.5, 0.42, 0.56, 1)
+
+[node name="SubidaLeste2" parent="." instance=ExtResource("9_pl")]
+position = Vector2(1135, 345)
+tamanho = Vector2(100, 18)
+altura_visual = 24.0
+cor_base = Color(0.24, 0.2, 0.28, 1)
+cor_topo = Color(0.5, 0.42, 0.56, 1)
+
 [node name="Cume" parent="." instance=ExtResource("9_pl")]
 position = Vector2(650, 350)
 tamanho = Vector2(720, 64)
