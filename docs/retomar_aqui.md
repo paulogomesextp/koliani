@@ -8,46 +8,128 @@
 
 # ⇢ COMEÇA AQUI
 
-**v0.13.0.** A sessão da manhã de 5 set fechou os dois pedidos do
-telemóvel e desenhou mais 15 chefes. Por ordem, o que eu faria a seguir:
+**v0.15.0**, tudo verde e no `master`. A sessão de 5 set (manhã/tarde)
+fechou o telemóvel, ligou 20 chefes nossos ao jogo e **auditou o catálogo
+de mecânicas do Paulo**.
 
-1. **Jogar no telemóvel.** Os controlos de toque são novos de raiz
-   (`scripts/controlos_tacteis.gd`): joystick à esquerda, Projéteis /
-   Espada / Escudo / **Salto** à direita, pausa em cima. **Dash e Rolar
-   ficaram sem botão** — foi o pedido (quatro), mas é a primeira coisa a
-   confirmar a jogar: se houver um vão que só se faz com dash, falta lá um
-   botão. Fotografa-se com `tools/shot_toque.gd` (precisa de janela).
-2. **O bot precisa de saber subir escadas.** A primeira corrida completa
-   dos 100 níveis (`tools/correr_bot_todos.py`, ~1h) deu 65 "não passou
-   dali" — e param todos entre os 496 e os 530 px do spawn, na mesma
-   escada de 104 px de subida por degrau. Não são 65 softlocks; é uma peça
-   só. Detalhe em [`relatorio_bot.md`](relatorio_bot.md). Enquanto ele
-   parar ali, os 100 níveis continuam por verificar a partir dos 500 px.
-3. **Arte dos chefes: faltam 80.** Regiões I a IV feitas (20/100). A
-   seguir são as Regiões V (Cidade Corrompida) e VI (Castelo de Zeriko),
-   que fecham os 30 originais. Receita e armadilhas na secção "EM CURSO"
-   mais abaixo.
-4. **Playtestar as 100 mecânicas**, que continuam sem ser jogadas.
+A ordem a seguir é a do painel, que é dele:
+<https://claude.ai/code/artifact/875b9e60-ef1b-4866-ad8f-d273169da411>
 
-## O que entrou nesta sessão
+Nesta sessão ele foi deixando pedidos com **"adicionar à lista"** — isso é
+fila, NÃO é para largar o que se está a fazer (disse-o explicitamente). Mas
+o painel actualiza-se **logo a seguir** a cada anotação, também a pedido
+dele. Os que estão lá por fazer, e que eu faria por esta ordem:
 
-- **Controlos de toque de raiz.** O que lá estava eram sete
-  `TouchScreenButton` **sem textura nenhuma** em píxeis fixos
-  (`y = 560..620`, só certo a 720 de alto): invisíveis, e fora do sítio em
-  qualquer telemóvel. Multi-toque a sério, evento só marcado como tratado
-  quando é nosso (senão tirava o toque aos botões WEAPONS/ARMOR e ao balão
-  de fala), e larga tudo ao esconder-se.
-- **O zoom do telemóvel.** O `stretch/aspect` é `expand`: a 20:9 o viewport
-  vai a 1600x720 e via-se 25% mais mundo à largura. A câmara
-  (`camera_tremor.gd`) sobe o zoom na mesma proporção. Mexer no `aspect`
-  resolvia o mundo mas tirava ecrã à UI.
-- **15 chefes novos** (Regiões II, III e IV). O nome `rei_ossario` já era
-  de um rig de pack **em uso** no nível 16 — o emprestado passou a
-  `rei_ossario_pack` e a cena aponta para lá, portanto o jogo está
-  exactamente como estava.
-- **A Essência ligava o `monitoring` no `_ready`** e ela nasce dentro do
-  `receber_dano` do bicho, a meio do passo de física: dava "Can't change
-  this state while flushing queries" e a moeda ficava sem área nenhuma.
+1. **Nível 12** — dois relatos dele, os dois por resolver: não se chega à
+   plataforma final (o mesmo do nível 10, que já ficou feito) e **o ecrã
+   fica todo preto a meio do nível**. Suspeitos do preto, por ordem: uma
+   `ZonaEscuridao` fora do sítio, a vinheta da `Atmosfera`, ou a luz dela a
+   ser desligada e não voltar.
+2. **Baú ao matar um chefe** — armas, armaduras, moedas ou pontos de stats.
+   As peças existem todas (15+15 de equipamento, a Essência, as 6
+   Melhorias); falta o baú, a tabela de sorteio e o ecrã do que saiu.
+3. **Explicar a mecânica nova quando ela estreia** — mensagem 5 s. O
+   gerador já sabe qual é a estreia de cada nível (`_estreia_cam`) e a HUD
+   já tem onde a pôr (os avisos de habilidade nova); falta o texto de cada
+   uma nos 6 idiomas.
+4. **Som e música** — o som de matar o chefe e o de entrar no portal; e a
+   música dos níveis 3 e 8, que não são rock épico como o resto.
+5. **Arte dos chefes: faltam 80.** Regiões I-IV feitas. A seguir são as
+   Regiões V e VI, que fecham os 30 originais.
+
+---
+
+# O que esta sessão fez (5 set 2026, manhã e tarde)
+
+## Telemóvel jogável
+
+- **Controlos de toque de raiz** (`scripts/controlos_tacteis.gd`):
+  joystick à esquerda (zona morta + base flutuante), e à direita
+  **Projéteis · Espada · Escudo · Salto** (o maior), mais uma pausa
+  pequena em cima. Multi-toque a sério. O que lá estava eram sete
+  `TouchScreenButton` **sem textura nenhuma** em píxeis fixos.
+  **Dash e Rolar ficaram sem botão** — foi o pedido (quatro); é a primeira
+  coisa a confirmar a jogar.
+- **Zoom** (`scripts/camera_tremor.gd`): o `stretch/aspect` é `expand`, e a
+  20:9 o viewport vai a 1600x720 — via-se 25% mais mundo à largura. A
+  câmara sobe o zoom na mesma proporção. Mexer no `aspect` resolvia o mundo
+  mas tirava ecrã à UI.
+- `tools/shot_toque.gd` fotografa isto com os controlos ligados à força e
+  na resolução que se quiser (a HUD vem do `Main.tscn`, não do nível).
+
+## Os chefes nossos ENTRARAM em jogo
+
+Regiões I a IV, **20 dos 100**, e as cenas já apontam para eles. A regra
+antiga era só trocar no fim; ele abriu a app, não os viu, e a troca é uma
+linha por cena. Do 21 ao 100 continuam os rigs de pack.
+
+- O nome `rei_ossario` já era de um rig de pack **em uso**: o emprestado
+  passou a `rei_ossario_pack`.
+- **Passe de proporções na Região I**: liam-se como totens. A lição que
+  vale para os 80 que faltam: **no plano humanoide os braços nascem da cor
+  do corpo**, portanto alargar só os ombros faz o tronco engoli-los. É
+  preciso alargar E repintar (`pintar(pecas, "braco_f", ...)`).
+
+## As mecânicas: a pergunta dele, respondida com números
+
+**`docs/mecanicas_catalogo.md` está auditado linha a linha: 75 das 95 estão
+no jogo, 18 faltam, 2 estão fora por decisão.** Das 18, quatro são
+ESTRUTURA (New Game Plus, ranking, troca de personagens, backtracking) e
+estão no painel à espera de decisão dele, não de trabalho.
+
+- **`tools/verifica_mecanicas.gd`** (novo, no CI) constrói os 100 níveis e
+  vai ver se os ACTORES da estreia nasceram mesmo lá dentro. O
+  `verifica_jornada` só provava que o gerador ESCOLHEU a câmara — e por
+  isso dizia "TUDO OK" com **os níveis 6 e 67 sem mecânica nenhuma**: a
+  `alavanca` e o `invertido` **desistiam em silêncio** (`return
+  _f_descanso(...)`) quando a sala era baixa. Agora encolhem, e há um
+  `PE_DIREITO` que abre a banda vertical do nível ao que a estreia precisa.
+- **Três mecânicas novas do catálogo dele**, cada uma num nível cuja
+  estreia REPETIA outra: `PlataformaPeso` (57), `BlocoEmpurravel` +
+  `PlacaPeso` (71) e `ZonaAfunda` (90).
+  `tools/verifica_camaras_novas.gd` mede-as a funcionar (10 asserções).
+
+## Armadilhas que custaram e não vale a pena redescobrir
+
+- **A caixa não pode ler a `velocity` dela.** Quando ela encosta, o
+  `move_and_slide` zera-lhe o x no mesmo frame. Lê-se a direcção pedida no
+  `InputMap` — o mesmo sítio de onde vem o joystick.
+- **Afundar não se faz empurrando a posição.** Pousada em chão sólido não
+  há para onde afundar. Faz-se pelo PESO (`definir_grav_escala`).
+- **A `Alavanca` falava com o `Som` e com o tipo `Koliani` pelo
+  IDENTIFICADOR** — nada que herdasse dela se conseguia medir em
+  `--script`. Passou a `/root/Som` e ao grupo `"koliani"`.
+- **Nada de aspas nos comentários do `CAMARAS_FLAVOUR`**: o teste lê a
+  lista do código-fonte e apanha tudo entre aspas.
+- **`falhas += await _corrotina()` não devolve o `return`** — soma `true`.
+  E o veredicto calcula-se ANTES do `queue_free` da cena, senão o
+  `k == null` passa a ser verdade.
+- **Um `queue_free()` + um `process_frame` não chega** entre bancadas: o
+  chão da anterior ainda está na física.
+- **A `Essencia` ligava o `monitoring` no `_ready`** e nasce a meio do
+  passo de física — "Can't change this state while flushing queries", e a
+  moeda ficava sem área.
+
+## O checkpoint que prende (nível 5) — MEIO FEITO
+
+Duas redes postas: ela nasce 40 px acima do checkpoint e desencrava-se se
+ficar dentro de geometria (`koliani.gd`, e é esta que salva quem já tem um
+checkpoint mau no save); e o gerador afasta checkpoints com tecto a menos
+de 130 px. **Mas o caso dele não foi reproduzido**: a
+`tools/verifica_spawn_livre.gd` percorre todos os checkpoints de 8 níveis a
+medir bolsos e não encontrou nenhum, nem com a rede desligada. Ou o sítio é
+uma fogueira da sala e não um check da jornada, ou o que a prende é uma
+plataforma que SE MEXE. **Falta o sítio exacto.**
+
+## O bot já corre os 100 níveis
+
+`tools/correr_bot_todos.py` (vários Godot em paralelo, ~1h) escreve
+`docs/relatorio_bot.md`. A primeira corrida deu 65 "não passou dali" — mas
+param **todos entre os 496 e os 530 px do spawn**, na mesma escada de
+104 px de subida por degrau. Não são 65 softlocks; é uma peça só, e é a
+fraqueza que já estava escrita no próprio bot. **O que falta ao bot é subir
+escadas** — enquanto não subir, os 100 níveis continuam por verificar a
+partir dos 500 px.
 
 ---
 
