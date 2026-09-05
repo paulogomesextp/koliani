@@ -8,23 +8,13 @@
 
 # ⇢ COMEÇA AQUI
 
-O pedido em curso é **"uma mecânica nova por nível"** (o Paulo: *"100
-níveis a fazer a mesma coisa e o mesmo padrão cansa o player"*). Passou de
-**52 linhas provisórias para 7**, e das 7 sobram **três grandes** e quatro
-pequenas:
+O pedido **"uma mecânica nova por nível"** está **implementado**: as 100
+linhas da `MECANICA_DO_NIVEL` têm dona, **zero provisórias** (eram 52 no
+início da sessão). Os sete "grandes" ficaram todos feitos, incluindo o
+gancho e a gravidade invertida.
 
-| | Nível | O que falta | Tamanho |
-|---|---|---|---|
-| 1 | **53** Jardim das Almas | **GANCHO** — engatar e balançar | **grande** (o maior de todos; muda os 100 níveis, não só o dele) |
-| 2 | **67** Mundo Invertido | inverter a gravidade à vontade | médio — o `_grav_escala` já existe, falta o sinal negativo + `up_direction` na Koliani |
-| 3 | **70** A Mente | o cenário reescreve-se atrás de ti | médio (o candidato a corte, se for preciso cortar: acontece onde já não se está a olhar) |
-| 4 | **56** Distrito das Engrenagens | plataforma que roda | pequeno-médio — cuidado, um corpo a rodar com ela em cima é física a sério |
-| 5 | **78** Navio da Condenação | convés que inclina | igual ao 56 (mesma peça, meia volta) |
-| 6 | **54** Estufa Maldita | esporos | o guia dizia "trocam os controlos", mas **a inversão de controlos foi retirada do jogo pelo Paulo**. Precisa de outra ideia — o `veneno` (N48) um grau acima é a mais barata e a mais fiel ao tema |
-| 7 | **99** O Fim de Tudo | "tudo desbloqueado, energia sem limite" | é uma **bandeira do nível**, não uma câmara: mexe no `EstadoJogo` à entrada do 99, não no gerador |
-
-**Antes de mexer em qualquer uma delas**, correr as três bancadas — é o que
-diz se alguma coisa se partiu:
+**O que falta é JOGAR.** Nada disto foi playtestado -- as três bancadas
+garantem que se constrói e que as regras mordem, não que sabe bem:
 
 ```bash
 "...Godot..._console.exe" --headless --script res://tests/run_tests.gd
@@ -32,12 +22,30 @@ diz se alguma coisa se partiu:
 "...Godot..._console.exe" --headless --script res://tools/verifica_jornada.gd
 ```
 
+Por ordem, o que eu faria a seguir:
+
+1. **Jogar os níveis das mecânicas novas** e afinar números. Os que mais
+   podem estar mal: `gancho` (53) -- a força do balanço e o empurrão ao
+   largar; `invertido` (67) -- o pé-direito da sala e o sítio das placas;
+   `conves` (78) e `engrenagens` (56) -- é a peça mais nova e a única que
+   depende de a Koliani se aguentar num chão a rodar.
+2. **O `tools/bot_gauntlet.gd` continua avariado** (acusa softlock no
+   Nível 1, a 150 px do spawn). Enquanto assim estiver, nenhuma câmara
+   pode ser dada como verificada sem ser à mão. Está no painel como
+   crítico, e agora custa mais: são 26 câmaras novas por verificar.
+3. **Arte própria dos 100 chefes** -- o pedido que estava a seguir na fila
+   (ver mais abaixo).
+
+Duas coisas ficaram de fora **de propósito** e estão escritas: escalar
+paredes e agarrar bordas continuam a assumir a gravidade normal (não
+aparecem na sala do N67), e o `PontoGancho` só engata no ar.
+
 ---
 
 # A sessão da madrugada de 5 set 2026 — 26 mecânicas novas
 
-**52 provisórias → 7.** Sobreposição média de câmaras entre níveis
-seguidos: **0.275 → 0.218** (menos 21%). Detalhe nível a nível em
+**52 provisórias → 0.** Sobreposição média de câmaras entre níveis
+seguidos: **0.275 → 0.224** (menos 19%). Detalhe nível a nível em
 [`mecanicas_por_nivel.md`](mecanicas_por_nivel.md), que ficou com uma
 secção por leva.
 
