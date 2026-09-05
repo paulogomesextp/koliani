@@ -216,6 +216,18 @@ const POOL_REGIAO := {
 ##   1 normal  -- duas vezes
 ##   2 dura    -- três vezes, encadeadas
 ##
+## CORTES decididos pelo Paulo (5 set 2026), dos 14 "grandes" da proposta:
+##   - **Nadar** (N37) -- fora. A bolsa de gravidade baixa fica no lugar
+##     dele: flutuar e cair devagar é o que a água faz ao corpo, e não
+##     precisa de física nova na Koliani.
+##   - **Gravidade a rodar 90°** (N90) -- fora. Era o mais caro da lista
+##     (câmara, controlos e geometria toda de lado) e o N67, inverter a
+##     gravidade à vontade, dá quase o mesmo espanto por uma mudança de
+##     sinal. Esse fica.
+##   - **Perseguidor invisível** (N89) -- fora, e não foi por preço: só é
+##     justo se o jogador ouvir, e o jogo joga-se no telemóvel, muitas vezes
+##     sem som. Uma coisa que mata sem aviso lê-se como bug.
+##
 ## ⚠ As linhas marcadas `# ~` são PROVISÓRIAS: repetem uma câmara que já
 ## estreou porque o actor próprio dessa mecânica ainda não existe. São a
 ## lista de trabalho -- a proposta completa está em
@@ -267,7 +279,7 @@ const MECANICA_DO_NIVEL := [
 	{"cam": "lava_sobe", "grau": 1},
 	# --- niveis 36-40  (Regiao 8) ---
 	{"cam": "mare", "grau": 1},
-	{"cam": "ferry", "grau": 1},  # ~
+	{"cam": "grav_baixa", "grau": 1},
 	{"cam": "ritmo", "grau": 1},  # ~
 	{"cam": "tapete", "grau": 1},
 	{"cam": "gravidade", "grau": 1},  # ~
@@ -299,7 +311,7 @@ const MECANICA_DO_NIVEL := [
 	{"cam": "orbita", "grau": 1},
 	{"cam": "para_raios", "grau": 1},
 	{"cam": "vento", "grau": 1},  # ~
-	{"cam": "grav_baixa", "grau": 1},
+	{"cam": "grav_baixa", "grau": 2},  # ~
 	{"cam": "ferry", "grau": 1},  # ~
 	# --- niveis 66-70  (Regiao 14) ---
 	{"cam": "portal", "grau": 2},  # ~
@@ -329,7 +341,7 @@ const MECANICA_DO_NIVEL := [
 	{"cam": "elevador", "grau": 2},  # ~
 	{"cam": "gravidade", "grau": 2},  # ~
 	{"cam": "elevador", "grau": 2},  # ~
-	{"cam": "espelhos", "grau": 2},  # ~
+	{"cam": "espectral", "grau": 2},  # ~
 	{"cam": "elevador", "grau": 2},  # ~
 	# --- niveis 91-95  (Regiao 19) ---
 	{"cam": "pedras", "grau": 2},  # ~

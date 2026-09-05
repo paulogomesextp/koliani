@@ -259,7 +259,47 @@ jogo perder a promessa de "uma mecânica nova por nível".
 
 ---
 
-## Os 14 "grandes" — é aqui que ele decide
+## DECIDIDO (5 set 2026) — os 14 grandes ficaram em 7
+
+O Paulo cortou três e aceitou as fusões. Fica assim:
+
+### Cortados
+
+| | Porquê |
+|---|---|
+| **N37 Nadar** | Física subaquática na Koliani. No lugar dele fica a **bolsa de gravidade baixa**, que já está construída: flutuar e cair devagar é o que a água faz ao corpo. A Cidade Submersa passa a estrear `grav_baixa`. |
+| **N90 Gravidade roda 90°** | O mais caro da lista — câmara, controlos e geometria toda de lado. O **N67 (inverter a gravidade à vontade) fica**, e dá quase o mesmo espanto por uma mudança de sinal. |
+| **N89 Perseguidor invisível** | **Não foi por preço.** Só é justo se o jogador ouvir, e o jogo joga-se no telemóvel, muitas vezes sem som — uma coisa que mata sem aviso lê-se como bug, não como tensão. No lugar dele fica a `espectral`. |
+
+### Fusões aceites
+
+- **N15 Planar + N63 Asas** = uma habilidade em dois graus. Estava mal
+  classificada como "grande": segurar o salto para abrandar a queda são
+  ~15 linhas.
+- **N29 Torre a desabar + N42 Avalanche + N65 Queda longa** = **uma**
+  máquina ("ameaça que avança e não se combate") com três caras. Dois dos
+  três níveis já têm câmara real (`chuva` no 42, `queda` construída).
+
+### O que sobra — 7 trabalhos, 1 grande
+
+| | Trabalho | Tamanho |
+|---|---|---|
+| 1 | **Gancho** (N53) — engatar e balançar | **grande** |
+| 2 | Inverter a gravidade à vontade (N67) | médio |
+| 3 | Ameaça que avança (N29/N42/N65) | médio |
+| 4 | Cenário reescreve-se atrás de ti (N70) | médio |
+| 5 | A sombra com atraso (N69) | médio |
+| 6 | Planar + Asas (N15/N63) | pequeno |
+| 7 | Perder uma habilidade por sala (N98) | pequeno |
+
+> **O gancho não se corta.** É a única da lista que muda todos os 100
+> níveis e não só o dela. Se for preciso cortar mais um, o candidato é o
+> N70 — é o que menos se nota a jogar, porque por definição acontece onde
+> já não se está a olhar.
+
+---
+
+## Os 14 "grandes" — a proposta original (histórico)
 
 Estes são os únicos que não cabem numa sessão a par de outra coisa. Por
 ordem do que **muda mais o jogo** para o que muda menos:
