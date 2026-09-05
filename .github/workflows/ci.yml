@@ -54,6 +54,10 @@ jobs:
         run: godot --headless --script res://tools/verifica_actores_novos.gd
       - name: As 100 jornadas constroem-se
         run: godot --headless --script res://tools/verifica_jornada.gd
+      # a jornada so' prova que a CAMARA da estreia foi escolhida. Esta
+      # prova que os ACTORES dela nasceram mesmo dentro do nivel.
+      - name: A mecanica de cada nivel existe mesmo
+        run: godot --headless --script res://tools/verifica_mecanicas.gd
 
   web:
     name: Build Web

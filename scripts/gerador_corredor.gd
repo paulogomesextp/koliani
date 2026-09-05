@@ -275,6 +275,25 @@ const POOL_REGIAO := {
 ## `docs/mecanicas_por_nivel.md`, com os 14 "grandes" que faltam construir.
 ## Trocar uma linha `# ~` por uma mecânica nova é o passo seguinte e não
 ## mexe em mais nada.
+## Pé-direito de que a câmara PRECISA para caber. Só está aqui quem não
+## cabe em qualquer sala.
+##
+## Isto existe porque duas câmaras -- `alavanca` e `invertido` -- desistiam
+## em silêncio e devolviam um `_f_descanso` quando a sala era baixa. Nos
+## níveis em que essa câmara é a ESTREIA (o 6 e o 67), a mecânica do nível
+## simplesmente não existia: a promessa de "uma mecânica nova por nível"
+## partia-se sem ninguém dar por isso, porque o `_estreia_cam` é gravado na
+## ESCOLHA e não na construção -- e por isso o `verifica_jornada.gd` dizia
+## "TUDO OK". Apanhado a 5 set 2026 pelo `tools/verifica_mecanicas.gd`, que
+## vai ver se os actores da estreia nasceram mesmo.
+##
+## Agora, quando a estreia do nível é uma destas, a banda vertical do nível
+## abre-se ao que ela precisa em vez de a câmara se render.
+const PE_DIREITO := {
+	"alavanca": 480.0,
+	"invertido": 545.0,
+}
+
 const MECANICA_DO_NIVEL := [
 	# --- niveis 1-5  (Regiao 1) ---
 	{"cam": "saltos", "grau": 0},
@@ -804,6 +823,10 @@ func _construir() -> void:
 		_idx, func() -> Vector2: return (kol as Node2D).global_position)
 	_chao_y = ancora.y + 92.0
 	_teto_y = _chao_y - lerpf(640.0, 1320.0, _dif) * _abertura
+	# a estreia manda: se ela precisa de mais pé-direito do que o perfil do
+	# nível dá, é o pé-direito que cede -- não a mecânica
+	if PE_DIREITO.has(_estreia_cam):
+		_teto_y = minf(_teto_y, _chao_y - float(PE_DIREITO[_estreia_cam]))
 
 	var comp: float = _comprimento(_idx)
 	var x0 := ancora.x - comp
@@ -869,6 +892,10 @@ func _construir() -> void:
 		var topo_casca: Variant = casca.get("topo")
 		if topo_casca != null:
 			_teto_y = maxf(_teto_y, float(topo_casca) + 110.0)
+			# Aqui NÃO se força nada: o tecto da masmorra é parede a sério e
+			# mandar a espinha acima dele é o bug antigo da "parede a
+			# impedir de subir". Quando a sala fechada não dá altura, é a
+			# câmara que encolhe -- ver `_f_alavanca` / `_f_invertido`.
 
 	var atm := get_tree().get_first_node_in_group("atmosfera")
 	if atm and atm.has_method("atualizar_extensao"):
@@ -2223,10 +2250,16 @@ func _f_portal(par: Node2D, x: float, y: float) -> Vector2:
 ## A ombreira por cima da grade fica a mais de um salto duplo do poleiro,
 ## senão saltava-se o portão por cima e não valia nada.
 func _f_alavanca(par: Node2D, x: float, y: float) -> Vector2:
-	if _chao_y - 96.0 - _teto_y < 460.0:
-		return _f_descanso(par, x, y)          # sem pé-direito para a grade
-	var cy: float = clampf(y, _teto_y + 400.0, _chao_y - 96.0)
-	var alt: float = clampf(cy - _teto_y - 60.0, 300.0, 360.0)
+	# Antes desistia aqui (`return _f_descanso(...)`) quando a sala era
+	# baixa -- e no nível 6, que TEM a alavanca por estreia, isso apagava a
+	# mecânica do nível sem deixar rasto. Agora a grade encolhe: uma grade
+	# de 200 px continua a ser uma grade, e a mecânica é a alavanca abri-la.
+	var vao := _chao_y - 96.0 - _teto_y
+	if vao < 300.0:
+		return _f_descanso(par, x, y)          # aí sim: não cabe mesmo
+	var folga: float = minf(400.0, vao * 0.62)
+	var cy: float = clampf(y, _teto_y + folga, _chao_y - 96.0)
+	var alt: float = clampf(cy - _teto_y - 60.0, 200.0, 360.0)
 	x += _rng.randf_range(150.0, 176.0)
 	var id := "jorn_%d_%d" % [_idx, _cont_i]
 	var topo := cy - 12.0
@@ -4497,11 +4530,15 @@ func _f_mente(par: Node2D, x: float, y: float) -> Vector2:
 ## Mundo Invertido de pernas para o ar partia o resto da jornada, que é
 ## toda desenhada para a gravidade normal.
 func _f_invertido(par: Node2D, x: float, y: float) -> Vector2:
-	# precisa de pé-direito para os dois pisos
-	if _chao_y - 120.0 - _teto_y < 520.0:
-		return _f_descanso(par, x, y)
-	var cy: float = clampf(y, _teto_y + 420.0, _chao_y - 120.0)
-	var teto := cy - 340.0
+	# Precisa de pé-direito para os DOIS pisos (anda-se no chão e no tecto).
+	# Também desistia em silêncio, e o nível 67 tem isto por estreia: os
+	# dois pisos aproximam-se em vez de a sala desaparecer.
+	var vao := _chao_y - 120.0 - _teto_y
+	if vao < 380.0:
+		return _f_descanso(par, x, y)          # aí sim: não cabe mesmo
+	var folga: float = minf(420.0, vao * 0.6)
+	var cy: float = clampf(y, _teto_y + folga, _chao_y - 120.0)
+	var teto: float = cy - clampf(vao * 0.62, 260.0, 340.0)
 	x += _rng.randf_range(150.0, 176.0)
 	_plat(par, Vector2(x, cy), Vector2(150.0, 18.0))
 	_checkpoint(x, cy, true)
