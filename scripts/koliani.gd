@@ -344,6 +344,12 @@ var _pos_inicial := Vector2.ZERO
 func _ready() -> void:
 	if EstadoJogo.checkpoint != Vector2.ZERO:
 		global_position = EstadoJogo.checkpoint
+		# ... e SEMPRE um pouco acima. O checkpoint da jornada é gravado 46
+		# px acima do chão da plataforma, que é a barriga dela; nascer
+		# exactamente ali com uma plataforma logo por cima entala-a e o
+		# nível fica intransponível. Sobe-se e deixa-se cair.
+		global_position.y -= ALTURA_SPAWN
+	_desencravar()
 	_pos_inicial = global_position
 	# a entrada do nível é um checkpoint implícito: morrer antes de tocar
 	# numa gema devolve a Koliani aqui (não ao início da campanha)
@@ -1826,3 +1832,42 @@ func _morrer() -> void:
 		# progresso (níveis concluídos, habilidades, pistas, equipamento) fica
 		EstadoJogo.reiniciar_run()
 	Transicao.fechar_e(get_tree().reload_current_scene)
+
+
+## Quantos píxeis ACIMA do checkpoint é que ela nasce. 40 px chegam para
+## sair de dentro de uma plataforma fina e são pouco para se dar por eles:
+## cai logo de volta ao chão.
+const ALTURA_SPAWN := 40.0
+## Até onde procurar sítio livre quando o ponto de nascimento está dentro de
+## geometria. 4 px de passo porque a plataforma mais fina do jogo tem 15.
+const BUSCA_DESENCRAVE := 220.0
+
+
+## Tira-a de dentro da parede, se lá estiver.
+##
+## Isto existe por um softlock real (nível 5, relatado pelo Paulo a 5 set
+## 2026): reaparecer no checkpoint punha-a entalada entre o chão e uma
+## plataforma logo por cima, e dali não saía de maneira nenhuma -- nem
+## morrendo, porque voltava exactamente ao mesmo sítio.
+##
+## A rede tem de estar AQUI e não só no gerador: quem já tem esse
+## checkpoint gravado no save continuaria preso para sempre.
+func _desencravar() -> void:
+	if not test_move(global_transform, Vector2.ZERO):
+		return
+	var passo := 4.0
+	var d := passo
+	while d <= BUSCA_DESENCRAVE:
+		# primeiro para cima (é de onde vem o tecto que a entala), depois
+		# para os lados, e só no fim para baixo
+		for tenta in [Vector2(0.0, -d), Vector2(-d, -d * 0.5),
+				Vector2(d, -d * 0.5), Vector2(-d, 0.0), Vector2(d, 0.0),
+				Vector2(0.0, d)]:
+			var t := global_transform
+			t.origin += tenta
+			if not test_move(t, Vector2.ZERO):
+				global_position += tenta
+				return
+		d += passo
+	push_warning("Koliani encravada no spawn em %s e sem saida a %d px"
+		% [global_position, int(BUSCA_DESENCRAVE)])

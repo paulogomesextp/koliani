@@ -1100,6 +1100,43 @@ func _construir() -> void:
 	_checkpoint(x + 60.0, yf, true)  # sempre um antes do chefe
 	_inimigo_em(par, Vector2(x + 240.0, yf - 30.0))
 
+	# ... e só no fim, com a jornada toda montada, é que se pode ver o que
+	# ficou POR CIMA de cada checkpoint
+	_afastar_checkpoints_do_tecto()
+
+
+## Um checkpoint com uma plataforma logo por cima é uma armadilha: ela
+## reaparece ali, fica entalada entre o chão e a plataforma, e nem morrer a
+## tira de lá -- volta sempre ao mesmo sítio. (Relatado pelo Paulo no nível
+## 5, a 5 set 2026.)
+##
+## Aqui varre-se a jornada já construída, lança-se um raio para cima de cada
+## checkpoint e, se houver tecto perto, empurra-se o checkpoint de lado até
+## haver céu. Se em 180 px não houver, o checkpoint sai: há muitos, e um
+## checkpoint a menos é melhor do que um nível intransponível.
+##
+## A rede do lado dela está no `koliani.gd` (`_desencravar`), e é a que
+## salva quem já tem um checkpoint mau gravado no save.
+const CEU_CHECKPOINT := 130.0
+
+func _afastar_checkpoints_do_tecto() -> void:
+	var espaco := get_world_2d().direct_space_state
+	for n in get_children():
+		if not n.name.begins_with("JornadaCheck_"):
+			continue
+		var ck := n as Node2D
+		var achou := false
+		for dx in [0.0, -60.0, 60.0, -120.0, 120.0, -180.0, 180.0]:
+			var o: Vector2 = ck.global_position + Vector2(dx, 0.0)
+			var q := PhysicsRayQueryParameters2D.create(
+				o, o + Vector2(0.0, -CEU_CHECKPOINT), 1)
+			if espaco.intersect_ray(q).is_empty():
+				ck.position.x += dx
+				achou = true
+				break
+		if not achou:
+			ck.queue_free()
+
 
 # --- infra --------------------------------------------------------------
 
