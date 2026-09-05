@@ -9,6 +9,24 @@ Quando se pegar numa entrada, marcar aqui com `✅` e apontar onde ficou
 
 ---
 
+## Onde é que isto está — 5 de setembro de 2026
+
+**75 das 95 linhas estão no jogo · 18 faltam · 2 estão fora por decisão.**
+
+`✅` está no jogo (e diz onde) · `⬜` não está · `➖` decidido que não entra.
+
+As 18 que faltam não são todas iguais: quatro delas (New Game Plus, ranking
+de fase, troca de personagens, backtracking) são **estrutura de jogo** e
+estão no painel de prioridades à espera de decisão do Paulo, não à espera
+de trabalho.
+
+O que fecha uma linha destas é código, não é uma tabela: quem marcar `✅`
+aqui aponta o ficheiro, e há bancadas no CI a garantir que a peça existe
+mesmo no nível (`tools/verifica_mecanicas.gd`) e que faz o que diz
+(`tools/verifica_camaras_novas.gd`).
+
+---
+
 ## Chefes
 
 - ✅ Padrões de ataque reconhecíveis — `chefe_base.gd`: telégrafo + EXPOSTO por arquétipo
@@ -68,7 +86,7 @@ Quando se pegar numa entrada, marcar aqui com `✅` e apontar onde ficou
 - ✅ Que caem após serem pisadas · temporizadas — `plataforma_quebra.gd`, `plataforma_ritmada.gd`
 - ✅ Que desaparecem e reaparecem — `plataforma_espectral.gd`, `plataforma_olhar.gd`
 - ✅ Que se movem ao ativar um interruptor — `alavanca.gd` + `porta_trancada.gd`
-- ⬜ Que sobem/descem com peso
+- ✅ Que sobem/descem com peso — `plataforma_peso.gd`, nível 57
 - ✅ Frágeis ou quebráveis — `parede_fragil.gd`, `plataforma_quebra.gd`
 - ✅ Nuvens atravessáveis por baixo — `plataforma.gd`: one-way
 - ✅ De salto · pegajosas · escorregadias — trampolim e `zona_gelo.gd` (atrito); pegajosas não
@@ -89,7 +107,7 @@ Quando se pegar numa entrada, marcar aqui com `✅` e apontar onde ficou
 - ✅ Armadilhas ativadas por proximidade · Armadilhas de tempo — `armadilha.gd`, `teia_prende.gd`
 - ✅ Piso que desaba — `plataforma_quebra.gd`
 - ✅ Água que afoga · Correntes de água · Areia movediça — `zona_sem_ar.gd` (nível 38), `corrente_lateral.gd`; areia movediça não
-- ⬜ Neve ou areia que afunda
+- ✅ Neve ou areia que afunda — `zona_afunda.gd`, nível 90
 - ✅ Escuridão limitada por luz · Névoa ou veneno — `zona_escuridao.gd`, `zona_estado.gd` (veneno e frio)
 - ✅ Inimigos patrulheiros · voadores · que perseguem · que atacam à distância — `demonio_base.gd` (`so_tiro`, voo, perseguição)
 - ✅ Inimigos invencíveis que forçam fuga — `ameaca_que_avanca.gd` — nível 65
@@ -110,7 +128,7 @@ Quando se pegar numa entrada, marcar aqui com `✅` e apontar onde ficou
 
 - ✅ Interruptores de pressão · Alavancas · Botões temporizados — `alavanca.gd`; botões temporizados não
 - ✅ Chaves e portas trancadas · Cartões de acesso — `porta_trancada.gd` ligada à alavanca; chaves de inventário não
-- ⬜ Objetos para colocar em pedestais · Mover caixas para alcançar locais — nada empurrável no jogo
+- ✅ Objetos para colocar em pedestais · Mover caixas para alcançar locais — `bloco_empurravel.gd` + `placa_peso.gd`, nível 71
 - ✅ Espelhos e reflexão de luz · Circuitos elétricos · Alterar fluxo de água — `espelho.gd` e `para_raios.gd`; fluxo de água não
 - ✅ Alterar gravidade · Manipulação do tempo · Pausar ou rebobinar objetos — `zona_gravidade.gd`, `placa_gravidade.gd` e o mundo invertido (67); tempo não
 - ⬜ Alternar entre dimensões · Alternar entre dia/noite — a Praça do Eclipse alterna cenário, mas é decoração
