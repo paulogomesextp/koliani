@@ -26,7 +26,11 @@ var _apanhado := false
 
 
 func _ready() -> void:
-	monitoring = true
+	# `set_deferred` e nao atribuicao directa: a essencia nasce DENTRO do
+	# `receber_dano` do bicho, que corre a meio do passo de fisica -- ligar
+	# o `monitoring` ali dava "Can't change this state while flushing
+	# queries" e a moeda ficava sem area nenhuma.
+	set_deferred("monitoring", true)
 	collision_layer = 0
 	collision_mask = 2   # a Koliani está na layer 2
 	body_entered.connect(_ao_tocar)
