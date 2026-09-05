@@ -112,6 +112,37 @@ func teste_movimento_anda_para_a_direita() -> void:
 	_ok(e.velocidade.x <= Movimento.VEL_CORRIDA + 0.001, "nao devia passar a velocidade de corrida")
 
 
+## CHAO ESCORREGADIO (nivel 41): `acel_escala` mexe nas DUAS metades --
+## custa a arrancar e custa a parar --, porque a travagem usa a mesma
+## aceleracao da arrancada. E' toda a mecanica do gelo num so' numero.
+func teste_movimento_gelo_custa_a_arrancar_e_a_parar() -> void:
+	var normal := Movimento.Estado.new()
+	var gelo := Movimento.Estado.new()
+	for i in 6:
+		Movimento.passo(normal, 1.0, false, false, true, DT)
+		Movimento.passo(gelo, 1.0, false, false, true, DT, 1, 1.0, 0.25)
+	_ok(gelo.velocidade.x < normal.velocidade.x,
+		"no gelo devia custar mais a ganhar velocidade (%.0f vs %.0f)"
+			% [gelo.velocidade.x, normal.velocidade.x])
+	# agora a travagem: larga-se o comando com as duas a' mesma velocidade
+	normal.velocidade.x = Movimento.VEL_CORRIDA
+	gelo.velocidade.x = Movimento.VEL_CORRIDA
+	for i in 6:
+		Movimento.passo(normal, 0.0, false, false, true, DT)
+		Movimento.passo(gelo, 0.0, false, false, true, DT, 1, 1.0, 0.25)
+	_ok(gelo.velocidade.x > normal.velocidade.x,
+		"no gelo devia custar mais a parar (%.0f vs %.0f)"
+			% [gelo.velocidade.x, normal.velocidade.x])
+	# e nunca chega a zero: a 0.25 ainda se muda de sentido, so' demora
+	var volta := Movimento.Estado.new()
+	volta.velocidade.x = Movimento.VEL_CORRIDA
+	for i in 120:
+		Movimento.passo(volta, -1.0, false, false, true, DT, 1, 1.0, 0.25)
+	_ok(volta.velocidade.x < 0.0,
+		"mesmo no gelo tem de dar para inverter o sentido (vx = %.0f)"
+			% volta.velocidade.x)
+
+
 func teste_movimento_salto_duplo() -> void:
 	var e := Movimento.Estado.new()
 	Movimento.passo(e, 0.0, false, false, true, DT, 2)   # 1 frame no chao arma o coyote

@@ -258,6 +258,10 @@ var _leve := 0.0
 ## zonas de "gravidade lunar" (< 1) e a Sacerdotisa mexe nisto durante a
 ## luta. Reposto a 1 por `definir_grav_escala(1.0)` ao sair da zona.
 var _grav_escala := 1.0
+## Atrito do chao: < 1 = ESCORREGADIO (nivel 41). Como a travagem usa a
+## mesma aceleracao da arrancada, um so' numero da' as duas metades da
+## sensacao. Reposto a 1 pela `ZonaGelo` a' saida.
+var _acel_escala := 1.0
 ## Multiplicador do input horizontal (-1 = controlos invertidos). O Olho do
 ## Abismo (nível 20) inverte-os por uns segundos com `inverter_controlos()`.
 var _inverso := 1.0
@@ -848,7 +852,7 @@ func _physics_process(dt: float) -> void:
 			_mov, dir,
 			Input.is_action_just_pressed("saltar"),
 			Input.is_action_pressed("saltar") or _impulso_externo_t > 0.0,
-			is_on_floor(), dt, saltos_max, _grav_escala,
+			is_on_floor(), dt, saltos_max, _grav_escala, _acel_escala,
 		)
 		velocity = _mov.velocidade
 		if _mov.saltos_dados > saltos_antes:
@@ -1546,6 +1550,13 @@ func aplicar_impulso(v: Vector2, manter_x := false) -> void:
 ## chamam isto ao entrar/sair; a Sacerdotisa mexe nisto durante a luta.
 func definir_grav_escala(v: float) -> void:
 	_grav_escala = clampf(v, 0.2, 1.5)
+
+
+## Atrito do chao (ver `_acel_escala`). Chamado pela `ZonaGelo`. O minimo e'
+## 0.15 de proposito: abaixo disso ela deixa de conseguir mudar de sentido
+## a tempo de qualquer coisa, e o gelo passava de mecanica a castigo.
+func definir_acel_escala(v: float) -> void:
+	_acel_escala = clampf(v, 0.15, 1.5)
 
 
 ## RETIRADO (pedido do Paulo): a inversão de controlos do Olho do Abismo

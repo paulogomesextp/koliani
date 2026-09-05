@@ -352,6 +352,22 @@ de editor onde se veja se está certo. A bancada apanhou:
   e a verificação das jornadas continuava a dizer "TUDO OK", porque a
   plataforma falhava em silêncio.
 
+### Quarta leva: o chão escorregadio (N41) — a primeira que mexe nela
+
+| Nível | Câmara | O que muda |
+|---|---|---|
+| 41 Floresta Congelada | `gelo` | a `ZonaGelo` baixa a **aceleração horizontal** dela. Como a travagem usa a mesma aceleração, um só número dá as duas metades da sensação: custa a arrancar e custa a parar. O salto é o de sempre e os vãos são os de sempre -- o que desaparece é a travagem, e o problema deixa de ser saltar e passa a ser **parar antes da beira** |
+
+O parâmetro vive na lógica **pura** (`Movimento.passo(..., acel_escala)`),
+ao lado do `grav_escala` que a `ZonaGravidade` já usava -- e por isso está
+coberto pela suite normal, sem bancada nenhuma à parte
+(`teste_movimento_gelo_custa_a_arrancar_e_a_parar`). O mínimo é 0.15: mais
+do que isso e ela deixava de conseguir mudar de sentido a tempo de nada, e
+o gelo passava de mecânica a castigo. As placas nunca cobrem a plataforma
+toda -- há sempre pedra onde se recupera o pé.
+
+**Provisórias: 26 → 25.**
+
 ### E as pools das regiões, que era o buraco maior
 
 As 16 estreias de 5 set (`lava_sobe`, `mare`, `espectral`, …) **não estavam

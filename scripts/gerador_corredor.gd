@@ -80,6 +80,7 @@ const CHAO_QUENTE := preload("res://scripts/chao_quente.gd")
 const CEIFA := preload("res://scripts/ceifa.gd")
 const ARIETE := preload("res://scripts/ariete.gd")
 const PLAT_OLHAR := preload("res://scenes/actors/PlataformaOlhar.tscn")
+const ZONA_GELO := preload("res://scripts/zona_gelo.gd")
 
 ## Líquido mortal por região: [cor, brasas]. floresta=água podre, prisão=ácido,
 ## torres=??? (usa trevas), catacumbas=trevas, cidade=ácido citrino,
@@ -145,7 +146,7 @@ const POOL_REGIAO := {
 	# de gelo a cair. Sem `fogo` (não há nada a arder numa montanha de neve).
 	8: ["vento", "quebra", "espelhos", "pedras", "saltos", "trampolim",
 		"elevador", "espinhos", "crossfire", "portal", "alavanca", "segredo",
-		"chuva", "vitral", "espectral", "placa"],
+		"chuva", "vitral", "espectral", "placa", "gelo"],
 	# X Deserto dos Esquecidos: templos cheios de ARMADILHAS. `crossfire`
 	# é a assinatura (as estátuas que disparam do plano) e `pedras` são as
 	# dunas que desabam. Sem `gravidade` e sem `vento` -- aqui o ar está
@@ -308,7 +309,7 @@ const MECANICA_DO_NIVEL := [
 	{"cam": "tapete", "grau": 1},
 	{"cam": "gravidade", "grau": 1},  # ~
 	# --- niveis 41-45  (Regiao 9) ---
-	{"cam": "vento", "grau": 1},  # ~
+	{"cam": "gelo", "grau": 1},
 	{"cam": "chuva", "grau": 1},
 	{"cam": "vitral", "grau": 1},
 	{"cam": "espectral", "grau": 1},
@@ -425,6 +426,7 @@ const CAMARAS_FLAVOUR := [
 	"correnteza", "sem_chao", "catapulta", "salvas", "assalto", "memoria",
 	"replicantes", "estatuas", "incorporeo",
 	"rosas", "imanes", "ceifa", "brasas", "olhar", "ariete", "revisao",
+	"gelo",
 ]
 
 ## Câmara "assinatura" de cada região -- no acto do meio da jornada aparece
@@ -1524,6 +1526,7 @@ func _flavour(par: Node2D, tipo: String, x: float, y: float) -> Vector2:
 		"olhar": return _f_olhar(par, x, y)
 		"ariete": return _f_ariete(par, x, y)
 		"revisao": return _f_revisao(par, x, y)
+		"gelo": return _f_gelo(par, x, y)
 	# tipo sem handler -> não deve acontecer (pool/assinatura mal configurada).
 	# Avisa em vez de gerar um vão morto silencioso e cai num `descanso`.
 	push_warning("GeradorCorredor: câmara '%s' sem _f_ correspondente" % tipo)
@@ -3590,6 +3593,37 @@ func _f_revisao(par: Node2D, x: float, y: float) -> Vector2:
 		pos = _flavour(par, esc, pos.x, pos.y)
 	_checkpoint(pos.x, pos.y, true)
 	return pos
+
+
+## GELO (N41, Floresta Congelada): placas escorregadias sobre um deck
+## partido. O salto é o de sempre e os vãos são os de sempre -- o que
+## desaparece é a travagem, e por isso o problema deixa de ser saltar e
+## passa a ser PARAR antes da beira. As placas nunca cobrem a plataforma
+## toda: há sempre um bocado de pedra em cada uma onde se recupera o pé.
+func _f_gelo(par: Node2D, x: float, y: float) -> Vector2:
+	var cy: float = clampf(y, _teto_y + 200.0, _chao_y - 110.0)
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(140.0, 18.0))
+	_checkpoint(x, cy, true)
+	var n := 3 + int(_dif * 2.0)
+	for i in n:
+		x += _rng.randf_range(150.0, 174.0)
+		var larg := 210.0
+		_plat(par, Vector2(x + larg * 0.5, cy), Vector2(larg, 18.0))
+		var zg := ZONA_GELO.new()
+		# a placa é mais curta do que a plataforma de propósito: o resto é
+		# pedra, e é lá que se trava
+		zg.tamanho = Vector2(larg - 60.0, 60.0)
+		zg.escala = 0.36 - 0.12 * _dif
+		zg.position = Vector2(x + larg * 0.5 - 20.0, cy - 34.0)
+		par.add_child(zg)
+		x += larg
+		if i % 2 == 1:
+			_checkpoint(x - larg * 0.5, cy)
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(140.0, 18.0))
+	_checkpoint(x, cy, true)
+	return Vector2(x, cy)
 
 
 ## Estica uma `ZonaGravidade` para cobrir `tam` (e o Fundo com ela).

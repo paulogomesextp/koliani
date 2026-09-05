@@ -34,7 +34,11 @@ class Estado:
 
 ## `saltos_max` = quantos saltos a Koliani pode encadear no ar antes de
 ## voltar a tocar no chão (1 = normal, 2 = salto duplo).
-static func passo(e: Estado, direcao: float, saltar_premido: bool, saltar_a_segurar: bool, no_chao: bool, dt: float, saltos_max: int = 1, grav_escala: float = 1.0) -> Estado:
+## `acel_escala` multiplica a aceleracao horizontal -- e como a travagem
+## usa a MESMA aceleracao, baixa'-la da' chao ESCORREGADIO: custa a ganhar
+## velocidade e custa a perde-la (nivel 41, Floresta Congelada). 1.0 = chao
+## normal. Nunca chega a zero: a 0.25 ainda se muda de sentido, so' demora.
+static func passo(e: Estado, direcao: float, saltar_premido: bool, saltar_a_segurar: bool, no_chao: bool, dt: float, saltos_max: int = 1, grav_escala: float = 1.0, acel_escala: float = 1.0) -> Estado:
 	# temporizadores
 	if no_chao:
 		e.coyote_restante = COYOTE
@@ -47,7 +51,7 @@ static func passo(e: Estado, direcao: float, saltar_premido: bool, saltar_a_segu
 
 	# horizontal
 	var alvo := direcao * VEL_CORRIDA
-	var acel := ACEL_CHAO if no_chao else ACEL_AR
+	var acel := (ACEL_CHAO if no_chao else ACEL_AR) * maxf(0.05, acel_escala)
 	e.velocidade.x = move_toward(e.velocidade.x, alvo, acel * dt)
 
 	# quem sai da plataforma a andar (sem saltar) e deixa o coyote expirar
