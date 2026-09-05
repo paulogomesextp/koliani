@@ -259,6 +259,45 @@ jogo perder a promessa de "uma mecânica nova por nível".
 
 ---
 
+## FEITO (5 set 2026, 3.ª passagem) — 11 provisórias a menos
+
+As linhas `# ~` da `MECANICA_DO_NIVEL` eram 52; passam a **41**. Nenhuma
+destas onze precisou de actor novo — o que muda é a **regra da sala**, e é
+por isso que saíram todas de uma vez.
+
+| Nível | Câmara nova | O que a distingue da parecida |
+|---|---|---|
+| 33 A Forja dos Demónios | `martelos` | as `guilhotinas` são uma por plataforma, cada uma no seu tempo; aqui o chão é contínuo, a linha inteira bate e há um jacto de forja entre martelos — pede passo, não espera |
+| 52 Labirinto Verde | `bifurcacao` | três bocas, duas mentem. É o labirinto **sem** a `SalaLabirinto` (em pausa desde 30 ago por softlock): um beco só se oferece com a volta atrás à vista e a um salto |
+| 55 Árvore do Rei | `raizes` | a fila de raízes irrompe em cadeia — atravessa-se entre duas quem anda ao passo delas |
+| 79 Fortaleza Kraken | `varredura` | os `pendulos` penduram-se do tecto e cortam o vão (passa-se por baixo); estes ancoram por baixo do convés e varrem o chão (salta-se por cima) |
+| 81 Portão Infernal | `prensa_fogo` | a `prensa` e o `fogo` no mesmo compasso: a parede empurra para o jacto e o jacto acende quando ela chega. O buraco seguro anda |
+| 83 Rio das Almas | `correnteza` | a `CorrenteLateral` empurra para trás o trecho todo. Estreia o actor que estava no repo desde 5 set **sem nenhuma câmara a usá-lo** |
+| 87 Segundo Vazio | `sem_chao` | rajadas de impulsor encadeadas e ilhotas do tamanho dos pés. A única câmara em que não é o salto dela que a leva à frente |
+| 91 Campo de Batalha | `catapulta` | a `chuva` é o tecto a desfazer-se num beiral; aqui vem tudo de fora e o chão é largo, para haver para onde correr |
+| 92 Céu em Guerra | `salvas` | o `crossfire` dispara sempre, cada torreta no seu tempo; aqui disparam **todas ao mesmo tempo** — lê-se o compasso, não a linha de tiro |
+| 94 Torre da Corrupção | `assalto` | a `torre` é uma subida limpa; esta é a mesma subida com as torretas todas do mesmo lado |
+| 96 O Reino Antes da Corrupção | `memoria` | a única câmara **sem perigo nenhum**. Só funciona porque as anteriores ensinaram a desconfiar |
+
+### E as pools das regiões, que era o buraco maior
+
+As 16 estreias de 5 set (`lava_sobe`, `mare`, `espectral`, …) **não estavam
+em pool nenhuma**: apareciam uma vez em 100 níveis — a estreia forçada — e
+nunca mais. As pools das regiões VII a XX continuavam a ser as mesmas 12
+câmaras de sempre, e era isso que fazia o 2.º acto saber ao 1.º. Agora cada
+região leva as suas (o filtro por nível de estreia continua a mandar: uma
+câmara que estreie depois nunca aparece antes).
+
+Medido com `tools/verifica_jornada.gd` (sobreposição de Jaccard entre
+níveis seguidos, menos é melhor):
+
+| | |
+|---|---|
+| antes desta passagem | 0.275 |
+| **depois** | **0.234** — menos 15% |
+
+---
+
 ## DECIDIDO (5 set 2026) — os 14 grandes ficaram em 7
 
 O Paulo cortou três e aceitou as fusões. Fica assim:
