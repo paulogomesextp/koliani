@@ -317,6 +317,41 @@ sério: o `float(null)` do `_koliani_a_olhar` quando o nó do grupo não é a
 Koliani, e uma expectativa de vida que ignorava a curva de dificuldade
 aplicada no `_ready`.
 
+### Terceira leva: sete câmaras e cinco actores novos
+
+| Nível | Câmara | Actor novo | O que a distingue |
+|---|---|---|---|
+| 51 Jardim das Rosas Negras | `rosas` | — (`Espinhos` em ciclo) | a `espinhos` é fixa e salta-se; aqui o chão é contínuo e o que muda é **quando** se pode estar em cada sítio |
+| 60 Coração da Máquina | `imanes` | **`Iman`** | campos que atraem e repelem a alternar. O cenário está parado e o salto é o de sempre -- o que muda é a conta, e muda a meio do voo |
+| 75 Trono da Morte | `ceifa` | **`Ceifa`** | uma lâmina rasa varre a sala de ponta a ponta. Os `pendulos` deixam sempre um lado livre; esta não |
+| 82 Cidade dos Demónios | `brasas` | **`ChaoQuente`** | o chão queima quem fica parado. Não é uma armadilha de reflexos -- é uma sala que não deixa pensar de pé, e os bichos estão lá para isso |
+| 86 Primeiro Vazio | `olhar` | **`PlataformaOlhar`** | as plataformas do meio só existem enquanto ela está virada para elas. Andar em frente acende o caminho; o que se perde é poder olhar para trás |
+| 93 Cerco ao Castelo | `ariete` | **`Ariete`** | a porta só abre a empurrar a máquina até lá, e a máquina é a única cobertura contra as torretas. Nunca recua nem fica presa: se ela se afastar, espera |
+| 97 O Primeiro Castelo | `revisao` | — | quatro câmaras de regiões diferentes, seguidas. A única câmara do jogo cujo assunto é o próprio jogo -- e só escolhe entre coisas que já estrearam |
+
+**Provisórias: 33 → 26.** Sobreposição: **0.222**.
+
+### `tools/verifica_actores_novos.gd` — e três falhas que eram da bancada
+
+Os cinco actores constroem a própria área/corpo em código e nenhum tem cena
+de editor onde se veja se está certo. A bancada apanhou:
+
+- **medir frames em vez de tempo não funciona em headless.** Os frames
+  correm o mais depressa que conseguem: 30 frames podem ser 30 ms, e um
+  actor com um ciclo de 0.25 s nunca lá chegava. Três "falhas" que não
+  existiam. (E a física em headless anda ~10% atrás do relógio -- as
+  esperas levam folga.)
+- **`await physics_frame` num `SceneTree` em `--script` fica pendurado.**
+  O `process_frame` é que anda.
+- o `Ariete` só se conseguiu testar depois de deixar de tocar em `Alavanca`
+  e em `Som` **pelo identificador** (passou a `get`/`set`/`has_signal` e a
+  `/root/Som`) -- de outra forma o script não compila em `--script` e a
+  bancada ficava sem o poder ver. É a armadilha dos autoloads outra vez.
+- e um bug a sério do desenho: o `PlataformaOlhar._aplicar(bool)` colidia
+  com o `_aplicar()` que a `Plataforma` já tinha. O script **não compilava**
+  e a verificação das jornadas continuava a dizer "TUDO OK", porque a
+  plataforma falhava em silêncio.
+
 ### E as pools das regiões, que era o buraco maior
 
 As 16 estreias de 5 set (`lava_sobe`, `mare`, `espectral`, …) **não estavam

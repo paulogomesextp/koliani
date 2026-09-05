@@ -1,0 +1,21 @@
+[gd_scene load_steps=3 format=3 uid="uid://bkolianiplatolhar86"]
+
+; Plataforma que só existe enquanto a Koliani está virada para ela (ver
+; scripts/plataforma_olhar.gd). Irmã da PlataformaEspectral: mesma API
+; `tamanho` e mesmos tiles por bioma, só muda o que a segura.
+
+[ext_resource type="Script" path="res://scripts/plataforma_olhar.gd" id="1_pol"]
+
+[sub_resource type="RectangleShape2D" id="rs_pol"]
+size = Vector2(96, 16)
+
+[node name="PlataformaOlhar" type="StaticBody2D"]
+collision_layer = 1
+collision_mask = 0
+script = ExtResource("1_pol")
+tamanho = Vector2(96, 16)
+
+[node name="Visual" type="Node2D" parent="."]
+
+[node name="Col" type="CollisionShape2D" parent="."]
+shape = SubResource("rs_pol")

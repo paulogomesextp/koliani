@@ -50,6 +50,8 @@ jobs:
       # passaria em silencio sem medir nada. Este corre a' parte.
       - name: Regras de bicho
         run: godot --headless --script res://tools/verifica_regras_bicho.gd
+      - name: Actores novos (Iman, ChaoQuente, Ceifa, PlataformaOlhar, Ariete)
+        run: godot --headless --script res://tools/verifica_actores_novos.gd
       - name: As 100 jornadas constroem-se
         run: godot --headless --script res://tools/verifica_jornada.gd
 

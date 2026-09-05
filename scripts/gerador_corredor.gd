@@ -73,6 +73,13 @@ const PARA_RAIOS := preload("res://scenes/actors/ParaRaios.tscn")
 ## Correnteza lateral -- actor novo (5 set 2026). Só script: constrói a
 ## própria área, como o `CHECKPOINT`.
 const CORRENTE_LAT := preload("res://scripts/corrente_lateral.gd")
+## Actores novos (5 set 2026, 3.ª leva). Os quatro primeiros são só script
+## -- constroem a própria área/corpo, como o `CHECKPOINT`.
+const IMAN := preload("res://scripts/iman.gd")
+const CHAO_QUENTE := preload("res://scripts/chao_quente.gd")
+const CEIFA := preload("res://scripts/ceifa.gd")
+const ARIETE := preload("res://scripts/ariete.gd")
+const PLAT_OLHAR := preload("res://scenes/actors/PlataformaOlhar.tscn")
 
 ## Líquido mortal por região: [cor, brasas]. floresta=água podre, prisão=ácido,
 ## torres=??? (usa trevas), catacumbas=trevas, cidade=ácido citrino,
@@ -151,14 +158,14 @@ const POOL_REGIAO := {
 	# foi plantado, não construído.
 	10: ["pendulos", "trampolim", "saltos", "ritmo", "velas", "espinhos",
 		"ferry", "gruta", "portal", "alavanca", "segredo", "bifurcacao",
-		"raizes", "espectral", "chuva"],
+		"raizes", "espectral", "chuva", "rosas"],
 	# XII Cidade das Maquinas: o oposto. Nada balança -- tudo ANDA, com
 	# `correntes` de assinatura (as correias). É a única região com todas
 	# as câmaras de máquina ao mesmo tempo.
 	11: ["correntes", "elevador", "impulso", "ritmo", "prensa", "serras",
 		"guilhotinas", "crossfire", "quebra", "portal", "alavanca",
 		"segredo", "circuito", "tapete", "placa", "martelos",
-		"replicantes"],
+		"replicantes", "imanes"],
 	# XIII Ceu Partido: não há chão -- só o que passa. `ferry` de
 	# assinatura (as ilhas que se movem), mais `vento` e `gravidade`.
 	12: ["ferry", "vento", "gravidade", "saltos", "trampolim", "elevador",
@@ -173,7 +180,8 @@ const POOL_REGIAO := {
 	# sólida a ponte fantasma, que é a mecânica-imagem da região inteira.
 	14: ["sinos", "velas", "gruta", "pendulos", "guilhotinas", "espinhos",
 		"ferry", "elevador", "portal", "alavanca", "segredo", "espectral",
-		"vitral", "bifurcacao", "raizes", "incorporeo", "estatuas"],
+		"vitral", "bifurcacao", "raizes", "incorporeo", "estatuas",
+		"ceifa"],
 	# XVI Mar Vermelho: a maré. `ritmo` de assinatura -- tudo aqui sobe e
 	# desce a compasso.
 	15: ["ritmo", "ferry", "quebra", "gravidade", "pendulos", "espinhos",
@@ -183,18 +191,18 @@ const POOL_REGIAO := {
 	# única região onde o `fogo` volta com tudo desde o Castelo (nível 30).
 	16: ["prensa", "fogo", "guilhotinas", "serras", "espinhos", "crossfire",
 		"pedras", "quebra", "portal", "alavanca", "segredo", "prensa_fogo",
-		"lava_sobe", "martelos", "anel", "correnteza"],
+		"lava_sobe", "martelos", "anel", "correnteza", "brasas"],
 	# XVIII O Vazio: nada é permanente. `elevador` de assinatura -- o chão
 	# que aparece e desaparece. Pool curta de propósito: a região tem de
 	# se sentir VAZIA, e uma pool grande enche a jornada de coisas.
 	17: ["elevador", "gravidade", "portal", "espelhos", "saltos", "quebra",
 		"alavanca", "segredo", "sem_chao", "espectral", "orbita", "queda",
-		"estatuas"],
+		"estatuas", "olhar"],
 	# XIX Guerra dos Reinos: cerco. `pedras` de assinatura (o que as
 	# catapultas mandam) mais tudo o que fere -- é a região mais densa.
 	18: ["pedras", "crossfire", "espinhos", "serras", "guilhotinas",
 		"prensa", "fogo", "correntes", "ferry", "portal", "alavanca",
-		"segredo", "catapulta", "salvas", "assalto", "horda", "chuva",
+		"segredo", "catapulta", "salvas", "assalto", "horda", "chuva", "ceifa",
 		"bombas"],
 	# XX O Ultimo Caminho: `velas` de assinatura -- acender uma luz para o
 	# caminho aparecer é a imagem da região inteira (são memórias).
@@ -312,7 +320,7 @@ const MECANICA_DO_NIVEL := [
 	{"cam": "prensa", "grau": 1},  # ~
 	{"cam": "queda", "grau": 1},
 	# --- niveis 51-55  (Regiao 11) ---
-	{"cam": "pendulos", "grau": 1},  # ~
+	{"cam": "rosas", "grau": 1},
 	{"cam": "bifurcacao", "grau": 1},
 	{"cam": "gruta", "grau": 1},  # ~
 	{"cam": "portal", "grau": 1},  # ~
@@ -322,7 +330,7 @@ const MECANICA_DO_NIVEL := [
 	{"cam": "elevador", "grau": 1},  # ~
 	{"cam": "replicantes", "grau": 1},
 	{"cam": "circuito", "grau": 1},
-	{"cam": "correntes", "grau": 1},  # ~
+	{"cam": "imanes", "grau": 1},
 	# --- niveis 61-65  (Regiao 13) ---
 	{"cam": "orbita", "grau": 1},
 	{"cam": "para_raios", "grau": 1},
@@ -340,7 +348,7 @@ const MECANICA_DO_NIVEL := [
 	{"cam": "gruta", "grau": 2},  # ~
 	{"cam": "incorporeo", "grau": 2},
 	{"cam": "guilhotinas", "grau": 2},  # ~
-	{"cam": "sinos", "grau": 2},  # ~
+	{"cam": "ceifa", "grau": 2},
 	# --- niveis 76-80  (Regiao 16) ---
 	{"cam": "mare", "grau": 2},
 	{"cam": "serras", "grau": 2},  # ~
@@ -349,12 +357,12 @@ const MECANICA_DO_NIVEL := [
 	{"cam": "ritmo", "grau": 2},  # ~
 	# --- niveis 81-85  (Regiao 17) ---
 	{"cam": "prensa_fogo", "grau": 2},
-	{"cam": "fogo", "grau": 2},  # ~
+	{"cam": "brasas", "grau": 2},
 	{"cam": "correnteza", "grau": 2},
 	{"cam": "prensa", "grau": 2},  # ~
 	{"cam": "anel", "grau": 2},
 	# --- niveis 86-90  (Regiao 18) ---
-	{"cam": "elevador", "grau": 2},  # ~
+	{"cam": "olhar", "grau": 2},
 	{"cam": "sem_chao", "grau": 2},
 	{"cam": "elevador", "grau": 2},  # ~
 	{"cam": "espectral", "grau": 2},
@@ -362,12 +370,12 @@ const MECANICA_DO_NIVEL := [
 	# --- niveis 91-95  (Regiao 19) ---
 	{"cam": "catapulta", "grau": 2},
 	{"cam": "salvas", "grau": 2},
-	{"cam": "espinhos", "grau": 2},  # ~
+	{"cam": "ariete", "grau": 2},
 	{"cam": "assalto", "grau": 2},
 	{"cam": "horda", "grau": 2},
 	# --- niveis 96-100  (Regiao 20) ---
 	{"cam": "memoria", "grau": 2},
-	{"cam": "velas", "grau": 2},  # ~
+	{"cam": "revisao", "grau": 2},
 	{"cam": "saltos", "grau": 2},  # ~
 	{"cam": "trampolim", "grau": 2},  # ~
 	{"cam": "velas", "grau": 2},  # ~
@@ -416,6 +424,7 @@ const CAMARAS_FLAVOUR := [
 	"martelos", "bifurcacao", "raizes", "varredura", "prensa_fogo",
 	"correnteza", "sem_chao", "catapulta", "salvas", "assalto", "memoria",
 	"replicantes", "estatuas", "incorporeo",
+	"rosas", "imanes", "ceifa", "brasas", "olhar", "ariete", "revisao",
 ]
 
 ## Câmara "assinatura" de cada região -- no acto do meio da jornada aparece
@@ -612,7 +621,7 @@ const INTENSAS := [
 	"guilhotinas", "serras", "pendulos", "fogo", "quebra", "crossfire", "ferry",
 	"pedras", "espinhos", "corredor", "arena", "prensa", "espelhos", "sinos",
 	"martelos", "raizes", "varredura", "prensa_fogo", "salvas",
-	"replicantes", "estatuas",
+	"replicantes", "estatuas", "ceifa", "brasas", "ariete", "rosas",
 	"catapulta", "assalto", "horda", "anel",
 ]
 
@@ -1508,6 +1517,13 @@ func _flavour(par: Node2D, tipo: String, x: float, y: float) -> Vector2:
 		"replicantes": return _f_replicantes(par, x, y)
 		"estatuas": return _f_estatuas(par, x, y)
 		"incorporeo": return _f_incorporeo(par, x, y)
+		"rosas": return _f_rosas(par, x, y)
+		"imanes": return _f_imanes(par, x, y)
+		"ceifa": return _f_ceifa(par, x, y)
+		"brasas": return _f_brasas(par, x, y)
+		"olhar": return _f_olhar(par, x, y)
+		"ariete": return _f_ariete(par, x, y)
+		"revisao": return _f_revisao(par, x, y)
 	# tipo sem handler -> não deve acontecer (pool/assinatura mal configurada).
 	# Avisa em vez de gerar um vão morto silencioso e cai num `descanso`.
 	push_warning("GeradorCorredor: câmara '%s' sem _f_ correspondente" % tipo)
@@ -3349,6 +3365,231 @@ func _f_incorporeo(par: Node2D, x: float, y: float) -> Vector2:
 	_plat(par, Vector2(x, cy), Vector2(140.0, 18.0))
 	_checkpoint(x, cy, true)
 	return Vector2(x, cy)
+
+
+## ROSAS (N51, Jardim das Rosas Negras): os canteiros abrem e fecham em
+## onda. Não é a `espinhos` (fixa, um obstáculo que se salta): aqui o chão
+## é contínuo e o que muda é QUANDO se pode estar em cada sítio -- passa-se
+## a andar atrás da onda, como no `ritmo`, mas sem plataforma nenhuma a
+## mexer-se.
+func _f_rosas(par: Node2D, x: float, y: float) -> Vector2:
+	var cy: float = clampf(y, _teto_y + 200.0, _chao_y - 96.0)
+	x += _rng.randf_range(150.0, 176.0)
+	var n := 4 + int(_dif * 3.0)
+	var larg := 128.0 * float(n) + 200.0
+	_plat(par, Vector2(x + larg * 0.5, cy), Vector2(larg, 24.0), 46.0)
+	_checkpoint(x + 44.0, cy, true)
+	var x0 := x
+	var per := 2.6 - 0.8 * _dif
+	for i in n:
+		var esp := ESPINHOS.instantiate()
+		esp.largura = 3
+		esp.position = Vector2(x0 + 140.0 + float(i) * 128.0, cy - 12.0)
+		par.add_child(esp)
+		esp.scale.y = 0.0
+		esp.ativa = false
+		# a onda: cada canteiro abre um pouco depois do anterior
+		var t := esp.create_tween().set_loops()
+		t.tween_interval(per * 0.22 * float(i))
+		t.tween_callback(func() -> void:
+			esp.ativa = true)
+		t.tween_property(esp, "scale:y", 1.0, 0.24)
+		t.tween_interval(per * 0.55)
+		t.tween_property(esp, "scale:y", 0.0, 0.22)
+		t.tween_callback(func() -> void:
+			esp.ativa = false)
+		t.tween_interval(per * 0.6)
+	_coluna_fundo(par, x0 + larg * 0.5)
+	x = x0 + larg + _rng.randf_range(148.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(130.0, 18.0))
+	_checkpoint(x, cy)
+	return Vector2(x, cy)
+
+
+## ÍMANES (N60, Coração da Máquina): campos que atraem e repelem, a
+## alternar. O cenário está parado e o salto é o de sempre -- o que muda é
+## a conta, e muda a meio do voo. As plataformas ficam à distância normal
+## de propósito: quem esperar o meio-ciclo certo atravessa sem esforço.
+func _f_imanes(par: Node2D, x: float, y: float) -> Vector2:
+	var cy: float = clampf(y, _teto_y + 260.0, _chao_y - 160.0)
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(140.0, 18.0))
+	_checkpoint(x, cy, true)
+	var n := 3 + int(_dif * 2.0)
+	for i in n:
+		var im := IMAN.new()
+		im.raio = 170.0
+		im.forca = 520.0 + 240.0 * _dif
+		im.periodo = 2.8 - 0.8 * _dif
+		im.position = Vector2(x + 92.0, cy - 96.0 - 26.0 * float(i % 2))
+		par.add_child(im)
+		x += _rng.randf_range(160.0, 184.0)
+		_plat(par, Vector2(x, cy - 16.0 * float(i % 2)), Vector2(94.0, 16.0))
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(140.0, 18.0))
+	_checkpoint(x, cy)
+	return Vector2(x, cy)
+
+
+## CEIFA (N75, Trono da Morte): uma lâmina rasa varre a sala de ponta a
+## ponta, sempre à mesma altura, e não há canto nenhum onde ela não chegue.
+## Os `pendulos` deixam sempre um lado livre; esta não -- só se passa por
+## cima, e é por isso que a sala tem degraus onde saltar vale a pena.
+func _f_ceifa(par: Node2D, x: float, y: float) -> Vector2:
+	var cy: float = clampf(y, _teto_y + 240.0, _chao_y - 150.0)
+	x += _rng.randf_range(150.0, 176.0)
+	var larg := 640.0 + 160.0 * _dif
+	_plat(par, Vector2(x + larg * 0.5, cy), Vector2(larg, 24.0), 46.0)
+	_checkpoint(x + 44.0, cy, true)
+	var x0 := x
+	var ce := CEIFA.new()
+	ce.curso = larg - 80.0
+	ce.periodo = 3.0 - 0.9 * _dif
+	ce.pausa = 0.7 - 0.2 * _dif
+	ce.dano = 14 + int(20.0 * _dif)
+	ce.position = Vector2(x0 + larg * 0.5, cy - 30.0)
+	par.add_child(ce)
+	# degraus: o sítio de onde a ceifa se salta sem ser à sorte
+	for k in 3:
+		_plat(par, Vector2(x0 + 180.0 + float(k) * 210.0, cy - 104.0),
+			Vector2(104.0, 15.0))
+	for i in 1 + int(_dif * 2.0):
+		_inimigo_em(par, Vector2(x0 + 240.0 + float(i) * 220.0, cy - 40.0), i == 0)
+	_coluna_fundo(par, x0 + larg * 0.5)
+	x = x0 + larg + _rng.randf_range(148.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(140.0, 18.0))
+	_checkpoint(x, cy)
+	return Vector2(x, cy)
+
+
+## BRASAS (N82, Cidade dos Demónios): o chão queima quem fica parado. As
+## placas só acendem ao fim de um segundo quieta em cima delas, e apagam-se
+## assim que ela anda -- não é uma armadilha de reflexos, é uma sala que
+## não deixa pensar de pé. Os bichos ficam em cima das placas de propósito:
+## a luta acontece onde não se pode parar a bloquear.
+func _f_brasas(par: Node2D, x: float, y: float) -> Vector2:
+	var cy: float = clampf(y, _teto_y + 200.0, _chao_y - 96.0)
+	x += _rng.randf_range(150.0, 176.0)
+	var n := 3 + int(_dif * 2.0)
+	var larg := 200.0 * float(n) + 200.0
+	_plat(par, Vector2(x + larg * 0.5, cy), Vector2(larg, 24.0), 46.0)
+	_checkpoint(x + 44.0, cy, true)
+	var x0 := x
+	for i in n:
+		var px := x0 + 170.0 + float(i) * 200.0
+		var cq := CHAO_QUENTE.new()
+		cq.tamanho = Vector2(150.0, 28.0)
+		cq.dano = 8 + int(14.0 * _dif)
+		cq.paciencia = 1.3 - 0.4 * _dif
+		cq.intervalo = 0.8 - 0.2 * _dif
+		cq.position = Vector2(px, cy - 24.0)
+		par.add_child(cq)
+		if i % 2 == 0:
+			_inimigo_em(par, Vector2(px + 40.0, cy - 40.0), i == 0 and _dif > 0.6)
+	_coluna_fundo(par, x0 + larg * 0.5)
+	x = x0 + larg + _rng.randf_range(148.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(130.0, 18.0))
+	_checkpoint(x, cy)
+	return Vector2(x, cy)
+
+
+## OLHAR (N86, Primeiro Vazio): as plataformas do meio só existem enquanto
+## ela está virada para elas. Como se olha sempre para onde se anda, andar
+## em frente acende o caminho -- o que isto tira é a possibilidade de olhar
+## para trás a meio. Entrada e saída são sólidas normais, e há sempre 0.35 s
+## de carência depois de desviar o olhar: virar-se é grátis e imediato,
+## portanto não há posição nenhuma de onde não se saia.
+func _f_olhar(par: Node2D, x: float, y: float) -> Vector2:
+	var cy: float = clampf(y, _teto_y + 200.0, _chao_y - 130.0)
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(140.0, 18.0))
+	_checkpoint(x, cy, true)
+	var n := 4 + int(_dif * 2.0)
+	for i in n:
+		x += _rng.randf_range(150.0, 172.0)
+		var po := PLAT_OLHAR.instantiate()
+		po.tamanho = Vector2(96.0, 16.0)
+		po.position = Vector2(x, cy - 14.0 * float(i % 2))
+		par.add_child(po)
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(140.0, 18.0))
+	_checkpoint(x, cy, true)
+	return Vector2(x, cy)
+
+
+## ARÍETE (N93, Cerco ao Castelo): a porta do fim só se abre a empurrar a
+## máquina até lá, e a máquina é a única cobertura contra as torretas que
+## disparam de frente. O problema não é o tempo de nada -- é quanto tempo
+## se fica atrás dela a ganhar terreno antes de sair para tratar do resto.
+## O aríete nunca recua nem fica preso: se ela se afastar, ele espera.
+func _f_ariete(par: Node2D, x: float, y: float) -> Vector2:
+	var cy: float = clampf(y, _teto_y + 220.0, _chao_y - 110.0)
+	var id := "ariete_%d" % _camaras
+	x += _rng.randf_range(150.0, 176.0)
+	var larg := 620.0 + 140.0 * _dif
+	_plat(par, Vector2(x + larg * 0.5, cy), Vector2(larg, 24.0), 60.0)
+	_checkpoint(x + 44.0, cy, true)
+	var x0 := x
+
+	var ar := ARIETE.new()
+	ar.id = id
+	ar.curso = larg - 260.0
+	ar.velocidade = 62.0 - 12.0 * _dif
+	ar.position = Vector2(x0 + 170.0, cy - 43.0)
+	par.add_child(ar)
+	# a alavanca que a porta ouve. Fica fora de alcance, atrás da grade:
+	# quem a abre é o aríete, não a mão dela.
+	var al := ALAVANCA.instantiate()
+	al.id = id
+	al.so_liga = true
+	al.position = Vector2(x0 + larg + 60.0, cy - 200.0)
+	par.add_child(al)
+	var gx := x0 + larg - 10.0
+	var pt := PORTA_TRANCADA.instantiate()
+	pt.id = id
+	pt.tamanho = Vector2(24.0, 150.0)
+	pt.position = Vector2(gx, cy - 42.0)
+	par.add_child(pt)
+	# as torretas do castelo, a bater de frente
+	for k in 1 + int(_dif * 2.0):
+		var tr := TORRETA.instantiate()
+		tr.direcao = Vector2(-1.0, 0.0)
+		tr.intervalo = 2.6 - 0.7 * _dif
+		tr.fase = 0.7 * float(k)
+		tr.dano = 8 + int(14.0 * _dif)
+		tr.position = Vector2(gx + 60.0, cy - 46.0 - 70.0 * float(k))
+		par.add_child(tr)
+	_coluna_fundo(par, gx + 90.0)
+	x = gx + _rng.randf_range(160.0, 190.0)
+	_plat(par, Vector2(x, cy), Vector2(140.0, 18.0))
+	_checkpoint(x, cy, true)
+	return Vector2(x, cy)
+
+
+## REVISÃO (N97, O Primeiro Castelo): quatro câmaras de regiões diferentes,
+## seguidas, sem nada entre elas. Não é uma mecânica nova -- é a única
+## câmara do jogo cujo assunto é o próprio jogo, e por isso só pode existir
+## no penúltimo acto. Escolhe de uma lista fixa e SÓ de coisas que já
+## estrearam (`nivel_de_estreia`), senão estreava por acidente aqui.
+func _f_revisao(par: Node2D, x: float, y: float) -> Vector2:
+	const REVER := ["trampolim", "guilhotinas", "vento", "gruta", "impulso",
+		"fogo", "quebra", "gravidade", "espelhos", "crossfire", "pendulos",
+		"correntes", "ferry", "portal", "sinos", "ritmo", "prensa", "elevador",
+		"pedras", "velas"]
+	var pos := Vector2(x, y)
+	var vistas: Array[String] = []
+	for i in 4:
+		var opc: Array[String] = []
+		for c in REVER:
+			if nivel_de_estreia(c) <= _idx and not (c in vistas):
+				opc.append(c)
+		if opc.is_empty():
+			break
+		var esc: String = opc[_rng.randi() % opc.size()]
+		vistas.append(esc)
+		pos = _flavour(par, esc, pos.x, pos.y)
+	_checkpoint(pos.x, pos.y, true)
+	return pos
 
 
 ## Estica uma `ZonaGravidade` para cobrir `tam` (e o Fundo com ela).
