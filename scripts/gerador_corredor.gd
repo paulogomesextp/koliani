@@ -88,6 +88,7 @@ const ZONA_SEM_AR := preload("res://scripts/zona_sem_ar.gd")
 const SERPENTE := preload("res://scripts/serpente.gd")
 const SOMBRA := preload("res://scripts/sombra_atrasada.gd")
 const AMEACA := preload("res://scripts/ameaca_que_avanca.gd")
+const ZONA_SEM_PODER := preload("res://scripts/zona_sem_poder.gd")
 
 ## Líquido mortal por região: [cor, brasas]. floresta=água podre, prisão=ácido,
 ## torres=??? (usa trevas), catacumbas=trevas, cidade=ácido citrino,
@@ -387,7 +388,7 @@ const MECANICA_DO_NIVEL := [
 	# --- niveis 96-100  (Regiao 20) ---
 	{"cam": "memoria", "grau": 2},
 	{"cam": "revisao", "grau": 2},
-	{"cam": "saltos", "grau": 2},  # ~
+	{"cam": "provacao", "grau": 2},
 	{"cam": "trampolim", "grau": 2},  # ~
 	{"cam": "velas", "grau": 2},
 ]
@@ -438,7 +439,7 @@ const CAMARAS_FLAVOUR := [
 	"rosas", "imanes", "ceifa", "brasas", "olhar", "ariete", "revisao",
 	"gelo", "frio", "veneno", "escuro", "areia_no_ar", "ciclo",
 	"mausoleu", "gemea", "ar", "serpente", "pulsacao", "asas", "sombra",
-	"ameaca",
+	"ameaca", "provacao",
 ]
 
 ## Câmara "assinatura" de cada região -- no acto do meio da jornada aparece
@@ -1552,6 +1553,7 @@ func _flavour(par: Node2D, tipo: String, x: float, y: float) -> Vector2:
 		"asas": return _f_asas(par, x, y)
 		"sombra": return _f_sombra(par, x, y)
 		"ameaca": return _f_ameaca(par, x, y)
+		"provacao": return _f_provacao(par, x, y)
 	# tipo sem handler -> não deve acontecer (pool/assinatura mal configurada).
 	# Avisa em vez de gerar um vão morto silencioso e cai num `descanso`.
 	push_warning("GeradorCorredor: câmara '%s' sem _f_ correspondente" % tipo)
@@ -4176,6 +4178,54 @@ func _f_ameaca(par: Node2D, x: float, y: float) -> Vector2:
 	x += _rng.randf_range(150.0, 176.0)
 	_plat(par, Vector2(x, cy), Vector2(150.0, 18.0))
 	_checkpoint(x, cy, true)
+	return Vector2(x, cy)
+
+
+## PROVAÇÃO (N98, O Coração de Zeriko): três salas seguidas, e em cada uma
+## falta-lhe uma coisa. É a última mecânica da campanha e a única que mexe
+## no que ela É em vez de mexer no cenário -- a sala não fica mais difícil,
+## ela é que fica menos.
+##
+## Cada sala é desenhada para a falta que tem: sem salto duplo os degraus
+## são baixos e juntos, sem escudo os inimigos ficam à distância, sem dash
+## o vão faz-se a saltar. Nenhuma pede a habilidade que tirou -- **tirar
+## uma habilidade é um assunto, não uma armadilha**.
+##
+## A habilidade nunca vai ao save (`EstadoJogo.habilidades_suspensas`, só
+## em memória) e volta à saída, a mudar de cena e a morrer.
+func _f_provacao(par: Node2D, x: float, y: float) -> Vector2:
+	var cy: float = clampf(y, _teto_y + 240.0, _chao_y - 120.0)
+	const FALTAS := ["salto_duplo", "escudo", "dash_aereo"]
+	for k in FALTAS.size():
+		x += _rng.randf_range(150.0, 176.0)
+		_plat(par, Vector2(x, cy), Vector2(140.0, 18.0))
+		if k == 0:
+			_checkpoint(x, cy, true)
+		var x0 := x
+		var larg := 480.0
+		var zp := ZONA_SEM_PODER.new()
+		zp.habilidade = FALTAS[k]
+		zp.tamanho = Vector2(larg, 340.0)
+		zp.position = Vector2(x0 + larg * 0.5, cy - 120.0)
+		par.add_child(zp)
+		match k:
+			0:  # sem salto duplo: degraus baixos e juntos
+				for i in 4:
+					x += 120.0
+					_plat(par, Vector2(x, cy - 52.0 * float(i % 2)), Vector2(92.0, 15.0))
+			1:  # sem escudo: os bichos ficam longe e o chão é limpo
+				_plat(par, Vector2(x0 + larg * 0.5, cy + 30.0), Vector2(larg, 22.0), 90.0)
+				for i in 2:
+					_inimigo_em(par, Vector2(x0 + 200.0 + float(i) * 180.0, cy - 40.0))
+				x = x0 + larg
+			2:  # sem dash: o vão faz-se a saltar, com uma ilha a meio
+				x += 175.0
+				_plat(par, Vector2(x, cy - 30.0), Vector2(88.0, 15.0))
+				x += 175.0
+				_plat(par, Vector2(x, cy), Vector2(88.0, 15.0))
+		x += _rng.randf_range(150.0, 176.0)
+		_plat(par, Vector2(x, cy), Vector2(140.0, 18.0))
+		_checkpoint(x, cy, true)
 	return Vector2(x, cy)
 
 

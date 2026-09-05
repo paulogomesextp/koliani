@@ -631,8 +631,28 @@ func desbloquear_habilidade(id: String) -> void:
 	guardar()
 
 
+## Habilidades SUSPENSAS -- tiradas por uma sala, nao pelo save (nivel 98,
+## O Coracao de Zeriko). Vivem so' em memoria e nunca chegam ao ficheiro:
+## e' de proposito, porque uma habilidade que se perdesse no disco por
+## causa de um crash dentro da sala era um save estragado.
+var habilidades_suspensas: Array[String] = []
+
+
+func suspender_habilidade(id: String) -> void:
+	if id != "" and id not in habilidades_suspensas:
+		habilidades_suspensas.append(id)
+
+
+func devolver_habilidade(id: String) -> void:
+	habilidades_suspensas.erase(id)
+
+
+func devolver_habilidades_todas() -> void:
+	habilidades_suspensas.clear()
+
+
 func tem_habilidade(id: String) -> bool:
-	return id in habilidades
+	return id in habilidades and id not in habilidades_suspensas
 
 
 func registar_pista(id: String) -> void:

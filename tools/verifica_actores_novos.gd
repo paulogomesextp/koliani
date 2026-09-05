@@ -20,6 +20,7 @@ const ZONA_SEM_AR := preload("res://scripts/zona_sem_ar.gd")
 const SERPENTE := preload("res://scripts/serpente.gd")
 const SOMBRA := preload("res://scripts/sombra_atrasada.gd")
 const AMEACA := preload("res://scripts/ameaca_que_avanca.gd")
+const ZONA_SEM_PODER := preload("res://scripts/zona_sem_poder.gd")
 ## A Koliani carrega-se em RUNTIME (nao com `preload`): o script dela usa
 ## autoloads pelo nome e isso nao compila em `--script`.
 const KOLIANI := "res://scenes/actors/Koliani.tscn"
@@ -237,6 +238,44 @@ var ligada := false
 				% [tipo, int(kv.get(campo))])
 		ze.queue_free()
 		kv.queue_free()
+		await process_frame
+
+	# --- ZONA SEM PODER ------------------------------------------------
+	# o que interessa provar e' que a habilidade volta SEMPRE: a' saida e
+	# tambem quando a zona morre com a cena. Nunca pode ficar por devolver.
+	var ej2 := root.get_node_or_null("/root/EstadoJogo")
+	if ej2 == null:
+		_ok(false, "sem EstadoJogo para testar a ZonaSemPoder")
+	else:
+		ej2.call("devolver_habilidades_todas")
+		var zp: Node2D = ZONA_SEM_PODER.new()
+		zp.habilidade = "salto_duplo"
+		zp.tamanho = Vector2(300.0, 200.0)
+		zp.global_position = Vector2(19000.0, 0.0)
+		_sala.add_child(zp)
+		var kp := _duble(Vector2(18500.0, 0.0))
+		kp.add_to_group("koliani")
+		await _esperar(0.2)
+		_ok(bool(ej2.call("tem_habilidade", "salto_duplo")),
+			"ZonaSemPoder: fora da zona a habilidade e' dela")
+		kp.global_position = Vector2(19000.0, 0.0)
+		await _esperar(0.3)
+		_ok(not bool(ej2.call("tem_habilidade", "salto_duplo")),
+			"ZonaSemPoder: la' dentro perde-a")
+		_ok("salto_duplo" in ej2.get("habilidades"),
+			"ZonaSemPoder: mas o SAVE nunca a perde (so' fica suspensa)")
+		kp.global_position = Vector2(18000.0, 0.0)
+		await _esperar(0.3)
+		_ok(bool(ej2.call("tem_habilidade", "salto_duplo")),
+			"ZonaSemPoder: a' saida devolve")
+		# e se a zona morrer com ela la' dentro (mudar de cena, morrer)
+		kp.global_position = Vector2(19000.0, 0.0)
+		await _esperar(0.3)
+		zp.queue_free()
+		await _esperar(0.2)
+		_ok(bool(ej2.call("tem_habilidade", "salto_duplo")),
+			"ZonaSemPoder: devolve tambem quando morre com a cena")
+		kp.queue_free()
 		await process_frame
 
 	# --- AMEACA QUE AVANCA ---------------------------------------------

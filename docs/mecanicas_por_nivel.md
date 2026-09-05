@@ -518,6 +518,30 @@ coisas a matar ao mesmo tempo não se leem.
 **Provisórias: 10 → 9.** Restam **4 grandes** (N53 gancho, N67 inverter a
 gravidade, N70 cenário que se reescreve, N98 perder uma habilidade).
 
+### O quarto "grande": PERDER UMA HABILIDADE POR SALA (N98)
+
+Três salas seguidas e em cada uma falta-lhe uma coisa. É a última mecânica
+da campanha e a única que mexe **no que ela é** em vez de mexer no
+cenário: a sala não fica mais difícil, ela é que fica menos.
+
+Duas regras que a tornam justa:
+
+- **cada sala é desenhada para a falta que tem.** Sem salto duplo os
+  degraus são baixos e juntos, sem escudo os inimigos ficam à distância,
+  sem dash o vão faz-se a saltar com uma ilha a meio. Nenhuma pede a
+  habilidade que tirou -- tirar uma habilidade é um assunto, não uma
+  armadilha. E há um rótulo à entrada a dizer qual falta: descobri-lo a
+  meio de um salto é que seria injusto.
+- **nunca toca no save.** A habilidade vai para
+  `EstadoJogo.habilidades_suspensas`, que vive só em memória, e volta à
+  saída, no `_exit_tree` (mudar de cena, morrer, recarregar) e no `_ready`
+  do `main.gd` por segurança. Uma habilidade perdida no disco por causa de
+  um crash dentro da sala era um save estragado -- e isto é o nível 98 de
+  100.
+
+**Provisórias: 9 → 8.** Restam **3 grandes**: N53 (gancho), N67 (inverter a
+gravidade à vontade) e N70 (o cenário reescreve-se atrás de ti).
+
 ### E as pools das regiões, que era o buraco maior
 
 As 16 estreias de 5 set (`lava_sobe`, `mare`, `espectral`, …) **não estavam

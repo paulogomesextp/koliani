@@ -13,6 +13,10 @@ const FIM_CAMPANHA := preload("res://scripts/fim_campanha.gd")
 
 
 func _ready() -> void:
+	# rede de seguranca das `ZonaSemPoder` (nivel 98): elas devolvem a
+	# habilidade a' saida e no `_exit_tree`, mas se alguma coisa correr mal
+	# a meio, o nivel seguinte comeca limpo na mesma.
+	EstadoJogo.devolver_habilidades_todas()
 	Engine.time_scale = 1.0  # rede de segurança: nunca começar um nível "congelado"
 	get_tree().paused = false
 	Musica.ambiente(EstadoJogo.indice_nivel)
