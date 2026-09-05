@@ -37,6 +37,7 @@ func _correr_tudo() -> void:
 	teste_i18n_en_tem_as_chaves_das_pistas()
 	teste_i18n_ficheiros_validos()
 	teste_tutorial_mecanica_tem_texto()
+	teste_controlos_tacteis_fixos()
 	teste_catalogo_campanha()
 	teste_equipamento_dados()
 	teste_equipamento_estado()
@@ -541,6 +542,52 @@ func teste_i18n_ficheiros_validos() -> void:
 			_ok(d.has(k), "%s.json sem a chave '%s'" % [loc, k])
 		for k: String in d:
 			_ok(chaves_en.has(k), "%s.json tem a chave a mais '%s'" % [loc, k])
+
+
+## CONTROLOS DE TOQUE. Duas coisas que o Paulo pediu a 5 set 2026:
+##  - "os controlos do telefone movimenta-se ao utilizar, não pode
+##    acontecer -- têm que ficar fixos": o aro do joystick era flutuante
+##    (ia ter com o dedo). Agora não sai do sítio, e é isso que se mede.
+##  - "falta um botão no UI de telefone para o dash".
+##
+## E, de caminho, que os botões não se sobreponham: cada um que entra
+## empurra a arrumação, e dois círculos a tocarem-se são dois botões que
+## disparam ao mesmo tempo -- o `_pousar` fica no primeiro que encontra.
+func teste_controlos_tacteis_fixos() -> void:
+	var c := ControlosTacteis.new()
+	c.size = Vector2(1600.0, 720.0)
+	c.call("_medir")
+	var base: Vector2 = c.get("_joy_base")
+
+	# um dedo LONGE do aro, mas dentro da metade do joystick
+	var longe := Vector2(base.x + 260.0, base.y - 190.0)
+	_ok(bool(c.call("_pousar", 0, longe)), "o joystick não agarrou o dedo")
+	_ok(c.get("_joy_base") == base,
+		"o aro do joystick MEXEU-SE (%s -> %s)" % [base, c.get("_joy_base")])
+	_ok(Input.is_action_pressed("mover_direita"),
+		"o dedo à direita do aro devia andar para a direita")
+	c.call("_levantar", 0)
+	_ok(not Input.is_action_pressed("mover_direita"), "não largou o mover_direita")
+
+	# o botão do dash existe e carrega mesmo a acção "dash"
+	var accoes := {}
+	for b: Dictionary in ControlosTacteis.BOTOES:
+		accoes[String(b["accao"])] = true
+	for a2 in ["dash", "saltar", "atacar", "defender", "lancar"]:
+		_ok(accoes.has(a2), "os controlos de toque não têm botão para '%s'" % a2)
+
+	# nenhum par de botões se toca
+	var n: int = ControlosTacteis.BOTOES.size()
+	for i in n:
+		for j in range(i + 1, n):
+			var si: Array = c.call("_sitio", ControlosTacteis.BOTOES[i])
+			var sj: Array = c.call("_sitio", ControlosTacteis.BOTOES[j])
+			var d: float = (si[0] as Vector2).distance_to(sj[0] as Vector2)
+			_ok(d > float(si[1]) + float(sj[1]),
+				"os botões '%s' e '%s' sobrepõem-se (%.0f px entre centros, %.0f de raios)"
+					% [ControlosTacteis.BOTOES[i]["accao"], ControlosTacteis.BOTOES[j]["accao"],
+						d, float(si[1]) + float(sj[1])])
+	c.free()
 
 
 ## TUTORIAL DA MECÂNICA (pedido do Paulo, 5 set 2026: "quando uma mecânica

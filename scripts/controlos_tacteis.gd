@@ -1,7 +1,8 @@
 extends Control
 class_name ControlosTacteis
-## Os controlos de toque do telemóvel: um **joystick** à esquerda e quatro
-## botões à direita -- Projéteis, Espada, Escudo e **Salto** (o maior).
+## Os controlos de toque do telemóvel: um **joystick** à esquerda e cinco
+## botões à direita -- Projéteis, Escudo, Investida, Espada e **Salto**
+## (o maior). A Investida entrou a pedido dele a 5 set 2026.
 ##
 ## Porque é que isto não são `TouchScreenButton`s (o que cá estava):
 ##
@@ -12,15 +13,19 @@ class_name ControlosTacteis
 ##     certo num ecrã de 720 de alto. Aqui a régua é o tamanho do
 ##     viewport, e o `resized` remede tudo.
 ##  3. **Andar era um d-pad de dois botões.** O joystick tem zona morta e
-##     recentra-se onde o dedo pousa (o "stick flutuante" dos telemóveis),
-##     que é o que deixa correr sem olhar para o polegar.
+##     agarra-se em qualquer sítio da metade esquerda -- não é preciso
+##     acertar no desenho.
 ##
 ## Multi-toque a sério: cada dedo é um `index` e cada `index` guarda o que
 ## está a carregar, portanto saltar-a-atacar-e-a-andar é um gesto só.
 ##
-## O que NÃO tem botão: `dash` e `rolar`. Foi o pedido -- quatro botões --
-## e mais dois enchiam o polegar direito. O salto duplo continua a fazer-se
-## carregando outra vez no Salto.
+## O ARO NÃO SE MEXE. A primeira versão era um "stick flutuante" (a base
+## ia ter com o dedo), que é o costume nos telemóveis -- mas ele viu-o a
+## andar e disse que não podia acontecer. Agora a direcção mede-se sempre
+## a partir do centro desenhado.
+##
+## O que continua sem botão: `rolar`. O salto duplo faz-se carregando
+## outra vez no Salto.
 
 ## Acções, na ordem em que se desenham. `r` é o raio em píxeis a 720 de
 ## altura de viewport; tudo isto é multiplicado pela escala do ecrã.
@@ -28,6 +33,7 @@ const BOTOES := [
 	{"accao": "lancar", "r": 46.0, "dx": -168.0, "dy": -138.0, "icone": "projetil"},
 	{"accao": "defender", "r": 46.0, "dx": -34.0, "dy": -152.0, "icone": "escudo"},
 	{"accao": "atacar", "r": 52.0, "dx": -148.0, "dy": -8.0, "icone": "espada"},
+	{"accao": "dash", "r": 44.0, "dx": -268.0, "dy": -56.0, "icone": "dash"},
 	{"accao": "saltar", "r": 70.0, "dx": 0.0, "dy": 0.0, "icone": "salto"},
 ]
 
@@ -124,10 +130,11 @@ func _pousar(index: int, pos: Vector2) -> bool:
 			return true
 	if pos.x < size.x * ZONA_JOYSTICK:
 		_dedos[index] = ""
-		# stick flutuante: a base vai ter com o dedo, não o contrário
-		_joy_base = Vector2(
-			clampf(pos.x, _joy_raio * 1.1, size.x * ZONA_JOYSTICK - _joy_raio * 0.2),
-			clampf(pos.y, size.y * 0.35, size.y - _joy_raio * 1.1))
+		# a base NAO se mexe (pedido do Paulo, 5 set 2026: "os controlos do
+		# telefone movimenta-se ao utilizar, não pode acontecer"). Continua a
+		# agarrar-se em qualquer sítio desta metade do ecrã -- o que muda é
+		# que a direcção se mede sempre a partir do MESMO centro, o que
+		# desenhado no aro.
 		_mexer_joystick(pos)
 		return true
 	return false
@@ -260,6 +267,18 @@ func _icone(qual: String, c: Vector2, r: float) -> void:
 				c + Vector2(-r * 0.75, r * 0.2)]), C_ICONE)
 			draw_line(c + Vector2(0.0, -r * 0.6), c + Vector2(0.0, r * 0.7),
 				C_FUNDO, 2.5 * _escala)
+		"dash":
+			# duplo galao para a frente: e' o simbolo de "mais depressa" que se
+			# le^ a esta escala sem legenda nenhuma
+			for k in 2:
+				var dx := -r * 0.55 + k * r * 0.78
+				draw_colored_polygon(PackedVector2Array([
+					c + Vector2(dx - r * 0.30, -r * 0.72),
+					c + Vector2(dx + r * 0.34, 0.0),
+					c + Vector2(dx - r * 0.30, r * 0.72),
+					c + Vector2(dx - r * 0.02, r * 0.72),
+					c + Vector2(dx + r * 0.62, 0.0),
+					c + Vector2(dx - r * 0.02, -r * 0.72)]), C_ICONE)
 		"projetil":
 			# três orbes em fuga: é o tiro roxo, e lê-se como "à distância"
 			for k in 3:
