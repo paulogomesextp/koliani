@@ -263,6 +263,21 @@ var _grav_escala := 1.0
 ## sensacao. Reposto a 1 pela `ZonaGelo` a' saida.
 var _acel_escala := 1.0
 
+## --- GANCHO (nível 53, Jardim das Almas) ------------------------------
+## Pendurada numa trepadeira, a física dela é um PÊNDULO e mais nada (a
+## matemática está em `Movimento.balanco`, pura e testada). Engata-se
+## sozinha ao passar por um `PontoGancho` no ar -- nunca há botão novo,
+## que num telemóvel seria mais um polegar --, e `saltar` larga com a
+## velocidade da tangente.
+var _gancho_ativo := false
+var _gancho_ancora := Vector2.ZERO
+var _gancho_theta := 0.0
+var _gancho_vel := 0.0
+var _gancho_comp := 130.0
+## Recarga depois de largar: sem ela voltava a engatar no mesmo ponto no
+## frame seguinte e nunca saía de lá.
+var _gancho_cd := 0.0
+
 ## --- ESTADOS que a apanham a ela (5 set 2026) -------------------------
 ## Os inimigos ja' tinham queimar/sangrar/atordoar (`DemonioBase`); ela nao
 ## tinha nenhum. Estes dois sao as estreias dos niveis 45 e 48.
@@ -654,6 +669,7 @@ func _physics_process(dt: float) -> void:
 	_parede_lock = maxf(0.0, _parede_lock - dt)
 	_borda_lock = maxf(0.0, _borda_lock - dt)
 	_djump_t = maxf(0.0, _djump_t - dt)
+	_gancho_cd = maxf(0.0, _gancho_cd - dt)
 	_leve = maxf(0.0, _leve - dt)
 	_sons_de_movimento(dt)
 	if _inverso_restante > 0.0:
@@ -679,6 +695,12 @@ func _physics_process(dt: float) -> void:
 			_olha_para = signf(vx)
 		move_and_slide()  # collision_mask = 0 enquanto voa -> atravessa tudo
 		_mov.velocidade = velocity
+		return
+
+	# GANCHO: enquanto está pendurada, o pêndulo é a física toda. Nada do
+	# que vem a seguir (andar, saltar, dash, gravidade) se aplica.
+	if _gancho_ativo:
+		_passo_gancho(dt)
 		return
 
 	var dir := Input.get_axis("mover_esquerda", "mover_direita") * _inverso
@@ -1646,6 +1668,58 @@ func definir_acel_escala(v: float) -> void:
 ## movimentos". Fica como no-op para não partir quem a chama.
 func inverter_controlos(_segundos: float) -> void:
 	pass
+
+
+## Engata numa trepadeira e começa o balanço. Chamado pelo `PontoGancho`
+## quando ela lhe passa perto NO AR -- não há botão para isto, e é de
+## propósito: no telemóvel um botão novo é mais um polegar.
+##
+## A velocidade que ela trazia não se deita fora: projecta-se na tangente
+## do círculo e vira velocidade angular. Chegar a correr e engatar dá um
+## balanço grande; chegar quase parada dá um balanço pequeno.
+func engatar(ancora: Vector2, comprimento := 0.0) -> void:
+	if _gancho_ativo or _gancho_cd > 0.0 or _a_morrer:
+		return
+	_gancho_ativo = true
+	_gancho_ancora = ancora
+	var d := global_position - ancora
+	_gancho_comp = comprimento if comprimento > 0.0 else clampf(d.length(), 48.0, 220.0)
+	_gancho_theta = atan2(d.x, d.y)          # 0 = pendurada a direito
+	var tangente := Vector2(cos(_gancho_theta), -sin(_gancho_theta))
+	_gancho_vel = clampf(velocity.dot(tangente) / maxf(24.0, _gancho_comp),
+		-Movimento.GANCHO_VEL_MAX, Movimento.GANCHO_VEL_MAX)
+	velocity = Vector2.ZERO
+	Som.toca("agarrar", -11.0, randf_range(0.95, 1.06))
+
+
+## Larga a trepadeira. Sai pela tangente do círculo mais um empurrão para
+## cima -- é isto que faz o balanço servir para atravessar: largar no fundo
+## do arco atira-a para a frente, largar no alto atira-a para cima e quase
+## parada.
+func largar_gancho() -> void:
+	if not _gancho_ativo:
+		return
+	_gancho_ativo = false
+	_gancho_cd = 0.45
+	velocity = Movimento.velocidade_ao_largar(_gancho_theta, _gancho_vel, _gancho_comp)
+	_mov.velocidade = velocity
+	_mov.saltos_dados = 1     # ainda lhe sobra o salto do ar
+	Som.toca("salto", -11.0)
+
+
+func _passo_gancho(dt: float) -> void:
+	var dir := Input.get_axis("mover_esquerda", "mover_direita") * _inverso
+	var r := Movimento.balanco(_gancho_theta, _gancho_vel, _gancho_comp, dir, dt)
+	_gancho_theta = r[0]
+	_gancho_vel = r[1]
+	global_position = Movimento.ponto_do_balanco(_gancho_ancora, _gancho_theta,
+		_gancho_comp)
+	velocity = Vector2.ZERO
+	_mov.velocidade = Vector2.ZERO
+	if dir != 0.0:
+		_olha_para = signf(dir)
+	if Input.is_action_just_pressed("saltar"):
+		largar_gancho()
 
 
 ## Corrente de ar a empurrar para cima (Torre dos Ventos, nível 12). A

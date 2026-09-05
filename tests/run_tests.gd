@@ -163,6 +163,64 @@ func teste_movimento_planar_prende_a_queda() -> void:
 	_ok(sobe.velocidade.y < 0.0, "o planar nao pode cortar o salto")
 
 
+## GANCHO (nivel 53): a matematica do balanco. Tudo aqui e' puro -- o
+## `Movimento` nao sabe o que e' uma trepadeira, so' sabe um pendulo.
+func teste_gancho_balanca_como_pendulo() -> void:
+	# largada de lado, sem comando: cai para o fundo do arco e passa por la'
+	var th := 0.9
+	var v := 0.0
+	var passou := false
+	for i in 200:
+		var r := Movimento.balanco(th, v, 130.0, 0.0, DT)
+		th = r[0]
+		v = r[1]
+		if absf(th) < 0.05:
+			passou = true
+			break
+	_ok(passou, "o balanco devia cair para o fundo do arco (theta = %.2f)" % th)
+
+	# o atrito existe: a amplitude de um balanco livre nao pode CRESCER
+	th = 0.9
+	v = 0.0
+	var amp := 0.0
+	for i in 2000:
+		var r2 := Movimento.balanco(th, v, 130.0, 0.0, DT)
+		th = r2[0]
+		v = r2[1]
+		amp = maxf(amp, absf(th))
+	_ok(amp <= 0.92, "sem comando a amplitude nao pode crescer (%.2f de 0.90)" % amp)
+
+	# e o comando dela empurra mesmo: a puxar sempre para o mesmo lado
+	# ganha-se altura em relacao a um balanco livre
+	var th_a := 0.2
+	var v_a := 0.0
+	var pico := 0.0
+	for i in 400:
+		var dir := signf(cos(th_a)) * signf(v_a) if v_a != 0.0 else 1.0
+		var r3 := Movimento.balanco(th_a, v_a, 130.0, dir, DT)
+		th_a = r3[0]
+		v_a = r3[1]
+		pico = maxf(pico, absf(th_a))
+	_ok(pico > 0.35, "a bombar, o balanco devia subir (%.2f de 0.20)" % pico)
+
+
+## E o que se ganha ao LARGAR: pela tangente, mais um empurrao para cima.
+## E' isto que faz o balanco servir para atravessar.
+func teste_gancho_largar_atira_pela_tangente() -> void:
+	# no fundo do arco (theta = 0) a tangente e' horizontal: sai para a
+	# frente, nao para cima
+	var vf := Movimento.velocidade_ao_largar(0.0, 2.0, 130.0)
+	_ok(vf.x > 200.0, "no fundo do arco devia sair para a frente (vx = %.0f)" % vf.x)
+	_ok(vf.y < 0.0, "e sempre com um empurrao para cima (vy = %.0f)" % vf.y)
+	# ao contrario, sai para tras
+	var vt := Movimento.velocidade_ao_largar(0.0, -2.0, 130.0)
+	_ok(vt.x < -200.0, "a balancar ao contrario devia sair para tras (vx = %.0f)" % vt.x)
+	# e o ponto do balanco: theta = 0 e' pendurada A DIREITO por baixo
+	var p := Movimento.ponto_do_balanco(Vector2(100.0, 50.0), 0.0, 130.0)
+	_ok(is_equal_approx(p.x, 100.0) and is_equal_approx(p.y, 180.0),
+		"theta = 0 devia po-la por baixo da ancora (%.0f, %.0f)" % [p.x, p.y])
+
+
 func teste_movimento_salto_duplo() -> void:
 	var e := Movimento.Estado.new()
 	Movimento.passo(e, 0.0, false, false, true, DT, 2)   # 1 frame no chao arma o coyote

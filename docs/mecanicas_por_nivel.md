@@ -557,6 +557,46 @@ que é para isso que ela ali está.
 
 **Provisórias: 8 → 7.** Bancada: 42 asserções.
 
+### O GANCHO (N53) — o grande que não se cortava
+
+> *"O gancho não se corta. É a única da lista que muda todos os 100 níveis
+> e não só o dela."*
+
+Feito. Trepadeiras onde ela **se engata no ar e balança**.
+
+**Não há botão novo** -- e é a decisão central. Engata ao passar por um
+`PontoGancho` no ar e larga com o botão de saltar, que já tem. Num
+telemóvel, um botão a mais é um polegar a mais, e este jogo joga-se com
+dois.
+
+Três regras que a tornam justa:
+
+- **só engata no ar.** A passar por baixo a pé não acontece nada -- uma
+  trepadeira pendurada sobre um caminho normal nunca estraga esse caminho.
+- **a velocidade que ela trazia não se deita fora**: projecta-se na
+  tangente do círculo e vira velocidade angular. Chegar a correr dá um
+  balanço grande; chegar quase parada dá um balanço pequeno.
+- **o vão largo tem sempre a rota de plataformas por baixo.** O balanço é o
+  caminho bom, nunca o único: quem não perceber a mecânica atravessa na
+  mesma.
+
+A matemática é um pêndulo com atrito e com um empurrão do comando, e vive
+**toda na lógica pura** (`Movimento.balanco`, `ponto_do_balanco`,
+`velocidade_ao_largar`) -- por isso está coberta pela suite normal, com as
+três coisas que interessam: cai para o fundo do arco, a amplitude de um
+balanço livre **nunca cresce** (o atrito existe) e a bombar ganha-se
+altura. Ao largar sai pela tangente mais um empurrão para cima: largar no
+fundo do arco atira-a para a frente, largar no alto atira-a para cima e
+quase parada.
+
+E há recarga depois de largar (0.45 s): sem ela voltava a engatar no mesmo
+ponto no frame seguinte e nunca saía de lá. A bancada prova que a recarga
+morde.
+
+**Provisórias: 7 → 6.** Restam **dois grandes** (N67 inverter a gravidade,
+N70 o cenário que se reescreve) e quatro pequenas (N54 esporos, N56
+plataforma que roda, N78 convés que inclina, N99 bandeira do nível).
+
 ### E as pools das regiões, que era o buraco maior
 
 As 16 estreias de 5 set (`lava_sobe`, `mare`, `espectral`, …) **não estavam

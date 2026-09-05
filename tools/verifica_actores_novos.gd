@@ -469,6 +469,31 @@ var ligada := false
 		await _esperar(1.2)
 		_ok(is_equal_approx(float(ko.get("_acel_escala")), 1.0),
 			"Koliani: o frio passa sozinho (acel = %.2f)" % float(ko.get("_acel_escala")))
+		# --- GANCHO: o balanco na Koliani a serio ----------------------
+		# `engatar` po~e-na no circulo, `largar_gancho` devolve-lhe
+		# velocidade, e o `_gancho_cd` impede que volte a engatar no frame
+		# seguinte (senao nunca saia do mesmo ponto)
+		var anc := ko.global_position + Vector2(0.0, -130.0)
+		ko.call("engatar", anc, 130.0)
+		await _esperar(0.1)
+		_ok(bool(ko.get("_gancho_ativo")), "Gancho: engata")
+		var raio_medido: float = ko.global_position.distance_to(anc)
+		_ok(absf(raio_medido - 130.0) < 6.0,
+			"Gancho: fica no circulo da corda (%.0f de 130)" % raio_medido)
+		ko.set("_gancho_vel", 2.0)
+		ko.set("_gancho_theta", 0.0)
+		await _esperar(0.05)
+		ko.call("largar_gancho")
+		_ok(not bool(ko.get("_gancho_ativo")), "Gancho: larga")
+		_ok(ko.velocity.length() > 150.0,
+			"Gancho: larga COM velocidade (%.0f)" % ko.velocity.length())
+		_ok(float(ko.get("_gancho_cd")) > 0.0,
+			"Gancho: fica em recarga -- nao volta a engatar no mesmo frame")
+		ko.call("engatar", anc, 130.0)
+		_ok(not bool(ko.get("_gancho_ativo")),
+			"Gancho: e a recarga MORDE (nao reengata)")
+		await _esperar(0.6)
+
 		# e a ZonaGelo repoe o atrito a' saida
 		var zg: Node2D = ZONA_GELO.new()
 		zg.tamanho = Vector2(300.0, 120.0)

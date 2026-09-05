@@ -94,6 +94,62 @@ static func passo(e: Estado, direcao: float, saltar_premido: bool, saltar_a_segu
 	return e
 
 
+# ── GANCHO (nível 53, Jardim das Almas) ─────────────────────────────────
+# A Koliani engata numa trepadeira e BALANÇA. A matemática do balanço fica
+# aqui, em funções puras, pelo mesmo motivo que o resto: dá para testar
+# headless, e um balanço mal afinado não se vê num teste de cena.
+#
+# O modelo é um pêndulo simples com atrito e com um empurrão do comando:
+# `theta` é o ângulo da corda medido a partir da vertical PARA BAIXO
+# (0 = pendurada a direito), positivo para a direita.
+
+## Aceleração angular por gravidade, já dividida pelo comprimento.
+const GANCHO_G := 1500.0
+## Quanto o comando dela empurra o balanço (rad/s^2). Sem isto o balanço
+## era só física e ela não decidia nada.
+const GANCHO_IMPULSO := 2.6
+## Atrito do balanço por segundo (1 = nenhum). Sem atrito ela nunca perde
+## altura e o balanço deixa de ter fim.
+const GANCHO_ATRITO := 0.994
+## Tecto da velocidade angular -- um balanço muito rápido atira-a para fora
+## do ecrã ao largar.
+const GANCHO_VEL_MAX := 4.2
+## Multiplicador da velocidade com que sai ao largar.
+const GANCHO_LARGAR := 1.0
+## Empurrão para cima ao largar, em px/s (o "salto" do fim do balanço).
+const GANCHO_SALTO := 210.0
+
+
+## Um passo do balanço. Devolve [theta, vel_ang] novos.
+## `comprimento` em px, `dir` = -1/0/+1 do comando.
+static func balanco(theta: float, vel_ang: float, comprimento: float,
+		dir: float, dt: float) -> Array:
+	var c: float = maxf(24.0, comprimento)
+	var a := -(GANCHO_G / c) * sin(theta) + GANCHO_IMPULSO * dir
+	var v := (vel_ang + a * dt) * GANCHO_ATRITO
+	v = clampf(v, -GANCHO_VEL_MAX, GANCHO_VEL_MAX)
+	return [theta + v * dt, v]
+
+
+## Onde fica ela, dado o ponto de engate e o ângulo. O y é POSITIVO para
+## baixo (é o Godot 2D), por isso a corda pendurada é `+cos`.
+static func ponto_do_balanco(ancora: Vector2, theta: float,
+		comprimento: float) -> Vector2:
+	var c: float = maxf(24.0, comprimento)
+	return ancora + Vector2(sin(theta) * c, cos(theta) * c)
+
+
+## Velocidade com que ela sai ao largar: a tangente do círculo, mais um
+## empurrão para cima. É isto que faz o balanço servir para atravessar --
+## largar no fundo do arco atira-a para a frente, largar no alto atira-a
+## para cima e quase parada, e as duas coisas leem-se a jogar.
+static func velocidade_ao_largar(theta: float, vel_ang: float,
+		comprimento: float) -> Vector2:
+	var c: float = maxf(24.0, comprimento)
+	var tangente := Vector2(cos(theta), -sin(theta)) * (vel_ang * c)
+	return tangente * GANCHO_LARGAR + Vector2(0.0, -GANCHO_SALTO)
+
+
 ## Predicado puro (testável) para começar um rolamento: recarga pronta, no
 ## chão, e sem já estar a rolar ou em dash. Fica aqui (e não em koliani.gd)
 ## para dar para testar headless em modo `--script` sem os autoloads.

@@ -89,6 +89,7 @@ const SERPENTE := preload("res://scripts/serpente.gd")
 const SOMBRA := preload("res://scripts/sombra_atrasada.gd")
 const AMEACA := preload("res://scripts/ameaca_que_avanca.gd")
 const ZONA_SEM_PODER := preload("res://scripts/zona_sem_poder.gd")
+const PONTO_GANCHO := preload("res://scripts/ponto_gancho.gd")
 
 ## Líquido mortal por região: [cor, brasas]. floresta=água podre, prisão=ácido,
 ## torres=??? (usa trevas), catacumbas=trevas, cidade=ácido citrino,
@@ -167,6 +168,7 @@ const POOL_REGIAO := {
 	# foi plantado, não construído.
 	10: ["pendulos", "trampolim", "saltos", "ritmo", "velas", "espinhos",
 		"ferry", "gruta", "portal", "alavanca", "segredo", "bifurcacao",
+		"gancho",
 		"raizes", "espectral", "chuva", "rosas"],
 	# XII Cidade das Maquinas: o oposto. Nada balança -- tudo ANDA, com
 	# `correntes` de assinatura (as correias). É a única região com todas
@@ -334,7 +336,7 @@ const MECANICA_DO_NIVEL := [
 	# --- niveis 51-55  (Regiao 11) ---
 	{"cam": "rosas", "grau": 1},
 	{"cam": "bifurcacao", "grau": 1},
-	{"cam": "gruta", "grau": 1},  # ~
+	{"cam": "gancho", "grau": 1},
 	{"cam": "portal", "grau": 1},  # ~
 	{"cam": "raizes", "grau": 1},
 	# --- niveis 56-60  (Regiao 12) ---
@@ -439,7 +441,7 @@ const CAMARAS_FLAVOUR := [
 	"rosas", "imanes", "ceifa", "brasas", "olhar", "ariete", "revisao",
 	"gelo", "frio", "veneno", "escuro", "areia_no_ar", "ciclo",
 	"mausoleu", "gemea", "ar", "serpente", "pulsacao", "asas", "sombra",
-	"ameaca", "provacao", "reflexo",
+	"ameaca", "provacao", "reflexo", "gancho",
 ]
 
 ## Câmara "assinatura" de cada região -- no acto do meio da jornada aparece
@@ -1555,6 +1557,7 @@ func _flavour(par: Node2D, tipo: String, x: float, y: float) -> Vector2:
 		"ameaca": return _f_ameaca(par, x, y)
 		"provacao": return _f_provacao(par, x, y)
 		"reflexo": return _f_reflexo(par, x, y)
+		"gancho": return _f_gancho(par, x, y)
 	# tipo sem handler -> não deve acontecer (pool/assinatura mal configurada).
 	# Avisa em vez de gerar um vão morto silencioso e cai num `descanso`.
 	push_warning("GeradorCorredor: câmara '%s' sem _f_ correspondente" % tipo)
@@ -4273,6 +4276,43 @@ func _f_reflexo(par: Node2D, x: float, y: float) -> Vector2:
 	_coluna_fundo(par, x0 + 60.0)
 	x = x0 + larg + _rng.randf_range(148.0, 176.0)
 	_plat(par, Vector2(x, cy), Vector2(140.0, 18.0))
+	_checkpoint(x, cy, true)
+	return Vector2(x, cy)
+
+
+## GANCHO (N53, Jardim das Almas): trepadeiras onde ela se engata no ar e
+## BALANÇA. Era o maior dos "grandes" e o único que o Paulo não deixou
+## cortar -- e a razão é boa: é a única mecânica que muda a maneira de
+## atravessar um vão, e não só o que lá está dentro.
+##
+## Três coisas que fazem a sala:
+##  - **não há botão novo.** Engata ao passar no ar, larga com o salto.
+##  - **por baixo passa-se a pé** -- o `PontoGancho` só engata no ar, por
+##    isso uma trepadeira nunca estraga um caminho normal;
+##  - **o vão largo tem sempre uma rota de plataformas**, mais baixa e mais
+##    lenta. O balanço é o caminho bom, nunca o único: quem não perceber a
+##    mecânica atravessa na mesma.
+func _f_gancho(par: Node2D, x: float, y: float) -> Vector2:
+	var cy: float = clampf(y, _teto_y + 300.0, _chao_y - 260.0)
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(150.0, 18.0))
+	_checkpoint(x, cy, true)
+	var x0 := x
+	var n := 2 + int(_dif * 2.0)
+	for i in n:
+		# a trepadeira fica a meio do vão, presa bem acima da linha dos pés
+		var px := x0 + 220.0 + float(i) * 300.0
+		var pg := PONTO_GANCHO.new()
+		pg.comprimento = 120.0 + 30.0 * float(i % 2)
+		pg.position = Vector2(px, cy - 250.0)
+		par.add_child(pg)
+		# a rota lenta, por baixo: dois degraus por cada vão
+		_plat(par, Vector2(px - 90.0, cy + 70.0), Vector2(88.0, 15.0))
+		_plat(par, Vector2(px + 90.0, cy + 70.0), Vector2(88.0, 15.0))
+		x = px + 150.0
+		_plat(par, Vector2(x, cy), Vector2(96.0, 16.0))
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(150.0, 18.0))
 	_checkpoint(x, cy, true)
 	return Vector2(x, cy)
 
