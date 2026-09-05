@@ -1,0 +1,112 @@
+<!-- ===================================================================
+     O que o Godot NÃO põe no `index.html` do export Web, e sem o qual o
+     jogo não se porta como uma app no telemóvel.
+
+     Isto NÃO se edita no `export_presets.cfg`: é aqui, e depois corre-se
+
+         python tools/gerar_head_web.py
+
+     que o mete no `html/head_include` do preset "Web". Um teste em
+     `tests/run_tests.gd` falha se os dois ficarem fora de sincronia --
+     senão editava-se este ficheiro e o build continuava com o antigo.
+
+     Regra que vem do formato do `.cfg`: aqui dentro NUNCA se usam aspas
+     duplas (o valor vive dentro de uma string entre aspas). Atributos e
+     strings de JS levam aspas simples.
+     =================================================================== -->
+
+<!-- 1. ATALHO NO IPHONE, EM ECRÃ INTEIRO ----------------------------
+     O `manifest.json` (que o Godot escreve) já diz display=standalone,
+     mas o Safari só larga a barra do browser com esta meta. -->
+<meta name='apple-mobile-web-app-capable' content='yes'>
+<meta name='mobile-web-app-capable' content='yes'>
+<meta name='apple-mobile-web-app-status-bar-style' content='black-translucent'>
+<meta name='apple-mobile-web-app-title' content='Koliani'>
+<meta name='theme-color' content='#0d0814'>
+
+<!-- `viewport-fit=cover`: sem ele fica uma barra preta no entalhe em vez
+     de o jogo ir até à borda. O Godot escreve um viewport sem isso. -->
+<meta name='viewport' content='width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover'>
+
+<style>
+/* 2. TIRAR OS TIQUES DE BROWSER QUE ESTRAGAM UM JOGO --------------- */
+html,body{width:100%;height:100%;overflow:hidden;background:#0d0814;
+overscroll-behavior:none;-webkit-user-select:none;user-select:none;
+-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+#canvas{width:100%;height:100%;touch-action:none}
+
+/* 3. HORIZONTAL SEMPRE ---------------------------------------------
+   O iOS ignora o `orientation` do manifest e não tem
+   `screen.orientation.lock` -- o Android tem, e tenta-se lá em baixo.
+   Onde não dá, o jogo NÃO se joga de pé: esta cortina tapa-o e diz
+   porquê. É preferível a rodar o canvas por CSS, que roda o desenho
+   mas não as coordenadas do toque (ficava a jogar às cegas). */
+#rodar{position:fixed;inset:0;z-index:9;display:none;
+background:#0d0814;color:#ece6f7;
+font:600 4.6vmin/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+text-align:center;align-items:center;justify-content:center;
+flex-direction:column;gap:5vmin;padding:8vmin}
+#rodar svg{width:34vmin;height:auto}
+#rodar .gira{animation:gira 2.4s ease-in-out infinite}
+@keyframes gira{0%,42%{transform:rotate(0)}70%,100%{transform:rotate(-90deg)}}
+@media (prefers-reduced-motion:reduce){#rodar .gira{animation:none}}
+@media (orientation:portrait){#rodar{display:flex}}
+</style>
+
+<div id='rodar' aria-hidden='true'><svg viewBox='0 0 120 120' fill='none' xmlns='http://www.w3.org/2000/svg'><path d='M22 44a42 42 0 0 1 76 0' stroke='#a45cff' stroke-width='4' stroke-linecap='round' stroke-dasharray='7 9'/><path d='M98 30v15h-15' stroke='#a45cff' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/><g class='gira' style='transform-origin:60px 74px'><rect x='42' y='50' width='36' height='58' rx='7' stroke='#ff5fd4' stroke-width='4'/><rect x='48' y='58' width='24' height='40' rx='2' fill='#ff5fd4' fill-opacity='.18'/></g></svg><span>Turn your phone sideways</span></div>
+
+<script>
+(function(){
+  /* 4. SOM NO IPHONE ------------------------------------------------
+     Duas coisas separadas, e as duas mordiam:
+
+     a) o INTERRUPTOR DE SILÊNCIO. Por omissão o Safari trata o Web
+        Audio como som de interface e cala-o com o interruptor lateral
+        do telefone. `audioSession.type = playback` diz-lhe que isto é
+        conteúdo, e passa a tocar na mesma (Safari 16.4+).
+
+     b) o CONTEXTO NASCE SUSPENSO. Um `AudioContext` criado sem um
+        toque do utilizador fica em `suspended` e nunca mais toca. O
+        Godot cria o dele no arranque, portanto embrulha-se o
+        construtor para saber quais são, e ao primeiro toque
+        retomam-se todos. */
+  try{ if (navigator.audioSession) navigator.audioSession.type = 'playback'; }catch(e){}
+
+  var AC = window.AudioContext || window.webkitAudioContext;
+  if (AC){
+    var vivos = [];
+    var Espia = new Proxy(AC, {construct: function(alvo, args){
+      var c = new alvo(args[0]);
+      vivos.push(c);
+      return c;
+    }});
+    window.AudioContext = Espia;
+    window.webkitAudioContext = Espia;
+    var acordar = function(){
+      for (var i = 0; i < vivos.length; i++){
+        try{ if (vivos[i].state !== 'running') vivos[i].resume(); }catch(e){}
+      }
+    };
+    /* `touchend` e não `touchstart`: no iOS é o fim do toque que conta
+       como gesto do utilizador para o áudio. */
+    ['touchend','pointerup','mouseup','keydown'].forEach(function(ev){
+      window.addEventListener(ev, acordar, {capture:true});
+    });
+  }
+
+  /* 5. TRANCAR NA HORIZONTAL onde o browser deixa (Android). No iOS
+     isto não existe e fica a cortina de cima. */
+  var trancar = function(){
+    try{
+      if (screen.orientation && screen.orientation.lock){
+        var p = screen.orientation.lock('landscape');
+        if (p && p.catch) p.catch(function(){});
+      }
+    }catch(e){}
+  };
+  trancar();
+  ['touchend','pointerup'].forEach(function(ev){
+    window.addEventListener(ev, trancar, {once:true, capture:true});
+  });
+})();
+</script>

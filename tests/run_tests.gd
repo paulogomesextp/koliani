@@ -38,6 +38,7 @@ func _correr_tudo() -> void:
 	teste_i18n_ficheiros_validos()
 	teste_tutorial_mecanica_tem_texto()
 	teste_controlos_tacteis_fixos()
+	teste_head_pwa_em_dia()
 	teste_catalogo_campanha()
 	teste_equipamento_dados()
 	teste_equipamento_estado()
@@ -542,6 +543,54 @@ func teste_i18n_ficheiros_validos() -> void:
 			_ok(d.has(k), "%s.json sem a chave '%s'" % [loc, k])
 		for k: String in d:
 			_ok(chaves_en.has(k), "%s.json tem a chave a mais '%s'" % [loc, k])
+
+
+## O `head_include` do export Web e' UMA string dentro do
+## `export_presets.cfg` -- sem newlines. Escrever HTML e JavaScript assim
+## a mao e' ilegivel, portanto o conteudo vive em `web/head_pwa.html` e
+## `tools/gerar_head_web.py` e' que o achata para la'.
+##
+## Isto guarda o obvio: editar o `head_pwa.html`, esquecer a ferramenta, e
+## o build sair na mesma com o `head_include` antigo -- sem ninguem dar por
+## isso, porque o jogo compila e corre na mesma. E' a diferenca entre "o
+## som do iPhone esta' corrigido" e "esta' corrigido no ficheiro".
+func teste_head_pwa_em_dia() -> void:
+	var fonte := _fonte("res://web/head_pwa.html")
+	var cfg := _fonte("res://export_presets.cfg")
+	if fonte == "" or cfg == "":
+		return
+
+	# o mesmo achatamento da ferramenta: fora os comentarios, uma linha so'
+	var rc := RegEx.new()
+	rc.compile("(?s)<!--.*?-->")
+	var limpo := rc.sub(fonte, "", true)
+	var partes: Array[String] = []
+	for linha in limpo.split("
+"):
+		var l := linha.strip_edges()
+		if l != "":
+			partes.append(l)
+	var esperado := " ".join(partes)
+
+	_ok(not esperado.contains("\""),
+		"o web/head_pwa.html tem aspas DUPLAS -- nao cabem no .cfg")
+
+	var rh := RegEx.new()
+	rh.compile("html/head_include=\"(.*)\"")
+	var m := rh.search(cfg)
+	_ok(m != null, "o preset Web nao tem `html/head_include`")
+	if m == null:
+		return
+	_ok(m.get_string(1) == esperado,
+		"o head_include esta DESACTUALIZADO (%d chars no .cfg, %d no head_pwa.html)"
+			 % [m.get_string(1).length(), esperado.length()]
+		+ " -- corre `python tools/gerar_head_web.py`")
+
+	# e as tres coisas por que ele existe, uma a uma
+	for peca in ["apple-mobile-web-app-capable", "viewport-fit=cover",
+			"audioSession", "orientation:portrait"]:
+		_ok(esperado.contains(peca),
+			"o head do Web perdeu a peca '%s'" % peca)
 
 
 ## CONTROLOS DE TOQUE. Duas coisas que o Paulo pediu a 5 set 2026:
