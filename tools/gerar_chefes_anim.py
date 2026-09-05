@@ -332,23 +332,28 @@ def _ghorak(juntas: Juntas, pecas: list[Peca], pal: dict) -> None:
     # os antebracos sao OSSO a' mostra -- mas num tom cavado, senao sao a
     # coisa mais clara do sprite e roubam o olho ao nucleo
     pintar(pecas, ("antebraco_t", "antebraco_f"), escurecer(osso, 0.34))
+    # os bracos tem de ser de OUTRO tom que o tronco. No plano humanoide
+    # nascem os dois com `pal["corpo"]`, e num chefe largo isso faz o
+    # tronco engoli-los -- foi o que aconteceu ao alarga-lo a primeira vez.
+    pintar(pecas, "braco_f", clarear(casca, 0.18))
+    pintar(pecas, "braco_t", escurecer(casca, 0.3))
     # ombros de raiz enrolada, muito mais largos que a cintura: le'-se como
     # arvore antes de se ler como homem
     for lado, j in ((-1.0, "ombro_t"), (1.0, "ombro_f")):
         z = -1.4 if lado < 0 else 3.4
-        pecas.append(Peca(j, elipse(lado * 3.0, -1.0, 9.5, 7.5), casca, z))
-        for ang in (-34.0, 0.0, 34.0):
-            pecas.append(Peca(j, rodar(membro(10.0, 4.0, 1.8), ang + lado * 22.0 - 90.0),
+        pecas.append(Peca(j, elipse(lado * 4.0, -1.0, 13.0, 10.0), casca, z))
+        for ang in (-42.0, -14.0, 14.0, 42.0):
+            pecas.append(Peca(j, rodar(membro(14.0, 5.0, 1.8), ang + lado * 24.0 - 90.0),
                               escurecer(casca, 0.18), z + 0.05))
-        pecas.append(Peca(j, elipse(lado * 4.5, -5.0, 5.0, 3.0), musgo, z + 0.1))
-    veios(pecas, "torso", escurecer(casca, 0.4), -6.0, -23.0, -3.0, n=4)
+        pecas.append(Peca(j, elipse(lado * 6.0, -6.0, 7.0, 4.0), musgo, z + 0.1))
+    veios(pecas, "torso", escurecer(casca, 0.4), -11.0, -22.0, -2.0, n=6)
     # costelas de osso a romper a casca. Em tom ESCURECIDO: a osso cheio
     # eram a coisa mais clara do sprite e roubavam o olho ao nucleo.
     osso_fundo = escurecer(osso, 0.42)
     for k in range(2):
         y = -12.0 + k * 5.5
-        pecas.append(Peca("torso", [(-8.0, y), (8.0, y - 1.0), (7.0, y + 2.2),
-                                    (-7.0, y + 3.0)], osso_fundo, 0.7))
+        pecas.append(Peca("torso", [(-13.0, y), (13.0, y - 1.0), (11.0, y + 2.6),
+                                    (-11.0, y + 3.4)], osso_fundo, 0.7))
     # A cabeca e' um CAPUZ de casca com um cranio la' dentro, quase todo na
     # sombra -- so' as orbitas acesas se leem. Mais gotico e mais legivel do
     # que uma caveira inteira em osso claro a esta escala.
@@ -437,6 +442,11 @@ def _entrevane(juntas: Juntas, pecas: list[Peca], pal: dict) -> None:
     casca, seiva = pal["corpo"], pal["corpo2"]
     # nao tem cabeca nenhuma: e' uma arvore
     tirar(pecas, "cabeca", "pescoco")
+    # os ramos-bracos noutro tom que o tronco, senao a silhueta e' um
+    # caixote: no plano humanoide nascem os dois da cor do corpo
+    pintar(pecas, "braco_f", clarear(casca, 0.2))
+    pintar(pecas, "braco_t", escurecer(casca, 0.32))
+    pintar(pecas, ("antebraco_t", "antebraco_f"), escurecer(seiva, 0.15))
     # nao tem cabeca: tem ROSTOS abertos na casca, a varias alturas
     for x, y, r in ((-4.0, -30.0, 4.5), (5.0, -18.0, 3.4), (-6.0, -9.0, 3.0)):
         pecas.append(Peca("torso", elipse(x, y, r * 1.15, r * 1.4),
@@ -824,17 +834,23 @@ CHEFES: dict[str, dict] = {
     # ── Regiao I -- Floresta Putrefacta ──────────────────────────────────
     "ghorak": {
         "plano": "humanoide",
-        "par": {"coxa": 16.0, "canela": 15.0, "esp_perna": 10.0, "torso": 26.0,
-                "ombros": 26.0, "cintura": 15.0, "braco": 14.0, "antebraco": 13.0,
-                "esp_braco": 8.0, "cabeca": 8.0},
+        # a primeira versao tinha 64 px de largura util para 158 de altura e
+        # lia-se como um totem. Ombros +50%, cintura e membros grossos: um
+        # bruto le'-se pela LARGURA, e o jogo normaliza-o pela altura.
+        "par": {"coxa": 15.0, "canela": 13.0, "esp_perna": 16.0, "torso": 24.0,
+                "ombros": 32.0, "cintura": 18.0, "braco": 16.0, "antebraco": 15.0,
+                "esp_braco": 13.0, "cabeca": 9.0, "pescoco": 1.0},
         "pal": paleta("4a3a28", "2f4224", "cdbb96", "1b2414", metal="2b2118"),
         "cfg": {"ataque": "golpe", "amp": 0.8},
         "extras": _ghorak,
     },
     "morvanna": {
         "plano": "flutuante",
-        "par": {"voo": 30.0, "torso": 21.0, "ombros": 16.0, "manto": 26.0,
-                "manto_larg": 21.0},
+        # manto MUITO mais largo do que alto na base: e' o que faz a
+        # silhueta de bruxa a flutuar, e o que ela nao tinha
+        "par": {"voo": 30.0, "torso": 22.0, "ombros": 26.0, "cintura": 18.0,
+                "manto": 30.0, "manto_larg": 36.0, "braco": 13.0,
+                "antebraco": 12.0, "esp_braco": 7.0},
         "pal": paleta("2a2340", "3d5236", "b9a9c9", "1a1526", metal="8f7fae",
                       brilho="9dff6b"),
         "cfg": {"ataque": "magia", "amp": 1.15},
@@ -850,17 +866,22 @@ CHEFES: dict[str, dict] = {
     },
     "entrevane": {
         "plano": "humanoide",
-        "par": {"coxa": 13.0, "canela": 12.0, "esp_perna": 12.0, "torso": 40.0,
-                "ombros": 24.0, "cintura": 22.0, "braco": 15.0, "antebraco": 14.0,
-                "esp_braco": 7.0, "cabeca": 5.0, "pescoco": 1.0},
+        # tronco de arvore: ombros quase tao largos como o torso e' alto, e
+        # os ramos-bracos com espessura de ramo e nao de arame
+        # tronco que AFINA de cima para baixo (28 -> 14) e ramos grossos que
+        # passam para fora da silhueta: com o tronco a direito e ramos finos
+        # ele lia-se como um caixote com galhos espetados em cima
+        "par": {"coxa": 13.0, "canela": 12.0, "esp_perna": 18.0, "torso": 38.0,
+                "ombros": 28.0, "cintura": 14.0, "braco": 17.0, "antebraco": 16.0,
+                "esp_braco": 15.0, "cabeca": 5.0, "pescoco": 1.0},
         "pal": paleta("3f3324", "26361d", "b8a684", "141c0e", metal="5c6b3a"),
         "cfg": {"ataque": "golpe", "amp": 0.6},
         "extras": _entrevane,
     },
     "coracao_putrefacto": {
         "plano": "flutuante",
-        "par": {"voo": 30.0, "torso": 24.0, "ombros": 4.0, "cintura": 4.0,
-                "manto": 22.0, "manto_larg": 24.0, "braco": 12.0, "antebraco": 11.0},
+        "par": {"voo": 30.0, "torso": 26.0, "ombros": 4.0, "cintura": 4.0,
+                "manto": 24.0, "manto_larg": 30.0, "braco": 13.0, "antebraco": 12.0},
         "pal": paleta("34281c", "5c1f3a", "cdbb96", "1b1410", metal="6b5f8f"),
         "cfg": {"ataque": "magia", "amp": 0.9},
         "extras": _coracao,
