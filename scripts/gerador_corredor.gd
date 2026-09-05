@@ -184,7 +184,7 @@ const POOL_REGIAO := {
 	14: ["sinos", "velas", "gruta", "pendulos", "guilhotinas", "espinhos",
 		"ferry", "elevador", "portal", "alavanca", "segredo", "espectral",
 		"vitral", "bifurcacao", "raizes", "incorporeo", "estatuas",
-		"ceifa", "ciclo"],
+		"ceifa", "ciclo", "mausoleu"],
 	# XVI Mar Vermelho: a maré. `ritmo` de assinatura -- tudo aqui sobe e
 	# desce a compasso.
 	15: ["ritmo", "ferry", "quebra", "gravidade", "pendulos", "espinhos",
@@ -200,7 +200,7 @@ const POOL_REGIAO := {
 	# se sentir VAZIA, e uma pool grande enche a jornada de coisas.
 	17: ["elevador", "gravidade", "portal", "espelhos", "saltos", "quebra",
 		"alavanca", "segredo", "sem_chao", "espectral", "orbita", "queda",
-		"estatuas", "olhar"],
+		"estatuas", "olhar", "gemea"],
 	# XIX Guerra dos Reinos: cerco. `pedras` de assinatura (o que as
 	# catapultas mandam) mais tudo o que fere -- é a região mais densa.
 	18: ["pedras", "crossfire", "espinhos", "serras", "guilhotinas",
@@ -330,7 +330,7 @@ const MECANICA_DO_NIVEL := [
 	{"cam": "raizes", "grau": 1},
 	# --- niveis 56-60  (Regiao 12) ---
 	{"cam": "correntes", "grau": 1},  # ~
-	{"cam": "elevador", "grau": 1},  # ~
+	{"cam": "elevador", "grau": 1},
 	{"cam": "replicantes", "grau": 1},
 	{"cam": "circuito", "grau": 1},
 	{"cam": "imanes", "grau": 1},
@@ -341,7 +341,7 @@ const MECANICA_DO_NIVEL := [
 	{"cam": "grav_baixa", "grau": 2},
 	{"cam": "ferry", "grau": 1},  # ~
 	# --- niveis 66-70  (Regiao 14) ---
-	{"cam": "portal", "grau": 2},  # ~
+	{"cam": "portal", "grau": 2},
 	{"cam": "quebra", "grau": 2},  # ~
 	{"cam": "estatuas", "grau": 2},
 	{"cam": "ritmo", "grau": 2},  # ~
@@ -350,7 +350,7 @@ const MECANICA_DO_NIVEL := [
 	{"cam": "sinos", "grau": 2},
 	{"cam": "ciclo", "grau": 2},
 	{"cam": "incorporeo", "grau": 2},
-	{"cam": "guilhotinas", "grau": 2},  # ~
+	{"cam": "mausoleu", "grau": 2},
 	{"cam": "ceifa", "grau": 2},
 	# --- niveis 76-80  (Regiao 16) ---
 	{"cam": "mare", "grau": 2},
@@ -367,7 +367,7 @@ const MECANICA_DO_NIVEL := [
 	# --- niveis 86-90  (Regiao 18) ---
 	{"cam": "olhar", "grau": 2},
 	{"cam": "sem_chao", "grau": 2},
-	{"cam": "elevador", "grau": 2},  # ~
+	{"cam": "gemea", "grau": 2},
 	{"cam": "espectral", "grau": 2},
 	{"cam": "elevador", "grau": 2},
 	# --- niveis 91-95  (Regiao 19) ---
@@ -381,7 +381,7 @@ const MECANICA_DO_NIVEL := [
 	{"cam": "revisao", "grau": 2},
 	{"cam": "saltos", "grau": 2},  # ~
 	{"cam": "trampolim", "grau": 2},  # ~
-	{"cam": "velas", "grau": 2},  # ~
+	{"cam": "velas", "grau": 2},
 ]
 
 
@@ -429,6 +429,7 @@ const CAMARAS_FLAVOUR := [
 	"replicantes", "estatuas", "incorporeo",
 	"rosas", "imanes", "ceifa", "brasas", "olhar", "ariete", "revisao",
 	"gelo", "frio", "veneno", "escuro", "areia_no_ar", "ciclo",
+	"mausoleu", "gemea",
 ]
 
 ## Câmara "assinatura" de cada região -- no acto do meio da jornada aparece
@@ -1534,6 +1535,8 @@ func _flavour(par: Node2D, tipo: String, x: float, y: float) -> Vector2:
 		"escuro": return _f_escuro(par, x, y)
 		"areia_no_ar": return _f_areia_no_ar(par, x, y)
 		"ciclo": return _f_ciclo(par, x, y)
+		"mausoleu": return _f_mausoleu(par, x, y)
+		"gemea": return _f_gemea(par, x, y)
 	# tipo sem handler -> não deve acontecer (pool/assinatura mal configurada).
 	# Avisa em vez de gerar um vão morto silencioso e cai num `descanso`.
 	push_warning("GeradorCorredor: câmara '%s' sem _f_ correspondente" % tipo)
@@ -3813,6 +3816,90 @@ func _f_ciclo(par: Node2D, x: float, y: float) -> Vector2:
 	_plat(par, Vector2(x, sy), Vector2(140.0, 18.0))
 	_checkpoint(x, sy, true)
 	return Vector2(x, sy)
+
+
+## MAUSOLÉU (N74, Palácio dos Reis Mortos): as estátuas do nível 68 dentro
+## do escuro do nível 40. Cada uma sozinha é uma regra; juntas são outra
+## coisa -- elas só andam quando ela não olha, e agora ela **não vê** o que
+## está fora do círculo de luz. Olhar para trás deixou de ser grátis: é o
+## único sítio onde se pode olhar, e é lá que elas estão.
+##
+## Continua sem armadilha nenhuma: o perigo desta sala anda, e telegrafa-se
+## sozinho ao aparecer mais perto de cada vez que a luz passa por ele.
+func _f_mausoleu(par: Node2D, x: float, y: float) -> Vector2:
+	var cy: float = clampf(y, _teto_y + 220.0, _chao_y - 150.0)
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(150.0, 18.0))
+	_checkpoint(x, cy, true)
+	var x0 := x
+	var larg := 640.0 + 160.0 * _dif
+	_plat(par, Vector2(x0 + larg * 0.5, cy + 34.0), Vector2(larg, 24.0), 120.0)
+
+	var ze := ZONA_ESCURIDAO.new()
+	ze.tipo = "escuro"
+	ze.tamanho = Vector2(larg, 440.0)
+	ze.forca = 0.86
+	ze.raio_luz = 200.0 - 40.0 * _dif
+	ze.position = Vector2(x0 + larg * 0.5, cy - 120.0)
+	par.add_child(ze)
+
+	var n := 3 + int(_dif * 2.0)
+	for i in n:
+		var px := x0 - 40.0 - float(i) * 46.0
+		if i % 2 == 0:
+			px = x0 + 220.0 + float(i) * (larg / float(n + 1))
+		_bicho_regra(par, Vector2(px, cy - 40.0),
+			{"so_mexe_sem_olhar": true, "velocidade": 88.0 + 40.0 * _dif})
+	# os nichos vazios do palácio: cenário, e a única coisa que se vê
+	# quando a luz lhes passa por cima
+	for k in 3:
+		_plat(par, Vector2(x0 + 190.0 + float(k) * 200.0, cy - 140.0),
+			Vector2(100.0, 15.0))
+	x = x0 + larg + _rng.randf_range(148.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(140.0, 18.0))
+	_checkpoint(x, cy, true)
+	return Vector2(x, cy)
+
+
+## GÉMEA (N88, Labirinto Impossível): a mesma sala duas vezes, e na segunda
+## há **uma** coisa diferente. Constrói-se a segunda com a mesma semente da
+## primeira -- é literalmente a mesma sala, não uma parecida --, e depois
+## troca-se uma peça só: onde havia um degrau passa a haver espinhos.
+##
+## O que ela pede não é reflexos, é MEMÓRIA: quem passou a primeira
+## distraído não tem como saber o que mudou. E como a diferença é sempre um
+## perigo (nunca um caminho que desapareça), enganar-se custa vida e nunca
+## fecha a passagem.
+func _f_gemea(par: Node2D, x: float, y: float) -> Vector2:
+	var cy: float = clampf(y, _teto_y + 220.0, _chao_y - 130.0)
+	var semente := _rng.randi()
+	var n := 4 + int(_dif * 2.0)
+	# a peça que muda na segunda volta
+	var trocada := 1 + _rng.randi() % maxi(1, n - 1)
+	for volta in 2:
+		var r := RandomNumberGenerator.new()
+		r.seed = semente                     # a MESMA sala, não uma parecida
+		x += _rng.randf_range(150.0, 176.0)
+		_plat(par, Vector2(x, cy), Vector2(140.0, 18.0))
+		if volta == 0:
+			_checkpoint(x, cy, true)
+		for i in n:
+			x += r.randf_range(150.0, 176.0)
+			var py := cy - r.randf_range(0.0, 70.0)
+			_plat(par, Vector2(x, py), Vector2(100.0, 16.0))
+			# o degrau que, na segunda volta, deixa de ser um degrau
+			if i == trocada:
+				if volta == 0:
+					_plat(par, Vector2(x + 70.0, py - 74.0), Vector2(80.0, 14.0))
+				else:
+					var esp := ESPINHOS.instantiate()
+					esp.largura = 4
+					esp.position = Vector2(x - 30.0, py - 8.0)
+					par.add_child(esp)
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(140.0, 18.0))
+	_checkpoint(x, cy, true)
+	return Vector2(x, cy)
 
 
 ## Estica uma `ZonaGravidade` para cobrir `tam` (e o Fundo com ela).

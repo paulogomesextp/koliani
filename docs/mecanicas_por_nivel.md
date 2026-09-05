@@ -418,6 +418,21 @@ luz do motor -- funciona igual com as luzes do bioma ligadas ou desligadas.
 
 **Provisórias: 23 → 20.** Bancada: 25 asserções.
 
+### Sétima leva: duas regras que se multiplicam, e três linhas mal marcadas
+
+| Nível | Câmara | O que muda |
+|---|---|---|
+| 74 Palácio dos Reis Mortos | `mausoleu` | as estátuas do N68 **dentro** do escuro do N40. Cada uma sozinha é uma regra; juntas são outra coisa: elas só andam quando ela não olha, e agora ela não vê o que está fora do círculo. Olhar para trás deixou de ser grátis -- é o único sítio onde se pode olhar, e é lá que elas estão |
+| 88 Labirinto Impossível | `gemea` | a mesma sala duas vezes, com **uma** coisa diferente. A segunda constrói-se com a mesma semente da primeira -- é literalmente a mesma sala --, e depois troca-se uma peça: onde havia um degrau passa a haver espinhos. Não pede reflexos, pede memória. E a diferença é sempre um perigo, nunca um caminho que desapareça: enganar-se custa vida, nunca fecha a passagem |
+
+E mais **três linhas estavam marcadas `# ~` sem o serem**: N57 (Linha 13 --
+o guia diz "tapete rolante", que é a `tapete` um grau acima), N66 (Vila dos
+Sonhos -- "portais que se movem" é a `portal` grau 2, assinatura da região
+XIV) e N100 (o duelo de espada vive na cena do chefe; o último nível nem
+sequer tem jornada).
+
+**Provisórias: 20 → 15.**
+
 ### E as pools das regiões, que era o buraco maior
 
 As 16 estreias de 5 set (`lava_sobe`, `mare`, `espectral`, …) **não estavam
