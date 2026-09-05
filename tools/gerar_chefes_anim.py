@@ -704,6 +704,122 @@ def _vyrak(juntas: Juntas, pecas: list[Peca], pal: dict) -> None:
     nucleo(pecas, "corpo", -4.0, 0.0, 3.0)
 
 
+# -- Regiao IV -- Catacumbas do Abismo ------------------------------------
+
+def _rei_ossario(juntas: Juntas, pecas: list[Peca], pal: dict) -> None:
+    # "rei morto-vivo num CAVALO ESQUELETICO"
+    osso, panos = escurecer(pal["pele"], 0.34), pal["corpo2"]
+    # o cavalo e' um esqueleto: costelas a' mostra e cranio comprido
+    for k in range(5):
+        x = -14.0 + k * 7.0
+        pecas.append(Peca("corpo", caixa(x, -7.0, x + 2.6, 7.0), osso, 0.3))
+    pecas.append(Peca("cabeca", [(-2.0, -4.0), (20.0, -3.0), (21.0, 3.0),
+                                 (-2.0, 4.5)], osso, 0.6))
+    pecas.append(Peca("cabeca", elipse(2.0, -1.0, 2.0, 1.6), CONTORNO, 0.7))
+    pecas.append(Peca("cabeca", elipse(3.0, -1.0, 1.2, 1.0), MAGENTA, 0.75, brilho=True))
+    # o rei: cranio coroado e manto por cima da garupa
+    # o manto acaba a' altura da sela: a versao anterior descia 16 px pela
+    # garupa abaixo e tapava as costelas do cavalo, que sao metade do lore
+    pecas.append(Peca("cavaleiro", [(-15.0, -14.0), (9.0, -14.0), (12.0, 4.0),
+                                    (-18.0, 4.0)], panos, 1.9))
+    veios(pecas, "cavaleiro", escurecer(panos, 0.4), -11.0, -8.0, 2.0, n=4, z=1.95)
+    cranio(pecas, "cab_cav", osso, r=6.5, z=2.3, c_olho=MAGENTA)
+    coroa(pecas, "cab_cav", pal["metal"], r=6.5, z=2.5)
+    espada(pecas, "braco_c", cor("2b2118"), clarear(pal["metal"], 0.25), comp=30.0, larg=4.5)
+    nucleo(pecas, "cavaleiro", -3.0, -2.0, 2.6)
+
+
+def _colosso_osseo(juntas: Juntas, pecas: list[Peca], pal: dict) -> None:
+    # "gigante de CENTENAS DE ESQUELETOS; ao perder partes, faz armas novas"
+    osso = escurecer(pal["pele"], 0.34)
+    tirar(pecas, "cabeca", "pescoco")
+    pintar(pecas, ("antebraco_t", "antebraco_f"), osso)
+    # caveiras encaixadas no tronco -- e' isso que diz "centenas", nao uma
+    for x, y, r in ((-7.0, -16.0, 4.2), (6.0, -12.0, 3.6), (-2.0, -5.0, 3.8),
+                    (9.0, -20.0, 3.0), (-10.0, -6.0, 3.0)):
+        pecas.append(Peca("torso", elipse(x, y, r, r * 1.05), osso, 0.7))
+        pecas.append(Peca("torso", elipse(x - r * 0.35, y - r * 0.1, r * 0.28, r * 0.24),
+                          CONTORNO, 0.75))
+        pecas.append(Peca("torso", elipse(x + r * 0.35, y - r * 0.1, r * 0.28, r * 0.24),
+                          CONTORNO, 0.75))
+    espinhos_ombro(pecas, "torso", osso, -24.0, n=5, larg=24.0, alt=8.0, z=0.9)
+    cranio(pecas, "cabeca", osso, r=9.0, z=2.0, c_olho=MAGENTA)
+    chifres(pecas, "cabeca", osso, alt=10.0, aber=8.0, z=1.9)
+    nucleo(pecas, "torso", 0.0, -13.0, 3.0)
+
+
+def _freira_negra(juntas: Juntas, pecas: list[Peca], pal: dict) -> None:
+    # "APAGA AS VELAS; manter certas chamas acesas durante a luta"
+    pano, cera = pal["corpo"], cor("e8dfc4")
+    tirar(pecas, "cabeca", "pescoco")
+    capuz(pecas, "cabeca", pano, r=9.5, z=2.0)
+    # a touca vai POR CIMA do capuz: por baixo ficava tapada e ela era so'
+    # um vulto preto. E' a unica coisa clara nela -- e e' o que a faz
+    # freira e nao feiticeira.
+    pecas.append(Peca("cabeca", caixa(-9.5, -9.5, 9.5, -6.0), cera, 2.75))
+    pecas.append(Peca("cabeca", caixa(-9.5, -9.0, -5.5, 4.0), cera, 2.75))
+    pecas.append(Peca("cabeca", caixa(5.5, -9.0, 9.5, 4.0), cera, 2.75))
+    olhos(pecas, "cabeca", 1.0, -4.0, 1.2, MAGENTA, sep=3.0, z=2.9)
+    # a cruz ao peito, virada ao contrario
+    pecas.append(Peca("corpo", caixa(-1.6, -18.0, 1.6, -4.0), pal["metal"], 1.5))
+    pecas.append(Peca("corpo", caixa(-5.5, -10.0, 5.5, -7.0), pal["metal"], 1.5))
+    # as velas: tres a flutuar a' volta dela, uma ja' apagada -- e' a
+    # ameaca dela numa imagem so'
+    for x, y, aceso in ((-20.0, -26.0, True), (19.0, -18.0, True), (-16.0, -6.0, False)):
+        pecas.append(Peca("corpo", caixa(x - 1.8, y, x + 1.8, y + 9.0), cera, 3.4))
+        if aceso:
+            chama(pecas, "corpo", x, y, 6.0, cor("ffd27a"), z=3.5)
+        else:
+            pecas.append(Peca("corpo", caixa(x - 0.8, y - 2.5, x + 0.8, y), CONTORNO, 3.5))
+    nucleo(pecas, "corpo", 1.0, -13.0, 2.4, cor("ffd27a"))
+
+
+def _naga_zeraph(juntas: Juntas, pecas: list[Peca], pal: dict) -> None:
+    # "invoca cobras; VENENO; troca de posicao com estatuas"
+    escama, veneno = pal["corpo"], cor("9dff6b")
+    tirar(pecas, "cabeca")
+    # capuz de naja aberto atras da cabeca: le'-se de longe e e' so' dela
+    pecas.append(Peca("cabeca", [(-15.0, 2.0), (-11.0, -12.0), (0.0, -17.0),
+                                 (11.0, -12.0), (15.0, 2.0), (0.0, 6.0)],
+                      pal["corpo2"], 1.6))
+    pecas.append(Peca("cabeca", elipse(0.0, -4.0, 6.5, 7.0), escama, 2.0))
+    olhos(pecas, "cabeca", 1.0, -5.0, 1.3, veneno, sep=3.2, z=2.2)
+    # a lingua bifida, sempre de fora
+    pecas.append(Peca("cabeca", [(5.0, -1.0), (13.0, 0.0), (10.0, 1.2),
+                                 (13.0, 2.6), (5.0, 1.6)], cor("ff5f8a"), 2.15))
+    # peito de escamas CLARAS: a versao anterior era verde sobre verde e a
+    # metade de cima dela desaparecia contra os aneis
+    pintar(pecas, "torso", clarear(escama, 0.22))
+    for k in range(4):
+        y = -18.0 + k * 5.0
+        pecas.append(Peca("torso", caixa(-6.0, y, 6.0, y + 3.2),
+                          escurecer(escama, 0.3), 0.62))
+    # cobras pequenas enroladas nos antebracos
+    for j, z in (("cotovelo_t", -1.4), ("cotovelo_f", 3.6)):
+        corrente(pecas, j, 0.0, 4.0, 4, 3.4, pal["corpo2"], z=z + 0.05)
+    cajado(pecas, "arma", cor("2b2118"), veneno, comp=34.0)
+    nucleo(pecas, "torso", 1.0, -13.0, 2.6, veneno)
+
+
+def _olho_do_abismo(juntas: Juntas, pecas: list[Peca], pal: dict) -> None:
+    # "OLHO FLUTUANTE SEM CORPO. Lasers; plataformas falsas; clones"
+    carne, iris = pal["corpo"], MAGENTA
+    # sem corpo nenhum: fica so' a esfera. E' literalmente o lore.
+    tirar(pecas, "torso", "manto", "ponta", "pescoco", "cabeca",
+          "braco_t", "antebraco_t", "braco_f", "antebraco_f")
+    tentaculos(pecas, "corpo", escurecer(carne, 0.3), 7, 16.0, 26.0,
+               a0=30.0, a1=150.0, z=-1.0)
+    pecas.append(Peca("corpo", elipse(0.0, -14.0, 20.0, 20.0), carne, 0.0))
+    pecas.append(Peca("corpo", elipse(2.0, -14.0, 11.0, 11.0), pal["pele"], 0.3))
+    pecas.append(Peca("corpo", elipse(4.0, -14.0, 6.5, 6.5), iris, 0.4, brilho=True))
+    pecas.append(Peca("corpo", elipse(5.0, -14.0, 2.8, 2.8), CONTORNO, 0.5))
+    # veias por cima da esclerotica -- sem elas e' uma bola, nao um olho
+    for x, y in ((-13.0, -22.0), (-15.0, -10.0), (-8.0, -27.0), (-10.0, -3.0)):
+        pecas.append(Peca("corpo", [(x, y), (x + 6.0, y + 1.5), (x + 3.0, y + 3.0),
+                                    (x + 8.0, y + 4.0)], escurecer(carne, 0.45), 0.2))
+
+
+
 CHEFES: dict[str, dict] = {
     # ── Regiao I -- Floresta Putrefacta ──────────────────────────────────
     "ghorak": {
@@ -849,6 +965,55 @@ CHEFES: dict[str, dict] = {
                       asa="241d38"),
         "cfg": {"amp": 1.1},
         "extras": _vyrak,
+    },
+
+    # -- Regiao IV -- Catacumbas do Abismo --------------------------------
+    "rei_ossario": {
+        "plano": "quadrupede",
+        "par": {"alt": 26.0, "corpo_c": 44.0, "corpo_a": 15.0, "pescoco": 15.0,
+                "cabeca": 6.0, "seg1": 15.0, "seg2": 15.0, "esp_pata": 5.0,
+                "tronco": 22.0, "braco": 13.0, "cab_c": 6.5},
+        "pal": paleta("3b3a44", "3a1f2e", "e6dcc4", "16151c", metal="c8ac52",
+                      cavaleiro="2a2436"),
+        "cfg": {"amp": 0.9},
+        "extras": _rei_ossario,
+    },
+    "colosso_osseo": {
+        # gigante: tudo o que e' de cima e' largo, tudo o que e' de baixo e' curto
+        "plano": "humanoide",
+        "par": {"coxa": 14.0, "canela": 13.0, "esp_perna": 13.0, "torso": 32.0,
+                "ombros": 32.0, "cintura": 17.0, "braco": 17.0, "antebraco": 16.0,
+                "esp_braco": 11.0, "cabeca": 9.0, "pescoco": 1.0},
+        "pal": paleta("504a3e", "36322a", "e6dcc4", "17150f", metal="8a8272"),
+        "cfg": {"ataque": "golpe", "amp": 0.7},
+        "extras": _colosso_osseo,
+    },
+    "freira_negra": {
+        "plano": "flutuante",
+        "par": {"voo": 30.0, "torso": 22.0, "ombros": 16.0, "cintura": 10.0,
+                "manto": 30.0, "manto_larg": 20.0, "braco": 12.0, "antebraco": 11.0},
+        "pal": paleta("1a1720", "24202c", "cfc4b0", "0e0c12", metal="b8ac7a",
+                      brilho="ffd27a"),
+        "cfg": {"ataque": "magia", "amp": 1.0},
+        "extras": _freira_negra,
+    },
+    "naga_zeraph": {
+        "plano": "serpente",
+        # aneis mais curtos: a 20 a cauda media 324 px e o jogo normaliza o
+        # chefe pela LARGURA -- ficava com a cabeca do tamanho de um bicho
+        "par": {"anel": 14.0, "esp_anel": 15.0, "torso": 26.0, "ombros": 18.0,
+                "braco": 13.0, "antebraco": 12.0, "esp_braco": 6.0, "cabeca": 7.5},
+        "pal": paleta("1f3a2c", "2f5c3e", "cfe0c4", "0e1a14", metal="b8a45a",
+                      brilho="9dff6b"),
+        "cfg": {"ataque": "magia", "amp": 1.05},
+        "extras": _naga_zeraph,
+    },
+    "olho_do_abismo": {
+        "plano": "flutuante",
+        "par": {"voo": 40.0, "torso": 10.0, "manto": 4.0, "manto_larg": 4.0},
+        "pal": paleta("6a2038", "3a1224", "f2e8ea", "1a0a12", metal="8a5a6a"),
+        "cfg": {"ataque": "magia", "amp": 1.3},
+        "extras": _olho_do_abismo,
     },
 }
 

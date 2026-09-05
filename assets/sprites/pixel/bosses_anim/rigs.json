@@ -164,19 +164,19 @@
  },
  "rei_ossario": {
   "w": 198,
-  "h": 113,
-  "pes_y": 113,
+  "h": 214,
+  "pes_y": 178,
   "estados": {
    "idle": 6,
    "walk": 8,
-   "attack": 6,
+   "attack": 10,
    "hurt": 4,
-   "death": 11
+   "death": 10
   },
   "fps": {
-   "idle": 8.0,
-   "walk": 12.0,
-   "attack": 12.0,
+   "idle": 7.0,
+   "walk": 11.0,
+   "attack": 14.0,
    "hurt": 12.0,
    "death": 10.0
   }
@@ -918,6 +918,101 @@
    "idle": 7.0,
    "walk": 11.0,
    "attack": 14.0,
+   "hurt": 12.0,
+   "death": 10.0
+  }
+ },
+ "colosso_osseo": {
+  "w": 190,
+  "h": 178,
+  "pes_y": 164,
+  "estados": {
+   "idle": 6,
+   "walk": 8,
+   "attack": 10,
+   "hurt": 4,
+   "death": 10
+  },
+  "fps": {
+   "idle": 7.0,
+   "walk": 11.0,
+   "attack": 14.0,
+   "hurt": 12.0,
+   "death": 10.0
+  }
+ },
+ "freira_negra": {
+  "w": 132,
+  "h": 190,
+  "pes_y": 154,
+  "estados": {
+   "idle": 6,
+   "walk": 8,
+   "attack": 10,
+   "hurt": 4,
+   "death": 10
+  },
+  "fps": {
+   "idle": 7.0,
+   "walk": 11.0,
+   "attack": 14.0,
+   "hurt": 12.0,
+   "death": 10.0
+  }
+ },
+ "naga_zeraph": {
+  "w": 272,
+  "h": 160,
+  "pes_y": 124,
+  "estados": {
+   "idle": 6,
+   "walk": 8,
+   "attack": 10,
+   "hurt": 4,
+   "death": 10
+  },
+  "fps": {
+   "idle": 7.0,
+   "walk": 11.0,
+   "attack": 14.0,
+   "hurt": 12.0,
+   "death": 10.0
+  }
+ },
+ "olho_do_abismo": {
+  "w": 120,
+  "h": 174,
+  "pes_y": 164,
+  "estados": {
+   "idle": 6,
+   "walk": 8,
+   "attack": 10,
+   "hurt": 4,
+   "death": 10
+  },
+  "fps": {
+   "idle": 7.0,
+   "walk": 11.0,
+   "attack": 14.0,
+   "hurt": 12.0,
+   "death": 10.0
+  }
+ },
+ "rei_ossario_pack": {
+  "w": 198,
+  "h": 113,
+  "pes_y": 113,
+  "estados": {
+   "idle": 6,
+   "walk": 8,
+   "attack": 6,
+   "hurt": 4,
+   "death": 11
+  },
+  "fps": {
+   "idle": 8.0,
+   "walk": 12.0,
+   "attack": 12.0,
    "hurt": 12.0,
    "death": 10.0
   }
