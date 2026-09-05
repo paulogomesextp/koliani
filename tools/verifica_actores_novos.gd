@@ -15,6 +15,7 @@ const ARIETE := preload("res://scripts/ariete.gd")
 const PLAT_OLHAR := preload("res://scenes/actors/PlataformaOlhar.tscn")
 const ZONA_ESTADO := preload("res://scripts/zona_estado.gd")
 const ZONA_GELO := preload("res://scripts/zona_gelo.gd")
+const ZONA_ESCURIDAO := preload("res://scripts/zona_escuridao.gd")
 ## A Koliani carrega-se em RUNTIME (nao com `preload`): o script dela usa
 ## autoloads pelo nome e isso nao compila em `--script`.
 const KOLIANI := "res://scenes/actors/Koliani.tscn"
@@ -62,6 +63,15 @@ func _duble(pos: Vector2) -> CharacterBody2D:
 ## e dava tres falhas que nao existiam.)
 func _esperar(seg: float) -> void:
 	await create_timer(seg).timeout
+
+
+## Quantas `CanvasLayer` e' que a zona tem penduradas (o veu).
+func _tem_camada(n: Node) -> int:
+	var c := 0
+	for f in n.get_children():
+		if f is CanvasLayer:
+			c += 1
+	return c
 
 
 func _init() -> void:
@@ -223,6 +233,29 @@ var ligada := false
 				% [tipo, int(kv.get(campo))])
 		ze.queue_free()
 		kv.queue_free()
+		await process_frame
+
+	# --- ZONA ESCURIDAO ------------------------------------------------
+	# o veu vive numa CanvasLayer que NASCE a' entrada e MORRE a' saida --
+	# um veu esquecido por cima do jogo seria pior do que nao haver escuro
+	for modo in ["escuro", "areia"]:
+		var zx: Node2D = ZONA_ESCURIDAO.new()
+		zx.tipo = modo
+		zx.tamanho = Vector2(300.0, 200.0)
+		zx.transicao = 0.1
+		zx.global_position = Vector2(7000.0, 0.0)
+		_sala.add_child(zx)
+		var kx := _duble(Vector2(6500.0, 0.0))
+		await _esperar(0.2)
+		_ok(_tem_camada(zx) == 0, "ZonaEscuridao(%s): sem veu de fora" % modo)
+		kx.global_position = Vector2(7000.0, 0.0)
+		await _esperar(0.3)
+		_ok(_tem_camada(zx) == 1, "ZonaEscuridao(%s): o veu aparece la' dentro" % modo)
+		kx.global_position = Vector2(6000.0, 0.0)
+		await _esperar(0.5)
+		_ok(_tem_camada(zx) == 0, "ZonaEscuridao(%s): e sai com ela" % modo)
+		zx.queue_free()
+		kx.queue_free()
 		await process_frame
 
 	# --- OS ESTADOS NA KOLIANI A SERIO ---------------------------------

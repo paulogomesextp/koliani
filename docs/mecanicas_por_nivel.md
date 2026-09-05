@@ -403,6 +403,21 @@ mediu foi a **queda no vazio**: "provou" um veneno a tirar 158 de vida em
 
 **Provisórias: 25 → 23.**
 
+### Sexta leva: tirar-lhe a vista (N40, N49) e o cemitério que se repete (N72)
+
+| Nível | Câmara | O que muda |
+|---|---|---|
+| 40 Abismo Oceânico | `escuro` | noite fechada com um buraco de luz à volta dela. A `velas` (N18) também é escura, mas lá a luz **acende-se e fica**; aqui não há nada para acender -- a luz anda com ela, e o que se perde é poder ler a sala antes de entrar. Por isso a geometria é honesta: vãos curtos, nada escondido. O escuro é o problema, não uma tampa por cima de outro |
+| 49 Cidade Enterrada | `areia_no_ar` | a tempestade não escurece, **tapa**. Vê-se tudo mal em vez de se ver só um círculo -- e por isso esta sala já pode ter perigo lá dentro: tira a nitidez, não a informação |
+| 72 Cemitério Infinito | `ciclo` | três bocas iguais e só uma sai; as outras devolvem à entrada. A `bifurcacao` (N52) mostra as bocas falsas (uma tem essência, outra um elite) -- aqui são iguais, e o que se perde é **tempo**, não vida |
+
+O véu vive numa `CanvasLayer` própria que **nasce à entrada e morre à
+saída** (um véu esquecido por cima do jogo seria pior do que não haver
+escuro nenhum) e o buraco de luz é um recorte em `BLEND_MODE_SUB`, não uma
+luz do motor -- funciona igual com as luzes do bioma ligadas ou desligadas.
+
+**Provisórias: 23 → 20.** Bancada: 25 asserções.
+
 ### E as pools das regiões, que era o buraco maior
 
 As 16 estreias de 5 set (`lava_sobe`, `mare`, `espectral`, …) **não estavam

@@ -82,6 +82,7 @@ const ARIETE := preload("res://scripts/ariete.gd")
 const PLAT_OLHAR := preload("res://scenes/actors/PlataformaOlhar.tscn")
 const ZONA_GELO := preload("res://scripts/zona_gelo.gd")
 const ZONA_ESTADO := preload("res://scripts/zona_estado.gd")
+const ZONA_ESCURIDAO := preload("res://scripts/zona_escuridao.gd")
 
 ## Líquido mortal por região: [cor, brasas]. floresta=água podre, prisão=ácido,
 ## torres=??? (usa trevas), catacumbas=trevas, cidade=ácido citrino,
@@ -141,7 +142,7 @@ const POOL_REGIAO := {
 	# `fogo` e sem `quebra`: debaixo de água não arde nem se estilhaça.
 	7: ["gravidade", "ferry", "ritmo", "impulso", "trampolim", "elevador",
 		"correntes", "crossfire", "portal", "pendulos", "vento", "alavanca",
-		"segredo", "mare", "grav_baixa", "tapete"],
+		"segredo", "mare", "grav_baixa", "tapete", "escuro"],
 	# IX Reino do Gelo: o gelo PARTE-SE e o vento EMPURRA. `espelhos` é a
 	# assinatura -- os cristais das cavernas -- e `pedras` são estalactites
 	# de gelo a cair. Sem `fogo` (não há nada a arder numa montanha de neve).
@@ -154,7 +155,7 @@ const POOL_REGIAO := {
 	# parado, o que mata é o que está construído.
 	9: ["crossfire", "espinhos", "serras", "prensa", "pedras", "guilhotinas",
 		"saltos", "gruta", "ferry", "portal", "alavanca", "segredo", "areia",
-		"placa", "queda", "chuva", "veneno"],
+		"placa", "queda", "chuva", "veneno", "areia_no_ar"],
 	# XI Jardins do Rei: tudo BALANÇA -- trepadeiras, ramos, pontes de
 	# folhagem. `pendulos` de assinatura. Nada de maquinaria: este jardim
 	# foi plantado, não construído.
@@ -183,7 +184,7 @@ const POOL_REGIAO := {
 	14: ["sinos", "velas", "gruta", "pendulos", "guilhotinas", "espinhos",
 		"ferry", "elevador", "portal", "alavanca", "segredo", "espectral",
 		"vitral", "bifurcacao", "raizes", "incorporeo", "estatuas",
-		"ceifa"],
+		"ceifa", "ciclo"],
 	# XVI Mar Vermelho: a maré. `ritmo` de assinatura -- tudo aqui sobe e
 	# desce a compasso.
 	15: ["ritmo", "ferry", "quebra", "gravidade", "pendulos", "espinhos",
@@ -308,7 +309,7 @@ const MECANICA_DO_NIVEL := [
 	{"cam": "grav_baixa", "grau": 1},
 	{"cam": "ritmo", "grau": 1},  # ~
 	{"cam": "tapete", "grau": 1},
-	{"cam": "gravidade", "grau": 1},  # ~
+	{"cam": "escuro", "grau": 1},
 	# --- niveis 41-45  (Regiao 9) ---
 	{"cam": "gelo", "grau": 1},
 	{"cam": "chuva", "grau": 1},
@@ -319,7 +320,7 @@ const MECANICA_DO_NIVEL := [
 	{"cam": "areia", "grau": 1},
 	{"cam": "placa", "grau": 1},
 	{"cam": "veneno", "grau": 1},
-	{"cam": "prensa", "grau": 1},  # ~
+	{"cam": "areia_no_ar", "grau": 1},
 	{"cam": "queda", "grau": 1},
 	# --- niveis 51-55  (Regiao 11) ---
 	{"cam": "rosas", "grau": 1},
@@ -347,7 +348,7 @@ const MECANICA_DO_NIVEL := [
 	{"cam": "portal", "grau": 2},  # ~
 	# --- niveis 71-75  (Regiao 15) ---
 	{"cam": "sinos", "grau": 2},
-	{"cam": "gruta", "grau": 2},  # ~
+	{"cam": "ciclo", "grau": 2},
 	{"cam": "incorporeo", "grau": 2},
 	{"cam": "guilhotinas", "grau": 2},  # ~
 	{"cam": "ceifa", "grau": 2},
@@ -427,7 +428,7 @@ const CAMARAS_FLAVOUR := [
 	"correnteza", "sem_chao", "catapulta", "salvas", "assalto", "memoria",
 	"replicantes", "estatuas", "incorporeo",
 	"rosas", "imanes", "ceifa", "brasas", "olhar", "ariete", "revisao",
-	"gelo", "frio", "veneno",
+	"gelo", "frio", "veneno", "escuro", "areia_no_ar", "ciclo",
 ]
 
 ## Câmara "assinatura" de cada região -- no acto do meio da jornada aparece
@@ -1530,6 +1531,9 @@ func _flavour(par: Node2D, tipo: String, x: float, y: float) -> Vector2:
 		"gelo": return _f_gelo(par, x, y)
 		"frio": return _f_frio(par, x, y)
 		"veneno": return _f_veneno(par, x, y)
+		"escuro": return _f_escuro(par, x, y)
+		"areia_no_ar": return _f_areia_no_ar(par, x, y)
+		"ciclo": return _f_ciclo(par, x, y)
 	# tipo sem handler -> não deve acontecer (pool/assinatura mal configurada).
 	# Avisa em vez de gerar um vão morto silencioso e cai num `descanso`.
 	push_warning("GeradorCorredor: câmara '%s' sem _f_ correspondente" % tipo)
@@ -3688,6 +3692,127 @@ func _f_veneno(par: Node2D, x: float, y: float) -> Vector2:
 	_plat(par, Vector2(x, cy), Vector2(130.0, 18.0))
 	_checkpoint(x, cy)
 	return Vector2(x, cy)
+
+
+## ESCURO (N40, Abismo Oceânico): noite fechada com um buraco de luz à
+## volta dela -- vê-se o passo seguinte e mais nada. A `velas` (N18) também
+## é escura, mas lá a luz é uma coisa que se ACENDE e fica; aqui não há
+## nada para acender: a luz é dela e anda com ela, e o que se perde é
+## poder ler a sala antes de entrar nela.
+## Por isso a geometria é honesta: vãos curtos, sem armadilhas escondidas.
+## O escuro é o problema, não uma tampa por cima de outro.
+func _f_escuro(par: Node2D, x: float, y: float) -> Vector2:
+	var cy: float = clampf(y, _teto_y + 200.0, _chao_y - 130.0)
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(140.0, 18.0))
+	_checkpoint(x, cy, true)
+	var x0 := x
+	var n := 4 + int(_dif * 2.0)
+	for i in n:
+		x += _rng.randf_range(140.0, 165.0)
+		_plat(par, Vector2(x, cy - 12.0 * float(i % 2)), Vector2(100.0, 16.0))
+	var ze := ZONA_ESCURIDAO.new()
+	ze.tipo = "escuro"
+	ze.tamanho = Vector2(x - x0 + 180.0, 460.0)
+	ze.forca = 0.82 + 0.1 * _dif
+	ze.raio_luz = 210.0 - 50.0 * _dif
+	ze.position = Vector2((x0 + x) * 0.5, cy - 90.0)
+	par.add_child(ze)
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(140.0, 18.0))
+	_checkpoint(x, cy, true)
+	return Vector2(x, cy)
+
+
+## AREIA NO AR (N49, Cidade Enterrada): a tempestade não escurece, TAPA --
+## um véu cor de duna por cima de tudo. Ao contrário do `escuro` (onde o
+## que se vê é um círculo à volta dela), aqui vê-se tudo mal, e por isso
+## esta sala pode ter perigo lá dentro: o que ela tira é a nitidez, não a
+## informação. As torretas ficam nos extremos, para se ouvirem antes de se
+## verem.
+func _f_areia_no_ar(par: Node2D, x: float, y: float) -> Vector2:
+	var cy: float = clampf(y, _teto_y + 220.0, _chao_y - 110.0)
+	x += _rng.randf_range(150.0, 176.0)
+	var larg := 620.0 + 160.0 * _dif
+	_plat(par, Vector2(x + larg * 0.5, cy), Vector2(larg, 24.0), 46.0)
+	_checkpoint(x + 44.0, cy, true)
+	var x0 := x
+	var ze := ZONA_ESCURIDAO.new()
+	ze.tipo = "areia"
+	ze.tamanho = Vector2(larg, 420.0)
+	ze.forca = 0.42 + 0.16 * _dif
+	ze.position = Vector2(x0 + larg * 0.5, cy - 110.0)
+	par.add_child(ze)
+	for k in 2:
+		var tr := TORRETA.instantiate()
+		tr.direcao = Vector2(1.0 if k == 0 else -1.0, 0.0)
+		tr.intervalo = 3.0 - 0.8 * _dif
+		tr.fase = 1.2 * float(k)
+		tr.dano = 8 + int(14.0 * _dif)
+		tr.position = Vector2(x0 - 30.0 if k == 0 else x0 + larg + 30.0, cy - 46.0)
+		par.add_child(tr)
+	for i in 1 + int(_dif * 2.0):
+		_inimigo_em(par, Vector2(x0 + 220.0 + float(i) * 200.0, cy - 40.0))
+	_coluna_fundo(par, x0 + larg * 0.5)
+	x = x0 + larg + _rng.randf_range(148.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(140.0, 18.0))
+	_checkpoint(x, cy)
+	return Vector2(x, cy)
+
+
+## CICLO (N72, Cemitério Infinito): três bocas iguais no fim da sala e só
+## uma sai. As outras duas são portais que devolvem à entrada -- e a sala
+## repete-se até se acertar. A diferença para a `bifurcacao` (N52) é que lá
+## as bocas falsas VÊEM-SE (uma tem essência, outra tem um elite); aqui são
+## iguais e o que se perde é tempo, não vida.
+##
+## Nunca tranca: a saída certa está sempre aberta e as erradas só teleportam
+## para trás. Ao fim de duas voltas o cemitério já não tem nada de novo --
+## o custo é exatamente esse.
+func _f_ciclo(par: Node2D, x: float, y: float) -> Vector2:
+	var cy: float = clampf(y, _teto_y + 240.0, _chao_y - 140.0)
+	var id := "ciclo_%d" % _camaras
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(160.0, 20.0))
+	_checkpoint(x, cy, true)
+	var x0 := x
+
+	# a saída de todos os portais falsos: uma plataforma sólida na entrada
+	var volta := PORTAL.instantiate()
+	volta.id = id + "_volta"
+	volta.destino_id = id + "_volta"
+	volta.so_saida = true
+	volta.position = Vector2(x0, cy - 28.0)
+	par.add_child(volta)
+
+	# a nave: campas iguais, e uma escada ate' a's tres bocas. Os degraus
+	# sobem de 100 em 100 px -- dentro do salto, que e' a lei da espinha.
+	var larg := 560.0
+	_plat(par, Vector2(x0 + larg * 0.5, cy + 34.0), Vector2(larg, 24.0), 110.0)
+	_plat(par, Vector2(x0 + 250.0, cy - 100.0), Vector2(120.0, 15.0))
+	_plat(par, Vector2(x0 + 380.0, cy - 200.0), Vector2(120.0, 15.0))
+	if _dif > 0.3:
+		_inimigo_em(par, Vector2(x0 + 300.0, cy - 40.0))
+
+	# tres bocas iguais: duas devolvem a' entrada, uma segue
+	var certa := _rng.randi() % 3
+	var bx := x0 + larg - 50.0
+	for k in 3:
+		var by := cy - 100.0 * float(k)
+		_plat(par, Vector2(bx, by), Vector2(100.0, 15.0))
+		if k == certa:
+			continue
+		var pf := PORTAL.instantiate()
+		pf.id = "%s_falso_%d" % [id, k]
+		pf.destino_id = id + "_volta"
+		pf.position = Vector2(bx, by - 28.0)
+		par.add_child(pf)
+
+	var sy := cy - 100.0 * float(certa)
+	x = bx + _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, sy), Vector2(140.0, 18.0))
+	_checkpoint(x, sy, true)
+	return Vector2(x, sy)
 
 
 ## Estica uma `ZonaGravidade` para cobrir `tam` (e o Fundo com ela).
