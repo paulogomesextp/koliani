@@ -73,7 +73,6 @@ func _ready() -> void:
 
 	Textos.idioma_mudou.connect(func(_l: String) -> void: _traduzir())
 	_traduzir()
-	_arrumar_sair()
 	# caveira a seguir a "HARDCORE MODE" (a fonte do jogo não tem o glifo ☠,
 	# por isso é um ícone desenhado em código, alinhado à direita do texto)
 	_hardcore.icon = _tex_caveira()
@@ -164,32 +163,29 @@ func _tex_caveira() -> ImageTexture:
 
 ## (Re)escreve todo o texto do menu no idioma atual.
 ## SAIR. `get_tree().quit()` fecha o executável de Windows e a app de
-## Android -- mas na WEB não faz nada: o Godot corre dentro de um separador
-## e não é ele que manda nele. O Paulo carregou no QUIT do telemóvel e não
-## aconteceu nada.
+## Android. Na WEB não fecha nada -- o Godot corre dentro de um separador e
+## não é ele que manda nele.
 ##
-## Na web tenta-se o `window.close()`, que o browser SÓ deixa numa janela
-## que não seja um separador normal -- e é esse o caso quando o jogo foi
-## instalado como atalho (a PWA corre em `display-mode: standalone`). Num
-## separador o browser recusa em silêncio, e por isso o botão só aparece
-## quando há alguma hipótese de ele funcionar: um QUIT que nunca faz nada
-## é pior do que não ter QUIT.
+## A primeira tentativa foi o `window.close()`, contando com o browser o
+## aceitar numa app instalada. O Paulo foi experimentar no Chrome e não
+## fechou: o `close()` só é permitido numa janela que o próprio script
+## abriu, e uma PWA não conta. Não há maneira de o contornar -- é a regra
+## do browser, e é assim de propósito.
+##
+## Então o QUIT faz o que PODE fazer, e faz até ao fim: tenta fechar, e se
+## a janela ficar, apaga a página e desliga o motor. A app fica desligada,
+## que era o pedido; o que sobra é um separado vazio a dizer que pode ser
+## fechado -- e isso só o dedo dele é que pode fazer.
+const JS_FECHAR := "(function(){try{window.close();}catch(e){}setTimeout(function(){if(window.closed||!document.body)return;document.body.innerHTML=\"<div style='position:fixed;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1rem;background:#0d0814;color:#ece6f7;font:600 5vmin/1.4 -apple-system,system-ui,sans-serif;text-align:center;padding:8vmin'>KOLIANI<span style='font-size:3.4vmin;font-weight:400;color:#8d7ea9'>The game is closed. You can close this tab.</span></div>\";},260);})();"
+
+
 func _ao_sair() -> void:
 	if OS.has_feature("web"):
-		JavaScriptBridge.eval("window.close()", true)
-		return
+		JavaScriptBridge.eval(JS_FECHAR, true)
+		# dá tempo ao `close()` de acontecer antes de se matar o motor: se a
+		# janela fechar mesmo, nunca se chega a ver a página apagada
+		await get_tree().create_timer(0.45).timeout
 	get_tree().quit()
-
-
-## Num separador de browser o QUIT não pode funcionar -- esconde-se. Numa
-## app instalada (PWA) fica, porque aí o `window.close()` é aceite.
-func _arrumar_sair() -> void:
-	if not OS.has_feature("web"):
-		return
-	var instalada: Variant = JavaScriptBridge.eval(
-		"(window.matchMedia && (matchMedia('(display-mode: standalone)').matches"
-		+ " || navigator.standalone === true)) ? 1 : 0", true)
-	_sair.visible = int(instalada) == 1
 
 
 func _traduzir() -> void:

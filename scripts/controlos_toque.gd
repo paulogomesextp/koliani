@@ -787,7 +787,7 @@ func _aviso(txt: String) -> void:
 ## Sobem por deslocação e não por âncora nova: estas peças estão todas
 ## presas ao fundo (`anchor_top/bottom = 1.0`) com deslocamentos negativos,
 ## portanto tirar 230 a cada um mantém a arrumação entre elas.
-const DESVIO_TOQUE := 230.0
+const DESVIO_TOQUE := 285.0
 var _desviado := false
 
 

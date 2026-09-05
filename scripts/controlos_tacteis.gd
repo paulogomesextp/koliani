@@ -30,15 +30,17 @@ class_name ControlosTacteis
 ## Acções, na ordem em que se desenham. `r` é o raio em píxeis a 720 de
 ## altura de viewport; tudo isto é multiplicado pela escala do ecrã.
 ##
-## Os TAMANHOS são a ordem de importância que ele deu (5 set 2026):
-## Salto e Investida os maiores, depois os tiros e a espada, e o
-## Escudo o mais pequeno. Não é enfeite: o polegar acerta no grande
-## sem olhar, e é isso que decide o que se faz a correr.
+## Os TAMANHOS são a ordem de importância que ele deu (5 set 2026,
+## segunda versão): **Salto, Tiros e Investida** são os que contam;
+## **Escudo e Espada** são os menos importantes, ficam pequenos e por
+## fora. Os três grandes ocupam o arco natural do polegar (o canto).
+## Não é enfeite: o polegar acerta no grande sem olhar, e é isso que
+## decide o que se faz a correr.
 const BOTOES := [
-	{"accao": "defender", "r": 40.0, "dx": -282.0, "dy": -60.0, "icone": "escudo"},
-	{"accao": "lancar", "r": 50.0, "dx": -190.0, "dy": -170.0, "icone": "projetil"},
-	{"accao": "atacar", "r": 50.0, "dx": -40.0, "dy": -158.0, "icone": "espada"},
-	{"accao": "dash", "r": 60.0, "dx": -158.0, "dy": -34.0, "icone": "dash"},
+	{"accao": "defender", "r": 40.0, "dx": -172.0, "dy": -228.0, "icone": "escudo"},
+	{"accao": "atacar", "r": 44.0, "dx": -262.0, "dy": -110.0, "icone": "espada"},
+	{"accao": "lancar", "r": 62.0, "dx": -40.0, "dy": -170.0, "icone": "projetil"},
+	{"accao": "dash", "r": 62.0, "dx": -150.0, "dy": -46.0, "icone": "dash"},
 	{"accao": "saltar", "r": 70.0, "dx": 0.0, "dy": 0.0, "icone": "salto"},
 ]
 
@@ -71,16 +73,45 @@ var _dedos := {}
 var _premidos := {}
 
 
+## Acções que o rato dispara e que, num telemóvel, disparavam SOZINHAS.
+## O Godot emula um clique de rato a partir de cada toque (e tem de o
+## fazer, senão os botões dos menus deixavam de responder ao dedo) -- só
+## que o `lancar` tem o botão esquerdo ligado e o `defender` o direito.
+## Resultado: tocar em qualquer sítio do ecrã atirava.
+##
+## Tira-se o rato destas acções QUANDO os controlos de toque estão a ser
+## usados. No PC não se mexe em nada: quem joga com rato continua a ter
+## o clique. Os menus também não sofrem -- eles usam `Button`, que não
+## passa pelo `InputMap`.
+const SO_COM_BOTAO := ["lancar", "defender"]
+
+
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	resized.connect(_medir)
+	visibility_changed.connect(_so_com_botao)
 	_medir()
+	_so_com_botao()
+
+
+func _so_com_botao() -> void:
+	if not visible:
+		return
+	for accao in SO_COM_BOTAO:
+		if not InputMap.has_action(accao):
+			continue
+		for ev in InputMap.action_get_events(accao):
+			if ev is InputEventMouseButton:
+				InputMap.action_erase_event(accao, ev)
 
 
 func _medir() -> void:
 	# a régua é a altura: num ecrã baixo os botões encolhem com ele
 	_escala = clampf(size.y / 720.0, 0.75, 1.6)
-	_joy_raio = 92.0 * _escala
+	# 118 e não 92: ele pediu-o maior. O aro cresce para CIMA (a base
+	# fica presa ao fundo), e por isso o `DESVIO_TOQUE` das barras da
+	# HUD subiu com ele -- senão o aro passava por cima delas.
+	_joy_raio = 118.0 * _escala
 	_joy_base = Vector2(_joy_raio * 1.55, size.y - _joy_raio * 1.35)
 	_joy_actual = _joy_base
 	_centro_botoes = Vector2(size.x - 118.0 * _escala, size.y - 118.0 * _escala)

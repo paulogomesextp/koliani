@@ -660,6 +660,16 @@ func teste_controlos_tacteis_fixos() -> void:
 				"os botões '%s' e '%s' sobrepõem-se (%.0f px entre centros, precisam de %.0f)"
 					% [ControlosTacteis.BOTOES[i]["accao"], ControlosTacteis.BOTOES[j]["accao"],
 						d, soma])
+	# TOCAR NO ECRA NAO PODE ATIRAR. O Godot emula um clique de rato a partir
+	# de cada toque, e o `lancar` tinha o botao esquerdo ligado -- tocar em
+	# qualquer sitio disparava. Com os controlos de toque a` vista, o rato sai
+	# destas accoes.
+	c.visible = true
+	c.call("_so_com_botao")
+	for accao in ControlosTacteis.SO_COM_BOTAO:
+		for ev in InputMap.action_get_events(accao):
+			_ok(not (ev is InputEventMouseButton),
+				"'%s' ainda dispara com o rato -- no telemovel isso e' tocar no ecra" % accao)
 	c.free()
 
 
