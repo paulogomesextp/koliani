@@ -6,9 +6,11 @@ var _t := 0.0
 var _cd := 0.0
 
 func _ready() -> void:
-	textura = null; super._ready()
+	rig = ""; textura = null; super._ready()
 	var c := get_node_or_null("Sprite/Corpo") as Sprite2D
 	if c: c.visible = false
+	var anim := get_node_or_null("Sprite/Anim") as AnimatedSprite2D
+	if anim: anim.visible = false
 	queue_redraw()
 
 func _process(dt: float) -> void:

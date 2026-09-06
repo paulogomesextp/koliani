@@ -8,11 +8,17 @@ var _brasas_t := 0.0
 var _fase2 := false
 
 func _ready() -> void:
+	# Vulkar tem silhueta desenhada por código. Desliga o rig da cena base
+	# antes do super: ChefeBase monta o AnimatedSprite quando `rig` existe.
+	rig = ""
 	textura = null
 	super._ready()
 	var corpo := get_node_or_null("Sprite/Corpo") as Sprite2D
 	if corpo:
 		corpo.visible = false
+	var anim := get_node_or_null("Sprite/Anim") as AnimatedSprite2D
+	if anim:
+		anim.visible = false
 	queue_redraw()
 
 func _process(dt: float) -> void:
