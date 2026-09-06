@@ -56,6 +56,7 @@ var _cab_nivel: VBoxContainer
 
 
 func _ready() -> void:
+	$Versao.text = "v" + str(ProjectSettings.get_setting("application/config/version", ""))
 	if _toque:
 		_toque.visible = DisplayServer.is_touchscreen_available()
 	# a barra de Energia só aparece depois de apanhar a habilidade "projetil"

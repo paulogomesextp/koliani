@@ -2,6 +2,9 @@
 
 ## Estado confirmado no Codex (ler antes do histórico abaixo)
 
+- v0.15.10: HUD mostra a versão do projeto no canto inferior direito,
+  com contorno para leitura e sem intercetar os controlos de toque.
+
 - Base obtida do GitHub: `6ab19e6`, v0.15.7. A fila antiga abaixo
   não acompanhou os últimos commits do Claude.
 - Acesso à arena do nível 12: degraus já acrescentados em `78081c7`.
