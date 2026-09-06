@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://bkolianiestradadascinzas31"]
+[gd_scene load_steps=9 format=3 uid="uid://bkolianiestradadascinzas31"]
 
 ; REGIAO 7 / nivel 31 -- Estrada das Cinzas.
 ; Floresta a arder: o chao cede. Guardiao: um imp de cinzas.
@@ -22,6 +22,9 @@
 [sub_resource type="RectangleShape2D" id="rs_chk"]
 size = Vector2(44, 96)
 
+[sub_resource type="RectangleShape2D" id="rs_arena_floor"]
+size = Vector2(1000, 60)
+
 [node name="Estrada_das_Cinzas" type="Node2D"]
 script = ExtResource("5_niv")
 
@@ -40,6 +43,16 @@ brasas = true
 position = Vector2(760, 700)
 tamanho = Vector2(1000, 60)
 altura_visual = 0.0
+
+; Colisão fixa da arena: a plataforma visual pode ser regenerada pelo
+; script @tool, mas o boss nunca fica sem chão durante a primeira frame.
+[node name="ArenaFloor" type="StaticBody2D" parent="."]
+position = Vector2(760, 700)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ArenaFloor"]
+shape = SubResource("rs_arena_floor")
 
 [node name="Chefe" parent="." instance=ExtResource("4_chefe")]
 position = Vector2(1020, 616)
