@@ -61,6 +61,10 @@ jobs:
 
       - name: Alcance das salas feitas a mao
         run: godot --headless --script res://tools/verifica_alcance_todos.gd
+      - name: Aerion permanece acima da arena
+        run: godot --headless --script res://tools/verifica_aerion.gd
+      - name: Bau de recompensa dos chefes
+        run: godot --headless --script res://tools/verifica_bau.gd
       # e existir nao chega: estas tres FAZEM o que dizem?
       - name: Camaras novas (peso, caixas, atoleiro)
         run: godot --headless --script res://tools/verifica_camaras_novas.gd

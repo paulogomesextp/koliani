@@ -1,4 +1,9 @@
 {
+"chest.title": "首领奖励",
+  "chest.essence": "精华",
+  "chest.stat": "等级 +1：",
+  "chest.continue": "继续",
+
 	"game.subtitle": "穿越幽灵般的世界。解救奥罗拉。",
 	"menu.new_game": "新游戏",
 	"menu.load_game": "读取游戏",

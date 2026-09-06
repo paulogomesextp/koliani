@@ -1,4 +1,9 @@
 {
+"chest.title": "Boss-Belohnung",
+  "chest.essence": "Essenz",
+  "chest.stat": "+1 Rang:",
+  "chest.continue": "Weiter",
+
 	"game.subtitle": "Durchquere die geisterhaften Welten. Befreie Aurora.",
 	"menu.new_game": "NEUES SPIEL",
 	"menu.load_game": "SPIEL LADEN",

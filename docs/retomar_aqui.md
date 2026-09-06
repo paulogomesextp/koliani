@@ -1,4 +1,40 @@
-# Retomar aqui — 5 de setembro de 2026 (sessão da madrugada)
+# Retomar aqui — atualização de 6 de setembro de 2026
+
+## Estado confirmado no Codex (ler antes do histórico abaixo)
+
+- Base obtida do GitHub: `6ab19e6`, v0.15.7. A fila antiga abaixo
+  não acompanhou os últimos commits do Claude.
+- Acesso à arena do nível 12: degraus já acrescentados em `78081c7`.
+  Verificação de alcance executada: porta alcançável, sem plataformas órfãs.
+- Tutorial de mecânicas: já implementado em `576f0b6` e ajustado em
+  `e99b6a7` para esperar pela mecânica e durar 10 segundos.
+- Correção LOCAL do Aerion: media o chão no `_ready` antes de a física
+  estar pronta e guardava 494 em vez do topo real, 240. Agora usa a
+  medição da arena da classe base. Teste `tools/verifica_aerion.gd`:
+  quatro verificações passaram (altura, voo, pisão e arena em Y negativo).
+  Suite geral passou. Combate renderizado em OpenGL a 1600x720 durante
+  nove segundos, sem ecrã preto. Isto não valida o Safari num iPhone.
+- Ecrã preto CONTINUA PENDENTE: Paulo confirmou que acontece ao chegar
+  ao boss do nível 12, no iPhone pelo atalho instalado do Safari.
+  Não foi reproduzido no PC; não declarar corrigido pela alteração acima.
+- Baú implementado: nasce junto à saída ao derrotar o chefe, abre por
+  proximidade e mostra o prémio antes de libertar o portal. Sorteio:
+  50% Essência, 20% arma, 15% armadura, 15% melhoria de atributo.
+  Equipamento respeita o nível de desbloqueio e não sai repetido;
+  categorias esgotadas dão Essência. Não substitui os prémios fixos
+  da campanha. Textos nos seis idiomas. Bancada `verifica_bau.gd`
+  e painel visual verificados.
+- Validação: bancadas específicas passaram. A suite geral imprime OK
+  mas já apresentava erros de compilação de autoloads antes destas
+  alterações; esse OK não prova cobertura completa. Export Web pendente
+  do CI, sem templates locais disponíveis.
+- Publicação: v0.15.8 corrige o Aerion; v0.15.9 acrescenta o baú.
+  Pedido permanente do Paulo: commit e push de cada correção concluída
+  para experimentar no telefone e no Windows.
+- Preferência do Paulo: reduzir consumo, trabalhar um problema de cada
+  vez, leituras dirigidas e não repetir verificações já aprovadas.
+
+## Histórico anterior (pode conter pendentes entretanto resolvidos)
 
 > **LEIA PRIMEIRO.** O topo é a **fila de pedidos do Paulo por fazer**.
 > A ordem é a do painel, que é dele:

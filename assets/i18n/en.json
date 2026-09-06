@@ -1,4 +1,9 @@
 {
+"chest.title": "Boss reward",
+  "chest.essence": "Essence",
+  "chest.stat": "+1 rank:",
+  "chest.continue": "Continue",
+
 	"game.subtitle": "Cross the ghostly worlds. Free Aurora.",
 	"menu.new_game": "NEW GAME",
 	"menu.load_game": "LOAD GAME",

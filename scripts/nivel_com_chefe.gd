@@ -173,8 +173,25 @@ func _selar(selada: bool) -> void:
 	_porta.modulate = Color(0.34, 0.34, 0.4) if selada else Color(1, 1, 1)
 
 
+var _bau_criado := false
+
 func _abrir() -> void:
-	_selar(false)
+	if _bau_criado:
+		return
+	_bau_criado = true
+	_criar_bau.call_deferred()
+
+func _criar_bau() -> void:
+	var bau := Node2D.new()
+	bau.set_script(preload("res://scripts/bau_chefe.gd"))
+	bau.name = "BauChefe"
+	# Ao lado da saída, assente na plataforma, mesmo com chefe voador.
+	var ponto: Vector2 = _porta.global_position + Vector2(-72, -150)
+	var raio := PhysicsRayQueryParameters2D.create(ponto, ponto + Vector2(0, 400), 1)
+	var hit := get_world_2d().direct_space_state.intersect_ray(raio)
+	bau.position = to_local(hit.position if not hit.is_empty() else _porta.global_position)
+	bau.recolhido.connect(func() -> void: _selar(false))
+	add_child(bau)
 
 
 ## Espalha CANDEEIROS e TOCHAS pelo nível. O Paulo: "o jogo está um bocado

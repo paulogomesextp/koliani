@@ -1,4 +1,9 @@
 {
+"chest.title": "Récompense du boss",
+  "chest.essence": "Essence",
+  "chest.stat": "+1 rang :",
+  "chest.continue": "Continuer",
+
 	"game.subtitle": "Traverse les mondes fantomatiques. Libère Aurora.",
 	"menu.new_game": "NOUVELLE PARTIE",
 	"menu.load_game": "CHARGER",

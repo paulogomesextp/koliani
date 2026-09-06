@@ -1,4 +1,9 @@
 {
+"chest.title": "Recompensa do chefe",
+  "chest.essence": "Essência",
+  "chest.stat": "+1 nível:",
+  "chest.continue": "Continuar",
+
 	"game.subtitle": "Atravessa os mundos fantasmagóricos. Liberta a Aurora.",
 	"menu.new_game": "NOVO JOGO",
 	"menu.load_game": "CARREGAR JOGO",
