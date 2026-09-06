@@ -1262,3 +1262,9 @@ Ao contrário, o gerador apaga a atmosfera afinada.
   ecrã) — não os re-ordenar ao acrescentar chaves.
 - `ffmpeg` existe via `pip install --user imageio-ffmpeg`.
 - **NUNCA `git add -A`** — o `incoming/` tem packs enormes.
+
+## Retoma: arquitetura de mapas
+- Piloto no nivel 4: enquadramento por salas (entrada, subida do tronco, bifurcacao, arena), com histerese nas fronteiras. Captura OpenGL inspecionada em work/salas-tronco.png. Nao constitui playtest completo nem remodelacao concluida.
+- Proximos passos: geometria propria, puzzles, cavernas e transicoes; manter qualidade dos materiais existentes.
+- Arte dos bosses continua provisoria: rigs reutilizados nao sao assets proprios gerados por IA. Auditoria de existencia de rigs nao valida combate nem animacoes completas.
+- Depois dos mapas: hold de projeteis continuo sem kamehameha; retratos no seletor; musica epic gaming rock.
