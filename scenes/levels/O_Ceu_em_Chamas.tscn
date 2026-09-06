@@ -25,20 +25,8 @@ size = Vector2(44, 96)
 script = ExtResource("5_niv")
 
 [node name="Atmosfera" parent="." instance=ExtResource("6_atm")]
-cor_ambiente = Color(1, 0.88, 0.76, 1)
-cor_fundo = Color(0.24, 0.08, 0.04, 1)
-cor_silhueta = Color(0.28, 0.11, 0.06, 1)
-cor_luz = Color(1, 0.72, 0.34, 1)
-cor_poeira = Color(1, 0.84, 0.5, 1)
-densidade_poeira = 3.2
 bioma = "castelo"
 largura_nivel = 1800.0
-fundo_pack = "horror"
-tinta_fundo = Color(1.24, 0.8, 0.56, 1)
-neblina_fundo = 0.22
-dessaturar_fundo = 0.38
-seed_ambiente = 2258
-luzes_horizonte = true
 
 [node name="LiquidoMortal" parent="." instance=ExtResource("8_liq")]
 position = Vector2(700, 980)

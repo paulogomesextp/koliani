@@ -548,6 +548,10 @@ def retratos() -> None:
 def main() -> int:
     seco = "--dry-run" in sys.argv
     for ficheiro, idx0, bioma, fim, arq, vida, rim, rig, nota in NIVEIS:
+        # A campanha passou a exigir um boss em todos os 100 níveis.
+        # Mantemos a tabela e as notas dos antigos guardiões como ponto de
+        # partida, mas todos usam agora a máquina de boss e selam a porta.
+        fim = "chefe"
         n = idx0 + 1
         texto = (MODELO_CHEFE if fim == "chefe" else MODELO_GUARDIAO).format(
             uid=ficheiro.lower().replace("_", "") + str(n),

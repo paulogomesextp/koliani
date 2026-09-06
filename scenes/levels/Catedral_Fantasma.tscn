@@ -3,16 +3,16 @@
 ; REGIAO 15 / nivel 73 -- Catedral Fantasma.
 ; A igreja existe em duas dimensoes. Guardiao: o santo.
 ;
-; NIVEL SEM CHEFE. A regiao tem um chefe so' -- o ultimo dos cinco --
-; e este acaba num GUARDIAO (elite) que sela a porta ate' cair.
-;
-; CENA GERADA por `tools/gerar_niveis_31_100.py` -- NAO editar a' mao.
+; CENA GERADA por `tools/gerar_niveis_31_100.py` -- NAO editar a' mao: o
+; proximo `python tools/gerar_niveis_31_100.py` apaga o que aqui se puser.
+; A JORNADA (`corredor = true`, `gerador_corredor.gd`) constroi tudo o que
+; vem antes desta sala; aqui so' esta' a arena do chefe.
 ; O bloco `Atmosfera` e' reescrito por `tools/afinar_atmosfera.py`.
 
 [ext_resource type="PackedScene" uid="uid://bkolianiactor01" path="res://scenes/actors/Koliani.tscn" id="1_kol"]
 [ext_resource type="PackedScene" uid="uid://bkolianiporta01" path="res://scenes/actors/Porta.tscn" id="2_porta"]
 [ext_resource type="Script" path="res://scripts/checkpoint.gd" id="3_chk"]
-[ext_resource type="PackedScene" uid="uid://bdemoniobase01" path="res://scenes/actors/DemonioBase.tscn" id="4_dem"]
+[ext_resource type="PackedScene" uid="uid://bkolianichefegenerico01" path="res://scenes/actors/ChefeGenerico.tscn" id="4_chefe"]
 [ext_resource type="Script" path="res://scripts/nivel_com_chefe.gd" id="5_niv"]
 [ext_resource type="PackedScene" uid="uid://bkolianiatmosfera01" path="res://scenes/fx/Atmosfera.tscn" id="6_atm"]
 [ext_resource type="PackedScene" uid="uid://bkolianiplataforma01" path="res://scenes/actors/Plataforma.tscn" id="7_pl"]
@@ -25,20 +25,8 @@ size = Vector2(44, 96)
 script = ExtResource("5_niv")
 
 [node name="Atmosfera" parent="." instance=ExtResource("6_atm")]
-cor_ambiente = Color(0.92, 1.02, 0.94, 1)
-cor_fundo = Color(0.1, 0.14, 0.12, 1)
-cor_silhueta = Color(0.16, 0.21, 0.18, 1)
-cor_luz = Color(0.84, 0.96, 0.88, 1)
-cor_poeira = Color(0.94, 1, 0.96, 1)
-densidade_poeira = 4
 bioma = "castelo"
 largura_nivel = 1800.0
-fundo_pack = "igreja"
-tinta_fundo = Color(0.88, 1.06, 0.92, 1)
-neblina_fundo = 0.36
-dessaturar_fundo = 0.6
-seed_ambiente = 3664
-luzes_horizonte = true
 
 [node name="LiquidoMortal" parent="." instance=ExtResource("8_liq")]
 position = Vector2(700, 980)
@@ -52,16 +40,14 @@ position = Vector2(760, 700)
 tamanho = Vector2(1000, 60)
 altura_visual = 110.0
 
-[node name="Guardiao" parent="." instance=ExtResource("4_dem")]
-position = Vector2(1020, 630)
-scale = Vector2(1.5, 1.5)
-elite = true
-especie = "wogol"
+[node name="Chefe" parent="." instance=ExtResource("4_chefe")]
+position = Vector2(1020, 616)
+arquetipo = 0
 vida = 1840
-dano_contacto = 26
-comportamento = "carga"
-alcance_patrulha = 150.0
 cor_rim = Color(0.84, 0.96, 0.88, 1)
+rig = "wogol"
+investidas_seguidas = 2
+dur_recupera = 0.7
 
 [node name="Koliani" parent="." instance=ExtResource("1_kol")]
 position = Vector2(360, 616)
