@@ -71,7 +71,7 @@ const RETRATO_CHEFE := [
 	# guardioes; o `_retrato_chefe` tenta as duas pastas.
 	"vulkar", "magma", "forja", "dragao_lava", "estrela_caida",   # 31-35
 	"capitao_afogado", "leviata", "nereia", "devorador_baleias", "abismo_oceanico",   # 36-40
-	"mastim", "abutre", "besouro", "esqueleto", "sacerdotisa_gelo",   # 41-45
+	"frostfang", "skyrend", "prism_scarab", "cryo_sentinel", "ymiria",   # 41-45
 	"raptor", "ogro", "besouro", "necromante", "monge_terra",   # 46-50
 	"mushroom", "goblin", "olho", "lodo", "folha",   # 51-55
 	"besouro", "esqueleto", "wogol", "chort", "lamina_metal",   # 56-60
