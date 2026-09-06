@@ -1,5 +1,16 @@
 # Retomar aqui — atualização de 6 de setembro de 2026
 
+## Continuação dos mapas — v0.15.14
+
+- Nível 6: seis volumes de alvenaria definem alturas diferentes para o
+  vestíbulo, correntes, transição, ala de celas e arena. A CascaMasmorra
+  gera tiles e colisões na mesma grelha; a lista vazia mantém os outros
+  níveis como estavam. Usa o tileset CC0 já existente.
+- Verificação estática: porta alcançável, sem plataformas órfãs. Este
+  crivo não simula os saltos sob os novos volumes; playtest completo pendente.
+  Captura OpenGL `work/prisao-interior.png` inspecionada, sem erros de execução.
+- Próximo passo: playtest do percurso do nível 6 antes de aplicar aos demais.
+
 ## Continuação dos mapas — v0.15.13
 
 - Nível 4: a alavanca da seiva abre também a saída direita. Um degrau

@@ -33,6 +33,9 @@ const CEL := 16 * ESCALA          # 32 px por célula no mundo
 ## plataforma jogável.
 @export var agua := true
 @export var agua_cor := Color(0.15, 0.3, 0.36, 0.62)
+## Volumes de alvenaria próprios da sala, em coordenadas locais de mundo.
+## A grelha e a colisão usam os mesmos limites para não criar paredes invisíveis.
+@export var volumes_interiores: Array[Rect2] = []
 
 const CENA_AGUA := preload("res://scenes/actors/AguaVenenosa.tscn")
 
@@ -81,6 +84,20 @@ func _construir() -> void:
 			tml.set_cell(Vector2i(cx, cy), 0, at)
 
 	# nichos/buracos esparsos nas paredes laterais (decoração discreta)
+	for i in volumes_interiores.size():
+		var volume := volumes_interiores[i]
+		if volume.size.x <= 0.0 or volume.size.y <= 0.0:
+			continue
+		var inicio := Vector2i(floor((volume.position.x - esquerda) / CEL), floor((volume.position.y - topo) / CEL))
+		var fim := Vector2i(ceil((volume.end.x - esquerda) / CEL), ceil((volume.end.y - topo) / CEL))
+		for cx in range(inicio.x, fim.x):
+			for cy in range(inicio.y, fim.y):
+				tml.set_cell(Vector2i(cx, cy), 0, T_TOPO if cy == inicio.y else T_PAREDE)
+		var origem := Vector2(esquerda, topo) + Vector2(inicio) * CEL
+		var dimensao := Vector2(fim - inicio) * CEL
+		_parede("Alvenaria%d" % i, origem + dimensao * 0.5, dimensao)
+
+	# Nichos das paredes exteriores.
 	for cy in range(2, rows - 2, 5):
 		tml.set_cell(Vector2i(-1, cy), 0, T_FUNDO)
 		tml.set_cell(Vector2i(cols, cy + 2), 0, T_FUNDO)
