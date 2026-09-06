@@ -64,10 +64,10 @@ const CHEFE_KEY: Array[String] = [
 	"guard.lodo_abissal",    # 38 Ossario das Baleias
 	"boss.mae_do_abismo",    # 39 Abismo Oceanico
 	# --- Regiao IX  Reino do Gelo ---
-	"guard.cao_de_gelo",        # 40 Floresta Congelada
-	"guard.abutre_ventania",    # 41 Montanha dos Ventos
-	"guard.besouro_cristal",    # 42 Cavernas Cristalinas
-	"guard.sentinela_gelada",   # 43 Castelo Congelado
+	"boss.frostfang",         # 40 Floresta Congelada
+	"boss.skyrend",           # 41 Montanha dos Ventos
+	"boss.prism_scarab",      # 42 Cavernas Cristalinas
+	"boss.cryo_sentinel",     # 43 Castelo Congelado
 	"boss.ymiria",              # 44 Coracao do Inverno
 	# --- Regiao X  Deserto dos Esquecidos ---
 	"guard.lagarto_dunas",      # 45 Mar de Areia
