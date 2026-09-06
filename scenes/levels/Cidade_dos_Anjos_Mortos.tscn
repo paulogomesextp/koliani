@@ -13,6 +13,7 @@
 [ext_resource type="PackedScene" uid="uid://bkolianiporta01" path="res://scenes/actors/Porta.tscn" id="2_porta"]
 [ext_resource type="Script" path="res://scripts/checkpoint.gd" id="3_chk"]
 [ext_resource type="PackedScene" uid="uid://bkolianichefegenerico01" path="res://scenes/actors/ChefeGenerico.tscn" id="4_chefe"]
+[ext_resource type="Script" path="res://scripts/chefe_lore.gd" id="9_lore"]
 [ext_resource type="Script" path="res://scripts/nivel_com_chefe.gd" id="5_niv"]
 [ext_resource type="PackedScene" uid="uid://bkolianiatmosfera01" path="res://scenes/fx/Atmosfera.tscn" id="6_atm"]
 [ext_resource type="PackedScene" uid="uid://bkolianiplataforma01" path="res://scenes/actors/Plataforma.tscn" id="7_pl"]
@@ -41,11 +42,13 @@ tamanho = Vector2(1000, 60)
 altura_visual = 110.0
 
 [node name="Chefe" parent="." instance=ExtResource("4_chefe")]
+script = ExtResource("9_lore")
+forma = "boss_63_anjo_corrompido"
 position = Vector2(1020, 616)
 arquetipo = 0
 vida = 1400
 cor_rim = Color(0.92, 0.9, 1.0, 1)
-rig = "wogol"
+rig = ""
 investidas_seguidas = 2
 dur_recupera = 0.7
 

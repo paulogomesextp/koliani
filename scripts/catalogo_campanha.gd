@@ -76,61 +76,61 @@ const CHEFE_KEY: Array[String] = [
 	"boss.sun_mummy",           # 48 Cidade Enterrada
 	"boss.forgotten_god",       # 49 Piramide Negra
 	# --- Regiao XI  Jardins do Rei ---
-	"guard.roseira_viva",       # 50 Jardim das Rosas Negras
-	"guard.jardineiro_perdido", # 51 Labirinto Verde
-	"guard.alma_errante",       # 52 Jardim das Almas
-	"guard.trepadeira",         # 53 Estufa Maldita
+	"boss.roseira_viva",       # 50 Jardim das Rosas Negras
+	"boss.jardineiro_perdido", # 51 Labirinto Verde
+	"boss.alma_errante",       # 52 Jardim das Almas
+	"boss.trepadeira",         # 53 Estufa Maldita
 	"boss.rei_botanico",        # 54 Arvore do Rei
 	# --- Regiao XII  Cidade das Maquinas ---
-	"guard.automato",           # 55 Distrito das Engrenagens
-	"guard.foguista",           # 56 Linha 13
-	"guard.homunculo",          # 57 Fabrica dos Homunculos
-	"guard.bobina_viva",        # 58 Torre Electrica
+	"boss.automato",           # 55 Distrito das Engrenagens
+	"boss.foguista",           # 56 Linha 13
+	"boss.homunculo",          # 57 Fabrica dos Homunculos
+	"boss.bobina_viva",        # 58 Torre Electrica
 	"boss.maquina_rei",         # 59 Coracao da Maquina
 	# --- Regiao XIII  Ceu Partido ---
-	"guard.guarda_nuvens",      # 60 Ilhas Flutuantes
-	"guard.servo_do_trovao",    # 61 Templo do Trovao
-	"guard.anjo_corrompido",    # 62 Cidade dos Anjos Mortos
-	"guard.olho_lunar",         # 63 Lua Quebrada
+	"boss.guarda_nuvens",      # 60 Ilhas Flutuantes
+	"boss.servo_do_trovao",    # 61 Templo do Trovao
+	"boss.anjo_corrompido",    # 62 Cidade dos Anjos Mortos
+	"boss.olho_lunar",         # 63 Lua Quebrada
 	"boss.astronomo",           # 64 O Fim do Ceu
 	# --- Regiao XIV  Reino dos Sonhos ---
-	"guard.sonhador",           # 65 Vila dos Sonhos
-	"guard.reflexo",            # 66 Mundo Invertido
-	"guard.boneca",             # 67 Quarto das Criancas Mortas
-	"guard.medo",               # 68 Pesadelo
+	"boss.sonhador",           # 65 Vila dos Sonhos
+	"boss.reflexo",            # 66 Mundo Invertido
+	"boss.boneca",             # 67 Quarto das Criancas Mortas
+	"boss.medo",               # 68 Pesadelo
 	"boss.outra_koliani",       # 69 A Mente
 	# --- Regiao XV  Cidade dos Mortos ---
-	"guard.colecionador",       # 70 Avenida dos Mortos
-	"guard.coveiro",            # 71 Cemiterio Infinito
-	"guard.santo_corrompido",   # 72 Catedral Fantasma
-	"guard.rei_morto",          # 73 Palacio dos Reis Mortos
+	"boss.colecionador",       # 70 Avenida dos Mortos
+	"boss.coveiro",            # 71 Cemiterio Infinito
+	"boss.santo_corrompido",   # 72 Catedral Fantasma
+	"boss.rei_morto",          # 73 Palacio dos Reis Mortos
 	"boss.morte",               # 74 Trono da Morte
 	# --- Regiao XVI  Mar Vermelho ---
-	"guard.afogado_vermelho",   # 75 Margem do Sangue
-	"guard.serpente_vermelha",  # 76 Serpentes do Mar
-	"guard.almirante_morto",    # 77 Navio da Condenacao
-	"guard.tentaculo",          # 78 Fortaleza Kraken
+	"boss.afogado_vermelho",   # 75 Margem do Sangue
+	"boss.serpente_vermelha",  # 76 Serpentes do Mar
+	"boss.almirante_morto",    # 77 Navio da Condenacao
+	"boss.tentaculo",          # 78 Fortaleza Kraken
 	"boss.o_mar",               # 79 Coracao Vermelho
 	# --- Regiao XVII  Inferno ---
-	"guard.sentinela_inferno",  # 80 Portao Infernal
-	"guard.duque_infernal",     # 81 Cidade dos Demonios
-	"guard.barqueiro",          # 82 Rio das Almas
-	"guard.princesa_demonio",   # 83 Palacio de Sangue
+	"boss.sentinela_inferno",  # 80 Portao Infernal
+	"boss.duque_infernal",     # 81 Cidade dos Demonios
+	"boss.barqueiro",          # 82 Rio das Almas
+	"boss.princesa_demonio",   # 83 Palacio de Sangue
 	"boss.rei_demonios",        # 84 Trono Infernal
 	# --- Regiao XVIII  O Vazio ---
-	"guard.sombra",             # 85 Primeiro Vazio
-	"guard.nada",               # 86 Segundo Vazio
-	"guard.paradoxo",           # 87 Labirinto Impossivel
-	"guard.observador",         # 88 A Coisa Atras do Mundo
+	"boss.sombra",             # 85 Primeiro Vazio
+	"boss.nada",               # 86 Segundo Vazio
+	"boss.paradoxo",           # 87 Labirinto Impossivel
+	"boss.observador",         # 88 A Coisa Atras do Mundo
 	"boss.entidade",            # 89 Centro do Vazio
 	# --- Regiao XIX  Guerra dos Reinos ---
-	"guard.general_caos",       # 90 Campo de Batalha
-	"guard.dragao_primordial",  # 91 Ceu em Guerra
-	"guard.ultimo_cavaleiro",   # 92 Cerco ao Castelo
-	"guard.arauto_final",       # 93 Torre da Corrupcao
+	"boss.general_caos",       # 90 Campo de Batalha
+	"boss.dragao_primordial",  # 91 Ceu em Guerra
+	"boss.ultimo_cavaleiro",   # 92 Cerco ao Castelo
+	"boss.arauto_final",       # 93 Torre da Corrupcao
 	"boss.campeao",             # 94 Os Cem Guerreiros
 	# --- Regiao XX  O Ultimo Caminho (quatro chefes: e' o final) ---
-	"guard.zeriko_jovem",       # 95 O Reino Antes da Corrupcao
+	"boss.zeriko_jovem",       # 95 O Reino Antes da Corrupcao
 	"boss.primeiro_rei",        # 96 O Primeiro Castelo
 	"boss.zeriko_absoluto",     # 97 O Coracao de Zeriko
 	"boss.entidade_purpura",    # 98 O Fim de Tudo

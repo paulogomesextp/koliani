@@ -73,16 +73,16 @@ const RETRATO_CHEFE := [
 	"capitao_afogado", "leviata", "nereia", "devorador_baleias", "abismo_oceanico",   # 36-40
 	"frostfang", "skyrend", "prism_scarab", "cryo_sentinel", "ymiria",   # 41-45
 	"dune_stalker", "sandstone_colossus", "scorpion_empress", "sun_mummy", "forgotten_god",   # 46-50
-	"mushroom", "goblin", "olho", "lodo", "folha",   # 51-55
-	"besouro", "esqueleto", "wogol", "chort", "lamina_metal",   # 56-60
-	"abutre", "xamane", "wogol", "olho", "cristal",   # 61-65
-	"abobora", "wogol", "gosma", "mushroom", "cavaleiro_negro",   # 66-70
-	"esqueleto", "necromante", "wogol", "chort", "ceifeiro",   # 71-75
-	"lodo", "raptor", "esqueleto", "gosma", "demonio_lodo",   # 76-80
-	"imp", "chort", "wogol", "demonio_grande", "cavaleiro_fogo",   # 81-85
-	"gosma", "olho", "wogol", "xamane", "horror",   # 86-90
-	"orc", "abutre", "ogro", "necromante", "assassino_vento",   # 91-95
-	"goblin", "rei_ossario", "colosso", "horror", "cavaleiro_negro",   # 96-100
+	"boss_51_roseira_viva", "boss_52_jardineiro_perdido", "boss_53_alma_errante", "boss_54_trepadeira", "boss_55_rei_botanico",   # 51-55
+	"boss_56_automato", "boss_57_foguista", "boss_58_homunculo", "boss_59_bobina_viva", "boss_60_maquina_rei",   # 56-60
+	"boss_61_guarda_nuvens", "boss_62_servo_do_trovao", "boss_63_anjo_corrompido", "boss_64_olho_lunar", "boss_65_astronomo",   # 61-65
+	"boss_66_sonhador", "boss_67_reflexo", "boss_68_boneca", "boss_69_medo", "boss_70_outra_koliani",   # 66-70
+	"boss_71_colecionador", "boss_72_coveiro", "boss_73_santo_corrompido", "boss_74_rei_morto", "boss_75_morte",   # 71-75
+	"boss_76_afogado_vermelho", "boss_77_serpente_vermelha", "boss_78_almirante_morto", "boss_79_tentaculo", "boss_80_o_mar",   # 76-80
+	"boss_81_sentinela_inferno", "boss_82_duque_infernal", "boss_83_barqueiro", "boss_84_princesa_demonio", "boss_85_rei_demonios",   # 81-85
+	"boss_86_sombra", "boss_87_nada", "boss_88_paradoxo", "boss_89_observador", "boss_90_entidade",   # 86-90
+	"boss_91_general_caos", "boss_92_dragao_primordial", "boss_93_ultimo_cavaleiro", "boss_94_arauto_final", "boss_95_campeao",   # 91-95
+	"boss_96_zeriko_jovem", "boss_97_primeiro_rei", "boss_98_zeriko_absoluto", "boss_99_entidade_purpura", "boss_100_zeriko_homem",   # 96-100
 ]
 
 const CARTAO := Vector2(336, 392)
