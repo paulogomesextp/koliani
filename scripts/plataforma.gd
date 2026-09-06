@@ -102,13 +102,6 @@ func _nome_bioma() -> String:
 		if atm and "bioma" in atm and BIOMAS.has(atm.bioma):
 			return atm.bioma
 	return "floresta"
-			var lore := "lore_%02d" % reg
-			if ResourceLoader.exists("res://assets/sprites/pixel/terreno/%s/corpo.png" % lore):
-				return lore
-		var atm := get_tree().get_first_node_in_group("atmosfera")
-		if atm and "bioma" in atm and BIOMAS.has(atm.bioma):
-			return atm.bioma
-	return "floresta"
 
 
 static func _tex(bioma: String, peca: String) -> Texture2D:
