@@ -9,6 +9,10 @@
   Os níveis desenhados à mão mantêm os seus fundos afinados.
 - A remodelação visual continua por fases: primeiro valida-se a leitura de
   cada região em DEBUG, depois aplica-se o padrão aos restantes níveis.
+- O primeiro passe dos bosses 31–100 deixou de usar folhas estáticas básicas:
+  Vulkar e os restantes bosses deste arco usam agora rigs pixel-art animados
+  com idle, marcha, ataque, dano e morte. Auditoria dos 70 níveis: zero rigs
+  em falta (`d385083`).
 
 ## Estado confirmado no Codex (ler antes do histórico abaixo)
 
