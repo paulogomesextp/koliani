@@ -2,7 +2,7 @@ class_name ChefeGlacial
 extends ChefeGenerico
 ## Chefes da Regiao IX: cada forma usa um sprite pixel art proprio e um padrao de ataque.
 @export_enum("frostfang", "skyrend", "prism_scarab", "cryo_sentinel", "ymiria") var forma := "frostfang"
-var _t := 0.0
+var _glacial_t := 0.0
 var _cd := 0.0
 var _ataque := 0
 
@@ -20,7 +20,7 @@ func _ready() -> void:
 	queue_redraw()
 
 func _process(dt: float) -> void:
-	_t += dt
+	_glacial_t += dt
 	_cd -= dt
 	if _cd <= 0.0:
 		_cd = {"frostfang":1.1,"skyrend":1.35,"prism_scarab":1.55,"cryo_sentinel":1.8,"ymiria":1.0}.get(forma, 1.2)
@@ -30,14 +30,14 @@ func _process(dt: float) -> void:
 
 func _draw() -> void:
 	# Runas de telegrapho e assinatura elemental sob o sprite.
-	var cor := {"frostfang":Color("75e9ff"),"skyrend":Color("a9d9ff"),"prism_scarab":Color("9d8dff"),"cryo_sentinel":Color("c6f7ff"),"ymiria":Color("d5b5ff")}.get(forma,Color.WHITE)
-	if fmod(_t, 1.0) < 0.5:
+	var cor: Color = {"frostfang":Color("75e9ff"),"skyrend":Color("a9d9ff"),"prism_scarab":Color("9d8dff"),"cryo_sentinel":Color("c6f7ff"),"ymiria":Color("d5b5ff")}.get(forma,Color.WHITE)
+	if fmod(_glacial_t, 1.0) < 0.5:
 		draw_arc(Vector2(0,42), 42.0, PI, TAU, 18, Color(cor,0.35), 2.0)
 	if forma == "cryo_sentinel":
-		draw_arc(Vector2.ZERO, 48.0, _t, _t + PI * 0.8, 16, Color(cor,0.55), 3.0)
+		draw_arc(Vector2.ZERO, 48.0, _glacial_t, _glacial_t + PI * 0.8, 16, Color(cor,0.55), 3.0)
 	elif forma == "ymiria":
 		for i in 5:
-			var a := _t * 0.8 + TAU * i / 5.0
+			var a := _glacial_t * 0.8 + TAU * i / 5.0
 			draw_circle(Vector2(cos(a), sin(a)) * 48.0, 3.0, Color(cor,0.65))
 
 func _executar_mecanica() -> void:

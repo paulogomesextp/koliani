@@ -72,7 +72,7 @@ const RETRATO_CHEFE := [
 	"vulkar", "magma", "forja", "dragao_lava", "estrela_caida",   # 31-35
 	"capitao_afogado", "leviata", "nereia", "devorador_baleias", "abismo_oceanico",   # 36-40
 	"frostfang", "skyrend", "prism_scarab", "cryo_sentinel", "ymiria",   # 41-45
-	"raptor", "ogro", "besouro", "necromante", "monge_terra",   # 46-50
+	"dune_stalker", "sandstone_colossus", "scorpion_empress", "sun_mummy", "forgotten_god",   # 46-50
 	"mushroom", "goblin", "olho", "lodo", "folha",   # 51-55
 	"besouro", "esqueleto", "wogol", "chort", "lamina_metal",   # 56-60
 	"abutre", "xamane", "wogol", "olho", "cristal",   # 61-65

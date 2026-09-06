@@ -70,11 +70,11 @@ const CHEFE_KEY: Array[String] = [
 	"boss.cryo_sentinel",     # 43 Castelo Congelado
 	"boss.ymiria",              # 44 Coracao do Inverno
 	# --- Regiao X  Deserto dos Esquecidos ---
-	"guard.lagarto_dunas",      # 45 Mar de Areia
-	"guard.colosso_arenito",    # 46 Templo Sem Nome
-	"guard.escorpiao_areia",    # 47 Vale dos Escorpioes
-	"guard.mumia",              # 48 Cidade Enterrada
-	"boss.deus_esquecido",      # 49 Piramide Negra
+	"boss.dune_stalker",        # 45 Mar de Areia
+	"boss.sandstone_colossus",  # 46 Templo Sem Nome
+	"boss.scorpion_empress",    # 47 Vale dos Escorpioes
+	"boss.sun_mummy",           # 48 Cidade Enterrada
+	"boss.forgotten_god",       # 49 Piramide Negra
 	# --- Regiao XI  Jardins do Rei ---
 	"guard.roseira_viva",       # 50 Jardim das Rosas Negras
 	"guard.jardineiro_perdido", # 51 Labirinto Verde
