@@ -174,12 +174,53 @@ const PACKS := {
 	],
 }
 
+## Os níveis 31-100 são cenas leves por desenho e não repetem propriedades
+## de arte em cada ficheiro. Esta paleta escolhe um pack CC0 já existente para
+## cada nível, mantendo os materiais detalhados das plataformas e dando uma
+## identidade visual própria a cada capítulo de cinco níveis.
+const PACKS_POR_REGIAO := [
+	["floresta", "pantano", "luar", "horror", "montanhas"],
+	["prisao", "masmorra", "igreja", "castelo_velho", "caverna"],
+	["montanhas", "rochoso", "luar", "horror", "cidade"],
+	["caverna", "gruta", "masmorra", "luar", "castelo_velho"],
+	["cidade", "vilanoite", "horror", "igreja", "luar"],
+	["igreja", "castelo_velho", "luar", "horror", "cidade"],
+	["horror", "castelo_velho", "montanhas", "rochoso", "luar"],
+	["caverna", "gruta", "rochoso", "montanhas", "luar"],
+	["montanhas", "gruta", "caverna", "rochoso", "horror"],
+	["rochoso", "luar", "montanhas", "caverna", "horror"],
+	["floresta", "pantano", "luar", "vilanoite", "horror"],
+	["cidade", "vilanoite", "castelo_velho", "igreja", "rochoso"],
+	["montanhas", "rochoso", "luar", "horror", "caverna"],
+	["luar", "horror", "vilanoite", "castelo_velho", "cidade"],
+	["luar", "castelo_velho", "caverna", "horror", "masmorra"],
+	["luar", "horror", "caverna", "rochoso", "vilanoite"],
+	["igreja", "castelo_velho", "horror", "luar", "montanhas"],
+	["luar", "horror", "gruta", "caverna", "castelo_velho"],
+	["horror", "montanhas", "rochoso", "luar", "cidade"],
+	["luar", "castelo_velho", "horror", "vilanoite", "caverna"],
+]
+
+## Cor de luz de cada capítulo. É uma modulação discreta sobre os packs para
+## preservar a arte original e, ao mesmo tempo, separar gelo, máquinas,
+## sonhos, guerra e o caminho final.
+const LUZ_REGIAO := [
+	Color(0.62, 1.00, 0.72), Color(0.60, 0.68, 1.00), Color(1.00, 0.74, 0.46),
+	Color(0.86, 0.70, 0.78), Color(1.00, 0.62, 0.72), Color(1.00, 0.44, 0.96),
+	Color(1.00, 0.52, 0.18), Color(0.42, 0.90, 0.98), Color(0.80, 0.96, 1.00),
+	Color(1.00, 0.86, 0.48), Color(0.90, 0.30, 0.52), Color(0.55, 0.85, 1.00),
+	Color(0.62, 0.70, 1.00), Color(0.92, 0.66, 0.96), Color(0.72, 0.92, 0.80),
+	Color(1.00, 0.30, 0.32), Color(1.00, 0.52, 0.10), Color(0.86, 0.80, 1.00),
+	Color(1.00, 0.74, 0.44), Color(1.00, 0.92, 0.60),
+]
+
 var _poeira: CPUParticles2D
 var _ceu_layer: ParallaxLayer
 var _ceu_tex: Sprite2D
 
 
 func _ready() -> void:
+	_aplicar_arte_automatico()
 	var modulacao := get_node_or_null("Modulacao") as CanvasModulate
 	if modulacao:
 		modulacao.color = cor_ambiente
@@ -197,6 +238,31 @@ func _ready() -> void:
 	if _poeira:
 		_poeira.color = cor_poeira
 		_poeira.amount = int(maxf(1.0, _poeira.amount * densidade_poeira))
+
+
+## Escolhe arte apenas quando a cena não definiu um pack. Assim os 30 níveis
+## desenhados à mão conservam as afinações próprias, enquanto as cenas 31-100
+## passam a usar os fundos pixel-art detalhados que já estão no projecto.
+func _aplicar_arte_automatico() -> void:
+	if fundo_pack != "":
+		return
+	var estado := get_node_or_null("/root/EstadoJogo")
+	if estado == null:
+		return
+	var indice := int(estado.get("indice_nivel"))
+	if indice < 30:
+		return
+	var regiao := clampi(indice / 5, 0, PACKS_POR_REGIAO.size() - 1)
+	var dentro := posmod(indice, 5)
+	var packs: Array = PACKS_POR_REGIAO[regiao]
+	if dentro < packs.size() and PACKS.has(packs[dentro]):
+		fundo_pack = str(packs[dentro])
+	if regiao < LUZ_REGIAO.size():
+		var luz: Color = LUZ_REGIAO[regiao]
+		cor_luz = cor_luz.lerp(luz, 0.42)
+		cor_poeira = cor_poeira.lerp(luz.lightened(0.18), 0.28)
+		tinta_fundo = Color(1.0, 1.0, 1.0).lerp(luz.lightened(0.1), 0.24)
+		neblina_fundo = maxf(neblina_fundo, 0.10)
 
 
 func _process(_dt: float) -> void:
