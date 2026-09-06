@@ -46,7 +46,11 @@
    shader ou limite gráfico do Web export. O acesso à plataforma final e
    a posição do Aerion já estão corrigidos.
 2. **Arte dos chefes.** Continuar os 80 chefes em falta, começando pelas
-   Regiões V e VI.
+   Regiões V e VI. Auditoria confirmou que o nível 31 (`Estrada_das_Cinzas`)
+   ainda termina com um guardião elite e está marcado como “sem chefe”,
+   apesar do guia definir Vulkar, o Cavaleiro das Cinzas. Próximo trabalho:
+   criar a cena/script e a mecânica própria de Vulkar, depois regenerar a
+   cena do nível.
 3. **Geometria das masmorras.** Substituir a moldura genérica por layouts
    interiores próprios nos 10 níveis das Regiões II e IV.
 4. **Checkpoint do nível 5.** Reproduzir o local exato que ainda pode prender
