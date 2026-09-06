@@ -58,7 +58,6 @@ func _ready() -> void:
 	_vida_max = vida
 	velocidade = 0.0
 	alcance_patrulha = 0.0
-	_chao_cache = _chao_y(global_position.x)
 	_mostrar_nucleo(false)
 
 
@@ -74,8 +73,14 @@ func _process(dt: float) -> void:
 
 func _physics_process(dt: float) -> void:
 	_ataque_forte = maxf(0.0, _ataque_forte - dt)
-	if _chao_cache <= 0.0:
-		_chao_cache = _chao_y(global_position.x)
+	# A física ainda pode não conhecer o chão no _ready. O valor de recurso
+	# ficava guardado para sempre e punha o Aerion debaixo da arena.
+	# Usa a medição da classe base, que repete a consulta até haver colisão.
+	if not _arena_ok:
+		_medir_arena()
+	if not _arena_ok or not is_finite(_arena_topo):
+		return
+	_chao_cache = _arena_topo
 	if not _fase2 and not _ja_derrotado and vida <= int(_vida_max * 0.5):
 		_entrar_fase2()
 
@@ -376,17 +381,6 @@ func _x_koliani() -> float:
 
 func _base_ou_koliani_x() -> float:
 	return _x_koliani()
-
-
-func _chao_y(x: float) -> float:
-	var mundo := get_world_2d()
-	if mundo == null:
-		return _origem.y + 200.0
-	var de := Vector2(x, _origem.y - 60.0)
-	var q := PhysicsRayQueryParameters2D.create(de, de + Vector2(0.0, 760.0), 1)
-	q.exclude = [self]
-	var hit := mundo.direct_space_state.intersect_ray(q)
-	return (hit["position"].y as float) if hit else _origem.y + 300.0
 
 
 func _abanar_camera(f: float) -> void:
