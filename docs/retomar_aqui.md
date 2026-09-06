@@ -1,5 +1,17 @@
 # Retomar aqui — atualização de 6 de setembro de 2026
 
+## Continuação dos mapas — v0.15.13
+
+- Nível 4: a alavanca da seiva abre também a saída direita. Um degrau
+  liga a câmara ao reencontro; já não é necessário regressar pela I4.
+- Teste dirigido com a Koliani real passou: grade, recolha, saída,
+  subida ao degrau, reencontro e entrada na arena, sem teletransportes
+  depois da posição inicial. Não valida o combate nem os outros níveis.
+  Mantêm-se avisos de recursos ao encerrar o Godot headless.
+- Próximo incremento: geometria interior própria das masmorras da Região II.
+- Preferência: reduzir tokens com leituras dirigidas e testes focados;
+  internet permitida quando útil.
+
 ## Continuação dos mapas — v0.15.12
 
 - Nível 4: câmara opcional de seiva sob os ramos, com chão, teto e parede

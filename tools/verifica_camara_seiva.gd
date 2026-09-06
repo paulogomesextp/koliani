@@ -29,5 +29,29 @@ func _init() -> void:
 	await create_timer(1.1).timeout
 	Input.action_release("mover_esquerda")
 	var saiu := k.global_position.x < 2440.0
+	await _andar_ate(k, 2670.0)
+	await _saltar_ate(k, 2770.0)
+	var degrau := k.is_on_floor() and absf(k.global_position.x - 2770.0) < 45.0 and k.global_position.y < 640.0
+	await _saltar_ate(k, 2860.0)
+	var reencontro := k.is_on_floor() and k.global_position.y < 587.0
+	await _saltar_ate(k, 3070.0)
+	await _andar_ate(k, 3170.0)
+	var arena := k.is_on_floor() and k.global_position.x > 3150.0
 	print("Câmara: fechada=", fechada, " abriu=", abriu, " entrou=", entrou, " recolheu=", recolheu, " saiu=", saiu)
-	quit(0 if fechada and abriu and entrou and recolheu and saiu else 1)
+	print("Percurso: degrau=", degrau, " reencontro=", reencontro, " arena=", arena, " posição=", k.global_position)
+	quit(0 if fechada and abriu and entrou and recolheu and saiu and degrau and reencontro and arena else 1)
+
+func _andar_ate(k: CharacterBody2D, x: float) -> void:
+	Input.action_press("mover_direita")
+	for i in 180:
+		await physics_frame
+		if k.global_position.x >= x:
+			break
+	Input.action_release("mover_direita")
+	await create_timer(0.2).timeout
+
+func _saltar_ate(k: CharacterBody2D, x: float) -> void:
+	Input.action_press("saltar")
+	await _andar_ate(k, x)
+	Input.action_release("saltar")
+	await create_timer(0.5).timeout

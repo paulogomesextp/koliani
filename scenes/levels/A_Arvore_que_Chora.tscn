@@ -405,10 +405,10 @@ position = Vector2(2510, 510)
 tamanho = Vector2(420, 36)
 altura_visual = 36.0
 
-[node name="ParedeCamaraSeiva" parent="." instance=ExtResource("9_pl")]
-position = Vector2(2700, 610)
-tamanho = Vector2(40, 200)
-altura_visual = 200.0
+[node name="DegrauSaidaSeiva" parent="." instance=ExtResource("9_pl")]
+position = Vector2(2770, 650)
+tamanho = Vector2(100, 20)
+altura_visual = 40.0
 
 [node name="AlavancaSeiva" parent="." instance=ExtResource("alavanca_interior")]
 position = Vector2(2330, 674)
@@ -417,6 +417,11 @@ so_liga = true
 
 [node name="GradeSeiva" parent="." instance=ExtResource("grade_interior")]
 position = Vector2(2460, 609)
+id = "arvore_reserva_seiva"
+tamanho = Vector2(24, 162)
+
+[node name="GradeSaidaSeiva" parent="." instance=ExtResource("grade_interior")]
+position = Vector2(2700, 609)
 id = "arvore_reserva_seiva"
 tamanho = Vector2(24, 162)
 
