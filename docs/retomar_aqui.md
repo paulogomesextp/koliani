@@ -47,6 +47,15 @@
 
 # ⇢ COMEÇA AQUI
 
+## Painel de controlo dos pedidos
+
+Este é o painel principal para acompanhar a fila, a ordem e o estado dos
+pedidos do Paulo:
+
+<https://claude.ai/code/artifact/875b9e60-ef1b-4866-ad8f-d273169da411>
+
+Ao fechar um pedido, actualizar esta nota e o painel antes do commit.
+
 **v0.15.0**, tudo verde e no `master`. A sessão de 5 set (manhã/tarde)
 fechou o telemóvel, ligou 20 chefes nossos ao jogo e **auditou o catálogo
 de mecânicas do Paulo**.
