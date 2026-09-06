@@ -295,7 +295,7 @@ brasas = {brasas}
 [node name="ChaoChefe" parent="." instance=ExtResource("7_pl")]
 position = Vector2(760, 700)
 tamanho = Vector2(1000, 60)
-altura_visual = 110.0
+altura_visual = 0.0
 
 [node name="Chefe" parent="." instance=ExtResource("4_chefe")]
 position = Vector2(1020, 616)
@@ -364,7 +364,7 @@ brasas = {brasas}
 [node name="ChaoChefe" parent="." instance=ExtResource("7_pl")]
 position = Vector2(760, 700)
 tamanho = Vector2(1000, 60)
-altura_visual = 110.0
+altura_visual = 0.0
 
 [node name="Guardiao" parent="." instance=ExtResource("4_dem")]
 position = Vector2(1020, 630)

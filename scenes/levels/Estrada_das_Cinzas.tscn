@@ -39,15 +39,16 @@ brasas = true
 [node name="ChaoChefe" parent="." instance=ExtResource("7_pl")]
 position = Vector2(760, 700)
 tamanho = Vector2(1000, 60)
-altura_visual = 110.0
+altura_visual = 0.0
 
 [node name="Chefe" parent="." instance=ExtResource("4_chefe")]
 position = Vector2(1020, 616)
 script = ExtResource("9_vulkar")
+floor_snap_length = 48.0
 arquetipo = 0
 vida = 260
 cor_rim = Color(1.0, 0.45, 0.15, 1)
-rig = "imp"
+rig = ""
 investidas_seguidas = 2
 dur_recupera = 0.7
 

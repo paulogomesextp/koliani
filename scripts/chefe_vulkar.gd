@@ -22,6 +22,12 @@ func _ready() -> void:
 	queue_redraw()
 
 func _process(dt: float) -> void:
+	# Rede de segurança da arena do nível 31: se a física perder a plataforma
+	# durante a primeira frame, repõe o cavaleiro sobre o chão em vez de o
+	# marcar como derrotado antes de o jogador o conseguir ver.
+	if global_position.y > 660.0 and not _ja_derrotado:
+		global_position.y = 630.0
+		velocity.y = 0.0
 	_pulso += dt
 	_brasas_t += dt
 	if not _fase2 and _vida_maxima > 0 and float(vida) / _vida_maxima < 0.5:
