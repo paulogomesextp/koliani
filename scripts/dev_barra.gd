@@ -21,6 +21,7 @@ func _ready() -> void:
 		return
 	_montar_botao_topo()
 	_montar_botao_flymode()
+	_montar_botao_testes()
 	_montar_painel()
 	Textos.idioma_mudou.connect(func(_l: String) -> void: _traduzir())
 	_traduzir()
@@ -70,12 +71,16 @@ func _montar_botao_topo() -> void:
 	b.add_theme_stylebox_override("pressed", sb)
 	b.add_theme_stylebox_override("focus", sb)
 	b.pressed.connect(_abrir)
+	# O seletor fica junto dos controlos de developer, por cima do Flymode.
 	add_child(b)
+	b.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
+	b.position = Vector2(14, -182)
 
 
 ## Botão FLYMODE -- canto inferior esquerdo, MESMO por cima das barras de
 ## vida/energia. Alterna o voo livre da Koliani (ver `Koliani.alternar_voo`).
 var _btn_fly: Button
+var _btn_boss: Button
 
 func _montar_botao_flymode() -> void:
 	_btn_fly = Button.new()
@@ -88,6 +93,35 @@ func _montar_botao_flymode() -> void:
 	_btn_fly.pressed.connect(_alternar_flymode)
 	add_child(_btn_fly)
 	_estilo_flymode(false)
+
+
+func _montar_botao_testes() -> void:
+	_btn_boss = Button.new()
+	_btn_boss.name = "BotaoBossTest"
+	_btn_boss.text = "BOSS TEST"
+	_btn_boss.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
+	_btn_boss.position = Vector2(14, -216)
+	_btn_boss.custom_minimum_size = Vector2(132, 28)
+	_btn_boss.focus_mode = Control.FOCUS_NONE
+	_btn_boss.add_theme_font_size_override("font_size", 13)
+	_btn_boss.pressed.connect(_teleportar_ao_boss)
+	_estilo_botao_teste(_btn_boss)
+	add_child(_btn_boss)
+
+
+func _estilo_botao_teste(btn: Button) -> void:
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0.08, 0.04, 0.11, 0.92)
+	sb.border_color = Color(0.95, 0.7, 0.3, 0.9)
+	sb.set_border_width_all(2)
+	sb.set_corner_radius_all(4)
+	sb.content_margin_left = 10
+	sb.content_margin_right = 10
+	sb.content_margin_top = 4
+	sb.content_margin_bottom = 4
+	for e in ["normal", "hover", "pressed", "focus"]:
+		btn.add_theme_stylebox_override(e, sb)
+	btn.add_theme_color_override("font_color", Color(1, 0.85, 0.4))
 
 
 func _estilo_flymode(ativo: bool) -> void:
@@ -114,6 +148,29 @@ func _alternar_flymode() -> void:
 	if k == null or not k.has_method("alternar_voo"):
 		return
 	_estilo_flymode(bool(k.alternar_voo()))
+
+
+func _teleportar_ao_boss() -> void:
+	var k := get_tree().get_first_node_in_group("koliani") as Node2D
+	var boss := get_tree().get_first_node_in_group("chefes") as Node2D
+	if k == null or boss == null:
+		return
+	var escolhido: Node2D = null
+	var melhor := INF
+	for no in get_tree().get_nodes_in_group("checkpoints"):
+		if not (no is Node2D) or (no as Node2D).global_position.x > boss.global_position.x + 20.0:
+			continue
+		var distancia := boss.global_position.x - (no as Node2D).global_position.x
+		if distancia < melhor:
+			melhor = distancia
+			escolhido = no as Node2D
+	if escolhido:
+		k.global_position = escolhido.global_position + Vector2(0.0, -42.0)
+		k.set("velocity", Vector2.ZERO)
+		EstadoJogo.checkpoint = escolhido.global_position
+	else:
+		k.global_position = boss.global_position + Vector2(-220.0, -42.0)
+		k.set("velocity", Vector2.ZERO)
 
 
 func _montar_painel() -> void:
