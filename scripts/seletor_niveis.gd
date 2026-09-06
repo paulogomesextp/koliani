@@ -400,10 +400,15 @@ func _retrato_chefe(indice: int) -> Texture2D:
 		return _frame0(cam, maxi(1, int(esp.get("idle", 4))))
 
 	cam = "res://assets/sprites/pixel/bosses/%s.png" % slug
-	if ResourceLoader.exists(cam):
-		return _frame0(cam, 4)
+	if FileAccess.file_exists(cam):
+		var folha := load(cam) as Texture2D
+		if folha == null:
+			return null
+		# Os bosses antigos usam tiras horizontais de quatro poses; os
+		# retratos novos são PNGs únicos quadrados.
+		return _frame0(cam, 4) if folha.get_width() > folha.get_height() * 1.5 else folha
 	cam = "res://assets/sprites/pixel/bosses/%s.svg" % slug
-	if ResourceLoader.exists(cam):
+	if FileAccess.file_exists(cam):
 		return load(cam)
 	return null
 
