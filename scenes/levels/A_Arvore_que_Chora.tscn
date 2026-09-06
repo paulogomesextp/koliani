@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3 uid="uid://bkolianiarvore04"]
+[gd_scene load_steps=21 format=3 uid="uid://bkolianiarvore04"]
 
 ; REGIAO I / nivel 4 -- A Arvore que Chora.
 ; Sala final FEITA A MAO (a JORNADA, que cresce com o nivel, vem antes), a' escala dos vizinhos (~3600 px).
@@ -25,6 +25,8 @@
 [ext_resource type="PackedScene" uid="uid://bkolianiessencia01" path="res://scenes/actors/Essencia.tscn" id="99_ess"]
 
 [ext_resource type="Script" path="res://scripts/raiz_elevatoria.gd" id="elevador"]
+[ext_resource type="PackedScene" path="res://scenes/actors/Alavanca.tscn" id="alavanca_interior"]
+[ext_resource type="PackedScene" path="res://scenes/actors/PortaTrancada.tscn" id="grade_interior"]
 
 [sub_resource type="RectangleShape2D" id="rs_chk"]
 size = Vector2(44, 96)
@@ -269,20 +271,6 @@ especie = "gosma"
 comportamento = "saltador"
 alcance_patrulha = 70.0
 
-[node name="I5" parent="." instance=ExtResource("9_pl")]
-position = Vector2(2400, 680)
-tamanho = Vector2(150, 22)
-altura_visual = 40.0
-cor_base = Color(0.17, 0.13, 0.08, 1)
-cor_topo = Color(0.38, 0.3, 0.18, 1)
-
-[node name="I6" parent="." instance=ExtResource("9_pl")]
-position = Vector2(2600, 630)
-tamanho = Vector2(150, 22)
-altura_visual = 40.0
-cor_base = Color(0.17, 0.13, 0.08, 1)
-cor_topo = Color(0.38, 0.3, 0.18, 1)
-
 ; -- reencontro das duas rotas --
 [node name="Reencontro" parent="." instance=ExtResource("9_pl")]
 position = Vector2(2860, 600)
@@ -404,3 +392,35 @@ salas = Array[Rect2]([Rect2(0, 0, 1120, 940), Rect2(1120, -60, 500, 1000), Rect2
 [node name="RaizElevatoria" type="AnimatableBody2D" parent="."]
 position = Vector2(1360, 620)
 script = ExtResource("elevador")
+
+; Câmara opcional sob os ramos: abrir a grade dá acesso à reserva de seiva.
+; O teto também serve de passagem para quem vem pela rota exterior.
+[node name="ChaoCamaraSeiva" parent="." instance=ExtResource("9_pl")]
+position = Vector2(2490, 710)
+tamanho = Vector2(460, 40)
+altura_visual = 70.0
+
+[node name="TetoCamaraSeiva" parent="." instance=ExtResource("9_pl")]
+position = Vector2(2510, 510)
+tamanho = Vector2(420, 36)
+altura_visual = 36.0
+
+[node name="ParedeCamaraSeiva" parent="." instance=ExtResource("9_pl")]
+position = Vector2(2700, 610)
+tamanho = Vector2(40, 200)
+altura_visual = 200.0
+
+[node name="AlavancaSeiva" parent="." instance=ExtResource("alavanca_interior")]
+position = Vector2(2330, 674)
+id = "arvore_reserva_seiva"
+so_liga = true
+
+[node name="GradeSeiva" parent="." instance=ExtResource("grade_interior")]
+position = Vector2(2460, 609)
+id = "arvore_reserva_seiva"
+tamanho = Vector2(24, 162)
+
+[node name="ReservaSeiva" parent="." instance=ExtResource("99_ess")]
+position = Vector2(2610, 668)
+valor = 24
+espalhar = false

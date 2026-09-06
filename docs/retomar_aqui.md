@@ -1,5 +1,19 @@
 # Retomar aqui — atualização de 6 de setembro de 2026
 
+## Continuação dos mapas — v0.15.12
+
+- Nível 4: câmara opcional de seiva sob os ramos, com chão, teto e parede
+  próprios, alavanca irreversível e grade a proteger 24 de Essência.
+  Substitui I5/I6; regressa-se pela entrada da câmara e sobe-se pela I4
+  para o teto, que liga à rota exterior. Este percurso completo ainda
+  precisa de playtest; a entrada, recolha e saída horizontal foram medidas.
+- `tools/verifica_camara_seiva.gd`: cinco verificações passaram em headless
+  e OpenGL com a Koliani real. Captura `work/camara-seiva.png` inspecionada.
+  Headless mantém avisos de recursos ao sair; OpenGL terminou sem erros.
+- Próximo passo: validar a subida da I4 ao teto e a ligação à arena,
+  depois continuar a geometria própria das masmorras. Não constitui
+  remodelação dos 100 níveis nem validação da suite geral.
+
 ## Atualização do passe visual — 6 de setembro de 2026
 
 - A cenografia experimental com texturas esquemáticas foi removida e o
