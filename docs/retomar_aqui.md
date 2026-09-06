@@ -1248,9 +1248,3 @@ Ao contrário, o gerador apaga a atmosfera afinada.
   ecrã) — não os re-ordenar ao acrescentar chaves.
 - `ffmpeg` existe via `pip install --user imageio-ffmpeg`.
 - **NUNCA `git add -A`** — o `incoming/` tem packs enormes.
-
-## Pontos deixados para a revisão final dos mapas
-
-- Retirar o Kamehameha: manter o botão de projéteis em hold para disparo contínuo.
-- Corrigir o seletor de níveis para mostrar sempre o retrato e o nome do boss.
-- Rever a banda sonora e privilegiar faixas no estilo epic gaming rock.

@@ -998,25 +998,8 @@ func _construir() -> void:
 		# menos "saltar de pedra em pedra minúscula", mais chão que dá para
 		# pousar -- o desafio vem de mecânicas (perigo no vão, espinhos por
 		# cima), não da precisão do salto em si.
-		# Cada regiao muda a linguagem da travessia, nao apenas a tinta.
-		var w_min := 100.0
-		var w_max := 160.0
-		var movel_ganho := 1.0
-		match _regiao:
-			6, 16: # magma/inferno: ilhas estreitas e saltos de fuga
-				w_min = 78.0; w_max = 128.0
-			7, 12: # mar/ceu: plataformas largas que se movem no vazio
-				w_min = 112.0; w_max = 188.0; movel_ganho = 2.2
-			8, 9: # gelo/deserto: pousos medios, mas perigos nos bordos
-				w_min = 92.0; w_max = 145.0
-			10, 11: # jardim/maquinas: passarelas mais longas e legiveis
-				w_min = 126.0; w_max = 210.0
-			13, 17: # sonhos/vazio: degraus pequenos e separados
-				w_min = 72.0; w_max = 118.0
-			18: # guerra: alternancia entre trincheira e plataforma de cerco
-				w_min = 88.0; w_max = 174.0
-		var w := _rng.randf_range(w_min, w_max)
-		var movel := _dif > 0.33 and _rng.randf() < (0.04 + 0.12 * _dif) * intens * movel_ganho
+		var w := _rng.randf_range(100.0, 160.0)
+		var movel := _dif > 0.33 and _rng.randf() < (0.04 + 0.12 * _dif) * intens
 		if movel:
 			_plat_movel_spine(par, Vector2(x, y), w)
 		else:
