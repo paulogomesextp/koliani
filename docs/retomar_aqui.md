@@ -1268,3 +1268,6 @@ Ao contrário, o gerador apaga a atmosfera afinada.
 - Proximos passos: geometria propria, puzzles, cavernas e transicoes; manter qualidade dos materiais existentes.
 - Arte dos bosses continua provisoria: rigs reutilizados nao sao assets proprios gerados por IA. Auditoria de existencia de rigs nao valida combate nem animacoes completas.
 - Depois dos mapas: hold de projeteis continuo sem kamehameha; retratos no seletor; musica epic gaming rock.
+
+- v0.15.11: nível 4 tem raiz elevatória de 300 px entre os degraus do tronco. Teste renderizado tools/verifica_raiz_elevatoria.gd confirmou transporte da Koliani real e regresso vazio; corrigida a borda do CimoTronco que a prendia. Captura work/raiz-elevatoria-topo.png. Restantes 99 mapas não receberam esta alteração; remodelação completa continua pendente.
+- Suite geral: 89 falhas, incluindo compilação por autoloads Som/EstadoJogo e nomes boss.* em en.json. Não confundir teste específico aprovado com suite global aprovada.
