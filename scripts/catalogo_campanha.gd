@@ -48,7 +48,7 @@ const CHEFE_KEY: Array[String] = [
 	"boss.arauto_de_zeriko",     # 28 Torre do Coração Negro
 	"boss.zeriko",               # 29 O Trono de Zeriko
 	# --- Regiao VII  Terras Queimadas ---
-	"guard.imp_cinzas",           # 30 Estrada das Cinzas
+	"boss.vulkar",                # 30 Estrada das Cinzas
 	"guard.chort_magma",          # 31 Rio de Magma
 	"guard.ferreiro",  # 32 A Forja dos Demonios
 	"guard.besta_vulcao",         # 33 Vulcao do Rei Morto
