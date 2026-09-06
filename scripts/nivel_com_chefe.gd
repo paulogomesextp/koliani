@@ -502,4 +502,3 @@ func _alongar_nivel() -> void:
 		atm.atualizar_extensao(atm.largura_nivel + total + 200.0, atm.extensao_esquerda)
 
 	print("[nivel %d] esticado +%.0f px (fator %.2f, %d segmentos)" % [idx + 1, total, fator, segs.size()])
-
