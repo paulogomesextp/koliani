@@ -52,6 +52,9 @@ func _unhandled_key_input(evento: InputEvent) -> void:
 func _montar_botao_topo() -> void:
 	var b := Button.new()
 	b.name = "BotaoTopo"
+	# Texto inicial para o botão já ter tamanho mesmo antes do autoload
+	# Textos terminar de carregar a tradução.
+	b.text = "TESTAR OUTRO NÍVEL"
 	b.set_anchors_preset(Control.PRESET_CENTER_TOP)
 	b.position = Vector2(-110, 6)
 	b.custom_minimum_size = Vector2(220, 30)
