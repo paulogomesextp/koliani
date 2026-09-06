@@ -45,17 +45,16 @@
    a chegada à arena e identificar se é `ZonaEscuridao`, vinheta, luz,
    shader ou limite gráfico do Web export. O acesso à plataforma final e
    a posição do Aerion já estão corrigidos.
-2. **Som e música.** Rever o som de chefe derrotado, entrada no portal e
-   as músicas dos níveis 3 e 8.
-3. **Arte dos chefes.** Continuar os 80 chefes em falta, começando pelas
+2. **Arte dos chefes.** Continuar os 80 chefes em falta, começando pelas
    Regiões V e VI.
-4. **Geometria das masmorras.** Substituir a moldura genérica por layouts
+3. **Geometria das masmorras.** Substituir a moldura genérica por layouts
    interiores próprios nos 10 níveis das Regiões II e IV.
-5. **Checkpoint do nível 5.** Reproduzir o local exato que ainda pode prender
+4. **Checkpoint do nível 5.** Reproduzir o local exato que ainda pode prender
    a personagem, incluindo plataformas móveis.
 
-Itens concluídos: acesso do nível 12, tutorial das mecânicas, baú de chefe
-e versão no canto inferior direito. A lista acima é a fila ativa; ao fechar
+Itens concluídos: acesso do nível 12, tutorial das mecânicas, baú de chefe,
+versão no canto inferior direito e som/música (efeitos de chefe e portal,
+faixas próprias dos níveis 3 e 8). A lista acima é a fila ativa; ao fechar
 um item, removê-lo daqui e atualizar o painel antes do commit.
 
 > **LEIA PRIMEIRO.** O topo é a **fila de pedidos do Paulo por fazer**.
