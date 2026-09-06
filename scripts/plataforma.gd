@@ -95,10 +95,9 @@ func _nome_bioma() -> String:
 	# A partir da regiao VII cada grupo tem terreno pixel-art proprio.
 	if is_inside_tree():
 		var reg := clampi(int(EstadoJogo.indice_nivel / 5), 0, 19)
-		if reg >= 6:
-			var lore := "lore_%02d" % reg
-			if ResourceLoader.exists("res://assets/sprites/pixel/terreno/%s/corpo.png" % lore):
-				return lore
+		var lore := "lore_%02d" % reg
+		if ResourceLoader.exists("res://assets/sprites/pixel/terreno/%s/corpo.png" % lore):
+			return lore
 		var atm := get_tree().get_first_node_in_group("atmosfera")
 		if atm and "bioma" in atm and BIOMAS.has(atm.bioma):
 			return atm.bioma
