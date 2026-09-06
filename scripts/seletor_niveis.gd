@@ -69,8 +69,8 @@ const RETRATO_CHEFE := [
 	# --- niveis 31-100 -- GERADO por tools/gerar_niveis_31_100.py --------
 	# Rig animado (bosses_anim/) nos chefes, especie (enemies/) nos
 	# guardioes; o `_retrato_chefe` tenta as duas pastas.
-	"imp", "chort", "ogro", "demonio_grande", "feiticeiro",   # 31-35
-	"esqueleto", "gosma", "wogol", "lodo", "horror",   # 36-40
+	"vulkar", "magma", "forja", "dragao_lava", "estrela_caida",   # 31-35
+	"capitao_afogado", "leviata", "nereia", "devorador_baleias", "abismo_oceanico",   # 36-40
 	"mastim", "abutre", "besouro", "esqueleto", "sacerdotisa_gelo",   # 41-45
 	"raptor", "ogro", "besouro", "necromante", "monge_terra",   # 46-50
 	"mushroom", "goblin", "olho", "lodo", "folha",   # 51-55
@@ -402,6 +402,9 @@ func _retrato_chefe(indice: int) -> Texture2D:
 	cam = "res://assets/sprites/pixel/bosses/%s.png" % slug
 	if ResourceLoader.exists(cam):
 		return _frame0(cam, 4)
+	cam = "res://assets/sprites/pixel/bosses/%s.svg" % slug
+	if ResourceLoader.exists(cam):
+		return load(cam)
 	return null
 
 
