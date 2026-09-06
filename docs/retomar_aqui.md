@@ -67,10 +67,9 @@ dele. Os que estão lá por fazer, e que eu faria por esta ordem:
 2. **Baú ao matar um chefe** — armas, armaduras, moedas ou pontos de stats.
    As peças existem todas (15+15 de equipamento, a Essência, as 6
    Melhorias); falta o baú, a tabela de sorteio e o ecrã do que saiu.
-3. **Explicar a mecânica nova quando ela estreia** — mensagem 5 s. O
-   gerador já sabe qual é a estreia de cada nível (`_estreia_cam`) e a HUD
-   já tem onde a pôr (os avisos de habilidade nova); falta o texto de cada
-   uma nos 6 idiomas.
+3. **CONCLUÍDO — Explicar a mecânica nova quando ela estreia.**
+   Paulo confirmou em 6 set 2026: retirar dos pendentes e não voltar a
+   trabalhar neste ponto. Implementado com mensagem de 10 segundos.
 4. **Som e música** — o som de matar o chefe e o de entrar no portal; e a
    música dos níveis 3 e 8, que não são rock épico como o resto.
 5. **Arte dos chefes: faltam 80.** Regiões I-IV feitas. A seguir são as
