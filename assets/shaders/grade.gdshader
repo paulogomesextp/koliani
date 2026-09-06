@@ -3,7 +3,10 @@ shader_type canvas_item;
 // claras, borra, soma). Barato o suficiente para 60fps; poe bloom a 0
 // para desligar (ex.: telemoveis fracos).
 
-uniform sampler2D ecra : hint_screen_texture, filter_linear_mipmap;
+// Safari/WebGL pode devolver preto ao amostrar a textura do ecrã com
+// mipmaps, sobretudo quando a câmara entra na arena do chefe. O filtro
+// linear simples é suportado pelos renderizadores Mobile e Web.
+uniform sampler2D ecra : hint_screen_texture, filter_linear;
 uniform float contraste : hint_range(0.8, 1.4) = 1.06;
 uniform float saturacao : hint_range(0.5, 2.0) = 1.12;
 uniform float bloom : hint_range(0.0, 1.5) = 0.35;
