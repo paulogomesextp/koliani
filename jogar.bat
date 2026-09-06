@@ -1,11 +1,12 @@
 @echo off
-REM Abre o Koliani a correr o codigo atual (nao precisa de reexportar).
-REM O atalho no Ambiente de Trabalho aponta para aqui.
-set "GODOT=C:\Users\paulo\Desktop\Godot_v4.7.2-stable_win64.exe"
-if not exist "%GODOT%" (
-  echo Godot nao encontrado em "%GODOT%".
-  echo Ajusta o caminho no cimo deste ficheiro ^(jogar.bat^).
+REM Abre a build Windows local exportada. O atalho no Ambiente de
+REM Trabalho aponta para este ficheiro, por isso cada exportacao fica logo
+REM disponivel sem abrir o editor Godot.
+set "JOGO=%~dp0build\windows\Koliani.exe"
+if not exist "%JOGO%" (
+  echo Executavel nao encontrado em "%JOGO%".
+  echo Exporta o preset Windows Desktop para build\windows\Koliani.exe.
   pause
   exit /b 1
 )
-start "" "%GODOT%" --path "%~dp0."
+start "" "%JOGO%"
