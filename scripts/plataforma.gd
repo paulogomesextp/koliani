@@ -92,9 +92,23 @@ func _set_altura_visual(v: float) -> void:
 
 ## Nome do bioma a usar (do no do grupo "atmosfera"), ou "floresta".
 func _nome_bioma() -> String:
-	var atm := get_tree().get_first_node_in_group("atmosfera") if is_inside_tree() else null
-	if atm and "bioma" in atm and BIOMAS.has(atm.bioma):
-		return atm.bioma
+	# A partir da regiao VII cada grupo tem terreno pixel-art proprio.
+	if is_inside_tree():
+		var reg := clampi(int(EstadoJogo.indice_nivel / 5), 0, 19)
+		if reg >= 6:
+			var lore := "lore_%02d" % reg
+			if ResourceLoader.exists("res://assets/sprites/pixel/terreno/%s/corpo.png" % lore):
+				return lore
+		var atm := get_tree().get_first_node_in_group("atmosfera")
+		if atm and "bioma" in atm and BIOMAS.has(atm.bioma):
+			return atm.bioma
+	return "floresta"
+			var lore := "lore_%02d" % reg
+			if ResourceLoader.exists("res://assets/sprites/pixel/terreno/%s/corpo.png" % lore):
+				return lore
+		var atm := get_tree().get_first_node_in_group("atmosfera")
+		if atm and "bioma" in atm and BIOMAS.has(atm.bioma):
+			return atm.bioma
 	return "floresta"
 
 
@@ -340,3 +354,5 @@ func _pendurar(vis: Node, bioma: String, largura: float, y_base: float,
 			s.position.x += tex.get_width() * e
 		s.z_index = -2                 # ATRAS do terreno e dos actores
 		vis.add_child(s)
+
+
