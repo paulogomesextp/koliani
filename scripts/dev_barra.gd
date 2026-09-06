@@ -75,9 +75,11 @@ func _montar_botao_topo() -> void:
 	b.add_theme_stylebox_override("focus", sb)
 	b.pressed.connect(_abrir)
 	# O seletor fica junto dos controlos de developer, por cima do Flymode.
-	add_child(b)
+	# A âncora tem de ser definida antes de adicionar ao CanvasLayer (que não
+	# tem tamanho próprio); depois disso uma âncora inferior cairia em y=0.
 	b.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
 	b.position = Vector2(14, -182)
+	add_child(b)
 
 
 ## Botão FLYMODE -- canto inferior esquerdo, MESMO por cima das barras de
