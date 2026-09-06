@@ -1,5 +1,15 @@
 # Retomar aqui — atualização de 6 de setembro de 2026
 
+## Atualização do passe visual — 6 de setembro de 2026
+
+- A cenografia experimental com texturas esquemáticas foi removida e o
+  sistema anterior de plataformas detalhadas foi restaurado (`4f6e581`).
+- Os níveis 31–100 agora escolhem automaticamente um fundo pixel-art CC0
+  detalhado por nível, com paleta de luz própria por região (`d6ac2d2`).
+  Os níveis desenhados à mão mantêm os seus fundos afinados.
+- A remodelação visual continua por fases: primeiro valida-se a leitura de
+  cada região em DEBUG, depois aplica-se o padrão aos restantes níveis.
+
 ## Estado confirmado no Codex (ler antes do histórico abaixo)
 
 - v0.15.10: HUD mostra a versão do projeto no canto inferior direito,
