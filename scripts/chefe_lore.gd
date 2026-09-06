@@ -6,13 +6,42 @@ var _lore_t := 0.0
 var _lore_cd := 0.0
 var _lore_n := 0
 func _ready() -> void:
-	rig = ""
-	textura = load("res://assets/sprites/pixel/bosses/%s.png" % forma) as Texture2D
+	rig = _rig_da_forma()
+	textura = null
 	super._ready()
-	var c := get_node_or_null("Sprite/Corpo") as Sprite2D
-	if c: c.visible=true; c.texture=textura; c.scale=Vector2(1.2,1.2)
-	var a := get_node_or_null("Sprite/Anim") as AnimatedSprite2D
-	if a: a.visible=false
+
+
+## Os bosses do segundo arco usam os mesmos cinco estados completos que a
+## Koliani: repouso, marcha, ataque, dano e morte. A escolha é por silhueta
+## e lore, não por recoloração de uma folha estática.
+func _rig_da_forma() -> String:
+	return {
+		"boss_51_roseira_viva": "entrevane", "boss_52_jardineiro_perdido": "entrevane",
+		"boss_53_alma_errante": "olho_voador", "boss_54_trepadeira": "serpente",
+		"boss_55_rei_botanico": "entrevane", "boss_56_automato": "lamina_metal",
+		"boss_57_foguista": "cavaleiro_fogo", "boss_58_homunculo": "mimico",
+		"boss_59_bobina_viva": "voltaris", "boss_60_maquina_rei": "lamina_metal",
+		"boss_61_guarda_nuvens": "aerion", "boss_62_servo_do_trovao": "voltaris",
+		"boss_63_anjo_corrompido": "aerion", "boss_64_olho_lunar": "sacerdotisa_lunar",
+		"boss_65_astronomo": "sacerdotisa_lunar", "boss_66_sonhador": "morvanna",
+		"boss_67_reflexo": "cavaleiro_negro", "boss_68_boneca": "mimico",
+		"boss_69_medo": "horror", "boss_70_outra_koliani": "cavaleiro_negro",
+		"boss_71_colecionador": "rei_ossario", "boss_72_coveiro": "ceifeiro",
+		"boss_73_santo_corrompido": "freira_negra", "boss_74_rei_morto": "rei_ossario",
+		"boss_75_morte": "ceifeiro", "boss_76_afogado_vermelho": "rei_devorador",
+		"boss_77_serpente_vermelha": "serpente", "boss_78_almirante_morto": "rei_devorador",
+		"boss_79_tentaculo": "horror", "boss_80_o_mar": "demonio_lodo",
+		"boss_81_sentinela_inferno": "cavaleiro_fogo", "boss_82_duque_infernal": "cavaleiro_fogo",
+		"boss_83_barqueiro": "rei_devorador", "boss_84_princesa_demonio": "dama_guilhotina",
+		"boss_85_rei_demonios": "cavaleiro_fogo", "boss_86_sombra": "cavaleiro_negro",
+		"boss_87_nada": "olho_do_abismo", "boss_88_paradoxo": "irmaos_condenados",
+		"boss_89_observador": "olho_do_abismo", "boss_90_entidade": "horror",
+		"boss_91_general_caos": "colosso", "boss_92_dragao_primordial": "vyrak",
+		"boss_93_ultimo_cavaleiro": "primeiro_prisioneiro", "boss_94_arauto_final": "arauto",
+		"boss_95_campeao": "cavaleiro_fogo", "boss_96_zeriko_jovem": "cavaleiro_negro",
+		"boss_97_primeiro_rei": "rei_ossario", "boss_98_zeriko_absoluto": "cavaleiro_fogo",
+		"boss_99_entidade_purpura": "horror", "boss_100_zeriko_homem": "cavaleiro_negro",
+	}.get(forma, "horror")
 func _process(dt:float)->void:
 	_lore_t+=dt; _lore_cd-=dt
 	if _lore_cd<=0.0:

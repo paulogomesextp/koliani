@@ -7,16 +7,10 @@ var _cd := 0.0
 var _ataque := 0
 
 func _ready() -> void:
-	rig = ""
-	textura = load("res://assets/sprites/pixel/bosses/%s.png" % forma) as Texture2D
+	rig = {"frostfang": "guardiao_gelo", "skyrend": "aerion", "prism_scarab": "cristal",
+		"cryo_sentinel": "guardiao_gelo", "ymiria": "sacerdotisa_gelo"}.get(forma, "guardiao_gelo")
+	textura = null
 	super._ready()
-	var corpo := get_node_or_null("Sprite/Corpo") as Sprite2D
-	if corpo:
-		corpo.visible = true
-		corpo.texture = textura
-		corpo.scale = Vector2(1.25, 1.25)
-	var anim := get_node_or_null("Sprite/Anim") as AnimatedSprite2D
-	if anim: anim.visible = false
 	queue_redraw()
 
 func _process(dt: float) -> void:

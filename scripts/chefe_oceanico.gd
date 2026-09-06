@@ -6,31 +6,14 @@ var _tempo_ataque := 0.0
 var _cd := 0.0
 
 func _ready() -> void:
-	rig = ""; textura = null; super._ready()
-	var c := get_node_or_null("Sprite/Corpo") as Sprite2D
-	if c: c.visible = false
-	var anim := get_node_or_null("Sprite/Anim") as AnimatedSprite2D
-	if anim: anim.visible = false
-	queue_redraw()
+	rig = {"estrela": "feiticeiro", "capitao": "rei_devorador", "leviata": "demonio_lodo", "nereia": "sacerdotisa",
+		"devorador": "rei_devorador", "abismo": "horror"}.get(forma, "rei_devorador")
+	textura = null
+	super._ready()
 
 func _process(dt: float) -> void:
 	_tempo_ataque += dt; _cd -= dt
 	if _cd <= 0.0: _cd = 0.7 if forma in ["abismo","leviata"] else 1.25; _onda()
-	queue_redraw()
-
-func _draw() -> void:
-	var c := Color("ffb52e") if forma == "estrela" else Color("36c9d2") if forma in ["capitao","nereia"] else Color("8d5cff")
-	if forma == "estrela":
-		var pts:=PackedVector2Array(); for i in 10: var a=-PI/2.0+TAU*i/10.0; var r=52.0 if i%2==0 else 22.0; pts.append(Vector2(cos(a),sin(a))*r); draw_colored_polygon(pts,c)
-	elif forma == "leviata":
-		_desenhar_elipse(Vector2.ZERO,Vector2(72,36),c); draw_circle(Vector2(-28,-4),10,Color.WHITE); draw_circle(Vector2(28,-4),10,Color.WHITE)
-	elif forma == "abismo":
-		draw_circle(Vector2.ZERO,48,Color("140c2b")); for i in 6: draw_circle(Vector2(cos(i)*34,sin(i)*34),9,c)
-	else:
-		draw_circle(Vector2(0,-35),24,Color("17243b")); draw_colored_polygon(PackedVector2Array([Vector2(-34,-16),Vector2(34,-16),Vector2(25,55),Vector2(-25,55)]),Color("17243b")); draw_line(Vector2(18,-5),Vector2(65,-45),c,7)
-
-func _desenhar_elipse(centro:Vector2, raio:Vector2, cor:Color) -> void:
-	var p:=PackedVector2Array(); for i in 24: var a=TAU*i/24.0; p.append(centro+Vector2(cos(a)*raio.x,sin(a)*raio.y)); draw_colored_polygon(p,cor)
 
 func _onda() -> void:
 	var k:=get_tree().get_first_node_in_group("koliani"); if k==null or global_position.distance_to(k.global_position)>900: return

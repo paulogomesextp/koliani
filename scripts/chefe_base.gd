@@ -45,6 +45,15 @@ const LARGURA_ALVO_CHEFE := 110.0
 
 static var _cache_rigs: Dictionary = {}
 
+## Algumas cenas antigas guardavam a espécie do pack em `rig` (wogol, lodo,
+## esqueleto...). Estes aliases encaminham-nas para uma folha de boss com os
+## cinco estados completos, sem obrigar a reescrever dezenas de cenas.
+const RIG_ALIASES := {
+	"esqueleto": "rei_ossario", "wogol": "golem_pedra", "lodo": "demonio_lodo",
+	"gosma": "demonio_lodo", "ogro": "colosso", "chort": "cavaleiro_fogo",
+	"demonio_grande": "colosso",
+}
+
 ## Escala visual do chefe (o `Sprite` inteiro, incluindo o `Nucleo`). Cada
 ## `Chefe*.tscn` põe a sua -- dá variedade de tamanho entre chefes e faz
 ## todos ficarem maiores que a Koliani. NÃO mexe na `AreaContacto`.
@@ -130,6 +139,8 @@ static func _rigs() -> Dictionary:
 func _montar_rig() -> void:
 	if rig == "":
 		return
+	if not _rigs().has(rig) and RIG_ALIASES.has(rig):
+		rig = RIG_ALIASES[rig]
 	var anim := get_node_or_null("Sprite/Anim") as AnimatedSprite2D
 	if anim == null:
 		push_warning("chefe com rig '%s' mas sem nó Sprite/Anim" % rig)

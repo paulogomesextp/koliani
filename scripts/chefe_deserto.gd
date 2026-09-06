@@ -6,13 +6,11 @@ var _deserto_t := 0.0
 var _cd := 0.0
 var _n := 0
 func _ready() -> void:
-	rig = ""
-	textura = load("res://assets/sprites/pixel/bosses/%s.png" % forma) as Texture2D
+	rig = {"dune_stalker": "naga_zeraph", "sandstone_colossus": "golem_pedra",
+		"scorpion_empress": "rainha_aracnidea", "sun_mummy": "rei_ossario",
+		"forgotten_god": "monge_terra"}.get(forma, "golem_pedra")
+	textura = null
 	super._ready()
-	var c := get_node_or_null("Sprite/Corpo") as Sprite2D
-	if c: c.visible = true; c.texture = textura; c.scale = Vector2(1.25,1.25)
-	var a := get_node_or_null("Sprite/Anim") as AnimatedSprite2D
-	if a: a.visible = false
 func _process(dt: float) -> void:
 	_deserto_t += dt; _cd -= dt
 	if _cd <= 0.0:

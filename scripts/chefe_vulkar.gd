@@ -8,18 +8,11 @@ var _brasas_t := 0.0
 var _fase2 := false
 
 func _ready() -> void:
-	# Vulkar tem silhueta desenhada por código. Desliga o rig da cena base
-	# antes do super: ChefeBase monta o AnimatedSprite quando `rig` existe.
-	rig = ""
+	# Vulkar usa o rig completo do cavaleiro de fogo: idle, corrida, ataque,
+	# dano e morte. A mecânica das brasas continua neste script.
+	rig = "cavaleiro_fogo"
 	textura = null
 	super._ready()
-	var corpo := get_node_or_null("Sprite/Corpo") as Sprite2D
-	if corpo:
-		corpo.visible = false
-	var anim := get_node_or_null("Sprite/Anim") as AnimatedSprite2D
-	if anim:
-		anim.visible = false
-	queue_redraw()
 
 func _process(dt: float) -> void:
 	# Rede de segurança da arena do nível 31: se a física perder a plataforma
@@ -35,23 +28,6 @@ func _process(dt: float) -> void:
 	if _brasas_t > (0.8 if _fase2 else 1.35):
 		_brasas_t = 0.0
 		_largar_brasa()
-	queue_redraw()
-
-func _draw() -> void:
-	var brilho := 0.12 + 0.08 * sin(_pulso * 8.0)
-	var fogo := Color(1.0, 0.22 + brilho, 0.04, 0.95)
-	var metal := Color(0.16, 0.12, 0.15, 1)
-	var cinza := Color(0.34, 0.27, 0.3, 1)
-	# silhueta humanoide própria: elmo, ombreiras, couraça, capa e espada
-	draw_polygon(PackedVector2Array([Vector2(-24,-72),Vector2(24,-72),Vector2(30,-46),Vector2(18,-34),Vector2(-18,-34),Vector2(-30,-46)]), PackedColorArray([metal]))
-	draw_circle(Vector2(0,-51), 15, cinza)
-	draw_rect(Rect2(-22,-38,44,48), metal)
-	draw_colored_polygon(PackedVector2Array([Vector2(-22,-32),Vector2(-40,-22),Vector2(-31,-5),Vector2(-18,-14)]), cinza)
-	draw_colored_polygon(PackedVector2Array([Vector2(22,-32),Vector2(40,-22),Vector2(31,-5),Vector2(18,-14)]), cinza)
-	draw_line(Vector2(18,-20), Vector2(58,-70), Color(0.95,0.8,0.55), 6)
-	draw_colored_polygon(PackedVector2Array([Vector2(-20,10),Vector2(20,10),Vector2(34,55),Vector2(0,42),Vector2(-34,55)]), Color(0.22,0.05,0.04,0.95))
-	for x in [-26.0, 26.0]:
-		draw_circle(Vector2(x, 47), 7, fogo)
 
 func _largar_brasa() -> void:
 	var pai := get_parent()
