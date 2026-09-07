@@ -8,6 +8,7 @@ extends Area2D
 signal fim_da_campanha
 
 const CENA_JOGO := "res://scenes/Main.tscn"
+const IDS_PROGRESSAO := preload("res://scripts/progression_ids.gd")
 
 @export var pista_ao_atravessar := ""  # id opcional de pista sobre a mãe
 
@@ -40,8 +41,10 @@ func _ao_entrar(corpo: Node) -> void:
 	Som.toca("transicao", -3.0)
 	var i := EstadoJogo.indice_nivel
 	EstadoJogo.marcar_nivel_concluido(i)
+	EstadoJogo.completar_sessao_nivel(
+		IDS_PROGRESSAO.level_id_do_indice(i))
 
-	# normal e hardcore: seguem linear para o nível seguinte, sem passar
+	# Segue linear para o nível seguinte, sem passar
 	# pelo mapa. Só a última porta (campanha feita) é que termina o jogo.
 	if EstadoJogo.ha_proximo_nivel():
 		EstadoJogo.avancar_nivel()

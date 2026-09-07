@@ -1,5 +1,5 @@
 extends SceneTree
-## Bancada dos PROJECTEIS: poe lado a lado o tiro da Koliani, o Kamehameha,
+## Bancada dos PROJECTEIS: poe lado a lado o tiro da Koliani,
 ## a bola do Zeriko e o portal de fim de nivel, sobre fundo escuro, e grava
 ## um PNG. Serve para ver a arte sem ter de jogar ate' la'.
 ##
@@ -12,7 +12,6 @@ extends SceneTree
 ## fica para o caso de voltar a haver variantes.
 const PECAS := [
 	["res://scenes/actors/ProjetilKoliani.tscn", "laser da Koliani", Vector2(230, 220), -1],
-	["res://scenes/actors/KamehamehaKoliani.tscn", "kamehameha", Vector2(660, 400), -1],
 	["res://scenes/actors/ProjetilZeriko.tscn", "bola do Zeriko", Vector2(1070, 220), -1],
 	["res://scenes/actors/Porta.tscn", "portal de fim", Vector2(700, 570), -1],
 ]

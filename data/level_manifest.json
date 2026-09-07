@@ -1,0 +1,2453 @@
+{
+  "schema_version": 1,
+  "contract": "Koliani level source of truth",
+  "generator_contracts": {
+    "koliani.level_scene_generator": {
+      "version": "2.0.0",
+      "source": "tools/gerar_niveis_31_100.py",
+      "runtime_generator": "res://scripts/gerador_corredor.gd",
+      "runtime_seed_format": "jornada4|{campaign_index}",
+      "promotion_rule": "generated ownership + generated origin + auto_regenerate=true only"
+    },
+    "koliani.atmosphere_tuning": {
+      "version": "1.0.0",
+      "source": "tools/afinar_atmosfera.py",
+      "seed_format": "1000 + campaign_index * 37",
+      "promotion_rule": "generated ownership + generated origin + auto_regenerate=true only"
+    }
+  },
+  "regions": [
+    {
+      "region_id": "region_01",
+      "campaign_order": 1,
+      "level_ids": [
+        "level_001",
+        "level_002",
+        "level_003",
+        "level_004",
+        "level_005"
+      ]
+    },
+    {
+      "region_id": "region_02",
+      "campaign_order": 2,
+      "level_ids": [
+        "level_006",
+        "level_007",
+        "level_008",
+        "level_009",
+        "level_010"
+      ]
+    },
+    {
+      "region_id": "region_03",
+      "campaign_order": 3,
+      "level_ids": [
+        "level_011",
+        "level_012",
+        "level_013",
+        "level_014",
+        "level_015"
+      ]
+    },
+    {
+      "region_id": "region_04",
+      "campaign_order": 4,
+      "level_ids": [
+        "level_016",
+        "level_017",
+        "level_018",
+        "level_019",
+        "level_020"
+      ]
+    },
+    {
+      "region_id": "region_05",
+      "campaign_order": 5,
+      "level_ids": [
+        "level_021",
+        "level_022",
+        "level_023",
+        "level_024",
+        "level_025"
+      ]
+    },
+    {
+      "region_id": "region_06",
+      "campaign_order": 6,
+      "level_ids": [
+        "level_026",
+        "level_027",
+        "level_028",
+        "level_029",
+        "level_030"
+      ]
+    },
+    {
+      "region_id": "region_07",
+      "campaign_order": 7,
+      "level_ids": [
+        "level_031",
+        "level_032",
+        "level_033",
+        "level_034",
+        "level_035"
+      ]
+    },
+    {
+      "region_id": "region_08",
+      "campaign_order": 8,
+      "level_ids": [
+        "level_036",
+        "level_037",
+        "level_038",
+        "level_039",
+        "level_040"
+      ]
+    },
+    {
+      "region_id": "region_09",
+      "campaign_order": 9,
+      "level_ids": [
+        "level_041",
+        "level_042",
+        "level_043",
+        "level_044",
+        "level_045"
+      ]
+    },
+    {
+      "region_id": "region_10",
+      "campaign_order": 10,
+      "level_ids": [
+        "level_046",
+        "level_047",
+        "level_048",
+        "level_049",
+        "level_050"
+      ]
+    },
+    {
+      "region_id": "region_11",
+      "campaign_order": 11,
+      "level_ids": [
+        "level_051",
+        "level_052",
+        "level_053",
+        "level_054",
+        "level_055"
+      ]
+    },
+    {
+      "region_id": "region_12",
+      "campaign_order": 12,
+      "level_ids": [
+        "level_056",
+        "level_057",
+        "level_058",
+        "level_059",
+        "level_060"
+      ]
+    },
+    {
+      "region_id": "region_13",
+      "campaign_order": 13,
+      "level_ids": [
+        "level_061",
+        "level_062",
+        "level_063",
+        "level_064",
+        "level_065"
+      ]
+    },
+    {
+      "region_id": "region_14",
+      "campaign_order": 14,
+      "level_ids": [
+        "level_066",
+        "level_067",
+        "level_068",
+        "level_069",
+        "level_070"
+      ]
+    },
+    {
+      "region_id": "region_15",
+      "campaign_order": 15,
+      "level_ids": [
+        "level_071",
+        "level_072",
+        "level_073",
+        "level_074",
+        "level_075"
+      ]
+    },
+    {
+      "region_id": "region_16",
+      "campaign_order": 16,
+      "level_ids": [
+        "level_076",
+        "level_077",
+        "level_078",
+        "level_079",
+        "level_080"
+      ]
+    },
+    {
+      "region_id": "region_17",
+      "campaign_order": 17,
+      "level_ids": [
+        "level_081",
+        "level_082",
+        "level_083",
+        "level_084",
+        "level_085"
+      ]
+    },
+    {
+      "region_id": "region_18",
+      "campaign_order": 18,
+      "level_ids": [
+        "level_086",
+        "level_087",
+        "level_088",
+        "level_089",
+        "level_090"
+      ]
+    },
+    {
+      "region_id": "region_19",
+      "campaign_order": 19,
+      "level_ids": [
+        "level_091",
+        "level_092",
+        "level_093",
+        "level_094",
+        "level_095"
+      ]
+    },
+    {
+      "region_id": "region_20",
+      "campaign_order": 20,
+      "level_ids": [
+        "level_096",
+        "level_097",
+        "level_098",
+        "level_099",
+        "level_100"
+      ]
+    }
+  ],
+  "levels": [
+    {
+      "level_id": "level_001",
+      "campaign_order": 1,
+      "region_id": "region_01",
+      "runtime_scene": "res://scenes/levels/Floresta_Putrefata.tscn",
+      "origin": "authored",
+      "ownership": "authored",
+      "boss_ref": {
+        "boss_id": "boss_level_001",
+        "scene": "res://scenes/actors/ChefeGhorak.tscn"
+      },
+      "auto_regenerate": false
+    },
+    {
+      "level_id": "level_002",
+      "campaign_order": 2,
+      "region_id": "region_01",
+      "runtime_scene": "res://scenes/levels/Pantano_dos_Sussurros.tscn",
+      "origin": "authored",
+      "ownership": "authored",
+      "boss_ref": {
+        "boss_id": "boss_level_002",
+        "scene": "res://scenes/actors/ChefeMorvanna.tscn"
+      },
+      "auto_regenerate": false
+    },
+    {
+      "level_id": "level_003",
+      "campaign_order": 3,
+      "region_id": "region_01",
+      "runtime_scene": "res://scenes/levels/Ninho_da_Viuva_Negra.tscn",
+      "origin": "authored",
+      "ownership": "authored",
+      "boss_ref": {
+        "boss_id": "boss_level_003",
+        "scene": "res://scenes/actors/ChefeRainhaAracnidea.tscn"
+      },
+      "auto_regenerate": false
+    },
+    {
+      "level_id": "level_004",
+      "campaign_order": 4,
+      "region_id": "region_01",
+      "runtime_scene": "res://scenes/levels/A_Arvore_que_Chora.tscn",
+      "origin": "authored",
+      "ownership": "authored",
+      "boss_ref": {
+        "boss_id": "boss_level_004",
+        "scene": "res://scenes/actors/ChefeEntrevane.tscn"
+      },
+      "auto_regenerate": false
+    },
+    {
+      "level_id": "level_005",
+      "campaign_order": 5,
+      "region_id": "region_01",
+      "runtime_scene": "res://scenes/levels/Coracao_da_Floresta.tscn",
+      "origin": "authored",
+      "ownership": "authored",
+      "boss_ref": {
+        "boss_id": "boss_level_005",
+        "scene": "res://scenes/actors/ChefeCoracaoPutrefacto.tscn"
+      },
+      "auto_regenerate": false
+    },
+    {
+      "level_id": "level_006",
+      "campaign_order": 6,
+      "region_id": "region_02",
+      "runtime_scene": "res://scenes/levels/Prisao_dos_Condenados.tscn",
+      "origin": "authored",
+      "ownership": "authored",
+      "boss_ref": {
+        "boss_id": "boss_level_006",
+        "scene": "res://scenes/actors/ChefeCarcereiro.tscn"
+      },
+      "auto_regenerate": false
+    },
+    {
+      "level_id": "level_007",
+      "campaign_order": 7,
+      "region_id": "region_02",
+      "runtime_scene": "res://scenes/levels/Fornalha_dos_Pecadores.tscn",
+      "origin": "authored",
+      "ownership": "authored",
+      "boss_ref": {
+        "boss_id": "boss_level_007",
+        "scene": "res://scenes/actors/ChefeIgnivar.tscn"
+      },
+      "auto_regenerate": false
+    },
+    {
+      "level_id": "level_008",
+      "campaign_order": 8,
+      "region_id": "region_02",
+      "runtime_scene": "res://scenes/levels/Corredor_das_Execucoes.tscn",
+      "origin": "authored",
+      "ownership": "authored",
+      "boss_ref": {
+        "boss_id": "boss_level_008",
+        "scene": "res://scenes/actors/ChefeDamaGuilhotina.tscn"
+      },
+      "auto_regenerate": false
+    },
+    {
+      "level_id": "level_009",
+      "campaign_order": 9,
+      "region_id": "region_02",
+      "runtime_scene": "res://scenes/levels/Ala_dos_Mortos.tscn",
+      "origin": "authored",
+      "ownership": "authored",
+      "boss_ref": {
+        "boss_id": "boss_level_009",
+        "scene": "res://scenes/actors/ChefeIrmaosCondenados.tscn"
+      },
+      "auto_regenerate": false
+    },
+    {
+      "level_id": "level_010",
+      "campaign_order": 10,
+      "region_id": "region_02",
+      "runtime_scene": "res://scenes/levels/A_Cela_Zero.tscn",
+      "origin": "authored",
+      "ownership": "authored",
+      "boss_ref": {
+        "boss_id": "boss_level_010",
+        "scene": "res://scenes/actors/ChefePrimeiroPrisioneiro.tscn"
+      },
+      "auto_regenerate": false
+    },
+    {
+      "level_id": "level_011",
+      "campaign_order": 11,
+      "region_id": "region_03",
+      "runtime_scene": "res://scenes/levels/Torre_dos_Sinos.tscn",
+      "origin": "authored",
+      "ownership": "authored",
+      "boss_ref": {
+        "boss_id": "boss_level_011",
+        "scene": "res://scenes/actors/ChefeSinoVivo.tscn"
+      },
+      "auto_regenerate": false
+    },
+    {
+      "level_id": "level_012",
+      "campaign_order": 12,
+      "region_id": "region_03",
+      "runtime_scene": "res://scenes/levels/Torre_dos_Ventos.tscn",
+      "origin": "authored",
+      "ownership": "authored",
+      "boss_ref": {
+        "boss_id": "boss_level_012",
+        "scene": "res://scenes/actors/ChefeAerion.tscn"
+      },
+      "auto_regenerate": false
+    },
+    {
+      "level_id": "level_013",
+      "campaign_order": 13,
+      "region_id": "region_03",
+      "runtime_scene": "res://scenes/levels/Torre_da_Tempestade.tscn",
+      "origin": "authored",
+      "ownership": "authored",
+      "boss_ref": {
+        "boss_id": "boss_level_013",
+        "scene": "res://scenes/actors/ChefeVoltaris.tscn"
+      },
+      "auto_regenerate": false
+    },
+    {
+      "level_id": "level_014",
+      "campaign_order": 14,
+      "region_id": "region_03",
+      "runtime_scene": "res://scenes/levels/Observatorio_Lunar.tscn",
+      "origin": "authored",
+      "ownership": "authored",
+      "boss_ref": {
+        "boss_id": "boss_level_014",
+        "scene": "res://scenes/actors/ChefeSacerdotisaLunar.tscn"
+      },
+      "auto_regenerate": false
+    },
+    {
+      "level_id": "level_015",
+      "campaign_order": 15,
+      "region_id": "region_03",
+      "runtime_scene": "res://scenes/levels/O_Pico_Esquecido.tscn",
+      "origin": "authored",
+      "ownership": "authored",
+      "boss_ref": {
+        "boss_id": "boss_level_015",
+        "scene": "res://scenes/actors/ChefeVyrak.tscn"
+      },
+      "auto_regenerate": false
+    },
+    {
+      "level_id": "level_016",
+      "campaign_order": 16,
+      "region_id": "region_04",
+      "runtime_scene": "res://scenes/levels/Cemiterio_dos_Reis.tscn",
+      "origin": "authored",
+      "ownership": "authored",
+      "boss_ref": {
+        "boss_id": "boss_level_016",
+        "scene": "res://scenes/actors/ChefeReiOssario.tscn"
+      },
+      "auto_regenerate": false
+    },
+    {
+      "level_id": "level_017",
+      "campaign_order": 17,
+      "region_id": "region_04",
+      "runtime_scene": "res://scenes/levels/Galeria_dos_Ossos.tscn",
+      "origin": "authored",
+      "ownership": "authored",
+      "boss_ref": {
+        "boss_id": "boss_level_017",
+        "scene": "res://scenes/actors/ChefeColossoOsseo.tscn"
+      },
+      "auto_regenerate": false
+    },
+    {
+      "level_id": "level_018",
+      "campaign_order": 18,
+      "region_id": "region_04",
+      "runtime_scene": "res://scenes/levels/Cripta_das_Mil_Velas.tscn",
+      "origin": "authored",
+      "ownership": "authored",
+      "boss_ref": {
+        "boss_id": "boss_level_018",
+        "scene": "res://scenes/actors/ChefeFreiraNegra.tscn"
+      },
+      "auto_regenerate": false
+    },
+    {
+      "level_id": "level_019",
+      "campaign_order": 19,
+      "region_id": "region_04",
+      "runtime_scene": "res://scenes/levels/Templo_da_Serpente.tscn",
+      "origin": "authored",
+      "ownership": "authored",
+      "boss_ref": {
+        "boss_id": "boss_level_019",
+        "scene": "res://scenes/actors/ChefeNagaZeraph.tscn"
+      },
+      "auto_regenerate": false
+    },
+    {
+      "level_id": "level_020",
+      "campaign_order": 20,
+      "region_id": "region_04",
+      "runtime_scene": "res://scenes/levels/O_Abismo.tscn",
+      "origin": "authored",
+      "ownership": "authored",
+      "boss_ref": {
+        "boss_id": "boss_level_020",
+        "scene": "res://scenes/actors/ChefeOlhoDoAbismo.tscn"
+      },
+      "auto_regenerate": false
+    },
+    {
+      "level_id": "level_021",
+      "campaign_order": 21,
+      "region_id": "region_05",
+      "runtime_scene": "res://scenes/levels/Vila_dos_Sem_Rosto.tscn",
+      "origin": "authored",
+      "ownership": "authored",
+      "boss_ref": {
+        "boss_id": "boss_level_021",
+        "scene": "res://scenes/actors/ChefePrefeitoSemRosto.tscn"
+      },
+      "auto_regenerate": false
+    },
+    {
+      "level_id": "level_022",
+      "campaign_order": 22,
+      "region_id": "region_05",
+      "runtime_scene": "res://scenes/levels/Mercado_da_Carne.tscn",
+      "origin": "authored",
+      "ownership": "authored",
+      "boss_ref": {
+        "boss_id": "boss_level_022",
+        "scene": "res://scenes/actors/ChefeAcougueiroReal.tscn"
+      },
+      "auto_regenerate": false
+    },
+    {
+      "level_id": "level_023",
+      "campaign_order": 23,
+      "region_id": "region_05",
+      "runtime_scene": "res://scenes/levels/Trem_dos_Mortos.tscn",
+      "origin": "authored",
+      "ownership": "authored",
+      "boss_ref": {
+        "boss_id": "boss_level_023",
+        "scene": "res://scenes/actors/ChefeMaquinistaInfernal.tscn"
+      },
+      "auto_regenerate": false
+    },
+    {
+      "level_id": "level_024",
+      "campaign_order": 24,
+      "region_id": "region_05",
+      "runtime_scene": "res://scenes/levels/Catedral_da_Corrupcao.tscn",
+      "origin": "authored",
+      "ownership": "authored",
+      "boss_ref": {
+        "boss_id": "boss_level_024",
+        "scene": "res://scenes/actors/ChefeBispoPurpura.tscn"
+      },
+      "auto_regenerate": false
+    },
+    {
+      "level_id": "level_025",
+      "campaign_order": 25,
+      "region_id": "region_05",
+      "runtime_scene": "res://scenes/levels/Praca_do_Eclipse.tscn",
+      "origin": "authored",
+      "ownership": "authored",
+      "boss_ref": {
+        "boss_id": "boss_level_025",
+        "scene": "res://scenes/actors/ChefeNoivaDoEclipse.tscn"
+      },
+      "auto_regenerate": false
+    },
+    {
+      "level_id": "level_026",
+      "campaign_order": 26,
+      "region_id": "region_06",
+      "runtime_scene": "res://scenes/levels/Portoes_de_Zeriko.tscn",
+      "origin": "authored",
+      "ownership": "authored",
+      "boss_ref": {
+        "boss_id": "boss_level_026",
+        "scene": "res://scenes/actors/ChefeCapitaoNegro.tscn"
+      },
+      "auto_regenerate": false
+    },
+    {
+      "level_id": "level_027",
+      "campaign_order": 27,
+      "region_id": "region_06",
+      "runtime_scene": "res://scenes/levels/Salao_dos_Espelhos.tscn",
+      "origin": "authored",
+      "ownership": "authored",
+      "boss_ref": {
+        "boss_id": "boss_level_027",
+        "scene": "res://scenes/actors/ChefeKolianiSombria.tscn"
+      },
+      "auto_regenerate": false
+    },
+    {
+      "level_id": "level_028",
+      "campaign_order": 28,
+      "region_id": "region_06",
+      "runtime_scene": "res://scenes/levels/Banquete_dos_Imortais.tscn",
+      "origin": "authored",
+      "ownership": "authored",
+      "boss_ref": {
+        "boss_id": "boss_level_028",
+        "scene": "res://scenes/actors/ChefeReiDevorador.tscn"
+      },
+      "auto_regenerate": false
+    },
+    {
+      "level_id": "level_029",
+      "campaign_order": 29,
+      "region_id": "region_06",
+      "runtime_scene": "res://scenes/levels/Torre_do_Coracao_Negro.tscn",
+      "origin": "authored",
+      "ownership": "authored",
+      "boss_ref": {
+        "boss_id": "boss_level_029",
+        "scene": "res://scenes/actors/ChefeArautoDeZeriko.tscn"
+      },
+      "auto_regenerate": false
+    },
+    {
+      "level_id": "level_030",
+      "campaign_order": 30,
+      "region_id": "region_06",
+      "runtime_scene": "res://scenes/levels/O_Trono_de_Zeriko.tscn",
+      "origin": "authored",
+      "ownership": "authored",
+      "boss_ref": {
+        "boss_id": "boss_level_030",
+        "scene": "res://scenes/actors/ChefeZerikoFinal.tscn"
+      },
+      "auto_regenerate": false
+    },
+    {
+      "level_id": "level_031",
+      "campaign_order": 31,
+      "region_id": "region_07",
+      "runtime_scene": "res://scenes/levels/Estrada_das_Cinzas.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_031",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|30",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_031",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 2110,
+          "config_ref": "tools/afinar_atmosfera.py#level_031"
+        }
+      }
+    },
+    {
+      "level_id": "level_032",
+      "campaign_order": 32,
+      "region_id": "region_07",
+      "runtime_scene": "res://scenes/levels/Rio_de_Magma.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_032",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|31",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_032",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 2147,
+          "config_ref": "tools/afinar_atmosfera.py#level_032"
+        }
+      }
+    },
+    {
+      "level_id": "level_033",
+      "campaign_order": 33,
+      "region_id": "region_07",
+      "runtime_scene": "res://scenes/levels/A_Forja_dos_Demonios.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_033",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|32",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_033",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 2184,
+          "config_ref": "tools/afinar_atmosfera.py#level_033"
+        }
+      }
+    },
+    {
+      "level_id": "level_034",
+      "campaign_order": 34,
+      "region_id": "region_07",
+      "runtime_scene": "res://scenes/levels/Vulcao_do_Rei_Morto.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_034",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|33",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_034",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 2221,
+          "config_ref": "tools/afinar_atmosfera.py#level_034"
+        }
+      }
+    },
+    {
+      "level_id": "level_035",
+      "campaign_order": 35,
+      "region_id": "region_07",
+      "runtime_scene": "res://scenes/levels/O_Ceu_em_Chamas.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_035",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|34",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_035",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 2258,
+          "config_ref": "tools/afinar_atmosfera.py#level_035"
+        }
+      }
+    },
+    {
+      "level_id": "level_036",
+      "campaign_order": 36,
+      "region_id": "region_08",
+      "runtime_scene": "res://scenes/levels/Porto_dos_Afogados.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_036",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|35",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_036",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 2295,
+          "config_ref": "tools/afinar_atmosfera.py#level_036"
+        }
+      }
+    },
+    {
+      "level_id": "level_037",
+      "campaign_order": 37,
+      "region_id": "region_08",
+      "runtime_scene": "res://scenes/levels/Cidade_Submersa.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_037",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|36",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_037",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 2332,
+          "config_ref": "tools/afinar_atmosfera.py#level_037"
+        }
+      }
+    },
+    {
+      "level_id": "level_038",
+      "campaign_order": 38,
+      "region_id": "region_08",
+      "runtime_scene": "res://scenes/levels/Palacio_das_Sereias_Mortas.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_038",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|37",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_038",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 2369,
+          "config_ref": "tools/afinar_atmosfera.py#level_038"
+        }
+      }
+    },
+    {
+      "level_id": "level_039",
+      "campaign_order": 39,
+      "region_id": "region_08",
+      "runtime_scene": "res://scenes/levels/Ossario_das_Baleias.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_039",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|38",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_039",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 2406,
+          "config_ref": "tools/afinar_atmosfera.py#level_039"
+        }
+      }
+    },
+    {
+      "level_id": "level_040",
+      "campaign_order": 40,
+      "region_id": "region_08",
+      "runtime_scene": "res://scenes/levels/Abismo_Oceanico.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_040",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|39",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_040",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 2443,
+          "config_ref": "tools/afinar_atmosfera.py#level_040"
+        }
+      }
+    },
+    {
+      "level_id": "level_041",
+      "campaign_order": 41,
+      "region_id": "region_09",
+      "runtime_scene": "res://scenes/levels/Floresta_Congelada.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_041",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|40",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_041",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 2480,
+          "config_ref": "tools/afinar_atmosfera.py#level_041"
+        }
+      }
+    },
+    {
+      "level_id": "level_042",
+      "campaign_order": 42,
+      "region_id": "region_09",
+      "runtime_scene": "res://scenes/levels/Montanha_dos_Ventos.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_042",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|41",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_042",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 2517,
+          "config_ref": "tools/afinar_atmosfera.py#level_042"
+        }
+      }
+    },
+    {
+      "level_id": "level_043",
+      "campaign_order": 43,
+      "region_id": "region_09",
+      "runtime_scene": "res://scenes/levels/Cavernas_Cristalinas.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_043",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|42",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_043",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 2554,
+          "config_ref": "tools/afinar_atmosfera.py#level_043"
+        }
+      }
+    },
+    {
+      "level_id": "level_044",
+      "campaign_order": 44,
+      "region_id": "region_09",
+      "runtime_scene": "res://scenes/levels/Castelo_Congelado.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_044",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|43",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_044",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 2591,
+          "config_ref": "tools/afinar_atmosfera.py#level_044"
+        }
+      }
+    },
+    {
+      "level_id": "level_045",
+      "campaign_order": 45,
+      "region_id": "region_09",
+      "runtime_scene": "res://scenes/levels/Coracao_do_Inverno.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_045",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|44",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_045",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 2628,
+          "config_ref": "tools/afinar_atmosfera.py#level_045"
+        }
+      }
+    },
+    {
+      "level_id": "level_046",
+      "campaign_order": 46,
+      "region_id": "region_10",
+      "runtime_scene": "res://scenes/levels/Mar_de_Areia.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_046",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|45",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_046",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 2665,
+          "config_ref": "tools/afinar_atmosfera.py#level_046"
+        }
+      }
+    },
+    {
+      "level_id": "level_047",
+      "campaign_order": 47,
+      "region_id": "region_10",
+      "runtime_scene": "res://scenes/levels/Templo_Sem_Nome.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_047",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|46",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_047",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 2702,
+          "config_ref": "tools/afinar_atmosfera.py#level_047"
+        }
+      }
+    },
+    {
+      "level_id": "level_048",
+      "campaign_order": 48,
+      "region_id": "region_10",
+      "runtime_scene": "res://scenes/levels/Vale_dos_Escorpioes.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_048",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|47",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_048",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 2739,
+          "config_ref": "tools/afinar_atmosfera.py#level_048"
+        }
+      }
+    },
+    {
+      "level_id": "level_049",
+      "campaign_order": 49,
+      "region_id": "region_10",
+      "runtime_scene": "res://scenes/levels/Cidade_Enterrada.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_049",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|48",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_049",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 2776,
+          "config_ref": "tools/afinar_atmosfera.py#level_049"
+        }
+      }
+    },
+    {
+      "level_id": "level_050",
+      "campaign_order": 50,
+      "region_id": "region_10",
+      "runtime_scene": "res://scenes/levels/Piramide_Negra.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_050",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|49",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_050",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 2813,
+          "config_ref": "tools/afinar_atmosfera.py#level_050"
+        }
+      }
+    },
+    {
+      "level_id": "level_051",
+      "campaign_order": 51,
+      "region_id": "region_11",
+      "runtime_scene": "res://scenes/levels/Jardim_das_Rosas_Negras.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_051",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|50",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_051",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 2850,
+          "config_ref": "tools/afinar_atmosfera.py#level_051"
+        }
+      }
+    },
+    {
+      "level_id": "level_052",
+      "campaign_order": 52,
+      "region_id": "region_11",
+      "runtime_scene": "res://scenes/levels/Labirinto_Verde.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_052",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|51",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_052",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 2887,
+          "config_ref": "tools/afinar_atmosfera.py#level_052"
+        }
+      }
+    },
+    {
+      "level_id": "level_053",
+      "campaign_order": 53,
+      "region_id": "region_11",
+      "runtime_scene": "res://scenes/levels/Jardim_das_Almas.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_053",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|52",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_053",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 2924,
+          "config_ref": "tools/afinar_atmosfera.py#level_053"
+        }
+      }
+    },
+    {
+      "level_id": "level_054",
+      "campaign_order": 54,
+      "region_id": "region_11",
+      "runtime_scene": "res://scenes/levels/Estufa_Maldita.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_054",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|53",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_054",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 2961,
+          "config_ref": "tools/afinar_atmosfera.py#level_054"
+        }
+      }
+    },
+    {
+      "level_id": "level_055",
+      "campaign_order": 55,
+      "region_id": "region_11",
+      "runtime_scene": "res://scenes/levels/Arvore_do_Rei.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_055",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|54",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_055",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 2998,
+          "config_ref": "tools/afinar_atmosfera.py#level_055"
+        }
+      }
+    },
+    {
+      "level_id": "level_056",
+      "campaign_order": 56,
+      "region_id": "region_12",
+      "runtime_scene": "res://scenes/levels/Distrito_das_Engrenagens.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_056",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|55",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_056",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 3035,
+          "config_ref": "tools/afinar_atmosfera.py#level_056"
+        }
+      }
+    },
+    {
+      "level_id": "level_057",
+      "campaign_order": 57,
+      "region_id": "region_12",
+      "runtime_scene": "res://scenes/levels/Linha_13.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_057",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|56",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_057",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 3072,
+          "config_ref": "tools/afinar_atmosfera.py#level_057"
+        }
+      }
+    },
+    {
+      "level_id": "level_058",
+      "campaign_order": 58,
+      "region_id": "region_12",
+      "runtime_scene": "res://scenes/levels/Fabrica_dos_Homunculos.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_058",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|57",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_058",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 3109,
+          "config_ref": "tools/afinar_atmosfera.py#level_058"
+        }
+      }
+    },
+    {
+      "level_id": "level_059",
+      "campaign_order": 59,
+      "region_id": "region_12",
+      "runtime_scene": "res://scenes/levels/Torre_Electrica.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_059",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|58",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_059",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 3146,
+          "config_ref": "tools/afinar_atmosfera.py#level_059"
+        }
+      }
+    },
+    {
+      "level_id": "level_060",
+      "campaign_order": 60,
+      "region_id": "region_12",
+      "runtime_scene": "res://scenes/levels/Coracao_da_Maquina.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_060",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|59",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_060",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 3183,
+          "config_ref": "tools/afinar_atmosfera.py#level_060"
+        }
+      }
+    },
+    {
+      "level_id": "level_061",
+      "campaign_order": 61,
+      "region_id": "region_13",
+      "runtime_scene": "res://scenes/levels/Ilhas_Flutuantes.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_061",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|60",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_061",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 3220,
+          "config_ref": "tools/afinar_atmosfera.py#level_061"
+        }
+      }
+    },
+    {
+      "level_id": "level_062",
+      "campaign_order": 62,
+      "region_id": "region_13",
+      "runtime_scene": "res://scenes/levels/Templo_do_Trovao.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_062",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|61",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_062",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 3257,
+          "config_ref": "tools/afinar_atmosfera.py#level_062"
+        }
+      }
+    },
+    {
+      "level_id": "level_063",
+      "campaign_order": 63,
+      "region_id": "region_13",
+      "runtime_scene": "res://scenes/levels/Cidade_dos_Anjos_Mortos.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_063",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|62",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_063",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 3294,
+          "config_ref": "tools/afinar_atmosfera.py#level_063"
+        }
+      }
+    },
+    {
+      "level_id": "level_064",
+      "campaign_order": 64,
+      "region_id": "region_13",
+      "runtime_scene": "res://scenes/levels/Lua_Quebrada.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_064",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|63",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_064",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 3331,
+          "config_ref": "tools/afinar_atmosfera.py#level_064"
+        }
+      }
+    },
+    {
+      "level_id": "level_065",
+      "campaign_order": 65,
+      "region_id": "region_13",
+      "runtime_scene": "res://scenes/levels/O_Fim_do_Ceu.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_065",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|64",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_065",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 3368,
+          "config_ref": "tools/afinar_atmosfera.py#level_065"
+        }
+      }
+    },
+    {
+      "level_id": "level_066",
+      "campaign_order": 66,
+      "region_id": "region_14",
+      "runtime_scene": "res://scenes/levels/Vila_dos_Sonhos.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_066",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|65",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_066",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 3405,
+          "config_ref": "tools/afinar_atmosfera.py#level_066"
+        }
+      }
+    },
+    {
+      "level_id": "level_067",
+      "campaign_order": 67,
+      "region_id": "region_14",
+      "runtime_scene": "res://scenes/levels/Mundo_Invertido.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_067",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|66",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_067",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 3442,
+          "config_ref": "tools/afinar_atmosfera.py#level_067"
+        }
+      }
+    },
+    {
+      "level_id": "level_068",
+      "campaign_order": 68,
+      "region_id": "region_14",
+      "runtime_scene": "res://scenes/levels/Quarto_das_Criancas_Mortas.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_068",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|67",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_068",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 3479,
+          "config_ref": "tools/afinar_atmosfera.py#level_068"
+        }
+      }
+    },
+    {
+      "level_id": "level_069",
+      "campaign_order": 69,
+      "region_id": "region_14",
+      "runtime_scene": "res://scenes/levels/Pesadelo.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_069",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|68",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_069",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 3516,
+          "config_ref": "tools/afinar_atmosfera.py#level_069"
+        }
+      }
+    },
+    {
+      "level_id": "level_070",
+      "campaign_order": 70,
+      "region_id": "region_14",
+      "runtime_scene": "res://scenes/levels/A_Mente.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_070",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|69",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_070",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 3553,
+          "config_ref": "tools/afinar_atmosfera.py#level_070"
+        }
+      }
+    },
+    {
+      "level_id": "level_071",
+      "campaign_order": 71,
+      "region_id": "region_15",
+      "runtime_scene": "res://scenes/levels/Avenida_dos_Mortos.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_071",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|70",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_071",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 3590,
+          "config_ref": "tools/afinar_atmosfera.py#level_071"
+        }
+      }
+    },
+    {
+      "level_id": "level_072",
+      "campaign_order": 72,
+      "region_id": "region_15",
+      "runtime_scene": "res://scenes/levels/Cemiterio_Infinito.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_072",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|71",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_072",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 3627,
+          "config_ref": "tools/afinar_atmosfera.py#level_072"
+        }
+      }
+    },
+    {
+      "level_id": "level_073",
+      "campaign_order": 73,
+      "region_id": "region_15",
+      "runtime_scene": "res://scenes/levels/Catedral_Fantasma.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_073",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|72",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_073",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 3664,
+          "config_ref": "tools/afinar_atmosfera.py#level_073"
+        }
+      }
+    },
+    {
+      "level_id": "level_074",
+      "campaign_order": 74,
+      "region_id": "region_15",
+      "runtime_scene": "res://scenes/levels/Palacio_dos_Reis_Mortos.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_074",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|73",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_074",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 3701,
+          "config_ref": "tools/afinar_atmosfera.py#level_074"
+        }
+      }
+    },
+    {
+      "level_id": "level_075",
+      "campaign_order": 75,
+      "region_id": "region_15",
+      "runtime_scene": "res://scenes/levels/Trono_da_Morte.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_075",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|74",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_075",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 3738,
+          "config_ref": "tools/afinar_atmosfera.py#level_075"
+        }
+      }
+    },
+    {
+      "level_id": "level_076",
+      "campaign_order": 76,
+      "region_id": "region_16",
+      "runtime_scene": "res://scenes/levels/Margem_do_Sangue.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_076",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|75",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_076",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 3775,
+          "config_ref": "tools/afinar_atmosfera.py#level_076"
+        }
+      }
+    },
+    {
+      "level_id": "level_077",
+      "campaign_order": 77,
+      "region_id": "region_16",
+      "runtime_scene": "res://scenes/levels/Serpentes_do_Mar.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_077",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|76",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_077",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 3812,
+          "config_ref": "tools/afinar_atmosfera.py#level_077"
+        }
+      }
+    },
+    {
+      "level_id": "level_078",
+      "campaign_order": 78,
+      "region_id": "region_16",
+      "runtime_scene": "res://scenes/levels/Navio_da_Condenacao.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_078",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|77",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_078",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 3849,
+          "config_ref": "tools/afinar_atmosfera.py#level_078"
+        }
+      }
+    },
+    {
+      "level_id": "level_079",
+      "campaign_order": 79,
+      "region_id": "region_16",
+      "runtime_scene": "res://scenes/levels/Fortaleza_Kraken.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_079",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|78",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_079",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 3886,
+          "config_ref": "tools/afinar_atmosfera.py#level_079"
+        }
+      }
+    },
+    {
+      "level_id": "level_080",
+      "campaign_order": 80,
+      "region_id": "region_16",
+      "runtime_scene": "res://scenes/levels/Coracao_Vermelho.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_080",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|79",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_080",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 3923,
+          "config_ref": "tools/afinar_atmosfera.py#level_080"
+        }
+      }
+    },
+    {
+      "level_id": "level_081",
+      "campaign_order": 81,
+      "region_id": "region_17",
+      "runtime_scene": "res://scenes/levels/Portao_Infernal.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_081",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|80",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_081",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 3960,
+          "config_ref": "tools/afinar_atmosfera.py#level_081"
+        }
+      }
+    },
+    {
+      "level_id": "level_082",
+      "campaign_order": 82,
+      "region_id": "region_17",
+      "runtime_scene": "res://scenes/levels/Cidade_dos_Demonios.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_082",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|81",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_082",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 3997,
+          "config_ref": "tools/afinar_atmosfera.py#level_082"
+        }
+      }
+    },
+    {
+      "level_id": "level_083",
+      "campaign_order": 83,
+      "region_id": "region_17",
+      "runtime_scene": "res://scenes/levels/Rio_das_Almas.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_083",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|82",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_083",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 4034,
+          "config_ref": "tools/afinar_atmosfera.py#level_083"
+        }
+      }
+    },
+    {
+      "level_id": "level_084",
+      "campaign_order": 84,
+      "region_id": "region_17",
+      "runtime_scene": "res://scenes/levels/Palacio_de_Sangue.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_084",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|83",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_084",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 4071,
+          "config_ref": "tools/afinar_atmosfera.py#level_084"
+        }
+      }
+    },
+    {
+      "level_id": "level_085",
+      "campaign_order": 85,
+      "region_id": "region_17",
+      "runtime_scene": "res://scenes/levels/Trono_Infernal.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_085",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|84",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_085",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 4108,
+          "config_ref": "tools/afinar_atmosfera.py#level_085"
+        }
+      }
+    },
+    {
+      "level_id": "level_086",
+      "campaign_order": 86,
+      "region_id": "region_18",
+      "runtime_scene": "res://scenes/levels/Primeiro_Vazio.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_086",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|85",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_086",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 4145,
+          "config_ref": "tools/afinar_atmosfera.py#level_086"
+        }
+      }
+    },
+    {
+      "level_id": "level_087",
+      "campaign_order": 87,
+      "region_id": "region_18",
+      "runtime_scene": "res://scenes/levels/Segundo_Vazio.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_087",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|86",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_087",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 4182,
+          "config_ref": "tools/afinar_atmosfera.py#level_087"
+        }
+      }
+    },
+    {
+      "level_id": "level_088",
+      "campaign_order": 88,
+      "region_id": "region_18",
+      "runtime_scene": "res://scenes/levels/Labirinto_Impossivel.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_088",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|87",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_088",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 4219,
+          "config_ref": "tools/afinar_atmosfera.py#level_088"
+        }
+      }
+    },
+    {
+      "level_id": "level_089",
+      "campaign_order": 89,
+      "region_id": "region_18",
+      "runtime_scene": "res://scenes/levels/A_Coisa_Atras_do_Mundo.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_089",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|88",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_089",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 4256,
+          "config_ref": "tools/afinar_atmosfera.py#level_089"
+        }
+      }
+    },
+    {
+      "level_id": "level_090",
+      "campaign_order": 90,
+      "region_id": "region_18",
+      "runtime_scene": "res://scenes/levels/Centro_do_Vazio.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_090",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|89",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_090",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 4293,
+          "config_ref": "tools/afinar_atmosfera.py#level_090"
+        }
+      }
+    },
+    {
+      "level_id": "level_091",
+      "campaign_order": 91,
+      "region_id": "region_19",
+      "runtime_scene": "res://scenes/levels/Campo_de_Batalha.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_091",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|90",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_091",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 4330,
+          "config_ref": "tools/afinar_atmosfera.py#level_091"
+        }
+      }
+    },
+    {
+      "level_id": "level_092",
+      "campaign_order": 92,
+      "region_id": "region_19",
+      "runtime_scene": "res://scenes/levels/Ceu_em_Guerra.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_092",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|91",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_092",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 4367,
+          "config_ref": "tools/afinar_atmosfera.py#level_092"
+        }
+      }
+    },
+    {
+      "level_id": "level_093",
+      "campaign_order": 93,
+      "region_id": "region_19",
+      "runtime_scene": "res://scenes/levels/Cerco_ao_Castelo.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_093",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|92",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_093",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 4404,
+          "config_ref": "tools/afinar_atmosfera.py#level_093"
+        }
+      }
+    },
+    {
+      "level_id": "level_094",
+      "campaign_order": 94,
+      "region_id": "region_19",
+      "runtime_scene": "res://scenes/levels/Torre_da_Corrupcao.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_094",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|93",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_094",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 4441,
+          "config_ref": "tools/afinar_atmosfera.py#level_094"
+        }
+      }
+    },
+    {
+      "level_id": "level_095",
+      "campaign_order": 95,
+      "region_id": "region_19",
+      "runtime_scene": "res://scenes/levels/Os_Cem_Guerreiros.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_095",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|94",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_095",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 4478,
+          "config_ref": "tools/afinar_atmosfera.py#level_095"
+        }
+      }
+    },
+    {
+      "level_id": "level_096",
+      "campaign_order": 96,
+      "region_id": "region_20",
+      "runtime_scene": "res://scenes/levels/O_Reino_Antes_da_Corrupcao.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_096",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|95",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_096",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 4515,
+          "config_ref": "tools/afinar_atmosfera.py#level_096"
+        }
+      }
+    },
+    {
+      "level_id": "level_097",
+      "campaign_order": 97,
+      "region_id": "region_20",
+      "runtime_scene": "res://scenes/levels/O_Primeiro_Castelo.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_097",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|96",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_097",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 4552,
+          "config_ref": "tools/afinar_atmosfera.py#level_097"
+        }
+      }
+    },
+    {
+      "level_id": "level_098",
+      "campaign_order": 98,
+      "region_id": "region_20",
+      "runtime_scene": "res://scenes/levels/O_Coracao_de_Zeriko.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_098",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|97",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_098",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 4589,
+          "config_ref": "tools/afinar_atmosfera.py#level_098"
+        }
+      }
+    },
+    {
+      "level_id": "level_099",
+      "campaign_order": 99,
+      "region_id": "region_20",
+      "runtime_scene": "res://scenes/levels/O_Fim_de_Tudo.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_099",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|98",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_099",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 4626,
+          "config_ref": "tools/afinar_atmosfera.py#level_099"
+        }
+      }
+    },
+    {
+      "level_id": "level_100",
+      "campaign_order": 100,
+      "region_id": "region_20",
+      "runtime_scene": "res://scenes/levels/O_Ultimo_Salto.tscn",
+      "origin": "generated",
+      "ownership": "unknown",
+      "boss_ref": {
+        "boss_id": "boss_level_100",
+        "scene": "res://scenes/actors/ChefeGenerico.tscn"
+      },
+      "auto_regenerate": false,
+      "generator": {
+        "identity": "koliani.level_scene_generator",
+        "version": "2.0.0",
+        "seed": "jornada4|99",
+        "config_ref": "tools/gerar_niveis_31_100.py#level_100",
+        "runtime_generator": "res://scripts/gerador_corredor.gd",
+        "atmosphere": {
+          "identity": "koliani.atmosphere_tuning",
+          "version": "1.0.0",
+          "seed": 4663,
+          "config_ref": "tools/afinar_atmosfera.py#level_100"
+        }
+      }
+    }
+  ]
+}

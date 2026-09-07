@@ -6,12 +6,18 @@ extends Node
 ## sobre a mae e que niveis/regioes ja foram concluidos. Toda a logica aqui e pura o
 ## suficiente para ser testada com `godot --headless` (ver tests/).
 ##
-## Save simples em JSON em `user://progresso.json`. Sem servidor.
+## Save versionado em JSON em `user://progresso.json`, com TEMP e backup.
 
-## O modo HARDCORE **não persiste** (é esse o conceito -- perder = recomeçar
-## tudo, game over). Só o modo normal grava, e num ficheiro que o hardcore
-## nunca toca. Ver `guardar()`/`carregar()`.
 const CAMINHO_SAVE := "user://progresso.json"
+const CAMINHO_SAVE_BACKUP := "user://progresso.json.bak"
+const CAMINHO_SAVE_TEMP := "user://progresso.json.tmp"
+const _SAVE := preload("res://scripts/save_foundation.gd")
+const _IDS := preload("res://scripts/progression_ids.gd")
+const _LEVEL_SESSION := preload("res://scripts/level_session.gd")
+const CURRENT_SAVE_VERSION := _SAVE.CURRENT_SAVE_VERSION
+
+var ultimo_erro_save: String = ""
+var ultima_origem_save: String = ""
 
 ## Tabela do equipamento. `preload` por caminho (e não o nome global
 ## `Equipamento`) porque este autoload é o 1.º a arrancar -- não pode
@@ -35,25 +41,6 @@ const HABILIDADES_TODAS := ["salto_duplo", "dash_aereo", "partir_paredes", "escu
 ## (ver koliani.gd). Garantido em `reiniciar_campanha()` e ao carregar saves
 ## antigos que ainda não o tinham.
 const HABILIDADES_INICIAIS: Array[String] = ["salto_duplo"]
-
-## Modo hardcore: tempo (segundos) para completar cada NÍVEL. Ao esgotar ->
-## Game Over e a campanha recomeça do nível 1. Uma entrada por nível (mesma
-## ordem de `NIVEIS`), a subir por região e com folga extra nos níveis-fim
-## de região; o nível 30 (Zeriko, 4 formas) leva o mais tempo. Ainda "a olho".
-# NB (2 set 2026): reperfilado outra vez -- `comprimento_base` da Jornada
-# desceu de 6200 para 1800 (nível 1 "básico, ~1 minuto") e `por_nivel` subiu
-# de 880 para 1050 (para o nível 30 continuar a chegar perto do
-# comprimento_max de antes). Estes valores escalam pela MESMA proporção
-# (comprimento novo / antigo, nível a nível) em vez de reinventar as
-# margens -- mantém a forma já afinada, só corrige o comprimento.
-const TEMPO_HARDCORE := [
-	49.0, 74.0, 98.0, 120.0, 154.0,        # I   Floresta
-	146.0, 166.0, 185.0, 204.0, 239.0,     # II  Prisão
-	221.0, 240.0, 258.0, 276.0, 316.0,     # III Torres
-	289.0, 307.0, 325.0, 343.0, 389.0,     # IV  Catacumbas
-	354.0, 372.0, 390.0, 407.0, 455.0,     # V   Cidade
-	418.0, 435.0, 453.0, 470.0, 646.0,     # VI  Castelo (+ Zeriko)
-]
 
 ## Sequencia fixa de mundos ate ao Zeriko (platformer por niveis, nao
 ## roguelite). O agente "gaming" acrescenta/renomeia niveis aqui a medida
@@ -224,9 +211,13 @@ const DANO_BASE := 50
 
 var vidas: int = VIDAS_INICIAIS
 var indice_nivel: int = 0
-## Posicao do ultimo checkpoint tocado no nivel atual (Vector2.ZERO = usar
-## o ponto de spawn do proprio nivel).
+## Contexto runtime resolvido do checkpoint seguro. Compatibilidade para os
+## consumidores de gameplay; desde v4 esta coordenada NAO e persistida.
 var checkpoint: Vector2 = Vector2.ZERO
+## Estado temporario persistido, separado dos campos permanentes da campanha.
+## Guarda apenas stable IDs; o mundo e sempre reconstruido pela cena.
+var level_session: Dictionary = _LEVEL_SESSION.vazia()
+var _spawn_inicio_sessao: Vector2 = Vector2.ZERO
 var habilidades: Array[String] = HABILIDADES_INICIAIS.duplicate()
 var pistas: Array[String] = []
 ## Equipamento ganho ao longo da campanha (ids de `Equipamento.ARMAS` /
@@ -239,6 +230,10 @@ var armadura_equipada: String = ""
 ## `reiniciar_campanha()` limpa. E' o que o mapa de regioes usa para marcar
 ## niveis/regioes como feitos.
 var concluidos: Array[int] = []
+## IDs persistentes explícitos dos chefes derrotados e recompensas únicas já
+## reclamadas. Não dependem do nome do nó, da cena ou do texto apresentado.
+var bosses_derrotados: Array[String] = []
+var recompensas_reclamadas: Array[String] = []
 
 ## --- ECONOMIA -------------------------------------------------------------
 ## Essência: moeda mágica largada por inimigos + em caches nas alcovas dos
@@ -247,17 +242,6 @@ var concluidos: Array[int] = []
 var essencia: int = 0
 ## id da melhoria -> rank atual (int, 0..Melhorias.max_rank).
 var melhorias: Dictionary = {}
-
-## Campanha a decorrer em modo hardcore (tempo limite por mundo). Fica
-## gravada no save -- um LOAD GAME retoma no mesmo modo. O menu inicial é
-## que a liga/desliga; `reiniciar_campanha()` de propósito NÃO lhe mexe
-## (assim o Game Over do hardcore recomeça já em hardcore).
-var hardcore: bool = false
-## Segundos que faltam no relógio do mundo atual (modo hardcore). < 0 =
-## "ainda não começou / recomeçar cheio". Gravado no save e mantido em
-## memória através das mortes -- por isso o tempo **continua a contar** a
-## cada morte; só `avancar_nivel()` / `reiniciar_campanha()` o repõem.
-var hardcore_tempo_restante: float = -1.0
 
 ## Posto a true pelos testes (ver tests/run_tests.gd) para NÃO tocar no
 ## ficheiro de save real ao instanciar o estado fora do jogo.
@@ -305,11 +289,6 @@ func ha_proximo_nivel() -> bool:
 	return indice_nivel + 1 < NIVEIS.size()
 
 
-## Tempo limite (segundos) do mundo atual em modo hardcore.
-func tempo_hardcore_nivel() -> float:
-	return TEMPO_HARDCORE[clampi(indice_nivel, 0, TEMPO_HARDCORE.size() - 1)]
-
-
 ## Posto a true quando `avancar_nivel()` salta mesmo de nível; a cena de
 ## jogo lê-o uma vez (banner "Avançou para o Nível N") e limpa. Não é
 ## gravado -- vive só entre a Porta e o `_ready` do nível seguinte.
@@ -317,16 +296,13 @@ var anunciar_avanco := false
 
 
 func avancar_nivel() -> void:
+	var level_id := _IDS.level_id_do_indice(indice_nivel)
 	marcar_nivel_concluido(indice_nivel)
+	completar_sessao_nivel(level_id, false)
 	if ha_proximo_nivel():
-		# +1 vida por nível passado (pedido do Paulo). No hardcore não: lá as
-		# vidas são o próprio limite do run.
-		if not hardcore:
-			vidas = mini(VIDAS_MAX, vidas + VIDAS_POR_NIVEL)
-			vidas_mudaram.emit(vidas)
+		vidas = mini(VIDAS_MAX, vidas + VIDAS_POR_NIVEL)
+		vidas_mudaram.emit(vidas)
 		indice_nivel += 1
-		checkpoint = Vector2.ZERO
-		hardcore_tempo_restante = -1.0  # mundo novo = relógio cheio
 		anunciar_avanco = true
 		_limpar_jornada_ancora()
 		guardar()
@@ -339,8 +315,54 @@ func marcar_nivel_concluido(indice: int) -> void:
 		return
 	concluidos.append(indice)
 	concluidos.sort()
+	_registar_chefe_do_nivel_sem_guardar(indice)
+	_registar_recompensa_do_nivel_sem_guardar(indice)
 	conceder_recompensa(indice)
 	guardar()
+
+
+func marcar_chefe_derrotado_por_nivel(indice: int) -> bool:
+	if not _registar_chefe_do_nivel_sem_guardar(indice):
+		return false
+	guardar()
+	return true
+
+
+func chefe_derrotado_por_nivel(indice: int) -> bool:
+	var boss_id := _IDS.boss_id_do_indice(indice)
+	return boss_id != "" and boss_id in bosses_derrotados
+
+
+func _registar_chefe_do_nivel_sem_guardar(indice: int) -> bool:
+	var boss_id := _IDS.boss_id_do_indice(indice)
+	if boss_id == "" or boss_id in bosses_derrotados:
+		return false
+	bosses_derrotados.append(boss_id)
+	bosses_derrotados.sort()
+	return true
+
+
+func recompensa_reclamada(reward_id: String) -> bool:
+	return reward_id in recompensas_reclamadas
+
+
+func marcar_recompensa_reclamada(reward_id: String) -> bool:
+	if reward_id == "" or reward_id not in _IDS.reward_ids() \
+			or reward_id in recompensas_reclamadas:
+		return false
+	recompensas_reclamadas.append(reward_id)
+	recompensas_reclamadas.sort()
+	guardar()
+	return true
+
+
+func _registar_recompensa_do_nivel_sem_guardar(indice: int) -> bool:
+	var reward_id := _IDS.reward_id_bau_chefe(_IDS.level_id_do_indice(indice))
+	if reward_id == "" or reward_id in recompensas_reclamadas:
+		return false
+	recompensas_reclamadas.append(reward_id)
+	recompensas_reclamadas.sort()
+	return true
 
 
 ## --- Equipamento (armas / armaduras) -------------------------------------
@@ -546,7 +568,7 @@ func ha_progresso() -> bool:
 	# as habilidades iniciais (salto duplo) não contam como progresso
 	var habilidade_ganha := habilidades.any(
 		func(h: String) -> bool: return h not in HABILIDADES_INICIAIS)
-	return indice_nivel > 0 or checkpoint != Vector2.ZERO \
+	return indice_nivel > 0 or level_session.get("active", false) \
 		or habilidade_ganha or not pistas.is_empty()
 
 
@@ -556,11 +578,10 @@ func ha_progresso() -> bool:
 ## energia infinita e ignorar dano.
 func ativar_modo_dev() -> void:
 	modo_dev = true
-	hardcore = false
 	vidas = 99
 	indice_nivel = 0
-	checkpoint = Vector2.ZERO
-	hardcore_tempo_restante = -1.0
+	_limpar_level_session_runtime()
+	level_session = _LEVEL_SESSION.vazia()
 	_limpar_jornada_ancora()
 	habilidades.assign(HABILIDADES_TODAS)
 	# modo dev: também todo o equipamento desbloqueado (a arma/armadura mais
@@ -584,21 +605,22 @@ func ativar_modo_dev() -> void:
 ## Modo normal: gastaram-se as vidas todas, MAS o progresso fica. Volta-se
 ## ao início do nível actual (o seguinte ao último chefe morto) com as
 ## vidas cheias -- habilidades, pistas, níveis concluídos e equipamento
-## mantêm-se. (No hardcore isto não corre: lá gastar as vidas é o fim do run.)
+## mantêm-se.
 ##
 ## As vidas voltam ao valor de PARTIDA para o ponto onde ele já vai -- não a
 ## 5 secas: com o +1 por nível, mandá-lo de volta às 5 no nível 60 era um
 ## castigo que o pedido não pede.
 func reiniciar_run() -> void:
 	vidas = vidas_de_partida()
-	checkpoint = Vector2.ZERO
-	hardcore_tempo_restante = -1.0  # nova tentativa -> relógio do nível cheio
 	_limpar_jornada_ancora()
 	# nunca à frente do progresso: nível a seguir ao último chefe derrotado
 	var teto := -1
 	for i in concluidos:
 		teto = maxi(teto, i)
 	indice_nivel = clampi(indice_nivel, 0, mini(teto + 1, NIVEIS.size() - 1))
+	level_session = _LEVEL_SESSION.iniciar(
+		_LEVEL_SESSION.vazia(), _IDS.level_id_do_indice(indice_nivel), true)
+	_limpar_level_session_runtime()
 	vidas_mudaram.emit(vidas)
 	guardar()
 
@@ -607,33 +629,123 @@ func reiniciar_campanha() -> void:
 	modo_dev = false
 	vidas = VIDAS_INICIAIS
 	indice_nivel = 0
-	checkpoint = Vector2.ZERO
+	level_session = _LEVEL_SESSION.vazia()
+	_limpar_level_session_runtime()
 	habilidades.assign(HABILIDADES_INICIAIS)
 	pistas.clear()
 	concluidos.clear()
+	bosses_derrotados.clear()
+	recompensas_reclamadas.clear()
 	armas.clear()
 	armaduras.clear()
 	arma_equipada = ""
 	armadura_equipada = ""
 	essencia = 0
 	melhorias.clear()
-	hardcore_tempo_restante = -1.0  # NB: `hardcore` (o modo) fica como está
 	_limpar_jornada_ancora()
 	vidas_mudaram.emit(vidas)
 	guardar()
 
 
-## --- Checkpoints ------------------------------------------------------
+## --- Level Session / Checkpoints --------------------------------------
 
+func iniciar_sessao_nivel(forcar_nova := false) -> void:
+	var level_id := _IDS.level_id_do_indice(indice_nivel)
+	var anterior := level_session.duplicate(true)
+	level_session = _LEVEL_SESSION.iniciar(level_session, level_id, forcar_nova)
+	_limpar_level_session_runtime()
+	if level_session != anterior:
+		guardar()
+
+
+func ativar_checkpoint(checkpoint_id: String, posicao_segura: Vector2) -> bool:
+	var level_id := _IDS.level_id_do_indice(indice_nivel)
+	if not _LEVEL_SESSION.id_valido_para_nivel(checkpoint_id, level_id):
+		return false
+	var anterior := level_session.duplicate(true)
+	level_session = _LEVEL_SESSION.ativar(level_session, level_id, checkpoint_id)
+	checkpoint = posicao_segura
+	if level_session != anterior:
+		guardar()
+	return true
+
+
+## Compatibilidade estreita para ferramentas antigas. Runtime normal deve
+## ativar por stable ID através de `ativar_checkpoint`.
 func definir_checkpoint(posicao: Vector2) -> void:
 	checkpoint = posicao
+	if checkpoint_id_session() == _LEVEL_SESSION.id_inicio(
+			_IDS.level_id_do_indice(indice_nivel)):
+		_spawn_inicio_sessao = posicao
+
+
+func registar_spawn_inicio(posicao: Vector2) -> void:
+	_spawn_inicio_sessao = posicao
+	if level_session.get("checkpoint_id", "") == _LEVEL_SESSION.id_inicio(
+			_IDS.level_id_do_indice(indice_nivel)):
+		checkpoint = posicao
+
+
+func registar_checkpoint_disponivel(checkpoint_id: String,
+		posicao_segura: Vector2) -> bool:
+	if str(level_session.get("checkpoint_id", "")) != checkpoint_id:
+		return false
+	checkpoint = posicao_segura
+	return true
+
+
+func validar_checkpoints_disponiveis(ids_disponiveis: Array[String]) -> bool:
+	var level_id := _IDS.level_id_do_indice(indice_nivel)
+	var esperado := str(level_session.get("checkpoint_id", ""))
+	if esperado == _LEVEL_SESSION.id_inicio(level_id):
+		checkpoint = _spawn_inicio_sessao
+		return true
+	if esperado in ids_disponiveis:
+		return true
+	# ID bem formado mas inexistente nesta reconstrução: fallback controlado.
+	level_session = _LEVEL_SESSION.iniciar(_LEVEL_SESSION.vazia(), level_id, true)
+	checkpoint = _spawn_inicio_sessao
 	guardar()
+	return false
+
+
+func checkpoint_id_session() -> String:
+	return str(level_session.get("checkpoint_id", "")) \
+		if level_session.get("active", false) else ""
+
+
+func ponto_recuperacao() -> Vector2:
+	return checkpoint if checkpoint != Vector2.ZERO else _spawn_inicio_sessao
+
+
+func completar_sessao_nivel(level_id: String, guardar_agora := true) -> bool:
+	if not level_session.get("active", false) \
+			or str(level_session.get("level_id", "")) != level_id:
+		return false
+	level_session = _LEVEL_SESSION.vazia()
+	_limpar_level_session_runtime()
+	if guardar_agora:
+		guardar()
+	return true
+
+
+func abandonar_sessao_nivel() -> void:
+	if not level_session.get("active", false):
+		return
+	level_session = _LEVEL_SESSION.vazia()
+	_limpar_level_session_runtime()
+	guardar()
+
+
+func _limpar_level_session_runtime() -> void:
+	checkpoint = Vector2.ZERO
+	_spawn_inicio_sessao = Vector2.ZERO
 
 
 ## --- Habilidades / pistas -------------------------------------------------
 
 func desbloquear_habilidade(id: String) -> void:
-	if id in habilidades:
+	if _IDS.ability_id_da_chave_runtime(id) == "" or id in habilidades:
 		return
 	habilidades.append(id)
 	habilidade_desbloqueada.emit(id)
@@ -677,7 +789,7 @@ func tem_habilidade(id: String) -> bool:
 
 
 func registar_pista(id: String) -> void:
-	if id in pistas:
+	if id not in _IDS.collectible_ids() or id in pistas:
 		return
 	pistas.append(id)
 	pista_encontrada.emit(id, pistas.size())
@@ -735,19 +847,31 @@ func bonus(chave: String) -> float:
 ## --- Persistencia ------------------------------------------------------
 
 func para_dicionario() -> Dictionary:
+	var ability_ids: Array[String] = []
+	for chave: String in habilidades:
+		var ability_id := _IDS.ability_id_da_chave_runtime(chave)
+		if ability_id != "" and ability_id not in ability_ids:
+			ability_ids.append(ability_id)
+	var completed_level_ids: Array[String] = []
+	for indice: int in concluidos:
+		var level_id := _IDS.level_id_do_indice(indice)
+		if level_id != "" and level_id not in completed_level_ids:
+			completed_level_ids.append(level_id)
 	return {
+		"save_version": CURRENT_SAVE_VERSION,
+		"save_kind": _SAVE.SAVE_KIND,
 		"vidas": vidas,
-		"indice_nivel": indice_nivel,
-		"checkpoint": [checkpoint.x, checkpoint.y],
-		"habilidades": habilidades,
-		"pistas": pistas,
-		"concluidos": concluidos,
+		"current_level_id": _IDS.level_id_do_indice(indice_nivel),
+		"level_session": level_session.duplicate(true),
+		"ability_ids": ability_ids,
+		"collectible_ids": pistas,
+		"completed_level_ids": completed_level_ids,
+		"defeated_boss_ids": bosses_derrotados,
+		"claimed_reward_ids": recompensas_reclamadas,
 		"armas": armas,
 		"armaduras": armaduras,
 		"arma_equipada": arma_equipada,
 		"armadura_equipada": armadura_equipada,
-		"hardcore": hardcore,
-		"hardcore_tempo_restante": hardcore_tempo_restante,
 		"essencia": essencia,
 		"melhorias": melhorias.duplicate(),
 	}
@@ -755,27 +879,33 @@ func para_dicionario() -> Dictionary:
 
 func de_dicionario(d: Dictionary) -> void:
 	vidas = int(d.get("vidas", VIDAS_INICIAIS))
-	indice_nivel = int(d.get("indice_nivel", 0))
-	var c: Array = d.get("checkpoint", [0, 0])
-	checkpoint = Vector2(c[0], c[1]) if c.size() == 2 else Vector2.ZERO
-	habilidades.assign(d.get("habilidades", []))
+	indice_nivel = maxi(0, _IDS.indice_do_level_id(str(d.get("current_level_id", "level_001"))))
+	level_session = _LEVEL_SESSION.normalizar(
+		d.get("level_session", {}), _IDS.level_id_do_indice(indice_nivel))
+	_limpar_level_session_runtime()
+	habilidades.clear()
+	for ability_id: String in d.get("ability_ids", []):
+		var chave := _IDS.chave_runtime_da_ability_id(ability_id)
+		if chave != "" and chave not in habilidades:
+			habilidades.append(chave)
 	# saves antigos (feitos antes de o salto duplo passar a básico) podem não
 	# ter as habilidades iniciais -- garante-as sempre
 	for h in HABILIDADES_INICIAIS:
 		if h not in habilidades:
 			habilidades.append(h)
-	pistas.assign(d.get("pistas", []))
+	pistas.assign(d.get("collectible_ids", []))
 	armas.assign(d.get("armas", []))
 	armaduras.assign(d.get("armaduras", []))
 	arma_equipada = str(d.get("arma_equipada", ""))
 	armadura_equipada = str(d.get("armadura_equipada", ""))
-	# JSON traz os índices como float -> converter para int
-	var cs: Array = d.get("concluidos", [])
 	concluidos.clear()
-	for ci in cs:
-		concluidos.append(int(ci))
-	hardcore = bool(d.get("hardcore", false))
-	hardcore_tempo_restante = float(d.get("hardcore_tempo_restante", -1.0))
+	for level_id: String in d.get("completed_level_ids", []):
+		var indice := _IDS.indice_do_level_id(level_id)
+		if indice >= 0 and indice not in concluidos:
+			concluidos.append(indice)
+	concluidos.sort()
+	bosses_derrotados.assign(d.get("defeated_boss_ids", []))
+	recompensas_reclamadas.assign(d.get("claimed_reward_ids", []))
 	essencia = int(d.get("essencia", 0))
 	melhorias.clear()
 	var ms: Dictionary = d.get("melhorias", {})
@@ -783,26 +913,47 @@ func de_dicionario(d: Dictionary) -> void:
 		melhorias[str(k)] = int(ms[k])
 
 
-func guardar() -> void:
-	if modo_teste or hardcore:  # hardcore não persiste -- perder = recomeçar tudo
-		return
-	var f := FileAccess.open(CAMINHO_SAVE, FileAccess.WRITE)
-	if f == null:
-		push_warning("Nao consegui gravar o progresso em %s" % CAMINHO_SAVE)
-		return
-	f.store_string(JSON.stringify(para_dicionario(), "\t"))
-	f.close()
+func guardar() -> bool:
+	if modo_teste:
+		return false
+	return guardar_em(CAMINHO_SAVE, CAMINHO_SAVE_BACKUP, CAMINHO_SAVE_TEMP)
 
 
-func carregar() -> void:
-	if modo_teste or hardcore:
-		return
-	if not FileAccess.file_exists(CAMINHO_SAVE):
-		return
-	var f := FileAccess.open(CAMINHO_SAVE, FileAccess.READ)
-	if f == null:
-		return
-	var dados: Variant = JSON.parse_string(f.get_as_text())
-	f.close()
-	if dados is Dictionary:
-		de_dicionario(dados)
+func guardar_em(primary: String, backup: String, temp: String) -> bool:
+	var resultado := _SAVE.escrever_seguro(
+		para_dicionario(), primary, backup, temp, NIVEIS.size())
+	ultimo_erro_save = str(resultado.get("error", ""))
+	if not resultado.get("ok", false):
+		push_warning("Nao consegui gravar o progresso: %s" % resultado.get("message", ""))
+		return false
+	return true
+
+
+func carregar() -> bool:
+	if modo_teste:
+		return false
+	return carregar_de(CAMINHO_SAVE, CAMINHO_SAVE_BACKUP)
+
+
+func carregar_de(primary: String, backup: String) -> bool:
+	ultima_origem_save = ""
+	if not FileAccess.file_exists(primary) and not FileAccess.file_exists(backup):
+		ultimo_erro_save = "not_found"
+		return false
+	var resultado := _SAVE.ler(primary, NIVEIS.size())
+	if resultado.get("ok", false):
+		de_dicionario(resultado["data"])
+		ultimo_erro_save = ""
+		ultima_origem_save = "primary"
+		return true
+	var erro_primary := str(resultado.get("error", "invalid_primary"))
+	var recuperado := _SAVE.ler(backup, NIVEIS.size())
+	if recuperado.get("ok", false):
+		de_dicionario(recuperado["data"])
+		ultimo_erro_save = erro_primary
+		ultima_origem_save = "backup"
+		push_warning("Primary invalido; progresso recuperado do backup")
+		return true
+	ultimo_erro_save = erro_primary
+	push_warning("Primary e backup de progresso invalidos ou inexistentes")
+	return false

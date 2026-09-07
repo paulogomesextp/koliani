@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://bkolianicripta18"]
+[gd_scene load_steps=14 format=3 uid="uid://bkolianicripta18"]
 
 ; REGIAO IV / nivel 18 -- Cripta das Mil Velas.
 ; Sala final FEITA A MAO (a JORNADA, que cresce com o nivel, vem antes). Luz e escuridao: plataformas que
@@ -18,6 +18,8 @@
 [ext_resource type="PackedScene" uid="uid://bkolianiplatluz18" path="res://scenes/actors/PlataformaLuz.tscn" id="10_luz"]
 [ext_resource type="PackedScene" uid="uid://bkolianivela18" path="res://scenes/actors/Vela.tscn" id="11_vela"]
 [ext_resource type="PackedScene" uid="uid://bkolianiaguavenenosa01" path="res://scenes/actors/AguaVenenosa.tscn" id="12_trevas"]
+
+[ext_resource type="PackedScene" path="res://scenes/actors/CascaMasmorra.tscn" id="interior_casca"]
 
 [sub_resource type="RectangleShape2D" id="rs_chk"]
 size = Vector2(44, 96)
@@ -225,3 +227,12 @@ shape = SubResource("rs_chk")
 [node name="Porta" parent="." instance=ExtResource("4_porta")]
 position = Vector2(2820, 626)
 pista_ao_atravessar = ""
+
+[node name="Casca" parent="." instance=ExtResource("interior_casca")]
+topo = -128.0
+altura = 2200.0
+largura = 3252.0
+volumes_interiores = Array[Rect2]([Rect2(8, -128, 448, 384), Rect2(456, -128, 448, 384), Rect2(904, -128, 448, 384), Rect2(1352, -128, 448, 320), Rect2(1800, -128, 448, 320), Rect2(2248, -128, 448, 384), Rect2(2696, -128, 448, 416)])
+esquerda = -120.0
+chao = false
+agua = false

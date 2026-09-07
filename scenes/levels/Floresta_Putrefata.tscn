@@ -306,6 +306,7 @@ scale = Vector2(2.6, 1.6)
 
 [node name="Koliani" parent="." instance=ExtResource("1_kol")]
 position = Vector2(150, 620)
+usar_prototipo_premium = true
 
 [node name="CheckInicio" type="Area2D" parent="."]
 position = Vector2(430, 636)

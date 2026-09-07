@@ -172,7 +172,9 @@ func _teleportar_ao_boss() -> void:
 	if escolhido:
 		k.global_position = escolhido.global_position + Vector2(0.0, -42.0)
 		k.set("velocity", Vector2.ZERO)
-		EstadoJogo.checkpoint = escolhido.global_position
+		if "checkpoint_id" in escolhido:
+			EstadoJogo.ativar_checkpoint(
+				escolhido.get("checkpoint_id"), escolhido.global_position)
 	else:
 		k.global_position = boss.global_position + Vector2(-220.0, -42.0)
 		k.set("velocity", Vector2.ZERO)
@@ -233,5 +235,5 @@ func _fechar() -> void:
 func _ir_para(i: int) -> void:
 	get_tree().paused = false
 	EstadoJogo.indice_nivel = clampi(i, 0, EstadoJogo.NIVEIS.size() - 1)
-	EstadoJogo.checkpoint = Vector2.ZERO
+	EstadoJogo.iniciar_sessao_nivel(true)
 	Transicao.fechar_e(func() -> void: get_tree().change_scene_to_file(CENA_JOGO))

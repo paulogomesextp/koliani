@@ -19,21 +19,34 @@ chefe no fim, nao uma sala desenhada como as 29 da campanha original. E' a
 troca assumida para 70 niveis caberem em tempo humano; qualquer um deles
 pode ser reescrito a' mao depois, e ai' basta por `corredor = false`.
 
-  python tools/gerar_niveis_31_100.py            # escreve
-  python tools/gerar_niveis_31_100.py --dry-run  # so' diz o que faria
+Por segurança, a execução normal escreve apenas em staging. A promoção para as
+cenas runtime consulta `data/level_manifest.json` e é recusada para conteúdo
+authored, hybrid ou de ownership unknown.
 
-Depois de correr: `godot --headless --import` e
-`python tools/afinar_atmosfera.py` (que da' a cada nivel o seu ceu).
+  python tools/gerar_niveis_31_100.py            # staging seguro
+  python tools/gerar_niveis_31_100.py --dry-run  # so' descreve
+  python tools/gerar_niveis_31_100.py --promote  # sujeito ao manifesto
 """
 
 from __future__ import annotations
 
-import io
+import argparse
 import os
+import shutil
 import sys
+
+from level_contract import (
+    carregar_manifesto,
+    caminho_local,
+    motivo_protecao,
+    validar_pasta_staging,
+)
 
 RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEST = os.path.join(RAIZ, "scenes", "levels")
+STAGING = os.path.join(RAIZ, "work", "generator_staging", "levels_31_100")
+GENERATOR_ID = "koliani.level_scene_generator"
+GENERATOR_VERSION = "2.0.0"
 
 # Um nivel = (ficheiro, indice0, regiao_id, arquetipo, vida, rim, sprite, nota)
 #   indice0  -- indice em `EstadoJogo.NIVEIS` (0-based)
@@ -260,8 +273,8 @@ MODELO_CHEFE = '''[gd_scene load_steps=8 format=3 uid="uid://bkoliani{uid}"]
 ; REGIAO {regiao_num} / nivel {n} -- {titulo}.
 ; {nota}
 ;
-; CENA GERADA por `tools/gerar_niveis_31_100.py` -- NAO editar a' mao: o
-; proximo `python tools/gerar_niveis_31_100.py` apaga o que aqui se puser.
+; CENA GERADA por `tools/gerar_niveis_31_100.py` em staging.
+; A promocao para runtime e' controlada por `data/level_manifest.json`.
 ; A JORNADA (`corredor = true`, `gerador_corredor.gd`) constroi tudo o que
 ; vem antes desta sala; aqui so' esta' a arena do chefe.
 ; O bloco `Atmosfera` e' reescrito por `tools/afinar_atmosfera.py`.
@@ -332,7 +345,8 @@ MODELO_GUARDIAO = '''[gd_scene load_steps=8 format=3 uid="uid://bkoliani{uid}"]
 ; NIVEL SEM CHEFE. A regiao tem um chefe so' -- o ultimo dos cinco --
 ; e este acaba num GUARDIAO (elite) que sela a porta ate' cair.
 ;
-; CENA GERADA por `tools/gerar_niveis_31_100.py` -- NAO editar a' mao.
+; CENA GERADA por `tools/gerar_niveis_31_100.py` em staging.
+; A promocao para runtime e' controlada por `data/level_manifest.json`.
 ; O bloco `Atmosfera` e' reescrito por `tools/afinar_atmosfera.py`.
 
 [ext_resource type="PackedScene" uid="uid://bkolianiactor01" path="res://scenes/actors/Koliani.tscn" id="1_kol"]
@@ -500,85 +514,104 @@ LIQUIDO_REGIAO = {
 }
 
 
-SELETOR = os.path.join(RAIZ, "scripts", "seletor_niveis.gd")
+def renderizar_nivel(dados: tuple) -> str:
+    """Produz o texto determinístico de uma cena sem tocar no disco."""
+    ficheiro, idx0, bioma, fim, arq, vida, rim, rig, nota = dados
+    # O estado runtime atual tem boss explícito em todos os níveis 31–100.
+    fim = "chefe"
+    n = idx0 + 1
+    return (MODELO_CHEFE if fim == "chefe" else MODELO_GUARDIAO).format(
+        uid=ficheiro.lower().replace("_", "") + str(n),
+        regiao_num=(idx0 // 5) + 1,
+        n=n,
+        titulo=TITULOS[ficheiro],
+        nota=nota,
+        ficheiro=ficheiro,
+        bioma=bioma,
+        arquetipo=arq,
+        vida=vida,
+        rim=rim,
+        rig=rig,
+        especie=rig,
+        liq=LIQUIDO_REGIAO.get(idx0 // 5, ((0.74, 0.28, 0.05, 0.95), "true"))[0],
+        brasas=LIQUIDO_REGIAO.get(idx0 // 5, ((0, 0, 0, 0), "true"))[1],
+        extra=AFINACAO.get(arq, "") if fim == "chefe" else "",
+    )
 
 
-def retratos() -> None:
-    """Escreve a cauda de `SeletorNiveis.RETRATO_CHEFE` (niveis 31-100).
-
-    O carrossel mostra o boneco do chefe/guardiao de cada nivel. Ate' 3 set
-    2026 a tabela tinha 30 entradas escritas a' mao e os niveis 31-100
-    apareciam sem retrato nenhum. Passa a sair daqui: e' esta tabela que
-    sabe que rig/especie tem cada nivel, portanto e' aqui que a lista se
-    mantem sozinha em sincronia -- troca-se o chefe de um nivel e o retrato
-    do carrossel segue atras.
-
-    Escreve so' a CAUDA: as 30 primeiras entradas sao dos niveis 1-30, que
-    nao vem desta tabela, e ficam intactas.
-    """
-    marca = "const RETRATO_CHEFE := ["
-    fim_marca = "\n]\n"
-    s = io.open(SELETOR, encoding="utf-8").read()
-    i = s.index(marca)
-    j = s.index(fim_marca, i)
-    manual = []
-    aspas = 0
-    for linha in s[i + len(marca):j].split("\n"):
-        if not linha.strip() or linha.strip().startswith("#"):
+def recusas_promocao(level_ids: list[str]) -> list[str]:
+    por_id = {nivel["level_id"]: nivel for nivel in carregar_manifesto()["levels"]}
+    recusas = []
+    for level_id in level_ids:
+        nivel = por_id.get(level_id)
+        if nivel is None:
+            recusas.append("%s: ausente do manifesto" % level_id)
             continue
-        manual.append(linha)
-        aspas += linha.count('"')
-        if aspas >= 60:          # 30 slugs = 60 aspas: acabaram os 1-30
-            break
-
-    linhas = [marca] + manual + [
-        "\t# --- niveis 31-100 -- GERADO por tools/gerar_niveis_31_100.py --------",
-        "\t# Rig animado (bosses_anim/) nos chefes, especie (enemies/) nos",
-        "\t# guardioes; o `_retrato_chefe` tenta as duas pastas.",
-    ]
-    for k in range(0, len(NIVEIS), 5):
-        fatia = NIVEIS[k:k + 5]
-        linhas.append("\t" + " ".join('"%s",' % n[7] for n in fatia)
-                      + "   # %d-%d" % (fatia[0][1] + 1, fatia[-1][1] + 1))
-    io.open(SELETOR, "w", encoding="utf-8", newline="\n").write(
-        s[:i] + "\n".join(linhas) + s[j:])
-    print("  RETRATO_CHEFE: +%d retratos (niveis 31-100)" % len(NIVEIS))
+        motivo = motivo_protecao(nivel)
+        if motivo:
+            recusas.append("%s: %s" % (level_id, motivo))
+    return recusas
 
 
 def main() -> int:
-    seco = "--dry-run" in sys.argv
-    for ficheiro, idx0, bioma, fim, arq, vida, rim, rig, nota in NIVEIS:
-        # A campanha passou a exigir um boss em todos os 100 níveis.
-        # Mantemos a tabela e as notas dos antigos guardiões como ponto de
-        # partida, mas todos usam agora a máquina de boss e selam a porta.
-        fim = "chefe"
+    parser = argparse.ArgumentParser(description="Gerador seguro dos níveis 31–100")
+    parser.add_argument("--dry-run", action="store_true", help="não escreve ficheiros")
+    parser.add_argument("--staging-dir", default=STAGING, help="pasta de staging")
+    parser.add_argument("--promote", action="store_true", help="promove apenas targets autorizados")
+    parser.add_argument("--level-id", action="append", dest="level_ids", help="limita a um ID estável")
+    args = parser.parse_args()
+    try:
+        args.staging_dir = validar_pasta_staging(args.staging_dir)
+    except ValueError as erro:
+        print("RECUSADO: %s" % erro, file=sys.stderr)
+        return 2
+
+    selecionados = set(args.level_ids or [])
+    linhas = [dados for dados in NIVEIS
+              if not selecionados or "level_%03d" % (dados[1] + 1) in selecionados]
+    conhecidos = {"level_%03d" % (dados[1] + 1) for dados in linhas}
+    desconhecidos = selecionados - conhecidos
+    if desconhecidos:
+        for level_id in sorted(desconhecidos):
+            print("RECUSADO %s: não pertence aos níveis 31–100" % level_id, file=sys.stderr)
+        return 2
+
+    level_ids = ["level_%03d" % (dados[1] + 1) for dados in linhas]
+    if args.promote:
+        recusas = recusas_promocao(level_ids)
+        if recusas:
+            for recusa in recusas:
+                print("RECUSADO " + recusa, file=sys.stderr)
+            print("Nenhuma cena runtime foi alterada.", file=sys.stderr)
+            return 2
+
+    if not args.dry_run:
+        os.makedirs(args.staging_dir, exist_ok=True)
+
+    for dados in linhas:
+        ficheiro, idx0, _bioma, _fim, _arq, _vida, _rim, rig, _nota = dados
         n = idx0 + 1
-        texto = (MODELO_CHEFE if fim == "chefe" else MODELO_GUARDIAO).format(
-            uid=ficheiro.lower().replace("_", "") + str(n),
-            regiao_num=(idx0 // 5) + 1,
-            n=n,
-            titulo=TITULOS[ficheiro],
-            nota=nota,
-            ficheiro=ficheiro,
-            bioma=bioma,
-            arquetipo=arq,
-            vida=vida,
-            rim=rim,
-            rig=rig,
-            especie=rig,
-            liq=LIQUIDO_REGIAO.get(idx0 // 5, ((0.74, 0.28, 0.05, 0.95), "true"))[0],
-            brasas=LIQUIDO_REGIAO.get(idx0 // 5, ((0, 0, 0, 0), "true"))[1],
-            extra=AFINACAO.get(arq, "") if fim == "chefe" else "",
-        )
-        cam = os.path.join(DEST, ficheiro + ".tscn")
-        print("  %-24s n%-3d %-8s vida=%-4d %-14s %s" % (
-            ficheiro, n, fim, vida, rig, "(dry-run)" if seco else ""))
-        if not seco:
-            with open(cam, "w", encoding="utf-8", newline="\n") as f:
+        texto = renderizar_nivel(dados)
+        staged = os.path.join(args.staging_dir, ficheiro + ".tscn")
+        print("  %-24s n%-3d %-14s %s" % (
+            ficheiro, n, rig, "(dry-run)" if args.dry_run else "-> staging"))
+        if not args.dry_run:
+            with open(staged, "w", encoding="utf-8", newline="\n") as f:
                 f.write(texto)
-    if not seco:
-        retratos()
-    print("%d niveis" % len(NIVEIS))
+
+    if args.promote and not args.dry_run:
+        manifesto = {nivel["level_id"]: nivel for nivel in carregar_manifesto()["levels"]}
+        for dados in linhas:
+            level_id = "level_%03d" % (dados[1] + 1)
+            origem = os.path.join(args.staging_dir, dados[0] + ".tscn")
+            destino = caminho_local(manifesto[level_id]["runtime_scene"])
+            temporario = destino + ".promotion_pending"
+            shutil.copyfile(origem, temporario)
+            os.replace(temporario, destino)
+        print("%d cenas promovidas segundo o manifesto" % len(linhas))
+    elif not args.dry_run:
+        print("Staging concluído; cenas runtime e seletor permaneceram intactos.")
+    print("%d niveis" % len(linhas))
     return 0
 
 

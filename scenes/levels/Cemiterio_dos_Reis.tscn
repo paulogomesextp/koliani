@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://bkolianicemiterio16"]
+[gd_scene load_steps=13 format=3 uid="uid://bkolianicemiterio16"]
 
 ; REGIAO IV / nivel 16 -- Cemiterio dos Reis.
 ; Sala final FEITA A MAO (a JORNADA, que cresce com o nivel, vem antes). Catacumba a DESCER. Tumulos que
@@ -17,6 +17,8 @@
 [ext_resource type="PackedScene" uid="uid://bkolianiplataforma01" path="res://scenes/actors/Plataforma.tscn" id="9_pl"]
 [ext_resource type="PackedScene" uid="uid://bkolianitumuloelev16" path="res://scenes/actors/TumuloElevador.tscn" id="10_tumulo"]
 [ext_resource type="PackedScene" uid="uid://bkolianiaguavenenosa01" path="res://scenes/actors/AguaVenenosa.tscn" id="11_trevas"]
+
+[ext_resource type="PackedScene" path="res://scenes/actors/CascaMasmorra.tscn" id="interior_casca"]
 
 [sub_resource type="RectangleShape2D" id="rs_chk"]
 size = Vector2(44, 96)
@@ -228,3 +230,12 @@ shape = SubResource("rs_chk")
 [node name="Porta" parent="." instance=ExtResource("4_porta")]
 position = Vector2(2820, 666)
 pista_ao_atravessar = ""
+
+[node name="Casca" parent="." instance=ExtResource("interior_casca")]
+topo = -96.0
+altura = 2200.0
+largura = 3252.0
+volumes_interiores = Array[Rect2]([Rect2(8, -96, 640, 320), Rect2(648, -96, 640, 416), Rect2(1288, -96, 640, 352), Rect2(1928, -96, 640, 352), Rect2(2568, -96, 640, 416)])
+esquerda = -120.0
+chao = false
+agua = false

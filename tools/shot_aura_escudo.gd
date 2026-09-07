@@ -14,7 +14,6 @@ extends SceneTree
 
 const NIVEL := "res://scenes/levels/Level_Test.tscn"
 const LASER := "res://scenes/actors/ProjetilKoliani.tscn"
-const KAME := "res://scenes/actors/KamehamehaKoliani.tscn"
 
 
 func _init() -> void:
@@ -51,11 +50,6 @@ func _init() -> void:
 			p.global_position = k.global_position + Vector2(60.0 + 70.0 * i, -20.0 * i)
 			p.lancar(Vector2.RIGHT.rotated(deg_to_rad(-20.0 * i)), 10)
 			p.set_physics_process(false)
-		var kame := (load(KAME) as PackedScene).instantiate() as Node2D
-		k.get_parent().add_child(kame)
-		kame.global_position = k.global_position + Vector2(160.0, 60.0)
-		kame.lancar(Vector2.RIGHT, 10)
-		kame.set_physics_process(false)
 	else:
 		# Esperar pelo CHAO. Ela cai ao entrar no nivel e a defesa so' vale
 		# com os pes assentes -- premir cedo de mais nao levanta escudo

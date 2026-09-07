@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://bkolianigaleriaossos17"]
+[gd_scene load_steps=14 format=3 uid="uid://bkolianigaleriaossos17"]
 
 ; REGIAO IV / nivel 17 -- Galeria dos Ossos.
 ; Sala final FEITA A MAO (a JORNADA, que cresce com o nivel, vem antes). Corredores de osso apertados.
@@ -18,6 +18,8 @@
 [ext_resource type="PackedScene" uid="uid://bkolianiparedefragil01" path="res://scenes/actors/ParedeFragil.tscn" id="10_fragil"]
 [ext_resource type="PackedScene" uid="uid://bkolianiaguavenenosa01" path="res://scenes/actors/AguaVenenosa.tscn" id="11_trevas"]
 [ext_resource type="PackedScene" uid="uid://bkolianiessencia01" path="res://scenes/actors/Essencia.tscn" id="99_ess"]
+
+[ext_resource type="PackedScene" path="res://scenes/actors/CascaMasmorra.tscn" id="interior_casca"]
 
 [sub_resource type="RectangleShape2D" id="rs_chk"]
 size = Vector2(44, 96)
@@ -236,3 +238,12 @@ espalhar = false
 [node name="Porta" parent="." instance=ExtResource("4_porta")]
 position = Vector2(2820, 626)
 pista_ao_atravessar = ""
+
+[node name="Casca" parent="." instance=ExtResource("interior_casca")]
+topo = -96.0
+altura = 2200.0
+largura = 3252.0
+volumes_interiores = Array[Rect2]([Rect2(8, -96, 352, 352), Rect2(360, -96, 352, 320), Rect2(712, -96, 352, 320), Rect2(1064, -96, 352, 320), Rect2(1416, -96, 352, 320), Rect2(1768, -96, 352, 320), Rect2(2120, -96, 352, 352), Rect2(2472, -96, 352, 384), Rect2(2824, -96, 352, 384)])
+esquerda = -120.0
+chao = false
+agua = false

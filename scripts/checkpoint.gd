@@ -13,6 +13,13 @@ const COR_LENHA := Color(0.29, 0.19, 0.14)
 const COR_LENHA_ACESA := Color(0.46, 0.29, 0.19)
 const COR_PEDRA := Color(0.3, 0.3, 0.36)
 const COR_LUZ := Color(1.0, 0.76, 0.32)
+const LEVEL_SESSION := preload("res://scripts/level_session.gd")
+const IDS_PROGRESSAO := preload("res://scripts/progression_ids.gd")
+
+## Identidade persistente. Pode ser fixada explicitamente por conteúdo
+## autoral; quando vazia, é atribuída pela ordem de percurso dos checkpoints
+## ativos do nível (`checkpoint_level_005_03`, por exemplo).
+@export var checkpoint_id := ""
 
 var _ativo := false
 var _t := 0.0
@@ -46,8 +53,48 @@ func _ready() -> void:
 	# `main.gd` só põe a cama de ambiente depois dos filhos -- avaliar (e
 	# tocar) mais cedo seria pisado por essa cama.
 	_avaliar_ultimo.call_deferred()
-	if EstadoJogo.checkpoint.is_equal_approx(global_position):
+	_preparar_identidade.call_deferred()
+
+
+func _preparar_identidade() -> void:
+	# `NivelComChefe` reduz fogueiras em deferred. Esperar quatro frames garante
+	# que a identidade descreve apenas o conjunto semanticamente ativo.
+	for _i in 4:
+		await get_tree().process_frame
+	if not is_inside_tree() or is_queued_for_deletion():
+		return
+	var level_id := IDS_PROGRESSAO.level_id_do_indice(EstadoJogo.indice_nivel)
+	var checkpoints: Array[Node2D] = []
+	for no in get_tree().get_nodes_in_group("checkpoints"):
+		if no is Node2D and is_instance_valid(no) and not no.is_queued_for_deletion():
+			checkpoints.append(no as Node2D)
+	checkpoints.sort_custom(func(a: Node2D, b: Node2D) -> bool:
+		if not is_equal_approx(a.global_position.x, b.global_position.x):
+			return a.global_position.x < b.global_position.x
+		return a.global_position.y < b.global_position.y)
+	var ordem := checkpoints.find(self) + 1
+	if checkpoint_id == "" and ordem > 0:
+		checkpoint_id = LEVEL_SESSION.id_checkpoint(level_id, ordem)
+	if not LEVEL_SESSION.id_valido_para_nivel(checkpoint_id, level_id):
+		push_warning("Checkpoint sem identidade valida em %s" % global_position)
+		return
+	if EstadoJogo.registar_checkpoint_disponivel(checkpoint_id, global_position):
 		_ativar(true)
+		var koliani := get_tree().get_first_node_in_group("koliani")
+		if koliani and koliani.has_method("recuperar_no_checkpoint"):
+			koliani.call_deferred("recuperar_no_checkpoint", global_position)
+	# A primeira fogueira valida o conjunto completo. Um ID persistido que ja
+	# nao existe converge para o spawn inicial, nunca para uma coordenada solta.
+	if ordem == 1:
+		var ids: Array[String] = []
+		for i in checkpoints.size():
+			var ck := checkpoints[i] as Checkpoint
+			var id := ck.checkpoint_id
+			if id == "":
+				id = LEVEL_SESSION.id_checkpoint(level_id, i + 1)
+			if id not in ids:
+				ids.append(id)
+		EstadoJogo.validar_checkpoints_disponiveis(ids)
 
 
 ## Decide se esta é a fogueira do chefe: de todas as do nível, a que está
@@ -245,8 +292,9 @@ func _process(dt: float) -> void:
 
 func _ao_entrar(corpo: Node) -> void:
 	if corpo is Koliani and not _ativo:
+		if not EstadoJogo.ativar_checkpoint(checkpoint_id, global_position):
+			return
 		_ativar(false)
-		EstadoJogo.definir_checkpoint(global_position)
 		Som.toca("selo", -12.0)
 		if _ultimo:
 			Musica.boss()

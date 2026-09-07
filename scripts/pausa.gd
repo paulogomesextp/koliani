@@ -2,8 +2,7 @@ extends CanvasLayer
 ## Menu de pausa. Abre/fecha com a ação `pausa` (tecla P ou Esc no PC, ou o
 ## botão do HUD) e também fecha com `ui_cancel`. Põe a árvore em pausa
 ## (`get_tree().paused`) e oferece duas saídas -- **Mapa de níveis** e
-## **Menu principal** -- além de Continuar. Em HARDCORE (sem mapa) o botão
-## do mapa dá lugar a "Recomeçar no checkpoint".
+## **Menu principal** -- além de Continuar.
 ##
 ## O diário usa o mesmo esquema -- só um deles segura a pausa de cada vez
 ## (ambos só abrem se a árvore ainda não estiver em pausa).
@@ -37,10 +36,8 @@ func _ready() -> void:
 	_mapa.pressed.connect(_ao_mapa)
 	_recomecar.pressed.connect(_ao_recomecar)
 	_menu.pressed.connect(_ao_menu)
-	# HARDCORE é linear e não tem Mapa do Mundo -> troca o botão.
-	var hardcore: bool = EstadoJogo.hardcore
-	_mapa.visible = not hardcore
-	_recomecar.visible = hardcore
+	_mapa.visible = true
+	_recomecar.visible = false
 	Textos.idioma_mudou.connect(func(_l: String) -> void: _traduzir())
 	_traduzir()
 	_destacar_continuar()
@@ -182,9 +179,11 @@ func _ao_recomecar() -> void:
 ## do início da próxima vez).
 func _ao_mapa() -> void:
 	get_tree().paused = false
+	EstadoJogo.abandonar_sessao_nivel()
 	Transicao.fechar_e(func() -> void: get_tree().change_scene_to_file(CENA_MAPA))
 
 
 func _ao_menu() -> void:
 	get_tree().paused = false
+	EstadoJogo.abandonar_sessao_nivel()
 	Transicao.fechar_e(func() -> void: get_tree().change_scene_to_file(CENA_MENU))

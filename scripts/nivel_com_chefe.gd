@@ -9,6 +9,7 @@ extends Node2D
 ## da campanha (o trono do Zeriko) nunca a tem.
 
 const GERADOR := preload("res://scripts/gerador_corredor.gd")
+const IDS_PROGRESSAO := preload("res://scripts/progression_ids.gd")
 const CANDEEIRO := preload("res://scenes/actors/Candeeiro.tscn")
 ## Só plataformas com ESTE script levam candeeiro (ver `_iluminar`).
 const CAMINHO_PLATAFORMA := "res://scripts/plataforma.gd"
@@ -70,10 +71,13 @@ var _entrada_fresca := true
 ## sem gastar um chefe: a campanha 31-100 passa a ter um chefe por REGIÃO
 ## (o último dos cinco) e guardiões nos outros quatro.
 @onready var _guardiao: Node = get_node_or_null("Guardiao")
+## Mantém a topologia de checkpoints quando um boss permanente já não deve
+## reaparecer: a fogueira segura junto da arena continua no mesmo lugar.
+var _boss_checkpoint_pos := Vector2.INF
 
 
 func _enter_tree() -> void:
-	_entrada_fresca = EstadoJogo.checkpoint == Vector2.ZERO
+	_entrada_fresca = EstadoJogo.checkpoint_id_session().ends_with("_start")
 
 
 func _ready() -> void:
@@ -93,6 +97,16 @@ func _ready() -> void:
 	_anunciar_mecanica.call_deferred()
 
 	if _porta == null:
+		return
+	# Boss defeat é campanha permanente. Se a cena for reconstruída depois
+	# de morte/reload, não recria a luta nem a recompensa de essência; apenas
+	# recompõe o baú único pendente ou abre a porta se já foi reclamado.
+	if _chefe and EstadoJogo.chefe_derrotado_por_nivel(EstadoJogo.indice_nivel):
+		_selar(true)
+		_boss_checkpoint_pos = (_chefe as Node2D).global_position
+		_chefe.queue_free()
+		_chefe = null
+		_abrir.call_deferred()
 		return
 	if _chefe and _chefe.has_signal("derrotado"):
 		_selar(true)
@@ -179,12 +193,19 @@ func _abrir() -> void:
 	if _bau_criado:
 		return
 	_bau_criado = true
+	EstadoJogo.marcar_chefe_derrotado_por_nivel(EstadoJogo.indice_nivel)
 	_criar_bau.call_deferred()
 
 func _criar_bau() -> void:
+	var level_id := IDS_PROGRESSAO.level_id_do_indice(EstadoJogo.indice_nivel)
+	var reward_id := IDS_PROGRESSAO.reward_id_bau_chefe(level_id)
+	if EstadoJogo.recompensa_reclamada(reward_id):
+		_selar(false)
+		return
 	var bau := Node2D.new()
 	bau.set_script(preload("res://scripts/bau_chefe.gd"))
 	bau.name = "BauChefe"
+	bau.reward_id = reward_id
 	# Ao lado da saída, assente na plataforma, mesmo com chefe voador.
 	var ponto: Vector2 = _porta.global_position + Vector2(-72, -150)
 	var raio := PhysicsRayQueryParameters2D.create(ponto, ponto + Vector2(0, 400), 1)
@@ -349,9 +370,11 @@ func _reduzir_checkpoints() -> void:
 
 	# garante um checkpoint perto do chefe -- se o mais próximo já lá
 	# estiver longe, acrescenta um novo mesmo à entrada da sala.
-	if _chefe:
-		var bx: float = (_chefe as Node2D).global_position.x
-		var by: float = (_chefe as Node2D).global_position.y
+	var boss_pos := (_chefe as Node2D).global_position \
+		if is_instance_valid(_chefe) else _boss_checkpoint_pos
+	if boss_pos != Vector2.INF:
+		var bx: float = boss_pos.x
+		var by: float = boss_pos.y
 		var mais_perto := INF
 		for c in meus:
 			mais_perto = minf(mais_perto, absf(c.global_position.x - bx))

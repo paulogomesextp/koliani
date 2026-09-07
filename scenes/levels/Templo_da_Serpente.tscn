@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://bkolianitemploserpente19"]
+[gd_scene load_steps=13 format=3 uid="uid://bkolianitemploserpente19"]
 
 ; REGIAO IV / nivel 19 -- Templo da Serpente.
 ; Sala final FEITA A MAO (a JORNADA, que cresce com o nivel, vem antes). PAREDES MOVEIS (ParedeMovel) que
@@ -17,6 +17,8 @@
 [ext_resource type="PackedScene" uid="uid://bkolianiplataforma01" path="res://scenes/actors/Plataforma.tscn" id="9_pl"]
 [ext_resource type="PackedScene" uid="uid://bkolianiparedemovel19" path="res://scenes/actors/ParedeMovel.tscn" id="10_movel"]
 [ext_resource type="PackedScene" uid="uid://bkolianiaguavenenosa01" path="res://scenes/actors/AguaVenenosa.tscn" id="11_veneno"]
+
+[ext_resource type="PackedScene" path="res://scenes/actors/CascaMasmorra.tscn" id="interior_casca"]
 
 [sub_resource type="RectangleShape2D" id="rs_chk"]
 size = Vector2(44, 96)
@@ -225,3 +227,12 @@ shape = SubResource("rs_chk")
 [node name="Porta" parent="." instance=ExtResource("4_porta")]
 position = Vector2(2820, 626)
 pista_ao_atravessar = ""
+
+[node name="Casca" parent="." instance=ExtResource("interior_casca")]
+topo = -96.0
+altura = 2200.0
+largura = 3252.0
+volumes_interiores = Array[Rect2]([Rect2(8, -96, 416, 352), Rect2(424, -96, 416, 352), Rect2(840, -96, 416, 352), Rect2(1256, -96, 416, 320), Rect2(1672, -96, 416, 320), Rect2(2088, -96, 416, 352), Rect2(2504, -96, 416, 384), Rect2(2920, -96, 416, 384)])
+esquerda = -120.0
+chao = false
+agua = false

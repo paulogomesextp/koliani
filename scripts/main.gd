@@ -8,11 +8,13 @@ extends Node2D
 const CENA_HUD := preload("res://scenes/ui/HUD.tscn")
 const CENA_PAUSA := preload("res://scenes/ui/Pausa.tscn")
 const CENA_DEV_BARRA := preload("res://scenes/ui/DevBarra.tscn")
-const RELOGIO_HARDCORE := preload("res://scripts/relogio_hardcore.gd")
 const FIM_CAMPANHA := preload("res://scripts/fim_campanha.gd")
 
 
 func _ready() -> void:
+	# Retoma a sessão v4 do mesmo nível ou inicia uma nova no spawn seguro.
+	# A cena resolverá o checkpoint ID para uma posição runtime válida.
+	EstadoJogo.iniciar_sessao_nivel()
 	# rede de seguranca das `ZonaSemPoder` (nivel 98): elas devolvem a
 	# habilidade a' saida e no `_exit_tree`, mas se alguma coisa correr mal
 	# a meio, o nivel seguinte comeca limpo na mesma.
@@ -27,6 +29,7 @@ func _ready() -> void:
 		return
 	var nivel := cena_nivel.instantiate()
 	add_child(nivel)
+	_validar_recovery_session.call_deferred(nivel)
 
 	var porta := _procurar_porta(nivel)
 	if porta:
@@ -38,11 +41,6 @@ func _ready() -> void:
 	add_child(CENA_PAUSA.instantiate())
 	if EstadoJogo.modo_dev:
 		add_child(CENA_DEV_BARRA.instantiate())
-
-	if EstadoJogo.hardcore:
-		var relogio := CanvasLayer.new()
-		relogio.set_script(RELOGIO_HARDCORE)
-		add_child(relogio)
 
 	# acabou de passar de nível (a Porta chamou `avancar_nivel`)
 	if EstadoJogo.anunciar_avanco:
@@ -66,6 +64,24 @@ func _procurar_porta(no: Node) -> Porta:
 	return null
 
 
+func _validar_recovery_session(nivel: Node) -> void:
+	# Checkpoints esperam pela redução existente antes de fixar IDs. Depois
+	# disso, confirma inclusive o caso de um ID sintaticamente válido mas já
+	# inexistente; a campanha permanece intacta e a sessão volta ao `_start`.
+	for _i in 8:
+		await get_tree().process_frame
+	if not is_instance_valid(nivel) or not nivel.is_inside_tree():
+		return
+	var ids: Array[String] = []
+	for no in get_tree().get_nodes_in_group("checkpoints"):
+		if no is Node2D and nivel.is_ancestor_of(no) \
+				and not no.is_queued_for_deletion():
+			var checkpoint_id := str(no.get("checkpoint_id"))
+			if checkpoint_id != "" and checkpoint_id not in ids:
+				ids.append(checkpoint_id)
+	EstadoJogo.validar_checkpoints_disponiveis(ids)
+
+
 ## Atalhos de depuração -- só em builds de debug (editor / export-debug).
 ## F1..F4: salta para o mundo 1..4. F5: dá todas as habilidades.
 ## F6: +3 vidas. F9: apaga o save e recomeça.
@@ -80,7 +96,7 @@ func _unhandled_input(evento: InputEvent) -> void:
 			var i: int = int(evento.physical_keycode) - KEY_F1
 			if i < EstadoJogo.NIVEIS.size():
 				EstadoJogo.indice_nivel = i
-				EstadoJogo.checkpoint = Vector2.ZERO
+				EstadoJogo.iniciar_sessao_nivel(true)
 				_toast_debug("mundo %d" % (i + 1))
 				await get_tree().create_timer(0.35).timeout
 				get_tree().change_scene_to_file("res://scenes/Main.tscn")

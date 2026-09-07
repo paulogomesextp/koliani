@@ -33,8 +33,8 @@ func _traduzir() -> void:
 
 func _entrar(indice: int) -> void:
 	EstadoJogo.indice_nivel = indice
-	EstadoJogo.checkpoint = Vector2.ZERO
-	EstadoJogo.guardar()
+	# Escolher no mapa é entrada deliberadamente fresca, não recovery.
+	EstadoJogo.iniciar_sessao_nivel(true)
 	if _seletor:
 		_seletor.set_process_unhandled_input(false)
 	Transicao.fechar_e(func() -> void: get_tree().change_scene_to_file(CENA_JOGO))

@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://tools/verifica_nivel12_visual.gd" id="1"]
+
+[node name="VerificaNivel12Visual" type="Node"]
+script = ExtResource("1")

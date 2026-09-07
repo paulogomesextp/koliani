@@ -125,20 +125,12 @@ const STOMP_RESSALTO := Movimento.FORCA_SALTO * 0.7
 ## ataque que venha de frente é bloqueado (sem dano) com um som subtil.
 const VEL_DEFESA := 70.0
 const BLOQUEIO_IFRAMES := 0.14
-## Tiro mágico (toque curto em "lancar"): lança em 8 direções, ILIMITADO,
+## Tiro mágico: premir dispara logo; manter premido repete em 8 direções,
 ## dá um terço do dano do ataque básico. Não gasta Energia.
 const DUR_LANCAR := 0.16
 const PROJETIL_MAGICO := preload("res://scenes/actors/ProjetilKoliani.tscn")
-## Kamehameha roxo (habilidade "projetil"): segura-se "lancar" ~0.4 s e
-## larga-se -> rajada roxa que atravessa inimigos. Cada rajada gasta 33% da
-## barra de Energia (3 seguidas), que regenera continuamente mas devagar
-## (não dá para spamar).
 const ENERGIA_MAX := 99.0
-const CUSTO_KAMEHAMEHA := 33.0
-const CARGA_KAMEHAMEHA := 0.4     # segundos com o botão em baixo até carregar
-const RECARGA_KAMEHAMEHA := 0.45  # gap mínimo entre rajadas
 const REGEN_ENERGIA := 12.0       # por segundo (barra cheia em ~8 s)
-const KAMEHAMEHA := preload("res://scenes/actors/KamehamehaKoliani.tscn")
 ## Abaixo deste Y considera-se que caiu no vazio (fosso sem fundo).
 const Y_MORTE := 1200.0
 const TEX_IMPACTO := preload("res://assets/sprites/impacto.svg")
@@ -157,6 +149,11 @@ const ARO_ALPHA := 0.62
 const AURA_ALPHA := 0.5
 const AURA_RESPIRA := 0.16          # amplitude do respirar (fracção)
 const AURA_ENERGIA := 0.85          # `energy` da LuzAura em repouso
+## Feedback dos tiers 0/leve/médio/pesado. Os thresholds físicos vivem em
+## Movimento; estes valores visuais/sonoros ficam juntos para o playtest.
+const ATERRAGEM_SQUASH := [0.0, 0.24, 0.48, 0.78]
+const ATERRAGEM_TREMOR := [0.0, 0.0, 1.4, 2.8]
+const ATERRAGEM_VOLUME := [0.0, -21.0, -15.0, -10.0]
 
 @onready var _hitbox: Area2D = $HitboxAtaque
 @onready var _sprite: Node2D = $Sprite
@@ -230,11 +227,6 @@ var _energia := ENERGIA_MAX
 ## paredes, sem gravidade nem dano de fosso.
 var _voando := false
 var _lancar_restante := 0.0
-## Carga do Kamehameha: segundos com "lancar" em baixo nesta pressão.
-var _lancar_seg := 0.0
-## Já disparou o Kamehameha nesta pressão (não repete até largar).
-var _hold_kame := false
-var _kame_recarga := 0.0
 ## Segundos que ainda está preso numa teia (Região III / Rainha Aracnídea):
 ## enquanto > 0 não anda nem salta -- só se sacode até se soltar.
 var _preso := 0.0
@@ -342,19 +334,11 @@ var _pos_inicial := Vector2.ZERO
 
 
 func _ready() -> void:
-	if EstadoJogo.checkpoint != Vector2.ZERO:
-		global_position = EstadoJogo.checkpoint
-		# ... e SEMPRE um pouco acima. O checkpoint da jornada é gravado 46
-		# px acima do chão da plataforma, que é a barriga dela; nascer
-		# exactamente ali com uma plataforma logo por cima entala-a e o
-		# nível fica intransponível. Sobe-se e deixa-se cair.
-		global_position.y -= ALTURA_SPAWN
 	_desencravar()
 	_pos_inicial = global_position
-	# a entrada do nível é um checkpoint implícito: morrer antes de tocar
-	# numa gema devolve a Koliani aqui (não ao início da campanha)
-	if EstadoJogo.checkpoint == Vector2.ZERO and not EstadoJogo.modo_dev:
-		EstadoJogo.definir_checkpoint(_pos_inicial)
+	# O início do nível é o checkpoint seguro `_start`. A posição concreta é
+	# contexto runtime e nunca entra no save v4.
+	EstadoJogo.registar_spawn_inicio(_pos_inicial)
 	if _hitbox:
 		_hitbox.monitoring = false
 		_hitbox.body_entered.connect(_ao_acertar_corpo)
@@ -387,6 +371,11 @@ func _ready() -> void:
 ##      `walk`; os outros 16 estados são derivados desses frames por
 ##      `tools/importar_rig_koliani_nova.py`.
 const RIG := "shadowblade"
+
+## Execution 5B: variante visual isolada por instancia. O valor por omissao
+## preserva o rig Shadowblade actual nos outros 99 niveis; apenas o Level 1
+## activa o prototype premium na sua cena.
+@export var usar_prototipo_premium := false
 
 ## Rigs desenhados frame a frame (tudo menos o "codigo", que é um boneco
 ## vectorial montado por código). Neles a animação PROCEDURAL de `_animar`
@@ -493,6 +482,33 @@ const _KOLI_ANIMS_SHADOW := {
 const SHADOW_ESCALA := 1.0
 const SHADOW_OFFSET_Y := -8.0
 
+## Prototype premium da Execution 5B. As tiras usam celulas 160x96; a escala
+## mantem a figura com ~59 px de altura no mundo. Os fps dos quatro golpes
+## correspondem aos tempos logicos 0.18/0.20/0.30/0.19 s sem os alterar.
+const _KOLI_ANIMS_PREMIUM := {
+	"idle":      [4, 6.0, true],
+	"run":       [5, 13.0, true],
+	"jump":      [3, 11.0, false],
+	"fall":      [2, 7.0, true],
+	"aterrar":   [2, 16.0, false],
+	"attack":    [6, 33.333333, false],
+	"attack2":   [6, 30.0, false],
+	"attack3":   [6, 20.0, false],
+	"attack4":   [6, 31.578947, false],
+	"dash":      [3, 18.75, false],
+	"hurt":      [2, 8.333333, false],
+	"morte":     [5, 9.0, false],
+	"crouch":    [1, 6.0, true],
+	"wallslide": [2, 8.0, true],
+	"borda":     [2, 5.0, true],
+	"djump":     [3, 14.0, false],
+	"roll":      [3, 18.75, false],
+	"defesa":    [1, 6.0, true],
+}
+const PREMIUM_ESCALA := 0.75
+## Pes em y=90 da celula: (90-48)*0.75 + offset*0.75 = 22 no mundo.
+const PREMIUM_OFFSET_Y := -12.666667
+
 ## Rig "nova" -- a arte do Paulo. Frames de 72x72 com os pés em y=68
 ## (`tools/importar_rig_koliani_nova.py`). O `idle` tem 10 frames e o `run`
 ## 12 (a passada original tinha 24, ficou de dois em dois).
@@ -526,13 +542,17 @@ const NOVA_OFFSET_Y := -6.4
 func _montar_frames() -> void:
 	if _corpo.sprite_frames != null:
 		return
+	var premium := usar_prototipo_premium
 	var gothic := RIG == "gothic"
 	var cavaleiro := RIG == "cavaleiro"
 	var nova := RIG == "nova"
 	var shadow := RIG == "shadowblade"
 	var anims: Dictionary = _KOLI_ANIMS
 	var dir_tiras := "koliani"
-	if gothic:
+	if premium:
+		anims = _KOLI_ANIMS_PREMIUM
+		dir_tiras = "koliani_premium_v1"
+	elif gothic:
 		anims = _KOLI_ANIMS_GOTHIC
 		dir_tiras = "koliani_gothic"
 	elif cavaleiro:
@@ -544,7 +564,14 @@ func _montar_frames() -> void:
 	elif shadow:
 		anims = _KOLI_ANIMS_SHADOW
 		dir_tiras = "koliani_shadowblade"
-	if shadow:
+	if premium:
+		_corpo.scale = Vector2(PREMIUM_ESCALA, PREMIUM_ESCALA)
+		_corpo.offset = Vector2(0.0, PREMIUM_OFFSET_Y)
+		if _armadura:
+			_armadura.visible = false
+		if _luz_lamina:
+			_luz_lamina.enabled = true
+	elif shadow:
 		_corpo.scale = Vector2(SHADOW_ESCALA, SHADOW_ESCALA)
 		_corpo.offset = Vector2(0.0, SHADOW_OFFSET_Y)
 		if _armadura:
@@ -592,6 +619,13 @@ func _montar_frames() -> void:
 			at.atlas = tex
 			at.region = Rect2(i * fw, 0, fw, tex.get_height())
 			sf.add_frame(nome, at)
+	# Gesto de lançamento com poses existentes, sem ativar a hitbox da espada.
+	if sf.has_animation("attack") and not sf.has_animation("lancar"):
+		sf.add_animation("lancar")
+		sf.set_animation_loop("lancar", false)
+		sf.set_animation_speed("lancar", sf.get_frame_count("attack") / DUR_LANCAR)
+		for i in sf.get_frame_count("attack"):
+			sf.add_frame("lancar", sf.get_frame_texture("attack", i))
 	_corpo.sprite_frames = sf
 	_corpo.play("idle")
 	_montar_material_equipamento()
@@ -695,7 +729,6 @@ func _physics_process(dt: float) -> void:
 	elif _vy() > 120.0:
 		_no_ar_antes = true
 	_lancar_restante = maxf(0.0, _lancar_restante - dt)
-	_kame_recarga = maxf(0.0, _kame_recarga - dt)
 	_preso = maxf(0.0, _preso - dt)
 	_parede_lock = maxf(0.0, _parede_lock - dt)
 	_borda_lock = maxf(0.0, _borda_lock - dt)
@@ -869,8 +902,7 @@ func _physics_process(dt: float) -> void:
 		if _combo_janela <= 0.0:
 			_combo_passo = 0
 
-	# "lancar": toque curto = tiro mágico ilimitado; segurar ~0.4 s e largar =
-	# Kamehameha roxo (habilidade "projetil", gasta 33% da Energia).
+	# Disparos contínuos enquanto o botão estiver premido.
 	_tratar_lancar(dt)
 
 	# estados exclusivos de movimento: rolamento > dash > movimento normal
@@ -880,8 +912,8 @@ func _physics_process(dt: float) -> void:
 			_pos_roll_t = POS_ROLL_JANELA   # abre a janela de crítico pós-rolamento
 		velocity.x = _olha_para * VEL_ROLAR
 		if not is_on_floor():
-			velocity.y = clampf(velocity.y + Movimento.GRAVIDADE * _grav_escala * _sinal_grav * dt,
-				-Movimento.VEL_MAX_QUEDA, Movimento.VEL_MAX_QUEDA)
+			velocity.y = Movimento.aplicar_gravidade(
+				velocity.y, dt, _grav_escala, _sinal_grav)
 	elif _dash_restante > 0.0:
 		_dash_restante -= dt
 		velocity.x = _olha_para * VEL_DASH
@@ -892,8 +924,8 @@ func _physics_process(dt: float) -> void:
 		if is_on_floor():
 			velocity.y = 0.0
 		else:
-			velocity.y = clampf(velocity.y + Movimento.GRAVIDADE * _grav_escala * _sinal_grav * dt,
-				-Movimento.VEL_MAX_QUEDA, Movimento.VEL_MAX_QUEDA)
+			velocity.y = Movimento.aplicar_gravidade(
+				velocity.y, dt, _grav_escala, _sinal_grav)
 		_mov.velocidade = velocity
 	elif Input.is_action_just_pressed("rolar") and Movimento.pode_rolar(
 			_rolar_recarga, is_on_floor(), _rolar_restante, _dash_restante):
@@ -1035,15 +1067,20 @@ func _physics_process(dt: float) -> void:
 	move_and_slide()
 	_mov.velocidade = velocity
 
-	# aterragem: pó + abanão + squash, proporcional à velocidade de queda
+	# Aterragem em três tiers, sempre só com feedback: nunca bloqueia input.
 	var no_chao := is_on_floor()
-	if no_chao and not _estava_no_chao and vel_queda > 180.0:
-		if _po:
+	var tier_aterragem := Movimento.tier_aterragem(vel_queda) \
+		if no_chao and not _estava_no_chao else 0
+	if tier_aterragem > 0:
+		if _po and tier_aterragem >= 2:
 			_po.restart()
-		var f := remap(minf(vel_queda, 1100.0), 180.0, 1100.0, 0.35, 1.0)
-		_squash = maxf(_squash, f)
-		_abanar(remap(minf(vel_queda, 1100.0), 180.0, 1100.0, 1.0, 4.5))
-		Som.toca("aterrar", remap(f, 0.35, 1.0, -20.0, -8.0))
+		var squash_tier: float = ATERRAGEM_SQUASH[tier_aterragem]
+		var tremor_tier: float = ATERRAGEM_TREMOR[tier_aterragem]
+		var volume_tier: float = ATERRAGEM_VOLUME[tier_aterragem]
+		_squash = maxf(_squash, squash_tier)
+		if tremor_tier > 0.0:
+			_abanar(tremor_tier)
+		Som.toca("aterrar", volume_tier)
 	_estava_no_chao = no_chao
 
 	# caiu num fosso sem fundo -> conta como morte (reaparece no checkpoint)
@@ -1053,7 +1090,7 @@ func _physics_process(dt: float) -> void:
 			# desatualizada assim que se toca num checkpoint mais à frente
 			# (era por isso que em modo dev não se reaparecia no checkpoint
 			# tocado). `EstadoJogo.checkpoint` é que está sempre atual.
-			var alvo := EstadoJogo.checkpoint if EstadoJogo.checkpoint != Vector2.ZERO else _pos_inicial
+			var alvo := EstadoJogo.ponto_recuperacao()
 			global_position = alvo if alvo != Vector2.ZERO else global_position
 			velocity = Vector2.ZERO
 		else:
@@ -1119,6 +1156,8 @@ func _atualizar_anim() -> void:
 		a = _anim_ataque()
 	elif _defendendo and sf.has_animation("defesa"):
 		a = "defesa"
+	elif _lancar_restante > 0.0 and sf.has_animation("lancar"):
+		a = "lancar"
 	elif _agachado:
 		a = "crouch"
 	elif not is_on_floor():
@@ -1197,13 +1236,11 @@ func _animar(dt: float) -> void:
 				_escudo_glow.modulate.a = 0.5 + 0.4 * (0.5 + 0.5 * sin(_anim_t * 7.0))
 			_animar_cupula()
 
-	# luz de carga do Kamehameha: cresce enquanto se segura "lancar"
+	# Clarão curto em cada lançamento, sem acumular carga ao segurar.
 	if _luz_carga:
-		var carga := clampf(_lancar_seg / CARGA_KAMEHAMEHA, 0.0, 1.0) if _lancar_seg > 0.0 \
-			and EstadoJogo.tem_habilidade("projetil") else 0.0
-		_luz_carga.energy = 3.2 * carga
-		var pronto := 1.0 + (0.12 * sin(_anim_t * 24.0) if carga >= 1.0 else 0.0)
-		_luz_carga.scale = Vector2(0.28, 0.28) * (0.6 + 0.8 * carga) * pronto
+		var pulso := clampf(_lancar_restante / DUR_LANCAR, 0.0, 1.0)
+		_luz_carga.energy = 1.4 * pulso
+		_luz_carga.scale = Vector2(0.22, 0.22) * (0.6 + 0.4 * pulso)
 
 	var no_chao := is_on_floor()
 	var vx := absf(velocity.x)
@@ -1283,6 +1320,10 @@ const _BRILHO_CORPO := Color(1.4, 1.38, 1.5)
 const _BRILHO_SHADOW := Color(1.12, 1.10, 1.18)
 
 func _tint_armadura() -> Color:
+	if usar_prototipo_premium:
+		# O Level 1 tem luz verde intensa; sem esta compensacao os grafites do
+		# prototype ficam quase brancos e perdem a silhueta dark-fantasy.
+		return Color(0.88, 0.86, 0.94)
 	if RIG == "gothic":
 		return Color.WHITE  # o rig já vem recolorido -- não pintar por cima
 	if RIG == "shadowblade":
@@ -1440,36 +1481,21 @@ func _flash_golpe() -> void:
 	tl.tween_property(_luz_golpe, "energy", 0.0, DUR_ATAQUE + 0.08).set_ease(Tween.EASE_IN)
 
 
-## Gere o botão "lancar": segurar carrega o Kamehameha, largar cedo dispara
-## o tiro mágico normal. Bloqueado a defender/rolar/dar dash.
-func _tratar_lancar(dt: float) -> void:
+## Dispara ao premir e repete até largar. Bloqueado a defender/rolar/dar dash.
+func _tratar_lancar(_dt: float) -> void:
 	if _defendendo or _rolar_restante > 0.0 or _dash_restante > 0.0:
-		_lancar_seg = 0.0
-		_hold_kame = false
 		return
-
-	if Input.is_action_pressed("lancar"):
-		_lancar_seg += dt
-		# carregou o suficiente -> dispara a rajada (uma vez por pressão)
-		if not _hold_kame and _lancar_seg >= CARGA_KAMEHAMEHA \
-				and _kame_recarga <= 0.0 \
-				and EstadoJogo.tem_habilidade("projetil") \
-				and (_energia >= CUSTO_KAMEHAMEHA or EstadoJogo.modo_dev):
-			_lancar_kamehameha()
-			_hold_kame = true
-
-	if Input.is_action_just_released("lancar"):
-		# toque curto (não chegou a carregar) -> tiro mágico normal
-		if not _hold_kame and _lancar_seg < CARGA_KAMEHAMEHA and _lancar_restante <= 0.0:
-			_lancar_projetil()
-		_lancar_seg = 0.0
-		_hold_kame = false
+	if Input.is_action_pressed("lancar") and _lancar_restante <= 0.0:
+		_lancar_projetil()
 
 
 ## Lança um tiro mágico numa das 8 direções (mira = eixos de movimento + W/S;
 ## sem mira, para onde está virada). Ilimitado, dá 1/3 do dano do golpe.
 func _lancar_projetil() -> void:
 	_lancar_restante = DUR_LANCAR
+	if _corpo and _corpo.sprite_frames and _corpo.sprite_frames.has_animation("lancar"):
+		_corpo.play("lancar")
+		_corpo.set_frame_and_progress(0, 0.0)
 	_pop = 1.0
 	_acender_aura(0.7)
 	var ax := Input.get_action_strength("mover_direita") - Input.get_action_strength("mover_esquerda")
@@ -1479,40 +1505,8 @@ func _lancar_projetil() -> void:
 	get_parent().add_child(p)
 	p.global_position = global_position + aim * 20.0 + Vector2(0.0, -4.0)
 	p.lancar(aim, maxi(1, roundi(_dano_golpe() / 3.0)))
+	magia_lancada.emit()  # Ativa plataformas espectrais sem depender do feixe.
 	Som.toca("lancar", -9.0, randf_range(0.96, 1.08))
-	if _faiscas:
-		_faiscas.position.x = absf(_faiscas.position.x) * signf(aim.x if aim.x != 0.0 else _olha_para)
-		_faiscas.restart()
-
-
-## Dano da rajada Kamehameha (a olho: 3x o golpe básico).
-func _dano_kamehameha() -> int:
-	return _dano_golpe() * 3
-
-
-## Dispara o Kamehameha roxo. Já validado: tem a habilidade, há Energia e
-## não está em recarga.
-func _lancar_kamehameha() -> void:
-	if not EstadoJogo.modo_dev:  # modo dev: energia infinita
-		# nivel 99 ("O Fim de Tudo"): a Energia nao se gasta -- e' o unico
-		# nivel do jogo em que ela nao tem de escolher o que usar
-		if not EstadoJogo.tudo_desbloqueado():
-			_energia = maxf(0.0, _energia - CUSTO_KAMEHAMEHA)
-	energia_mudou.emit(_energia, ENERGIA_MAX)
-	_kame_recarga = RECARGA_KAMEHAMEHA
-	_lancar_restante = DUR_LANCAR
-	_pop = 1.0
-	_acender_aura(1.0)
-	var ax := Input.get_action_strength("mover_direita") - Input.get_action_strength("mover_esquerda")
-	var ay := Input.get_action_strength("mirar_baixo") - Input.get_action_strength("mirar_cima")
-	var aim := Movimento.direcao_mira(ax, ay, _olha_para)
-	var p := KAMEHAMEHA.instantiate()
-	get_parent().add_child(p)
-	p.global_position = global_position + aim * 26.0 + Vector2(0.0, -4.0)
-	p.lancar(aim, _dano_kamehameha())
-	Som.toca("onda", -4.0, 0.85)
-	_abanar(6.0)
-	magia_lancada.emit()  # a magia "a sério" materializa as plataformas espectrais
 	if _faiscas:
 		_faiscas.position.x = absf(_faiscas.position.x) * signf(aim.x if aim.x != 0.0 else _olha_para)
 		_faiscas.restart()
@@ -1824,14 +1818,22 @@ func _morrer() -> void:
 	morreu.emit()
 	EstadoJogo.perder_vida()
 	if EstadoJogo.sem_vidas():
-		if EstadoJogo.hardcore:
-			# hardcore: 3 vidas gastas = fim do run -> cartão GAME OVER (com voz)
-			GameOver.mostrar(get_tree(), "lives")
-			return
-		# modo normal: vidas cheias e recomeça o nível actual, mas o
+		# Vidas cheias e recomeça o nível atual, mas o
 		# progresso (níveis concluídos, habilidades, pistas, equipamento) fica
 		EstadoJogo.reiniciar_run()
 	Transicao.fechar_e(get_tree().reload_current_scene)
+
+
+## Reconstrói a personagem no ponto seguro resolvido pela fogueira da cena.
+## Todo o resto (inimigos, perigos, projectiles, animações e velocity) nasce
+## de novo com a cena; não existe arbitrary frame save.
+func recuperar_no_checkpoint(posicao_segura: Vector2) -> void:
+	if _a_morrer or posicao_segura == Vector2.ZERO:
+		return
+	global_position = posicao_segura + Vector2(0.0, -ALTURA_SPAWN)
+	velocity = Vector2.ZERO
+	_desencravar()
+	_pos_inicial = global_position
 
 
 ## Quantos píxeis ACIMA do checkpoint é que ela nasce. 40 px chegam para

@@ -49,6 +49,20 @@ func _init() -> void:
 	_ok(bau.get("_painel") != null, "mostra a recompensa")
 	bau.recolhido.emit()
 	_ok(nivel.get_node("Porta").monitoring, "recolher liberta a saída")
+	# Recriar a cena (death/reload/session reset) não pode recriar o boss nem
+	# o baú já reclamado; apenas recompõe a porta aberta.
+	reload_current_scene()
+	await create_timer(0.5).timeout
+	var nivel_recarregado := current_scene.get_child(0)
+	var boss_recriado := false
+	for no in get_nodes_in_group("chefes"):
+		if nivel_recarregado.is_ancestor_of(no):
+			boss_recriado = true
+	_ok(not boss_recriado, "boss permanente não reaparece após reload")
+	_ok(nivel_recarregado.get_node_or_null("BauChefe") == null,
+		"reward reclamado não recria baú após session reset")
+	_ok(nivel_recarregado.get_node("Porta").monitoring,
+		"reload recompõe saída aberta para boss/reward permanentes")
 	print("Baú: %d falhas" % falhas)
 	quit(0 if falhas == 0 else 1)
 

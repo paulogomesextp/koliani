@@ -11,15 +11,26 @@ extends RefCounted
 ##  - saltos extra no ar (salto duplo) quando `saltos_max` > 1 -- a
 ##    habilidade permanente "salto_duplo" liga isto em `koliani.gd`
 
+## Tunables do primeiro passe de Movement Feel (Execution 4A). Ficam juntos
+## para o playtest poder afinar resposta/peso sem procurar magic numbers.
 const GRAVIDADE := 1400.0
+const GRAVIDADE_SUBIDA := 1.0
+const GRAVIDADE_QUEDA := 1.22
 const VEL_MAX_QUEDA := 1100.0
 const VEL_CORRIDA := 240.0
-const ACEL_CHAO := 2000.0
-const ACEL_AR := 1200.0
+const ACEL_CHAO := 2300.0
+const DESACEL_CHAO := 2200.0
+const VIRAGEM_CHAO := 3600.0
+const ACEL_AR := 1350.0
+const DESACEL_AR := 1050.0
+const VIRAGEM_AR := 1800.0
 const FORCA_SALTO := 470.0
 const COYOTE := 0.10          # segundos
 const BUFFER_SALTO := 0.12    # segundos
 const CORTE_SALTO := 0.45     # fração da velocidade vertical mantida ao largar
+const ATERRAGEM_LEVE := 180.0
+const ATERRAGEM_MEDIA := 430.0
+const ATERRAGEM_PESADA := 760.0
 ## PLANAR (habilidade "planar", nível 63): a descer, com o botão de saltar
 ## a segurar, a queda fica presa a este tecto em vez do `VEL_MAX_QUEDA`.
 ## Não é voar -- é cair devagar, e por isso o vão que se atravessa a planar
@@ -63,7 +74,21 @@ static func passo(e: Estado, direcao: float, saltar_premido: bool, saltar_a_segu
 
 	# horizontal
 	var alvo := direcao * VEL_CORRIDA
-	var acel := (ACEL_CHAO if no_chao else ACEL_AR) * maxf(0.05, acel_escala)
+	var a_arrancar := absf(direcao) > 0.01 and absf(e.velocidade.x) < 0.01
+	var a_virar := absf(direcao) > 0.01 and absf(e.velocidade.x) > 0.01 \
+		and signf(direcao) != signf(e.velocidade.x)
+	var acel: float
+	if a_virar:
+		acel = VIRAGEM_CHAO if no_chao else VIRAGEM_AR
+	elif absf(direcao) <= 0.01:
+		acel = DESACEL_CHAO if no_chao else DESACEL_AR
+	else:
+		acel = ACEL_CHAO if no_chao else ACEL_AR
+	# `a_arrancar` fica explícito para documentar que o primeiro frame usa a
+	# aceleração normal e responde logo; não há atraso/animação a roubar input.
+	if a_arrancar:
+		acel = ACEL_CHAO if no_chao else ACEL_AR
+	acel *= maxf(0.05, acel_escala)
 	e.velocidade.x = move_toward(e.velocidade.x, alvo, acel * dt)
 
 	# quem sai da plataforma a andar (sem saltar) e deixa o coyote expirar
@@ -84,8 +109,8 @@ static func passo(e: Estado, direcao: float, saltar_premido: bool, saltar_a_segu
 	# gravidade (grav_escala < 1 = "gravidade lunar" do Observatório, nível
 	# 14; sinal_grav = -1 = gravidade invertida, nível 67)
 	if not no_chao:
-		var v := e.velocidade.y + GRAVIDADE * grav_escala * sinal_grav * dt
-		e.velocidade.y = clampf(v, -VEL_MAX_QUEDA, VEL_MAX_QUEDA)
+		e.velocidade.y = aplicar_gravidade(
+			e.velocidade.y, dt, grav_escala, sinal_grav)
 
 	# corte de salto (`* sinal_grav` = "a subir", seja qual for o lado)
 	if e.velocidade.y * sinal_grav < 0.0 and not saltar_a_segurar:
@@ -99,6 +124,28 @@ static func passo(e: Estado, direcao: float, saltar_premido: bool, saltar_a_segu
 
 	e.no_chao = no_chao
 	return e
+
+
+## Gravidade comum ao movimento normal e aos estados transitórios. A queda
+## ligeiramente mais decisiva reduz floatiness sem alterar o impulso do salto.
+static func aplicar_gravidade(vel_y: float, dt: float, grav_escala: float = 1.0,
+		sinal_grav: float = 1.0) -> float:
+	var a_cair := vel_y * sinal_grav > 0.0
+	var fator := GRAVIDADE_QUEDA if a_cair else GRAVIDADE_SUBIDA
+	var v := vel_y + GRAVIDADE * fator * grav_escala * sinal_grav * dt
+	return clampf(v, -VEL_MAX_QUEDA, VEL_MAX_QUEDA)
+
+
+## 0 = sem aterragem, 1 = leve, 2 = média, 3 = pesada. A classificação não
+## bloqueia input; serve apenas para escolher feedback visual/sonoro/câmara.
+static func tier_aterragem(vel_queda: float) -> int:
+	if vel_queda < ATERRAGEM_LEVE:
+		return 0
+	if vel_queda < ATERRAGEM_MEDIA:
+		return 1
+	if vel_queda < ATERRAGEM_PESADA:
+		return 2
+	return 3
 
 
 # ── GANCHO (nível 53, Jardim das Almas) ─────────────────────────────────

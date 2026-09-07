@@ -2,6 +2,7 @@ extends Node2D
 ## Abre por proximidade: funciona com toque e teclado sem botão novo.
 signal recolhido
 const SAQUE := preload("res://scripts/saque_chefe.gd")
+@export var reward_id := ""
 var _aberto := false
 var _painel: CanvasLayer
 
@@ -25,9 +26,13 @@ func _process(_dt: float) -> void:
 func _abrir() -> void:
 	if _aberto:
 		return
+	var estado := get_node("/root/EstadoJogo")
+	if reward_id == "" or estado.recompensa_reclamada(reward_id):
+		recolhido.emit()
+		queue_free()
+		return
 	_aberto = true
 	queue_redraw()
-	var estado := get_node("/root/EstadoJogo")
 	var rng := RandomNumberGenerator.new()
 	rng.randomize()
 	var premio := SAQUE.sortear(estado.indice_nivel, estado.armas,
@@ -46,7 +51,7 @@ func _abrir() -> void:
 		_:
 			estado.ganhar_essencia(premio.valor)
 			descricao = "+%d " % int(premio.valor) + textos.t("chest.essence")
-	estado.guardar()
+	estado.marcar_recompensa_reclamada(reward_id)
 	get_node("/root/Som").toca("apanhar", -6.0)
 	_mostrar(descricao)
 

@@ -3,20 +3,17 @@ extends Control
 ##
 ##   NEW GAME       campanha nova, do mundo 1 (apaga o save se existir)
 ##   LOAD GAME      retoma o save (só aparece se houver progresso)
-##   HARDCORE MODE  campanha nova com tempo limite por mundo -- se o tempo
-##                  esgotar num mundo é Game Over e recomeça do início
 ##   OPTIONS        volume (música / efeitos) e idioma
 ##
-## NEW GAME / HARDCORE MODE pedem confirmação quando há um save por cima.
+## NEW GAME pede confirmação quando há um save por cima.
 ## Todo o texto vem do `Textos` (idioma por omissão: inglês).
 ##
 ## Em modo normal, NEW GAME / LOAD GAME abrem o **Mapa do Mundo**
-## (`MapaMundo.tscn`) para escolher o nível; HARDCORE vai direto ao jogo.
+## (`MapaMundo.tscn`) para escolher o nível.
 ##
 ## Atalhos de dev (a seguir a `--`):
 ##   --jogar / --foto[=...]   salta o menu e arranca já em Main.tscn
 ##   --nivel=N                salta o menu e arranca no mundo N (1..4)
-##   --hardcore               salta o menu e arranca uma campanha hardcore
 ##   --devmode                salta o menu e arranca em DEVELOPER MODE
 
 const CENA_JOGO := "res://scenes/Main.tscn"
@@ -27,14 +24,13 @@ const CENA_OPCOES := preload("res://scenes/ui/Opcoes.tscn")
 @onready var _subtitulo: Label = $Centro/Subtitulo
 @onready var _novo: Button = $Centro/NovoJogo
 @onready var _load: Button = $Centro/LoadGame
-@onready var _hardcore: Button = $Centro/Hardcore
 @onready var _opcoes: Button = $Centro/Opcoes
 @onready var _dev: Button = $Centro/DevMode
 @onready var _aviso: Label = $Centro/Aviso
 @onready var _sair: Button = $Centro/Sair
 @onready var _versao: Label = $Versao
 
-# "" (nada), "novo" ou "hardcore" -- qual o botão à espera de confirmação
+# "" (nada) ou "novo" -- qual o botão à espera de confirmação
 var _armado := ""
 
 
@@ -50,13 +46,6 @@ func _ready() -> void:
 		else:
 			EstadoJogo.reiniciar_campanha()
 
-	# voltar ao menu depois de uma sessão HARDCORE: a vista do menu
-	# (LOAD / NEW GAME) é a do modo normal -- volta ao save normal (o do
-	# hardcore fica no seu próprio ficheiro, intacto).
-	if EstadoJogo.hardcore:
-		EstadoJogo.hardcore = false
-		EstadoJogo.carregar()
-
 	if _tratar_atalhos_dev():
 		return
 
@@ -66,19 +55,12 @@ func _ready() -> void:
 
 	_novo.pressed.connect(_ao_novo)
 	_load.pressed.connect(_entrar_campanha)
-	_hardcore.pressed.connect(_ao_hardcore)
 	_opcoes.pressed.connect(_abrir_opcoes)
 	_dev.pressed.connect(_ao_dev_mode)
 	_sair.pressed.connect(_ao_sair)
 
 	Textos.idioma_mudou.connect(func(_l: String) -> void: _traduzir())
 	_traduzir()
-	# caveira a seguir a "HARDCORE MODE" (a fonte do jogo não tem o glifo ☠,
-	# por isso é um ícone desenhado em código, alinhado à direita do texto)
-	_hardcore.icon = _tex_caveira()
-	_hardcore.icon_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	_hardcore.expand_icon = false
-	_hardcore.add_theme_constant_override("h_separation", 10)
 	var principal := _load if EstadoJogo.ha_progresso() else _novo
 	_destacar_botao_principal(principal)
 	_preparar_hover_animado()
@@ -117,7 +99,7 @@ func _destacar_botao_principal(botao: Button) -> void:
 ## Pequena resposta de escala ao passar/focar o rato em cada botão --
 ## substitui a mudança de cor estática por algo com mais vida.
 func _preparar_hover_animado() -> void:
-	for b: Button in [_novo, _load, _hardcore, _opcoes, _dev, _sair]:
+	for b: Button in [_novo, _load, _opcoes, _dev, _sair]:
 		b.resized.connect(func() -> void: b.pivot_offset = b.size / 2.0)
 		b.mouse_entered.connect(func() -> void: _animar_escala(b, 1.035))
 		b.mouse_exited.connect(func() -> void: _animar_escala(b, 1.0))
@@ -128,37 +110,6 @@ func _preparar_hover_animado() -> void:
 func _animar_escala(botao: Button, alvo: float) -> void:
 	var t := create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_BACK)
 	t.tween_property(botao, "scale", Vector2(alvo, alvo), 0.18)
-
-
-## Caveira pixel-art minúscula (bone + 2 órbitas + nariz + dentes) para o
-## botão do modo hardcore.
-func _tex_caveira() -> ImageTexture:
-	var img := Image.create(18, 18, false, Image.FORMAT_RGBA8)
-	img.fill(Color(0, 0, 0, 0))
-	var osso := Color(0.94, 0.92, 0.84)
-	var buraco := Color(0.05, 0.02, 0.07)
-	# crânio
-	for y in range(1, 12):
-		for x in range(2, 16):
-			var canto := (y <= 1 and (x < 4 or x > 13)) \
-				or (x <= 2 and y > 9) or (x >= 15 and y > 9)
-			if not canto:
-				img.set_pixel(x, y, osso)
-	# maxilar + dentes
-	for y in range(12, 17):
-		for x in range(4, 14):
-			if y < 14 or x % 2 == 0:
-				img.set_pixel(x, y, osso)
-	# órbitas
-	for y in range(4, 8):
-		for x in range(4, 8):
-			img.set_pixel(x, y, buraco)
-		for x in range(10, 14):
-			img.set_pixel(x, y, buraco)
-	# nariz
-	for p in [Vector2i(9, 8), Vector2i(8, 10), Vector2i(9, 10), Vector2i(10, 10), Vector2i(9, 9)]:
-		img.set_pixel(p.x, p.y, buraco)
-	return ImageTexture.create_from_image(img)
 
 
 ## (Re)escreve todo o texto do menu no idioma atual.
@@ -191,7 +142,6 @@ func _ao_sair() -> void:
 func _traduzir() -> void:
 	_subtitulo.text = Textos.t("game.subtitle")
 	_novo.text = Textos.t("menu.new_game")
-	_hardcore.text = Textos.t("menu.hardcore")
 	_opcoes.text = Textos.t("menu.options")
 	_dev.text = Textos.t("menu.dev_mode")
 	_sair.text = Textos.t("menu.quit")
@@ -200,31 +150,22 @@ func _traduzir() -> void:
 	_load.visible = ha
 	if ha:
 		var txt := Textos.tf("menu.load_world", [EstadoJogo.indice_nivel + 1])
-		if EstadoJogo.hardcore:
-			txt += Textos.t("menu.hardcore_tag")
 		_load.text = txt
 
 	# se um botão estava "armado" para confirmar, repõe o aviso/sufixo
 	if _armado == "novo":
 		_novo.text += Textos.t("menu.confirm_suffix")
 		_aviso.text = Textos.t("menu.warn_new_game")
-	elif _armado == "hardcore":
-		_hardcore.text += Textos.t("menu.confirm_suffix")
-		_aviso.text = Textos.t("menu.warn_hardcore")
 
 
 ## Devolve true se um atalho de dev tratou o arranque (e já não há menu).
 func _tratar_atalhos_dev() -> bool:
 	var saltar := false
-	var hardcore := false
 	var devmode := false
 	var nivel := -1
 	for a in OS.get_cmdline_user_args():
 		if a == "--jogar" or a.begins_with("--foto"):
 			saltar = true
-		elif a == "--hardcore":
-			saltar = true
-			hardcore = true
 		elif a == "--devmode":
 			saltar = true
 			devmode = true
@@ -233,14 +174,11 @@ func _tratar_atalhos_dev() -> bool:
 			nivel = int(a.get_slice("=", 1)) - 1
 	if not saltar:
 		return false
-	if hardcore:
-		EstadoJogo.hardcore = true
-		EstadoJogo.reiniciar_campanha()
 	if devmode:
 		EstadoJogo.ativar_modo_dev()
 	if nivel >= 0:
 		EstadoJogo.indice_nivel = clampi(nivel, 0, EstadoJogo.NIVEIS.size() - 1)
-		EstadoJogo.checkpoint = Vector2.ZERO
+		EstadoJogo.iniciar_sessao_nivel(true)
 	_ir_jogar()
 	return true
 
@@ -274,18 +212,7 @@ func _ao_novo() -> void:
 	if _precisa_confirmar("novo"):
 		_armar("novo", _novo, Textos.t("menu.warn_new_game"))
 		return
-	_comecar_campanha(false)
-
-
-## HARDCORE MODE: campanha com tempo limite por mundo. NÃO tem save -- é
-## sempre do zero e perder é game over (é esse o conceito). Como não grava,
-## também nunca toca no progresso do modo normal, por isso já não precisa
-## de confirmação.
-func _ao_hardcore() -> void:
-	_repor_botoes()
-	EstadoJogo.hardcore = true
-	EstadoJogo.reiniciar_campanha()
-	_entrar_campanha()
+	_comecar_campanha()
 
 
 ## Há um save por cima e este botão ainda não foi confirmado?
@@ -305,20 +232,19 @@ func _armar(qual: String, botao: Button, texto: String) -> void:
 func _repor_botoes() -> void:
 	_armado = ""
 	_novo.text = Textos.t("menu.new_game")
-	_hardcore.text = Textos.t("menu.hardcore")
 	_aviso.visible = false
 
 
-func _comecar_campanha(hardcore: bool) -> void:
-	EstadoJogo.hardcore = hardcore
+func _comecar_campanha() -> void:
 	EstadoJogo.reiniciar_campanha()
 	_entrar_campanha()
 
 
-## Entrada normal na campanha: modo normal abre o Mapa do Mundo (escolher
-## nível); hardcore vai direto ao jogo (corre linear).
+## Entrada normal na campanha: abre o Mapa do Mundo para escolher o nível.
 func _entrar_campanha() -> void:
-	var destino := CENA_JOGO if EstadoJogo.hardcore else CENA_MAPA
+	# Fechar a aplicação preserva a sessão: LOAD regressa ao último checkpoint
+	# seguro. Sem sessão ativa, o fluxo normal continua a abrir o mapa.
+	var destino := CENA_JOGO if EstadoJogo.level_session.get("active", false) else CENA_MAPA
 	Transicao.fechar_e(func() -> void: get_tree().change_scene_to_file(destino))
 
 

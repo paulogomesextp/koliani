@@ -56,9 +56,10 @@ seed_ambiente = 1222
 luzes_horizonte = true
 
 [node name="Casca" parent="." instance=ExtResource("10_casca")]
-largura = 3600.0
-altura = 680.0
-topo = 100.0
+topo = -128.0
+altura = 2200.0
+largura = 3612.0
+volumes_interiores = Array[Rect2]([Rect2(8, -128, 576, 352), Rect2(584, -128, 576, 448), Rect2(1160, -128, 576, 320), Rect2(1736, -128, 576, 320), Rect2(2312, -128, 576, 320), Rect2(2888, -128, 576, 416)])
 esquerda = -120.0
 chao = false
 agua = false

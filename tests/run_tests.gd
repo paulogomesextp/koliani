@@ -1,27 +1,33 @@
-extends SceneTree
+extends Node
 ## Corredor de testes headless, sem dependencias externas (sem GUT).
 ##
-##   godot --headless --script res://tests/run_tests.gd
+##   godot --headless --path . res://tests/run_tests.tscn
 ##
 ## Sai com codigo 1 se algum teste falhar -- o CI (.github/workflows/ci.yml)
 ## usa isso para marcar o build como vermelho. Acrescenta testes novos como
 ## metodos `teste_*` e chama-os em `_correr_tudo`.
 ##
-## NOTA: em modo `--script` os autoloads (EstadoJogo) NAO existem como
-## identificador global, por isso os testes do estado instanciam
-## `estado_jogo.gd` diretamente com `load(...).new()`.
+## A cena de teste e' carregada pelo projeto para disponibilizar os mesmos
+## autoloads e recursos que existem no jogo. Os testes do estado continuam a
+## instanciar estado_jogo.gd diretamente para nao ler nem gravar o save real.
 
 const EstadoJogoScript := preload("res://scripts/estado_jogo.gd")
+const SaveFoundation := preload("res://scripts/save_foundation.gd")
+const ProgressionIDs := preload("res://scripts/progression_ids.gd")
+const LevelSession := preload("res://scripts/level_session.gd")
+const TestesMovimentoCamera4A := preload("res://tests/test_movimento_camera_4a.gd")
 const DT := 1.0 / 60.0
 
 var _falhas: Array[String] = []
 
 
-func _initialize() -> void:
+func _ready() -> void:
 	call_deferred("_correr_tudo")
 
 
 func _correr_tudo() -> void:
+	for falha in TestesMovimentoCamera4A.executar():
+		_falhas.append(falha)
 	teste_movimento_salto_com_coyote()
 	teste_movimento_corte_de_salto()
 	teste_movimento_anda_para_a_direita()
@@ -47,10 +53,35 @@ func _correr_tudo() -> void:
 	teste_estado_reiniciar_run()
 	teste_estado_pistas_sem_duplicados()
 	teste_estado_habilidade_sem_duplicados()
+	teste_progression_ids_niveis_e_bosses()
+	teste_progression_ids_habilidades_e_coletaveis()
+	teste_progression_ids_idempotencia_boss_e_recompensa()
+	teste_progression_ids_invalidos()
+	teste_progression_ids_resilientes_a_renames()
+	teste_level_session_begin()
+	teste_level_session_stable_checkpoint_identity()
+	teste_level_session_checkpoint_activation_repeated()
+	teste_level_session_death_respawn_contract()
+	teste_level_session_save_close_load()
+	teste_level_session_invalid_checkpoint_fallback()
+	teste_level_session_level_completion()
+	teste_level_session_boss_persistence()
+	teste_level_session_reward_idempotence()
+	teste_save_v3_migration_level_session()
+	teste_save_v4_migration_remove_hardcore()
 	teste_estado_nivel_atual_e_caminho_valido()
 	teste_estado_save_ida_e_volta()
+	teste_save_fresh_write_load()
+	teste_save_roundtrip_campos()
+	teste_save_legacy_migration()
+	teste_save_migration_sequencial()
+	teste_save_v2_migration_progressao()
+	teste_save_primary_corrupto_backup_valido()
+	teste_save_escrita_nova_invalida_preserva_anterior()
+	teste_save_temp_invalido_nao_promovido()
+	teste_save_versao_futura_preservada()
+	teste_save_migration_invalida_rejeitada()
 	teste_estado_ha_progresso()
-	teste_estado_hardcore()
 	teste_estado_regioes_e_conclusao()
 	teste_estado_mapa_desbloqueio()
 	teste_estado_modo_dev()
@@ -65,20 +96,39 @@ func _correr_tudo() -> void:
 	teste_pecas_de_ui_existem()
 	teste_mecanica_por_nivel()
 	teste_paineis_nao_trazem_o_vizinho()
+	teste_sala_labirinto_deterministica()
 
 	if _falhas.is_empty():
 		print("OK -- todos os testes passaram")
-		quit(0)
+		get_tree().quit(0)
 	else:
 		for f in _falhas:
 			printerr("FALHOU: ", f)
 		printerr("%d falha(s)" % _falhas.size())
-		quit(1)
+		get_tree().quit(1)
 
 
 func _ok(condicao: bool, mensagem: String) -> void:
 	if not condicao:
 		_falhas.append(mensagem)
+
+
+func teste_sala_labirinto_deterministica() -> void:
+	var a := SalaLabirinto.descricao_logica(1100.0, 420.0, 0.4, 1701)
+	var b := SalaLabirinto.descricao_logica(1100.0, 420.0, 0.4, 1701)
+	_ok(a == b, "SalaLabirinto: a mesma seed deve gerar a mesma descricao")
+	var prova := SalaLabirinto.validar_descricao(a)
+	_ok(prova.get("passou", false),
+		"SalaLabirinto invalida: %s" % [prova.get("erros", [])])
+	var rotas: Dictionary = prova.get("rotas", {})
+	for ordem in ["A_B", "B_A"]:
+		var rota: Array = rotas.get(ordem, [])
+		_ok(rota.has("A") and rota.has("B") and rota[-1] == "saida",
+			"SalaLabirinto: rota %s nao prova as duas alavancas e a saida" % ordem)
+	var fonte_gerador := _fonte("res://scripts/gerador_corredor.gd")
+	_ok(not fonte_gerador.contains("preload(\"res://scripts/sala_labirinto.gd\")")
+			and not fonte_gerador.contains("SalaLabirinto.new()"),
+		"SalaLabirinto deve continuar desativada no gerador ativo")
 
 
 ## Instancia estado_jogo.gd fora da arvore (nao chama _ready, logo nao le o
@@ -89,6 +139,184 @@ func _novo_estado() -> Node:
 	e.modo_teste = true
 	e.reiniciar_campanha()
 	return e
+
+
+# --- Level Session / Checkpoint State (Execution 3C) --------------------
+
+func teste_level_session_begin() -> void:
+	var e := _novo_estado()
+	e.iniciar_sessao_nivel(true)
+	_ok(e.level_session == {
+		"active": true,
+		"level_id": "level_001",
+		"checkpoint_id": "checkpoint_level_001_start",
+	}, "nível válido devia iniciar uma level session coerente")
+	e.free()
+
+
+func teste_level_session_stable_checkpoint_identity() -> void:
+	_ok(LevelSession.id_checkpoint("level_005", 3) == "checkpoint_level_005_03",
+		"checkpoint persistido devia usar level ID e identidade estável")
+	_ok(LevelSession.id_valido_para_nivel(
+		"checkpoint_level_005_03", "level_005"),
+		"stable checkpoint ID devia validar no próprio nível")
+	_ok(not LevelSession.id_valido_para_nivel(
+		"checkpoint_level_005_03", "level_006"),
+		"checkpoint ID não devia atravessar níveis")
+
+
+func teste_level_session_checkpoint_activation_repeated() -> void:
+	var e := _novo_estado()
+	e.indice_nivel = 4
+	e.iniciar_sessao_nivel(true)
+	var id := "checkpoint_level_005_03"
+	var pos := Vector2(2660.0, 442.0)
+	_ok(e.ativar_checkpoint(id, pos), "ativação devia aceitar checkpoint estável")
+	var uma_vez: Dictionary = e.level_session.duplicate(true)
+	_ok(e.ativar_checkpoint(id, pos), "ativação repetida devia ser segura")
+	_ok(e.level_session == uma_vez and e.ponto_recuperacao() == pos,
+		"ativação repetida devia ser idempotente")
+	e.free()
+
+
+func teste_level_session_death_respawn_contract() -> void:
+	var e := _novo_estado()
+	e.indice_nivel = 4
+	e.iniciar_sessao_nivel(true)
+	var id := "checkpoint_level_005_02"
+	var pos := Vector2(1700.0, 636.0)
+	e.ativar_checkpoint(id, pos)
+	# Reload reconstrói a cena: a coordenada runtime desaparece e o ID volta
+	# a resolvê-la quando a fogueira segura fica disponível.
+	e.checkpoint = Vector2.ZERO
+	_ok(e.registar_checkpoint_disponivel(id, pos),
+		"reload devia resolver o checkpoint esperado pelo stable ID")
+	_ok(e.ponto_recuperacao() == pos, "death/respawn devia regressar ao checkpoint")
+	e.free()
+
+
+func teste_level_session_save_close_load() -> void:
+	var base := "res://work/teste_level_session_close_load.json"
+	_limpar_save_teste(base)
+	var e := _novo_estado()
+	e.indice_nivel = 4
+	e.iniciar_sessao_nivel(true)
+	e.ativar_checkpoint("checkpoint_level_005_04", Vector2(3000.0, 500.0))
+	_ok(e.guardar_em(base, base + ".bak", base + ".tmp"),
+		"sessão válida devia ser gravada")
+	var copia := _novo_estado()
+	_ok(copia.carregar_de(base, base + ".bak"), "sessão devia carregar após close")
+	_ok(copia.checkpoint == Vector2.ZERO,
+		"load não devia confiar numa coordenada arbitrária")
+	_ok(copia.checkpoint_id_session() == "checkpoint_level_005_04",
+		"close/reopen devia preservar o último safe checkpoint ID")
+	e.free(); copia.free()
+	_limpar_save_teste(base)
+
+
+func teste_level_session_invalid_checkpoint_fallback() -> void:
+	var e := _novo_estado()
+	e.indice_nivel = 4
+	e.marcar_nivel_concluido(0)
+	e.ganhar_essencia(37)
+	var d: Dictionary = e.para_dicionario()
+	d["level_session"] = {
+		"active": true, "level_id": "level_005", "checkpoint_id": "invalido"}
+	var processado := SaveFoundation.processar(d, e.NIVEIS.size())
+	_ok(processado.get("ok", false),
+		"checkpoint inválido não devia inutilizar campaign save válido")
+	var seguro: Dictionary = processado.get("data", {})
+	_ok(seguro.get("level_session", {}).get("checkpoint_id", "") \
+		== "checkpoint_level_005_start", "checkpoint inválido devia usar fallback seguro")
+	_ok(seguro.get("completed_level_ids", []) == ["level_001"] \
+		and seguro.get("essencia", 0) == 37,
+		"fallback de sessão não devia perder campaign progress")
+	e.free()
+
+
+func teste_level_session_level_completion() -> void:
+	var e := _novo_estado()
+	e.iniciar_sessao_nivel(true)
+	e.ativar_checkpoint("checkpoint_level_001_01", Vector2(500.0, 300.0))
+	e.avancar_nivel()
+	_ok(0 in e.concluidos, "level completion devia manter progresso permanente")
+	_ok(not e.level_session.get("active", false),
+		"level completion devia terminar a sessão temporária antiga")
+	e.free()
+
+
+func teste_level_session_boss_persistence() -> void:
+	var e := _novo_estado()
+	e.indice_nivel = 4
+	e.iniciar_sessao_nivel(true)
+	e.marcar_chefe_derrotado_por_nivel(4)
+	e.abandonar_sessao_nivel()
+	var copia := _novo_estado()
+	copia.de_dicionario(e.para_dicionario())
+	_ok("boss_level_005" in copia.bosses_derrotados,
+		"boss derrotado devia sobreviver a death/reload/session reset")
+	e.free(); copia.free()
+
+
+func teste_level_session_reward_idempotence() -> void:
+	var e := _novo_estado()
+	e.indice_nivel = 4
+	e.iniciar_sessao_nivel(true)
+	var reward_id := "reward_boss_chest_level_005"
+	_ok(e.marcar_recompensa_reclamada(reward_id), "primeiro claim devia passar")
+	e.abandonar_sessao_nivel()
+	e.iniciar_sessao_nivel(true)
+	_ok(not e.marcar_recompensa_reclamada(reward_id),
+		"session reset não devia permitir duplicar boss chest reward")
+	e.free()
+
+
+func teste_save_v3_migration_level_session() -> void:
+	var e := _novo_estado()
+	e.indice_nivel = 4
+	e.marcar_nivel_concluido(0)
+	var v3: Dictionary = e.para_dicionario()
+	v3["save_version"] = 3
+	v3["checkpoint"] = [1700.0, 636.0]
+	v3["hardcore"] = false
+	v3["hardcore_tempo_restante"] = -1.0
+	v3.erase("level_session")
+	var resultado := SaveFoundation.processar(v3, e.NIVEIS.size())
+	_ok(resultado.get("migrations", []) == [3, 4, 5],
+		"v3 devia migrar sequencialmente por v4 para v5")
+	var d: Dictionary = resultado.get("data", {})
+	_ok(d.get("level_session", {}).get("checkpoint_id", "") \
+		== "checkpoint_level_005_start",
+		"coordenada legacy ambígua devia convergir para início seguro")
+	_ok(d.get("completed_level_ids", []) == ["level_001"],
+		"migration v3 não devia perder progresso permanente")
+	_ok(not d.has("checkpoint"), "schema atual não devia persistir coordenada legacy")
+	e.free()
+
+
+func teste_save_v4_migration_remove_hardcore() -> void:
+	var e := _novo_estado()
+	e.indice_nivel = 4
+	e.marcar_nivel_concluido(0)
+	var v4: Dictionary = e.para_dicionario()
+	v4["save_version"] = 4
+	v4["hardcore"] = true
+	v4["hardcore_tempo_restante"] = 37.5
+	var resultado := SaveFoundation.processar(v4, e.NIVEIS.size())
+	_ok(resultado.get("migrations", []) == [4, 5],
+		"v4 devia migrar sequencialmente para v5")
+	var atual: Dictionary = resultado.get("data", {})
+	_ok(not atual.has("hardcore") and not atual.has("hardcore_tempo_restante"),
+		"Hardcore legacy não devia chegar ao schema atual")
+	_ok(atual.get("current_level_id") == "level_005"
+		and atual.get("completed_level_ids", []) == ["level_001"],
+		"remover Hardcore não devia perder progresso permanente")
+	_ok(SaveFoundation.validar_atual(atual, e.NIVEIS.size()).get("ok", false),
+		"save migrado sem Hardcore devia validar no schema atual")
+	var roundtrip: Dictionary = e.para_dicionario()
+	_ok(not roundtrip.has("hardcore") and not roundtrip.has("hardcore_tempo_restante"),
+		"save atual não devia serializar estado Hardcore")
+	e.free()
 
 
 # --- Movimento (logica pura) -------------------------------------------------
@@ -716,7 +944,9 @@ func teste_tutorial_mecanica_tem_texto() -> void:
 	var cams: Array[String] = []
 	for m in rn.search_all(bloco):
 		cams.append(m.get_string(1))
-	var n_niveis: int = _novo_estado().NIVEIS.size()
+	var estado := _novo_estado()
+	var n_niveis: int = estado.NIVEIS.size()
+	estado.free()
 	_ok(cams.size() == n_niveis,
 		"MECANICA_DO_NIVEL tem %d entradas (deviam ser %d)" % [cams.size(), n_niveis])
 
@@ -780,14 +1010,7 @@ func teste_estado_vida_por_nivel() -> void:
 	_ok(e.vidas == antes + e.VIDAS_POR_NIVEL, "passar de nível devia dar +1 vida")
 	_ok(e.vidas_de_partida() == e.VIDAS_INICIAIS + e.VIDAS_POR_NIVEL,
 		"vidas_de_partida conta os níveis já concluídos")
-	# no hardcore as vidas são o limite do run -- não crescem
-	var h := _novo_estado()
-	h.hardcore = true
-	var antes_h: int = h.vidas
-	h.avancar_nivel()
-	_ok(h.vidas == antes_h, "no hardcore passar de nível NÃO dá vida")
 	e.free()
-	h.free()
 
 
 ## Modo normal: gastar as vidas todas recomeça o nível actual com vidas
@@ -817,8 +1040,8 @@ func teste_estado_reiniciar_run() -> void:
 
 func teste_estado_pistas_sem_duplicados() -> void:
 	var e := _novo_estado()
-	e.registar_pista("carta_da_mae")
-	e.registar_pista("carta_da_mae")
+	e.registar_pista("floresta_sinal_da_porta")
+	e.registar_pista("floresta_sinal_da_porta")
 	_ok(e.pistas.size() == 1, "registar a mesma pista duas vezes nao devia duplicar")
 	e.free()
 
@@ -830,6 +1053,110 @@ func teste_estado_habilidade_sem_duplicados() -> void:
 	_ok(e.habilidades.size() == 1, "desbloquear a mesma habilidade duas vezes nao devia duplicar")
 	_ok(e.tem_habilidade("salto_duplo"), "tem_habilidade devia ser verdadeiro apos desbloquear")
 	e.free()
+
+
+func teste_progression_ids_niveis_e_bosses() -> void:
+	var e := _novo_estado()
+	e.marcar_nivel_concluido(0)
+	e.marcar_nivel_concluido(0)
+	var save: Dictionary = e.para_dicionario()
+	_ok(save.get("current_level_id") == "level_001",
+		"nível atual devia persistir pelo ID estável da Execution 2")
+	_ok(save.get("completed_level_ids") == ["level_001"],
+		"conclusão repetida devia persistir um único level ID")
+	_ok(save.get("defeated_boss_ids") == ["boss_level_001"],
+		"conclusão devia persistir o boss ID explícito do manifesto")
+	_ok(not save.has("indice_nivel") and not save.has("concluidos"),
+		"schema atual não devia persistir referências legacy de nível")
+	e.free()
+
+
+func teste_progression_ids_habilidades_e_coletaveis() -> void:
+	var e := _novo_estado()
+	e.desbloquear_habilidade("dash_aereo")
+	e.desbloquear_habilidade("dash_aereo")
+	e.registar_pista("floresta_sinal_da_porta")
+	e.registar_pista("floresta_sinal_da_porta")
+	var save: Dictionary = e.para_dicionario()
+	_ok(save.get("ability_ids", []).count("ability_dash_aereo") == 1,
+		"ability unlock repetido devia persistir um único stable ID")
+	_ok(save.get("collectible_ids") == ["floresta_sinal_da_porta"],
+		"collectible repetido devia persistir uma única identidade do catálogo")
+	_ok(not save.has("habilidades") and not save.has("pistas"),
+		"schema atual não devia persistir chaves legacy de abilities/collectibles")
+	e.free()
+
+
+func teste_progression_ids_idempotencia_boss_e_recompensa() -> void:
+	var e := _novo_estado()
+	_ok(e.marcar_chefe_derrotado_por_nivel(4), "primeiro boss defeat devia ser registado")
+	_ok(not e.marcar_chefe_derrotado_por_nivel(4), "boss defeat repetido devia ser no-op")
+	var reward_id := ProgressionIDs.reward_id_bau_chefe("level_005")
+	_ok(e.marcar_recompensa_reclamada(reward_id), "primeira recompensa devia ser registada")
+	_ok(not e.marcar_recompensa_reclamada(reward_id), "recompensa repetida devia ser no-op")
+	_ok(e.bosses_derrotados == ["boss_level_005"]
+		and e.recompensas_reclamadas == [reward_id],
+		"boss/reward set-like não deviam conter duplicados")
+	var copia := _novo_estado()
+	copia.de_dicionario(e.para_dicionario())
+	_ok(copia.recompensa_reclamada(reward_id)
+		and not copia.marcar_recompensa_reclamada(reward_id),
+		"reward ID devia continuar idempotente depois de save/load")
+	e.free()
+	copia.free()
+
+
+func teste_progression_ids_invalidos() -> void:
+	var e := _novo_estado()
+	var invalido: Dictionary = e.para_dicionario()
+	invalido["completed_level_ids"] = ["level_999"]
+	_ok(SaveFoundation.validar_atual(invalido, e.NIVEIS.size()).get("error")
+		== "invalid_progression_id", "level ID atual inválido devia ser rejeitado")
+	invalido = e.para_dicionario()
+	invalido["defeated_boss_ids"] = ["boss_por_nome_localizado"]
+	_ok(SaveFoundation.validar_atual(invalido, e.NIVEIS.size()).get("error")
+		== "invalid_progression_id", "boss ID atual inválido devia ser rejeitado")
+	invalido = e.para_dicionario()
+	invalido["ability_ids"] = ["dash_aereo"]
+	_ok(SaveFoundation.validar_atual(invalido, e.NIVEIS.size()).get("error")
+		== "invalid_progression_id", "ability key legacy devia ser rejeitada no schema atual")
+	invalido = e.para_dicionario()
+	invalido["collectible_ids"] = ["nome_do_node"]
+	_ok(SaveFoundation.validar_atual(invalido, e.NIVEIS.size()).get("error")
+		== "invalid_progression_id", "collectible ID inválido devia ser rejeitado")
+	invalido = e.para_dicionario()
+	invalido["claimed_reward_ids"] = ["reward_desconhecida"]
+	_ok(SaveFoundation.validar_atual(invalido, e.NIVEIS.size()).get("error")
+		== "invalid_progression_id", "reward ID inválido devia ser rejeitado")
+	invalido = e.para_dicionario()
+	invalido["ability_ids"] = ["ability_salto_duplo", "ability_salto_duplo"]
+	_ok(SaveFoundation.validar_atual(invalido, e.NIVEIS.size()).get("error")
+		== "duplicate_progression_id", "IDs set-like duplicados deviam ser rejeitados")
+	invalido = e.para_dicionario()
+	invalido["concluidos"] = [0]
+	_ok(SaveFoundation.validar_atual(invalido, e.NIVEIS.size()).get("error")
+		== "legacy_id_in_current", "campo legacy não migrado devia ser detetado")
+	invalido = e.para_dicionario()
+	invalido["completed_level_ids"] = ["level_001"]
+	_ok(SaveFoundation.validar_atual(invalido, e.NIVEIS.size()).get("error")
+		== "incompatible_progression_reference",
+		"nível concluído sem boss/reward correspondentes devia ser rejeitado")
+	e.free()
+
+
+func teste_progression_ids_resilientes_a_renames() -> void:
+	var antes := {
+		"levels": [{"level_id": "level_001", "runtime_scene": "res://Antigo.tscn",
+			"display_name": "Nome Antigo", "boss_ref": {"boss_id": "boss_level_001",
+			"scene": "res://ChefeAntigo.tscn"}}]}
+	var depois := antes.duplicate(true)
+	depois["levels"][0]["runtime_scene"] = "res://Pasta/Novo.tscn"
+	depois["levels"][0]["display_name"] = "Novo nome localizado"
+	depois["levels"][0]["boss_ref"]["scene"] = "res://ChefeRenomeado.tscn"
+	var ids_antes := ProgressionIDs.identidades_do_manifesto(antes)
+	var ids_depois := ProgressionIDs.identidades_do_manifesto(depois)
+	_ok(ids_antes == ids_depois,
+		"renomear display/filename externo não devia alterar level/boss IDs persistentes")
 
 
 func teste_estado_nivel_atual_e_caminho_valido() -> void:
@@ -846,7 +1173,7 @@ func teste_estado_nivel_atual_e_caminho_valido() -> void:
 func teste_estado_save_ida_e_volta() -> void:
 	var e := _novo_estado()
 	e.perder_vida()
-	e.registar_pista("pista_x")
+	e.registar_pista("floresta_sinal_da_porta")
 	e.desbloquear_habilidade("dash_aereo")
 	e.marcar_nivel_concluido(0)
 	var copia := _novo_estado()
@@ -860,6 +1187,259 @@ func teste_estado_save_ida_e_volta() -> void:
 	copia.free()
 
 
+func teste_save_fresh_write_load() -> void:
+	var base := "res://work/teste_save_foundation_fresh.json"
+	_limpar_save_teste(base)
+	var original := _novo_estado()
+	original.vidas = 4
+	original.essencia = 17
+	_ok(original.guardar_em(base, base + ".bak", base + ".tmp"),
+		"fresh save devia ser escrito e verificado")
+	_ok(SaveFoundation.ler(base + ".bak", original.NIVEIS.size()).get("ok", false),
+		"fresh save devia criar logo um backup valido")
+	var copia := _novo_estado()
+	_ok(copia.carregar_de(base, base + ".bak"), "fresh save devia carregar")
+	_ok(copia.vidas == 4 and copia.essencia == 17,
+		"fresh save devia preservar os dados no load")
+	_ok(copia.ultima_origem_save == "primary", "fresh save devia vir do primary")
+	original.free()
+	copia.free()
+	_limpar_save_teste(base)
+
+
+func teste_save_roundtrip_campos() -> void:
+	var base := "res://work/teste_save_foundation_roundtrip.json"
+	_limpar_save_teste(base)
+	var original := _novo_estado()
+	original.indice_nivel = 3
+	original.iniciar_sessao_nivel(true)
+	original.ativar_checkpoint("checkpoint_level_004_02", Vector2(123.5, -42.0))
+	original.habilidades.assign(["salto_duplo", "dash_aereo"])
+	original.pistas.assign(["castelo_aurora_livre"])
+	for indice in [0, 1, 2]:
+		original.marcar_nivel_concluido(indice)
+	original.armas.assign(["shadowblade"])
+	original.arma_equipada = "shadowblade"
+	original.essencia = 29
+	original.melhorias = {"furia": 2}
+	_ok(original.guardar_em(base, base + ".bak", base + ".tmp"),
+		"roundtrip devia gravar estado valido")
+	var copia := _novo_estado()
+	_ok(copia.carregar_de(base, base + ".bak"), "roundtrip devia carregar")
+	_ok(copia.indice_nivel == original.indice_nivel
+		and copia.level_session == original.level_session
+		and copia.habilidades == original.habilidades
+		and copia.pistas == original.pistas
+		and copia.concluidos == original.concluidos
+		and copia.armas == original.armas
+		and copia.arma_equipada == original.arma_equipada
+		and copia.essencia == original.essencia
+		and copia.melhorias == original.melhorias,
+		"roundtrip devia preservar campanha/equipment/economy/abilities")
+	original.free()
+	copia.free()
+	_limpar_save_teste(base)
+
+
+func teste_save_legacy_migration() -> void:
+	var e := _novo_estado()
+	e.essencia = 41
+	var legacy: Dictionary = _save_v2_do_estado(e)
+	legacy.erase("save_version")
+	legacy.erase("save_kind")
+	var resultado := SaveFoundation.processar(legacy, e.NIVEIS.size())
+	_ok(resultado.get("ok", false), "save legacy reconhecido devia migrar")
+	var atual: Dictionary = resultado.get("data", {})
+	_ok(atual.get("save_version") == SaveFoundation.CURRENT_SAVE_VERSION,
+		"legacy migrado devia ficar na versao atual")
+	_ok(atual.get("essencia") == 41,
+		"migration legacy devia preservar progresso permanente")
+	_ok(not atual.has("hardcore") and not atual.has("hardcore_tempo_restante"),
+		"migration legacy não devia reativar Hardcore no schema atual")
+	var arbitrario := SaveFoundation.processar({"foo": "bar"}, e.NIVEIS.size())
+	_ok(arbitrario.get("error") == "invalid_legacy",
+		"JSON arbitrario sem versao nao devia ser assumido como legacy")
+	e.free()
+
+
+func teste_save_migration_sequencial() -> void:
+	var e := _novo_estado()
+	var legacy: Dictionary = _save_v2_do_estado(e)
+	legacy.erase("save_version")
+	legacy.erase("save_kind")
+	var resultado := SaveFoundation.processar(legacy, e.NIVEIS.size())
+	_ok(resultado.get("migrations", []) == [0, 1, 2, 3, 4, 5],
+		"pipeline legacy devia percorrer 0 -> 1 -> 2 -> 3 -> 4 -> 5 sem atalhos")
+	e.free()
+
+
+func teste_save_v2_migration_progressao() -> void:
+	var e := _novo_estado()
+	e.indice_nivel = 4
+	e.habilidades.assign(["salto_duplo", "dash_aereo"])
+	e.pistas.assign(["floresta_sinal_da_porta"])
+	e.concluidos.assign([0, 4, 4])
+	var resultado := SaveFoundation.processar(_save_v2_do_estado(e), e.NIVEIS.size())
+	_ok(resultado.get("ok", false), "save v2 válido devia migrar para stable IDs")
+	_ok(resultado.get("migrations", []) == [2, 3, 4, 5],
+		"migration v2 devia passar sequencialmente por v3, v4 e v5")
+	var atual: Dictionary = resultado.get("data", {})
+	_ok(atual.get("current_level_id") == "level_005",
+		"migration devia converter indice_nivel para level ID")
+	_ok(atual.get("completed_level_ids") == ["level_001", "level_005"],
+		"migration devia preservar conclusões e remover duplicados")
+	_ok(atual.get("defeated_boss_ids") == ["boss_level_001", "boss_level_005"],
+		"migration devia derivar boss IDs explícitos das conclusões v2")
+	_ok(atual.get("claimed_reward_ids") == [
+		"reward_boss_chest_level_001", "reward_boss_chest_level_005"],
+		"níveis v2 concluídos deviam conservar a recompensa já reclamada")
+	_ok(atual.get("ability_ids") == ["ability_salto_duplo", "ability_dash_aereo"],
+		"migration devia converter abilities legacy sem mudar unlocks")
+	_ok(atual.get("collectible_ids") == ["floresta_sinal_da_porta"],
+		"migration devia preservar collectible IDs conhecidos")
+	_ok(not atual.has("indice_nivel") and not atual.has("concluidos")
+		and not atual.has("habilidades") and not atual.has("pistas"),
+		"migration não devia deixar referências legacy no schema atual")
+	e.free()
+
+
+func teste_save_primary_corrupto_backup_valido() -> void:
+	var base := "res://work/teste_save_foundation_recovery.json"
+	_limpar_save_teste(base)
+	var e := _novo_estado()
+	e.essencia = 11
+	_ok(e.guardar_em(base, base + ".bak", base + ".tmp"), "primeiro save devia passar")
+	e.essencia = 22
+	_ok(e.guardar_em(base, base + ".bak", base + ".tmp"),
+		"segundo save devia criar backup do primeiro")
+	_escrever_save_teste(base, "{corrompido")
+	var copia := _novo_estado()
+	_ok(copia.carregar_de(base, base + ".bak"),
+		"primary corrupto devia recuperar pelo backup")
+	_ok(copia.essencia == 11 and copia.ultima_origem_save == "backup",
+		"recovery devia aplicar o ultimo primary anteriormente validado")
+	e.free()
+	copia.free()
+	_limpar_save_teste(base)
+
+
+func teste_save_escrita_nova_invalida_preserva_anterior() -> void:
+	var base := "res://work/teste_save_foundation_invalid_write.json"
+	_limpar_save_teste(base)
+	var e := _novo_estado()
+	e.essencia = 7
+	_ok(e.guardar_em(base, base + ".bak", base + ".tmp"), "save base devia passar")
+	var antes := FileAccess.get_file_as_string(base)
+	var invalido: Dictionary = e.para_dicionario()
+	invalido["vidas"] = -5
+	var resultado := SaveFoundation.escrever_seguro(
+		invalido, base, base + ".bak", base + ".tmp", e.NIVEIS.size())
+	_ok(not resultado.get("ok", false), "nova escrita estruturalmente invalida devia falhar")
+	_ok(FileAccess.get_file_as_string(base) == antes,
+		"escrita invalida nao devia alterar o primary valido")
+	_ok(SaveFoundation.ler(base, e.NIVEIS.size()).get("ok", false),
+		"primary anterior devia continuar recuperavel")
+	e.free()
+	_limpar_save_teste(base)
+
+
+func teste_save_temp_invalido_nao_promovido() -> void:
+	var base := "res://work/teste_save_foundation_invalid_temp.json"
+	_limpar_save_teste(base)
+	var e := _novo_estado()
+	e.essencia = 13
+	_ok(e.guardar_em(base, base + ".bak", base + ".tmp"), "save base devia passar")
+	var antes := FileAccess.get_file_as_string(base)
+	_escrever_save_teste(base + ".tmp", "{temp incompleto")
+	var resultado := SaveFoundation.promover_temp_validado(
+		base, base + ".bak", base + ".tmp", e.NIVEIS.size())
+	_ok(resultado.get("error") == "invalid_temp", "TEMP invalido devia ser rejeitado")
+	_ok(FileAccess.get_file_as_string(base) == antes,
+		"TEMP invalido nunca devia substituir o primary")
+	e.free()
+	_limpar_save_teste(base)
+
+
+func teste_save_versao_futura_preservada() -> void:
+	var base := "res://work/teste_save_foundation_future.json"
+	_limpar_save_teste(base)
+	var e := _novo_estado()
+	var futuro: Dictionary = e.para_dicionario()
+	futuro["save_version"] = SaveFoundation.CURRENT_SAVE_VERSION + 1
+	var texto_futuro := JSON.stringify(futuro, "\t")
+	_escrever_save_teste(base, texto_futuro)
+	var leitura := SaveFoundation.ler(base, e.NIVEIS.size())
+	_ok(leitura.get("error") == "future_version", "versao futura devia ser rejeitada")
+	var resultado := SaveFoundation.escrever_seguro(
+		e.para_dicionario(), base, base + ".bak", base + ".tmp", e.NIVEIS.size())
+	_ok(resultado.get("error") == "future_version",
+		"safe write nao devia substituir primary de versao futura")
+	_ok(FileAccess.get_file_as_string(base) == texto_futuro,
+		"save futuro devia permanecer byte a byte intacto")
+	e.free()
+	_limpar_save_teste(base)
+
+
+func teste_save_migration_invalida_rejeitada() -> void:
+	var base := "res://work/teste_save_foundation_invalid_migration.json"
+	_limpar_save_teste(base)
+	var e := _novo_estado()
+	_ok(e.guardar_em(base, base + ".bak", base + ".tmp"),
+		"save anterior da migration invalida devia ser valido")
+	var antes := FileAccess.get_file_as_string(base)
+	var v1: Dictionary = _save_v2_do_estado(e)
+	v1["save_version"] = 1
+	v1["save_kind"] = "estrutura_incompativel"
+	var resultado := SaveFoundation.processar(v1, e.NIVEIS.size())
+	_ok(resultado.get("error") == "invalid_migration",
+		"migration que produz schema atual incompativel devia ser rejeitada")
+	var escrita := SaveFoundation.escrever_seguro(
+		v1, base, base + ".bak", base + ".tmp", e.NIVEIS.size())
+	_ok(escrita.get("error") == "invalid_migration",
+		"migration invalida nao devia entrar no safe write")
+	_ok(FileAccess.get_file_as_string(base) == antes,
+		"migration invalida devia preservar o primary valido anterior")
+	e.free()
+	_limpar_save_teste(base)
+
+
+func _escrever_save_teste(caminho: String, texto: String) -> void:
+	var f := FileAccess.open(caminho, FileAccess.WRITE)
+	_ok(f != null, "teste nao conseguiu escrever %s" % caminho)
+	if f:
+		f.store_string(texto)
+		f.flush()
+		f.close()
+
+
+func _save_v2_do_estado(e: Node) -> Dictionary:
+	return {
+		"save_version": 2,
+		"save_kind": SaveFoundation.SAVE_KIND,
+		"vidas": e.vidas,
+		"indice_nivel": e.indice_nivel,
+		"checkpoint": [e.checkpoint.x, e.checkpoint.y],
+		"habilidades": e.habilidades.duplicate(),
+		"pistas": e.pistas.duplicate(),
+		"concluidos": e.concluidos.duplicate(),
+		"armas": e.armas.duplicate(),
+		"armaduras": e.armaduras.duplicate(),
+		"arma_equipada": e.arma_equipada,
+		"armadura_equipada": e.armadura_equipada,
+		"hardcore": false,
+		"hardcore_tempo_restante": -1.0,
+		"essencia": e.essencia,
+		"melhorias": e.melhorias.duplicate(),
+	}
+
+
+func _limpar_save_teste(base: String) -> void:
+	for sufixo: String in ["", ".bak", ".tmp", ".bak.tmp", ".tmp.restore"]:
+		var caminho: String = base + sufixo
+		if FileAccess.file_exists(caminho):
+			DirAccess.remove_absolute(ProjectSettings.globalize_path(caminho))
+
+
 ## O menu inicial usa isto para decidir se mostra "Continuar". Um arranque
 ## limpo (campanha reiniciada) não conta como progresso; desbloquear uma
 ## habilidade ou avançar de mundo já conta.
@@ -871,43 +1451,6 @@ func teste_estado_ha_progresso() -> void:
 	e.reiniciar_campanha()
 	_ok(not e.ha_progresso(), "reiniciar a campanha volta a 'sem progresso'")
 	e.free()
-
-
-## Modo hardcore: a flag sobrevive ao save, `reiniciar_campanha()` NÃO lhe
-## mexe (o Game Over recomeça já em hardcore), e o tempo por mundo é
-## positivo e limitado aos 4 mundos.
-func teste_estado_hardcore() -> void:
-	var e := _novo_estado()
-	_ok(not e.hardcore, "arranque normal não é hardcore")
-	e.hardcore = true
-	e.reiniciar_campanha()
-	_ok(e.hardcore, "reiniciar_campanha() não deve desligar o hardcore")
-
-	# o tempo restante conta através das mortes (fica no EstadoJogo), mas
-	# reinicia ao mudar de mundo ou recomeçar
-	e.hardcore_tempo_restante = 42.0
-	e.avancar_nivel()
-	_ok(e.hardcore_tempo_restante < 0.0, "mudar de mundo repõe o relógio hardcore")
-	e.hardcore_tempo_restante = 20.0
-	e.reiniciar_campanha()
-	_ok(e.hardcore_tempo_restante < 0.0, "reiniciar a campanha repõe o relógio hardcore")
-
-	var copia := _novo_estado()
-	e.hardcore_tempo_restante = 33.0
-	copia.de_dicionario(e.para_dicionario())
-	_ok(copia.hardcore, "a flag hardcore devia sobreviver ao save")
-	_ok(is_equal_approx(copia.hardcore_tempo_restante, 33.0),
-		"o tempo restante hardcore devia sobreviver ao save")
-
-	e.indice_nivel = 0
-	var t0: float = e.tempo_hardcore_nivel()
-	e.indice_nivel = 99  # fora dos limites -> usa o último mundo
-	var tn: float = e.tempo_hardcore_nivel()
-	_ok(t0 > 0.0 and tn > 0.0, "o tempo hardcore de cada mundo é positivo")
-	_ok(tn == e.TEMPO_HARDCORE[e.TEMPO_HARDCORE.size() - 1],
-		"índice fora dos limites cai no tempo do último mundo")
-	e.free()
-	copia.free()
 
 
 ## Regiões: cada nível da campanha pertence a uma região; concluir todos os
@@ -1011,10 +1554,9 @@ func teste_estado_mapa_desbloqueio() -> void:
 
 
 # --- Assets: rig da Koliani, especies dos inimigos, packs de fundo ----------
-# Estes testes leem os .gd como TEXTO em vez de os `preload`: em modo
-# `--script` os autoloads (EstadoJogo) nao existem, e `koliani.gd` /
-# `demonio_base.gd` / `checkpoint.gd` referem-nos, logo nem compilam aqui.
-# O que interessa e' apanhar o erro tipico: mudar um nome ou um numero de
+# Estes testes leem os .gd como TEXTO para validar tabelas declarativas sem
+# instanciar actores, efeitos ou estado de jogo. O que interessa e' apanhar o
+# erro tipico: mudar um nome ou um numero de
 # frames numa tabela e a tira deixar de bater certo com o PNG.
 
 ## Le um ficheiro de codigo do repo (ou "" se nao existir).
@@ -1055,11 +1597,16 @@ func _tabela_frames(fonte: String, nome_const: String) -> Dictionary:
 ## larguras entre animacoes: todas as tiras do mesmo rig/especie tem de ter
 ## o frame do mesmo tamanho -- e' o que apanha um numero de frames errado
 ## (400 px tanto da' 4 frames de 100 como 5 de 80).
+func _imagem_importada(caminho: String) -> Image:
+	var textura := ResourceLoader.load(caminho, "Texture2D") as Texture2D
+	return textura.get_image() if textura != null else null
+
+
 func _tira_bate_certo(caminho: String, n: int, quem: String) -> int:
 	if not FileAccess.file_exists(caminho):
 		_ok(false, "%s: falta a tira %s" % [quem, caminho])
 		return 0
-	var img := Image.load_from_file(caminho)
+	var img := _imagem_importada(caminho)
 	if img == null:
 		_ok(false, "%s: nao abriu %s" % [quem, caminho])
 		return 0
@@ -1153,7 +1700,9 @@ func teste_especies_dos_inimigos_existem() -> void:
 	var assinaturas: Array[String] = []
 	for m in rn.search_all(bloco):
 		assinaturas.append(m.get_string(1))
-	var n_niveis: int = _novo_estado().NIVEIS.size()
+	var estado := _novo_estado()
+	var n_niveis: int = estado.NIVEIS.size()
+	estado.free()
 	_ok(assinaturas.size() == n_niveis,
 		"ESP_ASSINATURA tem %d entradas (deviam ser %d, uma por nível)"
 			% [assinaturas.size(), n_niveis])
@@ -1208,6 +1757,7 @@ func teste_regioes_tem_nome_e_cor() -> void:
 	# o passo dentro da região (o "3 / 5" do cabeçalho da HUD)
 	var passo: Array[int] = e.passo_na_regiao(e.REGIOES[0]["niveis"][2])
 	_ok(passo == [3, 5], "passo_na_regiao devia dar [3, 5], deu %s" % str(passo))
+	e.free()
 
 
 ## As peças da interface (`assets/ui/`) estão geradas e importadas. Se
@@ -1250,7 +1800,7 @@ func teste_paineis_nao_trazem_o_vizinho() -> void:
 		var caminho := "res://assets/ui/%s.png" % nome
 		if not FileAccess.file_exists(caminho):
 			continue   # a falta ja' e' reportada por `teste_pecas_de_ui_existem`
-		var img := Image.load_from_file(caminho)
+		var img := _imagem_importada(caminho)
 		if img == null:
 			_ok(false, "%s: nao abriu" % nome)
 			continue
@@ -1296,10 +1846,9 @@ func _risca_escura(img: Image, fixo: int, de: int, ate: int, vertical: bool) -> 
 ##  - as 32 camaras estreiam todas nos primeiros 32 niveis, cada uma na sua
 ##    vez. Sem isto o jogo voltava a abrir tudo de uma vez.
 ##
-## Le'-se do CODIGO-FONTE, nao da classe: tocar em `GeradorCorredor` pelo
-## nome obriga a compilar o script, que usa autoloads -- e em `--script` os
-## autoloads nao existem, portanto o teste passaria EM SILENCIO sem medir
-## nada. Mesma armadilha do `verifica_jornada.gd`.
+## Le'-se do CODIGO-FONTE para medir a tabela declarativa completa sem
+## construir uma jornada. A integracao em runtime fica em
+## `verifica_jornada.gd`.
 func teste_mecanica_por_nivel() -> void:
 	var src := _fonte("res://scripts/gerador_corredor.gd")
 	if src == "":
@@ -1443,10 +1992,8 @@ func teste_rigs_dos_chefes() -> void:
 	var re_esc := RegEx.new()
 	re_esc.compile('(?m)^escala_visual = ([0-9.]+)')
 
-	# Os dois tectos vêm do `chefe_base.gd` -- lidos da FONTE, não do
-	# `ChefeBase.` directo: em `--script` os autoloads (`Som`, `EstadoJogo`)
-	# não existem, e tocar na classe puxava a cadeia toda e enchia o log de
-	# "Compile Error: Identifier not found".
+	# Os dois tectos vêm do `chefe_base.gd` e são lidos da FONTE para este
+	# teste continuar focado nos dados dos rigs, sem instanciar chefes.
 	var fonte_cb := _fonte("res://scripts/chefe_base.gd")
 	var alvo_h := _constante_float(fonte_cb, "ALTURA_ALVO_CHEFE")
 	var alvo_w := _constante_float(fonte_cb, "LARGURA_ALVO_CHEFE")
@@ -1494,7 +2041,7 @@ func teste_rigs_dos_chefes() -> void:
 
 		# tamanho no ecrã: o mesmo cálculo do `DemonioBase._normalizar_escala`
 		# (altura-alvo com tecto de largura) vezes o `escala_visual` da cena.
-		var img := Image.load_from_file(
+		var img := _imagem_importada(
 			"res://assets/sprites/pixel/bosses_anim/%s/idle.png" % rig)
 		if img == null or larg_frame <= 0:
 			continue

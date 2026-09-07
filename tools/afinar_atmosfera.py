@@ -26,22 +26,30 @@ a mesma imagem) e foi apagado. A II e a IV ficaram com um pack so', e por
 isso ganharam `masmorra` e `gruta`, montados de material CC0 que ja' estava
 descarregado e por usar (ver `tools/gerar_fundos.py`).
 
-Reescreve o bloco de propriedades do no `Atmosfera` de cada
-`scenes/levels/*.tscn`. So' mexe nas chaves da tabela -- `bioma`,
-`largura_nivel`, `extensao_esquerda` e o que mais la' esteja fica intacto.
+Produz em staging o bloco de propriedades do no `Atmosfera` de cada cena. A
+promoção para `scenes/levels/*.tscn` respeita o ownership do manifesto e é
+recusada para targets protegidos.
 
-  python tools/afinar_atmosfera.py            # aplica
+  python tools/afinar_atmosfera.py            # staging seguro
   python tools/afinar_atmosfera.py --dry-run  # so' diz o que faria
+  python tools/afinar_atmosfera.py --promote  # sujeito ao manifesto
 """
 
 from __future__ import annotations
 
+import argparse
 import os
 import re
+import shutil
 import sys
+
+from level_contract import carregar_manifesto, motivo_protecao, validar_pasta_staging
 
 RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 NIVEIS_DIR = os.path.join(RAIZ, "scenes", "levels")
+STAGING = os.path.join(RAIZ, "work", "generator_staging", "atmosfera")
+GENERATOR_ID = "koliani.atmosphere_tuning"
+GENERATOR_VERSION = "1.0.0"
 
 # Por nivel:
 #   pack     -- entrada de PACKS em atmosfera.gd
@@ -259,44 +267,104 @@ def cor(c) -> str:
     return "Color(%s, 1)" % ", ".join(("%g" % round(v, 3)) for v in c)
 
 
+def renderizar_atmosfera(s: str, i: int, linha: tuple) -> str | None:
+    """Devolve a cena afinada sem escrever; a mesma entrada dá a mesma saída."""
+    nome, pack, amb, fundo, silh, luz, po, dens, tinta, neb, des, horiz = linha
+    m = re.search(r'(\[node name="Atmosfera"[^\]]*\]\r?\n)((?:[a-z_]+ = .*\r?\n)*)', s)
+    if not m:
+        return None
+
+    antigos = {}
+    for lin in m.group(2).splitlines():
+        mm = re.match(r"([a-z_]+) = (.*)", lin.strip())
+        if mm and mm.group(1) not in MEUS:
+            antigos[mm.group(1)] = mm.group(2)
+
+    novos = {
+        "cor_ambiente": cor(amb), "cor_fundo": cor(fundo),
+        "cor_silhueta": cor(silh), "cor_luz": cor(luz), "cor_poeira": cor(po),
+        "densidade_poeira": "%g" % dens, "fundo_pack": '"%s"' % pack,
+        "tinta_fundo": cor(tinta), "neblina_fundo": "%g" % neb,
+        "dessaturar_fundo": "%g" % des, "seed_ambiente": str(1000 + i * 37),
+    }
+    if horiz:
+        novos["luzes_horizonte"] = "true"
+    novos.update(antigos)
+    corpo = "".join("%s = %s\n" % (k, novos[k]) for k in CHAVES if k in novos)
+    return s[:m.start(2)] + corpo + s[m.end(2):]
+
+
 def main() -> int:
-    seco = "--dry-run" in sys.argv
-    for i, linha in enumerate(TABELA):
+    parser = argparse.ArgumentParser(description="Afinação atmosférica não destrutiva")
+    parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--staging-dir", default=STAGING)
+    parser.add_argument("--promote", action="store_true")
+    parser.add_argument("--level-id", action="append", dest="level_ids")
+    args = parser.parse_args()
+    try:
+        args.staging_dir = validar_pasta_staging(args.staging_dir)
+    except ValueError as erro:
+        print("RECUSADO: %s" % erro, file=sys.stderr)
+        return 2
+
+    manifesto = carregar_manifesto()
+    por_id = {nivel["level_id"]: nivel for nivel in manifesto["levels"]}
+    por_nome = {
+        os.path.splitext(os.path.basename(nivel["runtime_scene"]))[0]: nivel
+        for nivel in manifesto["levels"]
+    }
+    selecionados = set(args.level_ids or [])
+    desconhecidos = selecionados - set(por_id)
+    if desconhecidos:
+        for level_id in sorted(desconhecidos):
+            print("RECUSADO %s: ausente do manifesto" % level_id, file=sys.stderr)
+        return 2
+    linhas = [(i, linha) for i, linha in enumerate(TABELA)
+              if not selecionados or por_nome.get(linha[0], {}).get("level_id") in selecionados]
+
+    if args.promote:
+        recusas = []
+        for _i, linha in linhas:
+            nivel = por_nome.get(linha[0])
+            motivo = "cena ausente do manifesto" if nivel is None else motivo_protecao(nivel)
+            if motivo:
+                recusas.append("%s: %s" % (nivel["level_id"] if nivel else linha[0], motivo))
+        if recusas:
+            for recusa in recusas:
+                print("RECUSADO " + recusa, file=sys.stderr)
+            print("Nenhuma cena runtime foi alterada.", file=sys.stderr)
+            return 2
+
+    if not args.dry_run:
+        os.makedirs(args.staging_dir, exist_ok=True)
+    staged: list[tuple[str, str]] = []
+    for i, linha in linhas:
         nome, pack, amb, fundo, silh, luz, po, dens, tinta, neb, des, horiz = linha
         cam = os.path.join(NIVEIS_DIR, nome + ".tscn")
         if not os.path.exists(cam):
             print("  ! sem cena:", nome)
             continue
         s = open(cam, encoding="utf-8").read()
-        m = re.search(r'(\[node name="Atmosfera"[^\]]*\]\r?\n)((?:[a-z_]+ = .*\r?\n)*)', s)
-        if not m:
+        s2 = renderizar_atmosfera(s, i, linha)
+        if s2 is None:
             print("  ! sem no Atmosfera:", nome)
             continue
-
-        # o que a cena ja' tinha e nao e' meu (bioma, largura_nivel, ...)
-        antigos = {}
-        for lin in m.group(2).splitlines():
-            mm = re.match(r"([a-z_]+) = (.*)", lin.strip())
-            if mm and mm.group(1) not in MEUS:
-                antigos[mm.group(1)] = mm.group(2)
-
-        novos = {
-            "cor_ambiente": cor(amb), "cor_fundo": cor(fundo),
-            "cor_silhueta": cor(silh), "cor_luz": cor(luz), "cor_poeira": cor(po),
-            "densidade_poeira": "%g" % dens, "fundo_pack": '"%s"' % pack,
-            "tinta_fundo": cor(tinta), "neblina_fundo": "%g" % neb,
-            "dessaturar_fundo": "%g" % des, "seed_ambiente": str(1000 + i * 37),
-        }
-        if horiz:
-            novos["luzes_horizonte"] = "true"
-        novos.update(antigos)
-
-        corpo = "".join("%s = %s\n" % (k, novos[k]) for k in CHAVES if k in novos)
-        s2 = s[:m.start(2)] + corpo + s[m.end(2):]
         print("%2d %-24s %-14s neb=%-4s des=%-4s%s" % (
             i, nome[:24], pack, neb, des, "  [horizonte]" if horiz else ""))
-        if not seco and s2 != s:
-            open(cam, "w", encoding="utf-8", newline="") .write(s2)
+        staged_path = os.path.join(args.staging_dir, nome + ".tscn")
+        if not args.dry_run:
+            with open(staged_path, "w", encoding="utf-8", newline="") as ficheiro:
+                ficheiro.write(s2)
+            staged.append((staged_path, cam))
+
+    if args.promote and not args.dry_run:
+        for origem, destino in staged:
+            temporario = destino + ".promotion_pending"
+            shutil.copyfile(origem, temporario)
+            os.replace(temporario, destino)
+        print("%d cenas promovidas segundo o manifesto" % len(staged))
+    elif not args.dry_run:
+        print("Staging concluído; cenas runtime permaneceram intactas.")
     return 0
 
 

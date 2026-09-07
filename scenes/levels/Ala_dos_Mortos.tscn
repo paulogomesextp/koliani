@@ -53,9 +53,10 @@ dessaturar_fundo = 0.28
 seed_ambiente = 1296
 
 [node name="Casca" parent="." instance=ExtResource("10_casca")]
-largura = 3500.0
-altura = 600.0
-topo = 150.0
+topo = -128.0
+altura = 2200.0
+largura = 3592.0
+volumes_interiores = Array[Rect2]([Rect2(8, -128, 512, 416), Rect2(520, -128, 512, 416), Rect2(1032, -128, 512, 352), Rect2(1544, -128, 512, 320), Rect2(2056, -128, 512, 320), Rect2(2568, -128, 512, 352), Rect2(3080, -128, 512, 416)])
 esquerda = -120.0
 chao = false
 agua = false
