@@ -29,6 +29,10 @@ func _ready() -> void:
 		return
 	var nivel := cena_nivel.instantiate()
 	add_child(nivel)
+	var boss_id := "boss_level_005" if EstadoJogo.indice_nivel == 4 else "none"
+	print("RUNTIME TRACE | build=%s | main_scene=res://scenes/Main.tscn | level_id=level_%03d | level_scene=%s | player_scene=res://scenes/actors/Koliani.tscn | boss_id=%s" % [
+		str(ProjectSettings.get_setting("application/config/version", "0.0.0")),
+		EstadoJogo.indice_nivel + 1, caminho, boss_id])
 	_validar_recovery_session.call_deferred(nivel)
 
 	var porta := _procurar_porta(nivel)
@@ -39,7 +43,7 @@ func _ready() -> void:
 	# O Diário de pistas foi retirado do jogo a pedido do Paulo (ago 2026).
 	# `scenes/ui/Diario.tscn` / `scripts/diario*.gd` ficam no repo, dormentes.
 	add_child(CENA_PAUSA.instantiate())
-	if EstadoJogo.modo_dev:
+	if EstadoJogo.modo_dev and OS.is_debug_build():
 		add_child(CENA_DEV_BARRA.instantiate())
 
 	# acabou de passar de nível (a Porta chamou `avancar_nivel`)
@@ -48,10 +52,17 @@ func _ready() -> void:
 		_anunciar_avanco()
 
 	# `godot --path . -- --foto[=ficheiro]`: tira uma captura e sai (dev).
+	var estado_foto := ""
+	for a in OS.get_cmdline_user_args():
+		if a.begins_with("--foto-estado="):
+			estado_foto = a.get_slice("=", 1)
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--foto"):
+			if a.begins_with("--foto-estado="):
+				continue
 			var alvo := a.get_slice("=", 1) if "=" in a else "user://foto.png"
-			_tirar_foto(alvo)
+			_tirar_foto(alvo, estado_foto)
+			break
 
 
 func _procurar_porta(no: Node) -> Porta:
@@ -170,8 +181,22 @@ func _toast_debug(txt: String) -> void:
 	t.tween_callback(camada.queue_free)
 
 
-func _tirar_foto(caminho: String) -> void:
-	await get_tree().create_timer(0.8).timeout
+func _tirar_foto(caminho: String, estado := "") -> void:
+	await get_tree().create_timer(0.55).timeout
+	var koliani := get_tree().get_first_node_in_group("koliani") as Node2D
+	if estado == "combate" and koliani:
+		Input.action_press("atacar")
+		await get_tree().create_timer(0.12).timeout
+		Input.action_release("atacar")
+		await get_tree().create_timer(0.08).timeout
+	elif estado == "boss" and koliani:
+		var boss := get_tree().get_first_node_in_group("chefes") as Node2D
+		if boss:
+			koliani.global_position = boss.global_position + Vector2(-210.0, -42.0)
+			koliani.set("velocity", Vector2.ZERO)
+			await get_tree().create_timer(0.45).timeout
+	else:
+		await get_tree().create_timer(0.25).timeout
 	var img := get_viewport().get_texture().get_image()
 	img.save_png(caminho)
 	print("FOTO guardada: ", ProjectSettings.globalize_path(caminho))

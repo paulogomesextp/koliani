@@ -60,6 +60,7 @@ func _correr_tudo() -> void:
 	teste_progression_ids_resilientes_a_renames()
 	teste_execution_7_combate_e_progressao_regiao1()
 	teste_execution_7_guardioes_e_boss_regional()
+	teste_execution_8_integracao_player_facing()
 	teste_level_session_begin()
 	teste_level_session_stable_checkpoint_identity()
 	teste_level_session_checkpoint_activation_repeated()
@@ -1219,6 +1220,42 @@ func teste_execution_7_guardioes_e_boss_regional() -> void:
 		and estado.recompensas_reclamadas == ["reward_boss_chest_level_005"],
 		"Execution 7: boss/reward de L5 deviam manter IDs estáveis")
 	estado.free()
+
+
+func teste_execution_8_integracao_player_facing() -> void:
+	var caminhos := [
+		"res://scenes/levels/Floresta_Putrefata.tscn",
+		"res://scenes/levels/Pantano_dos_Sussurros.tscn",
+		"res://scenes/levels/Ninho_da_Viuva_Negra.tscn",
+		"res://scenes/levels/A_Arvore_que_Chora.tscn",
+		"res://scenes/levels/Coracao_da_Floresta.tscn",
+	]
+	for i in caminhos.size():
+		var cena := load(caminhos[i]) as PackedScene
+		var nivel := cena.instantiate() if cena else null
+		_ok(nivel != null, "Execution 8: L%d não carregou" % (i + 1))
+		if nivel == null:
+			continue
+		var koliani := nivel.get_node_or_null("Koliani")
+		_ok(koliani != null and bool(koliani.get("usar_piloto_visual_5g"))
+			and bool(koliani.get("usar_prototipo_premium")),
+			"Execution 8: Koliani validada não ativa em L%d" % (i + 1))
+		var visual := nivel.get_node_or_null("Region1HybridVisualTarget")
+		_ok(visual != null and bool(visual.get("ativo")),
+			"Execution 8: panorama aprovado não ativo em L%d" % (i + 1))
+		_ok(i == 0 or bool(visual.get("apenas_panorama_aprovado")),
+			"Execution 8: L%d devia reutilizar apenas o panorama aprovado" % (i + 1))
+		nivel.free()
+
+	var menu := FileAccess.get_file_as_string("res://scripts/menu_inicial.gd")
+	var main := FileAccess.get_file_as_string("res://scripts/main.gd")
+	var dev := FileAccess.get_file_as_string("res://scripts/dev_barra.gd")
+	_ok(menu.contains("_dev.visible = permitir_dev")
+		and menu.contains("--devmode\" and OS.is_debug_build()"),
+		"Execution 8: menu release não fecha as entradas de developer mode")
+	_ok(main.contains("EstadoJogo.modo_dev and OS.is_debug_build()")
+		and dev.contains("not OS.is_debug_build() or not EstadoJogo.modo_dev"),
+		"Execution 8: DevBarra não tem defesa release em profundidade")
 
 
 func teste_progression_ids_resilientes_a_renames() -> void:

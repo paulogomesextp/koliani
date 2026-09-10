@@ -27,11 +27,21 @@ func _ok(condicao: bool, mensagem: String) -> void:
 func _correr() -> void:
 	await process_frame
 	var estado := root.get_node_or_null("EstadoJogo")
+	var bosses_antes: Array[String] = []
+	var recompensas_antes: Array[String] = []
 	if estado:
+		# O gate tem de medir o estado inicial do nível, independentemente do save
+		# local do jogador. Restauramos a memória antes de terminar e não gravamos.
+		bosses_antes.assign(estado.bosses_derrotados)
+		recompensas_antes.assign(estado.recompensas_reclamadas)
+		estado.bosses_derrotados.erase("boss_level_005")
+		estado.recompensas_reclamadas.erase("reward_boss_chest_level_005")
 		estado.modo_teste = true
 	for i in LEVELS.size():
 		await _verificar_nivel(i)
 	if estado:
+		estado.bosses_derrotados.assign(bosses_antes)
+		estado.recompensas_reclamadas.assign(recompensas_antes)
 		estado.modo_teste = false
 	if _falhas.is_empty():
 		print("EXECUTION 7 TARGETED: PASS -- combate/progressao, inimigos, L1-L5 e boss")

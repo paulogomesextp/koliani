@@ -3,10 +3,12 @@ extends Node2D
 ## Execution 5C — amostra visual Hybrid Cinematic 2D da Região I.
 ##
 ## Este módulo só desenha apresentação. Não cria corpos, áreas, colisões nem
-## altera a geometria existente. A instância vive exclusivamente no Level 1 e
+## altera a geometria existente. No Level 1 mantém a integração 6A completa;
+## nos restantes níveis da Região I pode montar apenas o panorama aprovado.
 ## `ativo = false` é o interruptor de rollback.
 
 @export var ativo := true
+@export var apenas_panorama_aprovado := false
 @export var limite_esquerdo := -2550.0
 @export var limite_direito := 3850.0
 
@@ -105,13 +107,14 @@ func _ready() -> void:
 	_montar_background()
 	_montar_heart_tree()
 	_montar_midground()
+	_montar_foreground()
+	if apenas_panorama_aprovado:
+		return
 	_montar_superficies()
 	_montar_corrupcao()
 	_montar_atmosfera()
-	_montar_foreground()
 	_montar_luzes()
 	_ligar_shadowblade.call_deferred()
-	_aplicar_skin_hud.call_deferred()
 
 
 func _exit_tree() -> void:

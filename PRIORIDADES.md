@@ -2,17 +2,20 @@
 
 ## Agora
 
-1. **Execution 7 — PARTIAL PASS / HUMAN REVIEW REQUIRED:** jogar a Região I
+1. **Execution 8 — PARTIAL PASS / HUMAN REVIEW REQUIRED:** jogar a Região I
    completa (L1→L5→Coração Putrefacto→reward) nos builds Windows e Web/PWA;
-   validar legibilidade visual, feel do combo/aéreo/Dash, curva de dificuldade,
-   checkpoints e ritmo do boss. A validação técnica disponível passou; isto
-   não constitui aprovação humana.
+   confirmar o menu sem dev UI, Koliani atual, panorama partilhado e validar
+   legibilidade visual, feel do combo/aéreo/Dash, curva de dificuldade,
+   checkpoints e ritmo do boss. A validação técnica e o runtime exportado
+   passaram; isto não constitui aprovação humana.
 
 ## A seguir
 
-2. **Produção visual aprovada em falta:** frames limpos de combate, layers
+2. **Produção visual aprovada em falta:** frames limpos de combate, plataformas,
+   props, layers
    alpha/tiles Hybrid L2–L5, criaturas/guardiões, Coração Putrefacto, HUD,
-   VFX e áudio, sem reabrir design nem recortar pranchas arbitrariamente.
+   menu/seletor, VFX e áudio, sem reabrir design nem recortar pranchas
+   arbitrariamente.
 3. **Completar run_brake e land — PRODUÇÃO EM FALTA:** substituir os fallbacks
    aprovados apenas quando existirem os 11 frames limpos. Não inferir pixels.
 

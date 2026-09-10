@@ -4,6 +4,29 @@
 
 Atualizado em 10 de setembro de 2026.
 
+## Execution 8 — Real Game Production Integration
+
+Estado: **PARTIAL PASS — REAL RUNTIME TECHNICALLY VALIDATED / HUMAN REVIEW
+REQUIRED**. O fluxo real `Koliani.exe` → menu → mapa/seletor → `Main` →
+L1–L5 foi traçado. A Koliani 6B e os 44 frames SAFE estão ativos nos cinco
+níveis; panorama/Heart Tree aprovado de 6A foi ligado em toda a Região I;
+combate, guardiões, Coração Putrefacto e reward foram confirmados ativos.
+
+Exports release já não oferecem `DEVELOPER MODE`, `BOSS TEST`, `TESTAR OUTRO
+NÍVEL` nem `FLYMODE`. Windows e Web/PWA foram regenerados do mesmo estado;
+smoke Windows, capturas reais, HTTP/Chrome e service worker passaram. Cache
+PWA: `1789065387|5837615`. Evidência:
+`work/execution_8/real_runtime/region1_runtime_contact_sheet.png`. Relatório:
+`docs/execution_8_real_game_production_integration.md`. Retoma externa:
+`docs/claude_handoff_execution_8.md`.
+
+Plataformas, props, inimigos/guardiões, boss art, parte de UI e VFX/SFX
+continuam legacy por falta de assets de produção aprovados. O kit regional
+ImageGen permanece apenas tecnicamente validado e não foi promovido para
+L2–L5. **HUMAN VISUAL/COMBAT FEEL/BALANCE/PLAYTEST e DEVICE VALIDATION
+REQUIRED**. Próximo passo: revisão humana do build 8 e criação/aprovação dos
+gaps; não iniciar Região II.
+
 ## Execution 7 — Region I Vertical Slice Completion
 
 Estado: **PARTIAL PASS — TECHNICALLY VALIDATED / HUMAN REVIEW REQUIRED**.

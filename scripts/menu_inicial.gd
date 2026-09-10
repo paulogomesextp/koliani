@@ -25,6 +25,7 @@ const CENA_OPCOES := preload("res://scenes/ui/Opcoes.tscn")
 @onready var _novo: Button = $Centro/NovoJogo
 @onready var _load: Button = $Centro/LoadGame
 @onready var _opcoes: Button = $Centro/Opcoes
+@onready var _espaco_dev: Control = $Centro/EspacoDev
 @onready var _dev: Button = $Centro/DevMode
 @onready var _aviso: Label = $Centro/Aviso
 @onready var _sair: Button = $Centro/Sair
@@ -36,6 +37,14 @@ var _armado := ""
 
 func _ready() -> void:
 	_versao.text = "v" + str(ProjectSettings.get_setting("application/config/version", "0.0.0"))
+	print("RUNTIME TRACE | build=%s | main_scene=res://scenes/ui/MenuInicial.tscn" %
+		str(ProjectSettings.get_setting("application/config/version", "0.0.0")))
+	# A entrada de desenvolvimento pertence ao editor/export-debug. O export
+	# release mantém os atalhos de captura, mas nunca oferece um caminho normal
+	# para BOSS TEST / TESTAR OUTRO NÍVEL / FLYMODE.
+	var permitir_dev := OS.is_debug_build()
+	_espaco_dev.visible = permitir_dev
+	_dev.visible = permitir_dev
 
 	# voltar ao menu sai do "DEV MODE" -- recarrega o save real do disco
 	# (o sandbox de dev nunca é gravado, por isso o progresso fica intacto).
@@ -65,6 +74,7 @@ func _ready() -> void:
 	_destacar_botao_principal(principal)
 	_preparar_hover_animado()
 	principal.grab_focus()
+	_agendar_prova_runtime()
 
 
 ## Dá destaque visual (mais saturado, com glow) ao botão de ação principal
@@ -99,12 +109,18 @@ func _destacar_botao_principal(botao: Button) -> void:
 ## Pequena resposta de escala ao passar/focar o rato em cada botão --
 ## substitui a mudança de cor estática por algo com mais vida.
 func _preparar_hover_animado() -> void:
-	for b: Button in [_novo, _load, _opcoes, _dev, _sair]:
+	for b: Button in [_novo, _load, _opcoes, _sair]:
 		b.resized.connect(func() -> void: b.pivot_offset = b.size / 2.0)
 		b.mouse_entered.connect(func() -> void: _animar_escala(b, 1.035))
 		b.mouse_exited.connect(func() -> void: _animar_escala(b, 1.0))
 		b.focus_entered.connect(func() -> void: _animar_escala(b, 1.035))
 		b.focus_exited.connect(func() -> void: _animar_escala(b, 1.0))
+	if _dev.visible:
+		_dev.resized.connect(func() -> void: _dev.pivot_offset = _dev.size / 2.0)
+		_dev.mouse_entered.connect(func() -> void: _animar_escala(_dev, 1.035))
+		_dev.mouse_exited.connect(func() -> void: _animar_escala(_dev, 1.0))
+		_dev.focus_entered.connect(func() -> void: _animar_escala(_dev, 1.035))
+		_dev.focus_exited.connect(func() -> void: _animar_escala(_dev, 1.0))
 
 
 func _animar_escala(botao: Button, alvo: float) -> void:
@@ -164,9 +180,9 @@ func _tratar_atalhos_dev() -> bool:
 	var devmode := false
 	var nivel := -1
 	for a in OS.get_cmdline_user_args():
-		if a == "--jogar" or a.begins_with("--foto"):
+		if a == "--jogar" or a == "--foto" or a.begins_with("--foto="):
 			saltar = true
-		elif a == "--devmode":
+		elif a == "--devmode" and OS.is_debug_build():
 			saltar = true
 			devmode = true
 		elif a.begins_with("--nivel="):
@@ -181,6 +197,26 @@ func _tratar_atalhos_dev() -> bool:
 		EstadoJogo.iniciar_sessao_nivel(true)
 	_ir_jogar()
 	return true
+
+
+## Prova invisível do export: fotografa as cenas reais do fluxo normal. Não
+## ativa modo dev nem reconstrói UI fora do produto.
+func _agendar_prova_runtime() -> void:
+	for argumento in OS.get_cmdline_user_args():
+		if argumento.begins_with("--foto-menu="):
+			_tirar_foto_menu.call_deferred(argumento.get_slice("=", 1))
+			return
+		if argumento.begins_with("--foto-mapa="):
+			get_tree().change_scene_to_file.call_deferred(CENA_MAPA)
+			return
+
+
+func _tirar_foto_menu(caminho: String) -> void:
+	await get_tree().create_timer(0.8).timeout
+	var imagem := get_viewport().get_texture().get_image()
+	imagem.save_png(caminho)
+	print("PROVA RUNTIME MENU: ", caminho)
+	get_tree().quit(0)
 
 
 ## Deriva muito lenta do fundo (a `Arte` é maior que o ecrã, sobra folga).
@@ -203,6 +239,8 @@ func _abrir_opcoes() -> void:
 ## infinita, sem perder vida) a partir do nível 1. Não mexe no save real; a
 ## barra "TESTAR OUTRO NÍVEL" (dev_barra.gd) troca de nível dentro do jogo.
 func _ao_dev_mode() -> void:
+	if not OS.is_debug_build():
+		return
 	_repor_botoes()
 	EstadoJogo.ativar_modo_dev()
 	_ir_jogar()

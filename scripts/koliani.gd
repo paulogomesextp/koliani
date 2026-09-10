@@ -387,12 +387,11 @@ func _ready() -> void:
 ##      `tools/importar_rig_koliani_nova.py`.
 const RIG := "shadowblade"
 
-## Execution 5B: variante visual isolada por instancia. O valor por omissao
-## preserva o rig Shadowblade actual nos outros 99 niveis; apenas o Level 1
-## activa o prototype premium na sua cena.
+## Execution 5B/8: variante visual por instância. O valor por omissão preserva
+## o rig Shadowblade fora do lote; a Região I ativa o fallback premium.
 @export var usar_prototipo_premium := false
 
-## Execution 5G: sobreposição exclusiva de locomoção para o piloto do Level 1.
+## Execution 5G/8: sobreposição de locomoção validada para a Região I.
 ## Mantém o prototype 5B como fallback para combate e estados sem arte 5G.
 @export var usar_piloto_visual_5g := false
 

@@ -166,7 +166,7 @@ theme_override_font_sizes/font_size = 68
 [node name="Subtitulo" type="Label" parent="Centro"]
 layout_mode = 2
 horizontal_alignment = 1
-text = "Cross the ghostly worlds. Free Aurora."
+text = "Cross the ghostly worlds. Free Elara."
 theme_override_colors/font_color = Color(0.82, 0.72, 0.9, 1)
 theme_override_colors/font_outline_color = Color(0.02, 0.01, 0.03, 0.9)
 theme_override_constants/outline_size = 6

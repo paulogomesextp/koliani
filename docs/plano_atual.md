@@ -1,4 +1,84 @@
-# Plano atual — Execution 7 Region I Vertical Slice Completion
+# Plano atual — Execution 8 Real Game Production Integration
+
+## Objetivo, âmbito e critério de conclusão 8 — 10 setembro 2026
+
+Integrar no fluxo real do produto todo o trabalho funcional e todo o material
+de produção já aprovado, seguro e disponível para a Região I, retirando da
+apresentação normal os controlos de desenvolvimento e provando a cadeia
+menu → seletor → `level_001`–`level_005` → Coração Putrefacto → recompensa.
+
+Âmbito exato de níveis:
+
+- `scenes/levels/Floresta_Putrefata.tscn` (`level_001`);
+- `scenes/levels/Pantano_dos_Sussurros.tscn` (`level_002`);
+- `scenes/levels/Ninho_da_Viuva_Negra.tscn` (`level_003`);
+- `scenes/levels/A_Arvore_que_Chora.tscn` (`level_004`);
+- `scenes/levels/Coracao_da_Floresta.tscn` (`level_005`).
+
+Âmbito partilhado: `MenuInicial`, `MapaMundo`/`SeletorNiveis`, `HUD`, pausa,
+`Main`, `Koliani`, combate, inimigos e arquitetura de chefe já usada pelos
+cinco níveis; assets e módulos visuais existentes; pipelines de export
+Windows/Web-PWA; verificadores, evidência e documentação exclusivos da
+Execution 8. Movimento, câmara, colisões, escala `0,82`, offset
+`-15,170732`, pivot `(80,90)`, canvas `160×96` e baseline `Y=90` ficam
+congelados. Região II, Android, iOS, redesign e arte inventada ficam fora.
+
+Critério: mapear recurso canónico contra recurso realmente carregado; ligar
+implementações validadas que estejam desconectadas; integrar apenas assets
+de produção com proveniência permitida; esconder `BOSS TEST`, `TESTAR OUTRO
+NÍVEL`, `FLYMODE` e equivalentes no build normal; validar import, suite,
+source/generator, jornada 1–100, alcance e bancos dirigidos dos níveis 1–5,
+combate, boss e recompensa; exportar Windows e Web/PWA do mesmo estado;
+executar smoke do EXE canónico; produzir evidência real quando o ambiente o
+permita; atualizar retoma/dashboard/handoff; efetuar um único commit/push com
+ficheiros intencionais. Aparência, feel, equilíbrio e percurso humano ficam
+sempre `HUMAN PLAYTEST REQUIRED`; hardware/browser final fica `DEVICE
+VALIDATION REQUIRED`.
+
+## Prova por etapa 8
+
+1. Congelar Git, propriedade do working tree e hashes/dimensões das doze
+   autoridades visuais; classificar produção, referência, legacy e faltas.
+2. Traçar `project.godot` → menu → campanha/seletor → níveis 1–5 → jogador →
+   combate/inimigos → boss/reward e auditar flags/implementações concorrentes.
+3. Capturar baseline do executável atual pelo fluxo normal ou registar o
+   bloqueio exato da automação de interface, sem substituir playtest humano.
+4. Integrar apenas ligações e apresentação seguras; não promover o kit
+   `_source/imagegen_v1`, porque a Execution 8 proíbe produção generativa.
+5. Validar import/cenas, Execution 7, combate, jornada, alcance, interiores e
+   checkpoints; ler erros e logs, não apenas os códigos de saída.
+6. Exportar Windows, lançar exatamente `build/windows/Koliani.exe`, capturar
+   prova disponível e confirmar rastreabilidade; depois exportar Web/PWA uma
+   vez e renovar cache/versionamento.
+7. Produzir matriz de runtime, comparação legacy/current, relatório,
+   dashboard, prioridades, retoma e handoff; `git diff --check`, fetch final,
+   commit e push não destrutivo.
+
+## Limite de execução já identificado
+
+A API de aplicações Windows do Computer Use está desativada nesta sessão: o
+runtime expõe apenas browser e `getApp` não existe. Navegação/captura manual do
+EXE não pode ser declarada PASS por esse meio. A execução continuará com os
+harnesses reais existentes e smoke do processo exportado; qualquer prova que
+dependa de input/observação humana permanece explicitamente pendente.
+
+## Resultado da Execution 8
+
+**PARTIAL PASS — REAL RUNTIME TECHNICALLY VALIDATED / HUMAN REVIEW REQUIRED.**
+Objetivo técnico cumprido: runtime mapeado, Koliani atual e panorama aprovado
+ativos em L1–L5, apresentação de desenvolvimento escondida nos releases,
+combate/boss/reward confirmados, suite/jornada/alcance e gates dirigidos PASS,
+Windows e Web/PWA exportados do mesmo estado e provas reais produzidas.
+
+Critério humano não encerrado: a API nativa Windows estava indisponível e
+aparência, feel, equilíbrio e percurso exigem o Game Master. Plataformas,
+props, inimigos, boss art, UI final e VFX/SFX permanecem legacy porque os
+replacements de produção aprovados não existem. Ver
+`docs/execution_8_real_game_production_integration.md`.
+
+---
+
+# Histórico — Execution 7 Region I Vertical Slice Completion
 
 ## Objetivo, âmbito e critério de conclusão 7 — 10 setembro 2026
 

@@ -1,5 +1,6 @@
 extends SceneTree
 const SAQUE := preload("res://scripts/saque_chefe.gd")
+const IDS := preload("res://scripts/progression_ids.gd")
 var falhas := 0
 
 func _init() -> void:
@@ -33,9 +34,20 @@ func _init() -> void:
 	estado.modo_teste = true
 	estado.indice_nivel = indice_nivel
 	estado.checkpoint = Vector2.ZERO
+	# Mede o ciclo inicial do boss sem depender do progresso persistido local.
+	# O processo corre em modo de teste e termina sem gravar este estado isolado.
+	var boss_id := IDS.boss_id_do_indice(indice_nivel)
+	var reward_id := IDS.reward_id_bau_chefe(IDS.level_id_do_indice(indice_nivel))
+	estado.bosses_derrotados.erase(boss_id)
+	estado.recompensas_reclamadas.erase(reward_id)
 	change_scene_to_file("res://scenes/Main.tscn")
 	await create_timer(0.4).timeout
 	var chefe := get_first_node_in_group("chefes")
+	_ok(chefe != null, "boss nasce no estado inicial isolado")
+	if chefe == null:
+		print("Baú: %d falhas" % falhas)
+		quit(1)
+		return
 	var nivel := chefe.get_parent()
 	chefe.set_physics_process(false)
 	chefe.derrotado.emit()

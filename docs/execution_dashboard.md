@@ -22,6 +22,7 @@ Atualizado em 10 de setembro de 2026.
 | Execution 6A | PARTIAL VISUAL BUILD | Panorama, Heart Tree, cascatas e ruínas integrados; PRODUCTION ASSETS MISSING. |
 | Execution 6B | PARTIAL PASS | Sete frames `run` recuperados; 44/44 safe; Level 1 preservado até ao limite da autoridade; HUMAN VISUAL REVIEW REQUIRED. |
 | Execution 7 | PARTIAL PASS | Combate 3-hit/aéreo/Dash, guardiões L1–L4 e Coração Putrefacto L5 integrados; gates técnicos PASS; HUMAN VISUAL/FEEL/BALANCE/PLAYTEST REQUIRED. |
+| Execution 8 | PARTIAL PASS | Runtime real traçado; Koliani 6B e panorama aprovado ativos L1–L5; debug UI escondida em release; Windows/Web-PWA e provas reais PASS; produção visual e revisão humana pendentes. |
 
 ## Baseline após a Execution 3D
 

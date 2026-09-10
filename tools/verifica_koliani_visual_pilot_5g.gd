@@ -2,7 +2,13 @@ extends Node
 ## Verificação dirigida da integração visual da Execution 5G.
 
 const CENA_LEVEL_1 := preload("res://scenes/levels/Floresta_Putrefata.tscn")
-const CENA_LEVEL_2 := preload("res://scenes/levels/Pantano_dos_Sussurros.tscn")
+const CENAS_REGIAO_I := [
+	preload("res://scenes/levels/Floresta_Putrefata.tscn"),
+	preload("res://scenes/levels/Pantano_dos_Sussurros.tscn"),
+	preload("res://scenes/levels/Ninho_da_Viuva_Negra.tscn"),
+	preload("res://scenes/levels/A_Arvore_que_Chora.tscn"),
+	preload("res://scenes/levels/Coracao_da_Floresta.tscn"),
+]
 
 var falhas: Array[String] = []
 
@@ -95,12 +101,16 @@ func _ready() -> void:
 	level_1.queue_free()
 	await get_tree().process_frame
 
-	var level_2 := CENA_LEVEL_2.instantiate()
-	var koliani_2 := level_2.get_node_or_null("Koliani")
-	_ok(koliani_2 != null, "Level 2 sem Koliani")
-	if koliani_2:
-		_ok(not koliani_2.get("usar_piloto_visual_5g"), "piloto 5G escapou do Level 1")
-	level_2.free()
+	for indice in range(1, CENAS_REGIAO_I.size()):
+		var nivel_regiao := (CENAS_REGIAO_I[indice] as PackedScene).instantiate()
+		var koliani_regiao := nivel_regiao.get_node_or_null("Koliani")
+		_ok(koliani_regiao != null, "Level %d sem Koliani" % (indice + 1))
+		if koliani_regiao:
+			_ok(bool(koliani_regiao.get("usar_piloto_visual_5g")),
+				"piloto 5G não ativo no Level %d" % (indice + 1))
+			_ok(bool(koliani_regiao.get("usar_prototipo_premium")),
+				"fallback premium não ativo no Level %d" % (indice + 1))
+		nivel_regiao.free()
 	_terminar()
 
 
@@ -111,7 +121,7 @@ func _ok(condicao: bool, mensagem: String) -> void:
 
 func _terminar() -> void:
 	if falhas.is_empty():
-		print("EXECUTION 5G TARGETED: PASS")
+		print("EXECUTION 5G/8 TARGETED: PASS -- piloto ativo em L1-L5")
 		get_tree().quit(0)
 	else:
 		for falha in falhas:

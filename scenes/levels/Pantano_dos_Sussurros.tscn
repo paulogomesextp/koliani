@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://bkolianipantano02"]
+[gd_scene load_steps=16 format=3 uid="uid://bkolianipantano02"]
 
 ; REGIAO I / nivel 2 -- Pantano dos Sussurros.
 ; Sala final FEITA A MAO (a JORNADA, que cresce com o nivel, vem antes). Arquipelago de ilhas sobre agua
@@ -20,6 +20,7 @@
 [ext_resource type="PackedScene" uid="uid://bkolianiaguavenenosa01" path="res://scenes/actors/AguaVenenosa.tscn" id="11_agua"]
 [ext_resource type="PackedScene" uid="uid://bkolianiraizperigo01" path="res://scenes/actors/RaizPerigo.tscn" id="12_raiz"]
 [ext_resource type="PackedScene" uid="uid://bkolianiessencia01" path="res://scenes/actors/Essencia.tscn" id="99_ess"]
+[ext_resource type="PackedScene" path="res://scenes/fx/Region1HybridVisualTarget.tscn" id="100_target"]
 
 [sub_resource type="RectangleShape2D" id="rs_chk"]
 size = Vector2(44, 96)
@@ -53,6 +54,10 @@ tinta_fundo = Color(0.76, 1, 0.96, 1)
 neblina_fundo = 0.5
 dessaturar_fundo = 0.24
 seed_ambiente = 1037
+
+; Execution 8 — panorama aprovado da Região I, sem formas específicas do L1.
+[node name="Region1HybridVisualTarget" parent="." instance=ExtResource("100_target")]
+apenas_panorama_aprovado = true
 
 [node name="AguaMortal" parent="." instance=ExtResource("11_agua")]
 position = Vector2(1850, 950)
@@ -261,6 +266,8 @@ scale = Vector2(2.6, 1.6)
 
 [node name="Koliani" parent="." instance=ExtResource("1_kol")]
 position = Vector2(150, 620)
+usar_prototipo_premium = true
+usar_piloto_visual_5g = true
 
 [node name="CheckInicio" type="Area2D" parent="."]
 position = Vector2(420, 636)

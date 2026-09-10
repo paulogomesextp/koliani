@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3 uid="uid://bkolianiarvore04"]
+[gd_scene load_steps=22 format=3 uid="uid://bkolianiarvore04"]
 
 ; REGIAO I / nivel 4 -- A Arvore que Chora.
 ; Sala final FEITA A MAO (a JORNADA, que cresce com o nivel, vem antes), a' escala dos vizinhos (~3600 px).
@@ -23,6 +23,7 @@
 [ext_resource type="PackedScene" uid="uid://bkolianiaguavenenosa01" path="res://scenes/actors/AguaVenenosa.tscn" id="11_agua"]
 [ext_resource type="PackedScene" uid="uid://bkolianiraizperigo01" path="res://scenes/actors/RaizPerigo.tscn" id="12_raiz"]
 [ext_resource type="PackedScene" uid="uid://bkolianiessencia01" path="res://scenes/actors/Essencia.tscn" id="99_ess"]
+[ext_resource type="PackedScene" path="res://scenes/fx/Region1HybridVisualTarget.tscn" id="100_target"]
 
 [ext_resource type="Script" path="res://scripts/raiz_elevatoria.gd" id="elevador"]
 [ext_resource type="PackedScene" path="res://scenes/actors/Alavanca.tscn" id="alavanca_interior"]
@@ -60,6 +61,10 @@ tinta_fundo = Color(1, 0.86, 1, 1)
 neblina_fundo = 0.22
 dessaturar_fundo = 0.1
 seed_ambiente = 1111
+
+; Execution 8 — panorama aprovado da Região I, sem formas específicas do L1.
+[node name="Region1HybridVisualTarget" parent="." instance=ExtResource("100_target")]
+apenas_panorama_aprovado = true
 
 ; --- poca acida por baixo de todo o nivel -----------------------------
 [node name="PocaAcida" parent="." instance=ExtResource("11_agua")]
@@ -342,6 +347,8 @@ scale = Vector2(2.6, 1.6)
 
 [node name="Koliani" parent="." instance=ExtResource("1_kol")]
 position = Vector2(150, 620)
+usar_prototipo_premium = true
+usar_piloto_visual_5g = true
 
 [node name="CheckInicio" type="Area2D" parent="."]
 position = Vector2(430, 636)

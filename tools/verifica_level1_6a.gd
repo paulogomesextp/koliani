@@ -74,7 +74,7 @@ func _init() -> void:
 
 	_ok(nivel.get_node_or_null("EliteGoblin") != null, "EliteGoblin legacy removido")
 	_ok(nivel.get_node_or_null("GoblinBaixa") != null, "GoblinBaixa legacy removido")
-	_ok(nivel.get_node_or_null("Chefe") != null, "Ghorak removido")
+	_ok(nivel.get_node_or_null("Guardiao") != null, "Ghorak removido")
 	nivel.queue_free()
 	await process_frame
 
