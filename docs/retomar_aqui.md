@@ -12,7 +12,10 @@ O job `pages` da CI passou a fornecer realmente `enablement: true` ao
 publica a PWA em `https://paulogomesextp.github.io/koliani/`, no mesmo ciclo que
 gera a versão Windows. Falhas de publicação ficam visíveis no workflow. O job
 de testes cria agora `work/` antes da suite: a pasta é ignorada pelo Git, mas os
-testes de save usam `res://work/` e falhavam em checkouts limpos sem ela.
+testes de save usam `res://work/` e falhavam em checkouts limpos sem ela. A
+bancada `verifica_actores_novos.gd` prepara explicitamente `salto_duplo` antes
+de testar `ZonaSemPoder`, pois a campanha atual começa canonicamente sem
+habilidades e o teste antigo ainda assumia esse desbloqueio inicial.
 
 ## Execution 8.1E — Congelamento do save — **RESOLVIDO**
 

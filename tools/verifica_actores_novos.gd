@@ -250,6 +250,10 @@ var ligada := false
 	if ej2 == null:
 		_ok(false, "sem EstadoJogo para testar a ZonaSemPoder")
 	else:
+		# A campanha atual começa sem habilidades. Esta bancada testa a
+		# suspensão temporária, portanto prepara explicitamente a habilidade
+		# que a zona vai suspender em vez de depender da progressão inicial.
+		ej2.call("desbloquear_habilidade", "salto_duplo")
 		ej2.call("devolver_habilidades_todas")
 		var zp: Node2D = ZONA_SEM_PODER.new()
 		zp.habilidade = "salto_duplo"
