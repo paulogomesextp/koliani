@@ -203,6 +203,14 @@ func _ready() -> void:
 		_mat = _a.material
 		_mat.set_shader_parameter("rim_cor", cor_rim)
 	add_to_group("chefes")
+	# Aquece o audio do combate ANTES de o combate existir. O `Musica.boss()`
+	# só é chamado no primeiro golpe (`provocar`), e fazia o `load()` da faixa
+	# nesse instante, na thread principal: 2006 ms de jogo parado, medidos em
+	# `tools/bench_combate.gd`. Os SFX de combate tinham o mesmo problema, em
+	# menor escala. Pedidos aqui, em segundo plano, chegam prontos.
+	Musica.preparar_boss()
+	Som.aquecer(["ataque", "ataque_forte", "acerto", "dano", "bloqueio",
+		"projetil", "lancar", "chefe_cai"])
 	# Sem escudos, os chefes levam dano o tempo todo -> batem MUITO mais
 	# forte ao contacto (x1.4 no N1 -> x2.8 no N30). A vida-base sai de
 	# cada chefe concreto; o multiplicador de vida entra em _afinar_dificuldade.

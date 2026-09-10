@@ -95,11 +95,28 @@ const ATAQUE_ATIVO_FIM := [0.68, 0.7, 0.74]
 ## Regra nova: **o balanco nao mexe na camara nem para o tempo**. So' a
 ## LIGACAO tem peso, e o peso e' curto -- um frame no golpe normal, e
 ## reserva-se o resto para o que e' raro (remate, critico, levar dano).
-const HITSTOP_GOLPE := 0.02        # ~1 frame a 60 fps
-const HITSTOP_REMATE := 0.045      # 3.o golpe do combo
-const HITSTOP_CRIT := 0.06
-const HITSTOP_PISAO := 0.03
-const HITSTOP_DANO := 0.05
+## REAFINADO A 10 SET 2026 (Execution 8.1C). O Paulo: ainda "congela" ao
+## acertar e ao levar. Medido no codigo real (`tools/verifica_hitstop.gd`),
+## a parede: remate 41 ms, critico 62 ms, levar dano 55 ms. A 165 Hz isso e'
+## 6,8 / 10,3 / 9,1 frames com o jogo TODO parado -- camara, parallax,
+## particulas, tudo. Um combo de tres mais um golpe levado dava ~97 ms.
+##
+## O mecanismo nao estava avariado: nao acumula e repoe sempre o
+## `time_scale`. O que mudou foi o CONTRASTE. Estes valores foram afinados a
+## 4 set, quando a apresentacao ainda era o judder de 60 Hz (3-3-2) e uma
+## paragem de 50 ms se escondia lá dentro. Depois da interpolacao (8.1B) o
+## movimento e' liso a 165 Hz, e a mesma paragem passou a ser um buraco de 9
+## frames contra um fundo perfeitamente suave.
+##
+## Regra nova, em frames a 165 Hz: **<=2 frames para o que acontece a toda a
+## hora, <=4 para o que e' raro**. Acima disso deixa de se ler como peso e
+## passa a ler-se como o jogo a bloquear. Combo de tres + golpe levado passa
+## de ~97 ms para ~58 ms, e nenhuma paragem sozinha chega aos 25 ms.
+const HITSTOP_GOLPE := 0.010       # ~1,7 frames a 165 Hz -- e' o mais frequente
+const HITSTOP_REMATE := 0.018      # 3.o golpe do combo -- ~3 frames
+const HITSTOP_CRIT := 0.024        # ~4 frames, so' em critico
+const HITSTOP_PISAO := 0.014       # ~2,3 frames
+const HITSTOP_DANO := 0.020        # ~3,3 frames -- levar dano ja' tem tremor
 const TREMOR_GOLPE := 2.0
 const TREMOR_REMATE := 3.2
 const TREMOR_CRIT := 4.5
@@ -361,6 +378,13 @@ func _sem_interpolacao_no_visual() -> void:
 
 
 func _ready() -> void:
+	# Os SFX dela carregavam à primeira utilização, ou seja a meio do jogo:
+	# o primeiro golpe, o primeiro dash, a primeira vez que leva dano. Pedidos
+	# aqui em segundo plano, chegam prontos e não engasgam. Ver
+	# `tools/bench_combate.gd` (Execution 8.1C).
+	Som.aquecer(["ataque", "ataque_forte", "acerto", "dano", "salto",
+		"salto_duplo", "dash", "rolamento", "aterrar", "agarrar", "parede",
+		"lancar", "projetil", "bloqueio", "morte_koliani"])
 	_sem_interpolacao_no_visual()
 	_desencravar()
 	_pos_inicial = global_position

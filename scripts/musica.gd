@@ -94,6 +94,21 @@ func boss() -> void:
 	_tocar(caminho, 1.0, VOL_BOSS, false)
 
 
+## Pede a faixa do chefe em SEGUNDO PLANO, para ela já estar em memória
+## quando o combate começar.
+##
+## O `boss()` fazia `load()` da faixa no instante do primeiro golpe, na
+## thread principal. Medido em `tools/bench_combate.gd` (Execution 8.1C):
+## **um frame de 2006 ms** ao bater no guardião do nível 1. Era esta a
+## "congelação ao acertar no chefe"; o hitstop era o menor dos dois males.
+func preparar_boss() -> void:
+	var caminho := PASTA_CHEFES % ((EstadoJogo.indice_nivel % N_FAIXAS) + 1)
+	if not ResourceLoader.exists(caminho):
+		caminho = CAMINHO_BOSS
+	if ResourceLoader.exists(caminho):
+		ResourceLoader.load_threaded_request(caminho)
+
+
 func parar() -> void:
 	_p.stop()
 	_caminho_atual = ""

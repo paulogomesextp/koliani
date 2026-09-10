@@ -105,6 +105,23 @@ func _stream(nome: String) -> AudioStream:
 	return _cache[nome]
 
 
+## Manda carregar estes sons em SEGUNDO PLANO, para o `load()` do `_stream`
+## não acontecer a meio do jogo.
+##
+## O `_stream` carregava à primeira utilização, ou seja **no instante do
+## primeiro golpe**. Medido em `tools/bench_combate.gd` (Execution 8.1C):
+## era isso, e sobretudo o `Musica.boss()`, que dava o congelamento que o
+## Paulo via ao bater no chefe -- um frame de 2 segundos. Depois de aquecido,
+## o `load()` sai da cache do `ResourceLoader` e não custa nada.
+func aquecer(nomes: Array) -> void:
+	for n in nomes:
+		if _cache.has(n):
+			continue
+		var c: String = CAMINHOS.get(str(n), "")
+		if c != "" and ResourceLoader.exists(c):
+			ResourceLoader.load_threaded_request(c)
+
+
 func toca(nome: String, volume_db := -6.0, pitch := 1.0) -> void:
 	var st := _stream(nome)
 	if st == null:
