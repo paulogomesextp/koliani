@@ -40,6 +40,21 @@ Verificação visual: `tools/shot_plataforma.gd` (`--script ... -- <cena>
   `Co-Authored-By: Claude Sonnet 5 <noreply@anthropic.com>`
 - Remote: `github.com/paulogomesextp/koliani` (público).
 
+## Gravar o estado ao fim de cada execução
+
+Ao terminar um briefing grande ("EXECUTION N"), **gravar antes de responder**
+— não deixar o resultado só no chat, que se perde no `/clear` e não chega à
+sessão do outro colaborador:
+
+1. `docs/retomar_aqui.md` — estado novo: causa provada, números medidos, o
+   que ficou por fazer e porquê;
+2. `docs/execution_<n>_*.md` — relatório da execução;
+3. topo de `PRIORIDADES.md` — o que ficou pendente de decisão;
+4. `commit` + `push` (paths explícitos, nunca `git add -A`).
+
+Guardar sobretudo o que custou a descobrir: números medidos, hipóteses
+**descartadas** e armadilhas de método.
+
 ## Colaboração entre sessões
 
 Projeto trabalhado por duas pessoas (Paulo e Luís/Jensath), cada uma com a
