@@ -4,6 +4,14 @@
 
 Atualizado em 10 de setembro de 2026.
 
+## Publicação contínua Web/PWA
+
+O job `pages` da CI passou a fornecer realmente `enablement: true` ao
+`actions/configure-pages@v5` e deixou de mascarar falhas com
+`continue-on-error`. Cada push aceite em `master` que passe testes e export Web
+publica a PWA em `https://paulogomesextp.github.io/koliani/`, no mesmo ciclo que
+gera a versão Windows. Falhas de publicação ficam visíveis no workflow.
+
 ## Execution 8.1E — Congelamento do save — **RESOLVIDO**
 
 Estado: **PASS.** `EstadoJogo.guardar()`: **2047 ms -> 9,2 ms** de mediana

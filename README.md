@@ -146,6 +146,8 @@ assets/                -- branding/, fonts/, tiles/ -- SO CC0/gratis (ou nosso)
 4. **windows** -- export "Windows Desktop" (release) -> artifact
    `koliani-windows` **e** publica `Koliani-windows.zip` no Release
    **`win-latest`** (tag rolante, marcado como *latest*).
+5. **pages** -- publica o mesmo export Web no GitHub Pages, em
+   <https://paulogomesextp.github.io/koliani/>.
 
 Assim há sempre um APK para instalar no telemóvel sem o PC ligado (mesma
 ideia do deploy do jogo do jardim). A **primeira execução** pode precisar
@@ -165,6 +167,10 @@ com a versão mais recente:
 `.exe` e actualiza o `win-latest`. O amigo volta ao mesmo link, descarrega,
 extrai e corre `Koliani.exe` (SmartScreen: *Mais informações* -> *Executar
 mesmo assim*; é um `.exe` não assinado).
+
+No mesmo ciclo, o build Web/PWA é publicado automaticamente no endereço fixo
+<https://paulogomesextp.github.io/koliani/>. Uma falha de Pages faz o workflow
+falhar visivelmente; não é ignorada.
 
 **Publicar num clique:** `publicar.bat` (atalho **"Publicar Koliani"** no
 Ambiente de Trabalho, via `criar-atalho.ps1`) sobe o patch de
