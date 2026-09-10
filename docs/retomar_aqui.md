@@ -4,6 +4,38 @@
 
 Atualizado em 10 de setembro de 2026.
 
+## Execution 8.1 — Windows Performance Gate
+
+Estado: **PARTIAL PASS — DIAGNÓSTICO FECHADO / DECISÃO DO GAME MASTER
+NECESSÁRIA**. **Nenhuma alteração ao runtime do jogo.**
+
+Os "framedrops severos" no `Koliani.exe` **não são falta de desempenho**. Com
+o VSync desligado o L1 corre a **1388 FPS (0,72 ms/frame)** a 1080p; script
+0,03 ms, física 0,2 ms, 129 draw calls. Em 47 recargas os nós ficam fixos em
+871 e os órfãos em 0 — **não há fugas**. Menu, L1, L3, L5 e o Coração
+Putrefacto têm todos o mesmo tempo de frame.
+
+Causas-raiz provadas:
+
+1. **Cadência (PROVEN):** física a 60 Hz num painel de 165 Hz com
+   `physics_interpolation` desligado → **67,2 % dos frames desenhados não têm
+   avanço nenhum**. Os FPS ficam nos 165 e o movimento anda aos degraus. É o
+   que se lê como "framedrop" sem os FPS caírem.
+2. **Carregamento de cena (PROVEN):** ~150 ms de congelamento em cada morte e
+   troca de nível (todos os picos > 33 ms medidos são recargas).
+3. **Primeira utilização (LIKELY):** quedas esparsas de um segundo no EXE
+   real; o preset de export não tem `shader_baker/enabled`.
+
+As três correções são arquiteturais e ficam **para decisão** (secção 25 do
+briefing). Relatório e números:
+[`execution_8_1_windows_performance_gate.md`](execution_8_1_windows_performance_gate.md).
+Sonda reutilizável: `tools/perf_gate.tscn`.
+
+Duas armadilhas de método registadas: morrer recarrega a cena atual, o que
+reinicia qualquer sonda que seja a cena; e a suite corre por **cena**
+(`--headless --path . res://tests/run_tests.tscn`), não por `--script` — e
+precisa da pasta `work/`.
+
 ## Execution 8 — Real Game Production Integration
 
 Estado: **PARTIAL PASS — REAL RUNTIME TECHNICALLY VALIDATED / HUMAN REVIEW

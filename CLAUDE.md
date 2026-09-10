@@ -18,8 +18,10 @@ terminal usar a variante `..._console.exe`).
 # reimportar recursos (SEMPRE depois de acrescentar/mudar assets)
 "/c/Users/paulo/Desktop/Godot_v4.7.2-stable_win64_console.exe" --headless --import
 
-# suite de testes headless (sai != 0 se falhar)
-"/c/Users/paulo/Desktop/Godot_v4.7.2-stable_win64_console.exe" --headless --script res://tests/run_tests.gd
+# suite de testes headless (sai != 0 se falhar). E' uma CENA, nao um
+# `--script`: em `--script` os autoloads nao existem e a compilacao rebenta.
+# Precisa da pasta `work/` (nao vem do git) senao da' 25 falsos negativos.
+"/c/Users/paulo/Desktop/Godot_v4.7.2-stable_win64_console.exe" --headless --path . res://tests/run_tests.tscn
 
 # smoke-test de uma cena (corre N frames e sai)
 "...Godot..._console.exe" --headless --quit-after 180 res://scenes/levels/Floresta_Putrefata.tscn

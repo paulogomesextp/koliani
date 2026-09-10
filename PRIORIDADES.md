@@ -2,6 +2,16 @@
 
 ## Agora
 
+0. **DECISÃO PENDENTE — interpolação de física (Execution 8.1):** os
+   "framedrops" no Windows foram diagnosticados e **não são falta de
+   desempenho** (o L1 corre a 1388 FPS sem VSync; zero fugas). São cadência:
+   a física corre a 60 Hz num painel de 165 Hz sem interpolação, logo **67 %
+   dos frames desenhados são duplicados**. A correção é ligar
+   `physics/common/physics_interpolation`; não foi aplicada porque é uma
+   mudança de motor que precisa de validação visual humana (respawn,
+   checkpoints, arenas de chefe, poeira). Detalhe e números:
+   [`docs/execution_8_1_windows_performance_gate.md`](docs/execution_8_1_windows_performance_gate.md).
+
 1. **Execution 8 — PARTIAL PASS / HUMAN REVIEW REQUIRED:** jogar a Região I
    completa (L1→L5→Coração Putrefacto→reward) nos builds Windows e Web/PWA;
    confirmar o menu sem dev UI, Koliani atual, panorama partilhado e validar
