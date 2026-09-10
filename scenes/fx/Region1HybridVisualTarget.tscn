@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/region1_hybrid_visual_target.gd" id="1_target"]
+
+[node name="Region1HybridVisualTarget" type="Node2D"]
+script = ExtResource("1_target")
+ativo = true
+limite_esquerdo = -2550.0
+limite_direito = 3850.0
