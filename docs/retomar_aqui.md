@@ -4,6 +4,50 @@
 
 Atualizado em 10 de setembro de 2026.
 
+## Execution 8.1C — Combat Freeze / Hit-Stop Gate
+
+Estado: **PARTIAL PASS — CAUSA PRINCIPAL PROVADA, CORREÇÃO POR DECIDIR.**
+
+**O congelamento é GRAVAR O SAVE.** `EstadoJogo.guardar()` custa **~2047 ms
+de mediana** na thread principal (`tools/verifica_gravar.gd`, 12 gravações).
+É chamado por `ativar_checkpoint()` (passar num checkpoint) e por
+`perder_vida()` — os dois gatilhos que o Paulo identificou. Explica também
+todos os buracos de ~2 s que apareceram nas medições desta sessão (2019,
+1975, 1953, 2254, 2081 ms), incluindo o "parada no spawn aos 9 s".
+
+Não há esperas no código: são ~10 operações de ficheiro síncronas por
+gravação (escrever TEMP, ler TEMP, ler primary, ler backup, escrever backup,
+apagar primary, renomear), cada uma inspeccionada pelo antivírus em
+`%APPDATA%` — ~200 ms cada.
+
+**Teste de confirmação sem tocar em código:** excluir
+`%APPDATA%\Godot\app_userdata\Koliani` do Windows Defender e voltar a jogar.
+
+**NÃO se mexeu no sistema de save** — tem suite própria de robustez
+(corrupção, recuperação, versões, backup validado). Opções por risco
+crescente: (a) gravar em thread de fundo mantendo a lógica de integridade;
+(b) juntar/espaçar gravações; (c) cortar as leituras de validação repetidas
+(esta mexe nas garantias que os testes protegem).
+
+Já corrigido e provado nesta execução:
+
+- **música do chefe**: `provocar()` → `Musica.boss()` fazia `load()` no
+  primeiro golpe, na thread principal, com o `time_scale` já a 0 (hitstop) —
+  o temporizador que repõe o tempo não podia correr. **2019 ms → 23,4 ms**;
+- **áudio dos passos**: `som.gd` carregava cada SFX à primeira utilização.
+  Saltar/andar tocava `passo1/2/3.ogg` pela primeira vez e congelava. Agora
+  `Som.aquecer_tudo()` pede os 66 sons em segundo plano no arranque —
+  **zero carregamentos de áudio depois do nível arrancar**;
+- **hit-stop** reduzido para ≤2 frames no frequente e ≤4 no raro (era 7–10).
+  Combo + golpe levado: ~97 ms → ~28 ms.
+
+**Correção ao que a 8.1 dizia:** a recarga de nível **não custa 150 ms, custa
+~2 s**. A 8.1 mediu com o `delta` do motor, que vem **limitado**; medir
+engasgos exige tempo de parede (`Time.get_ticks_usec()`).
+
+Branch `perf/windows-gate-8-1`, commit `b0e9728`. `origin/master` continua
+`b2fd8a0` — **não fundir sem revisão do Game Master**.
+
 ## Execution 8.1B — Physics Interpolation / Cadence Fix
 
 Estado: **TECHNICALLY VALIDATED / GAME MASTER CADENCE REVIEW REQUIRED**.

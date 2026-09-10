@@ -2,7 +2,15 @@
 
 ## Agora
 
-0. **GAME MASTER CADENCE REVIEW REQUIRED (Execution 8.1B):** a interpolação
+0. **DECIDIR: gravar o save custa ~2 s (Execution 8.1C).** É esta a
+   "congelação" — `EstadoJogo.guardar()` leva **2047 ms de mediana** na
+   thread principal e é chamado ao passar num checkpoint e ao perder vida.
+   Confirmação sem código: excluir `%APPDATA%\Godot\app_userdata\Koliani` do
+   Windows Defender. Não mexi no save (tem suite de robustez própria).
+   Opções por risco: (a) thread de fundo; (b) espaçar gravações; (c) cortar
+   validações repetidas. Ver `docs/retomar_aqui.md`.
+
+0b. **GAME MASTER CADENCE REVIEW REQUIRED (Execution 8.1B):** a interpolação
    de física está **ligada** e validada tecnicamente — a física continua a
    60 Hz e nenhuma constante de movimento/câmara mudou. Medido sobre a
    imagem desenhada: o desvio entre frames consecutivos caiu 59 % e o
