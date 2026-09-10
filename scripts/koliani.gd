@@ -378,13 +378,6 @@ func _sem_interpolacao_no_visual() -> void:
 
 
 func _ready() -> void:
-	# Os SFX dela carregavam à primeira utilização, ou seja a meio do jogo:
-	# o primeiro golpe, o primeiro dash, a primeira vez que leva dano. Pedidos
-	# aqui em segundo plano, chegam prontos e não engasgam. Ver
-	# `tools/bench_combate.gd` (Execution 8.1C).
-	Som.aquecer(["ataque", "ataque_forte", "acerto", "dano", "salto",
-		"salto_duplo", "dash", "rolamento", "aterrar", "agarrar", "parede",
-		"lancar", "projetil", "bloqueio", "morte_koliani"])
 	_sem_interpolacao_no_visual()
 	_desencravar()
 	_pos_inicial = global_position

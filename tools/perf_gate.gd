@@ -27,6 +27,9 @@ var _segundos := 8.0
 var _etiqueta := "sem-nome"
 var _idle := false
 var _frente := false
+var _saltar := false
+var _spawn_x := INF
+var _ultimo_real_us := 0
 var _cap_fps := 0
 var _desligar: Array[String] = []
 
@@ -74,6 +77,8 @@ func _ready() -> void:
 			_idle = true
 		elif a == "--frente":
 			_frente = true
+		elif a == "--saltar":
+			_saltar = true
 		elif a.begins_with("--capfps="):
 			_cap_fps = int(a.get_slice("=", 1))
 		elif a.begins_with("--ciclar="):
@@ -223,6 +228,15 @@ func _desligar_particulas(raiz: Node) -> int:
 
 func _process(dt: float) -> void:
 	_t += dt
+	# Buraco medido a' PAREDE (imune ao time_scale) e impresso JA', para
+	# ficar intercalado com as linhas de carregamento do `--verbose` --
+	# e' assim que se ve o que estava a carregar no instante do engasgo.
+	var _ag := Time.get_ticks_usec()
+	if _ultimo_real_us > 0:
+		var _g := (_ag - _ultimo_real_us) / 1000.0
+		if _g > 25.0:
+			print(">>> PERF_GAP %.0f ms (time_scale=%.2f, t=%.1fs)" % [_g, Engine.time_scale, _t])
+	_ultimo_real_us = _ag
 
 	# Rede de seguranca: se por alguma razao o tempo de jogo nunca chegar ao
 	# fim (pausa, `time_scale`, mortes em cadeia), a sonda sai na mesma em vez
@@ -305,6 +319,30 @@ func _conduzir(dt: float) -> void:
 	# `--frente`: atravessa o nivel a serio (e morre pelo caminho, o que a
 	# persistencia aguenta). E' o unico modo que chega aos inimigos, as VFX e
 	# as zonas carregadas do nivel -- o vaivem so' mede a area do spawn.
+	# `--saltar`: fica no spawn e so' salta. E' o repro do Paulo -- "no nivel 1
+	# fica no spawn e salta varias vezes, ao fim de alguns saltos congela".
+	if _saltar:
+		# salto duplo (dois toques) + vaivem: e' o repro do Paulo, e e' o que
+		# gera mais aterragens, logo mais sons de passo pela primeira vez.
+		var c := fmod(_ciclo, 0.9)
+		_premir("saltar", c < 0.09 or (c > 0.20 and c < 0.29))
+		# Vaivem CURTO e preso ao spawn. O Paulo: "faca esse teste em cima da
+		# plataforma, sem cair" -- e tinha razao: a cair, ela morria, a cena
+		# recarregava, e os ~1,95 s da recarga contavam como engasgo e
+		# escondiam o que se queria medir.
+		var esq := fmod(_ciclo, 1.0) < 0.5
+		_premir("mover_direita", esq)
+		_premir("mover_esquerda", not esq)
+		var k := get_tree().get_first_node_in_group("koliani") as Node2D
+		if k:
+			if _spawn_x == INF:
+				_spawn_x = k.global_position.x
+			# nao a deixa sair da plataforma do spawn
+			if absf(k.global_position.x - _spawn_x) > 110.0:
+				k.global_position.x = _spawn_x
+				k.reset_physics_interpolation()
+		return
+
 	if _frente:
 		_premir("mover_direita", true)
 		_premir("saltar", fmod(_ciclo, 0.9) < 0.14)

@@ -96,6 +96,25 @@ func _ready() -> void:
 		p.bus = "SFX"  # bus criado pelo autoload Opcoes
 		add_child(p)
 		_pool.append(p)
+	aquecer_tudo()
+
+
+## Manda vir TODOS os sons do catálogo, em segundo plano, uma vez por sessão.
+##
+## Isto não é optimização preventiva: é a correcção de um congelamento real.
+## O `_stream` carregava cada som à PRIMEIRA utilização, na thread principal.
+## O Paulo: "no nível 1 fica no spawn e salta várias vezes, ao fim de alguns
+## saltos congela; andar para os lados dá mais freezes". Era isso mesmo --
+## cada aterragem toca um `passo1/2/3.ogg`, e a primeira vez que cada um
+## tocava custava ~1,9 s de jogo parado (medido com `--verbose` a mostrar o
+## `Loading resource:` em cima do buraco de frame).
+##
+## Uma lista curada não chega: qualquer som que escape volta a congelar na
+## primeira vez que toca. São 66 ficheiros, ~48 MB no total -- ao lado dos
+## ~78 MB que o jogo já usa, não é nada, e passa a estar tudo pronto antes de
+## alguém carregar num botão.
+func aquecer_tudo() -> void:
+	aquecer(CAMINHOS.keys())
 
 
 func _stream(nome: String) -> AudioStream:
