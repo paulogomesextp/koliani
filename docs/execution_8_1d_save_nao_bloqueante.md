@@ -4,6 +4,13 @@ Data: 10 de setembro de 2026. Ramo: `perf/windows-gate-8-1`.
 
 ## Estado: **BLOCKED — INCOMPLETO. NÃO ENTREGA O OBJETIVO.**
 
+> **Nota da 8.1E (posterior).** A hipótese do manifesto que este relatório
+> levantou **confirmou-se**: 1312 leituras+parses por gravação, 2481 ms -> 9,8 ms
+> com cache. A thread de fundo deixou de ser necessária e
+> `scripts/save_pipeline.gd` **foi removido** — o desenho fica no commit
+> `0269d20`. Ver [execution_8_1e_causa_do_congelamento.md](execution_8_1e_causa_do_congelamento.md).
+> O resto deste documento fica como estava, incluindo o que ficou por fazer.
+
 A sessão foi encerrada a pedido antes de a implementação ser ligada ao jogo.
 O que está no repo **não altera o comportamento**: `save_pipeline.gd` existe
 mas **nenhum ficheiro o usa**. Os engasgos de ~2 s ao passar num checkpoint e

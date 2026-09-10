@@ -84,6 +84,8 @@ func _correr_tudo() -> void:
 	teste_save_temp_invalido_nao_promovido()
 	teste_save_versao_futura_preservada()
 	teste_save_migration_invalida_rejeitada()
+	teste_save_nao_repete_leitura_do_manifesto()
+	teste_manifesto_cache_nao_altera_identidades()
 	teste_estado_ha_progresso()
 	teste_estado_regioes_e_conclusao()
 	teste_estado_mapa_desbloqueio()
@@ -109,6 +111,58 @@ func _correr_tudo() -> void:
 			printerr("FALHOU: ", f)
 		printerr("%d falha(s)" % _falhas.size())
 		get_tree().quit(1)
+
+
+## Execution 8.1E. Uma gravacao chegava a ler e a parsear
+## `data/level_manifest.json` 1312 vezes -- 2481 ms presos na thread
+## principal a cada checkpoint e a cada dano. Este teste e' a trava: se
+## alguem voltar a tirar o cache, ou puser o manifesto num caminho quente
+## sem cache, isto acende.
+func teste_save_nao_repete_leitura_do_manifesto() -> void:
+	var base := "res://work/teste_manifesto_cache.json"
+	_limpar_save_teste(base)
+	ProgressionIDs.aquecer()
+	ProgressionIDs.zerar_diagnostico()
+	var e := _novo_estado()
+	e.essencia = 7
+	_ok(e.guardar_em(base, base + ".bak", base + ".tmp"),
+		"cache do manifesto: a gravacao devia continuar a funcionar")
+	var diag := ProgressionIDs.diagnostico()
+	_ok(int(diag.get("leituras_disco", -1)) == 0,
+		"uma gravacao nao devia ler o manifesto do disco (leu %s vezes)" % [
+			diag.get("leituras_disco")])
+	_ok(int(diag.get("parses_json", -1)) == 0,
+		"uma gravacao nao devia parsear o manifesto (parseou %s vezes)" % [
+			diag.get("parses_json")])
+	# E prova que a assercao morde: sem cache, isto dispara aos milhares.
+	ProgressionIDs.usar_cache(false)
+	ProgressionIDs.zerar_diagnostico()
+	e.guardar_em(base, base + ".bak", base + ".tmp")
+	var sem_cache := ProgressionIDs.diagnostico()
+	_ok(int(sem_cache.get("leituras_disco", 0)) > 100,
+		"controlo: sem cache a gravacao TEM de reler o manifesto muitas vezes")
+	ProgressionIDs.usar_cache(true)
+	ProgressionIDs.aquecer()
+	e.free()
+	_limpar_save_teste(base)
+
+
+## O cache so' vale se devolver exatamente o mesmo que o disco devolvia.
+func teste_manifesto_cache_nao_altera_identidades() -> void:
+	ProgressionIDs.usar_cache(false)
+	var sem_cache := ProgressionIDs.identidades().duplicate(true)
+	var manifesto_sem := ProgressionIDs.carregar_manifesto().duplicate(true)
+	ProgressionIDs.usar_cache(true)
+	ProgressionIDs.aquecer()
+	var com_cache := ProgressionIDs.identidades()
+	_ok(sem_cache == com_cache,
+		"o cache do manifesto nao pode mudar uma unica identidade persistida")
+	_ok(manifesto_sem == ProgressionIDs.carregar_manifesto(),
+		"o cache do manifesto nao pode mudar o manifesto lido")
+	# invalidar_cache() tem de voltar a dar o mesmo (caminho das ferramentas)
+	ProgressionIDs.invalidar_cache()
+	_ok(sem_cache == ProgressionIDs.identidades(),
+		"invalidar_cache() devia reconstruir identidades identicas")
 
 
 func _ok(condicao: bool, mensagem: String) -> void:

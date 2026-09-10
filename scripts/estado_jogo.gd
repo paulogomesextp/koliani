@@ -275,6 +275,11 @@ var modo_dev: bool = false
 
 
 func _ready() -> void:
+	# Aquece o cache do manifesto ANTES de qualquer coisa lhe tocar. Sem
+	# isto, uma gravacao do progresso lia e parseava
+	# `data/level_manifest.json` 1312 vezes -- 2481 ms presos na thread
+	# principal a cada checkpoint e a cada dano (Execution 8.1E).
+	_IDS.aquecer()
 	carregar()
 
 

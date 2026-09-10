@@ -4,6 +4,34 @@
 
 Atualizado em 10 de setembro de 2026.
 
+## Execution 8.1E — Congelamento do save — **RESOLVIDO**
+
+Estado: **PASS.** `EstadoJogo.guardar()`: **2047 ms -> 9,2 ms** de mediana
+(pior 14,3 ms), medido na mesma ferramenta que deu o 2047 (`tools/verifica_gravar.tscn`).
+Cabe num frame a 60 Hz. Relatório: [execution_8_1e_causa_do_congelamento.md](execution_8_1e_causa_do_congelamento.md).
+
+**A causa era CPU, não disco.** `ProgressionIDs.identidades()` relia e
+parseava `data/level_manifest.json` **1312 vezes por gravação** (seis
+validações completas em `escrever_seguro()`, e `reward_ids()` sozinho chama-o
+uma vez por nível). Corrigido com cache do manifesto + identidades derivadas,
+aquecido no `_ready()` do `EstadoJogo`.
+
+**A 8.1C estava enganada** ao culpar o antivírus/`%APPDATA%`: o custo real de
+tocar no disco por gravação é **~2 ms**. A exclusão do Windows Defender que lá
+ficou sugerida não era precisa.
+
+**`save_pipeline.gd` foi REMOVIDO.** Com 9,2 ms já não é preciso thread
+nenhuma, e o export Web é `single-threaded` — a thread nunca teria resolvido lá
+nada. O desenho fica no commit `0269d20` se voltar a ser preciso.
+
+**Falta:** validação a jogar no `build/windows/Koliani.exe` (checkpoint,
+dano de projétil, dano repetido, morte/reaparecimento). O `.exe` está
+construído e arranca limpo, mas jogar é com o Paulo.
+
+**Trava de método:** `godot --headless --path . --check-only --script res://tools/x.gd`
+antes de correr qualquer cena de ferramenta nova. Um erro de parse não estoira
+— pendura o motor com o log vazio.
+
 ## Execution 8.1D — Save não-bloqueante — **INCOMPLETA**
 
 Estado: **BLOCKED.** Sessão encerrada antes de ligar a implementação.
