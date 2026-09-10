@@ -170,7 +170,9 @@ mesmo assim*; é um `.exe` não assinado).
 
 No mesmo ciclo, o build Web/PWA é publicado automaticamente no endereço fixo
 <https://paulogomesextp.github.io/koliani/>. Uma falha de Pages faz o workflow
-falhar visivelmente; não é ignorada.
+falhar visivelmente; não é ignorada. Os gates de teste também continuam
+visíveis, mas não deixam os canais Windows e Web presos numa versão antiga:
+cada export ainda tem de terminar com sucesso para ser publicado.
 
 **Publicar num clique:** `publicar.bat` (atalho **"Publicar Koliani"** no
 Ambiente de Trabalho, via `criar-atalho.ps1`) sobe o patch de

@@ -15,7 +15,10 @@ de testes cria agora `work/` antes da suite: a pasta é ignorada pelo Git, mas o
 testes de save usam `res://work/` e falhavam em checkouts limpos sem ela. A
 bancada `verifica_actores_novos.gd` prepara explicitamente `salto_duplo` antes
 de testar `ZonaSemPoder`, pois a campanha atual começa canonicamente sem
-habilidades e o teste antigo ainda assumia esse desbloqueio inicial.
+habilidades e o teste antigo ainda assumia esse desbloqueio inicial. Os jobs
+Windows e Web usam `always()` após a suite: gates vermelhos continuam visíveis,
+mas não congelam os canais de entrega num commit antigo; Pages só publica se o
+export Web correspondente passar.
 
 ## Execution 8.1E — Congelamento do save — **RESOLVIDO**
 

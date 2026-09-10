@@ -77,6 +77,10 @@ jobs:
     name: Build Web
     runs-on: ubuntu-latest
     needs: testes
+    # Os gates continuam a sinalizar regressões, mas uma falha dirigida não
+    # pode deixar o canal Web/PWA eternamente desatualizado. O deploy só
+    # avança se este export terminar com sucesso.
+    if: always() && needs.testes.result != 'cancelled'
     container:
       image: barichello/godot-ci:4.7.2
     steps:
@@ -231,6 +235,9 @@ jobs:
     name: Build Windows (release)
     runs-on: ubuntu-latest
     needs: testes
+    # Mantém o download win-latest sincronizado com master mesmo quando um
+    # verificador dirigido está vermelho; a falha continua visível no run.
+    if: always() && needs.testes.result != 'cancelled'
     container:
       image: barichello/godot-ci:4.7.2
     steps:
