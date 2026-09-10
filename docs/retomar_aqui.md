@@ -2,7 +2,17 @@
 
 Índice de integração documental: [master_package_integration.md](master_package_integration.md).
 
-Atualizado em 10 de setembro de 2026.
+Atualizado em 11 de setembro de 2026.
+
+## Desbloqueio de áudio Web/PWA
+
+O bootstrap Web retoma agora o `AudioContext` no início e no fim do gesto
+(`touchstart`, `pointerdown`, `click` e equivalentes), mantém `audioSession` em
+`playback` quando disponível e só reavalia o aviso depois de a Promise de
+`resume()` terminar. Um pulso quase inaudível, em vez de um buffer totalmente a
+zero, cobre WebKit que não reconheça silêncio otimizado como reprodução. Suite
+Godot verde e export Web local concluído. Falta confirmar som num telemóvel
+real após a publicação: **DEVICE VALIDATION REQUIRED**.
 
 ## Publicação contínua Web/PWA
 

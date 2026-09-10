@@ -72,10 +72,10 @@ flex-direction:column;gap:5vmin;padding:8vmin}
         arranque, antes de haver toque nenhum -- por isso embrulha-se o
         construtor para saber quais sao.
 
-     c) E O QUE FALTAVA: no WebKit o `resume()` sozinho NAO chega. O
-        contexto passa a `running` e continua mudo. O que o desbloqueia
-        e TOCAR alguma coisa de dentro do gesto -- um buffer de uma
-        amostra, silencioso, chega. Sem isso o estado mente.
+     c) A retoma tem de comecar DENTRO do gesto. `resume()` devolve uma
+        Promise; verificar o estado logo a seguir da um falso negativo.
+        Alem da retoma, agenda-se um pulso praticamente inaudivel dentro
+        do mesmo gesto para cobrir as versoes de WebKit que o exigem.
 
      d) e nao se tenta UMA vez: tenta-se em cada toque enquanto nao
         estiver a tocar, e outra vez ao voltar ao jogo (mudar de app
@@ -100,27 +100,38 @@ flex-direction:column;gap:5vmin;padding:8vmin}
   }
 
   var soar = function(c){
-    /* o desbloqueio a serio: uma amostra silenciosa tocada DE DENTRO do
-       gesto. E isto, e nao o `resume()`, que faz o WebKit abrir o som. */
+    /* Um pulso real, mas praticamente inaudivel. Um buffer integralmente
+       a zero pode ser optimizado pelo browser e nao contar como reproducao. */
     try{
-      var b = c.createBuffer(1, 1, 22050);
-      var f = c.createBufferSource();
-      f.buffer = b;
-      f.connect(c.destination);
-      if (f.start) f.start(0); else if (f.noteOn) f.noteOn(0);
+      var o = c.createOscillator();
+      var g = c.createGain();
+      g.gain.value = 0.00001;
+      o.connect(g);
+      g.connect(c.destination);
+      o.start(0);
+      o.stop(c.currentTime + 0.03);
     }catch(e){}
   };
   var acordar = function(){
+    try{ if (navigator.audioSession) navigator.audioSession.type = 'playback'; }catch(e){}
     for (var i = 0; i < vivos.length; i++){
       var c = vivos[i];
-      try{ if (c.state !== 'running' && c.resume) c.resume(); }catch(e){}
+      /* Ambas as operacoes comecam sincronicamente dentro do gesto. */
       soar(c);
+      try{
+        if (c.state !== 'running' && c.resume){
+          var retomado = c.resume();
+          if (retomado && retomado.then){
+            retomado.then(function(){ pintar(); }, function(){ pintar(); });
+          }
+        }
+      }catch(e){}
     }
     pintar();
   };
-  /* `touchend` e nao `touchstart`: no iOS e o FIM do toque que conta como
-     gesto do utilizador. E em captura, para chegar antes do canvas. */
-  ['touchend','pointerup','mouseup','keydown'].forEach(function(ev){
+  /* Browsers e versoes de iOS divergem no evento reconhecido como activacao.
+     Em captura, a tentativa chega antes de o canvas consumir o evento. */
+  ['touchstart','touchend','pointerdown','pointerup','mousedown','mouseup','click','keydown'].forEach(function(ev){
     window.addEventListener(ev, acordar, {capture:true});
   });
   document.addEventListener('visibilitychange', function(){
@@ -153,10 +164,9 @@ flex-direction:column;gap:5vmin;padding:8vmin}
       + 'gap:.5rem;padding:.55rem 1rem;border-radius:999px;border:1px solid #ff5fd4;'
       + 'background:rgba(20,13,30,.92);color:#ece6f7;font:600 14px/1 -apple-system,'
       + 'system-ui,sans-serif;cursor:pointer;-webkit-appearance:none');
-    pilula.addEventListener('click', function(ev){
-      ev.stopPropagation();
-      acordar();
-    });
+    pilula.addEventListener('touchstart', acordar, {capture:true});
+    pilula.addEventListener('pointerdown', acordar, {capture:true});
+    pilula.addEventListener('click', acordar, {capture:true});
     document.body.appendChild(pilula);
     setInterval(pintar, 700);
   };
