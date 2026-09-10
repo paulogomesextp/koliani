@@ -42,6 +42,10 @@ jobs:
       - uses: actions/checkout@v4
       - name: Importar recursos
         run: godot --headless --import || true
+      # A suite escreve saves sintéticos em res://work/. A pasta é ignorada
+      # pelo Git e por isso não existe num checkout limpo dos Actions.
+      - name: Preparar diretório temporário dos testes
+        run: mkdir -p work
       - name: Correr suite de testes
         run: godot --headless --path . res://tests/run_tests.tscn
       # Verificacao dirigida das regras de bicho (divide_em / so_tiro /
