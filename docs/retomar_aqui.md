@@ -10,9 +10,11 @@ O bootstrap Web retoma agora o `AudioContext` no início e no fim do gesto
 (`touchstart`, `pointerdown`, `click` e equivalentes), mantém `audioSession` em
 `playback` quando disponível e só reavalia o aviso depois de a Promise de
 `resume()` terminar. Um pulso quase inaudível, em vez de um buffer totalmente a
-zero, cobre WebKit que não reconheça silêncio otimizado como reprodução. Suite
-Godot verde e export Web local concluído. Falta confirmar som num telemóvel
-real após a publicação: **DEVICE VALIDATION REQUIRED**.
+zero, cobre WebKit que não reconheça silêncio otimizado como reprodução. Para
+iPhone/Safari, o mesmo gesto arranca ainda um HTML Audio silencioso em loop,
+forçando o canal multimédia que o Web Audio isolado nem sempre abre. Suite Godot
+verde e export Web local concluído. Falta confirmar som num telemóvel real após
+a publicação: **DEVICE VALIDATION REQUIRED**.
 
 ## Publicação contínua Web/PWA
 

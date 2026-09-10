@@ -77,7 +77,11 @@ flex-direction:column;gap:5vmin;padding:8vmin}
         Alem da retoma, agenda-se um pulso praticamente inaudivel dentro
         do mesmo gesto para cobrir as versoes de WebKit que o exigem.
 
-     d) e nao se tenta UMA vez: tenta-se em cada toque enquanto nao
+     d) NO IPHONE, Web Audio e HTML Audio podem usar canais diferentes.
+        Um audio HTML silencioso em loop, arrancado pelo toque, mantem o
+        canal multimédia aberto mesmo com o interruptor lateral activo.
+
+     e) e nao se tenta UMA vez: tenta-se em cada toque enquanto nao
         estiver a tocar, e outra vez ao voltar ao jogo (mudar de app
         suspende o contexto e ele nao volta sozinho).
 
@@ -89,6 +93,10 @@ flex-direction:column;gap:5vmin;padding:8vmin}
 
   var AC = window.AudioContext || window.webkitAudioContext;
   var vivos = [];
+  var ios = /iPad|iPhone|iPod/.test(navigator.userAgent)
+    || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  var canalIOS = null;
+  var canalIOSAtivo = !ios;
   if (AC){
     var Espia = new Proxy(AC, {construct: function(alvo, args){
       var c = new alvo(args[0]);
@@ -98,6 +106,44 @@ flex-direction:column;gap:5vmin;padding:8vmin}
     window.AudioContext = Espia;
     window.webkitAudioContext = Espia;
   }
+
+  var wavSilencioso = function(amostragem){
+    /* WAVE mono de sete amostras, inspirado no mecanismo MIT
+       `unmute-ios-audio`; pequeno, local e sem pedido de rede. */
+    var dados = new ArrayBuffer(10);
+    var vista = new DataView(dados);
+    vista.setUint32(0, amostragem, true);
+    vista.setUint32(4, amostragem, true);
+    vista.setUint16(8, 1, true);
+    var bytes = new Uint8Array(dados);
+    var texto = '';
+    for (var i = 0; i < bytes.length; i++) texto += String.fromCharCode(bytes[i]);
+    var meio = window.btoa(texto).slice(0, 13);
+    return 'data:audio/wav;base64,UklGRisAAABXQVZFZm10IBAAAAABAAEA'
+      + meio + 'AgAZGF0YQcAAACAgICAgICAAAA=';
+  };
+  var abrirCanalIOS = function(){
+    if (!ios || canalIOSAtivo) return;
+    try{
+      if (!canalIOS){
+        var taxa = vivos.length && vivos[0].sampleRate ? vivos[0].sampleRate : 44100;
+        canalIOS = document.createElement('audio');
+        canalIOS.setAttribute('playsinline', '');
+        canalIOS.setAttribute('x-webkit-airplay', 'deny');
+        canalIOS.preload = 'auto';
+        canalIOS.loop = true;
+        canalIOS.src = wavSilencioso(taxa);
+        canalIOS.load();
+      }
+      var tocando = canalIOS.play();
+      if (tocando && tocando.then){
+        tocando.then(function(){ canalIOSAtivo = true; pintar(); }, function(){
+          canalIOSAtivo = false;
+          pintar();
+        });
+      }
+    }catch(e){ canalIOSAtivo = false; }
+  };
 
   var soar = function(c){
     /* Um pulso real, mas praticamente inaudivel. Um buffer integralmente
@@ -114,6 +160,7 @@ flex-direction:column;gap:5vmin;padding:8vmin}
   };
   var acordar = function(){
     try{ if (navigator.audioSession) navigator.audioSession.type = 'playback'; }catch(e){}
+    abrirCanalIOS();
     for (var i = 0; i < vivos.length; i++){
       var c = vivos[i];
       /* Ambas as operacoes comecam sincronicamente dentro do gesto. */
@@ -145,6 +192,7 @@ flex-direction:column;gap:5vmin;padding:8vmin}
   var pilula = null;
   var mudo = function(){
     if (!vivos.length) return false;
+    if (!canalIOSAtivo) return true;
     for (var i = 0; i < vivos.length; i++){
       if (vivos[i].state === 'running') return false;
     }
