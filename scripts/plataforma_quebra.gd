@@ -29,6 +29,8 @@ func _ready() -> void:
 	collision_layer = 1
 	collision_mask = 0
 	_base = position
+	# Treme e cai no `_process`, com a posicao dela propria.
+	physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 	_montar()
 
 

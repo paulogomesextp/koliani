@@ -2,15 +2,17 @@
 
 ## Agora
 
-0. **DECISÃO PENDENTE — interpolação de física (Execution 8.1):** os
-   "framedrops" no Windows foram diagnosticados e **não são falta de
-   desempenho** (o L1 corre a 1388 FPS sem VSync; zero fugas). São cadência:
-   a física corre a 60 Hz num painel de 165 Hz sem interpolação, logo **67 %
-   dos frames desenhados são duplicados**. A correção é ligar
-   `physics/common/physics_interpolation`; não foi aplicada porque é uma
-   mudança de motor que precisa de validação visual humana (respawn,
-   checkpoints, arenas de chefe, poeira). Detalhe e números:
-   [`docs/execution_8_1_windows_performance_gate.md`](docs/execution_8_1_windows_performance_gate.md).
+0. **GAME MASTER CADENCE REVIEW REQUIRED (Execution 8.1B):** a interpolação
+   de física está **ligada** e validada tecnicamente — a física continua a
+   60 Hz e nenhuma constante de movimento/câmara mudou. Medido sobre a
+   imagem desenhada: o desvio entre frames consecutivos caiu 59 % e o
+   movimento deixou de chegar aos solavancos. Falta a **sua** validação
+   visual no `build/windows/Koliani.exe`: corrida, saltos, mudanças rápidas
+   de direção, Dash, combate, câmara, checkpoint, morte/reaparecimento, L3,
+   L5, arena, Coração Putrefacto, projéteis. Olhar em especial para o
+   **reaparecimento** e para a **textura do screen shake** (agora amostrado a
+   60 Hz). Detalhe:
+   [`docs/execution_8_1b_physics_interpolation.md`](docs/execution_8_1b_physics_interpolation.md).
 
 1. **Execution 8 — PARTIAL PASS / HUMAN REVIEW REQUIRED:** jogar a Região I
    completa (L1→L5→Coração Putrefacto→reward) nos builds Windows e Web/PWA;

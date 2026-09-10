@@ -41,6 +41,9 @@ func _ready() -> void:
 		return
 	body_entered.connect(_ao_entrar)
 	_montar_visual()
+	# O `_visual` flutua no `_process`; interpolado ficava a saltitar.
+	if _visual:
+		_visual.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 
 
 ## Verdadeiro se este coletável não tem NADA de novo para dar. Sem

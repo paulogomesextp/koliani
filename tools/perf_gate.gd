@@ -84,6 +84,7 @@ func _ready() -> void:
 	Engine.max_fps = _cap_fps
 	_arranque_ms = Time.get_ticks_msec()
 	_recuperar_estado()
+	_guardar_save_real()
 	print("PERF_GATE inicio | etiqueta=%s | nivel=%d | menu=%s | segundos=%.1f | vsync=%d | desligar=%s | recarga=%d" % [
 		_etiqueta, _nivel, str(_menu), _segundos,
 		DisplayServer.window_get_vsync_mode(), str(_desligar), _recargas])
@@ -101,6 +102,29 @@ func _ready() -> void:
 		await get_tree().process_frame
 		await get_tree().process_frame
 		_aplicar_isolamento()
+
+
+## A sonda corre o jogo A SERIO, e o jogo grava. Sem isto, medir estragava o
+## save do jogador (o `indice_nivel` ficava onde a ultima medicao parou). O
+## save real e' posto de lado no arranque e repousto no fim.
+const SAVE_REAL := "user://progresso.json"
+const SAVE_GUARDADO := "user://perf/progresso_real.bak"
+
+
+func _guardar_save_real() -> void:
+	if _recargas > 0:  # so' na primeira encarnacao
+		return
+	DirAccess.make_dir_recursive_absolute("user://perf")
+	if FileAccess.file_exists(SAVE_REAL):
+		DirAccess.copy_absolute(SAVE_REAL, SAVE_GUARDADO)
+
+
+func _repor_save_real() -> void:
+	if not FileAccess.file_exists(SAVE_GUARDADO):
+		return
+	DirAccess.copy_absolute(SAVE_GUARDADO, SAVE_REAL)
+	DirAccess.remove_absolute(SAVE_GUARDADO)
+	print("PERF_GATE save do jogador reposto")
 
 
 ## Retoma o que ficou de uma encarnacao anterior desta sonda (a Koliani
@@ -420,6 +444,7 @@ func _terminar() -> void:
 	set_process(false)
 	_largar_tudo()
 	get_tree().remove_meta(META)
+	_repor_save_real()
 
 	var out := {
 		"etiqueta": _etiqueta,

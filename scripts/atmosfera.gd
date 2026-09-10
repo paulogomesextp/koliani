@@ -236,6 +236,10 @@ func _ready() -> void:
 
 	_poeira = get_node_or_null("Poeira") as CPUParticles2D
 	if _poeira:
+		# A poeira é colada ao centro do ecrã no `_process` (ver mais abaixo).
+		# Interpolada, ficava um tick atrás da câmara e via-se a nadar contra
+		# o cenário sempre que a Koliani anda.
+		_poeira.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 		_poeira.color = cor_poeira
 		_poeira.amount = int(maxf(1.0, _poeira.amount * densidade_poeira))
 

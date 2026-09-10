@@ -9,6 +9,12 @@ extends Node2D
 var _alvo: Node2D
 
 
+func _ready() -> void:
+	# Persegue a Koliani no `_process`, a 165 Hz. Interpolada, a luz ficava um
+	# tick atrás do que ela própria acabou de calcular -- atraso a dobrar.
+	physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
+
+
 func _process(dt: float) -> void:
 	if not is_instance_valid(_alvo):
 		_alvo = get_tree().get_first_node_in_group("koliani")

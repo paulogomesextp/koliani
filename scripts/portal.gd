@@ -110,6 +110,11 @@ func _montar_visual() -> void:
 		_anel.material = mat
 		add_child(_anel)
 
+		# Anel e nucleo rodam no `_process`: sem isto a rotacao era
+		# reamostrada a 60 Hz e o portal parecia engasgado.
+		for no in [_anel, _nucleo]:
+			(no as Node).physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
+
 	_luz = PointLight2D.new()
 	_luz.texture = _tex_luz()
 	_luz.color = cor
@@ -189,6 +194,9 @@ func _ao_entrar(corpo: Node) -> void:
 	alvo._cd = RECARGA  # o parceiro tambem arrefece -> sem ping-pong imediato
 	var k := corpo as Node2D
 	k.global_position = _lugar_livre(k, alvo.global_position + Vector2(0.0, -SUBIDA))
+	# Sair pelo outro portal é descontínuo por definição: sem o reset a
+	# interpolação desenhava o percurso entre os dois portais.
+	k.reset_physics_interpolation()
 	if "velocity" in k:
 		k.velocity = Vector2(k.velocity.x * 0.4, minf(k.velocity.y, 0.0))
 	if k.has_method("conceder_iframes"):

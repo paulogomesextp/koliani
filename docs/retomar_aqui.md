@@ -4,6 +4,36 @@
 
 Atualizado em 10 de setembro de 2026.
 
+## Execution 8.1B — Physics Interpolation / Cadence Fix
+
+Estado: **TECHNICALLY VALIDATED / GAME MASTER CADENCE REVIEW REQUIRED**.
+
+`physics/common/physics_interpolation = true`, com a física a continuar a
+**60 Hz**. Nenhuma constante de movimento, salto, dash, combate ou câmara
+mudou. Provado sobre a imagem desenhada (gravador de filme a 165 fps): o
+desvio-padrão da diferença entre frames consecutivos caiu **59 %** e o rácio
+p90/mediana passou de **4,19× para 2,06×** — o movimento deixou de chegar aos
+solavancos.
+
+Auditados e resolvidos: 4 teletransportes com `reset_physics_interpolation()`
+(respawn, rebordo, fosso dev, portal) e 10 nós animados no `_process` com
+`PHYSICS_INTERPOLATION_MODE_OFF`. O risco escondido era a **viragem**
+(`scale.x = ±1`), que interpolada esmagava o sprite; resolvido desligando no
+`$Sprite` (o modo é herdado). Como `ChefeBase extends DemonioBase`, uma
+correção cobre inimigos e chefes todos.
+
+A câmara não foi tocada: é filha da Koliani e só escreve `offset`, que não é
+interpolado. O motor avisa que passa a `Camera2D` para modo física — é
+esperado; o efeito é o screen shake ficar amostrado a 60 Hz.
+
+Suite, jornada 1–100, alcance, Execution 7 targeted e combate runtime: PASS.
+Windows e Web/PWA reexportados do mesmo source; cache PWA
+`1789071258|42187478`. Relatório:
+[`execution_8_1b_physics_interpolation.md`](execution_8_1b_physics_interpolation.md).
+
+Backlog que fica OPEN por instrução: recarga de cena ~150 ms e compilação de
+pipelines à primeira utilização.
+
 ## Execution 8.1 — Windows Performance Gate
 
 Estado: **PARTIAL PASS — DIAGNÓSTICO FECHADO / DECISÃO DO GAME MASTER

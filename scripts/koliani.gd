@@ -348,7 +348,20 @@ var _pop := 0.0      # impulso do ataque
 var _pos_inicial := Vector2.ZERO
 
 
+## O CORPO da Koliani é interpolado -- é isso que dá o movimento suave num
+## painel de 165 Hz. O `$Sprite` NÃO: a viragem dela é `scale.x = ±1`
+## (`_aplicar_pose`), e interpolar isso fá-la-ia passar por zero durante um
+## tick, ou seja esmagava-se de cada vez que se virava. Como o modo é
+## herdado, desligar no `$Sprite` chega para todo o visual por baixo (corpo,
+## arma, escudo, armadura, luzes). Eles continuam a herdar a posição
+## interpolada do corpo: anda suave, vira seco.
+func _sem_interpolacao_no_visual() -> void:
+	if _sprite:
+		_sprite.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
+
+
 func _ready() -> void:
+	_sem_interpolacao_no_visual()
 	_desencravar()
 	_pos_inicial = global_position
 	# O início do nível é o checkpoint seguro `_start`. A posição concreta é
@@ -899,6 +912,9 @@ func _physics_process(dt: float) -> void:
 			_borda = true
 			_borda_lado = lado
 			global_position.y = lip_y + 34.0  # mãos ao nível do rebordo
+			# Salto de posição: sem isto a interpolação desenhava-a a subir
+			# desde onde estava, em vez de já agarrada ao rebordo.
+			reset_physics_interpolation()
 			velocity = Vector2.ZERO
 			_mov.saltos_dados = 0
 			Som.toca("agarrar", -14.0, randf_range(0.96, 1.06))
@@ -1168,6 +1184,7 @@ func _physics_process(dt: float) -> void:
 			# tocado). `EstadoJogo.checkpoint` é que está sempre atual.
 			var alvo := EstadoJogo.ponto_recuperacao()
 			global_position = alvo if alvo != Vector2.ZERO else global_position
+			reset_physics_interpolation()  # teletransporte: não arrastar
 			velocity = Vector2.ZERO
 		else:
 			receber_dano(vida)
@@ -1996,6 +2013,9 @@ func recuperar_no_checkpoint(posicao_segura: Vector2) -> void:
 	if _a_morrer or posicao_segura == Vector2.ZERO:
 		return
 	global_position = posicao_segura + Vector2(0.0, -ALTURA_SPAWN)
+	# Reaparecer é o teletransporte mais longo do jogo (fogueira do outro lado
+	# do nível). Sem este reset via-se um risco dela a atravessar o mapa.
+	reset_physics_interpolation()
 	velocity = Vector2.ZERO
 	_desencravar()
 	_pos_inicial = global_position

@@ -53,6 +53,12 @@ func _pronto() -> void:
 	_faixa.name = "Faixa"
 	add_child(_faixa)
 	move_child(_faixa, _sup.get_index() + 1)      # entre a Superficie e o Rebordo
+	# A onda da superficie e' animada no `_process`; interpolada, era
+	# reamostrada a 60 Hz e ficava a tremer contra o resto do cenario.
+	for no in [_sup, _rim, _faixa]:
+		if no:
+			(no as Node).physics_interpolation_mode = \
+				Node.PHYSICS_INTERPOLATION_MODE_OFF
 	if brasas:
 		_montar_brasas()
 	else:

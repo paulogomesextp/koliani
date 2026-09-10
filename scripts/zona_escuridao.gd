@@ -93,6 +93,8 @@ func _montar_veu() -> void:
 
 	if tipo == "escuro":
 		_buraco = Sprite2D.new()
+		# Segue a Koliani no `_process` -- interpolado ficava um tick atras.
+		_buraco.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 		_buraco.texture = _tex_buraco()
 		var m := CanvasItemMaterial.new()
 		m.blend_mode = CanvasItemMaterial.BLEND_MODE_SUB

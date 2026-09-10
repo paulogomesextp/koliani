@@ -299,6 +299,26 @@ func _e_chefe() -> bool:
 	return false
 
 
+## O CORPO do bicho é interpolado (é ele que anda) mas os nós de dentro NÃO.
+## Duas razões, ambas visíveis se isto faltar:
+##
+## - o balanço/respiração (`_corpo.position.y`, `_sprite.rotation`) é animado
+##   no `_process`, a 165 Hz; interpolado, voltava a ser amostrado a 60 Hz e
+##   com um tick de atraso -- ficava mole;
+## - a viragem é `_sprite.scale.x = ±1`. Interpolar isso faz o sprite passar
+##   POR ZERO durante um tick, ou seja esmagava-se de cada vez que o bicho se
+##   virava.
+##
+## Como só o transform LOCAL destes filhos deixa de ser interpolado, eles
+## continuam a herdar a posição interpolada do corpo: movimento suave, virar
+## seco. Herdado por `ChefeBase`, portanto vale para todos os chefes também.
+func _sem_interpolacao_no_visual() -> void:
+	for no in [_sprite, _corpo, _anim]:
+		if no:
+			(no as Node).physics_interpolation_mode = \
+				Node.PHYSICS_INTERPOLATION_MODE_OFF
+
+
 func _ready() -> void:
 	# dificuldade a subir ao longo de TODA a campanha, e devagar: o Nível 1
 	# tem demónios MAIS FRACOS que o valor base (o jogo estava a começar
@@ -309,6 +329,7 @@ func _ready() -> void:
 		dano_contacto = maxi(1, int(round(dano_contacto * (0.65 + 0.75 * f))))
 		velocidade *= 0.88 + 0.34 * f
 
+	_sem_interpolacao_no_visual()
 	_vida_ini = vida
 	if comportamento != "patrulha":
 		_acao_cd = randf_range(0.6, 1.8)

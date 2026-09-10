@@ -148,6 +148,13 @@ ui_cancel={
 
 [physics]
 
+; Execution 8.1B -- CADENCIA. A fisica continua a 60 Hz (nao se mexe em
+; constantes de movimento); isto so' interpola a transformacao DESENHADA
+; entre ticks. Sem isto, num painel de 165 Hz, 67% dos frames desenhados
+; repetiam a posicao anterior e o movimento lia-se como "frame drop".
+; Nos cujo transform e' animado no _process (sprites, poeira, agua) levam
+; PHYSICS_INTERPOLATION_MODE_OFF a' mao -- ver docs/execution_8_1b_*.md.
+common/physics_interpolation=true
 2d/default_gravity=1400.0
 
 [rendering]

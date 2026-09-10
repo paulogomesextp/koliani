@@ -45,6 +45,8 @@ func _montar() -> void:
 	base.color = Color(0.18, 0.16, 0.2)
 	add_child(base)
 	_almofada = Polygon2D.new()
+	# A almofada e' animada no `_process` quando a Koliani salta nela.
+	_almofada.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 	_almofada.polygon = PackedVector2Array([
 		Vector2(-28, -8), Vector2(28, -8), Vector2(30, 4), Vector2(-30, 4)])
 	_almofada.color = Color(0.85, 0.35, 1.0)
