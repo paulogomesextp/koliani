@@ -4,6 +4,18 @@
 
 Atualizado em 10 de setembro de 2026.
 
+## Production Asset Validator v2 — infraestrutura técnica
+
+Branch `tools/production-asset-validator-v2`: validator determinístico e
+somente-leitura preparado em `tools/production_asset_validator/`, com contrato
+JSON configurável, relatórios JSON/Markdown, contact sheet 1:1 e fixtures
+sintéticas. Suite própria: 6 testes, 0 falhas. Não houve decisão artística,
+geração/integração de assets nem alteração de runtime; 9B não foi iniciada.
+
+Próximo passo: após conclusão de 9A, fornecer em 9B manifestos e caminhos/hash
+das referências aprovadas, correr o validator e encaminhar `REVIEW` ao Game
+Master.
+
 ## Execution 8.1E — Congelamento do save — **RESOLVIDO**
 
 Estado: **PASS.** `EstadoJogo.guardar()`: **2047 ms -> 9,2 ms** de mediana
