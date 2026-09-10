@@ -2,17 +2,17 @@
 
 ## Agora
 
-1. **Execution 6B — PARTIAL PASS / HUMAN VISUAL REVIEW REQUIRED:** jogar o
-   Level 1 completo e validar as pernas recuperadas de `run_03`–`run_09`,
-   contraste, continuidade do panorama/caps e leitura do Heart Tree. Windows
-   e Web/PWA locais passaram; dispositivo/browser final continua
-   `DEVICE VALIDATION REQUIRED`.
+1. **Execution 7 — PARTIAL PASS / HUMAN REVIEW REQUIRED:** jogar a Região I
+   completa (L1→L5→Coração Putrefacto→reward) nos builds Windows e Web/PWA;
+   validar legibilidade visual, feel do combo/aéreo/Dash, curva de dificuldade,
+   checkpoints e ritmo do boss. A validação técnica disponível passou; isto
+   não constitui aprovação humana.
 
 ## A seguir
 
-2. **Produção visual aprovada em falta:** exportar layers alpha, tiles Hybrid,
-   props, criatura infectada, replacement de Ghorak, HUD e áudio sem reabrir
-   design.
+2. **Produção visual aprovada em falta:** frames limpos de combate, layers
+   alpha/tiles Hybrid L2–L5, criaturas/guardiões, Coração Putrefacto, HUD,
+   VFX e áudio, sem reabrir design nem recortar pranchas arbitrariamente.
 3. **Completar run_brake e land — PRODUÇÃO EM FALTA:** substituir os fallbacks
    aprovados apenas quando existirem os 11 frames limpos. Não inferir pixels.
 
@@ -27,7 +27,7 @@
 - Definir versionamento e migrações de save antes de mudar progressão.
 - Definir IDs estáveis de progressão e persistência de recompensas.
 - Validar safe areas e resolver a divergência de versão Android.
-- Construir a primeira Vertical Slice na Região I apenas na execução aprovada.
+- Não iniciar Região II antes do gate humano da primeira Vertical Slice.
 
 Detalhes e riscos em [docs/backlog_tecnico.md](docs/backlog_tecnico.md). O
 dashboard de execução está em

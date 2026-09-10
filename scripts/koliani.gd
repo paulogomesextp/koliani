@@ -63,17 +63,23 @@ const BORDA_PEITO := -30.0        # altura do sensor "há parede à frente"
 const BORDA_CABECA := -60.0       # altura do sensor "está livre por cima do rebordo"
 const BORDA_MANTLE := Vector2(150.0, -430.0)  # impulso ao subir para a plataforma
 const DUR_ATAQUE := 0.18
-## Combo de espada (só rig "cavaleiro", que tem 4 tiras de ataque
-## distintas): Single -> Double -> Triple -> Quadruple. Encadeia-se
+## Combo base aprovado: três golpes intencionais. Os rigs legacy ainda podem
+## conter `attack4`, mas essa tira já não participa no combate da Região I.
+## Encadeia-se
 ## carregando em "atacar" outra vez dentro da `JANELA_COMBO` a seguir ao
 ## golpe atual (input bufferizado se carregar a meio do golpe); passado
 ## esse tempo sem novo golpe, o combo cai de volta ao 1.º hit.
-const NUM_COMBO := 4
+const NUM_COMBO := 3
 const JANELA_COMBO := 0.42
 ## Duração de cada golpe do combo, a acompanhar o comprimento real de cada
 ## tira (attack/attack2/attack3/attack4) -- senão a animação era cortada a
 ## meio antes de terminar, sobretudo o 3.º hit (9 frames, o mais longo).
-const DUR_COMBO := [0.18, 0.2, 0.3, 0.19]
+const DUR_COMBO := [0.18, 0.2, 0.3]
+## Cada golpe tem antecipação, janela ativa e recuperação explícitas. Os
+## valores são frações da duração, para a hitbox acompanhar também a duração
+## maior do terceiro golpe sem ficar ligada durante a animação inteira.
+const ATAQUE_ATIVO_INICIO := [0.22, 0.2, 0.24]
+const ATAQUE_ATIVO_FIM := [0.68, 0.7, 0.74]
 
 ## PESO DO IMPACTO -- reafinado a 4 set 2026.
 ##
@@ -90,7 +96,7 @@ const DUR_COMBO := [0.18, 0.2, 0.3, 0.19]
 ## LIGACAO tem peso, e o peso e' curto -- um frame no golpe normal, e
 ## reserva-se o resto para o que e' raro (remate, critico, levar dano).
 const HITSTOP_GOLPE := 0.02        # ~1 frame a 60 fps
-const HITSTOP_REMATE := 0.045      # 4.o golpe do combo
+const HITSTOP_REMATE := 0.045      # 3.o golpe do combo
 const HITSTOP_CRIT := 0.06
 const HITSTOP_PISAO := 0.03
 const HITSTOP_DANO := 0.05
@@ -104,11 +110,11 @@ const TREMOR_DANO := 5.0
 ## direção para onde se olha -- curto nos três primeiros, comprido no
 ## remate. Velocidade inicial (px/s) e duração (s) por passo: a
 ## velocidade decai linearmente, por isso o passo mede ~`vel * dur / 2`
-## px, mais o deslize da desaceleração normal a seguir -- medido no
-## `Level_Test`: 23, 29, 34 e 64 px. No AR vale metade, para não atirar
+## px, mais o deslize da desaceleração normal a seguir. No AR vale metade,
+## para não atirar
 ## a Koliani para fora das plataformas a meio de um combo.
-const AVANCO_VEL := [330.0, 370.0, 390.0, 540.0]
-const AVANCO_DUR := [0.13, 0.13, 0.16, 0.18]
+const AVANCO_VEL := [330.0, 370.0, 390.0]
+const AVANCO_DUR := [0.13, 0.13, 0.16]
 const AVANCO_NO_AR := 0.5
 const I_FRAMES := 0.6
 ## Ressalto ao cair em cima de um inimigo (Mario-style): pulo AUTOMÁTICO --
@@ -210,6 +216,12 @@ var _combo_janela := 0.0
 ## Carregou em "atacar" a meio do golpe atual -- o próximo golpe do combo
 ## dispara assim que este acabar (não se perde o input).
 var _combo_pedido := false
+## Ataque aéreo é um golpe único: usa a apresentação de ataque disponível,
+## preserva gravidade/controlo no ar e nunca abre uma cadeia infinita.
+var _ataque_no_ar := false
+## Um corpo só pode receber dano uma vez por golpe, mesmo que saia e volte a
+## entrar na Area2D durante a mesma janela ativa.
+var _alvos_atingidos_ataque := {}
 var _invulneravel := 0.0
 ## Contadores só visuais (o rig "cavaleiro" tem desenho para eles).
 var _hurt_t := 0.0
@@ -943,17 +955,24 @@ func _physics_process(dt: float) -> void:
 	# golpe a meio do atual fica bufferizado (`_combo_pedido`) e dispara
 	# assim que este acabar, em vez de se perder.
 	if not _defendendo and _rolar_restante <= 0.0 and Input.is_action_just_pressed("atacar"):
+		# Dash -> ataque é um cancel explícito; não deixa o estado de dash
+		# continuar por baixo do golpe nem duplica a hitbox.
+		if _dash_restante > 0.0:
+			_dash_restante = 0.0
 		if _ataque_restante > 0.0:
-			_combo_pedido = true
+			_combo_pedido = not _ataque_no_ar
 		else:
 			_iniciar_ataque()
 	if _ataque_restante > 0.0:
 		_ataque_restante -= dt
-		if _ataque_restante <= 0.0 and _hitbox:
-			_hitbox.monitoring = false
+		_atualizar_janela_ataque()
+		if _ataque_restante <= 0.0:
+			_desativar_hitbox_ataque()
 			if _combo_pedido:
 				_combo_pedido = false
 				_iniciar_ataque()
+			else:
+				_ataque_no_ar = false
 	elif _combo_janela > 0.0:
 		_combo_janela -= dt
 		if _combo_janela <= 0.0:
@@ -993,21 +1012,20 @@ func _physics_process(dt: float) -> void:
 		# roll-cancel (pegada Dead Cells): o rolamento corta o recovery do
 		# ataque -> encadeia-se ataque -> rolar -> ataque sem esperar
 		if _ataque_restante > 0.0:
-			_ataque_restante = 0.0
-			_avanco_restante = 0.0
-			if _hitbox:
-				_hitbox.monitoring = false
-	elif Input.is_action_just_pressed("dash") and _dash_recarga <= 0.0 and (
+			_cancelar_ataque()
+	elif Input.is_action_just_pressed("dash") and _dash_recarga <= 0.0 \
+			and EstadoJogo.tem_habilidade("dash") and (
 			is_on_floor() or EstadoJogo.tem_habilidade("dash_aereo")):
+		# Ataque -> Dash corta recovery e a janela física antes de arrancar.
+		if _ataque_restante > 0.0:
+			_cancelar_ataque()
 		_dash_restante = DUR_DASH
 		_dash_recarga = RECARGA_DASH
 		_acender_aura(0.8)
 		Som.toca("dash", -11.0, randf_range(0.97, 1.05))
 		_invulneravel = maxf(_invulneravel, DUR_DASH)
 	else:
-		# salto duplo: intrínseco à Koliani desde o nível 1 (deixou de ser um
-		# requisito de habilidade -- ver EstadoJogo.HABILIDADES_INICIAIS)
-		var saltos_max := 2
+		var saltos_max := 2 if EstadoJogo.tem_habilidade("salto_duplo") else 1
 		var saltos_antes := _mov.saltos_dados
 		_mov = Movimento.passo(
 			_mov, dir,
@@ -1049,7 +1067,8 @@ func _physics_process(dt: float) -> void:
 	# modo por cima -- serve para inimigos de vários tamanhos. Encadeia:
 	# cada pisão devolve os saltos de ar todos.
 	_stomp_cd = maxf(0.0, _stomp_cd - dt)
-	if _stomp_cd <= 0.0 and _vy() > 40.0 and not is_on_floor() and _dash_restante <= 0.0:
+	if EstadoJogo.tem_habilidade("pogo") and _stomp_cd <= 0.0 \
+			and _vy() > 40.0 and not is_on_floor() and _dash_restante <= 0.0:
 		var pes := global_position.y + 24.0
 		for e in get_tree().get_nodes_in_group("inimigos"):
 			if not is_instance_valid(e) or not (e as Node).has_method("receber_dano"):
@@ -1089,7 +1108,8 @@ func _physics_process(dt: float) -> void:
 	# pogo: cair em cima de uma serra / espinhos (grupo "pogavel", layer 6)
 	# -> ressalta em vez de levar o golpe (os i-frames apanham o toque desse
 	# frame). Só a descer a sério e pela parte de cima.
-	if _stomp_cd <= 0.0 and _vy() > 90.0 and not is_on_floor() and _dash_restante <= 0.0:
+	if EstadoJogo.tem_habilidade("pogo") and _stomp_cd <= 0.0 \
+			and _vy() > 90.0 and not is_on_floor() and _dash_restante <= 0.0:
 		var esp := get_world_2d().direct_space_state
 		var rq := PhysicsRayQueryParameters2D.create(
 			global_position + Vector2(0.0, 16.0), global_position + Vector2(0.0, 46.0), 1 << 5)
@@ -1523,14 +1543,19 @@ func _hitstop(segundos: float) -> void:
 func _iniciar_ataque() -> void:
 	# encadeia o combo se ainda estamos na janela do golpe anterior;
 	# senão volta ao 1.º hit ("Single").
-	_combo_passo = (_combo_passo + 1) % NUM_COMBO if _combo_janela > 0.0 else 0
-	# o combo de 4 golpes existe nos rigs com tiras `attack2/3/4`
+	_ataque_no_ar = not is_on_floor()
+	_combo_passo = 0 if _ataque_no_ar else (
+		(_combo_passo + 1) % NUM_COMBO if _combo_janela > 0.0 else 0)
+	# Os rigs com tiras extra apresentam os três golpes; no ar fica um golpe
+	# único e coerente mesmo quando só existe a animação `attack`.
 	var tem_combo := RIG == "cavaleiro" or RIG == "nova" or RIG == "shadowblade"
 	_ataque_dur = DUR_COMBO[_combo_passo] if tem_combo else DUR_ATAQUE
 	_ataque_restante = _ataque_dur
-	_combo_janela = _ataque_dur + JANELA_COMBO
+	_combo_janela = 0.0 if _ataque_no_ar else _ataque_dur + JANELA_COMBO
+	_combo_pedido = false
+	_alvos_atingidos_ataque.clear()
 	_pop = 1.0
-	# a aura acende mais a cada golpe do combo: o 4.º é o que "estoira"
+	# a aura acende mais a cada golpe do combo: o 3.º é o remate
 	_acender_aura(0.42 + 0.19 * _combo_passo)
 	# passo em frente: o golpe "pisa" para onde se olha (ver `AVANCO_VEL`).
 	var i_av: int = clampi(_combo_passo, 0, AVANCO_VEL.size() - 1)
@@ -1547,7 +1572,37 @@ func _iniciar_ataque() -> void:
 	# combo esta' todo na LIGACAO (ver `TREMOR_REMATE`/`HITSTOP_REMATE`).
 	if _hitbox:
 		_hitbox.scale.x = _olha_para
-		_hitbox.monitoring = true
+		_hitbox.monitoring = false
+
+
+func _atualizar_janela_ataque() -> void:
+	if _hitbox == null or _ataque_dur <= 0.0:
+		return
+	var passo := clampi(_combo_passo, 0, NUM_COMBO - 1)
+	var progresso := clampf(1.0 - _ataque_restante / _ataque_dur, 0.0, 1.0)
+	_hitbox.monitoring = janela_ataque_ativa(passo, progresso)
+
+
+static func janela_ataque_ativa(passo: int, progresso: float) -> bool:
+	var i := clampi(passo, 0, NUM_COMBO - 1)
+	return progresso >= ATAQUE_ATIVO_INICIO[i] and progresso <= ATAQUE_ATIVO_FIM[i]
+
+
+func _desativar_hitbox_ataque() -> void:
+	if _hitbox:
+		_hitbox.monitoring = false
+	_alvos_atingidos_ataque.clear()
+
+
+func _cancelar_ataque(reiniciar_combo := false) -> void:
+	_ataque_restante = 0.0
+	_avanco_restante = 0.0
+	_combo_pedido = false
+	_ataque_no_ar = false
+	_desativar_hitbox_ataque()
+	if reiniciar_combo:
+		_combo_janela = 0.0
+		_combo_passo = 0
 
 
 ## Nome da animação do golpe atual do combo ("attack".."attack4"). Cai
@@ -1589,7 +1644,8 @@ func _flash_golpe() -> void:
 
 ## Dispara ao premir e repete até largar. Bloqueado a defender/rolar/dar dash.
 func _tratar_lancar(_dt: float) -> void:
-	if _defendendo or _rolar_restante > 0.0 or _dash_restante > 0.0:
+	if not EstadoJogo.tem_habilidade("projetil") \
+			or _defendendo or _rolar_restante > 0.0 or _dash_restante > 0.0:
 		return
 	if Input.is_action_pressed("lancar") and _lancar_restante <= 0.0:
 		_lancar_projetil()
@@ -1620,6 +1676,10 @@ func _lancar_projetil() -> void:
 
 func _ao_acertar_corpo(corpo: Node) -> void:
 	if corpo.has_method("receber_dano"):
+		var alvo_id := corpo.get_instance_id()
+		if _alvos_atingidos_ataque.has(alvo_id):
+			return
+		_alvos_atingidos_ataque[alvo_id] = true
 		# CRÍTICO (pegada Dead Cells): inimigo vulnerável (gelo/fogo/sangue/
 		# atordoado), golpe logo a seguir a um rolamento, ou golpe pelas costas.
 		var crit := false
@@ -1631,7 +1691,7 @@ func _ao_acertar_corpo(corpo: Node) -> void:
 				and signf(global_position.x - (corpo as Node2D).global_position.x) == -float(corpo._direcao):
 			crit = true
 		corpo.receber_dano(_dano_golpe(), sign(_olha_para), crit)
-		# remate do combo (4.º golpe) -> deixa o inimigo a SANGRAR
+		# remate do combo (3.º golpe) -> deixa o inimigo a SANGRAR
 		if _combo_passo >= NUM_COMBO - 1 and corpo.has_method("sangrar"):
 			corpo.sangrar(2.6, maxi(3, roundi(_dano_golpe() * 0.16)))
 		if _faiscas:
@@ -1883,8 +1943,7 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0) -> void:
 	vida = maxi(0, vida - maxi(1, real))
 	_invulneravel = I_FRAMES
 	_hurt_t = 0.24
-	_combo_janela = 0.0  # levar um golpe corta o combo -- o proximo ataque volta ao 1.o hit
-	_combo_passo = 0
+	_cancelar_ataque(true)  # dano corta ataque/combo e desliga a hitbox imediatamente
 	vida_mudou.emit(vida, _vida_max())
 	_flash_branco()
 	_abanar(TREMOR_DANO)
@@ -1918,6 +1977,7 @@ func _morrer() -> void:
 	if _a_morrer:
 		return
 	_a_morrer = true
+	_cancelar_ataque(true)
 	Som.toca("morte_koliani", -6.0)
 	Engine.time_scale = 1.0  # não deixar um hitstop pendente a segurar o tempo
 	set_physics_process(false)

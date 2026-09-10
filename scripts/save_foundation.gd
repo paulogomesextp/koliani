@@ -271,6 +271,11 @@ static func _validar_campos_v3(d: Dictionary, total_niveis: int) -> Dictionary:
 		if not resultado.get("ok", false):
 			return resultado
 	for level_id: String in d["completed_level_ids"]:
+		# Guardiões dos quatro primeiros níveis não são bosses/recompensas de
+		# boss. Mantêm-se aceites os IDs legacy já presentes, mas só o quinto
+		# nível de cada região exige estas referências num save novo.
+		if not _e_exame_regional(level_id):
+			continue
 		var boss_id := IDS.boss_id_do_level_id(level_id)
 		var reward_id := IDS.reward_id_bau_chefe(level_id)
 		if boss_id != "" and boss_id not in d["defeated_boss_ids"]:
@@ -298,6 +303,11 @@ static func _validar_campos_v3(d: Dictionary, total_niveis: int) -> Dictionary:
 				or int(d["melhorias"][chave]) < 0:
 			return _falha("invalid_structure", "rank de melhoria invalido")
 	return {"ok": true}
+
+
+static func _e_exame_regional(level_id: String) -> bool:
+	var indice := IDS.indice_do_level_id(level_id)
+	return indice >= 0 and (indice + 1) % 5 == 0
 
 
 static func _validar_campos_v4(d: Dictionary, total_niveis: int) -> Dictionary:

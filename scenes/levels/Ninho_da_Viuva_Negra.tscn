@@ -7,7 +7,7 @@
 ; (TeiaPrende) a atrasar; no cimo espera o elite besouro TREPADOR.
 ; ACTO 3: bifurcacao -- DOSSEL (por cima, rapido, com a alcova secreta) ou
 ; CHAO DO NINHO (larga-se do poco, mais seguro mas cheio de teias e bichos).
-; Reencontro com a recompensa e, no fim, a arena da Rainha Aracnidea.
+; Reencontro das rotas e, no fim, o guardiao Rainha Aracnidea.
 
 [ext_resource type="PackedScene" uid="uid://bkolianiactor01" path="res://scenes/actors/Koliani.tscn" id="1_kol"]
 [ext_resource type="PackedScene" uid="uid://bdemoniobase01" path="res://scenes/actors/DemonioBase.tscn" id="2_dem"]
@@ -315,13 +315,7 @@ altura_visual = 44.0
 cor_base = Color(0.18, 0.15, 0.2, 1)
 cor_topo = Color(0.46, 0.42, 0.54, 1)
 
-; recompensa do nivel -- no caminho critico, ninguem a falha
-[node name="ColEscalar" parent="." instance=ExtResource("3_col")]
-position = Vector2(2860, 566)
-pista_id = "ninho_teia_com_cabelo"
-habilidade_id = "escalar_paredes"
-
-; =====================  BOSS  =======================================
+; =====================  GUARDIAO  ===================================
 [node name="SubidaChefe" parent="." instance=ExtResource("9_pl")]
 position = Vector2(3060, 660)
 tamanho = Vector2(150, 22)
@@ -342,7 +336,7 @@ permanente = true
 largura = 130.0
 dur_preso = 0.6
 
-[node name="Chefe" parent="." instance=ExtResource("6_chefe")]
+[node name="Guardiao" parent="." instance=ExtResource("6_chefe")]
 position = Vector2(3400, 624)
 
 ; =====================  luzes / checkpoints / porta  ================

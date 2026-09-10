@@ -5,7 +5,7 @@
 ; "batimento" (PlataformaRitmada em sincronia) com ancoras solidas pelo
 ; meio. Bifurcacao: POCO DE GRAVIDADE LUNAR (saltos enormes) / rota solida
 ; segura. Elite: lodo de CARGA. Poca de podridao em baixo (morte). Chefe:
-; O Coracao Putrefacto -- a arena bate e desmorona.
+; O Coracao Putrefacto -- a arena bate, mas mantém o chão principal contínuo.
 
 [ext_resource type="PackedScene" uid="uid://bkolianiactor01" path="res://scenes/actors/Koliani.tscn" id="1_kol"]
 [ext_resource type="PackedScene" uid="uid://bdemoniobase01" path="res://scenes/actors/DemonioBase.tscn" id="2_dem"]
@@ -228,7 +228,7 @@ cor_topo = Color(0.4, 0.58, 0.3, 1)
 
 [node name="ColBatida" parent="." instance=ExtResource("3_col")]
 position = Vector2(2660, 434)
-habilidade_id = "projetil"
+habilidade_id = "dash"
 
 ; ===================  arena do chefe  ========================
 [node name="ChaoChefe" parent="." instance=ExtResource("9_pl")]

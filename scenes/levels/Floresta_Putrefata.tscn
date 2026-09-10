@@ -5,7 +5,7 @@
 ; ligadas, uma bifurcacao (linha alta rapida com segredo / linha baixa
 ; segura), um elite a meio, o pantano mortal por baixo. Mecanica-assinatura
 ; da regiao: raizes que crescem e somem (PlataformaRitmada) + raizes que
-; irrompem a agarrar (RaizPerigo auto). Chefe: Ghorak, o Guardiao Raiz.
+; irrompem a agarrar (RaizPerigo auto). Guardiao: Ghorak, Guardiao Raiz.
 
 [ext_resource type="PackedScene" uid="uid://bkolianiactor01" path="res://scenes/actors/Koliani.tscn" id="1_kol"]
 [ext_resource type="PackedScene" uid="uid://bdemoniobase01" path="res://scenes/actors/DemonioBase.tscn" id="2_dem"]
@@ -244,11 +244,6 @@ altura_visual = 44.0
 cor_base = Color(0.16, 0.24, 0.1, 1)
 cor_topo = Color(0.42, 0.64, 0.29, 1)
 
-; recompensa do nivel -- no ponto de reencontro (ninguem falha)
-[node name="ColEscudo" parent="." instance=ExtResource("3_col")]
-position = Vector2(2600, 520)
-habilidade_id = "escudo"
-
 [node name="RaizAgarra3" parent="." instance=ExtResource("10_raiz")]
 position = Vector2(2600, 544)
 auto = true
@@ -285,7 +280,7 @@ intervalo = 2.5
 fase = 1.6
 dano = 14
 
-[node name="Chefe" parent="." instance=ExtResource("6_chefe")]
+[node name="Guardiao" parent="." instance=ExtResource("6_chefe")]
 position = Vector2(3260, 624)
 
 ; =====================  luzes / checkpoints / porta  ================

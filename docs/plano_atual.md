@@ -1,4 +1,91 @@
-# Plano atual — Execution 6B Character + Level 1 Completion
+# Plano atual — Execution 7 Region I Vertical Slice Completion
+
+## Objetivo, âmbito e critério de conclusão 7 — 10 setembro 2026
+
+Concluir o máximo tecnicamente seguro da primeira Vertical Slice, Região I
+(`level_001`–`level_005`), numa execução consolidada: auditar e completar o
+combate base permitido, integrar os inimigos já definidos, validar/ajustar os
+cinco níveis autorais sem os reconstruir, fechar o boss regional
+`boss_level_005` (`ChefeCoracaoPutrefacto.tscn`), progressão, recompensa,
+evidência real, exports Windows/Web-PWA, documentação e Git.
+
+Âmbito de níveis exato:
+
+- `scenes/levels/Floresta_Putrefata.tscn` (`level_001`);
+- `scenes/levels/Pantano_dos_Sussurros.tscn` (`level_002`);
+- `scenes/levels/Ninho_da_Viuva_Negra.tscn` (`level_003`);
+- `scenes/levels/A_Arvore_que_Chora.tscn` (`level_004`);
+- `scenes/levels/Coracao_da_Floresta.tscn` (`level_005`).
+
+Âmbito partilhado candidato, sujeito à auditoria antes de editar:
+`scripts/koliani.gd`, `scripts/demonio_base.gd`, `scripts/chefe_base.gd`,
+`scripts/chefe_generico.gd`, scripts/cenas concretos já referenciados pelos
+cinco níveis, EstadoJogo/progressão apenas quando a integração do Dash,
+conclusão regional ou recompensa prove uma lacuna, e verificadores/capturas
+exclusivos da Execution 7. `scripts/movimento.gd`, parâmetros de câmara,
+colisões validadas, escala `0,82`, offset `-15,170732`, pivot `(80,90)`, canvas
+`160x96` e baseline `Y=90` ficam congelados.
+
+Critério: gates A–E dirigidos sem hitbox persistente/dano duplicado/deadlock,
+IA e telegraphs estáveis, L1–L5 carregáveis com checkpoints/saídas alcançáveis,
+boss com ativação/fase 2/morte/recompensa idempotente, fluxo regional e schema
+v5 preservados; suite completa e renderer real sem erro fatal; pacote de
+revisão em `work/execution_7/review/`; builds finais Windows e Web/PWA com
+rastreabilidade; commit/push único apenas com ficheiros intencionais. Feel,
+equilíbrio e qualidade visual terminam obrigatoriamente como revisão humana
+pendente. Ausência de arte de produção é classificada e não preenchida por
+improviso.
+
+## Prova por etapa 7
+
+1. Congelar baseline Git e abrir as autoridades 03, 07, 08, 10 e 12 com
+   path, dimensões, modo, SHA-256 e domínio visual confirmados.
+2. Auditar runtime atual de combate, inimigos, cenas L1–L5, boss regional,
+   checkpoints, progressão, reward e exports; distinguir implementado,
+   legado, asset em falta, bloqueio e decisão nova.
+3. Gate A: testes de ataque/3-hit/aéreo/Dash/feedback e regressão integral de
+   Movement+Camera, sem retuning.
+4. Gate B: IA, telegraphs, reação, morte, dano, respawn/checkpoint e
+   distribuição segura dos inimigos existentes.
+5. Gates C/D: load, spawn, todos os checkpoints, alcance, saída e renderer de
+   cada nível 2–5; alcance estático não substitui playtest humano.
+6. Gate E: boss `boss_level_005`, arena, fase 2, restart, morte, reward e
+   save/reload idempotente.
+7. Integração L1→L5→boss→reward→conclusão regional, suite geral, localização,
+   100 cenas/integridade existente, capturas reais, performance observável e
+   `git diff --check`.
+8. Um ciclo final de Windows + Web/PWA, cache novo, smoke exportado,
+   rastreabilidade, documentação, fetch final, commit e push não destrutivo.
+
+## Baseline e classificações recuperadas
+
+- início: `master`, `HEAD = origin/master = cdfa85a`, contendo 6B;
+- `project.godot` e vários ficheiros não rastreados são trabalho local
+  preexistente e permanecem excluídos salvo prova de necessidade;
+- `boss_level_005` / Coração Putrefacto: boss regional canónico recuperado;
+- Ghorak e bosses L1–L4: implementação legada, não novos bosses regionais;
+- referências 03/07/08/10/12: **APPROVED DESIGN**, pranchas compostas;
+  produção separável continua sujeita ao gate técnico;
+- Execution 6B mantém **TECHNICALLY VALIDATED / HUMAN VISUAL REVIEW
+  REQUIRED** e não será retroativamente promovida.
+
+## Resultado técnico 7
+
+Os gates funcionais disponíveis passaram: combo 3-hit com hitbox temporária,
+ataque aéreo, gating do Dash, guardiões L1–L4 sem reward de boss, L1–L5 e
+checkpoints alcançáveis, interior L4, Coração Putrefacto em duas fases e baú
+idempotente. Suite, source/generator, jornada 1–100, alcance e renderer real:
+PASS. Relatório e rastreabilidade ficam em
+`docs/execution_7_region1_vertical_slice_completion.md`.
+
+Estado: **PARTIAL PASS — HUMAN VISUAL/COMBAT FEEL/BALANCE/PLAYTEST REQUIRED**.
+Arte/áudio de produção em falta permanecem classificados; legacy funcional
+foi retido. A execução termina após um único ciclo Windows/Web-PWA e Git; não
+autoriza Região II.
+
+---
+
+# Histórico — Execution 6B Character + Level 1 Completion
 
 ## Objetivo, âmbito e critério de conclusão 6B — 10 setembro 2026
 

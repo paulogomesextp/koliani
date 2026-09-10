@@ -58,6 +58,8 @@ func _correr_tudo() -> void:
 	teste_progression_ids_idempotencia_boss_e_recompensa()
 	teste_progression_ids_invalidos()
 	teste_progression_ids_resilientes_a_renames()
+	teste_execution_7_combate_e_progressao_regiao1()
+	teste_execution_7_guardioes_e_boss_regional()
 	teste_level_session_begin()
 	teste_level_session_stable_checkpoint_identity()
 	teste_level_session_checkpoint_activation_repeated()
@@ -1064,8 +1066,8 @@ func teste_progression_ids_niveis_e_bosses() -> void:
 		"nível atual devia persistir pelo ID estável da Execution 2")
 	_ok(save.get("completed_level_ids") == ["level_001"],
 		"conclusão repetida devia persistir um único level ID")
-	_ok(save.get("defeated_boss_ids") == ["boss_level_001"],
-		"conclusão devia persistir o boss ID explícito do manifesto")
+	_ok(save.get("defeated_boss_ids") == [],
+		"concluir L1 com guardião não devia persistir derrota de boss")
 	_ok(not save.has("indice_nivel") and not save.has("concluidos"),
 		"schema atual não devia persistir referências legacy de nível")
 	e.free()
@@ -1137,11 +1139,86 @@ func teste_progression_ids_invalidos() -> void:
 	_ok(SaveFoundation.validar_atual(invalido, e.NIVEIS.size()).get("error")
 		== "legacy_id_in_current", "campo legacy não migrado devia ser detetado")
 	invalido = e.para_dicionario()
-	invalido["completed_level_ids"] = ["level_001"]
+	invalido["completed_level_ids"] = ["level_005"]
 	_ok(SaveFoundation.validar_atual(invalido, e.NIVEIS.size()).get("error")
 		== "incompatible_progression_reference",
 		"nível concluído sem boss/reward correspondentes devia ser rejeitado")
 	e.free()
+
+
+func teste_execution_7_combate_e_progressao_regiao1() -> void:
+	_ok(Koliani.NUM_COMBO == 3, "Execution 7: combate base devia ter combo de 3 golpes")
+	_ok(Koliani.DUR_COMBO.size() == 3
+		and Koliani.ATAQUE_ATIVO_INICIO.size() == 3
+		and Koliani.ATAQUE_ATIVO_FIM.size() == 3,
+		"Execution 7: cada golpe devia ter duração e janela ativa próprias")
+	for i in 3:
+		_ok(Koliani.ATAQUE_ATIVO_INICIO[i] > 0.0
+			and Koliani.ATAQUE_ATIVO_INICIO[i] < Koliani.ATAQUE_ATIVO_FIM[i]
+			and Koliani.ATAQUE_ATIVO_FIM[i] < 1.0,
+			"Execution 7: golpe %d precisa de antecipação, ativo e recovery" % (i + 1))
+		_ok(not Koliani.janela_ataque_ativa(i, 0.0)
+			and Koliani.janela_ataque_ativa(i, 0.5)
+			and not Koliani.janela_ataque_ativa(i, 1.0),
+			"Execution 7: hitbox do golpe %d devia respeitar as três fases" % (i + 1))
+	_ok(EstadoJogoScript.HABILIDADES_INICIAIS.is_empty(),
+		"Execution 7: L1 devia começar apenas com run/jump/attack")
+	_ok(ProgressionIDs.ability_id_da_chave_runtime("dash") == "ability_dash",
+		"Execution 7: Dash precisava de stable ability ID")
+	_ok(ProgressionIDs.ability_id_da_chave_runtime("pogo") == "ability_pogo",
+		"Execution 7: pogo tardio precisava de gating persistível")
+
+
+func teste_execution_7_guardioes_e_boss_regional() -> void:
+	_ok(CatalogoCampanha.CHEFE_KEY.slice(0, 4).all(
+		func(chave: String) -> bool: return chave.begins_with("guard.")),
+		"Execution 7: HUD devia classificar L1-L4 como guardiões")
+	_ok(CatalogoCampanha.tem_chefe(4),
+		"Execution 7: HUD devia classificar L5 como boss regional")
+	var manifesto := ProgressionIDs.carregar_manifesto()
+	var entradas_regiao1: Array = manifesto.get("levels", []).slice(0, 5)
+	_ok(entradas_regiao1.size() == 5
+		and entradas_regiao1[0].get("encounter_role") == "guardian"
+		and entradas_regiao1[3].get("encounter_role") == "guardian"
+		and entradas_regiao1[4].get("encounter_role") == "regional_boss",
+		"Execution 7: manifesto devia distinguir guardiões do boss regional")
+	var caminhos := [
+		"res://scenes/levels/Floresta_Putrefata.tscn",
+		"res://scenes/levels/Pantano_dos_Sussurros.tscn",
+		"res://scenes/levels/Ninho_da_Viuva_Negra.tscn",
+		"res://scenes/levels/A_Arvore_que_Chora.tscn",
+	]
+	for caminho in caminhos:
+		var cena: PackedScene = load(caminho)
+		var nivel := cena.instantiate() if cena else null
+		_ok(nivel != null and nivel.get_node_or_null("Guardiao") != null
+			and nivel.get_node_or_null("Chefe") == null,
+			"Execution 7: %s devia terminar em Guardiao" % caminho.get_file())
+		if nivel:
+			nivel.free()
+	var l5: PackedScene = load("res://scenes/levels/Coracao_da_Floresta.tscn")
+	var exame := l5.instantiate() if l5 else null
+	_ok(exame != null and exame.get_node_or_null("Chefe") != null,
+		"Execution 7: L5 devia manter o boss regional")
+	_ok(exame != null and exame.get_node("ColBatida").habilidade_id == "dash",
+		"Execution 7: L5 devia desbloquear Dash")
+	if exame:
+		exame.free()
+	_ok(ChefeCoracaoPutrefacto.fase_por_vida(51, 100) == 1
+		and ChefeCoracaoPutrefacto.fase_por_vida(50, 100) == 2,
+		"Execution 7: Coração Putrefacto devia transitar de fase a 50%")
+	var estado := _novo_estado()
+	_ok(not estado.nivel_e_exame_regional(0) and not estado.nivel_e_exame_regional(3)
+		and estado.nivel_e_exame_regional(4),
+		"Execution 7: só o quinto nível devia ser exame regional")
+	estado.marcar_nivel_concluido(0)
+	_ok(estado.bosses_derrotados.is_empty() and estado.recompensas_reclamadas.is_empty(),
+		"Execution 7: guardião não devia criar reward/boss state")
+	estado.marcar_nivel_concluido(4)
+	_ok(estado.bosses_derrotados == ["boss_level_005"]
+		and estado.recompensas_reclamadas == ["reward_boss_chest_level_005"],
+		"Execution 7: boss/reward de L5 deviam manter IDs estáveis")
+	estado.free()
 
 
 func teste_progression_ids_resilientes_a_renames() -> void:

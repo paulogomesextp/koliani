@@ -7,7 +7,7 @@
 ; pelo elite gosma SALTADOR. ACTO 3: bifurcacao -- RAMOS EXTERIORES (por
 ; cima, rapido, com a alcova secreta, debaixo das lagrimas acidas) ou
 ; INTERIOR DO TRONCO (desce em espiral, sem gotas, mas com raizes).
-; Reencontro com a recompensa e, no fim, a clareira de Entrevane.
+; Reencontro das rotas e, no fim, a clareira do guardiao Entrevane.
 
 [ext_resource type="PackedScene" uid="uid://bkolianiactor01" path="res://scenes/actors/Koliani.tscn" id="1_kol"]
 [ext_resource type="PackedScene" uid="uid://bdemoniobase01" path="res://scenes/actors/DemonioBase.tscn" id="2_dem"]
@@ -279,13 +279,7 @@ altura_visual = 44.0
 cor_base = Color(0.2, 0.15, 0.09, 1)
 cor_topo = Color(0.46, 0.36, 0.22, 1)
 
-; recompensa do nivel -- no caminho critico, ninguem a falha
-[node name="ColLagrima" parent="." instance=ExtResource("3_col")]
-position = Vector2(2860, 566)
-pista_id = "arvore_lagrima_no_tronco"
-habilidade_id = "partir_paredes"
-
-; =====================  BOSS  =======================================
+; =====================  GUARDIAO  ===================================
 [node name="SubidaChefe" parent="." instance=ExtResource("9_pl")]
 position = Vector2(3060, 660)
 tamanho = Vector2(150, 22)
@@ -314,7 +308,7 @@ intervalo = 2.4
 fase = 1.5
 dano = 14
 
-[node name="Chefe" parent="." instance=ExtResource("6_chefe")]
+[node name="Guardiao" parent="." instance=ExtResource("6_chefe")]
 position = Vector2(3400, 624)
 
 ; =====================  luzes / checkpoints / porta  ================

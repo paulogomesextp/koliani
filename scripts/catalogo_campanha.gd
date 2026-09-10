@@ -17,10 +17,10 @@ extends RefCounted
 ## `guard.*` em vez de `boss.*`; o carrossel usa isso para dizer
 ## "Guardião: X" em vez de "Chefe: X".
 const CHEFE_KEY: Array[String] = [
-	"boss.ghorak",               # 00 Floresta Putrefacta
-	"boss.morvanna",             # 01 Pântano dos Sussurros
-	"boss.rainha_aracnidea",     # 02 Ninho da Viúva Negra
-	"boss.entrevane",            # 03 A Árvore que Chora
+	"guard.ghorak",               # 00 Floresta Putrefacta
+	"guard.morvanna",             # 01 Pântano dos Sussurros
+	"guard.rainha_aracnidea",     # 02 Ninho da Viúva Negra
+	"guard.entrevane",            # 03 A Árvore que Chora
 	"boss.coracao_putrefacto",   # 04 Coração da Floresta
 	"boss.carcereiro",           # 05 Prisão dos Condenados
 	"boss.ignivar",              # 06 Fornalha dos Pecadores

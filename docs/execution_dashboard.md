@@ -21,6 +21,7 @@ Atualizado em 10 de setembro de 2026.
 | Execution 5G.1 | TECHNICAL PASS / HUMAN VISUAL FAIL | Piloto integrado; corte visual inferior reportado pelo Game Master. |
 | Execution 6A | PARTIAL VISUAL BUILD | Panorama, Heart Tree, cascatas e ruínas integrados; PRODUCTION ASSETS MISSING. |
 | Execution 6B | PARTIAL PASS | Sete frames `run` recuperados; 44/44 safe; Level 1 preservado até ao limite da autoridade; HUMAN VISUAL REVIEW REQUIRED. |
+| Execution 7 | PARTIAL PASS | Combate 3-hit/aéreo/Dash, guardiões L1–L4 e Coração Putrefacto L5 integrados; gates técnicos PASS; HUMAN VISUAL/FEEL/BALANCE/PLAYTEST REQUIRED. |
 
 ## Baseline após a Execution 3D
 

@@ -4,6 +4,8 @@ var falhas := 0
 
 func _init() -> void:
 	await process_frame
+	var args := OS.get_cmdline_user_args()
+	var indice_nivel := int(args[0]) if not args.is_empty() else 11
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 1234
 	var tipos := {}
@@ -29,7 +31,7 @@ func _init() -> void:
 	_ok(esgotado, "inventário completo e atributos no máximo dão Essência")
 	var estado := root.get_node("EstadoJogo")
 	estado.modo_teste = true
-	estado.indice_nivel = 11
+	estado.indice_nivel = indice_nivel
 	estado.checkpoint = Vector2.ZERO
 	change_scene_to_file("res://scenes/Main.tscn")
 	await create_timer(0.4).timeout

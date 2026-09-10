@@ -4,6 +4,31 @@
 
 Atualizado em 10 de setembro de 2026.
 
+## Execution 7 — Region I Vertical Slice Completion
+
+Estado: **PARTIAL PASS — TECHNICALLY VALIDATED / HUMAN REVIEW REQUIRED**.
+Combate base foi fechado em três golpes com janelas ativas/deduplicação,
+ataque aéreo singular e integração de Dash sem alterar movimento, câmara ou
+colisões. L1–L4 terminam agora em guardiões (Ghorak, Morvanna, Rainha
+Aracnídea e Entrevane) sem estado/baú de boss; L5 mantém o boss regional
+canónico Coração Putrefacto, fase 2 a 50%, Dash e reward idempotente.
+
+Suite, gates dirigidos, source/generator, jornada 1–100, alcance, L4 interior,
+checkpoints L5, reward e renderer real passaram. Evidência:
+`work/execution_7/review/region1_vertical_slice_review.png`,
+`combat_review.png`, `region1_boss_review.png`. Relatório completo:
+`docs/execution_7_region1_vertical_slice_completion.md`.
+
+Windows `build/windows/Koliani.exe` e Web/PWA `build/web/index.html` foram
+regenerados e passaram smoke local; cache PWA `1789055058|5419303`. Para
+retoma noutra ferramenta, usar `docs/claude_handoff_execution_7.md`.
+
+Produção final de combate/inimigos/boss e expansão visual L2–L5 continuam em
+falta; legacy funcional foi mantido. **HUMAN VISUAL REVIEW REQUIRED, HUMAN
+COMBAT FEEL REVIEW REQUIRED, HUMAN BALANCE REVIEW REQUIRED e HUMAN PLAYTEST
+REQUIRED**. Próximo passo: rever Região I nos builds finais desta execução;
+não iniciar Região II.
+
 ## Execution 6B — Character + Level 1 Completion
 
 Estado: **PARTIAL PASS — TECHNICALLY VALIDATED / HUMAN VISUAL REVIEW

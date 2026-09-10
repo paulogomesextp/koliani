@@ -246,6 +246,7 @@
       "runtime_scene": "res://scenes/levels/Floresta_Putrefata.tscn",
       "origin": "authored",
       "ownership": "authored",
+      "encounter_role": "guardian",
       "boss_ref": {
         "boss_id": "boss_level_001",
         "scene": "res://scenes/actors/ChefeGhorak.tscn"
@@ -259,6 +260,7 @@
       "runtime_scene": "res://scenes/levels/Pantano_dos_Sussurros.tscn",
       "origin": "authored",
       "ownership": "authored",
+      "encounter_role": "guardian",
       "boss_ref": {
         "boss_id": "boss_level_002",
         "scene": "res://scenes/actors/ChefeMorvanna.tscn"
@@ -272,6 +274,7 @@
       "runtime_scene": "res://scenes/levels/Ninho_da_Viuva_Negra.tscn",
       "origin": "authored",
       "ownership": "authored",
+      "encounter_role": "guardian",
       "boss_ref": {
         "boss_id": "boss_level_003",
         "scene": "res://scenes/actors/ChefeRainhaAracnidea.tscn"
@@ -285,6 +288,7 @@
       "runtime_scene": "res://scenes/levels/A_Arvore_que_Chora.tscn",
       "origin": "authored",
       "ownership": "authored",
+      "encounter_role": "guardian",
       "boss_ref": {
         "boss_id": "boss_level_004",
         "scene": "res://scenes/actors/ChefeEntrevane.tscn"
@@ -298,6 +302,7 @@
       "runtime_scene": "res://scenes/levels/Coracao_da_Floresta.tscn",
       "origin": "authored",
       "ownership": "authored",
+      "encounter_role": "regional_boss",
       "boss_ref": {
         "boss_id": "boss_level_005",
         "scene": "res://scenes/actors/ChefeCoracaoPutrefacto.tscn"

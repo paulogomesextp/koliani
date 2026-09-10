@@ -34,7 +34,7 @@ def cenas_estado_jogo() -> list[str]:
     return re.findall(r'"(res://scenes/levels/[^\"]+\.tscn)"', bloco)
 
 
-def boss_da_cena(caminho_res: str) -> str | None:
+def encontro_da_cena(caminho_res: str, nome_no: str = "Chefe") -> str | None:
     texto = open(caminho_local(caminho_res), encoding="utf-8").read()
     recursos = {
         achado.group(2): achado.group(1)
@@ -42,12 +42,12 @@ def boss_da_cena(caminho_res: str) -> str | None:
             r'\[ext_resource[^\]]*path="([^"]+)" id="([^"]+)"\]', texto
         )
     }
-    chefe = re.search(
-        r'^\[node name="Chefe"[^\]]*instance=ExtResource\("([^"]+)"\)',
+    encontro = re.search(
+        rf'^\[node name="{re.escape(nome_no)}"[^\]]*instance=ExtResource\("([^"]+)"\)',
         texto,
         re.MULTILINE,
     )
-    return recursos.get(chefe.group(1)) if chefe else None
+    return recursos.get(encontro.group(1)) if encontro else None
 
 
 def carregar_modulo(nome: str, ficheiro: str):
@@ -107,8 +107,12 @@ def validar_source_of_truth() -> list[str]:
             bosses.add(boss_id)
             if not os.path.isfile(caminho_local(boss_scene)):
                 falhar(erros, "%s referencia boss scene inexistente" % level_id)
-            if boss_da_cena(cena) != boss_scene:
-                falhar(erros, "%s diverge da associação de boss da cena" % level_id)
+            papel = nivel.get("encounter_role", "boss")
+            if papel not in {"boss", "regional_boss", "guardian"}:
+                falhar(erros, "%s tem encounter_role inválido" % level_id)
+            nome_no = "Guardiao" if papel == "guardian" else "Chefe"
+            if encontro_da_cena(cena, nome_no) != boss_scene:
+                falhar(erros, "%s diverge da associação do encontro da cena" % level_id)
 
         gerador = nivel.get("generator")
         if nivel.get("origin") == "generated":

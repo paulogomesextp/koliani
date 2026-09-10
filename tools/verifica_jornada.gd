@@ -17,6 +17,7 @@ extends SceneTree
 func _init() -> void:
 	await process_frame
 	var es := root.get_node_or_null("/root/EstadoJogo")
+	es.modo_teste = true
 	var falhas := 0
 	_perfis.clear()
 	for idx in es.NIVEIS.size():
@@ -37,6 +38,7 @@ func _init() -> void:
 		await process_frame
 	_resumo_variedade()
 	print("\n=== JORNADA: %s ===" % ("TUDO OK" if falhas == 0 else "%d FALHA(S)" % falhas))
+	es.modo_teste = false
 	quit(1 if falhas else 0)
 
 

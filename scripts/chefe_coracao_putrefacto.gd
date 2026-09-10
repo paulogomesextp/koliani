@@ -7,14 +7,13 @@ extends ChefeBase
 ##
 ## A cada SÍSTOLE o núcleo abre-se por um instante -- é a ÚNICA janela de
 ## dano, e a dobrar. Entre batidas, ataca conforme a fase:
-##   * Fase 1 (vida > 66%): raízes sob os pés da Koliani (`RaizPerigo`) +
+##   * Fase 1 (vida > 50%): raízes sob os pés da Koliani (`RaizPerigo`) +
 ##     salvas de projéteis dirigidos (`ProjetilZeriko`).
-##   * Fase 2 (vida <= 66%): mais depressa e, a cada batida, dispara um
-##     leque radial de projéteis e ALIVIA a gravidade da Koliani
+##   * Fase 2 (vida <= 50%): combina o padrão base com um leque radial em
+##     cada batida e ALIVIA a gravidade da Koliani
 ##     (`Koliani.flutuar`) -- "o coração bate e altera a gravidade".
-##   * Fase 3 (vida <= 33%): a arena DESMORONA -- a cada batida parte uma
-##     `PlataformaRitmada` do grupo "plataformas_coracao" e caem blocos de
-##     entulho do teto.
+## A plataforma principal permanece contínua: o desafio cresce por padrão e
+## combinação, não por retirar chão ao jogador.
 
 const RAIZ := preload("res://scenes/actors/RaizPerigo.tscn")
 const TIRO := preload("res://scenes/actors/ProjetilZeriko.tscn")
@@ -31,7 +30,7 @@ enum Fase { DORME, ENTRE, RAIZES_TEL, RAIZES, TIROS_TEL, TIROS }
 var _fase: Fase = Fase.DORME
 var _t := 0.0
 var _pulso := 0.0
-var _nivel := 1  ## 1, 2 ou 3
+var _nivel := 1  ## 1 ou 2
 var _nucleo_exposto := false
 var _ciclos := 0
 var _vida_max := 460
@@ -123,9 +122,6 @@ func _bater() -> void:
 		if k and k.has_method("flutuar"):
 			k.flutuar(periodo_batida * 0.8)
 		_leque_radial()
-	if _nivel >= 3:
-		_desmoronar_um_pedaco()
-		_queda_entulho(_x_koliani() + randf_range(-120.0, 120.0))
 
 
 ## --- máquina de estados / fases -------------------------------------
@@ -137,10 +133,9 @@ func _ir(f: Fase) -> void:
 
 func _escolher() -> void:
 	_ciclos += 1
-	# fase 3 dispara menos e desmorona mais; fases 1-2 alternam raiz/tiro
-	if _nivel >= 3 and _ciclos % 2 == 0:
-		_ir(Fase.RAIZES_TEL)
-	elif _ciclos % 2 == 0:
+	# alterna pressão de chão e espaçamento; a fase 2 combina o pulso radial
+	# previsível com este mesmo padrão em vez de apenas multiplicar dano.
+	if _ciclos % 2 == 0:
 		_ir(Fase.RAIZES_TEL)
 	else:
 		_ir(Fase.TIROS_TEL)
@@ -149,11 +144,7 @@ func _escolher() -> void:
 func _atualiza_fase() -> void:
 	if _ja_derrotado:
 		return
-	var novo := 1
-	if vida <= int(_vida_max * 0.33):
-		novo = 3
-	elif vida <= int(_vida_max * 0.66):
-		novo = 2
+	var novo := fase_por_vida(vida, _vida_max)
 	if novo != _nivel:
 		_nivel = novo
 		_atualizar_frame()
@@ -162,10 +153,10 @@ func _atualiza_fase() -> void:
 		if _nivel == 2:
 			periodo_batida *= 0.85
 			dur_tel *= 0.8
-		elif _nivel == 3:
-			periodo_batida *= 0.85
-			dur_tel *= 0.8
-			dur_exposta *= 1.2  # janela maior: recompensa aguentar o caos
+
+
+static func fase_por_vida(vida_atual: int, vida_maxima: int) -> int:
+	return 2 if vida_atual <= int(maxi(vida_maxima, 1) * 0.5) else 1
 
 
 func _ve_koliani() -> bool:
@@ -286,7 +277,7 @@ func _atualizar_frame() -> void:
 	if _nucleo_exposto:
 		_corpo.frame = 2 if _nivel >= 2 else 1
 	else:
-		_corpo.frame = 3 if _nivel >= 3 else 0
+		_corpo.frame = 0
 
 
 func _mostrar_nucleo(v: bool) -> void:

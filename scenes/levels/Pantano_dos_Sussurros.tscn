@@ -5,7 +5,7 @@
 ; venenosa (morte). Bifurcacao: linha alta solida / linha baixa rente a'
 ; agua com plataformas flutuantes a driftar. Alcova secreta LA EM BAIXO
 ; (larga-se de proposito para a apanhar). Elite: cogumelo cuspidor no
-; centro. Chefe: Morvanna, a Bruxa do Pantano.
+; centro. Guardiao: Morvanna, a Bruxa do Pantano.
 
 [ext_resource type="PackedScene" uid="uid://bkolianiactor01" path="res://scenes/actors/Koliani.tscn" id="1_kol"]
 [ext_resource type="PackedScene" uid="uid://bdemoniobase01" path="res://scenes/actors/DemonioBase.tscn" id="2_dem"]
@@ -204,11 +204,6 @@ altura_visual = 44.0
 cor_base = Color(0.15, 0.23, 0.13, 1)
 cor_topo = Color(0.36, 0.56, 0.32, 1)
 
-; recompensa do nivel -- no ponto de reencontro
-[node name="ColDash" parent="." instance=ExtResource("3_col")]
-position = Vector2(2620, 524)
-habilidade_id = "dash_aereo"
-
 ; ilha baixa opcional (rota alternativa rente a' agua para quem arrisca)
 [node name="AlcovaIlha" parent="." instance=ExtResource("9_pl")]
 position = Vector2(2600, 720)
@@ -239,7 +234,7 @@ intervalo = 2.7
 fase = 0.3
 dano = 14
 
-[node name="Chefe" parent="." instance=ExtResource("6_chefe")]
+[node name="Guardiao" parent="." instance=ExtResource("6_chefe")]
 position = Vector2(3280, 624)
 
 ; ===================  luzes / checkpoints / porta  =============

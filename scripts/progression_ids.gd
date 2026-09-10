@@ -10,8 +10,10 @@ const CAMINHO_MANIFESTO := "res://data/level_manifest.json"
 const DIARIO := preload("res://scripts/diario_pistas.gd")
 
 const HABILIDADE_RUNTIME_PARA_ID := {
+	"dash": "ability_dash",
 	"salto_duplo": "ability_salto_duplo",
 	"dash_aereo": "ability_dash_aereo",
+	"pogo": "ability_pogo",
 	"partir_paredes": "ability_partir_paredes",
 	"escudo": "ability_escudo",
 	"projetil": "ability_projetil",

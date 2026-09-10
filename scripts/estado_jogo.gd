@@ -35,12 +35,11 @@ const VIDAS_POR_NIVEL := 1
 const VIDAS_MAX := 99
 
 ## Todas as habilidades da campanha (o modo dev desbloqueia-as de uma vez).
-const HABILIDADES_TODAS := ["salto_duplo", "dash_aereo", "partir_paredes", "escudo", "projetil", "escalar_paredes", "planar"]
-## Habilidades que a Koliani já tem no arranque da campanha (nível 1). O
-## salto duplo deixou de ser um Coletavel a caçar: é básico desde o início
-## (ver koliani.gd). Garantido em `reiniciar_campanha()` e ao carregar saves
-## antigos que ainda não o tinham.
-const HABILIDADES_INICIAIS: Array[String] = ["salto_duplo"]
+const HABILIDADES_TODAS := ["dash", "salto_duplo", "dash_aereo", "pogo", "partir_paredes", "escudo", "projetil", "escalar_paredes", "planar"]
+## No nível 1 a Koliani dispõe apenas de correr, saltar e ataque base. Os
+## desbloqueios permanentes entram pela progressão da campanha; saves antigos
+## mantêm as habilidades que já possuíam, sem revogação destrutiva.
+const HABILIDADES_INICIAIS: Array[String] = []
 
 ## Sequencia fixa de mundos ate ao Zeriko (platformer por niveis, nao
 ## roguelite). O agente "gaming" acrescenta/renomeia niveis aqui a medida
@@ -315,10 +314,18 @@ func marcar_nivel_concluido(indice: int) -> void:
 		return
 	concluidos.append(indice)
 	concluidos.sort()
-	_registar_chefe_do_nivel_sem_guardar(indice)
-	_registar_recompensa_do_nivel_sem_guardar(indice)
+	# Só o quinto nível de cada região é boss/exame. IDs antigos dos níveis
+	# 1–4 continuam válidos para carregar saves legacy, mas um Guardião já não
+	# cria hoje uma nova derrota/recompensa de boss.
+	if nivel_e_exame_regional(indice):
+		_registar_chefe_do_nivel_sem_guardar(indice)
+		_registar_recompensa_do_nivel_sem_guardar(indice)
 	conceder_recompensa(indice)
 	guardar()
+
+
+func nivel_e_exame_regional(indice: int) -> bool:
+	return indice >= 0 and indice < NIVEIS.size() and (indice + 1) % 5 == 0
 
 
 func marcar_chefe_derrotado_por_nivel(indice: int) -> bool:

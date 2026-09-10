@@ -114,7 +114,7 @@ func _ready() -> void:
 	elif _guardiao:
 		# o guardião não tem sinal próprio: morrer é sair da árvore
 		_selar(true)
-		_guardiao.tree_exited.connect(_abrir)
+		_guardiao.tree_exited.connect(_abrir_guardiao)
 	else:
 		_selar(false)
 
@@ -189,6 +189,12 @@ func _selar(selada: bool) -> void:
 
 var _bau_criado := false
 
+func _abrir_guardiao() -> void:
+	# Os níveis 1--4 têm encontros de fecho, não chefes regionais. O guardião
+	# apenas liberta a saída: não grava boss, não cria recompensa e não avança
+	# o contrato persistente reservado ao exame do quinto nível.
+	_selar(false)
+
 func _abrir() -> void:
 	if _bau_criado:
 		return
@@ -197,6 +203,11 @@ func _abrir() -> void:
 	_criar_bau.call_deferred()
 
 func _criar_bau() -> void:
+	# Um reload/saída pode libertar a cena entre `_abrir` e este callback
+	# diferido. Nesse caso não existe mundo onde pousar o baú e o callback da
+	# cena antiga deve terminar silenciosamente.
+	if not is_inside_tree() or _porta == null:
+		return
 	var level_id := IDS_PROGRESSAO.level_id_do_indice(EstadoJogo.indice_nivel)
 	var reward_id := IDS_PROGRESSAO.reward_id_bau_chefe(level_id)
 	if EstadoJogo.recompensa_reclamada(reward_id):
@@ -209,7 +220,10 @@ func _criar_bau() -> void:
 	# Ao lado da saída, assente na plataforma, mesmo com chefe voador.
 	var ponto: Vector2 = _porta.global_position + Vector2(-72, -150)
 	var raio := PhysicsRayQueryParameters2D.create(ponto, ponto + Vector2(0, 400), 1)
-	var hit := get_world_2d().direct_space_state.intersect_ray(raio)
+	var mundo := get_world_2d()
+	if mundo == null:
+		return
+	var hit := mundo.direct_space_state.intersect_ray(raio)
 	bau.position = to_local(hit.position if not hit.is_empty() else _porta.global_position)
 	bau.recolhido.connect(func() -> void: _selar(false))
 	add_child(bau)
