@@ -18,7 +18,9 @@ de testar `ZonaSemPoder`, pois a campanha atual começa canonicamente sem
 habilidades e o teste antigo ainda assumia esse desbloqueio inicial. Os jobs
 Windows e Web usam `always()` após a suite: gates vermelhos continuam visíveis,
 mas não congelam os canais de entrega num commit antigo; Pages só publica se o
-export Web correspondente passar.
+export Web correspondente passar. O próprio job Pages também usa `always()` e
+`needs.web.result == 'success'`, evitando herdar o failure ancestral dos testes
+quando o export Web terminou verde.
 
 ## Execution 8.1E — Congelamento do save — **RESOLVIDO**
 

@@ -288,7 +288,9 @@ jobs:
     name: Publicar o Web no GitHub Pages
     runs-on: ubuntu-latest
     needs: web
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    # `web` pode correr com gates vermelhos; sem `always()` o GitHub herda o
+    # failure ancestral de `testes` e salta Pages mesmo com export Web verde.
+    if: always() && needs.web.result == 'success' && github.event_name == 'push' && github.ref == 'refs/heads/master'
     # So' um deploy de Pages de cada vez -- e' este JOB que se serializa, nao
     # o workflow todo (a nivel de workflow, um push novo cancelava tambem os
     # testes e os builds do run anterior).
