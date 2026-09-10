@@ -1,0 +1,20 @@
+{
+  "schema_version": 2,
+  "character": "TO_BE_SUPPLIED_BY_9B",
+  "animation": "example",
+  "frame_count": 1,
+  "canvas_width": 64,
+  "canvas_height": 64,
+  "pivot_x": 32,
+  "pivot_y": 56,
+  "baseline_y": 56,
+  "baseline_tolerance": 1,
+  "max_scale_ratio": 1.6,
+  "max_bbox_drift": 16,
+  "asset_type": "BODY",
+  "expected_alpha": true,
+  "vfx_separate": true,
+  "reference_path": null,
+  "reference_sha256": null,
+  "frames": ["frame_001.png"]
+}
