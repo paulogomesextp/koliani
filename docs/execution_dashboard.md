@@ -1,6 +1,6 @@
 # Execution dashboard — Koliani
 
-Atualizado em 7 de setembro de 2026.
+Atualizado em 10 de setembro de 2026.
 
 | Execução | Estado | Resultado / saída |
 |---|---|---|
@@ -17,6 +17,10 @@ Atualizado em 7 de setembro de 2026.
 | Execution 4A | TECHNICAL PASS | Movement + Camera first pass; HUMAN PLAYTEST REQUIRED. |
 | Execution 4B | HUMAN-APPROVED | Camera transition tuning aprovada pelo utilizador. |
 | Execution 5B | TECHNICAL PASS | Koliani Premium Pixel Art v1 no Level 1; HUMAN PLAYTEST REQUIRED. |
+| Execution 5C | TECHNICAL PASS | Region I Hybrid Cinematic Visual Target no início do Level 1; HUMAN VISUAL REVIEW REQUIRED. |
+| Execution 5G.1 | TECHNICAL PASS / HUMAN VISUAL FAIL | Piloto integrado; corte visual inferior reportado pelo Game Master. |
+| Execution 6A | PARTIAL VISUAL BUILD | Panorama, Heart Tree, cascatas e ruínas integrados; PRODUCTION ASSETS MISSING. |
+| Execution 6B | PARTIAL PASS | Sete frames `run` recuperados; 44/44 safe; Level 1 preservado até ao limite da autoridade; HUMAN VISUAL REVIEW REQUIRED. |
 
 ## Baseline após a Execution 3D
 
@@ -49,6 +53,26 @@ estão protegidos contra promoção. Reclassificá-los exige evidência e altera
 explícita do manifesto; não faz parte da próxima execução.
 
 Execution 3D terminou. 4C não foi iniciada.
+
+## Execution 5C — evidência técnica
+
+- Target exclusivo do Level 1 em `x=-300..1250`, aproximadamente dois ecrãs.
+- Oito grupos visuais: background, Heart Tree, midground, gameplay skin,
+  corrupção, atmosfera, foreground e iluminação seletiva.
+- Módulo sem física; spawn, quatro plataformas iniciais, body 20×44 e hitbox
+  30×34 em `(23,-4)` verificados sem mudanças.
+- Shadowblade reage ao ataque existente com violeta limpo; corrupção usa
+  preto/violeta sujo/magenta.
+- Skin do HUD local, reversível e sem alteração de lógica.
+- `ativo=false` provado: invisível e zero conteúdo montado.
+- Targeted 5C, 5B, Movement/Camera, alcance do Level 1 e smoke/capturas Forward
+  Mobile: PASS.
+- Suite completa 74/74; localização 701×6 preservada; `git diff --check` PASS.
+- Capturas: `work/execution_5c/region1_hybrid_idle.png` e
+  `work/execution_5c/region1_hybrid_attack.png`.
+- Orçamento: 406 nós, três luzes, um emissor CPU/34 partículas; profiling
+  Web/mobile requerido antes de escalar.
+- Estado visual: **HUMAN VISUAL REVIEW REQUIRED**.
 
 ## Execution 5B — evidência técnica
 

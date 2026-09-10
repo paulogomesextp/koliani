@@ -2,14 +2,19 @@
 
 ## Agora
 
-1. **Execution 1C — CURRENT:** concluir a documentação canónica e validar
-   coerência/referências, sem alterações funcionais.
+1. **Execution 6B — PARTIAL PASS / HUMAN VISUAL REVIEW REQUIRED:** jogar o
+   Level 1 completo e validar as pernas recuperadas de `run_03`–`run_09`,
+   contraste, continuidade do panorama/caps e leitura do Heart Tree. Windows
+   e Web/PWA locais passaram; dispositivo/browser final continua
+   `DEVICE VALIDATION REQUIRED`.
 
 ## A seguir
 
-2. **Execution 2 — NEXT:** congelar fontes de verdade e reduzir o risco de
-   geração destrutiva, com âmbito a definir num pedido próprio. Não iniciar a
-   partir desta lista.
+2. **Produção visual aprovada em falta:** exportar layers alpha, tiles Hybrid,
+   props, criatura infectada, replacement de Ghorak, HUD e áudio sem reabrir
+   design.
+3. **Completar run_brake e land — PRODUÇÃO EM FALTA:** substituir os fallbacks
+   aprovados apenas quando existirem os 11 frames limpos. Não inferir pixels.
 
 ## Validação externa pendente
 

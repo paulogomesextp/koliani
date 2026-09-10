@@ -215,6 +215,9 @@ var _invulneravel := 0.0
 var _hurt_t := 0.0
 var _aterrar_t := 0.0
 var _no_ar_antes := false
+var _piloto_5g_em_movimento := false
+var _piloto_5g_no_ar := false
+var _piloto_5g_facing := 1.0
 var _stomp_cd := 0.0
 var _estava_no_chao := true
 var _defendendo := false
@@ -377,6 +380,10 @@ const RIG := "shadowblade"
 ## activa o prototype premium na sua cena.
 @export var usar_prototipo_premium := false
 
+## Execution 5G: sobreposição exclusiva de locomoção para o piloto do Level 1.
+## Mantém o prototype 5B como fallback para combate e estados sem arte 5G.
+@export var usar_piloto_visual_5g := false
+
 ## Rigs desenhados frame a frame (tudo menos o "codigo", que é um boneco
 ## vectorial montado por código). Neles a animação PROCEDURAL de `_animar`
 ## -- o balanço da corrida, a inclinação, o "respirar" parado, o esticão do
@@ -509,6 +516,23 @@ const PREMIUM_ESCALA := 0.75
 ## Pes em y=90 da celula: (90-48)*0.75 + offset*0.75 = 22 no mundo.
 const PREMIUM_OFFSET_Y := -12.666667
 
+## Frames tecnicamente limpos da Execution 5G. `run_brake` e `land` são
+## montados abaixo com poses destas sequências, sem gerar ou inferir pixels.
+const _KOLI_ANIMS_PILOTO_5G := {
+	"idle":       [10, 8.0, true],
+	"run":        [12, 16.0, true],
+	"turn":       [4, 12.0, false],
+	"run_start":  [6, 12.0, false],
+	"jump_start": [4, 12.0, false],
+	"jump_loop":  [4, 8.0, true],
+	"fall":       [4, 8.0, true],
+}
+const PILOTO_5G_DIR := "koliani_visual_pilot_5g"
+## A escala 5G.1 aumenta a leitura da personagem no Level 1 sem mover os pes.
+## (90 - 48 + offset) * escala continua igual a 22 no mundo.
+const PILOTO_5G_ESCALA := 0.82
+const PILOTO_5G_OFFSET_Y := -15.170732
+
 ## Rig "nova" -- a arte do Paulo. Frames de 72x72 com os pés em y=68
 ## (`tools/importar_rig_koliani_nova.py`). O `idle` tem 10 frames e o `run`
 ## 12 (a passada original tinha 24, ficou de dois em dois).
@@ -602,23 +626,17 @@ func _montar_frames() -> void:
 		# ao sprite (o clarão do GOLPE continua a disparar nos acertos)
 		if _luz_lamina:
 			_luz_lamina.enabled = false
+	if usar_piloto_visual_5g:
+		_corpo.scale = Vector2(PILOTO_5G_ESCALA, PILOTO_5G_ESCALA)
+		_corpo.offset = Vector2(0.0, PILOTO_5G_OFFSET_Y)
 	var sf := SpriteFrames.new()
 	sf.remove_animation("default")
 	for nome: String in anims:
-		var cfg: Array = anims[nome]
-		sf.add_animation(nome)
-		sf.set_animation_speed(nome, cfg[1])
-		sf.set_animation_loop(nome, cfg[2])
-		var tex: Texture2D = load("res://assets/sprites/pixel/%s/%s.png" % [dir_tiras, nome])
-		if tex == null:
-			continue
-		var n: int = cfg[0]
-		var fw := tex.get_width() / maxi(1, n)
-		for i in n:
-			var at := AtlasTexture.new()
-			at.atlas = tex
-			at.region = Rect2(i * fw, 0, fw, tex.get_height())
-			sf.add_frame(nome, at)
+		_adicionar_animacao_de_tira(sf, nome, anims[nome], dir_tiras)
+	if usar_piloto_visual_5g:
+		for nome: String in _KOLI_ANIMS_PILOTO_5G:
+			_adicionar_animacao_de_tira(sf, nome, _KOLI_ANIMS_PILOTO_5G[nome], PILOTO_5G_DIR)
+		_montar_fallbacks_piloto_5g(sf)
 	# Gesto de lançamento com poses existentes, sem ativar a hitbox da espada.
 	if sf.has_animation("attack") and not sf.has_animation("lancar"):
 		sf.add_animation("lancar")
@@ -629,6 +647,45 @@ func _montar_frames() -> void:
 	_corpo.sprite_frames = sf
 	_corpo.play("idle")
 	_montar_material_equipamento()
+
+
+func _adicionar_animacao_de_tira(sf: SpriteFrames, nome: String, cfg: Array,
+		dir_tiras: String) -> void:
+	if sf.has_animation(nome):
+		sf.remove_animation(nome)
+	sf.add_animation(nome)
+	sf.set_animation_speed(nome, cfg[1])
+	sf.set_animation_loop(nome, cfg[2])
+	var tex: Texture2D = load("res://assets/sprites/pixel/%s/%s.png" % [dir_tiras, nome])
+	if tex == null:
+		return
+	var n: int = cfg[0]
+	var fw := tex.get_width() / maxi(1, n)
+	for i in n:
+		var at := AtlasTexture.new()
+		at.atlas = tex
+		at.region = Rect2(i * fw, 0, fw, tex.get_height())
+		sf.add_frame(nome, at)
+
+
+func _montar_fallbacks_piloto_5g(sf: SpriteFrames) -> void:
+	# Travagem: últimos três momentos da passada e regresso ao primeiro idle.
+	sf.add_animation("run_brake")
+	sf.set_animation_speed("run_brake", 14.0)
+	sf.set_animation_loop("run_brake", false)
+	for indice in [9, 10, 11]:
+		sf.add_frame("run_brake", sf.get_frame_texture("run", indice))
+	sf.add_frame("run_brake", sf.get_frame_texture("idle", 0))
+	# Aterragem: fecha a queda e estabiliza em idle. O alias `aterrar` preserva
+	# o nome legado do runtime; `land` torna o fallback explícito e substituível.
+	for nome in ["land", "aterrar"]:
+		if sf.has_animation(nome):
+			sf.remove_animation(nome)
+		sf.add_animation(nome)
+		sf.set_animation_speed(nome, 12.0)
+		sf.set_animation_loop(nome, false)
+		sf.add_frame(nome, sf.get_frame_texture("fall", 3))
+		sf.add_frame(nome, sf.get_frame_texture("idle", 0))
 
 
 ## Pousa no `Corpo` o shader que troca as duas rampas de cinzento do rig
@@ -1160,6 +1217,8 @@ func _atualizar_anim() -> void:
 		a = "lancar"
 	elif _agachado:
 		a = "crouch"
+	elif usar_piloto_visual_5g:
+		a = _anim_locomocao_piloto_5g(sf)
 	elif not is_on_floor():
 		if _djump_t > 0.0:
 			a = "djump"
@@ -1189,11 +1248,58 @@ func _atualizar_anim() -> void:
 		elif a == "wallslide":
 			rot = 0.5
 			off = Vector2(6, 0)
-		elif a == "jump" or a == "djump":
+		elif a in ["jump", "jump_start", "jump_loop", "djump"]:
 			rot = -0.7
 			off = Vector2(7, -6)
 		_arma.rotation = rot
 		_arma.position = off
+
+
+## Seleção estritamente visual dos estados 5G. Só observa o estado físico já
+## calculado; não escreve velocidade, posição, colisões nem tempos de gameplay.
+func _anim_locomocao_piloto_5g(sf: SpriteFrames) -> String:
+	if not is_on_floor():
+		_piloto_5g_em_movimento = false
+		if _djump_t > 0.0 and sf.has_animation("djump"):
+			_piloto_5g_no_ar = true
+			return "djump"
+		if not _piloto_5g_no_ar:
+			_piloto_5g_no_ar = true
+			return "jump_start" if _vy() < -20.0 else "fall"
+		if _vy() > 20.0:
+			return "fall"
+		if _corpo.animation == &"jump_start" and _corpo.is_playing():
+			return "jump_start"
+		return "jump_loop"
+
+	if _piloto_5g_no_ar:
+		_piloto_5g_no_ar = false
+		_piloto_5g_em_movimento = false
+		return "land"
+	if _aterrar_t > 0.0 and _corpo.animation == &"land" and _corpo.is_playing():
+		return "land"
+
+	var em_movimento := absf(velocity.x) > 24.0
+	if em_movimento:
+		var virou := _piloto_5g_em_movimento and not is_equal_approx(_piloto_5g_facing, _olha_para)
+		_piloto_5g_facing = _olha_para
+		if virou:
+			return "turn"
+		if _corpo.animation == &"turn" and _corpo.is_playing():
+			return "turn"
+		if not _piloto_5g_em_movimento:
+			_piloto_5g_em_movimento = true
+			return "run_start"
+		if _corpo.animation == &"run_start" and _corpo.is_playing():
+			return "run_start"
+		return "run"
+
+	if _piloto_5g_em_movimento:
+		_piloto_5g_em_movimento = false
+		return "run_brake"
+	if _corpo.animation == &"run_brake" and _corpo.is_playing():
+		return "run_brake"
+	return "idle"
 
 
 ## Para que lado o sprite é espelhado. Por omissão é `_olha_para` (as tiras

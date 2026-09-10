@@ -1,6 +1,390 @@
 # Retomar aqui — Koliani
 
-Atualizado em 7 de setembro de 2026.
+Índice de integração documental: [master_package_integration.md](master_package_integration.md).
+
+Atualizado em 10 de setembro de 2026.
+
+## Execution 6B — Character + Level 1 Completion
+
+Estado: **PARTIAL PASS — TECHNICALLY VALIDATED / HUMAN VISUAL REVIEW
+REQUIRED**. A causa das pernas cortadas era a extração histórica da faixa
+`run`: divisão uniforme sobre células de larguras reais irregulares, seguida
+de seleção que descartou componentes legítimos dos membros. `run_03`–`run_09`
+foram reextraídos apenas da autoridade 05; resultado: 44/44 frames ativos
+`SAFE`, sete `FIXED`, zero bloqueados e zero divergências de atlas.
+
+Escala `0,82`, offset `-15,170732`, pivot `(80,90)`, canvas `160×96`, baseline
+`Y=90`, colisão, movimento e câmara foram preservados. Renderer real, targeted
+de Koliani/Level 1/Movement+Camera, alcance e suite completa: PASS.
+
+O ambiente 6A foi preservado. O kit modular local 12/12 passou tecnicamente,
+mas permanece `validated`, com origem `_source/imagegen_v1`; não foi promovido
+sem aprovação visual. Legacy funcional de plataformas, inimigos, HUD, VFX e
+áudio foi retido onde falta produção aprovada. Windows e Web/PWA foram
+regenerados; smoke local PASS; cache PWA `1789047133|5780304`.
+
+Evidência: `work/execution_6b/preview/level1_6b_review.png`,
+`level1_6a_vs_6b.png`, `koliani_6b_gameplay_review.png` e relatório
+`docs/execution_6b_character_level1_completion.md`.
+
+Próximo passo autorizado: **HUMAN VISUAL REVIEW REQUIRED** da Koliani 6B e do
+Level 1 6A/6B. Não iniciar 6C nem Levels 2–5.
+
+## Execution 6B — Character + Level 1 Completion
+
+Estado: **PARTIAL PASS — TECHNICALLY VALIDATED / HUMAN VISUAL REVIEW
+REQUIRED**. A causa das pernas cortadas era a extração histórica da faixa
+`run`: divisão uniforme sobre células de larguras reais irregulares, seguida
+de seleção que descartou componentes legítimos dos membros. `run_03`–`run_09`
+foram reextraídos apenas da autoridade 05; resultado: 44/44 frames ativos
+`SAFE`, sete `FIXED`, zero bloqueados e zero divergências de atlas.
+
+Escala `0,82`, offset `-15,170732`, pivot `(80,90)`, canvas `160×96`, baseline
+`Y=90`, colisão, movimento e câmara foram preservados. Renderer real, targeted
+de Koliani/Level 1/Movement+Camera, alcance e suite completa: PASS.
+
+O ambiente 6A foi preservado. O kit modular local 12/12 passou tecnicamente,
+mas permanece `validated`, com origem `_source/imagegen_v1`; não foi promovido
+sem aprovação visual. Legacy funcional de plataformas, inimigos, HUD, VFX e
+áudio foi retido onde falta produção aprovada. Windows e Web/PWA foram
+regenerados; smoke local PASS; cache PWA `1789047133|5780304`.
+
+Evidência: `work/execution_6b/preview/level1_6b_review.png`,
+`level1_6a_vs_6b.png`, `koliani_6b_gameplay_review.png` e relatório
+`docs/execution_6b_character_level1_completion.md`.
+
+Próximo passo autorizado: **HUMAN VISUAL REVIEW REQUIRED** da Koliani 6B e do
+Level 1 6A/6B. Não iniciar 6C nem Levels 2–5.
+
+## Region I — Modular Sprite Kit v1
+
+Estado: **TECHNICALLY VALIDATED / HUMAN VISUAL REVIEW REQUIRED**. As
+autoridades aprovadas 08 e 10 foram convertidas em 12 sprites ambientais
+individuais: terreno, remates, cantos, duas plataformas, raízes, musgo,
+corrupção e bloco de ruína. Todos cumprem as dimensões 32/64/96 px, alfa,
+nearest-neighbour e costuras declaradas no contrato; `validate_region_artkit`
+passou com `12 presentes / 0 missing / 0 fails` e o Godot 4.7.2 importou os 12
+PNGs.
+
+Fontes, gerador e hashes foram preservados. Prancha de revisão:
+`work/region_01_sprite_kit_v1/preview/region_01_sprite_review.png`. Não houve
+integração no Level 1 nem alterações de gameplay, geometria ou Koliani. Próximo
+passo: aprovação visual humana da prancha antes de qualquer integração.
+
+## Delivery Sync — Windows + Web/PWA
+
+Estado: **PASS LOCAL / REMOTE PAGES NOT CONFIGURED**. Em 10 de setembro de
+2026, os presets existentes `Windows Desktop` e `Web` foram exportados do
+working tree em `HEAD 24fdf3f` (com alterações locais 5G.1 preservadas) para
+`build/windows/Koliani.exe` e `build/web/`. O atalho estabelecido
+`Koliani (testar).lnk` continua a apontar para `jogar.bat` e foi confirmado a
+lançar o novo `build/windows/Koliani.exe`; o executável anterior era de 6 de
+setembro e, portanto, anterior à Execution 6A.
+
+Smoke Windows real e smoke Web/PWA local: PASS. Ambos mostraram no Level 1 o
+panorama/floresta, Heart Tree baked, cascatas, ruínas/silhuetas e foreground
+da 6A. O PWA gerou manifest, service worker e cache novo
+`1789024307|5115130`, que elimina caches antigos com o prefixo Koliani. A rota
+GitHub Pages existe no workflow, mas o deployment público permanece 404 e a
+própria configuração regista que Pages ainda precisa de ativação no repo.
+Metadados locais ignorados em `build/*/BUILD_SOURCE.txt` ligam os artefactos ao
+commit e ao estado dirty.
+
+Próximo passo: **HUMAN PLAYTEST REQUIRED** para o bloqueio visual já conhecido
+das pernas/lower body da Koliani; não foi alterado nesta sincronização.
+
+## Execution 6A — Level 1 Approved Visual Build
+
+Estado: **PARTIAL VISUAL BUILD / PRODUCTION ASSETS MISSING — HUMAN REVIEW
+REQUIRED**. O panorama aprovado da referência 08 foi recortado losslessly e
+integrado em toda a rota do Level 1, incluindo Heart Tree, cascatas, ruínas,
+floresta profunda e foreground baked. Foram removidos do runtime o céu,
+landmark, máscaras de plataforma, midground e foreground vetoriais genéricos
+do target 5C. Geometria, colisões, 20 plataformas, porta, inimigos, Ghorak e
+Koliani 5G.1 foram preservados.
+
+Verificação 6A, 5G.1, Movement/Camera, alcance e suite completa: PASS. Renderer
+Vulkan Forward Mobile: PASS em oito pontos. O módulo visual tem agora 29 nós,
+3 luzes e 1 emissor/34 partículas, contra 406 nós no 5C. Evidência:
+`work/execution_6a/preview/level1_6a_review.png` e
+`work/execution_6a/preview/level1_before_after.png`. Relatório completo:
+`docs/execution_6a_level1_implementation.md`.
+
+Próximo passo: **HUMAN PLAYTEST REQUIRED** para legibilidade/continuidade e
+produção, sem redesign, dos layers alpha, tiles Hybrid, props, inimigo
+infectado, replacement de Ghorak, HUD e áudio ainda em falta.
+
+## Execution 6A — Level 1 Approved Visual Build
+
+Estado: **PARTIAL VISUAL BUILD / PRODUCTION ASSETS MISSING — HUMAN REVIEW
+REQUIRED**. O panorama aprovado da referência 08 foi recortado losslessly e
+integrado em toda a rota do Level 1, incluindo Heart Tree, cascatas, ruínas,
+floresta profunda e foreground baked. Foram removidos do runtime o céu,
+landmark, máscaras de plataforma, midground e foreground vetoriais genéricos
+do target 5C. Geometria, colisões, 20 plataformas, porta, inimigos, Ghorak e
+Koliani 5G.1 foram preservados.
+
+Verificação 6A, 5G.1, Movement/Camera, alcance e suite completa: PASS. Renderer
+Vulkan Forward Mobile: PASS em oito pontos. O módulo visual tem agora 29 nós,
+3 luzes e 1 emissor/34 partículas, contra 406 nós no 5C. Evidência:
+`work/execution_6a/preview/level1_6a_review.png` e
+`work/execution_6a/preview/level1_before_after.png`. Relatório completo:
+`docs/execution_6a_level1_implementation.md`.
+
+Próximo passo: **HUMAN PLAYTEST REQUIRED** para legibilidade/continuidade e
+produção, sem redesign, dos layers alpha, tiles Hybrid, props, inimigo
+infectado, replacement de Ghorak, HUD e áudio ainda em falta.
+
+## Execution 5G.1 — Correção visual do piloto no Level 1
+
+Estado: **PARTIAL PASS / HUMAN PLAYTEST REQUIRED**. A medição determinística
+dos sete strips ativos encontrou 44 frames únicos: 37 `SAFE` e 7
+`ACTUAL_CLIPPING`. O número 45 anteriormente documentado inclui
+`run_brake_01`, que não integra o fallback atual. Nenhum frame toca o canvas
+normalizado `160×96`; as margens mínimas são 12 px no topo, 38 px nos lados e
+6 px no fundo, com baseline opaca uniforme em `Y=89`.
+
+A causa primária é recorte-fonte anterior à normalização: `run_03`–`run_06`
+tocam o limite esquerdo do recorte original e `run_07`–`run_09` o limite
+direito. Padding, offset ou escala não recuperam esses pixels ausentes, e não
+foram inventados, redesenhados ou reextraídos sprites. Como correção parcial da
+escala pequena observada no Level 1, a apresentação global do piloto passou de
+`0,75` para `0,82`; o offset Y passou de `-12,666667` para `-15,170732`,
+preservando pés em `y=22`, pivot `(80,90)`, colisão e hitbox.
+
+Verificador 5G, Movement + Camera 4A, alcance do Level 1 (20 plataformas e
+porta alcançável) e suite completa: PASS. Smoke/captura real OpenGL 3.3 na
+NVIDIA RTX 5070: PASS, com avisos ambientais já conhecidos de `user://`,
+certificados e opções. Relatório: `work/execution_5g_1/frame_margin_report.json`.
+Comparação: `work/execution_5g_1/preview/before_after_visual_fix.png`.
+
+Próximo passo único: **HUMAN PLAYTEST REQUIRED** no Level 1 para validar escala
+`0,82`, contacto dos pés, face, centro visual e popping das transições antes de
+aceitar a correção. Os sete frames `run_03`–`run_09` continuam a exigir fonte
+completa para eliminar o clipping sem inventar arte.
+
+## Execution 5G — Level 1 Locomotion Visual Pilot
+
+Estado: **TECHNICAL PASS / HUMAN PLAYTEST REQUIRED**. Os 45 frames limpos de
+`idle` (10), `run` (12), `turn` (4), `run_start` (6), `jump_start` (4),
+`jump_loop` (4) e `fall` (4) foram copiados sem alteração para
+`assets/sprites/pixel/koliani_visual_pilot_5g/` e ligados ao runtime apenas na
+instância da Koliani do Level 1. A seleção de animação observa o estado físico
+existente, mas não altera movimento, salto, gravidade, dash, combate, colisões,
+hitboxes, câmara, save/sessão, localização ou progressão.
+
+`run_brake` é um fallback explícito com `run_10`–`run_12` + `idle_01`;
+`land` (com alias legado `aterrar`) usa `fall_04` + `idle_01`. Combate e outros
+estados sem frames 5G continuam no piloto 5B. A flag nova está desligada por
+omissão, ativa apenas em `Floresta_Putrefata.tscn` e pode ser desligada para
+rollback imediato.
+
+Validação: targeted 5G PASS, suite completa PASS, Movement + Camera 4A PASS,
+alcance do Level 1 PASS (20 plataformas, porta alcançável), smoke OpenGL real
+com o target 5C ativo PASS e nove capturas em `work/execution_5g/`. O import
+reportou apenas avisos ambientais/preexistentes de escrita em `user://` e
+ficheiros AppleDouble `.wav`; o smoke real final não reportou erros.
+
+Ficheiros 5G: `scripts/koliani.gd`; uma propriedade em
+`scenes/levels/Floresta_Putrefata.tscn`; sete PNG + `.import` na pasta do piloto;
+os pares `.gd`/`.tscn` `tools/verifica_koliani_visual_pilot_5g` e
+`tools/shot_koliani_visual_pilot_5g`; `PRIORIDADES.md`, `docs/plano_atual.md` e
+este ficheiro. Capturas em `work/execution_5g/` são evidência ignorada pelo Git.
+
+Próximo passo único: **HUMAN PLAYTEST REQUIRED** no Level 1 para escala,
+legibilidade, continuidade das nove sequências visuais e glitches nos fallbacks.
+Não iniciar outro lote antes dessa decisão.
+
+## Recuperacao Medium — sprites base normalizados
+
+Estado: **PARTIAL PASS / HUMAN REVIEW REQUIRED**. Foram inventariados os 56
+frames existentes e revistos os 13 alvos prioritarios. A selecao deterministica
+do componente alto/central recuperou os sete falsos recortes (`turn_04`,
+`jump_start_03`, `jump_start_04`, `jump_loop_01`, `jump_loop_03`, `fall_01` e
+`fall_04`) sem criar pixels. A revisao geral corrigiu ainda 23 contaminacoes
+objetivas por moldura/legenda. Existem 45 frames limpos e strips completos de
+`idle`, `run`, `turn`, `run_start`, `jump_start`, `jump_loop` e `fall`.
+
+Continuam bloqueados `run_brake_02`–`run_brake_06` e `land_01`–`land_06` como
+`VFX_SEPARATION_REQUIRED`, porque poeira/impacto toca pes ou corpo e a remocao
+segura exigiria inferir pixels ocultos. `run_brake` e `land` nao receberam strip
+final. Relatorio, folhas de revisao, frames e fonte deterministica:
+`work/koliani_extraction_recovery_medium/`. Runtime, cenas, gameplay e assets
+integrados permaneceram inalterados.
+
+Proximo passo unico: revisao humana da folha
+`work/koliani_extraction_recovery_medium/preview/review_before_after.png` e
+fornecimento de frames sem VFX para os 11 bloqueios; nao integrar no Godot antes
+dessa decisao.
+
+## Execution 5F.1 — limpeza dirigida da extração
+
+Estado: **TARGETED CLEANUP COMPLETE / HUMAN REVIEW REQUIRED**. Foram
+inspecionados os 56 frames normalizados existentes em
+`work/koliani_extraction_full/`; nenhum frame aprovado foi alterado. A revisão
+identificou 7 frames com falha estrutural de extração (`turn_04`,
+`jump_start_03`, `jump_start_04`, `jump_loop_01`, `jump_loop_03`, `fall_01`,
+`fall_04`) e os 6 frames de `land` com poeira/impacto fundidos. Não foi segura
+uma separação determinística sem risco de perder corpo/cabelo/pernas ou
+inventar pixels. A folha exclusiva de revisão está em
+`work/koliani_extraction_full/preview/problem_frames_review.png`.
+Runtime permaneceu inalterado. Próximo passo único: revisão humana destes 13
+frames; `land_01`–`land_06` permanecem `VFX_SEPARATION_REQUIRED`.
+
+## Execution 5E — piloto de extração automática
+
+Estado: **PILOT EXTRACTION READY / HUMAN REVIEW REQUIRED**. Foram extraídos
+deterministicamente seis testes da prancha aprovada `05`: dois Idle, dois Run,
+um Jump Loop e um Land. Cada recorte mantém a resolução natural e tem uma
+versão RGBA com alpha binário `0/255`; não houve geração de arte, integração
+Godot ou alteração de runtime. A preview compara cada resultado com o original
+sobre fundos preto, branco e verde. Não há dano grosseiro visível, mas halo,
+microperdas e o VFX ligado do Land dependem de revisão humana.
+
+Próximo passo único: **HUMAN REVIEW OF CONTACT SHEET** em
+`work/koliani_extraction_pilot/preview/koliani_extraction_pilot_contact_sheet.png`.
+Não extrair os restantes frames antes da aprovação. Relatório:
+`work/koliani_extraction_pilot/reports/execution_5e_pilot.md`.
+
+## Pixelorama capability test — master sprite pilot
+
+Estado: **PIXELORAMA NOT USABLE FOR ART AUTHORING** neste ambiente de agente.
+O Pixelorama portátil `v1.2.2-stable` existe e executa localmente; a versão Web
+oficial também carregou no browser e aceitou interação básica. Contudo, a
+janela nativa não é exposta ao controlo de computador e o editor Web surge
+inteiro como um único canvas sem controlos semânticos, seleção de layers ou
+feedback de píxel acessíveis. O controlo por coordenadas não oferece precisão
+nem auditabilidade suficientes para reconstruir com qualidade de produção uma
+personagem de `64–68 px`.
+
+O executável confirmou apenas opções de sistema do Godot. A documentação
+oficial descreve uma CLI para inspeção/exportação de projetos existentes e uma
+API de extensões carregada dentro da aplicação; nenhuma delas fornece neste
+setup um canal comprovado para autorar o desenho. Por isso não foram criados
+PNG, PXO, preview ou frames adicionais, e runtime/gameplay permaneceram
+inalterados.
+
+Próximo passo único: expor a janela nativa do Pixelorama a um canal de controlo
+com precisão de canvas e layers, e então repetir este piloto de um só sprite.
+
+Follow-up de extração: a folha correta
+`Koliani_1.0_Master_Package_v2/references/approved/01_KOLIANI_VISUAL_AUTHORITY_v1_1.png`
+é um PNG legível de `1536×1024`, mas está em modo `RGB`, sem canal alpha. As
+poses estão compostas sobre painéis/fundos opacos. A extração parou sem criar
+recortes ou contact sheet, porque isolar personagens com transparência exigiria
+remoção/reconstrução de fundo em vez de simples crop lossless.
+
+## Execution 5D.2 — Reconstrução limpa de sprites de produção
+
+Estado: **MASTER TECHNICAL PASS / HUMAN VISUAL REVIEW REQUIRED**. Foi criado
+um master novo em `assets/sprites/koliani_production/master/`, gerado de raiz
+por `tools/generate_koliani_master.py`, sem recortar ou limpar as pranchas
+aprovadas. O PNG passa o gate técnico: `160×96`, RGBA, alpha estritamente
+`0/255`, altura visual `66 px`, pivot `(80,90)`, pés em `Y=90`, orientação à
+direita e ausência de VFX/fundo residual.
+
+A tentativa built-in de geração visual produziu novamente RGB sem alpha e
+checkerboard incorporado; não entrou no projeto. O master final tem fonte
+determinística editável. Contrato, pastas dos 40 frames e sete famílias de VFX
+separadas ficaram preparados, e `tools/validate_koliani_production.py` mantém
+o lote em `PENDING 0/40` e impede strips antes de `40/40 PASS`. Gameplay,
+cenas e runtime não foram alterados.
+
+Próximo passo único: revisão visual humana do master. Se aprovado, produzir os
+40 frames base mantendo identidade, cabelo, escala, pivot e baseline; só após
+o gate completo montar strips e avaliar integração. Relatório:
+[execution_5d_2_sprite_production.md](execution_5d_2_sprite_production.md).
+
+## Execution 5D.1 — Native Locomotion Asset Production
+
+Estado: **IMAGE GENERATION CAPABILITY REQUIRED**. A capacidade `imagegen`
+disponível foi testada com a autoridade visual `01` e a referência de pose
+`05`. Produziu uma linha coerente de 10 poses Idle, mas os dois outputs — a
+geração original e uma iteração explícita de extração de fundo — foram PNG
+`RGB` de `1983×793`, sem canal alpha e com checkerboard incorporado.
+
+O contrato exige frames nativos `160×96` em RGBA com alpha 0 real e proíbe
+remoção de fundo contaminado ou conversão de pranchas em falso asset. Por
+isso, nenhum PNG foi copiado para o projeto, as restantes 30 poses não foram
+geradas e runtime, cenas, gameplay e integração permaneceram inalterados.
+
+Próximo passo único: executar o brief 5D.1 numa ferramenta de produção que
+garanta exports RGBA nativos com transparência real e controlo de frames,
+submetendo depois os 40 frames e seis strips ao gate técnico e à revisão
+visual humana.
+
+## Execution 5D — Production Asset Gate
+
+Estado: **ART ASSET REQUIRED**. A inspeção técnica e visual direta das
+referências aprovadas `01`–`07` confirmou que são pranchas de autoridade, não
+assets de produção seguros. `01`–`04` são RGB sem alpha; `05` e `07` têm alpha
+global anómalo sem qualquer píxel totalmente opaco, e `07` nem sequer contém
+alpha 0; `06` tem áreas transparentes, mas preserva cabeçalhos, barras,
+números, linhas e VFX numa única composição e não mantém de forma segura a
+identidade/cabelo da autoridade `01`.
+
+Idle, Run, Jump Start, Jump Loop, Fall e Land ficaram todos classificados
+`REFERENCE_ONLY`. Não houve extração, criação de assets, integração, testes de
+runtime ou alteração de gameplay. O relatório e a especificação dos seis
+exports RGBA necessários estão em
+[execution_5d_asset_gate.md](execution_5d_asset_gate.md).
+
+Próximo passo único: produzir os seis strips RGBA nativos conforme essa
+especificação e repetir o asset gate antes de tocar no runtime.
+
+## Master Package v2 — verificação documental
+
+Estado: **PASS WITH DOC FIXES**. O pacote
+`Koliani_1.0_Master_Package_v2/` está instalado ao lado de `project.godot` com
+README, instruções de instalação, regras de agente, 17 documentos de design e
+dois manifestos de referências. Os 12 PNGs esperados estão presentes em
+`references/approved/`, abrem como PNG e os SHA-256 correspondem integralmente
+a `references/manifest.json`.
+
+O pacote é Source of Truth para produto/design aprovado; código, testes e
+documentação operacional local continuam a vencer para implementação. A
+autoridade de personagem está explícita: Koliani tem 16 anos, proporções
+atléticas não chibi, cabelo longo completamente solto com raízes pretas e
+pontas vermelhas, roupa black/charcoal com vermelho e assinatura violeta da
+Shadowblade. A precedência é `01`–`06`; `07` vale apenas para VFX, e figuras
+incidentais dos Production Packs não a substituem.
+
+Foi corrigido `docs/master_package_integration.md`, que ainda descrevia o
+pacote anterior e referências aprovadas ausentes. As referências v2 são
+**APPROVED DESIGN**, não assets production-ready; readiness técnica não foi
+avaliada nesta execução. Runtime, cenas, gameplay, imagens e assets não foram
+alterados.
+
+Próxima execução, com Luna Medium: fazer um asset gate técnico das referências
+`01`–`07`; provar por frame origem, alpha real, dimensões, grelha, baseline,
+pivot, separação personagem/VFX e fidelidade à autoridade `01`; parar como
+`ART ASSET REQUIRED` se não existirem fontes RGBA separáveis. Só após PASS,
+produzir um lote reversível de idle/run/jump/fall/land, validá-lo e integrá-lo
+exclusivamente no Level 1 sem alterar gameplay, colisões, hitboxes, movimento,
+câmara, save ou progressão; terminar com testes direcionados, suite completa,
+captura em renderer real e `HUMAN PLAYTEST REQUIRED`.
+
+## Asset Production Pilot v1.1 — Movement Core
+
+Estado: **ASSET PRODUCTION REQUIRED**. A auditoria conservadora encontrou 16
+frames candidatos para idle, run, jump, fall e land, mas nenhum cumpre o
+contrato v1.1. A folha `koliani_premium_v1_sheet.png` e as duas referências de
+branding não têm alpha real; a folha tem checkerboard incorporado e apresenta
+cabelo preso/ponytail. Os strips RGBA existentes foram derivados por remoção
+automática desse fundo, `run` inclui poeira colada e `aterrar` reutiliza poses
+de fallback em vez de um export dedicado.
+
+`asset_contract_v1_1.json` regista fontes, grelha e falhas semânticas;
+`tools/validate_assets.py` mede formato, modo, alpha, dimensões, bounding box,
+baseline e pivot por frame. Relatório: `work/koliani_asset_pilot_report.json`,
+com 0 PASS e 16 FAIL. Nenhum frame foi copiado para
+`assets/sprites/koliani_v1_1/pilot/` e nenhuma referência original foi
+alterada.
+
+Próximo passo seguro: produzir exports RGBA nativos de idle, run, jump, fall e
+land, com cabelo longo completamente solto, identidade consistente, alpha 0
+real, personagem separada de VFX e grelha/pivot documentados; depois repetir o
+validator antes de qualquer integração no runtime.
 
 ## Onde está o projeto
 
@@ -18,11 +402,56 @@ Atualizado em 7 de setembro de 2026.
 - Execution 4B: **HUMAN-APPROVED** — transições da câmara aprovadas.
 - Execution 5B: **TECHNICAL PASS / HUMAN PLAYTEST REQUIRED** — prototype
   Premium Pixel Art da Koliani, isolado ao Level 1.
+- Execution 5C: **TECHNICAL PASS / HUMAN VISUAL REVIEW REQUIRED** — target
+  Hybrid Cinematic de dois ecrãs no início do Level 1.
 
 Baseline confirmado: 74 testes, 0 falhas, localização PASS, manifesto com 100
 níveis/20 regiões PASS, 100 cenas carregáveis, jornadas PASS e geradores de
 cena/atmosfera não destrutivos por defeito. O nível 12 em Safari/PWA num
 iPhone continua **DEVICE VALIDATION REQUIRED**.
+
+## Region I Production Art Kit R1.1 — infraestrutura
+
+Estado: **PASS**. Foi criada a estrutura isolada
+`assets/art/regions/region_01_forest/production/`, com pastas para terrain,
+overlays, props, backgrounds, vfx e fontes. O manifest v1 fixa 12 stable IDs,
+grid de 32 px, dimensões, alpha, repetição, nearest filter, uso e estado.
+
+`tools/validate_region_artkit.py` usa apenas a biblioteca standard e valida
+manifest, paths/naming, IDs duplicados, estrutura/CRC/IDAT de PNG, dimensões,
+grid e alpha. Validação final: `WARNING` controlado, exit code 0, 12 esperados,
+0 presentes, 12 missing, 0 fails; compilação Python, JSON e `git diff --check`
+PASS. Um PNG real existente também foi aceite pelo leitor técnico.
+
+Nenhum PNG final foi criado, nenhum asset foi integrado e cenas, TileMaps,
+gameplay e `Region1HybridVisualTarget` permaneceram intocados nesta execução.
+Próximo passo seguro: produzir e inserir o primeiro lote de PNGs reais
+aprovados, antes de qualquer integração no Level 1.
+
+## Execution 5C — retoma
+
+O target Hybrid Cinematic está ativo apenas em `Floresta_Putrefata.tscn`, no
+intervalo aproximado `x=-300..1250`. O módulo
+`Region1HybridVisualTarget.tscn` acrescenta background/midground/foreground,
+Heart Tree distante, revestimento visual natural sobre as quatro primeiras
+superfícies, vegetação, névoa, 34 partículas, três luzes seletivas, uma amostra
+de corrupção e uma assinatura de ataque Shadowblade. Não contém nós físicos.
+
+A skin dark-fantasy das barras do HUD é aplicada e restaurada pelo próprio
+módulo; não altera valores, sinais ou visibilidade lógica. `ativo = false` na
+instância do Level 1 é o rollback: a validação provou que, nesse estado, o
+módulo fica invisível e não monta filhos.
+
+Validação 5C: targeted/rollback PASS; prototype 5B PASS; Movement/Camera PASS;
+Level 1 com 20 plataformas e porta alcançável PASS; smoke e duas capturas
+Forward Mobile reais PASS; suite completa 74/74; localização 701×6 preservada;
+`git diff --check` PASS. Capturas em
+`work/execution_5c/region1_hybrid_{idle,attack}.png`.
+
+Orçamento medido: 406 nós no módulo, três `PointLight2D` e um
+`CPUParticles2D` com 34 partículas. As luzes e partículas são contidas, mas os
+CanvasItems precisam de profiling em Web/mobile antes de reutilizar o padrão.
+Qualidade estética e salto geracional: **HUMAN VISUAL REVIEW REQUIRED**.
 
 ## Execution 5B — retoma
 
@@ -133,10 +562,11 @@ da 3A.
 
 ## O que vem a seguir
 
-1. Playtest humano do build 5B no Level 1: silhueta, escala, animação,
-   Shadowblade e leitura durante gameplay.
+1. Revisão humana das duas capturas e do target 5C no Level 1: salto visual,
+   leitura da Koliani, profundidade, corrupção/Shadowblade e HUD.
 2. Manter pendente a validação do nível 12 num iPhone real com Safari/PWA.
-3. Não iniciar ambiente Hybrid, UI, 4C ou o Visual Target seguinte sem pedido.
+3. Não escalar o estilo, otimizar em massa, alterar outros níveis ou iniciar a
+   execução seguinte antes da decisão humana.
 
 ## Fonte canónica
 
