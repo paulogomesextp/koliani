@@ -2,7 +2,18 @@
 
 ## Agora
 
-0. **DECIDIR: gravar o save custa ~2 s (Execution 8.1C).** É esta a
+0. **RETOMAR: save não-bloqueante (Execution 8.1D) — ficou a meio.**
+   Direção já decidida pelo Game Master (thread de fundo + coalescência).
+   `scripts/save_pipeline.gd` está escrito e compila, mas **não está ligado**
+   — o congelamento de ~2 s no checkpoint e no dano **continua**. Falta
+   ligar ao `EstadoJogo` (`guardar()`, `instantaneo()` com `duplicate(true)`,
+   `parar()` no fecho). Ver `docs/execution_8_1d_save_nao_bloqueante.md`.
+   **Suspeita não medida mas forte:** os ~2 s são o re-parse do
+   `level_manifest.json` (sem cache) × seis validações por gravação — e não
+   o disco. Confirmar isso primeiro: muda a solução e é o único caminho que
+   também arranja a Web, onde não há threads.
+
+0z. **DECIDIR: gravar o save custa ~2 s (Execution 8.1C).** É esta a
    "congelação" — `EstadoJogo.guardar()` leva **2047 ms de mediana** na
    thread principal e é chamado ao passar num checkpoint e ao perder vida.
    Confirmação sem código: excluir `%APPDATA%\Godot\app_userdata\Koliani` do

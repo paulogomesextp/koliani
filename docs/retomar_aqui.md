@@ -4,6 +4,27 @@
 
 Atualizado em 10 de setembro de 2026.
 
+## Execution 8.1D — Save não-bloqueante — **INCOMPLETA**
+
+Estado: **BLOCKED.** Sessão encerrada antes de ligar a implementação.
+**O jogo continua a congelar ~2 s** no checkpoint e ao levar dano.
+
+`scripts/save_pipeline.gd` está escrito e compila (suite verde), mas
+**nenhum ficheiro o usa** — é código inerte. Falta ligá-lo ao `EstadoJogo`.
+Relatório e passos exatos: [execution_8_1d_save_nao_bloqueante.md](execution_8_1d_save_nao_bloqueante.md).
+
+**Pista principal para quem retomar:** `ProgressionIDs.identidades()` lê e
+faz parse de `data/level_manifest.json` **do disco a cada chamada**, e
+`escrever_seguro()` faz seis validações completas que a chamam dezenas de
+vezes. Os ~2 s são provavelmente isso — não a escrita, não o antivírus.
+**Não medido**, é leitura de código. Se se confirmar, um cache do manifesto
+resolve Windows **e** Web (na Web não há threads, o fallback é síncrono e a
+thread de fundo sozinha não a salvava).
+
+**Armadilha:** uma cena de ferramenta com erro de parse não estoira — o
+Godot fica a correr para sempre sem imprimir nada. Procurar `Parse Error`
+no log antes de assumir que está lento. Custou duas corridas de 10 minutos.
+
 ## Execution 8.1C — Combat Freeze / Hit-Stop Gate
 
 Estado: **PARTIAL PASS — CAUSA PRINCIPAL PROVADA, CORREÇÃO POR DECIDIR.**
