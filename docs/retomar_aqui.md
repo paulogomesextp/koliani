@@ -4,6 +4,36 @@
 
 Atualizado em 11 de setembro de 2026.
 
+## Execution 9B.4 — Pacote completo da Koliani
+
+Estado: **PASS — KOLIANI PRODUCTION GATE CLOSED. Pronto para 9C: SIM.**
+Relatório: [execution_9b4_full_character_package.md](execution_9b4_full_character_package.md).
+
+- **KOLIANI GOLDEN SET: PRODUCTION INTEGRATED / HUMAN APPROVED. KOLIANI FULL
+  PACKAGE: PRODUCTION INTEGRATED.** Os 9 estados que caíam no premium_v1 (dash,
+  roll, hurt, morte, crouch, wallslide, borda, djump, defesa) têm agora 23
+  frames derivados **só** de frames golden inteiros: cópia, translação inteira,
+  rotação exata de 90°. Ferramenta: `tools/derivar_pacote_koliani_9b4.py`.
+  Validator v2: 7 PASS, 2 REVIEW (`POSE_AREA_VARIATION`), 0 FAIL.
+- **PREMIUM_V1 / 5G BODY NA REGIÃO I: NÃO / NÃO.** Com `usar_golden_set` o
+  `_montar_frames` não carrega tira nenhuma de outro rig; o teste novo exige
+  que todos os frames venham de `koliani_golden_set/`.
+- **Causa escondida do "chibi" no dash/roll:** o `_animar` esmagava o sprite a
+  1,32×0,78 no dash e rodava-o no roll, mesmo em pixel-art. Desligado com o
+  Golden Set (a pose está nos frames).
+- VFX à parte: `RastoDash`, `SaltoDuploVFX`, `MorteVFX` (+ `SlashVFX`, flash,
+  `Escudo`). Gameplay: nenhuma constante mudou.
+- Builds de `f912753` (0.15.17), de worktree limpo: EXE 162,9 MB (`31e89a6b…`),
+  PCK 53,7 MB (`4c5ae22f…`), cache PWA `1789108285|4479642`. Prova no EXE:
+  12/12 estados com textura golden (`--foto-estado=pacote`; parede e rebordo
+  forçados).
+- **Limites (design novo se o GM quiser):** a morte acaba de joelhos (não há
+  pose deitada), o rebordo é um agarrar ao nível do peito, os golpes 2–4
+  reutilizam os frames do golpe 1.
+- **Armadilha de método:** no Git Bash, `grep -c $'\r'` conta TODAS as linhas
+  (deu "1779 CR" em ficheiros LF). Verificar CRLF com Python sobre os bytes.
+- **Próximo:** 9C — kit de ambiente da Região I (não iniciada).
+
 ## Execution 9B.3 — Golden Set em produção e no runtime
 
 Estado: **PASS — KOLIANI GOLDEN SET — PRODUCTION INTEGRATED.** Relatório:

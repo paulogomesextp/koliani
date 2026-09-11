@@ -2,6 +2,16 @@
 
 ## Agora
 
+00000. **9B.4 FEITA — KOLIANI PRODUCTION GATE CLOSED (v0.15.17).** Todos os
+   estados da Koliani na Região I saem do Golden Set; o premium_v1 e a 5G já não
+   aparecem. **Pendente de decisão do Game Master (opcional, é design novo):**
+   poses próprias para morte deitada, rebordo de braços por cima e golpes 2–4
+   do combo. **Seguinte: 9C — kit de ambiente da Região I.** Backlog técnico:
+   excluir `assets/**/manifest.json` dos exports; CI vermelha em "Nascer no
+   checkpoint sem ficar preso" (anterior à 9B.3). Relatório:
+   `docs/execution_9b4_full_character_package.md`.
+   *(As entradas 0000/0000b/000/00a abaixo estão resolvidas pela 9B.1–9B.4.)*
+
 0000. **9B.1 BLOQUEADA: o Golden Set da Koliani precisa de quem o desenhe.**
    O Paulo resolveu CONF-01 para **Route B** (arte de raiz). Um agente sem
    ferramenta de imagem não consegue produzir 33 frames de pixel-art premium

@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "execution": "9B.4",
+  "character": "Koliani",
+  "scope": "Region I (usar_golden_set = true, L1-L5)",
+  "authority_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+  "premium_v1_body_used_in_region_i": false,
+  "pilot_5g_body_used_in_region_i": false,
+  "states": {
+    "idle":       {"reachable": true, "source": "golden", "frames": "frames/idle"},
+    "run":        {"reachable": true, "source": "golden", "frames": "frames/run"},
+    "jump_start": {"reachable": true, "source": "golden", "frames": "frames/jump_start"},
+    "jump_loop":  {"reachable": true, "source": "golden", "frames": "frames/jump_loop"},
+    "fall":       {"reachable": true, "source": "golden", "frames": "frames/fall"},
+    "attack":     {"reachable": true, "source": "golden", "frames": "frames/attack_basic", "vfx": "SlashVFX"},
+    "attack2":    {"reachable": true, "source": "golden_derived_9b3", "frames": "frames/attack_basic"},
+    "attack3":    {"reachable": true, "source": "golden_derived_9b3", "frames": "frames/attack_basic"},
+    "attack4":    {"reachable": true, "source": "golden_derived_9b3", "frames": "frames/attack_basic"},
+    "lancar":     {"reachable": true, "source": "golden_derived_9b3", "frames": "frames/attack_basic"},
+    "turn":       {"reachable": true, "source": "golden_derived_9b3", "frames": "frames/run"},
+    "run_start":  {"reachable": true, "source": "golden_derived_9b3", "frames": "frames/run"},
+    "run_brake":  {"reachable": true, "source": "golden_derived_9b3", "frames": "frames/run + frames/idle"},
+    "land":       {"reachable": true, "source": "golden_derived_9b3", "frames": "frames/fall + frames/idle"},
+    "aterrar":    {"reachable": true, "source": "golden_derived_9b3", "frames": "frames/fall + frames/idle"},
+    "dash":       {"reachable": true, "ability": "dash", "source": "golden_derived_9b4", "frames": "frames/dash", "vfx": "RastoDash"},
+    "roll":       {"reachable": true, "source": "golden_derived_9b4", "frames": "frames/roll"},
+    "hurt":       {"reachable": true, "source": "golden_derived_9b4", "frames": "frames/hurt", "vfx": "flash branco"},
+    "morte":      {"reachable": true, "source": "golden_derived_9b4", "frames": "frames/morte", "vfx": "MorteVFX"},
+    "crouch":     {"reachable": true, "source": "golden_derived_9b4", "frames": "frames/crouch"},
+    "wallslide":  {"reachable": true, "ability": "escalar_paredes", "source": "golden_derived_9b4", "frames": "frames/wallslide"},
+    "borda":      {"reachable": true, "source": "golden_derived_9b4", "frames": "frames/borda"},
+    "djump":      {"reachable": true, "ability": "salto_duplo", "source": "golden_derived_9b4", "frames": "frames/djump", "vfx": "SaltoDuploVFX"},
+    "defesa":     {"reachable": true, "ability": "escudo", "source": "golden_derived_9b4", "frames": "frames/defesa", "vfx": "Escudo (no existente)"},
+    "jump":       {"reachable": false, "note": "caminho de locomoção antigo; alias golden para fechar o legado", "source": "golden_derived_9b4", "frames": "frames/jump_start"}
+  },
+  "future_bespoke_poses_optional": [
+    "morte deitada (a autoridade não tem pose deitada; hoje acaba de joelhos)",
+    "borda com os braços por cima da cabeça (hoje: agarrar ao nível do peito)",
+    "golpes 2-4 do combo com poses próprias (hoje: os 6 frames do golpe 1)"
+  ]
+}

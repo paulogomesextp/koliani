@@ -12,6 +12,12 @@
   `tools/promover_golden_set_9b3.py`. O detalhe por frame (caminho, SHA-256,
   resultado do validator) está em `production_manifest.json`.
 - Ativo no runtime da Região I (`usar_golden_set = true` em L1–L5).
+- **Execution 9B.4 — pacote completo:** mais 23 frames em `frames/` (`dash` 3,
+  `roll` 6, `hurt` 2, `morte` 3, `crouch` 1, `wallslide` 2, `borda` 1, `djump` 4,
+  `defesa` 1), derivados **só** de frames golden inteiros (cópia, translação
+  inteira, rotação exata de 90°) por `tools/derivar_pacote_koliani_9b4.py`. Com o
+  Golden Set ligado, nenhum frame de outro rig é carregado. Estados e fontes:
+  `animation_inventory.json`.
 - **8 frames baixos (`jump_start_001`, `jump_loop_001/003`,
   `attack_basic_001/002/003/005/006`): POSE-JUSTIFIED / ACCEPTED.** A regra dos
   59 px passou a ser **só um alerta de revisão**: a rejeição por chibi exige
