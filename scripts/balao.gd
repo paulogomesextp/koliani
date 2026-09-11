@@ -74,25 +74,18 @@ func _montar() -> void:
 	_raiz.mouse_filter = Control.MOUSE_FILTER_IGNORE  # não rouba toque ao jogo
 	add_child(_raiz)
 
+	# Execution 9F: a CAIXA DE DIÁLOGO da prancha 09 (moldura de ouro sobre
+	# grafite azulado); a cauda leva a cor do interior da caixa.
 	_cauda = Polygon2D.new()
-	_cauda.color = Color(0.12, 0.09, 0.17, 0.96)
+	_cauda.color = Color(0.02, 0.03, 0.08, 0.97)
 	_raiz.add_child(_cauda)
 
 	_painel = PanelContainer.new()
 	_painel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_painel.custom_minimum_size = Vector2(LARGURA, 0.0)
-	var sb := StyleBoxFlat.new()
-	sb.bg_color = Color(0.12, 0.09, 0.17, 0.96)
-	sb.set_corner_radius_all(14)
-	sb.set_border_width_all(2)
-	sb.border_color = Color(0.86, 0.4, 0.82, 0.95)
-	sb.shadow_color = Color(0.5, 0.15, 0.6, 0.35)
-	sb.shadow_size = 12
-	sb.content_margin_left = 18
-	sb.content_margin_right = 18
-	sb.content_margin_top = 12
-	sb.content_margin_bottom = 12
-	_painel.add_theme_stylebox_override("panel", sb)
+	_painel.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+	_painel.add_theme_stylebox_override("panel",
+		UIProducao.caixa("caixa_dialogo", Vector4(28, 22, 28, 24)))
 	_raiz.add_child(_painel)
 
 	var col := VBoxContainer.new()
@@ -101,19 +94,18 @@ func _montar() -> void:
 
 	_nome = Label.new()
 	_nome.add_theme_font_size_override("font_size", 16)
-	_nome.add_theme_color_override("font_color", Color(1, 0.72, 0.95))
+	_nome.add_theme_color_override("font_color", UIProducao.CIANO)
+	_nome.add_theme_color_override("font_outline_color", UIProducao.CONTORNO)
+	_nome.add_theme_constant_override("outline_size", 3)
 	col.add_child(_nome)
-
-	var risca := HSeparator.new()
-	col.add_child(risca)
 
 	_corpo = RichTextLabel.new()
 	_corpo.bbcode_enabled = true
 	_corpo.fit_content = true
 	_corpo.scroll_active = false
-	_corpo.custom_minimum_size = Vector2(LARGURA - 36.0, 0.0)
+	_corpo.custom_minimum_size = Vector2(LARGURA - 56.0, 0.0)
 	_corpo.add_theme_font_size_override("normal_font_size", 17)
-	_corpo.add_theme_color_override("default_color", Color(0.96, 0.93, 1))
+	_corpo.add_theme_color_override("default_color", UIProducao.TEXTO)
 	col.add_child(_corpo)
 
 

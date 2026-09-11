@@ -39,6 +39,7 @@
 	"hud.ability.escudo": "Escudo",
 	"hud.ability.projetil": "Magia Espectral",
 	"hud.new_ability": "Nova habilidade: %s",
+	"hud.checkpoint": "Ponto de controlo ativado!",
 	"hud.clue_found": "Pista encontrada  (%d)",
 	"hud.advanced": "Avançou para o Nível %d",
 	"hud.upgrade_available": "Upgrade Disponível",

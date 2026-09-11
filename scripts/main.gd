@@ -207,6 +207,10 @@ func _tirar_foto(caminho: String, estado := "") -> void:
 		await _prova_inimigos_9e2(caminho, koliani)
 		get_tree().quit(0)
 		return
+	elif estado == "ui9f" and koliani:
+		await _prova_ui_9f(caminho, koliani)
+		get_tree().quit(0)
+		return
 	else:
 		await get_tree().create_timer(0.25).timeout
 	var img := get_viewport().get_texture().get_image()
@@ -423,6 +427,86 @@ func _prova_inimigos_9e2(caminho: String, koliani: Node2D) -> void:
 			await get_tree().create_timer(0.06).timeout
 			await _foto_inimigo(base, "coracao_5_fase2_hit", e, registo)
 	print("PROVA INIMIGOS 9E.2: ", ProjectSettings.globalize_path(base + "_registo.json"))
+
+
+## Execution 9F: prova, no runtime EXPORTADO, da UI de produção em jogo --
+## HUD, toasts (checkpoint e habilidade), HUD do chefe em combate, balão de
+## diálogo e pausa. Não mexe em progresso: a Koliani fica invulnerável, a
+## habilidade do toast NÃO é concedida (só se chama o aviso) e nada grava.
+## Uso: Koliani.exe -- --nivel=N --foto-estado=ui9f --foto=<png>
+func _prova_ui_9f(caminho: String, koliani: Node2D) -> void:
+	var base := caminho.get_basename()
+	var registo: Array = []
+	get_tree().create_timer(60.0, true, false, true).timeout.connect(func() -> void: get_tree().quit(3))
+	koliani.set("_invulneravel", 9999.0)
+	await get_tree().create_timer(1.2).timeout
+	await _foto_ui(base, "1_hud", registo)
+	get_tree().call_group("hud_9f", "_aviso", Textos.t("hud.checkpoint"), "ico_checkpoint", "info")
+	await get_tree().create_timer(0.4).timeout
+	await _foto_ui(base, "2_toast_checkpoint", registo)
+	await get_tree().create_timer(2.6).timeout
+	get_tree().call_group("hud_9f", "_aviso", Textos.tf("hud.new_ability", [Textos.t("hud.ability.dash_aereo")]),
+		"ico_dash", "habilidade")
+	await get_tree().create_timer(0.4).timeout
+	await _foto_ui(base, "3_toast_habilidade", registo)
+	var boss := get_tree().get_first_node_in_group("chefes") as Node2D
+	if boss:
+		koliani.global_position = boss.global_position + Vector2(-230.0, -40.0)
+		koliani.set("velocity", Vector2.ZERO)
+		if koliani.has_method("reset_physics_interpolation"):
+			koliani.reset_physics_interpolation()
+		await get_tree().create_timer(0.5).timeout
+		if boss.has_method("provocar"):
+			boss.call("provocar")
+		await get_tree().create_timer(1.2).timeout
+		await _foto_ui(base, "4_boss_hud", registo)
+		var falas: Array = boss.get("falas_intro") if boss.get("falas_intro") else []
+		if falas.is_empty():
+			falas = [{"quem": CatalogoCampanha.chave_chefe(EstadoJogo.indice_nivel), "texto": "mec.%s.txt" % "portal"}]
+		var f0: Dictionary = (falas[0] as Dictionary).duplicate()
+		f0["alvo"] = boss
+		Dialogo.correr([f0])
+		await get_tree().create_timer(1.1).timeout
+		await _foto_ui(base, "5_dialogo", registo)
+	var pausa := get_tree().current_scene.find_child("Pausa", true, false)
+	if pausa and pausa.has_method("_abrir"):
+		pausa.call("_abrir")
+		await get_tree().create_timer(0.4, true).timeout
+		await _foto_ui(base, "6_pausa", registo)
+		pausa.call("_fechar")
+	print("PROVA UI 9F: ", ProjectSettings.globalize_path(base + "_registo.json"))
+
+
+## Foto + registo das texturas que a HUD está MESMO a desenhar (prova de que
+## vêm do kit `assets/ui/producao_9f/`, não do legado `assets/ui/`).
+func _foto_ui(base: String, etiqueta: String, registo: Array) -> void:
+	await RenderingServer.frame_post_draw
+	var cam := "%s_%s.png" % [base, etiqueta]
+	get_viewport().get_texture().get_image().save_png(cam)
+	var usadas := {}
+	for no in get_tree().root.find_children("*", "", true, false):
+		if not (no is CanvasItem) or not (no as CanvasItem).is_visible_in_tree():
+			continue
+		var tex: Texture2D = null
+		if no is TextureRect:
+			tex = (no as TextureRect).texture
+		elif no is Control:
+			for nome_sb in ["panel", "normal", "background"]:
+				var sb := (no as Control).get_theme_stylebox(nome_sb) if (no as Control).has_theme_stylebox(nome_sb) else null
+				if sb is StyleBoxTexture:
+					tex = (sb as StyleBoxTexture).texture
+					break
+		if tex is AtlasTexture:
+			tex = (tex as AtlasTexture).atlas
+		if tex and tex.resource_path.begins_with("res://assets/ui/"):
+			usadas[tex.resource_path] = true
+	var legado := usadas.keys().filter(func(p: String) -> bool: return not p.contains("producao_9f"))
+	registo.append({"etiqueta": etiqueta, "foto": cam, "ui_producao": usadas.keys().filter(
+		func(p: String) -> bool: return p.contains("producao_9f")), "ui_legado": legado})
+	print("FOTO9F %s producao=%d legado=%s" % [etiqueta, usadas.size() - legado.size(), legado])
+	var f := FileAccess.open(base + "_registo.json", FileAccess.WRITE)
+	if f:
+		f.store_string(JSON.stringify(registo, "  "))
 
 
 func _juntar_inimigos(no: Node, saida: Array) -> void:

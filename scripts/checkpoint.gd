@@ -296,6 +296,9 @@ func _ao_entrar(corpo: Node) -> void:
 			return
 		_ativar(false)
 		Som.toca("selo", -12.0)
+		# 9F: o feedback da prancha 09 (secção 8) -- só expõe o que já
+		# aconteceu (o checkpoint foi registado no EstadoJogo acima)
+		get_tree().call_group("hud_9f", "_aviso", Textos.t("hud.checkpoint"), "ico_checkpoint", "info")
 		if _ultimo:
 			Musica.boss()
 

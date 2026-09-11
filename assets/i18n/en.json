@@ -39,6 +39,7 @@
 	"hud.ability.escudo": "Shield",
 	"hud.ability.projetil": "Spectral Magic",
 	"hud.new_ability": "New ability: %s",
+	"hud.checkpoint": "Checkpoint activated!",
 	"hud.clue_found": "Clue found  (%d)",
 	"hud.advanced": "Advanced to Level %d",
 	"hud.upgrade_available": "Upgrade Available",

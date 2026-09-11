@@ -39,6 +39,7 @@
 	"hud.ability.escudo": "盾牌",
 	"hud.ability.projetil": "幽灵魔法",
 	"hud.new_ability": "新能力：%s",
+	"hud.checkpoint": "检查点已激活！",
 	"hud.clue_found": "找到线索  (%d)",
 	"hud.advanced": "进入第 %d 关",
 	"hud.upgrade_available": "有可升级装备",

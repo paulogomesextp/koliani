@@ -70,6 +70,10 @@ func _ready() -> void:
 
 	Textos.idioma_mudou.connect(func(_l: String) -> void: _traduzir())
 	_traduzir()
+	# Execution 9F: botões e título no kit de produção (prancha 09)
+	UIProducao.vestir_ecra(self)
+	UIProducao.titulo($Centro/Titulo, 68)
+	$Centro/Titulo.add_theme_color_override("font_shadow_color", Color(0.55, 0.22, 0.75, 0.45))
 	var principal := _load if EstadoJogo.ha_progresso() else _novo
 	_destacar_botao_principal(principal)
 	_preparar_hover_animado()
@@ -79,31 +83,12 @@ func _ready() -> void:
 
 ## Dá destaque visual (mais saturado, com glow) ao botão de ação principal
 ## do momento -- LOAD GAME se há progresso, senão NEW GAME.
+##
+## Com o kit de produção (9F) o destaque é a MOLDURA DE OURO do botão
+## selecionado da prancha 09 -- o foco já a desenha; aqui só sobe a letra.
 func _destacar_botao_principal(botao: Button) -> void:
-	var normal := StyleBoxFlat.new()
-	normal.bg_color = Color(0.17, 0.06, 0.21, 0.95)
-	normal.set_border_width_all(2)
-	normal.border_width_top = 3
-	normal.border_color = Color(0.85, 0.35, 0.85, 0.85)
-	normal.set_corner_radius_all(10)
-	normal.shadow_color = Color(0.75, 0.25, 0.75, 0.35)
-	normal.shadow_size = 10
-	normal.content_margin_left = 22.0
-	normal.content_margin_right = 22.0
-	normal.content_margin_top = 15.0
-	normal.content_margin_bottom = 15.0
-
-	var hover := normal.duplicate() as StyleBoxFlat
-	hover.bg_color = Color(0.34, 0.15, 0.4, 0.98)
-	hover.border_color = Color(1, 0.55, 0.95, 1)
-	hover.shadow_size = 18
-	hover.shadow_color = Color(0.95, 0.4, 0.9, 0.55)
-
-	botao.add_theme_stylebox_override("normal", normal)
-	botao.add_theme_stylebox_override("hover", hover)
-	botao.add_theme_stylebox_override("focus", hover)
-	botao.add_theme_stylebox_override("pressed", hover)
 	botao.add_theme_font_size_override("font_size", 22)
+	botao.custom_minimum_size.y = 58.0
 
 
 ## Pequena resposta de escala ao passar/focar o rato em cada botão --
@@ -232,7 +217,13 @@ func _deriva_arte() -> void:
 
 func _abrir_opcoes() -> void:
 	_repor_botoes()
-	add_child(CENA_OPCOES.instantiate())
+	var o := CENA_OPCOES.instantiate()
+	# 9F: ao fechar, o foco volta ao menu -- sem isto o teclado/comando
+	# ficavam sem botão nenhum (↓/↑ não faziam nada)
+	o.tree_exited.connect(func() -> void:
+		if is_inside_tree():
+			_opcoes.grab_focus())
+	add_child(o)
 
 
 ## "DEVELOPER MODE": sandbox de testes (habilidades todas, energia

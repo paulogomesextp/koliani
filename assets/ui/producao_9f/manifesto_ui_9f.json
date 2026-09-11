@@ -1,0 +1,387 @@
+{
+  "execution": "9F",
+  "autoridade": "09_PRODUCTION_PACK_v7_UI_HUD_MAPS_MENUS.png",
+  "sha_autoridade": "264d6def7c961ea04635754ae91f33f81c891a6eae6eddaf0b1420f094a7aba9",
+  "escala": 2,
+  "pecas": {
+    "barra_energia_calha": {
+      "metodo": "C",
+      "caixa_prancha": [
+        503,
+        131,
+        722,
+        153
+      ],
+      "enchimento_substituido_x": [
+        521,
+        653
+      ],
+      "colunas_vazias_x": [
+        662,
+        712
+      ],
+      "ficheiro": "barra_energia_calha.png",
+      "tamanho": [
+        438,
+        44
+      ],
+      "sha256": "6c44b2ba689a0e46ff9a199d122bc74a1f3bad3762ab89f73d3cb781bfc32fd8"
+    },
+    "barra_energia_enchimento": {
+      "metodo": "C",
+      "caixa_prancha": [
+        540,
+        135,
+        604,
+        149
+      ],
+      "ficheiro": "barra_energia_enchimento.png",
+      "tamanho": [
+        128,
+        28
+      ],
+      "sha256": "e4252f8114bbf28e133459af324e277076d161a230288f90a758208c8fb4566d"
+    },
+    "barra_vida_calha": {
+      "metodo": "C",
+      "caixa_prancha": [
+        503,
+        104,
+        722,
+        126
+      ],
+      "enchimento_substituido_x": [
+        521,
+        674
+      ],
+      "colunas_vazias_x": [
+        682,
+        712
+      ],
+      "ficheiro": "barra_vida_calha.png",
+      "tamanho": [
+        438,
+        44
+      ],
+      "sha256": "8ecd5033ff3b4856f9ed24f65f26db120f3a3313763450bd455f82043eec5d58"
+    },
+    "barra_vida_enchimento": {
+      "metodo": "C",
+      "caixa_prancha": [
+        540,
+        108,
+        604,
+        122
+      ],
+      "ficheiro": "barra_vida_enchimento.png",
+      "tamanho": [
+        128,
+        28
+      ],
+      "sha256": "34fc0fb8b6b30ad13390eb1d4d2705169db0d4b55aa520c2f7ae47c91b2bc876"
+    },
+    "botao_desativado": {
+      "metodo": "B",
+      "caixa_prancha": [
+        1021,
+        646,
+        1177,
+        672
+      ],
+      "inpaint_texto": [
+        [
+          1047,
+          651,
+          1148,
+          667
+        ]
+      ],
+      "mascara": "bordas",
+      "ficheiro": "botao_desativado.png",
+      "tamanho": [
+        312,
+        52
+      ],
+      "sha256": "8fc6c60b3221a74ee8142ba402b2d31c7b76012001132a8693de6b193c250786"
+    },
+    "botao_normal": {
+      "metodo": "B",
+      "caixa_prancha": [
+        1019,
+        590,
+        1177,
+        616
+      ],
+      "inpaint_texto": [
+        [
+          1050,
+          595,
+          1146,
+          612
+        ]
+      ],
+      "mascara": "bordas",
+      "ficheiro": "botao_normal.png",
+      "tamanho": [
+        316,
+        52
+      ],
+      "sha256": "0bda4014330e8baad5e9b767537f7901515c94749c2315ac533822006300aec6"
+    },
+    "botao_selecionado": {
+      "metodo": "B",
+      "caixa_prancha": [
+        1012,
+        617,
+        1185,
+        646
+      ],
+      "inpaint_texto": [
+        [
+          1043,
+          622,
+          1154,
+          641
+        ]
+      ],
+      "mascara": "bordas",
+      "ficheiro": "botao_selecionado.png",
+      "tamanho": [
+        346,
+        58
+      ],
+      "sha256": "10f01faf49739d23b103d8ea80191d50daae4df6c9d8f636f97d32c347ef8293"
+    },
+    "caixa_dialogo": {
+      "metodo": "B",
+      "caixa_prancha": [
+        1298,
+        580,
+        1517,
+        656
+      ],
+      "inpaint_texto": [
+        [
+          1306,
+          585,
+          1472,
+          641
+        ],
+        [
+          1482,
+          624,
+          1504,
+          647
+        ]
+      ],
+      "mascara": "bordas",
+      "ficheiro": "caixa_dialogo.png",
+      "tamanho": [
+        438,
+        152
+      ],
+      "sha256": "5a24ed1211219df57d861d62c1c40268862779217c66d827fb7ab261051a68fd"
+    },
+    "ico_ataque_especial": {
+      "metodo": "A",
+      "caixa_prancha": [
+        1400,
+        94,
+        1458,
+        148
+      ],
+      "inpaint_texto": [],
+      "mascara": "bordas",
+      "ficheiro": "ico_ataque_especial.png",
+      "tamanho": [
+        116,
+        108
+      ],
+      "sha256": "4c21370e07f0d78e97c15947628a2d9c47f8550414308ccfea7a7bec0405e530"
+    },
+    "ico_checkpoint": {
+      "metodo": "B",
+      "caixa_prancha": [
+        786,
+        673,
+        817,
+        707
+      ],
+      "inpaint_texto": [],
+      "mascara": "bordas",
+      "ficheiro": "ico_checkpoint.png",
+      "tamanho": [
+        62,
+        68
+      ],
+      "sha256": "523fa214319e1aa47020f0d0f004ed4f4cdd527ca6d6610d68ac9f8707b9e3ab"
+    },
+    "ico_coracao": {
+      "metodo": "B",
+      "caixa_prancha": [
+        132,
+        113,
+        155,
+        138
+      ],
+      "inpaint_texto": [],
+      "mascara": "bordas",
+      "ficheiro": "ico_coracao.png",
+      "tamanho": [
+        46,
+        50
+      ],
+      "sha256": "1247cc8b9adff262217a4cddd173d39ab77b134b0ba75700285e3cf89bf5fd39"
+    },
+    "ico_cristal": {
+      "metodo": "B",
+      "caixa_prancha": [
+        403,
+        97,
+        429,
+        135
+      ],
+      "inpaint_texto": [],
+      "mascara": "bordas",
+      "ficheiro": "ico_cristal.png",
+      "tamanho": [
+        52,
+        76
+      ],
+      "sha256": "976d4f3ca7486ced0d402d82fdf2b3ca11cd74eeaacb06304a38701f46d2aea9"
+    },
+    "ico_dash": {
+      "metodo": "A",
+      "caixa_prancha": [
+        1075,
+        94,
+        1134,
+        148
+      ],
+      "inpaint_texto": [],
+      "mascara": "bordas",
+      "ficheiro": "ico_dash.png",
+      "tamanho": [
+        118,
+        108
+      ],
+      "sha256": "11155500778201109e3b0cd9a3d57bc561b5903c0866ca9c7b43b2d8a751a2b7"
+    },
+    "ico_escudo": {
+      "metodo": "A",
+      "caixa_prancha": [
+        1290,
+        94,
+        1349,
+        148
+      ],
+      "inpaint_texto": [],
+      "mascara": "bordas",
+      "ficheiro": "ico_escudo.png",
+      "tamanho": [
+        118,
+        108
+      ],
+      "sha256": "e1f267e7ed56f5602405f264da68920e0d92cb92ae8e4c820807f58d52d75cc9"
+    },
+    "ico_salto_duplo": {
+      "metodo": "A",
+      "caixa_prancha": [
+        1183,
+        94,
+        1242,
+        148
+      ],
+      "inpaint_texto": [],
+      "mascara": "bordas",
+      "ficheiro": "ico_salto_duplo.png",
+      "tamanho": [
+        118,
+        108
+      ],
+      "sha256": "2f728b264b0128622b5f81dfd21c44f31e9a9d5139327c7312cdd9342e0532a4"
+    },
+    "moldura_ornamentada": {
+      "metodo": "A",
+      "caixa_prancha": [
+        1186,
+        589,
+        1279,
+        659
+      ],
+      "inpaint_texto": [],
+      "mascara": "bordas",
+      "ficheiro": "moldura_ornamentada.png",
+      "tamanho": [
+        186,
+        140
+      ],
+      "sha256": "9f4ce4e447ac154d25991ac9f064b0ce0ed359db2292f7f4576998ec2c12b651"
+    },
+    "moldura_painel": {
+      "metodo": "A",
+      "caixa_prancha": [
+        1426,
+        686,
+        1516,
+        756
+      ],
+      "inpaint_texto": [],
+      "mascara": "bordas",
+      "ficheiro": "moldura_painel.png",
+      "tamanho": [
+        180,
+        140
+      ],
+      "sha256": "b7bf88636ed9ebfd7ea57a3b4e89c2e60c90aaf8b67514e22fbf94390be6b67a"
+    },
+    "toast_habilidade": {
+      "metodo": "B",
+      "caixa_prancha": [
+        779,
+        718,
+        983,
+        758
+      ],
+      "inpaint_texto": [
+        [
+          787,
+          722,
+          974,
+          755
+        ]
+      ],
+      "mascara": "bordas",
+      "ficheiro": "toast_habilidade.png",
+      "tamanho": [
+        408,
+        80
+      ],
+      "sha256": "1bc00d0fe7fda64eded5ea532fb1398f566a80a32e9307a7eb9b6ef39ddb2831"
+    },
+    "toast_info": {
+      "metodo": "B",
+      "caixa_prancha": [
+        779,
+        588,
+        983,
+        622
+      ],
+      "inpaint_texto": [
+        [
+          791,
+          591,
+          972,
+          619
+        ]
+      ],
+      "mascara": "bordas",
+      "ficheiro": "toast_info.png",
+      "tamanho": [
+        408,
+        68
+      ],
+      "sha256": "46dee202ff0c9be5529a1c18f96a90afa3d96092e56d00dbb91af2b6237425e0"
+    }
+  }
+}

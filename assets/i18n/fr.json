@@ -39,6 +39,7 @@
 	"hud.ability.escudo": "Bouclier",
 	"hud.ability.projetil": "Magie spectrale",
 	"hud.new_ability": "Nouvelle capacité : %s",
+	"hud.checkpoint": "Point de contrôle activé !",
 	"hud.clue_found": "Indice trouvé  (%d)",
 	"hud.advanced": "Passage au Niveau %d",
 	"hud.upgrade_available": "Amélioration dispo",

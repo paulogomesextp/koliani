@@ -46,6 +46,7 @@ func _correr_tudo() -> void:
 	teste_controlos_tacteis_fixos()
 	teste_head_pwa_em_dia()
 	teste_9f_buses_de_audio_estaticos()
+	teste_9f_ui_producao()
 	teste_catalogo_campanha()
 	teste_equipamento_dados()
 	teste_equipamento_estado()
@@ -950,7 +951,88 @@ func teste_9f_buses_de_audio_estaticos() -> void:
 		_ok(ResourceLoader.exists(c), "9F: falta o audio %s" % c)
 
 
-## CONTROLOS DE TOQUE. Duas coisas que o Paulo pediu a 5 set 2026:
+## UI DE PRODUÇÃO (Execution 9F). O kit vem da prancha 09 por
+## `tools/produzir_ui_9f.py`; aqui guarda-se que (1) as peças no disco são
+## as do manifesto (SHA), (2) o tema usa-as, (3) o seletor comunica 20
+## regiões × 5 níveis sem mexer no desbloqueio, e (4) HUD/pausa/opções já
+## não desenham os estilos legados.
+func teste_9f_ui_producao() -> void:
+	var dir := "res://assets/ui/producao_9f/"
+	var man: Variant = JSON.parse_string(_fonte(dir + "manifesto_ui_9f.json"))
+	_ok(man is Dictionary, "9F: manifesto do kit de UI em falta")
+	if not (man is Dictionary):
+		return
+	_ok(str(man.get("sha_autoridade", "")) == "264d6def7c961ea04635754ae91f33f81c891a6eae6eddaf0b1420f094a7aba9",
+		"9F: o kit nao aponta a prancha 09 aprovada")
+	var pecas: Dictionary = man.get("pecas", {})
+	_ok(pecas.size() >= 19, "9F: kit com %d pecas (esperadas 19)" % pecas.size())
+	for nome: String in pecas:
+		var cam: String = dir + str(pecas[nome].get("ficheiro", ""))
+		var bytes := FileAccess.get_file_as_bytes(cam)
+		var h := HashingContext.new()
+		h.start(HashingContext.HASH_SHA256)
+		h.update(bytes)
+		_ok(h.finish().hex_encode() == str(pecas[nome].get("sha256", "")),
+			"9F: %s nao bate com o SHA do manifesto" % nome)
+		_ok(ResourceLoader.exists(cam), "9F: %s nao importado" % cam)
+
+	_ok(UIProducao.disponivel(), "9F: UIProducao sem texturas")
+	var sb := UIProducao.tema().get_stylebox("normal", "Button")
+	_ok(sb is StyleBoxTexture and (sb as StyleBoxTexture).texture.resource_path.begins_with(dir),
+		"9F: o tema nao usa o botao do kit")
+
+	# seletor: 20 pastilhas I..XX, "1-1".."20-5", 5 cartoes visiveis por regiao
+	var desbloq_antes: Array = []
+	for i in EstadoJogo.NIVEIS.size():
+		desbloq_antes.append(EstadoJogo.nivel_desbloqueado(i))
+	var sel: SeletorNiveis = load("res://scenes/ui/SeletorNiveis.tscn").instantiate()
+	get_tree().root.add_child(sel)
+	sel.size = Vector2(1280, 720)
+	sel.configurar(0, true)
+	sel.call("_reposicionar", true)
+	var pills: Array = sel.get("_regiao_pills")
+	_ok(pills.size() == 20, "9F: %d pastilhas de regiao (esperadas 20)" % pills.size())
+	if pills.size() == 20:
+		_ok((pills[0] as Button).text == "I" and (pills[19] as Button).text == "XX",
+			"9F: pastilhas sem numeracao romana")
+	var cartoes: Array = sel.get("_cartoes")
+	_ok((cartoes[0]["numero"] as Label).text == "1-1" and (cartoes[7]["numero"] as Label).text == "2-3"
+		and (cartoes[99]["numero"] as Label).text == "20-5", "9F: numeracao regiao-nivel errada")
+	var visiveis := func() -> Array:
+		var v: Array = []
+		for c in cartoes:
+			if (c["raiz"] as Control).visible:
+				v.append(c["indice"])
+		return v
+	_ok(visiveis.call() == [0, 1, 2, 3, 4], "9F: a regiao I devia mostrar os niveis 0..4 (%s)" % [visiveis.call()])
+	sel.call("_ir_para_regiao", 3)
+	sel.call("_reposicionar", true)
+	_ok(visiveis.call() == [15, 16, 17, 18, 19], "9F: a regiao IV devia mostrar 15..19 (%s)" % [visiveis.call()])
+	var cab := sel.find_child("CabecalhoRegiao", true, false) as Label
+	_ok(cab != null and cab.text.begins_with("IV"), "9F: cabecalho da regiao nao diz IV")
+	for i in EstadoJogo.NIVEIS.size():
+		if EstadoJogo.nivel_desbloqueado(i) != desbloq_antes[i]:
+			_ok(false, "9F: o seletor mexeu no desbloqueio do nivel %d" % i)
+			break
+	sel.queue_free()
+
+	# ecras de menu: sem StyleBoxFlat legado nos botoes
+	for cena in ["res://scenes/ui/Opcoes.tscn", "res://scenes/ui/Pausa.tscn"]:
+		var no: Node = load(cena).instantiate()
+		get_tree().root.add_child(no)
+		for b in no.find_children("*", "Button", true, false):
+			var st := (b as Button).get_theme_stylebox("normal")
+			_ok(st is StyleBoxTexture, "9F: %s -> botao '%s' ainda com estilo legado" % [cena.get_file(), b.name])
+		no.queue_free()
+
+	# HUD: calha/enchimento das barras do kit
+	var hud: Node = load("res://scenes/ui/HUD.tscn").instantiate()
+	get_tree().root.add_child(hud)
+	var calha := hud.get_node_or_null("Vida/Barra/CalhaMeio") as TextureRect
+	_ok(calha != null and (calha.texture as AtlasTexture).atlas.resource_path == dir + "barra_vida_calha.png",
+		"9F: a barra de vida da HUD nao usa a calha do kit")
+	hud.queue_free()
+
 ##  - "os controlos do telefone movimenta-se ao utilizar, não pode
 ##    acontecer -- têm que ficar fixos": o aro do joystick era flutuante
 ##    (ia ter com o dedo). Agora não sai do sítio, e é isso que se mede.

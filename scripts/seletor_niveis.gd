@@ -155,6 +155,15 @@ func _montar() -> void:
 	_montar_seta("›", 1, false)
 	_montar_rodape()
 	_montar_topo()
+	# Execution 9F: botões do rodapé no kit de produção (prancha 09)
+	UIProducao.vestir_ecra(self)
+	for b in find_children("*", "Button", true, false):
+		if b.has_meta("principal_9f"):
+			b.add_theme_stylebox_override("normal", UIProducao.caixa("botao_selecionado", Vector4(40, 12, 40, 12)))
+	for seta in [find_child("SetaEsq", true, false), find_child("SetaDir", true, false)]:
+		if seta:
+			for e in ["normal", "hover", "pressed", "focus", "hover_pressed", "disabled"]:
+				(seta as Button).add_theme_stylebox_override(e, StyleBoxEmpty.new())
 	_pronto = true
 	_reconstruir_estilos()
 	_reposicionar(true)
@@ -202,7 +211,7 @@ func _fazer_cartao(indice: int) -> Dictionary:
 	brilho.modulate.a = 0.0
 	var sbg := StyleBoxFlat.new()
 	sbg.bg_color = Color(0, 0, 0, 0)
-	sbg.shadow_color = Color(base.r, base.g, base.b, 0.28)
+	sbg.shadow_color = Color(UIProducao.OURO.r, UIProducao.OURO.g, UIProducao.OURO.b, 0.22)
 	sbg.shadow_size = 10
 	brilho.add_theme_stylebox_override("panel", sbg)
 	raiz.add_child(brilho)
@@ -210,13 +219,13 @@ func _fazer_cartao(indice: int) -> Dictionary:
 	var painel := Panel.new()
 	painel.set_anchors_preset(Control.PRESET_FULL_RECT)
 	painel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	painel.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
 	raiz.add_child(painel)
-	# a mesma pedra, tingida com a cor da região: apagada de lado, acesa no
-	# centro -- é a tinta que diz qual é o cartão escolhido, não uma borda
-	var sb := UI.painel("painel_pedra",
-		Color(base.r * 0.26 + 0.13, base.g * 0.26 + 0.13, base.b * 0.26 + 0.15, 0.98))
-	var sb_sel := UI.painel("painel_pedra",
-		Color(base.r * 0.5 + 0.28, base.g * 0.5 + 0.28, base.b * 0.5 + 0.3))
+	# Execution 9F: a moldura de ouro da prancha 09 (secção 9) -- apagada
+	# nos vizinhos, acesa no escolhido, como os cartões da secção 5
+	var sb := UIProducao.caixa("moldura_ornamentada", Vector4(0, 0, 0, 0),
+		Color(0.55, 0.55, 0.62, 0.98))
+	var sb_sel := UIProducao.caixa("moldura_ornamentada", Vector4(0, 0, 0, 0))
 	painel.add_theme_stylebox_override("panel", sb)
 
 	# interior escuro dentro da moldura: é ele que faz a pedra ler-se como
@@ -287,16 +296,19 @@ func _fazer_cartao(indice: int) -> Dictionary:
 	selo.size = Vector2(54, 54)
 	selo.position = Vector2(MARG_MOLDURA - 8.0, MARG_MOLDURA - 8.0)
 	selo.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	selo.add_theme_stylebox_override("panel", UI.painel("selo", base * 0.7, 2.0))
+	selo.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+	selo.custom_minimum_size = Vector2(72, 44)
+	selo.size = Vector2(72, 44)
+	selo.add_theme_stylebox_override("panel", UIProducao.caixa("botao_desativado", Vector4(8, 2, 8, 2)))
 	raiz.add_child(selo)
 
 	var badge := Label.new()
 	badge.name = "Numero"
-	badge.text = "%02d" % (indice + 1)
+	badge.text = _numero_regional(indice)
 	badge.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	badge.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	badge.add_theme_font_size_override("font_size", 22)
-	badge.add_theme_color_override("font_color", Color(1, 0.97, 1))
+	badge.add_theme_font_size_override("font_size", 20)
+	badge.add_theme_color_override("font_color", UIProducao.OURO_CLARO)
 	badge.add_theme_color_override("font_outline_color", Color(0.04, 0.01, 0.06))
 	badge.add_theme_constant_override("outline_size", 5)
 	selo.add_child(badge)
@@ -424,29 +436,21 @@ func _frame0(caminho: String, n: int) -> Texture2D:
 	return atlas
 
 
-## Seta de navegação: placa de pedra do kit + o ícone de seta do mesmo
-## pack. O `txt` já não se desenha -- fica só como rótulo de acessibilidade
-## (o botão passou a ser gráfico).
+## Seta de navegação: o chevron solto da prancha 09 (secção 5) -- sem
+## placa, claro sobre o fundo escuro, a ouro ao passar.
 func _montar_seta(txt: String, dir: int, esquerda: bool) -> void:
 	var b := Button.new()
-	b.tooltip_text = txt
+	b.name = "SetaEsq" if esquerda else "SetaDir"
+	b.text = txt
 	b.focus_mode = Control.FOCUS_NONE
-	var sb := UI.painel("painel_pedra", Color(0.86, 0.72, 0.95, 0.94), 0.0)
-	var sb_hover := UI.painel("painel_placa", Color(1.0, 0.72, 1.0), 0.0)
-	b.add_theme_stylebox_override("normal", sb)
-	b.add_theme_stylebox_override("hover", sb_hover)
-	b.add_theme_stylebox_override("pressed", sb_hover)
-	b.add_theme_stylebox_override("focus", sb)
-
-	var ic := UI.icone("ico_seta_esq" if esquerda else "ico_seta_dir", 34.0,
-		Color(1, 0.94, 1))
-	# num `CenterContainer` para a seta ficar mesmo no meio da placa sem
-	# depender de o botão já ter tamanho quando isto corre
-	var meio := CenterContainer.new()
-	meio.set_anchors_preset(Control.PRESET_FULL_RECT)
-	meio.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	meio.add_child(ic)
-	b.add_child(meio)
+	for e in ["normal", "hover", "pressed", "focus", "hover_pressed", "disabled"]:
+		b.add_theme_stylebox_override(e, StyleBoxEmpty.new())
+	b.add_theme_font_size_override("font_size", 72)
+	b.add_theme_color_override("font_color", UIProducao.TEXTO)
+	b.add_theme_color_override("font_hover_color", UIProducao.OURO_CLARO)
+	b.add_theme_color_override("font_pressed_color", UIProducao.OURO)
+	b.add_theme_color_override("font_outline_color", UIProducao.CONTORNO)
+	b.add_theme_constant_override("outline_size", 8)
 	b.anchor_top = 0.5
 	b.anchor_bottom = 0.5
 	b.offset_top = -36.0
@@ -600,22 +604,47 @@ func _atualizar_fundo() -> void:
 ## Cabeçalho moderno por cima do carrossel: pastilhas de região (atalho de
 ## zona -- salta logo para lá em vez de percorrer nível a nível) + barra
 ## fina com o progresso total da campanha.
+##
+## Execution 9F -- a estrutura da campanha tem de se LER no ecrã:
+## 20 REGIÕES × 5 NÍVEIS. Por cima: legenda, as 20 pastilhas em numeração
+## romana (I..XX), e o cabeçalho da região escolhida ("I · FLORESTA ...
+## · 0 / 5") com o total da campanha à direita. O carrossel só mostra os
+## 5 níveis dessa região, numerados "1-1".."1-5" (como a secção 5 da
+## prancha 09). ↑/↓ (ou as pastilhas) mudam de região.
+var _cab_regiao: Label
+var _cab_progresso: Label
+var _pontos: Array[Label] = []
+
+const ROMANOS := ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X",
+	"XI", "XII", "XIII", "XIV", "XV", "XVI", "XVII", "XVIII", "XIX", "XX"]
+
+
+func _romano(r: int) -> String:
+	return ROMANOS[r] if r >= 0 and r < ROMANOS.size() else str(r + 1)
+
+
+## "1-3" = região 1, 3.º nível dela.
+func _numero_regional(indice: int) -> String:
+	var r := EstadoJogo.regiao_do_nivel(indice)
+	if r < 0 or r >= EstadoJogo.REGIOES.size():
+		return "%02d" % (indice + 1)
+	var niveis: Array = EstadoJogo.REGIOES[r]["niveis"]
+	return "%d-%d" % [r + 1, niveis.find(indice) + 1]
+
+
 func _montar_topo() -> void:
 	var titulo := Label.new()
 	titulo.name = "Titulo"
 	titulo.anchor_left = 0.5
 	titulo.anchor_right = 0.5
-	titulo.anchor_top = 0.0
-	titulo.anchor_bottom = 0.0
 	titulo.offset_left = -300.0
 	titulo.offset_right = 300.0
-	titulo.offset_top = 32.0
-	titulo.offset_bottom = 72.0
+	titulo.offset_top = 14.0
+	titulo.offset_bottom = 38.0
 	titulo.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	titulo.add_theme_font_size_override("font_size", 26)
-	titulo.add_theme_color_override("font_color", Color(0.96, 0.92, 1.0))
-	titulo.add_theme_color_override("font_outline_color", Color(0.02, 0.01, 0.03))
-	titulo.add_theme_constant_override("outline_size", 5)
+	UIProducao.seccao(titulo, 16)
+	titulo.add_theme_color_override("font_outline_color", UIProducao.CONTORNO)
+	titulo.add_theme_constant_override("outline_size", 3)
 	titulo.text = Textos.t("sel.title") if Textos.t("sel.title") != "sel.title" else "ESCOLHER NÍVEL"
 	titulo.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(titulo)
@@ -624,99 +653,84 @@ func _montar_topo() -> void:
 	pastilhas.name = "Pastilhas"
 	pastilhas.anchor_left = 0.5
 	pastilhas.anchor_right = 0.5
-	pastilhas.anchor_top = 0.0
-	pastilhas.anchor_bottom = 0.0
-	pastilhas.offset_top = 84.0
-	pastilhas.offset_bottom = 114.0
+	pastilhas.offset_top = 42.0
+	pastilhas.offset_bottom = 78.0
 	pastilhas.grow_horizontal = Control.GROW_DIRECTION_BOTH
 	pastilhas.alignment = BoxContainer.ALIGNMENT_CENTER
-	pastilhas.add_theme_constant_override("separation", 8)
+	pastilhas.add_theme_constant_override("separation", 4)
 	pastilhas.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(pastilhas)
 
+	# pastilha = a placa do botão normal da prancha (apagada) / de ouro
+	# (a região aberta); o texto é o numeral romano da região
+	var sb := UIProducao.caixa("botao_desativado", Vector4(4, 2, 4, 2))
+	var sb_ativa := UIProducao.caixa("botao_normal", Vector4(4, 2, 4, 2), Color(1.25, 1.05, 0.7))
+	var sb_hover := UIProducao.caixa("botao_normal", Vector4(4, 2, 4, 2))
 	for r in EstadoJogo.REGIOES.size():
-		var cor := cor_regiao(r)
 		var b := Button.new()
 		b.name = "Regiao%d" % r
 		b.focus_mode = Control.FOCUS_NONE
-		b.custom_minimum_size = Vector2(32, 32)
-		b.text = "%d" % (r + 1)
+		b.custom_minimum_size = Vector2(50, 36)
+		b.text = _romano(r)
+		b.tooltip_text = Textos.t(EstadoJogo.REGIOES[r].get("chave", ""))
 		b.add_theme_font_size_override("font_size", 13)
-		b.add_theme_color_override("font_color", Color(1, 0.97, 1))
-		b.add_theme_color_override("font_outline_color", Color(0.03, 0.01, 0.05))
-		b.add_theme_constant_override("outline_size", 4)
 		b.mouse_filter = Control.MOUSE_FILTER_STOP
-		# o mesmo selo do número do cartão, apagado; a região actual acende
-		# a tinta MULTIPLICA a pedra roxa: sem levantar a saturacao as 20
-		# regioes saiam todas do mesmo cinzento-roxo e a pastilha deixava de
-		# dizer em que zona se esta'
-		var forte := Color(cor.r, cor.g, cor.b).lightened(0.15)
-		var sb := UI.painel("selo",
-			Color(forte.r * 0.85, forte.g * 0.85, forte.b * 0.85, 0.85), 0.0)
-		var sb_ativa := UI.painel("selo", forte.lightened(0.55) * 1.6, 0.0)
-		b.add_theme_stylebox_override("normal", sb)
-		b.add_theme_stylebox_override("hover", sb_ativa)
-		b.add_theme_stylebox_override("pressed", sb_ativa)
-		b.add_theme_stylebox_override("focus", sb)
 		b.set_meta("sb_normal", sb)
 		b.set_meta("sb_ativa", sb_ativa)
+		b.set_meta("sb_hover", sb_hover)
 		b.pressed.connect(_ir_para_regiao.bind(r))
 		pastilhas.add_child(b)
 		_regiao_pills.append(b)
 
-	var faixa_prog := Control.new()
-	faixa_prog.name = "Progresso"
-	faixa_prog.anchor_left = 0.5
-	faixa_prog.anchor_right = 0.5
-	faixa_prog.anchor_top = 0.0
-	faixa_prog.anchor_bottom = 0.0
-	faixa_prog.offset_left = -110.0
-	faixa_prog.offset_right = 110.0
-	faixa_prog.offset_top = 120.0
-	faixa_prog.offset_bottom = 138.0
-	faixa_prog.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(faixa_prog)
+	_cab_regiao = Label.new()
+	_cab_regiao.name = "CabecalhoRegiao"
+	_cab_regiao.anchor_left = 0.5
+	_cab_regiao.anchor_right = 0.5
+	_cab_regiao.offset_left = -420.0
+	_cab_regiao.offset_right = 420.0
+	_cab_regiao.offset_top = 84.0
+	_cab_regiao.offset_bottom = 124.0
+	_cab_regiao.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_cab_regiao.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_cab_regiao.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	UIProducao.titulo(_cab_regiao, 30)
+	_cab_regiao.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_cab_regiao)
 
-	# a mesma calha e o mesmo enchimento das barras da HUD
-	var trilho := Panel.new()
-	trilho.set_anchors_preset(Control.PRESET_FULL_RECT)
-	trilho.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	trilho.add_theme_stylebox_override("panel", UI.calha())
-	faixa_prog.add_child(trilho)
+	# os 5 níveis da região, em linha: "1-1 ✓  1-2  1-3 🔒 ..." -- mostra
+	# de relance que a região tem cinco e onde se está
+	var linha := HBoxContainer.new()
+	linha.name = "NiveisDaRegiao"
+	linha.anchor_left = 0.5
+	linha.anchor_right = 0.5
+	linha.offset_top = 124.0
+	linha.offset_bottom = 148.0
+	linha.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	linha.alignment = BoxContainer.ALIGNMENT_CENTER
+	linha.add_theme_constant_override("separation", 22)
+	linha.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(linha)
+	for k in 5:
+		var p := Label.new()
+		p.add_theme_font_size_override("font_size", 15)
+		p.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		linha.add_child(p)
+		_pontos.append(p)
 
-	var ench := NinePatchRect.new()
-	ench.texture = UI.textura("enchimento")
-	ench.patch_margin_top = 2 * UI.ESCALA
-	ench.patch_margin_bottom = 2 * UI.ESCALA
-	ench.axis_stretch_horizontal = NinePatchRect.AXIS_STRETCH_MODE_TILE
-	ench.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	ench.modulate = Color(0.95, 0.4, 0.9)
-	ench.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	ench.anchor_top = 0.0
-	ench.anchor_bottom = 1.0
-	ench.anchor_left = 0.0
-	ench.anchor_right = 0.0
-	ench.offset_top = UI.RECUO_BARRA
-	ench.offset_bottom = -UI.RECUO_BARRA
-	ench.offset_left = UI.RECUO_BARRA
-	_prog_fill = ench
-	faixa_prog.add_child(ench)
-
-	_prog_label = Label.new()
-	_prog_label.anchor_left = 0.5
-	_prog_label.anchor_right = 0.5
-	_prog_label.anchor_top = 0.0
-	_prog_label.anchor_bottom = 0.0
-	_prog_label.offset_left = -80.0
-	_prog_label.offset_right = 80.0
-	_prog_label.offset_top = 142.0
-	_prog_label.offset_bottom = 158.0
-	_prog_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_prog_label.add_theme_font_size_override("font_size", 12)
-	_prog_label.add_theme_color_override("font_color", Color(0.8, 0.76, 0.86, 0.85))
-	_prog_label.add_theme_color_override("font_outline_color", Color(0.02, 0.01, 0.03))
-	_prog_label.add_theme_constant_override("outline_size", 3)
-	add_child(_prog_label)
+	_cab_progresso = Label.new()
+	_cab_progresso.name = "ProgressoCampanha"
+	_cab_progresso.anchor_left = 1.0
+	_cab_progresso.anchor_right = 1.0
+	_cab_progresso.offset_left = -220.0
+	_cab_progresso.offset_right = -24.0
+	_cab_progresso.offset_top = 14.0
+	_cab_progresso.offset_bottom = 38.0
+	_cab_progresso.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	_cab_progresso.add_theme_font_size_override("font_size", 14)
+	_cab_progresso.add_theme_color_override("font_color", UIProducao.TEXTO_APAGADO)
+	_cab_progresso.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_prog_label = _cab_progresso
+	add_child(_cab_progresso)
 
 
 ## Pastilha de região premida -- salta para o 1.º nível alcançável dessa
@@ -736,19 +750,14 @@ func _ir_para_regiao(regiao: int) -> void:
 	_ir_para(alvo)
 
 
+## Botões do rodapé: o tema de produção (9F) veste-os todos; o principal
+## (JOGAR) é o botão SELECIONADO da prancha 09 também em repouso -- a
+## hierarquia sai da moldura de ouro. Chamado antes do `vestir_ecra`, por
+## isso o override do principal é posto depois (em `_montar`).
 func _estilo_botao_rodape(b: Button, principal: bool) -> void:
-	b.add_theme_font_size_override("font_size", 16 if not principal else 17)
-	b.add_theme_color_override("font_color", Color(1, 0.9, 1))
-	# o botão principal (JOGAR) é a placa acesa a magenta; os outros são a
-	# madeira apagada -- a hierarquia sai do MATERIAL, não de uma borda
-	var sb := UI.painel("painel_placa", Color(1.0, 0.55, 1.0), 6.0) if principal \
-		else UI.painel("painel_madeira", Color(0.82, 0.72, 0.9, 0.92), 6.0)
-	var sb_hover := UI.painel("painel_placa", Color(1.0, 0.78, 1.0), 6.0) if principal \
-		else UI.painel("painel_placa", Color(0.95, 0.72, 1.0), 6.0)
-	for e in ["normal", "focus", "disabled"]:
-		b.add_theme_stylebox_override(e, sb)
-	for e in ["hover", "pressed"]:
-		b.add_theme_stylebox_override(e, sb_hover)
+	b.add_theme_font_size_override("font_size", 16 if not principal else 18)
+	if principal:
+		b.set_meta("principal_9f", true)
 	b.pivot_offset = b.custom_minimum_size / 2.0
 	b.mouse_entered.connect(func() -> void: _animar_escala(b, 1.05))
 	b.mouse_exited.connect(func() -> void: _animar_escala(b, 1.0))
@@ -764,7 +773,7 @@ func _reconstruir_estilos() -> void:
 		var regiao := EstadoJogo.regiao_do_nivel(idx)
 		var nome_regiao := Textos.t(EstadoJogo.chave_regiao_do_nivel(idx))
 		(c["regiao"] as Label).text = "%s  ·  %s" % [nome_regiao.to_upper(), _progresso_regiao(regiao)]
-		(c["numero"] as Label).text = "%02d" % (idx + 1)
+		(c["numero"] as Label).text = _numero_regional(idx)
 		(c["nome"] as Label).text = _nome_nivel(idx)
 		var rotulo := "sel.boss" if CatalogoCampanha.tem_chefe(idx) else "sel.guard"
 		(c["chefe"] as Label).text = Textos.tf(rotulo, [_nome_chefe(idx)])
@@ -777,7 +786,7 @@ func _reconstruir_estilos() -> void:
 			pill.visible = true
 			_estilo_pill(pill, Color(0.38, 0.82, 0.5))
 		elif not jog:
-			pill.text = "🔒 " + Textos.t("sel.locked")
+			pill.text = Textos.t("sel.locked")   # sem emoji: tofu no Web (9F)
 			pill.visible = true
 			_estilo_pill(pill, Color(0.5, 0.5, 0.56))
 			painel.modulate = Color(0.72, 0.7, 0.78)   # cartão trancado esbatido
@@ -803,6 +812,32 @@ func _atualizar_topo() -> void:
 		var b := _regiao_pills[r]
 		var ativa := r == regiao_atual
 		b.add_theme_stylebox_override("normal", b.get_meta("sb_ativa") if ativa else b.get_meta("sb_normal"))
+		b.add_theme_stylebox_override("hover", b.get_meta("sb_ativa") if ativa else b.get_meta("sb_hover"))
+		b.add_theme_stylebox_override("pressed", b.get_meta("sb_ativa"))
+		b.add_theme_color_override("font_color", UIProducao.OURO_CLARO if ativa else UIProducao.TEXTO_APAGADO)
+	if _cab_regiao and regiao_atual >= 0 and regiao_atual < EstadoJogo.REGIOES.size():
+		var nome := Textos.t(EstadoJogo.REGIOES[regiao_atual].get("chave", ""))
+		_cab_regiao.text = "%s  ·  %s  ·  %s" % [_romano(regiao_atual), nome.to_upper(),
+			_progresso_regiao(regiao_atual)]
+		var niveis: Array = EstadoJogo.REGIOES[regiao_atual]["niveis"]
+		for k in _pontos.size():
+			var p := _pontos[k]
+			if k >= niveis.size():
+				p.visible = false
+				continue
+			var n: int = niveis[k]
+			p.visible = true
+			# estado pela COR (a fonte do Web não tem emoji: o 🔒 saía em tofu)
+			p.text = "%d-%d" % [regiao_atual + 1, k + 1]
+			var cor := UIProducao.TEXTO_APAGADO
+			if EstadoJogo.nivel_esta_concluido(n):
+				cor = Color(0.5, 0.86, 0.56)
+			elif _respeitar_bloqueio and not EstadoJogo.nivel_desbloqueado(n):
+				cor = Color(0.36, 0.38, 0.45)
+			if n == _sel:
+				cor = UIProducao.OURO_CLARO
+			p.add_theme_color_override("font_color", cor)
+			p.add_theme_font_size_override("font_size", 17 if n == _sel else 15)
 
 
 ## "2 / 5" -- quantos níveis da região já estão concluídos, sobre o total.
@@ -826,18 +861,28 @@ func _estilo_pill(pill: Label, cor: Color) -> void:
 	pill.add_theme_constant_override("outline_size", 4)
 	# `selo` e não `painel_placa`: a fita tem 40 px e a moldura dos painéis
 	# grandes precisa de 60 (ver `ALT_MIN_PAINEL`).
-	pill.add_theme_stylebox_override("normal", UI.painel("selo",
-		Color(cor.r * 0.75 + 0.08, cor.g * 0.75 + 0.08, cor.b * 0.75 + 0.08), 4.0))
+	pill.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+	pill.add_theme_stylebox_override("normal", UIProducao.caixa("botao_normal",
+		Vector4(10, 2, 10, 2), Color(cor.r * 0.5 + 0.5, cor.g * 0.5 + 0.5, cor.b * 0.5 + 0.5)))
 
 
 func _reposicionar(instantaneo: bool) -> void:
 	if not _pronto or size.x < 200.0:
 		return
-	var centro := size * 0.5
+	var centro := size * 0.5 + Vector2(0, 26)
+	# 9F: só os 5 níveis da região do escolhido entram na fila -- a
+	# posição é a do nível DENTRO da região, e as outras regiões somem
+	var regiao_sel := EstadoJogo.regiao_do_nivel(_sel)
+	var niveis_sel: Array = EstadoJogo.REGIOES[regiao_sel]["niveis"] if regiao_sel >= 0 else []
+	var local_sel := niveis_sel.find(_sel)
 	for i in _cartoes.size():
 		var raiz := _cartoes[i]["raiz"] as Control
-		var alvo_pos := Vector2(centro.x - CARTAO.x * 0.5 + (i - _sel) * PASSO, centro.y - CARTAO.y * 0.5)
-		var dist: int = absi(i - _sel)
+		var local_i := niveis_sel.find(i)
+		var fora := local_i < 0
+		var rel := (local_i - local_sel) if not fora else (i - _sel) * 10
+		var alvo_pos := Vector2(centro.x - CARTAO.x * 0.5 + rel * PASSO, centro.y - CARTAO.y * 0.5)
+		var dist: int = absi(rel)
+		raiz.visible = not fora
 		var escala := 1.0
 		var alpha := 1.0
 		var dy := 0.0
@@ -1008,4 +1053,9 @@ func _unhandled_input(evento: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 	elif evento.is_action_pressed("pausa") or evento.is_action_pressed("ui_cancel"):
 		cancelado.emit()
+		get_viewport().set_input_as_handled()
+	elif evento.is_action_pressed("ui_up") or evento.is_action_pressed("ui_down"):
+		# 9F: região anterior/seguinte (teclado e comando)
+		var r := EstadoJogo.regiao_do_nivel(_sel) + (-1 if evento.is_action_pressed("ui_up") else 1)
+		_ir_para_regiao(clampi(r, 0, EstadoJogo.REGIOES.size() - 1))
 		get_viewport().set_input_as_handled()

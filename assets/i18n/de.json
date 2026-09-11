@@ -39,6 +39,7 @@
 	"hud.ability.escudo": "Schild",
 	"hud.ability.projetil": "Spektralmagie",
 	"hud.new_ability": "Neue Fähigkeit: %s",
+	"hud.checkpoint": "Checkpoint aktiviert!",
 	"hud.clue_found": "Hinweis gefunden  (%d)",
 	"hud.advanced": "Weiter zu Level %d",
 	"hud.upgrade_available": "Upgrade verfügbar",

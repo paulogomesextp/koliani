@@ -56,6 +56,7 @@ var _cab_nivel: VBoxContainer
 
 
 func _ready() -> void:
+	add_to_group("hud_9f")   # toasts de feedback (ex.: checkpoint.gd)
 	$Versao.text = "v" + str(ProjectSettings.get_setting("application/config/version", ""))
 	if _toque:
 		_toque.visible = DisplayServer.is_touchscreen_available()
@@ -113,16 +114,17 @@ func _ready() -> void:
 ## e outro no contador de vidas. As barras em si (posição, tamanho, sinais)
 ## continuam a vir do `HUD.tscn`.
 func _vestir_barras() -> void:
+	# Execution 9F: calhas com gema e enchimentos da prancha 09 (secção 2).
 	if _barra_vida:
-		UI.vestir_barra(_barra_vida, UI.COR_VIDA)
+		UIProducao.vestir_barra(_barra_vida, "vida")
 	if _barra_energia:
-		UI.vestir_barra(_barra_energia, UI.COR_ENERGIA)
+		UIProducao.vestir_barra(_barra_energia, "energia")
 
 	# o contador de vidas passa de "x3" a "♥ x3". O coração fica ao lado do
 	# número, DENTRO da caixa `Vidas` -- à esquerda dela está o disco da arma,
 	# e um ícone posto para fora ficava por baixo do disco.
 	if _label_vidas:
-		var ic := UI.icone("ico_coracao", 18)
+		var ic := UIProducao.icone("ico_coracao", 20)
 		ic.name = "IconeVidas"
 		ic.position = Vector2(0, 3)
 		_label_vidas.get_parent().add_child(ic)
@@ -150,14 +152,17 @@ func _fazer_botao_equip(tipo: String) -> Button:
 	b.offset_top = -116.0
 	b.offset_bottom = -92.0
 	b.add_theme_font_size_override("font_size", 11)
-	b.add_theme_color_override("font_color", Color(1, 0.88, 0.98))
-	b.add_theme_color_override("font_hover_color", Color(1, 0.96, 1))
-	b.add_theme_color_override("font_pressed_color", Color(1, 0.8, 0.96))
-	# a mesma pedra da HUD, mais acesa quando o rato lá está
-	b.add_theme_stylebox_override("normal", UI.painel("painel_pedra", Color(1, 0.9, 1, 0.94), 3.0))
-	b.add_theme_stylebox_override("hover", UI.painel("painel_placa", Color(1, 0.9, 1), 3.0))
-	b.add_theme_stylebox_override("pressed", UI.painel("painel_placa", Color(0.8, 0.6, 0.9), 3.0))
-	b.add_theme_stylebox_override("focus", UI.painel("painel_pedra", Color(1, 0.9, 1, 0.94), 3.0))
+	b.add_theme_color_override("font_color", UIProducao.TEXTO)
+	b.add_theme_color_override("font_hover_color", UIProducao.OURO_CLARO)
+	b.add_theme_color_override("font_pressed_color", UIProducao.OURO)
+	# 9F: o botão da prancha 09 em ponto pequeno (margens à medida dos 24 px)
+	b.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+	var m := [10, 8, 10, 8]
+	var pad := Vector4(8, 2, 8, 2)
+	b.add_theme_stylebox_override("normal", UIProducao.caixa("botao_desativado", pad, Color.WHITE, m))
+	b.add_theme_stylebox_override("hover", UIProducao.caixa("botao_normal", pad, Color.WHITE, m))
+	b.add_theme_stylebox_override("pressed", UIProducao.caixa("botao_selecionado", pad, Color.WHITE, m))
+	b.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
 	b.pressed.connect(_abrir_equip.bind(tipo))
 	return b
 
@@ -182,13 +187,11 @@ func _fazer_selo(x: float) -> Label:
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	l.add_theme_font_size_override("font_size", 9)
-	l.add_theme_color_override("font_color", Color(0.15, 0.05, 0.02))
-	var sb := StyleBoxFlat.new()
-	sb.bg_color = Color(1.0, 0.82, 0.3, 0.95)
-	sb.set_corner_radius_all(4)
-	sb.content_margin_top = 2
-	sb.content_margin_bottom = 2
-	l.add_theme_stylebox_override("normal", sb)
+	l.add_theme_color_override("font_color", UIProducao.OURO_CLARO)
+	l.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+	# 9F: a moldura de ouro do botão selecionado, em ponto pequeno
+	l.add_theme_stylebox_override("normal", UIProducao.caixa("botao_selecionado",
+		Vector4(8, 1, 8, 1), Color.WHITE, [10, 7, 10, 7]))
 	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	l.visible = false
 	return l
@@ -268,14 +271,11 @@ func _montar_disco_arma() -> void:
 	_arma_disco.offset_right = 84.0
 	_arma_disco.offset_top = -84.0
 	_arma_disco.offset_bottom = -20.0
-	var sb := StyleBoxFlat.new()
-	sb.bg_color = Color(0.06, 0.04, 0.09, 0.96)
-	sb.set_corner_radius_all(32)
-	sb.set_border_width_all(3)
-	sb.border_color = Color(0.85, 0.4, 0.82, 0.95)
-	sb.shadow_color = Color(0, 0, 0, 0.5)
-	sb.shadow_size = 8
-	_arma_disco.add_theme_stylebox_override("panel", sb)
+	# 9F: ranhura de ouro da prancha 09 (a moldura ornamentada em ponto
+	# pequeno); a cor da arma entra por tinta, como antes pela borda
+	_arma_disco.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+	_arma_disco.add_theme_stylebox_override("panel", UIProducao.caixa("moldura_ornamentada",
+		Vector4(0, 0, 0, 0), Color.WHITE, [22, 22, 22, 22]))
 	add_child(_arma_disco)
 
 	_arma_label = Label.new()
@@ -299,9 +299,9 @@ func _atualizar_disco_arma() -> void:
 		return
 	_arma_disco.modulate.a = 1.0
 	var wi := Equipamento.indice_arma(EstadoJogo.arma_equipada)
-	var sb := _arma_disco.get_theme_stylebox("panel") as StyleBoxFlat
+	var sb := _arma_disco.get_theme_stylebox("panel") as StyleBoxTexture
 	if sb and wi >= 0:
-		sb.border_color = Equipamento.cor_arma(wi)
+		sb.modulate_color = Color.WHITE.lerp(Equipamento.cor_arma(wi), 0.35)
 	var nome := Textos.t(Equipamento.arma(EstadoJogo.arma_equipada).get("nome", ""))
 	# iniciais da arma (placeholder até haver ícone pixel)
 	var ini := ""
@@ -345,7 +345,9 @@ func _montar_barra_chefe() -> void:
 	var placa := PanelContainer.new()
 	placa.set_anchors_preset(Control.PRESET_FULL_RECT)
 	placa.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	placa.add_theme_stylebox_override("panel", UI.painel("painel_chefe", Color(1, 1, 1, 0.96), 8.0))
+	placa.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+	placa.add_theme_stylebox_override("panel", UIProducao.caixa("moldura_painel",
+		Vector4(26, 12, 26, 14), Color(1, 0.92, 0.9, 0.96)))
 	_chefe_caixa.add_child(placa)
 
 	var col := VBoxContainer.new()
@@ -369,13 +371,13 @@ func _montar_barra_chefe() -> void:
 	titulo.add_child(_chefe_nome)
 
 	_chefe_barra = ProgressBar.new()
-	_chefe_barra.custom_minimum_size = Vector2(0, 26)
+	_chefe_barra.custom_minimum_size = Vector2(0, 30)
 	_chefe_barra.show_percentage = false
 	_chefe_barra.min_value = 0.0
 	_chefe_barra.max_value = 1.0
 	_chefe_barra.value = 1.0
 	col.add_child(_chefe_barra)
-	UI.vestir_barra(_chefe_barra, UI.COR_CHEFE)
+	UIProducao.vestir_barra(_chefe_barra, "chefe")
 
 
 func _ao_combate_chefe(chefe: Node) -> void:
@@ -432,8 +434,10 @@ func _montar_contador_essencia() -> void:
 	caixa.offset_bottom = 54.0
 	caixa.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	caixa.pivot_offset = Vector2(79, 19)
-	caixa.add_theme_stylebox_override("panel", UI.painel(
-		"painel_pedra", Color(1.0, 0.86, 1.0, 0.94), 6.0))
+	# Execution 9F: placa do kit + o cristal de Essência da prancha 09
+	caixa.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+	caixa.add_theme_stylebox_override("panel", UIProducao.caixa("botao_desativado",
+		Vector4(18, 4, 20, 4)))
 	add_child(caixa)
 
 	var linha := HBoxContainer.new()
@@ -441,7 +445,7 @@ func _montar_contador_essencia() -> void:
 	linha.add_theme_constant_override("separation", 8)
 	linha.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	caixa.add_child(linha)
-	linha.add_child(UI.icone("ico_losango", 18))
+	linha.add_child(UIProducao.icone("ico_cristal", 26))
 
 	_ess_label = Label.new()
 	_ess_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
@@ -580,10 +584,13 @@ func _encher_cabecalho_nivel() -> void:
 
 	# a placa: pedra tingida com a cor da região, mas escura -- é fundo de
 	# texto, não pode competir com o cenário
+	# 9F: placa escura do kit da prancha 09 -- fundo de texto discreto, não
+	# compete com o cenário da 9C; o número é o "região-nível" (1-3)
 	var placa := PanelContainer.new()
 	placa.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	placa.add_theme_stylebox_override("panel", UI.painel(
-		"painel_placa", Color(cor.r * 0.5 + 0.2, cor.g * 0.5 + 0.2, cor.b * 0.5 + 0.2, 0.94), 8.0))
+	placa.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+	placa.add_theme_stylebox_override("panel", UIProducao.caixa("botao_desativado",
+		Vector4(12, 6, 18, 6), Color(1, 1, 1, 0.94), [14, 12, 14, 12]))
 	_cab_nivel.add_child(placa)
 
 	var linha := HBoxContainer.new()
@@ -592,16 +599,18 @@ func _encher_cabecalho_nivel() -> void:
 
 	# selo com o número do nível
 	var selo := PanelContainer.new()
-	selo.custom_minimum_size = Vector2(52, 52)
+	selo.custom_minimum_size = Vector2(56, 44)
 	selo.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	selo.add_theme_stylebox_override("panel", UI.painel("selo", cor * 0.7, 2.0))
+	selo.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+	selo.add_theme_stylebox_override("panel", UIProducao.caixa("botao_selecionado",
+		Vector4(6, 2, 6, 2), Color.WHITE, [14, 12, 14, 12]))
 	linha.add_child(selo)
 	var num := Label.new()
-	num.text = "%02d" % (i + 1)
+	num.text = "%d-%d" % [EstadoJogo.regiao_do_nivel(i) + 1, passo[0]] if passo[1] > 0 else "%02d" % (i + 1)
 	num.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	num.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	num.add_theme_font_size_override("font_size", 24)
-	num.add_theme_color_override("font_color", Color(1, 0.97, 1))
+	num.add_theme_font_size_override("font_size", 20)
+	num.add_theme_color_override("font_color", UIProducao.OURO_CLARO)
 	num.add_theme_color_override("font_outline_color", Color(0.04, 0.01, 0.06))
 	num.add_theme_constant_override("outline_size", 5)
 	selo.add_child(num)
@@ -615,7 +624,7 @@ func _encher_cabecalho_nivel() -> void:
 	var cabecalho := Textos.t(EstadoJogo.chave_regiao_do_nivel(i)).to_upper()
 	if passo[1] > 0:
 		cabecalho += "   ·   " + Textos.tf("hud.region_step", [passo[0], passo[1]])
-	col.add_child(_linha_cab(cabecalho, 12, cor.lerp(Color.WHITE, 0.35), false))
+	col.add_child(_linha_cab(cabecalho, 12, UIProducao.CIANO, false))
 	# nome do nível
 	col.add_child(_linha_cab(Textos.t(CatalogoCampanha.chave_nivel(i)), 18,
 		Color(1, 0.96, 1), false))
@@ -640,8 +649,8 @@ func _encher_cabecalho_nivel() -> void:
 		var p := ColorRect.new()
 		p.custom_minimum_size = Vector2(18, 4)
 		var feito := n < passo[0] - 1
-		p.color = cor if n == passo[0] - 1 else (
-			cor * 0.55 if feito else Color(0.24, 0.2, 0.3, 0.9))
+		p.color = UIProducao.OURO if n == passo[0] - 1 else (
+			UIProducao.OURO * 0.55 if feito else Color(0.2, 0.24, 0.32, 0.9))
 		_cab_pastilhas.add_child(p)
 
 
@@ -685,7 +694,8 @@ func _ao_habilidade(id: String) -> void:
 	if id == "projetil" and _barra_energia:
 		_barra_energia.get_parent().visible = true
 	var nome: String = Textos.t(NOME_HABILIDADE.get(id, id))
-	_aviso(Textos.tf("hud.new_ability", [nome]))
+	_aviso(Textos.tf("hud.new_ability", [nome]),
+		UIProducao.ICONE_HABILIDADE.get(id, ""), "habilidade")
 
 
 func _ao_pista(_id: String, total: int) -> void:
@@ -720,8 +730,9 @@ func _ao_mecanica(cam: String) -> void:
 
 func _placa_tutorial(nome: String, txt: String) -> void:
 	var caixa := PanelContainer.new()
-	caixa.add_theme_stylebox_override("panel", UI.painel(
-		"painel_placa", Color(1.0, 0.62, 1.0), 10.0))
+	caixa.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+	caixa.add_theme_stylebox_override("panel", UIProducao.caixa("caixa_dialogo",
+		Vector4(28, 20, 28, 22)))
 	caixa.size = Vector2(TUTORIAL_LARGURA, 0.0)
 	caixa.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
@@ -732,7 +743,7 @@ func _placa_tutorial(nome: String, txt: String) -> void:
 	var l_nome := Label.new()
 	l_nome.text = nome
 	l_nome.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	l_nome.add_theme_color_override("font_color", Color(1, 0.86, 1))
+	l_nome.add_theme_color_override("font_color", UIProducao.OURO)
 	l_nome.add_theme_color_override("font_outline_color", Color(0.05, 0.01, 0.06))
 	l_nome.add_theme_constant_override("outline_size", 4)
 	l_nome.add_theme_font_size_override("font_size", 22)
@@ -763,18 +774,14 @@ func _placa_tutorial(nome: String, txt: String) -> void:
 	t.tween_callback(caixa.queue_free)
 
 
-func _aviso(txt: String) -> void:
-	var l := Label.new()
-	l.text = "  " + txt + "  "
-	var larg := get_viewport().get_visible_rect().size.x
-	l.position = Vector2(larg * 0.5 - 130.0, 68.0)
-	l.add_theme_color_override("font_color", Color(1, 0.92, 1))
-	l.add_theme_color_override("font_outline_color", Color(0.05, 0.01, 0.06))
-	l.add_theme_constant_override("outline_size", 4)
-	l.add_theme_font_size_override("font_size", 20)
-	l.add_theme_stylebox_override("normal", UI.painel(
-		"painel_placa", Color(1.0, 0.62, 1.0), 8.0))
+## Toast de feedback (prancha 09, secção 8): moldura + ícone + texto
+## dinâmico, centrado no topo. `estilo` "info" (azul) ou "habilidade".
+func _aviso(txt: String, icone := "", estilo := "info") -> void:
+	var l := UIProducao.toast(txt, icone, estilo)
 	add_child(l)
+	l.reset_size()
+	var larg := get_viewport().get_visible_rect().size.x
+	l.position = Vector2(roundf((larg - l.size.x) * 0.5), 68.0)
 	var t := l.create_tween()
 	t.tween_interval(1.8)
 	t.tween_property(l, "modulate:a", 0.0, 0.6)
