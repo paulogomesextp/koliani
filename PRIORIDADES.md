@@ -2,7 +2,17 @@
 
 ## Agora
 
-0000000. **9D BLOQUEADA NA ARTE — falta uma prancha de inimigos da Região I.**
+00000000. **9D+9E PARTIAL PASS (v0.15.19) — inimigos feitos, falta o Coração.**
+   Os 5 comuns, os 4 guardiões, os clones da Morvanna e as crias da Rainha já
+   usam arte derivada da autoridade aprovada (SHA `8ebf8ecd…`). **Decisão do
+   Game Master:** o **Coração Putrefacto** não se consegue tirar da prancha sem
+   inventar o contorno — está pintado dentro da arena. Entregar o Coração
+   isolado (alfa real ou fundo liso; idealmente fase 1 e fase 2). Opcional
+   (design novo): poses de andar/golpe para os inimigos (hoje uma pose, mexida
+   inteira). A 9F só depois do boss. Relatório:
+   `docs/execution_9d_9e_region1_enemies_boss.md`.
+
+0000000. *(Resolvida pela 9D+9E.)* **9D BLOQUEADA NA ARTE — falta uma prancha de inimigos da Região I.**
    Nenhuma das 12 pranchas desenha inimigos, e os da prancha 12 não se extraem
    (30 px, RGB, fundo pintado). **Decisão do Game Master:** (1) entregar uma
    prancha com os 9 inimigos (goblin, mushroom, gosma, besouro, lodo, Ghorak,

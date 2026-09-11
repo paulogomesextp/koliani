@@ -4,7 +4,32 @@
 
 Atualizado em 11 de setembro de 2026.
 
-## Execution 9D — Inimigos e guardiões da Região I — **BLOCKED na arte**
+## Execution 9D+9E — Inimigos + Coração Putrefacto — **PARTIAL PASS**
+
+**ENEMY GATE CLOSED. BOSS GATE OPEN. Pronto para 9F: NÃO.** v0.15.19, commit
+`dc06608`. Relatório:
+[execution_9d_9e_region1_enemies_boss.md](execution_9d_9e_region1_enemies_boss.md).
+
+- **Autoridade aprovada:**
+  `work/production_art_gate/9D1_game_master_approved/region1_enemies_boss_visual_authority_v1_0.png`,
+  1536×1024 RGBA, SHA `8ebf8ecd13e8d7e7d803acfcccf3361a35cb77ff9ad6dd1d01c79b8b24ebb2fd`.
+- **Feito:** 11 entidades (5 comuns, 4 guardiões, clones da Morvanna, crias da
+  Rainha) derivadas por `tools/produzir_inimigos_regiao1.py` e integradas;
+  nenhuma arte legada de inimigo/guardião visível na Região I. Crias: campo
+  `DemonioBase.identidade_visual` (só arte; `especie` fica goblin).
+- **Bloqueado:** Coração Putrefacto. Está pintado dentro da arena; 3 máscaras
+  tentadas (duas levam a arena, a terceira inventa uma elipse e perde os
+  troncos). **Próximo passo:** o Game Master entregar o Coração isolado (alfa ou
+  fundo liso); depois é juntar uma entrada ao produtor e o override de fase 2.
+- **Armadilhas:** (1) o `run_tests.gd` só corre testes chamados em
+  `_correr_tudo` — um `teste_*` novo não registado passa sem correr; (2)
+  ferramentas de evidência que citam `DemonioBase`/`Chefe*` têm de ser CENA, não
+  `--script`; (3) sem vsync, "N frames" são milissegundos — esperar por timer;
+  (4) o rosa claro dos guardiões nas fotos é o `_piscar` (telégrafo), não a arte.
+- Limitação aceite: uma pose por entidade → estados por translação/dissolução,
+  sem ciclos de pernas.
+
+## Execution 9D — Inimigos e guardiões da Região I — **BLOCKED na arte** (superada pela 9D+9E)
 
 Estado: **APPROVED DIRECTION / PRODUCTION ASSET MISSING. REGION I ENEMY
 PRODUCTION GATE: OPEN. Pronto para a 9E: NÃO.** Relatório:

@@ -20,6 +20,16 @@
       ],
       "port": 8071,
       "autoPort": true
+    },
+    {
+      "name": "koliani-web-9d9e",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-c",
+        "import os,functools,http.server as h,socketserver as s;s.ThreadingTCPServer.allow_reuse_address=True;port=int(os.environ.get('PORT','8072'));srv=s.ThreadingTCPServer(('',port),functools.partial(h.SimpleHTTPRequestHandler,directory='.worktrees/export-9d9e/build/web'));print('koliani-web-9d9e: a servir o export limpo em http://localhost:%d/' % srv.server_address[1]);srv.serve_forever()"
+      ],
+      "port": 8072,
+      "autoPort": true
     }
   ]
 }
