@@ -1291,9 +1291,12 @@ func teste_execution_8_integracao_player_facing() -> void:
 		if nivel == null:
 			continue
 		var koliani := nivel.get_node_or_null("Koliani")
-		_ok(koliani != null and bool(koliani.get("usar_piloto_visual_5g"))
-			and bool(koliani.get("usar_prototipo_premium")),
-			"Execution 8: Koliani validada não ativa em L%d" % (i + 1))
+		# Execution 9B.3: o Golden Set aprovado substitui a 5G; o premium_v1 fica
+		# só como fallback dos estados ainda sem arte de produção.
+		_ok(koliani != null and bool(koliani.get("usar_golden_set"))
+			and bool(koliani.get("usar_prototipo_premium"))
+			and not bool(koliani.get("usar_piloto_visual_5g")),
+			"Execution 9B.3: Golden Set não ativo em L%d" % (i + 1))
 		var visual := nivel.get_node_or_null("Region1HybridVisualTarget")
 		_ok(visual != null and bool(visual.get("ativo")),
 			"Execution 8: panorama aprovado não ativo em L%d" % (i + 1))

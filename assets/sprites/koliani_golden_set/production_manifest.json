@@ -1,0 +1,808 @@
+{
+  "schema_version": 1,
+  "execution": "9B.3",
+  "character": "Koliani",
+  "visual_authority": {
+    "status": "GAME MASTER APPROVED",
+    "path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+    "sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4"
+  },
+  "low_height_frames": {
+    "status": "POSE-JUSTIFIED / ACCEPTED",
+    "rule_59px": "REVIEW ALERT ONLY",
+    "frames": [
+      "jump_start_001",
+      "jump_loop_001",
+      "jump_loop_003",
+      "attack_basic_001",
+      "attack_basic_002",
+      "attack_basic_003",
+      "attack_basic_005",
+      "attack_basic_006"
+    ]
+  },
+  "contract": {
+    "canvas": [
+      128,
+      128
+    ],
+    "pivot": [
+      64,
+      104
+    ],
+    "baseline_y": 103,
+    "facing": "right",
+    "normalization_scale": 0.3975,
+    "godot": {
+      "scale": 1.0,
+      "offset": [
+        0,
+        -18
+      ]
+    }
+  },
+  "animations": {
+    "idle": {
+      "type": "frames",
+      "frame_count": 7,
+      "path": "assets/sprites/koliani_golden_set/frames/idle",
+      "validator_v2": "PASS",
+      "findings": []
+    },
+    "run": {
+      "type": "frames",
+      "frame_count": 10,
+      "path": "assets/sprites/koliani_golden_set/frames/run",
+      "validator_v2": "REVIEW",
+      "findings": [
+        "POSE_AREA_VARIATION"
+      ]
+    },
+    "jump_start": {
+      "type": "frames",
+      "frame_count": 4,
+      "path": "assets/sprites/koliani_golden_set/frames/jump_start",
+      "validator_v2": "REVIEW",
+      "findings": [
+        "POSE_AREA_VARIATION"
+      ]
+    },
+    "jump_loop": {
+      "type": "frames",
+      "frame_count": 3,
+      "path": "assets/sprites/koliani_golden_set/frames/jump_loop",
+      "validator_v2": "REVIEW",
+      "findings": [
+        "POSE_AREA_VARIATION"
+      ]
+    },
+    "fall": {
+      "type": "frames",
+      "frame_count": 3,
+      "path": "assets/sprites/koliani_golden_set/frames/fall",
+      "validator_v2": "PASS",
+      "findings": []
+    },
+    "attack_basic": {
+      "type": "frames",
+      "frame_count": 6,
+      "path": "assets/sprites/koliani_golden_set/frames/attack_basic",
+      "validator_v2": "PASS",
+      "findings": []
+    },
+    "vfx_slash_basic": {
+      "type": "vfx",
+      "frame_count": 6,
+      "path": "assets/sprites/koliani_golden_set/vfx/vfx_slash_basic",
+      "validator_v2": "REVIEW",
+      "findings": [
+        "BOUNDING_BOX_DRIFT",
+        "POSE_AREA_VARIATION"
+      ]
+    }
+  },
+  "frames": [
+    {
+      "animation": "idle",
+      "frame_index": 1,
+      "path": "assets/sprites/koliani_golden_set/frames/idle/idle_001.png",
+      "sha256": "b00d188c4b425cfd2fb24918ee3e69e72caba8eac713432d45a74924ebd8a80b",
+      "canvas": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        104
+      ],
+      "baseline_y": 103,
+      "authority_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+      "authority_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+      "validator_result": "PASS"
+    },
+    {
+      "animation": "idle",
+      "frame_index": 2,
+      "path": "assets/sprites/koliani_golden_set/frames/idle/idle_002.png",
+      "sha256": "1d642e18126d06429ece2e64273b8041b83dd8b952489acbdd9416fa3f01345a",
+      "canvas": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        104
+      ],
+      "baseline_y": 103,
+      "authority_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+      "authority_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+      "validator_result": "PASS"
+    },
+    {
+      "animation": "idle",
+      "frame_index": 3,
+      "path": "assets/sprites/koliani_golden_set/frames/idle/idle_003.png",
+      "sha256": "381561a9a9d41eeb5f2bd3c6b347e195dd31924fea00dab4c2e93e95bbb9c1c4",
+      "canvas": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        104
+      ],
+      "baseline_y": 103,
+      "authority_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+      "authority_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+      "validator_result": "PASS"
+    },
+    {
+      "animation": "idle",
+      "frame_index": 4,
+      "path": "assets/sprites/koliani_golden_set/frames/idle/idle_004.png",
+      "sha256": "f6476c93a856b81f4607426acaa55d621dd57c12b08a323761d24fa47770568f",
+      "canvas": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        104
+      ],
+      "baseline_y": 103,
+      "authority_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+      "authority_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+      "validator_result": "PASS"
+    },
+    {
+      "animation": "idle",
+      "frame_index": 5,
+      "path": "assets/sprites/koliani_golden_set/frames/idle/idle_005.png",
+      "sha256": "2c88a9dbe5a172ece4cb42178a46b7a8dfba0416e595674c82f601e9f2def32d",
+      "canvas": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        104
+      ],
+      "baseline_y": 103,
+      "authority_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+      "authority_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+      "validator_result": "PASS"
+    },
+    {
+      "animation": "idle",
+      "frame_index": 6,
+      "path": "assets/sprites/koliani_golden_set/frames/idle/idle_006.png",
+      "sha256": "e4c13e30d4ada3e3128dc9bb91ea9b4594cbbacd9b788270f9ef6051c568d454",
+      "canvas": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        104
+      ],
+      "baseline_y": 103,
+      "authority_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+      "authority_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+      "validator_result": "PASS"
+    },
+    {
+      "animation": "idle",
+      "frame_index": 7,
+      "path": "assets/sprites/koliani_golden_set/frames/idle/idle_007.png",
+      "sha256": "8551bf94975d0275c190cb6bc5c914b8699ebe4522487d8fa8276f10ae7ee18b",
+      "canvas": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        104
+      ],
+      "baseline_y": 103,
+      "authority_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+      "authority_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+      "validator_result": "PASS"
+    },
+    {
+      "animation": "run",
+      "frame_index": 1,
+      "path": "assets/sprites/koliani_golden_set/frames/run/run_001.png",
+      "sha256": "83d9ceb7d8cc3919609b75880ca57b952ad99cc64a52c4ef6731e774d9020b72",
+      "canvas": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        104
+      ],
+      "baseline_y": 103,
+      "authority_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+      "authority_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+      "validator_result": "PASS"
+    },
+    {
+      "animation": "run",
+      "frame_index": 2,
+      "path": "assets/sprites/koliani_golden_set/frames/run/run_002.png",
+      "sha256": "d30728f5576f8cdf67df6a1d3b6a26d96572ab2de5e1c23e2ad765f1bd071e91",
+      "canvas": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        104
+      ],
+      "baseline_y": 103,
+      "authority_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+      "authority_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+      "validator_result": "PASS"
+    },
+    {
+      "animation": "run",
+      "frame_index": 3,
+      "path": "assets/sprites/koliani_golden_set/frames/run/run_003.png",
+      "sha256": "8684915934cd2b7e77325324c415e4b6920fed401b37ebfe24980982132279ef",
+      "canvas": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        104
+      ],
+      "baseline_y": 103,
+      "authority_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+      "authority_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+      "validator_result": "PASS"
+    },
+    {
+      "animation": "run",
+      "frame_index": 4,
+      "path": "assets/sprites/koliani_golden_set/frames/run/run_004.png",
+      "sha256": "06e13630a37a17f05fa44f508113a4164190c5d3722e971f3603e4947930bdf9",
+      "canvas": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        104
+      ],
+      "baseline_y": 103,
+      "authority_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+      "authority_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+      "validator_result": "PASS"
+    },
+    {
+      "animation": "run",
+      "frame_index": 5,
+      "path": "assets/sprites/koliani_golden_set/frames/run/run_005.png",
+      "sha256": "a8ca6693f75c8f541fcb70123391b45f26ca1d9594f2369732dd4033382af72b",
+      "canvas": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        104
+      ],
+      "baseline_y": 103,
+      "authority_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+      "authority_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+      "validator_result": "PASS"
+    },
+    {
+      "animation": "run",
+      "frame_index": 6,
+      "path": "assets/sprites/koliani_golden_set/frames/run/run_006.png",
+      "sha256": "82e2122ec1426dee04a4c4546f137c74af1bd63c9a346e07099e220c5d4fda2a",
+      "canvas": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        104
+      ],
+      "baseline_y": 103,
+      "authority_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+      "authority_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+      "validator_result": "PASS"
+    },
+    {
+      "animation": "run",
+      "frame_index": 7,
+      "path": "assets/sprites/koliani_golden_set/frames/run/run_007.png",
+      "sha256": "a074e2b90202b11127bc5d88fe80f8c6fcc99ec7e1a2811963346d58fa86e3b7",
+      "canvas": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        104
+      ],
+      "baseline_y": 103,
+      "authority_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+      "authority_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+      "validator_result": "PASS"
+    },
+    {
+      "animation": "run",
+      "frame_index": 8,
+      "path": "assets/sprites/koliani_golden_set/frames/run/run_008.png",
+      "sha256": "ce0555267d00b0dbed1c8aa01eca43fb464d73cacf43cdfb48bc9c38af425b0b",
+      "canvas": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        104
+      ],
+      "baseline_y": 103,
+      "authority_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+      "authority_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+      "validator_result": "PASS"
+    },
+    {
+      "animation": "run",
+      "frame_index": 9,
+      "path": "assets/sprites/koliani_golden_set/frames/run/run_009.png",
+      "sha256": "53ac9f2f41c01d429693d1f8d0455b524e707295cf677f21fbe1b8f9a7718101",
+      "canvas": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        104
+      ],
+      "baseline_y": 103,
+      "authority_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+      "authority_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+      "validator_result": "PASS"
+    },
+    {
+      "animation": "run",
+      "frame_index": 10,
+      "path": "assets/sprites/koliani_golden_set/frames/run/run_010.png",
+      "sha256": "bd148c4e24c8e05bf8d8ee4225054642d255e47e03ee8ed5a708944659bf570c",
+      "canvas": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        104
+      ],
+      "baseline_y": 103,
+      "authority_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+      "authority_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+      "validator_result": "PASS"
+    },
+    {
+      "animation": "jump_start",
+      "frame_index": 1,
+      "path": "assets/sprites/koliani_golden_set/frames/jump_start/jump_start_001.png",
+      "sha256": "b30448e0485ae2f9f16e0d865862ee8871690a1e16091d7cb3da016bb352d6f9",
+      "canvas": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        104
+      ],
+      "baseline_y": 103,
+      "authority_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+      "authority_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+      "validator_result": "PASS"
+    },
+    {
+      "animation": "jump_start",
+      "frame_index": 2,
+      "path": "assets/sprites/koliani_golden_set/frames/jump_start/jump_start_002.png",
+      "sha256": "84a8ba1853c9b07d274704a236d240059c45617cd9fd0ce5b88d9808d3eba8d0",
+      "canvas": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        104
+      ],
+      "baseline_y": 103,
+      "authority_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+      "authority_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+      "validator_result": "PASS"
+    },
+    {
+      "animation": "jump_start",
+      "frame_index": 3,
+      "path": "assets/sprites/koliani_golden_set/frames/jump_start/jump_start_003.png",
+      "sha256": "19c95bef0289e9dc64b814b348290020ea8e82e2a22a09e72388b1f4d48426f4",
+      "canvas": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        104
+      ],
+      "baseline_y": 103,
+      "authority_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+      "authority_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+      "validator_result": "PASS"
+    },
+    {
+      "animation": "jump_start",
+      "frame_index": 4,
+      "path": "assets/sprites/koliani_golden_set/frames/jump_start/jump_start_004.png",
+      "sha256": "472dce18542ec2da57199cdb84e47dd99c70218697b3342ae2a10ac16e96ee1d",
+      "canvas": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        104
+      ],
+      "baseline_y": 103,
+      "authority_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+      "authority_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+      "validator_result": "PASS"
+    },
+    {
+      "animation": "jump_loop",
+      "frame_index": 1,
+      "path": "assets/sprites/koliani_golden_set/frames/jump_loop/jump_loop_001.png",
+      "sha256": "6fdcdbba05a8768d27be141a0b27d8c89954323b6e8a91a21e7833b4133bd8df",
+      "canvas": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        104
+      ],
+      "baseline_y": 103,
+      "authority_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+      "authority_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+      "validator_result": "PASS"
+    },
+    {
+      "animation": "jump_loop",
+      "frame_index": 2,
+      "path": "assets/sprites/koliani_golden_set/frames/jump_loop/jump_loop_002.png",
+      "sha256": "1932e63defbe5b977d6d9d0cccbbb5835692db6ed857be60e57288d707e76494",
+      "canvas": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        104
+      ],
+      "baseline_y": 103,
+      "authority_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+      "authority_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+      "validator_result": "PASS"
+    },
+    {
+      "animation": "jump_loop",
+      "frame_index": 3,
+      "path": "assets/sprites/koliani_golden_set/frames/jump_loop/jump_loop_003.png",
+      "sha256": "0e4a7a9ebc838a64a19bafe11837785e0adbd80388bd9c8e2a41b7f5c33ff0eb",
+      "canvas": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        104
+      ],
+      "baseline_y": 103,
+      "authority_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+      "authority_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+      "validator_result": "PASS"
+    },
+    {
+      "animation": "fall",
+      "frame_index": 1,
+      "path": "assets/sprites/koliani_golden_set/frames/fall/fall_001.png",
+      "sha256": "8b2cd2ad8d4fb4263507751720e903d6b2ca8396604fa64d3464d1a03e364ff9",
+      "canvas": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        104
+      ],
+      "baseline_y": 103,
+      "authority_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+      "authority_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+      "validator_result": "PASS"
+    },
+    {
+      "animation": "fall",
+      "frame_index": 2,
+      "path": "assets/sprites/koliani_golden_set/frames/fall/fall_002.png",
+      "sha256": "20d6bb86e894119291c119bbe57c6e75efa44a3da04962d6b89bb93ec8f1f447",
+      "canvas": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        104
+      ],
+      "baseline_y": 103,
+      "authority_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+      "authority_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+      "validator_result": "PASS"
+    },
+    {
+      "animation": "fall",
+      "frame_index": 3,
+      "path": "assets/sprites/koliani_golden_set/frames/fall/fall_003.png",
+      "sha256": "da29de69644447c99ad2baf076d969ff42b1cf56b39dd89ae89c41d5ee971dfe",
+      "canvas": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        104
+      ],
+      "baseline_y": 103,
+      "authority_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+      "authority_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+      "validator_result": "PASS"
+    },
+    {
+      "animation": "attack_basic",
+      "frame_index": 1,
+      "path": "assets/sprites/koliani_golden_set/frames/attack_basic/attack_basic_001.png",
+      "sha256": "1c1f97065cc200a87696a0ae3a76e84ffb5a1f9ed8ebe056a3d7ea72a79538da",
+      "canvas": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        104
+      ],
+      "baseline_y": 103,
+      "authority_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+      "authority_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+      "validator_result": "PASS"
+    },
+    {
+      "animation": "attack_basic",
+      "frame_index": 2,
+      "path": "assets/sprites/koliani_golden_set/frames/attack_basic/attack_basic_002.png",
+      "sha256": "596bbcb00d09e74b023efb1e2c1f11e7af0b96f2c6ff5b0f281c275735515d34",
+      "canvas": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        104
+      ],
+      "baseline_y": 103,
+      "authority_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+      "authority_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+      "validator_result": "PASS"
+    },
+    {
+      "animation": "attack_basic",
+      "frame_index": 3,
+      "path": "assets/sprites/koliani_golden_set/frames/attack_basic/attack_basic_003.png",
+      "sha256": "c8a422a57c77c81f0df6e4df5693cc4cc5c81d3f0d9a781d2d088d07597af05c",
+      "canvas": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        104
+      ],
+      "baseline_y": 103,
+      "authority_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+      "authority_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+      "validator_result": "PASS"
+    },
+    {
+      "animation": "attack_basic",
+      "frame_index": 4,
+      "path": "assets/sprites/koliani_golden_set/frames/attack_basic/attack_basic_004.png",
+      "sha256": "48539828ea1183a6d08dfe06959ecca8e78a75b091a8a5e337e4642d160d2d8e",
+      "canvas": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        104
+      ],
+      "baseline_y": 103,
+      "authority_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+      "authority_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+      "validator_result": "PASS"
+    },
+    {
+      "animation": "attack_basic",
+      "frame_index": 5,
+      "path": "assets/sprites/koliani_golden_set/frames/attack_basic/attack_basic_005.png",
+      "sha256": "2b86518faa9eaf48cd8a79e982a1043ee42b669788610f9a4beaacef74d8efe5",
+      "canvas": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        104
+      ],
+      "baseline_y": 103,
+      "authority_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+      "authority_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+      "validator_result": "PASS"
+    },
+    {
+      "animation": "attack_basic",
+      "frame_index": 6,
+      "path": "assets/sprites/koliani_golden_set/frames/attack_basic/attack_basic_006.png",
+      "sha256": "d8b51e042e24d6280a4c0ac52b28793fe8fb4525f37f88e4d1ddbbb190cf8927",
+      "canvas": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        104
+      ],
+      "baseline_y": 103,
+      "authority_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+      "authority_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+      "validator_result": "PASS"
+    },
+    {
+      "animation": "vfx_slash_basic",
+      "frame_index": 1,
+      "path": "assets/sprites/koliani_golden_set/vfx/vfx_slash_basic/vfx_slash_basic_001.png",
+      "sha256": "9888ef56e079dd74f4c9699d04125464703cfc83ecf58e813e2d8e29939286b9",
+      "canvas": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        104
+      ],
+      "baseline_y": 103,
+      "authority_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+      "authority_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+      "validator_result": "PASS"
+    },
+    {
+      "animation": "vfx_slash_basic",
+      "frame_index": 2,
+      "path": "assets/sprites/koliani_golden_set/vfx/vfx_slash_basic/vfx_slash_basic_002.png",
+      "sha256": "b52cf1da5a62db99b4dcf96d4caffd43d70aed81327a9c521a751588608ec8a9",
+      "canvas": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        104
+      ],
+      "baseline_y": 103,
+      "authority_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+      "authority_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+      "validator_result": "PASS"
+    },
+    {
+      "animation": "vfx_slash_basic",
+      "frame_index": 3,
+      "path": "assets/sprites/koliani_golden_set/vfx/vfx_slash_basic/vfx_slash_basic_003.png",
+      "sha256": "35a4914219280d403e17d7b8718680dc22eb78dc8c035487790d7c721aa3d19c",
+      "canvas": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        104
+      ],
+      "baseline_y": 103,
+      "authority_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+      "authority_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+      "validator_result": "PASS"
+    },
+    {
+      "animation": "vfx_slash_basic",
+      "frame_index": 4,
+      "path": "assets/sprites/koliani_golden_set/vfx/vfx_slash_basic/vfx_slash_basic_004.png",
+      "sha256": "295a37027207330b4f64627764b69bdccb55b46bc85e63286ff4b3e99cf2f2a7",
+      "canvas": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        104
+      ],
+      "baseline_y": 103,
+      "authority_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+      "authority_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+      "validator_result": "PASS"
+    },
+    {
+      "animation": "vfx_slash_basic",
+      "frame_index": 5,
+      "path": "assets/sprites/koliani_golden_set/vfx/vfx_slash_basic/vfx_slash_basic_005.png",
+      "sha256": "ef2f4d6fee2e319ae500992956cde9da77fbe78f0ff6786a97a7c64079aa9f1b",
+      "canvas": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        104
+      ],
+      "baseline_y": 103,
+      "authority_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+      "authority_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+      "validator_result": "PASS"
+    },
+    {
+      "animation": "vfx_slash_basic",
+      "frame_index": 6,
+      "path": "assets/sprites/koliani_golden_set/vfx/vfx_slash_basic/vfx_slash_basic_006.png",
+      "sha256": "63aa144a9bb49b6c811173ce30f6b881467f85277e88bc32772173e671ecf432",
+      "canvas": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        104
+      ],
+      "baseline_y": 103,
+      "authority_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+      "authority_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+      "validator_result": "PASS"
+    }
+  ]
+}

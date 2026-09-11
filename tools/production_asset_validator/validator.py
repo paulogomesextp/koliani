@@ -53,27 +53,43 @@ def _componentes(mask: list[bool], largura: int, altura: int) -> list[dict[str, 
     return sorted(saida, key=lambda c: (-c["pixels"], c["top"], c["left"]))
 
 
+## Mínimo de píxeis visíveis para a heurística ter significado.
+_CHECKER_MIN_VISIVEIS = 64
+
+
 def _checkerboard(imagem: Image.Image) -> tuple[bool, float]:
-    """Deteta padrão alternado repetido; é indício, nunca prova artística."""
-    rgb = imagem.convert("RGB")
-    w, h = rgb.size
+    """Deteta padrão alternado repetido; é indício, nunca prova artística.
+
+    Só píxeis VISÍVEIS (alpha > 0) contam: o RGB de um píxel com alpha 0 não se
+    vê, e um exterior transparente uniforme (ou com lixo RGB) não é xadrez
+    incorporado (falso positivo provado na Execution 9B.2). Xadrez opaco ou
+    semi-opaco continua a ser apanhado.
+    """
+    rgba = imagem.convert("RGBA")
+    w, h = rgba.size
     if w < 16 or h < 16:
+        return False, 0.0
+    px = _pixels(rgba)
+    visiveis = [p for p in px if p[3] > 0]
+    if len(visiveis) < _CHECKER_MIN_VISIVEIS:
         return False, 0.0
     amostras = []
     for bloco in (4, 8, 16):
         acertos = total = 0
-        for y in range(h):
-            for x in range(w):
-                if x + bloco >= w or y + bloco >= h:
+        for y in range(h - bloco):
+            for x in range(w - bloco):
+                p = px[y * w + x]
+                if p[3] == 0:
                     continue
-                p = rgb.getpixel((x, y))
-                total += 2
-                acertos += p == rgb.getpixel((x + bloco, y))
-                acertos += p == rgb.getpixel((x, y + bloco))
+                for q in (px[y * w + x + bloco], px[(y + bloco) * w + x]):
+                    if q[3] == 0:
+                        continue
+                    total += 1
+                    acertos += p == q
         amostras.append(acertos / total if total else 0.0)
     score = max(amostras)
-    cores = Counter(_pixels(rgb)).most_common(4)
-    cobertura = sum(n for _, n in cores[:2]) / (w * h)
+    cores = Counter(visiveis).most_common(4)
+    cobertura = sum(n for _, n in cores[:2]) / len(visiveis)
     return score > 0.88 and cobertura > 0.55 and len(cores) >= 2, round(score * cobertura, 6)
 
 
@@ -193,8 +209,26 @@ def _consistencia(frames: list[dict[str, Any]], contrato: dict[str, Any]) -> dic
         achados.append(_achado("INCONSISTENT_VERTICAL_PLACEMENT", "FAIL", "Baseline varia excessivamente entre frames."))
     areas = [f["occupied_area"] for f in validos]
     area_ratio = max(areas)/min(areas) if areas and min(areas) else None
+    contagens = [f["occupied_pixel_count"] for f in validos]
+    pixel_ratio = max(contagens)/min(contagens) if contagens and min(contagens) else None
     if area_ratio and area_ratio > float(contrato.get("max_scale_ratio", 1.6)):
-        achados.append(_achado("GROSS_SCALE_VARIATION", "FAIL", f"Variação de área delimitadora {area_ratio:.3f}×."))
+        # A área da CAIXA muda com a pose (corrida esticada, agachado, encolhido
+        # no ar, ataque). Só é escala errada se a normalização não for provada
+        # uniforme OU se a própria silhueta (nº de píxeis visíveis) mudar mais do
+        # que a pose explica: um redimensionamento linear k muda-a em k².
+        uniforme = (contrato.get("normalization_scale") is not None
+                    and len(dimensoes) <= 1
+                    and max_baseline_drift <= int(contrato.get("baseline_tolerance", 0))*2
+                    and all(f["baseline"]["pass"] for f in validos))
+        limite_px = float(contrato.get("max_pixel_count_ratio", 1.45))
+        vfx = contrato.get("asset_type") == "VFX"
+        if uniforme and (vfx or (pixel_ratio is not None and pixel_ratio <= limite_px)):
+            achados.append(_achado("POSE_AREA_VARIATION", "MANUAL_REVIEW_REQUIRED",
+                                   f"Área delimitadora varia {area_ratio:.3f}× com escala de normalização uniforme "
+                                   f"({contrato.get('normalization_scale')}); silhueta varia {pixel_ratio:.3f}×."))
+        else:
+            detalhe = f"; silhueta varia {pixel_ratio:.3f}× (limite {limite_px})" if uniforme and pixel_ratio else ""
+            achados.append(_achado("GROSS_SCALE_VARIATION", "FAIL", f"Variação de área delimitadora {area_ratio:.3f}×{detalhe}."))
     centers = [((f["opaque_bounds"][0]+f["opaque_bounds"][2])/2, (f["opaque_bounds"][1]+f["opaque_bounds"][3])/2) for f in validos]
     drift = max((math.dist(a,b) for a in centers for b in centers), default=0.0)
     limite = float(contrato.get("max_bbox_drift", max(4, (contrato.get("canvas_width") or 32)*.25)))
@@ -202,6 +236,8 @@ def _consistencia(frames: list[dict[str, Any]], contrato: dict[str, Any]) -> dic
     return {"canvas_consistent": len(dimensoes)<=1, "mode_consistent": len(modos)<=1,
             "baseline_values": baselines, "max_baseline_drift": max_baseline_drift,
             "occupied_area_ratio": round(area_ratio, 6) if area_ratio else None,
+            "occupied_pixel_ratio": round(pixel_ratio, 6) if pixel_ratio else None,
+            "normalization_scale": contrato.get("normalization_scale"),
             "bbox_center_max_drift": round(drift, 6), "findings": achados}
 
 

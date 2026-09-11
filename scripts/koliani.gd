@@ -425,6 +425,12 @@ const RIG := "shadowblade"
 ## Mantém o prototype 5B como fallback para combate e estados sem arte 5G.
 @export var usar_piloto_visual_5g := false
 
+## Execution 9B.3: Golden Set aprovado pelo Game Master como fonte visual ativa
+## de idle/run/jump_start/jump_loop/fall/ataque básico (+ VFX do golpe à parte).
+## Substitui a 5G e o corpo premium_v1 nesses estados; o premium_v1 fica só
+## como fallback dos estados ainda sem arte de produção (ver `_montar_golden_set`).
+@export var usar_golden_set := false
+
 ## Rigs desenhados frame a frame (tudo menos o "codigo", que é um boneco
 ## vectorial montado por código). Neles a animação PROCEDURAL de `_animar`
 ## -- o balanço da corrida, a inclinação, o "respirar" parado, o esticão do
@@ -574,6 +580,30 @@ const PILOTO_5G_DIR := "koliani_visual_pilot_5g"
 const PILOTO_5G_ESCALA := 0.82
 const PILOTO_5G_OFFSET_Y := -15.170732
 
+## Golden Set (contrato 9B.1): células 128x128, pés em y=104, desenhado a 1:1.
+## (104 - 64 + offset) * escala = 22 no mundo, igual aos (90-48-15,17)*0,82 da 5G.
+const GOLDEN_DIR := "res://assets/sprites/koliani_golden_set"
+const GOLDEN_ESCALA := 1.0
+const GOLDEN_OFFSET_Y := -18.0
+## [pasta, n_frames, fps, loop]. Os ciclos seguem os da 5G (run 0,75 s, ar
+## 0,5 s); o golpe dura exatamente `DUR_COMBO[0]` (6 frames / 0,18 s).
+const _KOLI_ANIMS_GOLDEN := {
+	"idle":       ["frames/idle", 7, 8.0, true],
+	"run":        ["frames/run", 10, 13.333333, true],
+	"jump_start": ["frames/jump_start", 4, 12.0, false],
+	"jump_loop":  ["frames/jump_loop", 3, 6.0, true],
+	"fall":       ["frames/fall", 3, 6.0, true],
+	"attack":     ["frames/attack_basic", 6, 33.333333, false],
+}
+## Golpes seguintes do combo: os MESMOS 6 frames aprovados, à velocidade que faz
+## a animação durar o tempo lógico de cada golpe (0,20 / 0,30 / 0,19 s). Não há
+## arte própria de combo -- mas também não se volta ao corpo premium_v1.
+const _GOLDEN_COMBO_FPS := {"attack2": 30.0, "attack3": 20.0, "attack4": 31.578947}
+const GOLDEN_VFX_FRAMES := 6
+## Onde nasce o arco do golpe, relativo à origem da Koliani (virada à direita):
+## à frente e à altura do peito. Só visual -- a hitbox não depende disto.
+const GOLDEN_VFX_OFFSET := Vector2(16.0, -30.0)
+
 ## Rig "nova" -- a arte do Paulo. Frames de 72x72 com os pés em y=68
 ## (`tools/importar_rig_koliani_nova.py`). O `idle` tem 10 frames e o `run`
 ## 12 (a passada original tinha 24, ficou de dois em dois).
@@ -667,14 +697,22 @@ func _montar_frames() -> void:
 		# ao sprite (o clarão do GOLPE continua a disparar nos acertos)
 		if _luz_lamina:
 			_luz_lamina.enabled = false
-	if usar_piloto_visual_5g:
+	if usar_piloto_visual_5g and not usar_golden_set:
 		_corpo.scale = Vector2(PILOTO_5G_ESCALA, PILOTO_5G_ESCALA)
 		_corpo.offset = Vector2(0.0, PILOTO_5G_OFFSET_Y)
 	var sf := SpriteFrames.new()
 	sf.remove_animation("default")
 	for nome: String in anims:
 		_adicionar_animacao_de_tira(sf, nome, anims[nome], dir_tiras)
-	if usar_piloto_visual_5g:
+	if usar_golden_set:
+		_montar_golden_set(sf)
+		# A luz magenta da lâmina servia a lâmina acesa do premium_v1; sobre o
+		# Golden Set pintava as pontas do cabelo e a pele de rosa-choque, e a
+		# autoridade aprovada tem a Shadowblade inativa, sem brilho (9B.1 §F).
+		# O glow curto do golpe (`_luz_golpe`) continua.
+		if _luz_lamina:
+			_luz_lamina.enabled = false
+	elif usar_piloto_visual_5g:
 		for nome: String in _KOLI_ANIMS_PILOTO_5G:
 			_adicionar_animacao_de_tira(sf, nome, _KOLI_ANIMS_PILOTO_5G[nome], PILOTO_5G_DIR)
 		_montar_fallbacks_piloto_5g(sf)
@@ -686,8 +724,118 @@ func _montar_frames() -> void:
 		for i in sf.get_frame_count("attack"):
 			sf.add_frame("lancar", sf.get_frame_texture("attack", i))
 	_corpo.sprite_frames = sf
+	if usar_golden_set:
+		_corpo.animation_changed.connect(_aplicar_contrato_visual)
 	_corpo.play("idle")
+	_aplicar_contrato_visual()
 	_montar_material_equipamento()
+
+
+## Nomes servidos pelo Golden Set (inclui os derivados só de frames golden).
+var _golden_anims := {}
+var _slash_vfx: AnimatedSprite2D
+
+
+## Monta o Golden Set por cima do premium_v1. Tudo o que o Golden Set cobre
+## sai SÓ de frames golden; o premium_v1 continua como fallback explícito para
+## o que ainda não tem arte de produção: dash, roll, hurt, morte, crouch,
+## wallslide, borda, djump, defesa.
+func _montar_golden_set(sf: SpriteFrames) -> void:
+	_golden_anims.clear()
+	for nome: String in _KOLI_ANIMS_GOLDEN:
+		var c: Array = _KOLI_ANIMS_GOLDEN[nome]
+		var base: String = String(c[0]).get_file()
+		var quadros: Array = []
+		for i in int(c[1]):
+			quadros.append("%s/%s/%s_%03d.png" % [GOLDEN_DIR, c[0], base, i + 1])
+		_animacao_golden(sf, nome, quadros, c[2], c[3])
+	var ataque: Array = _frames_de(sf, "attack", range(6))
+	for nome: String in _GOLDEN_COMBO_FPS:
+		_animacao_golden(sf, nome, ataque, _GOLDEN_COMBO_FPS[nome], false)
+	# Estados de locomoção da 5G, agora montados com poses golden existentes.
+	_animacao_golden(sf, "turn", _frames_de(sf, "run", [0, 1, 2, 3]), 12.0, false)
+	_animacao_golden(sf, "run_start", _frames_de(sf, "run", [0, 1, 2, 3, 4, 5]), 12.0, false)
+	_animacao_golden(sf, "run_brake", _frames_de(sf, "run", [7, 8, 9]) + _frames_de(sf, "idle", [0]), 14.0, false)
+	var aterrar: Array = _frames_de(sf, "fall", [2]) + _frames_de(sf, "idle", [0])
+	for nome in ["land", "aterrar"]:
+		_animacao_golden(sf, nome, aterrar, 12.0, false)
+	_montar_vfx_golpe()
+
+
+## Cria (ou substitui) uma animação a partir de caminhos res:// ou texturas já
+## carregadas, e marca-a como golden para o contrato de escala.
+func _animacao_golden(sf: SpriteFrames, nome: String, quadros: Array, fps: float, loop: bool) -> void:
+	if sf.has_animation(nome):
+		sf.remove_animation(nome)
+	sf.add_animation(nome)
+	sf.set_animation_speed(nome, fps)
+	sf.set_animation_loop(nome, loop)
+	for q in quadros:
+		var tex: Texture2D = load(q) if q is String else q
+		if tex:
+			sf.add_frame(nome, tex)
+	_golden_anims[nome] = true
+
+
+func _frames_de(sf: SpriteFrames, nome: String, indices: Array) -> Array:
+	var saida: Array = []
+	for i in indices:
+		if i < sf.get_frame_count(nome):
+			saida.append(sf.get_frame_texture(nome, i))
+	return saida
+
+
+## As células golden (128x128, escala 1,0) e as premium_v1 (160x96, escala
+## 0,75) põem os pés no mesmo sítio do mundo, mas precisam de escala/offset
+## próprios -- troca-se ao mudar de animação. `_animar` deforma o `_sprite`
+## (o pai), por isso isto não colide com o squash/rotação.
+func _aplicar_contrato_visual() -> void:
+	if not usar_golden_set or _corpo == null:
+		return
+	if _golden_anims.has(String(_corpo.animation)):
+		_corpo.scale = Vector2(GOLDEN_ESCALA, GOLDEN_ESCALA)
+		_corpo.offset = Vector2(0.0, GOLDEN_OFFSET_Y)
+	else:
+		_corpo.scale = Vector2(PREMIUM_ESCALA, PREMIUM_ESCALA)
+		_corpo.offset = Vector2(0.0, PREMIUM_OFFSET_Y)
+
+
+## O arco do golpe é uma camada à parte (contrato 9B.1 §F): nunca dentro do
+## frame do corpo. É filho da própria Koliani (que não é espelhada) e vira-se à
+## mão com `_olha_para`.
+func _montar_vfx_golpe() -> void:
+	if _slash_vfx != null:
+		return
+	var sf := SpriteFrames.new()
+	sf.remove_animation("default")
+	sf.add_animation("slash")
+	sf.set_animation_loop("slash", false)
+	for i in GOLDEN_VFX_FRAMES:
+		var tex: Texture2D = load("%s/vfx/vfx_slash_basic/vfx_slash_basic_%03d.png" % [GOLDEN_DIR, i + 1])
+		if tex:
+			sf.add_frame("slash", tex)
+	_slash_vfx = AnimatedSprite2D.new()
+	_slash_vfx.name = "SlashVFX"
+	_slash_vfx.sprite_frames = sf
+	_slash_vfx.offset = Vector2(0.0, GOLDEN_OFFSET_Y)
+	_slash_vfx.z_index = 1
+	_slash_vfx.visible = false
+	_slash_vfx.animation_finished.connect(func() -> void: _slash_vfx.visible = false)
+	add_child(_slash_vfx)
+
+
+func _disparar_vfx_golpe() -> void:
+	if _slash_vfx == null:
+		return
+	# 6 frames na duração lógica do golpe -- o VFX acaba com a animação do corpo.
+	_slash_vfx.sprite_frames.set_animation_speed("slash", GOLDEN_VFX_FRAMES / maxf(_ataque_dur, 0.05))
+	# acompanha o espelho do corpo, incluindo a gravidade invertida (`_sinal_grav`)
+	_slash_vfx.scale = Vector2(_olha_para, _sinal_grav)
+	_slash_vfx.position = Vector2(GOLDEN_VFX_OFFSET.x * _olha_para,
+		(GOLDEN_VFX_OFFSET.y - GOLDEN_OFFSET_Y) * _sinal_grav)
+	_slash_vfx.visible = true
+	_slash_vfx.play("slash")
+	_slash_vfx.set_frame_and_progress(0, 0.0)
 
 
 func _adicionar_animacao_de_tira(sf: SpriteFrames, nome: String, cfg: Array,
@@ -1270,7 +1418,7 @@ func _atualizar_anim() -> void:
 		a = "lancar"
 	elif _agachado:
 		a = "crouch"
-	elif usar_piloto_visual_5g:
+	elif usar_piloto_visual_5g or usar_golden_set:
 		a = _anim_locomocao_piloto_5g(sf)
 	elif not is_on_floor():
 		if _djump_t > 0.0:
@@ -1601,6 +1749,7 @@ func _iniciar_ataque() -> void:
 	else:
 		Som.toca("ataque", -6.0, randf_range(0.95, 1.06))
 	_flash_golpe()
+	_disparar_vfx_golpe()
 	# NB: o balanco do remate ja' nao abana nem para o tempo -- o peso do
 	# combo esta' todo na LIGACAO (ver `TREMOR_REMATE`/`HITSTOP_REMATE`).
 	if _hitbox:
@@ -1633,6 +1782,8 @@ func _cancelar_ataque(reiniciar_combo := false) -> void:
 	_combo_pedido = false
 	_ataque_no_ar = false
 	_desativar_hitbox_ataque()
+	if _slash_vfx:
+		_slash_vfx.visible = false
 	if reiniciar_combo:
 		_combo_janela = 0.0
 		_combo_passo = 0

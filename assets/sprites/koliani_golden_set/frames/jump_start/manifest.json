@@ -22,12 +22,23 @@
       "sha256": "afbd74469444ad01883ea8069ec64b818e47612da481becfe32581f883a324b3"
     }
   ],
-  "visual_review_state": "NOT_PRODUCED",
-  "runtime_integration_state": "NOT_INTEGRATED",
+  "visual_review_state": "GAME_MASTER_APPROVED",
+  "runtime_integration_state": "INTEGRATED_9B3",
   "frames": [
     "jump_start_001.png",
     "jump_start_002.png",
     "jump_start_003.png",
     "jump_start_004.png"
-  ]
+  ],
+  "normalization_scale": 0.3975,
+  "max_pixel_count_ratio": 1.45,
+  "source_image": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+  "source_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+  "godot": {
+    "scale": 1.0,
+    "offset": [
+      0,
+      -18
+    ]
+  }
 }

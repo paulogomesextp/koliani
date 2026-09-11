@@ -195,12 +195,88 @@ func _tirar_foto(caminho: String, estado := "") -> void:
 			koliani.global_position = boss.global_position + Vector2(-210.0, -42.0)
 			koliani.set("velocity", Vector2.ZERO)
 			await get_tree().create_timer(0.45).timeout
+	elif estado == "golden" and koliani:
+		await _prova_golden_set(caminho, koliani)
+		get_tree().quit(0)
+		return
 	else:
 		await get_tree().create_timer(0.25).timeout
 	var img := get_viewport().get_texture().get_image()
 	img.save_png(caminho)
 	print("FOTO guardada: ", ProjectSettings.globalize_path(caminho))
 	get_tree().quit(0)
+
+
+## Execution 9B.3: prova do Golden Set no runtime real (export incluído). Conduz
+## a Koliani pelos estados cobertos com o input normal e fotografa cada um; ao
+## lado grava um JSON com a animação e o recurso do frame que estava MESMO a ser
+## desenhado -- é isso que prova que o jogo usa o Golden Set, não o PNG.
+func _prova_golden_set(caminho: String, koliani: Node2D) -> void:
+	var base := caminho.get_basename()
+	var registo: Array = []
+	# rede de segurança: a prova nunca pendura o processo
+	get_tree().create_timer(25.0, true, false, true).timeout.connect(func() -> void: get_tree().quit(3))
+	var corpo_k := koliani as CharacterBody2D
+	for _i in 120:  # nasce no ar: espera pelo chão antes de fotografar o idle
+		await get_tree().physics_frame
+		if corpo_k.is_on_floor():
+			break
+	await get_tree().create_timer(0.5).timeout
+	await _foto_golden(base, "1_idle", koliani, registo)
+	# ataque no chão de partida (antes de andar, para não depender do nível)
+	Input.action_press("atacar")
+	await get_tree().create_timer(0.05).timeout
+	Input.action_release("atacar")
+	await _foto_golden(base, "2_attack", koliani, registo)
+	await get_tree().create_timer(0.05).timeout
+	await _foto_golden(base, "3_attack_late", koliani, registo)
+	await get_tree().create_timer(0.5).timeout
+	Input.action_press("mover_direita")
+	await get_tree().create_timer(0.3).timeout
+	await _foto_golden(base, "4_run", koliani, registo)
+	Input.action_release("mover_direita")
+	await get_tree().create_timer(0.5).timeout
+	# salto na vertical, no mesmo chão
+	Input.action_press("saltar")
+	await get_tree().create_timer(0.05).timeout
+	await _foto_golden(base, "5_jump_start", koliani, registo)
+	# jump_loop só aparece entre o fim do jump_start (4/12 s) e o início da
+	# descida: espera que esteja MESMO a ser desenhado (máx. 1 s).
+	var corpo_anim := koliani.get("_corpo") as AnimatedSprite2D
+	for _i in 60:
+		await get_tree().process_frame
+		if corpo_anim and corpo_anim.animation == &"jump_loop":
+			break
+	await _foto_golden(base, "6_air", koliani, registo)
+	Input.action_release("saltar")
+	for _i in 120:  # espera pela descida (máx. 2 s)
+		await get_tree().physics_frame
+		if float(koliani.get("velocity").y) * float(koliani.get("_sinal_grav")) > 60.0:
+			break
+	await _foto_golden(base, "7_fall", koliani, registo)
+	print("PROVA GOLDEN SET: ", ProjectSettings.globalize_path(base + "_registo.json"))
+
+
+func _foto_golden(base: String, etiqueta: String, koliani: Node2D, registo: Array) -> void:
+	await RenderingServer.frame_post_draw
+	var corpo := koliani.get("_corpo") as AnimatedSprite2D
+	var vfx := koliani.get("_slash_vfx") as AnimatedSprite2D
+	var anim := String(corpo.animation) if corpo else ""
+	var tex: Texture2D = corpo.sprite_frames.get_frame_texture(anim, corpo.frame) if corpo and corpo.sprite_frames else null
+	var caminho := "%s_%s.png" % [base, etiqueta]
+	get_viewport().get_texture().get_image().save_png(caminho)
+	var ecra := koliani.get_global_transform_with_canvas().origin
+	registo.append({"etiqueta": etiqueta, "animacao": anim, "frame": corpo.frame if corpo else -1,
+		"textura": tex.resource_path if tex else "", "escala": [corpo.scale.x, corpo.scale.y] if corpo else [],
+		"offset": [corpo.offset.x, corpo.offset.y] if corpo else [],
+		"vfx_visivel": vfx != null and vfx.visible,
+		"vfx_frame": vfx.frame if vfx else -1,
+		"no_chao": (koliani as CharacterBody2D).is_on_floor(),
+		"ecra": [ecra.x, ecra.y], "foto": caminho})
+	# grava a cada foto: se algo interromper a prova, o que já se provou fica
+	var f := FileAccess.open(base + "_registo.json", FileAccess.WRITE)
+	if f:
+		f.store_string(JSON.stringify(registo, "  "))
 
 
 func _ao_fim_da_campanha() -> void:
