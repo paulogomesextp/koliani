@@ -95,8 +95,10 @@ flex-direction:column;gap:5vmin;padding:8vmin}
   var vivos = [];
   var ios = /iPad|iPhone|iPod/.test(navigator.userAgent)
     || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  var diagnostico = location.search.indexOf('audio-debug=1') >= 0;
   var canalIOS = null;
   var canalIOSAtivo = !ios;
+  var erroCanalIOS = '';
   if (AC){
     var Espia = new Proxy(AC, {construct: function(alvo, args){
       var c = new alvo(args[0]);
@@ -137,12 +139,16 @@ flex-direction:column;gap:5vmin;padding:8vmin}
       }
       var tocando = canalIOS.play();
       if (tocando && tocando.then){
-        tocando.then(function(){ canalIOSAtivo = true; pintar(); }, function(){
+        tocando.then(function(){ canalIOSAtivo = true; erroCanalIOS = ''; pintar(); }, function(e){
           canalIOSAtivo = false;
+          erroCanalIOS = e && e.name ? e.name : 'play rejeitado';
           pintar();
         });
       }
-    }catch(e){ canalIOSAtivo = false; }
+    }catch(e){
+      canalIOSAtivo = false;
+      erroCanalIOS = e && e.name ? e.name : 'erro';
+    }
   };
 
   var soar = function(c){
@@ -190,6 +196,29 @@ flex-direction:column;gap:5vmin;padding:8vmin}
      esta mudo. Ser um elemento do DOM (e nao o canvas) importa: o toque
      nele e o gesto mais limpo que ha para o WebKit aceitar. */
   var pilula = null;
+  var estados = function(){
+    if (!vivos.length) return 'sem contexto';
+    var lista = [];
+    for (var i = 0; i < vivos.length; i++) lista.push(vivos[i].state || 'desconhecido');
+    return lista.join(',');
+  };
+  var testarSom = function(){
+    if (!diagnostico) return;
+    for (var i = 0; i < vivos.length; i++){
+      var c = vivos[i];
+      if (c.state !== 'running') continue;
+      try{
+        var o = c.createOscillator();
+        var g = c.createGain();
+        o.frequency.value = 660;
+        g.gain.value = 0.08;
+        o.connect(g);
+        g.connect(c.destination);
+        o.start(0);
+        o.stop(c.currentTime + 0.18);
+      }catch(e){}
+    }
+  };
   var mudo = function(){
     if (!vivos.length) return false;
     if (!canalIOSAtivo) return true;
@@ -200,7 +229,15 @@ flex-direction:column;gap:5vmin;padding:8vmin}
   };
   var pintar = function(){
     if (!pilula) return;
-    pilula.style.display = mudo() ? 'flex' : 'none';
+    if (diagnostico){
+      pilula.textContent = 'TESTE SOM — tocar para apitar | Web: ' + estados()
+        + ' | canal iPhone: ' + (canalIOSAtivo ? 'activo' : 'bloqueado')
+        + (erroCanalIOS ? ' (' + erroCanalIOS + ')' : '');
+      pilula.style.display = 'flex';
+    }else{
+      pilula.textContent = 'Sound is off - tap here';
+      pilula.style.display = mudo() ? 'flex' : 'none';
+    }
   };
   var montar = function(){
     if (pilula || !document.body) return;
@@ -214,7 +251,7 @@ flex-direction:column;gap:5vmin;padding:8vmin}
       + 'system-ui,sans-serif;cursor:pointer;-webkit-appearance:none');
     pilula.addEventListener('touchstart', acordar, {capture:true});
     pilula.addEventListener('pointerdown', acordar, {capture:true});
-    pilula.addEventListener('click', acordar, {capture:true});
+    pilula.addEventListener('click', function(){ acordar(); testarSom(); }, {capture:true});
     document.body.appendChild(pilula);
     setInterval(pintar, 700);
   };

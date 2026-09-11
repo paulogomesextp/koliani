@@ -53,8 +53,11 @@ O bootstrap Web retoma agora o `AudioContext` no início e no fim do gesto
 zero, cobre WebKit que não reconheça silêncio otimizado como reprodução. Para
 iPhone/Safari, o mesmo gesto arranca ainda um HTML Audio silencioso em loop,
 forçando o canal multimédia que o Web Audio isolado nem sempre abre. Suite Godot
-verde e export Web local concluído. Falta confirmar som num telemóvel real após
-a publicação: **DEVICE VALIDATION REQUIRED**.
+verde e export Web local concluído. O parâmetro `?audio-debug=1` mantém um botão
+de diagnóstico visível com os estados Web/iPhone; ao tocar, produz um apito de
+660 Hz diretamente no contexto para separar bloqueio do browser de falha interna
+do Godot. Falta confirmar som num telemóvel real após a publicação: **DEVICE
+VALIDATION REQUIRED**.
 
 ## Publicação contínua Web/PWA
 
