@@ -2,6 +2,20 @@
 
 ## Agora
 
+0000000000. **9F PASS (v0.16.0) — UI da Região I em produção + som do Web/PWA
+   corrigido na raiz.** O Web estava mudo porque os buses Music/SFX eram
+   criados em runtime e o espelho JS do Godot (modo Sample) ligava o Master num
+   ciclo sem saída para o altifalante; agora vêm do `default_bus_layout.tres`.
+   Provado no Chrome real: contexto `suspended` → `running` ao 1.º clique,
+   música do menu, música de jogo, SFX de UI e de jogo com pico medido. UI:
+   kit da prancha 09 (botões, painéis, barras com gema, diálogo, toasts) e
+   seletor 20 regiões × 5. **Seguinte: 9G — VFX** (não iniciada). Nada pendente
+   de decisão do Game Master. **Backlog:** (1) fonte CJK livre para o chinês
+   no Web (hoje tofu, anterior à 9F); (2) o `✦` do "Santuário" no i18n sai em
+   tofu no Web; (3) `ico_caveira.png` (16 px) ainda é do kit antigo; (4)
+   excluir `assets/**/manifest*.json` dos exports. Relatório:
+   `docs/execution_9f_ui_pwa_audio.md`.
+
 000000000. **9E.2 PASS (v0.15.20) — Região I fechada: inimigos E Coração em
    produção.** O Coração Putrefacto usa a autoridade dedicada (fase 1 contida,
    fase 2 intensificada, erupção na transição); os 11 inimigos/guardiões/crias e

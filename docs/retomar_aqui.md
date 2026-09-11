@@ -4,6 +4,43 @@
 
 Atualizado em 11 de setembro de 2026.
 
+## Execution 9F — UI da Região I + áudio do Web/PWA — **PASS**
+
+**REGION I UI GATE CLOSED. WEB/PWA AUDIO GATE CLOSED. Pronto para 9G (VFX):
+SIM** (não iniciada). v0.16.0, commits `72bdc2a` (áudio) + `00399d0` (UI).
+Relatório: [execution_9f_ui_pwa_audio.md](execution_9f_ui_pwa_audio.md).
+
+- **Causa-raiz do Web mudo (provada no grafo Web Audio):** os buses Music/SFX
+  eram criados em runtime (`Opcoes._criar_buses`). No Web o Godot 4.7.2 toca em
+  modo Sample e o `GodotAudio.Bus.move()` do motor faz `splice(toIndex-1)`: o
+  bus novo ia para a posição 0 e o Master antigo ficava ligado a ele — ciclo
+  Master→SFX→Music→Master, nada chegava ao destino. Contexto `running`, pico 0.
+  **Não era autoplay** (as 4 correcções de gesto anteriores não podiam
+  resolver). Correcção: `default_bus_layout.tres`. Teste
+  `teste_9f_buses_de_audio_estaticos` (morde).
+- **Prova no Chrome real** (`?audio-debug=1` + `kolianiAudioDiag()`):
+  `suspended` antes do gesto → `running` ao 1.º clique; música do menu 0,08–0,25;
+  música de jogo L1 ≈0,09–0,11 contínua; com a Música a 0, SFX de UI (0,30) e de
+  jogo (0,28–0,33) isolados. PCK no browser = export (`52349f3a…`), cache
+  `1789150815|5733576`.
+- **UI:** `tools/produzir_ui_9f.py` → `assets/ui/producao_9f/` (19 peças da
+  prancha 09, SHA `264d6def…`; A recorte / B inpaint do texto + máscara / C
+  barras). `scripts/ui_producao.gd` (tema). Menu, pausa, opções, diálogo, HUD
+  (vida, energia, chefe, vidas, essência, cabeçalho "1-5"), toasts, checkpoint.
+  **Seletor 20 × 5:** pastilhas I–XX, "I · REGIÃO · n/5", 1-1..1-5, só a região
+  no carrossel, ↑/↓ muda de região; desbloqueio intacto (testado).
+- **Prova no EXE:** `Koliani.exe -- --nivel=5 --foto-estado=ui9f --foto=…`
+  (HUD, toasts, chefe, diálogo, pausa + JSON das texturas). Única legada:
+  `ico_caveira.png`.
+- **Armadilhas:** o pane do browser interno permite autoplay (o gesto só se
+  prova num Chrome real); `AudioBufferSourceNode.prototype.start` é próprio (o
+  hook no pai não apanha nada); rAF pára com o pane escondido; teclas de teste
+  só chegam com o canvas focado (clicar primeiro); Espaço também confirma no
+  seletor; logo a seguir a retomar da pausa a música recria a fonte (uma
+  leitura a 0 nesse instante não é silêncio); a fonte Web não tem emoji nem CJK.
+- **Backlog:** fonte CJK livre (chinês em tofu no Web, anterior); `✦` do
+  Santuário no i18n; `ico_caveira`; manifestos fora dos exports.
+
 ## Execution 9E.2 — Coração Putrefacto fechado + prova no EXE — **PASS**
 
 **ENEMY GATE CLOSED. BOSS GATE CLOSED. Pronto para 9F: SIM** (não iniciada).
