@@ -34,6 +34,9 @@ var _chama: CPUParticles2D
 var _brasas: CPUParticles2D
 var _nucleo: Polygon2D
 var _luz: PointLight2D
+## 9G: brilho de "pronta a usar" enquanto a fogueira está apagada.
+var _pronta9g: AnimatedSprite2D
+const Vfx9G := preload("res://scripts/vfx_regiao1.gd")
 
 
 func _ready() -> void:
@@ -211,6 +214,16 @@ func _montar_visual() -> void:
 	_nucleo.visible = false
 	_base.add_child(_nucleo)
 
+	# 9G: fogueira por acender -- um brilho fraco, em ciclo, a marcar que está
+	# pronta. Desaparece assim que acende.
+	if Vfx9G.ativo(self):
+		_pronta9g = Vfx9G.novo("pickup", true)
+		if _pronta9g:
+			_pronta9g.modulate.a = 0.38
+			_pronta9g.position = Vector2(0.0, -14.0)
+			_base.add_child(_pronta9g)
+			_pronta9g.play("ciclo")
+
 	_luz = PointLight2D.new()
 	_luz.texture = _tex_luz()
 	_luz.color = COR_LUZ
@@ -305,6 +318,15 @@ func _ao_entrar(corpo: Node) -> void:
 
 func _ativar(instantaneo: bool) -> void:
 	_ativo = true
+	# 9G: o mesmo brilho de "interagir" da prancha 07 -- apagado, a fogueira
+	# pisca baixinho a dizer que dá para usar; ao acender, dá um estalo. Nada
+	# disto mexe no checkpoint em si (já foi registado no EstadoJogo).
+	if _pronta9g:
+		_pronta9g.queue_free()
+		_pronta9g = null
+	if not instantaneo and Vfx9G.ativo(self):
+		Vfx9G.tocar(self, "pickup", global_position + Vector2(0.0, _base.position.y - 16.0 if _base else -16.0),
+			1.4, 0.0, false, false, 12, 0.5)
 	if _nucleo:
 		_nucleo.visible = true
 	if _chama:

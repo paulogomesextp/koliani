@@ -68,6 +68,7 @@ func _correr_tudo() -> void:
 	teste_execution_9d_inimigos_regiao1()
 	teste_9d9e_crias_sem_goblin()
 	teste_9e2_coracao_producao_e_fases()
+	teste_9g_vfx_producao_regiao1()
 	teste_level_session_begin()
 	teste_level_session_stable_checkpoint_identity()
 	teste_level_session_checkpoint_activation_repeated()
@@ -2670,3 +2671,88 @@ func teste_sfx_existem() -> void:
 		var c: String = caminhos[nome]
 		_ok(ResourceLoader.exists(c),
 			"Som: o efeito '%s' aponta para %s, que nao existe" % [nome, c])
+
+
+## Execution 9G -- VFX de produção da Região I (prancha 07).
+func teste_9g_vfx_producao_regiao1() -> void:
+	const Vfx := preload("res://scripts/vfx_regiao1.gd")
+	var m := Vfx.manifesto()
+	_ok(String(m.get("status", "")) == "PRODUCTION_INTEGRATED",
+		"9G: manifesto dos VFX não está PRODUCTION_INTEGRATED")
+	var aut: Dictionary = m.get("autoridade", {})
+	_ok(String(aut.get("sha256", "")) == "6564982d4ccfad84d0a5f6d0e73196785afcff7ac8cd218dd27f066f883fe8c6",
+		"9G: os VFX não vêm da prancha 07 aprovada (SHA: %s)" % aut.get("sha256", ""))
+	var fams: Dictionary = m.get("familias", {})
+	_ok(fams.size() >= 14, "9G: só %d famílias de VFX no manifesto" % fams.size())
+	for nome: String in fams:
+		var fam: Dictionary = fams[nome]
+		for fr: Dictionary in fam.get("frames", []):
+			var caminho := "%s/%s" % [Vfx.DIR, fr["ficheiro"]]
+			_ok(ResourceLoader.exists(caminho), "9G: falta o frame %s" % caminho)
+			_ok(String(fr.get("estado", "")) != "FAIL",
+				"9G: frame reprovado em produção: %s %s" % [fr["ficheiro"], fr.get("alertas", [])])
+		var sf := Vfx.frames(nome)
+		_ok(sf != null and sf.get_frame_count("fx") > 0, "9G: família '%s' sem frames" % nome)
+		if sf == null:
+			continue
+		for i in sf.get_frame_count("fx"):
+			var tex := sf.get_frame_texture("fx", i)
+			var p := tex.resource_path if tex else ""
+			_ok(p.begins_with(Vfx.DIR), "9G: '%s' carrega textura de fora da produção: %s" % [nome, p])
+
+	# A CORRUPÇÃO tem de se ler diferente da Shadowblade (briefing 9G §4/§12).
+	var lum_sb := _lum_media_9g(Vfx.frames("hit_sparks"))
+	var lum_cor := _lum_media_9g(Vfx.frames("hit_sparks_corrupcao"))
+	_ok(lum_cor < lum_sb * 0.85,
+		"9G: a corrupção não é mais escura que a Shadowblade (%.3f vs %.3f)" % [lum_cor, lum_sb])
+
+	# INTERRUPTOR: ligado na Região I, desligado fora dela.
+	var l1 := (load("res://scenes/levels/Floresta_Putrefata.tscn") as PackedScene).instantiate()
+	get_tree().root.add_child(l1)
+	var k1 := l1.get_node_or_null("Koliani")
+	_ok(k1 != null and Vfx.ativo(k1), "9G: VFX de produção desligados na Região I")
+	if k1:
+		var fx := Vfx.tocar(k1, "hit_sparks", k1.global_position)
+		_ok(fx != null and fx.sprite_frames.get_frame_texture("fx", 0).resource_path.begins_with(Vfx.DIR),
+			"9G: o acerto na Região I não usa o VFX de produção")
+		if fx:
+			fx.queue_free()
+	l1.free()
+	var l6 := (load("res://scenes/levels/Prisao_dos_Condenados.tscn") as PackedScene).instantiate()
+	get_tree().root.add_child(l6)
+	var k6 := l6.get_node_or_null("Koliani")
+	_ok(k6 == null or not Vfx.ativo(k6), "9G: VFX da Região I ligados fora da Região I")
+	l6.free()
+
+	# o nome canónico da Região I nos 6 idiomas
+	for loc in ["en", "pt", "es", "fr", "de", "zh"]:
+		var d: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://assets/i18n/%s.json" % loc))
+		_ok(d is Dictionary, "9G: %s.json ilegível" % loc)
+		if d is Dictionary:
+			for chave in ["world.forest", "level.n00"]:
+				var v := String((d as Dictionary).get(chave, ""))
+				_ok(not v.to_lower().contains("rotting") and not v.to_lower().contains("putref"),
+					"9G: '%s' em %s ainda é o nome velho: %s" % [chave, loc, v])
+				_ok(v == String((d as Dictionary).get("world.forest", "")),
+					"9G: '%s' em %s não bate com o nome da região" % [chave, loc])
+
+
+## Luminância média dos píxeis visíveis de uma família de VFX.
+func _lum_media_9g(sf: SpriteFrames) -> float:
+	if sf == null:
+		return 0.0
+	var soma := 0.0
+	var n := 0
+	for i in sf.get_frame_count("fx"):
+		var tex := sf.get_frame_texture("fx", i)
+		if tex == null:
+			continue
+		var im := tex.get_image()
+		for y in range(0, im.get_height(), 2):
+			for x in range(0, im.get_width(), 2):
+				var c := im.get_pixel(x, y)
+				if c.a <= 0.3:
+					continue
+				soma += (0.3 * c.r + 0.59 * c.g + 0.11 * c.b) * c.a
+				n += 1
+	return soma / maxf(1.0, float(n))

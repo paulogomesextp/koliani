@@ -108,6 +108,10 @@ var _arena_topo := 0.0
 var _tocou_chao := false
 
 
+## 9G: aura de corrupção do telégrafo (criada à primeira vez que é precisa).
+var _aura9g: AnimatedSprite2D
+
+
 func _e_chefe() -> bool:
 	return true
 
@@ -440,6 +444,24 @@ func _explodir_derrotado() -> void:
 	_soltar_essencia_chefe(cena)
 	var base := global_position + Vector2(0.0, -30.0 * maxf(0.8, escala_visual))
 	var tinta: Color = cor_rim.lerp(Color(1, 1, 1), 0.4)
+	# 9G: a queda de um chefe na Região I é a corrupção a rebentar e a
+	# dissolver-se -- sem o disco de polígono que havia por baixo.
+	if Vfx9G.ativo(self):
+		var esc9g := clampf(_altura_alvo() / 55.0, 1.0, 3.0)
+		Vfx9G.tocar(cena, "finisher_burst_corrupcao", base, esc9g, 0.0, false, false, 45, 0.45)
+		Vfx9G.tocar(cena, "death_dissolve_corrupcao", base, esc9g * 1.2, 0.0, false, false, 44, 1.1)
+		for i in 2:
+			var pos9g := base + Vector2(randf_range(-30.0, 30.0), randf_range(-24.0, 16.0))
+			var esc_i := esc9g * 0.8
+			get_tree().create_timer(0.12 + i * 0.12).timeout.connect(
+				func() -> void:
+					if is_instance_valid(cena) and cena.is_inside_tree():
+						Vfx9G.tocar(cena, "finisher_burst_corrupcao", pos9g, esc_i,
+							0.0, false, false, 45, 0.4))
+		var cam9g := get_viewport().get_camera_2d()
+		if cam9g and cam9g.has_method("bater"):
+			cam9g.bater(9.0)
+		return
 	for i in 3:
 		var desloc := Vector2(randf_range(-26.0, 26.0), randf_range(-22.0, 14.0))
 		var esc := 3.6 + i * 1.2
@@ -500,7 +522,29 @@ func _encarar_koliani() -> void:
 		_sprite.scale = Vector2(_direcao * escala_visual, escala_visual)
 
 
+## 9G: aura de corrupção do telégrafo. Fica ATRÁS do corpo e aos pés: o aviso
+## lê-se mais cedo sem tapar a silhueta nem o ponto fraco. O tom do corpo
+## continua a ser o telégrafo principal -- isto só o reforça. Criada à
+## primeira vez que é precisa e depois só ligada/desligada (o telégrafo chama
+## isto a cada frame).
+func _aura_telegrafo(ligado: bool) -> void:
+	if _aura9g == null:
+		if not ligado or not Vfx9G.ativo(self):
+			return
+		_aura9g = Vfx9G.novo("charge_aura_corrupcao", true)
+		if _aura9g == null:
+			return
+		_aura9g.z_index = -2
+		_aura9g.scale = Vector2.ONE * clampf(_altura_alvo() / 70.0, 0.8, 2.4)
+		_aura9g.position = Vector2(0.0, _altura_alvo() * 0.1)
+		_aura9g.modulate.a = 0.75
+		add_child(_aura9g)
+		_aura9g.play("ciclo")
+	_aura9g.visible = ligado
+
+
 func _piscar(ligado: bool) -> void:
+	_aura_telegrafo(ligado)
 	if _sprite:
 		_sprite.modulate = Color(1.7, 1.25, 1.5) if ligado else Color(1, 1, 1)
 	if ligado:

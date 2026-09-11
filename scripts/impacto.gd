@@ -13,6 +13,10 @@ extends AnimatedSprite2D
 ## roxo deixou de casar com quem da' o golpe. A folha roxa continua no repo
 ## para os inimigos/Zeriko.
 const TIRA := preload("res://assets/sprites/pixel/fx/impacto_azul.png")
+## Execution 9G: dentro da Região I o anel do pack CC0 dá lugar às faíscas da
+## prancha 07. A `cor` continua a valer -- é ela que distingue queimar (laranja)
+## de sangrar (vermelho) de um acerto normal.
+const Vfx9G := preload("res://scripts/vfx_regiao1.gd")
 const FRAMES := 4
 const FPS := 26.0
 
@@ -26,6 +30,10 @@ static func rebentar(onde: Node, pos: Vector2, cor := Color(1, 1, 1),
 	# `current_scene` e' nulo em bancadas de teste (`--script` monta a arvore
 	# a' mao, sem cena corrente) -- sem este recurso ao pai, cada acerto
 	# enchia o log de "add_child on a null value".
+	if Vfx9G.ativo(onde):
+		Vfx9G.tocar(onde, "hit_sparks", pos, clampf(escala * 0.38, 0.35, 1.6),
+			randf_range(-0.3, 0.3), false, false, 40, 0.2, cor)
+		return
 	var destino: Node = onde.get_tree().current_scene
 	if destino == null:
 		destino = onde.get_parent()

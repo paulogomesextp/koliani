@@ -20,6 +20,9 @@ var _atraso := 0.0
 var _koli: Node2D
 var _apanhado := false
 
+## Execution 9G: brilho de recolha da prancha 07 (só na Região I).
+const Vfx9G := preload("res://scripts/vfx_regiao1.gd")
+
 @onready var _nucleo: Polygon2D = $Nucleo
 @onready var _halo: Polygon2D = $Halo
 @onready var _luz: PointLight2D = $Luz
@@ -78,6 +81,8 @@ func _apanhar() -> void:
 		return
 	_apanhado = true
 	EstadoJogo.ganhar_essencia(valor)
+	if Vfx9G.ativo(self):
+		Vfx9G.tocar(self, "pickup", global_position, 0.7, 0.0, false, false, 38, 0.28)
 	Som.toca("apanhar", -14.0, randf_range(1.15, 1.4))
 	set_deferred("monitoring", false)
 	var t := create_tween().set_parallel(true)

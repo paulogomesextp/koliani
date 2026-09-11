@@ -15,6 +15,10 @@ const COR := Color(0.85, 0.45, 1.0)
 ## -- o "vivo" vem do pulsar da escala e da luz, nao de uma tira de animacao.
 ## Substituiu as tres formas do pack das balas a pedido do Paulo.
 const CORPO: Texture2D = preload("res://assets/sprites/pixel/fx/laser_roxo.png")
+## Execution 9G: na Região I o corpo é o "projectile (energia)" da prancha 07
+## (o laser do pack CC0 fica para as outras regiões).
+const Vfx9G := preload("res://scripts/vfx_regiao1.gd")
+var _corpo9g: AnimatedSprite2D
 ## Escala de repouso; a cabeca do cometa fica com ~54 px de comprido.
 const ESCALA := 0.75
 
@@ -43,6 +47,13 @@ func _ready() -> void:
 	_fase = randf() * TAU
 	if _corpo:
 		_corpo.texture = CORPO
+	if Vfx9G.ativo(self):
+		_corpo9g = Vfx9G.novo("projectile", true)
+		if _corpo9g:
+			_corpo.visible = false
+			_corpo9g.z_index = 39
+			add_child(_corpo9g)
+			_corpo9g.play("ciclo")
 
 
 func _physics_process(dt: float) -> void:
@@ -50,7 +61,10 @@ func _physics_process(dt: float) -> void:
 	_t += dt
 	if _luz:
 		_luz.energy = 1.8 + 0.4 * sin(_t * 20.0)  # a aura roxa "respira"
-	if _corpo:
+	if _corpo9g:
+		var q := 1.0 + 0.06 * sin(_t * 18.0 + _fase)
+		_corpo9g.scale = Vector2(q, 1.0 / q)
+	elif _corpo:
 		# o pulsar substitui a tira de frames: a cabeça estica e encolhe ~6%
 		# ao longo do tiro. A rotação é a do nó, que já aponta na direção.
 		var p := 1.0 + 0.06 * sin(_t * 18.0 + _fase)

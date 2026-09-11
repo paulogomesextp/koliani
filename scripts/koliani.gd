@@ -157,6 +157,8 @@ const REGEN_ENERGIA := 12.0       # por segundo (barra cheia em ~8 s)
 ## Abaixo deste Y considera-se que caiu no vazio (fosso sem fundo).
 const Y_MORTE := 1200.0
 const TEX_IMPACTO := preload("res://assets/sprites/impacto.svg")
+## Execution 9G: VFX de produção da Região I (prancha 07). Fora dela, nada muda.
+const Vfx9G := preload("res://scripts/vfx_regiao1.gd")
 
 ## Cúpula de energia roxa à volta do escudo (pedido do Paulo). `ABRIR` é o
 ## tempo que leva a crescer até ficar redonda ao levantar o escudo; o resto
@@ -753,6 +755,12 @@ func _montar_frames() -> void:
 ## Nomes servidos pelo Golden Set (inclui os derivados só de frames golden).
 var _golden_anims := {}
 var _slash_vfx: AnimatedSprite2D
+## 9G: arco dos golpes 2/3 (spin/heavy slash), filho da Koliani enquanto dura.
+var _vfx_combo: AnimatedSprite2D
+## 9G: cúpula do escudo (prancha 07), filha do nó `Escudo`.
+var _escudo_9g: AnimatedSprite2D
+## Centro do arco dos golpes 2/3: à frente do peito, onde a lâmina passa.
+const VFX9G_COMBO_POS := Vector2(20.0, -10.0)
 
 
 ## Monta o Golden Set: todos os estados alcançáveis da Koliani, só com frames
@@ -843,6 +851,26 @@ func _montar_vfx_golpe() -> void:
 func _disparar_vfx_golpe() -> void:
 	if _slash_vfx == null:
 		return
+	# 9G: os golpes 2 e 3 do combo no chão têm o arco próprio da prancha 07
+	# ("spin slash -- ataque 2", "heavy slash -- ataque 3"). Só visual: a
+	# duração é a do golpe e a hitbox não sabe que isto existe.
+	if _vfx_combo and is_instance_valid(_vfx_combo):
+		_vfx_combo.queue_free()
+	_vfx_combo = null
+	if _combo_passo > 0 and not _ataque_no_ar and Vfx9G.ativo(self):
+		var fam := "spin_slash" if _combo_passo == 1 else "heavy_slash"
+		_vfx_combo = Vfx9G.novo(fam)
+		if _vfx_combo:
+			_slash_vfx.visible = false
+			var n := _vfx_combo.sprite_frames.get_frame_count("fx")
+			_vfx_combo.speed_scale = (n / _vfx_combo.sprite_frames.get_animation_speed("fx")) / maxf(_ataque_dur, 0.05)
+			_vfx_combo.scale = Vector2(_olha_para, _sinal_grav)
+			_vfx_combo.position = Vector2(VFX9G_COMBO_POS.x * _olha_para, VFX9G_COMBO_POS.y * _sinal_grav)
+			_vfx_combo.z_index = 1
+			_vfx_combo.animation_finished.connect(_vfx_combo.queue_free)
+			add_child(_vfx_combo)
+			_vfx_combo.play("fx")
+			return
 	# 6 frames na duração lógica do golpe -- o VFX acaba com a animação do corpo.
 	_slash_vfx.sprite_frames.set_animation_speed("slash", GOLDEN_VFX_FRAMES / maxf(_ataque_dur, 0.05))
 	# acompanha o espelho do corpo, incluindo a gravidade invertida (`_sinal_grav`)
@@ -892,6 +920,12 @@ func _rasto_dash(dt: float) -> void:
 func _vfx_salto_duplo() -> void:
 	if not usar_golden_set:
 		return
+	# 9G: o "dash impact" da prancha, rodado para baixo -- o impulso sai dos
+	# pés. Rotação exacta e viragem, sem redesenhar nada.
+	if Vfx9G.ativo(self):
+		Vfx9G.tocar(self, "dash_impact", global_position + Vector2(0.0, 18.0 * _sinal_grav),
+			0.9, PI * 0.5 * _sinal_grav, false, false, -1, 0.3)
+		return
 	_rajada("SaltoDuploVFX", Vector2(0.0, 20.0 * _sinal_grav), 14, 0.32,
 		Vector2(0.0, 1.0 * _sinal_grav), 70.0, COR_SHADOWBLADE)
 
@@ -900,8 +934,47 @@ func _vfx_salto_duplo() -> void:
 func _vfx_morte() -> void:
 	if not usar_golden_set:
 		return
+	if Vfx9G.ativo(self):
+		Vfx9G.tocar(self, "death_dissolve", global_position + Vector2(0.0, -6.0), 1.3, 0.0,
+			false, false, 41, 0.9)
+		return
 	_rajada("MorteVFX", Vector2(0.0, -10.0), 26, 0.6,
 		Vector2(0.0, -1.0 * _sinal_grav), 55.0, Color(0.9, 0.18, 0.28))
+
+
+## 9G: arranque do dash -- o rasto e o estalo da prancha 07. O rasto nasce
+## atrás dela e fica no mundo; o estalo sai dos pés, virado ao contrário do
+## sentido do dash. Nada disto toca na física do dash.
+func _vfx9g_dash() -> void:
+	if not Vfx9G.ativo(self):
+		return
+	Vfx9G.tocar(self, "dash_trail", global_position + Vector2(-10.0 * _olha_para, -6.0),
+		1.0, 0.0, _olha_para > 0.0, _sinal_grav < 0.0, -1, DUR_DASH)
+	Vfx9G.tocar(self, "dash_impact", global_position + Vector2(-16.0 * _olha_para, 10.0 * _sinal_grav),
+		0.8, 0.0, _olha_para > 0.0, _sinal_grav < 0.0, -1, 0.26)
+
+
+## 9G: a cúpula de energia da prancha 07 substitui os polígonos desenhados por
+## código. Os polígonos ficam escondidos (não apagados: fora da Região I são
+## eles que se veem). O clarão do bloqueio continua a vir do `_cupula_flash`.
+func _vfx9g_escudo() -> void:
+	if not Vfx9G.ativo(self) or _escudo == null:
+		return
+	if _escudo_9g == null:
+		_escudo_9g = Vfx9G.novo("defend_shield", true)
+		if _escudo_9g == null:
+			return
+		_escudo_9g.z_index = 1
+		_escudo.add_child(_escudo_9g)
+		_escudo_9g.play("ciclo")
+		for n in ["Cupula", "Aro", "Glow", "Placa"]:
+			var c := _escudo.get_node_or_null(n) as CanvasItem
+			if c:
+				c.visible = false
+	var respira := 0.5 + 0.5 * sin(_anim_t * 5.5)
+	var e := 0.95 + 0.05 * respira + 0.1 * _cupula_flash
+	_escudo_9g.scale = Vector2(e, e)
+	_escudo_9g.modulate = Color(1, 1, 1).lerp(Color(2.2, 2.0, 2.4), _cupula_flash)
 
 
 func _rajada(nome: String, desvio: Vector2, n: int, vida_s: float, dir: Vector2,
@@ -1281,6 +1354,9 @@ func _physics_process(dt: float) -> void:
 		_rolar_restante = DUR_ROLAR
 		_rolar_recarga = RECARGA_ROLAR
 		Som.toca("rolamento", -13.0, randf_range(0.95, 1.06))
+		if Vfx9G.ativo(self):
+			Vfx9G.tocar(self, "roll_dodge", global_position + Vector2(0.0, 6.0 * _sinal_grav),
+				1.0, 0.0, _olha_para < 0.0, _sinal_grav < 0.0, -1, DUR_ROLAR)
 		_invulneravel = maxf(_invulneravel, DUR_ROLAR + EstadoJogo.bonus("iframes_roll"))  # melhoria "agilidade"
 		# roll-cancel (pegada Dead Cells): o rolamento corta o recovery do
 		# ataque -> encadeia-se ataque -> rolar -> ataque sem esperar
@@ -1296,6 +1372,7 @@ func _physics_process(dt: float) -> void:
 		_dash_recarga = RECARGA_DASH
 		_acender_aura(0.8)
 		Som.toca("dash", -11.0, randf_range(0.97, 1.05))
+		_vfx9g_dash()
 		_invulneravel = maxf(_invulneravel, DUR_DASH)
 	else:
 		var saltos_max := 2 if EstadoJogo.tem_habilidade("salto_duplo") else 1
@@ -1423,8 +1500,12 @@ func _physics_process(dt: float) -> void:
 	var tier_aterragem := Movimento.tier_aterragem(vel_queda) \
 		if no_chao and not _estava_no_chao else 0
 	if tier_aterragem > 0:
-		if _po and tier_aterragem >= 2:
-			_po.restart()
+		if tier_aterragem >= 2:
+			if Vfx9G.ativo(self):
+				Vfx9G.tocar(self, "land_impact", global_position + Vector2(0.0, 22.0 * _sinal_grav),
+					1.0, 0.0, false, _sinal_grav < 0.0, -1, 0.4)
+			elif _po:
+				_po.restart()
 		var squash_tier: float = ATERRAGEM_SQUASH[tier_aterragem]
 		var tremor_tier: float = ATERRAGEM_TREMOR[tier_aterragem]
 		var volume_tier: float = ATERRAGEM_VOLUME[tier_aterragem]
@@ -1626,6 +1707,7 @@ func _animar(dt: float) -> void:
 	# os outros usam a placa daqui -- e o "shadowblade" nem sequer tem pose de
 	# defesa no atlas, por isso antes disto NÃO aparecia escudo nenhum.
 	if _escudo and RIG != "cavaleiro":
+		_vfx9g_escudo()
 		if _defendendo != _escudo.visible:
 			_escudo.visible = _defendendo
 			if _defendendo:
@@ -1886,6 +1968,9 @@ func _cancelar_ataque(reiniciar_combo := false) -> void:
 	_desativar_hitbox_ataque()
 	if _slash_vfx:
 		_slash_vfx.visible = false
+	if _vfx_combo and is_instance_valid(_vfx_combo):
+		_vfx_combo.queue_free()
+	_vfx_combo = null
 	if reiniciar_combo:
 		_combo_janela = 0.0
 		_combo_passo = 0
@@ -1983,8 +2068,9 @@ func _ao_acertar_corpo(corpo: Node) -> void:
 		if _faiscas:
 			_faiscas.position.x = absf(_faiscas.position.x) * _olha_para
 			_faiscas.restart()
-		_pop_impacto((corpo as Node2D).global_position if corpo is Node2D else global_position)
 		var remate := _combo_passo >= NUM_COMBO - 1
+		_pop_impacto((corpo as Node2D).global_position if corpo is Node2D else global_position,
+			crit or remate)
 		_abanar(TREMOR_CRIT if crit else (TREMOR_REMATE if remate else TREMOR_GOLPE))
 		_hitstop(HITSTOP_CRIT if crit else (HITSTOP_REMATE if remate else HITSTOP_GOLPE))
 		if crit:
@@ -1995,7 +2081,14 @@ func _ao_acertar_corpo(corpo: Node) -> void:
 
 ## "Frame de impacto": o anel pixel-art (`Impacto`) a abrir no ponto do
 ## acerto, com a cor da arma, mais o clarão antigo por baixo a dar o flash.
-func _pop_impacto(pos: Vector2) -> void:
+func _pop_impacto(pos: Vector2, forte := false) -> void:
+	# 9G: "hit sparks" no acerto normal, "finisher burst" no remate/crítico --
+	# o jogador distingue os dois sem olhar para a barra de vida.
+	if Vfx9G.ativo(self):
+		Vfx9G.tocar(self, "finisher_burst" if forte else "hit_sparks", pos,
+			1.1 if forte else 0.9, randf_range(-0.25, 0.25), false, false, 40,
+			0.34 if forte else 0.2)
+		return
 	Impacto.rebentar(self, pos, _cor_golpe().lerp(Color(1, 1, 1), 0.45), 2.2)
 	var s := Sprite2D.new()
 	s.texture = TEX_IMPACTO
@@ -2232,6 +2325,9 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0) -> void:
 	_cancelar_ataque(true)  # dano corta ataque/combo e desliga a hitbox imediatamente
 	vida_mudou.emit(vida, _vida_max())
 	_flash_branco()
+	if Vfx9G.ativo(self):
+		Vfx9G.tocar(self, "hurt_blood", global_position + Vector2(4.0 * _olha_para, -8.0),
+			1.0, 0.0, _olha_para < 0.0, false, 41, 0.35)
 	_abanar(TREMOR_DANO)
 	_hitstop(HITSTOP_DANO)
 	Som.toca("dano", -7.0)

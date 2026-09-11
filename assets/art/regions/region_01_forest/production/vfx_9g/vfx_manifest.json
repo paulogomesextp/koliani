@@ -1,0 +1,3333 @@
+{
+  "execution": "9G",
+  "status": "PRODUCTION_INTEGRATED",
+  "autoridade": {
+    "ficheiro": "Koliani_1.0_Master_Package_v2/references/approved/07_KOLIANI_VFX_CLEAN_v1_1.png",
+    "sha256": "6564982d4ccfad84d0a5f6d0e73196785afcff7ac8cd218dd27f066f883fe8c6",
+    "dimensoes": [
+      1536,
+      1024
+    ],
+    "modo": "RGBA",
+    "nota": "alfa 208-250 em toda a prancha: fundo pintado, alfa reconstruído"
+  },
+  "referencia_apresentacao": {
+    "ficheiro": "Koliani_1.0_Master_Package_v2/references/approved/12_PRODUCTION_PACK_v10_GAMEPLAY_VFX_SFX_POLISH.png",
+    "sha256": "6eea95ba9816509fa4f520b1aeeeda17b0246c56576c57af4ef0a15c65ccc221",
+    "uso": "só apresentação (hit-stop, telegraph, feedback); RGB pintado sobre cenário, nada extraído"
+  },
+  "familias": {
+    "spin_slash": {
+      "classe": "B",
+      "derivacao": "cortes nos vales do desenho + alfa reconstruído sobre o fundo medido",
+      "cortes_prancha": [
+        593,
+        650,
+        702,
+        756,
+        812,
+        857,
+        914
+      ],
+      "uso": "golpe 2 do combo",
+      "fundo_medido": [
+        60,
+        52,
+        61
+      ],
+      "tamanho": [
+        64,
+        66
+      ],
+      "ancora": [
+        32,
+        40
+      ],
+      "blend": "add",
+      "frames": [
+        {
+          "ficheiro": "spin_slash/spin_slash_01.png",
+          "sha256": "3e47bd1c08c1789c50329f28f33efdc20f1ac49e2db0dc3efd36ad5e61ba7a5d",
+          "caixa_prancha": [
+            536,
+            138,
+            580,
+            218
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 460,
+            "fortes": 196,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "spin_slash/spin_slash_02.png",
+          "sha256": "602e0762350fee357a6fb7f907218c2e6359a71bfc1a5fbface596db2c1c9cf9",
+          "caixa_prancha": [
+            604,
+            138,
+            650,
+            218
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 560,
+            "fortes": 291,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "spin_slash/spin_slash_03.png",
+          "sha256": "6c514e3ba4f8b0c68b47cfffaa7c91824e4056e155dbf323032b39a4e7e86c22",
+          "caixa_prancha": [
+            650,
+            138,
+            702,
+            218
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 385,
+            "fortes": 160,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "spin_slash/spin_slash_04.png",
+          "sha256": "8540032dbcf69b28d833d146765ca7bd2d5be13bc3816c92c114a22ba03ad3fa",
+          "caixa_prancha": [
+            702,
+            138,
+            756,
+            218
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 692,
+            "fortes": 374,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "spin_slash/spin_slash_05.png",
+          "sha256": "acd226c60889966416b6efcba14d18ed19a41d31c0b9678cd9b6c0e37a9fdef6",
+          "caixa_prancha": [
+            756,
+            138,
+            812,
+            218
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 814,
+            "fortes": 428,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "spin_slash/spin_slash_06.png",
+          "sha256": "32c85bccdf158be27ff5faad0946ec56861aad6391abd2fdc11403b67e00bb86",
+          "caixa_prancha": [
+            821,
+            138,
+            857,
+            218
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 178,
+            "fortes": 66,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "spin_slash/spin_slash_07.png",
+          "sha256": "4c97aed6a2c86f1d2fcb04e0e0864bc7dfd4bfcc30faa3c2441ba7f2ee77cc4c",
+          "caixa_prancha": [
+            857,
+            138,
+            914,
+            218
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 862,
+            "fortes": 503,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "spin_slash/spin_slash_08.png",
+          "sha256": "56aa50f004f96836b4a11351cf2cc6da79d3b748eba4c408ef93519a95763208",
+          "caixa_prancha": [
+            914,
+            138,
+            969,
+            218
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 1264,
+            "fortes": 667,
+            "isolados": 1,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        }
+      ]
+    },
+    "heavy_slash": {
+      "classe": "B",
+      "derivacao": "cortes nos vales do desenho + alfa reconstruído sobre o fundo medido",
+      "cortes_prancha": [
+        1036,
+        1086,
+        1138,
+        1194,
+        1251,
+        1308,
+        1339,
+        1392,
+        1452
+      ],
+      "uso": "golpe 3 (remate)",
+      "fundo_medido": [
+        62,
+        53,
+        61
+      ],
+      "tamanho": [
+        76,
+        73
+      ],
+      "ancora": [
+        38,
+        40
+      ],
+      "blend": "add",
+      "frames": [
+        {
+          "ficheiro": "heavy_slash/heavy_slash_01.png",
+          "sha256": "b797cef6530897822eb0d931c12b30e5b118896937d1611980de2e7406df3cfb",
+          "caixa_prancha": [
+            987,
+            138,
+            1027,
+            218
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 273,
+            "fortes": 119,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "heavy_slash/heavy_slash_02.png",
+          "sha256": "6a109203e8fcfbc2fafd542d6336957ff13555013cf97f86d27a8a301edb3db0",
+          "caixa_prancha": [
+            1037,
+            138,
+            1074,
+            218
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 355,
+            "fortes": 180,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "heavy_slash/heavy_slash_03.png",
+          "sha256": "95bb9f4ba88031df133d86ca24018c7428e1527bfd69941dc6ce4b0cacb21c6a",
+          "caixa_prancha": [
+            1086,
+            138,
+            1138,
+            218
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 586,
+            "fortes": 323,
+            "isolados": 2,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "heavy_slash/heavy_slash_04.png",
+          "sha256": "42ad676331b163c9d846074a54bc2373053c6840861cbea1d12a07bcf455cfbc",
+          "caixa_prancha": [
+            1138,
+            138,
+            1188,
+            218
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 1127,
+            "fortes": 603,
+            "isolados": 1,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "heavy_slash/heavy_slash_05.png",
+          "sha256": "2af057894c966b2ea0b87a4d04a28066ce3978438610464428c163cf48ec9c53",
+          "caixa_prancha": [
+            1198,
+            138,
+            1251,
+            218
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 1380,
+            "fortes": 797,
+            "isolados": 1,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "heavy_slash/heavy_slash_06.png",
+          "sha256": "90d7675e38f5927e6e6091adb72b9ef557d0c05a4387eedb73a59cb379855e4b",
+          "caixa_prancha": [
+            1251,
+            138,
+            1308,
+            218
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 1045,
+            "fortes": 565,
+            "isolados": 2,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "heavy_slash/heavy_slash_07.png",
+          "sha256": "7b5d540fb1bccdacfbd944e48098cfa49079f620f373b16983708ee1712e6842",
+          "caixa_prancha": [
+            1308,
+            138,
+            1339,
+            218
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 135,
+            "fortes": 32,
+            "isolados": 1,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "heavy_slash/heavy_slash_08.png",
+          "sha256": "c4757544eeaa90652a70b59f5cc7be18cc94c75f69fdf0f46d2f4dc88acb18d9",
+          "caixa_prancha": [
+            1339,
+            138,
+            1392,
+            218
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 1598,
+            "fortes": 948,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "heavy_slash/heavy_slash_09.png",
+          "sha256": "c5106e4141ce755dd9fb35830bd2f1e6c105bc8038ea2b41461772ee43f335de",
+          "caixa_prancha": [
+            1392,
+            138,
+            1452,
+            218
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 2463,
+            "fortes": 1455,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "heavy_slash/heavy_slash_10.png",
+          "sha256": "ef6e91fc558ac7b5fc3cf21691bfce7e26780d57d93f4e0ddcfb33bf0acc1b8d",
+          "caixa_prancha": [
+            1452,
+            138,
+            1512,
+            218
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 2119,
+            "fortes": 1278,
+            "isolados": 1,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        }
+      ]
+    },
+    "dash_trail": {
+      "classe": "B",
+      "derivacao": "cortes nos vales do desenho + alfa reconstruído sobre o fundo medido",
+      "cortes_prancha": [
+        63,
+        132,
+        202,
+        272,
+        341,
+        410,
+        479
+      ],
+      "uso": "rasto do dash",
+      "fundo_medido": [
+        58,
+        54,
+        62
+      ],
+      "tamanho": [
+        86,
+        61
+      ],
+      "ancora": [
+        43,
+        37
+      ],
+      "blend": "add",
+      "frames": [
+        {
+          "ficheiro": "dash_trail/dash_trail_01.png",
+          "sha256": "9330aa0ffdc13dd16ca9cf167369122f9aab4a387b6e43f9acc4fed8032a0d1b",
+          "caixa_prancha": [
+            24,
+            274,
+            63,
+            348
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 111,
+            "fortes": 5,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "dash_trail/dash_trail_02.png",
+          "sha256": "a1f305877f38478e9f822a952334b8c59da6350c12ec46b5b7892429158818a8",
+          "caixa_prancha": [
+            63,
+            274,
+            125,
+            348
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 1465,
+            "fortes": 735,
+            "isolados": 2,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "dash_trail/dash_trail_03.png",
+          "sha256": "2745e71076f932b646f7c429a588c1dc0ab187412d7a949d3c8d2aea416e6d82",
+          "caixa_prancha": [
+            135,
+            274,
+            193,
+            348
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 698,
+            "fortes": 364,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "dash_trail/dash_trail_04.png",
+          "sha256": "d296de16604c8e238682d3c4377dfd4b06f93855b4b4732f74f935f3b2e7446d",
+          "caixa_prancha": [
+            227,
+            274,
+            271,
+            348
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 388,
+            "fortes": 163,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "dash_trail/dash_trail_05.png",
+          "sha256": "5a0b06589394bab1e1eea0d227fd8a19b0029a1cd3bd422d40922faff5f702d2",
+          "caixa_prancha": [
+            303,
+            274,
+            339,
+            348
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 264,
+            "fortes": 109,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "dash_trail/dash_trail_06.png",
+          "sha256": "1533c768d5ec5a705ce495190710b983b1b339f62fda93b57a4ceda45f85b861",
+          "caixa_prancha": [
+            365,
+            274,
+            408,
+            348
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 437,
+            "fortes": 188,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "dash_trail/dash_trail_07.png",
+          "sha256": "b211fbda5f650375607d171a9283de94fba946fd7b2a751648bc53770ea3c443",
+          "caixa_prancha": [
+            434,
+            274,
+            474,
+            348
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 418,
+            "fortes": 198,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "dash_trail/dash_trail_08.png",
+          "sha256": "a5a559c003191fa3097fde169f0a3f80c2bfaf48a8b944684efbd0e5baca1a7d",
+          "caixa_prancha": [
+            484,
+            274,
+            544,
+            348
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 1095,
+            "fortes": 584,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        }
+      ]
+    },
+    "dash_impact": {
+      "classe": "B",
+      "derivacao": "cortes nos vales do desenho + alfa reconstruído sobre o fundo medido",
+      "cortes_prancha": [
+        635,
+        704,
+        773,
+        842,
+        911
+      ],
+      "uso": "arranque do dash / 2.º salto",
+      "fundo_medido": [
+        60,
+        55,
+        65
+      ],
+      "tamanho": [
+        56,
+        69
+      ],
+      "ancora": [
+        28,
+        37
+      ],
+      "blend": "add",
+      "frames": [
+        {
+          "ficheiro": "dash_impact/dash_impact_01.png",
+          "sha256": "6dd861411ef0b6dbec84767f501e7763c2fa15824ab6c7f684f366061b66bb36",
+          "caixa_prancha": [
+            566,
+            274,
+            621,
+            348
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 1344,
+            "fortes": 718,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "dash_impact/dash_impact_02.png",
+          "sha256": "b595a49438ff5c9bb1b5a38e9bdd18add2503e12e560b24297fd87e4f8fc176a",
+          "caixa_prancha": [
+            641,
+            274,
+            687,
+            348
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 1034,
+            "fortes": 526,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "dash_impact/dash_impact_03.png",
+          "sha256": "b05951f7673dc552c5aafe5797db90799f7bd1604f81e7fad4427eb5e3805866",
+          "caixa_prancha": [
+            710,
+            274,
+            754,
+            348
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 819,
+            "fortes": 393,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "dash_impact/dash_impact_04.png",
+          "sha256": "c335769160c70d0a1ffc08652f9724ea505f11f875304ef5eea27dd954881550",
+          "caixa_prancha": [
+            783,
+            274,
+            823,
+            348
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 591,
+            "fortes": 318,
+            "isolados": 1,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "dash_impact/dash_impact_05.png",
+          "sha256": "0f327d4ed4348e8320d5b2986de2241c5c20f895385d81ad13ad34f1dd68f589",
+          "caixa_prancha": [
+            857,
+            274,
+            889,
+            348
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 454,
+            "fortes": 224,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "dash_impact/dash_impact_06.png",
+          "sha256": "a53a84606c99db556093f0c4d3c6092b1399d007bd81ea57dd5394e9fb52e1ca",
+          "caixa_prancha": [
+            931,
+            274,
+            959,
+            348
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 202,
+            "fortes": 104,
+            "isolados": 1,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        }
+      ]
+    },
+    "roll_dodge": {
+      "classe": "B",
+      "derivacao": "cortes nos vales do desenho + alfa reconstruído sobre o fundo medido",
+      "cortes_prancha": [
+        1062,
+        1127,
+        1192,
+        1257,
+        1323,
+        1388,
+        1450
+      ],
+      "uso": "rolamento",
+      "fundo_medido": [
+        61,
+        56,
+        65
+      ],
+      "tamanho": [
+        80,
+        65
+      ],
+      "ancora": [
+        40,
+        36
+      ],
+      "blend": "add",
+      "frames": [
+        {
+          "ficheiro": "roll_dodge/roll_dodge_01.png",
+          "sha256": "0c7793764df96beb03d3c9e7db43111bff8ca44072ad34dc015d138479c60d43",
+          "caixa_prancha": [
+            998,
+            274,
+            1049,
+            348
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 361,
+            "fortes": 178,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "roll_dodge/roll_dodge_02.png",
+          "sha256": "e3624d25b3d98addc26e4353394176faf09626cb925232cc856360d7f2cee1ef",
+          "caixa_prancha": [
+            1072,
+            274,
+            1112,
+            348
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 388,
+            "fortes": 185,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "roll_dodge/roll_dodge_03.png",
+          "sha256": "3c475a464529fa7220e9e2a6e97e7a48365e363b42700e07c62b69681bfbf4b1",
+          "caixa_prancha": [
+            1135,
+            274,
+            1181,
+            348
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 575,
+            "fortes": 280,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "roll_dodge/roll_dodge_04.png",
+          "sha256": "e2d806764b522c047578923b8cfe505b506c52f96d4537fd2a6ebe04861b23fc",
+          "caixa_prancha": [
+            1202,
+            274,
+            1252,
+            348
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 529,
+            "fortes": 246,
+            "isolados": 2,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "roll_dodge/roll_dodge_05.png",
+          "sha256": "befaaf85ae1380228013a76127124d0f9b9da257ec5410f135ce8cb24338f989",
+          "caixa_prancha": [
+            1270,
+            274,
+            1323,
+            348
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 1320,
+            "fortes": 709,
+            "isolados": 1,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "roll_dodge/roll_dodge_06.png",
+          "sha256": "8c072c379708b9c09294e90d969205e01351665ac09b5028e2c9404f3cbe6e09",
+          "caixa_prancha": [
+            1323,
+            274,
+            1388,
+            348
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 1471,
+            "fortes": 841,
+            "isolados": 1,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "roll_dodge/roll_dodge_07.png",
+          "sha256": "0303109e85039efa0142fde1e3e38ae83976f22066fc8a6a96d4968713e19081",
+          "caixa_prancha": [
+            1388,
+            274,
+            1449,
+            348
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 1466,
+            "fortes": 896,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "roll_dodge/roll_dodge_08.png",
+          "sha256": "a0d3d4ad4522031677885b1b6d2966c36768dfe8ecc2878395ada0627b95c34f",
+          "caixa_prancha": [
+            1459,
+            274,
+            1511,
+            348
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 1751,
+            "fortes": 1053,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        }
+      ]
+    },
+    "hit_sparks": {
+      "classe": "B",
+      "derivacao": "cortes nos vales do desenho + alfa reconstruído sobre o fundo medido",
+      "cortes_prancha": [
+        84,
+        144,
+        204,
+        264,
+        324,
+        384,
+        444
+      ],
+      "uso": "acerto",
+      "fundo_medido": [
+        57,
+        52,
+        60
+      ],
+      "tamanho": [
+        72,
+        67
+      ],
+      "ancora": [
+        36,
+        37
+      ],
+      "blend": "add",
+      "frames": [
+        {
+          "ficheiro": "hit_sparks/hit_sparks_01.png",
+          "sha256": "eaa10629d02faf1cf3e503dd6cfef0b5cff986396c7f5d47ca5f4b168f38f66a",
+          "caixa_prancha": [
+            24,
+            402,
+            76,
+            476
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 273,
+            "fortes": 88,
+            "isolados": 1,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "hit_sparks/hit_sparks_02.png",
+          "sha256": "1cfcde8b64d5bf2b2579fa1d0b736cda520ca9f3e133d6823df5c89b13e0b8b4",
+          "caixa_prancha": [
+            102,
+            402,
+            137,
+            476
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 486,
+            "fortes": 203,
+            "isolados": 1,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "hit_sparks/hit_sparks_03.png",
+          "sha256": "0ae31932664c687cf2d54ddf4157b362c64334d96ab6367cd0313b04dbcb4af0",
+          "caixa_prancha": [
+            160,
+            402,
+            197,
+            476
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 571,
+            "fortes": 209,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "hit_sparks/hit_sparks_04.png",
+          "sha256": "4c26f1782cd538f140a3caa5d674f8bd5475be4607c6bfcace4a0289629715cb",
+          "caixa_prancha": [
+            224,
+            402,
+            255,
+            476
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 394,
+            "fortes": 149,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "hit_sparks/hit_sparks_05.png",
+          "sha256": "2cb775a819278bd904711bfd5b287c5d65c191a329586e83e1c4ecb7d5914a82",
+          "caixa_prancha": [
+            288,
+            402,
+            313,
+            476
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 350,
+            "fortes": 135,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "hit_sparks/hit_sparks_06.png",
+          "sha256": "e2f777c290f8f5302783b16216a9ad9d8413c38aae462a150e3ef3e9020440c8",
+          "caixa_prancha": [
+            342,
+            402,
+            374,
+            476
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 470,
+            "fortes": 196,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "hit_sparks/hit_sparks_07.png",
+          "sha256": "e80399c4d6460a4fe4dcef6ddf58502d2ec013d3603210fecc0e5de8f6f7f6fe",
+          "caixa_prancha": [
+            402,
+            402,
+            433,
+            476
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 432,
+            "fortes": 182,
+            "isolados": 1,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "hit_sparks/hit_sparks_08.png",
+          "sha256": "ed7716a70739a93506b424f31f585e4f9c7519ee815383317c57560a2867d29c",
+          "caixa_prancha": [
+            465,
+            402,
+            492,
+            476
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 361,
+            "fortes": 153,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        }
+      ]
+    },
+    "finisher_burst": {
+      "classe": "B",
+      "derivacao": "cortes nos vales do desenho + alfa reconstruído sobre o fundo medido",
+      "cortes_prancha": [
+        580,
+        650,
+        707,
+        770,
+        834,
+        897,
+        961
+      ],
+      "uso": "remate / crítico",
+      "fundo_medido": [
+        59,
+        53,
+        64
+      ],
+      "tamanho": [
+        72,
+        72
+      ],
+      "ancora": [
+        36,
+        37
+      ],
+      "blend": "add",
+      "frames": [
+        {
+          "ficheiro": "finisher_burst/finisher_burst_01.png",
+          "sha256": "a86b3cf8acd627719aefd1237f5fad965f188c2a7b38961fb678590fbcc81829",
+          "caixa_prancha": [
+            524,
+            402,
+            580,
+            476
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 348,
+            "fortes": 86,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "finisher_burst/finisher_burst_02.png",
+          "sha256": "94d5f1eb5165ae7d4fa4f7b0ceec799f54e33b2ef4d06ec1eeafa9e3f8315b2b",
+          "caixa_prancha": [
+            580,
+            402,
+            650,
+            476
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 2367,
+            "fortes": 1047,
+            "isolados": 1,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "finisher_burst/finisher_burst_03.png",
+          "sha256": "acb229c25a9d2471d3b4a58aba510d617e1cb4e5220df761c2d7e641084d2431",
+          "caixa_prancha": [
+            650,
+            402,
+            707,
+            476
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 1440,
+            "fortes": 635,
+            "isolados": 3,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "finisher_burst/finisher_burst_04.png",
+          "sha256": "52ff7e263580af486e0a1c75be08d79c8834ca736fee79d0904f8977807347c8",
+          "caixa_prancha": [
+            707,
+            402,
+            770,
+            476
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 1678,
+            "fortes": 782,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "finisher_burst/finisher_burst_05.png",
+          "sha256": "8bb6703a3a915680b26e12db18a6744383d6f5fdb05cdd9e1e9e944f6e17b604",
+          "caixa_prancha": [
+            770,
+            402,
+            833,
+            476
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 1507,
+            "fortes": 552,
+            "isolados": 2,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "finisher_burst/finisher_burst_06.png",
+          "sha256": "3248085743fa7f2532e57177dd6e4a58767a0aae18bc4777be51cd833d068a1f",
+          "caixa_prancha": [
+            841,
+            402,
+            895,
+            476
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 843,
+            "fortes": 258,
+            "isolados": 2,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "finisher_burst/finisher_burst_07.png",
+          "sha256": "02534e9c71701bc59804d2a0f69ca29b6592c4aea91bcdc9f3843df1a641f1e3",
+          "caixa_prancha": [
+            905,
+            402,
+            961,
+            476
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 379,
+            "fortes": 114,
+            "isolados": 1,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "finisher_burst/finisher_burst_08.png",
+          "sha256": "7b3481730b63802ff347ae93e07f67a40fc3a9276b2293ab40580f3dd852d055",
+          "caixa_prancha": [
+            961,
+            402,
+            1022,
+            476
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 423,
+            "fortes": 87,
+            "isolados": 1,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        }
+      ]
+    },
+    "hurt_blood": {
+      "classe": "B",
+      "derivacao": "cortes nos vales do desenho + alfa reconstruído sobre o fundo medido",
+      "cortes_prancha": [
+        1126,
+        1203,
+        1280,
+        1357,
+        1434
+      ],
+      "uso": "Koliani ferida",
+      "fundo_medido": [
+        56,
+        51,
+        58
+      ],
+      "tamanho": [
+        82,
+        64
+      ],
+      "ancora": [
+        41,
+        37
+      ],
+      "blend": "add",
+      "frames": [
+        {
+          "ficheiro": "hurt_blood/hurt_blood_01.png",
+          "sha256": "3cda3a5092c48a8ee300b071529dd7736a517a507df1df4b1b07735988e47968",
+          "caixa_prancha": [
+            1049,
+            402,
+            1116,
+            476
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 549,
+            "fortes": 244,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "hurt_blood/hurt_blood_02.png",
+          "sha256": "793d99eb3b300b6a03fc47bdefff137f012562365774997d2067d385a368fe25",
+          "caixa_prancha": [
+            1141,
+            402,
+            1187,
+            476
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 570,
+            "fortes": 248,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "hurt_blood/hurt_blood_03.png",
+          "sha256": "8eefbb9921b73095b628739f5184969eac05843d4937ae6a51cb0be55e8821d5",
+          "caixa_prancha": [
+            1222,
+            402,
+            1267,
+            476
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 508,
+            "fortes": 209,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "hurt_blood/hurt_blood_04.png",
+          "sha256": "d653826ab7678504d91675a72430e2ad1e4e3c0ed0db5cda260a5c7f85b0118a",
+          "caixa_prancha": [
+            1304,
+            402,
+            1340,
+            476
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 487,
+            "fortes": 191,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "hurt_blood/hurt_blood_05.png",
+          "sha256": "c77ed02f5244637752d5b2cff26bf099efee3fe84e471a374ee35ed5e625f99b",
+          "caixa_prancha": [
+            1376,
+            402,
+            1408,
+            476
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 479,
+            "fortes": 215,
+            "isolados": 1,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "hurt_blood/hurt_blood_06.png",
+          "sha256": "1ea3811380ffa1021bcfe14863711ed1c790bd73ff179cf92a3d72ddf2bd6a63",
+          "caixa_prancha": [
+            1456,
+            402,
+            1488,
+            476
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 226,
+            "fortes": 59,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        }
+      ]
+    },
+    "land_impact": {
+      "classe": "B",
+      "derivacao": "cortes nos vales do desenho + alfa reconstruído sobre o fundo medido",
+      "cortes_prancha": [
+        83,
+        142,
+        201,
+        260,
+        319,
+        378,
+        416
+      ],
+      "uso": "aterragem forte",
+      "fundo_medido": [
+        70,
+        64,
+        68
+      ],
+      "tamanho": [
+        76,
+        68
+      ],
+      "ancora": [
+        38,
+        37
+      ],
+      "blend": "add",
+      "frames": [
+        {
+          "ficheiro": "land_impact/land_impact_01.png",
+          "sha256": "1e11966ba50ab4182401ae4c917eec8ddc4475983d8aadab0530ab4dee44774c",
+          "caixa_prancha": [
+            24,
+            528,
+            75,
+            606
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 460,
+            "fortes": 358,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "land_impact/land_impact_02.png",
+          "sha256": "55b305c2d6e2d924d58b3473ad91785bab8905ae3a461ff561b60f8a0073fb43",
+          "caixa_prancha": [
+            97,
+            528,
+            132,
+            606
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 174,
+            "fortes": 136,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "land_impact/land_impact_03.png",
+          "sha256": "74310785249258a81d72755c2d8b4acf8f36caf1e1b9d23ea4567a28c52b1641",
+          "caixa_prancha": [
+            152,
+            528,
+            189,
+            606
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 329,
+            "fortes": 293,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "land_impact/land_impact_04.png",
+          "sha256": "1baea0f0c3fcb214259247ad333a9ecc25cca567f25e6d902a5da8a1c5c2ce51",
+          "caixa_prancha": [
+            208,
+            528,
+            246,
+            606
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 423,
+            "fortes": 336,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "land_impact/land_impact_05.png",
+          "sha256": "cf74d024aa5ae4825f82f3e2324d444d707ecdab128d175ff25ee2016c4997d6",
+          "caixa_prancha": [
+            265,
+            528,
+            308,
+            606
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 569,
+            "fortes": 433,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "land_impact/land_impact_06.png",
+          "sha256": "19e3f5735fcdfa700e6c2ced4c639ce37ce9bf87673001d31e9371070356e58b",
+          "caixa_prancha": [
+            327,
+            528,
+            377,
+            606
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 827,
+            "fortes": 665,
+            "isolados": 1,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "land_impact/land_impact_07.png",
+          "sha256": "615134fe655abb409e30152674d0764a3dbd23aa7a4e1f57e8aa1e8e64dce18d",
+          "caixa_prancha": [
+            397,
+            528,
+            416,
+            606
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 190,
+            "fortes": 147,
+            "isolados": 1,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "land_impact/land_impact_08.png",
+          "sha256": "c6483bfb9d9a63ed4b7746a735d30ce62bc89bdb25adb4b88a2f569894e7fd36",
+          "caixa_prancha": [
+            416,
+            528,
+            458,
+            606
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 827,
+            "fortes": 676,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        }
+      ]
+    },
+    "projectile": {
+      "classe": "B",
+      "derivacao": "cortes nos vales do desenho + alfa reconstruído sobre o fundo medido",
+      "cortes_prancha": [
+        549,
+        612,
+        672,
+        732,
+        794,
+        858,
+        921
+      ],
+      "uso": "tiro mágico",
+      "fundo_medido": [
+        69,
+        67,
+        78
+      ],
+      "tamanho": [
+        70,
+        76
+      ],
+      "ancora": [
+        35,
+        38
+      ],
+      "blend": "add",
+      "frames": [
+        {
+          "ficheiro": "projectile/projectile_01.png",
+          "sha256": "47e060c067a9701a1171fb510864a40f128ca316ac3db8c9e8a2f155aa0f3743",
+          "caixa_prancha": [
+            488,
+            528,
+            522,
+            606
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 45,
+            "fortes": 16,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "projectile/projectile_02.png",
+          "sha256": "bbf1ef7a2a02c3de2773b44ead3b371a07c565f17cff7dde597f98db68359049",
+          "caixa_prancha": [
+            549,
+            528,
+            611,
+            606
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 302,
+            "fortes": 185,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "projectile/projectile_03.png",
+          "sha256": "9d4fcfa7e5d590b6de3c659c5b8b0aaf97665042b9b1c1641fedd8f9663deb25",
+          "caixa_prancha": [
+            626,
+            528,
+            671,
+            606
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 222,
+            "fortes": 120,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "projectile/projectile_04.png",
+          "sha256": "70ddf995bbc127c670d201f53bda1744fd4e259c3b325ffb9a0d5990866ce6d3",
+          "caixa_prancha": [
+            673,
+            528,
+            732,
+            606
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 416,
+            "fortes": 218,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "projectile/projectile_05.png",
+          "sha256": "01fd5abfe9b33d06486e40f556905755fc39103c89ac257ade92aba7ea8b6df8",
+          "caixa_prancha": [
+            732,
+            528,
+            794,
+            606
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 584,
+            "fortes": 331,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "projectile/projectile_06.png",
+          "sha256": "de801132da0c1edb1189c9c4fb56dd6d0b73333de8b9d8daafba9dd6faa548f5",
+          "caixa_prancha": [
+            794,
+            528,
+            858,
+            606
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 882,
+            "fortes": 529,
+            "isolados": 1,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "projectile/projectile_07.png",
+          "sha256": "8199edfdecc6f5420d2848fe6d182b304d42aac27f31f506feaabf5830af032d",
+          "caixa_prancha": [
+            858,
+            528,
+            921,
+            606
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 1263,
+            "fortes": 749,
+            "isolados": 1,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "projectile/projectile_08.png",
+          "sha256": "2428fd2da1c3ee934d483eab0c58213f4ad4e49f7dadb6c3208da9cddea70d26",
+          "caixa_prancha": [
+            921,
+            528,
+            979,
+            606
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 2370,
+            "fortes": 1798,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        }
+      ]
+    },
+    "charge_aura": {
+      "classe": "B",
+      "derivacao": "cortes nos vales do desenho + alfa reconstruído sobre o fundo medido",
+      "cortes_prancha": [
+        1069,
+        1132,
+        1195,
+        1258,
+        1321,
+        1384,
+        1447
+      ],
+      "uso": "só como base da corrupção",
+      "fundo_medido": [
+        70,
+        68,
+        79
+      ],
+      "tamanho": [
+        52,
+        72
+      ],
+      "ancora": [
+        26,
+        37
+      ],
+      "blend": "add",
+      "frames": [
+        {
+          "ficheiro": "charge_aura/charge_aura_01.png",
+          "sha256": "cdc0d1b052af626037ab7b503243a257bdfed7c3c6644d22138d1eb74893f775",
+          "caixa_prancha": [
+            1008,
+            528,
+            1050,
+            606
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 289,
+            "fortes": 153,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "charge_aura/charge_aura_02.png",
+          "sha256": "81b8b38226ef039b9311a8957e2e24d9d534769e61961cb159299eb7efaccf7a",
+          "caixa_prancha": [
+            1086,
+            528,
+            1111,
+            606
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 463,
+            "fortes": 260,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "charge_aura/charge_aura_03.png",
+          "sha256": "72f78622519e8ceb425acaea18bb86812bcbc260986f0e53c516f0a56287d3a7",
+          "caixa_prancha": [
+            1143,
+            528,
+            1173,
+            606
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 784,
+            "fortes": 452,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "charge_aura/charge_aura_04.png",
+          "sha256": "82477a1c8d292e0aa0df26470e0c8be72b4d6d4aa5f4f222e0f426576657dcba",
+          "caixa_prancha": [
+            1204,
+            528,
+            1236,
+            606
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 1000,
+            "fortes": 570,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "charge_aura/charge_aura_05.png",
+          "sha256": "8f07e332249bcf33faf91b78a8fad2d1172948a8d2a2f6c9f81c08c2909ceb88",
+          "caixa_prancha": [
+            1266,
+            528,
+            1302,
+            606
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 1199,
+            "fortes": 732,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "charge_aura/charge_aura_06.png",
+          "sha256": "fba19778878977f68f4aee8a074bd8acb3fd439e13bb4bba2243dd4361fdb84c",
+          "caixa_prancha": [
+            1331,
+            528,
+            1368,
+            606
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 1261,
+            "fortes": 802,
+            "isolados": 1,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "charge_aura/charge_aura_07.png",
+          "sha256": "6fc05714dabdc6f11d8eebba600ef59145881057d9104e819a118407ba33ace8",
+          "caixa_prancha": [
+            1395,
+            528,
+            1432,
+            606
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 1243,
+            "fortes": 768,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "charge_aura/charge_aura_08.png",
+          "sha256": "84bce93ef2d117b4376d7036fb4606cc403bc00a6cae624c0af0232ef661a45e",
+          "caixa_prancha": [
+            1462,
+            528,
+            1497,
+            606
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 1192,
+            "fortes": 750,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        }
+      ]
+    },
+    "defend_shield": {
+      "classe": "B",
+      "derivacao": "cortes nos vales do desenho + alfa reconstruído sobre o fundo medido",
+      "cortes_prancha": [
+        78,
+        132,
+        186,
+        216,
+        263,
+        318,
+        373
+      ],
+      "uso": "escudo",
+      "fundo_medido": [
+        66,
+        61,
+        77
+      ],
+      "tamanho": [
+        74,
+        72
+      ],
+      "ancora": [
+        37,
+        39
+      ],
+      "blend": "add",
+      "frames": [
+        {
+          "ficheiro": "defend_shield/defend_shield_01.png",
+          "sha256": "641194f9fa0ecb6f521d3771df195bc8158cc5ed1b4f2f1824f915a1c2bc8cbb",
+          "caixa_prancha": [
+            26,
+            664,
+            75,
+            742
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 826,
+            "fortes": 346,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "defend_shield/defend_shield_02.png",
+          "sha256": "970520b21f91bca1f607abc40263f6f7e867f96c7e9f55bf327794c01f88aaf5",
+          "caixa_prancha": [
+            86,
+            664,
+            129,
+            742
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 1204,
+            "fortes": 539,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "defend_shield/defend_shield_03.png",
+          "sha256": "985aa45ec2ae785091e4b2dc1dd02a1ca37e2a9840218b7123de0467d8440e69",
+          "caixa_prancha": [
+            145,
+            664,
+            186,
+            742
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 1390,
+            "fortes": 685,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "defend_shield/defend_shield_04.png",
+          "sha256": "18045b80469b2a8982f109cca3a4f421e02420c0d9048c76f96f5a96394cb9e4",
+          "caixa_prancha": [
+            186,
+            664,
+            216,
+            742
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 221,
+            "fortes": 28,
+            "isolados": 1,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "defend_shield/defend_shield_05.png",
+          "sha256": "5857c126ee14970411443a4fff5c4c1848bcde669b836607461221f3ec097f89",
+          "caixa_prancha": [
+            216,
+            664,
+            263,
+            742
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 1155,
+            "fortes": 604,
+            "isolados": 2,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "defend_shield/defend_shield_06.png",
+          "sha256": "1869fdd1de254fadbcca708d846dca18b1c8bb5cf82db0e49c8b1f6cf079f635",
+          "caixa_prancha": [
+            263,
+            664,
+            304,
+            742
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 1426,
+            "fortes": 755,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "defend_shield/defend_shield_07.png",
+          "sha256": "314b64ddb9c411833a39f113d5ad8f64a72e0d49c041250bd4f5920565c25f36",
+          "caixa_prancha": [
+            319,
+            664,
+            364,
+            742
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 1740,
+            "fortes": 930,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "defend_shield/defend_shield_08.png",
+          "sha256": "70d3713875e2a708faf95ab5286d193147f5301fe4b21f27806cfd14394e755c",
+          "caixa_prancha": [
+            377,
+            664,
+            420,
+            742
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 1661,
+            "fortes": 894,
+            "isolados": 1,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        }
+      ]
+    },
+    "pickup": {
+      "classe": "B",
+      "derivacao": "cortes nos vales do desenho + alfa reconstruído sobre o fundo medido",
+      "cortes_prancha": [
+        818,
+        866,
+        914,
+        961,
+        1008
+      ],
+      "uso": "apanhar / checkpoint",
+      "fundo_medido": [
+        52,
+        49,
+        61
+      ],
+      "tamanho": [
+        50,
+        77
+      ],
+      "ancora": [
+        25,
+        39
+      ],
+      "blend": "add",
+      "frames": [
+        {
+          "ficheiro": "pickup/pickup_01.png",
+          "sha256": "399c260c01adf26ee8d2c01361c0c76b85659a5c7521087c65edea1c619b98b3",
+          "caixa_prancha": [
+            771,
+            664,
+            809,
+            742
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 548,
+            "fortes": 214,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "pickup/pickup_02.png",
+          "sha256": "e3a2d5d214017f81dca82d44cfb9bcaa1c6ccd7eca7b1944329c3500e4a17d6e",
+          "caixa_prancha": [
+            823,
+            664,
+            855,
+            742
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 434,
+            "fortes": 200,
+            "isolados": 2,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "pickup/pickup_03.png",
+          "sha256": "35c475bc35fb5d80d31d4a84b720a1e6135168cb46652e0527d420b2d6cd5982",
+          "caixa_prancha": [
+            878,
+            664,
+            903,
+            742
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 506,
+            "fortes": 211,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "pickup/pickup_04.png",
+          "sha256": "4c00380b68db03bc403631b48de56ed14701d214a5f5e731461e7e87c62cd7f0",
+          "caixa_prancha": [
+            927,
+            664,
+            948,
+            742
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 437,
+            "fortes": 183,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "pickup/pickup_05.png",
+          "sha256": "cfd97d6d26093e9bc5315d82ad75cceac75bbdec30162c7d35df24f7a03b575d",
+          "caixa_prancha": [
+            976,
+            664,
+            995,
+            742
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 437,
+            "fortes": 176,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "pickup/pickup_06.png",
+          "sha256": "4c90e847364ad456f2f9debe915a319cc21ab2484667bc7afda32dcf7641a213",
+          "caixa_prancha": [
+            1021,
+            664,
+            1044,
+            742
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 424,
+            "fortes": 178,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        }
+      ]
+    },
+    "death_dissolve": {
+      "classe": "B",
+      "derivacao": "cortes nos vales do desenho + alfa reconstruído sobre o fundo medido",
+      "cortes_prancha": [
+        1128,
+        1182,
+        1237,
+        1292,
+        1347,
+        1402,
+        1457
+      ],
+      "uso": "morte",
+      "fundo_medido": [
+        53,
+        53,
+        62
+      ],
+      "tamanho": [
+        48,
+        72
+      ],
+      "ancora": [
+        24,
+        39
+      ],
+      "blend": "add",
+      "frames": [
+        {
+          "ficheiro": "death_dissolve/death_dissolve_01.png",
+          "sha256": "b76771513bf9090ab8289de4c48941222ab24be51efb72385643aaeb7cdcad3a",
+          "caixa_prancha": [
+            1076,
+            664,
+            1114,
+            742
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 97,
+            "fortes": 10,
+            "isolados": 3,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "death_dissolve/death_dissolve_02.png",
+          "sha256": "013485edfa495084b686e830425a3a29652405fcab75b1c052805e4e0f9014b8",
+          "caixa_prancha": [
+            1130,
+            664,
+            1166,
+            742
+          ],
+          "estado": "REVIEW",
+          "alertas": [
+            "RUIDO_ISOLADO"
+          ],
+          "medidas": {
+            "pixeis": 116,
+            "fortes": 8,
+            "isolados": 4,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "death_dissolve/death_dissolve_03.png",
+          "sha256": "a4be552a487dd6f756a68c0d7b1002beaedba49bb0e8b79a70dfd6f318308894",
+          "caixa_prancha": [
+            1197,
+            664,
+            1225,
+            742
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 219,
+            "fortes": 24,
+            "isolados": 5,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "death_dissolve/death_dissolve_04.png",
+          "sha256": "b4c7c71be0bf518f8f2a911873e40d18e84bfe1e07b768f2b61b29eb61cce03c",
+          "caixa_prancha": [
+            1249,
+            664,
+            1279,
+            742
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 405,
+            "fortes": 80,
+            "isolados": 1,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "death_dissolve/death_dissolve_05.png",
+          "sha256": "2fb2db44b0b7d5a04694c02527ce5b0276a4f685f4c3ad098100425d90779d99",
+          "caixa_prancha": [
+            1306,
+            664,
+            1337,
+            742
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 634,
+            "fortes": 131,
+            "isolados": 2,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "death_dissolve/death_dissolve_06.png",
+          "sha256": "67af41d5c2126e0f8d06207f078c2768f9efc929e8d819b77c4d5b89e5816061",
+          "caixa_prancha": [
+            1365,
+            664,
+            1392,
+            742
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 439,
+            "fortes": 94,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "death_dissolve/death_dissolve_07.png",
+          "sha256": "5cf6c54f2948d8e9f28ca7e8e2201571881292fac58c928c7d9fd78eda4fb43b",
+          "caixa_prancha": [
+            1416,
+            664,
+            1445,
+            742
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 466,
+            "fortes": 121,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "death_dissolve/death_dissolve_08.png",
+          "sha256": "a85fe27d079860e9a11d8cdd6de7a7e9dd2c38e63dc625d75ed5d53560bfa29e",
+          "caixa_prancha": [
+            1472,
+            664,
+            1500,
+            742
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 394,
+            "fortes": 116,
+            "isolados": 1,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        }
+      ]
+    },
+    "death_dissolve_corrupcao": {
+      "classe": "C",
+      "derivacao": "death_dissolve com a luminância na rampa de corrupção [(0.0, (10, 4, 14)), (0.3, (60, 16, 88)), (0.6, (150, 24, 108)), (1.0, (232, 82, 162))]",
+      "uso": "corrupção (inimigos, guardiões, Coração)",
+      "tamanho": [
+        48,
+        72
+      ],
+      "ancora": [
+        24,
+        39
+      ],
+      "blend": "mix",
+      "frames": [
+        {
+          "ficheiro": "death_dissolve_corrupcao/death_dissolve_corrupcao_01.png",
+          "sha256": "ad10c5b82b8c3c5795ab561a079f9a8c82bb77f51c56526fd059b5ed9a874694",
+          "caixa_prancha": [
+            1076,
+            664,
+            1114,
+            742
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 97,
+            "fortes": 10,
+            "isolados": 3,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "death_dissolve_corrupcao/death_dissolve_corrupcao_02.png",
+          "sha256": "4d216a26db5289330a1c0e88383a6933110ed5126c7a8ce8dbd11ace00a5832c",
+          "caixa_prancha": [
+            1130,
+            664,
+            1166,
+            742
+          ],
+          "estado": "REVIEW",
+          "alertas": [
+            "RUIDO_ISOLADO"
+          ],
+          "medidas": {
+            "pixeis": 116,
+            "fortes": 8,
+            "isolados": 4,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "death_dissolve_corrupcao/death_dissolve_corrupcao_03.png",
+          "sha256": "c143d2ded24c76e2ee9ea4c24162c2284d37998e89c1dc946b8b41f6c7c0390d",
+          "caixa_prancha": [
+            1197,
+            664,
+            1225,
+            742
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 219,
+            "fortes": 24,
+            "isolados": 5,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "death_dissolve_corrupcao/death_dissolve_corrupcao_04.png",
+          "sha256": "d54296d79582b0a8d5008e47abd2656237726fb4a3c14a517e12ac0f71d66f48",
+          "caixa_prancha": [
+            1249,
+            664,
+            1279,
+            742
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 405,
+            "fortes": 80,
+            "isolados": 1,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "death_dissolve_corrupcao/death_dissolve_corrupcao_05.png",
+          "sha256": "50db057c3d7797cb9cf9d0856d47f1a14700ba3a36d280cde4281db1ee531b9c",
+          "caixa_prancha": [
+            1306,
+            664,
+            1337,
+            742
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 634,
+            "fortes": 131,
+            "isolados": 2,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "death_dissolve_corrupcao/death_dissolve_corrupcao_06.png",
+          "sha256": "1a2ede733fbaca608342b7cc73be075ad6b61a06a2963c9344d938f8a65d9cba",
+          "caixa_prancha": [
+            1365,
+            664,
+            1392,
+            742
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 439,
+            "fortes": 94,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "death_dissolve_corrupcao/death_dissolve_corrupcao_07.png",
+          "sha256": "5de2e83960e333813c9f578056509a06aa93ef488bf9061f15dc3910e64e4b9b",
+          "caixa_prancha": [
+            1416,
+            664,
+            1445,
+            742
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 466,
+            "fortes": 121,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "death_dissolve_corrupcao/death_dissolve_corrupcao_08.png",
+          "sha256": "ffcc475452a9a9eb501afbb9fb5c840e2065f962aabf3504c2ce266c22d64d5a",
+          "caixa_prancha": [
+            1472,
+            664,
+            1500,
+            742
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 394,
+            "fortes": 116,
+            "isolados": 1,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        }
+      ]
+    },
+    "finisher_burst_corrupcao": {
+      "classe": "C",
+      "derivacao": "finisher_burst com a luminância na rampa de corrupção [(0.0, (10, 4, 14)), (0.3, (60, 16, 88)), (0.6, (150, 24, 108)), (1.0, (232, 82, 162))]",
+      "uso": "corrupção (inimigos, guardiões, Coração)",
+      "tamanho": [
+        72,
+        72
+      ],
+      "ancora": [
+        36,
+        37
+      ],
+      "blend": "mix",
+      "frames": [
+        {
+          "ficheiro": "finisher_burst_corrupcao/finisher_burst_corrupcao_01.png",
+          "sha256": "51e7faf9d7a1320bb9c6576d5540f33262f5cb8bfd92266a953d7feac2e7fc42",
+          "caixa_prancha": [
+            524,
+            402,
+            580,
+            476
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 348,
+            "fortes": 86,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "finisher_burst_corrupcao/finisher_burst_corrupcao_02.png",
+          "sha256": "2c1ede9a6b261c75e242de98911b86e3689661176671a8e3edb3a0af47386ebd",
+          "caixa_prancha": [
+            580,
+            402,
+            650,
+            476
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 2367,
+            "fortes": 1047,
+            "isolados": 1,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "finisher_burst_corrupcao/finisher_burst_corrupcao_03.png",
+          "sha256": "48f0130f83118373c9af133c743966d913be41ac9f0acc99bf4297ce05a20171",
+          "caixa_prancha": [
+            650,
+            402,
+            707,
+            476
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 1440,
+            "fortes": 635,
+            "isolados": 3,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "finisher_burst_corrupcao/finisher_burst_corrupcao_04.png",
+          "sha256": "f57d3adafbcbcb499012ad6baf98f9ea562c556aea66b60dc391ac6e0e3aed4a",
+          "caixa_prancha": [
+            707,
+            402,
+            770,
+            476
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 1678,
+            "fortes": 782,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "finisher_burst_corrupcao/finisher_burst_corrupcao_05.png",
+          "sha256": "1a4bdbd2b931d37c24e629ac4843e94fceecbd3bad39700848d6ded7bd57424d",
+          "caixa_prancha": [
+            770,
+            402,
+            833,
+            476
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 1507,
+            "fortes": 552,
+            "isolados": 2,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "finisher_burst_corrupcao/finisher_burst_corrupcao_06.png",
+          "sha256": "99ea117d78b94b4cb83b146e74ba5f13407e5c9d37916573328e23a52b37a773",
+          "caixa_prancha": [
+            841,
+            402,
+            895,
+            476
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 843,
+            "fortes": 258,
+            "isolados": 2,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "finisher_burst_corrupcao/finisher_burst_corrupcao_07.png",
+          "sha256": "888a4ea4a23c233c63df4475ce5dfc5fdf9b09e46e2f5ad8fc6492cbcd26bd13",
+          "caixa_prancha": [
+            905,
+            402,
+            961,
+            476
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 379,
+            "fortes": 114,
+            "isolados": 1,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "finisher_burst_corrupcao/finisher_burst_corrupcao_08.png",
+          "sha256": "8e90f2153209188223f1b712acb0b73420b686b7c09f2f485da95ef313eeb449",
+          "caixa_prancha": [
+            961,
+            402,
+            1022,
+            476
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 423,
+            "fortes": 87,
+            "isolados": 1,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        }
+      ]
+    },
+    "projectile_corrupcao": {
+      "classe": "C",
+      "derivacao": "projectile com a luminância na rampa de corrupção [(0.0, (10, 4, 14)), (0.3, (60, 16, 88)), (0.6, (150, 24, 108)), (1.0, (232, 82, 162))]",
+      "uso": "corrupção (inimigos, guardiões, Coração)",
+      "tamanho": [
+        70,
+        76
+      ],
+      "ancora": [
+        35,
+        38
+      ],
+      "blend": "mix",
+      "frames": [
+        {
+          "ficheiro": "projectile_corrupcao/projectile_corrupcao_01.png",
+          "sha256": "2cba22e9232d7ee177e57372fb6b964d8f62b5e6cef70129faec1f3cd842f512",
+          "caixa_prancha": [
+            488,
+            528,
+            522,
+            606
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 45,
+            "fortes": 16,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "projectile_corrupcao/projectile_corrupcao_02.png",
+          "sha256": "27d9d03ec209fa80eeb23536d3ebe34035ffb65c78d88a3107c26070d95c4a65",
+          "caixa_prancha": [
+            549,
+            528,
+            611,
+            606
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 302,
+            "fortes": 185,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "projectile_corrupcao/projectile_corrupcao_03.png",
+          "sha256": "ff96b59b8507293c929a76e50dedc9d9828997e3664ff43c3f8d37dd7201479e",
+          "caixa_prancha": [
+            626,
+            528,
+            671,
+            606
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 222,
+            "fortes": 120,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "projectile_corrupcao/projectile_corrupcao_04.png",
+          "sha256": "c59b20b8824c4f8c729b2324a079cb0f358864e5aa23832bd04c8823ec083067",
+          "caixa_prancha": [
+            673,
+            528,
+            732,
+            606
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 416,
+            "fortes": 218,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "projectile_corrupcao/projectile_corrupcao_05.png",
+          "sha256": "5b6ea5b18249d5be66ac8e978b711d738347bb59d144dcd4c57c40342f550107",
+          "caixa_prancha": [
+            732,
+            528,
+            794,
+            606
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 584,
+            "fortes": 331,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "projectile_corrupcao/projectile_corrupcao_06.png",
+          "sha256": "0efa91e091bcfd88d5f8c5df4a8ad528ee24efd08f4d9493e19c97d007875203",
+          "caixa_prancha": [
+            794,
+            528,
+            858,
+            606
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 882,
+            "fortes": 529,
+            "isolados": 1,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "projectile_corrupcao/projectile_corrupcao_07.png",
+          "sha256": "8c19ecfb8358744099b28edba9cb52d786e7e5a843c0c26667accea80b9e3878",
+          "caixa_prancha": [
+            858,
+            528,
+            921,
+            606
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 1263,
+            "fortes": 749,
+            "isolados": 1,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "projectile_corrupcao/projectile_corrupcao_08.png",
+          "sha256": "3c9e18820c3c65548bf84451c8ad63bc37350e3d3c67beee01709fc893f47c4b",
+          "caixa_prancha": [
+            921,
+            528,
+            979,
+            606
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 2370,
+            "fortes": 1798,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        }
+      ]
+    },
+    "charge_aura_corrupcao": {
+      "classe": "C",
+      "derivacao": "charge_aura com a luminância na rampa de corrupção [(0.0, (10, 4, 14)), (0.3, (60, 16, 88)), (0.6, (150, 24, 108)), (1.0, (232, 82, 162))]",
+      "uso": "corrupção (inimigos, guardiões, Coração)",
+      "tamanho": [
+        52,
+        72
+      ],
+      "ancora": [
+        26,
+        37
+      ],
+      "blend": "mix",
+      "frames": [
+        {
+          "ficheiro": "charge_aura_corrupcao/charge_aura_corrupcao_01.png",
+          "sha256": "54526290f10d07ae1435940a79115379ef8233603871266725a3b3ede07fb4e9",
+          "caixa_prancha": [
+            1008,
+            528,
+            1050,
+            606
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 289,
+            "fortes": 153,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "charge_aura_corrupcao/charge_aura_corrupcao_02.png",
+          "sha256": "78e826db9489922f8e53bc13b5436afd9b922abc5bb2f7bd01dbffe2b71299c9",
+          "caixa_prancha": [
+            1086,
+            528,
+            1111,
+            606
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 463,
+            "fortes": 260,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "charge_aura_corrupcao/charge_aura_corrupcao_03.png",
+          "sha256": "cf7065d387a4a235f3672b24fff793d44804ac57131766652416745166e486a5",
+          "caixa_prancha": [
+            1143,
+            528,
+            1173,
+            606
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 784,
+            "fortes": 452,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "charge_aura_corrupcao/charge_aura_corrupcao_04.png",
+          "sha256": "657fd54258c5a53b2bb9bd5a44a5141ceacd312a4600771c90b5f070b73aeebe",
+          "caixa_prancha": [
+            1204,
+            528,
+            1236,
+            606
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 1000,
+            "fortes": 570,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "charge_aura_corrupcao/charge_aura_corrupcao_05.png",
+          "sha256": "e22ed0c87bfbe3e83d5d3440229824a5843c4dd5102fff14f33e84205f0b6f63",
+          "caixa_prancha": [
+            1266,
+            528,
+            1302,
+            606
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 1199,
+            "fortes": 732,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "charge_aura_corrupcao/charge_aura_corrupcao_06.png",
+          "sha256": "4d50b387569cb90aab98e6ffbdb6350e4950dd6cacd33290592a7b5d6ce9a270",
+          "caixa_prancha": [
+            1331,
+            528,
+            1368,
+            606
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 1261,
+            "fortes": 802,
+            "isolados": 1,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "charge_aura_corrupcao/charge_aura_corrupcao_07.png",
+          "sha256": "08794df448f5f8d5b21d17e678dd718287b4630a80865756bd63580d06458523",
+          "caixa_prancha": [
+            1395,
+            528,
+            1432,
+            606
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 1243,
+            "fortes": 768,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "charge_aura_corrupcao/charge_aura_corrupcao_08.png",
+          "sha256": "5e4754abd0fc4b8bbb22790b4769fd1e5d5f0f94d9e977a8ee8517b186a0894e",
+          "caixa_prancha": [
+            1462,
+            528,
+            1497,
+            606
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 1192,
+            "fortes": 750,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        }
+      ]
+    },
+    "hit_sparks_corrupcao": {
+      "classe": "C",
+      "derivacao": "hit_sparks com a luminância na rampa de corrupção [(0.0, (10, 4, 14)), (0.3, (60, 16, 88)), (0.6, (150, 24, 108)), (1.0, (232, 82, 162))]",
+      "uso": "corrupção (inimigos, guardiões, Coração)",
+      "tamanho": [
+        72,
+        67
+      ],
+      "ancora": [
+        36,
+        37
+      ],
+      "blend": "mix",
+      "frames": [
+        {
+          "ficheiro": "hit_sparks_corrupcao/hit_sparks_corrupcao_01.png",
+          "sha256": "2683f9d9a3b9b96621c7fb8b4a80077fc4566790c0938cf201ae8729f07a2b45",
+          "caixa_prancha": [
+            24,
+            402,
+            76,
+            476
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 273,
+            "fortes": 88,
+            "isolados": 1,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "hit_sparks_corrupcao/hit_sparks_corrupcao_02.png",
+          "sha256": "1bc4c8220fd7a09e67163853748e987f5d84e09266f4bc4089fe356c06dc3caf",
+          "caixa_prancha": [
+            102,
+            402,
+            137,
+            476
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 486,
+            "fortes": 203,
+            "isolados": 1,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "hit_sparks_corrupcao/hit_sparks_corrupcao_03.png",
+          "sha256": "2db75a72ccb66a57aad996c4d49248b27b1ef18535fff14950d699a7f7269cb0",
+          "caixa_prancha": [
+            160,
+            402,
+            197,
+            476
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 571,
+            "fortes": 209,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "hit_sparks_corrupcao/hit_sparks_corrupcao_04.png",
+          "sha256": "4337868464567b6f2614c3b9141f1310d4878f7e9c48b70be6ec7505242b1ed8",
+          "caixa_prancha": [
+            224,
+            402,
+            255,
+            476
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 394,
+            "fortes": 149,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "hit_sparks_corrupcao/hit_sparks_corrupcao_05.png",
+          "sha256": "022e48837bc57c00b82ccb9ec0e14199bc3e0733f4d5497864bbd5d193ce292a",
+          "caixa_prancha": [
+            288,
+            402,
+            313,
+            476
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 350,
+            "fortes": 135,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "hit_sparks_corrupcao/hit_sparks_corrupcao_06.png",
+          "sha256": "db0f9017b9643904af026861a9a0d07d291b6026eac66f5ac4c7af0814bd09a0",
+          "caixa_prancha": [
+            342,
+            402,
+            374,
+            476
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 470,
+            "fortes": 196,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "hit_sparks_corrupcao/hit_sparks_corrupcao_07.png",
+          "sha256": "cacd4e4d82ac54c5269bb689af4dcfdb8b32b8e4f9099d53cc7240503bd9f0c0",
+          "caixa_prancha": [
+            402,
+            402,
+            433,
+            476
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 432,
+            "fortes": 182,
+            "isolados": 1,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        },
+        {
+          "ficheiro": "hit_sparks_corrupcao/hit_sparks_corrupcao_08.png",
+          "sha256": "cfd0a7ce5096c1bc4acd2297635e33d17817816c7120f248070dcebf152812eb",
+          "caixa_prancha": [
+            465,
+            402,
+            492,
+            476
+          ],
+          "estado": "PASS",
+          "alertas": [],
+          "medidas": {
+            "pixeis": 361,
+            "fortes": 153,
+            "isolados": 0,
+            "cinza_fraco": 0,
+            "borda": 0
+          }
+        }
+      ]
+    }
+  }
+}

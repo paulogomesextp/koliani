@@ -9,6 +9,8 @@ const CENA_HUD := preload("res://scenes/ui/HUD.tscn")
 const CENA_PAUSA := preload("res://scenes/ui/Pausa.tscn")
 const CENA_DEV_BARRA := preload("res://scenes/ui/DevBarra.tscn")
 const FIM_CAMPANHA := preload("res://scripts/fim_campanha.gd")
+## Execution 9G: VFX de produção da Região I (só usado pela rota de prova).
+const Vfx9G := preload("res://scripts/vfx_regiao1.gd")
 
 
 func _ready() -> void:
@@ -209,6 +211,10 @@ func _tirar_foto(caminho: String, estado := "") -> void:
 		return
 	elif estado == "ui9f" and koliani:
 		await _prova_ui_9f(caminho, koliani)
+		get_tree().quit(0)
+		return
+	elif estado == "vfx9g" and koliani:
+		await _prova_vfx_9g(caminho, koliani)
 		get_tree().quit(0)
 		return
 	else:
@@ -575,3 +581,146 @@ func _ao_fim_da_campanha() -> void:
 	var fim := CanvasLayer.new()
 	fim.set_script(FIM_CAMPANHA)
 	add_child(fim)
+
+
+## Execution 9G: prova, no runtime EXPORTADO, dos VFX de produção da Região I.
+## Dispara cada efeito pelo caminho normal do jogo (o mesmo código que corre a
+## jogar), fotografa e regista a textura que o efeito está MESMO a desenhar.
+## Não mexe em progresso: a Koliani fica invulnerável, o chefe não é morto (só
+## se chama o rebentamento da queda) e nada grava.
+## Uso: Koliani.exe -- --nivel=N --foto-estado=vfx9g --foto=<png>
+func _prova_vfx_9g(caminho: String, koliani: Node2D) -> void:
+	var base := caminho.get_basename()
+	var registo: Array = []
+	get_tree().create_timer(180.0, true, false, true).timeout.connect(func() -> void: get_tree().quit(3))
+	koliani.set("_invulneravel", 9999.0)
+	await get_tree().create_timer(0.8).timeout
+
+	# --- Koliani: combo, dash, salto duplo, aterragem, dano, escudo ---
+	for passo in 3:
+		koliani.set("_combo_passo", passo - 1)
+		koliani.set("_combo_janela", 9.0)
+		koliani.call("_iniciar_ataque")
+		await get_tree().create_timer(0.06).timeout
+		await _foto_vfx(base, "1_golpe_%d" % (passo + 1), registo)
+	koliani.call("_vfx9g_dash")
+	await get_tree().create_timer(0.05).timeout
+	await _foto_vfx(base, "2_dash", registo)
+	koliani.call("_vfx_salto_duplo")
+	await get_tree().create_timer(0.05).timeout
+	await _foto_vfx(base, "3_salto_duplo", registo)
+	Vfx9G.tocar(koliani, "land_impact", koliani.global_position + Vector2(0.0, 22.0), 1.0, 0.0,
+		false, false, -1, 0.4)
+	await get_tree().create_timer(0.08).timeout
+	await _foto_vfx(base, "4_aterragem", registo)
+	koliani.set("_invulneravel", 0.0)
+	koliani.call("receber_dano", 1, 1.0)
+	koliani.set("_invulneravel", 9999.0)
+	await get_tree().create_timer(0.08).timeout
+	await _foto_vfx(base, "5_dano", registo)
+	koliani.set("_defendendo", true)
+	await get_tree().create_timer(0.25).timeout
+	await _foto_vfx(base, "6_escudo", registo)
+	koliani.set("_defendendo", false)
+
+	# --- tiros: o dela (Shadowblade) e o do chefe (corrupção) ---
+	var pai := get_tree().current_scene
+	var tiro := (load("res://scenes/actors/ProjetilKoliani.tscn") as PackedScene).instantiate()
+	pai.add_child(tiro)
+	tiro.global_position = koliani.global_position + Vector2(40.0, -10.0)
+	tiro.call("lancar", Vector2.RIGHT, 1)
+	tiro.set("_dir", Vector2.ZERO)  # fica parado para a foto
+	await get_tree().create_timer(0.2).timeout
+	await _foto_vfx(base, "7_tiro_koliani", registo)
+	tiro.queue_free()
+	var tiro_z := (load("res://scenes/actors/ProjetilZeriko.tscn") as PackedScene).instantiate()
+	pai.add_child(tiro_z)
+	tiro_z.global_position = koliani.global_position + Vector2(60.0, -10.0)
+	tiro_z.set("velocidade", 0.0)
+	await get_tree().create_timer(0.2).timeout
+	await _foto_vfx(base, "8_tiro_chefe", registo)
+	tiro_z.queue_free()
+
+	# --- inimigos: acerto, remate, telégrafo, morte ---
+	var alvos: Array = []
+	_juntar_inimigos(get_tree().current_scene, alvos)
+	alvos.sort_custom(func(a: Node, b: Node) -> bool: return a is ChefeBase and not b is ChefeBase)
+	var comum: DemonioBase = null
+	var chefe: ChefeBase = null
+	for e: DemonioBase in alvos:
+		if e is ChefeBase and chefe == null:
+			chefe = e
+		elif not (e is ChefeBase) and comum == null:
+			comum = e
+	if comum:
+		await _encostar_9e2(koliani, comum)
+		koliani.call("_pop_impacto", comum.global_position, false)
+		await get_tree().create_timer(0.05).timeout
+		await _foto_vfx(base, "9_acerto", registo)
+		koliani.call("_pop_impacto", comum.global_position, true)
+		await get_tree().create_timer(0.05).timeout
+		await _foto_vfx(base, "10_remate", registo)
+		comum.call("_vfx9g_morte")
+		await get_tree().create_timer(0.12).timeout
+		await _foto_vfx(base, "11_morte_inimigo", registo)
+	if chefe:
+		await _encostar_9e2(koliani, chefe)
+		chefe.call("_piscar", true)
+		await get_tree().create_timer(0.15).timeout
+		await _foto_vfx(base, "12_telegrafo_guardiao", registo)
+		chefe.call("_piscar", false)
+		if chefe is ChefeCoracaoPutrefacto:
+			await _foto_vfx(base, "13_coracao_fase1", registo)
+			chefe.set("vida", int(int(chefe.get("_vida_max")) * 0.45))
+			await get_tree().create_timer(0.3).timeout
+			await _foto_vfx(base, "14_coracao_transicao", registo)
+			await get_tree().create_timer(1.3).timeout
+			await _foto_vfx(base, "15_coracao_fase2", registo)
+		# rebentamento da queda SEM matar o chefe (nada de progresso/reward)
+		chefe.call("_explodir_derrotado")
+		await get_tree().create_timer(0.14).timeout
+		await _foto_vfx(base, "16_queda_chefe", registo)
+
+	# --- checkpoint (só o efeito; o registo do checkpoint não é tocado) ---
+	var fog := get_tree().get_first_node_in_group("checkpoints")
+	if fog:
+		koliani.global_position = (fog as Node2D).global_position + Vector2(-40.0, -30.0)
+		await get_tree().create_timer(0.4).timeout
+		await _foto_vfx(base, "17_checkpoint_pronto", registo)
+		fog.call("_ativar", false)
+		await get_tree().create_timer(0.2).timeout
+		await _foto_vfx(base, "18_checkpoint_aceso", registo)
+	print("PROVA VFX 9G: ", ProjectSettings.globalize_path(base + "_registo.json"))
+
+
+## Foto + registo das texturas que os nós de VFX 9G estão MESMO a desenhar.
+func _foto_vfx(base: String, etiqueta: String, registo: Array) -> void:
+	await RenderingServer.frame_post_draw
+	var cam := "%s_%s.png" % [base, etiqueta]
+	get_viewport().get_texture().get_image().save_png(cam)
+	var producao: Array = []
+	var legado: Array = []
+	for no in get_tree().root.find_children("*", "", true, false):
+		if not (no is CanvasItem) or not (no as CanvasItem).is_visible_in_tree():
+			continue
+		var tex: Texture2D = null
+		if no is AnimatedSprite2D:
+			var a := no as AnimatedSprite2D
+			if a.sprite_frames and a.sprite_frames.has_animation(a.animation):
+				tex = a.sprite_frames.get_frame_texture(a.animation, a.frame)
+		elif no is Sprite2D:
+			tex = (no as Sprite2D).texture
+		if tex is AtlasTexture:
+			tex = (tex as AtlasTexture).atlas
+		if tex == null:
+			continue
+		if tex.resource_path.contains("/vfx_9g/"):
+			producao.append("%s=%s" % [no.name, tex.resource_path.get_file()])
+		elif String(no.name).begins_with("VFX9G") or String(no.name) in [
+				"Impacto", "RastoDash", "SaltoDuploVFX", "MorteVFX"]:
+			legado.append("%s=%s" % [no.name, tex.resource_path])
+	registo.append({"etiqueta": etiqueta, "foto": cam, "vfx_producao": producao, "vfx_legado": legado})
+	print("FOTO9G %s producao=%d %s legado=%s" % [etiqueta, producao.size(), producao, legado])
+	var f := FileAccess.open(base + "_registo.json", FileAccess.WRITE)
+	if f:
+		f.store_string(JSON.stringify(registo, "  "))

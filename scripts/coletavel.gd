@@ -1,5 +1,7 @@
 class_name Coletavel
 extends Area2D
+## Execution 9G: brilho de recolha da prancha 07 (só na Região I).
+const Vfx9G := preload("res://scripts/vfx_regiao1.gd")
 ## Item apanhável no mundo: quando a Koliani lhe toca, desbloqueia uma
 ## habilidade permanente e desaparece. Por cima flutua a FAIXA "SKILL" --
 ## placa escura, letras azuis e brilho aditivo (ver `_faixa_skill`).
@@ -160,5 +162,7 @@ func _ao_entrar(corpo: Node) -> void:
 	if habilidade_id != "":
 		EstadoJogo.desbloquear_habilidade(habilidade_id)
 	Som.toca("apanhar", -6.0)
+	if Vfx9G.ativo(self):
+		Vfx9G.tocar(self, "pickup", global_position, 1.1, 0.0, false, false, 38, 0.38)
 	apanhado.emit(pista_id, habilidade_id)
 	queue_free()

@@ -822,6 +822,20 @@ func _ao_tocar(corpo: Node) -> void:
 ## pelas costas ou logo a seguir a um rolamento -- ver `Koliani`).
 const CRIT_MULT := 1.7
 
+## Execution 9G: VFX de produção da Região I (prancha 07, paleta de corrupção).
+const Vfx9G := preload("res://scripts/vfx_regiao1.gd")
+
+
+## Morte na Região I: a corrupção larga o corpo e dissolve-se. Devolve `true`
+## quando tratou do assunto (aí não há anel nem estilhaços do legado).
+func _vfx9g_morte() -> bool:
+	if not Vfx9G.ativo(self):
+		return false
+	var alt := maxf(_altura_alvo(), 24.0)
+	Vfx9G.tocar(self, "death_dissolve_corrupcao", global_position + Vector2(0.0, -alt * 0.4),
+		clampf(alt / 60.0, 0.7, 2.2), 0.0, false, false, 39, 0.8)
+	return true
+
 func receber_dano(quantidade: int, dir_empurrao: float = 0.0, critico := false) -> void:
 	if _morto:
 		return
@@ -864,9 +878,10 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0, critico := false) 
 		else:
 			_soltar_essencia()
 			# mesmo "pop" da morte com animação, para o feedback ser igual
-			Impacto.rebentar(self, global_position + Vector2(0.0, -10.0),
-				cor_rim.lerp(Color(1, 1, 1), 0.35), 3.0)
-			soltar_estilhacos()
+			if not _vfx9g_morte():
+				Impacto.rebentar(self, global_position + Vector2(0.0, -10.0),
+					cor_rim.lerp(Color(1, 1, 1), 0.35), 3.0)
+				soltar_estilhacos()
 			queue_free()
 	else:
 		if dir_empurrao != 0.0:
@@ -959,14 +974,17 @@ func _morrer_anim() -> void:
 	velocity = Vector2.ZERO
 	_soltar_essencia()
 	# "pop" de morte: o mesmo anel do acerto, maior e na cor do rim do bioma
-	Impacto.rebentar(self, global_position + Vector2(0.0, -10.0),
-		cor_rim.lerp(Color(1, 1, 1), 0.35), 3.4)
+	var prod_9g := _vfx9g_morte()
+	if not prod_9g:
+		Impacto.rebentar(self, global_position + Vector2(0.0, -10.0),
+			cor_rim.lerp(Color(1, 1, 1), 0.35), 3.4)
 	if _area_contacto:
 		_area_contacto.set_deferred("monitoring", false)
 	set_deferred("collision_layer", 0)
 	_anim.play("dead")
 	await _anim.animation_finished
-	soltar_estilhacos()
+	if not prod_9g:
+		soltar_estilhacos()
 	queue_free()
 
 

@@ -45,6 +45,8 @@ var _combate := false
 ## Sem ela, tudo fica como antes. Nada disto toca em vida, dano ou tempos.
 const CORACAO_ID := "coracao_putrefacto"
 var _prod := false
+## 9G: aura de corrupção da fase 2.
+var _aura_f2: AnimatedSprite2D
 
 
 func _ready() -> void:
@@ -133,6 +135,22 @@ func _erupcao() -> void:
 	tw.tween_property(s, "position:y", s.position.y - 22.0, 1.1).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	tw.parallel().tween_property(s, "modulate:a", 0.0, 1.1).set_delay(0.35)
 	tw.tween_callback(s.queue_free)
+
+
+## 9G: a fase 2 não é só "mais depressa" -- a corrupção passa a arder à volta
+## do corpo, sem tocar no núcleo (é o ponto fraco) nem tapar a silhueta.
+func _aura_fase2() -> void:
+	if _aura_f2 != null or not Vfx9G.ativo(self):
+		return
+	_aura_f2 = Vfx9G.novo("charge_aura_corrupcao", true)
+	if _aura_f2 == null:
+		return
+	_aura_f2.z_index = -2
+	_aura_f2.scale = Vector2.ONE * 2.6
+	_aura_f2.modulate.a = 0.55
+	_aura_f2.position = Vector2(0.0, 10.0)
+	add_child(_aura_f2)
+	_aura_f2.play("ciclo")
 
 
 func _process(dt: float) -> void:
@@ -237,6 +255,8 @@ func _atualiza_fase() -> void:
 		if _prod and _nivel == 2:
 			_alinhar_nucleo("fase_2")
 			_erupcao()
+		if _nivel == 2:
+			_aura_fase2()
 		Som.toca("chefe_cai", -9.0, 0.7)
 		_abanar_camera(6.0)
 		if _nivel == 2:
