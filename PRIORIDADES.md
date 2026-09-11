@@ -2,6 +2,19 @@
 
 ## Agora
 
+0000. **9B.1 BLOQUEADA: o Golden Set da Koliani precisa de quem o desenhe.**
+   O Paulo resolveu CONF-01 para **Route B** (arte de raiz). Um agente sem
+   ferramenta de imagem não consegue produzir 33 frames de pixel-art premium
+   com identidade consistente — desenhar por código dava as aproximações
+   poligonais que a 9A proibiu. **Falta decidir quem desenha.**
+   Está tudo o resto pronto: contrato de canvas, pastas, manifestos, validador
+   provado. Ver `docs/production_art_gate_9b1_golden_set.md`.
+
+0000b. **APROVAR O CONTRATO DE CANVAS antes de alguém desenhar.** 128×128,
+   personagem a 64 px, pivot (64,104), baseline 103, escala Godot 1,0, offset
+   (0,−18). Mantém o tamanho aparente de hoje, por isso não mexe em colisão,
+   câmara, física nem tempos. Mudá-lo depois custa os 33 frames todos.
+
 000. **DECISÃO DO GAME MASTER PENDENTE (CONF-01, Execution 9A): o 9B extrai
    das pranchas ou desenha de raiz?** O `production_contract.json` diz que
    «nenhum frame ou píxel é extraído ou reciclado» das pranchas, mas as 7

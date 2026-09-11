@@ -1,0 +1,43 @@
+{
+  "schema_version": 2,
+  "character": "Koliani",
+  "animation": "run",
+  "frame_count": 10,
+  "canvas_width": 128,
+  "canvas_height": 128,
+  "pivot_x": 64,
+  "pivot_y": 104,
+  "baseline_y": 103,
+  "baseline_tolerance": 1,
+  "max_scale_ratio": 1.25,
+  "max_bbox_drift": 14,
+  "asset_type": "BODY",
+  "expected_alpha": true,
+  "vfx_separate": true,
+  "reference_path": "C:\\Projetos\\koliani\\Koliani_1.0_Master_Package_v2\\references\\approved\\05_KOLIANI_IDLE_RUN_CLEAN_v1_1.png",
+  "reference_sha256": "5056b726728328f1f88092f26456fea8b9785f7e57d89c6c2976485d8c83980d",
+  "authority": [
+    {
+      "file": "05_KOLIANI_IDLE_RUN_CLEAN_v1_1.png",
+      "sha256": "5056b726728328f1f88092f26456fea8b9785f7e57d89c6c2976485d8c83980d"
+    },
+    {
+      "file": "02_KOLIANI_MOVEMENT_CORE_v1_1.png",
+      "sha256": "78788a0327347767bc2d94b08b75fe3f45a80fe48fe18aeab501873f4bda83b6"
+    }
+  ],
+  "visual_review_state": "NOT_PRODUCED",
+  "runtime_integration_state": "NOT_INTEGRATED",
+  "frames": [
+    "run_001.png",
+    "run_002.png",
+    "run_003.png",
+    "run_004.png",
+    "run_005.png",
+    "run_006.png",
+    "run_007.png",
+    "run_008.png",
+    "run_009.png",
+    "run_010.png"
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "schema_version": 2,
+  "character": "Koliani",
+  "animation": "attack_basic",
+  "frame_count": 6,
+  "canvas_width": 128,
+  "canvas_height": 128,
+  "pivot_x": 64,
+  "pivot_y": 104,
+  "baseline_y": 103,
+  "baseline_tolerance": 1,
+  "max_scale_ratio": 1.25,
+  "max_bbox_drift": 14,
+  "asset_type": "BODY",
+  "expected_alpha": true,
+  "vfx_separate": true,
+  "reference_path": "C:\\Projetos\\koliani\\Koliani_1.0_Master_Package_v2\\references\\approved\\03_KOLIANI_COMBAT_ACTIONS_v1_1.png",
+  "reference_sha256": "a2d91fc8bff998398f761d92f0f948c0dce6425944a2fbe6e409ee6355cae319",
+  "authority": [
+    {
+      "file": "03_KOLIANI_COMBAT_ACTIONS_v1_1.png",
+      "sha256": "a2d91fc8bff998398f761d92f0f948c0dce6425944a2fbe6e409ee6355cae319"
+    },
+    {
+      "file": "01_KOLIANI_VISUAL_AUTHORITY_v1_1.png",
+      "sha256": "91c298010a3e606d12f73136e41667c6e82ac9c24b577e04e4e4093431408a5f"
+    }
+  ],
+  "visual_review_state": "NOT_PRODUCED",
+  "runtime_integration_state": "NOT_INTEGRATED",
+  "frames": [
+    "attack_basic_001.png",
+    "attack_basic_002.png",
+    "attack_basic_003.png",
+    "attack_basic_004.png",
+    "attack_basic_005.png",
+    "attack_basic_006.png"
+  ]
+}

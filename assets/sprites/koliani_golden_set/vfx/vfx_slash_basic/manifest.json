@@ -1,0 +1,35 @@
+{
+  "schema_version": 2,
+  "character": "Koliani",
+  "animation": "vfx_slash_basic",
+  "frame_count": 6,
+  "canvas_width": 128,
+  "canvas_height": 128,
+  "pivot_x": 64,
+  "pivot_y": 104,
+  "baseline_y": 103,
+  "baseline_tolerance": 1,
+  "max_scale_ratio": 1.25,
+  "max_bbox_drift": 14,
+  "asset_type": "VFX",
+  "expected_alpha": true,
+  "vfx_separate": true,
+  "reference_path": "C:\\Projetos\\koliani\\Koliani_1.0_Master_Package_v2\\references\\approved\\07_KOLIANI_VFX_CLEAN_v1_1.png",
+  "reference_sha256": "6564982d4ccfad84d0a5f6d0e73196785afcff7ac8cd218dd27f066f883fe8c6",
+  "authority": [
+    {
+      "file": "07_KOLIANI_VFX_CLEAN_v1_1.png",
+      "sha256": "6564982d4ccfad84d0a5f6d0e73196785afcff7ac8cd218dd27f066f883fe8c6"
+    }
+  ],
+  "visual_review_state": "NOT_PRODUCED",
+  "runtime_integration_state": "NOT_INTEGRATED",
+  "frames": [
+    "vfx_slash_basic_001.png",
+    "vfx_slash_basic_002.png",
+    "vfx_slash_basic_003.png",
+    "vfx_slash_basic_004.png",
+    "vfx_slash_basic_005.png",
+    "vfx_slash_basic_006.png"
+  ]
+}

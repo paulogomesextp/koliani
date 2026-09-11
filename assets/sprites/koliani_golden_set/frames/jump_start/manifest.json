@@ -1,0 +1,33 @@
+{
+  "schema_version": 2,
+  "character": "Koliani",
+  "animation": "jump_start",
+  "frame_count": 4,
+  "canvas_width": 128,
+  "canvas_height": 128,
+  "pivot_x": 64,
+  "pivot_y": 104,
+  "baseline_y": 103,
+  "baseline_tolerance": 1,
+  "max_scale_ratio": 1.25,
+  "max_bbox_drift": 14,
+  "asset_type": "BODY",
+  "expected_alpha": true,
+  "vfx_separate": true,
+  "reference_path": "C:\\Projetos\\koliani\\Koliani_1.0_Master_Package_v2\\references\\approved\\06_KOLIANI_JUMP_FALL_LAND_v1_1.png",
+  "reference_sha256": "afbd74469444ad01883ea8069ec64b818e47612da481becfe32581f883a324b3",
+  "authority": [
+    {
+      "file": "06_KOLIANI_JUMP_FALL_LAND_v1_1.png",
+      "sha256": "afbd74469444ad01883ea8069ec64b818e47612da481becfe32581f883a324b3"
+    }
+  ],
+  "visual_review_state": "NOT_PRODUCED",
+  "runtime_integration_state": "NOT_INTEGRATED",
+  "frames": [
+    "jump_start_001.png",
+    "jump_start_002.png",
+    "jump_start_003.png",
+    "jump_start_004.png"
+  ]
+}

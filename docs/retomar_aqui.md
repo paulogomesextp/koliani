@@ -4,6 +4,43 @@
 
 Atualizado em 11 de setembro de 2026.
 
+## Execution 9B.1 — Golden Set da Koliani — **BLOQUEADA na arte**
+
+Relatório: [production_art_gate_9b1_golden_set.md](production_art_gate_9b1_golden_set.md).
+O Game Master resolveu CONF-01: **Route B**, arte desenhada de raiz.
+
+**O bloqueio é simples: falta quem desenhe.** Um agente sem ferramenta de
+imagem só consegue desenhar por código, e isso dava as "generic polygon
+approximations" que a 9A proibiu. Não se produziu nem integrou arte nenhuma.
+
+**Feito tudo o resto:** autoridade reverificada (6/6 SHA batem), contrato de
+canvas derivado de medições, validador v2 integrado e **provado**, e o
+`assets/sprites/koliani_golden_set/` criado com manifestos prontos.
+
+**Contrato de canvas (falta o Paulo aprovar):** 128×128, personagem a 64 px,
+pivot (64,104), baseline 103, escala Godot **1,0**, offset (0,−18). Os 64 px
+aparentes são os mesmos de hoje (78 px × 0,82), por isso colisão, câmara,
+física e tempos de combate não mexem. `(104−64−18)×1,0 = 22` = fundo da caixa
+de 20×44, igual a `(90−48−15,170732)×0,82`.
+
+**Defeito do salto CONFIRMADO por medição:** no conjunto 5G activo, `idle` e
+`run` têm 78 px de altura; `jump_start` cai para 69 de média e **64 no pior
+frame — menos 18%**. A cabeça não encolhe, logo a razão cabeça/corpo desloca-se
+mesmo para chibi. Regra que fica: no Golden Set nenhum frame perde mais de 8%
+(64 → mínimo 59 px). Imagem em
+`work/production_art_gate/9b1_evidencia/defeito_chibi_salto.jpg`.
+
+**Método descartado, para não se repetir:** medir a razão cabeça/corpo por
+detecção de tom de pele **não funciona** — apanha braços e pernas e devolve
+caixas de 27 a 64 px para a mesma personagem. A altura da figura é que é a
+métrica objectiva.
+
+**Validador v2 (`6f13409`) integrado por cherry-pick**, 6/6 testes verdes, e
+provado contra o jogo real: `pilot_5g/idle` **PASS**, `premium_v1/attack`
+**FAIL** (`CLIPPED_RIGHT`, o arco pintado sai do canvas), `premium_v1/dash`
+**FAIL** (baseline 79 em vez de 89). Não vê rabo-de-cavalo nem idade — isso é
+Gate 2, humano.
+
 ## Production Art Gate 9A — inventário feito, uma decisão à espera
 
 Relatórios: [production_art_gate_9a_authority_inventory.md](production_art_gate_9a_authority_inventory.md)
