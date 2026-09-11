@@ -2,6 +2,16 @@
 
 ## Agora
 
+000000. **9C FEITA — REGION I ENVIRONMENT GATE CLOSED (v0.15.18).** L1–L5 usam
+   o kit de produção derivado das pranchas 08/10 (terreno, props, corrupção,
+   4 planos de parallax, névoa); o terreno CC0 já não aparece na Região I.
+   **Seguinte: 9D — inimigos e guardiões da Região I** (não iniciada).
+   Nada pendente de decisão do Game Master. Opcional (seria design novo ou
+   outra execução): arte própria para os objectos de gameplay da região (água
+   venenosa, checkpoints); um corpo de terreno maior que o mosaico de 44 px da
+   prancha 10. Backlog técnico mantido: excluir `assets/**/manifest.json` dos
+   exports. Relatório: `docs/execution_9c_region1_environment_kit.md`.
+
 00000. **9B.4 FEITA — KOLIANI PRODUCTION GATE CLOSED (v0.15.17).** Todos os
    estados da Koliani na Região I saem do Golden Set; o premium_v1 e a 5G já não
    aparecem. **Pendente de decisão do Game Master (opcional, é design novo):**

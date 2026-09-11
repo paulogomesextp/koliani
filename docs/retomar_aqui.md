@@ -4,6 +4,45 @@
 
 Atualizado em 11 de setembro de 2026.
 
+## Execution 9C — Kit de ambiente da Região I
+
+Estado: **PASS — REGION I ENVIRONMENT GATE CLOSED. KOLIANI PRODUCTION GATE
+CLOSED (não tocado). Pronto para 9D (inimigos/guardiões): SIM** — a 9D não
+foi iniciada. Relatório:
+[execution_9c_region1_environment_kit.md](execution_9c_region1_environment_kit.md).
+
+- **Kit:** 31 peças em `assets/art/regions/region_01_forest/production/kit_9c/`,
+  recortadas sem perdas das pranchas 08 (autoridade, SHA `840cfd82…` = manifesto)
+  e 10 (tileset, graduado para a noite da 08) por
+  `tools/produzir_kit_regiao1_9c.py`; `--validar` 31/31 PASS; manifesto com a
+  caixa exacta na prancha e o SHA de cada peça.
+- **O kit `imagegen_v1` da 9A (12 peças) NÃO foi promovido:** musgo amarelo-lima
+  em todas as pedras, ruído a 32 px — afasta-se da 08. Fica não rastreado.
+- **LEGACY CC0 TERRAIN VISIBLE IN REGION I: NO.** Interruptor único: o nó
+  `Region1HybridVisualTarget` entra no grupo `regiao1_kit`; `plataforma.gd` e
+  `plataforma_flutuante.gd` usam o kit; os outros 95 níveis ficam no legado
+  (testado). `perfil` 1–5 = moods da 08. Geometria intacta.
+- **Parallax** à mão, 4 planos + primeiro plano (`posição = desvio × (1−f)`);
+  o fundo legado da `Atmosfera` fica escondido. Lanternas com halo aditivo, não
+  PointLight2D (não tinge a Koliani).
+- **Desempenho:** +0,1 ms/frame (0,52–0,56 vs 0,42–0,44 ms), draw calls
+  **descem** (49–62 vs 67–75). Sem regressão.
+- Builds de `a5d9ec9` (0.15.18), worktree limpo: EXE 163,2 MB (`4f49ce2d…`),
+  PCK 54,1 MB (`0a43829e…`), cache PWA `1789112478|4547531`. EXE: L1–L5 5/5.
+  Web: SHA do PCK medido no browser = export.
+- **Armadilhas de método (custaram tempo):**
+  - o `run_tests.gd` é um nó, não `SceneTree`: `get_root()` → parse error → o
+    Godot **pendura** (10 min). `get_tree().root`, e correr sempre com `timeout`;
+  - o EXE de **release** recusa `--script` e caminhos de cena. Para fotografar
+    níveis no EXE: `Koliani.exe -- --nivel=N --foto=<png>`, com cópia de
+    segurança da pasta `app_userdata/Koliani` antes e reposição por SHA depois
+    (a rotação de logs apaga logs antigos — repor também os que faltam);
+  - o `tools/shot_plataforma.gd` não move a Koliani (fotos iguais) — usar
+    `tools/shot_regiao1_9c.gd`.
+- **Por fazer (não bloqueia):** o corpo do terreno é um mosaico de 44 px e lê-se
+  regular em paredes muito altas; objectos de gameplay (água venenosa,
+  checkpoints) mantêm arte própria — 9D/depois.
+
 ## Execution 9B.4 — Pacote completo da Koliani
 
 Estado: **PASS — KOLIANI PRODUCTION GATE CLOSED. Pronto para 9C: SIM.**
