@@ -4,6 +4,20 @@
 
 Atualizado em 11 de setembro de 2026.
 
+## Execution 9B.2 — Golden Set extraction
+
+Estado: **EXTRACTION PASS — HUMAN VISUAL REVIEW REQUIRED; runtime inalterado.**
+Fonte: `work/production_art_gate/koliani_golden_set_approved.png.png` (a pasta
+`9b1_game_master_approved/` não existe). Saíram 33 frames de personagem (idle 7,
+run 10, jump start 4, air 3, fall 3, attack 6) e 6 de VFX, extraídos pelo alpha real
+sem redesenho: raw à resolução da fonte e normalizados 128×128 / pivot (64,104) /
+baseline 103, escala uniforme 0,5662, alpha 0/255; validação 39/39 PASS. Saída
+em `work/production_art_gate/9b2_extraction/` (fora do git; relatório em
+`reports/execution_9b2_report.md`). Ferramentas: `tools/extrair_golden_set_9b2.py`
+e `tools/validar_golden_set_9b2.py`. **Antes de integrar:** o Game Master aprova a
+contact sheet e decide o contrato (o runtime ainda usa 160×96 / (80,90), com ~66 px
+de altura; aqui o idle mede 91 px).
+
 ## Execution 9B.1 — Golden Set da Koliani — **BLOQUEADA na arte**
 
 Relatório: [production_art_gate_9b1_golden_set.md](production_art_gate_9b1_golden_set.md).

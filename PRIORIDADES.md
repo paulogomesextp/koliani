@@ -74,6 +74,10 @@
    checkpoints e ritmo do boss. A validação técnica e o runtime exportado
    passaram; isto não constitui aprovação humana.
 
+1b. **Execution 9B.2 — Golden Set extraído (39 frames, 39/39 PASS técnico):**
+   rever `work/production_art_gate/9b2_extraction/preview/` e decidir a escala e o
+   contrato (128×128 contra os 160×96 do runtime) antes de qualquer integração.
+
 ## A seguir
 
 2. **Produção visual aprovada em falta:** frames limpos de combate, plataformas,
