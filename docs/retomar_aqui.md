@@ -4,7 +4,29 @@
 
 Atualizado em 11 de setembro de 2026.
 
-## Execution 9D+9E — Inimigos + Coração Putrefacto — **PARTIAL PASS**
+## Execution 9E.2 — Coração Putrefacto fechado + prova no EXE — **PASS**
+
+**ENEMY GATE CLOSED. BOSS GATE CLOSED. Pronto para 9F: SIM** (não iniciada).
+v0.15.20, commit `901da1f`. Relatório:
+[execution_9e2_coracao_putrefacto_closure.md](execution_9e2_coracao_putrefacto_closure.md).
+
+- **Autoridade dedicada:**
+  `work/production_art_gate/9E1_game_master_approved/coracao_putrefacto_production_authority_v1_0.png`,
+  1448×1086 RGBA com alfa real, SHA `460435aaf18b9b568b0f4529a087a2cc80e07554def894c313f579b9b9247693`.
+- **Boss:** fase 1 = forma contida, fase 2 = forma intensificada (limiar de 50 %
+  do jogo), erupção = VFX da transição. `tools/produzir_coracao_9e2.py` →
+  `assets/art/regions/region_01_forest/bosses/coracao_putrefacto/production/`.
+  As luzes do legado lavavam a casca de rosa: raio a 40 % com produção.
+- **Prova no EXE:** `Koliani.exe -- --nivel=N --foto-estado=inimigos --foto=…`
+  (rota só de dev em `main.gd`) — 11 identidades + as 2 fases, 58 registos, 0
+  texturas legadas. `work/execution_9e2/evidencia_exe_9e2.png`.
+- **Armadilhas novas:** o Main junta mais bichos que a cena do nível (dezenas no
+  L5) — a rota faz uma série por identidade e chefes primeiro; o alfa binarizado
+  come/ganha 1 px, por isso a escala do boss é procurada até dar 100 px exatos.
+- Pendente (opcional, design novo): poses de ataque do corpo (a autoridade tem
+  duas, mas o runtime não tem estado onde as mostrar); arte do `RaizPerigo`.
+
+## Execution 9D+9E — Inimigos + Coração Putrefacto — **PARTIAL PASS** (boss fechado pela 9E.2)
 
 **ENEMY GATE CLOSED. BOSS GATE OPEN. Pronto para 9F: NÃO.** v0.15.19, commit
 `dc06608`. Relatório:

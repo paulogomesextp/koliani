@@ -2,7 +2,16 @@
 
 ## Agora
 
-00000000. **9D+9E PARTIAL PASS (v0.15.19) — inimigos feitos, falta o Coração.**
+000000000. **9E.2 PASS (v0.15.20) — Região I fechada: inimigos E Coração em
+   produção.** O Coração Putrefacto usa a autoridade dedicada (fase 1 contida,
+   fase 2 intensificada, erupção na transição); os 11 inimigos/guardiões/crias e
+   as 2 fases estão provados no EXE exportado. **Seguinte: 9F — UI / menu / HUD**
+   (não iniciada). Nada pendente de decisão do Game Master. Opcional (design
+   novo): mostrar as poses de alcance do Coração num estado de ataque; arte do
+   `RaizPerigo`. Backlog técnico: excluir `assets/**/manifest.json` dos exports.
+   Relatório: `docs/execution_9e2_coracao_putrefacto_closure.md`.
+
+00000000. *(Resolvida pela 9E.2.)* **9D+9E PARTIAL PASS (v0.15.19) — inimigos feitos, falta o Coração.**
    Os 5 comuns, os 4 guardiões, os clones da Morvanna e as crias da Rainha já
    usam arte derivada da autoridade aprovada (SHA `8ebf8ecd…`). **Decisão do
    Game Master:** o **Coração Putrefacto** não se consegue tirar da prancha sem
