@@ -99,6 +99,11 @@ flex-direction:column;gap:5vmin;padding:8vmin}
   var canalIOS = null;
   var canalIOSAtivo = !ios;
   var erroCanalIOS = '';
+  var avisarGodot = function(){
+    try{
+      if (window.kolianiGodotAudioReady) window.kolianiGodotAudioReady();
+    }catch(e){}
+  };
   if (AC){
     var Espia = new Proxy(AC, {construct: function(alvo, args){
       var c = new alvo(args[0]);
@@ -139,7 +144,12 @@ flex-direction:column;gap:5vmin;padding:8vmin}
       }
       var tocando = canalIOS.play();
       if (tocando && tocando.then){
-        tocando.then(function(){ canalIOSAtivo = true; erroCanalIOS = ''; pintar(); }, function(e){
+        tocando.then(function(){
+          canalIOSAtivo = true;
+          erroCanalIOS = '';
+          setTimeout(avisarGodot, 80);
+          pintar();
+        }, function(e){
           canalIOSAtivo = false;
           erroCanalIOS = e && e.name ? e.name : 'play rejeitado';
           pintar();
@@ -175,7 +185,7 @@ flex-direction:column;gap:5vmin;padding:8vmin}
         if (c.state !== 'running' && c.resume){
           var retomado = c.resume();
           if (retomado && retomado.then){
-            retomado.then(function(){ pintar(); }, function(){ pintar(); });
+            retomado.then(function(){ setTimeout(avisarGodot, 80); pintar(); }, function(){ pintar(); });
           }
         }
       }catch(e){}

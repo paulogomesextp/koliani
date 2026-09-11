@@ -45,6 +45,8 @@ var _p: AudioStreamPlayer       # cama principal (menu / bioma / chefe)
 var _amb: AudioStreamPlayer     # camada de casa assombrada
 var _caminho_atual := ""
 var _pitch_atual := -1.0
+var _web_audio_callback: JavaScriptObject
+var _web_reinicio_agendado := false
 
 
 func _ready() -> void:
@@ -64,6 +66,31 @@ func _ready() -> void:
 	add_child(_amb)
 	if ResourceLoader.exists(CAMINHO_ASSOMBRACAO):
 		_amb.stream = _carregar_loop(CAMINHO_ASSOMBRACAO)
+		_amb.play()
+	if OS.has_feature("web"):
+		# O Safari pode descartar uma faixa iniciada antes do primeiro gesto,
+		# embora o AudioStreamPlayer continue a declarar `playing = true`.
+		# O bootstrap HTML chama este callback depois de abrir o AudioContext.
+		_web_audio_callback = JavaScriptBridge.create_callback(_ao_audio_web_pronto)
+		JavaScriptBridge.get_interface("window").kolianiGodotAudioReady = _web_audio_callback
+
+
+func _ao_audio_web_pronto(_args: Array) -> void:
+	if _web_reinicio_agendado:
+		return
+	_web_reinicio_agendado = true
+	call_deferred("_reiniciar_audio_web")
+
+
+func _reiniciar_audio_web() -> void:
+	# Dá ao WebKit um instante para concluir também a abertura do canal HTML
+	# multimédia antes de voltar a agendar as fontes do Godot.
+	await get_tree().create_timer(0.12, true, false, true).timeout
+	_web_reinicio_agendado = false
+	if _p and _p.stream and _caminho_atual != "":
+		_p.stop()
+		_p.play()
+	if _amb and _amb.stream and not _amb.playing:
 		_amb.play()
 
 

@@ -56,8 +56,12 @@ forçando o canal multimédia que o Web Audio isolado nem sempre abre. Suite God
 verde e export Web local concluído. O parâmetro `?audio-debug=1` mantém um botão
 de diagnóstico visível com os estados Web/iPhone; ao tocar, produz um apito de
 660 Hz diretamente no contexto para separar bloqueio do browser de falha interna
-do Godot. Falta confirmar som num telemóvel real após a publicação: **DEVICE
-VALIDATION REQUIRED**.
+do Godot. O teste no iPhone 14 do Paulo ouviu esse apito: browser, contexto e
+saída física estão funcionais. A causa restante era a música ser agendada antes
+do desbloqueio e descartada pelo iOS enquanto o player continuava marcado como
+activo. O HTML avisa agora `Musica` após a retoma e o autoload reinicia as fontes
+120 ms depois. Falta confirmar a música/SFX num telemóvel real após a publicação:
+**DEVICE VALIDATION REQUIRED**.
 
 ## Publicação contínua Web/PWA
 
