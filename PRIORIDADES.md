@@ -2,6 +2,37 @@
 
 ## Agora
 
+000. **DECISÃO DO GAME MASTER PENDENTE (CONF-01, Execution 9A): o 9B extrai
+   das pranchas ou desenha de raiz?** O `production_contract.json` diz que
+   «nenhum frame ou píxel é extraído ou reciclado» das pranchas, mas as 7
+   animações que estão no `.exe` aprovado (`koliani_visual_pilot_5g`) foram
+   extraídas das pranchas 05/06. Sem esta decisão o 9B não arranca. As duas
+   rotas estão em `docs/production_art_gate_asset_gap_map.md`.
+
+00a. **LACUNA CENTRAL MEDIDA (9A): na Região I vêem-se duas Kolianis.** Parada
+   e a correr usa a 5G (cabelo solto, preto/vermelho, sem VFX colado); a
+   atacar, dash e morte usa a `koliani_premium_v1`, que tem **rabo-de-cavalo**,
+   cabelo roxo e **o arco do golpe pintado dentro do frame**. Viola três
+   cláusulas congeladas. `tools/validate_assets.py` → PASS=0 FAIL=16. É a
+   causa técnica do «ainda parece antigo».
+
+00b. **WINDOWS PERFORMANCE GATE = FECHADO, APROVADO POR HUMANO.** `master`
+   avançou por fast-forward para `6beb05b` e foi empurrado; `origin/master`
+   está agora em `423fde7` (commits posteriores, `6beb05b` é antepassado).
+   **Mas o `.exe` aprovado foi exportado de `05f050e` (8.1C)** — não traz a
+   correção 8.1E. Reexportar antes de dar a 8.1E por validada no binário.
+   A `master` do checkout principal ficou em `b2fd8a0` de propósito (tem
+   `project.godot` sujo + arte de produção por versionar): `git pull
+   --ff-only` só depois de arrumar isso.
+
+00c. **RISCO: arte de produção só existe na máquina do Paulo.** O kit modular
+   de 12 peças da Região I e os 449 ficheiros de
+   `work/koliani_extraction_recovery_medium/` não estão versionados (e `work/`
+   está no `.gitignore`). Um `git clean` apaga trabalho insubstituível. As 12
+   pranchas aprovadas (~29 MB) também estão por versionar — comitá-las é
+   praticável, mas exige acrescentar `Koliani_1.0_Master_Package_v2/**` ao
+   `exclude_filter` dos presets no mesmo gesto.
+
 0. **VALIDAR A JOGAR: o congelamento do save está corrigido (Execution 8.1E).**
    `guardar()` passou de **2047 ms para 9,2 ms** — cabe num frame. A causa era
    `ProgressionIDs.identidades()` a reler e parsear o `level_manifest.json`

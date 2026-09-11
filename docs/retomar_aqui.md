@@ -4,6 +4,46 @@
 
 Atualizado em 11 de setembro de 2026.
 
+## Production Art Gate 9A — inventário feito, uma decisão à espera
+
+Relatórios: [production_art_gate_9a_authority_inventory.md](production_art_gate_9a_authority_inventory.md)
+e [production_art_gate_asset_gap_map.md](production_art_gate_asset_gap_map.md).
+Manifestos em `work/production_art_gate/` (não versionado).
+
+**As 12 autoridades aprovadas: 12/12 presentes, legíveis, e os 12 SHA-256 batem
+com o `references/manifest.json` do pacote.** O que custou a descobrir: **só 3
+têm canal alfa** (05, 06, 07). As outras 9 são RGB puro — incluindo a 02, que
+desenha o xadrez de transparência *nos píxeis* e escreve «alpha real, pronto
+para Godot». Não está. São exactamente as 3 com alfa as únicas de onde alguma
+vez se extraiu alguma coisa.
+
+**A lacuna central, medida:** na Região I o jogador vê **duas Kolianis**. Os
+cinco níveis ligam `usar_prototipo_premium = true` **e**
+`usar_piloto_visual_5g = true`, por isso `idle/run/turn/run_start/jump_start/
+jump_loop/fall` saem da 5G (boa) e `attack1-4/dash/roll/hurt/morte/crouch/
+wallslide/borda/djump/defesa/aterrar/jump` saem da `koliani_premium_v1`, que
+tem **rabo-de-cavalo**, cabelo roxo e o **arco do golpe pintado dentro do
+frame**. `run_brake` e `land` não têm frames — são montados por fallback.
+
+**Números medidos:** 5G = 160×96, alfa binário 0/255, última linha opaca **89
+em 7/7** (base consistente). `premium_v1` = base a variar entre 79, 80, 88, 89
+e 90. Pacote contratado da Koliani: **0/40 frames**. VFX da prancha 07:
+**0 de 16** produzidos. Kit modular da Região I: 12 peças existem, **0 estão no
+build** (provado por varrimento de bytes do PCK e do EXE).
+
+**Hipóteses descartadas:** (a) «as pranchas entram no build» — não entram, 0
+ocorrências de `KOLIANI_VISUAL_AUTHORITY` no PCK e no EXE; o que inchou o build
+antigo de 350 MB foi `work/**`, que já está no `exclude_filter`. Mas **nada
+exclui o master package**, e as pranchas estão importadas (`.import` + `.ctex`)
+— um export feito no checkout principal voltava a arrastar 29 MB. (b) «o rig
+activo é o shadowblade» — é o `const RIG` do script, mas a Região I força o
+premium, por isso não é o que se vê.
+
+**A decidir antes do 9B (CONF-01):** o contrato proíbe extrair píxeis das
+pranchas; o `.exe` aprovado usa 7 animações extraídas delas. Rota A (extracção
+determinista, já provada em 45 frames, mas só serve as 3 pranchas com alfa) ou
+Rota B (desenhar de raiz, cobre tudo). Recomendação no mapa de lacunas.
+
 ## Desbloqueio de áudio Web/PWA
 
 O bootstrap Web retoma agora o `AudioContext` no início e no fim do gesto
