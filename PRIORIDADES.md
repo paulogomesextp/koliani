@@ -74,9 +74,13 @@
    checkpoints e ritmo do boss. A validação técnica e o runtime exportado
    passaram; isto não constitui aprovação humana.
 
-1b. **Execution 9B.2 — Golden Set extraído (39 frames, 39/39 PASS técnico):**
-   rever `work/production_art_gate/9b2_extraction/preview/` e decidir a escala e o
-   contrato (128×128 contra os 160×96 do runtime) antes de qualquer integração.
+1b. **Execution 9B.2 — Golden Set EXTRAÍDO da imagem do GM (33 corpo + 6 VFX,
+   contrato 9B.1 a 64 px):** rever
+   `work/production_art_gate/9b2_extraction/preview/contact_sheet_normalized_x3.png`
+   e decidir os **8 frames abaixo do mínimo anti-chibi de 59 px** (pose de arranque,
+   encolhido no ar, guarda baixa do ataque: aceitar como pose justificada ou pedir
+   arte nova). Só depois se promove para `assets/sprites/koliani_golden_set/` e se
+   integra.
 
 ## A seguir
 

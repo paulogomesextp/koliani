@@ -6,17 +6,22 @@ Atualizado em 11 de setembro de 2026.
 
 ## Execution 9B.2 — Golden Set extraction
 
-Estado: **EXTRACTION PASS — HUMAN VISUAL REVIEW REQUIRED; runtime inalterado.**
-Fonte: `work/production_art_gate/koliani_golden_set_approved.png.png` (a pasta
-`9b1_game_master_approved/` não existe). Saíram 33 frames de personagem (idle 7,
-run 10, jump start 4, air 3, fall 3, attack 6) e 6 de VFX, extraídos pelo alpha real
-sem redesenho: raw à resolução da fonte e normalizados 128×128 / pivot (64,104) /
-baseline 103, escala uniforme 0,5662, alpha 0/255; validação 39/39 PASS. Saída
-em `work/production_art_gate/9b2_extraction/` (fora do git; relatório em
-`reports/execution_9b2_report.md`). Ferramentas: `tools/extrair_golden_set_9b2.py`
-e `tools/validar_golden_set_9b2.py`. **Antes de integrar:** o Game Master aprova a
-contact sheet e decide o contrato (o runtime ainda usa 160×96 / (80,90), com ~66 px
-de altura; aqui o idle mede 91 px).
+Estado: **PARTIAL PASS — EXTRAÍDO, GAME MASTER REVIEW REQUIRED; runtime
+inalterado.** O Game Master forneceu a arte que bloqueava a 9B.1:
+`work/production_art_gate/koliani_golden_set_approved.png.png` (a pasta
+`9b1_game_master_approved/` não existe). Os 33 frames de corpo (idle 7, run 10,
+jump_start 4, jump_loop 3, fall 3, attack_basic 6) e os 6 de `vfx_slash_basic` foram
+extraídos pelo alpha real, sem redesenho, e normalizados ao contrato 9B.1: 128×128,
+repouso **64 px**, pivot (64,104), baseline 103, escala uniforme 0,3975, alpha 0/255.
+Validator v2: attack PASS; idle/fall REVIEW (`SUSPICIOUS_CHECKERBOARD`, falso positivo
+provado: a heurística ignora o alpha); run/jump_start/jump_loop/vfx FAIL em
+`GROSS_SCALE_VARIATION` (área da caixa por pose; a escala é uniforme). **Anti-chibi:
+8 frames abaixo dos 59 px** por pose (jump_start_001 48 px, jump_loop_001/003,
+attack 1/2/3/5/6), à espera de decisão do GM. Saída em
+`work/production_art_gate/9b2_extraction/` (fora do git), relatório
+`reports/execution_9b2_report.md`. Ferramentas: `tools/extrair_golden_set_9b2.py`,
+`tools/validar_golden_set_9b2.py`. `assets/sprites/koliani_golden_set/` não foi
+tocado.
 
 ## Execution 9B.1 — Golden Set da Koliani — **BLOQUEADA na arte**
 

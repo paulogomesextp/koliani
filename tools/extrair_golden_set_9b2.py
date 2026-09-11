@@ -34,16 +34,21 @@ AREA_SEMENTE = 400
 # Faixas (x0, y0, x1, y1) medidas na fonte; retângulos a apagar = labels/logo/molduras.
 # O JUMP/FALL fica dentro das 3 molduras (cabeçalho y 471-491, bordas nas colunas
 # 28, 502-508, 933-938, 1433 e linha 682) -- as caixas começam por dentro delas.
+# Nomes = pastas do contrato 9B.1 (assets/sprites/koliani_golden_set/).
 FAIXAS = {
-    "idle":    {"caixa": (0, 32, 1290, 222), "esperados": 7},
-    "run":     {"caixa": (0, 254, 1536, 440), "esperados": 10},
-    "jump_start": {"caixa": (31, 494, 500, 681), "esperados": 4},
-    "air":     {"caixa": (511, 494, 931, 681), "esperados": 3},
-    "fall":    {"caixa": (941, 494, 1431, 681), "esperados": 3},
-    "attack":  {"caixa": (0, 688, 1300, 878), "esperados": 6,
-                "apagar": [(0, 688, 305, 720)]},
-    "vfx":     {"caixa": (0, 912, 1300, 1015), "esperados": 6, "vfx": True},
+    "idle":         {"caixa": (0, 32, 1290, 222), "esperados": 7},
+    "run":          {"caixa": (0, 254, 1536, 440), "esperados": 10},
+    "jump_start":   {"caixa": (31, 494, 500, 681), "esperados": 4},
+    "jump_loop":    {"caixa": (511, 494, 931, 681), "esperados": 3},
+    "fall":         {"caixa": (941, 494, 1431, 681), "esperados": 3},
+    "attack_basic": {"caixa": (0, 688, 1300, 878), "esperados": 6,
+                     "apagar": [(0, 688, 305, 720)]},
+    "vfx_slash_basic": {"caixa": (0, 912, 1300, 1015), "esperados": 6, "vfx": True},
 }
+# Contrato 9B.1 (docs/production_art_gate_9b1_golden_set.md §C): personagem em
+# repouso a 64 px, escala Godot 1,0 -> a escala de extração é a que põe o idle a 64.
+ALTURA_REPOUSO = 64
+ALTURA_MIN_ANTICHIBI = 59  # §E: nenhum frame perde mais de 8%
 
 
 def componentes(alpha: Image.Image, limiar: int):
@@ -171,11 +176,17 @@ def main() -> int:
             })
         cfg["encontrados"] = len(grupos)
 
-    # escala uniforme: cabe tudo (personagem e VFX) no canvas com 2 px de margem
-    pers = [f for f in frames if not f["vfx"]]
-    s = min(min((BASELINE - 1) / f["raw_size"][1] for f in pers),
-            min((CANVAS - 4) / f["raw_size"][0] for f in frames))
-    s = round(s, 4)
+    # escala uniforme: a que põe a altura opaca (alpha>=128) média do idle em 64 px
+    def alt_opaca(f):
+        bb = f["_img"].getchannel("A").point(lambda v: 255 if v >= LIMIAR_BIN else 0).getbbox()
+        return bb[3] - bb[1]
+    idle = [alt_opaca(f) for f in frames if f["animation"] == "idle"]
+    s = round(ALTURA_REPOUSO / (sum(idle) / len(idle)), 4)
+    maior_w = max(f["raw_size"][0] for f in frames) * s
+    maior_h = max(f["raw_size"][1] for f in frames if not f["vfx"]) * s
+    if maior_w > CANVAS - 2 or maior_h > BASELINE:
+        print(f"ERRO: à escala {s} o maior frame ({maior_w:.0f}x{maior_h:.0f}) não cabe no canvas")
+        return 3
 
     for f in frames:
         raw = f.pop("_img")
@@ -195,13 +206,13 @@ def main() -> int:
         ax = cols[len(cols) // 2] if cols else red.width // 2
         px = PIVOT[0] - ax
         px_fit = min(max(px, 1), CANVAS - 1 - red.width)
-        if f["vfx"]:
-            py = (CANVAS - red.height) // 2
-        else:
-            py = BASELINE + 1 - red.height
+        # corpo e VFX assentes na baseline 103 (o manifesto 9B.1 do VFX também exige baseline)
+        py = BASELINE + 1 - red.height
         tela = Image.new("RGBA", (CANVAS, CANVAS), (0, 0, 0, 0))
         tela.paste(red, (px_fit, py))
-        caminho = SAIDA / "normalized" / f"{f['name']}.png"
+        pasta = SAIDA / "normalized" / f["animation"]
+        pasta.mkdir(parents=True, exist_ok=True)
+        caminho = pasta / f"{f['animation']}_{f['index']:03d}.png"
         tela.save(caminho)
         f.update(normalized=caminho.relative_to(RAIZ).as_posix(),
                  anchor_x_shift_to_fit=px_fit - px, placed_at=[px_fit, py],
