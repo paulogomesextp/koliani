@@ -45,6 +45,7 @@ func _correr_tudo() -> void:
 	teste_tutorial_mecanica_tem_texto()
 	teste_controlos_tacteis_fixos()
 	teste_head_pwa_em_dia()
+	teste_9f_buses_de_audio_estaticos()
 	teste_catalogo_campanha()
 	teste_equipamento_dados()
 	teste_equipamento_estado()
@@ -881,6 +882,72 @@ func teste_head_pwa_em_dia() -> void:
 			"audioSession", "orientation:portrait"]:
 		_ok(esperado.contains(peca),
 			"o head do Web perdeu a peca '%s'" % peca)
+
+
+## SILÊNCIO TOTAL NO WEB/PWA (Execution 9F). Não era o gesto nem o
+## autoplay: com o AudioContext `running`, o pico no destino era 0.
+## No Web o Godot 4.7.2 toca em modo *Sample* e espelha os buses em JS;
+## o `GodotAudio.Bus.move()` do motor faz `splice(toIndex-1, ...)`, por
+## isso um bus acrescentado em RUNTIME (`AudioServer.add_bus`) passava
+## para a posição 0 e o `set_bus_send(.., "Master")` ligava o Master
+## antigo ao bus novo -- um ciclo Master->SFX->Music->Master sem saída
+## para o `AudioDestination`. Medido no grafo (docs/execution_9f_*).
+##
+## A correcção é os buses virem do `default_bus_layout.tres` (criados
+## pelo motor no arranque, por ordem, sem `move`). Este teste morde se
+## alguém apagar o layout ou voltar a precisar do `_criar_buses`.
+func teste_9f_buses_de_audio_estaticos() -> void:
+	var caminho := str(ProjectSettings.get_setting(
+		"audio/buses/default_bus_layout", "res://default_bus_layout.tres"))
+	_ok(ResourceLoader.exists(caminho),
+		"9F: falta o layout de buses estatico (%s) -- no Web o audio fica MUDO" % caminho)
+	var layout = load(caminho) if ResourceLoader.exists(caminho) else null
+	_ok(layout is AudioBusLayout, "9F: %s nao e' um AudioBusLayout" % caminho)
+	if layout is AudioBusLayout:
+		for i in [1, 2]:
+			var nome := "Music" if i == 1 else "SFX"
+			_ok(str(layout.get("bus/%d/name" % i)) == nome,
+				"9F: o bus %d do layout devia ser '%s'" % [i, nome])
+			_ok(str(layout.get("bus/%d/send" % i)) == "Master",
+				"9F: o bus '%s' tem de mandar para o Master" % nome)
+
+	# no runtime: os buses ja' existem ANTES do Opcoes (nenhum add_bus)
+	_ok(AudioServer.bus_count == 3,
+		"9F: esperados 3 buses (Master/Music/SFX), ha' %d" % AudioServer.bus_count)
+	_ok(AudioServer.get_bus_index("Music") == 1 and AudioServer.get_bus_index("SFX") == 2,
+		"9F: Music/SFX fora da ordem do layout (%d/%d)"
+			% [AudioServer.get_bus_index("Music"), AudioServer.get_bus_index("SFX")])
+	for nome in ["Music", "SFX"]:
+		var i := AudioServer.get_bus_index(nome)
+		if i >= 0:
+			_ok(AudioServer.get_bus_send(i) == &"Master",
+				"9F: o bus '%s' manda para '%s'" % [nome, AudioServer.get_bus_send(i)])
+	_ok(not AudioServer.is_bus_mute(0), "9F: o Master esta' mudo")
+	_ok(is_equal_approx(AudioServer.get_bus_volume_db(0), 0.0),
+		"9F: o Master nao esta' a 0 dB (%.1f)" % AudioServer.get_bus_volume_db(0))
+	# o volume guardado continua a mandar (0 = mudo de proposito)
+	_ok(AudioServer.is_bus_mute(1) == (Opcoes.vol_musica <= 0.001),
+		"9F: o mute do Music nao segue as Opcoes")
+	_ok(AudioServer.is_bus_mute(2) == (Opcoes.vol_efeitos <= 0.001),
+		"9F: o mute do SFX nao segue as Opcoes")
+	_ok(not bool(Opcoes.get("_criou_buses")),
+		"9F: o Opcoes teve de criar buses em runtime -- no Web isso cala o jogo")
+
+	# o export leva o audio e o desbloqueio por gesto continua no head
+	var cfg := _fonte("res://export_presets.cfg")
+	var rx := RegEx.new()
+	rx.compile("(?s)name=\"Web\".*?exclude_filter=\"([^\"]*)\"")
+	var m := rx.search(cfg)
+	_ok(m != null, "9F: preset Web sem exclude_filter")
+	if m:
+		_ok(not m.get_string(1).contains("audio") and not m.get_string(1).contains("*.ogg"),
+			"9F: o preset Web exclui audio (%s)" % m.get_string(1))
+	var head := _fonte("res://web/head_pwa.html")
+	for peca in [".resume(", "kolianiGodotAudioReady", "kolianiAudioDiag"]:
+		_ok(head.contains(peca), "9F: o head do Web perdeu '%s'" % peca)
+	for c in ["res://assets/audio/bg_menu.mp3", "res://assets/audio/musica/niveis/nivel_01.ogg",
+			"res://assets/audio/carrossel.wav", "res://assets/audio/ataque.ogg"]:
+		_ok(ResourceLoader.exists(c), "9F: falta o audio %s" % c)
 
 
 ## CONTROLOS DE TOQUE. Duas coisas que o Paulo pediu a 5 set 2026:

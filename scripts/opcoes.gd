@@ -21,9 +21,18 @@ func _ready() -> void:
 	aplicar()
 
 
+## Os buses vêm do `default_bus_layout.tres` (Execution 9F). Isto é só a
+## rede para um layout em falta -- e no Web NÃO serve: o modo *Sample* do
+## Godot 4.7.2 baralha a ordem dos buses acrescentados em runtime e o
+## Master deixa de chegar ao altifalante (silêncio total). Daí o aviso.
+var _criou_buses := false
+
+
 func _criar_buses() -> void:
 	for nome in ["Music", "SFX"]:
 		if AudioServer.get_bus_index(nome) == -1:
+			_criou_buses = true
+			push_warning("Opcoes: bus '%s' criado em runtime -- falta o default_bus_layout.tres (no Web fica mudo)" % nome)
 			var i := AudioServer.bus_count
 			AudioServer.add_bus(i)
 			AudioServer.set_bus_name(i, nome)

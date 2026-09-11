@@ -201,6 +201,40 @@ flex-direction:column;gap:5vmin;padding:8vmin}
     if (!document.hidden) acordar();
   });
 
+  /* DIAGNOSTICO (Execution 9F). `kolianiAudioDiag()` na consola diz o
+     estado de cada contexto; com `?audio-debug=1` mede tambem o pico
+     que chega ao altifalante -- o silencio total do Web era um bus do
+     Godot sem saida para o destino, com o contexto `running`, e so o
+     pico o mostrava. O ramo de medida so existe em modo diagnostico. */
+  if (diagnostico && window.AudioNode){
+    var ligar = AudioNode.prototype.connect;
+    AudioNode.prototype.connect = function(alvo){
+      var r = ligar.apply(this, arguments);
+      try{
+        if (window.AudioDestinationNode && alvo instanceof AudioDestinationNode){
+          var c = this.context;
+          if (!c.kolianiMedidor){ c.kolianiMedidor = c.createAnalyser(); c.kolianiMedidor.fftSize = 2048; }
+          ligar.call(this, c.kolianiMedidor);
+        }
+      }catch(e){}
+      return r;
+    };
+  }
+  window.kolianiAudioDiag = function(){
+    var r = [];
+    for (var i = 0; i < vivos.length; i++){
+      var c = vivos[i], pico = null;
+      if (c.kolianiMedidor){
+        var d = new Float32Array(c.kolianiMedidor.fftSize);
+        c.kolianiMedidor.getFloatTimeDomainData(d);
+        pico = 0;
+        for (var k = 0; k < d.length; k++) pico = Math.max(pico, Math.abs(d[k]));
+      }
+      r.push({estado: c.state, tempo: c.currentTime, pico: pico});
+    }
+    return {contextos: r, canalIOS: canalIOSAtivo, erroCanalIOS: erroCanalIOS};
+  };
+
   /* O BOTAO DE ULTIMO RECURSO. So aparece se ja houver um contexto de
      audio e nenhum estiver a tocar -- ou seja, exactamente quando o jogo
      esta mudo. Ser um elemento do DOM (e nao o canvas) importa: o toque
