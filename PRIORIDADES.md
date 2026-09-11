@@ -2,6 +2,24 @@
 
 ## Agora
 
+0000000000. **9G PASS (v0.16.1) -- VFX de producao da Regiao I.** Os efeitos
+   passaram a sair da prancha 07 aprovada: golpes 2/3 do combo, dash,
+   rolamento, salto duplo, aterragem, dano, morte, escudo, tiro; faiscas no
+   acerto e rebentamento no remate/critico; corrupcao (rampa escura, alfa
+   preso a luminancia) na morte dos inimigos, no telegrafo dos guardioes, no
+   tiro e na fase 2 do Coracao, e na sua queda; brilho de recolha nas
+   essencias e no checkpoint. 148 frames (146 PASS, 2 REVIEW, 0 FAIL),
+   produzidos por `tools/produzir_vfx_9g.py` -- a prancha tem o fundo pintado
+   e a grelha nao bate com os frames, por isso o alfa e reconstruido e os
+   cortes caem nos vales do desenho. Gameplay intacto. Nome canonico da regiao
+   corrigido nos 6 idiomas: **FLORESTA CORROMPIDA**. Prova no EXE (37 fotos,
+   zero legado) e no Web/PWA (PCK = export, audio do 9F sem regressao).
+   **Seguinte: 9H -- montagem visual da Regiao I + gate humano** (nao
+   iniciada). **Nada pendente de decisao do Game Master.** Fica em aberto, por
+   falta de autoridade: a arte do `RaizPerigo` (a prancha nao desenha raizes),
+   a agua venenosa e a arte base da fogueira. Relatorio:
+   `docs/execution_9g_region1_vfx.md`.
+
 0000000000. **9F PASS (v0.16.0) — UI da Região I em produção + som do Web/PWA
    corrigido na raiz.** O Web estava mudo porque os buses Music/SFX eram
    criados em runtime e o espelho JS do Godot (modo Sample) ligava o Master num

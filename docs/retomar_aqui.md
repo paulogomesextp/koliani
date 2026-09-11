@@ -4,6 +4,42 @@
 
 Atualizado em 11 de setembro de 2026.
 
+## Execution 9G — VFX de produção da Região I — **PASS**
+
+**REGION I VFX PRODUCTION GATE CLOSED. Pronto para 9H (montagem visual +
+gate humano): SIM** (não iniciada). v0.16.1, commit `651c87f`. Relatório:
+[execution_9g_region1_vfx.md](execution_9g_region1_vfx.md).
+
+- **A prancha 07 tem alfa mas NÃO é transparente** (208–250 em toda a imagem;
+  o xadrez está pintado nos píxeis) e **a grelha das células não bate com os
+  frames** (dois rebentamentos numa célula; a elipse do "spin slash 03" cai em
+  cima do rótulo 04). Método que resultou (`tools/produzir_vfx_9g.py`): fundo
+  medido por painel (percentil 97 dos cinzentos) → `efeito = px − fundo`
+  guardado para desenho **aditivo**; frames separados nos **vales do desenho**
+  por programação dinâmica com as larguras presas ao espaçamento dos rótulos;
+  âncora por grelha ajustada (mínimos quadrados) para o arco AVANÇAR.
+- **Hipóteses descartadas, por ordem, e porquê:** (1) recorte pela grelha das
+  células — as linhas não são os frames; (2) componentes ligadas por janela —
+  o brilho fraco cola o vizinho e vinham lascas; (3) "rótulo mais perto" — a
+  arte está desalinhada dos números e esvaziava frames; (4) DP sem penalização
+  de largura — enfia vários cortes seguidos na primeira zona vazia.
+- **148 frames: 146 PASS, 2 REVIEW, 0 FAIL.** 14 famílias Shadowblade
+  (classe B) + 5 de corrupção (classe C).
+- **Armadilha da corrupção:** recolorir mantendo o alfa dava uma **mancha
+  preta por cima do guardião** (tapava a silhueta e o telégrafo). Resolvido
+  prendendo o alfa à luminância (`a' = a × (0,12 + 1,15·lum)`).
+- **Prova no EXE:** `--foto-estado=vfx9g` (rota nova, só dev): 17 fotos no L1,
+  20 no L5, **zero texturas legadas**; userdata reposto e verificado por SHA
+  (180/180). **Web:** PCK no browser = export (`3928d358…`), cache
+  `1789164610|58655591`, VFX visíveis e **áudio do 9F sem regressão**
+  (`running`, picos 0,18 menu / 0,29 jogo).
+- **Desempenho sem regressão:** L1 1,072 → 1,046 ms; L5 1,067 → 1,011 ms. A
+  sonda anda e salta, **não combate**.
+- **Nome canónico corrigido nos 6 idiomas: FLORESTA CORROMPIDA**
+  (`world.forest` + `level.n00`; live na HUD e no selector).
+- **Por fazer:** `RaizPerigo` continua por código (a prancha não tem raízes =
+  arte nova); água venenosa e arte da fogueira mantidas; sem playtest humano.
+
 ## Execution 9F — UI da Região I + áudio do Web/PWA — **PASS**
 
 **REGION I UI GATE CLOSED. WEB/PWA AUDIO GATE CLOSED. Pronto para 9G (VFX):
