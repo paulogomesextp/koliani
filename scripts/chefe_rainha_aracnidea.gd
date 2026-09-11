@@ -185,6 +185,7 @@ func _ovo_em(x: float, eclosao: float) -> void:
 		if not is_instance_valid(ovo):
 			return
 		var aranha := ARANHA.instantiate()
+		aranha.identidade_visual = "cria_rainha"  # só a arte; a espécie fica
 		aranha.vida = 16
 		aranha.dano_contacto = 12
 		aranha.velocidade = 88.0

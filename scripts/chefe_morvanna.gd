@@ -223,6 +223,7 @@ func _largar_clones() -> void:
 	var n := 2 if _fase2 else 1
 	for i in n:
 		var clone := CLONE.instantiate()
+		clone.identidade_visual = "clone_morvanna"  # só a arte; a espécie fica
 		clone.vida = 22
 		clone.dano_contacto = dano_clone
 		clone.velocidade = 74.0

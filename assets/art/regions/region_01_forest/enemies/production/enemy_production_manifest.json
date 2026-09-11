@@ -1,73 +1,2583 @@
 {
-  "execution": "9D",
+  "execution": "9D+9E",
   "regiao": "region_01_floresta_corrompida",
-  "estado_geral": "APPROVED DIRECTION / PRODUCTION ASSET MISSING",
-  "nota": "Nenhuma das 12 pranchas aprovadas desenha inimigos. A prancha 12 (secção 10) mostra inimigos incidentais (plantas carnívoras, besouro, morcego, gosma) a ~30 px, em RGB sem alfa, pintados sobre o cenário e com o nome não canónico 'Floresta Sagrada'. Extraí-los exigia remover o fundo, o que o contrato proíbe. Produzir arte nova é design novo (política A/F). Enquanto a entrada não estiver PRODUCTION_INTEGRATED, o runtime monta a arte legada (scripts/regiao1_inimigos.gd).",
+  "estado_geral": "PRODUCTION_INTEGRATED",
+  "nota": "Arte derivada da autoridade visual aprovada pelo Game Master (itens 1-12) por tools/produzir_inimigos_regiao1.py: recorte, remoção determinística do fundo de apresentação, redução BOX ao contrato, alfa 0/255. Estados derivados só por píxel inteiro (translação, dissolução Bayer; no boss, ganho da corrupção). A autoridade tem UMA pose por entidade: ciclos articulados (pernas a andar) seriam poses novas -- APPROVED DESIGN / PRODUCTION ASSET MISSING, não se inventaram.",
   "autoridade": {
+    "inimigos_boss": "work/production_art_gate/9D1_game_master_approved/region1_enemies_boss_visual_authority_v1_0.png",
+    "inimigos_boss_sha256": "8ebf8ecd13e8d7e7d803acfcccf3361a35cb77ff9ad6dd1d01c79b8b24ebb2fd",
+    "inimigos_boss_dimensoes": [
+      1536,
+      1024
+    ],
+    "inimigos_boss_modo": "RGBA",
+    "aprovacao": "GAME MASTER APPROVED (Paulo, 11 set 2026)",
     "regiao": "Koliani_1.0_Master_Package_v2/references/approved/08_REGION_I_ART_KIT_BACKGROUNDS_PARALLAX_v1_0.png",
     "sha256": "840cfd8241a54f7bab0be58ab96892eba8438517888e490587451339b23263a7",
     "ambiente_producao": "assets/art/regions/region_01_forest/production/kit_9c/"
   },
   "contrato_frames": {
-    "formato": "PNG RGBA, alfa 0/255, um ficheiro por frame, sem VFX grandes no corpo",
-    "inimigo_comum": {"canvas": [96, 96], "altura_corpo_px": 48, "baseline_y": 88, "pivot": [48, 88], "olha_para": "direita"},
-    "guardiao": {"canvas": [192, 192], "altura_corpo_px": 100, "baseline_y": 180, "pivot": [96, 180], "largura_max_px": 110, "olha_para": "direita"}
+    "formato": "PNG RGBA, alfa 0/255, um ficheiro por frame, sem VFX grandes no corpo, virado para a direita",
+    "inimigo_comum": {
+      "canvas": [
+        128,
+        96
+      ],
+      "altura_corpo_px": 48,
+      "baseline_y": 88,
+      "pivot": [
+        64,
+        88
+      ],
+      "porque": "besouro/gosma da autoridade medem 94-96 px de largura a 48 de altura"
+    },
+    "guardiao": {
+      "canvas": [
+        192,
+        192
+      ],
+      "altura_corpo_px": 100,
+      "largura_max_px": 110,
+      "baseline_y": 180,
+      "pivot": [
+        96,
+        180
+      ]
+    },
+    "boss": {
+      "canvas": [
+        192,
+        192
+      ],
+      "altura_corpo_px": 100,
+      "largura_max_px": 110,
+      "baseline_y": 180,
+      "pivot": [
+        96,
+        180
+      ],
+      "porque": "mesma regra do ChefeBase; no ecrã vai x escala_visual 1.7 -- o tamanho do Coração não baixa"
+    }
   },
   "inimigos": {
     "goblin": {
-      "tipo": "comum", "status": "PRODUCTION_ASSET_MISSING", "cena": "res://scenes/actors/DemonioBase.tscn",
-      "niveis": {"L1": ["EliteGoblin (elite, carga, x1.4)", "GoblinBaixa (patrulha)"], "L2": ["clones da Morvanna (herdam a espécie por omissão)"], "L3": ["aranhas da Rainha Aracnídea (herdam a espécie por omissão, x0.62)"]},
-      "legado": "res://assets/sprites/pixel/enemies/goblin/", "estados_alcancaveis": ["idle", "run", "hit", "dead"],
-      "animacoes": {}
+      "tipo": "comum",
+      "status": "PRODUCTION_INTEGRATED",
+      "cena": "res://scenes/actors/DemonioBase.tscn",
+      "autoridade_item": 1,
+      "proveniencia": {
+        "caixa_autoridade": [
+          27,
+          183,
+          280,
+          339
+        ],
+        "fundo_removido": "xadrez",
+        "limiar_croma_gradiente": [
+          14,
+          10
+        ],
+        "escala_reducao": 0.324324,
+        "classificacao": "B"
+      },
+      "contrato": {
+        "canvas": [
+          128,
+          96
+        ],
+        "baseline_y": 88,
+        "pivot": [
+          64,
+          88
+        ],
+        "corpo_px": [
+          65,
+          48
+        ]
+      },
+      "animacoes": {
+        "idle": {
+          "fps": 5.0,
+          "ciclo": true,
+          "frames": [
+            {
+              "ficheiro": "goblin/frames/idle_01.png",
+              "sha256": "ae7f0e6ab13011e31a0fa2febe8f60152898defd396726ee67701fd6fbe8eb2d",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "goblin/frames/idle_02.png",
+              "sha256": "ae7f0e6ab13011e31a0fa2febe8f60152898defd396726ee67701fd6fbe8eb2d",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "goblin/frames/idle_03.png",
+              "sha256": "df7ffb2a3427423a716d41971d702fa957abf84c1f797b0482d2bba09f9197e0",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "goblin/frames/idle_04.png",
+              "sha256": "df7ffb2a3427423a716d41971d702fa957abf84c1f797b0482d2bba09f9197e0",
+              "dimensoes": [
+                128,
+                96
+              ]
+            }
+          ]
+        },
+        "run": {
+          "fps": 10.0,
+          "ciclo": true,
+          "frames": [
+            {
+              "ficheiro": "goblin/frames/run_01.png",
+              "sha256": "ae7f0e6ab13011e31a0fa2febe8f60152898defd396726ee67701fd6fbe8eb2d",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "goblin/frames/run_02.png",
+              "sha256": "df7ffb2a3427423a716d41971d702fa957abf84c1f797b0482d2bba09f9197e0",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "goblin/frames/run_03.png",
+              "sha256": "81301b854dad67cb15c01504861b72084ce60086547f922ae8a5ca6b9b02aec6",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "goblin/frames/run_04.png",
+              "sha256": "df7ffb2a3427423a716d41971d702fa957abf84c1f797b0482d2bba09f9197e0",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "goblin/frames/run_05.png",
+              "sha256": "ae7f0e6ab13011e31a0fa2febe8f60152898defd396726ee67701fd6fbe8eb2d",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "goblin/frames/run_06.png",
+              "sha256": "df7ffb2a3427423a716d41971d702fa957abf84c1f797b0482d2bba09f9197e0",
+              "dimensoes": [
+                128,
+                96
+              ]
+            }
+          ]
+        },
+        "hit": {
+          "fps": 12.0,
+          "ciclo": false,
+          "frames": [
+            {
+              "ficheiro": "goblin/frames/hit_01.png",
+              "sha256": "8845569a93cbbc5f490c581ee9ef048ef6e9a724e6471824e54a014b01c373e3",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "goblin/frames/hit_02.png",
+              "sha256": "c6777f57d6c4ef4fcdb612333f8514cd3f9aff20b0d99d574cc7edd200c069ad",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "goblin/frames/hit_03.png",
+              "sha256": "dd65e70267c13e638fa74db0ff38c375f8ebbd80af0d4f1668275ba80b674cf3",
+              "dimensoes": [
+                128,
+                96
+              ]
+            }
+          ]
+        },
+        "dead": {
+          "fps": 10.0,
+          "ciclo": false,
+          "frames": [
+            {
+              "ficheiro": "goblin/frames/dead_01.png",
+              "sha256": "ae7f0e6ab13011e31a0fa2febe8f60152898defd396726ee67701fd6fbe8eb2d",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "goblin/frames/dead_02.png",
+              "sha256": "04900e978bd538e8d8daf7b48b68832b2187701ce04ef6a2c8bc7d19f8360976",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "goblin/frames/dead_03.png",
+              "sha256": "72eab357f958ac1760e649c92be174b20ac55260bcf9cb472def2803a35acde3",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "goblin/frames/dead_04.png",
+              "sha256": "3a31bfbade244f5429bd5d1fdfd569cbf6c2dfed053367ff9e6761b22bec2c29",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "goblin/frames/dead_05.png",
+              "sha256": "d4be18f7bd263ac072e4a8c98890b0b988c84fd43d65b8eeae5fcf35962349c7",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "goblin/frames/dead_06.png",
+              "sha256": "fe83c7464c7886570cac08baa3ab718f8afdaa1a267c6e1e1bbf1272e9ed2d56",
+              "dimensoes": [
+                128,
+                96
+              ]
+            }
+          ]
+        }
+      },
+      "niveis": {
+        "L1": [
+          "EliteGoblin (elite, carga, x1.4)",
+          "GoblinBaixa (patrulha)"
+        ]
+      },
+      "legado": "res://assets/sprites/pixel/enemies/goblin/",
+      "estados_alcancaveis": [
+        "dead",
+        "hit",
+        "idle",
+        "run"
+      ]
     },
     "mushroom": {
-      "tipo": "comum", "status": "PRODUCTION_ASSET_MISSING", "cena": "res://scenes/actors/DemonioBase.tscn",
-      "niveis": {"L2": ["EliteCuspidor (elite, cuspidor, x1.35)"]},
-      "legado": "res://assets/sprites/pixel/enemies/mushroom/", "estados_alcancaveis": ["idle", "run", "hit", "dead"],
-      "animacoes": {}
+      "tipo": "comum",
+      "status": "PRODUCTION_INTEGRATED",
+      "cena": "res://scenes/actors/DemonioBase.tscn",
+      "autoridade_item": 2,
+      "proveniencia": {
+        "caixa_autoridade": [
+          290,
+          183,
+          606,
+          339
+        ],
+        "fundo_removido": "xadrez",
+        "limiar_croma_gradiente": [
+          14,
+          10
+        ],
+        "escala_reducao": 0.311688,
+        "classificacao": "B"
+      },
+      "contrato": {
+        "canvas": [
+          128,
+          96
+        ],
+        "baseline_y": 88,
+        "pivot": [
+          64,
+          88
+        ],
+        "corpo_px": [
+          60,
+          48
+        ]
+      },
+      "animacoes": {
+        "idle": {
+          "fps": 5.0,
+          "ciclo": true,
+          "frames": [
+            {
+              "ficheiro": "mushroom/frames/idle_01.png",
+              "sha256": "5729aab61a76b86f505f614d90ae7e17d592415cfa34547f08bdfbbef4274597",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "mushroom/frames/idle_02.png",
+              "sha256": "5729aab61a76b86f505f614d90ae7e17d592415cfa34547f08bdfbbef4274597",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "mushroom/frames/idle_03.png",
+              "sha256": "8f31176ee257b3ef85d99e5faea18f6232e3f91bfd9ff8cd6c79064fa37bed52",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "mushroom/frames/idle_04.png",
+              "sha256": "8f31176ee257b3ef85d99e5faea18f6232e3f91bfd9ff8cd6c79064fa37bed52",
+              "dimensoes": [
+                128,
+                96
+              ]
+            }
+          ]
+        },
+        "run": {
+          "fps": 10.0,
+          "ciclo": true,
+          "frames": [
+            {
+              "ficheiro": "mushroom/frames/run_01.png",
+              "sha256": "5729aab61a76b86f505f614d90ae7e17d592415cfa34547f08bdfbbef4274597",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "mushroom/frames/run_02.png",
+              "sha256": "8f31176ee257b3ef85d99e5faea18f6232e3f91bfd9ff8cd6c79064fa37bed52",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "mushroom/frames/run_03.png",
+              "sha256": "21d5a8fb4f679f9158642fb791a0b5e4178fbf5cb05c6f8d8e8bc315cbf06d8f",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "mushroom/frames/run_04.png",
+              "sha256": "8f31176ee257b3ef85d99e5faea18f6232e3f91bfd9ff8cd6c79064fa37bed52",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "mushroom/frames/run_05.png",
+              "sha256": "5729aab61a76b86f505f614d90ae7e17d592415cfa34547f08bdfbbef4274597",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "mushroom/frames/run_06.png",
+              "sha256": "8f31176ee257b3ef85d99e5faea18f6232e3f91bfd9ff8cd6c79064fa37bed52",
+              "dimensoes": [
+                128,
+                96
+              ]
+            }
+          ]
+        },
+        "hit": {
+          "fps": 12.0,
+          "ciclo": false,
+          "frames": [
+            {
+              "ficheiro": "mushroom/frames/hit_01.png",
+              "sha256": "10326991b3f1312fa7081b5d38a163e03bca347075b528ba628f035caaf56ad2",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "mushroom/frames/hit_02.png",
+              "sha256": "b711e85b32faa9c0154be1db1a608ad5e9f4b941e6d2894863b8a89c0a0d1bbc",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "mushroom/frames/hit_03.png",
+              "sha256": "805f25fbbf6e06e3d6ea304260ae8576fa21d9eee6847339b8895c75c913a2cb",
+              "dimensoes": [
+                128,
+                96
+              ]
+            }
+          ]
+        },
+        "dead": {
+          "fps": 10.0,
+          "ciclo": false,
+          "frames": [
+            {
+              "ficheiro": "mushroom/frames/dead_01.png",
+              "sha256": "5729aab61a76b86f505f614d90ae7e17d592415cfa34547f08bdfbbef4274597",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "mushroom/frames/dead_02.png",
+              "sha256": "5419cea7b9e1449e3c33b4333c800f7aa010b9b6752f190dcdeb12bc2617f191",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "mushroom/frames/dead_03.png",
+              "sha256": "4c0c4cf783b7f5a24f6d615a7055b170afde1d6be11f7869e3449cc5f4b49716",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "mushroom/frames/dead_04.png",
+              "sha256": "4a7a2d72fb71adce6c2826ccb41568b54825616873036a5083a20a5594470621",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "mushroom/frames/dead_05.png",
+              "sha256": "d15943b62d9b56c13494016baa96b6d2d7213f41607f11d068790032dea943ea",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "mushroom/frames/dead_06.png",
+              "sha256": "8bef27f7456b3b5f7ea8df460ca83a5d9fe1efebc0ab5cf9e2a21a93f510b4b1",
+              "dimensoes": [
+                128,
+                96
+              ]
+            }
+          ]
+        }
+      },
+      "niveis": {
+        "L2": [
+          "EliteCuspidor (elite, cuspidor, x1.35)"
+        ]
+      },
+      "legado": "res://assets/sprites/pixel/enemies/mushroom/",
+      "estados_alcancaveis": [
+        "dead",
+        "hit",
+        "idle",
+        "run"
+      ]
     },
     "gosma": {
-      "tipo": "comum", "status": "PRODUCTION_ASSET_MISSING", "cena": "res://scenes/actors/DemonioBase.tscn",
-      "niveis": {"L2": ["GoblinBaixa (patrulha)"], "L4": ["GosmaR2 (patrulha)", "EliteSaltador (elite, saltador, x1.4)", "GosmaInterior (saltador)"]},
-      "legado": "res://assets/sprites/pixel/enemies/gosma/", "estados_alcancaveis": ["idle", "run", "hit", "dead"],
-      "animacoes": {}
+      "tipo": "comum",
+      "status": "PRODUCTION_INTEGRATED",
+      "cena": "res://scenes/actors/DemonioBase.tscn",
+      "autoridade_item": 3,
+      "proveniencia": {
+        "caixa_autoridade": [
+          616,
+          183,
+          865,
+          339
+        ],
+        "fundo_removido": "xadrez",
+        "limiar_croma_gradiente": [
+          14,
+          10
+        ],
+        "escala_reducao": 0.403361,
+        "classificacao": "B"
+      },
+      "contrato": {
+        "canvas": [
+          128,
+          96
+        ],
+        "baseline_y": 88,
+        "pivot": [
+          64,
+          88
+        ],
+        "corpo_px": [
+          95,
+          48
+        ]
+      },
+      "animacoes": {
+        "idle": {
+          "fps": 5.0,
+          "ciclo": true,
+          "frames": [
+            {
+              "ficheiro": "gosma/frames/idle_01.png",
+              "sha256": "d861cfb4538ae410d891646d73fd6c49da841a17a834dc2eb4336b495905d3e4",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "gosma/frames/idle_02.png",
+              "sha256": "d861cfb4538ae410d891646d73fd6c49da841a17a834dc2eb4336b495905d3e4",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "gosma/frames/idle_03.png",
+              "sha256": "ef8119c816aa7cc5eaf12a54ce492feeec7c5c0ad021becf0859381a59294a78",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "gosma/frames/idle_04.png",
+              "sha256": "ef8119c816aa7cc5eaf12a54ce492feeec7c5c0ad021becf0859381a59294a78",
+              "dimensoes": [
+                128,
+                96
+              ]
+            }
+          ]
+        },
+        "run": {
+          "fps": 10.0,
+          "ciclo": true,
+          "frames": [
+            {
+              "ficheiro": "gosma/frames/run_01.png",
+              "sha256": "d861cfb4538ae410d891646d73fd6c49da841a17a834dc2eb4336b495905d3e4",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "gosma/frames/run_02.png",
+              "sha256": "ef8119c816aa7cc5eaf12a54ce492feeec7c5c0ad021becf0859381a59294a78",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "gosma/frames/run_03.png",
+              "sha256": "d412a751504627577c7172c549e200bc06049faf2609fb69df12aa7047043aea",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "gosma/frames/run_04.png",
+              "sha256": "ef8119c816aa7cc5eaf12a54ce492feeec7c5c0ad021becf0859381a59294a78",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "gosma/frames/run_05.png",
+              "sha256": "d861cfb4538ae410d891646d73fd6c49da841a17a834dc2eb4336b495905d3e4",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "gosma/frames/run_06.png",
+              "sha256": "ef8119c816aa7cc5eaf12a54ce492feeec7c5c0ad021becf0859381a59294a78",
+              "dimensoes": [
+                128,
+                96
+              ]
+            }
+          ]
+        },
+        "hit": {
+          "fps": 12.0,
+          "ciclo": false,
+          "frames": [
+            {
+              "ficheiro": "gosma/frames/hit_01.png",
+              "sha256": "1c49ba1989cb7465a84910f16f6d867d4b09d3178c75398839342a6bd905568c",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "gosma/frames/hit_02.png",
+              "sha256": "62e8222afbe7015c5939862e3cada14b43e7f987fe2995d183b9cab555feeb5f",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "gosma/frames/hit_03.png",
+              "sha256": "735ae34473b171c12a7de35eb94eaa86d12828d01cc9b664b533efaeef9fafd4",
+              "dimensoes": [
+                128,
+                96
+              ]
+            }
+          ]
+        },
+        "dead": {
+          "fps": 10.0,
+          "ciclo": false,
+          "frames": [
+            {
+              "ficheiro": "gosma/frames/dead_01.png",
+              "sha256": "d861cfb4538ae410d891646d73fd6c49da841a17a834dc2eb4336b495905d3e4",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "gosma/frames/dead_02.png",
+              "sha256": "a371c59e25799ec8354a45e2d2eb063f694213ddcf5d26afbf48f3103fe9cad1",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "gosma/frames/dead_03.png",
+              "sha256": "934bf6a45755479855829660f017648c0459da1161e183a2aae18e218d570a38",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "gosma/frames/dead_04.png",
+              "sha256": "3c7cc0fae9ad946c74c0ac83cc43f8ec2be80b73d7a707e051b0db1e412c5948",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "gosma/frames/dead_05.png",
+              "sha256": "1a7aa68bf507b0bc27907fc84ab5ae0d411bc3348fee6cc2a83b786289264d65",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "gosma/frames/dead_06.png",
+              "sha256": "b1d9425b3f745c8be3650aaa7650cf31266a0b28b43f5c62c9df6437d0459ea7",
+              "dimensoes": [
+                128,
+                96
+              ]
+            }
+          ]
+        }
+      },
+      "niveis": {
+        "L2": [
+          "GoblinBaixa (patrulha)"
+        ],
+        "L4": [
+          "GosmaR2 (patrulha)",
+          "EliteSaltador (elite, saltador, x1.4)",
+          "GosmaInterior (saltador)"
+        ]
+      },
+      "legado": "res://assets/sprites/pixel/enemies/gosma/",
+      "estados_alcancaveis": [
+        "dead",
+        "hit",
+        "idle",
+        "run"
+      ]
     },
     "besouro": {
-      "tipo": "comum", "status": "PRODUCTION_ASSET_MISSING", "cena": "res://scenes/actors/DemonioBase.tscn",
-      "niveis": {"L3": ["BesouroPasso (patrulha)", "EliteTrepador (elite, trepador, x1.4)", "BesouroDossel (trepador)", "BesouroNinho (patrulha)"]},
-      "legado": "res://assets/sprites/pixel/enemies/besouro/", "estados_alcancaveis": ["idle", "run", "hit", "dead"],
-      "animacoes": {}
+      "tipo": "comum",
+      "status": "PRODUCTION_INTEGRATED",
+      "cena": "res://scenes/actors/DemonioBase.tscn",
+      "autoridade_item": 4,
+      "proveniencia": {
+        "caixa_autoridade": [
+          874,
+          183,
+          1208,
+          339
+        ],
+        "fundo_removido": "xadrez",
+        "limiar_croma_gradiente": [
+          14,
+          10
+        ],
+        "escala_reducao": 0.377953,
+        "classificacao": "B"
+      },
+      "contrato": {
+        "canvas": [
+          128,
+          96
+        ],
+        "baseline_y": 88,
+        "pivot": [
+          64,
+          88
+        ],
+        "corpo_px": [
+          100,
+          48
+        ]
+      },
+      "animacoes": {
+        "idle": {
+          "fps": 5.0,
+          "ciclo": true,
+          "frames": [
+            {
+              "ficheiro": "besouro/frames/idle_01.png",
+              "sha256": "852803de9212316c83c9160cf1de728d9968fc20ac7c9927c9f860f4cc60065e",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "besouro/frames/idle_02.png",
+              "sha256": "852803de9212316c83c9160cf1de728d9968fc20ac7c9927c9f860f4cc60065e",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "besouro/frames/idle_03.png",
+              "sha256": "30c24d758a9e6e6705018a4f129da56a9196b7184ed9cf0050832517d5795a26",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "besouro/frames/idle_04.png",
+              "sha256": "30c24d758a9e6e6705018a4f129da56a9196b7184ed9cf0050832517d5795a26",
+              "dimensoes": [
+                128,
+                96
+              ]
+            }
+          ]
+        },
+        "run": {
+          "fps": 10.0,
+          "ciclo": true,
+          "frames": [
+            {
+              "ficheiro": "besouro/frames/run_01.png",
+              "sha256": "852803de9212316c83c9160cf1de728d9968fc20ac7c9927c9f860f4cc60065e",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "besouro/frames/run_02.png",
+              "sha256": "30c24d758a9e6e6705018a4f129da56a9196b7184ed9cf0050832517d5795a26",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "besouro/frames/run_03.png",
+              "sha256": "85b54f3bd33e127f917f8e202a567ba4aad4bf88fb7031efaa9e980707aeea4f",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "besouro/frames/run_04.png",
+              "sha256": "30c24d758a9e6e6705018a4f129da56a9196b7184ed9cf0050832517d5795a26",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "besouro/frames/run_05.png",
+              "sha256": "852803de9212316c83c9160cf1de728d9968fc20ac7c9927c9f860f4cc60065e",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "besouro/frames/run_06.png",
+              "sha256": "30c24d758a9e6e6705018a4f129da56a9196b7184ed9cf0050832517d5795a26",
+              "dimensoes": [
+                128,
+                96
+              ]
+            }
+          ]
+        },
+        "hit": {
+          "fps": 12.0,
+          "ciclo": false,
+          "frames": [
+            {
+              "ficheiro": "besouro/frames/hit_01.png",
+              "sha256": "7e724103b0f85c3b742d63a312aac28dc5a7df26fd6c635dac337d6d2b37ba9e",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "besouro/frames/hit_02.png",
+              "sha256": "b35522ee99dee45807976832ff4907af2798280edfea27313b00447a79a120d3",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "besouro/frames/hit_03.png",
+              "sha256": "e1848a552f46ffe41a79916f71d5f009d97642a46e43a221ee380d9cba31da36",
+              "dimensoes": [
+                128,
+                96
+              ]
+            }
+          ]
+        },
+        "dead": {
+          "fps": 10.0,
+          "ciclo": false,
+          "frames": [
+            {
+              "ficheiro": "besouro/frames/dead_01.png",
+              "sha256": "852803de9212316c83c9160cf1de728d9968fc20ac7c9927c9f860f4cc60065e",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "besouro/frames/dead_02.png",
+              "sha256": "87e1a1c9bbd922608568784717242ee540fc572d42f8dedcbaf196399faf91ae",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "besouro/frames/dead_03.png",
+              "sha256": "b54024d3c0e2b13633efa56d2109442a101e4105ed426bd5623be9e56ee846c0",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "besouro/frames/dead_04.png",
+              "sha256": "636af9220331d442008867244431a2c2d6bd816da9ef0060498c55e0431dad00",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "besouro/frames/dead_05.png",
+              "sha256": "862d40927ba102a95d57b31c125df0d6dbe7243c115e4c919ccdbe2b6e814ccf",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "besouro/frames/dead_06.png",
+              "sha256": "ed4fa308bab1b7c34376b362ec464b781b70357efb9c30fb80aba05c93b2830e",
+              "dimensoes": [
+                128,
+                96
+              ]
+            }
+          ]
+        }
+      },
+      "niveis": {
+        "L3": [
+          "BesouroPasso (patrulha)",
+          "EliteTrepador (elite, trepador, x1.4)",
+          "BesouroDossel (trepador)",
+          "BesouroNinho (patrulha)"
+        ]
+      },
+      "legado": "res://assets/sprites/pixel/enemies/besouro/",
+      "estados_alcancaveis": [
+        "dead",
+        "hit",
+        "idle",
+        "run"
+      ]
     },
     "lodo": {
-      "tipo": "comum", "status": "PRODUCTION_ASSET_MISSING", "cena": "res://scenes/actors/DemonioBase.tscn",
-      "niveis": {"L5": ["EliteLodo (elite, carga, x1.45)"]},
-      "legado": "res://assets/sprites/pixel/enemies/lodo/", "estados_alcancaveis": ["idle", "run", "hit", "dead"],
-      "animacoes": {}
+      "tipo": "comum",
+      "status": "PRODUCTION_INTEGRATED",
+      "cena": "res://scenes/actors/DemonioBase.tscn",
+      "autoridade_item": 5,
+      "proveniencia": {
+        "caixa_autoridade": [
+          1218,
+          183,
+          1510,
+          339
+        ],
+        "fundo_removido": "xadrez",
+        "limiar_croma_gradiente": [
+          14,
+          10
+        ],
+        "escala_reducao": 0.322148,
+        "classificacao": "B"
+      },
+      "contrato": {
+        "canvas": [
+          128,
+          96
+        ],
+        "baseline_y": 88,
+        "pivot": [
+          64,
+          88
+        ],
+        "corpo_px": [
+          88,
+          48
+        ]
+      },
+      "animacoes": {
+        "idle": {
+          "fps": 5.0,
+          "ciclo": true,
+          "frames": [
+            {
+              "ficheiro": "lodo/frames/idle_01.png",
+              "sha256": "62a08a9ebcc2ea7a269237a5102f376a1f85bb47a8657eb8e9fa8f7abd1e3602",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "lodo/frames/idle_02.png",
+              "sha256": "62a08a9ebcc2ea7a269237a5102f376a1f85bb47a8657eb8e9fa8f7abd1e3602",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "lodo/frames/idle_03.png",
+              "sha256": "28fb6cca452d4efa77a7a677b2f98d61619cfa10d2ffdff44d6c865fe24320e2",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "lodo/frames/idle_04.png",
+              "sha256": "28fb6cca452d4efa77a7a677b2f98d61619cfa10d2ffdff44d6c865fe24320e2",
+              "dimensoes": [
+                128,
+                96
+              ]
+            }
+          ]
+        },
+        "run": {
+          "fps": 10.0,
+          "ciclo": true,
+          "frames": [
+            {
+              "ficheiro": "lodo/frames/run_01.png",
+              "sha256": "62a08a9ebcc2ea7a269237a5102f376a1f85bb47a8657eb8e9fa8f7abd1e3602",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "lodo/frames/run_02.png",
+              "sha256": "28fb6cca452d4efa77a7a677b2f98d61619cfa10d2ffdff44d6c865fe24320e2",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "lodo/frames/run_03.png",
+              "sha256": "2c041c3323c9447ca11e3fbcd97498e92079f9343241456e4247e4dca12f7bf9",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "lodo/frames/run_04.png",
+              "sha256": "28fb6cca452d4efa77a7a677b2f98d61619cfa10d2ffdff44d6c865fe24320e2",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "lodo/frames/run_05.png",
+              "sha256": "62a08a9ebcc2ea7a269237a5102f376a1f85bb47a8657eb8e9fa8f7abd1e3602",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "lodo/frames/run_06.png",
+              "sha256": "28fb6cca452d4efa77a7a677b2f98d61619cfa10d2ffdff44d6c865fe24320e2",
+              "dimensoes": [
+                128,
+                96
+              ]
+            }
+          ]
+        },
+        "hit": {
+          "fps": 12.0,
+          "ciclo": false,
+          "frames": [
+            {
+              "ficheiro": "lodo/frames/hit_01.png",
+              "sha256": "60859949a45482a1b2eb07307d01df87d02080eb455429585d8e2513709a03c4",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "lodo/frames/hit_02.png",
+              "sha256": "c5a54439a277c4a965904251196e5f44e5d85d79fd82762b028160deca46543b",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "lodo/frames/hit_03.png",
+              "sha256": "0a52aaeaf1aff492ade4f2db17c00f02f467daff8daa4f7899747f386e241c5d",
+              "dimensoes": [
+                128,
+                96
+              ]
+            }
+          ]
+        },
+        "dead": {
+          "fps": 10.0,
+          "ciclo": false,
+          "frames": [
+            {
+              "ficheiro": "lodo/frames/dead_01.png",
+              "sha256": "62a08a9ebcc2ea7a269237a5102f376a1f85bb47a8657eb8e9fa8f7abd1e3602",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "lodo/frames/dead_02.png",
+              "sha256": "7ecb9ffb342e3880a44e49d2af355beccfbff99c415ee537fcc2ea72f40431d1",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "lodo/frames/dead_03.png",
+              "sha256": "c34e7db7f344b610453aac5aa8c5d2453cb350ef21421cbe05a52dc9e3d03580",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "lodo/frames/dead_04.png",
+              "sha256": "bf1ad987e60c8cc4e9c8ef9c6535609d4fb427a31998192434cef6ccbb0d9d22",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "lodo/frames/dead_05.png",
+              "sha256": "2bc19248611e84bce1441fb2496ec20b3e63b79f81bf478d71d4c413608b5902",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "lodo/frames/dead_06.png",
+              "sha256": "68c5f6467c230f7ec041a6d037b348f2f471d343fbf2877d7822de5d07a9e188",
+              "dimensoes": [
+                128,
+                96
+              ]
+            }
+          ]
+        }
+      },
+      "niveis": {
+        "L5": [
+          "EliteLodo (elite, carga, x1.45)"
+        ]
+      },
+      "legado": "res://assets/sprites/pixel/enemies/lodo/",
+      "estados_alcancaveis": [
+        "dead",
+        "hit",
+        "idle",
+        "run"
+      ]
     },
     "ghorak": {
-      "tipo": "guardiao", "status": "PRODUCTION_ASSET_MISSING", "cena": "res://scenes/actors/ChefeGhorak.tscn",
-      "niveis": {"L1": ["Guardiao (escala_visual 1.2)"]},
-      "legado": "res://assets/sprites/pixel/bosses_anim/ghorak/", "estados_alcancaveis": ["idle", "run", "hit", "dead"],
+      "tipo": "guardiao",
+      "status": "PRODUCTION_INTEGRATED",
+      "cena": "res://scenes/actors/ChefeGhorak.tscn",
+      "autoridade_item": 6,
+      "proveniencia": {
+        "caixa_autoridade": [
+          27,
+          452,
+          373,
+          630
+        ],
+        "fundo_removido": "liso",
+        "limiar_croma_gradiente": [
+          10,
+          6
+        ],
+        "escala_reducao": 0.381944,
+        "classificacao": "B"
+      },
+      "contrato": {
+        "canvas": [
+          192,
+          192
+        ],
+        "baseline_y": 180,
+        "pivot": [
+          96,
+          180
+        ],
+        "corpo_px": [
+          110,
+          63
+        ]
+      },
+      "animacoes": {
+        "idle": {
+          "fps": 5.0,
+          "ciclo": true,
+          "frames": [
+            {
+              "ficheiro": "ghorak/frames/idle_01.png",
+              "sha256": "d66dc5f292db3b6e7c6fd122c348eb551ac3ee5a233e212064efc33ec192035a",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "ghorak/frames/idle_02.png",
+              "sha256": "d66dc5f292db3b6e7c6fd122c348eb551ac3ee5a233e212064efc33ec192035a",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "ghorak/frames/idle_03.png",
+              "sha256": "4dad367e9ad480051a527ed9fd7a69b404fddd46e77e25b642e25fd2971379fc",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "ghorak/frames/idle_04.png",
+              "sha256": "4dad367e9ad480051a527ed9fd7a69b404fddd46e77e25b642e25fd2971379fc",
+              "dimensoes": [
+                192,
+                192
+              ]
+            }
+          ]
+        },
+        "run": {
+          "fps": 10.0,
+          "ciclo": true,
+          "frames": [
+            {
+              "ficheiro": "ghorak/frames/run_01.png",
+              "sha256": "d66dc5f292db3b6e7c6fd122c348eb551ac3ee5a233e212064efc33ec192035a",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "ghorak/frames/run_02.png",
+              "sha256": "4dad367e9ad480051a527ed9fd7a69b404fddd46e77e25b642e25fd2971379fc",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "ghorak/frames/run_03.png",
+              "sha256": "8e3467f5da63d30248525f48b4b63f8d2f60692d768e0b7d9c6c3bae11d10c07",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "ghorak/frames/run_04.png",
+              "sha256": "4dad367e9ad480051a527ed9fd7a69b404fddd46e77e25b642e25fd2971379fc",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "ghorak/frames/run_05.png",
+              "sha256": "d66dc5f292db3b6e7c6fd122c348eb551ac3ee5a233e212064efc33ec192035a",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "ghorak/frames/run_06.png",
+              "sha256": "4dad367e9ad480051a527ed9fd7a69b404fddd46e77e25b642e25fd2971379fc",
+              "dimensoes": [
+                192,
+                192
+              ]
+            }
+          ]
+        },
+        "hit": {
+          "fps": 12.0,
+          "ciclo": false,
+          "frames": [
+            {
+              "ficheiro": "ghorak/frames/hit_01.png",
+              "sha256": "aafaf41dc270a46faeda8eab00b09ed2fae3b6eb7586e4af5a52f55e222c2f6e",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "ghorak/frames/hit_02.png",
+              "sha256": "59cfb6926c63183016e0e4f437441f04661540657489f014c730ab9e686ea53f",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "ghorak/frames/hit_03.png",
+              "sha256": "90c3eaf38b2b89b3d3107e7b1ea441bb148367b10157c9c638651020a2850567",
+              "dimensoes": [
+                192,
+                192
+              ]
+            }
+          ]
+        },
+        "dead": {
+          "fps": 10.0,
+          "ciclo": false,
+          "frames": [
+            {
+              "ficheiro": "ghorak/frames/dead_01.png",
+              "sha256": "d66dc5f292db3b6e7c6fd122c348eb551ac3ee5a233e212064efc33ec192035a",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "ghorak/frames/dead_02.png",
+              "sha256": "de3418a7016caef74926663572b91cbe573c760dba5739cf5169ccc9c78c848b",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "ghorak/frames/dead_03.png",
+              "sha256": "9529c7a0a5eabc721619119f187eb319b8fa5c0833991c17588b383e448f1f12",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "ghorak/frames/dead_04.png",
+              "sha256": "03ce24bdf42e7426913d197bc498dd108a987147925ca82811ec934067c7d1cd",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "ghorak/frames/dead_05.png",
+              "sha256": "ddb902cef1af11e14ac44dff3cbaa3210c9d9b10313c552750402f366f12a78f",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "ghorak/frames/dead_06.png",
+              "sha256": "2178cb1ff18186dce6920de879997c0085e406b40b63c72864b8467b443ffb7c",
+              "dimensoes": [
+                192,
+                192
+              ]
+            }
+          ]
+        }
+      },
+      "niveis": {
+        "L1": [
+          "Guardiao (escala_visual 1.2)"
+        ]
+      },
+      "legado": "res://assets/sprites/pixel/bosses_anim/ghorak/",
       "nota": "o rig tem 'attack', mas ChefeBase.atacar_anim() não é chamado em lado nenhum",
-      "animacoes": {}
+      "estados_alcancaveis": [
+        "dead",
+        "hit",
+        "idle",
+        "run"
+      ]
     },
     "morvanna": {
-      "tipo": "guardiao", "status": "PRODUCTION_ASSET_MISSING", "cena": "res://scenes/actors/ChefeMorvanna.tscn",
-      "niveis": {"L2": ["Guardiao (escala_visual 1.35, flutua)"]},
-      "legado": "res://assets/sprites/pixel/bosses_anim/morvanna/", "estados_alcancaveis": ["idle", "run", "hit", "dead"],
-      "animacoes": {}
+      "tipo": "guardiao",
+      "status": "PRODUCTION_INTEGRATED",
+      "cena": "res://scenes/actors/ChefeMorvanna.tscn",
+      "autoridade_item": 7,
+      "proveniencia": {
+        "caixa_autoridade": [
+          383,
+          450,
+          708,
+          630
+        ],
+        "fundo_removido": "liso",
+        "limiar_croma_gradiente": [
+          10,
+          6
+        ],
+        "escala_reducao": 0.466102,
+        "classificacao": "B"
+      },
+      "contrato": {
+        "canvas": [
+          192,
+          192
+        ],
+        "baseline_y": 180,
+        "pivot": [
+          96,
+          180
+        ],
+        "corpo_px": [
+          110,
+          84
+        ]
+      },
+      "animacoes": {
+        "idle": {
+          "fps": 5.0,
+          "ciclo": true,
+          "frames": [
+            {
+              "ficheiro": "morvanna/frames/idle_01.png",
+              "sha256": "ad19e15d02a0a8a6ffe9613fc5d1ce56cbdfbaa8e02326004c9426211ed0e2c5",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "morvanna/frames/idle_02.png",
+              "sha256": "ad19e15d02a0a8a6ffe9613fc5d1ce56cbdfbaa8e02326004c9426211ed0e2c5",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "morvanna/frames/idle_03.png",
+              "sha256": "8eb39ca47802bef393d1e00e4d3400e9234293da3309c50655ab0ad62740c9fb",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "morvanna/frames/idle_04.png",
+              "sha256": "8eb39ca47802bef393d1e00e4d3400e9234293da3309c50655ab0ad62740c9fb",
+              "dimensoes": [
+                192,
+                192
+              ]
+            }
+          ]
+        },
+        "run": {
+          "fps": 10.0,
+          "ciclo": true,
+          "frames": [
+            {
+              "ficheiro": "morvanna/frames/run_01.png",
+              "sha256": "ad19e15d02a0a8a6ffe9613fc5d1ce56cbdfbaa8e02326004c9426211ed0e2c5",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "morvanna/frames/run_02.png",
+              "sha256": "8eb39ca47802bef393d1e00e4d3400e9234293da3309c50655ab0ad62740c9fb",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "morvanna/frames/run_03.png",
+              "sha256": "adc2069b7a55eb19a125fa2b3e372bdef5777a26ed49ce3fd5d0143eafcb031f",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "morvanna/frames/run_04.png",
+              "sha256": "8eb39ca47802bef393d1e00e4d3400e9234293da3309c50655ab0ad62740c9fb",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "morvanna/frames/run_05.png",
+              "sha256": "ad19e15d02a0a8a6ffe9613fc5d1ce56cbdfbaa8e02326004c9426211ed0e2c5",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "morvanna/frames/run_06.png",
+              "sha256": "8eb39ca47802bef393d1e00e4d3400e9234293da3309c50655ab0ad62740c9fb",
+              "dimensoes": [
+                192,
+                192
+              ]
+            }
+          ]
+        },
+        "hit": {
+          "fps": 12.0,
+          "ciclo": false,
+          "frames": [
+            {
+              "ficheiro": "morvanna/frames/hit_01.png",
+              "sha256": "9c0eb4b2edc2191ebe2ae2ba48eb806bf9c5c0e6243178a8c97acf48b7cf0e60",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "morvanna/frames/hit_02.png",
+              "sha256": "c186c9986eaa282cbf31f1d4627c946ddae6ee1e883ac32c6f802a3ac5e9d312",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "morvanna/frames/hit_03.png",
+              "sha256": "0c8a99d7f6e0259323797bad57e9494a68f0e8959901be7167217806cf28fc57",
+              "dimensoes": [
+                192,
+                192
+              ]
+            }
+          ]
+        },
+        "dead": {
+          "fps": 10.0,
+          "ciclo": false,
+          "frames": [
+            {
+              "ficheiro": "morvanna/frames/dead_01.png",
+              "sha256": "ad19e15d02a0a8a6ffe9613fc5d1ce56cbdfbaa8e02326004c9426211ed0e2c5",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "morvanna/frames/dead_02.png",
+              "sha256": "2fdff221cf65c822de032d7b95dcaae867cf1e2e10af19d62fb459637dad9345",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "morvanna/frames/dead_03.png",
+              "sha256": "e719f164cd75042fd4f7aec42e74007825b84d0a5512880ad33beb8d99884f78",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "morvanna/frames/dead_04.png",
+              "sha256": "df96f66647f42134bf6b79ef1f730b884a468e21aed8fe444256d0276b80c8ce",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "morvanna/frames/dead_05.png",
+              "sha256": "5f66811dcc7c55dddee1a6c2aa2f969f66b7ca55b2108147d2b6a0109be9fe47",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "morvanna/frames/dead_06.png",
+              "sha256": "ea7042be795e3733d89153558668d59f93d94d3973ec3882267ea622af058c57",
+              "dimensoes": [
+                192,
+                192
+              ]
+            }
+          ]
+        }
+      },
+      "niveis": {
+        "L2": [
+          "Guardiao (escala_visual 1.35, flutua)"
+        ]
+      },
+      "legado": "res://assets/sprites/pixel/bosses_anim/morvanna/",
+      "estados_alcancaveis": [
+        "dead",
+        "hit",
+        "idle",
+        "run"
+      ]
     },
     "rainha_aracnidea": {
-      "tipo": "guardiao", "status": "PRODUCTION_ASSET_MISSING", "cena": "res://scenes/actors/ChefeRainhaAracnidea.tscn",
-      "niveis": {"L3": ["Guardiao (escala_visual 1.4)"]},
-      "legado": "res://assets/sprites/pixel/bosses_anim/rainha_aracnidea/", "estados_alcancaveis": ["idle", "run", "hit", "dead"],
-      "animacoes": {}
+      "tipo": "guardiao",
+      "status": "PRODUCTION_INTEGRATED",
+      "cena": "res://scenes/actors/ChefeRainhaAracnidea.tscn",
+      "autoridade_item": 8,
+      "proveniencia": {
+        "caixa_autoridade": [
+          718,
+          450,
+          1104,
+          630
+        ],
+        "fundo_removido": "liso",
+        "limiar_croma_gradiente": [
+          10,
+          6
+        ],
+        "escala_reducao": 0.297297,
+        "classificacao": "B"
+      },
+      "contrato": {
+        "canvas": [
+          192,
+          192
+        ],
+        "baseline_y": 180,
+        "pivot": [
+          96,
+          180
+        ],
+        "corpo_px": [
+          110,
+          49
+        ]
+      },
+      "animacoes": {
+        "idle": {
+          "fps": 5.0,
+          "ciclo": true,
+          "frames": [
+            {
+              "ficheiro": "rainha_aracnidea/frames/idle_01.png",
+              "sha256": "4c7cf9d9945321b7d683ad52d0dcf966708734b4edfbfa5e8482fc9d764f3531",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "rainha_aracnidea/frames/idle_02.png",
+              "sha256": "4c7cf9d9945321b7d683ad52d0dcf966708734b4edfbfa5e8482fc9d764f3531",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "rainha_aracnidea/frames/idle_03.png",
+              "sha256": "f3256dadb1b95107db21e7dcbfdb2ed21c9b60bf643b70dea103f8cb6f3a04bb",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "rainha_aracnidea/frames/idle_04.png",
+              "sha256": "f3256dadb1b95107db21e7dcbfdb2ed21c9b60bf643b70dea103f8cb6f3a04bb",
+              "dimensoes": [
+                192,
+                192
+              ]
+            }
+          ]
+        },
+        "run": {
+          "fps": 10.0,
+          "ciclo": true,
+          "frames": [
+            {
+              "ficheiro": "rainha_aracnidea/frames/run_01.png",
+              "sha256": "4c7cf9d9945321b7d683ad52d0dcf966708734b4edfbfa5e8482fc9d764f3531",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "rainha_aracnidea/frames/run_02.png",
+              "sha256": "f3256dadb1b95107db21e7dcbfdb2ed21c9b60bf643b70dea103f8cb6f3a04bb",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "rainha_aracnidea/frames/run_03.png",
+              "sha256": "82eb40b3919f0585c0e474665e0813f2c747413b2b27352f3d941941fe6e4edd",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "rainha_aracnidea/frames/run_04.png",
+              "sha256": "f3256dadb1b95107db21e7dcbfdb2ed21c9b60bf643b70dea103f8cb6f3a04bb",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "rainha_aracnidea/frames/run_05.png",
+              "sha256": "4c7cf9d9945321b7d683ad52d0dcf966708734b4edfbfa5e8482fc9d764f3531",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "rainha_aracnidea/frames/run_06.png",
+              "sha256": "f3256dadb1b95107db21e7dcbfdb2ed21c9b60bf643b70dea103f8cb6f3a04bb",
+              "dimensoes": [
+                192,
+                192
+              ]
+            }
+          ]
+        },
+        "hit": {
+          "fps": 12.0,
+          "ciclo": false,
+          "frames": [
+            {
+              "ficheiro": "rainha_aracnidea/frames/hit_01.png",
+              "sha256": "ad12399f31fd454b51537edb9e654b68b1d7919f44fbf86a59fbf8a52fe86c68",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "rainha_aracnidea/frames/hit_02.png",
+              "sha256": "fd7ea6117c2eaf5e30f1c3a0ee203ec2542a0761128cc869019be8b40fd04ab5",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "rainha_aracnidea/frames/hit_03.png",
+              "sha256": "82e80d4d8ca6e1b4e84f253eaa3745bcea9be57fe57e036cb151b5222485b404",
+              "dimensoes": [
+                192,
+                192
+              ]
+            }
+          ]
+        },
+        "dead": {
+          "fps": 10.0,
+          "ciclo": false,
+          "frames": [
+            {
+              "ficheiro": "rainha_aracnidea/frames/dead_01.png",
+              "sha256": "4c7cf9d9945321b7d683ad52d0dcf966708734b4edfbfa5e8482fc9d764f3531",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "rainha_aracnidea/frames/dead_02.png",
+              "sha256": "1c758d408f40af04671ea17ac4eec940d53e208d358c8cda89182e5ca0bd2380",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "rainha_aracnidea/frames/dead_03.png",
+              "sha256": "9ec0705c01e00a6e2e8014857d914ff73b3ce3138dd4d1e48aaa6298fbfb6fa5",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "rainha_aracnidea/frames/dead_04.png",
+              "sha256": "15535b8cb3ba05b622b40c199a353406a2309b9d5335c2a9f237a2985176b18f",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "rainha_aracnidea/frames/dead_05.png",
+              "sha256": "ddd6e0f8f0768fdd565034027ae484deb8d3a181f24e794ea6575491c44bea52",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "rainha_aracnidea/frames/dead_06.png",
+              "sha256": "34c717263b8a0e993f520eb6b27dbd8e6dfff394b8f78f59180a54452ca3ba46",
+              "dimensoes": [
+                192,
+                192
+              ]
+            }
+          ]
+        }
+      },
+      "niveis": {
+        "L3": [
+          "Guardiao (escala_visual 1.4)"
+        ]
+      },
+      "legado": "res://assets/sprites/pixel/bosses_anim/rainha_aracnidea/",
+      "estados_alcancaveis": [
+        "dead",
+        "hit",
+        "idle",
+        "run"
+      ]
     },
     "entrevane": {
-      "tipo": "guardiao", "status": "PRODUCTION_ASSET_MISSING", "cena": "res://scenes/actors/ChefeEntrevane.tscn",
-      "niveis": {"L4": ["Guardiao (escala_visual 1.25, enraizada)"]},
-      "legado": "res://assets/sprites/pixel/bosses_anim/entrevane/", "estados_alcancaveis": ["idle", "run", "hit", "dead"],
-      "animacoes": {}
+      "tipo": "guardiao",
+      "status": "PRODUCTION_INTEGRATED",
+      "cena": "res://scenes/actors/ChefeEntrevane.tscn",
+      "autoridade_item": 9,
+      "proveniencia": {
+        "caixa_autoridade": [
+          1206,
+          424,
+          1511,
+          630
+        ],
+        "fundo_removido": "liso",
+        "limiar_croma_gradiente": [
+          10,
+          6
+        ],
+        "escala_reducao": 0.364238,
+        "classificacao": "B"
+      },
+      "contrato": {
+        "canvas": [
+          192,
+          192
+        ],
+        "baseline_y": 180,
+        "pivot": [
+          96,
+          180
+        ],
+        "corpo_px": [
+          110,
+          75
+        ]
+      },
+      "animacoes": {
+        "idle": {
+          "fps": 5.0,
+          "ciclo": true,
+          "frames": [
+            {
+              "ficheiro": "entrevane/frames/idle_01.png",
+              "sha256": "82ce0cf40cafe379cf0128aede68febedf04673a365f7d2e4ec94acb27e4a24e",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "entrevane/frames/idle_02.png",
+              "sha256": "82ce0cf40cafe379cf0128aede68febedf04673a365f7d2e4ec94acb27e4a24e",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "entrevane/frames/idle_03.png",
+              "sha256": "260f641ecb465bbd9a439dea0d3d054037aeb5545db8fa93d9bd7c0075fc0d3b",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "entrevane/frames/idle_04.png",
+              "sha256": "260f641ecb465bbd9a439dea0d3d054037aeb5545db8fa93d9bd7c0075fc0d3b",
+              "dimensoes": [
+                192,
+                192
+              ]
+            }
+          ]
+        },
+        "run": {
+          "fps": 10.0,
+          "ciclo": true,
+          "frames": [
+            {
+              "ficheiro": "entrevane/frames/run_01.png",
+              "sha256": "82ce0cf40cafe379cf0128aede68febedf04673a365f7d2e4ec94acb27e4a24e",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "entrevane/frames/run_02.png",
+              "sha256": "260f641ecb465bbd9a439dea0d3d054037aeb5545db8fa93d9bd7c0075fc0d3b",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "entrevane/frames/run_03.png",
+              "sha256": "bbf166a930232d3011f1d9e2339085628e1a308efaa4c0a44b6e7e3eb06a5dc5",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "entrevane/frames/run_04.png",
+              "sha256": "260f641ecb465bbd9a439dea0d3d054037aeb5545db8fa93d9bd7c0075fc0d3b",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "entrevane/frames/run_05.png",
+              "sha256": "82ce0cf40cafe379cf0128aede68febedf04673a365f7d2e4ec94acb27e4a24e",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "entrevane/frames/run_06.png",
+              "sha256": "260f641ecb465bbd9a439dea0d3d054037aeb5545db8fa93d9bd7c0075fc0d3b",
+              "dimensoes": [
+                192,
+                192
+              ]
+            }
+          ]
+        },
+        "hit": {
+          "fps": 12.0,
+          "ciclo": false,
+          "frames": [
+            {
+              "ficheiro": "entrevane/frames/hit_01.png",
+              "sha256": "309680b988aa9361451dcaa635ad7aa8e57892786c894db7c7714f3a4f10ffa6",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "entrevane/frames/hit_02.png",
+              "sha256": "ef2eea55d931375fdfcbcc1408625f085ce4d97661f8c125aa5e19c663b5eab7",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "entrevane/frames/hit_03.png",
+              "sha256": "dff0c0e5d565aa073c42154732686e65cdd84dded9b776f244cc26b6f4b4d8e1",
+              "dimensoes": [
+                192,
+                192
+              ]
+            }
+          ]
+        },
+        "dead": {
+          "fps": 10.0,
+          "ciclo": false,
+          "frames": [
+            {
+              "ficheiro": "entrevane/frames/dead_01.png",
+              "sha256": "82ce0cf40cafe379cf0128aede68febedf04673a365f7d2e4ec94acb27e4a24e",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "entrevane/frames/dead_02.png",
+              "sha256": "52a4bbfda6609bb7468ff0c8ca7ae47968321621bf61d37c8ced9a3557db551a",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "entrevane/frames/dead_03.png",
+              "sha256": "847c639ca3939ebac7e3e1e395689fd437557452c1c036893cd63cbd8ce91bcd",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "entrevane/frames/dead_04.png",
+              "sha256": "c5b62166ce128cf9c2b5275a7554b9a1b3aa1836c2edf5f1ad84107fc20a1905",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "entrevane/frames/dead_05.png",
+              "sha256": "764f546ab470b456312fbecb8f5bac151f807555e4ca29a5e53ac0714d20c281",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "entrevane/frames/dead_06.png",
+              "sha256": "061aa4594d783d0e310219347e5d3e7a14b01c488384bcecb5b613c3f75db4dc",
+              "dimensoes": [
+                192,
+                192
+              ]
+            }
+          ]
+        }
+      },
+      "niveis": {
+        "L4": [
+          "Guardiao (escala_visual 1.25, enraizada)"
+        ]
+      },
+      "legado": "res://assets/sprites/pixel/bosses_anim/entrevane/",
+      "estados_alcancaveis": [
+        "dead",
+        "hit",
+        "idle",
+        "run"
+      ]
+    },
+    "clone_morvanna": {
+      "tipo": "comum",
+      "status": "PRODUCTION_INTEGRATED",
+      "cena": "res://scenes/actors/DemonioBase.tscn",
+      "autoridade_item": 10,
+      "proveniencia": {
+        "caixa_autoridade": [
+          27,
+          745,
+          264,
+          890
+        ],
+        "fundo_removido": "xadrez",
+        "limiar_croma_gradiente": [
+          14,
+          10
+        ],
+        "escala_reducao": 0.352941,
+        "classificacao": "B"
+      },
+      "contrato": {
+        "canvas": [
+          128,
+          96
+        ],
+        "baseline_y": 88,
+        "pivot": [
+          64,
+          88
+        ],
+        "corpo_px": [
+          52,
+          48
+        ]
+      },
+      "animacoes": {
+        "idle": {
+          "fps": 5.0,
+          "ciclo": true,
+          "frames": [
+            {
+              "ficheiro": "clone_morvanna/frames/idle_01.png",
+              "sha256": "211e83fa3d83378b6280cb5c1bcfc84e93d1528314e857b4ae203e3ae5533ebd",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "clone_morvanna/frames/idle_02.png",
+              "sha256": "211e83fa3d83378b6280cb5c1bcfc84e93d1528314e857b4ae203e3ae5533ebd",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "clone_morvanna/frames/idle_03.png",
+              "sha256": "7520b1e4a03a8f47ae3d44dbd7e0611dea228061e80188c8cd4ba04f1de2a84a",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "clone_morvanna/frames/idle_04.png",
+              "sha256": "7520b1e4a03a8f47ae3d44dbd7e0611dea228061e80188c8cd4ba04f1de2a84a",
+              "dimensoes": [
+                128,
+                96
+              ]
+            }
+          ]
+        },
+        "run": {
+          "fps": 10.0,
+          "ciclo": true,
+          "frames": [
+            {
+              "ficheiro": "clone_morvanna/frames/run_01.png",
+              "sha256": "211e83fa3d83378b6280cb5c1bcfc84e93d1528314e857b4ae203e3ae5533ebd",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "clone_morvanna/frames/run_02.png",
+              "sha256": "7520b1e4a03a8f47ae3d44dbd7e0611dea228061e80188c8cd4ba04f1de2a84a",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "clone_morvanna/frames/run_03.png",
+              "sha256": "76c83438a6069d3351ffea58cef452c499e212c6e41b4da15909878fda5f66fe",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "clone_morvanna/frames/run_04.png",
+              "sha256": "7520b1e4a03a8f47ae3d44dbd7e0611dea228061e80188c8cd4ba04f1de2a84a",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "clone_morvanna/frames/run_05.png",
+              "sha256": "211e83fa3d83378b6280cb5c1bcfc84e93d1528314e857b4ae203e3ae5533ebd",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "clone_morvanna/frames/run_06.png",
+              "sha256": "7520b1e4a03a8f47ae3d44dbd7e0611dea228061e80188c8cd4ba04f1de2a84a",
+              "dimensoes": [
+                128,
+                96
+              ]
+            }
+          ]
+        },
+        "hit": {
+          "fps": 12.0,
+          "ciclo": false,
+          "frames": [
+            {
+              "ficheiro": "clone_morvanna/frames/hit_01.png",
+              "sha256": "e9d5673499ede7acfbe060ca8c547552d9c0fb56258426b7f0ef06b734bee1bf",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "clone_morvanna/frames/hit_02.png",
+              "sha256": "d32252df84e3adc6b53e5d1b1d263ca8d6dbc66e2367ea524b900fad113856e1",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "clone_morvanna/frames/hit_03.png",
+              "sha256": "0b9d8b402b8e6c76a02b1204e5cfa31a37cc15bc19e1aec9fc40170d64fc2959",
+              "dimensoes": [
+                128,
+                96
+              ]
+            }
+          ]
+        },
+        "dead": {
+          "fps": 10.0,
+          "ciclo": false,
+          "frames": [
+            {
+              "ficheiro": "clone_morvanna/frames/dead_01.png",
+              "sha256": "211e83fa3d83378b6280cb5c1bcfc84e93d1528314e857b4ae203e3ae5533ebd",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "clone_morvanna/frames/dead_02.png",
+              "sha256": "7079b8b690103a5bf952646257aa1e6a5a2f74d770e0e5f23666fc828f178cdc",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "clone_morvanna/frames/dead_03.png",
+              "sha256": "ecb0c8ab8b6a58297aebeb81e0c74c5e3dae1ee0611052c0efc783f7ad091f01",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "clone_morvanna/frames/dead_04.png",
+              "sha256": "6a8c63568dc9a454b076cf307af9c96b63140c8d7b1d41005c32a86b7ce494cf",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "clone_morvanna/frames/dead_05.png",
+              "sha256": "168d3231d126a83a725c8f3122280424730f89de3399e2260972b377f214aec7",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "clone_morvanna/frames/dead_06.png",
+              "sha256": "6be3a91b7d79cddafaf441899b6b86cea9ac51f0d03971bbdcab7c0c72bab335",
+              "dimensoes": [
+                128,
+                96
+              ]
+            }
+          ]
+        }
+      },
+      "niveis": {
+        "L2": [
+          "clones largados pela Morvanna (identidade_visual; especie continua goblin)"
+        ]
+      },
+      "estados_alcancaveis": [
+        "dead",
+        "hit",
+        "idle",
+        "run"
+      ]
+    },
+    "cria_rainha": {
+      "tipo": "comum",
+      "status": "PRODUCTION_INTEGRATED",
+      "cena": "res://scenes/actors/DemonioBase.tscn",
+      "autoridade_item": 11,
+      "proveniencia": {
+        "caixa_autoridade": [
+          274,
+          745,
+          511,
+          890
+        ],
+        "fundo_removido": "xadrez",
+        "limiar_croma_gradiente": [
+          14,
+          10
+        ],
+        "escala_reducao": 0.607595,
+        "classificacao": "B"
+      },
+      "contrato": {
+        "canvas": [
+          128,
+          96
+        ],
+        "baseline_y": 88,
+        "pivot": [
+          64,
+          88
+        ],
+        "corpo_px": [
+          99,
+          48
+        ]
+      },
+      "animacoes": {
+        "idle": {
+          "fps": 5.0,
+          "ciclo": true,
+          "frames": [
+            {
+              "ficheiro": "cria_rainha/frames/idle_01.png",
+              "sha256": "91d1c47d92358b2493e108e0ec8538e5084edc8624a637644b0da2743b4bcc71",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "cria_rainha/frames/idle_02.png",
+              "sha256": "91d1c47d92358b2493e108e0ec8538e5084edc8624a637644b0da2743b4bcc71",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "cria_rainha/frames/idle_03.png",
+              "sha256": "bcd332259adb49b0efc038e73f52752127654c738f346f57729542b627a7d715",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "cria_rainha/frames/idle_04.png",
+              "sha256": "bcd332259adb49b0efc038e73f52752127654c738f346f57729542b627a7d715",
+              "dimensoes": [
+                128,
+                96
+              ]
+            }
+          ]
+        },
+        "run": {
+          "fps": 10.0,
+          "ciclo": true,
+          "frames": [
+            {
+              "ficheiro": "cria_rainha/frames/run_01.png",
+              "sha256": "91d1c47d92358b2493e108e0ec8538e5084edc8624a637644b0da2743b4bcc71",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "cria_rainha/frames/run_02.png",
+              "sha256": "bcd332259adb49b0efc038e73f52752127654c738f346f57729542b627a7d715",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "cria_rainha/frames/run_03.png",
+              "sha256": "4f4d56ad7f75adfaa94f1eca5c172d9ff3fef9858fdb328dc26bb50a6b11b4ea",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "cria_rainha/frames/run_04.png",
+              "sha256": "bcd332259adb49b0efc038e73f52752127654c738f346f57729542b627a7d715",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "cria_rainha/frames/run_05.png",
+              "sha256": "91d1c47d92358b2493e108e0ec8538e5084edc8624a637644b0da2743b4bcc71",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "cria_rainha/frames/run_06.png",
+              "sha256": "bcd332259adb49b0efc038e73f52752127654c738f346f57729542b627a7d715",
+              "dimensoes": [
+                128,
+                96
+              ]
+            }
+          ]
+        },
+        "hit": {
+          "fps": 12.0,
+          "ciclo": false,
+          "frames": [
+            {
+              "ficheiro": "cria_rainha/frames/hit_01.png",
+              "sha256": "c29d187b6d362a4523980af2a5305c171a6855d0b92452a6af8b00eaa88433dd",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "cria_rainha/frames/hit_02.png",
+              "sha256": "3d6c795d9ed2e3a0c77693940065dfe49c4f7de37df95b8adb57af7e451a9168",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "cria_rainha/frames/hit_03.png",
+              "sha256": "fc18254e944428d11c6d4612b464399dfa3afde1590084e0c2f63d3e916b9d2b",
+              "dimensoes": [
+                128,
+                96
+              ]
+            }
+          ]
+        },
+        "dead": {
+          "fps": 10.0,
+          "ciclo": false,
+          "frames": [
+            {
+              "ficheiro": "cria_rainha/frames/dead_01.png",
+              "sha256": "91d1c47d92358b2493e108e0ec8538e5084edc8624a637644b0da2743b4bcc71",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "cria_rainha/frames/dead_02.png",
+              "sha256": "ceffa70d8cb1d7292e86d7dd6be7c4433becb1da2ca4b100b8eddf9a7ec84145",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "cria_rainha/frames/dead_03.png",
+              "sha256": "937cc647b838649869ad6e7d6e15394a232e24055ea14384c9019519e546c89b",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "cria_rainha/frames/dead_04.png",
+              "sha256": "cf12d5203d1b6d4e1ca7c54e6926223440f6bce1ac4a08a9878a1a1f5482b02c",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "cria_rainha/frames/dead_05.png",
+              "sha256": "dc22f777f51e2a80ad2d6f61b6dfa3289983a35c957a23760bfb97afacfb763b",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "cria_rainha/frames/dead_06.png",
+              "sha256": "0cef34299927548b50e0fa9937a67fd1c68f8b60831bdb4dfcf3a9c2b755a7db",
+              "dimensoes": [
+                128,
+                96
+              ]
+            }
+          ]
+        }
+      },
+      "niveis": {
+        "L3": [
+          "crias que eclodem dos ovos da Rainha (identidade_visual; especie continua goblin, x0.62)"
+        ]
+      },
+      "estados_alcancaveis": [
+        "dead",
+        "hit",
+        "idle",
+        "run"
+      ]
+    },
+    "coracao_putrefacto": {
+      "tipo": "boss",
+      "status": "PRODUCTION_ASSET_MISSING",
+      "autoridade_item": 12,
+      "cena": "res://scenes/actors/ChefeCoracaoPutrefacto.tscn",
+      "classificacao": "D",
+      "motivo": "APPROVED DESIGN / PRODUCTION ASSET MISSING: o Coração está pintado dentro da arena, sem fundo separável; as máscaras determinísticas ou incluem o cenário ou inventam o contorno (elipse) e perdem os troncos. Precisa de uma fonte isolada do Coração (alfa real ou fundo liso).",
+      "tentativas_mascara": [
+        "nevoa_magenta_lisa: 99% opaco",
+        "casca_escura: 99% opaco",
+        "casca_neutra+elipse_nucleo: 35% opaco, contorno inventado, troncos perdidos"
+      ],
+      "animacoes": {},
+      "niveis": {
+        "L5": [
+          "Chefe (escala_visual 1.7, enraizado)"
+        ]
+      },
+      "legado": "res://assets/sprites/pixel/bosses_anim/coracao_putrefacto/",
+      "estados_alcancaveis": [
+        "idle",
+        "hit",
+        "dead"
+      ]
     }
   }
 }

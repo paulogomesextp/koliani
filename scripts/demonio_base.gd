@@ -81,6 +81,11 @@ var _dive_dir := Vector2.ZERO
 	"imp", "chort", "orc", "xamane", "demonio_grande", "ogro",
 	"abobora", "wogol", "necromante", "lodo",
 	"besouro", "raptor", "mastim", "gosma", "abutre") var especie := "goblin"
+## Só a ARTE (Execution 9D+9E): quem a define veste-se com a arte de produção
+## desta identidade em vez da da `especie`, que continua a mandar no som, no
+## tamanho e em tudo o resto. É o que faz os clones da Morvanna parecerem
+## Morvanna e as crias da Rainha parecerem aranhas, sem lhes mudar o jogo.
+var identidade_visual := ""
 
 ## Frames por animação de cada espécie. luizmelo (goblin/mushroom/esqueleto/
 ## olho) = tiras 150x150. Os restantes vêm do 0x72 DungeonTileset II (CC0),
@@ -463,7 +468,7 @@ func _montar_frames() -> void:
 	if _anim.sprite_frames != null:
 		return  # a cena já traz os seus (chefes pixel-art)
 	# Região I: arte de produção 9D, se a desta espécie já estiver integrada
-	var prod := Inimigos9D.sprite_frames(self, especie)
+	var prod := Inimigos9D.sprite_frames(self, identidade_visual if identidade_visual != "" else especie)
 	if prod:
 		_anim.sprite_frames = prod
 		return

@@ -64,6 +64,7 @@ func _correr_tudo() -> void:
 	teste_execution_9b4_pacote_golden_sem_legado()
 	teste_execution_9c_kit_ambiente_regiao1()
 	teste_execution_9d_inimigos_regiao1()
+	teste_9d9e_crias_sem_goblin()
 	teste_level_session_begin()
 	teste_level_session_stable_checkpoint_identity()
 	teste_level_session_checkpoint_activation_repeated()
@@ -1383,7 +1384,7 @@ func teste_execution_9d_inimigos_regiao1() -> void:
 			if not (no is DemonioBase):
 				continue
 			var id: String = no.get("rig") if no.is_in_group("chefes") else no.get("especie")
-			if id == "" or id == "coracao_putrefacto":
+			if id == "":
 				continue
 			_ok(entradas.has(id), "9D: %s/%s ('%s') fora do manifesto" % [cam.get_file(), no.name, id])
 			var integrado: bool = entradas.get(id, {}).get("status", "") == Ini.INTEGRADO
@@ -1398,6 +1399,59 @@ func teste_execution_9d_inimigos_regiao1() -> void:
 						p = (t as AtlasTexture).atlas.resource_path
 					_ok(p.begins_with(Ini.DIR) == integrado,
 						"9D: %s/%s anim '%s' carrega %s (integrado=%s)" % [cam.get_file(), no.name, a, p, integrado])
+		nivel.free()
+	# Cada frame de uma entrada integrada existe e tem o SHA do manifesto --
+	# um PNG trocado à mão (ou regerado sem atualizar o manifesto) falha aqui.
+	for id: String in entradas:
+		var e: Dictionary = entradas[id]
+		if e.get("status", "") != Ini.INTEGRADO:
+			continue
+		for a: String in e.get("animacoes", {}):
+			for f: Dictionary in e["animacoes"][a]["frames"]:
+				var cam_f := "%s/%s" % [Ini.DIR, f["ficheiro"]]
+				var sha := FileAccess.get_sha256(cam_f)
+				_ok(sha == String(f["sha256"]), "9D+9E: %s/%s SHA diferente do manifesto (%s)" % [id, a, cam_f])
+
+
+## Execution 9D+9E: os clones da Morvanna e as crias da Rainha Aracnídea
+## vestem a arte de produção DELES (identidade_visual), nunca a do goblin --
+## que era a espécie por omissão e continua a ser, para o jogo não mudar.
+func teste_9d9e_crias_sem_goblin() -> void:
+	const Ini := preload("res://scripts/regiao1_inimigos.gd")
+	for caso in [["res://scenes/levels/Pantano_dos_Sussurros.tscn", "clone_morvanna"],
+			["res://scenes/levels/Ninho_da_Viuva_Negra.tscn", "cria_rainha"]]:
+		var nivel := (load(caso[0]) as PackedScene).instantiate()
+		get_tree().root.add_child(nivel)
+		var chefe: Node = null
+		for no in nivel.get_children():
+			if no is ChefeMorvanna or no is ChefeRainhaAracnidea:
+				chefe = no
+		_ok(chefe != null, "9D+9E: chefe de %s não encontrado" % caso[0].get_file())
+		if chefe == null:
+			nivel.free()
+			continue
+		var antes := nivel.get_child_count()
+		if chefe is ChefeMorvanna:
+			chefe.call("_largar_clones")
+		else:
+			chefe.call("_ovo_em", chefe.global_position.x - 60.0, 0.4)
+			for t in get_tree().get_processed_tweens():
+				t.custom_step(5.0)  # o ovo eclode já
+		var crias := 0
+		for i in range(antes, nivel.get_child_count()):
+			var c := nivel.get_child(i)
+			if not (c is DemonioBase):
+				continue
+			crias += 1
+			_ok(c.identidade_visual == caso[1], "9D+9E: cria sem identidade '%s'" % caso[1])
+			_ok(c.especie == "goblin", "9D+9E: a espécie (jogo) da cria mudou -- só a arte devia mudar")
+			var sf: SpriteFrames = (c.get_node("Sprite/Anim") as AnimatedSprite2D).sprite_frames
+			for a in ["idle", "run", "hit", "dead"]:
+				_ok(sf.has_animation(a), "9D+9E: %s sem '%s'" % [caso[1], a])
+				var p := sf.get_frame_texture(a, 0).resource_path if sf.has_animation(a) else ""
+				_ok(p.begins_with("%s/%s/" % [Ini.DIR, caso[1]]),
+					"9D+9E: %s anim '%s' carrega %s (devia ser produção, nunca goblin)" % [caso[1], a, p])
+		_ok(crias > 0, "9D+9E: %s não largou crias no teste" % caso[1])
 		nivel.free()
 
 
