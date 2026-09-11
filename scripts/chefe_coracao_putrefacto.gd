@@ -39,6 +39,13 @@ var _combate := false
 
 @onready var _nucleo: Node2D = get_node_or_null("Sprite/Nucleo")
 
+## Execution 9E.2 -- arte de produção (Região I, manifesto dos inimigos). Com
+## ela: fase 1 = forma contida, fase 2 = forma intensificada (`idle_f2`,
+## `hit_f2`), erupção de corrupção na transição, núcleo alinhado com o da arte.
+## Sem ela, tudo fica como antes. Nada disto toca em vida, dano ou tempos.
+const CORACAO_ID := "coracao_putrefacto"
+var _prod := false
+
 
 func _ready() -> void:
 	super._ready()
@@ -46,7 +53,86 @@ func _ready() -> void:
 	_vida_max = vida
 	velocidade = 0.0
 	alcance_patrulha = 0.0
+	_prod = not Inimigos9D.entrada(self, CORACAO_ID).is_empty()
+	if _prod:
+		_alinhar_nucleo("fase_1")
+		# a luz da sístole foi pensada para o coração pequeno do legado: a este
+		# raio (~300 px no ecrã) lava o corpo todo de rosa. Encolhida, fica um
+		# brilho só no núcleo -- a janela de dano continua a ler-se (a energia
+		# e o tempo não mudam).
+		var luz_n := _nucleo.get_node_or_null("Luz") as Node2D if _nucleo else null
+		if luz_n:
+			luz_n.scale *= 0.4
+		# idem para a luz magenta constante do coração (~330 px): pinta a casca
+		# escura de rosa. Fica um halo à volta do núcleo.
+		var luz_c := get_node_or_null("Sprite/LuzCoracao") as Node2D
+		if luz_c:
+			luz_c.scale *= 0.4
 	_mostrar_nucleo(false)
+
+
+## O Coração de produção é mais largo que alto: com o teto de 110 dos
+## guardiões ficava raso. A 150 mantém a altura de sempre (100 x 1.7).
+func _largura_alvo() -> float:
+	if not Inimigos9D.entrada(self, CORACAO_ID).is_empty():
+		return 150.0
+	return super._largura_alvo()
+
+
+## Fase 2 da arte: a forma intensificada substitui a contida; o golpe da fase
+## 2 recua a forma intensificada. A fase 1 é o comportamento de sempre.
+func _atualizar_anim() -> void:
+	if not _prod or _nivel < 2:
+		super._atualizar_anim()
+		return
+	if _morto:
+		return
+	if _anim.animation in ["hit", "hit_f2"] and _anim.is_playing():
+		return
+	if _anim.animation != "idle_f2":
+		_anim.play("idle_f2")
+
+
+## Põe o ponto fraco (`Nucleo`) e a luz em cima do núcleo desenhado na arte.
+func _alinhar_nucleo(fase: String) -> void:
+	var c: Array = (Inimigos9D.entrada(self, CORACAO_ID).get("nucleo_no_frame", {}) as Dictionary).get(fase, [])
+	if c.size() < 2 or _anim == null or _anim.sprite_frames == null:
+		return
+	var tex := _anim.sprite_frames.get_frame_texture("idle", 0)
+	if tex == null:
+		return
+	var meio := Vector2(tex.get_width(), tex.get_height()) * 0.5
+	var pos := _anim.position + (Vector2(float(c[0]), float(c[1])) - meio) * _anim.scale
+	if _nucleo:
+		_nucleo.position = pos
+	var luz := get_node_or_null("Sprite/LuzCoracao") as Node2D
+	if luz:
+		luz.position = pos
+
+
+## VFX separado da transição para a fase 2: a erupção de corrupção da
+## autoridade, na base do corpo, a subir e a apagar-se. Só visual.
+func _erupcao() -> void:
+	var v: Dictionary = (Inimigos9D.entrada(self, CORACAO_ID).get("vfx", {}) as Dictionary).get("erupcao", {})
+	var tex := load(String(v.get("ficheiro", ""))) as Texture2D if not v.is_empty() else null
+	if tex == null:
+		return
+	var s := Sprite2D.new()
+	s.name = "Erupcao9E2"
+	s.texture = tex
+	s.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	s.z_index = 1
+	s.scale = Vector2.ONE * escala_visual
+	var base_y := 0.0
+	var col := get_node_or_null("CollisionShape2D") as CollisionShape2D
+	if col and col.shape is RectangleShape2D:
+		base_y = col.position.y + (col.shape as RectangleShape2D).size.y * 0.5
+	s.position = Vector2(0.0, base_y - tex.get_height() * escala_visual * 0.5)
+	add_child(s)
+	var tw := s.create_tween()
+	tw.tween_property(s, "position:y", s.position.y - 22.0, 1.1).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tw.parallel().tween_property(s, "modulate:a", 0.0, 1.1).set_delay(0.35)
+	tw.tween_callback(s.queue_free)
 
 
 func _process(dt: float) -> void:
@@ -148,6 +234,9 @@ func _atualiza_fase() -> void:
 	if novo != _nivel:
 		_nivel = novo
 		_atualizar_frame()
+		if _prod and _nivel == 2:
+			_alinhar_nucleo("fase_2")
+			_erupcao()
 		Som.toca("chefe_cai", -9.0, 0.7)
 		_abanar_camera(6.0)
 		if _nivel == 2:
@@ -299,6 +388,9 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0, critico := false) 
 		return
 	provocar()
 	super.receber_dano(quantidade, dir_empurrao, critico)
+	if _prod and _nivel >= 2 and _anim and _anim.animation == "hit" \
+			and _anim.sprite_frames.has_animation("hit_f2"):
+		_anim.play("hit_f2")
 
 
 ## --- utilitários ----------------------------------------------------

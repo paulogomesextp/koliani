@@ -15,8 +15,22 @@ const Kit := preload("res://scripts/regiao1_kit.gd")
 const DIR := "res://assets/art/regions/region_01_forest/enemies/production"
 const MANIFESTO := DIR + "/enemy_production_manifest.json"
 const INTEGRADO := "PRODUCTION_INTEGRATED"
+## Execution 9E.2: a arte do Coração Putrefacto vive na pasta dos chefes; o
+## manifesto dos inimigos regista-a com caminhos `res://` absolutos.
+const DIR_BOSS := "res://assets/art/regions/region_01_forest/bosses"
 
 static var _cache: Dictionary = {}
+
+
+## Caminho `res://` de um frame do manifesto (relativo à pasta dos inimigos,
+## ou absoluto).
+static func caminho(ficheiro: String) -> String:
+	return ficheiro if ficheiro.begins_with("res://") else "%s/%s" % [DIR, ficheiro]
+
+
+## true se `p` é arte de produção da Região I (inimigos ou chefe).
+static func e_producao(p: String) -> bool:
+	return p.begins_with(DIR + "/") or p.begins_with(DIR_BOSS + "/")
 
 
 static func manifesto() -> Dictionary:
@@ -56,7 +70,7 @@ static func sprite_frames(no: Node, id: String) -> SpriteFrames:
 		sf.set_animation_speed(nome, float(a.get("fps", 10.0)))
 		sf.set_animation_loop(nome, bool(a.get("ciclo", false)))
 		for f: Dictionary in a.get("frames", []):
-			var t := load("%s/%s" % [DIR, f["ficheiro"]]) as Texture2D
+			var t := load(caminho(f["ficheiro"])) as Texture2D
 			if t:
 				sf.add_frame(nome, t)
 	if not sf.has_animation("idle") or sf.get_frame_count("idle") == 0:

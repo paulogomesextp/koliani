@@ -65,6 +65,7 @@ func _correr_tudo() -> void:
 	teste_execution_9c_kit_ambiente_regiao1()
 	teste_execution_9d_inimigos_regiao1()
 	teste_9d9e_crias_sem_goblin()
+	teste_9e2_coracao_producao_e_fases()
 	teste_level_session_begin()
 	teste_level_session_stable_checkpoint_identity()
 	teste_level_session_checkpoint_activation_repeated()
@@ -1397,7 +1398,7 @@ func teste_execution_9d_inimigos_regiao1() -> void:
 					var p := t.resource_path if t else ""
 					if t is AtlasTexture:
 						p = (t as AtlasTexture).atlas.resource_path
-					_ok(p.begins_with(Ini.DIR) == integrado,
+					_ok(Ini.e_producao(p) == integrado,
 						"9D: %s/%s anim '%s' carrega %s (integrado=%s)" % [cam.get_file(), no.name, a, p, integrado])
 		nivel.free()
 	# Cada frame de uma entrada integrada existe e tem o SHA do manifesto --
@@ -1408,7 +1409,7 @@ func teste_execution_9d_inimigos_regiao1() -> void:
 			continue
 		for a: String in e.get("animacoes", {}):
 			for f: Dictionary in e["animacoes"][a]["frames"]:
-				var cam_f := "%s/%s" % [Ini.DIR, f["ficheiro"]]
+				var cam_f := Ini.caminho(String(f["ficheiro"]))
 				var sha := FileAccess.get_sha256(cam_f)
 				_ok(sha == String(f["sha256"]), "9D+9E: %s/%s SHA diferente do manifesto (%s)" % [id, a, cam_f])
 
@@ -1453,6 +1454,44 @@ func teste_9d9e_crias_sem_goblin() -> void:
 					"9D+9E: %s anim '%s' carrega %s (devia ser produção, nunca goblin)" % [caso[1], a, p])
 		_ok(crias > 0, "9D+9E: %s não largou crias no teste" % caso[1])
 		nivel.free()
+
+
+## Execution 9E.2: o Coração Putrefacto do L5 desenha SÓ arte de produção (nem
+## um frame do rig legado `bosses_anim/coracao_putrefacto`, folha estática
+## escondida), e a fase 2 -- decidida pelo limiar de vida do jogo -- troca a
+## forma contida pela intensificada.
+func teste_9e2_coracao_producao_e_fases() -> void:
+	const Ini := preload("res://scripts/regiao1_inimigos.gd")
+	var nivel := (load("res://scenes/levels/Coracao_da_Floresta.tscn") as PackedScene).instantiate()
+	get_tree().root.add_child(nivel)
+	var c := nivel.get_node_or_null("Chefe")
+	_ok(c is ChefeCoracaoPutrefacto, "9E.2: Coração não encontrado no L5")
+	if not (c is ChefeCoracaoPutrefacto):
+		nivel.free()
+		return
+	var anim := c.get_node("Sprite/Anim") as AnimatedSprite2D
+	var sf := anim.sprite_frames
+	for a in ["idle", "hit", "idle_f2", "hit_f2", "dead"]:
+		_ok(sf != null and sf.has_animation(a) and sf.get_frame_count(a) > 0, "9E.2: Coração sem '%s'" % a)
+		if sf == null or not sf.has_animation(a):
+			continue
+		for i in sf.get_frame_count(a):
+			var p := sf.get_frame_texture(a, i).resource_path
+			_ok(Ini.e_producao(p) and p.contains("/bosses/coracao_putrefacto/production/"),
+				"9E.2: Coração '%s' carrega %s (devia ser produção)" % [a, p])
+			_ok(not p.contains("bosses_anim/coracao_putrefacto"), "9E.2: frame legado no Coração: %s" % p)
+	var corpo := c.get_node_or_null("Sprite/Corpo") as CanvasItem
+	_ok(corpo == null or not corpo.visible, "9E.2: folha legada do Coração visível")
+	c.call("_atualizar_anim")
+	_ok(anim.animation == "idle", "9E.2: fase 1 devia mostrar 'idle', mostra '%s'" % anim.animation)
+	c.set("vida", int(c.get("_vida_max")) / 2 - 1)
+	c.call("_atualiza_fase")
+	c.call("_atualizar_anim")
+	_ok(anim.animation == "idle_f2", "9E.2: fase 2 devia mostrar 'idle_f2', mostra '%s'" % anim.animation)
+	var t2 := sf.get_frame_texture(anim.animation, 0).resource_path if sf.has_animation(anim.animation) else ""
+	_ok(t2.contains("/phase_2/"), "9E.2: fase 2 com arte fora de phase_2: %s" % t2)
+	_ok(c.get_node_or_null("Erupcao9E2") != null, "9E.2: sem erupção na transição de fase")
+	nivel.free()
 
 
 func teste_execution_9b4_pacote_golden_sem_legado() -> void:

@@ -203,6 +203,10 @@ func _tirar_foto(caminho: String, estado := "") -> void:
 		await _prova_pacote_9b4(caminho, koliani)
 		get_tree().quit(0)
 		return
+	elif estado == "inimigos" and koliani:
+		await _prova_inimigos_9e2(caminho, koliani)
+		get_tree().quit(0)
+		return
 	else:
 		await get_tree().create_timer(0.25).timeout
 	var img := get_viewport().get_texture().get_image()
@@ -341,6 +345,123 @@ func _prova_pacote_9b4(caminho: String, koliani: Node2D) -> void:
 	await get_tree().create_timer(0.1).timeout
 	await _foto_golden(base, "12_morte", koliani, registo)
 	print("PROVA PACOTE 9B.4: ", ProjectSettings.globalize_path(base + "_registo.json"))
+
+
+## Execution 9E.2: prova, no runtime EXPORTADO, de que cada inimigo, guardião,
+## cria e o Coração desenham a arte de produção. Só se mexe a Koliani (encosta-
+## se a cada bicho, invulnerável); os bichos ficam onde o nível os pôs. As crias
+## são largadas pelo próprio código dos chefes; a fase 2 do Coração entra pelo
+## limiar do jogo (vida a 45 %). Ao lado das fotos: JSON com a animação e o
+## recurso do frame que estava MESMO a ser desenhado.
+## Uso: Koliani.exe -- --nivel=N --foto-estado=inimigos --foto=<png>
+func _prova_inimigos_9e2(caminho: String, koliani: Node2D) -> void:
+	var base := caminho.get_basename()
+	var registo: Array = []
+	get_tree().create_timer(150.0, true, false, true).timeout.connect(func() -> void: get_tree().quit(3))
+	koliani.set("_invulneravel", 9999.0)
+	await get_tree().create_timer(0.5).timeout
+	var alvos: Array = []
+	_juntar_inimigos(get_tree().current_scene, alvos)
+	# chefes primeiro (crias e o Coração são o que mais importa provar) e UMA
+	# série de fotos por identidade visual -- o nível junta dezenas de bichos
+	alvos.sort_custom(func(a: Node, b: Node) -> bool: return a is ChefeBase and not b is ChefeBase)
+	var vistos := {}
+	for e: DemonioBase in alvos:
+		if not is_instance_valid(e) or e is ChefeCoracaoPutrefacto:
+			continue
+		var id := String(e.get("rig")) if e is ChefeBase else (e.identidade_visual if e.identidade_visual != "" else e.especie)
+		if vistos.has(id):
+			continue
+		vistos[id] = true
+		await _encostar_9e2(koliani, e)
+		await _foto_inimigo(base, "%s_%s_1_idle" % [e.name, id], e, registo)
+		if not is_instance_valid(e):
+			continue
+		if e is ChefeBase:
+			e.call("_piscar", true)
+		else:
+			e.set("_telegrafo", 0.45)
+		await get_tree().create_timer(0.1).timeout
+		await _foto_inimigo(base, "%s_%s_2_telegrafo" % [e.name, id], e, registo)
+		if e is ChefeBase:
+			e.call("_piscar", false)
+		if not is_instance_valid(e):
+			continue
+		e.receber_dano(1, 1.0)
+		await get_tree().create_timer(0.06).timeout
+		await _foto_inimigo(base, "%s_%s_3_hit" % [e.name, id], e, registo)
+	for e: DemonioBase in alvos:
+		if not is_instance_valid(e):
+			continue
+		if e is ChefeMorvanna or e is ChefeRainhaAracnidea:
+			await _encostar_9e2(koliani, e)
+			if e is ChefeMorvanna:
+				e.call("_largar_clones")
+			else:
+				e.call("_ovo_em", e.global_position.x - 70.0, 0.4)
+			await get_tree().create_timer(1.5).timeout
+			var crias: Array = []
+			_juntar_inimigos(get_tree().current_scene, crias)
+			for c: DemonioBase in crias:
+				if c.identidade_visual != "":
+					await _encostar_9e2(koliani, c)
+					await _foto_inimigo(base, "cria_%s" % c.identidade_visual, c, registo)
+					break
+		elif e is ChefeCoracaoPutrefacto:
+			await _encostar_9e2(koliani, e)
+			await _foto_inimigo(base, "coracao_1_fase1", e, registo)
+			e.call("_piscar", true)
+			await get_tree().create_timer(0.1).timeout
+			await _foto_inimigo(base, "coracao_2_fase1_telegrafo", e, registo)
+			e.call("_piscar", false)
+			e.set("vida", int(int(e.get("_vida_max")) * 0.45))
+			await get_tree().create_timer(0.25).timeout
+			await _foto_inimigo(base, "coracao_3_transicao_erupcao", e, registo)
+			await get_tree().create_timer(1.4).timeout
+			await _foto_inimigo(base, "coracao_4_fase2", e, registo)
+			e.receber_dano(1, 1.0)
+			await get_tree().create_timer(0.06).timeout
+			await _foto_inimigo(base, "coracao_5_fase2_hit", e, registo)
+	print("PROVA INIMIGOS 9E.2: ", ProjectSettings.globalize_path(base + "_registo.json"))
+
+
+func _juntar_inimigos(no: Node, saida: Array) -> void:
+	if no == null:
+		return
+	if no is DemonioBase and not no.is_queued_for_deletion():
+		saida.append(no)
+	for filho in no.get_children():
+		_juntar_inimigos(filho, saida)
+
+
+func _encostar_9e2(koliani: Node2D, e: Node2D) -> void:
+	koliani.global_position = e.global_position + Vector2(-150.0, -20.0)
+	koliani.set("velocity", Vector2.ZERO)
+	if koliani.has_method("reset_physics_interpolation"):
+		koliani.reset_physics_interpolation()
+	await get_tree().create_timer(0.45).timeout
+
+
+func _foto_inimigo(base: String, etiqueta: String, e: Node, registo: Array) -> void:
+	await RenderingServer.frame_post_draw
+	var caminho := "%s_%s.png" % [base, etiqueta]
+	get_viewport().get_texture().get_image().save_png(caminho)
+	var anim := e.get_node_or_null("Sprite/Anim") as AnimatedSprite2D if is_instance_valid(e) else null
+	var nome := String(anim.animation) if anim else ""
+	var tex: Texture2D = anim.sprite_frames.get_frame_texture(nome, anim.frame) \
+		if anim and anim.sprite_frames and anim.sprite_frames.has_animation(nome) else null
+	var p := tex.resource_path if tex else ""
+	if tex is AtlasTexture:
+		p = (tex as AtlasTexture).atlas.resource_path
+	var ecra := (e as Node2D).get_global_transform_with_canvas().origin if is_instance_valid(e) else Vector2(-1, -1)
+	var no_ecra := Rect2(Vector2.ZERO, get_viewport().get_visible_rect().size).has_point(ecra)
+	registo.append({"etiqueta": etiqueta, "no": e.name if is_instance_valid(e) else "", "animacao": nome,
+		"frame": anim.frame if anim else -1, "textura": p, "anim_visivel": anim != null and anim.is_visible_in_tree(),
+		"ecra": [ecra.x, ecra.y], "no_ecra": no_ecra, "foto": caminho})
+	print("FOTO9E2 %s anim=%s tex=%s no_ecra=%s" % [etiqueta, nome, p, no_ecra])
+	var f := FileAccess.open(base + "_registo.json", FileAccess.WRITE)
+	if f:
+		f.store_string(JSON.stringify(registo, "  "))
 
 
 func _foto_golden(base: String, etiqueta: String, koliani: Node2D, registo: Array) -> void:

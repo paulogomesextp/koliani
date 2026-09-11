@@ -2556,17 +2556,253 @@
     },
     "coracao_putrefacto": {
       "tipo": "boss",
-      "status": "PRODUCTION_ASSET_MISSING",
+      "status": "PRODUCTION_INTEGRATED",
       "autoridade_item": 12,
       "cena": "res://scenes/actors/ChefeCoracaoPutrefacto.tscn",
-      "classificacao": "D",
-      "motivo": "APPROVED DESIGN / PRODUCTION ASSET MISSING: o Coração está pintado dentro da arena, sem fundo separável; as máscaras determinísticas ou incluem o cenário ou inventam o contorno (elipse) e perdem os troncos. Precisa de uma fonte isolada do Coração (alfa real ou fundo liso).",
-      "tentativas_mascara": [
-        "nevoa_magenta_lisa: 99% opaco",
-        "casca_escura: 99% opaco",
-        "casca_neutra+elipse_nucleo: 35% opaco, contorno inventado, troncos perdidos"
-      ],
-      "animacoes": {},
+      "animacoes": {
+        "idle": {
+          "fps": 5.0,
+          "ciclo": true,
+          "fase": 1,
+          "frames": [
+            {
+              "ficheiro": "res://assets/art/regions/region_01_forest/bosses/coracao_putrefacto/production/phase_1/idle_01.png",
+              "sha256": "b3b2c32075671b670707414b65ea259ad6f0647d950e4217c2920712893f0312",
+              "dimensoes": [
+                176,
+                120
+              ]
+            },
+            {
+              "ficheiro": "res://assets/art/regions/region_01_forest/bosses/coracao_putrefacto/production/phase_1/idle_02.png",
+              "sha256": "43f3b72b183292565b6c191dacb7682f8173075d9fe1b021ceb33c37bcbe2b3e",
+              "dimensoes": [
+                176,
+                120
+              ]
+            },
+            {
+              "ficheiro": "res://assets/art/regions/region_01_forest/bosses/coracao_putrefacto/production/phase_1/idle_03.png",
+              "sha256": "1627ae392618774775e56547178f2719567d38acc96a09cd6bbd9a16e1e7d683",
+              "dimensoes": [
+                176,
+                120
+              ]
+            },
+            {
+              "ficheiro": "res://assets/art/regions/region_01_forest/bosses/coracao_putrefacto/production/phase_1/idle_04.png",
+              "sha256": "43f3b72b183292565b6c191dacb7682f8173075d9fe1b021ceb33c37bcbe2b3e",
+              "dimensoes": [
+                176,
+                120
+              ]
+            }
+          ]
+        },
+        "run": {
+          "fps": 5.0,
+          "ciclo": true,
+          "fase": 1,
+          "frames": [
+            {
+              "ficheiro": "res://assets/art/regions/region_01_forest/bosses/coracao_putrefacto/production/phase_1/run_01.png",
+              "sha256": "b3b2c32075671b670707414b65ea259ad6f0647d950e4217c2920712893f0312",
+              "dimensoes": [
+                176,
+                120
+              ]
+            }
+          ]
+        },
+        "hit": {
+          "fps": 14.0,
+          "ciclo": false,
+          "fase": 1,
+          "frames": [
+            {
+              "ficheiro": "res://assets/art/regions/region_01_forest/bosses/coracao_putrefacto/production/phase_1/hit_01.png",
+              "sha256": "beb96a0a06a62696470add95cbe8803ddd85fdff4ddb14b98fbd9006618fc2a5",
+              "dimensoes": [
+                176,
+                120
+              ]
+            },
+            {
+              "ficheiro": "res://assets/art/regions/region_01_forest/bosses/coracao_putrefacto/production/phase_1/hit_02.png",
+              "sha256": "6e9a08d190f63dd3429a15b7168e43cf2d7844e8c44edc71a9996ab25bb17f2a",
+              "dimensoes": [
+                176,
+                120
+              ]
+            },
+            {
+              "ficheiro": "res://assets/art/regions/region_01_forest/bosses/coracao_putrefacto/production/phase_1/hit_03.png",
+              "sha256": "94446ce33455e87d41ade4c22efc795a16738ef3d3872218101656fccaf847d3",
+              "dimensoes": [
+                176,
+                120
+              ]
+            }
+          ]
+        },
+        "idle_f2": {
+          "fps": 6.0,
+          "ciclo": true,
+          "fase": 2,
+          "frames": [
+            {
+              "ficheiro": "res://assets/art/regions/region_01_forest/bosses/coracao_putrefacto/production/phase_2/idle_f2_01.png",
+              "sha256": "2f8e66f489685f93c74ff25f19b354b696a69afb24f19bdb78c4d318517e2cdb",
+              "dimensoes": [
+                176,
+                120
+              ]
+            },
+            {
+              "ficheiro": "res://assets/art/regions/region_01_forest/bosses/coracao_putrefacto/production/phase_2/idle_f2_02.png",
+              "sha256": "5bb9a8f2923af4bd6b3ea1d2c06f1f82d6d5365ffcf43605f39fc21f5d6dd44a",
+              "dimensoes": [
+                176,
+                120
+              ]
+            },
+            {
+              "ficheiro": "res://assets/art/regions/region_01_forest/bosses/coracao_putrefacto/production/phase_2/idle_f2_03.png",
+              "sha256": "8d443a4f9508a3a772e6ca6ecdab5149246890c3f300812e25a20e69a9c3cb2c",
+              "dimensoes": [
+                176,
+                120
+              ]
+            },
+            {
+              "ficheiro": "res://assets/art/regions/region_01_forest/bosses/coracao_putrefacto/production/phase_2/idle_f2_04.png",
+              "sha256": "5bb9a8f2923af4bd6b3ea1d2c06f1f82d6d5365ffcf43605f39fc21f5d6dd44a",
+              "dimensoes": [
+                176,
+                120
+              ]
+            }
+          ]
+        },
+        "hit_f2": {
+          "fps": 14.0,
+          "ciclo": false,
+          "fase": 2,
+          "frames": [
+            {
+              "ficheiro": "res://assets/art/regions/region_01_forest/bosses/coracao_putrefacto/production/phase_2/hit_f2_01.png",
+              "sha256": "415ae85447e5e56111e9c1ceec014410382053273f2f20e04285553f9b6c4310",
+              "dimensoes": [
+                176,
+                120
+              ]
+            },
+            {
+              "ficheiro": "res://assets/art/regions/region_01_forest/bosses/coracao_putrefacto/production/phase_2/hit_f2_02.png",
+              "sha256": "50949025eac1afeed8a0cc259970668c48ac106e2ac495cf0c7a22f18c325371",
+              "dimensoes": [
+                176,
+                120
+              ]
+            },
+            {
+              "ficheiro": "res://assets/art/regions/region_01_forest/bosses/coracao_putrefacto/production/phase_2/hit_f2_03.png",
+              "sha256": "542afeda84fc376829288c0bb23acb3c960b36073de4713a94555a8b4d203425",
+              "dimensoes": [
+                176,
+                120
+              ]
+            }
+          ]
+        },
+        "dead": {
+          "fps": 10.0,
+          "ciclo": false,
+          "fase": 2,
+          "frames": [
+            {
+              "ficheiro": "res://assets/art/regions/region_01_forest/bosses/coracao_putrefacto/production/phase_2/dead_01.png",
+              "sha256": "2f8e66f489685f93c74ff25f19b354b696a69afb24f19bdb78c4d318517e2cdb",
+              "dimensoes": [
+                176,
+                120
+              ]
+            },
+            {
+              "ficheiro": "res://assets/art/regions/region_01_forest/bosses/coracao_putrefacto/production/phase_2/dead_02.png",
+              "sha256": "46bb06adf80eb944177244b70a5283d85362e28d3d8a7b860d5784752bcc353b",
+              "dimensoes": [
+                176,
+                120
+              ]
+            },
+            {
+              "ficheiro": "res://assets/art/regions/region_01_forest/bosses/coracao_putrefacto/production/phase_2/dead_03.png",
+              "sha256": "9c44a229402e8fae299262a17d5a33b06c7575fbeed36ad379690aca3ac1ec45",
+              "dimensoes": [
+                176,
+                120
+              ]
+            },
+            {
+              "ficheiro": "res://assets/art/regions/region_01_forest/bosses/coracao_putrefacto/production/phase_2/dead_04.png",
+              "sha256": "52ec5bb669a888182930e2df546741661a028388de643b4571162996333fea79",
+              "dimensoes": [
+                176,
+                120
+              ]
+            },
+            {
+              "ficheiro": "res://assets/art/regions/region_01_forest/bosses/coracao_putrefacto/production/phase_2/dead_05.png",
+              "sha256": "762b756e9ea453964f40196e280267d8a0015a0601baa63a313aad41aaa0715f",
+              "dimensoes": [
+                176,
+                120
+              ]
+            },
+            {
+              "ficheiro": "res://assets/art/regions/region_01_forest/bosses/coracao_putrefacto/production/phase_2/dead_06.png",
+              "sha256": "886e35dc0c31402ffe4eb7b8e12aeed758223b5d5b7084d50de534575519c6ca",
+              "dimensoes": [
+                176,
+                120
+              ]
+            },
+            {
+              "ficheiro": "res://assets/art/regions/region_01_forest/bosses/coracao_putrefacto/production/phase_2/dead_07.png",
+              "sha256": "600dce3745cc0cdcbd76de782a50dc1b463387c29b21dd372193167f14187199",
+              "dimensoes": [
+                176,
+                120
+              ]
+            },
+            {
+              "ficheiro": "res://assets/art/regions/region_01_forest/bosses/coracao_putrefacto/production/phase_2/dead_08.png",
+              "sha256": "362166e2b7c65ef49d505a2190adc8cc47f49eaf148810c350791553069bd282",
+              "dimensoes": [
+                176,
+                120
+              ]
+            },
+            {
+              "ficheiro": "res://assets/art/regions/region_01_forest/bosses/coracao_putrefacto/production/phase_2/dead_09.png",
+              "sha256": "3260ff65162be44f5d5b6c9826ff36babcad189c80e6aca44736d6216e6387fc",
+              "dimensoes": [
+                176,
+                120
+              ]
+            },
+            {
+              "ficheiro": "res://assets/art/regions/region_01_forest/bosses/coracao_putrefacto/production/phase_2/dead_10.png",
+              "sha256": "c1ab0f5a66d4d5dc77183c5895acc70b3f674e15eabc9a2c1fc0f31b58cbe6de",
+              "dimensoes": [
+                176,
+                120
+              ]
+            }
+          ]
+        }
+      },
       "niveis": {
         "L5": [
           "Chefe (escala_visual 1.7, enraizado)"
@@ -2574,10 +2810,38 @@
       },
       "legado": "res://assets/sprites/pixel/bosses_anim/coracao_putrefacto/",
       "estados_alcancaveis": [
-        "idle",
+        "dead",
         "hit",
-        "dead"
-      ]
+        "hit_f2",
+        "idle",
+        "idle_f2",
+        "run"
+      ],
+      "execution": "9E.2",
+      "manifesto_boss": "res://assets/art/regions/region_01_forest/bosses/coracao_putrefacto/production/manifest.json",
+      "autoridade": "work/production_art_gate/9E1_game_master_approved/coracao_putrefacto_production_authority_v1_0.png",
+      "autoridade_sha256": "460435aaf18b9b568b0f4529a087a2cc80e07554def894c313f579b9b9247693",
+      "vfx": {
+        "erupcao": {
+          "ficheiro": "res://assets/art/regions/region_01_forest/bosses/coracao_putrefacto/production/vfx/erupcao.png",
+          "sha256": "7c73bce4d6a8fc446e4e2b7ac0c27611edf5f3fad8c83e917f48270b5427ff8d",
+          "dimensoes": [
+            68,
+            44
+          ],
+          "uso": "VFX da transição de fase"
+        }
+      },
+      "nucleo_no_frame": {
+        "fase_1": [
+          88,
+          56.67
+        ],
+        "fase_2": [
+          88,
+          55.0
+        ]
+      }
     }
   }
 }
