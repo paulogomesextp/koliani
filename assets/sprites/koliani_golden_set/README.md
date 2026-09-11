@@ -1,6 +1,21 @@
-# Koliani Golden Set — arte final de produção (Execution 9B.1)
+# Koliani Golden Set — arte final de produção (Execution 9B.1 → 9B.3)
 
-**Estado: VAZIO. Nenhum frame produzido.**
+**Estado: KOLIANI GOLDEN SET — PRODUCTION INTEGRATED (Execution 9B.3).**
+
+- **Autoridade visual: GAME MASTER APPROVED** —
+  `work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png`,
+  SHA-256 `0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4`
+  (cópia byte-a-byte do `koliani_golden_set_approved.png.png` original).
+- 39 frames: `idle` 7, `run` 10, `jump_start` 4, `jump_loop` 3, `fall` 3,
+  `attack_basic` 6 e `vfx/vfx_slash_basic` 6. Extraídos na 9B.2 (sem redesenho,
+  escala uniforme 0,3975) e promovidos na 9B.3 por
+  `tools/promover_golden_set_9b3.py`. O detalhe por frame (caminho, SHA-256,
+  resultado do validator) está em `production_manifest.json`.
+- Ativo no runtime da Região I (`usar_golden_set = true` em L1–L5).
+- **8 frames baixos (`jump_start_001`, `jump_loop_001/003`,
+  `attack_basic_001/002/003/005/006`): POSE-JUSTIFIED / ACCEPTED.** A regra dos
+  59 px passou a ser **só um alerta de revisão**: a rejeição por chibi exige
+  deriva de identidade/anatomia, não basta a altura da caixa.
 
 Esta pasta é o local isolado da arte **final** da Koliani. Não se mistura aqui
 nada de legado: `koliani_premium_v1`, `koliani_shadowblade` e
@@ -61,10 +76,11 @@ de cabeça, sem cabelo curto, sem cabelo roxo a substituir o canónico. Cabelo
 rosto, mesma silhueta, mesmas proporções, mesma roupa e mesma idade aparente em
 **todos** os frames, incluindo os do ar.
 
-**Regra de aceitação medida:** nenhum frame pode perder mais de **8%** da
-altura da figura em repouso (64 px → mínimo **59 px**) sem justificação de
-pose. Os frames de salto actuais perdem até 18% — é o defeito que o Game Master
-identificou.
+**Alerta de revisão (desde a 9B.3, já não é rejeição automática):** um frame que
+perca mais de **8%** da altura em repouso (64 px → **59 px**) é assinalado para
+revisão técnica. Agachar, encolher as pernas no ar ou baixar a guarda reduzem a
+caixa sem encolher a cabeça, e isso é legítimo. Chibi é deriva de
+identidade/anatomia: cabeça maior, pernas mais curtas, outra personagem.
 
 ## Como validar
 

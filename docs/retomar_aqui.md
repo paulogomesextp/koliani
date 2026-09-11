@@ -4,6 +4,30 @@
 
 Atualizado em 11 de setembro de 2026.
 
+## Execution 9B.3 — Golden Set em produção e no runtime
+
+Estado: **PASS — KOLIANI GOLDEN SET — PRODUCTION INTEGRATED.** Relatório:
+[execution_9b3_golden_set_integration.md](execution_9b3_golden_set_integration.md).
+
+- **KOLIANI GOLDEN SET VISUAL AUTHORITY: GAME MASTER APPROVED.** Canónico:
+  `work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png`,
+  SHA-256 `0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4`
+  (byte-idêntico ao `.png.png` original, que se mantém).
+- **8 LOW-HEIGHT FRAMES: POSE-JUSTIFIED / ACCEPTED — 59px RULE = REVIEW ALERT
+  ONLY.**
+- Validator v2: o xadrez ignora alpha 0; a variação de área por pose passa a REVIEW
+  com escala uniforme declarada; um resize real continua FAIL. 10/10 testes.
+- 39 frames em `assets/sprites/koliani_golden_set/` + `production_manifest.json`.
+  Ativos em L1–L5 via `usar_golden_set`. Os estados derivados usam só frames
+  golden; o premium_v1 fica só para dash/roll/hurt/morte/crouch/wallslide/borda/
+  djump/defesa. VFX no nó `SlashVFX`, `LuzLamina` desligada, gameplay intacto.
+- Builds de `98d8c1b` (0.15.16), exportados de um **worktree limpo**: EXE
+  162,7 MB (`d2fbf5e6…`), PCK Web 53,6 MB (`3b618698…`), cache PWA
+  `1789089732|5080222`. Prova no EXE: 7/7 estados com a textura golden
+  registada. Na Web: PCK byte-idêntico e Koliani golden visível, mas só parada
+  (o painel do browser estava escondido).
+- **Próximo:** pacote completo da Koliani, a derivar do Golden Set.
+
 ## Execution 9B.2 — Golden Set extraction
 
 Estado: **PARTIAL PASS — EXTRAÍDO, GAME MASTER REVIEW REQUIRED; runtime

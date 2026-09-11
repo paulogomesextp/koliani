@@ -74,13 +74,12 @@
    checkpoints e ritmo do boss. A validação técnica e o runtime exportado
    passaram; isto não constitui aprovação humana.
 
-1b. **Execution 9B.2 — Golden Set EXTRAÍDO da imagem do GM (33 corpo + 6 VFX,
-   contrato 9B.1 a 64 px):** rever
-   `work/production_art_gate/9b2_extraction/preview/contact_sheet_normalized_x3.png`
-   e decidir os **8 frames abaixo do mínimo anti-chibi de 59 px** (pose de arranque,
-   encolhido no ar, guarda baixa do ataque: aceitar como pose justificada ou pedir
-   arte nova). Só depois se promove para `assets/sprites/koliani_golden_set/` e se
-   integra.
+1b. **KOLIANI GOLDEN SET — PRODUCTION INTEGRATED (Execution 9B.3, v0.15.16).**
+   Ativo em L1–L5 no Windows e na Web. Os 8 frames baixos foram aceites como
+   pose; a regra dos 59 px é só alerta de revisão. **A seguir: pacote completo da
+   Koliani** (dash, roll, hurt, morte, crouch, wallslide, borda, djump, defesa,
+   combos próprios e land), derivado do Golden Set. Até lá esses estados ficam
+   no premium_v1. Ver `docs/execution_9b3_golden_set_integration.md`.
 
 ## A seguir
 
