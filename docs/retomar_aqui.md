@@ -4,6 +4,31 @@
 
 Atualizado em 11 de setembro de 2026.
 
+## Execution 9D — Inimigos e guardiões da Região I — **BLOCKED na arte**
+
+Estado: **APPROVED DIRECTION / PRODUCTION ASSET MISSING. REGION I ENEMY
+PRODUCTION GATE: OPEN. Pronto para a 9E: NÃO.** Relatório:
+[execution_9d_region1_enemies.md](execution_9d_region1_enemies.md).
+
+- **Porquê:** nenhuma prancha desenha inimigos. A 12 (secção 10) tem alguns
+  incidentais (plantas carnívoras, besouro, morcego, gosma), mas com ~30 px, em
+  RGB, pintados sobre o cenário. Extraí-los obrigava a remover o fundo
+  (proibido). Desenhar é design novo, o mesmo bloqueio da 9B.1. **Precisa de
+  uma prancha de inimigos do Game Master.**
+- **Pronto para quando a arte chegar:** `scripts/regiao1_inimigos.gd`
+  (interruptor: kit 9C na cena + `PRODUCTION_INTEGRATED` no manifesto),
+  chamado por `DemonioBase._montar_frames` e `ChefeBase._montar_rig`. Manifesto
+  e contrato em `assets/art/regions/region_01_forest/enemies/production/`.
+  Teste `teste_execution_9d_inimigos_regiao1`, provado a morder.
+- **Inventário:** 5 espécies comuns (goblin L1, mushroom L2, gosma L2/L4,
+  besouro L3, lodo L5) e 4 guardiões (Ghorak, Morvanna, Rainha, Entrevane).
+  **Estados alcançáveis: só idle/run/hit/dead.** O `ChefeBase.atacar_anim()`
+  nunca é chamado e o telégrafo é todo por código.
+- **As aranhas da Rainha e os clones da Morvanna nascem como goblins** (a
+  espécie fica na omissão). É um buraco de identidade e pede design.
+- Gameplay intacto. Suite PASS. Builds não refeitos (nada visível mudou; o
+  jogo continua o `a5d9ec9`/0.15.18).
+
 ## Execution 9C — Kit de ambiente da Região I
 
 Estado: **PASS — REGION I ENVIRONMENT GATE CLOSED. KOLIANI PRODUCTION GATE

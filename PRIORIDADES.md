@@ -2,6 +2,17 @@
 
 ## Agora
 
+0000000. **9D BLOQUEADA NA ARTE — falta uma prancha de inimigos da Região I.**
+   Nenhuma das 12 pranchas desenha inimigos, e os da prancha 12 não se extraem
+   (30 px, RGB, fundo pintado). **Decisão do Game Master:** (1) entregar uma
+   prancha com os 9 inimigos (goblin, mushroom, gosma, besouro, lodo, Ghorak,
+   Morvanna, Rainha, Entrevane), cada um com idle/run/hit/dead, ao contrato do
+   manifesto (comum 96×96 a 48 px; guardião 192×192 a 100 px), ou (2) autorizar
+   pixel-art por código como produção. **Decidir também** que aspeto têm as
+   crias da Rainha e os clones da Morvanna, que hoje nascem como goblins.
+   A integração já está pronta: basta preencher o manifesto. Relatório:
+   `docs/execution_9d_region1_enemies.md`.
+
 000000. **9C FEITA — REGION I ENVIRONMENT GATE CLOSED (v0.15.18).** L1–L5 usam
    o kit de produção derivado das pranchas 08/10 (terreno, props, corrupção,
    4 planos de parallax, névoa); o terreno CC0 já não aparece na Região I.

@@ -41,6 +41,7 @@ const TELEGRAFO_CUSPIR := 0.5
 const VEL_CUSPO := 300.0
 const PROJETIL_CUSPO := preload("res://scenes/actors/BolaFogo.tscn")
 const ESSENCIA := preload("res://scenes/actors/Essencia.tscn")
+const Inimigos9D := preload("res://scripts/regiao1_inimigos.gd")
 var _acao_cd := 0.0
 var _windup := 0.0
 var _carga := 0.0
@@ -461,6 +462,11 @@ func _calibrar_pes() -> void:
 func _montar_frames() -> void:
 	if _anim.sprite_frames != null:
 		return  # a cena já traz os seus (chefes pixel-art)
+	# Região I: arte de produção 9D, se a desta espécie já estiver integrada
+	var prod := Inimigos9D.sprite_frames(self, especie)
+	if prod:
+		_anim.sprite_frames = prod
+		return
 	var cfg: Dictionary = ESPECIES.get(especie, ESPECIES["goblin"])
 	var base := "res://assets/sprites/pixel/enemies/%s" % especie
 	var sf := SpriteFrames.new()

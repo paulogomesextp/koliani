@@ -1,0 +1,73 @@
+{
+  "execution": "9D",
+  "regiao": "region_01_floresta_corrompida",
+  "estado_geral": "APPROVED DIRECTION / PRODUCTION ASSET MISSING",
+  "nota": "Nenhuma das 12 pranchas aprovadas desenha inimigos. A prancha 12 (secção 10) mostra inimigos incidentais (plantas carnívoras, besouro, morcego, gosma) a ~30 px, em RGB sem alfa, pintados sobre o cenário e com o nome não canónico 'Floresta Sagrada'. Extraí-los exigia remover o fundo, o que o contrato proíbe. Produzir arte nova é design novo (política A/F). Enquanto a entrada não estiver PRODUCTION_INTEGRATED, o runtime monta a arte legada (scripts/regiao1_inimigos.gd).",
+  "autoridade": {
+    "regiao": "Koliani_1.0_Master_Package_v2/references/approved/08_REGION_I_ART_KIT_BACKGROUNDS_PARALLAX_v1_0.png",
+    "sha256": "840cfd8241a54f7bab0be58ab96892eba8438517888e490587451339b23263a7",
+    "ambiente_producao": "assets/art/regions/region_01_forest/production/kit_9c/"
+  },
+  "contrato_frames": {
+    "formato": "PNG RGBA, alfa 0/255, um ficheiro por frame, sem VFX grandes no corpo",
+    "inimigo_comum": {"canvas": [96, 96], "altura_corpo_px": 48, "baseline_y": 88, "pivot": [48, 88], "olha_para": "direita"},
+    "guardiao": {"canvas": [192, 192], "altura_corpo_px": 100, "baseline_y": 180, "pivot": [96, 180], "largura_max_px": 110, "olha_para": "direita"}
+  },
+  "inimigos": {
+    "goblin": {
+      "tipo": "comum", "status": "PRODUCTION_ASSET_MISSING", "cena": "res://scenes/actors/DemonioBase.tscn",
+      "niveis": {"L1": ["EliteGoblin (elite, carga, x1.4)", "GoblinBaixa (patrulha)"], "L2": ["clones da Morvanna (herdam a espécie por omissão)"], "L3": ["aranhas da Rainha Aracnídea (herdam a espécie por omissão, x0.62)"]},
+      "legado": "res://assets/sprites/pixel/enemies/goblin/", "estados_alcancaveis": ["idle", "run", "hit", "dead"],
+      "animacoes": {}
+    },
+    "mushroom": {
+      "tipo": "comum", "status": "PRODUCTION_ASSET_MISSING", "cena": "res://scenes/actors/DemonioBase.tscn",
+      "niveis": {"L2": ["EliteCuspidor (elite, cuspidor, x1.35)"]},
+      "legado": "res://assets/sprites/pixel/enemies/mushroom/", "estados_alcancaveis": ["idle", "run", "hit", "dead"],
+      "animacoes": {}
+    },
+    "gosma": {
+      "tipo": "comum", "status": "PRODUCTION_ASSET_MISSING", "cena": "res://scenes/actors/DemonioBase.tscn",
+      "niveis": {"L2": ["GoblinBaixa (patrulha)"], "L4": ["GosmaR2 (patrulha)", "EliteSaltador (elite, saltador, x1.4)", "GosmaInterior (saltador)"]},
+      "legado": "res://assets/sprites/pixel/enemies/gosma/", "estados_alcancaveis": ["idle", "run", "hit", "dead"],
+      "animacoes": {}
+    },
+    "besouro": {
+      "tipo": "comum", "status": "PRODUCTION_ASSET_MISSING", "cena": "res://scenes/actors/DemonioBase.tscn",
+      "niveis": {"L3": ["BesouroPasso (patrulha)", "EliteTrepador (elite, trepador, x1.4)", "BesouroDossel (trepador)", "BesouroNinho (patrulha)"]},
+      "legado": "res://assets/sprites/pixel/enemies/besouro/", "estados_alcancaveis": ["idle", "run", "hit", "dead"],
+      "animacoes": {}
+    },
+    "lodo": {
+      "tipo": "comum", "status": "PRODUCTION_ASSET_MISSING", "cena": "res://scenes/actors/DemonioBase.tscn",
+      "niveis": {"L5": ["EliteLodo (elite, carga, x1.45)"]},
+      "legado": "res://assets/sprites/pixel/enemies/lodo/", "estados_alcancaveis": ["idle", "run", "hit", "dead"],
+      "animacoes": {}
+    },
+    "ghorak": {
+      "tipo": "guardiao", "status": "PRODUCTION_ASSET_MISSING", "cena": "res://scenes/actors/ChefeGhorak.tscn",
+      "niveis": {"L1": ["Guardiao (escala_visual 1.2)"]},
+      "legado": "res://assets/sprites/pixel/bosses_anim/ghorak/", "estados_alcancaveis": ["idle", "run", "hit", "dead"],
+      "nota": "o rig tem 'attack', mas ChefeBase.atacar_anim() não é chamado em lado nenhum",
+      "animacoes": {}
+    },
+    "morvanna": {
+      "tipo": "guardiao", "status": "PRODUCTION_ASSET_MISSING", "cena": "res://scenes/actors/ChefeMorvanna.tscn",
+      "niveis": {"L2": ["Guardiao (escala_visual 1.35, flutua)"]},
+      "legado": "res://assets/sprites/pixel/bosses_anim/morvanna/", "estados_alcancaveis": ["idle", "run", "hit", "dead"],
+      "animacoes": {}
+    },
+    "rainha_aracnidea": {
+      "tipo": "guardiao", "status": "PRODUCTION_ASSET_MISSING", "cena": "res://scenes/actors/ChefeRainhaAracnidea.tscn",
+      "niveis": {"L3": ["Guardiao (escala_visual 1.4)"]},
+      "legado": "res://assets/sprites/pixel/bosses_anim/rainha_aracnidea/", "estados_alcancaveis": ["idle", "run", "hit", "dead"],
+      "animacoes": {}
+    },
+    "entrevane": {
+      "tipo": "guardiao", "status": "PRODUCTION_ASSET_MISSING", "cena": "res://scenes/actors/ChefeEntrevane.tscn",
+      "niveis": {"L4": ["Guardiao (escala_visual 1.25, enraizada)"]},
+      "legado": "res://assets/sprites/pixel/bosses_anim/entrevane/", "estados_alcancaveis": ["idle", "run", "hit", "dead"],
+      "animacoes": {}
+    }
+  }
+}

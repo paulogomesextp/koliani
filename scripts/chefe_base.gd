@@ -145,6 +145,17 @@ func _montar_rig() -> void:
 	if anim == null:
 		push_warning("chefe com rig '%s' mas sem nó Sprite/Anim" % rig)
 		return
+	# Região I: arte de produção 9D do guardião, se já estiver integrada
+	var prod := Inimigos9D.sprite_frames(self, rig)
+	if prod:
+		anim.sprite_frames = prod
+		anim.visible = true
+		var c9d := get_node_or_null("Sprite/Corpo") as Sprite2D
+		if c9d:
+			c9d.visible = false
+			if c9d.material is ShaderMaterial:
+				anim.material = (c9d.material as ShaderMaterial).duplicate()
+		return
 	var cfg: Variant = _rigs().get(rig, null)
 	if not (cfg is Dictionary):
 		push_warning("rig de chefe desconhecido: '%s'" % rig)

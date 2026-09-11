@@ -63,6 +63,7 @@ func _correr_tudo() -> void:
 	teste_execution_8_integracao_player_facing()
 	teste_execution_9b4_pacote_golden_sem_legado()
 	teste_execution_9c_kit_ambiente_regiao1()
+	teste_execution_9d_inimigos_regiao1()
 	teste_level_session_begin()
 	teste_level_session_stable_checkpoint_identity()
 	teste_level_session_checkpoint_activation_repeated()
@@ -1361,6 +1362,43 @@ func teste_execution_9c_kit_ambiente_regiao1() -> void:
 		"res://assets/art/regions/region_01_forest/production/kit_9c/kit_9c_manifest.json"))
 	_ok(man is Dictionary and (man["ativos"] as Array).size() >= 30,
 		"Execution 9C: manifesto do kit em falta ou incompleto")
+
+
+## Execution 9D: o manifesto de produção dos inimigos cobre TODOS os inimigos
+## e guardiões de L1–L4 (o chefe do L5 é da 9E), e cada inimigo carrega a arte
+## que o manifesto declara: produção se estiver PRODUCTION_INTEGRATED, legado
+## caso contrário. Um inimigo integrado com um frame de fora da pasta de
+## produção falha aqui -- é a guarda contra arte legada visível na Região I.
+func teste_execution_9d_inimigos_regiao1() -> void:
+	const Ini := preload("res://scripts/regiao1_inimigos.gd")
+	var man: Dictionary = Ini.manifesto()
+	var entradas: Dictionary = man.get("inimigos", {})
+	_ok(not entradas.is_empty(), "9D: manifesto de produção dos inimigos em falta")
+	for cam in ["res://scenes/levels/Floresta_Putrefata.tscn", "res://scenes/levels/Pantano_dos_Sussurros.tscn",
+			"res://scenes/levels/Ninho_da_Viuva_Negra.tscn", "res://scenes/levels/A_Arvore_que_Chora.tscn",
+			"res://scenes/levels/Coracao_da_Floresta.tscn"]:
+		var nivel := (load(cam) as PackedScene).instantiate()
+		get_tree().root.add_child(nivel)
+		for no in nivel.get_children():
+			if not (no is DemonioBase):
+				continue
+			var id: String = no.get("rig") if no.is_in_group("chefes") else no.get("especie")
+			if id == "" or id == "coracao_putrefacto":
+				continue
+			_ok(entradas.has(id), "9D: %s/%s ('%s') fora do manifesto" % [cam.get_file(), no.name, id])
+			var integrado: bool = entradas.get(id, {}).get("status", "") == Ini.INTEGRADO
+			var anim := no.get_node_or_null("Sprite/Anim") as AnimatedSprite2D
+			if anim == null or anim.sprite_frames == null:
+				continue
+			for a in anim.sprite_frames.get_animation_names():
+				for i in anim.sprite_frames.get_frame_count(a):
+					var t := anim.sprite_frames.get_frame_texture(a, i)
+					var p := t.resource_path if t else ""
+					if t is AtlasTexture:
+						p = (t as AtlasTexture).atlas.resource_path
+					_ok(p.begins_with(Ini.DIR) == integrado,
+						"9D: %s/%s anim '%s' carrega %s (integrado=%s)" % [cam.get_file(), no.name, a, p, integrado])
+		nivel.free()
 
 
 func teste_execution_9b4_pacote_golden_sem_legado() -> void:
