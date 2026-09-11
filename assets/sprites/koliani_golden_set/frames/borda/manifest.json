@@ -1,0 +1,49 @@
+{
+  "schema_version": 2,
+  "character": "Koliani",
+  "animation": "borda",
+  "frame_count": 1,
+  "canvas_width": 128,
+  "canvas_height": 128,
+  "pivot_x": 64,
+  "pivot_y": 104,
+  "baseline_y": null,
+  "baseline_tolerance": 1,
+  "max_scale_ratio": 1.25,
+  "max_bbox_drift": 14,
+  "asset_type": "BODY",
+  "expected_alpha": true,
+  "vfx_separate": true,
+  "reference_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+  "reference_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+  "authority": [
+    {
+      "file": "koliani_golden_set_approved.png",
+      "sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4"
+    }
+  ],
+  "visual_review_state": "DERIVED_FROM_GAME_MASTER_APPROVED_GOLDEN_SET",
+  "runtime_integration_state": "INTEGRATED_9B4",
+  "frames": [
+    "borda_001.png"
+  ],
+  "normalization_scale": 0.3975,
+  "max_pixel_count_ratio": 1.45,
+  "source_image": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+  "source_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+  "godot": {
+    "scale": 1.0,
+    "offset": [
+      0,
+      -18
+    ]
+  },
+  "derivation": [
+    {
+      "frame": "borda_001.png",
+      "source": "assets/sprites/koliani_golden_set/frames/jump_start/jump_start_004.png",
+      "source_sha256": "472dce18542ec2da57199cdb84e47dd99c70218697b3342ae2a10ac16e96ee1d",
+      "operation": "integer translate dx=-6, dy=-15 (front hand to ledge corner 74,48)"
+    }
+  ]
+}

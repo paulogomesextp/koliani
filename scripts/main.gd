@@ -199,6 +199,10 @@ func _tirar_foto(caminho: String, estado := "") -> void:
 		await _prova_golden_set(caminho, koliani)
 		get_tree().quit(0)
 		return
+	elif estado == "pacote" and koliani:
+		await _prova_pacote_9b4(caminho, koliani)
+		get_tree().quit(0)
+		return
 	else:
 		await get_tree().create_timer(0.25).timeout
 	var img := get_viewport().get_texture().get_image()
@@ -255,6 +259,88 @@ func _prova_golden_set(caminho: String, koliani: Node2D) -> void:
 			break
 	await _foto_golden(base, "7_fall", koliani, registo)
 	print("PROVA GOLDEN SET: ", ProjectSettings.globalize_path(base + "_registo.json"))
+
+
+## Execution 9B.4: prova do pacote completo. As habilidades entram só em memória
+## (nada é gravado). Dash, roll, defesa, agachar, salto duplo, dano e morte vão
+## pelo input/código normal do jogo; parede e rebordo precisam de geometria que
+## o início do L1 não tem, por isso são FORÇADOS (física parada, flags visuais)
+## -- a etiqueta diz "forcado" e o registo guarda isso.
+func _prova_pacote_9b4(caminho: String, koliani: Node2D) -> void:
+	var base := caminho.get_basename()
+	var registo: Array = []
+	get_tree().create_timer(40.0, true, false, true).timeout.connect(func() -> void: get_tree().quit(3))
+	for h in ["dash", "salto_duplo", "escudo"]:
+		if not EstadoJogo.habilidades.has(h):
+			EstadoJogo.habilidades.append(h)
+	var ck := koliani as CharacterBody2D
+	var corpo := koliani.get("_corpo") as AnimatedSprite2D
+	for _i in 120:
+		await get_tree().physics_frame
+		if ck.is_on_floor():
+			break
+	await get_tree().create_timer(0.5).timeout
+	await _foto_golden(base, "01_idle", koliani, registo)
+	Input.action_press("mirar_baixo")
+	await get_tree().create_timer(0.15).timeout
+	await _foto_golden(base, "02_crouch", koliani, registo)
+	Input.action_release("mirar_baixo")
+	Input.action_press("defender")
+	await get_tree().create_timer(0.15).timeout
+	await _foto_golden(base, "03_defesa", koliani, registo)
+	Input.action_release("defender")
+	await get_tree().create_timer(0.3).timeout
+	Input.action_press("rolar")
+	await get_tree().create_timer(0.1).timeout
+	Input.action_release("rolar")
+	await _foto_golden(base, "04_roll", koliani, registo)
+	await get_tree().create_timer(0.07).timeout
+	await _foto_golden(base, "05_roll_late", koliani, registo)
+	await get_tree().create_timer(0.8).timeout
+	Input.action_press("mover_direita")
+	await get_tree().create_timer(0.35).timeout
+	await _foto_golden(base, "06_run", koliani, registo)
+	Input.action_press("dash")
+	await get_tree().create_timer(0.07).timeout
+	Input.action_release("dash")
+	await _foto_golden(base, "07_dash", koliani, registo)
+	Input.action_release("mover_direita")
+	await get_tree().create_timer(0.6).timeout
+	Input.action_press("saltar")
+	await get_tree().create_timer(0.1).timeout
+	Input.action_release("saltar")
+	await get_tree().create_timer(0.2).timeout
+	Input.action_press("saltar")
+	await get_tree().create_timer(0.08).timeout
+	Input.action_release("saltar")
+	await _foto_golden(base, "08_djump", koliani, registo)
+	for _i in 180:
+		await get_tree().physics_frame
+		if ck.is_on_floor():
+			break
+	await get_tree().create_timer(0.4).timeout
+	# forçados: parede e rebordo
+	koliani.set_physics_process(false)
+	koliani.set("_escalando", true)
+	await get_tree().create_timer(0.1).timeout
+	await _foto_golden(base, "09_wallslide_forcado", koliani, registo)
+	koliani.set("_escalando", false)
+	koliani.set("_borda", true)
+	await get_tree().create_timer(0.1).timeout
+	await _foto_golden(base, "10_borda_forcado", koliani, registo)
+	koliani.set("_borda", false)
+	koliani.set_physics_process(true)
+	await get_tree().create_timer(0.3).timeout
+	koliani.set("_invulneravel", 0.0)
+	koliani.call("receber_dano", 1, -1.0)
+	await get_tree().create_timer(0.06).timeout
+	await _foto_golden(base, "11_hurt", koliani, registo)
+	await get_tree().create_timer(0.5).timeout
+	koliani.set("_invulneravel", 0.0)
+	koliani.call("receber_dano", 999, -1.0)
+	await get_tree().create_timer(0.1).timeout
+	await _foto_golden(base, "12_morte", koliani, registo)
+	print("PROVA PACOTE 9B.4: ", ProjectSettings.globalize_path(base + "_registo.json"))
 
 
 func _foto_golden(base: String, etiqueta: String, koliani: Node2D, registo: Array) -> void:

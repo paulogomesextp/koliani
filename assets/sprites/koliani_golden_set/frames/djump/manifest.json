@@ -1,0 +1,70 @@
+{
+  "schema_version": 2,
+  "character": "Koliani",
+  "animation": "djump",
+  "frame_count": 4,
+  "canvas_width": 128,
+  "canvas_height": 128,
+  "pivot_x": 64,
+  "pivot_y": 104,
+  "baseline_y": 103,
+  "baseline_tolerance": 1,
+  "max_scale_ratio": 1.25,
+  "max_bbox_drift": 14,
+  "asset_type": "BODY",
+  "expected_alpha": true,
+  "vfx_separate": true,
+  "reference_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+  "reference_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+  "authority": [
+    {
+      "file": "koliani_golden_set_approved.png",
+      "sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4"
+    }
+  ],
+  "visual_review_state": "DERIVED_FROM_GAME_MASTER_APPROVED_GOLDEN_SET",
+  "runtime_integration_state": "INTEGRATED_9B4",
+  "frames": [
+    "djump_001.png",
+    "djump_002.png",
+    "djump_003.png",
+    "djump_004.png"
+  ],
+  "normalization_scale": 0.3975,
+  "max_pixel_count_ratio": 1.45,
+  "source_image": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+  "source_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+  "godot": {
+    "scale": 1.0,
+    "offset": [
+      0,
+      -18
+    ]
+  },
+  "derivation": [
+    {
+      "frame": "djump_001.png",
+      "source": "assets/sprites/koliani_golden_set/frames/jump_start/jump_start_003.png",
+      "source_sha256": "19c95bef0289e9dc64b814b348290020ea8e82e2a22a09e72388b1f4d48426f4",
+      "operation": "copy (byte-identical)"
+    },
+    {
+      "frame": "djump_002.png",
+      "source": "assets/sprites/koliani_golden_set/frames/jump_start/jump_start_004.png",
+      "source_sha256": "472dce18542ec2da57199cdb84e47dd99c70218697b3342ae2a10ac16e96ee1d",
+      "operation": "copy (byte-identical)"
+    },
+    {
+      "frame": "djump_003.png",
+      "source": "assets/sprites/koliani_golden_set/frames/jump_loop/jump_loop_001.png",
+      "source_sha256": "6fdcdbba05a8768d27be141a0b27d8c89954323b6e8a91a21e7833b4133bd8df",
+      "operation": "copy (byte-identical)"
+    },
+    {
+      "frame": "djump_004.png",
+      "source": "assets/sprites/koliani_golden_set/frames/jump_loop/jump_loop_002.png",
+      "source_sha256": "1932e63defbe5b977d6d9d0cccbbb5835692db6ed857be60e57288d707e76494",
+      "operation": "copy (byte-identical)"
+    }
+  ]
+}

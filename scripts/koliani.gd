@@ -594,6 +594,18 @@ const _KOLI_ANIMS_GOLDEN := {
 	"jump_loop":  ["frames/jump_loop", 3, 6.0, true],
 	"fall":       ["frames/fall", 3, 6.0, true],
 	"attack":     ["frames/attack_basic", 6, 33.333333, false],
+	# Execution 9B.4: pacote completo, derivado só de frames golden inteiros
+	# (`tools/derivar_pacote_koliani_9b4.py`). Os fps fazem cada animação durar
+	# o tempo lógico do estado: dash 0,16 s, roll 0,30 s, hurt 0,24 s.
+	"dash":       ["frames/dash", 3, 18.75, false],
+	"roll":       ["frames/roll", 6, 20.0, false],
+	"hurt":       ["frames/hurt", 2, 8.333333, false],
+	"morte":      ["frames/morte", 3, 14.0, false],
+	"crouch":     ["frames/crouch", 1, 6.0, true],
+	"wallslide":  ["frames/wallslide", 2, 6.0, true],
+	"borda":      ["frames/borda", 1, 5.0, true],
+	"djump":      ["frames/djump", 4, 10.0, false],
+	"defesa":     ["frames/defesa", 1, 6.0, true],
 }
 ## Golpes seguintes do combo: os MESMOS 6 frames aprovados, à velocidade que faz
 ## a animação durar o tempo lógico de cada golpe (0,20 / 0,30 / 0,19 s). Não há
@@ -700,6 +712,13 @@ func _montar_frames() -> void:
 	if usar_piloto_visual_5g and not usar_golden_set:
 		_corpo.scale = Vector2(PILOTO_5G_ESCALA, PILOTO_5G_ESCALA)
 		_corpo.offset = Vector2(0.0, PILOTO_5G_OFFSET_Y)
+	if usar_golden_set:
+		# Execution 9B.4: com o Golden Set o corpo sai SÓ de frames golden. Nem o
+		# premium_v1 nem o rig do script chegam a ser carregados, por isso não há
+		# estado nenhum que possa cair de volta noutra Koliani.
+		anims = {}
+		if _armadura:
+			_armadura.visible = false
 	var sf := SpriteFrames.new()
 	sf.remove_animation("default")
 	for nome: String in anims:
@@ -736,10 +755,8 @@ var _golden_anims := {}
 var _slash_vfx: AnimatedSprite2D
 
 
-## Monta o Golden Set por cima do premium_v1. Tudo o que o Golden Set cobre
-## sai SÓ de frames golden; o premium_v1 continua como fallback explícito para
-## o que ainda não tem arte de produção: dash, roll, hurt, morte, crouch,
-## wallslide, borda, djump, defesa.
+## Monta o Golden Set: todos os estados alcançáveis da Koliani, só com frames
+## golden (diretos, ou derivados sem píxeis novos na 9B.3/9B.4).
 func _montar_golden_set(sf: SpriteFrames) -> void:
 	_golden_anims.clear()
 	for nome: String in _KOLI_ANIMS_GOLDEN:
@@ -759,6 +776,8 @@ func _montar_golden_set(sf: SpriteFrames) -> void:
 	var aterrar: Array = _frames_de(sf, "fall", [2]) + _frames_de(sf, "idle", [0])
 	for nome in ["land", "aterrar"]:
 		_animacao_golden(sf, nome, aterrar, 12.0, false)
+	# `jump` só é pedido pelo caminho de locomoção antigo; fica golden na mesma.
+	_animacao_golden(sf, "jump", _frames_de(sf, "jump_start", [1, 2, 3]), 12.0, false)
 	_montar_vfx_golpe()
 
 
@@ -792,12 +811,9 @@ func _frames_de(sf: SpriteFrames, nome: String, indices: Array) -> Array:
 func _aplicar_contrato_visual() -> void:
 	if not usar_golden_set or _corpo == null:
 		return
-	if _golden_anims.has(String(_corpo.animation)):
-		_corpo.scale = Vector2(GOLDEN_ESCALA, GOLDEN_ESCALA)
-		_corpo.offset = Vector2(0.0, GOLDEN_OFFSET_Y)
-	else:
-		_corpo.scale = Vector2(PREMIUM_ESCALA, PREMIUM_ESCALA)
-		_corpo.offset = Vector2(0.0, PREMIUM_OFFSET_Y)
+	# 9B.4: já não há animações de outro rig no SpriteFrames -- escala única.
+	_corpo.scale = Vector2(GOLDEN_ESCALA, GOLDEN_ESCALA)
+	_corpo.offset = Vector2(0.0, GOLDEN_OFFSET_Y)
 
 
 ## O arco do golpe é uma camada à parte (contrato 9B.1 §F): nunca dentro do
@@ -836,6 +852,83 @@ func _disparar_vfx_golpe() -> void:
 	_slash_vfx.visible = true
 	_slash_vfx.play("slash")
 	_slash_vfx.set_frame_and_progress(0, 0.0)
+
+
+## VFX do pacote 9B.4 -- todos à parte do corpo, como o `SlashVFX`: o frame
+## golden nunca leva efeito pintado dentro. Nascem no pai da Koliani (o nível),
+## por isso ficam para trás no mundo e saem com a cena.
+const COR_SHADOWBLADE := Color(0.78, 0.32, 1.0)
+const RASTO_INTERVALO := 0.035
+var _rasto_t := 0.0
+
+
+## Rasto do dash: cópias do frame golden que está a ser desenhado, tingidas do
+## roxo da Shadowblade, a apagar em 0,18 s. Não tocam em nada da física.
+func _rasto_dash(dt: float) -> void:
+	_rasto_t -= dt
+	if _rasto_t > 0.0 or _corpo == null or get_parent() == null:
+		return
+	_rasto_t = RASTO_INTERVALO
+	var tex := _corpo.sprite_frames.get_frame_texture(_corpo.animation, _corpo.frame)
+	if tex == null:
+		return
+	var eco := Sprite2D.new()
+	eco.name = "RastoDash"
+	eco.texture = tex
+	eco.centered = true
+	eco.offset = _corpo.offset
+	eco.global_position = _corpo.global_position
+	eco.scale = _sprite.scale * _corpo.scale
+	eco.modulate = Color(COR_SHADOWBLADE, 0.55)
+	eco.z_index = -1
+	eco.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
+	get_parent().add_child(eco)
+	var t := eco.create_tween()
+	t.tween_property(eco, "modulate:a", 0.0, 0.18)
+	t.tween_callback(eco.queue_free)
+
+
+## Explosão curta de partículas nos pés, no 2.º salto.
+func _vfx_salto_duplo() -> void:
+	if not usar_golden_set:
+		return
+	_rajada("SaltoDuploVFX", Vector2(0.0, 20.0 * _sinal_grav), 14, 0.32,
+		Vector2(0.0, 1.0 * _sinal_grav), 70.0, COR_SHADOWBLADE)
+
+
+## Motes vermelhos/roxos a subir quando ela cai; o fade da recarga fecha logo.
+func _vfx_morte() -> void:
+	if not usar_golden_set:
+		return
+	_rajada("MorteVFX", Vector2(0.0, -10.0), 26, 0.6,
+		Vector2(0.0, -1.0 * _sinal_grav), 55.0, Color(0.9, 0.18, 0.28))
+
+
+func _rajada(nome: String, desvio: Vector2, n: int, vida_s: float, dir: Vector2,
+		vel: float, cor: Color) -> void:
+	if get_parent() == null:
+		return
+	var p := CPUParticles2D.new()
+	p.name = nome
+	p.one_shot = true
+	p.explosiveness = 0.9
+	p.amount = n
+	p.lifetime = vida_s
+	p.direction = dir
+	p.spread = 70.0
+	p.gravity = Vector2.ZERO
+	p.initial_velocity_min = vel * 0.5
+	p.initial_velocity_max = vel
+	p.scale_amount_min = 1.5
+	p.scale_amount_max = 2.5
+	var rampa := Gradient.new()
+	rampa.set_color(0, cor)
+	rampa.set_color(1, Color(cor, 0.0))
+	p.color_ramp = rampa
+	p.global_position = global_position + desvio
+	get_parent().add_child(p)
+	p.emitting = true
+	get_tree().create_timer(vida_s + 0.2, false).timeout.connect(p.queue_free)
 
 
 func _adicionar_animacao_de_tira(sf: SpriteFrames, nome: String, cfg: Array,
@@ -1223,6 +1316,7 @@ func _physics_process(dt: float) -> void:
 			Som.toca("salto_duplo" if _mov.saltos_dados >= 2 else "salto", -10.0)
 			if _mov.saltos_dados >= 2:
 				_djump_t = 0.45  # mostra a animação do salto duplo
+				_vfx_salto_duplo()
 
 	# batida do Coração Putrefacto (fase 2): gravidade aliviada -- a Koliani
 	# fica "leve" e a queda abranda para lhe dar tempo no ar
@@ -1508,7 +1602,8 @@ func _anim_locomocao_piloto_5g(sf: SpriteFrames) -> String:
 ## `PAREDE_ESPELHADA`. Olha para a animação que está MESMO a ser desenhada,
 ## para não inverter a Koliani quando o estado de parede escolhe outra tira.
 func _flip_sprite() -> float:
-	if PAREDE_ESPELHADA and _corpo != null \
+	# as poses de parede golden seguem a convenção "virada à direita"
+	if PAREDE_ESPELHADA and not usar_golden_set and _corpo != null \
 			and (_corpo.animation == &"wallslide" or _corpo.animation == &"borda"):
 		return -_olha_para
 	return _olha_para
@@ -1554,7 +1649,14 @@ func _animar(dt: float) -> void:
 	var escala := Vector2.ONE
 	var rot_alvo := 0.0
 
-	if _rolar_restante > 0.0:
+	if usar_golden_set and (_rolar_restante > 0.0 or _dash_restante > 0.0):
+		# 9B.4: a cambalhota e a passada do dash já estão nos frames golden.
+		# Esmagar (0,78 de altura) ou rodar o sprite por código era o que fazia
+		# o boneco parecer chibi -- aqui só se deixa o rasto, que é um VFX à parte.
+		_sprite.rotation = 0.0
+		if _dash_restante > 0.0:
+			_rasto_dash(dt)
+	elif _rolar_restante > 0.0:
 		escala = Vector2(1.2, 0.8)
 		_sprite.rotation += dt * _olha_para * 20.0
 	elif _dash_restante > 0.0:
@@ -2162,6 +2264,7 @@ func _morrer() -> void:
 		return
 	_a_morrer = true
 	_cancelar_ataque(true)
+	_vfx_morte()
 	Som.toca("morte_koliani", -6.0)
 	Engine.time_scale = 1.0  # não deixar um hitstop pendente a segurar o tempo
 	set_physics_process(false)

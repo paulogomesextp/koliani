@@ -1,0 +1,63 @@
+{
+  "schema_version": 2,
+  "character": "Koliani",
+  "animation": "dash",
+  "frame_count": 3,
+  "canvas_width": 128,
+  "canvas_height": 128,
+  "pivot_x": 64,
+  "pivot_y": 104,
+  "baseline_y": 103,
+  "baseline_tolerance": 1,
+  "max_scale_ratio": 1.25,
+  "max_bbox_drift": 14,
+  "asset_type": "BODY",
+  "expected_alpha": true,
+  "vfx_separate": true,
+  "reference_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+  "reference_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+  "authority": [
+    {
+      "file": "koliani_golden_set_approved.png",
+      "sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4"
+    }
+  ],
+  "visual_review_state": "DERIVED_FROM_GAME_MASTER_APPROVED_GOLDEN_SET",
+  "runtime_integration_state": "INTEGRATED_9B4",
+  "frames": [
+    "dash_001.png",
+    "dash_002.png",
+    "dash_003.png"
+  ],
+  "normalization_scale": 0.3975,
+  "max_pixel_count_ratio": 1.45,
+  "source_image": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+  "source_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+  "godot": {
+    "scale": 1.0,
+    "offset": [
+      0,
+      -18
+    ]
+  },
+  "derivation": [
+    {
+      "frame": "dash_001.png",
+      "source": "assets/sprites/koliani_golden_set/frames/run/run_006.png",
+      "source_sha256": "82e2122ec1426dee04a4c4546f137c74af1bd63c9a346e07099e220c5d4fda2a",
+      "operation": "copy (byte-identical)"
+    },
+    {
+      "frame": "dash_002.png",
+      "source": "assets/sprites/koliani_golden_set/frames/run/run_010.png",
+      "source_sha256": "bd148c4e24c8e05bf8d8ee4225054642d255e47e03ee8ed5a708944659bf570c",
+      "operation": "copy (byte-identical)"
+    },
+    {
+      "frame": "dash_003.png",
+      "source": "assets/sprites/koliani_golden_set/frames/run/run_010.png",
+      "source_sha256": "bd148c4e24c8e05bf8d8ee4225054642d255e47e03ee8ed5a708944659bf570c",
+      "operation": "copy (byte-identical)"
+    }
+  ]
+}

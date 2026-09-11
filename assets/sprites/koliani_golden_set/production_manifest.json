@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "execution": "9B.3",
+  "execution": "9B.4",
   "character": "Koliani",
   "visual_authority": {
     "status": "GAME MASTER APPROVED",
@@ -99,6 +99,100 @@
         "BOUNDING_BOX_DRIFT",
         "POSE_AREA_VARIATION"
       ]
+    },
+    "dash": {
+      "type": "frames",
+      "frame_count": 3,
+      "path": "assets/sprites/koliani_golden_set/frames/dash",
+      "fps": 18.75,
+      "loop": false,
+      "source": "DERIVED_FROM_GOLDEN_SET_9B4",
+      "validator_v2": "PASS",
+      "findings": []
+    },
+    "roll": {
+      "type": "frames",
+      "frame_count": 6,
+      "path": "assets/sprites/koliani_golden_set/frames/roll",
+      "fps": 20.0,
+      "loop": false,
+      "source": "DERIVED_FROM_GOLDEN_SET_9B4",
+      "validator_v2": "PASS",
+      "findings": []
+    },
+    "hurt": {
+      "type": "frames",
+      "frame_count": 2,
+      "path": "assets/sprites/koliani_golden_set/frames/hurt",
+      "fps": 8.333333,
+      "loop": false,
+      "source": "DERIVED_FROM_GOLDEN_SET_9B4",
+      "validator_v2": "PASS",
+      "findings": []
+    },
+    "morte": {
+      "type": "frames",
+      "frame_count": 3,
+      "path": "assets/sprites/koliani_golden_set/frames/morte",
+      "fps": 14.0,
+      "loop": false,
+      "source": "DERIVED_FROM_GOLDEN_SET_9B4",
+      "validator_v2": "REVIEW",
+      "findings": [
+        "POSE_AREA_VARIATION"
+      ]
+    },
+    "crouch": {
+      "type": "frames",
+      "frame_count": 1,
+      "path": "assets/sprites/koliani_golden_set/frames/crouch",
+      "fps": 6.0,
+      "loop": true,
+      "source": "DERIVED_FROM_GOLDEN_SET_9B4",
+      "validator_v2": "PASS",
+      "findings": []
+    },
+    "wallslide": {
+      "type": "frames",
+      "frame_count": 2,
+      "path": "assets/sprites/koliani_golden_set/frames/wallslide",
+      "fps": 6.0,
+      "loop": true,
+      "source": "DERIVED_FROM_GOLDEN_SET_9B4",
+      "validator_v2": "PASS",
+      "findings": []
+    },
+    "borda": {
+      "type": "frames",
+      "frame_count": 1,
+      "path": "assets/sprites/koliani_golden_set/frames/borda",
+      "fps": 5.0,
+      "loop": true,
+      "source": "DERIVED_FROM_GOLDEN_SET_9B4",
+      "validator_v2": "PASS",
+      "findings": []
+    },
+    "djump": {
+      "type": "frames",
+      "frame_count": 4,
+      "path": "assets/sprites/koliani_golden_set/frames/djump",
+      "fps": 10.0,
+      "loop": false,
+      "source": "DERIVED_FROM_GOLDEN_SET_9B4",
+      "validator_v2": "REVIEW",
+      "findings": [
+        "POSE_AREA_VARIATION"
+      ]
+    },
+    "defesa": {
+      "type": "frames",
+      "frame_count": 1,
+      "path": "assets/sprites/koliani_golden_set/frames/defesa",
+      "fps": 6.0,
+      "loop": true,
+      "source": "DERIVED_FROM_GOLDEN_SET_9B4",
+      "validator_v2": "PASS",
+      "findings": []
     }
   },
   "frames": [
@@ -802,6 +896,489 @@
       "baseline_y": 103,
       "authority_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
       "authority_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+      "validator_result": "PASS"
+    },
+    {
+      "animation": "dash",
+      "frame_index": 1,
+      "path": "assets/sprites/koliani_golden_set/frames/dash/dash_001.png",
+      "sha256": "82e2122ec1426dee04a4c4546f137c74af1bd63c9a346e07099e220c5d4fda2a",
+      "canvas": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        104
+      ],
+      "baseline_y": 103,
+      "authority_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+      "authority_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+      "execution": "9B.4",
+      "derived_from": "assets/sprites/koliani_golden_set/frames/run/run_006.png",
+      "operation": "copy (byte-identical)",
+      "validator_result": "PASS"
+    },
+    {
+      "animation": "dash",
+      "frame_index": 2,
+      "path": "assets/sprites/koliani_golden_set/frames/dash/dash_002.png",
+      "sha256": "bd148c4e24c8e05bf8d8ee4225054642d255e47e03ee8ed5a708944659bf570c",
+      "canvas": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        104
+      ],
+      "baseline_y": 103,
+      "authority_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+      "authority_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+      "execution": "9B.4",
+      "derived_from": "assets/sprites/koliani_golden_set/frames/run/run_010.png",
+      "operation": "copy (byte-identical)",
+      "validator_result": "PASS"
+    },
+    {
+      "animation": "dash",
+      "frame_index": 3,
+      "path": "assets/sprites/koliani_golden_set/frames/dash/dash_003.png",
+      "sha256": "bd148c4e24c8e05bf8d8ee4225054642d255e47e03ee8ed5a708944659bf570c",
+      "canvas": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        104
+      ],
+      "baseline_y": 103,
+      "authority_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+      "authority_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+      "execution": "9B.4",
+      "derived_from": "assets/sprites/koliani_golden_set/frames/run/run_010.png",
+      "operation": "copy (byte-identical)",
+      "validator_result": "PASS"
+    },
+    {
+      "animation": "roll",
+      "frame_index": 1,
+      "path": "assets/sprites/koliani_golden_set/frames/roll/roll_001.png",
+      "sha256": "b30448e0485ae2f9f16e0d865862ee8871690a1e16091d7cb3da016bb352d6f9",
+      "canvas": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        104
+      ],
+      "baseline_y": 103,
+      "authority_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+      "authority_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+      "execution": "9B.4",
+      "derived_from": "assets/sprites/koliani_golden_set/frames/jump_start/jump_start_001.png",
+      "operation": "copy (byte-identical)",
+      "validator_result": "PASS"
+    },
+    {
+      "animation": "roll",
+      "frame_index": 2,
+      "path": "assets/sprites/koliani_golden_set/frames/roll/roll_002.png",
+      "sha256": "32c3df0853ddbcf3690bca45a39f0e3707eff243d8ff5b9002a875faf3ee035e",
+      "canvas": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        104
+      ],
+      "baseline_y": 103,
+      "authority_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+      "authority_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+      "execution": "9B.4",
+      "derived_from": "assets/sprites/koliani_golden_set/frames/jump_loop/jump_loop_003.png",
+      "operation": "lossless rotate 0 deg clockwise, bbox centred on x=64, grounded at y=103",
+      "validator_result": "PASS"
+    },
+    {
+      "animation": "roll",
+      "frame_index": 3,
+      "path": "assets/sprites/koliani_golden_set/frames/roll/roll_003.png",
+      "sha256": "d40f7073fb0752ebfa6cf9454be16d3bc46fe3e846dc59bea25cfe02522999e3",
+      "canvas": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        104
+      ],
+      "baseline_y": 103,
+      "authority_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+      "authority_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+      "execution": "9B.4",
+      "derived_from": "assets/sprites/koliani_golden_set/frames/jump_loop/jump_loop_003.png",
+      "operation": "lossless rotate 90 deg clockwise, bbox centred on x=64, grounded at y=103",
+      "validator_result": "PASS"
+    },
+    {
+      "animation": "roll",
+      "frame_index": 4,
+      "path": "assets/sprites/koliani_golden_set/frames/roll/roll_004.png",
+      "sha256": "21696f11cf0d769e25e15eb34ef57201c4b3fce3ee925c1d3f8f4568fef9910f",
+      "canvas": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        104
+      ],
+      "baseline_y": 103,
+      "authority_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+      "authority_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+      "execution": "9B.4",
+      "derived_from": "assets/sprites/koliani_golden_set/frames/jump_loop/jump_loop_003.png",
+      "operation": "lossless rotate 180 deg clockwise, bbox centred on x=64, grounded at y=103",
+      "validator_result": "PASS"
+    },
+    {
+      "animation": "roll",
+      "frame_index": 5,
+      "path": "assets/sprites/koliani_golden_set/frames/roll/roll_005.png",
+      "sha256": "93020f8e4655e6a79ba8ee2b0638ee6d4132aec048298b1819f21ee5d9853c8e",
+      "canvas": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        104
+      ],
+      "baseline_y": 103,
+      "authority_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+      "authority_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+      "execution": "9B.4",
+      "derived_from": "assets/sprites/koliani_golden_set/frames/jump_loop/jump_loop_003.png",
+      "operation": "lossless rotate 270 deg clockwise, bbox centred on x=64, grounded at y=103",
+      "validator_result": "PASS"
+    },
+    {
+      "animation": "roll",
+      "frame_index": 6,
+      "path": "assets/sprites/koliani_golden_set/frames/roll/roll_006.png",
+      "sha256": "b30448e0485ae2f9f16e0d865862ee8871690a1e16091d7cb3da016bb352d6f9",
+      "canvas": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        104
+      ],
+      "baseline_y": 103,
+      "authority_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+      "authority_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+      "execution": "9B.4",
+      "derived_from": "assets/sprites/koliani_golden_set/frames/jump_start/jump_start_001.png",
+      "operation": "copy (byte-identical)",
+      "validator_result": "PASS"
+    },
+    {
+      "animation": "hurt",
+      "frame_index": 1,
+      "path": "assets/sprites/koliani_golden_set/frames/hurt/hurt_001.png",
+      "sha256": "8b2cd2ad8d4fb4263507751720e903d6b2ca8396604fa64d3464d1a03e364ff9",
+      "canvas": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        104
+      ],
+      "baseline_y": 103,
+      "authority_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+      "authority_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+      "execution": "9B.4",
+      "derived_from": "assets/sprites/koliani_golden_set/frames/fall/fall_001.png",
+      "operation": "copy (byte-identical)",
+      "validator_result": "PASS"
+    },
+    {
+      "animation": "hurt",
+      "frame_index": 2,
+      "path": "assets/sprites/koliani_golden_set/frames/hurt/hurt_002.png",
+      "sha256": "20d6bb86e894119291c119bbe57c6e75efa44a3da04962d6b89bb93ec8f1f447",
+      "canvas": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        104
+      ],
+      "baseline_y": 103,
+      "authority_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+      "authority_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+      "execution": "9B.4",
+      "derived_from": "assets/sprites/koliani_golden_set/frames/fall/fall_002.png",
+      "operation": "copy (byte-identical)",
+      "validator_result": "PASS"
+    },
+    {
+      "animation": "morte",
+      "frame_index": 1,
+      "path": "assets/sprites/koliani_golden_set/frames/morte/morte_001.png",
+      "sha256": "8b2cd2ad8d4fb4263507751720e903d6b2ca8396604fa64d3464d1a03e364ff9",
+      "canvas": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        104
+      ],
+      "baseline_y": 103,
+      "authority_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+      "authority_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+      "execution": "9B.4",
+      "derived_from": "assets/sprites/koliani_golden_set/frames/fall/fall_001.png",
+      "operation": "copy (byte-identical)",
+      "validator_result": "PASS"
+    },
+    {
+      "animation": "morte",
+      "frame_index": 2,
+      "path": "assets/sprites/koliani_golden_set/frames/morte/morte_002.png",
+      "sha256": "84a8ba1853c9b07d274704a236d240059c45617cd9fd0ce5b88d9808d3eba8d0",
+      "canvas": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        104
+      ],
+      "baseline_y": 103,
+      "authority_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+      "authority_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+      "execution": "9B.4",
+      "derived_from": "assets/sprites/koliani_golden_set/frames/jump_start/jump_start_002.png",
+      "operation": "copy (byte-identical)",
+      "validator_result": "PASS"
+    },
+    {
+      "animation": "morte",
+      "frame_index": 3,
+      "path": "assets/sprites/koliani_golden_set/frames/morte/morte_003.png",
+      "sha256": "b30448e0485ae2f9f16e0d865862ee8871690a1e16091d7cb3da016bb352d6f9",
+      "canvas": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        104
+      ],
+      "baseline_y": 103,
+      "authority_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+      "authority_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+      "execution": "9B.4",
+      "derived_from": "assets/sprites/koliani_golden_set/frames/jump_start/jump_start_001.png",
+      "operation": "copy (byte-identical)",
+      "validator_result": "PASS"
+    },
+    {
+      "animation": "crouch",
+      "frame_index": 1,
+      "path": "assets/sprites/koliani_golden_set/frames/crouch/crouch_001.png",
+      "sha256": "b30448e0485ae2f9f16e0d865862ee8871690a1e16091d7cb3da016bb352d6f9",
+      "canvas": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        104
+      ],
+      "baseline_y": 103,
+      "authority_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+      "authority_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+      "execution": "9B.4",
+      "derived_from": "assets/sprites/koliani_golden_set/frames/jump_start/jump_start_001.png",
+      "operation": "copy (byte-identical)",
+      "validator_result": "PASS"
+    },
+    {
+      "animation": "wallslide",
+      "frame_index": 1,
+      "path": "assets/sprites/koliani_golden_set/frames/wallslide/wallslide_001.png",
+      "sha256": "9f31e146513ec8fad67b2880938bd5fd8043e7b2313fdfdf4d8dfd9a76de733b",
+      "canvas": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        104
+      ],
+      "baseline_y": 103,
+      "authority_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+      "authority_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+      "execution": "9B.4",
+      "derived_from": "assets/sprites/koliani_golden_set/frames/fall/fall_001.png",
+      "operation": "integer translate dx=-7 (front edge to wall column 74)",
+      "validator_result": "PASS"
+    },
+    {
+      "animation": "wallslide",
+      "frame_index": 2,
+      "path": "assets/sprites/koliani_golden_set/frames/wallslide/wallslide_002.png",
+      "sha256": "e1f6d6299f2dc594abe7b010fce2eee8c1515d5d0a105315ce2b5e3912122cfc",
+      "canvas": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        104
+      ],
+      "baseline_y": 103,
+      "authority_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+      "authority_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+      "execution": "9B.4",
+      "derived_from": "assets/sprites/koliani_golden_set/frames/fall/fall_002.png",
+      "operation": "integer translate dx=-7 (front edge to wall column 74)",
+      "validator_result": "PASS"
+    },
+    {
+      "animation": "borda",
+      "frame_index": 1,
+      "path": "assets/sprites/koliani_golden_set/frames/borda/borda_001.png",
+      "sha256": "77044c3418c5321005f477c8902d9734b5d6663a01a7494dcfb52367216e52c9",
+      "canvas": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        104
+      ],
+      "baseline_y": null,
+      "authority_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+      "authority_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+      "execution": "9B.4",
+      "derived_from": "assets/sprites/koliani_golden_set/frames/jump_start/jump_start_004.png",
+      "operation": "integer translate dx=-6, dy=-15 (front hand to ledge corner 74,48)",
+      "validator_result": "PASS"
+    },
+    {
+      "animation": "djump",
+      "frame_index": 1,
+      "path": "assets/sprites/koliani_golden_set/frames/djump/djump_001.png",
+      "sha256": "19c95bef0289e9dc64b814b348290020ea8e82e2a22a09e72388b1f4d48426f4",
+      "canvas": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        104
+      ],
+      "baseline_y": 103,
+      "authority_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+      "authority_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+      "execution": "9B.4",
+      "derived_from": "assets/sprites/koliani_golden_set/frames/jump_start/jump_start_003.png",
+      "operation": "copy (byte-identical)",
+      "validator_result": "PASS"
+    },
+    {
+      "animation": "djump",
+      "frame_index": 2,
+      "path": "assets/sprites/koliani_golden_set/frames/djump/djump_002.png",
+      "sha256": "472dce18542ec2da57199cdb84e47dd99c70218697b3342ae2a10ac16e96ee1d",
+      "canvas": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        104
+      ],
+      "baseline_y": 103,
+      "authority_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+      "authority_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+      "execution": "9B.4",
+      "derived_from": "assets/sprites/koliani_golden_set/frames/jump_start/jump_start_004.png",
+      "operation": "copy (byte-identical)",
+      "validator_result": "PASS"
+    },
+    {
+      "animation": "djump",
+      "frame_index": 3,
+      "path": "assets/sprites/koliani_golden_set/frames/djump/djump_003.png",
+      "sha256": "6fdcdbba05a8768d27be141a0b27d8c89954323b6e8a91a21e7833b4133bd8df",
+      "canvas": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        104
+      ],
+      "baseline_y": 103,
+      "authority_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+      "authority_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+      "execution": "9B.4",
+      "derived_from": "assets/sprites/koliani_golden_set/frames/jump_loop/jump_loop_001.png",
+      "operation": "copy (byte-identical)",
+      "validator_result": "PASS"
+    },
+    {
+      "animation": "djump",
+      "frame_index": 4,
+      "path": "assets/sprites/koliani_golden_set/frames/djump/djump_004.png",
+      "sha256": "1932e63defbe5b977d6d9d0cccbbb5835692db6ed857be60e57288d707e76494",
+      "canvas": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        104
+      ],
+      "baseline_y": 103,
+      "authority_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+      "authority_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+      "execution": "9B.4",
+      "derived_from": "assets/sprites/koliani_golden_set/frames/jump_loop/jump_loop_002.png",
+      "operation": "copy (byte-identical)",
+      "validator_result": "PASS"
+    },
+    {
+      "animation": "defesa",
+      "frame_index": 1,
+      "path": "assets/sprites/koliani_golden_set/frames/defesa/defesa_001.png",
+      "sha256": "1c1f97065cc200a87696a0ae3a76e84ffb5a1f9ed8ebe056a3d7ea72a79538da",
+      "canvas": [
+        128,
+        128
+      ],
+      "pivot": [
+        64,
+        104
+      ],
+      "baseline_y": 103,
+      "authority_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+      "authority_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+      "execution": "9B.4",
+      "derived_from": "assets/sprites/koliani_golden_set/frames/attack_basic/attack_basic_001.png",
+      "operation": "copy (byte-identical)",
       "validator_result": "PASS"
     }
   ]

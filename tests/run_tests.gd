@@ -61,6 +61,7 @@ func _correr_tudo() -> void:
 	teste_execution_7_combate_e_progressao_regiao1()
 	teste_execution_7_guardioes_e_boss_regional()
 	teste_execution_8_integracao_player_facing()
+	teste_execution_9b4_pacote_golden_sem_legado()
 	teste_level_session_begin()
 	teste_level_session_stable_checkpoint_identity()
 	teste_level_session_checkpoint_activation_repeated()
@@ -1313,6 +1314,43 @@ func teste_execution_8_integracao_player_facing() -> void:
 	_ok(main.contains("EstadoJogo.modo_dev and OS.is_debug_build()")
 		and dev.contains("not OS.is_debug_build() or not EstadoJogo.modo_dev"),
 		"Execution 8: DevBarra não tem defesa release em profundidade")
+
+
+## Execution 9B.4: na Região I todos os estados da Koliani saem do Golden Set.
+## Monta a Koliani do L1 a sério (o `_ready` constrói o SpriteFrames) e exige
+## que TODAS as animações e TODOS os frames venham de `koliani_golden_set`.
+func teste_execution_9b4_pacote_golden_sem_legado() -> void:
+	var cena := load("res://scenes/levels/Floresta_Putrefata.tscn") as PackedScene
+	var nivel := cena.instantiate()
+	var k := nivel.get_node_or_null("Koliani")
+	_ok(k != null, "9B.4: Koliani não encontrada no L1")
+	if k == null:
+		nivel.free()
+		return
+	nivel.remove_child(k)
+	nivel.free()
+	add_child(k)
+	var corpo := k.get("_corpo") as AnimatedSprite2D
+	var sf := corpo.sprite_frames if corpo else null
+	_ok(sf != null, "9B.4: SpriteFrames da Koliani não montado")
+	if sf:
+		for estado in ["idle", "run", "turn", "run_start", "run_brake", "jump", "jump_start",
+				"jump_loop", "fall", "land", "aterrar", "attack", "attack2", "attack3", "attack4",
+				"lancar", "dash", "roll", "hurt", "morte", "crouch", "wallslide", "borda",
+				"djump", "defesa"]:
+			_ok(sf.has_animation(estado) and sf.get_frame_count(estado) > 0,
+				"9B.4: estado '%s' sem frames golden" % estado)
+		var fora: Array[String] = []
+		for anim in sf.get_animation_names():
+			for i in sf.get_frame_count(anim):
+				var tex := sf.get_frame_texture(anim, i)
+				var p := tex.resource_path if tex else ""
+				if not p.begins_with("res://assets/sprites/koliani_golden_set/"):
+					fora.append("%s[%d]=%s" % [anim, i, p])
+		_ok(fora.is_empty(), "9B.4: frames fora do Golden Set: %s" % str(fora))
+	_ok(corpo != null and corpo.scale == Vector2.ONE and corpo.offset == Vector2(0.0, -18.0),
+		"9B.4: contrato visual golden (escala 1, offset -18) não aplicado")
+	k.free()
 
 
 func teste_progression_ids_resilientes_a_renames() -> void:

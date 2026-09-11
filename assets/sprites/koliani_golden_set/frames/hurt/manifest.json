@@ -1,0 +1,56 @@
+{
+  "schema_version": 2,
+  "character": "Koliani",
+  "animation": "hurt",
+  "frame_count": 2,
+  "canvas_width": 128,
+  "canvas_height": 128,
+  "pivot_x": 64,
+  "pivot_y": 104,
+  "baseline_y": 103,
+  "baseline_tolerance": 1,
+  "max_scale_ratio": 1.25,
+  "max_bbox_drift": 14,
+  "asset_type": "BODY",
+  "expected_alpha": true,
+  "vfx_separate": true,
+  "reference_path": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+  "reference_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+  "authority": [
+    {
+      "file": "koliani_golden_set_approved.png",
+      "sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4"
+    }
+  ],
+  "visual_review_state": "DERIVED_FROM_GAME_MASTER_APPROVED_GOLDEN_SET",
+  "runtime_integration_state": "INTEGRATED_9B4",
+  "frames": [
+    "hurt_001.png",
+    "hurt_002.png"
+  ],
+  "normalization_scale": 0.3975,
+  "max_pixel_count_ratio": 1.45,
+  "source_image": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+  "source_sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4",
+  "godot": {
+    "scale": 1.0,
+    "offset": [
+      0,
+      -18
+    ]
+  },
+  "derivation": [
+    {
+      "frame": "hurt_001.png",
+      "source": "assets/sprites/koliani_golden_set/frames/fall/fall_001.png",
+      "source_sha256": "8b2cd2ad8d4fb4263507751720e903d6b2ca8396604fa64d3464d1a03e364ff9",
+      "operation": "copy (byte-identical)"
+    },
+    {
+      "frame": "hurt_002.png",
+      "source": "assets/sprites/koliani_golden_set/frames/fall/fall_002.png",
+      "source_sha256": "20d6bb86e894119291c119bbe57c6e75efa44a3da04962d6b89bb93ec8f1f447",
+      "operation": "copy (byte-identical)"
+    }
+  ]
+}
