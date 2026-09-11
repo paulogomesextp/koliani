@@ -62,6 +62,7 @@ func _correr_tudo() -> void:
 	teste_execution_7_guardioes_e_boss_regional()
 	teste_execution_8_integracao_player_facing()
 	teste_execution_9b4_pacote_golden_sem_legado()
+	teste_execution_9c_kit_ambiente_regiao1()
 	teste_level_session_begin()
 	teste_level_session_stable_checkpoint_identity()
 	teste_level_session_checkpoint_activation_repeated()
@@ -1301,8 +1302,11 @@ func teste_execution_8_integracao_player_facing() -> void:
 		var visual := nivel.get_node_or_null("Region1HybridVisualTarget")
 		_ok(visual != null and bool(visual.get("ativo")),
 			"Execution 8: panorama aprovado não ativo em L%d" % (i + 1))
-		_ok(i == 0 or bool(visual.get("apenas_panorama_aprovado")),
-			"Execution 8: L%d devia reutilizar apenas o panorama aprovado" % (i + 1))
+		# Execution 9C: os cinco níveis montam o kit inteiro, cada um com a sua
+		# variante de cenário da prancha 08.
+		_ok(visual != null and not bool(visual.get("apenas_panorama_aprovado"))
+			and int(visual.get("perfil")) == i + 1,
+			"Execution 9C: L%d devia montar o kit com perfil %d" % [i + 1, i + 1])
 		nivel.free()
 
 	var menu := FileAccess.get_file_as_string("res://scripts/menu_inicial.gd")
@@ -1319,6 +1323,46 @@ func teste_execution_8_integracao_player_facing() -> void:
 ## Execution 9B.4: na Região I todos os estados da Koliani saem do Golden Set.
 ## Monta a Koliani do L1 a sério (o `_ready` constrói o SpriteFrames) e exige
 ## que TODAS as animações e TODOS os frames venham de `koliani_golden_set`.
+## Execution 9C: na Região I o terreno sai do kit de produção (pranchas 08/10),
+## não do terreno CC0; sem o nó do kit, a mesma plataforma volta ao legado
+## (os outros 95 níveis também usam o bioma "floresta").
+func teste_execution_9c_kit_ambiente_regiao1() -> void:
+	var nivel := (load("res://scenes/levels/Floresta_Putrefata.tscn") as PackedScene).instantiate()
+	get_tree().root.add_child(nivel)
+	var chao := nivel.get_node_or_null("ChaoInicio")
+	var caminhos: Array[String] = []
+	if chao:
+		for f in chao.get_node("Visual").get_children():
+			if f is Sprite2D and f.texture and f.texture.resource_path != "":
+				caminhos.append(f.texture.resource_path)
+	var do_kit := caminhos.filter(func(c: String) -> bool: return c.contains("/kit_9c/"))
+	var legado := caminhos.filter(func(c: String) -> bool: return c.contains("pixel/terreno"))
+	_ok(do_kit.size() >= 4 and legado.is_empty(),
+		"Execution 9C: L1 não usa o terreno do kit (%s)" % str(caminhos))
+	var alvo := nivel.get_node_or_null("Region1HybridVisualTarget")
+	_ok(alvo != null and alvo.get_node_or_null("Camada3Distante") != null
+		and alvo.get_node_or_null("Camada2Floresta") != null
+		and alvo.get_node_or_null("BackgroundApproved08") != null,
+		"Execution 9C: faltam camadas de parallax da 08 no L1")
+	nivel.free()
+
+	var solta := (load("res://scenes/actors/Plataforma.tscn") as PackedScene).instantiate()
+	solta.tamanho = Vector2(300, 40)
+	get_tree().root.add_child(solta)
+	var usa_legado := false
+	for f in solta.get_node("Visual").get_children():
+		if f is Sprite2D and f.texture and f.texture.resource_path.contains("pixel/terreno"):
+			usa_legado = true
+	_ok(usa_legado, "Execution 9C: fora da Região I a plataforma devia manter o terreno legado")
+	solta.free()
+
+	# As peças do kit estão todas no manifesto, com o SHA certo.
+	var man: Variant = JSON.parse_string(FileAccess.get_file_as_string(
+		"res://assets/art/regions/region_01_forest/production/kit_9c/kit_9c_manifest.json"))
+	_ok(man is Dictionary and (man["ativos"] as Array).size() >= 30,
+		"Execution 9C: manifesto do kit em falta ou incompleto")
+
+
 func teste_execution_9b4_pacote_golden_sem_legado() -> void:
 	var cena := load("res://scenes/levels/Floresta_Putrefata.tscn") as PackedScene
 	var nivel := cena.instantiate()

@@ -59,6 +59,7 @@ seed_ambiente = 1000
 ; regressa à apresentação anterior sem tocar em gameplay ou geometria.
 [node name="Region1HybridVisualTarget" parent="." instance=ExtResource("100_target")]
 ativo = true
+perfil = 1
 
 ; --- pantano mortal por baixo de todo o nivel -------------------------
 [node name="PantanoMortal" parent="." instance=ExtResource("12_agua")]

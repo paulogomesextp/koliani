@@ -27,6 +27,9 @@ extends StaticBody2D
 ## "atmosfera" (o raiz de Atmosfera.tscn). Sem esse no, cai em "floresta".
 
 const DIR_TERRENO := "res://assets/sprites/pixel/terreno"
+## Execution 9C: na Região I o terreno e os props vêm do kit de produção
+## derivado das pranchas aprovadas (ver `regiao1_kit.gd`). Fora dela, o legado.
+const Kit := preload("res://scripts/regiao1_kit.gd")
 
 ## Linha da superficie dentro de `topo.png` -- a capa assenta com esta linha
 ## em cima do topo da colisao, e o que fica acima e' balanco (ver
@@ -174,7 +177,8 @@ func _aplicar() -> void:
 	var dx := float(rng.randi_range(0, 191))
 	var dy := float(rng.randi_range(0, 191))
 
-	var corpo := _tex(bioma, "corpo")
+	var kit := Kit.alvo(self)
+	var corpo: Texture2D = Kit.tex("terreno/terreno_corpo.png") if kit else _tex(bioma, "corpo")
 	if corpo == null:                        # terreno por gerar -> nao pinta nada
 		return
 
@@ -190,7 +194,8 @@ func _aplicar() -> void:
 	vis.add_child(som)
 
 	# 3. cortes laterais
-	var lado := _tex(bioma, "lado")
+	# (o lado do kit tem o contorno na coluna 10: fica 2 px para fora da colisao)
+	var lado: Texture2D = Kit.tex("terreno/terreno_lado.png") if kit else _tex(bioma, "lado")
 	if lado:
 		var le := _mosaico(lado, Vector2(x0 - 12.0, y0), Vector2(16.0, alt), Vector2(0, dy))
 		vis.add_child(le)
@@ -199,19 +204,26 @@ func _aplicar() -> void:
 		vis.add_child(ld)
 
 	# 4. franja de baixo -- so' quando a plataforma tem corpo que valha a pena
-	var base := _tex(bioma, "base")
+	var base: Texture2D = Kit.tex("terreno/terreno_base.png") if kit else _tex(bioma, "base")
 	if base and alt >= 26.0:
-		vis.add_child(_mosaico(base, Vector2(x0, y0 + alt), Vector2(largura, 24.0), Vector2(dx, 0)))
+		# a franja do kit comeca 12 px acima do fim do bloco (sao as pedras
+		# arredondadas de baixo, nao um remate solto)
+		var yb := y0 + alt - (12.0 if kit else 0.0)
+		vis.add_child(_mosaico(base, Vector2(x0, yb), Vector2(largura, 24.0), Vector2(dx, 0)))
 
 	# 5. a capa, por cima de tudo (e a sobressair para cima do plano de pouso)
-	var topo := _tex(bioma, "topo")
+	var topo: Texture2D = Kit.topo(rng) if kit else _tex(bioma, "topo")
 	if topo:
 		vis.add_child(_mosaico(topo, Vector2(x0, y0 - SUPERFICIE), Vector2(largura, 32.0), Vector2(dx, 0)))
 
 	# 6. o que POUSA em cima -- cogumelos, lapides, caixotes, cristais...
-	_decorar(vis, bioma, largura, y0, rng)
-
 	# 7. o que PENDE por baixo -- raizes, correntes, estalactites
+	if kit:
+		Kit.decorar(vis, largura, y0, rng, Kit.perfil_de(kit))
+		if alt >= PENDURA_ALT_MIN:
+			Kit.pendurar(vis, largura, y0 + alt, alt >= PENDURA_ALT_GROSSA, rng)
+		return
+	_decorar(vis, bioma, largura, y0, rng)
 	if alt >= PENDURA_ALT_MIN:
 		_pendurar(vis, bioma, largura, y0 + alt, alt >= PENDURA_ALT_GROSSA, rng)
 

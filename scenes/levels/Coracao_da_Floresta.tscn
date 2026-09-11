@@ -57,7 +57,7 @@ seed_ambiente = 1148
 
 ; Execution 8 — panorama aprovado da Região I, sem formas específicas do L1.
 [node name="Region1HybridVisualTarget" parent="." instance=ExtResource("100_target")]
-apenas_panorama_aprovado = true
+perfil = 5
 limite_direito = 3450.0
 
 [node name="Podridao" parent="." instance=ExtResource("11_agua")]

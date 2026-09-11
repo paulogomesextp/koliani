@@ -9,6 +9,8 @@ extends AnimatableBody2D
 ## `desvanecer()` / `reaparecer()`. Todas entram no grupo
 ## "plataformas_flutuantes".
 
+const Kit := preload("res://scripts/regiao1_kit.gd")
+
 @export var largura := 150.0 : set = _set_largura
 ## Amplitude e período do baloiço vertical (px / segundos).
 @export var balanco := 10.0
@@ -84,3 +86,48 @@ func _reconstruir() -> void:
 		Vector2(hw - 8, 16), Vector2(-hw + 8, 16),
 	])
 	_visual.vertex_colors = PackedColorArray([cor_topo, cor_topo, cor_base, cor_base])
+	_vestir_kit_regiao1(hw)
+
+
+## Execution 9C: na Região I a laje deixa de ser um trapézio chapado e passa a
+## ser um degrau de pedra do kit de produção. O `Polygon2D` fica (a Morvanna
+## desvanece-o pelo `modulate`, que os filhos herdam), mas sem cor própria.
+func _vestir_kit_regiao1(hw: float) -> void:
+	for f in _visual.get_children():
+		if f.has_meta("kit_9c"):
+			f.free()
+	if Kit.alvo(self) == null:
+		_visual.self_modulate.a = 1.0
+		return
+	_visual.self_modulate.a = 0.0
+	var pecas := [
+		# textura, posição, tamanho
+		[Kit.tex("terreno/terreno_corpo.png"), Vector2(-hw, -10.0), Vector2(largura, 20.0)],
+		[Kit.tex("terreno/terreno_base.png"), Vector2(-hw, -2.0), Vector2(largura, 24.0)],
+		[Kit.tex("terreno/terreno_topo.png"), Vector2(-hw, -18.0), Vector2(largura, 32.0)],
+	]
+	for p: Array in pecas:
+		if p[0] == null:
+			continue
+		var s := Sprite2D.new()
+		s.texture = p[0]
+		s.centered = false
+		s.texture_repeat = CanvasItem.TEXTURE_REPEAT_ENABLED
+		s.region_enabled = true
+		s.region_rect = Rect2(Vector2(absf(fase) * 37.0, 0.0), p[2])
+		s.position = p[1]
+		s.set_meta("kit_9c", true)
+		_visual.add_child(s)
+	var lado: Texture2D = Kit.tex("terreno/terreno_lado.png")
+	if lado:
+		for dir in [-1.0, 1.0]:
+			var l := Sprite2D.new()
+			l.texture = lado
+			l.centered = false
+			l.texture_repeat = CanvasItem.TEXTURE_REPEAT_ENABLED
+			l.region_enabled = true
+			l.region_rect = Rect2(0, 0, 16, 26)
+			l.position = Vector2(-hw - 12.0, -10.0) if dir < 0.0 else Vector2(hw + 12.0, -10.0)
+			l.scale.x = 1.0 if dir < 0.0 else -1.0
+			l.set_meta("kit_9c", true)
+			_visual.add_child(l)

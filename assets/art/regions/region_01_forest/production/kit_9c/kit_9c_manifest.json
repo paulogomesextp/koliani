@@ -1,0 +1,895 @@
+{
+  "kit_id": "region_01_floresta_corrompida_9c",
+  "execution": "9C",
+  "autoridade": {
+    "regiao": "08_REGION_I_ART_KIT_BACKGROUNDS_PARALLAX_v1_0.png",
+    "sha256": "840cfd8241a54f7bab0be58ab96892eba8438517888e490587451339b23263a7",
+    "tamanho": [
+      1536,
+      1024
+    ],
+    "modo": "RGB"
+  },
+  "referencia_estrutural": {
+    "ficheiro": "10_PRODUCTION_PACK_v8_ENV_LIGHT_ATMOSPHERE.png",
+    "sha256": "86087e523990a882f2c23c98596265e5afbd5567dfd0c3be02399ecdf0b7b6f6",
+    "nota": "tileset e elementos soltos; a luz de dia e o nome 'Floresta Sagrada' não são canónicos -- tudo o que vem daqui é graduado para a noite da 08"
+  },
+  "graduacao_10_para_08": {
+    "origem_media": [
+      61.4,
+      75.71,
+      58.41
+    ],
+    "origem_desvio": [
+      67.23,
+      62.68,
+      37.66
+    ],
+    "alvo_media": [
+      24.69,
+      31.88,
+      34.09
+    ],
+    "alvo_desvio": [
+      42.78,
+      39.92,
+      33.25
+    ],
+    "amostras_alvo_08": [
+      [
+        14,
+        853,
+        210,
+        900
+      ],
+      [
+        454,
+        820,
+        546,
+        887
+      ]
+    ]
+  },
+  "tintas_por_mood_08": {
+    "entrada": [
+      1.18,
+      1.143,
+      0.85
+    ],
+    "ruinas": [
+      1.18,
+      1.052,
+      0.85
+    ],
+    "cascatas": [
+      1.158,
+      1.143,
+      1.039
+    ],
+    "coracao": [
+      1.18,
+      0.85,
+      0.938
+    ]
+  },
+  "ativos": [
+    {
+      "id": "terreno_topo",
+      "ficheiro": "terreno/terreno_topo.png",
+      "categoria": "terrain_top",
+      "fonte": "10_PRODUCTION_PACK_v8_ENV_LIGHT_ATMOSPHERE.png",
+      "fonte_sha256": "86087e523990a882f2c23c98596265e5afbd5567dfd0c3be02399ecdf0b7b6f6",
+      "caixa_na_prancha": [
+        21,
+        97,
+        107,
+        204
+      ],
+      "operacoes": [
+        "chave_fundo(0,27,36;34)",
+        "graduar(10->08;0.65)",
+        "linhas -1..31 (superficie na linha 8)",
+        "continuo_x(10)"
+      ],
+      "tamanho": [
+        62,
+        32
+      ],
+      "modo": "RGBA",
+      "mosaico": "x",
+      "sha256": "532657cab1e47abdec723963a163655cf8f15941dbade8f996ae109490f625f4",
+      "uso": "Capa do terreno: musgo e 1.ª fiada de pedra; superfície de pouso na linha 8."
+    },
+    {
+      "id": "terreno_corpo",
+      "ficheiro": "terreno/terreno_corpo.png",
+      "categoria": "terrain_body",
+      "fonte": "10_PRODUCTION_PACK_v8_ENV_LIGHT_ATMOSPHERE.png",
+      "fonte_sha256": "86087e523990a882f2c23c98596265e5afbd5567dfd0c3be02399ecdf0b7b6f6",
+      "caixa_na_prancha": [
+        193,
+        101,
+        243,
+        201
+      ],
+      "operacoes": [
+        "chave_fundo(0,27,36;34)",
+        "graduar(10->08;0.65)",
+        "miolo do bloco PAREDES",
+        "continuo_x(8)",
+        "continuo_y(8)",
+        "argamassa opaca"
+      ],
+      "tamanho": [
+        30,
+        75
+      ],
+      "modo": "RGBA",
+      "mosaico": "xy",
+      "sha256": "7ca063878e9b2035511997835c818aa9429525841b0e5ddc056078b246f76857",
+      "uso": "Miolo de pedra do terreno, em mosaico nos dois eixos."
+    },
+    {
+      "id": "terreno_lado",
+      "ficheiro": "terreno/terreno_lado.png",
+      "categoria": "terrain_edge",
+      "fonte": "10_PRODUCTION_PACK_v8_ENV_LIGHT_ATMOSPHERE.png",
+      "fonte_sha256": "86087e523990a882f2c23c98596265e5afbd5567dfd0c3be02399ecdf0b7b6f6",
+      "caixa_na_prancha": [
+        21,
+        97,
+        107,
+        204
+      ],
+      "operacoes": [
+        "chave_fundo(0,27,36;34)",
+        "graduar(10->08;0.65)",
+        "contorno esquerdo na coluna 10",
+        "continuo_y(8)"
+      ],
+      "tamanho": [
+        16,
+        57
+      ],
+      "modo": "RGBA",
+      "mosaico": "y",
+      "sha256": "36f416b0be91b3e8de87865505a82bbab4c4fba4ea14930d377e8b68a4c858fe",
+      "uso": "Remate lateral (esquerdo; o direito é o mesmo espelhado)."
+    },
+    {
+      "id": "terreno_base",
+      "ficheiro": "terreno/terreno_base.png",
+      "categoria": "terrain_bottom",
+      "fonte": "10_PRODUCTION_PACK_v8_ENV_LIGHT_ATMOSPHERE.png",
+      "fonte_sha256": "86087e523990a882f2c23c98596265e5afbd5567dfd0c3be02399ecdf0b7b6f6",
+      "caixa_na_prancha": [
+        21,
+        97,
+        107,
+        204
+      ],
+      "operacoes": [
+        "chave_fundo(0,27,36;34)",
+        "graduar(10->08;0.65)",
+        "remate inferior",
+        "continuo_x(10)"
+      ],
+      "tamanho": [
+        62,
+        24
+      ],
+      "modo": "RGBA",
+      "mosaico": "x",
+      "sha256": "91c4562fa7dbcaa41af38a2d04ce19692e6b3b2b5cf5d5dfea45788124033dcb",
+      "uso": "Remate inferior: as pedras arredondadas onde o bloco acaba."
+    },
+    {
+      "id": "terreno_topo_erva",
+      "ficheiro": "terreno/terreno_topo_erva.png",
+      "categoria": "terrain_top",
+      "fonte": "10_PRODUCTION_PACK_v8_ENV_LIGHT_ATMOSPHERE.png",
+      "fonte_sha256": "86087e523990a882f2c23c98596265e5afbd5567dfd0c3be02399ecdf0b7b6f6",
+      "caixa_na_prancha": [
+        21,
+        266,
+        106,
+        308
+      ],
+      "operacoes": [
+        "chave_fundo(0,27,36;34)",
+        "graduar(10->08;0.65)",
+        "superficie na linha 8",
+        "continuo_x(10)"
+      ],
+      "tamanho": [
+        61,
+        32
+      ],
+      "modo": "RGBA",
+      "mosaico": "x",
+      "sha256": "fc4c7ae1d7803ca385218b584313a4028515ed40080c823f2d6f82aeefc03007",
+      "uso": "Variante da capa com erva alta, para as plataformas não serem todas iguais."
+    },
+    {
+      "id": "vinha_a",
+      "ficheiro": "props/vinha_a.png",
+      "categoria": "vegetation",
+      "fonte": "10_PRODUCTION_PACK_v8_ENV_LIGHT_ATMOSPHERE.png",
+      "fonte_sha256": "86087e523990a882f2c23c98596265e5afbd5567dfd0c3be02399ecdf0b7b6f6",
+      "caixa_na_prancha": [
+        439,
+        231,
+        465,
+        287
+      ],
+      "operacoes": [
+        "chave_fundo(0,27,36;34)",
+        "tirar_aureola",
+        "graduar(10->08;0.65)",
+        "aparar"
+      ],
+      "tamanho": [
+        22,
+        53
+      ],
+      "modo": "RGBA",
+      "mosaico": "",
+      "sha256": "f21ed6357544a370f4240db7ba3b67c8da1425b3248032328e28066c40e1b5b2",
+      "uso": "Vinha curta pendurada. [onde=pendurado]"
+    },
+    {
+      "id": "vinha_b",
+      "ficheiro": "props/vinha_b.png",
+      "categoria": "vegetation",
+      "fonte": "10_PRODUCTION_PACK_v8_ENV_LIGHT_ATMOSPHERE.png",
+      "fonte_sha256": "86087e523990a882f2c23c98596265e5afbd5567dfd0c3be02399ecdf0b7b6f6",
+      "caixa_na_prancha": [
+        468,
+        232,
+        494,
+        284
+      ],
+      "operacoes": [
+        "chave_fundo(0,27,36;34)",
+        "tirar_aureola",
+        "graduar(10->08;0.65)",
+        "aparar"
+      ],
+      "tamanho": [
+        24,
+        50
+      ],
+      "modo": "RGBA",
+      "mosaico": "",
+      "sha256": "436e9a322585f1d8c0cb25eb47a857f8641353455838e32f5d347c244d443bc8",
+      "uso": "Vinha curta pendurada. [onde=pendurado]"
+    },
+    {
+      "id": "vinha_longa",
+      "ficheiro": "props/vinha_longa.png",
+      "categoria": "vegetation",
+      "fonte": "10_PRODUCTION_PACK_v8_ENV_LIGHT_ATMOSPHERE.png",
+      "fonte_sha256": "86087e523990a882f2c23c98596265e5afbd5567dfd0c3be02399ecdf0b7b6f6",
+      "caixa_na_prancha": [
+        536,
+        599,
+        587,
+        689
+      ],
+      "operacoes": [
+        "chave_fundo(0,27,36;34)",
+        "tirar_aureola",
+        "graduar(10->08;0.65)",
+        "aparar"
+      ],
+      "tamanho": [
+        48,
+        89
+      ],
+      "modo": "RGBA",
+      "mosaico": "",
+      "sha256": "42115b582a05f58edfc936c7e4e1806acd69318a3b7e7c32f66335b546cfe481",
+      "uso": "Cortina de vinhas. [onde=pendurado]"
+    },
+    {
+      "id": "plantas",
+      "ficheiro": "props/plantas.png",
+      "categoria": "vegetation",
+      "fonte": "10_PRODUCTION_PACK_v8_ENV_LIGHT_ATMOSPHERE.png",
+      "fonte_sha256": "86087e523990a882f2c23c98596265e5afbd5567dfd0c3be02399ecdf0b7b6f6",
+      "caixa_na_prancha": [
+        158,
+        602,
+        274,
+        686
+      ],
+      "operacoes": [
+        "chave_fundo(0,27,36;34)",
+        "tirar_aureola",
+        "graduar(10->08;0.65)",
+        "aparar"
+      ],
+      "tamanho": [
+        114,
+        82
+      ],
+      "modo": "RGBA",
+      "mosaico": "",
+      "sha256": "3227a16a00a68a55621b96ddb75e70efd2618fed406701a75f833706e6c0e3ff",
+      "uso": "Tufo de plantas e flor. [onde=chao]"
+    },
+    {
+      "id": "cogumelos",
+      "ficheiro": "props/cogumelos.png",
+      "categoria": "bioluminescence",
+      "fonte": "10_PRODUCTION_PACK_v8_ENV_LIGHT_ATMOSPHERE.png",
+      "fonte_sha256": "86087e523990a882f2c23c98596265e5afbd5567dfd0c3be02399ecdf0b7b6f6",
+      "caixa_na_prancha": [
+        282,
+        620,
+        351,
+        689
+      ],
+      "operacoes": [
+        "chave_fundo(0,27,36;34)",
+        "tirar_aureola",
+        "graduar(10->08;0.45)",
+        "aparar"
+      ],
+      "tamanho": [
+        65,
+        67
+      ],
+      "modo": "RGBA",
+      "mosaico": "",
+      "sha256": "04d3cbc4b2c6b63351a035b030b0fb062abe375dcd287246789cde13fecae698",
+      "uso": "Cogumelos com o chapéu aceso (acento quente). [onde=chao]"
+    },
+    {
+      "id": "rocha",
+      "ficheiro": "props/rocha.png",
+      "categoria": "rocks",
+      "fonte": "10_PRODUCTION_PACK_v8_ENV_LIGHT_ATMOSPHERE.png",
+      "fonte_sha256": "86087e523990a882f2c23c98596265e5afbd5567dfd0c3be02399ecdf0b7b6f6",
+      "caixa_na_prancha": [
+        356,
+        604,
+        436,
+        685
+      ],
+      "operacoes": [
+        "chave_fundo(0,27,36;34)",
+        "tirar_aureola",
+        "graduar(10->08;0.65)",
+        "aparar"
+      ],
+      "tamanho": [
+        76,
+        79
+      ],
+      "modo": "RGBA",
+      "mosaico": "",
+      "sha256": "2ab3c70afd6d6639eba3eecd2d73a75d933d1f0438b5f3573771d05ac5de8ca5",
+      "uso": "Rocha com musgo. [onde=chao]"
+    },
+    {
+      "id": "raizes",
+      "ficheiro": "props/raizes.png",
+      "categoria": "roots",
+      "fonte": "10_PRODUCTION_PACK_v8_ENV_LIGHT_ATMOSPHERE.png",
+      "fonte_sha256": "86087e523990a882f2c23c98596265e5afbd5567dfd0c3be02399ecdf0b7b6f6",
+      "caixa_na_prancha": [
+        442,
+        605,
+        526,
+        688
+      ],
+      "operacoes": [
+        "chave_fundo(0,27,36;34)",
+        "tirar_aureola",
+        "graduar(10->08;0.65)",
+        "aparar"
+      ],
+      "tamanho": [
+        81,
+        81
+      ],
+      "modo": "RGBA",
+      "mosaico": "",
+      "sha256": "64559a053de150cd94548c723a45ba7bf17db75acb02a2ab49f6aa17dd17e26b",
+      "uso": "Toco e raízes monumentais. [onde=chao]"
+    },
+    {
+      "id": "planta_luminosa",
+      "ficheiro": "props/planta_luminosa.png",
+      "categoria": "bioluminescence",
+      "fonte": "10_PRODUCTION_PACK_v8_ENV_LIGHT_ATMOSPHERE.png",
+      "fonte_sha256": "86087e523990a882f2c23c98596265e5afbd5567dfd0c3be02399ecdf0b7b6f6",
+      "caixa_na_prancha": [
+        594,
+        602,
+        658,
+        686
+      ],
+      "operacoes": [
+        "chave_fundo(0,27,36;34)",
+        "tirar_aureola",
+        "graduar(10->08;0.35)",
+        "aparar"
+      ],
+      "tamanho": [
+        58,
+        66
+      ],
+      "modo": "RGBA",
+      "mosaico": "",
+      "sha256": "fdf721d4c1e53c0b7e9d51c3ef453a4a4c66a9ebdc7100562c2a4b7b8b70e7a3",
+      "uso": "Planta luminosa violeta (bioluminescência controlada). [onde=chao]"
+    },
+    {
+      "id": "lanterna",
+      "ficheiro": "props/lanterna.png",
+      "categoria": "lanterns",
+      "fonte": "10_PRODUCTION_PACK_v8_ENV_LIGHT_ATMOSPHERE.png",
+      "fonte_sha256": "86087e523990a882f2c23c98596265e5afbd5567dfd0c3be02399ecdf0b7b6f6",
+      "caixa_na_prancha": [
+        666,
+        262,
+        709,
+        316
+      ],
+      "operacoes": [
+        "chave_fundo(0,27,36;34)",
+        "tirar_aureola",
+        "graduar(10->08;0.3)",
+        "aparar"
+      ],
+      "tamanho": [
+        43,
+        53
+      ],
+      "modo": "RGBA",
+      "mosaico": "",
+      "sha256": "2d4c0645fb151dcef3ac61ea79e7f9555e6865964ce3f7f16c85cc7ce13d36d2",
+      "uso": "Lanterna de ferro, luz quente. [onde=chao]"
+    },
+    {
+      "id": "tocha",
+      "ficheiro": "props/tocha.png",
+      "categoria": "lanterns",
+      "fonte": "10_PRODUCTION_PACK_v8_ENV_LIGHT_ATMOSPHERE.png",
+      "fonte_sha256": "86087e523990a882f2c23c98596265e5afbd5567dfd0c3be02399ecdf0b7b6f6",
+      "caixa_na_prancha": [
+        632,
+        241,
+        673,
+        316
+      ],
+      "operacoes": [
+        "chave_fundo(0,27,36;34)",
+        "tirar_aureola",
+        "graduar(10->08;0.3)",
+        "aparar"
+      ],
+      "tamanho": [
+        41,
+        73
+      ],
+      "modo": "RGBA",
+      "mosaico": "",
+      "sha256": "744c1d7875da9890bf770eba9987cab839b915bb52e28b4a800ba7c4cec4ebdd",
+      "uso": "Poste com chama, luz quente. [onde=chao]"
+    },
+    {
+      "id": "ruina",
+      "ficheiro": "props/ruina.png",
+      "categoria": "ruins",
+      "fonte": "10_PRODUCTION_PACK_v8_ENV_LIGHT_ATMOSPHERE.png",
+      "fonte_sha256": "86087e523990a882f2c23c98596265e5afbd5567dfd0c3be02399ecdf0b7b6f6",
+      "caixa_na_prancha": [
+        637,
+        104,
+        739,
+        215
+      ],
+      "operacoes": [
+        "chave_fundo(0,27,36;34)",
+        "tirar_aureola",
+        "graduar(10->08;0.65)",
+        "aparar"
+      ],
+      "tamanho": [
+        100,
+        109
+      ],
+      "modo": "RGBA",
+      "mosaico": "",
+      "sha256": "0a9334a38ad572b53e324855be850b8dc6ea34021e8886d6230d572734d9416a",
+      "uso": "Ruína de pedra (plano de fundo). [onde=fundo]"
+    },
+    {
+      "id": "cascata",
+      "ficheiro": "props/cascata.png",
+      "categoria": "waterfalls",
+      "fonte": "10_PRODUCTION_PACK_v8_ENV_LIGHT_ATMOSPHERE.png",
+      "fonte_sha256": "86087e523990a882f2c23c98596265e5afbd5567dfd0c3be02399ecdf0b7b6f6",
+      "caixa_na_prancha": [
+        864,
+        98,
+        948,
+        215
+      ],
+      "operacoes": [
+        "chave_fundo(0,27,36;34)",
+        "tirar_aureola",
+        "graduar(10->08;0.5)",
+        "aparar"
+      ],
+      "tamanho": [
+        81,
+        113
+      ],
+      "modo": "RGBA",
+      "mosaico": "",
+      "sha256": "2d94b9c4711f16cad6119ebd29b9838194fc96c6fe1e75fd37b632b81e948724",
+      "uso": "Cascata entre rochedos. [onde=fundo]"
+    },
+    {
+      "id": "cristal_corrupcao_a",
+      "ficheiro": "corrupcao/cristal_corrupcao_a.png",
+      "categoria": "corruption",
+      "fonte": "08_REGION_I_ART_KIT_BACKGROUNDS_PARALLAX_v1_0.png",
+      "fonte_sha256": "840cfd8241a54f7bab0be58ab96892eba8438517888e490587451339b23263a7",
+      "caixa_na_prancha": [
+        16,
+        737,
+        67,
+        773
+      ],
+      "operacoes": [
+        "chave_matiz_magenta(+contorno 1px)",
+        "aparar"
+      ],
+      "tamanho": [
+        52,
+        35
+      ],
+      "modo": "RGBA",
+      "mosaico": "",
+      "sha256": "eda2ad0916fff3827f90b78b22701a628b92ab4aaf651a622a82b3bc1bc45e96",
+      "uso": "Cristal de corrupção magenta/violeta/preto. [onde=chao]"
+    },
+    {
+      "id": "cristal_corrupcao_b",
+      "ficheiro": "corrupcao/cristal_corrupcao_b.png",
+      "categoria": "corruption",
+      "fonte": "08_REGION_I_ART_KIT_BACKGROUNDS_PARALLAX_v1_0.png",
+      "fonte_sha256": "840cfd8241a54f7bab0be58ab96892eba8438517888e490587451339b23263a7",
+      "caixa_na_prancha": [
+        471,
+        779,
+        543,
+        818
+      ],
+      "operacoes": [
+        "chave_matiz_magenta(+contorno 1px)",
+        "aparar"
+      ],
+      "tamanho": [
+        71,
+        39
+      ],
+      "modo": "RGBA",
+      "mosaico": "",
+      "sha256": "75cbff8e4cf5ef19ce0816718c4093c77e46d4604202ff4e0723b59e3d6381fe",
+      "uso": "Cristal de corrupção magenta/violeta/preto. [onde=chao]"
+    },
+    {
+      "id": "cristal_corrupcao_c",
+      "ficheiro": "corrupcao/cristal_corrupcao_c.png",
+      "categoria": "corruption",
+      "fonte": "08_REGION_I_ART_KIT_BACKGROUNDS_PARALLAX_v1_0.png",
+      "fonte_sha256": "840cfd8241a54f7bab0be58ab96892eba8438517888e490587451339b23263a7",
+      "caixa_na_prancha": [
+        421,
+        900,
+        454,
+        930
+      ],
+      "operacoes": [
+        "chave_matiz_magenta(+contorno 1px)",
+        "aparar"
+      ],
+      "tamanho": [
+        33,
+        30
+      ],
+      "modo": "RGBA",
+      "mosaico": "",
+      "sha256": "5ea76e9e9ba9d63e75588aff3dc95185b8f613a17e67d9cff56192f8522cc580",
+      "uso": "Cristal de corrupção magenta/violeta/preto. [onde=chao]"
+    },
+    {
+      "id": "cristal_corrupcao_d",
+      "ficheiro": "corrupcao/cristal_corrupcao_d.png",
+      "categoria": "corruption",
+      "fonte": "08_REGION_I_ART_KIT_BACKGROUNDS_PARALLAX_v1_0.png",
+      "fonte_sha256": "840cfd8241a54f7bab0be58ab96892eba8438517888e490587451339b23263a7",
+      "caixa_na_prancha": [
+        140,
+        820,
+        167,
+        845
+      ],
+      "operacoes": [
+        "chave_matiz_magenta(+contorno 1px)",
+        "aparar"
+      ],
+      "tamanho": [
+        26,
+        24
+      ],
+      "modo": "RGBA",
+      "mosaico": "",
+      "sha256": "00d41cc5c883ac4e8acb514c4993393581ca622410ad54a2af813eb5eb8b89d6",
+      "uso": "Cristal de corrupção magenta/violeta/preto. [onde=chao]"
+    },
+    {
+      "id": "faisca_corrupcao",
+      "ficheiro": "corrupcao/faisca_corrupcao.png",
+      "categoria": "corruption_particle",
+      "fonte": "08_REGION_I_ART_KIT_BACKGROUNDS_PARALLAX_v1_0.png",
+      "fonte_sha256": "840cfd8241a54f7bab0be58ab96892eba8438517888e490587451339b23263a7",
+      "caixa_na_prancha": [
+        1219,
+        752,
+        1230,
+        763
+      ],
+      "operacoes": [
+        "alfa_por_luz(1.0; piso 0.3)"
+      ],
+      "tamanho": [
+        11,
+        11
+      ],
+      "modo": "RGBA",
+      "mosaico": "",
+      "sha256": "680036f19aee67447b9d470daf9048f79a8bc97c353dfccbb6cbc05f585f2503",
+      "uso": "Textura das partículas de corrupção."
+    },
+    {
+      "id": "fundo_montanhas",
+      "ficheiro": "fundo/fundo_montanhas.png",
+      "categoria": "background_element",
+      "fonte": "08_REGION_I_ART_KIT_BACKGROUNDS_PARALLAX_v1_0.png",
+      "fonte_sha256": "840cfd8241a54f7bab0be58ab96892eba8438517888e490587451339b23263a7",
+      "caixa_na_prancha": [
+        1117,
+        402,
+        1308,
+        446
+      ],
+      "operacoes": [
+        "chave_fundo(7,16,25;24)",
+        "limpar_salpicos(40)",
+        "aparar"
+      ],
+      "tamanho": [
+        191,
+        43
+      ],
+      "modo": "RGBA",
+      "mosaico": "",
+      "sha256": "6b77ff539e6d204764cd74f334c093a5794d89878b7ebeed3a787c0ed8819aad",
+      "uso": "Serra distante (camada 3)."
+    },
+    {
+      "id": "fundo_arco_ruina",
+      "ficheiro": "fundo/fundo_arco_ruina.png",
+      "categoria": "background_element",
+      "fonte": "08_REGION_I_ART_KIT_BACKGROUNDS_PARALLAX_v1_0.png",
+      "fonte_sha256": "840cfd8241a54f7bab0be58ab96892eba8438517888e490587451339b23263a7",
+      "caixa_na_prancha": [
+        1311,
+        402,
+        1386,
+        489
+      ],
+      "operacoes": [
+        "chave_fundo(7,16,25;24)",
+        "limpar_salpicos(40)",
+        "aparar"
+      ],
+      "tamanho": [
+        75,
+        87
+      ],
+      "modo": "RGBA",
+      "mosaico": "",
+      "sha256": "bc5588559d974c02078396992689829af1adb41501b2dd4114e71f5d63ec9cce",
+      "uso": "Arco de ruína distante (camada 2/3)."
+    },
+    {
+      "id": "fundo_colunas_cascata",
+      "ficheiro": "fundo/fundo_colunas_cascata.png",
+      "categoria": "background_element",
+      "fonte": "08_REGION_I_ART_KIT_BACKGROUNDS_PARALLAX_v1_0.png",
+      "fonte_sha256": "840cfd8241a54f7bab0be58ab96892eba8438517888e490587451339b23263a7",
+      "caixa_na_prancha": [
+        1387,
+        416,
+        1437,
+        489
+      ],
+      "operacoes": [
+        "chave_fundo(7,16,25;24)",
+        "limpar_salpicos(40)",
+        "aparar"
+      ],
+      "tamanho": [
+        51,
+        72
+      ],
+      "modo": "RGBA",
+      "mosaico": "",
+      "sha256": "763bf5d917625fbf3a7695f02c1c0c9207cc3d3a5bb73ee290d31de3218acbc0",
+      "uso": "Colunas e fios de água (camada 3)."
+    },
+    {
+      "id": "fundo_cascata",
+      "ficheiro": "fundo/fundo_cascata.png",
+      "categoria": "background_element",
+      "fonte": "08_REGION_I_ART_KIT_BACKGROUNDS_PARALLAX_v1_0.png",
+      "fonte_sha256": "840cfd8241a54f7bab0be58ab96892eba8438517888e490587451339b23263a7",
+      "caixa_na_prancha": [
+        1434,
+        403,
+        1510,
+        489
+      ],
+      "operacoes": [
+        "chave_fundo(7,16,25;24)",
+        "limpar_salpicos(40)",
+        "aparar"
+      ],
+      "tamanho": [
+        76,
+        87
+      ],
+      "modo": "RGBA",
+      "mosaico": "",
+      "sha256": "010615a760667cfe9d63960e32436791d887a42378bacff2ba34b1923662c122",
+      "uso": "Cascata grande com espuma (camada 3)."
+    },
+    {
+      "id": "fundo_arvores_par",
+      "ficheiro": "fundo/fundo_arvores_par.png",
+      "categoria": "background_element",
+      "fonte": "08_REGION_I_ART_KIT_BACKGROUNDS_PARALLAX_v1_0.png",
+      "fonte_sha256": "840cfd8241a54f7bab0be58ab96892eba8438517888e490587451339b23263a7",
+      "caixa_na_prancha": [
+        1114,
+        449,
+        1312,
+        584
+      ],
+      "operacoes": [
+        "chave_escura(lum<9)",
+        "fechar_buracos",
+        "aparar"
+      ],
+      "tamanho": [
+        198,
+        133
+      ],
+      "modo": "RGBA",
+      "mosaico": "",
+      "sha256": "394bbd263b230537d71da6c62fc8c1e1a1ab23a71efd0232540f50c97b46208c",
+      "uso": "Par de árvores em silhueta (camada 2)."
+    },
+    {
+      "id": "fundo_arvore_a",
+      "ficheiro": "fundo/fundo_arvore_a.png",
+      "categoria": "background_element",
+      "fonte": "08_REGION_I_ART_KIT_BACKGROUNDS_PARALLAX_v1_0.png",
+      "fonte_sha256": "840cfd8241a54f7bab0be58ab96892eba8438517888e490587451339b23263a7",
+      "caixa_na_prancha": [
+        1307,
+        502,
+        1413,
+        584
+      ],
+      "operacoes": [
+        "chave_escura(lum<9)",
+        "fechar_buracos",
+        "aparar"
+      ],
+      "tamanho": [
+        104,
+        79
+      ],
+      "modo": "RGBA",
+      "mosaico": "",
+      "sha256": "43eb5c39eb2c32b2fe88e6469bb081f90a46db457675dfb5c44ee3a76abf3238",
+      "uso": "Árvore em silhueta (camada 2)."
+    },
+    {
+      "id": "fundo_arvore_b",
+      "ficheiro": "fundo/fundo_arvore_b.png",
+      "categoria": "background_element",
+      "fonte": "08_REGION_I_ART_KIT_BACKGROUNDS_PARALLAX_v1_0.png",
+      "fonte_sha256": "840cfd8241a54f7bab0be58ab96892eba8438517888e490587451339b23263a7",
+      "caixa_na_prancha": [
+        1414,
+        497,
+        1514,
+        584
+      ],
+      "operacoes": [
+        "chave_escura(lum<9)",
+        "fechar_buracos",
+        "aparar"
+      ],
+      "tamanho": [
+        97,
+        85
+      ],
+      "modo": "RGBA",
+      "mosaico": "",
+      "sha256": "4807f7e859fef7166766bd15683e7f1a7d877053100c37118b37794b360c1c82",
+      "uso": "Árvore em silhueta (camada 2)."
+    },
+    {
+      "id": "frente_vegetacao",
+      "ficheiro": "fundo/frente_vegetacao.png",
+      "categoria": "foreground",
+      "fonte": "08_REGION_I_ART_KIT_BACKGROUNDS_PARALLAX_v1_0.png",
+      "fonte_sha256": "840cfd8241a54f7bab0be58ab96892eba8438517888e490587451339b23263a7",
+      "caixa_na_prancha": [
+        147,
+        597,
+        1089,
+        661
+      ],
+      "operacoes": [
+        "chave_escura(lum<13)",
+        "fechar_buracos"
+      ],
+      "tamanho": [
+        942,
+        64
+      ],
+      "modo": "RGBA",
+      "mosaico": "",
+      "sha256": "6cb4bb1d99359ff17b4b059224811748679ac4a0788e65e9b47c8023bdb67cce",
+      "uso": "Silhuetas de vegetação em primeiro plano (camada 1 da 08)."
+    },
+    {
+      "id": "nevoa",
+      "ficheiro": "atmosfera/nevoa.png",
+      "categoria": "fog",
+      "fonte": "08_REGION_I_ART_KIT_BACKGROUNDS_PARALLAX_v1_0.png",
+      "fonte_sha256": "840cfd8241a54f7bab0be58ab96892eba8438517888e490587451339b23263a7",
+      "caixa_na_prancha": [
+        1053,
+        707,
+        1153,
+        781
+      ],
+      "operacoes": [
+        "alfa_por_luz(0.85; piso 0.12)",
+        "continuo_x(24, alfa suave)"
+      ],
+      "tamanho": [
+        76,
+        74
+      ],
+      "modo": "RGBA",
+      "mosaico": "x",
+      "sha256": "616ab8fb6ded75d0b56eb830e1424884a86331c40b83434cd3bdecd774509857",
+      "uso": "Névoa (foreground/midground) em mosaico horizontal."
+    }
+  ]
+}
