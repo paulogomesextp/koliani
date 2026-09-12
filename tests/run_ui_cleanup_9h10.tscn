@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://tests/run_ui_cleanup_9h10.gd" id="1"]
+
+[node name="ProvaUI9H10" type="Node"]
+script = ExtResource("1")

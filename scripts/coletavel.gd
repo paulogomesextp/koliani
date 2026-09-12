@@ -154,6 +154,16 @@ func _process(dt: float) -> void:
 	var faixa := _visual.get_node_or_null("Faixa") if _visual else null
 	if faixa:
 		faixa.scale = Vector2.ONE * (1.0 + 0.05 * sin(_t * 4.0))
+		# Mantém o estandarte inteiro nas margens, sem deslocar o item/colisão.
+		faixa.position.x = 0.0
+		var transformacao: Transform2D = faixa.get_global_transform_with_canvas()
+		var vp := get_viewport().get_visible_rect()
+		var ancora := get_global_transform_with_canvas().origin
+		faixa.visible = vp.has_point(ancora)
+		var margem := 44.0 * transformacao.x.length() + 6.0
+		var centro := transformacao.origin
+		var ajustado := Vector2(clampf(centro.x, margem, maxf(margem, vp.size.x - margem)), centro.y)
+		faixa.position += transformacao.affine_inverse() * ajustado
 
 
 func _ao_entrar(corpo: Node) -> void:

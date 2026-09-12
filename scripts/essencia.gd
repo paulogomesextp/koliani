@@ -29,6 +29,17 @@ const Vfx9G := preload("res://scripts/vfx_regiao1.gd")
 
 
 func _ready() -> void:
+	# O cristal de Essência da prancha 09 já identifica esta moeda no HUD.
+	var cristal := UIProducao.textura("ico_cristal")
+	if cristal:
+		_nucleo.self_modulate.a = 0.0
+		_halo.visible = false
+		var arte := Sprite2D.new()
+		arte.name = "CristalEssencia"
+		arte.texture = cristal
+		arte.scale = Vector2.ONE * (14.0 / cristal.get_height())
+		arte.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		_nucleo.add_child(arte)
 	# `set_deferred` e nao atribuicao directa: a essencia nasce DENTRO do
 	# `receber_dano` do bicho, que corre a meio do passo de fisica -- ligar
 	# o `monitoring` ali dava "Can't change this state while flushing
