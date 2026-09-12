@@ -624,14 +624,46 @@ func _vida_no_anim(dt: float) -> void:
 func _atualizar_anim() -> void:
 	if _morto:
 		return
-	if _anim.animation in ["hit", "attack"] and _anim.is_playing():
+	# levar um golpe manda sempre: a reacção tem de se ver mesmo a atacar
+	if _anim.animation == "hit" and _anim.is_playing():
 		return
-	if _telegrafo > 0.0 and _anim.sprite_frames != null 			and _anim.sprite_frames.has_animation("attack") 			and _anim.sprite_frames.get_frame_count("attack") > 1:
+	# Execution 9H.9: quem tem estados próprios (um chefe a picar, a aterrar,
+	# a levantar-se) diz aqui qual é o clipe. Sem isto um chefe ficava preso
+	# na escolha automática e lia-se como um sprite parado.
+	var pedida := _anim_desejada()
+	if pedida != "" and _tem_anim(pedida):
+		# só ao MUDAR de clipe: um clipe sem ciclo que acabou fica na última
+		# pose, e é isso que se quer (o remate/recuperação fica sustentado).
+		# Re-tocar aqui fazia o ataque repetir-se em loop.
+		if _anim.animation != pedida:
+			_anim.play(pedida)
+		return
+	if _anim.animation == "attack" and _anim.is_playing():
+		return
+	if _telegrafo > 0.0 and _tem_anim("attack"):
 		_anim.play("attack")
 		return
-	var alvo := "run" if absf(velocity.x) > 6.0 else "idle"
+	var alvo := "run" if _velocidade_visual() > 6.0 else "idle"
 	if _anim.animation != alvo:
 		_anim.play(alvo)
+
+
+## O clipe que este bicho quer neste instante, ou "" para deixar a escolha
+## automática (idle/run/attack pelo telégrafo). Gancho para as subclasses.
+func _anim_desejada() -> String:
+	return ""
+
+
+## Velocidade que conta para a LOCOMOÇÃO visual. Não pode ser só o `x`: quem
+## voa mexe-se sobretudo em `y`, e às vezes escrevendo `global_position` sem
+## passar pelo `velocity` -- ficava em `idle` a vida toda (era a queixa do
+## Game Master de os bichos parecerem sprites fixos).
+func _velocidade_visual() -> float:
+	return velocity.length()
+
+
+func _tem_anim(nome: String) -> bool:
+	return _anim != null and _anim.sprite_frames != null 		and _anim.sprite_frames.has_animation(nome) 		and _anim.sprite_frames.get_frame_count(nome) > 1
 
 
 func _physics_process(dt: float) -> void:

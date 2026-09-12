@@ -4,6 +4,43 @@
 
 Atualizado em 12 de setembro de 2026.
 
+## Execution 9H.9 - movimento das criaturas + luta da Morvanna
+
+- Branch `claude/9h9-creature-motion-morvanna` (worktree proprio). NAO mergeada.
+- Criaturas pareciam sprites fixos e OS FRAMES JA EXISTIAM (8 idle, 8 run, 7
+  attack, 3 hit por criatura, desde a 9H.1): faltava quem os PEDISSE.
+  `DemonioBase._atualizar_anim` escolhia `run` por `absf(velocity.x)` -- quem
+  voa mexe-se em y (e a Morvanna por `global_position`, sem velocity), logo
+  ficava em `idle` para sempre; e os chefes, a perseguir, ficavam em `run` a
+  luta toda, sem pose de telegrafo, golpe ou recuperacao.
+- Agora: `_velocidade_visual()` usa a velocidade TOTAL, e ha um gancho
+  `_anim_desejada()`. O `ChefeBase` implementa-o de forma GENERICA pelo NOME
+  da fase do enum `Fase` de cada chefe (`*_TEL` -> attack, `EXPOST*` -> hit,
+  `DORME`/`DECIDE` -> automatico, fase de accao quieta -> attack) -- a mesma
+  convencao de nomes de que o `_encurtar_fase_exposto` ja vivia, portanto
+  serve os 30 chefes sem tocar em nenhum deles um a um. Um clipe sem ciclo
+  que acaba FICA na ultima pose (recuperacao sustentada); re-toca-lo punha o
+  ataque em loop.
+- Medido: guardiao (Ghorak) passou de `run` 900/900 para run 508 / attack 424
+  / hit 259 / idle 109. Inimigo comum run/attack/idle a alternar.
+- MORVANNA: ciclo novo REPOSICIONA -> TELEGRAFO -> ataque -> PICADA_TEL ->
+  PICADA -> ATERRADA (janela de melee) -> LEVANTA -> ar. Aterra no chao
+  (altura 24 px, era 88 = o apogeu exacto de um salto de 470 de forca, e so
+  la chegava ~0,8 s dos 1,5 s). Medido: 355 de 1400 frames ao alcance melee,
+  altura minima 24 px.
+- DANO PASSIVO RESOLVIDO: o corpo dela so machuca durante a PICADA (64 de
+  1400 frames), por overlap directo e uma vez por picada -- `body_entered`
+  nao servia porque a Koliani pode ja estar dentro da area quando a picada
+  comeca. Pairar por cima nao faz dano nenhum.
+- Nao se tocou no movimento da Koliani nem se criou ranged. Nenhum rebalance
+  dos outros chefes. Suite completa OK (a suite precisa da pasta `work/`:
+  num worktree novo da 8 falsos negativos de save).
+- HUMAN PLAYTEST REQUIRED: a queixa era de SENSACAO (parecem parados / a luta
+  nao faz sentido). Os numeros mostram os estados e o alcance; se a leitura
+  em jogo ainda nao convencer, afinar `dur_exposta`/`dur_picada_tel`.
+- Prova: `tools/prova_9h9.tscn` (e uma CENA -- em `--script` os autoloads nao
+  existem e a compilacao rebenta em cascata).
+
 ## Execution 9H.7 - nitidez do fundo + conteudo dos niveis da Regiao I
 
 - Relatorio: docs/execution_9h7_regiao1_nitidez_conteudo.md. Versao 0.18.1.

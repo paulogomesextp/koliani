@@ -8,28 +8,57 @@ extends ChefeBase
 ##               DemonioBase; pouca vida, desfazem-se sozinhos).
 ##   * APAGA  -- faz desaparecer metade das plataformas flutuantes por uns
 ##               segundos (a Koliani fica sem onde pisar sobre a água).
-## Depois de cada ataque DESCE até ao nível das plataformas para "saborear"
-## o medo (estado EXPOSTA): é a única janela em que leva dano -- e a dobrar.
-## Fora disso o manto espectral absorve os golpes.
+## Execution 9H.9 -- O Game Master disse que a luta não fazia sentido: ela
+## ficava no ar, a Koliani é MELEE e não tem nada para lhe chegar, o simples
+## facto de ela pairar por cima já fazia dano, e não havia janela de ataque
+## legível. O ciclo é agora sempre o mesmo, e acaba sempre ao alcance:
+##
+##   REPOSICIONA (voa em x) -> TELEGRAFO -> ATAQUE -> PICADA até ao chão
+##   -> ATERRADA (janela de melee, leva dano a dobrar) -> LEVANTA -> ar
+##
+## Duas regras que a luta não tinha:
+##   * o dano dela vem SÓ de ataques reconhecíveis. No ar não tem dano de
+##     contacto nenhum -- só a picada (e essa tem telégrafo) e as invocações.
+##   * a janela de melee é no CHÃO, não a pairar a meia altura. A Koliani
+##     salta 85 px de um salto; a EXPOSTA antiga punha-a a 88, ou seja no
+##     limite exacto do apogeu, e só lá chegava ~0,8 s dos 1,5 s do estado.
+##     (Ela leva dano em qualquer altura desde o passe "chefes sem escudos";
+##     o que faltava não era vulnerabilidade, era ALCANCE.)
+##
 ## Fase 2 (< 50% vida): telégrafos mais curtos, mais mãos, apaga mais tempo.
 
 const CLONE := preload("res://scenes/actors/DemonioBase.tscn")
 
-enum Fase { DORME, DECIDE, MAOS_TEL, MAOS, CLONES_TEL, CLONES, APAGA_TEL, APAGA, EXPOSTA }
+enum Fase {
+	DORME, REPOSICIONA, MAOS_TEL, MAOS, CLONES_TEL, CLONES, APAGA_TEL, APAGA,
+	PICADA_TEL, PICADA, ATERRADA, LEVANTA,
+}
 
 @export var dist_deteta := 460.0
 ## Altura a que paira (px acima do chão da arena) fora da janela de dano.
 @export var altura_voo := 210.0
-## Altura a que desce no estado EXPOSTA -- baixa o suficiente para a Koliani
-## a acertar com um salto+ataque.
-@export var altura_exposta := 88.0
+## Altura a que fica ATERRADA: no chão. A Koliani chega-lhe a andar.
+@export var altura_exposta := 24.0
 @export var balanco := 12.0
 @export var dur_tel := 0.62
 @export var dur_maos := 0.7
 @export var dur_apaga := 3.2
-@export var dur_exposta := 1.5
+## Janela de melee. Generosa de propósito: é o único sítio onde ela leva
+## dano, e é o que torna a luta possível com o kit actual da Koliani.
+@export var dur_exposta := 2.1
+## Quanto tempo leva a reposicionar-se no ar antes do telégrafo seguinte.
+@export var dur_reposiciona := 0.9
+## Telégrafo da picada -- mais longo que os outros: é o ataque que a põe em
+## cima da Koliani, portanto tem de ser o mais legível de todos.
+@export var dur_picada_tel := 0.72
+@export var dur_picada := 0.5
+@export var dur_levanta := 0.45
+## Velocidade do voo horizontal no reposicionamento.
+@export var vel_voo := 150.0
 @export var dano_mao := 18
 @export var dano_clone := 14
+## Dano da picada. É o único dano de CONTACTO dela, e só durante a picada.
+@export var dano_picada := 20
 
 var _fase: Fase = Fase.DORME
 var _t := 0.0
@@ -42,6 +71,11 @@ var _vida_max := 300
 ## Y do chão da arena por baixo da Morvanna (raycast uma vez, ela quase não
 ## se desloca em x). As alturas de voo/EXPOSTA são relativas a isto.
 var _chao_cache := 0.0
+## Só durante a PICADA é que o corpo dela machuca. Ver `_ao_tocar`.
+var _picada_ativa := false
+## x para onde está a voar no REPOSICIONA (do lado da Koliani, com folga).
+var _alvo_x := 0.0
+var _x_picada := 0.0
 
 @onready var _nucleo: Node2D = get_node_or_null("Sprite/Nucleo")
 
@@ -51,6 +85,7 @@ func _ready() -> void:
 	vida = maxi(vida, 275)
 	_vida_max = vida
 	_alvo_y = _origem.y
+	_alvo_x = global_position.x
 	_mostrar_nucleo(false)
 
 
@@ -73,19 +108,31 @@ func _physics_process(dt: float) -> void:
 	if _chao_cache <= 0.0:
 		_chao_cache = _chao_y(global_position.x)
 
-	# glide suave até à altura-alvo do estado atual
-	var y := global_position.y
-	global_position.y = lerpf(y, _alvo_y, clampf(dt * 4.0, 0.0, 1.0))
+	# glide suave até à altura-alvo do estado atual. A PICADA é mais rápida
+	# do que o resto: é um ataque, tem de se sentir como uma queda.
+	var antes := global_position
+	var resposta := 9.0 if _fase == Fase.PICADA else 4.0
+	global_position.y = lerpf(global_position.y, _alvo_y, clampf(dt * resposta, 0.0, 1.0))
+	# `velocity` não move nada aqui (ela voa por posição), mas é o que o
+	# `_atualizar_anim` lê para saber se está a deslocar-se -- sem isto
+	# ficava em `idle` a luta toda.
+	if dt > 0.0:
+		velocity = (global_position - antes) / dt
 	_encarar_koliani()
 
 	match _fase:
 		Fase.DORME:
 			_alvo_y = _chao_cache - altura_voo
 			if _ve_koliani():
-				_ir(Fase.DECIDE)
-		Fase.DECIDE:
+				_ir(Fase.REPOSICIONA)
+		# Voa para o lado da Koliani, com folga, antes de telegrafar. É o que
+		# a faz LER como uma bruxa a voar e não como um sprite pendurado.
+		Fase.REPOSICIONA:
 			_alvo_y = _chao_cache - altura_voo
-			if _t >= 0.35:
+			if _t < dt:
+				_escolher_pouso()
+			_voar_para(_alvo_x, dt)
+			if _t >= dur_reposiciona:
 				_escolher()
 		Fase.MAOS_TEL:
 			_piscar(true)
@@ -96,7 +143,7 @@ func _physics_process(dt: float) -> void:
 			if _t < dt:
 				_lancar_maos()
 			if _t >= dur_maos:
-				_ir(Fase.EXPOSTA)
+				_ir(Fase.PICADA_TEL)
 		Fase.CLONES_TEL:
 			_piscar(true)
 			if _t >= dur_tel:
@@ -106,7 +153,7 @@ func _physics_process(dt: float) -> void:
 			if _t < dt:
 				_largar_clones()
 			if _t >= 0.5:
-				_ir(Fase.EXPOSTA)
+				_ir(Fase.PICADA_TEL)
 		Fase.APAGA_TEL:
 			_piscar(true)
 			if _t >= dur_tel:
@@ -116,17 +163,52 @@ func _physics_process(dt: float) -> void:
 			if _t < dt:
 				_apagar_plataformas()
 			if _t >= 0.5:
-				_ir(Fase.EXPOSTA)
-		Fase.EXPOSTA:
+				_ir(Fase.PICADA_TEL)
+		# TELÉGRAFO DA PICADA: sobe um pouco, fica quieta em x e pisca. É o
+		# aviso de que vem a caminho -- e é o que dá à Koliani a informação
+		# para se afastar ou para se preparar para castigar.
+		Fase.PICADA_TEL:
+			_alvo_y = _chao_cache - altura_voo - 26.0
+			_piscar(true)
+			if _t < dt:
+				_x_picada = _x_koliani()
+				Som.toca("chefe_magia", -10.0, 1.2)
+			if _t >= dur_picada_tel * (0.8 if _fase2 else 1.0):
+				_piscar(false)
+				_picada_ativa = true
+				_abanar_camera(2.0)
+				_ir(Fase.PICADA)
+		# A PICADA é o único momento em que o corpo dela faz dano.
+		Fase.PICADA:
 			_alvo_y = _chao_cache - altura_exposta
+			_voar_para(_x_picada, dt, 2.4)
+			_dano_da_picada()
+			if _t >= dur_picada:
+				_picada_ativa = false
+				_abanar_camera(4.0)
+				Som.toca("chefe_cai", -10.0, 1.0)
+				_ir(Fase.ATERRADA)
+		# JANELA DE MELEE. No chão, núcleo à mostra, sem dano de contacto e
+		# quieta: é aqui que a luta se ganha, e é longa o suficiente para
+		# caber um combo da Koliani.
+		Fase.ATERRADA:
+			_alvo_y = _chao_cache - altura_exposta
+			velocity.x = 0.0
 			if not _exposta:
 				_exposta = true
 				_mostrar_nucleo(true)
 			if _t >= dur_exposta:
+				_ir(Fase.LEVANTA)
+		# Levanta-se: recolhe o núcleo e sobe, mas ainda não ataca -- a
+		# Koliani tem tempo de sair de baixo dela.
+		Fase.LEVANTA:
+			_alvo_y = _chao_cache - altura_voo
+			if _exposta:
 				_exposta = false
 				_mostrar_nucleo(false)
+			if _t >= dur_levanta:
 				_ciclos += 1
-				_ir(Fase.DECIDE)
+				_ir(Fase.REPOSICIONA)
 	_t += dt
 
 
@@ -137,8 +219,10 @@ func _ir(f: Fase) -> void:
 	_t = 0.0
 
 
+## Roda entre os três ataques de invocação; na fase 2 repete APAGA mais
+## vezes. Cada um deles cai depois na PICADA, portanto cada ciclo tem sempre
+## a sua janela de melee -- não há ciclo em que ela fique inalcançável.
 func _escolher() -> void:
-	# roda entre os três ataques; na fase 2 repete APAGA mais vezes
 	var op := _ciclos % 3
 	if _fase2 and _ciclos % 4 == 3:
 		op = 2
@@ -146,6 +230,65 @@ func _escolher() -> void:
 		0: _ir(Fase.MAOS_TEL)
 		1: _ir(Fase.CLONES_TEL)
 		_: _ir(Fase.APAGA_TEL)
+
+
+## Onde se vai pôr no ar: do lado da Koliani, a uma distância que a deixa
+## ver-se no ecrã inteira (e não colada por cima dela).
+func _escolher_pouso() -> void:
+	var k := _obter_koliani()
+	if k == null:
+		_alvo_x = global_position.x
+		return
+	var lado := -1.0 if k.global_position.x > global_position.x else 1.0
+	_alvo_x = clampf(k.global_position.x + lado * 170.0,
+		_origem.x - 300.0, _origem.x + 300.0)
+
+
+## Voo horizontal por posição (ela não usa `move_and_slide`: atravessa as
+## plataformas flutuantes da arena de propósito).
+func _voar_para(x: float, dt: float, mult := 1.0) -> void:
+	var d := x - global_position.x
+	var passo := vel_voo * mult * dt
+	if absf(d) <= passo:
+		global_position.x = x
+		return
+	global_position.x += signf(d) * passo
+
+
+## O dano da picada: só enquanto `_picada_ativa`, e só uma vez por picada.
+## É por overlap directo e não pelo `body_entered` porque a Koliani já pode
+## estar dentro da área quando a picada começa.
+func _dano_da_picada() -> void:
+	if not _picada_ativa or _area_contacto == null:
+		return
+	for c in _area_contacto.get_overlapping_bodies():
+		if c is Koliani:
+			_picada_ativa = false
+			c.receber_dano(int(round(dano_picada * (1.15 if _fase2 else 1.0))),
+				signf(c.global_position.x - global_position.x))
+			return
+
+
+## O corpo dela NÃO machuca fora da picada. Era esta a queixa do Game
+## Master: pairar sobre a Koliani fazia dano sem ataque nenhum.
+func _ao_tocar(corpo: Node) -> void:
+	if _picada_ativa:
+		super._ao_tocar(corpo)
+
+
+## O clipe que o `DemonioBase._atualizar_anim` deve tocar em cada estado.
+func _anim_desejada() -> String:
+	match _fase:
+		Fase.MAOS_TEL, Fase.CLONES_TEL, Fase.APAGA_TEL, Fase.PICADA_TEL:
+			return "attack"
+		Fase.MAOS, Fase.CLONES, Fase.APAGA, Fase.PICADA:
+			return "attack"
+		Fase.ATERRADA:
+			return "hit"
+		Fase.REPOSICIONA, Fase.LEVANTA:
+			return "run"
+		_:
+			return ""
 
 
 func _ve_koliani() -> bool:
