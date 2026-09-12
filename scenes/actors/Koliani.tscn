@@ -252,6 +252,9 @@ color = Color(0.62, 0.7, 0.5, 0.7)
 
 [node name="Camera2D" type="Camera2D" parent="."]
 zoom = Vector2(1.4, 1.4)
-position_smoothing_enabled = true
-position_smoothing_speed = 8.0
+# 9H.13/14: o atraso da camara passou para `camera_tremor.gd` (_process).
+# O `position_smoothing` nativo e resolvido na FISICA e, com
+# `physics_interpolation` ligada e o ecra acima dos 60 Hz, fazia a vista
+# avancar aos saltos -- o "fundo treme" do Game Master.
+position_smoothing_enabled = false
 script = ExtResource("2_cam")

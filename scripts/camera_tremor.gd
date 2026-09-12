@@ -26,6 +26,38 @@ const QUEDA_DISTANCIA_LIMIAR := 84.0
 const LOOK_QUEDA_Y := 92.0
 const LOOK_VERTICAL_RESPOSTA := 5.0
 
+## SEM `position_smoothing` (Execution 9H.13/14) -- e e' de proposito.
+##
+## O projecto tem `physics/common/physics_interpolation=true`. O
+## `position_smoothing` do `Camera2D` e' resolvido no passo de FISICA; com o
+## ecra' acima dos 60 Hz (o do Paulo anda a 165) as duas suavizacoes entram em
+## conflito e a vista avanca aos saltos -- era isto que o Game Master via como
+## "o fundo do L2 treme constantemente". Medido em
+## `tools/probe_jitter_fundo.gd`, no L2, em REGIME PERMANENTE (velocidade
+## maxima, >20 frames depois de qualquer inversao de marcha) e com
+## `--fixed-fps`, para o tempo de frame nao entrar na conta:
+##
+##   165 Hz, smoothing ligado : dp/media = 1,70   (1 a 1000 px/s)
+##   165 Hz, smoothing fora   : dp/media = 0,87   (max. 187 px/s)
+##    60 Hz (ecra = fisica)   : dp/media = 0,22   -- nunca tremeu
+##
+## HIPOTESE TESTADA E DESCARTADA: refazer o atraso aqui no `_process`
+## (lerp de `global_position` para dentro do `offset`). Da' PIOR -- 2781 px/s
+## de pico. Em `_process`, `global_position` e' a posicao da FISICA, que anda
+## aos degraus de 60 Hz; somar um atraso calculado sobre ela a uma camara ja'
+## interpolada e' misturar dois relogios. Com a interpolacao ligada o motor
+## ja' entrega a posicao do jogador suave frame a frame -- a camara nao
+## precisa de atraso nenhum, e o que da' o toque de camara e' o look-ahead
+## (`_seguimento`), que continua tal e qual.
+##
+## HIPOTESE TESTADA E DESCARTADA (2): "o `ParallaxBackground` e' legado e nao
+## sabe de interpolacao, por isso o fundo atrasa-se em relacao ao mundo". NAO
+## se confirma. Medido frame a frame a 165 Hz, `scroll_offset.x` e a origem da
+## `canvas_transform` sao IGUAIS ate' a' milesima -- atraso 0,000 em todos os
+## frames. O fundo nunca esteve dessincronizado da camara; o que tremia era a
+## camara, e as duas coisas tremiam juntas. Nao ha' aqui migracao para
+## `Parallax2D` a fazer.
+
 enum IntensidadeTremor { DESLIGADO, REDUZIDO, COMPLETO }
 
 var _tremor := Tremor.new()
