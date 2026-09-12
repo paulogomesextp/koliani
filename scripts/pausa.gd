@@ -40,16 +40,37 @@ func _ready() -> void:
 	_recomecar.visible = false
 	Textos.idioma_mudou.connect(func(_l: String) -> void: _traduzir())
 	_traduzir()
-	# Execution 9F: painel e botões no kit de produção (prancha 09). O
-	# Continuar destaca-se pela moldura de ouro do foco, que abre nele.
-	UIProducao.vestir_ecra($Painel)
-	UIProducao.titulo(_titulo, 32)
+	# Execution 9H.11: o painel passa do kit de ouro/ciano da 9F para a
+	# linguagem do menu principal (carmesim sobre carvão). O foco/hover
+	# desenha a placa em losango, tal como no frontend.
+	Frontend9H.vestir($Painel)
+	($Painel as PanelContainer).add_theme_stylebox_override(
+		"panel", Frontend9H.painel_liso())
+	Frontend9H.cabecalho(_titulo, 32)
+	_ornamentar()
 	for b: Button in [_continuar, _opcoes_btn, _santuario_btn, _mapa, _recomecar, _menu]:
 		b.resized.connect(func() -> void: b.pivot_offset = b.size / 2.0)
 		b.mouse_entered.connect(func() -> void: _animar_escala(b, 1.03))
 		b.mouse_exited.connect(func() -> void: _animar_escala(b, 1.0))
 		b.focus_entered.connect(func() -> void: _animar_escala(b, 1.03))
 		b.focus_exited.connect(func() -> void: _animar_escala(b, 1.0))
+
+
+## Losango do frontend por baixo do título -- o mesmo ornamento que separa
+## o logótipo das entradas no menu principal.
+func _ornamentar() -> void:
+	if not Frontend9H.disponivel():
+		return
+	var sep := Frontend9H.separador()
+	sep.custom_minimum_size = Vector2(0, 12)
+	sep.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var col := _titulo.get_parent()
+	# o losango substitui o HSeparator do .tscn (dois traços seguidos)
+	var velho := col.get_node_or_null("Separador") as Control
+	if velho:
+		velho.visible = false
+	col.add_child(sep)
+	col.move_child(sep, _titulo.get_index() + 1)
 
 
 func _animar_escala(botao: Button, alvo: float) -> void:

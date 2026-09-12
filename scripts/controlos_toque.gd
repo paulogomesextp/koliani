@@ -358,8 +358,17 @@ func _montar_barra_chefe() -> void:
 	placa.set_anchors_preset(Control.PRESET_FULL_RECT)
 	placa.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	placa.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
-	placa.add_theme_stylebox_override("panel", Frontend9H.caixa("painel_detalhe",
-		Vector4(26, 12, 26, 14), Color(1, 0.92, 0.9, 0.96)))
+	# 9H.11: a moldura pintada `painel_detalhe` tem 70 px de margem de cada
+	# lado -- numa placa de 60 px de alto as quinas encontram-se e o que se
+	# via eram lascas da pintura à volta da barra. Caixa lisa da mesma
+	# família (ver `Frontend9H.painel_liso`).
+	var sb_chefe := Frontend9H.painel_liso(0.80)
+	sb_chefe.content_margin_left = 26
+	sb_chefe.content_margin_right = 26
+	sb_chefe.content_margin_top = 10
+	sb_chefe.content_margin_bottom = 12
+	sb_chefe.shadow_size = 14
+	placa.add_theme_stylebox_override("panel", sb_chefe)
 	_chefe_caixa.add_child(placa)
 
 	var col := VBoxContainer.new()
