@@ -387,6 +387,32 @@ func _agendar_prova_runtime() -> void:
 		if argumento.begins_with("--foto-mapa="):
 			get_tree().change_scene_to_file.call_deferred(CENA_MAPA)
 			return
+		# 9H.1: prova do SELETOR com a pele da região, no export real.
+		#   --foto-seletor=<png>@<indice do nível>
+		if argumento.begins_with("--foto-seletor="):
+			var arg := argumento.get_slice("=", 1)
+			var cam := arg.get_slice("@", 0)
+			var idx := int(arg.get_slice("@", 1)) if "@" in arg else 0
+			_tirar_foto_seletor.call_deferred(cam, idx)
+			return
+
+
+## Abre o `SeletorNiveis` como o jogo o abre (mesma cena, mesma
+## `configurar`) e fotografa-o. `indice` escolhe a região: 0 = Região I
+## (pele de floresta), 20 = Região V (apresentação neutra).
+func _tirar_foto_seletor(caminho: String, indice: int) -> void:
+	var cena: PackedScene = load("res://scenes/ui/SeletorNiveis.tscn")
+	var no: Control = cena.instantiate()
+	add_child(no)
+	no.set_anchors_preset(Control.PRESET_FULL_RECT)
+	no.configurar(indice, false)
+	for _i in 40:
+		await get_tree().process_frame
+	await get_tree().create_timer(0.6).timeout
+	var imagem := get_viewport().get_texture().get_image()
+	imagem.save_png(caminho)
+	print("PROVA RUNTIME SELETOR: ", caminho, " regiao ", EstadoJogo.regiao_do_nivel(indice) + 1)
+	get_tree().quit(0)
 
 
 func _tirar_foto_menu(caminho: String) -> void:
