@@ -615,11 +615,19 @@ func _vida_no_anim(dt: float) -> void:
 	_sprite.rotation = lerp_angle(_sprite.rotation, incl, clampf(dt * 14.0, 0.0, 1.0))
 
 
-## Estado da anim do inimigo comum (idle/run). "hit" e "dead" mandam.
+## Estado da anim do inimigo comum (idle/run/attack). "hit" e "dead" mandam.
+##
+## O `attack` existe desde a 9H.1 (`tools/animar_criaturas_9h1.py`) e entra no
+## TELEGRAFO -- é o mesmo instante em que o bicho estremece e pisca antes de
+## bater, e é aí que a antecipação tem de se ver. Antes da 9H.1 nenhum inimigo
+## comum tinha animação de ataque: o telégrafo era só cor e tremura.
 func _atualizar_anim() -> void:
 	if _morto:
 		return
 	if _anim.animation in ["hit", "attack"] and _anim.is_playing():
+		return
+	if _telegrafo > 0.0 and _anim.sprite_frames != null 			and _anim.sprite_frames.has_animation("attack") 			and _anim.sprite_frames.get_frame_count("attack") > 1:
+		_anim.play("attack")
 		return
 	var alvo := "run" if absf(velocity.x) > 6.0 else "idle"
 	if _anim.animation != alvo:

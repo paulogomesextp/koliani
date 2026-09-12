@@ -1,0 +1,141 @@
+{
+  "schema_version": 2,
+  "character": "Koliani",
+  "animation": "attack_3",
+  "leitura": "rodopio -- a figura da' a volta; nos frames 3 e 4 veem-se as costas",
+  "frame_count": 6,
+  "canvas_width": 128,
+  "canvas_height": 128,
+  "pivot_x": 64,
+  "pivot_y": 104,
+  "baseline_y": 103,
+  "asset_type": "BODY",
+  "expected_alpha": true,
+  "vfx_separate": true,
+  "fps": 20.0,
+  "derivacao": "Execution 9H.1 -- tools/derivar_combo_koliani_9h1.py. Poses de corpo derivadas de frames do Golden Set aprovado, por operacoes de pixel inteiro (cisalhamento do tronco, passada, compressao vertical, espelho) mais rotacao da Shadowblade em torno do punho. Nenhum pixel desenhado a mao; cara, cabelo, fato e proporcoes vem intactos da autoridade.",
+  "autorizacao": "GAME MASTER 9H.1 - DERIVED BODY COMBAT POSES",
+  "authority": [
+    {
+      "file": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+      "sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4"
+    }
+  ],
+  "visual_review_state": "DERIVED_9H1_PENDING_GAME_MASTER",
+  "runtime_integration_state": "INTEGRATED_9H1",
+  "frames": [
+    {
+      "ficheiro": "attack_3_001.png",
+      "origem_golden": "attack_basic_001.png",
+      "operacoes_corpo": [
+        [
+          "inclinar",
+          -0.45
+        ],
+        [
+          "passada",
+          -2
+        ]
+      ],
+      "espelhado": false,
+      "delta_lamina_graus": -20.0,
+      "angulo_lamina_origem_graus": -38.7,
+      "angulo_lamina_final_graus": -58.7,
+      "sha256": "1be02b6efe3eb4ff5f737bf5e30416346ac5f82a9919f371efab1340d5fdab89"
+    },
+    {
+      "ficheiro": "attack_3_002.png",
+      "origem_golden": "attack_basic_002.png",
+      "operacoes_corpo": [
+        [
+          "inclinar",
+          -0.1
+        ],
+        [
+          "passada",
+          1
+        ]
+      ],
+      "espelhado": false,
+      "delta_lamina_graus": 25.0,
+      "angulo_lamina_origem_graus": 29.5,
+      "angulo_lamina_final_graus": 54.5,
+      "sha256": "1dbc63e1a2aeac46405772204ef41e5aa80cc8c8a0eb3cf4dcbfca92545ee4f2"
+    },
+    {
+      "ficheiro": "attack_3_003.png",
+      "origem_golden": "attack_basic_004.png",
+      "operacoes_corpo": [
+        [
+          "agachar",
+          0.04
+        ]
+      ],
+      "espelhado": true,
+      "delta_lamina_graus": -18.0,
+      "angulo_lamina_origem_graus": 65.2,
+      "angulo_lamina_final_graus": 47.2,
+      "sha256": "85028ab4fd29a4cf1ba6c3a8b5bba7c5da72c8fc23010c7e5b00495e8a3ff652"
+    },
+    {
+      "ficheiro": "attack_3_004.png",
+      "origem_golden": "attack_basic_005.png",
+      "operacoes_corpo": [
+        [
+          "inclinar",
+          0.18
+        ]
+      ],
+      "espelhado": true,
+      "delta_lamina_graus": -12.0,
+      "angulo_lamina_origem_graus": 146.8,
+      "angulo_lamina_final_graus": 134.8,
+      "sha256": "eb2edee379cd4d5e6d046a59379bdc57c5d2cfa78a509e9bcbe074916cdba9b4"
+    },
+    {
+      "ficheiro": "attack_3_005.png",
+      "origem_golden": "attack_basic_006.png",
+      "operacoes_corpo": [
+        [
+          "inclinar",
+          0.56
+        ],
+        [
+          "passada",
+          10
+        ]
+      ],
+      "espelhado": false,
+      "delta_lamina_graus": -30.0,
+      "angulo_lamina_origem_graus": 21.8,
+      "angulo_lamina_final_graus": -8.2,
+      "sha256": "9e3bd6b129ca0c6e8f90c38872ed7674a6d2ffac6ee2fd99e89c65ea94f86334"
+    },
+    {
+      "ficheiro": "attack_3_006.png",
+      "origem_golden": "attack_basic_001.png",
+      "operacoes_corpo": [
+        [
+          "inclinar",
+          0.24
+        ],
+        [
+          "passada",
+          5
+        ]
+      ],
+      "espelhado": false,
+      "delta_lamina_graus": 15.0,
+      "angulo_lamina_origem_graus": -38.7,
+      "angulo_lamina_final_graus": -23.7,
+      "sha256": "bfc6907074d1855024773999ce6ea718b40b2a3d62a198458dbe2a03d02fd0aa"
+    }
+  ],
+  "godot": {
+    "scale": 1.0,
+    "offset": [
+      0,
+      -18
+    ]
+  }
+}

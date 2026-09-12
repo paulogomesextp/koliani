@@ -1,0 +1,149 @@
+{
+  "schema_version": 2,
+  "character": "Koliani",
+  "animation": "attack_2",
+  "leitura": "reves ascendente -- a lamina sobe de baixo-atras ate' ao alto",
+  "frame_count": 6,
+  "canvas_width": 128,
+  "canvas_height": 128,
+  "pivot_x": 64,
+  "pivot_y": 104,
+  "baseline_y": 103,
+  "asset_type": "BODY",
+  "expected_alpha": true,
+  "vfx_separate": true,
+  "fps": 30.0,
+  "derivacao": "Execution 9H.1 -- tools/derivar_combo_koliani_9h1.py. Poses de corpo derivadas de frames do Golden Set aprovado, por operacoes de pixel inteiro (cisalhamento do tronco, passada, compressao vertical, espelho) mais rotacao da Shadowblade em torno do punho. Nenhum pixel desenhado a mao; cara, cabelo, fato e proporcoes vem intactos da autoridade.",
+  "autorizacao": "GAME MASTER 9H.1 - DERIVED BODY COMBAT POSES",
+  "authority": [
+    {
+      "file": "work/production_art_gate/9b1_game_master_approved/koliani_golden_set_approved.png",
+      "sha256": "0b067780d316d1fcb288c2a3d944cd758a212f8d696c1818ae6ac0e4db0c60c4"
+    }
+  ],
+  "visual_review_state": "DERIVED_9H1_PENDING_GAME_MASTER",
+  "runtime_integration_state": "INTEGRATED_9H1",
+  "frames": [
+    {
+      "ficheiro": "attack_2_001.png",
+      "origem_golden": "attack_basic_001.png",
+      "operacoes_corpo": [
+        [
+          "inclinar",
+          -0.55
+        ],
+        [
+          "passada",
+          -4
+        ]
+      ],
+      "espelhado": false,
+      "delta_lamina_graus": -40.0,
+      "angulo_lamina_origem_graus": -38.7,
+      "angulo_lamina_final_graus": -78.7,
+      "sha256": "b9291be16de27e9083a465b716f707e5881208f042eade2b4423fcc3314058c1"
+    },
+    {
+      "ficheiro": "attack_2_002.png",
+      "origem_golden": "attack_basic_001.png",
+      "operacoes_corpo": [
+        [
+          "inclinar",
+          -0.28
+        ],
+        [
+          "passada",
+          -2
+        ]
+      ],
+      "espelhado": false,
+      "delta_lamina_graus": -12.0,
+      "angulo_lamina_origem_graus": -38.7,
+      "angulo_lamina_final_graus": -50.7,
+      "sha256": "269de22eae7eb007d0345f315e1fd86551a0d0a39b7341deb261a21be69409f7"
+    },
+    {
+      "ficheiro": "attack_2_003.png",
+      "origem_golden": "attack_basic_006.png",
+      "operacoes_corpo": [
+        [
+          "inclinar",
+          0.2
+        ],
+        [
+          "passada",
+          4
+        ]
+      ],
+      "espelhado": false,
+      "delta_lamina_graus": -30.0,
+      "angulo_lamina_origem_graus": 21.8,
+      "angulo_lamina_final_graus": -8.2,
+      "sha256": "2a2d41525cf096ef826879d16ddfea930f713adbf65b0f6e7448e627a03a121b"
+    },
+    {
+      "ficheiro": "attack_2_004.png",
+      "origem_golden": "attack_basic_005.png",
+      "operacoes_corpo": [
+        [
+          "inclinar",
+          0.52
+        ],
+        [
+          "passada",
+          9
+        ]
+      ],
+      "espelhado": false,
+      "delta_lamina_graus": 0.0,
+      "angulo_lamina_origem_graus": 33.2,
+      "angulo_lamina_final_graus": 33.2,
+      "sha256": "b406df9079a64993071f64bc9abf0948472a293a7e82f00ed804245d067b30c9"
+    },
+    {
+      "ficheiro": "attack_2_005.png",
+      "origem_golden": "attack_basic_002.png",
+      "operacoes_corpo": [
+        [
+          "inclinar",
+          0.6
+        ],
+        [
+          "passada",
+          11
+        ]
+      ],
+      "espelhado": false,
+      "delta_lamina_graus": 38.0,
+      "angulo_lamina_origem_graus": 29.5,
+      "angulo_lamina_final_graus": 67.5,
+      "sha256": "3354ed2b54faf3599fc064dcf4072433458e7d886dd3604c49e6ae9258219cd7"
+    },
+    {
+      "ficheiro": "attack_2_006.png",
+      "origem_golden": "attack_basic_002.png",
+      "operacoes_corpo": [
+        [
+          "inclinar",
+          0.3
+        ],
+        [
+          "passada",
+          5
+        ]
+      ],
+      "espelhado": false,
+      "delta_lamina_graus": 20.0,
+      "angulo_lamina_origem_graus": 29.5,
+      "angulo_lamina_final_graus": 49.5,
+      "sha256": "f1ded12c9610434ab68c07356b6771d8629cc3cecf4dda003993f406f74829c4"
+    }
+  ],
+  "godot": {
+    "scale": 1.0,
+    "offset": [
+      0,
+      -18
+    ]
+  }
+}

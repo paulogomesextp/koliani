@@ -33,6 +33,35 @@ const CAMINHO_AMB_FLORESTA := "res://assets/audio/ambiente_floresta.wav"
 ## Quantos níveis da campanha usam a ambiência de floresta (a Região I).
 const NIVEIS_FLORESTA := 5
 
+## TRILHA DE PRODUÇÃO (Execution 9H.1). Seis peças originais do projeto,
+## compostas por `tools/compor_trilha_9h1.py` -- sem amostras de terceiros,
+## sem licenças, sem atribuição devida (ver
+## `assets/audio/musica/producao/manifesto_trilha_9h1.json`).
+##
+## Servem o FRONTEND e a REGIÃO I, que é a fatia que existe a sério. As
+## Regiões II-XX continuam nas 20+20 faixas CC0/CC-BY: compor 38 peças para
+## regiões sem arte aprovada nem playtest seria fazer número, que foi
+## precisamente o que o Game Master proibiu.
+const DIR_PRODUCAO := "res://assets/audio/musica/producao/"
+const PRODUCAO := {
+	"menu": DIR_PRODUCAO + "tema_menu.wav",
+	"exploracao": DIR_PRODUCAO + "regiao1_exploracao.wav",
+	"combate": DIR_PRODUCAO + "regiao1_combate.wav",
+	"guardiao": DIR_PRODUCAO + "regiao1_guardiao.wav",
+	"coracao": DIR_PRODUCAO + "regiao1_coracao.wav",
+	"pausa": DIR_PRODUCAO + "pausa_ambiente.wav",
+}
+## Quantos níveis usam a trilha de produção (a Região I: 1-1 a 1-5).
+const NIVEIS_PRODUCAO := 5
+## O nível da campanha onde está o Coração Putrefacto (1-5), que tem tema
+## próprio -- é o clímax da região, não mais um guardião.
+const NIVEL_CORACAO := 4
+## Quanto tempo a camada de combate se mantém depois do último golpe.
+const COMBATE_CAUDA := 7.0
+## Duração do cruzamento entre camas. Um fade-OUT sozinho abriria um buraco
+## (as camas tocam em ciclo); o que se faz é cruzar as duas.
+const CRUZAR := 0.9
+
 ## 20 faixas de nível / 20 de chefe, em ciclo (ver assets/audio/CREDITS.md
 ## para a fonte de cada uma -- todas CC0/CC-BY do OpenGameArt).
 const N_FAIXAS := 20
@@ -49,7 +78,13 @@ const VOL_BOSS := -6.0
 const VOL_ASSOMBRACAO := -19.0
 
 var _p: AudioStreamPlayer       # cama principal (menu / bioma / chefe)
-var _amb: AudioStreamPlayer     # camada de casa assombrada
+var _p2: AudioStreamPlayer      # cama a SAIR, enquanto dura o cruzamento
+var _amb: AudioStreamPlayer     # camada de ambiência do bioma
+var _pausa_p: AudioStreamPlayer # ambiência do menu de pausa
+## Até quando dura a camada de intensidade (segundos de relógio; 0 = fora).
+var _combate_ate := 0.0
+## Volume nominal da cama, para a pausa poder baixá-lo e repô-lo.
+var _vol_cama_atual := VOL_CAMA
 var _caminho_atual := ""
 var _pitch_atual := -1.0
 var _web_audio_callback: JavaScriptObject
@@ -65,6 +100,16 @@ func _ready() -> void:
 		if _caminho_atual != "":
 			_p.play())
 	add_child(_p)
+
+	_p2 = AudioStreamPlayer.new()
+	_p2.bus = "Music"
+	add_child(_p2)
+
+	_pausa_p = AudioStreamPlayer.new()
+	_pausa_p.bus = "Music"
+	_pausa_p.volume_db = -14.0
+	_pausa_p.finished.connect(func() -> void: _pausa_p.play())
+	add_child(_pausa_p)
 
 	_amb = AudioStreamPlayer.new()
 	_amb.bus = "Music"
@@ -101,9 +146,33 @@ func _reiniciar_audio_web() -> void:
 		_amb.play()
 
 
+## Qual a cama de EXPLORAÇÃO do nível `i`. Dentro da Região I é a peça de
+## produção; fora dela, a faixa do ciclo de 20.
+static func faixa_de_nivel(i: int) -> String:
+	if i >= 0 and i < NIVEIS_PRODUCAO and ResourceLoader.exists(PRODUCAO["exploracao"]):
+		return PRODUCAO["exploracao"]
+	var caminho := PASTA_NIVEIS % ((i % N_FAIXAS) + 1)
+	return caminho if ResourceLoader.exists(caminho) else CAMINHO
+
+
+## Qual a cama de CHEFE do nível `i`. O Coração Putrefacto (1-5) tem tema
+## próprio; os outros quatro guardiões da Região I partilham o dos guardiões.
+static func faixa_de_chefe(i: int) -> String:
+	if i >= 0 and i < NIVEIS_PRODUCAO:
+		var chave := "coracao" if i == NIVEL_CORACAO else "guardiao"
+		if ResourceLoader.exists(PRODUCAO[chave]):
+			return PRODUCAO[chave]
+	var caminho := PASTA_CHEFES % ((i % N_FAIXAS) + 1)
+	return caminho if ResourceLoader.exists(caminho) else CAMINHO_BOSS
+
+
 ## Tema do menu inicial (lento, pad + melodia esparsa).
 func menu() -> void:
-	_tocar(CAMINHO_MENU, 1.0, VOL_CAMA, true)
+	_combate_ate = 0.0
+	var cam: String = PRODUCAO["menu"]
+	if not ResourceLoader.exists(cam):
+		cam = CAMINHO_MENU
+	_tocar(cam, 1.0, VOL_CAMA, true)
 
 
 ## Cama de exploração de um mundo: uma das 20 faixas de nível, em ciclo
@@ -111,10 +180,8 @@ func menu() -> void:
 ## cima disto; ao morrer/recarregar a cena volta-se aqui até o combate
 ## recomeçar.
 func ambiente(indice_nivel: int) -> void:
-	var caminho := PASTA_NIVEIS % ((indice_nivel % N_FAIXAS) + 1)
-	if not ResourceLoader.exists(caminho):
-		caminho = CAMINHO  # reserva: fresh checkout antes do --import
-	_tocar(caminho, 1.0, VOL_CAMA, true)
+	_combate_ate = 0.0
+	_tocar(faixa_de_nivel(indice_nivel), 1.0, VOL_CAMA, true)
 
 
 ## Música de chefe -- chamada por `chefe_base.gd` quando o **combate
@@ -122,10 +189,8 @@ func ambiente(indice_nivel: int) -> void:
 ## mesmo índice de nível que `ambiente()`, por isso o chefe de cada nível
 ## tem sempre a mesma faixa.
 func boss() -> void:
-	var caminho := PASTA_CHEFES % ((EstadoJogo.indice_nivel % N_FAIXAS) + 1)
-	if not ResourceLoader.exists(caminho):
-		caminho = CAMINHO_BOSS  # reserva: fresh checkout antes do --import
-	_tocar(caminho, 1.0, VOL_BOSS, false)
+	_combate_ate = 0.0
+	_tocar(faixa_de_chefe(EstadoJogo.indice_nivel), 1.0, VOL_BOSS, false)
 
 
 ## Pede a faixa do chefe em SEGUNDO PLANO, para ela já estar em memória
@@ -136,11 +201,56 @@ func boss() -> void:
 ## **um frame de 2006 ms** ao bater no guardião do nível 1. Era esta a
 ## "congelação ao acertar no chefe"; o hitstop era o menor dos dois males.
 func preparar_boss() -> void:
-	var caminho := PASTA_CHEFES % ((EstadoJogo.indice_nivel % N_FAIXAS) + 1)
-	if not ResourceLoader.exists(caminho):
-		caminho = CAMINHO_BOSS
+	var caminho := faixa_de_chefe(EstadoJogo.indice_nivel)
 	if ResourceLoader.exists(caminho):
 		ResourceLoader.load_threaded_request(caminho)
+
+
+## CAMADA DE INTENSIDADE (Execution 9H.1). O Game Master pediu, para a
+## Região I, "a higher-intensity/combat layer or theme". Isto é a camada: a
+## `regiao1_combate` entra quando há combate a sério e sai sozinha
+## `COMBATE_CAUDA` segundos depois do último golpe.
+##
+## Quem chama é a Koliani (ao acertar num inimigo e ao levar dano). Fora da
+## Região I não faz nada -- as outras regiões não têm peça de combate, e
+## meter aqui uma faixa do ciclo de 20 seria trocar de música por trocar.
+func intensificar() -> void:
+	if EstadoJogo.indice_nivel >= NIVEIS_PRODUCAO:
+		return
+	if _caminho_atual == faixa_de_chefe(EstadoJogo.indice_nivel):
+		return          # num combate de chefe manda o tema do chefe
+	_combate_ate = Time.get_ticks_msec() / 1000.0 + COMBATE_CAUDA
+	var cam: String = PRODUCAO["combate"]
+	if _caminho_atual != cam and ResourceLoader.exists(cam):
+		_tocar(cam, 1.0, VOL_CAMA + 1.0, true)
+
+
+## Ambiência da pausa: baixa a cama e põe por cima a peça de pausa. Não PARA
+## a cama -- pará-la e recomeçá-la ao fechar o menu punha a música de volta
+## ao princípio a cada pausa.
+func pausa(ligada: bool) -> void:
+	if _p == null:
+		return
+	_p.volume_db = (_vol_cama_atual - 11.0) if ligada else _vol_cama_atual
+	var cam: String = PRODUCAO["pausa"]
+	if not ResourceLoader.exists(cam) or _pausa_p == null:
+		return
+	if ligada:
+		if _pausa_p.stream == null:
+			_pausa_p.stream = _carregar_loop(cam)
+		_pausa_p.play()
+	else:
+		_pausa_p.stop()
+
+
+func _process(_dt: float) -> void:
+	if _combate_ate <= 0.0:
+		return
+	if Time.get_ticks_msec() / 1000.0 < _combate_ate:
+		return
+	_combate_ate = 0.0
+	if _caminho_atual == PRODUCAO["combate"]:
+		_tocar(faixa_de_nivel(EstadoJogo.indice_nivel), 1.0, VOL_CAMA, true)
 
 
 func parar() -> void:
@@ -163,12 +273,28 @@ func _tocar(caminho: String, pitch: float, vol: float, com_assombracao: bool) ->
 		return
 	if not ResourceLoader.exists(caminho):
 		return
+	# CRUZAMENTO. Trocar `stream` a seco corta a cama a meio de um compasso, e
+	# um fade-out sozinho abre um buraco (uma cama toca em ciclo, não tem fim).
+	# O que se faz é pôr a cama velha no `_p2`, a descer, enquanto a nova sobe
+	# no `_p`. Sem tween quando não havia nada a tocar -- não há o que cruzar.
+	var cruzar := _p.playing and _caminho_atual != ""
+	if cruzar:
+		_p2.stream = _p.stream
+		_p2.pitch_scale = _p.pitch_scale
+		_p2.volume_db = _p.volume_db
+		_p2.play(_p.get_playback_position())
+		var t2 := create_tween()
+		t2.tween_property(_p2, "volume_db", -40.0, CRUZAR)
+		t2.tween_callback(_p2.stop)
 	_p.stream = _carregar_loop(caminho)
 	_p.pitch_scale = pitch
-	_p.volume_db = vol
+	_vol_cama_atual = vol
+	_p.volume_db = (vol - 22.0) if cruzar else vol
 	_caminho_atual = caminho
 	_pitch_atual = pitch
 	_p.play()
+	if cruzar:
+		create_tween().tween_property(_p, "volume_db", vol, CRUZAR)
 
 
 ## Qual a cama de ambiência para o sítio onde se está. Troca-se só quando
@@ -206,7 +332,7 @@ func _carregar_loop(caminho: String) -> AudioStream:
 
 func _exit_tree() -> void:
 	# fecha os streams ao sair (evita "resource still in use" no shutdown)
-	for pl in [_p, _amb]:
+	for pl in [_p, _p2, _amb, _pausa_p]:
 		if pl:
 			pl.stop()
 			pl.stream = null

@@ -63,23 +63,32 @@ const BORDA_PEITO := -30.0        # altura do sensor "há parede à frente"
 const BORDA_CABECA := -60.0       # altura do sensor "está livre por cima do rebordo"
 const BORDA_MANTLE := Vector2(150.0, -430.0)  # impulso ao subir para a plataforma
 const DUR_ATAQUE := 0.18
-## Combo base aprovado: três golpes intencionais. Os rigs legacy ainda podem
-## conter `attack4`, mas essa tira já não participa no combate da Região I.
-## Encadeia-se
-## carregando em "atacar" outra vez dentro da `JANELA_COMBO` a seguir ao
-## golpe atual (input bufferizado se carregar a meio do golpe); passado
-## esse tempo sem novo golpe, o combo cai de volta ao 1.º hit.
-const NUM_COMBO := 3
+## QUATRO golpes, desde a 9H.1. Eram três porque só havia arte para um: os
+## golpes 2 e 3 repetiam os seis frames golden do `attack_basic` a velocidades
+## diferentes, e um quarto passo seria a mesma animação uma quarta vez. Agora
+## cada golpe tem poses de corpo próprias (`tools/derivar_combo_koliani_9h1.py`)
+## e o 4.º é o REMATE -- antecipação agachada, lâmina por cima da cabeça,
+## estocada com avanço fundo e recuperação longa.
+##
+## O dano POR GOLPE não mudou (vem de `_dano_golpe()`, não do passo); o que
+## mudou foi o comprimento da cadeia. Encadeia-se carregando em "atacar" outra
+## vez dentro da `JANELA_COMBO` a seguir ao golpe atual (input bufferizado se
+## carregar a meio do golpe); passado esse tempo sem novo golpe, o combo cai
+## de volta ao 1.º hit.
+const NUM_COMBO := 4
 const JANELA_COMBO := 0.42
 ## Duração de cada golpe do combo, a acompanhar o comprimento real de cada
 ## tira (attack/attack2/attack3/attack4) -- senão a animação era cortada a
 ## meio antes de terminar, sobretudo o 3.º hit (9 frames, o mais longo).
-const DUR_COMBO := [0.18, 0.2, 0.3]
+## O remate é o golpe mais longo depois do rodopio: 6 frames a 23,08 fps.
+const DUR_COMBO := [0.18, 0.2, 0.3, 0.26]
 ## Cada golpe tem antecipação, janela ativa e recuperação explícitas. Os
 ## valores são frações da duração, para a hitbox acompanhar também a duração
 ## maior do terceiro golpe sem ficar ligada durante a animação inteira.
-const ATAQUE_ATIVO_INICIO := [0.22, 0.2, 0.24]
-const ATAQUE_ATIVO_FIM := [0.68, 0.7, 0.74]
+## O remate arma mais tempo (a antecipação são dois frames) e por isso a
+## janela activa abre mais tarde -- é o que faz o golpe LER-SE como remate.
+const ATAQUE_ATIVO_INICIO := [0.22, 0.2, 0.24, 0.34]
+const ATAQUE_ATIVO_FIM := [0.68, 0.7, 0.74, 0.72]
 
 ## PESO DO IMPACTO -- reafinado a 4 set 2026.
 ##
@@ -130,8 +139,8 @@ const TREMOR_DANO := 5.0
 ## px, mais o deslize da desaceleração normal a seguir. No AR vale metade,
 ## para não atirar
 ## a Koliani para fora das plataformas a meio de um combo.
-const AVANCO_VEL := [330.0, 370.0, 390.0]
-const AVANCO_DUR := [0.13, 0.13, 0.16]
+const AVANCO_VEL := [330.0, 370.0, 390.0, 470.0]
+const AVANCO_DUR := [0.13, 0.13, 0.16, 0.19]
 const AVANCO_NO_AR := 0.5
 const I_FRAMES := 0.6
 ## Ressalto ao cair em cima de um inimigo (Mario-style): pulo AUTOMÁTICO --
@@ -596,6 +605,12 @@ const _KOLI_ANIMS_GOLDEN := {
 	"jump_loop":  ["frames/jump_loop", 3, 6.0, true],
 	"fall":       ["frames/fall", 3, 6.0, true],
 	"attack":     ["frames/attack_basic", 6, 33.333333, false],
+	# Execution 9H.1: poses de corpo PRÓPRIAS para os golpes 2/3/4 do combo
+	# (`tools/derivar_combo_koliani_9h1.py`). Os fps fazem cada tira durar
+	# exactamente o `DUR_COMBO` do seu passo: 0,20 / 0,30 / 0,26 s.
+	"attack2":    ["frames/attack_2", 6, 30.0, false],
+	"attack3":    ["frames/attack_3", 6, 20.0, false],
+	"attack4":    ["frames/attack_4", 6, 23.076923, false],
 	# Execution 9B.4: pacote completo, derivado só de frames golden inteiros
 	# (`tools/derivar_pacote_koliani_9b4.py`). Os fps fazem cada animação durar
 	# o tempo lógico do estado: dash 0,16 s, roll 0,30 s, hurt 0,24 s.
@@ -609,10 +624,11 @@ const _KOLI_ANIMS_GOLDEN := {
 	"djump":      ["frames/djump", 4, 10.0, false],
 	"defesa":     ["frames/defesa", 1, 6.0, true],
 }
-## Golpes seguintes do combo: os MESMOS 6 frames aprovados, à velocidade que faz
-## a animação durar o tempo lógico de cada golpe (0,20 / 0,30 / 0,19 s). Não há
-## arte própria de combo -- mas também não se volta ao corpo premium_v1.
-const _GOLDEN_COMBO_FPS := {"attack2": 30.0, "attack3": 20.0, "attack4": 31.578947}
+## RESERVA dos golpes 2/3/4: os mesmos 6 frames do `attack_basic` à velocidade
+## de cada passo. Era isto que o jogo fazia até à 9H.1 e é o que volta a fazer
+## se as tiras derivadas não estiverem importadas (checkout fresco antes do
+## `--import`). Com as tiras presentes, nunca é usado.
+const _GOLDEN_COMBO_FPS := {"attack2": 30.0, "attack3": 20.0, "attack4": 23.076923}
 const GOLDEN_VFX_FRAMES := 6
 ## Onde nasce o arco do golpe, relativo à origem da Koliani (virada à direita):
 ## à frente e à altura do peito. Só visual -- a hitbox não depende disto.
@@ -782,9 +798,12 @@ const ARCO_COMBO := [
 		"giro": -12.0, "cor": Color(1.0, 0.92, 0.98, 1.0)},
 	{"fam": "heavy_slash", "escala": Vector2(1.34, 1.28), "desloc": Vector2(14.0, 0.0),
 		"giro": 0.0, "cor": Color(1.0, 0.80, 0.86, 1.0)},
+	## remate: o arco mais largo, virado para baixo e à frente (a lâmina crava)
+	{"fam": "heavy_slash", "escala": Vector2(1.52, -1.40), "desloc": Vector2(18.0, 8.0),
+		"giro": 34.0, "cor": Color(1.0, 0.72, 0.80, 1.0)},
 ]
 ## Tom de cada golpe: o combo sobe de altura, e o remate cai para o grave.
-const TOM_COMBO := [1.0, 1.09, 0.88]
+const TOM_COMBO := [1.0, 1.09, 1.16, 0.84]
 ## 9G: cúpula do escudo (prancha 07), filha do nó `Escudo`.
 var _escudo_9g: AnimatedSprite2D
 ## Centro do arco dos golpes 2/3: à frente do peito, onde a lâmina passa.
@@ -802,8 +821,11 @@ func _montar_golden_set(sf: SpriteFrames) -> void:
 		for i in int(c[1]):
 			quadros.append("%s/%s/%s_%03d.png" % [GOLDEN_DIR, c[0], base, i + 1])
 		_animacao_golden(sf, nome, quadros, c[2], c[3])
+	# Reserva: só para os golpes cuja tira derivada não veio no pacote.
 	var ataque: Array = _frames_de(sf, "attack", range(6))
 	for nome: String in _GOLDEN_COMBO_FPS:
+		if sf.has_animation(nome) and sf.get_frame_count(nome) > 0:
+			continue
 		_animacao_golden(sf, nome, ataque, _GOLDEN_COMBO_FPS[nome], false)
 	# Estados de locomoção da 5G, agora montados com poses golden existentes.
 	_animacao_golden(sf, "turn", _frames_de(sf, "run", [0, 1, 2, 3]), 12.0, false)
@@ -2150,6 +2172,9 @@ func _ao_acertar_corpo(corpo: Node) -> void:
 			crit or remate)
 		_abanar(TREMOR_CRIT if crit else (TREMOR_REMATE if remate else TREMOR_GOLPE))
 		_hitstop(HITSTOP_CRIT if crit else (HITSTOP_REMATE if remate else HITSTOP_GOLPE))
+		# 9H.1: acertar num inimigo levanta a camada de intensidade da música
+		# (só na Região I, e só fora do combate de chefe -- ver `Musica`).
+		Musica.intensificar()
 		if crit:
 			Som.toca("acerto", -5.0, randf_range(1.18, 1.32))
 		else:
@@ -2399,6 +2424,7 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0) -> void:
 	vida = maxi(0, vida - maxi(1, real))
 	_invulneravel = I_FRAMES
 	_hurt_t = 0.24
+	Musica.intensificar()   # 9H.1: levar dano também é combate
 	_cancelar_ataque(true)  # dano corta ataque/combo e desliga a hitbox imediatamente
 	vida_mudou.emit(vida, _vida_max())
 	_flash_branco()

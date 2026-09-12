@@ -1,0 +1,106 @@
+{
+  "execucao": "9H.1",
+  "regiao": 1,
+  "nome": "FLORESTA CORROMPIDA",
+  "o_que": "Pele do selector de niveis para a Regiao I.",
+  "fundo": "Composicao de arte de producao APROVADA da Regiao I (panorama 9H + kit 9C). Nenhum cenario inventado.",
+  "pecas": "As pecas do frontend 9H com a matiz do carmesim rodada para verde de musgo (0,30); o anel do guardiao e o cadeado ficam no magenta da corrupcao (0,84).",
+  "regioes_sem_autoridade": "II-XX nao tem pele. O selector usa a apresentacao NEUTRA -- ver scripts/tema_regiao.gd. REGION SELECTOR THEME AUTHORITY MISSING.",
+  "ficheiros": {
+    "fundo_seletor": {
+      "sha256": "60ba31487698d2bde9f191782cd5d60490f008818cfdad669c4e68a763fd4d51",
+      "dimensoes": [
+        1920,
+        1080
+      ],
+      "composto_de": [
+        "assets/art/regions/region_01_forest/production/backgrounds/region1_panorama_heart_tree_x2.png",
+        "assets/art/regions/region_01_forest/production/kit_9c/atmosfera/nevoa.png",
+        "assets/art/regions/region_01_forest/production/kit_9c/fundo/frente_vegetacao.png",
+        "assets/art/regions/region_01_forest/production/kit_9c/fundo/fundo_arvores_par.png",
+        "assets/art/regions/region_01_forest/production/kit_9c/fundo/fundo_arvore_a.png",
+        "assets/art/regions/region_01_forest/production/kit_9c/fundo/fundo_arvore_b.png"
+      ]
+    },
+    "anel_normal": {
+      "sha256": "6f9f02de85511e1a57ea2823914b7070a8e54e80451ea612697b5ae04915ab9e",
+      "matiz": 0.3,
+      "origem": "assets/ui/frontend_9h/anel_normal.png"
+    },
+    "anel_atual": {
+      "sha256": "2e9e322c62f89fe569fedc4a18f01d73cb69fd7a507694d16513b7d05878bf9c",
+      "matiz": 0.3,
+      "origem": "assets/ui/frontend_9h/anel_atual.png"
+    },
+    "anel_chefe": {
+      "sha256": "813b678fbed0f41d4a84f73090103fedb7d9f4bf05c7a9a8ac21f7d13fb749b0",
+      "matiz": 0.84,
+      "origem": "assets/ui/frontend_9h/anel_chefe.png"
+    },
+    "painel_detalhe": {
+      "sha256": "788c103b4ff710a56b91527f47d3be97b75dc010c404847894fb595ab0819a0c",
+      "matiz": 0.3,
+      "origem": "assets/ui/frontend_9h/painel_detalhe.png"
+    },
+    "botao_jogar": {
+      "sha256": "255983504278125b20da1e5c46a98238ec45707f10a7cebad5bdb1a2e55eb35a",
+      "matiz": 0.3,
+      "origem": "assets/ui/frontend_9h/botao_jogar.png"
+    },
+    "aba_atual": {
+      "sha256": "d77672298250bf4a78e0098ca0650c853fc0e907f8abcc6be6d91546eb6bb089",
+      "matiz": 0.3,
+      "origem": "assets/ui/frontend_9h/aba_atual.png"
+    },
+    "aba_bloqueada": {
+      "sha256": "28367d0db86cb515735dd7f54645a5e76d5a8f513c5898e03c14147984defc8c",
+      "matiz": 0.3,
+      "origem": "assets/ui/frontend_9h/aba_bloqueada.png"
+    },
+    "ficha_nivel": {
+      "sha256": "96d9e5057b3dd5e3398ad54b5ccc1cb5e99f8f3ad4f038e0ceafea9e604ecb9b",
+      "matiz": 0.3,
+      "origem": "assets/ui/frontend_9h/ficha_nivel.png"
+    },
+    "placa_selecionada": {
+      "sha256": "659e223a78f057af900af633f1fed641570afb3ee5652f57fa12d8d5fcafbc9c",
+      "matiz": 0.3,
+      "origem": "assets/ui/frontend_9h/placa_selecionada.png"
+    },
+    "separador_menu": {
+      "sha256": "db6cd26b5c2625424ce1218d18fc0cde1369b6f55b31fb3fc7a0e76b95e961ed",
+      "matiz": 0.3,
+      "origem": "assets/ui/frontend_9h/separador_menu.png"
+    },
+    "seta_direita": {
+      "sha256": "624374efc1e97e323f41a76f981138414a372183646abd50229e411f77c700f2",
+      "matiz": 0.3,
+      "origem": "assets/ui/frontend_9h/seta_direita.png"
+    },
+    "seta_esquerda": {
+      "sha256": "a6e4c0cd1074276694b6b4b0ad1489c2f251e5774d602f9a38b2e962c9f21f06",
+      "matiz": 0.3,
+      "origem": "assets/ui/frontend_9h/seta_esquerda.png"
+    },
+    "cadeado": {
+      "sha256": "9df9578e25e4b7d85cd626cf821fa3b73268cc792a5da35842f44b096d759d31",
+      "matiz": 0.84,
+      "origem": "assets/ui/frontend_9h/cadeado.png"
+    },
+    "ornamento_rodape": {
+      "sha256": "27cab566f66784317697adde1e5ce4ee348ea515ccf09948994c6e913d296ded",
+      "matiz": 0.3,
+      "origem": "assets/ui/frontend_9h/ornamento_rodape.png"
+    },
+    "voltar_seta": {
+      "sha256": "bc8121c1ad7b22e1944056e92e2bed8cbc89fe5622c90f4cff46066749df9fdb",
+      "matiz": 0.3,
+      "origem": "assets/ui/frontend_9h/voltar_seta.png"
+    },
+    "losango": {
+      "sha256": "de21f46f609f74995f8c749f2f0e06433d8f4f795506ae15521e427de979ad0f",
+      "matiz": 0.3,
+      "origem": "assets/ui/frontend_9h/losango.png"
+    }
+  }
+}

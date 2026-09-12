@@ -97,12 +97,12 @@
       },
       "animacoes": {
         "idle": {
-          "fps": 5.0,
+          "fps": 7.0,
           "ciclo": true,
           "frames": [
             {
               "ficheiro": "goblin/frames/idle_01.png",
-              "sha256": "ae7f0e6ab13011e31a0fa2febe8f60152898defd396726ee67701fd6fbe8eb2d",
+              "sha256": "aaafc0bc00f234db060c16b57747c97759c04d56a17e3c0b71743221905e1aab",
               "dimensoes": [
                 128,
                 96
@@ -110,7 +110,7 @@
             },
             {
               "ficheiro": "goblin/frames/idle_02.png",
-              "sha256": "ae7f0e6ab13011e31a0fa2febe8f60152898defd396726ee67701fd6fbe8eb2d",
+              "sha256": "818769d11af400b7f0f2ed792820853ca210b629f2fc7dec614b2c3fed2c0542",
               "dimensoes": [
                 128,
                 96
@@ -118,7 +118,7 @@
             },
             {
               "ficheiro": "goblin/frames/idle_03.png",
-              "sha256": "df7ffb2a3427423a716d41971d702fa957abf84c1f797b0482d2bba09f9197e0",
+              "sha256": "c510ed0cacbbc6a4516c71ee8e607a3ca191a8c2dfaa02bd7acfb902b615fc78",
               "dimensoes": [
                 128,
                 96
@@ -126,21 +126,54 @@
             },
             {
               "ficheiro": "goblin/frames/idle_04.png",
-              "sha256": "df7ffb2a3427423a716d41971d702fa957abf84c1f797b0482d2bba09f9197e0",
+              "sha256": "d3b168c84b985b3ab7578bfad3cb3e4a4cdce551fd40973f128c9c781f5150ff",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "goblin/frames/idle_05.png",
+              "sha256": "96fe9a3912ec38e43bfbc93996ccd6e88d8675db5ea40d771951a01bee11e1ad",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "goblin/frames/idle_06.png",
+              "sha256": "12701eb5539efac1929933049f4db58caafbfa0326467e410ba988eee0818e2c",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "goblin/frames/idle_07.png",
+              "sha256": "40289e96d28cfd2a58e180ba78c942fd82e7ea5ca9f801b089d802417b13acf1",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "goblin/frames/idle_08.png",
+              "sha256": "4004ce4394b3c54f77e6129e96f0da05d8bda77198a9f461cc3661cb1d0a8ea1",
               "dimensoes": [
                 128,
                 96
               ]
             }
-          ]
+          ],
+          "origem": "DERIVED_9H1"
         },
         "run": {
-          "fps": 10.0,
+          "fps": 11.0,
           "ciclo": true,
           "frames": [
             {
               "ficheiro": "goblin/frames/run_01.png",
-              "sha256": "ae7f0e6ab13011e31a0fa2febe8f60152898defd396726ee67701fd6fbe8eb2d",
+              "sha256": "05bbedc25fc23714977cd6154688798b360fb30b4e5a60c0912bb940de1e1c23",
               "dimensoes": [
                 128,
                 96
@@ -148,7 +181,7 @@
             },
             {
               "ficheiro": "goblin/frames/run_02.png",
-              "sha256": "df7ffb2a3427423a716d41971d702fa957abf84c1f797b0482d2bba09f9197e0",
+              "sha256": "3ca54ddc30db30c9c735c93d42579e3a2b06ba014f4f6b6eb40906c424fe4c14",
               "dimensoes": [
                 128,
                 96
@@ -156,7 +189,7 @@
             },
             {
               "ficheiro": "goblin/frames/run_03.png",
-              "sha256": "81301b854dad67cb15c01504861b72084ce60086547f922ae8a5ca6b9b02aec6",
+              "sha256": "b134e3f968f58ef99b2fd88d12640b066ee3f4665623f031797daf7f53a57640",
               "dimensoes": [
                 128,
                 96
@@ -164,7 +197,7 @@
             },
             {
               "ficheiro": "goblin/frames/run_04.png",
-              "sha256": "df7ffb2a3427423a716d41971d702fa957abf84c1f797b0482d2bba09f9197e0",
+              "sha256": "381d2df684b8e9edc7f5218209610bfe6583a571b5ac94426273018739f49011",
               "dimensoes": [
                 128,
                 96
@@ -172,7 +205,7 @@
             },
             {
               "ficheiro": "goblin/frames/run_05.png",
-              "sha256": "ae7f0e6ab13011e31a0fa2febe8f60152898defd396726ee67701fd6fbe8eb2d",
+              "sha256": "ca5a632c60c5f3480dbdec5f0358c279b8c35bc93d2a31951e1b4d8ff1bb436b",
               "dimensoes": [
                 128,
                 96
@@ -180,13 +213,30 @@
             },
             {
               "ficheiro": "goblin/frames/run_06.png",
-              "sha256": "df7ffb2a3427423a716d41971d702fa957abf84c1f797b0482d2bba09f9197e0",
+              "sha256": "dffa67179d89f3d495f786a6d8d2c7c8671083a50de178b25808634f2300f463",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "goblin/frames/run_07.png",
+              "sha256": "3a41684f1474391ae1942401f0d7c02525d8da5777bfb7a4e0a8ba979e3a95e6",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "goblin/frames/run_08.png",
+              "sha256": "09c176c6c2478eb64a022cf0fc1b9cdc094a14d9a5a1add42e315c7ca5818f36",
               "dimensoes": [
                 128,
                 96
               ]
             }
-          ]
+          ],
+          "origem": "DERIVED_9H1"
         },
         "hit": {
           "fps": 12.0,
@@ -271,6 +321,69 @@
               ]
             }
           ]
+        },
+        "attack": {
+          "fps": 14.0,
+          "ciclo": false,
+          "frames": [
+            {
+              "ficheiro": "goblin/frames/attack_01.png",
+              "sha256": "b4b487c7b9829f5d10d4f802faf520d2c4b90ce528be6535a9d2bff5b503ee3a",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "goblin/frames/attack_02.png",
+              "sha256": "5845eb4c4e7617e29146d70e2f2944bebf35a5b4089a431ddcb08dc21718a00b",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "goblin/frames/attack_03.png",
+              "sha256": "42ba44ddd356bc243fdaec4928de4a17c89ff13414a02c8b80fc8c3e7d222ae5",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "goblin/frames/attack_04.png",
+              "sha256": "8764def87c2a201cb7ae4f29bd1bd507be1e870fbd8424115ea74f5d3b0b6953",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "goblin/frames/attack_05.png",
+              "sha256": "b91741942488275ba70a0579e813296c1f0ce83b271989cd5028a6672a91f95a",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "goblin/frames/attack_06.png",
+              "sha256": "a6bcf9ba65ac96749d3edce3d833cc7be83ffc0387b0aae7c16adb6d763e0211",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "goblin/frames/attack_07.png",
+              "sha256": "c7e7893383976c5098cd1c94889455e2e3b72adbed59dc8acab34a19b555df39",
+              "dimensoes": [
+                128,
+                96
+              ]
+            }
+          ],
+          "origem": "DERIVED_9H1"
         }
       },
       "niveis": {
@@ -285,7 +398,12 @@
         "hit",
         "idle",
         "run"
-      ]
+      ],
+      "animacao_9h1": {
+        "tipo": "bipede",
+        "ferramenta": "tools/animar_criaturas_9h1.py",
+        "o_que": "Movimento anatomico segmentado derivado da pose aprovada."
+      }
     },
     "mushroom": {
       "tipo": "comum",
@@ -324,12 +442,12 @@
       },
       "animacoes": {
         "idle": {
-          "fps": 5.0,
+          "fps": 7.0,
           "ciclo": true,
           "frames": [
             {
               "ficheiro": "mushroom/frames/idle_01.png",
-              "sha256": "5729aab61a76b86f505f614d90ae7e17d592415cfa34547f08bdfbbef4274597",
+              "sha256": "307d166f31dbce3af0ce39d66bf86b85660b56db3d8c82b97d79682df53361a3",
               "dimensoes": [
                 128,
                 96
@@ -337,7 +455,7 @@
             },
             {
               "ficheiro": "mushroom/frames/idle_02.png",
-              "sha256": "5729aab61a76b86f505f614d90ae7e17d592415cfa34547f08bdfbbef4274597",
+              "sha256": "f09f01a46e2e69bed05df55dc6dd622e89b2b443be02ea01888fe6702d6cfa75",
               "dimensoes": [
                 128,
                 96
@@ -345,7 +463,7 @@
             },
             {
               "ficheiro": "mushroom/frames/idle_03.png",
-              "sha256": "8f31176ee257b3ef85d99e5faea18f6232e3f91bfd9ff8cd6c79064fa37bed52",
+              "sha256": "11dd9ce94ba04dd413bf2b9df2317f0d55a3a365504e5ae7bdf9f4e34081529f",
               "dimensoes": [
                 128,
                 96
@@ -353,21 +471,54 @@
             },
             {
               "ficheiro": "mushroom/frames/idle_04.png",
-              "sha256": "8f31176ee257b3ef85d99e5faea18f6232e3f91bfd9ff8cd6c79064fa37bed52",
+              "sha256": "78ca4c8b619a16ea1a917d1736dcdf96291cf34744b46525e9ef09cb01fe4861",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "mushroom/frames/idle_05.png",
+              "sha256": "637b77774d27ab5e1cd01b7ad7223830c3bdbda1fc3a08f349ca55b12a7e8986",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "mushroom/frames/idle_06.png",
+              "sha256": "f0200f328abf52633ef8dd74ce63c9b7b090bd9448a40c8d67247f0debc57ca0",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "mushroom/frames/idle_07.png",
+              "sha256": "86cc2bfc2f5744f3399fe2cc89d2439cf77048f01ab8f63a0e8fa4cdc363c933",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "mushroom/frames/idle_08.png",
+              "sha256": "78182c5bcc50ca84aab3efaef3dd0e64c222a7a112a8310455ebf436e4352c49",
               "dimensoes": [
                 128,
                 96
               ]
             }
-          ]
+          ],
+          "origem": "DERIVED_9H1"
         },
         "run": {
-          "fps": 10.0,
+          "fps": 11.0,
           "ciclo": true,
           "frames": [
             {
               "ficheiro": "mushroom/frames/run_01.png",
-              "sha256": "5729aab61a76b86f505f614d90ae7e17d592415cfa34547f08bdfbbef4274597",
+              "sha256": "1e1b3c6bf74d2069266428d832dac1db58382b4102e8b230c7ecee6270287a1f",
               "dimensoes": [
                 128,
                 96
@@ -375,7 +526,7 @@
             },
             {
               "ficheiro": "mushroom/frames/run_02.png",
-              "sha256": "8f31176ee257b3ef85d99e5faea18f6232e3f91bfd9ff8cd6c79064fa37bed52",
+              "sha256": "24ead1eb9377ab4da6b8379bd61780f0dea8d2e4f795c014b19fbd47bcc8650b",
               "dimensoes": [
                 128,
                 96
@@ -383,7 +534,7 @@
             },
             {
               "ficheiro": "mushroom/frames/run_03.png",
-              "sha256": "21d5a8fb4f679f9158642fb791a0b5e4178fbf5cb05c6f8d8e8bc315cbf06d8f",
+              "sha256": "9461f9f3c373633e6106b6ac0e0f8436d736206f20f896daeaf9b3b09d9896df",
               "dimensoes": [
                 128,
                 96
@@ -391,7 +542,7 @@
             },
             {
               "ficheiro": "mushroom/frames/run_04.png",
-              "sha256": "8f31176ee257b3ef85d99e5faea18f6232e3f91bfd9ff8cd6c79064fa37bed52",
+              "sha256": "b3ea4a946fd6a03f4716032fa33f4e33b3e5cff13e00021bd280fddb40dc1ab1",
               "dimensoes": [
                 128,
                 96
@@ -399,7 +550,7 @@
             },
             {
               "ficheiro": "mushroom/frames/run_05.png",
-              "sha256": "5729aab61a76b86f505f614d90ae7e17d592415cfa34547f08bdfbbef4274597",
+              "sha256": "1e1b3c6bf74d2069266428d832dac1db58382b4102e8b230c7ecee6270287a1f",
               "dimensoes": [
                 128,
                 96
@@ -407,13 +558,30 @@
             },
             {
               "ficheiro": "mushroom/frames/run_06.png",
-              "sha256": "8f31176ee257b3ef85d99e5faea18f6232e3f91bfd9ff8cd6c79064fa37bed52",
+              "sha256": "d7ad55db49ccd8aa9d3525273b39f84e7df764f830db02fb481493ca35170966",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "mushroom/frames/run_07.png",
+              "sha256": "0813319eab1985d1a070f777a76ab95f09f1cddccf8d552a6a8e621902f788c1",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "mushroom/frames/run_08.png",
+              "sha256": "d4f093b51e225429e8aa88f12c54d34607cfa23985e9789ca76d6b384cf9656f",
               "dimensoes": [
                 128,
                 96
               ]
             }
-          ]
+          ],
+          "origem": "DERIVED_9H1"
         },
         "hit": {
           "fps": 12.0,
@@ -498,6 +666,69 @@
               ]
             }
           ]
+        },
+        "attack": {
+          "fps": 14.0,
+          "ciclo": false,
+          "frames": [
+            {
+              "ficheiro": "mushroom/frames/attack_01.png",
+              "sha256": "2bce02e7c2db019a352954aa741ba95b6c499d884632e589336969e19c660dcd",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "mushroom/frames/attack_02.png",
+              "sha256": "225515c0b5a106b0de393b639475279bb4aebcdeb050e3cff99cc9f183b4e283",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "mushroom/frames/attack_03.png",
+              "sha256": "7130639a460b585227b3e12197ccf1702da52029be154e8ddb7b866bb37c9f0a",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "mushroom/frames/attack_04.png",
+              "sha256": "5de23897b5b5b1b86ef6d5e102d832fcbfaff3e12c413c7ce061cae778e49b61",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "mushroom/frames/attack_05.png",
+              "sha256": "2e3fd0b0b2041e56953f9fabeecf77953ac9c08dc340bc51bf97d926fe959309",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "mushroom/frames/attack_06.png",
+              "sha256": "25a24424555896a0c09a9b716d8e3a574e8de6c22a1a9d886225275c593536bc",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "mushroom/frames/attack_07.png",
+              "sha256": "1e1b3c6bf74d2069266428d832dac1db58382b4102e8b230c7ecee6270287a1f",
+              "dimensoes": [
+                128,
+                96
+              ]
+            }
+          ],
+          "origem": "DERIVED_9H1"
         }
       },
       "niveis": {
@@ -511,7 +742,12 @@
         "hit",
         "idle",
         "run"
-      ]
+      ],
+      "animacao_9h1": {
+        "tipo": "fungo",
+        "ferramenta": "tools/animar_criaturas_9h1.py",
+        "o_que": "Movimento anatomico segmentado derivado da pose aprovada."
+      }
     },
     "gosma": {
       "tipo": "comum",
@@ -550,12 +786,12 @@
       },
       "animacoes": {
         "idle": {
-          "fps": 5.0,
+          "fps": 7.0,
           "ciclo": true,
           "frames": [
             {
               "ficheiro": "gosma/frames/idle_01.png",
-              "sha256": "d861cfb4538ae410d891646d73fd6c49da841a17a834dc2eb4336b495905d3e4",
+              "sha256": "9fd9905f5166109b174dfda2fdc826478dee41c132834c7882220fed4d75c2cb",
               "dimensoes": [
                 128,
                 96
@@ -563,7 +799,7 @@
             },
             {
               "ficheiro": "gosma/frames/idle_02.png",
-              "sha256": "d861cfb4538ae410d891646d73fd6c49da841a17a834dc2eb4336b495905d3e4",
+              "sha256": "66ba9b3523a7ef454900b3ca9d2755c6845a27bd5299b4d854d6d51f48e4ff5b",
               "dimensoes": [
                 128,
                 96
@@ -571,7 +807,7 @@
             },
             {
               "ficheiro": "gosma/frames/idle_03.png",
-              "sha256": "ef8119c816aa7cc5eaf12a54ce492feeec7c5c0ad021becf0859381a59294a78",
+              "sha256": "ae10ae0508fcd678577df60809c9ad3999eb9eed7633d6a377cb93cede4a996a",
               "dimensoes": [
                 128,
                 96
@@ -579,21 +815,54 @@
             },
             {
               "ficheiro": "gosma/frames/idle_04.png",
-              "sha256": "ef8119c816aa7cc5eaf12a54ce492feeec7c5c0ad021becf0859381a59294a78",
+              "sha256": "fdc76b32d8c67d2074d355c6fcd8708e06cbaf07533d6d6ee3f7dabc6afc9347",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "gosma/frames/idle_05.png",
+              "sha256": "6d8fb591c26b2b1348f6cda83758ef1f1a19579d0b9794497d9617ec9975c817",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "gosma/frames/idle_06.png",
+              "sha256": "1e5513a1c9155a5394aee48398e7a1f49eb0d45a8d552d1475fa47c43cb698ce",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "gosma/frames/idle_07.png",
+              "sha256": "45f3774fa6f794c496f1bf9291d8aedcaca772a856f3e1332a1e1e84faafae17",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "gosma/frames/idle_08.png",
+              "sha256": "952a9774a730e427abe3d8efdb2cab7ee34bd4edea58a78f3d2ea9a80a73e5aa",
               "dimensoes": [
                 128,
                 96
               ]
             }
-          ]
+          ],
+          "origem": "DERIVED_9H1"
         },
         "run": {
-          "fps": 10.0,
+          "fps": 11.0,
           "ciclo": true,
           "frames": [
             {
               "ficheiro": "gosma/frames/run_01.png",
-              "sha256": "d861cfb4538ae410d891646d73fd6c49da841a17a834dc2eb4336b495905d3e4",
+              "sha256": "739271a406fc4bbb5c457f5939ce0acf58b54ac6fbf85bcd664da181db77106e",
               "dimensoes": [
                 128,
                 96
@@ -601,7 +870,7 @@
             },
             {
               "ficheiro": "gosma/frames/run_02.png",
-              "sha256": "ef8119c816aa7cc5eaf12a54ce492feeec7c5c0ad021becf0859381a59294a78",
+              "sha256": "d66fbacea2fe1a577a178b30e28a1ecf21ffdb1d016211d7bcff061df1ca4945",
               "dimensoes": [
                 128,
                 96
@@ -609,7 +878,7 @@
             },
             {
               "ficheiro": "gosma/frames/run_03.png",
-              "sha256": "d412a751504627577c7172c549e200bc06049faf2609fb69df12aa7047043aea",
+              "sha256": "5beaf0aed289f8d26630e32a5a2848f01ba8d320576faf39076155a4cfaf5817",
               "dimensoes": [
                 128,
                 96
@@ -617,7 +886,7 @@
             },
             {
               "ficheiro": "gosma/frames/run_04.png",
-              "sha256": "ef8119c816aa7cc5eaf12a54ce492feeec7c5c0ad021becf0859381a59294a78",
+              "sha256": "6fa187aa782c8f87fd7b40da10fab5b0ac22d82a92c34dbc6067429b19e44095",
               "dimensoes": [
                 128,
                 96
@@ -625,7 +894,7 @@
             },
             {
               "ficheiro": "gosma/frames/run_05.png",
-              "sha256": "d861cfb4538ae410d891646d73fd6c49da841a17a834dc2eb4336b495905d3e4",
+              "sha256": "739271a406fc4bbb5c457f5939ce0acf58b54ac6fbf85bcd664da181db77106e",
               "dimensoes": [
                 128,
                 96
@@ -633,13 +902,30 @@
             },
             {
               "ficheiro": "gosma/frames/run_06.png",
-              "sha256": "ef8119c816aa7cc5eaf12a54ce492feeec7c5c0ad021becf0859381a59294a78",
+              "sha256": "e51b1241d6075500788db0e9299833cd0dcaaa213fb48e71f2ac4e865d2aad6d",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "gosma/frames/run_07.png",
+              "sha256": "be0b2052681918935b06f2850faa86d161669eadafd8484eac072dc7a3d83de3",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "gosma/frames/run_08.png",
+              "sha256": "65d763a46995a44d0906836bb14f021e9e526a10e54a0ea3063ff2c7297e7191",
               "dimensoes": [
                 128,
                 96
               ]
             }
-          ]
+          ],
+          "origem": "DERIVED_9H1"
         },
         "hit": {
           "fps": 12.0,
@@ -724,6 +1010,69 @@
               ]
             }
           ]
+        },
+        "attack": {
+          "fps": 14.0,
+          "ciclo": false,
+          "frames": [
+            {
+              "ficheiro": "gosma/frames/attack_01.png",
+              "sha256": "f8610da7299fff7efb646343853740e27af93122eb38f626081746d294d8fd26",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "gosma/frames/attack_02.png",
+              "sha256": "079752b0c41d662fca9ef27906366694bba0bbecf34ae274986c80af38bf9670",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "gosma/frames/attack_03.png",
+              "sha256": "0eaa30833f09c3daa24db39140180d92178238b3f7f441d0236cb8eb663715ca",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "gosma/frames/attack_04.png",
+              "sha256": "de70fb2228c788caf4cda840d35d52e968517a397d6f815840bf75bdee6d96bb",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "gosma/frames/attack_05.png",
+              "sha256": "fe47be281af7b3c32ad3622e89dfc84e9150ce6154ae477025f7eb6b5f0a1769",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "gosma/frames/attack_06.png",
+              "sha256": "98da105db03b5edb1570f110191bb168f0d97903fa126ac1deae04a9883acf64",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "gosma/frames/attack_07.png",
+              "sha256": "11f98173c03111ec3b27df03dbea3708094acc5604d23b66bea12de0b21c7f8d",
+              "dimensoes": [
+                128,
+                96
+              ]
+            }
+          ],
+          "origem": "DERIVED_9H1"
         }
       },
       "niveis": {
@@ -742,7 +1091,12 @@
         "hit",
         "idle",
         "run"
-      ]
+      ],
+      "animacao_9h1": {
+        "tipo": "blob",
+        "ferramenta": "tools/animar_criaturas_9h1.py",
+        "o_que": "Movimento anatomico segmentado derivado da pose aprovada."
+      }
     },
     "besouro": {
       "tipo": "comum",
@@ -781,12 +1135,12 @@
       },
       "animacoes": {
         "idle": {
-          "fps": 5.0,
+          "fps": 7.0,
           "ciclo": true,
           "frames": [
             {
               "ficheiro": "besouro/frames/idle_01.png",
-              "sha256": "852803de9212316c83c9160cf1de728d9968fc20ac7c9927c9f860f4cc60065e",
+              "sha256": "0a908d1f810c7975e84fed2070e2eec3e3360a58889cac9c205342635c9564ad",
               "dimensoes": [
                 128,
                 96
@@ -794,7 +1148,7 @@
             },
             {
               "ficheiro": "besouro/frames/idle_02.png",
-              "sha256": "852803de9212316c83c9160cf1de728d9968fc20ac7c9927c9f860f4cc60065e",
+              "sha256": "78ea2628c648ce404fcfd2e8bc6b1f234f5c5bbdfe33a4c195d32f259ba05f99",
               "dimensoes": [
                 128,
                 96
@@ -802,7 +1156,7 @@
             },
             {
               "ficheiro": "besouro/frames/idle_03.png",
-              "sha256": "30c24d758a9e6e6705018a4f129da56a9196b7184ed9cf0050832517d5795a26",
+              "sha256": "ced5c14e85c781788eb5fd0cf2e0c135dd98aef78d4773ad040f60fd79340ac7",
               "dimensoes": [
                 128,
                 96
@@ -810,21 +1164,54 @@
             },
             {
               "ficheiro": "besouro/frames/idle_04.png",
-              "sha256": "30c24d758a9e6e6705018a4f129da56a9196b7184ed9cf0050832517d5795a26",
+              "sha256": "8c11ddf53e1f4b6945e40eaf8f82f2c9425655610f624a2cea55515a14cc2a97",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "besouro/frames/idle_05.png",
+              "sha256": "40cb49e817692553eee19d066533eda873316c11575e244fa6acf70384d93dff",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "besouro/frames/idle_06.png",
+              "sha256": "6756654f5975b9faf27c1c44b257d8ffc5bf104bccc7e08d35c1fc5aafed5317",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "besouro/frames/idle_07.png",
+              "sha256": "cbe8407378e6afc8578d52831a31bd255067178e922d059152e2b9b77e4e9d7b",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "besouro/frames/idle_08.png",
+              "sha256": "0d83ab80c531a9a34effb66c19026dabb837d0e66360dfbf169af20788f9c16c",
               "dimensoes": [
                 128,
                 96
               ]
             }
-          ]
+          ],
+          "origem": "DERIVED_9H1"
         },
         "run": {
-          "fps": 10.0,
+          "fps": 11.0,
           "ciclo": true,
           "frames": [
             {
               "ficheiro": "besouro/frames/run_01.png",
-              "sha256": "852803de9212316c83c9160cf1de728d9968fc20ac7c9927c9f860f4cc60065e",
+              "sha256": "be93ae28d892bbc3f635e816ab9d7e62ee3f63a1e4175a9395e255e87e4d5e54",
               "dimensoes": [
                 128,
                 96
@@ -832,7 +1219,7 @@
             },
             {
               "ficheiro": "besouro/frames/run_02.png",
-              "sha256": "30c24d758a9e6e6705018a4f129da56a9196b7184ed9cf0050832517d5795a26",
+              "sha256": "d039b9dc34eb8f7f03c6e28ae2808820ae89e5ad702c5e96ffb2632587c52f8a",
               "dimensoes": [
                 128,
                 96
@@ -840,7 +1227,7 @@
             },
             {
               "ficheiro": "besouro/frames/run_03.png",
-              "sha256": "85b54f3bd33e127f917f8e202a567ba4aad4bf88fb7031efaa9e980707aeea4f",
+              "sha256": "548855e7e36cb9f0a176cd49b0cb1e4f802aa108caa2b03620d317e0dee22b05",
               "dimensoes": [
                 128,
                 96
@@ -848,7 +1235,7 @@
             },
             {
               "ficheiro": "besouro/frames/run_04.png",
-              "sha256": "30c24d758a9e6e6705018a4f129da56a9196b7184ed9cf0050832517d5795a26",
+              "sha256": "5cd083c0eab4e474352d7f67aa8f161d02d993537a9e53868af2df440a24d25b",
               "dimensoes": [
                 128,
                 96
@@ -856,7 +1243,7 @@
             },
             {
               "ficheiro": "besouro/frames/run_05.png",
-              "sha256": "852803de9212316c83c9160cf1de728d9968fc20ac7c9927c9f860f4cc60065e",
+              "sha256": "13117055dfd4baca9307ca03b8334bfd308a6c54b4662492f6c755d9764f85ff",
               "dimensoes": [
                 128,
                 96
@@ -864,13 +1251,30 @@
             },
             {
               "ficheiro": "besouro/frames/run_06.png",
-              "sha256": "30c24d758a9e6e6705018a4f129da56a9196b7184ed9cf0050832517d5795a26",
+              "sha256": "c2eaa142955cde94891700aeadfa0da7003bdf975422167a93aa48534704a874",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "besouro/frames/run_07.png",
+              "sha256": "d834f051579e3305d2eb636bd0bd49b89990d162880b3c395dc516fefda42e9b",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "besouro/frames/run_08.png",
+              "sha256": "aabd755af5dab9c1a101d50afed95a13e476c19681c7edc4e041b5071356c5c7",
               "dimensoes": [
                 128,
                 96
               ]
             }
-          ]
+          ],
+          "origem": "DERIVED_9H1"
         },
         "hit": {
           "fps": 12.0,
@@ -955,6 +1359,69 @@
               ]
             }
           ]
+        },
+        "attack": {
+          "fps": 14.0,
+          "ciclo": false,
+          "frames": [
+            {
+              "ficheiro": "besouro/frames/attack_01.png",
+              "sha256": "8847bce229fc1115a811d3423108702d537f84bc4703bb22d6098af57c86997f",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "besouro/frames/attack_02.png",
+              "sha256": "2ac2a95d87d00c8d5ca17a6bcfd70829a8b6af12a310f7ac4e43ff768beea9af",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "besouro/frames/attack_03.png",
+              "sha256": "d8966b0ba6b448d6c17a99cd61afaba0dee9229ba4f05e2050077aa7456d6f56",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "besouro/frames/attack_04.png",
+              "sha256": "22a722a7a19fcd848fa5c48c920bc4750d0d0ca9ea8579d4f1cec51606f95a4a",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "besouro/frames/attack_05.png",
+              "sha256": "bfaceeec4af9e10580bdcd0fd4bff9209ff980aeb0982db4ca10c7fab5766cec",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "besouro/frames/attack_06.png",
+              "sha256": "24d34026c7b4e15384507b33314c4d2324c65e853d5b22e257f954f07d574b52",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "besouro/frames/attack_07.png",
+              "sha256": "d42d26a9eb695885b4feabffce729ad43009e59fcd42566c453b3aab428323e8",
+              "dimensoes": [
+                128,
+                96
+              ]
+            }
+          ],
+          "origem": "DERIVED_9H1"
         }
       },
       "niveis": {
@@ -971,7 +1438,12 @@
         "hit",
         "idle",
         "run"
-      ]
+      ],
+      "animacao_9h1": {
+        "tipo": "aracnideo",
+        "ferramenta": "tools/animar_criaturas_9h1.py",
+        "o_que": "Movimento anatomico segmentado derivado da pose aprovada."
+      }
     },
     "lodo": {
       "tipo": "comum",
@@ -1010,12 +1482,12 @@
       },
       "animacoes": {
         "idle": {
-          "fps": 5.0,
+          "fps": 7.0,
           "ciclo": true,
           "frames": [
             {
               "ficheiro": "lodo/frames/idle_01.png",
-              "sha256": "62a08a9ebcc2ea7a269237a5102f376a1f85bb47a8657eb8e9fa8f7abd1e3602",
+              "sha256": "1078194b9ec22b508c426270114b07d45603ccf070081dc7f70f3514fbf9a6eb",
               "dimensoes": [
                 128,
                 96
@@ -1023,7 +1495,7 @@
             },
             {
               "ficheiro": "lodo/frames/idle_02.png",
-              "sha256": "62a08a9ebcc2ea7a269237a5102f376a1f85bb47a8657eb8e9fa8f7abd1e3602",
+              "sha256": "193321ebebb732160b75f3147d1a8d9f1c98be23e34c362811ee473bfceb5793",
               "dimensoes": [
                 128,
                 96
@@ -1031,7 +1503,7 @@
             },
             {
               "ficheiro": "lodo/frames/idle_03.png",
-              "sha256": "28fb6cca452d4efa77a7a677b2f98d61619cfa10d2ffdff44d6c865fe24320e2",
+              "sha256": "9c847ba6da4d20b7a3fa0927bc49928474e3005bba4ade211a2995188585ae5d",
               "dimensoes": [
                 128,
                 96
@@ -1039,21 +1511,54 @@
             },
             {
               "ficheiro": "lodo/frames/idle_04.png",
-              "sha256": "28fb6cca452d4efa77a7a677b2f98d61619cfa10d2ffdff44d6c865fe24320e2",
+              "sha256": "5f8afb2a28348dcd42fef51cd39c76c386d808df90e73da0f74417797fa6bfdf",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "lodo/frames/idle_05.png",
+              "sha256": "77aa2e180482ac0556c9767da2d8005727dfb17355461cd90441d5f497952a8f",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "lodo/frames/idle_06.png",
+              "sha256": "cac98f88926b9005d9056761226cb3c0a3c828e049a4e59069b72fe6a8646b03",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "lodo/frames/idle_07.png",
+              "sha256": "00c99ee00778b6b281266aaa995b508e3b8404ba2506191e4e4c037925b36159",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "lodo/frames/idle_08.png",
+              "sha256": "5b9e6845a908eaba38568ea76bd02d09532f4103af6b7ef88b880b464eaca2c1",
               "dimensoes": [
                 128,
                 96
               ]
             }
-          ]
+          ],
+          "origem": "DERIVED_9H1"
         },
         "run": {
-          "fps": 10.0,
+          "fps": 11.0,
           "ciclo": true,
           "frames": [
             {
               "ficheiro": "lodo/frames/run_01.png",
-              "sha256": "62a08a9ebcc2ea7a269237a5102f376a1f85bb47a8657eb8e9fa8f7abd1e3602",
+              "sha256": "93fe2bcf6f6ef1f62a128b443b2d3772578db312781d0c42a1dc4d0d165617dd",
               "dimensoes": [
                 128,
                 96
@@ -1061,7 +1566,7 @@
             },
             {
               "ficheiro": "lodo/frames/run_02.png",
-              "sha256": "28fb6cca452d4efa77a7a677b2f98d61619cfa10d2ffdff44d6c865fe24320e2",
+              "sha256": "906a2680aab37010cf9f831ddf1cc67318aebb3aff370f87d1b2333c323cf520",
               "dimensoes": [
                 128,
                 96
@@ -1069,7 +1574,7 @@
             },
             {
               "ficheiro": "lodo/frames/run_03.png",
-              "sha256": "2c041c3323c9447ca11e3fbcd97498e92079f9343241456e4247e4dca12f7bf9",
+              "sha256": "ea1dcd56229be446a152156671fb4c6599f168e87cb12ecdad678ea4811157b4",
               "dimensoes": [
                 128,
                 96
@@ -1077,7 +1582,7 @@
             },
             {
               "ficheiro": "lodo/frames/run_04.png",
-              "sha256": "28fb6cca452d4efa77a7a677b2f98d61619cfa10d2ffdff44d6c865fe24320e2",
+              "sha256": "9f677ac97eb09a703a44f6a41943cce74b90a0671a58a74bb568e70d29b85466",
               "dimensoes": [
                 128,
                 96
@@ -1085,7 +1590,7 @@
             },
             {
               "ficheiro": "lodo/frames/run_05.png",
-              "sha256": "62a08a9ebcc2ea7a269237a5102f376a1f85bb47a8657eb8e9fa8f7abd1e3602",
+              "sha256": "93fe2bcf6f6ef1f62a128b443b2d3772578db312781d0c42a1dc4d0d165617dd",
               "dimensoes": [
                 128,
                 96
@@ -1093,13 +1598,30 @@
             },
             {
               "ficheiro": "lodo/frames/run_06.png",
-              "sha256": "28fb6cca452d4efa77a7a677b2f98d61619cfa10d2ffdff44d6c865fe24320e2",
+              "sha256": "39c68435833a6627a552d2abc8639e4547f5c32cca29754146ddb61308e91e50",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "lodo/frames/run_07.png",
+              "sha256": "7b08b2d8c05ee5d4b8a5b679def4b09bc1f32b1364116038552416e596116002",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "lodo/frames/run_08.png",
+              "sha256": "30bb4dcaa7b7b4cd3288d03507c60de572d8d9836b09b2d2badab6518c018238",
               "dimensoes": [
                 128,
                 96
               ]
             }
-          ]
+          ],
+          "origem": "DERIVED_9H1"
         },
         "hit": {
           "fps": 12.0,
@@ -1184,6 +1706,69 @@
               ]
             }
           ]
+        },
+        "attack": {
+          "fps": 14.0,
+          "ciclo": false,
+          "frames": [
+            {
+              "ficheiro": "lodo/frames/attack_01.png",
+              "sha256": "e34443218988cef1e1ed8cdd7b87257a1979e20dfba21cc9499bbe9c0a9d9f61",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "lodo/frames/attack_02.png",
+              "sha256": "96a7ef1cb4947fcd710c58697c28bd45b6c92f75d83a7b98fb6029e93d2356b4",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "lodo/frames/attack_03.png",
+              "sha256": "6499e4b292d17feaeb06d0051339b7c9bff20bf46e76b4f4d93c1887851c7100",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "lodo/frames/attack_04.png",
+              "sha256": "3bbd37b8a68e26a1325742015f948c1ff40ce382d39f9fb1dac121d30eef6ec5",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "lodo/frames/attack_05.png",
+              "sha256": "915a8258c3ed8c5989c47c64e73c4b201d76cf8cf4423964cd9852fc2822c72c",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "lodo/frames/attack_06.png",
+              "sha256": "db076e83d4c8d30c64fbc1662edd9c5ad7c3beb6c30cf75323a230d834e5f73b",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "lodo/frames/attack_07.png",
+              "sha256": "167a1c80b8943c762abf7ab882f0add4c9dc8e1e82c196a8181e7354f7a5edcf",
+              "dimensoes": [
+                128,
+                96
+              ]
+            }
+          ],
+          "origem": "DERIVED_9H1"
         }
       },
       "niveis": {
@@ -1197,7 +1782,12 @@
         "hit",
         "idle",
         "run"
-      ]
+      ],
+      "animacao_9h1": {
+        "tipo": "blob",
+        "ferramenta": "tools/animar_criaturas_9h1.py",
+        "o_que": "Movimento anatomico segmentado derivado da pose aprovada."
+      }
     },
     "ghorak": {
       "tipo": "guardiao",
@@ -1236,12 +1826,12 @@
       },
       "animacoes": {
         "idle": {
-          "fps": 5.0,
+          "fps": 7.0,
           "ciclo": true,
           "frames": [
             {
               "ficheiro": "ghorak/frames/idle_01.png",
-              "sha256": "d66dc5f292db3b6e7c6fd122c348eb551ac3ee5a233e212064efc33ec192035a",
+              "sha256": "422f430837a756ec8fd08be78f9231b82efb032dfb93335b0cb05f9ebbf1b6a0",
               "dimensoes": [
                 192,
                 192
@@ -1249,7 +1839,7 @@
             },
             {
               "ficheiro": "ghorak/frames/idle_02.png",
-              "sha256": "d66dc5f292db3b6e7c6fd122c348eb551ac3ee5a233e212064efc33ec192035a",
+              "sha256": "f19f13d8e65158d7f48217fc545446100c276fff1c83114421fe14f1e41561d5",
               "dimensoes": [
                 192,
                 192
@@ -1257,7 +1847,7 @@
             },
             {
               "ficheiro": "ghorak/frames/idle_03.png",
-              "sha256": "4dad367e9ad480051a527ed9fd7a69b404fddd46e77e25b642e25fd2971379fc",
+              "sha256": "587cd09adccdd976dcee036388f3dd511a728a90a2ceb62f1bc2cfa73a78851f",
               "dimensoes": [
                 192,
                 192
@@ -1265,21 +1855,54 @@
             },
             {
               "ficheiro": "ghorak/frames/idle_04.png",
-              "sha256": "4dad367e9ad480051a527ed9fd7a69b404fddd46e77e25b642e25fd2971379fc",
+              "sha256": "e4daf44c4253206371c0aeaa1abf7f9ed3b870b473098c5307a16c22632ceac3",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "ghorak/frames/idle_05.png",
+              "sha256": "8ac28397cad1bd43b4ba77e1421dd932e0437ce4c59e81278406661c682e4bad",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "ghorak/frames/idle_06.png",
+              "sha256": "563e173ad5bab7792dcd411d3f818cba49ed53b2bd05d6c74c18691c44fb5b4f",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "ghorak/frames/idle_07.png",
+              "sha256": "055b0134f2df392c8c948bb3ed43fa0b3ab5be367054f5c31fca599f0b9c8da0",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "ghorak/frames/idle_08.png",
+              "sha256": "25ba770fda133106a88c7566a3524bfd468bd86eaee4f2d0324b69005ea701e3",
               "dimensoes": [
                 192,
                 192
               ]
             }
-          ]
+          ],
+          "origem": "DERIVED_9H1"
         },
         "run": {
-          "fps": 10.0,
+          "fps": 11.0,
           "ciclo": true,
           "frames": [
             {
               "ficheiro": "ghorak/frames/run_01.png",
-              "sha256": "d66dc5f292db3b6e7c6fd122c348eb551ac3ee5a233e212064efc33ec192035a",
+              "sha256": "a8983f9dc7eb06d14ceaad022f74a04c42d5f161c28e8c2a88c79ce0e59f8a88",
               "dimensoes": [
                 192,
                 192
@@ -1287,7 +1910,7 @@
             },
             {
               "ficheiro": "ghorak/frames/run_02.png",
-              "sha256": "4dad367e9ad480051a527ed9fd7a69b404fddd46e77e25b642e25fd2971379fc",
+              "sha256": "cf0d2b3efa68898eab3aa39af3f0c1fc97079c1fa785e16772385f6352f6c8a6",
               "dimensoes": [
                 192,
                 192
@@ -1295,7 +1918,7 @@
             },
             {
               "ficheiro": "ghorak/frames/run_03.png",
-              "sha256": "8e3467f5da63d30248525f48b4b63f8d2f60692d768e0b7d9c6c3bae11d10c07",
+              "sha256": "68399eaef2c7d2f807bfd585fdf59908a3e5e70646601880784ff86b04f3c6ac",
               "dimensoes": [
                 192,
                 192
@@ -1303,7 +1926,7 @@
             },
             {
               "ficheiro": "ghorak/frames/run_04.png",
-              "sha256": "4dad367e9ad480051a527ed9fd7a69b404fddd46e77e25b642e25fd2971379fc",
+              "sha256": "ce52a1edd056e6e130f11178a5f5064180afd1178448c5e749d1e19835dfe332",
               "dimensoes": [
                 192,
                 192
@@ -1311,7 +1934,7 @@
             },
             {
               "ficheiro": "ghorak/frames/run_05.png",
-              "sha256": "d66dc5f292db3b6e7c6fd122c348eb551ac3ee5a233e212064efc33ec192035a",
+              "sha256": "34ab68fdec830f08ecfbdc84f4960a4235076b550cbffd81aab3c3dc426ac02d",
               "dimensoes": [
                 192,
                 192
@@ -1319,13 +1942,30 @@
             },
             {
               "ficheiro": "ghorak/frames/run_06.png",
-              "sha256": "4dad367e9ad480051a527ed9fd7a69b404fddd46e77e25b642e25fd2971379fc",
+              "sha256": "f2ff4f4813aae98790e2754916484a77a02fda38d241a2eeebca89d454677f23",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "ghorak/frames/run_07.png",
+              "sha256": "1b9e28ea945ec276f3eb74fcfbccb4202e80a066feeede110149fdb302d46b5e",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "ghorak/frames/run_08.png",
+              "sha256": "f8bc5203f7031c9976dc9686d72242ea0072acb6ec46929a3b1add5c28a8a6fc",
               "dimensoes": [
                 192,
                 192
               ]
             }
-          ]
+          ],
+          "origem": "DERIVED_9H1"
         },
         "hit": {
           "fps": 12.0,
@@ -1410,6 +2050,69 @@
               ]
             }
           ]
+        },
+        "attack": {
+          "fps": 14.0,
+          "ciclo": false,
+          "frames": [
+            {
+              "ficheiro": "ghorak/frames/attack_01.png",
+              "sha256": "fa5344ef65e64433c59e3dd75333b035c4b0bdc0e706649b9a2c4e81e4caf66c",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "ghorak/frames/attack_02.png",
+              "sha256": "524c5bddeee357f2dd5229ebcb06918f516ca2daea0372df9919d14a36bca387",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "ghorak/frames/attack_03.png",
+              "sha256": "12369b0a7fd5d86c4c41e79d9850e8444931d9b4c062e090f2cd5600f5064638",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "ghorak/frames/attack_04.png",
+              "sha256": "33c32915d799e86dddaa388f30c2c5889623850ede7763d4e2a1798c7866f263",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "ghorak/frames/attack_05.png",
+              "sha256": "49a2fe6fa3082679b8d28d53e832bbe528219b6bef70c25dbf5fdd93debe1bf0",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "ghorak/frames/attack_06.png",
+              "sha256": "a23a77e397fbef11c21e70c75055cab34b5506bb55632ff25270cba8051a3fd0",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "ghorak/frames/attack_07.png",
+              "sha256": "1c6bcec8117640edb754f6eaec10b4cd639a9ef81f2dfe0250bde6e991fc6bb9",
+              "dimensoes": [
+                192,
+                192
+              ]
+            }
+          ],
+          "origem": "DERIVED_9H1"
         }
       },
       "niveis": {
@@ -1424,7 +2127,12 @@
         "hit",
         "idle",
         "run"
-      ]
+      ],
+      "animacao_9h1": {
+        "tipo": "quadrupede",
+        "ferramenta": "tools/animar_criaturas_9h1.py",
+        "o_que": "Movimento anatomico segmentado derivado da pose aprovada."
+      }
     },
     "morvanna": {
       "tipo": "guardiao",
@@ -1463,12 +2171,12 @@
       },
       "animacoes": {
         "idle": {
-          "fps": 5.0,
+          "fps": 7.0,
           "ciclo": true,
           "frames": [
             {
               "ficheiro": "morvanna/frames/idle_01.png",
-              "sha256": "ad19e15d02a0a8a6ffe9613fc5d1ce56cbdfbaa8e02326004c9426211ed0e2c5",
+              "sha256": "04186f7ecaabfe4a2db902fdc064eafad60e791d07aa280ab054cc7f94d40447",
               "dimensoes": [
                 192,
                 192
@@ -1476,7 +2184,7 @@
             },
             {
               "ficheiro": "morvanna/frames/idle_02.png",
-              "sha256": "ad19e15d02a0a8a6ffe9613fc5d1ce56cbdfbaa8e02326004c9426211ed0e2c5",
+              "sha256": "891a1807ccc71c6aac9d8af77bf2fcd0b743950070376a5f815396aca9400aac",
               "dimensoes": [
                 192,
                 192
@@ -1484,7 +2192,7 @@
             },
             {
               "ficheiro": "morvanna/frames/idle_03.png",
-              "sha256": "8eb39ca47802bef393d1e00e4d3400e9234293da3309c50655ab0ad62740c9fb",
+              "sha256": "3f08c6f7d41bc0dbf6cae3f7f9bda36fee0ab02e12b6fab3961de565ebd6be06",
               "dimensoes": [
                 192,
                 192
@@ -1492,21 +2200,54 @@
             },
             {
               "ficheiro": "morvanna/frames/idle_04.png",
-              "sha256": "8eb39ca47802bef393d1e00e4d3400e9234293da3309c50655ab0ad62740c9fb",
+              "sha256": "78d220c909fd8bd8f35bda9d405c1ec7e7a87950fda830084ab95467c4c7e539",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "morvanna/frames/idle_05.png",
+              "sha256": "4de4c187fc1c02af832e61c00cd057296a95e402c3b10de0aa44b25c3f43d214",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "morvanna/frames/idle_06.png",
+              "sha256": "c7dd922bff94cace80ee4a36ee7967fe420a16c989479ce456ecb11aa57d9220",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "morvanna/frames/idle_07.png",
+              "sha256": "74c64eae018c57b21c73697e8167bbfef57273b4f2ad92002ec1bfb810666bf2",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "morvanna/frames/idle_08.png",
+              "sha256": "2383100858f83374ac3a1cb8b7c9e3c7fbc1f336d7e7747e6d84b9f724ac034e",
               "dimensoes": [
                 192,
                 192
               ]
             }
-          ]
+          ],
+          "origem": "DERIVED_9H1"
         },
         "run": {
-          "fps": 10.0,
+          "fps": 11.0,
           "ciclo": true,
           "frames": [
             {
               "ficheiro": "morvanna/frames/run_01.png",
-              "sha256": "ad19e15d02a0a8a6ffe9613fc5d1ce56cbdfbaa8e02326004c9426211ed0e2c5",
+              "sha256": "da527c6d7770a440c700be5083d929f94de4a07626deadfbe9728c60cc7769cf",
               "dimensoes": [
                 192,
                 192
@@ -1514,7 +2255,7 @@
             },
             {
               "ficheiro": "morvanna/frames/run_02.png",
-              "sha256": "8eb39ca47802bef393d1e00e4d3400e9234293da3309c50655ab0ad62740c9fb",
+              "sha256": "921440a8e3f180e14b8be4c60303469af7146ca4c1499dc629eb1bac49b2045a",
               "dimensoes": [
                 192,
                 192
@@ -1522,7 +2263,7 @@
             },
             {
               "ficheiro": "morvanna/frames/run_03.png",
-              "sha256": "adc2069b7a55eb19a125fa2b3e372bdef5777a26ed49ce3fd5d0143eafcb031f",
+              "sha256": "210bb22d8c8ffb0b9f6a391268b12f2194f5fe65bb7fd799ebcb1a43b4070056",
               "dimensoes": [
                 192,
                 192
@@ -1530,7 +2271,7 @@
             },
             {
               "ficheiro": "morvanna/frames/run_04.png",
-              "sha256": "8eb39ca47802bef393d1e00e4d3400e9234293da3309c50655ab0ad62740c9fb",
+              "sha256": "9c171136837ff72750a54905aa98f6514310f126cc99cd0efb6fbaff2c1bd12b",
               "dimensoes": [
                 192,
                 192
@@ -1538,7 +2279,7 @@
             },
             {
               "ficheiro": "morvanna/frames/run_05.png",
-              "sha256": "ad19e15d02a0a8a6ffe9613fc5d1ce56cbdfbaa8e02326004c9426211ed0e2c5",
+              "sha256": "b7f8b9c29278c9ba943a74df2c7817f913f9921f6d61af5820f55cdaa3af3959",
               "dimensoes": [
                 192,
                 192
@@ -1546,13 +2287,30 @@
             },
             {
               "ficheiro": "morvanna/frames/run_06.png",
-              "sha256": "8eb39ca47802bef393d1e00e4d3400e9234293da3309c50655ab0ad62740c9fb",
+              "sha256": "e774ab9d330b46ed4b70f42b1422dc53ed3211256f732eff8831dc5824153418",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "morvanna/frames/run_07.png",
+              "sha256": "67b465f193e7684490acb4cb884b4b77d73299eff8275cc2220efc4285dd4621",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "morvanna/frames/run_08.png",
+              "sha256": "bea42503af04fcb4ee0f657648975b029a7cf49b8ba391b0e8cb5b7ffe7c85dd",
               "dimensoes": [
                 192,
                 192
               ]
             }
-          ]
+          ],
+          "origem": "DERIVED_9H1"
         },
         "hit": {
           "fps": 12.0,
@@ -1637,6 +2395,69 @@
               ]
             }
           ]
+        },
+        "attack": {
+          "fps": 14.0,
+          "ciclo": false,
+          "frames": [
+            {
+              "ficheiro": "morvanna/frames/attack_01.png",
+              "sha256": "920475cf85e5f097ae214fc2c0b04f089571470fc1ca21dfd87c1538e275e928",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "morvanna/frames/attack_02.png",
+              "sha256": "9457ed1401ed8326bc38a160d6bc4b514f19e7aafbc7d57015a0d8310460c0da",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "morvanna/frames/attack_03.png",
+              "sha256": "f7d206ee6c5c6954ecf25d2e080cea91f61f26c5160141fe953ab9c3cc584c23",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "morvanna/frames/attack_04.png",
+              "sha256": "5612cc176e8dbdd457ada4253e3f36566674d84b3bfdafd3c06a99521298141e",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "morvanna/frames/attack_05.png",
+              "sha256": "12277ebddbbe9597068ae535c2e938164875619b873ef87cdc8622e5ef24859e",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "morvanna/frames/attack_06.png",
+              "sha256": "189b38f4dc86a18b39ffe83d74c1c873d3bb3433e86e3caeadbd453b3b8ee3d3",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "morvanna/frames/attack_07.png",
+              "sha256": "24f6ad82aaed68cac528d8e7aa2006c888661c9985f98bc2d2ba530b9a0095f9",
+              "dimensoes": [
+                192,
+                192
+              ]
+            }
+          ],
+          "origem": "DERIVED_9H1"
         }
       },
       "niveis": {
@@ -1650,7 +2471,12 @@
         "hit",
         "idle",
         "run"
-      ]
+      ],
+      "animacao_9h1": {
+        "tipo": "bipede",
+        "ferramenta": "tools/animar_criaturas_9h1.py",
+        "o_que": "Movimento anatomico segmentado derivado da pose aprovada."
+      }
     },
     "rainha_aracnidea": {
       "tipo": "guardiao",
@@ -1689,12 +2515,12 @@
       },
       "animacoes": {
         "idle": {
-          "fps": 5.0,
+          "fps": 7.0,
           "ciclo": true,
           "frames": [
             {
               "ficheiro": "rainha_aracnidea/frames/idle_01.png",
-              "sha256": "4c7cf9d9945321b7d683ad52d0dcf966708734b4edfbfa5e8482fc9d764f3531",
+              "sha256": "72adcd98f6d8cb3227079d06c63313cc01839318f0d647c292841ce89b546737",
               "dimensoes": [
                 192,
                 192
@@ -1702,7 +2528,7 @@
             },
             {
               "ficheiro": "rainha_aracnidea/frames/idle_02.png",
-              "sha256": "4c7cf9d9945321b7d683ad52d0dcf966708734b4edfbfa5e8482fc9d764f3531",
+              "sha256": "f4e3a53ed1475b296026df6acb61f6ffdb1bbc1c3f1509bf3e8f7a4b8582d097",
               "dimensoes": [
                 192,
                 192
@@ -1710,7 +2536,7 @@
             },
             {
               "ficheiro": "rainha_aracnidea/frames/idle_03.png",
-              "sha256": "f3256dadb1b95107db21e7dcbfdb2ed21c9b60bf643b70dea103f8cb6f3a04bb",
+              "sha256": "e8b5b2c985c5bcc13b50e445eca2a7f5fd16ac9be6ff4de3e8008402782a6510",
               "dimensoes": [
                 192,
                 192
@@ -1718,21 +2544,54 @@
             },
             {
               "ficheiro": "rainha_aracnidea/frames/idle_04.png",
-              "sha256": "f3256dadb1b95107db21e7dcbfdb2ed21c9b60bf643b70dea103f8cb6f3a04bb",
+              "sha256": "adc31646afa20985a304b79949f4d6b5da3e82ac453c77332e21ae90a1b953cc",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "rainha_aracnidea/frames/idle_05.png",
+              "sha256": "28f244211e771f91da2625e80857949b3774df50e6c1003066aa731debe4c830",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "rainha_aracnidea/frames/idle_06.png",
+              "sha256": "7907fb2ef2ac90ae8dafb64f0011f7af78f34f710da0a1caf087e58bf44f7531",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "rainha_aracnidea/frames/idle_07.png",
+              "sha256": "7008fca73ae0dccfa0eb3b1e1ecc4db92902637b5016cf5f8ac671db1639f244",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "rainha_aracnidea/frames/idle_08.png",
+              "sha256": "392a1a126ea2b6aac3f51d37593cc90346adee8512503ca6f77a89a318fc830b",
               "dimensoes": [
                 192,
                 192
               ]
             }
-          ]
+          ],
+          "origem": "DERIVED_9H1"
         },
         "run": {
-          "fps": 10.0,
+          "fps": 11.0,
           "ciclo": true,
           "frames": [
             {
               "ficheiro": "rainha_aracnidea/frames/run_01.png",
-              "sha256": "4c7cf9d9945321b7d683ad52d0dcf966708734b4edfbfa5e8482fc9d764f3531",
+              "sha256": "7d8f0ec4b198c79a25650bea12139fe7dcf394e3e743040832fe0a5bfa84adb4",
               "dimensoes": [
                 192,
                 192
@@ -1740,7 +2599,7 @@
             },
             {
               "ficheiro": "rainha_aracnidea/frames/run_02.png",
-              "sha256": "f3256dadb1b95107db21e7dcbfdb2ed21c9b60bf643b70dea103f8cb6f3a04bb",
+              "sha256": "0f7c5710f0f6d46ec83d33bade27e76f383e7699c33f4f60334326dd78b72c57",
               "dimensoes": [
                 192,
                 192
@@ -1748,7 +2607,7 @@
             },
             {
               "ficheiro": "rainha_aracnidea/frames/run_03.png",
-              "sha256": "82eb40b3919f0585c0e474665e0813f2c747413b2b27352f3d941941fe6e4edd",
+              "sha256": "78030d696a2d4ca6066704487e1077bf0c719ee0139b71197130d6fe869b7576",
               "dimensoes": [
                 192,
                 192
@@ -1756,7 +2615,7 @@
             },
             {
               "ficheiro": "rainha_aracnidea/frames/run_04.png",
-              "sha256": "f3256dadb1b95107db21e7dcbfdb2ed21c9b60bf643b70dea103f8cb6f3a04bb",
+              "sha256": "bc66624dd2cd6e4955ff7984d4e148effad14783644ed1ec131ccc1f08140ec2",
               "dimensoes": [
                 192,
                 192
@@ -1764,7 +2623,7 @@
             },
             {
               "ficheiro": "rainha_aracnidea/frames/run_05.png",
-              "sha256": "4c7cf9d9945321b7d683ad52d0dcf966708734b4edfbfa5e8482fc9d764f3531",
+              "sha256": "497dd0770f3bb2ee43d291fa18deaf0c01eba57f16c951f6369a340ae91aa1ef",
               "dimensoes": [
                 192,
                 192
@@ -1772,13 +2631,30 @@
             },
             {
               "ficheiro": "rainha_aracnidea/frames/run_06.png",
-              "sha256": "f3256dadb1b95107db21e7dcbfdb2ed21c9b60bf643b70dea103f8cb6f3a04bb",
+              "sha256": "25da32d030ac816403183b89e9e38188a4ebed2edaa9d4ec64dd574231e087df",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "rainha_aracnidea/frames/run_07.png",
+              "sha256": "e326fe43cfc9c3a0d56fcbbc3f751e96b508abb5b95596774a2d5126c9ebfefb",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "rainha_aracnidea/frames/run_08.png",
+              "sha256": "9adbb1bf029844d1a827a75a4204d173474d68be7db498aa24d7b9a8a3afdae1",
               "dimensoes": [
                 192,
                 192
               ]
             }
-          ]
+          ],
+          "origem": "DERIVED_9H1"
         },
         "hit": {
           "fps": 12.0,
@@ -1863,6 +2739,69 @@
               ]
             }
           ]
+        },
+        "attack": {
+          "fps": 14.0,
+          "ciclo": false,
+          "frames": [
+            {
+              "ficheiro": "rainha_aracnidea/frames/attack_01.png",
+              "sha256": "3ea87202e7691b9686ba6e362965dd43a779bff0f227a961d1813550e660af62",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "rainha_aracnidea/frames/attack_02.png",
+              "sha256": "77f97ebdb4027f138e88ce275b7cbd7e71798c68d304d1be3f3a78c32f74d1a6",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "rainha_aracnidea/frames/attack_03.png",
+              "sha256": "720723033dd03be2f7d468ad581d675046b91ee0b225744bbe5f0f5a533cccee",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "rainha_aracnidea/frames/attack_04.png",
+              "sha256": "0de67ed2051dc1cfac1a772ccecbc7b48e4c72e5756489eb02c3246567d50691",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "rainha_aracnidea/frames/attack_05.png",
+              "sha256": "3d924127fa0b23812627e63b749c114f3a073c56a5b8212157ddf7494866c216",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "rainha_aracnidea/frames/attack_06.png",
+              "sha256": "f2508c1499bb765ab544f5171c127e62887b4537e24eca91bc04194aae6a4c23",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "rainha_aracnidea/frames/attack_07.png",
+              "sha256": "62b310324a0a87162e9254a9799299916334434fd48969b010debd07ace11545",
+              "dimensoes": [
+                192,
+                192
+              ]
+            }
+          ],
+          "origem": "DERIVED_9H1"
         }
       },
       "niveis": {
@@ -1876,7 +2815,12 @@
         "hit",
         "idle",
         "run"
-      ]
+      ],
+      "animacao_9h1": {
+        "tipo": "aracnideo",
+        "ferramenta": "tools/animar_criaturas_9h1.py",
+        "o_que": "Movimento anatomico segmentado derivado da pose aprovada."
+      }
     },
     "entrevane": {
       "tipo": "guardiao",
@@ -1915,12 +2859,12 @@
       },
       "animacoes": {
         "idle": {
-          "fps": 5.0,
+          "fps": 7.0,
           "ciclo": true,
           "frames": [
             {
               "ficheiro": "entrevane/frames/idle_01.png",
-              "sha256": "82ce0cf40cafe379cf0128aede68febedf04673a365f7d2e4ec94acb27e4a24e",
+              "sha256": "4206fb7ff179b8cf2191c40799e401bbc89775a58cbb5aa77350de37f51cc623",
               "dimensoes": [
                 192,
                 192
@@ -1928,7 +2872,7 @@
             },
             {
               "ficheiro": "entrevane/frames/idle_02.png",
-              "sha256": "82ce0cf40cafe379cf0128aede68febedf04673a365f7d2e4ec94acb27e4a24e",
+              "sha256": "11d772bad9ef7c5d01fef8186ffb144d63599430dc00121534fcfd255456b186",
               "dimensoes": [
                 192,
                 192
@@ -1936,7 +2880,7 @@
             },
             {
               "ficheiro": "entrevane/frames/idle_03.png",
-              "sha256": "260f641ecb465bbd9a439dea0d3d054037aeb5545db8fa93d9bd7c0075fc0d3b",
+              "sha256": "e84476d632fb7c0374b8c928312a249987ef7678eaac022c9e40022e0ce4cfb9",
               "dimensoes": [
                 192,
                 192
@@ -1944,21 +2888,54 @@
             },
             {
               "ficheiro": "entrevane/frames/idle_04.png",
-              "sha256": "260f641ecb465bbd9a439dea0d3d054037aeb5545db8fa93d9bd7c0075fc0d3b",
+              "sha256": "eeafc204d9508f0063a3e316ba236b4e171cc55b105668ea220b2ce1ac7fff4c",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "entrevane/frames/idle_05.png",
+              "sha256": "b1edd8359c90dd51fd99361f671c02d7b286fcb201152d7a32ffbd82194473f2",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "entrevane/frames/idle_06.png",
+              "sha256": "af421237cf1b77894e09d2586ef193305983ad94e5c7644e8049198e50547c2f",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "entrevane/frames/idle_07.png",
+              "sha256": "905540e18012630a7fc9642be1ebbc4b855df4e8e124a0278f8cf0e01c2f9f2d",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "entrevane/frames/idle_08.png",
+              "sha256": "5fe3f62c9445453691ee95a6b39423fc6b49300bcb0b6dc7a90f85d5c63289a2",
               "dimensoes": [
                 192,
                 192
               ]
             }
-          ]
+          ],
+          "origem": "DERIVED_9H1"
         },
         "run": {
-          "fps": 10.0,
+          "fps": 11.0,
           "ciclo": true,
           "frames": [
             {
               "ficheiro": "entrevane/frames/run_01.png",
-              "sha256": "82ce0cf40cafe379cf0128aede68febedf04673a365f7d2e4ec94acb27e4a24e",
+              "sha256": "d1c3557af1c430e8b124533d17f180326e961fb077b116868e6d6dadf22ee50b",
               "dimensoes": [
                 192,
                 192
@@ -1966,7 +2943,7 @@
             },
             {
               "ficheiro": "entrevane/frames/run_02.png",
-              "sha256": "260f641ecb465bbd9a439dea0d3d054037aeb5545db8fa93d9bd7c0075fc0d3b",
+              "sha256": "06d3b7ce91f1ec508aae7bff6e17f12f5d03e5abf2ee71c407a563cb815a4ecc",
               "dimensoes": [
                 192,
                 192
@@ -1974,7 +2951,7 @@
             },
             {
               "ficheiro": "entrevane/frames/run_03.png",
-              "sha256": "bbf166a930232d3011f1d9e2339085628e1a308efaa4c0a44b6e7e3eb06a5dc5",
+              "sha256": "85f79790a26e779dce1a19baabc6d23d6b7579279f30bf09bba18db92c42cbb5",
               "dimensoes": [
                 192,
                 192
@@ -1982,7 +2959,7 @@
             },
             {
               "ficheiro": "entrevane/frames/run_04.png",
-              "sha256": "260f641ecb465bbd9a439dea0d3d054037aeb5545db8fa93d9bd7c0075fc0d3b",
+              "sha256": "842ce53c1ed4c33f1269b5ed02391b661dbe09b49c190c30077834959236af78",
               "dimensoes": [
                 192,
                 192
@@ -1990,7 +2967,7 @@
             },
             {
               "ficheiro": "entrevane/frames/run_05.png",
-              "sha256": "82ce0cf40cafe379cf0128aede68febedf04673a365f7d2e4ec94acb27e4a24e",
+              "sha256": "d1c3557af1c430e8b124533d17f180326e961fb077b116868e6d6dadf22ee50b",
               "dimensoes": [
                 192,
                 192
@@ -1998,13 +2975,30 @@
             },
             {
               "ficheiro": "entrevane/frames/run_06.png",
-              "sha256": "260f641ecb465bbd9a439dea0d3d054037aeb5545db8fa93d9bd7c0075fc0d3b",
+              "sha256": "937e4bcba941755fc3f044456da336a58028d7a7430b391732e11dab1c3b105f",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "entrevane/frames/run_07.png",
+              "sha256": "e30d49cad4835deaf3da190d4deaad38d6127dc41a55e17c716a75702cadd30e",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "entrevane/frames/run_08.png",
+              "sha256": "3de4dfdc252fb9d61afbbd158f84b1085f6b600310e21f0cd2c85018352acb19",
               "dimensoes": [
                 192,
                 192
               ]
             }
-          ]
+          ],
+          "origem": "DERIVED_9H1"
         },
         "hit": {
           "fps": 12.0,
@@ -2089,6 +3083,69 @@
               ]
             }
           ]
+        },
+        "attack": {
+          "fps": 14.0,
+          "ciclo": false,
+          "frames": [
+            {
+              "ficheiro": "entrevane/frames/attack_01.png",
+              "sha256": "900065fb0a7159012bd6ded346f371100d72b00dcfff5aa16bc9740669e4c8f0",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "entrevane/frames/attack_02.png",
+              "sha256": "8b2a6ab086786a82374850a759278d662bbd04e8cd47d052a9f86fa0674d872c",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "entrevane/frames/attack_03.png",
+              "sha256": "7183250c7dd147d707d280a5001fb66101645b44657577f0f77e41ebecb9eafc",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "entrevane/frames/attack_04.png",
+              "sha256": "599ae291bb3106ad869099f6f8af814145bfd422e9203e9e34e716bdb1b125e9",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "entrevane/frames/attack_05.png",
+              "sha256": "fcb57e0c94bfea35fbc8be72fa83158388d88b4beb06f67aac676268a6f8853a",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "entrevane/frames/attack_06.png",
+              "sha256": "2547b97b3ae2410a9339ebafe7576fc7c13ab841c7e57efe05fcd9f19d4afe58",
+              "dimensoes": [
+                192,
+                192
+              ]
+            },
+            {
+              "ficheiro": "entrevane/frames/attack_07.png",
+              "sha256": "d1c3557af1c430e8b124533d17f180326e961fb077b116868e6d6dadf22ee50b",
+              "dimensoes": [
+                192,
+                192
+              ]
+            }
+          ],
+          "origem": "DERIVED_9H1"
         }
       },
       "niveis": {
@@ -2102,7 +3159,12 @@
         "hit",
         "idle",
         "run"
-      ]
+      ],
+      "animacao_9h1": {
+        "tipo": "planta",
+        "ferramenta": "tools/animar_criaturas_9h1.py",
+        "o_que": "Movimento anatomico segmentado derivado da pose aprovada."
+      }
     },
     "clone_morvanna": {
       "tipo": "comum",
@@ -2141,12 +3203,12 @@
       },
       "animacoes": {
         "idle": {
-          "fps": 5.0,
+          "fps": 7.0,
           "ciclo": true,
           "frames": [
             {
               "ficheiro": "clone_morvanna/frames/idle_01.png",
-              "sha256": "211e83fa3d83378b6280cb5c1bcfc84e93d1528314e857b4ae203e3ae5533ebd",
+              "sha256": "99bc8ebd536124e543f04ce7391d3d8bed6c5afecd5b1a5321f08e4c514a1ff3",
               "dimensoes": [
                 128,
                 96
@@ -2154,7 +3216,7 @@
             },
             {
               "ficheiro": "clone_morvanna/frames/idle_02.png",
-              "sha256": "211e83fa3d83378b6280cb5c1bcfc84e93d1528314e857b4ae203e3ae5533ebd",
+              "sha256": "22b446630f53399f90f402981e5ecb8b22f3cc060ddbf01dfab1a4de11244acd",
               "dimensoes": [
                 128,
                 96
@@ -2162,7 +3224,7 @@
             },
             {
               "ficheiro": "clone_morvanna/frames/idle_03.png",
-              "sha256": "7520b1e4a03a8f47ae3d44dbd7e0611dea228061e80188c8cd4ba04f1de2a84a",
+              "sha256": "b2183d0ea540d461cc990457d81744ae665fd37bbb497c006ace2d8ca290dc7c",
               "dimensoes": [
                 128,
                 96
@@ -2170,21 +3232,54 @@
             },
             {
               "ficheiro": "clone_morvanna/frames/idle_04.png",
-              "sha256": "7520b1e4a03a8f47ae3d44dbd7e0611dea228061e80188c8cd4ba04f1de2a84a",
+              "sha256": "d52e42ad35267448bb9ec519ee79e8b2077cf84ce66a81a76c5df537c925d3cd",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "clone_morvanna/frames/idle_05.png",
+              "sha256": "c89160b08191b863ebab6e4b279c7f41aa5b469525c5747cbafe347922f2e15e",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "clone_morvanna/frames/idle_06.png",
+              "sha256": "7752cadd9783a82310e7cdd3f11095e475c6793d307801c498e0195ede66810e",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "clone_morvanna/frames/idle_07.png",
+              "sha256": "e17caabd1085703904499de594d456d5d9cd8f23355ba57cda905fb9ebe4412d",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "clone_morvanna/frames/idle_08.png",
+              "sha256": "fb8b06802114ee027506059d652b91b9b546cc583090e7deacfbe2bc1e153959",
               "dimensoes": [
                 128,
                 96
               ]
             }
-          ]
+          ],
+          "origem": "DERIVED_9H1"
         },
         "run": {
-          "fps": 10.0,
+          "fps": 11.0,
           "ciclo": true,
           "frames": [
             {
               "ficheiro": "clone_morvanna/frames/run_01.png",
-              "sha256": "211e83fa3d83378b6280cb5c1bcfc84e93d1528314e857b4ae203e3ae5533ebd",
+              "sha256": "6e172257fcfec21e8ca35e57595ce2ddcc520270b366e3db0177e1746997cf5f",
               "dimensoes": [
                 128,
                 96
@@ -2192,7 +3287,7 @@
             },
             {
               "ficheiro": "clone_morvanna/frames/run_02.png",
-              "sha256": "7520b1e4a03a8f47ae3d44dbd7e0611dea228061e80188c8cd4ba04f1de2a84a",
+              "sha256": "e255a03a36f8d7d40ea117b6bf82e04b22e13c3b960854cfed7cde8fea485f58",
               "dimensoes": [
                 128,
                 96
@@ -2200,7 +3295,7 @@
             },
             {
               "ficheiro": "clone_morvanna/frames/run_03.png",
-              "sha256": "76c83438a6069d3351ffea58cef452c499e212c6e41b4da15909878fda5f66fe",
+              "sha256": "0adc4df5f12643630720250d172686e4840eb446a0e557e61955a355845a4794",
               "dimensoes": [
                 128,
                 96
@@ -2208,7 +3303,7 @@
             },
             {
               "ficheiro": "clone_morvanna/frames/run_04.png",
-              "sha256": "7520b1e4a03a8f47ae3d44dbd7e0611dea228061e80188c8cd4ba04f1de2a84a",
+              "sha256": "6d5fea31db0a3565c222b0e383ae2776315f1143edc4dbac9139667ef28275c7",
               "dimensoes": [
                 128,
                 96
@@ -2216,7 +3311,7 @@
             },
             {
               "ficheiro": "clone_morvanna/frames/run_05.png",
-              "sha256": "211e83fa3d83378b6280cb5c1bcfc84e93d1528314e857b4ae203e3ae5533ebd",
+              "sha256": "69e686dbb8db45ddded3bdcf2c531539ed7747c0562be0d26e87d64ec6cc19aa",
               "dimensoes": [
                 128,
                 96
@@ -2224,13 +3319,30 @@
             },
             {
               "ficheiro": "clone_morvanna/frames/run_06.png",
-              "sha256": "7520b1e4a03a8f47ae3d44dbd7e0611dea228061e80188c8cd4ba04f1de2a84a",
+              "sha256": "e5f91d16d9fbc4cd5878460a3e9bbce352ef4ec1870571fb958c113024ad198e",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "clone_morvanna/frames/run_07.png",
+              "sha256": "d4287eee9eb62f4cc89a62bc680a813eb5bba16eb6a58d9b69ddbf62f45124cb",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "clone_morvanna/frames/run_08.png",
+              "sha256": "20f267afbe9bdae0ffe608dfafe1f9e175ff02e210a8955a9944fc43ef4e0ff3",
               "dimensoes": [
                 128,
                 96
               ]
             }
-          ]
+          ],
+          "origem": "DERIVED_9H1"
         },
         "hit": {
           "fps": 12.0,
@@ -2315,6 +3427,69 @@
               ]
             }
           ]
+        },
+        "attack": {
+          "fps": 14.0,
+          "ciclo": false,
+          "frames": [
+            {
+              "ficheiro": "clone_morvanna/frames/attack_01.png",
+              "sha256": "6886bbde5e6aea6ecbe2c038924095fd874a57152ef105637424cbf628dbe3bc",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "clone_morvanna/frames/attack_02.png",
+              "sha256": "f009badf680050dd75a56b30e1ea08f6a56d3a42b015d487a73d3f9384b20043",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "clone_morvanna/frames/attack_03.png",
+              "sha256": "5bfb8d74d06dcff2734f07f29bbfeb1987371fe645c8b524a314b800682624d6",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "clone_morvanna/frames/attack_04.png",
+              "sha256": "d492fa9c6f3d4016f04b6de74962b4398beb4e0f9c93e3f9dea5819b7da9ae8b",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "clone_morvanna/frames/attack_05.png",
+              "sha256": "30462d91200ca09bd039876751a38d79540277478a1f03357147cbf56092e527",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "clone_morvanna/frames/attack_06.png",
+              "sha256": "f359480f4b93ac2589bc756e3ced13d9c864f379aad1d3167c71a0eb43fc2bc7",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "clone_morvanna/frames/attack_07.png",
+              "sha256": "f1d9a1961db76dc1f7b51159980254bd446135d82c75f9a479fd6ada706ade24",
+              "dimensoes": [
+                128,
+                96
+              ]
+            }
+          ],
+          "origem": "DERIVED_9H1"
         }
       },
       "niveis": {
@@ -2327,7 +3502,12 @@
         "hit",
         "idle",
         "run"
-      ]
+      ],
+      "animacao_9h1": {
+        "tipo": "bipede",
+        "ferramenta": "tools/animar_criaturas_9h1.py",
+        "o_que": "Movimento anatomico segmentado derivado da pose aprovada."
+      }
     },
     "cria_rainha": {
       "tipo": "comum",
@@ -2366,12 +3546,12 @@
       },
       "animacoes": {
         "idle": {
-          "fps": 5.0,
+          "fps": 7.0,
           "ciclo": true,
           "frames": [
             {
               "ficheiro": "cria_rainha/frames/idle_01.png",
-              "sha256": "91d1c47d92358b2493e108e0ec8538e5084edc8624a637644b0da2743b4bcc71",
+              "sha256": "83e962fd63cf802b06b7873e6ce37e507b8df4aefcf0f3c48267b07898a7fc15",
               "dimensoes": [
                 128,
                 96
@@ -2379,7 +3559,7 @@
             },
             {
               "ficheiro": "cria_rainha/frames/idle_02.png",
-              "sha256": "91d1c47d92358b2493e108e0ec8538e5084edc8624a637644b0da2743b4bcc71",
+              "sha256": "4712343c1fed74f19123ae7de9c43b81b71c272090f1e463ce1bff5210dcc36e",
               "dimensoes": [
                 128,
                 96
@@ -2387,7 +3567,7 @@
             },
             {
               "ficheiro": "cria_rainha/frames/idle_03.png",
-              "sha256": "bcd332259adb49b0efc038e73f52752127654c738f346f57729542b627a7d715",
+              "sha256": "184f7427e11e080036e0b219549fede4e7f7eb5c42bda3f4be4392fadbab9faa",
               "dimensoes": [
                 128,
                 96
@@ -2395,21 +3575,54 @@
             },
             {
               "ficheiro": "cria_rainha/frames/idle_04.png",
-              "sha256": "bcd332259adb49b0efc038e73f52752127654c738f346f57729542b627a7d715",
+              "sha256": "c4cfd3475a9c3f82e311dfac447e06825f9a657fb05905455ed9ff29f72b7c71",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "cria_rainha/frames/idle_05.png",
+              "sha256": "1d74edea247c40082d0b99ec2e3027ff8665eda507c64ff0cc90f5aa1d70690f",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "cria_rainha/frames/idle_06.png",
+              "sha256": "83918a9d06969cb2d75b985cc73c815b56765c4e03ccfdda2b9db5e105d24b86",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "cria_rainha/frames/idle_07.png",
+              "sha256": "00cbcd21127cbab36fcd3f25bbafc1721a2db21400bfcaee42758631593b91de",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "cria_rainha/frames/idle_08.png",
+              "sha256": "273726a8e449a977fbdcf3fc662930dc69627dd691ec9e640e03695bbd262272",
               "dimensoes": [
                 128,
                 96
               ]
             }
-          ]
+          ],
+          "origem": "DERIVED_9H1"
         },
         "run": {
-          "fps": 10.0,
+          "fps": 11.0,
           "ciclo": true,
           "frames": [
             {
               "ficheiro": "cria_rainha/frames/run_01.png",
-              "sha256": "91d1c47d92358b2493e108e0ec8538e5084edc8624a637644b0da2743b4bcc71",
+              "sha256": "9067acd0e5ab64b00d6edac24d988411f4b38924b603f00fc31b55e0d058fb77",
               "dimensoes": [
                 128,
                 96
@@ -2417,7 +3630,7 @@
             },
             {
               "ficheiro": "cria_rainha/frames/run_02.png",
-              "sha256": "bcd332259adb49b0efc038e73f52752127654c738f346f57729542b627a7d715",
+              "sha256": "d2badb178bda29f3105a78153dddc8058b6c9337602299ac94048b495248df4f",
               "dimensoes": [
                 128,
                 96
@@ -2425,7 +3638,7 @@
             },
             {
               "ficheiro": "cria_rainha/frames/run_03.png",
-              "sha256": "4f4d56ad7f75adfaa94f1eca5c172d9ff3fef9858fdb328dc26bb50a6b11b4ea",
+              "sha256": "e852a12ecfc7271037f69d79dd259063ae968be9b921d2c642f14d182c8494fa",
               "dimensoes": [
                 128,
                 96
@@ -2433,7 +3646,7 @@
             },
             {
               "ficheiro": "cria_rainha/frames/run_04.png",
-              "sha256": "bcd332259adb49b0efc038e73f52752127654c738f346f57729542b627a7d715",
+              "sha256": "a100b558daeb48fc3313ec557b63e188c2f0664320e5b469c0eba4c3f960c816",
               "dimensoes": [
                 128,
                 96
@@ -2441,7 +3654,7 @@
             },
             {
               "ficheiro": "cria_rainha/frames/run_05.png",
-              "sha256": "91d1c47d92358b2493e108e0ec8538e5084edc8624a637644b0da2743b4bcc71",
+              "sha256": "9d4da2d69b35b858c4efbab0a469d0f42e918f4af9fcaed658a1fa2041636adb",
               "dimensoes": [
                 128,
                 96
@@ -2449,13 +3662,30 @@
             },
             {
               "ficheiro": "cria_rainha/frames/run_06.png",
-              "sha256": "bcd332259adb49b0efc038e73f52752127654c738f346f57729542b627a7d715",
+              "sha256": "0ee007c78cd5fb2447326822f91b317c2a0ea3c22b9f270bfec51962fcb257fe",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "cria_rainha/frames/run_07.png",
+              "sha256": "5dfbf07f880d1d3d1322163ebee60f76b66cd62746036ba129daaac0b8592f10",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "cria_rainha/frames/run_08.png",
+              "sha256": "605d32c396588badcbe2f2e5cda4426039b2981e9bf09bc283194e8656a35a9a",
               "dimensoes": [
                 128,
                 96
               ]
             }
-          ]
+          ],
+          "origem": "DERIVED_9H1"
         },
         "hit": {
           "fps": 12.0,
@@ -2540,6 +3770,69 @@
               ]
             }
           ]
+        },
+        "attack": {
+          "fps": 14.0,
+          "ciclo": false,
+          "frames": [
+            {
+              "ficheiro": "cria_rainha/frames/attack_01.png",
+              "sha256": "126369691ad834a59da987f29fcb5e3f8b300e8c829ce5ac3c9c1893731b3be2",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "cria_rainha/frames/attack_02.png",
+              "sha256": "b43fe85da895c85dd1074e13d023e7e745b3afa76f7cb4ad5dd5349e65cdc0c9",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "cria_rainha/frames/attack_03.png",
+              "sha256": "c82f4048dbf4f9e89ac49d3a00c41d7704059b7a85829e1e807c477b5f5f75fc",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "cria_rainha/frames/attack_04.png",
+              "sha256": "386ccb575ca670f5fdd94b7a1b10839bb8c1e57ab4781791e482372742a548a6",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "cria_rainha/frames/attack_05.png",
+              "sha256": "1aa54fe0db8445a06cdb8e65c7f1f9fe71d35ae6e3b3f26816566feecf11c38d",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "cria_rainha/frames/attack_06.png",
+              "sha256": "d1784298c2b20f4e050da7902dac08b647383f7b2072a1bf67f7179f85c50722",
+              "dimensoes": [
+                128,
+                96
+              ]
+            },
+            {
+              "ficheiro": "cria_rainha/frames/attack_07.png",
+              "sha256": "494f994a8edda95c96db2b8a0ed126f78a9c0389015980394b421efeebe68a0f",
+              "dimensoes": [
+                128,
+                96
+              ]
+            }
+          ],
+          "origem": "DERIVED_9H1"
         }
       },
       "niveis": {
@@ -2552,7 +3845,12 @@
         "hit",
         "idle",
         "run"
-      ]
+      ],
+      "animacao_9h1": {
+        "tipo": "aracnideo",
+        "ferramenta": "tools/animar_criaturas_9h1.py",
+        "o_que": "Movimento anatomico segmentado derivado da pose aprovada."
+      }
     },
     "coracao_putrefacto": {
       "tipo": "boss",
@@ -2561,13 +3859,12 @@
       "cena": "res://scenes/actors/ChefeCoracaoPutrefacto.tscn",
       "animacoes": {
         "idle": {
-          "fps": 5.0,
+          "fps": 7.0,
           "ciclo": true,
-          "fase": 1,
           "frames": [
             {
               "ficheiro": "res://assets/art/regions/region_01_forest/bosses/coracao_putrefacto/production/phase_1/idle_01.png",
-              "sha256": "b3b2c32075671b670707414b65ea259ad6f0647d950e4217c2920712893f0312",
+              "sha256": "c55e481ef90cdb936272f0164a4376e79bfb8fa08a27cfa3e2e498d274aa1531",
               "dimensoes": [
                 176,
                 120
@@ -2575,7 +3872,7 @@
             },
             {
               "ficheiro": "res://assets/art/regions/region_01_forest/bosses/coracao_putrefacto/production/phase_1/idle_02.png",
-              "sha256": "43f3b72b183292565b6c191dacb7682f8173075d9fe1b021ceb33c37bcbe2b3e",
+              "sha256": "4edf3102c5d22c5999c605e7c8891f23fadca8fb959f4d14e85aaccad4456593",
               "dimensoes": [
                 176,
                 120
@@ -2583,7 +3880,7 @@
             },
             {
               "ficheiro": "res://assets/art/regions/region_01_forest/bosses/coracao_putrefacto/production/phase_1/idle_03.png",
-              "sha256": "1627ae392618774775e56547178f2719567d38acc96a09cd6bbd9a16e1e7d683",
+              "sha256": "0343c33c735f8eed35e6607dd6f030dc1b8ba5aa968880babd23a0b587ba5a3a",
               "dimensoes": [
                 176,
                 120
@@ -2591,13 +3888,46 @@
             },
             {
               "ficheiro": "res://assets/art/regions/region_01_forest/bosses/coracao_putrefacto/production/phase_1/idle_04.png",
-              "sha256": "43f3b72b183292565b6c191dacb7682f8173075d9fe1b021ceb33c37bcbe2b3e",
+              "sha256": "3fc4224adfdea454e3dd2495e00ecb29de75f89bffb8740bb629ef961366047f",
+              "dimensoes": [
+                176,
+                120
+              ]
+            },
+            {
+              "ficheiro": "res://assets/art/regions/region_01_forest/bosses/coracao_putrefacto/production/phase_1/idle_05.png",
+              "sha256": "4ee8d76299f6543716b645f1346322dc73aa5bdca7eee7722c264d81119d6bd4",
+              "dimensoes": [
+                176,
+                120
+              ]
+            },
+            {
+              "ficheiro": "res://assets/art/regions/region_01_forest/bosses/coracao_putrefacto/production/phase_1/idle_06.png",
+              "sha256": "b479d15369ba617ab9f80436a4aec2883af3fcda7805ad5c20623f6f31af72b7",
+              "dimensoes": [
+                176,
+                120
+              ]
+            },
+            {
+              "ficheiro": "res://assets/art/regions/region_01_forest/bosses/coracao_putrefacto/production/phase_1/idle_07.png",
+              "sha256": "e5e7685f94dff2d45cb51e1d78c081039b7ec025119b7d5737e68464583c3b5a",
+              "dimensoes": [
+                176,
+                120
+              ]
+            },
+            {
+              "ficheiro": "res://assets/art/regions/region_01_forest/bosses/coracao_putrefacto/production/phase_1/idle_08.png",
+              "sha256": "c891862b9edb14bca1a78427ffa0414a0f5a3f554ef32ec0abd2bbfdbacb2aa9",
               "dimensoes": [
                 176,
                 120
               ]
             }
-          ]
+          ],
+          "origem": "DERIVED_9H1"
         },
         "run": {
           "fps": 5.0,
@@ -2646,13 +3976,12 @@
           ]
         },
         "idle_f2": {
-          "fps": 6.0,
+          "fps": 7.0,
           "ciclo": true,
-          "fase": 2,
           "frames": [
             {
               "ficheiro": "res://assets/art/regions/region_01_forest/bosses/coracao_putrefacto/production/phase_2/idle_f2_01.png",
-              "sha256": "2f8e66f489685f93c74ff25f19b354b696a69afb24f19bdb78c4d318517e2cdb",
+              "sha256": "99517caa109701bf9ab2c0ac495cf5a546462b15cc4b4168b9b01ca3d8711070",
               "dimensoes": [
                 176,
                 120
@@ -2660,7 +3989,7 @@
             },
             {
               "ficheiro": "res://assets/art/regions/region_01_forest/bosses/coracao_putrefacto/production/phase_2/idle_f2_02.png",
-              "sha256": "5bb9a8f2923af4bd6b3ea1d2c06f1f82d6d5365ffcf43605f39fc21f5d6dd44a",
+              "sha256": "f9fbee93867b5d5a6e398fc1a164d534f16b43f9ca4ea2d9efe1da13b37e16a2",
               "dimensoes": [
                 176,
                 120
@@ -2668,7 +3997,7 @@
             },
             {
               "ficheiro": "res://assets/art/regions/region_01_forest/bosses/coracao_putrefacto/production/phase_2/idle_f2_03.png",
-              "sha256": "8d443a4f9508a3a772e6ca6ecdab5149246890c3f300812e25a20e69a9c3cb2c",
+              "sha256": "896a93c9d80910ae88a19c9b919f86bba7ab817352cb3eccc183a9029a5bee99",
               "dimensoes": [
                 176,
                 120
@@ -2676,13 +4005,46 @@
             },
             {
               "ficheiro": "res://assets/art/regions/region_01_forest/bosses/coracao_putrefacto/production/phase_2/idle_f2_04.png",
-              "sha256": "5bb9a8f2923af4bd6b3ea1d2c06f1f82d6d5365ffcf43605f39fc21f5d6dd44a",
+              "sha256": "50375900e593f030468ea077c86bf8e21ff072b41f915fca7989f403af4f09f4",
+              "dimensoes": [
+                176,
+                120
+              ]
+            },
+            {
+              "ficheiro": "res://assets/art/regions/region_01_forest/bosses/coracao_putrefacto/production/phase_2/idle_f2_05.png",
+              "sha256": "b45a06b05d2489cb8173acf296a3fe5f56691fd26399a683b5c326e65f184645",
+              "dimensoes": [
+                176,
+                120
+              ]
+            },
+            {
+              "ficheiro": "res://assets/art/regions/region_01_forest/bosses/coracao_putrefacto/production/phase_2/idle_f2_06.png",
+              "sha256": "b9ffd63f3fa4117e41380da4d878586f8c84b26f51cfebf4e4711cc4ed2687a5",
+              "dimensoes": [
+                176,
+                120
+              ]
+            },
+            {
+              "ficheiro": "res://assets/art/regions/region_01_forest/bosses/coracao_putrefacto/production/phase_2/idle_f2_07.png",
+              "sha256": "d4f0df67407242bedc2cd6c1112ed112b576e5b27cb51da927c5babbd13f2e95",
+              "dimensoes": [
+                176,
+                120
+              ]
+            },
+            {
+              "ficheiro": "res://assets/art/regions/region_01_forest/bosses/coracao_putrefacto/production/phase_2/idle_f2_08.png",
+              "sha256": "ef44686c49874084dbebf0124b190456dd2025a79ca2ca2959e03b42bb3c1569",
               "dimensoes": [
                 176,
                 120
               ]
             }
-          ]
+          ],
+          "origem": "DERIVED_9H1"
         },
         "hit_f2": {
           "fps": 14.0,
@@ -2801,6 +4163,132 @@
               ]
             }
           ]
+        },
+        "attack": {
+          "fps": 12.0,
+          "ciclo": false,
+          "frames": [
+            {
+              "ficheiro": "res://assets/art/regions/region_01_forest/bosses/coracao_putrefacto/production/phase_1/attack_01.png",
+              "sha256": "d01120f7138b5cac7fbc63cbbb5e254f34ddc2bb4830c7a202f258eb519ab3c0",
+              "dimensoes": [
+                176,
+                120
+              ]
+            },
+            {
+              "ficheiro": "res://assets/art/regions/region_01_forest/bosses/coracao_putrefacto/production/phase_1/attack_02.png",
+              "sha256": "3a73c13ecc253d0bcd313598ea2b064f86911eb86b1672811d2b87d0377f61bc",
+              "dimensoes": [
+                176,
+                120
+              ]
+            },
+            {
+              "ficheiro": "res://assets/art/regions/region_01_forest/bosses/coracao_putrefacto/production/phase_1/attack_03.png",
+              "sha256": "5217dfc0870f36da1dbdf3086883adf0739f2d5ac5bbbc3361cd9b3c1ea0d32c",
+              "dimensoes": [
+                176,
+                120
+              ]
+            },
+            {
+              "ficheiro": "res://assets/art/regions/region_01_forest/bosses/coracao_putrefacto/production/phase_1/attack_04.png",
+              "sha256": "3b1dfe1d280886720761cfcac432068451e1c11ebd6fbe8027c3e0b6dd447c5c",
+              "dimensoes": [
+                176,
+                120
+              ]
+            },
+            {
+              "ficheiro": "res://assets/art/regions/region_01_forest/bosses/coracao_putrefacto/production/phase_1/attack_05.png",
+              "sha256": "5db91ce232e5581c62ff262182bf3aae423dd7c9f498620233ef4bb103814215",
+              "dimensoes": [
+                176,
+                120
+              ]
+            },
+            {
+              "ficheiro": "res://assets/art/regions/region_01_forest/bosses/coracao_putrefacto/production/phase_1/attack_06.png",
+              "sha256": "8aaff2ae518862639fc3dc33db9f05831ff4371ea6c902807636f1c5ad2a54b8",
+              "dimensoes": [
+                176,
+                120
+              ]
+            },
+            {
+              "ficheiro": "res://assets/art/regions/region_01_forest/bosses/coracao_putrefacto/production/phase_1/attack_07.png",
+              "sha256": "8dc7b568f1e9c44c03315d6cc29e4b5ad89f8abe5b91d2e2610337dd25be74c3",
+              "dimensoes": [
+                176,
+                120
+              ]
+            }
+          ],
+          "origem": "DERIVED_9H1"
+        },
+        "attack_f2": {
+          "fps": 12.0,
+          "ciclo": false,
+          "frames": [
+            {
+              "ficheiro": "res://assets/art/regions/region_01_forest/bosses/coracao_putrefacto/production/phase_2/attack_f2_01.png",
+              "sha256": "3be5ae31fe483b4adb23610a3fb7b3da8323fd575eb64d4021f86ab5abf655cc",
+              "dimensoes": [
+                176,
+                120
+              ]
+            },
+            {
+              "ficheiro": "res://assets/art/regions/region_01_forest/bosses/coracao_putrefacto/production/phase_2/attack_f2_02.png",
+              "sha256": "f8e4f8b0d33b413725c436b94f735fc30974a61fecbad688740216da9a50598a",
+              "dimensoes": [
+                176,
+                120
+              ]
+            },
+            {
+              "ficheiro": "res://assets/art/regions/region_01_forest/bosses/coracao_putrefacto/production/phase_2/attack_f2_03.png",
+              "sha256": "505332f824636d91124e9bb649d2364465c3df88fc145fc0432cbffc9bf08190",
+              "dimensoes": [
+                176,
+                120
+              ]
+            },
+            {
+              "ficheiro": "res://assets/art/regions/region_01_forest/bosses/coracao_putrefacto/production/phase_2/attack_f2_04.png",
+              "sha256": "d5b8b5ada9f2ede285f7a5b820016807e99ad79a0e250311f611f8b0ad18b4db",
+              "dimensoes": [
+                176,
+                120
+              ]
+            },
+            {
+              "ficheiro": "res://assets/art/regions/region_01_forest/bosses/coracao_putrefacto/production/phase_2/attack_f2_05.png",
+              "sha256": "6a8781dd248380ce0c06ab12e7b25857259c1b0b5f3a5a9d8692ebe4950f0692",
+              "dimensoes": [
+                176,
+                120
+              ]
+            },
+            {
+              "ficheiro": "res://assets/art/regions/region_01_forest/bosses/coracao_putrefacto/production/phase_2/attack_f2_06.png",
+              "sha256": "7f2fd05125bbfbaf121c4e8147f9a0d870d07c37e6871621912eee51c73b7158",
+              "dimensoes": [
+                176,
+                120
+              ]
+            },
+            {
+              "ficheiro": "res://assets/art/regions/region_01_forest/bosses/coracao_putrefacto/production/phase_2/attack_f2_07.png",
+              "sha256": "793806a4d7798dc35a7b751e1cf9fd0fe12c6362a1f94071e924a6906af19efa",
+              "dimensoes": [
+                176,
+                120
+              ]
+            }
+          ],
+          "origem": "DERIVED_9H1"
         }
       },
       "niveis": {
@@ -2843,5 +4331,11 @@
         ]
       }
     }
+  },
+  "execucao_9h1": {
+    "o_que": "Movimento anatomico derivado: pernas por grupos detectados, tronco a respirar, cabeca/copa/tentaculos com fase propria, brilho da corrupcao a pulsar, e um estado ATTACK que nao existia.",
+    "autorizacao": "GAME MASTER 9H.1 - DERIVED ANIMATION FRAMES / SEGMENTED ANATOMICAL MOTION",
+    "ferramenta": "tools/animar_criaturas_9h1.py",
+    "pose_de_partida": "frames/_base_9h1.png (copia intocada da pose 9D/9E)"
   }
 }

@@ -1,0 +1,76 @@
+{
+  "execucao": "9H.1",
+  "o_que": "Apresentacao NEUTRA do selector, para as regioes sem autoridade visual aprovada (II-XX).",
+  "como": "As pecas do frontend 9H dessaturadas para aco frio. Nao ha' identidade de regiao nenhuma aqui -- e' esse o ponto.",
+  "estado": "REGION SELECTOR THEME AUTHORITY MISSING",
+  "ficheiros": {
+    "fundo_seletor": {
+      "sha256": "29a9556bb58c17eed4728d6b7c5813adf54ed38a54f8bbbe0280cf7a8800f51b",
+      "origem": "assets/ui/frontend_9h/fundo_seletor.png"
+    },
+    "anel_normal": {
+      "sha256": "a53c41e93f206d1de2693bad56491f9cabf5ef6dabd23cb9eba7e9d0520a68f9",
+      "origem": "assets/ui/frontend_9h/anel_normal.png"
+    },
+    "anel_atual": {
+      "sha256": "435d0ca26d7b1c4a02c68e8f675361fce5bedd9504b24512d661fdc7920c7b07",
+      "origem": "assets/ui/frontend_9h/anel_atual.png"
+    },
+    "anel_chefe": {
+      "sha256": "b8c3f2f0c6dfa77db5a7c8df0e7804b4d697fbea863fcedc8d46fe30096f5264",
+      "origem": "assets/ui/frontend_9h/anel_chefe.png"
+    },
+    "painel_detalhe": {
+      "sha256": "4fd4c3b6787c0e825c21c52284b64b5414e59548a27e514b18a76d6f3d4ac121",
+      "origem": "assets/ui/frontend_9h/painel_detalhe.png"
+    },
+    "botao_jogar": {
+      "sha256": "9bb3bd079238224270fffeccc85b9df7386aba3ba707669c7187cc9289c59c72",
+      "origem": "assets/ui/frontend_9h/botao_jogar.png"
+    },
+    "aba_atual": {
+      "sha256": "c24d50ece1a4b2eed06ca6b989ab7dda970738f9005761b34c69cff0cf1ca695",
+      "origem": "assets/ui/frontend_9h/aba_atual.png"
+    },
+    "aba_bloqueada": {
+      "sha256": "a080459ef783a959bbb244a720a5b520e0e989311eb94bd2bb9b976a2a0ab187",
+      "origem": "assets/ui/frontend_9h/aba_bloqueada.png"
+    },
+    "ficha_nivel": {
+      "sha256": "435510ef97db1f36318fcaca4aaf8adb62c51214b3c1a178a075734c2d6e03fe",
+      "origem": "assets/ui/frontend_9h/ficha_nivel.png"
+    },
+    "placa_selecionada": {
+      "sha256": "1d38fc41697e4856a5d6720077562682046dab26688b85f7747aef1cdde93261",
+      "origem": "assets/ui/frontend_9h/placa_selecionada.png"
+    },
+    "separador_menu": {
+      "sha256": "43989824637d9fb50b21f472e815a638d40525d69a26027d4df8cfd3ad5a1cdd",
+      "origem": "assets/ui/frontend_9h/separador_menu.png"
+    },
+    "seta_direita": {
+      "sha256": "909a5857f0e2b07b6e69e97120b76b87ec15c12e461259cfb92c4a8037dd98da",
+      "origem": "assets/ui/frontend_9h/seta_direita.png"
+    },
+    "seta_esquerda": {
+      "sha256": "0641f3657075b53c0ae3fb5873f7e6c989dd605da1442f992191af95750d2ec1",
+      "origem": "assets/ui/frontend_9h/seta_esquerda.png"
+    },
+    "cadeado": {
+      "sha256": "b802252e40e291aea1d9b668c6940a9184bbcf9002968f738f372c6fd9c11285",
+      "origem": "assets/ui/frontend_9h/cadeado.png"
+    },
+    "ornamento_rodape": {
+      "sha256": "6d8ea9a27a7131d1a2057cf0bbd2c17207848e34bdf7be2b38ac0b26916c9eee",
+      "origem": "assets/ui/frontend_9h/ornamento_rodape.png"
+    },
+    "voltar_seta": {
+      "sha256": "d610733f36dab83dbad38e6df54ed0744f46faf624a8baabe4fc776f35fa8c35",
+      "origem": "assets/ui/frontend_9h/voltar_seta.png"
+    },
+    "losango": {
+      "sha256": "8b0d100f129d41f06be094c16fc5d8a4f7bbcbef6dee471a619a6159cfd2b31b",
+      "origem": "assets/ui/frontend_9h/losango.png"
+    }
+  }
+}

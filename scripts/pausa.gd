@@ -97,6 +97,9 @@ func _abrir() -> void:
 	_cd = 0.35
 	visible = true
 	get_tree().paused = true
+	# 9H.1: a cama desce e entra a ambiência da pausa. NÃO se pára a música --
+	# pará-la e recomeçá-la punha a faixa de volta ao princípio a cada pausa.
+	Musica.pausa(true)
 	_continuar.grab_focus()
 
 
@@ -104,6 +107,7 @@ func _fechar() -> void:
 	_cd = 0.35
 	visible = false
 	get_tree().paused = false
+	Musica.pausa(false)
 
 
 ## Sobrepõe o ecrã de Opções ao menu de pausa. Não mexe em

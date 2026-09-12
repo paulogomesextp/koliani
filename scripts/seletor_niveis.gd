@@ -111,6 +111,13 @@ var _pronto := false
 
 var _palco: Control
 var _arte: TextureRect
+var _barras: TextureRect
+## Peças do frontend que trocam de pele com a região: [{no, peca}].
+var _pecas: Array[Dictionary] = []
+## Região cuja pele está montada (-1 = nenhuma ainda).
+var _tema_montado := -1
+var _veu_painel: TextureRect
+var _chao_painel: ColorRect
 var _titulo_regiao: Label
 var _citacao: Label
 var _nos: Array[Dictionary] = []      # [{botao, ficha, indice, jogavel}]
@@ -162,16 +169,35 @@ func configurar(indice_inicial: int, respeitar_bloqueio: bool) -> void:
 
 # ── montagem ─────────────────────────────────────────────────────────────
 
+## Imagem do frontend que ACOMPANHA a pele da região (ver `_aplicar_tema`).
+## Tudo o que é moldura passa por aqui; o que não passa fica carmesim para
+## sempre, e foi assim que a primeira montagem deixou as setas vermelhas num
+## ecrã verde.
+func _imagem(nome: String, tinta := Color.WHITE) -> TextureRect:
+	var tr := Frontend9H.imagem(nome, tinta)
+	tr.set_meta("peca", nome)
+	_pecas.append({"no": tr, "peca": nome})
+	return tr
+
+
+func _separador() -> TextureRect:
+	var tr := Frontend9H.separador()
+	tr.set_meta("peca", "separador_menu")
+	_pecas.append({"no": tr, "peca": "separador_menu"})
+	return tr
+
+
 func _montar() -> void:
 	_palco = Frontend9H.palco(self, "fundo_seletor")
 	_arte = _palco.get_node_or_null("Arte")
+	_barras = get_node_or_null("Barras") as TextureRect
 	_palco.add_child(Frontend9H.vinheta())
 	# véu por baixo do painel e das abas: a metade de baixo do ecrã é toda
 	# UI, e sem ele a arte competia com o texto
-	var v := Frontend9H.veu(Vector2(0, 0), Vector2(1280, 720), 0.0)
-	v.texture = _degrade_vertical()
-	Frontend9H.por(v, Rect2(0, 330, 1280, 390))
-	_palco.add_child(v)
+	_veu_painel = Frontend9H.veu(Vector2(0, 0), Vector2(1280, 720), 0.0)
+	_veu_painel.texture = _degrade_vertical()
+	Frontend9H.por(_veu_painel, Rect2(0, 330, 1280, 390))
+	_palco.add_child(_veu_painel)
 
 	_trilho = Control.new()
 	_trilho.name = "Trilho"
@@ -187,12 +213,13 @@ func _montar() -> void:
 
 
 func _degrade_vertical() -> Texture2D:
+	var v: Color = TemaRegiao.do_indice(_regiao)["veu"]
 	var g := Gradient.new()
 	g.offsets = PackedFloat32Array([0.0, 0.45, 1.0])
 	g.colors = PackedColorArray([
-		Color(0.02, 0.008, 0.018, 0.0),
-		Color(0.02, 0.008, 0.018, 0.55),
-		Color(0.02, 0.008, 0.018, 0.86)])
+		Color(v.r, v.g, v.b, 0.0),
+		Color(v.r, v.g, v.b, 0.55),
+		Color(v.r, v.g, v.b, 0.86)])
 	var gt := GradientTexture2D.new()
 	gt.gradient = g
 	gt.width = 8
@@ -211,7 +238,7 @@ func _montar_topo() -> void:
 		cancelado.emit())
 	Frontend9H.por(_voltar, Rect2(48, 14, 130, 46))
 	_palco.add_child(_voltar)
-	var seta := Frontend9H.imagem("voltar_seta")
+	var seta := _imagem("voltar_seta")
 	Frontend9H.por(seta, Rect2(14, 18, 34, 38))
 	_palco.add_child(seta)
 
@@ -228,7 +255,7 @@ func _montar_topo() -> void:
 	Frontend9H.por(_titulo_regiao, Rect2(340, 134, 600, 34))
 	_palco.add_child(_titulo_regiao)
 
-	var orn := Frontend9H.separador()
+	var orn := _separador()
 	Frontend9H.por(orn, Rect2(535, 168, 210, 12))
 	_palco.add_child(orn)
 
@@ -240,7 +267,7 @@ func _montar_topo() -> void:
 	Frontend9H.por(_citacao, Rect2(420, 184, 440, 42))
 	_palco.add_child(_citacao)
 
-	var orn2 := Frontend9H.separador()
+	var orn2 := _separador()
 	Frontend9H.por(orn2, Rect2(535, 226, 210, 12))
 	_palco.add_child(orn2)
 
@@ -267,7 +294,7 @@ func _montar_seta(direita: bool) -> Button:
 	b.pressed.connect(func() -> void: _mudar_regiao(1 if direita else -1))
 	_palco.add_child(b)
 
-	var img := Frontend9H.imagem("seta_direita" if direita else "seta_esquerda")
+	var img := _imagem("seta_direita" if direita else "seta_esquerda")
 	Frontend9H.por(img, Rect2(1222.0 if direita else 14.0, 290, 44, 56))
 	_palco.add_child(img)
 	b.mouse_entered.connect(func() -> void: img.modulate = Color(1.4, 1.1, 1.1))
@@ -291,7 +318,7 @@ func _montar_nos() -> void:
 		var centro: Vector2 = dados["p"]
 		var raio: float = dados["r"]
 
-		var anel := Frontend9H.imagem("anel_normal")
+		var anel := _imagem("anel_normal")
 		Frontend9H.por(anel, Rect2(centro - Vector2(raio, raio) * 1.16, Vector2(raio, raio) * 2.32))
 		_palco.add_child(anel)
 
@@ -313,7 +340,7 @@ func _montar_nos() -> void:
 		# losango (30 px de cada lado a 2x) comiam o miolo de uma peça de
 		# 36 px de alto e o que se via eram duas barras soltas.
 		var alt := 40.0
-		var ficha := Frontend9H.imagem("ficha_nivel")
+		var ficha := _imagem("ficha_nivel")
 		ficha.stretch_mode = TextureRect.STRETCH_SCALE
 		Frontend9H.por(ficha, Rect2(centro.x - 50.0, centro.y + raio * 0.56, 100.0, alt))
 		_palco.add_child(ficha)
@@ -325,7 +352,7 @@ func _montar_nos() -> void:
 		Frontend9H.por(rot, Rect2(centro.x - 50.0, centro.y + raio * 0.56, 100.0, alt))
 		_palco.add_child(rot)
 
-		var trinco := Frontend9H.imagem("cadeado")
+		var trinco := _imagem("cadeado")
 		Frontend9H.por(trinco, Rect2(centro.x - 13.0, centro.y - 15.0, 26.0, 30.0))
 		trinco.visible = false
 		_palco.add_child(trinco)
@@ -345,6 +372,7 @@ func _montar_painel() -> void:
 	# fundo do painel: a moldura da prancha é oca, e sem chão o texto ficava
 	# em cima da vista
 	var chao := ColorRect.new()
+	_chao_painel = chao
 	chao.color = Color(0.035, 0.016, 0.028, 0.86)
 	chao.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	Frontend9H.por(chao, Rect2(R_PAINEL.position + Vector2(8, 8), R_PAINEL.size - Vector2(16, 16)))
@@ -416,7 +444,7 @@ func _montar_painel() -> void:
 	# prancha. Levam o que o jogo SABE mesmo -- guardião, passo na região,
 	# estado -- e não contadores que ainda não existem.
 	for i in 3:
-		var ico := Frontend9H.imagem("losango")
+		var ico := _imagem("losango")
 		Frontend9H.por(ico, Rect2(994, 462.0 + i * 30.0, 18, 18))
 		ico.modulate = Color(1.2, 0.9, 0.95)
 		_palco.add_child(ico)
@@ -444,10 +472,65 @@ func _montar_abas() -> void:
 		_palco.add_child(b)
 		_abas.append(b)
 		if i < 4:
-			var d := Frontend9H.imagem("losango")
+			var d := _imagem("losango")
 			Frontend9H.por(d, Rect2(R_ABAS.position.x + i * PASSO_ABA + LARG_ABA + 14.0,
 				R_ABAS.position.y + 24.0, 22, 22))
 			_palco.add_child(d)
+
+
+## Veste o ecrã com a pele da região atual (ver `scripts/tema_regiao.gd`).
+##
+## Corre a cada `_actualizar`, mas só faz trabalho quando a região MUDA --
+## trocar dezenas de texturas a cada movimento do cursor seria caro e
+## visível. A Região I tem pele própria; todas as outras caem na
+## apresentação neutra, com a arte de marca dessaturada. Nada aqui mexe em
+## posições, navegação ou bloqueios: muda a cor e a moldura, mais nada.
+func _aplicar_tema() -> void:
+	if _tema_montado == _regiao:
+		return
+	_tema_montado = _regiao
+	var t := TemaRegiao.do_indice(_regiao)
+	var tinta: Color = t.get("tinta_pecas", Color.WHITE)
+
+	var fundo := TemaRegiao.textura("fundo_seletor", _regiao)
+	if _arte:
+		_arte.texture = fundo
+		_arte.modulate = t.get("tinta_fundo", Color.WHITE)
+	if _barras:
+		_barras.texture = fundo
+		# as barras laterais são o mesmo fundo, desfocado e escuro
+		var c: Color = t.get("tinta_fundo", Color.WHITE)
+		_barras.modulate = Color(c.r * 0.30, c.g * 0.26, c.b * 0.32, 1.0)
+
+	for d in _pecas:
+		var no := d["no"] as TextureRect
+		if not is_instance_valid(no):
+			continue
+		no.texture = TemaRegiao.textura(String(d["peca"]), _regiao)
+		no.modulate = tinta
+
+	if _painel:
+		_painel.add_theme_stylebox_override("panel",
+			TemaRegiao.caixa("painel_detalhe", _regiao, Vector4(0, 0, 0, 0)))
+	if _chao_painel:
+		var v: Color = t["veu"]
+		_chao_painel.color = Color(v.r, v.g, v.b, 0.86)
+	if _veu_painel:
+		_veu_painel.texture = _degrade_vertical()
+	if _jogar:
+		for estado in ["normal", "hover", "focus", "pressed"]:
+			var extra := Color.WHITE
+			if estado in ["hover", "focus"]:
+				extra = Color(1.45, 1.1, 1.1) if t.get("autoridade", false) 					else Color(1.25, 1.25, 1.28)
+			elif estado == "pressed":
+				extra = Color(0.8, 0.78, 0.8)
+			_jogar.add_theme_stylebox_override(estado,
+				TemaRegiao.caixa("botao_jogar", _regiao, Vector4(20, 6, 20, 6), extra))
+	# o brilho por trás dos cabeçalhos segue a cor da região
+	for l in [_titulo_regiao, _nivel_titulo]:
+		if l:
+			var p: Color = t["primaria"]
+			l.add_theme_color_override("font_shadow_color", Color(p.r, p.g, p.b, 0.5))
 
 
 # ── desenho do trilho ────────────────────────────────────────────────────
@@ -476,10 +559,11 @@ func _desenhar_trilho() -> void:
 		var a := suave[i]
 		var b := suave[i + 1]
 		var aceso := b.x <= limite + 2.0
-		var cor := Color(0.92, 0.16, 0.26, 0.85) if aceso else Color(0.45, 0.42, 0.48, 0.32)
+		var t := TemaRegiao.do_indice(_regiao)
+		var cor: Color = t["trilho"] if aceso else Color(0.45, 0.42, 0.48, 0.32)
 		_trilho.draw_line(a, b, cor, 3.0 * k.y, true)
 		if aceso:
-			_trilho.draw_line(a, b, Color(1.0, 0.55, 0.58, 0.30), 8.0 * k.y, true)
+			_trilho.draw_line(a, b, t["trilho_brilho"], 8.0 * k.y, true)
 
 
 # ── estado ───────────────────────────────────────────────────────────────
@@ -487,6 +571,7 @@ func _desenhar_trilho() -> void:
 func _actualizar() -> void:
 	if not _pronto:
 		return
+	_aplicar_tema()
 	var niveis: Array = EstadoJogo.REGIOES[_regiao]["niveis"]
 	if not (_sel in niveis):
 		_sel = niveis[0]
@@ -518,10 +603,19 @@ func _actualizar() -> void:
 		var anel := n["anel"] as TextureRect
 		var qual := "anel_chefe" if i == NOS.size() - 1 else (
 			"anel_atual" if indice == _sel else "anel_normal")
-		anel.texture = Frontend9H.textura(qual)
+		anel.texture = TemaRegiao.textura(qual, _regiao)
+		anel.set_meta("peca", qual)
+		for d in _pecas:
+			if d["no"] == anel:
+				d["peca"] = qual
 		anel.modulate = Color(1, 1, 1, 1) if jogavel else Color(0.55, 0.52, 0.58, 0.7)
 		if indice == _sel:
-			anel.modulate = Color(1.3, 1.05, 1.05, 1)
+			# realce na cor da região (nas regiões sem pele fica em aço, não
+			# em rosa -- o realce era o último sítio por onde o carmesim
+			# fugia para um ecrã que já não é carmesim)
+			var pc: Color = TemaRegiao.do_indice(_regiao)["primaria_clara"]
+			anel.modulate = Color(0.7 + pc.r * 0.75, 0.7 + pc.g * 0.75,
+				0.7 + pc.b * 0.75, 1.0)
 		(n["rotulo"] as Label).text = "%d-%d" % [_regiao + 1, i + 1]
 		(n["rotulo"] as Label).add_theme_color_override("font_color",
 			Frontend9H.OSSO if jogavel else Frontend9H.TEXTO_APAGADO)
@@ -579,12 +673,12 @@ func _actualizar() -> void:
 			Textos.t(EstadoJogo.REGIOES[r]["chave"]).to_upper() if aberta
 			else Textos.t("selector.unknown")]
 		b.add_theme_stylebox_override("normal",
-			Frontend9H.caixa("aba_atual" if r == _regiao else "aba_bloqueada",
+			TemaRegiao.caixa("aba_atual" if r == _regiao else "aba_bloqueada", _regiao,
 				Vector4(10, 6, 10, 6)))
 		b.add_theme_stylebox_override("hover",
-			Frontend9H.caixa("aba_atual", Vector4(10, 6, 10, 6), Color(1.3, 1.05, 1.05)))
+			TemaRegiao.caixa("aba_atual", _regiao, Vector4(10, 6, 10, 6), Color(1.3, 1.05, 1.05)))
 		b.add_theme_stylebox_override("focus",
-			Frontend9H.caixa("aba_atual", Vector4(10, 6, 10, 6), Color(1.3, 1.05, 1.05)))
+			TemaRegiao.caixa("aba_atual", _regiao, Vector4(10, 6, 10, 6), Color(1.3, 1.05, 1.05)))
 		b.add_theme_color_override("font_color",
 			Frontend9H.OSSO if r == _regiao else (
 				Frontend9H.TEXTO if aberta else Frontend9H.TEXTO_APAGADO))
@@ -737,7 +831,15 @@ func _nome_chefe(indice: int) -> String:
 	return Textos.t(chave) if chave != "" else ""
 
 
+## Miniatura do painel. Onde há arte de produção da região, é ELA que se vê
+## (a Região I tem o panorama da Árvore-Coração); fora disso volta-se à
+## camada de parallax de sempre. A `FUNDO_REGIAO[0]` era uma floresta de
+## OUTONO, laranja e vermelha, e num ecrã verde lia-se como um erro.
 func _fundo_regiao(r: int) -> Texture2D:
+	var t := TemaRegiao.do_indice(r)
+	var mini: String = String(t.get("miniatura", ""))
+	if mini != "" and ResourceLoader.exists(mini):
+		return load(mini)
 	if r < 0 or r >= FUNDO_REGIAO.size():
 		return null
 	var cam: String = FUNDO_REGIAO[r]

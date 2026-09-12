@@ -1,0 +1,85 @@
+{
+  "execucao": "9H.1",
+  "o_que_e": "Trilha sonora de producao do frontend e da Regiao I.",
+  "proveniencia": "100% original do projecto. Sintese por tools/motor_musical.py (Python puro). Nenhuma amostra, gravacao ou composicao de terceiros.",
+  "licenca": "Propriedade do projecto Koliani.",
+  "atribuicao_devida": "nenhuma",
+  "motor": "tools/motor_musical.py",
+  "compositor": "tools/compor_trilha_9h1.py",
+  "taxa_hz": 32000,
+  "faixas": {
+    "pausa_ambiente": {
+      "ficheiro": "assets/audio/musica/producao/pausa_ambiente.wav",
+      "papel": "Pausa/Opcoes",
+      "duracao_s": 32.0,
+      "taxa_hz": 32000,
+      "canais": 2,
+      "bytes": 4096044,
+      "sha256": "4f5550fe386810b13e624db4b420bee380be5db06062fca4a671d433dd2361a6",
+      "origem": "ORIGINAL -- composto e sintetizado por tools/compor_trilha_9h1.py",
+      "licenca": "Propriedade do projecto Koliani (sem terceiros, sem atribuicao devida)",
+      "ciclo": true
+    },
+    "tema_menu": {
+      "ficheiro": "assets/audio/musica/producao/tema_menu.wav",
+      "papel": "Menu inicial, intro e ecras do frontend",
+      "duracao_s": 48.0,
+      "taxa_hz": 32000,
+      "canais": 2,
+      "bytes": 6144044,
+      "sha256": "118eb4dbca3d2528fcacf71136594bf4434259bc77561a53848579547343428c",
+      "origem": "ORIGINAL -- composto e sintetizado por tools/compor_trilha_9h1.py",
+      "licenca": "Propriedade do projecto Koliani (sem terceiros, sem atribuicao devida)",
+      "ciclo": true
+    },
+    "regiao1_exploracao": {
+      "ficheiro": "assets/audio/musica/producao/regiao1_exploracao.wav",
+      "papel": "Regiao I -- niveis 1-5, exploracao",
+      "duracao_s": 60.0,
+      "taxa_hz": 32000,
+      "canais": 2,
+      "bytes": 7680044,
+      "sha256": "43a27ec030bccf00acb6d102d056f98bf9c7248c121928886fe10f00b3da0221",
+      "origem": "ORIGINAL -- composto e sintetizado por tools/compor_trilha_9h1.py",
+      "licenca": "Propriedade do projecto Koliani (sem terceiros, sem atribuicao devida)",
+      "ciclo": true
+    },
+    "regiao1_combate": {
+      "ficheiro": "assets/audio/musica/producao/regiao1_combate.wav",
+      "papel": "Regiao I -- camada de intensidade/combate",
+      "duracao_s": 60.0,
+      "taxa_hz": 32000,
+      "canais": 2,
+      "bytes": 7680044,
+      "sha256": "ed08bb7a97f87243ad8ba3c24cec3348de34ee4174cb5f746fc8660185a52194",
+      "origem": "ORIGINAL -- composto e sintetizado por tools/compor_trilha_9h1.py",
+      "licenca": "Propriedade do projecto Koliani (sem terceiros, sem atribuicao devida)",
+      "ciclo": true
+    },
+    "regiao1_guardiao": {
+      "ficheiro": "assets/audio/musica/producao/regiao1_guardiao.wav",
+      "papel": "Regiao I -- guardioes (1-1 a 1-4)",
+      "duracao_s": 57.6,
+      "taxa_hz": 32000,
+      "canais": 2,
+      "bytes": 7372840,
+      "sha256": "ab95a03e643e050665f64275a142cd4a33153054e277b3862000e57e325d8089",
+      "origem": "ORIGINAL -- composto e sintetizado por tools/compor_trilha_9h1.py",
+      "licenca": "Propriedade do projecto Koliani (sem terceiros, sem atribuicao devida)",
+      "ciclo": true
+    },
+    "regiao1_coracao": {
+      "ficheiro": "assets/audio/musica/producao/regiao1_coracao.wav",
+      "papel": "Regiao I -- Coracao Putrefacto (1-5)",
+      "duracao_s": 60.0,
+      "taxa_hz": 32000,
+      "canais": 2,
+      "bytes": 7680040,
+      "sha256": "e7c348ac66772e3fd1d7cf89b82a5baaa8d1ee5eb63f7ea0120e21a304d9b8e8",
+      "origem": "ORIGINAL -- composto e sintetizado por tools/compor_trilha_9h1.py",
+      "licenca": "Propriedade do projecto Koliani (sem terceiros, sem atribuicao devida)",
+      "ciclo": true
+    }
+  },
+  "regioes_ii_xx": "Continuam nas 20+20 faixas CC0/CC-BY de assets/audio/musica/{niveis,chefes} (ver CREDITS.md). Sem autoridade visual nem playtest, compor 38 faixas seria exactamente o que o Game Master proibiu."
+}

@@ -113,6 +113,10 @@ func _correr_tudo() -> void:
 	teste_mecanica_por_nivel()
 	teste_paineis_nao_trazem_o_vizinho()
 	teste_sala_labirinto_deterministica()
+	teste_9h1_trilha_de_producao()
+	teste_9h1_combo_com_poses_proprias()
+	teste_9h1_criaturas_com_movimento()
+	teste_9h1_tema_do_seletor()
 
 	if _falhas.is_empty():
 		print("OK -- todos os testes passaram")
@@ -1368,12 +1372,18 @@ func teste_progression_ids_invalidos() -> void:
 
 
 func teste_execution_7_combate_e_progressao_regiao1() -> void:
-	_ok(Koliani.NUM_COMBO == 3, "Execution 7: combate base devia ter combo de 3 golpes")
-	_ok(Koliani.DUR_COMBO.size() == 3
-		and Koliani.ATAQUE_ATIVO_INICIO.size() == 3
-		and Koliani.ATAQUE_ATIVO_FIM.size() == 3,
+	# 9H.1: o combo passou de 3 para 4 golpes (o 4.º é o remate). Era 3
+	# porque só havia arte para um golpe; agora cada passo tem tira própria.
+	_ok(Koliani.NUM_COMBO == 4, "Execution 9H.1: combate base devia ter combo de 4 golpes")
+	_ok(Koliani.DUR_COMBO.size() == Koliani.NUM_COMBO
+		and Koliani.ATAQUE_ATIVO_INICIO.size() == Koliani.NUM_COMBO
+		and Koliani.ATAQUE_ATIVO_FIM.size() == Koliani.NUM_COMBO
+		and Koliani.AVANCO_VEL.size() == Koliani.NUM_COMBO
+		and Koliani.AVANCO_DUR.size() == Koliani.NUM_COMBO
+		and Koliani.TOM_COMBO.size() == Koliani.NUM_COMBO
+		and Koliani.ARCO_COMBO.size() == Koliani.NUM_COMBO,
 		"Execution 7: cada golpe devia ter duração e janela ativa próprias")
-	for i in 3:
+	for i in Koliani.NUM_COMBO:
 		_ok(Koliani.ATAQUE_ATIVO_INICIO[i] > 0.0
 			and Koliani.ATAQUE_ATIVO_INICIO[i] < Koliani.ATAQUE_ATIVO_FIM[i]
 			and Koliani.ATAQUE_ATIVO_FIM[i] < 1.0,
@@ -2882,3 +2892,169 @@ func _lum_media_9g(sf: SpriteFrames) -> float:
 				soma += (0.3 * c.r + 0.59 * c.g + 0.11 * c.b) * c.a
 				n += 1
 	return soma / maxf(1.0, float(n))
+
+
+## -- Execution 9H.1 -------------------------------------------------------
+
+## A trilha de producao existe, esta' importada, toca em CICLO e esta'
+## declarada com proveniencia. A asserção morde: se alguem apagar uma faixa
+## ou lhe tirar o loop, isto falha.
+func teste_9h1_trilha_de_producao() -> void:
+	var man: Variant = JSON.parse_string(FileAccess.get_file_as_string(
+		"res://assets/audio/musica/producao/manifesto_trilha_9h1.json"))
+	_ok(man is Dictionary, "9H.1: falta o manifesto da trilha de producao")
+	if not (man is Dictionary):
+		return
+	var faixas: Dictionary = (man as Dictionary).get("faixas", {})
+	_ok(faixas.size() >= 6, "9H.1: a trilha de producao devia ter 6 pecas")
+	for chave in Musica.PRODUCAO:
+		var cam: String = Musica.PRODUCAO[chave]
+		_ok(ResourceLoader.exists(cam), "9H.1: falta a faixa %s" % cam)
+		if not ResourceLoader.exists(cam):
+			continue
+		var st: AudioStream = load(cam)
+		_ok(st != null and st.get_length() > 20.0,
+			"9H.1: %s nao carrega ou e curta demais" % cam)
+		if st is AudioStreamWAV:
+			_ok((st as AudioStreamWAV).loop_mode != AudioStreamWAV.LOOP_DISABLED,
+				"9H.1: %s sem loop -- uma cama de jogo toca em ciclo" % cam)
+	for k in faixas:
+		var f: Dictionary = faixas[k]
+		_ok(String(f.get("origem", "")).begins_with("ORIGINAL"),
+			"9H.1: faixa %s sem proveniencia declarada" % k)
+		_ok(String(f.get("licenca", "")) != "", "9H.1: faixa %s sem licenca" % k)
+	# encaminhamento: as camas continuam nos buses do 9F
+	_ok(AudioServer.get_bus_index("Music") >= 0, "9H.1: bus Music desapareceu")
+	_ok(AudioServer.get_bus_index("SFX") >= 0, "9H.1: bus SFX desapareceu")
+	# o mapeamento aponta mesmo para as pecas novas DENTRO da Regiao I e
+	# mantem as faixas antigas fora dela
+	_ok(Musica.faixa_de_nivel(0).begins_with(Musica.DIR_PRODUCAO),
+		"9H.1: o nivel 1-1 devia usar a trilha de producao")
+	_ok(not Musica.faixa_de_nivel(19).begins_with(Musica.DIR_PRODUCAO),
+		"9H.1: fora da Regiao I a trilha nova nao se aplica")
+	_ok(Musica.faixa_de_chefe(4).begins_with(Musica.DIR_PRODUCAO),
+		"9H.1: o Coracao Putrefacto devia ter tema proprio")
+
+
+## Os quatro golpes do combo tem TIRAS PROPRIAS. O que isto guarda nao e' a
+## existencia dos ficheiros -- e' que `attack2/3/4` nao voltem a ser a MESMA
+## sequencia de `attack`, que era o defeito que o Game Master apontou.
+func teste_9h1_combo_com_poses_proprias() -> void:
+	var k: Koliani = preload("res://scenes/actors/Koliani.tscn").instantiate()
+	k.usar_golden_set = true
+	add_child(k)
+	var corpo := k.get_node_or_null("Sprite/Corpo") as AnimatedSprite2D
+	_ok(corpo != null and corpo.sprite_frames != null, "9H.1: Koliani sem SpriteFrames")
+	if corpo == null or corpo.sprite_frames == null:
+		k.queue_free()
+		return
+	var sf := corpo.sprite_frames
+	var tiras := {}
+	for nome in ["attack", "attack2", "attack3", "attack4"]:
+		_ok(sf.has_animation(nome), "9H.1: falta a tira %s" % nome)
+		if not sf.has_animation(nome):
+			continue
+		_ok(sf.get_frame_count(nome) == 6, "9H.1: %s devia ter 6 frames" % nome)
+		var ids: Array[String] = []
+		for i in sf.get_frame_count(nome):
+			var t := sf.get_frame_texture(nome, i)
+			ids.append(t.resource_path if t != null else "")
+		tiras[nome] = ids
+	var nomes: Array = tiras.keys()
+	for i in nomes.size():
+		for j in range(i + 1, nomes.size()):
+			_ok(tiras[nomes[i]] != tiras[nomes[j]],
+				"9H.1: %s e %s sao a MESMA sequencia de frames" % [nomes[i], nomes[j]])
+	_ok(Koliani.NUM_COMBO == 4 and Koliani.DUR_COMBO.size() == 4,
+		"9H.1: o combo devia ter 4 passos")
+	for i in 4:
+		var nome := "attack" if i == 0 else "attack%d" % (i + 1)
+		if not sf.has_animation(nome):
+			continue
+		var dur := sf.get_frame_count(nome) / maxf(0.001, sf.get_animation_speed(nome))
+		_ok(absf(dur - float(Koliani.DUR_COMBO[i])) < 0.02,
+			"9H.1: %s dura %.3f s mas o golpe dura %.3f s"
+				% [nome, dur, float(Koliani.DUR_COMBO[i])])
+	k.queue_free()
+
+
+## Pasta dos inimigos de producao (o `regiao1_inimigos.gd` nao tem
+## `class_name`, e num teste nao vale a pena carrega-lo so' para isto).
+const DIR_INIMIGOS_9H1 := "res://assets/art/regions/region_01_forest/enemies/production"
+
+
+## As criaturas da Regiao I tem ciclos DERIVADOS (nao uma pose por estado) e
+## um estado de ataque que nao existia. Guarda tambem que o Coracao tem as
+## duas fases com material proprio.
+func teste_9h1_criaturas_com_movimento() -> void:
+	var man: Variant = JSON.parse_string(FileAccess.get_file_as_string(
+		"res://assets/art/regions/region_01_forest/enemies/production/enemy_production_manifest.json"))
+	_ok(man is Dictionary, "9H.1: manifesto dos inimigos ilegivel")
+	if not (man is Dictionary):
+		return
+	var inimigos: Dictionary = (man as Dictionary).get("inimigos", {})
+	_ok((man as Dictionary).has("execucao_9h1"),
+		"9H.1: o manifesto nao declara o passe de movimento")
+	for id in inimigos:
+		var anims: Dictionary = (inimigos[id] as Dictionary).get("animacoes", {})
+		for estado in anims:
+			var spec: Dictionary = anims[estado]
+			var frames: Array = spec.get("frames", [])
+			var unicos := {}
+			for f in frames:
+				unicos[String((f as Dictionary).get("sha256", ""))] = true
+				var ficheiro := String((f as Dictionary)["ficheiro"])
+				var cam: String = ficheiro if ficheiro.begins_with("res://") 					else "%s/%s" % [DIR_INIMIGOS_9H1, ficheiro]
+				_ok(ResourceLoader.exists(cam), "9H.1: falta o frame %s" % cam)
+			if String(spec.get("origem", "")) == "DERIVED_9H1":
+				_ok(frames.size() >= 7,
+					"9H.1: %s/%s so tem %d frames" % [id, estado, frames.size()])
+				_ok(unicos.size() >= 5,
+					"9H.1: %s/%s tem %d frames mas so %d desenhos"
+						% [id, estado, frames.size(), unicos.size()])
+	for id in ["ghorak", "morvanna", "rainha_aracnidea", "entrevane"]:
+		var anims: Dictionary = (inimigos.get(id, {}) as Dictionary).get("animacoes", {})
+		for estado in ["idle", "run", "attack", "hit", "dead"]:
+			_ok(anims.has(estado), "9H.1: o guardiao %s nao tem %s" % [id, estado])
+	var coracao: Dictionary = (inimigos.get("coracao_putrefacto", {}) as Dictionary).get("animacoes", {})
+	for estado in ["idle", "attack", "idle_f2", "attack_f2"]:
+		_ok(coracao.has(estado), "9H.1: o Coracao nao tem %s" % estado)
+	# as duas fases tem de ser MATERIAL DIFERENTE, nao a mesma tira
+	var f1: Array = (coracao.get("idle", {}) as Dictionary).get("frames", [])
+	var f2: Array = (coracao.get("idle_f2", {}) as Dictionary).get("frames", [])
+	var sha1 := "a" if f1.is_empty() else String((f1[0] as Dictionary).get("sha256", "a"))
+	var sha2 := "b" if f2.is_empty() else String((f2[0] as Dictionary).get("sha256", "b"))
+	_ok(sha1 != sha2, "9H.1: as duas fases do Coracao sao o mesmo frame")
+
+
+## O selector tem tema POR REGIAO, a Regiao I tem pele propria, as outras
+## caem no neutro -- e os bloqueios nao mudaram com nada disto.
+func teste_9h1_tema_do_seletor() -> void:
+	_ok(TemaRegiao.tem_autoridade(0), "9H.1: a Regiao I devia ter pele propria")
+	var estado := TemaRegiao.estado()
+	_ok((estado["com_autoridade"] as Array).size() == 1,
+		"9H.1: so a Regiao I tem autoridade visual -- nao se inventam as outras")
+	_ok((estado["sem_autoridade"] as Array).size() == 19,
+		"9H.1: as 19 regioes sem arte deviam estar marcadas")
+	_ok(String(estado["nota"]) == TemaRegiao.SEM_AUTORIDADE,
+		"9H.1: falta a marca REGION SELECTOR THEME AUTHORITY MISSING")
+	for peca in ["fundo_seletor", "anel_normal", "anel_chefe", "painel_detalhe",
+			"aba_atual", "botao_jogar", "ficha_nivel"]:
+		var r1 := TemaRegiao.textura(peca, 0)
+		var neutra := TemaRegiao.textura(peca, 4)
+		_ok(r1 != null and neutra != null, "9H.1: falta a peca %s" % peca)
+		_ok(r1 != neutra, "9H.1: %s e igual na Regiao I e numa regiao neutra" % peca)
+	var t := TemaRegiao.do_indice(0)
+	var p: Color = t["primaria"]
+	_ok(p.g > p.r and p.g > p.b, "9H.1: a cor da Regiao I nao e verde")
+	var a: Color = t["acento"]
+	_ok(a.r > a.g and a.b > a.g, "9H.1: o acento da Regiao I nao e magenta")
+	# estrutura igual para todas: 20 regioes x 5 niveis, bloqueios intactos
+	_ok(EstadoJogo.REGIOES.size() == 20, "9H.1: deviam ser 20 regioes")
+	for r in EstadoJogo.REGIOES.size():
+		_ok((EstadoJogo.REGIOES[r]["niveis"] as Array).size() == 5,
+			"9H.1: a regiao %d nao tem 5 niveis" % (r + 1))
+		var d := TemaRegiao.do_indice(r)
+		for campo in ["primaria", "primaria_clara", "acento", "veu", "trilho",
+				"trilho_brilho", "motivo"]:
+			_ok(d.has(campo), "9H.1: o tema da regiao %d nao tem %s" % [r + 1, campo])
