@@ -13,6 +13,7 @@ const IDS_PROGRESSAO := preload("res://scripts/progression_ids.gd")
 @export var pista_ao_atravessar := ""  # id opcional de pista sobre a mãe
 
 var _t := 0.0
+var _em_transicao := false
 var _vortice_arte: Sprite2D
 @onready var _anel_e: Node = get_node_or_null("Vortice/AnelExterno")
 @onready var _anel_i: Node = get_node_or_null("Vortice/AnelInterno")
@@ -52,8 +53,15 @@ func _process(dt: float) -> void:
 
 
 func _ao_entrar(corpo: Node) -> void:
-	if not (corpo is Koliani):
+	if not (corpo is Koliani) or _em_transicao:
 		return
+	_em_transicao = true
+	# body_entered corre no flush da física: trocar a cena aqui remove corpos
+	# ainda em uso pelo motor. Concluir uma única vez após o callback.
+	_concluir.call_deferred()
+
+
+func _concluir() -> void:
 	if pista_ao_atravessar != "":
 		EstadoJogo.registar_pista(pista_ao_atravessar)
 	Som.toca("transicao", -3.0)

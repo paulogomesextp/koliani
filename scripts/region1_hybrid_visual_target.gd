@@ -18,6 +18,9 @@ extends Node2D
 ## `ativo = false` é o interruptor de rollback.
 
 const Kit := preload("res://scripts/regiao1_kit.gd")
+const Remaster := preload("res://scripts/regiao1_remaster.gd")
+var _remaster: Node2D
+
 
 @export var ativo := true
 ## Execution 8 montava só o panorama em L2–L5. Desde a 9C os cinco níveis
@@ -137,6 +140,10 @@ func _ready() -> void:
 	set_meta("visual_target_5c", true)
 	set_meta("region1_kit_9c", true)
 	set_meta("intervalo_target", Vector2(limite_esquerdo, limite_direito))
+	_remaster = Remaster.new()
+	_remaster.name = "RemasterRegiaoI"
+	add_child(_remaster)
+	_remaster.montar(perfil)
 	var p := Kit.perfil_de(self)
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 9000 + perfil
@@ -166,6 +173,8 @@ func _process(_dt: float) -> void:
 		return
 	var c := cam.get_screen_center_position()
 	var desvio := c - referencia
+	if _remaster:
+		_remaster.atualizar(desvio)
 	for par: Array in _camadas:
 		var n: Node2D = par[0]
 		var f: Vector2 = par[1]
@@ -266,9 +275,6 @@ func _montar_heart_tree() -> void:
 ## quantidades passaram a densidades por 1000 px. Antes eram contagens fixas
 ## num intervalo escrito à mão: o L3 ("Ruínas Antigas" na 08) tinha 6 arcos
 ## para 5200 px e a serra parava antes da ponta esquerda do nível.
-const DENS_C3_CASCATA := 3.2
-const DENS_C3_COLUNAS := 2.4
-const DENS_C3_ARCO := 5.2
 
 func _montar_camada3(p: Dictionary, rng: RandomNumberGenerator) -> void:
 	var camada := _camada("Camada3Distante", -26, Vector2(0.26, 0.16))
@@ -297,9 +303,9 @@ func _montar_camada3(p: Dictionary, rng: RandomNumberGenerator) -> void:
 			x += w - 24.0
 			i += 1
 	var pecas := [
-		["fundo/fundo_cascata.png", float(p["cascatas"]) * DENS_C3_CASCATA],
-		["fundo/fundo_colunas_cascata.png", float(p["cascatas"]) * DENS_C3_COLUNAS],
-		["fundo/fundo_arco_ruina.png", float(p["ruinas"]) * DENS_C3_ARCO],
+		["fundo/fundo_cascata.png", float(p["cascatas"]) * Remaster.densidade("c3_cascata")],
+		["fundo/fundo_colunas_cascata.png", float(p["cascatas"]) * Remaster.densidade("c3_colunas")],
+		["fundo/fundo_arco_ruina.png", float(p["ruinas"]) * Remaster.densidade("c3_arco")],
 	]
 	for peca: Array in pecas:
 		var t := Kit.tex(peca[0])
@@ -323,9 +329,6 @@ func _montar_camada3(p: Dictionary, rng: RandomNumberGenerator) -> void:
 ## 9C tem as quatro peças (`corrupcao/cristal_corrupcao_a…d`), mas até agora
 ## só eram usadas como props de chão: o L5, com corrupção a 1,0, lia-se igual
 ## ao L1.
-const DENS_C2_RUINA := 3.4
-const DENS_C2_CASCATA := 2.2
-const DENS_C2_CRISTAL := 4.2
 const CRISTAIS := ["corrupcao/cristal_corrupcao_a.png",
 	"corrupcao/cristal_corrupcao_b.png", "corrupcao/cristal_corrupcao_c.png",
 	"corrupcao/cristal_corrupcao_d.png"]
@@ -351,8 +354,8 @@ func _montar_camada2(p: Dictionary, rng: RandomNumberGenerator) -> void:
 			x += 400.0
 	# ruínas e cascatas da prancha 10 (graduadas), mais perto e mais escuras
 	var extra := [
-		["props/ruina.png", float(p["ruinas"]) * DENS_C2_RUINA],
-		["props/cascata.png", float(p["cascatas"]) * DENS_C2_CASCATA],
+		["props/ruina.png", float(p["ruinas"]) * Remaster.densidade("c2_ruina")],
+		["props/cascata.png", float(p["cascatas"]) * Remaster.densidade("c2_cascata")],
 	]
 	for peca: Array in extra:
 		var t := Kit.tex(peca[0])
@@ -385,7 +388,7 @@ func _montar_corrupcao_media(p: Dictionary, rng: RandomNumberGenerator) -> void:
 	var camada := _camada("Camada2Corrupcao", -21, Vector2(0.52, 0.34))
 	var banda := _banda(0.52)
 	var chao := 880.0
-	var n := _quantas(banda, intensidade * DENS_C2_CRISTAL)
+	var n := _quantas(banda, intensidade * Remaster.densidade("c2_cristal"))
 	var passo := (banda.y - banda.x) / float(maxi(1, n))
 	for k in n:
 		var rel: String = CRISTAIS[rng.randi() % CRISTAIS.size()]
@@ -466,7 +469,6 @@ func _montar_corrupcao(p: Dictionary) -> void:
 ## plataformas (`Kit.pendurar`), onde quase não se vêem. Penduradas do topo
 ## fecham a moldura do primeiro plano, que era o que faltava para o ecrã
 ## parecer o da prancha.
-const DENS_VINHAS := 2.6
 
 func _montar_primeiro_plano() -> void:
 	if not is_inside_tree():
@@ -511,7 +513,7 @@ func _montar_vinhas(banda: Vector2) -> void:
 	_vinhas.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 	add_child(_vinhas)
 	var lista := ["props/vinha_longa.png", "props/vinha_a.png", "props/vinha_b.png"]
-	var n := _quantas(banda, DENS_VINHAS)
+	var n := _quantas(banda, Remaster.densidade("vinhas"))
 	var passo := (banda.y - banda.x) / float(maxi(1, n))
 	for k in n:
 		var rel: String = lista[rng.randi() % lista.size()]

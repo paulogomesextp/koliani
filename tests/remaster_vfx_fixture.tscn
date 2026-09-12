@@ -1,0 +1,5 @@
+[gd_scene format=3]
+
+[node name="VFXTeste" type="CPUParticles2D"]
+emitting = false
+amount = 1

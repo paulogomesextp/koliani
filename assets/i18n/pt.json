@@ -614,6 +614,7 @@
   "mec.rosas.txt": "Os espinhos crescem e recolhem em ciclo. O chão só é chão numa parte do compasso.",
   "mec.saltos.nome": "Saltos em Ziguezague",
   "mec.saltos.txt": "As plataformas sobem em ziguezague apertado. Encadeia os saltos e usa o duplo para salvar um mau.",
+  "mec.saltos.txt_basico": "As plataformas sobem em ziguezague apertado. Encadeia os saltos e aponta para cada aterragem.",
   "mec.salvas.nome": "Salvas de Flechas",
   "mec.salvas.txt": "As flechas vêm em vagas, todas ao mesmo tempo, e cada vaga é telegrafada. Anda entre salvas.",
   "mec.segredo.nome": "Parede Rachada",

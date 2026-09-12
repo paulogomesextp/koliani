@@ -2,6 +2,23 @@
 
 ## Estado — 12 de setembro de 2026
 
+### Execution 9H.12A — portal, tutorial e scaffold Região I
+
+- Base bd2aa418; âmbito exclusivo: provar/corrigir portal L1, coerência do
+  tutorial de saltos e infraestrutura data-driven do remaster L1–L5.
+- Hipóteses dirigidas: troca de cena durante flush de física; reentrada no
+  portal; tutorial sem gate pela habilidade inicial/desbloqueada.
+- Scaffold: perfis, seis slots visuais e planos de remodelação inativos,
+  preservando arte, colisões, checkpoints e fluxo atuais. Sem Região II.
+- Conclusão: regressão reproduzida e corrigida, testes A/B/scaffold, smoke
+  L1–L5 com renderer real e Windows de checkout limpo antes de commit/push.
+- HUMAN PLAYTEST REQUIRED para percurso/sensação; DEVICE VALIDATION REQUIRED
+  para aceitação em dispositivo. Não fechar arte nem iniciar execução seguinte.
+- Resultado técnico: portal/save/retoma/reentrada e tutorial seis idiomas PASS;
+  manifesto/VFX e smoke L1–L5 PASS, suite completa/UI PASS. Windows 0.18.3
+  exportado de snapshot limpo das fontes do índice antes do commit; EXE local
+  atualizado e smoke L1/L5 PASS. Próximo: passe de arte e Game Master test.
+
 ### Integração 9H.10 + 9H.11
 
 - Objetivo: integrar ec9a6260 e depois 109653fc sobre master f45fe9a5.

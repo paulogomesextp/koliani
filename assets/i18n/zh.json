@@ -614,6 +614,7 @@
   "mec.rosas.txt": "尖刺按周期升起又缩回。地面只在节拍的一部分才是地面。",
   "mec.saltos.nome": "之字跳跃",
   "mec.saltos.txt": "平台以密集的之字形上升。连续起跳，用二段跳补救失误。",
+  "mec.saltos.txt_basico": "平台以密集的之字形上升。连续起跳，瞄准每个落脚点。",
   "mec.salvas.nome": "箭雨齐射",
   "mec.salvas.txt": "箭矢成波齐发，每一波都有预警。在两轮齐射之间移动。",
   "mec.segredo.nome": "裂墙",

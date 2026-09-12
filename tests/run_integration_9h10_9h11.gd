@@ -42,7 +42,7 @@ func provar() -> void:
 		verificar(hud != null, "HUD ausente")
 		if hud:
 			verificar(hud.get_node_or_null("LegendaControlos") == null, "control strip ativo por defeito")
-			verificar(hud.get_node("Versao").text == "v0.18.2", "versão do HUD desatualizada")
+			verificar(hud.get_node("Versao").text == "v" + str(ProjectSettings.get_setting("application/config/version")), "versão do HUD desatualizada")
 			var boss = get_tree().get_first_node_in_group("chefes")
 			if boss:
 				hud._ao_combate_chefe(boss)

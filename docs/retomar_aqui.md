@@ -42,6 +42,41 @@ O que custou a descobrir, e que não se deve voltar a re-derivar:
 grandes, fundo nativo) está **bloqueado** por duas decisões do Paulo —
 contrato de geração e política de assets externos.
 
+## Execution 9H.12A — portal, tutorial e scaffold Região I
+
+- Ramo codex/9h12a-portal-remaster, base origin/master bd2aa418.
+- Portal L1: entrada física real reproduziu remoção ilegal de CollisionObject2D
+  durante body_entered, em headless e Vulkan. O processo não caiu nestas provas;
+  comprovada a operação insegura, não uma stack de crash nativo. Correção mínima:
+  conclusão diferida e guarda de reentrada, sem editar progressão/save globais.
+- Teste atravessa por input normal desde antes do portal; uma entrada/recompensa,
+  L1 concluído, cena/sessão L2 ativas, save recarregável. Erro físico eliminado.
+- Double jump conserva design base: salto simples em L1. Tutorial usa texto
+  básico sem habilidade e texto original quando salto_duplo existe. Seis idiomas
+  verificados nos dois contextos; nenhum desbloqueio alterado.
+- Fonte única data/regiao1/remaster.json: cinco perfis/temas/tintas/densidades,
+  seis slots para fundos, terreno visual, silhuetas, atmosfera e landmarks.
+  Runtime aceita texturas ilustradas/pixel e cenas VFX; rejeita colisões visuais.
+  Slots novos vazios/aditivos; geometria e apresentação atuais preservadas.
+- Plano por nível: patamares futuros, leitura das colunas, landmarks e dressing;
+  explicitamente inativo. Não é mapa novo nem prova de jogabilidade futura.
+  Contrato e instruções: docs/remaster_regiao1_9h12a.md.
+- Suite completa/UI 9H.10/11 PASS; dirigido 9H.12A headless e Vulkan zero falhas;
+  smoke real L1–L5 e capturas verificados. Erros de recursos/ObjectDB apenas no
+  encerramento headless, como nos testes anteriores; Vulkan sem erros funcionais.
+- Windows 0.18.3 exportado antes do commit, de snapshot das fontes do índice
+  sem ficheiros locais alheios; manifesto incluído, 4168 entradas e zero pastas
+  work/.worktrees/pacotes Master/handoff/tools/tests/docs. EXE local atualizado
+  build/windows/Koliani.exe: 201183840 bytes, SHA256
+  e88246a001560daf3d329f41e499b40f22def3a850f66b5458a9fbc4ed90cd6c.
+  EXE release L1/L5 smoke exit 0, versão visível e logs sem erros.
+- Evidência local: work/9h12a/ (before/after, testes, capturas, logs de export,
+  pack_audit.json e export_source_tree.txt). Save sintético usa APPDATA isolado.
+- Próximo: publicar ramo isolado e revisão/passe de arte por Claude; depois
+  HUMAN PLAYTEST REQUIRED no portal e percurso. DEVICE VALIDATION REQUIRED
+  para aceitação em dispositivo. Sem merge master; Região II NÃO iniciada.
+- Usage consultado: 43% disponível na janela 5h; 77% semanal.
+
 ## Integração 9H.10 + 9H.11 — 12 de setembro de 2026
 
 - Master base f45fe9a5; 9H.10 ec9a6260 integrado primeiro (0b48ba3f),

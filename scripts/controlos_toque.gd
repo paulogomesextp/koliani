@@ -744,6 +744,8 @@ const TUTORIAL_LARGURA := 560.0
 func _ao_mecanica(cam: String) -> void:
 	var chave_nome := "mec.%s.nome" % cam
 	var chave_txt := "mec.%s.txt" % cam
+	if cam == "saltos" and not EstadoJogo.tem_habilidade("salto_duplo"):
+		chave_txt = "mec.saltos.txt_basico"
 	var nome := Textos.t(chave_nome)
 	var txt := Textos.t(chave_txt)
 	if nome == chave_nome or txt == chave_txt:
