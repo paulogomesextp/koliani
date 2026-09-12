@@ -2,6 +2,15 @@
 
 ## Estado — 12 de setembro de 2026
 
+### Execution 9H.10 — lote exclusivo de UI
+
+- Objetivo/âmbito: legenda, clipping CHECKPOINT/SKILL, fila de notificações e
+  substituição de formas legadas apenas por arte já integrada; sem redesign.
+- Conclusão técnica: testes dirigidos headless/Vulkan, smoke EXE L1, exports
+  Windows/Web sem erros, commit/push isolado. Sem áudio, mobs/bosses ou backgrounds.
+- Gate restante: HUMAN PLAYTEST REQUIRED / DEVICE VALIDATION REQUIRED Web real.
+  Revisão e merge pelo Game Master; não iniciar outra execução.
+
 ### Execution 9H.7 - nitidez do fundo + conteudo dos niveis da Regiao I
 
 - Desfoque: ampliacao bilinear de 2,1x-3,6x no ecra em TODAS as camadas (a 9H

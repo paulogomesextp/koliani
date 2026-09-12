@@ -37,6 +37,7 @@ var _cauda: Polygon2D
 
 
 func _ready() -> void:
+	add_to_group("dialogo_ui")
 	layer = 30
 	process_mode = Node.PROCESS_MODE_PAUSABLE
 	_montar()
@@ -155,7 +156,7 @@ func _posicionar() -> void:
 	var px := clampf(_ancora_ecra.x - tam.x * 0.5,
 		MARGEM_ECRA, vp.x - tam.x - MARGEM_ECRA)
 	var py := clampf(_ancora_ecra.y - ACIMA_DO_ALVO - tam.y,
-		MARGEM_ECRA, vp.y - tam.y - MARGEM_ECRA)
+		160.0, maxf(160.0, vp.y - tam.y - MARGEM_ECRA))
 	_painel.position = Vector2(px, py)
 	# cauda: do fundo do painel até um ponto sobre o orador
 	var base := Vector2(clampf(_ancora_ecra.x, px + 18.0, px + tam.x - 18.0),

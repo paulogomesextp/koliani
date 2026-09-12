@@ -4,6 +4,25 @@
 
 Atualizado em 12 de setembro de 2026.
 
+## Execution 9H.10 — limpeza técnica da UI
+
+- Branch isolada `codex/9h10-ui-cleanup`, base master `f45fe9a5`; sem merge.
+- Legenda de controlos só com `koliani/ui/mostrar_legenda_controlos=true`;
+  por defeito desligada. Rótulo CHECKPOINT redundante removido; toast preservado.
+- SKILL ajusta o estandarte à margem, sem deslocar item/colisão.
+- Tutorial/toast partilham fila FIFO abaixo do cabeçalho; diálogo tem prioridade
+  e suspende visibilidade/tempo do aviso. Falas ficam abaixo do cabeçalho.
+- Hexágono identificado: vórtice legado da Porta funcional. Reutilizada a tira
+  CC0 de Portal já creditada; Essência usa o cristal aprovado da prancha 09/HUD.
+  Gema SKILL autoral e indicadores funcionais de progressão preservados.
+- Teste dirigido headless e Vulkan: 0 falhas. Headless: 72 ObjectDB + 1 recurso
+  ao sair, reproduzidos com HUD do master; runtime Vulkan dirigido sem erros.
+- Windows/Web exportados sem erros; EXE local atualizado e smoke L1 Vulkan,
+  exit 0, captura real em `work/9h10/runtime.png`. Sem deploy Web/PWA.
+- Próximo passo: revisão/merge pelo Game Master. HUMAN PLAYTEST REQUIRED para
+  aceitação visual; DEVICE VALIDATION REQUIRED no Web/PWA real. Região II não iniciada.
+- Usage consultado: 84% disponível 5h; 83% semanal. STOP após push da branch.
+
 ## Integração 9H.7B + 9H.9 — 12 de setembro de 2026
 
 - Ordem em master: 9H.7B (2b1d2f45) por fast-forward, depois 9H.9 (1e0c6751).

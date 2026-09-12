@@ -13,6 +13,7 @@ const IDS_PROGRESSAO := preload("res://scripts/progression_ids.gd")
 @export var pista_ao_atravessar := ""  # id opcional de pista sobre a mãe
 
 var _t := 0.0
+var _vortice_arte: Sprite2D
 @onready var _anel_e: Node = get_node_or_null("Vortice/AnelExterno")
 @onready var _anel_i: Node = get_node_or_null("Vortice/AnelInterno")
 @onready var _luz: PointLight2D = get_node_or_null("PointLight2D")
@@ -20,11 +21,28 @@ var _t := 0.0
 
 func _ready() -> void:
 	body_entered.connect(_ao_entrar)
+	# A mesma tira CC0 já aprovada para Portal substitui o hexágono legado.
+	if ResourceLoader.exists(Portal.TIRA_VORTICE):
+		$Vortice.visible = false
+		_vortice_arte = Sprite2D.new()
+		_vortice_arte.name = "VorticeArte"
+		_vortice_arte.texture = load(Portal.TIRA_VORTICE)
+		_vortice_arte.hframes = Portal.FRAMES_VORTICE
+		_vortice_arte.position = Vector2(0, 2)
+		_vortice_arte.scale = Vector2(1.5, 1.8)
+		_vortice_arte.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		_vortice_arte.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
+		var material_arte := CanvasItemMaterial.new()
+		material_arte.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
+		_vortice_arte.material = material_arte
+		add_child(_vortice_arte)
 
 
 func _process(dt: float) -> void:
 	# vórtice: anéis a rodar em sentidos opostos + luz a pulsar
 	_t += dt
+	if _vortice_arte:
+		_vortice_arte.frame = int(_t * Portal.FPS_VORTICE) % Portal.FRAMES_VORTICE
 	if _anel_e:
 		_anel_e.rotation += dt * 1.1
 	if _anel_i:

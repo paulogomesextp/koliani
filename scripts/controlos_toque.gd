@@ -484,8 +484,8 @@ func _atualizar_essencia(total: int) -> void:
 
 
 func _montar_legenda_controlos() -> void:
-	# em ecrã táctil os botões de toque já mostram tudo
-	if DisplayServer.is_touchscreen_available():
+	# Ajuda opcional; não ocupa permanentemente o HUD de produção.
+	if not ProjectSettings.get_setting("koliani/ui/mostrar_legenda_controlos", false) or DisplayServer.is_touchscreen_available():
 		return
 	var faixa := Control.new()
 	faixa.name = "LegendaControlos"
@@ -744,11 +744,16 @@ func _ao_mecanica(cam: String) -> void:
 
 
 func _placa_tutorial(nome: String, txt: String) -> void:
+	_enfileirar_notificacao({"nome": nome, "txt": txt, "tutorial": true})
+
+
+func _criar_tutorial(nome: String, txt: String) -> PanelContainer:
+	var largura := minf(TUTORIAL_LARGURA, get_viewport().get_visible_rect().size.x - 48.0)
 	var caixa := PanelContainer.new()
 	caixa.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
 	caixa.add_theme_stylebox_override("panel", UIProducao.caixa("caixa_dialogo",
 		Vector4(28, 20, 28, 22)))
-	caixa.size = Vector2(TUTORIAL_LARGURA, 0.0)
+	caixa.size = Vector2(largura, 0.0)
 	caixa.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 	var col := VBoxContainer.new()
@@ -757,6 +762,7 @@ func _placa_tutorial(nome: String, txt: String) -> void:
 
 	var l_nome := Label.new()
 	l_nome.text = nome
+	l_nome.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	l_nome.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	l_nome.add_theme_color_override("font_color", UIProducao.OURO)
 	l_nome.add_theme_color_override("font_outline_color", Color(0.05, 0.01, 0.06))
@@ -768,39 +774,91 @@ func _placa_tutorial(nome: String, txt: String) -> void:
 	l_txt.text = txt
 	l_txt.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	l_txt.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	l_txt.custom_minimum_size.x = TUTORIAL_LARGURA - 36.0
+	l_txt.custom_minimum_size.x = largura - 56.0
 	l_txt.add_theme_color_override("font_color", Color(0.94, 0.88, 1))
 	l_txt.add_theme_color_override("font_outline_color", Color(0.05, 0.01, 0.06))
 	l_txt.add_theme_constant_override("outline_size", 3)
 	l_txt.add_theme_font_size_override("font_size", 17)
 	col.add_child(l_txt)
 
-	add_child(caixa)
-	# a altura só é conhecida depois de o texto ser medido
-	await get_tree().process_frame
-	var larg := get_viewport().get_visible_rect().size.x
-	caixa.position = Vector2((larg - TUTORIAL_LARGURA) * 0.5, 78.0)
-
-	caixa.modulate.a = 0.0
-	var t := caixa.create_tween()
-	t.tween_property(caixa, "modulate:a", 1.0, 0.35)
-	t.tween_interval(TUTORIAL_SEGUNDOS - 0.95)
-	t.tween_property(caixa, "modulate:a", 0.0, 0.6)
-	t.tween_callback(caixa.queue_free)
+	return caixa
 
 
 ## Toast de feedback (prancha 09, secção 8): moldura + ícone + texto
 ## dinâmico, centrado no topo. `estilo` "info" (azul) ou "habilidade".
 func _aviso(txt: String, icone := "", estilo := "info") -> void:
-	var l := UIProducao.toast(txt, icone, estilo)
-	add_child(l)
-	l.reset_size()
+	_enfileirar_notificacao({"txt": txt, "icone": icone, "estilo": estilo})
+
+
+## Um único slot para tutorial/toast; falas dos chefes têm prioridade.
+var _fila_notificacoes: Array[Dictionary] = []
+var _notificacao: Control
+var _notificacao_tween: Tween
+var _fila_ativa := false
+var _notificacao_suspensa := false
+
+
+func _dialogo_visivel() -> bool:
+	for balao in get_tree().get_nodes_in_group("dialogo_ui"):
+		if balao.visible:
+			return true
+	return false
+
+
+func _enfileirar_notificacao(dados: Dictionary) -> void:
+	_fila_notificacoes.append(dados)
+	if not _fila_ativa:
+		_consumir_notificacoes()
+
+
+func _consumir_notificacoes() -> void:
+	_fila_ativa = true
+	while not _fila_notificacoes.is_empty():
+		while _dialogo_visivel():
+			await get_tree().process_frame
+		var dados: Dictionary = _fila_notificacoes.pop_front()
+		var tutorial: bool = dados.get("tutorial", false)
+		_notificacao = _criar_tutorial(dados.nome, dados.txt) if tutorial else UIProducao.toast(dados.txt, dados.icone, dados.estilo)
+		if not tutorial:
+			var texto: Label = _notificacao.get_child(0).get_child(_notificacao.get_child(0).get_child_count() - 1)
+			texto.custom_minimum_size.x = minf(texto.get_minimum_size().x, get_viewport().get_visible_rect().size.x - 168.0)
+			texto.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		_notificacao.name = "NotificacaoAtiva"
+		_notificacao_suspensa = false
+		add_child(_notificacao)
+		await get_tree().process_frame
+		_notificacao.reset_size()
+		_posicionar_notificacao()
+		_notificacao_tween = _notificacao.create_tween()
+		_notificacao_tween.tween_interval(TUTORIAL_SEGUNDOS - 0.6 if tutorial else 1.8)
+		_notificacao_tween.tween_property(_notificacao, "modulate:a", 0.0, 0.6)
+		await _notificacao_tween.finished
+		_notificacao.queue_free()
+		_notificacao = null
+		await get_tree().process_frame
+	_fila_ativa = false
+
+
+func _posicionar_notificacao() -> void:
 	var larg := get_viewport().get_visible_rect().size.x
-	l.position = Vector2(roundf((larg - l.size.x) * 0.5), 68.0)
-	var t := l.create_tween()
-	t.tween_interval(1.8)
-	t.tween_property(l, "modulate:a", 0.0, 0.6)
-	t.tween_callback(l.queue_free)
+	var topo := 160.0
+	if _cab_nivel:
+		topo = maxf(topo, _cab_nivel.position.y + _cab_nivel.size.y + 12.0)
+	_notificacao.position = Vector2(roundf((larg - _notificacao.size.x) * 0.5), topo)
+
+
+func _process(_dt: float) -> void:
+	if not is_instance_valid(_notificacao):
+		return
+	var suspensa := _dialogo_visivel()
+	_notificacao.visible = not suspensa
+	_posicionar_notificacao()
+	if suspensa != _notificacao_suspensa and _notificacao_tween and _notificacao_tween.is_valid():
+		if suspensa:
+			_notificacao_tween.pause()
+		else:
+			_notificacao_tween.play()
+		_notificacao_suspensa = suspensa
 
 
 ## Com os controlos de toque ligados, o canto de baixo à esquerda é do
