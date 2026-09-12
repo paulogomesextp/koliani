@@ -4,6 +4,99 @@
 
 Atualizado em 12 de setembro de 2026.
 
+## Execution 9H.1 — fecho do gate humano da Região I — **PARTIAL PASS**
+
+**READY FOR GAME MASTER HUMAN REVIEW: SIM.** v0.18.0. Relatório:
+[execution_9h1_gate_humano.md](execution_9h1_gate_humano.md). Pacote de
+revisão: `work/execution_9h1/`. **Região II NÃO iniciada.**
+
+- **Trilha sonora: de PRODUCTION AUDIO MISSING a seis peças ORIGINAIS.**
+  Menu, exploração da Região I, camada de combate, guardiões, Coração,
+  ambiência de pausa. Compostas por `tools/compor_trilha_9h1.py` sobre um
+  sintetizador escrito de raiz (`tools/motor_musical.py`: wavetable,
+  Karplus-Strong, filtro de 2 pólos, reverbe de Schroeder — Python puro).
+  **Zero amostras de terceiros, zero licenças, zero atribuição devida.** As
+  cinco com melodia partilham o mesmo motivo de sete notas em ré menor; o
+  Coração toca-o INVERTIDO com um segundo sino 18 cents acima. As Regiões
+  II-XX ficam nas 40 faixas CC0/CC-BY — o briefing proíbe fazer número.
+- **ARMADILHA DA EMENDA DO LOOP (custou duas renderizações).** À primeira, o
+  fim de cada faixa estava até **−27 dB** do princípio: as notas acabavam
+  com o seu release e o bordão tinha ataque/queda. Ouve-se como um buraco a
+  cada volta. Resolvido com (a) `voz_continua()` — arredonda a frequência do
+  bordão para caber um número INTEIRO de ciclos na duração, sem envelope — e
+  (b) camas de acorde a transbordar 1,55 compassos, que dão a volta e
+  reentram no princípio. E depois ainda faltava a FASE: um salto de forma de
+  onda de 0,18 (40 % do pico) estala na emenda; **2,5 ms** de esbatimento
+  nas duas pontas resolvem-no e não se ouvem.
+- **Combo: os golpes 2/3/4 deixaram de ser os mesmos 6 frames.** Poses de
+  corpo próprias derivadas da autoridade (`derivar_combo_koliani_9h1.py`):
+  separa-se a Shadowblade por matiz, cisalha-se o tronco, abre-se a passada,
+  comprime-se na vertical, espelha-se, e roda-se a lâmina em torno do punho.
+  **37-49 % de silhueta diferente entre golpes, nenhum frame repetido.**
+  Combo de 3 → 4 golpes (o briefing pede 1→2→3→4); o **dano por golpe não
+  mudou**. O 4.º é o REMATE: duas antecipações agachadas, lâmina por cima da
+  cabeça, avanço de 17 px.
+- **Duas lições do combo.** (1) Ângulos ABSOLUTOS de lâmina (até 160°) põem
+  a espada onde o braço desenhado não a pode levar — lê-se como lâmina
+  solta. A versão boa usa deltas ≤ 40° e tira a trajectória da ESCOLHA do
+  frame de origem. (2) O **contorno escuro** da lâmina falha o teste de
+  saturação e fica no corpo; cisalhado com o tronco, aparece uma **segunda
+  espada a tracejado** ao lado da verdadeira.
+- **Criaturas: 283 frames derivados, 12 entidades.** Pernas DETECTADAS (cada
+  corrida de colunas ligadas na faixa de baixo é uma perna — serve um goblin
+  de 2, um Ghorak de 4 e uma Rainha de 8), tronco a respirar, cabeça/copa/
+  tentáculos com fase própria, brilho da corrupção a pulsar, e um estado
+  **ATTACK que não existia** (entra no telégrafo do `DemonioBase`). Coração:
+  fase 1 contida, fase 2 com amplitude **1,9×**, material diferente.
+- **Três armadilhas do movimento, todas da mesma família.** (1) RODAR uma
+  faixa parte o bicho na linha do corte — usar CISALHAMENTO, que é contínuo
+  na fronteira. (2) Comprimir linha a linha abre costuras — redimensionar a
+  REGIÃO. (3) Uma rampa VERTICAL em píxeis inteiros deixa um buraco em cada
+  degrau (o clone da Morvanna tinha um risco transparente na linha 47).
+  Verificação automática: **0 frames com linha vazia**.
+- **Seletor com tema POR REGIÃO** (`scripts/tema_regiao.gd`). A Região I em
+  **verde de musgo** com o panorama da Árvore-Coração ao fundo (arte de
+  produção aprovada, não inventada) e o **magenta da corrupção só no nó do
+  guardião e no cadeado**. As 19 sem autoridade em **aço frio**, marcadas
+  `REGION SELECTOR THEME AUTHORITY MISSING`. Navegação, 20×5 e bloqueios
+  intactos. **Nota:** dessaturar por `modulate` NÃO chega — carmesim ×
+  cinzento continua carmesim; tem de se tirar a cor na produção da peça.
+- **Bug apanhado por fazer a prova em Chrome real:** o **REPOR** do editor
+  de layout de toque punha os controlos no sítio mas **não apagava o
+  ficheiro** no Web — na recarga voltava tudo. Causa: `apagar()` usava
+  `ProjectSettings.globalize_path()`, e no emscripten esse caminho não é
+  apagável pelo `DirAccess`; `user://` é. Corrigido, com teste, e
+  **re-verificado no browser**: GRAVAR põe o ficheiro em IndexedDB, REPOR
+  tira-o em 8 s (antes continuava lá 16 s depois).
+- **Provado no EXE de release** (commit `12f1209`, SHA
+  `670b6943…`): intro, menu, **seletor verde da Região I**, seletor neutro,
+  L1/L3/L5 com HUD. Rota nova `--foto-seletor=<png>@<n>`.
+- **Provado no Web, em Chrome REAL e visível** (PCK `297cf8e2…`): menu,
+  seletor da Região I em verde, apresentação neutra, **áudio a chegar ao
+  altifalante (picos 0,09-0,20 com `?audio-debug=1`)**, editor de layout,
+  mover e redimensionar dois controlos, gravar, e **persistência lida do
+  IndexedDB**.
+- **RESSALVA: o Chrome desta máquina corre OCLUÍDO — rAF a 1 Hz.** O jogo
+  anda a 1 frame por segundo e cada navegação leva 40-60 s. Está provado que
+  FUNCIONA; não está provada a FLUIDEZ, nem o **combo de 4 golpes por
+  toque** (a 1 fps não se encadeia dentro da janela de 0,42 s). É o P1 da
+  próxima sessão, com uma janela de Chrome em primeiro plano.
+- **Armadilha de prova (3 passagens).** O viewport **não** devolve RGBA8 —
+  misturar formatos num `blit_rect` dá cores trocadas e bandas horizontais.
+  Esconder VFX **por nome** falha: os arcos do combo nascem como filhos da
+  própria Koliani; a regra boa é por exclusão. E a **câmara é filha da
+  Koliani**: teleportar a Koliani não chega para fotografar o chefe (câmara
+  em x=−3116, Coração em x=+3080) — precisa de `top_level`.
+- **Desempenho sem regressão:** menu 0,389 ms, seletor 0,384, L1 0,646, L3
+  0,678, L5 0,973 (média de parede). Pior frame do conjunto: 2,8 ms.
+- **Chefes: NADA foi afinado**, como o briefing manda. Tabela antes/depois
+  em `work/execution_9h1/chefes_regiao1.md`. **A decidir:** o
+  `dano_contacto` é o único dano que a rampa não alivia e por isso SOBE ao
+  longo da região (16 → 25) enquanto os outros descem.
+- **Por fazer:** P1 combo por toque + playtest humano dos chefes; P2 o ecrã
+  de Opções ainda é ouro/ciano do 9F dentro de um frontend carmesim, e o PCK
+  do Web está em 85,9 MB.
+
 ## Execution 9H — Frontend de produção + slice final da Região I — **PARTIAL PASS**
 
 **READY FOR GAME MASTER HUMAN REVIEW: SIM.** v0.17.0. Relatório:

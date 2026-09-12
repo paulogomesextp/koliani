@@ -2,6 +2,35 @@
 
 ## Agora
 
+000000000000. **9H.1 PARTIAL PASS (v0.18.0) -- fecho do gate humano da
+   Regiao I. PRONTO PARA REVISAO HUMANA.** Fechou os cinco pontos que o
+   Game Master deixou abertos na 9H: **trilha sonora de producao** (6 pecas
+   ORIGINAIS do projecto -- menu, exploracao, combate, guardioes, Coracao,
+   pausa -- sintetizador escrito de raiz, zero licencas, mesmo motivo de 7
+   notas nas cinco com melodia); **combo da Koliani com poses de corpo
+   proprias** nos golpes 2/3/4 (reves ascendente / rodopio com as COSTAS
+   viradas / remate com avanco fundo -- 37-49 % de silhueta diferente entre
+   golpes, nenhum frame repetido; o combo passou de 3 para 4 golpes como o
+   briefing pedia, **sem mexer no dano por golpe**); **283 frames derivados
+   de movimento** para as 11 especies e as 2 fases do Coracao (pernas
+   detectadas por grupos, tronco a respirar, e um estado ATTACK que nao
+   existia); **seletor com tema POR REGIAO** (Regiao I em verde de musgo com
+   o panorama da Arvore-Coracao e o magenta da corrupcao so' no no' do
+   guardiao; as 19 sem autoridade em aco frio, marcadas REGION SELECTOR
+   THEME AUTHORITY MISSING). Desempenho sem regressao (pior frame 2,8 ms).
+   Relatorio: `docs/execution_9h1_gate_humano.md`.
+
+000000000001. **A DECIDIR (Game Master): o `dano_contacto` dos chefes SOBE
+   ao longo da Regiao I** -- 16 no Ghorak, 25 no Coracao -- enquanto todos
+   os outros danos descem com a rampa de alivio. Esta excluido do
+   `_afinar_dificuldade` de proposito ou por descuido? Nao se mexeu.
+   Tabela completa antes/depois em `work/execution_9h1/chefes_regiao1.md`.
+
+000000000002. **P1 por fazer da 9H.1**: (a) **combo de 4 golpes por TOQUE**
+   no browser -- o Chrome desta maquina corre ocluido, a 1 fps, e nao se
+   encadeia dentro da janela de 0,42 s; (b) **playtest humano dos chefes**
+   da Regiao I -- os numeros nao se mexem sem ele.
+
 00000000000. **9H PARTIAL PASS (v0.17.0) -- frontend de producao + slice
    final da Regiao I. PRONTO PARA REVISAO HUMANA.** Menu novo, **intro em
    video**, icone/logo em todo o lado, **seletor = mapa de regiao** (nos,
