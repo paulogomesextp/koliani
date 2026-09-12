@@ -1,0 +1,103 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+OpenGL API 3.3.0 NVIDIA 595.97 - Compatibility - Using Device: NVIDIA - NVIDIA GeForce RTX 5070
+
+RUNTIME TRACE | build=0.18.4 | main_scene=res://scenes/Main.tscn | level_id=level_001 | level_scene=res://scenes/levels/Floresta_Putrefata.tscn | player_scene=res://scenes/actors/Koliani.tscn | boss_id=none
+TEXTURA /root/Main/Floresta_Putrefata/Atmosfera/Parallax/Ceu/@Sprite2D@15 
+TEXTURA /root/Main/Floresta_Putrefata/ChaoInicio/Visual/@Sprite2D@92 
+TEXTURA /root/Main/Floresta_Putrefata/ChaoInicio/Visual/@Sprite2D@93 
+TEXTURA /root/Main/Floresta_Putrefata/ChaoInicio/Visual/@Sprite2D@98 
+TEXTURA /root/Main/Floresta_Putrefata/Passo1/Visual/@Sprite2D@103 
+TEXTURA /root/Main/Floresta_Putrefata/Passo1/Visual/@Sprite2D@104 
+TEXTURA /root/Main/Floresta_Putrefata/Passo1/Visual/@Sprite2D@109 
+TEXTURA /root/Main/Floresta_Putrefata/Passo2/Visual/@Sprite2D@111 
+TEXTURA /root/Main/Floresta_Putrefata/Passo2/Visual/@Sprite2D@112 
+TEXTURA /root/Main/Floresta_Putrefata/Passo2/Visual/@Sprite2D@117 
+TEXTURA /root/Main/Floresta_Putrefata/Passo3/Visual/@Sprite2D@119 
+TEXTURA /root/Main/Floresta_Putrefata/Passo3/Visual/@Sprite2D@120 
+TEXTURA /root/Main/Floresta_Putrefata/Passo3/Visual/@Sprite2D@125 
+TEXTURA /root/Main/Floresta_Putrefata/RaizCresce1/Visual/@Sprite2D@127 
+TEXTURA /root/Main/Floresta_Putrefata/RaizCresce1/Visual/@Sprite2D@131 
+TEXTURA /root/Main/Floresta_Putrefata/RaizCresce2/Visual/@Sprite2D@133 
+TEXTURA /root/Main/Floresta_Putrefata/RaizCresce2/Visual/@Sprite2D@137 
+TEXTURA /root/Main/Floresta_Putrefata/RaizCresce3/Visual/@Sprite2D@139 
+TEXTURA /root/Main/Floresta_Putrefata/RaizCresce3/Visual/@Sprite2D@143 
+TEXTURA /root/Main/Floresta_Putrefata/ChaoMeio/Visual/@Sprite2D@145 
+TEXTURA /root/Main/Floresta_Putrefata/ChaoMeio/Visual/@Sprite2D@146 
+TEXTURA /root/Main/Floresta_Putrefata/ChaoMeio/Visual/@Sprite2D@151 
+TEXTURA /root/Main/Floresta_Putrefata/Alta1/Visual/@Sprite2D@159 
+TEXTURA /root/Main/Floresta_Putrefata/Alta1/Visual/@Sprite2D@164 
+TEXTURA /root/Main/Floresta_Putrefata/Alta2/Visual/@Sprite2D@166 
+TEXTURA /root/Main/Floresta_Putrefata/Alta2/Visual/@Sprite2D@171 
+TEXTURA /root/Main/Floresta_Putrefata/Alta3/Visual/@Sprite2D@173 
+TEXTURA /root/Main/Floresta_Putrefata/Alta3/Visual/@Sprite2D@178 
+TEXTURA /root/Main/Floresta_Putrefata/Alcova/Visual/@Sprite2D@180 
+TEXTURA /root/Main/Floresta_Putrefata/Alcova/Visual/@Sprite2D@184 
+TEXTURA /root/Main/Floresta_Putrefata/Alta4/Visual/@Sprite2D@186 
+TEXTURA /root/Main/Floresta_Putrefata/Alta4/Visual/@Sprite2D@191 
+TEXTURA /root/Main/Floresta_Putrefata/Baixa1/Visual/@Sprite2D@193 
+TEXTURA /root/Main/Floresta_Putrefata/Baixa1/Visual/@Sprite2D@198 
+TEXTURA /root/Main/Floresta_Putrefata/Baixa2/Visual/@Sprite2D@200 
+TEXTURA /root/Main/Floresta_Putrefata/Baixa2/Visual/@Sprite2D@205 
+TEXTURA /root/Main/Floresta_Putrefata/Baixa3/Visual/@Sprite2D@207 
+TEXTURA /root/Main/Floresta_Putrefata/Baixa3/Visual/@Sprite2D@212 
+TEXTURA /root/Main/Floresta_Putrefata/Baixa4/Visual/@Sprite2D@214 
+TEXTURA /root/Main/Floresta_Putrefata/Baixa4/Visual/@Sprite2D@219 
+TEXTURA /root/Main/Floresta_Putrefata/Reencontro/Visual/@Sprite2D@221 
+TEXTURA /root/Main/Floresta_Putrefata/Reencontro/Visual/@Sprite2D@222 
+TEXTURA /root/Main/Floresta_Putrefata/Reencontro/Visual/@Sprite2D@227 
+TEXTURA /root/Main/Floresta_Putrefata/SubidaChefe/Visual/@Sprite2D@230 
+TEXTURA /root/Main/Floresta_Putrefata/SubidaChefe/Visual/@Sprite2D@231 
+TEXTURA /root/Main/Floresta_Putrefata/SubidaChefe/Visual/@Sprite2D@236 
+TEXTURA /root/Main/Floresta_Putrefata/ChaoChefe/Visual/@Sprite2D@238 
+TEXTURA /root/Main/Floresta_Putrefata/ChaoChefe/Visual/@Sprite2D@239 
+TEXTURA /root/Main/Floresta_Putrefata/ChaoChefe/Visual/@Sprite2D@244 
+TEXTURA /root/Main/Floresta_Putrefata/Porta/VorticeArte res://assets/sprites/pixel/props/portal.png
+TEXTURA /root/Main/Floresta_Putrefata/CorredorAproximacao/Plataforma/Visual/@Sprite2D@331 
+TEXTURA /root/Main/Floresta_Putrefata/CorredorAproximacao/Plataforma/Visual/@Sprite2D@332 
+TEXTURA /root/Main/Floresta_Putrefata/CorredorAproximacao/Plataforma/Visual/@Sprite2D@337 
+TEXTURA /root/Main/Floresta_Putrefata/CorredorAproximacao/@StaticBody2D@339/Visual/@Sprite2D@350 
+TEXTURA /root/Main/Floresta_Putrefata/CorredorAproximacao/@StaticBody2D@339/Visual/@Sprite2D@351 
+TEXTURA /root/Main/Floresta_Putrefata/CorredorAproximacao/@StaticBody2D@339/Visual/@Sprite2D@356 
+TEXTURA /root/Main/Floresta_Putrefata/CorredorAproximacao/@StaticBody2D@358/Visual/@Sprite2D@369 
+TEXTURA /root/Main/Floresta_Putrefata/CorredorAproximacao/@StaticBody2D@358/Visual/@Sprite2D@370 
+TEXTURA /root/Main/Floresta_Putrefata/CorredorAproximacao/@StaticBody2D@358/Visual/@Sprite2D@375 
+TEXTURA /root/Main/Floresta_Putrefata/CorredorAproximacao/@StaticBody2D@377/Visual/@Sprite2D@388 
+TEXTURA /root/Main/Floresta_Putrefata/CorredorAproximacao/@StaticBody2D@377/Visual/@Sprite2D@389 
+TEXTURA /root/Main/Floresta_Putrefata/CorredorAproximacao/@StaticBody2D@377/Visual/@Sprite2D@394 
+TEXTURA /root/Main/Floresta_Putrefata/CorredorAproximacao/Cam_1/Plataforma/Visual/@Sprite2D@428 
+TEXTURA /root/Main/Floresta_Putrefata/CorredorAproximacao/Cam_1/Plataforma/Visual/@Sprite2D@429 
+TEXTURA /root/Main/Floresta_Putrefata/CorredorAproximacao/Cam_1/Plataforma/Visual/@Sprite2D@434 
+TEXTURA /root/Main/Floresta_Putrefata/CorredorAproximacao/Cam_2/Plataforma/Visual/@Sprite2D@452 
+TEXTURA /root/Main/Floresta_Putrefata/CorredorAproximacao/Cam_2/Plataforma/Visual/@Sprite2D@456 
+TEXTURA /root/Main/Floresta_Putrefata/CorredorAproximacao/Cam_2/@Sprite2D@457 res://assets/sprites/pixel/deco/floresta/arbusto_g.png
+TEXTURA /root/Main/Floresta_Putrefata/CorredorAproximacao/Cam_2/@StaticBody2D@458/Visual/@Sprite2D@460 
+TEXTURA /root/Main/Floresta_Putrefata/CorredorAproximacao/Cam_2/@StaticBody2D@458/Visual/@Sprite2D@464 
+TEXTURA /root/Main/Floresta_Putrefata/CorredorAproximacao/Cam_2/@StaticBody2D@465/Visual/@Sprite2D@467 
+TEXTURA /root/Main/Floresta_Putrefata/CorredorAproximacao/Cam_2/@StaticBody2D@465/Visual/@Sprite2D@471 
+TEXTURA /root/Main/Floresta_Putrefata/CorredorAproximacao/Cam_2/@StaticBody2D@472/Visual/@Sprite2D@474 
+TEXTURA /root/Main/Floresta_Putrefata/CorredorAproximacao/Cam_2/@StaticBody2D@472/Visual/@Sprite2D@478 
+TEXTURA /root/Main/Floresta_Putrefata/CorredorAproximacao/Cam_2/@StaticBody2D@479/Visual/@Sprite2D@481 
+TEXTURA /root/Main/Floresta_Putrefata/CorredorAproximacao/Cam_2/@StaticBody2D@479/Visual/@Sprite2D@485 
+TEXTURA /root/Main/Floresta_Putrefata/CorredorAproximacao/Cam_2/@StaticBody2D@486/Visual/@Sprite2D@488 
+TEXTURA /root/Main/Floresta_Putrefata/CorredorAproximacao/Cam_2/@StaticBody2D@486/Visual/@Sprite2D@492 
+TEXTURA /root/Main/Floresta_Putrefata/CorredorAproximacao/Cam_2/@StaticBody2D@493/Visual/@Sprite2D@495 
+TEXTURA /root/Main/Floresta_Putrefata/CorredorAproximacao/Cam_2/@StaticBody2D@493/Visual/@Sprite2D@499 
+TEXTURA /root/Main/Floresta_Putrefata/CorredorAproximacao/Cam_2/@Sprite2D@500 res://assets/sprites/pixel/deco/floresta/arvore_morta2.png
+TEXTURA /root/Main/Floresta_Putrefata/CorredorAproximacao/Cam_2/@StaticBody2D@501/Visual/@Sprite2D@503 
+TEXTURA /root/Main/Floresta_Putrefata/CorredorAproximacao/Cam_2/@StaticBody2D@501/Visual/@Sprite2D@507 
+TEXTURA /root/Main/Floresta_Putrefata/CorredorAproximacao/Cam_2/@StaticBody2D@508/Visual/@Sprite2D@510 
+TEXTURA /root/Main/Floresta_Putrefata/CorredorAproximacao/Cam_2/@StaticBody2D@508/Visual/@Sprite2D@514 
+TEXTURA /root/Main/Floresta_Putrefata/CorredorAproximacao/Cam_2/@StaticBody2D@515/Visual/@Sprite2D@517 
+TEXTURA /root/Main/Floresta_Putrefata/CorredorAproximacao/Cam_2/@StaticBody2D@515/Visual/@Sprite2D@521 
+TEXTURA /root/Main/Floresta_Putrefata/CorredorAproximacao/Cam_2/@StaticBody2D@522/Visual/@Sprite2D@524 
+TEXTURA /root/Main/Floresta_Putrefata/CorredorAproximacao/Cam_2/@StaticBody2D@522/Visual/@Sprite2D@528 
+TEXTURA /root/Main/Floresta_Putrefata/CorredorAproximacao/Cam_2/@StaticBody2D@529/Visual/@Sprite2D@531 
+TEXTURA /root/Main/Floresta_Putrefata/CorredorAproximacao/Cam_2/@StaticBody2D@529/Visual/@Sprite2D@535 
+TEXTURA /root/Main/Floresta_Putrefata/CorredorAproximacao/Cam_2/@StaticBody2D@536/Visual/@Sprite2D@538 
+TEXTURA /root/Main/Floresta_Putrefata/CorredorAproximacao/Cam_2/@StaticBody2D@536/Visual/@Sprite2D@542 
+TEXTURA /root/Main/Floresta_Putrefata/CorredorAproximacao/@StaticBody2D@544/Visual/@Sprite2D@567 
+TEXTURA /root/Main/Floresta_Putrefata/CorredorAproximacao/@StaticBody2D@544/Visual/@Sprite2D@568 
+TEXTURA /root/Main/Floresta_Putrefata/CorredorAproximacao/@StaticBody2D@544/Visual/@Sprite2D@573 
+TEXTURA /root/Main/Floresta_Putrefata/Luzes/@Node2D@600/Corpo res://assets/sprites/pixel/props/tocha.png
+TEXTURA /root/Main/Floresta_Putrefata/Luzes/@Node2D@601/Corpo res://assets/sprites/pixel/props/tocha.png
+L1 HYBRID: abertura e 5 camadas PASS; 2 capturas reais; percurso humano não testado

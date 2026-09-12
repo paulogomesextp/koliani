@@ -1,0 +1,294 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+Unable to open Android 'build-tools' directory.
+[   0% ] [90m[1mfirst_scan_filesystem[22m | Started Inicialização do projeto (5 steps)[39m[0m
+[   0% ] [90m[1mfirst_scan_filesystem[22m | Verificando a estrutura do arquivo...[39m[0m
+WARNING: Detected another project.godot at res://work/9h12a_integration/source. The folder will be ignored.
+   at: _should_skip_directory (editor/file_system/editor_file_system.cpp:3497)
+[  16% ] [90m[1mfirst_scan_filesystem[22m | Carregando nomes de classes globais...[39m[0m
+[  33% ] [90m[1mfirst_scan_filesystem[22m | Verificando extensões GD...[39m[0m
+[  50% ] [90m[1mfirst_scan_filesystem[22m | Criando scripts de carregamento automático...[39m[0m
+[  66% ] [90m[1mfirst_scan_filesystem[22m | Inicializando plug-ins...[39m[0m
+[  83% ] [90m[1mfirst_scan_filesystem[22m | Iniciando a verificação de arquivos...[39m[0m
+[92m[ DONE ][39m [1mfirst_scan_filesystem[22m
+[0m
+[   0% ] [90m[1mupdate_scripts_classes[22m | Started Registrando classes globais... (3 steps)[39m[0m
+[   0% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  25% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  50% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[92m[ DONE ][39m [1mupdate_scripts_classes[22m
+[0m
+[   0% ] [90m[1m_update_scan_actions[22m | Started Ações de verificação... (65 steps)[39m[0m
+[   0% ] [90m[1m_update_scan_actions[22m | authority.png[39m[0m
+[   1% ] [90m[1m_update_scan_actions[22m | 01_far_sky_castle.png[39m[0m
+[   3% ] [90m[1m_update_scan_actions[22m | 02_mid_mountains_waterfalls.png[39m[0m
+[   4% ] [90m[1m_update_scan_actions[22m | 03_forest_silhouette.png[39m[0m
+[   6% ] [90m[1m_update_scan_actions[22m | 04_ruins_arches.png[39m[0m
+[   7% ] [90m[1m_update_scan_actions[22m | 05_foreground_branches_vines.png[39m[0m
+[   9% ] [90m[1m_update_scan_actions[22m | contact_sheet.png[39m[0m
+[  10% ] [90m[1m_update_scan_actions[22m | arco.png[39m[0m
+[  12% ] [90m[1m_update_scan_actions[22m | arco_partido.png[39m[0m
+[  13% ] [90m[1m_update_scan_actions[22m | arvore.png[39m[0m
+[  15% ] [90m[1m_update_scan_actions[22m | cascata.png[39m[0m
+[  16% ] [90m[1m_update_scan_actions[22m | cristais.png[39m[0m
+[  18% ] [90m[1m_update_scan_actions[22m | floresta.png[39m[0m
+[  19% ] [90m[1m_update_scan_actions[22m | lanterna.png[39m[0m
+[  21% ] [90m[1m_update_scan_actions[22m | liquido.png[39m[0m
+[  22% ] [90m[1m_update_scan_actions[22m | raizes.png[39m[0m
+[  24% ] [90m[1m_update_scan_actions[22m | ramos.png[39m[0m
+[  25% ] [90m[1m_update_scan_actions[22m | torres.png[39m[0m
+[  27% ] [90m[1m_update_scan_actions[22m | vinhas.png[39m[0m
+[  28% ] [90m[1m_update_scan_actions[22m | panorama.png[39m[0m
+[  30% ] [90m[1m_update_scan_actions[22m | corpo.png[39m[0m
+[  31% ] [90m[1m_update_scan_actions[22m | corrupcao.png[39m[0m
+[  33% ] [90m[1m_update_scan_actions[22m | plataforma.png[39m[0m
+[  34% ] [90m[1m_update_scan_actions[22m | raizes.png[39m[0m
+[  36% ] [90m[1m_update_scan_actions[22m | rocha.png[39m[0m
+[  37% ] [90m[1m_update_scan_actions[22m | ruina.png[39m[0m
+[  39% ] [90m[1m_update_scan_actions[22m | topo.png[39m[0m
+[  40% ] [90m[1m_update_scan_actions[22m | ._monster-1.wav[39m[0m
+[  42% ] [90m[1m_update_scan_actions[22m | ._monster-2.wav[39m[0m
+[  43% ] [90m[1m_update_scan_actions[22m | ._monster-3.wav[39m[0m
+[  45% ] [90m[1m_update_scan_actions[22m | ._monster-4.wav[39m[0m
+[  46% ] [90m[1m_update_scan_actions[22m | ._monster-5.wav[39m[0m
+[  48% ] [90m[1m_update_scan_actions[22m | ._monster-6.wav[39m[0m
+[  50% ] [90m[1m_update_scan_actions[22m | ._monster-7.wav[39m[0m
+[  51% ] [90m[1m_update_scan_actions[22m | ._monster-8.wav[39m[0m
+[  53% ] [90m[1m_update_scan_actions[22m | ._monster-9.wav[39m[0m
+[  54% ] [90m[1m_update_scan_actions[22m | ._monster-10.wav[39m[0m
+[  56% ] [90m[1m_update_scan_actions[22m | koliani_ref.png[39m[0m
+[  57% ] [90m[1m_update_scan_actions[22m | region1_l1_hybrid_visual_authority_v1.png[39m[0m
+[  59% ] [90m[1m_update_scan_actions[22m | 01_far_sky_castle.png[39m[0m
+[  60% ] [90m[1m_update_scan_actions[22m | 02_mid_mountains_waterfalls.png[39m[0m
+[  62% ] [90m[1m_update_scan_actions[22m | 03_forest_silhouette.png[39m[0m
+[  63% ] [90m[1m_update_scan_actions[22m | 04_ruins_arches.png[39m[0m
+[  65% ] [90m[1m_update_scan_actions[22m | 05_foreground_branches_vines.png[39m[0m
+[  66% ] [90m[1m_update_scan_actions[22m | contact_sheet.png[39m[0m
+[  68% ] [90m[1m_update_scan_actions[22m | arco.png[39m[0m
+[  69% ] [90m[1m_update_scan_actions[22m | arco_partido.png[39m[0m
+[  71% ] [90m[1m_update_scan_actions[22m | arvore.png[39m[0m
+[  72% ] [90m[1m_update_scan_actions[22m | cascata.png[39m[0m
+[  74% ] [90m[1m_update_scan_actions[22m | cristais.png[39m[0m
+[  75% ] [90m[1m_update_scan_actions[22m | floresta.png[39m[0m
+[  77% ] [90m[1m_update_scan_actions[22m | lanterna.png[39m[0m
+[  78% ] [90m[1m_update_scan_actions[22m | liquido.png[39m[0m
+[  80% ] [90m[1m_update_scan_actions[22m | raizes.png[39m[0m
+[  81% ] [90m[1m_update_scan_actions[22m | ramos.png[39m[0m
+[  83% ] [90m[1m_update_scan_actions[22m | torres.png[39m[0m
+[  84% ] [90m[1m_update_scan_actions[22m | vinhas.png[39m[0m
+[  86% ] [90m[1m_update_scan_actions[22m | panorama.png[39m[0m
+[  87% ] [90m[1m_update_scan_actions[22m | corpo.png[39m[0m
+[  89% ] [90m[1m_update_scan_actions[22m | corrupcao.png[39m[0m
+[  90% ] [90m[1m_update_scan_actions[22m | plataforma.png[39m[0m
+[  92% ] [90m[1m_update_scan_actions[22m | raizes.png[39m[0m
+[  93% ] [90m[1m_update_scan_actions[22m | rocha.png[39m[0m
+[  95% ] [90m[1m_update_scan_actions[22m | ruina.png[39m[0m
+[  96% ] [90m[1m_update_scan_actions[22m | topo.png[39m[0m
+[92m[ DONE ][39m [1m_update_scan_actions[22m
+[0m
+[   0% ] [90m[1mreimport[22m | Started A (Re)Importar Recursos (64 steps)[39m[0m
+[   0% ] [90m[1mreimport[22m | Preparando arquivos para reimportação...[39m[0m
+[   1% ] [90m[1mreimport[22m | Preparando arquivos para reimportação...[39m[0m
+[   3% ] [90m[1mreimport[22m | Preparando arquivos para reimportação...[39m[0m
+[   4% ] [90m[1mreimport[22m | Preparando arquivos para reimportação...[39m[0m
+[   6% ] [90m[1mreimport[22m | Preparando arquivos para reimportação...[39m[0m
+[   7% ] [90m[1mreimport[22m | Preparando arquivos para reimportação...[39m[0m
+[   9% ] [90m[1mreimport[22m | Preparando arquivos para reimportação...[39m[0m
+[  10% ] [90m[1mreimport[22m | Preparando arquivos para reimportação...[39m[0m
+[  12% ] [90m[1mreimport[22m | Preparando arquivos para reimportação...[39m[0m
+[  13% ] [90m[1mreimport[22m | Preparando arquivos para reimportação...[39m[0m
+[  15% ] [90m[1mreimport[22m | Preparando arquivos para reimportação...[39m[0m
+[  16% ] [90m[1mreimport[22m | Preparando arquivos para reimportação...[39m[0m
+[  18% ] [90m[1mreimport[22m | Preparando arquivos para reimportação...[39m[0m
+[  20% ] [90m[1mreimport[22m | Preparando arquivos para reimportação...[39m[0m
+[  21% ] [90m[1mreimport[22m | Preparando arquivos para reimportação...[39m[0m
+[  23% ] [90m[1mreimport[22m | Preparando arquivos para reimportação...[39m[0m
+[  24% ] [90m[1mreimport[22m | Preparando arquivos para reimportação...[39m[0m
+[  26% ] [90m[1mreimport[22m | Preparando arquivos para reimportação...[39m[0m
+[  27% ] [90m[1mreimport[22m | Preparando arquivos para reimportação...[39m[0m
+[  29% ] [90m[1mreimport[22m | Preparando arquivos para reimportação...[39m[0m
+[  30% ] [90m[1mreimport[22m | Preparando arquivos para reimportação...[39m[0m
+[  32% ] [90m[1mreimport[22m | Preparando arquivos para reimportação...[39m[0m
+[  33% ] [90m[1mreimport[22m | Preparando arquivos para reimportação...[39m[0m
+[  35% ] [90m[1mreimport[22m | Preparando arquivos para reimportação...[39m[0m
+[  36% ] [90m[1mreimport[22m | Preparando arquivos para reimportação...[39m[0m
+[  38% ] [90m[1mreimport[22m | Preparando arquivos para reimportação...[39m[0m
+[  40% ] [90m[1mreimport[22m | Preparando arquivos para reimportação...[39m[0m
+[  41% ] [90m[1mreimport[22m | Preparando arquivos para reimportação...[39m[0m
+[  43% ] [90m[1mreimport[22m | Preparando arquivos para reimportação...[39m[0m
+[  44% ] [90m[1mreimport[22m | Preparando arquivos para reimportação...[39m[0m
+[  46% ] [90m[1mreimport[22m | Preparando arquivos para reimportação...[39m[0m
+[  47% ] [90m[1mreimport[22m | Preparando arquivos para reimportação...[39m[0m
+[  49% ] [90m[1mreimport[22m | Preparando arquivos para reimportação...[39m[0m
+[  50% ] [90m[1mreimport[22m | Preparando arquivos para reimportação...[39m[0m
+[  52% ] [90m[1mreimport[22m | Preparando arquivos para reimportação...[39m[0m
+[  53% ] [90m[1mreimport[22m | Preparando arquivos para reimportação...[39m[0m
+[  55% ] [90m[1mreimport[22m | Preparando arquivos para reimportação...[39m[0m
+[  56% ] [90m[1mreimport[22m | Preparando arquivos para reimportação...[39m[0m
+[  58% ] [90m[1mreimport[22m | Preparando arquivos para reimportação...[39m[0m
+[  60% ] [90m[1mreimport[22m | Preparando arquivos para reimportação...[39m[0m
+[  61% ] [90m[1mreimport[22m | Preparando arquivos para reimportação...[39m[0m
+[  63% ] [90m[1mreimport[22m | Preparando arquivos para reimportação...[39m[0m
+[  64% ] [90m[1mreimport[22m | Preparando arquivos para reimportação...[39m[0m
+[  66% ] [90m[1mreimport[22m | Preparando arquivos para reimportação...[39m[0m
+[  67% ] [90m[1mreimport[22m | Preparando arquivos para reimportação...[39m[0m
+[  69% ] [90m[1mreimport[22m | Preparando arquivos para reimportação...[39m[0m
+[  70% ] [90m[1mreimport[22m | Preparando arquivos para reimportação...[39m[0m
+[  72% ] [90m[1mreimport[22m | Preparando arquivos para reimportação...[39m[0m
+[  73% ] [90m[1mreimport[22m | Preparando arquivos para reimportação...[39m[0m
+[  75% ] [90m[1mreimport[22m | Preparando arquivos para reimportação...[39m[0m
+[  76% ] [90m[1mreimport[22m | Preparando arquivos para reimportação...[39m[0m
+[  78% ] [90m[1mreimport[22m | Preparando arquivos para reimportação...[39m[0m
+[  80% ] [90m[1mreimport[22m | Preparando arquivos para reimportação...[39m[0m
+[  81% ] [90m[1mreimport[22m | Preparando arquivos para reimportação...[39m[0m
+[  83% ] [90m[1mreimport[22m | Preparando arquivos para reimportação...[39m[0m
+[  84% ] [90m[1mreimport[22m | Preparando arquivos para reimportação...[39m[0m
+[  86% ] [90m[1mreimport[22m | Preparando arquivos para reimportação...[39m[0m
+[  87% ] [90m[1mreimport[22m | Preparando arquivos para reimportação...[39m[0m
+[  89% ] [90m[1mreimport[22m | Preparando arquivos para reimportação...[39m[0m
+[  90% ] [90m[1mreimport[22m | Preparando arquivos para reimportação...[39m[0m
+[  92% ] [90m[1mreimport[22m | Preparando arquivos para reimportação...[39m[0m
+[  93% ] [90m[1mreimport[22m | Preparando arquivos para reimportação...[39m[0m
+[  95% ] [90m[1mreimport[22m | Preparando arquivos para reimportação...[39m[0m
+[  96% ] [90m[1mreimport[22m | Preparando arquivos para reimportação...[39m[0m
+[   0% ] [90m[1mreimport[22m | Executando operações de pré-reimportação...[39m[0m
+[   0% ] [90m[1mreimport[22m | region1_l1_hybrid_visual_authority_v1.png[39m[0m
+[   1% ] [90m[1mreimport[22m | 01_far_sky_castle.png[39m[0m
+[   3% ] [90m[1mreimport[22m | 02_mid_mountains_waterfalls.png[39m[0m
+[   4% ] [90m[1mreimport[22m | 03_forest_silhouette.png[39m[0m
+[   6% ] [90m[1mreimport[22m | 04_ruins_arches.png[39m[0m
+[   7% ] [90m[1mreimport[22m | 05_foreground_branches_vines.png[39m[0m
+[   9% ] [90m[1mreimport[22m | contact_sheet.png[39m[0m
+[  10% ] [90m[1mreimport[22m | arco.png[39m[0m
+[  12% ] [90m[1mreimport[22m | arco_partido.png[39m[0m
+[  13% ] [90m[1mreimport[22m | arvore.png[39m[0m
+[  15% ] [90m[1mreimport[22m | cascata.png[39m[0m
+[  16% ] [90m[1mreimport[22m | cristais.png[39m[0m
+[  18% ] [90m[1mreimport[22m | floresta.png[39m[0m
+[  20% ] [90m[1mreimport[22m | lanterna.png[39m[0m
+[  21% ] [90m[1mreimport[22m | liquido.png[39m[0m
+[  23% ] [90m[1mreimport[22m | raizes.png[39m[0m
+[  24% ] [90m[1mreimport[22m | ramos.png[39m[0m
+[  26% ] [90m[1mreimport[22m | torres.png[39m[0m
+[  27% ] [90m[1mreimport[22m | vinhas.png[39m[0m
+[  29% ] [90m[1mreimport[22m | panorama.png[39m[0m
+[  30% ] [90m[1mreimport[22m | corpo.png[39m[0m
+[  32% ] [90m[1mreimport[22m | corrupcao.png[39m[0m
+[  33% ] [90m[1mreimport[22m | plataforma.png[39m[0m
+[  35% ] [90m[1mreimport[22m | raizes.png[39m[0m
+[  36% ] [90m[1mreimport[22m | rocha.png[39m[0m
+[  38% ] [90m[1mreimport[22m | ruina.png[39m[0m
+[  40% ] [90m[1mreimport[22m | topo.png[39m[0m
+[  41% ] [90m[1mreimport[22m | torres.png[39m[0m
+[  43% ] [90m[1mreimport[22m | ramos.png[39m[0m
+[  44% ] [90m[1mreimport[22m | raizes.png[39m[0m
+[  46% ] [90m[1mreimport[22m | liquido.png[39m[0m
+[  47% ] [90m[1mreimport[22m | lanterna.png[39m[0m
+[  49% ] [90m[1mreimport[22m | floresta.png[39m[0m
+[  50% ] [90m[1mreimport[22m | cristais.png[39m[0m
+[  52% ] [90m[1mreimport[22m | cascata.png[39m[0m
+[  53% ] [90m[1mreimport[22m | arvore.png[39m[0m
+[  55% ] [90m[1mreimport[22m | arco_partido.png[39m[0m
+[  56% ] [90m[1mreimport[22m | arco.png[39m[0m
+[  58% ] [90m[1mreimport[22m | contact_sheet.png[39m[0m
+[  60% ] [90m[1mreimport[22m | 05_foreground_branches_vines.png[39m[0m
+[  61% ] [90m[1mreimport[22m | 04_ruins_arches.png[39m[0m
+[  63% ] [90m[1mreimport[22m | 03_forest_silhouette.png[39m[0m
+[  64% ] [90m[1mreimport[22m | 02_mid_mountains_waterfalls.png[39m[0m
+[  66% ] [90m[1mreimport[22m | 01_far_sky_castle.png[39m[0m
+[  67% ] [90m[1mreimport[22m | authority.png[39m[0m
+[  69% ] [90m[1mreimport[22m | vinhas.png[39m[0m
+[  70% ] [90m[1mreimport[22m | panorama.png[39m[0m
+[  72% ] [90m[1mreimport[22m | corpo.png[39m[0m
+[  73% ] [90m[1mreimport[22m | corrupcao.png[39m[0m
+[  75% ] [90m[1mreimport[22m | plataforma.png[39m[0m
+[  76% ] [90m[1mreimport[22m | raizes.png[39m[0m
+[  78% ] [90m[1mreimport[22m | rocha.png[39m[0m
+[  80% ] [90m[1mreimport[22m | ruina.png[39m[0m
+[  81% ] [90m[1mreimport[22m | topo.png[39m[0m
+[  83% ] [90m[1mreimport[22m | region1_l1_hybrid_visual_authority_v1.png[39m[0m
+ERROR: Not a WAV file. File should start with 'RIFF', but found '', in file of size 82 bytes
+   at: load_from_buffer (scene/resources/audio_stream_wav.cpp:673)
+ERROR: Not a WAV file. File should start with 'RIFF', but found '', in file of size 82 bytes
+   at: load_from_buffer (scene/resources/audio_stream_wav.cpp:673)
+ERROR: Can't save empty resource to path 'res://.godot/imported/._monster-2.wav-8bcf144bf33c393c5b41c17e06d42ceb.sample'.
+   at: save (core/io/resource_saver.cpp:103)
+ERROR: Not a WAV file. File should start with 'RIFF', but found '', in file of size 82 bytes
+   at: load_from_buffer (scene/resources/audio_stream_wav.cpp:673)
+ERROR: Can't save empty resource to path 'res://.godot/imported/._monster-1.wav-b5e921c961705babe4a78e0aea451cff.sample'.
+ERROR: Not a WAV file. File should start with 'RIFF', but found '', in file of size 82 bytes
+   at: save (core/io/resource_saver.cpp:103)
+ERROR: Not a WAV file. File should start with 'RIFF', but found '', in file of size 82 bytes
+ERROR: Can't save empty resource to path 'res://.godot/imported/._monster-3.wav-f9a3ab97599efd2ca5a4f66bafc3f8d0.sample'.
+   at: load_from_buffer (scene/resources/audio_stream_wav.cpp:673)
+   at: load_from_buffer (scene/resources/audio_stream_wav.cpp:673)
+   at: save (core/io/resource_saver.cpp:103)
+ERROR: Can't save empty resource to path 'res://.godot/imported/._monster-5.wav-02673c0308025578a6a41b3b7a9d942b.sample'.
+   at: save (core/io/resource_saver.cpp:103)
+ERROR: Can't save empty resource to path 'res://.godot/imported/._monster-4.wav-2bf09d6daf95ee4135aff81a721bed28.sample'.
+   at: save (core/io/resource_saver.cpp:103)
+ERROR: Not a WAV file. File should start with 'RIFF', but found '', in file of size 82 bytes
+   at: load_from_buffer (scene/resources/audio_stream_wav.cpp:673)
+ERROR: Can't save empty resource to path 'res://.godot/imported/._monster-9.wav-74ab173a1c202bf8f7a5e376cfed939e.sample'.
+   at: save (core/io/resource_saver.cpp:103)
+ERROR: Not a WAV file. File should start with 'RIFF', but found '', in file of size 82 bytes
+   at: load_from_buffer (scene/resources/audio_stream_wav.cpp:673)
+ERROR: Not a WAV file. File should start with 'RIFF', but found '', in file of size 82 bytes
+   at: load_from_buffer (scene/resources/audio_stream_wav.cpp:673)
+ERROR: Not a WAV file. File should start with 'RIFF', but found '', in file of size 82 bytes
+ERROR: Can't save empty resource to path 'res://.godot/imported/._monster-10.wav-a8b1e2eb6c8e1fc35acfb4b12d473273.sample'.
+ERROR: Not a WAV file. File should start with 'RIFF', but found '', in file of size 82 bytes
+ERROR: Can't save empty resource to path 'res://.godot/imported/._monster-7.wav-6a521ce20e3accc1dae701c4dfa3fe3e.sample'.
+   at: save (core/io/resource_saver.cpp:103)
+   at: save (core/io/resource_saver.cpp:103)
+   at: load_from_buffer (scene/resources/audio_stream_wav.cpp:673)
+   at: load_from_buffer (scene/resources/audio_stream_wav.cpp:673)
+ERROR: Can't save empty resource to path 'res://.godot/imported/._monster-8.wav-2afce18f8e95c7a5eed849d75540c0b0.sample'.
+   at: save (core/io/resource_saver.cpp:103)
+ERROR: Can't save empty resource to path 'res://.godot/imported/._monster-6.wav-a7fe651f0bb97e54f382b55faf211ad0.sample'.
+   at: save (core/io/resource_saver.cpp:103)
+ERROR: Condition "f.is_null()" is true. Continuing.
+   at: get_multiple_md5 (core/io/file_access.cpp:967)
+ERROR: Condition "f.is_null()" is true. Continuing.
+   at: get_multiple_md5 (core/io/file_access.cpp:967)
+ERROR: Condition "f.is_null()" is true. Continuing.
+   at: get_multiple_md5 (core/io/file_access.cpp:967)
+ERROR: Condition "f.is_null()" is true. Continuing.
+   at: get_multiple_md5 (core/io/file_access.cpp:967)
+ERROR: Condition "f.is_null()" is true. Continuing.
+   at: get_multiple_md5 (core/io/file_access.cpp:967)
+ERROR: Condition "f.is_null()" is true. Continuing.
+   at: get_multiple_md5 (core/io/file_access.cpp:967)
+ERROR: Condition "f.is_null()" is true. Continuing.
+   at: get_multiple_md5 (core/io/file_access.cpp:967)
+ERROR: Condition "f.is_null()" is true. Continuing.
+   at: get_multiple_md5 (core/io/file_access.cpp:967)
+ERROR: Condition "f.is_null()" is true. Continuing.
+   at: get_multiple_md5 (core/io/file_access.cpp:967)
+ERROR: Condition "f.is_null()" is true. Continuing.
+   at: get_multiple_md5 (core/io/file_access.cpp:967)
+[  84% ] [90m[1mreimport[22m | 01_far_sky_castle.png[39m[0m
+[  86% ] [90m[1mreimport[22m | 02_mid_mountains_waterfalls.png[39m[0m
+[  87% ] [90m[1mreimport[22m | 03_forest_silhouette.png[39m[0m
+[  89% ] [90m[1mreimport[22m | 04_ruins_arches.png[39m[0m
+[  90% ] [90m[1mreimport[22m | 05_foreground_branches_vines.png[39m[0m
+[  92% ] [90m[1mreimport[22m | contact_sheet.png[39m[0m
+[  93% ] [90m[1mreimport[22m | arco.png[39m[0m
+[  95% ] [90m[1mreimport[22m | arco_partido.png[39m[0m
+[  96% ] [90m[1mreimport[22m | arvore.png[39m[0m
+[  98% ] [90m[1mreimport[22m | Finalizando importação de Asset...[39m[0m
+[92m[ DONE ][39m [1mreimport[22m
+[0m
+[   0% ] [90m[1mreimport[22m | Started A (Re)Importar Recursos (64 steps)[39m[0m
+[   0% ] [90m[1mreimport[22m | Executando operações pós-reimportação...[39m[0m
+[92m[ DONE ][39m [1mreimport[22m
+[0m
+[   0% ] [90m[1mloading_editor_layout[22m | Started Carregando editor (5 steps)[39m[0m
+[   0% ] [90m[1mloading_editor_layout[22m | Carregando layout do editor...[39m[0m
+[  16% ] [90m[1mloading_editor_layout[22m | Carregando docks...[39m[0m
+[  33% ] [90m[1mloading_editor_layout[22m | Reabrindo cenas...[39m[0m
+[  50% ] [90m[1mloading_editor_layout[22m | Carregando layout do editor central...[39m[0m
+[  66% ] [90m[1mloading_editor_layout[22m | Carregando o layout da janela do plugin...[39m[0m
+[  83% ] [90m[1mloading_editor_layout[22m | Layout do editor pronto.[39m[0m
+[92m[ DONE ][39m [1mloading_editor_layout[22m
+[0m

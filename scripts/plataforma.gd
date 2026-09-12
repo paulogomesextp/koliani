@@ -30,6 +30,7 @@ const DIR_TERRENO := "res://assets/sprites/pixel/terreno"
 ## Execution 9C: na Região I o terreno e os props vêm do kit de produção
 ## derivado das pranchas aprovadas (ver `regiao1_kit.gd`). Fora dela, o legado.
 const Kit := preload("res://scripts/regiao1_kit.gd")
+const HybridL1 := preload("res://scripts/l1_hybrid_9h12e.gd")
 
 ## Linha da superficie dentro de `topo.png` -- a capa assenta com esta linha
 ## em cima do topo da colisao, e o que fica acima e' balanco (ver
@@ -178,7 +179,11 @@ func _aplicar() -> void:
 	var dy := float(rng.randi_range(0, 191))
 
 	var kit := Kit.alvo(self)
+	var hybrid_l1: bool = kit != null and int(kit.get("perfil")) == 1
+	vis.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR if hybrid_l1 else CanvasItem.TEXTURE_FILTER_PARENT_NODE
 	var corpo: Texture2D = Kit.terreno(Kit.HD_CORPO, "terreno/terreno_corpo.png") if kit else _tex(bioma, "corpo")
+	if hybrid_l1:
+		corpo = HybridL1.tex("terrain_hd/corpo")
 	if corpo == null:                        # terreno por gerar -> nao pinta nada
 		return
 
@@ -233,6 +238,8 @@ func _aplicar() -> void:
 
 	# 5. a capa, por cima de tudo (e a sobressair para cima do plano de pouso)
 	var topo: Texture2D = Kit.topo(rng) if kit else _tex(bioma, "topo")
+	if hybrid_l1:
+		topo = HybridL1.tex("terrain_hd/topo")
 	if topo:
 		var th: float = Kit.ALTURA_TOPO if kit else 32.0
 		vis.add_child(_mosaico(topo, Vector2(x0, y0 - SUPERFICIE), Vector2(largura, th), Vector2(dx, 0)))
@@ -255,6 +262,9 @@ func _aplicar() -> void:
 	# 6. o que POUSA em cima -- cogumelos, lapides, caixotes, cristais...
 	# 7. o que PENDE por baixo -- raizes, correntes, estalactites
 	if kit:
+		if hybrid_l1:
+			HybridL1.decorar(vis, largura, y0, alt, rng)
+			return
 		Kit.decorar(vis, largura, y0, rng, Kit.perfil_de(kit))
 		if alt >= PENDURA_ALT_MIN:
 			Kit.pendurar(vis, largura, y0 + alt, alt >= PENDURA_ALT_GROSSA, rng)

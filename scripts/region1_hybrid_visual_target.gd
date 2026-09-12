@@ -147,10 +147,13 @@ func _ready() -> void:
 	var p := Kit.perfil_de(self)
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 9000 + perfil
-	_montar_background(p)
-	_montar_heart_tree()
-	_montar_camada3(p, rng)
-	_montar_camada2(p, rng)
+	if perfil == 1:
+		preload("res://scripts/l1_hybrid_9h12e.gd").montar(self)
+	else:
+		_montar_background(p)
+		_montar_heart_tree()
+		_montar_camada3(p, rng)
+		_montar_camada2(p, rng)
 	_montar_nevoa(p)
 	_montar_raios(p)
 	_montar_corrupcao(p)
@@ -158,7 +161,8 @@ func _ready() -> void:
 		set_process(false)
 		return
 	_esconder_legado.call_deferred()
-	_montar_primeiro_plano.call_deferred()
+	if perfil != 1:
+		_montar_primeiro_plano.call_deferred()
 	if perfil == 1:
 		_ligar_shadowblade.call_deferred()
 
