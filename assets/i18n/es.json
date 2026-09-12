@@ -614,6 +614,7 @@
   "mec.rosas.txt": "Las espinas crecen y se retraen en ciclo. El suelo solo es suelo parte del compás.",
   "mec.saltos.nome": "Saltos en Zigzag",
   "mec.saltos.txt": "Las plataformas suben en zigzag cerrado. Encadena los saltos y usa el doble para salvar uno malo.",
+  "mec.saltos.txt_basico": "Las plataformas suben en zigzag cerrado. Encadena los saltos y apunta a cada aterrizaje.",
   "mec.salvas.nome": "Andanadas de Flechas",
   "mec.salvas.txt": "Las flechas llegan en oleadas, todas a la vez, y cada una se avisa. Muévete entre andanadas.",
   "mec.segredo.nome": "Muro Agrietado",

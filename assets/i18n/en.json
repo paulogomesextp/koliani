@@ -614,6 +614,7 @@
   "mec.rosas.txt": "Thorns grow and retract on a cycle. The floor is only floor for part of the beat.",
   "mec.saltos.nome": "Zigzag Leaps",
   "mec.saltos.txt": "Platforms climb in tight zigzags. Chain the jumps and use the double jump to save a bad one.",
+  "mec.saltos.txt_basico": "Platforms climb in tight zigzags. Chain your jumps and aim for each landing.",
   "mec.salvas.nome": "Arrow Volleys",
   "mec.salvas.txt": "Arrows come in waves, all at once, and every wave is telegraphed. Move between volleys.",
   "mec.segredo.nome": "Cracked Wall",

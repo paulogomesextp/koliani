@@ -614,6 +614,7 @@
   "mec.rosas.txt": "Les épines poussent et se rétractent en cycle. Le sol n'est sol qu'une partie du temps.",
   "mec.saltos.nome": "Sauts en Zigzag",
   "mec.saltos.txt": "Les plates-formes montent en zigzag serré. Enchaîne les sauts et garde le double pour te rattraper.",
+  "mec.saltos.txt_basico": "Les plates-formes montent en zigzag serré. Enchaîne les sauts et vise chaque réception.",
   "mec.salvas.nome": "Salves de Flèches",
   "mec.salvas.txt": "Les flèches arrivent par vagues, toutes ensemble, chacune annoncée. Bouge entre les salves.",
   "mec.segredo.nome": "Mur Fissuré",

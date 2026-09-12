@@ -1,0 +1,469 @@
+{
+  "schema": 1,
+  "regiao": 1,
+  "slots": {
+    "far_background": {
+      "nome": "FundoDistante",
+      "z": -30,
+      "parallax": [
+        0.12,
+        0.08
+      ],
+      "legado": [
+        "BackgroundApproved08",
+        "Camada3Distante"
+      ]
+    },
+    "mid_background": {
+      "nome": "FundoMedio",
+      "z": -22,
+      "parallax": [
+        0.46,
+        0.3
+      ],
+      "legado": [
+        "Camada2Floresta",
+        "Camada2Corrupcao"
+      ]
+    },
+    "gameplay_terrain": {
+      "nome": "TerrenoVisual",
+      "z": 0,
+      "parallax": [
+        1,
+        1
+      ],
+      "legado": [
+        "Plataformas: regiao1_kit.gd"
+      ]
+    },
+    "front_silhouettes": {
+      "nome": "SilhuetasFrente",
+      "z": 12,
+      "parallax": [
+        1.15,
+        1
+      ],
+      "legado": [
+        "PrimeiroPlano",
+        "VinhasFrente"
+      ]
+    },
+    "atmospheric_vfx": {
+      "nome": "AtmosferaVFX",
+      "z": -3,
+      "parallax": [
+        1,
+        1
+      ],
+      "legado": [
+        "NevoaMedia",
+        "NevoaChao",
+        "ParticulasCorrupcao",
+        "RaiosLuz"
+      ]
+    },
+    "landmark_layers": {
+      "nome": "Landmarks",
+      "z": -24,
+      "parallax": [
+        0.26,
+        0.16
+      ],
+      "legado": [
+        "LandmarkHeartTreeApproved08 (pintado em BackgroundApproved08)"
+      ]
+    }
+  },
+  "densidades_fundo": {
+    "c3_cascata": 3.2,
+    "c3_colunas": 2.4,
+    "c3_arco": 5.2,
+    "c2_ruina": 3.4,
+    "c2_cascata": 2.2,
+    "c2_cristal": 4.2,
+    "vinhas": 2.6
+  },
+  "niveis": {
+    "1": {
+      "level_id": "level_001",
+      "tema": "limiar_do_bosque",
+      "visual_atual": {
+        "mood": "entrada",
+        "corrupcao": 0.25,
+        "nevoa": 0.55,
+        "ruinas": 0.25,
+        "cascatas": 0.3,
+        "lanternas": 0.5,
+        "densidade": 1.15,
+        "tinta": [
+          1.18,
+          1.143,
+          0.85
+        ],
+        "forca_tinta": 0.35
+      },
+      "camadas": {
+        "far_background": [],
+        "mid_background": [],
+        "gameplay_terrain": [],
+        "front_silhouettes": [],
+        "atmospheric_vfx": [],
+        "landmark_layers": []
+      },
+      "plano_mapa": {
+        "estado": "planeado_nao_aplicado",
+        "aplicar_geometria": false,
+        "preservar": [
+          "spawn",
+          "checkpoints",
+          "porta",
+          "arena",
+          "jogabilidade_base"
+        ],
+        "plataformas_adicionais": [
+          {
+            "zona": [
+              0.15,
+              0.35
+            ],
+            "objetivo": "intercalar patamares curtos; validar saltos simples e checkpoints"
+          },
+          {
+            "zona": [
+              0.45,
+              0.7
+            ],
+            "objetivo": "criar leitura ascendente junto do landmark; validar percurso humano"
+          }
+        ],
+        "colunas": {
+          "acao": "substituir leitura visual por raizes, contrafortes e vazios ilustrados",
+          "alterar_colisoes": false
+        },
+        "landmarks": [
+          {
+            "id": "arco_de_entrada",
+            "progresso": 0.25,
+            "slot": "landmark_layers"
+          },
+          {
+            "id": "sinal_da_porta",
+            "progresso": 0.75,
+            "slot": "landmark_layers"
+          }
+        ],
+        "dressing": [
+          "silhuetas dark fantasy",
+          "luz de luar nos apoios",
+          "VFX atmosféricos com contraste controlado"
+        ],
+        "gate": "HUMAN PLAYTEST REQUIRED antes de aplicar nova geometria"
+      }
+    },
+    "2": {
+      "level_id": "level_002",
+      "tema": "pantano_dos_sussurros",
+      "visual_atual": {
+        "mood": "entrada",
+        "corrupcao": 0.35,
+        "nevoa": 0.95,
+        "ruinas": 0.2,
+        "cascatas": 0.45,
+        "lanternas": 0.3,
+        "densidade": 1.0,
+        "tinta": [
+          1.18,
+          1.143,
+          0.85
+        ],
+        "forca_tinta": 0.35
+      },
+      "camadas": {
+        "far_background": [],
+        "mid_background": [],
+        "gameplay_terrain": [],
+        "front_silhouettes": [],
+        "atmospheric_vfx": [],
+        "landmark_layers": []
+      },
+      "plano_mapa": {
+        "estado": "planeado_nao_aplicado",
+        "aplicar_geometria": false,
+        "preservar": [
+          "spawn",
+          "checkpoints",
+          "porta",
+          "arena",
+          "jogabilidade_base"
+        ],
+        "plataformas_adicionais": [
+          {
+            "zona": [
+              0.15,
+              0.35
+            ],
+            "objetivo": "intercalar patamares curtos; validar saltos simples e checkpoints"
+          },
+          {
+            "zona": [
+              0.45,
+              0.7
+            ],
+            "objetivo": "criar leitura ascendente junto do landmark; validar percurso humano"
+          }
+        ],
+        "colunas": {
+          "acao": "substituir leitura visual por raizes, contrafortes e vazios ilustrados",
+          "alterar_colisoes": false
+        },
+        "landmarks": [
+          {
+            "id": "raizes_submersas",
+            "progresso": 0.25,
+            "slot": "landmark_layers"
+          },
+          {
+            "id": "ponte_dos_sussurros",
+            "progresso": 0.75,
+            "slot": "landmark_layers"
+          }
+        ],
+        "dressing": [
+          "silhuetas dark fantasy",
+          "luz de luar nos apoios",
+          "VFX atmosféricos com contraste controlado"
+        ],
+        "gate": "HUMAN PLAYTEST REQUIRED antes de aplicar nova geometria"
+      }
+    },
+    "3": {
+      "level_id": "level_003",
+      "tema": "ruinas_da_viuva",
+      "visual_atual": {
+        "mood": "ruinas",
+        "corrupcao": 0.5,
+        "nevoa": 0.6,
+        "ruinas": 0.85,
+        "cascatas": 0.2,
+        "lanternas": 0.6,
+        "densidade": 1.25,
+        "tinta": [
+          1.18,
+          1.052,
+          0.85
+        ],
+        "forca_tinta": 0.35
+      },
+      "camadas": {
+        "far_background": [],
+        "mid_background": [],
+        "gameplay_terrain": [],
+        "front_silhouettes": [],
+        "atmospheric_vfx": [],
+        "landmark_layers": []
+      },
+      "plano_mapa": {
+        "estado": "planeado_nao_aplicado",
+        "aplicar_geometria": false,
+        "preservar": [
+          "spawn",
+          "checkpoints",
+          "porta",
+          "arena",
+          "jogabilidade_base"
+        ],
+        "plataformas_adicionais": [
+          {
+            "zona": [
+              0.15,
+              0.35
+            ],
+            "objetivo": "intercalar patamares curtos; validar saltos simples e checkpoints"
+          },
+          {
+            "zona": [
+              0.45,
+              0.7
+            ],
+            "objetivo": "criar leitura ascendente junto do landmark; validar percurso humano"
+          }
+        ],
+        "colunas": {
+          "acao": "substituir leitura visual por raizes, contrafortes e vazios ilustrados",
+          "alterar_colisoes": false
+        },
+        "landmarks": [
+          {
+            "id": "arco_das_ruinas",
+            "progresso": 0.25,
+            "slot": "landmark_layers"
+          },
+          {
+            "id": "ninho_suspenso",
+            "progresso": 0.75,
+            "slot": "landmark_layers"
+          }
+        ],
+        "dressing": [
+          "silhuetas dark fantasy",
+          "luz de luar nos apoios",
+          "VFX atmosféricos com contraste controlado"
+        ],
+        "gate": "HUMAN PLAYTEST REQUIRED antes de aplicar nova geometria"
+      }
+    },
+    "4": {
+      "level_id": "level_004",
+      "tema": "cascatas_da_seiva",
+      "visual_atual": {
+        "mood": "cascatas",
+        "corrupcao": 0.6,
+        "nevoa": 0.75,
+        "ruinas": 0.35,
+        "cascatas": 0.9,
+        "lanternas": 0.3,
+        "densidade": 1.0,
+        "tinta": [
+          1.158,
+          1.143,
+          1.039
+        ],
+        "forca_tinta": 0.35
+      },
+      "camadas": {
+        "far_background": [],
+        "mid_background": [],
+        "gameplay_terrain": [],
+        "front_silhouettes": [],
+        "atmospheric_vfx": [],
+        "landmark_layers": []
+      },
+      "plano_mapa": {
+        "estado": "planeado_nao_aplicado",
+        "aplicar_geometria": false,
+        "preservar": [
+          "spawn",
+          "checkpoints",
+          "porta",
+          "arena",
+          "jogabilidade_base"
+        ],
+        "plataformas_adicionais": [
+          {
+            "zona": [
+              0.15,
+              0.35
+            ],
+            "objetivo": "intercalar patamares curtos; validar saltos simples e checkpoints"
+          },
+          {
+            "zona": [
+              0.45,
+              0.7
+            ],
+            "objetivo": "criar leitura ascendente junto do landmark; validar percurso humano"
+          }
+        ],
+        "colunas": {
+          "acao": "substituir leitura visual por raizes, contrafortes e vazios ilustrados",
+          "alterar_colisoes": false
+        },
+        "landmarks": [
+          {
+            "id": "cascata_da_seiva",
+            "progresso": 0.25,
+            "slot": "landmark_layers"
+          },
+          {
+            "id": "arvore_que_chora",
+            "progresso": 0.75,
+            "slot": "landmark_layers"
+          }
+        ],
+        "dressing": [
+          "silhuetas dark fantasy",
+          "luz de luar nos apoios",
+          "VFX atmosféricos com contraste controlado"
+        ],
+        "gate": "HUMAN PLAYTEST REQUIRED antes de aplicar nova geometria"
+      }
+    },
+    "5": {
+      "level_id": "level_005",
+      "tema": "coracao_corrompido",
+      "visual_atual": {
+        "mood": "coracao",
+        "corrupcao": 1.8,
+        "nevoa": 0.6,
+        "ruinas": 0.4,
+        "cascatas": 0.3,
+        "lanternas": 0.12,
+        "densidade": 1.45,
+        "tinta": [
+          1.18,
+          0.85,
+          0.938
+        ],
+        "forca_tinta": 0.35
+      },
+      "camadas": {
+        "far_background": [],
+        "mid_background": [],
+        "gameplay_terrain": [],
+        "front_silhouettes": [],
+        "atmospheric_vfx": [],
+        "landmark_layers": []
+      },
+      "plano_mapa": {
+        "estado": "planeado_nao_aplicado",
+        "aplicar_geometria": false,
+        "preservar": [
+          "spawn",
+          "checkpoints",
+          "porta",
+          "arena",
+          "jogabilidade_base"
+        ],
+        "plataformas_adicionais": [
+          {
+            "zona": [
+              0.15,
+              0.35
+            ],
+            "objetivo": "intercalar patamares curtos; validar saltos simples e checkpoints"
+          },
+          {
+            "zona": [
+              0.45,
+              0.7
+            ],
+            "objetivo": "criar leitura ascendente junto do landmark; validar percurso humano"
+          }
+        ],
+        "colunas": {
+          "acao": "substituir leitura visual por raizes, contrafortes e vazios ilustrados",
+          "alterar_colisoes": false
+        },
+        "landmarks": [
+          {
+            "id": "heart_tree",
+            "progresso": 0.25,
+            "slot": "landmark_layers"
+          },
+          {
+            "id": "altar_do_coracao",
+            "progresso": 0.75,
+            "slot": "landmark_layers"
+          }
+        ],
+        "dressing": [
+          "silhuetas dark fantasy",
+          "luz de luar nos apoios",
+          "VFX atmosféricos com contraste controlado"
+        ],
+        "gate": "HUMAN PLAYTEST REQUIRED antes de aplicar nova geometria"
+      }
+    }
+  }
+}

@@ -16,13 +16,7 @@ const GRUPO := "regiao1_kit"
 ## Variantes de cenário da prancha 08 ("Entrada da Floresta" nos níveis 1-2,
 ## "Ruínas Antigas" no 3, "Cascatas e Abismos" no 4, "Heart Tree Próximo" no
 ## 5). A identidade é a mesma; muda a mistura.
-const PERFIS := {
-	1: {"mood": "entrada", "corrupcao": 0.25, "nevoa": 0.55, "ruinas": 0.25, "cascatas": 0.3, "lanternas": 0.5, "densidade": 1.15},
-	2: {"mood": "entrada", "corrupcao": 0.35, "nevoa": 0.95, "ruinas": 0.2, "cascatas": 0.45, "lanternas": 0.3, "densidade": 1.0},
-	3: {"mood": "ruinas", "corrupcao": 0.5, "nevoa": 0.6, "ruinas": 0.85, "cascatas": 0.2, "lanternas": 0.6, "densidade": 1.25},
-	4: {"mood": "cascatas", "corrupcao": 0.6, "nevoa": 0.75, "ruinas": 0.35, "cascatas": 0.9, "lanternas": 0.3, "densidade": 1.0},
-	5: {"mood": "coracao", "corrupcao": 1.8, "nevoa": 0.6, "ruinas": 0.4, "cascatas": 0.3, "lanternas": 0.12, "densidade": 1.45},
-}
+const Remaster := preload("res://scripts/regiao1_remaster.gd")
 
 ## Execution 9H.11. O QA viu o L2 melhor vestido do que o 1, o 3 e o 5, e o
 ## L5 a ler-se como "o L1 com outro tom". Duas alavancas, sem arte nova:
@@ -39,18 +33,12 @@ const PERFIS := {
 ## panorama; a 100% puxavam a noite para o crepúsculo.
 ##   entrada [1.18, 1.143, 0.85]  ruinas [1.18, 1.052, 0.85]
 ##   cascatas [1.158, 1.143, 1.039]  coracao [1.18, 0.85, 0.938]
-const FORCA_TINTA := 0.35
-const TINTAS := {
-	"entrada": Color(1.18, 1.143, 0.85),
-	"ruinas": Color(1.18, 1.052, 0.85),
-	"cascatas": Color(1.158, 1.143, 1.039),
-	"coracao": Color(1.18, 0.85, 0.938),
-}
 
 
 static func tinta(perfil: Dictionary) -> Color:
-	var t: Color = TINTAS.get(perfil.get("mood", "entrada"), Color.WHITE)
-	return Color.WHITE.lerp(t, FORCA_TINTA)
+	var canais: Array = perfil["tinta"]
+	var t := Color(canais[0], canais[1], canais[2])
+	return Color.WHITE.lerp(t, float(perfil["forca_tinta"]))
 
 ## Props de chão: [ficheiro, peso base, chave do perfil que o multiplica,
 ## escala mín, escala máx]. As rochas e raízes da prancha têm quase a altura
@@ -113,7 +101,7 @@ static func perfil_de(kit: Node) -> Dictionary:
 	var n := 1
 	if kit != null and "perfil" in kit:
 		n = int(kit.perfil)
-	return PERFIS.get(n, PERFIS[1])
+	return Remaster.perfil(clampi(n, 1, 5))
 
 
 ## Capa: a variante com erva alta entra numa em cada três plataformas.
