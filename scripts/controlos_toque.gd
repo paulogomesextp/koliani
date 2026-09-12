@@ -152,16 +152,28 @@ func _fazer_botao_equip(tipo: String) -> Button:
 	b.offset_top = -116.0
 	b.offset_bottom = -92.0
 	b.add_theme_font_size_override("font_size", 11)
-	b.add_theme_color_override("font_color", UIProducao.TEXTO)
-	b.add_theme_color_override("font_hover_color", UIProducao.OURO_CLARO)
-	b.add_theme_color_override("font_pressed_color", UIProducao.OURO)
-	# 9F: o botão da prancha 09 em ponto pequeno (margens à medida dos 24 px)
-	b.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
-	var m := [10, 8, 10, 8]
-	var pad := Vector4(8, 2, 8, 2)
-	b.add_theme_stylebox_override("normal", UIProducao.caixa("botao_desativado", pad, Color.WHITE, m))
-	b.add_theme_stylebox_override("hover", UIProducao.caixa("botao_normal", pad, Color.WHITE, m))
-	b.add_theme_stylebox_override("pressed", UIProducao.caixa("botao_selecionado", pad, Color.WHITE, m))
+	# Execution 9H: caixa lisa da paleta nova. Um botão de 24 px de altura
+	# não cabe em nenhuma nine-patch da prancha (as molduras têm 10-30 px de
+	# margem de cada lado); o que se lê aqui é a cor, não a moldura.
+	b.add_theme_color_override("font_color", Frontend9H.TEXTO)
+	b.add_theme_color_override("font_hover_color", Frontend9H.OSSO)
+	b.add_theme_color_override("font_pressed_color", Frontend9H.CARMESIM_CLARO)
+	b.add_theme_color_override("font_outline_color", Frontend9H.CONTORNO)
+	b.add_theme_constant_override("outline_size", 4)
+	for estado in ["normal", "hover", "pressed", "hover_pressed"]:
+		var sb := StyleBoxFlat.new()
+		var forte: bool = estado != "normal"
+		sb.bg_color = Color(0.12, 0.045, 0.07, 0.92 if forte else 0.74)
+		sb.border_color = Color(Frontend9H.CARMESIM.r, Frontend9H.CARMESIM.g,
+			Frontend9H.CARMESIM.b, 0.95 if forte else 0.40)
+		sb.set_border_width_all(1)
+		sb.border_width_top = 2
+		sb.set_corner_radius_all(2)
+		sb.content_margin_left = 8
+		sb.content_margin_right = 8
+		sb.content_margin_top = 2
+		sb.content_margin_bottom = 2
+		b.add_theme_stylebox_override(estado, sb)
 	b.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
 	b.pressed.connect(_abrir_equip.bind(tipo))
 	return b
@@ -346,7 +358,7 @@ func _montar_barra_chefe() -> void:
 	placa.set_anchors_preset(Control.PRESET_FULL_RECT)
 	placa.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	placa.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
-	placa.add_theme_stylebox_override("panel", UIProducao.caixa("moldura_painel",
+	placa.add_theme_stylebox_override("panel", Frontend9H.caixa("painel_detalhe",
 		Vector4(26, 12, 26, 14), Color(1, 0.92, 0.9, 0.96)))
 	_chefe_caixa.add_child(placa)
 
@@ -436,8 +448,11 @@ func _montar_contador_essencia() -> void:
 	caixa.pivot_offset = Vector2(79, 19)
 	# Execution 9F: placa do kit + o cristal de Essência da prancha 09
 	caixa.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
-	caixa.add_theme_stylebox_override("panel", UIProducao.caixa("botao_desativado",
-		Vector4(18, 4, 20, 4)))
+	# Execution 9H: a placa passou a ser a aba do rebrand -- o contador é a
+	# única coisa no canto superior direito e tinha de ser da mesma família
+	# que o cabeçalho do nível.
+	caixa.add_theme_stylebox_override("panel", Frontend9H.caixa("aba_bloqueada",
+		Vector4(18, 4, 20, 4), Color(1, 1, 1, 0.96), [16, 12, 16, 12]))
 	add_child(caixa)
 
 	var linha := HBoxContainer.new()
@@ -451,7 +466,7 @@ func _montar_contador_essencia() -> void:
 	_ess_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	_ess_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_ess_label.add_theme_font_size_override("font_size", 18)
-	_ess_label.add_theme_color_override("font_color", Color(1.0, 0.86, 1.0))
+	_ess_label.add_theme_color_override("font_color", Frontend9H.OSSO)
 	_ess_label.add_theme_color_override("font_outline_color", Color(0.05, 0.01, 0.06))
 	_ess_label.add_theme_constant_override("outline_size", 4)
 	linha.add_child(_ess_label)
@@ -589,8 +604,8 @@ func _encher_cabecalho_nivel() -> void:
 	var placa := PanelContainer.new()
 	placa.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	placa.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
-	placa.add_theme_stylebox_override("panel", UIProducao.caixa("botao_desativado",
-		Vector4(12, 6, 18, 6), Color(1, 1, 1, 0.94), [14, 12, 14, 12]))
+	placa.add_theme_stylebox_override("panel", Frontend9H.caixa("aba_bloqueada",
+		Vector4(12, 6, 18, 6), Color(1, 1, 1, 0.96), [16, 14, 16, 14]))
 	_cab_nivel.add_child(placa)
 
 	var linha := HBoxContainer.new()
@@ -602,15 +617,15 @@ func _encher_cabecalho_nivel() -> void:
 	selo.custom_minimum_size = Vector2(56, 44)
 	selo.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	selo.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
-	selo.add_theme_stylebox_override("panel", UIProducao.caixa("botao_selecionado",
-		Vector4(6, 2, 6, 2), Color.WHITE, [14, 12, 14, 12]))
+	selo.add_theme_stylebox_override("panel", Frontend9H.caixa("ficha_nivel",
+		Vector4(6, 2, 6, 2), Color.WHITE, [16, 10, 16, 10]))
 	linha.add_child(selo)
 	var num := Label.new()
 	num.text = "%d-%d" % [EstadoJogo.regiao_do_nivel(i) + 1, passo[0]] if passo[1] > 0 else "%02d" % (i + 1)
 	num.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	num.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	num.add_theme_font_size_override("font_size", 20)
-	num.add_theme_color_override("font_color", UIProducao.OURO_CLARO)
+	num.add_theme_color_override("font_color", Frontend9H.OSSO)
 	num.add_theme_color_override("font_outline_color", Color(0.04, 0.01, 0.06))
 	num.add_theme_constant_override("outline_size", 5)
 	selo.add_child(num)
@@ -624,7 +639,7 @@ func _encher_cabecalho_nivel() -> void:
 	var cabecalho := Textos.t(EstadoJogo.chave_regiao_do_nivel(i)).to_upper()
 	if passo[1] > 0:
 		cabecalho += "   ·   " + Textos.tf("hud.region_step", [passo[0], passo[1]])
-	col.add_child(_linha_cab(cabecalho, 12, UIProducao.CIANO, false))
+	col.add_child(_linha_cab(cabecalho, 12, Frontend9H.CARMESIM_CLARO, false))
 	# nome do nível
 	col.add_child(_linha_cab(Textos.t(CatalogoCampanha.chave_nivel(i)), 18,
 		Color(1, 0.96, 1), false))

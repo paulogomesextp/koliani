@@ -1,0 +1,313 @@
+{
+  "execucao": "9H",
+  "autoridade": {
+    "menu": {
+      "ficheiro": "work/production_art_gate/10_menu_rebrand/01_main_menu_approved/koliani_main_menu_v1.png",
+      "sha256": "22d1ecf0889f02e6445346d2e85716490460010164a5680f69014bbee05d21b6"
+    },
+    "seletor": {
+      "ficheiro": "work/production_art_gate/10_menu_rebrand/02_level_selector_approved/koliani_level_selector_v1.png",
+      "sha256": "3fbaa747f6da1d4761380f5734a6687f9fb89e6bfe2bd02f148a9be030599323"
+    },
+    "icone": {
+      "ficheiro": "work/production_art_gate/10_menu_rebrand/04_branding_icon_approved/koliani_logo_icon_v1.png",
+      "sha256": "948e01984a7325d41792f16f65dd73d85a1e64e682db30ab63dc2a4f6ed78066"
+    }
+  },
+  "margens_nine_patch": {
+    "placa_selecionada": [
+      110,
+      26,
+      110,
+      26
+    ],
+    "painel_detalhe": [
+      70,
+      60,
+      70,
+      60
+    ],
+    "botao_jogar": [
+      90,
+      26,
+      90,
+      26
+    ],
+    "aba_atual": [
+      36,
+      28,
+      36,
+      28
+    ],
+    "aba_bloqueada": [
+      36,
+      28,
+      36,
+      28
+    ],
+    "ficha_nivel": [
+      30,
+      14,
+      30,
+      14
+    ]
+  },
+  "ficheiros": {
+    "assets/ui/frontend_9h/fundo_menu.png": {
+      "sha256": "790f67e0177d09c9a182dafcc9927578a443c6e41400b120992d5615b1f52e3e",
+      "tamanho": [
+        1920,
+        1080
+      ],
+      "modo": "RGB"
+    },
+    "assets/ui/frontend_9h/fundo_seletor.png": {
+      "sha256": "b6e5eb270c512e13d978e9065763c853dd998e5657d6ca391641bfbcfd205bed",
+      "tamanho": [
+        1920,
+        1080
+      ],
+      "modo": "RGB"
+    },
+    "assets/ui/frontend_9h/placa_selecionada.png": {
+      "sha256": "3c63d0fbc10a6386793d8f054995a03fa51c4c8e80675f03f1e40e6a0331541e",
+      "tamanho": [
+        800,
+        144
+      ],
+      "modo": "RGBA"
+    },
+    "assets/ui/frontend_9h/separador_menu.png": {
+      "sha256": "2ebf78276f0c69d444be4bdc207f0390b54fdbc6ca8b5cca03ccd2e2647e3452",
+      "tamanho": [
+        664,
+        52
+      ],
+      "modo": "RGBA"
+    },
+    "assets/ui/frontend_9h/ornamento_rodape.png": {
+      "sha256": "415adf177ba62fd5bcf118540e620294492b65dda48716f112ea60de9052de94",
+      "tamanho": [
+        664,
+        68
+      ],
+      "modo": "RGBA"
+    },
+    "assets/ui/frontend_9h/painel_detalhe.png": {
+      "sha256": "5f0fc2afa0afa7454b986bd51995f97e61a736e77af14ae4568c52f75e762a14",
+      "tamanho": [
+        2204,
+        548
+      ],
+      "modo": "RGBA"
+    },
+    "assets/ui/frontend_9h/botao_jogar.png": {
+      "sha256": "b5bea500e3ec675584aca8e039f10ea79acf2f3c1384d99cbd93bc9a339557e8",
+      "tamanho": [
+        708,
+        124
+      ],
+      "modo": "RGBA"
+    },
+    "assets/ui/frontend_9h/aba_atual.png": {
+      "sha256": "c6179722f1881ee9d532b7bc8b4e94e794ef1ff7cba237f5d304ce1ce08a707c",
+      "tamanho": [
+        524,
+        184
+      ],
+      "modo": "RGBA"
+    },
+    "assets/ui/frontend_9h/aba_bloqueada.png": {
+      "sha256": "684af40f8580c37f6f64ac6c78850755d7d62d3505416e6fff64fb3d427986cb",
+      "tamanho": [
+        520,
+        172
+      ],
+      "modo": "RGBA"
+    },
+    "assets/ui/frontend_9h/seta_esquerda.png": {
+      "sha256": "7716c5dedc2cb75e8f4a2342ef3c79ea218ca55a0faed0710787f61a1f73491e",
+      "tamanho": [
+        124,
+        152
+      ],
+      "modo": "RGBA"
+    },
+    "assets/ui/frontend_9h/seta_direita.png": {
+      "sha256": "976c6fc421350f706614ae778776e3580fa27ab3676bbb2cb6c0edd835787ef1",
+      "tamanho": [
+        124,
+        152
+      ],
+      "modo": "RGBA"
+    },
+    "assets/ui/frontend_9h/voltar_seta.png": {
+      "sha256": "2ccd8e545145e4d6f3b1aa56eb52c812de0507f1b8d28e4b3a3dc99d65c56fbf",
+      "tamanho": [
+        108,
+        116
+      ],
+      "modo": "RGBA"
+    },
+    "assets/ui/frontend_9h/ficha_nivel.png": {
+      "sha256": "923a1ada6d3928a5e24f63f47e01e5aaa257758848e9c964f9148e2dd99f0935",
+      "tamanho": [
+        204,
+        108
+      ],
+      "modo": "RGBA"
+    },
+    "assets/ui/frontend_9h/cadeado.png": {
+      "sha256": "65a4842a3e514cab97c8b2bed5b9bd4378a80e8774278e0d36b0f1fe18caee3f",
+      "tamanho": [
+        72,
+        80
+      ],
+      "modo": "RGBA"
+    },
+    "assets/ui/frontend_9h/losango.png": {
+      "sha256": "fb5f3e26033c6127543612cedc190979d072e471b5dbad98b424015947b7c501",
+      "tamanho": [
+        88,
+        88
+      ],
+      "modo": "RGBA"
+    },
+    "assets/ui/frontend_9h/anel_normal.png": {
+      "sha256": "e49244dc37db0202fe88318b0539bc8e8ed2fbc99b17b8f243b611ef701992fe",
+      "tamanho": [
+        248,
+        248
+      ],
+      "modo": "RGBA"
+    },
+    "assets/ui/frontend_9h/anel_atual.png": {
+      "sha256": "c3045206b02ddbec8f875187dac4dc618d890e77dee78f7432877e0c3e151b70",
+      "tamanho": [
+        288,
+        288
+      ],
+      "modo": "RGBA"
+    },
+    "assets/ui/frontend_9h/anel_chefe.png": {
+      "sha256": "0bccc6813f9f654a0dca093eaa88a6489b1ffd58705300e36f257f34b67528dd",
+      "tamanho": [
+        424,
+        424
+      ],
+      "modo": "RGBA"
+    },
+    "assets/branding/icone_9h_1024.png": {
+      "sha256": "e7aff77c385215de273d46c96cf8d13f20de226f065f1f5e8520548b8ac071f2",
+      "tamanho": [
+        1024,
+        1024
+      ],
+      "modo": "RGBA"
+    },
+    "assets/branding/icone_9h_16.png": {
+      "sha256": "fbd5c8a06929a9091b9f0e316af98b013228132129c73199cd32039c1ee1f9ef",
+      "tamanho": [
+        16,
+        16
+      ],
+      "modo": "RGBA"
+    },
+    "assets/branding/icone_9h_24.png": {
+      "sha256": "c8a19aebded48a70afd1a66a45e33e6a0b2397db41c68d82a1851eb9b9368d27",
+      "tamanho": [
+        24,
+        24
+      ],
+      "modo": "RGBA"
+    },
+    "assets/branding/icone_9h_32.png": {
+      "sha256": "7fd1e5f17c7a40c1d1194de040e34b7bfe9754c7cb23d25b3cb4db4dbd4e6875",
+      "tamanho": [
+        32,
+        32
+      ],
+      "modo": "RGBA"
+    },
+    "assets/branding/icone_9h_48.png": {
+      "sha256": "10bbedc7bccee13fb6754729d34173f620d65e57eaacd5d59d72c3f502c48d7f",
+      "tamanho": [
+        48,
+        48
+      ],
+      "modo": "RGBA"
+    },
+    "assets/branding/icone_9h_64.png": {
+      "sha256": "f523a695d85e2355c7b1c36a56837b2a4310776704d0372b9f13dc9a93b7db59",
+      "tamanho": [
+        64,
+        64
+      ],
+      "modo": "RGBA"
+    },
+    "assets/branding/icone_9h_128.png": {
+      "sha256": "11ebac2ca4353c864e5983140bd5528997feb7ead46f1c1d36efd805124914fe",
+      "tamanho": [
+        128,
+        128
+      ],
+      "modo": "RGBA"
+    },
+    "assets/branding/icone_9h_180.png": {
+      "sha256": "200d9cc780394aeea701575549b4ae6f8d39792f5d57f571795b8985fdea3c1c",
+      "tamanho": [
+        180,
+        180
+      ],
+      "modo": "RGBA"
+    },
+    "assets/branding/icone_9h_192.png": {
+      "sha256": "72c031b0d74e36a674f64c3790b27bdf22b4cda055a5b15b6a16def7266c5382",
+      "tamanho": [
+        192,
+        192
+      ],
+      "modo": "RGBA"
+    },
+    "assets/branding/icone_9h_256.png": {
+      "sha256": "7a24312f3211f2a6035e77635fb581c3c754ea1e459f97c09e5bab4debda3af8",
+      "tamanho": [
+        256,
+        256
+      ],
+      "modo": "RGBA"
+    },
+    "assets/branding/icone_9h_384.png": {
+      "sha256": "6f5fcd944580b7b5779d02d1fd1d6427c86cf0badc58531023f3c16b52191c6b",
+      "tamanho": [
+        384,
+        384
+      ],
+      "modo": "RGBA"
+    },
+    "assets/branding/icone_9h_512.png": {
+      "sha256": "5ebabaad9706dd7ba6bc1f37dd0c91b724fed08537531002a0eb17c9159ee1dd",
+      "tamanho": [
+        512,
+        512
+      ],
+      "modo": "RGBA"
+    },
+    "assets/branding/koliani.ico": {
+      "sha256": "081a523d36cda028fab9c8c2eccb950aedfbf26fc97f7c4e35d63cba0ec51ac8",
+      "tamanho": [
+        256,
+        256
+      ],
+      "modo": "ICO"
+    },
+    "icon.png": {
+      "sha256": "5ebabaad9706dd7ba6bc1f37dd0c91b724fed08537531002a0eb17c9159ee1dd",
+      "tamanho": [
+        512,
+        512
+      ],
+      "modo": "RGBA"
+    }
+  }
+}

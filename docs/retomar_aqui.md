@@ -2,7 +2,80 @@
 
 Índice de integração documental: [master_package_integration.md](master_package_integration.md).
 
-Atualizado em 11 de setembro de 2026.
+Atualizado em 12 de setembro de 2026.
+
+## Execution 9H — Frontend de produção + slice final da Região I — **PARTIAL PASS**
+
+**READY FOR GAME MASTER HUMAN REVIEW: SIM.** v0.17.0. Relatório:
+[execution_9h_frontend_regiao1.md](execution_9h_frontend_regiao1.md). Pacote
+de revisão: `work/execution_9h/folha_revisao_9h.png` (11 painéis).
+**Região II NÃO iniciada.**
+
+- **A autoridade não estava onde o briefing dizia.** Não existe
+  `work/production_art_gate/9H_game_master_approved/`; as cinco peças estão em
+  `work/production_art_gate/10_menu_rebrand/` com outros nomes (menu
+  `22d1ecf0889f`, seletor `3fbaa747f6da`, ícone `948e01984a73`, vídeo
+  `dab200cef9db`). Os SHA estão presos em `tools/produzir_frontend_9h.py`.
+- **Método (uma passagem serve os dois fins):** máscara das zonas com UI
+  pintada → inpaint por difusão multi-escala (raio 128→1, píxeis conhecidos
+  repostos a cada passo) = **arte limpa**; `prancha − arte limpa` = **peças
+  recortadas**. Mesmo princípio do 9G. 32 ficheiros, com manifesto e
+  `--validar`.
+- **Armadilhas do produtor:** a máscara das coroas dos anéis tem de vir
+  ANTES dos retângulos (senão devolve as fichas ao fundo — “1-4”/“1-5”
+  sobreviviam); nas abas o texto apaga-se na VERTICAL (na horizontal deixava
+  rasto de lado a lado); a ficha do nível não é nine-patch (as pontas em
+  losango sobrepunham-se); **`--import` SEMPRE depois de correr a ferramenta**
+  (senão o ecrã aparece sem texturas e parece bug de código).
+- **Palco 16:9:** todo o frontend vive num `AspectRatioContainer` onde arte e
+  UI partilham as coordenadas de 1280×720 (as pranchas são composições
+  fechadas; esticar tirava a UI do sítio).
+- **Feito:** menu novo (5 entradas + realce que escorrega + crédito),
+  **intro em vídeo** (main_scene nova), ícone/logo em todo o lado
+  (Windows/.ico, PWA, Android, projeto), **seletor = mapa de região** (nós,
+  trilho que acende, painel, 20 abas), HUD em carmesim, **EDITAR LAYOUT** na
+  PWA (frações do viewport, `user://layout_toque.json`), 4 vozes de UI +
+  ambiência própria da Região I.
+- **Chefes L1–L5 mais fáceis:** rampa `ChefeBase.ALIVIO_R1` que mexe em vida,
+  dano, telégrafo, EXPOSTO e recuperação ao mesmo tempo. **Ghorak (1-1): vida
+  800→416, `dano_onda` 22→13, EXPOSTO 0,72→1,11 s.** Fora da Região I nada
+  muda.
+- **Fundo desfocado — causa provada:** panorama 1:1 de 952×247 desenhado a 3×
+  com LINEAR, mais o zoom 1,4 da câmara = ~4,2× de ampliação bilinear.
+  Corrigido com panorama em DOBRO no disco (Lanczos + unsharp, desenhado a
+  1,5×) + **máscara de desfoque no píxel do ECRÃ**
+  (`nitidez_fundo.gdshader`). **Acutância +19 %** (5,00 → 5,95, medida na
+  banda de fundo do L1).
+- **Inimigos parados — causa provada:** o `_process` do `DemonioBase` **saía
+  assim que existisse `_anim`**, e a arte de produção tem uma pose por
+  estado. `_vida_no_anim()` repõe respiração/passada/inclinação/recuo/
+  aterragem, com fase própria por instância. A escala é compensada na
+  posição, senão os pés flutuavam ~4 px.
+- **Combos que não se liam:** os três golpes saem dos mesmos 6 frames golden.
+  Agora cada um tem arco próprio, tom próprio e há **selo `×2`/`×3`** por
+  cima da cabeça.
+- **Web: o vídeo NÃO pode ser do Godot.** O export Web é single-threaded e
+  descodificar Theora em wasm **bloqueia a thread principal** (a página
+  deixava de responder). Passou a ser um `<video>` do DOM
+  (`web/intro_koliani.mp4`, o CI copia-o). **Bug apanhado só no browser:** o
+  cartão de gesto comia o toque (`Control` nasce com `MOUSE_FILTER_STOP`).
+- **Provado no EXE de release:** intro (`pos=2,93 s`), menu (sem DEVELOPER
+  MODE), mapa, L1–L5, 18 fotos de inimigos. **Userdata intacto** (181
+  ficheiros, 0 mudados fora de `logs/`).
+- **Provado no Web:** carrega sem erros de GDScript, ícone novo + cartão,
+  `<video>` a tocar (`currentTime=6,6 s`, `error=null`), PCK com tudo o que é
+  novo, manifesto/ícones da PWA.
+- **ARMADILHA DE MÉTODO (custou 3 falsos negativos):** o Python no Windows
+  escreve `
+` por omissão. O `run_tests.gd` tem quebras de linha
+  **literais dentro de constantes de texto**; com o ficheiro em CRLF essas
+  buscas deixam de bater e inventam falhas (“MECANICA_DO_NIVEL tem 0
+  entradas”). **`write_text(..., newline="
+")` sempre.**
+- **Por fazer (detalhe no relatório):** P1 capturas do Web em Chrome real +
+  **soundtrack nova (PRODUCTION AUDIO MISSING)**; P2 estatísticas do seletor
+  (colecionáveis/desafios/tempo não existem no jogo), citações por região,
+  PCK do Web com 285 MB.
 
 ## Execution 9G — VFX de produção da Região I — **PASS**
 

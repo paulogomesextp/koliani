@@ -757,6 +757,34 @@ var _golden_anims := {}
 var _slash_vfx: AnimatedSprite2D
 ## 9G: arco dos golpes 2/3 (spin/heavy slash), filho da Koliani enquanto dura.
 var _vfx_combo: AnimatedSprite2D
+var _combo_selo: Label
+
+## LEITURA DO COMBO (Execution 9H). O Game Master: "a Koliani não parece dar
+## combos". Não era o encadeamento -- esse funciona: era a APRESENTAÇÃO. Os
+## três golpes saem dos mesmos seis frames aprovados do Golden Set (não há
+## arte própria por golpe), e o que mudava entre eles era a velocidade. Três
+## golpes com a mesma pose e o mesmo arco lêem-se como um só, repetido.
+##
+## O que passa a distinguir cada golpe, sem tocar no corpo aprovado (o rig
+## não se deforma por código -- ver `RIG_PIXEL`):
+##
+##   1.º  arco baixo, diagonal a subir, curto e frio
+##   2.º  giro largo (spin slash), espelhado na vertical, mais alto
+##   3.º  arco pesado (heavy slash), maior, deslocado à frente, quente
+##
+## mais o SELO do combo (o "×2"/"×3" por cima da cabeça, que apaga com a
+## janela) e um tom de voz próprio em cada golpe. Nenhum destes mexe na
+## hitbox: a leitura mudou, o combate não.
+const ARCO_COMBO := [
+	{"fam": "spin_slash", "escala": Vector2(0.82, 0.82), "desloc": Vector2(-4.0, 6.0),
+		"giro": 16.0, "cor": Color(0.86, 0.90, 1.0, 0.95)},
+	{"fam": "spin_slash", "escala": Vector2(1.16, -1.12), "desloc": Vector2(6.0, -4.0),
+		"giro": -12.0, "cor": Color(1.0, 0.92, 0.98, 1.0)},
+	{"fam": "heavy_slash", "escala": Vector2(1.34, 1.28), "desloc": Vector2(14.0, 0.0),
+		"giro": 0.0, "cor": Color(1.0, 0.80, 0.86, 1.0)},
+]
+## Tom de cada golpe: o combo sobe de altura, e o remate cai para o grave.
+const TOM_COMBO := [1.0, 1.09, 0.88]
 ## 9G: cúpula do escudo (prancha 07), filha do nó `Escudo`.
 var _escudo_9g: AnimatedSprite2D
 ## Centro do arco dos golpes 2/3: à frente do peito, onde a lâmina passa.
@@ -857,15 +885,20 @@ func _disparar_vfx_golpe() -> void:
 	if _vfx_combo and is_instance_valid(_vfx_combo):
 		_vfx_combo.queue_free()
 	_vfx_combo = null
-	if _combo_passo > 0 and not _ataque_no_ar and Vfx9G.ativo(self):
-		var fam := "spin_slash" if _combo_passo == 1 else "heavy_slash"
-		_vfx_combo = Vfx9G.novo(fam)
+	if _combo_passo >= 0 and not _ataque_no_ar and Vfx9G.ativo(self):
+		var d: Dictionary = ARCO_COMBO[clampi(_combo_passo, 0, ARCO_COMBO.size() - 1)]
+		_vfx_combo = Vfx9G.novo(str(d["fam"]))
 		if _vfx_combo:
 			_slash_vfx.visible = false
 			var n := _vfx_combo.sprite_frames.get_frame_count("fx")
 			_vfx_combo.speed_scale = (n / _vfx_combo.sprite_frames.get_animation_speed("fx")) / maxf(_ataque_dur, 0.05)
-			_vfx_combo.scale = Vector2(_olha_para, _sinal_grav)
-			_vfx_combo.position = Vector2(VFX9G_COMBO_POS.x * _olha_para, VFX9G_COMBO_POS.y * _sinal_grav)
+			var e: Vector2 = d["escala"]
+			_vfx_combo.scale = Vector2(e.x * _olha_para, e.y * _sinal_grav)
+			var desl: Vector2 = d["desloc"]
+			_vfx_combo.position = Vector2((VFX9G_COMBO_POS.x + desl.x) * _olha_para,
+				(VFX9G_COMBO_POS.y + desl.y) * _sinal_grav)
+			_vfx_combo.rotation_degrees = float(d["giro"]) * _olha_para * _sinal_grav
+			_vfx_combo.modulate = d["cor"]
 			_vfx_combo.z_index = 1
 			_vfx_combo.animation_finished.connect(_vfx_combo.queue_free)
 			add_child(_vfx_combo)
@@ -1928,10 +1961,12 @@ func _iniciar_ataque() -> void:
 	_avanco_dur = AVANCO_DUR[i_av]
 	_avanco_restante = _avanco_dur
 	# o remate do combo tem som proprio (mais fundo, com peso de metal)
+	var tom: float = TOM_COMBO[clampi(_combo_passo, 0, TOM_COMBO.size() - 1)]
 	if _combo_passo == NUM_COMBO - 1:
-		Som.toca("ataque_forte", -5.0, randf_range(0.96, 1.04))
+		Som.toca("ataque_forte", -4.0, tom * randf_range(0.98, 1.02))
 	else:
-		Som.toca("ataque", -6.0, randf_range(0.95, 1.06))
+		Som.toca("ataque", -6.0, tom * randf_range(0.98, 1.02))
+	_marcar_combo()
 	_flash_golpe()
 	_disparar_vfx_golpe()
 	# NB: o balanco do remate ja' nao abana nem para o tempo -- o peso do
@@ -1939,6 +1974,48 @@ func _iniciar_ataque() -> void:
 	if _hitbox:
 		_hitbox.scale.x = _olha_para
 		_hitbox.monitoring = false
+
+
+## Selo do combo: o "×2"/"×3" por cima da cabeça, que dá um salto a cada
+## ligação e apaga quando a janela fecha. É o que faz o combo LER-SE como
+## combo -- os três golpes saem dos mesmos frames e, sem contador, quem joga
+## não distingue "encadeei" de "carreguei outra vez".
+##
+## O 1.º golpe não mostra nada de propósito: um "×1" em cada toque no botão
+## era ruído constante. O selo aparece quando há mesmo cadeia.
+func _marcar_combo() -> void:
+	if _combo_passo <= 0:
+		if _combo_selo:
+			_combo_selo.visible = false
+		return
+	if _combo_selo == null:
+		_combo_selo = Label.new()
+		_combo_selo.name = "SeloCombo"
+		_combo_selo.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		_combo_selo.add_theme_font_size_override("font_size", 20)
+		_combo_selo.add_theme_color_override("font_outline_color", Color(0.05, 0.01, 0.03, 0.95))
+		_combo_selo.add_theme_constant_override("outline_size", 6)
+		_combo_selo.z_index = 30
+		_combo_selo.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_combo_selo.size = Vector2(80, 26)
+		_combo_selo.pivot_offset = Vector2(40, 13)
+		add_child(_combo_selo)
+	_combo_selo.position = Vector2(-40.0, SELO_COMBO_Y)
+	_combo_selo.text = "×%d" % (_combo_passo + 1)
+	# o remate é dourado; as ligações do meio são o carmesim do rebrand
+	_combo_selo.add_theme_color_override("font_color",
+		Color(1.0, 0.86, 0.42) if _combo_passo == NUM_COMBO - 1 else Color(1.0, 0.46, 0.52))
+	_combo_selo.visible = true
+	_combo_selo.modulate.a = 1.0
+	_combo_selo.scale = Vector2(1.55, 1.55)
+	var t := create_tween()
+	t.tween_property(_combo_selo, "scale", Vector2.ONE, 0.13).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	t.tween_interval(_ataque_dur + JANELA_COMBO * 0.6)
+	t.tween_property(_combo_selo, "modulate:a", 0.0, 0.18)
+
+
+## Altura do selo acima da origem da Koliani (o corpo mede ~72 px).
+const SELO_COMBO_Y := -104.0
 
 
 func _atualizar_janela_ataque() -> void:

@@ -227,7 +227,9 @@ func _ready() -> void:
 	# Sem escudos, os chefes levam dano o tempo todo -> batem MUITO mais
 	# forte ao contacto (x1.4 no N1 -> x2.8 no N30). A vida-base sai de
 	# cada chefe concreto; o multiplicador de vida entra em _afinar_dificuldade.
-	dano_contacto = int(round(dano_contacto * (1.4 + 0.05 * float(clampi(EstadoJogo.indice_nivel, 0, 29)))))
+	dano_contacto = int(round(dano_contacto
+		* (1.4 + 0.05 * float(clampi(EstadoJogo.indice_nivel, 0, 29)))
+		* float(alivio_regiao_i()["dano"])))
 	if _sprite:
 		_sprite.scale = Vector2(_direcao * escala_visual, escala_visual)
 	call_deferred("_encurtar_fase_exposto")
@@ -238,13 +240,67 @@ func _ready() -> void:
 ## Corre depois do `_ready` do chefe concreto (que define `vida`). Sem a
 ## janela EXPOSTA a Koliani acerta ~3x mais vezes -> a vida sobe muito para
 ## a luta não acabar num instante, e os telégrafos/recuperações encurtam.
+## ALÍVIO DA REGIÃO I (Execution 9H). O Game Master jogou a Região I e disse
+## que os cinco chefes estão demasiado difíceis -- "nem o do nível 1 está
+## aceitável". A causa é conhecida e está escrita aqui em cima: quando os
+## escudos saíram (maratona de 2 set), a vida subiu x3,2 e o dano de contacto
+## x1,4 para a luta não acabar num instante. Isso serve um jogador que já
+## conhece os padrões; não serve os cinco primeiros níveis do jogo, que são
+## onde se aprende a lê-los.
+##
+## A correção é uma RAMPA dentro da região, e não um corte igual para todos:
+## o 1-1 é a primeira luta do jogo e o 1-5 é o clímax regional. Mexe em
+## quatro coisas ao mesmo tempo, porque baixar só a vida faz lutas longas e
+## igualmente injustas:
+##
+##   vida      quanto aguenta          0,52 no 1-1  ->  0,86 no 1-5
+##   dano      quanto tira             0,58         ->  0,88
+##   tel       quanto TELEGRAFA        1,25 (mais)  ->  1,02
+##   exposto   quanto fica a jeito     1,55 (mais)  ->  1,06
+##   recupera  quanto demora a voltar  1,15 (mais)  ->  1,00
+##
+## Fora da Região I nada muda (fator 1,0): o resto da campanha não foi
+## jogado nem afinado nesta execução.
+const ALIVIO_R1 := [
+	{"vida": 0.52, "dano": 0.58, "tel": 1.25, "exposto": 1.55, "recupera": 1.15},
+	{"vida": 0.60, "dano": 0.65, "tel": 1.20, "exposto": 1.42, "recupera": 1.11},
+	{"vida": 0.68, "dano": 0.72, "tel": 1.14, "exposto": 1.30, "recupera": 1.08},
+	{"vida": 0.77, "dano": 0.80, "tel": 1.08, "exposto": 1.18, "recupera": 1.04},
+	{"vida": 0.86, "dano": 0.88, "tel": 1.02, "exposto": 1.06, "recupera": 1.00},
+]
+const SEM_ALIVIO := {"vida": 1.0, "dano": 1.0, "tel": 1.0, "exposto": 1.0, "recupera": 1.0}
+
+
+## Fatores de alívio do nível em curso (1,0 fora da Região I).
+static func alivio_regiao_i(indice := -1) -> Dictionary:
+	var i := EstadoJogo.indice_nivel if indice < 0 else indice
+	if i < 0 or i >= ALIVIO_R1.size():
+		return SEM_ALIVIO
+	return ALIVIO_R1[i]
+
+
 func _afinar_dificuldade() -> void:
 	if _ja_derrotado:
 		return
 	var idx := float(clampi(EstadoJogo.indice_nivel, 0, 29))
+	var al := alivio_regiao_i()
 	# a Koliani acerta ~3x mais sem a janela EXPOSTA -> vida bem para cima
 	var mult_vida := 3.2 + 1.6 * (idx / 29.0)   # N1 x3.2 -> N30 x4.8
-	vida = int(round(vida * mult_vida))
+	vida = int(round(vida * mult_vida * float(al["vida"])))
+	# os danos POR ATAQUE de cada chefe (`dano_onda`, `dano_galho`, ...)
+	# descem com o mesmo fator: sem isto, baixar a vida só fazia a luta mais
+	# curta -- continuava a matar em três golpes.
+	if float(al["dano"]) < 1.0:
+		for prop in get_property_list():
+			var nome: String = prop["name"]
+			if not nome.begins_with("dano_") or nome == "dano_contacto":
+				continue
+			if not (prop["type"] in [TYPE_INT, TYPE_FLOAT]):
+				continue
+			var v: float = float(get(nome))
+			if v > 0.0:
+				set(nome, int(round(v * float(al["dano"])))
+					if prop["type"] == TYPE_INT else v * float(al["dano"]))
 	_vida_maxima = maxi(vida, 1)
 	# vários chefes usam `_vida_max` para os limiares de fase -- acompanha
 	if "_vida_max" in self:
@@ -256,12 +312,12 @@ func _afinar_dificuldade() -> void:
 		if nome in self:
 			var v: float = get(nome)
 			if v > 0.05:
-				set(nome, maxf(v * 0.85, 0.3))
+				set(nome, maxf(v * 0.85 * float(al["tel"]), 0.3))
 	for nome in ["dur_recupera", "dur_baque"]:
 		if nome in self:
 			var v: float = get(nome)
 			if v > 0.05:
-				set(nome, v * 0.8)
+				set(nome, v * 0.8 * float(al["recupera"]))
 
 
 var _arena_tentativas := 0
@@ -336,11 +392,12 @@ func _prender_na_arena() -> void:
 ## um respiro entre ataques -- encurta-se para o chefe não ficar parado
 ## sem fazer nada.
 func _encurtar_fase_exposto() -> void:
+	var al := alivio_regiao_i()
 	for nome in ["dur_exposto", "dur_exposta"]:
 		if nome in self:
 			var v: float = get(nome)
 			if v > 0.0:
-				set(nome, maxf(v * 0.55, 0.35))
+				set(nome, maxf(v * 0.55 * float(al["exposto"]), 0.35))
 
 
 

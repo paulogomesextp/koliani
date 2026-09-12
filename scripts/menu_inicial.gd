@@ -1,53 +1,62 @@
 extends Control
-## Menu inicial (é a `main_scene` do projeto). Formas de jogar:
+## Menu inicial (é a cena que a intro abre, e a `main_scene` quando não há
+## intro). Execution 9H: refeito sobre a prancha aprovada
+## `10_menu_rebrand/01_main_menu_approved` -- arte limpa por baixo
+## (`fundo_menu`, a prancha com a UI pintada retirada) e a UI viva por cima,
+## nas coordenadas da própria prancha.
 ##
-##   NEW GAME       campanha nova, do mundo 1 (apaga o save se existir)
-##   LOAD GAME      retoma o save (só aparece se houver progresso)
-##   OPTIONS        volume (música / efeitos) e idioma
+## Entradas, na ordem da prancha:
 ##
-## NEW GAME pede confirmação quando há um save por cima.
-## Todo o texto vem do `Textos` (idioma por omissão: inglês).
+##   CONTINUAR        retoma a sessão/checkpoint (só com progresso)
+##   NOVO JOGO        campanha nova (pede confirmação se há save)
+##   SELECIONAR NÍVEL abre o Mapa do Mundo
+##   OPÇÕES           volume, idioma, layout de toque
+##   SAIR
 ##
-## Em modo normal, NEW GAME / LOAD GAME abrem o **Mapa do Mundo**
-## (`MapaMundo.tscn`) para escolher o nível.
+## Todo o texto vem do `Textos`. O canto inferior direito tem a versão e o
+## crédito, como o Game Master pediu; os textos que ele mandou tirar dos
+## cantos de baixo não voltaram.
 ##
 ## Atalhos de dev (a seguir a `--`):
 ##   --jogar / --foto[=...]   salta o menu e arranca já em Main.tscn
-##   --nivel=N                salta o menu e arranca no mundo N (1..4)
+##   --nivel=N                salta o menu e arranca no nível N
 ##   --devmode                salta o menu e arranca em DEVELOPER MODE
 
 const CENA_JOGO := "res://scenes/Main.tscn"
 const CENA_MAPA := "res://scenes/ui/MapaMundo.tscn"
 const CENA_OPCOES := preload("res://scenes/ui/Opcoes.tscn")
 
-@onready var _arte: TextureRect = $Arte
-@onready var _subtitulo: Label = $Centro/Subtitulo
-@onready var _novo: Button = $Centro/NovoJogo
-@onready var _load: Button = $Centro/LoadGame
-@onready var _opcoes: Button = $Centro/Opcoes
-@onready var _espaco_dev: Control = $Centro/EspacoDev
-@onready var _dev: Button = $Centro/DevMode
-@onready var _aviso: Label = $Centro/Aviso
-@onready var _sair: Button = $Centro/Sair
-@onready var _versao: Label = $Versao
+## Medidas da prancha, já em coordenadas do palco (1280x720). O eixo da
+## coluna é o mesmo do logótipo: x=805.
+const EIXO := 805.0
+const LARG_COLUNA := 330.0
+const Y_SUBTITULO := 216.0
+const Y_COLUNA := 280.0
+const ALT_BOTAO := 46.0
+const ALT_SEPARADOR := 12.0
+const Y_RODAPE := 604.0
 
-# "" (nada) ou "novo" -- qual o botão à espera de confirmação
-var _armado := ""
+var _palco: Control
+var _coluna: VBoxContainer
+var _subtitulo: Label
+var _aviso: Label
+var _premir: Label
+var _versao: Label
+var _credito: Label
+var _dev: Button
+var _realce: TextureRect
+var _botoes := {}          # chave -> Button
+var _armado := ""          # "" ou "novo" -- botão à espera de confirmação
+## O foco inicial não toca nada: um "ding" a abrir o menu soa a erro.
+var _pronto_para_som := false
 
 
 func _ready() -> void:
-	_versao.text = "v" + str(ProjectSettings.get_setting("application/config/version", "0.0.0"))
-	print("RUNTIME TRACE | build=%s | main_scene=res://scenes/ui/MenuInicial.tscn" %
-		str(ProjectSettings.get_setting("application/config/version", "0.0.0")))
-	# A entrada de desenvolvimento pertence ao editor/export-debug. O export
-	# release mantém os atalhos de captura, mas nunca oferece um caminho normal
-	# para BOSS TEST / TESTAR OUTRO NÍVEL / FLYMODE.
-	var permitir_dev := OS.is_debug_build()
-	_espaco_dev.visible = permitir_dev
-	_dev.visible = permitir_dev
+	print("RUNTIME TRACE | build=%s | main_scene=%s | frontend=9H" % [
+		str(ProjectSettings.get_setting("application/config/version", "0.0.0")),
+		str(ProjectSettings.get_setting("application/run/main_scene", "?"))])
 
 	# voltar ao menu sai do "DEV MODE" -- recarrega o save real do disco
-	# (o sandbox de dev nunca é gravado, por isso o progresso fica intacto).
 	if EstadoJogo.modo_dev:
 		EstadoJogo.modo_dev = false
 		if FileAccess.file_exists(EstadoJogo.CAMINHO_SAVE):
@@ -58,106 +67,291 @@ func _ready() -> void:
 	if _tratar_atalhos_dev():
 		return
 
-	Musica.menu()  # tema próprio do menu (por baixo do título)
-	_aviso.visible = false
-	_deriva_arte()  # leve "Ken Burns" no fundo (key art)
-
-	_novo.pressed.connect(_ao_novo)
-	_load.pressed.connect(_entrar_campanha)
-	_opcoes.pressed.connect(_abrir_opcoes)
-	_dev.pressed.connect(_ao_dev_mode)
-	_sair.pressed.connect(_ao_sair)
-
+	Frontend9H.vestir(self)
+	_montar()
+	Musica.menu()
 	Textos.idioma_mudou.connect(func(_l: String) -> void: _traduzir())
 	_traduzir()
-	# Execution 9F: botões e título no kit de produção (prancha 09)
-	UIProducao.vestir_ecra(self)
-	UIProducao.titulo($Centro/Titulo, 68)
-	$Centro/Titulo.add_theme_color_override("font_shadow_color", Color(0.55, 0.22, 0.75, 0.45))
-	var principal := _load if EstadoJogo.ha_progresso() else _novo
-	_destacar_botao_principal(principal)
-	_preparar_hover_animado()
-	principal.grab_focus()
+	_focar_principal()
+	_pronto_para_som = true
 	_agendar_prova_runtime()
 
 
-## Dá destaque visual (mais saturado, com glow) ao botão de ação principal
-## do momento -- LOAD GAME se há progresso, senão NEW GAME.
-##
-## Com o kit de produção (9F) o destaque é a MOLDURA DE OURO do botão
-## selecionado da prancha 09 -- o foco já a desenha; aqui só sobe a letra.
-func _destacar_botao_principal(botao: Button) -> void:
-	botao.add_theme_font_size_override("font_size", 22)
-	botao.custom_minimum_size.y = 58.0
+# ── montagem ─────────────────────────────────────────────────────────────
 
+func _montar() -> void:
+	_palco = Frontend9H.palco(self, "fundo_menu")
+	# a prancha escurece a coluna dos botões; aqui isso é um véu, e é ele
+	# que segura a legibilidade quando a arte por baixo é clara
+	_palco.add_child(Frontend9H.veu(Vector2(EIXO - 330.0, 0.0), Vector2(EIXO + 330.0, 720.0), 0.5))
+	_palco.add_child(Frontend9H.vinheta())
 
-## Pequena resposta de escala ao passar/focar o rato em cada botão --
-## substitui a mudança de cor estática por algo com mais vida.
-func _preparar_hover_animado() -> void:
-	for b: Button in [_novo, _load, _opcoes, _sair]:
+	_subtitulo = Label.new()
+	Frontend9H.capitular(_subtitulo, 17, Frontend9H.TEXTO)
+	_subtitulo.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	Frontend9H.por(_subtitulo, Rect2(EIXO - 300.0, Y_SUBTITULO, 600.0, 30.0))
+	_palco.add_child(_subtitulo)
+	for lado in [-1.0, 1.0]:
+		var risca := Frontend9H.separador()
+		risca.modulate = Color(2.0, 1.7, 1.7, 1.0)
+		Frontend9H.por(risca, Rect2(EIXO + lado * 235.0 - 55.0, Y_SUBTITULO + 6.0, 110.0, 16.0))
+		_palco.add_child(risca)
+
+	_realce = Frontend9H.realce()
+	_realce.modulate.a = 0.0
+	_palco.add_child(_realce)
+
+	_coluna = VBoxContainer.new()
+	_coluna.add_theme_constant_override("separation", 0)
+	_coluna.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	Frontend9H.por(_coluna, Rect2(EIXO - LARG_COLUNA * 0.5, Y_COLUNA, LARG_COLUNA, 320.0))
+	_palco.add_child(_coluna)
+
+	var chaves := ["continuar", "novo", "niveis", "opcoes", "sair"]
+	for i in chaves.size():
+		if i > 0:
+			var caixa := CenterContainer.new()
+			caixa.custom_minimum_size = Vector2(0, ALT_SEPARADOR)
+			caixa.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			var s := Frontend9H.separador()
+			s.custom_minimum_size = Vector2(LARG_COLUNA * 0.9, ALT_SEPARADOR)
+			s.modulate = Color(1, 1, 1, 0.8)
+			caixa.add_child(s)
+			_coluna.add_child(caixa)
+		var b := Button.new()
+		b.name = chaves[i].capitalize()
+		b.custom_minimum_size = Vector2(0, ALT_BOTAO)
+		Frontend9H.rotulo_menu(b, 26)
+		# o destaque é a PLACA da prancha, e quem a desenha é o foco: sem
+		# isto o rato ficava com uma placa e o comando com outra
+		b.mouse_entered.connect(b.grab_focus)
+		b.focus_entered.connect(func() -> void:
+			_mover_realce(b)
+			if _pronto_para_som:
+				Som.toca("ui_mover", -13.0, randf_range(0.97, 1.04)))
+		b.pressed.connect(func() -> void: Som.toca("ui_confirmar", -8.0))
 		b.resized.connect(func() -> void: b.pivot_offset = b.size / 2.0)
-		b.mouse_entered.connect(func() -> void: _animar_escala(b, 1.035))
-		b.mouse_exited.connect(func() -> void: _animar_escala(b, 1.0))
-		b.focus_entered.connect(func() -> void: _animar_escala(b, 1.035))
-		b.focus_exited.connect(func() -> void: _animar_escala(b, 1.0))
-	if _dev.visible:
-		_dev.resized.connect(func() -> void: _dev.pivot_offset = _dev.size / 2.0)
-		_dev.mouse_entered.connect(func() -> void: _animar_escala(_dev, 1.035))
-		_dev.mouse_exited.connect(func() -> void: _animar_escala(_dev, 1.0))
-		_dev.focus_entered.connect(func() -> void: _animar_escala(_dev, 1.035))
-		_dev.focus_exited.connect(func() -> void: _animar_escala(_dev, 1.0))
+		_coluna.add_child(b)
+		_botoes[chaves[i]] = b
+
+	_botoes["continuar"].pressed.connect(_ao_continuar)
+	_botoes["novo"].pressed.connect(_ao_novo)
+	_botoes["niveis"].pressed.connect(_ao_niveis)
+	_botoes["opcoes"].pressed.connect(_abrir_opcoes)
+	_botoes["sair"].pressed.connect(_ao_sair)
+
+	_aviso = Label.new()
+	Frontend9H.corpo(_aviso, 15, Color(1.0, 0.62, 0.45))
+	_aviso.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_aviso.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_aviso.visible = false
+	_aviso.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	Frontend9H.por(_aviso, Rect2(EIXO - 300.0, Y_RODAPE + 18.0, 600.0, 40.0))
+	_palco.add_child(_aviso)
+
+	# A entrada de desenvolvimento pertence ao editor/export-debug.
+	_dev = Button.new()
+	_dev.visible = OS.is_debug_build()
+	Frontend9H.rotulo_menu(_dev, 14)
+	_dev.add_theme_color_override("font_color", Color(0.85, 0.72, 0.35, 0.8))
+	_dev.pressed.connect(_ao_dev_mode)
+	Frontend9H.por(_dev, Rect2(EIXO - 120.0, 572.0, 240.0, 24.0))
+	_palco.add_child(_dev)
+
+	var orn := Frontend9H.separador("ornamento_rodape")
+	Frontend9H.por(orn, Rect2(EIXO - 205.0, Y_RODAPE, 410.0, 20.0))
+	_palco.add_child(orn)
+
+	_premir = Label.new()
+	Frontend9H.capitular(_premir, 14, Frontend9H.TEXTO_APAGADO)
+	_premir.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	Frontend9H.por(_premir, Rect2(EIXO - 250.0, Y_RODAPE + 22.0, 500.0, 26.0))
+	_palco.add_child(_premir)
+
+	_versao = Label.new()
+	Frontend9H.corpo(_versao, 14, Frontend9H.TEXTO_APAGADO)
+	_versao.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	_versao.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	Frontend9H.por(_versao, Rect2(1000.0, 624.0, 262.0, 22.0))
+	_palco.add_child(_versao)
+
+	_credito = Label.new()
+	Frontend9H.corpo(_credito, 13, Frontend9H.TEXTO_APAGADO)
+	_credito.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	_credito.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	Frontend9H.por(_credito, Rect2(1000.0, 645.0, 262.0, 22.0))
+	_palco.add_child(_credito)
+
+	var orn2 := Frontend9H.separador()
+	orn2.modulate = Color(1, 1, 1, 0.5)
+	Frontend9H.por(orn2, Rect2(1140.0, 668.0, 120.0, 14.0))
+	_palco.add_child(orn2)
+
+	_folhas()
 
 
-func _animar_escala(botao: Button, alvo: float) -> void:
-	var t := create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_BACK)
-	t.tween_property(botao, "scale", Vector2(alvo, alvo), 0.18)
+## Folhas vermelhas a atravessar o ecrã, como as da prancha. É o único
+## movimento do menu: a arte é uma composição fechada e mexê-la inteira
+## (o "Ken Burns" que aqui estava) tirava o logótipo do sítio.
+func _folhas() -> void:
+	var p := CPUParticles2D.new()
+	p.name = "Folhas"
+	p.amount = 22
+	p.lifetime = 9.0
+	p.preprocess = 6.0
+	p.position = Vector2(0, -30)
+	p.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
+	p.emission_rect_extents = Vector2(700, 10)
+	p.direction = Vector2(0.55, 1)
+	p.spread = 22.0
+	p.gravity = Vector2(14, 26)
+	p.initial_velocity_min = 26.0
+	p.initial_velocity_max = 58.0
+	p.angular_velocity_min = -70.0
+	p.angular_velocity_max = 70.0
+	p.scale_amount_min = 1.6
+	p.scale_amount_max = 3.4
+	p.color = Color(0.78, 0.10, 0.16, 0.62)
+	var folha := Control.new()
+	folha.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	folha.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	folha.add_child(p)
+	_palco.add_child(folha)
+	folha.resized.connect(func() -> void:
+		p.position = Vector2(folha.size.x * 0.5, -30.0)
+		p.emission_rect_extents = Vector2(folha.size.x * 0.6, 10.0))
 
 
-## (Re)escreve todo o texto do menu no idioma atual.
+## Leva a placa até ao botão com foco. A primeira vez salta (senão via-se a
+## placa a vir do canto superior esquerdo no arranque).
+func _mover_realce(botao: Button) -> void:
+	if _realce == null or not botao.is_inside_tree():
+		return
+	await get_tree().process_frame
+	if not is_instance_valid(botao) or not botao.is_inside_tree():
+		return
+	var alvo := Rect2(botao.position + _coluna.position - Vector2(12, 5),
+		botao.size + Vector2(24, 10))
+	if _realce.modulate.a < 0.05:
+		_realce.position = alvo.position
+		_realce.size = alvo.size
+		_realce.modulate.a = 1.0
+		return
+	var t := create_tween().set_parallel().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+	t.tween_property(_realce, "position", alvo.position, 0.17)
+	t.tween_property(_realce, "size", alvo.size, 0.17)
+
+
+func _focar_principal() -> void:
+	var principal: Button = _botoes["continuar"] if EstadoJogo.ha_progresso() else _botoes["novo"]
+	principal.grab_focus()
+
+
+# ── texto ────────────────────────────────────────────────────────────────
+
+func _traduzir() -> void:
+	_subtitulo.text = Frontend9H.espacar(Textos.t("menu.tagline"), 1)
+	var ha := EstadoJogo.ha_progresso()
+	_botoes["continuar"].visible = ha
+	_botoes["continuar"].text = Textos.t("menu.continue")
+	_botoes["novo"].text = Textos.t("menu.new_game")
+	_botoes["niveis"].text = Textos.t("menu.select_level")
+	_botoes["opcoes"].text = Textos.t("menu.options")
+	_botoes["sair"].text = Textos.t("menu.quit")
+	_dev.text = Textos.t("menu.dev_mode")
+	var toque := DisplayServer.is_touchscreen_available()
+	_premir.text = Frontend9H.espacar(
+		Textos.t("menu.tap_play" if toque else "menu.press_enter"), 1)
+	_versao.text = "v" + str(ProjectSettings.get_setting("application/config/version", "0.0.0"))
+	_credito.text = Textos.t("menu.developed_by")
+	if _armado == "novo":
+		_botoes["novo"].text += Textos.t("menu.confirm_suffix")
+		_aviso.text = Textos.t("menu.warn_new_game")
+
+
+# ── ações ────────────────────────────────────────────────────────────────
+
+func _ao_continuar() -> void:
+	_repor_botoes()
+	_entrar_campanha()
+
+
+func _ao_novo() -> void:
+	if EstadoJogo.ha_progresso() and _armado != "novo":
+		_armar("novo", _botoes["novo"], Textos.t("menu.warn_new_game"))
+		return
+	_repor_botoes()
+	EstadoJogo.reiniciar_campanha()
+	_entrar_campanha()
+
+
+func _ao_niveis() -> void:
+	_repor_botoes()
+	Transicao.fechar_e(func() -> void: get_tree().change_scene_to_file(CENA_MAPA))
+
+
+func _armar(qual: String, botao: Button, texto: String) -> void:
+	_repor_botoes()
+	_armado = qual
+	botao.text = botao.text + Textos.t("menu.confirm_suffix")
+	_aviso.text = texto
+	_aviso.visible = true
+	_premir.visible = false
+	botao.grab_focus()
+
+
+func _repor_botoes() -> void:
+	_armado = ""
+	_botoes["novo"].text = Textos.t("menu.new_game")
+	_aviso.visible = false
+	_premir.visible = true
+
+
+func _abrir_opcoes() -> void:
+	_repor_botoes()
+	var o := CENA_OPCOES.instantiate()
+	o.tree_exited.connect(func() -> void:
+		if is_inside_tree():
+			_botoes["opcoes"].grab_focus())
+	add_child(o)
+
+
+func _ao_dev_mode() -> void:
+	if not OS.is_debug_build():
+		return
+	_repor_botoes()
+	EstadoJogo.ativar_modo_dev()
+	_ir_jogar()
+
+
 ## SAIR. `get_tree().quit()` fecha o executável de Windows e a app de
 ## Android. Na WEB não fecha nada -- o Godot corre dentro de um separador e
-## não é ele que manda nele.
-##
-## A primeira tentativa foi o `window.close()`, contando com o browser o
-## aceitar numa app instalada. O Paulo foi experimentar no Chrome e não
-## fechou: o `close()` só é permitido numa janela que o próprio script
-## abriu, e uma PWA não conta. Não há maneira de o contornar -- é a regra
-## do browser, e é assim de propósito.
-##
-## Então o QUIT faz o que PODE fazer, e faz até ao fim: tenta fechar, e se
-## a janela ficar, apaga a página e desliga o motor. A app fica desligada,
-## que era o pedido; o que sobra é um separado vazio a dizer que pode ser
-## fechado -- e isso só o dedo dele é que pode fazer.
-const JS_FECHAR := "(function(){try{window.close();}catch(e){}setTimeout(function(){if(window.closed||!document.body)return;document.body.innerHTML=\"<div style='position:fixed;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1rem;background:#0d0814;color:#ece6f7;font:600 5vmin/1.4 -apple-system,system-ui,sans-serif;text-align:center;padding:8vmin'>KOLIANI<span style='font-size:3.4vmin;font-weight:400;color:#8d7ea9'>The game is closed. You can close this tab.</span></div>\";},260);})();"
+## não é ele que manda nele. O `window.close()` só é permitido numa janela
+## que o próprio script abriu, e uma PWA não conta (experimentado no Chrome).
+## Então o QUIT faz o que PODE: tenta fechar e, se a janela ficar, apaga a
+## página e desliga o motor.
+const JS_FECHAR := "(function(){try{window.close();}catch(e){}setTimeout(function(){if(window.closed||!document.body)return;document.body.innerHTML=\"<div style='position:fixed;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1rem;background:#0b0509;color:#fdf6f3;font:600 5vmin/1.4 -apple-system,system-ui,sans-serif;text-align:center;padding:8vmin'>KOLIANI<span style='font-size:3.4vmin;font-weight:400;color:#94838a'>The game is closed. You can close this tab.</span></div>\";},260);})();"
 
 
 func _ao_sair() -> void:
+	Som.toca("ui_voltar", -8.0)
 	if OS.has_feature("web"):
 		JavaScriptBridge.eval(JS_FECHAR, true)
-		# dá tempo ao `close()` de acontecer antes de se matar o motor: se a
-		# janela fechar mesmo, nunca se chega a ver a página apagada
 		await get_tree().create_timer(0.45).timeout
 	get_tree().quit()
 
 
-func _traduzir() -> void:
-	_subtitulo.text = Textos.t("game.subtitle")
-	_novo.text = Textos.t("menu.new_game")
-	_opcoes.text = Textos.t("menu.options")
-	_dev.text = Textos.t("menu.dev_mode")
-	_sair.text = Textos.t("menu.quit")
+## Entrada normal na campanha: retoma a sessão se houver, senão abre o mapa.
+func _entrar_campanha() -> void:
+	var destino := CENA_JOGO if EstadoJogo.level_session.get("active", false) else CENA_MAPA
+	Transicao.fechar_e(func() -> void: get_tree().change_scene_to_file(destino))
 
-	var ha := EstadoJogo.ha_progresso()
-	_load.visible = ha
-	if ha:
-		var txt := Textos.tf("menu.load_world", [EstadoJogo.indice_nivel + 1])
-		_load.text = txt
 
-	# se um botão estava "armado" para confirmar, repõe o aviso/sufixo
-	if _armado == "novo":
-		_novo.text += Textos.t("menu.confirm_suffix")
-		_aviso.text = Textos.t("menu.warn_new_game")
+func _ir_jogar() -> void:
+	Transicao.fechar_e(func() -> void: get_tree().change_scene_to_file(CENA_JOGO))
 
+
+# ── dev / prova ──────────────────────────────────────────────────────────
 
 ## Devolve true se um atalho de dev tratou o arranque (e já não há menu).
 func _tratar_atalhos_dev() -> bool:
@@ -184,8 +378,7 @@ func _tratar_atalhos_dev() -> bool:
 	return true
 
 
-## Prova invisível do export: fotografa as cenas reais do fluxo normal. Não
-## ativa modo dev nem reconstrói UI fora do produto.
+## Prova invisível do export: fotografa as cenas reais do fluxo normal.
 func _agendar_prova_runtime() -> void:
 	for argumento in OS.get_cmdline_user_args():
 		if argumento.begins_with("--foto-menu="):
@@ -197,86 +390,8 @@ func _agendar_prova_runtime() -> void:
 
 
 func _tirar_foto_menu(caminho: String) -> void:
-	await get_tree().create_timer(0.8).timeout
+	await get_tree().create_timer(1.0).timeout
 	var imagem := get_viewport().get_texture().get_image()
 	imagem.save_png(caminho)
 	print("PROVA RUNTIME MENU: ", caminho)
 	get_tree().quit(0)
-
-
-## Deriva muito lenta do fundo (a `Arte` é maior que o ecrã, sobra folga).
-func _deriva_arte() -> void:
-	if _arte == null:
-		return
-	var base := _arte.position
-	var t := create_tween().set_loops().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	t.tween_property(_arte, "position", base + Vector2(46, -30), 24.0)
-	t.tween_property(_arte, "position", base + Vector2(-40, 24), 26.0)
-	t.tween_property(_arte, "position", base, 22.0)
-
-
-func _abrir_opcoes() -> void:
-	_repor_botoes()
-	var o := CENA_OPCOES.instantiate()
-	# 9F: ao fechar, o foco volta ao menu -- sem isto o teclado/comando
-	# ficavam sem botão nenhum (↓/↑ não faziam nada)
-	o.tree_exited.connect(func() -> void:
-		if is_inside_tree():
-			_opcoes.grab_focus())
-	add_child(o)
-
-
-## "DEVELOPER MODE": sandbox de testes (habilidades todas, energia
-## infinita, sem perder vida) a partir do nível 1. Não mexe no save real; a
-## barra "TESTAR OUTRO NÍVEL" (dev_barra.gd) troca de nível dentro do jogo.
-func _ao_dev_mode() -> void:
-	if not OS.is_debug_build():
-		return
-	_repor_botoes()
-	EstadoJogo.ativar_modo_dev()
-	_ir_jogar()
-
-
-func _ao_novo() -> void:
-	if _precisa_confirmar("novo"):
-		_armar("novo", _novo, Textos.t("menu.warn_new_game"))
-		return
-	_comecar_campanha()
-
-
-## Há um save por cima e este botão ainda não foi confirmado?
-func _precisa_confirmar(qual: String) -> bool:
-	return EstadoJogo.ha_progresso() and _armado != qual
-
-
-func _armar(qual: String, botao: Button, texto: String) -> void:
-	_repor_botoes()
-	_armado = qual
-	botao.text = botao.text + Textos.t("menu.confirm_suffix")
-	_aviso.text = texto
-	_aviso.visible = true
-	botao.grab_focus()
-
-
-func _repor_botoes() -> void:
-	_armado = ""
-	_novo.text = Textos.t("menu.new_game")
-	_aviso.visible = false
-
-
-func _comecar_campanha() -> void:
-	EstadoJogo.reiniciar_campanha()
-	_entrar_campanha()
-
-
-## Entrada normal na campanha: abre o Mapa do Mundo para escolher o nível.
-func _entrar_campanha() -> void:
-	# Fechar a aplicação preserva a sessão: LOAD regressa ao último checkpoint
-	# seguro. Sem sessão ativa, o fluxo normal continua a abrir o mapa.
-	var destino := CENA_JOGO if EstadoJogo.level_session.get("active", false) else CENA_MAPA
-	Transicao.fechar_e(func() -> void: get_tree().change_scene_to_file(destino))
-
-
-## Salto direto para o jogo -- usado só pelos atalhos de dev (--jogar/--nivel).
-func _ir_jogar() -> void:
-	Transicao.fechar_e(func() -> void: get_tree().change_scene_to_file(CENA_JOGO))

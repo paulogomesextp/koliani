@@ -69,6 +69,9 @@ func _correr_tudo() -> void:
 	teste_9d9e_crias_sem_goblin()
 	teste_9e2_coracao_producao_e_fases()
 	teste_9g_vfx_producao_regiao1()
+	teste_9h_frontend_producao()
+	await teste_9h_inimigos_com_vida()
+	await teste_9h_chefes_regiao1_mais_faceis()
 	teste_level_session_begin()
 	teste_level_session_stable_checkpoint_identity()
 	teste_level_session_checkpoint_activation_repeated()
@@ -982,38 +985,46 @@ func teste_9f_ui_producao() -> void:
 	_ok(sb is StyleBoxTexture and (sb as StyleBoxTexture).texture.resource_path.begins_with(dir),
 		"9F: o tema nao usa o botao do kit")
 
-	# seletor: 20 pastilhas I..XX, "1-1".."20-5", 5 cartoes visiveis por regiao
+	# seletor (9H): mapa de regiao -- 5 nos por regiao, fichas "1-1".."20-5",
+	# abas das 20 regioes, desbloqueio intacto
 	var desbloq_antes: Array = []
 	for i in EstadoJogo.NIVEIS.size():
 		desbloq_antes.append(EstadoJogo.nivel_desbloqueado(i))
 	var sel: SeletorNiveis = load("res://scenes/ui/SeletorNiveis.tscn").instantiate()
 	get_tree().root.add_child(sel)
 	sel.size = Vector2(1280, 720)
-	sel.configurar(0, true)
-	sel.call("_reposicionar", true)
-	var pills: Array = sel.get("_regiao_pills")
-	_ok(pills.size() == 20, "9F: %d pastilhas de regiao (esperadas 20)" % pills.size())
-	if pills.size() == 20:
-		_ok((pills[0] as Button).text == "I" and (pills[19] as Button).text == "XX",
-			"9F: pastilhas sem numeracao romana")
-	var cartoes: Array = sel.get("_cartoes")
-	_ok((cartoes[0]["numero"] as Label).text == "1-1" and (cartoes[7]["numero"] as Label).text == "2-3"
-		and (cartoes[99]["numero"] as Label).text == "20-5", "9F: numeracao regiao-nivel errada")
-	var visiveis := func() -> Array:
+	sel.configurar(0, false)
+	var nos: Array = sel.get("_nos")
+	_ok(nos.size() == 5, "9H: %d nos no mapa (esperados 5)" % nos.size())
+	var fichas := func() -> Array:
 		var v: Array = []
-		for c in cartoes:
-			if (c["raiz"] as Control).visible:
-				v.append(c["indice"])
+		for n in nos:
+			v.append((n["rotulo"] as Label).text)
 		return v
-	_ok(visiveis.call() == [0, 1, 2, 3, 4], "9F: a regiao I devia mostrar os niveis 0..4 (%s)" % [visiveis.call()])
-	sel.call("_ir_para_regiao", 3)
-	sel.call("_reposicionar", true)
-	_ok(visiveis.call() == [15, 16, 17, 18, 19], "9F: a regiao IV devia mostrar 15..19 (%s)" % [visiveis.call()])
-	var cab := sel.find_child("CabecalhoRegiao", true, false) as Label
-	_ok(cab != null and cab.text.begins_with("IV"), "9F: cabecalho da regiao nao diz IV")
+	var indices := func() -> Array:
+		var v: Array = []
+		for n in nos:
+			v.append(int(n["indice"]))
+		return v
+	_ok(indices.call() == [0, 1, 2, 3, 4],
+		"9H: a regiao I devia mostrar os niveis 0..4 (%s)" % [indices.call()])
+	_ok(fichas.call() == ["1-1", "1-2", "1-3", "1-4", "1-5"],
+		"9H: fichas da regiao I erradas (%s)" % [fichas.call()])
+	sel.call("_mudar_regiao", 3)
+	_ok(indices.call() == [15, 16, 17, 18, 19],
+		"9H: a regiao IV devia mostrar 15..19 (%s)" % [indices.call()])
+	_ok(fichas.call() == ["4-1", "4-2", "4-3", "4-4", "4-5"],
+		"9H: fichas da regiao IV erradas (%s)" % [fichas.call()])
+	var titulo: Label = sel.get("_titulo_regiao")
+	_ok(titulo != null and titulo.text.contains("IV"), "9H: cabecalho da regiao nao diz IV")
+	var abas: Array = sel.get("_abas")
+	_ok(abas.size() == 5, "9H: %d abas de regiao (esperadas 5)" % abas.size())
+	sel.call("_mudar_regiao", 16)   # ate' a ultima regiao
+	_ok(int(sel.get("_regiao")) == 19 and indices.call()[4] == 99,
+		"9H: a ultima regiao devia acabar no nivel 100 (%s)" % [indices.call()])
 	for i in EstadoJogo.NIVEIS.size():
 		if EstadoJogo.nivel_desbloqueado(i) != desbloq_antes[i]:
-			_ok(false, "9F: o seletor mexeu no desbloqueio do nivel %d" % i)
+			_ok(false, "9H: o seletor mexeu no desbloqueio do nivel %d" % i)
 			break
 	sel.queue_free()
 
@@ -1465,7 +1476,9 @@ func teste_execution_8_integracao_player_facing() -> void:
 	var menu := FileAccess.get_file_as_string("res://scripts/menu_inicial.gd")
 	var main := FileAccess.get_file_as_string("res://scripts/main.gd")
 	var dev := FileAccess.get_file_as_string("res://scripts/dev_barra.gd")
-	_ok(menu.contains("_dev.visible = permitir_dev")
+	# 9H: o menu foi refeito sobre a prancha aprovada e monta-se em código --
+	# a defesa é a mesma, o nome da variável é que deixou de existir.
+	_ok(menu.contains("_dev.visible = OS.is_debug_build()")
 		and menu.contains("--devmode\" and OS.is_debug_build()"),
 		"Execution 8: menu release não fecha as entradas de developer mode")
 	_ok(main.contains("EstadoJogo.modo_dev and OS.is_debug_build()")
@@ -2674,6 +2687,119 @@ func teste_sfx_existem() -> void:
 
 
 ## Execution 9G -- VFX de produção da Região I (prancha 07).
+## Execution 9H: o frontend (intro, menu, seletor, icone) sai das pranchas
+## aprovadas e o texto todo vem do `Textos`.
+## Execution 9H: os inimigos deixaram de ser imagem parada. A asserção mede
+## o sprite ao longo de meio segundo: se a camada de vida for desligada (ou
+## o `_process` voltar a sair cedo quando há `_anim`), a amplitude vai a
+## zero e isto falha.
+func teste_9h_inimigos_com_vida() -> void:
+	var cena := load("res://scenes/actors/DemonioBase.tscn")
+	if cena == null:
+		_ok(false, "9H: falta a cena do demónio")
+		return
+	var d: Node = cena.instantiate()
+	get_tree().root.add_child(d)
+	await get_tree().process_frame
+	var anim: Node2D = d.get_node_or_null("Sprite/Anim")
+	var sprite: Node2D = d.get_node_or_null("Sprite")
+	_ok(anim != null and sprite != null, "9H: o demónio não tem Sprite/Anim")
+	if anim == null or sprite == null:
+		d.queue_free()
+		return
+	var esc_min := INF
+	var esc_max := -INF
+	var y_min := INF
+	var y_max := -INF
+	for _i in 40:
+		await get_tree().process_frame
+		esc_min = minf(esc_min, anim.scale.y)
+		esc_max = maxf(esc_max, anim.scale.y)
+		y_min = minf(y_min, sprite.position.y)
+		y_max = maxf(y_max, sprite.position.y)
+	_ok(esc_max - esc_min > 0.004,
+		"9H: o inimigo não respira (amplitude de escala %.4f)" % (esc_max - esc_min))
+	_ok(y_max - y_min > 0.20,
+		"9H: o inimigo não tem passada (amplitude vertical %.2f px)" % (y_max - y_min))
+	d.queue_free()
+
+
+func teste_9h_frontend_producao() -> void:
+	_ok(Frontend9H.disponivel(), "9H: kit do frontend nao importado")
+	for peca in ["fundo_menu", "fundo_seletor", "placa_selecionada", "painel_detalhe",
+			"botao_jogar", "aba_atual", "anel_normal", "anel_atual", "anel_chefe",
+			"ficha_nivel", "losango", "cadeado"]:
+		_ok(Frontend9H.textura(peca) != null, "9H: falta a peca `%s` do kit" % peca)
+	# a intro e' a cena de arranque, e o menu e' a que ela abre
+	_ok(str(ProjectSettings.get_setting("application/run/main_scene", ""))
+		== "res://scenes/ui/Intro.tscn", "9H: a `main_scene` nao e a intro")
+	_ok(ResourceLoader.exists("res://assets/video/intro_koliani.ogv"),
+		"9H: falta o video da intro em Ogg Theora")
+	_ok(str(ProjectSettings.get_setting("application/config/icon", ""))
+		== "res://icon.png", "9H: o icone do projeto nao e o do rebrand")
+	# sem texto a` mao nos ecras novos
+	for caminho in ["res://scripts/menu_inicial.gd", "res://scripts/seletor_niveis.gd",
+			"res://scripts/editor_layout_toque.gd"]:
+		if not ResourceLoader.exists(caminho):
+			continue
+		var fonte := FileAccess.get_file_as_string(caminho)
+		_ok(not fonte.contains(".text = \"") or fonte.contains("Textos.t"),
+			"9H: %s escreve texto a mao" % caminho)
+	# as chaves novas existem nos 6 idiomas
+	var chaves := ["menu.tagline", "menu.continue", "menu.select_level", "menu.press_enter",
+		"menu.tap_play", "menu.developed_by", "selector.back_to_menu", "selector.play",
+		"selector.state_available", "selector.quote_region_1", "options.touch_layout",
+		"layout.title", "layout.save", "layout.reset"]
+	for lang in ["en", "pt", "es", "fr", "de", "zh"]:
+		var txt := FileAccess.get_file_as_string("res://assets/i18n/%s.json" % lang)
+		var d: Variant = JSON.parse_string(txt)
+		_ok(d is Dictionary, "9H: %s.json invalido" % lang)
+		if d is Dictionary:
+			for k in chaves:
+				_ok((d as Dictionary).has(k), "9H: falta `%s` em %s.json" % [k, lang])
+
+
+## Execution 9H: os chefes da Regiao I ficaram mais faceis, em rampa do 1-1
+## ao 1-5, e o resto da campanha NAO mudou. A asserção morde: instancia o
+## Ghorak (chefe do 1-1) e compara a vida final com a que ele teria sem o
+## alivio -- se alguem puser os fatores a 1,0, isto falha.
+func teste_9h_chefes_regiao1_mais_faceis() -> void:
+	var fora := ChefeBase.alivio_regiao_i(5)
+	_ok(is_equal_approx(float(fora["vida"]), 1.0) and is_equal_approx(float(fora["dano"]), 1.0),
+		"9H: o alivio nao devia sair da Regiao I")
+	var v_ant := 0.0
+	var d_ant := 0.0
+	for i in 5:
+		var a := ChefeBase.alivio_regiao_i(i)
+		_ok(float(a["vida"]) < 1.0 and float(a["dano"]) < 1.0,
+			"9H: o nivel 1-%d devia levar alivio" % (i + 1))
+		_ok(float(a["tel"]) >= 1.0 and float(a["exposto"]) >= 1.0,
+			"9H: o nivel 1-%d devia telegrafar mais, nao menos" % (i + 1))
+		_ok(float(a["vida"]) > v_ant and float(a["dano"]) > d_ant,
+			"9H: a rampa da Regiao I devia subir do 1-1 ao 1-5")
+		v_ant = float(a["vida"])
+		d_ant = float(a["dano"])
+
+	var antes := EstadoJogo.indice_nivel
+	EstadoJogo.indice_nivel = 0
+	var chefe: Node = load("res://scenes/actors/ChefeGhorak.tscn").instantiate()
+	get_tree().root.add_child(chefe)
+	await get_tree().process_frame
+	await get_tree().process_frame
+	var vida_com := int(chefe.get("vida"))
+	var esperado := int(round(250.0 * 3.2 * float(ChefeBase.ALIVIO_R1[0]["vida"])))
+	_ok(absi(vida_com - esperado) <= 2,
+		"9H: o Ghorak devia ficar com ~%d de vida, ficou com %d" % [esperado, vida_com])
+	_ok(vida_com < int(round(250.0 * 3.2 * 0.75)),
+		"9H: o Ghorak do 1-1 continua com a vida antiga (%d)" % vida_com)
+	_ok(float(chefe.get("dano_onda")) < 22.0,
+		"9H: o dano por ataque do Ghorak nao desceu (%s)" % chefe.get("dano_onda"))
+	_ok(float(chefe.get("dur_exposto")) > 0.9,
+		"9H: a janela EXPOSTO do 1-1 devia ser mais generosa (%.2f s)" % chefe.get("dur_exposto"))
+	chefe.queue_free()
+	EstadoJogo.indice_nivel = antes
+
+
 func teste_9g_vfx_producao_regiao1() -> void:
 	const Vfx := preload("res://scripts/vfx_regiao1.gd")
 	var m := Vfx.manifesto()

@@ -1,0 +1,16 @@
+[gd_scene load_steps=2 format=3 uid="uid://bkolianiintro9h"]
+
+; Execution 9H: abertura em vídeo. É a `main_scene` do projeto; o menu
+; passou a ser a cena seguinte. Ver `scripts/intro.gd` para o porquê do
+; cartão de gesto no Web e do relógio de segurança.
+
+[ext_resource type="Script" path="res://scripts/intro.gd" id="1_intro"]
+
+[node name="Intro" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_intro")

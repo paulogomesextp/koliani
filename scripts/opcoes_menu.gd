@@ -18,6 +18,21 @@ extends Control
 @onready var _voltar: Button = $Painel/Coluna/Voltar
 
 var _botoes_idioma: Dictionary = {}
+var _layout: Button
+var _editor: Control
+
+
+## Abre o editor de layout de toque por cima das Opções.
+func _abrir_layout() -> void:
+	if _editor != null and is_instance_valid(_editor):
+		return
+	_editor = (load("res://scripts/editor_layout_toque.gd") as Script).new()
+	_editor.z_index = 50
+	add_child(_editor)
+	_editor.fechado.connect(func() -> void:
+		_editor = null
+		if is_inside_tree():
+			_layout.grab_focus())
 
 
 func _ready() -> void:
@@ -41,6 +56,14 @@ func _ready() -> void:
 		b.pressed.connect(_escolher_idioma.bind(loc))
 		_grelha.add_child(b)
 		_botoes_idioma[loc] = b
+
+	# Execution 9H: EDITAR LAYOUT -- só onde há toque. Num PC com teclado a
+	# entrada não aparece de todo (não há controlos de toque para arrumar).
+	if DisplayServer.is_touchscreen_available() or OS.has_feature("web"):
+		_layout = Button.new()
+		_layout.pressed.connect(_abrir_layout)
+		_grelha.get_parent().add_child(_layout)
+		_grelha.get_parent().move_child(_layout, _voltar.get_index())
 
 	_voltar.pressed.connect(_fechar)
 	# Execution 9F: kit de produção -- painel de ouro, botões da prancha 09,
@@ -87,6 +110,8 @@ func _traduzir() -> void:
 	_lbl_efeitos.text = Textos.t("options.effects")
 	_lbl_idioma.text = Textos.t("options.language")
 	_voltar.text = Textos.t("options.back")
+	if _layout:
+		_layout.text = Textos.t("options.touch_layout")
 	# realça o idioma atual
 	for loc: String in _botoes_idioma:
 		var b: Button = _botoes_idioma[loc]

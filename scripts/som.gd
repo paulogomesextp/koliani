@@ -28,6 +28,14 @@ const CAMINHOS := {
 	"conquista": "res://assets/audio/conquista.wav",
 	"transicao": "res://assets/audio/transicao.wav",
 	"carrossel": "res://assets/audio/carrossel.wav",
+	# --- vozes de interface (Execution 9H) --------------------------------
+	# O frontend novo pedia um som próprio: o `carrossel` era um clique seco
+	# de interface e destoava do menu de fantasia escura. Sintetizados por
+	# `tools/gerar_audio_9h.py` (sino + sopro, sem licenças).
+	"ui_mover": "res://assets/audio/ui_mover.wav",
+	"ui_confirmar": "res://assets/audio/ui_confirmar.wav",
+	"ui_voltar": "res://assets/audio/ui_voltar.wav",
+	"ui_negado": "res://assets/audio/ui_negado.wav",
 	"chefe_magia": "res://assets/audio/chefe_magia.ogg",
 	# sons de habilidade por chefe (2 set 2026)
 	"esmagar": "res://assets/audio/esmagar.ogg",

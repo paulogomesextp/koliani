@@ -1,8 +1,8 @@
 [gd_scene load_steps=2 format=3 uid="uid://bkolianiseletorniveis01"]
 
-; Carrossel de escolha de nível (cover-flow). Tudo -- cartões, setas, rodapé
-; -- é construído em runtime por seletor_niveis.gd. Usado pelo MapaMundo
-; (modo normal, respeita bloqueios) e pela DevBarra (modo dev, livre).
+; Mapa de REGIÃO (Execution 9H, prancha `02_level_selector_approved`). Tudo
+; -- nós, trilho, painel, abas -- é construído em runtime por seletor_niveis.gd.
+; Usado pelo MapaMundo (respeita bloqueios) e pela DevBarra (modo dev, livre).
 
 [ext_resource type="Script" path="res://scripts/seletor_niveis.gd" id="1_sel"]
 

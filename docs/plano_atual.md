@@ -1,4 +1,30 @@
-# Plano atual — Execution 8 Real Game Production Integration
+# Plano atual — Execution 9H: frontend de produção + slice final da Região I
+
+## Estado — 12 de setembro de 2026
+
+**9H PARTIAL PASS (v0.17.0). Região I pronta para o gate humano; Região II
+não iniciada.** O frontend inteiro passou a sair das pranchas aprovadas em
+`work/production_art_gate/10_menu_rebrand/`: intro em vídeo, menu, seletor
+(mapa de região), ícone/logo, HUD. Acrescentou-se o editor de layout de
+toque da PWA e responderam-se os onze apontamentos do Game Master
+(chefes L1–L5 mais fáceis, fundo mais nítido, inimigos com movimento,
+combos legíveis, áudio de interface).
+
+Relatório completo, com números medidos e armadilhas:
+[execution_9h_frontend_regiao1.md](execution_9h_frontend_regiao1.md).
+Ponto de retoma: [retomar_aqui.md](retomar_aqui.md).
+Pendentes de decisão: topo de [../PRIORIDADES.md](../PRIORIDADES.md).
+
+### Critério de conclusão do slice (o que falta para fechar o gate)
+
+1. **Revisão humana** de `work/execution_9h/folha_revisao_9h.png`.
+2. **Soundtrack**: entrega do pacote licenciado (bloqueio declarado).
+3. **Estatísticas do seletor**: decisão de design (ou manter as três linhas
+   que o jogo sabe responder).
+
+---
+
+## Plano anterior (Execution 8)
 
 ## Objetivo, âmbito e critério de conclusão 8 — 10 setembro 2026
 

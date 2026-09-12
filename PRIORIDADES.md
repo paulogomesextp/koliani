@@ -2,6 +2,51 @@
 
 ## Agora
 
+00000000000. **9H PARTIAL PASS (v0.17.0) -- frontend de producao + slice
+   final da Regiao I. PRONTO PARA REVISAO HUMANA.** Menu novo, **intro em
+   video**, icone/logo em todo o lado, **seletor = mapa de regiao** (nos,
+   trilho, painel, 20 abas), HUD em carmesim, **EDITAR LAYOUT** na PWA,
+   vozes de interface + ambiencia propria da Regiao I, **chefes L1-L5 mais
+   faceis** (Ghorak: vida 800->416, EXPOSTO 0,72->1,11 s), **fundo mais
+   nitido** (+19 % de acutancia medida), **inimigos e chefes com vida**
+   (respiracao/passada/recuo -- o `_process` saia cedo e nao corria nada),
+   **combos que se leem** (arco e tom proprios por golpe + selo x2/x3).
+   Tudo sai das pranchas aprovadas em
+   `work/production_art_gate/10_menu_rebrand/` -- **o caminho do briefing
+   (`9H_game_master_approved`) nao existe**. Provado no EXE de release
+   (intro pos=2,93 s, menu, mapa, L1-L5) e no Web (carrega, icone, cartao,
+   `<video>` a tocar). Pacote de revisao:
+   `work/execution_9h/folha_revisao_9h.png`. Relatorio:
+   `docs/execution_9h_frontend_regiao1.md`.
+
+   **PENDENTE DE DECISAO DO GAME MASTER:**
+
+   a) **SOUNDTRACK NOVA (`PRODUCTION AUDIO MISSING`).** Pediste "mudar
+      soundtrack completa". As 40 faixas atuais (20 de nivel + 20 de chefe)
+      sao pecas compostas, com licenca; troca-las por sintese seria pior, nao
+      melhor. **Preciso do pacote novo com a licenca** -- 20+20, ou um
+      conjunto menor com a regra de qual toca onde. O resto do audio que se
+      podia fazer sem licencas ja esta feito (vozes de interface, ambiencia
+      da floresta, tom por golpe do combo).
+
+   b) **ESTATISTICAS DO SELETOR (`APPROVED DESIGN / PRODUCTION ASSET
+      MISSING`).** A prancha mostra *Colecionaveis 0/3*, *Desafios 0/1* e
+      *Melhor Tempo*. O jogo nao tem nenhum dos tres. Ou decides o design (o
+      que conta como colecionavel? o que e um desafio? guarda-se o tempo por
+      nivel?) ou as tres linhas ficam como estao: guardiao / passo na regiao
+      / estado.
+
+   c) **CAPTURAS DO WEB EM CHROME REAL.** O pane de browser desta sessao
+      esteve escondido, e um pane escondido para o `requestAnimationFrame`
+      -- sem rAF o Godot Web fica parado e as capturas esgotam o tempo. O
+      build esta provado por outras vias; falta a foto do menu/seletor/HUD
+      no browser e os picos de audio.
+
+   Backlog tecnico: citacoes por regiao (so a I tem a aprovada); PCK do Web
+   com 285 MB; poses de ataque proprias para inimigos e para os golpes do
+   combo; `RaizPerigo`/agua venenosa/fogueira sem autoridade (da 9G); fonte
+   CJK livre para o chines no Web (da 9F).
+
 0000000000. **9G PASS (v0.16.1) -- VFX de producao da Regiao I.** Os efeitos
    passaram a sair da prancha 07 aprovada: golpes 2/3 do combo, dash,
    rolamento, salto duplo, aterragem, dano, morte, escudo, tiro; faiscas no

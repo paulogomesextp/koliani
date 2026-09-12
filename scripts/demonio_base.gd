@@ -354,6 +354,9 @@ func _ready() -> void:
 	if _anim:
 		_montar_frames()
 		_normalizar_escala()   # todas as espécies ao mesmo tamanho no ecrã
+		_anim_escala_base = _anim.scale
+		_sprite_base_y = _sprite.position.y if _sprite else 0.0
+		_fase_vida = randf() * TAU
 		_anim.play("idle")
 		_calibrar_pes()
 	if elite:
@@ -455,12 +458,14 @@ func _calibrar_pes() -> void:
 		return
 	# distância do CENTRO do frame aos pés, já com a escala aplicada
 	var pes_do_centro := (float(r.position.y + r.size.y) - float(img.get_height()) * 0.5) * _anim.scale.y
+	_pes_do_centro = pes_do_centro
 	# linha de chão = fundo da caixa de colisão do corpo
 	var col := get_node_or_null("CollisionShape2D") as CollisionShape2D
 	if col == null or not (col.shape is RectangleShape2D):
 		return
 	var chao_y := col.position.y + (col.shape as RectangleShape2D).size.y * 0.5
 	_anim.position.y = chao_y - pes_do_centro + 2.0  # +2 = enterra ligeiramente
+	_anim_base_y = _anim.position.y
 
 
 ## Monta os SpriteFrames a partir das tiras da espécie escolhida.
@@ -507,12 +512,9 @@ func _process(dt: float) -> void:
 		if _telegrafo > 0.0 and not _morto:
 			var p := 0.5 + 0.5 * sin(Time.get_ticks_msec() * 0.045)
 			_anim.modulate = Color(1, 1, 1).lerp(Color(2.6, 1.6, 1.4), p)
-			if _sprite:
-				_sprite.rotation = sin(Time.get_ticks_msec() * 0.09) * 0.06
 		elif not _morto and _congelado <= 0.0:
 			_anim.modulate = _anim.modulate.lerp(Color(1, 1, 1), dt * 4.0)
-			if _sprite and absf(_sprite.rotation) > 0.001:
-				_sprite.rotation = lerp_angle(_sprite.rotation, 0.0, dt * 10.0)
+		_vida_no_anim(dt)
 		return
 	if _corpo == null:
 		return
@@ -530,6 +532,87 @@ func _process(dt: float) -> void:
 	_corpo.scale = Vector2(sx, sy)
 	if _sprite:
 		_sprite.rotation = _flinch * _flinch_dir * 0.5
+
+
+## Fase própria de cada bicho, para um grupo não respirar em uníssono.
+var _fase_vida := 0.0
+## Escala que o `_normalizar_escala` deixou no `_anim` -- a camada de vida
+## MULTIPLICA esta, nunca a substitui (senão todos os bichos voltavam ao
+## tamanho da tira).
+var _anim_escala_base := Vector2.ONE
+var _sprite_base_y := 0.0
+## Distância do centro do frame aos pés (com escala), e a altura calibrada.
+## A respiração escala à volta do CENTRO do sprite; sem compensar isto, os
+## pés subiam e desciam ~4 px e o bicho parecia a flutuar.
+var _pes_do_centro := 0.0
+var _anim_base_y := 0.0
+var _no_ar_antes := false
+var _aterrou := 0.0
+
+
+## CAMADA DE VIDA (Execution 9H). O Game Master: os inimigos e os chefes
+## "parecem demasiado estáticos, quase imagem parada". Estavam mesmo: a arte
+## de produção da Região I (9D/9E) tem uma pose por estado, e o `_process`
+## RETORNAVA assim que existisse `_anim` -- toda a respiração, antecipação e
+## recuo que o caminho antigo (`_corpo`) fazia ficava por correr. Um bicho
+## com uma pose e sem camada procedimental é, literalmente, uma imagem
+## parada a deslizar pelo chão.
+##
+## O que esta camada acrescenta, sem tocar na arte aprovada nem na física:
+##
+##   respiração   sobe/desce lento + peito a encher (escala ±4 %)
+##   passada      salto vertical ao ritmo do andar, mais alto a correr
+##   inclinação   inclina-se para onde vai; recua no telégrafo
+##   antecipação  estica-se para trás antes de bater (`anticipacao`)
+##   recuo        encolhe e roda ao levar (`_flinch`)
+##   aterragem    esmaga e volta ao cair no chão
+##
+## A amplitude cai para 42 % quando a animação em curso tem mais do que um
+## frame: aí a arte já se mexe sozinha e isto é só movimento secundário.
+func _vida_no_anim(dt: float) -> void:
+	if _sprite == null or _anim == null:
+		return
+	if _morto:
+		return
+	_t_anim += dt
+	anticipacao = move_toward(anticipacao, 0.0, dt * 3.5)
+	_flinch = move_toward(_flinch, 0.0, dt * 6.0)
+	_aterrou = move_toward(_aterrou, 0.0, dt * 5.0)
+	var no_ar := not is_on_floor()
+	if _no_ar_antes and not no_ar:
+		_aterrou = 1.0
+	_no_ar_antes = no_ar
+
+	var quadros := 1
+	if _anim.sprite_frames != null and _anim.sprite_frames.has_animation(_anim.animation):
+		quadros = _anim.sprite_frames.get_frame_count(_anim.animation)
+	var g := 1.0 if quadros <= 1 else 0.42
+
+	var t := _t_anim + _fase_vida
+	var anda := absf(velocity.x) > 5.0
+	var vel := 9.0 if anda else 3.4
+	var amp := (2.8 if anda else 1.3) * g
+	# a passada usa |sin|: o pé toca o chão duas vezes por ciclo
+	_sprite.position.y = _sprite_base_y - absf(sin(t * vel)) * amp
+	var resp := sin(t * vel * 0.5) * 0.045 * g
+	var sx := 1.0 - resp + anticipacao * 0.20 * g - _flinch * 0.22 - _aterrou * 0.10
+	var sy := 1.0 + resp - anticipacao * 0.18 * g + _flinch * 0.18 + _aterrou * 0.14
+	var esc := _anim_escala_base * Vector2(maxf(sx, 0.4), maxf(sy, 0.4))
+	_anim.scale = esc
+	# os pés ficam no sítio: o que a escala afasta do centro, a posição repõe
+	if _pes_do_centro != 0.0 and _anim_escala_base.y != 0.0:
+		_anim.position.y = _anim_base_y - _pes_do_centro * (esc.y / _anim_escala_base.y - 1.0)
+
+	# inclinação: à frente a andar, atrás a preparar o golpe, sacudida no
+	# telégrafo. Tudo no `_sprite`, que é quem já trata da viragem.
+	var incl := 0.0
+	if anda:
+		incl += 0.055 * signf(velocity.x) * g
+	incl -= anticipacao * 0.11 * _direcao
+	incl += _flinch * _flinch_dir * 0.5
+	if _telegrafo > 0.0:
+		incl += sin(Time.get_ticks_msec() * 0.09) * 0.06
+	_sprite.rotation = lerp_angle(_sprite.rotation, incl, clampf(dt * 14.0, 0.0, 1.0))
 
 
 ## Estado da anim do inimigo comum (idle/run). "hit" e "dead" mandam.

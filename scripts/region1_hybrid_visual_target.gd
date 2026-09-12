@@ -32,11 +32,19 @@ const Kit := preload("res://scripts/regiao1_kit.gd")
 
 const COR_SHADOWBLADE := Color("bb8cff")
 const COR_SHADOWBLADE_NUCLEO := Color("f1e5ff")
-const TEX_BACKGROUND_APPROVED := preload("res://assets/art/regions/region_01_forest/production/backgrounds/region1_panorama_heart_tree.png")
-const TEX_BACKGROUND_LEFT := preload("res://assets/art/regions/region_01_forest/production/backgrounds/region1_panorama_left_cap.png")
-const TEX_BACKGROUND_RIGHT := preload("res://assets/art/regions/region_01_forest/production/backgrounds/region1_panorama_right_cap.png")
-## Coluna da Heart Tree dentro do panorama (px da textura; 08: x≈450 − 18).
-const HEART_TREE_X := 432.0
+## Execution 9H: o panorama passou a vir em DOBRO (Lanczos + máscara de
+## desfoque, `tools/nitidez_panorama_9h.py`) e desenha-se a 1,5x em vez de
+## 3x. A geometria no mundo é a mesma (2 x 1,5 = 3); o que muda é que metade
+## da ampliação deixou de ser feita pelo filtro bilinear do GPU -- era essa
+## a razão de o fundo parecer desfocado.
+const TEX_BACKGROUND_APPROVED := preload("res://assets/art/regions/region_01_forest/production/backgrounds/region1_panorama_heart_tree_x2.png")
+const TEX_BACKGROUND_LEFT := preload("res://assets/art/regions/region_01_forest/production/backgrounds/region1_panorama_left_cap_x2.png")
+const TEX_BACKGROUND_RIGHT := preload("res://assets/art/regions/region_01_forest/production/backgrounds/region1_panorama_right_cap_x2.png")
+## Fator a que o panorama já vem ampliado no disco.
+const PANORAMA_HD := 2.0
+## Coluna da Heart Tree dentro do panorama (px da textura de origem; 08:
+## x≈450 − 18), convertida para os píxeis da textura em dobro.
+const HEART_TREE_X := 432.0 * PANORAMA_HD
 
 var _camadas: Array = []          # [Node2D, fator Vector2]
 var _particulas: CPUParticles2D
@@ -174,10 +182,11 @@ func _montar_background(p: Dictionary) -> void:
 	# 18% mais escuro: a camada mais funda recua, e o magenta da Heart Tree
 	# deixa de concorrer com a corrupção do plano de jogo
 	camada.modulate = Kit.tinta(p) * Color(0.82, 0.82, 0.82, 1.0)
-	# Escala uniforme 3x (a 4x da 6A, vezes o zoom 1,4 da câmara, a prancha
-	# desfocava). A Heart Tree fica a meio do nível com a câmara na referência;
-	# os caps são as extremidades espelhadas, encostadas pixel a pixel.
-	var e := 3.0
+	# Escala 3x no MUNDO (a 4x da 6A, vezes o zoom 1,4 da câmara, a prancha
+	# desfocava), mas metade dela já vem feita no disco: 3 / PANORAMA_HD.
+	# A Heart Tree fica a meio do nível com a câmara na referência; os caps
+	# são as extremidades espelhadas, encostadas pixel a pixel.
+	var e := 3.0 / PANORAMA_HD
 	var x0 := referencia.x - HEART_TREE_X * e
 	var y0 := 170.0
 	var fim := x0 + TEX_BACKGROUND_APPROVED.get_width() * e
@@ -413,6 +422,20 @@ func _restaurar_skin_hud() -> void:
 	_hud_aplicado = false
 
 
+const SHADER_NITIDEZ := preload("res://assets/shaders/nitidez_fundo.gdshader")
+
+## Máscara de desfoque no pixel do ECRÃ (ver `nitidez_fundo.gdshader`).
+## `ampliacao` é a escala a que a peça vai ser desenhada: quanto mais se
+## amplia, mais macia fica, e mais força precisa. Sem tecto não é: acima de
+## ~0,8 a aresta ganha halo branco e a pintura parece recortada.
+static func _nitidez(s: Sprite2D, ampliacao: float) -> void:
+	var mat := ShaderMaterial.new()
+	mat.shader = SHADER_NITIDEZ
+	mat.set_shader_parameter("forca", clampf(0.30 * ampliacao + 0.20, 0.35, 1.05))
+	mat.set_shader_parameter("raio", 1.30)
+	s.material = mat
+
+
 func _sprite_fundo(camada: Node2D, t: Texture2D, pos: Vector2, e: float,
 		espelho: bool) -> Sprite2D:
 	var s := Sprite2D.new()
@@ -421,6 +444,7 @@ func _sprite_fundo(camada: Node2D, t: Texture2D, pos: Vector2, e: float,
 	s.scale = Vector2(-e if espelho else e, e)
 	s.position = pos + (Vector2(t.get_width() * e, 0.0) if espelho else Vector2.ZERO)
 	s.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+	_nitidez(s, e)
 	camada.add_child(s)
 	return s
 
@@ -435,6 +459,7 @@ func _faixa(camada: Node2D, t: Texture2D, pos: Vector2, tam: Vector2, e: float) 
 	s.region_rect = Rect2(Vector2.ZERO, tam)
 	s.scale = Vector2(e, e)
 	s.position = pos
+	_nitidez(s, e)
 	camada.add_child(s)
 	return s
 
@@ -447,5 +472,6 @@ func _sprite_aprovado(camada: Node2D, textura: Texture2D, pos: Vector2,
 	s.position = pos
 	s.scale = escala
 	s.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+	_nitidez(s, maxf(absf(escala.x), absf(escala.y)))
 	camada.add_child(s)
 	return s

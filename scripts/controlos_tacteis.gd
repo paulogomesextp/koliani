@@ -67,6 +67,16 @@ const APANHA_MAX := 96.0
 ## polegar, no canto de cima -- mas TEM de existir, num telemóvel não há ESC.
 const R_PAUSA := 30.0
 
+## LAYOUT DO JOGADOR (Execution 9H). Vazio = layout de fábrica (as
+## constantes acima). Cheio = o que o jogador guardou em Opções -> EDITAR
+## LAYOUT, em frações do viewport (ver `LayoutToque`).
+var layout: Dictionary = {}
+## Em modo de edição os toques MOVEM os controlos em vez de os carregar.
+var modo_edicao := false
+## Controlo agarrado no editor: "joy", "pausa" ou o nome de uma ação.
+var selecionado := ""
+signal layout_mexido
+
 var _escala := 1.0
 var _centro_botoes := Vector2.ZERO
 var _joy_base := Vector2.ZERO
@@ -95,6 +105,8 @@ const SO_COM_BOTAO := ["lancar", "defender"]
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	if not modo_edicao:
+		layout = LayoutToque.carregar()
 	resized.connect(_medir)
 	visibility_changed.connect(_so_com_botao)
 	_medir()
@@ -120,23 +132,135 @@ func _medir() -> void:
 	# HUD subiu com ele -- senão o aro passava por cima delas.
 	_joy_raio = 118.0 * _escala
 	_joy_base = Vector2(_joy_raio * 1.55, size.y - _joy_raio * 1.35)
-	_joy_actual = _joy_base
 	_centro_botoes = Vector2(size.x - 118.0 * _escala, size.y - 118.0 * _escala)
 	# por BAIXO do contador de essência, que vive de y=16 a y=54 no canto
 	_pausa_centro = Vector2(size.x - R_PAUSA * 1.5 * _escala, 104.0 * _escala)
+	# o layout do jogador manda por cima de tudo o que ficou medido acima
+	var j: Dictionary = layout.get("joystick", {})
+	if j.has("x"):
+		_joy_base = Vector2(float(j["x"]) * size.x, float(j.get("y", 0.76)) * size.y)
+	if j.has("r"):
+		_joy_raio = LayoutToque.prender_raio(float(j["r"])) * size.y
+	var pa: Dictionary = layout.get("pausa", {})
+	if pa.has("x"):
+		_pausa_centro = Vector2(float(pa["x"]) * size.x, float(pa.get("y", 0.14)) * size.y)
+	_joy_actual = _joy_base
 	queue_redraw()
 
 
-## Centro e raio de um botão, já com a escala do ecrã.
+## Raio da pausa, já com o layout do jogador.
+func _raio_pausa() -> float:
+	var pa: Dictionary = layout.get("pausa", {})
+	if pa.has("r"):
+		return LayoutToque.prender_raio(float(pa["r"])) * size.y
+	return R_PAUSA * _escala
+
+
+## Centro e raio de um botão, já com a escala do ecrã e com o layout do
+## jogador por cima (se houver).
 func _sitio(b: Dictionary) -> Array:
-	return [_centro_botoes + Vector2(b["dx"], b["dy"]) * _escala,
-		float(b["r"]) * _escala]
+	var accao := str(b["accao"])
+	var meu: Dictionary = (layout.get("botoes", {}) as Dictionary).get(accao, {})
+	var c: Vector2 = _centro_botoes + Vector2(b["dx"], b["dy"]) * _escala
+	var r: float = float(b["r"]) * _escala
+	if meu.has("x"):
+		c = Vector2(float(meu["x"]) * size.x, float(meu.get("y", 0.8)) * size.y)
+	if meu.has("r"):
+		r = LayoutToque.prender_raio(float(meu["r"])) * size.y
+	return [c, r]
+
+
+## O layout ATUAL em frações do viewport -- é o que o editor guarda.
+func layout_actual() -> Dictionary:
+	var botoes := {}
+	for b in BOTOES:
+		var s := _sitio(b)
+		botoes[str(b["accao"])] = {
+			"x": (s[0] as Vector2).x / maxf(size.x, 1.0),
+			"y": (s[0] as Vector2).y / maxf(size.y, 1.0),
+			"r": float(s[1]) / maxf(size.y, 1.0)}
+	return {
+		"joystick": {"x": _joy_base.x / maxf(size.x, 1.0),
+			"y": _joy_base.y / maxf(size.y, 1.0),
+			"r": _joy_raio / maxf(size.y, 1.0)},
+		"pausa": {"x": _pausa_centro.x / maxf(size.x, 1.0),
+			"y": _pausa_centro.y / maxf(size.y, 1.0),
+			"r": _raio_pausa() / maxf(size.y, 1.0)},
+		"botoes": botoes,
+	}
+
+
+# ── edição ───────────────────────────────────────────────────────────────
+
+## Qual o controlo mais perto de `pos` (em píxeis do ecrã).
+func controlo_em(pos: Vector2) -> String:
+	if pos.distance_to(_pausa_centro) <= _raio_pausa() * 1.4:
+		return "pausa"
+	for b in BOTOES:
+		var s := _sitio(b)
+		if pos.distance_to(s[0]) <= float(s[1]) * 1.25:
+			return str(b["accao"])
+	if pos.distance_to(_joy_base) <= _joy_raio * 1.15:
+		return "joy"
+	return ""
+
+
+## Põe o controlo `qual` em `pos` (píxeis), preso ao ecrã.
+func mover_controlo(qual: String, pos: Vector2) -> void:
+	if qual == "":
+		return
+	var f := Vector2(pos.x / maxf(size.x, 1.0), pos.y / maxf(size.y, 1.0))
+	var r := _raio_de(qual) / maxf(size.y, 1.0)
+	f = LayoutToque.prender(f, r, size.y / maxf(size.x, 1.0))
+	_definir(qual, {"x": f.x, "y": f.y})
+
+
+## Muda o tamanho do controlo `qual` em `delta` (fração da altura).
+func redimensionar(qual: String, delta: float) -> void:
+	if qual == "":
+		return
+	var r := LayoutToque.prender_raio(_raio_de(qual) / maxf(size.y, 1.0) + delta)
+	_definir(qual, {"r": r})
+
+
+func _raio_de(qual: String) -> float:
+	if qual == "joy":
+		return _joy_raio
+	if qual == "pausa":
+		return _raio_pausa()
+	for b in BOTOES:
+		if str(b["accao"]) == qual:
+			return float(_sitio(b)[1])
+	return 40.0
+
+
+func _definir(qual: String, campos: Dictionary) -> void:
+	var base := layout_actual()
+	if qual == "joy":
+		(base["joystick"] as Dictionary).merge(campos, true)
+	elif qual == "pausa":
+		(base["pausa"] as Dictionary).merge(campos, true)
+	else:
+		var bs: Dictionary = base["botoes"]
+		if not bs.has(qual):
+			return
+		(bs[qual] as Dictionary).merge(campos, true)
+	layout = base
+	_medir()
+	layout_mexido.emit()
+
+
+## Volta ao layout de fábrica (em memória -- quem grava é o editor).
+func repor_layout() -> void:
+	layout = {}
+	_medir()
+	layout_mexido.emit()
 
 
 # ── toque ────────────────────────────────────────────────────────────────
 
 func _input(evento: InputEvent) -> void:
-	if not visible:
+	if not visible or modo_edicao:
 		return
 	# So' se marca o evento como tratado quando ELE E' NOSSO. Marcar sempre
 	# tirava o toque a tudo o resto: os botoes WEAPONS/ARMOR da propria HUD
@@ -158,7 +282,7 @@ func _input(evento: InputEvent) -> void:
 
 ## Devolve `true` se o dedo caiu num controlo nosso.
 func _pousar(index: int, pos: Vector2) -> bool:
-	if pos.distance_to(_pausa_centro) <= R_PAUSA * _escala * 1.3:
+	if pos.distance_to(_pausa_centro) <= _raio_pausa() * 1.3:
 		_dedos[index] = "pausa"
 		_premir("pausa", true)
 		queue_redraw()
@@ -303,10 +427,11 @@ func _draw() -> void:
 			pv + Vector2(a * 0.8, -lado * a * 0.5)]), Color(C_BORDA, C_BORDA.a * 0.6))
 
 	# pausa: duas barras, o símbolo de sempre
-	draw_circle(_pausa_centro, R_PAUSA * _escala, C_FUNDO)
-	draw_arc(_pausa_centro, R_PAUSA * _escala, 0.0, TAU, 28, C_BORDA, 2.5 * _escala, true)
+	var rp := _raio_pausa()
+	draw_circle(_pausa_centro, rp, C_FUNDO)
+	draw_arc(_pausa_centro, rp, 0.0, TAU, 28, C_BORDA, 2.5 * _escala, true)
 	for l in [-1.0, 1.0]:
-		var barra := R_PAUSA * _escala * 0.34
+		var barra := rp * 0.34
 		draw_rect(Rect2(_pausa_centro + Vector2(l * barra - barra * 0.28, -barra),
 			Vector2(barra * 0.55, barra * 2.0)), C_ICONE)
 
@@ -319,6 +444,30 @@ func _draw() -> void:
 		draw_arc(c, r, 0.0, TAU, 40, C_BORDA_PRESSA if premido else C_BORDA,
 			3.0 * _escala, true)
 		_icone(str(b["icone"]), c, r * 0.52)
+
+	if modo_edicao:
+		_marcar_selecionado()
+
+
+## No editor de layout, o controlo agarrado leva um halo e um alvo: sem isto
+## não se sabe qual é que os botões − / + vão mudar.
+func _marcar_selecionado() -> void:
+	var alvos := {"joy": [_joy_base, _joy_raio], "pausa": [_pausa_centro, _raio_pausa()]}
+	for b in BOTOES:
+		var s := _sitio(b)
+		alvos[str(b["accao"])] = [s[0], s[1]]
+	for chave: String in alvos:
+		var c: Vector2 = alvos[chave][0]
+		var r: float = alvos[chave][1]
+		var escolhido := chave == selecionado
+		var cor := Color(1.0, 0.42, 0.48, 0.95) if escolhido else Color(1.0, 0.9, 0.95, 0.28)
+		draw_arc(c, r + 6.0 * _escala, 0.0, TAU, 48, cor, (4.0 if escolhido else 1.5) * _escala, true)
+		if not escolhido:
+			continue
+		# cruz de mira no centro: diz que ISTO é que se está a arrastar
+		var a := r * 0.34
+		draw_line(c - Vector2(a, 0), c + Vector2(a, 0), cor, 2.5 * _escala, true)
+		draw_line(c - Vector2(0, a), c + Vector2(0, a), cor, 2.5 * _escala, true)
 
 
 ## Os ícones são polígonos: à escala a que isto se vê num telemóvel, um

@@ -1,0 +1,294 @@
+extends Control
+## INTRO EM VÍDEO (Execution 9H). É a `main_scene` do projeto: o jogo
+## arranca aqui, toca o vídeo aprovado
+## (`10_menu_rebrand/05_intro_video_approved`, convertido para Ogg Theora
+## por ser o único formato que o `VideoStreamPlayer` do Godot lê) e passa
+## ao menu.
+##
+## TRÊS COISAS QUE TÊM DE SER VERDADE, E PORQUÊ:
+##
+##  1. **O arranque nunca pode ficar preso aqui.** Se o ficheiro não estiver
+##     importado, se o descodificador falhar, ou se o vídeo simplesmente não
+##     começar a andar, `_desistir()` leva ao menu. O relógio de segurança
+##     (`ESPERA_ARRANQUE`) é o que apanha o caso mau de verdade -- o vídeo
+##     que diz que está a tocar e não avança um único frame.
+##  2. **No browser não há autoplay com som.** O contexto de áudio nasce
+##     suspenso e só um gesto o acorda; um vídeo que arrancasse sozinho ia
+##     ser mudo. Por isso no Web (e em qualquer ecrã de toque) mostra-se
+##     primeiro um cartão "TOCAR PARA JOGAR": o toque é o gesto, e o vídeo
+##     começa depois dele.
+##  3. **Salta-se sempre.** Qualquer tecla, botão do rato ou toque salta.
+##     Ninguém quer ver a mesma abertura à décima vez.
+##
+## Os atalhos de dev (`--nivel=`, `--foto…`, `--jogar`, `--devmode`) e as
+## provas de runtime passam ao lado da intro: quem os usa quer o jogo, não
+## a abertura.
+
+const CENA_MENU := "res://scenes/ui/MenuInicial.tscn"
+const VIDEO := "res://assets/video/intro_koliani.ogv"
+## No Web o vídeo é um `<video>` do DOM, servido ao lado do `index.html`
+## (ver `web/README.md`). O caminho é relativo: a PWA pode estar em
+## qualquer subpasta.
+const VIDEO_WEB := "intro_koliani.mp4"
+
+## Quanto tempo se espera até decidir que o vídeo não arrancou.
+const ESPERA_ARRANQUE := 1.6
+## Teto absoluto (o vídeo aprovado tem 10 s; a folga é para o Web lento).
+const TETO := 26.0
+
+var _video: VideoStreamPlayer
+var _cartao: Control
+var _saltar: Label
+var _acabou := false
+var _a_tocar := false
+
+
+func _ready() -> void:
+	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	# O clique TEM de chegar ao `_unhandled_input`. Um `Control` nasce com
+	# `MOUSE_FILTER_STOP` e come o evento: no Web, o cartão "TOCAR PARA
+	# JOGAR" ficava a piscar e o toque não fazia nada -- visto no Chrome
+	# real com o build 0.17.0. No PC nunca se via, porque lá não há cartão.
+	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	if _saltar_intro():
+		_ir_menu(true)
+		return
+
+	var fundo := ColorRect.new()
+	fundo.color = Color(0.02, 0.01, 0.02)
+	fundo.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	fundo.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(fundo)
+
+	_video = VideoStreamPlayer.new()
+	_video.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_video.expand = true
+	_video.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_video.autoplay = false
+	_video.finished.connect(_ao_fim)
+	add_child(_video)
+
+	_saltar = Label.new()
+	_saltar.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
+	_saltar.offset_top = -60.0
+	_saltar.offset_bottom = -24.0
+	_saltar.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_saltar.modulate.a = 0.0
+	_saltar.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	Frontend9H.capitular(_saltar, 13, Frontend9H.TEXTO_APAGADO)
+	_saltar.text = Frontend9H.espacar(Textos.t("menu.press_enter"), 1)
+	add_child(_saltar)
+
+	# No Web o vídeo é do DOM (ver `_intro_web`): não se carrega o Theora,
+	# que lá só ocuparia memória e nunca seria descodificado.
+	if not OS.has_feature("web"):
+		if ResourceLoader.exists(VIDEO):
+			var fluxo := load(VIDEO)
+			if fluxo is VideoStream:
+				_video.stream = fluxo
+		if _video.stream == null:
+			push_warning("INTRO 9H: sem vídeo importado -- a saltar para o menu")
+			_ir_menu(true)
+			return
+
+	# No Web o áudio só acorda com um gesto do utilizador; num telemóvel a
+	# regra é a mesma. Sem cartão, a intro seria muda.
+	if OS.has_feature("web") or DisplayServer.is_touchscreen_available():
+		_mostrar_cartao()
+	else:
+		_arrancar()
+
+	get_tree().create_timer(TETO).timeout.connect(func() -> void:
+		if not _acabou:
+			_ao_fim())
+	_prova_intro()
+
+
+## Cartão mínimo de gesto: logótipo + "TOCAR PARA JOGAR".
+func _mostrar_cartao() -> void:
+	_cartao = Control.new()
+	_cartao.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_cartao.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	add_child(_cartao)
+	var logo := TextureRect.new()
+	logo.texture = load("res://assets/branding/icone_9h_512.png") if \
+		ResourceLoader.exists("res://assets/branding/icone_9h_512.png") else null
+	logo.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	logo.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	logo.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+	logo.offset_left = -150.0
+	logo.offset_top = -180.0
+	logo.offset_right = 150.0
+	logo.offset_bottom = 120.0
+	logo.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	logo.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+	_cartao.add_child(logo)
+	var l := Label.new()
+	Frontend9H.capitular(l, 20, Frontend9H.OSSO)
+	l.text = Frontend9H.espacar(Textos.t("menu.tap_play"), 1)
+	l.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+	l.offset_left = -400.0
+	l.offset_right = 400.0
+	l.offset_top = 150.0
+	l.offset_bottom = 190.0
+	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_cartao.add_child(l)
+	var t := create_tween().set_loops()
+	t.tween_property(l, "modulate:a", 0.42, 1.1).set_trans(Tween.TRANS_SINE)
+	t.tween_property(l, "modulate:a", 1.0, 1.1).set_trans(Tween.TRANS_SINE)
+
+
+## NO WEB O VÍDEO NÃO É DO GODOT. O export Web é single-threaded e
+## descodificar Theora em wasm bloqueia a thread principal: com a intro a
+## tocar, a página deixava de responder (medido -- nem um `screenshot` nem
+## um `eval` voltavam). Um `<video>` do DOM é descodificado pelo browser,
+## por hardware, sem tocar na thread do jogo; toca com som porque já houve o
+## gesto do cartão; e se falhar (ficheiro em falta, codec recusado) o estado
+## vem "erro" e vai-se para o menu na mesma.
+const JS_INTRO := """
+window.kolianiIntro = (function(){
+  var estado = 'idle', v = null;
+  window.kolianiIntroTocar = function(url){
+	try{
+	  v = document.createElement('video');
+	  v.src = url; v.setAttribute('playsinline',''); v.preload = 'auto';
+	  v.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;' +
+		'object-fit:contain;background:#0b0509;z-index:20';
+	  v.addEventListener('ended', function(){ window.kolianiIntroSaltar(); });
+	  v.addEventListener('error', function(){ estado = 'erro'; window.kolianiIntroSaltar(); });
+	  v.addEventListener('pointerdown', function(){ window.kolianiIntroSaltar(); });
+	  document.body.appendChild(v);
+	  var p = v.play();
+	  if (p && p.catch) p.catch(function(){ estado = 'erro'; window.kolianiIntroSaltar(); });
+	  if (estado !== 'erro') estado = 'a_tocar';
+	}catch(e){ estado = 'erro'; }
+  };
+  window.kolianiIntroSaltar = function(){
+	if (estado !== 'erro') estado = 'fim';
+	try{ if (v){ v.pause(); v.remove(); v = null; } }catch(e){}
+  };
+  window.kolianiIntroEstado = function(){ return estado; };
+  return true;
+})();
+"""
+
+
+## Toca a intro no browser e devolve quando ela acabar (ou falhar).
+func _intro_web() -> void:
+	_a_tocar = true
+	JavaScriptBridge.eval(JS_INTRO, true)
+	var url: Variant = JavaScriptBridge.eval(
+		"(function(){var b=location.href.split('?')[0].split('#')[0];" +
+		"return b.substring(0, b.lastIndexOf('/') + 1) + '%s';})()" % VIDEO_WEB, true)
+	JavaScriptBridge.eval("window.kolianiIntroTocar(%s)" % JSON.stringify(str(url)), true)
+	var fim := Time.get_ticks_msec() + int(TETO * 1000.0)
+	while Time.get_ticks_msec() < fim:
+		await get_tree().create_timer(0.2).timeout
+		if _acabou:
+			return
+		var e := str(JavaScriptBridge.eval("window.kolianiIntroEstado()", true))
+		if e == "fim" or e == "erro":
+			if e == "erro":
+				push_warning("INTRO 9H: o <video> do browser não tocou -- a saltar")
+			break
+	JavaScriptBridge.eval("window.kolianiIntroSaltar()", true)
+	_ao_fim()
+
+
+func _arrancar() -> void:
+	if _cartao:
+		_cartao.queue_free()
+		_cartao = null
+	if OS.has_feature("web"):
+		_intro_web()
+		return
+	_video.play()
+	_a_tocar = true
+	var t := create_tween()
+	t.tween_interval(1.2)
+	t.tween_property(_saltar, "modulate:a", 0.85, 0.5)
+	# Relógio de segurança: o `VideoStreamPlayer` pode aceitar o `play()` e
+	# nunca avançar (descodificador em falta no export). Mede-se a POSIÇÃO,
+	# não o `is_playing()` -- foi o `is_playing()` a dizer que sim com o
+	# vídeo parado que motivou este relógio.
+	await get_tree().create_timer(ESPERA_ARRANQUE).timeout
+	if not _acabou and _video.stream_position <= 0.02:
+		push_warning("INTRO 9H: o vídeo não avançou em %.1fs -- a saltar" % ESPERA_ARRANQUE)
+		_ao_fim()
+
+
+func _unhandled_input(evento: InputEvent) -> void:
+	if _acabou:
+		return
+	var gesto := false
+	if evento is InputEventKey:
+		gesto = (evento as InputEventKey).pressed and not (evento as InputEventKey).echo
+	elif evento is InputEventMouseButton:
+		gesto = (evento as InputEventMouseButton).pressed
+	elif evento is InputEventScreenTouch:
+		gesto = (evento as InputEventScreenTouch).pressed
+	elif evento is InputEventJoypadButton:
+		gesto = (evento as InputEventJoypadButton).pressed
+	if not gesto:
+		return
+	get_viewport().set_input_as_handled()
+	if not _a_tocar:
+		_arrancar()
+	else:
+		_ao_fim()
+
+
+func _ao_fim() -> void:
+	if _acabou:
+		return
+	_acabou = true
+	if _video and _video.is_playing():
+		_video.stop()
+	if OS.has_feature("web"):
+		JavaScriptBridge.eval("if(window.kolianiIntroSaltar)window.kolianiIntroSaltar()", true)
+	_ir_menu(false)
+
+
+func _ir_menu(imediato: bool) -> void:
+	if imediato:
+		get_tree().change_scene_to_file.call_deferred(CENA_MENU)
+		return
+	Transicao.fechar_e(func() -> void: get_tree().change_scene_to_file(CENA_MENU))
+
+
+## A intro não se mete no caminho de quem pediu o jogo por linha de comando.
+## A exceção é o `--foto-intro=`, que é precisamente para a fotografar.
+func _saltar_intro() -> bool:
+	for a in OS.get_cmdline_user_args():
+		if a.begins_with("--foto-intro="):
+			return false
+	for a in OS.get_cmdline_user_args():
+		if a == "--sem-intro" or a == "--jogar" or a == "--devmode" \
+				or a.begins_with("--nivel=") or a.begins_with("--foto"):
+			return true
+	return false
+
+
+## Prova da intro no EXE / no browser: `--foto-intro=<png>@<segundos>`
+## arranca o vídeo sem esperar gesto e fotografa o ecrã ao fim desse tempo,
+## imprimindo a POSIÇÃO do stream -- é a posição que prova que o vídeo anda
+## mesmo (o `is_playing()` diz que sim com o vídeo parado; foi por isso que
+## o relógio de segurança mede a posição e não o estado).
+func _prova_intro() -> void:
+	for a in OS.get_cmdline_user_args():
+		if not a.begins_with("--foto-intro="):
+			continue
+		var valor := a.get_slice("=", 1)
+		var caminho := valor
+		var quando := 3.0
+		if "@" in valor:
+			caminho = valor.get_slice("@", 0)
+			quando = float(valor.get_slice("@", 1))
+		_arrancar()
+		await get_tree().create_timer(quando).timeout
+		var img := get_viewport().get_texture().get_image()
+		img.save_png(caminho)
+		print("PROVA RUNTIME INTRO: %s | pos=%.2fs | a_tocar=%s"
+			% [caminho, _video.stream_position, str(_video.is_playing())])
+		get_tree().quit(0)
+		return

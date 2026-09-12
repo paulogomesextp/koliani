@@ -25,6 +25,13 @@ const CAMINHO := "res://assets/audio/bg_niveis.mp3"       # "Shadow of the Forsa
 const CAMINHO_MENU := "res://assets/audio/bg_menu.mp3"    # "The Alchemist's Library"
 const CAMINHO_BOSS := "res://assets/audio/bg_boss.mp3"    # "Final Battle II" (Nyxaurora)
 const CAMINHO_ASSOMBRACAO := "res://assets/audio/assombracao.wav"
+## Execution 9H: ambiência própria da Região I -- vento nas folhas, água ao
+## longe e um bordão de corrupção. A `assombracao` é uma casa assombrada
+## (rangidos, correntes) e nunca foi uma floresta; nos cinco primeiros
+## níveis é esta que toca por baixo da música.
+const CAMINHO_AMB_FLORESTA := "res://assets/audio/ambiente_floresta.wav"
+## Quantos níveis da campanha usam a ambiência de floresta (a Região I).
+const NIVEIS_FLORESTA := 5
 
 ## 20 faixas de nível / 20 de chefe, em ciclo (ver assets/audio/CREDITS.md
 ## para a fonte de cada uma -- todas CC0/CC-BY do OpenGameArt).
@@ -64,8 +71,8 @@ func _ready() -> void:
 	_amb.volume_db = VOL_ASSOMBRACAO
 	_amb.finished.connect(func() -> void: _amb.play())
 	add_child(_amb)
-	if ResourceLoader.exists(CAMINHO_ASSOMBRACAO):
-		_amb.stream = _carregar_loop(CAMINHO_ASSOMBRACAO)
+	_escolher_ambiencia()
+	if _amb.stream:
 		_amb.play()
 	if OS.has_feature("web"):
 		# O Safari pode descartar uma faixa iniciada antes do primeiro gesto,
@@ -145,6 +152,7 @@ func parar() -> void:
 ## Troca a cama para `caminho`/`pitch`/`vol` (sem cortar se já for isso) e
 ## liga/desliga a camada de assombração.
 func _tocar(caminho: String, pitch: float, vol: float, com_assombracao: bool) -> void:
+	_escolher_ambiencia()
 	if _amb.stream:
 		if com_assombracao and not _amb.playing:
 			_amb.play()
@@ -161,6 +169,25 @@ func _tocar(caminho: String, pitch: float, vol: float, com_assombracao: bool) ->
 	_caminho_atual = caminho
 	_pitch_atual = pitch
 	_p.play()
+
+
+## Qual a cama de ambiência para o sítio onde se está. Troca-se só quando
+## muda mesmo (um `stream =` novo reinicia a reprodução, e ouvia-se o
+## corte a cada mudança de faixa).
+var _amb_caminho := ""
+
+
+func _escolher_ambiencia() -> void:
+	var quer := CAMINHO_AMB_FLORESTA if EstadoJogo.indice_nivel < NIVEIS_FLORESTA 		else CAMINHO_ASSOMBRACAO
+	if not ResourceLoader.exists(quer):
+		quer = CAMINHO_ASSOMBRACAO
+	if quer == _amb_caminho or not ResourceLoader.exists(quer):
+		return
+	var tocava := _amb.playing
+	_amb.stream = _carregar_loop(quer)
+	_amb_caminho = quer
+	if tocava:
+		_amb.play()
 
 
 ## Carrega um .wav e força o loop no próprio recurso. Em 4.7.2 o
