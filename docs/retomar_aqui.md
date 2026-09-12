@@ -4,6 +4,69 @@
 
 Atualizado em 12 de setembro de 2026 (9H.12E).
 
+## 9H.13/14 — SFX, corrida da Koliani e tremor do L2 (12 set 2026)
+
+Ramo `claude/9h13-14-audio-koliani-l2` (NÃO integrado em `master`).
+Relatório: [`execution_9h13_14_audio_koliani_l2.md`](execution_9h13_14_audio_koliani_l2.md).
+
+**Feito e provado:**
+
+- **23 SFX refeitos** (`tools/gerar_sfx_9h13.py`, tudo sintetizado aqui). O
+  que conta não é a lista, é o método: três camadas (corpo grave +
+  transiente de 3–8 ms + cauda com ecos) em vez de uma, nenhuma senoide a
+  descoberto, e picos hierarquizados por som (`ALVO`, 0,40 a 0,92) em vez de
+  normalizar tudo ao máximo — por isso nada clipa e o remate manda na
+  mistura. O **combo passou a ter 4 sons próprios** (antes eram 2 samples
+  com `pitch_scale`, que se lê logo como sample repetido).
+- **O tremor do fundo do L2 era o `position_smoothing` do `Camera2D`.** É
+  resolvido no passo de FÍSICA e o projecto tem `physics_interpolation`
+  ligada; acima dos 60 Hz (o ecrã do Paulo anda a 165) as duas suavizações
+  lutam e a vista avança aos saltos. Em regime permanente: **1,70 de
+  dp/média com smoothing, 0,87 sem ele, 0,22 a 60 Hz**. Fora ele, o
+  look-ahead é que dá o toque de câmara.
+- **Cadência da corrida** passa a acompanhar a velocidade: o ciclo corria
+  sempre a 13,33 fps = 0,75 s, e a 240 px/s são **180 px de chão por uma só
+  passada** — o pé varria o chão.
+
+**Armadilhas de método a não repetir** (custaram os primeiros ensaios todos):
+
+- Medir tremor **sem `--fixed-fps` não mede nada**: com vsync desligado o
+  frame dura entre 1,2 e 17,3 ms e o avanço por frame varia na mesma
+  proporção — isso é correcto. Tremor é a VELOCIDADE a oscilar.
+- Não se mede **encostado a uma parede** (o 1.º ensaio saiu 141 frames
+  parados em 150) nem em cima de uma **inversão de marcha** (o look-ahead de
+  112 px acelera a câmara de propósito).
+
+**Duas hipóteses testadas e DESCARTADAS:**
+
+- Refazer o atraso da câmara à mão no `_process` dá **pior** (2781 px/s de
+  pico): em `_process`, `global_position` é a posição da FÍSICA e anda aos
+  degraus de 60 Hz — é misturar dois relógios.
+- **O `ParallaxBackground` NÃO está dessincronizado.** Medido a 165 Hz,
+  `scroll_offset.x` e a origem da `canvas_transform` são iguais até à
+  milésima em todos os frames. Não há `Parallax2D` a fazer.
+
+**O que ficou por fazer, e porquê:**
+
+1. **KOLIANI RUN NATIVE FRAMES REQUIRED.** Está medido que os 10 frames
+   golden do `run` são um ciclo de **uma perna**: o pé de trás percorre 13 px
+   em todo o ciclo (o da frente, 34) e **em nenhum dos 10 frames passa à
+   frente**. Não há meia-passada a derivar dali. Fabricá-la por cirurgia de
+   pixels parte a arte (espelhar o bloco das pernas vira as biqueiras para
+   trás; transladar um membro descola-o da anca) e o briefing proíbe
+   deformações. Precisa de **decisão do Game Master**.
+2. **L2 NATIVE HYBRID ART REQUIRED** — mesma decisão pendente do L1 desde a
+   9H.12D. Não há fonte com mais informação no repo.
+3. **`build/windows/Koliani.exe` NÃO foi actualizado.** A árvore tem as
+   pastas não versionadas do `work/` sujas do 9H.12E, e a 12E já tinha
+   deixado escrito que exportar daqui incha o EXE (422 MB contra 347).
+   Exportar de worktree limpo.
+4. Os 23 sons **não foram ouvidos** — os picos estão hierarquizados por
+   construção, mas o equilíbrio Music/SFX é juízo de ouvido.
+
+**Suite:** 26 falhas, as MESMAS 26 do baseline 9H.12E. Zero falhas novas.
+
+
 ## 9H.12E — reparação de produção do L1 Hybrid (12 set 2026, v0.18.5)
 
 Ramo `codex/9h12e-l1-hybrid-wip`. Autoridade FROZEN verificada antes de

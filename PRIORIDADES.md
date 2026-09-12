@@ -2,6 +2,20 @@
 
 ## Agora
 
+0000000000000000. **9H.13/14 FEITO -- SFX, corrida e tremor do L2. DUAS
+   DECISOES DO PAULO.** Ramo `claude/9h13-14-audio-koliani-l2`, por integrar.
+   Relatorio: `docs/execution_9h13_14_audio_koliani_l2.md`. Feito: 23 SFX
+   refeitos (combo com 4 sons proprios), tremor do fundo do L2 morto (era o
+   `position_smoothing` da camara a lutar com a `physics_interpolation` --
+   dp/media 1,70 -> 0,87 a 165 Hz), cadencia da corrida pela velocidade.
+   **PENDENTE 1: KOLIANI RUN NATIVE FRAMES.** Esta' medido que os 10 frames
+   golden do `run` sao um ciclo de UMA perna (o pe' de tras percorre 13 px em
+   todo o ciclo e nunca passa a' frente). Fabricar a meia-passada por cirurgia
+   de pixels parte a arte. Precisa de frames nativos na linguagem do Golden
+   Set. **PENDENTE 2: L2 NATIVE HYBRID ART**, a mesma decisao que o L1 ja'
+   espera desde a 9H.12D.
+
+
 000000000000000. **9H.12D FEITO -- L1 em Hybrid Cinematic 2D. FALTA UMA
    DECISAO DO PAULO.** Relatorio:
    `docs/execution_9h12d_l1_hybrid_prototype.md`. Feito: terreno HD (periodo
