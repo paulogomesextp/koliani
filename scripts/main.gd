@@ -186,7 +186,15 @@ func _toast_debug(txt: String) -> void:
 func _tirar_foto(caminho: String, estado := "") -> void:
 	await get_tree().create_timer(0.55).timeout
 	var koliani := get_tree().get_first_node_in_group("koliani") as Node2D
-	if estado == "combate" and koliani:
+	if estado == "fundo9h7b" and koliani:
+		var fundo := get_tree().current_scene.find_child("Region1HybridVisualTarget", true, false)
+		if fundo:
+			var x := lerpf(float(fundo.get("limite_esquerdo")), float(fundo.get("limite_direito")), 0.65)
+			koliani.set_physics_process(false)
+			koliani.global_position = Vector2(x, 560.0)
+			koliani.set("velocity", Vector2.ZERO)
+			await get_tree().create_timer(0.8).timeout
+	elif estado == "combate" and koliani:
 		Input.action_press("atacar")
 		await get_tree().create_timer(0.12).timeout
 		Input.action_release("atacar")

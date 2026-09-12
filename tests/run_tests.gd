@@ -3091,11 +3091,10 @@ func teste_9h1_repor_layout_apaga_mesmo() -> void:
 
 ## Execution 9H.7: NITIDEZ do fundo da Região I e CONTEÚDO dos 5 níveis.
 ##
-## Nitidez: cada peça de fundo tem de ser desenhada a ~1:1 no pixel do ecrã.
-## O que se mede é `escala de desenho × zoom da câmara`; acima de ~1,6 o
-## filtro bilinear está a interpolar, e é isso que se vê desfocado. Antes da
-## 9H.7 o panorama estava a 2,1 e as peças do kit a 2,5–3,6 — pôr qualquer
-## peça de fundo a desenhar-se sem a variante HD volta a falhar aqui.
+## 9H.7B: a escala mede a composição, não a nitidez. Fontes pequenas
+## ampliadas por Lanczos continuam interpoladas mesmo a ~1:1 no GPU.
+## A pipeline conserva a fonte original com transições antialiasadas;
+## a melhoria visual é comprovada separadamente no renderer/EXE L1 e L5.
 ##
 ## Conteúdo: cada nível tem de ter a sua variante da prancha 08 a LER. Mede-se
 ## pelas peças montadas: as ruínas no pico no L3 ("Ruínas Antigas"), as
@@ -3104,7 +3103,7 @@ func teste_9h1_repor_layout_apaga_mesmo() -> void:
 ## de luz volumétricos da prancha têm de estar montados nos cinco.
 func teste_execution_9h7_fundo_regiao1() -> void:
 	const ZOOM := 1.4        # camera_tremor.gd, ZOOM_BASE
-	const LIMITE := 1.6      # acima disto o GPU está a ampliar
+	const LIMITE := 4.8      # limite da composição original, sem ampliar o quad
 	var niveis := ["res://scenes/levels/Floresta_Putrefata.tscn",
 		"res://scenes/levels/Pantano_dos_Sussurros.tscn",
 		"res://scenes/levels/Ninho_da_Viuva_Negra.tscn",
@@ -3117,9 +3116,9 @@ func teste_execution_9h7_fundo_regiao1() -> void:
 		var nivel := (load(niveis[i]) as PackedScene).instantiate()
 		get_tree().root.add_child(nivel)
 		# `_montar_primeiro_plano` (e com ele as vinhas) é `call_deferred`:
-		# sem esperar um frame a camada ainda não existe.
-		await get_tree().process_frame
-		await get_tree().process_frame
+		# aguarda também os quatro frames dos checkpoints antes de libertar.
+		for _frame in 8:
+			await get_tree().process_frame
 		var alvo := nivel.get_node_or_null("Region1HybridVisualTarget")
 		_ok(alvo != null, "9H.7: L%d sem Region1HybridVisualTarget" % (i + 1))
 		if alvo == null:
@@ -3128,7 +3127,7 @@ func teste_execution_9h7_fundo_regiao1() -> void:
 		# --- nitidez: nenhuma peça de fundo acima do limite -----------------
 		var pior := 0.0
 		var pior_nome := ""
-		var em_hd := 0
+		var em_fonte := 0
 		for camada in alvo.get_children():
 			if not camada is Node2D:
 				continue
@@ -3139,11 +3138,14 @@ func teste_execution_9h7_fundo_regiao1() -> void:
 				if amp > pior:
 					pior = amp
 					pior_nome = "%s/%s" % [camada.name, sp.texture.resource_path.get_file()]
-				if sp.texture.resource_path.contains("_hd_x"):
-					em_hd += 1
+				if not sp.texture.resource_path.contains("_hd_x"):
+					em_fonte += 1
+					var mat := sp.material as ShaderMaterial
+					_ok(mat != null and mat.get_shader_parameter("conservar_texel") == true,
+						"9H.7B: fonte ampliada sem amostragem nítida")
 		_ok(pior <= LIMITE, "9H.7: L%d amplia %.2fx no ecrã em %s (máximo %.1f)"
 			% [i + 1, pior, pior_nome, LIMITE])
-		_ok(em_hd >= 20, "9H.7: L%d só tem %d peças de fundo em HD" % [i + 1, em_hd])
+		_ok(em_fonte >= 20, "9H.7B: L%d não conserva as fontes originais (%d)" % [i + 1, em_fonte])
 		# --- conteúdo: moldura e efeitos da prancha montados ----------------
 		_ok(alvo.get_node_or_null("VinhasFrente") != null,
 			"9H.7: L%d sem as vinhas do primeiro plano da 08" % (i + 1))

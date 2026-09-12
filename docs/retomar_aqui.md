@@ -4,6 +4,29 @@
 
 Atualizado em 12 de setembro de 2026.
 
+## Execution 9H.7B — background sharpness
+
+- Branch isolada `codex/9h7b-background-sharpness`, base `125618b5`.
+- Causa restante: HD x3/x4 era interpolação Lanczos das fontes pequenas,
+  não detalhe adicional; a escala numérica ~1:1 não provava nitidez visual.
+  Imports examinados: lossless, sem mipmaps e sem size limit; não é EXE antigo.
+- Panorama, serra, árvores, ruínas, cascatas, cristais e foreground usam
+  fontes originais com sampler que conserva texels e interpola apenas uma
+  transição de um pixel do ecrã. Sem unsharp; névoa continua HD/bilinear.
+  Modulate, quads, recortes, espelhos, parallax e composição preservados.
+  A moldura do panorama continua excluída por clamp ao vizinho aprovado.
+- Prova local no worktree `C:/Projetos/koliani-9h7b`: `work/9h7b/`
+  contém `before_L1/L5.png`, `after_L1/L5.png`, `exe_L1/L5.png` e
+  `exe_mobile_L5.png` (renderer Vulkan padrão). Mesma câmara a 65 %, 1280x720.
+  Arestas das silhuetas mais definidas; a fonte continua limitada a 952x247.
+- EXE ativo: `build/windows/Koliani-9H7B.exe`. Export sem erros;
+  dirigido L1–L5: zero asserções falhadas; warnings de interpolação da câmara
+  e recursos/ObjectDB no encerramento registados, sem alterações fora do scope.
+- Próximo passo: integração pelo Game Master e HUMAN PLAYTEST REQUIRED
+  para aceitação subjetiva da nitidez e do parallax em movimento.
+- Usage consultado nesta execução: 12 % disponível na janela de 5 h,
+  86 % na semanal. Sem merge em master.
+
 ## Execution 9H.7 - nitidez do fundo + conteudo dos niveis da Regiao I
 
 - Relatorio: docs/execution_9h7_regiao1_nitidez_conteudo.md. Versao 0.18.1.

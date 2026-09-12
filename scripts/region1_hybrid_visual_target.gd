@@ -40,19 +40,13 @@ const Kit := preload("res://scripts/regiao1_kit.gd")
 
 const COR_SHADOWBLADE := Color("bb8cff")
 const COR_SHADOWBLADE_NUCLEO := Color("f1e5ff")
-## Execution 9H.7: o panorama vem ampliado x4 no disco (Lanczos sobre alfa
-## premultiplicado + máscara de desfoque, `tools/nitidez_fundo_9h7.py`) e
-## desenha-se a 0,75x em vez de 3x. A geometria no mundo é a mesma
-## (4 x 0,75 = 3) e nenhum pixel foi pintado; o que muda é a ampliação que
-## sobra para o filtro bilinear do GPU. A 9H tinha-a descido de 4,2x para
-## 2,1x com um x2; 2,1x ainda é interpolação a dobrar, e era por isso que o
-## Game Master continuava a ver o fundo desfocado. Com x4 sobra 1,05x -- 1:1
-## no pixel do ecrã (3 / 4 x 1,4 de zoom da câmara).
-const TEX_BACKGROUND_APPROVED := preload("res://assets/art/regions/region_01_forest/production/backgrounds/region1_panorama_heart_tree_hd_x4.png")
-const TEX_BACKGROUND_LEFT := preload("res://assets/art/regions/region_01_forest/production/backgrounds/region1_panorama_left_cap_hd_x4.png")
-const TEX_BACKGROUND_RIGHT := preload("res://assets/art/regions/region_01_forest/production/backgrounds/region1_panorama_right_cap_hd_x4.png")
-## Fator a que o panorama já vem ampliado no disco.
-const PANORAMA_HD := 4.0
+## 9H.7B: fontes aprovadas a 1x. A amostragem do shader conserva os texels
+## e antialiasa apenas as transições; ampliar por Lanczos no disco já gravava
+## o desfoque antes de o GPU receber a textura. Escala/composição iguais.
+const TEX_BACKGROUND_APPROVED := preload("res://assets/art/regions/region_01_forest/production/backgrounds/region1_panorama_heart_tree.png")
+const TEX_BACKGROUND_LEFT := preload("res://assets/art/regions/region_01_forest/production/backgrounds/region1_panorama_left_cap.png")
+const TEX_BACKGROUND_RIGHT := preload("res://assets/art/regions/region_01_forest/production/backgrounds/region1_panorama_right_cap.png")
+const PANORAMA_HD := 1.0
 ## Zoom da câmara desenhado na cena (`camera_tremor.gd`, ZOOM_BASE). Serve só
 ## para estimar a ampliação no pixel do ecrã e afinar a acutância; num ecrã
 ## mais largo o zoom sobe e a ampliação com ele, mas a diferença é pequena.
@@ -623,34 +617,24 @@ func _restaurar_skin_hud() -> void:
 
 const SHADER_NITIDEZ := preload("res://assets/shaders/nitidez_fundo.gdshader")
 
-## Máscara de desfoque no pixel do ECRÃ (ver `nitidez_fundo.gdshader`).
-## `ampliacao` é quantos píxeis de ecrã cada pixel da textura vai ocupar
-## (escala de desenho × zoom da câmara). Desde a 9H.7 as peças de fundo vêm
-## ampliadas do disco e desenham-se a ~1:1, portanto já não há softness de
-## reamostragem para combater: a força desce para uma acutância leve, que é
-## só a que o Lanczos come. Manter os 0,55 de antes a 1:1 desenhava halo.
-static func _nitidez(s: Sprite2D, ampliacao: float) -> void:
+## Amostragem alinhada à grelha da fonte, com transição de um pixel de ecrã.
+## Mantém a modulação aprovada e evita halos de sharpen e saltos de Nearest.
+static func _nitidez(s: Sprite2D, panorama := false, suave := false) -> void:
 	var mat := ShaderMaterial.new()
 	mat.shader = SHADER_NITIDEZ
-	mat.set_shader_parameter("forca",
-		clampf(0.34 * (ampliacao - 1.0) + 0.18, 0.12, 1.05))
-	mat.set_shader_parameter("raio", 1.30)
+	mat.set_shader_parameter("conservar_texel", not suave)
+	mat.set_shader_parameter("reparar_borda", panorama)
 	s.material = mat
 
 
-## A peça `rel` desenhada com escala `e` em unidades da textura ORIGINAL.
-## Se houver variante HD no disco, é essa que vai para o GPU, com a escala
-## dividida pelo fator: o quad no mundo é do mesmo tamanho ao pixel
-## (`largura_hd × e/HD == largura × e`) e o GPU deixa de ampliar. Quem chama
-## continua a medir em píxeis da original -- nada na composição se mexe.
-## `fator_hd` fica em meta para quem precise de `region_rect` (ver `_regiao`).
+## A fonte original define o quad; nenhuma escala/composição é alterada.
 func _sprite_fundo(camada: Node2D, rel: String, pos: Vector2, e: float,
 		espelho: bool) -> Sprite2D:
 	var orig := Kit.tex(rel)
 	if orig == null:
 		return null
-	var t := Kit.tex_hd(rel)
-	var k := float(Kit.HD) if t != null else 1.0
+	var t := orig
+	var k := 1.0
 	if t == null:
 		t = orig
 	var eh := e / k
@@ -661,7 +645,7 @@ func _sprite_fundo(camada: Node2D, rel: String, pos: Vector2, e: float,
 	s.position = pos + (Vector2(orig.get_width() * e, 0.0) if espelho else Vector2.ZERO)
 	s.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
 	s.set_meta("fator_hd", k)
-	_nitidez(s, eh * ZOOM_CAMARA)
+	_nitidez(s)
 	camada.add_child(s)
 	return s
 
@@ -693,7 +677,7 @@ func _faixa(camada: Node2D, rel: String, pos: Vector2, tam: Vector2, e: float) -
 	s.position = pos
 	s.set_meta("fator_hd", k)
 	_regiao(s, Rect2(Vector2.ZERO, tam))
-	_nitidez(s, eh * ZOOM_CAMARA)
+	_nitidez(s, false, true)
 	camada.add_child(s)
 	return s
 
@@ -706,6 +690,6 @@ func _sprite_aprovado(camada: Node2D, textura: Texture2D, pos: Vector2,
 	s.position = pos
 	s.scale = escala
 	s.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
-	_nitidez(s, maxf(absf(escala.x), absf(escala.y)) * ZOOM_CAMARA)
+	_nitidez(s, true)
 	camada.add_child(s)
 	return s
