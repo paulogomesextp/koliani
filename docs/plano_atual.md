@@ -2,6 +2,16 @@
 
 ## Estado — 12 de setembro de 2026
 
+### Integração 9H.10 + 9H.11
+
+- Objetivo: integrar ec9a6260 e depois 109653fc sobre master f45fe9a5.
+- Âmbito: preservar UI funcional 9H.10 e consistência visual 9H.11;
+  smoke L1/L3/L5, Pause, HUD, Santuário e menu sem redesenhar nem alterar gameplay.
+- Conclusão: suite completa e runtime dirigido, exports Windows/Web de checkout
+  limpo, EXE local atualizado, push normal e CI remoto confirmado.
+- Versão visível 0.18.2. HUMAN PLAYTEST REQUIRED; DEVICE VALIDATION REQUIRED
+  para aceitação em dispositivo. STOP após publicação e CI; Região II não iniciada.
+
 ### Execution 9H.10 — lote exclusivo de UI
 
 - Objetivo/âmbito: legenda, clipping CHECKPOINT/SKILL, fila de notificações e
