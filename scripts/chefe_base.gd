@@ -584,6 +584,50 @@ func _encarar_koliani() -> void:
 ## continua a ser o telégrafo principal -- isto só o reforça. Criada à
 ## primeira vez que é precisa e depois só ligada/desligada (o telégrafo chama
 ## isto a cada frame).
+## Execution 9H.9 -- o clipe de cada fase, pelo NOME da fase.
+##
+## O Game Master disse que os chefes pareciam sprites fixos, e pareciam: a
+## escolha automática do `DemonioBase` só olha para a velocidade, portanto um
+## guardião a perseguir ficava em `run` a luta inteira -- telégrafo, golpe e
+## recuperação passavam todos sem pose nenhuma. Os frames existem desde a
+## 9H.1 (8 idle, 8 run, 7 attack, 3 hit por criatura); faltava quem os pedisse.
+##
+## Todos os chefes seguem a mesma convenção no seu enum `Fase` (`*_TEL` para
+## o telégrafo, `EXPOSTO`/`EXPOSTA` para a janela de castigo, `DORME`/`DECIDE`
+## à espera) -- a mesma convenção de que o `_encurtar_fase_exposto` já vive.
+var _nomes_fase: Dictionary = {}
+
+
+func _nome_fase() -> String:
+	if _nomes_fase.is_empty():
+		var mapa: Variant = get_script().get_script_constant_map().get("Fase", null)
+		if not (mapa is Dictionary):
+			return ""
+		for nome: String in (mapa as Dictionary):
+			_nomes_fase[int((mapa as Dictionary)[nome])] = nome
+	var f: Variant = get("_fase")
+	if f == null:
+		return ""
+	return String(_nomes_fase.get(int(f), ""))
+
+
+func _anim_desejada() -> String:
+	var n := _nome_fase()
+	if n == "":
+		return ""
+	if n.contains("TEL"):
+		return "attack"          # antecipação
+	if n.contains("EXPOST"):
+		return "hit"             # recuperação / castigo
+	if n in ["DORME", "DECIDE"]:
+		return ""
+	# Fase de acção: se está praticamente quieta, é um golpe ou um conjuro --
+	# a pose de ataque. Se está a deslocar-se, a locomoção manda.
+	if absf(velocity.x) <= 20.0:
+		return "attack"
+	return ""
+
+
 func _aura_telegrafo(ligado: bool) -> void:
 	if _aura9g == null:
 		if not ligado or not Vfx9G.ativo(self):
