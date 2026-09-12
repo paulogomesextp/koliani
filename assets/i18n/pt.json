@@ -341,6 +341,7 @@
   "layout.close": "FECHAR",
   "layout.hint": "Arrasta um controlo para o mover. Usa as pegas para o redimensionar.",
   "layout.reset": "REPOR",
+  "layout.reset_done": "Layout reposto",
   "layout.save": "GUARDAR",
   "layout.saved": "Layout guardado",
   "layout.smaller": "−",

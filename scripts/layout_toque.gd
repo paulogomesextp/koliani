@@ -65,9 +65,24 @@ static func guardar(layout: Dictionary) -> bool:
 	return true
 
 
-static func apagar() -> void:
-	if FileAccess.file_exists(CAMINHO):
-		DirAccess.remove_absolute(ProjectSettings.globalize_path(CAMINHO))
+## Repõe o layout de fábrica. APAGA o ficheiro -- não basta repor os
+## controlos no ecrã.
+##
+## 9H.1, apanhado na prova do Web em Chrome real: o REPOR devolvia os
+## controlos ao sítio certo mas o `layout_toque.json` continuava em
+## IndexedDB com os valores editados, e ao recarregar a página voltava tudo
+## ao que estava. A causa era `globalize_path()`: no export Web devolve um
+## caminho do sistema de ficheiros do emscripten que o `DirAccess` não
+## apaga. O `DirAccess` aceita `user://` tal e qual -- e é isso que funciona
+## nas três plataformas.
+static func apagar() -> bool:
+	if not FileAccess.file_exists(CAMINHO):
+		return true
+	if DirAccess.remove_absolute(CAMINHO) == OK:
+		return not FileAccess.file_exists(CAMINHO)
+	# último recurso (desktop): o caminho do sistema
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(CAMINHO))
+	return not FileAccess.file_exists(CAMINHO)
 
 
 ## Prende um ponto ao ecrã, com folga para o raio. `r` é fração da ALTURA;

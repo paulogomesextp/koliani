@@ -191,10 +191,14 @@ func _ao_guardar() -> void:
 
 
 func _ao_repor() -> void:
-	LayoutToque.apagar()
+	var apagado := LayoutToque.apagar()
 	_controlos.repor_layout()
 	_controlos.selecionado = ""
 	Som.toca("carrossel", -12.0, 0.9)
+	# diz o que REALMENTE aconteceu. Antes da 9H.1 o botão repunha o ecrã e
+	# deixava o ficheiro gravado: o layout voltava na recarga seguinte e
+	# ninguém percebia porquê.
+	_piscar(Textos.t("layout.reset_done") if apagado else Textos.t("layout.reset"))
 
 
 func _ao_fechar() -> void:

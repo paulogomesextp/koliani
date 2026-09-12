@@ -341,6 +341,7 @@
   "layout.close": "关闭",
   "layout.hint": "拖动控件可移动，使用手柄可调整大小。",
   "layout.reset": "重置",
+  "layout.reset_done": "布局已重置",
   "layout.save": "保存",
   "layout.saved": "布局已保存",
   "layout.smaller": "−",

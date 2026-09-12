@@ -341,6 +341,7 @@
   "layout.close": "CLOSE",
   "layout.hint": "Drag a control to move it. Use the handles to resize.",
   "layout.reset": "RESET",
+  "layout.reset_done": "Layout reset",
   "layout.save": "SAVE",
   "layout.saved": "Layout saved",
   "layout.smaller": "−",

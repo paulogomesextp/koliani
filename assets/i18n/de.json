@@ -341,6 +341,7 @@
   "layout.close": "SCHLIESSEN",
   "layout.hint": "Ziehe ein Bedienelement zum Verschieben. Mit den Griffen änderst du die Größe.",
   "layout.reset": "ZURÜCKSETZEN",
+  "layout.reset_done": "Layout zurueckgesetzt",
   "layout.save": "SPEICHERN",
   "layout.saved": "Layout gespeichert",
   "layout.smaller": "−",

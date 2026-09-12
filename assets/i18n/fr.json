@@ -341,6 +341,7 @@
   "layout.close": "FERMER",
   "layout.hint": "Fais glisser un bouton pour le déplacer. Utilise les poignées pour le redimensionner.",
   "layout.reset": "RÉINITIALISER",
+  "layout.reset_done": "Disposition reinitialisee",
   "layout.save": "ENREGISTRER",
   "layout.saved": "Disposition enregistrée",
   "layout.smaller": "−",

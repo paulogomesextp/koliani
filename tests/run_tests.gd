@@ -117,6 +117,7 @@ func _correr_tudo() -> void:
 	teste_9h1_combo_com_poses_proprias()
 	teste_9h1_criaturas_com_movimento()
 	teste_9h1_tema_do_seletor()
+	teste_9h1_repor_layout_apaga_mesmo()
 
 	if _falhas.is_empty():
 		print("OK -- todos os testes passaram")
@@ -3058,3 +3059,23 @@ func teste_9h1_tema_do_seletor() -> void:
 		for campo in ["primaria", "primaria_clara", "acento", "veu", "trilho",
 				"trilho_brilho", "motivo"]:
 			_ok(d.has(campo), "9H.1: o tema da regiao %d nao tem %s" % [r + 1, campo])
+
+
+## O REPOR do editor de layout tem de APAGAR o ficheiro, nao so' repor os
+## controlos no ecra. Apanhado na prova do Web (9H.1): o ecra voltava ao
+## sitio e o `layout_toque.json` ficava em IndexedDB com os valores antigos,
+## portanto na recarga seguinte voltava tudo. A causa era `globalize_path()`
+## no export Web.
+func teste_9h1_repor_layout_apaga_mesmo() -> void:
+	var antes := LayoutToque.existe()
+	var copia := LayoutToque.carregar() if antes else {}
+	var demo := {"joystick": {"x": 0.4, "y": 0.8, "r": 0.17},
+		"botoes": {"saltar": {"x": 0.8, "y": 0.7, "r": 0.11}},
+		"pausa": {"x": 0.97, "y": 0.14, "r": 0.04}}
+	_ok(LayoutToque.guardar(demo), "9H.1: nao gravou o layout de teste")
+	_ok(LayoutToque.existe(), "9H.1: o layout gravado devia existir")
+	_ok(LayoutToque.apagar(), "9H.1: `apagar()` devia devolver true")
+	_ok(not LayoutToque.existe(),
+		"9H.1: REPOR deixou o ficheiro no disco -- o layout voltava na recarga")
+	if antes and not copia.is_empty():
+		LayoutToque.guardar(copia)

@@ -341,6 +341,7 @@
   "layout.close": "CERRAR",
   "layout.hint": "Arrastra un control para moverlo. Usa los tiradores para cambiar el tamaño.",
   "layout.reset": "RESTABLECER",
+  "layout.reset_done": "Disposicion restablecida",
   "layout.save": "GUARDAR",
   "layout.saved": "Diseño guardado",
   "layout.smaller": "−",
