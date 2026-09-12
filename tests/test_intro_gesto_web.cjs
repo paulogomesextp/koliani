@@ -6,26 +6,30 @@ const fonte=readFileSync('scripts/intro.gd','utf8').match(/const JS_INTRO := """
 function preparar(rejeitar=false){
   const eventos=new Map(), media=new Map();
   const canvas={style:{visibility:'visible'}}, splash={style:{visibility:'visible'}};
-  let dentro=false,chamadas=0,audio=0,menus=0,parou=0,descarregou=0,video,skip;
+  let dentro=false,chamadas=0,audio=0,menus=0,parou=0,descarregou=0,video,skip,painel,intervalo,timeout;
+  function adicionar(mapa,e,f){const anterior=mapa.get(e);mapa.set(e,anterior?x=>{anterior(x);f(x);}:f);}
   const janela={kolianiIntroTextoSkip:'SKIP TO MENU',
     kolianiAudioAcordar(){assert.ok(dentro);audio++;},kolianiIntroMenu(){menus++;},
-    addEventListener(e,f){eventos.set(e,f);},removeEventListener(e){eventos.delete(e);}};
+    addEventListener(e,f){adicionar(eventos,e,f);},removeEventListener(e){eventos.delete(e);}};
   const document={body:{appendChild(){}},getElementById(id){return id==='canvas'?canvas:splash;},
     createElement(tipo){
+      if(tipo==='pre'){painel={style:{}};return painel;}
       if(tipo==='button'){skip={style:{},remove(){this.removido=true;}};return skip;}
-      video={style:{},paused:true,currentTime:0,readyState:4,
+      video={style:{},paused:true,ended:false,currentTime:0,duration:10,readyState:4,networkState:1,videoWidth:832,videoHeight:464,
         setAttribute(){},removeAttribute(){},load(){descarregou++;},
-        addEventListener(e,f){media.set(e,f);},remove(){this.removido=true;},
+        addEventListener(e,f){adicionar(media,e,f);},remove(){this.removido=true;},
         pause(){parou++;this.paused=true;media.get('pause')?.();},
         play(){assert.ok(dentro,'play fora do gesto');chamadas++;
           assert.equal(this.style.display,'block');assert.equal(canvas.style.visibility,'hidden');
           assert.equal(splash.style.visibility,'hidden');
           return rejeitar?Promise.reject(new Error('codec recusado')):Promise.resolve();}};
-      return video;}};
-  vm.runInNewContext(fonte,{window:janela,document,location:{href:'https://exemplo.test/koliani/?teste=1'},URL,Date});
+      return video;},elementFromPoint(){return {tagName:'BUTTON',id:'koliani-intro-skip'};}};
+  vm.runInNewContext(fonte,{window:janela,document,location:{href:'https://exemplo.test/koliani/?teste=1'},URL,Date,
+    setInterval(f,ms){assert.equal(ms,500);intervalo=f;return 1;},clearInterval(){intervalo=null;},
+    setTimeout(f,ms){assert.equal(ms,5000);timeout=f;}});
   function gesto(tipo,alvo){dentro=true;eventos.get(tipo)?.({type:tipo,target:alvo,preventDefault(){},stopPropagation(){}});dentro=false;}
-  return {janela,eventos,media,canvas,splash,gesto,get video(){return video;},get skip(){return skip;},
-    contagens(){return {chamadas,audio,menus,parou,descarregou};}};
+  return {janela,eventos,media,canvas,splash,gesto,get video(){return video;},get skip(){return skip;},get painel(){return painel;},atualizar(){intervalo?.();},
+    expirar(){timeout?.();},contagens(){return {chamadas,audio,menus,parou,descarregou};}};
 }
 async function provar(rejeitar=false,tipo='touchend'){
   const t=preparar(rejeitar);
@@ -88,6 +92,25 @@ async function provarAudioIntegrado() {
   assert.equal(janela.kolianiAudioDiag().canalIOS,true);
 }
 (async () => {
+  const d=preparar();
+  assert.match(d.painel.textContent,/SKIP EVENT: NONE/);
+  assert.match(d.painel.textContent,/MENU TRANSITION: NOT ATTEMPTED/);
+  d.gesto('pointerdown',d.skip);assert.match(d.painel.textContent,/SKIP EVENT: POINTERDOWN/);
+  d.gesto('touchstart',d.skip);assert.match(d.painel.textContent,/SKIP EVENT: TOUCHSTART/);
+  assert.equal(d.contagens().menus,0,'instrumentação consumiu o gesto');
+  d.gesto('keydown',{id:'canvas'});await Promise.resolve();
+  assert.match(d.painel.textContent,/play\(\) promise: resolved/);
+  for(const ev of ['loadedmetadata','canplay','playing','timeupdate','pause','waiting','stalled']){
+    d.media.get(ev)();assert.match(d.painel.textContent,new RegExp('LAST EVENT: '+ev));
+  }
+  d.video.currentTime=3.5;d.atualizar();assert.match(d.painel.textContent,/3.5 \/ 10/);
+  d.gesto('click',d.skip);assert.match(d.painel.textContent,/SKIP EVENT: CLICK/);
+  assert.match(d.painel.textContent,/HIT ELEMENT: <button#koliani-intro-skip>/);
+  d.janela.kolianiIntroMenuTentativa();d.expirar();assert.match(d.painel.textContent,/MENU TRANSITION: FAIL/);
+  d.janela.kolianiIntroMenuResultado(true);d.expirar();assert.match(d.painel.textContent,/MENU TRANSITION: PASS/);
+  assert.match(readFileSync('scripts/menu_inicial.gd','utf8'),/kolianiIntroMenuResultado\(true\)/);
+  const r=preparar(true);r.gesto('keydown',{id:'canvas'});await Promise.resolve();
+  assert.match(r.painel.textContent,/rejected: Error: codec recusado/);
   await provarAudioIntegrado();
   await provarSkipBloqueado();
   await provar(); await provar(true); await provar(false, 'click'); await provar(false, 'keydown');

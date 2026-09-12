@@ -149,6 +149,48 @@ const JS_INTRO := """
 window.kolianiIntro = (function(){
   var estado = 'idle', v = null, ultimoToque = -Infinity, fechado = false;
   window.kolianiIntroAtiva = true;
+  // Diagnóstico temporário 9H.5D: observação, sem consumir gestos.
+  var ultimoEvento = 'NONE', promessa = 'NOT ATTEMPTED';
+  var eventoSkip = 'NONE', hit = 'NONE', transicao = 'NOT ATTEMPTED';
+  var amostra = {readyState:0, networkState:0, paused:true, ended:false,
+    currentTime:0, duration:NaN, videoWidth:0, videoHeight:0};
+  var painel = document.createElement('pre');
+  painel.id = 'koliani-ios-debug';
+  painel.style.cssText = 'position:fixed;left:max(8px,env(safe-area-inset-left));' +
+    'top:max(8px,env(safe-area-inset-top));z-index:23;pointer-events:none;' +
+    'margin:0;padding:6px;background:rgba(0,0,0,.78);color:#fff;' +
+    'font:11px/1.25 monospace;max-width:75vw;white-space:pre-wrap';
+  document.body.appendChild(painel);
+  var pintarDebug = function(){
+    if (v && !fechado) amostra = {readyState:v.readyState, networkState:v.networkState,
+      paused:v.paused, ended:v.ended, currentTime:v.currentTime, duration:v.duration,
+      videoWidth:v.videoWidth, videoHeight:v.videoHeight};
+    var nl = String.fromCharCode(10);
+    painel.textContent = 'DEBUG 9H.5D' + nl + 'VIDEO' + nl + 'readyState: ' + amostra.readyState +
+      ' | networkState: ' + amostra.networkState + nl + 'paused: ' + amostra.paused +
+      ' | ended: ' + amostra.ended + nl + 'currentTime / duration: ' +
+      amostra.currentTime + ' / ' + amostra.duration + nl + 'videoWidth x videoHeight: ' +
+      amostra.videoWidth + ' x ' + amostra.videoHeight + nl + 'LAST EVENT: ' + ultimoEvento +
+      nl + 'play() promise: ' + promessa + nl + 'SKIP EVENT: ' + eventoSkip +
+      nl + 'HIT ELEMENT: ' + hit + nl + 'MENU TRANSITION: ' + transicao;
+  };
+  window.kolianiIntroMenuResultado = function(passou){
+    transicao = passou ? 'PASS' : 'FAIL'; pintarDebug();
+  };
+  window.kolianiIntroMenuTentativa = function(){
+    // FAIL significa que o menu não confirmou chegada em 5 s; uma chegada tardia dá PASS.
+    setTimeout(function(){ if (transicao !== 'PASS') window.kolianiIntroMenuResultado(false); }, 5000);
+  };
+  var observarToque = function(e){
+    var ponto = e.touches && e.touches[0] || e;
+    var el = document.elementFromPoint(ponto.clientX, ponto.clientY);
+    hit = el ? '<' + el.tagName.toLowerCase() + (el.id ? '#' + el.id : '') + '>' : 'NONE';
+    eventoSkip = e.type.toUpperCase(); pintarDebug();
+  };
+  var eventosDebug = ['pointerdown', 'touchstart', 'click'];
+  eventosDebug.forEach(function(e){ window.addEventListener(e, observarToque, {capture:true, passive:true}); });
+  pintarDebug();
+  var relogioDebug = setInterval(pintarDebug, 500);
   var skip = document.createElement('button');
   skip.id = 'koliani-intro-skip'; skip.type = 'button';
   skip.textContent = window.kolianiIntroTextoSkip;
@@ -198,6 +240,9 @@ window.kolianiIntro = (function(){
       v.autoplay = false; v.muted = false; v.loop = false;
 	  v.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;' +
 		'object-fit:contain;background:#0b0509;z-index:20;visibility:visible;opacity:1';
+      ['loadedmetadata','canplay','playing','timeupdate','pause','waiting','stalled','error','ended'].forEach(function(ev){
+        v.addEventListener(ev, function(){ if (!fechado){ ultimoEvento = ev; pintarDebug(); } });
+      });
 	  v.addEventListener('ended', function(){ window.kolianiIntroSaltar(); });
 	  v.addEventListener('error', function(){ estado = 'erro'; window.kolianiIntroSaltar(); });
       v.addEventListener('playing', function(){ if (!fechado) estado = 'a_tocar'; });
@@ -210,6 +255,10 @@ window.kolianiIntro = (function(){
 	  // WebKit: visível antes de play(), sempre dentro do gesto permitido.
       mostrarVideo();
       var p = v.play();
+      promessa = 'PENDING'; pintarDebug();
+      if (p && p.then) p.then(function(){ promessa = 'resolved'; pintarDebug(); }, function(e){
+        promessa = 'rejected: ' + (e && e.name || 'Error') + ': ' + (e && e.message || ''); pintarDebug();
+      });
 	  if (p && p.catch) p.catch(function(e){
         if (fechado) return;
 		if (e && e.name === 'NotAllowedError'){
@@ -219,11 +268,14 @@ window.kolianiIntro = (function(){
 		estado = 'erro'; window.kolianiIntroSaltar();
 	  });
 
-	}catch(e){ estado = 'erro'; window.kolianiIntroSaltar(); }
+	}catch(e){ promessa = 'rejected: ' + e.name + ': ' + e.message; pintarDebug(); estado = 'erro'; window.kolianiIntroSaltar(); }
   };
   window.kolianiIntroSaltar = function(imediato){
     if (fechado) return;
+    pintarDebug();
     fechado = true; window.kolianiIntroAtiva = false;
+    clearInterval(relogioDebug);
+    eventosDebug.forEach(function(e){ window.removeEventListener(e, observarToque, true); });
 	if (estado !== 'erro') estado = 'fim';
 	eventos.forEach(function(e){ window.removeEventListener(e, gesto, true); });
 	try{ if (v){ v.pause(); v.removeAttribute('src'); v.load(); v.remove(); v = null; } }catch(e){}
@@ -335,6 +387,9 @@ func _ao_fim(imediato: bool = false) -> void:
 
 
 func _ir_menu(imediato: bool) -> void:
+	# Observa a tentativa; o menu confirma a chegada após montar a UI.
+	if OS.has_feature("web"):
+		JavaScriptBridge.eval("if(window.kolianiIntroMenuTentativa)window.kolianiIntroMenuTentativa()", true)
 	if imediato:
 		get_tree().change_scene_to_file.call_deferred(CENA_MENU)
 		return

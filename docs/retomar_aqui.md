@@ -4,6 +4,23 @@
 
 Atualizado em 12 de setembro de 2026.
 
+## Execution 9H.5D — diagnóstico iOS autorizado
+
+- Objetivo exclusivo: publicar instrumentação temporária para trace físico.
+- Painel DEBUG sempre ativo na intro Web, atualização a 500 ms; estados,
+  dimensões, eventos de vídeo e resultado/erro da promessa play().
+- Captura passiva pointerdown/touchstart/click e elementFromPoint;
+  não corrige vídeo/Skip nem altera codec, landscape, gameplay ou arte.
+- Painel permanece após intro para ler MENU TRANSITION; PASS confirmado
+  após montagem do menu; FAIL se não houver confirmação em 5 s.
+- Testes DOM intro/diagnóstico e landscape PASS; export Web exit 0,
+  sem erros de script. Erros WAV AppleDouble preexistentes preservados.
+- Cache local nova 1789224947|7971234; worker limpa versões anteriores.
+- Publicação pelo pipeline existente de master; confirmação após push.
+- DEVICE VALIDATION REQUIRED: Game Master testar PWA no iPhone e recolher
+  painel antes/depois do Skip. Não continuar investigação sem trace físico.
+- Usage consultado: disponível, 41% restante na janela de 5 h e 91% semanal.
+
 ## Execution 9H.4 — iPhone intro hotfix
 
 - Game Master viu frame estático na intro e pediu skip visível independente.
