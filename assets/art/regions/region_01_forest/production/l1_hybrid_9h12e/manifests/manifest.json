@@ -1,306 +1,276 @@
 {
-  "execucao": "9H.12D/E L1",
-  "origem": "C:\\Users\\paulo\\Pictures\\Imagem Codex 12_09_2026, 20_36_00.png",
-  "sha256": "8ca9a4f4e548024688e19945c0560c23c5411b5f92d376de2547687225b7c2df",
-  "fonte_px": [
-    1536,
-    1024
-  ],
-  "direitos": "Imagem original gerada por IA nesta tarefa e aprovada pelo utilizador; sem assets externos. Não se afirma licença CC0.",
-  "limites": "Primeiro passe derivado: camadas ampliadas de recortes, não arte nativa 1920. Fundo base composto; máscaras por conectividade exigem revisão humana.",
-  "ativos": [
-    {
-      "ficheiro": "props_hd/arco.png",
-      "tamanho": [
-        134,
-        180
-      ],
-      "recorte": [
-        578,
-        389,
-        712,
-        569
-      ]
-    },
-    {
-      "ficheiro": "props_hd/arco_partido.png",
-      "tamanho": [
-        206,
-        180
-      ],
-      "recorte": [
-        710,
-        389,
-        916,
-        569
-      ]
-    },
-    {
-      "ficheiro": "props_hd/arvore.png",
-      "tamanho": [
-        265,
-        180
-      ],
-      "recorte": [
-        8,
-        390,
-        273,
-        570
-      ]
-    },
-    {
-      "ficheiro": "props_hd/floresta.png",
-      "tamanho": [
-        300,
-        180
-      ],
-      "recorte": [
-        275,
-        390,
-        575,
-        570
-      ]
-    },
-    {
-      "ficheiro": "props_hd/cascata.png",
-      "tamanho": [
-        300,
-        181
-      ],
-      "recorte": [
-        900,
-        389,
-        1200,
-        570
-      ]
-    },
-    {
-      "ficheiro": "props_hd/torres.png",
-      "tamanho": [
-        323,
-        181
-      ],
-      "recorte": [
-        1205,
-        389,
-        1528,
-        570
-      ]
-    },
-    {
-      "ficheiro": "props_hd/vinhas.png",
-      "tamanho": [
-        89,
-        126
-      ],
-      "recorte": [
-        9,
-        584,
-        98,
-        710
-      ]
-    },
-    {
-      "ficheiro": "props_hd/raizes.png",
-      "tamanho": [
-        174,
-        126
-      ],
-      "recorte": [
-        104,
-        584,
-        278,
-        710
-      ]
-    },
-    {
-      "ficheiro": "props_hd/lanterna.png",
-      "tamanho": [
-        49,
-        126
-      ],
-      "recorte": [
-        399,
-        584,
-        448,
-        710
-      ]
-    },
-    {
-      "ficheiro": "props_hd/cristais.png",
-      "tamanho": [
-        214,
-        126
-      ],
-      "recorte": [
-        723,
-        584,
-        937,
-        710
-      ]
-    },
-    {
-      "ficheiro": "props_hd/ramos.png",
-      "tamanho": [
-        397,
-        126
-      ],
-      "recorte": [
-        1130,
-        584,
-        1527,
-        710
-      ]
-    },
-    {
-      "ficheiro": "source_clean/panorama.png",
-      "tamanho": [
-        748,
-        370
-      ],
-      "recorte": [
-        780,
-        5,
-        1528,
-        375
-      ]
-    },
-    {
-      "ficheiro": "layers/01_far_sky_castle.png",
-      "tamanho": [
-        1920,
-        950
-      ],
-      "recorte": null
-    },
-    {
-      "ficheiro": "layers/02_mid_mountains_waterfalls.png",
-      "tamanho": [
-        1920,
-        950
-      ],
-      "recorte": null
-    },
-    {
-      "ficheiro": "layers/03_forest_silhouette.png",
-      "tamanho": [
-        1920,
-        950
-      ],
-      "recorte": null
-    },
-    {
-      "ficheiro": "layers/04_ruins_arches.png",
-      "tamanho": [
-        1920,
-        950
-      ],
-      "recorte": null
-    },
-    {
-      "ficheiro": "layers/05_foreground_branches_vines.png",
-      "tamanho": [
-        1920,
-        950
-      ],
-      "recorte": null
-    },
-    {
-      "ficheiro": "terrain_hd/plataforma.png",
-      "tamanho": [
-        290,
-        275
-      ],
-      "recorte": [
-        10,
-        727,
-        300,
-        1002
-      ]
-    },
-    {
-      "ficheiro": "terrain_hd/rocha.png",
-      "tamanho": [
-        120,
-        245
-      ],
-      "recorte": [
-        318,
-        743,
-        438,
-        988
-      ]
-    },
-    {
-      "ficheiro": "terrain_hd/raizes.png",
-      "tamanho": [
-        181,
-        277
-      ],
-      "recorte": [
-        451,
-        727,
-        632,
-        1004
-      ]
-    },
-    {
-      "ficheiro": "terrain_hd/ruina.png",
-      "tamanho": [
-        183,
-        277
-      ],
-      "recorte": [
-        644,
-        727,
-        827,
-        1004
-      ]
-    },
-    {
-      "ficheiro": "terrain_hd/corrupcao.png",
-      "tamanho": [
-        207,
-        278
-      ],
-      "recorte": [
-        839,
-        727,
-        1046,
-        1005
-      ]
-    },
-    {
-      "ficheiro": "terrain_hd/corpo.png",
-      "tamanho": [
-        384,
-        384
-      ],
-      "recorte": null
-    },
-    {
-      "ficheiro": "terrain_hd/topo.png",
-      "tamanho": [
-        512,
-        56
-      ],
-      "recorte": null
-    },
-    {
-      "ficheiro": "props_hd/liquido.png",
-      "tamanho": [
-        250,
-        94
-      ],
-      "recorte": null
-    },
-    {
-      "ficheiro": "preview/contact_sheet.png",
-      "tamanho": [
-        1200,
-        900
-      ],
-      "recorte": null
-    }
-  ]
+ "execucao": "9H.12E L1 (reparação de produção)",
+ "autoridade": "work/production_art_gate/9H12D_astra_approved/region1_l1_hybrid_visual_authority_v1.png",
+ "sha256": "8ca9a4f4e548024688e19945c0560c23c5411b5f92d376de2547687225b7c2df",
+ "fonte_px": [
+  1536,
+  1024
+ ],
+ "direitos": "Derivado da autoridade aprovada pelo Game Master na 9H.12D. Sem assets externos.",
+ "metodo": "silhueta por coluna + margens dissolvidas + limpeza de alfa; terreno em recorte NATIVO 1:1 costurado; camada 01 única (sem repetição de landmark).",
+ "ativos": [
+  {
+   "ficheiro": "source_clean/panorama.png",
+   "tamanho": [
+    748,
+    370
+   ],
+   "recorte": [
+    780,
+    5,
+    1528,
+    375
+   ]
+  },
+  {
+   "ficheiro": "layers/01_far_sky_castle.png",
+   "tamanho": [
+    2048,
+    723
+   ],
+   "recorte": null
+  },
+  {
+   "ficheiro": "elementos/arvore.png",
+   "tamanho": [
+    265,
+    180
+   ],
+   "recorte": [
+    8,
+    390,
+    273,
+    570
+   ]
+  },
+  {
+   "ficheiro": "elementos/floresta.png",
+   "tamanho": [
+    300,
+    180
+   ],
+   "recorte": [
+    275,
+    390,
+    575,
+    570
+   ]
+  },
+  {
+   "ficheiro": "elementos/arco.png",
+   "tamanho": [
+    134,
+    180
+   ],
+   "recorte": [
+    578,
+    389,
+    712,
+    569
+   ]
+  },
+  {
+   "ficheiro": "elementos/arco_partido.png",
+   "tamanho": [
+    206,
+    180
+   ],
+   "recorte": [
+    710,
+    389,
+    916,
+    569
+   ]
+  },
+  {
+   "ficheiro": "elementos/cascata.png",
+   "tamanho": [
+    300,
+    181
+   ],
+   "recorte": [
+    900,
+    389,
+    1200,
+    570
+   ]
+  },
+  {
+   "ficheiro": "elementos/torres.png",
+   "tamanho": [
+    323,
+    181
+   ],
+   "recorte": [
+    1205,
+    389,
+    1528,
+    570
+   ]
+  },
+  {
+   "ficheiro": "elementos/vinhas.png",
+   "tamanho": [
+    89,
+    126
+   ],
+   "recorte": [
+    9,
+    584,
+    98,
+    710
+   ]
+  },
+  {
+   "ficheiro": "elementos/raizes.png",
+   "tamanho": [
+    174,
+    126
+   ],
+   "recorte": [
+    104,
+    584,
+    278,
+    710
+   ]
+  },
+  {
+   "ficheiro": "elementos/lanterna.png",
+   "tamanho": [
+    49,
+    126
+   ],
+   "recorte": [
+    399,
+    584,
+    448,
+    710
+   ]
+  },
+  {
+   "ficheiro": "elementos/cristais.png",
+   "tamanho": [
+    214,
+    126
+   ],
+   "recorte": [
+    723,
+    584,
+    937,
+    710
+   ]
+  },
+  {
+   "ficheiro": "elementos/ramos.png",
+   "tamanho": [
+    397,
+    126
+   ],
+   "recorte": [
+    1130,
+    584,
+    1527,
+    710
+   ]
+  },
+  {
+   "ficheiro": "elementos/ramo_curvo.png",
+   "tamanho": [
+    165,
+    116
+   ],
+   "recorte": [
+    960,
+    584,
+    1125,
+    700
+   ]
+  },
+  {
+   "ficheiro": "terrain_hd/corpo.png",
+   "tamanho": [
+    128,
+    128
+   ],
+   "recorte": [
+    486,
+    846,
+    646,
+    1006
+   ]
+  },
+  {
+   "ficheiro": "terrain_hd/topo.png",
+   "tamanho": [
+    216,
+    74
+   ],
+   "recorte": [
+    24,
+    703,
+    300,
+    777
+   ]
+  },
+  {
+   "ficheiro": "terrain_hd/lado.png",
+   "tamanho": [
+    40,
+    128
+   ],
+   "recorte": [
+    660,
+    850,
+    700,
+    1014
+   ]
+  },
+  {
+   "ficheiro": "terrain_hd/base.png",
+   "tamanho": [
+    203,
+    70
+   ],
+   "recorte": [
+    300,
+    940,
+    560,
+    1010
+   ]
+  },
+  {
+   "ficheiro": "terrain_hd/corrupcao.png",
+   "tamanho": [
+    199,
+    290
+   ],
+   "recorte": [
+    1052,
+    726,
+    1300,
+    1016
+   ]
+  },
+  {
+   "ficheiro": "elementos/eixo_luz.png",
+   "tamanho": [
+    218,
+    290
+   ],
+   "recorte": [
+    1310,
+    726,
+    1528,
+    1016
+   ]
+  },
+  {
+   "ficheiro": "preview/verificacao_12e.png",
+   "tamanho": [
+    1200,
+    900
+   ],
+   "recorte": null
+  }
+ ]
 }

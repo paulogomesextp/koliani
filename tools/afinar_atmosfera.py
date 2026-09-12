@@ -69,7 +69,12 @@ GENERATOR_VERSION = "1.0.0"
 # cada regiao, cada nivel puxa a luz-chave para um lado diferente.
 TABELA = [
     # ---- I  Floresta Putrefacta -------------------------------------
-    ("Floresta_Putrefata",     "floresta",      (.86,.92,.86), (.05,.09,.09), (.09,.15,.09), (.62,1.0,.72), (.72,1.0,.86), 1.5, (.82,.94,1.02), .30, .26, False),
+    # 9H.12E: o L1 saiu da identidade VERDE. A Regiao I e' a Floresta
+    # CORROMPIDA vista ao luar -- carvao, azul-noite e violeta, com o carmim
+    # so' na folhagem. A luz-chave verde-menta (.62,1,.72) tingia a Koliani,
+    # os goblins e a rocha toda de verde e era ela, mais do que o fundo, que
+    # fazia o nivel ler-se como o platformer antigo.
+    ("Floresta_Putrefata",     "luar",          (.80,.84,1.0), (.04,.05,.09), (.07,.08,.14), (.70,.72,1.0), (.86,.80,1.0), 1.2, (.78,.80,1.06), .34, .40, False),
     ("Pantano_dos_Sussurros",  "pantano",       (.80,.90,.84), (.05,.10,.09), (.07,.14,.11), (.46,.92,.76), (.62,1.0,.88), 2.2, (.76,1.00,.96), .50, .24, False),
     ("Ninho_da_Viuva_Negra",   "floresta",       (.84,.80,.90), (.07,.05,.10), (.11,.08,.15), (.86,.56,1.0), (.92,.72,1.0), 1.8, (.94,.78,1.08), .38, .30, False),
     ("A_Arvore_que_Chora",     "pantano",          (.90,.88,.92), (.09,.04,.11), (.10,.06,.12), (1.0,.44,.86),  (1.0,.72,.92), 1.6, (1.00,.86,1.00), .22, .10, False),

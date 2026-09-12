@@ -22,6 +22,7 @@
 [ext_resource type="Texture2D" path="res://assets/art/regions/region_01_forest/production/kit_9c/atmosfera/nevoa.png" id="13_nevoa"]
 [ext_resource type="PackedScene" uid="uid://bkolianiessencia01" path="res://scenes/actors/Essencia.tscn" id="99_ess"]
 [ext_resource type="PackedScene" path="res://scenes/fx/Region1HybridVisualTarget.tscn" id="100_target"]
+[ext_resource type="Texture2D" path="res://assets/art/regions/region_01_forest/production/l1_hybrid_9h12e/terrain_hd/corrupcao.png" id="13_corr"]
 
 [sub_resource type="RectangleShape2D" id="rs_chk"]
 size = Vector2(44, 96)
@@ -42,18 +43,18 @@ fill_to = Vector2(1, 0.5)
 script = ExtResource("7_niv")
 
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
-cor_ambiente = Color(0.86, 0.92, 0.86, 1)
-cor_fundo = Color(0.05, 0.09, 0.09, 1)
-cor_silhueta = Color(0.09, 0.15, 0.09, 1)
-cor_luz = Color(0.62, 1, 0.72, 1)
-cor_poeira = Color(0.72, 1, 0.86, 1)
-densidade_poeira = 1.5
+cor_ambiente = Color(0.8, 0.84, 1, 1)
+cor_fundo = Color(0.04, 0.05, 0.09, 1)
+cor_silhueta = Color(0.07, 0.08, 0.14, 1)
+cor_luz = Color(0.7, 0.72, 1, 1)
+cor_poeira = Color(0.86, 0.8, 1, 1)
+densidade_poeira = 1.2
 bioma = "floresta"
 largura_nivel = 3800.0
-fundo_pack = "floresta"
-tinta_fundo = Color(0.82, 0.94, 1.02, 1)
-neblina_fundo = 0.3
-dessaturar_fundo = 0.26
+fundo_pack = "luar"
+tinta_fundo = Color(0.78, 0.8, 1.06, 1)
+neblina_fundo = 0.34
+dessaturar_fundo = 0.4
 seed_ambiente = 1000
 
 ; Execution 6A — implementação visual aprovada e reversível. `ativo = false`
@@ -68,7 +69,7 @@ position = Vector2(1850, 930)
 largura = 4200.0
 altura = 320.0
 cor = Color(0.26, 0.16, 0.42, 0.92)
-superficie_textura = ExtResource("13_nevoa")
+superficie_textura = ExtResource("13_corr")
 
 ; =====================  ACTO 1 -- entrada + raizes  ===================
 [node name="ChaoInicio" parent="." instance=ExtResource("9_pl")]

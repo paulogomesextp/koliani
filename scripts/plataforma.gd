@@ -219,6 +219,8 @@ func _aplicar() -> void:
 	# 3. cortes laterais
 	# (o lado do kit tem o contorno na coluna 10: fica 2 px para fora da colisao)
 	var lado: Texture2D = Kit.terreno(Kit.HD_LADO, "terreno/terreno_lado.png") if kit else _tex(bioma, "lado")
+	if hybrid_l1:
+		lado = HybridL1.tex("terrain_hd/lado")
 	if lado:
 		var lw: float = Kit.LARGURA_LADO if kit else 16.0
 		var le := _mosaico(lado, Vector2(x0 - 12.0, y0), Vector2(lw, alt), Vector2(0, dy))
@@ -229,6 +231,8 @@ func _aplicar() -> void:
 
 	# 4. franja de baixo -- so' quando a plataforma tem corpo que valha a pena
 	var base: Texture2D = Kit.terreno(Kit.HD_BASE, "terreno/terreno_base.png") if kit else _tex(bioma, "base")
+	if hybrid_l1:
+		base = HybridL1.tex("terrain_hd/base")
 	if base and alt >= 26.0:
 		# a franja do kit comeca 12 px acima do fim do bloco (sao as pedras
 		# arredondadas de baixo, nao um remate solto)

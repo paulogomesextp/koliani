@@ -2,7 +2,76 @@
 
 Índice de integração documental: [master_package_integration.md](master_package_integration.md).
 
-Atualizado em 12 de setembro de 2026.
+Atualizado em 12 de setembro de 2026 (9H.12E).
+
+## 9H.12E — reparação de produção do L1 Hybrid (12 set 2026, v0.18.5)
+
+Ramo `codex/9h12e-l1-hybrid-wip`. Autoridade FROZEN verificada antes de
+mexer: `work/production_art_gate/9H12D_astra_approved/region1_l1_hybrid_visual_authority_v1.png`,
+1536x1024 RGB, SHA256 `8ca9a4f4…c2df` (o produtor recusa correr se mudar).
+
+O review independente do checkpoint `08c1cb70` apontou três P0. Os três
+estão fechados; o que custou a descobrir:
+
+- **Os rectângulos do fundo vinham do MÉTODO de recorte, não do desenho.**
+  O 1º passe tirava o alfa por flood-fill do carvão a partir da borda — e as
+  peças de floresta/cascata/torres/arcos vêm de painéis com **céu pintado**,
+  onde esse flood-fill não apaga nada e sai o rectângulo inteiro. Agora
+  `silhueta_topo()` procura, coluna a coluna, onde a pintura se afasta do céu
+  dessa coluna, e `esbater_lados/baixo()` dissolvem as margens com um degradê
+  ondulado. A franja preta era serrilha do flood-fill: mediana no alfa + 0,7
+  px de desfoque.
+- **A repetição de landmark era desnecessária desde o início.** Com parallax
+  0,12 num nível de 6400 px a camada do céu só percorre 6400x0,12 = **768
+  px**: uma pintura de 2048 px cobre o nível inteiro. As 9 repetições com
+  `flip_h` (lua e castelo a repetir) foram substituídas por UMA instância.
+  As camadas 02–05 deixaram de ser canvases 1920x950 com 60% de vazio: são
+  elementos soltos pousados por `_x_camada(ref, f, mundo_x)` — a conta
+  inversa do parallax, para não se pousar nada "a olho".
+- **Alargar a pintura espelhando as margens DUPLICA o castelo.** O 1º ensaio
+  fez isso; a asa direita trouxe as torres outra vez. A extensão passou a
+  sair de uma faixa neutra (colunas 200–340: floresta e serra, sem lua nem
+  castelo), escurecida por **degradê** (escurecer por igual deixava um degrau
+  de valor visível) e com uma **coluna de bruma** por cima de cada emenda —
+  duas pinturas encostadas deixam sempre linha, por mais igualado o valor.
+- **Arrefecer musgo amarelo dá MAGENTA.** Cortar o verde a 0,76 e empurrar o
+  azul a 1,10 pôs as plataformas cor-de-rosa no 1º ensaio. Quem tem de
+  trabalhar é o **valor** (a rocha é o registo mais escuro do ecrã); o corte
+  do verde é suave (0,88).
+- **`matte_carvao` no topo da plataforma come o bloco todo.** O miolo da
+  plataforma é quase tão escuro como o carvão do fundo, e o flood-fill passa
+  lá para dentro: sobrava um fio de musgo a flutuar. O céu por cima do lábio
+  tira-se por perfil de corte (com ruído, para a silhueta não voltar a ser
+  uma aresta de tile), nunca por preenchimento.
+- **`ParallaxBackground` é `CanvasLayer`, não `CanvasItem`** — o cast
+  `(par as CanvasItem).visible` dava `Nil` em runtime sem parar nada.
+
+Feito além disso: props com âncora declarada (chão/pendurado — a lanterna
+pende do lábio de baixo com halo quente, em vez de flutuar no chão);
+atmosfera do L1 fora do verde (`luar`, luz-chave fria, poeira violeta) na
+**tabela do `afinar_atmosfera.py` E na cena**, para a ferramenta ficar
+idempotente; parallax legado do perfil 1 escondido por inteiro (era ele que
+punha a moita pixel-art verde no spawn); superfície do pântano com a poça de
+corrupção pintada da prancha.
+
+**Medido:** suite completa 48 falhas no `08c1cb70` -> **26** agora (A/B na
+mesma árvore, com `work/` presente).
+
+### O que ficou por fazer (9H.12E)
+
+1. **PLAYTEST HUMANO do L1** — só houve smoke em 4 pontos do nível.
+2. **26 falhas da suite**, todas contratos das execuções 9C/9H.7 que a
+   direcção aprovada na 12D substituiu no L1: nomes de nós da prancha 08
+   (`BackgroundApproved08`, `Camada3Distante`, `VinhasFrente`), terreno
+   `kit_9c`, e 23x `9H.7B: fonte ampliada sem amostragem nítida` (as peças
+   são recortes de 1536x1024 ampliados 1,0–2,0x em vez de arte nativa com o
+   shader `conservar_texel`). **Decisão do Game Master:** actualizar os
+   testes à direcção nova, ou produzir arte nativa.
+3. **O escudo do goblin elite é verde-lima** e destoa a sério da paleta — é
+   equipamento de inimigo, ficou de fora (DO NOT TOUCH desta execução).
+4. O EXE saiu com 422 MB (era 347): a exportação correu na árvore de
+   trabalho, que tem pastas não versionadas na raiz. Exportar de worktree
+   limpo na próxima.
 
 ## 9H.12D — protótipo Hybrid Cinematic 2D do L1 (12 set 2026, v0.18.4)
 

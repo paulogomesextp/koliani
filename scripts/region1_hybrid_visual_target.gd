@@ -581,10 +581,24 @@ func _esconder_legado() -> void:
 	var escondidos: Array[String] = []
 	var par := atm.get_node_or_null("Parallax")
 	if par:
-		for c in par.get_children():
-			if c.name != "Ceu" and c is CanvasItem:
-				c.visible = false
-				escondidos.append("Parallax/%s" % c.name)
+		# 9H.12E: no perfil 1 o Hybrid traz o céu, a serra, a mata e o
+		# primeiro plano todos seus. Deixar QUALQUER camada do parallax
+		# legado por baixo era o que punha a moita pixel-art verde no spawn
+		# -- e a "Ceu" (ColorRect + faixas) é justamente a que se via.
+		if perfil == 1:
+			par.set("visible", false)
+			escondidos.append("Parallax")
+		else:
+			for c in par.get_children():
+				if c.name != "Ceu" and c is CanvasItem:
+					c.visible = false
+					escondidos.append("Parallax/%s" % c.name)
+	if perfil == 1:
+		# poeira verde-menta do legado: a corrupção do Hybrid faz esse papel
+		var po := atm.get_node_or_null("Poeira") as CanvasItem
+		if po:
+			po.visible = false
+			escondidos.append("Poeira")
 	for nome in ["FrenteAmbiente", "Raios"]:
 		var n := atm.get_node_or_null(nome) as CanvasItem
 		if n:
