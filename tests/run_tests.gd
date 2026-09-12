@@ -65,6 +65,7 @@ func _correr_tudo() -> void:
 	teste_execution_8_integracao_player_facing()
 	teste_execution_9b4_pacote_golden_sem_legado()
 	teste_execution_9c_kit_ambiente_regiao1()
+	await teste_execution_9h7_fundo_regiao1()
 	teste_execution_9d_inimigos_regiao1()
 	teste_9d9e_crias_sem_goblin()
 	teste_9e2_coracao_producao_e_fases()
@@ -3086,3 +3087,106 @@ func teste_9h1_repor_layout_apaga_mesmo() -> void:
 		"9H.2: reler após REPOR devia devolver o layout de fábrica")
 	if antes and not copia.is_empty():
 		LayoutToque.guardar(copia)
+
+
+## Execution 9H.7: NITIDEZ do fundo da Região I e CONTEÚDO dos 5 níveis.
+##
+## Nitidez: cada peça de fundo tem de ser desenhada a ~1:1 no pixel do ecrã.
+## O que se mede é `escala de desenho × zoom da câmara`; acima de ~1,6 o
+## filtro bilinear está a interpolar, e é isso que se vê desfocado. Antes da
+## 9H.7 o panorama estava a 2,1 e as peças do kit a 2,5–3,6 — pôr qualquer
+## peça de fundo a desenhar-se sem a variante HD volta a falhar aqui.
+##
+## Conteúdo: cada nível tem de ter a sua variante da prancha 08 a LER. Mede-se
+## pelas peças montadas: as ruínas no pico no L3 ("Ruínas Antigas"), as
+## cascatas no pico no L4 ("Cascatas e Abismos") e a corrupção a subir até ao
+## L5 ("Heart Tree Próximo"). A moldura do primeiro plano (vinhas) e os raios
+## de luz volumétricos da prancha têm de estar montados nos cinco.
+func teste_execution_9h7_fundo_regiao1() -> void:
+	const ZOOM := 1.4        # camera_tremor.gd, ZOOM_BASE
+	const LIMITE := 1.6      # acima disto o GPU está a ampliar
+	var niveis := ["res://scenes/levels/Floresta_Putrefata.tscn",
+		"res://scenes/levels/Pantano_dos_Sussurros.tscn",
+		"res://scenes/levels/Ninho_da_Viuva_Negra.tscn",
+		"res://scenes/levels/A_Arvore_que_Chora.tscn",
+		"res://scenes/levels/Coracao_da_Floresta.tscn"]
+	var corrupcao: Array[int] = []
+	var ruinas: Array[int] = []
+	var cascatas: Array[int] = []
+	for i in niveis.size():
+		var nivel := (load(niveis[i]) as PackedScene).instantiate()
+		get_tree().root.add_child(nivel)
+		# `_montar_primeiro_plano` (e com ele as vinhas) é `call_deferred`:
+		# sem esperar um frame a camada ainda não existe.
+		await get_tree().process_frame
+		await get_tree().process_frame
+		var alvo := nivel.get_node_or_null("Region1HybridVisualTarget")
+		_ok(alvo != null, "9H.7: L%d sem Region1HybridVisualTarget" % (i + 1))
+		if alvo == null:
+			nivel.free()
+			continue
+		# --- nitidez: nenhuma peça de fundo acima do limite -----------------
+		var pior := 0.0
+		var pior_nome := ""
+		var em_hd := 0
+		for camada in alvo.get_children():
+			if not camada is Node2D:
+				continue
+			for sp in camada.get_children():
+				if not sp is Sprite2D or sp.texture == null:
+					continue
+				var amp: float = absf(sp.scale.x) * ZOOM
+				if amp > pior:
+					pior = amp
+					pior_nome = "%s/%s" % [camada.name, sp.texture.resource_path.get_file()]
+				if sp.texture.resource_path.contains("_hd_x"):
+					em_hd += 1
+		_ok(pior <= LIMITE, "9H.7: L%d amplia %.2fx no ecrã em %s (máximo %.1f)"
+			% [i + 1, pior, pior_nome, LIMITE])
+		_ok(em_hd >= 20, "9H.7: L%d só tem %d peças de fundo em HD" % [i + 1, em_hd])
+		# --- conteúdo: moldura e efeitos da prancha montados ----------------
+		_ok(alvo.get_node_or_null("VinhasFrente") != null,
+			"9H.7: L%d sem as vinhas do primeiro plano da 08" % (i + 1))
+		_ok(alvo.get_node_or_null("RaiosLuz") != null,
+			"9H.7: L%d sem os raios de luz volumétricos da 08" % (i + 1))
+		# --- conteúdo: quanto há de cada identidade -------------------------
+		var c3 := alvo.get_node_or_null("Camada3Distante")
+		var c2 := alvo.get_node_or_null("Camada2Floresta")
+		corrupcao.append(_contar_pecas(alvo.get_node_or_null("Camada2Corrupcao"), "cristal"))
+		ruinas.append(_contar_pecas(c3, "ruina") + _contar_pecas(c2, "ruina"))
+		cascatas.append(_contar_pecas(c3, "cascata") + _contar_pecas(c2, "cascata"))
+		nivel.free()
+	# A corrupção sobe do L1 ao L5 (0,25 -> 1,0 nos perfis da 08). O mínimo
+	# absoluto é o que impede a asserção de passar por vacuidade: com o L1 a
+	# zero, "L5 > 2 x L1" é verdade com um único cristal no nível todo, e o
+	# ecrã continuava vazio -- foi exactamente a queixa do Game Master.
+	_ok(corrupcao[4] >= 12 and corrupcao[4] > corrupcao[0] * 2,
+		"9H.7: a corrupção não escala L1->L5 ou é fraca no L5 (%s)" % str(corrupcao))
+	# O L3 é o nível das ruínas e o L4 o das cascatas -- e ambos com peças
+	# suficientes para se ler ao atravessar o nível, não uma ou duas.
+	_ok(ruinas[2] == ruinas.max() and ruinas[2] >= 14,
+		"9H.7: o L3 não é o nível das ruínas, ou tem poucas (%s)" % str(ruinas))
+	_ok(cascatas[3] == cascatas.max() and cascatas[3] >= 14,
+		"9H.7: o L4 não é o nível das cascatas, ou tem poucas (%s)" % str(cascatas))
+	# As peças em HD estão no manifesto do produtor, com o SHA certo.
+	var man: Variant = JSON.parse_string(FileAccess.get_file_as_string(
+		"res://assets/art/regions/region_01_forest/production/nitidez_9h7_manifest.json"))
+	_ok(man is Dictionary and (man["pecas"] as Dictionary).size() >= 21,
+		"9H.7: manifesto da nitidez em falta ou incompleto")
+	# O shader repõe o `modulate` (ver `nitidez_fundo.gdshader`): sem isto o
+	# fundo da Região I é desenhado sem a tinta de mood nem os alfas das
+	# camadas, e foi metade do ar errado que o Game Master viu.
+	var glsl := FileAccess.get_file_as_string("res://assets/shaders/nitidez_fundo.gdshader")
+	_ok(glsl.contains("modulacao = COLOR") and glsl.contains("COLOR = c * modulacao"),
+		"9H.7: o shader de nitidez voltou a atirar o modulate fora")
+
+
+## Quantas peças de uma camada têm `parte` no nome do ficheiro da textura.
+func _contar_pecas(camada: Node, parte: String) -> int:
+	if camada == null:
+		return 0
+	var n := 0
+	for sp in camada.get_children():
+		if sp is Sprite2D and sp.texture != null 				and sp.texture.resource_path.get_file().contains(parte):
+			n += 1
+	return n

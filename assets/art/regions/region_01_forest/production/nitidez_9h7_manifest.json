@@ -1,0 +1,137 @@
+{
+	"fator_panorama": 4,
+	"fator_kit": 3,
+	"unsharp": {
+		"raio": "k",
+		"percent": 95,
+		"threshold": 2
+	},
+	"pecas": {
+		"assets/art/regions/region_01_forest/production/backgrounds/region1_panorama_heart_tree_hd_x4.png": {
+			"origem": "assets/art/regions/region_01_forest/production/backgrounds/region1_panorama_heart_tree.png",
+			"fator": 4,
+			"borda_reparada": true,
+			"sha256": "dc1c82dcf1a346667ca2f38c3601f8aceaff2fe3e3c00bed78d70a13f3971a36"
+		},
+		"assets/art/regions/region_01_forest/production/backgrounds/region1_panorama_left_cap_hd_x4.png": {
+			"origem": "assets/art/regions/region_01_forest/production/backgrounds/region1_panorama_left_cap.png",
+			"fator": 4,
+			"borda_reparada": true,
+			"sha256": "1295579d63fcdc4f307ebebe7e3cbb90fa628731b379d16a35f0b0216c70d81c"
+		},
+		"assets/art/regions/region_01_forest/production/backgrounds/region1_panorama_right_cap_hd_x4.png": {
+			"origem": "assets/art/regions/region_01_forest/production/backgrounds/region1_panorama_right_cap.png",
+			"fator": 4,
+			"borda_reparada": true,
+			"sha256": "9fe1f7266fe467d2053d39ae08b41ca728b48674f429a89fb4c66631e65b6ff7"
+		},
+		"assets/art/regions/region_01_forest/production/kit_9c/fundo/fundo_montanhas_hd_x3.png": {
+			"origem": "assets/art/regions/region_01_forest/production/kit_9c/fundo/fundo_montanhas.png",
+			"fator": 3,
+			"borda_reparada": false,
+			"sha256": "218af40065ed8a8445ee93e24f06956b193a291782e351d4173862b009d46a79"
+		},
+		"assets/art/regions/region_01_forest/production/kit_9c/fundo/fundo_cascata_hd_x3.png": {
+			"origem": "assets/art/regions/region_01_forest/production/kit_9c/fundo/fundo_cascata.png",
+			"fator": 3,
+			"borda_reparada": false,
+			"sha256": "801e16de6c39a64d98183d9ffe24e7428ba1c08922097e2d4184761f4ad465af"
+		},
+		"assets/art/regions/region_01_forest/production/kit_9c/fundo/fundo_colunas_cascata_hd_x3.png": {
+			"origem": "assets/art/regions/region_01_forest/production/kit_9c/fundo/fundo_colunas_cascata.png",
+			"fator": 3,
+			"borda_reparada": false,
+			"sha256": "43b8cb3a2a50fb61b36c347e6a5f8764f9544bf6f02c64e2a621e0c02db81ff7"
+		},
+		"assets/art/regions/region_01_forest/production/kit_9c/fundo/fundo_arco_ruina_hd_x3.png": {
+			"origem": "assets/art/regions/region_01_forest/production/kit_9c/fundo/fundo_arco_ruina.png",
+			"fator": 3,
+			"borda_reparada": false,
+			"sha256": "d8efa9c654de7286e7619fae24d08eb3d4c418c989d6f2c4644cd6c5c9c0182f"
+		},
+		"assets/art/regions/region_01_forest/production/kit_9c/fundo/fundo_arvore_a_hd_x3.png": {
+			"origem": "assets/art/regions/region_01_forest/production/kit_9c/fundo/fundo_arvore_a.png",
+			"fator": 3,
+			"borda_reparada": false,
+			"sha256": "7ace45778fc8d94db3e054e3f9d7ba27932646c0e34b7e11638ba28dd430e16d"
+		},
+		"assets/art/regions/region_01_forest/production/kit_9c/fundo/fundo_arvore_b_hd_x3.png": {
+			"origem": "assets/art/regions/region_01_forest/production/kit_9c/fundo/fundo_arvore_b.png",
+			"fator": 3,
+			"borda_reparada": false,
+			"sha256": "83620b6e4e98511a8f3ab8816759c184c5b7fe346fabf6d3102eed8fc9ad0938"
+		},
+		"assets/art/regions/region_01_forest/production/kit_9c/fundo/fundo_arvores_par_hd_x3.png": {
+			"origem": "assets/art/regions/region_01_forest/production/kit_9c/fundo/fundo_arvores_par.png",
+			"fator": 3,
+			"borda_reparada": false,
+			"sha256": "d63c0177827005d20b401ce378ac08ee1d6983e1a96289420787e3ba22bcacc4"
+		},
+		"assets/art/regions/region_01_forest/production/kit_9c/fundo/frente_vegetacao_hd_x3.png": {
+			"origem": "assets/art/regions/region_01_forest/production/kit_9c/fundo/frente_vegetacao.png",
+			"fator": 3,
+			"borda_reparada": false,
+			"sha256": "c1d22ec9a9eb2a4f1ba67f05a599c72a342852770fcb8f39f4e24fd3e7efc14e"
+		},
+		"assets/art/regions/region_01_forest/production/kit_9c/atmosfera/nevoa_hd_x3.png": {
+			"origem": "assets/art/regions/region_01_forest/production/kit_9c/atmosfera/nevoa.png",
+			"fator": 3,
+			"borda_reparada": false,
+			"sha256": "7899748c4ebb1b504c5cf0f385736fb75aa021e30834f7d4fca02375653a680f"
+		},
+		"assets/art/regions/region_01_forest/production/kit_9c/corrupcao/cristal_corrupcao_a_hd_x3.png": {
+			"origem": "assets/art/regions/region_01_forest/production/kit_9c/corrupcao/cristal_corrupcao_a.png",
+			"fator": 3,
+			"borda_reparada": false,
+			"sha256": "719239871c431a1ecaa1acbfa4dae78241743ca9152bb58d5ecf988a11ef373c"
+		},
+		"assets/art/regions/region_01_forest/production/kit_9c/corrupcao/cristal_corrupcao_b_hd_x3.png": {
+			"origem": "assets/art/regions/region_01_forest/production/kit_9c/corrupcao/cristal_corrupcao_b.png",
+			"fator": 3,
+			"borda_reparada": false,
+			"sha256": "8fbcd0daee104b8392f20bd7383003ef9f34c2fa221553c88d1cf1b5e9ccf513"
+		},
+		"assets/art/regions/region_01_forest/production/kit_9c/corrupcao/cristal_corrupcao_c_hd_x3.png": {
+			"origem": "assets/art/regions/region_01_forest/production/kit_9c/corrupcao/cristal_corrupcao_c.png",
+			"fator": 3,
+			"borda_reparada": false,
+			"sha256": "fce407f01a7cefaa045b3c8a1dd07fceed0d23cb37ed254109badb51b561fb36"
+		},
+		"assets/art/regions/region_01_forest/production/kit_9c/corrupcao/cristal_corrupcao_d_hd_x3.png": {
+			"origem": "assets/art/regions/region_01_forest/production/kit_9c/corrupcao/cristal_corrupcao_d.png",
+			"fator": 3,
+			"borda_reparada": false,
+			"sha256": "26c9217c118f16a4d137a066d18823907c5c75781806363842f210d2caad82cf"
+		},
+		"assets/art/regions/region_01_forest/production/kit_9c/props/ruina_hd_x3.png": {
+			"origem": "assets/art/regions/region_01_forest/production/kit_9c/props/ruina.png",
+			"fator": 3,
+			"borda_reparada": false,
+			"sha256": "ea9491c673ff4a7f1c0792938e379ac485bca3d459d49cad399ec664e82ca8e7"
+		},
+		"assets/art/regions/region_01_forest/production/kit_9c/props/cascata_hd_x3.png": {
+			"origem": "assets/art/regions/region_01_forest/production/kit_9c/props/cascata.png",
+			"fator": 3,
+			"borda_reparada": false,
+			"sha256": "b6770c1f3c6bff997432e15e74e3e7f8108bf973a98f2da53c84758a0482ad70"
+		},
+		"assets/art/regions/region_01_forest/production/kit_9c/props/vinha_a_hd_x3.png": {
+			"origem": "assets/art/regions/region_01_forest/production/kit_9c/props/vinha_a.png",
+			"fator": 3,
+			"borda_reparada": false,
+			"sha256": "1e6c3aa1afdcd7671c47ee0aa9d1455d0b4e7d1cd9687a592bd74efc17ca062a"
+		},
+		"assets/art/regions/region_01_forest/production/kit_9c/props/vinha_b_hd_x3.png": {
+			"origem": "assets/art/regions/region_01_forest/production/kit_9c/props/vinha_b.png",
+			"fator": 3,
+			"borda_reparada": false,
+			"sha256": "906006c01c35ecf79a4af2400601f15face571f346c8af1c26d2210d74db6828"
+		},
+		"assets/art/regions/region_01_forest/production/kit_9c/props/vinha_longa_hd_x3.png": {
+			"origem": "assets/art/regions/region_01_forest/production/kit_9c/props/vinha_longa.png",
+			"fator": 3,
+			"borda_reparada": false,
+			"sha256": "edaaea4bbbda881e1e9e12430d8af74419b4077c3908c7a17d40be90b1eded11"
+		}
+	}
+}

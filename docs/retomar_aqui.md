@@ -4,6 +4,56 @@
 
 Atualizado em 12 de setembro de 2026.
 
+## Execution 9H.7 - nitidez do fundo + conteudo dos niveis da Regiao I
+
+- Relatorio: docs/execution_9h7_regiao1_nitidez_conteudo.md. Versao 0.18.1.
+- Fundo desfocado: DUAS causas provadas. (1) cada camada era ampliada 2,1x a
+  3,6x no pixel do ecra com filtro bilinear (escala no mundo x zoom 1,4); a
+  9H so tratou o panorama e deixou serra/arvores/ruinas/cascatas/primeiro
+  plano. (2) `nitidez_fundo.gdshader` fazia `COLOR = c` e ATIRAVA O MODULATE
+  FORA -- desde a 9H o fundo era desenhado sem a tinta de mood da 08, sem os
+  -18 % da camada funda e sem os alfas 0,82/0,6; o azul ceifava a B=255.
+- Correccao: `tools/nitidez_fundo_9h7.py` amplia no DISCO ao fator exacto
+  (panorama x4, kit x3; Lanczos sobre alfa premultiplicado, mascara de
+  desfoque so na cor e com orla replicada) e quem monta divide a escala por
+  esse fator -- geometria no mundo igual ao pixel. O shader repoe o modulate
+  pelo estagio de VERTICE (o built-in `MODULATE` NAO existe nesta versao: da
+  "Unknown identifier", confirmado em runtime). Forca da acutancia de
+  0,35-1,05 para 0,12-0,35 (a 1:1 a antiga desenhava halo).
+- Medido: ampliacao mediana 2,8 -> 1,05-1,10; maximo 1,58 (cristais grandes
+  e nevoa). O filtro fica LINEAR e NAO passa a Nearest: a arte e pintada e a
+  1:1 o Nearest dava cintilacao no parallax.
+- A risca vertical escura do L5 ERA REAL e vem do recorte da 6A: a caixa
+  (18,97,952,247) leva uma coluna da MOLDURA do painel da prancha em cada
+  lado (luminancia 55 contra 148), e as pontas do panorama sao espelhadas e
+  encostadas -- a coluna aparecia a dobrar. Estava escondida dentro do azul
+  ceifado. O produtor repete o pixel aprovado do lado; caixa e tamanho iguais.
+- Conteudo: a lacuna estrutural era o INTERVALO DE POUSO. As pecas eram
+  espalhadas por `referencia.x +- 2600/3200`, escritos a mao; com fator 0,26
+  e o nivel de -2550 a 3850 a camara so ve o local [286, 2864], portanto
+  METADE das pecas ficava onde nao se pode ver. `_banda(f)` calcula a faixa
+  real e as quantidades passaram a densidades por 1000 px.
+- Montado do que a 08 tem e faltava: vinhas a emoldurar o ecra do topo
+  (`VinhasFrente`, 20-22/nivel), aglomerados de cristal a media distancia
+  (`Camada2Corrupcao`, 4/6/9/11/17 de L1 a L5), e os "Raios de Luz
+  (volumetricos)" (`RaiosLuz`) -- a 9C escondeu o `Raios` legado e nao pos
+  nada no lugar. L3 no pico das ruinas (23+29), L4 no das cascatas (27),
+  L5 com a Heart Tree sobre a arena (`landmark_visto_em = 3060`).
+- NAO mexido: colisoes, geometria, checkpoints, progressao, inimigos, chefes,
+  save, movimento. O unico `.tscn` tocado e o do L5, so para o landmark.
+- PRODUCTION ASSET MISSING: Chuvisco/Chuva -- esta na 08 mas marcado
+  "(variante)" e sem peca no kit 9C. Nao improvisado.
+- Desempenho (relogio de parede, 240 frames): media 0,77-1,03 ms, p95
+  1,19-1,70 ms, 69-72 draw calls, para 16,7 ms de orcamento. O panorama x4
+  sao ~25 MB de VRAM (o x2 eram ~14). MEDIDO EM PC, nao em telemovel.
+- Suite OK. Teste dirigido `teste_execution_9h7_fundo_regiao1`, com as
+  asserçoes PROVADAS por mutacao (a 1.a versao da da corrupcao passava por
+  VACUIDADE: com o L1 a zero, "L5 > 2 x L1" e verdade com um cristal).
+- Prova: work/9h7/9h7_antes_depois.png, 9h7_niveis.png, auditoria_depois.json.
+  O ponto de PARTIDA de cada nivel e mau sitio para julgar o fundo (a
+  geometria tapa 45 % do ecra); fotografar a 15/40/65/90 % da largura.
+- Regiao II NAO iniciada.
+
 ## Execution 9H.6 — iOS intro + layout live
 
 - Trace físico recebido: playing/play resolved, paused=false, readyState=3,
@@ -26,6 +76,18 @@ Atualizado em 12 de setembro de 2026.
 - DEVICE VALIDATION REQUIRED: retestar movimento/A-V/Skip no iPhone.
   Não se declara reprodução iOS PASS com provas DOM/desktop.
 - STOP após deployment; Região II NÃO iniciada.
+- Publicação confirmada: 64a57f5; CI 34702490395 todos os jobs SUCCESS;
+  Pages 6411333452, SHA 64a57f5 SUCCESS. Shell iOS público confirmado,
+  painel temporário ausente; cache 1789227369|8048406 e limpeza antiga.
+- Próximo passo exclusivo: Game Master retestar iPhone vídeo/A-V/Skip e
+  drag/resize/guardar/REPOR live; sem continuar outra execução.
+- Usage final consultado: 20% restante na janela de 5 h e 87% semanal.
+- Publicação confirmada: 64a57f5; CI 34702490395 todos os jobs SUCCESS;
+  Pages 6411333452, SHA 64a57f5 SUCCESS. Shell iOS público confirmado,
+  painel temporário ausente; cache 1789227369|8048406 e limpeza antiga.
+- Próximo passo exclusivo: Game Master retestar iPhone vídeo/A-V/Skip e
+  drag/resize/guardar/REPOR live; sem continuar outra execução.
+- Usage final consultado: 20% restante na janela de 5 h e 87% semanal.
 
 ## Execution 9H.5D — diagnóstico iOS autorizado
 
@@ -40,9 +102,41 @@ Atualizado em 12 de setembro de 2026.
   sem erros de script. Erros WAV AppleDouble preexistentes preservados.
 - Cache local nova 1789224947|7971234; worker limpa versões anteriores.
 - Publicação pelo pipeline existente de master; confirmação após push.
+- Confirmação final: commit/origin/master 99da1cd; CI 34700745955 todos
+  os jobs SUCCESS; Pages 6410999649 SHA 99da1cd SUCCESS; PWA HTTP 200.
+- Cache pública 1789225279|8067147, limpeza de versões antigas confirmada.
+- STOP: diagnóstico publicado; nenhuma investigação adicional iniciada.
 - DEVICE VALIDATION REQUIRED: Game Master testar PWA no iPhone e recolher
   painel antes/depois do Skip. Não continuar investigação sem trace físico.
 - Usage consultado: disponível, 41% restante na janela de 5 h e 91% semanal.
+- Usage final consultado: 36% restante na janela de 5 h e 90% semanal.
+
+## Execution 9H.5 — investigação bloqueada antes do hotfix
+
+- Âmbito: intro iPhone/Skip/transição; nenhum código ou asset alterado.
+- MP4 descarregado da PWA pública: SHA256
+  dab200cef9db8c8b0a4fd8f70f2d1911eb59c804e70d6ca9f8ca9ec0e4d947a9,
+  idêntico ao ficheiro Web e ao vídeo aprovado.
+- MP4/mp42, H.264 Baseline nível 3.1, yuv420p progressivo BT.709,
+  832×464, 30 fps, AAC-LC stereo 44,1 kHz, duração 10 s.
+  moov antes de mdat (faststart); FFmpeg descodificou 300 frames distintos.
+  Evidência local: work/9h5_public_intro.mp4 e work/9h5_frames.md5.
+- Ciclo existente: play síncrono no gesto; playing/timeupdate/pause/error;
+  diagnóstico currentTime/paused/readyState. Não regista metadata/canplay/
+  waiting/stalled nem histórico físico; não distingue A/B/D no iPhone.
+- Skip está z-index 22 (vídeo 20, rotação 21), touch-action manipulation;
+  captura global touchend/click/keydown. Sem hit testing/eventos físicos,
+  causa do toque não provada. Não se atribui a falha ao CSS ou codec.
+- DEVICE VALIDATION REQUIRED: obter do Game Master trace iPhone de
+  eventos/currentTime e alvo do toque; não automatizar dispositivo físico.
+- Continuação autónoma: testes DOM intro/landscape PASS; não provam iOS.
+- PWA no browser desktop integrado mostrou cartão; sem botão DOM nesse
+  arranque; clique não concluiu em 30 s e a ferramenta perdeu o alvo.
+  Prova inconclusiva, não atribuída ao codec/compositor nem ao iPhone.
+- Sem build/commit/push/deploy de lote incompleto. Região II NÃO iniciada.
+- Próximo passo: trace físico ou decisão explícita para publicar apenas
+  instrumentação diagnóstica; fix de causa só depois da evidência.
+- Usage consultado: disponível, 45% da janela de 5 h e 91% semanal.
 
 ## Execution 9H.4 — iPhone intro hotfix
 
@@ -61,7 +155,11 @@ Atualizado em 12 de setembro de 2026.
   Sem hacks de rotação; aviso esperado quando lock ausente/recusado.
 - DOM startup/skip bloqueado/duplo/áudio sem concorrência e landscape PASS.
   Export Web exit 0, sem erros de script; log work/9h4_web_export.log.
-- Próximo passo: confirmar CI/Pages, depois Game Master reteste iPhone/PWA.
+- Publicado `462fdef`, origin/master confirmado; CI `34699292675` todos
+  os jobs SUCCESS; Pages deployment `6410721223` SHA 462fdef SUCCESS.
+  Cache pública nova `1789223481|6481015`; wrapper startup confirmado.
+  Confirmação final registada localmente após push, sem novo commit.
+- Próximo passo exclusivo: Game Master reteste iPhone/PWA.
   Gameplay/bosses/arte/áudio geral/UI do jogo/Região II intactos.
 
 ## Execution 9H.3 — iPhone startup hotfix

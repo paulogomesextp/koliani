@@ -2,6 +2,30 @@
 
 ## Agora
 
+0000000000000. **9H.7 PASS (v0.18.1) -- fundo da Regiao I nitido e niveis
+   1-5 completos. PRONTO PARA REVISAO DO GAME MASTER.** Fechou os dois
+   pontos que o Game Master deixou abertos. **Desfoque: duas causas
+   provadas** -- cada camada era ampliada 2,1x a 3,6x no pixel do ecra com
+   filtro bilinear (a 9H so tratou o panorama), e o shader de nitidez fazia
+   `COLOR = c`, o que **atirava fora o modulate de toda a cadeia**: desde a
+   9H o fundo era desenhado sem a tinta de mood da prancha 08, sem os -18 %
+   da camada funda e sem os alfas das camadas, e o azul ceifava a B=255.
+   Agora amplia-se no DISCO ao fator exacto (panorama x4, kit x3) e desenha-se
+   a ~1:1 (mediana 2,8 -> 1,05-1,10). Corrigida tambem a risca escura do L5:
+   o recorte da 6A levava uma coluna da moldura do painel da prancha, e as
+   pontas espelhadas duplicavam-na. **Conteudo: metade do vestuario caia fora
+   do ecra** -- as pecas eram espalhadas por intervalos escritos a mao que
+   nao sabem onde o nivel comeca; `_banda()` calcula a faixa que a camara
+   percorre e as quantidades passaram a densidades por 1000 px. Montado o que
+   a 08 tem e faltava: vinhas a emoldurar o ecra, aglomerados de cristal a
+   media distancia (4/6/9/11/17 de L1 a L5) e os raios de luz volumetricos
+   (que a 9C escondeu sem substituir). L3 e o pico das ruinas, L4 o das
+   cascatas, L5 tem a Heart Tree sobre a arena do chefe. Zero alteracoes a
+   colisoes, geometria, checkpoints, inimigos, chefes, save ou movimento.
+   Desempenho 0,77-1,03 ms de 16,7 (**medido em PC, nao em telemovel**).
+   PRODUCTION ASSET MISSING: Chuvisco/Chuva (esta na 08 mas marcado
+   "(variante)" e sem peca no kit 9C). **Regiao II NAO iniciada.**
+
 000000000000. **9H.1 PARTIAL PASS (v0.18.0) -- fecho do gate humano da
    Regiao I. PRONTO PARA REVISAO HUMANA.** Fechou os cinco pontos que o
    Game Master deixou abertos na 9H: **trilha sonora de producao** (6 pecas

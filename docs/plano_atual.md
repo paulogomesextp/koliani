@@ -2,6 +2,21 @@
 
 ## Estado — 12 de setembro de 2026
 
+### Execution 9H.7 - nitidez do fundo + conteudo dos niveis da Regiao I
+
+- Desfoque: ampliacao bilinear de 2,1x-3,6x no ecra em TODAS as camadas (a 9H
+  so tratou o panorama) + o shader de nitidez a atirar o `modulate` fora
+  desde a 9H. Corrigido: amplia-se no disco ao fator exacto (panorama x4,
+  kit x3), desenha-se a ~1:1, e o shader repoe o modulate pelo vertice.
+- Conteudo: as pecas eram pousadas em intervalos escritos a mao e metade caia
+  fora do que a camara ve. `_banda()` + densidades por 1000 px. Montado o que
+  a 08 tem e faltava: vinhas do primeiro plano, cristais de corrupcao a media
+  distancia e os raios de luz volumetricos. L3 ruinas, L4 cascatas, L5 Heart
+  Tree sobre a arena.
+- Zero alteracoes a gameplay (colisoes/geometria/checkpoints/inimigos/chefes/
+  save/movimento). Suite OK + teste dirigido provado por mutacao.
+- v0.18.1. Regiao II NAO iniciada. PRONTO PARA REVISAO DO GAME MASTER.
+
 ### Execution 9H.6 — lote exclusivo iOS + layout live
 
 - Corrigir ciclo de vídeo Web/iOS bloqueado em t=0 e Skip DOM, mantendo MP4.
@@ -9,6 +24,8 @@
 - Retirar painel temporário; landscape e restantes sistemas congelados.
 - Conclusão: testes dirigidos, export Web, commit/push, CI/Pages confirmados.
 - STOP após deploy; DEVICE VALIDATION REQUIRED para vídeo/áudio/Skip no iPhone.
+- Publicado 64a57f5: CI/Pages SUCCESS; testes dirigidos e suite PASS.
+  STOP de publicação cumprido; reteste físico do Game Master pendente.
 
 **9H PARTIAL PASS (v0.17.0). Região I pronta para o gate humano; Região II
 não iniciada.** O frontend inteiro passou a sair das pranchas aprovadas em

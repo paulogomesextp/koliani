@@ -59,6 +59,7 @@ seed_ambiente = 1148
 [node name="Region1HybridVisualTarget" parent="." instance=ExtResource("100_target")]
 perfil = 5
 limite_direito = 3450.0
+landmark_visto_em = 3060.0
 
 [node name="Podridao" parent="." instance=ExtResource("11_agua")]
 position = Vector2(1650, 970)

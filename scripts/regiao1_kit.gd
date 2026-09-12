@@ -76,6 +76,23 @@ static func tex(rel: String) -> Texture2D:
 	return _cache[rel]
 
 
+## Execution 9H.7 -- as peças de FUNDO também vêm ampliadas no disco
+## (`<nome>_hd_x3.png`, Lanczos + máscara de desfoque de
+## `tools/nitidez_fundo_9h7.py`). O fundo desenhava-se com filtro bilinear a
+## 2,5x-3,6x no pixel do ecrã, e ampliação bilinear é interpolação: era isso
+## que o Game Master via desfocado. Quem monta divide a escala por `HD` e
+## desenha ~1:1; a geometria no mundo fica igual (3 x e/3 = e).
+const HD := 3
+
+## A peça em HD, ou `null` se não houver (aí desenha-se a original como antes).
+static func tex_hd(rel: String) -> Texture2D:
+	var chave := "hd:" + rel
+	if not _cache.has(chave):
+		var cam := "%s/%s_hd_x%d.png" % [DIR, rel.trim_suffix(".png"), HD]
+		_cache[chave] = load(cam) if ResourceLoader.exists(cam) else null
+	return _cache[chave]
+
+
 ## O nó que ligou o kit neste nível, ou null (kit desligado).
 static func alvo(no: Node) -> Node:
 	if no == null or not no.is_inside_tree():

@@ -29,25 +29,42 @@ const Kit := preload("res://scripts/regiao1_kit.gd")
 @export var limite_direito := 3850.0
 ## Câmara de referência (centro do ecrã) em que as camadas ficam no sítio.
 @export var referencia := Vector2(1900.0, 560.0)
+## Execution 9H.7 -- ÊNFASE DO LANDMARK. A prancha 08 tem uma variante de
+## cenário por nível e a do L5 chama-se "Heart Tree Próximo"; a Heart Tree
+## está pintada no panorama a uma coluna fixa, e com a âncora antiga caía
+## sempre no mesmo ponto do mundo -- no L5 o jogador chegava ao chefe sem a
+## ver. Aqui diz-se em que X do MUNDO a câmara tem de estar para a Heart Tree
+## ficar ao centro do ecrã, e a âncora do panorama sai daí (ver
+## `_ancora_panorama`). 0 = como antes (a `referencia`).
+@export var landmark_visto_em := 0.0
 
 const COR_SHADOWBLADE := Color("bb8cff")
 const COR_SHADOWBLADE_NUCLEO := Color("f1e5ff")
-## Execution 9H: o panorama passou a vir em DOBRO (Lanczos + máscara de
-## desfoque, `tools/nitidez_panorama_9h.py`) e desenha-se a 1,5x em vez de
-## 3x. A geometria no mundo é a mesma (2 x 1,5 = 3); o que muda é que metade
-## da ampliação deixou de ser feita pelo filtro bilinear do GPU -- era essa
-## a razão de o fundo parecer desfocado.
-const TEX_BACKGROUND_APPROVED := preload("res://assets/art/regions/region_01_forest/production/backgrounds/region1_panorama_heart_tree_x2.png")
-const TEX_BACKGROUND_LEFT := preload("res://assets/art/regions/region_01_forest/production/backgrounds/region1_panorama_left_cap_x2.png")
-const TEX_BACKGROUND_RIGHT := preload("res://assets/art/regions/region_01_forest/production/backgrounds/region1_panorama_right_cap_x2.png")
+## Execution 9H.7: o panorama vem ampliado x4 no disco (Lanczos sobre alfa
+## premultiplicado + máscara de desfoque, `tools/nitidez_fundo_9h7.py`) e
+## desenha-se a 0,75x em vez de 3x. A geometria no mundo é a mesma
+## (4 x 0,75 = 3) e nenhum pixel foi pintado; o que muda é a ampliação que
+## sobra para o filtro bilinear do GPU. A 9H tinha-a descido de 4,2x para
+## 2,1x com um x2; 2,1x ainda é interpolação a dobrar, e era por isso que o
+## Game Master continuava a ver o fundo desfocado. Com x4 sobra 1,05x -- 1:1
+## no pixel do ecrã (3 / 4 x 1,4 de zoom da câmara).
+const TEX_BACKGROUND_APPROVED := preload("res://assets/art/regions/region_01_forest/production/backgrounds/region1_panorama_heart_tree_hd_x4.png")
+const TEX_BACKGROUND_LEFT := preload("res://assets/art/regions/region_01_forest/production/backgrounds/region1_panorama_left_cap_hd_x4.png")
+const TEX_BACKGROUND_RIGHT := preload("res://assets/art/regions/region_01_forest/production/backgrounds/region1_panorama_right_cap_hd_x4.png")
 ## Fator a que o panorama já vem ampliado no disco.
-const PANORAMA_HD := 2.0
+const PANORAMA_HD := 4.0
+## Zoom da câmara desenhado na cena (`camera_tremor.gd`, ZOOM_BASE). Serve só
+## para estimar a ampliação no pixel do ecrã e afinar a acutância; num ecrã
+## mais largo o zoom sobe e a ampliação com ele, mas a diferença é pequena.
+const ZOOM_CAMARA := 1.4
 ## Coluna da Heart Tree dentro do panorama (px da textura de origem; 08:
 ## x≈450 − 18), convertida para os píxeis da textura em dobro.
 const HEART_TREE_X := 432.0 * PANORAMA_HD
 
 var _camadas: Array = []          # [Node2D, fator Vector2]
 var _particulas: CPUParticles2D
+var _vinhas: Node2D
+var _raios: Node2D
 var _restauro_hud: Array[Dictionary] = []
 var _hud_aplicado := false
 
@@ -134,6 +151,7 @@ func _ready() -> void:
 	_montar_camada3(p, rng)
 	_montar_camada2(p, rng)
 	_montar_nevoa(p)
+	_montar_raios(p)
 	_montar_corrupcao(p)
 	if Engine.is_editor_hint():
 		set_process(false)
@@ -160,6 +178,12 @@ func _process(_dt: float) -> void:
 		n.position = desvio * (Vector2.ONE - f)
 	if _particulas:
 		_particulas.global_position = c
+	if _raios:
+		_raios.position = c - global_position
+	if _vinhas:
+		# 300 px acima do centro: o topo do ecrã está a 257 (720 / 2 / 1,4), por
+		# isso as vinhas nascem já fora do ecrã e nunca se vê onde agarram.
+		_vinhas.position.y = c.y - global_position.y - 300.0
 
 
 ## Camada nova sob este nó, com parallax. Não é interpolada: a posição é
@@ -187,7 +211,7 @@ func _montar_background(p: Dictionary) -> void:
 	# A Heart Tree fica a meio do nível com a câmara na referência; os caps
 	# são as extremidades espelhadas, encostadas pixel a pixel.
 	var e := 3.0 / PANORAMA_HD
-	var x0 := referencia.x - HEART_TREE_X * e
+	var x0 := _ancora_panorama() - HEART_TREE_X * e
 	var y0 := 170.0
 	var fim := x0 + TEX_BACKGROUND_APPROVED.get_width() * e
 	var le := TEX_BACKGROUND_LEFT.get_width() * e
@@ -197,6 +221,39 @@ func _montar_background(p: Dictionary) -> void:
 	_sprite_aprovado(camada, TEX_BACKGROUND_LEFT, Vector2(x0 - le * 2.0, y0), Vector2(e, e))
 	_sprite_aprovado(camada, TEX_BACKGROUND_RIGHT, Vector2(fim + ld, y0), Vector2(-e, e))
 	_sprite_aprovado(camada, TEX_BACKGROUND_RIGHT, Vector2(fim + ld, y0), Vector2(e, e))
+
+
+## X do mundo em que a coluna da Heart Tree é desenhada quando a câmara está
+## na `referencia`. A camada tem fator 0,12, portanto a árvore aparece em
+## `ancora + desvio × 0,88`; para ficar ao centro com a câmara em `visto`:
+##   ancora = 0,12 × visto + 0,88 × referencia.x
+func _ancora_panorama() -> float:
+	if is_zero_approx(landmark_visto_em):
+		return referencia.x
+	return 0.12 * landmark_visto_em + 0.88 * referencia.x
+
+
+## Execution 9H.7 -- a FAIXA de uma camada de parallax: o intervalo de x
+## LOCAL que a câmara chega a ver, percorrendo o nível de ponta a ponta.
+##
+## Era aqui que os níveis pareciam vazios. As peças eram espalhadas por
+## `referencia.x ± 2600` a ± 3200 -- intervalos escritos à mão que não sabem
+## onde o nível começa nem acaba. Com fator 0,26 e o nível de −2550 a 3850, a
+## câmara só vê o local [286, 2864]: metade das peças era pousada fora do que
+## se pode ver, e a outra metade tinha de encher o ecrã inteiro sozinha.
+func _banda(f: float) -> Vector2:
+	# metade da largura do mundo que cabe no ecrã (1280 px a 1,4x de zoom)
+	var meia := 1280.0 * 0.5 / ZOOM_CAMARA
+	var d0 := (limite_esquerdo - referencia.x) * (1.0 - f)
+	var d1 := (limite_direito - referencia.x) * (1.0 - f)
+	var lo := minf(limite_esquerdo - meia - d0, limite_direito - meia - d1)
+	var hi := maxf(limite_esquerdo + meia - d0, limite_direito + meia - d1)
+	return Vector2(lo, hi)
+
+
+## Quantas peças de um tipo entram numa faixa, a uma densidade por 1000 px.
+static func _quantas(banda: Vector2, por_mil: float) -> int:
+	return int(round((banda.y - banda.x) / 1000.0 * por_mil))
 
 
 func _montar_heart_tree() -> void:
@@ -210,9 +267,19 @@ func _montar_heart_tree() -> void:
 
 ## Camada 3 da 08: serra contínua, com cascatas e arcos de ruína pousados
 ## nela. Quantos de cada, conforme a variante do nível.
+##
+## 9H.7: a serra e as peças passaram a cobrir a FAIXA do nível (`_banda`) e as
+## quantidades passaram a densidades por 1000 px. Antes eram contagens fixas
+## num intervalo escrito à mão: o L3 ("Ruínas Antigas" na 08) tinha 6 arcos
+## para 5200 px e a serra parava antes da ponta esquerda do nível.
+const DENS_C3_CASCATA := 3.2
+const DENS_C3_COLUNAS := 2.4
+const DENS_C3_ARCO := 5.2
+
 func _montar_camada3(p: Dictionary, rng: RandomNumberGenerator) -> void:
 	var camada := _camada("Camada3Distante", -26, Vector2(0.26, 0.16))
 	camada.modulate = Color(0.86, 0.9, 1.0, 0.82)
+	var banda := _banda(0.26)
 	var serra := Kit.tex("fundo/fundo_montanhas.png")
 	var chao := 700.0
 	if serra:
@@ -223,70 +290,119 @@ func _montar_camada3(p: Dictionary, rng: RandomNumberGenerator) -> void:
 		var e := 2.2
 		var corte := 3.0
 		var w := (serra.get_width() - corte * 2.0) * e
-		var x := referencia.x - 3200.0
+		var x := banda.x - w
 		var i := 0
-		while x < referencia.x + 3200.0:
-			var s := _sprite_fundo(camada, serra, Vector2(x, chao + 60.0 - serra.get_height() * e), e,
-				i % 2 == 1)
-			s.region_enabled = true
-			s.region_rect = Rect2(corte, 0.0, serra.get_width() - corte * 2.0, serra.get_height())
+		while x < banda.y + w:
+			var s := _sprite_fundo(camada, "fundo/fundo_montanhas.png",
+				Vector2(x, chao + 60.0 - serra.get_height() * e), e, i % 2 == 1)
+			_regiao(s, Rect2(corte, 0.0, serra.get_width() - corte * 2.0,
+				serra.get_height()))
 			if i % 2 == 1:
 				s.position.x = x + w
 			s.set_meta("peca", "serra")
 			x += w - 24.0
 			i += 1
 	var pecas := [
-		["fundo/fundo_cascata.png", float(p["cascatas"]) * 7.0],
-		["fundo/fundo_colunas_cascata.png", float(p["cascatas"]) * 5.0],
-		["fundo/fundo_arco_ruina.png", float(p["ruinas"]) * 7.0],
+		["fundo/fundo_cascata.png", float(p["cascatas"]) * DENS_C3_CASCATA],
+		["fundo/fundo_colunas_cascata.png", float(p["cascatas"]) * DENS_C3_COLUNAS],
+		["fundo/fundo_arco_ruina.png", float(p["ruinas"]) * DENS_C3_ARCO],
 	]
 	for peca: Array in pecas:
 		var t := Kit.tex(peca[0])
 		if t == null:
 			continue
-		var n := int(round(peca[1]))
+		var n := _quantas(banda, peca[1])
+		var passo := (banda.y - banda.x) / float(maxi(1, n))
 		for k in n:
 			var e := rng.randf_range(1.8, 2.2)
-			var x := referencia.x - 2600.0 + (5200.0 / float(maxi(1, n))) * (float(k) + rng.randf_range(0.1, 0.9))
-			_sprite_fundo(camada, t, Vector2(x, chao + 30.0 - t.get_height() * e), e,
-				rng.randf() < 0.5)
+			var x := banda.x + passo * (float(k) + rng.randf_range(0.1, 0.9))
+			_sprite_fundo(camada, peca[0],
+				Vector2(x, chao + 30.0 - t.get_height() * e), e, rng.randf() < 0.5)
 
 
 ## Camada 2 da 08: floresta e ruínas a média distância. Silhuetas escuras,
 ## espaçadas — a camada dá profundidade, não enche o ecrã.
+##
+## 9H.7: faixa do nível e densidades (ver `_montar_camada3`), árvores mais
+## juntas, e os CRISTAIS DE CORRUPÇÃO da 08 entram aqui. O "exemplo em jogo"
+## da prancha tem aglomerados de cristal magenta a média distância, e o kit
+## 9C tem as quatro peças (`corrupcao/cristal_corrupcao_a…d`), mas até agora
+## só eram usadas como props de chão: o L5, com corrupção a 1,0, lia-se igual
+## ao L1.
+const DENS_C2_RUINA := 3.4
+const DENS_C2_CASCATA := 2.2
+const DENS_C2_CRISTAL := 4.2
+const CRISTAIS := ["corrupcao/cristal_corrupcao_a.png",
+	"corrupcao/cristal_corrupcao_b.png", "corrupcao/cristal_corrupcao_c.png",
+	"corrupcao/cristal_corrupcao_d.png"]
+
 func _montar_camada2(p: Dictionary, rng: RandomNumberGenerator) -> void:
 	var camada := _camada("Camada2Floresta", -22, Vector2(0.46, 0.3))
 	# alfa 0,6: silhueta escura inteira atrás de pedra escura apagava a aresta
 	camada.modulate = Color(1, 1, 1, 0.6)
+	var banda := _banda(0.46)
 	var arvores := ["fundo/fundo_arvores_par.png", "fundo/fundo_arvore_a.png",
 		"fundo/fundo_arvore_b.png"]
 	var chao := 860.0
-	var x := referencia.x - 2800.0
-	while x < referencia.x + 2800.0:
-		var t := Kit.tex(arvores[rng.randi() % arvores.size()])
+	var x := banda.x
+	while x < banda.y:
+		var rel: String = arvores[rng.randi() % arvores.size()]
+		var t := Kit.tex(rel)
 		if t:
 			var e := rng.randf_range(2.0, 2.4)
-			_sprite_fundo(camada, t, Vector2(x, chao - t.get_height() * e), e, rng.randf() < 0.5)
-			x += t.get_width() * e * rng.randf_range(0.9, 1.6)
+			_sprite_fundo(camada, rel, Vector2(x, chao - t.get_height() * e), e,
+				rng.randf() < 0.5)
+			x += t.get_width() * e * rng.randf_range(0.72, 1.24)
 		else:
 			x += 400.0
 	# ruínas e cascatas da prancha 10 (graduadas), mais perto e mais escuras
 	var extra := [
-		["props/ruina.png", float(p["ruinas"]) * 5.0],
-		["props/cascata.png", float(p["cascatas"]) * 4.0],
+		["props/ruina.png", float(p["ruinas"]) * DENS_C2_RUINA],
+		["props/cascata.png", float(p["cascatas"]) * DENS_C2_CASCATA],
 	]
 	for peca: Array in extra:
 		var t := Kit.tex(peca[0])
 		if t == null:
 			continue
-		var n := int(round(peca[1]))
+		var n := _quantas(banda, peca[1])
+		var passo := (banda.y - banda.x) / float(maxi(1, n))
 		for k in n:
 			var e := rng.randf_range(2.0, 2.6)
-			var px := referencia.x - 2400.0 + (4800.0 / float(maxi(1, n))) * (float(k) + rng.randf_range(0.1, 0.9))
-			var s := _sprite_fundo(camada, t, Vector2(px, chao + 10.0 - t.get_height() * e), e,
-				rng.randf() < 0.5)
-			s.modulate = Color(0.62, 0.68, 0.84)
+			var px := banda.x + passo * (float(k) + rng.randf_range(0.1, 0.9))
+			var s := _sprite_fundo(camada, peca[0],
+				Vector2(px, chao + 10.0 - t.get_height() * e), e, rng.randf() < 0.5)
+			# 0,62 apagava a ruína contra o azul do panorama, e o L3 ("Ruínas
+			# Antigas" na 08) é o nível em que ela tem de ser o que se lê.
+			s.modulate = Color(0.72, 0.76, 0.9)
 			s.z_index = -1
+	_montar_corrupcao_media(p, rng)
+
+
+## Os aglomerados de cristal da 08, a média distância. Camada própria (fator
+## 0,52, entre a floresta e a névoa) e não dentro da `Camada2Floresta`, porque
+## o alfa 0,6 dessa camada -- que existe para a silhueta das árvores não
+## apagar as arestas -- também apagava a corrupção, e a corrupção é a escala
+## que separa o L1 (0,25) do L5 (1,0). Sem isto o primeiro ecrã do L5 lia-se
+## igual ao do L3.
+func _montar_corrupcao_media(p: Dictionary, rng: RandomNumberGenerator) -> void:
+	var intensidade: float = p["corrupcao"]
+	if intensidade <= 0.0:
+		return
+	var camada := _camada("Camada2Corrupcao", -21, Vector2(0.52, 0.34))
+	var banda := _banda(0.52)
+	var chao := 880.0
+	var n := _quantas(banda, intensidade * DENS_C2_CRISTAL)
+	var passo := (banda.y - banda.x) / float(maxi(1, n))
+	for k in n:
+		var rel: String = CRISTAIS[rng.randi() % CRISTAIS.size()]
+		var t := Kit.tex(rel)
+		if t == null:
+			continue
+		var e := rng.randf_range(2.4, 3.4)
+		var px := banda.x + passo * (float(k) + rng.randf_range(0.1, 0.9))
+		var s := _sprite_fundo(camada, rel,
+			Vector2(px, chao - t.get_height() * e), e, rng.randf() < 0.5)
+		s.modulate = Color(1.0, 0.74, 1.0, 0.82)
 
 
 func _montar_nevoa(p: Dictionary) -> void:
@@ -296,14 +412,17 @@ func _montar_nevoa(p: Dictionary) -> void:
 	var densidade: float = p["nevoa"]
 	# névoa média: entre a floresta e o plano de jogo
 	var media := _camada("NevoaMedia", -20, Vector2(0.6, 0.4))
-	var s := _faixa(media, t, Vector2(referencia.x - 3600.0, 470.0), Vector2(7200.0, t.get_height()), 3.0)
+	var banda := _banda(0.6)
+	var s := _faixa(media, "atmosfera/nevoa.png", Vector2(banda.x, 470.0),
+		Vector2((banda.y - banda.x) / 3.0, t.get_height()), 3.0)
 	s.modulate = Color(1, 1, 1, 0.34 * densidade)
 	# névoa do chão: ATRÁS do terreno (z −6), por isso nunca tapa uma aresta
 	var chao := Node2D.new()
 	chao.name = "NevoaChao"
 	chao.z_index = -6
 	add_child(chao)
-	var s2 := _faixa(chao, t, Vector2(limite_esquerdo - 800.0, 600.0),
+	var s2 := _faixa(chao, "atmosfera/nevoa.png",
+		Vector2(limite_esquerdo - 800.0, 600.0),
 		Vector2((limite_direito - limite_esquerdo + 1600.0) / 2.0, t.get_height()), 2.0)
 	s2.modulate = Color(0.9, 0.95, 1.0, 0.26 * densidade)
 	var tw := create_tween().set_loops()
@@ -346,6 +465,15 @@ func _montar_corrupcao(p: Dictionary) -> void:
 ## Camada 1 da 08: a vegetação em silhueta à frente de tudo. Fica abaixo do
 ## fundo visual das plataformas e abaixo da superfície das poças mortais —
 ## enquadra o ecrã por baixo sem tapar pouso, arestas nem perigos.
+##
+## 9H.7: e as VINHAS penduradas do topo. O "exemplo em jogo" da prancha 08
+## tem o ecrã emoldurado por vinhas a cair de cima, e o kit 9C tem as três
+## peças (`props/vinha_a/b/longa`) — mas só eram usadas por baixo das
+## plataformas (`Kit.pendurar`), onde quase não se vêem. Penduradas do topo
+## fecham a moldura do primeiro plano, que era o que faltava para o ecrã
+## parecer o da prancha.
+const DENS_VINHAS := 2.6
+
 func _montar_primeiro_plano() -> void:
 	if not is_inside_tree():
 		return
@@ -362,15 +490,86 @@ func _montar_primeiro_plano() -> void:
 		topo = 830.0
 	var camada := _camada("PrimeiroPlano", 12, Vector2(1.15, 1.0))
 	camada.set_meta("topo_mundo", topo)
+	var banda := _banda(1.15)
 	var e := 2.4
 	var w := t.get_width() * e
-	var x := limite_esquerdo - 1200.0
+	var x := banda.x
 	var i := 0
-	while x < limite_direito + 1600.0:
-		var s := _sprite_fundo(camada, t, Vector2(x, topo), e, i % 2 == 1)
+	while x < banda.y:
+		var s := _sprite_fundo(camada, "fundo/frente_vegetacao.png",
+			Vector2(x, topo), e, i % 2 == 1)
 		s.modulate = Color(1, 1, 1, 0.94)
 		x += w - 4.0
 		i += 1
+	_montar_vinhas(banda)
+
+
+## As vinhas ficam num nó só com x do mundo (fator 1) e o y colado ao topo do
+## ecrã no `_process`: penduradas de um sítio fixo do mundo, ou saíam do ecrã
+## (as plataformas destes níveis andam pelo y 600-900 e a câmara sobe e desce
+## com a Koliani). O x é mundo, portanto rolam com o cenário e não nadam.
+func _montar_vinhas(banda: Vector2) -> void:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 970 + perfil
+	_vinhas = Node2D.new()
+	_vinhas.name = "VinhasFrente"
+	_vinhas.z_index = 13
+	_vinhas.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
+	add_child(_vinhas)
+	var lista := ["props/vinha_longa.png", "props/vinha_a.png", "props/vinha_b.png"]
+	var n := _quantas(banda, DENS_VINHAS)
+	var passo := (banda.y - banda.x) / float(maxi(1, n))
+	for k in n:
+		var rel: String = lista[rng.randi() % lista.size()]
+		var t := Kit.tex(rel)
+		if t == null:
+			continue
+		var e := rng.randf_range(1.8, 3.1)
+		var x := banda.x + passo * (float(k) + rng.randf_range(0.1, 0.9))
+		var s := _sprite_fundo(_vinhas, rel, Vector2(x, 0.0), e, rng.randf() < 0.5)
+		# As peças de vinha do kit foram graduadas para o CHÃO, ao lado das
+		# lanternas: penduradas do topo, à luz do luar, aquele verde-lima lia-se
+		# como vegetação iluminada e não como a silhueta escura da prancha.
+		s.modulate = Color(0.42, 0.48, 0.64, 0.92)
+
+
+## "Raios de Luz (volumétricos)" dos EFEITOS ATMOSFÉRICOS da prancha 08.
+##
+## A 9C escondeu o nó `Raios` da Atmosfera legada junto com o resto do fundo
+## antigo e não pôs nada no lugar — um efeito aprovado da prancha ficou de
+## fora da região. Aqui volta, mas como a névoa e as partículas: polígonos
+## aditivos colados ao ecrã, graduados para o luar da 08. A intensidade
+## acompanha a névoa (sem bruma no ar não há feixe).
+func _montar_raios(p: Dictionary) -> void:
+	var densidade: float = p["nevoa"]
+	if densidade <= 0.0:
+		return
+	_raios = Node2D.new()
+	_raios.name = "RaiosLuz"
+	# Atrás da névoa do chão (−6) e do plano de jogo: os feixes atravessam o
+	# fundo, não lavam a Koliani nem escondem uma aresta de pouso.
+	_raios.z_index = -10
+	_raios.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
+	add_child(_raios)
+	var mat := CanvasItemMaterial.new()
+	mat.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
+	var luar := Kit.tinta(p) * Color(0.58, 0.68, 0.95)
+	# x do feixe no ecrã, largura em cima, deriva em baixo, alfa
+	var feixes := [
+		[-430.0, 62.0, 150.0, 0.055], [-140.0, 96.0, 210.0, 0.045],
+		[180.0, 74.0, 176.0, 0.05], [430.0, 110.0, 240.0, 0.04],
+	]
+	for f: Array in feixes:
+		var poli := Polygon2D.new()
+		poli.material = mat
+		poli.color = Color(luar.r, luar.g, luar.b, float(f[3]) * densidade)
+		poli.polygon = PackedVector2Array([
+			Vector2(float(f[0]), -300.0),
+			Vector2(float(f[0]) + float(f[1]), -300.0),
+			Vector2(float(f[0]) + float(f[1]) + float(f[2]), 300.0),
+			Vector2(float(f[0]) + float(f[2]), 300.0),
+		])
+		_raios.add_child(poli)
 
 
 ## Esconde o fundo LEGADO da Atmosfera (pack CC0 + silhuetas por código). O
@@ -425,41 +624,76 @@ func _restaurar_skin_hud() -> void:
 const SHADER_NITIDEZ := preload("res://assets/shaders/nitidez_fundo.gdshader")
 
 ## Máscara de desfoque no pixel do ECRÃ (ver `nitidez_fundo.gdshader`).
-## `ampliacao` é a escala a que a peça vai ser desenhada: quanto mais se
-## amplia, mais macia fica, e mais força precisa. Sem tecto não é: acima de
-## ~0,8 a aresta ganha halo branco e a pintura parece recortada.
+## `ampliacao` é quantos píxeis de ecrã cada pixel da textura vai ocupar
+## (escala de desenho × zoom da câmara). Desde a 9H.7 as peças de fundo vêm
+## ampliadas do disco e desenham-se a ~1:1, portanto já não há softness de
+## reamostragem para combater: a força desce para uma acutância leve, que é
+## só a que o Lanczos come. Manter os 0,55 de antes a 1:1 desenhava halo.
 static func _nitidez(s: Sprite2D, ampliacao: float) -> void:
 	var mat := ShaderMaterial.new()
 	mat.shader = SHADER_NITIDEZ
-	mat.set_shader_parameter("forca", clampf(0.30 * ampliacao + 0.20, 0.35, 1.05))
+	mat.set_shader_parameter("forca",
+		clampf(0.34 * (ampliacao - 1.0) + 0.18, 0.12, 1.05))
 	mat.set_shader_parameter("raio", 1.30)
 	s.material = mat
 
 
-func _sprite_fundo(camada: Node2D, t: Texture2D, pos: Vector2, e: float,
+## A peça `rel` desenhada com escala `e` em unidades da textura ORIGINAL.
+## Se houver variante HD no disco, é essa que vai para o GPU, com a escala
+## dividida pelo fator: o quad no mundo é do mesmo tamanho ao pixel
+## (`largura_hd × e/HD == largura × e`) e o GPU deixa de ampliar. Quem chama
+## continua a medir em píxeis da original -- nada na composição se mexe.
+## `fator_hd` fica em meta para quem precise de `region_rect` (ver `_regiao`).
+func _sprite_fundo(camada: Node2D, rel: String, pos: Vector2, e: float,
 		espelho: bool) -> Sprite2D:
+	var orig := Kit.tex(rel)
+	if orig == null:
+		return null
+	var t := Kit.tex_hd(rel)
+	var k := float(Kit.HD) if t != null else 1.0
+	if t == null:
+		t = orig
+	var eh := e / k
 	var s := Sprite2D.new()
 	s.texture = t
 	s.centered = false
-	s.scale = Vector2(-e if espelho else e, e)
-	s.position = pos + (Vector2(t.get_width() * e, 0.0) if espelho else Vector2.ZERO)
+	s.scale = Vector2(-eh if espelho else eh, eh)
+	s.position = pos + (Vector2(orig.get_width() * e, 0.0) if espelho else Vector2.ZERO)
 	s.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
-	_nitidez(s, e)
+	s.set_meta("fator_hd", k)
+	_nitidez(s, eh * ZOOM_CAMARA)
 	camada.add_child(s)
 	return s
 
 
-func _faixa(camada: Node2D, t: Texture2D, pos: Vector2, tam: Vector2, e: float) -> Sprite2D:
+## `region_rect` em píxeis da textura ORIGINAL, convertido para a HD.
+static func _regiao(s: Sprite2D, rect: Rect2) -> void:
+	if s == null:
+		return
+	var k := float(s.get_meta("fator_hd", 1.0))
+	s.region_enabled = true
+	s.region_rect = Rect2(rect.position * k, rect.size * k)
+
+
+func _faixa(camada: Node2D, rel: String, pos: Vector2, tam: Vector2, e: float) -> Sprite2D:
+	var orig := Kit.tex(rel)
+	if orig == null:
+		return null
+	var t := Kit.tex_hd(rel)
+	var k := float(Kit.HD) if t != null else 1.0
+	if t == null:
+		t = orig
+	var eh := e / k
 	var s := Sprite2D.new()
 	s.texture = t
 	s.centered = false
 	s.texture_repeat = CanvasItem.TEXTURE_REPEAT_ENABLED
 	s.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
-	s.region_enabled = true
-	s.region_rect = Rect2(Vector2.ZERO, tam)
-	s.scale = Vector2(e, e)
+	s.scale = Vector2(eh, eh)
 	s.position = pos
-	_nitidez(s, e)
+	s.set_meta("fator_hd", k)
+	_regiao(s, Rect2(Vector2.ZERO, tam))
+	_nitidez(s, eh * ZOOM_CAMARA)
 	camada.add_child(s)
 	return s
 
@@ -472,6 +706,6 @@ func _sprite_aprovado(camada: Node2D, textura: Texture2D, pos: Vector2,
 	s.position = pos
 	s.scale = escala
 	s.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
-	_nitidez(s, maxf(absf(escala.x), absf(escala.y)))
+	_nitidez(s, maxf(absf(escala.x), absf(escala.y)) * ZOOM_CAMARA)
 	camada.add_child(s)
 	return s
