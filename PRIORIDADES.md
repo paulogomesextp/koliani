@@ -2,6 +2,27 @@
 
 ## Agora
 
+00000000000000. **9H.12B PLANO FECHADO -- remaster da Regiao I. A ESPERA DE
+   DUAS DECISOES DO PAULO.** Plano completo em
+   `docs/execution_9h12b_regiao1_remaster_plan.md`. Quatro causas MEDIDAS:
+   (1) o desfoque do fundo e' aritmetica -- a fonte e' um recorte de
+   **952x247** ampliado **4,2x** (3,0 no mundo x 1,4 de zoom), ou seja 0,24 px
+   de fonte por pixel de ecra; os `_hd_x4` sao upscales e nao acrescentam
+   informacao; (2) o "mosaico pobre" e' o `terreno_corpo.png` de **30x75**
+   repetido ~35x por plataforma, sem variantes; (3) **ja' existem 12 fontes
+   de 1254x1254 a 2172x724** em `_source/imagegen_v1/` que o
+   `build_region_01_sprite_kit.py` **reduz a 32/64/96 px** -- e' a alavanca
+   mais barata que temos; (4) **o repo e' PUBLICO**, logo commitar um asset
+   e' redistribui-lo: so' entra CC0 ou arte nossa. **BLOQUEADO ate' o Paulo
+   decidir:** (a) mudar o contrato de geracao (hoje pede "pixel-art, hard
+   pixel clusters, no antialiasing" -- o hibrido 2D exige o oposto) e (b) a
+   politica de assets externos nao-CC0 num repo publico. **Pixsol REJEITADO**
+   (16x16 px e proibe uso em IA). Segue sem aprovacao: **9H.12C** (bugs do
+   GM). Bugs confirmados: a legenda do HUD promete "Jump x2" mas
+   `HABILIDADES_INICIAIS` esta vazio; o crash da saida do L1 esta na
+   TRANSICAO (`porta.gd:69`), nao na cena de destino -- o L2 carrega limpo em
+   headless. **Regiao II NAO iniciada.**
+
 0000000000000. **9H.7 PASS (v0.18.1) -- fundo da Regiao I nitido e niveis
    1-5 completos. PRONTO PARA REVISAO DO GAME MASTER.** Fechou os dois
    pontos que o Game Master deixou abertos. **Desfoque: duas causas

@@ -4,6 +4,44 @@
 
 Atualizado em 12 de setembro de 2026.
 
+## 9H.12B — plano do remaster da Região I (12 set 2026)
+
+**Nada de arte foi produzido; é um plano.** Relatório:
+[`execution_9h12b_regiao1_remaster_plan.md`](execution_9h12b_regiao1_remaster_plan.md).
+
+O que custou a descobrir, e que não se deve voltar a re-derivar:
+
+- **O desfoque do fundo não é filtro, é falta de informação na fonte.** O
+  panorama é `region1_panorama_heart_tree.png` a **952x247**, desenhado a
+  escala 3,0 no mundo com a câmara a 1,4 de zoom = **4,2x no ecrã**, ou seja
+  **0,24 px de fonte por px de ecrã**. Os `_x2` e `_hd_x4` (3808x988) são
+  reamostragens do mesmo recorte — **não acrescentam nada**. A 9H.7 tratou o
+  filtro e ganhou o que havia a ganhar; o resto só sai com fonte nativa.
+- **O "mosaico pixel art pobre" é o `terreno_corpo.png` de 30x75**, repetido
+  ~35 vezes numa plataforma de 1050 px, sem variantes. O fundo é pintado e o
+  chão é mosaico — é a discordância entre os dois que parece amadora, não
+  cada um por si.
+- **Já existe material híbrido no repo e está a ser deitado fora:**
+  `_source/imagegen_v1/` tem 12 PNGs de **1254x1254 a 2172x724**
+  (`terrain_fill`, `terrain_top`, `ruin_block`, `platform_large_segment`,
+  `moss/root/corruption_overlay`...) e o `build_region_01_sprite_kit.py`
+  **reduz tudo a 32/64/96 px**. O `README.md` da pasta guarda um contrato de
+  prompt que pede *"pixel-art ... hard pixel clusters; no antialiasing"* —
+  é esse contrato que tem de mudar primeiro.
+- **Armadilha de licença:** o repo é público, portanto **commitar = redistribuir**.
+  PitiIT e Pixsol proíbem redistribuição; **Pixsol proíbe ainda uso em IA**
+  (rejeitado). Só CC0 (OpenGameArt DARK PLATFORMER) entra directo.
+- **Hipóteses descartadas:** que o blur fosse do shader de nitidez (a 9H.7 já
+  o tinha corrigido); que a cena do L2 estivesse partida (carrega **limpa**
+  em headless, 240 frames, zero erros — o crash da porta está na transição
+  `porta.gd:69`, `change_scene_to_file` a partir do `body_entered`).
+- **Bug confirmado sem custo:** `EstadoJogo.HABILIDADES_INICIAIS` está vazio,
+  mas `en.json:325` tem `hud.controls.jump` = "Jump x2" fixo na legenda.
+
+**A seguir:** 9H.12C (bugs do GM) arranca sem aprovação. 9H.12D+ (tiles
+grandes, fundo nativo) está **bloqueado** por duas decisões do Paulo —
+contrato de geração e política de assets externos.
+
 ## Integração 9H.10 + 9H.11 — 12 de setembro de 2026
 
 - Master base f45fe9a5; 9H.10 ec9a6260 integrado primeiro (0b48ba3f),
