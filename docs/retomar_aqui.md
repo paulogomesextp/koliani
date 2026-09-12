@@ -4,6 +4,37 @@
 
 Atualizado em 12 de setembro de 2026.
 
+## Integração 9H.10 + 9H.11 — 12 de setembro de 2026
+
+- Master base f45fe9a5; 9H.10 ec9a6260 integrado primeiro (0b48ba3f),
+  depois 9H.11 109653fc (375931ab). Sem conflitos manuais; HUD combinado
+  automaticamente, informação documental anterior conservada.
+- Preservados: control strip opcional/off, remoção do label CHECKPOINT,
+  margens SKILL, fila única/prioridade do diálogo, placeholders substituídos;
+  Pause Frontend9H, boss bar/plate, Santuário e visual L1/L3/L5.
+- Versão visível 0.18.2. Menu principal sem diff; nenhuma alteração nova
+  a gameplay, colisões, física, IA, progressão, save ou bosses.
+- Suite completa PASS; teste 9H.10 headless/Vulkan: zero falhas;
+  smoke integrado headless/Vulkan: zero falhas em L1/L3/L5, HUD/boss,
+  Pause/retoma e seis cartões do Santuário. Capturas abertas e verificadas.
+- Suite baseline f45fe9a5 também PASS e reproduz o erro de um recurso em uso
+  no encerramento. Warnings ObjectDB/interpolação preexistentes; nenhuma nova
+  falha funcional nos testes executados. Sem reauditoria ou correção fora do lote.
+- Exports release Windows/Web em worktree separada, Git limpo antes de cada
+  export; apenas cache/import/UID gerados pelo Godot. Sem pastas locais copiadas.
+  PCKs: 4165 entradas, zero work/.worktrees/pacotes Master/tools/tests/docs.
+- EXE local atualizado em build/windows/Koliani.exe: 201168240 bytes,
+  SHA256 053421084f6969780a47155309471848581de5cb462b22ba10759d19b694ebca.
+  Anterior 415926168 bytes; checkout limpo eliminou a inflação do pacote.
+- EXE release: menu, L1/L3/L5 e UI9F smoke com exit 0/capturas reais.
+  Web/PWA: arranque WebGL, intro/Skip, menu, seletor e L1/HUD no browser desktop,
+  sem erros de consola; manifest standalone/landscape e service worker exportados.
+- Evidência local: work/integration_9h10_9h11/ (logs, capturas, pack_audit.json).
+- Próximo gate desta publicação: push normal origin/master e confirmar CI do
+  SHA final; depois STOP e Game Master playtest. HUMAN PLAYTEST REQUIRED;
+  DEVICE VALIDATION REQUIRED para aceitação PWA em dispositivo. Região II NÃO.
+- Usage consultado: 69% disponível na janela 5h, 81% semanal.
+
 ## Execution 9H.10 — limpeza técnica da UI
 
 - Branch isolada `codex/9h10-ui-cleanup`, base master `f45fe9a5`; sem merge.
