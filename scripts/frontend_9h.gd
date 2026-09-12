@@ -314,6 +314,30 @@ static func botao_placa(b: Button, tamanho := 17) -> void:
 	b.add_theme_stylebox_override("disabled", _caixa_lisa(0.14))
 
 
+## Painel liso da mesma família (carvão, fio carmesim, cantos cortados).
+##
+## Vale a mesma ressalva do `botao_placa`: a moldura pintada `painel_detalhe`
+## tem 70 px de margem de cada lado e só assenta em painéis grandes (o do
+## seletor). Num painel de menu (~500 px) as quinas encontram-se e o que se
+## vê é a pintura cortada -- foi o que aconteceu à Pausa na 9H.11.
+static func painel_liso(alfa := 0.96) -> StyleBoxFlat:
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0.045, 0.026, 0.042, alfa)
+	sb.set_border_width_all(1)
+	sb.border_width_top = 3
+	sb.border_color = Color(CARMESIM.r, CARMESIM.g, CARMESIM.b, 0.75)
+	sb.set_corner_radius_all(4)
+	sb.corner_radius_top_left = 0
+	sb.corner_radius_bottom_right = 0
+	sb.shadow_color = Color(BRASA.r, BRASA.g, BRASA.b, 0.30)
+	sb.shadow_size = 22
+	sb.content_margin_left = 44
+	sb.content_margin_right = 44
+	sb.content_margin_top = 30
+	sb.content_margin_bottom = 30
+	return sb
+
+
 static func _caixa_lisa(forca: float, cheia := false) -> StyleBoxFlat:
 	var sb := StyleBoxFlat.new()
 	sb.bg_color = Color(CARMESIM.r * 0.30, CARMESIM.g * 0.12, CARMESIM.b * 0.16,

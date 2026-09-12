@@ -192,6 +192,13 @@ static func seccao(l: Label, tamanho := 15) -> void:
 ## Mesmo método do `UI.vestir_barra` (enchimento num nó filho): uma
 ## `StyleBoxTexture` no "fill" desaparece conforme a altura.
 static func vestir_barra(barra: ProgressBar, tipo: String) -> void:
+	# Execution 9H.11: a barra do CHEFE deixa de reaproveitar a calha de ouro
+	# da vida do jogador -- em combate as duas liam-se como a mesma coisa. O
+	# chefe passa a ser uma lâmina carmesim sobre carvão (a linguagem do
+	# frontend), sem gema e sem seta: larga, chata e de outra família.
+	if tipo == "chefe":
+		_vestir_barra_chefe(barra)
+		return
 	var base := "energia" if tipo == "energia" else "vida"
 	var calha := textura("barra_%s_calha" % base)
 	if calha == null:
@@ -357,3 +364,25 @@ static func _recurso() -> StyleBoxFlat:
 	sb.border_color = OURO
 	sb.set_content_margin_all(12)
 	return sb
+
+
+## Barra do chefe: carvão + fio carmesim + enchimento em brasa. Não tem
+## filhos (`Enchimento`/`Calha*`), por isso `ajustar_barra` ignora-a.
+static func _vestir_barra_chefe(barra: ProgressBar) -> void:
+	var fundo := StyleBoxFlat.new()
+	fundo.bg_color = Color(0.05, 0.028, 0.043, 0.94)
+	fundo.set_border_width_all(2)
+	fundo.border_color = Color(0.886, 0.133, 0.235, 0.55)
+	fundo.border_width_bottom = 3
+	fundo.set_corner_radius_all(2)
+	fundo.shadow_color = Color(0.02, 0.008, 0.016, 0.8)
+	fundo.shadow_size = 6
+	var ench := StyleBoxFlat.new()
+	ench.bg_color = Color(0.72, 0.10, 0.17, 0.98)
+	ench.set_corner_radius_all(1)
+	ench.set_border_width_all(0)
+	ench.border_width_top = 2
+	ench.border_color = Color(1.0, 0.39, 0.42, 0.85)
+	ench.set_expand_margin_all(-3.0)
+	barra.add_theme_stylebox_override("background", fundo)
+	barra.add_theme_stylebox_override("fill", ench)

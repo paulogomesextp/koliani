@@ -193,6 +193,24 @@ func _aplicar() -> void:
 	som.scale = Vector2(largura / 8.0, alt / 128.0)
 	vis.add_child(som)
 
+	# 2b. VALOR (9H.11, só Região I): um gradiente escuro que afunda a base do
+	# bloco. Sem ele, um bloco alto é a mesma amostra repetida 8x e lê-se como
+	# uma mancha chapada -- era isto que o QA via nos L1/L3/L5. O gradiente dá
+	# o degradê de cima para baixo que a prancha tem e que o mosaico perde.
+	if kit and alt >= 40.0:
+		var val := Sprite2D.new()
+		val.texture = Kit.gradiente_vertical()
+		val.centered = false
+		val.position = Vector2(x0, y0)
+		val.scale = Vector2(largura / 4.0, alt / 128.0)
+		# a sombra do bloco tinge-se de violeta com a CORRUPÇÃO do perfil: no
+		# L1 a rocha é neutra, no L5 está tomada. É o que faz o clímax da
+		# região não ser "o L1 com outro céu".
+		var corr := clampf(float(Kit.perfil_de(kit).get("corrupcao", 0.0)) / 1.8, 0.0, 1.0)
+		val.modulate = Color(0.06, 0.05, 0.10).lerp(Color(0.20, 0.03, 0.24), corr)
+		val.modulate.a = 0.9 + 0.08 * corr
+		vis.add_child(val)
+
 	# 3. cortes laterais
 	# (o lado do kit tem o contorno na coluna 10: fica 2 px para fora da colisao)
 	var lado: Texture2D = Kit.tex("terreno/terreno_lado.png") if kit else _tex(bioma, "lado")
@@ -215,6 +233,21 @@ func _aplicar() -> void:
 	var topo: Texture2D = Kit.topo(rng) if kit else _tex(bioma, "topo")
 	if topo:
 		vis.add_child(_mosaico(topo, Vector2(x0, y0 - SUPERFICIE), Vector2(largura, 32.0), Vector2(dx, 0)))
+
+	# 5b. RIM-LIGHT (9H.11, só Região I): fio de luar frio no lábio da capa. É
+	# o que separa o topo do bloco do fundo quando os dois estão no mesmo
+	# valor -- a leitura da silhueta que faltava aos blocos altos.
+	if kit and topo:
+		var rim := Sprite2D.new()
+		rim.texture = Kit.gradiente_vertical()
+		rim.centered = false
+		rim.position = Vector2(x0, y0 - SUPERFICIE + 14.0)
+		rim.scale = Vector2(largura / 4.0, -14.0 / 128.0)
+		var mat_rim := CanvasItemMaterial.new()
+		mat_rim.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
+		rim.material = mat_rim
+		rim.modulate = Color(0.42, 0.50, 0.82, 0.34)
+		vis.add_child(rim)
 
 	# 6. o que POUSA em cima -- cogumelos, lapides, caixotes, cristais...
 	# 7. o que PENDE por baixo -- raizes, correntes, estalactites

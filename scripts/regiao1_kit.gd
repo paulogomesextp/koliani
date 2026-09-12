@@ -17,12 +17,21 @@ const GRUPO := "regiao1_kit"
 ## "Ruínas Antigas" no 3, "Cascatas e Abismos" no 4, "Heart Tree Próximo" no
 ## 5). A identidade é a mesma; muda a mistura.
 const PERFIS := {
-	1: {"mood": "entrada", "corrupcao": 0.25, "nevoa": 0.55, "ruinas": 0.25, "cascatas": 0.3, "lanternas": 0.35},
-	2: {"mood": "entrada", "corrupcao": 0.35, "nevoa": 0.95, "ruinas": 0.2, "cascatas": 0.45, "lanternas": 0.3},
-	3: {"mood": "ruinas", "corrupcao": 0.5, "nevoa": 0.6, "ruinas": 0.85, "cascatas": 0.2, "lanternas": 0.45},
-	4: {"mood": "cascatas", "corrupcao": 0.6, "nevoa": 0.75, "ruinas": 0.35, "cascatas": 0.9, "lanternas": 0.3},
-	5: {"mood": "coracao", "corrupcao": 1.0, "nevoa": 0.6, "ruinas": 0.4, "cascatas": 0.3, "lanternas": 0.2},
+	1: {"mood": "entrada", "corrupcao": 0.25, "nevoa": 0.55, "ruinas": 0.25, "cascatas": 0.3, "lanternas": 0.5, "densidade": 1.15},
+	2: {"mood": "entrada", "corrupcao": 0.35, "nevoa": 0.95, "ruinas": 0.2, "cascatas": 0.45, "lanternas": 0.3, "densidade": 1.0},
+	3: {"mood": "ruinas", "corrupcao": 0.5, "nevoa": 0.6, "ruinas": 0.85, "cascatas": 0.2, "lanternas": 0.6, "densidade": 1.25},
+	4: {"mood": "cascatas", "corrupcao": 0.6, "nevoa": 0.75, "ruinas": 0.35, "cascatas": 0.9, "lanternas": 0.3, "densidade": 1.0},
+	5: {"mood": "coracao", "corrupcao": 1.8, "nevoa": 0.6, "ruinas": 0.4, "cascatas": 0.3, "lanternas": 0.12, "densidade": 1.45},
 }
+
+## Execution 9H.11. O QA viu o L2 melhor vestido do que o 1, o 3 e o 5, e o
+## L5 a ler-se como "o L1 com outro tom". Duas alavancas, sem arte nova:
+##   * `densidade` -- quantos props cabem num metro de plataforma. O L2 é a
+##     referência (1.0); 1 e 3 estavam a meia dose, o 5 sobe a 1.45.
+##   * o L5 é o CLÍMAX: `corrupcao` 1.0 -> 1.8 (o cristal domina o sorteio) e
+##     `lanternas` 0.2 -> 0.12 (a luz quente da entrada já não chega aqui).
+## O L1 e o L3 sobem em lanternas em vez de corrupção: é o mesmo bosque, mais
+## habitado, não mais podre.
 
 ## Tinta do panorama por mood: razão média-da-variante / média-do-panorama,
 ## medida na 08 pelo produtor (`kit_9c_manifest.json`, `tintas_por_mood_08`),
@@ -122,9 +131,10 @@ static func decorar(vis: Node, largura: float, y0: float, rng: RandomNumberGener
 		perfil: Dictionary) -> void:
 	if largura < 110.0:
 		return
-	var quantos: int = mini(MAX_DECO, int(largura / PASSO_DECO))
+	var dens := maxf(0.35, float(perfil.get("densidade", 1.0)))
+	var quantos: int = mini(MAX_DECO, int(largura * dens / PASSO_DECO))
 	if quantos <= 0:
-		quantos = 1 if rng.randf() < 0.55 else 0
+		quantos = 1 if rng.randf() < 0.55 * dens else 0
 	var margem := 30.0
 	var util := largura - margem * 2.0
 	if util <= 0.0 or quantos <= 0:
@@ -228,3 +238,24 @@ static func pendurar(vis: Node, largura: float, y_base: float, grossa: bool,
 			s.position.x += t.get_width() * e
 		s.z_index = -2
 		vis.add_child(s)
+
+
+## Gradiente vertical opaco->transparente, para o trabalho de VALOR nos
+## blocos altos de terreno (9H.11). Não é arte nova: é o mesmo material do
+## kit lido com outra luz. Um só recurso partilhado por todas as plataformas.
+static var _vertical: GradientTexture2D = null
+
+static func gradiente_vertical() -> GradientTexture2D:
+	if _vertical != null:
+		return _vertical
+	var g := Gradient.new()
+	g.offsets = PackedFloat32Array([0.0, 0.22, 1.0])
+	g.colors = PackedColorArray([
+		Color(1, 1, 1, 0.0), Color(1, 1, 1, 0.18), Color(1, 1, 1, 0.62)])
+	_vertical = GradientTexture2D.new()
+	_vertical.gradient = g
+	_vertical.fill_from = Vector2(0, 0)
+	_vertical.fill_to = Vector2(0, 1)
+	_vertical.width = 4
+	_vertical.height = 128
+	return _vertical

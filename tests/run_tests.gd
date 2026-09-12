@@ -1034,13 +1034,20 @@ func teste_9f_ui_producao() -> void:
 			break
 	sel.queue_free()
 
-	# ecras de menu: sem StyleBoxFlat legado nos botoes
+	# ecras de menu: sem StyleBoxFlat legado nos botoes.
+	# 9H.11: a Pausa passou do kit de ouro (9F) para a linguagem do menu
+	# principal, onde uma ENTRADA DE MENU nao tem caixa em repouso -- a placa
+	# em losango so' aparece no hover/foco. Por isso o "normal" pode ser vazio
+	# desde que o realce venha de uma peca pintada de um dos kits.
 	for cena in ["res://scenes/ui/Opcoes.tscn", "res://scenes/ui/Pausa.tscn"]:
 		var no: Node = load(cena).instantiate()
 		get_tree().root.add_child(no)
 		for b in no.find_children("*", "Button", true, false):
-			var st := (b as Button).get_theme_stylebox("normal")
-			_ok(st is StyleBoxTexture, "9F: %s -> botao '%s' ainda com estilo legado" % [cena.get_file(), b.name])
+			var bt := b as Button
+			var st := bt.get_theme_stylebox("normal")
+			var vestido: bool = st is StyleBoxTexture or (
+				st is StyleBoxEmpty and bt.get_theme_stylebox("hover") is StyleBoxTexture)
+			_ok(vestido, "9F: %s -> botao '%s' ainda com estilo legado" % [cena.get_file(), b.name])
 		no.queue_free()
 
 	# HUD: calha/enchimento das barras do kit
