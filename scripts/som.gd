@@ -11,19 +11,25 @@ extends Node
 const CAMINHOS := {
 	"salto": "res://assets/audio/salto.wav",
 	"salto_duplo": "res://assets/audio/salto_duplo.wav",
-	"ataque": "res://assets/audio/ataque.ogg",
+	# Execution 9H.13: o combo tem QUATRO sons proprios, que crescem em peso.
+	# Ate' aqui os golpes 2 e 3 eram o `ataque` com `pitch_scale`
+	# diferente -- e um sample repetido com outro tom le-se logo como sample
+	# repetido. Ver `tools/gerar_sfx_9h13.py` (os tres eixos de crescimento).
+	"ataque": "res://assets/audio/ataque.wav",
+	"ataque2": "res://assets/audio/ataque2.wav",
+	"ataque3": "res://assets/audio/ataque3.wav",
 	"lancar": "res://assets/audio/lancar.ogg",
-	"acerto": "res://assets/audio/acerto.ogg",
-	"dano": "res://assets/audio/dano.ogg",
-	"aterrar": "res://assets/audio/aterrar.mp3",
+	"acerto": "res://assets/audio/acerto.wav",
+	"dano": "res://assets/audio/dano.wav",
+	"aterrar": "res://assets/audio/aterrar.wav",
 	"apanhar": "res://assets/audio/apanhar.wav",
 	"porta": "res://assets/audio/porta.wav",
 	"chefe_cai": "res://assets/audio/chefe_cai.wav",
-	"selo": "res://assets/audio/selo.ogg",
+	"selo": "res://assets/audio/selo.wav",
 	"projetil": "res://assets/audio/projetil.wav",
 	"investida": "res://assets/audio/investida.wav",
 	"onda": "res://assets/audio/onda.ogg",
-	"bloqueio": "res://assets/audio/bloqueio.ogg",
+	"bloqueio": "res://assets/audio/bloqueio.wav",
 	"demonio_ataque": "res://assets/audio/demonio_ataque.ogg",
 	"conquista": "res://assets/audio/conquista.wav",
 	"transicao": "res://assets/audio/transicao.wav",
@@ -57,15 +63,15 @@ const CAMINHOS := {
 	# --- a Koliani a mexer-se (4 set 2026) --------------------------------
 	# "Faca um set de sons para a koliani quando faz animacoes, ataques,
 	# etc." -- pedido do Paulo. Construidos por `tools/preparar_sfx.py`.
-	"passo1": "res://assets/audio/passo1.ogg",
-	"passo2": "res://assets/audio/passo2.ogg",
-	"passo3": "res://assets/audio/passo3.ogg",
-	"rolamento": "res://assets/audio/rolamento.ogg",
-	"dash": "res://assets/audio/dash.ogg",
+	"passo1": "res://assets/audio/passo1.wav",
+	"passo2": "res://assets/audio/passo2.wav",
+	"passo3": "res://assets/audio/passo3.wav",
+	"rolamento": "res://assets/audio/rolamento.wav",
+	"dash": "res://assets/audio/dash.wav",
 	"parede": "res://assets/audio/parede.ogg",
 	"agarrar": "res://assets/audio/agarrar.ogg",
-	"morte_koliani": "res://assets/audio/morte_koliani.ogg",
-	"ataque_forte": "res://assets/audio/ataque_forte.ogg",
+	"morte_koliani": "res://assets/audio/morte_koliani.wav",
+	"ataque_forte": "res://assets/audio/ataque_forte.wav",
 	# --- monstros, por ARQUETIPO ------------------------------------------
 	# "Faca com que os mobs facam sons apropriados ao tipo de monstro."
 	# As 19 especies mapeiam-se em sete familias -- ver `demonio_base.gd`.

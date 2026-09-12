@@ -144,3 +144,24 @@ Codificadas em ogg mono a 64 kbps.
 | `boss_18.ogg` | Light battle theme -- Alexandr Zhelanov | CC-BY 4.0 | https://opengameart.org/content/light-battle-theme |
 | `boss_19.ogg` | Wasteland Showdown -- matthew-pablo | CC-BY 3.0 | https://opengameart.org/content/wasteland-showdown-battle-music |
 | `boss_20.ogg` | Rise of spirit -- Alexandr Zhelanov | CC-BY 3.0 | https://opengameart.org/content/rise-of-spirit |
+
+## Execution 9H.13 -- passe profissional dos SFX (12 set 2026)
+
+Os sons abaixo foram REFEITOS de raiz por `tools/gerar_sfx_9h13.py`:
+100% sintetizados neste repositorio, sem samples de terceiros, sem numpy e
+sem licencas a creditar. Substituem as versoes anteriores com o mesmo nome.
+
+Jogador: `salto`, `salto_duplo`, `aterrar`, `dash`, `rolamento`,
+`passo1..3`, `morte_koliani`, `dano`.
+Combate: `ataque`, `ataque2`, `ataque3`, `ataque_forte` (os quatro golpes do
+combo, cada um com som proprio -- antes eram dois samples com `pitch_scale`),
+`acerto`, `bloqueio`.
+Mundo: `apanhar`, `selo` (checkpoint/fogueira), `transicao` (porta/portal).
+Interface: `ui_mover`, `ui_confirmar`, `ui_voltar`, `ui_negado`.
+
+Direccao: fantasia escura, cinematografico, impacto limpo. Cada som e' feito
+de tres camadas (corpo grave + transiente curto + cauda com reverberacao) --
+o cabecalho do gerador explica porque e' que uma camada so' soa a
+sintetizador. Os picos sao hierarquizados no dicionario `ALVO`, entre 0,40
+(`ui_mover`) e 0,92 (`ataque_forte`), portanto nenhum som chega a 1,0 e a
+soma das 8 vozes do pool nao clipa.

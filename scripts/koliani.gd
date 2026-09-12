@@ -804,6 +804,11 @@ const ARCO_COMBO := [
 ]
 ## Tom de cada golpe: o combo sobe de altura, e o remate cai para o grave.
 const TOM_COMBO := [1.0, 1.09, 1.16, 0.84]
+## Som e volume de cada golpe do combo (Execution 9H.13). O remate e' o
+## evento mais pesado do teclado de sons do jogo -- e' ele que tem de
+## mandar na mistura quando toca.
+const SOM_COMBO := ["ataque", "ataque2", "ataque3", "ataque_forte"]
+const VOL_COMBO := [-8.0, -7.0, -6.0, -3.0]
 ## 9G: cúpula do escudo (prancha 07), filha do nó `Escudo`.
 var _escudo_9g: AnimatedSprite2D
 ## Centro do arco dos golpes 2/3: à frente do peito, onde a lâmina passa.
@@ -1665,6 +1670,7 @@ func _atualizar_anim() -> void:
 		_corpo.play(a)
 	elif not _corpo.is_playing():
 		_corpo.play(a)
+	_passo_cadencia_locomocao(a)
 
 	# a arma acompanha grosso modo a pose: balanço no ataque, recolhida no ar
 	# a Arma tem `offset` a pôr o punho na origem do nó -> roda pelo punho.
@@ -1982,12 +1988,15 @@ func _iniciar_ataque() -> void:
 	_avanco_vel = AVANCO_VEL[i_av] * (1.0 if is_on_floor() else AVANCO_NO_AR)
 	_avanco_dur = AVANCO_DUR[i_av]
 	_avanco_restante = _avanco_dur
-	# o remate do combo tem som proprio (mais fundo, com peso de metal)
+	# CADA golpe do combo tem som proprio (Execution 9H.13). Antes eram dois
+	# samples com `pitch_scale` por cima (`TOM_COMBO`) -- o mesmo golpe quatro
+	# vezes com outro tom, que e' exactamente o que soava a amador. Agora os
+	# quatro crescem em corpo, em sopro e em cauda; o volume tambem sobe, mas
+	# e' o que menos conta. `TOM_COMBO` fica so' como variacao ligeira.
 	var tom: float = TOM_COMBO[clampi(_combo_passo, 0, TOM_COMBO.size() - 1)]
-	if _combo_passo == NUM_COMBO - 1:
-		Som.toca("ataque_forte", -4.0, tom * randf_range(0.98, 1.02))
-	else:
-		Som.toca("ataque", -6.0, tom * randf_range(0.98, 1.02))
+	var i_som: int = clampi(_combo_passo, 0, SOM_COMBO.size() - 1)
+	Som.toca(SOM_COMBO[i_som], VOL_COMBO[i_som],
+		lerpf(1.0, tom, 0.35) * randf_range(0.98, 1.02))
 	_marcar_combo()
 	_flash_golpe()
 	_disparar_vfx_golpe()
@@ -2528,3 +2537,45 @@ func _desencravar() -> void:
 		d += passo
 	push_warning("Koliani encravada no spawn em %s e sem saida a %d px"
 		% [global_position, int(BUSCA_DESENCRAVE)])
+
+
+## Cadencia da locomocao: a passada acompanha a VELOCIDADE (Execution 9H.13).
+##
+## Ate' aqui o `run` corria sempre aos 13,33 fps da folha golden, andasse a
+## Koliani depressa ou devagar. Duas consequencias, ambas medidas e nao
+## adivinhadas:
+##
+## 1. **Patinagem.** O ciclo golden sao 10 frames a 13,33 fps = 0,75 s, e a
+##    `Movimento.VEL_CORRIDA` sao 240 px/s: 180 px de chao por ciclo. O ciclo
+##    desenhado tem UMA passada, e a perna de tras mede 23 px -- ou seja, o
+##    chao passa quatro a seis vezes mais depressa do que a passada. O pe'
+##    varre o chao em vez de o agarrar, que e' metade do "parece que uma perna
+##    nao mexe" que o Game Master descreveu.
+## 2. **A andar devagar** (encostada, a sair de um travao, no ar a tocar o
+##    chao) a animacao corria na mesma a fundo, o que e' pior ainda.
+##
+## O `speed_scale` passa a ser a razao entre a velocidade real e a de
+## corrida, com um chao (nunca abaixo de 0,55, senao parece cinema lento) e
+## um tecto (nunca acima de 1,85, senao borra). Nao mexe em nada da fisica
+## nem do `Movimento` -- e' so' o relogio do `AnimatedSprite2D`.
+##
+## NB: isto NAO resolve a alternancia das pernas. Os 10 frames golden do
+## `run` sao um ciclo de UMA perna -- medido: o pe' de tras percorre 13 px em
+## todo o ciclo e o da frente 34 px, e em nenhum dos 10 frames o pe' esquerdo
+## passa a' frente do direito. Isso precisa de frames nativos -- ver o
+## relatorio da 9H.13/14 (KOLIANI RUN NATIVE FRAMES REQUIRED).
+const CADENCIA_MIN := 0.55
+const CADENCIA_MAX := 1.85
+
+
+func _passo_cadencia_locomocao(a: String) -> void:
+	if _corpo == null:
+		return
+	if a != "run":
+		# fora da locomocao o relogio volta ao normal, senao um ataque ou uma
+		# queda herdavam a cadencia da corrida anterior.
+		if not is_equal_approx(_corpo.speed_scale, 1.0):
+			_corpo.speed_scale = 1.0
+		return
+	var ref: float = maxf(Movimento.VEL_CORRIDA, 1.0)
+	_corpo.speed_scale = clampf(absf(velocity.x) / ref, CADENCIA_MIN, CADENCIA_MAX)
