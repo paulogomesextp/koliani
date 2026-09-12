@@ -31,7 +31,12 @@ Atualizado em 12 de setembro de 2026.
   Build local validada; RC destinada à publicação pelo pipeline existente.
 - Game Master autorizou explicitamente commit/push da Release Candidate em
   12/09/2026, com gates humanos/dispositivo PENDING para testar na PWA.
-  Sem alterações adicionais ao jogo; próximo passo é o playtest na RC.
+  Commit/push: `acf24c6`, confirmado em origin/master.
+  CI `34696375168`: Pages publicado; falha preexistente de invocação do teste
+  Node com --script, confirmada no log exato e reproduzida localmente.
+  Correção exclusiva: CI executa tools/verifica_spawn_livre.tscn.
+  Teste afetado: SPAWN NIVEL 5 TUDO OK; gameplay intacto.
+  Próximo passo: confirmar CI/Pages desta correção e playtest iPhone/PWA.
 - Próximo passo exclusivo do Game Master: iPhone/PWA real, playtest boss L1–L5
   e aprovação final da Região I. Região II NÃO iniciada; pontos congelados intactos.
 

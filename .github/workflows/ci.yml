@@ -71,7 +71,7 @@ jobs:
       - name: Camaras novas (peso, caixas, atoleiro)
         run: godot --headless --script res://tools/verifica_camaras_novas.gd
       - name: Nascer no checkpoint sem ficar preso
-        run: godot --headless --script res://tools/verifica_spawn_livre.gd
+        run: godot --headless --path . res://tools/verifica_spawn_livre.tscn
 
   web:
     name: Build Web
