@@ -4,6 +4,20 @@
 
 Atualizado em 12 de setembro de 2026.
 
+## Execution 9H.3 — iPhone startup hotfix
+
+- Game Master observou no iPhone áudio sem imagem e gesto extra de som.
+- Âmbito exclusivo Web: gesto DOM chama desbloqueio AudioContext/canal iOS
+  e play da intro síncronos; botão de som apenas em ?audio-debug=1.
+- Vídeo oculto após autoplay recusado era mostrado depois de play(). Agora
+  display=block antes de play; playsinline/WebKit explícitos; canvas/splash
+  ocultos durante a intro e restaurados no fim, skip ou erro.
+- MP4 aprovado preservado: H.264 Baseline/AAC. Causa WebKit visual ainda
+  depende de reteste: DEVICE VALIDATION REQUIRED, sem PASS de dispositivo.
+- Provas DOM de gesto/áudio/visibilidade/restauro e landscape PASS.
+  Export Web exit 0, sem SCRIPT ERROR; log work/9h3_web_export.log.
+- Próximo passo: confirmar CI/Pages e Game Master reteste iPhone/PWA.
+  Gameplay, bosses, arte e Região II intactos; sem export Windows local.
 ## Execution 9H.2 — Release Candidate autorizada pelo Game Master
 
 - Correção local da intro preservada: `play()` síncrono no gesto DOM;
@@ -36,7 +50,11 @@ Atualizado em 12 de setembro de 2026.
   Node com --script, confirmada no log exato e reproduzida localmente.
   Correção exclusiva: CI executa tools/verifica_spawn_livre.tscn.
   Teste afetado: SPAWN NIVEL 5 TUDO OK; gameplay intacto.
-  Próximo passo: confirmar CI/Pages desta correção e playtest iPhone/PWA.
+  Correção publicada: `ccd8132`, origin/master confirmado; CI `34696680848`
+  SUCCESS em todos os jobs e Pages. Deployment `6410214418` SHA ccd8132.
+  PWA pública 0.18.0; cache `1789220190|7899982`, manifest landscape.
+  Confirmação final registada localmente após push; sem novo commit.
+  Próximo passo exclusivo: Game Master playtest iPhone/PWA, bosses e aprovação.
 - Próximo passo exclusivo do Game Master: iPhone/PWA real, playtest boss L1–L5
   e aprovação final da Região I. Região II NÃO iniciada; pontos congelados intactos.
 

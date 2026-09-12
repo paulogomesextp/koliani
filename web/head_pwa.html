@@ -192,6 +192,8 @@ flex-direction:column;gap:5vmin;padding:8vmin}
     }
     pintar();
   };
+  /* A intro reutiliza este desbloqueio dentro do primeiro gesto DOM. */
+  window.kolianiAudioAcordar = acordar;
   /* Browsers e versoes de iOS divergem no evento reconhecido como activacao.
      Em captura, a tentativa chega antes de o canvas consumir o evento. */
   ['touchstart','touchend','pointerdown','pointerup','mousedown','mouseup','click','keydown'].forEach(function(ev){
@@ -284,7 +286,7 @@ flex-direction:column;gap:5vmin;padding:8vmin}
     }
   };
   var montar = function(){
-    if (pilula || !document.body) return;
+    if (!diagnostico || pilula || !document.body) return;
     pilula = document.createElement('button');
     pilula.type = 'button';
     pilula.textContent = 'Sound is off - tap here';

@@ -147,6 +147,18 @@ func _mostrar_cartao() -> void:
 const JS_INTRO := """
 window.kolianiIntro = (function(){
   var estado = 'idle', v = null, ultimoToque = -Infinity;
+  var cobertos = [];
+  var mostrarVideo = function(){
+    v.style.display = 'block';
+    if (!cobertos.length) ['canvas', 'status'].forEach(function(id){
+      var el = document.getElementById(id);
+      if (el){ cobertos.push([el, el.style.visibility]); el.style.visibility = 'hidden'; }
+    });
+  };
+  var restaurar = function(){
+    cobertos.forEach(function(par){ par[0].style.visibility = par[1]; });
+    cobertos = [];
+  };
   var eventos = ['touchend', 'click', 'keydown'];
   var gesto = function(e){
 	if (e.repeat || (e.type !== 'keydown' && e.target.id !== 'canvas' && e.target !== v && !e.target.closest?.('#rodar'))) return;
@@ -154,7 +166,10 @@ window.kolianiIntro = (function(){
 	if (e.type === 'touchend') ultimoToque = Date.now();
 	e.preventDefault();
 	e.stopPropagation();
-	if (estado === 'idle' || estado === 'a_tentar') window.kolianiIntroTocar(new URL('intro_koliani.mp4', location.href).href);
+	if (estado === 'idle' || estado === 'a_tentar'){
+      if (window.kolianiAudioAcordar) window.kolianiAudioAcordar();
+      window.kolianiIntroTocar(new URL('intro_koliani.mp4', location.href).href);
+    }
 	else if (estado === 'a_tocar') window.kolianiIntroSaltar();
   };
   eventos.forEach(function(e){ window.addEventListener(e, gesto, {capture:true, passive:false}); });
@@ -164,29 +179,33 @@ window.kolianiIntro = (function(){
 	try{
 	  if (!v){
 	  v = document.createElement('video');
-	  v.src = url; v.setAttribute('playsinline',''); v.preload = 'auto';
+	  v.src = url; v.setAttribute('playsinline',''); v.setAttribute('webkit-playsinline','');
+      v.playsInline = true; v.preload = 'auto';
 	  v.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;' +
-		'object-fit:contain;background:#0b0509;z-index:20';
+		'object-fit:contain;background:#0b0509;z-index:20;visibility:visible;opacity:1';
 	  v.addEventListener('ended', function(){ window.kolianiIntroSaltar(); });
 	  v.addEventListener('error', function(){ estado = 'erro'; window.kolianiIntroSaltar(); });
 	  document.body.appendChild(v);
 	  }
-	  var p = v.play();
+	  // WebKit: tornar visível antes de play(), incluindo a repetição após autoplay recusado.
+      mostrarVideo();
+      var p = v.play();
 	  if (p && p.then) p.then(function(){ if (estado === 'a_tentar') estado = 'a_tocar'; }, function(e){
 		if (automatico && e && e.name === 'NotAllowedError'){
 		  if (estado === 'a_tentar') estado = 'idle';
-		  if (v && estado === 'idle') v.style.display = 'none';
+		  if (v && estado === 'idle'){ v.style.display = 'none'; restaurar(); }
 		  return;
 		}
 		estado = 'erro'; window.kolianiIntroSaltar();
 	  });
-	  if (v) v.style.display = '';
+
 	}catch(e){ estado = 'erro'; window.kolianiIntroSaltar(); }
   };
   window.kolianiIntroSaltar = function(){
 	if (estado !== 'erro') estado = 'fim';
 	eventos.forEach(function(e){ window.removeEventListener(e, gesto, true); });
 	try{ if (v){ v.pause(); v.remove(); v = null; } }catch(e){}
+    restaurar();
   };
   window.kolianiIntroEstado = function(){ return estado; };
   window.kolianiIntroTocar(new URL('intro_koliani.mp4', location.href).href, true);
