@@ -41,7 +41,7 @@ overscroll-behavior:none;-webkit-user-select:none;user-select:none;
    Onde não dá, o jogo NÃO se joga de pé: esta cortina tapa-o e diz
    porquê. É preferível a rodar o canvas por CSS, que roda o desenho
    mas não as coordenadas do toque (ficava a jogar às cegas). */
-#rodar{position:fixed;inset:0;z-index:9;display:none;
+#rodar{position:fixed;inset:0;z-index:21;display:none;
 background:#0d0814;color:#ece6f7;
 font:600 4.6vmin/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
 text-align:center;align-items:center;justify-content:center;
@@ -50,7 +50,7 @@ flex-direction:column;gap:5vmin;padding:8vmin}
 #rodar .gira{animation:gira 2.4s ease-in-out infinite}
 @keyframes gira{0%,42%{transform:rotate(0)}70%,100%{transform:rotate(-90deg)}}
 @media (prefers-reduced-motion:reduce){#rodar .gira{animation:none}}
-@media (orientation:portrait){#rodar{display:flex}}
+@media (orientation:portrait){#rodar.fallback{display:flex}}
 </style>
 
 <div id='rodar' aria-hidden='true'><svg viewBox='0 0 120 120' fill='none' xmlns='http://www.w3.org/2000/svg'><path d='M22 44a42 42 0 0 1 76 0' stroke='#a45cff' stroke-width='4' stroke-linecap='round' stroke-dasharray='7 9'/><path d='M98 30v15h-15' stroke='#a45cff' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/><g class='gira' style='transform-origin:60px 74px'><rect x='42' y='50' width='36' height='58' rx='7' stroke='#ff5fd4' stroke-width='4'/><rect x='48' y='58' width='24' height='40' rx='2' fill='#ff5fd4' fill-opacity='.18'/></g></svg><span>Turn your phone sideways</span></div>
@@ -302,19 +302,32 @@ flex-direction:column;gap:5vmin;padding:8vmin}
   if (document.body) montar();
   else document.addEventListener('DOMContentLoaded', montar);
 
-  /* 5. TRANCAR NA HORIZONTAL onde o browser deixa (Android). No iOS
-     isto não existe e fica a cortina de cima. */
+  /* 5. Tentar no arranque e repetir no gesto; nunca esperar pelo lock
+     para iniciar áudio/vídeo. Safari/iOS pode recusar ou não ter a API. */
+  var movel = /Android|iPad|iPhone|iPod/.test(navigator.userAgent) || ios;
+  var fallback = false;
+  var pintarOrientacao = function(){
+    var aviso = document.getElementById('rodar');
+    if (!aviso) return;
+    aviso.classList.toggle('fallback', movel && fallback);
+    aviso.setAttribute('aria-hidden', !(movel && fallback && innerHeight > innerWidth));
+  };
   var trancar = function(){
+    if (!movel) return;
     try{
       if (screen.orientation && screen.orientation.lock){
         var p = screen.orientation.lock('landscape');
-        if (p && p.catch) p.catch(function(){});
-      }
-    }catch(e){}
+        if (p && p.then) p.then(function(){ fallback = false; pintarOrientacao(); },
+          function(){ fallback = true; pintarOrientacao(); });
+      }else{ fallback = true; pintarOrientacao(); }
+    }catch(e){ fallback = true; pintarOrientacao(); }
   };
+  window.kolianiLandscape = trancar;
   trancar();
-  ['touchend','pointerup'].forEach(function(ev){
-    window.addEventListener(ev, trancar, {once:true, capture:true});
+  ['touchend','click','keydown'].forEach(function(ev){
+    window.addEventListener(ev, trancar, {capture:true});
   });
+  window.addEventListener('resize', pintarOrientacao);
+  document.addEventListener('DOMContentLoaded', pintarOrientacao);
 })();
 </script>

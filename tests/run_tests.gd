@@ -3074,8 +3074,15 @@ func teste_9h1_repor_layout_apaga_mesmo() -> void:
 		"pausa": {"x": 0.97, "y": 0.14, "r": 0.04}}
 	_ok(LayoutToque.guardar(demo), "9H.1: nao gravou o layout de teste")
 	_ok(LayoutToque.existe(), "9H.1: o layout gravado devia existir")
+	var relido := LayoutToque.carregar()
+	_ok(relido.get("joystick", {}) == demo["joystick"],
+		"9H.2: guardar e reler perdeu a posição do joystick")
+	_ok(relido.get("botoes", {}) == demo["botoes"],
+		"9H.2: guardar e reler perdeu o layout dos botões")
 	_ok(LayoutToque.apagar(), "9H.1: `apagar()` devia devolver true")
 	_ok(not LayoutToque.existe(),
 		"9H.1: REPOR deixou o ficheiro no disco -- o layout voltava na recarga")
+	_ok(LayoutToque.carregar().is_empty(),
+		"9H.2: reler após REPOR devia devolver o layout de fábrica")
 	if antes and not copia.is_empty():
 		LayoutToque.guardar(copia)

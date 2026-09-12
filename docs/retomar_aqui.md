@@ -4,6 +4,37 @@
 
 Atualizado em 12 de setembro de 2026.
 
+## Execution 9H.2 — Release Candidate autorizada pelo Game Master
+
+- Correção local da intro preservada: `play()` síncrono no gesto DOM;
+  acrescentado autoplay com som e retorno ao cartão se `NotAllowedError`.
+  Primeiro toque inicia diretamente; clique emulado ignorado; skip intacto.
+  Watchdog de 26 s apenas fallback. Prova DOM PASS, não prova de iPhone.
+- Landscape: manifest gerado `orientation=landscape`; API tentada no arranque
+  e repetida no gesto, sem aguardar Promise antes de áudio/vídeo. Desktop
+  excluído. Aviso traduzido nos seis catálogos apenas após API ausente/recusa,
+  em portrait e acima do vídeo; toque no aviso também chega à intro.
+- `node tests/test_intro_gesto_web.cjs` e `test_landscape_web.cjs`: PASS.
+  Suite normal: `OK -- todos os testes passaram`; mantém avisos finais de
+  73 instâncias leaked e um recurso em uso. Logs em `work/9h2_suite.log`.
+- Layout: guardar → reler e REPOR → reler/default PASS na suite existente.
+  Reload/IndexedDB na build atual não revalidado. Sistema preservado.
+- TOUCH COMBO IMPLEMENTATION: PASS por wiring (atacar → buffer → quatro
+  passos); janela 0,42 s intacta. REAL DEVICE VALIDATION: GAME MASTER PENDING.
+- Windows e Web/PWA exportados (exit 0). Logs `work/9h2_*_export.log`:
+  erros de importação em `._monster-*.wav` alheios ao lote; não corrigidos.
+  Windows: renderer NVIDIA real, intro pos=2,91 s e a_tocar=true;
+  captura `work/9h2_intro.png`. Prova adicional intro→menu/áudio inconclusiva.
+- Web local mostrou cartão; clique expirou em 15 s. Sem insistir no browser.
+  Smoke de gesto/vídeo/áudio/reload real pendente. DEVICE VALIDATION REQUIRED.
+- Cache Web nova `1789219075|9217045`; worker gerado remove caches antigos.
+  Build local validada; RC destinada à publicação pelo pipeline existente.
+- Game Master autorizou explicitamente commit/push da Release Candidate em
+  12/09/2026, com gates humanos/dispositivo PENDING para testar na PWA.
+  Sem alterações adicionais ao jogo; próximo passo é o playtest na RC.
+- Próximo passo exclusivo do Game Master: iPhone/PWA real, playtest boss L1–L5
+  e aprovação final da Região I. Região II NÃO iniciada; pontos congelados intactos.
+
 ## Execution 9H.1 — fecho do gate humano da Região I — **PARTIAL PASS**
 
 **READY FOR GAME MASTER HUMAN REVIEW: SIM.** v0.18.0. Relatório:
