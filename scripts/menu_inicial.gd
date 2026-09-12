@@ -75,9 +75,6 @@ func _ready() -> void:
 	_focar_principal()
 	_pronto_para_som = true
 	_agendar_prova_runtime()
-	# Diagnóstico temporário 9H.5D: confirmação real de chegada ao menu Web.
-	if OS.has_feature("web"):
-		JavaScriptBridge.eval("if(window.kolianiIntroMenuResultado)window.kolianiIntroMenuResultado(true)", true)
 
 
 # ── montagem ─────────────────────────────────────────────────────────────

@@ -1,0 +1,41 @@
+/* 9H.6: intro iOS antes do main loop/áudio Godot; MP4 único com A/V sincronizados. */
+window.kolianiArranqueIntro = function(engine, config, opcoes) {
+  var ios = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  if (!ios) return engine.startGame(opcoes);
+  // API da configuração da versão exportada 4.7.2, sem arrancar o main loop.
+  engine.config.update(opcoes);
+  var pack = config.executable + '.pck';
+  // Termina downloads/compilação ANTES da intro: Skip não volta a descarregar o jogo.
+  return Promise.all([engine.init(config.executable), engine.preloadFile(pack)]).then(function(){
+    return new Promise(function(resolve){
+      var catalogos = $CATALOGOS_INTRO;
+      var idioma = 'en';
+      try{ idioma = localStorage.getItem('koliani-intro-idioma') || 'en'; }catch(e){}
+      var Textos = {t:function(chave){ return (catalogos[idioma] || catalogos.en)[chave] || catalogos.en[chave]; }};
+      window.kolianiIntroTextoSkip = Textos.t('menu.skip_to_menu');
+      var aviso = document.querySelector('#rodar span');
+      if (aviso) aviso.textContent = Textos.t('menu.rotate_device');
+      var cartao = document.createElement('div');
+      cartao.style.cssText = 'position:absolute;inset:0;display:flex;align-items:center;' +
+        'justify-content:center;flex-direction:column;background:#050305;pointer-events:none';
+      var logo = document.createElement('img');
+      logo.src = config.executable + '.apple-touch-icon.png';
+      logo.style.cssText = 'width:300px;height:300px;max-height:55vh;object-fit:contain';
+      var tocar = document.createElement('span');
+      tocar.textContent = Textos.t('menu.tap_play');
+      tocar.style.cssText = 'font:600 20px system-ui;color:#ece6f7;letter-spacing:1px;margin-top:30px';
+      cartao.appendChild(logo); cartao.appendChild(tocar);
+      window.kolianiIntroCartaoDOM = cartao;
+      window.kolianiIntroPrevia = true;
+      window.kolianiIntroMenu = function(){
+        window.kolianiIntroPreviaConcluida = true;
+        window.kolianiIntroCartaoDOM = null;
+        resolve();
+      };
+      $JS_INTRO
+    });
+  }).then(function(){
+    return engine.start({args:['--main-pack', pack].concat(config.args || [])});
+  });
+};

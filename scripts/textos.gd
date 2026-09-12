@@ -38,6 +38,9 @@ func idioma() -> String:
 func definir_idioma(loc: String) -> void:
 	if loc not in IDIOMAS:
 		loc = "en"
+	# Espelho apenas para a intro anterior ao runtime iOS; o save continua autoritativo.
+	if OS.has_feature("web"):
+		JavaScriptBridge.eval("try{localStorage.setItem('koliani-intro-idioma', %s)}catch(e){}" % JSON.stringify(loc), true)
 	if loc == _loc and not _map.is_empty():
 		return
 	_loc = loc

@@ -42,6 +42,9 @@ var _skip_web: JavaScriptObject
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	if OS.has_feature("web") and JavaScriptBridge.eval("Boolean(window.kolianiIntroPreviaConcluida)", true):
+		_ir_menu(true)
+		return
 	# O clique TEM de chegar ao `_unhandled_input`. Um `Control` nasce com
 	# `MOUSE_FILTER_STOP` e come o evento: no Web, o cartão "TOCAR PARA
 	# JOGAR" ficava a piscar e o toque não fazia nada -- visto no Chrome
@@ -149,56 +152,28 @@ const JS_INTRO := """
 window.kolianiIntro = (function(){
   var estado = 'idle', v = null, ultimoToque = -Infinity, fechado = false;
   window.kolianiIntroAtiva = true;
-  // Diagnóstico temporário 9H.5D: observação, sem consumir gestos.
-  var ultimoEvento = 'NONE', promessa = 'NOT ATTEMPTED';
-  var eventoSkip = 'NONE', hit = 'NONE', transicao = 'NOT ATTEMPTED';
-  var amostra = {readyState:0, networkState:0, paused:true, ended:false,
-    currentTime:0, duration:NaN, videoWidth:0, videoHeight:0};
-  var painel = document.createElement('pre');
-  painel.id = 'koliani-ios-debug';
-  painel.style.cssText = 'position:fixed;left:max(8px,env(safe-area-inset-left));' +
-    'top:max(8px,env(safe-area-inset-top));z-index:23;pointer-events:none;' +
-    'margin:0;padding:6px;background:rgba(0,0,0,.78);color:#fff;' +
-    'font:11px/1.25 monospace;max-width:75vw;white-space:pre-wrap';
-  document.body.appendChild(painel);
-  var pintarDebug = function(){
-    if (v && !fechado) amostra = {readyState:v.readyState, networkState:v.networkState,
-      paused:v.paused, ended:v.ended, currentTime:v.currentTime, duration:v.duration,
-      videoWidth:v.videoWidth, videoHeight:v.videoHeight};
-    var nl = String.fromCharCode(10);
-    painel.textContent = 'DEBUG 9H.5D' + nl + 'VIDEO' + nl + 'readyState: ' + amostra.readyState +
-      ' | networkState: ' + amostra.networkState + nl + 'paused: ' + amostra.paused +
-      ' | ended: ' + amostra.ended + nl + 'currentTime / duration: ' +
-      amostra.currentTime + ' / ' + amostra.duration + nl + 'videoWidth x videoHeight: ' +
-      amostra.videoWidth + ' x ' + amostra.videoHeight + nl + 'LAST EVENT: ' + ultimoEvento +
-      nl + 'play() promise: ' + promessa + nl + 'SKIP EVENT: ' + eventoSkip +
-      nl + 'HIT ELEMENT: ' + hit + nl + 'MENU TRANSITION: ' + transicao;
-  };
-  window.kolianiIntroMenuResultado = function(passou){
-    transicao = passou ? 'PASS' : 'FAIL'; pintarDebug();
-  };
-  window.kolianiIntroMenuTentativa = function(){
-    // FAIL significa que o menu não confirmou chegada em 5 s; uma chegada tardia dá PASS.
-    setTimeout(function(){ if (transicao !== 'PASS') window.kolianiIntroMenuResultado(false); }, 5000);
-  };
-  var observarToque = function(e){
-    var ponto = e.touches && e.touches[0] || e;
-    var el = document.elementFromPoint(ponto.clientX, ponto.clientY);
-    hit = el ? '<' + el.tagName.toLowerCase() + (el.id ? '#' + el.id : '') + '>' : 'NONE';
-    eventoSkip = e.type.toUpperCase(); pintarDebug();
-  };
-  var eventosDebug = ['pointerdown', 'touchstart', 'click'];
-  eventosDebug.forEach(function(e){ window.addEventListener(e, observarToque, {capture:true, passive:true}); });
-  pintarDebug();
-  var relogioDebug = setInterval(pintarDebug, 500);
+  // Top layer nativa: fora dos stacking contexts do canvas Godot.
+  var camada = document.createElement('dialog');
+  camada.id = 'koliani-intro-layer';
+  camada.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;max-width:none;' +
+    'max-height:none;margin:0;padding:0;border:0;background:transparent;' +
+    'z-index:2147483647;pointer-events:auto;overflow:hidden';
+  document.body.appendChild(camada);
+  if (camada.showModal) camada.showModal(); else camada.setAttribute('open','');
+  var canvas = document.getElementById('canvas');
+  var ponteirosCanvas = canvas && canvas.style.pointerEvents;
+  if (canvas) canvas.style.pointerEvents = 'none';
+  var rodar = document.getElementById('rodar'), paiRodar = rodar && rodar.parentNode;
+  if (rodar) camada.appendChild(rodar);
+  if (window.kolianiIntroCartaoDOM) camada.appendChild(window.kolianiIntroCartaoDOM);
   var skip = document.createElement('button');
   skip.id = 'koliani-intro-skip'; skip.type = 'button';
   skip.textContent = window.kolianiIntroTextoSkip;
   skip.style.cssText = 'position:fixed;right:max(16px,env(safe-area-inset-right));' +
     'bottom:max(16px,env(safe-area-inset-bottom));z-index:22;display:block;' +
     'padding:12px 18px;color:#ece6f7;background:#0d0814;border:1px solid #ff5fd4;' +
-    'border-radius:8px;font:600 16px system-ui;touch-action:manipulation';
-  document.body.appendChild(skip);
+    'border-radius:8px;font:600 16px system-ui;touch-action:manipulation;pointer-events:auto';
+  camada.appendChild(skip);
   var cobertos = [];
   var mostrarVideo = function(){
     v.style.display = 'block';
@@ -217,7 +192,8 @@ window.kolianiIntro = (function(){
 	if (e.target === skip || e.target.closest?.('#koliani-intro-skip')){
       e.preventDefault(); e.stopPropagation(); window.kolianiIntroSaltar(true); return;
     }
-	if (e.repeat || (e.type !== 'keydown' && e.target.id !== 'canvas' && e.target !== v && !e.target.closest?.('#rodar'))) return;
+	if (e.repeat || (e.type !== 'keydown' && e.target.id !== 'canvas' && e.target !== camada && e.target !== v && !camada.contains(e.target))) return;
+	if (e.type === 'pointerdown' || e.type === 'touchstart') return;
 	if (e.type === 'click' && Date.now() - ultimoToque < 600) return;
 	if (e.type === 'touchend') ultimoToque = Date.now();
 	e.preventDefault();
@@ -228,7 +204,9 @@ window.kolianiIntro = (function(){
     }
 	else if (estado === 'a_tocar') window.kolianiIntroSaltar();
   };
+  eventos = ['pointerdown','touchstart','touchend','click','keydown'];
   eventos.forEach(function(e){ window.addEventListener(e, gesto, {capture:true, passive:false}); });
+  camada.addEventListener('cancel', function(e){ e.preventDefault(); window.kolianiIntroSaltar(true); });
   window.kolianiIntroTocar = function(url){
 	if (fechado || (estado !== 'idle' && estado !== 'pausado')) return;
 	estado = 'a_tentar';
@@ -239,10 +217,7 @@ window.kolianiIntro = (function(){
       v.playsInline = true; v.preload = 'auto';
       v.autoplay = false; v.muted = false; v.loop = false;
 	  v.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;' +
-		'object-fit:contain;background:#0b0509;z-index:20;visibility:visible;opacity:1';
-      ['loadedmetadata','canplay','playing','timeupdate','pause','waiting','stalled','error','ended'].forEach(function(ev){
-        v.addEventListener(ev, function(){ if (!fechado){ ultimoEvento = ev; pintarDebug(); } });
-      });
+		'object-fit:contain;background:#0b0509;z-index:20;visibility:visible;opacity:1;pointer-events:none';
 	  v.addEventListener('ended', function(){ window.kolianiIntroSaltar(); });
 	  v.addEventListener('error', function(){ estado = 'erro'; window.kolianiIntroSaltar(); });
       v.addEventListener('playing', function(){ if (!fechado) estado = 'a_tocar'; });
@@ -250,38 +225,40 @@ window.kolianiIntro = (function(){
       v.addEventListener('timeupdate', function(){
         if (!fechado && !v.paused && v.currentTime > 0) estado = 'a_tocar';
       });
-	  document.body.appendChild(v);
+	  camada.appendChild(v);
 	  }
 	  // WebKit: visível antes de play(), sempre dentro do gesto permitido.
       mostrarVideo();
+      if (window.kolianiIntroCartaoDOM) window.kolianiIntroCartaoDOM.style.display = 'none';
       var p = v.play();
-      promessa = 'PENDING'; pintarDebug();
-      if (p && p.then) p.then(function(){ promessa = 'resolved'; pintarDebug(); }, function(e){
-        promessa = 'rejected: ' + (e && e.name || 'Error') + ': ' + (e && e.message || ''); pintarDebug();
-      });
+	  if (window.kolianiIntroPrevia) setTimeout(function(){
+        if (!fechado){ console.warn('INTRO 9H.6: teto de reprodução', window.kolianiIntroDiag()); window.kolianiIntroSaltar(); }
+      }, 26000);
 	  if (p && p.catch) p.catch(function(e){
         if (fechado) return;
 		if (e && e.name === 'NotAllowedError'){
           estado = 'idle'; v.style.display = 'none'; restaurar();
+          if (window.kolianiIntroCartaoDOM) window.kolianiIntroCartaoDOM.style.display = 'flex';
 		  return;
 		}
 		estado = 'erro'; window.kolianiIntroSaltar();
 	  });
 
-	}catch(e){ promessa = 'rejected: ' + e.name + ': ' + e.message; pintarDebug(); estado = 'erro'; window.kolianiIntroSaltar(); }
+	}catch(e){ estado = 'erro'; window.kolianiIntroSaltar(); }
   };
   window.kolianiIntroSaltar = function(imediato){
     if (fechado) return;
-    pintarDebug();
     fechado = true; window.kolianiIntroAtiva = false;
-    clearInterval(relogioDebug);
-    eventosDebug.forEach(function(e){ window.removeEventListener(e, observarToque, true); });
 	if (estado !== 'erro') estado = 'fim';
 	eventos.forEach(function(e){ window.removeEventListener(e, gesto, true); });
 	try{ if (v){ v.pause(); v.removeAttribute('src'); v.load(); v.remove(); v = null; } }catch(e){}
     skip.remove();
+    if (canvas) canvas.style.pointerEvents = ponteirosCanvas;
+    if (rodar && paiRodar) paiRodar.appendChild(rodar);
+    if (camada.close) camada.close();
+    camada.remove();
     restaurar();
-    if (imediato && window.kolianiIntroMenu) window.kolianiIntroMenu();
+    if ((imediato || window.kolianiIntroPrevia) && window.kolianiIntroMenu) window.kolianiIntroMenu();
   };
   window.kolianiIntroEstado = function(){ return estado; };
   window.kolianiIntroDiag = function(){ return {
@@ -387,9 +364,6 @@ func _ao_fim(imediato: bool = false) -> void:
 
 
 func _ir_menu(imediato: bool) -> void:
-	# Observa a tentativa; o menu confirma a chegada após montar a UI.
-	if OS.has_feature("web"):
-		JavaScriptBridge.eval("if(window.kolianiIntroMenuTentativa)window.kolianiIntroMenuTentativa()", true)
 	if imediato:
 		get_tree().change_scene_to_file.call_deferred(CENA_MENU)
 		return

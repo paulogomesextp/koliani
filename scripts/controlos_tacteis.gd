@@ -107,10 +107,17 @@ func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	if not modo_edicao:
 		layout = LayoutToque.carregar()
+		add_to_group("controlos_layout_ativos")
 	resized.connect(_medir)
 	visibility_changed.connect(_so_com_botao)
 	_medir()
 	_so_com_botao()
+
+
+## Atualiza desenho e hit testing da instância existente, mesmo com o jogo pausado.
+func aplicar_layout(novo: Dictionary) -> void:
+	layout = novo.duplicate(true)
+	_medir()
 
 
 func _so_com_botao() -> void:

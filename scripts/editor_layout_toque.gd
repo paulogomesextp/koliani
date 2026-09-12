@@ -55,6 +55,7 @@ func _ready() -> void:
 	_controlos.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_controlos.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_controlos)
+	_controlos.layout_mexido.connect(_aplicar_live)
 
 	_titulo = Label.new()
 	Frontend9H.cabecalho(_titulo, 26)
@@ -186,6 +187,7 @@ func _redimensionar(delta: float) -> void:
 
 func _ao_guardar() -> void:
 	if LayoutToque.guardar(_controlos.layout_actual()):
+		_aplicar_live()
 		_piscar(Textos.t("layout.saved"))
 		Som.toca("porta", -10.0, 1.15)
 
@@ -202,8 +204,14 @@ func _ao_repor() -> void:
 
 
 func _ao_fechar() -> void:
+	# FECHAR continua sem gravar: desfaz a pré-visualização que não foi guardada.
+	get_tree().call_group("controlos_layout_ativos", "aplicar_layout", LayoutToque.carregar())
 	fechado.emit()
 	queue_free()
+
+
+func _aplicar_live() -> void:
+	get_tree().call_group("controlos_layout_ativos", "aplicar_layout", _controlos.layout)
 
 
 func _piscar(txt: String) -> void:

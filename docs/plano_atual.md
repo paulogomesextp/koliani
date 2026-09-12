@@ -2,6 +2,14 @@
 
 ## Estado — 12 de setembro de 2026
 
+### Execution 9H.6 — lote exclusivo iOS + layout live
+
+- Corrigir ciclo de vídeo Web/iOS bloqueado em t=0 e Skip DOM, mantendo MP4.
+- Propagar drag/resize/save/REPOR às instâncias tácteis ativas, sem alterar persistência.
+- Retirar painel temporário; landscape e restantes sistemas congelados.
+- Conclusão: testes dirigidos, export Web, commit/push, CI/Pages confirmados.
+- STOP após deploy; DEVICE VALIDATION REQUIRED para vídeo/áudio/Skip no iPhone.
+
 **9H PARTIAL PASS (v0.17.0). Região I pronta para o gate humano; Região II
 não iniciada.** O frontend inteiro passou a sair das pranchas aprovadas em
 `work/production_art_gate/10_menu_rebrand/`: intro em vídeo, menu, seletor

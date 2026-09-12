@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0">
+		<title>$GODOT_PROJECT_NAME</title>
+		<style>
+html, body, #canvas {
+	margin: 0;
+	padding: 0;
+	border: 0;
+}
+
+body {
+	color: white;
+	background-color: black;
+	overflow: hidden;
+	touch-action: none;
+}
+
+#canvas {
+	display: block;
+}
+
+#canvas:focus {
+	outline: none;
+}
+
+#status, #status-splash, #status-progress {
+	position: absolute;
+	left: 0;
+	right: 0;
+}
+
+#status, #status-splash {
+	top: 0;
+	bottom: 0;
+}
+
+#status {
+	background-color: $GODOT_SPLASH_COLOR;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	visibility: hidden;
+}
+
+#status-splash {
+	max-height: 100%;
+	max-width: 100%;
+	margin: auto;
+}
+
+#status-splash.show-image--false {
+	display: none;
+}
+
+#status-splash.fullsize--true {
+	height: 100%;
+	width: 100%;
+	object-fit: contain;
+}
+
+#status-splash.use-filter--false {
+	image-rendering: pixelated;
+}
+
+#status-progress, #status-notice {
+	display: none;
+}
+
+#status-progress {
+	bottom: 10%;
+	width: 50%;
+	margin: 0 auto;
+}
+
+#status-notice {
+	background-color: #5b3943;
+	border-radius: 0.5rem;
+	border: 1px solid #9b3943;
+	color: #e0e0e0;
+	font-family: 'Noto Sans', 'Droid Sans', Arial, sans-serif;
+	line-height: 1.3;
+	margin: 0 2rem;
+	overflow: hidden;
+	padding: 1rem;
+	text-align: center;
+	z-index: 1;
+}
+		</style>
+		$GODOT_HEAD_INCLUDE
+	</head>
+	<body>
+		<canvas id="canvas">
+			Your browser does not support the canvas tag.
+		</canvas>
+
+		<noscript>
+			Your browser does not support JavaScript.
+		</noscript>
+
+		<div id="status">
+			<img id="status-splash" class="$GODOT_SPLASH_CLASSES" src="$GODOT_SPLASH" alt="">
+			<progress id="status-progress"></progress>
+			<div id="status-notice"></div>
+		</div>
+
+		<script>/* 9H.6: intro iOS antes do main loop/áudio Godot; MP4 único com A/V sincronizados. */
+window.kolianiArranqueIntro = function(engine, config, opcoes) {
+  var ios = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  if (!ios) return engine.startGame(opcoes);
+  // API da configuração da versão exportada 4.7.2, sem arrancar o main loop.
+  engine.config.update(opcoes);
+  var pack = config.executable + '.pck';
+  // Termina downloads/compilação ANTES da intro: Skip não volta a descarregar o jogo.
+  return Promise.all([engine.init(config.executable), engine.preloadFile(pack)]).then(function(){
+    return new Promise(function(resolve){
+      var catalogos = {"en": {"menu.skip_to_menu": "SKIP TO MENU", "menu.tap_play": "TAP TO PLAY", "menu.rotate_device": "Turn your device sideways"}, "pt": {"menu.skip_to_menu": "SALTAR PARA O MENU", "menu.tap_play": "TOCAR PARA JOGAR", "menu.rotate_device": "Rode o dispositivo"}, "es": {"menu.skip_to_menu": "SALTAR AL MENÚ", "menu.tap_play": "TOCA PARA JUGAR", "menu.rotate_device": "Gira el dispositivo"}, "fr": {"menu.skip_to_menu": "PASSER AU MENU", "menu.tap_play": "TOUCHER POUR JOUER", "menu.rotate_device": "Tournez votre appareil"}, "de": {"menu.skip_to_menu": "ZUM MENÜ", "menu.tap_play": "ZUM SPIELEN TIPPEN", "menu.rotate_device": "Drehe dein Gerät"}, "zh": {"menu.skip_to_menu": "跳过并进入菜单", "menu.tap_play": "点击开始", "menu.rotate_device": "请横置设备"}};
+      var idioma = 'en';
+      try{ idioma = localStorage.getItem('koliani-intro-idioma') || 'en'; }catch(e){}
+      var Textos = {t:function(chave){ return (catalogos[idioma] || catalogos.en)[chave] || catalogos.en[chave]; }};
+      window.kolianiIntroTextoSkip = Textos.t('menu.skip_to_menu');
+      var aviso = document.querySelector('#rodar span');
+      if (aviso) aviso.textContent = Textos.t('menu.rotate_device');
+      var cartao = document.createElement('div');
+      cartao.style.cssText = 'position:absolute;inset:0;display:flex;align-items:center;' +
+        'justify-content:center;flex-direction:column;background:#050305;pointer-events:none';
+      var logo = document.createElement('img');
+      logo.src = config.executable + '.apple-touch-icon.png';
+      logo.style.cssText = 'width:300px;height:300px;max-height:55vh;object-fit:contain';
+      var tocar = document.createElement('span');
+      tocar.textContent = Textos.t('menu.tap_play');
+      tocar.style.cssText = 'font:600 20px system-ui;color:#ece6f7;letter-spacing:1px;margin-top:30px';
+      cartao.appendChild(logo); cartao.appendChild(tocar);
+      window.kolianiIntroCartaoDOM = cartao;
+      window.kolianiIntroPrevia = true;
+      window.kolianiIntroMenu = function(){
+        window.kolianiIntroPreviaConcluida = true;
+        window.kolianiIntroCartaoDOM = null;
+        resolve();
+      };
+
+window.kolianiIntro = (function(){
+  var estado = 'idle', v = null, ultimoToque = -Infinity, fechado = false;
+  window.kolianiIntroAtiva = true;
+  // Top layer nativa: fora dos stacking contexts do canvas Godot.
+  var camada = document.createElement('dialog');
+  camada.id = 'koliani-intro-layer';
+  camada.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;max-width:none;' +
+    'max-height:none;margin:0;padding:0;border:0;background:transparent;' +
+    'z-index:2147483647;pointer-events:auto;overflow:hidden';
+  document.body.appendChild(camada);
+  if (camada.showModal) camada.showModal(); else camada.setAttribute('open','');
+  var canvas = document.getElementById('canvas');
+  var ponteirosCanvas = canvas && canvas.style.pointerEvents;
+  if (canvas) canvas.style.pointerEvents = 'none';
+  var rodar = document.getElementById('rodar'), paiRodar = rodar && rodar.parentNode;
+  if (rodar) camada.appendChild(rodar);
+  if (window.kolianiIntroCartaoDOM) camada.appendChild(window.kolianiIntroCartaoDOM);
+  var skip = document.createElement('button');
+  skip.id = 'koliani-intro-skip'; skip.type = 'button';
+  skip.textContent = window.kolianiIntroTextoSkip;
+  skip.style.cssText = 'position:fixed;right:max(16px,env(safe-area-inset-right));' +
+    'bottom:max(16px,env(safe-area-inset-bottom));z-index:22;display:block;' +
+    'padding:12px 18px;color:#ece6f7;background:#0d0814;border:1px solid #ff5fd4;' +
+    'border-radius:8px;font:600 16px system-ui;touch-action:manipulation;pointer-events:auto';
+  camada.appendChild(skip);
+  var cobertos = [];
+  var mostrarVideo = function(){
+    v.style.display = 'block';
+    if (!cobertos.length) ['canvas', 'status'].forEach(function(id){
+      var el = document.getElementById(id);
+      if (el){ cobertos.push([el, el.style.visibility]); el.style.visibility = 'hidden'; }
+    });
+  };
+  var restaurar = function(){
+    cobertos.forEach(function(par){ par[0].style.visibility = par[1]; });
+    cobertos = [];
+  };
+  var eventos = ['touchend', 'click', 'keydown'];
+  var gesto = function(e){
+	if (fechado) return;
+	if (e.target === skip || e.target.closest?.('#koliani-intro-skip')){
+      e.preventDefault(); e.stopPropagation(); window.kolianiIntroSaltar(true); return;
+    }
+	if (e.repeat || (e.type !== 'keydown' && e.target.id !== 'canvas' && e.target !== camada && e.target !== v && !camada.contains(e.target))) return;
+	if (e.type === 'pointerdown' || e.type === 'touchstart') return;
+	if (e.type === 'click' && Date.now() - ultimoToque < 600) return;
+	if (e.type === 'touchend') ultimoToque = Date.now();
+	e.preventDefault();
+	e.stopPropagation();
+	if (estado === 'idle' || estado === 'pausado'){
+      if (window.kolianiAudioAcordar) window.kolianiAudioAcordar();
+      window.kolianiIntroTocar(new URL('intro_koliani.mp4', location.href).href);
+    }
+	else if (estado === 'a_tocar') window.kolianiIntroSaltar();
+  };
+  eventos = ['pointerdown','touchstart','touchend','click','keydown'];
+  eventos.forEach(function(e){ window.addEventListener(e, gesto, {capture:true, passive:false}); });
+  camada.addEventListener('cancel', function(e){ e.preventDefault(); window.kolianiIntroSaltar(true); });
+  window.kolianiIntroTocar = function(url){
+	if (fechado || (estado !== 'idle' && estado !== 'pausado')) return;
+	estado = 'a_tentar';
+	try{
+	  if (!v){
+	  v = document.createElement('video');
+	  v.src = url; v.setAttribute('playsinline',''); v.setAttribute('webkit-playsinline','');
+      v.playsInline = true; v.preload = 'auto';
+      v.autoplay = false; v.muted = false; v.loop = false;
+	  v.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;' +
+		'object-fit:contain;background:#0b0509;z-index:20;visibility:visible;opacity:1;pointer-events:none';
+	  v.addEventListener('ended', function(){ window.kolianiIntroSaltar(); });
+	  v.addEventListener('error', function(){ estado = 'erro'; window.kolianiIntroSaltar(); });
+      v.addEventListener('playing', function(){ if (!fechado) estado = 'a_tocar'; });
+      v.addEventListener('pause', function(){ if (!fechado) estado = 'pausado'; });
+      v.addEventListener('timeupdate', function(){
+        if (!fechado && !v.paused && v.currentTime > 0) estado = 'a_tocar';
+      });
+	  camada.appendChild(v);
+	  }
+	  // WebKit: visível antes de play(), sempre dentro do gesto permitido.
+      mostrarVideo();
+      if (window.kolianiIntroCartaoDOM) window.kolianiIntroCartaoDOM.style.display = 'none';
+      var p = v.play();
+	  if (window.kolianiIntroPrevia) setTimeout(function(){
+        if (!fechado){ console.warn('INTRO 9H.6: teto de reprodução', window.kolianiIntroDiag()); window.kolianiIntroSaltar(); }
+      }, 26000);
+	  if (p && p.catch) p.catch(function(e){
+        if (fechado) return;
+		if (e && e.name === 'NotAllowedError'){
+          estado = 'idle'; v.style.display = 'none'; restaurar();
+          if (window.kolianiIntroCartaoDOM) window.kolianiIntroCartaoDOM.style.display = 'flex';
+		  return;
+		}
+		estado = 'erro'; window.kolianiIntroSaltar();
+	  });
+
+	}catch(e){ estado = 'erro'; window.kolianiIntroSaltar(); }
+  };
+  window.kolianiIntroSaltar = function(imediato){
+    if (fechado) return;
+    fechado = true; window.kolianiIntroAtiva = false;
+	if (estado !== 'erro') estado = 'fim';
+	eventos.forEach(function(e){ window.removeEventListener(e, gesto, true); });
+	try{ if (v){ v.pause(); v.removeAttribute('src'); v.load(); v.remove(); v = null; } }catch(e){}
+    skip.remove();
+    if (canvas) canvas.style.pointerEvents = ponteirosCanvas;
+    if (rodar && paiRodar) paiRodar.appendChild(rodar);
+    if (camada.close) camada.close();
+    camada.remove();
+    restaurar();
+    if ((imediato || window.kolianiIntroPrevia) && window.kolianiIntroMenu) window.kolianiIntroMenu();
+  };
+  window.kolianiIntroEstado = function(){ return estado; };
+  window.kolianiIntroDiag = function(){ return {
+    estado:estado, currentTime:v ? v.currentTime : 0,
+    paused:v ? v.paused : true, readyState:v ? v.readyState : 0
+  }; };
+  return true;
+})();
+
+    });
+  }).then(function(){
+    return engine.start({args:['--main-pack', pack].concat(config.args || [])});
+  });
+};
+</script>
+		<script src="$GODOT_URL"></script>
+		<script>
+const GODOT_CONFIG = $GODOT_CONFIG;
+const GODOT_THREADS_ENABLED = $GODOT_THREADS_ENABLED;
+const engine = new Engine(GODOT_CONFIG);
+
+(function () {
+	const statusOverlay = document.getElementById('status');
+	const statusProgress = document.getElementById('status-progress');
+	const statusNotice = document.getElementById('status-notice');
+
+	let initializing = true;
+	let statusMode = '';
+
+	function setStatusMode(mode) {
+		if (statusMode === mode || !initializing) {
+			return;
+		}
+		if (mode === 'hidden') {
+			statusOverlay.remove();
+			initializing = false;
+			return;
+		}
+		statusOverlay.style.visibility = 'visible';
+		statusProgress.style.display = mode === 'progress' ? 'block' : 'none';
+		statusNotice.style.display = mode === 'notice' ? 'block' : 'none';
+		statusMode = mode;
+	}
+
+	function setStatusNotice(text) {
+		while (statusNotice.lastChild) {
+			statusNotice.removeChild(statusNotice.lastChild);
+		}
+		const lines = text.split('\n');
+		lines.forEach((line) => {
+			statusNotice.appendChild(document.createTextNode(line));
+			statusNotice.appendChild(document.createElement('br'));
+		});
+	}
+
+	function displayFailureNotice(err) {
+		console.error(err);
+		if (err instanceof Error) {
+			setStatusNotice(err.message);
+		} else if (typeof err === 'string') {
+			setStatusNotice(err);
+		} else {
+			setStatusNotice('An unknown error occurred.');
+		}
+		setStatusMode('notice');
+		initializing = false;
+	}
+
+	const missing = Engine.getMissingFeatures({
+		threads: GODOT_THREADS_ENABLED,
+	});
+
+	if (missing.length !== 0) {
+		if (GODOT_CONFIG['serviceWorker'] && GODOT_CONFIG['ensureCrossOriginIsolationHeaders'] && 'serviceWorker' in navigator) {
+			let serviceWorkerRegistrationPromise;
+			try {
+				serviceWorkerRegistrationPromise = navigator.serviceWorker.getRegistration();
+			} catch (err) {
+				serviceWorkerRegistrationPromise = Promise.reject(new Error('Service worker registration failed.'));
+			}
+			// There's a chance that installing the service worker would fix the issue
+			Promise.race([
+				serviceWorkerRegistrationPromise.then((registration) => {
+					if (registration != null) {
+						return Promise.reject(new Error('Service worker already exists.'));
+					}
+					return registration;
+				}).then(() => engine.installServiceWorker()),
+				// For some reason, `getRegistration()` can stall
+				new Promise((resolve) => {
+					setTimeout(() => resolve(), 2000);
+				}),
+			]).then(() => {
+				// Reload if there was no error.
+				window.location.reload();
+			}).catch((err) => {
+				console.error('Error while registering service worker:', err);
+			});
+		} else {
+			// Display the message as usual
+			const missingMsg = 'Error\nThe following features required to run Godot projects on the Web are missing:\n';
+			displayFailureNotice(missingMsg + missing.join('\n'));
+		}
+	} else {
+		setStatusMode('progress');
+		window.kolianiArranqueIntro(engine, GODOT_CONFIG, {
+			'onProgress': function (current, total) {
+				if (current > 0 && total > 0) {
+					statusProgress.value = current;
+					statusProgress.max = total;
+				} else {
+					statusProgress.removeAttribute('value');
+					statusProgress.removeAttribute('max');
+				}
+			},
+		}).then(() => {
+			setStatusMode('hidden');
+		}, displayFailureNotice);
+	}
+}());
+		</script>
+	</body>
+</html>

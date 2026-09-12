@@ -4,6 +4,29 @@
 
 Atualizado em 12 de setembro de 2026.
 
+## Execution 9H.6 — iOS intro + layout live
+
+- Trace físico recebido: playing/play resolved, paused=false, readyState=3,
+  currentTime=0/10; toque hit canvas, nenhuma tentativa de menu.
+- Stall confirmado; causa interna WebKit não demonstrada. Nova via iOS
+  prepara WASM/PCK antes da intro, sem main loop ou áudio Godot concorrente;
+  só inicia o jogo após ended/Skip, sem nova descarga do pack.
+- MP4 aprovado intocado: vídeo/áudio no mesmo elemento, sem recodificação.
+- Skip em dialog top layer; canvas sem pointer-events durante intro,
+  captura touchstart/pointerdown/click, teardown e callback protegidos.
+- Drag/resize/guardar/REPOR propagados por grupo às instâncias tácteis
+  existentes; medir+redraw síncronos, inclusive pausado. FECHAR não grava
+  e volta ao layout persistido; ficheiro/formato/persistência preservados.
+- Painel 9H.5D removido. Landscape/API/CSS fallback sem alteração funcional.
+- DOM startup/Skip/recusa/fim/desktop PASS; layout live no Godot PASS.
+  Suite existente: OK, 71 ObjectDB leaked no fim. Teste dirigido:
+  76 leaked/3 recursos no fim, sem erro funcional; não corrigidos fora de scope.
+- Export Web exit 0, sem SCRIPT ERROR/Parse Error; cache local
+  1789226956|8542300. Logs work/9h6_*; publicação pelo CI existente.
+- DEVICE VALIDATION REQUIRED: retestar movimento/A-V/Skip no iPhone.
+  Não se declara reprodução iOS PASS com provas DOM/desktop.
+- STOP após deployment; Região II NÃO iniciada.
+
 ## Execution 9H.5D — diagnóstico iOS autorizado
 
 - Objetivo exclusivo: publicar instrumentação temporária para trace físico.
