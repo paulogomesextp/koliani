@@ -12,8 +12,7 @@ extends Control
 ##     começar a andar, `_desistir()` leva ao menu. O relógio de segurança
 ##     (`ESPERA_ARRANQUE`) é o que apanha o caso mau de verdade -- o vídeo
 ##     que diz que está a tocar e não avança um único frame.
-##  2. No browser tenta-se autoplay com som. Se a política o recusar,
-##     o primeiro gesto DOM inicia o vídeo e desbloqueia áudio e orientação.
+##  2. No browser, o primeiro gesto DOM inicia vídeo, áudio e orientação.
 ##  3. **Salta-se sempre.** Qualquer tecla, botão do rato ou toque salta.
 ##     Ninguém quer ver a mesma abertura à décima vez.
 ##
@@ -38,6 +37,7 @@ var _cartao: Control
 var _saltar: Label
 var _acabou := false
 var _a_tocar := false
+var _skip_web: JavaScriptObject
 
 
 func _ready() -> void:
@@ -97,9 +97,10 @@ func _ready() -> void:
 	else:
 		_arrancar()
 
-	get_tree().create_timer(TETO).timeout.connect(func() -> void:
-		if not _acabou:
-			_ao_fim())
+	if not OS.has_feature("web"):
+		get_tree().create_timer(TETO).timeout.connect(func() -> void:
+			if not _acabou:
+				_ao_fim())
 	_prova_intro()
 
 
@@ -146,7 +147,16 @@ func _mostrar_cartao() -> void:
 ## vem "erro" e vai-se para o menu na mesma.
 const JS_INTRO := """
 window.kolianiIntro = (function(){
-  var estado = 'idle', v = null, ultimoToque = -Infinity;
+  var estado = 'idle', v = null, ultimoToque = -Infinity, fechado = false;
+  window.kolianiIntroAtiva = true;
+  var skip = document.createElement('button');
+  skip.id = 'koliani-intro-skip'; skip.type = 'button';
+  skip.textContent = window.kolianiIntroTextoSkip;
+  skip.style.cssText = 'position:fixed;right:max(16px,env(safe-area-inset-right));' +
+    'bottom:max(16px,env(safe-area-inset-bottom));z-index:22;display:block;' +
+    'padding:12px 18px;color:#ece6f7;background:#0d0814;border:1px solid #ff5fd4;' +
+    'border-radius:8px;font:600 16px system-ui;touch-action:manipulation';
+  document.body.appendChild(skip);
   var cobertos = [];
   var mostrarVideo = function(){
     v.style.display = 'block';
@@ -161,39 +171,49 @@ window.kolianiIntro = (function(){
   };
   var eventos = ['touchend', 'click', 'keydown'];
   var gesto = function(e){
+	if (fechado) return;
+	if (e.target === skip || e.target.closest?.('#koliani-intro-skip')){
+      e.preventDefault(); e.stopPropagation(); window.kolianiIntroSaltar(true); return;
+    }
 	if (e.repeat || (e.type !== 'keydown' && e.target.id !== 'canvas' && e.target !== v && !e.target.closest?.('#rodar'))) return;
 	if (e.type === 'click' && Date.now() - ultimoToque < 600) return;
 	if (e.type === 'touchend') ultimoToque = Date.now();
 	e.preventDefault();
 	e.stopPropagation();
-	if (estado === 'idle' || estado === 'a_tentar'){
+	if (estado === 'idle' || estado === 'pausado'){
       if (window.kolianiAudioAcordar) window.kolianiAudioAcordar();
       window.kolianiIntroTocar(new URL('intro_koliani.mp4', location.href).href);
     }
 	else if (estado === 'a_tocar') window.kolianiIntroSaltar();
   };
   eventos.forEach(function(e){ window.addEventListener(e, gesto, {capture:true, passive:false}); });
-  window.kolianiIntroTocar = function(url, automatico){
-	if (estado !== 'idle' && estado !== 'a_tentar') return;
-	estado = automatico ? 'a_tentar' : 'a_tocar';
+  window.kolianiIntroTocar = function(url){
+	if (fechado || (estado !== 'idle' && estado !== 'pausado')) return;
+	estado = 'a_tentar';
 	try{
 	  if (!v){
 	  v = document.createElement('video');
 	  v.src = url; v.setAttribute('playsinline',''); v.setAttribute('webkit-playsinline','');
       v.playsInline = true; v.preload = 'auto';
+      v.autoplay = false; v.muted = false; v.loop = false;
 	  v.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;' +
 		'object-fit:contain;background:#0b0509;z-index:20;visibility:visible;opacity:1';
 	  v.addEventListener('ended', function(){ window.kolianiIntroSaltar(); });
 	  v.addEventListener('error', function(){ estado = 'erro'; window.kolianiIntroSaltar(); });
+      v.addEventListener('playing', function(){ if (!fechado) estado = 'a_tocar'; });
+      v.addEventListener('pause', function(){ if (!fechado) estado = 'pausado'; });
+      v.addEventListener('timeupdate', function(){
+        if (!fechado && !v.paused && v.currentTime > 0) estado = 'a_tocar';
+      });
 	  document.body.appendChild(v);
 	  }
-	  // WebKit: tornar visível antes de play(), incluindo a repetição após autoplay recusado.
+	  // WebKit: visível antes de play(), sempre dentro do gesto permitido.
       mostrarVideo();
       var p = v.play();
-	  if (p && p.then) p.then(function(){ if (estado === 'a_tentar') estado = 'a_tocar'; }, function(e){
-		if (automatico && e && e.name === 'NotAllowedError'){
-		  if (estado === 'a_tentar') estado = 'idle';
-		  if (v && estado === 'idle'){ v.style.display = 'none'; restaurar(); }
+	  if (p && p.catch) p.catch(function(e){
+        if (fechado) return;
+		if (e && e.name === 'NotAllowedError'){
+          estado = 'idle'; v.style.display = 'none'; restaurar();
 		  return;
 		}
 		estado = 'erro'; window.kolianiIntroSaltar();
@@ -201,14 +221,21 @@ window.kolianiIntro = (function(){
 
 	}catch(e){ estado = 'erro'; window.kolianiIntroSaltar(); }
   };
-  window.kolianiIntroSaltar = function(){
+  window.kolianiIntroSaltar = function(imediato){
+    if (fechado) return;
+    fechado = true; window.kolianiIntroAtiva = false;
 	if (estado !== 'erro') estado = 'fim';
 	eventos.forEach(function(e){ window.removeEventListener(e, gesto, true); });
-	try{ if (v){ v.pause(); v.remove(); v = null; } }catch(e){}
+	try{ if (v){ v.pause(); v.removeAttribute('src'); v.load(); v.remove(); v = null; } }catch(e){}
+    skip.remove();
     restaurar();
+    if (imediato && window.kolianiIntroMenu) window.kolianiIntroMenu();
   };
   window.kolianiIntroEstado = function(){ return estado; };
-  window.kolianiIntroTocar(new URL('intro_koliani.mp4', location.href).href, true);
+  window.kolianiIntroDiag = function(){ return {
+    estado:estado, currentTime:v ? v.currentTime : 0,
+    paused:v ? v.paused : true, readyState:v ? v.readyState : 0
+  }; };
   return true;
 })();
 """
@@ -217,23 +244,33 @@ window.kolianiIntro = (function(){
 ## Arma o gesto DOM antes do toque. O Safari exige play() dentro do evento,
 ## não num frame posterior de input do Godot. Este ciclo só observa o estado.
 func _intro_web() -> void:
+	_skip_web = JavaScriptBridge.create_callback(func(_args: Array) -> void: _ao_fim(true))
+	var janela := JavaScriptBridge.get_interface("window")
+	janela.kolianiIntroMenu = _skip_web
+	JavaScriptBridge.eval("window.kolianiIntroTextoSkip = %s" %
+		JSON.stringify(Textos.t("menu.skip_to_menu")), true)
 	JavaScriptBridge.eval("document.querySelector('#rodar span').textContent = %s" %
 		JSON.stringify(Textos.t("menu.rotate_device")), true)
 	JavaScriptBridge.eval(JS_INTRO, true)
-	var fim := Time.get_ticks_msec() + int(TETO * 1000.0)
-	while Time.get_ticks_msec() < fim:
+	var fim := 0
+	while not _acabou:
 		await get_tree().create_timer(0.2).timeout
 		if _acabou:
 			return
 		var e := str(JavaScriptBridge.eval("window.kolianiIntroEstado()", true))
 		if e == "a_tocar" and not _a_tocar:
 			_a_tocar = true
+			fim = Time.get_ticks_msec() + int(TETO * 1000.0)
 			if _cartao:
 				_cartao.queue_free()
 				_cartao = null
 		if e == "fim" or e == "erro":
 			if e == "erro":
 				push_warning("INTRO 9H: o <video> do browser não tocou -- a saltar")
+			break
+		if fim > 0 and Time.get_ticks_msec() >= fim:
+			push_warning("INTRO 9H.4: reprodução excedeu o teto; diagnóstico %s" %
+				str(JavaScriptBridge.eval("JSON.stringify(window.kolianiIntroDiag())", true)))
 			break
 	JavaScriptBridge.eval("window.kolianiIntroSaltar()", true)
 	_ao_fim()
@@ -286,7 +323,7 @@ func _unhandled_input(evento: InputEvent) -> void:
 		_ao_fim()
 
 
-func _ao_fim() -> void:
+func _ao_fim(imediato: bool = false) -> void:
 	if _acabou:
 		return
 	_acabou = true
@@ -294,7 +331,7 @@ func _ao_fim() -> void:
 		_video.stop()
 	if OS.has_feature("web"):
 		JavaScriptBridge.eval("if(window.kolianiIntroSaltar)window.kolianiIntroSaltar()", true)
-	_ir_menu(false)
+	_ir_menu(imediato)
 
 
 func _ir_menu(imediato: bool) -> void:

@@ -4,6 +4,26 @@
 
 Atualizado em 12 de setembro de 2026.
 
+## Execution 9H.4 — iPhone intro hotfix
+
+- Game Master viu frame estático na intro e pediu skip visível independente.
+- Intro Web só inicia no gesto DOM; sem tentativa de autoplay. Estado de
+  reprodução confirmado por playing/timeupdate, pausa distinta e retomada
+  apenas por gesto. Diag inclui currentTime/paused/readyState.
+- HTML áudio silencioso suspenso apenas durante a intro para não concorrer
+  com o vídeo; AudioContext continua desbloqueado no primeiro gesto.
+- Botão skip DOM acima do vídeo/fallback, traduzido nos seis catálogos.
+  Disponível desde o início, mesmo bloqueado: pause, retirar src/load,
+  remover camada, callback imediato ao menu, guardas contra duplo menu.
+- MP4 aprovado preservado: H.264 Baseline/AAC, 300 amostras de vídeo.
+  Causa exata no WebKit físico não provada; DEVICE VALIDATION REQUIRED.
+- Landscape manifest/API/repetição após gesto e fallback iOS preservados.
+  Sem hacks de rotação; aviso esperado quando lock ausente/recusado.
+- DOM startup/skip bloqueado/duplo/áudio sem concorrência e landscape PASS.
+  Export Web exit 0, sem erros de script; log work/9h4_web_export.log.
+- Próximo passo: confirmar CI/Pages, depois Game Master reteste iPhone/PWA.
+  Gameplay/bosses/arte/áudio geral/UI do jogo/Região II intactos.
+
 ## Execution 9H.3 — iPhone startup hotfix
 
 - Game Master observou no iPhone áudio sem imagem e gesto extra de som.
@@ -16,7 +36,11 @@ Atualizado em 12 de setembro de 2026.
   depende de reteste: DEVICE VALIDATION REQUIRED, sem PASS de dispositivo.
 - Provas DOM de gesto/áudio/visibilidade/restauro e landscape PASS.
   Export Web exit 0, sem SCRIPT ERROR; log work/9h3_web_export.log.
-- Próximo passo: confirmar CI/Pages e Game Master reteste iPhone/PWA.
+- Publicado: `4e64b72`, origin/master confirmado; CI `34697524547` todos
+  os jobs SUCCESS. Pages deployment `6410380760` SHA 4e64b72 SUCCESS.
+  Wrapper público confirmado; cache nova `1789221304|6430512`.
+  Confirmação final registada localmente após push, sem novo commit.
+- Próximo passo exclusivo: Game Master reteste iPhone/PWA.
   Gameplay, bosses, arte e Região II intactos; sem export Windows local.
 ## Execution 9H.2 — Release Candidate autorizada pelo Game Master
 

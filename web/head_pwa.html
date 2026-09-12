@@ -130,6 +130,8 @@ flex-direction:column;gap:5vmin;padding:8vmin}
       + meio + 'AgAZGF0YQcAAACAgICAgICAAAA=';
   };
   var abrirCanalIOS = function(){
+    /* Durante a intro, o vídeo é o único HTML media com som. */
+    if (window.kolianiIntroAtiva) return;
     if (!ios || canalIOSAtivo) return;
     try{
       if (!canalIOS){
