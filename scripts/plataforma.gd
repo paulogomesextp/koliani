@@ -178,7 +178,7 @@ func _aplicar() -> void:
 	var dy := float(rng.randi_range(0, 191))
 
 	var kit := Kit.alvo(self)
-	var corpo: Texture2D = Kit.tex("terreno/terreno_corpo.png") if kit else _tex(bioma, "corpo")
+	var corpo: Texture2D = Kit.terreno(Kit.HD_CORPO, "terreno/terreno_corpo.png") if kit else _tex(bioma, "corpo")
 	if corpo == null:                        # terreno por gerar -> nao pinta nada
 		return
 
@@ -213,26 +213,29 @@ func _aplicar() -> void:
 
 	# 3. cortes laterais
 	# (o lado do kit tem o contorno na coluna 10: fica 2 px para fora da colisao)
-	var lado: Texture2D = Kit.tex("terreno/terreno_lado.png") if kit else _tex(bioma, "lado")
+	var lado: Texture2D = Kit.terreno(Kit.HD_LADO, "terreno/terreno_lado.png") if kit else _tex(bioma, "lado")
 	if lado:
-		var le := _mosaico(lado, Vector2(x0 - 12.0, y0), Vector2(16.0, alt), Vector2(0, dy))
+		var lw: float = Kit.LARGURA_LADO if kit else 16.0
+		var le := _mosaico(lado, Vector2(x0 - 12.0, y0), Vector2(lw, alt), Vector2(0, dy))
 		vis.add_child(le)
-		var ld := _mosaico(lado, Vector2(largura * 0.5 + 12.0, y0), Vector2(16.0, alt), Vector2(0, dy))
+		var ld := _mosaico(lado, Vector2(largura * 0.5 + 12.0, y0), Vector2(lw, alt), Vector2(0, dy))
 		ld.scale.x = -1.0
 		vis.add_child(ld)
 
 	# 4. franja de baixo -- so' quando a plataforma tem corpo que valha a pena
-	var base: Texture2D = Kit.tex("terreno/terreno_base.png") if kit else _tex(bioma, "base")
+	var base: Texture2D = Kit.terreno(Kit.HD_BASE, "terreno/terreno_base.png") if kit else _tex(bioma, "base")
 	if base and alt >= 26.0:
 		# a franja do kit comeca 12 px acima do fim do bloco (sao as pedras
 		# arredondadas de baixo, nao um remate solto)
 		var yb := y0 + alt - (12.0 if kit else 0.0)
-		vis.add_child(_mosaico(base, Vector2(x0, yb), Vector2(largura, 24.0), Vector2(dx, 0)))
+		var bh: float = Kit.ALTURA_BASE if kit else 24.0
+		vis.add_child(_mosaico(base, Vector2(x0, yb), Vector2(largura, bh), Vector2(dx, 0)))
 
 	# 5. a capa, por cima de tudo (e a sobressair para cima do plano de pouso)
 	var topo: Texture2D = Kit.topo(rng) if kit else _tex(bioma, "topo")
 	if topo:
-		vis.add_child(_mosaico(topo, Vector2(x0, y0 - SUPERFICIE), Vector2(largura, 32.0), Vector2(dx, 0)))
+		var th: float = Kit.ALTURA_TOPO if kit else 32.0
+		vis.add_child(_mosaico(topo, Vector2(x0, y0 - SUPERFICIE), Vector2(largura, th), Vector2(dx, 0)))
 
 	# 5b. RIM-LIGHT (9H.11, só Região I): fio de luar frio no lábio da capa. É
 	# o que separa o topo do bloco do fundo quando os dois estão no mesmo

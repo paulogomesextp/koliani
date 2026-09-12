@@ -106,7 +106,13 @@ const PLACA_GRAV := preload("res://scripts/placa_gravidade.gd")
 ## dessaturados (a linha de água acesa do `AguaVenenosa` é que dá a leitura
 ## do perigo) e puxados para o luar/magenta do key_art.
 const LIQUIDO := {
-	0: [Color(0.13, 0.28, 0.15, 0.94), false],   # água podre
+	# 9H.12D -- ERA DAQUI que vinha a "faixa verde-oliva chapada" que o QA viu
+	# nos cinco níveis da Região I: este líquido tem 460 px de altura e atravessa
+	# o nível todo, e a oliva lia-se como relva, não como perigo. A Região I é a
+	# Floresta CORROMPIDA: o que está na água é corrupção, e a corrupção da
+	# região é violeta/magenta em todo o lado (VFX, cristais, Árvore). Só cor --
+	# a geometria, a colisão e o dano não mudam.
+	0: [Color(0.26, 0.16, 0.42, 0.94), false],   # seiva corrompida
 	1: [Color(0.26, 0.42, 0.14, 0.93), false],   # ácido
 	2: [Color(0.06, 0.05, 0.12, 0.96), false],   # trevas / vazio
 	3: [Color(0.05, 0.03, 0.09, 0.97), false],   # trevas do abismo
@@ -869,6 +875,12 @@ func _construir() -> void:
 	agua.largura = comp + 900.0
 	agua.altura = 460.0
 	agua.cor = liq[0]
+	# Véu de superfície na Região I: sem ele a massa é um polígono de cor plana
+	# e um degradê grande e liso não pertence a uma direcção pintada.
+	if _regiao == 0:
+		var veu := load("res://assets/art/regions/region_01_forest/production/kit_9c/atmosfera/nevoa.png")
+		if veu != null:
+			agua.superficie_textura = veu
 	agua.brasas = liq[1]
 	agua.position = Vector2((x0 + ancora.x) * 0.5, _chao_y + 230.0)
 	add_child(agua)

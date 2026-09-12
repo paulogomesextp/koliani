@@ -2,6 +2,20 @@
 
 ## Agora
 
+000000000000000. **9H.12D FEITO -- L1 em Hybrid Cinematic 2D. FALTA UMA
+   DECISAO DO PAULO.** Relatorio:
+   `docs/execution_9h12d_l1_hybrid_prototype.md`. Feito: terreno HD (periodo
+   30 px -> 384/512, das pranchas de 1254 px que estavam a ser reduzidas a
+   32), faixa verde-oliva morta (a fonte era o `LiquidoMortal` do
+   `gerador_corredor.gd`, 460 px por REGIAO, nao a poca da cena) e veu de
+   superficie na agua. **PENDENTE DE DECISAO: background nativo HD.** Nao ha'
+   fonte com mais informacao no repo -- a prancha 08 e' 1536x1024 e o recorte
+   do panorama 952x247; ampliar nao acrescenta nada (ja' medido 2x). Para
+   fechar e' preciso o Paulo dizer se autoriza **arte nativa nova em 5 layers
+   de 1920x1080+** (IA original especifica para Koliani, ou CC0 compativel com
+   redistribuicao num repo publico). Sem isso o fundo fica desfocado.
+
+
 00000000000000. **9H.12B PLANO FECHADO -- remaster da Regiao I. A ESPERA DE
    DUAS DECISOES DO PAULO.** Plano completo em
    `docs/execution_9h12b_regiao1_remaster_plan.md`. Quatro causas MEDIDAS:

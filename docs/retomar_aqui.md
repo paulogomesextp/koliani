@@ -4,6 +4,42 @@
 
 Atualizado em 12 de setembro de 2026.
 
+## 9H.12D — protótipo Hybrid Cinematic 2D do L1 (12 set 2026, v0.18.4)
+
+Relatório: [`execution_9h12d_l1_hybrid_prototype.md`](execution_9h12d_l1_hybrid_prototype.md).
+**9H.12A foi integrado primeiro** (merge `8c784fd0`) — estava só no ramo
+`codex/9h12a-portal-remaster`, nunca tinha entrado em `master`.
+
+O que custou a descobrir e não se deve re-derivar:
+
+- **A faixa verde-oliva NÃO era a poça da cena.** A `PantanoMortal` do
+  `.tscn` está a y=930/320 de altura; a faixa começava 53 px acima. A fonte
+  é o **`LiquidoMortal` que o `gerador_corredor.gd` instancia** — 460 px de
+  altura, nível inteiro, cor de `LIQUIDO[0]` (por REGIÃO, não por nível), o
+  que explica aparecer nos cinco níveis e tomar um terço do ecrã no L4.
+  Retintado para violeta de corrupção + véu de superfície.
+- **O mosaico era mesmo o período do tile**, não a resolução da fonte: 30 px
+  repetidos ~35x. O kit HD (`tools/gerar_terreno_hd_regiao1.py`, das pranchas
+  de 1254 px que estavam a ser reduzidas a 32) sobe o período para 384/512.
+- **Duas armadilhas do produtor de tiles:** (a) sem cross-fade das arestas o
+  `texture_repeat` marca linha a cada período — trocava-se uma grelha de 30
+  por uma de 384; (b) cortar a capa por fracção da prancha gravou-a PRETA
+  (média RGB 0,2,2) porque a `platform_large_segment` tem margem
+  transparente por cima — o corte tem de sair da caixa do ALFA.
+- **Hipótese testada e REVERTIDA:** `PANORAMA_HD = 4.0` com a `_hd_x4`. A
+  9H.7B já tinha medido o contrário e deixou-o escrito no ficheiro (o shader
+  conserva os texels; o Lanczos de disco grava o desfoque antes do GPU).
+
+**Ficou por fazer, e porquê:** o **background nativo HD** (ponto 1 do
+briefing). Não existe fonte com mais informação — a prancha 08 é 1536x1024 e
+o recorte do panorama é 952x247; o único 1920x1080 ilustrado da região
+(`ui/frontend_9h/regioes/r01/fundo_seletor.png`) é uma composição do MESMO
+panorama ampliado. Precisa de **decisão do Paulo**: arte nativa nova em 5
+layers (IA original ou CC0 redistribuível num repo público). O dressing novo
+e o VFX adicional também não entraram — o orçamento foi para o terreno e
+para caçar a fonte real da faixa verde.
+
+
 ## 9H.12A — integração no master atual (12 set 2026)
 
 - Integração já presente no master local: merge 8c784fd0, pais 71522899

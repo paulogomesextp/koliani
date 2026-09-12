@@ -12,6 +12,13 @@ extends Armadilha
 @export var altura := 120.0 : set = _set_altura
 ## Cor da superfície (a metade de cima é mais clara).
 @export var cor := Color(0.3, 0.62, 0.36, 0.9) : set = _set_cor
+## Execution 9H.12D -- TEXTURA DE SUPERFÍCIE. O QA viu "uma faixa verde-oliva
+## chapada, massa lisa, sem textura, com um recorte ondulado duro" a tomar um
+## terço do ecrã. Metade do defeito era a COR (ver a poça do L1) e a outra
+## metade era a massa ser um polígono de cor plana: um degradê grande e liso
+## não pertence a uma direcção pintada. Com uma textura aqui, a superfície
+## ganha movimento e profundidade; sem ela (todos os outros níveis) nada muda.
+@export var superficie_textura: Texture2D = null : set = _set_textura
 ## Variante "lava": brasas a subir + superfície mais quente/luminosa
 ## (Fornalha dos Pecadores). Sem isto é a poça de veneno normal.
 @export var brasas := false
@@ -38,6 +45,15 @@ var _t := 0.0
 
 
 var _brasas_no: CPUParticles2D
+## Duas cópias da mesma textura a deslizar a velocidades diferentes: uma só
+## repetia-se em fase com a onda e lia-se como papel de parede.
+var _veu: Array[Sprite2D] = []
+
+
+func _set_textura(v: Texture2D) -> void:
+	superficie_textura = v
+	if is_node_ready():
+		_reconstruir()
 
 
 func _pronto() -> void:
@@ -113,6 +129,37 @@ func _montar_bruma() -> void:
 	add_child(_brasas_no)
 
 
+## Véu de superfície: duas tiras da mesma textura, repetidas na horizontal
+## logo abaixo da linha de água, a deslizar em sentidos e velocidades
+## diferentes. É o que tira a leitura de "polígono de cor plana" sem custar
+## mais do que dois quads.
+func _montar_veu(hw: float, hh: float) -> void:
+	for v in _veu:
+		if is_instance_valid(v):
+			v.queue_free()
+	_veu.clear()
+	if superficie_textura == null:
+		return
+	var altura_veu: float = minf(altura * 0.9, 240.0)
+	for i in 2:
+		var s := Sprite2D.new()
+		s.texture = superficie_textura
+		s.centered = false
+		s.texture_repeat = CanvasItem.TEXTURE_REPEAT_ENABLED
+		s.region_enabled = true
+		# uma vaga a mais de cada lado: o deslize nunca descobre as pontas
+		s.region_rect = Rect2(Vector2.ZERO, Vector2(largura + VAGA * 2.0, altura_veu))
+		s.position = Vector2(-hw - VAGA, -hh)
+		# a de baixo é mais funda, mais lenta e mais apagada: dá profundidade
+		var perto := i == 0
+		s.modulate = cor.lightened(0.55 if perto else 0.30)
+		s.modulate.a = 0.20 if perto else 0.12
+		s.z_index = 1 if perto else 0
+		s.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
+		add_child(s)
+		_veu.append(s)
+
+
 func _process(dt: float) -> void:
 	if _sup == null:
 		return
@@ -129,6 +176,11 @@ func _process(dt: float) -> void:
 		_rim.modulate.a = 0.7 + 0.3 * sin(_t * 2.0 + 1.0)
 	if _faixa:
 		_faixa.position.y = onda
+	for i in _veu.size():
+		var v := _veu[i]
+		var vel := 9.0 if i == 0 else -4.0
+		v.region_rect.position.x = _t * vel
+		v.position.y = -altura * 0.5 + onda * (1.4 if i == 0 else 0.6)
 	if _luz:
 		_luz.energy = _luz_base * (1.0 + 0.2 * sin(_t * 2.6))
 
@@ -241,8 +293,12 @@ func _reconstruir() -> void:
 		for i in range(topo.size() - 1, -1, -1):
 			esp.append(topo[i] + Vector2(0.0, 8.0))
 		_rim.polygon = esp
-		var rc := cor.lightened(0.4) if brasas else cor.lightened(0.7)
-		_rim.color = Color(rc.r, rc.g, rc.b, 0.6 if brasas else 0.95)
+		# 9H.12D -- clarear 0,7 servia a` oliva antiga; numa cor escura de
+		# corrupcao dava uma fita quase branca de lado a lado do ecra, que e'
+		# exactamente a leitura de placeholder que se estava a tirar. A linha
+		# tem de AVISAR, nao de iluminar: menos clara e menos opaca.
+		var rc := cor.lightened(0.4) if brasas else cor.lightened(0.45)
+		_rim.color = Color(rc.r, rc.g, rc.b, 0.6 if brasas else 0.7)
 		_rim.vertex_colors = PackedColorArray()
 	if _luz:
 		_luz.position = Vector2(0.0, -hh)
@@ -255,6 +311,7 @@ func _reconstruir() -> void:
 			_luz_base = 0.9
 			_luz.color = Color(1.0, 0.5, 0.18)
 			_luz.scale = Vector2(clampf(largura / 150.0, 1.6, 5.0), 1.8)
+	_montar_veu(hw, hh)
 	if _brasas_no:
 		_brasas_no.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
 		_brasas_no.emission_rect_extents = Vector2(hw, 6.0)

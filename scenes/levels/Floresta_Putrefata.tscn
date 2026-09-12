@@ -19,6 +19,7 @@
 [ext_resource type="PackedScene" uid="uid://bkolianiraizperigo01" path="res://scenes/actors/RaizPerigo.tscn" id="10_raiz"]
 [ext_resource type="PackedScene" uid="uid://bkolianiplatritmada05" path="res://scenes/actors/PlataformaRitmada.tscn" id="11_ritmo"]
 [ext_resource type="PackedScene" uid="uid://bkolianiaguavenenosa01" path="res://scenes/actors/AguaVenenosa.tscn" id="12_agua"]
+[ext_resource type="Texture2D" path="res://assets/art/regions/region_01_forest/production/kit_9c/atmosfera/nevoa.png" id="13_nevoa"]
 [ext_resource type="PackedScene" uid="uid://bkolianiessencia01" path="res://scenes/actors/Essencia.tscn" id="99_ess"]
 [ext_resource type="PackedScene" path="res://scenes/fx/Region1HybridVisualTarget.tscn" id="100_target"]
 
@@ -66,7 +67,8 @@ perfil = 1
 position = Vector2(1850, 930)
 largura = 4200.0
 altura = 320.0
-cor = Color(0.22, 0.4, 0.2, 0.92)
+cor = Color(0.26, 0.16, 0.42, 0.92)
+superficie_textura = ExtResource("13_nevoa")
 
 ; =====================  ACTO 1 -- entrada + raizes  ===================
 [node name="ChaoInicio" parent="." instance=ExtResource("9_pl")]

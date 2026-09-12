@@ -104,8 +104,36 @@ static func perfil_de(kit: Node) -> Dictionary:
 	return Remaster.perfil(clampi(n, 1, 5))
 
 
+## Execution 9H.12D -- TERRENO HD. O corpo era `terreno_corpo.png` de 30x75
+## repetido ~35 vezes por plataforma: a 30 px de período vê-se a grelha, não a
+## rocha, e era isso que fazia o chão ler-se como mosaico pobre contra um
+## fundo pintado. O kit HD (`tools/gerar_terreno_hd_regiao1.py`, das pranchas
+## de 1254 px que estavam a ser reduzidas a 32 px) sobe o período para 384/512
+## e traz antialiasing, como a direcção HYBRID CINEMATIC 2D pede.
+##
+## `ALTURA_*` são as alturas DESENHADAS de cada peça: a capa e a franja
+## passaram a ter corpo em vez de serem tiras de 32/24 px. Nada disto toca em
+## colisões -- quem as define é `tamanho` da plataforma.
+const HD_CORPO := "terreno/terreno_corpo_hd.png"
+const HD_TOPO := "terreno/terreno_topo_hd.png"
+const HD_LADO := "terreno/terreno_lado_hd.png"
+const HD_BASE := "terreno/terreno_base_hd.png"
+const ALTURA_TOPO := 56.0
+const ALTURA_BASE := 34.0
+const LARGURA_LADO := 26.0
+
+
+## A peça grande, ou a antiga se o kit HD ainda não foi produzido.
+static func terreno(rel_hd: String, rel_legado: String) -> Texture2D:
+	var t := tex(rel_hd)
+	return t if t != null else tex(rel_legado)
+
+
 ## Capa: a variante com erva alta entra numa em cada três plataformas.
 static func topo(rng: RandomNumberGenerator) -> Texture2D:
+	var hd := tex(HD_TOPO)
+	if hd != null:
+		return hd
 	if rng.randf() < 0.34:
 		var t := tex("terreno/terreno_topo_erva.png")
 		if t:
