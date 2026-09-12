@@ -4,6 +4,25 @@
 
 Atualizado em 12 de setembro de 2026.
 
+## 9H.12A — integração no master atual (12 set 2026)
+
+- Integração já presente no master local: merge 8c784fd0, pais 71522899
+  (12B/QA) e 22368973 (12A). Apenas conflito documental combinado;
+  relatórios posteriores 12B/QA preservados sem alterações.
+- Prova dirigida existente em Vulkan real: 0 falhas, uma entrada no portal,
+  L1 concluído/L2 ativo, save recarregável, tutorial por habilidade nos seis
+  idiomas, cinco perfis e seis slots vazios sem ativar nova arte/geometria.
+- Export release de snapshot Git limpo; smoke EXE L1 e captura verificados.
+  Visual atual preservado; HUD normal sem Jump ×2. Windows 0.18.3 atualizado
+  em build/windows/Koliani.exe, 201183840 bytes, SHA256
+  5d8863c1652886ef408190eeda9740407bd62ee351a1ebe9f12efe425131a81d.
+- Logs curtos locais: work/9h12a_integration/. Sem erros funcionais;
+  avisos Camera2D/ObjectDB no encerramento, sem investigação fora do âmbito.
+- Próximo: push master e aguardar CI desta integração. 12D continua dependente
+  das decisões de contrato/licenças registadas em 12B; não iniciado.
+  HUMAN PLAYTEST REQUIRED para sensação/percurso; DEVICE VALIDATION REQUIRED.
+- Usage atual: 38% disponível em 5h; 76% semanal.
+
 ## 9H.12B — plano do remaster da Região I (12 set 2026)
 
 **Nada de arte foi produzido; é um plano.** Relatório:
