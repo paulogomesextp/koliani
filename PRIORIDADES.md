@@ -1,3 +1,28 @@
+## Pendente de decisao do Paulo -- 9H.18 (13 set 2026)
+
+1. **A CORRIDA PRECISA DE ARTE DESENHADA -- nao ha' volta a dar.** Medido
+   com um crivo novo e independente (`tools/validar_run_nativo_9h18.py`): nos
+   10 frames golden o pe' de tras percorre **7 px** em todo o ciclo e o da
+   frente 29, e nenhum dos dois atravessa a linha da anca. A pose do segundo
+   contacto **nao esta' desenhada** -- nenhum `fps`, `speed_scale`, espelho
+   ou particula a cria. Procuradas todas as fontes do repo, do master package
+   e dos 15 ramos: so' o **piloto 5G** tem passada a serio, e e' outra
+   Koliani (cabelo roxo, saia de chama, sem lenco vermelho).
+   **Decisao:** encomenda-se o ciclo novo (a spec ja' esta' escrita em
+   `docs/spec_run_nativo_koliani.md`, e o jogo ja' o aceita como drop-in), ou
+   aceita-se mudar a personagem para a do piloto 5G?
+2. **Os SFX do menu e do combate foram refeitos -- falta OUVIR.** 22
+   ficheiros novos, todos dentro de alvos de forma medidos (navegar passou de
+   160 ms para 55; o remate do combo deixou de chegar 70 ms atrasado; golpear
+   e acertar deixaram de ter o mesmo timbre). Mas quem os fez **nao os ouve**.
+   Teclado de sons no modo Dev, **tecla S** -- os ~40 eventos a um toque, com
+   os volumes reais. **HUMAN LISTEN REQUIRED** antes de se dar isto por bom.
+3. **Sons ainda por refazer (ja' auditados).** `porta` (1000 ms, com o pico
+   aos 236 ms), `transicao`, `apanhar`, `selo`, `conquista`, `projetil`,
+   `investida`, `chefe_cai`, `dano`, `bloqueio`, `morte_koliani`, `raiz_*`,
+   `plataforma_surge` e os 21 `mob_*`. Ficaram de fora por prioridade -- o
+   Game Master nomeou o menu e o combate. Seguem na proxima passagem?
+
 ## Pendente de decisao do Paulo -- 9H.17 CONTINUATION (13 set 2026)
 
 1. **QA jogado nao certificou nenhum nivel.** A Koliani chega a` arena do

@@ -1,3 +1,78 @@
+## 9H.18 — a corrida (NATIVE ART REQUIRED) e os SFX pela FORMA (13 set 2026)
+
+- Relatorio: [`execution_9h18_corrida_e_sfx.md`](execution_9h18_corrida_e_sfx.md).
+  Commits: `27fc583f` (corrida), `673a2c6f` (SFX). Build **v0.18.12**.
+- **A CORRIDA E' ARTE QUE FALTA, nao afinacao -- confirmado por um crivo
+  novo e independente.** `tools/validar_run_nativo_9h18.py` nao mede a
+  abertura das pernas (um ciclo de UMA perna abre e fecha na mesma): segue
+  o pe' de tras e o da frente nos frames de contacto e mede o chao que CADA
+  um percorre. Folha golden: contactos 4/10, tras **7 px**, frente 29 px,
+  razao **0,24**. Medido a` parte: um pe' vive entre -26 e -2 da anca e o
+  outro entre +13 e +27, e **nenhum atravessa a anca em frame nenhum**.
+  - Procuradas TODAS as fontes (7 rigs, work/, master package, historico,
+    15 ramos). So' o **piloto 5G** passa (11/12, 22/20 px, razao 0,91) --
+    e e' o desenho ANTERIOR ao Golden (cabelo roxo, saia de chama, sem
+    lenco). Trocar por ele muda a personagem.
+  - O master package tem uma linha `RUN (12 FRAMES)` em
+    `05_KOLIANI_IDLE_RUN_CLEAN_v1_1.png`, citada pela propria manifesta do
+    Golden -- mas e' folha de APRESENTACAO (xadrez pintado em RGB, sem
+    alfa) e do mesmo desenho anterior.
+  - Candidatos da 9H.15: 2 px de varrimento. Confirmam-se rejeitados.
+  - **DROP-IN PRONTO**: `docs/spec_run_nativo_koliani.md` (contrato do
+    ficheiro + as 6 poses obrigatorias) e
+    `koliani.gd::_substituir_run_por_nativo()` -- largar os PNG em
+    `assets/sprites/koliani_golden_set/frames/run_native/`, reimportar, e o
+    jogo troca sozinho com o fps recalculado para o ciclo dar 0,75 s.
+  - ARMADILHA: a `Koliani.tscn` em bruto **nao** vem com o Golden Set --
+    cai no rig `shadowblade` (5 frames, que reprova ainda pior). O Golden
+    e' ligado nivel a nivel. Fotografar a cena em bruto fotografa o rig
+    errado, e foi o que aconteceu a` primeira.
+- **OS SFX FALHAVAM NA FORMA, e ninguem a tinha medido.** A 9H.13B ja'
+  tinha resolvido a sonoridade e mesmo assim o GM disse que continuavam
+  maus. `tools/auditar_sfx_9h18.py` (tempo ate' ao pico, cauda, crista,
+  bandas) mostrou: `ui_mover` 160 ms com 109 de cauda; `ui_confirmar` 560
+  com 417; `carrossel` com o pico so' aos **136 ms**; `ataque_forte` com o
+  pico aos **70 ms** (o remate chega TARDE ao golpe); e `ataque` 15/75/11
+  contra `acerto` 20/64/16 -- **golpear e acertar tinham o mesmo timbre**.
+  Os tres passos eram o mesmo som.
+  - `tools/gerar_sfx_9h18.py` refaz **22 ficheiros** com ALVOS DE FORMA por
+    evento e **verifica-se a si proprio** (PASSA/FALHA por som, sai != 0 se
+    algum ficar fora). Os 22 passam. Motor novo: filtro ressonante,
+    objecto percutido com modos inarmonicos, grao.
+  - Depois: navegar sao 55 ms (eram 160), confirmar 230 (eram 560), todos
+    os picos nos primeiros ms, e os alvos de banda do golpe (4/46/50) e do
+    acerto (43/43/14) **nao se sobrepoem de proposito**.
+  - ARMADILHA 1: **um unico fluxo de aleatorio fazia os ficheiros mudarem
+    uns com os outros** -- mexer no `acerto` deslocava o ruido do `ataque`.
+    Semente por ficheiro, com `zlib.crc32` (o `hash()` de string em Python
+    e' aleatorizado por processo).
+  - ARMADILHA 2: **o grao espalhado por igual punha o PICO a 10-18 ms do
+    inicio.** Passou a denso no impacto e ralo depois.
+  - **MOBILE-FIRST manda no tecto de grave**: um altifalante de telemovel
+    nao da' nada abaixo de ~300 Hz, logo 80% da energia em grave e' energia
+    que o jogador nunca ouve. Varios sons subiram o fundamental.
+  - VARIACAO: `ui_mover` e `acerto` saem em 3 amostras e o `Som.toca()`
+    sorteia sem repetir a anterior. Nenhum sitio que os chama mudou.
+  - MISTURA: **nao se mexeu**. O `opcoes.json` do Paulo (efeitos 0,40,
+    musica 0,45) e' dele e continua a mandar.
+- **PHASE C: teclado de sons no modo Dev, tecla S** (`scripts/dev_sons.gd`).
+  ~40 eventos a um toque, com os volumes e tons REAIS de cada sitio. Quem
+  fez os sons nao os ouve -- **HUMAN LISTEN REQUIRED**.
+- POR FAZER:
+  * **desenhar a corrida** (spec pronta, cano pronto);
+  * sons ainda por refazer: `porta` (1000 ms, pico aos 236 ms),
+    `transicao`, `apanhar`, `selo`, `conquista`, `projetil`, `investida`,
+    `chefe_cai`, `dano`, `bloqueio`, `morte_koliani`, `raiz_*`,
+    `plataforma_surge` e os 21 `mob_*` -- todos ja' auditados;
+  * 13 `.ogg` legados estao no repo mas **inertes** (o catalogo aponta aos
+    `.wav`): acerto, ataque, ataque_forte, bloqueio, dano, dash,
+    morte_koliani, passo1..3, rolamento, selo, agarrar.
+- BUILD: `C:/Projetos/koliani/build/windows/Koliani.exe`, release
+  **v0.18.12**, 205 735 752 bytes, SHA256
+  `13FD274D4C22CFB9DBA45B0E2169027D93FACFBFC8AFEE622956235FA5F29E5B`.
+  Suite EXIT 0 por `tools/correr_testes.ps1`; save do Paulo verificado por
+  SHA256 antes e depois, intacto.
+
 ## 9H.17 CONTINUATION — Regiao I toda em Hybrid; QA jogado PARCIAL (13 set 2026)
 
 - Relatorio: [`execution_9h17_continuation.md`](execution_9h17_continuation.md).
