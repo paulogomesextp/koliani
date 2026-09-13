@@ -1,3 +1,17 @@
+## Pendente de decisao do Paulo -- 9H.17 CONTINUATION (13 set 2026)
+
+1. **QA jogado nao certificou nenhum nivel.** A Koliani chega a` arena do
+   chefe do 1-1 com input real, mas o Ghorak mata-a e a run reinicia.
+   Conduzir um combate de chefe as cegas (rajada de teclas -> fotografia) nao
+   converge. Decisao: aperta-se o laco observacao-accao (caro), joga-se o
+   percurso a mao, ou aceita-se certificar so' a TRAVESSIA sem o chefe?
+2. **"DEVELOPER MODE" aparece no menu da build de RELEASE.** A 9H.17 D pos a
+   entrada Dev disponivel em release para o QA. Para uma build que va' para o
+   playtester isto parece errado -- tirar, ou manter enquanto houver QA?
+3. **NOVO JOGO destruiu a campanha do Paulo nesta sessao.** Corrigido o buraco
+   (sair do botao desarma) e reposto o save por SHA256. Fica a pergunta maior:
+   quer saves multiplos / um slot separado de QA, ou basta esta proteccao?
+
 ## Pendente de decisao do Paulo -- 9H.17 (13 set 2026)
 
 1. **NATIVE ART REQUIRED -- corrida da Koliani.** Os 10 frames golden nao tem

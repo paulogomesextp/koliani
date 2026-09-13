@@ -1,3 +1,41 @@
+## 9H.17 CONTINUATION — Regiao I toda em Hybrid; QA jogado PARCIAL (13 set 2026)
+
+- Relatorio: [`execution_9h17_continuation.md`](execution_9h17_continuation.md).
+  Commits: `24b9eef8` (Hybrid L3/L4/L5), `ca4fb0e1` (seguranca do Novo Jogo),
+  `3a39300b` (isolamento dos testes). Build **v0.18.11**, smoke PASS.
+- **NENHUM NIVEL CERTIFICADO.** A Koliani atravessou o 1-1 do spawn ate' a`
+  arena do chefe (a barra do GHORAK apareceu) e numa das corridas chegou a
+  meio com 5/5 vidas -- mas **o Ghorak nao foi morto**, logo nao ha' prova de
+  atravessar um nivel de ponta a ponta. L1..L5 continuam SEM PASS.
+- **INPUT REAL PROVADO**: `PostMessage(WM_KEYDOWN/KEYUP)` para o handle da
+  janela entrega teclas ao Godot **sem foco**, no 2.o monitor **e ate'
+  minimizada**. O ecra principal fica livre.
+  - ARMADILHA: o salto e' de ALTURA VARIAVEL (`koliani.gd` passa
+    `is_action_pressed` alem do `just_pressed`). Toques de 90 ms davam o
+    salto MINIMO -- era isso que travava a Koliani, nao o desenho do nivel.
+    Com 330 ms segurados o percurso abre-se.
+  - ARMADILHA: em `pt-PT`, `[double]"0.5"` da' **5**. Os instantes dos saltos
+    iam parar ao fim do percurso. Parsing em cultura invariante.
+  - O padrao que resultou foi avancar **aos saltos curtos com paragem entre
+    eles**; correr a direito leva-a ao pantano. Para o CHEFE as cegas nao
+    converge -- faz falta um laco observacao-accao muito mais apertado.
+- **A SUITE DE TESTES ESCREVIA NO SAVE REAL.** A essencia do Paulo foi
+  239 -> 0 depois de duas corridas de `run_tests.tscn` (nao foi o playtest).
+  O autoload `EstadoJogo` esta' vivo na cena de testes. Correr SEMPRE por
+  `tools/correr_testes.ps1`, que isola o `user://` por %APPDATA% e confirma
+  por SHA256 que o save ficou igual. Save do GM reposto e verificado.
+- **BASELINE DO BRIEFING ERRADA**: dizia 26 falhas conhecidas; eram **2**, na
+  suite PRINCIPAL, no mesmo teste (`teste_execution_9c_kit_ambiente_regiao1`).
+  Corrigidas. **Suite agora EXIT 0.**
+- O `serve()` do Hybrid tambem liga o CORPO ORGANICO da plataforma
+  (`plataforma.gd`) -- um interruptor explicava fundo E plataformas.
+- O landmark Heart Tree do L5 vivia na coluna pintada do panorama
+  (`_montar_heart_tree()` e' um no' VAZIO): trocar o fundo apagava-o. Recriado
+  como peca propria.
+- POR FAZER: QA visual do L2 em percurso jogado; trace jogado do salto duplo
+  (codigo diz `HABILIDADE_DO_CHEFE = {4: "salto_duplo"}`); agente
+  independente de QA com notas /10.
+
 ## 9H.17 — a Regiao I faz-se toda com salto SIMPLES (13 set 2026)
 
 - PHASE CURRENT: **A, B, C, D, E, G, H, I2, I3, J FECHADAS. F NAO REPRODUZ.
