@@ -128,23 +128,30 @@ fase = 0.8
 dano = 12
 
 ; ===================  BIFURCACAO  ================================
+; 9H.17 B -- contrato de mobilidade da Regiao I (sem salto duplo). A rota
+; ALTA subia 108 px do ChaoMeio para a Alta1 e 72..110 px entre degraus: com
+; salto simples o tecto medido e' 80 px (`tests/run_alcance_9h17.tscn`), por
+; isso a rota inteira estava trancada. Desceu-se a escada (Alta1 566->612,
+; Alta2 494->552, Alta3 442->500) mantendo a forma e o Alta4 onde estava.
+; O Reencontro (560->600) subia 86 px da Baixa3 -- era o unico degrau
+; impossivel da rota BAIXA, que de resto se faz pelas flutuantes.
 ; -- rota ALTA (solida) --
 [node name="Alta1" parent="." instance=ExtResource("9_pl")]
-position = Vector2(1790, 566)
+position = Vector2(1790, 612)
 tamanho = Vector2(130, 18)
 altura_visual = 26.0
 cor_base = Color(0.16, 0.24, 0.13, 1)
 cor_topo = Color(0.36, 0.56, 0.32, 1)
 
 [node name="Alta2" parent="." instance=ExtResource("9_pl")]
-position = Vector2(1980, 494)
+position = Vector2(1980, 552)
 tamanho = Vector2(130, 18)
 altura_visual = 26.0
 cor_base = Color(0.16, 0.24, 0.13, 1)
 cor_topo = Color(0.36, 0.56, 0.32, 1)
 
 [node name="Alta3" parent="." instance=ExtResource("9_pl")]
-position = Vector2(2170, 442)
+position = Vector2(2170, 500)
 tamanho = Vector2(150, 18)
 altura_visual = 26.0
 cor_base = Color(0.16, 0.24, 0.13, 1)
@@ -203,7 +210,7 @@ alcance_patrulha = 70.0
 
 ; -- reencontro --
 [node name="Reencontro" parent="." instance=ExtResource("9_pl")]
-position = Vector2(2620, 560)
+position = Vector2(2620, 600)
 tamanho = Vector2(200, 24)
 altura_visual = 44.0
 cor_base = Color(0.15, 0.23, 0.13, 1)

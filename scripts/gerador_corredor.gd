@@ -763,10 +763,40 @@ var _dif_especial := 0.0
 var _falta_nova := 0
 const CICLO_VARIEDADE := 2
 
-## Subida máxima (px) de um degrau para o seguinte -- um salto + duplo salto
-## da Koliani. Nenhuma plataforma da jornada fica mais alta que isto face à
-## anterior (descer é livre). Descer/cair pode ser muito mais.
+## Subida máxima (px) de um degrau para o seguinte. Nenhuma plataforma da
+## jornada fica mais alta que isto face à anterior (descer é livre).
+##
+## 9H.17 A: HAVIA DOIS TECTOS E SÓ ESTAVA CÁ UM. Os 104 px são o salto +
+## DUPLO salto -- e o salto duplo só se ganha ao derrubar o chefe do nível 5.
+## Na Região I (níveis 1-5) o degrau de 104 px é FISICAMENTE IMPOSSÍVEL, e
+## era esse o bloqueio que o Game Master apanhou no 1-3. Medido com a física
+## do jogo (`tests/run_alcance_9h17.tscn`, agarrar-borda incluído):
+##
+##   subida   0 px -> vão até 140 px      subida  72 px -> vão até  80 px
+##   subida  64 px -> vão até 110 px      subida  88 px -> NUNCA, a qualquer vão
+##
+## O tecto real do salto simples está entre 80 e 88 px. `SUBIDA_SIMPLES` fica
+## nos 64 px: dentro da envolvente com folga, e ainda um degrau que se lê.
 const SUBIDA_MAX := 104.0
+## Tecto com salto simples (Regiao I). Ver acima.
+## 60 e nao 64: a fronteira da tabela medida esta' nos 64, e a diferenca de
+## espessura entre duas plataformas (18 px contra 15 px) chegava para um
+## degrau nominal de 64 aterrar do lado de la' da fronteira.
+const SUBIDA_SIMPLES := 60.0
+## Índice do primeiro nível que já pode assumir o salto duplo na travessia
+## obrigatória (contrato congelado pelo Game Master: o salto duplo abre ao
+## derrubar o chefe do nível 5, portanto o nível 6 -- índice 5 -- é o
+## primeiro que o pode exigir).
+const NIVEL_SALTO_DUPLO := 5
+## Tecto de subida em uso nesta jornada (ver `_construir`).
+var _subida_max := SUBIDA_MAX
+## Um degrau para cima, dentro do tecto desta jornada. `minimo` é a altura
+## mínima pedida por quem chama; se o tecto for mais baixo que ela (Região I),
+## encolhe-se o mínimo em vez de estourar a envolvente do salto.
+func _subida(minimo: float) -> float:
+	return _rng.randf_range(minf(minimo, _subida_max * 0.62), _subida_max)
+
+
 ## Topo da banda vertical jogável (definido em `_construir`). Quanto maior a
 ## dificuldade, mais alto -> jornadas com torres e poços a sério, não só uma
 ## fita de plataformas quase em linha.
@@ -835,6 +865,12 @@ func _construir() -> void:
 	_idx = EstadoJogo.indice_nivel
 	_dif = _dificuldade(_idx)
 	_regiao = maxi(0, EstadoJogo.regiao_atual())
+	# 9H.17 A -- CONTRATO DE MOBILIDADE. O tecto do degrau vem do que a
+	# jogadora PODE ter neste ponto da campanha, não do save que está na
+	# máquina: o modo Dev dá tudo, e uma jornada desenhada com base nisso
+	# ficaria intransponível para quem joga a sério. Até ao nível 5 não há
+	# salto duplo, logo a espinha faz-se toda com salto simples.
+	_subida_max = SUBIDA_MAX if _idx >= NIVEL_SALTO_DUPLO else SUBIDA_SIMPLES
 	_rng.seed = hash("jornada4|%d" % _idx)
 	_esp = especie_inimigo if especie_inimigo != "" else _especie_do_nivel()
 	# PERFIL DE FORMA deste nível (redesenho 2 set 2026): tendência vertical,
@@ -1004,7 +1040,7 @@ func _construir() -> void:
 		# --- passo da espinha: caminha para a altitude-alvo, mas NUNCA sobe
 		#     mais que um salto de cada vez (descer/cair pode ser muito mais) ---
 		var passo_y := clampf((alvo_y - y) * 0.5 + _rng.randf_range(-32.0, 32.0),
-			-SUBIDA_MAX, 300.0)
+			-_subida_max, 300.0)
 		y = clampf(y + passo_y, _teto_y, _chao_y - 66.0)
 		# plataformas mais largas e ligadas (pedido do Paulo, 2 set 2026):
 		# menos "saltar de pedra em pedra minúscula", mais chão que dá para
@@ -1148,6 +1184,7 @@ func _construir() -> void:
 	# ... e só no fim, com a jornada toda montada, é que se pode ver o que
 	# ficou POR CIMA de cada checkpoint
 	_afastar_checkpoints_do_tecto()
+	_garantir_alcance()
 
 
 ## Um checkpoint com uma plataforma logo por cima é uma armadilha: ela
@@ -1757,7 +1794,7 @@ func _f_espinhos(par: Node2D, x: float, y: float) -> Vector2:
 	var hy_alvo: float = maxf(_teto_y + 40.0, cy - _rng.randf_range(150.0, 180.0))
 	for _i in n:
 		hx += _rng.randf_range(150.0, 176.0)
-		hy = maxf(hy_alvo, hy - SUBIDA_MAX)
+		hy = maxf(hy_alvo, hy - _subida_max)
 		_plat(par, Vector2(hx, hy), Vector2(84.0, 15.0))
 	# reencontro
 	var jx: float = maxf(lx, hx) + _rng.randf_range(150.0, 176.0)
@@ -1854,7 +1891,7 @@ func _f_cripta(par: Node2D, x: float, y: float) -> Vector2:
 	if _dif > 0.2:
 		_inimigo_em(par, Vector2(x + 224.0, cy - 30.0))
 	x += 280.0 + _rng.randf_range(150.0, 176.0)
-	var ny: float = maxf(_teto_y + 40.0, cy - _rng.randf_range(-30.0, SUBIDA_MAX))
+	var ny: float = maxf(_teto_y + 40.0, cy - _rng.randf_range(-30.0, _subida_max))
 	_plat(par, Vector2(x, ny), Vector2(100.0, 18.0))
 	return Vector2(x, ny)
 
@@ -1875,7 +1912,7 @@ func _f_arena(par: Node2D, x: float, y: float) -> Vector2:
 		# a partir do meio da campanha, um dos bichos da arena é ELITE
 		_inimigo_em(par, Vector2(ex, cy - 30.0), _dif > 0.42 and i == n / 2)
 	x += larg + _rng.randf_range(148.0, 176.0)
-	var ny: float = maxf(_teto_y + 40.0, cy - _rng.randf_range(-40.0, SUBIDA_MAX))
+	var ny: float = maxf(_teto_y + 40.0, cy - _rng.randf_range(-40.0, _subida_max))
 	_plat(par, Vector2(x, ny), Vector2(104.0, 18.0))
 	_checkpoint(x, ny)
 	return Vector2(x, ny)
@@ -1925,7 +1962,7 @@ func _f_forquilha(par: Node2D, x: float, y: float) -> Vector2:
 	var bx := x + 60.0
 	var hy := y
 	for i in n:
-		hy = maxf(_teto_y + 40.0, hy - _rng.randf_range(72.0, SUBIDA_MAX))
+		hy = maxf(_teto_y + 40.0, hy - _subida(72.0))
 		_plat(par, Vector2(bx + passo * float(i + 1), hy), Vector2(72.0, 15.0))
 		if i < n - 1 and _rng.randf() < 0.5 + 0.3 * _dif:
 			_perigo_no_vao(par, bx + passo * float(i + 1), hy)
@@ -1948,7 +1985,7 @@ func _f_torre(par: Node2D, x: float, y: float) -> Vector2:
 	var cy := y
 	for i in n:
 		x += _rng.randf_range(62.0, 106.0)
-		cy = maxf(_teto_y, cy - _rng.randf_range(84.0, SUBIDA_MAX))
+		cy = maxf(_teto_y, cy - _subida(84.0))
 		_plat(par, Vector2(x, cy), Vector2(_rng.randf_range(58.0, 80.0), 16.0))
 		if i > 0 and i < n - 1 and _rng.randf() < 0.16 + 0.4 * _dif:
 			_perigo_no_vao(par, x, cy)
@@ -1977,7 +2014,7 @@ func _f_poco(par: Node2D, x: float, y: float) -> Vector2:
 	var alvo := maxf(_teto_y + 120.0, y - _rng.randf_range(140.0, 380.0))
 	for _i in 6:
 		x += _rng.randf_range(70.0, 116.0)
-		cy = maxf(alvo, cy - _rng.randf_range(86.0, SUBIDA_MAX))
+		cy = maxf(alvo, cy - _subida(86.0))
 		_plat(par, Vector2(x, cy), Vector2(_rng.randf_range(58.0, 80.0), 16.0))
 		if cy <= alvo + 6.0:
 			break
@@ -1995,7 +2032,7 @@ func _f_pilares(par: Node2D, x: float, y: float) -> Vector2:
 	var cy := y
 	for i in n:
 		x += _rng.randf_range(150.0, 184.0)
-		cy = clampf(cy - _rng.randf_range(-96.0, SUBIDA_MAX), _teto_y + 40.0, _chao_y - 150.0)
+		cy = clampf(cy - _rng.randf_range(-96.0, _subida_max), _teto_y + 40.0, _chao_y - 150.0)
 		_coluna_fundo(par, x)  # o "pilar" é só um sprite de fundo, não bloqueia
 		_plat(par, Vector2(x, cy), Vector2(_rng.randf_range(74.0, 100.0), 16.0))  # o topo (sólido)
 		if i > 0 and _rng.randf() < 0.24 + 0.36 * _dif:
@@ -2592,7 +2629,7 @@ func _f_lava_sobe(par: Node2D, x: float, y: float) -> Vector2:
 	var cy := base_y
 	for _i in n:
 		x += _rng.randf_range(150.0, 174.0)
-		cy = maxf(_teto_y + 60.0, cy - _rng.randf_range(58.0, SUBIDA_MAX))
+		cy = maxf(_teto_y + 60.0, cy - _subida(58.0))
 		_plat(par, Vector2(x, cy), Vector2(96.0, 16.0))
 	x += _rng.randf_range(150.0, 176.0)
 	_plat(par, Vector2(x, cy), Vector2(130.0, 18.0))
@@ -3379,7 +3416,7 @@ func _f_assalto(par: Node2D, x: float, y: float) -> Vector2:
 	var x0 := x
 	for i in n:
 		x += _rng.randf_range(78.0, 118.0)
-		cy = maxf(_teto_y + 40.0, cy - _rng.randf_range(84.0, SUBIDA_MAX))
+		cy = maxf(_teto_y + 40.0, cy - _subida(84.0))
 		_plat(par, Vector2(x, cy), Vector2(_rng.randf_range(70.0, 92.0), 16.0))
 		if i % 2 == 0:
 			var tr := TORRETA.instantiate()
@@ -4782,3 +4819,233 @@ func _cor_luz_regiao() -> Color:
 	var liq: Array = LIQUIDO.get(_regiao, LIQUIDO[0])
 	var c: Color = liq[0]
 	return Color(c.r * 0.5 + 0.5, c.g * 0.4 + 0.4, c.b * 0.5 + 0.5)
+
+
+## ENVOLVENTE DE SALTO, medida na física do jogo com `tests/run_alcance_9h17.tscn`
+## (agarrar-borda incluído, que é básico e está sempre lá). Diz o vão MÁXIMO
+## entre bordas para uma dada subida. `-1` = não há salto que o faça.
+##
+## Salto simples (Região I):  subida 0 -> 140 | <=64 -> 110 | <=72 -> 80 |
+## <=80 -> 60 | acima de 80 -> nunca.
+static func vao_possivel(subida: float, tecto: float) -> float:
+	if subida > tecto:
+		return -1.0
+	if tecto > SUBIDA_SIMPLES:
+		return 210.0 if subida <= 0.0 else 195.0
+	if subida <= 0.0:
+		return 140.0
+	if subida <= 64.0:
+		return 110.0
+	if subida <= 72.0:
+		return 80.0
+	return 60.0
+
+
+## REPARAÇÃO DA ESPINHA. A jornada promete, na cabeça deste ficheiro, que
+## "cada plataforma está ao alcance de salto da anterior" -- mas até aqui
+## isso era uma INTENÇÃO espalhada por dezenas de sítios que escolhiam o
+## passo em x e a subida em y sem se falarem. Com salto duplo sobrava
+## folga que tapava a conta; com salto SIMPLES (Regiao I) um degrau que
+## sobe 64 px e afasta 83 px deixa de se fazer -- e era assim que se chegava
+## a um nível intransponível por 3 px.
+##
+## Aqui percorre-se a espinha da esquerda para a direita e, sempre que um
+## degrau estático fica fora da envolvente, BAIXA-SE esse degrau até voltar
+## a estar ao alcance. Baixar (e não criar plataformas novas) mantém a
+## composição: a peça é a mesma, a arte é a mesma, só assenta mais baixo.
+##
+## Só se mexe em plataformas ESTÁTICAS (`Plataforma`): as móveis, os
+## trampolins e os elevadores têm regras próprias e passam a ser apenas
+## origem de salto, nunca destino a corrigir.
+func _garantir_alcance() -> void:
+	_ajudas = _ajudas_verticais()
+	var plats: Array = []
+	for n in get_children():
+		_recolher_plats(n, plats)
+	if plats.size() < 3:
+		return
+	plats.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+		return float(a.cx) < float(b.cx))
+	var n_p := plats.size()
+	var alcancado: Array[bool] = []
+	alcancado.resize(n_p)
+	alcancado[0] = true          # onde a jornada comeca
+	var corrigidas := 0
+	# PONTO FIXO, e nao uma passagem da esquerda para a direita: uma
+	# plataforma larga pode comecar antes de outra e acabar depois dela, e
+	# com uma ordem fixa ficava-se a julgar inalcancavel um degrau cuja
+	# origem ainda nao tinha sido visitada. Aqui alastra-se o alcance ate'
+	# estabilizar; so' depois se baixa UM degrau, e alastra-se outra vez.
+	for _ronda in 60:
+		_alastrar(plats, alcancado)
+		var pior := -1
+		var pior_topo := INF
+		for k in n_p:
+			if alcancado[k] or bool(plats[k].movel):
+				continue
+			var alvo := _topo_alcancavel(plats, alcancado, k)
+			if alvo == INF:
+				continue
+			if pior < 0 or float(plats[k].cx) < float(plats[pior].cx):
+				pior = k
+				pior_topo = alvo
+		if pior < 0:
+			break
+		var b: Dictionary = plats[pior]
+		var alvo_topo: float = minf(pior_topo, _chao_y - 56.0)  # fora do liquido
+		var desce := alvo_topo - float(b.topo)
+		if desce <= 1.0:
+			alcancado[pior] = true      # ja' la' esta': nao ha' nada a baixar
+			continue
+		(b.no as Node2D).position.y += desce
+		b.topo = float(b.topo) + desce
+		b.base = float(b.base) + desce
+		alcancado[pior] = true
+		corrigidas += 1
+	if OS.has_feature("editor") or OS.is_debug_build():
+		var falta := 0
+		var pior_x := 0.0
+		for k in n_p:
+			if not alcancado[k]:
+				falta += 1
+				pior_x = minf(pior_x, float(plats[k].cx)) if falta > 1 else float(plats[k].cx)
+		print("[jornada N%d] espinha: %d baixadas, %d/%d por alcancar (1.a em x=%.0f)" % [
+			_idx + 1, corrigidas, falta, n_p, pior_x])
+
+
+## Alastra o alcance pelo grafo ate' estabilizar.
+func _alastrar(plats: Array, alcancado: Array) -> void:
+	var mudou := true
+	while mudou:
+		mudou = false
+		for j in plats.size():
+			if alcancado[j]:
+				continue
+			var b: Dictionary = plats[j]
+			for i in plats.size():
+				if i == j or not alcancado[i]:
+					continue
+				var a: Dictionary = plats[i]
+				var vao := _vao_entre(a, b)
+				var subida: float = float(a.topo) - float(b.topo)
+				if subida < -QUEDA_LIVRE:
+					continue
+				if subida > 0.0 and not _fora_da_sombra(a, b):
+					continue    # debaixo da barriga dela: o corpo dela e' tecto
+				if vao <= vao_possivel(maxf(subida, 0.0), _subida_max) 						or (bool(b.movel) and vao <= 210.0 and subida <= 150.0) 						or (subida > SUBIDA_TORRE and _tem_ajuda_entre(a, b)):
+					alcancado[j] = true
+					mudou = true
+					break
+
+
+## O topo mais ALTO a que a plataforma `k` pode ser posta e ainda ficar ao
+## alcance de alguma plataforma ja' alcancada. `INF` = nao ha' origem.
+func _topo_alcancavel(plats: Array, alcancado: Array, k: int) -> float:
+	var b: Dictionary = plats[k]
+	var melhor := INF
+	for i in plats.size():
+		if i == k or not alcancado[i]:
+			continue
+		var a: Dictionary = plats[i]
+		var vao := _vao_entre(a, b)
+		if vao > 260.0 or not _fora_da_sombra(a, b):
+			continue
+		var sub_ok := _subida_max
+		while sub_ok > 0.0 and vao > vao_possivel(sub_ok, _subida_max):
+			sub_ok -= 4.0
+		# FOLGA: nao se poe o degrau EM CIMA do limite. Sem isto o degrau
+		# corrigido ficava a raspar e a espessura das pecas voltava a
+		# atira'-lo para fora.
+		sub_ok -= FOLGA
+		if sub_ok > 0.0:
+			melhor = minf(melhor, float(a.topo) - sub_ok)
+	return melhor
+
+
+## Folga (px) com que se baixa um degrau corrigido.
+const FOLGA := 8.0
+## A partir daqui ja' nao e' um degrau, e' uma TORRE: so' ai e' que um
+## trampolim/elevador por perto justifica deixar o desnivel em paz. Abaixo
+## disto o degrau tem de se fazer a salto, haja la' o que houver ao lado --
+## era assim que um degrau de 76 px se safava por ter uma plataforma
+## ritmada no mesmo pedaco de mapa.
+const SUBIDA_TORRE := 120.0
+## Alcance (px) de um trampolim / impulsor / elevador: um degrau alto que
+## tenha um deles a` mao NAO e' um bloqueio -- e' a mecanica dele. O crivo
+## estatico nao os sabe simular, por isso limita-se a nao lhes mexer.
+const ALCANCE_AJUDA := 240.0
+
+
+## Onde e' que a jornada pos trampolins, impulsores e elevadores.
+func _ajudas_verticais() -> Array[Vector2]:
+	var out: Array[Vector2] = []
+	_recolher_ajudas(self, out)
+	return out
+
+
+func _recolher_ajudas(no: Node, out: Array[Vector2]) -> void:
+	var e: Script = no.get_script()
+	if e:
+		var f := e.resource_path.get_file()
+		if f in ["trampolim.gd", "impulsor.gd", "tumulo_elevador.gd",
+				"plataforma_corrente.gd", "raiz_elevatoria.gd"]:
+			out.append((no as Node2D).global_position)
+	for c in no.get_children():
+		_recolher_ajudas(c, out)
+
+
+## Descer e' de graca ate' aqui (acima disto ja' e' um poco, nao um degrau).
+const QUEDA_LIVRE := 520.0
+## Quanto e' que a plataforma de baixo tem de sobrar para fora da sombra da
+## de cima para se poder saltar da ponta em vez de bater com a cabeca na
+## barriga dela. E' a regra que falta va aqui e que ja' custou ao projeto
+## dois niveis com o chefe inacessivel (ver `tools/verifica_alcance.gd`).
+const MARGEM_PONTA := 26.0
+
+
+## `a` sobra para fora da sombra de `b`?
+static func _fora_da_sombra(a: Dictionary, b: Dictionary) -> bool:
+	return float(b.esq) - float(a.esq) >= MARGEM_PONTA 		or float(a.dir) - float(b.dir) >= MARGEM_PONTA
+var _ajudas: Array[Vector2] = []
+
+
+## Ha' um trampolim/impulsor/elevador no vao entre `a` e `b`?
+func _tem_ajuda_entre(a: Dictionary, b: Dictionary) -> bool:
+	var x0: float = minf(float(a.cx), float(b.cx)) - ALCANCE_AJUDA
+	var x1: float = maxf(float(a.cx), float(b.cx)) + ALCANCE_AJUDA
+	for pos in _ajudas:
+		if pos.x >= x0 and pos.x <= x1 and pos.y <= float(a.base) + 80.0 				and pos.y >= float(b.topo) - 80.0:
+			return true
+	return false
+
+
+static func _vao_entre(a: Dictionary, b: Dictionary) -> float:
+	if float(b.esq) > float(a.dir):
+		return float(b.esq) - float(a.dir)
+	if float(a.esq) > float(b.dir):
+		return float(a.esq) - float(b.dir)
+	return 0.0
+
+
+## Apanha as plataformas da jornada com a AABB do topo. `movel` marca as que
+## nao se podem baixar (flutuantes, ritmadas, de corrente, elevadores).
+func _recolher_plats(no: Node, out: Array) -> void:
+	var e: Script = no.get_script()
+	var caminho := ""
+	if e:
+		caminho = e.resource_path
+	if caminho.get_file().begins_with("plataforma"):
+		var tv: Variant = no.get("tamanho")
+		var tam: Vector2 = tv if tv != null else Vector2(200, 40)
+		var p := no as Node2D
+		if p != null and tam.x > 1.0:
+			out.append({
+				"no": p, "movel": caminho.get_file() != "plataforma.gd",
+				"cx": p.global_position.x,
+				"esq": p.global_position.x - tam.x * 0.5,
+				"dir": p.global_position.x + tam.x * 0.5,
+				"topo": p.global_position.y - tam.y * 0.5,
+				"base": p.global_position.y + tam.y * 0.5,
+			})
+	for f in no.get_children():
+		_recolher_plats(f, out)

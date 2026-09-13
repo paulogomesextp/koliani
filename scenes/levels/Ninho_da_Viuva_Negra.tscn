@@ -116,15 +116,21 @@ altura_visual = 120.0
 cor_base = Color(0.18, 0.15, 0.2, 1)
 cor_topo = Color(0.46, 0.42, 0.54, 1)
 
+; 9H.17 B -- contrato de mobilidade da Regiao I (sem salto duplo). O poco
+; subia 85 px do ChaoPoco para o W1 e 80 px de fio para fio com 110 px de
+; vao. Medido na fisica do jogo (`tests/run_alcance_9h17.tscn`), o tecto do
+; salto simples esta' nos 80 px -- e aos 80 px o vao maximo e' 60, nao 110.
+; O ziguezague e' o mesmo, com degraus de 59/64/64 px e vaos de 80. Do W3
+; para cima quem manda e' o FioTeia (ritmada), que nao se mexeu.
 [node name="W1" parent="." instance=ExtResource("9_pl")]
-position = Vector2(1230, 590)
+position = Vector2(1230, 616)
 tamanho = Vector2(140, 20)
 altura_visual = 30.0
 cor_base = Color(0.2, 0.18, 0.24, 1)
 cor_topo = Color(0.5, 0.46, 0.58, 1)
 
 [node name="W2" parent="." instance=ExtResource("9_pl")]
-position = Vector2(1480, 510)
+position = Vector2(1450, 552)
 tamanho = Vector2(140, 20)
 altura_visual = 30.0
 cor_base = Color(0.2, 0.18, 0.24, 1)
@@ -137,7 +143,7 @@ largura = 110.0
 dur_preso = 0.5
 
 [node name="W3" parent="." instance=ExtResource("9_pl")]
-position = Vector2(1230, 430)
+position = Vector2(1230, 488)
 tamanho = Vector2(140, 20)
 altura_visual = 30.0
 cor_base = Color(0.2, 0.18, 0.24, 1)

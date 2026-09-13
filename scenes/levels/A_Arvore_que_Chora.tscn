@@ -133,22 +133,29 @@ dano_contacto = 19
 comportamento = "saltador"
 cor_rim = Color(0.7, 1.0, 0.55, 1)
 
+; 9H.17 B -- contrato de mobilidade da Regiao I (sem salto duplo). A escada
+; do tronco subia 80 px de ramo para ramo com 80 px de vao: medido na fisica
+; do jogo (`tests/run_alcance_9h17.tscn`), aos 80 px de subida o salto simples
+; so' atravessa 60 px de vao, por isso a arvore estava trancada de alto a
+; baixo. Os ramos passaram a 64 px de subida e 60 px de vao -- a mesma
+; espiral, degraus que se fazem -- e nasceu um ramo T5 para encostar ao
+; CimoTronco, que ficou onde estava.
 [node name="T1" parent="." instance=ExtResource("9_pl")]
-position = Vector2(1250, 600)
+position = Vector2(1250, 616)
 tamanho = Vector2(140, 20)
 altura_visual = 30.0
 cor_base = Color(0.19, 0.15, 0.09, 1)
 cor_topo = Color(0.42, 0.34, 0.2, 1)
 
 [node name="T2" parent="." instance=ExtResource("9_pl")]
-position = Vector2(1470, 520)
+position = Vector2(1450, 552)
 tamanho = Vector2(140, 20)
 altura_visual = 30.0
 cor_base = Color(0.19, 0.15, 0.09, 1)
 cor_topo = Color(0.42, 0.34, 0.2, 1)
 
 [node name="T3" parent="." instance=ExtResource("9_pl")]
-position = Vector2(1250, 440)
+position = Vector2(1250, 488)
 tamanho = Vector2(140, 20)
 altura_visual = 30.0
 cor_base = Color(0.19, 0.15, 0.09, 1)
@@ -162,7 +169,14 @@ dano = 12
 altura_queda = 190.0
 
 [node name="T4" parent="." instance=ExtResource("9_pl")]
-position = Vector2(1470, 360)
+position = Vector2(1450, 424)
+tamanho = Vector2(140, 20)
+altura_visual = 30.0
+cor_base = Color(0.19, 0.15, 0.09, 1)
+cor_topo = Color(0.42, 0.34, 0.2, 1)
+
+[node name="T5" parent="." instance=ExtResource("9_pl")]
+position = Vector2(1400, 368)
 tamanho = Vector2(140, 20)
 altura_visual = 30.0
 cor_base = Color(0.19, 0.15, 0.09, 1)

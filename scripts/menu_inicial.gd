@@ -30,7 +30,6 @@ const CENA_OPCOES := preload("res://scenes/ui/Opcoes.tscn")
 ## coluna é o mesmo do logótipo: x=805.
 const EIXO := 805.0
 const LARG_COLUNA := 330.0
-const Y_SUBTITULO := 216.0
 const Y_COLUNA := 280.0
 const ALT_BOTAO := 46.0
 const ALT_SEPARADOR := 12.0
@@ -38,7 +37,6 @@ const Y_RODAPE := 604.0
 
 var _palco: Control
 var _coluna: VBoxContainer
-var _subtitulo: Label
 var _aviso: Label
 var _premir: Label
 var _versao: Label
@@ -82,16 +80,11 @@ func _montar() -> void:
 	_palco.add_child(Frontend9H.veu(Vector2(EIXO - 330.0, 0.0), Vector2(EIXO + 330.0, 720.0), 0.5))
 	_palco.add_child(Frontend9H.vinheta())
 
-	_subtitulo = Label.new()
-	Frontend9H.capitular(_subtitulo, 17, Frontend9H.TEXTO)
-	_subtitulo.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	Frontend9H.por(_subtitulo, Rect2(EIXO - 300.0, Y_SUBTITULO, 600.0, 30.0))
-	_palco.add_child(_subtitulo)
-	for lado in [-1.0, 1.0]:
-		var risca := Frontend9H.separador()
-		risca.modulate = Color(2.0, 1.7, 1.7, 1.0)
-		Frontend9H.por(risca, Rect2(EIXO + lado * 235.0 - 55.0, Y_SUBTITULO + 6.0, 110.0, 16.0))
-		_palco.add_child(risca)
+	# 9H.17 E: o Game Master congelou o menu com o logotipo SOZINHO. O
+	# subtitulo ("FLORESTA SAGRADA") saiu, e com ele as duas riscas que o
+	# ladeavam -- sem texto no meio ficavam dois tracos orfaos a meio do ar.
+	# A chave `menu.tagline` fica nos 6 i18n (nao se mexe nas chaves por um
+	# rotulo que pode voltar).
 
 	_realce = Frontend9H.realce()
 	_realce.modulate.a = 0.0
@@ -246,7 +239,6 @@ func _focar_principal() -> void:
 # ── texto ────────────────────────────────────────────────────────────────
 
 func _traduzir() -> void:
-	_subtitulo.text = Frontend9H.espacar(Textos.t("menu.tagline"), 1)
 	var ha := EstadoJogo.ha_progresso()
 	_botoes["continuar"].visible = ha
 	_botoes["continuar"].text = Textos.t("menu.continue")
