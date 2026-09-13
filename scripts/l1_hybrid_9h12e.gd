@@ -35,6 +35,22 @@ const F_FRENTE := 1.10
 const FY := 0.08
 
 
+## AMOSTRAGEM. As pecas do Hybrid sao recortes a` resolucao da fonte
+## (130-300 px) ampliados 1,1x a 2,0x -- exactamente o caso que a regra da
+## 9H.7B cobre: fonte ampliada tem de ser amostrada alinhada a` grelha da
+## fonte, com transicao de um pixel de ecra, em vez de um `linear` que a
+## esborrata. O passe 9H.12E nasceu depois dessa regra e nunca a aplicou; as
+## 23 falhas que a suite trazia no L1 eram isto, e nao um teste obsoleto.
+const SHADER_NITIDEZ := preload("res://assets/shaders/nitidez_fundo.gdshader")
+
+static func _nitidez(s: Sprite2D) -> void:
+	var mat := ShaderMaterial.new()
+	mat.shader = SHADER_NITIDEZ
+	mat.set_shader_parameter("conservar_texel", true)
+	mat.set_shader_parameter("reparar_borda", false)
+	s.material = mat
+
+
 static func tex(nome: String) -> Texture2D:
 	return load(DIR + nome + ".png") as Texture2D
 
@@ -52,13 +68,44 @@ static func _peca(camada: Node2D, nome: String, ref_x: float, f: float,
 	s.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
 	s.scale = Vector2(escala, escala)
 	s.flip_h = espelhar
+	_nitidez(s)
 	s.modulate = tinta
 	s.position = Vector2(_x_camada(ref_x, f, mundo_x) - s.texture.get_width() * escala * 0.5, y)
 	camada.add_child(s)
 	return s
 
 
+## 9H.17 G -- o passe deixou de ser exclusivo do L1. O Game Master viu o
+## fundo do L2 "desfocado e de baixa qualidade", e a medicao explica porque:
+## o L2 vivia do panorama `region1_panorama_heart_tree.png`, 952x247, esticado
+## por todo o ecra. Nao ha' fonte nativa maior no repo -- o `_hd_x4` e' esse
+## mesmo ficheiro reamostrado (erro medio 3,01/255 ao reduzi-lo; a energia de
+## bordos cai de 1533 para 74), e o proprio manifesto da producao 9H.12E
+## declara as camadas de 1920 como "camadas ampliadas de recortes, nao arte
+## nativa". A resposta honesta e' NATIVE ART REQUIRED.
+##
+## O que da' para fazer com o que ha', e que e' o que o L1 ja' fazia: em vez
+## de AMPLIAR uma tira pequena, COMPOR muitos recortes nativos (130-300 px)
+## a` escala a que foram cortados. Mais informacao por pixel de ecra, sem
+## emendas rectangulares e sem inventar nitidez que a fonte nao tem.
+##
+## O L2 nao e' o L1 com outro nome: e' um PANTANO. Mesmo vocabulario de
+## pecas, arranjo e paleta proprios -- mais mata e vinhas, menos castelo e
+## arcos, e um verde doentio no lugar do azul frio.
+const PERFIL_L1 := 1
+const PERFIL_L2 := 2
+
+
+## Este perfil monta-se com o passe Hybrid?
+static func serve(perfil: int) -> bool:
+	return perfil == PERFIL_L1 or perfil == PERFIL_L2
+
+
 static func montar(alvo: Node2D) -> void:
+	var perfil: int = int(alvo.get("perfil"))
+	if perfil == PERFIL_L2:
+		_montar_l2(alvo)
+		return
 	var ref_x: float = alvo.referencia.x
 	# VALOR POR PROFUNDIDADE. No 1º ensaio da 12E o fundo estava tão claro
 	# como o plano de jogo e a cascata pintada ganhava à plataforma onde se
@@ -76,6 +123,7 @@ static func montar(alvo: Node2D) -> void:
 	pintura.position = Vector2(
 		_x_camada(ref_x, F_CEU, ref_x) - pintura.texture.get_width() * esc * 0.5, 60.0)
 	pintura.modulate = Color(0.46, 0.50, 0.66, 1.0)   # o plano mais fundo: lavado E escuro
+	_nitidez(pintura)
 	ceu.add_child(pintura)
 
 	# --- 02 serra e cascatas ---------------------------------------------
@@ -120,6 +168,75 @@ static func montar(alvo: Node2D) -> void:
 		["ramos", 180.0, 165.0, 1.5, false], ["vinhas", 900.0, 150.0, 1.7, false],
 		["ramo_curvo", 1600.0, 160.0, 1.6, true], ["ramos", 2400.0, 158.0, 1.4, true],
 		["vinhas", 3150.0, 150.0, 1.5, true], ["ramo_curvo", 3800.0, 168.0, 1.5, false],
+	]
+	for p in frente_pecas:
+		_peca(frente, p[0], ref_x, F_FRENTE, p[1], p[2], p[3], t5, p[4])
+
+
+## ARRANJO DO L2 -- Pantano dos Sussurros. Mesmas pecas nativas do kit 9H.12E,
+## outra composicao e outra luz. O ceu pintado entra uma vez (como no L1, o
+## parallax de 0,12 faz uma imagem de 2048 px cobrir o nivel inteiro), mas
+## puxado para o verde e mais baixo no ecra -- num pantano ve-se menos ceu.
+## As torres do castelo saem: aqui nao ha' castelo, ha' mata. Os arcos
+## partidos ficam, poucos e afundados, como ruinas a apodrecer na agua.
+static func _montar_l2(alvo: Node2D) -> void:
+	var ref_x: float = alvo.referencia.x
+
+	# --- 01 ceu: o mesmo plano fundo, lavado e puxado ao verde-agua -------
+	var ceu: Node2D = alvo._camada("HybridL2_ceu", -30, Vector2(F_CEU, FY))
+	ceu.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+	var pintura := Sprite2D.new()
+	pintura.texture = tex("layers/01_far_sky_castle")
+	pintura.centered = false
+	var esc := 940.0 / float(pintura.texture.get_height())
+	pintura.scale = Vector2(esc, esc)
+	pintura.position = Vector2(
+		_x_camada(ref_x, F_CEU, ref_x) - pintura.texture.get_width() * esc * 0.5, 96.0)
+	# mais verde e mais escuro que o L1: o pantano nao tem luar limpo
+	pintura.modulate = Color(0.38, 0.50, 0.50, 1.0)
+	_nitidez(pintura)
+	ceu.add_child(pintura)
+
+	# --- 02 cascatas ao longe (o pantano alimenta-se delas) --------------
+	var longe: Node2D = alvo._camada("HybridL2_longe", -27, Vector2(F_SERRA, FY))
+	var t2 := Color(0.32, 0.44, 0.46, 0.80)
+	_peca(longe, "cascata", ref_x, F_SERRA, 760.0, 315.0, 1.30, t2)
+	_peca(longe, "cascata", ref_x, F_SERRA, 2740.0, 300.0, 1.10, t2, true)
+
+	# --- 03 mata cerrada: o plano que da' o carater ----------------------
+	# Mais densa que no L1 (oito pecas contra seis) e mais baixa: as copas
+	# fecham o ceu, que e' o que faz um pantano ser um pantano.
+	var mata: Node2D = alvo._camada("HybridL2_mata", -24, Vector2(F_FLORESTA, FY))
+	var t3 := Color(0.26, 0.36, 0.34, 0.92)
+	for i in 8:
+		var nome: String = "floresta" if i % 3 != 1 else "arvore"
+		_peca(mata, nome, ref_x, F_FLORESTA, -200.0 + float(i) * 560.0,
+			300.0 + float(i % 3) * 22.0, 1.6 + float(i % 2) * 0.3, t3, i % 2 == 1)
+
+	# --- 04 ruinas afundadas: poucas, e baixas ---------------------------
+	var ruinas: Node2D = alvo._camada("HybridL2_ruinas", -21, Vector2(F_RUINAS, FY))
+	var t4 := Color(0.28, 0.34, 0.36, 0.90)
+	_peca(ruinas, "arco_partido", ref_x, F_RUINAS, 640.0, 452.0, 1.10, t4)
+	_peca(ruinas, "arco_partido", ref_x, F_RUINAS, 2260.0, 460.0, 1.25, t4, true)
+	_peca(ruinas, "raizes", ref_x, F_RUINAS, 1500.0, 430.0, 1.5, t4)
+	_peca(ruinas, "raizes", ref_x, F_RUINAS, 3300.0, 436.0, 1.3, t4, true)
+
+	# --- eixos de luz: menos e mais verdes (a luz custa a entrar) --------
+	var eixos: Node2D = alvo._camada("HybridL2_eixos", -18, Vector2(0.70, FY))
+	for par in [[900.0, 0.13], [2500.0, 0.11]]:
+		var e := _peca(eixos, "eixo_luz", ref_x, 0.70, par[0], 140.0, 2.0,
+			Color(0.66, 0.86, 0.74, par[1]))
+		var mat := CanvasItemMaterial.new()
+		mat.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
+		e.material = mat
+
+	# --- 05 primeiro plano: vinhas a cair, que e' a moldura do pantano ---
+	var frente: Node2D = alvo._camada("HybridL2_frente", 9, Vector2(F_FRENTE, FY))
+	var t5 := Color(0.16, 0.20, 0.19, 0.95)
+	var frente_pecas := [
+		["vinhas", 120.0, 142.0, 1.8, false], ["ramos", 780.0, 155.0, 1.5, true],
+		["vinhas", 1450.0, 138.0, 1.9, true], ["ramo_curvo", 2100.0, 160.0, 1.6, false],
+		["vinhas", 2800.0, 145.0, 1.7, false], ["ramos", 3500.0, 158.0, 1.45, true],
 	]
 	for p in frente_pecas:
 		_peca(frente, p[0], ref_x, F_FRENTE, p[1], p[2], p[3], t5, p[4])

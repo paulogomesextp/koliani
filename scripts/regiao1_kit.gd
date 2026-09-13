@@ -56,8 +56,14 @@ const PROPS_CHAO := [
 	["corrupcao/cristal_corrupcao_c.png", 1.0, "corrupcao", 0.8, 1.0],
 	["corrupcao/cristal_corrupcao_d.png", 1.0, "corrupcao", 0.9, 1.1],
 ]
-const PROPS_PENDURA := ["props/vinha_a.png", "props/vinha_b.png"]
-const PROPS_PENDURA_GROSSA := ["props/vinha_a.png", "props/vinha_b.png", "props/vinha_longa.png"]
+## O QUE PENDE POR BAIXO DE UM BLOCO. 9H.17 H -- eram SO' VINHAS, e o Game
+## Master apanhou o resultado: "vegetacao a flutuar por baixo da plataforma e
+## uma laje de rocha por cima", que nao faz sentido nenhum. Por baixo de um
+## bloco o que se agarra e' ESTRUTURA -- raiz e rocha -- e a folhagem e'
+## minoria, a cair da aresta. A vegetacao vive em cima (`PROPS_CHAO`).
+const PROPS_PENDURA := ["props/raizes.png", "props/raizes.png", "props/vinha_a.png"]
+const PROPS_PENDURA_GROSSA := ["props/raizes.png", "props/raizes.png",
+	"props/rocha.png", "props/vinha_a.png", "props/vinha_b.png", "props/vinha_longa.png"]
 
 const PASSO_DECO := 170.0
 const MAX_DECO := 9
@@ -249,7 +255,17 @@ static func pendurar(vis: Node, largura: float, y_base: float, grossa: bool,
 		var e := rng.randf_range(0.8, 1.1) if grossa else rng.randf_range(0.6, 0.85)
 		s.scale = Vector2(e if rng.randf() < 0.5 else -e, e)
 		var cx := -largura * 0.5 + margem + faixa * (float(i) + rng.randf_range(0.1, 0.9))
-		s.position = Vector2(cx, y_base - rng.randf_range(6.0, 14.0))
+		# `y_base` e' o labio VISIVEL do bloco, nao o fundo da colisao. A peca
+		# entra 16..26 px para dentro dele: ficando atras do terreno
+		# (`z_index = -2`), o sitio onde foi colada nunca se ve' e a raiz
+		# parece nascer de dentro da rocha.
+		#
+		# 9H.17 H -- era aqui que estava a "vegetacao a flutuar". A ancora
+		# usava o fundo da COLISAO, e a franja de baixo mais a capa descem
+		# ~30 px abaixo dele: a peca ficava tapada 32 px e so' reaparecia ja'
+		# longe da pedra, sem nada que a ligasse. Escondida de mais e' tao
+		# mau como escondida de menos.
+		s.position = Vector2(cx, y_base - rng.randf_range(16.0, 26.0))
 		if s.scale.x < 0.0:
 			s.position.x += t.get_width() * e
 		s.z_index = -2

@@ -3162,15 +3162,30 @@ func teste_execution_9h7_fundo_regiao1() -> void:
 					pior_nome = "%s/%s" % [camada.name, sp.texture.resource_path.get_file()]
 				if not sp.texture.resource_path.contains("_hd_x"):
 					em_fonte += 1
+					# EXCEÇÃO: um feixe de luz volumétrica é um gradiente em
+					# blend aditivo -- não tem textura com grelha para
+					# conservar, e a amostragem alinhada não lhe faz nada
+					# senão tirar-lhe a suavidade. A regra é para ARTE
+					# ampliada, não para luz.
+					var soma := sp.material as CanvasItemMaterial
+					if soma != null and soma.blend_mode == CanvasItemMaterial.BLEND_MODE_ADD:
+						continue
 					var mat := sp.material as ShaderMaterial
 					_ok(mat != null and mat.get_shader_parameter("conservar_texel") == true,
-						"9H.7B: fonte ampliada sem amostragem nítida")
+						"9H.7B: fonte ampliada sem amostragem nítida [L%d %s/%s]" % [
+							i + 1, camada.name, sp.texture.resource_path.get_file()])
 		_ok(pior <= LIMITE, "9H.7: L%d amplia %.2fx no ecrã em %s (máximo %.1f)"
 			% [i + 1, pior, pior_nome, LIMITE])
 		_ok(em_fonte >= 20, "9H.7B: L%d não conserva as fontes originais (%d)" % [i + 1, em_fonte])
 		# --- conteúdo: moldura e efeitos da prancha montados ----------------
-		_ok(alvo.get_node_or_null("VinhasFrente") != null,
-			"9H.7: L%d sem as vinhas do primeiro plano da 08" % (i + 1))
+		# A moldura de vinhas do primeiro plano: nos perfis que montam o passe
+		# Hybrid (9H.12E no L1, 9H.17 no L2) ela vem da camada `*_frente`, com
+		# as peças nativas do kit, e não do `VinhasFrente` da prancha 08. O
+		# que o teste guarda é que HÁ moldura -- não de que ficheiro veio.
+		var frente_hybrid := alvo.get_node_or_null("HybridL%d_frente" % (i + 1))
+		_ok(alvo.get_node_or_null("VinhasFrente") != null
+				or (frente_hybrid != null and frente_hybrid.get_child_count() >= 4),
+			"9H.7: L%d sem as vinhas do primeiro plano" % (i + 1))
 		_ok(alvo.get_node_or_null("RaiosLuz") != null,
 			"9H.7: L%d sem os raios de luz volumétricos da 08" % (i + 1))
 		# --- conteúdo: quanto há de cada identidade -------------------------

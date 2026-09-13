@@ -65,7 +65,10 @@ const MAX_PENDURA := 3
 ## que se ve' o fundo por baixo -- e' onde a pendura mais faz falta. Mas de um
 ## degrau fino nao pende uma corrente de 12 elos: so' pecas curtas, uma de
 ## cada vez.
-const PENDURA_ALT_MIN := 16.0
+## 9H.17 H: 16 px deixava pendurar coisas de uma tabua sem corpo nenhum --
+## a peca era maior do que o bloco de onde saia. O passe Hybrid do L1 ja'
+## usava 34 (`l1_hybrid_9h12e.decorar`); a Regiao I passa a usar o mesmo.
+const PENDURA_ALT_MIN := 34.0
 ## Acima disto a plataforma tem corpo a serio (slab de chao, lasca de rocha).
 const PENDURA_ALT_GROSSA := 34.0
 ## Altura maxima (px) de um prop pendurado num degrau fino.
@@ -179,7 +182,13 @@ func _aplicar() -> void:
 	var dy := float(rng.randi_range(0, 191))
 
 	var kit := Kit.alvo(self)
-	var hybrid_l1: bool = kit != null and int(kit.get("perfil")) == 1
+	# 9H.17 H: o corpo HD e os remates organicos passam a servir tambem o L2.
+	# Era o L2 que o Game Master via com "uma laje de rocha por cima e
+	# vegetacao a flutuar por baixo": o bloco do kit 9C e' um rectangulo
+	# chapado, e a capa de 56 px em cima de uma colisao de 18 le'-se como uma
+	# laje pousada. O corpo `terrain_hd` tem silhueta, e o `rematar_bordas`
+	# quebra-lhe as pontas com raizes.
+	var hybrid_l1: bool = kit != null and HybridL1.serve(int(kit.get("perfil")))
 	vis.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR if hybrid_l1 else CanvasItem.TEXTURE_FILTER_PARENT_NODE
 	var corpo: Texture2D = Kit.terreno(Kit.HD_CORPO, "terreno/terreno_corpo.png") if kit else _tex(bioma, "corpo")
 	if hybrid_l1:
@@ -270,8 +279,18 @@ func _aplicar() -> void:
 			HybridL1.decorar(vis, largura, y0, alt, rng)
 			return
 		Kit.decorar(vis, largura, y0, rng, Kit.perfil_de(kit))
+		# 9H.17 H -- o LABIO VISIVEL, e nao o fundo da colisao. A capa desce
+		# ate' `y0 - SUPERFICIE + ALTURA_TOPO` e a franja ate' `y0 + alt +
+		# ALTURA_BASE - 12`: num degrau de 18 px de colisao isso sao mais 30
+		# px de pedra desenhada. Pendurar pelo fundo da colisao punha a peca
+		# a nascer 30 px acima do sitio onde a pedra acaba -- e o que se via
+		# era a ponta solta, a flutuar debaixo de uma laje.
+		var labio: float = y0 + alt
+		if alt >= 26.0:
+			labio = maxf(labio, y0 + alt + Kit.ALTURA_BASE - 12.0)
+		labio = maxf(labio, y0 - SUPERFICIE + Kit.ALTURA_TOPO)
 		if alt >= PENDURA_ALT_MIN:
-			Kit.pendurar(vis, largura, y0 + alt, alt >= PENDURA_ALT_GROSSA, rng)
+			Kit.pendurar(vis, largura, labio, alt >= PENDURA_ALT_GROSSA, rng)
 		return
 	_decorar(vis, bioma, largura, y0, rng)
 	if alt >= PENDURA_ALT_MIN:

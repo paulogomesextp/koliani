@@ -147,8 +147,11 @@ func _ready() -> void:
 	var p := Kit.perfil_de(self)
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 9000 + perfil
-	if perfil == 1:
-		preload("res://scripts/l1_hybrid_9h12e.gd").montar(self)
+	# 9H.17 G: o passe Hybrid deixou de ser so' do L1 -- o L2 vinha do
+	# panorama de 952x247 esticado, e era isso que o Game Master via
+	# desfocado. Ver o cabecalho de `l1_hybrid_9h12e.gd`.
+	if Hybrid.serve(perfil):
+		Hybrid.montar(self)
 	else:
 		_montar_background(p)
 		_montar_heart_tree()
@@ -161,7 +164,7 @@ func _ready() -> void:
 		set_process(false)
 		return
 	_esconder_legado.call_deferred()
-	if perfil != 1:
+	if not Hybrid.serve(perfil):
 		_montar_primeiro_plano.call_deferred()
 	if perfil == 1:
 		_ligar_shadowblade.call_deferred()
@@ -585,7 +588,7 @@ func _esconder_legado() -> void:
 		# primeiro plano todos seus. Deixar QUALQUER camada do parallax
 		# legado por baixo era o que punha a moita pixel-art verde no spawn
 		# -- e a "Ceu" (ColorRect + faixas) é justamente a que se via.
-		if perfil == 1:
+		if Hybrid.serve(perfil):
 			par.set("visible", false)
 			escondidos.append("Parallax")
 		else:
@@ -593,7 +596,7 @@ func _esconder_legado() -> void:
 				if c.name != "Ceu" and c is CanvasItem:
 					c.visible = false
 					escondidos.append("Parallax/%s" % c.name)
-	if perfil == 1:
+	if Hybrid.serve(perfil):
 		# poeira verde-menta do legado: a corrupção do Hybrid faz esse papel
 		var po := atm.get_node_or_null("Poeira") as CanvasItem
 		if po:
@@ -634,6 +637,8 @@ func _restaurar_skin_hud() -> void:
 	_restauro_hud.clear()
 	_hud_aplicado = false
 
+
+const Hybrid := preload("res://scripts/l1_hybrid_9h12e.gd")
 
 const SHADER_NITIDEZ := preload("res://assets/shaders/nitidez_fundo.gdshader")
 
