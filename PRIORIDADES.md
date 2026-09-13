@@ -2,6 +2,24 @@
 
 ## Agora
 
+00000000000000000. **9H.16 FEITO -- L1 como Golden Level (fases B-F). TRES
+   DECISOES DO PAULO.** Ramo `codex/9h16-l1-perfection`, v0.18.8. Relatorio:
+   `docs/execution_9h16_l1_golden.md`. Feito: Phase B fechada com QA nativo
+   (isolamento do save provado byte a byte), ajudas fora do centro do ecra,
+   cadeia de espada com funcao por golpe (0,85x/1,0x/1,25x/1,9x de dano,
+   90/150/230/470 px/s de recuo FISICO, o 3.o atordoa e o 4.o sangra), a raiz
+   da floresta passou a espetar inimigos, remates organicos nas plataformas e
+   som para as duas mecanicas-assinatura do L1 (estavam MUDAS).
+   **DECISAO 1: PERCURSO HUMANO DO L1.** O input sintetico so' cobriu o
+   primeiro terco -- falta o percurso ate' ao Ghorak e a travessia L1->L2, a
+   sensacao do combate depois da mudanca, e ouvir os SFX novos.
+   **DECISAO 2: KOLIANI RUN NATIVE FRAMES** (confirmado por medicao; e' o
+   mesmo PENDENTE 1 da 9H.13/14).
+   **DECISAO 3: CHAO/PANTANO NATIVE ART** -- a faixa palida no fundo do L1
+   esta' medida (o `LiquidoMortal` do corredor triplica a luminancia da banda)
+   mas nao se isolou correccao com prova; a hipotese do veu foi revertida.
+
+
 0000000000000000. **9H.13/14 FEITO -- SFX, corrida e tremor do L2. DUAS
    DECISOES DO PAULO.** Ramo `claude/9h13-14-audio-koliani-l2`, por integrar.
    Relatorio: `docs/execution_9h13_14_audio_koliani_l2.md`. Feito: 23 SFX

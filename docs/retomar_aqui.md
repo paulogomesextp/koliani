@@ -1,3 +1,61 @@
+## 9H.16 — fases B a F executadas (13 set 2026)
+
+- PHASE CURRENT: **B CLOSED, C/D/E entregues e provadas, F PARCIAL.**
+  Relatorio completo: [`execution_9h16_l1_golden.md`](execution_9h16_l1_golden.md).
+  Commits: 8d815dba (C), b3fa7160 (D), 0fd5f8e4 (E), 1b149f7e (v0.18.8).
+- **PHASE B CLOSED com QA NATIVO.** O Game Master autorizou foco temporario
+  e foi isso que destrancou a fase. Dev entry, ARMAS 20/20, ARMADURAS 10/10,
+  x99 vidas, FlyMode nas 4 direcoes com OFF a repor o movimento, e
+  L1->L20->L50->L100->L1 sem crash. ISOLAMENTO DO SAVE PROVEN: `progresso.json`
+  byte a byte identico (`d302def8f79b…`) depois de sessao Dev completa +
+  reinicio do processo; seletor normal manteve 1-3/1-4/1-5 trancados;
+  `CONTINUAR` carregou o progresso legitimo. Nao foi preciso corrigir nada.
+- **C**: as ajudas viviam CENTRADAS (`(larg - size.x) * 0.5`, y>=160) -- em
+  1280x720 em cima da Koliani. Passaram ao canto superior-esquerdo com travao
+  para nao invadirem os 34% centrais; placa 560->380 px; toast deixou de poder
+  ter 1112 px de largura; sem banners grandes em combate (espera ate' 6 s).
+  Provado: toast (24,94) 305x81, placa (24,94) 360x126.
+- **D**: a causa de "combate basico" estava medida -- os 4 golpes davam o
+  MESMO dano e o "recuo" era `global_position.x += dir * 8` (teletransporte
+  de 8 px). Agora 0,85x/1,0x/1,25x/1,9x de dano, 90/150/230/470 px/s de
+  recuo FISICO, o 3.o ATORDOA 0,38 s e o 4.o SANGRA e levanta do chao. A raiz
+  da floresta passou a espetar INIMIGOS (mascara 2->6): com o recuo novo o
+  remate atira o bicho ~90 px e a mecanica-assinatura liga-se ao combate.
+- **E**: remates organicos nas pontas das plataformas com arte JA' PRODUZIDA
+  e por usar (`terrain_hd/raizes.png`/`rocha.png`) -- mosaico de rectangulo
+  dava rectangulo. E os tres sons que faltavam: `raiz_perigo.gd` e
+  `plataforma_ritmada.gd` tinham ZERO chamadas a `Som.`.
+- ARMADILHAS que custaram a descobrir:
+  1. `receber_dano(..., forca_recuo)` obriga a alinhar os **30 overrides** dos
+     chefes, senao o `main.gd` nao compila;
+  2. **nao se conduz um bench de combo pelo teclado** -- os intervalos do
+     arnes passam a `JANELA_COMBO` (0,42 s) e a cadeia reinicia a meio, pelo
+     que cada corrida mede passos diferentes. Fixar `_combo_passo`;
+  3. o modo CENARIO da `RaizPerigo` tem a irrupcao dentro do `_loop_auto` e
+     **nao passa por `_irromper()`** -- por isso as raizes ficavam mudas mesmo
+     com o som ligado la';
+  4. nomear `RaizPerigo`/`DemonioBase` num `--script` arrasta os autoloads e o
+     proprio bench deixa de compilar em silencio (duck typing em vez disso).
+- HIPOTESE DESCARTADA: a faixa palida no fundo do L1 e' o `LiquidoMortal` do
+  corredor gerado (medido: triplica a luminancia, 0,038 -> 0,110, via
+  `Superficie`/`Faixa`), mas trocar o veu `nevoa.png` -> `corrupcao.png` NAO
+  teve efeito e foi revertido. Integracao chao/pantano: NATIVE ART REQUIRED.
+- **KOLIANI RUN NATIVE ART BLOCKER confirmado por medicao**: abertura das
+  pernas nos 10 frames = 38,40,39,38,38,53,44,46,43,56 (os cinco primeiros sao
+  a mesma pose) e o centro de massa nunca troca de lado. Nao ha outra fonte no
+  repo nem no historico.
+- BUILD: `C:/Projetos/koliani/build/windows/Koliani.exe`, release v0.18.8,
+  205 755 688 bytes, SHA256
+  42764fe51ad46d2cd3faf2ef2c398900cb618a23c2c234f10cf470d555fcf13d.
+  A anterior ficou como `Koliani-v0.18.6-humantest.exe` e a de QA da Phase B
+  como `Koliani-9h16-PhaseB-dev.exe`.
+- NEXT ACTION: **percurso HUMANO do L1 inteiro** (o input sintetico so' cobriu
+  o primeiro terco -- nao segura duas teclas sem acorde, e o platforming
+  exige-o), ouvir os SFX, e decidir os dois NATIVE ART (corrida da Koliani,
+  chao/pantano). Suite: 26 falhas conhecidas, zero novas, em todas as fases.
+- Nota de UX por tratar: a pausa abre com `P` mas NAO com `Escape`.
+- O save legitimo do Paulo foi salvaguardado antes do QA e reposto no fim.
+
 ## 9H.16 — continuação autorizada depois de 9af93695 (13 set 2026)
 
 - PHASE CURRENT: B INCOMPLETE; C–F não iniciadas. User autorizou usar o
