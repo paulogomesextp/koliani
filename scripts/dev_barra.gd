@@ -11,6 +11,9 @@ const CENA_SELETOR := preload("res://scenes/ui/SeletorNiveis.tscn")
 
 var _painel: Control
 var _seletor: SeletorNiveis
+## Execution 9H.18 Phase C: teclado de sons (tecla S). So' no modo Dev.
+const CENA_SONS := preload("res://scripts/dev_sons.gd")
+var _sons: Control
 
 
 func _ready() -> void:
@@ -29,6 +32,8 @@ func _ready() -> void:
 	estado.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(estado)
 	_montar_painel()
+	_sons = CENA_SONS.new()
+	add_child(_sons)
 	Textos.idioma_mudou.connect(func(_l: String) -> void: _traduzir())
 	_traduzir()
 
@@ -47,12 +52,20 @@ func _input(evento: InputEvent) -> void:
 		_abrir()
 
 
-## Tecla F (só developer mode) faz o mesmo que o botão FLYMODE.
+## Teclas do developer mode: F liga/desliga o FLYMODE, S abre o teclado de
+## sons (Execution 9H.18 -- para se poder ouvir cada evento sem ter de o
+## provocar em jogo).
 func _unhandled_key_input(evento: InputEvent) -> void:
-	if evento is InputEventKey and evento.pressed and not evento.echo \
-			and (evento as InputEventKey).keycode == KEY_F:
-		get_viewport().set_input_as_handled()
-		_alternar_flymode()
+	if not (evento is InputEventKey) or not evento.pressed or evento.echo:
+		return
+	match (evento as InputEventKey).keycode:
+		KEY_F:
+			get_viewport().set_input_as_handled()
+			_alternar_flymode()
+		KEY_S:
+			get_viewport().set_input_as_handled()
+			if _sons:
+				_sons.alternar()
 
 
 func _montar_botao_topo() -> void:

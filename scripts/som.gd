@@ -37,6 +37,12 @@ const CAMINHOS := {
 	"plataforma_surge": "res://assets/audio/plataforma_surge.wav",
 	"demonio_ataque": "res://assets/audio/demonio_ataque.ogg",
 	"conquista": "res://assets/audio/conquista.wav",
+	# Execution 9H.18: VARIACOES dos sons que mais se repetem. Nao entram no
+	# codigo do jogo -- o `toca()` sorteia-as sozinho pelo nome base.
+	"ui_mover_v2": "res://assets/audio/ui_mover_v2.wav",
+	"ui_mover_v3": "res://assets/audio/ui_mover_v3.wav",
+	"acerto_v2": "res://assets/audio/acerto_v2.wav",
+	"acerto_v3": "res://assets/audio/acerto_v3.wav",
 	"transicao": "res://assets/audio/transicao.wav",
 	"carrossel": "res://assets/audio/carrossel.wav",
 	# --- vozes de interface (Execution 9H) --------------------------------
@@ -160,7 +166,36 @@ func aquecer(nomes: Array) -> void:
 			ResourceLoader.load_threaded_request(c)
 
 
+## Sons com variacoes `_v2`/`_v3` no catalogo. O `toca()` sorteia entre as
+## tres sem que quem chama saiba -- os sitios que tocam `ui_mover` e `acerto`
+## sao dezenas e nenhum precisa de mudar.
+##
+## Porque e' preciso: a navegacao do menu e o acerto da espada sao os dois
+## sons mais repetidos do jogo. Um `pitch_scale` aleatorio de +-5% nao chega
+## para esconder que e' a MESMA forma de onda a disparar vinte vezes -- e a
+## repeticao e' metade do que se ouve como "som barato". Sao tres amostras
+## mesmo diferentes (madeiras/frequencias diferentes), nao a mesma com outro
+## tom; as variacoes ficam perto o suficiente para a identidade nao mudar.
+const VARIANTES := {"ui_mover": 3, "acerto": 3}
+var _ultima_variante := {}
+
+
+## Escolhe uma variacao, evitando repetir a anterior de seguida -- e' a
+## repeticao imediata que se ouve, nao a distribuicao ao longo do tempo.
+func _sortear_variante(nome: String) -> String:
+	var n: int = VARIANTES.get(nome, 0)
+	if n < 2:
+		return nome
+	var anterior: int = _ultima_variante.get(nome, -1)
+	var i := randi() % n
+	if i == anterior:
+		i = (i + 1 + (randi() % (n - 1))) % n
+	_ultima_variante[nome] = i
+	return nome if i == 0 else "%s_v%d" % [nome, i + 1]
+
+
 func toca(nome: String, volume_db := -6.0, pitch := 1.0) -> void:
+	nome = _sortear_variante(nome)
 	var st := _stream(nome)
 	if st == null:
 		return
