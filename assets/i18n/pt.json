@@ -1,4 +1,9 @@
 {
+  "dev.pin_title": "ACESSO AO DEV MODE",
+  "dev.pin_placeholder": "Introduz o PIN de 4 dígitos",
+  "dev.pin_enter": "Entrar",
+  "dev.pin_cancel": "Cancelar",
+  "dev.pin_invalid": "PIN incorreto",
   "menu.skip_to_menu": "SALTAR PARA O MENU",
   "menu.rotate_device": "Rode o dispositivo",
   "boss.acougueiro_real": "O Açougueiro Real",

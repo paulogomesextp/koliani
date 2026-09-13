@@ -1,4 +1,9 @@
 {
+  "dev.pin_title": "开发模式访问",
+  "dev.pin_placeholder": "输入4位PIN码",
+  "dev.pin_enter": "进入",
+  "dev.pin_cancel": "取消",
+  "dev.pin_invalid": "PIN码错误",
   "menu.skip_to_menu": "跳过并进入菜单",
   "menu.rotate_device": "请横置设备",
   "boss.acougueiro_real": "The Royal Butcher",

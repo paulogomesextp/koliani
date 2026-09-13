@@ -1,4 +1,9 @@
 {
+  "dev.pin_title": "DEV MODE ACCESS",
+  "dev.pin_placeholder": "Enter the 4-digit PIN",
+  "dev.pin_enter": "Enter",
+  "dev.pin_cancel": "Cancel",
+  "dev.pin_invalid": "Incorrect PIN",
   "menu.skip_to_menu": "SKIP TO MENU",
   "menu.rotate_device": "Turn your device sideways",
   "boss.acougueiro_real": "The Royal Butcher",

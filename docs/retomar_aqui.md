@@ -1,3 +1,10 @@
+## PWA — Dev Mode com PIN 0980 (13 set 2026)
+
+- Publicação v0.18.16 em cópia isolada `codex/pwa-dev-pin-0980`, base estável `6251bf5b`. Apenas o acesso Dev concluído e traduções foram adicionados; áudio 9H.20 não publicado.
+- Botão no menu principal abre campo mascarado; PIN 0980 ativa o sandbox Dev. Cancelar/Esc e PIN inválido mantêm a campanha fora do Dev.
+- Suite `tools/correr_testes.ps1` EXIT 0; teste dirigido `tests/run_dev_pin.gd` EXIT 0; export Web EXIT 0. Navegador local confirmou modal, rejeição e entrada no Dev L1.
+- QA usou userdata isolada. Nenhuma migração, limpeza de dados PWA ou alteração do save GM.
+- Próximo: publicação GitHub Pages pelo workflow existente e escuta/validação no dispositivo do GM. DEVICE VALIDATION REQUIRED no telemóvel; rebuild de áudio permanece pendente no worktree original.
 ## 9H.19 — auditoria de áudio, gate de produção bloqueado (13 set 2026)
 
 - HEAD inicial `1d1fd7c1`, branch `codex/9h16-l1-perfection`, worktree `C:\Projetos\koliani-9h16`. Relatório: `docs/execution_9h19_audio_vertical_slice.md`.
