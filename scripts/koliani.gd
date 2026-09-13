@@ -856,7 +856,12 @@ func _montar_golden_set(sf: SpriteFrames) -> void:
 		if sf.has_animation(nome) and sf.get_frame_count(nome) > 0:
 			continue
 		_animacao_golden(sf, nome, ataque, _GOLDEN_COMBO_FPS[nome], false)
+	# Execution 9H.18: se a arte NATIVA da corrida estiver no repo, e' ela que
+	# manda. Ver `docs/spec_run_nativo_koliani.md` -- e' um drop-in: chega
+	# largar os frames na pasta e reimportar, sem tocar em codigo.
+	_substituir_run_por_nativo(sf)
 	# Estados de locomoção da 5G, agora montados com poses golden existentes.
+	# NB: saem do `run` que ficou montado acima (nativo, se existir).
 	_animacao_golden(sf, "turn", _frames_de(sf, "run", [0, 1, 2, 3]), 12.0, false)
 	_animacao_golden(sf, "run_start", _frames_de(sf, "run", [0, 1, 2, 3, 4, 5]), 12.0, false)
 	_animacao_golden(sf, "run_brake", _frames_de(sf, "run", [7, 8, 9]) + _frames_de(sf, "idle", [0]), 14.0, false)
@@ -866,6 +871,43 @@ func _montar_golden_set(sf: SpriteFrames) -> void:
 	# `jump` só é pedido pelo caminho de locomoção antigo; fica golden na mesma.
 	_animacao_golden(sf, "jump", _frames_de(sf, "jump_start", [1, 2, 3]), 12.0, false)
 	_montar_vfx_golpe()
+
+
+## Pasta onde a arte NATIVA da corrida entra, quando existir. Enquanto nao
+## existir, o jogo corre com o `run` da folha golden -- que NAO tem passada
+## de duas pernas (medido na 9H.18: o pe' de tras varre 7 px e o da frente
+## 29; `tools/validar_run_nativo_9h18.py` reprova-o). O contrato do ficheiro
+## esta' em `docs/spec_run_nativo_koliani.md`.
+const GOLDEN_RUN_NATIVO_DIR := "res://assets/sprites/koliani_golden_set/frames/run_native"
+
+
+## Troca o `run` pela tira nativa, se ela estiver no repo. Silenciosa e sem
+## efeito nenhum quando a pasta nao existe -- e' so' isso que separa o jogo
+## de hoje do jogo com a corrida boa.
+func _substituir_run_por_nativo(sf: SpriteFrames) -> void:
+	if not DirAccess.dir_exists_absolute(GOLDEN_RUN_NATIVO_DIR):
+		return
+	var dir := DirAccess.open(GOLDEN_RUN_NATIVO_DIR)
+	if dir == null:
+		return
+	var nomes: Array[String] = []
+	for f in dir.get_files():
+		# depois do export so' ha' `.ctex`; em editor ha' `.png` e `.png.import`.
+		if f.ends_with(".import") or f.ends_with(".ctex"):
+			f = f.get_basename()
+		if f.get_extension().to_lower() == "png" and not nomes.has(f):
+			nomes.append(f)
+	nomes.sort()
+	if nomes.size() < 6:
+		push_warning("run nativo com %d frames -- sao precisos 8 a 12; fica o golden"
+			% nomes.size())
+		return
+	var quadros: Array = []
+	for n in nomes:
+		quadros.append("%s/%s" % [GOLDEN_RUN_NATIVO_DIR, n])
+	# O ciclo dura o mesmo que o golden (0,75 s), para nao mexer na cadencia
+	# nem no `speed_scale` que acompanha a velocidade.
+	_animacao_golden(sf, "run", quadros, float(nomes.size()) / DUR_CICLO_CORRIDA, true)
 
 
 ## Cria (ou substitui) uma animação a partir de caminhos res:// ou texturas já
@@ -2597,6 +2639,10 @@ func _desencravar() -> void:
 ## todo o ciclo e o da frente 34 px, e em nenhum dos 10 frames o pe' esquerdo
 ## passa a' frente do direito. Isso precisa de frames nativos -- ver o
 ## relatorio da 9H.13/14 (KOLIANI RUN NATIVE FRAMES REQUIRED).
+## Duracao do ciclo de corrida, em segundos. Os 10 frames golden a 13,33 fps
+## dao exactamente isto, e a tira nativa tem de dar o mesmo para a cadencia
+## por velocidade continuar a bater certo.
+const DUR_CICLO_CORRIDA := 0.75
 const CADENCIA_MIN := 0.55
 const CADENCIA_MAX := 1.85
 
