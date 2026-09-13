@@ -98,6 +98,16 @@ func _init() -> void:
 	for n in chaves:
 		print("   %-16s x%d" % [n, _tocados[n]])
 	print("QA sons pedidos SEM stream (bug de caminho): %s" % str(_sem_stream.keys()))
+	# Execution 9H.13B: provar o NIVEL a que os efeitos chegam ao bus. Era aqui
+	# que estava a terceira causa do "soa igual" -- o bus SFX a 0,45 (-6,9 dB)
+	# com a musica a 1,0.
+	var i_sfx := AudioServer.get_bus_index("SFX")
+	var i_mus := AudioServer.get_bus_index("Music")
+	print("QA bus SFX=%.1f dB  Music=%.1f dB  (pico SFX visto em jogo: %.1f dB)" % [
+		AudioServer.get_bus_volume_db(i_sfx) if i_sfx >= 0 else 0.0,
+		AudioServer.get_bus_volume_db(i_mus) if i_mus >= 0 else 0.0,
+		_pico_sfx,
+	])
 	print("QA fim")
 	quit(0)
 
@@ -133,6 +143,7 @@ func _accao(accao: String, n: int) -> void:
 ## comecar a tocar um stream conta como um evento. Barato e suficiente para
 ## provar que o evento chegou ao audio.
 var _antes := {}
+var _pico_sfx := -200.0
 
 
 func _espiar() -> void:
@@ -150,6 +161,9 @@ func _espiar() -> void:
 			var nome := _nome_do(p.stream)
 			_tocados[nome] = int(_tocados.get(nome, 0)) + 1
 		_antes[chave] = pos if p.playing else -1.0
+	var ib := AudioServer.get_bus_index("SFX")
+	if ib >= 0:
+		_pico_sfx = maxf(_pico_sfx, AudioServer.get_bus_peak_volume_left_db(ib, 0))
 
 
 func _nome_do(st: AudioStream) -> String:

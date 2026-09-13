@@ -11,7 +11,22 @@ extends Node
 const CAMINHO := "user://opcoes.json"
 
 var vol_musica := 1.0    # 0.0 .. 1.0 (linear)
-var vol_efeitos := 0.45  # 0.0 .. 1.0 -- efeitos deliberadamente por baixo da música
+## 0.0 .. 1.0 (linear). Execution 9H.13B: era 0,45.
+##
+## 0,45 sao -6,9 dB no bus SFX inteiro, com a musica a 1,0 (0 dB) -- ou seja,
+## TODOS os efeitos comecavam 7 dB abaixo da musica antes de qualquer volume
+## por evento (que ainda tira -3 a -24 dB). O comentario que aqui estava
+## assumia-o: "efeitos deliberadamente por baixo da musica".
+##
+## Num platformer de accao isso esta' ao contrario: o feedback de combate e'
+## informacao, nao decoracao -- e' por ele que o jogador sabe que acertou.
+##
+## ATENCAO, para nao se contar a historia errada: isto NAO foi o que o Game
+## Master ouviu. O `opcoes.json` da maquina dele tem `vol_efeitos` 0,40 e
+## `vol_musica` 0,45 -- escolhas dele, com apenas 1,1 dB entre as duas. O
+## buraco de 6,9 dB so' existe em instalacao NOVA, e e' so' isso que esta
+## linha corrige. Um save existente continua a mandar.
+var vol_efeitos := 0.90
 var idioma := "en"
 
 

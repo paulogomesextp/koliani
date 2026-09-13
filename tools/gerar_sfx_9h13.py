@@ -1,35 +1,49 @@
 #!/usr/bin/env python3
-"""Execution 9H.13 -- passe profissional dos SFX que o jogo toca mesmo.
+"""Execution 9H.13/9H.13B -- os SFX que o runtime dispara mesmo.
 
     python tools/gerar_sfx_9h13.py
 
-O Game Master: "os SFX gerais continuam fracos/amadores". Este ficheiro
-refaz SO' os sons que o runtime dispara de facto (`grep 'Som.toca('`), na
-direccao do rebrand: fantasia escura, cinematografico, impacto limpo, sem
-bips de arcade.
+Tudo sintetizado aqui: sem samples de terceiros, sem licencas, sem numpy.
 
-O QUE MUDA DE METODO face ao `tools/gerar_audio.py` (que fez a 1.a leva):
+## Porque e' que a 1.a versao (9H.13) falhou
 
-1. **Tres camadas em vez de uma.** Um som de jogo le^-se como "profissional"
-   quando tem CORPO (o peso, grave, e' o que se sente), BATIDA (o transiente,
-   e' o que da' a leitura de impacto) e AR (a cauda, e' o que da' o espaco).
-   A leva antiga era quase so' corpo -- dai' soar a sintetizador.
-2. **O transiente vem primeiro e e' curtissimo.** 3 a 8 ms de ruido com
-   queda abrupta. E' isto, e nao o volume, que faz um golpe "bater".
-3. **Cauda com reverbera'cao** (`cauda()`): ecos curtos, cada vez mais
-   abafados. Sem cauda um som acaba a pique e soa a amostra cortada.
-4. **Sem ondas puras a descoberto.** Toda a senoide leva batimento (duas
-   vozes desafinadas) ou ruido por cima. Uma senoide limpa e' um bip.
-5. **Pico controlado por soma, nao por normalizacao cega.** Cada som sai a
-   um alvo de pico proprio (ver `ALVO`), para a mistura ficar hierarquizada:
-   o remate do combo tem de ser o mais pesado do teclado, o passo o mais
-   discreto.
+O Game Master ouviu a build e disse: "os SFX parecem praticamente iguais aos
+anteriores". Estavam ligados -- os 13 eventos do jogador apontavam mesmo para
+os ficheiros novos. O que estava mal era o DESENHO, e mediu-se:
 
-MISTURA: os alvos de pico abaixo sao deliberadamente baixos (0,55-0,90) e o
-`Som.toca` ainda aplica -4 a -24 dB por evento. Nenhum som chega a 1,0, logo
-nao ha' clipping na soma de vozes do pool.
+1. **Normalizei por PICO, e o ouvido nao ouve picos, ouve ENERGIA.** Os sons
+   novos eram cheios de transiente e vazios de corpo: crista de 14 a 18 dB,
+   contra 8 a 12 dB dos antigos. Com o pico igual, a energia ficava muito
+   abaixo. Medido na janela de 100 ms mais forte, novo contra antigo:
 
-LICENCAS: 100% sintetizado aqui, sem samples de terceiros. Sem numpy.
+       hit confirm  -7,5 dB     passos    -6,2 dB
+       UI move     -12,0 dB     bloqueio  -1,3 dB
+
+   O `acerto` e' o som mais repetido do combate inteiro. Tirar-lhe 7,5 dB fez
+   o combate soar MENOS forte do que antes -- exactamente o contrario do
+   pedido.
+
+2. **Os golpes eram mais compridos do que o proprio combo.** O passo do combo
+   e' 0,18 / 0,20 / 0,30 / 0,26 s (`DUR_COMBO` no `koliani.gd`) e os sons
+   duravam 0,64 a 0,94 s: 64 a 73% de sobreposicao. Quatro caudas empilhadas
+   nao se ouvem como quatro golpes, ouvem-se como uma papa -- e a progressao
+   1->4, que era o ponto todo, desaparecia.
+
+## O que esta versao faz de diferente
+
+- **Normaliza para SONORIDADE** (`ALVO_DB`, RMS da janela de 100 ms mais
+  forte), nao para pico. O pico passa a ser so' um tecto que o limitador
+  segura. E' esta a linha que resolve o ponto 1.
+- **O corpo do golpe cabe no passo do combo.** Cada ataque tem o seu peso
+  entregue nos primeiros ~0,12 s; so' o remate tem direito a cauda longa, e
+  mesmo essa e' cauda a decair, nao corpo.
+- **A progressao 1->4 e' de TIMBRE, nao so' de volume:** o 1 e' fino e
+  cortante (agudo, sem grave), e a cada golpe desce o registo, entra grito
+  harmonico (distorcao suave) e alarga a cauda. O remate e' o unico com sub
+  e badalada de metal.
+
+Verifica-se sozinho: no fim imprime a sonoridade medida de cada ficheiro ao
+lado do alvo, e o desvio. Se um som nao chegar ao alvo, ve^-se na tabela.
 """
 from __future__ import annotations
 
@@ -43,34 +57,47 @@ TAXA = 44100
 SAIDA = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
 	"assets", "audio")
 
-## Pico alvo de cada som. E' a hierarquia da mistura, escrita de uma vez:
-## o combo cresce 1->4, o remate manda, e o que e' constante (passos) fica
-## em baixo para nao mascarar os telegrafos dos inimigos.
-ALVO = {
-	"passo": 0.42,
-	"salto": 0.66,
-	"salto_duplo": 0.70,
-	"aterrar": 0.72,
-	"dash": 0.74,
-	"rolamento": 0.60,
-	"ataque": 0.70,
-	"ataque2": 0.76,
-	"ataque3": 0.82,
-	"ataque_forte": 0.92,
-	"acerto": 0.80,
-	"dano": 0.74,
-	"morte_koliani": 0.86,
-	"bloqueio": 0.72,
-	"apanhar": 0.58,
-	"selo": 0.70,
-	"transicao": 0.80,
-	"ui_mover": 0.40,
-	"ui_confirmar": 0.60,
-	"ui_voltar": 0.52,
-	"ui_negado": 0.58,
+## SONORIDADE alvo de cada som, em dB (RMS da janela de 100 ms mais forte).
+##
+## E' a hierarquia da mistura escrita de uma vez. Referencia do que ca' estava
+## ANTES da 9H.13, para nenhum som de feedback voltar a ficar mais fraco do
+## que o legado que substitui:
+##
+##   acerto -10,4 | aterrar -13,9 | ataque -16,4 | ataque_forte -12,5
+##   dano -11,3   | passo1 -16,3  | dash -13,4   | bloqueio -11,4
+##
+## Tudo o que e' feedback de combate fica ACIMA do legado. O que e' constante
+## (passos) fica em baixo, mas audivel -- os -22,5 dB da 1.a versao eram
+## inaudiveis por cima da musica.
+ALVO_DB = {
+	"passo": -17.0,
+	"salto": -12.5,
+	"salto_duplo": -11.5,
+	"aterrar": -10.5,
+	"dash": -12.0,
+	"rolamento": -14.0,
+	"ataque": -11.5,
+	"ataque2": -10.0,
+	"ataque3": -8.5,
+	"ataque_forte": -5.5,
+	"acerto": -9.0,
+	"dano": -9.0,
+	"morte_koliani": -7.0,
+	"bloqueio": -9.5,
+	"apanhar": -12.0,
+	"selo": -10.0,
+	"transicao": -8.0,
+	"ui_mover": -14.5,
+	"ui_confirmar": -11.5,
+	"ui_voltar": -12.5,
+	"ui_negado": -11.5,
 }
 
-rng = random.Random(91314)
+## Tecto de pico. Abaixo de 1,0 para as 8 vozes do pool poderem somar sem
+## clipar o master.
+TECTO = 0.93
+
+rng = random.Random(913132)
 
 
 # --------------------------------------------------------------- utilitarios
@@ -79,19 +106,68 @@ def novo(dur: float) -> list[float]:
 	return [0.0] * int(TAXA * dur)
 
 
-def escrever(nome: str, buf: list[float], alvo: float) -> None:
-	"""Grava a `alvo` de pico. Nao normaliza para 1,0 de proposito -- ver
-	o cabecalho: a hierarquia da mistura esta' no `ALVO`."""
-	pico = max((abs(v) for v in buf), default=1.0) or 1.0
-	k = alvo / pico
+def sonoridade(buf: list[float]) -> float:
+	"""RMS da janela de 100 ms mais forte, em dB. E' o numero que acompanha o
+	"quao alto isto soa" -- muito melhor do que o pico, que so' diz o quao
+	afiado e' o transiente."""
+	n = len(buf)
+	w = int(TAXA * 0.1)
+	if n < w:
+		s = math.sqrt(sum(x * x for x in buf) / max(n, 1))
+		return 20.0 * math.log10(max(s, 1e-9))
+	melhor = 0.0
+	passo = max(1, w // 2)
+	for i in range(0, n - w + 1, passo):
+		s = math.sqrt(sum(x * x for x in buf[i:i + w]) / w)
+		melhor = max(melhor, s)
+	return 20.0 * math.log10(max(melhor, 1e-9))
+
+
+def limitar(buf: list[float], tecto: float = TECTO) -> None:
+	"""Saturacao suave: so' morde nos picos, e por isso SOBE a energia media
+	em vez de a baixar (e' o que um limitador faz num master a serio)."""
+	joelho = tecto * 0.72
+	for i, v in enumerate(buf):
+		a = abs(v)
+		if a > joelho:
+			sinal = 1.0 if v >= 0.0 else -1.0
+			excesso = (a - joelho) / max(tecto - joelho, 1e-6)
+			buf[i] = sinal * (joelho + (tecto - joelho) * math.tanh(excesso))
+
+
+def normalizar(buf: list[float], alvo_db: float) -> None:
+	"""Leva o som ate' a' SONORIDADE pedida e so' depois segura o pico.
+	Itera porque o limitador muda a energia -- duas voltas chegam a <0,3 dB."""
+	# O limitador corre SEMPRE uma vez antes de medir. Sem isto, um som que ja'
+	# nascesse com a sonoridade certa saltava o ciclo inteiro e ficava por
+	# limitar: foi assim que o `ataque_forte` saiu com pico 1,89 (a cortar em
+	# bruto na escrita, que e' o pior tipo de distorcao que ha').
+	limitar(buf)
+	for _ in range(4):
+		actual = sonoridade(buf)
+		ganho = 10.0 ** ((alvo_db - actual) / 20.0)
+		if abs(20.0 * math.log10(max(ganho, 1e-9))) < 0.1:
+			break
+		for i in range(len(buf)):
+			buf[i] *= ganho
+		limitar(buf)
+
+
+def escrever(nome: str, buf: list[float], chave: str) -> tuple[float, float]:
+	alvo = ALVO_DB[chave]
+	normalizar(buf, alvo)
+	medido = sonoridade(buf)
+	pico = max((abs(v) for v in buf), default=0.0)
 	dados = b"".join(
-		struct.pack("<h", int(max(-1.0, min(1.0, v * k)) * 32767)) for v in buf)
+		struct.pack("<h", int(max(-1.0, min(1.0, v)) * 32767)) for v in buf)
 	with wave.open(os.path.join(SAIDA, nome), "wb") as w:
 		w.setnchannels(1)
 		w.setsampwidth(2)
 		w.setframerate(TAXA)
 		w.writeframes(dados)
-	print("%-24s %5.3f s  pico=%.2f" % (nome, len(buf) / TAXA, alvo))
+	print("%-22s %5.2f s  alvo %6.1f  medido %6.1f  (%+.1f)  pico %.2f" % (
+		nome, len(buf) / TAXA, alvo, medido, medido - alvo, pico))
+	return medido, pico
 
 
 def queda(t: float, k: float) -> float:
@@ -100,24 +176,24 @@ def queda(t: float, k: float) -> float:
 
 def transiente(buf: list[float], t0: float, dur: float, amp: float,
 		cor: float = 0.5) -> None:
-	"""A BATIDA: ruido de 3-8 ms com queda abrupta. `cor` de 0 (escuro) a 1
-	(brilhante) -- e' um passa-baixo de um polo aplicado ao ruido."""
-	n = int(TAXA * dur)
+	"""A BATIDA: ruido curtissimo com queda abrupta."""
+	n = max(1, int(TAXA * dur))
 	i0 = int(TAXA * t0)
 	ant = 0.0
 	for i in range(n):
 		if i0 + i >= len(buf):
 			break
-		r = rng.uniform(-1.0, 1.0)
-		ant += (r - ant) * (0.04 + 0.92 * cor)
+		ant += (rng.uniform(-1.0, 1.0) - ant) * (0.04 + 0.92 * cor)
 		buf[i0 + i] += ant * amp * queda(i / n, 7.0)
 
 
 def corpo(buf: list[float], t0: float, f0: float, f1: float, dur: float,
-		amp: float, k: float = 4.0, desafinar: float = 1.006) -> None:
-	"""O PESO: duas vozes graves em varrimento de `f0` para `f1`, desafinadas
-	entre si. O batimento das duas e' o que impede isto de soar a bip."""
-	n = int(TAXA * dur)
+		amp: float, k: float = 4.0, desafinar: float = 1.006,
+		grito: float = 0.0) -> None:
+	"""O PESO: duas vozes graves em varrimento, desafinadas (o batimento e' o
+	que impede isto de soar a bip). `grito` mete distorcao suave -- e' o que
+	da' agressividade sem subir o volume."""
+	n = max(1, int(TAXA * dur))
 	i0 = int(TAXA * t0)
 	fa = fb = 0.0
 	for i in range(n):
@@ -127,14 +203,16 @@ def corpo(buf: list[float], t0: float, f0: float, f1: float, dur: float,
 		f = f0 * (f1 / f0) ** t
 		fa += 2.0 * math.pi * f / TAXA
 		fb += 2.0 * math.pi * f * desafinar / TAXA
-		buf[i0 + i] += (math.sin(fa) + 0.7 * math.sin(fb)) * amp * queda(t, k)
+		s = math.sin(fa) + 0.7 * math.sin(fb)
+		if grito > 0.0:
+			s = math.tanh(s * (1.0 + 4.0 * grito)) * (1.0 - 0.25 * grito)
+		buf[i0 + i] += s * amp * queda(t, k)
 
 
 def sopro(buf: list[float], t0: float, dur: float, amp: float,
 		cor0: float, cor1: float, k: float = 3.0) -> None:
-	"""O AR: ruido filtrado com o filtro a abrir/fechar. E' o que da' o
-	'whoosh' de uma lamina e o espaco de uma sala."""
-	n = int(TAXA * dur)
+	"""O AR: ruido filtrado com o filtro a abrir/fechar -- o 'whoosh'."""
+	n = max(1, int(TAXA * dur))
 	i0 = int(TAXA * t0)
 	ant = 0.0
 	for i in range(n):
@@ -148,27 +226,24 @@ def sopro(buf: list[float], t0: float, dur: float, amp: float,
 
 def sino(buf: list[float], t0: float, f: float, dur: float, amp: float,
 		brilho: float = 0.4) -> None:
-	"""Sino: fundamental + as parciais inarmonicas 2,76 e 5,40 de um sino
-	real, cada uma a decair mais depressa. E' a voz do menu."""
-	n = int(TAXA * dur)
+	"""Sino: fundamental + parciais inarmonicas 2,76 e 5,40 (as de um sino
+	real), cada uma a decair mais depressa."""
+	n = max(1, int(TAXA * dur))
 	i0 = int(TAXA * t0)
 	for p, (mult, ka) in enumerate(((1.0, 3.0), (2.76, 5.0), (5.40, 8.0))):
 		a = amp * (1.0 if p == 0 else brilho ** p)
 		for i in range(n):
 			if i0 + i >= len(buf):
 				break
-			t = i / n
 			buf[i0 + i] += math.sin(
-				2.0 * math.pi * f * mult * (i / TAXA)) * a * queda(t, ka)
+				2.0 * math.pi * f * mult * (i / TAXA)) * a * queda(i / n, ka)
 
 
 def cauda(buf: list[float], atraso: float = 0.045, n_ecos: int = 4,
 		g: float = 0.34, abafar: float = 0.5) -> None:
-	"""Reverbera'cao pobre mas honesta: ecos curtos, cada um mais abafado que
-	o anterior. Sem isto o som acaba a pique e denuncia-se como sintetico."""
-	d = int(TAXA * atraso)
+	"""Reverberacao pobre mas honesta: ecos curtos, cada um mais abafado."""
+	d = max(1, int(TAXA * atraso))
 	fonte = list(buf)
-	ant = 0.0
 	for e in range(1, n_ecos + 1):
 		amp = g ** e
 		off = d * e
@@ -180,292 +255,269 @@ def cauda(buf: list[float], atraso: float = 0.045, n_ecos: int = 4,
 			buf[i + off] += ant * amp
 
 
-def limitar(buf: list[float], tecto: float = 0.98) -> None:
-	"""Saturacao suave (tanh) em vez de corte -- so' morde nos picos."""
-	for i, v in enumerate(buf):
-		if abs(v) > tecto * 0.7:
-			buf[i] = tecto * math.tanh(v / tecto)
+# ------------------------------------------------------------------- combate
+
+## Os quatro golpes. O CORPO de cada um cabe no passo do combo (`DUR_COMBO` =
+## 0,18 / 0,20 / 0,30 / 0,26 s); o que passa disso e' cauda a decair, nunca
+## corpo, para os golpes nao se taparem uns aos outros.
+##
+## A progressao e' de TIMBRE:
+##   1  fino e cortante -- agudo, sem grave nenhum, cauda curtissima
+##   2  entra corpo medio
+##   3  entra grito (distorcao) -- agressivo
+##   4  desce ao sub, badalada de metal e a unica cauda longa
+COMBO = [
+	# dur, f0,    f1,   grito, cauda_ecos, cor_transiente
+	(0.30, 620.0, 300.0, 0.00, 2, 0.80),
+	(0.34, 500.0, 220.0, 0.18, 3, 0.70),
+	(0.40, 420.0, 150.0, 0.42, 4, 0.58),
+	(0.68, 300.0, 62.0, 0.30, 5, 0.42),
+]
+
+
+def golpe(passo: int) -> list[float]:
+	dur, f0, f1, grito, ecos, cor = COMBO[passo]
+	remate = passo == 3
+	b = novo(dur)
+	t = 0.0
+	if remate:
+		# antecipacao curta: a lamina arma-se. 60 ms, nao 100 -- tem de caber.
+		sopro(b, 0.0, 0.055, 0.26, 0.72, 0.40, k=3.0)
+		t = 0.06
+	# BATIDA
+	transiente(b, t, 0.004 + 0.001 * passo, 0.85 + 0.10 * passo, cor)
+	# o corte de ar: curto e a fechar
+	sopro(b, t, 0.055 + 0.012 * passo, 0.40 + 0.06 * passo, 0.34, 0.90, k=5.0)
+	sopro(b, t + 0.03, 0.10, 0.26, 0.90, 0.20, k=6.0)
+	# CORPO -- entregue nos primeiros ~0,12 s
+	corpo(b, t, f0, f1, 0.10 + 0.02 * passo, 0.62 + 0.10 * passo,
+		k=9.0 - 1.2 * passo, grito=grito)
+	if remate:
+		corpo(b, t + 0.008, 88.0, 44.0, 0.26, 0.70, k=5.0, desafinar=1.012)
+		sino(b, t + 0.012, 146.0, 0.34, 0.26, 0.32)
+	cauda(b, 0.030 + 0.005 * passo, ecos, 0.24 + 0.03 * passo)
+	return b
+
+
+def acerto() -> list[float]:
+	"""Confirmacao de golpe -- o som mais repetido do jogo. Na 1.a versao
+	perdeu 7,5 dB face ao legado e foi isso que fez o combate soar mais fraco.
+	Agora e' CURTO (0,20 s) e forte: metal a morder, sem cauda que se arraste.
+	"""
+	b = novo(0.20)
+	transiente(b, 0.0, 0.004, 1.00, 0.78)
+	corpo(b, 0.0, 340.0, 120.0, 0.055, 0.80, k=13.0, grito=0.25)
+	sopro(b, 0.002, 0.060, 0.40, 0.70, 0.28, k=8.0)
+	sino(b, 0.0, 1180.0, 0.075, 0.22, 0.5)
+	cauda(b, 0.022, 2, 0.20)
+	return b
+
+
+def dano() -> list[float]:
+	"""LEVAR dano: claro e SECO (o Game Master pediu "nao abafado demais").
+	A 1.a versao era so' grave -- lia-se como um baque distante. Agora tem
+	corpo grave E um estalo medio por cima, que e' o que se ouve."""
+	b = novo(0.46)
+	transiente(b, 0.0, 0.006, 0.85, 0.45)
+	corpo(b, 0.0, 300.0, 70.0, 0.16, 0.85, k=7.0, desafinar=1.013, grito=0.30)
+	corpo(b, 0.0, 74.0, 46.0, 0.30, 0.42, k=4.0, desafinar=1.004)
+	sopro(b, 0.003, 0.10, 0.26, 0.45, 0.12, k=6.0)
+	cauda(b, 0.040, 3, 0.26, abafar=0.42)
+	return b
+
+
+def bloqueio() -> list[float]:
+	"""Escudo: metal contra metal, brilhante, curto, com anel."""
+	b = novo(0.40)
+	transiente(b, 0.0, 0.004, 1.00, 0.90)
+	sino(b, 0.0, 900.0, 0.26, 0.40, 0.55)
+	sino(b, 0.002, 1350.0, 0.17, 0.22, 0.45)
+	corpo(b, 0.0, 340.0, 170.0, 0.05, 0.45, k=13.0)
+	cauda(b, 0.028, 4, 0.28, abafar=0.64)
+	return b
 
 
 # ------------------------------------------------------------------- jogador
 
 def salto(duplo: bool = False) -> list[float]:
-	"""Salto: nao e' um 'boing'. E' o ATRITO da bota a largar o chao (sopro
-	curto e escuro) mais uma subida de corpo. O salto duplo leva um sino
-	roxo por cima -- e' magia, tem de se ouvir que e' outra coisa."""
-	b = novo(0.40)
-	transiente(b, 0.0, 0.006, 0.5, 0.35)
-	sopro(b, 0.0, 0.16, 0.30, 0.10, 0.45, k=4.5)
-	corpo(b, 0.004, 150.0 if not duplo else 210.0,
-		330.0 if not duplo else 520.0, 0.20, 0.55, k=5.5)
+	"""Salto: leve, curto, FISICO. O atrito da bota a largar o chao."""
+	b = novo(0.26 if not duplo else 0.32)
+	transiente(b, 0.0, 0.005, 0.60, 0.38)
+	sopro(b, 0.0, 0.10, 0.34, 0.12, 0.50, k=6.0)
+	corpo(b, 0.003, 160.0 if not duplo else 230.0,
+		340.0 if not duplo else 540.0, 0.11, 0.60, k=8.0)
 	if duplo:
-		sino(b, 0.01, 660.0, 0.34, 0.20, 0.5)
-		sopro(b, 0.01, 0.26, 0.16, 0.5, 0.9, k=3.0)
-	cauda(b, 0.038, 3, 0.26)
-	limitar(b)
+		sino(b, 0.008, 680.0, 0.22, 0.24, 0.5)
+		sopro(b, 0.008, 0.18, 0.18, 0.55, 0.92, k=4.0)
+	cauda(b, 0.026, 2, 0.22)
 	return b
 
 
 def aterrar() -> list[float]:
-	"""Aterragem: batida escura + corpo a descer + poeira. O peso esta' na
-	descida da frequencia, nao no volume."""
-	b = novo(0.50)
-	transiente(b, 0.0, 0.008, 0.85, 0.22)
-	corpo(b, 0.0, 190.0, 58.0, 0.20, 0.75, k=7.0)
-	sopro(b, 0.006, 0.30, 0.22, 0.30, 0.06, k=3.4)
-	cauda(b, 0.050, 4, 0.30)
-	limitar(b)
+	"""Aterragem: impacto corporal + terreno. O peso esta' na descida."""
+	b = novo(0.40)
+	transiente(b, 0.0, 0.007, 0.95, 0.26)
+	corpo(b, 0.0, 210.0, 54.0, 0.14, 0.90, k=9.0, grito=0.20)
+	sopro(b, 0.005, 0.20, 0.30, 0.34, 0.07, k=4.5)
+	cauda(b, 0.038, 3, 0.28)
 	return b
 
 
 def dash() -> list[float]:
-	"""Arranque: sopro que ABRE e volta a fechar (o corpo a rasgar o ar) com
-	um fio de corpo grave por baixo. Sem transiente forte -- um dash nao
-	bate em nada, desliza."""
-	b = novo(0.42)
-	transiente(b, 0.0, 0.005, 0.34, 0.6)
-	sopro(b, 0.0, 0.13, 0.46, 0.20, 0.85, k=1.6)
-	sopro(b, 0.11, 0.22, 0.30, 0.85, 0.12, k=3.2)
-	corpo(b, 0.0, 260.0, 90.0, 0.18, 0.30, k=6.0)
-	cauda(b, 0.042, 3, 0.28)
-	limitar(b)
+	"""Arranque: sopro que abre e fecha; desliza, nao bate."""
+	b = novo(0.34)
+	transiente(b, 0.0, 0.004, 0.40, 0.62)
+	sopro(b, 0.0, 0.10, 0.55, 0.22, 0.88, k=2.2)
+	sopro(b, 0.085, 0.17, 0.34, 0.88, 0.14, k=4.0)
+	corpo(b, 0.0, 280.0, 95.0, 0.13, 0.34, k=8.0)
+	cauda(b, 0.032, 3, 0.24)
 	return b
 
 
 def rolamento() -> list[float]:
-	"""Rolamento: tres roces de tecido/couro em cima do chao, nao um."""
-	b = novo(0.46)
-	for i, t in enumerate((0.0, 0.085, 0.175)):
-		sopro(b, t, 0.12, 0.34 - 0.07 * i, 0.24, 0.08, k=4.0)
-		transiente(b, t, 0.005, 0.22, 0.25)
-	corpo(b, 0.0, 120.0, 70.0, 0.22, 0.24, k=5.0)
-	cauda(b, 0.045, 3, 0.24)
-	limitar(b)
+	b = novo(0.38)
+	for i, t in enumerate((0.0, 0.075, 0.155)):
+		sopro(b, t, 0.10, 0.40 - 0.08 * i, 0.26, 0.10, k=5.0)
+		transiente(b, t, 0.004, 0.30, 0.28)
+	corpo(b, 0.0, 130.0, 70.0, 0.16, 0.28, k=7.0)
+	cauda(b, 0.034, 3, 0.22)
 	return b
 
 
 def passo(n: int) -> list[float]:
-	"""Passo: discreto de proposito (alvo 0,42 e o runtime ainda poe -24 dB).
-	Um passo que se ouve bem e' um passo que chateia ao fim de dois minutos."""
-	b = novo(0.16)
-	transiente(b, 0.0, 0.004 + 0.001 * n, 0.55, 0.28 + 0.07 * n)
-	corpo(b, 0.0, 130.0 + 22.0 * n, 62.0, 0.07, 0.34, k=9.0)
-	sopro(b, 0.002, 0.075, 0.16, 0.35, 0.10, k=6.0)
-	cauda(b, 0.028, 2, 0.18)
-	limitar(b)
-	return b
-
-
-# ------------------------------------------------------------------- combate
-
-def golpe(passo_combo: int) -> list[float]:
-	"""Os quatro golpes do combo. Crescem em TRES eixos ao mesmo tempo --
-	nao chega subir o volume, que e' o que soa a amador:
-
-	  1. o corpo desce de registo (400->150 Hz no 1.o, 300->70 no remate):
-	     grave = pesado;
-	  2. o sopro alarga (a lamina 'rasga' mais ar);
-	  3. a cauda cresce (o espaco abre-se a cada golpe).
-
-	O remate (indice 3) leva ainda um transiente duplo -- arma e bate -- e
-	uma badalada grave por baixo. E' o golpe mais lento e o mais fundo.
-	"""
-	remate = passo_combo >= 3
-	dur = 0.34 + 0.10 * passo_combo
-	b = novo(dur + 0.30)
-	f0 = (400.0, 360.0, 330.0, 300.0)[passo_combo]
-	f1 = (150.0, 125.0, 100.0, 70.0)[passo_combo]
-	larg = 0.30 + 0.09 * passo_combo
-	if remate:
-		# antecipacao: a lamina arma-se antes de bater
-		sopro(b, 0.0, 0.10, 0.20, 0.70, 0.35, k=2.0)
-		transiente(b, 0.098, 0.010, 0.90, 0.30)
-		t_bate = 0.10
-	else:
-		t_bate = 0.0
-	transiente(b, t_bate, 0.005 + 0.001 * passo_combo,
-		0.55 + 0.12 * passo_combo, 0.62 - 0.10 * passo_combo)
-	# o 'rasgar' da lamina: abre e fecha
-	sopro(b, t_bate, 0.10 + 0.02 * passo_combo, larg, 0.30, 0.88, k=2.2)
-	sopro(b, t_bate + 0.06, 0.20, larg * 0.7, 0.88, 0.14, k=3.0)
-	corpo(b, t_bate, f0, f1, 0.16 + 0.05 * passo_combo,
-		0.50 + 0.14 * passo_combo, k=5.5 - 0.7 * passo_combo)
-	if remate:
-		corpo(b, t_bate + 0.01, 92.0, 46.0, 0.34, 0.55, k=3.0, desafinar=1.011)
-		sino(b, t_bate + 0.012, 138.0, 0.40, 0.16, 0.30)
-	cauda(b, 0.046 + 0.006 * passo_combo, 3 + passo_combo,
-		0.28 + 0.03 * passo_combo)
-	limitar(b)
-	return b
-
-
-def acerto() -> list[float]:
-	"""Confirmacao de golpe: e' o som mais repetido do jogo, por isso e'
-	CURTO (0,22 s) e sem cauda longa. Metal a morder carne: transiente
-	brilhante, corpo curto, e um raspar por cima."""
-	b = novo(0.30)
-	transiente(b, 0.0, 0.005, 0.95, 0.72)
-	corpo(b, 0.0, 300.0, 110.0, 0.08, 0.48, k=11.0)
-	sopro(b, 0.003, 0.10, 0.26, 0.65, 0.20, k=6.0)
-	cauda(b, 0.030, 2, 0.22)
-	limitar(b)
-	return b
-
-
-def dano() -> list[float]:
-	"""LEVAR dano. O briefing pede "claro sem ser agressivo": a leitura vem
-	de um corpo grave a cair e de um abafamento (o mundo a fechar-se por um
-	instante), NAO de ruido agudo -- ruido agudo em cima do jogador que acaba
-	de ser atingido e' o que torna um jogo cansativo."""
-	b = novo(0.60)
-	transiente(b, 0.0, 0.007, 0.55, 0.18)
-	corpo(b, 0.0, 240.0, 62.0, 0.26, 0.80, k=5.0, desafinar=1.013)
-	# sub por baixo: sente-se mais do que se ouve
-	corpo(b, 0.0, 70.0, 44.0, 0.40, 0.42, k=3.2, desafinar=1.004)
-	sopro(b, 0.004, 0.18, 0.14, 0.22, 0.05, k=4.0)
-	cauda(b, 0.055, 4, 0.32, abafar=0.34)
-	limitar(b)
+	"""Passo: discreto, mas nao inaudivel -- a 1.a versao tinha -22,5 dB e
+	desaparecia por baixo da musica."""
+	b = novo(0.13)
+	transiente(b, 0.0, 0.004 + 0.001 * n, 0.70, 0.30 + 0.07 * n)
+	corpo(b, 0.0, 140.0 + 22.0 * n, 64.0, 0.05, 0.45, k=12.0)
+	sopro(b, 0.002, 0.055, 0.22, 0.38, 0.12, k=8.0)
+	cauda(b, 0.022, 2, 0.16)
 	return b
 
 
 def morte() -> list[float]:
-	"""Morte: o unico som do jogador com direito a cauda longa. Corpo a
-	afundar + sino grave invertido (o ar a ser sugado) + silencio."""
-	b = novo(1.30)
-	transiente(b, 0.0, 0.010, 0.50, 0.20)
-	corpo(b, 0.0, 300.0, 38.0, 0.70, 0.85, k=2.4, desafinar=1.016)
-	corpo(b, 0.02, 110.0, 30.0, 0.95, 0.50, k=1.8, desafinar=1.007)
-	sino(b, 0.04, 96.0, 1.00, 0.26, 0.34)
-	sopro(b, 0.0, 0.55, 0.18, 0.30, 0.03, k=2.0)
-	cauda(b, 0.075, 5, 0.38, abafar=0.30)
-	limitar(b)
-	return b
-
-
-def bloqueio() -> list[float]:
-	"""Escudo: metal contra metal, brilhante e CURTO, com um anel a seguir.
-	E' o unico som do jogador que pode ser agudo -- e' a recompensa de ter
-	defendido a tempo."""
-	b = novo(0.44)
-	transiente(b, 0.0, 0.004, 0.90, 0.88)
-	sino(b, 0.0, 880.0, 0.30, 0.34, 0.55)
-	sino(b, 0.002, 1320.0, 0.20, 0.18, 0.45)
-	corpo(b, 0.0, 320.0, 160.0, 0.07, 0.40, k=10.0)
-	cauda(b, 0.034, 4, 0.30, abafar=0.62)
-	limitar(b)
+	b = novo(1.10)
+	transiente(b, 0.0, 0.009, 0.60, 0.24)
+	corpo(b, 0.0, 320.0, 38.0, 0.55, 0.90, k=3.0, desafinar=1.016, grito=0.35)
+	corpo(b, 0.02, 112.0, 30.0, 0.80, 0.55, k=2.2, desafinar=1.007)
+	sino(b, 0.04, 98.0, 0.85, 0.28, 0.34)
+	sopro(b, 0.0, 0.45, 0.22, 0.32, 0.04, k=2.4)
+	cauda(b, 0.065, 5, 0.36, abafar=0.32)
 	return b
 
 
 # --------------------------------------------------------------- mundo e UI
 
 def apanhar() -> list[float]:
-	"""Essencia/coletavel: dois sinos em quinta ascendente, curtos e doces.
-	Sem 'moeda de arcade' -- o brilho vem do sino, nao de uma onda quadrada."""
-	b = novo(0.50)
-	sino(b, 0.0, 784.0, 0.26, 0.34, 0.42)
-	sino(b, 0.055, 1174.0, 0.30, 0.26, 0.38)
-	sopro(b, 0.0, 0.10, 0.08, 0.75, 0.95, k=5.0)
-	cauda(b, 0.040, 4, 0.30, abafar=0.60)
-	limitar(b)
+	b = novo(0.40)
+	sino(b, 0.0, 784.0, 0.22, 0.40, 0.42)
+	sino(b, 0.048, 1174.0, 0.26, 0.30, 0.38)
+	sopro(b, 0.0, 0.07, 0.12, 0.78, 0.95, k=6.0)
+	cauda(b, 0.034, 4, 0.28, abafar=0.60)
 	return b
 
 
 def selo() -> list[float]:
-	"""Checkpoint (a fogueira a acender): sino grave a abrir + fole de chama
-	+ cauda larga. Tem de soar a ALIVIO, e' a unica boa noticia do nivel."""
-	b = novo(1.10)
-	transiente(b, 0.0, 0.012, 0.40, 0.30)
-	sino(b, 0.0, 196.0, 0.85, 0.40, 0.40)
-	sino(b, 0.10, 294.0, 0.70, 0.26, 0.36)
-	sino(b, 0.20, 392.0, 0.60, 0.18, 0.34)
-	# a chama a pegar: ruido a abrir devagar
-	sopro(b, 0.03, 0.55, 0.20, 0.08, 0.40, k=1.6)
-	corpo(b, 0.0, 120.0, 84.0, 0.50, 0.30, k=2.6, desafinar=1.009)
-	cauda(b, 0.070, 5, 0.36, abafar=0.44)
-	limitar(b)
+	"""Checkpoint (a fogueira a pegar): alivio."""
+	b = novo(1.00)
+	transiente(b, 0.0, 0.010, 0.50, 0.32)
+	sino(b, 0.0, 196.0, 0.75, 0.45, 0.40)
+	sino(b, 0.09, 294.0, 0.62, 0.30, 0.36)
+	sino(b, 0.18, 392.0, 0.52, 0.20, 0.34)
+	sopro(b, 0.03, 0.48, 0.24, 0.09, 0.42, k=1.8)
+	corpo(b, 0.0, 122.0, 84.0, 0.42, 0.34, k=3.0, desafinar=1.009)
+	cauda(b, 0.060, 5, 0.34, abafar=0.46)
 	return b
 
 
 def transicao() -> list[float]:
-	"""Porta/portal: sopro a ABRIR longo (o vacuo a puxar) e um sino grave a
-	fechar por cima. Cinematografico, e' o corte entre dois sitios."""
-	b = novo(1.20)
-	sopro(b, 0.0, 0.60, 0.34, 0.06, 0.70, k=0.9)
-	corpo(b, 0.0, 60.0, 190.0, 0.55, 0.40, k=1.4, desafinar=1.012)
-	sino(b, 0.42, 262.0, 0.70, 0.30, 0.40)
-	transiente(b, 0.42, 0.012, 0.45, 0.40)
-	sopro(b, 0.45, 0.50, 0.20, 0.70, 0.05, k=2.2)
-	cauda(b, 0.080, 5, 0.38, abafar=0.40)
-	limitar(b)
+	b = novo(1.05)
+	sopro(b, 0.0, 0.52, 0.38, 0.07, 0.72, k=1.0)
+	corpo(b, 0.0, 62.0, 195.0, 0.48, 0.44, k=1.6, desafinar=1.012)
+	sino(b, 0.38, 262.0, 0.60, 0.34, 0.40)
+	transiente(b, 0.38, 0.010, 0.55, 0.42)
+	sopro(b, 0.40, 0.42, 0.22, 0.72, 0.06, k=2.4)
+	cauda(b, 0.070, 5, 0.36, abafar=0.42)
 	return b
 
 
 def ui_mover() -> list[float]:
-	"""Foco no menu: o mais discreto do teclado (0,40). Sopro + meio sino."""
-	b = novo(0.22)
-	sopro(b, 0.0, 0.07, 0.20, 0.55, 0.92, k=6.0)
-	sino(b, 0.0, 523.0, 0.16, 0.16, 0.28)
-	cauda(b, 0.026, 2, 0.22, abafar=0.60)
-	limitar(b)
+	"""Foco no menu. Discreto, mas a 1.a versao tinha -12 dB face ao legado --
+	era um sopro que ninguem ouvia."""
+	b = novo(0.16)
+	transiente(b, 0.0, 0.003, 0.45, 0.85)
+	sino(b, 0.0, 620.0, 0.11, 0.34, 0.30)
+	sopro(b, 0.0, 0.045, 0.26, 0.60, 0.94, k=7.0)
+	cauda(b, 0.020, 2, 0.20, abafar=0.62)
 	return b
 
 
 def ui_confirmar() -> list[float]:
-	"""Confirmar: quinta ASCENDENTE, com cauda -- le^-se como porta a abrir."""
-	b = novo(0.70)
-	sino(b, 0.0, 392.0, 0.38, 0.34, 0.40)
-	sino(b, 0.070, 588.0, 0.46, 0.30, 0.38)
-	sopro(b, 0.0, 0.14, 0.10, 0.50, 0.90, k=4.0)
-	cauda(b, 0.052, 4, 0.34, abafar=0.50)
-	limitar(b)
+	b = novo(0.56)
+	sino(b, 0.0, 392.0, 0.30, 0.42, 0.40)
+	sino(b, 0.060, 588.0, 0.36, 0.34, 0.38)
+	transiente(b, 0.0, 0.004, 0.35, 0.70)
+	sopro(b, 0.0, 0.10, 0.14, 0.55, 0.92, k=5.0)
+	cauda(b, 0.042, 4, 0.32, abafar=0.52)
 	return b
 
 
 def ui_voltar() -> list[float]:
-	"""Recuar: a mesma voz, DESCENDENTE e mais curta."""
-	b = novo(0.50)
-	sino(b, 0.0, 523.0, 0.30, 0.30, 0.36)
-	sino(b, 0.060, 349.0, 0.34, 0.26, 0.34)
-	sopro(b, 0.0, 0.10, 0.08, 0.80, 0.40, k=5.0)
-	cauda(b, 0.044, 3, 0.30, abafar=0.46)
-	limitar(b)
+	b = novo(0.40)
+	sino(b, 0.0, 523.0, 0.24, 0.36, 0.36)
+	sino(b, 0.050, 349.0, 0.28, 0.30, 0.34)
+	sopro(b, 0.0, 0.075, 0.12, 0.82, 0.42, k=6.0)
+	cauda(b, 0.036, 3, 0.28, abafar=0.48)
 	return b
 
 
 def ui_negado() -> list[float]:
-	"""Trancado: golpe abafado, SEM brilho nenhum. Todo o passa-baixo."""
-	b = novo(0.42)
-	transiente(b, 0.0, 0.008, 0.40, 0.12)
-	corpo(b, 0.0, 150.0, 74.0, 0.22, 0.70, k=6.0, desafinar=1.015)
-	sopro(b, 0.004, 0.12, 0.10, 0.14, 0.04, k=5.0)
-	cauda(b, 0.040, 3, 0.24, abafar=0.30)
-	limitar(b)
+	b = novo(0.36)
+	transiente(b, 0.0, 0.007, 0.50, 0.14)
+	corpo(b, 0.0, 155.0, 76.0, 0.18, 0.80, k=7.0, desafinar=1.015, grito=0.25)
+	sopro(b, 0.003, 0.09, 0.14, 0.16, 0.05, k=6.0)
+	cauda(b, 0.034, 3, 0.22, abafar=0.32)
 	return b
 
 
 def main() -> None:
-	escrever("salto.wav", salto(False), ALVO["salto"])
-	escrever("salto_duplo.wav", salto(True), ALVO["salto_duplo"])
-	escrever("aterrar.wav", aterrar(), ALVO["aterrar"])
-	escrever("dash.wav", dash(), ALVO["dash"])
-	escrever("rolamento.wav", rolamento(), ALVO["rolamento"])
+	print("%-22s %7s  %11s  %14s  %s" % (
+		"ficheiro", "duracao", "alvo dB", "medido dB", "pico"))
+	res = []
+	res.append(("salto.wav", escrever("salto.wav", salto(False), "salto")))
+	res.append(("salto_duplo.wav",
+		escrever("salto_duplo.wav", salto(True), "salto_duplo")))
+	res.append(("aterrar.wav", escrever("aterrar.wav", aterrar(), "aterrar")))
+	res.append(("dash.wav", escrever("dash.wav", dash(), "dash")))
+	res.append(("rolamento.wav",
+		escrever("rolamento.wav", rolamento(), "rolamento")))
 	for n in range(3):
-		escrever("passo%d.wav" % (n + 1), passo(n), ALVO["passo"])
-	escrever("ataque.wav", golpe(0), ALVO["ataque"])
-	escrever("ataque2.wav", golpe(1), ALVO["ataque2"])
-	escrever("ataque3.wav", golpe(2), ALVO["ataque3"])
-	escrever("ataque_forte.wav", golpe(3), ALVO["ataque_forte"])
-	escrever("acerto.wav", acerto(), ALVO["acerto"])
-	escrever("dano.wav", dano(), ALVO["dano"])
-	escrever("morte_koliani.wav", morte(), ALVO["morte_koliani"])
-	escrever("bloqueio.wav", bloqueio(), ALVO["bloqueio"])
-	escrever("apanhar.wav", apanhar(), ALVO["apanhar"])
-	escrever("selo.wav", selo(), ALVO["selo"])
-	escrever("transicao.wav", transicao(), ALVO["transicao"])
-	escrever("ui_mover.wav", ui_mover(), ALVO["ui_mover"])
-	escrever("ui_confirmar.wav", ui_confirmar(), ALVO["ui_confirmar"])
-	escrever("ui_voltar.wav", ui_voltar(), ALVO["ui_voltar"])
-	escrever("ui_negado.wav", ui_negado(), ALVO["ui_negado"])
+		res.append(("passo%d.wav" % (n + 1),
+			escrever("passo%d.wav" % (n + 1), passo(n), "passo")))
+	for i, nome in enumerate(
+			["ataque.wav", "ataque2.wav", "ataque3.wav", "ataque_forte.wav"]):
+		chave = nome[:-4]
+		res.append((nome, escrever(nome, golpe(i), chave)))
+	res.append(("acerto.wav", escrever("acerto.wav", acerto(), "acerto")))
+	res.append(("dano.wav", escrever("dano.wav", dano(), "dano")))
+	res.append(("morte_koliani.wav",
+		escrever("morte_koliani.wav", morte(), "morte_koliani")))
+	res.append(("bloqueio.wav", escrever("bloqueio.wav", bloqueio(), "bloqueio")))
+	res.append(("apanhar.wav", escrever("apanhar.wav", apanhar(), "apanhar")))
+	res.append(("selo.wav", escrever("selo.wav", selo(), "selo")))
+	res.append(("transicao.wav",
+		escrever("transicao.wav", transicao(), "transicao")))
+	res.append(("ui_mover.wav", escrever("ui_mover.wav", ui_mover(), "ui_mover")))
+	res.append(("ui_confirmar.wav",
+		escrever("ui_confirmar.wav", ui_confirmar(), "ui_confirmar")))
+	res.append(("ui_voltar.wav",
+		escrever("ui_voltar.wav", ui_voltar(), "ui_voltar")))
+	res.append(("ui_negado.wav",
+		escrever("ui_negado.wav", ui_negado(), "ui_negado")))
+	mau = [n for n, (m, _p) in res if abs(m - ALVO_DB[n[:-4].rstrip("123")
+		if n.startswith("passo") else n[:-4]]) > 1.0]
+	print()
+	print("fora do alvo por mais de 1 dB: %s" % (mau or "nenhum"))
 
 
 if __name__ == "__main__":

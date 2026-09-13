@@ -165,3 +165,24 @@ o cabecalho do gerador explica porque e' que uma camada so' soa a
 sintetizador. Os picos sao hierarquizados no dicionario `ALVO`, entre 0,40
 (`ui_mover`) e 0,92 (`ataque_forte`), portanto nenhum som chega a 1,0 e a
 soma das 8 vozes do pool nao clipa.
+
+## Execution 9H.13B -- redesenho depois do teste humano (13 set 2026)
+
+O Game Master ouviu a build 0.18.6 e disse que os SFX pareciam iguais aos
+anteriores. Estavam LIGADOS (os 13 eventos apontavam mesmo para os ficheiros
+novos), mas o desenho estava errado e mediu-se porque:
+
+- **normalizei por PICO em vez de SONORIDADE.** Os sons eram todo transiente
+  e pouco corpo (crista 14-18 dB contra 8-12 dB do legado), por isso com o
+  mesmo pico tinham muito menos energia. O `acerto` -- o som mais repetido do
+  combate -- ficou **7,5 dB MAIS FRACO** do que o legado que substituia; os
+  passos -6,2 dB; o `ui_mover` -12 dB;
+- **os golpes eram mais longos do que o passo do combo** (0,64-0,94 s contra
+  0,18-0,30 s), portanto sobrepunham-se 64-73% e a progressao 1->4 lia-se
+  como uma papa em vez de quatro golpes.
+
+Esta versao normaliza para sonoridade (`ALVO_DB`, RMS da janela de 100 ms
+mais forte), encurta os golpes e faz a progressao 1->4 por TIMBRE (o registo
+desce 2655 -> 1788 -> 838 Hz e entra distorcao suave), nao so' por volume.
+Resultado medido, legado -> v1 -> v2: `acerto` -10,4 -> -17,9 -> **-9,5**;
+passos -16,3 -> -22,5 -> **-17,1**; `bloqueio` -11,4 -> -12,7 -> **-9,6**.
