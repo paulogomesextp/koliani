@@ -116,6 +116,21 @@ func _montar() -> void:
 		b.mouse_entered.connect(b.grab_focus)
 		b.focus_entered.connect(func() -> void:
 			_mover_realce(b)
+			# 9H.17 CONTINUATION -- DESARMAR AO SAIR DO BOTAO.
+			#
+			# O NOVO JOGO ja pedia confirmacao em dois passos, com aviso e com o
+			# foco preso ao botao. O que faltava era o fim do estado armado:
+			# `_armado` so era limpo DENTRO das accoes, nunca ao navegar. Ou
+			# seja, bastava armar o NOVO JOGO, percorrer o menu e voltar la para
+			# a campanha ser apagada a` primeira tecla -- sem segundo aviso, e
+			# com o aviso laranja ainda no ecra colado a outro item. Foi assim
+			# que esta sessao apagou o save do Paulo durante o QA.
+			#
+			# Sair do botao e' arrependimento: desarma. Vale para o teclado e
+			# para o rato (o `mouse_entered` acima tambem da foco), que e' a
+			# proteccao contra o clique acidental que faltava.
+			if _armado != "" and _botoes.get(_armado) != b:
+				_repor_botoes()
 			if _pronto_para_som:
 				Som.toca("ui_mover", -13.0, randf_range(0.97, 1.04)))
 		b.pressed.connect(func() -> void: Som.toca("ui_confirmar", -8.0))

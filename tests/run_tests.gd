@@ -49,6 +49,7 @@ func _correr_tudo() -> void:
 	teste_9f_ui_producao()
 	teste_catalogo_campanha()
 	teste_9h17_contrato_de_mobilidade_regiao1()
+	await teste_9h17_novo_jogo_desarma_ao_sair()
 	teste_equipamento_dados()
 	teste_equipamento_estado()
 	teste_estado_tres_mortes_sem_vidas()
@@ -3281,6 +3282,59 @@ func _contar_pecas(camada: Node, parte: String) -> int:
 		if sp is Sprite2D and sp.texture != null 				and sp.texture.resource_path.get_file().contains(parte):
 			n += 1
 	return n
+
+
+## 9H.17 CONTINUATION -- O NOVO JOGO NAO PODE APAGAR A CAMPANHA SOZINHO.
+##
+## A confirmacao em dois passos ja existia. O que nao existia era o FIM do
+## estado armado: `_armado` so era limpo dentro das accoes, nunca ao navegar.
+## Armava-se o NOVO JOGO, passeava-se pelo menu, e a campanha morria a`
+## primeira tecla de volta -- sem segundo aviso. Foi assim que o QA desta
+## sessao apagou o save do Game Master (reposto por hash a seguir).
+##
+## O que este teste guarda nao e a implementacao, e a GARANTIA: depois de
+## sair do botao, uma unica confirmacao nunca chega para destruir nada.
+func teste_9h17_novo_jogo_desarma_ao_sair() -> void:
+	var menu = load("res://scenes/ui/MenuInicial.tscn").instantiate()
+	get_tree().root.add_child(menu)
+	await get_tree().process_frame
+	# fingir que HA campanha guardada, sem tocar no ficheiro de save
+	var indice_real: int = EstadoJogo.indice_nivel
+	EstadoJogo.indice_nivel = 3
+	_ok(EstadoJogo.ha_progresso(), "9H.17: o cenario do teste nao tem progresso")
+
+	var botoes: Dictionary = menu.get("_botoes")
+	var novo: Button = botoes["novo"]
+	var opcoes: Button = botoes["opcoes"]
+
+	# 1.o toque: arma, avisa, e NAO reinicia
+	novo.grab_focus()
+	await get_tree().process_frame
+	novo.pressed.emit()
+	await get_tree().process_frame
+	_ok(str(menu.get("_armado")) == "novo",
+		"9H.17: o NOVO JOGO nao pediu confirmacao com campanha guardada")
+	_ok(EstadoJogo.indice_nivel == 3,
+		"9H.17: o 1.o toque no NOVO JOGO ja apagou a campanha")
+
+	# sair do botao TEM de desarmar -- e o arrependimento do jogador
+	opcoes.grab_focus()
+	await get_tree().process_frame
+	_ok(str(menu.get("_armado")) == "",
+		"9H.17: o NOVO JOGO fica armado depois de a seleccao sair do botao")
+
+	# de volta: tem de voltar a pedir confirmacao, nao destruir
+	novo.grab_focus()
+	await get_tree().process_frame
+	novo.pressed.emit()
+	await get_tree().process_frame
+	_ok(EstadoJogo.indice_nivel == 3,
+		"9H.17: voltar ao NOVO JOGO apagou a campanha sem novo aviso")
+	_ok(str(menu.get("_armado")) == "novo",
+		"9H.17: o regresso ao NOVO JOGO nao voltou a armar")
+
+	EstadoJogo.indice_nivel = indice_real
+	menu.queue_free()
 
 
 ## 9H.17 C -- CONTRATO DE MOBILIDADE DA REGIAO I. Duas coisas que se partem
