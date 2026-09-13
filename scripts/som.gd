@@ -30,6 +30,11 @@ const CAMINHOS := {
 	"investida": "res://assets/audio/investida.wav",
 	"onda": "res://assets/audio/onda.ogg",
 	"bloqueio": "res://assets/audio/bloqueio.wav",
+	# 9H.16 E4 -- as mecanicas-assinatura da Regiao I estavam MUDAS
+	# (`tools/gerar_sfx_9h16.py`).
+	"raiz_irrompe": "res://assets/audio/raiz_irrompe.wav",
+	"raiz_aviso": "res://assets/audio/raiz_aviso.wav",
+	"plataforma_surge": "res://assets/audio/plataforma_surge.wav",
 	"demonio_ataque": "res://assets/audio/demonio_ataque.ogg",
 	"conquista": "res://assets/audio/conquista.wav",
 	"transicao": "res://assets/audio/transicao.wav",

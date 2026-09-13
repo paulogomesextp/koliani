@@ -135,6 +135,7 @@ static func montar(alvo: Node2D) -> void:
 ## Densidade contida: no máximo dois em cima e um pendurado por plataforma.
 static func decorar(vis: Node, largura: float, y0: float, alt: float,
 		rng: RandomNumberGenerator) -> void:
+	rematar_bordas(vis, largura, y0, alt, rng)
 	if largura < 130.0:
 		return
 	var chao := ["cristais", "raizes"]
@@ -180,6 +181,70 @@ static func decorar(vis: Node, largura: float, y0: float, alt: float,
 			p.texture.get_width() * esc * 0.5, p.texture.get_height() * esc * 0.72)
 		vis.add_child(luz)
 
+
+## REMATE DAS PONTAS (9H.16 E1). O bloco e' um MOSAICO de `corpo`/`lado`/
+## `base`/`topo`: mosaico de um retangulo da' um retangulo, e por isso as
+## plataformas liam-se como LAJES -- duas arestas verticais a direito e uma
+## barriga plana. O Game Master reportou exactamente isso.
+##
+## Nao se inventa silhueta com poligonos nem gradientes (regra E2): usa-se a
+## arte JA' PRODUZIDA e por usar do mesmo passe -- `terrain_hd/raizes.png`
+## (coluna de rocha com capa de musgo e bordo esfarrapado) nas pontas e
+## `terrain_hd/rocha.png` (massa pendente a escorrer) na barriga.
+##
+## Regras: so' VISUAL (nao toca na colisao), sempre ABAIXO da linha de
+## pouso -- a aresta onde se aterra tem de continuar a ler-se -- e com a
+## ponta virada para fora. Fica atras do miolo (`z_index = -1`) para o
+## mosaico continuar a mandar na leitura do corpo.
+static func rematar_bordas(vis: Node, largura: float, y0: float, alt: float,
+		rng: RandomNumberGenerator) -> void:
+	# Tambem nas finas: uma borda de 18 px e' onde a laje mais se nota.
+	if largura < 70.0 or alt < 14.0:
+		return
+	var tex_ponta := tex("terrain_hd/raizes")
+	if tex_ponta == null:
+		return
+	# a peca e' mais alta do que larga; escala-se pela ALTURA do bloco, com
+	# um pouco de folga para transbordar por baixo (e' o que quebra a barriga)
+	var esc: float = clampf((alt * 1.35) / float(tex_ponta.get_height()), 0.08, 0.7)
+	var lp := float(tex_ponta.get_width()) * esc
+	for lado_i: float in [-1.0, 1.0]:
+		var s := Sprite2D.new()
+		s.texture = tex_ponta
+		s.centered = false
+		s.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+		s.scale = Vector2(esc, esc)
+		s.flip_h = lado_i < 0.0
+		s.z_index = -1
+		# encosta a ponta ao topo do corpo, mordendo 18% para dentro
+		var x := largura * 0.5 * lado_i
+		if lado_i < 0.0:
+			x -= lp * 0.82
+		else:
+			x -= lp * 0.18
+		s.position = Vector2(x, y0 - 2.0)
+		s.modulate = Color(1, 1, 1, 0.96)
+		vis.add_child(s)
+
+	# barriga: uma massa a pender, so' em blocos com corpo que se veja
+	if alt < 40.0 or largura < 200.0:
+		return
+	var tex_barriga := tex("terrain_hd/rocha")
+	if tex_barriga == null:
+		return
+	var eb: float = clampf((alt * 0.9) / float(tex_barriga.get_height()), 0.06, 0.6)
+	var b := Sprite2D.new()
+	b.texture = tex_barriga
+	b.centered = false
+	b.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+	b.scale = Vector2(eb, eb)
+	b.flip_h = rng.randf() < 0.5
+	b.z_index = -1
+	b.position = Vector2(
+		rng.randf_range(-0.22, 0.22) * largura - float(tex_barriga.get_width()) * eb * 0.5,
+		y0 + alt * 0.45)
+	b.modulate = Color(1, 1, 1, 0.9)
+	vis.add_child(b)
 
 static var _halo_cache: GradientTexture2D = null
 
