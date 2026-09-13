@@ -1,3 +1,8 @@
+## Regra permanente — Windows e PWA sincronizados (14 set 2026)
+
+- Pedido do GM: todas as entregas atualizam Windows e PWA juntos, mesmo commit e versão. Regra acrescentada a AGENTS.md; o CI existente exporta ambos em cada push master.
+- Entrega pública atual: v0.18.16, commit 230f122d; testes, export Windows, export Web e Pages confirmados success no run 34787609185.
+- Próximo lote: exportar, validar e entregar ambas as plataformas; não publicar o áudio 9H.20 incompleto. Validação mobile requer DEVICE VALIDATION REQUIRED.
 ## PWA — Dev Mode com PIN 0980 (13 set 2026)
 
 - Publicação v0.18.16 em cópia isolada `codex/pwa-dev-pin-0980`, base estável `6251bf5b`. Apenas o acesso Dev concluído e traduções foram adicionados; áudio 9H.20 não publicado.
