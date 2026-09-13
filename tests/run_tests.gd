@@ -1498,11 +1498,25 @@ func teste_execution_8_integracao_player_facing() -> void:
 	var dev := FileAccess.get_file_as_string("res://scripts/dev_barra.gd")
 	# 9H: o menu foi refeito sobre a prancha aprovada e monta-se em código --
 	# a defesa é a mesma, o nome da variável é que deixou de existir.
-	_ok(menu.contains("_dev.visible = OS.is_debug_build()")
-		and menu.contains("--devmode\" and OS.is_debug_build()"),
+	# 9H.17 D: a defesa continua a ser a mesma -- em release as entradas de
+	# developer mode estão fechadas -- mas deixou de ser escrita três vezes.
+	# Havia três `OS.is_debug_build()` independentes (menu, barra Dev, atalhos
+	# F1-F9) e isso teve duas consequências: o Game Master não encontrava o
+	# modo Dev numa build de QA exportada em release, e quem o forçasse por
+	# `--devmode` entrava SEM barra, ou seja sem FlyMode nem troca de nível.
+	# Agora há um portão só, `EstadoJogo.entrada_dev_disponivel()`, e o que o
+	# abre em release é um interruptor explícito que o export público desliga.
+	var estado_src := FileAccess.get_file_as_string("res://scripts/estado_jogo.gd")
+	_ok(estado_src.contains("static func entrada_dev_disponivel() -> bool:")
+		and estado_src.contains("ProjectSettings.get_setting(\"koliani/qa/entrada_dev\", false)")
+		and estado_src.contains("if OS.is_debug_build():"),
+		"Execution 8: o portão do developer mode deixou de fechar por omissão em release")
+	_ok(menu.contains("_dev.visible = EstadoJogo.entrada_dev_disponivel()")
+		and menu.contains("--devmode\" and EstadoJogo.entrada_dev_disponivel()"),
 		"Execution 8: menu release não fecha as entradas de developer mode")
-	_ok(main.contains("EstadoJogo.modo_dev and OS.is_debug_build()")
-		and dev.contains("not OS.is_debug_build() or not EstadoJogo.modo_dev"),
+	_ok(main.contains("EstadoJogo.modo_dev and EstadoJogo.entrada_dev_disponivel()")
+		and main.contains("if not EstadoJogo.entrada_dev_disponivel():")
+		and dev.contains("not EstadoJogo.entrada_dev_disponivel() or not EstadoJogo.modo_dev"),
 		"Execution 8: DevBarra não tem defesa release em profundidade")
 
 
