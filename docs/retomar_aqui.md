@@ -78,6 +78,39 @@
   L2 em jogo, Escape na pausa com maos, e o passe Dev (FlyMode, 1/20/50/100,
   isolamento do save).
 
+### QA jogado (9H.17) -- NAO SE FEZ, e porque
+
+O agente independente de QA foi lancado duas vezes. O 1.o morreu no limite de
+sessao. O 2.o correu ate' ao fim mas **nao conseguiu enviar input**: todas as
+chamadas de tecla foram rejeitadas com "user interrupt" (o teclado real do
+Paulo estava em uso concorrente), e o `type` executa sem erro mas nao move
+nada -- um platformer precisa de estado de tecla PREMIDA, nao de um evento de
+texto. Chegou ao menu, NOVO JOGO e ao seletor com o rato, e carregou o 1-1,
+com a personagem parada.
+
+**POR PROVAR A JOGAR, e e' o primeiro item da proxima sessao:**
+travessia 1-1 -> 1-2 -> 1-3 com salto SIMPLES, Escape na pausa com maos,
+combate, e o passe Dev (FlyMode, 1/20/50/100, isolamento do save). Precisa da
+maquina livre ou de maos humanas.
+
+**O QUE ELE APANHOU MESMO (verificado por mim depois):** os niveis 1-3, 1-4 e
+1-5 continuam na apresentacao ANTERIOR a esta execucao -- plataformas
+rectangulares com a faixa de musgo, emendas rectangulares no fundo, parede de
+tijolo. O passe Hybrid so' serve os perfis 1 e 2 (`L1Hybrid.serve`), e por
+isso a correcao das fases G/H/I3 cobriu o L1 e o L2 e deixou os outros tres
+para tras -- o corte visual dentro da Regiao I nao desapareceu, MUDOU DE
+SITIO. Medido: L3 vs L4 = 66% de pixeis praticamente iguais, L4 vs L5 e
+L3 vs L5 = 35% (o agente disse "quase identicos pixel a pixel", o que e'
+exagerado: e' o mesmo MOLDE e o mesmo ESTILO, nao a mesma sala).
+**NAO SE ESTENDEU DE PROPOSITO** -- o briefing congelou "L2-L5 REMASTER
+STARTED: NO" e isto muda o aspecto de tres niveis. E' decisao do Game Master,
+e e' barata: uma linha em `L1Hybrid.serve()`.
+
+Outros dois achados dele, ambos PRE-EXISTENTES a esta execucao:
+`WARNING: 76 ObjectDB instances were leaked at exit` em todas as corridas, e o
+processo que fica vivo uns segundos depois de a janela fechar.
+
+
 ## 9H.16 — fases B a F executadas (13 set 2026)
 
 - PHASE CURRENT: **B CLOSED, C/D/E entregues e provadas, F PARCIAL.**

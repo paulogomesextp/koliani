@@ -12,10 +12,16 @@
 3. **NATIVE ART REQUIRED -- faixa de superficie do chao/pantano.** O leito ja'
    esta' feito com arte aprovada; a faixa palida na base do ecra permanece e a
    origem dela nao se identificou nesta execucao.
-4. **Export publico:** desligar `koliani/qa/entrada_dev` no `project.godot`
+4. **Estender o passe Hybrid aos niveis 1-3/1-4/1-5?** Eles ficaram na
+   apresentacao antiga (plataformas rectangulares, emendas no fundo) porque o
+   `L1Hybrid.serve()` so' cobre os perfis 1 e 2. O corte visual dentro da
+   Regiao I nao desapareceu, mudou de sitio. Nao se estendeu porque o briefing
+   da 9H.17 congelou "L2-L5 REMASTER STARTED: NO" -- e' uma linha, e e'
+   decisao tua.
+5. **Export publico:** desligar `koliani/qa/entrada_dev` no `project.godot`
    antes de uma apresentacao final -- e' o que fecha a entrada "DEVELOPER
    MODE" do menu.
-5. **As 2 falhas de teste que restam** (Execution 9C: o L1 usar o kit 9C e as
+6. **As 2 falhas de teste que restam** (Execution 9C: o L1 usar o kit 9C e as
    camadas da 08) sao decisao do nivel Golden: o passe Hybrid superou as duas.
    Decidir se os testes se actualizam ou se o L1 volta atras.
 
