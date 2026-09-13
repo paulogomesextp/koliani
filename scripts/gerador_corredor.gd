@@ -112,7 +112,11 @@ const LIQUIDO := {
 	# Floresta CORROMPIDA: o que está na água é corrupção, e a corrupção da
 	# região é violeta/magenta em todo o lado (VFX, cristais, Árvore). Só cor --
 	# a geometria, a colisão e o dano não mudam.
-	0: [Color(0.26, 0.16, 0.42, 0.94), false],   # seiva corrompida
+	# 9H.17 I2 -- alfa 0,94 -> 0,72. Por baixo deste poligono passou a estar
+	# ARTE (`_leito_pintado`, a poca de corrupcao pintada do kit), e um
+	# poligono quase opaco em cima dela devolvia exactamente a tira palida e
+	# chapada que o review reclamou. Nao se pintou nada: destapou-se.
+	0: [Color(0.26, 0.16, 0.42, 0.72), false],   # seiva corrompida
 	1: [Color(0.26, 0.42, 0.14, 0.93), false],   # ácido
 	2: [Color(0.06, 0.05, 0.12, 0.96), false],   # trevas / vazio
 	3: [Color(0.05, 0.03, 0.09, 0.97), false],   # trevas do abismo
@@ -923,6 +927,8 @@ func _construir() -> void:
 	agua.brasas = liq[1]
 	agua.position = Vector2((x0 + ancora.x) * 0.5, _chao_y + 230.0)
 	add_child(agua)
+	if _regiao == 0:
+		_leito_pintado(x0, ancora.x)
 
 	# parede de fundo (não se sai pela esquerda). É o "fim do mundo": tem de
 	# ler como maciço de rocha, não como uma parede a partir/trepar com
@@ -5056,3 +5062,53 @@ func _recolher_plats(no: Node, out: Array) -> void:
 			})
 	for f in no.get_children():
 		_recolher_plats(f, out)
+
+
+## LEITO PINTADO DA REGIAO I (9H.17 I2).
+##
+## O review dizia que a transicao chao/pantano "le'-se demasiado plana e
+## palida e separa o plano de jogo do ambiente". A hipotese do veu foi
+## testada na 9H.16 e revertida -- nao se repete aqui.
+##
+## A peca que faltava estava produzida e nunca fora usada:
+## `terrain_hd/corrupcao.png` (199x290) -- uma poca de corrupcao PINTADA,
+## com linha de agua luminosa, nevoa a subir, raizes e folhagem escura e o
+## fundo a reflectir. Medida, a linha de agua esta' a 29,3% da altura da
+## peca; e' por ai que ela se alinha com a superficie do liquido.
+##
+## Nao e' um degrade nem um poligono: e' arte de producao aprovada, posta
+## ATRAS do liquido, a dar-lhe leito. Para nao se ver a repeticao numa
+## extensao de milhares de px, as instancias alternam o espelho e variam de
+## escala e de alfa.
+const LEITO_LINHA_AGUA := 0.293
+
+func _leito_pintado(x0: float, x1: float) -> void:
+	var t: Texture2D = load("res://assets/art/regions/region_01_forest/production/l1_hybrid_9h12e/terrain_hd/corrupcao.png")
+	if t == null:
+		return
+	var leito := Node2D.new()
+	leito.name = "LeitoPintado"
+	leito.z_index = -6          # atras do liquido, a` frente do parallax
+	add_child(leito)
+	# a superficie do liquido: o poligono e' desenhado de `-altura * 0.5`,
+	# e a agua esta' em `_chao_y + 230` com 460 de altura -> a linha de agua
+	# cai exactamente em `_chao_y`.
+	var y_agua := _chao_y
+	var x := x0 - 200.0
+	var i := 0
+	while x < x1 + 400.0:
+		var esc: float = 1.55 + float(i % 3) * 0.22
+		var s := Sprite2D.new()
+		s.texture = t
+		s.centered = false
+		s.scale = Vector2(esc, esc)
+		s.flip_h = i % 2 == 1
+		s.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+		# a linha de agua da peca assenta na superficie do liquido
+		s.position = Vector2(x, y_agua - float(t.get_height()) * esc * LEITO_LINHA_AGUA)
+		s.modulate = Color(0.72, 0.68, 0.82, 0.86 - 0.06 * float(i % 3))
+		leito.add_child(s)
+		# sobrepoem-se ~28%: com 12% via-se a aresta direita da peca como uma
+		# linha vertical no meio do pantano
+		x += float(t.get_width()) * esc * 0.72
+		i += 1
