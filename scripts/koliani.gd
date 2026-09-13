@@ -864,10 +864,23 @@ func _montar_golden_set(sf: SpriteFrames) -> void:
 	# NB: saem do `run` que ficou montado acima (nativo, se existir).
 	_animacao_golden(sf, "turn", _frames_de(sf, "run", [0, 1, 2, 3]), 12.0, false)
 	_animacao_golden(sf, "run_start", _frames_de(sf, "run", [0, 1, 2, 3, 4, 5]), 12.0, false)
-	_animacao_golden(sf, "run_brake", _frames_de(sf, "run", [7, 8, 9]) + _frames_de(sf, "idle", [0]), 14.0, false)
-	var aterrar: Array = _frames_de(sf, "fall", [2]) + _frames_de(sf, "idle", [0])
+	# 9H.18: o travao e a aterragem DAVAM UM POP. Medido em largura de
+	# silhueta: o `run_brake` ia do frame mais aberto do ciclo (57 px) para o
+	# `idle` (37 px) num unico frame de 71 ms -- 20 px de silhueta a
+	# desaparecer de repente, que se le' como um salto, nao como uma
+	# derrapagem. O `land` fazia o mesmo de 49 para 37.
+	#
+	# Nao ha' frames novos aqui -- ha' os MESMOS frames escolhidos por
+	# largura, a fechar por degraus. O travao passa a 57-51-48-46-43-37
+	# (degrau maximo 6 px) e a aterragem a 49-44-38-37 (maximo 6), que
+	# tambem e' o gesto certo: bate, encolhe, levanta.
+	_animacao_golden(sf, "run_brake",
+		_frames_de(sf, "run", [9, 8, 2, 0]) + _frames_de(sf, "idle", [3, 0]),
+		20.0, false)
+	var aterrar: Array = _frames_de(sf, "fall", [2, 0])
+	aterrar += _frames_de(sf, "crouch", [0]) + _frames_de(sf, "idle", [0])
 	for nome in ["land", "aterrar"]:
-		_animacao_golden(sf, nome, aterrar, 12.0, false)
+		_animacao_golden(sf, nome, aterrar, 16.0, false)
 	# `jump` só é pedido pelo caminho de locomoção antigo; fica golden na mesma.
 	_animacao_golden(sf, "jump", _frames_de(sf, "jump_start", [1, 2, 3]), 12.0, false)
 	_montar_vfx_golpe()

@@ -58,6 +58,21 @@
 - **PHASE C: teclado de sons no modo Dev, tecla S** (`scripts/dev_sons.gd`).
   ~40 eventos a um toque, com os volumes e tons REAIS de cada sitio. Quem
   fez os sons nao os ouve -- **HUMAN LISTEN REQUIRED**.
+- **QA INDEPENDENTE (Phase E) confirmou, e mediu mais duas coisas**: o pe' de
+  tras **toca o chao em 8 dos 10 frames** (nunca faz fase aerea), e nos
+  frames 3 e 10 os DOIS pes estao plantados em split largo ao mesmo tempo --
+  pose que nao existe numa corrida. Notas: corrida **3/10**, transicoes
+  **3/10**, audio NOT ASSESSABLE. "Nao esta' bom para build comercial."
+- **O POP DO TRAVAO E DA ATERRAGEM FOI CORRIGIDO** (o QA apanhou-o): medido
+  em largura de silhueta, o `run_brake` ia do frame mais aberto do ciclo
+  (57 px) para o `idle` (37) num unico frame de 71 ms, e o `land` de 49 para
+  37. Sem frames novos -- os MESMOS frames escolhidos por largura, a fechar
+  por degraus: travao 57-51-48-46-43-37 e aterragem 49-44-38-37, degrau
+  maximo **6 px** em vez de 20. A aterragem passou tambem a ler-se como
+  bate-encolhe-levanta (entra o `crouch`).
+- O `turn` continua indistinguivel de continuar a correr (sao os frames
+  0-3 do `run`) e o `run_start` nao tem antecipacao. Isso precisa de arte,
+  como o ciclo.
 - POR FAZER:
   * **desenhar a corrida** (spec pronta, cano pronto);
   * sons ainda por refazer: `porta` (1000 ms, pico aos 236 ms),
