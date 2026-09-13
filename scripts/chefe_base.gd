@@ -661,7 +661,8 @@ func _ao_tocar(corpo: Node) -> void:
 		corpo.receber_dano(dano, signf(corpo.global_position.x - global_position.x))
 
 
-func receber_dano(quantidade: int, dir_empurrao: float = 0.0, critico := false) -> void:
+func receber_dano(quantidade: int, dir_empurrao: float = 0.0, critico := false,
+		_forca_recuo := 0.0) -> void:
 	if _ja_derrotado:
 		return
 	_garantir_vida_maxima()

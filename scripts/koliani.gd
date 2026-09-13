@@ -141,6 +141,30 @@ const TREMOR_DANO := 5.0
 ## a Koliani para fora das plataformas a meio de um combo.
 const AVANCO_VEL := [330.0, 370.0, 390.0, 470.0]
 const AVANCO_DUR := [0.13, 0.13, 0.16, 0.19]
+
+## 9H.16 D -- O QUE CADA GOLPE FAZ.
+##
+## Até aqui os quatro golpes davam o MESMO dano (`_dano_golpe()` não olhava
+## para `_combo_passo`) e o único empurrão era um salto de 8 px. O 4.º
+## golpe é o que mais compromete -- 0,26 s, janela activa só a 34% da
+## animação -- e não pagava nada por isso. Carregar quatro vezes no mesmo
+## botão valia tanto como carregar uma; daí "o combate é básico".
+##
+## Agora a cadeia tem uma curva:
+##   1 ABERTURA    -- rápido e barato; pouco dano, quase sem empurrão
+##   2 CONTINUIDADE-- dano de referência, empurrão curto, avança
+##   3 COMPROMISSO -- mais lento e mais forte; ATORDOA, abrindo a janela
+##                    de castigo (é aqui que se decide encadear ou sair)
+##   4 REMATE      -- dano a dobrar, empurrão que ATIRA o inimigo, sangra
+##
+## O dano dos outros golpes (tiro, pisão) continua a sair de `_dano_golpe()`
+## sem multiplicador -- só a espada tem cadeia.
+const DANO_COMBO := [0.85, 1.0, 1.25, 1.9]
+## Empurrão por golpe, em px/s (ver `DemonioBase.receber_dano`).
+const RECUO_COMBO := [90.0, 150.0, 230.0, 470.0]
+## O 3.º golpe atordoa: é o que transforma o combo numa DECISÃO (arriscar o
+## golpe lento para ganhar a janela) em vez de um martelar de botão.
+const ATORDOA_COMBO := 0.38
 const AVANCO_NO_AR := 0.5
 const I_FRAMES := 0.6
 ## Ressalto ao cair em cima de um inimigo (Mario-style): pulo AUTOMÁTICO --
@@ -2171,18 +2195,27 @@ func _ao_acertar_corpo(corpo: Node) -> void:
 		elif corpo is Node2D and corpo.get("_direcao") != null \
 				and signf(global_position.x - (corpo as Node2D).global_position.x) == -float(corpo._direcao):
 			crit = true
-		corpo.receber_dano(_dano_golpe(), sign(_olha_para), crit)
-		# remate do combo (3.º golpe) -> deixa o inimigo a SANGRAR
-		if _combo_passo >= NUM_COMBO - 1 and corpo.has_method("sangrar"):
-			corpo.sangrar(2.6, maxi(3, roundi(_dano_golpe() * 0.16)))
+		var passo := clampi(_combo_passo, 0, NUM_COMBO - 1)
+		var dano := maxi(1, roundi(_dano_golpe() * float(DANO_COMBO[passo])))
+		corpo.receber_dano(dano, sign(_olha_para), crit, float(RECUO_COMBO[passo]))
+		# 3.º golpe: ATORDOA -- é o pagamento por arriscar o golpe lento.
+		if passo == NUM_COMBO - 2 and corpo.has_method("atordoar"):
+			corpo.atordoar(ATORDOA_COMBO)
+		# remate do combo (4.º golpe) -> deixa o inimigo a SANGRAR
+		if passo >= NUM_COMBO - 1 and corpo.has_method("sangrar"):
+			corpo.sangrar(2.6, maxi(3, roundi(dano * 0.16)))
 		if _faiscas:
 			_faiscas.position.x = absf(_faiscas.position.x) * _olha_para
 			_faiscas.restart()
-		var remate := _combo_passo >= NUM_COMBO - 1
+		var remate := passo >= NUM_COMBO - 1
+		# Os dois golpes do fim da cadeia (o que atordoa e o remate) pesam
+		# mais. Continuam dentro da regra de 8.1C: <=2 frames a 165 Hz no
+		# que acontece a toda a hora, <=4 no que é raro.
+		var pesado := passo >= NUM_COMBO - 2
 		_pop_impacto((corpo as Node2D).global_position if corpo is Node2D else global_position,
 			crit or remate)
-		_abanar(TREMOR_CRIT if crit else (TREMOR_REMATE if remate else TREMOR_GOLPE))
-		_hitstop(HITSTOP_CRIT if crit else (HITSTOP_REMATE if remate else HITSTOP_GOLPE))
+		_abanar(TREMOR_CRIT if crit else (TREMOR_REMATE if pesado else TREMOR_GOLPE))
+		_hitstop(HITSTOP_CRIT if crit else (HITSTOP_REMATE if pesado else HITSTOP_GOLPE))
 		# 9H.1: acertar num inimigo levanta a camada de intensidade da música
 		# (só na Região I, e só fora do combate de chefe -- ver `Musica`).
 		Musica.intensificar()

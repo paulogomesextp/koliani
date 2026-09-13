@@ -139,6 +139,18 @@ var anticipacao := 0.0
 ## decai a zero). Não afeta a física -- só o "juice".
 var _flinch := 0.0
 var _flinch_dir := 1.0
+## RECUO a sério (9H.16 D). Até aqui levar um golpe era
+## `global_position.x += dir * 8` -- um TELETRANSPORTE de 8 px, instantâneo
+## e sem física: o bicho não recuava, piscava para o lado. Sem reação
+## visível, qualquer combo se lê como bater num saco. Agora o golpe deixa
+## uma velocidade que decai por atrito, e enquanto ela durar a IA não manda
+## no movimento.
+var _recuo_vel := 0.0
+var _recuo_t := 0.0
+## Atrito do recuo (px/s por segundo). Alto = trava depressa.
+const RECUO_ATRITO := 1250.0
+## Quanto este inimigo resiste ao empurrão. 1 = normal; >1 = pesado.
+@export var resistencia_recuo := 1.0
 ## Segundos que ainda está congelado (Torre dos Sinos: a badalada gela os
 ## inimigos comuns). Enquanto > 0 não patrulha nem persegue.
 var _congelado := 0.0
@@ -681,6 +693,18 @@ func _physics_process(dt: float) -> void:
 	_tick_status(dt)
 	if _morto:  # um DoT pode tê-lo morto
 		return
+	# Enquanto o recuo dura, ele manda no movimento -- senão a IA reescrevia
+	# `velocity.x` no frame seguinte e o empurrão não se via.
+	if _recuo_t > 0.0:
+		_recuo_t = maxf(0.0, _recuo_t - dt)
+		_congelado = maxf(0.0, _congelado - dt)
+		_atordoado = maxf(0.0, _atordoado - dt)
+		velocity.x = _recuo_vel
+		_recuo_vel = move_toward(_recuo_vel, 0.0, RECUO_ATRITO * dt)
+		if not is_on_floor():
+			velocity.y += GRAVIDADE * dt
+		move_and_slide()
+		return
 	if _congelado > 0.0 or _atordoado > 0.0:
 		_congelado = maxf(0.0, _congelado - dt)
 		_atordoado = maxf(0.0, _atordoado - dt)
@@ -959,7 +983,11 @@ func _vfx9g_morte() -> bool:
 		clampf(alt / 60.0, 0.7, 2.2), 0.0, false, false, 39, 0.8)
 	return true
 
-func receber_dano(quantidade: int, dir_empurrao: float = 0.0, critico := false) -> void:
+## `forca_recuo` (9H.16 D) é a velocidade do empurrão em px/s. 0 = sem
+## recuo (pisão, dano por estado). Os golpes do combo mandam valores
+## crescentes -- é o que faz o remate ler-se como remate.
+func receber_dano(quantidade: int, dir_empurrao: float = 0.0, critico := false,
+		forca_recuo := 0.0) -> void:
 	if _morto:
 		return
 	# INCORPÓREO: a lâmina passa através. Só o que vem de longe lhe toca --
@@ -991,7 +1019,20 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0, critico := false) 
 			_tom_estado = ""
 		Impacto.rebentar(self, global_position + Vector2(0.0, -12.0), Color(1, 1, 1), 3.2)
 	vida -= q
-	global_position.x += dir_empurrao * (12.0 if critico else 8.0)
+	if forca_recuo > 0.0 and dir_empurrao != 0.0:
+		var f := forca_recuo * (1.35 if critico else 1.0) / maxf(0.2, resistencia_recuo)
+		_recuo_vel = signf(dir_empurrao) * f
+		_recuo_t = clampf(f / RECUO_ATRITO, 0.08, 0.45)
+		# Remate: além de empurrar, LEVANTA do chão. É o que dá ao 4.º
+		# golpe um remate que se vê sem olhar para a barra de vida.
+		if f >= 380.0 and is_on_floor():
+			velocity.y = -195.0
+		_flinch = maxf(_flinch, 1.2)
+		_flinch_dir = signf(dir_empurrao)
+	else:
+		# sem recuo pedido: fica o toque de antes, para não mudar o pisão
+		# nem o dano por estado.
+		global_position.x += dir_empurrao * (12.0 if critico else 8.0)
 	if vida <= 0:
 		_dividir()
 		if elite:

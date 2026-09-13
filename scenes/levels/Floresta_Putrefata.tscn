@@ -166,6 +166,8 @@ vida = 140
 dano_contacto = 20
 comportamento = "carga"
 alcance_patrulha = 120.0
+; Pesado: nao voa com o remate como a arraia-miuda (9H.16 D4).
+resistencia_recuo = 2.2
 cor_rim = Color(0.7, 1.0, 0.55, 1)
 
 ; =====================  BIFURCACAO  =================================

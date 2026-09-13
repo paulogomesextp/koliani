@@ -299,7 +299,8 @@ func _mostrar_nucleo(v: bool) -> void:
 			brilho.visible = v
 
 
-func receber_dano(quantidade: int, dir_empurrao: float = 0.0, critico := false) -> void:
+func receber_dano(quantidade: int, dir_empurrao: float = 0.0, critico := false,
+		_forca_recuo := 0.0) -> void:
 	if _ja_derrotado:
 		return
 	provocar()

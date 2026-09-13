@@ -163,3 +163,21 @@ func _ao_tocar(corpo: Node) -> void:
 		if dir == 0.0:
 			dir = signf(corpo.global_position.x - global_position.x)
 		corpo.receber_dano(dano, dir)
+		return
+	# 9H.16 D5 -- IDENTIDADE DO NIVEL 1. A raiz tambem espeta INIMIGOS: com
+	# o recuo novo da espada (ver `DANO_COMBO`/`RECUO_COMBO`), o remate
+	# atira o bicho ~90 px, e a floresta corrompida acaba o servico. E' o
+	# que liga a mecanica-assinatura da regiao ao combate em vez de a
+	# deixar como um perigo que so' se desvia.
+	#
+	# Os CHEFES ficam de fora: o Ghorak semeia estas raizes -- seria ele a
+	# matar-se com o proprio ataque.
+	if corpo is ChefeBase:
+		return
+	if corpo is DemonioBase and corpo.has_method("receber_dano"):
+		var d := signf(corpo.global_position.x - global_position.x)
+		if d == 0.0:
+			d = 1.0
+		# Dano a dobrar do que faz a' Koliani e sem empurrao grande: a
+		# graca e' o inimigo ficar espetado, nao voar outra vez.
+		corpo.receber_dano(dano * 2, d, true, 60.0)
