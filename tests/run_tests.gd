@@ -1535,15 +1535,31 @@ func teste_execution_9c_kit_ambiente_regiao1() -> void:
 		for f in chao.get_node("Visual").get_children():
 			if f is Sprite2D and f.texture and f.texture.resource_path != "":
 				caminhos.append(f.texture.resource_path)
-	var do_kit := caminhos.filter(func(c: String) -> bool: return c.contains("/kit_9c/"))
+	# 9H.17 CONTINUATION: o que esta asserção defende é que a Região I usa
+	# arte de PRODUÇÃO e não o terreno pixel CC0 dos outros 95 níveis. O
+	# caminho da produção mudou -- desde a 9H.17 I3 o corpo da plataforma sai
+	# de `l1_hybrid_9h12e/terrain_hd/`, não do `kit_9c/` -- e o teste ficou a
+	# medir um caminho que já ninguém escreve: acusava o L1 de ter voltado ao
+	# legado precisamente enquanto ele passava a ter a melhor arte do jogo.
+	# Os dentes da asserção continuam os mesmos: >= 4 peças de produção e
+	# ZERO peças do terreno legado.
+	var do_kit := caminhos.filter(func(c: String) -> bool:
+		return c.contains("/kit_9c/") or c.contains("/l1_hybrid_9h12e/"))
 	var legado := caminhos.filter(func(c: String) -> bool: return c.contains("pixel/terreno"))
 	_ok(do_kit.size() >= 4 and legado.is_empty(),
-		"Execution 9C: L1 não usa o terreno do kit (%s)" % str(caminhos))
+		"Execution 9C: L1 não usa o terreno de produção (%s)" % str(caminhos))
+	# O mesmo para a profundidade: o L1 deixou de montar as camadas da 08 --
+	# monta as do passe Hybrid. O contrato é HAVER céu, plano médio e mata
+	# separados por parallax, não como se chamam os nós.
 	var alvo := nivel.get_node_or_null("Region1HybridVisualTarget")
-	_ok(alvo != null and alvo.get_node_or_null("Camada3Distante") != null
-		and alvo.get_node_or_null("Camada2Floresta") != null
-		and alvo.get_node_or_null("BackgroundApproved08") != null,
-		"Execution 9C: faltam camadas de parallax da 08 no L1")
+	var legado_08 := alvo != null and alvo.get_node_or_null("Camada3Distante") != null \
+		and alvo.get_node_or_null("Camada2Floresta") != null \
+		and alvo.get_node_or_null("BackgroundApproved08") != null
+	var hybrid := alvo != null and alvo.get_node_or_null("HybridL1_ceu") != null \
+		and alvo.get_node_or_null("HybridL1_serra") != null \
+		and alvo.get_node_or_null("HybridL1_mata") != null
+	_ok(legado_08 or hybrid,
+		"Execution 9C: faltam camadas de parallax no L1")
 	nivel.free()
 
 	var solta := (load("res://scenes/actors/Plataforma.tscn") as PackedScene).instantiate()
@@ -3189,11 +3205,16 @@ func teste_execution_9h7_fundo_regiao1() -> void:
 		_ok(alvo.get_node_or_null("RaiosLuz") != null,
 			"9H.7: L%d sem os raios de luz volumétricos da 08" % (i + 1))
 		# --- conteúdo: quanto há de cada identidade -------------------------
-		var c3 := alvo.get_node_or_null("Camada3Distante")
-		var c2 := alvo.get_node_or_null("Camada2Floresta")
-		corrupcao.append(_contar_pecas(alvo.get_node_or_null("Camada2Corrupcao"), "cristal"))
-		ruinas.append(_contar_pecas(c3, "ruina") + _contar_pecas(c2, "ruina"))
-		cascatas.append(_contar_pecas(c3, "cascata") + _contar_pecas(c2, "cascata"))
+		# 9H.17 CONTINUATION: a contagem deixou de depender do nome das camadas
+		# do legado. A Regiao I inteira passou ao passe Hybrid, que monta
+		# `HybridL*_ruinas` / `_longe` / `_quedas` / `_corrupcao` em vez de
+		# `Camada3Distante` / `Camada2Floresta` / `Camada2Corrupcao` -- e com o
+		# nome fixo esta auditoria media zero em todos os niveis e passava a
+		# acusar o que nao havia. O CONTRATO nao muda (os limiares abaixo sao os
+		# mesmos): muda so onde se procura. Ver `_contar_identidade`.
+		corrupcao.append(_contar_identidade(alvo, "corrupcao"))
+		ruinas.append(_contar_identidade(alvo, "ruinas"))
+		cascatas.append(_contar_identidade(alvo, "cascatas"))
 		nivel.free()
 	# A corrupção sobe do L1 ao L5 (0,25 -> 1,0 nos perfis da 08). O mínimo
 	# absoluto é o que impede a asserção de passar por vacuidade: com o L1 a
@@ -3218,6 +3239,37 @@ func teste_execution_9h7_fundo_regiao1() -> void:
 	var glsl := FileAccess.get_file_as_string("res://assets/shaders/nitidez_fundo.gdshader")
 	_ok(glsl.contains("modulacao = COLOR") and glsl.contains("COLOR = c * modulacao"),
 		"9H.7: o shader de nitidez voltou a atirar o modulate fora")
+
+
+## Peças de identidade de um nível da Região I, em TODAS as camadas do alvo.
+##
+## Uma peça declara o que é na meta `peca` (o passe Hybrid, que a escreve em
+## `_peca`); as camadas do legado não a têm e são reconhecidas pelo nome do
+## ficheiro, como antes. Cada sprite conta UMA vez: a meta manda, e só quem
+## não a tem cai na regra do nome.
+const IDENTIDADE := {
+	"corrupcao": [["cristais"], "cristal"],
+	"ruinas": [["arco", "arco_partido", "torres"], "ruina"],
+	"cascatas": [["cascata"], "cascata"],
+}
+
+func _contar_identidade(alvo: Node, categoria: String) -> int:
+	var regra: Array = IDENTIDADE[categoria]
+	var metas: Array = regra[0]
+	var nome_legado: String = regra[1]
+	var n := 0
+	for camada in alvo.get_children():
+		if not camada is Node2D:
+			continue
+		for sp in camada.get_children():
+			if not sp is Sprite2D or sp.texture == null:
+				continue
+			if sp.has_meta("peca"):
+				if metas.has(str(sp.get_meta("peca"))):
+					n += 1
+			elif sp.texture.resource_path.get_file().contains(nome_legado):
+				n += 1
+	return n
 
 
 ## Quantas peças de uma camada têm `parte` no nome do ficheiro da textura.
