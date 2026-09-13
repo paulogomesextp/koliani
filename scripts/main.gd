@@ -45,7 +45,7 @@ func _ready() -> void:
 	# O Diário de pistas foi retirado do jogo a pedido do Paulo (ago 2026).
 	# `scenes/ui/Diario.tscn` / `scripts/diario*.gd` ficam no repo, dormentes.
 	add_child(CENA_PAUSA.instantiate())
-	if EstadoJogo.modo_dev and OS.is_debug_build():
+	if EstadoJogo.modo_dev and EstadoJogo.entrada_dev_disponivel():
 		add_child(CENA_DEV_BARRA.instantiate())
 
 	# acabou de passar de nível (a Porta chamou `avancar_nivel`)
@@ -95,11 +95,11 @@ func _validar_recovery_session(nivel: Node) -> void:
 	EstadoJogo.validar_checkpoints_disponiveis(ids)
 
 
-## Atalhos de depuração -- só em builds de debug (editor / export-debug).
-## F1..F4: salta para o mundo 1..4. F5: dá todas as habilidades.
-## F6: +3 vidas. F9: apaga o save e recomeça.
+## Atalhos de depuração -- só em builds que deixam entrar em modo Dev
+## (`EstadoJogo.entrada_dev_disponivel`). F1..F4: salta para o mundo 1..4.
+## F5: dá todas as habilidades. F6: +3 vidas. F9: apaga o save e recomeça.
 func _unhandled_input(evento: InputEvent) -> void:
-	if not OS.is_debug_build():
+	if not EstadoJogo.entrada_dev_disponivel():
 		return
 	if not (evento is InputEventKey and evento.pressed and not evento.echo):
 		return

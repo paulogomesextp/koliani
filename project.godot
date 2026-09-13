@@ -8,6 +8,13 @@
 
 config_version=5
 
+[koliani]
+
+; 9H.17 D -- a entrada "MODO DEV" do menu principal. Nao depende de a build
+; ter sido exportada com debug: um export de release continua a ser uma
+; build de QA enquanto isto estiver ligado. Desligar no export publico final.
+qa/entrada_dev=true
+
 [application]
 
 config/name="Koliani"

@@ -16,7 +16,7 @@ var _seletor: SeletorNiveis
 func _ready() -> void:
 	layer = 20
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	if not OS.is_debug_build() or not EstadoJogo.modo_dev:
+	if not EstadoJogo.entrada_dev_disponivel() or not EstadoJogo.modo_dev:
 		queue_free()
 		return
 	_montar_botao_topo()

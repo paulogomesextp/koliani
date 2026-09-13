@@ -138,13 +138,26 @@ func _montar() -> void:
 	Frontend9H.por(_aviso, Rect2(EIXO - 300.0, Y_RODAPE + 18.0, 600.0, 40.0))
 	_palco.add_child(_aviso)
 
-	# A entrada de desenvolvimento pertence ao editor/export-debug.
+	# 9H.17 D -- A ENTRADA DE DESENVOLVIMENTO. Ela ja' ca' estava; o que nao
+	# estava era VISIVEL. Vivia atras de `OS.is_debug_build()`, e a build que
+	# o Game Master abre e' de RELEASE -- por isso, do lado dele, o modo Dev
+	# simplesmente nao existia. Um export de release nao deixa de ser uma
+	# build de QA so' porque foi exportado sem debug.
+	#
+	# Passa a mandar um interruptor proprio, `koliani/qa/entrada_dev`, para a
+	# visibilidade nao depender de como a build foi exportada. Fica LIGADO
+	# aqui; a apresentacao publica final exporta com ele desligado.
+	#
+	# E sai do meio para o canto INFERIOR ESQUERDO: e' para se encontrar, nao
+	# para competir com a coluna dos botoes nem com o logotipo.
 	_dev = Button.new()
-	_dev.visible = OS.is_debug_build()
-	Frontend9H.rotulo_menu(_dev, 14)
-	_dev.add_theme_color_override("font_color", Color(0.85, 0.72, 0.35, 0.8))
+	_dev.visible = EstadoJogo.entrada_dev_disponivel()
+	Frontend9H.rotulo_menu(_dev, 13)
+	_dev.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	_dev.add_theme_color_override("font_color", Color(0.78, 0.66, 0.34, 0.62))
+	_dev.add_theme_color_override("font_hover_color", Color(1.0, 0.86, 0.46, 1.0))
 	_dev.pressed.connect(_ao_dev_mode)
-	Frontend9H.por(_dev, Rect2(EIXO - 120.0, 572.0, 240.0, 24.0))
+	Frontend9H.por(_dev, Rect2(22.0, 676.0, 190.0, 26.0))
 	_palco.add_child(_dev)
 
 	var orn := Frontend9H.separador("ornamento_rodape")
@@ -305,7 +318,7 @@ func _abrir_opcoes() -> void:
 
 
 func _ao_dev_mode() -> void:
-	if not OS.is_debug_build():
+	if not EstadoJogo.entrada_dev_disponivel():
 		return
 	_repor_botoes()
 	EstadoJogo.ativar_modo_dev()
@@ -349,7 +362,7 @@ func _tratar_atalhos_dev() -> bool:
 	for a in OS.get_cmdline_user_args():
 		if a == "--jogar" or a == "--foto" or a.begins_with("--foto="):
 			saltar = true
-		elif a == "--devmode" and OS.is_debug_build():
+		elif a == "--devmode" and EstadoJogo.entrada_dev_disponivel():
 			saltar = true
 			devmode = true
 		elif a.begins_with("--nivel="):

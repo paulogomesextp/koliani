@@ -590,6 +590,22 @@ func ha_progresso() -> bool:
 ## habilidades, muitas vidas) SEM tocar no ficheiro de save -- ao sair do
 ## jogo o progresso real continua lá. `koliani.gd` lê `modo_dev` para dar
 ## energia infinita e ignorar dano.
+## 9H.17 D -- A build deixa entrar em modo Dev? Em debug, sempre. Em release,
+## so' se a build o declarar (`koliani/qa/entrada_dev` no `project.godot`).
+##
+## Isto existe porque a porta do modo Dev estava presa a `OS.is_debug_build()`
+## em dois sitios independentes -- o botao do menu e a BARRA de controlos --
+## e a build que o Game Master abre e' de release. Resultado: nao havia
+## entrada nenhuma, e mesmo forcando por linha de comando o modo ligava sem
+## barra, ou seja sem FlyMode nem troca de nivel. Um export de release nao
+## deixa de ser uma build de QA so' porque foi exportado sem debug; o que o
+## decide e' este interruptor, que o export publico final desliga.
+static func entrada_dev_disponivel() -> bool:
+	if OS.is_debug_build():
+		return true
+	return bool(ProjectSettings.get_setting("koliani/qa/entrada_dev", false))
+
+
 func ativar_modo_dev() -> void:
 	if modo_dev:
 		return
