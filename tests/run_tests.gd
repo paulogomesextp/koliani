@@ -48,6 +48,7 @@ func _correr_tudo() -> void:
 	teste_9f_buses_de_audio_estaticos()
 	teste_9f_ui_producao()
 	teste_catalogo_campanha()
+	teste_9h17_contrato_de_mobilidade_regiao1()
 	teste_equipamento_dados()
 	teste_equipamento_estado()
 	teste_estado_tres_mortes_sem_vidas()
@@ -3199,3 +3200,44 @@ func _contar_pecas(camada: Node, parte: String) -> int:
 		if sp is Sprite2D and sp.texture != null 				and sp.texture.resource_path.get_file().contains(parte):
 			n += 1
 	return n
+
+
+## 9H.17 C -- CONTRATO DE MOBILIDADE DA REGIAO I. Duas coisas que se partem
+## caladas e so' aparecem a` 3.a hora de playtest:
+##   1. o salto duplo tem de ter UMA porta de entrada na campanha (nao tinha
+##      nenhuma: as `HABILIDADES_INICIAIS` foram esvaziadas e ninguem lhe deu
+##      outra), e essa porta e' o chefe do nivel 5;
+##   2. a Jornada dos niveis 1-5 tem de ser desenhada para o salto SIMPLES.
+##      O tecto do salto duplo (104 px) esta' acima do tecto FISICO do salto
+##      simples, medido em `tests/run_alcance_9h17.tscn` (entre 80 e 88 px).
+func teste_9h17_contrato_de_mobilidade_regiao1() -> void:
+	var estado := EstadoJogoScript.new()
+	_ok(not estado.HABILIDADES_INICIAIS.has("salto_duplo"),
+		"9H.17: o salto duplo nao pode vir de borla no arranque")
+	estado.free()
+	var niv := load("res://scripts/nivel_com_chefe.gd") as GDScript
+	var tabela: Dictionary = niv.HABILIDADE_DO_CHEFE
+	_ok(String(tabela.get(4, "")) == "salto_duplo",
+		"9H.17: o chefe do nivel 5 (indice 4) deixou de dar o salto duplo")
+	for i in 4:
+		_ok(not tabela.has(i),
+			"9H.17: o nivel %d larga uma habilidade e a Regiao I e' sem salto duplo" % (i + 1))
+	# A Jornada: tecto por nivel, e a envolvente medida a bater certo com ela.
+	var g := load("res://scripts/gerador_corredor.gd") as GDScript
+	_ok(int(g.NIVEL_SALTO_DUPLO) == 5,
+		"9H.17: o primeiro nivel que pode exigir salto duplo deixou de ser o 6")
+	_ok(float(g.SUBIDA_SIMPLES) <= 64.0,
+		"9H.17: o degrau da Regiao I passou dos 64 px (medido: falha aos 88)")
+	_ok(float(g.SUBIDA_SIMPLES) < float(g.SUBIDA_MAX),
+		"9H.17: o tecto do salto simples nao pode ser o do salto duplo")
+	# A envolvente MEDIDA. Se alguem mexer nestes numeros sem voltar a correr
+	# o `run_alcance_9h17.tscn`, e' aqui que se da' por isso.
+	# (o 2.o argumento e' o TECTO em uso, e uma subida acima do tecto e' -1 --
+	# por isso a tabela prova-se com o tecto aberto nos 80, o limite fisico)
+	_ok(g.vao_possivel(0.0, 80.0) == 140.0
+			and g.vao_possivel(64.0, 80.0) == 110.0
+			and g.vao_possivel(72.0, 80.0) == 80.0
+			and g.vao_possivel(80.0, 80.0) == 60.0
+			and g.vao_possivel(88.0, 80.0) < 0.0
+			and g.vao_possivel(120.0, g.SUBIDA_SIMPLES) < 0.0,
+		"9H.17: a tabela da envolvente de salto deixou de bater com a medicao")

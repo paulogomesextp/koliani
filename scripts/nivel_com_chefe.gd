@@ -195,11 +195,29 @@ func _abrir_guardiao() -> void:
 	# o contrato persistente reservado ao exame do quinto nível.
 	_selar(false)
 
+## A habilidade PERMANENTE que cada chefe regional larga. Isto e' progressao,
+## nao saque: o bau do chefe sorteia arma/armadura/melhoria, e um sorteio nao
+## pode decidir se o jogo continua a ser jogavel.
+##
+## 9H.17 C -- contrato congelado pelo Game Master: o SALTO DUPLO abre ao
+## derrubar o chefe do nivel 5 e nao antes. Ate' la' a Regiao I inteira
+## faz-se com salto simples (ver `GeradorCorredor.NIVEL_SALTO_DUPLO` e
+## `tools/verifica_mobilidade_9h17.gd`). Antes desta entrada o salto duplo
+## nao se ganhava em SITIO NENHUM da campanha: as `HABILIDADES_INICIAIS`
+## foram esvaziadas e nunca ninguem lhe deu uma porta de entrada.
+const HABILIDADE_DO_CHEFE := {4: "salto_duplo"}
+
+
 func _abrir() -> void:
 	if _bau_criado:
 		return
 	_bau_criado = true
 	EstadoJogo.marcar_chefe_derrotado_por_nivel(EstadoJogo.indice_nivel)
+	var hab: String = HABILIDADE_DO_CHEFE.get(EstadoJogo.indice_nivel, "")
+	if hab != "" and not EstadoJogo.tem_habilidade(hab):
+		# `desbloquear_habilidade` avisa a HUD e GRAVA -- sobrevive a morte,
+		# a reload, ao seletor de niveis e a fechar o jogo.
+		EstadoJogo.desbloquear_habilidade(hab)
 	_criar_bau.call_deferred()
 
 func _criar_bau() -> void:

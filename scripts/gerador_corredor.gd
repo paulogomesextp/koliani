@@ -783,6 +783,9 @@ const SUBIDA_MAX := 104.0
 ## espessura entre duas plataformas (18 px contra 15 px) chegava para um
 ## degrau nominal de 64 aterrar do lado de la' da fronteira.
 const SUBIDA_SIMPLES := 60.0
+## Tecto FISICO do salto simples (medido: 80 passa, 88 nao). E' o limite do
+## que se consegue; a `SUBIDA_SIMPLES` e' o que se DESENHA, com folga.
+const TECTO_FISICO_SIMPLES := 80.0
 ## Índice do primeiro nível que já pode assumir o salto duplo na travessia
 ## obrigatória (contrato congelado pelo Game Master: o salto duplo abre ao
 ## derrubar o chefe do nível 5, portanto o nível 6 -- índice 5 -- é o
@@ -4830,7 +4833,11 @@ func _cor_luz_regiao() -> Color:
 static func vao_possivel(subida: float, tecto: float) -> float:
 	if subida > tecto:
 		return -1.0
-	if tecto > SUBIDA_SIMPLES:
+	# O regime escolhe-se pelo TECTO FISICO, nao pelo tecto de DESENHO: a
+	# `SUBIDA_SIMPLES` (60) fica de proposito abaixo do que o salto simples
+	# aguenta (80), e comparar com ela metia a tabela do salto duplo a
+	# responder por saltos simples.
+	if tecto > TECTO_FISICO_SIMPLES:
 		return 210.0 if subida <= 0.0 else 195.0
 	if subida <= 0.0:
 		return 140.0
