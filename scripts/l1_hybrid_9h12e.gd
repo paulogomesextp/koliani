@@ -242,6 +242,73 @@ static func _montar_l2(alvo: Node2D) -> void:
 		_peca(frente, p[0], ref_x, F_FRENTE, p[1], p[2], p[3], t5, p[4])
 
 
+## CORPO ORGANICO DA PLATAFORMA (9H.17 I3).
+##
+## O review disse que as pontas ajudaram mas que o MEIO continua a ler-se
+## como um rectangulo repetido -- e lia mesmo: o corpo era `corpo.png`
+## (128x128) em mosaico, e um mosaico de um rectangulo da' um rectangulo.
+##
+## A peca que faltava ja' estava produzida e nunca tinha sido usada:
+## `terrain_hd/plataforma.png`, 290x275. Medida, tem tres bandas:
+##
+##   y   0.. 32   rebentos POR CIMA da superficie (musgo, corrupcao vermelha)
+##   y  32..104   a laje solida -- a linha de pouso e' o topo dela, y=36
+##   y 104..275   a barriga esfarrapada: raiz, rocha e estalactite
+##
+## Isso resolve de uma vez a silhueta irregular, a quebra do mosaico E a
+## logica visual que o Game Master reclamou no L2: a vegetacao nasce EM CIMA
+## e o que pende por baixo e' estrutura.
+##
+## Desenha-se em TRES FATIAS -- ponta esquerda, meio repetido, ponta direita
+## (espelhada) -- para a peca servir de 56 a 660 px sem ser esticada.
+const PLAT_SUPERFICIE := 36.0   ## linha de pouso dentro da fonte
+const PLAT_SOLIDO := 68.0       ## altura da laje solida na fonte
+const PLAT_CAP := 96.0          ## largura de cada ponta na fonte
+const PLAT_MEIO_X := 96.0       ## banda repetivel: x de 96 a 194
+const PLAT_MEIO_W := 98.0
+
+
+## Devolve `false` se a peca nao existir (ai o chamador faz o mosaico antigo).
+static func corpo_organico(vis: Node, largura: float, y0: float, alt: float) -> bool:
+	var t := tex("terrain_hd/plataforma")
+	if t == null or largura < 40.0:
+		return false
+	var h := float(t.get_height())
+	# a laje solida da peca cobre o corpo do bloco; nunca tao pequena que os
+	# rebentos de cima desaparecam, nem tao grande que a barriga tape o vao
+	var esc: float = clampf(alt / PLAT_SOLIDO, 0.52, 1.45)
+	var topo_y := y0 - PLAT_SUPERFICIE * esc
+	var cap_w := PLAT_CAP * esc
+	var meio_w := PLAT_MEIO_W * esc
+
+	var fatia := func(rx: float, rw: float, x: float, espelhar: bool) -> void:
+		var s := Sprite2D.new()
+		s.texture = t
+		s.centered = false
+		s.region_enabled = true
+		s.region_rect = Rect2(rx, 0.0, rw, h)
+		s.scale = Vector2(esc, esc)
+		s.flip_h = espelhar
+		s.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+		s.z_index = -1              # atras da Koliani e dos inimigos
+		s.position = Vector2(x, topo_y)
+		_nitidez(s)
+		vis.add_child(s)
+
+	var x_esq := -largura * 0.5
+	var x_dir := largura * 0.5
+	# meio primeiro, para as pontas ficarem por cima da emenda
+	var meio_x0 := x_esq + cap_w
+	var meio_x1 := x_dir - cap_w
+	var x := meio_x0
+	while x < meio_x1 - 1.0 and meio_w > 4.0:
+		fatia.call(PLAT_MEIO_X, minf(PLAT_MEIO_W, (meio_x1 - x) / esc), x, false)
+		x += meio_w
+	fatia.call(0.0, PLAT_CAP, x_esq, false)
+	fatia.call(0.0, PLAT_CAP, x_dir - cap_w, true)
+	return true
+
+
 ## Props de uma plataforma, com ÂNCORA declarada. O primeiro passe pousava a
 ## lanterna no chão como se fosse um arbusto — e como a peça traz a corrente
 ## por cima, lia-se a flutuar. Cada tipo tem agora o seu suporte:

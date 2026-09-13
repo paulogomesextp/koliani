@@ -196,6 +196,18 @@ func _aplicar() -> void:
 	if corpo == null:                        # terreno por gerar -> nao pinta nada
 		return
 
+	# 9H.17 I3 -- CORPO ORGANICO. Nos perfis Hybrid o bloco deixa de ser um
+	# mosaico de `corpo.png` com uma capa por cima: passa a ser a peca
+	# `terrain_hd/plataforma.png`, que ja' estava produzida e nunca tinha
+	# sido usada, em tres fatias (ponta / meio repetido / ponta espelhada).
+	# Traz silhueta irregular, vegetacao EM CIMA e barriga de raiz por baixo
+	# -- as tres coisas que o review pedia. As camadas antigas (miolo,
+	# sombra, valor, lados, franja, capa, rim) nao entram: eram elas que
+	# faziam o rectangulo.
+	if hybrid_l1 and HybridL1.corpo_organico(vis, largura, y0, alt):
+		HybridL1.decorar(vis, largura, y0, alt, rng)
+		return
+
 	# 1. miolo
 	vis.add_child(_mosaico(corpo, Vector2(x0, y0), Vector2(largura, alt), Vector2(dx, dy)))
 
