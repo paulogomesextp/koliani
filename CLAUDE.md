@@ -21,6 +21,15 @@ terminal usar a variante `..._console.exe`).
 # suite de testes headless (sai != 0 se falhar). E' uma CENA, nao um
 # `--script`: em `--script` os autoloads nao existem e a compilacao rebenta.
 # Precisa da pasta `work/` (nao vem do git) senao da' 25 falsos negativos.
+#
+# CORRER ASSIM -- a suite ESCREVE no save real. O autoload `EstadoJogo`
+# esta' vivo na cena de testes, e basta um teste mexer-lhe e outro provocar
+# uma gravacao para a campanha do jogador ir atras (em 9H.17 a essencia do
+# Paulo foi a zero assim). O script isola o `user://` num sandbox e confirma
+# por SHA256 que o save real ficou intacto.
+powershell -ExecutionPolicy Bypass -File tools/correr_testes.ps1
+
+# a forma crua -- so' quando o save nao importa; MEXE no save real
 "/c/Users/paulo/Desktop/Godot_v4.7.2-stable_win64_console.exe" --headless --path . res://tests/run_tests.tscn
 
 # smoke-test de uma cena (corre N frames e sai)
