@@ -1,3 +1,24 @@
+## Pendente de decisao do Paulo -- 9H.17 (13 set 2026)
+
+1. **NATIVE ART REQUIRED -- corrida da Koliani.** Os 10 frames golden nao tem
+   passada alternada: a abertura das pernas nunca fecha (38,40,39,38,38,53,
+   44,46,43,56) e o centro de massa nao troca de lado. Nao ha' outra fonte no
+   repo nem no historico, e nao se fabricam frames espelhados.
+2. **NATIVE ART REQUIRED -- fundo HD do L2.** A autoridade de arte da Regiao I
+   inteira e' uma prancha de 1536x1024; tudo o que no repo se chama "HD" e'
+   reamostragem dela, incluindo o `_hd_x4` e as camadas de 1920 (declaradas
+   como ampliadas pelo proprio manifesto). Entretanto o L2 passou a compor
+   recortes nativos em vez de esticar uma tira -- melhora, mas nao e' nativo.
+3. **NATIVE ART REQUIRED -- faixa de superficie do chao/pantano.** O leito ja'
+   esta' feito com arte aprovada; a faixa palida na base do ecra permanece e a
+   origem dela nao se identificou nesta execucao.
+4. **Export publico:** desligar `koliani/qa/entrada_dev` no `project.godot`
+   antes de uma apresentacao final -- e' o que fecha a entrada "DEVELOPER
+   MODE" do menu.
+5. **As 2 falhas de teste que restam** (Execution 9C: o L1 usar o kit 9C e as
+   camadas da 08) sao decisao do nivel Golden: o passe Hybrid superou as duas.
+   Decidir se os testes se actualizam ou se o L1 volta atras.
+
 # Prioridades — Koliani
 
 ## Agora

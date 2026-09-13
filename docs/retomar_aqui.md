@@ -1,3 +1,83 @@
+## 9H.17 — a Regiao I faz-se toda com salto SIMPLES (13 set 2026)
+
+- PHASE CURRENT: **A, B, C, D, E, G, H, I2, I3, J FECHADAS. F NAO REPRODUZ.
+  I1 e' NATIVE ART REQUIRED.** Relatorio:
+  [`execution_9h17_regiao1_mobilidade.md`](execution_9h17_regiao1_mobilidade.md).
+  Commits: ab4fd0b6 (A/B/E), daad0bae (C), b0cf4a15 + 5fe9b799 (D/F),
+  2551f41a (G/H), 9cb56e6d (I3), 918662a0 (I2), c40ccc23 (v0.18.9).
+- **A CAUSA DO BLOQUEIO DO 1-3 NAO ERA DAQUELE SITIO.** A Jornada construia a
+  espinha com `SUBIDA_MAX = 104 px` -- um salto MAIS o salto duplo -- e os
+  cinco niveis da Regiao I tem a Jornada ligada. Medida a envolvente do salto
+  simples com a FISICA DO JOGO (`tests/run_alcance_9h17.tscn`, agarrar-borda
+  incluido): subida 0 -> vao 140 | 64 -> 110 | 72 -> 80 | 80 -> 60 |
+  **88 -> impossivel a qualquer vao**. O tecto fisico esta' entre 80 e 88.
+  Os 104 estavam acima dele.
+- **O SALTO DUPLO NAO SE GANHAVA EM SITIO NENHUM DA CAMPANHA.** As
+  `HABILIDADES_INICIAIS` estao vazias e nao ha' um unico `Coletavel` com
+  `habilidade_id = "salto_duplo"` nos 100 niveis. Agora:
+  `NivelComChefe.HABILIDADE_DO_CHEFE = {4: "salto_duplo"}` -- progressao, e
+  nao saque (o bau sorteia, e um sorteio nao pode decidir se o jogo continua
+  jogavel). Vai por `desbloquear_habilidade`, que avisa a HUD e GRAVA.
+- `SUBIDA_SIMPLES = 60` nos niveis 1-5, do CONTRATO da campanha e nao do save
+  da maquina (o modo Dev da' tudo). Mais `_garantir_alcance()`: a Jornada
+  prometia na propria documentacao que "cada plataforma esta' ao alcance de
+  salto da anterior", mas era uma INTENCAO espalhada por dezenas de sitios
+  que escolhiam o passo em x e a subida em y sem se falarem. E faltava-lhe a
+  regra "nao se sobe estando debaixo da barriga da plataforma" -- a mesma que
+  ja' custou dois niveis com o chefe inacessivel.
+- Salas a` mao: o poco do N3, a escada do tronco do N4 e OS DOIS ramos da
+  bifurcacao do N2 subiam 80-108 px. Desceram para 59-64 com a mesma forma.
+- ARMADILHAS DE METODO:
+  1. **limite fisico e alvo de desenho sao coisas diferentes** -- com uma
+     margem de 15% como porteiro o N1 reprovava por 2 px num salto que se faz;
+  2. o `verifica_alcance.gd` DESLIGA a jornada (mede a sala a` mao) e nao
+     serve para este contrato -- dai o `verifica_mobilidade_9h17.gd`;
+  3. um crivo estatico mente de duas maneiras, e as duas apareceram: nao
+     conhecia as plataformas FLUTUANTES (a rota baixa do N2 e' feita delas)
+     nem os TRAMPOLINS (o poco do N3 tem um no fundo, em -3523,494);
+  4. quando o gerador e o crivo discordam, o errado e' quase sempre o MODELO,
+     nao a geometria.
+- **D: a entrada Dev existia, o que nao existia era VISIVEL.** Estava atras de
+  `OS.is_debug_build()` e a build do Game Master e' de release. Pior: o
+  `main.gd` so' punha a BARRA Dev com a mesma condicao -- `--devmode` entrava
+  sem FlyMode nem troca de nivel. Portao unico
+  `EstadoJogo.entrada_dev_disponivel()` + `koliani/qa/entrada_dev`, e o botao
+  foi para o canto inferior esquerdo. PROVADO na build de release v0.18.9.
+- **F NAO REPRODUZ**: o mapa tem P e Escape na accao `pausa`, e duas provas de
+  runtime com teclas a serio mostram o Escape a abrir -- em isolamento e no
+  jogo montado. Falta confirmar com MAOS na build.
+- **G/H: o L2 vivia de um panorama de 952x247 esticado.** Nao ha' fonte nativa
+  maior: o `_hd_x4` e' esse ficheiro reamostrado (erro 3,01/255; energia de
+  bordos 1533 -> 74), as camadas de 1920 sao declaradas pelo proprio manifesto
+  como ampliadas, e a autoridade da regiao inteira e' UMA prancha de 1536x1024.
+  **NATIVE ART REQUIRED -- L2 BACKGROUND HD.** O que se fez: o passe Hybrid
+  passou a servir o perfil 2, com arranjo e paleta de pantano.
+- **TRES PECAS DE PRODUCAO ESTAVAM NO REPO POR LIGAR**: `plataforma.png`
+  (290x275) resolve a I3 inteira -- em tres fatias, com vegetacao em cima e
+  barriga de raiz por baixo; a mesma peca nas flutuantes; e `corrupcao.png`
+  (199x290) da' leito pintado ao pantano.
+- POR FAZER / DECIDIR:
+  * **KOLIANI RUN -- NATIVE ART REQUIRED** (confirmado por medicao propria:
+    abertura das pernas 38,40,39,38,38,53,44,46,43,56 -- nunca fecha);
+  * **REGION I GROUND/SWAMP -- NATIVE ART REQUIRED** so' na FAIXA de
+    superficie; o leito ja' esta'. A origem da faixa palida NAO se identificou
+    nesta execucao: nao e' o corpo do liquido (baixar-lhe o alfa nao a mexeu)
+    nem a `Faixa` nem o `Rebordo`;
+  * as 2 falhas que restam sao da Execution 9C sobre o L1 usar o kit 9C e as
+    camadas da 08 -- ambas superadas pelo Hybrid, ambas decisao do Golden.
+- SUITE: baseline eram 26 falhas, **ficaram 2**, zero novas. As 24 que cairam
+  nao foram caladas -- 18 eram a regra da 9H.7B a apanhar as pecas do Hybrid
+  (aplicada; o L1 mudou 0,89/255 e ficou 3% MAIS nitido), 5 eram eixos de luz
+  em blend aditivo (sem grelha para conservar) e 1 era a moldura de vinhas.
+- BUILD: `C:/Projetos/koliani/build/windows/Koliani.exe`, release **v0.18.9**,
+  205 766 688 bytes, SHA256
+  `b1f81051309b34e031efd63612b080aa10a5a07487e069c337b0d6f09a39954d`.
+- **NEXT ACTION: o QA jogado.** O agente independente foi lancado e morreu no
+  limite de sessao antes de concluir. Falta: percurso normal L1->L2->L3 sem
+  modo Dev a provar o 1-3 com salto simples, olhar o fundo e as plataformas do
+  L2 em jogo, Escape na pausa com maos, e o passe Dev (FlyMode, 1/20/50/100,
+  isolamento do save).
+
 ## 9H.16 — fases B a F executadas (13 set 2026)
 
 - PHASE CURRENT: **B CLOSED, C/D/E entregues e provadas, F PARCIAL.**
