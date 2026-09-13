@@ -731,9 +731,11 @@ func _ao_pista(_id: String, total: int) -> void:
 ## meio da acção (quando a mecânica entra no ecrã) e a 5 s não dava para a
 ## ler sem deixar de jogar.
 const TUTORIAL_SEGUNDOS := 10.0
-## Largura da placa. Uma linha comprida a meio do ecrã lê-se de relance; um
-## bloco estreito e alto obriga a parar o jogo para o ler.
-const TUTORIAL_LARGURA := 560.0
+## Largura da placa. Era 560 quando a placa vivia ao MEIO do ecrã. Desde a
+## 9H.16 C vive no canto superior-esquerdo, fora da zona de acção: aí uma
+## caixa larga voltaria a invadir o meio, por isso encolheu para 380 -- o
+## texto ganha uma linha ou duas, mas nunca tapa a Koliani.
+const TUTORIAL_LARGURA := 380.0
 
 
 ## A mecânica deste nível estreia aqui: diz o nome e como funciona.
@@ -763,8 +765,11 @@ func _criar_tutorial(nome: String, txt: String) -> PanelContainer:
 	var caixa := PanelContainer.new()
 	caixa.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
 	caixa.add_theme_stylebox_override("panel", UIProducao.caixa("caixa_dialogo",
-		Vector4(28, 20, 28, 22)))
+		Vector4(18, 12, 18, 14)))
 	caixa.size = Vector2(largura, 0.0)
+	# Semitransparente: lê-se, mas deixa ver o jogo por baixo.
+	caixa.modulate.a = 0.9
+	# Não bloqueia input (o toque atravessa para os controlos).
 	caixa.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 	var col := VBoxContainer.new()
@@ -774,22 +779,22 @@ func _criar_tutorial(nome: String, txt: String) -> PanelContainer:
 	var l_nome := Label.new()
 	l_nome.text = nome
 	l_nome.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	l_nome.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	l_nome.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	l_nome.add_theme_color_override("font_color", UIProducao.OURO)
 	l_nome.add_theme_color_override("font_outline_color", Color(0.05, 0.01, 0.06))
 	l_nome.add_theme_constant_override("outline_size", 4)
-	l_nome.add_theme_font_size_override("font_size", 22)
+	l_nome.add_theme_font_size_override("font_size", 18)
 	col.add_child(l_nome)
 
 	var l_txt := Label.new()
 	l_txt.text = txt
-	l_txt.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	l_txt.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	l_txt.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	l_txt.custom_minimum_size.x = largura - 56.0
 	l_txt.add_theme_color_override("font_color", Color(0.94, 0.88, 1))
 	l_txt.add_theme_color_override("font_outline_color", Color(0.05, 0.01, 0.06))
 	l_txt.add_theme_constant_override("outline_size", 3)
-	l_txt.add_theme_font_size_override("font_size", 17)
+	l_txt.add_theme_font_size_override("font_size", 15)
 	col.add_child(l_txt)
 
 	return caixa
@@ -807,6 +812,31 @@ var _notificacao: Control
 var _notificacao_tween: Tween
 var _fila_ativa := false
 var _notificacao_suspensa := false
+
+
+## Segundos que uma placa de tutorial espera por uma pausa no combate.
+const ESPERA_COMBATE := 6.0
+## Distância (px) a que um inimigo vivo já conta como "estou em combate".
+const RAIO_COMBATE := 460.0
+
+
+## Verdadeiro quando há um chefe em cena ou um inimigo vivo perto da
+## Koliani -- momento em que uma caixa grande é estorvo, não ajuda.
+func _em_combate() -> bool:
+	if not is_inside_tree():
+		return false
+	if not get_tree().get_nodes_in_group("chefes").is_empty():
+		return true
+	var k := get_tree().get_first_node_in_group("koliani") as Node2D
+	if k == null:
+		return false
+	for no in get_tree().get_nodes_in_group("inimigos"):
+		var d := no as Node2D
+		if d == null or bool(d.get("_morto")):
+			continue
+		if d.global_position.distance_to(k.global_position) < RAIO_COMBATE:
+			return true
+	return false
 
 
 func _dialogo_visivel() -> bool:
@@ -833,11 +863,25 @@ func _consumir_notificacoes() -> void:
 				return
 		var dados: Dictionary = _fila_notificacoes.pop_front()
 		var tutorial: bool = dados.get("tutorial", false)
+		# "Durante combate: sem banners grandes." A placa da mecânica espera
+		# que o combate acalme -- mas no máximo `ESPERA_COMBATE` segundos,
+		# senão numa arena longa a explicação nunca chegava a aparecer.
+		if tutorial:
+			var esperou := 0.0
+			while _em_combate() and esperou < ESPERA_COMBATE:
+				await get_tree().process_frame
+				if not is_inside_tree():
+					return
+				esperou += get_process_delta_time()
 		_notificacao = _criar_tutorial(dados.nome, dados.txt) if tutorial else UIProducao.toast(dados.txt, dados.icone, dados.estilo)
 		if not tutorial:
 			var texto: Label = _notificacao.get_child(0).get_child(_notificacao.get_child(0).get_child_count() - 1)
-			texto.custom_minimum_size.x = minf(texto.get_minimum_size().x, get_viewport().get_visible_rect().size.x - 168.0)
+			# 9H.16 C: era `larg - 168` (1112 px em 1280!) -- uma faixa que
+			# atravessava o ecrã todo. No canto, o toast tem de ser estreito.
+			texto.custom_minimum_size.x = minf(texto.get_minimum_size().x,
+				get_viewport().get_visible_rect().size.x * 0.30)
 			texto.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			_notificacao.modulate.a = 0.92
 		_notificacao.name = "NotificacaoAtiva"
 		_notificacao_suspensa = false
 		add_child(_notificacao)
@@ -862,14 +906,33 @@ func _consumir_notificacoes() -> void:
 	_fila_ativa = false
 
 
+## 9H.16 C -- a placa vivia CENTRADA a meio do ecrã (`(larg - size.x) * 0.5`
+## a y >= 160): em 1280x720 isso é exactamente por cima da Koliani, dos
+## inimigos e das plataformas onde se aterra. Passa a encostar ao canto
+## SUPERIOR-ESQUERDO, debaixo do cabeçalho do nível, e nunca entra na banda
+## central da acção (`FRACAO_ACAO` da largura, ao centro).
+const MARGEM_SEGURA := 24.0
+## Metade da banda central que a notificação não pode invadir (fracção da
+## largura do ecrã). 0.34 => os 34% do meio ficam sempre livres.
+const FRACAO_ACAO := 0.34
+
+
 func _posicionar_notificacao() -> void:
 	if not is_inside_tree() or not is_instance_valid(_notificacao):
 		return
-	var larg := get_viewport().get_visible_rect().size.x
-	var topo := 160.0
+	var ecra := get_viewport().get_visible_rect().size
+	var topo := MARGEM_SEGURA
 	if _cab_nivel:
-		topo = maxf(topo, _cab_nivel.position.y + _cab_nivel.size.y + 12.0)
-	_notificacao.position = Vector2(roundf((larg - _notificacao.size.x) * 0.5), topo)
+		topo = maxf(topo, _cab_nivel.position.y + _cab_nivel.size.y + 10.0)
+	# Nunca tapar o HUD de baixo (barras/equipamento) nem sair do ecrã.
+	topo = minf(topo, maxf(MARGEM_SEGURA, ecra.y - _notificacao.size.y - 200.0))
+	var esquerda := MARGEM_SEGURA
+	# Se ainda assim a caixa fosse larga ao ponto de entrar no meio do ecrã,
+	# encolhe-se a caixa -- não se empurra para o centro.
+	var limite := ecra.x * (0.5 - FRACAO_ACAO * 0.5) - MARGEM_SEGURA
+	if _notificacao.size.x > limite and limite > 160.0:
+		_notificacao.size.x = limite
+	_notificacao.position = Vector2(roundf(esquerda), roundf(topo))
 
 
 func _process(_dt: float) -> void:
