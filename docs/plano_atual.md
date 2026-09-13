@@ -1,3 +1,11 @@
+## 9H.19 — áudio vertical slice: paragem no gate de fontes
+
+- Objetivo: 12 candidatos físicos/orgânicos, música candidata, A/B Dev e Windows validado, sem propagação antes de escuta humana.
+- Âmbito exclusivo de áudio; preservar mixer/save e restantes sistemas.
+- Hipóteses dirigidas: packs locais, arquivos/histórico, instrumentos/stems.
+- Auditoria/brief concluídos em `docs/execution_9h19_audio_vertical_slice.md`; adequação profissional não estabelecida. PROFESSIONAL PRODUCTION ASSET REQUIRED.
+- Critério de retoma: fontes selecionadas por escuta e proveniência/licença suficiente; depois produzir B. B–F não iniciadas; execução INCOMPLETE.
+
 ## 9H.16 — L1 Perfection: PHASE A em curso (13 set 2026)
 
 - Briefing autoritativo recebido no anexo pasted-text; ordem A→B→C→D→E→F, sem avanço antes do fecho/commit/push da fase. Base f29b8f5c, branch codex/9h16-l1-perfection, worktree C:/Projetos/koliani-9h16.

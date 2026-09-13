@@ -1,3 +1,11 @@
+## 9H.19 — auditoria de áudio, gate de produção bloqueado (13 set 2026)
+
+- HEAD inicial `1d1fd7c1`, branch `codex/9h16-l1-perfection`, worktree `C:\Projetos\koliani-9h16`. Relatório: `docs/execution_9h19_audio_vertical_slice.md`.
+- 259 amostras em cinco packs locais creditados CC0; madeira/metal/ar/vidro/passos encontrados. Adequação profissional não estabelecida por escuta; não afirmar ausência total de fontes nem qualidade por métricas.
+- `PROFESSIONAL PRODUCTION ASSET REQUIRED`. `MAIN MENU MUSIC — PROFESSIONAL PRODUCTION ASSET REQUIRED`. Brief musical de produção registado; nenhum candidato, A/B novo, integração, alteração de mixer ou export 9H.19.
+- Baseline/final pelo arnês isolado EXIT 0; save real intacto. Logs `C:\Temp\koliani_9h19_baseline.log` e `C:\Temp\koliani_9h19_final.log`; retenção de recursos à saída já existente no baseline.
+- INCOMPLETE. Próximo: seleção auditiva das fontes locais e gravações/stems com licença pública clara; retomar B só depois do gate. HUMAN LISTEN REQUIRED: YES. Apenas documentação de auditoria/brief concluída; B–F pendentes.
+
 ## 9H.18 — a corrida (NATIVE ART REQUIRED) e os SFX pela FORMA (13 set 2026)
 
 - Relatorio: [`execution_9h18_corrida_e_sfx.md`](execution_9h18_corrida_e_sfx.md).
