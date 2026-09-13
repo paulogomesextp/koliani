@@ -20,7 +20,8 @@ const DANO_ATAQUE := 50
 
 ## Vida máxima efetiva = base + bónus da armadura equipada.
 func _vida_max() -> int:
-	return VIDA_MAXIMA + EstadoJogo.vida_bonus_armadura()
+	return VIDA_MAXIMA + EstadoJogo.vida_bonus_armadura() + (
+		int(EstadoJogo.bonus("vida_max")) if EstadoJogo.modo_dev else 0)
 
 
 ## Dano do golpe = arma equipada, ou a base se não houver arma.
@@ -1231,6 +1232,8 @@ func _physics_process(dt: float) -> void:
 			_olha_para = signf(vx)
 		move_and_slide()  # collision_mask = 0 enquanto voa -> atravessa tudo
 		_mov.velocidade = velocity
+		if _corpo:
+			_corpo.play("idle")
 		return
 
 	# GANCHO: enquanto está pendurada, o pêndulo é a física toda. Nada do
@@ -2424,13 +2427,11 @@ func soprar_para_cima(forca: float, alvo: float) -> void:
 func receber_dano(quantidade: int, dir_empurrao: float = 0.0) -> void:
 	if _invulneravel > 0.0:
 		return
-	if EstadoJogo.modo_dev:  # modo de testes: não perde vida
-		return
 	if _defendendo and _bloqueia(dir_empurrao):
 		_ao_bloquear()
 		return
 	var real := int(round(quantidade * (1.0 - EstadoJogo.reducao_armadura())))
-	vida = maxi(0, vida - maxi(1, real))
+	vida = _vida_max() if EstadoJogo.modo_dev else maxi(0, vida - maxi(1, real))
 	_invulneravel = I_FRAMES
 	_hurt_t = 0.24
 	Musica.intensificar()   # 9H.1: levar dano também é combate

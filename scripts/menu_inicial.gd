@@ -56,13 +56,9 @@ func _ready() -> void:
 		str(ProjectSettings.get_setting("application/config/version", "0.0.0")),
 		str(ProjectSettings.get_setting("application/run/main_scene", "?"))])
 
-	# voltar ao menu sai do "DEV MODE" -- recarrega o save real do disco
+	# Voltar ao menu repõe a sessão legítima em memória, sem escrever saves.
 	if EstadoJogo.modo_dev:
-		EstadoJogo.modo_dev = false
-		if FileAccess.file_exists(EstadoJogo.CAMINHO_SAVE):
-			EstadoJogo.carregar()
-		else:
-			EstadoJogo.reiniciar_campanha()
+		EstadoJogo.desativar_modo_dev()
 
 	if _tratar_atalhos_dev():
 		return

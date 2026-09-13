@@ -10,6 +10,19 @@
 
 # Plano atual — Execution 9H: frontend de produção + slice final da Região I
 
+## 9H.16 continuação — Phase B (13 setembro 2026)
+
+- Objetivo: Dev Mode temporário com progresso normal isolado em memória.
+- Âmbito: estado, dano/HP Dev, barra periférica, traduções e provas dirigidas.
+- Conclusão: B1–B7 cobertos, QA com input no export Windows limpo, zero
+  poluição de save, testes sem regressões além das 26 falhas visuais antigas;
+  só então commit/push da fase e avanço para C. A fechada em 9eda04e0.
+- Histórico reutilizado: b59f0b8d (sandbox/seletor), ab78a04b (FlyMode),
+  scripts atuais. Nenhum desenvolvimento em L2+; L20/50/100 só QA Dev pedido.
+- Checkpoint técnico validado; fase continua INCOMPLETE. Provas sintéticas e
+  Vulkan registadas na retoma; build Dev separada em C:/Temp. Paragem perto do
+  limite usage. Próximo: critérios restantes B e HUMAN PLAYTEST REQUIRED.
+
 ## Estado — 12 de setembro de 2026
 
 ### Execution 9H.12A — portal, tutorial e scaffold Região I

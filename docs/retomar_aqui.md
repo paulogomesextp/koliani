@@ -1,4 +1,36 @@
-## 9H.16 — preparação e diagnóstico inicial da PHASE A (13 set 2026)
+## 9H.16 — continuação: checkpoint Phase B (13 set 2026)
+
+- PHASE CURRENT: B INCOMPLETE. A fechada em 9eda04e0 conforme briefing;
+  notas antigas de diagnóstico abaixo são históricas, não reabrem A.
+- COMPLETED: lote técnico de isolamento Dev em memória; guardar/guardar_em
+  bloqueados; snapshot profundo e saída sem escrever/restaurar disco;
+  melhorias no máximo, recursos QA, HP Dev cheio com feedback normal de dano;
+  UI Dev no canto superior direito e FlyMode ON/OFF nos seis catálogos.
+- PROVEN: prova de bytes/snapshot, completion/boss/equipamento temporários,
+  checkpoint runtime e bloqueios normais intactos em save sintético. Runtime
+  Vulkan RTX 5070 com input sintético: L1/L20/L50/L100, spawn/voo/dano PASS.
+  Suite: mesmas 26 falhas conhecidas, zero novas falhas de teste.
+- REMAINING: B1–B7 integral no export (entrada pelo botão, seletor 1–100,
+  skills/equipamento em uso, quatro direções de voo, feedback/knockback,
+  saída/restart/Continuar/seletor normal). Não declarar Phase B concluída.
+- Build QA separada: C:/Temp/Koliani-9h16-PhaseB-dev.exe, debug 0.18.7,
+  199628496 bytes, SHA256
+  919c15fd969ad1ada35f632de713a87e1e2d4956bde14d6be90ac78618bae078.
+  Snapshot limpo de HEAD + fontes deste lote; export sem pastas de trabalho,
+  smoke Dev L1 Vulkan sem erro runtime. Build Windows principal não substituída.
+- Logs: C:/Temp/koliani-9h16-b-*.log. Headless nos níveis altos mostrou
+  coordenadas não finitas em essencia.gd; ausentes no Vulkan. Retenções ObjectDB
+  à saída ainda presentes; não investigadas fora do lote. Não afirmar zero erros.
+- NEXT ACTION: retomar B no worktree C:/Projetos/koliani-9h16, rever checkpoint
+  e concluir os critérios restantes antes de commit de fecho/push e Phase C.
+  HUMAN PLAYTEST REQUIRED: controlo nativo Windows indisponível nesta sessão;
+  input sintético/smoke não substituem o percurso humano exigido no briefing.
+- C–F não iniciadas; scores e qualidade Golden NOT ASSESSABLE. L1 READY AS
+  GOLDEN LEVEL: NO. Região II/L2 remaster/PWA final não iniciados; API paga não usada.
+- Desenvolvimento parado perto do limite pedido (17% cinco horas / 57% semanal
+  na leitura de checkpoint; consultar valores frescos na próxima sessão).
+
+## 9H.16 — preparação e diagnóstico inicial da PHASE A (histórico)
 
 - Branch `codex/9h16-l1-perfection`, worktree `C:/Projetos/koliani-9h16`, base obrigatória `claude/9h13b-sfx-redesign` / `f29b8f5c`. Árvore original e worktrees alheios preservados. Fetch origin master executado.
 - Âmbito atual: P0 portal/física L1; conclusão exige sintoma reproduzido ou explicitamente coberto, regressões e gameplay real com input. Fases B–F não iniciadas.

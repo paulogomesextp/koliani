@@ -272,6 +272,8 @@ func _limpar_jornada_ancora() -> void:
 ## energia infinita e sem perder vida (ver koliani.gd). NÃO é gravado no
 ## save -- vive só nesta sessão e o save real fica intacto.
 var modo_dev: bool = false
+## Cópia independente da sessão legítima; nunca é escrita pelo sandbox.
+var _sessao_normal_dev: Dictionary = {}
 
 
 func _ready() -> void:
@@ -589,6 +591,15 @@ func ha_progresso() -> bool:
 ## jogo o progresso real continua lá. `koliani.gd` lê `modo_dev` para dar
 ## energia infinita e ignorar dano.
 func ativar_modo_dev() -> void:
+	if modo_dev:
+		return
+	_sessao_normal_dev = para_dicionario().duplicate(true)
+	_sessao_normal_dev["runtime_dev"] = {
+		"checkpoint": checkpoint, "spawn": _spawn_inicio_sessao,
+		"ancora": _jornada_ancora, "ancora_idx": _jornada_ancora_idx,
+		"suspensas": habilidades_suspensas.duplicate(),
+		"anunciar": anunciar_avanco,
+	}
 	modo_dev = true
 	vidas = 99
 	indice_nivel = 0
@@ -606,12 +617,32 @@ func ativar_modo_dev() -> void:
 		armaduras.append(a["id"])
 	arma_equipada = _EQUIP.ARMAS[_EQUIP.ARMAS.size() - 1]["id"]
 	armadura_equipada = _EQUIP.ARMADURAS[_EQUIP.ARMADURAS.size() - 1]["id"]
-	# pistas/concluidos ficam como estão -- não interessam ao sandbox
+	essencia = 1000000
+	melhorias.clear()
+	for id: String in _MELHORIAS.CATALOGO:
+		melhorias[id] = _MELHORIAS.max_rank(id)
 	vidas_mudaram.emit(vidas)
 	for h in HABILIDADES_TODAS:
 		habilidade_desbloqueada.emit(h)
 	equipamento_mudou.emit("arma", arma_equipada)
 	equipamento_mudou.emit("armadura", armadura_equipada)
+
+
+## Sai sem restaurar/escrever ficheiros: repõe apenas a memória legítima.
+func desativar_modo_dev() -> void:
+	if not modo_dev:
+		return
+	modo_dev = false
+	var runtime: Dictionary = _sessao_normal_dev.get("runtime_dev", {})
+	de_dicionario(_sessao_normal_dev)
+	checkpoint = runtime.get("checkpoint", Vector2.ZERO)
+	_spawn_inicio_sessao = runtime.get("spawn", Vector2.ZERO)
+	_jornada_ancora = runtime.get("ancora", Vector2.ZERO)
+	_jornada_ancora_idx = int(runtime.get("ancora_idx", -1))
+	habilidades_suspensas.assign(runtime.get("suspensas", []))
+	anunciar_avanco = bool(runtime.get("anunciar", false))
+	_sessao_normal_dev.clear()
+	vidas_mudaram.emit(vidas)
 
 
 ## Modo normal: gastaram-se as vidas todas, MAS o progresso fica. Volta-se
@@ -926,12 +957,14 @@ func de_dicionario(d: Dictionary) -> void:
 
 
 func guardar() -> bool:
-	if modo_teste:
+	if modo_teste or modo_dev:
 		return false
 	return guardar_em(CAMINHO_SAVE, CAMINHO_SAVE_BACKUP, CAMINHO_SAVE_TEMP)
 
 
 func guardar_em(primary: String, backup: String, temp: String) -> bool:
+	if modo_dev:
+		return false
 	var resultado := _SAVE.escrever_seguro(
 		para_dicionario(), primary, backup, temp, NIVEIS.size())
 	ultimo_erro_save = str(resultado.get("error", ""))

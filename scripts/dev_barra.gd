@@ -21,7 +21,13 @@ func _ready() -> void:
 		return
 	_montar_botao_topo()
 	_montar_botao_flymode()
-	_montar_botao_testes()
+	var estado := Label.new()
+	estado.name = "EstadoDev"
+	estado.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+	estado.position = Vector2(-234, 26)
+	estado.add_theme_font_size_override("font_size", 13)
+	estado.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(estado)
 	_montar_painel()
 	Textos.idioma_mudou.connect(func(_l: String) -> void: _traduzir())
 	_traduzir()
@@ -55,8 +61,8 @@ func _montar_botao_topo() -> void:
 	# Texto inicial para o botão já ter tamanho mesmo antes do autoload
 	# Textos terminar de carregar a tradução.
 	b.text = "TESTAR OUTRO NÍVEL"
-	b.set_anchors_preset(Control.PRESET_CENTER_TOP)
-	b.position = Vector2(-110, 6)
+	b.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+	b.position = Vector2(-234, 50)
 	b.custom_minimum_size = Vector2(220, 30)
 	b.add_theme_font_size_override("font_size", 13)
 	b.add_theme_color_override("font_color", Color(1, 0.85, 0.4))
@@ -90,8 +96,8 @@ var _btn_boss: Button
 func _montar_botao_flymode() -> void:
 	_btn_fly = Button.new()
 	_btn_fly.name = "BotaoFlymode"
-	_btn_fly.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
-	_btn_fly.position = Vector2(14, -148)
+	_btn_fly.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+	_btn_fly.position = Vector2(-234, 86)
 	_btn_fly.custom_minimum_size = Vector2(132, 28)
 	_btn_fly.focus_mode = Control.FOCUS_NONE
 	_btn_fly.add_theme_font_size_override("font_size", 13)
@@ -132,7 +138,7 @@ func _estilo_botao_teste(btn: Button) -> void:
 func _estilo_flymode(ativo: bool) -> void:
 	if _btn_fly == null:
 		return
-	_btn_fly.text = "FLYMODE: ON" if ativo else "FLYMODE"
+	_btn_fly.text = Textos.t("dev.fly_on" if ativo else "dev.fly_off")
 	var sb := StyleBoxFlat.new()
 	sb.bg_color = Color(0.1, 0.35, 0.18, 0.92) if ativo else Color(0.08, 0.04, 0.11, 0.9)
 	sb.border_color = Color(0.5, 1.0, 0.55, 0.95) if ativo else Color(0.95, 0.7, 0.3, 0.9)
@@ -209,9 +215,14 @@ func _montar_painel() -> void:
 
 
 func _traduzir() -> void:
+	var estado := get_node_or_null("EstadoDev") as Label
+	if estado:
+		estado.text = Textos.t("dev.status") % (EstadoJogo.indice_nivel + 1)
 	var bt := get_node_or_null("BotaoTopo") as Button
 	if bt:
 		bt.text = Textos.t("dev.test_level")
+	var k := get_tree().get_first_node_in_group("koliani")
+	_estilo_flymode(k != null and bool(k.get("_voando")))
 	if _painel:
 		var titulo := _painel.find_child("Titulo", true, false) as Label
 		if titulo:
