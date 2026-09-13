@@ -1,4 +1,34 @@
-## 9H.16 — continuação: checkpoint Phase B (13 set 2026)
+## 9H.16 — continuação autorizada depois de 9af93695 (13 set 2026)
+
+- PHASE CURRENT: B INCOMPLETE; C–F não iniciadas. User autorizou usar o
+  usage restante apesar do limiar anterior. Fetch executado; trabalho alheio preservado.
+- COMPLETED: corrigida soma duplicada de vitalidade Dev introduzida no
+  checkpoint anterior; FlyMode escolhe idle no controlo real de animações,
+  preservando hurt; removida reposição legada do botão de nível no canto
+  inferior esquerdo; rótulo/controlos Dev abaixo das essências, no topo direito.
+- PROVEN: Vulkan RTX 5070 com input sintético em L1/L20/L50/L100 passou:
+  quatro direções de voo, idle, HP correto e feedback de dano sem morte.
+  Seletor Dev configurado para os 100 níveis, com nomes e sem bloqueio;
+  após saída, seletor normal respeitou a fronteira legítima. Isolamento
+  bytes/snapshot voltou a passar. Suite mantém 26 falhas conhecidas, zero novas.
+- Captura renderer real 1280×720: C:/Temp/koliani-9h16-b2-ui.png;
+  controlos Dev juntos sem sobreposição do contador de essências nesse frame.
+- Build QA limpa atualizada: C:/Temp/Koliani-9h16-PhaseB-dev.exe, debug
+  0.18.7, 199628400 bytes, SHA256
+  25a3125a8b5ae65a49a5f28d0869b0dc7987cca51ee8b85f81281d6e5015366a.
+  Smoke Dev L1 Vulkan sem erros runtime; aviso ObjectDB à saída permanece.
+  Logs C:/Temp/koliani-9h16-b2-*.log; EXE principal continua preservado.
+- Correção da limitação anterior: runtime Windows @oai/sky inicializado via
+  node_repl está disponível. Não foi enviado input nativo: a API ativa a
+  janela, em conflito com «não roubar foco» do briefing. Pergunta sobre foco
+  temporário apresentada ao user, ainda sem resposta; não inferir autorização.
+- REMAINING / NEXT ACTION: obter essa resposta e realizar QA no export por
+  menu/seletor, skills/equipamento em uso, dano/feedback/knockback, saída,
+  restart, Continuar e seletor normal. HUMAN PLAYTEST REQUIRED para o percurso
+  humano; não confundir input sintético com QA integral nem fechar B.
+- Usage na leitura desta continuação: 6% cinco horas / 55% semanal.
+
+## 9H.16 — continuação: checkpoint Phase B (histórico, 13 set 2026)
 
 - PHASE CURRENT: B INCOMPLETE. A fechada em 9eda04e0 conforme briefing;
   notas antigas de diagnóstico abaixo são históricas, não reabrem A.

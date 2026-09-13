@@ -22,6 +22,10 @@
 - Checkpoint técnico validado; fase continua INCOMPLETE. Provas sintéticas e
   Vulkan registadas na retoma; build Dev separada em C:/Temp. Paragem perto do
   limite usage. Próximo: critérios restantes B e HUMAN PLAYTEST REQUIRED.
+- Continuação após 9af93695: HP duplicado, animação de voo e sobreposições
+  Dev corrigidos/validados; quatro direções e seletor 100 níveis provados.
+  Runtime Windows sky disponível; input nativo aguarda resposta sobre foco
+  temporário devido à restrição explícita do briefing. B continua aberta.
 
 ## Estado — 12 de setembro de 2026
 

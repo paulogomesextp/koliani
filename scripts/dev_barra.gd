@@ -24,7 +24,7 @@ func _ready() -> void:
 	var estado := Label.new()
 	estado.name = "EstadoDev"
 	estado.set_anchors_preset(Control.PRESET_TOP_RIGHT)
-	estado.position = Vector2(-234, 26)
+	estado.position = Vector2(-234, 74)
 	estado.add_theme_font_size_override("font_size", 13)
 	estado.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(estado)
@@ -62,7 +62,7 @@ func _montar_botao_topo() -> void:
 	# Textos terminar de carregar a tradução.
 	b.text = "TESTAR OUTRO NÍVEL"
 	b.set_anchors_preset(Control.PRESET_TOP_RIGHT)
-	b.position = Vector2(-234, 50)
+	b.position = Vector2(-234, 98)
 	b.custom_minimum_size = Vector2(220, 30)
 	b.add_theme_font_size_override("font_size", 13)
 	b.add_theme_color_override("font_color", Color(1, 0.85, 0.4))
@@ -80,11 +80,7 @@ func _montar_botao_topo() -> void:
 	b.add_theme_stylebox_override("pressed", sb)
 	b.add_theme_stylebox_override("focus", sb)
 	b.pressed.connect(_abrir)
-	# O seletor fica junto dos controlos de developer, por cima do Flymode.
-	# A âncora tem de ser definida antes de adicionar ao CanvasLayer (que não
-	# tem tamanho próprio); depois disso uma âncora inferior cairia em y=0.
-	b.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
-	b.position = Vector2(14, -182)
+	# Controlos periféricos abaixo do contador de essências do HUD.
 	add_child(b)
 
 
@@ -97,7 +93,7 @@ func _montar_botao_flymode() -> void:
 	_btn_fly = Button.new()
 	_btn_fly.name = "BotaoFlymode"
 	_btn_fly.set_anchors_preset(Control.PRESET_TOP_RIGHT)
-	_btn_fly.position = Vector2(-234, 86)
+	_btn_fly.position = Vector2(-234, 134)
 	_btn_fly.custom_minimum_size = Vector2(132, 28)
 	_btn_fly.focus_mode = Control.FOCUS_NONE
 	_btn_fly.add_theme_font_size_override("font_size", 13)

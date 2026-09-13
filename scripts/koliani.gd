@@ -20,8 +20,7 @@ const DANO_ATAQUE := 50
 
 ## Vida máxima efetiva = base + bónus da armadura equipada.
 func _vida_max() -> int:
-	return VIDA_MAXIMA + EstadoJogo.vida_bonus_armadura() + (
-		int(EstadoJogo.bonus("vida_max")) if EstadoJogo.modo_dev else 0)
+	return VIDA_MAXIMA + EstadoJogo.vida_bonus_armadura()
 
 
 ## Dano do golpe = arma equipada, ou a base se não houver arma.
@@ -1232,8 +1231,6 @@ func _physics_process(dt: float) -> void:
 			_olha_para = signf(vx)
 		move_and_slide()  # collision_mask = 0 enquanto voa -> atravessa tudo
 		_mov.velocidade = velocity
-		if _corpo:
-			_corpo.play("idle")
 		return
 
 	# GANCHO: enquanto está pendurada, o pêndulo é a física toda. Nada do
@@ -1640,6 +1637,8 @@ func _atualizar_anim() -> void:
 		a = "morte"
 	elif _hurt_t > 0.0 and sf.has_animation("hurt"):
 		a = "hurt"
+	elif _voando:
+		a = "idle"  # Voo Dev sem queda infinita; preserva a reação ao dano.
 	elif _rolar_restante > 0.0 and sf.has_animation("roll"):
 		a = "roll"
 	elif _dash_restante > 0.0 and sf.has_animation("dash"):
