@@ -1076,7 +1076,9 @@ func _soltar_essencia() -> void:
 		var m := ESSENCIA.instantiate()
 		m.valor = maxi(1, total / n + (1 if i < total % n else 0))
 		m.global_position = global_position + Vector2(randf_range(-10.0, 10.0), -14.0)
-		cena.add_child(m)
+		# O golpe fatal pode correr no flush da física. Adiar a inserção da
+		# Area2D inteira, não apenas o monitoring da essência.
+		cena.add_child.call_deferred(m)
 
 
 ## Rebentamento GRANDE quando um elite cai (2 anéis da cor do rim + clarão).

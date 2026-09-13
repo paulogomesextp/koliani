@@ -1,3 +1,14 @@
+## 9H.16 — preparação e diagnóstico inicial da PHASE A (13 set 2026)
+
+- Branch `codex/9h16-l1-perfection`, worktree `C:/Projetos/koliani-9h16`, base obrigatória `claude/9h13b-sfx-redesign` / `f29b8f5c`. Árvore original e worktrees alheios preservados. Fetch origin master executado.
+- Âmbito atual: P0 portal/física L1; conclusão exige sintoma reproduzido ou explicitamente coberto, regressões e gameplay real com input. Fases B–F não iniciadas.
+- PROVEN: regressão existente `tests/run_9h12a.tscn` headless com APPDATA isolado: 0 falhas, uma entrada no portal. A suite existente também carregou scaffold L1–L5; não houve desenvolvimento desses níveis.
+- PROVEN: arnês temporário em `work/9h16/portal.tscn`, limitado à travessia L1→L2, OpenGL real na RTX 5070, fixed-fps 60, input de movimento: 0 falhas, uma entrada, recompensa única, save/retoma e sessão L2. Aproximação começa 85 px antes da porta após remoção artificial do guardião; não prova combate nem percurso completo.
+- Logs: `C:/Temp/koliani-9h16-import.log`, `koliani-9h16-portal-headless.log`, `koliani-9h16-real.log`, `koliani-9h16-real-errors.log`. Sem erros de runtime; avisos de Camera2D e 73/74 instâncias ObjectDB retidas à saída. Causa dos avisos não investigada nesta prova.
+- QA crítico: bugs da travessia PROVEN apenas no cenário ensaiado; UI da transição PROVEN visível em captura. Combate, mecânicas L1, game feel, animações e equilíbrio de áudio NOT ASSESSABLE nesta travessia curta. Placeholders e compatibilidade Hybrid L1 NOT ASSESSABLE pela captura L2; destino L2 ainda mostra estética pixel-art legada (LIKELY incompatibilidade visual, fora de âmbito). Banner de avanço ocupa o centro da imagem e merece revisão humana de legibilidade. HUMAN PLAYTEST REQUIRED para sensação/diversão/mix; DEVICE VALIDATION REQUIRED para browser/mobile.
+- Não houve alteração runtime nem commit/push de fase. Fase A INCOMPLETE: falta o sintoma P0 atual e os critérios detalhados da 9H.16. Não fabricar correção para bug não reproduzido. Arte nova: NATIVE ART REQUIRED quando faltar fonte aprovada.
+- Próximo: obter briefing/sintoma atual; delimitar reprodução e critérios da PHASE A antes de editar. Retoma atualizada apenas neste worktree.
+
 # Retomar aqui — Koliani
 
 Índice de integração documental: [master_package_integration.md](master_package_integration.md).
@@ -1931,3 +1942,11 @@ da 3A.
 
 A auditoria de Execution 0 é evidência histórica, não o estado operacional
 atual. Não repetir auditorias completas nesta retoma.
+## 9H.16 PHASE A — P0 portal/physics concluída (13 set 2026)
+
+- `ChefeBase` e `DemonioBase` inserem `Essencia` com `cena.add_child.call_deferred(m)` quando a morte nasce da hitbox. A recompensa mantém 7 motes/70 essência. `ControlosToque` abandona continuações quando o HUD sai da árvore e valida viewport/notificação.
+- `tests/run_portal_9h16.tscn` passou quatro cenários com renderer real: normal, corrida, salto+dash e efeitos próximos. Confirmou uma entrada, reentrada bloqueada, L2, save e spawn; o dash foi observado no caso próprio.
+- Build candidata Windows Vulkan `C:/Temp/koliani-9h16-candidate2.exe`: cinco processos separados, incluindo após reinício, terminaram com código 0. Logs `C:/Temp/koliani-9h16-c2-case*.log` sem `flushing queries`, `SCRIPT ERROR`, `ERROR:` ou softlock.
+- WER confirma o histórico `APPCRASH` do EXE 0.18.6 (`c0000005`, RVA `0x16b3420`), mas a queda nativa não foi reproduzida na base 0.18.7 nem na candidata. Estabilidade atual PROVEN; causa do crash histórico NOT ASSESSABLE.
+- QA crítico: portal/save/spawn PROVEN. Aviso de Camera2D e leaks ObjectDB dos arneses persistem fora do fluxo jogável. Combate completo, animações, mix, sensação e dispositivo mobile NOT ASSESSABLE. Banner central é PHASE C. Sem arte nova: NATIVE ART REQUIRED se houver lacuna.
+- Fases B–F não iniciadas; próximo passo é PHASE B após este commit/push.

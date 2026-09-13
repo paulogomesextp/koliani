@@ -817,6 +817,8 @@ func _dialogo_visivel() -> bool:
 
 
 func _enfileirar_notificacao(dados: Dictionary) -> void:
+	if not is_inside_tree():
+		return
 	_fila_notificacoes.append(dados)
 	if not _fila_ativa:
 		_consumir_notificacoes()
@@ -827,6 +829,8 @@ func _consumir_notificacoes() -> void:
 	while not _fila_notificacoes.is_empty():
 		while _dialogo_visivel():
 			await get_tree().process_frame
+			if not is_inside_tree():
+				return
 		var dados: Dictionary = _fila_notificacoes.pop_front()
 		var tutorial: bool = dados.get("tutorial", false)
 		_notificacao = _criar_tutorial(dados.nome, dados.txt) if tutorial else UIProducao.toast(dados.txt, dados.icone, dados.estilo)
@@ -838,19 +842,29 @@ func _consumir_notificacoes() -> void:
 		_notificacao_suspensa = false
 		add_child(_notificacao)
 		await get_tree().process_frame
+		# A Porta pode substituir a cena no mesmo frame. A continuação da
+		# fila não pode usar o viewport do HUD que acabou de sair da árvore.
+		if not is_inside_tree() or not is_instance_valid(_notificacao):
+			return
 		_notificacao.reset_size()
 		_posicionar_notificacao()
 		_notificacao_tween = _notificacao.create_tween()
 		_notificacao_tween.tween_interval(TUTORIAL_SEGUNDOS - 0.6 if tutorial else 1.8)
 		_notificacao_tween.tween_property(_notificacao, "modulate:a", 0.0, 0.6)
 		await _notificacao_tween.finished
+		if not is_inside_tree() or not is_instance_valid(_notificacao):
+			return
 		_notificacao.queue_free()
 		_notificacao = null
 		await get_tree().process_frame
+		if not is_inside_tree():
+			return
 	_fila_ativa = false
 
 
 func _posicionar_notificacao() -> void:
+	if not is_inside_tree() or not is_instance_valid(_notificacao):
+		return
 	var larg := get_viewport().get_visible_rect().size.x
 	var topo := 160.0
 	if _cab_nivel:

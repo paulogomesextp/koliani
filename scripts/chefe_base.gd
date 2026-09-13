@@ -475,7 +475,9 @@ func _soltar_essencia_chefe(cena: Node) -> void:
 		var m := ESSENCIA.instantiate()
 		m.valor = maxi(1, total / n + (1 if i < total % n else 0))
 		m.global_position = global_position + Vector2(randf_range(-40.0, 40.0), -30.0)
-		cena.add_child(m)
+		# A morte pode vir de body_entered da espada: inserir a Area2D com
+		# formas físicas durante o flush falha, mesmo com monitoring adiado.
+		cena.add_child.call_deferred(m)
 
 
 func _cair_derrotado() -> void:

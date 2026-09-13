@@ -1,3 +1,13 @@
+## 9H.16 — L1 Perfection: PHASE A em curso (13 set 2026)
+
+- Briefing autoritativo recebido no anexo pasted-text; ordem A→B→C→D→E→F, sem avanço antes do fecho/commit/push da fase. Base f29b8f5c, branch codex/9h16-l1-perfection, worktree C:/Projetos/koliani-9h16.
+- Objetivo A: reproduzir/classificar/corrigir fecho Windows após derrotar Ghorak e atravessar L1→L2. Scope: callbacks/colisões/recompensa de morte/Porta/EstadoJogo/spawn L2. Sem arte nova ou mudanças de design.
+- Hipóteses: divergência da build; mutação de física na morte; transição/spawn/resource failure. WER confirma crash nativo c0000005 (versões PE 0.18.6 e 0.18.2, RVA 0x16b3420). EXE no destino foi substituído antes desta execução: SHA256 fe7de41f1 no sufixo, versão runtime 0.18.7; crash anterior ainda não reproduzido nesta base.
+- Prova dirigida Ghorak vida=1, ataque por input, aproximação contínua da morte ao portal: reproduz sete area_set_shape_disabled em _soltar_essencia_chefe/cena.add_child durante callback _ao_acertar_corpo. L2 ainda carrega nesta prova (headless e Vulkan real). Não atribuir ao crash causalidade sem evidência.
+- Alteração técnica delimitada: adiar inserção de Essencia inteira em ChefeBase e DemonioBase; sem alterar valores nem assets. Critério local: morte por hitbox real, recompensa exata e ausência de flushing queries.
+- Aceitação da fase: EXE Windows real, cinco entradas (normal/corrida/salto+dash/efeitos/novo processo), L2 spawn válido, sem crash/softlock/flushing queries; zero falhas novas além das 26 baseline; QA crítico com limites, commit/push isolados só após fase concluída.
+- B–F não iniciadas. NATIVE ART REQUIRED se faltar fonte. HUMAN PLAYTEST REQUIRED e DEVICE VALIDATION REQUIRED nos pontos dependentes de sensação/hardware mobile.
+
 # Plano atual — Execution 9H: frontend de produção + slice final da Região I
 
 ## Estado — 12 de setembro de 2026
