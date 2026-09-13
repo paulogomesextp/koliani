@@ -83,8 +83,8 @@
     `.wav`): acerto, ataque, ataque_forte, bloqueio, dano, dash,
     morte_koliani, passo1..3, rolamento, selo, agarrar.
 - BUILD: `C:/Projetos/koliani/build/windows/Koliani.exe`, release
-  **v0.18.12**, 205 735 752 bytes, SHA256
-  `13FD274D4C22CFB9DBA45B0E2169027D93FACFBFC8AFEE622956235FA5F29E5B`.
+  **v0.18.13**, 205 736 040 bytes, SHA256
+  `E6E801E25F7CBF9304D110643E50A0B9B7DF6811F09E7BD46FC592F65869124E`.
   Suite EXIT 0 por `tools/correr_testes.ps1`; save do Paulo verificado por
   SHA256 antes e depois, intacto.
 
