@@ -883,6 +883,12 @@ func _montar_golden_set(sf: SpriteFrames) -> void:
 		_animacao_golden(sf, nome, aterrar, 16.0, false)
 	# `jump` só é pedido pelo caminho de locomoção antigo; fica golden na mesma.
 	_animacao_golden(sf, "jump", _frames_de(sf, "jump_start", [1, 2, 3]), 12.0, false)
+	# RUN final aprovada: substituir só depois de preservar os derivados anteriores.
+	# Os dez PNGs NN128 usam o mesmo contrato; física e cadência não mudam.
+	var run_final: Array = []
+	for i in 10:
+		run_final.append("%s/frames/run_final/run_%03d.png" % [GOLDEN_DIR, i + 1])
+	_animacao_golden(sf, "run", run_final, _KOLI_ANIMS_GOLDEN["run"][2], true)
 	_montar_vfx_golpe()
 
 

@@ -1,0 +1,66 @@
+{
+  "human_approval": "2026-09-15",
+  "pipeline": "1254 to 70 NEAREST; canvas128; placement29,37",
+  "frames": [
+    {
+      "frame": 1,
+      "asset": "assets\\sprites\\koliani_golden_set\\frames\\run_final\\run_001.png",
+      "approved_source": "work\\production_art_gate\\run_10_motion_review_20260915\\gameplay_128\\frame_01_128.png",
+      "sha256": "b7254243e60a0bf2a547dfc483d4a78c7c76efda7e9b6b984ab422bb65082040"
+    },
+    {
+      "frame": 2,
+      "asset": "assets\\sprites\\koliani_golden_set\\frames\\run_final\\run_002.png",
+      "approved_source": "work\\production_art_gate\\run_10_motion_review_20260915\\gameplay_128\\frame_02_128.png",
+      "sha256": "6bf03c28b43343973a4817ea47cfa93e4519e2035cf25315c985f427f9545330"
+    },
+    {
+      "frame": 3,
+      "asset": "assets\\sprites\\koliani_golden_set\\frames\\run_final\\run_003.png",
+      "approved_source": "work\\production_art_gate\\run_10_motion_review_20260915\\gameplay_128\\frame_03_128.png",
+      "sha256": "99c764e0b2ef7b091037a34c8bfd0d5116bb12623979aeb800041476630a9aa0"
+    },
+    {
+      "frame": 4,
+      "asset": "assets\\sprites\\koliani_golden_set\\frames\\run_final\\run_004.png",
+      "approved_source": "work\\production_art_gate\\run_10_motion_review_20260915\\gameplay_128\\frame_04_128.png",
+      "sha256": "162b22f9e933f90a3fed53be0d0ae9bed74764cb1b70985e73cf236e78ce6487"
+    },
+    {
+      "frame": 5,
+      "asset": "assets\\sprites\\koliani_golden_set\\frames\\run_final\\run_005.png",
+      "approved_source": "work\\production_art_gate\\run_10_motion_review_20260915\\gameplay_128\\frame_05_128.png",
+      "sha256": "b766c754d4a1b4278927f4fd3113015c9e1d4c411ccbc22cdb4465b8dd02dd23"
+    },
+    {
+      "frame": 6,
+      "asset": "assets\\sprites\\koliani_golden_set\\frames\\run_final\\run_006.png",
+      "approved_source": "work\\production_art_gate\\run_10_motion_review_20260915\\gameplay_128\\frame_06_128.png",
+      "sha256": "a13242cdc64e968d848be912bbbd182afa1cec6941b562b34a313fc3f6a778a0"
+    },
+    {
+      "frame": 7,
+      "asset": "assets\\sprites\\koliani_golden_set\\frames\\run_final\\run_007.png",
+      "approved_source": "work\\production_art_gate\\run_10_motion_review_20260915\\gameplay_128\\frame_07_128.png",
+      "sha256": "b86d0d8915def6f02b5e3305d5454db8b152d615827828a8cda6a80fcea120d1"
+    },
+    {
+      "frame": 8,
+      "asset": "assets\\sprites\\koliani_golden_set\\frames\\run_final\\run_008.png",
+      "approved_source": "work\\production_art_gate\\run_10_motion_review_20260915\\gameplay_128\\frame_08_128.png",
+      "sha256": "4f9a2bf453c5ca7a16d36f9aac1c70a19b1af2533d2f39fefbe9c6a66de2eae3"
+    },
+    {
+      "frame": 9,
+      "asset": "assets\\sprites\\koliani_golden_set\\frames\\run_final\\run_009.png",
+      "approved_source": "work\\production_art_gate\\run_10_motion_review_20260915\\gameplay_128\\frame_09_128.png",
+      "sha256": "378317480da768a22e32146f000b2ee3c66ee7c335d908c0e55a88f688ab9289"
+    },
+    {
+      "frame": 10,
+      "asset": "assets\\sprites\\koliani_golden_set\\frames\\run_final\\run_010.png",
+      "approved_source": "work\\production_art_gate\\run_10_motion_review_20260915\\gameplay_128\\frame_10_128.png",
+      "sha256": "c044f3454c1e5bfd330950697b3f204ac8f0c6e9687342510babd220d85d1397"
+    }
+  ]
+}
