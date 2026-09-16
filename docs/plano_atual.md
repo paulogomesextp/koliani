@@ -1,3 +1,15 @@
+## Process 09 — Região II: sistema reutilizável de vento (16 set 2026)
+
+- Objetivo: componente de vento horizontal/vertical reutilizável, aplicado à
+  Koliani como força externa e validado isoladamente.
+- Âmbito: `WindZone`, integração mínima no player, testes A–L e documentação;
+  sem alterar cenas N06–N10, glide, boss, arte, áudio, inimigos, UI ou saves.
+- Critério: baseline de movimento preservada fora das zonas; enter/exit,
+  múltiplas zonas, dash e respawn sem força residual; targeted Godot e suite
+  geral sem novas falhas; commit/push dedicado com HEAD local=remoto.
+- Worktree `C:/Users/sarac/Koliani/koliani_region02`, branch
+  `codex/region02-wind-system`, base `4e3ea01e`.
+
 ## 9H.19 — áudio vertical slice: paragem no gate de fontes
 
 - Objetivo: 12 candidatos físicos/orgânicos, música candidata, A/B Dev e Windows validado, sem propagação antes de escuta humana.

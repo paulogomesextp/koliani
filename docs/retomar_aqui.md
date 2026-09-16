@@ -1,3 +1,20 @@
+## Process 09 — sistema reutilizável de vento da Região II (16 set 2026)
+
+- Worktree `C:/Users/sarac/Koliani/koliani_region02`, branch
+  `codex/region02-wind-system`, base `4e3ea01e`.
+- Criados `WindZone.tscn`/`wind_zone.gd`: direção, intensidade, tamanho,
+  velocidade máxima, contínuo/pulsado, multiplicador variável e sinais para
+  feedback. Vento chega à Koliani como força externa por origem, com exit,
+  TTL defensivo e composição de múltiplas zonas.
+- Física base não foi retunada; respawn limpa velocidade/vento. N06–N10 não
+  foram alterados; glide N08, boss N10, inimigos, UI, SFX e arte ficaram fora.
+- Godot 4.7.2: targeted A–L PASS, Movement+Camera 4A PASS, suite completa PASS;
+  save real intacto. Avisos de recursos retidos no shutdown imediato também
+  aparecem no targeted baseline de Movement+Camera e não causaram falhas.
+- Documento: `docs/implementation/region_02_wind_system.md`.
+- Próximo passo: aplicar e afinar zonas em N06/N07/N09 num processo separado,
+  com validação de níveis e `HUMAN PLAYTEST REQUIRED`. Não iniciar Process 10.
+
 ## Regra permanente — Windows e PWA sincronizados (14 set 2026)
 
 - Pedido do GM: todas as entregas atualizam Windows e PWA juntos, mesmo commit e versão. Regra acrescentada a AGENTS.md; o CI existente exporta ambos em cada push master.

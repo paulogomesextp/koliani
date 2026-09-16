@@ -386,6 +386,12 @@ var _inverso_restante := 0.0
 var _vento_restante := 0.0
 var _vento_forca := 0.0
 var _vento_alvo := 0.0
+## Influências reutilizáveis de vento. Cada zona renova a sua entrada por
+## frame e remove-a no exit; o TTL é a rede para teleporte/queue_free/sinais
+## perdidos. A chave é o instance_id da zona, por isso sobreposições somam sem
+## um booleano global que possa ficar preso.
+var _ventos_externos: Dictionary = {}
+const VENTO_EXTERNO_TTL := 0.12
 
 # animação procedural (visual, corre em _process)
 var _mat: ShaderMaterial
@@ -1558,6 +1564,8 @@ func _physics_process(dt: float) -> void:
 	elif _vento_restante > 0.0:
 		_vento_restante -= dt
 
+	_aplicar_ventos_externos(dt)
+
 	# cair em cima de um inimigo = golpe de espada + pulo automático (estilo
 	# Mario). Janela GENEROSA: basta vir a descer e apanhar o bicho grosso
 	# modo por cima -- serve para inimigos de vários tamanhos. Encadeia:
@@ -2517,6 +2525,70 @@ func soprar_para_cima(forca: float, alvo: float) -> void:
 	_vento_restante = 0.12  # renova-se enquanto a área a alimentar
 
 
+## Regista ou renova uma força de vento proveniente de uma zona concreta.
+## A direção está embutida em `aceleracao`; a velocidade máxima limita apenas
+## o sentido dessa influência. Não altera gravidade, corrida ou aceleração.
+func atualizar_vento(fonte: Object, aceleracao: Vector2,
+		velocidade_max: float, duracao := VENTO_EXTERNO_TTL) -> void:
+	if fonte == null or aceleracao.is_zero_approx():
+		if fonte != null:
+			remover_vento(fonte)
+		return
+	_ventos_externos[fonte.get_instance_id()] = {
+		"fonte": weakref(fonte),
+		"aceleracao": aceleracao,
+		"velocidade_max": maxf(0.0, velocidade_max),
+		"restante": maxf(duracao, 0.0),
+	}
+
+
+func remover_vento(fonte: Object) -> void:
+	if fonte != null:
+		_ventos_externos.erase(fonte.get_instance_id())
+
+
+func limpar_ventos() -> void:
+	_ventos_externos.clear()
+
+
+func quantidade_ventos_ativos() -> int:
+	_descartar_ventos_invalidos(0.0)
+	return _ventos_externos.size()
+
+
+func aceleracao_vento_resultante() -> Vector2:
+	_descartar_ventos_invalidos(0.0)
+	var resultado := Vector2.ZERO
+	for entrada: Dictionary in _ventos_externos.values():
+		resultado += entrada["aceleracao"] as Vector2
+	return resultado
+
+
+func _aplicar_ventos_externos(dt: float) -> void:
+	_descartar_ventos_invalidos(dt)
+	var ids := _ventos_externos.keys()
+	ids.sort()
+	for id in ids:
+		var entrada: Dictionary = _ventos_externos[id]
+		velocity = Movimento.aplicar_forca_externa(
+			velocity,
+			entrada["aceleracao"] as Vector2,
+			float(entrada["velocidade_max"]),
+			dt,
+		)
+
+
+func _descartar_ventos_invalidos(dt: float) -> void:
+	for id in _ventos_externos.keys():
+		var entrada: Dictionary = _ventos_externos[id]
+		var fonte_fraca: WeakRef = entrada["fonte"]
+		entrada["restante"] = float(entrada["restante"]) - dt
+		if fonte_fraca.get_ref() == null or float(entrada["restante"]) <= 0.0:
+			_ventos_externos.erase(id)
+		else:
+			_ventos_externos[id] = entrada
+
+
 func receber_dano(quantidade: int, dir_empurrao: float = 0.0) -> void:
 	if _invulneravel > 0.0:
 		return
@@ -2590,6 +2662,8 @@ func recuperar_no_checkpoint(posicao_segura: Vector2) -> void:
 	# do nível). Sem este reset via-se um risco dela a atravessar o mapa.
 	reset_physics_interpolation()
 	velocity = Vector2.ZERO
+	_mov.velocidade = Vector2.ZERO
+	limpar_ventos()
 	_desencravar()
 	_pos_inicial = global_position
 

@@ -136,6 +136,22 @@ static func aplicar_gravidade(vel_y: float, dt: float, grav_escala: float = 1.0,
 	return clampf(v, -VEL_MAX_QUEDA, VEL_MAX_QUEDA)
 
 
+## Aplica uma força externa sem alterar os parâmetros base de movimento.
+## `aceleracao` já inclui direção e intensidade; `velocidade_max` limita só
+## a componente no sentido da força, preservando movimento perpendicular e
+## velocidade que o corpo já tenha no sentido oposto.
+static func aplicar_forca_externa(velocidade: Vector2, aceleracao: Vector2,
+		velocidade_max: float, dt: float) -> Vector2:
+	if aceleracao.is_zero_approx() or dt <= 0.0:
+		return velocidade
+	var direcao := aceleracao.normalized()
+	var incremento := aceleracao.length() * dt
+	if velocidade_max > 0.0:
+		var atual := velocidade.dot(direcao)
+		incremento = minf(incremento, maxf(0.0, velocidade_max - atual))
+	return velocidade + direcao * incremento
+
+
 ## 0 = sem aterragem, 1 = leve, 2 = média, 3 = pesada. A classificação não
 ## bloqueia input; serve apenas para escolher feedback visual/sonoro/câmara.
 static func tier_aterragem(vel_queda: float) -> int:
