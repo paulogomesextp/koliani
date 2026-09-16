@@ -18,11 +18,16 @@ enum Modo { CONTINUO, PULSADO }
 @export_range(0.05, 20.0, 0.05) var duracao_pulso := 1.0
 @export_range(0.0, 20.0, 0.05) var intervalo_pulso := 1.0
 @export_range(0.0, 20.0, 0.05) var fase_inicial := 0.0
+## Guia mecânica provisória: linhas/setas deixam direção e pulso legíveis sem
+## depender de arte ou SFX finais. Pode ser desligada por instância.
+@export var mostrar_guia := true
+@export var cor_guia := Color(0.72, 0.88, 1.0, 0.42)
 
 var _corpos: Array[Node] = []
 var _tempo := 0.0
 var _multiplicador_externo := 1.0
 var _multiplicador_emitido := -1.0
+var _guia: Node2D
 
 
 func _ready() -> void:
@@ -31,6 +36,7 @@ func _ready() -> void:
 	collision_mask = 2
 	monitoring = true
 	_configurar_forma()
+	_montar_guia()
 	body_entered.connect(_ao_entrar)
 	body_exited.connect(_ao_sair)
 	_tempo = fase_inicial
@@ -62,6 +68,8 @@ func _physics_process(dt: float) -> void:
 	if not is_equal_approx(multiplicador, _multiplicador_emitido):
 		_multiplicador_emitido = multiplicador
 		intensidade_mudou.emit(multiplicador)
+	if _guia:
+		_guia.modulate.a = multiplicador
 	for i in range(_corpos.size() - 1, -1, -1):
 		var corpo := _corpos[i]
 		if not is_instance_valid(corpo):
@@ -104,3 +112,37 @@ func _configurar_forma() -> void:
 		retangulo = RectangleShape2D.new()
 		colisao.shape = retangulo
 	retangulo.size = Vector2(maxf(1.0, tamanho.x), maxf(1.0, tamanho.y))
+
+
+func _montar_guia() -> void:
+	if not mostrar_guia:
+		return
+	_guia = Node2D.new()
+	_guia.name = "GuiaVento"
+	_guia.z_index = -1
+	add_child(_guia)
+	var sentido := direcao.normalized()
+	if sentido.is_zero_approx():
+		sentido = Vector2.RIGHT
+	var transversal_dir := Vector2(-sentido.y, sentido.x)
+	var comprimento := absf(sentido.x) * tamanho.x + absf(sentido.y) * tamanho.y
+	var transversal := absf(transversal_dir.x) * tamanho.x \
+		+ absf(transversal_dir.y) * tamanho.y
+	var quantidade := clampi(int(transversal / 52.0), 3, 8)
+	var meio := maxf(18.0, comprimento * 0.32)
+	for i in quantidade:
+		var faixa := Line2D.new()
+		faixa.name = "Faixa%d" % (i + 1)
+		faixa.width = 2.0
+		faixa.default_color = cor_guia
+		faixa.points = PackedVector2Array([-sentido * meio, sentido * meio])
+		var t := (float(i) + 0.5) / float(quantidade) - 0.5
+		faixa.position = transversal_dir * transversal * t
+		_guia.add_child(faixa)
+		var seta := Polygon2D.new()
+		var ponta := sentido * meio
+		var base := ponta - sentido * 11.0
+		seta.polygon = PackedVector2Array([
+			ponta, base + transversal_dir * 4.5, base - transversal_dir * 4.5])
+		seta.color = cor_guia
+		faixa.add_child(seta)

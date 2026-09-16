@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://bkolianiprisao01"]
+[gd_scene load_steps=15 format=3 uid="uid://bkolianiprisao01"]
 
 ; REGIAO II / nivel 6 -- Portao dos Condenados.
 ; Sala final FEITA A MAO (a JORNADA, que cresce com o nivel, vem antes). Masmorra FECHADA (CascaMasmorra).
@@ -20,6 +20,7 @@
 [ext_resource type="PackedScene" uid="uid://bkolianiplatcorrente06" path="res://scenes/actors/PlataformaCorrente.tscn" id="11_corr"]
 [ext_resource type="PackedScene" uid="uid://bkolianifogo01" path="res://scenes/actors/Fogo.tscn" id="12_fogo"]
 [ext_resource type="PackedScene" uid="uid://bkolianiaguavenenosa01" path="res://scenes/actors/AguaVenenosa.tscn" id="13_agua"]
+[ext_resource type="PackedScene" path="res://scenes/actors/WindZone.tscn" id="14_wind"]
 
 [sub_resource type="RectangleShape2D" id="rs_chk"]
 size = Vector2(44, 96)
@@ -138,6 +139,18 @@ fase = 0.4
 intervalo = 2.2
 dur_ativa = 1.2
 
+; Rajada de introdução: a favor da marcha, pulsada e fora dos checkpoints.
+[node name="VentoEntrada" parent="." instance=ExtResource("14_wind")]
+position = Vector2(860, 590)
+direcao = Vector2(1, 0)
+intensidade = 420.0
+velocidade_max = 300.0
+tamanho = Vector2(760, 250)
+modo = 1
+duracao_pulso = 1.6
+intervalo_pulso = 1.2
+cor_guia = Color(0.62, 0.82, 1, 0.4)
+
 ; ===================  BIFURCACAO  =============================
 ; -- passadico de CIMA --
 [node name="Cima1" parent="." instance=ExtResource("9_pl")]
@@ -201,6 +214,19 @@ cor_topo = Color(0.4, 0.52, 0.66, 1)
 position = Vector2(2080, 629)
 especie = "chort"
 alcance_patrulha = 80.0
+
+; Segunda leitura: contra a marcha, cobre as duas rotas sem tocar na arena.
+[node name="VentoBifurcacao" parent="." instance=ExtResource("14_wind")]
+position = Vector2(1950, 585)
+direcao = Vector2(-1, 0)
+intensidade = 520.0
+velocidade_max = 320.0
+tamanho = Vector2(820, 300)
+modo = 1
+duracao_pulso = 1.25
+intervalo_pulso = 1.0
+fase_inicial = 0.45
+cor_guia = Color(0.72, 0.86, 1, 0.44)
 
 [node name="Baixo4" parent="." instance=ExtResource("9_pl")]
 position = Vector2(2300, 625)

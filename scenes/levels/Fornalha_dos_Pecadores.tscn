@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://bkolianifornalha07"]
+[gd_scene load_steps=15 format=3 uid="uid://bkolianifornalha07"]
 
 ; REGIAO II / nivel 7 -- Fornalha dos Pecadores.
 ; Sala final FEITA A MAO (a JORNADA, que cresce com o nivel, vem antes). Fabrica infernal: LAVA em baixo
@@ -20,6 +20,7 @@
 [ext_resource type="PackedScene" uid="uid://bkolianifogo01" path="res://scenes/actors/Fogo.tscn" id="12_fogo"]
 [ext_resource type="PackedScene" uid="uid://bkolianiaguavenenosa01" path="res://scenes/actors/AguaVenenosa.tscn" id="13_lava"]
 [ext_resource type="PackedScene" uid="uid://bkolianiserra01" path="res://scenes/actors/Serra.tscn" id="14_serra"]
+[ext_resource type="PackedScene" path="res://scenes/actors/WindZone.tscn" id="15_wind"]
 
 [sub_resource type="RectangleShape2D" id="rs_chk"]
 size = Vector2(44, 96)
@@ -139,6 +140,32 @@ modo = "vertical"
 amplitude = 90.0
 periodo = 3.2
 largura = 130.0
+
+; Colunas contínuas da rota alta. Começam acima do passadiço inferior para
+; não transformar a alternativa segura num lançamento involuntário.
+[node name="UpdraftEntrada" parent="." instance=ExtResource("15_wind")]
+position = Vector2(1690, 560)
+direcao = Vector2(0, -1)
+intensidade = 1050.0
+velocidade_max = 340.0
+tamanho = Vector2(190, 300)
+cor_guia = Color(0.68, 0.9, 1, 0.42)
+
+[node name="UpdraftMeio" parent="." instance=ExtResource("15_wind")]
+position = Vector2(1935, 500)
+direcao = Vector2(0, -1)
+intensidade = 1180.0
+velocidade_max = 380.0
+tamanho = Vector2(210, 320)
+cor_guia = Color(0.72, 0.92, 1, 0.44)
+
+[node name="UpdraftSaida" parent="." instance=ExtResource("15_wind")]
+position = Vector2(2170, 500)
+direcao = Vector2(0, -1)
+intensidade = 980.0
+velocidade_max = 330.0
+tamanho = Vector2(190, 300)
+cor_guia = Color(0.66, 0.88, 1, 0.4)
 
 [node name="C2" parent="." instance=ExtResource("9_pl")]
 position = Vector2(1840, 600)

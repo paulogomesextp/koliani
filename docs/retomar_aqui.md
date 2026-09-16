@@ -1,3 +1,41 @@
+## Process 10B — fecho por playtest humano, PASS (16 set 2026)
+
+- Precheck confirmado em `codex/region02-wind-system`: alterações do Process
+  10 preservadas; apenas N06, N07 e N09 alterados entre os níveis; N08/N10
+  intactos e nenhum ficheiro não relacionado identificado.
+- Cenas exatas: `scenes/levels/Prisao_dos_Condenados.tscn` (N06),
+  `scenes/levels/Fornalha_dos_Pecadores.tscn` (N07) e
+  `scenes/levels/Ala_dos_Mortos.tscn` (N09).
+- O host atual não tem executável Godot 4.7.2 localizável no `PATH`, pastas
+  usuais, registo ou Steam, e este worktree não contém build Windows. Não foi
+  possível repetir testes nem abrir o jogo nesta sessão.
+- Estado de progressão exigido: save normal após concluir N05, com `dash`
+  adquirido legitimamente; `--nivel=6` não ativa `modo_dev`, mas preserva as
+  habilidades do save e não deve ser usado sobre um save contaminado por Dev.
+- Confirmação do Game Master: N06/N07/N09 PASS sem problemas e sem cheats;
+  checkpoint/morte/respawn PASS nos três; combate/knockback de N09 PASS; ponto
+  perto de `x≈954` PASS. O playtest usou condições normais de progressão.
+- Gate humano fechado: **PASS**. Processo 10 concluído; não iniciar Process 11
+  nesta execução.
+
+## Process 10 — vento aplicado a N06/N07/N09, PASS (16 set 2026)
+
+- Worktree `C:/Users/sarac/Koliani/koliani_region02`, branch
+  `codex/region02-wind-system`, base `6005177f`.
+- N06 recebeu duas rajadas horizontais pulsadas; N07, três updrafts contínuos
+  na rota alta; N09, três zonas pulsadas com direção/intensidade alternadas.
+  Checkpoints e arenas ficaram fora das zonas. N08/N10 não foram alterados.
+- `WindZone` tem agora guia mecânico procedural opcional, sincronizado com o
+  pulso; não é arte/SFX final.
+- Godot 4.7.2: WindZone A–L PASS, Movement+Camera PASS, suite completa PASS,
+  três smokes PASS e alcance estático às três portas PASS. O bot anti-softlock
+  chegou às portas (N06 14 s, N07 14 s, N09 39 s), mas usa `modo_dev` e todas
+  as habilidades; N09 teve paragem resolvida de 26,1 s perto de `x=954`.
+- Estado **PASS**: percurso humano sem debug/cheats confirmado em N06/N07/N09;
+  checkpoint/respawn, fairness, combate/knockback e `x≈954` validados.
+- Documento: `docs/implementation/region_02_wind_level_integration.md`.
+- Gate de commit/push satisfeito. Não iniciar Process 11 nesta execução.
+
 ## Process 09 — sistema reutilizável de vento da Região II (16 set 2026)
 
 - Worktree `C:/Users/sarac/Koliani/koliani_region02`, branch

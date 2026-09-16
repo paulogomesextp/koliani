@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://bkolianialamortos09"]
+[gd_scene load_steps=14 format=3 uid="uid://bkolianialamortos09"]
 
 ; REGIAO II / nivel 9 -- Ala dos Mortos.
 ; Sala final FEITA A MAO (a JORNADA, que cresce com o nivel, vem antes). Plataformas ESPECTRAIS que piscam
@@ -18,6 +18,7 @@
 [ext_resource type="PackedScene" uid="uid://bkolianicascamasmorra01" path="res://scenes/actors/CascaMasmorra.tscn" id="10_casca"]
 [ext_resource type="PackedScene" uid="uid://bkolianiplatespectral09" path="res://scenes/actors/PlataformaEspectral.tscn" id="11_esp"]
 [ext_resource type="PackedScene" uid="uid://bkolianiaguavenenosa01" path="res://scenes/actors/AguaVenenosa.tscn" id="12_acido"]
+[ext_resource type="PackedScene" path="res://scenes/actors/WindZone.tscn" id="13_wind"]
 
 [sub_resource type="RectangleShape2D" id="rs_chk"]
 size = Vector2(44, 96)
@@ -101,6 +102,18 @@ tamanho = Vector2(120, 18)
 segundos_solida = 2.8
 aviso = 0.6
 
+; Primeira zona variável: impulso a favor entre plataformas espectrais.
+[node name="VentoVariavelEntrada" parent="." instance=ExtResource("13_wind")]
+position = Vector2(930, 585)
+direcao = Vector2(1, 0)
+intensidade = 360.0
+velocidade_max = 280.0
+tamanho = Vector2(680, 240)
+modo = 1
+duracao_pulso = 1.45
+intervalo_pulso = 1.0
+cor_guia = Color(0.58, 1, 0.88, 0.4)
+
 [node name="ChaoMeio" parent="." instance=ExtResource("9_pl")]
 position = Vector2(1440, 690)
 tamanho = Vector2(340, 60)
@@ -159,6 +172,20 @@ position = Vector2(1860, 644)
 especie = "orc"
 alcance_patrulha = 80.0
 
+; O segundo trecho inverte direção e sobe a intensidade durante traversal e
+; combate, mas começa depois do checkpoint/elite.
+[node name="VentoVariavelCombate" parent="." instance=ExtResource("13_wind")]
+position = Vector2(1870, 600)
+direcao = Vector2(-1, 0)
+intensidade = 440.0
+velocidade_max = 300.0
+tamanho = Vector2(650, 270)
+modo = 1
+duracao_pulso = 1.1
+intervalo_pulso = 0.85
+fase_inicial = 0.35
+cor_guia = Color(0.64, 1, 0.9, 0.44)
+
 [node name="S3" parent="." instance=ExtResource("9_pl")]
 position = Vector2(2060, 650)
 tamanho = Vector2(150, 20)
@@ -190,6 +217,19 @@ tamanho = Vector2(140, 20)
 altura_visual = 30.0
 cor_base = Color(0.18, 0.24, 0.24, 1)
 cor_topo = Color(0.36, 0.54, 0.48, 1)
+
+; Rajada curta de saída: nova intensidade/direção, termina antes da arena.
+[node name="VentoVariavelSaida" parent="." instance=ExtResource("13_wind")]
+position = Vector2(2500, 575)
+direcao = Vector2(1, 0)
+intensidade = 520.0
+velocidade_max = 320.0
+tamanho = Vector2(300, 220)
+modo = 1
+duracao_pulso = 0.9
+intervalo_pulso = 0.75
+fase_inicial = 0.2
+cor_guia = Color(0.7, 1, 0.92, 0.46)
 
 ; ===================  cripta do chefe  ====================
 [node name="ChaoChefe" parent="." instance=ExtResource("9_pl")]

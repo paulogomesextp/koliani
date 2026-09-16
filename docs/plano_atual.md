@@ -1,3 +1,37 @@
+## Process 10 — aplicar vento a N06/N07/N09 (16 set 2026)
+
+- Objetivo: aplicar o `WindZone` do Process 09 às três cenas authored da
+  Região II: rajadas horizontais em N06, updrafts em N07 e vento variável em
+  N09.
+- Âmbito exato: `Prisao_dos_Condenados.tscn`,
+  `Fornalha_dos_Pecadores.tscn`, `Ala_dos_Mortos.tscn`, testes dirigidos e
+  documentação. N08/N10, gerador, bosses, inimigos, UI, SFX, arte, saves e
+  progressão ficam congelados.
+- Comportamento esperado: N06 usa zonas pulsadas nas travessias antes do
+  reencontro; N07 usa colunas ascendentes contínuas alinhadas com a rota alta;
+  N09 usa zonas sequenciais com direções/intensidades alternadas, sem vento na
+  arena. Checkpoints ficam fora das zonas e mantêm a topologia existente.
+- Hipóteses: instâncias authored acompanham a sala quando a jornada é
+  prepended; forças moderadas preservam os vãos atuais; excluir checkpoints e
+  arenas evita respawn/bosses sob influência residual.
+- Prova por etapa: baseline e final de alcance nas três cenas; import/smoke
+  individual; verificador estrutural de direção, intensidade, cobertura,
+  checkpoints, inimigos, bosses e scope; targeted WindZone e Movement+Camera;
+  suite completa com save isolado; `git diff --check`.
+- Critério: zero alteração estrutural fora das três cenas, portas/checkpoints
+  e bosses preservados, zonas sem sobrepor checkpoints/arenas, cenas e testes
+  sem erro fatal ou falha nova. Alcance estático e automação não substituem
+  percurso/sensação humana: `HUMAN PLAYTEST REQUIRED` para certificação final.
+- Base: `6005177f`, branch `codex/region02-wind-system`, worktree
+  `C:/Users/sarac/Koliani/koliani_region02`.
+- Resultado técnico: WindZone A–L, Movement+Camera, suite, smokes e alcance
+  PASS. Bot anti-softlock chegou às três portas, com uma paragem resolvida de
+  26,1 s em N09.
+- Resultado humano: N06/N07/N09 percorridos sem problemas e sem cheats;
+  checkpoint/morte/respawn PASS nos três; combate/knockback e o ponto perto de
+  `x≈954` em N09 PASS.
+- Estado: **PASS**. Gate humano fechado pelo Game Master em 16 set 2026.
+
 ## Process 09 — Região II: sistema reutilizável de vento (16 set 2026)
 
 - Objetivo: componente de vento horizontal/vertical reutilizável, aplicado à
