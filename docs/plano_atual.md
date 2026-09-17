@@ -12,8 +12,9 @@
 - Prova: suite, harness glide A–O, WindZone, Movement+Camera, smoke, CI
   (alcance/jornada/mecânicas/baú/spawn…), rota automática sem Dev,
   contrafactual sem planar, mutações a provar que os testes mordem.
-- Resultado técnico: tudo PASS. Estado: **PARTIAL — HUMAN PLAYTEST
-  REQUIRED**; sem commit até ao gate humano.
+- Resultado técnico: tudo PASS. Playtest humano na build Windows:
+  **APPROVED** (humano). Estado: **COMPLETE / APPROVED**, gameplay LOCKED.
+- Seguinte: Process 12 — N10 Final Exam + Guardião dos Céus.
 
 ## Process 10 — aplicar vento a N06/N07/N09 (16 set 2026)
 

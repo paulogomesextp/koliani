@@ -2,14 +2,26 @@
 
 ## Estado
 
-**PARTIAL — HUMAN PLAYTEST REQUIRED** (17 set 2026, Process 11).
+**COMPLETE / APPROVED** (17 set 2026, Process 11). Gameplay **LOCKED** para
+esta fase.
 
-Integração técnica concluída e verificada no motor: cena carrega, suite
-completa, harness de glide A–O, WindZone A–L, Movement+Camera 4A, verificações
-do CI e rota automática do spawn à arena com a Koliani real, sem modo Dev.
-Falta o percurso humano (sensação, legibilidade, justiça dos vãos e luta com o
-chefe), por isso não há PASS final. Browser/telemóvel: **DEVICE VALIDATION
-REQUIRED**.
+- Testes automaticos: **PASS** (suite, glide A–O, WindZone A–L,
+  Movement+Camera 4A, CI, rota automatica do spawn a' arena sem Dev).
+- Koliani canonica: **PASS**.
+- **HUMAN PLAYTEST (build Windows `Koliani-N08-Test.exe`, commit `7e1007df`):
+  APPROVED** -- aprovacao HUMANA do Paulo, nao so' automatizada. Aprovados:
+  gameplay, percurso de ilhas, planar contextual, updraft/tailwind/headwind
+  (`WindZone`), checkpoints e progressao ate' a' arena. Sem ajustes de
+  gameplay neste processo.
+
+Trabalho futuro (nao bloqueia):
+  1. art pass canonico da Regiao II por fazer;
+  2. validacao manual completa device/PWA nao e' precisa para fechar o
+     gameplay (o playtest humano no Windows foi aprovado);
+  3. `WindZone` com forma de colisao partilhada afeta N06/N07/N09, NAO o N08
+     (cada zona do N08 tem forma propria);
+  4. `tools/correr_testes.ps1` rebenta no Windows PowerShell 5.1 -- tratar a
+     parte.
 
 Branch `claude/region02-n08-glide`, base `c41c19ed` (`origin/codex/region02-wind-system`).
 

@@ -1,15 +1,18 @@
-## Pendente de decisao -- Process 11, N08 Ilhas Suspensas (17 set 2026)
+## Process 11, N08 Ilhas Suspensas -- FECHADO (17 set 2026)
 
-1. **Playtest humano do N08** (branch `claude/region02-n08-glide`, publicada
-   com a Koliani canonica ja' integrada). Checklist em
-   `docs/implementation/region_02_n08_glide.md`.
+Playtest humano no Windows **APPROVED**; Process 11 COMPLETE, gameplay LOCKED.
+Fica pendente, sem bloquear:
+
+1. **Art pass canonico da Regiao II** por fazer.
 2. **Bug do `WindZone`: as zonas de uma cena partilham a forma de colisao.**
-   N09 tem duas zonas a colidir com 300x220 em vez de 680x240/650x270 (N06 e
-   N07 com desvios pequenos). Corrigir = duplicar a forma no
-   `wind_zone.gd` + repetir o playtest de N06/N07/N09. Fazer num lote proprio?
-3. **Dash aereo encurta vaos de planar.** Com salto duplo + dash, dois dos
-   vaos do N08 fazem-se sem planar (o de vento a favor nao). Aceitavel, ou o
-   N08 deve exigir o planar em mais vaos?
+   Afeta N06/N07/N09 (N09 com duas zonas a 300x220 em vez de 680x240/650x270),
+   NAO o N08. Corrigir = duplicar a forma no `wind_zone.gd` + repetir o
+   playtest de N06/N07/N09. Lote proprio.
+3. **`tools/correr_testes.ps1` rebenta no Windows PowerShell 5.1** -- tratar a
+   parte.
+4. Validacao manual device/PWA: ja' nao e' precisa para fechar o gameplay.
+5. (Nota de design, sem decisao pendente depois da aprovacao) com salto duplo
+   + dash dois vaos do N08 fazem-se sem planar.
 
 ## Pendente de decisao do Paulo -- 9H.18 (13 set 2026)
 

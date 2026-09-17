@@ -1,3 +1,22 @@
+## Process 11 — N08 Ilhas Suspensas + planar contextual, COMPLETE / APPROVED (17 set 2026)
+
+- **HUMAN PLAYTEST na build Windows: APPROVED** (aprovacao humana do Paulo,
+  nao so' automatizada), sobre `claude/region02-n08-glide@7e1007df`.
+- Testes automaticos PASS; Koliani canonica PASS; planar contextual,
+  `WindZone` (updraft/tailwind/headwind) e checkpoints APPROVED.
+- Gameplay do Process 11 **LOCKED** para esta fase. Nao ha' merge em master
+  nesta execucao.
+- Trabalho futuro, NAO bloqueia o Process 11:
+  1. art pass canonico da Regiao II por fazer;
+  2. validacao manual completa device/PWA nao e' precisa para fechar o
+     gameplay (o playtest humano no Windows foi aprovado);
+  3. `WindZone` com forma de colisao partilhada afeta N06/N07/N09, NAO o N08
+     (cada zona do N08 tem forma propria);
+  4. `tools/correr_testes.ps1` rebenta no Windows PowerShell 5.1 -- tratar a
+     parte.
+- Seguinte: Process 12 — N10 Final Exam + Guardiao dos Ceus (a espera do
+  briefing).
+
 ## Process 11 — sync da Koliani canónica antes do playtest, PASS (17 set 2026)
 
 - Branch `claude/region02-n08-glide` publicada em
