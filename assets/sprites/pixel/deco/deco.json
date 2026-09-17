@@ -586,5 +586,79 @@
    "w": 35,
    "h": 108
   }
+ ],
+ "desfiladeiro": [
+  {
+   "nome": "balaustrada",
+   "onde": "parede",
+   "w": 96,
+   "h": 57
+  },
+  {
+   "nome": "velas",
+   "onde": "parede",
+   "w": 38,
+   "h": 76
+  },
+  {
+   "nome": "tocha",
+   "onde": "parede",
+   "w": 38,
+   "h": 62
+  },
+  {
+   "nome": "janela_gotica",
+   "onde": "parede",
+   "w": 38,
+   "h": 76
+  },
+  {
+   "nome": "coluna_igreja",
+   "onde": "parede",
+   "w": 136,
+   "h": 228
+  },
+  {
+   "nome": "pedra_talhada",
+   "onde": "chao",
+   "w": 38,
+   "h": 38
+  },
+  {
+   "nome": "cruz",
+   "onde": "chao",
+   "w": 27,
+   "h": 40
+  },
+  {
+   "nome": "lapide",
+   "onde": "chao",
+   "w": 21,
+   "h": 37
+  },
+  {
+   "nome": "lampiao_t",
+   "onde": "pendurado",
+   "w": 31,
+   "h": 97
+  },
+  {
+   "nome": "corrente_t",
+   "onde": "pendurado",
+   "w": 10,
+   "h": 93
+  },
+  {
+   "nome": "corrente_t2",
+   "onde": "pendurado",
+   "w": 10,
+   "h": 52
+  },
+  {
+   "nome": "flamula",
+   "onde": "pendurado",
+   "w": 31,
+   "h": 106
+  }
  ]
 }

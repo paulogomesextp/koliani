@@ -39,6 +39,10 @@ const SUPERFICIE := 8.0
 
 const BIOMAS := [
 	"floresta", "prisao", "torres", "catacumbas", "cidade", "castelo",
+	# Regiao II -- Desfiladeiro dos Ventos. Tem material proprio
+	# (`tools/gerar_terreno_regiao02.py`) porque o `prisao` era tijolo de
+	# cela e o `torres` ja' e' da Regiao III.
+	"desfiladeiro",
 ]
 
 @export var tamanho := Vector2(200.0, 40.0) : set = _set_tamanho

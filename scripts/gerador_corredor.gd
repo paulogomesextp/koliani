@@ -117,7 +117,13 @@ const LIQUIDO := {
 	# poligono quase opaco em cima dela devolvia exactamente a tira palida e
 	# chapada que o review reclamou. Nao se pintou nada: destapou-se.
 	0: [Color(0.26, 0.16, 0.42, 0.72), false],   # seiva corrompida
-	1: [Color(0.26, 0.42, 0.14, 0.93), false],   # ácido
+	# Super-Process A -- a MESMA "faixa verde-oliva chapada" que a 9H.12D
+	# tirou da Região I estava aqui, na II. O Desfiladeiro dos Ventos não
+	# tem ácido nenhum: o que está lá em baixo é o ABISMO. Fica no vinho
+	# carmesim da região (a cor da lua e dos estandartes da prancha), que
+	# se lê como perigo contra o índigo de tudo o resto. Só cor -- a
+	# geometria, a colisão e o dano não mudam.
+	1: [Color(0.46, 0.14, 0.28, 0.90), false],   # o abismo do Desfiladeiro
 	2: [Color(0.06, 0.05, 0.12, 0.96), false],   # trevas / vazio
 	3: [Color(0.05, 0.03, 0.09, 0.97), false],   # trevas do abismo
 	4: [Color(0.34, 0.40, 0.12, 0.93), false],   # ácido citrino

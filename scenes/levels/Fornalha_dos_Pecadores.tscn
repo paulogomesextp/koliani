@@ -40,23 +40,28 @@ fill_to = Vector2(1, 0.5)
 [node name="Fornalha_dos_Pecadores" type="Node2D"]
 script = ExtResource("7_niv")
 
+; N07 -- a subida: a nuvem fecha-se e a luz arrefece (ainda violeta,
+; nunca laranja de fornalha -- isso era o tema antigo).
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
-cor_ambiente = Color(0.98, 0.86, 0.78, 1)
-cor_fundo = Color(0.13, 0.05, 0.04, 1)
-cor_silhueta = Color(0.18, 0.08, 0.06, 1)
-cor_luz = Color(1, 0.58, 0.26, 1)
-cor_poeira = Color(1, 0.76, 0.44, 1)
-densidade_poeira = 2.4
-bioma = "prisao"
+cor_ambiente = Color(0.78, 0.8, 0.98, 1)
+cor_fundo = Color(0.05, 0.05, 0.14, 1)
+cor_silhueta = Color(0.08, 0.09, 0.2, 1)
+cor_luz = Color(0.66, 0.72, 1, 1)
+cor_poeira = Color(0.8, 0.86, 1, 1)
+densidade_poeira = 2.2
+bioma = "desfiladeiro"
 largura_nivel = 3400.0
-fundo_pack = "masmorra"
-tinta_fundo = Color(1.14, 0.72, 0.62, 1)
-neblina_fundo = 0.28
-dessaturar_fundo = 0.44
+fundo_pack = "desfiladeiro"
+tinta_fundo = Color(0.78, 0.82, 1.2, 1)
+neblina_fundo = 0.46
+dessaturar_fundo = 0.4
 seed_ambiente = 1222
-luzes_horizonte = true
 
 [node name="Casca" parent="." instance=ExtResource("10_casca")]
+; a agua morta do fundo da Casca segue o mesmo abismo dos niveis
+agua_cor = Color(0.4, 0.13, 0.26, 0.62)
+; pedra do Desfiladeiro em vez de tijolo de cela (mesma colisao)
+estilo = "desfiladeiro"
 topo = -128.0
 altura = 2200.0
 largura = 3612.0
@@ -69,7 +74,8 @@ agua = false
 position = Vector2(1700, 980)
 largura = 3900.0
 altura = 340.0
-cor = Color(0.62, 0.22, 0.08, 0.94)
+; o fundo do desfiladeiro e' o abismo, nao acido nem lava
+cor = Color(0.46, 0.14, 0.28, 0.9)
 brasas = true
 
 ; ===================  entrada + descida  =======================
@@ -135,6 +141,7 @@ cor_base = Color(0.24, 0.16, 0.12, 1)
 cor_topo = Color(0.48, 0.3, 0.2, 1)
 
 [node name="CorrenteSobe" parent="." instance=ExtResource("11_corr")]
+tinta = Color(1.05, 0.86, 1.35, 1)
 position = Vector2(1700, 620)
 modo = "vertical"
 amplitude = 90.0

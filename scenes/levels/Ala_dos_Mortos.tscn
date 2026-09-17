@@ -38,22 +38,27 @@ fill_to = Vector2(1, 0.5)
 [node name="Ala_dos_Mortos" type="Node2D"]
 script = ExtResource("7_niv")
 
+; N09 -- o vento vira: o carmesim da regiao entra no ar e na luz.
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
-cor_ambiente = Color(0.84, 0.92, 0.9, 1)
-cor_fundo = Color(0.04, 0.09, 0.09, 1)
-cor_silhueta = Color(0.06, 0.13, 0.12, 1)
-cor_luz = Color(0.48, 1, 0.86, 1)
-cor_poeira = Color(0.66, 1, 0.92, 1)
-densidade_poeira = 1.8
-bioma = "prisao"
+cor_ambiente = Color(0.86, 0.78, 0.9, 1)
+cor_fundo = Color(0.09, 0.05, 0.12, 1)
+cor_silhueta = Color(0.14, 0.08, 0.17, 1)
+cor_luz = Color(1, 0.56, 0.7, 1)
+cor_poeira = Color(1, 0.74, 0.82, 1)
+densidade_poeira = 2.0
+bioma = "desfiladeiro"
 largura_nivel = 3400.0
-fundo_pack = "masmorra"
-tinta_fundo = Color(0.8, 1.04, 1, 1)
-neblina_fundo = 0.4
-dessaturar_fundo = 0.28
+fundo_pack = "desfiladeiro"
+tinta_fundo = Color(1.08, 0.78, 1.02, 1)
+neblina_fundo = 0.38
+dessaturar_fundo = 0.3
 seed_ambiente = 1296
 
 [node name="Casca" parent="." instance=ExtResource("10_casca")]
+; a agua morta do fundo da Casca segue o mesmo abismo dos niveis
+agua_cor = Color(0.4, 0.13, 0.26, 0.62)
+; pedra do Desfiladeiro em vez de tijolo de cela (mesma colisao)
+estilo = "desfiladeiro"
 topo = -128.0
 altura = 2200.0
 largura = 3592.0
@@ -66,7 +71,8 @@ agua = false
 position = Vector2(1650, 950)
 largura = 3800.0
 altura = 320.0
-cor = Color(0.22, 0.4, 0.3, 0.9)
+; o fundo do desfiladeiro e' o abismo, nao acido nem lava
+cor = Color(0.46, 0.14, 0.28, 0.9)
 
 ; ===================  entrada  ==============================
 [node name="ChaoInicio" parent="." instance=ExtResource("9_pl")]

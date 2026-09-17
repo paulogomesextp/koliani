@@ -2668,15 +2668,41 @@ func teste_rigs_dos_chefes() -> void:
 			continue
 		var me := re_esc.search(src)
 		var esc := float(me.get_string(1)) if me else 1.3
-		var k: float = minf(alvo_h / float(r.size.y), alvo_w / float(r.size.x))
+		# Um chefe pode reescrever os alvos (`_altura_alvo`/`_largura_alvo`
+		# são virtuais no `DemonioBase`). Até ao Super-Process A este teste
+		# lia só as constantes do `ChefeBase` e media qualquer chefe com
+		# override pelo número errado -- acusou o Guardião dos Céus de sair
+		# com 54 px de alto quando na verdade sai com 160.
+		var h_alvo := alvo_h
+		var w_alvo := alvo_w
+		var proprio := false
+		var cam_script := _script_do_chefe(src)
+		if cam_script != "":
+			var fonte := _fonte(cam_script)
+			var ph := _retorno_float(fonte, "_altura_alvo")
+			var pw := _retorno_float(fonte, "_largura_alvo")
+			if ph > 0.0:
+				h_alvo = ph
+				proprio = true
+			if pw > 0.0:
+				w_alvo = pw
+				proprio = true
+		var k: float = minf(h_alvo / float(r.size.y), w_alvo / float(r.size.x))
 		var largura := r.size.x * k * esc
 		var altura := r.size.y * k * esc
 		# A banda vem dos nove rigs que já cá estavam antes de 3 set 2026:
 		# o mais pequeno media 52x125 e o maior 150x200. Fora disto o chefe
 		# ou não se lê como chefe, ou não cabe na plataforma da arena.
-		_ok(largura <= 175.0,
-			"%s: rig '%s' sai com %d px de largo (máx 175) -- baixar escala_visual"
-				% [f, rig, int(largura)])
+		#
+		# EXCEÇÃO com alvos próprios: o Guardião dos Céus é o primeiro chefe
+		# ALADO de asas abertas, e nele a largura É a silhueta -- o cânone
+		# da Região II diz isso com todas as letras. O tecto sobe para 240,
+		# que é o que ainda deixa 57% da plataforma da arena do N10 (560 px)
+		# livre para a Koliani. Acima disso o chefe tapa a arena.
+		var tecto := 240.0 if proprio else 175.0
+		_ok(largura <= tecto,
+			"%s: rig '%s' sai com %d px de largo (máx %d) -- baixar escala_visual"
+				% [f, rig, int(largura), int(tecto)])
 		_ok(altura >= 75.0,
 			"%s: rig '%s' sai com %d px de alto (mín 75) -- lê-se como bicho comum"
 				% [f, rig, int(altura)])
@@ -2687,6 +2713,23 @@ func teste_rigs_dos_chefes() -> void:
 func _constante_float(fonte: String, nome: String) -> float:
 	var re := RegEx.new()
 	re.compile("const %s := ([0-9.]+)" % nome)
+	var m := re.search(fonte)
+	return float(m.get_string(1)) if m else 0.0
+
+
+## Caminho do script de um `Chefe*.tscn`, ou "" se não tiver.
+func _script_do_chefe(src: String) -> String:
+	var re := RegEx.new()
+	re.compile('type="Script" path="(res://scripts/[^"]+)"')
+	var m := re.search(src)
+	return m.get_string(1) if m else ""
+
+
+## O valor que `func <nome>() -> float: return X` devolve, ou 0.0 se o
+## ficheiro não reescrever essa função.
+func _retorno_float(fonte: String, nome: String) -> float:
+	var re := RegEx.new()
+	re.compile("func %s\\(\\) -> float:\\s*\\n\\treturn ([0-9.]+)" % nome)
 	var m := re.search(fonte)
 	return float(m.get_string(1)) if m else 0.0
 

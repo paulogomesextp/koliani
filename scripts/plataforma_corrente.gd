@@ -31,10 +31,26 @@ var _travada := false
 
 @onready var _forma: CollisionShape2D = $Col
 @onready var _visual: Polygon2D = $Visual
+
+## Cor da laje e da corrente. Branco (omissao) deixa a arte da cena como
+## esta'. A Regiao II usa isto para a laje deixar de ser cinzento de
+## prisao e passar a ser a pedra do Desfiladeiro -- so' cor, a colisao e o
+## movimento nao mudam.
+@export var tinta := Color(1, 1, 1, 1)
 @onready var _corrente: Line2D = $Corrente
 
 
 func _ready() -> void:
+	# A tinta tem de entrar nas CORES DOS VERTICES, nao no `color` do
+	# Polygon2D: o `_reconstruir()` reescreve `vertex_colors` a partir de
+	# `cor_topo`/`cor_base` e por cima delas o `color` nao se ve'. (A
+	# primeira tentativa tingiu o `color` e as lajes continuaram cinzentas.)
+	if not tinta.is_equal_approx(Color(1, 1, 1, 1)):
+		cor_topo = cor_topo * tinta
+		cor_base = cor_base * tinta
+		var lin := get_node_or_null("Corrente") as Line2D
+		if lin:
+			lin.default_color = lin.default_color * tinta
 	add_to_group("plataformas_correntes")
 	sync_to_physics = true
 	_base = global_position

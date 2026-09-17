@@ -58,22 +58,27 @@ corredor = false
 alongar_plataformas = false
 mecanica_anunciada = "vento"
 
+; N10 -- o exame, sob a lua de sangue: violeta fundo e neblina densa.
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
-cor_ambiente = Color(0.76, 0.76, 0.94, 1)
-cor_fundo = Color(0.05, 0.04, 0.11, 1)
-cor_silhueta = Color(0.08, 0.07, 0.15, 1)
-cor_luz = Color(0.74, 0.44, 1, 1)
-cor_poeira = Color(0.82, 0.62, 1, 1)
-densidade_poeira = 1.4
-bioma = "prisao"
+cor_ambiente = Color(0.74, 0.7, 0.94, 1)
+cor_fundo = Color(0.05, 0.03, 0.12, 1)
+cor_silhueta = Color(0.09, 0.06, 0.17, 1)
+cor_luz = Color(0.78, 0.44, 1, 1)
+cor_poeira = Color(0.88, 0.6, 1, 1)
+densidade_poeira = 1.5
+bioma = "desfiladeiro"
 largura_nivel = 2400.0
-fundo_pack = "prisao"
-tinta_fundo = Color(0.78, 0.7, 1.2, 1)
-neblina_fundo = 0.5
-dessaturar_fundo = 0.6
+fundo_pack = "desfiladeiro"
+tinta_fundo = Color(0.86, 0.66, 1.22, 1)
+neblina_fundo = 0.52
+dessaturar_fundo = 0.36
 seed_ambiente = 1333
 
 [node name="Casca" parent="." instance=ExtResource("10_casca")]
+; a agua morta do fundo da Casca segue o mesmo abismo dos niveis
+agua_cor = Color(0.4, 0.13, 0.26, 0.62)
+; pedra do Desfiladeiro em vez de tijolo de cela (mesma colisao)
+estilo = "desfiladeiro"
 topo = -448.0
 altura = 2200.0
 largura = 1484.0
@@ -86,7 +91,8 @@ agua = false
 position = Vector2(600, 1080)
 largura = 2800.0
 altura = 320.0
-cor = Color(0.24, 0.4, 0.16, 0.92)
+; o fundo do desfiladeiro e' o abismo, nao acido nem lava
+cor = Color(0.46, 0.14, 0.28, 0.9)
 
 ; ===================  poco em ziguezague  ==================
 [node name="ChaoInicio" parent="." instance=ExtResource("9_pl")]

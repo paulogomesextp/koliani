@@ -40,22 +40,27 @@ fill_to = Vector2(1, 0.5)
 [node name="Prisao_dos_Condenados" type="Node2D"]
 script = ExtResource("7_niv")
 
+; N06 -- chegada ao Desfiladeiro: a lua alta, o ar limpo, pouca neblina.
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
-cor_ambiente = Color(0.8, 0.84, 0.96, 1)
-cor_fundo = Color(0.04, 0.06, 0.12, 1)
-cor_silhueta = Color(0.07, 0.09, 0.16, 1)
-cor_luz = Color(0.6, 0.68, 1, 1)
-cor_poeira = Color(0.72, 0.84, 1, 1)
-densidade_poeira = 1.2
-bioma = "prisao"
+cor_ambiente = Color(0.84, 0.82, 0.96, 1)
+cor_fundo = Color(0.06, 0.05, 0.13, 1)
+cor_silhueta = Color(0.1, 0.09, 0.19, 1)
+cor_luz = Color(0.78, 0.6, 1, 1)
+cor_poeira = Color(0.86, 0.76, 1, 1)
+densidade_poeira = 1.6
+bioma = "desfiladeiro"
 largura_nivel = 3600.0
-fundo_pack = "prisao"
-tinta_fundo = Color(0.7, 0.82, 1.14, 1)
-neblina_fundo = 0.44
-dessaturar_fundo = 0.56
+fundo_pack = "desfiladeiro"
+tinta_fundo = Color(0.88, 0.8, 1.14, 1)
+neblina_fundo = 0.3
+dessaturar_fundo = 0.32
 seed_ambiente = 1185
 
 [node name="Casca" parent="." instance=ExtResource("10_casca")]
+; a agua morta do fundo da Casca segue o mesmo abismo dos niveis
+agua_cor = Color(0.4, 0.13, 0.26, 0.62)
+; pedra do Desfiladeiro em vez de tijolo de cela (mesma colisao)
+estilo = "desfiladeiro"
 topo = -160.0
 altura = 2200.0
 largura = 3692.0
@@ -68,7 +73,8 @@ agua = false
 position = Vector2(1750, 960)
 largura = 4000.0
 altura = 320.0
-cor = Color(0.28, 0.42, 0.14, 0.93)
+; o fundo do desfiladeiro e' o abismo, nao acido nem lava
+cor = Color(0.46, 0.14, 0.28, 0.9)
 
 ; ===================  bloco de entrada  ========================
 [node name="ChaoInicio" parent="." instance=ExtResource("9_pl")]
@@ -86,6 +92,7 @@ cor_base = Color(0.2, 0.24, 0.32, 1)
 cor_topo = Color(0.42, 0.54, 0.68, 1)
 
 [node name="CorrenteA" parent="." instance=ExtResource("11_corr")]
+tinta = Color(1.05, 0.86, 1.35, 1)
 position = Vector2(740, 610)
 modo = "vertical"
 amplitude = 60.0
@@ -100,6 +107,7 @@ cor_base = Color(0.2, 0.24, 0.32, 1)
 cor_topo = Color(0.42, 0.54, 0.68, 1)
 
 [node name="CorrenteB" parent="." instance=ExtResource("11_corr")]
+tinta = Color(1.05, 0.86, 1.35, 1)
 position = Vector2(980, 590)
 modo = "pendulo"
 amplitude = 28.0
@@ -197,6 +205,7 @@ cor_base = Color(0.2, 0.24, 0.32, 1)
 cor_topo = Color(0.4, 0.52, 0.66, 1)
 
 [node name="CorrenteC" parent="." instance=ExtResource("11_corr")]
+tinta = Color(1.05, 0.86, 1.35, 1)
 position = Vector2(1970, 665)
 modo = "horizontal"
 amplitude = 90.0

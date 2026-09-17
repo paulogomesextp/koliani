@@ -178,7 +178,7 @@ Rig `assets/sprites/pixel/bosses_anim/guardiao_dos_ceus/`, desenhado por
 | Ponto do contrato | Entregue |
 |---|---|
 | L1 espécie/silhueta | corvídeo em três quartos, duas asas abertas, cabeça de perfil |
-| L2 escala | 324 × 160 px = **2,46 × a Koliani** (contrato: 2,6 ×, ±10% ⇒ 2,34–2,86) |
+| L2 escala | 235 × 160 px = **2,46 × a Koliani** (contrato: 2,6 ×, ±10% ⇒ 2,34–2,86); rácio 1,47, contra os 1,39 medidos na prancha |
 | L3 paleta | penas `#1e1e33`/`#433d80`/`#3a3468`, ponta `#8e3a3c`, ouro `#c98f4e`, núcleo `#c68af9` |
 | L4 núcleo = olho | desenhado na cabeça; o nó `Nucleo` da cena é só a luz que pulsa no `EXPOSTO` |
 | L5 estados | `idle` 6 · `walk` 8 · `attack` 10 · `hurt` 4 · `death` 10 |
@@ -191,6 +191,11 @@ Rig `assets/sprites/pixel/bosses_anim/guardiao_dos_ceus/`, desenhado por
 - **Perfil estrito** com as duas asas varridas para trás: lia-se como um
   galináceo deitado. A prancha desenha o Guardião de frente/três quartos
   (`IDLE (ASA ABERTA)`, `ANDAR / AJUSTE`) — foi seguir isso que resolveu.
+- **Envergadura a mais.** A primeira versão em três quartos saiu 304 × 150
+  (rácio 2,03) e, à altura canónica, dava **324 px de largo** — 58% da
+  plataforma da arena do N10, que mede 560 px. A suite apanhou-o (a banda
+  de largura dos chefes existe justamente por isto). As asas encurtaram e
+  o arco subiu até ao rácio da prancha, e a largura final é 235.
 - **Leque de penas todas presas à mesma junta**: dava uma cauda de peru.
   Uma asa lê-se por massa varrida + remiges a abrir só na ponta.
 - **Rodar só o desenho da asa** e não a junta da 2.ª metade: a ponta
@@ -200,7 +205,9 @@ Rig `assets/sprites/pixel/bosses_anim/guardiao_dos_ceus/`, desenhado por
 
 ### Para o playtest humano
 
-- **Largura**: 324 px são 25% da largura do ecrã (1280). É o que o cânone
-  pede ("a largura não pode ser normalizada pelo tecto comum"), mas é a
-  primeira coisa a julgar a jogar: as asas tapam a Koliani na arena?
+- **Largura**: 235 px contra os 560 px da plataforma da arena — o Guardião
+  ocupa 42% dela e deixa 57% livres. Está acima da banda normal dos chefes
+  (175) e a suite só o aceita porque o chefe declara alvos próprios; o
+  tecto da exceção é 240, ou seja isto passa por 5 px. **É a primeira coisa
+  a julgar a jogar**: as asas tapam a Koliani na arena?
 - As asas **não** dão dano (não são hitbox). Isso lê-se ou parece injusto?

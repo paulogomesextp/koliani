@@ -97,6 +97,21 @@ const PACKS := {
 		["celas.png", "Longe", 1010.0, 2.4],
 		["arcada.png", "Meio", 1045.0, 2.2],
 	],
+	# Região II -- Desfiladeiro dos Ventos. Composto por
+	# `tools/gerar_fundos_regiao02.py` a partir de camadas CC0 que já cá
+	# estavam, recolorido para a paleta da prancha aprovada. A região
+	# corria com `prisao`/`masmorra` -- paredes de cela num sítio que o
+	# cânone descreve como falésias abertas ao céu.
+	#
+	# As quatro camadas são as que `concept_environment_01.png` nomeia.
+	# A `nuvens` é a que faz o trabalho todo: é o mar de nuvens que diz
+	# ALTITUDE, e sem ele isto era só mais uma serra à noite.
+	"desfiladeiro": [
+		["ceu.png", "Fundo", 320.0, 5.6],
+		["serras.png", "Longe", 830.0, 4.4],
+		["nuvens.png", "Meio", 900.0, 3.6],
+		["falesias.png", "Perto", 960.0, 3.8],
+	],
 	# Região IV -- Catacumbas do Abismo (ansimuz "Caverns", CC0) + túmulos e
 	# pilar da "Gothicvania Church" em primeiro plano (a gruta sozinha era só
 	# rocha; os túmulos é que dizem "catacumbas").
@@ -180,7 +195,10 @@ const PACKS := {
 ## identidade visual própria a cada capítulo de cinco níveis.
 const PACKS_POR_REGIAO := [
 	["floresta", "pantano", "luar", "horror", "montanhas"],
-	["prisao", "masmorra", "igreja", "castelo_velho", "caverna"],
+	# Região II -- Desfiladeiro dos Ventos: o pack próprio primeiro; os
+	# outros quatro só aparecem se um nível os pedir à mão (nenhum pede).
+	["desfiladeiro", "desfiladeiro", "desfiladeiro", "desfiladeiro",
+		"desfiladeiro"],
 	["montanhas", "rochoso", "luar", "horror", "cidade"],
 	["caverna", "gruta", "masmorra", "luar", "castelo_velho"],
 	["cidade", "vilanoite", "horror", "igreja", "luar"],
@@ -205,7 +223,9 @@ const PACKS_POR_REGIAO := [
 ## preservar a arte original e, ao mesmo tempo, separar gelo, máquinas,
 ## sonhos, guerra e o caminho final.
 const LUZ_REGIAO := [
-	Color(0.62, 1.00, 0.72), Color(0.60, 0.68, 1.00), Color(1.00, 0.74, 0.46),
+	# A II era `0.60, 0.68, 1.00` -- azul-ferro de masmorra. A prancha da
+	# Região II é violeta de luar com a lua de sangue ao fundo.
+	Color(0.62, 1.00, 0.72), Color(0.78, 0.54, 0.98), Color(1.00, 0.74, 0.46),
 	Color(0.86, 0.70, 0.78), Color(1.00, 0.62, 0.72), Color(1.00, 0.44, 0.96),
 	Color(1.00, 0.52, 0.18), Color(0.42, 0.90, 0.98), Color(0.80, 0.96, 1.00),
 	Color(1.00, 0.86, 0.48), Color(0.90, 0.30, 0.52), Color(0.55, 0.85, 1.00),
@@ -420,7 +440,10 @@ func _frente_ambiente(rng: RandomNumberGenerator) -> void:
 		n.free()
 	# alguns biomas são céu aberto -- pouca ou nenhuma frente
 	var densidade: float = {"floresta": 620.0, "prisao": 720.0, "catacumbas": 620.0,
-		"cidade": 820.0, "castelo": 680.0, "torres": 1600.0}.get(bioma, 820.0)
+		"cidade": 820.0, "castelo": 680.0, "torres": 1600.0,
+		# céu aberto: uma frente cerrada tapava o mar de nuvens, que é
+		# justamente o que diz que isto é alto
+		"desfiladeiro": 1900.0}.get(bioma, 820.0)
 	var cor := cor_silhueta.darkened(0.2).lerp(cor_fundo, 0.1)
 	var x := extensao_esquerda + rng.randf_range(0.0, densidade)
 	while x < largura_nivel + 200.0:
@@ -771,6 +794,8 @@ func _formas(b: String, perto: bool, rng: RandomNumberGenerator, larg: float, h:
 	match b:
 		"prisao", "catacumbas":
 			return _forma_pilar(rng, larg, h, b == "prisao")
+		"desfiladeiro":
+			return _forma_penhasco(rng, larg, h)
 		"torres":
 			return _forma_torre(rng, larg, h)
 		"cidade":
@@ -779,6 +804,43 @@ func _formas(b: String, perto: bool, rng: RandomNumberGenerator, larg: float, h:
 			return _forma_arco(rng, larg, h)
 		_:
 			return _forma_arvore(rng, larg, h, perto)
+
+
+## Penhasco: uma agulha de rocha com o topo partido e, uma vez por outra,
+## um coto de torre gótica em cima. É a silhueta da Região II -- pedra
+## exposta e ruína, não o pilar de alvenaria da prisão.
+func _forma_penhasco(rng: RandomNumberGenerator, larg: float, h: float) -> Array:
+	var base: float = larg * rng.randf_range(0.2, 0.34)
+	var topo: float = base * rng.randf_range(0.28, 0.52)
+	var alt: float = h * rng.randf_range(0.6, 0.95)
+	var inclina: float = larg * rng.randf_range(-0.09, 0.09)
+	# a aresta de cima é partida: dois degraus a alturas diferentes
+	var degrau: float = alt * rng.randf_range(0.06, 0.16)
+	var agulha := PackedVector2Array([
+		Vector2(-base, CHAO),
+		Vector2(-base * 0.74, CHAO - alt * 0.42),
+		Vector2(-topo + inclina, CHAO - alt + degrau),
+		Vector2(inclina * 0.5, CHAO - alt),
+		Vector2(topo + inclina, CHAO - alt * 0.94),
+		Vector2(base * 0.82, CHAO - alt * 0.38),
+		Vector2(base, CHAO),
+	])
+	var formas: Array = [agulha]
+	# uma em cada três leva ruína em cima: é o que separa um desfiladeiro
+	# vazio de um desfiladeiro com passado
+	if rng.randf() < 0.34:
+		var tw: float = topo * rng.randf_range(0.5, 0.9)
+		var th: float = alt * rng.randf_range(0.18, 0.32)
+		var y0: float = CHAO - alt
+		formas.append(PackedVector2Array([
+			Vector2(inclina - tw, y0),
+			Vector2(inclina - tw, y0 - th),
+			Vector2(inclina - tw * 0.3, y0 - th * rng.randf_range(0.6, 1.0)),
+			Vector2(inclina + tw * 0.3, y0 - th),
+			Vector2(inclina + tw, y0 - th * rng.randf_range(0.7, 1.0)),
+			Vector2(inclina + tw, y0),
+		]))
+	return formas
 
 
 func _forma_arvore(rng: RandomNumberGenerator, larg: float, h: float, perto: bool) -> Array:

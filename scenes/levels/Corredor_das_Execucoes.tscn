@@ -55,19 +55,21 @@ corredor = false
 alongar_plataformas = false
 mecanica_anunciada = "asas"
 
+; N08 -- o ponto mais alto da regiao: ceu aberto, quase sem neblina,
+; a cor mais clara dos cinco. E' aqui que se planam as ilhas.
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
-cor_ambiente = Color(0.82, 0.88, 0.98, 1)
-cor_fundo = Color(0.04, 0.07, 0.11, 1)
-cor_silhueta = Color(0.07, 0.11, 0.16, 1)
-cor_luz = Color(0.62, 0.84, 1, 1)
-cor_poeira = Color(0.78, 0.92, 1, 1)
-densidade_poeira = 1
-bioma = "prisao"
+cor_ambiente = Color(0.9, 0.88, 1, 1)
+cor_fundo = Color(0.06, 0.06, 0.16, 1)
+cor_silhueta = Color(0.11, 0.1, 0.22, 1)
+cor_luz = Color(0.82, 0.7, 1, 1)
+cor_poeira = Color(0.9, 0.84, 1, 1)
+densidade_poeira = 1.1
+bioma = "desfiladeiro"
 largura_nivel = 5800.0
-fundo_pack = "prisao"
-tinta_fundo = Color(0.72, 0.9, 1.16, 1)
-neblina_fundo = 0.38
-dessaturar_fundo = 0.58
+fundo_pack = "desfiladeiro"
+tinta_fundo = Color(0.94, 0.88, 1.18, 1)
+neblina_fundo = 0.2
+dessaturar_fundo = 0.24
 seed_ambiente = 1259
 
 ; Planar contextual em TODO o percurso (inclui as fogueiras: reaparecer ja' plana).

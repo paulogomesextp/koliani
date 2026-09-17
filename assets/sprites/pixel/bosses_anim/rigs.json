@@ -1018,9 +1018,9 @@
   }
  },
  "guardiao_dos_ceus": {
-  "w": 334,
-  "h": 252,
-  "pes_y": 218,
+  "w": 272,
+  "h": 224,
+  "pes_y": 200,
   "estados": {
    "idle": 6,
    "walk": 8,
