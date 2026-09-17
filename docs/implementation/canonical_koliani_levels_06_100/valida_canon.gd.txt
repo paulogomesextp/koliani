@@ -1,0 +1,149 @@
+extends SceneTree
+## Pre-Process 11B: Koliani canónica em runtime nas amostras.
+## Para cada nível corre a MESMA sequência de input duas vezes:
+##   canon  -> cena tal como está gravada (flags true)
+##   antigo -> flags forçadas a false em memória (rig shadowblade)
+## e compara trajetória/física. So' a primeira conta para a validação visual.
+##   Godot --path . --window --screen 1 --fixed-fps 60 --script <isto> -- <out> [niveis]
+
+const AMOSTRAS := [1, 5, 6, 7, 8, 9, 10, 30, 31, 63, 100]
+var OUT := ""
+var E: Node
+var _sessao0 := {}
+
+func _initialize() -> void:
+	call_deferred("_run")
+
+func _run() -> void:
+	var a := OS.get_cmdline_user_args()
+	OUT = a[0]
+	DirAccess.make_dir_recursive_absolute(OUT + "/antigo")
+	root.size = Vector2i(1280, 720)
+	root.content_scale_size = Vector2i(1280, 720)
+	E = root.get_node("EstadoJogo")
+	E.set("modo_teste", true)
+	E.ativar_modo_dev()
+	_sessao0 = (E.get("level_session") as Dictionary).duplicate(true)
+	var lista: Array = AMOSTRAS
+	if a.size() > 1:
+		lista = []
+		for s in a[1].split(","):
+			lista.append(int(s))
+	var tudo := {}
+	for n in lista:
+		var canon := await _correr(n, false)
+		var antigo := await _correr(n, true)
+		var maxd := 0.0
+		var difs: Array = []
+		var amostras := mini(canon.traj.size(), antigo.traj.size())
+		for i in amostras:
+			for j in 4:
+				var d := absf(float(canon.traj[i][j]) - float(antigo.traj[i][j]))
+				maxd = maxf(maxd, d)
+				if d > 0.001 and difs.size() < 12:
+					difs.append([i, ["x", "y", "vx", "vy"][j], canon.traj[i][j], antigo.traj[i][j], canon.fases[i]])
+		canon["fisica_vs_antigo"] = {"inicio_igual": canon.inicio == antigo.inicio, "inicio_antigo": str(antigo.inicio),"amostras": amostras, "max_delta_xy_vxvy": maxd,
+			"mesmo_n": canon.traj.size() == antigo.traj.size(), "difs": difs,
+			"colisao_antigo": antigo.colisao, "mask_layer_antigo": antigo.mask_layer,
+			"anims_antigo_run_frames": antigo.run_frames, "idle0_antigo": antigo.idle0}
+		canon.erase("traj")
+		canon.erase("fases")
+		canon.erase("inicio")
+		tudo["L%03d" % n] = canon
+		print("L%03d golden=%s run=%d fps=%s delta=%s inicio=%s/%s" % [n, canon.flags, canon.run_frames, canon.run_fps, maxd, canon.inicio_txt, canon.fisica_vs_antigo.inicio_antigo])
+	FileAccess.open(OUT + "/validacao_canonica.json", FileAccess.WRITE).store_string(JSON.stringify(tudo, "\t"))
+	for nome in tudo:
+		print(nome, " difs=", tudo[nome].fisica_vs_antigo.difs)
+	print("VALIDA_OK")
+	quit()
+
+func _correr(n: int, forcar_antigo: bool) -> Dictionary:
+	var idx := n - 1
+	E.indice_nivel = idx
+	E.set("level_session", _sessao0.duplicate(true))
+	E._limpar_level_session_runtime()
+	E._limpar_jornada_ancora()
+	var nivel: Node = (load(E.NIVEIS[idx]) as PackedScene).instantiate()
+	var k := nivel.get_node("Koliani") as CharacterBody2D
+	if forcar_antigo:
+		k.set("usar_prototipo_premium", false)
+		k.set("usar_golden_set", false)
+	if current_scene:
+		current_scene.free()
+	root.add_child(nivel)
+	current_scene = nivel
+	for i in 40:
+		await process_frame
+	await create_timer(0.4).timeout
+	var corpo := k.get_node("Sprite/Corpo") as AnimatedSprite2D
+	var sf := corpo.sprite_frames
+	var inicio := k.global_position
+	var cam := k.get_node_or_null("Camera2D") as Camera2D
+	var res := {"cena": E.NIVEIS[idx], "flags": [k.get("usar_prototipo_premium"), k.get("usar_golden_set")],
+		"idle0": _p(sf.get_frame_texture("idle", 0)), "idle_frames": sf.get_frame_count("idle"),
+		"run_frames": sf.get_frame_count("run"), "run_fps": sf.get_animation_speed("run"),
+		"run_loop": sf.get_animation_loop("run"), "run_paths": [],
+		"tem_morte": sf.has_animation("morte"), "tem_dash": sf.has_animation("dash"),
+		"scale": str(corpo.scale), "offset": str(corpo.offset),
+		"colisao": str((k.get_node("CollisionShape2D") as CollisionShape2D).shape.get_rect().size),
+		"mask_layer": [k.collision_mask, k.collision_layer], "anims_vistas": {}, "traj": [], "fases": [],
+		"inicio": inicio, "inicio_txt": str(inicio)}
+	for i in sf.get_frame_count("run"):
+		res.run_paths.append(_p(sf.get_frame_texture("run", i)))
+	if cam:
+		cam.zoom = Vector2(2.4, 2.4)
+		cam.position_smoothing_enabled = false
+	var vistas: Dictionary = res.anims_vistas
+	var passo := func(fase: String, frames: int) -> void:
+		for i in frames:
+			await physics_frame
+			var rel: Vector2 = k.global_position - res.inicio
+			res.traj.append([rel.x, rel.y, k.velocity.x, k.velocity.y])
+			res.fases.append(fase)
+			if not vistas.has(fase):
+				vistas[fase] = []
+			if not str(corpo.animation) in vistas[fase]:
+				vistas[fase].append(str(corpo.animation))
+	await passo.call("idle", 30)
+	await _shot(("L%03d_idle" if not forcar_antigo else "antigo/L%03d_idle") % n)
+	Input.action_press("mover_direita")
+	await passo.call("run", 40)
+	await _shot(("L%03d_run" if not forcar_antigo else "antigo/L%03d_run") % n)
+	Input.action_release("mover_direita")
+	await passo.call("paragem", 25)
+	Input.action_press("saltar")
+	await passo.call("jump", 10)
+	Input.action_release("saltar")
+	await passo.call("queda", 45)
+	var dash_ativo := false
+	Input.action_press("dash")
+	for i in 4:
+		await passo.call("dash", 1)
+		dash_ativo = dash_ativo or float(k.get("_dash_restante")) > 0.0
+	Input.action_release("dash")
+	await passo.call("pos_dash", 20)
+	res["dash_ativo"] = dash_ativo
+	# morte: estado visual apenas (sem reload nem vidas)
+	k.set("_a_morrer", true)
+	k.call("_atualizar_anim")
+	res["anim_morte"] = str(corpo.animation)
+	res["morte_path0"] = _p(corpo.sprite_frames.get_frame_texture(corpo.animation, 0))
+	k.set("_a_morrer", false)
+	k.call("recuperar_no_checkpoint", k.global_position + Vector2(0, -10))
+	await passo.call("respawn", 20)
+	res["scale_final"] = str(corpo.scale)
+	res["offset_final"] = str(corpo.offset)
+	return res
+
+func _p(tx: Texture2D) -> String:
+	if tx == null:
+		return ""
+	if tx.resource_path != "":
+		return tx.resource_path
+	if tx is AtlasTexture and (tx as AtlasTexture).atlas:
+		return "atlas:" + (tx as AtlasTexture).atlas.resource_path
+	return "<runtime>"
+
+func _shot(nome: String) -> void:
+	await RenderingServer.frame_post_draw
+	root.get_texture().get_image().save_png(OUT + "/" + nome + ".png")

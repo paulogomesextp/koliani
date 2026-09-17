@@ -18,6 +18,7 @@ const LevelSession := preload("res://scripts/level_session.gd")
 const TestesMovimentoCamera4A := preload("res://tests/test_movimento_camera_4a.gd")
 const TestesWindSystem := preload("res://tests/test_wind_system.gd")
 const TestesRegion02WindLevels := preload("res://tests/test_region02_wind_levels.gd")
+const TestesKolianiCanonicaNiveis := preload("res://tests/test_koliani_canonica_niveis.gd")
 const DT := 1.0 / 60.0
 
 var _falhas: Array[String] = []
@@ -33,6 +34,8 @@ func _correr_tudo() -> void:
 	for falha in TestesWindSystem.executar():
 		_falhas.append(falha)
 	for falha in TestesRegion02WindLevels.executar():
+		_falhas.append(falha)
+	for falha in TestesKolianiCanonicaNiveis.executar():
 		_falhas.append(falha)
 	teste_movimento_salto_com_coyote()
 	teste_movimento_corte_de_salto()

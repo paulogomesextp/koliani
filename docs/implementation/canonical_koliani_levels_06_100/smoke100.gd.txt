@@ -1,0 +1,57 @@
+extends SceneTree
+## Smoke dos 100 níveis: carrega cada cena real, corre ~30 frames e lê o
+## AnimatedSprite2D vivo da Koliani. Correr com APPDATA em sandbox.
+
+const RUN0 := "res://assets/sprites/koliani_golden_set/frames/run_final/run_001.png"
+const RUN9 := "res://assets/sprites/koliani_golden_set/frames/run_final/run_010.png"
+
+func _initialize() -> void:
+	call_deferred("_run")
+
+func _run() -> void:
+	var E := root.get_node("EstadoJogo")
+	E.set("modo_teste", true)
+	var sessao0: Dictionary = (E.get("level_session") as Dictionary).duplicate(true)
+	var falhas: Array = []
+	var linhas: Array = []
+	for idx in E.NIVEIS.size():
+		E.indice_nivel = idx
+		E.set("level_session", sessao0.duplicate(true))
+		E._limpar_level_session_runtime()
+		E._limpar_jornada_ancora()
+		var cena := load(E.NIVEIS[idx]) as PackedScene
+		if cena == null:
+			falhas.append("L%03d nao carrega" % (idx + 1))
+			continue
+		var nivel := cena.instantiate()
+		if current_scene:
+			current_scene.free()
+		root.add_child(nivel)
+		current_scene = nivel
+		for i in 30:
+			await process_frame
+		var k := nivel.get_node_or_null("Koliani")
+		var corpo := k.get_node_or_null("Sprite/Corpo") as AnimatedSprite2D if k else null
+		if corpo == null or corpo.sprite_frames == null:
+			falhas.append("L%03d sem corpo" % (idx + 1))
+			continue
+		var sf := corpo.sprite_frames
+		var ok: bool = k.get("usar_golden_set") and k.get("usar_prototipo_premium") \
+			and sf.get_frame_count("run") == 10 \
+			and sf.get_frame_texture("run", 0).resource_path == RUN0 \
+			and sf.get_frame_texture("run", 9).resource_path == RUN9 \
+			and is_equal_approx(sf.get_animation_speed("run"), 13.333333) \
+			and sf.get_animation_loop("run") \
+			and sf.get_frame_texture("idle", 0).resource_path.contains("koliani_golden_set/frames/idle") \
+			and sf.has_animation("morte") and sf.has_animation("dash") \
+			and corpo.scale == Vector2.ONE and corpo.offset == Vector2(0, -18) \
+			and (k.get_node("CollisionShape2D") as CollisionShape2D).shape.get_rect().size == Vector2(20, 44)
+		linhas.append("L%03d %s" % [idx + 1, "OK" if ok else "FAIL"])
+		if not ok:
+			falhas.append("L%03d contrato visual canonico falhou" % (idx + 1))
+	for l in linhas:
+		print(l)
+	print("SMOKE100 niveis=%d ok=%d falhas=%s" % [linhas.size(), linhas.size() - falhas.size(), falhas])
+	if current_scene:
+		current_scene.free()
+	quit(0 if falhas.is_empty() else 1)
