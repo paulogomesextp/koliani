@@ -479,10 +479,11 @@ func _ir_jogar() -> void:
 ## Só existe na branch `claude/n08-pwa-preview` (playtest remoto do Process
 ## 11 pela PWA). NUNCA entra em master: para remover, apagar este bloco e a
 ## chamada no início de `_tratar_atalhos_dev`.
-## No Web arranca SEMPRE direto no N08 com o kit de chegada da campanha (o
-## mesmo do `tools/verifica_rota_n08.gd`); `?menu=1` no URL mostra o menu
-## normal. A preview vive noutra origem, por isso o save da PWA de produção
-## não é tocado; o kit só é posto em memória.
+## No Web arranca SEMPRE direto no N08, numa campanha limpa EM MEMÓRIA com o
+## kit de chegada (o mesmo do `tools/verifica_rota_n08.gd`). A preview é
+## servida em `paulogomesextp.github.io`, a MESMA origem da PWA de produção,
+## e o save Web (IndexedDB `/userfs`) é por origem: por isso `modo_teste`
+## liga-se ANTES de tudo e nenhum progresso é gravado (`guardar()` sai logo).
 const _PREVIEW_N08_INDICE := 7
 const _PREVIEW_N08_KIT: Array[String] = ["dash", "salto_duplo", "dash_aereo", "escalar_paredes"]
 
@@ -490,15 +491,13 @@ const _PREVIEW_N08_KIT: Array[String] = ["dash", "salto_duplo", "dash_aereo", "e
 func _preview_n08_web() -> bool:
 	if not OS.has_feature("web"):
 		return false
-	var menu := str(JavaScriptBridge.eval(
-		"new URLSearchParams(location.search).get('menu') || ''", true))
-	if menu == "1":
-		return false
+	EstadoJogo.modo_teste = true
+	EstadoJogo.reiniciar_campanha()
 	EstadoJogo.habilidades.assign(_PREVIEW_N08_KIT)
 	EstadoJogo.habilidades_suspensas.clear()
 	EstadoJogo.indice_nivel = _PREVIEW_N08_INDICE
 	EstadoJogo.iniciar_sessao_nivel(true)
-	print("PREVIEW N08 (test-only): nivel ", EstadoJogo.NIVEIS[_PREVIEW_N08_INDICE])
+	print("PREVIEW N08 (test-only, sem gravar): nivel ", EstadoJogo.NIVEIS[_PREVIEW_N08_INDICE])
 	_ir_jogar()
 	return true
 ## <<< PREVIEW N08 -- TEST-ONLY ------------------------------------------
