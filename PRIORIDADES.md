@@ -1,3 +1,26 @@
+## Pendente — Super-Process A, Região II fechada (17 set 2026)
+
+Branch `claude/region02-completion-pass`. Tudo o que estava em aberto do
+Process 11 e 12 sobre arte, vento e lore está feito; o que sobra é humano.
+
+1. **PLAYTEST HUMANO DA REGIÃO II INTEIRA (N06–N10).** É o único gate que
+   falta. Build Windows isolada com launcher por nível em
+   `builds/windows/` (save próprio, não toca no save real).
+2. **A largura do Guardião** é a primeira coisa a julgar: 235 px numa
+   plataforma de arena de 560. As asas tapam a Koliani? Elas não dão dano —
+   isso lê-se, ou parece injusto?
+3. **N06/N07/N09 vão jogar-se diferente.** As zonas de vento ficaram com o
+   tamanho desenhado (o N09 passa de 300 px de largo para 680/650). Está
+   certo em relação ao que foi authored, mas nunca foi jogado assim.
+4. **Os inimigos não são da região** (esqueleto, chort, imp, mastim, orc; o
+   cânone pede morcego dos ventos, sentinela flutuante, gaivota sombria,
+   golem aéreo, mago do vento). Trocar só o aspeto parte a leitura
+   silhueta→comportamento — precisa de lote próprio, com gameplay.
+5. **N06/N07/N09 ainda têm jornada procedural** (`corredor = true`) e N08/N10
+   não. Inconsistência de estrutura da região; é gameplay.
+6. Quatro ataques canónicos do Guardião por implementar: RAJADA DE VENTO,
+   CHOQUE AÉREO, METEOROS CELESTIAIS, INVOCAR GAIVOTAS SOMBRIAS.
+
 ## Pendente -- Process 12, N10 Guardião dos Céus (17 set 2026)
 
 1. **PLAYTEST HUMANO do N10** (branch `claude/region02-n10-guardian-skies`).

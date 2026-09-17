@@ -1,3 +1,21 @@
+## Super-Process A — passe de fecho da Região II (17 set 2026)
+
+- Objetivo: fechar a Região II — Desfiladeiro dos Ventos — como bloco
+  coerente, canónico e pronto para playtest humano. **Região III não.**
+- Âmbito: contrato visual do Guardião + arte dele, passe de arte canónico
+  de N06–N10, o bug das zonas de vento partilhadas, e o texto que
+  contradizia o cânone. Gameplay do N08 LOCKED; lógica do N10 preservada.
+- Decisão de fundo: a região ganha material PRÓPRIO em vez de emprestar o
+  da Região III. Os packs certos em matéria (`montanhas`, `rochoso`) são
+  dela, e a regra "um pack nunca aparece em duas regiões" vale — é a
+  mudança de região que o jogador tem de sentir.
+- Decisão de método: um passe de arte tem de PROVAR que não mexeu em
+  gameplay. `tools/geometria_regiao02.tscn` fotografa os 248 nós que o
+  jogador toca e compara antes/depois.
+- Resultado técnico: tudo PASS, 0 falhas novas, save real intacto.
+  Estado: **HUMAN PLAYTEST REQUIRED**.
+- Seguinte: playtest humano da Região II. Depois, e só depois, Região III.
+
 ## Process 12 — N10 exame final + Guardião dos Céus (17 set 2026)
 
 - Objetivo: fechar a Região II no N10 -- exame cumulativo das leituras de

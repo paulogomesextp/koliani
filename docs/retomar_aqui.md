@@ -1,3 +1,45 @@
+## Super-Process A — Região II fecha, TÉCNICO COMPLETO (17 set 2026)
+
+- Branch `claude/region02-completion-pass` (base
+  `claude/region02-n10-guardian-skies@d7af0c3d`), worktree
+  `C:/Projetos/koliani-region02-complete`. Detalhe:
+  `docs/implementation/region_02_completion_pass.md`.
+- **Gate A PASS**: a prancha aprovada chegava para definir o Guardião sem
+  inventar nada. Contrato em
+  `docs/art_direction/regions/region_02/GUARDIAO_DOS_CEUS_VISUAL_CONTRACT.md`.
+  Descoberta útil: os **três ataques da luta já eram canónicos** — LÂMINA =
+  PENAS CORTANTES, COMANDO DO VENTO = CHAMADA DOS VENTOS, QUEDA = MERGULHO.
+  A luta não teve de mudar nada.
+- **Guardião**: deixa de ser o rig de pack `monge_celeste` (humanoide de
+  manto ciano) e passa a ser um **corvídeo colossal** desenhado pelo motor
+  dos chefes — plano de corpo `ave` novo, que reusa o gait do `alado`. 235 ×
+  160 px = 2,46 × a Koliani. Colisão inalterada; só as âncoras visuais
+  mudaram (lâmina ← ombro da asa, pó ← garras, núcleo ← cabeça).
+- **Passe de arte N06–N10**: bioma e pack próprios (`desfiladeiro`),
+  compostos de material CC0 que já cá estava, recolorido para a paleta
+  amostrada da prancha. Três ferramentas novas. A `CascaMasmorra` troca de
+  TEXTURA e não de tiles — no `masmorra.tres` cada tile traz a sua colisão.
+- **Bug das zonas de vento CORRIGIDO** (estava aberto desde o Process 10). O
+  Godot partilha sub-recursos entre instâncias da mesma PackedScene: a
+  última zona a arrancar impunha a forma às outras. No N09 duas zonas
+  corriam a 300×220 em vez de 680×240 e 650×270.
+- **Texto alinhado**: os cinco nomes de nível eram de prisão e as pistas do
+  N10 falavam do Primeiro Prisioneiro. Corrigido nos 6 idiomas sem mexer no
+  arco (a Aurora continua a passar por aqui, o Zeriko continua a mandar
+  forjar-lhe grilhões — muda o sítio, não a história).
+- **Art safety provado**: `tools/geometria_regiao02.tscn` fotografa os 248
+  nós de gameplay das cinco cenas e compara antes/depois — 0 diferenças. O
+  comparador foi testado com uma mutação de 16 px.
+- ARMADILHA que custou a descobrir: **a suite mede a silhueta dos chefes
+  pelas CONSTANTES do `ChefeBase`**, e por isso media mal qualquer chefe com
+  `_altura_alvo`/`_largura_alvo` próprios. Depois de corrigida mostrou o
+  problema a sério: o Guardião saía com 324 px de largo contra os 560 px da
+  plataforma da arena. Ficou em 235.
+- Falta: **HUMAN PLAYTEST da Região II inteira**. Ver §7 do relatório — em
+  especial, as zonas de vento de N06/N07/N09 passam a ter o tamanho que
+  sempre estiveram desenhadas a ter, e nunca foram jogadas assim.
+- **Região III NÃO iniciada.**
+
 ## Process 12 — N10 exame final + Guardião dos Céus, TÉCNICO COMPLETO (17 set 2026)
 
 - Branch `claude/region02-n10-guardian-skies` (base `a5825950`), worktree
