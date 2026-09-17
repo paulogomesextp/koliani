@@ -1,11 +1,16 @@
 class_name ChefeIrmaosCondenados
 extends ChefeBase
-## Região II / nível 09 -- Os Irmãos Condenados. Dois fantasmas de forçado
-## ligados por uma corrente de alma:
-##   * IRMÃO PERTO (o corpo deste nó) -- arremete corpo-a-corpo (LUNGE).
-##   * IRMÃO LONGE (um Node2D-fantasma que o script move e desenha) --
-##     mantém-se a distância e atira dardos de alma (BOLTS).
-## A corrente entre os dois é uma `Line2D` atualizada a cada frame.
+## Região II / N09 -- os ESPECTROS GÉMEOS (`guard.espectros_gemeos`).
+## Arquétipo "Espectro das Ruínas" da prancha aprovada da região. Dois
+## espectros ligados por uma CORRENTE DE AR:
+##   * ESPECTRO PERTO (o corpo deste nó) -- arremete corpo-a-corpo (LUNGE).
+##   * ESPECTRO LONGE (um Node2D-fantasma que o script move e desenha) --
+##     mantém-se a distância e atira dardos de vento (BOLTS).
+## O fio entre os dois é uma `Line2D` atualizada a cada frame.
+##
+## Eram Os Irmãos Condenados, dois forçados presos por uma corrente de
+## ferro, na Ala dos Mortos. A mecânica dos dois corpos é a mesma; o que
+## os liga e a cor com que brilham é que deixaram de ser de prisão.
 ##
 ## Depois de cada combo os DOIS param, etéreos deixam de o ser por instantes
 ## (estado EXPOSTO): única janela de dano, à vida partilhada, a dobrar.
@@ -67,7 +72,7 @@ func _montar_irmao_longe() -> void:
 		return
 	_corrente = Line2D.new()
 	_corrente.width = 3.0
-	_corrente.default_color = Color(0.55, 0.95, 0.8, 0.5)
+	_corrente.default_color = Color(0.5, 0.72, 0.94, 0.5)
 	_corrente.z_index = -1
 	pai.add_child(_corrente)
 
@@ -78,13 +83,13 @@ func _montar_irmao_longe() -> void:
 	_longe_sprite.texture = _corpo.texture if _corpo else null
 	_longe_sprite.hframes = 4
 	_longe_sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	_longe_sprite.modulate = Color(0.7, 1.0, 0.9, 0.92)
+	_longe_sprite.modulate = Color(0.72, 0.86, 1.0, 0.92)
 	_longe.add_child(_longe_sprite)
 
 	var luz := PointLight2D.new()
 	luz.texture = _tex_luz()
 	luz.energy = 0.6
-	luz.color = Color(0.5, 1.0, 0.8)
+	luz.color = Color(0.47, 0.67, 0.9)
 	luz.scale = Vector2(0.9, 0.9)
 	_longe.add_child(luz)
 
@@ -284,13 +289,13 @@ func _disparar_dardo(de: Vector2, dir: Vector2) -> void:
 	forma.shape = cs
 	d.add_child(forma)
 	var poly := Polygon2D.new()
-	poly.color = Color(0.5, 1.0, 0.8, 0.95)
+	poly.color = Color(0.47, 0.67, 0.9, 0.95)
 	poly.polygon = PackedVector2Array([Vector2(-8, 0), Vector2(0, -7), Vector2(8, 0), Vector2(0, 7)])
 	d.add_child(poly)
 	var luz := PointLight2D.new()
 	luz.texture = _tex_luz()
 	luz.energy = 0.7
-	luz.color = Color(0.5, 1.0, 0.8)
+	luz.color = Color(0.47, 0.67, 0.9)
 	luz.scale = Vector2(0.35, 0.35)
 	d.add_child(luz)
 	var dano := int(round(dano_dardo * (1.15 if _fase2 else 1.0)))
@@ -328,7 +333,7 @@ func _um_morre() -> void:
 		estilhacos.gravity = Vector2(0, 300)
 		estilhacos.initial_velocity_min = 80.0
 		estilhacos.initial_velocity_max = 240.0
-		estilhacos.color = Color(0.5, 1.0, 0.8)
+		estilhacos.color = Color(0.47, 0.67, 0.9)
 		get_parent().add_child(estilhacos)
 		estilhacos.get_tree().create_timer(1.2).timeout.connect(estilhacos.queue_free)
 		var lg := _longe
@@ -359,7 +364,7 @@ func _mostrar_nucleo(v: bool) -> void:
 		_corpo.frame = 3 if v else 0
 	if _longe_sprite and _longe_vivo:
 		_longe_sprite.frame = 3 if v else 0
-		_longe_sprite.modulate = Color(1.4, 1.6, 1.5, 0.95) if v else Color(0.7, 1.0, 0.9, 0.92)
+		_longe_sprite.modulate = Color(1.4, 1.5, 1.6, 0.95) if v else Color(0.72, 0.86, 1.0, 0.92)
 	if _nucleo:
 		_nucleo.scale = Vector2.ONE * (1.0 if v else 0.4)
 		var luz: PointLight2D = _nucleo.get_node_or_null("Luz")

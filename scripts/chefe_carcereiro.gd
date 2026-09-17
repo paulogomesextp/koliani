@@ -1,9 +1,15 @@
 class_name ChefeCarcereiro
 extends ChefeBase
-## Chefe do mundo 2 -- o Carcereiro. Pesado e lento: aproxima-se da
-## Koliani, e quando a tem ao alcance ergue-se (telegrafo), salta e cai
-## com um baque que manda uma **onda de choque** rasteira -- só magoa quem
-## estiver no chão dentro do raio. Depois recupera, vulnerável.
+## Região II / N06 -- o GOLEM DAS FALÉSIAS (`guard.golem_falesias`).
+## Arquétipo "Golem Aéreo" da prancha aprovada da região. Pesado e lento:
+## aproxima-se da Koliani, e quando a tem ao alcance junta-se no ar
+## (telégrafo), salta e cai com um baque que manda uma **onda de choque**
+## rasteira -- só magoa quem estiver no chão dentro do raio. Depois
+## recupera, vulnerável.
+##
+## A classe ainda se chama `ChefeCarcereiro` por causa das cenas e dos
+## uids que lhe apontam; a identidade do Carcereiro (a CHAVE por cabeça,
+## as correntes-chicote) saiu toda -- ver `tools/gerar_chefes_anim.py`.
 
 enum Fase { APROXIMA, TELEGRAFO, SALTO, IMPACTO, RECUPERA }
 
@@ -114,6 +120,7 @@ func _onda() -> void:
 	p.initial_velocity_max = 380.0
 	p.scale_amount_min = 2.0
 	p.scale_amount_max = 4.0
-	p.color = Color(0.55, 0.7, 0.95)
+	# pó e lasca de pedra do desfiladeiro, não faísca azul de masmorra
+	p.color = Color(0.58, 0.56, 0.72)
 	add_sibling(p)
 	p.get_tree().create_timer(1.0).timeout.connect(p.queue_free)

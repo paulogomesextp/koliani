@@ -1,9 +1,13 @@
 [gd_scene load_steps=15 format=3 uid="uid://bkolianiprisao01"]
 
 ; REGIAO II / nivel 6 -- Portao dos Condenados.
-; Sala final FEITA A MAO (a JORNADA, que cresce com o nivel, vem antes). Masmorra FECHADA (CascaMasmorra).
-; Correntes como PLATAFORMAS MOVEIS (PlataformaCorrente) entre blocos de
-; celas solidos. Bifurcacao: passadico de cima / fila de celas em baixo.
+; Sala final FEITA A MAO (a JORNADA, que cresce com o nivel, vem antes).
+; Desfiladeiro FECHADO pela casca de pedra. Correntes de ar como
+; PLATAFORMAS MOVEIS (PlataformaCorrente) entre esporoes de rocha.
+; Bifurcacao: passadico de cima / fila de saliencias em baixo.
+; O NOME DO FICHEIRO ficou da Prisao dos Condenados: muda-lo partia os
+; saves e os checkpoints. O que o jogador le e "The Open Cliffs"
+; (`level.n05`) e o guardiao e o Golem das Falesias.
 ; Elite: esqueleto de carga. Poca de acido no fundo. Chefe: O Carcereiro
 ; Sem Rosto.
 
@@ -59,7 +63,7 @@ seed_ambiente = 1185
 [node name="Casca" parent="." instance=ExtResource("10_casca")]
 ; a agua morta do fundo da Casca segue o mesmo abismo dos niveis
 agua_cor = Color(0.4, 0.13, 0.26, 0.62)
-; pedra do Desfiladeiro em vez de tijolo de cela (mesma colisao)
+; pedra do Desfiladeiro (mesma colisao)
 estilo = "desfiladeiro"
 topo = -160.0
 altura = 2200.0
@@ -84,7 +88,7 @@ altura_visual = 110.0
 cor_base = Color(0.2, 0.24, 0.32, 1)
 cor_topo = Color(0.42, 0.54, 0.68, 1)
 
-[node name="Cela1" parent="." instance=ExtResource("9_pl")]
+[node name="Saliencia1" parent="." instance=ExtResource("9_pl")]
 position = Vector2(620, 650)
 tamanho = Vector2(150, 22)
 altura_visual = 40.0
@@ -99,7 +103,7 @@ amplitude = 60.0
 periodo = 3.0
 largura = 120.0
 
-[node name="Cela2" parent="." instance=ExtResource("9_pl")]
+[node name="Saliencia2" parent="." instance=ExtResource("9_pl")]
 position = Vector2(860, 620)
 tamanho = Vector2(150, 22)
 altura_visual = 40.0
@@ -116,7 +120,7 @@ comprimento = 140.0
 fase = 0.5
 largura = 120.0
 
-[node name="Cela3" parent="." instance=ExtResource("9_pl")]
+[node name="Saliencia3" parent="." instance=ExtResource("9_pl")]
 position = Vector2(1100, 640)
 tamanho = Vector2(150, 22)
 altura_visual = 40.0
@@ -189,7 +193,7 @@ altura_visual = 26.0
 cor_base = Color(0.2, 0.24, 0.32, 1)
 cor_topo = Color(0.42, 0.54, 0.68, 1)
 
-; -- fila de celas em BAIXO --
+; -- fila de saliencias em BAIXO --
 [node name="Baixo1" parent="." instance=ExtResource("9_pl")]
 position = Vector2(1640, 690)
 tamanho = Vector2(150, 20)

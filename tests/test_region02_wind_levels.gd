@@ -66,6 +66,119 @@ static func executar() -> Array[String]:
 		raiz.free()
 
 	falhas.append_array(_regiao_coerente())
+	falhas.append_array(_encontros_canonicos())
+	return falhas
+
+
+## Os QUATRO encontros intermédios da Região II (N06-N09).
+##
+## Depois de a região passar a Desfiladeiro dos Ventos ficaram cá dentro o
+## Carcereiro, Ignivar (o Ferreiro Maldito), a Dama da Guilhotina e os
+## Irmãos Condenados: quatro CHEFES com identidade de prisão e de forja, a
+## disputar o lugar do único chefe canónico da região, o Guardião dos Céus.
+## Isto prende as três coisas ao mesmo tempo -- são GUARDIÕES, o nome não
+## traz vocabulário da região antiga, e o rig já não é o da silhueta antiga.
+const INTERMEDIOS := {
+	5: {
+		"chave": "guard.golem_falesias",
+		"rig": "golem_falesias",
+		"cena": "res://scenes/actors/ChefeCarcereiro.tscn",
+	},
+	6: {
+		"chave": "guard.vigia_desfiladeiro",
+		"rig": "vigia_desfiladeiro",
+		"cena": "res://scenes/actors/ChefeIgnivar.tscn",
+	},
+	7: {
+		"chave": "guard.feiticeira_ventos",
+		"rig": "feiticeira_ventos",
+		"cena": "res://scenes/actors/ChefeDamaGuilhotina.tscn",
+	},
+	8: {
+		"chave": "guard.espectros_gemeos",
+		"rig": "espectros_gemeos",
+		"cena": "res://scenes/actors/ChefeIrmaosCondenados.tscn",
+	},
+}
+
+## Vocabulário que a Região II deixou para trás. Fica no teste, não no
+## código: é a lista que diz o que NÃO pode voltar a aparecer no nome de um
+## encontro da região, em nenhum dos seis idiomas.
+const PROIBIDO := [
+	"jailer", "carcereiro", "guillotine", "guilhotina", "condemned",
+	"condenados", "smith", "ferreiro", "forge", "forja", "prison",
+	"prisão", "prisao", "damned", "gaoler", "warden",
+]
+
+const IDIOMAS := ["en", "pt", "es", "fr", "de", "zh"]
+
+
+static func _encontros_canonicos() -> Array[String]:
+	var falhas: Array[String] = []
+	# Os ficheiros LIDOS DO DISCO, não `Textos.t()`: o `t()` cai para o
+	# inglês quando a chave falta, por isso passaria com a chave ausente em
+	# cinco dos seis idiomas.
+	var dicionarios := {}
+	for idioma: String in IDIOMAS:
+		var texto := FileAccess.get_file_as_string("res://assets/i18n/%s.json" % idioma)
+		var dados: Variant = JSON.parse_string(texto)
+		if dados is Dictionary:
+			dicionarios[idioma] = dados
+		else:
+			falhas.append("assets/i18n/%s.json não é JSON" % idioma)
+	for indice: int in INTERMEDIOS:
+		var esperado: Dictionary = INTERMEDIOS[indice]
+		var chave := CatalogoCampanha.chave_chefe(indice)
+		_verificar(falhas, chave == esperado["chave"],
+			"nível %02d: a chave do encontro é '%s', esperava '%s'"
+				% [indice + 1, chave, esperado["chave"]])
+		# GUARDIÃO, não chefe: o carrossel lê isto para escolher o rótulo, e
+		# quatro "Chefe:" antes do N10 tiram-lhe o peso de final de região
+		_verificar(falhas, not CatalogoCampanha.tem_chefe(indice),
+			"nível %02d ainda se anuncia como CHEFE" % [indice + 1])
+		# o nome, nos seis idiomas
+		for idioma: String in dicionarios:
+			var dicionario: Dictionary = dicionarios[idioma]
+			_verificar(falhas, dicionario.has(chave),
+				"%s.json não tem '%s'" % [idioma, chave])
+			if not dicionario.has(chave):
+				continue
+			var nome := String(dicionario[chave])
+			var minusculas := nome.to_lower()
+			for palavra: String in PROIBIDO:
+				_verificar(falhas, not minusculas.contains(palavra),
+					"%s: o nível %02d ainda se chama '%s'"
+						% [idioma, indice + 1, nome])
+			# e a chave antiga não pode ter ficado para trás a apodrecer
+			for velha: String in ["boss.carcereiro", "boss.ignivar",
+					"boss.dama_guilhotina", "boss.irmaos_condenados"]:
+				_verificar(falhas, not dicionario.has(velha),
+					"%s.json ainda tem a chave antiga '%s'" % [idioma, velha])
+		# e a silhueta: o rig antigo era a identidade antiga desenhada
+		var cena := load(esperado["cena"]) as PackedScene
+		if cena == null:
+			falhas.append("%s não carrega" % esperado["cena"])
+			continue
+		var chefe := cena.instantiate()
+		_verificar(falhas, str(chefe.get("rig")) == esperado["rig"],
+			"%s usa o rig '%s', esperava '%s'"
+				% [esperado["cena"], chefe.get("rig"), esperado["rig"]])
+		_verificar(falhas, ResourceLoader.exists(
+				"res://assets/sprites/pixel/bosses_anim/%s/idle.png" % esperado["rig"]),
+			"o rig '%s' não tem tira de sprites" % esperado["rig"])
+		chefe.free()
+
+	# ... e o N10 continua a ser o ÚNICO chefe da região
+	_verificar(falhas, CatalogoCampanha.chave_chefe(9) == "boss.guardiao_dos_ceus",
+		"o N10 deixou de ser o Guardião dos Céus")
+	_verificar(falhas, CatalogoCampanha.tem_chefe(9),
+		"o N10 deixou de se anunciar como chefe")
+	var chefes := 0
+	for indice in range(5, 10):
+		if CatalogoCampanha.tem_chefe(indice):
+			chefes += 1
+	_verificar(falhas, chefes == 1,
+		"a Região II tem %d chefes -- só pode ter um, o do N10" % chefes)
 	return falhas
 
 

@@ -1,17 +1,20 @@
 class_name ChefeIgnivar
 extends ChefeBase
-## Região II / nível 07 -- Ignivar, o Ferreiro Maldito. Um gigante de ferro
-## e escória com um braço em martelo e um núcleo de forja no peito. Fica
-## junto à bigorna e alterna três ataques:
-##   * MARTELO -- ergue o braço e baixa-o com um baque: onda de choque
-##     rasteira (só magoa a Koliani no chão ao alcance) -- salta por cima.
-##   * FORJA   -- malha na bigorna e atira uma lâmina em brasa na horizontal.
-##   * BRASAS  -- lança brasas que sobem e chovem sobre a Koliani (reutiliza
-##     `GotaAcida` recolorida a laranja: gota + poça que magoa).
-## A seguir a cada ataque volta-se para a forja: a fenda das costas abre-se
-## (EXPOSTO) -- única janela de dano, a dobrar.
-## Fase 2 (< 62% vida): "derrete a arena" -- alarga as poças de lava do
-## grupo "lava_fornalha", telégrafos mais curtos, mais brasas.
+## Região II / N07 -- a VIGIA DO DESFILADEIRO (`guard.vigia_desfiladeiro`).
+## Arquétipo "Torre Vigia" da prancha aprovada da região: uma vigia de
+## pedra que se soltou da rocha e ainda cumpre a ordem. Braço-contrapeso,
+## conduta de vento no peito. Não sai do sítio e alterna três ataques:
+##   * BAQUE   -- ergue o contrapeso e baixa-o: onda de choque rasteira
+##     (só magoa a Koliani no chão ao alcance) -- salta por cima.
+##   * LANÇA   -- dispara uma lâmina de vento na horizontal.
+##   * ESTILHAÇOS -- atira pedra que sobe e chove sobre a Koliani
+##     (reutiliza `GotaAcida` recolorida: queda + zona que magoa).
+## A seguir a cada ataque volta as costas: a conduta abre-se (EXPOSTO) --
+## única janela de dano, a dobrar.
+## Fase 2 (< 62% vida): telégrafos mais curtos e mais estilhaços.
+##
+## Era Ignivar, o Ferreiro Maldito, da Fornalha dos Pecadores. A máquina
+## de estados é a mesma -- mudou o que ela veste, cospe e soa.
 
 const BRASA := preload("res://scenes/actors/GotaAcida.tscn")
 
@@ -165,7 +168,8 @@ func _forjar_lamina() -> void:
 	var pai := get_parent()
 	if pai == null:
 		return
-	Som.toca("chama", -8.0, 1.4)
+	# "chama" era a forja. O que ela dispara agora é vento.
+	Som.toca("onda", -8.0, 1.4)
 	var dir := _dir_para_koliani()
 	var lamina := Area2D.new()
 	lamina.collision_layer = 0
@@ -180,7 +184,7 @@ func _forjar_lamina() -> void:
 	lamina.add_child(forma)
 
 	var poly := Polygon2D.new()
-	poly.color = Color(1.0, 0.5, 0.12, 1.0)
+	poly.color = Color(0.47, 0.67, 0.9, 1.0)
 	poly.polygon = PackedVector2Array([Vector2(-17, 0), Vector2(6, -6), Vector2(17, 0), Vector2(6, 6)])
 	poly.scale.x = dir
 	lamina.add_child(poly)
@@ -188,7 +192,7 @@ func _forjar_lamina() -> void:
 	var luz := PointLight2D.new()
 	luz.texture = _tex_luz()
 	luz.energy = 0.7
-	luz.color = Color(1.0, 0.55, 0.2)
+	luz.color = Color(0.47, 0.67, 0.9)
 	luz.scale = Vector2(0.5, 0.4)
 	lamina.add_child(luz)
 
@@ -204,7 +208,7 @@ func _forjar_lamina() -> void:
 
 
 func _lancar_brasas() -> void:
-	Som.toca("chama", -9.0, 0.8)
+	Som.toca("onda", -9.0, 0.6)
 	var pai := get_parent()
 	if pai == null:
 		return
@@ -215,7 +219,7 @@ func _lancar_brasas() -> void:
 		var g := BRASA.instantiate()
 		g.automatico = false
 		g.dano = dano_brasa
-		g.cor = Color(1.0, 0.55, 0.18, 1.0)
+		g.cor = Color(0.55, 0.58, 0.74, 1.0)
 		g.global_position = Vector2(x, _chao_cache - 200.0)
 		pai.add_child(g)
 		g.cair(0.12 + i * 0.12)
@@ -312,7 +316,7 @@ func _particulas_onda() -> void:
 	p.initial_velocity_max = 360.0
 	p.scale_amount_min = 2.0
 	p.scale_amount_max = 4.5
-	p.color = Color(1.0, 0.55, 0.2)
+	p.color = Color(0.47, 0.67, 0.9)
 	add_sibling(p)
 	p.get_tree().create_timer(1.0).timeout.connect(p.queue_free)
 

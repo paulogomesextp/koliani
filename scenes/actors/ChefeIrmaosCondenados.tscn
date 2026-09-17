@@ -1,10 +1,13 @@
 [gd_scene load_steps=6 format=3 uid="uid://bkolianichefeirmaos09"]
 
-; Região II / nível 09 -- Os Irmãos Condenados. O corpo deste nó é o IRMÃO
-; PERTO; o script cria em runtime o IRMÃO LONGE (mesmo sprite, tom mais
-; frio) e a corrente entre os dois. Tira pixel-art de 4 frames
-; (0/1 pairar, 2 encolher p/ arremesso, 3 peito aberto -- núcleo de alma)
-; em assets/sprites/pixel/bosses/irmaos.png. Script chefe_irmaos_condenados.gd.
+; Região II / N09 -- ESPECTROS GÉMEOS (`guard.espectros_gemeos`).
+; Arquétipo "Espectro das Ruínas" da prancha aprovada da região. Eram os
+; Irmãos Condenados, dois forçados presos por uma CORRENTE DE FERRO:
+; identidade da Ala dos Mortos. Continuam a ser dois -- é a mecânica --
+; mas o que os liga passou a ser uma CORRENTE DE AR.
+; O corpo deste nó é o espectro PERTO; o script cria em runtime o
+; espectro LONGE (mesmo sprite, tom mais frio) e o fio entre os dois.
+; Script chefe_irmaos_condenados.gd.
 
 [ext_resource type="Script" path="res://scripts/chefe_irmaos_condenados.gd" id="1_chefe"]
 [ext_resource type="Texture2D" path="res://assets/sprites/pixel/bosses/irmaos.png" id="2_tex"]
@@ -31,13 +34,13 @@ fill_to = Vector2(1, 0.5)
 collision_layer = 4
 collision_mask = 1
 script = ExtResource("1_chefe")
-rig = "irmaos_condenados"
+rig = "espectros_gemeos"
 escala_visual = 1.3
 vida = 440
 dano_contacto = 18
 alcance_patrulha = 0.0
-cor_estilhacos = Color(0.5, 0.95, 0.78, 1)
-cor_rim = Color(0.5, 1, 0.8, 1)
+cor_estilhacos = Color(0.47, 0.67, 0.9, 1)
+cor_rim = Color(0.47, 0.67, 0.9, 1)
 
 [node name="Sprite" type="Node2D" parent="."]
 
@@ -48,17 +51,18 @@ texture = ExtResource("2_tex")
 hframes = 4
 
 
-; RIG ANIMADO -- n9 Ala dos Mortos -- lutador desarmado. Fica vazio: o `ChefeBase._montar_rig` enche-o
-; de `bosses_anim/monge` e esconde o `Corpo` acima.
+; RIG ANIMADO -- N09 -- dois espectros e o fio de ar entre eles. Fica
+; vazio: o `ChefeBase._montar_rig` enche-o de
+; `bosses_anim/espectros_gemeos` e esconde o `Corpo` acima.
 [node name="Anim" type="AnimatedSprite2D" parent="Sprite"]
 visible = false
 texture_filter = 1
 
-[node name="LuzAlma" type="PointLight2D" parent="Sprite"]
+[node name="LuzVento" type="PointLight2D" parent="Sprite"]
 position = Vector2(0, -14)
 texture = SubResource("tex_luz")
 energy = 0.7
-color = Color(0.5, 1, 0.8, 1)
+color = Color(0.47, 0.67, 0.9, 1)
 scale = Vector2(1, 0.95)
 
 [node name="Nucleo" type="Node2D" parent="Sprite"]
@@ -68,21 +72,21 @@ scale = Vector2(0.4, 0.4)
 [node name="Brilho" type="Sprite2D" parent="Sprite/Nucleo"]
 visible = false
 texture = SubResource("tex_luz")
-modulate = Color(0.5, 1, 0.8, 0.9)
+modulate = Color(0.47, 0.67, 0.9, 0.9)
 scale = Vector2(0.32, 0.32)
 
 [node name="Diamante" type="Polygon2D" parent="Sprite/Nucleo"]
-color = Color(0.5, 0.95, 0.78, 1)
+color = Color(0.36, 0.62, 0.9, 1)
 polygon = PackedVector2Array(-8, 0, 0, -12, 8, 0, 0, 12)
 
 [node name="Cerne" type="Polygon2D" parent="Sprite/Nucleo"]
-color = Color(0.9, 1, 0.95, 1)
+color = Color(0.92, 0.96, 1, 1)
 polygon = PackedVector2Array(-3.5, 0, 0, -6, 3.5, 0, 0, 6)
 
 [node name="Luz" type="PointLight2D" parent="Sprite/Nucleo"]
 texture = SubResource("tex_luz")
 energy = 0.12
-color = Color(0.5, 1, 0.8, 1)
+color = Color(0.47, 0.67, 0.9, 1)
 scale = Vector2(0.6, 0.6)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]

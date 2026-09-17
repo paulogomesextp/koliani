@@ -1035,5 +1035,81 @@
    "hurt": 12.0,
    "death": 10.0
   }
+ },
+ "golem_falesias": {
+  "w": 190,
+  "h": 192,
+  "pes_y": 160,
+  "estados": {
+   "idle": 6,
+   "walk": 8,
+   "attack": 10,
+   "hurt": 4,
+   "death": 10
+  },
+  "fps": {
+   "idle": 7.0,
+   "walk": 11.0,
+   "attack": 14.0,
+   "hurt": 12.0,
+   "death": 10.0
+  }
+ },
+ "vigia_desfiladeiro": {
+  "w": 232,
+  "h": 240,
+  "pes_y": 204,
+  "estados": {
+   "idle": 6,
+   "walk": 8,
+   "attack": 10,
+   "hurt": 4,
+   "death": 10
+  },
+  "fps": {
+   "idle": 7.0,
+   "walk": 11.0,
+   "attack": 14.0,
+   "hurt": 12.0,
+   "death": 10.0
+  }
+ },
+ "feiticeira_ventos": {
+  "w": 204,
+  "h": 248,
+  "pes_y": 212,
+  "estados": {
+   "idle": 6,
+   "walk": 8,
+   "attack": 10,
+   "hurt": 4,
+   "death": 10
+  },
+  "fps": {
+   "idle": 7.0,
+   "walk": 11.0,
+   "attack": 14.0,
+   "hurt": 12.0,
+   "death": 10.0
+  }
+ },
+ "espectros_gemeos": {
+  "w": 150,
+  "h": 182,
+  "pes_y": 146,
+  "estados": {
+   "idle": 6,
+   "walk": 8,
+   "attack": 10,
+   "hurt": 4,
+   "death": 10
+  },
+  "fps": {
+   "idle": 7.0,
+   "walk": 11.0,
+   "attack": 14.0,
+   "hurt": 12.0,
+   "death": 10.0
+  }
  }
 }

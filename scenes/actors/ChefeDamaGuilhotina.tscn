@@ -1,9 +1,12 @@
 [gd_scene load_steps=6 format=3 uid="uid://bkolianichefedama08"]
 
-; Região II / nível 08 -- A Dama da Guilhotina. Sprite pixel-art animado
-; (tira de 4 frames: 0/1 pairar, 2 lâmina erguida (telegrafo), 3 capuz
-; recolhido -- crânio + núcleo ciano (exposto)) em
-; assets/sprites/pixel/bosses/dama.png -- o script troca `frame`.
+; Região II / N08 -- FEITICEIRA DOS VENTOS (`guard.feiticeira_ventos`).
+; Arquétipo "Mago do Vento" da prancha aprovada da região: "lança magia
+; de vento, teleporta-se" -- que era, letra por letra, o que este
+; encontro já fazia. Era A Dama da Guilhotina, com a lâmina do cadafalso
+; e a corda ao pescoço: identidade do Corredor das Execuções.
+; O N08 está LOCKED -- aqui mudou a APRESENTAÇÃO, não o combate: mesmos
+; ataques, mesmos tempos, mesma arena, mesmo gait ("golpe").
 ; Ela é etérea: o script gere a posição (teleporta) e o alpha do Sprite.
 ; Script chefe_dama_guilhotina.gd (herda ChefeBase).
 
@@ -32,13 +35,13 @@ fill_to = Vector2(1, 0.5)
 collision_layer = 4
 collision_mask = 1
 script = ExtResource("1_chefe")
-rig = "dama_guilhotina"
+rig = "feiticeira_ventos"
 escala_visual = 1.25
 vida = 420
 dano_contacto = 18
 alcance_patrulha = 0.0
-cor_estilhacos = Color(0.62, 0.72, 0.85, 1)
-cor_rim = Color(0.7, 0.9, 1, 1)
+cor_estilhacos = Color(0.64, 0.54, 0.86, 1)
+cor_rim = Color(0.78, 0.54, 0.98, 1)
 
 [node name="Sprite" type="Node2D" parent="."]
 
@@ -48,18 +51,18 @@ position = Vector2(0, -8)
 texture = ExtResource("2_tex")
 hframes = 4
 
-; RIG ANIMADO (regiao II / n8 -- carrasco sombrio, foice). Vazio: o
-; `ChefeBase._montar_rig` enche-o de `bosses_anim/verdugo` e esconde o
-; `Corpo` acima.
+; RIG ANIMADO (Região II / N08 -- maga do vento, cajado e orbe). Vazio:
+; o `ChefeBase._montar_rig` enche-o de `bosses_anim/feiticeira_ventos`
+; e esconde o `Corpo` acima.
 [node name="Anim" type="AnimatedSprite2D" parent="Sprite"]
 visible = false
 texture_filter = 1
 
-[node name="LuzEspetro" type="PointLight2D" parent="Sprite"]
+[node name="LuzMagia" type="PointLight2D" parent="Sprite"]
 position = Vector2(0, -20)
 texture = SubResource("tex_luz")
 energy = 0.7
-color = Color(0.6, 0.85, 1, 1)
+color = Color(0.72, 0.5, 0.95, 1)
 scale = Vector2(1.1, 1.0)
 
 [node name="Nucleo" type="Node2D" parent="Sprite"]
@@ -69,21 +72,21 @@ scale = Vector2(0.4, 0.4)
 [node name="Brilho" type="Sprite2D" parent="Sprite/Nucleo"]
 visible = false
 texture = SubResource("tex_luz")
-modulate = Color(0.5, 0.85, 1, 0.9)
+modulate = Color(0.72, 0.5, 0.95, 0.9)
 scale = Vector2(0.32, 0.32)
 
 [node name="Diamante" type="Polygon2D" parent="Sprite/Nucleo"]
-color = Color(0.44, 0.88, 1, 1)
+color = Color(0.68, 0.45, 0.95, 1)
 polygon = PackedVector2Array(-8, 0, 0, -12, 8, 0, 0, 12)
 
 [node name="Cerne" type="Polygon2D" parent="Sprite/Nucleo"]
-color = Color(0.9, 0.96, 1, 1)
+color = Color(0.96, 0.92, 1, 1)
 polygon = PackedVector2Array(-3.5, 0, 0, -6, 3.5, 0, 0, 6)
 
 [node name="Luz" type="PointLight2D" parent="Sprite/Nucleo"]
 texture = SubResource("tex_luz")
 energy = 0.12
-color = Color(0.5, 0.9, 1, 1)
+color = Color(0.72, 0.5, 0.95, 1)
 scale = Vector2(0.6, 0.6)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]

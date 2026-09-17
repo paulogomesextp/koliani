@@ -5,9 +5,12 @@
 ; (`ZonaPlanar` a cobrir o nivel -- segurar saltar a cair) e VENTO como forca
 ; externa (`WindZone`: corrente ascendente, rajada a favor, rajada contra).
 ; Ordem: ensaio com rede -> cadeia de planar -> corrente -> meio (elite +
-; fogueira) -> a favor -> contra -> arena. Gameplay e estrutura apenas: a
-; arte da Regiao II e' um processo posterior. O nome da cena fica (saves,
-; manifesto e seletor apontam para ele). Chefe antigo preservado.
+; fogueira) -> a favor -> contra -> arena. O nome da cena fica (saves,
+; manifesto e seletor apontam para ele) -- o jogador le "The Suspended
+; Ruins" (`level.n07`).
+; GAMEPLAY LOCKED: layout, vaos, planar, WindZones, checkpoints, rota e
+; fisica nao se tocam. O encontro do fim passou a ser a FEITICEIRA DOS
+; VENTOS -- mesma maquina de estados, mesma arena, so' mudou o que se ve.
 
 [ext_resource type="PackedScene" uid="uid://bkolianiactor01" path="res://scenes/actors/Koliani.tscn" id="1_kol"]
 [ext_resource type="PackedScene" uid="uid://bdemoniobase01" path="res://scenes/actors/DemonioBase.tscn" id="2_dem"]

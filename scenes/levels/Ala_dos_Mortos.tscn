@@ -1,10 +1,13 @@
 [gd_scene load_steps=14 format=3 uid="uid://bkolianialamortos09"]
 
-; REGIAO II / nivel 9 -- Ala dos Mortos.
-; Sala final FEITA A MAO (a JORNADA, que cresce com o nivel, vem antes). Plataformas ESPECTRAIS que piscam
-; entre solidas e fantasma (PlataformaEspectral) intercaladas com ancoras
-; solidas. Bifurcacao: fila espectral rapida (timing) / passadico solido
-; longo. Elite: mastim (cao) de carga. Chefe: Os Irmaos Condenados.
+; REGIAO II / N09 -- "The Turning Gale" (`level.n08`).
+; Sala final FEITA A MAO (a JORNADA, que cresce com o nivel, vem antes).
+; Plataformas ESPECTRAIS que piscam entre solidas e fantasma
+; (PlataformaEspectral) intercaladas com ancoras solidas. Bifurcacao: fila
+; espectral rapida (timing) / passadico solido longo. Elite: besta de
+; carga. Guardioes: os Espectros Gemeos.
+; O NOME DO FICHEIRO ficou da Ala dos Mortos: muda-lo partia os saves e
+; os checkpoints.
 
 [ext_resource type="PackedScene" uid="uid://bkolianiactor01" path="res://scenes/actors/Koliani.tscn" id="1_kol"]
 [ext_resource type="PackedScene" uid="uid://bdemoniobase01" path="res://scenes/actors/DemonioBase.tscn" id="2_dem"]
@@ -57,7 +60,7 @@ seed_ambiente = 1296
 [node name="Casca" parent="." instance=ExtResource("10_casca")]
 ; a agua morta do fundo da Casca segue o mesmo abismo dos niveis
 agua_cor = Color(0.4, 0.13, 0.26, 0.62)
-; pedra do Desfiladeiro em vez de tijolo de cela (mesma colisao)
+; pedra do Desfiladeiro (mesma colisao)
 estilo = "desfiladeiro"
 topo = -128.0
 altura = 2200.0
@@ -67,7 +70,7 @@ esquerda = -120.0
 chao = false
 agua = false
 
-[node name="Acido" parent="." instance=ExtResource("12_acido")]
+[node name="FundoDoAbismo" parent="." instance=ExtResource("12_acido")]
 position = Vector2(1650, 950)
 largura = 3800.0
 altura = 320.0

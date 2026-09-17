@@ -591,6 +591,182 @@ def _irmaos_condenados(juntas: Juntas, pecas: list[Peca], pal: dict) -> None:
     nucleo(pecas, "corpo", 1.0, -13.0, 2.6)
 
 
+# ── Regiao II -- Desfiladeiro dos Ventos ─────────────────────────────────
+# Canon: `docs/art_direction/regions/region_02/` (prancha INIMIGOS &
+# CRIATURAS, aprovada). Os quatro encontros intermedios NAO sao chefes:
+# sao GUARDIOES do desfiladeiro, e cada um traduz um arquetipo DA PRANCHA
+# -- Golem Aereo, Torre Vigia, Mago do Vento, Espectro das Ruinas. O unico
+# chefe canonico da regiao e' o Guardiao dos Ceus, no N10.
+#
+# As quatro silhuetas anteriores (Carcereiro com uma CHAVE por cabeca,
+# Ignivar a martelar numa BIGORNA, a Dama com a LAMINA DA GUILHOTINA, os
+# Irmaos presos por uma CORRENTE de ferro) ficaram de uma regiao que ja'
+# nao existe: a Prisao dos Condenados. Nenhuma troca de nome resolvia
+# isso -- tinham de ser redesenhadas.
+
+
+def rajada(pecas: list[Peca], j: str, x: float, y: float, comp: float,
+           c, n: int = 3, z: float = 4.6, inclina: float = 0.0) -> None:
+    """Riscos de vento. A prancha da Regiao II usa-os por toda a parte
+    ("RAJADA PEQUENA"/"RAJADA GRANDE" no painel de FX) -- a esta escala
+    sao eles que dizem VENTO, mais do que qualquer pose."""
+    for k in range(n):
+        f = 1.0 - k * 0.22
+        dy = y + (k - (n - 1) * 0.5) * 3.4
+        pecas.append(Peca(j, mover(rodar([
+            (0.0, -1.1), (comp * f, -0.7), (comp * f * 1.12, 0.0),
+            (comp * f, 0.7), (0.0, 1.1)], inclina), x, dy),
+            c, z + k * 0.01, brilho=True))
+
+
+def _golem_falesias(juntas: Juntas, pecas: list[Peca], pal: dict) -> None:
+    # prancha, painel GOLEM AEREO: "corpo de pedra levitacao, ataque a'
+    # distancia e corpo a corpo". No N06 e' a versao pesada: lajes soltas
+    # que se juntam no ar, caem em cima da Koliani e rebentam o chao.
+    pedra, veio = pal["metal"], pal["corpo2"]
+    tirar(pecas, "cabeca", "pescoco")
+    # cabeca: um calhau a pairar, SEM cara. A leitura tem de ser "pedra que
+    # se juntou" -- e' por isso que nao leva elmo nem olhos.
+    pecas.append(Peca("cabeca", [(-10.0, -8.0), (-4.0, -16.0), (6.0, -15.0),
+                                 (11.0, -6.0), (7.0, 2.0), (-6.0, 1.0)],
+                      pedra, 2.0))
+    pecas.append(Peca("cabeca", [(-6.0, -12.0), (2.0, -13.5), (5.0, -8.0),
+                                 (-3.0, -6.0)], clarear(pedra, 0.16), 2.05))
+    pecas.append(Peca("cabeca", elipse(0.5, -7.0, 3.2, 3.2), pal["brilho"],
+                      2.1, brilho=True))
+    # peito em lajes separadas por folga: nao e' um bloco, sao pecas
+    for k, (dy, larg) in enumerate(((-16.0, 26.0), (-7.0, 30.0), (2.0, 24.0))):
+        pecas.append(Peca("torso", trapezio(dy, larg, dy + 7.0, larg * 0.86),
+                          pedra if k % 2 == 0 else escurecer(pedra, 0.18),
+                          0.6 + k * 0.02))
+    veios(pecas, "torso", escurecer(veio, 0.35), -10.0, -16.0, 2.0, n=4, z=0.7)
+    # ombros: calhaus maiores, cada um com o seu veio aceso
+    for j, z, r in (("ombro_t", -1.3, 8.0), ("ombro_f", 3.5, 9.0)):
+        pecas.append(Peca(j, [(-r, -r * 0.5), (-r * 0.3, -r), (r * 0.7, -r * 0.8),
+                              (r, r * 0.3), (0.0, r * 0.7)], pedra, z))
+        pecas.append(Peca(j, elipse(0.0, 0.0, r * 0.3, r * 0.3), pal["brilho"],
+                          z + 0.05, brilho=True))
+    # detritos em orbita ("ESTILHACOS DE PEDRA" no painel de FX da prancha)
+    for dx, dy, r in ((-22.0, -24.0, 2.6), (20.0, -30.0, 2.0),
+                      (26.0, -6.0, 2.4), (-26.0, -2.0, 1.8)):
+        pecas.append(Peca("torso", elipse(dx, dy, r, r * 0.8),
+                          escurecer(pedra, 0.22), -1.8))
+    rajada(pecas, "anca", -14.0, 8.0, 16.0, pal["vento"], n=2, z=-1.9,
+           inclina=180.0)
+    nucleo(pecas, "torso", 0.0, -8.0, 2.8, pal["brilho"])
+
+
+def _vigia_desfiladeiro(juntas: Juntas, pecas: list[Peca], pal: dict) -> None:
+    # prancha, painel TORRE VIGIA: "automatica, dispara rajadas". O N07
+    # da'-lhe pernas -- uma vigia que se soltou da rocha e ainda cumpre a
+    # ordem. Braco-contrapeso (o baque), lanca de vento (o tiro
+    # horizontal) e a conduta das costas aberta (EXPOSTO): a maquina de
+    # estados do N07 ja' era esta, so' estava vestida de ferreiro.
+    pedra, ouro, vento = pal["metal"], pal["ouro"], pal["vento"]
+    tirar(pecas, "cabeca", "pescoco")
+    # tronco: fuste de torre, estreito em cima, com a cinta de ouro do pack
+    pecas.append(Peca("torso", trapezio(-20.0, 18.0, 4.0, 26.0), pedra, 0.6))
+    pecas.append(Peca("torso", caixa(-13.0, -9.0, 13.0, -5.5), ouro, 0.7))
+    veios(pecas, "torso", escurecer(pedra, 0.4), -9.0, -18.0, 2.0, n=4, z=0.65)
+    # cabeca: cabine da vigia -- fresta acesa e PARAPEITO por cima. A
+    # primeira versao levava o catavento na coroa e lia-se como um
+    # diadema: exatamente a silhueta de coroa-de-chamas do ferreiro que se
+    # estava a tirar do caminho.
+    elmo(pecas, "cabeca", pedra, r=8.0, c_olho=vento)
+    pecas.append(Peca("cabeca", caixa(-9.5, -11.5, 9.5, -8.0), pedra, 1.7))
+    for k in range(-2, 3):
+        pecas.append(Peca("cabeca", caixa(k * 4.0 - 1.4, -14.5,
+                                          k * 4.0 + 1.4, -11.0), pedra, 1.72))
+    pecas.append(Peca("cabeca", caixa(-9.5, -9.2, 9.5, -8.2), ouro, 1.75))
+    # o catavento e' MAQUINA e vive nas COSTAS, a rodar num eixo -- e' o
+    # que diz "torre vigia automatica" sem pousar nada na cabeca
+    for ang in (22.0, 112.0, 202.0, 292.0):
+        pecas.append(Peca("torso", mover(rodar([
+            (-2.2, 0.0), (2.2, 0.0), (1.4, -13.0), (-3.2, -10.0),
+        ], ang), -13.0, -14.0), escurecer(ouro, 0.25), -2.2))
+    pecas.append(Peca("torso", elipse(-13.0, -14.0, 3.2, 3.2), pedra, -2.1))
+    pecas.append(Peca("torso", elipse(-13.0, -14.0, 1.6, 1.6), vento, -2.05,
+                      brilho=True))
+    # pauliteiras de pedra macica
+    for j, z in (("ombro_t", -1.3), ("ombro_f", 3.5)):
+        pecas.append(Peca(j, [(-8.0, -6.0), (8.0, -7.0), (9.0, 3.0),
+                              (-9.0, 2.0)], pedra, z))
+        pecas.append(Peca(j, caixa(-7.0, -2.0, 7.0, 0.0), ouro, z + 0.05))
+    # braco-contrapeso: a mesma peca do martelo, mas de PEDRA e ouro
+    martelo(pecas, "arma", cor("2a2f44"), pedra, comp=24.0)
+    pecas.append(Peca("arma", caixa(-9.5, 25.0, 9.5, 27.0), ouro, 4.2))
+    # condutas: fendas por onde o vento lhe passa
+    for x, y in ((-6.0, -12.0), (5.0, -16.0), (-1.0, -4.0)):
+        pecas.append(Peca("torso", elipse(x, y, 2.2, 1.1), vento, 0.9,
+                          brilho=True))
+    rajada(pecas, "torso", 14.0, -14.0, 18.0, vento, n=3, z=-1.7)
+    nucleo(pecas, "torso", 1.0, -22.0, 2.6, vento)
+
+
+def _feiticeira_ventos(juntas: Juntas, pecas: list[Peca], pal: dict) -> None:
+    # prancha, painel MAGO DO VENTO: "lanca magia de vento, teleporta-se".
+    # E' letra por letra o que o N08 ja' fazia -- so' que com uma
+    # guilhotina na mao. Agora o que ela ergue e' um cajado, e o que cai do
+    # teto sao LAMINAS DE VENTO (hazard da propria prancha).
+    pano, magia, vento = pal["corpo"], pal["brilho"], pal["vento"]
+    tirar(pecas, "cabeca", "pescoco")
+    capuz(pecas, "cabeca", escurecer(pano, 0.2), r=8.5)
+    olhos(pecas, "cabeca", 1.5, -6.0, 1.2, magia, sep=3.0, z=2.9)
+    # gola erguida PELO VENTO, aberta em leque. A da Dama era uma gola de
+    # carrasco: fechada, com a corda do enforcado ao pescoco.
+    pecas.append(Peca("corpo", [(-13.0, -20.0), (13.0, -20.0), (9.0, -11.0),
+                                (-9.0, -11.0)], escurecer(pano, 0.3), 1.6))
+    # ... e as abas do manto, levantadas pelo vento. Duas notas que
+    # custaram duas passagens: ABAIXO da linha dos ombros (mais acima os
+    # bicos encostavam ao capuz e liam-se como ORELHAS) e em FLAMULA, nao
+    # em painel -- dois quadrados simetricos ficavam a flutuar ao lado
+    # dela como se fossem outra coisa qualquer.
+    for lado, tom, z in ((-1.0, escurecer(pal["corpo2"], 0.3), -1.5),
+                         (1.0, pal["corpo2"], 1.5)):
+        pecas.append(Peca("corpo", [(lado * 6.0, -16.0), (lado * 14.0, -13.0),
+                                    (lado * 25.0, -4.0), (lado * 13.0, -5.0),
+                                    (lado * 7.0, 1.0)], tom, z))
+    # cajado com orbe: a arma dela passou a ser magia, nao aco
+    cajado(pecas, "arma", cor("2a2f44"), magia, comp=30.0)
+    # lamina de vento a orbitar a orbe -- o telegrafo dela feito objeto
+    pecas.append(Peca("arma", [(-13.0, -5.0), (0.0, -12.0), (13.0, -5.0),
+                               (0.0, -8.0)], vento, 4.2, brilho=True))
+    rajada(pecas, "corpo", -12.0, -6.0, 18.0, vento, n=3, z=-2.0,
+           inclina=180.0)
+    nucleo(pecas, "corpo", 1.0, -14.0, 2.6, magia)
+
+
+def _espectros_gemeos(juntas: Juntas, pecas: list[Peca], pal: dict) -> None:
+    # prancha, painel ESPECTRO DAS RUINAS: "surge das ruinas, ataque em
+    # area". Continuam a ser DOIS -- o de perto e o de longe --, que e' a
+    # mecanica do N09; o que os liga e' que deixou de ser uma corrente de
+    # forcado e passou a ser uma CORRENTE DE AR, a mesma que o jogador
+    # anda a apanhar o nivel inteiro.
+    espectro, vento = pal["corpo"], pal["vento"]
+    tirar(pecas, "cabeca", "pescoco")
+    capuz(pecas, "cabeca", espectro, r=8.0)
+    olhos(pecas, "cabeca", 1.5, -5.5, 1.2, vento, sep=3.0, z=2.9)
+    # trapos a fugir para tras: e' o vento que lhes desenha a silhueta
+    for k, (dy, comp) in enumerate(((-6.0, 15.0), (2.0, 19.0), (9.0, 13.0))):
+        pecas.append(Peca("corpo", [(-6.0, dy - 3.0), (-6.0, dy + 3.0),
+                                    (-6.0 - comp, dy + 6.0 + k),
+                                    (-6.0 - comp * 0.7, dy - 2.0)],
+                          escurecer(espectro, 0.22 + 0.06 * k),
+                          -1.5 + k * 0.01))
+    # o SEGUNDO espectro, mais pequeno e atras -- o encontro numa imagem so'
+    junta(juntas, "irmao", "corpo", -26.0, -6.0)
+    pecas.append(Peca("irmao", [(-9.0, -14.0), (9.0, -14.0), (7.0, 16.0),
+                                (2.0, 10.0), (-3.0, 18.0), (-8.0, 11.0)],
+                      escurecer(espectro, 0.3), -2.4))
+    pecas.append(Peca("irmao", elipse(0.0, -17.0, 6.5, 6.8),
+                      escurecer(espectro, 0.2), -2.3))
+    olhos(pecas, "irmao", 0.0, -18.0, 1.1, vento, sep=2.6, z=-2.2)
+    # a corrente DE AR que os liga (era uma corrente de ferro)
+    rajada(pecas, "corpo", -8.0, -12.0, 17.0, vento, n=3, z=-2.0,
+           inclina=186.0)
+    nucleo(pecas, "corpo", 1.0, -13.0, 2.6, vento)
+
+
 def _primeiro_prisioneiro(juntas: Juntas, pecas: list[Peca], pal: dict) -> None:
     # "heroi antigo. Espada parecida com a da Koliani; imita ataques dela"
     trapo, pele = pal["corpo"], pal["pele"]
@@ -963,6 +1139,59 @@ CHEFES: dict[str, dict] = {
         "cfg": {"ataque": "magia", "amp": 1.05},
         "extras": _irmaos_condenados,
     },
+    # -- Regiao II -- Desfiladeiro dos Ventos -----------------------------
+    # GUARDIOES, nao chefes: os quatro traduzem arquetipos da prancha
+    # aprovada da regiao. Paleta amostrada do painel "PALETA DE CORES DA
+    # REGIAO II" do `enemy_gameplay_pack.png`: base 131a29, rocha 4a4f71,
+    # detalhes ab745d, acentos b33346, FX vento 79ace6, FX magia 49357f.
+    "golem_falesias": {
+        # N06 -- arquetipo GOLEM AEREO. Gigante: ombros largos, pernas
+        # curtas -- as mesmas proporcoes de antes, porque o salto-e-baque
+        # do N06 esta' afinado para elas.
+        "plano": "humanoide",
+        "par": {"coxa": 15.0, "canela": 14.0, "esp_perna": 12.0, "torso": 30.0,
+                "ombros": 30.0, "cintura": 18.0, "braco": 16.0, "antebraco": 15.0,
+                "esp_braco": 10.0, "cabeca": 8.0, "pescoco": 2.0},
+        "pal": paleta("3c4261", "262e45", "9aa3bd", "131a29", metal="4a4f71",
+                      brilho="c68af9", vento="79ace6"),
+        "cfg": {"ataque": "golpe", "amp": 0.75},
+        "extras": _golem_falesias,
+    },
+    "vigia_desfiladeiro": {
+        # N07 -- arquetipo TORRE VIGIA
+        "plano": "humanoide",
+        "par": {"coxa": 14.0, "canela": 13.0, "esp_perna": 10.0, "torso": 25.0,
+                "ombros": 26.0, "cintura": 16.0, "braco": 14.0, "antebraco": 14.0,
+                "esp_braco": 9.0, "cabeca": 7.0, "pescoco": 2.0},
+        "pal": paleta("2b3146", "1c2436", "9aa3bd", "131a29", metal="4a4f71",
+                      brilho="79ace6", ouro="c98f4e", vento="79ace6"),
+        "cfg": {"ataque": "golpe", "amp": 0.95},
+        "extras": _vigia_desfiladeiro,
+    },
+    "feiticeira_ventos": {
+        # N08 -- arquetipo MAGO DO VENTO. O N08 esta' LOCKED: o gait fica
+        # "golpe" de proposito, para o arco descendente do CORTE continuar
+        # a bater no mesmo sitio, no mesmo instante.
+        "plano": "flutuante",
+        "par": {"voo": 32.0, "torso": 22.0, "ombros": 16.0, "cintura": 10.0,
+                "manto": 30.0, "manto_larg": 19.0, "braco": 12.0, "antebraco": 12.0},
+        "pal": paleta("2a2440", "49357f", "cfc6d6", "120e18", metal="c98f4e",
+                      brilho="c68af9", vento="79ace6"),
+        "cfg": {"ataque": "golpe", "amp": 1.1},
+        "extras": _feiticeira_ventos,
+    },
+    "espectros_gemeos": {
+        # N09 -- arquetipo ESPECTRO DAS RUINAS. Dois de uma vez: o corpo
+        # estreita-se para caber o segundo ao lado.
+        "plano": "flutuante",
+        "par": {"voo": 30.0, "torso": 20.0, "ombros": 14.0, "cintura": 9.0,
+                "manto": 24.0, "manto_larg": 16.0, "braco": 11.0, "antebraco": 10.0},
+        "pal": paleta("555f85", "343c5c", "c5cee6", "131a29", metal="79ace6",
+                      brilho="79ace6", vento="79ace6"),
+        "cfg": {"ataque": "magia", "amp": 1.05},
+        "extras": _espectros_gemeos,
+    },
+
     "primeiro_prisioneiro": {
         # a silhueta dela, gasta: mesmas proporcoes, ombros mais caidos
         "plano": "humanoide",

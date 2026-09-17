@@ -1,10 +1,12 @@
 [gd_scene load_steps=15 format=3 uid="uid://bkolianifornalha07"]
 
-; REGIAO II / nivel 7 -- Fornalha dos Pecadores.
-; Sala final FEITA A MAO (a JORNADA, que cresce com o nivel, vem antes). Fabrica infernal: LAVA em baixo
-; (morte), plataformas moveis por cima, jatos de fogo. Bifurcacao: correntes
-; a subir pela chamine / passadico lateral com serras. Elite: imp cuspidor.
-; Chefe: Ignivar, o Ferreiro Maldito.
+; REGIAO II / N07 -- "The Rising Gorge" (`level.n06`).
+; Sala final FEITA A MAO (a JORNADA, que cresce com o nivel, vem antes).
+; Fenda vertical: o ABISMO em baixo (morte), plataformas moveis por cima.
+; Bifurcacao: updrafts a subir pela chamine / passadico lateral com
+; serras. Elite: cuspidor. Guardiao: a Vigia do Desfiladeiro.
+; O NOME DO FICHEIRO ficou da Fornalha dos Pecadores: muda-lo partia os
+; saves e os checkpoints.
 
 [ext_resource type="PackedScene" uid="uid://bkolianiactor01" path="res://scenes/actors/Koliani.tscn" id="1_kol"]
 [ext_resource type="PackedScene" uid="uid://bdemoniobase01" path="res://scenes/actors/DemonioBase.tscn" id="2_dem"]
@@ -70,13 +72,14 @@ esquerda = -120.0
 chao = false
 agua = false
 
-[node name="Lava" parent="." instance=ExtResource("13_lava")]
+[node name="FundoDoAbismo" parent="." instance=ExtResource("13_lava")]
 position = Vector2(1700, 980)
 largura = 3900.0
 altura = 340.0
-; o fundo do desfiladeiro e' o abismo, nao acido nem lava
+; o fundo do desfiladeiro e' o abismo, nao acido nem lava -- e um
+; abismo nao deita BRASAS a subir, que era o ultimo resto da forja
 cor = Color(0.46, 0.14, 0.28, 0.9)
-brasas = true
+brasas = false
 
 ; ===================  entrada + descida  =======================
 [node name="ChaoInicio" parent="." instance=ExtResource("9_pl")]
@@ -246,7 +249,7 @@ cor_topo = Color(0.5, 0.32, 0.2, 1)
 position = Vector2(2440, 584)
 habilidade_id = "escalar_paredes"
 
-; ===================  forja do chefe  ========================
+; ===================  arena do guardiao  ======================
 [node name="ChaoChefe" parent="." instance=ExtResource("9_pl")]
 position = Vector2(2900, 700)
 tamanho = Vector2(600, 60)

@@ -22,11 +22,16 @@ const CHEFE_KEY: Array[String] = [
 	"guard.rainha_aracnidea",     # 02 Ninho da Viúva Negra
 	"guard.entrevane",            # 03 A Árvore que Chora
 	"boss.coracao_putrefacto",   # 04 Coração da Floresta
-	"boss.carcereiro",           # 05 Prisão dos Condenados
-	"boss.ignivar",              # 06 Fornalha dos Pecadores
-	"boss.dama_guilhotina",      # 07 Corredor das Execuções
-	"boss.irmaos_condenados",    # 08 Ala dos Mortos
-	"boss.guardiao_dos_ceus",    # 09 A Cela Zero (exame da Regiao II)
+	# Região II -- Desfiladeiro dos Ventos. Os quatro encontros
+	# intermédios são GUARDIÕES, não chefes: o único chefe da região é o
+	# Guardião dos Céus, no N10. Os ficheiros das cenas ainda têm nomes de
+	# prisão (mudá-los partia saves e checkpoints); o que o jogador lê é a
+	# chave `level.n##` e estas.
+	"guard.golem_falesias",      # 05 N06 -- arquétipo Golem Aéreo
+	"guard.vigia_desfiladeiro",  # 06 N07 -- arquétipo Torre Vigia
+	"guard.feiticeira_ventos",   # 07 N08 -- arquétipo Mago do Vento
+	"guard.espectros_gemeos",    # 08 N09 -- arquétipo Espectro das Ruínas
+	"boss.guardiao_dos_ceus",    # 09 N10 -- o chefe da Região II
 	"boss.sino_vivo",            # 10 Torre dos Sinos
 	"boss.aerion",               # 11 Torre dos Ventos
 	"boss.voltaris",             # 12 Torre da Tempestade
