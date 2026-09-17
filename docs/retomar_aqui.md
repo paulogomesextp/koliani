@@ -35,6 +35,11 @@
   `_altura_alvo`/`_largura_alvo` próprios. Depois de corrigida mostrou o
   problema a sério: o Guardião saía com 324 px de largo contra os 560 px da
   plataforma da arena. Ficou em 235.
+- ARMADILHA nº2, e a mais util: **o que o jogador LE^ no ecra nao estava
+  coberto por teste nenhum**. A HUD dizia "PRISON OF THE DAMNED" por cima
+  de "The Eternal Winds", e so' apareceu ao exportar a build e fotografar.
+  A entrada da Regiao II em `EstadoJogo.REGIOES` continuava a ser a da
+  prisao (nome, chave i18n, cor). Exportar e fotografar CEDO, nao no fim.
 - Falta: **HUMAN PLAYTEST da Região II inteira**. Ver §7 do relatório — em
   especial, as zonas de vento de N06/N07/N09 passam a ter o tamanho que
   sempre estiveram desenhadas a ter, e nunca foram jogadas assim.

@@ -210,6 +210,32 @@ a mexer no mapa de pistas e nos seis ficheiros sem nada ganhar no ecrã.
 `data/level_manifest.json` ainda apontava o `boss_ref` do `level_010` ao
 `ChefePrimeiroPrisioneiro.tscn`, que já não está em nível nenhum.
 
+### O que só a build exportada apanhou
+
+O cabeçalho da HUD dizia **"PRISON OF THE DAMNED"** por cima de "The
+Eternal Winds". Nenhum teste viu isto: a HUD e as pastilhas do carrossel
+leem `EstadoJogo.REGIOES`, e a entrada da Região II continuava a ser a da
+prisão — nome, chave i18n e cor azul-ferro.
+
+| | Antes | Agora |
+|---|---|---|
+| `id` | `prisao` | `desfiladeiro` |
+| `nome` | Prisao dos Condenados | Desfiladeiro dos Ventos |
+| `chave` | `world.prison` | `world.gorge` |
+| `cor` | `(0.60, 0.68, 1.00)` | `(0.78, 0.60, 1.00)` |
+
+A chave foi **renomeada** nos seis idiomas, não duplicada: não sobra uma
+única referência a `world.prison`. As 7 pistas da região no
+`diario_pistas.gd` apontavam-lhe e passam a apontar a nova.
+
+Há teste para não voltar: a Região II tem de apontar `world.gorge`, a
+chave tem de estar traduzida, o nome não pode conter vocabulário de prisão
+em nenhum idioma, e a região tem de continuar a cobrir os níveis 06–10.
+
+**A lição de método:** a suite valida cenas, dados e comportamento — mas o
+que o jogador **lê no ecrã** só se viu ao exportar e fotografar. Vale a
+pena fazer isso cedo, não no fim.
+
 ---
 
 ## 6. Testes
@@ -279,25 +305,32 @@ Todas revertidas; a árvore final não tem mutações.
    acima da banda normal dos chefes (175) e passa o tecto da exceção (240)
    por 5 px. **É a primeira coisa a julgar a jogar**: as asas tapam a
    Koliani na arena? As asas não dão dano — isso lê-se, ou parece injusto?
-2. **Os inimigos não são da região.** N06 esqueleto+chort, N07 imp+chort,
+2. **Os chefes intermédios ainda são de prisão** — a HUD mostra "The
+   Jailer", "Ignivar, the Cursed Smith", "The Guillotine Lady", "The
+   Condemned Brothers". É agora a contradição mais visível que sobra:
+   aparece no cartão de quatro dos cinco níveis. **Não foi mudada de
+   propósito**: são mesmo criaturas de prisão (um carcereiro com chaves,
+   uma dama da guilhotina), e trocar-lhes só o nome mudava a etiqueta sem
+   mudar a contradição. Substituí-los é design, não arte.
+3. **Os inimigos não são da região.** N06 esqueleto+chort, N07 imp+chort,
    N08 chort, N09 mastim+orc, N10 orc. O cânone pede Morcego dos Ventos,
    Sentinela Flutuante, Gaivota Sombria, Golem Aéreo e Mago do Vento.
    Trocar a identidade visual é barato (`identidade_visual` existe e não
    mexe em som nem comportamento) — **mas trocar só o aspeto parte a
    leitura silhueta→comportamento**, e trocar o comportamento é gameplay,
    não arte. Fica para um processo próprio.
-3. **N06/N07/N09 continuam com `corredor = true`** — têm uma jornada
+4. **N06/N07/N09 continuam com `corredor = true`** — têm uma jornada
    procedural prependida à sala desenhada; N08 e N10 não. É uma
    inconsistência de estrutura da região, e mudá-la é gameplay.
-4. **O tipo de perigo do fundo.** Passou a ler-se como abismo, mas
+5. **O tipo de perigo do fundo.** Passou a ler-se como abismo, mas
    continua a ser um `AguaVenenosa` — um plano de líquido. A auditoria
    pedia queda/abismo a sério. É gameplay.
-5. **As zonas de vento do N06/N07/N09 ficaram MAIORES** do que estavam a
+6. **As zonas de vento do N06/N07/N09 ficaram MAIORES** do que estavam a
    correr até agora (é o tamanho que sempre estiveram desenhadas a ter).
    O N09 é o que mais muda: duas zonas passam de 300 px de largo para 680
    e 650. **Isto muda como esses níveis se jogam** — para o que estava
    desenhado, mas nunca foi jogado assim.
-6. Continua tudo o que o Process 12 já tinha deixado em aberto sobre a
+7. Continua tudo o que o Process 12 já tinha deixado em aberto sobre a
    luta: sensação da arena, ritmo do `EXPOSTO`, justiça da picada na borda.
 
 ---
