@@ -1,0 +1,259 @@
+extends SceneTree
+## Auditoria pre-Process 11 do N08. Modos:
+##   dump  <out>        -> geometria de runtime (jornada + sala) de N06..N09 em JSON
+##   shots <out> <tag> [golden]  -> capturas do N08 ao longo do percurso
+##   anims <out> [golden] -> idle/run/jump/dash/morte/respawn no N08, com paths
+
+var OUT := ""
+var E: Node
+
+func _initialize() -> void:
+	call_deferred("_run")
+
+func _carregar(idx: int, golden: int) -> Node:
+	E.indice_nivel = idx
+	E.checkpoint = Vector2.ZERO
+	E._limpar_jornada_ancora()
+	var cena: PackedScene = load(E.NIVEIS[idx])
+	var nivel := cena.instantiate()
+	if golden >= 0:
+		var k0 := nivel.get_node("Koliani")
+		k0.set("usar_prototipo_premium", golden == 1)
+		k0.set("usar_golden_set", golden == 1)
+	if current_scene:
+		current_scene.queue_free()
+	root.add_child(nivel)
+	current_scene = nivel
+	for i in 40:
+		await process_frame
+	await create_timer(0.5).timeout
+	return nivel
+
+func _run() -> void:
+	var a := OS.get_cmdline_user_args()
+	var modo: String = a[0]
+	OUT = a[1]
+	DirAccess.make_dir_recursive_absolute(OUT)
+	root.size = Vector2i(1280, 720)
+	root.content_scale_size = Vector2i(1280, 720)
+	E = root.get_node("EstadoJogo")
+	E.set("modo_teste", true)
+	if modo == "dump":
+		var tudo := {}
+		for idx in [5, 6, 7, 8]:
+			var nivel := await _carregar(idx, -1)
+			tudo[str(idx + 1)] = _dump(nivel)
+		FileAccess.open(OUT + "/runtime_geometry.json", FileAccess.WRITE).store_string(JSON.stringify(tudo, "\t"))
+	elif modo == "shots":
+		await _shots(a[2], a.size() > 3 and a[3] == "golden")
+	elif modo == "anims":
+		await _anims(a.size() > 2 and a[2] == "golden")
+	quit()
+
+# ---------------------------------------------------------------- dump
+func _tipo(n: Node) -> String:
+	if n.scene_file_path != "":
+		return n.scene_file_path.get_file().get_basename()
+	var s: Script = n.get_script()
+	if s and s.resource_path != "":
+		return s.resource_path.get_file().get_basename()
+	return n.get_class()
+
+const IGNORAR := ["Atmosfera", "Koliani", "HUD", "Casca"]
+
+func _dump(nivel: Node) -> Dictionary:
+	var itens: Array = []
+	var cams: Array = []
+	_varrer(nivel, itens, "")
+	var ger := nivel.get_node_or_null("CorredorAproximacao")
+	var info := {}
+	if ger:
+		for c in ger.get_children():
+			if c.name.begins_with("Cam_"):
+				var xs: Array = []
+				var tipos := {}
+				for d in c.get_children():
+					if d is Node2D:
+						xs.append((d as Node2D).global_position.x)
+						var t := _tipo(d)
+						tipos[t] = int(tipos.get(t, 0)) + 1
+				if not xs.is_empty():
+					cams.append({"nome": str(c.name), "x0": xs.min(), "x1": xs.max(), "tipos": tipos})
+		info = {"tipos_usados": ger.get("_tipos_usados"), "foco": ger.get("_foco"),
+			"tendencia": ger.get("_tendencia"), "abertura": ger.get("_abertura"),
+			"estreia": ger.get("_estreia_cam"), "vertical": ger.get("_vertical_do_nivel"),
+			"especial": ger.get("_especial_do_nivel"), "especie": ger.get("_esp"),
+			"chao_y": ger.get("_chao_y"), "teto_y": ger.get("_teto_y"),
+			"comprimento": ger.call("_comprimento", E.indice_nivel)}
+	var k := nivel.get_node("Koliani") as Node2D
+	return {"itens": itens, "camaras": cams, "gerador": info,
+		"spawn": [k.global_position.x, k.global_position.y]}
+
+func _varrer(n: Node, itens: Array, origem: String) -> void:
+	for c in n.get_children():
+		if str(c.name) in IGNORAR:
+			continue
+		var o := origem
+		if c.name == "CorredorAproximacao":
+			o = "jornada"
+		elif origem == "":
+			o = "sala"
+		var t := _tipo(c)
+		var folha := c.scene_file_path != "" or (c.get_script() != null and t != "gerador_corredor")
+		if c is Node2D and folha:
+			var d := {"n": str(c.name), "t": t, "o": o,
+				"x": (c as Node2D).global_position.x, "y": (c as Node2D).global_position.y}
+			if "tamanho" in c:
+				d["w"] = (c.get("tamanho") as Vector2).x
+				d["h"] = (c.get("tamanho") as Vector2).y
+			if "largura" in c:
+				d["largura"] = c.get("largura")
+			itens.append(d)
+		elif c is Node2D and c.get_class() == "Area2D":
+			itens.append({"n": str(c.name), "t": "Area2D", "o": o,
+				"x": (c as Node2D).global_position.x, "y": (c as Node2D).global_position.y})
+		else:
+			_varrer(c, itens, o)
+
+# --------------------------------------------------------------- shots
+func _shot(nome: String) -> void:
+	await RenderingServer.frame_post_draw
+	root.get_texture().get_image().save_png(OUT + "/" + nome + ".png")
+	print("shot -> ", nome)
+
+func _por(k: CharacterBody2D, p: Vector2) -> void:
+	k.global_position = p
+	k.velocity = Vector2.ZERO
+	k.reset_physics_interpolation()
+	for i in 45:
+		await process_frame
+	await create_timer(0.35).timeout
+
+func _plat_perto(nivel: Node, x: float) -> Vector2:
+	var itens: Array = []
+	_varrer(nivel, itens, "")
+	var melhor := Vector2.INF
+	for d in itens:
+		if d.t == "Plataforma" and d.get("w", 0.0) >= 60.0 and d.get("w", 0.0) < 1200.0 and d.h < 200.0:
+			var p := Vector2(d.x, d.y - d.h * 0.5 - 40.0)
+			if melhor == Vector2.INF or absf(p.x - x) < absf(melhor.x - x):
+				melhor = p
+	return melhor
+
+func _shots(tag: String, golden: bool) -> void:
+	var nivel := await _carregar(7, -1)
+	var k := nivel.get_node("Koliani") as CharacterBody2D
+	var ger := nivel.get_node_or_null("CorredorAproximacao")
+	var x_ini := k.global_position.x
+	var x_fim: float = (nivel.get_node("Porta") as Node2D).global_position.x
+	var total := x_fim - x_ini
+	await _shot("%s_1_inicio" % tag)
+	var alvos := {"2_primeiro_terco": x_ini + total / 3.0, "3_centro": x_ini + total * 0.5,
+		"4_ultimo_terco": x_ini + total * 2.0 / 3.0,
+		"5_arena_final": (nivel.get_node("ChaoChefe") as Node2D).global_position.x - 120.0}
+	var chaves := alvos.keys()
+	chaves.sort()
+	for ch in chaves:
+		await _por(k, _plat_perto(nivel, alvos[ch]))
+		await _shot("%s_%s" % [tag, ch])
+	# 6: Koliani em gameplay, a correr sobre o chao da sala
+	var chao := nivel.get_node("ChaoMeio") as Node2D
+	await _por(k, chao.global_position + Vector2(-120, -60))
+	Input.action_press("mover_direita")
+	for i in 22:
+		await physics_frame
+		await process_frame
+	await _shot("%s_6_koliani_gameplay" % tag)
+	Input.action_release("mover_direita")
+	var cam := k.get_node_or_null("Camera2D") as Camera2D
+	if cam:
+		cam.zoom = Vector2(2.5, 2.5)
+		cam.position_smoothing_enabled = false
+		await _por(k, chao.global_position + Vector2(-60, -60))
+		await _shot("%s_7_koliani_zoom" % tag)
+	print("N08 x_ini=%s x_fim=%s total=%s jornada=%s" % [x_ini, x_fim, total, ger != null])
+
+# --------------------------------------------------------------- anims
+func _txpath(tx: Texture2D) -> String:
+	if tx == null:
+		return ""
+	if tx.resource_path != "":
+		return tx.resource_path
+	if tx is AtlasTexture and (tx as AtlasTexture).atlas:
+		return "atlas:" + (tx as AtlasTexture).atlas.resource_path
+	return "<runtime>"
+
+func _anims(golden: bool) -> void:
+	var nivel := await _carregar(7, -1)
+	E.ativar_modo_dev()
+	var k := nivel.get_node("Koliani") as CharacterBody2D
+	var corpo := k.get_node("Sprite/Corpo") as AnimatedSprite2D
+	var chao := nivel.get_node("ChaoInicio") as Node2D
+	var base := chao.global_position + Vector2(-170, -80)
+	await _por(k, base)
+	var vistos := {}
+	var reg := func(fase: String) -> void:
+		var an := str(corpo.animation)
+		var tx := corpo.sprite_frames.get_frame_texture(corpo.animation, corpo.frame)
+		var key := fase + "|" + an
+		if not vistos.has(key):
+			vistos[key] = {"fase": fase, "anim": an, "frames": corpo.sprite_frames.get_frame_count(corpo.animation),
+				"fps": corpo.sprite_frames.get_animation_speed(corpo.animation),
+				"path0": _txpath(tx), "size": str(tx.get_size()) if tx else "",
+				"scale": str(corpo.scale), "offset": str(corpo.offset), "frames_vistos": []}
+		if not corpo.frame in vistos[key].frames_vistos:
+			vistos[key].frames_vistos.append(corpo.frame)
+	for i in 40:
+		await physics_frame; reg.call("idle")
+	await _shot("anims_%s_idle" % ("golden" if golden else "antigo"))
+	Input.action_press("mover_direita")
+	for i in 40:
+		await physics_frame; reg.call("run")
+	await _shot("anims_%s_run" % ("golden" if golden else "antigo"))
+	Input.action_release("mover_direita")
+	for i in 40:
+		await physics_frame; reg.call("paragem")
+	Input.action_press("saltar")
+	for i in 12:
+		await physics_frame; reg.call("jump")
+	await _shot("anims_%s_jump" % ("golden" if golden else "antigo"))
+	Input.action_release("saltar")
+	for i in 70:
+		await physics_frame; reg.call("queda_aterrar")
+	await _por(k, base)
+	var dash_visto := false
+	Input.action_press("dash")
+	for i in 3:
+		await physics_frame; reg.call("dash")
+		dash_visto = dash_visto or float(k.get("_dash_restante")) > 0.0
+	Input.action_release("dash")
+	for i in 3:
+		await physics_frame; reg.call("dash")
+		dash_visto = dash_visto or float(k.get("_dash_restante")) > 0.0
+	await _shot("anims_%s_dash" % ("golden" if golden else "antigo"))
+	for i in 20:
+		await physics_frame; reg.call("pos_dash")
+	# morte: so' o estado visual (sem recarregar a cena nem gastar vidas)
+	k.set("_a_morrer", true)
+	for i in 14:
+		await process_frame
+		k.call("_atualizar_anim")
+		reg.call("morte")
+	await _shot("anims_%s_morte" % ("golden" if golden else "antigo"))
+	k.set("_a_morrer", false)
+	k.call("recuperar_no_checkpoint", chao.global_position)
+	for i in 40:
+		await physics_frame; reg.call("respawn")
+	await _shot("anims_%s_respawn" % ("golden" if golden else "antigo"))
+	var sf := corpo.sprite_frames
+	var run_paths: Array = []
+	for i in sf.get_frame_count("run"):
+		run_paths.append(_txpath(sf.get_frame_texture("run", i)))
+	var res := {"golden": golden, "estados": vistos.values(), "run_paths": run_paths,
+		"run_fps": sf.get_animation_speed("run"), "run_loop": sf.get_animation_loop("run"),
+		"dash_visto": dash_visto, "flags": [k.get("usar_prototipo_premium"), k.get("usar_golden_set")],
+		"tem_morte": sf.has_animation("morte"),
+		"collision": str((k.get_node("CollisionShape2D") as CollisionShape2D).shape.get_rect().size),
+		"filtro_nearest": corpo.texture_filter == CanvasItem.TEXTURE_FILTER_NEAREST}
+	FileAccess.open(OUT + "/anims_%s.json" % ("golden" if golden else "antigo"), FileAccess.WRITE).store_string(JSON.stringify(res, "	"))
+	print("ANIMS_OK")

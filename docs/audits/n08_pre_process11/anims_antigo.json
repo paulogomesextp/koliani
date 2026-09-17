@@ -1,0 +1,267 @@
+{
+	"collision": "(20.0, 44.0)",
+	"dash_visto": true,
+	"estados": [
+		{
+			"anim": "idle",
+			"fase": "idle",
+			"fps": 6.0,
+			"frames": 4,
+			"frames_vistos": [
+				1,
+				2,
+				3,
+				0
+			],
+			"offset": "(0.0, -8.0)",
+			"path0": "atlas:res://assets/sprites/pixel/koliani_shadowblade/idle.png",
+			"scale": "(1.0, 1.0)",
+			"size": "(51.0, 64.0)"
+		},
+		{
+			"anim": "idle",
+			"fase": "run",
+			"fps": 6.0,
+			"frames": 4,
+			"frames_vistos": [
+				1
+			],
+			"offset": "(0.0, -8.0)",
+			"path0": "atlas:res://assets/sprites/pixel/koliani_shadowblade/idle.png",
+			"scale": "(1.0, 1.0)",
+			"size": "(51.0, 64.0)"
+		},
+		{
+			"anim": "run",
+			"fase": "run",
+			"fps": 13.0,
+			"frames": 5,
+			"frames_vistos": [
+				1,
+				2,
+				3,
+				4,
+				0
+			],
+			"offset": "(0.0, -8.0)",
+			"path0": "atlas:res://assets/sprites/pixel/koliani_shadowblade/run.png",
+			"scale": "(1.0, 1.0)",
+			"size": "(51.0, 64.0)"
+		},
+		{
+			"anim": "run",
+			"fase": "paragem",
+			"fps": 13.0,
+			"frames": 5,
+			"frames_vistos": [
+				3,
+				4
+			],
+			"offset": "(0.0, -8.0)",
+			"path0": "atlas:res://assets/sprites/pixel/koliani_shadowblade/run.png",
+			"scale": "(1.0, 1.0)",
+			"size": "(51.0, 64.0)"
+		},
+		{
+			"anim": "idle",
+			"fase": "paragem",
+			"fps": 6.0,
+			"frames": 4,
+			"frames_vistos": [
+				0,
+				1,
+				2,
+				3
+			],
+			"offset": "(0.0, -8.0)",
+			"path0": "atlas:res://assets/sprites/pixel/koliani_shadowblade/idle.png",
+			"scale": "(1.0, 1.0)",
+			"size": "(51.0, 64.0)"
+		},
+		{
+			"anim": "idle",
+			"fase": "jump",
+			"fps": 6.0,
+			"frames": 4,
+			"frames_vistos": [
+				3
+			],
+			"offset": "(0.0, -8.0)",
+			"path0": "atlas:res://assets/sprites/pixel/koliani_shadowblade/idle.png",
+			"scale": "(1.0, 1.0)",
+			"size": "(51.0, 64.0)"
+		},
+		{
+			"anim": "jump",
+			"fase": "jump",
+			"fps": 11.0,
+			"frames": 2,
+			"frames_vistos": [
+				0,
+				1
+			],
+			"offset": "(0.0, -8.0)",
+			"path0": "atlas:res://assets/sprites/pixel/koliani_shadowblade/jump.png",
+			"scale": "(1.0, 1.0)",
+			"size": "(51.0, 64.0)"
+		},
+		{
+			"anim": "fall",
+			"fase": "jump",
+			"fps": 7.0,
+			"frames": 1,
+			"frames_vistos": [
+				0
+			],
+			"offset": "(0.0, -8.0)",
+			"path0": "atlas:res://assets/sprites/pixel/koliani_shadowblade/fall.png",
+			"scale": "(1.0, 1.0)",
+			"size": "(51.0, 64.0)"
+		},
+		{
+			"anim": "fall",
+			"fase": "queda_aterrar",
+			"fps": 7.0,
+			"frames": 1,
+			"frames_vistos": [
+				0
+			],
+			"offset": "(0.0, -8.0)",
+			"path0": "atlas:res://assets/sprites/pixel/koliani_shadowblade/fall.png",
+			"scale": "(1.0, 1.0)",
+			"size": "(51.0, 64.0)"
+		},
+		{
+			"anim": "idle",
+			"fase": "queda_aterrar",
+			"fps": 6.0,
+			"frames": 4,
+			"frames_vistos": [
+				0,
+				1,
+				2,
+				3
+			],
+			"offset": "(0.0, -8.0)",
+			"path0": "atlas:res://assets/sprites/pixel/koliani_shadowblade/idle.png",
+			"scale": "(1.0, 1.0)",
+			"size": "(51.0, 64.0)"
+		},
+		{
+			"anim": "aterrar",
+			"fase": "queda_aterrar",
+			"fps": 16.0,
+			"frames": 2,
+			"frames_vistos": [
+				0,
+				1
+			],
+			"offset": "(0.0, -8.0)",
+			"path0": "atlas:res://assets/sprites/pixel/koliani_shadowblade/aterrar.png",
+			"scale": "(1.0, 1.0)",
+			"size": "(51.0, 64.0)"
+		},
+		{
+			"anim": "idle",
+			"fase": "dash",
+			"fps": 6.0,
+			"frames": 4,
+			"frames_vistos": [
+				1
+			],
+			"offset": "(0.0, -8.0)",
+			"path0": "atlas:res://assets/sprites/pixel/koliani_shadowblade/idle.png",
+			"scale": "(1.0, 1.0)",
+			"size": "(51.0, 64.0)"
+		},
+		{
+			"anim": "run",
+			"fase": "dash",
+			"fps": 13.0,
+			"frames": 5,
+			"frames_vistos": [
+				0,
+				1
+			],
+			"offset": "(0.0, -8.0)",
+			"path0": "atlas:res://assets/sprites/pixel/koliani_shadowblade/run.png",
+			"scale": "(1.0, 1.0)",
+			"size": "(51.0, 64.0)"
+		},
+		{
+			"anim": "run",
+			"fase": "pos_dash",
+			"fps": 13.0,
+			"frames": 5,
+			"frames_vistos": [
+				1,
+				4,
+				0,
+				2,
+				3
+			],
+			"offset": "(0.0, -8.0)",
+			"path0": "atlas:res://assets/sprites/pixel/koliani_shadowblade/run.png",
+			"scale": "(1.0, 1.0)",
+			"size": "(51.0, 64.0)"
+		},
+		{
+			"anim": "run",
+			"fase": "morte",
+			"fps": 13.0,
+			"frames": 5,
+			"frames_vistos": [
+				3
+			],
+			"offset": "(0.0, -8.0)",
+			"path0": "atlas:res://assets/sprites/pixel/koliani_shadowblade/run.png",
+			"scale": "(1.0, 1.0)",
+			"size": "(51.0, 64.0)"
+		},
+		{
+			"anim": "idle",
+			"fase": "morte",
+			"fps": 6.0,
+			"frames": 4,
+			"frames_vistos": [
+				0
+			],
+			"offset": "(0.0, -8.0)",
+			"path0": "atlas:res://assets/sprites/pixel/koliani_shadowblade/idle.png",
+			"scale": "(1.0, 1.0)",
+			"size": "(51.0, 64.0)"
+		},
+		{
+			"anim": "idle",
+			"fase": "respawn",
+			"fps": 6.0,
+			"frames": 4,
+			"frames_vistos": [
+				0,
+				1,
+				2,
+				3
+			],
+			"offset": "(0.0, -8.0)",
+			"path0": "atlas:res://assets/sprites/pixel/koliani_shadowblade/idle.png",
+			"scale": "(1.0, 1.0)",
+			"size": "(51.0, 64.0)"
+		}
+	],
+	"filtro_nearest": true,
+	"flags": [
+		false,
+		false
+	],
+	"golden": false,
+	"run_fps": 13.0,
+	"run_loop": true,
+	"run_paths": [
+		"atlas:res://assets/sprites/pixel/koliani_shadowblade/run.png",
+		"atlas:res://assets/sprites/pixel/koliani_shadowblade/run.png",
+		"atlas:res://assets/sprites/pixel/koliani_shadowblade/run.png",
+		"atlas:res://assets/sprites/pixel/koliani_shadowblade/run.png",
+		"atlas:res://assets/sprites/pixel/koliani_shadowblade/run.png"
+	],
+	"tem_morte": false
+}
