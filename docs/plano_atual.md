@@ -1,3 +1,16 @@
+## Process 12 — N10 exame final + Guardião dos Céus (17 set 2026)
+
+- Objetivo: fechar a Região II no N10 -- exame cumulativo das leituras de
+  vento e chefe regional canónico no lugar do Primeiro Prisioneiro.
+- Âmbito: `A_Cela_Zero.tscn`, `chefe_guardiao_dos_ceus.gd` +
+  `ChefeGuardiaoDosCeus.tscn`, `definir_direcao()` no `wind_zone.gd`, chave
+  do carrossel, i18n do chefe, testes e docs. N06–N09, física, save,
+  progressão, UI, SFX e arte global congelados.
+- Decisão: vento sempre FORÇA EXTERNA (nada de levitação -- isso é da
+  Região V); o chefe voa mas desce a cada recuperação.
+- Resultado técnico: tudo PASS. Estado: **HUMAN PLAYTEST REQUIRED**.
+- Seguinte: Process 13 — passe canónico de arte da Região II.
+
 ## Process 11 — N08 Ilhas Suspensas + planar (17 set 2026)
 
 - Objetivo: migrar só o N08 para a identidade canónica (ilhas suspensas +

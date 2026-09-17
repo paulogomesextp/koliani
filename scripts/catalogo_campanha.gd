@@ -26,7 +26,7 @@ const CHEFE_KEY: Array[String] = [
 	"boss.ignivar",              # 06 Fornalha dos Pecadores
 	"boss.dama_guilhotina",      # 07 Corredor das Execuções
 	"boss.irmaos_condenados",    # 08 Ala dos Mortos
-	"boss.primeiro_prisioneiro", # 09 A Cela Zero
+	"boss.guardiao_dos_ceus",    # 09 A Cela Zero (exame da Regiao II)
 	"boss.sino_vivo",            # 10 Torre dos Sinos
 	"boss.aerion",               # 11 Torre dos Ventos
 	"boss.voltaris",             # 12 Torre da Tempestade

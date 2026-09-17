@@ -1,3 +1,13 @@
+## Pendente -- Process 12, N10 Guardião dos Céus (17 set 2026)
+
+1. **PLAYTEST HUMANO do N10** (branch `claude/region02-n10-guardian-skies`).
+   O que interessa: os tres telegrafos leem-se? o vento comandado na arena e'
+   pressao ou estorvo? o EXPOSTO de 1,35 s chega para responder?
+2. **Arte do Guardiao dos Ceus** e' rig de pack (`monge_celeste`) -- passe
+   canonico da Regiao II fica para o Process 13.
+3. A lore da Cela Zero ainda fala do Primeiro Prisioneiro (pistas dormentes);
+   alinhar quando a Regiao II levar passe narrativo.
+
 ## Process 11, N08 Ilhas Suspensas -- FECHADO (17 set 2026)
 
 Playtest humano no Windows **APPROVED**; Process 11 COMPLETE, gameplay LOCKED.

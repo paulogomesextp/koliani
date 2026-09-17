@@ -52,6 +52,23 @@ func definir_multiplicador_externo(valor: float) -> void:
 	_multiplicador_externo = maxf(0.0, valor)
 
 
+## Muda o sentido do vento em runtime e redesenha a guia (as setas ficariam
+## a apontar para o lado antigo). Aditivo: as cenas que nunca chamam isto
+## comportam-se exatamente como antes. Usado pelo Guardião dos Céus (N10),
+## que vira o vento da arena durante o combate.
+func definir_direcao(nova: Vector2) -> void:
+	if nova.is_zero_approx():
+		return
+	if direcao.normalized().is_equal_approx(nova.normalized()):
+		return
+	direcao = nova
+	if _guia:
+		remove_child(_guia)
+		_guia.queue_free()
+		_guia = null
+		_montar_guia()
+
+
 func multiplicador_atual() -> float:
 	if not ativa:
 		return 0.0

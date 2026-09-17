@@ -1,3 +1,28 @@
+## Process 12 — N10 exame final + Guardião dos Céus, TÉCNICO COMPLETO (17 set 2026)
+
+- Branch `claude/region02-n10-guardian-skies` (base `a5825950`), worktree
+  `C:/Projetos/koliani-region02-n10`. Detalhe:
+  `docs/implementation/region_02_n10_guardian_skies.md`.
+- `A_Cela_Zero.tscn` (mesma cena/UID) passou a exame da Região II:
+  `corredor = false`, 3 zonas de vento (a favor / corrente / contra pulsada)
+  + `VentoArena` parada que o chefe comanda. Topologia, elite, ácido,
+  fogueiras, porta e `ColProjetil` intactos.
+- Chefe novo `ChefeGuardiaoDosCeus` (rig `monge_celeste`) substitui o
+  Primeiro Prisioneiro: LÂMINA / COMANDO DO VENTO / QUEDA, todos com
+  telégrafo próprio, `EXPOSTO` entre ataques (nunca é inatingível) e fase 2
+  aos 50% que encadeia em vez de inflar números.
+- `wind_zone.gd` só ganhou `definir_direcao()` (aditivo). O bug da forma de
+  colisão partilhada continua ABERTO e fora do âmbito: no N10 cada zona tem
+  forma própria na cena, como no N08.
+- Provas: suite, harness próprio do chefe (`tests/run_boss_guardiao_ceus.tscn`),
+  glide N08, Movement+Camera, os 8 verificadores do CI + spawn livre, e o
+  nível aberto no Godot real. 3 mutações provaram que os testes mordem.
+- ARMADILHA que custou a descobrir: **em GDScript as lambdas capturam por
+  VALOR** -- a bandeira do sinal `derrotado` numa variável local fazia o
+  harness jurar que o chefe não morria. Usar Array/membro.
+- Falta: HUMAN PLAYTEST do N10; passe canónico de arte da Região II
+  (Process 13).
+
 ## Process 11 — N08 Ilhas Suspensas + planar contextual, COMPLETE / APPROVED (17 set 2026)
 
 - **HUMAN PLAYTEST na build Windows: APPROVED** (aprovacao humana do Paulo,
