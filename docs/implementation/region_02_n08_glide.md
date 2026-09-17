@@ -179,3 +179,12 @@ Save normal com N01–N07 concluídos (`dash`, `salto_duplo`, `dash_aereo`,
 7. Arena: vão final, fogueira pré-arena, chefe, baú e porta.
 8. Morrer nas três secções: reaparece na fogueira certa, sem vento/planar residual.
 9. Nada de planar fora do N08 (ex.: N09) e nenhuma habilidade nova na HUD.
+
+## Sync da Koliani canónica (17 set 2026)
+
+Antes do playtest humano incorporaram-se `7ff1dbaf` + `5f22e374` (cherry-pick
+sobre `cccd7a43`). O N08 mantém o layout do Process 11 e passa a instanciar a
+Koliani com `usar_prototipo_premium = true` e `usar_golden_set = true`.
+Reverificado: suite, glide A–O, WindZone A–L, Movement+Camera 4A, smoke,
+rota, alcance 100 níveis -- tudo OK; save real intacto; Godot real mostra a
+Koliani Golden Set (RUN 10 fr) a planar e a ser empurrada pelas três zonas.

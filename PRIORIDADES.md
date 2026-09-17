@@ -1,8 +1,8 @@
 ## Pendente de decisao -- Process 11, N08 Ilhas Suspensas (17 set 2026)
 
-1. **Playtest humano do N08** (branch `claude/region02-n08-glide`, ainda sem
-   commit). Checklist em `docs/implementation/region_02_n08_glide.md`. So'
-   depois disso: commit + push.
+1. **Playtest humano do N08** (branch `claude/region02-n08-glide`, publicada
+   com a Koliani canonica ja' integrada). Checklist em
+   `docs/implementation/region_02_n08_glide.md`.
 2. **Bug do `WindZone`: as zonas de uma cena partilham a forma de colisao.**
    N09 tem duas zonas a colidir com 300x220 em vez de 680x240/650x270 (N06 e
    N07 com desvios pequenos). Corrigir = duplicar a forma no

@@ -1,3 +1,27 @@
+## Process 11 — sync da Koliani canónica antes do playtest, PASS (17 set 2026)
+
+- Branch `claude/region02-n08-glide` publicada em
+  `origin/claude/region02-n08-glide` (o upstream antigo
+  `origin/codex/region02-wind-system` NÃO recebeu push).
+- `cccd7a43` preserva o Process 11; cherry-pick de `7ff1dbaf` (flags no N08,
+  auto-merge limpo) e `5f22e374` (flags nos 94 níveis + teste
+  `test_koliani_canonica_niveis.gd`; conflito só no `run_tests.gd`, ficaram
+  os três conjuntos: glide, N08 e canónica).
+- N08 em runtime (Godot real, janela): Golden Set ativo, RUN `run_final`
+  10 fr / 13,333 fps / loop, escala 1, offset (0,-18), colisão 20×44;
+  1 `ZonaPlanar`, 3 `WindZone` (as três empurram), 3 fogueiras, chefe e porta;
+  planar ativo sem habilidade permanente; respawn deixa ventos=0/a_planar=false.
+- Provas: suite completa OK (save real intacto), glide A–O, WindZone A–L,
+  Movement+Camera 4A, smoke N08 240/600, rota N08 chega à arena, alcance 100
+  níveis 0 portas inalcançáveis. Mutação: sem as flags no N08 a suite dá
+  exatamente 2 falhas (L008).
+- Armadilhas: `tools/correr_testes.ps1` rebenta no PowerShell 5.1 ao primeiro
+  WARNING no stderr (`ErrorActionPreference=Stop`) -- replicar o APPDATA
+  isolado à mão ou usar `pwsh`. O `--import` gera `.translation` a partir dos
+  CSV em `docs/` -- são artefactos, não commitar.
+- Falta: HUMAN PLAYTEST do N08 (checklist em
+  `docs/implementation/region_02_n08_glide.md`), device/PWA, art pass.
+
 ## Process 11 — N08 Ilhas Suspensas + planar contextual, PARTIAL (17 set 2026)
 
 - Worktree `C:/Projetos/koliani-region02-n08`, branch
