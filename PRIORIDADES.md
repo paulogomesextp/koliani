@@ -12,10 +12,15 @@ Process 11 e 12 sobre arte, vento e lore está feito; o que sobra é humano.
 3. **N06/N07/N09 vão jogar-se diferente.** As zonas de vento ficaram com o
    tamanho desenhado (o N09 passa de 300 px de largo para 680/650). Está
    certo em relação ao que foi authored, mas nunca foi jogado assim.
-4. **Os chefes intermédios ainda se chamam The Jailer / The Guillotine
-   Lady / The Condemned Brothers / Ignivar the Cursed Smith.** É a
-   contradição mais visível que sobra — está no cartão de quatro dos cinco
-   níveis. Mudar-lhes o nome não chega: são criaturas de prisão. Design.
+4. ~~**Os chefes intermédios ainda se chamam The Jailer / The Guillotine
+   Lady / The Condemned Brothers / Ignivar the Cursed Smith.**~~ **FEITO**
+   (18 set 2026, `8431d887`). Passaram a Golem das Falésias, Vigia do
+   Desfiladeiro, Feiticeira dos Ventos e Espectros Gémeos — GUARDIÕES
+   (`guard.*`), não chefes, cada um a traduzir um arquétipo da prancha
+   aprovada da região. As quatro silhuetas foram redesenhadas; o gameplay
+   não mudou. **Por julgar no playtest:** as criaturas novas leem-se à
+   escala de jogo? O N07 perdeu o laranja todo — a arena ficou legível ou
+   ficou monótona?
 5. **Os inimigos não são da região** (esqueleto, chort, imp, mastim, orc; o
    cânone pede morcego dos ventos, sentinela flutuante, gaivota sombria,
    golem aéreo, mago do vento). Trocar só o aspeto parte a leitura

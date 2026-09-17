@@ -368,6 +368,91 @@ assets/i18n/*.json (6) · data/level_manifest.json
 
 ---
 
+## 8-bis. Super-Process A — os encontros intermédios (18 set 2026)
+
+Commit `8431d887`.
+
+### O que estava errado
+
+A região já se chamava Desfiladeiro dos Ventos e já se via como tal, mas
+os quatro encontros do caminho continuavam a ser **chefes da Prisão dos
+Condenados**. E a identidade não estava só no nome: estava **desenhada**.
+
+| nível | era | a identidade estava em | passou a ser | arquétipo da prancha |
+|---|---|---|---|---|
+| N06 | O Carcereiro | uma **CHAVE** no lugar da cabeça, correntes-chicote | **Golem das Falésias** | GOLEM AÉREO |
+| N07 | Ignivar, o Ferreiro Maldito | **BIGORNA**, coroa de chamas, avental, laranja | **Vigia do Desfiladeiro** | TORRE VIGIA |
+| N08 | A Dama da Guilhotina | a **LÂMINA DO CADAFALSO**, a corda ao pescoço | **Feiticeira dos Ventos** | MAGO DO VENTO |
+| N09 | Os Irmãos Condenados | a **CORRENTE DE FERRO** entre os dois, alma verde | **Espectros Gémeos** | ESPECTRO DAS RUÍNAS |
+
+Os arquétipos saíram todos de
+`docs/art_direction/regions/region_02/enemy_gameplay_pack.png`, que é
+autoridade aprovada. Não se inventou lore nenhum: cada um é uma criatura
+que a prancha já tinha desenhado, na escala de guardião.
+
+### O que NÃO mudou
+
+Gameplay. Máquina de estados, vida, dano, alcances, telégrafos, janela de
+EXPOSTO, arena, recompensa, checkpoints e spawn ficaram como estavam nos
+quatro. O **N08 está LOCKED** e por isso até o *gait* do rig ficou
+`"golpe"` em vez de `"magia"`: o arco descendente do CORTE tinha de bater
+no mesmo sítio, no mesmo instante.
+
+### O que mudou além da silhueta
+
+- **`boss.*` → `guard.*`** nos quatro. Não é cosmética: `CatalogoCampanha.
+  tem_chefe()` decide se o carrossel diz "Chefe:" ou "Guardião:", e a
+  Região II passou de **cinco chefes a um**. O peso de fim de região volta
+  a ser só do Guardião dos Céus.
+- **Cor.** Rim, estilhaços, núcleo e luzes dos quatro foram para a paleta
+  do painel *PALETA DE CORES DA REGIÃO II* (FX vento `79ace6`, FX magia
+  `49357f`, rocha `4a4f71`). O laranja de forja e o verde-alma saíram.
+- **Som.** Os dois `Som.toca("chama")` do N07 eram a forja; passaram a
+  `onda`.
+- **Restos que só se viam a ler as cenas:** as plataformas do N06
+  chamavam-se `Cela1/2/3`, e o N07 tinha uma poça chamada `Lava` com
+  `brasas = true` — brasas a subir mesmo por baixo da arena do guardião.
+
+### O que ficou de fora, de propósito
+
+- **Os nomes dos ficheiros das cenas** (`Prisao_dos_Condenados.tscn`, …) e
+  as `class_name` (`ChefeCarcereiro`, …). Mudá-los mexe em uids, saves,
+  checkpoints e no manifesto às vésperas do playtest, e não é nada que o
+  jogador leia — o que ele lê é `level.n##`, que já estava corrigido. Cada
+  ficheiro leva agora um comentário a dizer isto, para ninguém se enganar.
+- **`gear.*.{malha,martelo}_do_carcereiro`** (equipamento de nível 25/40).
+  Não é da Região II, o `id` está gravado nos saves, e carcereiros existem
+  no mundo — a própria pista `clue.praca_para_o_castelo` fala de um.
+
+### Prova
+
+Teste novo em `tests/test_region02_wind_levels.gd::_encontros_canonicos`,
+**provado a morder**: repus `boss.*` no índice 5 e deu 3 falhas. Prende
+cinco coisas — a chave é `guard.*`, o nível não se anuncia como chefe, o
+nome não tem vocabulário de prisão/forja em nenhum dos 6 idiomas, a chave
+antiga não ficou para trás, e o rig é o novo e existe em disco.
+
+**Armadilha evitada:** a primeira versão lia os nomes por `Textos.t()`.
+Não servia — o `t()` cai para o inglês quando a chave falta, por isso
+passaria com a chave ausente em cinco dos seis ficheiros. Lê o JSON.
+
+**Duas passagens de desenho** que a folha de contacto apanhou e um teste
+nunca apanharia: o catavento da Vigia começou na coroa e lia-se como um
+**diadema** — exatamente a silhueta de coroa-de-chamas do ferreiro que se
+estava a tirar do caminho (foi para as costas, e a cabeça levou um
+parapeito ameado); e as abas do manto da Feiticeira começaram à altura do
+capuz, onde liam como **orelhas**, e depois como dois painéis quadrados a
+flutuar ao lado dela (ficaram em flâmula, e a de trás mais escura).
+
+### Por verificar
+
+- **Nunca foram vistos a correr no Godot real.** A validação foi por folha
+  de contacto dos frames. À escala de jogo, com a câmara a mexer, pode
+  ler-se diferente.
+- **Build Windows não regenerada** com estas quatro criaturas.
+
+---
+
 ## 9. Próximo passo
 
 **HUMAN PLAYTEST REGIÃO II + N10 BOSS.**

@@ -1,3 +1,21 @@
+## Super-Process A — encontros intermédios da Região II (18 set 2026)
+
+- Objetivo: fechar a **única** contradição canónica que sobrava na Região
+  II antes do playtest humano — os quatro encontros do meio (N06–N09)
+  ainda eram chefes da Prisão dos Condenados. **Região III não.**
+- Âmbito: identidade — nome, função, silhueta, apresentação. Sem art pass
+  novo, sem tocar no N08 aprovado, sem redesenhar o Guardião dos Céus.
+- Decisão de fundo: os quatro passam a **GUARDIÕES** (`guard.*`), não a
+  quatro chefes novos, para o único chefe da região continuar a ser o
+  Guardião dos Céus no N10. Cada um traduz um arquétipo já desenhado na
+  prancha aprovada da região — não se inventou lore.
+- Regra que se seguiu: **preservar gameplay sempre que possível**. Saldo:
+  zero alterações a vida, dano, telégrafos, arena, recompensa, progressão,
+  save, checkpoints e colisão.
+- **FEITO.** Estado e o que falta: `docs/retomar_aqui.md`.
+
+---
+
 ## Super-Process A — passe de fecho da Região II (17 set 2026)
 
 - Objetivo: fechar a Região II — Desfiladeiro dos Ventos — como bloco

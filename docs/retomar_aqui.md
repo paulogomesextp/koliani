@@ -1,3 +1,52 @@
+## Super-Process A — encontros do meio da Região II (18 set 2026)
+
+- Branch `claude/region02-completion-pass`, HEAD a seguir a este trabalho.
+  Worktree `C:/Projetos/koliani-region02-complete`. Detalhe na secção
+  **8-bis** de `docs/implementation/region_02_completion_pass.md`.
+- **A última contradição canónica da Região II fechou.** A região já era o
+  Desfiladeiro dos Ventos, mas pelo caminho o jogador encontrava O
+  Carcereiro, Ignivar, A Dama da Guilhotina e Os Irmãos Condenados —
+  quatro CHEFES da Prisão dos Condenados, a disputar o lugar do Guardião
+  dos Céus.
+- **Trocar os nomes não chegava: a identidade estava DESENHADA.** Chave no
+  lugar da cabeça, bigorna e coroa de chamas, lâmina do cadafalso, corrente
+  de ferro. Os quatro foram redesenhados no motor de arte dos chefes, cada
+  um a traduzir um arquétipo do `enemy_gameplay_pack.png` aprovado:
+  Golem das Falésias (GOLEM AÉREO), Vigia do Desfiladeiro (TORRE VIGIA),
+  Feiticeira dos Ventos (MAGO DO VENTO), Espectros Gémeos (ESPECTRO DAS
+  RUÍNAS).
+- **Gameplay intacto nos quatro.** Nenhum número de vida, dano, telégrafo
+  ou alcance mexeu. O N08 está LOCKED e por isso até o *gait* ficou
+  `"golpe"` em vez de `"magia"`, para o CORTE bater no mesmo sítio.
+- **`boss.*` → `guard.*`**: a Região II passou de cinco chefes a UM. O
+  carrossel diz "Guardião:" nos quatro e "Chefe:" só no N10.
+- Restos que só se viam a ler as cenas e saíram: as plataformas do N06
+  chamavam-se `Cela1/2/3`; o N07 tinha uma poça `Lava` com `brasas = true`
+  a subir por baixo da arena.
+- **Deixado de fora de propósito** (e comentado nos ficheiros): os nomes
+  dos `.tscn` e as `class_name`. Mexer neles toca em uids, saves,
+  checkpoints e manifesto às vésperas do playtest, e o jogador nunca os lê.
+  Também o equipamento `gear.*_do_carcereiro` — não é da região e o `id`
+  está gravado nos saves.
+- **Armadilha de método:** a primeira versão do teste lia os nomes por
+  `Textos.t()`. Não serve — o `t()` cai para o inglês quando a chave falta,
+  por isso passava com a chave ausente em cinco dos seis ficheiros. Lê o
+  JSON direto. A asserção foi **provada a morder** (repus `boss.*` no
+  índice 5 → 3 falhas).
+- Duas passagens de desenho que só a folha de contacto apanhou: o catavento
+  da Vigia na coroa lia-se como **diadema** (foi para as costas; a cabeça
+  levou parapeito ameado) e as abas do manto da Feiticeira liam-se como
+  **orelhas**, depois como painéis a flutuar (ficaram em flâmula).
+- **VERDE**: suite completa, `run_glide_region02` (N08) e
+  `run_region02_wind_shapes`.
+- **POR FAZER**, e é só isto: (1) **ver os quatro a correr no Godot real** —
+  a validação foi por folha de contacto dos frames, à escala de jogo com a
+  câmara a mexer pode ler-se diferente; (2) **regenerar a build Windows**
+  `Koliani-Region02-Test.exe` e os launchers N06–N10. Depois disso:
+  **PLAYTEST HUMANO DA REGIÃO II**. Não iniciar a Região III.
+
+---
+
 ## Super-Process A — Região II fecha, TÉCNICO COMPLETO (17 set 2026)
 
 - Branch `claude/region02-completion-pass` (base
