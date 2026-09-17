@@ -2,6 +2,8 @@
 .godot/
 /android/
 /build/
+# builds de playtest isoladas (Super-Process A) -- nunca vao para o Git
+/builds/
 export_presets.cfg.bak
 
 # Editor do Godot (binarios locais, nao versionar)

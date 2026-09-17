@@ -163,7 +163,9 @@ const NIVEIS := [
 ##            cada regiao ter a sua cor mesmo antes de se ver o cenario.
 const REGIOES := [
 	{"id": "floresta", "nome": "Floresta Corrompida", "niveis": [0, 1, 2, 3, 4], "chave": "world.forest", "cor": Color(0.62, 1.00, 0.72)},
-	{"id": "prisao", "nome": "Prisao dos Condenados", "niveis": [5, 6, 7, 8, 9], "chave": "world.prison", "cor": Color(0.60, 0.68, 1.00)},
+	# Regiao II -- Desfiladeiro dos Ventos. A cor e' a luz-chave do N06,
+	# como manda o comentario acima; era o azul-ferro da masmorra.
+	{"id": "desfiladeiro", "nome": "Desfiladeiro dos Ventos", "niveis": [5, 6, 7, 8, 9], "chave": "world.gorge", "cor": Color(0.78, 0.60, 1.00)},
 	{"id": "torres", "nome": "Torres Esquecidas", "niveis": [10, 11, 12, 13, 14], "chave": "world.towers", "cor": Color(1.00, 0.74, 0.46)},
 	{"id": "catacumbas", "nome": "Catacumbas do Abismo", "niveis": [15, 16, 17, 18, 19], "chave": "world.catacombs", "cor": Color(0.86, 0.70, 0.78)},
 	{"id": "cidade", "nome": "Cidade Corrompida", "niveis": [20, 21, 22, 23, 24], "chave": "world.city", "cor": Color(1.00, 0.62, 0.72)},

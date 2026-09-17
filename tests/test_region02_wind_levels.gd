@@ -130,6 +130,23 @@ static func _regiao_coerente() -> Array[String]:
 				"%s: a Casca ainda usa tijolo de masmorra" % nome)
 		raiz.free()
 
+	# O NOME DA REGIÃO. Isto escapou a todos os testes e só apareceu numa
+	# captura da build exportada: o cabeçalho da HUD dizia "PRISON OF THE
+	# DAMNED" por cima de "The Eternal Winds". A HUD e as pastilhas do
+	# carrossel leem `EstadoJogo.REGIOES`, que ninguém verificava.
+	var regiao: Dictionary = EstadoJogo.REGIOES[1]
+	_verificar(falhas, regiao.get("chave", "") == "world.gorge",
+		"a Região II aponta a chave i18n '%s'" % regiao.get("chave", ""))
+	_verificar(falhas, Textos.t("world.gorge") != "world.gorge",
+		"'world.gorge' não está traduzido")
+	var nome_regiao := String(Textos.t("world.gorge")).to_lower()
+	for proibida in ["prison", "prisão", "prisao", "damned", "condenados",
+			"kerker", "gefängnis", "监狱", "牢狱"]:
+		_verificar(falhas, not nome_regiao.contains(proibida),
+			"o nome da Região II ainda diz '%s': %s" % [proibida, nome_regiao])
+	_verificar(falhas, (regiao.get("niveis", []) as Array) == [5, 6, 7, 8, 9],
+		"a Região II deixou de cobrir os níveis 06-10")
+
 	_verificar(falhas, assinatura.size() == 5,
 		"a Região II tem de ter cinco níveis com papéis distintos")
 	var vistos := {}
