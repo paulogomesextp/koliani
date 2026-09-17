@@ -127,7 +127,17 @@ func _configurar_forma() -> void:
 	var retangulo := colisao.shape as RectangleShape2D
 	if retangulo == null:
 		retangulo = RectangleShape2D.new()
-		colisao.shape = retangulo
+	else:
+		# O Godot PARTILHA os sub-recursos entre instancias da mesma
+		# PackedScene, e a `WindZone.tscn` traz o `RectangleShape2D` como
+		# sub-recurso. Sem esta copia, redimensionar aqui mexia na forma de
+		# TODAS as zonas da cena e so' sobrevivia o tamanho da ultima a
+		# arrancar -- em N09 as tres zonas ficavam com 300x220 em vez dos
+		# 680x240 / 650x270 desenhados. Copiar por instancia e' generico:
+		# nao sabe de niveis nem de tamanhos, e as cenas que ja' davam forma
+		# propria a cada zona (N08, N10) ficam exatamente como estavam.
+		retangulo = retangulo.duplicate() as RectangleShape2D
+	colisao.shape = retangulo
 	retangulo.size = Vector2(maxf(1.0, tamanho.x), maxf(1.0, tamanho.y))
 
 
