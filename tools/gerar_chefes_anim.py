@@ -1030,11 +1030,15 @@ CHEFES: dict[str, dict] = {
         # SO' nas remiges e na cauda, ouro SO' no bico e nas garras,
         # nucleo violeta na cabeca.
         "plano": "ave",
-        # tres quartos: corpo de pe' e envergadura ~2,6x a largura do
-        # corpo -- e' o que faz a leitura de AVE GRANDE
-        "par": {"voo": 52.0, "corpo_c": 30.0, "corpo_a": 34.0,
-                "pescoco": 10.0, "cabeca": 9.5, "asa1": 30.0, "asa2": 27.0,
-                "asa_esp": 17.0, "cauda": 22.0, "perna": 16.0, "penas": 5},
+        # Tres quartos, corpo de pe'. As asas sao CURTAS de proposito: a
+        # versao de envergadura larga saia com racio 2,03 e, a' altura
+        # canonica, dava 324 px de largo contra os 560 px da plataforma
+        # da arena do N10 -- tapava-a mais de metade, e a suite apanhou.
+        # Estes numeros dao 238x162 (racio 1,47), contra os 1,39 medidos
+        # no painel ESCALA da prancha.
+        "par": {"voo": 52.0, "corpo_c": 30.0, "corpo_a": 36.0,
+                "pescoco": 10.0, "cabeca": 9.5, "asa1": 24.0, "asa2": 21.0,
+                "asa_esp": 17.0, "cauda": 26.0, "perna": 20.0, "penas": 5},
         "pal": paleta("1e1e33", "433d80", "d8d0e6", "904143",
                       metal="c98f4e", brilho="c68af9",
                       asa="3a3468", ponta="8e3a3c", ouro="c98f4e"),

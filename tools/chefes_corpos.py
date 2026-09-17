@@ -331,7 +331,7 @@ def _asa(comp: float, esp: float) -> list[tuple[float, float]]:
 ## a rotacao do desenho e a posicao da junta da 2.a metade da asa. Quando
 ## so' o desenho rodava, a ponta da asa descolava do ombro e ficava um
 ## naco de penas a flutuar ao lado do bicho.
-ARCO_ASA = -36.0
+ARCO_ASA = -48.0
 
 AVE = {
     "voo": 52.0, "corpo_c": 30.0, "corpo_a": 34.0,
