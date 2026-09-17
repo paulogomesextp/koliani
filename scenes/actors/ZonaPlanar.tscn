@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3]
+
+; Zona que concede planar CONTEXTUAL (N08, Ilhas Suspensas). Sem arte: o
+; planar lê-se pela queda lenta. Ajustar `tamanho` no Inspector.
+
+[ext_resource type="Script" path="res://scripts/zona_planar.gd" id="1_planar"]
+
+[sub_resource type="RectangleShape2D" id="rs_planar"]
+size = Vector2(1200, 900)
+
+[node name="ZonaPlanar" type="Area2D"]
+collision_layer = 0
+collision_mask = 2
+script = ExtResource("1_planar")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("rs_planar")

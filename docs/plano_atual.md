@@ -1,3 +1,20 @@
+## Process 11 — N08 Ilhas Suspensas + planar (17 set 2026)
+
+- Objetivo: migrar só o N08 para a identidade canónica (ilhas suspensas +
+  planar controlado + vento como força externa), jogável do início ao fim em
+  progressão normal.
+- Âmbito: `Corredor_das_Execucoes.tscn`, `ZonaPlanar` nova, planar contextual
+  em `koliani.gd`, `mecanica_anunciada` em `nivel_com_chefe.gd`, crivo de
+  alcance com planar/vento, bot de rota do N08, testes e docs. N06/N07/N09/N10,
+  `wind_zone.gd`, chefes, inimigos, UI, SFX, arte, saves e progressão
+  congelados.
+- Decisão: planar LOCAL (a habilidade permanente é do N63).
+- Prova: suite, harness glide A–O, WindZone, Movement+Camera, smoke, CI
+  (alcance/jornada/mecânicas/baú/spawn…), rota automática sem Dev,
+  contrafactual sem planar, mutações a provar que os testes mordem.
+- Resultado técnico: tudo PASS. Estado: **PARTIAL — HUMAN PLAYTEST
+  REQUIRED**; sem commit até ao gate humano.
+
 ## Process 10 — aplicar vento a N06/N07/N09 (16 set 2026)
 
 - Objetivo: aplicar o `WindZone` do Process 09 às três cenas authored da

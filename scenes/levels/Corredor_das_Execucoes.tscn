@@ -1,10 +1,13 @@
-[gd_scene load_steps=15 format=3 uid="uid://bkolianiexecucoes08"]
+[gd_scene load_steps=18 format=3 uid="uid://bkolianiexecucoes08"]
 
-; REGIAO II / nivel 8 -- Corredor das Execucoes.
-; Sala final FEITA A MAO (a JORNADA, que cresce com o nivel, vem antes). GAUNTLET: um corredor de guilhotinas
-; automaticas, laminas (serras) e plataformas que se desfazem (PlataformaQuebra)
-; sobre acido. Mini-bifurcacao a meio (salto alto por cima de uma guilhotina
-; / passar por baixo). Elite: chort de carga. Chefe: A Dama da Guilhotina.
+; REGIAO II / nivel 8 -- ILHAS SUSPENSAS (Process 11). Sala feita a mao, SEM
+; jornada procedural: ilhas separadas sobre o abismo, PLANAR contextual
+; (`ZonaPlanar` a cobrir o nivel -- segurar saltar a cair) e VENTO como forca
+; externa (`WindZone`: corrente ascendente, rajada a favor, rajada contra).
+; Ordem: ensaio com rede -> cadeia de planar -> corrente -> meio (elite +
+; fogueira) -> a favor -> contra -> arena. Gameplay e estrutura apenas: a
+; arte da Regiao II e' um processo posterior. O nome da cena fica (saves,
+; manifesto e seletor apontam para ele). Chefe antigo preservado.
 
 [ext_resource type="PackedScene" uid="uid://bkolianiactor01" path="res://scenes/actors/Koliani.tscn" id="1_kol"]
 [ext_resource type="PackedScene" uid="uid://bdemoniobase01" path="res://scenes/actors/DemonioBase.tscn" id="2_dem"]
@@ -15,14 +18,24 @@
 [ext_resource type="Script" path="res://scripts/nivel_com_chefe.gd" id="7_niv"]
 [ext_resource type="PackedScene" uid="uid://bkolianiatmosfera01" path="res://scenes/fx/Atmosfera.tscn" id="8_atm"]
 [ext_resource type="PackedScene" uid="uid://bkolianiplataforma01" path="res://scenes/actors/Plataforma.tscn" id="9_pl"]
-[ext_resource type="PackedScene" uid="uid://bkolianicascamasmorra01" path="res://scenes/actors/CascaMasmorra.tscn" id="10_casca"]
-[ext_resource type="PackedScene" uid="uid://bkolianiguilhotina08" path="res://scenes/actors/Guilhotina.tscn" id="11_guilh"]
-[ext_resource type="PackedScene" uid="uid://bkolianiplataquebra01" path="res://scenes/actors/PlataformaQuebra.tscn" id="12_quebra"]
-[ext_resource type="PackedScene" uid="uid://bkolianiserra01" path="res://scenes/actors/Serra.tscn" id="13_serra"]
-[ext_resource type="PackedScene" uid="uid://bkolianiaguavenenosa01" path="res://scenes/actors/AguaVenenosa.tscn" id="14_acido"]
+[ext_resource type="PackedScene" path="res://scenes/actors/WindZone.tscn" id="15_wind"]
+[ext_resource type="PackedScene" path="res://scenes/actors/ZonaPlanar.tscn" id="16_planar"]
 
 [sub_resource type="RectangleShape2D" id="rs_chk"]
 size = Vector2(44, 96)
+
+; Uma forma POR zona de vento: a `WindZone.tscn` partilha um so' recurso e o
+; `wind_zone.gd` redimensiona-o, por isso sem isto todas as zonas desta cena
+; colidiam com o tamanho da ultima (defeito anterior, registado no relatorio
+; do Process 11; o script partilhado nao foi mexido).
+[sub_resource type="RectangleShape2D" id="rs_CorrenteSubida"]
+size = Vector2(200, 600)
+
+[sub_resource type="RectangleShape2D" id="rs_RajadaFavor"]
+size = Vector2(620, 340)
+
+[sub_resource type="RectangleShape2D" id="rs_RajadaContra"]
+size = Vector2(240, 280)
 
 [sub_resource type="Gradient" id="grad_luz"]
 offsets = PackedFloat32Array(0, 1)
@@ -38,6 +51,9 @@ fill_to = Vector2(1, 0.5)
 
 [node name="Corredor_das_Execucoes" type="Node2D"]
 script = ExtResource("7_niv")
+corredor = false
+alongar_plataformas = false
+mecanica_anunciada = "asas"
 
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
 cor_ambiente = Color(0.82, 0.88, 0.98, 1)
@@ -47,192 +63,212 @@ cor_luz = Color(0.62, 0.84, 1, 1)
 cor_poeira = Color(0.78, 0.92, 1, 1)
 densidade_poeira = 1
 bioma = "prisao"
-largura_nivel = 3400.0
+largura_nivel = 5800.0
 fundo_pack = "prisao"
 tinta_fundo = Color(0.72, 0.9, 1.16, 1)
 neblina_fundo = 0.38
 dessaturar_fundo = 0.58
 seed_ambiente = 1259
 
-[node name="Casca" parent="." instance=ExtResource("10_casca")]
-topo = -192.0
-altura = 2200.0
-largura = 3612.0
-volumes_interiores = Array[Rect2]([Rect2(8, -192, 384, 448), Rect2(392, -192, 384, 352), Rect2(776, -192, 384, 320), Rect2(1160, -192, 384, 320), Rect2(1544, -192, 384, 320), Rect2(1928, -192, 384, 320), Rect2(2312, -192, 384, 320), Rect2(2696, -192, 384, 320), Rect2(3080, -192, 384, 352)])
-esquerda = -120.0
-chao = false
-agua = false
+; Planar contextual em TODO o percurso (inclui as fogueiras: reaparecer ja' plana).
+[node name="ZonaPlanar" parent="." instance=ExtResource("16_planar")]
+position = Vector2(2780, 325)
+tamanho = Vector2(5680, 1850)
 
-[node name="Acido" parent="." instance=ExtResource("14_acido")]
-position = Vector2(1650, 940)
-largura = 3800.0
-altura = 320.0
-cor = Color(0.26, 0.4, 0.14, 0.93)
+; ===================  partida  ============================
 
-; ===================  o corredor  ============================
+[node name="MuroInicio" parent="." instance=ExtResource("9_pl")]
+position = Vector2(-30, 300)
+tamanho = Vector2(60, 1600)
+altura_visual = 100
+cor_base = Color(0.2, 0.24, 0.32, 1)
+cor_topo = Color(0.42, 0.54, 0.68, 1)
+
 [node name="ChaoInicio" parent="." instance=ExtResource("9_pl")]
-position = Vector2(280, 680)
-tamanho = Vector2(420, 60)
-altura_visual = 100.0
+position = Vector2(230, 700)
+tamanho = Vector2(460, 100)
+altura_visual = 100
 cor_base = Color(0.2, 0.24, 0.32, 1)
 cor_topo = Color(0.42, 0.54, 0.68, 1)
 
-[node name="Ga" parent="." instance=ExtResource("9_pl")]
-position = Vector2(600, 660)
-tamanho = Vector2(150, 22)
-altura_visual = 34.0
+; -- 1. ENSAIO: primeiro vao de planar; quem cai fica na rede e volta a subir --
+
+[node name="RedeEnsaio" parent="." instance=ExtResource("9_pl")]
+position = Vector2(585, 880)
+tamanho = Vector2(230, 40)
+altura_visual = 64
 cor_base = Color(0.2, 0.24, 0.32, 1)
 cor_topo = Color(0.42, 0.54, 0.68, 1)
 
-[node name="GuilhA" parent="." instance=ExtResource("11_guilh")]
-position = Vector2(730, 480)
-automatico = true
-periodo = 2.6
-fase = 0.0
-
-[node name="Gb" parent="." instance=ExtResource("9_pl")]
-position = Vector2(820, 640)
-tamanho = Vector2(150, 22)
-altura_visual = 34.0
+[node name="Ilha1" parent="." instance=ExtResource("9_pl")]
+position = Vector2(870, 780)
+tamanho = Vector2(260, 60)
+altura_visual = 96
 cor_base = Color(0.2, 0.24, 0.32, 1)
 cor_topo = Color(0.42, 0.54, 0.68, 1)
 
-[node name="QuebraA" parent="." instance=ExtResource("12_quebra")]
-position = Vector2(1010, 630)
-tamanho = Vector2(120, 18)
-atraso = 0.5
-respawn = 2.4
+; -- 2. CADEIA: pedra estreita e vao comprido a descer (planar + salto duplo) --
 
-[node name="Gc" parent="." instance=ExtResource("9_pl")]
-position = Vector2(1200, 630)
-tamanho = Vector2(150, 22)
-altura_visual = 34.0
+[node name="Pedra1" parent="." instance=ExtResource("9_pl")]
+position = Vector2(1220, 840)
+tamanho = Vector2(80, 40)
+altura_visual = 64
 cor_base = Color(0.2, 0.24, 0.32, 1)
 cor_topo = Color(0.42, 0.54, 0.68, 1)
 
-[node name="GuilhB" parent="." instance=ExtResource("11_guilh")]
-position = Vector2(1330, 460)
-automatico = true
-periodo = 2.4
-fase = 0.6
-
-[node name="ChaoMeio" parent="." instance=ExtResource("9_pl")]
-position = Vector2(1560, 660)
-tamanho = Vector2(320, 60)
-altura_visual = 100.0
+[node name="Ilha2" parent="." instance=ExtResource("9_pl")]
+position = Vector2(1770, 930)
+tamanho = Vector2(260, 60)
+altura_visual = 96
 cor_base = Color(0.2, 0.24, 0.32, 1)
-cor_topo = Color(0.4, 0.52, 0.66, 1)
+cor_topo = Color(0.42, 0.54, 0.68, 1)
+
+; -- 3. CORRENTE: planar para dentro da coluna, segurar saltar para subir --
+
+[node name="RepousoCorrente" parent="." instance=ExtResource("9_pl")]
+position = Vector2(2230, 820)
+tamanho = Vector2(120, 40)
+altura_visual = 64
+cor_base = Color(0.2, 0.24, 0.32, 1)
+cor_topo = Color(0.42, 0.54, 0.68, 1)
+
+[node name="Ilha3" parent="." instance=ExtResource("9_pl")]
+position = Vector2(2305, 590)
+tamanho = Vector2(270, 60)
+altura_visual = 96
+cor_base = Color(0.2, 0.24, 0.32, 1)
+cor_topo = Color(0.42, 0.54, 0.68, 1)
+
+; ===================  meio  ================================
+
+[node name="IlhaElite" parent="." instance=ExtResource("9_pl")]
+position = Vector2(2720, 640)
+tamanho = Vector2(320, 80)
+altura_visual = 100
+cor_base = Color(0.2, 0.24, 0.32, 1)
+cor_topo = Color(0.42, 0.54, 0.68, 1)
+
+[node name="IlhaMeio" parent="." instance=ExtResource("9_pl")]
+position = Vector2(3100, 640)
+tamanho = Vector2(280, 80)
+altura_visual = 100
+cor_base = Color(0.2, 0.24, 0.32, 1)
+cor_topo = Color(0.42, 0.54, 0.68, 1)
+
+; -- 4. A FAVOR: rajada continua leva o planar sobre o vao grande --
+
+[node name="IlhaVento" parent="." instance=ExtResource("9_pl")]
+position = Vector2(4020, 710)
+tamanho = Vector2(280, 60)
+altura_visual = 96
+cor_base = Color(0.2, 0.24, 0.32, 1)
+cor_topo = Color(0.42, 0.54, 0.68, 1)
+
+; -- 5. CONTRA: rajada pulsada; esperar a pausa (setas apagadas) --
+
+[node name="IlhaContra" parent="." instance=ExtResource("9_pl")]
+position = Vector2(4520, 730)
+tamanho = Vector2(240, 60)
+altura_visual = 96
+cor_base = Color(0.2, 0.24, 0.32, 1)
+cor_topo = Color(0.42, 0.54, 0.68, 1)
+
+; ===================  arena do chefe (preservado)  =========
+
+[node name="ChaoChefe" parent="." instance=ExtResource("9_pl")]
+position = Vector2(5280, 810)
+tamanho = Vector2(560, 100)
+altura_visual = 100
+cor_base = Color(0.2, 0.24, 0.32, 1)
+cor_topo = Color(0.42, 0.54, 0.68, 1)
+
+[node name="MuroFim" parent="." instance=ExtResource("9_pl")]
+position = Vector2(5590, 510)
+tamanho = Vector2(60, 700)
+altura_visual = 100
+cor_base = Color(0.2, 0.24, 0.32, 1)
+cor_topo = Color(0.42, 0.54, 0.68, 1)
+
+; Coluna continua: mais forte do que a gravidade de queda, levanta quem
+; segura saltar; quem sai por baixo/pela direita apanha o RepousoCorrente.
+
+[node name="CorrenteSubida" parent="." instance=ExtResource("15_wind")]
+position = Vector2(2050, 800)
+direcao = Vector2(0, -1)
+intensidade = 2600
+velocidade_max = 340
+tamanho = Vector2(200, 600)
+cor_guia = Color(0.72, 0.92, 1, 0.44)
+
+[node name="CollisionShape2D" parent="CorrenteSubida"]
+shape = SubResource("rs_CorrenteSubida")
+
+; Continua (a leitura de rajada ja' veio do N06); acaba na borda da IlhaVento.
+
+[node name="RajadaFavor" parent="." instance=ExtResource("15_wind")]
+position = Vector2(3570, 550)
+direcao = Vector2(1, 0)
+intensidade = 2000
+velocidade_max = 420
+tamanho = Vector2(620, 340)
+cor_guia = Color(0.68, 0.9, 1, 0.42)
+
+[node name="CollisionShape2D" parent="RajadaFavor"]
+shape = SubResource("rs_RajadaFavor")
+
+; Pulsada: 0,9 s a empurrar para tras, 1,6 s de pausa (setas apagadas);
+; atravessar os 240 px cabe na pausa.
+
+[node name="RajadaContra" parent="." instance=ExtResource("15_wind")]
+position = Vector2(4280, 620)
+direcao = Vector2(-1, 0)
+intensidade = 1600
+velocidade_max = 150
+tamanho = Vector2(240, 280)
+modo = 1
+duracao_pulso = 0.9
+intervalo_pulso = 1.6
+cor_guia = Color(1, 0.82, 0.72, 0.46)
+
+[node name="CollisionShape2D" parent="RajadaContra"]
+shape = SubResource("rs_RajadaContra")
 
 [node name="EliteChort" parent="." instance=ExtResource("2_dem")]
-position = Vector2(1560, 596)
+position = Vector2(2720, 566)
 scale = Vector2(1.4, 1.4)
 elite = true
 especie = "chort"
 vida = 170
 dano_contacto = 24
 comportamento = "carga"
-alcance_patrulha = 110.0
+alcance_patrulha = 90.0
 cor_rim = Color(0.6, 0.7, 1.0, 1)
 
-; -- mini-fork: por CIMA da guilhotina (alto) ou por BAIXO --
-[node name="Alto1" parent="." instance=ExtResource("9_pl")]
-position = Vector2(1780, 560)
-tamanho = Vector2(140, 18)
-altura_visual = 24.0
-cor_base = Color(0.2, 0.24, 0.32, 1)
-cor_topo = Color(0.42, 0.54, 0.68, 1)
-
-[node name="Alto2" parent="." instance=ExtResource("9_pl")]
-position = Vector2(1980, 540)
-tamanho = Vector2(150, 18)
-altura_visual = 24.0
-cor_base = Color(0.2, 0.24, 0.32, 1)
-cor_topo = Color(0.42, 0.54, 0.68, 1)
-
-[node name="Baixo1" parent="." instance=ExtResource("9_pl")]
-position = Vector2(1800, 670)
-tamanho = Vector2(150, 20)
-altura_visual = 30.0
-cor_base = Color(0.2, 0.24, 0.32, 1)
-cor_topo = Color(0.4, 0.52, 0.66, 1)
-
-[node name="GuilhC" parent="." instance=ExtResource("11_guilh")]
-position = Vector2(1900, 490)
-automatico = true
-periodo = 2.2
-fase = 0.3
-
-[node name="SerraBaixo" parent="." instance=ExtResource("13_serra")]
-position = Vector2(2000, 640)
-percurso = Vector2(120, 0)
-tempo = 1.6
-
-[node name="Baixo2" parent="." instance=ExtResource("9_pl")]
-position = Vector2(2010, 660)
-tamanho = Vector2(150, 20)
-altura_visual = 30.0
-cor_base = Color(0.2, 0.24, 0.32, 1)
-cor_topo = Color(0.4, 0.52, 0.66, 1)
-
-; -- reencontro --
-[node name="Reencontro" parent="." instance=ExtResource("9_pl")]
-position = Vector2(2230, 600)
-tamanho = Vector2(200, 24)
-altura_visual = 40.0
-cor_base = Color(0.2, 0.24, 0.32, 1)
-cor_topo = Color(0.42, 0.54, 0.68, 1)
-
 [node name="ColProjetil" parent="." instance=ExtResource("3_col")]
-position = Vector2(2230, 564)
+position = Vector2(3020, 576)
 habilidade_id = "projetil"
 
-[node name="GuilhD" parent="." instance=ExtResource("11_guilh")]
-position = Vector2(2500, 470)
-automatico = true
-periodo = 2.5
-fase = 0.15
-
-[node name="Pre1" parent="." instance=ExtResource("9_pl")]
-position = Vector2(2500, 640)
-tamanho = Vector2(150, 20)
-altura_visual = 30.0
-cor_base = Color(0.2, 0.24, 0.32, 1)
-cor_topo = Color(0.4, 0.52, 0.66, 1)
-
-; ===================  cadafalso do chefe  ===================
-[node name="ChaoChefe" parent="." instance=ExtResource("9_pl")]
-position = Vector2(2900, 680)
-tamanho = Vector2(560, 60)
-altura_visual = 100.0
-cor_base = Color(0.2, 0.24, 0.32, 1)
-cor_topo = Color(0.4, 0.52, 0.66, 1)
-
-[node name="GuilhChefe" parent="." instance=ExtResource("11_guilh")]
-position = Vector2(3000, 500)
-automatico = true
-periodo = 3.0
-fase = 0.5
-
 [node name="Chefe" parent="." instance=ExtResource("6_chefe")]
-position = Vector2(3060, 604)
+position = Vector2(5400, 714)
 
 ; ===================  luzes / checkpoints / porta  =========
+
 [node name="LuzInicio" type="PointLight2D" parent="."]
-position = Vector2(260, 620)
+position = Vector2(260, 590)
 texture = SubResource("tex_luz")
 energy = 0.5
 color = Color(0.55, 0.7, 1.0, 1)
 scale = Vector2(1.9, 1.3)
 
 [node name="LuzMeio" type="PointLight2D" parent="."]
-position = Vector2(1560, 600)
+position = Vector2(3100, 540)
 texture = SubResource("tex_luz")
 energy = 0.5
 color = Color(0.58, 0.72, 1.0, 1)
 scale = Vector2(1.8, 1.3)
 
 [node name="LuzChefe" type="PointLight2D" parent="."]
-position = Vector2(2900, 610)
+position = Vector2(5280, 690)
 texture = SubResource("tex_luz")
 energy = 0.6
 color = Color(0.7, 0.8, 1.0, 1)
@@ -242,7 +278,7 @@ scale = Vector2(2.8, 1.7)
 position = Vector2(150, 600)
 
 [node name="CheckInicio" type="Area2D" parent="."]
-position = Vector2(420, 616)
+position = Vector2(300, 602)
 collision_layer = 16
 collision_mask = 2
 script = ExtResource("5_chk")
@@ -251,7 +287,7 @@ script = ExtResource("5_chk")
 shape = SubResource("rs_chk")
 
 [node name="CheckMeio" type="Area2D" parent="."]
-position = Vector2(1560, 596)
+position = Vector2(3160, 552)
 collision_layer = 16
 collision_mask = 2
 script = ExtResource("5_chk")
@@ -260,7 +296,7 @@ script = ExtResource("5_chk")
 shape = SubResource("rs_chk")
 
 [node name="CheckReencontro" type="Area2D" parent="."]
-position = Vector2(2230, 572)
+position = Vector2(5180, 712)
 collision_layer = 16
 collision_mask = 2
 script = ExtResource("5_chk")
@@ -269,5 +305,5 @@ script = ExtResource("5_chk")
 shape = SubResource("rs_chk")
 
 [node name="Porta" parent="." instance=ExtResource("4_porta")]
-position = Vector2(3180, 606)
+position = Vector2(5530, 716)
 pista_ao_atravessar = ""

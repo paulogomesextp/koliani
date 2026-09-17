@@ -3,8 +3,10 @@ extends SceneTree
 ## nivel sem trancar a Koliani/Porta/Chefe. Uso:
 ##   Godot --headless --script res://tools/verifica_casca.gd
 
+## O N08 (Corredor_das_Execucoes) saiu no Process 11: passou a Ilhas
+## Suspensas, ao céu aberto, sem Casca.
 const NIVEIS := [
-	"Prisao_dos_Condenados", "Fornalha_dos_Pecadores", "Corredor_das_Execucoes",
+	"Prisao_dos_Condenados", "Fornalha_dos_Pecadores",
 	"Ala_dos_Mortos", "A_Cela_Zero", "Cemiterio_dos_Reis", "Galeria_dos_Ossos",
 	"Cripta_das_Mil_Velas", "Templo_da_Serpente", "O_Abismo",
 ]

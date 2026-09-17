@@ -13,7 +13,9 @@ extends SceneTree
 ##   * vao horizontal entre bordas <= 210 px
 ##   * subida <= 118 px (salto + duplo); descer e' livre ate' 520 px
 ##   * NAO se sobe para cima de uma plataforma estando debaixo dela
-## Nao modela plataformas moveis -- e' um crivo de "ilha morta".
+##   * onde a cena tem `ZonaPlanar`/`WindZone` contínua: vãos de planar,
+##     rajada a favor e corrente ascendente (ver `_da_para_saltar`)
+## Nao modela plataformas moveis nem vento pulsado -- e' um crivo de "ilha morta".
 
 const VAO_MAX := 210.0
 const SUBIDA_MAX := 118.0
@@ -112,6 +114,9 @@ static func _medir_arvore(st: SceneTree, raiz: Node) -> Dictionary:
 	if i_spawn < 0 or i_porta < 0:
 		return {"erro": "spawn ou porta sem plataforma por baixo"}
 
+	# --- ar: planar contextual e vento (Região II, Process 11) ---
+	var ar := _recolher_ar(raiz)
+
 	# --- grafo de alcance ---
 	var n := plats.size()
 	var adj: Array = []
@@ -121,7 +126,7 @@ static func _medir_arvore(st: SceneTree, raiz: Node) -> Dictionary:
 		for j in n:
 			if i == j:
 				continue
-			if _da_para_saltar(plats[i], plats[j]):
+			if _da_para_saltar(plats[i], plats[j], ar):
 				adj[i].append(j)
 
 	# BFS do spawn
@@ -200,7 +205,110 @@ static func _plat_mais_perto(plats: Array, pos: Vector2) -> int:
 	return melhor
 
 
-static func _da_para_saltar(a: Dictionary, b: Dictionary) -> bool:
+## PLANAR e VENTO (Process 11, N08). Regras conservadoras medidas com a
+## Koliani real (`tools/verifica_rota_n08.gd`) e só ativas onde a cena tem
+## `ZonaPlanar` / `WindZone`; sem elas o crivo é exatamente o de antes.
+##   * planar: para uma plataforma ao mesmo nível ou abaixo, o vão cresce com
+##     a descida. Medido: planar + duplo cobre 356 px a 0 de descida e 480 px
+##     a 100; aqui usa-se 300 + descida, com teto 700.
+##   * rajada a favor CONTÍNUA sobre o vão (com planar): +metade do troço
+##     coberto, escalado pela intensidade (medido: 640 px com 620 de rajada
+##     2000 passam com folga).
+##   * corrente ascendente CONTÍNUA mais forte do que a queda: de uma
+##     plataforma encostada à coluna (vão <= VAO_MAX) e não acima do topo
+##     dela, chega-se a outra encostada (vão <= VAO_CORRENTE) cujo topo não
+##     fique mais de `SOBE_ALEM_CORRENTE` acima do topo da coluna.
+## Pulsos não contam: uma rajada que pode estar desligada não é caminho.
+const VAO_PLANAR := 300.0
+const VAO_PLANAR_TETO := 700.0
+const VAO_CORRENTE := 150.0
+const SOBE_ALEM_CORRENTE := 60.0
+const QUEDA_REF := 1400.0 * 1.22   # Movimento.GRAVIDADE * GRAVIDADE_QUEDA
+
+
+static func _recolher_ar(raiz: Node) -> Dictionary:
+	var planar: Array[Rect2] = []
+	var favor: Array[Dictionary] = []
+	var sobe: Array[Rect2] = []
+	var pilha: Array[Node] = [raiz]
+	while not pilha.is_empty():
+		var no: Node = pilha.pop_back()
+		pilha.append_array(no.get_children())
+		if no.is_in_group("zonas_planar") and bool(no.get("ativa")):
+			var tp: Vector2 = no.get("tamanho")
+			planar.append(Rect2((no as Node2D).global_position - tp * 0.5, tp))
+		elif no.is_in_group("zonas_vento") and bool(no.get("ativa")) and int(no.get("modo")) == 0:
+			var tv: Vector2 = no.get("tamanho")
+			var ret := Rect2((no as Node2D).global_position - tv * 0.5, tv)
+			var d: Vector2 = (no.get("direcao") as Vector2).normalized()
+			var inten := float(no.get("intensidade"))
+			if d.y < -0.5 and inten > QUEDA_REF:
+				sobe.append(ret)
+			elif absf(d.x) > 0.5:
+				favor.append({"ret": ret, "sentido": signf(d.x), "intensidade": inten})
+	return {"planar": planar, "favor": favor, "sobe": sobe}
+
+
+static func _em_zona(zonas: Array, p: Vector2) -> bool:
+	for r: Rect2 in zonas:
+		if r.has_point(p):
+			return true
+	return false
+
+
+static func _vao_entre(e0: float, d0: float, e1: float, d1: float) -> float:
+	if e1 > d0:
+		return e1 - d0
+	if e0 > d1:
+		return e0 - d1
+	return 0.0
+
+
+static func _da_para_saltar(a: Dictionary, b: Dictionary, ar: Dictionary = {}) -> bool:
+	if _da_para_saltar_a_pe(a, b):
+		return true
+	if ar.is_empty():
+		return false
+	var a_topo := float(a.topo)
+	var b_topo := float(b.topo)
+	# corrente ascendente
+	for col: Rect2 in ar.get("sobe", []):
+		if _vao_entre(float(a.esq), float(a.dir), col.position.x, col.end.x) > VAO_MAX:
+			continue
+		if a_topo < col.position.y or a_topo > col.end.y + SUBIDA_MAX:
+			continue
+		if _vao_entre(float(b.esq), float(b.dir), col.position.x, col.end.x) > VAO_CORRENTE:
+			continue
+		if b_topo < col.position.y - SOBE_ALEM_CORRENTE:
+			continue
+		return true
+	# planar (só para o mesmo nível ou abaixo)
+	var queda := b_topo - a_topo
+	if queda < 0.0:
+		return false
+	var para_direita := float(b.esq) > float(a.dir)
+	var borda_a := float(a.dir) if para_direita else float(a.esq)
+	var borda_b := float(b.esq) if para_direita else float(b.dir)
+	var zonas_planar: Array = ar.get("planar", [])
+	if not _em_zona(zonas_planar, Vector2(borda_a, a_topo - 30.0)) \
+			or not _em_zona(zonas_planar, Vector2(float(b.cx), b_topo - 30.0)):
+		return false
+	var vao := _vao_entre(float(a.esq), float(a.dir), float(b.esq), float(b.dir))
+	var limite := minf(VAO_PLANAR + queda, VAO_PLANAR_TETO)
+	var sentido := 1.0 if para_direita else -1.0
+	var x0 := minf(borda_a, borda_b)
+	var x1 := maxf(borda_a, borda_b)
+	for f: Dictionary in ar.get("favor", []):
+		var r: Rect2 = f["ret"]
+		var banda := a_topo - 60.0
+		if float(f["sentido"]) != sentido or banda < r.position.y or banda > r.end.y:
+			continue
+		var cobre := maxf(0.0, minf(x1, r.end.x) - maxf(x0, r.position.x))
+		limite += cobre * 0.5 * clampf(float(f["intensidade"]) / 1600.0, 0.0, 1.0)
+	return vao <= limite
+
+
+static func _da_para_saltar_a_pe(a: Dictionary, b: Dictionary) -> bool:
 	var a_esq := float(a.esq)
 	var a_dir := float(a.dir)
 	var a_topo := float(a.topo)

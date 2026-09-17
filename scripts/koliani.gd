@@ -392,6 +392,17 @@ var _vento_alvo := 0.0
 ## um booleano global que possa ficar preso.
 var _ventos_externos: Dictionary = {}
 const VENTO_EXTERNO_TTL := 0.12
+## PLANAR CONTEXTUAL (Região II / N08, Ilhas Suspensas). Não é a habilidade
+## permanente "planar" (essa só abre no N63): é concedido por uma
+## `ZonaPlanar` enquanto a Koliani lá está. Mesmo contrato do vento -- uma
+## entrada por zona, renovada por frame, com TTL de rede para teleporte,
+## queue_free ou sinal de saída perdido. Nada disto é gravado no save.
+var _planar_contextos: Dictionary = {}
+const PLANAR_CONTEXTO_TTL := 0.12
+## Verdadeiro no frame em que o planar está mesmo a segurar a queda (no ar,
+## a descer, botão seguro). Só leitura -- feedback e testes; a física não
+## depende dele.
+var _planando := false
 
 # animação procedural (visual, corre em _process)
 var _mat: ShaderMaterial
@@ -1282,6 +1293,10 @@ func _physics_process(dt: float) -> void:
 	_invulneravel = maxf(0.0, _invulneravel - dt)
 	_impulso_externo_t = maxf(0.0, _impulso_externo_t - dt)
 	_hurt_t = maxf(0.0, _hurt_t - dt)
+	# planar é estado de UM frame: só volta a verdadeiro no ramo do movimento
+	# normal (dash, rolamento, escudo, gancho e voo nunca planam)
+	_planando = false
+	_descartar_planar_invalido(dt)
 	_tick_estados(dt)
 	_aterrar_t = maxf(0.0, _aterrar_t - dt)
 	# aterragem: só depois de ter estado mesmo no ar
@@ -1528,17 +1543,22 @@ func _physics_process(dt: float) -> void:
 	else:
 		var saltos_max := 2 if EstadoJogo.tem_habilidade("salto_duplo") else 1
 		var saltos_antes := _mov.saltos_dados
+		# PLANAR: habilidade permanente (N63) OU uma `ZonaPlanar` (N08), e
+		# só a segurar o botão. Durante o atordoamento do dano fica suspenso
+		# (o golpe lê-se como queda a sério). O `Movimento` é que decide se
+		# ela já está a cair -- planar nunca acrescenta subida.
+		var planar_pedido := Input.is_action_pressed("saltar") \
+			and pode_planar() and _hurt_t <= 0.0
 		_mov = Movimento.passo(
 			_mov, dir,
 			Input.is_action_just_pressed("saltar"),
 			Input.is_action_pressed("saltar") or _impulso_externo_t > 0.0,
 			is_on_floor(), dt, saltos_max, _grav_escala, _acel_escala,
-			# PLANAR (nível 63): só com a habilidade, e só a segurar o
-			# botão. O `Movimento` e' que decide se ela ja' esta' a cair.
-			Input.is_action_pressed("saltar")
-				and EstadoJogo.tem_habilidade("planar"),
+			planar_pedido,
 			_sinal_grav,
 		)
+		_planando = planar_pedido and not is_on_floor() \
+			and _mov.velocidade.y * _sinal_grav > 0.0
 		velocity = _mov.velocidade
 		if _mov.saltos_dados > saltos_antes:
 			Som.toca("salto_duplo" if _mov.saltos_dados >= 2 else "salto", -10.0)
@@ -2589,6 +2609,57 @@ func _descartar_ventos_invalidos(dt: float) -> void:
 			_ventos_externos[id] = entrada
 
 
+## Regista ou renova o planar concedido por uma zona concreta (`ZonaPlanar`).
+func atualizar_planar_contextual(fonte: Object,
+		duracao := PLANAR_CONTEXTO_TTL) -> void:
+	if fonte == null:
+		return
+	_planar_contextos[fonte.get_instance_id()] = {
+		"fonte": weakref(fonte),
+		"restante": maxf(duracao, 0.0),
+	}
+
+
+func remover_planar_contextual(fonte: Object) -> void:
+	if fonte != null:
+		_planar_contextos.erase(fonte.get_instance_id())
+
+
+func limpar_planar_contextual() -> void:
+	_planar_contextos.clear()
+	_planando = false
+
+
+func quantidade_planar_contextual() -> int:
+	_descartar_planar_invalido(0.0)
+	return _planar_contextos.size()
+
+
+## Pode planar AGORA? Habilidade permanente ou contexto de zona. Uma
+## `ZonaSemPoder` que suspenda "planar" desliga as duas fontes.
+func pode_planar() -> bool:
+	if EstadoJogo.tem_habilidade("planar"):
+		return true
+	if "planar" in EstadoJogo.habilidades_suspensas:
+		return false
+	return quantidade_planar_contextual() > 0
+
+
+func esta_a_planar() -> bool:
+	return _planando
+
+
+func _descartar_planar_invalido(dt: float) -> void:
+	for id in _planar_contextos.keys():
+		var entrada: Dictionary = _planar_contextos[id]
+		var fonte_fraca: WeakRef = entrada["fonte"]
+		entrada["restante"] = float(entrada["restante"]) - dt
+		if fonte_fraca.get_ref() == null or float(entrada["restante"]) <= 0.0:
+			_planar_contextos.erase(id)
+		else:
+			_planar_contextos[id] = entrada
+
+
 func receber_dano(quantidade: int, dir_empurrao: float = 0.0) -> void:
 	if _invulneravel > 0.0:
 		return
@@ -2664,6 +2735,8 @@ func recuperar_no_checkpoint(posicao_segura: Vector2) -> void:
 	velocity = Vector2.ZERO
 	_mov.velocidade = Vector2.ZERO
 	limpar_ventos()
+	# a zona que contenha a fogueira volta a conceder no frame seguinte
+	limpar_planar_contextual()
 	_desencravar()
 	_pos_inicial = global_position
 

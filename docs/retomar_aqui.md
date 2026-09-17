@@ -1,3 +1,32 @@
+## Process 11 — N08 Ilhas Suspensas + planar contextual, PARTIAL (17 set 2026)
+
+- Worktree `C:/Projetos/koliani-region02-n08`, branch
+  `claude/region02-n08-glide`, base `c41c19ed`
+  (`origin/codex/region02-wind-system`). **Sem commit/push**: o estado é
+  PARTIAL só por falta de playtest humano (regra do briefing).
+- Planar **contextual** (`ZonaPlanar`), não habilidade: a permanente
+  `"planar"` continua a abrir no N63. Mesmo input e física do N63 (segurar
+  saltar, queda presa a 190 px/s, nunca sobe). Suspenso durante o dano;
+  limpo no respawn e ao sair da zona/cena.
+- N08 (`Corredor_das_Execucoes.tscn`, nome/UID mantidos): sala à mão sem
+  jornada, ilhas suspensas, corrente ascendente, rajada a favor contínua e
+  rajada contra pulsada; guilhotinas/serra/quebra/ácido/Casca removidos;
+  spawn, 3 fogueiras, porta, chefe, elite e `projetil` preservados.
+- Provas: suite completa OK (save real intacto), glide A–O no motor, WindZone
+  A–L, Movement+Camera 4A, smoke N08, os 8 verificadores do CI TUDO OK,
+  alcance 100 níveis sem portas inalcançáveis. `tools/verifica_rota_n08.gd`
+  chega à arena com a Koliani real sem Dev, com morte provocada e respawn
+  limpo na fogueira do meio. Contrafactual: sem planar falham 3/9 vãos; o de
+  vento a favor (640 px) só se faz a planar; o dash aéreo encurta 2 vãos.
+- **Defeito anterior descoberto (não corrigido):** todas as `WindZone` de uma
+  cena partilham a mesma forma e colidem com o tamanho da última. N09 tem duas
+  zonas a 300×220 em vez de 680×240/650×270. No N08 cada zona tem forma
+  própria. Correção = lote próprio + novo playtest de N06/N07/N09.
+- Falta: HUMAN PLAYTEST (checklist em
+  `docs/implementation/region_02_n08_glide.md`) e DEVICE VALIDATION. Depois,
+  commit `feat: add n08 suspended islands and glide` + push. Não iniciar o
+  Process 12.
+
 ## Process 10B — fecho por playtest humano, PASS (16 set 2026)
 
 - Precheck confirmado em `codex/region02-wind-system`: alterações do Process

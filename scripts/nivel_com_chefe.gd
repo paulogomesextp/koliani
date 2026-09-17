@@ -57,6 +57,12 @@ const DIST_MAX_ANTES_CHEFE := 260.0
 ## roxas/azuis e é o contraste quente/frio que faz a luz ler-se.
 @export var cor_candeeiro := Color(1.0, 0.76, 0.45)
 
+## Mecânica explicada por este nível quando a sala feita à mão ensina outra
+## coisa que não a estreia da jornada (`GERADOR.estreia_do_nivel`). Vazio =
+## usa a da jornada. Ex.: o N08 (Ilhas Suspensas) sem jornada ensina o
+## planar contextual com o texto "asas".
+@export var mecanica_anunciada := ""
+
 ## Entrada "fresca" no nível (não é um respawn num checkpoint a meio). É
 ## capturado em `_enter_tree`, ANTES de a Koliani correr o seu `_ready` (que
 ## define um checkpoint implícito no ponto de spawn) -- só assim se
@@ -143,7 +149,8 @@ func _anunciar_mecanica() -> void:
 	# aparecia logo à entrada, que é o que isto vem corrigir
 	if _gerador:
 		_tut_x = float(_gerador.get("estreia_x"))
-	var cam := GERADOR.estreia_do_nivel(EstadoJogo.indice_nivel)
+	var cam := mecanica_anunciada if mecanica_anunciada != "" \
+		else GERADOR.estreia_do_nivel(EstadoJogo.indice_nivel)
 	if cam == "" or EstadoJogo.mecanicas_explicadas.has(cam):
 		return
 	_tut_cam = cam
