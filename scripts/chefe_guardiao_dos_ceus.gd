@@ -219,7 +219,7 @@ func _physics_process(dt: float) -> void:
 			if _t >= _tel():
 				_piscar(false)
 				atacar_anim()
-				var de := global_position + Vector2(0, -8)
+				var de := _origem_asa()
 				var base := _dir_para(de)
 				if _fase2:
 					for a in [-0.26, 0.0, 0.26]:
@@ -348,6 +348,29 @@ func _seguir_koliani(dt: float) -> void:
 
 ## --- ataques ----------------------------------------------------------
 
+## Contrato visual (L7): as PENAS CORTANTES nascem da ASA. Com o rig
+## canónico o Guardião mede 160 px de alto e a linha das asas fica bem
+## acima da origem -- a lâmina a sair do umbigo do chefe lia-se mal. Sai
+## do ombro da asa da frente, não da ponta dela: uma lâmina nascida 90 px
+## à frente do corpo podia aparecer já do outro lado da Koliani.
+func _origem_asa() -> Vector2:
+	return global_position + Vector2(26.0 * _direcao, -64.0)
+
+
+## O corvídeo não cabe no tecto comum dos chefes (`LARGURA_ALVO_CHEFE`
+## = 110), que existe para impedir que um rig largo seja esticado. Aqui a
+## largura É a silhueta: uma ave de asas abertas estreitada deixa de se
+## ler como ave. Medido no rig: 304x150 -> a 160 de alto fica com 324 de
+## largo, ou seja ~2,5x a altura da Koliani, dentro do contrato (2,6x
+## +-10%). Só o VISUAL cresce -- a colisão continua 40x88.
+func _altura_alvo() -> float:
+	return 160.0
+
+
+func _largura_alvo() -> float:
+	return 340.0
+
+
 func _dir_para(de: Vector2) -> Vector2:
 	var k := _obter_koliani()
 	if k == null:
@@ -441,7 +464,10 @@ func _impacto() -> void:
 			k.receber_dano(int(round(dano_queda * (1.1 if _fase2 else 1.0))),
 				signf(d.x) if not is_zero_approx(d.x) else _direcao)
 	var p := CPUParticles2D.new()
-	p.global_position = global_position + Vector2(0, 6)
+	# contrato visual (L7): o ponto de chão do Guardião são as GARRAS --
+	# a base da caixa de colisão (40x88 centrada na origem), não o meio
+	# do corpo. O pó da picada tem de sair de onde ele bate.
+	p.global_position = global_position + Vector2(0, 44)
 	p.emitting = true
 	p.one_shot = true
 	p.explosiveness = 1.0

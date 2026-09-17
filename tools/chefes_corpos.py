@@ -22,8 +22,9 @@ from __future__ import annotations
 
 import math
 
-from chefes_desenho import (CENTRO_X, CHAO_Y, Cor, Peca, caixa, elipse,
-                            escurecer, membro, trapezio)
+from chefes_desenho import (CENTRO_X, CHAO_Y, Cor, Peca, caixa, clarear,
+                            elipse, escurecer, espelhar_x, membro, mover,
+                            rodar, trapezio)
 
 Juntas = dict[str, tuple[str | None, tuple[float, float]]]
 
@@ -316,6 +317,239 @@ def _asa(comp: float, esp: float) -> list[tuple[float, float]]:
             (-comp * 0.5, esp * 0.2), (2.0, esp * 0.3)]
 
 
+# ── ave (corvideo colossal: o Guardiao dos Ceus) ─────────────────
+
+## Usa os MESMOS nomes de junta do plano `alado`, de proposito: assim
+## reaproveita o gait dele (as asas batem sempre, a cauda arrasta, o
+## pescoco recolhe antes do golpe) sem duplicar animacao. O que muda e' o
+## DESENHO -- um corvideo nao tem asa de membrana nem pescoco de dragao:
+## tem penas sobrepostas, cauda em leque, bico curvo e garras.
+## Contrato visual: docs/art_direction/regions/region_02/
+## GUARDIAO_DOS_CEUS_VISUAL_CONTRACT.md
+
+## Angulo a que a asa LEVANTA. Usado em dois sitios que tem de concordar:
+## a rotacao do desenho e a posicao da junta da 2.a metade da asa. Quando
+## so' o desenho rodava, a ponta da asa descolava do ombro e ficava um
+## naco de penas a flutuar ao lado do bicho.
+ARCO_ASA = -36.0
+
+AVE = {
+    "voo": 52.0, "corpo_c": 30.0, "corpo_a": 34.0,
+    "pescoco": 10.0, "cabeca": 9.5,
+    "asa1": 40.0, "asa2": 36.0, "asa_esp": 18.0,
+    "cauda": 22.0, "perna": 16.0,
+    "penas": 5,
+}
+
+
+def ave(par: dict, pal: dict) -> tuple[Juntas, list[Peca]]:
+    """Corvideo colossal em TRES QUARTOS -- nao de perfil.
+
+    A prancha aprovada desenha o Guardiao de frente/tres quartos, com as
+    DUAS asas abertas (`IDLE (ASA ABERTA)`, `ANDAR / AJUSTE`). De perfil
+    estrito, com as duas asas varridas para tras, a silhueta lia-se como
+    um galinaceo deitado -- tentou-se e nao passava. Em tres quartos o
+    corpo fica de pe', a asa de tras abre para -x, a da frente para +x, e
+    a cabeca fica de perfil com o bico para o lado que o chefe encara --
+    por isso o `scale.x = +-1` do jogo continua a servir.
+
+    Juntas com os mesmos nomes do plano `alado`, para reusar o gait dele.
+    """
+    p = dict(AVE)
+    p.update(par)
+    juntas: Juntas = {
+        "raiz": (None, (CENTRO_X, CHAO_Y - p["voo"])),
+        "corpo": ("raiz", (0.0, 0.0)),
+        "pescoco": ("corpo", (p["corpo_c"] * 0.3, -p["corpo_a"] * 0.44)),
+        "cabeca": ("pescoco", (p["pescoco"] * 0.42, -p["pescoco"] * 0.9)),
+        # asa de TRAS: ombro de la', abre para -x
+        "asa_t1": ("corpo", (-p["corpo_c"] * 0.3, -p["corpo_a"] * 0.34)),
+        "asa_t2": ("asa_t1", _ponta_asa(p["asa1"] * 0.86, False)),
+        # asa da FRENTE: ombro de ca', abre para +x (espelhada)
+        "asa_f1": ("corpo", (p["corpo_c"] * 0.26, -p["corpo_a"] * 0.28)),
+        "asa_f2": ("asa_f1", _ponta_asa(p["asa1"] * 0.86, True)),
+        "cauda1": ("corpo", (-p["corpo_c"] * 0.2, p["corpo_a"] * 0.42)),
+        "cauda2": ("cauda1", (-p["cauda"] * 0.72, p["cauda"] * 0.2)),
+        "perna_t": ("corpo", (-p["corpo_c"] * 0.24, p["corpo_a"] * 0.38)),
+        "perna_f": ("corpo", (p["corpo_c"] * 0.2, p["corpo_a"] * 0.4)),
+    }
+
+    c, c2 = pal["corpo"], pal["corpo2"]
+    asa = pal.get("asa", c2)
+    ponta = pal.get("ponta", pal["detalhe"])
+    ouro = pal.get("ouro", pal["metal"])
+    n = int(p["penas"])
+
+    pes: list[Peca] = []
+
+    # asa de tras (mais escura; fica atras do corpo)
+    _asa_de_penas(pes, "asa_t1", p["asa1"], p["asa_esp"], n,
+                  _atras(asa), _atras(ponta), -3.2)
+    _asa_de_penas(pes, "asa_t2", p["asa2"], p["asa_esp"] * 0.88, n,
+                  _atras(asa), _atras(ponta), -3.0, remiges=True)
+
+    # cauda, curta e em baixo
+    _leque(pes, "cauda1", p["cauda"], n - 1, escurecer(c2, 0.2), ponta, -2.4)
+
+    # perna de tras
+    pes.append(Peca("perna_t", membro(p["perna"], 7.0), _atras(c2), -1.2,
+                    tag="perna_t"))
+    _garra(pes, "perna_t", p["perna"], _atras(ouro), -1.0)
+
+    # corpo: de pe', peito largo em baixo
+    pes.append(Peca("corpo", elipse(0.0, 0.0, p["corpo_c"] * 0.5,
+                                    p["corpo_a"] * 0.5), c, 0.0, tag="corpo"))
+    pes.append(Peca("corpo", elipse(0.0, p["corpo_a"] * 0.18,
+                                    p["corpo_c"] * 0.38, p["corpo_a"] * 0.3),
+                    clarear(c, 0.1), 0.08))
+    # colar escuro em V, como o dos corvideos
+    pes.append(Peca("corpo", [
+        (-p["corpo_c"] * 0.36, -p["corpo_a"] * 0.34),
+        (p["corpo_c"] * 0.36, -p["corpo_a"] * 0.34),
+        (0.0, p["corpo_a"] * 0.06),
+    ], escurecer(c, 0.24), 0.12))
+    pes.append(Peca("pescoco", trapezio(0.0, 16.0, -p["pescoco"], 12.0), c,
+                    0.5, tag="pescoco"))
+
+    # cabeca de perfil + bico curvo
+    pes.append(Peca("cabeca", elipse(0.6, 0.0, p["cabeca"] * 1.12,
+                                     p["cabeca"] * 0.95), c, 1.0, tag="cabeca"))
+    pes.append(Peca("cabeca", elipse(p["cabeca"] * 0.34, -p["cabeca"] * 0.18,
+                                     p["cabeca"] * 0.7, p["cabeca"] * 0.6),
+                    escurecer(c, 0.3), 1.02))
+    _bico(pes, "cabeca", p["cabeca"], ouro, 1.2)
+
+    # perna da frente
+    pes.append(Peca("perna_f", membro(p["perna"], 7.5), c2, 2.0, tag="perna_f"))
+    _garra(pes, "perna_f", p["perna"], ouro, 2.2)
+
+    # asa da frente, ESPELHADA (abre para +x)
+    _asa_de_penas(pes, "asa_f1", p["asa1"], p["asa_esp"], n, asa, ponta, 3.0,
+                  espelhada=True)
+    _asa_de_penas(pes, "asa_f2", p["asa2"], p["asa_esp"] * 0.88, n, asa,
+                  ponta, 3.2, remiges=True, espelhada=True)
+    return juntas, pes
+
+
+def _asa_de_penas(pes: list[Peca], junta: str, comp: float, esp: float,
+                  n: int, c: Cor, c_ponta: Cor, z: float,
+                  remiges: bool = False, arco: float = ARCO_ASA,
+                  espelhada: bool = False) -> None:
+    """Uma asa, nao um leque.
+
+    A primeira versao punha N penas a irradiar da MESMA junta e lia-se
+    como a cauda de um peru. Uma asa le'-se por uma massa varrida (as
+    coberturas) com as penas de voo a abrir SO' na ponta -- e e' a ponta
+    que leva o carmesim, porque na prancha o vermelho e' acento nas
+    remiges, nunca cor de corpo. `espelhada` da' a asa da FRENTE, que em
+    tres quartos abre para o lado oposto.
+    """
+    def _a(pts):
+        pts = rodar(pts, arco)
+        return espelhar_x(pts) if espelhada else pts
+
+    pes.append(Peca(junta, _a([
+        (3.0, -esp * 0.34), (-comp * 0.42, -esp * 0.86),
+        (-comp * 0.88, -esp * 0.74), (-comp, -esp * 0.18),
+        (-comp * 0.8, esp * 0.36), (-comp * 0.3, esp * 0.5),
+        (3.0, esp * 0.3),
+    ]), c, z))
+    pes.append(Peca(junta, _a([
+        (1.0, -esp * 0.2), (-comp * 0.22, -esp * 0.5),
+        (-comp * 0.36, -esp * 0.3), (-comp * 0.16, -esp * 0.04),
+        (0.0, esp * 0.0),
+    ]), clarear(c, 0.05), z + 0.01))
+    if not remiges:
+        return
+    for k in range(max(2, n)):
+        t = k / float(max(1, n - 1))
+        ang = -22.0 + 52.0 * t
+        comp_p = comp * (0.62 + 0.3 * (1.0 - abs(t - 0.35)))
+        desl = (-comp * 0.78, -esp * 0.34 + esp * 0.5 * t)
+        pes.append(Peca(junta,
+                        _a(mover(rodar(_remige(comp_p, esp * 0.42), ang), *desl)),
+                        escurecer(c, 0.06 * k), z + 0.02 + k * 0.01))
+        if k >= n - 2:
+            pes.append(Peca(junta,
+                            _a(mover(rodar(_ponta_remige(comp_p, esp * 0.42),
+                                           ang), *desl)),
+                            c_ponta, z + 0.03 + k * 0.01))
+
+
+def _ponta_asa(comp: float, espelhada: bool) -> tuple[float, float]:
+    """Onde acaba a 1.a metade da asa, JA' com o `ARCO_ASA` aplicado."""
+    a = math.radians(ARCO_ASA)
+    x, y = -comp * math.cos(a), -comp * math.sin(a)
+    return (-x, y) if espelhada else (x, y)
+
+
+def _remige(comp: float, esp: float) -> list[tuple[float, float]]:
+    """Pena de voo inteira: base larga na asa, ponta fina para -x."""
+    return [
+        (1.0, -esp * 0.5), (-comp * 0.6, -esp * 0.42),
+        (-comp, -esp * 0.08), (-comp * 0.94, esp * 0.12),
+        (-comp * 0.5, esp * 0.42), (1.0, esp * 0.5),
+    ]
+
+
+def _ponta_remige(comp: float, esp: float) -> list[tuple[float, float]]:
+    """So' o terco da ponta -- o acento carmesim da prancha."""
+    return [
+        (-comp * 0.66, -esp * 0.4), (-comp, -esp * 0.08),
+        (-comp * 0.94, esp * 0.12), (-comp * 0.56, esp * 0.4),
+    ]
+
+
+def _leque(pes: list[Peca], junta: str, comp: float, n: int, c: Cor,
+           c_ponta: Cor, z: float) -> None:
+    """Cauda: leque ESTREITO e baixo, para nao competir com a asa."""
+    n = max(2, n)
+    for k in range(n):
+        t = k / float(n - 1)
+        ang = -12.0 + 34.0 * t
+        pena = rodar(_remige(comp * (0.84 + 0.16 * (1.0 - abs(t - 0.5) * 2.0)),
+                             6.5), ang)
+        pes.append(Peca(junta, pena, escurecer(c, 0.05 * k), z + k * 0.02))
+        if k >= n - 2:
+            comp_p = comp * (0.84 + 0.16 * (1.0 - abs(t - 0.5) * 2.0))
+            pes.append(Peca(junta, rodar(_ponta_remige(comp_p, 6.5), ang),
+                            c_ponta, z + 0.01 + k * 0.02))
+
+
+def _bico(pes: list[Peca], junta: str, cab: float, ouro: Cor,
+          z: float) -> None:
+    """Bico de RAPINA: curto, fundo na base, com gancho a descer.
+
+    A primeira versao saiu um pau horizontal claro -- lia-se como uma
+    tabua espetada na cara. O que da' a leitura e' o GANCHO e a base
+    funda, nao o comprimento.
+    """
+    pes.append(Peca(junta, [
+        (cab * 0.5, -cab * 0.6), (cab * 1.62, -cab * 0.4),
+        (cab * 2.02, cab * 0.1), (cab * 1.66, cab * 0.82),
+        (cab * 1.36, cab * 0.2), (cab * 0.56, cab * 0.28),
+    ], ouro, z))
+    # narina + sombra da mandibula de baixo
+    pes.append(Peca(junta, [
+        (cab * 0.58, cab * 0.16), (cab * 1.44, cab * 0.18),
+        (cab * 1.26, cab * 0.54), (cab * 0.62, cab * 0.48),
+    ], escurecer(ouro, 0.38), z + 0.05))
+    pes.append(Peca(junta, elipse(cab * 0.86, -cab * 0.22, 1.2, 1.0),
+                    escurecer(ouro, 0.5), z + 0.06))
+
+
+def _garra(pes: list[Peca], junta: str, perna: float, ouro: Cor,
+           z: float) -> None:
+    """Tres dedos curvos, dourados, na ponta da perna."""
+    for k, ang in enumerate((-34.0, -4.0, 24.0)):
+        dedo = mover(rodar(membro(8.5, 3.2, 1.0), ang - 90.0), 0.0, perna)
+        pes.append(Peca(junta, dedo, ouro if k == 1 else escurecer(ouro, 0.18),
+                        z + k * 0.01))
+    # esporao virado para tras
+    pes.append(Peca(junta, mover(rodar(membro(5.5, 2.6, 1.0), -118.0),
+                                 0.0, perna), escurecer(ouro, 0.28), z - 0.01))
+
+
 # ── quadrupede ───────────────────────────────────────────────────────────
 
 QUADRUPEDE = {
@@ -419,6 +653,7 @@ CORPOS = {
     "aracnideo": aracnideo,
     "serpente": serpente,
     "alado": alado,
+    "ave": ave,
     "quadrupede": quadrupede,
     "objeto": objeto,
 }

@@ -714,6 +714,43 @@ def _vyrak(juntas: Juntas, pecas: list[Peca], pal: dict) -> None:
     nucleo(pecas, "corpo", -4.0, 0.0, 3.0)
 
 
+def _guardiao_dos_ceus(juntas: Juntas, pecas: list[Peca], pal: dict) -> None:
+    """Regiao II / N10 -- o corvideo colossal da prancha aprovada.
+
+    Contrato: docs/art_direction/regions/region_02/
+    GUARDIAO_DOS_CEUS_VISUAL_CONTRACT.md
+
+    O plano `ave` ja' da' penas, bico e garras. Aqui pendura-se o que e'
+    SO' deste chefe: a crista da coroa, o colar de penas erguidas e --
+    sobretudo -- o NUCLEO, que na prancha e' o proprio OLHO ("OLHO /
+    NUCLEO" no painel DETALHES). Nao e' um diamante no peito: e' a cabeca
+    que brilha, e e' para la' que o jogador olha.
+    """
+    pena, luz = pal["corpo2"], pal["brilho"]
+    ponta = pal["ponta"]
+    # crista: tres penas erguidas na coroa, a do meio carmesim
+    for k, (dx, alt, tinta) in enumerate((
+            (-6.0, 11.0, pena), (-2.0, 14.0, pena), (2.0, 13.0, ponta),
+            (5.5, 9.5, pena))):
+        pecas.append(Peca("cabeca", [
+            (dx - 2.6, -5.0), (dx + 2.0, -5.2),
+            (dx + 1.0 - k * 0.8, -alt), (dx - 3.0, -alt * 0.66),
+        ], tinta, 1.05 + k * 0.01))
+    # colar: penas do pescoco erguidas (o corvo eriça-se antes do grito)
+    for k in range(4):
+        t = k / 3.0
+        pecas.append(Peca("pescoco", [
+            (-7.0 + k * 4.6, 2.0), (-3.6 + k * 4.6, 2.0),
+            (-2.0 + k * 4.6, -7.0 - 3.0 * (1.0 - abs(t - 0.5) * 2.0)),
+            (-8.2 + k * 4.6, -4.0),
+        ], escurecer(pena, 0.12 + 0.05 * k), 0.55))
+    # OLHO = NUCLEO: halo largo e cerne branco, sem contorno (brilho=True)
+    pecas.append(Peca("cabeca", elipse(2.6, -1.6, 4.4, 4.0), luz, 1.35,
+                      brilho=True))
+    pecas.append(Peca("cabeca", elipse(2.6, -1.6, 1.9, 1.7),
+                      clarear(luz, 0.65), 1.4, brilho=True))
+
+
 # -- Regiao IV -- Catacumbas do Abismo ------------------------------------
 
 def _rei_ossario(juntas: Juntas, pecas: list[Peca], pal: dict) -> None:
@@ -986,6 +1023,23 @@ CHEFES: dict[str, dict] = {
                       asa="241d38"),
         "cfg": {"amp": 1.1},
         "extras": _vyrak,
+    },
+    "guardiao_dos_ceus": {
+        # Regiao II / N10 -- corvideo colossal. Paleta amostrada da prancha
+        # aprovada (`boss_pack.png`): penas violeta-indigo, acento carmesim
+        # SO' nas remiges e na cauda, ouro SO' no bico e nas garras,
+        # nucleo violeta na cabeca.
+        "plano": "ave",
+        # tres quartos: corpo de pe' e envergadura ~2,6x a largura do
+        # corpo -- e' o que faz a leitura de AVE GRANDE
+        "par": {"voo": 52.0, "corpo_c": 30.0, "corpo_a": 34.0,
+                "pescoco": 10.0, "cabeca": 9.5, "asa1": 30.0, "asa2": 27.0,
+                "asa_esp": 17.0, "cauda": 22.0, "perna": 16.0, "penas": 5},
+        "pal": paleta("1e1e33", "433d80", "d8d0e6", "904143",
+                      metal="c98f4e", brilho="c68af9",
+                      asa="3a3468", ponta="8e3a3c", ouro="c98f4e"),
+        "cfg": {"amp": 1.15},
+        "extras": _guardiao_dos_ceus,
     },
 
     # -- Regiao IV -- Catacumbas do Abismo --------------------------------

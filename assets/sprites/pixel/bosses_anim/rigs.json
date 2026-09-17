@@ -1016,5 +1016,24 @@
    "hurt": 12.0,
    "death": 10.0
   }
+ },
+ "guardiao_dos_ceus": {
+  "w": 334,
+  "h": 252,
+  "pes_y": 218,
+  "estados": {
+   "idle": 6,
+   "walk": 8,
+   "attack": 10,
+   "hurt": 4,
+   "death": 10
+  },
+  "fps": {
+   "idle": 7.0,
+   "walk": 11.0,
+   "attack": 14.0,
+   "hurt": 12.0,
+   "death": 10.0
+  }
  }
 }

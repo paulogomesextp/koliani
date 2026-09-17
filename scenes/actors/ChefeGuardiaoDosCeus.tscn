@@ -1,11 +1,17 @@
 [gd_scene load_steps=6 format=3 uid="uid://bkolianichefeguardiaoceus10"]
 
-; Região II / nível 10 -- GUARDIÃO DOS CÉUS (Process 12). Substitui o
-; ChefePrimeiroPrisioneiro como confronto regional. A silhueta vem do rig
-; animado `bosses_anim/monge_celeste` (o `ChefeBase._montar_rig` enche o nó
-; `Anim` e esconde o `Corpo`); a folha estática por baixo é só rede de
-; segurança. ARTE FINAL PENDENTE -- Process 13 faz o passe canónico da
-; Região II. Script: chefe_guardiao_dos_ceus.gd.
+; Região II / nível 10 -- GUARDIÃO DOS CÉUS. Confronto regional canónico.
+; ARTE CANÓNICA (Super-Process A): rig `bosses_anim/guardiao_dos_ceus`,
+; desenhado por `tools/gerar_chefes_anim.py` a partir da prancha aprovada
+; `docs/art_direction/regions/region_02/boss_pack.png`. Contrato em
+; `docs/art_direction/regions/region_02/GUARDIAO_DOS_CEUS_VISUAL_CONTRACT.md`.
+; O rig anterior (`monge_celeste`) era um humanoide de manto ciano -- nem a
+; espécie nem a paleta batiam certo com o cânone.
+;
+; A COLISÃO NÃO MUDOU: corpo 40x88 e AreaContacto 58x96 são os mesmos da
+; luta aprovada. O corvídeo é MAIS LARGO do que a colisão de propósito --
+; as asas são silhueta, não hitbox (contrato, "Impacto em colisão").
+; Script: chefe_guardiao_dos_ceus.gd.
 
 [ext_resource type="Script" path="res://scripts/chefe_guardiao_dos_ceus.gd" id="1_chefe"]
 [ext_resource type="Texture2D" path="res://assets/sprites/pixel/bosses/boss_61_guarda_nuvens.png" id="2_tex"]
@@ -32,13 +38,17 @@ fill_to = Vector2(1, 0.5)
 collision_layer = 4
 collision_mask = 1
 script = ExtResource("1_chefe")
-rig = "monge_celeste"
-escala_visual = 1.25
+rig = "guardiao_dos_ceus"
+; a altura/largura alvo vêm do script (`_altura_alvo`/`_largura_alvo`):
+; um corvídeo de asas abertas não cabe no tecto de largura comum.
+escala_visual = 1.0
 vida = 540
 dano_contacto = 17
 alcance_patrulha = 0.0
-cor_estilhacos = Color(0.72, 0.88, 1, 1)
-cor_rim = Color(0.66, 0.92, 1, 1)
+; estilhaços e rim na família violeta da prancha (#c68af9), não no
+; ciano do rig antigo
+cor_estilhacos = Color(0.78, 0.54, 0.98, 1)
+cor_rim = Color(0.78, 0.54, 0.98, 1)
 
 [node name="Sprite" type="Node2D" parent="."]
 
@@ -52,35 +62,34 @@ visible = false
 texture_filter = 1
 
 [node name="LuzAsas" type="PointLight2D" parent="Sprite"]
-position = Vector2(0, -12)
+position = Vector2(0, -52)
 texture = SubResource("tex_luz")
 energy = 0.55
-color = Color(0.6, 0.88, 1, 1)
-scale = Vector2(0.9, 0.9)
+color = Color(0.7, 0.5, 0.95, 1)
+scale = Vector2(1.3, 1.3)
 
+; O NÚCLEO É O OLHO. Na prancha o painel DETALHES rotula-o "OLHO /
+; NÚCLEO": não há diamante no peito, há uma cabeça que brilha. O olho
+; está DESENHADO no rig; este nó é só a luz que o faz pulsar quando o
+; chefe fica EXPOSTO -- que é a leitura que o jogador precisa de ter.
+; Medido no rig (escala final 1.067): o olho fica 134 px acima dos pés e
+; 37 px à frente do centro; com os pés na base da colisão (y=+44) dá
+; (37, -90).
 [node name="Nucleo" type="Node2D" parent="Sprite"]
-position = Vector2(0, -16)
+position = Vector2(37, -90)
 scale = Vector2(0.35, 0.35)
 
 [node name="Brilho" type="Sprite2D" parent="Sprite/Nucleo"]
 visible = false
 texture = SubResource("tex_luz")
-modulate = Color(0.72, 0.92, 1, 0.9)
-scale = Vector2(0.32, 0.32)
-
-[node name="Diamante" type="Polygon2D" parent="Sprite/Nucleo"]
-color = Color(0.7, 0.92, 1, 1)
-polygon = PackedVector2Array(-9, 0, 0, -13, 9, 0, 0, 13)
-
-[node name="Cerne" type="Polygon2D" parent="Sprite/Nucleo"]
-color = Color(0.95, 0.99, 1, 1)
-polygon = PackedVector2Array(-3.5, 0, 0, -6, 3.5, 0, 0, 6)
+modulate = Color(0.78, 0.54, 0.98, 0.9)
+scale = Vector2(0.5, 0.5)
 
 [node name="Luz" type="PointLight2D" parent="Sprite/Nucleo"]
 texture = SubResource("tex_luz")
 energy = 0.12
-color = Color(0.7, 0.92, 1, 1)
-scale = Vector2(0.6, 0.6)
+color = Color(0.78, 0.54, 0.98, 1)
+scale = Vector2(0.9, 0.9)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, 0)

@@ -166,3 +166,41 @@ Alteração de colisão autorizada por este contrato: **nenhuma**.
 
 O que **não** muda: `ChefeBase`, vida, fases, timings, máquina de estados,
 arena, `WindZone`, recompensa, porta, morte, save.
+
+---
+
+## Entregue (Super-Process A, Fase B)
+
+Rig `assets/sprites/pixel/bosses_anim/guardiao_dos_ceus/`, desenhado por
+`tools/gerar_chefes_anim.py` (plano de corpo `ave`, novo, em
+`tools/chefes_corpos.py`). Os outros 54 rigs regeneram byte a byte iguais.
+
+| Ponto do contrato | Entregue |
+|---|---|
+| L1 espécie/silhueta | corvídeo em três quartos, duas asas abertas, cabeça de perfil |
+| L2 escala | 324 × 160 px = **2,46 × a Koliani** (contrato: 2,6 ×, ±10% ⇒ 2,34–2,86) |
+| L3 paleta | penas `#1e1e33`/`#433d80`/`#3a3468`, ponta `#8e3a3c`, ouro `#c98f4e`, núcleo `#c68af9` |
+| L4 núcleo = olho | desenhado na cabeça; o nó `Nucleo` da cena é só a luz que pulsa no `EXPOSTO` |
+| L5 estados | `idle` 6 · `walk` 8 · `attack` 10 · `hurt` 4 · `death` 10 |
+| L6 ataques | os três da luta continuam a ser PENAS CORTANTES / CHAMADA DOS VENTOS / MERGULHO |
+| L7 âncoras | lâmina ← ombro da asa (`_origem_asa`, `(26·dir, −64)`); pó da picada ← garras (`(0, +44)`); núcleo ← `(37, −90)` |
+| Colisão | **inalterada** — corpo 40×88, `AreaContacto` 58×96 |
+
+### O que se tentou e não passou
+
+- **Perfil estrito** com as duas asas varridas para trás: lia-se como um
+  galináceo deitado. A prancha desenha o Guardião de frente/três quartos
+  (`IDLE (ASA ABERTA)`, `ANDAR / AJUSTE`) — foi seguir isso que resolveu.
+- **Leque de penas todas presas à mesma junta**: dava uma cauda de peru.
+  Uma asa lê-se por massa varrida + remiges a abrir só na ponta.
+- **Rodar só o desenho da asa** e não a junta da 2.ª metade: a ponta
+  descolava do ombro (`ARCO_ASA` passou a ser usado nos dois sítios).
+- **Mesma rotação de gait nas duas asas**: com a da frente espelhada,
+  batiam em sentidos contrários. O gait `ave` troca o sinal da asa da frente.
+
+### Para o playtest humano
+
+- **Largura**: 324 px são 25% da largura do ecrã (1280). É o que o cânone
+  pede ("a largura não pode ser normalizada pelo tecto comum"), mas é a
+  primeira coisa a julgar a jogar: as asas tapam a Koliani na arena?
+- As asas **não** dão dano (não são hitbox). Isso lê-se ou parece injusto?
