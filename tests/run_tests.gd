@@ -67,6 +67,7 @@ func _correr_tudo() -> void:
 	teste_9f_ui_producao()
 	teste_catalogo_campanha()
 	teste_9h17_contrato_de_mobilidade_regiao1()
+	await teste_gate1_hitstop_nao_gera_nan()
 	await teste_9h17_novo_jogo_desarma_ao_sair()
 	teste_equipamento_dados()
 	teste_equipamento_estado()
@@ -3437,3 +3438,59 @@ func teste_9h17_contrato_de_mobilidade_regiao1() -> void:
 			and g.vao_possivel(88.0, 80.0) < 0.0
 			and g.vao_possivel(120.0, g.SUBIDA_SIMPLES) < 0.0,
 		"9H.17: a tabela da envolvente de salto deixou de bater com a medicao")
+
+
+## GATE 1 -- o NaN do N06 (Super-Process A2, 18 set 2026).
+##
+## Em 3 das 9 runs do bot human-like no N06 a posicao da Koliani foi NaN em
+## pelo menos um frame. A causa NAO era do nivel nem do vento: o `_hitstop`
+## punha `Engine.time_scale = 0.0`, o Godot passa `physics_step * time_scale`
+## ao servidor de fisica, e a integracao de um corpo cinematico
+## (`AnimatableBody2D` com `sync_to_physics`) calcula-lhe a velocidade por
+## `motion / passo`. Parada e com passo zero isso e' 0/0 = NaN; quem estiver
+## EM CIMA le' essa velocidade em `move_and_slide()` e sai de la' com
+## `global_position` a NaN.
+##
+## Este teste monta o caso minimo -- plataforma-corrente + Koliani em cima +
+## a escala de tempo do hitstop -- e falha com o valor antigo (0.0).
+func teste_gate1_hitstop_nao_gera_nan() -> void:
+	_ok(Koliani.HITSTOP_ESCALA_TEMPO > 0.0,
+		"GATE 1: o hitstop nao pode pôr `Engine.time_scale` a zero"
+		+ " (passo de fisica zero -> velocidade cinematica 0/0 = NaN)")
+
+	var raiz := Node2D.new()
+	add_child(raiz)
+	var plat: Node2D = preload("res://scenes/actors/PlataformaCorrente.tscn").instantiate()
+	plat.set("modo", "horizontal")
+	plat.set("amplitude", 90.0)
+	plat.set("periodo", 3.4)
+	plat.set("largura", 120.0)
+	plat.position = Vector2(0.0, 200.0)
+	raiz.add_child(plat)
+	var k: Koliani = preload("res://scenes/actors/Koliani.tscn").instantiate()
+	k.position = Vector2(0.0, 150.0)
+	raiz.add_child(k)
+
+	# deixar assentar em cima da laje antes de mexer no tempo
+	for _i in 40:
+		await get_tree().physics_frame
+	var pousada := k.is_on_floor()
+
+	var antes := Engine.time_scale
+	Engine.time_scale = Koliani.HITSTOP_ESCALA_TEMPO
+	for _i in 8:
+		await get_tree().physics_frame
+	var p := k.global_position
+	var v := k.velocity
+	Engine.time_scale = antes
+
+	_ok(pousada,
+		"GATE 1: a Koliani nao chegou a pousar na plataforma -- o teste nao"
+		+ " esta' a medir o caso que devia")
+	_ok(is_finite(p.x) and is_finite(p.y),
+		"GATE 1: posicao nao-finita depois do hitstop em cima de um"
+		+ " `AnimatableBody2D`: %s" % str(p))
+	_ok(is_finite(v.x) and is_finite(v.y),
+		"GATE 1: velocidade nao-finita depois do hitstop em cima de um"
+		+ " `AnimatableBody2D`: %s" % str(v))
+	raiz.queue_free()

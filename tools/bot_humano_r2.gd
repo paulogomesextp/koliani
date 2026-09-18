@@ -99,6 +99,9 @@ var _superficies: Array = []
 ## se fazem COM o vento, e sem isto o Dijkstra mandava sempre o bot pelo
 ## caminho mais perigoso.
 var _updrafts: Array = []
+## Ultimo estado FINITO da Koliani -- contexto para a armadilha de NaN.
+var _nan_pos_ant := Vector2.ZERO
+var _nan_vel_ant := Vector2.ZERO
 ## Zonas que ESTICAM um vao: planar contextual (N08) e rajadas horizontais.
 ## Sem elas o grafo cortava o salto central do N08 -- 640 px entre a
 ## IlhaMeio e a IlhaVento -- e o bot nem chegava a meio do nivel.
@@ -120,6 +123,7 @@ var M := {
 	"progresso_x": 0.0, "x_max": 0.0, "x_alvo": 0.0,
 	"pontos_de_falha": {}, "mortes_pos": [],     # x arredondado a 100 -> nº de mortes
 	"encravamentos": 0,
+	"nan_frames": 0, "nan_primeiro": null,
 	"chefe_vida_inicial": 0, "chefe_vida_min": 0,
 }
 
@@ -315,6 +319,8 @@ func _soltar_tudo() -> void:
 # --- um passo do piloto -----------------------------------------------------
 func _passo(dt: float) -> void:
 	var pos: Vector2 = _kol.global_position
+	_vigiar_nan(pos)
+	_lembrar_estado_nan(pos)
 	M["x_max"] = maxf(M["x_max"], pos.x)
 	_servir_botoes()
 	_ataque_cd = maxf(0.0, _ataque_cd - dt)
@@ -945,3 +951,44 @@ func _alvo_atual(pos: Vector2) -> Vector2:
 	var wp: Dictionary = _rota[mini(_rota_i, _rota.size() - 1)]
 	return Vector2(clampf(pos.x, float(wp["x0"]) + 22.0, float(wp["x1"]) - 22.0),
 		float(wp["y"]))
+
+
+## Armadilha de NaN (GATE 1). A posicao da Koliani chegou a ser NaN em 3 das
+## 9 runs do N06 e ninguem sabia onde. Isto apanha o PRIMEIRO frame em que
+## aparece e despeja o estado todo -- velocidade, chao, ventos activos e
+## zonas a cobrir a Koliani -- em vez de deixar so' um `null` no JSON.
+func _vigiar_nan(pos: Vector2) -> void:
+	var v: Vector2 = _kol.velocity
+	if not (is_nan(pos.x) or is_nan(pos.y) or is_nan(v.x) or is_nan(v.y)):
+		return
+	M["nan_frames"] = int(M["nan_frames"]) + 1
+	if M["nan_primeiro"] != null:
+		return
+	var ventos := []
+	for w in get_nodes_in_group("zonas_vento"):
+		var c: Vector2 = w.global_position
+		var tam: Vector2 = w.tamanho
+		ventos.append({
+			"nome": String(w.name), "pos": [c.x, c.y], "tam": [tam.x, tam.y],
+			"dir": [w.direcao.x, w.direcao.y], "mult": w.multiplicador_atual(),
+			"cobre": absf(c.x - pos.x) < tam.x * 0.5 + 40.0 \
+				and absf(c.y - pos.y) < tam.y * 0.5 + 40.0,
+		})
+	var d := {
+		"t": _t, "pos": [pos.x, pos.y], "vel": [v.x, v.y],
+		"anterior_pos": [_nan_pos_ant.x, _nan_pos_ant.y],
+		"anterior_vel": [_nan_vel_ant.x, _nan_vel_ant.y],
+		"no_chao": _kol.is_on_floor(), "na_parede": _kol.is_on_wall(),
+		"ventos_activos": _kol.quantidade_ventos_ativos(),
+		"vento_resultante": [_kol.aceleracao_vento_resultante().x,
+			_kol.aceleracao_vento_resultante().y],
+		"zonas": ventos,
+	}
+	M["nan_primeiro"] = d
+	printerr("[NAN] ", JSON.stringify(d))
+
+
+func _lembrar_estado_nan(pos: Vector2) -> void:
+	if not (is_nan(pos.x) or is_nan(pos.y)):
+		_nan_pos_ant = pos
+		_nan_vel_ant = _kol.velocity

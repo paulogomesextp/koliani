@@ -93,8 +93,8 @@ const ATAQUE_ATIVO_FIM := [0.68, 0.7, 0.74, 0.72]
 ## PESO DO IMPACTO -- reafinado a 4 set 2026.
 ##
 ## O Paulo: "quando a Koliani ataca com espada o ecra treme e gera frame
-## drop". Nao era impressao. O `_hitstop` poe `Engine.time_scale = 0.0`,
-## ou seja PARA o jogo: cada acerto parava 50 ms (crit 110 ms), o remate
+## drop". Nao era impressao. O `_hitstop` punha `Engine.time_scale` a
+## zero, ou seja PARAVA o jogo: cada acerto parava 50 ms (crit 110 ms), o remate
 ## do combo parava mais 50 ms **no balanco**, e o proprio `_flash_golpe`
 ## ja' abanava a camara 1,8 px sem sequer acertar em nada. Num combo de
 ## quatro acertos dava ~340 ms de jogo parado dentro de 1,5 s -- 23% do
@@ -126,6 +126,28 @@ const HITSTOP_REMATE := 0.018      # 3.o golpe do combo -- ~3 frames
 const HITSTOP_CRIT := 0.024        # ~4 frames, so' em critico
 const HITSTOP_PISAO := 0.014       # ~2,3 frames
 const HITSTOP_DANO := 0.020        # ~3,3 frames -- levar dano ja' tem tremor
+## A escala de tempo do hitstop. NAO E' ZERO, e o motivo nao e' estetico.
+##
+## Ate' 18 set 2026 isto era `Engine.time_scale = 0.0`. Com o tempo a zero o
+## Godot chama `PhysicsServer2D.step(physics_step * time_scale)` com passo
+## ZERO, e a integracao de um corpo cinematico (`AnimatableBody2D` com
+## `sync_to_physics`) calcula a velocidade dele por
+## `linear_velocity = motion / passo`. Parado e com passo zero isso e'
+## 0/0 = **NaN**. A Koliani em cima da plataforma le' essa velocidade em
+## `move_and_slide()` (velocidade da plataforma), e sai de la' com
+## `global_position` e `velocity` a NaN -- ela desaparece do nivel.
+##
+## Foi assim que o NaN do N06 aconteceu: a `CorrenteC` (horizontal, x=1970)
+## tem um `chort` a 110 px, e bastava um acerto com a Koliani em cima da
+## laje. Nas 9 runs do bot deu em 3 -- e o mesmo valia para as outras oito
+## plataformas `AnimatableBody2D` do jogo (elevadores, roda, parede movel,
+## raiz elevatoria...), portanto isto NAO era um defeito da Regiao II.
+##
+## 0,0005 congela o jogo na pratica (uma paragem de 24 ms deixa passar
+## 0,012 ms de jogo) e mantem o passo de fisica diferente de zero, que e' o
+## que a divisao precisa. O `Engine.time_scale < 0.5` que marca "estou em
+## hitstop" continua a dar verdadeiro.
+const HITSTOP_ESCALA_TEMPO := 0.0005
 const TREMOR_GOLPE := 2.0
 const TREMOR_REMATE := 3.2
 const TREMOR_CRIT := 4.5
@@ -2070,10 +2092,12 @@ func _abanar(forca: float) -> void:
 
 
 ## Pequena paragem de tempo real ("hitstop") para dar peso ao impacto.
+##
+## Nao poe o tempo a ZERO -- ver `HITSTOP_ESCALA_TEMPO`.
 func _hitstop(segundos: float) -> void:
 	if Engine.time_scale < 0.5:
 		return
-	Engine.time_scale = 0.0
+	Engine.time_scale = HITSTOP_ESCALA_TEMPO
 	# NÃO usar `await` aqui: se a Koliani for libertada (reload de cena) a
 	# meio, a corrotina morre e o time_scale ficava preso em 0 = freeze.
 	# O timer vive na árvore e o Callable não segura `self`.
