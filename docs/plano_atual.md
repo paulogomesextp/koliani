@@ -1,3 +1,25 @@
+## Super-Process A2 — remediação de fidelidade da Região II (18 set 2026)
+
+**Estado: PARCIAL — parou por limite de uso a meio.**
+Branch `claude/region02-fidelity-remediation` @ `206519a2`.
+Relatório: `docs/implementation/region_02_fidelity_remediation.md`.
+
+| Fase | Estado |
+|---|---|
+| GATE 1 — NaN do N06 | **FEITO e provado** (`84b409e9`) |
+| GATE 2 — pico de mortes do N10 | **FEITO e medido** (`5187b52c`) |
+| Fase 3 — inimigos canónicos + guardiões N06-N09 | por começar |
+| Fase 4 — ambiente N06-N10 | por começar |
+| Fase 5 — Guardião dos Céus + arena do N10 | por começar |
+| Fase 6 — re-audit visual | por começar |
+| Fase 7 — re-run do bot (mín. 30 runs) | por começar |
+| Fase 8 — revisão no Godot real | por começar |
+| Fase 9 — build Windows + launchers | por começar |
+
+**Região III: não.** Continua fora de âmbito.
+
+---
+
 ## Super-Process A — encontros intermédios da Região II (18 set 2026)
 
 - Objetivo: fechar a **única** contradição canónica que sobrava na Região
