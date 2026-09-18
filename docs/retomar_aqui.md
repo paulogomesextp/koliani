@@ -1,3 +1,82 @@
+## Playtest human-like por bot + audit de fidelidade da Região II (18 set 2026)
+
+- Branch `claude/region02-humanlike-bot-playtest`, a partir de
+  `claude/region02-completion-pass` @ `53f4d448`. **NADA de jogo mudou**:
+  nem cenas, nem chefes, nem assets, nem física, nem balanceamento.
+  Relatório: [`docs/playtests/region_02_bot_humanlike_playtest.md`](playtests/region_02_bot_humanlike_playtest.md).
+  Dados: `region_02_bot_humanlike_data.json`. Provas (45 fotografias reais do
+  jogo + fichas de comparação): `docs/playtests/region_02_visual_evidence/`.
+
+- **Método que não existia e agora existe.** `tools/bot_humano_r2.gd` é um
+  piloto human-like (3 perfis de reacção, hesitação, erro de temporização,
+  saltos curtos, dashes desperdiçados) que navega por um grafo das
+  superfícies do nível. `tools/shot_r2.gd` fotografa por X/Y **ou por FASE
+  nomeada da máquina de estados do chefe**. `tools/recon_r2.gd` inventaria o
+  nível JÁ CONSTRUÍDO — sem isto não se sabe nada dos níveis com jornada
+  procedural, porque ler o `.tscn` só mostra a sala final.
+  `tools/correr_bot_r2.sh` corre 54 runs (6 níveis x 3 perfis x 3 seeds).
+  Correm em Linux/headless com `--fixed-fps 60` a ~16x tempo real; as fotos
+  precisam de Xvfb + OpenGL3 (llvmpipe).
+
+- **As duas perguntas em aberto do contrato do Guardião têm resposta.**
+  (1) As asas **não** tapam a Koliani na arena — mas por má razão: elas ficam
+  coladas ao corpo, portanto os 235 px não custam jogabilidade **e também não
+  fazem o trabalho de silhueta para que existem**. (2) As asas não darem dano
+  **lê-se bem**: o chefe paira acima da cabeça dela e as asas nunca chegam ao
+  chão onde ela está.
+
+- **O que o audit prova, com números.** A escala do Guardião CUMPRE o contrato
+  (2,46x altura, 3,6x largura). O que não cumpre é a silhueta: as asas estão
+  espalmadas, e só o `walk` as levanta num V raso. O projéctil das PENAS
+  CORTANTES é `Color(0.72,0.92,1.0)` = **#B8EBFF** — a paleta ciano que L3 do
+  contrato **proíbe explicitamente** (`chefe_guardiao_dos_ceus.gd:399`).
+  Censo de inimigos medido em jogo: **0 dos 10 canónicos** em N06-N10 (são
+  esqueleto/chort/orc/imp/mastim/goblin; `ESP_REGIAO[1]` ainda diz
+  `# II Prisão`). O mar de nuvens **está lá** e chega ao ecrã com **10-24% de
+  luminância contra os 53% com que foi pintado** — não é asset em falta, é
+  tratamento. A bandeira da região é lavanda (rgb 107·98·147), não carmesim.
+
+- **Fidelidade:** N06 LOW · N07 MEDIUM · N08 MEDIUM · N09 LOW · N10 (arena)
+  LOW. Guardiões: Golem LOW, Vigia MEDIUM, Feiticeira MEDIUM, Espectros
+  MEDIUM, Guardião dos Céus MEDIUM (rig) / LOW (chefe+arena). **Nenhum
+  FAILED** — nada parece placeholder nem outra direcção artística.
+
+- **A prova que fecha a discussão** é o N05 (Região I) fotografado com o mesmo
+  harness ao lado do N06: a densidade que a prancha da Região II pede já
+  existe no nível anterior. Não é limitação técnica.
+
+- **Gameplay, medido:** o N10 é **200,7 mortes/1000 px** contra 4,7-32,1 nos
+  outros — e mata de vida cheia (58,8 de dano médio contra 3 465-6 604). 76%
+  das mortes do nível num único ponto (x≈700), 99% na faixa x=600-820, todas
+  no ácido. O N08 é o melhor nível da região (100% de progresso nas 9 runs,
+  462 s de 900 a planar). A curva de dificuldade N06→N10 é 6,3 · 4,9 · 23,8 ·
+  4,7 · 200,7 — não é uma curva.
+
+- **Armadilhas de método que custaram a descobrir** (estão nos comentários do
+  bot, mas ficam aqui porque valem para qualquer bot futuro):
+  1. um botão carregado com `Input.action_press` e nunca largado faz o
+     `is_action_just_pressed` da Koliani disparar **uma vez só** — os chefes
+     acabavam as runs com a vida cheia;
+  2. `_fase != 0` **não** serve para "o combate começou": das cinco máquinas
+     de estado da região só quatro começam em `DORME` (a do Golem começa em
+     `APROXIMA`). O critério uniforme é a distância;
+  3. `EXPOSTA` (Feiticeira) e `RECUPERA` (Golem) são a mesma janela que
+     `EXPOSTO` — sem isso "ataques evitados" dava 0 em dois encontros;
+  4. nenhuma plataforma é atravessável: um grafo de navegação que permita
+     saltar para uma plataforma que esteja **inteiramente por cima** manda o
+     bot bater na barriga dela, sempre;
+  5. as correntes ascendentes mudam o que é alcançável **e** o bot tem de
+     FICAR na coluna (mover-se para o alvo tira-o dela a meio);
+  6. comparar perfis exige normalizar por progresso — quem hesita mais avança
+     menos e morre menos, e parece melhor.
+
+- **Fica por fazer / a investigar:** em 3 das 9 runs do N06 a posição da
+  Koliani foi **NaN** em pelo menos um frame (o acumulador `x_max` ficou
+  `null`; as posições de morte são todas finitas). Não foi diagnosticado —
+  estava fora do âmbito, mas não devia acontecer. E o bot encrava à entrada
+  da sala do N07 em x≈590-610 nos perfis `normal`/`experiente`: é falhanço
+  dele, e esses 6 runs não se usam para traversal.
+
 ## Super-Process A — encontros do meio da Região II (18 set 2026)
 
 - Branch `claude/region02-completion-pass`, HEAD a seguir a este trabalho.

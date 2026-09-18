@@ -1,3 +1,48 @@
+## Pendente de DECISÃO — depois do audit de fidelidade da Região II (18 set 2026)
+
+Branch `claude/region02-humanlike-bot-playtest`. Relatório completo em
+`docs/playtests/region_02_bot_humanlike_playtest.md`. **Nada foi corrigido**:
+a execução era observação, prova e crítica. O que fica para o Paulo decidir:
+
+1. **O bestiário da Região II.** Censo medido em jogo: **0 dos 10 inimigos
+   canónicos** em N06-N10. `ESP_REGIAO[1]` em `gerador_corredor.gd` ainda diz
+   `# II Prisão`. O jogo já tem `abutre` e `olho` com arte completa e já
+   marcadas como voadoras — é uma linha de tabela. **Decisão:** apontar já a
+   Região II a estas duas, ou esperar pelas criaturas desenhadas da prancha?
+2. **O projéctil das PENAS CORTANTES viola o contrato do Guardião.** É
+   `Color(0.72, 0.92, 1.0)` = `#B8EBFF` (`chefe_guardiao_dos_ceus.gd:399`),
+   que é a paleta ciano/gelo do `monge_celeste` que L3 **proíbe**; e é um
+   losango, não uma pena. Correcção de uma linha.
+3. **O mar de nuvens chega ao ecrã com 10-24% da luminância com que foi
+   pintado** (53% na origem). Não falta asset — é `neblina_fundo`,
+   `dessaturar_fundo` e `cor_fundo` nas cinco cenas. **Decisão:** clarear,
+   e quanto? É o que diz ALTITUDE.
+4. **O ácido do N10.** 76% das mortes do nível num único ponto (x≈700), 99%
+   na faixa x=600-820, e mata de vida cheia. **Decisão:** encurtar o ácido,
+   pôr uma saliência de recuperação por baixo do ziguezague, ou deixar como
+   exame final duro?
+5. **A pose do Guardião dos Céus.** A escala CUMPRE o contrato (2,46x altura,
+   3,6x largura); a silhueta não — as asas estão espalmadas, e a prancha
+   define a leitura à distância pelas asas ABERTAS. Abri-las obriga a rever
+   o tecto de 240 px de largura. **Decisão do Paulo, é arte.**
+6. **Terreno sem vegetação.** O material `desfiladeiro` é tijolo liso e o
+   catálogo de props da região tem 12 entradas (3 de chão, duas das quais
+   são `cruz` e `lapide`, de cemitério). A Região I tem 17 props e 8 de chão,
+   com folhagem carmesim em todas as bordas. É o item mais caro e o que mais
+   fecha a distância à prancha.
+7. **A jornada procedural.** Em N06/N07/N09 ela é ~75% do nível e não tem
+   uma única zona de vento — a mecânica que dá nome à região vive só na sala
+   final. **Decisão:** levar o vento à jornada, ou encurtar a jornada?
+
+**Respondido, não precisa de decisão:** as asas do Guardião **não** tapam a
+Koliani na arena (mas também não fazem trabalho de silhueta), e as asas não
+darem dano **lê-se bem**.
+
+**A investigar:** em 3 das 9 runs do N06 a posição da Koliani foi NaN em pelo
+menos um frame. Não diagnosticado.
+
+---
+
 ## Pendente — Super-Process A, Região II fechada (17 set 2026)
 
 Branch `claude/region02-completion-pass`. Tudo o que estava em aberto do
