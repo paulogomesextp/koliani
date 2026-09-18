@@ -23,6 +23,7 @@
 [ext_resource type="PackedScene" uid="uid://bkolianiaguavenenosa01" path="res://scenes/actors/AguaVenenosa.tscn" id="13_lava"]
 [ext_resource type="PackedScene" uid="uid://bkolianiserra01" path="res://scenes/actors/Serra.tscn" id="14_serra"]
 [ext_resource type="PackedScene" path="res://scenes/actors/WindZone.tscn" id="15_wind"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/backgrounds/desfiladeiro/nuvens.png" id="90_nuvens"]
 
 [sub_resource type="RectangleShape2D" id="rs_chk"]
 size = Vector2(44, 96)
@@ -72,6 +73,13 @@ esquerda = -120.0
 chao = false
 agua = false
 
+; O fundo do Desfiladeiro e' o MAR DE NUVENS, nao uma poca. A banda
+; lisa cor-de-ameixa era "o elemento com mais ar de placeholder" do
+; audit -- ~15%% do ecra, sem textura, sem profundidade e sem
+; transicao para o que esta' por cima. A `superficie_textura` (que o
+; `agua_venenosa.gd` ja' sabia usar desde 9H.12D) recebe a MESMA
+; `nuvens.png` do parallax: duas veus a deslizar a velocidades
+; diferentes por cima da linha. Mesma colisao, mesmo `dano`.
 [node name="FundoDoAbismo" parent="." instance=ExtResource("13_lava")]
 position = Vector2(1700, 980)
 largura = 3900.0
@@ -82,6 +90,10 @@ cor = Color(0.46, 0.14, 0.28, 0.9)
 brasas = false
 
 ; ===================  entrada + descida  =======================
+veu_forca = 2.6
+veu_origem = 0.5
+superficie_textura = ExtResource("90_nuvens")
+
 [node name="ChaoInicio" parent="." instance=ExtResource("9_pl")]
 position = Vector2(280, 640)
 tamanho = Vector2(420, 60)

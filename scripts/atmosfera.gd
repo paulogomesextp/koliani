@@ -113,7 +113,7 @@ const PACKS := {
 		# que o audit via ("as ilhas do fundo sao blocos de rocha"). Um ganho
 		# pequeno devolve-lhes a leitura de cumeada sem as trazer para a
 		# frente do mar de nuvens.
-		["serras.png", "Longe", 830.0, 4.4, 1.35],
+		["serras.png", "Longe", 830.0, 4.4, 1.12],
 		# GANHO 1.6 no mar de nuvens (Super-Process A2). O audit mediu a
 		# `nuvens.png` a chegar ao ecra com 10-24% de luminancia contra os
 		# ~52% com que foi pintada -- lia-se como rocha, nao como nuvem. Nao
@@ -126,7 +126,7 @@ const PACKS := {
 		# que separa "desfiladeiro" de "masmorra a' noite". Por isso leva
 		# ganho proprio em vez de se clarear a regiao toda, que lavava o
 		# terreno e os inimigos com ela.
-		["nuvens.png", "Meio", 900.0, 3.6, 2.1],
+		["nuvens.png", "Meio", 900.0, 3.6, 1.7],
 		["falesias.png", "Perto", 960.0, 3.8],
 	],
 	# Região IV -- Catacumbas do Abismo (ansimuz "Caverns", CC0) + túmulos e

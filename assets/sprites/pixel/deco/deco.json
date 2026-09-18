@@ -625,18 +625,6 @@
    "h": 38
   },
   {
-   "nome": "cruz",
-   "onde": "chao",
-   "w": 27,
-   "h": 40
-  },
-  {
-   "nome": "lapide",
-   "onde": "chao",
-   "w": 21,
-   "h": 37
-  },
-  {
    "nome": "lampiao_t",
    "onde": "pendurado",
    "w": 31,
@@ -655,10 +643,100 @@
    "h": 52
   },
   {
-   "nome": "flamula",
+   "nome": "estatua",
+   "onde": "chao",
+   "w": 47,
+   "h": 96
+  },
+  {
+   "nome": "bandeira",
    "onde": "pendurado",
-   "w": 31,
-   "h": 106
+   "w": 48,
+   "h": 100
+  },
+  {
+   "nome": "correntes",
+   "onde": "pendurado",
+   "w": 34,
+   "h": 54
+  },
+  {
+   "nome": "gargula",
+   "onde": "chao",
+   "w": 50,
+   "h": 82
+  },
+  {
+   "nome": "lanterna",
+   "onde": "pendurado",
+   "w": 40,
+   "h": 91
+  },
+  {
+   "nome": "gaiola",
+   "onde": "pendurado",
+   "w": 33,
+   "h": 100
+  },
+  {
+   "nome": "coluna",
+   "onde": "parede",
+   "w": 21,
+   "h": 98
+  },
+  {
+   "nome": "arco",
+   "onde": "parede",
+   "w": 46,
+   "h": 101
+  },
+  {
+   "nome": "janela",
+   "onde": "parede",
+   "w": 45,
+   "h": 88
+  },
+  {
+   "nome": "escombros",
+   "onde": "chao",
+   "w": 52,
+   "h": 54
+  },
+  {
+   "nome": "vitral",
+   "onde": "parede",
+   "w": 36,
+   "h": 96
+  },
+  {
+   "nome": "pedras",
+   "onde": "chao",
+   "w": 27,
+   "h": 40
+  },
+  {
+   "nome": "cristais",
+   "onde": "chao",
+   "w": 22,
+   "h": 58
+  },
+  {
+   "nome": "vegetacao_alta",
+   "onde": "chao",
+   "w": 37,
+   "h": 70
+  },
+  {
+   "nome": "vegetacao_baixa",
+   "onde": "chao",
+   "w": 37,
+   "h": 46
+  },
+  {
+   "nome": "arvore_seca",
+   "onde": "parede",
+   "w": 107,
+   "h": 101
   }
  ]
 }
