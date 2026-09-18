@@ -41,6 +41,11 @@ MANIFESTO = os.path.join(TERR, "terreno.json")
 
 PECAS = ["corpo.png", "topo.png", "lado.png", "base.png"]
 
+## Props do `torres` que NAO servem o Desfiladeiro. Sao os do audit: cruz e
+## lapide sao cemiterio, e a flamula e' lavanda onde o canone pede carmesim
+## (ha' a `bandeira` da prancha, que e' carmesim e tem a cruz).
+FORA_DA_REGIAO = {"cruz", "lapide", "flamula"}
+
 DECO = os.path.join(RAIZ, "assets", "sprites", "pixel", "deco")
 DECO_BASE = os.path.join(DECO, "torres")
 DECO_DEST = os.path.join(DECO, "desfiladeiro")
@@ -125,11 +130,78 @@ def props() -> int:
 
     with open(DECO_MANIFESTO, encoding="utf-8") as f:
         cat = json.load(f)
-    cat["desfiladeiro"] = cat["torres"]
+    # NAO fazer `cat["desfiladeiro"] = cat["torres"]`.
+    #
+    # Era o que estava aqui, e e' a origem exacta do achado do audit: a
+    # Regiao II ficava com o catalogo INTEIRO da Regiao III, incluindo
+    # `cruz` e `lapide`, que sao vocabulario de cemiterio e nao aparecem em
+    # nenhuma prancha do Desfiladeiro. Os props canonicos da regiao vem
+    # agora do `extrair_props_regiao02.py`, recortados da prancha aprovada,
+    # e esta linha apagava-os de cada vez que alguem corresse este script.
+    #
+    # Os props do `torres` continuam a ser RECOLORIDOS (o `for` acima) e
+    # ficam no disco -- ha' entradas que sobreviveram ao corte (balaustrada,
+    # tocha, velas, coluna...) e essas continuam a apontar para estes PNG.
+    # O que muda e' que o catalogo nao se reescreve: acrescenta-se o que
+    # falta e nao se mexe no que ja' la' esta'.
+    jah = {p["nome"] for p in cat.get("desfiladeiro", [])}
+    for prop in cat["torres"]:
+        if prop["nome"] not in jah and prop["nome"] not in FORA_DA_REGIAO:
+            cat.setdefault("desfiladeiro", []).append(dict(prop))
     with open(DECO_MANIFESTO, "w", encoding="utf-8", newline="\n") as f:
         json.dump(cat, f, indent=1, ensure_ascii=False)
         f.write("\n")
     return n
+
+
+def folhagem_no_topo(topo: Image.Image) -> Image.Image:
+    """Folhagem CARMESIM a nascer do labio da pedra.
+
+    O audit poe o terreno como "maior desvio visual" da regiao, e nao por
+    causa da cor: a prancha define o Desfiladeiro por pedra com folhagem
+    carmesim a cair das bordas, e o jogo tinha uma parede de alvenaria sem
+    uma unica folha -- em 100% do ecra, 100% do tempo, nos cinco niveis.
+
+    As folhas nao sao desenhadas aqui: sao as `vegetacao_*` recortadas da
+    prancha aprovada pelo `extrair_props_regiao02.py`, encolhidas para a
+    escala do labio. Se ainda nao tiverem sido extraidas, o terreno sai
+    como antes em vez de rebentar.
+
+    O `plataforma.gd` desenha a capa a partir de `y0 - SUPERFICIE`, ou seja
+    as 8 primeiras linhas da textura caem ACIMA da linha onde se pisa. E'
+    nessas que a folhagem vive, com a base a entrar uns pixeis na pedra para
+    nao ficar pousada por cima.
+
+    A tira e' um mosaico de 96 px: quem cruza a borda e' carimbado tambem do
+    outro lado, senao aparecia um corte a cada 96 px de plataforma.
+    """
+    tufos = []
+    for nome, alt in (("vegetacao_alta.png", 15), ("vegetacao_baixa.png", 11),
+                      ("vegetacao_alta.png", 10)):
+        cam = os.path.join(DECO_DEST, nome)
+        if not os.path.exists(cam):
+            continue
+        v = Image.open(cam).convert("RGBA")
+        e = alt / float(v.height)
+        tufos.append(v.resize((max(1, round(v.width * e)), alt), Image.LANCZOS))
+    if not tufos:
+        print("  (sem vegetacao extraida -- topo fica sem folhagem)")
+        return topo
+
+    fora = topo.copy()
+    # posicoes fixas: o terreno tem de sair igual entre sessoes
+    for i, (x, k, espelho) in enumerate((
+            (6, 0, False), (27, 1, True), (46, 2, False),
+            (63, 1, False), (82, 0, True))):
+        t = tufos[k % len(tufos)]
+        if espelho:
+            t = t.transpose(Image.FLIP_LEFT_RIGHT)
+        y = 9 - t.height + 3           # 3 px enterrados na pedra
+        for dx in (0, -fora.width, fora.width):
+            fora.alpha_composite(t, (x + dx, max(0, y))) if 0 <= x + dx < fora.width else None
+            if x + dx + t.width > fora.width and dx == 0:
+                fora.alpha_composite(t, (x - fora.width, max(0, y)))
+    return fora
 
 
 def main() -> None:
@@ -137,6 +209,8 @@ def main() -> None:
     for nome in PECAS:
         origem = os.path.join(BASE, nome)
         im = recolorir(Image.open(origem))
+        if nome == "topo.png":
+            im = folhagem_no_topo(im)
         im.save(os.path.join(DEST, nome))
         print("  %-10s %s" % (nome, im.size))
 
