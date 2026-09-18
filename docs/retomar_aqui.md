@@ -3,9 +3,16 @@
 - Branch `claude/region02-fidelity-remediation` @ `77b4c891`, a partir de
   `claude/region02-humanlike-bot-playtest` @ `1bfda76f`. Relatório completo:
   [`docs/implementation/region_02_fidelity_remediation.md`](implementation/region_02_fidelity_remediation.md).
-  **Feito:** GATE 1, GATE 2, Fases 3-7 e 9. **Falta:** o relatório final no
-  formato do briefing, correr os harnesses avulso um a um, e os itens da
-  secção "O que falta" do relatório.
+  **A2 está FECHADO:** GATE 1, GATE 2, Fases 3-7 e 9, mais o relatório final
+  ([`docs/execution_a2_regiao02_fidelidade.md`](execution_a2_regiao02_fidelidade.md))
+  e a varredura dos harnesses — `run_tests.tscn`, `run_boss_guardiao_ceus` e
+  os 7 avulso (`run_movement_camera_4a`, `run_wind_system`,
+  `run_glide_region02`, `run_region02_wind_shapes`, `run_level_session_tests`,
+  `run_save_foundation_tests`, `run_progression_ids_tests`) **todos verdes**,
+  com o `user://` isolado por `XDG_DATA_HOME`. **O que sobra é decisão do
+  Paulo** — os pontos A-D no topo do `PRIORIDADES.md`: lua de sangue, os
+  quatro guardiões intermédios, as outras cinco criaturas canónicas, a
+  mordida do N10 e o contraste.
 
 - **O NaN do N06 não era da Região II.** `_hitstop()` punha
   `Engine.time_scale = 0.0`; o Godot passa `physics_step * time_scale` ao

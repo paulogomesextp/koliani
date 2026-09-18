@@ -1,7 +1,8 @@
 # Região II — Fidelity & Playability Remediation (Super-Process A2)
 
-**Estado: quase completo — falta o relatório final e uma varredura de
-harnesses. Ver "O que falta" no fim.**
+**Estado: completo.** Relatório final em
+[`docs/execution_a2_regiao02_fidelidade.md`](../execution_a2_regiao02_fidelidade.md).
+O que sobra é decisão do Paulo — ver "O que falta" no fim.
 **Data:** 18 set 2026
 **Base:** `claude/region02-humanlike-bot-playtest` @ `1bfda76f`
 **Branch:** `claude/region02-fidelity-remediation`
@@ -438,15 +439,17 @@ CI — o `.github/workflows/ci.yml` corre em **cada push** e produz o Windows.
 
 ## O que falta
 
-**Para fechar o Super-Process A2:**
+**Para fechar o Super-Process A2 — feito:**
 
-1. **Relatório final** no formato pedido pelo briefing (a secção
-   `KOLIANI — EXECUTION REPORT`). Os números todos estão neste documento.
-2. **Varredura dos harnesses avulso** — a suite (`run_tests.tscn`) está
-   verde e o `run_boss_guardiao_ceus.tscn` também, mas faltou correr um a um:
-   `run_movement_camera_4a`, `run_wind_system`, `run_glide_region02`,
-   `run_region02_wind_shapes`, `run_level_session_tests`,
-   `run_save_foundation_tests`, `run_progression_ids_tests`.
+1. **Relatório final** escrito:
+   [`docs/execution_a2_regiao02_fidelidade.md`](../execution_a2_regiao02_fidelidade.md).
+2. **Varredura dos harnesses avulso** — corridos um a um, **7/7 verdes**
+   (exit 0), mais a suite `run_tests.tscn` e o `run_boss_guardiao_ceus.tscn`:
+   `run_movement_camera_4a`, `run_wind_system` (A-L), `run_glide_region02`
+   (A-O), `run_region02_wind_shapes`, `run_level_session_tests` (11),
+   `run_save_foundation_tests` (11), `run_progression_ids_tests` (6).
+   Os `ObjectDB instances were leaked at exit` são ruído de saída do Godot
+   headless, não falhas.
 
 **Ficou por fazer, e é decisão do Paulo:**
 

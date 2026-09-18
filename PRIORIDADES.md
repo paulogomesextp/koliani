@@ -1,7 +1,9 @@
 ## Pendente de DECISÃO — depois do Super-Process A2 (18 set 2026)
 
-Branch `claude/region02-fidelity-remediation` @ `77b4c891`. Relatório:
-`docs/implementation/region_02_fidelity_remediation.md`.
+Branch `claude/region02-fidelity-remediation`. **Super-Process A2 fechado:**
+relatório final em `docs/execution_a2_regiao02_fidelidade.md` (detalhe
+técnico em `docs/implementation/region_02_fidelity_remediation.md`). A suite,
+o harness do chefe e os 7 harnesses avulso estão **todos verdes**.
 
 **Corrigido e provado:** o NaN do N06 (era o `Engine.time_scale = 0.0` do
 hitstop, e afectava as **nove** plataformas `AnimatableBody2D` do jogo
