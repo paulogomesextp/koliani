@@ -542,14 +542,17 @@ func _combate(pos: Vector2, inimigo: Node, chefe_vivo: bool, _dt: float) -> void
 		if f != _fase_chefe_ant:
 			_fase_chefe_ant = f
 			var nome := _nome_fase_chefe(f)
-			if nome.ends_with("_TEL"):
+			# `TELEGRAFO` (Golem) conta como telegrafo tanto como `*_TEL`
+			# (os outros quatro); `EXPOSTA` (Feiticeira) e `RECUPERA`
+			# (Golem) sao a mesma janela de castigo que `EXPOSTO`.
+			if nome.ends_with("_TEL") or nome == "TELEGRAFO":
 				M["chefe_telegrafos"] += 1
 				_tel_dano = false
 				# reaccao tardia: quem e' casual ve' o telegrafo demasiado tarde
 				var atraso: float = _rng.randf_range(
 					float(_p["reac_min"]), float(_p["reac_max"])) * 1.4
 				_tel_em = _t + atraso
-			elif nome == "EXPOSTO":
+			elif nome.begins_with("EXPOST") or nome == "RECUPERA":
 				if not _tel_dano:
 					M["chefe_ataques_evitados"] += 1
 		# esquiva: dash/rolar para longe quando o telegrafo "chega ao cerebro"
@@ -624,15 +627,16 @@ func _inimigo_perto(pos: Vector2) -> Node:
 	return melhor
 
 
+## O combate comecou? NAO se pode testar por `_fase != 0`: so' quatro das
+## cinco maquinas de estado da regiao comecam em DORME -- a do Golem das
+## Falesias comeca em APROXIMA, e com aquele teste o combate dele contava
+## desde o primeiro frame do nivel. O criterio uniforme e' a DISTANCIA.
 func _chefe_acordado() -> bool:
-	if _chefe == null or not is_instance_valid(_chefe):
+	if _chefe == null or not is_instance_valid(_chefe) or _kol == null:
 		return false
 	if "vida" in _chefe and int(_chefe.vida) <= 0:
 		return false
-	var f: Variant = _chefe.get("_fase")
-	if f == null:
-		return false
-	return int(f) != 0     # 0 = DORME em todas as maquinas de estado
+	return absf(_chefe.global_position.x - _kol.global_position.x) < 620.0
 
 
 func _nome_fase_chefe(valor: int) -> String:
