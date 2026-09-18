@@ -1,6 +1,11 @@
 ## A2 em produção — master, Windows e PWA (18 set 2026)
 
-- **`master` = `9740a24d`** (local == `origin/master`). A integração foi
+- **A integração entrou em `master` como `9740a24d`** (local == `origin/master`).
+  Os commits seguintes desta execução são só documentação e metadados de
+  import; `docs/**` está fora do `exclude_filter` dos presets, portanto o
+  payload de jogo publicado continua a ser o de `9740a24d`. O CI republica o
+  Pages e o Release `win-latest` a CADA push, sempre a partir do SHA desse
+  commit — produção segue o master sozinha. A integração foi
   **fast-forward puro** a partir de `e665da0b`: 37 commits, 0 conflitos, 0
   commits perdidos — `e665da0b` era exactamente o merge-base, portanto entrou
   a cadeia toda (sistema de vento → N08 planeio → Guardião dos Céus →
