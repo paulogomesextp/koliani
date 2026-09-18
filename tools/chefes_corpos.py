@@ -333,12 +333,21 @@ def _asa(comp: float, esp: float) -> list[tuple[float, float]]:
 ## naco de penas a flutuar ao lado do bicho.
 ARCO_ASA = -48.0
 
+## Z da cabeca no plano `ave`. Acima do da asa da frente (3.0-3.2) -- ver o
+## comentario em `ave()`.
+Z_CABECA = 3.6
+
 AVE = {
     "voo": 52.0, "corpo_c": 30.0, "corpo_a": 34.0,
     "pescoco": 10.0, "cabeca": 9.5,
     "asa1": 40.0, "asa2": 36.0, "asa_esp": 18.0,
     "cauda": 22.0, "perna": 16.0,
     "penas": 5,
+    # Quanto a asa SOBE a partir do ombro. Deixou de ser a constante
+    # `ARCO_ASA` para ser parametro do rig: o Guardiao dos Ceus precisa das
+    # asas ERGUIDAS (e' esse o criterio de leitura a' distancia do contrato)
+    # e as outras aves da campanha nao.
+    "arco": ARCO_ASA,
 }
 
 
@@ -364,10 +373,10 @@ def ave(par: dict, pal: dict) -> tuple[Juntas, list[Peca]]:
         "cabeca": ("pescoco", (p["pescoco"] * 0.42, -p["pescoco"] * 0.9)),
         # asa de TRAS: ombro de la', abre para -x
         "asa_t1": ("corpo", (-p["corpo_c"] * 0.3, -p["corpo_a"] * 0.34)),
-        "asa_t2": ("asa_t1", _ponta_asa(p["asa1"] * 0.86, False)),
+        "asa_t2": ("asa_t1", _ponta_asa(p["asa1"] * 0.86, False, p["arco"])),
         # asa da FRENTE: ombro de ca', abre para +x (espelhada)
         "asa_f1": ("corpo", (p["corpo_c"] * 0.26, -p["corpo_a"] * 0.28)),
-        "asa_f2": ("asa_f1", _ponta_asa(p["asa1"] * 0.86, True)),
+        "asa_f2": ("asa_f1", _ponta_asa(p["asa1"] * 0.86, True, p["arco"])),
         "cauda1": ("corpo", (-p["corpo_c"] * 0.2, p["corpo_a"] * 0.42)),
         "cauda2": ("cauda1", (-p["cauda"] * 0.72, p["cauda"] * 0.2)),
         "perna_t": ("corpo", (-p["corpo_c"] * 0.24, p["corpo_a"] * 0.38)),
@@ -384,9 +393,10 @@ def ave(par: dict, pal: dict) -> tuple[Juntas, list[Peca]]:
 
     # asa de tras (mais escura; fica atras do corpo)
     _asa_de_penas(pes, "asa_t1", p["asa1"], p["asa_esp"], n,
-                  _atras(asa), _atras(ponta), -3.2)
+                  _atras(asa), _atras(ponta), -3.2, arco=p["arco"])
     _asa_de_penas(pes, "asa_t2", p["asa2"], p["asa_esp"] * 0.88, n,
-                  _atras(asa), _atras(ponta), -3.0, remiges=True)
+                  _atras(asa), _atras(ponta), -3.0, remiges=True,
+                  arco=p["arco"])
 
     # cauda, curta e em baixo
     _leque(pes, "cauda1", p["cauda"], n - 1, escurecer(c2, 0.2), ponta, -2.4)
@@ -411,13 +421,21 @@ def ave(par: dict, pal: dict) -> tuple[Juntas, list[Peca]]:
     pes.append(Peca("pescoco", trapezio(0.0, 16.0, -p["pescoco"], 12.0), c,
                     0.5, tag="pescoco"))
 
-    # cabeca de perfil + bico curvo
+    # cabeca de perfil + bico curvo, A' FRENTE DA ASA DA FRENTE.
+    #
+    # `Z_CABECA` fica acima do z da asa da frente (3.0-3.2) de proposito.
+    # Com as asas ERGUIDAS o ombro da asa de ca' passou a cruzar a cabeca, e
+    # com a cabeca por baixo o bico dourado desaparecia -- e o bico e a
+    # cabeca pequena projectada a' frente sao L1 do contrato. Em tres
+    # quartos a cabeca esta' mesmo a' frente do ombro, portanto isto nao e'
+    # so' legibilidade: e' a ordem certa.
     pes.append(Peca("cabeca", elipse(0.6, 0.0, p["cabeca"] * 1.12,
-                                     p["cabeca"] * 0.95), c, 1.0, tag="cabeca"))
+                                     p["cabeca"] * 0.95), c, Z_CABECA,
+                    tag="cabeca"))
     pes.append(Peca("cabeca", elipse(p["cabeca"] * 0.34, -p["cabeca"] * 0.18,
                                      p["cabeca"] * 0.7, p["cabeca"] * 0.6),
-                    escurecer(c, 0.3), 1.02))
-    _bico(pes, "cabeca", p["cabeca"], ouro, 1.2)
+                    escurecer(c, 0.3), Z_CABECA + 0.02))
+    _bico(pes, "cabeca", p["cabeca"], ouro, Z_CABECA + 0.2)
 
     # perna da frente
     pes.append(Peca("perna_f", membro(p["perna"], 7.5), c2, 2.0, tag="perna_f"))
@@ -425,9 +443,9 @@ def ave(par: dict, pal: dict) -> tuple[Juntas, list[Peca]]:
 
     # asa da frente, ESPELHADA (abre para +x)
     _asa_de_penas(pes, "asa_f1", p["asa1"], p["asa_esp"], n, asa, ponta, 3.0,
-                  espelhada=True)
+                  espelhada=True, arco=p["arco"])
     _asa_de_penas(pes, "asa_f2", p["asa2"], p["asa_esp"] * 0.88, n, asa,
-                  ponta, 3.2, remiges=True, espelhada=True)
+                  ponta, 3.2, remiges=True, espelhada=True, arco=p["arco"])
     return juntas, pes
 
 
@@ -476,9 +494,10 @@ def _asa_de_penas(pes: list[Peca], junta: str, comp: float, esp: float,
                             c_ponta, z + 0.03 + k * 0.01))
 
 
-def _ponta_asa(comp: float, espelhada: bool) -> tuple[float, float]:
-    """Onde acaba a 1.a metade da asa, JA' com o `ARCO_ASA` aplicado."""
-    a = math.radians(ARCO_ASA)
+def _ponta_asa(comp: float, espelhada: bool,
+               arco: float = ARCO_ASA) -> tuple[float, float]:
+    """Onde acaba a 1.a metade da asa, JA' com o arco aplicado."""
+    a = math.radians(arco)
     x, y = -comp * math.cos(a), -comp * math.sin(a)
     return (-x, y) if espelhada else (x, y)
 

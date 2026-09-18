@@ -911,7 +911,7 @@ def _guardiao_dos_ceus(juntas: Juntas, pecas: list[Peca], pal: dict) -> None:
         pecas.append(Peca("cabeca", [
             (dx - 2.6, -5.0), (dx + 2.0, -5.2),
             (dx + 1.0 - k * 0.8, -alt), (dx - 3.0, -alt * 0.66),
-        ], tinta, 1.05 + k * 0.01))
+        ], tinta, 3.65 + k * 0.01))
     # colar: penas do pescoco erguidas (o corvo eriça-se antes do grito)
     for k in range(4):
         t = k / 3.0
@@ -921,10 +921,10 @@ def _guardiao_dos_ceus(juntas: Juntas, pecas: list[Peca], pal: dict) -> None:
             (-8.2 + k * 4.6, -4.0),
         ], escurecer(pena, 0.12 + 0.05 * k), 0.55))
     # OLHO = NUCLEO: halo largo e cerne branco, sem contorno (brilho=True)
-    pecas.append(Peca("cabeca", elipse(2.6, -1.6, 4.4, 4.0), luz, 1.35,
+    pecas.append(Peca("cabeca", elipse(2.6, -1.6, 4.4, 4.0), luz, 3.95,
                       brilho=True))
     pecas.append(Peca("cabeca", elipse(2.6, -1.6, 1.9, 1.7),
-                      clarear(luz, 0.65), 1.4, brilho=True))
+                      clarear(luz, 0.65), 4.0, brilho=True))
 
 
 # -- Regiao IV -- Catacumbas do Abismo ------------------------------------
@@ -1259,14 +1259,34 @@ CHEFES: dict[str, dict] = {
         # SO' nas remiges e na cauda, ouro SO' no bico e nas garras,
         # nucleo violeta na cabeca.
         "plano": "ave",
-        # Tres quartos, corpo de pe'. As asas sao CURTAS de proposito: a
-        # versao de envergadura larga saia com racio 2,03 e, a' altura
-        # canonica, dava 324 px de largo contra os 560 px da plataforma
-        # da arena do N10 -- tapava-a mais de metade, e a suite apanhou.
-        # Estes numeros dao 238x162 (racio 1,47), contra os 1,39 medidos
-        # no painel ESCALA da prancha.
+        # Tres quartos, corpo de pe', ASAS ABERTAS E ERGUIDAS.
+        #
+        # E' o criterio de leitura do contrato: L1 diz que a silhueta se
+        # define "sobretudo pelas ASAS -- o elemento mais largo e o que
+        # define a leitura a' distancia". O audit mediu o contrario: asas
+        # espalmadas ao nivel do corpo, so' o `walk` as levantava num V
+        # raso, e a criatura lia-se como ave POUSADA (dodo, abutre
+        # agachado) e nao como o corvideo da `ARTE PRINCIPAL`.
+        #
+        # A versao anterior tinha as asas curtas (24/21) e o arco a -48
+        # (para BAIXO -- o sinal positivo e' que sobe). Nao foi capricho:
+        # uma tentativa de envergadura larga saiu com racio 2,03 e 324 px
+        # de largo contra os 560 px da plataforma da arena, e a suite
+        # apanhou-a. O erro foi so' alargar sem LEVANTAR.
+        #
+        # Levantar troca largura por altura, e como o jogo escala o chefe
+        # pela ALTURA (`_altura_alvo()` = 160), a largura em jogo cai com o
+        # racio. Por isso as asas tambem crescem 40% (34/30): e' a
+        # combinacao que da' asas erguidas E mantem o contrato de escala.
+        #
+        # Medido no rig: 306x210 = racio 1,46 -> 233 px em jogo = **3,59x**
+        # a Koliani, dentro da banda 3,5-3,7 de L2 (a anterior dava 3,53x).
+        # A plataforma da arena tem 560 px, portanto o chefe ocupa 42% --
+        # o mesmo de antes, e a pergunta em aberto do contrato ("as asas
+        # tapam a Koliani?") continua a ter a resposta "nao".
         "par": {"voo": 52.0, "corpo_c": 30.0, "corpo_a": 36.0,
-                "pescoco": 10.0, "cabeca": 9.5, "asa1": 24.0, "asa2": 21.0,
+                "pescoco": 10.0, "cabeca": 9.5, "asa1": 34.0, "asa2": 30.0,
+                "arco": 12.0,
                 "asa_esp": 17.0, "cauda": 26.0, "perna": 20.0, "penas": 5},
         "pal": paleta("1e1e33", "433d80", "d8d0e6", "904143",
                       metal="c98f4e", brilho="c68af9",
