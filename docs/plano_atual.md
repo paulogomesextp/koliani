@@ -1,20 +1,24 @@
 ## Super-Process A2 — remediação de fidelidade da Região II (18 set 2026)
 
-**Estado: PARCIAL — parou por limite de uso a meio.**
-Branch `claude/region02-fidelity-remediation` @ `206519a2`.
+**Estado: quase completo.**
+Branch `claude/region02-fidelity-remediation` @ `77b4c891`.
 Relatório: `docs/implementation/region_02_fidelity_remediation.md`.
 
 | Fase | Estado |
 |---|---|
 | GATE 1 — NaN do N06 | **FEITO e provado** (`84b409e9`) |
 | GATE 2 — pico de mortes do N10 | **FEITO e medido** (`5187b52c`) |
-| Fase 3 — inimigos canónicos + guardiões N06-N09 | por começar |
-| Fase 4 — ambiente N06-N10 | por começar |
-| Fase 5 — Guardião dos Céus + arena do N10 | por começar |
-| Fase 6 — re-audit visual | por começar |
-| Fase 7 — re-run do bot (mín. 30 runs) | por começar |
-| Fase 8 — revisão no Godot real | por começar |
-| Fase 9 — build Windows + launchers | por começar |
+| Fase 3 — inimigos canónicos | **FEITO** — 0/10 → 5 espécies da prancha, 100% dos comuns canónicos (`74b487e8`) |
+| Fase 3 — guardiões N06-N09 | **NÃO FEITO** — Golem LOW, Vigia MEDIUM, Feiticeira MEDIUM, Espectros MEDIUM, como estavam |
+| Fase 4 — ambiente N06-N10 | **FEITO** (`a74152ec`, `cbf640bf`, `77b4c891`) |
+| Fase 5 — Guardião dos Céus | **FEITO** — asas abertas, paleta do contrato (`8c59be26`, `a74152ec`) |
+| Fase 5 — arena do N10 | **PARCIAL** — 6 dos 8 elementos; falta a lua de sangue |
+| Fase 6 — re-audit visual | **FEITO** — 19 fotografias novas, reclassificado |
+| Fase 7 — re-run do bot | **FEITO** — 30 runs, 0 NaN, N10 200,7 → 18,5 |
+| Fase 8 — revisão no Godot real | **FEITO** — fotografias reais em cada passe |
+| Fase 9 — build Windows + launchers | **FEITO** — fora do Git, contentor efémero |
+| Relatório final | **POR FAZER** |
+| Harnesses avulso, um a um | **POR FAZER** |
 
 **Região III: não.** Continua fora de âmbito.
 

@@ -1,28 +1,39 @@
-## Pendente de DECISÃO — depois dos GATES 1 e 2 (18 set 2026)
+## Pendente de DECISÃO — depois do Super-Process A2 (18 set 2026)
 
-Branch `claude/region02-fidelity-remediation`. Relatório:
+Branch `claude/region02-fidelity-remediation` @ `77b4c891`. Relatório:
 `docs/implementation/region_02_fidelity_remediation.md`.
-**Corrigidos e provados:** o NaN do N06 (era o `Engine.time_scale = 0.0` do
-hitstop, e afectava as nove plataformas `AnimatableBody2D` do jogo inteiro) e
-o pico de mortes do N10 (200,7 → 0-31 mortes/1000 px).
 
-**As Fases 3 a 9 do Super-Process A2 NÃO foram começadas** — inimigos
-canónicos, guardiões N06-N09, ambiente, Guardião dos Céus, arena do N10,
-re-audit, re-run do bot e build Windows. A lista de decisões em aberto da
-secção seguinte continua **toda válida**, menos o ponto 4 (o ácido do N10),
-que está resolvido.
+**Corrigido e provado:** o NaN do N06 (era o `Engine.time_scale = 0.0` do
+hitstop, e afectava as **nove** plataformas `AnimatableBody2D` do jogo
+inteiro); o pico de mortes do N10 (200,7 → 18,5 mortes/1000 px); o bestiário
+(0/10 canónicos → 5 espécies recortadas da prancha, 100% dos inimigos comuns
+da região); o ambiente (nuvens, props, folhagem carmesim, abismo); e o
+Guardião (asas abertas + a paleta ciano que o contrato proíbe, que estava em
+cinco sítios).
 
-O que fica novo para decidir:
+O que fica para o Paulo decidir:
 
-A. **O N10 ficou demasiado fácil?** A mortalidade caiu para a ordem do N08
-   (o segundo mais mortal da região), que era o alvo — mas quem decide se o
-   exame final quer mais mordida é o Paulo, no playtest humano. A laje
-   `ChaoResgate` cobre x 540-880; alargá-la ou encolhê-la é uma linha na
-   cena, e o comentário lá dentro tem as três variantes medidas.
-B. **O ácido do N10 não se lê.** Nas fotografias reais é uma onda de ameixa
-   escura sobre fundo preto. Clarear a banda do abismo já estava na lista
-   como arte (ponto 7); passa a ser também **justiça**, porque é um perigo
-   que mata de vida cheia.
+A. **O N10 ficou fácil demais?** 200,7 → 18,5 mortes/1000 px. O alvo era a
+   ordem do N08 (24,2) e cumpriu-se, mas quem decide se o exame final quer
+   mais mordida é o playtest humano. A laje `ChaoResgate` cobre x 540-880 e
+   o comentário na cena tem as três variantes medidas.
+B. **Contraste.** O mar de nuvens foi clareado de propósito (realces 39-53%
+   → 57-68%; a textura foi pintada a 51,9%). Se algum nível parecer LAVADO,
+   o botão é o 5.º campo da tabela `PACKS` em `atmosfera.gd`.
+C. **Os quatro guardiões intermédios não foram tocados** — Golem LOW, Vigia
+   MEDIUM, Feiticeira MEDIUM, Espectros MEDIUM. O Vigia continua a CAMINHAR
+   e a `TORRE VIGIA` da prancha é uma estrutura fixa. É o maior bloco de
+   trabalho que sobra.
+D. **A lua de sangue continua a não entrar no enquadramento.** Está na
+   `ceu.png` mas essa camada é aplicada a 320 px de altura e o disco fica
+   muito acima da câmara; tentou-se recortá-la por cor e não sai limpa (o
+   `realcar_lua` tinge-a). O caminho é um elemento próprio na camada `Ceu`
+   do `atmosfera.gd`, que tem `motion_scale = 0` e portanto fica fixa à
+   câmara. Era prioridade BAIXA (#15) no audit.
+E. **As outras cinco criaturas canónicas** (serpente eólica, espectro das
+   ruínas, arqueiro eólico, torre vigia, mago do vento como inimigo comum).
+F. **A build de Windows não está no Git** e o contentor onde foi feita é
+   efémero. Chega ao Paulo pelo CI, que corre em cada push.
 
 ---
 
