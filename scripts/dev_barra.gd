@@ -78,6 +78,13 @@ func _montar_botao_topo() -> void:
 	b.position = Vector2(-234, 98)
 	b.custom_minimum_size = Vector2(220, 30)
 	b.add_theme_font_size_override("font_size", 13)
+	# SEM FOCO (como o FLYMODE e o BOSS TEST, que ja' o tinham). O ESPACO e'
+	# `saltar` E `ui_accept` ao mesmo tempo: se este botao ficasse com o foco
+	# depois de um clique, cada salto voltava a carregar nele -- abria o
+	# selector de niveis, e o salto seguinte escolhia um nivel, o que em jogo
+	# se le como "o espaco da' reset ao nivel". Quem joga a comando tem o
+	# atalho do botao SELECT em `_input`.
+	b.focus_mode = Control.FOCUS_NONE
 	b.add_theme_color_override("font_color", Color(1, 0.85, 0.4))
 	var sb := StyleBoxFlat.new()
 	sb.bg_color = Color(0.08, 0.04, 0.11, 0.9)
@@ -249,6 +256,11 @@ func _abrir() -> void:
 func _fechar() -> void:
 	if _painel:
 		_painel.visible = false
+	# Defesa em profundidade: se algum controlo do painel ficou com o foco,
+	# o ESPACO seguinte era consumido por ele em vez de saltar.
+	var focado := get_viewport().gui_get_focus_owner()
+	if focado:
+		focado.release_focus()
 	get_tree().paused = false
 
 

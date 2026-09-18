@@ -68,6 +68,7 @@ func _correr_tudo() -> void:
 	teste_catalogo_campanha()
 	teste_9h17_contrato_de_mobilidade_regiao1()
 	await teste_gate1_hitstop_nao_gera_nan()
+	await teste_dev_barra_salto_nao_abre_seletor()
 	await teste_9h17_novo_jogo_desarma_ao_sair()
 	teste_equipamento_dados()
 	teste_equipamento_estado()
@@ -3453,6 +3454,63 @@ func teste_9h17_contrato_de_mobilidade_regiao1() -> void:
 ##
 ## Este teste monta o caso minimo -- plataforma-corrente + Koliani em cima +
 ## a escala de tempo do hitstop -- e falha com o valor antigo (0.0).
+## O ESPAÇO é `saltar` E `ui_accept`. Se um botão da barra Dev ficar com o
+## foco (basta um clique de rato), cada salto volta a carregá-lo: abria o
+## selector de níveis e o salto seguinte escolhia um nível -- em jogo lê-se
+## como "no DEV MODE o espaço dá reset ao nível". Os botões que ficam por
+## cima do jogo não podem aceitar foco.
+func teste_dev_barra_salto_nao_abre_seletor() -> void:
+	var antes := EstadoJogo.para_dicionario().duplicate(true)
+	var era_dev := EstadoJogo.modo_dev
+	if not era_dev:
+		EstadoJogo.ativar_modo_dev()
+	var barra := preload("res://scenes/ui/DevBarra.tscn").instantiate()
+	add_child(barra)
+	await get_tree().process_frame
+
+	_ok(barra.get_node_or_null("BotaoTopo") != null,
+		"DEV MODE: a barra Dev nao se montou -- o teste nao esta' a medir"
+		+ " o caso que devia")
+	for nome in ["BotaoTopo", "BotaoFlymode"]:
+		var b := barra.get_node_or_null(nome) as Button
+		if b == null:
+			continue
+		_ok(b.focus_mode == Control.FOCUS_NONE,
+			"DEV MODE: `%s` aceita foco -- o ESPACO (saltar == ui_accept)"
+			% nome + " volta a carregar nele em vez de saltar")
+
+	# e com o painel fechado, um `ui_accept` sintetico nao pode abri-lo.
+	# Se o botao ACEITAR foco, damo-lo primeiro -- e' exactamente o que um
+	# clique de rato faz, e sem isso o teste nao reproduzia a queixa.
+	var painel := barra.get("_painel") as Control
+	var topo := barra.get_node_or_null("BotaoTopo") as Button
+	if topo and topo.focus_mode != Control.FOCUS_NONE:
+		topo.grab_focus()
+		await get_tree().process_frame
+	# tecla a serio (nao `Input.action_press`): so' um InputEventKey passa
+	# pelo caminho de GUI que activa um botao com foco.
+	for pressionada in [true, false]:
+		var tecla := InputEventKey.new()
+		tecla.physical_keycode = KEY_SPACE
+		tecla.keycode = KEY_SPACE
+		tecla.pressed = pressionada
+		Input.parse_input_event(tecla)
+		await get_tree().process_frame
+		await get_tree().process_frame
+	_ok(painel == null or not painel.visible,
+		"DEV MODE: o ESPACO abriu o selector de niveis por cima do jogo")
+
+	# se a falha acima acontecer, o painel deixou a arvore EM PAUSA e os
+	# testes seguintes mediam um jogo parado -- nao deixar isso acontecer.
+	get_tree().paused = false
+	barra.queue_free()
+	await get_tree().process_frame
+	if not era_dev:
+		EstadoJogo.desativar_modo_dev()
+	_ok(EstadoJogo.para_dicionario() == antes,
+		"DEV MODE: o teste da barra Dev mexeu no estado do jogo")
+
+
 func teste_gate1_hitstop_nao_gera_nan() -> void:
 	_ok(Koliani.HITSTOP_ESCALA_TEMPO > 0.0,
 		"GATE 1: o hitstop nao pode pôr `Engine.time_scale` a zero"
