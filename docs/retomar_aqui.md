@@ -23,9 +23,19 @@
   em localhost e carregado em Chromium: título "Koliani", canvas 1280x720,
   `index.manifest.json` ligado, service worker activo, menu a desenhar com
   v0.18.16 (`docs/playtests/producao_a2/pwa_menu_master_9740a24d.png`).
-- **Prova de que Windows e PWA são a mesma versão:** o `.pck` de dentro do
-  `.exe` e o `index.pck` do Web têm o MESMO SHA256
-  (`ceedabaeb9d96ecf...`) — mesmo conteúdo, mesmo master.
+- **Prova de que Windows e PWA são a mesma versão:** é o **SHA do commit**
+  registado pelo próprio GitHub — o artifact `github-pages` e o
+  `koliani-windows` do run #478 têm ambos `head_sha = 9740a24d`, o deployment
+  do Pages é desse SHA, e o corpo do Release `win-latest` nomeia-o.
+  **Armadilha de método (custou uma volta):** o `.pck` **não é reproduzível
+  byte a byte** entre exportações. Duas exportações seguidas do MESMO commit
+  dão pck do mesmo tamanho mas com ~2 MB diferentes, todos na cauda
+  (`uid_cache.bin`, `global_script_class_cache`, tabela de ficheiros), porque
+  dependem do estado do import. A primeira medição deu SHA igual só porque as
+  duas exportações partilharam a cache de import — não serve de prova de
+  alinhamento. **E não exportar o Web para `build/web/` antes do Windows:**
+  o `exclude_filter` dos presets não exclui `build/**`, portanto os PNGs do
+  export Web entram no `.exe` seguinte (+911 KB medidos).
 - **Save real intacto:** tudo correu com `XDG_DATA_HOME` isolado e este
   contentor nem sequer tem `progresso.json`; o save do Paulo está na máquina
   dele e não foi tocado.
