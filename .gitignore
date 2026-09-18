@@ -14,6 +14,9 @@ export_presets.cfg.bak
 
 # Import cache
 *.import.bak
+# Traducoes COMPILADAS a partir dos .csv rastreados (o Godot regera-as no
+# `--import`). Sao binarios derivados: o repo nunca rastreou nenhuma.
+*.translation
 
 # Sistema
 .DS_Store

@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://dyc203tyuwp4s"
+
+[deps]
+
+files=["res://docs/implementation/canonical_koliani_levels_06_100/inventario_niveis.scene.translation", "res://docs/implementation/canonical_koliani_levels_06_100/inventario_niveis.player.translation", "res://docs/implementation/canonical_koliani_levels_06_100/inventario_niveis.flags.translation", "res://docs/implementation/canonical_koliani_levels_06_100/inventario_niveis.action.translation", "res://docs/implementation/canonical_koliani_levels_06_100/inventario_niveis.runtime.translation"]
+
+source_file="res://docs/implementation/canonical_koliani_levels_06_100/inventario_niveis.csv"
+dest_files=["res://docs/implementation/canonical_koliani_levels_06_100/inventario_niveis.scene.translation", "res://docs/implementation/canonical_koliani_levels_06_100/inventario_niveis.player.translation", "res://docs/implementation/canonical_koliani_levels_06_100/inventario_niveis.flags.translation", "res://docs/implementation/canonical_koliani_levels_06_100/inventario_niveis.action.translation", "res://docs/implementation/canonical_koliani_levels_06_100/inventario_niveis.runtime.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true
