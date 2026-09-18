@@ -1,3 +1,61 @@
+## Remediação de fidelidade da Região II — GATES 1 e 2 (18 set 2026)
+
+- Branch `claude/region02-fidelity-remediation`, a partir de
+  `claude/region02-humanlike-bot-playtest` @ `1bfda76f`.
+  Relatório: [`docs/implementation/region_02_fidelity_remediation.md`](implementation/region_02_fidelity_remediation.md).
+  **PARCIAL: só os dois GATES. As Fases 3 a 9 (inimigos canónicos,
+  ambiente, Guardião, arena, re-audit, re-run, build) NÃO foram começadas** —
+  a execução parou por limite de uso.
+
+- **O NaN do N06 tinha causa, e não era da Região II.** `_hitstop()` punha
+  `Engine.time_scale = 0.0`; o Godot passa `physics_step * time_scale` ao
+  servidor de física, portanto o passo ia a ZERO, e a integração de um
+  `AnimatableBody2D` com `sync_to_physics` calcula-lhe a velocidade por
+  `motion / passo` = **0/0 = NaN**. Quem está EM CIMA lê essa velocidade em
+  `move_and_slide()` e sai de lá com posição e velocidade a NaN. No N06 era
+  a `CorrenteC` (x=1970) com um `chort` a 110 px. **Valia para as nove
+  plataformas `AnimatableBody2D` do jogo.** Correcção:
+  `Koliani.HITSTOP_ESCALA_TEMPO = 0.0005`.
+  Prova determinística: `teste_gate1_hitstop_nao_gera_nan` (falha com 0.0,
+  passa com 0.0005) + 15 runs do bot com 0 frames NaN.
+
+- **O pico do N10 não era o salto, era a consequência.** Com salto duplo a
+  envolvente dá 195 px de vão para uma subida de 80; o vão `L1`→`R1` são 70.
+  O que matava era (a) a `RajadaFavor` soprar 80 px para além do `ChaoInicio`
+  e (b) só haver ácido (`dano = 999`) debaixo de 570 px de subida. Correcção:
+  rajada acaba em x=540 e `ChaoResgate` (x 540-880, topo y=850).
+  **200,7 → 0-31 mortes/1000 px; o aglomerado de x≈700 desapareceu.**
+  De x=880 para a direita o ácido continua vivo de propósito.
+
+- **Armadilhas de método que custaram a descobrir** (ler antes de repetir):
+  1. As runs do bot **não são determinísticas entre processos** — a seed só
+     governa o RNG do bot, o jogo usa `randf()` global. O NaN dava em ~1 de
+     cada 4 runs e 2 runs não chegaram para o apanhar; foram precisas 12.
+  2. `x_max` **não mede progresso num poço vertical**. O bot passou a gravar
+     `y_min`/`y_spawn`. No N10 é esse o número que vale.
+  3. Um chão largo no fundo de uma subida vertical é um **atractor de
+     navegação**: a laje de 580 px apagou as mortes todas mas fez o bot subir
+     menos (204 px contra 497) e nenhuma run voltou a chegar ao chefe.
+  4. Uma saliência estreita **não resolve, muda a borda de sítio**: a de
+     260 px levou 73,5% das mortes para a ponta direita dela (x≈900).
+
+- **Achado novo para a Fase 4:** nas fotografias reais o ácido do N10 é
+  **quase invisível** — onda de ameixa escura sobre fundo preto. Um perigo
+  que mata de vida cheia e não se lê é metade da injustiça que o GATE 2
+  corrigiu.
+
+- **Rede de art safety montada:**
+  `docs/playtests/region_02_visual_evidence_after/geometria_gameplay_base.json`
+  é a geometria de jogo DEPOIS do GATE 2. O passe de arte tem de provar 0
+  alterações contra ela com
+  `godot --headless --path . res://tools/geometria_regiao02.tscn -- comparar <ficheiro>`.
+
+- **Correr em Linux/headless** (o `correr_testes.ps1` é PowerShell): o
+  equivalente do isolamento do `user://` é `XDG_DATA_HOME=$(mktemp -d)`. As
+  fotografias precisam de `xvfb-run` + `--rendering-driver opengl3`.
+
+---
+
 ## Playtest human-like por bot + audit de fidelidade da Região II (18 set 2026)
 
 - Branch `claude/region02-humanlike-bot-playtest`, a partir de

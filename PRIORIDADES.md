@@ -1,3 +1,31 @@
+## Pendente de DECISÃO — depois dos GATES 1 e 2 (18 set 2026)
+
+Branch `claude/region02-fidelity-remediation`. Relatório:
+`docs/implementation/region_02_fidelity_remediation.md`.
+**Corrigidos e provados:** o NaN do N06 (era o `Engine.time_scale = 0.0` do
+hitstop, e afectava as nove plataformas `AnimatableBody2D` do jogo inteiro) e
+o pico de mortes do N10 (200,7 → 0-31 mortes/1000 px).
+
+**As Fases 3 a 9 do Super-Process A2 NÃO foram começadas** — inimigos
+canónicos, guardiões N06-N09, ambiente, Guardião dos Céus, arena do N10,
+re-audit, re-run do bot e build Windows. A lista de decisões em aberto da
+secção seguinte continua **toda válida**, menos o ponto 4 (o ácido do N10),
+que está resolvido.
+
+O que fica novo para decidir:
+
+A. **O N10 ficou demasiado fácil?** A mortalidade caiu para a ordem do N08
+   (o segundo mais mortal da região), que era o alvo — mas quem decide se o
+   exame final quer mais mordida é o Paulo, no playtest humano. A laje
+   `ChaoResgate` cobre x 540-880; alargá-la ou encolhê-la é uma linha na
+   cena, e o comentário lá dentro tem as três variantes medidas.
+B. **O ácido do N10 não se lê.** Nas fotografias reais é uma onda de ameixa
+   escura sobre fundo preto. Clarear a banda do abismo já estava na lista
+   como arte (ponto 7); passa a ser também **justiça**, porque é um perigo
+   que mata de vida cheia.
+
+---
+
 ## Pendente de DECISÃO — depois do audit de fidelidade da Região II (18 set 2026)
 
 Branch `claude/region02-humanlike-bot-playtest`. Relatório completo em
