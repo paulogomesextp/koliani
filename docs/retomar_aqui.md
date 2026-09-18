@@ -1,3 +1,38 @@
+## A2 em produção — master, Windows e PWA (18 set 2026)
+
+- **`master` = `9740a24d`** (local == `origin/master`). A integração foi
+  **fast-forward puro** a partir de `e665da0b`: 37 commits, 0 conflitos, 0
+  commits perdidos — `e665da0b` era exactamente o merge-base, portanto entrou
+  a cadeia toda (sistema de vento → N08 planeio → Guardião dos Céus →
+  Super-Process A → A2), não só o último commit.
+- **Testes em master:** suite + 8 harnesses + 9 verificadores do CI, todos
+  exit 0, com o `user://` isolado por `XDG_DATA_HOME`. O CI (run #478) repetiu
+  a mesma bateria e passou: testes, Web, Windows e Android verdes.
+- **Windows:** `build/windows/Koliani.exe` (197 MB, v0.18.16) exportado do
+  master com o preset "Windows Desktop". **Não há Windows neste contentor**
+  (nem wine), por isso o `.exe` não foi aberto aqui: o que se validou foi o
+  CONTEÚDO empacotado, extraindo o `.pck` de dentro do `.exe` e correndo-o
+  com `--main-pack` (menu + N06-N10, 0 erros; também com janela real via
+  Xvfb + OpenGL3). Quem abre o executável em Windows é o Paulo. O canal
+  público está actualizado: Release `win-latest` com o build do `9740a24d`.
+- **PWA:** o CI publicou no GitHub Pages — deployment `6533456718`, SHA
+  `9740a24d`, estado `success`, URL `https://paulogomesextp.github.io/koliani/`
+  (o anterior era `e665da0b`). **A URL pública não foi aberta daqui**: a
+  política de rede deste contentor bloqueia `github.io` e o blob dos
+  artifacts. O que se validou foi o mesmo bundle exportado do master, servido
+  em localhost e carregado em Chromium: título "Koliani", canvas 1280x720,
+  `index.manifest.json` ligado, service worker activo, menu a desenhar com
+  v0.18.16 (`docs/playtests/producao_a2/pwa_menu_master_9740a24d.png`).
+- **Prova de que Windows e PWA são a mesma versão:** o `.pck` de dentro do
+  `.exe` e o `index.pck` do Web têm o MESMO SHA256
+  (`ceedabaeb9d96ecf...`) — mesmo conteúdo, mesmo master.
+- **Save real intacto:** tudo correu com `XDG_DATA_HOME` isolado e este
+  contentor nem sequer tem `progresso.json`; o save do Paulo está na máquina
+  dele e não foi tocado.
+- **Nada de jogo mudou nesta execução** — só integração, builds e documentos.
+
+---
+
 ## Remediação de fidelidade da Região II — Super-Process A2 (18 set 2026)
 
 - Branch `claude/region02-fidelity-remediation` @ `77b4c891`, a partir de
