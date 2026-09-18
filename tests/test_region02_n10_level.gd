@@ -71,6 +71,41 @@ static func executar() -> Array[String]:
 
 	_verificar(falhas, favor != null and favor.direcao.x > 0.0 and favor.intensidade > 0.0,
 		"N10: rajada A FAVOR na entrada")
+
+	# GATE 2 (Super-Process A2) -- a rajada nao pode soprar para la' do chao.
+	# Media antes: x 180-620 com o `ChaoInicio` a acabar em 540, ou seja 80 px
+	# de vento por cima do vazio, a empurrar para uma queda mortal antes de
+	# haver onde pousar.
+	var chao_inicio := raiz.get_node_or_null("ChaoInicio") as Node2D
+	if favor != null and chao_inicio != null:
+		var fim_vento: float = favor.position.x + favor.tamanho.x * 0.5
+		var fim_chao: float = chao_inicio.position.x \
+			+ (chao_inicio.get("tamanho") as Vector2).x * 0.5
+		_verificar(falhas, fim_vento <= fim_chao + 1.0,
+			"N10: a rajada a favor acaba em x=%.0f e o chao em x=%.0f --"
+			% [fim_vento, fim_chao]
+			+ " o vento nao pode empurrar para alem do chao que existe")
+
+	# GATE 2 -- a saliencia de recuperacao debaixo do vao `L1`->`R1`, onde
+	# estavam 99% das mortes do nivel (76% so' em x~700). Sem ela, falhar o
+	# primeiro salto do ziguezague e' morte instantanea de vida cheia.
+	var resgate := raiz.get_node_or_null("ChaoResgate") as Node2D
+	_verificar(falhas, resgate != null,
+		"N10: falta a saliencia de recuperacao do fundo do poco")
+	if resgate != null:
+		var r_tam := resgate.get("tamanho") as Vector2
+		var r0: float = resgate.position.x - r_tam.x * 0.5
+		var r1: float = resgate.position.x + r_tam.x * 0.5
+		var topo: float = resgate.position.y - r_tam.y * 0.5
+		var acido := raiz.get_node_or_null("Acido") as Node2D
+		_verificar(falhas, r0 <= 600.0 and r1 >= 820.0,
+			"N10: a saliencia (x %.0f-%.0f) tem de cobrir a faixa das mortes"
+			% [r0, r1] + " medida (x 600-820)")
+		if acido != null:
+			var sup: float = acido.position.y - float(acido.get("altura")) * 0.5
+			_verificar(falhas, topo < sup - 40.0,
+				"N10: a saliencia (topo y=%.0f) tem de ficar acima da linha"
+				% topo + " do acido (y=%.0f)" % sup)
 	_verificar(falhas, corrente != null and corrente.direcao.y < 0.0
 		and corrente.intensidade > 1400.0,
 		"N10: corrente ASCENDENTE capaz de levantar")

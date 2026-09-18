@@ -29,7 +29,7 @@
 size = Vector2(44, 96)
 
 [sub_resource type="RectangleShape2D" id="rs_RajadaFavor"]
-size = Vector2(440, 130)
+size = Vector2(360, 130)
 
 [sub_resource type="RectangleShape2D" id="rs_CorrenteEsq"]
 size = Vector2(190, 320)
@@ -99,6 +99,40 @@ cor = Color(0.46, 0.14, 0.28, 0.9)
 position = Vector2(320, 880)
 tamanho = Vector2(440, 60)
 altura_visual = 100.0
+cor_base = Color(0.2, 0.24, 0.32, 1)
+cor_topo = Color(0.42, 0.54, 0.68, 1)
+
+; GATE 2 -- SALIENCIA DE RECUPERACAO DA SUBIDA BAIXA.
+;
+; O problema medido: 76% das mortes do nivel num unico ponto (x~700) e 99%
+; na faixa x=600-820 -- o vao entre a `L1` (acaba em 635) e a `R1` (comeca
+; em 705). Por baixo dele so' havia acido, que mata de vida cheia. Dai o
+; N10 dar 200,7 mortes/1000 px contra 4,7-23,8 nos outros quatro, e faze-lo
+; com 58,8 de dano por run contra 3465-6604: o nivel nao feria, executava.
+;
+; A causa nao e' o salto. Com salto duplo a envolvente da' 195 px de vao
+; para uma subida de 80, e o vao L1->R1 sao 70. E' a CONSEQUENCIA: falhar
+; um salto a meio de uma subida era morte instantanea de vida cheia.
+;
+; Esta laje fecha o fundo debaixo da subida BAIXA -- x 540-880, encostada
+; ao `ChaoInicio` (acaba em 540) e a cobrir a faixa das mortes com folga.
+; Quem falha cai aqui e perde a subida toda, que e' castigo a serio, mas
+; nao perde uma vida.
+;
+; NAO fecha o poco todo, de proposito. De x=880 para a direita o acido
+; continua vivo, e e' para la' que cai quem falha a subida ALTA (RR2,
+; SubidaDir1/2). Essa metade ja' esta' depois do `CheckMeio` (660,516),
+; portanto morrer la' custa pouco -- e a torre continua a ser uma torre de
+; onde se cai. Duas tentativas descartadas antes desta:
+;   * 260 px (x 600-860): o aglomerado mudou-se para a ponta direita dela
+;     (73,5% das mortes em x~900) -- so' se muda a borda de sitio;
+;   * 580 px (x 540-1120): apagou as mortes todas mas virou um atractor de
+;     navegacao no fundo do poco -- o bot passou a SUBIR MENOS (204 px
+;     contra 497) e nenhuma run voltou a chegar ao chefe.
+[node name="ChaoResgate" parent="." instance=ExtResource("9_pl")]
+position = Vector2(710, 872)
+tamanho = Vector2(340, 44)
+altura_visual = 60.0
 cor_base = Color(0.2, 0.24, 0.32, 1)
 cor_topo = Color(0.42, 0.54, 0.68, 1)
 
@@ -224,12 +258,16 @@ cor_topo = Color(0.42, 0.54, 0.68, 1)
 
 ; ===================  EXAME DE VENTO (Regiao II)  =========================
 ; 1. A FAVOR, em baixo: leva quem corre para a direita ate' ao ziguezague.
+; GATE 2 (18 set 2026) -- a rajada ACABA onde o `ChaoInicio` acaba (x=540).
+; Media antes: x 180-620, ou seja soprava 80 px para alem do chao que
+; existe, e empurrava para uma queda mortal antes de haver onde pousar.
+; Agora x 180-540. O impulso de corrida continua inteiro.
 [node name="RajadaFavor" parent="." instance=ExtResource("12_wind")]
-position = Vector2(400, 820)
+position = Vector2(360, 820)
 direcao = Vector2(1, 0)
 intensidade = 1400
 velocidade_max = 360
-tamanho = Vector2(440, 130)
+tamanho = Vector2(360, 130)
 cor_guia = Color(0.68, 0.9, 1, 0.42)
 
 [node name="CollisionShape2D" parent="RajadaFavor"]

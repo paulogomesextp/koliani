@@ -121,6 +121,9 @@ var M := {
 	"chefe_duracao_s": 0.0, "chefe_dano_sofrido": 0, "chefe_golpes_sofridos": 0,
 	"chefe_telegrafos": 0, "chefe_ataques_evitados": 0, "chefe_derrotado": false,
 	"progresso_x": 0.0, "x_max": 0.0, "x_alvo": 0.0,
+	# O N10 e' um POCO: o `x_max` nao mede nada la'. `y_min` = o ponto mais
+	# alto a que a run chegou (y cresce para baixo).
+	"y_min": 1.0e9, "y_spawn": 0.0,
 	"pontos_de_falha": {}, "mortes_pos": [],     # x arredondado a 100 -> nº de mortes
 	"encravamentos": 0,
 	"nan_frames": 0, "nan_primeiro": null,
@@ -182,6 +185,8 @@ func _ligar() -> void:
 	if _porta:
 		M["x_alvo"] = _porta.global_position.x
 	_x_ref = _kol.global_position.x
+	if float(M["y_spawn"]) == 0.0:
+		M["y_spawn"] = _kol.global_position.y
 	_x_ref_t = _t
 	for z in get_nodes_in_group("zonas_vento"):
 		if not z.is_connected("corpo_entrou", _ao_vento):
@@ -322,6 +327,7 @@ func _passo(dt: float) -> void:
 	_vigiar_nan(pos)
 	_lembrar_estado_nan(pos)
 	M["x_max"] = maxf(M["x_max"], pos.x)
+	M["y_min"] = minf(float(M["y_min"]), pos.y)
 	_servir_botoes()
 	_ataque_cd = maxf(0.0, _ataque_cd - dt)
 	_dash_cd = maxf(0.0, _dash_cd - dt)

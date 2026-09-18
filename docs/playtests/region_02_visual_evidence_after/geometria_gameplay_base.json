@@ -1,0 +1,2301 @@
+{
+	"N06": {
+		"AcidoFundo": {
+			"altura": 320.0,
+			"largura": 4000.0,
+			"pos": [
+				1750.0,
+				960.0
+			]
+		},
+		"AcidoFundo/CollisionShape2D": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"Baixo1/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"Baixo2/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"Baixo3/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"Baixo4/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"ChaoChefe": {
+			"pos": [
+				2960.0,
+				700.0
+			],
+			"tamanho": [
+				600.0,
+				60.0
+			]
+		},
+		"ChaoChefe/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"ChaoInicio": {
+			"pos": [
+				280.0,
+				700.0
+			],
+			"tamanho": [
+				440.0,
+				60.0
+			]
+		},
+		"ChaoInicio/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"ChaoMeio": {
+			"pos": [
+				1420.0,
+				700.0
+			],
+			"tamanho": [
+				360.0,
+				60.0
+			]
+		},
+		"ChaoMeio/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"CheckInicio": {
+			"col": [
+				44.0,
+				96.0
+			],
+			"col_pos": [
+				0.0,
+				0.0
+			],
+			"pos": [
+				420.0,
+				636.0
+			]
+		},
+		"CheckInicio/CollisionShape2D": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"CheckMeio": {
+			"col": [
+				44.0,
+				96.0
+			],
+			"col_pos": [
+				0.0,
+				0.0
+			],
+			"pos": [
+				1450.0,
+				636.0
+			]
+		},
+		"CheckMeio/CollisionShape2D": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"CheckReencontro": {
+			"col": [
+				44.0,
+				96.0
+			],
+			"col_pos": [
+				0.0,
+				0.0
+			],
+			"pos": [
+				2540.0,
+				552.0
+			]
+		},
+		"CheckReencontro/CollisionShape2D": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"Chefe": {
+			"col": [
+				54.0,
+				72.0
+			],
+			"col_pos": [
+				0.0,
+				0.0
+			],
+			"pos": [
+				3100.0,
+				624.0
+			]
+		},
+		"Chefe/AreaContacto/CollisionShape2D": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"Chefe/CollisionShape2D": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"Cima1/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"Cima2/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"Cima3/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"Cima4/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"ColDash": {
+			"pos": [
+				2520.0,
+				534.0
+			]
+		},
+		"ColDash/CollisionShape2D": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"CorrenteA": {
+			"largura": 120.0,
+			"modo": "vertical",
+			"pos": [
+				740.0,
+				610.0
+			]
+		},
+		"CorrenteA/Col": {
+			"pos": [
+				0.0,
+				3.0
+			]
+		},
+		"CorrenteA/Corrente": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"CorrenteB": {
+			"largura": 120.0,
+			"modo": "pendulo",
+			"pos": [
+				980.0,
+				590.0
+			]
+		},
+		"CorrenteB/Col": {
+			"pos": [
+				0.0,
+				3.0
+			]
+		},
+		"CorrenteB/Corrente": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"CorrenteC": {
+			"largura": 120.0,
+			"modo": "horizontal",
+			"pos": [
+				1970.0,
+				665.0
+			]
+		},
+		"CorrenteC/Col": {
+			"pos": [
+				0.0,
+				3.0
+			]
+		},
+		"CorrenteC/Corrente": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"EliteEsqueleto": {
+			"col": [
+				40.0,
+				64.0
+			],
+			"col_pos": [
+				0.0,
+				-13.0
+			],
+			"pos": [
+				1420.0,
+				636.0
+			]
+		},
+		"EliteEsqueleto/AreaContacto/CollisionShape2D": {
+			"pos": [
+				0.0,
+				-14.0
+			]
+		},
+		"EliteEsqueleto/CollisionShape2D": {
+			"pos": [
+				0.0,
+				-13.0
+			]
+		},
+		"FogoChefe": {
+			"col": [
+				12.0,
+				18.0
+			],
+			"col_pos": [
+				0.0,
+				-22.0
+			],
+			"pos": [
+				3060.0,
+				668.0
+			]
+		},
+		"FogoChefe/CollisionShape2D": {
+			"pos": [
+				0.0,
+				-22.0
+			]
+		},
+		"FogoMeio": {
+			"col": [
+				12.0,
+				18.0
+			],
+			"col_pos": [
+				0.0,
+				-22.0
+			],
+			"pos": [
+				1490.0,
+				668.0
+			]
+		},
+		"FogoMeio/CollisionShape2D": {
+			"pos": [
+				0.0,
+				-22.0
+			]
+		},
+		"GoblinBaixo/AreaContacto/CollisionShape2D": {
+			"pos": [
+				0.0,
+				-14.0
+			]
+		},
+		"GoblinBaixo/CollisionShape2D": {
+			"pos": [
+				0.0,
+				-13.0
+			]
+		},
+		"Koliani": {
+			"col": [
+				20.0,
+				44.0
+			],
+			"col_pos": [
+				0.0,
+				0.0
+			],
+			"pos": [
+				150.0,
+				620.0
+			]
+		},
+		"Koliani/CollisionShape2D": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"Koliani/HitboxAtaque/CollisionShape2D": {
+			"pos": [
+				23.0,
+				-4.0
+			]
+		},
+		"Porta": {
+			"col": [
+				48.0,
+				96.0
+			],
+			"col_pos": [
+				0.0,
+				0.0
+			],
+			"pos": [
+				3260.0,
+				626.0
+			]
+		},
+		"Porta/CollisionShape2D": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"Reencontro/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"Saliencia1/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"Saliencia2/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"Saliencia3/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"VentoBifurcacao": {
+			"col": [
+				320.0,
+				160.0
+			],
+			"col_pos": [
+				0.0,
+				0.0
+			],
+			"direcao": [
+				-1.0,
+				0.0
+			],
+			"duracao_pulso": 1.25,
+			"intensidade": 520.0,
+			"intervalo_pulso": 1.0,
+			"modo": 1,
+			"pos": [
+				1950.0,
+				585.0
+			],
+			"tamanho": [
+				820.0,
+				300.0
+			],
+			"velocidade_max": 320.0
+		},
+		"VentoBifurcacao/CollisionShape2D": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"VentoEntrada": {
+			"col": [
+				320.0,
+				160.0
+			],
+			"col_pos": [
+				0.0,
+				0.0
+			],
+			"direcao": [
+				1.0,
+				0.0
+			],
+			"duracao_pulso": 1.6,
+			"intensidade": 420.0,
+			"intervalo_pulso": 1.2,
+			"modo": 1,
+			"pos": [
+				860.0,
+				590.0
+			],
+			"tamanho": [
+				760.0,
+				250.0
+			],
+			"velocidade_max": 300.0
+		},
+		"VentoEntrada/CollisionShape2D": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		}
+	},
+	"N07": {
+		"C1/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"C2/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"C3/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"C4/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"ChaoChefe": {
+			"pos": [
+				2900.0,
+				700.0
+			],
+			"tamanho": [
+				600.0,
+				60.0
+			]
+		},
+		"ChaoChefe/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"ChaoInicio": {
+			"pos": [
+				280.0,
+				640.0
+			],
+			"tamanho": [
+				420.0,
+				60.0
+			]
+		},
+		"ChaoInicio/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"ChaoMeio": {
+			"pos": [
+				1360.0,
+				780.0
+			],
+			"tamanho": [
+				360.0,
+				60.0
+			]
+		},
+		"ChaoMeio/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"CheckInicio": {
+			"col": [
+				44.0,
+				96.0
+			],
+			"col_pos": [
+				0.0,
+				0.0
+			],
+			"pos": [
+				420.0,
+				576.0
+			]
+		},
+		"CheckInicio/CollisionShape2D": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"CheckMeio": {
+			"col": [
+				44.0,
+				96.0
+			],
+			"col_pos": [
+				0.0,
+				0.0
+			],
+			"pos": [
+				1360.0,
+				716.0
+			]
+		},
+		"CheckMeio/CollisionShape2D": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"CheckReencontro": {
+			"col": [
+				44.0,
+				96.0
+			],
+			"col_pos": [
+				0.0,
+				0.0
+			],
+			"pos": [
+				2440.0,
+				592.0
+			]
+		},
+		"CheckReencontro/CollisionShape2D": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"Chefe": {
+			"col": [
+				56.0,
+				104.0
+			],
+			"col_pos": [
+				0.0,
+				0.0
+			],
+			"pos": [
+				3020.0,
+				624.0
+			]
+		},
+		"Chefe/AreaContacto/CollisionShape2D": {
+			"pos": [
+				0.0,
+				-4.0
+			]
+		},
+		"Chefe/CollisionShape2D": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"ColEscalar": {
+			"pos": [
+				2440.0,
+				584.0
+			]
+		},
+		"ColEscalar/CollisionShape2D": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"CorrenteSobe": {
+			"largura": 130.0,
+			"modo": "vertical",
+			"pos": [
+				1700.0,
+				620.0
+			]
+		},
+		"CorrenteSobe/Col": {
+			"pos": [
+				0.0,
+				3.0
+			]
+		},
+		"CorrenteSobe/Corrente": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"D1/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"D2/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"D3/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"EliteImp": {
+			"col": [
+				40.0,
+				64.0
+			],
+			"col_pos": [
+				0.0,
+				-13.0
+			],
+			"pos": [
+				1360.0,
+				716.0
+			]
+		},
+		"EliteImp/AreaContacto/CollisionShape2D": {
+			"pos": [
+				0.0,
+				-14.0
+			]
+		},
+		"EliteImp/CollisionShape2D": {
+			"pos": [
+				0.0,
+				-13.0
+			]
+		},
+		"FogoChefe1": {
+			"col": [
+				12.0,
+				18.0
+			],
+			"col_pos": [
+				0.0,
+				-22.0
+			],
+			"pos": [
+				2780.0,
+				668.0
+			]
+		},
+		"FogoChefe1/CollisionShape2D": {
+			"pos": [
+				0.0,
+				-22.0
+			]
+		},
+		"FogoChefe2": {
+			"col": [
+				12.0,
+				18.0
+			],
+			"col_pos": [
+				0.0,
+				-22.0
+			],
+			"pos": [
+				3120.0,
+				668.0
+			]
+		},
+		"FogoChefe2/CollisionShape2D": {
+			"pos": [
+				0.0,
+				-22.0
+			]
+		},
+		"FogoD2": {
+			"col": [
+				12.0,
+				18.0
+			],
+			"col_pos": [
+				0.0,
+				-22.0
+			],
+			"pos": [
+				820.0,
+				688.0
+			]
+		},
+		"FogoD2/CollisionShape2D": {
+			"pos": [
+				0.0,
+				-22.0
+			]
+		},
+		"FundoDoAbismo/CollisionShape2D": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"GoblinP/AreaContacto/CollisionShape2D": {
+			"pos": [
+				0.0,
+				-14.0
+			]
+		},
+		"GoblinP/CollisionShape2D": {
+			"pos": [
+				0.0,
+				-13.0
+			]
+		},
+		"Koliani": {
+			"col": [
+				20.0,
+				44.0
+			],
+			"col_pos": [
+				0.0,
+				0.0
+			],
+			"pos": [
+				150.0,
+				560.0
+			]
+		},
+		"Koliani/CollisionShape2D": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"Koliani/HitboxAtaque/CollisionShape2D": {
+			"pos": [
+				23.0,
+				-4.0
+			]
+		},
+		"P1/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"P2/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"P3/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"P4/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"Porta": {
+			"col": [
+				48.0,
+				96.0
+			],
+			"col_pos": [
+				0.0,
+				0.0
+			],
+			"pos": [
+				3180.0,
+				626.0
+			]
+		},
+		"Porta/CollisionShape2D": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"Reencontro/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"SerraP1": {
+			"pos": [
+				1700.0,
+				740.0
+			]
+		},
+		"SerraP1/CollisionShape2D": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"UpdraftEntrada": {
+			"col": [
+				320.0,
+				160.0
+			],
+			"col_pos": [
+				0.0,
+				0.0
+			],
+			"direcao": [
+				0.0,
+				-1.0
+			],
+			"duracao_pulso": 1.0,
+			"intensidade": 1050.0,
+			"intervalo_pulso": 1.0,
+			"modo": 0,
+			"pos": [
+				1690.0,
+				560.0
+			],
+			"tamanho": [
+				190.0,
+				300.0
+			],
+			"velocidade_max": 340.0
+		},
+		"UpdraftEntrada/CollisionShape2D": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"UpdraftMeio": {
+			"col": [
+				320.0,
+				160.0
+			],
+			"col_pos": [
+				0.0,
+				0.0
+			],
+			"direcao": [
+				0.0,
+				-1.0
+			],
+			"duracao_pulso": 1.0,
+			"intensidade": 1180.0,
+			"intervalo_pulso": 1.0,
+			"modo": 0,
+			"pos": [
+				1935.0,
+				500.0
+			],
+			"tamanho": [
+				210.0,
+				320.0
+			],
+			"velocidade_max": 380.0
+		},
+		"UpdraftMeio/CollisionShape2D": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"UpdraftSaida": {
+			"col": [
+				320.0,
+				160.0
+			],
+			"col_pos": [
+				0.0,
+				0.0
+			],
+			"direcao": [
+				0.0,
+				-1.0
+			],
+			"duracao_pulso": 1.0,
+			"intensidade": 980.0,
+			"intervalo_pulso": 1.0,
+			"modo": 0,
+			"pos": [
+				2170.0,
+				500.0
+			],
+			"tamanho": [
+				190.0,
+				300.0
+			],
+			"velocidade_max": 330.0
+		},
+		"UpdraftSaida/CollisionShape2D": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		}
+	},
+	"N08": {
+		"ChaoChefe": {
+			"pos": [
+				5280.0,
+				810.0
+			],
+			"tamanho": [
+				560.0,
+				100.0
+			]
+		},
+		"ChaoChefe/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"ChaoInicio": {
+			"pos": [
+				230.0,
+				700.0
+			],
+			"tamanho": [
+				460.0,
+				100.0
+			]
+		},
+		"ChaoInicio/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"CheckInicio": {
+			"col": [
+				44.0,
+				96.0
+			],
+			"col_pos": [
+				0.0,
+				0.0
+			],
+			"pos": [
+				300.0,
+				602.0
+			]
+		},
+		"CheckInicio/CollisionShape2D": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"CheckMeio": {
+			"col": [
+				44.0,
+				96.0
+			],
+			"col_pos": [
+				0.0,
+				0.0
+			],
+			"pos": [
+				3160.0,
+				552.0
+			]
+		},
+		"CheckMeio/CollisionShape2D": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"CheckReencontro": {
+			"col": [
+				44.0,
+				96.0
+			],
+			"col_pos": [
+				0.0,
+				0.0
+			],
+			"pos": [
+				5180.0,
+				712.0
+			]
+		},
+		"CheckReencontro/CollisionShape2D": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"Chefe": {
+			"col": [
+				46.0,
+				92.0
+			],
+			"col_pos": [
+				0.0,
+				0.0
+			],
+			"pos": [
+				5400.0,
+				714.0
+			]
+		},
+		"Chefe/AreaContacto/CollisionShape2D": {
+			"pos": [
+				0.0,
+				-4.0
+			]
+		},
+		"Chefe/CollisionShape2D": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"ColProjetil": {
+			"pos": [
+				3020.0,
+				576.0
+			]
+		},
+		"ColProjetil/CollisionShape2D": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"CorrenteSubida": {
+			"col": [
+				200.0,
+				600.0
+			],
+			"col_pos": [
+				0.0,
+				0.0
+			],
+			"direcao": [
+				0.0,
+				-1.0
+			],
+			"duracao_pulso": 1.0,
+			"intensidade": 2600.0,
+			"intervalo_pulso": 1.0,
+			"modo": 0,
+			"pos": [
+				2050.0,
+				800.0
+			],
+			"tamanho": [
+				200.0,
+				600.0
+			],
+			"velocidade_max": 340.0
+		},
+		"CorrenteSubida/CollisionShape2D": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"EliteChort": {
+			"col": [
+				40.0,
+				64.0
+			],
+			"col_pos": [
+				0.0,
+				-13.0
+			],
+			"pos": [
+				2720.0,
+				566.0
+			]
+		},
+		"EliteChort/AreaContacto/CollisionShape2D": {
+			"pos": [
+				0.0,
+				-14.0
+			]
+		},
+		"EliteChort/CollisionShape2D": {
+			"pos": [
+				0.0,
+				-13.0
+			]
+		},
+		"Ilha1": {
+			"pos": [
+				870.0,
+				780.0
+			],
+			"tamanho": [
+				260.0,
+				60.0
+			]
+		},
+		"Ilha1/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"Ilha2": {
+			"pos": [
+				1770.0,
+				930.0
+			],
+			"tamanho": [
+				260.0,
+				60.0
+			]
+		},
+		"Ilha2/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"Ilha3": {
+			"pos": [
+				2305.0,
+				590.0
+			],
+			"tamanho": [
+				270.0,
+				60.0
+			]
+		},
+		"Ilha3/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"IlhaContra": {
+			"pos": [
+				4520.0,
+				730.0
+			],
+			"tamanho": [
+				240.0,
+				60.0
+			]
+		},
+		"IlhaContra/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"IlhaElite": {
+			"pos": [
+				2720.0,
+				640.0
+			],
+			"tamanho": [
+				320.0,
+				80.0
+			]
+		},
+		"IlhaElite/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"IlhaMeio": {
+			"pos": [
+				3100.0,
+				640.0
+			],
+			"tamanho": [
+				280.0,
+				80.0
+			]
+		},
+		"IlhaMeio/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"IlhaVento": {
+			"pos": [
+				4020.0,
+				710.0
+			],
+			"tamanho": [
+				280.0,
+				60.0
+			]
+		},
+		"IlhaVento/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"Koliani": {
+			"col": [
+				20.0,
+				44.0
+			],
+			"col_pos": [
+				0.0,
+				0.0
+			],
+			"pos": [
+				150.0,
+				600.0
+			]
+		},
+		"Koliani/CollisionShape2D": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"Koliani/HitboxAtaque/CollisionShape2D": {
+			"pos": [
+				23.0,
+				-4.0
+			]
+		},
+		"MuroFim/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"MuroInicio/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"Pedra1/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"Porta": {
+			"col": [
+				48.0,
+				96.0
+			],
+			"col_pos": [
+				0.0,
+				0.0
+			],
+			"pos": [
+				5530.0,
+				716.0
+			]
+		},
+		"Porta/CollisionShape2D": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"RajadaContra": {
+			"col": [
+				240.0,
+				280.0
+			],
+			"col_pos": [
+				0.0,
+				0.0
+			],
+			"direcao": [
+				-1.0,
+				0.0
+			],
+			"duracao_pulso": 0.9,
+			"intensidade": 1600.0,
+			"intervalo_pulso": 1.6,
+			"modo": 1,
+			"pos": [
+				4280.0,
+				620.0
+			],
+			"tamanho": [
+				240.0,
+				280.0
+			],
+			"velocidade_max": 150.0
+		},
+		"RajadaContra/CollisionShape2D": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"RajadaFavor": {
+			"col": [
+				620.0,
+				340.0
+			],
+			"col_pos": [
+				0.0,
+				0.0
+			],
+			"direcao": [
+				1.0,
+				0.0
+			],
+			"duracao_pulso": 1.0,
+			"intensidade": 2000.0,
+			"intervalo_pulso": 1.0,
+			"modo": 0,
+			"pos": [
+				3570.0,
+				550.0
+			],
+			"tamanho": [
+				620.0,
+				340.0
+			],
+			"velocidade_max": 420.0
+		},
+		"RajadaFavor/CollisionShape2D": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"RedeEnsaio/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"RepousoCorrente/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"ZonaPlanar": {
+			"col": [
+				1200.0,
+				900.0
+			],
+			"col_pos": [
+				0.0,
+				0.0
+			],
+			"pos": [
+				2780.0,
+				325.0
+			],
+			"tamanho": [
+				5680.0,
+				1850.0
+			]
+		},
+		"ZonaPlanar/CollisionShape2D": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		}
+	},
+	"N09": {
+		"A1/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"A2/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"ChaoChefe": {
+			"pos": [
+				2900.0,
+				690.0
+			],
+			"tamanho": [
+				560.0,
+				60.0
+			]
+		},
+		"ChaoChefe/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"ChaoInicio": {
+			"pos": [
+				280.0,
+				690.0
+			],
+			"tamanho": [
+				420.0,
+				60.0
+			]
+		},
+		"ChaoInicio/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"ChaoMeio": {
+			"pos": [
+				1440.0,
+				690.0
+			],
+			"tamanho": [
+				340.0,
+				60.0
+			]
+		},
+		"ChaoMeio/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"CheckInicio": {
+			"col": [
+				44.0,
+				96.0
+			],
+			"col_pos": [
+				0.0,
+				0.0
+			],
+			"pos": [
+				420.0,
+				626.0
+			]
+		},
+		"CheckInicio/CollisionShape2D": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"CheckMeio": {
+			"col": [
+				44.0,
+				96.0
+			],
+			"col_pos": [
+				0.0,
+				0.0
+			],
+			"pos": [
+				1440.0,
+				626.0
+			]
+		},
+		"CheckMeio/CollisionShape2D": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"CheckReencontro": {
+			"col": [
+				44.0,
+				96.0
+			],
+			"col_pos": [
+				0.0,
+				0.0
+			],
+			"pos": [
+				2280.0,
+				562.0
+			]
+		},
+		"CheckReencontro/CollisionShape2D": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"Chefe": {
+			"col": [
+				44.0,
+				88.0
+			],
+			"col_pos": [
+				0.0,
+				0.0
+			],
+			"pos": [
+				3020.0,
+				614.0
+			]
+		},
+		"Chefe/AreaContacto/CollisionShape2D": {
+			"pos": [
+				0.0,
+				-4.0
+			]
+		},
+		"Chefe/CollisionShape2D": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"ColPartir": {
+			"pos": [
+				2280.0,
+				554.0
+			]
+		},
+		"ColPartir/CollisionShape2D": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"EliteMastim": {
+			"col": [
+				40.0,
+				64.0
+			],
+			"col_pos": [
+				0.0,
+				-13.0
+			],
+			"pos": [
+				1440.0,
+				626.0
+			]
+		},
+		"EliteMastim/AreaContacto/CollisionShape2D": {
+			"pos": [
+				0.0,
+				-14.0
+			]
+		},
+		"EliteMastim/CollisionShape2D": {
+			"pos": [
+				0.0,
+				-13.0
+			]
+		},
+		"Esp1/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"Esp2/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"Esp3/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"EspF1/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"EspF2/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"EspF3/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"FundoDoAbismo/CollisionShape2D": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"GoblinS/AreaContacto/CollisionShape2D": {
+			"pos": [
+				0.0,
+				-14.0
+			]
+		},
+		"GoblinS/CollisionShape2D": {
+			"pos": [
+				0.0,
+				-13.0
+			]
+		},
+		"Koliani": {
+			"col": [
+				20.0,
+				44.0
+			],
+			"col_pos": [
+				0.0,
+				0.0
+			],
+			"pos": [
+				150.0,
+				610.0
+			]
+		},
+		"Koliani/CollisionShape2D": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"Koliani/HitboxAtaque/CollisionShape2D": {
+			"pos": [
+				23.0,
+				-4.0
+			]
+		},
+		"Porta": {
+			"col": [
+				48.0,
+				96.0
+			],
+			"col_pos": [
+				0.0,
+				0.0
+			],
+			"pos": [
+				3160.0,
+				616.0
+			]
+		},
+		"Porta/CollisionShape2D": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"Pre1/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"Reencontro/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"S1/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"S2/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"S3/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"VentoVariavelCombate": {
+			"col": [
+				320.0,
+				160.0
+			],
+			"col_pos": [
+				0.0,
+				0.0
+			],
+			"direcao": [
+				-1.0,
+				0.0
+			],
+			"duracao_pulso": 1.1,
+			"intensidade": 440.0,
+			"intervalo_pulso": 0.85,
+			"modo": 1,
+			"pos": [
+				1870.0,
+				600.0
+			],
+			"tamanho": [
+				650.0,
+				270.0
+			],
+			"velocidade_max": 300.0
+		},
+		"VentoVariavelCombate/CollisionShape2D": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"VentoVariavelEntrada": {
+			"col": [
+				320.0,
+				160.0
+			],
+			"col_pos": [
+				0.0,
+				0.0
+			],
+			"direcao": [
+				1.0,
+				0.0
+			],
+			"duracao_pulso": 1.45,
+			"intensidade": 360.0,
+			"intervalo_pulso": 1.0,
+			"modo": 1,
+			"pos": [
+				930.0,
+				585.0
+			],
+			"tamanho": [
+				680.0,
+				240.0
+			],
+			"velocidade_max": 280.0
+		},
+		"VentoVariavelEntrada/CollisionShape2D": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"VentoVariavelSaida": {
+			"col": [
+				320.0,
+				160.0
+			],
+			"col_pos": [
+				0.0,
+				0.0
+			],
+			"direcao": [
+				1.0,
+				0.0
+			],
+			"duracao_pulso": 0.9,
+			"intensidade": 520.0,
+			"intervalo_pulso": 0.75,
+			"modo": 1,
+			"pos": [
+				2500.0,
+				575.0
+			],
+			"tamanho": [
+				300.0,
+				220.0
+			],
+			"velocidade_max": 320.0
+		},
+		"VentoVariavelSaida/CollisionShape2D": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		}
+	},
+	"N10": {
+		"Acido": {
+			"altura": 320.0,
+			"largura": 2800.0,
+			"pos": [
+				600.0,
+				1080.0
+			]
+		},
+		"Acido/CollisionShape2D": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"CentroLedge/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"ChaoChefe": {
+			"pos": [
+				640.0,
+				270.0
+			],
+			"tamanho": [
+				560.0,
+				60.0
+			]
+		},
+		"ChaoChefe/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"ChaoInicio": {
+			"pos": [
+				320.0,
+				880.0
+			],
+			"tamanho": [
+				440.0,
+				60.0
+			]
+		},
+		"ChaoInicio/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"ChaoResgate": {
+			"pos": [
+				710.0,
+				872.0
+			],
+			"tamanho": [
+				340.0,
+				44.0
+			]
+		},
+		"ChaoResgate/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"CheckInicio": {
+			"col": [
+				44.0,
+				96.0
+			],
+			"col_pos": [
+				0.0,
+				0.0
+			],
+			"pos": [
+				440.0,
+				816.0
+			]
+		},
+		"CheckInicio/CollisionShape2D": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"CheckMeio": {
+			"col": [
+				44.0,
+				96.0
+			],
+			"col_pos": [
+				0.0,
+				0.0
+			],
+			"pos": [
+				660.0,
+				516.0
+			]
+		},
+		"CheckMeio/CollisionShape2D": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"Chefe": {
+			"col": [
+				40.0,
+				88.0
+			],
+			"col_pos": [
+				0.0,
+				0.0
+			],
+			"pos": [
+				760.0,
+				194.0
+			]
+		},
+		"Chefe/AreaContacto/CollisionShape2D": {
+			"pos": [
+				0.0,
+				-4.0
+			]
+		},
+		"Chefe/CollisionShape2D": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"ColProjetil": {
+			"pos": [
+				640.0,
+				234.0
+			]
+		},
+		"ColProjetil/CollisionShape2D": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"CorrenteEsq": {
+			"col": [
+				190.0,
+				320.0
+			],
+			"col_pos": [
+				0.0,
+				0.0
+			],
+			"direcao": [
+				0.0,
+				-1.0
+			],
+			"duracao_pulso": 1.0,
+			"intensidade": 2500.0,
+			"intervalo_pulso": 1.0,
+			"modo": 0,
+			"pos": [
+				500.0,
+				420.0
+			],
+			"tamanho": [
+				190.0,
+				320.0
+			],
+			"velocidade_max": 330.0
+		},
+		"CorrenteEsq/CollisionShape2D": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"EliteOrc": {
+			"col": [
+				40.0,
+				64.0
+			],
+			"col_pos": [
+				0.0,
+				-13.0
+			],
+			"pos": [
+				660.0,
+				512.0
+			]
+		},
+		"EliteOrc/AreaContacto/CollisionShape2D": {
+			"pos": [
+				0.0,
+				-14.0
+			]
+		},
+		"EliteOrc/CollisionShape2D": {
+			"pos": [
+				0.0,
+				-13.0
+			]
+		},
+		"Koliani": {
+			"col": [
+				20.0,
+				44.0
+			],
+			"col_pos": [
+				0.0,
+				0.0
+			],
+			"pos": [
+				180.0,
+				810.0
+			]
+		},
+		"Koliani/CollisionShape2D": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"Koliani/HitboxAtaque/CollisionShape2D": {
+			"pos": [
+				23.0,
+				-4.0
+			]
+		},
+		"L1/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"L2/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"LL1/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"LL2/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"LL3/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"Porta": {
+			"col": [
+				48.0,
+				96.0
+			],
+			"col_pos": [
+				0.0,
+				0.0
+			],
+			"pos": [
+				900.0,
+				246.0
+			]
+		},
+		"Porta/CollisionShape2D": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"R1/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"RR1/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"RR2/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"RR3/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"RajadaContra": {
+			"col": [
+				230.0,
+				270.0
+			],
+			"col_pos": [
+				0.0,
+				0.0
+			],
+			"direcao": [
+				-1.0,
+				0.0
+			],
+			"duracao_pulso": 0.9,
+			"intensidade": 1500.0,
+			"intervalo_pulso": 1.6,
+			"modo": 1,
+			"pos": [
+				900.0,
+				420.0
+			],
+			"tamanho": [
+				230.0,
+				270.0
+			],
+			"velocidade_max": 150.0
+		},
+		"RajadaContra/CollisionShape2D": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"RajadaFavor": {
+			"col": [
+				360.0,
+				130.0
+			],
+			"col_pos": [
+				0.0,
+				0.0
+			],
+			"direcao": [
+				1.0,
+				0.0
+			],
+			"duracao_pulso": 1.0,
+			"intensidade": 1400.0,
+			"intervalo_pulso": 1.0,
+			"modo": 0,
+			"pos": [
+				360.0,
+				820.0
+			],
+			"tamanho": [
+				360.0,
+				130.0
+			],
+			"velocidade_max": 360.0
+		},
+		"RajadaFavor/CollisionShape2D": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"SubidaDir1/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"SubidaDir2/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"SubidaEsq1/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"SubidaEsq2/Col": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		},
+		"VentoArena": {
+			"col": [
+				640.0,
+				210.0
+			],
+			"col_pos": [
+				0.0,
+				0.0
+			],
+			"direcao": [
+				1.0,
+				0.0
+			],
+			"duracao_pulso": 1.0,
+			"intensidade": 0.0,
+			"intervalo_pulso": 1.0,
+			"modo": 0,
+			"pos": [
+				640.0,
+				160.0
+			],
+			"tamanho": [
+				640.0,
+				210.0
+			],
+			"velocidade_max": 260.0
+		},
+		"VentoArena/CollisionShape2D": {
+			"pos": [
+				0.0,
+				0.0
+			]
+		}
+	}
+}
