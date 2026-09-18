@@ -25,6 +25,21 @@ extends ChefeBase
 const NO_VENTO_ARENA := "VentoArena"
 const LAMINA_VEL := 300.0
 
+## PALETA DO CONTRATO (L3 de `GUARDIAO_DOS_CEUS_VISUAL_CONTRACT.md`,
+## amostrada da prancha `boss_pack.png`). Esta' aqui em constantes porque o
+## audit apanhou a cor errada espalhada por cinco sitios do ficheiro: o
+## projectil, a luz dele, o po' das garras, o tom da fase 2 e o rebentamento
+## da fase 2 estavam todos na **paleta ciano/branco-gelo do `monge_celeste`**
+## (`#a8ebff`), que o contrato PROIBE por escrito -- e logo no ataque que
+## da' nome ao chefe. O rig ja' tinha sido redesenhado para violeta-indigo;
+## os ataques ficaram com a paleta do rig antigo.
+const PENA_BASE := Color(0.118, 0.118, 0.200)    # #1e1e33  penas, base
+const PENA_MEIO := Color(0.361, 0.255, 0.624)    # #5c419f  penas, meio
+const PENA_LUZ := Color(0.831, 0.584, 0.992)     # #d495fd  penas, luz
+const CARMESIM := Color(0.565, 0.255, 0.263)     # #904143  remiges
+const CARMESIM_ALTA := Color(1.000, 0.486, 0.439)  # #ff7c70
+const NUCLEO := Color(0.776, 0.541, 0.976)       # #c68af9  olho/nucleo
+
 enum Fase {
 	DORME, DECIDE,
 	LAMINA_TEL, LAMINA,
@@ -395,16 +410,13 @@ func _lamina(de: Vector2, dir: Vector2) -> void:
 	cs.radius = 9.0
 	forma.shape = cs
 	a.add_child(forma)
-	var poly := Polygon2D.new()
-	poly.color = Color(0.72, 0.92, 1.0, 0.95)
-	poly.polygon = PackedVector2Array([
-		Vector2(-14, 0), Vector2(0, -6), Vector2(14, 0), Vector2(0, 6)])
-	poly.rotation = dir.angle()
-	a.add_child(poly)
+	var pena := _montar_pena()
+	pena.rotation = dir.angle()
+	a.add_child(pena)
 	var luz := PointLight2D.new()
 	luz.texture = _tex_luz()
 	luz.energy = 0.6
-	luz.color = Color(0.7, 0.9, 1.0)
+	luz.color = NUCLEO
 	luz.scale = Vector2(0.32, 0.32)
 	a.add_child(luz)
 	var dano := int(round(dano_lamina * (1.12 if _fase2 else 1.0)))
@@ -415,6 +427,52 @@ func _lamina(de: Vector2, dir: Vector2) -> void:
 	var t := a.create_tween()
 	t.tween_property(a, "global_position", de + dir * 1200.0, 1200.0 / LAMINA_VEL)
 	t.tween_callback(a.queue_free)
+
+
+
+## Uma PENA CORTANTE, desenhada como a prancha a desenha.
+##
+## O painel `2. PENAS CORTANTES` do `boss_pack.png` nao tem losangos: tem
+## laminas EMPLUMADAS -- ponta violeta acesa a' frente, haste indigo escura,
+## e barbas carmesim a arrastar para tras. Sao tres camadas, e nao uma cor,
+## porque e' o contraste entre elas que se le' a voar.
+##
+## So' o DESENHO muda. A colisao continua a ser o mesmo circulo de raio 9 e
+## a velocidade a mesma `LAMINA_VEL`: o combate esta' aprovado e o audit nao
+## trouxe dados que justifiquem mexer-lhe.
+func _montar_pena() -> Node2D:
+	var no := Node2D.new()
+	no.name = "Pena"
+	var base := Polygon2D.new()
+	base.color = PENA_BASE
+	base.polygon = PackedVector2Array([
+		Vector2(19, 0), Vector2(5, -6), Vector2(-9, -5), Vector2(-19, -2),
+		Vector2(-19, 2), Vector2(-9, 5), Vector2(5, 6)])
+	no.add_child(base)
+	for lado in [-1.0, 1.0]:
+		var barba := Polygon2D.new()
+		barba.color = CARMESIM
+		barba.polygon = PackedVector2Array([
+			Vector2(7, -1.0 * lado), Vector2(-15, -6.0 * lado),
+			Vector2(-6, -1.0 * lado)])
+		no.add_child(barba)
+	var haste := Polygon2D.new()
+	haste.color = PENA_MEIO
+	haste.polygon = PackedVector2Array([
+		Vector2(16, 0), Vector2(0, -3), Vector2(-17, 0), Vector2(0, 3)])
+	no.add_child(haste)
+	var ponta := Polygon2D.new()
+	ponta.color = PENA_LUZ
+	ponta.polygon = PackedVector2Array([
+		Vector2(19, 0), Vector2(6, -2.2), Vector2(1, 0), Vector2(6, 2.2)])
+	no.add_child(ponta)
+	var risca := Polygon2D.new()          # a alta carmesim, so' um fio
+	risca.color = CARMESIM_ALTA
+	risca.polygon = PackedVector2Array([
+		Vector2(10, -0.6), Vector2(-12, -2.4), Vector2(-12, -1.2),
+		Vector2(10, 0.6)])
+	no.add_child(risca)
+	return no
 
 
 ## Zona de perigo da QUEDA, desenhada no chão durante o telégrafo. Sem ela
@@ -478,7 +536,7 @@ func _impacto() -> void:
 	p.gravity = Vector2(0, 700)
 	p.initial_velocity_min = 70.0
 	p.initial_velocity_max = 240.0
-	p.color = Color(0.8, 0.92, 1.0)
+	p.color = PENA_MEIO.lerp(Color(0.62, 0.58, 0.60), 0.5)  # po' de pedra, nao gelo
 	add_sibling(p)
 	p.get_tree().create_timer(1.2).timeout.connect(p.queue_free)
 
@@ -496,7 +554,8 @@ func _abrir_asas() -> void:
 	dur_exposto = maxf(0.8, dur_exposto * 0.88)
 	dano_contacto = int(round(dano_contacto * 1.1))
 	if _sprite:
-		_sprite.modulate = Color(0.86, 0.96, 1.2, 1.0)
+		# a fase 2 ACENDE o violeta do rig; antes clareava-o para ciano
+		_sprite.modulate = Color(1.10, 0.94, 1.22, 1.0)
 	var p := CPUParticles2D.new()
 	p.global_position = global_position
 	p.emitting = true
@@ -509,7 +568,7 @@ func _abrir_asas() -> void:
 	p.gravity = Vector2(0, 260)
 	p.initial_velocity_min = 90.0
 	p.initial_velocity_max = 260.0
-	p.color = Color(0.78, 0.93, 1.0)
+	p.color = NUCLEO
 	add_sibling(p)
 	p.get_tree().create_timer(1.3).timeout.connect(p.queue_free)
 	_ir(Fase.VENTO_TEL)

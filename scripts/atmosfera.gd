@@ -108,8 +108,25 @@ const PACKS := {
 	# ALTITUDE, e sem ele isto era só mais uma serra à noite.
 	"desfiladeiro": [
 		["ceu.png", "Fundo", 320.0, 5.6],
-		["serras.png", "Longe", 830.0, 4.4],
-		["nuvens.png", "Meio", 900.0, 3.6],
+		# As serras sao pintadas a 18% de luminancia e a camada "Longe" leva
+		# 62% da neblina: chegavam ao ecra como manchas pretas, e era isso
+		# que o audit via ("as ilhas do fundo sao blocos de rocha"). Um ganho
+		# pequeno devolve-lhes a leitura de cumeada sem as trazer para a
+		# frente do mar de nuvens.
+		["serras.png", "Longe", 830.0, 4.4, 1.35],
+		# GANHO 1.6 no mar de nuvens (Super-Process A2). O audit mediu a
+		# `nuvens.png` a chegar ao ecra com 10-24% de luminancia contra os
+		# ~52% com que foi pintada -- lia-se como rocha, nao como nuvem. Nao
+		# faltava asset: era tratamento. A camada "Meio" leva `_gradacao` +
+		# `dessaturar_fundo` + o `CanvasModulate` do bioma por cima, e as
+		# tres juntas comiam-lhe dois tercos do brilho.
+		#
+		# O mar de nuvens NAO e' uma nevoa distante: as pranchas da Regiao II
+		# poem-no como elemento ESTRUTURAL -- e' ele que diz ALTITUDE, e e' o
+		# que separa "desfiladeiro" de "masmorra a' noite". Por isso leva
+		# ganho proprio em vez de se clarear a regiao toda, que lavava o
+		# terreno e os inimigos com ela.
+		["nuvens.png", "Meio", 900.0, 3.6, 2.1],
 		["falesias.png", "Perto", 960.0, 3.8],
 	],
 	# Região IV -- Catacumbas do Abismo (ansimuz "Caverns", CC0) + túmulos e
@@ -602,14 +619,22 @@ func _montar_fundo_pack(_rng: RandomNumberGenerator) -> void:
 		# A gradação da camada entra pelo shader (desatura o pack ANTES de o
 		# pintar); sem desaturação basta o `modulate`, que é mais barato.
 		var cor := _gradacao(item[1])
+		# 5.o campo OPCIONAL da tabela: ganho de brilho desta camada. Serve
+		# as camadas que sao CONTEUDO e nao ar -- ver o mar de nuvens do
+		# Desfiladeiro. Sem 5.o campo nada muda (todos os outros biomas).
+		# Vai em uniform PROPRIO e nao dobrado na tinta: a `tinta` do shader
+		# e' `source_color` e fica grampeada a 1.0.
+		var ganho: float = float(item[4]) if item.size() > 4 else 1.0
 		if dessaturar_fundo > 0.0:
 			var mat := ShaderMaterial.new()
 			mat.shader = SHADER_FUNDO
 			mat.set_shader_parameter("dessaturar", dessaturar_fundo)
 			mat.set_shader_parameter("tinta", cor)
+			mat.set_shader_parameter("ganho", ganho)
 			spr.material = mat
 		else:
-			spr.modulate = cor
+			spr.modulate = Color(cor.r * ganho, cor.g * ganho,
+				cor.b * ganho, cor.a)
 		spr.set_meta("gerado", true)
 		layer.add_child(spr)
 		# BANDA POR CIMA (3 set 2026 -- bug do "ecrã preto" no nível 7): a

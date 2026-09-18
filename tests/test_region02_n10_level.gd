@@ -157,8 +157,43 @@ static func executar() -> Array[String]:
 		_verificar(falhas, k.get("usar_prototipo_premium") == true,
 			"N10: Koliani canónica (protótipo premium)")
 
+	_paleta_do_guardiao(falhas)
 	raiz.free()
 	return falhas
+
+
+## O contrato do Guardião (L3) PROÍBE por escrito "a paleta ciano/branco-gelo
+## do `monge_celeste` (`#a8ebff`)". O audit encontrou-a em cinco sítios do
+## `chefe_guardiao_dos_ceus.gd` -- incluindo o projéctil das PENAS CORTANTES,
+## o ataque que dá nome ao chefe. Aconteceu porque o rig foi redesenhado para
+## violeta-índigo e os ataques ficaram com a paleta do rig antigo; sem um
+## teste, volta a acontecer à próxima vez que alguém mexer numa cor.
+##
+## "Gelo" aqui é: azul dominante, muito claro, e com o vermelho bem abaixo do
+## azul. A família violeta do contrato (`#d495fd`, `#c68af9`) tem o vermelho
+## ALTO, portanto passa; `#a8ebff` e `#b8ebff` não.
+static func _paleta_do_guardiao(falhas: Array[String]) -> void:
+	var f := FileAccess.open(
+		"res://scripts/chefe_guardiao_dos_ceus.gd", FileAccess.READ)
+	if f == null:
+		falhas.append("N10: não consegui ler o script do Guardião")
+		return
+	var src := f.get_as_text()
+	f.close()
+	var re := RegEx.new()
+	re.compile("Color\\(\\s*([0-9.]+)\\s*,\\s*([0-9.]+)\\s*,\\s*([0-9.]+)")
+	var achadas := 0
+	for m in re.search_all(src):
+		var r := float(m.get_string(1))
+		var g := float(m.get_string(2))
+		var b := float(m.get_string(3))
+		if b >= 0.9 and g >= 0.85 and b - r >= 0.15:
+			achadas += 1
+			falhas.append(
+				"N10: o Guardião usa a paleta gelo que o contrato L3 proíbe"
+				+ " -- Color(%.2f, %.2f, %.2f)" % [r, g, b])
+	if achadas == 0:
+		return
 
 
 static func _verificar(falhas: Array[String], condicao: bool, rotulo: String) -> void:

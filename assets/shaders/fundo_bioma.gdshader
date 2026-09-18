@@ -10,11 +10,17 @@ shader_type canvas_item;
 
 uniform float dessaturar : hint_range(0.0, 1.0) = 0.0;
 uniform vec4 tinta : source_color = vec4(1.0, 1.0, 1.0, 1.0);
+// Ganho de brilho da camada, DEPOIS da tinta. Existe em separado porque o
+// `source_color` da `tinta` grampeia-a a 1.0 -- pôr o ganho lá dentro não
+// fazia nada (foi a primeira tentativa, e o mar de nuvens subiu 11% em vez
+// dos 60% pedidos). 1.0 = como estava, e é o que todos os outros biomas
+// usam.
+uniform float ganho = 1.0;
 
 void fragment() {
 	vec4 c = texture(TEXTURE, UV);
 	float l = dot(c.rgb, vec3(0.299, 0.587, 0.114));
 	c.rgb = mix(c.rgb, vec3(l), dessaturar);
-	c.rgb *= tinta.rgb;
+	c.rgb *= tinta.rgb * ganho;
 	COLOR = c;
 }
