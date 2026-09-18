@@ -130,11 +130,13 @@ altura_visual = 100.0
 cor_base = Color(0.18, 0.24, 0.24, 1)
 cor_topo = Color(0.36, 0.54, 0.48, 1)
 
+; Regiao II canonica: era `mastim` (bicho terrestre da antiga Prisao).
+; N09 sao ruinas atmosfericas: o golem le'-se contra o vento variavel. O nome do no fica como estava.
 [node name="EliteMastim" parent="." instance=ExtResource("2_dem")]
 position = Vector2(1440, 626)
 scale = Vector2(1.4, 1.4)
 elite = true
-especie = "mastim"
+especie = "golem_aereo"
 vida = 165
 dano_contacto = 23
 comportamento = "carga"
@@ -176,9 +178,11 @@ altura_visual = 30.0
 cor_base = Color(0.18, 0.24, 0.24, 1)
 cor_topo = Color(0.36, 0.54, 0.48, 1)
 
+; Regiao II canonica: era `orc` (bicho terrestre da antiga Prisao).
+; a sentinela fecha a rota de saida. O nome do no fica como estava.
 [node name="GoblinS" parent="." instance=ExtResource("2_dem")]
 position = Vector2(1860, 644)
-especie = "orc"
+especie = "sentinela_flutuante"
 alcance_patrulha = 80.0
 
 ; O segundo trecho inverte direção e sobe a intensidade durante traversal e

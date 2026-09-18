@@ -164,11 +164,13 @@ altura_visual = 40.0
 cor_base = Color(0.2, 0.24, 0.32, 1)
 cor_topo = Color(0.42, 0.54, 0.68, 1)
 
+; Regiao II canonica: era `orc` (bicho terrestre da antiga Prisao).
+; N10 e' a Torre dos Ceus: o exame final guarda-se com vento puro. O nome do no fica como estava.
 [node name="EliteOrc" parent="." instance=ExtResource("2_dem")]
 position = Vector2(660, 512)
 scale = Vector2(1.45, 1.45)
 elite = true
-especie = "orc"
+especie = "elemental_do_vento"
 vida = 175
 dano_contacto = 24
 comportamento = "carga"

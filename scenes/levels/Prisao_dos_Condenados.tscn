@@ -134,11 +134,13 @@ altura_visual = 110.0
 cor_base = Color(0.2, 0.24, 0.32, 1)
 cor_topo = Color(0.4, 0.52, 0.66, 1)
 
+; Regiao II canonica: era `esqueleto` (bicho terrestre da antiga Prisao).
+; N06 sao falesias abertas: o construto de pedra a levitar e' a massa da regiao. O nome do no fica como estava.
 [node name="EliteEsqueleto" parent="." instance=ExtResource("2_dem")]
 position = Vector2(1420, 636)
 scale = Vector2(1.4, 1.4)
 elite = true
-especie = "esqueleto"
+especie = "golem_aereo"
 vida = 165
 dano_contacto = 22
 comportamento = "carga"
@@ -223,9 +225,11 @@ altura_visual = 34.0
 cor_base = Color(0.2, 0.24, 0.32, 1)
 cor_topo = Color(0.4, 0.52, 0.66, 1)
 
+; Regiao II canonica: era `chort` (bicho terrestre da antiga Prisao).
+; a criatura-assinatura do N06, em bando pelas rajadas. O nome do no fica como estava.
 [node name="GoblinBaixo" parent="." instance=ExtResource("2_dem")]
 position = Vector2(2080, 629)
-especie = "chort"
+especie = "morcego_dos_ventos"
 alcance_patrulha = 80.0
 
 ; Segunda leitura: contra a marcha, cobre as duas rotas sem tocar na arena.

@@ -238,11 +238,13 @@ cor_guia = Color(1, 0.82, 0.72, 0.46)
 [node name="CollisionShape2D" parent="RajadaContra"]
 shape = SubResource("rs_RajadaContra")
 
+; Regiao II canonica: era `chort` (bicho terrestre da antiga Prisao).
+; N08 sao ilhas suspensas: o mergulho em picada e' a ameaca do vao. O nome do no fica como estava.
 [node name="EliteChort" parent="." instance=ExtResource("2_dem")]
 position = Vector2(2720, 566)
 scale = Vector2(1.4, 1.4)
 elite = true
-especie = "chort"
+especie = "gaivota_sombria"
 vida = 170
 dano_contacto = 24
 comportamento = "carga"

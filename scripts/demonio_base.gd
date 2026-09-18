@@ -80,7 +80,9 @@ var _dive_dir := Vector2.ZERO
 @export_enum("goblin", "mushroom", "esqueleto", "olho",
 	"imp", "chort", "orc", "xamane", "demonio_grande", "ogro",
 	"abobora", "wogol", "necromante", "lodo",
-	"besouro", "raptor", "mastim", "gosma", "abutre") var especie := "goblin"
+	"besouro", "raptor", "mastim", "gosma", "abutre",
+	"morcego_dos_ventos", "sentinela_flutuante", "gaivota_sombria",
+	"golem_aereo", "elemental_do_vento") var especie := "goblin"
 ## Só a ARTE (Execution 9D+9E): quem a define veste-se com a arte de produção
 ## desta identidade em vez da da `especie`, que continua a mandar no som, no
 ## tamanho e em tudo o resto. É o que faz os clones da Morvanna parecerem
@@ -107,6 +109,18 @@ const ESPECIES := {
 	"lodo":           {"idle": 4, "run": 4, "hit": 4, "dead": 4},
 	# pack CC0 ansimuz "Enemies Pack" (tools/extrair_inimigos_pack.gd). O
 	# `hit` é o idle (o pisca do dano é do shader) e o `dead` é gerado.
+	# --- REGIAO II, bestiario CANONICO (Super-Process A2, 18 set 2026) ------
+	# Recortadas da prancha aprovada `enemy_gameplay_pack.png` por
+	# `tools/extrair_inimigos_regiao02.py` -- nao sao desenho novo, sao as
+	# poses que a prancha ja' tinha, com os estados que ela ja' nomeava.
+	# Ate' aqui a Regiao II usava o pool da antiga Prisao (esqueleto, chort,
+	# orc, imp, mastim): bichos terrestres de masmorra num sitio cuja
+	# identidade e' o AR. Censo do audit: 0 dos 10 canonicos em N06-N10.
+	"morcego_dos_ventos":  {"idle": 2, "run": 2, "hit": 1, "dead": 1},
+	"sentinela_flutuante": {"idle": 2, "run": 2, "hit": 1, "dead": 1},
+	"gaivota_sombria":     {"idle": 2, "run": 2, "hit": 1, "dead": 1},
+	"golem_aereo":         {"idle": 2, "run": 2, "hit": 1, "dead": 1},
+	"elemental_do_vento":  {"idle": 2, "run": 2, "hit": 1, "dead": 1},
 	"besouro":        {"idle": 4, "run": 4, "hit": 4, "dead": 4},
 	"raptor":         {"idle": 4, "run": 7, "hit": 4, "dead": 4},
 	"mastim":         {"idle": 6, "run": 4, "hit": 6, "dead": 4},
@@ -390,8 +404,24 @@ func _largura_alvo() -> float:
 	return 0.0
 
 
+## Quem tem POSE DE ATAQUE propria, e com quantos quadros. Fica em tabela a
+## parte (e nao dentro de `ESPECIES`) porque o formato de `ESPECIES` esta'
+## travado por um teste que o le' com expressao regular; e porque ter ou nao
+## pose de ataque e' uma propriedade de quem tem a arte, nao de todos.
+const ATAQUE_FRAMES := {
+	"morcego_dos_ventos": 1,      # INVESTIDA
+	"sentinela_flutuante": 1,
+	"gaivota_sombria": 2,         # MERGULHO + ATAQUE
+	"golem_aereo": 1,             # ATAQUE
+	"elemental_do_vento": 1,
+}
+
 ## Espécies que voam -- não se alinham os pés ao chão.
-const ESPECIES_VOAM := ["olho", "abutre"]
+const ESPECIES_VOAM := ["olho", "abutre",
+	# as cinco canonicas da Regiao II voam, levitam ou SAO vento -- e' a
+	# definicao da regiao ("Nenhum e' um bicho de masmorra terrestre")
+	"morcego_dos_ventos", "sentinela_flutuante", "gaivota_sombria",
+	"golem_aereo", "elemental_do_vento"]
 
 ## A que FAMILIA de som pertence cada espécie (4 set 2026, pedido do Paulo:
 ## "faça com que os mobs façam sons apropriados ao tipo de monstro"). Até
@@ -406,6 +436,9 @@ const FAMILIA_SOM := {
 	"mastim": "besta", "raptor": "besta",
 	"besouro": "insecto",
 	"olho": "voador", "abutre": "voador",
+	"morcego_dos_ventos": "voador", "gaivota_sombria": "voador",
+	"elemental_do_vento": "voador",
+	"sentinela_flutuante": "morto", "golem_aereo": "grande",
 	"demonio_grande": "grande", "ogro": "grande",
 	"xamane": "grande", "abobora": "grande",
 }
@@ -497,6 +530,13 @@ func _montar_frames() -> void:
 	_add_tira(sf, "run", load("%s/run.png" % base), int(cfg["run"]), 11.0, true)
 	_add_tira(sf, "hit", load("%s/hit.png" % base), int(cfg["hit"]), 14.0, false)
 	_add_tira(sf, "dead", load("%s/dead.png" % base), int(cfg["dead"]), 11.0, false)
+	# A tira de ATAQUE e' opcional e so' existe para quem esta' em
+	# `ATAQUE_FRAMES`. O `_estado_anim` ja' pedia "attack" no telegrafo
+	# (`_tem_anim("attack")`) desde sempre -- o que nunca existiu foi quem a
+	# montasse. As especies antigas nao tem `attack.png` e continuam iguais.
+	if ATAQUE_FRAMES.has(especie):
+		_add_tira(sf, "attack", load("%s/attack.png" % base),
+			int(ATAQUE_FRAMES[especie]), 10.0, false)
 	_anim.sprite_frames = sf
 
 

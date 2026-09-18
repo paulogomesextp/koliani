@@ -123,11 +123,13 @@ altura_visual = 110.0
 cor_base = Color(0.24, 0.16, 0.12, 1)
 cor_topo = Color(0.46, 0.3, 0.2, 1)
 
+; Regiao II canonica: era `imp` (bicho terrestre da antiga Prisao).
+; N07 sao torres destruidas: a sentinela patrulha e dispara vento. O nome do no fica como estava.
 [node name="EliteImp" parent="." instance=ExtResource("2_dem")]
 position = Vector2(1360, 716)
 scale = Vector2(1.35, 1.35)
 elite = true
-especie = "imp"
+especie = "sentinela_flutuante"
 vida = 160
 dano_contacto = 22
 comportamento = "cuspidor"
@@ -225,9 +227,11 @@ altura_visual = 32.0
 cor_base = Color(0.24, 0.16, 0.12, 1)
 cor_topo = Color(0.46, 0.3, 0.2, 1)
 
+; Regiao II canonica: era `chort` (bicho terrestre da antiga Prisao).
+; o bando volta, agora dentro das correntes ascendentes. O nome do no fica como estava.
 [node name="GoblinP" parent="." instance=ExtResource("2_dem")]
 position = Vector2(2010, 694)
-especie = "chort"
+especie = "morcego_dos_ventos"
 alcance_patrulha = 80.0
 
 [node name="P4" parent="." instance=ExtResource("9_pl")]

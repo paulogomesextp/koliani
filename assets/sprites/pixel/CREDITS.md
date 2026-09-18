@@ -405,3 +405,21 @@ mão. Passa a ser arte a sério:
 Foi este que fechou a questão do **portal da Frostwindz**: aquele era pago e
 a licença proíbe redistribuir os ficheiros num repo público (ver
 `assets/sprites/incoming/LICENSES.md`).
+
+## Bestiário canónico da Região II (18 set 2026)
+
+`enemies/morcego_dos_ventos`, `enemies/sentinela_flutuante`,
+`enemies/gaivota_sombria`, `enemies/golem_aereo`, `enemies/elemental_do_vento`.
+
+**Não vêm de nenhum pack.** São recortes da prancha de arte **aprovada** do
+próprio projeto — `docs/art_direction/regions/region_02/enemy_gameplay_pack.png`
+—, feitos por `tools/extrair_inimigos_regiao02.py`. A prancha já desenhava
+cada criatura em poses com **estados nomeados** (IDLE / VOO / INVESTIDA /
+DANO / MORTE…) a ~50-125 px de altura, ou seja praticamente à escala de jogo
+(`DemonioBase.ALTURA_ALVO_INIMIGO` = 48): não havia nada a inventar, só a
+recortar, tirar o fundo e montar as tiras.
+
+Cinco das dez criaturas da prancha, e não as dez, porque o plano de cada
+painel não é o mesmo — a Sentinela tem o **projétil** na linha de estados e
+não a criatura, e as quatro figuras do Mago do Vento estão coladas umas às
+outras. O detalhe, criatura a criatura, está no cabeçalho da ferramenta.

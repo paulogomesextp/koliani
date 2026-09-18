@@ -1547,7 +1547,14 @@ func _inimigo_em(par: Node2D, pos: Vector2, elite := false) -> void:
 
 const ESP_REGIAO := {
 	0: ["goblin", "mushroom", "lodo", "besouro", "gosma"],
-	1: ["esqueleto", "chort", "orc", "imp", "mastim"],
+	# REGIAO II -- bestiario CANONICO da prancha aprovada (18 set 2026).
+	# Era `["esqueleto", "chort", "orc", "imp", "mastim"]`, comentado
+	# "# II Prisao": cinco bichos TERRESTRES de masmorra numa regiao cuja
+	# identidade e' o ar. O audit mediu 0 dos 10 canonicos em N06-N10.
+	# Estes cinco vem do `enemy_gameplay_pack.png` e voam, levitam ou SAO
+	# vento, que e' o que a prancha manda.
+	1: ["morcego_dos_ventos", "sentinela_flutuante", "gaivota_sombria",
+		"golem_aereo", "elemental_do_vento"],
 	2: ["xamane", "wogol", "olho", "abutre", "imp"],
 	3: ["esqueleto", "necromante", "chort", "ogro", "gosma"],
 	4: ["orc", "abobora", "xamane", "raptor", "mastim"],
@@ -1574,7 +1581,9 @@ const ESP_REGIAO := {
 ## na jornada desse nível; o resto vem da pool da região.
 const ESP_ASSINATURA := [
 	"goblin", "mushroom", "besouro", "gosma", "lodo",              # I  Floresta
-	"esqueleto", "imp", "chort", "mastim", "orc",                  # II Prisão
+	# II Desfiladeiro dos Ventos -- uma criatura canonica por nivel (N06-N10)
+	"morcego_dos_ventos", "sentinela_flutuante", "gaivota_sombria",
+	"golem_aereo", "elemental_do_vento",
 	"xamane", "abutre", "olho", "wogol", "imp",                    # III Torres
 	"necromante", "esqueleto", "gosma", "wogol", "ogro",           # IV Catacumbas
 	"abobora", "orc", "mastim", "raptor", "xamane",                # V  Cidade
