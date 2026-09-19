@@ -867,27 +867,84 @@ def _sacerdotisa_lunar(juntas: Juntas, pecas: list[Peca], pal: dict) -> None:
 
 
 def _vyrak(juntas: Juntas, pecas: list[Peca], pal: dict) -> None:
-    # "Vyrak, o DRAGAO DAS SOMBRAS. F2 destroi a torre e voa"
-    escama, sombra = pal["corpo"], pal["corpo2"]
-    # crista de espinhos das costas ate' a' cauda
-    for k in range(6):
-        pecas.append(Peca("corpo", [(-14.0 + k * 6.0, -8.0), (-10.0 + k * 6.0, -8.0),
-                                    (-12.0 + k * 6.0, -15.0 + abs(k - 2) * 1.5)],
-                          sombra, 0.6))
-    # chifres e mandibula
-    chifres(pecas, "cabeca", sombra, alt=12.0, aber=4.0, z=1.2)
-    pecas.append(Peca("cabeca", [(4.0, 2.0), (16.0, 3.0), (15.0, 6.5), (4.0, 6.0)],
-                      escama, 1.15))
-    for k in range(3):
-        pecas.append(Peca("cabeca", [(6.0 + k * 3.5, 2.0), (8.0 + k * 3.5, 2.0),
-                                     (7.0 + k * 3.5, 6.0)], pal["pele"], 1.2))
-    pecas.append(Peca("cabeca", elipse(6.0, -1.0, 1.6, 1.1), MAGENTA, 1.3, brilho=True))
-    # garras
-    for j, z in (("perna_t", -1.9), ("perna_f", 2.1)):
-        for ang in (-14.0, 0.0, 14.0):
-            pecas.append(Peca(j, mover(rodar(membro(7.0, 2.6, 1.0), ang), 0.0, 14.0),
-                              pal["pele"], z))
-    nucleo(pecas, "corpo", -4.0, 0.0, 3.0)
+    """Regiao III / N15 -- VYRAK, A VOZ DOS ECOS.
+
+    Contrato: docs/art_direction/regions/region_03/
+    REGION03_VISUAL_GAMEPLAY_CONTRACT.md §3, da prancha `boss_pack.png`.
+
+    Era um DRAGAO (plano `alado`, escamas roxas, crista de espinhos). A
+    prancha aprovada mostra outra criatura: um guardiao humanoide
+    encapuzado que PAIRA, de manto enorme, coroa em anel, SINO AO PEITO e
+    asas de eco -- laminas de luz, nao membrana. "Um ser que ja' foi
+    humano, agora fundido com os sinos e a memoria da torre."
+
+    O painel DETALHES da prancha nomeia cinco pecas, e sao estas:
+    cabeca/coroa · sino central · asas de eco · armadura · simbolos.
+    """
+    manto, ouro, eco = pal["corpo2"], pal["metal"], pal["brilho"]
+
+    # --- manto: a prancha abre-o em leque ate' ao chao -------------------
+    # O plano `flutuante` afunila o manto (metade da largura no fim); aqui
+    # abre-se por tras, que e' o que da' a massa de 4x Koliani.
+    pecas.append(Peca("cauda1", [(-19.0, 0.0), (19.0, 0.0), (30.0, 40.0),
+                                 (22.0, 46.0), (-24.0, 46.0), (-31.0, 39.0)],
+                      escurecer(manto, 0.28), -1.4))
+
+    # --- asas de eco: LAMINAS de luz (penas=True da' as laminas) --------
+    # O `asas` varre as duas asas para TRAS (-x), que e' o que serve um
+    # chefe que corre. A prancha abre-as para os DOIS lados, em leque
+    # simetrico -- por isso acrescenta-se aqui o leque da frente. Fica na
+    # junta `corpo` (estatico) de proposito: sao laminas de LUZ, nao
+    # membrana, e na prancha nao batem, pairam.
+    asas(pecas, juntas, "corpo", 0.0, -22.0, 40.0, 15.0, eco, penas=True)
+    for k in range(4):
+        f = 1.0 - k * 0.16
+        pecas.append(Peca("corpo", [
+            (2.0, -24.0 + k * 2.4), (36.0 * f, -29.5 + k * 3.0),
+            (34.0 * f, -22.0 + k * 3.0), (2.0, -20.0 + k * 2.4)],
+            escurecer(eco, 0.18), -2.0 + k * 0.01))
+
+    # --- armadura: ombreiras assentes no torso --------------------------
+    for lado, z in ((-1.0, -1.2), (1.0, 3.4)):
+        pecas.append(Peca("corpo", [
+            (lado * 7.0, -26.0), (lado * 19.0, -23.0),
+            (lado * 17.0, -14.0), (lado * 6.0, -16.0)], ouro, z))
+        pecas.append(Peca("corpo", [
+            (lado * 9.0, -24.5), (lado * 16.5, -22.0),
+            (lado * 15.5, -18.5), (lado * 8.0, -19.5)],
+            escurecer(ouro, 0.3), z + 0.1))
+
+    # --- cabeca: capuz fechado + COROA em anel --------------------------
+    capuz(pecas, "cabeca", manto, r=9.5)
+    # o anel da coroa le'-se de frente como uma elipse fina
+    pecas.append(Peca("cabeca", elipse(0.0, -15.0, 15.0, 4.2),
+                      escurecer(ouro, 0.35), 2.2))
+    pecas.append(Peca("cabeca", elipse(0.0, -15.6, 13.0, 3.0), ouro, 2.3))
+    pecas.append(Peca("cabeca", elipse(0.0, -16.0, 9.5, 1.8),
+                      clarear(ouro, 0.45), 2.4, brilho=True))
+    # dois olhos de eco no escuro do capuz
+    for dx in (-2.6, 2.6):
+        pecas.append(Peca("cabeca", elipse(dx, -5.0, 1.5, 1.1), eco, 2.8,
+                          brilho=True))
+
+    # --- SINO CENTRAL ao peito: e' o ponto fraco e o motivo da regiao ---
+    pecas.append(Peca("corpo", trapezio(-20.0, 9.0, -7.0, 17.0),
+                      escurecer(ouro, 0.22), 3.8))
+    pecas.append(Peca("corpo", trapezio(-19.0, 7.0, -8.0, 14.0), ouro, 3.9))
+    pecas.append(Peca("corpo", caixa(-9.5, -8.0, 9.5, -5.5), ouro, 3.9))
+    # jugo por cima
+    pecas.append(Peca("corpo", caixa(-1.4, -24.0, 1.4, -19.0),
+                      escurecer(ouro, 0.35), 3.7))
+    # o badalo e' o nucleo -- a luz que o jogador procura
+    nucleo(pecas, "corpo", 0.0, -11.0, 3.2, eco)
+
+    # --- simbolos: aneis de eco a pairar aos lados ----------------------
+    for dx, dy, r in ((-36.0, -40.0, 5.0), (37.0, -44.0, 4.0),
+                      (30.0, -8.0, 3.2)):
+        pecas.append(Peca("corpo", elipse(dx, dy, r, r * 0.92),
+                          escurecer(eco, 0.55), 1.4))
+        pecas.append(Peca("corpo", elipse(dx, dy, r * 0.58, r * 0.54),
+                          escurecer(manto, 0.1), 1.5))
 
 
 def _guardiao_dos_ceus(juntas: Juntas, pecas: list[Peca], pal: dict) -> None:
@@ -1243,14 +1300,22 @@ CHEFES: dict[str, dict] = {
         "extras": _sacerdotisa_lunar,
     },
     "vyrak": {
-        # dragao: o plano alado da-lhe pescoco, cauda e asas de membrana
-        "plano": "alado",
-        "par": {"voo": 30.0, "corpo_c": 40.0, "corpo_a": 19.0, "pescoco": 16.0,
-                "cabeca": 8.5, "asa1": 30.0, "asa2": 26.0, "asa_esp": 18.0,
-                "cauda": 22.0, "perna": 15.0},
-        "pal": paleta("1a1626", "2e2444", "d8d0e6", "0d0a16", metal="5a4f78",
-                      asa="241d38"),
-        "cfg": {"amp": 1.1},
+        # Regiao III / N15 -- VYRAK, A VOZ DOS ECOS. Paleta amostrada da
+        # prancha aprovada (`boss_pack.png`, painel CORES E MATERIAIS):
+        # metal envelhecido, pedra gotica, OURO ANTIGO, energia de eco,
+        # vitrais. Nada de roxo-sombra de dragao.
+        # Ele PAIRA e nao tem pernas -- o manto desce e desfaz-se em
+        # pontas -- por isso o plano e' `flutuante` e nao `alado`.
+        # E' o maior da regiao: a prancha poe-no a ~4x a Koliani, e e' o
+        # manto (40) mais as ombreiras que fazem essa massa.
+        "plano": "flutuante",
+        "par": {"voo": 38.0, "torso": 26.0, "ombros": 24.0, "cintura": 12.0,
+                "manto": 40.0, "manto_larg": 30.0, "cauda": 20.0,
+                "braco": 14.0, "antebraco": 13.0, "esp_braco": 6.0,
+                "cabeca": 7.5},
+        "pal": paleta("27305c", "39447e", "efe4c4", "141936", metal="edbc66",
+                      brilho="9fb6ff"),
+        "cfg": {"ataque": "magia", "amp": 1.15},
         "extras": _vyrak,
     },
     "guardiao_dos_ceus": {

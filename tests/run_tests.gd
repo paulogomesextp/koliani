@@ -143,6 +143,15 @@ func _correr_tudo() -> void:
 	teste_9h1_tema_do_seletor()
 	teste_9h1_repor_layout_apaga_mesmo()
 
+	# --- Região III -- Torre dos Ecos (N11-N15) -----------------------
+	teste_r3_nomes_canonicos()
+	teste_r3_um_so_chefe_na_regiao()
+	teste_r3_fundo_proprio_da_torre()
+	teste_r3_assinatura_e_de_sinos()
+	await teste_r3_niveis_carregam()
+	await teste_r3_vyrak_identidade()
+	await teste_r3_vyrak_leva_dano_muda_de_fase_e_morre()
+
 	if _falhas.is_empty():
 		print("OK -- todos os testes passaram")
 		get_tree().quit(0)
@@ -3645,3 +3654,200 @@ func teste_gate1_hitstop_nao_gera_nan() -> void:
 		"GATE 1: velocidade nao-finita depois do hitstop em cima de um"
 		+ " `AnimatableBody2D`: %s" % str(v))
 	raiz.queue_free()
+
+
+## =====================================================================
+##  REGIÃO III -- TORRE DOS ECOS (N11-N15)
+##
+##  Contrato: docs/art_direction/regions/region_03/
+##  REGION03_VISUAL_GAMEPLAY_CONTRACT.md
+##
+##  ARMADILHA: as chaves i18n `level.nXX` usam o indice 0-BASED de
+##  `EstadoJogo.NIVEIS`. Os niveis N11-N15 que o jogador ve' sao as
+##  chaves `level.n10` a `level.n14`. Quem mexer em `level.n11` a pensar
+##  no N11 esta' a estragar o N12.
+## =====================================================================
+
+## Indice de `EstadoJogo.NIVEIS` do primeiro nivel da Regiao III (o N11).
+const R3_BASE := 10
+
+
+func _json_de(caminho: String) -> Dictionary:
+	var f := FileAccess.open(caminho, FileAccess.READ)
+	if f == null:
+		_ok(false, "devia existir: %s" % caminho)
+		return {}
+	var d: Variant = JSON.parse_string(f.get_as_text())
+	f.close()
+	if not (d is Dictionary):
+		_ok(false, "devia ser um objecto JSON: %s" % caminho)
+		return {}
+	return d as Dictionary
+
+
+func teste_r3_nomes_canonicos() -> void:
+	# Os nomes vem das pranchas APPROVED e sao canone.
+	var esperado := {
+		"level.n10": "Entrance of Echoes",
+		"level.n11": "Vertical Galleries",
+		"level.n12": "Ancient Mechanisms",
+		"level.n13": "The Belfry",
+		"level.n14": "The Summit of Echoes",
+		"boss.vyrak": "Vyrak, the Voice of Echoes",
+	}
+	var en: Dictionary = _json_de("res://assets/i18n/en.json")
+	for chave: String in esperado:
+		_ok(String(en.get(chave, "")) == String(esperado[chave]),
+			"R3: `%s` devia ser \"%s\", esta' \"%s\"" % [
+				chave, esperado[chave], en.get(chave, "")])
+	# O Vyrak nao pode voltar a ser dragao: a prancha mostra um guardiao
+	# humanoide de sinos, e o texto antigo do projeto e' que estava errado.
+	_ok(not String(en.get("boss.vyrak", "")).to_lower().contains("dragon"),
+		"R3: o Vyrak canonico nao e' um dragao")
+	# As 6 linguas tem de ter as MESMAS chaves.
+	var base := _json_de("res://assets/i18n/en.json").keys()
+	for lang: String in ["pt", "es", "fr", "de", "zh"]:
+		var d: Dictionary = _json_de("res://assets/i18n/%s.json" % lang)
+		for chave: String in esperado:
+			_ok(d.has(chave), "R3: falta `%s` no %s.json" % [chave, lang])
+		_ok(d.size() == base.size(),
+			"R3: %s.json tem %d chaves, o en.json tem %d" % [
+				lang, d.size(), base.size()])
+
+
+func teste_r3_um_so_chefe_na_regiao() -> void:
+	# O canone da Regiao III admite UM confronto -- o Vyrak, no N15. Os
+	# quatro encontros intermedios sao GUARDIOES, como na Regiao II.
+	for i in 4:
+		var chave: String = CatalogoCampanha.CHEFE_KEY[R3_BASE + i]
+		_ok(chave.begins_with("guard."),
+			"R3: o N%d devia ser guardiao, e' `%s`" % [11 + i, chave])
+	_ok(CatalogoCampanha.CHEFE_KEY[R3_BASE + 4] == "boss.vyrak",
+		"R3: o N15 devia ser `boss.vyrak`, e' `%s`" % [
+			CatalogoCampanha.CHEFE_KEY[R3_BASE + 4]])
+	# O Sino Vivo fica -- um chefe-sino numa torre de sinos e' canonico.
+	_ok(CatalogoCampanha.CHEFE_KEY[R3_BASE] == "guard.sino_vivo",
+		"R3: o Sino Vivo do N11 devia manter-se (como guardiao)")
+
+
+func teste_r3_fundo_proprio_da_torre() -> void:
+	# O `montanhas` tem uma camada `trees.png` de PINHEIROS: com ele, a
+	# Torre dos Ecos renderizava como floresta. A regiao tem pack proprio.
+	const ATM := preload("res://scripts/atmosfera.gd")
+	_ok(ATM.PACKS.has("torre_ecos"), "R3: falta o pack `torre_ecos`")
+	for item: Array in ATM.PACKS["torre_ecos"]:
+		var cam := "res://assets/sprites/pixel/backgrounds/torre_ecos/%s" % item[0]
+		_ok(ResourceLoader.exists(cam), "R3: falta a camada %s" % cam)
+	for i in 5:
+		var cena: PackedScene = load(EstadoJogo.NIVEIS[R3_BASE + i])
+		var raiz: Node = cena.instantiate()
+		var atm: Node = raiz.get_node_or_null("Atmosfera")
+		_ok(atm != null and String(atm.get("fundo_pack")) == "torre_ecos",
+			"R3: o N%d devia usar o pack `torre_ecos`, usa `%s`" % [
+				11 + i, atm.get("fundo_pack") if atm else "<sem Atmosfera>"])
+		_ok(atm != null and String(atm.get("bioma")) == "torres",
+			"R3: o N%d devia ser do bioma `torres`" % [11 + i])
+		raiz.free()
+
+
+func teste_r3_assinatura_e_de_sinos() -> void:
+	# `ASSINATURA[2]` era "vento" -- a assinatura da Regiao II. O canone
+	# diz que o elemento central da Torre dos Ecos sao os SINOS.
+	const GER := preload("res://scripts/gerador_corredor.gd")
+	_ok(String(GER.ASSINATURA[2]) == "sinos",
+		"R3: a camara de assinatura da regiao devia ser `sinos`, e' `%s`" % [
+			GER.ASSINATURA[2]])
+	_ok(GER.POOL_REGIAO[2].has("sinos"),
+		"R3: `sinos` tem de estar na pool da regiao")
+
+
+func teste_r3_niveis_carregam() -> void:
+	# Apanha a falha de arranque real (o historico de "ecra preto" do N12).
+	for i in 5:
+		var caminho: String = EstadoJogo.NIVEIS[R3_BASE + i]
+		_ok(ResourceLoader.exists(caminho), "R3: falta a cena do N%d" % [11 + i])
+		var cena: PackedScene = load(caminho)
+		_ok(cena != null, "R3: o N%d nao carrega" % [11 + i])
+		var raiz: Node = cena.instantiate()
+		get_tree().root.add_child(raiz)
+		await get_tree().process_frame
+		await get_tree().process_frame
+		_ok(raiz.get_node_or_null("Koliani") != null,
+			"R3: o N%d devia ter a Koliani" % [11 + i])
+		_ok(raiz.get_node_or_null("Porta") != null,
+			"R3: o N%d devia ter a saida" % [11 + i])
+		raiz.queue_free()
+		await get_tree().process_frame
+
+
+func teste_r3_vyrak_identidade() -> void:
+	var chefe: Node = load("res://scenes/actors/ChefeVyrak.tscn").instantiate()
+	get_tree().root.add_child(chefe)
+	await get_tree().process_frame
+	_ok(String(chefe.get("rig")) == "vyrak",
+		"R3: o Vyrak devia usar o rig `vyrak`")
+	# A prancha poe-no a ~4x a Koliani (44 px). Ele tem alvos PROPRIOS
+	# (como o Guardiao dos Ceus), por isso mede-se por ai' e nao pela
+	# constante do `ChefeBase`.
+	var altura := float(chefe.call("_altura_alvo"))
+	_ok(altura / 44.0 >= 3.5,
+		"R3: o Vyrak devia ler-se a ~4x a Koliani (%.0f px = %.2fx)" % [
+			altura, altura / 44.0])
+	_ok(float(chefe.get("escala_visual")) == 1.0,
+		"R3: com alvos proprios o `escala_visual` deve ficar em 1.0")
+	# O ciclo de combate da prancha tem DUAS fases, nao tres.
+	_ok(ChefeVyrak.CICLO_F1.size() > 0 and ChefeVyrak.CICLO_F2.size() > 0,
+		"R3: o Vyrak devia ter as duas rotacoes de ataque")
+	# Os nove ataques nomeados na prancha existem todos.
+	_ok(ChefeVyrak.ATAQUES.size() == 9,
+		"R3: a prancha nomeia 9 ataques, ha' %d" % ChefeVyrak.ATAQUES.size())
+	for a: int in ChefeVyrak.ATAQUES:
+		var cfg: Dictionary = ChefeVyrak.ATAQUES[a]
+		_ok(float(cfg["tel"]) >= 0.45,
+			"R3: o ataque %d telegrafa menos de 0,45 s -- a prancha exige"
+			% a + " janelas de reacao justas")
+	# Os quatro da fase 2 so' podem sair na fase 2.
+	for a: int in [ChefeVyrak.Atk.CHUVA_SINOS, ChefeVyrak.Atk.ESPIRAL,
+			ChefeVyrak.Atk.PAREDE_ECO, ChefeVyrak.Atk.JULGAMENTO]:
+		_ok(not ChefeVyrak.CICLO_F1.has(a),
+			"R3: o ataque %d e' da fase 2 e esta' na rotacao da fase 1" % a)
+	chefe.queue_free()
+	await get_tree().process_frame
+
+
+func teste_r3_vyrak_leva_dano_muda_de_fase_e_morre() -> void:
+	# Harness tecnico: o bot nao consegue provar uma luta de chefe, por
+	# isso prova-se aqui que o Vyrak e' atingivel, transita aos 50 % e
+	# morre -- que e' o que separa "existe" de "funciona".
+	var chefe: Node = load("res://scenes/actors/ChefeVyrak.tscn").instantiate()
+	get_tree().root.add_child(chefe)
+	await get_tree().process_frame
+	var vida_max := int(chefe.get("vida"))
+	_ok(vida_max > 0, "R3: o Vyrak devia arrancar com vida")
+
+	chefe.call("receber_dano", 40, 1.0)
+	await get_tree().process_frame
+	_ok(int(chefe.get("vida")) < vida_max,
+		"R3: o Vyrak devia levar dano (%d -> %d)" % [
+			vida_max, chefe.get("vida")])
+
+	# Bater-lhe ate' abaixo de metade tem de acender a fase 2.
+	var seguranca := 0
+	while int(chefe.get("vida")) > int(vida_max * 0.45) and seguranca < 400:
+		chefe.call("receber_dano", 25, 1.0)
+		seguranca += 1
+	await get_tree().physics_frame
+	await get_tree().physics_frame
+	_ok(bool(chefe.get("_f2")),
+		"R3: abaixo de 50 %% de vida o Vyrak devia estar na fase 2")
+
+	# E tem de morrer -- um chefe que nao morre e' um softlock.
+	seguranca = 0
+	while int(chefe.get("vida")) > 0 and seguranca < 400:
+		chefe.call("receber_dano", 40, 1.0)
+		seguranca += 1
+	await get_tree().physics_frame
+	_ok(int(chefe.get("vida")) <= 0,
+		"R3: o Vyrak nao morreu ao fim de %d golpes" % seguranca)
+	chefe.queue_free()
+	await get_tree().process_frame

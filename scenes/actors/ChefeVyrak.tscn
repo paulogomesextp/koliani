@@ -1,19 +1,29 @@
 [gd_scene load_steps=6 format=3 uid="uid://bkolianichefevyrak15"]
 
-; Região III / nível 15 -- Vyrak, o Dragão das Sombras. Tira pixel-art de
-; 4 frames (0/1 empoleirado, 2 asa/garra erguida (telegrafo), 3 cabeça
-; baixa a rugir -- núcleo em brasa (exposto)) em
-; assets/sprites/pixel/bosses/vyrak.png. Luta em 3 fases (ver
-; scripts/chefe_vyrak.gd, herda ChefeBase). "plataformas_pico" caem na F2.
+; Região III / nível 15 -- VYRAK, A VOZ DOS ECOS. O guardião do topo da
+; Torre dos Ecos: humanoide encapuzado que PAIRA, coroa em anel, SINO ao
+; peito (é o núcleo -- o ponto fraco) e asas de eco. Ver o contrato em
+; docs/art_direction/regions/region_03/REGION03_VISUAL_GAMEPLAY_CONTRACT.md
+; §3, tirado da prancha aprovada `boss_pack.png`.
+;
+; Era "o Dragão das Sombras", uma besta alada roxa de 3 fases -- outra
+; criatura. O rig `vyrak` (assets/sprites/pixel/bosses_anim/vyrak/, gerado
+; por tools/gerar_chefes_anim.py) é agora o da prancha, e a luta tem as
+; DUAS fases do cânone (ver scripts/chefe_vyrak.gd, herda ChefeBase).
+;
+; A prancha põe-no a ~4x a Koliani (44 px): os chefes são normalizados a
+; 100 px de altura, por isso `escala_visual = 1.0` dá ~170 px. As formas
+; de colisão crescem com ele -- um chefe que se vê maior do que se acerta
+; contradiz o "boss sempre atingível" dos princípios de design.
 
 [ext_resource type="Script" path="res://scripts/chefe_vyrak.gd" id="1_chefe"]
 [ext_resource type="Texture2D" path="res://assets/sprites/pixel/bosses/vyrak.png" id="2_tex"]
 
 [sub_resource type="RectangleShape2D" id="rs_body"]
-size = Vector2(84, 96)
+size = Vector2(104, 120)
 
 [sub_resource type="RectangleShape2D" id="rs_contacto"]
-size = Vector2(110, 104)
+size = Vector2(128, 122)
 
 [sub_resource type="Gradient" id="grad_luz"]
 offsets = PackedFloat32Array(0, 1)
@@ -32,12 +42,12 @@ collision_layer = 4
 collision_mask = 1
 script = ExtResource("1_chefe")
 rig = "vyrak"
-escala_visual = 1.35
+escala_visual = 1.0
 vida = 620
 dano_contacto = 22
 alcance_patrulha = 0.0
-cor_estilhacos = Color(0.4, 0.26, 0.55, 1)
-cor_rim = Color(0.75, 0.45, 1, 1)
+cor_estilhacos = Color(0.79, 0.63, 0.35, 1)
+cor_rim = Color(0.56, 0.66, 1, 1)
 
 [node name="Sprite" type="Node2D" parent="."]
 
@@ -48,8 +58,8 @@ texture = ExtResource("2_tex")
 hframes = 4
 
 
-; RIG ANIMADO -- n15 O Pico Esquecido -- besta alada. Fica vazio: o `ChefeBase._montar_rig` enche-o
-; de `bosses_anim/alado` e esconde o `Corpo` acima.
+; RIG ANIMADO -- n15 O Topo dos Ecos. Fica vazio: o `ChefeBase._montar_rig`
+; enche-o de `bosses_anim/vyrak` e esconde o `Corpo` acima.
 [node name="Anim" type="AnimatedSprite2D" parent="Sprite"]
 visible = false
 texture_filter = 1
@@ -58,7 +68,7 @@ texture_filter = 1
 position = Vector2(8, 0)
 texture = SubResource("tex_luz")
 energy = 0.6
-color = Color(0.7, 0.42, 1, 1)
+color = Color(0.56, 0.66, 1, 1)
 scale = Vector2(1, 1)
 
 [node name="Nucleo" type="Node2D" parent="Sprite"]
@@ -68,21 +78,21 @@ scale = Vector2(0.4, 0.4)
 [node name="Brilho" type="Sprite2D" parent="Sprite/Nucleo"]
 visible = false
 texture = SubResource("tex_luz")
-modulate = Color(0.7, 0.42, 1, 0.9)
+modulate = Color(0.56, 0.66, 1, 0.9)
 scale = Vector2(0.4, 0.4)
 
 [node name="Diamante" type="Polygon2D" parent="Sprite/Nucleo"]
-color = Color(0.69, 0.42, 1, 1)
+color = Color(0.56, 0.66, 1, 1)
 polygon = PackedVector2Array(-10, 0, 0, -14, 10, 0, 0, 14)
 
 [node name="Cerne" type="Polygon2D" parent="Sprite/Nucleo"]
-color = Color(0.97, 0.92, 1, 1)
+color = Color(0.95, 0.97, 1, 1)
 polygon = PackedVector2Array(-4, 0, 0, -7, 4, 0, 0, 7)
 
 [node name="Luz" type="PointLight2D" parent="Sprite/Nucleo"]
 texture = SubResource("tex_luz")
 energy = 0.12
-color = Color(0.7, 0.42, 1, 1)
+color = Color(0.56, 0.66, 1, 1)
 scale = Vector2(0.7, 0.7)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
