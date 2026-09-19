@@ -1,6 +1,7 @@
 [gd_scene load_steps=13 format=3 uid="uid://bkolianitorretempestade13"]
 
-; REGIAO III / nivel 13 -- Torre da Tempestade.
+; REGIAO III / nivel 13 -- MECANISMOS ANTIGOS (`level.n12`).
+; O nome do ficheiro fica: muda-lo partia saves e checkpoints.
 ; Sala final FEITA A MAO (a JORNADA, que cresce com o nivel, vem antes) e VERTICAL. RAIOS (RaioTempestade
 ; automatico) caem em colunas com padrao previsivel sobre a subida; ha
 ; PARA-RAIOS para armar e desviar. Bifurcacao: rampa oeste / rampa este.
@@ -111,11 +112,13 @@ cor_topo = Color(0.48, 0.5, 0.6, 1)
 [node name="ParaMeio" parent="." instance=ExtResource("11_para")]
 position = Vector2(760, 556)
 
-[node name="EliteOlho" parent="." instance=ExtResource("2_dem")]
+; N13: o Espirito "atravessa plataformas e persegue" -- e' o voador do nivel. So' muda a IDENTIDADE: vida, dano,
+; comportamento e posicao ficam como estavam.
+[node name="EliteEspirito" parent="." instance=ExtResource("2_dem")]
 position = Vector2(620, 440)
 scale = Vector2(1.35, 1.35)
 elite = true
-especie = "olho"
+especie = "espirito_do_eco"
 vida = 155
 dano_contacto = 22
 comportamento = "voador"

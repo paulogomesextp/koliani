@@ -1559,7 +1559,14 @@ const ESP_REGIAO := {
 	# vento, que e' o que a prancha manda.
 	1: ["morcego_dos_ventos", "sentinela_flutuante", "gaivota_sombria",
 		"golem_aereo", "elemental_do_vento"],
-	2: ["xamane", "wogol", "olho", "abutre", "imp"],
+	# REGIAO III -- bestiario CANONICO da prancha aprovada. Era
+	# `["xamane", "wogol", "olho", "abutre", "imp"]`, comentado "# III
+	# Torres": demonios genericos herdados das regioes anteriores numa
+	# torre de sinos. A auditoria mediu 0 dos 10 canonicos em N11-N15.
+	# Estes vem do `enemy_gameplay_pack.png` da Regiao III, recortados por
+	# `tools/extrair_inimigos_regiao03.py`.
+	2: ["sentinela_da_torre", "acolito_do_eco", "automato_do_sino",
+		"espirito_do_eco", "corvo_do_sino"],
 	3: ["esqueleto", "necromante", "chort", "ogro", "gosma"],
 	4: ["orc", "abobora", "xamane", "raptor", "mastim"],
 	5: ["demonio_grande", "ogro", "chort", "olho", "raptor"],
@@ -1588,7 +1595,15 @@ const ESP_ASSINATURA := [
 	# II Desfiladeiro dos Ventos -- uma criatura canonica por nivel (N06-N10)
 	"morcego_dos_ventos", "sentinela_flutuante", "gaivota_sombria",
 	"golem_aereo", "elemental_do_vento",
-	"xamane", "abutre", "olho", "wogol", "imp",                    # III Torres
+	# III Torre dos Ecos -- os "INIMIGOS PRINCIPAIS" que o `layout_usage.png`
+	# da' a cada nivel. A prancha e' clara nesta lista, ao contrario da
+	# tabela "progressao de aparicao" do `enemy_gameplay_pack.png`, que tem
+	# os pontos desalinhados meia-linha e nao serve como fonte.
+	"acolito_do_eco",       # N11 Entrada dos Ecos
+	"gargula_vitral",       # N12 Galerias Verticais
+	"construto_vitral",     # N13 Mecanismos Antigos
+	"monge_das_correntes",  # N14 Campanario
+	"sino_flutuante",       # N15 O Topo dos Ecos
 	"necromante", "esqueleto", "gosma", "wogol", "ogro",           # IV Catacumbas
 	"abobora", "orc", "mastim", "raptor", "xamane",                # V  Cidade
 	"demonio_grande", "chort", "raptor", "ogro", "olho",           # VI Castelo

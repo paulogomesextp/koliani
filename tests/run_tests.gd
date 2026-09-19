@@ -148,6 +148,7 @@ func _correr_tudo() -> void:
 	teste_r3_um_so_chefe_na_regiao()
 	teste_r3_fundo_proprio_da_torre()
 	teste_r3_assinatura_e_de_sinos()
+	teste_r3_bestiario_canonico()
 	await teste_r3_niveis_carregam()
 	await teste_r3_vyrak_identidade()
 	await teste_r3_vyrak_leva_dano_muda_de_fase_e_morre()
@@ -3851,3 +3852,52 @@ func teste_r3_vyrak_leva_dano_muda_de_fase_e_morre() -> void:
 		"R3: o Vyrak nao morreu ao fim de %d golpes" % seguranca)
 	chefe.queue_free()
 	await get_tree().process_frame
+
+
+func teste_r3_bestiario_canonico() -> void:
+	# A auditoria mediu 0 dos 10 inimigos canonicos em N11-N15: a regiao
+	# usava `xamane, wogol, olho, abutre, imp`, demonios genericos
+	# herdados. Estes dez vem recortados da prancha APPROVED por
+	# `tools/extrair_inimigos_regiao03.py`.
+	const R3 := ["sentinela_da_torre", "acolito_do_eco", "automato_do_sino",
+		"gargula_vitral", "sino_flutuante", "arqueiro_das_sombras",
+		"monge_das_correntes", "espirito_do_eco", "construto_vitral",
+		"corvo_do_sino"]
+	for esp: String in R3:
+		_ok(DemonioBase.ESPECIES.has(esp),
+			"R3: a especie `%s` nao esta' registada" % esp)
+		for anim: String in ["idle", "run", "attack", "hit", "dead"]:
+			var cam := "res://assets/sprites/pixel/enemies/%s/%s.png" % [esp, anim]
+			_ok(ResourceLoader.exists(cam), "R3: falta %s" % cam)
+
+	const GER := preload("res://scripts/gerador_corredor.gd")
+	# A pool da regiao nao pode ter nenhum demonio herdado.
+	var pool: Array = GER.ESP_REGIAO[2]
+	for esp: String in pool:
+		_ok(R3.has(esp),
+			"R3: `%s` na pool da regiao nao e' do bestiario canonico" % esp)
+	# Cada um dos cinco niveis tem a sua assinatura, e sao cinco DIFERENTES
+	# -- a prancha da' um inimigo principal distinto a cada nivel.
+	var assin := {}
+	for i in 5:
+		var esp: String = GER.ESP_ASSINATURA[R3_BASE + i]
+		_ok(R3.has(esp),
+			"R3: a assinatura do N%d (`%s`) nao e' canonica" % [11 + i, esp])
+		assin[esp] = true
+	_ok(assin.size() == 5,
+		"R3: os cinco niveis deviam ter assinaturas diferentes, ha' %d" % assin.size())
+
+	# E os elites postos a' mao nas cinco cenas tambem. Os CHEFES ficam de
+	# fora: vestem-se pelo `rig`, e a `especie` deles nunca chega ao ecra --
+	# fica no "goblin" que e' o valor por omissao do `DemonioBase`.
+	for i in 5:
+		var raiz: Node = (load(EstadoJogo.NIVEIS[R3_BASE + i]) as PackedScene).instantiate()
+		for n in raiz.get_children():
+			if not ("especie" in n) or String(n.get("especie")) == "":
+				continue
+			if "rig" in n and String(n.get("rig")) != "":
+				continue
+			_ok(R3.has(String(n.get("especie"))),
+				"R3: o elite `%s` do N%d usa `%s`, que nao e' da regiao"
+				% [n.name, 11 + i, n.get("especie")])
+		raiz.free()

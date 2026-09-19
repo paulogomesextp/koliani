@@ -406,6 +406,29 @@ Foi este que fechou a questão do **portal da Frostwindz**: aquele era pago e
 a licença proíbe redistribuir os ficheiros num repo público (ver
 `assets/sprites/incoming/LICENSES.md`).
 
+## Bestiário canónico da Região III — Torre dos Ecos (19 set 2026)
+
+`enemies/sentinela_da_torre`, `enemies/acolito_do_eco`,
+`enemies/automato_do_sino`, `enemies/gargula_vitral`,
+`enemies/sino_flutuante`, `enemies/arqueiro_das_sombras`,
+`enemies/monge_das_correntes`, `enemies/espirito_do_eco`,
+`enemies/construto_vitral`, `enemies/corvo_do_sino`.
+
+**Não vêm de nenhum pack.** Mesmo método da Região II: recortes da prancha
+**aprovada** do próprio projeto —
+`docs/art_direction/regions/region_03/enemy_gameplay_pack.png` —, feitos por
+`tools/extrair_inimigos_regiao03.py`.
+
+Aqui saem **as dez**, e não cinco como na Região II: nesta prancha os dez
+painéis têm todos a criatura na linha de estados, com os cinco estados
+nomeados (IDLE / ANDA / ATAQUE / DANO / MORTE) e em caixas alinhadas.
+
+Uma ressalva de fidelidade: o painel do **Sino Flutuante** tem a figura de
+conceito a desenhar um sino a pairar, mas a linha de estados desse painel
+mostra outra coisa (uma criatura alada e rebentamentos dourados). O recorte
+é fiel ao que a prancha desenha na linha de estados — a inconsistência é da
+prancha, e não se inventou um sino para a tapar.
+
 ## Bestiário canónico da Região II (18 set 2026)
 
 `enemies/morcego_dos_ventos`, `enemies/sentinela_flutuante`,

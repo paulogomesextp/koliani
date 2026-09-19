@@ -82,7 +82,11 @@ var _dive_dir := Vector2.ZERO
 	"abobora", "wogol", "necromante", "lodo",
 	"besouro", "raptor", "mastim", "gosma", "abutre",
 	"morcego_dos_ventos", "sentinela_flutuante", "gaivota_sombria",
-	"golem_aereo", "elemental_do_vento") var especie := "goblin"
+	"golem_aereo", "elemental_do_vento",
+	"sentinela_da_torre", "acolito_do_eco", "automato_do_sino",
+	"gargula_vitral", "sino_flutuante", "arqueiro_das_sombras",
+	"monge_das_correntes", "espirito_do_eco", "construto_vitral",
+	"corvo_do_sino") var especie := "goblin"
 ## Só a ARTE (Execution 9D+9E): quem a define veste-se com a arte de produção
 ## desta identidade em vez da da `especie`, que continua a mandar no som, no
 ## tamanho e em tudo o resto. É o que faz os clones da Morvanna parecerem
@@ -118,6 +122,23 @@ const ESPECIES := {
 	# identidade e' o AR. Censo do audit: 0 dos 10 canonicos em N06-N10.
 	"morcego_dos_ventos":  {"idle": 2, "run": 2, "hit": 1, "dead": 1},
 	"sentinela_flutuante": {"idle": 2, "run": 2, "hit": 1, "dead": 1},
+	# --- REGIAO III, bestiario CANONICO ------------------------------------
+	# Recortadas da prancha aprovada `enemy_gameplay_pack.png` da Regiao III
+	# por `tools/extrair_inimigos_regiao03.py`. Mesmo metodo da Regiao II --
+	# nao e' desenho novo, sao as poses que a prancha ja' tinha, com os
+	# cinco estados que ela ja' nomeava (IDLE/ANDA/ATAQUE/DANO/MORTE).
+	# Ate' aqui a Torre dos Ecos usava `xamane, wogol, olho, abutre, imp`:
+	# demonios genericos herdados. Censo da auditoria: 0 dos 10 canonicos.
+	"sentinela_da_torre":   {"idle": 2, "run": 2, "hit": 1, "dead": 1},
+	"acolito_do_eco":       {"idle": 2, "run": 2, "hit": 1, "dead": 1},
+	"automato_do_sino":     {"idle": 2, "run": 2, "hit": 1, "dead": 1},
+	"gargula_vitral":       {"idle": 2, "run": 2, "hit": 1, "dead": 1},
+	"sino_flutuante":       {"idle": 2, "run": 2, "hit": 1, "dead": 1},
+	"arqueiro_das_sombras": {"idle": 2, "run": 2, "hit": 1, "dead": 1},
+	"monge_das_correntes":  {"idle": 2, "run": 2, "hit": 1, "dead": 1},
+	"espirito_do_eco":      {"idle": 2, "run": 2, "hit": 1, "dead": 1},
+	"construto_vitral":     {"idle": 2, "run": 2, "hit": 1, "dead": 1},
+	"corvo_do_sino":        {"idle": 2, "run": 2, "hit": 1, "dead": 1},
 	"gaivota_sombria":     {"idle": 2, "run": 2, "hit": 1, "dead": 1},
 	"golem_aereo":         {"idle": 2, "run": 2, "hit": 1, "dead": 1},
 	"elemental_do_vento":  {"idle": 2, "run": 2, "hit": 1, "dead": 1},
@@ -421,7 +442,10 @@ const ESPECIES_VOAM := ["olho", "abutre",
 	# as cinco canonicas da Regiao II voam, levitam ou SAO vento -- e' a
 	# definicao da regiao ("Nenhum e' um bicho de masmorra terrestre")
 	"morcego_dos_ventos", "sentinela_flutuante", "gaivota_sombria",
-	"golem_aereo", "elemental_do_vento"]
+	"golem_aereo", "elemental_do_vento",
+	# Regiao III: a gargula patrulha EM VOO, o sino flutua, o corvo voa e o
+	# espirito atravessa plataformas -- a prancha diz isso de cada um.
+	"gargula_vitral", "sino_flutuante", "corvo_do_sino", "espirito_do_eco"]
 
 ## A que FAMILIA de som pertence cada espécie (4 set 2026, pedido do Paulo:
 ## "faça com que os mobs façam sons apropriados ao tipo de monstro"). Até
@@ -441,6 +465,12 @@ const FAMILIA_SOM := {
 	"sentinela_flutuante": "morto", "golem_aereo": "grande",
 	"demonio_grande": "grande", "ogro": "grande",
 	"xamane": "grande", "abobora": "grande",
+	# Regiao III -- Torre dos Ecos
+	"sentinela_da_torre": "humano", "arqueiro_das_sombras": "humano",
+	"monge_das_correntes": "humano", "acolito_do_eco": "morto",
+	"espirito_do_eco": "morto", "sino_flutuante": "morto",
+	"gargula_vitral": "voador", "corvo_do_sino": "voador",
+	"automato_do_sino": "grande", "construto_vitral": "grande",
 }
 
 

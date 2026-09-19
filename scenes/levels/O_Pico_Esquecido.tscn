@@ -1,9 +1,10 @@
 [gd_scene load_steps=11 format=3 uid="uid://bkolianipico15"]
 
-; REGIAO III / nivel 15 -- O Pico Esquecido (chefe da regiao).
+; REGIAO III / nivel 15 -- O TOPO DOS ECOS (`level.n14`), o exame da regiao.
+; O nome do ficheiro fica: muda-lo partia saves e checkpoints.
 ; Sala final FEITA A MAO (a JORNADA, que cresce com o nivel, vem antes). Subida curta e exposta ate' ao
 ; CUME -- arena ampla. Bifurcacao: cornija oeste / cornija este. Elite:
-; imp cuspidor. Vazio em baixo. Chefe: Vyrak, o Dragao das Sombras (3 fases).
+; Arqueiro das Sombras (cuspidor). Vazio em baixo. Chefe: Vyrak, A Voz dos Ecos (2 fases -- ver o contrato da regiao).
 
 [ext_resource type="PackedScene" uid="uid://bkolianiactor01" path="res://scenes/actors/Koliani.tscn" id="1_kol"]
 [ext_resource type="PackedScene" uid="uid://bdemoniobase01" path="res://scenes/actors/DemonioBase.tscn" id="2_dem"]
@@ -84,11 +85,13 @@ altura_visual = 42.0
 cor_base = Color(0.24, 0.2, 0.28, 1)
 cor_topo = Color(0.5, 0.42, 0.56, 1)
 
-[node name="EliteImp" parent="." instance=ExtResource("2_dem")]
+; N15: o Arqueiro "mantem distancia e dispara" -- o `cuspidor` ja' era isso. So' muda a IDENTIDADE: vida, dano,
+; comportamento e posicao ficam como estavam.
+[node name="EliteArqueiro" parent="." instance=ExtResource("2_dem")]
 position = Vector2(640, 542)
 scale = Vector2(1.4, 1.4)
 elite = true
-especie = "imp"
+especie = "arqueiro_das_sombras"
 vida = 180
 dano_contacto = 26
 comportamento = "cuspidor"

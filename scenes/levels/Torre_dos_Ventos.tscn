@@ -1,6 +1,7 @@
 [gd_scene load_steps=12 format=3 uid="uid://bkolianitorreventos12"]
 
-; REGIAO III / nivel 12 -- Torre dos Ventos.
+; REGIAO III / nivel 12 -- GALERIAS VERTICAIS (`level.n11`).
+; O nome do ficheiro fica: muda-lo partia saves e checkpoints.
 ; Sala final FEITA A MAO (a JORNADA, que cresce com o nivel, vem antes) e VERTICAL. CORRENTES DE AR
 ; ascendentes (CorrenteAr) entre os degraus -- sobem-se ao sabor do vento.
 ; Bifurcacao: coluna de ar oeste / degraus este. Elite: abutre voador.
@@ -95,11 +96,13 @@ altura_visual = 40.0
 cor_base = Color(0.24, 0.22, 0.24, 1)
 cor_topo = Color(0.52, 0.48, 0.5, 1)
 
-[node name="EliteAbutre" parent="." instance=ExtResource("2_dem")]
+; N12: a Gargula e' a "predadora aerea" da prancha; `voador` fica igual. So' muda a IDENTIDADE: vida, dano,
+; comportamento e posicao ficam como estavam.
+[node name="EliteGargula" parent="." instance=ExtResource("2_dem")]
 position = Vector2(760, 430)
 scale = Vector2(1.35, 1.35)
 elite = true
-especie = "abutre"
+especie = "gargula_vitral"
 vida = 150
 dano_contacto = 22
 comportamento = "voador"
