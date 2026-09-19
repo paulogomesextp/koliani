@@ -1,3 +1,23 @@
+## Pendente de DECISÃO — DEV MODE sem PIN (19 set 2026)
+
+Branch `claude/remove-devmode-pin`. Relatório:
+`docs/execution_devmode_sem_pin.md`. O PIN saiu como pedido e o DEV MODE
+ficou intacto. Duas coisas para o Paulo decidir:
+
+A. **O DEV MODE fica visível em builds de loja?** Hoje quem manda é o
+   interruptor `koliani/qa/entrada_dev` no `project.godot`, e ele está
+   `true`. Enquanto o PIN existia, dava para argumentar que era uma segunda
+   tranca; agora é a ÚNICA. Se alguma build pública não deve ter o botão,
+   esse interruptor tem de ir a `false` no preset dessa build — não é uma
+   decisão que eu deva tomar sozinho.
+
+B. **O bug do ESPAÇO estava vivo, e não era o que se pensava.** A
+   correcção de 18 set (`7a4e586a`) atacou o foco do botão; a causa era o
+   `SeletorNiveis` escondido a continuar a ouvir `ui_accept`. Está
+   corrigido e provado nos dois sentidos. **Vale a pena o Paulo confirmar
+   no Windows dele**, porque a queixa original veio de lá: em DEV MODE,
+   saltar repetidamente já não recarrega o nível.
+
 ## Pendente de DECISÃO — depois do Super-Process A2 (18 set 2026)
 
 Branch `claude/region02-fidelity-remediation`. **Super-Process A2 fechado:**

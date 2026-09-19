@@ -1,3 +1,61 @@
+## DEV MODE sem PIN + o bug do ESPAÇO a sério (19 set 2026)
+
+Branch `claude/remove-devmode-pin`, a partir de `origin/master @ 7a4e586a`
+(HEAD real, confirmado por `git fetch` — não o de relatórios antigos).
+Relatório: [`docs/execution_devmode_sem_pin.md`](execution_devmode_sem_pin.md).
+Versão **0.18.17 → 0.18.18**.
+
+- **O PIN saiu por inteiro.** Carregar no DEV MODE do menu entra já; o
+  `--devmode` também. Não há painel, campo nem validação. A porta a sério
+  continua a ser o interruptor de build `koliani/qa/entrada_dev` — é ele que
+  decide se o botão existe, e é ele que fica `false` numa build de loja.
+- **Não houve compatibilidade de saves a tratar, e é um facto medido, não
+  uma suposição:** o PIN era `const PIN_DEV := "0980"` no código e
+  `estado_jogo.gd` nunca o conheceu. Saves antigos lêem-se na mesma.
+- **`Frontend9H.painel_liso` e o som `ui_negado` NÃO foram removidos** —
+  parecem órfãos depois de tirar o painel, mas continuam a ser usados pela
+  Pausa e pelos controlos de toque. Verificado antes de apagar.
+
+**O ACHADO, e é o que interessa guardar: o bug do ESPAÇO não estava
+corrigido.** `7a4e586a` está certa no que faz (o botão deixou mesmo de ficar
+com o foco) mas atacou o caminho errado. Medido em janela real:
+
+    QA DEV: foco depois de fechar o selector = NINGUEM
+    ERROR: o salto 1 trocou de cena -- a barra Dev morreu
+
+Causa: `dev_barra.gd` monta o `SeletorNiveis` no `_ready` dentro de um painel
+apenas ESCONDIDO; em Godot `visible = false` cala o `_gui_input` mas **não**
+o `_unhandled_input`; `seletor_niveis.gd:790` trata lá `ui_accept` →
+`escolhido` → `_ir_para()` → troca de cena. O ESPAÇO é `saltar` E
+`ui_accept`, e saltar não consome o evento. Cada salto em DEV MODE
+confirmava um nível no selector invisível. **Nem era preciso ter clicado no
+botão.**
+
+**Duas armadilhas de método, que custaram voltas:**
+
+1. **Desligar o painel-pai não chega.** O `SeletorNiveis` põe-se a si
+   próprio em `PROCESS_MODE_ALWAYS`, e `ALWAYS` ignora de propósito o estado
+   dos antepassados. É preciso desligar o **selector**. A primeira tentativa
+   desligou só o painel e a suite continuou vermelha.
+2. **O teste antigo não podia apanhar isto.** Exigia que o PAINEL não
+   ficasse visível, e o nível recarregava sem o painel alguma vez aparecer:
+   passava com o bug vivo. Agora vigia-se o SINAL `escolhido`. Prova do
+   ponto cego: com `dev_barra.gd` revertido, falha **só** a asserção nova.
+3. **Ler código não chegava.** Isto só apareceu porque se foi ver numa
+   janela real (`tools/qa_dev_sem_pin.gd`, Xvfb + OpenGL3), com rato e
+   teclado a sério. O harness fica no repo.
+
+**Testes:** bateria de 21 (suite + 12 harnesses + 9 verificadores do CI) a
+0 falhas, com `XDG_DATA_HOME` isolado. Baseline antes de mexer: 22 corridos,
+1 falha — o `run_dev_runtime_9h16`, que faz `assert("9h16" in
+user_data_dir)` e precisa de uma pasta de utilizador dedicada; é condição de
+ambiente, não regressão.
+
+**Save real intacto:** tudo correu com `XDG_DATA_HOME` isolado; este
+contentor nem sequer tem o `progresso.json` do Paulo.
+
+---
+
 ## A2 em produção — master, Windows e PWA (18 set 2026)
 
 - **A integração entrou em `master` como `9740a24d`** (local == `origin/master`).
