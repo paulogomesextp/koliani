@@ -1,0 +1,2980 @@
+{
+ "processo": "Super-Process B -- Regiao III (N11-N15)",
+ "bot": "tools/bot_humano_r2.gd (o mesmo da Regiao II)",
+ "bateria": "tools/correr_bot_r3.sh -- 3 perfis x 2 seeds x 5 niveis = 30 runs, 600 s de jogo cada",
+ "total_runs": 30,
+ "global": {
+  "runs": 30,
+  "concluidos": 0,
+  "mortes_media": 10.67,
+  "progresso_medio_pct": 58.6,
+  "encravamentos_media": 154.7,
+  "saltos_falhados_media": 9.6,
+  "quedas_media": 0,
+  "nan_frames": 0,
+  "chefes_derrotados": 0
+ },
+ "por_nivel": {
+  "n11": {
+   "runs": 6,
+   "concluidos": 0,
+   "mortes_media": 0,
+   "progresso_medio_pct": 55.0,
+   "encravamentos_media": 172.5,
+   "saltos_falhados_media": 0,
+   "quedas_media": 0,
+   "nan_frames": 0,
+   "chefes_derrotados": 0
+  },
+  "n12": {
+   "runs": 6,
+   "concluidos": 0,
+   "mortes_media": 0,
+   "progresso_medio_pct": 55.6,
+   "encravamentos_media": 172.8,
+   "saltos_falhados_media": 0,
+   "quedas_media": 0,
+   "nan_frames": 0,
+   "chefes_derrotados": 0
+  },
+  "n13": {
+   "runs": 6,
+   "concluidos": 0,
+   "mortes_media": 0,
+   "progresso_medio_pct": 55.0,
+   "encravamentos_media": 172,
+   "saltos_falhados_media": 0,
+   "quedas_media": 0,
+   "nan_frames": 0,
+   "chefes_derrotados": 0
+  },
+  "n14": {
+   "runs": 6,
+   "concluidos": 0,
+   "mortes_media": 0,
+   "progresso_medio_pct": 55.6,
+   "encravamentos_media": 172.7,
+   "saltos_falhados_media": 0,
+   "quedas_media": 0,
+   "nan_frames": 0,
+   "chefes_derrotados": 0
+  },
+  "n15": {
+   "runs": 6,
+   "concluidos": 0,
+   "mortes_media": 53.33,
+   "progresso_medio_pct": 71.7,
+   "encravamentos_media": 83.7,
+   "saltos_falhados_media": 48.2,
+   "quedas_media": 0,
+   "nan_frames": 0,
+   "chefes_derrotados": 0
+  }
+ },
+ "por_perfil": {
+  "casual": {
+   "runs": 10,
+   "concluidos": 0,
+   "mortes_media": 14.8,
+   "progresso_medio_pct": 60.3,
+   "encravamentos_media": 150.6,
+   "saltos_falhados_media": 13.1,
+   "quedas_media": 0,
+   "nan_frames": 0,
+   "chefes_derrotados": 0
+  },
+  "experiente": {
+   "runs": 10,
+   "concluidos": 0,
+   "mortes_media": 11.8,
+   "progresso_medio_pct": 57.7,
+   "encravamentos_media": 152.4,
+   "saltos_falhados_media": 11,
+   "quedas_media": 0,
+   "nan_frames": 0,
+   "chefes_derrotados": 0
+  },
+  "normal": {
+   "runs": 10,
+   "concluidos": 0,
+   "mortes_media": 5.4,
+   "progresso_medio_pct": 57.7,
+   "encravamentos_media": 161.2,
+   "saltos_falhados_media": 4.8,
+   "quedas_media": 0,
+   "nan_frames": 0,
+   "chefes_derrotados": 0
+  }
+ },
+ "controlo_regiao_II": {
+  "A_Cela_Zero_experiente": {
+   "concluido": false,
+   "mortes": 0,
+   "progresso_pct": 101.4,
+   "encravamentos": 167
+  },
+  "A_Cela_Zero_normal": {
+   "concluido": false,
+   "mortes": 14,
+   "progresso_pct": 110.9,
+   "encravamentos": 128
+  },
+  "Prisao_dos_Condenados_experiente": {
+   "concluido": false,
+   "mortes": 50,
+   "progresso_pct": 85.0,
+   "encravamentos": 26
+  },
+  "Prisao_dos_Condenados_normal": {
+   "concluido": false,
+   "mortes": 56,
+   "progresso_pct": 84.9,
+   "encravamentos": 7
+  }
+ },
+ "runs": [
+  {
+   "ataques": 0,
+   "cena": "res://scenes/levels/Torre_dos_Sinos.tscn",
+   "checkpoints": 2,
+   "chefe_ataques_evitados": 0,
+   "chefe_dano_sofrido": 0,
+   "chefe_derrotado": false,
+   "chefe_duracao_s": 0.0,
+   "chefe_golpes_sofridos": 0,
+   "chefe_telegrafos": 0,
+   "chefe_vida_final": 2026,
+   "chefe_vida_inicial": 2026,
+   "chefe_vida_max": 2026,
+   "chefe_vida_min": 2026,
+   "concluido": false,
+   "dano_total": 0,
+   "dashes": 181,
+   "dashes_desperdicados": 181,
+   "encravamentos": 171,
+   "golpes_sofridos": 0,
+   "hesitacao_s": 12.53,
+   "hesitacoes": 21,
+   "mortes": 0,
+   "mortes_pos": [],
+   "motivo_fim": "timeout_jogo",
+   "nan_frames": 0,
+   "nan_primeiro": null,
+   "perfil": "casual",
+   "planar_frames": 0,
+   "planar_s": 0.0,
+   "pontos_de_falha": {},
+   "progresso_x": 494.999542236328,
+   "quedas": 0,
+   "rota_passos": 9,
+   "saltos": 2012,
+   "saltos_falhados": 0,
+   "seed": 11000,
+   "superficies_mapeadas": 113,
+   "tempo_s": 600.02,
+   "vento_entradas": 0,
+   "vento_s": 0.0,
+   "x_alvo": 900.0,
+   "x_max": 494.999542236328,
+   "y_min": 796.000366210938,
+   "y_spawn": 839.450012207031,
+   "_nivel": "n11",
+   "_perfil": "casual",
+   "_run": 0
+  },
+  {
+   "ataques": 0,
+   "cena": "res://scenes/levels/Torre_dos_Sinos.tscn",
+   "checkpoints": 2,
+   "chefe_ataques_evitados": 0,
+   "chefe_dano_sofrido": 0,
+   "chefe_derrotado": false,
+   "chefe_duracao_s": 0.0,
+   "chefe_golpes_sofridos": 0,
+   "chefe_telegrafos": 0,
+   "chefe_vida_final": 2026,
+   "chefe_vida_inicial": 2026,
+   "chefe_vida_max": 2026,
+   "chefe_vida_min": 2026,
+   "concluido": false,
+   "dano_total": 0,
+   "dashes": 180,
+   "dashes_desperdicados": 180,
+   "encravamentos": 170,
+   "golpes_sofridos": 0,
+   "hesitacao_s": 14.37,
+   "hesitacoes": 23,
+   "mortes": 0,
+   "mortes_pos": [],
+   "motivo_fim": "timeout_jogo",
+   "nan_frames": 0,
+   "nan_primeiro": null,
+   "perfil": "casual",
+   "planar_frames": 0,
+   "planar_s": 0.0,
+   "pontos_de_falha": {},
+   "progresso_x": 494.999908447266,
+   "quedas": 0,
+   "rota_passos": 9,
+   "saltos": 2028,
+   "saltos_falhados": 0,
+   "seed": 11001,
+   "superficies_mapeadas": 113,
+   "tempo_s": 600.02,
+   "vento_entradas": 0,
+   "vento_s": 0.0,
+   "x_alvo": 900.0,
+   "x_max": 494.999908447266,
+   "y_min": 796.000366210938,
+   "y_spawn": 839.450012207031,
+   "_nivel": "n11",
+   "_perfil": "casual",
+   "_run": 1
+  },
+  {
+   "ataques": 0,
+   "cena": "res://scenes/levels/Torre_dos_Sinos.tscn",
+   "checkpoints": 2,
+   "chefe_ataques_evitados": 0,
+   "chefe_dano_sofrido": 0,
+   "chefe_derrotado": false,
+   "chefe_duracao_s": 0.0,
+   "chefe_golpes_sofridos": 0,
+   "chefe_telegrafos": 0,
+   "chefe_vida_final": 2026,
+   "chefe_vida_inicial": 2026,
+   "chefe_vida_max": 2026,
+   "chefe_vida_min": 2026,
+   "concluido": false,
+   "dano_total": 0,
+   "dashes": 176,
+   "dashes_desperdicados": 176,
+   "encravamentos": 176,
+   "golpes_sofridos": 0,
+   "hesitacao_s": 0.6,
+   "hesitacoes": 2,
+   "mortes": 0,
+   "mortes_pos": [],
+   "motivo_fim": "timeout_jogo",
+   "nan_frames": 0,
+   "nan_primeiro": null,
+   "perfil": "experiente",
+   "planar_frames": 0,
+   "planar_s": 0.0,
+   "pontos_de_falha": {},
+   "progresso_x": 494.999938964844,
+   "quedas": 0,
+   "rota_passos": 9,
+   "saltos": 4735,
+   "saltos_falhados": 0,
+   "seed": 11200,
+   "superficies_mapeadas": 113,
+   "tempo_s": 600.02,
+   "vento_entradas": 0,
+   "vento_s": 0.0,
+   "x_alvo": 900.0,
+   "x_max": 494.999938964844,
+   "y_min": 796.003540039062,
+   "y_spawn": 839.450012207031,
+   "_nivel": "n11",
+   "_perfil": "experiente",
+   "_run": 0
+  },
+  {
+   "ataques": 0,
+   "cena": "res://scenes/levels/Torre_dos_Sinos.tscn",
+   "checkpoints": 2,
+   "chefe_ataques_evitados": 0,
+   "chefe_dano_sofrido": 0,
+   "chefe_derrotado": false,
+   "chefe_duracao_s": 0.0,
+   "chefe_golpes_sofridos": 0,
+   "chefe_telegrafos": 0,
+   "chefe_vida_final": 2026,
+   "chefe_vida_inicial": 2026,
+   "chefe_vida_max": 2026,
+   "chefe_vida_min": 2026,
+   "concluido": false,
+   "dano_total": 0,
+   "dashes": 174,
+   "dashes_desperdicados": 174,
+   "encravamentos": 173,
+   "golpes_sofridos": 0,
+   "hesitacao_s": 0.8,
+   "hesitacoes": 4,
+   "mortes": 0,
+   "mortes_pos": [],
+   "motivo_fim": "timeout_jogo",
+   "nan_frames": 0,
+   "nan_primeiro": null,
+   "perfil": "experiente",
+   "planar_frames": 0,
+   "planar_s": 0.0,
+   "pontos_de_falha": {},
+   "progresso_x": 494.999786376953,
+   "quedas": 0,
+   "rota_passos": 9,
+   "saltos": 4835,
+   "saltos_falhados": 0,
+   "seed": 11201,
+   "superficies_mapeadas": 113,
+   "tempo_s": 600.02,
+   "vento_entradas": 0,
+   "vento_s": 0.0,
+   "x_alvo": 900.0,
+   "x_max": 494.999786376953,
+   "y_min": 796.074768066406,
+   "y_spawn": 839.450012207031,
+   "_nivel": "n11",
+   "_perfil": "experiente",
+   "_run": 1
+  },
+  {
+   "ataques": 0,
+   "cena": "res://scenes/levels/Torre_dos_Sinos.tscn",
+   "checkpoints": 2,
+   "chefe_ataques_evitados": 0,
+   "chefe_dano_sofrido": 0,
+   "chefe_derrotado": false,
+   "chefe_duracao_s": 0.0,
+   "chefe_golpes_sofridos": 0,
+   "chefe_telegrafos": 0,
+   "chefe_vida_final": 2026,
+   "chefe_vida_inicial": 2026,
+   "chefe_vida_max": 2026,
+   "chefe_vida_min": 2026,
+   "concluido": false,
+   "dano_total": 0,
+   "dashes": 180,
+   "dashes_desperdicados": 180,
+   "encravamentos": 172,
+   "golpes_sofridos": 0,
+   "hesitacao_s": 3.43,
+   "hesitacoes": 9,
+   "mortes": 0,
+   "mortes_pos": [],
+   "motivo_fim": "timeout_jogo",
+   "nan_frames": 0,
+   "nan_primeiro": null,
+   "perfil": "normal",
+   "planar_frames": 0,
+   "planar_s": 0.0,
+   "pontos_de_falha": {},
+   "progresso_x": 494.999908447266,
+   "quedas": 0,
+   "rota_passos": 9,
+   "saltos": 2250,
+   "saltos_falhados": 0,
+   "seed": 11100,
+   "superficies_mapeadas": 113,
+   "tempo_s": 600.02,
+   "vento_entradas": 0,
+   "vento_s": 0.0,
+   "x_alvo": 900.0,
+   "x_max": 494.999908447266,
+   "y_min": 796.000366210938,
+   "y_spawn": 839.450012207031,
+   "_nivel": "n11",
+   "_perfil": "normal",
+   "_run": 0
+  },
+  {
+   "ataques": 0,
+   "cena": "res://scenes/levels/Torre_dos_Sinos.tscn",
+   "checkpoints": 2,
+   "chefe_ataques_evitados": 0,
+   "chefe_dano_sofrido": 0,
+   "chefe_derrotado": false,
+   "chefe_duracao_s": 0.0,
+   "chefe_golpes_sofridos": 0,
+   "chefe_telegrafos": 0,
+   "chefe_vida_final": 2026,
+   "chefe_vida_inicial": 2026,
+   "chefe_vida_max": 2026,
+   "chefe_vida_min": 2026,
+   "concluido": false,
+   "dano_total": 0,
+   "dashes": 182,
+   "dashes_desperdicados": 182,
+   "encravamentos": 173,
+   "golpes_sofridos": 0,
+   "hesitacao_s": 4.7,
+   "hesitacoes": 12,
+   "mortes": 0,
+   "mortes_pos": [],
+   "motivo_fim": "timeout_jogo",
+   "nan_frames": 0,
+   "nan_primeiro": null,
+   "perfil": "normal",
+   "planar_frames": 0,
+   "planar_s": 0.0,
+   "pontos_de_falha": {},
+   "progresso_x": 494.999908447266,
+   "quedas": 0,
+   "rota_passos": 9,
+   "saltos": 2285,
+   "saltos_falhados": 0,
+   "seed": 11101,
+   "superficies_mapeadas": 113,
+   "tempo_s": 600.02,
+   "vento_entradas": 0,
+   "vento_s": 0.0,
+   "x_alvo": 900.0,
+   "x_max": 494.999908447266,
+   "y_min": 796.000366210938,
+   "y_spawn": 839.450012207031,
+   "_nivel": "n11",
+   "_perfil": "normal",
+   "_run": 1
+  },
+  {
+   "ataques": 0,
+   "cena": "res://scenes/levels/Torre_dos_Ventos.tscn",
+   "checkpoints": 1,
+   "chefe_ataques_evitados": 0,
+   "chefe_dano_sofrido": 0,
+   "chefe_derrotado": false,
+   "chefe_duracao_s": 0.0,
+   "chefe_golpes_sofridos": 0,
+   "chefe_telegrafos": 0,
+   "chefe_vida_final": 2056,
+   "chefe_vida_inicial": 2056,
+   "chefe_vida_max": 2056,
+   "chefe_vida_min": 2056,
+   "concluido": false,
+   "dano_total": 0,
+   "dashes": 192,
+   "dashes_desperdicados": 192,
+   "encravamentos": 170,
+   "golpes_sofridos": 0,
+   "hesitacao_s": 19.08,
+   "hesitacoes": 28,
+   "mortes": 0,
+   "mortes_pos": [],
+   "motivo_fim": "timeout_jogo",
+   "nan_frames": 0,
+   "nan_primeiro": null,
+   "perfil": "casual",
+   "planar_frames": 0,
+   "planar_s": 0.0,
+   "pontos_de_falha": {},
+   "progresso_x": 499.999908447266,
+   "quedas": 0,
+   "rota_passos": 9,
+   "saltos": 1936,
+   "saltos_falhados": 0,
+   "seed": 12000,
+   "superficies_mapeadas": 124,
+   "tempo_s": 600.02,
+   "vento_entradas": 0,
+   "vento_s": 0.0,
+   "x_alvo": 900.0,
+   "x_max": 499.999908447266,
+   "y_min": 796.000366210938,
+   "y_spawn": 839.450012207031,
+   "_nivel": "n12",
+   "_perfil": "casual",
+   "_run": 0
+  },
+  {
+   "ataques": 0,
+   "cena": "res://scenes/levels/Torre_dos_Ventos.tscn",
+   "checkpoints": 1,
+   "chefe_ataques_evitados": 0,
+   "chefe_dano_sofrido": 0,
+   "chefe_derrotado": false,
+   "chefe_duracao_s": 0.0,
+   "chefe_golpes_sofridos": 0,
+   "chefe_telegrafos": 0,
+   "chefe_vida_final": 2056,
+   "chefe_vida_inicial": 2056,
+   "chefe_vida_max": 2056,
+   "chefe_vida_min": 2056,
+   "concluido": false,
+   "dano_total": 0,
+   "dashes": 184,
+   "dashes_desperdicados": 184,
+   "encravamentos": 172,
+   "golpes_sofridos": 0,
+   "hesitacao_s": 13.42,
+   "hesitacoes": 23,
+   "mortes": 0,
+   "mortes_pos": [],
+   "motivo_fim": "timeout_jogo",
+   "nan_frames": 0,
+   "nan_primeiro": null,
+   "perfil": "casual",
+   "planar_frames": 0,
+   "planar_s": 0.0,
+   "pontos_de_falha": {},
+   "progresso_x": 499.999633789062,
+   "quedas": 0,
+   "rota_passos": 9,
+   "saltos": 1908,
+   "saltos_falhados": 0,
+   "seed": 12001,
+   "superficies_mapeadas": 124,
+   "tempo_s": 600.02,
+   "vento_entradas": 0,
+   "vento_s": 0.0,
+   "x_alvo": 900.0,
+   "x_max": 499.999633789062,
+   "y_min": 796.000366210938,
+   "y_spawn": 839.450012207031,
+   "_nivel": "n12",
+   "_perfil": "casual",
+   "_run": 1
+  },
+  {
+   "ataques": 0,
+   "cena": "res://scenes/levels/Torre_dos_Ventos.tscn",
+   "checkpoints": 1,
+   "chefe_ataques_evitados": 0,
+   "chefe_dano_sofrido": 0,
+   "chefe_derrotado": false,
+   "chefe_duracao_s": 0.0,
+   "chefe_golpes_sofridos": 0,
+   "chefe_telegrafos": 0,
+   "chefe_vida_final": 2056,
+   "chefe_vida_inicial": 2056,
+   "chefe_vida_max": 2056,
+   "chefe_vida_min": 2056,
+   "concluido": false,
+   "dano_total": 0,
+   "dashes": 178,
+   "dashes_desperdicados": 178,
+   "encravamentos": 175,
+   "golpes_sofridos": 0,
+   "hesitacao_s": 1.13,
+   "hesitacoes": 5,
+   "mortes": 0,
+   "mortes_pos": [],
+   "motivo_fim": "timeout_jogo",
+   "nan_frames": 0,
+   "nan_primeiro": null,
+   "perfil": "experiente",
+   "planar_frames": 0,
+   "planar_s": 0.0,
+   "pontos_de_falha": {},
+   "progresso_x": 499.999908447266,
+   "quedas": 0,
+   "rota_passos": 9,
+   "saltos": 5180,
+   "saltos_falhados": 0,
+   "seed": 12200,
+   "superficies_mapeadas": 124,
+   "tempo_s": 600.02,
+   "vento_entradas": 0,
+   "vento_s": 0.0,
+   "x_alvo": 900.0,
+   "x_max": 499.999908447266,
+   "y_min": 796.003540039062,
+   "y_spawn": 839.450012207031,
+   "_nivel": "n12",
+   "_perfil": "experiente",
+   "_run": 0
+  },
+  {
+   "ataques": 0,
+   "cena": "res://scenes/levels/Torre_dos_Ventos.tscn",
+   "checkpoints": 1,
+   "chefe_ataques_evitados": 0,
+   "chefe_dano_sofrido": 0,
+   "chefe_derrotado": false,
+   "chefe_duracao_s": 0.0,
+   "chefe_golpes_sofridos": 0,
+   "chefe_telegrafos": 0,
+   "chefe_vida_final": 2056,
+   "chefe_vida_inicial": 2056,
+   "chefe_vida_max": 2056,
+   "chefe_vida_min": 2056,
+   "concluido": false,
+   "dano_total": 0,
+   "dashes": 173,
+   "dashes_desperdicados": 173,
+   "encravamentos": 173,
+   "golpes_sofridos": 0,
+   "hesitacao_s": 0.35,
+   "hesitacoes": 2,
+   "mortes": 0,
+   "mortes_pos": [],
+   "motivo_fim": "timeout_jogo",
+   "nan_frames": 0,
+   "nan_primeiro": null,
+   "perfil": "experiente",
+   "planar_frames": 0,
+   "planar_s": 0.0,
+   "pontos_de_falha": {},
+   "progresso_x": 499.999908447266,
+   "quedas": 0,
+   "rota_passos": 9,
+   "saltos": 4405,
+   "saltos_falhados": 0,
+   "seed": 12201,
+   "superficies_mapeadas": 124,
+   "tempo_s": 600.02,
+   "vento_entradas": 0,
+   "vento_s": 0.0,
+   "x_alvo": 900.0,
+   "x_max": 499.999908447266,
+   "y_min": 796.003540039062,
+   "y_spawn": 839.450012207031,
+   "_nivel": "n12",
+   "_perfil": "experiente",
+   "_run": 1
+  },
+  {
+   "ataques": 0,
+   "cena": "res://scenes/levels/Torre_dos_Ventos.tscn",
+   "checkpoints": 1,
+   "chefe_ataques_evitados": 0,
+   "chefe_dano_sofrido": 0,
+   "chefe_derrotado": false,
+   "chefe_duracao_s": 0.0,
+   "chefe_golpes_sofridos": 0,
+   "chefe_telegrafos": 0,
+   "chefe_vida_final": 2056,
+   "chefe_vida_inicial": 2056,
+   "chefe_vida_max": 2056,
+   "chefe_vida_min": 2056,
+   "concluido": false,
+   "dano_total": 0,
+   "dashes": 179,
+   "dashes_desperdicados": 179,
+   "encravamentos": 171,
+   "golpes_sofridos": 0,
+   "hesitacao_s": 5.32,
+   "hesitacoes": 13,
+   "mortes": 0,
+   "mortes_pos": [],
+   "motivo_fim": "timeout_jogo",
+   "nan_frames": 0,
+   "nan_primeiro": null,
+   "perfil": "normal",
+   "planar_frames": 0,
+   "planar_s": 0.0,
+   "pontos_de_falha": {},
+   "progresso_x": 499.999908447266,
+   "quedas": 0,
+   "rota_passos": 9,
+   "saltos": 2216,
+   "saltos_falhados": 0,
+   "seed": 12100,
+   "superficies_mapeadas": 124,
+   "tempo_s": 600.02,
+   "vento_entradas": 0,
+   "vento_s": 0.0,
+   "x_alvo": 900.0,
+   "x_max": 499.999908447266,
+   "y_min": 796.000366210938,
+   "y_spawn": 839.450012207031,
+   "_nivel": "n12",
+   "_perfil": "normal",
+   "_run": 0
+  },
+  {
+   "ataques": 0,
+   "cena": "res://scenes/levels/Torre_dos_Ventos.tscn",
+   "checkpoints": 1,
+   "chefe_ataques_evitados": 0,
+   "chefe_dano_sofrido": 0,
+   "chefe_derrotado": false,
+   "chefe_duracao_s": 0.0,
+   "chefe_golpes_sofridos": 0,
+   "chefe_telegrafos": 0,
+   "chefe_vida_final": 2056,
+   "chefe_vida_inicial": 2056,
+   "chefe_vida_max": 2056,
+   "chefe_vida_min": 2056,
+   "concluido": false,
+   "dano_total": 0,
+   "dashes": 179,
+   "dashes_desperdicados": 179,
+   "encravamentos": 176,
+   "golpes_sofridos": 0,
+   "hesitacao_s": 3.13,
+   "hesitacoes": 10,
+   "mortes": 0,
+   "mortes_pos": [],
+   "motivo_fim": "timeout_jogo",
+   "nan_frames": 0,
+   "nan_primeiro": null,
+   "perfil": "normal",
+   "planar_frames": 0,
+   "planar_s": 0.0,
+   "pontos_de_falha": {},
+   "progresso_x": 499.999908447266,
+   "quedas": 0,
+   "rota_passos": 9,
+   "saltos": 2259,
+   "saltos_falhados": 0,
+   "seed": 12101,
+   "superficies_mapeadas": 124,
+   "tempo_s": 600.02,
+   "vento_entradas": 0,
+   "vento_s": 0.0,
+   "x_alvo": 900.0,
+   "x_max": 499.999908447266,
+   "y_min": 796.000366210938,
+   "y_spawn": 839.450012207031,
+   "_nivel": "n12",
+   "_perfil": "normal",
+   "_run": 1
+  },
+  {
+   "ataques": 0,
+   "cena": "res://scenes/levels/Torre_da_Tempestade.tscn",
+   "checkpoints": 2,
+   "chefe_ataques_evitados": 0,
+   "chefe_dano_sofrido": 0,
+   "chefe_derrotado": false,
+   "chefe_duracao_s": 0.0,
+   "chefe_golpes_sofridos": 0,
+   "chefe_telegrafos": 0,
+   "chefe_vida_final": 2221,
+   "chefe_vida_inicial": 2221,
+   "chefe_vida_max": 2221,
+   "chefe_vida_min": 2221,
+   "concluido": false,
+   "dano_total": 0,
+   "dashes": 183,
+   "dashes_desperdicados": 183,
+   "encravamentos": 173,
+   "golpes_sofridos": 0,
+   "hesitacao_s": 12.2,
+   "hesitacoes": 21,
+   "mortes": 0,
+   "mortes_pos": [],
+   "motivo_fim": "timeout_jogo",
+   "nan_frames": 0,
+   "nan_primeiro": null,
+   "perfil": "casual",
+   "planar_frames": 0,
+   "planar_s": 0.0,
+   "pontos_de_falha": {},
+   "progresso_x": 494.999542236328,
+   "quedas": 0,
+   "rota_passos": 9,
+   "saltos": 2043,
+   "saltos_falhados": 0,
+   "seed": 13000,
+   "superficies_mapeadas": 139,
+   "tempo_s": 600.02,
+   "vento_entradas": 0,
+   "vento_s": 0.0,
+   "x_alvo": 900.0,
+   "x_max": 494.999542236328,
+   "y_min": 796.000366210938,
+   "y_spawn": 839.450012207031,
+   "_nivel": "n13",
+   "_perfil": "casual",
+   "_run": 0
+  },
+  {
+   "ataques": 0,
+   "cena": "res://scenes/levels/Torre_da_Tempestade.tscn",
+   "checkpoints": 2,
+   "chefe_ataques_evitados": 0,
+   "chefe_dano_sofrido": 0,
+   "chefe_derrotado": false,
+   "chefe_duracao_s": 0.0,
+   "chefe_golpes_sofridos": 0,
+   "chefe_telegrafos": 0,
+   "chefe_vida_final": 2221,
+   "chefe_vida_inicial": 2221,
+   "chefe_vida_max": 2221,
+   "chefe_vida_min": 2221,
+   "concluido": false,
+   "dano_total": 0,
+   "dashes": 188,
+   "dashes_desperdicados": 188,
+   "encravamentos": 173,
+   "golpes_sofridos": 0,
+   "hesitacao_s": 17.48,
+   "hesitacoes": 27,
+   "mortes": 0,
+   "mortes_pos": [],
+   "motivo_fim": "timeout_jogo",
+   "nan_frames": 0,
+   "nan_primeiro": null,
+   "perfil": "casual",
+   "planar_frames": 0,
+   "planar_s": 0.0,
+   "pontos_de_falha": {},
+   "progresso_x": 494.999847412109,
+   "quedas": 0,
+   "rota_passos": 9,
+   "saltos": 1922,
+   "saltos_falhados": 0,
+   "seed": 13001,
+   "superficies_mapeadas": 139,
+   "tempo_s": 600.02,
+   "vento_entradas": 0,
+   "vento_s": 0.0,
+   "x_alvo": 900.0,
+   "x_max": 494.999847412109,
+   "y_min": 796.000366210938,
+   "y_spawn": 839.450012207031,
+   "_nivel": "n13",
+   "_perfil": "casual",
+   "_run": 1
+  },
+  {
+   "ataques": 0,
+   "cena": "res://scenes/levels/Torre_da_Tempestade.tscn",
+   "checkpoints": 2,
+   "chefe_ataques_evitados": 0,
+   "chefe_dano_sofrido": 0,
+   "chefe_derrotado": false,
+   "chefe_duracao_s": 0.0,
+   "chefe_golpes_sofridos": 0,
+   "chefe_telegrafos": 0,
+   "chefe_vida_final": 2221,
+   "chefe_vida_inicial": 2221,
+   "chefe_vida_max": 2221,
+   "chefe_vida_min": 2221,
+   "concluido": false,
+   "dano_total": 0,
+   "dashes": 176,
+   "dashes_desperdicados": 176,
+   "encravamentos": 174,
+   "golpes_sofridos": 0,
+   "hesitacao_s": 1.0,
+   "hesitacoes": 4,
+   "mortes": 0,
+   "mortes_pos": [],
+   "motivo_fim": "timeout_jogo",
+   "nan_frames": 0,
+   "nan_primeiro": null,
+   "perfil": "experiente",
+   "planar_frames": 0,
+   "planar_s": 0.0,
+   "pontos_de_falha": {},
+   "progresso_x": 494.999938964844,
+   "quedas": 0,
+   "rota_passos": 9,
+   "saltos": 4547,
+   "saltos_falhados": 0,
+   "seed": 13200,
+   "superficies_mapeadas": 139,
+   "tempo_s": 600.02,
+   "vento_entradas": 0,
+   "vento_s": 0.0,
+   "x_alvo": 900.0,
+   "x_max": 494.999938964844,
+   "y_min": 796.003540039062,
+   "y_spawn": 839.450012207031,
+   "_nivel": "n13",
+   "_perfil": "experiente",
+   "_run": 0
+  },
+  {
+   "ataques": 0,
+   "cena": "res://scenes/levels/Torre_da_Tempestade.tscn",
+   "checkpoints": 2,
+   "chefe_ataques_evitados": 0,
+   "chefe_dano_sofrido": 0,
+   "chefe_derrotado": false,
+   "chefe_duracao_s": 0.0,
+   "chefe_golpes_sofridos": 0,
+   "chefe_telegrafos": 0,
+   "chefe_vida_final": 2221,
+   "chefe_vida_inicial": 2221,
+   "chefe_vida_max": 2221,
+   "chefe_vida_min": 2221,
+   "concluido": false,
+   "dano_total": 0,
+   "dashes": 174,
+   "dashes_desperdicados": 174,
+   "encravamentos": 170,
+   "golpes_sofridos": 0,
+   "hesitacao_s": 0.57,
+   "hesitacoes": 2,
+   "mortes": 0,
+   "mortes_pos": [],
+   "motivo_fim": "timeout_jogo",
+   "nan_frames": 0,
+   "nan_primeiro": null,
+   "perfil": "experiente",
+   "planar_frames": 0,
+   "planar_s": 0.0,
+   "pontos_de_falha": {},
+   "progresso_x": 494.999908447266,
+   "quedas": 0,
+   "rota_passos": 9,
+   "saltos": 4916,
+   "saltos_falhados": 0,
+   "seed": 13201,
+   "superficies_mapeadas": 139,
+   "tempo_s": 600.02,
+   "vento_entradas": 0,
+   "vento_s": 0.0,
+   "x_alvo": 900.0,
+   "x_max": 494.999908447266,
+   "y_min": 796.003540039062,
+   "y_spawn": 839.450012207031,
+   "_nivel": "n13",
+   "_perfil": "experiente",
+   "_run": 1
+  },
+  {
+   "ataques": 0,
+   "cena": "res://scenes/levels/Torre_da_Tempestade.tscn",
+   "checkpoints": 2,
+   "chefe_ataques_evitados": 0,
+   "chefe_dano_sofrido": 0,
+   "chefe_derrotado": false,
+   "chefe_duracao_s": 0.0,
+   "chefe_golpes_sofridos": 0,
+   "chefe_telegrafos": 0,
+   "chefe_vida_final": 2221,
+   "chefe_vida_inicial": 2221,
+   "chefe_vida_max": 2221,
+   "chefe_vida_min": 2221,
+   "concluido": false,
+   "dano_total": 0,
+   "dashes": 182,
+   "dashes_desperdicados": 182,
+   "encravamentos": 173,
+   "golpes_sofridos": 0,
+   "hesitacao_s": 2.62,
+   "hesitacoes": 7,
+   "mortes": 0,
+   "mortes_pos": [],
+   "motivo_fim": "timeout_jogo",
+   "nan_frames": 0,
+   "nan_primeiro": null,
+   "perfil": "normal",
+   "planar_frames": 0,
+   "planar_s": 0.0,
+   "pontos_de_falha": {},
+   "progresso_x": 494.999572753906,
+   "quedas": 0,
+   "rota_passos": 9,
+   "saltos": 2257,
+   "saltos_falhados": 0,
+   "seed": 13100,
+   "superficies_mapeadas": 139,
+   "tempo_s": 600.02,
+   "vento_entradas": 0,
+   "vento_s": 0.0,
+   "x_alvo": 900.0,
+   "x_max": 494.999572753906,
+   "y_min": 796.000366210938,
+   "y_spawn": 839.450012207031,
+   "_nivel": "n13",
+   "_perfil": "normal",
+   "_run": 0
+  },
+  {
+   "ataques": 0,
+   "cena": "res://scenes/levels/Torre_da_Tempestade.tscn",
+   "checkpoints": 2,
+   "chefe_ataques_evitados": 0,
+   "chefe_dano_sofrido": 0,
+   "chefe_derrotado": false,
+   "chefe_duracao_s": 0.0,
+   "chefe_golpes_sofridos": 0,
+   "chefe_telegrafos": 0,
+   "chefe_vida_final": 2221,
+   "chefe_vida_inicial": 2221,
+   "chefe_vida_max": 2221,
+   "chefe_vida_min": 2221,
+   "concluido": false,
+   "dano_total": 0,
+   "dashes": 170,
+   "dashes_desperdicados": 170,
+   "encravamentos": 169,
+   "golpes_sofridos": 0,
+   "hesitacao_s": 2.97,
+   "hesitacoes": 9,
+   "mortes": 0,
+   "mortes_pos": [],
+   "motivo_fim": "timeout_jogo",
+   "nan_frames": 0,
+   "nan_primeiro": null,
+   "perfil": "normal",
+   "planar_frames": 0,
+   "planar_s": 0.0,
+   "pontos_de_falha": {},
+   "progresso_x": 494.999908447266,
+   "quedas": 0,
+   "rota_passos": 9,
+   "saltos": 2075,
+   "saltos_falhados": 0,
+   "seed": 13101,
+   "superficies_mapeadas": 139,
+   "tempo_s": 600.02,
+   "vento_entradas": 0,
+   "vento_s": 0.0,
+   "x_alvo": 900.0,
+   "x_max": 494.999908447266,
+   "y_min": 796.000366210938,
+   "y_spawn": 839.450012207031,
+   "_nivel": "n13",
+   "_perfil": "normal",
+   "_run": 1
+  },
+  {
+   "ataques": 0,
+   "cena": "res://scenes/levels/Observatorio_Lunar.tscn",
+   "checkpoints": 2,
+   "chefe_ataques_evitados": 0,
+   "chefe_dano_sofrido": 0,
+   "chefe_derrotado": false,
+   "chefe_duracao_s": 0.0,
+   "chefe_golpes_sofridos": 0,
+   "chefe_telegrafos": 0,
+   "chefe_vida_final": 2115,
+   "chefe_vida_inicial": 2115,
+   "chefe_vida_max": 2115,
+   "chefe_vida_min": 2115,
+   "concluido": false,
+   "dano_total": 0,
+   "dashes": 193,
+   "dashes_desperdicados": 193,
+   "encravamentos": 171,
+   "golpes_sofridos": 0,
+   "hesitacao_s": 13.48,
+   "hesitacoes": 21,
+   "mortes": 0,
+   "mortes_pos": [],
+   "motivo_fim": "timeout_jogo",
+   "nan_frames": 0,
+   "nan_primeiro": null,
+   "perfil": "casual",
+   "planar_frames": 0,
+   "planar_s": 0.0,
+   "pontos_de_falha": {},
+   "progresso_x": 499.999542236328,
+   "quedas": 0,
+   "rota_passos": 9,
+   "saltos": 1908,
+   "saltos_falhados": 0,
+   "seed": 14000,
+   "superficies_mapeadas": 151,
+   "tempo_s": 600.02,
+   "vento_entradas": 0,
+   "vento_s": 0.0,
+   "x_alvo": 900.0,
+   "x_max": 499.999542236328,
+   "y_min": 796.000366210938,
+   "y_spawn": 839.450012207031,
+   "_nivel": "n14",
+   "_perfil": "casual",
+   "_run": 0
+  },
+  {
+   "ataques": 0,
+   "cena": "res://scenes/levels/Observatorio_Lunar.tscn",
+   "checkpoints": 2,
+   "chefe_ataques_evitados": 0,
+   "chefe_dano_sofrido": 0,
+   "chefe_derrotado": false,
+   "chefe_duracao_s": 0.0,
+   "chefe_golpes_sofridos": 0,
+   "chefe_telegrafos": 0,
+   "chefe_vida_final": 2115,
+   "chefe_vida_inicial": 2115,
+   "chefe_vida_max": 2115,
+   "chefe_vida_min": 2115,
+   "concluido": false,
+   "dano_total": 0,
+   "dashes": 182,
+   "dashes_desperdicados": 182,
+   "encravamentos": 172,
+   "golpes_sofridos": 0,
+   "hesitacao_s": 14.15,
+   "hesitacoes": 20,
+   "mortes": 0,
+   "mortes_pos": [],
+   "motivo_fim": "timeout_jogo",
+   "nan_frames": 0,
+   "nan_primeiro": null,
+   "perfil": "casual",
+   "planar_frames": 0,
+   "planar_s": 0.0,
+   "pontos_de_falha": {},
+   "progresso_x": 499.999938964844,
+   "quedas": 0,
+   "rota_passos": 9,
+   "saltos": 1955,
+   "saltos_falhados": 0,
+   "seed": 14001,
+   "superficies_mapeadas": 151,
+   "tempo_s": 600.02,
+   "vento_entradas": 0,
+   "vento_s": 0.0,
+   "x_alvo": 900.0,
+   "x_max": 499.999938964844,
+   "y_min": 796.000366210938,
+   "y_spawn": 839.450012207031,
+   "_nivel": "n14",
+   "_perfil": "casual",
+   "_run": 1
+  },
+  {
+   "ataques": 0,
+   "cena": "res://scenes/levels/Observatorio_Lunar.tscn",
+   "checkpoints": 2,
+   "chefe_ataques_evitados": 0,
+   "chefe_dano_sofrido": 0,
+   "chefe_derrotado": false,
+   "chefe_duracao_s": 0.0,
+   "chefe_golpes_sofridos": 0,
+   "chefe_telegrafos": 0,
+   "chefe_vida_final": 2115,
+   "chefe_vida_inicial": 2115,
+   "chefe_vida_max": 2115,
+   "chefe_vida_min": 2115,
+   "concluido": false,
+   "dano_total": 0,
+   "dashes": 173,
+   "dashes_desperdicados": 173,
+   "encravamentos": 173,
+   "golpes_sofridos": 0,
+   "hesitacao_s": 0.67,
+   "hesitacoes": 2,
+   "mortes": 0,
+   "mortes_pos": [],
+   "motivo_fim": "timeout_jogo",
+   "nan_frames": 0,
+   "nan_primeiro": null,
+   "perfil": "experiente",
+   "planar_frames": 0,
+   "planar_s": 0.0,
+   "pontos_de_falha": {},
+   "progresso_x": 499.999938964844,
+   "quedas": 0,
+   "rota_passos": 9,
+   "saltos": 3889,
+   "saltos_falhados": 0,
+   "seed": 14200,
+   "superficies_mapeadas": 151,
+   "tempo_s": 600.02,
+   "vento_entradas": 0,
+   "vento_s": 0.0,
+   "x_alvo": 900.0,
+   "x_max": 499.999938964844,
+   "y_min": 796.003540039062,
+   "y_spawn": 839.450012207031,
+   "_nivel": "n14",
+   "_perfil": "experiente",
+   "_run": 0
+  },
+  {
+   "ataques": 0,
+   "cena": "res://scenes/levels/Observatorio_Lunar.tscn",
+   "checkpoints": 2,
+   "chefe_ataques_evitados": 0,
+   "chefe_dano_sofrido": 0,
+   "chefe_derrotado": false,
+   "chefe_duracao_s": 0.0,
+   "chefe_golpes_sofridos": 0,
+   "chefe_telegrafos": 0,
+   "chefe_vida_final": 2115,
+   "chefe_vida_inicial": 2115,
+   "chefe_vida_max": 2115,
+   "chefe_vida_min": 2115,
+   "concluido": false,
+   "dano_total": 0,
+   "dashes": 175,
+   "dashes_desperdicados": 175,
+   "encravamentos": 174,
+   "golpes_sofridos": 0,
+   "hesitacao_s": 0.93,
+   "hesitacoes": 5,
+   "mortes": 0,
+   "mortes_pos": [],
+   "motivo_fim": "timeout_jogo",
+   "nan_frames": 0,
+   "nan_primeiro": null,
+   "perfil": "experiente",
+   "planar_frames": 0,
+   "planar_s": 0.0,
+   "pontos_de_falha": {},
+   "progresso_x": 499.999755859375,
+   "quedas": 0,
+   "rota_passos": 9,
+   "saltos": 3911,
+   "saltos_falhados": 0,
+   "seed": 14201,
+   "superficies_mapeadas": 151,
+   "tempo_s": 600.02,
+   "vento_entradas": 0,
+   "vento_s": 0.0,
+   "x_alvo": 900.0,
+   "x_max": 499.999755859375,
+   "y_min": 796.003540039062,
+   "y_spawn": 839.450012207031,
+   "_nivel": "n14",
+   "_perfil": "experiente",
+   "_run": 1
+  },
+  {
+   "ataques": 0,
+   "cena": "res://scenes/levels/Observatorio_Lunar.tscn",
+   "checkpoints": 2,
+   "chefe_ataques_evitados": 0,
+   "chefe_dano_sofrido": 0,
+   "chefe_derrotado": false,
+   "chefe_duracao_s": 0.0,
+   "chefe_golpes_sofridos": 0,
+   "chefe_telegrafos": 0,
+   "chefe_vida_final": 2115,
+   "chefe_vida_inicial": 2115,
+   "chefe_vida_max": 2115,
+   "chefe_vida_min": 2115,
+   "concluido": false,
+   "dano_total": 0,
+   "dashes": 184,
+   "dashes_desperdicados": 184,
+   "encravamentos": 175,
+   "golpes_sofridos": 0,
+   "hesitacao_s": 5.63,
+   "hesitacoes": 13,
+   "mortes": 0,
+   "mortes_pos": [],
+   "motivo_fim": "timeout_jogo",
+   "nan_frames": 0,
+   "nan_primeiro": null,
+   "perfil": "normal",
+   "planar_frames": 0,
+   "planar_s": 0.0,
+   "pontos_de_falha": {},
+   "progresso_x": 499.999908447266,
+   "quedas": 0,
+   "rota_passos": 9,
+   "saltos": 2187,
+   "saltos_falhados": 0,
+   "seed": 14100,
+   "superficies_mapeadas": 151,
+   "tempo_s": 600.02,
+   "vento_entradas": 0,
+   "vento_s": 0.0,
+   "x_alvo": 900.0,
+   "x_max": 499.999908447266,
+   "y_min": 796.000061035156,
+   "y_spawn": 839.450012207031,
+   "_nivel": "n14",
+   "_perfil": "normal",
+   "_run": 0
+  },
+  {
+   "ataques": 0,
+   "cena": "res://scenes/levels/Observatorio_Lunar.tscn",
+   "checkpoints": 2,
+   "chefe_ataques_evitados": 0,
+   "chefe_dano_sofrido": 0,
+   "chefe_derrotado": false,
+   "chefe_duracao_s": 0.0,
+   "chefe_golpes_sofridos": 0,
+   "chefe_telegrafos": 0,
+   "chefe_vida_final": 2115,
+   "chefe_vida_inicial": 2115,
+   "chefe_vida_max": 2115,
+   "chefe_vida_min": 2115,
+   "concluido": false,
+   "dano_total": 0,
+   "dashes": 175,
+   "dashes_desperdicados": 175,
+   "encravamentos": 171,
+   "golpes_sofridos": 0,
+   "hesitacao_s": 4.88,
+   "hesitacoes": 16,
+   "mortes": 0,
+   "mortes_pos": [],
+   "motivo_fim": "timeout_jogo",
+   "nan_frames": 0,
+   "nan_primeiro": null,
+   "perfil": "normal",
+   "planar_frames": 0,
+   "planar_s": 0.0,
+   "pontos_de_falha": {},
+   "progresso_x": 499.999816894531,
+   "quedas": 0,
+   "rota_passos": 9,
+   "saltos": 2221,
+   "saltos_falhados": 0,
+   "seed": 14101,
+   "superficies_mapeadas": 151,
+   "tempo_s": 600.02,
+   "vento_entradas": 0,
+   "vento_s": 0.0,
+   "x_alvo": 900.0,
+   "x_max": 499.999816894531,
+   "y_min": 796.000366210938,
+   "y_spawn": 839.450012207031,
+   "_nivel": "n14",
+   "_perfil": "normal",
+   "_run": 1
+  },
+  {
+   "ataques": 9,
+   "cena": "res://scenes/levels/O_Pico_Esquecido.tscn",
+   "checkpoints": 2,
+   "chefe_ataques_evitados": 0,
+   "chefe_dano_sofrido": 0,
+   "chefe_derrotado": false,
+   "chefe_duracao_s": 0.0,
+   "chefe_golpes_sofridos": 0,
+   "chefe_telegrafos": 0,
+   "chefe_vida_final": 3019,
+   "chefe_vida_inicial": 3019,
+   "chefe_vida_max": 3019,
+   "chefe_vida_min": 3019,
+   "concluido": false,
+   "dano_total": 224,
+   "dashes": 295,
+   "dashes_desperdicados": 115,
+   "encravamentos": 106,
+   "golpes_sofridos": 11,
+   "hesitacao_s": 18.7,
+   "hesitacoes": 29,
+   "mortes": 44,
+   "mortes_pos": [
+    [
+     646.0,
+     891.0
+    ],
+    [
+     -19438.0,
+     909.0
+    ],
+    [
+     -19261.0,
+     904.0
+    ],
+    [
+     -19432.0,
+     910.0
+    ],
+    [
+     -19229.0,
+     906.0
+    ],
+    [
+     -19237.0,
+     907.0
+    ],
+    [
+     -19234.0,
+     906.0
+    ],
+    [
+     -18929.0,
+     908.0
+    ],
+    [
+     -17574.0,
+     916.0
+    ],
+    [
+     -18879.0,
+     908.0
+    ],
+    [
+     -19424.0,
+     910.0
+    ],
+    [
+     -19222.0,
+     903.0
+    ],
+    [
+     -18239.0,
+     905.0
+    ],
+    [
+     -19597.0,
+     898.0
+    ],
+    [
+     -19432.0,
+     912.0
+    ],
+    [
+     -19679.0,
+     904.0
+    ],
+    [
+     -19639.0,
+     899.0
+    ],
+    [
+     -19629.0,
+     895.0
+    ],
+    [
+     -19434.0,
+     900.0
+    ],
+    [
+     -17886.0,
+     911.0
+    ],
+    [
+     -17889.0,
+     909.0
+    ],
+    [
+     -18778.0,
+     908.0
+    ],
+    [
+     -18730.0,
+     908.0
+    ],
+    [
+     -18886.0,
+     915.0
+    ],
+    [
+     -19448.0,
+     898.0
+    ],
+    [
+     -19429.0,
+     908.0
+    ],
+    [
+     -19432.0,
+     907.0
+    ],
+    [
+     -19449.0,
+     898.0
+    ],
+    [
+     -19054.0,
+     904.0
+    ],
+    [
+     -19445.0,
+     897.0
+    ],
+    [
+     -19470.0,
+     906.0
+    ],
+    [
+     -19444.0,
+     902.0
+    ],
+    [
+     -18754.0,
+     908.0
+    ],
+    [
+     -19237.0,
+     912.0
+    ],
+    [
+     -19461.0,
+     907.0
+    ],
+    [
+     -19454.0,
+     907.0
+    ],
+    [
+     -19230.0,
+     906.0
+    ],
+    [
+     -19262.0,
+     906.0
+    ],
+    [
+     -18901.0,
+     906.0
+    ],
+    [
+     -19242.0,
+     902.0
+    ],
+    [
+     -19229.0,
+     906.0
+    ],
+    [
+     -19233.0,
+     905.0
+    ],
+    [
+     -18880.0,
+     913.0
+    ],
+    [
+     -19445.0,
+     905.0
+    ]
+   ],
+   "motivo_fim": "timeout_jogo",
+   "nan_frames": 0,
+   "nan_primeiro": null,
+   "perfil": "casual",
+   "planar_frames": 0,
+   "planar_s": 0.0,
+   "pontos_de_falha": {
+    "-17600": 1,
+    "-17900": 2,
+    "-18200": 1,
+    "-18700": 1,
+    "-18800": 2,
+    "-18900": 5,
+    "-19100": 1,
+    "-19200": 9,
+    "-19300": 2,
+    "-19400": 12,
+    "-19500": 3,
+    "-19600": 3,
+    "-19700": 1,
+    "600": 1
+   },
+   "progresso_x": 646.459350585938,
+   "quedas": 0,
+   "rota_passos": 74,
+   "saltos": 836,
+   "saltos_falhados": 41,
+   "seed": 15000,
+   "superficies_mapeadas": 151,
+   "tempo_s": 600.02,
+   "vento_entradas": 0,
+   "vento_s": 0.0,
+   "x_alvo": 960.0,
+   "x_max": 646.459350585938,
+   "y_min": 59.2602195739746,
+   "y_spawn": 819.450012207031,
+   "_nivel": "n15",
+   "_perfil": "casual",
+   "_run": 0
+  },
+  {
+   "ataques": 74,
+   "cena": "res://scenes/levels/O_Pico_Esquecido.tscn",
+   "checkpoints": 4,
+   "chefe_ataques_evitados": 0,
+   "chefe_dano_sofrido": 230,
+   "chefe_derrotado": false,
+   "chefe_duracao_s": 1.83,
+   "chefe_golpes_sofridos": 17,
+   "chefe_telegrafos": 0,
+   "chefe_vida_final": 1265,
+   "chefe_vida_inicial": 3019,
+   "chefe_vida_max": 1265,
+   "chefe_vida_min": 1265,
+   "concluido": false,
+   "dano_total": 551,
+   "dashes": 423,
+   "dashes_desperdicados": 32,
+   "encravamentos": 28,
+   "golpes_sofridos": 33,
+   "hesitacao_s": 16.07,
+   "hesitacoes": 24,
+   "mortes": 104,
+   "mortes_pos": [
+    [
+     644.0,
+     891.0
+    ],
+    [
+     -19250.0,
+     909.0
+    ],
+    [
+     -19418.0,
+     897.0
+    ],
+    [
+     -19431.0,
+     908.0
+    ],
+    [
+     -19250.0,
+     909.0
+    ],
+    [
+     -19062.0,
+     904.0
+    ],
+    [
+     -19238.0,
+     906.0
+    ],
+    [
+     -19637.0,
+     893.0
+    ],
+    [
+     -18902.0,
+     910.0
+    ],
+    [
+     -18881.0,
+     901.0
+    ],
+    [
+     -18735.0,
+     908.0
+    ],
+    [
+     -19238.0,
+     911.0
+    ],
+    [
+     -19433.0,
+     909.0
+    ],
+    [
+     -19563.0,
+     893.0
+    ],
+    [
+     -19246.0,
+     908.0
+    ],
+    [
+     -19444.0,
+     899.0
+    ],
+    [
+     -19450.0,
+     908.0
+    ],
+    [
+     -19242.0,
+     909.0
+    ],
+    [
+     -19242.0,
+     910.0
+    ],
+    [
+     -18754.0,
+     908.0
+    ],
+    [
+     -19441.0,
+     913.0
+    ],
+    [
+     -19234.0,
+     911.0
+    ],
+    [
+     -18802.0,
+     908.0
+    ],
+    [
+     -19066.0,
+     909.0
+    ],
+    [
+     -18815.0,
+     908.0
+    ],
+    [
+     -19421.0,
+     909.0
+    ],
+    [
+     -18906.0,
+     910.0
+    ],
+    [
+     -19213.0,
+     916.0
+    ],
+    [
+     -19221.0,
+     903.0
+    ],
+    [
+     -19062.0,
+     904.0
+    ],
+    [
+     -19441.0,
+     898.0
+    ],
+    [
+     -19208.0,
+     908.0
+    ],
+    [
+     -18830.0,
+     912.0
+    ],
+    [
+     -19435.0,
+     911.0
+    ],
+    [
+     -18906.0,
+     908.0
+    ],
+    [
+     -18788.0,
+     908.0
+    ],
+    [
+     -19441.0,
+     906.0
+    ],
+    [
+     -19058.0,
+     913.0
+    ],
+    [
+     -19438.0,
+     909.0
+    ],
+    [
+     -19234.0,
+     910.0
+    ],
+    [
+     -19254.0,
+     908.0
+    ],
+    [
+     -19226.0,
+     909.0
+    ],
+    [
+     -19428.0,
+     905.0
+    ],
+    [
+     -19433.0,
+     905.0
+    ],
+    [
+     -19562.0,
+     896.0
+    ],
+    [
+     -19046.0,
+     900.0
+    ],
+    [
+     -19597.0,
+     898.0
+    ],
+    [
+     -18812.0,
+     908.0
+    ],
+    [
+     -19438.0,
+     897.0
+    ],
+    [
+     -19551.0,
+     896.0
+    ],
+    [
+     -19626.0,
+     903.0
+    ],
+    [
+     -18884.0,
+     900.0
+    ],
+    [
+     -19230.0,
+     908.0
+    ],
+    [
+     -19438.0,
+     907.0
+    ],
+    [
+     -19205.0,
+     916.0
+    ],
+    [
+     -19477.0,
+     899.0
+    ],
+    [
+     -19448.0,
+     899.0
+    ],
+    [
+     -19067.0,
+     912.0
+    ],
+    [
+     -19234.0,
+     904.0
+    ],
+    [
+     -18905.0,
+     910.0
+    ],
+    [
+     -19266.0,
+     907.0
+    ],
+    [
+     -19551.0,
+     896.0
+    ],
+    [
+     -19477.0,
+     913.0
+    ],
+    [
+     -19447.0,
+     899.0
+    ],
+    [
+     -19058.0,
+     899.0
+    ],
+    [
+     -19445.0,
+     898.0
+    ],
+    [
+     -18739.0,
+     908.0
+    ],
+    [
+     -17731.0,
+     903.0
+    ],
+    [
+     -19424.0,
+     911.0
+    ],
+    [
+     -19266.0,
+     909.0
+    ],
+    [
+     -19440.0,
+     913.0
+    ],
+    [
+     -19633.0,
+     900.0
+    ],
+    [
+     -19476.0,
+     909.0
+    ],
+    [
+     -18746.0,
+     908.0
+    ],
+    [
+     -19431.0,
+     910.0
+    ],
+    [
+     -19429.0,
+     905.0
+    ],
+    [
+     -18728.0,
+     911.0
+    ],
+    [
+     -19256.0,
+     904.0
+    ],
+    [
+     -19249.0,
+     908.0
+    ],
+    [
+     -19431.0,
+     912.0
+    ],
+    [
+     -19437.0,
+     913.0
+    ],
+    [
+     -19432.0,
+     897.0
+    ],
+    [
+     -19633.0,
+     902.0
+    ],
+    [
+     -19593.0,
+     898.0
+    ],
+    [
+     -19629.0,
+     903.0
+    ],
+    [
+     -19451.0,
+     904.0
+    ],
+    [
+     -19625.0,
+     898.0
+    ],
+    [
+     -19230.0,
+     908.0
+    ],
+    [
+     -19629.0,
+     902.0
+    ],
+    [
+     -19225.0,
+     904.0
+    ],
+    [
+     -19633.0,
+     900.0
+    ],
+    [
+     -19252.0,
+     906.0
+    ],
+    [
+     -19416.0,
+     900.0
+    ],
+    [
+     -18763.0,
+     908.0
+    ],
+    [
+     -19066.0,
+     899.0
+    ],
+    [
+     -19552.0,
+     896.0
+    ],
+    [
+     -19457.0,
+     909.0
+    ],
+    [
+     -19381.0,
+     910.0
+    ],
+    [
+     -19597.0,
+     898.0
+    ],
+    [
+     537.0,
+     575.0
+    ],
+    [
+     757.0,
+     958.0
+    ],
+    [
+     756.0,
+     950.0
+    ],
+    [
+     754.0,
+     946.0
+    ],
+    [
+     756.0,
+     946.0
+    ]
+   ],
+   "motivo_fim": "timeout_jogo",
+   "nan_frames": 0,
+   "nan_primeiro": null,
+   "perfil": "casual",
+   "planar_frames": 0,
+   "planar_s": 0.0,
+   "pontos_de_falha": {
+    "-17700": 1,
+    "-18700": 4,
+    "-18800": 7,
+    "-18900": 6,
+    "-19000": 1,
+    "-19100": 7,
+    "-19200": 19,
+    "-19300": 5,
+    "-19400": 27,
+    "-19500": 5,
+    "-19600": 16,
+    "500": 1,
+    "600": 1,
+    "800": 4
+   },
+   "progresso_x": 893.796142578125,
+   "quedas": 0,
+   "rota_passos": 74,
+   "saltos": 1992,
+   "saltos_falhados": 90,
+   "seed": 15001,
+   "superficies_mapeadas": 32,
+   "tempo_s": 600.02,
+   "vento_entradas": 0,
+   "vento_s": 0.0,
+   "x_alvo": 960.0,
+   "x_max": 893.796142578125,
+   "y_min": 145.158721923828,
+   "y_spawn": 819.450012207031,
+   "_nivel": "n15",
+   "_perfil": "casual",
+   "_run": 1
+  },
+  {
+   "ataques": 13,
+   "cena": "res://scenes/levels/O_Pico_Esquecido.tscn",
+   "checkpoints": 2,
+   "chefe_ataques_evitados": 0,
+   "chefe_dano_sofrido": 0,
+   "chefe_derrotado": false,
+   "chefe_duracao_s": 0.0,
+   "chefe_golpes_sofridos": 0,
+   "chefe_telegrafos": 0,
+   "chefe_vida_final": 3019,
+   "chefe_vida_inicial": 3019,
+   "chefe_vida_max": 3019,
+   "chefe_vida_min": 3019,
+   "concluido": false,
+   "dano_total": 492,
+   "dashes": 348,
+   "dashes_desperdicados": 97,
+   "encravamentos": 93,
+   "golpes_sofridos": 24,
+   "hesitacao_s": 1.07,
+   "hesitacoes": 5,
+   "mortes": 45,
+   "mortes_pos": [
+    [
+     647.0,
+     891.0
+    ],
+    [
+     -18730.0,
+     908.0
+    ],
+    [
+     -19241.0,
+     903.0
+    ],
+    [
+     -17907.0,
+     906.0
+    ],
+    [
+     -19457.0,
+     910.0
+    ],
+    [
+     -18850.0,
+     908.0
+    ],
+    [
+     -18786.0,
+     908.0
+    ],
+    [
+     -19062.0,
+     915.0
+    ],
+    [
+     -18906.0,
+     908.0
+    ],
+    [
+     -18746.0,
+     908.0
+    ],
+    [
+     -19435.0,
+     898.0
+    ],
+    [
+     -18850.0,
+     908.0
+    ],
+    [
+     -18894.0,
+     915.0
+    ],
+    [
+     -19443.0,
+     897.0
+    ],
+    [
+     -18891.0,
+     915.0
+    ],
+    [
+     -18898.0,
+     908.0
+    ],
+    [
+     -18866.0,
+     908.0
+    ],
+    [
+     -19451.0,
+     900.0
+    ],
+    [
+     -19439.0,
+     898.0
+    ],
+    [
+     -18906.0,
+     910.0
+    ],
+    [
+     -18891.0,
+     905.0
+    ],
+    [
+     -18730.0,
+     908.0
+    ],
+    [
+     -19435.0,
+     912.0
+    ],
+    [
+     -18931.0,
+     908.0
+    ],
+    [
+     -19594.0,
+     898.0
+    ],
+    [
+     -18891.0,
+     901.0
+    ],
+    [
+     -19041.0,
+     909.0
+    ],
+    [
+     -19058.0,
+     913.0
+    ],
+    [
+     -17728.0,
+     916.0
+    ],
+    [
+     -18888.0,
+     901.0
+    ],
+    [
+     -19225.0,
+     903.0
+    ],
+    [
+     -19447.0,
+     898.0
+    ],
+    [
+     -19435.0,
+     911.0
+    ],
+    [
+     -16533.0,
+     101.0
+    ],
+    [
+     -18892.0,
+     905.0
+    ],
+    [
+     -18850.0,
+     908.0
+    ],
+    [
+     -19429.0,
+     908.0
+    ],
+    [
+     -18922.0,
+     908.0
+    ],
+    [
+     -19270.0,
+     912.0
+    ],
+    [
+     -18882.0,
+     917.0
+    ],
+    [
+     -19058.0,
+     914.0
+    ],
+    [
+     -19443.0,
+     911.0
+    ],
+    [
+     -18885.0,
+     917.0
+    ],
+    [
+     -18810.0,
+     908.0
+    ],
+    [
+     -18762.0,
+     908.0
+    ]
+   ],
+   "motivo_fim": "timeout_jogo",
+   "nan_frames": 0,
+   "nan_primeiro": null,
+   "perfil": "experiente",
+   "planar_frames": 0,
+   "planar_s": 0.0,
+   "pontos_de_falha": {
+    "-16500": 1,
+    "-17700": 1,
+    "-17900": 1,
+    "-18700": 3,
+    "-18800": 3,
+    "-18900": 17,
+    "-19000": 1,
+    "-19100": 3,
+    "-19200": 2,
+    "-19300": 1,
+    "-19400": 8,
+    "-19500": 2,
+    "-19600": 1,
+    "600": 1
+   },
+   "progresso_x": 647.382873535156,
+   "quedas": 0,
+   "rota_passos": 74,
+   "saltos": 1023,
+   "saltos_falhados": 43,
+   "seed": 15200,
+   "superficies_mapeadas": 151,
+   "tempo_s": 600.02,
+   "vento_entradas": 0,
+   "vento_s": 0.0,
+   "x_alvo": 960.0,
+   "x_max": 647.382873535156,
+   "y_min": -52.0462417602539,
+   "y_spawn": 819.450012207031,
+   "_nivel": "n15",
+   "_perfil": "experiente",
+   "_run": 0
+  },
+  {
+   "ataques": 159,
+   "cena": "res://scenes/levels/O_Pico_Esquecido.tscn",
+   "checkpoints": 3,
+   "chefe_ataques_evitados": 0,
+   "chefe_dano_sofrido": 0,
+   "chefe_derrotado": false,
+   "chefe_duracao_s": 0.0,
+   "chefe_golpes_sofridos": 0,
+   "chefe_telegrafos": 0,
+   "chefe_vida_final": 3019,
+   "chefe_vida_inicial": 3019,
+   "chefe_vida_max": 3019,
+   "chefe_vida_min": 3019,
+   "concluido": false,
+   "dano_total": 1774,
+   "dashes": 395,
+   "dashes_desperdicados": 42,
+   "encravamentos": 43,
+   "golpes_sofridos": 103,
+   "hesitacao_s": 0.22,
+   "hesitacoes": 1,
+   "mortes": 73,
+   "mortes_pos": [
+    [
+     647.0,
+     891.0
+    ],
+    [
+     -18874.0,
+     908.0
+    ],
+    [
+     -19439.0,
+     907.0
+    ],
+    [
+     -19254.0,
+     907.0
+    ],
+    [
+     -18891.0,
+     902.0
+    ],
+    [
+     -17883.0,
+     911.0
+    ],
+    [
+     -18810.0,
+     908.0
+    ],
+    [
+     -19221.0,
+     903.0
+    ],
+    [
+     -18914.0,
+     908.0
+    ],
+    [
+     -19221.0,
+     903.0
+    ],
+    [
+     -19456.0,
+     898.0
+    ],
+    [
+     -18890.0,
+     908.0
+    ],
+    [
+     -18874.0,
+     908.0
+    ],
+    [
+     -19439.0,
+     911.0
+    ],
+    [
+     -18770.0,
+     908.0
+    ],
+    [
+     -18904.0,
+     910.0
+    ],
+    [
+     -18770.0,
+     908.0
+    ],
+    [
+     -19062.0,
+     915.0
+    ],
+    [
+     -18866.0,
+     908.0
+    ],
+    [
+     -18907.0,
+     910.0
+    ],
+    [
+     -19433.0,
+     906.0
+    ],
+    [
+     -18888.0,
+     901.0
+    ],
+    [
+     -18818.0,
+     908.0
+    ],
+    [
+     -18914.0,
+     908.0
+    ],
+    [
+     -19458.0,
+     911.0
+    ],
+    [
+     -19041.0,
+     909.0
+    ],
+    [
+     -19433.0,
+     897.0
+    ],
+    [
+     -18936.0,
+     908.0
+    ],
+    [
+     -19439.0,
+     910.0
+    ],
+    [
+     -18890.0,
+     915.0
+    ],
+    [
+     -19443.0,
+     901.0
+    ],
+    [
+     -18906.0,
+     910.0
+    ],
+    [
+     -19258.0,
+     912.0
+    ],
+    [
+     -18754.0,
+     908.0
+    ],
+    [
+     -18850.0,
+     908.0
+    ],
+    [
+     -19439.0,
+     910.0
+    ],
+    [
+     -19258.0,
+     912.0
+    ],
+    [
+     -19233.0,
+     903.0
+    ],
+    [
+     -18818.0,
+     908.0
+    ],
+    [
+     -18834.0,
+     908.0
+    ],
+    [
+     -19225.0,
+     904.0
+    ],
+    [
+     -18858.0,
+     908.0
+    ],
+    [
+     -19459.0,
+     903.0
+    ],
+    [
+     -19058.0,
+     912.0
+    ],
+    [
+     -19246.0,
+     905.0
+    ],
+    [
+     -19435.0,
+     910.0
+    ],
+    [
+     -19062.0,
+     915.0
+    ],
+    [
+     -18795.0,
+     908.0
+    ],
+    [
+     -18888.0,
+     901.0
+    ],
+    [
+     -19221.0,
+     903.0
+    ],
+    [
+     -19443.0,
+     912.0
+    ],
+    [
+     -19447.0,
+     909.0
+    ],
+    [
+     -19447.0,
+     900.0
+    ],
+    [
+     -18948.0,
+     908.0
+    ],
+    [
+     -19451.0,
+     906.0
+    ],
+    [
+     -19447.0,
+     899.0
+    ],
+    [
+     -19451.0,
+     910.0
+    ],
+    [
+     -19451.0,
+     896.0
+    ],
+    [
+     -15228.0,
+     106.0
+    ],
+    [
+     -13314.0,
+     -71.0
+    ],
+    [
+     -13698.0,
+     899.0
+    ],
+    [
+     -13891.0,
+     19.0
+    ],
+    [
+     -15220.0,
+     106.0
+    ],
+    [
+     -13295.0,
+     -92.0
+    ],
+    [
+     -14227.0,
+     -23.0
+    ],
+    [
+     -13313.0,
+     -33.0
+    ],
+    [
+     -14151.0,
+     -46.0
+    ],
+    [
+     -14351.0,
+     913.0
+    ],
+    [
+     -14133.0,
+     -42.0
+    ],
+    [
+     -13640.0,
+     899.0
+    ],
+    [
+     -13296.0,
+     -95.0
+    ],
+    [
+     -14168.0,
+     19.0
+    ],
+    [
+     -14392.0,
+     916.0
+    ]
+   ],
+   "motivo_fim": "timeout_jogo",
+   "nan_frames": 0,
+   "nan_primeiro": null,
+   "perfil": "experiente",
+   "planar_frames": 0,
+   "planar_s": 0.0,
+   "pontos_de_falha": {
+    "-13300": 4,
+    "-13600": 1,
+    "-13700": 1,
+    "-13900": 1,
+    "-14100": 1,
+    "-14200": 3,
+    "-14400": 2,
+    "-15200": 2,
+    "-17900": 1,
+    "-18800": 8,
+    "-18900": 17,
+    "-19000": 1,
+    "-19100": 3,
+    "-19200": 6,
+    "-19300": 3,
+    "-19400": 12,
+    "-19500": 6,
+    "600": 1
+   },
+   "progresso_x": 647.410888671875,
+   "quedas": 0,
+   "rota_passos": 74,
+   "saltos": 1451,
+   "saltos_falhados": 67,
+   "seed": 15201,
+   "superficies_mapeadas": 151,
+   "tempo_s": 600.02,
+   "vento_entradas": 0,
+   "vento_s": 0.0,
+   "x_alvo": 960.0,
+   "x_max": 647.410888671875,
+   "y_min": -155.343414306641,
+   "y_spawn": 819.450012207031,
+   "_nivel": "n15",
+   "_perfil": "experiente",
+   "_run": 1
+  },
+  {
+   "ataques": 53,
+   "cena": "res://scenes/levels/O_Pico_Esquecido.tscn",
+   "checkpoints": 2,
+   "chefe_ataques_evitados": 0,
+   "chefe_dano_sofrido": 0,
+   "chefe_derrotado": false,
+   "chefe_duracao_s": 0.0,
+   "chefe_golpes_sofridos": 0,
+   "chefe_telegrafos": 0,
+   "chefe_vida_final": 3019,
+   "chefe_vida_inicial": 3019,
+   "chefe_vida_max": 3019,
+   "chefe_vida_min": 3019,
+   "concluido": false,
+   "dano_total": 890,
+   "dashes": 350,
+   "dashes_desperdicados": 73,
+   "encravamentos": 68,
+   "golpes_sofridos": 47,
+   "hesitacao_s": 3.5,
+   "hesitacoes": 10,
+   "mortes": 49,
+   "mortes_pos": [
+    [
+     648.0,
+     891.0
+    ],
+    [
+     -19072.0,
+     912.0
+    ],
+    [
+     -19593.0,
+     898.0
+    ],
+    [
+     -19396.0,
+     897.0
+    ],
+    [
+     -19436.0,
+     897.0
+    ],
+    [
+     -18922.0,
+     908.0
+    ],
+    [
+     -19233.0,
+     903.0
+    ],
+    [
+     -19449.0,
+     902.0
+    ],
+    [
+     -18885.0,
+     917.0
+    ],
+    [
+     -19454.0,
+     896.0
+    ],
+    [
+     -16532.0,
+     75.0
+    ],
+    [
+     -15764.0,
+     47.0
+    ],
+    [
+     -19062.0,
+     915.0
+    ],
+    [
+     -19234.0,
+     907.0
+    ],
+    [
+     -18778.0,
+     908.0
+    ],
+    [
+     -19637.0,
+     894.0
+    ],
+    [
+     -19221.0,
+     903.0
+    ],
+    [
+     -18904.0,
+     910.0
+    ],
+    [
+     -19441.0,
+     910.0
+    ],
+    [
+     -17891.0,
+     911.0
+    ],
+    [
+     -19447.0,
+     908.0
+    ],
+    [
+     -19453.0,
+     898.0
+    ],
+    [
+     -17912.0,
+     901.0
+    ],
+    [
+     -16534.0,
+     74.0
+    ],
+    [
+     -19451.0,
+     901.0
+    ],
+    [
+     -18842.0,
+     908.0
+    ],
+    [
+     -17884.0,
+     910.0
+    ],
+    [
+     -19245.0,
+     912.0
+    ],
+    [
+     -18891.0,
+     902.0
+    ],
+    [
+     -19447.0,
+     909.0
+    ],
+    [
+     -19429.0,
+     905.0
+    ],
+    [
+     -19434.0,
+     907.0
+    ],
+    [
+     -17906.0,
+     901.0
+    ],
+    [
+     -19456.0,
+     910.0
+    ],
+    [
+     -18891.0,
+     915.0
+    ],
+    [
+     -19222.0,
+     903.0
+    ],
+    [
+     -18906.0,
+     908.0
+    ],
+    [
+     -19245.0,
+     903.0
+    ],
+    [
+     -18882.0,
+     908.0
+    ],
+    [
+     -18715.0,
+     909.0
+    ],
+    [
+     -16906.0,
+     899.0
+    ],
+    [
+     -19429.0,
+     901.0
+    ],
+    [
+     -19442.0,
+     903.0
+    ],
+    [
+     -17370.0,
+     47.0
+    ],
+    [
+     -19452.0,
+     906.0
+    ],
+    [
+     -16362.0,
+     198.0
+    ],
+    [
+     -19257.0,
+     912.0
+    ],
+    [
+     -19249.0,
+     906.0
+    ],
+    [
+     -17910.0,
+     906.0
+    ]
+   ],
+   "motivo_fim": "timeout_jogo",
+   "nan_frames": 0,
+   "nan_primeiro": null,
+   "perfil": "normal",
+   "planar_frames": 0,
+   "planar_s": 0.0,
+   "pontos_de_falha": {
+    "-15800": 1,
+    "-16400": 1,
+    "-16500": 2,
+    "-16900": 1,
+    "-17400": 1,
+    "-17900": 5,
+    "-18700": 1,
+    "-18800": 2,
+    "-18900": 7,
+    "-19100": 2,
+    "-19200": 7,
+    "-19300": 1,
+    "-19400": 10,
+    "-19500": 5,
+    "-19600": 2,
+    "600": 1
+   },
+   "progresso_x": 647.924926757812,
+   "quedas": 0,
+   "rota_passos": 74,
+   "saltos": 1146,
+   "saltos_falhados": 44,
+   "seed": 15100,
+   "superficies_mapeadas": 151,
+   "tempo_s": 600.02,
+   "vento_entradas": 0,
+   "vento_s": 0.0,
+   "x_alvo": 960.0,
+   "x_max": 647.924926757812,
+   "y_min": -52.0462493896484,
+   "y_spawn": 819.450012207031,
+   "_nivel": "n15",
+   "_perfil": "normal",
+   "_run": 0
+  },
+  {
+   "ataques": 2,
+   "cena": "res://scenes/levels/O_Pico_Esquecido.tscn",
+   "checkpoints": 2,
+   "chefe_ataques_evitados": 0,
+   "chefe_dano_sofrido": 0,
+   "chefe_derrotado": false,
+   "chefe_duracao_s": 0.0,
+   "chefe_golpes_sofridos": 0,
+   "chefe_telegrafos": 0,
+   "chefe_vida_final": 3019,
+   "chefe_vida_inicial": 3019,
+   "chefe_vida_max": 3019,
+   "chefe_vida_min": 3019,
+   "concluido": false,
+   "dano_total": 16,
+   "dashes": 193,
+   "dashes_desperdicados": 173,
+   "encravamentos": 164,
+   "golpes_sofridos": 1,
+   "hesitacao_s": 3.13,
+   "hesitacoes": 7,
+   "mortes": 5,
+   "mortes_pos": [
+    [
+     644.0,
+     891.0
+    ],
+    [
+     -19434.0,
+     899.0
+    ],
+    [
+     -19222.0,
+     903.0
+    ],
+    [
+     -19469.0,
+     913.0
+    ],
+    [
+     -19040.0,
+     909.0
+    ]
+   ],
+   "motivo_fim": "timeout_jogo",
+   "nan_frames": 0,
+   "nan_primeiro": null,
+   "perfil": "normal",
+   "planar_frames": 0,
+   "planar_s": 0.0,
+   "pontos_de_falha": {
+    "-19000": 1,
+    "-19200": 1,
+    "-19400": 1,
+    "-19500": 1,
+    "600": 1
+   },
+   "progresso_x": 644.202514648438,
+   "quedas": 0,
+   "rota_passos": 74,
+   "saltos": 276,
+   "saltos_falhados": 4,
+   "seed": 15101,
+   "superficies_mapeadas": 151,
+   "tempo_s": 600.02,
+   "vento_entradas": 0,
+   "vento_s": 0.0,
+   "x_alvo": 960.0,
+   "x_max": 644.202514648438,
+   "y_min": 223.986663818359,
+   "y_spawn": 819.450012207031,
+   "_nivel": "n15",
+   "_perfil": "normal",
+   "_run": 1
+  }
+ ]
+}

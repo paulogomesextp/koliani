@@ -1,3 +1,102 @@
+## Região III — Torre dos Ecos: identidade canónica (19 set 2026)
+
+Branch `claude/region03-completion-pass`, a partir de `origin/master @
+17b90e28` (HEAD real, confirmado por `git fetch`).
+Relatório: [`docs/implementation/region_03_completion_pass.md`](implementation/region_03_completion_pass.md).
+Auditoria: [`docs/implementation/region_03_audit.md`](implementation/region_03_audit.md).
+Contrato: [`REGION03_VISUAL_GAMEPLAY_CONTRACT.md`](art_direction/regions/region_03/REGION03_VISUAL_GAMEPLAY_CONTRACT.md).
+
+**Estado: PARTIAL. NÃO integrado em `master`** — ainda há fidelidade LOW
+(ver abaixo), e o briefing só manda integrar em PASS.
+
+### O que custou a descobrir (guardar isto)
+
+- **O `.tscn` de um nível é só a sala do chefe.** O grosso é uma jornada
+  procedural que o `nivel_com_chefe.gd` prepende, gerada por tabelas do
+  `gerador_corredor.gd` indexadas pela REGIÃO. Tornar uma região canónica
+  é sobretudo mexer nessas tabelas. Medir só o `.tscn` engana — foi assim
+  que a baseline deu "1 inimigo por nível".
+- **As chaves i18n `level.nXX` usam o índice 0-BASED.** O N11 é
+  `level.n10`. Mexer em `level.n11` a pensar no N11 estraga o **N12**.
+- **`ASSINATURA[2]` era `"vento"`** — a assinatura da Região II — quando o
+  cânone diz que o elemento central da Torre dos Ecos são os sinos.
+- **`fundo_pack = "montanhas"` tem uma camada `trees.png` de pinheiros.**
+  Os cinco níveis renderizavam como floresta ao entardecer. Só se viu com
+  PNGs reais (Xvfb); o headless não desenha nada e não prova aparência.
+- **O primeiro pack `torre_ecos` não se via**: escolhi tons de pedra com
+  praticamente a mesma luminância do céu (34,40,74 contra 28,34,68) e a
+  `dessaturar`/`tinta` da Atmosfera ainda os baixava. De noite, quem dá
+  leitura a uma torre gótica é a **janela acesa**.
+- **`for x in (a, b)` é sintaxe de Python.** Em GDScript dá
+  "Expected closing )" — e os parênteses estão equilibrados, o que faz
+  perder tempo a procurar outra coisa. O erro aponta a linha certa.
+- **Recortar inimigos desta prancha ≠ Região II.** Aqui cada sprite vive
+  numa CAIXA com borda e as caixas tocam-se: não há uma coluna vazia na
+  tira toda, e o corte por corridas devolve sempre "1 corrida para 5
+  estados". Partir em cinco partes iguais também não chega (o erro
+  acumula e a 5.ª caixa apanha metade do vizinho). O que funciona é
+  cortar pelos **centros das legendas** por baixo de cada caixa.
+- **As cenas dos cinco níveis são `authored` no `data/level_manifest.json`**,
+  logo protegidas do `--promote` em massa do `afinar_atmosfera.py`. A
+  promoção tem de ser deliberada e só para elas.
+
+### Hipóteses DESCARTADAS (não voltar a gastar tempo)
+
+- *"O N12 tem ecrã preto"* — **não reproduz.** Carrega com `exit=0` e o
+  frame renderizado tem terreno, parallax e luz. Não se criou regressão
+  para um bug que não existe.
+- *"O Sino Vivo é uma mecânica do N11"* — **é o chefe do N11**
+  (`ChefeSinoVivo.tscn`). E é canónico: um chefe-sino numa torre de sinos.
+  Preservado, só passou a guardião.
+- *"O bot mede a dificuldade da região"* — **não mede.** 0 de 30
+  concluídos, mas o mesmo bot faz 0 de 4 na Região II (controlo corrido de
+  propósito). A porta só abre com o chefe morto e o bot não mata chefes.
+  Em N11–N14 ele **não morre, encrava** (0 mortes, ~172 encravamentos):
+  é navegação, não dificuldade. O bot foi feito para a Região II, que é
+  horizontal; esta é vertical.
+
+### Números medidos
+
+- Baseline: as 5 salas eram quase clones (4 com a mesma extensão x
+  200–1065, mesma largura 2600, 16 plataformas). N15 era a mais pobre
+  (13 plataformas, sem ator regional).
+- Inimigos canónicos antes: **0 de 10**. Depois: **10 de 10**, e num
+  nível gerado o inimigo de assinatura domina (8 Acólitos no N11, 11
+  Construtos no N13, 12 Sinos no N15).
+- Vyrak sai a **142×176 px = 4,00× a Koliani** (a prancha pede ~4×).
+- Bot: **0 frames com NaN e 0 crashes em ~5 h de jogo simulado**.
+- N15 é o outlier do bot: 53 mortes e 48 saltos falhados por run, contra
+  0 nos outros quatro. **Queda punitiva** — sinal para o playtest humano.
+
+### O que ficou por fazer, e porquê
+
+1. **Arquitetura e props no primeiro plano** (os dois eixos ainda LOW). A
+   camada jogável continua a ser corredor de tijolo liso; o cânone pede
+   arcos, colunas, vitrais e estátuas *onde se anda*. Está no fundo, não
+   no jogo. Mexe no `_deco` por bioma e no vocabulário de câmaras.
+2. **Mecânicas por nível**: oscilantes (N11), elevadores e plataformas que
+   desaparecem (N12), engrenagens e alavancas (N13), updraft e rotativas
+   (N14), plataformas ilusórias (N15). É isto que dá papéis distintos aos
+   cinco em vez de só paletas distintas.
+3. **Bot com navegação vertical** — sem ele não há medição de progressão
+   de dificuldade nesta região.
+4. Guardiões N12–N14 continuam Aerion/Voltaris/Sacerdotisa. O vento do N12
+   e a lua do N14 têm apoio no cânone; o **raio do N13 não** (o N13
+   canónico é de engrenagens).
+5. Build Windows, PWA e integração em `master`: só depois de 1 e 2.
+
+### Ambiente desta sessão (Linux, não Windows)
+
+Não havia Godot no PATH nem máquina Windows. Ficou em
+`tools/correr_testes.sh` o equivalente Linux do `.ps1` (isola o `user://`
+por `XDG_DATA_HOME` e confirma o SHA256 do save real) e em
+`tools/capturar_regiao3.sh` a captura de PNGs reais sobre **Xvfb** — que
+é a única forma de provar aparência, porque o headless não desenha.
+Os templates de exportação Windows **existem** (cross-export é possível),
+mas não se gerou build: não há PASS para publicar.
+
+---
+
 ## DEV MODE sem PIN + o bug do ESPAÇO a sério (19 set 2026)
 
 Branch `claude/remove-devmode-pin`, a partir de `origin/master @ 7a4e586a`

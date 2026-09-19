@@ -1,3 +1,34 @@
+## Pendente de DECISÃO — Região III, Torre dos Ecos (19 set 2026)
+
+Branch `claude/region03-completion-pass` (**PARTIAL, não integrada**).
+Relatório: `docs/implementation/region_03_completion_pass.md`.
+
+A identidade da região está feita e testada: nomes canónicos, um só chefe,
+sinos como assinatura, fundo próprio, os 10 inimigos da prancha e o Vyrak
+refeito. A suite passa e a Região II não regride. O que falta é a
+**arquitetura do primeiro plano** e as **mecânicas por nível** — e são
+esses dois que mantêm fidelidade LOW.
+
+Três coisas para o Paulo decidir:
+
+A. **O Vyrak deixou de ser dragão.** A prancha APPROVED
+   (`boss_pack.png`) mostra "A Voz dos Ecos", um guardião humanoide de
+   sinos, 2 fases. O `docs/niveis.md` e o `docs/progresso_agente.md`
+   chamavam-lhe "o Dragão das Sombras" e ficaram desatualizados de
+   propósito — a prancha é a fonte de verdade, mas **confirma-se que o
+   texto antigo é que estava errado, e não o contrário?**
+
+B. **O N13 continua a ser de raios.** O nível chama-se agora "Mecanismos
+   Antigos" e o cânone dele é engrenagens, alavancas e plataformas
+   rotativas. A cena mantém `RaioTempestade`/`ParaRaios` e o guardião
+   Voltaris. Trocar isso é refazer o nível — fica para decisão.
+
+C. **O N15 tem queda punitiva.** O bot morre 53 vezes por run ali e 0 nos
+   outros quatro. Pode ser do bot (não sabe subir), pode ser real. **Vale
+   um playtest humano do N15 antes de se mexer na geometria.**
+
+---
+
 ## Pendente de DECISÃO — DEV MODE sem PIN (19 set 2026)
 
 Branch `claude/remove-devmode-pin`. Relatório:
