@@ -25,7 +25,6 @@ extends Control
 const CENA_JOGO := "res://scenes/Main.tscn"
 const CENA_MAPA := "res://scenes/ui/MapaMundo.tscn"
 const CENA_OPCOES := preload("res://scenes/ui/Opcoes.tscn")
-const PIN_DEV := "0980"
 
 ## Medidas da prancha, já em coordenadas do palco (1280x720). O eixo da
 ## coluna é o mesmo do logótipo: x=805.
@@ -48,13 +47,6 @@ var _botoes := {}          # chave -> Button
 var _armado := ""          # "" ou "novo" -- botão à espera de confirmação
 ## O foco inicial não toca nada: um "ding" a abrir o menu soa a erro.
 var _pronto_para_som := false
-var _pedir_pin_dev := false
-var _pin_painel: Control
-var _pin_campo: LineEdit
-var _pin_erro: Label
-var _pin_titulo: Label
-var _pin_entrar: Button
-var _pin_cancelar: Button
 
 
 func _ready() -> void:
@@ -77,8 +69,6 @@ func _ready() -> void:
 	_focar_principal()
 	_pronto_para_som = true
 	_agendar_prova_runtime()
-	if _pedir_pin_dev:
-		_ao_dev_mode.call_deferred()
 
 
 # ── montagem ─────────────────────────────────────────────────────────────
@@ -286,12 +276,6 @@ func _traduzir() -> void:
 	_botoes["opcoes"].text = Textos.t("menu.options")
 	_botoes["sair"].text = Textos.t("menu.quit")
 	_dev.text = Textos.t("menu.dev_mode")
-	if is_instance_valid(_pin_painel):
-		_pin_titulo.text = Textos.t("dev.pin_title")
-		_pin_campo.placeholder_text = Textos.t("dev.pin_placeholder")
-		_pin_entrar.text = Textos.t("dev.pin_enter")
-		_pin_cancelar.text = Textos.t("dev.pin_cancel")
-		_pin_erro.text = Textos.t("dev.pin_invalid")
 	var toque := DisplayServer.is_touchscreen_available()
 	_premir.text = Frontend9H.espacar(
 		Textos.t("menu.tap_play" if toque else "menu.press_enter"), 1)
@@ -349,101 +333,23 @@ func _abrir_opcoes() -> void:
 	add_child(o)
 
 
+## DEV MODE. Entra directamente -- NÃO há PIN nem qualquer outra etapa de
+## autenticação (19 set 2026, pedido do Paulo). A porta continua a ser o
+## interruptor de build `koliani/qa/entrada_dev`: é ele que decide se este
+## botão sequer existe, e é ele que fica `false` numa build de loja. Um PIN
+## de quatro dígitos escrito no código-fonte de um jogo público nunca foi
+## uma credencial -- era um atrito para quem desenvolve e mais nada.
+##
+## `ativar_modo_dev()` guarda a campanha legítima antes de mexer em nada; a
+## sessão normal volta intacta em `desativar_modo_dev()` (o `_ready` deste
+## menu chama-o sempre que se volta cá).
 func _ao_dev_mode() -> void:
 	if not EstadoJogo.entrada_dev_disponivel():
 		return
-	if is_instance_valid(_pin_painel):
-		_pin_campo.grab_focus()
-		return
 	_repor_botoes()
-	for b: Button in _botoes.values():
-		b.disabled = true
-	_dev.disabled = true
-	_pin_painel = Control.new()
-	_pin_painel.name = "AcessoDev"
-	_pin_painel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	_palco.add_child(_pin_painel)
-	var veu := ColorRect.new()
-	veu.color = Color(0.015, 0.006, 0.02, 0.82)
-	veu.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	_pin_painel.add_child(veu)
-	var painel := PanelContainer.new()
-	painel.add_theme_stylebox_override("panel", Frontend9H.painel_liso())
-	Frontend9H.por(painel, Rect2(400, 235, 480, 250))
-	_pin_painel.add_child(painel)
-	var margem := MarginContainer.new()
-	for lado in ["left", "right", "top", "bottom"]:
-		margem.add_theme_constant_override("margin_" + lado, 24)
-	painel.add_child(margem)
-	var coluna := VBoxContainer.new()
-	coluna.add_theme_constant_override("separation", 14)
-	margem.add_child(coluna)
-	_pin_titulo = Label.new()
-	Frontend9H.cabecalho(_pin_titulo, 24)
-	_pin_titulo.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	coluna.add_child(_pin_titulo)
-	_pin_campo = LineEdit.new()
-	_pin_campo.name = "PIN"
-	_pin_campo.secret = true
-	_pin_campo.max_length = 4
-	_pin_campo.virtual_keyboard_type = LineEdit.KEYBOARD_TYPE_NUMBER
-	_pin_campo.alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_pin_campo.custom_minimum_size = Vector2(0, 48)
-	_pin_campo.add_theme_font_size_override("font_size", 24)
-	_pin_campo.text_submitted.connect(func(_texto: String) -> void: _confirmar_pin_dev())
-	_pin_campo.text_changed.connect(func(_texto: String) -> void: _pin_erro.visible = false)
-	coluna.add_child(_pin_campo)
-	_pin_erro = Label.new()
-	Frontend9H.corpo(_pin_erro, 16, Color(1.0, 0.5, 0.5))
-	_pin_erro.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_pin_erro.visible = false
-	coluna.add_child(_pin_erro)
-	var linha := HBoxContainer.new()
-	linha.add_theme_constant_override("separation", 16)
-	coluna.add_child(linha)
-	_pin_cancelar = Button.new()
-	_pin_entrar = Button.new()
-	for b: Button in [_pin_cancelar, _pin_entrar]:
-		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		b.custom_minimum_size = Vector2(0, 44)
-		linha.add_child(b)
-	_pin_cancelar.pressed.connect(_fechar_pin_dev)
-	_pin_entrar.pressed.connect(_confirmar_pin_dev)
-	_traduzir()
-	_pin_campo.grab_focus()
-
-
-func _confirmar_pin_dev() -> void:
-	if not is_instance_valid(_pin_painel) or not EstadoJogo.entrada_dev_disponivel():
-		return
-	if _pin_campo.text != PIN_DEV:
-		_pin_campo.clear()
-		_pin_erro.visible = true
-		_pin_campo.grab_focus()
-		Som.toca("ui_negado", -8.0)
-		return
-	_fechar_pin_dev()
 	EstadoJogo.ativar_modo_dev()
 	Som.toca("ui_confirmar", -8.0)
 	_ir_jogar()
-
-
-func _fechar_pin_dev() -> void:
-	if not is_instance_valid(_pin_painel):
-		return
-	_pin_campo.clear()
-	_pin_painel.queue_free()
-	_pin_painel = null
-	for b: Button in _botoes.values():
-		b.disabled = false
-	_dev.disabled = false
-	_dev.grab_focus()
-
-
-func _input(evento: InputEvent) -> void:
-	if is_instance_valid(_pin_painel) and evento.is_action_pressed("ui_cancel"):
-		get_viewport().set_input_as_handled()
-		_fechar_pin_dev()
 
 
 ## SAIR. `get_tree().quit()` fecha o executável de Windows e a app de
@@ -489,12 +395,11 @@ func _tratar_atalhos_dev() -> bool:
 		elif a.begins_with("--nivel="):
 			saltar = true
 			nivel = int(a.get_slice("=", 1)) - 1
-	if devmode:
-		# O atalho abre o mesmo pedido de PIN; não autoriza a entrada.
-		_pedir_pin_dev = true
-		return false
 	if not saltar:
 		return false
+	# `--devmode` entra já em DEV MODE: sem PIN, como o botão do menu.
+	if devmode:
+		EstadoJogo.ativar_modo_dev()
 	if nivel >= 0:
 		EstadoJogo.indice_nivel = clampi(nivel, 0, EstadoJogo.NIVEIS.size() - 1)
 		EstadoJogo.iniciar_sessao_nivel(true)

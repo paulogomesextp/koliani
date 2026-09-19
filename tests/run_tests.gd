@@ -69,6 +69,7 @@ func _correr_tudo() -> void:
 	teste_9h17_contrato_de_mobilidade_regiao1()
 	await teste_gate1_hitstop_nao_gera_nan()
 	await teste_dev_barra_salto_nao_abre_seletor()
+	await teste_dev_mode_sem_pin()
 	await teste_9h17_novo_jogo_desarma_ao_sair()
 	teste_equipamento_dados()
 	teste_equipamento_estado()
@@ -3509,6 +3510,75 @@ func teste_dev_barra_salto_nao_abre_seletor() -> void:
 		EstadoJogo.desativar_modo_dev()
 	_ok(EstadoJogo.para_dicionario() == antes,
 		"DEV MODE: o teste da barra Dev mexeu no estado do jogo")
+
+
+## DEV MODE SEM PIN (19 set 2026, pedido do Paulo). O botão do menu entrava
+## num painel de quatro dígitos; agora entra em DEV MODE e ponto. A porta da
+## build continua a ser `koliani/qa/entrada_dev` -- é esse interruptor que
+## decide se o botão sequer existe, e é ele que fica `false` numa build de
+## loja. Um PIN escrito no código-fonte de um jogo público nunca foi uma
+## credencial; era atrito para quem desenvolve.
+##
+## Este teste guarda as duas metades: que ACTIVA já, e que não sobrou nada do
+## painel (nó, campo de texto ou membro órfão). O harness dedicado
+## `tests/run_dev_acesso.gd` cobre o mesmo com os catálogos i18n.
+func teste_dev_mode_sem_pin() -> void:
+	# o retrato da campanha tira-se com o Dev JA' desligado -- e' esse o
+	# estado a que se volta no fim, aconteca o que acontecer no meio.
+	var era_dev := EstadoJogo.modo_dev
+	if era_dev:
+		EstadoJogo.desativar_modo_dev()
+	var antes := EstadoJogo.para_dicionario().duplicate(true)
+
+	var menu: Control = preload("res://scenes/ui/MenuInicial.tscn").instantiate()
+	add_child(menu)
+	await get_tree().process_frame
+	var dev := menu.get("_dev") as Button
+	_ok(dev != null and dev.visible,
+		"DEV MODE: o botão do menu devia estar visível numa build de QA")
+	_ok(not EstadoJogo.modo_dev, "DEV MODE: o menu não pode entrar em Dev sozinho")
+
+	# tudo o que interessa em `_ao_dev_mode` é síncrono: quando o `pressed`
+	# volta, o modo dev já está ligado. Por isso NÃO se espera um frame aqui
+	# -- esperar só daria tempo ao fade de trocar de cena.
+	if dev != null:
+		dev.pressed.emit()
+	_ok(EstadoJogo.modo_dev,
+		"DEV MODE: carregar no botão devia activar já, sem PIN nem painel")
+	_ok(menu.find_child("AcessoDev", true, false) == null,
+		"DEV MODE: nasceu um painel de acesso (`AcessoDev`) -- o PIN voltou")
+	_ok(_sem_campo_de_texto(menu),
+		"DEV MODE: o menu tem um campo de texto -- o PIN voltou")
+	for membro in ["_pin_painel", "_pin_campo", "_pin_erro", "_pin_titulo",
+			"_pin_entrar", "_pin_cancelar"]:
+		_ok(menu.get(membro) == null, "DEV MODE: membro órfão do PIN: " + membro)
+
+	# `_ao_dev_mode` acaba em `Transicao.fechar_e`, que ~0.22 s depois trocava
+	# a cena -- e levava o corredor de testes com ela. Corta-se o fade aqui.
+	var fade: Tween = Transicao.get("_tween")
+	if fade and fade.is_valid():
+		fade.kill()
+
+	menu.queue_free()
+	await get_tree().process_frame
+	# o botao LIGOU o Dev, haja o que houver antes -- por isso desliga-se
+	# sempre, e so' depois se compara. (Com `if not era_dev` ficava ligado
+	# justamente no caso em que ja' estava, e a comparacao falhava.)
+	EstadoJogo.desativar_modo_dev()
+	_ok(EstadoJogo.para_dicionario() == antes,
+		"DEV MODE: o teste do acesso Dev mexeu no estado do jogo")
+	if era_dev:
+		EstadoJogo.ativar_modo_dev()
+
+
+## True se não há um único `LineEdit` na sub-árvore.
+func _sem_campo_de_texto(no: Node) -> bool:
+	if no is LineEdit:
+		return false
+	for f in no.get_children():
+		if not _sem_campo_de_texto(f):
+			return false
+	return true
 
 
 func teste_gate1_hitstop_nao_gera_nan() -> void:
