@@ -74,6 +74,21 @@ const PACKS := {
 		["mid2.png", "Meio", 905.0, 3.6],
 		["trees.png", "Perto", 950.0, 3.8],
 	],
+	# Região III -- Torre dos Ecos. Pack PRÓPRIO, gerado por
+	# `tools/gerar_fundo_torre_ecos.py`. Os cinco níveis usavam "montanhas",
+	# que tem uma camada `trees.png` de PINHEIROS: a torre de sinos lia-se
+	# como floresta ao entardecer (prova em
+	# docs/playtests/region_03_visual_evidence/antes/). As pranchas APPROVED
+	# nomeiam cinco camadas -- silhueta próxima / torres distantes /
+	# catedral da cidade / montanhas e nuvens / lua e céu -- e como só há
+	# quatro ranhuras (uma entrada por camada, senão a seguinte limpa a
+	# anterior), as nuvens vão dentro do `ceu.png`, como nos outros packs.
+	"torre_ecos": [
+		["ceu.png", "Fundo", 320.0, 5.6],
+		["catedral.png", "Longe", 880.0, 3.6, 1.18],
+		["torres.png", "Meio", 930.0, 3.4, 1.12],
+		["silhueta.png", "Perto", 1000.0, 3.4],
+	],
 	# Região II -- Prisão dos Condenados (ansimuz "Cold Corridors", CC0).
 	"prisao": [
 		["back.png", "Fundo", 900.0, 4.4],
@@ -216,7 +231,9 @@ const PACKS_POR_REGIAO := [
 	# outros quatro só aparecem se um nível os pedir à mão (nenhum pede).
 	["desfiladeiro", "desfiladeiro", "desfiladeiro", "desfiladeiro",
 		"desfiladeiro"],
-	["montanhas", "rochoso", "luar", "horror", "cidade"],
+	# Região III -- Torre dos Ecos: pack próprio nos cinco níveis, como se
+	# fez na Região II com o `desfiladeiro`.
+	["torre_ecos", "torre_ecos", "torre_ecos", "torre_ecos", "torre_ecos"],
 	["caverna", "gruta", "masmorra", "luar", "castelo_velho"],
 	["cidade", "vilanoite", "horror", "igreja", "luar"],
 	["igreja", "castelo_velho", "luar", "horror", "cidade"],

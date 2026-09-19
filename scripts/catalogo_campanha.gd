@@ -32,11 +32,17 @@ const CHEFE_KEY: Array[String] = [
 	"guard.feiticeira_ventos",   # 07 N08 -- arquétipo Mago do Vento
 	"guard.espectros_gemeos",    # 08 N09 -- arquétipo Espectro das Ruínas
 	"boss.guardiao_dos_ceus",    # 09 N10 -- o chefe da Região II
-	"boss.sino_vivo",            # 10 Torre dos Sinos
-	"boss.aerion",               # 11 Torre dos Ventos
-	"boss.voltaris",             # 12 Torre da Tempestade
-	"boss.sacerdotisa_lunar",    # 13 Observatório Lunar
-	"boss.vyrak",                # 14 O Pico Esquecido
+	# Região III -- Torre dos Ecos (pranchas APPROVED em
+	# docs/art_direction/regions/region_03/). O cânone só admite UM
+	# confronto na região -- o Vyrak, no N15 -- por isso os quatro
+	# encontros intermédios são GUARDIÕES, como já se fez na Região II.
+	# Os nomes dos ficheiros das cenas ficam como estão: mudá-los partia
+	# saves e checkpoints. O que o jogador lê é a chave `level.n##`.
+	"guard.sino_vivo",           # 10 N11 -- Entrada dos Ecos
+	"guard.aerion",              # 11 N12 -- Galerias Verticais
+	"guard.voltaris",            # 12 N13 -- Mecanismos Antigos
+	"guard.sacerdotisa_lunar",   # 13 N14 -- Campanário
+	"boss.vyrak",                # 14 N15 -- O Topo dos Ecos (o chefe da Região III)
 	"boss.rei_ossario",          # 15 Cemitério dos Reis
 	"boss.colosso_osseo",        # 16 Galeria dos Ossos
 	"boss.freira_negra",         # 17 Cripta das Mil Velas

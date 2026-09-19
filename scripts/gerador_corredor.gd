@@ -513,7 +513,11 @@ const CAMARAS_FLAVOUR := [
 const ASSINATURA := {
 	0: "trampolim",    # Floresta -- ricochete
 	1: "guilhotinas",  # Prisão -- execuções
-	2: "vento",        # Torres -- correntes de ar
+	# Regiao III Torre dos Ecos: o cânone das pranchas APPROVED diz que o
+	# elemento central sao os SINOS E ECOS -- era "vento", que e' a
+	# assinatura da Regiao II (Desfiladeiro dos Ventos) e que no cânone da
+	# III aparece so' como seccao do N14. `sinos` ja' estava na pool.
+	2: "sinos",        # Torre dos Ecos -- a badalada que move a torre
 	3: "gruta",        # Catacumbas -- túneis escuros
 	4: "impulso",      # Cidade -- máquinas
 	5: "fogo",         # Castelo -- lava

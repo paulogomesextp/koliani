@@ -19,7 +19,7 @@ ser diferente em cada um dos 30 niveis.
 
   I   floresta, pantano          IV  caverna, gruta
   II  prisao, masmorra           V   vilanoite, cidade, horror
-  III montanhas, rochoso         VI  castelo_velho, igreja, luar
+  III torre_ecos (proprio)       VI  castelo_velho, igreja, luar
 
 O pack `corredores` era uma copia byte a byte do `prisao` (dois nomes para
 a mesma imagem) e foi apagado. A II e a IV ficaram com um pack so', e por
@@ -85,12 +85,26 @@ TABELA = [
     ("Corredor_das_Execucoes", "prisao",    (.82,.88,.98), (.04,.07,.11), (.07,.11,.16), (.62,.84,1.0),  (.78,.92,1.0), 1.0, (.72,.90,1.16), .38, .58, False),
     ("Ala_dos_Mortos",         "masmorra", (.84,.92,.90), (.04,.09,.09), (.06,.13,.12), (.48,1.0,.86),  (.66,1.0,.92), 1.8, (.80,1.04,1.00), .40, .28, False),
     ("A_Cela_Zero",            "prisao",        (.76,.76,.94), (.05,.04,.11), (.08,.07,.15), (.74,.44,1.0),  (.82,.62,1.0), 1.4, (.78,.70,1.20), .50, .60, False),
-    # ---- III Torres --------------------------------------------------
-    ("Torre_dos_Sinos",        "montanhas",     (.96,.90,.86), (.09,.07,.11), (.14,.11,.14), (1.0,.74,.46),  (1.0,.88,.68), 1.1, (1.06,.90,.94), .30, .22, True),
-    ("Torre_dos_Ventos",       "rochoso",       (.92,.92,.96), (.06,.07,.12), (.10,.12,.18), (.96,.86,.64),  (1.0,.96,.84), 1.9, (.94,.94,1.06), .34, .26, False),
-    ("Torre_da_Tempestade",    "montanhas",        (.86,.90,1.0), (.04,.06,.13), (.07,.10,.18), (.70,.88,1.0),  (.80,.94,1.0), 2.3, (.74,.88,1.20), .46, .34, False),
-    ("Observatorio_Lunar",     "rochoso",          (.94,.94,1.0), (.07,.06,.14), (.10,.10,.18), (.88,.90,1.0),  (.94,.96,1.0), 1.3, (.90,.92,1.14), .18, .16, False),
-    ("O_Pico_Esquecido",       "montanhas",     (.90,.90,.98), (.06,.06,.13), (.10,.11,.19), (.78,.58,1.0),  (.88,.78,1.0), 2.0, (.86,.86,1.16), .40, .30, False),
+    # ---- III Torre dos Ecos ------------------------------------------
+    # Pack PROPRIO `torre_ecos` nos cinco (gerado por
+    # `tools/gerar_fundo_torre_ecos.py`), como a II tem o `desfiladeiro`.
+    # Antes eram "montanhas"/"rochoso": a camada `trees.png` do montanhas
+    # punha PINHEIROS na torre de sinos, e a tinta do N11 era rosada
+    # (1.06,.90,.94) contra um cânone de azul noite. Prova em
+    # docs/playtests/region_03_visual_evidence/antes/.
+    # A luz-chave e' o contraste que a prancha pede: luz FRIA da lua no ar
+    # e luz DOURADA dos sinos como luz-chave. Cada nivel leva a paleta que
+    # o `level_mechanics.png` lhe da'.
+    # N11 "azul frio, luz divina, primeiros ecos"
+    ("Torre_dos_Sinos",        "torre_ecos",    (.90,.92,1.00), (.05,.06,.14), (.09,.10,.20), (1.0,.78,.48),  (1.0,.90,.72), 1.1, (.88,.94,1.16), .30, .18, True),
+    # N12 "interiores altos, vitrais, luz divina filtrada"
+    ("Torre_dos_Ventos",       "torre_ecos",    (.86,.90,1.04), (.04,.06,.15), (.08,.10,.21), (.74,.86,1.00),  (.84,.92,1.0), 1.6, (.80,.90,1.22), .36, .22, False),
+    # N13 "metal antigo, ouro envelhecido, maquinas"
+    ("Torre_da_Tempestade",    "torre_ecos",    (1.00,.92,.80), (.07,.06,.12), (.12,.10,.16), (1.0,.72,.38),  (1.0,.86,.62), 2.2, (1.04,.92,.94), .28, .20, True),
+    # N14 "ceu aberto, vento, sinos monumentais"
+    ("Observatorio_Lunar",     "torre_ecos",    (.92,.95,1.06), (.05,.07,.17), (.09,.12,.24), (.96,.88,.66),  (1.0,.98,.88), 2.6, (.86,.94,1.24), .40, .16, True),
+    # N15 "ceu noturno, energia do eco, climax"
+    ("O_Pico_Esquecido",       "torre_ecos",    (.90,.86,1.04), (.05,.05,.14), (.09,.09,.20), (.86,.60,1.00),  (.92,.76,1.0), 2.2, (.84,.84,1.26), .38, .24, True),
     # ---- IV Catacumbas ----------------------------------------------
     ("Cemiterio_dos_Reis",     "caverna",          (.88,.88,.92), (.07,.04,.10), (.11,.09,.13), (.86,.70,.78),  (.96,.88,.90), 1.4, (1.00,.84,.96), .26, .14, False),
     ("Galeria_dos_Ossos",      "gruta",       (.90,.88,.84), (.07,.06,.07), (.13,.12,.10), (.92,.86,.66),  (1.0,.96,.80), 1.6, (1.04,.94,.86), .34, .26, False),
