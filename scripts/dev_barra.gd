@@ -207,6 +207,14 @@ func _montar_painel() -> void:
 	_painel.name = "Painel"
 	_painel.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_painel.visible = false
+	# ESCONDER NAO CHEGA. Em Godot, `visible = false` cala o `_gui_input`,
+	# mas NAO cala o `_unhandled_input` -- e o `SeletorNiveis` trata la'
+	# dentro o `ui_accept`. Como o ESPACO e' `saltar` E `ui_accept` ao mesmo
+	# tempo, e saltar nao consome o evento, cada salto em DEV MODE chegava ao
+	# selector INVISIVEL, que confirmava o nivel seleccionado e o recarregava.
+	# Em jogo lia-se exactamente como a queixa do playtest: "o espaco da'
+	# reset ao nivel". Desligado, o painel e' mesmo como se nao estivesse ca'.
+	_painel.process_mode = Node.PROCESS_MODE_DISABLED
 	add_child(_painel)
 
 	var fundo := ColorRect.new()
@@ -226,6 +234,11 @@ func _montar_painel() -> void:
 
 	_seletor = CENA_SELETOR.instantiate()
 	_painel.add_child(_seletor)
+	# E' PRECISO DESLIGAR O SELECTOR, NAO SO' O PAINEL: o `SeletorNiveis`
+	# poe-se a si proprio em `PROCESS_MODE_ALWAYS` (precisa disso para
+	# responder com o jogo em pausa), e `ALWAYS` ignora de proposito o estado
+	# dos antepassados -- desligar o painel-pai nao lhe toca.
+	_seletor.process_mode = Node.PROCESS_MODE_DISABLED
 	_seletor.escolhido.connect(_ir_para)
 	_seletor.cancelado.connect(_fechar)
 
@@ -247,8 +260,12 @@ func _traduzir() -> void:
 
 func _abrir() -> void:
 	if _painel:
+		# volta a INHERIT (= ALWAYS, herdado desta barra), para o selector
+		# continuar a responder com a arvore em pausa, como sempre respondeu.
+		_painel.process_mode = Node.PROCESS_MODE_INHERIT
 		_painel.visible = true
 	if _seletor:
+		_seletor.process_mode = Node.PROCESS_MODE_ALWAYS
 		_seletor.configurar(EstadoJogo.indice_nivel, false)
 	get_tree().paused = true
 
@@ -256,6 +273,9 @@ func _abrir() -> void:
 func _fechar() -> void:
 	if _painel:
 		_painel.visible = false
+		_painel.process_mode = Node.PROCESS_MODE_DISABLED
+	if _seletor:
+		_seletor.process_mode = Node.PROCESS_MODE_DISABLED
 	# Defesa em profundidade: se algum controlo do painel ficou com o foco,
 	# o ESPACO seguinte era consumido por ele em vez de saltar.
 	var focado := get_viewport().gui_get_focus_owner()

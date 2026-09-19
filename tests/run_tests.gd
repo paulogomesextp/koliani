@@ -3484,6 +3484,19 @@ func teste_dev_barra_salto_nao_abre_seletor() -> void:
 	# Se o botao ACEITAR foco, damo-lo primeiro -- e' exactamente o que um
 	# clique de rato faz, e sem isso o teste nao reproduzia a queixa.
 	var painel := barra.get("_painel") as Control
+	# O PAINEL FICAR INVISIVEL NAO CHEGA COMO PROVA -- e' esse o ponto cego
+	# que deixou a queixa viva depois de `7a4e586a`. O `SeletorNiveis` vive
+	# dentro do painel e trata `ui_accept` no `_unhandled_input`, que em
+	# Godot NAO se cala com `visible = false`. Resultado: o ESPACO confirmava
+	# o nivel e recarregava-o com o painel invisivel o tempo todo, e o teste
+	# passava. Agora vigia-se o SINAL, que e' o que leva mesmo a` troca de
+	# cena (`_ir_para` -> `Transicao.fechar_e(change_scene_to_file)`).
+	var escolheu := [false]
+	var seletor := barra.get("_seletor") as Node
+	_ok(seletor != null, "DEV MODE: a barra Dev nao montou o selector")
+	if seletor:
+		seletor.connect("escolhido", func(_i: int) -> void: escolheu[0] = true)
+	var nivel_antes: int = EstadoJogo.indice_nivel
 	var topo := barra.get_node_or_null("BotaoTopo") as Button
 	if topo and topo.focus_mode != Control.FOCUS_NONE:
 		topo.grab_focus()
@@ -3500,6 +3513,16 @@ func teste_dev_barra_salto_nao_abre_seletor() -> void:
 		await get_tree().process_frame
 	_ok(painel == null or not painel.visible,
 		"DEV MODE: o ESPACO abriu o selector de niveis por cima do jogo")
+	_ok(not escolheu[0],
+		"DEV MODE: o ESPACO confirmou um nivel no selector ESCONDIDO -- e'"
+		+ " isto que em jogo se le como `o espaco da' reset ao nivel`")
+	_ok(EstadoJogo.indice_nivel == nivel_antes,
+		"DEV MODE: o ESPACO mudou o nivel da sessao")
+	# e uma troca de cena agendada pelo fade levaria o corredor de testes
+	# atras -- se alguma chegou a ser pedida, corta-se aqui.
+	var fade_dev: Tween = Transicao.get("_tween")
+	if fade_dev and fade_dev.is_valid():
+		fade_dev.kill()
 
 	# se a falha acima acontecer, o painel deixou a arvore EM PAUSA e os
 	# testes seguintes mediam um jogo parado -- nao deixar isso acontecer.
