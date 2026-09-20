@@ -355,13 +355,13 @@ const MECANICA_DO_NIVEL := [
 	# proibe ("nao declarar HIGH porque a cor parece semelhante").
 	{"cam": "espectral", "grau": 1},  # N15 O Topo dos Ecos -- plataformas ilusorias
 	# --- niveis 16-20  (Regiao 4) ---
-	# N16 Cemiterio dos Reis: APRESENTAVA `elevador`, que a Torre dos Ecos
-	# reclamou para o N12 (canone: "elevador de coluna"). Os tumulos
-	# elevadores do N16 continuam la' -- `elevador` esta' na pool da Regiao
-	# IV e ja' desbloqueado --, o que muda e' qual a mecanica que o nivel
-	# APRESENTA. Fica com a `torre`, que nao esta' na pool de regiao nenhuma
-	# e por isso pode mudar de casa sem mexer no calendario de ninguem.
-	{"cam": "torre", "grau": 0},
+	# O `cam` de cada linha NAO e' so' o aviso de tutorial: e' a camara de
+	# ASSINATURA que o gerador FORCA na jornada deste nivel. Trocar o do N16
+	# de `elevador` para outra coisa mudou-lhe 832 linhas de geometria (e o
+	# do 56, 848) -- medido na verificacao dos 100 niveis. Por isso os slots
+	# fora da Regiao III ficam exactamente como estavam, e a Torre dos Ecos
+	# usa os seus (10-14) mais o desbloqueio local.
+	{"cam": "elevador", "grau": 0},   # N16 Cemiterio dos Reis -- tumulos elevadores
 	{"cam": "quebra", "grau": 0},
 	{"cam": "velas", "grau": 0},
 	{"cam": "pedras", "grau": 0},
@@ -409,7 +409,7 @@ const MECANICA_DO_NIVEL := [
 	{"cam": "esporos", "grau": 1},
 	{"cam": "raizes", "grau": 1},
 	# --- niveis 56-60  (Regiao 12) ---
-	{"cam": "torre", "grau": 0},
+	{"cam": "engrenagens", "grau": 1},
 	{"cam": "peso", "grau": 1},  # estreia propria: era o `elevador` do 16 outra vez
 	{"cam": "replicantes", "grau": 1},
 	{"cam": "circuito", "grau": 1},

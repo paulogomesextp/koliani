@@ -2637,11 +2637,29 @@ func teste_mecanica_por_nivel() -> void:
 
 	# e os primeiros 32 niveis estreiam 32 coisas diferentes: sem isto o
 	# jogo voltava a abrir tudo de uma vez logo no inicio
-	var primeiras: Dictionary = {}
+	#
+	# 20 set 2026: passam a ser 31, e a excepcao e' NOMEADA. O `elevador` e'
+	# a camara-assinatura do N12 ("elevador de coluna", canone da Torre dos
+	# Ecos) E do N16 (Cemiterio dos Reis, tumulos elevadores). Quem joga
+	# conhece o elevador no N12; o N16 usa-o sem o voltar a apresentar, que
+	# e' o comportamento certo -- repetir o aviso era ruido. A lista de
+	# repeticoes permitidas fica aqui, explicita: uma SEGUNDA repeticao
+	# volta a falhar, e e' isso que impede isto de virar uma gaveta.
+	const REPETIDAS_OK := ["elevador"]
+	var contagem: Dictionary = {}
 	for k in range(0, 32):
-		primeiras[mec[k]] = true
-	_ok(primeiras.size() == 32,
-		"os primeiros 32 niveis estreiam so' %d camaras distintas" % primeiras.size())
+		contagem[mec[k]] = int(contagem.get(mec[k], 0)) + 1
+	var repetidas: Array[String] = []
+	for c: String in contagem:
+		if int(contagem[c]) > 1:
+			repetidas.append(c)
+	repetidas.sort()
+	_ok(repetidas == REPETIDAS_OK,
+		"nos primeiros 32 niveis repetem-se %s; so' %s esta' justificada"
+			% [str(repetidas), str(REPETIDAS_OK)])
+	_ok(contagem.size() == 32 - REPETIDAS_OK.size(),
+		"os primeiros 32 niveis apresentam %d camaras distintas, esperavam-se %d"
+			% [contagem.size(), 32 - REPETIDAS_OK.size()])
 
 
 ## Todas as strings de um bloco `const NOME := [...]`.

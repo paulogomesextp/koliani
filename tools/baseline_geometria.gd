@@ -79,7 +79,7 @@ func _recolher(no: Node, fora: Array[String]) -> void:
 	if not DECORATIVOS.has(classe):
 		var p := _posicao(no)
 		if no is CollisionShape2D:
-			fora.append("COLISAO %s %s %s" % [p, _forma(no.shape), no.disabled])
+			fora.append("COLISAO %s %s %s" % [p, _forma(no.shape), _estado(no)])
 		elif no is CollisionPolygon2D:
 			fora.append("POLIGONO %s %d pontos" % [p, no.polygon.size()])
 		elif no is Area2D or no is CharacterBody2D or no is StaticBody2D \
@@ -89,6 +89,23 @@ func _recolher(no: Node, fora: Array[String]) -> void:
 			fora.append("MARCA %s %s" % [classe, p])
 	for filho in no.get_children():
 		_recolher(filho, fora)
+
+
+## O `disabled` de uma colisão, EXCEPTO nas plataformas rítmicas.
+##
+## A `PlataformaRitmada` liga e desliga a colisão ao ritmo de
+## `Time.get_ticks_msec()` -- RELOGIO DE PAREDE, que o
+## `Engine.time_scale = 0` nao congela. O estado instantaneo dela depende de
+## ha' quanto tempo o processo arrancou, e duas corridas do MESMO nivel
+## davam `disabled` diferente ora numa plataforma ora noutra. Isso nao e'
+## geometria -- a posicao, o tamanho e o `periodo` sao identicos, e sao
+## esses que este ficheiro guarda. Registar o estado delas era acusar
+## regressoes que nao existem: custou uma investigacao inteira no nivel 77.
+func _estado(c: CollisionShape2D) -> String:
+	var dono := c.get_parent()
+	if dono and dono.is_in_group("plataformas_ritmadas"):
+		return "ritmada"
+	return str(c.disabled)
 
 
 ## Posição no mundo, arredondada a 0,01 px. Sem arredondar, o mesmo mundo

@@ -376,6 +376,68 @@ func _decorar(vis: Node, bioma: String, largura: float, y0: float, rng: RandomNu
 			s.position.x += tex.get_width() * e
 		s.z_index = -1                 # atras da Koliani e dos inimigos
 		vis.add_child(s)
+		_acender(s, String(p["nome"]), tex, e)
+
+
+## PROPS QUE DAO LUZ -- nome -> (cor, forca, raio em px).
+##
+## A prancha aprovada da Regiao III (`concept_environment.png`) e' azul-noite
+## POLVILHADA DE LUZ QUENTE: lanternas, braseiros, candelabros e vitrais
+## acesos, um a cada poucos metros. O jogo tinha os props mas nenhum deles
+## dava luz, e o resultado media-se a olho: metade do ecra' era massa quase
+## preta e nao se distinguia plataforma de fundo. Isto nao clareia a regiao
+## -- acende os pontos que a referencia ja' tinha acesos.
+const PROPS_COM_LUZ := {
+	"braseiro": [Color(1.0, 0.70, 0.36), 0.95, 150.0],
+	"candelabro": [Color(1.0, 0.82, 0.52), 0.80, 140.0],
+	"lanterna_eco": [Color(0.62, 0.80, 1.0), 0.75, 120.0],
+	"vitral_alto": [Color(0.50, 0.68, 1.0), 0.62, 190.0],
+	"vitral_partido": [Color(0.50, 0.68, 1.0), 0.45, 150.0],
+	"pedra_memoria": [Color(0.66, 0.84, 1.0), 0.55, 100.0],
+	"velas": [Color(1.0, 0.86, 0.58), 0.62, 110.0],
+	"tocha": [Color(1.0, 0.72, 0.38), 0.90, 150.0],
+	"lampiao_t": [Color(1.0, 0.84, 0.54), 0.70, 130.0],
+}
+
+## Um degrade radial branco, feito UMA vez e partilhado por todas as luzes.
+## Uma `GradientTexture2D` por prop seria centenas de texturas iguais numa
+## jornada de dezenas de milhares de px.
+static var _tex_luz_partilhada: GradientTexture2D = null
+
+static func _tex_luz() -> GradientTexture2D:
+	if _tex_luz_partilhada != null:
+		return _tex_luz_partilhada
+	var g := Gradient.new()
+	g.offsets = PackedFloat32Array([0.0, 1.0])
+	g.colors = PackedColorArray([Color(1, 1, 1, 1), Color(1, 1, 1, 0)])
+	var t := GradientTexture2D.new()
+	t.gradient = g
+	t.width = 180
+	t.height = 180
+	t.fill = GradientTexture2D.FILL_RADIAL
+	t.fill_from = Vector2(0.5, 0.5)
+	t.fill_to = Vector2(1.0, 0.5)
+	_tex_luz_partilhada = t
+	return t
+
+
+## Acende o prop, se for dos que dao luz. Nao sorteia nada: na referencia
+## TODOS os braseiros estao acesos, e um sorteio aqui mexia na decoracao
+## desta plataforma sem necessidade nenhuma.
+func _acender(sp: Sprite2D, nome: String, tex: Texture2D, esc: float) -> void:
+	if not PROPS_COM_LUZ.has(nome):
+		return
+	var cfg: Array = PROPS_COM_LUZ[nome]
+	var luz := PointLight2D.new()
+	luz.texture = _tex_luz()
+	luz.color = cfg[0]
+	luz.energy = float(cfg[1])
+	luz.texture_scale = float(cfg[2]) / 90.0
+	luz.blend_mode = Light2D.BLEND_MODE_ADD
+	# o prop e' desenhado com `centered = false`, portanto o centro dele
+	# esta' a meia largura/altura do canto
+	luz.position = Vector2(tex.get_width() * 0.5, tex.get_height() * 0.45)
+	sp.add_child(luz)
 
 
 ## Pendura props por baixo da plataforma (`y_base` = o fundo do visual).
@@ -437,3 +499,5 @@ func _pendurar(vis: Node, bioma: String, largura: float, y_base: float,
 			s.position.x += tex.get_width() * e
 		s.z_index = -2                 # ATRAS do terreno e dos actores
 		vis.add_child(s)
+		# o candelabro e a lanterna tambem pendem, e na prancha estao acesos
+		_acender(s, String(p["nome"]), tex, e)
