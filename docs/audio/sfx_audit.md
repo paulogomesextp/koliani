@@ -125,8 +125,73 @@ leitura no caos e volume “razoável”. `DEVICE VALIDATION REQUIRED` para mobi
 e Web reais. A validação técnica prova routing, contagem, carregamento e margem;
 não substitui audição humana.
 
+## Prompt 2 — player, combate e inimigos
+
+### PLAYER
+
+| EVENT | CURRENT SFX | STATUS | PROBLEM | ACTION | RESULT |
+| --- | --- | --- | --- | --- | --- |
+| Jump / double jump | `salto`/`salto_duplo` −10 dB, 1,00 ±3% | VOLUME FIX | wall-jumps variavam entre −9 e −11 dB e alguns callsites somavam duas randomizações | normalizar ganho e deixar a variação apenas em `Som.toca()` | routing uniforme; uma voz por salto |
+| Land | `aterrar`, tiers −21/−15/−10 dB, 1,00 ±2% | KEEP | tiers já distinguiam intensidade | preservar tiers; queda forte com prioridade média | uma voz por aterragem |
+| Dash / roll | `dash` −11 dB, 1,00 ±3%; `rolamento` −13 dB, 1,00 ±4% | KEEP | pitch era implícito/global | declarar perfis no evento | uma voz por ação |
+| Combo 1–4 | `ataque`, `ataque2`, `ataque3`, `ataque_forte`, −10 dB, 1,00 ±2% | DUPLICATION FIX | pitch podia variar no callsite e novamente no autoload | uma só fonte de variação central | sequência A→B→C→D, exatamente uma voz por golpe |
+| Sword hit | `acerto` normal −8 dB, 1,00 ±4%; crítico −6 dB, 1,25 ±4% | VOLUME FIX | diferença arbitrária de 5 dB e dupla randomização | reduzir diferença e centralizar variação; prioridade média no crítico | impacto continua legível sem dominar o combo |
+| Hurt | `dano` −7 dB, 1,00 ±2% | DUPLICATION FIX | podia repetir rapidamente; fatal não deve empilhar hurt | cooldown semântico 120 ms, prioridade média; preservar exclusão fatal | hurt limitado; morte continua isolada |
+| Death | `morte_koliani` −6 dB, 1,00 ±2% | KEEP | evento crítico podia perder voz para spam normal | prioridade alta | uma voz fatal; regressão do Prompt 1 passou |
+| Shield activation | `bloqueio` −18 dB, 1,28 ±1% | MISSING | levantar escudo não tinha feedback próprio | perfil metálico curto/agudo, cooldown 180 ms | distinguível do impacto sem asset novo |
+| Shield impact | `bloqueio` −11 dB, 0,92 ±2% | VOLUME FIX | mesmo material sem distinção e possível spam | perfil mais grave/forte, cooldown 120 ms, prioridade média | bloqueio confirmado legível |
+| Shield break/failure | inexistente | MISSING | não existe mecânica/estado explícito no player | não inventar evento nem ficheiro | diferido até existir semântica de gameplay |
+| Grab / wall feedback | `agarrar` −11/−14 dB conforme ação, 1,00 ±4%; `parede` −22 dB, 1,00 ±6% | TIMING FIX | variação duplicada entre callsite e autoload | centralizar a variação | uma fonte de pitch |
+| Footsteps | `passo1`/`passo2`/`passo3`, −24 dB, 1,00 ±8% | DUPLICATION FIX | sorteio podia repetir A A apesar de haver três variantes | ciclo determinístico A→B→C | antirrepetição testável |
+
+### ENEMIES E PROJECTILES
+
+| EVENT | CURRENT SFX | STATUS | PROBLEM | ACTION | RESULT |
+| --- | --- | --- | --- | --- | --- |
+| Family attack | `mob_{humano,morto,gosma,besta,insecto,voador,grande}_ataque`, −14 dB | VOLUME FIX | volumes/pitch variavam por callsite | perfil comum, pitch base da espécie + ciclo −3,5%/+2,5%/0%, cooldown 120 ms | sete famílias mantêm timbres distintos sem sequência A A A |
+| Family hurt | `mob_*_dano`, −16 dB | DUPLICATION FIX | reações consecutivas podiam saturar e competir com impacto | ciclo determinístico e cooldown 140 ms por inimigo/evento | impacto da espada fica acima da voz; reação não spamma |
+| Family death | `mob_*_morte`, −11 dB | KEEP | morte fatal precisava continuar sem hurt simultâneo | sem cooldown, mantendo prioridade sobre a reação | uma voz de morte; regressão passou |
+| Enemy block / incorporeal / wall | `bloqueio`, `fantasma`, `parede` | DUPLICATION FIX | pitch aleatório no callsite e no autoload | base fixa + uma variação central e cooldown por instância | feedback limitado sem cortar golpes legítimos |
+| Player projectile | `lancar`, −9 dB, 1,00 ±4% | KEEP | categoria energética precisava de contrato explícito | classificar como energia/magia | categoria energia validada |
+| Cuspidor projectile | antes `projetil`; agora `praga`, −13 dB, 0,90 ±3% | REPLACE | projétil orgânico soava igual ao genérico | reutilizar variante orgânica existente, cooldown 180 ms | categoria orgânica distinta validada |
+| Metal/stone/wind/fire projectiles | usos especializados dispersos | REPLACE | não há base suficiente para normalizar sem entrar em bosses/mundo | diferir inventário por boss e comportamento | Prompt 3 |
+
+### BOSS BASE E POOL
+
+| EVENT | CURRENT SFX | STATUS | PROBLEM | ACTION | RESULT |
+| --- | --- | --- | --- | --- | --- |
+| Boss base hurt | `mob_grande_dano`, −14 dB, 0,82 ±2% | MISSING | `ChefeBase` não respondia sonoramente a dano não fatal | adicionar feedback base com cooldown local 220 ms e prioridade média | dano contínuo não toca por frame |
+| Boss base death | `chefe_cai` → 450 ms → `conquista` | KEEP | não pode competir com hurt nem ser cortado por spam | hurt só no ramo não fatal; ambos com prioridade alta | morte vence sempre; regressão passou |
+| Global pool | 8 `AudioStreamPlayer` | DUPLICATION FIX | round-robin podia cortar morte/progressão por ataque normal | manter oito vozes e escolher livre ou a voz elegível mais antiga por prioridade | normal não rouba voz alta; sem refatoração grande |
+
+`Som.toca()` aceita agora variação explícita, cooldown/chave e prioridade. O RNG
+de áudio é separado e pode receber seed no harness. A política evita que spam
+normal corte eventos críticos; se as oito vozes estiverem ocupadas por eventos
+altos, um evento normal é descartado. Reservas por categoria, áudio espacial e
+voice ducking continuam fora deste passe.
+
+### Validação do Prompt 2
+
+- Godot 4.7.2 editor/import: zero erros de script/resource.
+- Renderer real OpenGL/RTX 5070, `verificar_sfx_combate.gd`: combo 1–4,
+  dash, shield activation/impact, player hurt, sete famílias, antirrepetição,
+  cooldown, fatal hit, energia/orgânico, boss hurt/death e pool: **0 falhas**.
+- Regressão `verificar_sfx_criticos.gd`: catálogo 79/79, portal, checkpoint,
+  UI básica, enemy death, boss death e player death: **0 falhas**.
+- QA jogado no N2: 23/23 streams, nenhum pedido sem stream, combo uma vez por
+  passo; pico observado do bus SFX **−3,9 dB**, com margem técnica.
+- Transição L1→L2: **0 falhas**. Boss Guardião dos Céus: **PASS**.
+- A suite geral não foi repetida: no Prompt 1 chegou a “todos os testes
+  passaram”, depois reproduziu três vezes o bug preexistente de destruição da
+  SceneTree em `run_tests.gd:3940–3983`. O runner não foi alterado.
+- Os avisos Camera2D/ObjectDB de saída continuam preexistentes e fora do scope.
+
+`HUMAN LISTEN REQUIRED` para timbre, conforto, impacto, repetição e volume
+relativo. `HUMAN PLAYTEST REQUIRED` para leitura no caos. `DEVICE VALIDATION
+REQUIRED` para mobile e Web reais.
+
 ## Próxima ação
 
-**SFX PROMPT 2 — COMBAT + PLAYER + ENEMY SOUND PASS.** Prioridade: consolidar
-ganhos/pitch de ataque-hit-hurt-shield, variantes das famílias inimigas,
-projectiles por material e boss hurt com cooldown. Depois: boss-by-boss e mundo.
+**SFX PROMPT 3 — BOSSES + WORLD + PROGRESSION SOUND PASS.** Incluir subclasses
+de boss e ataques, wind, bells, mechanisms, chest, unlock, checkpoints e
+feedback de mundo. Não iniciado.

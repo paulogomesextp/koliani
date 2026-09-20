@@ -109,18 +109,27 @@ const CAMINHOS := {
 	"mob_grande_morte": "res://assets/audio/mob_grande_morte.ogg",
 }
 const VOZES := 8
+enum Prioridade { NORMAL, MEDIA, ALTA }
 
 var _pool: Array[AudioStreamPlayer] = []
 var _idx := 0
 var _cache := {}
+var _prioridades: Array[int] = []
+var _ordem_vozes: Array[int] = []
+var _ordem := 0
+var _cooldowns := {}
+var _rng := RandomNumberGenerator.new()
 
 
 func _ready() -> void:
+	_rng.randomize()
 	for i in VOZES:
 		var p := AudioStreamPlayer.new()
 		p.bus = "SFX"  # bus criado pelo autoload Opcoes
 		add_child(p)
 		_pool.append(p)
+		_prioridades.append(Prioridade.NORMAL)
+		_ordem_vozes.append(0)
 	aquecer_tudo()
 
 
@@ -187,21 +196,66 @@ func _sortear_variante(nome: String) -> String:
 	if n < 2:
 		return nome
 	var anterior: int = _ultima_variante.get(nome, -1)
-	var i := randi() % n
+	var i := _rng.randi_range(0, n - 1)
 	if i == anterior:
-		i = (i + 1 + (randi() % (n - 1))) % n
+		i = (i + 1 + _rng.randi_range(0, n - 2)) % n
 	_ultima_variante[nome] = i
 	return nome if i == 0 else "%s_v%d" % [nome, i + 1]
 
 
-func toca(nome: String, volume_db := -6.0, pitch := 1.0) -> void:
+## Reproduz um SFX. `variacao_pitch` e' a UNICA variacao aplicada aqui; quem
+## chama passa sempre o pitch BASE. `cooldown` usa uma chave semantica, que
+## pode incluir o instance id para nao silenciar inimigos diferentes.
+##
+## A prioridade nao aumenta o pool: escolhe uma voz livre; se todas estiverem
+## ocupadas, so' substitui a voz mais antiga de prioridade igual/inferior.
+## Assim passos/projeteis nao cortam morte de player/boss.
+func toca(nome: String, volume_db := -6.0, pitch := 1.0,
+		variacao_pitch := 0.05, cooldown := 0.0, chave_cooldown := "",
+		prioridade := Prioridade.NORMAL) -> bool:
+	var agora := Time.get_ticks_msec() * 0.001
+	var chave := chave_cooldown if chave_cooldown != "" else nome
+	if cooldown > 0.0 and agora < float(_cooldowns.get(chave, 0.0)):
+		return false
 	nome = _sortear_variante(nome)
 	var st := _stream(nome)
 	if st == null:
-		return
-	var p := _pool[_idx]
-	_idx = (_idx + 1) % VOZES
+		return false
+	var i := _escolher_voz(prioridade)
+	if i < 0:
+		return false
+	var p := _pool[i]
+	_idx = (i + 1) % VOZES
 	p.stream = st
 	p.volume_db = volume_db
-	p.pitch_scale = pitch * randf_range(0.95, 1.05)
+	p.pitch_scale = pitch * (1.0 + _rng.randf_range(-variacao_pitch, variacao_pitch))
+	_prioridades[i] = prioridade
+	_ordem += 1
+	_ordem_vozes[i] = _ordem
+	if cooldown > 0.0:
+		_cooldowns[chave] = agora + cooldown
 	p.play()
+	return true
+
+
+func _escolher_voz(prioridade: int) -> int:
+	for passo in VOZES:
+		var i := (_idx + passo) % VOZES
+		if not _pool[i].playing:
+			return i
+	var melhor := -1
+	for i in VOZES:
+		if _prioridades[i] > prioridade:
+			continue
+		if melhor < 0 or _prioridades[i] < _prioridades[melhor] \
+				or (_prioridades[i] == _prioridades[melhor]
+				and _ordem_vozes[i] < _ordem_vozes[melhor]):
+			melhor = i
+	return melhor
+
+
+## Harnesses podem fixar a sequencia sem contaminar o RNG de gameplay.
+func definir_semente_teste(semente: int) -> void:
+	_rng.seed = semente
+	_ultima_variante.clear()
+	_cooldowns.clear()

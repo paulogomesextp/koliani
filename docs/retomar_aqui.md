@@ -1,3 +1,23 @@
+## SFX Overhaul — Prompt 2 player/combat/enemies (20 set 2026) · PASS técnico
+
+Branch `codex/sfx-overhaul`, base/HEAD inicial `f8e73ed`. Normalizados player,
+combate, sete famílias inimigas e duas categorias de projétil; removida a
+dupla randomização de pitch no âmbito; adicionados cooldowns semânticos,
+antirrepetição determinística, boss hurt base e prioridade leve no pool global
+de oito vozes. As correções do Prompt 1 (portal e mortes fatais) não regrediram.
+
+Godot real/OpenGL: harness de combate 0 falhas; harness crítico 79/79 e 0
+falhas; QA N2 23/23, sem stream ausente e pico SFX −3,9 dB; portal L1→L2 0
+falhas; Guardião dos Céus PASS. Suite geral não repetida: o Prompt 1 já provou
+três vezes a assinatura preexistente do runner após “todos os testes passaram”.
+Relatório: [`docs/audio/sfx_audit.md`](audio/sfx_audit.md).
+
+Fica obrigatório `HUMAN LISTEN REQUIRED`, `HUMAN PLAYTEST REQUIRED` e `DEVICE
+VALIDATION REQUIRED`. Próximo processo: **SFX Prompt 3 — bosses + world +
+progression**; não iniciar automaticamente.
+
+---
+
 ## Região III FECHADA — tecnicamente completa (20 set 2026) · PASS
 
 Branch `claude/region03-completion-pass`, integrada em `master`.

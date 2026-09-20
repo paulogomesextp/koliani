@@ -84,6 +84,7 @@ var _koliani: Node2D
 ## Fica > 0 durante um golpe forte do chefe (o contacto magoa mais).
 var _ataque_forte := 0.0
 var _ja_derrotado := false
+var _sfx_dano_cd := 0.0
 ## true assim que o combate começa (troca a música para a do chefe). Fica
 ## false num chefe recém-instanciado (após morte/recarga), por isso a
 ## música só volta a mudar quando a luta recomeça de facto.
@@ -403,6 +404,7 @@ func _encurtar_fase_exposto() -> void:
 
 func _process(dt: float) -> void:
 	super._process(dt)
+	_sfx_dano_cd = maxf(0.0, _sfx_dano_cd - dt)
 	if is_on_floor():
 		_tocou_chao = true
 	if not _arena_ok:
@@ -686,6 +688,12 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0, critico := false,
 			soltar_estilhacos()
 			queue_free()
 	else:
+		# Resposta BASE, discreta e limitada. O impacto da Shadowblade continua
+		# a ser o primeiro plano; a voz grave apenas confirma que o boss sentiu.
+		if _sfx_dano_cd <= 0.0:
+			Som.toca("mob_grande_dano", -14.0, 0.82, 0.02, 0.0, "",
+				Som.Prioridade.MEDIA)
+			_sfx_dano_cd = 0.22
 		var anim := get_node_or_null("Sprite/Anim") as AnimatedSprite2D
 		if anim and anim.sprite_frames and anim.sprite_frames.has_animation("hit"):
 			anim.play("hit")
@@ -696,9 +704,10 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0, critico := false,
 ## mesmo frame e os graves/transientes mascaravam-se. O timer vive na arvore,
 ## portanto a conquista toca mesmo depois de o chefe fazer `queue_free()`.
 func _tocar_som_derrota() -> void:
-	Som.toca("chefe_cai", -6.0)
+	Som.toca("chefe_cai", -6.0, 1.0, 0.02, 0.0, "", Som.Prioridade.ALTA)
 	get_tree().create_timer(0.45, true, false, true).timeout.connect(
-		func() -> void: Som.toca("conquista", -6.0))
+		func() -> void: Som.toca("conquista", -6.0, 1.0, 0.01, 0.0, "",
+			Som.Prioridade.ALTA))
 
 
 ## Morte dos chefes-história: congela o chefe, diz as últimas falas e só
@@ -708,9 +717,9 @@ func _cair_com_falas() -> void:
 		return
 	_fim_em_curso = true
 	set_physics_process(false)
-	Som.toca("chefe_cai", -6.0)
+	Som.toca("chefe_cai", -6.0, 1.0, 0.02, 0.0, "", Som.Prioridade.ALTA)
 	await Dialogo.correr(_com_alvo(falas_fim))
-	Som.toca("conquista", -4.0)
+	Som.toca("conquista", -6.0, 1.0, 0.01, 0.0, "", Som.Prioridade.ALTA)
 	derrotado.emit()
 	_explodir_derrotado()
 	soltar_estilhacos()

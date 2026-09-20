@@ -48,7 +48,7 @@ func _provar_portal() -> void:
 	k.global_position = Vector2(-200, 0)
 	cena.add_child(k)
 	await process_frame
-	var antes := int(_som.get("_idx"))
+	var antes := _contador()
 	entrada.call("_ao_entrar", k)
 	_verificar(_avanco(antes) == 1, "portal nao disparou exactamente uma voz")
 	_verificar(_ultimo_stream() == "transicao.wav", "portal nao usa transicao.wav")
@@ -70,7 +70,7 @@ func _provar_checkpoint() -> void:
 	checkpoint.checkpoint_id = "checkpoint_level_001_01"
 	cena.add_child(checkpoint)
 	await process_frame
-	var antes := int(_som.get("_idx"))
+	var antes := _contador()
 	checkpoint.call("_ao_entrar", k)
 	_verificar(_avanco(antes) == 1, "checkpoint nao disparou exactamente uma voz")
 	_verificar(_ultimo_stream() == "selo.wav", "checkpoint usa stream errado")
@@ -88,11 +88,11 @@ func _provar_ui() -> void:
 	cena.add_child(menu)
 	await process_frame
 	var opcoes: Button = menu.get("_botoes").get("opcoes")
-	var antes := int(_som.get("_idx"))
+	var antes := _contador()
 	opcoes.focus_entered.emit()
 	_verificar(_avanco(antes) == 1 and _ultimo_stream().begins_with("ui_mover"),
 		"movimento de UI nao disparou uma voz ui_mover")
-	antes = int(_som.get("_idx"))
+	antes = _contador()
 	opcoes.pressed.emit()
 	_verificar(_avanco(antes) == 1 and _ultimo_stream() == "ui_confirmar.wav",
 		"confirmacao de UI nao disparou uma voz ui_confirmar")
@@ -111,7 +111,7 @@ func _provar_morte_koliani() -> void:
 	await process_frame
 	k.vida = 1
 	k._invulneravel = 0.0
-	var antes := int(_som.get("_idx"))
+	var antes := _contador()
 	k.call("receber_dano", 1)
 	_verificar(_avanco(antes) == 1, "morte da Koliani empilhou dano+morte")
 	_verificar(_ultimo_stream() == "morte_koliani.wav", "morte da Koliani usa stream errado")
@@ -129,7 +129,7 @@ func _provar_morte_inimigo() -> void:
 	cena.add_child(inimigo)
 	await process_frame
 	inimigo.vida = 1
-	var antes := int(_som.get("_idx"))
+	var antes := _contador()
 	inimigo.call("receber_dano", 1)
 	_verificar(_avanco(antes) == 1, "morte do inimigo empilhou dano+morte")
 	_verificar(_ultimo_stream().ends_with("_morte.ogg"), "morte do inimigo usa stream errado")
@@ -146,7 +146,7 @@ func _provar_derrota_chefe() -> void:
 	var chefe = load("res://scenes/actors/ChefeGhorak.tscn").instantiate()
 	cena.add_child(chefe)
 	await process_frame
-	var antes := int(_som.get("_idx"))
+	var antes := _contador()
 	chefe.call("_tocar_som_derrota")
 	_verificar(_avanco(antes) == 1, "chefe_cai e conquista ainda arrancam juntos")
 	_verificar(_ultimo_stream() == "chefe_cai.wav", "queda do chefe usa stream errado")
@@ -160,7 +160,11 @@ func _provar_derrota_chefe() -> void:
 
 
 func _avanco(antes: int) -> int:
-	return posmod(int(_som.get("_idx")) - antes, int(_som.VOZES))
+	return _contador() - antes
+
+
+func _contador() -> int:
+	return int(_som.get("_ordem"))
 
 
 func _ultimo_stream() -> String:
