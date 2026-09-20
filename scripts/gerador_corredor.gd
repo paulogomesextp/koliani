@@ -465,45 +465,83 @@ const MECANICA_DO_NIVEL := [
 ]
 
 
-## DESBLOQUEIO FIXO -- e porque e' que isto teve de existir.
+## APRESENTACAO vs DESBLOQUEIO -- e porque e' que tiveram de se separar.
 ##
-## A `MECANICA_DO_NIVEL` fazia DUAS coisas ao mesmo tempo: dizia que mecanica
-## cada nivel APRESENTA, e -- por ser a primeira ocorrencia -- decidia a
-## partir de que nivel cada camara fica DISPONIVEL em todas as regioes. Com
-## as duas presas uma a` outra, dar aos cinco niveis da Torre dos Ecos as
-## mecanicas do canone mexia no calendario de desbloqueio de regioes que
-## nada tem a ver com isto: a melhor permutacao possivel ainda reconstruia
-## dez niveis das Regioes VI e VIII.
+## A `MECANICA_DO_NIVEL` fazia DUAS coisas ao mesmo tempo:
+##   1. dizia que mecanica cada nivel APRESENTA (o aviso de tutorial);
+##   2. por ser a primeira ocorrencia, decidia a partir de que nivel cada
+##      camara fica DISPONIVEL -- em TODAS as regioes.
 ##
-## A `gravidade` e' o caso que sobra. Apresentava-se no N14 (que era o
-## "Observatorio Lunar" e passou a "Campanario"), mas continua na pool das
-## Regioes VI, VIII, XIII, XIV, XVI e XVIII -- e se o desbloqueio dela
-## escorregasse, esses niveis mudavam de forma. Fica presa no 13, que e'
-## onde sempre esteve.
+## Presas uma a` outra, dar aos cinco niveis da Torre dos Ecos as mecanicas
+## do canone reescrevia o tracado de niveis que nada tem a ver com isto. E
+## nao era por consumo de sorteios: era a POOL a mudar de conteudo. O
+## `_pool_permitida()` filtra pelo desbloqueio E duplica o peso de uma
+## camara nos 8 niveis a seguir -- por isso antecipar o `elevador` de 15
+## para 11 tirava o peso dobrado ao nivel 20, que passava a sortear outra
+## coisa e a construir outra geometria. Medido: 12 niveis (20, 41-45, 51,
+## 56-60) mudavam de forma.
 ##
-## O PRECO, dito sem rodeios: a `gravidade` deixa de ter nivel onde seja
-## APRESENTADA ao jogador (continua a aparecer, so' nao leva o aviso de
-## estreia). E' o unico custo de nao reconstruir dez niveis de outras
-## regioes, e esta' anotado no PRIORIDADES.md para o Paulo decidir.
-const DESBLOQUEIO_FIXO := {
+## Agora sao duas coisas separadas:
+##   - APRESENTACAO  = posicao na `MECANICA_DO_NIVEL`. So' controla o aviso.
+##   - DESBLOQUEIO   = `DESBLOQUEIO_BASE`, com antecipacao LOCAL por regiao.
+##
+## Mexer no que um nivel apresenta deixou de poder mexer na geometria de
+## ninguem.
+
+## Calendario GLOBAL de desbloqueio, CONGELADO nos valores historicos. So'
+## precisa de entrada quem se apresenta noutro sitio que nao o seu
+## desbloqueio -- para os outros, a posicao na tabela serve.
+const DESBLOQUEIO_BASE := {
+	# a Torre dos Ecos reclamou estes slots de apresentacao; o calendario
+	# GLOBAL deles fica onde sempre esteve, senao mudava o resto do jogo
+	"vento": 11,
+	"elevador": 15,
+	"espectral": 43,
+	"engrenagens": 55,
+	# estas perderam o slot de apresentacao para o canone da Regiao III
+	# (era o "Observatorio Lunar" e a "Torre da Tempestade"). Continuam a
+	# aparecer no jogo, no mesmo calendario; o que perderam foi o aviso.
 	"serras": 12,
 	"gravidade": 13,
+	"torre": 14,
 }
 
-## Nível (0-based) em que cada câmara fica DISPONÍVEL. Derivado da tabela,
-## uma vez, com o `DESBLOQUEIO_FIXO` por cima.
-## Uma câmara que não esteja na tabela (poço/descanso e as `TIER_EXTRA`,
-## que são escolhidas por outros ramos) devolve 0 -- sempre disponível.
+## ANTECIPACAO LOCAL. A Regiao III precisa destas mais cedo porque o canone
+## lhas da' (contrato §2: elevador de coluna no N12, rodas de engrenagem no
+## N13, plataformas ilusorias no N15). Vale SO' dentro da regiao -- e' isso
+## que permite a Torre dos Ecos ter as suas mecanicas sem tocar em ninguem.
+const DESBLOQUEIO_REGIAO := {
+	2: {"elevador": 10, "engrenagens": 10, "espectral": 10},
+}
+
 static var _estreia_cache: Dictionary = {}
 
-static func nivel_de_estreia(cam: String) -> int:
+## Primeira posição na `MECANICA_DO_NIVEL` -- é o que decide o AVISO.
+static func nivel_de_apresentacao(cam: String) -> int:
 	if _estreia_cache.is_empty():
 		for i in MECANICA_DO_NIVEL.size():
 			var c: String = MECANICA_DO_NIVEL[i]["cam"]
 			if not _estreia_cache.has(c):
 				_estreia_cache[c] = i
-		_estreia_cache.merge(DESBLOQUEIO_FIXO, true)
-	return int(_estreia_cache.get(cam, 0))
+	return int(_estreia_cache.get(cam, -1))
+
+
+## Nível a partir do qual a câmara pode APARECER. `regiao` < 0 = o
+## calendário global; caso contrário aplica-se a antecipação local.
+static func nivel_de_desbloqueio(cam: String, regiao := -1) -> int:
+	if regiao >= 0:
+		var loc: Dictionary = DESBLOQUEIO_REGIAO.get(regiao, {})
+		if loc.has(cam):
+			return int(loc[cam])
+	if DESBLOQUEIO_BASE.has(cam):
+		return int(DESBLOQUEIO_BASE[cam])
+	var a := nivel_de_apresentacao(cam)
+	return a if a >= 0 else 0
+
+
+## Mantida para quem já a chamava. É o calendário GLOBAL.
+static func nivel_de_estreia(cam: String) -> int:
+	return nivel_de_desbloqueio(cam)
 
 
 ## A câmara que ESTREIA neste nível (0-based), ou "" se o nível repete uma
@@ -514,7 +552,7 @@ static func estreia_do_nivel(indice: int) -> String:
 	if indice < 0 or indice >= MECANICA_DO_NIVEL.size():
 		return ""
 	var cam: String = MECANICA_DO_NIVEL[indice]["cam"]
-	return cam if nivel_de_estreia(cam) == indice else ""
+	return cam if nivel_de_apresentacao(cam) == indice else ""
 
 
 ## Câmaras que não vivem na pool de nenhuma região (são escolhidas por outro
@@ -1227,7 +1265,7 @@ func _construir() -> void:
 				f = _escolher_tom_novo(pool)
 				_pos_intenso = true
 			elif prog >= 0.28 and prog <= 0.82 and sig != "" \
-					and nivel_de_estreia(sig) <= _idx \
+					and nivel_de_desbloqueio(sig, _regiao) <= _idx \
 					and _rng.randf() < 0.3:
 				f = sig                 # ACTO 2: a assinatura do bioma
 				_pos_intenso = sig in ["guilhotinas", "fogo"]
@@ -1337,7 +1375,7 @@ func _pool_permitida() -> Array:
 	var base: Array = POOL_REGIAO.get(_regiao, POOL_REGIAO[0])
 	var out: Array = []
 	for f: String in base:
-		var e := nivel_de_estreia(f)
+		var e := nivel_de_desbloqueio(f, _regiao)
 		if e > _idx:
 			continue          # ainda não estreou -- não pode aparecer
 		out.append(f)
@@ -3975,7 +4013,7 @@ func _f_revisao(par: Node2D, x: float, y: float) -> Vector2:
 	for i in 4:
 		var opc: Array[String] = []
 		for c in REVER:
-			if nivel_de_estreia(c) <= _idx and not (c in vistas):
+			if nivel_de_desbloqueio(c, _regiao) <= _idx and not (c in vistas):
 				opc.append(c)
 		if opc.is_empty():
 			break

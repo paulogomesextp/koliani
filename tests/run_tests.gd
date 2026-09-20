@@ -135,6 +135,7 @@ func _correr_tudo() -> void:
 	teste_regioes_tem_nome_e_cor()
 	teste_pecas_de_ui_existem()
 	teste_mecanica_por_nivel()
+	teste_desbloqueio_nao_segue_a_apresentacao()
 	teste_paineis_nao_trazem_o_vizinho()
 	teste_sala_labirinto_deterministica()
 	teste_9h1_trilha_de_producao()
@@ -1243,6 +1244,66 @@ func teste_tutorial_mecanica_tem_texto() -> void:
 	_ok(g.estreia_do_nivel(-1) == "", "estreia_do_nivel(-1) devia dar \"\"")
 	_ok(g.estreia_do_nivel(cams.size()) == "",
 		"estreia_do_nivel(fora da tabela) devia dar \"\"")
+
+
+## GATE 1 -- APRESENTAR UMA MECANICA NAO PODE MEXER NA GEOMETRIA DE NINGUEM.
+##
+## O que aconteceu, para nao voltar a acontecer: a `MECANICA_DO_NIVEL` fazia
+## duas coisas ao mesmo tempo. Dizia que mecanica cada nivel APRESENTA e,
+## por ser a primeira ocorrencia, decidia a partir de quando cada camara
+## fica DISPONIVEL em TODAS as regioes. Dar a` Torre dos Ecos o `elevador`
+## no N12 antecipava o desbloqueio de 15 para 11 -- e como o
+## `_pool_permitida()` DUPLICA o peso de uma camara nos 8 niveis a seguir ao
+## desbloqueio, o nivel 20 deixava de ter o elevador a pesar a dobrar,
+## sorteava outra coisa e construia outra geometria. Doze niveis (20, 41-45,
+## 51, 56-60) mudaram de forma sem ninguem ter pedido.
+##
+## Nao era consumo de sorteios -- era o CONTEUDO da pool. Por isso a
+## correccao nao e' um `RandomNumberGenerator` a mais: e' separar as duas
+## responsabilidades. A apresentacao vive na tabela; o desbloqueio vive no
+## `DESBLOQUEIO_BASE` (calendario global, congelado) com antecipacao LOCAL
+## por regiao no `DESBLOQUEIO_REGIAO`.
+##
+## Este teste falha com o comportamento antigo: la', `nivel_de_estreia`
+## devolvia a posicao na tabela, portanto o `elevador` daria 11 e nao 15.
+func teste_desbloqueio_nao_segue_a_apresentacao() -> void:
+	var g := GeradorCorredor
+	# calendario HISTORICO (o que o master publica). Congelado a` mao: e' o
+	# contrato com as outras 19 regioes.
+	var historico := {
+		"sinos": 10, "vento": 11, "serras": 12, "gravidade": 13,
+		"torre": 14, "elevador": 15, "espectral": 43, "engrenagens": 55,
+	}
+	for cam: String in historico:
+		_ok(g.nivel_de_desbloqueio(cam) == int(historico[cam]),
+			"GATE1: `%s` desbloqueia globalmente no %d, devia ser no %d"
+			% [cam, g.nivel_de_desbloqueio(cam), historico[cam]])
+
+	# a antecipacao da Regiao III e' LOCAL: mais nenhuma regiao a ve'
+	for r in 20:
+		if r == 2:
+			continue
+		for cam: String in ["elevador", "engrenagens", "espectral"]:
+			_ok(g.nivel_de_desbloqueio(cam, r) == g.nivel_de_desbloqueio(cam),
+				"GATE1: a regiao %d ve' `%s` a desbloquear no %d em vez do"
+				% [r + 1, cam, g.nivel_de_desbloqueio(cam, r)]
+				+ " calendario global (%d)" % g.nivel_de_desbloqueio(cam))
+
+	# e dentro da Regiao III elas TE'M mesmo de estar disponiveis, senao o
+	# canone (elevador no N12, engrenagens no N13, ilusorias no N15) nao
+	# chega a acontecer
+	for par in [["elevador", 11], ["engrenagens", 12], ["espectral", 14]]:
+		var cam: String = par[0]
+		var nivel: int = par[1]
+		_ok(g.nivel_de_desbloqueio(cam, 2) <= nivel,
+			"GATE1: `%s` nao esta' disponivel no nivel %d da Torre dos Ecos"
+			% [cam, nivel + 1])
+
+	# a apresentacao E' a posicao na tabela, e e' outra coisa
+	_ok(g.nivel_de_apresentacao("elevador") == 11,
+		"GATE1: o `elevador` devia APRESENTAR-SE no N12")
+	_ok(g.nivel_de_apresentacao("elevador") != g.nivel_de_desbloqueio("elevador"),
+		"GATE1: apresentacao e desbloqueio voltaram a ser a mesma coisa")
 
 
 ## Os ids que as cenas de nível usam (Porta.pista_ao_atravessar e
@@ -2534,33 +2595,45 @@ func teste_mecanica_por_nivel() -> void:
 	# -- e' por isso que o teste a le' do codigo em vez de a aceitar em
 	# silencio, e falha se alguem la' despejar camaras para calar o teste.
 	var estreadas: Dictionary = {}
-	for c in mec:
-		estreadas[c] = true
+	var estreadas_em: Dictionary = {}
+	for k in mec.size():
+		estreadas[mec[k]] = true
+		if not estreadas_em.has(mec[k]):
+			estreadas_em[mec[k]] = k
 	# le'-se do CODIGO-FONTE, como o resto deste teste
 	var fixas: Array[String] = []
-	var j := src.find("const DESBLOQUEIO_FIXO :=")
-	_ok(j >= 0, "falta a const DESBLOQUEIO_FIXO")
+	var fixas_niveis: Dictionary = {}
+	var j := src.find("const DESBLOQUEIO_BASE :=")
+	_ok(j >= 0, "falta a const DESBLOQUEIO_BASE")
 	if j >= 0:
 		var bf := src.substr(j, src.find("\n}", j) - j)
 		for linha in bf.split("\n"):
 			var l := linha.strip_edges()
 			if not l.begins_with("\""):
 				continue
-			fixas.append(l.substr(1, l.find("\"", 1) - 1))
-	_ok(fixas.size() <= 3,
-		"DESBLOQUEIO_FIXO tem %d entradas: e' uma excepcao, nao uma gaveta"
-			% fixas.size())
+			var nome := l.substr(1, l.find("\"", 1) - 1)
+			fixas.append(nome)
+			var dp := l.find(":")
+			fixas_niveis[nome] = int(l.substr(dp + 1).strip_edges()
+				.trim_suffix(",").strip_edges())
+	_ok(fixas.size() <= 10,
+		"DESBLOQUEIO_BASE tem %d entradas: e' o calendario congelado das"
+			% fixas.size() + " que mudaram de lugar, nao uma gaveta")
 	for c: String in cams:
 		if c == "descanso":
 			continue
-		_ok(estreadas.has(c) or fixas.has(c),
+		_ok(estreadas.has(c) or c in fixas,
 			"a camara '%s' existe mas nunca aparece em nivel nenhum" % c)
 	for c: String in fixas:
 		_ok(c in cams,
 			"DESBLOQUEIO_FIXO prende '%s', que nem sequer existe" % c)
-		_ok(not estreadas.has(c),
-			"'%s' esta' no DESBLOQUEIO_FIXO e TAMBEM e' apresentada num" % c
-			+ " nivel -- uma das duas esta' a mais")
+		# uma camara PODE estar nas duas: o `DESBLOQUEIO_BASE` congela o
+		# calendario GLOBAL de quem se apresenta noutro sitio. O que nao
+		# pode e' apresentar-se no mesmo nivel em que desbloqueia -- ai' a
+		# entrada nao serve para nada.
+		_ok(fixas_niveis.get(c, -1) != estreadas_em.get(c, -2),
+			"'%s' no DESBLOQUEIO_BASE prende o nivel onde ja' se apresenta"
+			% c + " -- a entrada esta' a mais")
 
 	# e os primeiros 32 niveis estreiam 32 coisas diferentes: sem isto o
 	# jogo voltava a abrir tudo de uma vez logo no inicio
