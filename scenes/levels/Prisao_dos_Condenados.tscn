@@ -59,6 +59,7 @@ fundo_pack = "desfiladeiro"
 tinta_fundo = Color(0.88, 0.8, 1.14, 1)
 neblina_fundo = 0.3
 dessaturar_fundo = 0.32
+perfil_altitude = "n06"
 seed_ambiente = 1185
 
 [node name="Casca" parent="." instance=ExtResource("10_casca")]

@@ -73,6 +73,7 @@ fundo_pack = "desfiladeiro"
 tinta_fundo = Color(0.94, 0.88, 1.18, 1)
 neblina_fundo = 0.2
 dessaturar_fundo = 0.24
+perfil_altitude = "n08"
 seed_ambiente = 1259
 
 ; Planar contextual em TODO o percurso (inclui as fogueiras: reaparecer ja' plana).
