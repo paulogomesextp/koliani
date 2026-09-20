@@ -1,5 +1,18 @@
 ## Estado (20 set 2026)
 
+**Região III — TECNICAMENTE COMPLETA.** Super-Process B fechado em PASS e
+integrado em `master` (v0.18.19). Zero alterações de geometria fora da
+região, auditoria eixo a eixo sem nenhum LOW, legibilidade corrigida com
+medição. Detalhe em
+`docs/implementation/region_03_final_closure.md`.
+
+Próximo passo: **playtest humano da Região III**. Não iniciar a Região IV
+antes disso.
+
+---
+
+## Estado (20 set 2026)
+
 Região III — continuação do Super-Process B: **PARTIAL**, na branch
 `claude/region03-completion-pass`. Arquitetura de primeiro plano e props
 saíram de LOW; mecânicas canónicas implementadas nos cinco níveis; Vyrak

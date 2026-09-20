@@ -1,3 +1,54 @@
+## Região III FECHADA — tecnicamente completa (20 set 2026) · PASS
+
+Branch `claude/region03-completion-pass`, integrada em `master`.
+Relatório: [`region_03_final_closure.md`](implementation/region_03_final_closure.md).
+Auditoria por eixo: [`AUDITORIA_EIXOS.md`](playtests/region_03_visual_evidence/AUDITORIA_EIXOS.md).
+Versão **0.18.19**.
+
+**O número que interessa:** verificação global dos 100 níveis, "antes"
+com o gerador do `master` e "depois" com este HEAD —
+**95 iguais, 5 mudados, e os 5 são exactamente os N11-N15**. Alterações
+fora da Região III: **zero**. Bateria de 21 (suite, Vyrak, Região II,
+sessão, save, progressão, movimento, 9 verificadores do CI, spawn): 0 falhas.
+
+**QUATRO ARMADILHAS, e são o que vale a pena guardar:**
+
+1. **O `cam` da `MECANICA_DO_NIVEL` não é só o aviso de tutorial** — é a
+   câmara-assinatura que o gerador FORÇA na jornada desse nível, e o
+   `grau` diz quantas vezes (`1 + grau`). Dar o slot do N16 a outra coisa
+   mudou-lhe 832 linhas de geometria; perder um `grau: 1` na linha 55
+   mudou 848 no N56.
+2. **Comparar só QUE câmaras estão disponíveis mente.** O
+   `_pool_permitida()` duplica o peso de uma câmara nos 8 níveis a seguir
+   ao desbloqueio. O modelo tem de ser o **multiconjunto pesado** — o meu
+   modelo sem isso disse "zero afectados" e a medição deu 90/10.
+3. **`nivel_de_estreia()` devolvia 0 para uma câmara fora da tabela.**
+   Tirar `serras` do sítio onde estreava pô-la disponível desde o nível 1:
+   a Floresta ganhou salas de serra e o `spawn_livre` acusou "respawn não
+   permite salto (8 px)", risco de softlock.
+4. **A `PlataformaRitmada` usa `Time.get_ticks_msec()`** — relógio de
+   PAREDE, que o `Engine.time_scale = 0` não congela. A minha baseline
+   acusava regressões que mudavam de plataforma a cada corrida. Era da
+   ferramenta, não do jogo.
+
+E uma de método: uma suite de 25 min (normal ~8) não eram as luzes novas
+— era **contenção de CPU** com o batch dos 100 níveis a correr em
+paralelo. Medido depois: as luzes de props são 15-23 por nível, ~20% do
+total. Medir antes de concluir.
+
+**A arquitetura que fechou isto:** apresentação e desbloqueio deixaram de
+ser a mesma coisa. `nivel_de_apresentacao()` (posição na tabela, só o
+aviso) vs `nivel_de_desbloqueio()` (`DESBLOQUEIO_BASE` global congelado +
+`DESBLOQUEIO_REGIAO` local). A Torre dos Ecos antecipa elevador,
+engrenagens e plataformas ilusórias só para si.
+
+**Fica para playtest humano:** a queda punitiva do N15 (não foi tocada,
+por decisão), e os eixos que ficaram em MEDIUM — midground, densidade
+visual e composição, porque a prancha tem arcadas densas e a jornada é
+procedural.
+
+---
+
 ## Região III — continuação do Super-Process B (20 set 2026) · PARTIAL
 
 Branch `claude/region03-completion-pass`, de `3c1ca794` (LOCAL == REMOTE

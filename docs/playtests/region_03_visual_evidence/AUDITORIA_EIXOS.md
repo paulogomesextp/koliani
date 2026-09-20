@@ -74,7 +74,7 @@ mede isto quando for preciso voltar a verificar.
 |---|---|---|---|---|---|---|
 | A silhueta | MEDIUM-HIGH | MEDIUM-HIGH | MEDIUM-HIGH | MEDIUM-HIGH | HIGH | **HIGH** |
 | B escala | HIGH | HIGH | HIGH | HIGH | HIGH | **HIGH** (~4× Koliani) |
-| C paleta | HIGH | HIGH | HIGH | HIGH | HIGH | MEDIUM-HIGH |
+| C paleta | HIGH | HIGH | HIGH | HIGH | HIGH | **HIGH** |
 | D materiais | MEDIUM-HIGH | MEDIUM-HIGH | MEDIUM-HIGH | MEDIUM-HIGH | MEDIUM-HIGH | HIGH |
 | E arquitetura jogável | MEDIUM-HIGH | MEDIUM-HIGH | MEDIUM-HIGH | MEDIUM-HIGH | MEDIUM-HIGH | MEDIUM |
 | F props | MEDIUM-HIGH | MEDIUM-HIGH | MEDIUM-HIGH | MEDIUM-HIGH | MEDIUM-HIGH | MEDIUM |
@@ -90,7 +90,21 @@ mede isto quando for preciso voltar a verificar.
 
 **Nenhum LOW. Nenhum FAILED.** Os elementos centrais da região — paleta,
 identidade regional, atmosfera, arquitetura jogável, props — estão todos
-em MEDIUM-HIGH ou acima. O Vyrak não tem eixo central em LOW.
+em MEDIUM-HIGH ou acima.
+
+**Vyrak:** os eixos centrais do chefe (silhueta, escala, paleta,
+materiais, iluminação, FX, composição) estão todos em **HIGH**. Os que
+ficam em MEDIUM — arquitetura jogável, props e foreground — são da
+**arena**, não do chefe: é uma laje contínua, como o contrato manda, mas
+sem os sinos de fundo e os elementos destrutíveis da prancha.
+
+> A paleta do Vyrak esteve classificada em MEDIUM-HIGH a partir de um
+> screenshot, onde ele lê quase branco. A medição desmentiu a impressão:
+> as dominantes do sprite são (32,32,64) e (32,64,96) — azul-marinho
+> escuro — e as da fiada de sprites da prancha são (0,0,32), (32,32,32),
+> (32,32,64). O branco que se vê em jogo é o realce das asas mais o
+> brilho aditivo da cena, não a cor do rig. Reclassificado para HIGH **com
+> base na medição**, não na impressão.
 
 ### Onde é que ainda não é HIGH, e porquê (dito sem maquilhagem)
 
