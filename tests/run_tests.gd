@@ -145,6 +145,7 @@ func _correr_tudo() -> void:
 
 	# --- Região III -- Torre dos Ecos (N11-N15) -----------------------
 	teste_r3_nomes_canonicos()
+	teste_r3_vyrak_sem_lore_de_dragao()
 	teste_r3_um_so_chefe_na_regiao()
 	teste_r3_fundo_proprio_da_torre()
 	teste_r3_assinatura_e_de_sinos()
@@ -3714,6 +3715,41 @@ func teste_r3_nomes_canonicos() -> void:
 		_ok(d.size() == base.size(),
 			"R3: %s.json tem %d chaves, o en.json tem %d" % [
 				lang, d.size(), base.size()])
+
+
+## O NOME do chefe ja' estava tratado; o que o jogador LE' a` volta dele nao
+## estava. A pista do pico contava o Vyrak como dragao ("uma escama caida...
+## o dragao deitou-se e deixou-a passar-lhe pelo pescoco") e o equipamento
+## chamava-se Escamas e Presa -- anatomia de dragao, nas seis linguas. Nada
+## disso e' o guardiao de sinos da prancha aprovada.
+##
+## As CHAVES continuam a chamar-se `...escama...` e `...presa...` de
+## proposito: mudar a chave partia o `equipamento.gd` (que guarda o `id`
+## separado) e os saves. O que conta e' o que se le' no ecra.
+func teste_r3_vyrak_sem_lore_de_dragao() -> void:
+	var proibidas := ["dragon", "dragão", "dragao", "dragón", "drache",
+		"scale", "escama", "écaille", "schuppe", "fang", "presa", "croc",
+		"reißzahn", "巨龙", "龙", "鳞"]
+	var chaves := ["boss.vyrak", "clue.pico_escama_de_vyrak.title",
+		"clue.pico_escama_de_vyrak.body", "gear.w.presa_de_vyrak",
+		"gear.a.escamas_de_vyrak"]
+	for lang: String in ["en", "pt", "es", "fr", "de", "zh"]:
+		var d: Dictionary = _json_de("res://assets/i18n/%s.json" % lang)
+		for chave: String in chaves:
+			var texto := String(d.get(chave, "")).to_lower()
+			_ok(not texto.is_empty(),
+				"R3: `%s` vazio no %s.json" % [chave, lang])
+			for palavra: String in proibidas:
+				_ok(not texto.contains(palavra),
+					"R3: `%s` no %s.json ainda apresenta o Vyrak como dragao"
+					% [chave, lang] + " (encontrado: \"%s\")" % palavra)
+	# E o nome tem de estar MESMO traduzido: as quatro linguas de fora do
+	# en/pt ficaram com a string inglesa quando o chefe foi renomeado.
+	var en2: Dictionary = _json_de("res://assets/i18n/en.json")
+	for lang: String in ["pt", "es", "fr", "de", "zh"]:
+		var d: Dictionary = _json_de("res://assets/i18n/%s.json" % lang)
+		_ok(String(d.get("boss.vyrak", "")) != String(en2.get("boss.vyrak", "")),
+			"R3: `boss.vyrak` no %s.json ficou por traduzir" % lang)
 
 
 func teste_r3_um_so_chefe_na_regiao() -> void:
