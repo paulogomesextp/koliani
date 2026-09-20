@@ -80,6 +80,53 @@ const CHAO := 900.0  # base das silhuetas, bem abaixo do chão jogável
 
 const BG_DIR := "res://assets/sprites/pixel/backgrounds"
 const SHADER_FUNDO := preload("res://assets/shaders/fundo_bioma.gdshader")
+const ARQ_R2_DIR := "res://assets/sprites/pixel/arquitetura/desfiladeiro"
+const DECO_R2_DIR := "res://assets/sprites/pixel/deco/desfiladeiro"
+
+## Arquitectura authored da Regiao II. Formato de cada peca:
+## [caminho, x, base_y, altura_aparente, z_index, espelhar].
+##
+## O gerador de jornada planta o vocabulario comum ao longo do percurso; esta
+## tabela trata as salas feitas a mao e, sobretudo, o LANDMARK unico de cada
+## nivel. Tudo fica em z=-1 (lua em -2), sem corpo nem colisao.
+const ARQUITETURA_ALTITUDE := {
+	"n06": [
+		[ARQ_R2_DIR + "/ponte_monumental.png", 1900.0, 560.0, 230.0, -1, false],
+		[DECO_R2_DIR + "/arco.png", 520.0, 540.0, 260.0, -1, false],
+		[DECO_R2_DIR + "/coluna.png", 1060.0, 540.0, 250.0, -1, true],
+		[DECO_R2_DIR + "/balaustrada.png", 2820.0, 540.0, 190.0, -1, false],
+	],
+	"n07": [
+		# A sala authored e' fechada pela Casca; o landmark vive na jornada
+		# aberta, onde a fractura se recorta contra o ceu.
+		[ARQ_R2_DIR + "/torre_partida.png", -4500.0, 520.0, 430.0, -1, false],
+		[DECO_R2_DIR + "/arco.png", 420.0, 500.0, 270.0, -1, true],
+		[DECO_R2_DIR + "/coluna.png", 1040.0, 500.0, 270.0, -1, false],
+		[DECO_R2_DIR + "/janela.png", 2510.0, 500.0, 250.0, -1, false],
+		[DECO_R2_DIR + "/arco.png", 3090.0, 500.0, 270.0, -1, false],
+	],
+	"n08": [
+		# No x=3570 a massa rochosa tapava-a por inteiro. Aqui cai no vao
+		# entre duas ilhas, sem lhes acrescentar colisao.
+		[ARQ_R2_DIR + "/queda_agua.png", 1500.0, 920.0, 500.0, -1, false],
+		[DECO_R2_DIR + "/arco.png", 430.0, 710.0, 250.0, -1, false],
+		[DECO_R2_DIR + "/coluna.png", 2050.0, 800.0, 270.0, -1, true],
+		[DECO_R2_DIR + "/arco.png", 4280.0, 700.0, 260.0, -1, true],
+		[DECO_R2_DIR + "/balaustrada.png", 5300.0, 810.0, 190.0, -1, false],
+	],
+	"n09": [
+		[ARQ_R2_DIR + "/altar_ruinas.png", 2220.0, 540.0, 200.0, -1, false],
+		[DECO_R2_DIR + "/arco.png", 460.0, 530.0, 270.0, -1, false],
+		[DECO_R2_DIR + "/coluna.png", 1110.0, 530.0, 260.0, -1, true],
+		[DECO_R2_DIR + "/janela.png", 2820.0, 530.0, 250.0, -1, false],
+	],
+	"n10": [
+		[ARQ_R2_DIR + "/lua_sangue.png", 1090.0, 350.0, 230.0, -2, false],
+		[ARQ_R2_DIR + "/torre_ceus.png", 850.0, 730.0, 430.0, -1, false],
+		[DECO_R2_DIR + "/arco.png", 260.0, 880.0, 280.0, -1, true],
+		[DECO_R2_DIR + "/coluna.png", 1320.0, 880.0, 280.0, -1, false],
+	],
+}
 
 ## Packs de fundo pixel-art (Ansimuz, CC0). Cada entrada:
 ##   [ficheiro, camada_parallax, y_da_base(px), escala]
@@ -447,7 +494,8 @@ func _limpar_gerado() -> void:
 	# seus sprites levam meta "gerado", portanto sem isto acumulavam-se a
 	# cada nova geracao do parallax (um banco de nuvens por cima do outro).
 	for caminho in ["Parallax/Fundo", "Parallax/Longe", "Parallax/Meio",
-			"Parallax/MarBaixo", "Parallax/Perto", "Parallax/PropsRegiao"]:
+			"Parallax/MarBaixo", "Parallax/Perto", "Parallax/PropsRegiao",
+			"ArquiteturaAltitude"]:
 		var layer := get_node_or_null(caminho) as Node2D
 		if layer == null:
 			continue
@@ -460,6 +508,7 @@ func _gerar_parallax() -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = hash("%d|%s" % [seed_ambiente, bioma])
 	_limpar_gerado()
+	_arquitetura_altitude()
 
 	# pack pixel-art: camadas reais em vez das silhuetas geradas
 	if fundo_pack != "" and PACKS.has(fundo_pack):
@@ -508,6 +557,37 @@ func _gerar_parallax() -> void:
 
 	if luzes_horizonte:
 		_brilho_horizonte(rng)
+
+
+## LANDMARKS e arquitectura proxima das salas authored da Regiao II.
+## Um RNG proprio nem sequer e' necessario: as posicoes sao deliberadas e
+## fixas para cada composicao. O no pode ser reconstruido quando a jornada
+## alarga a Atmosfera sem acumular sprites, porque todos levam meta `gerado`.
+func _arquitetura_altitude() -> void:
+	if not ARQUITETURA_ALTITUDE.has(perfil_altitude):
+		return
+	var camada := get_node_or_null("ArquiteturaAltitude") as Node2D
+	if camada == null:
+		camada = Node2D.new()
+		camada.name = "ArquiteturaAltitude"
+		add_child(camada)
+	for item: Array in ARQUITETURA_ALTITUDE[perfil_altitude]:
+		var caminho: String = item[0]
+		var tex: Texture2D = load(caminho) if ResourceLoader.exists(caminho) else null
+		if tex == null:
+			continue
+		var altura: float = float(item[3])
+		var esc: float = altura / maxf(1.0, float(tex.get_height()))
+		var s := Sprite2D.new()
+		s.name = caminho.get_file().get_basename()
+		s.texture = tex
+		s.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		s.scale = Vector2(-esc if bool(item[5]) else esc, esc)
+		s.position = Vector2(float(item[1]), float(item[2]) - altura * 0.5)
+		s.z_index = int(item[4])
+		s.modulate = Color(0.92, 0.88, 1.04, 0.96)
+		s.set_meta("gerado", true)
+		camada.add_child(s)
 
 
 ## Fundo do "céu" (gradiente vertical) fixo relativamente à CÂMARA (não ao

@@ -1,3 +1,32 @@
+## Região II — remodel total · Prompt 3 fechado (20 set 2026) · PASS técnico
+
+Branch `claude/region02-total-remodel`, partida de `5588b04d`. Relatório:
+[`region_02_total_remodel.md`](implementation/region_02_total_remodel.md).
+Evidência:
+[`prompt_03_architecture/`](playtests/region_02_total_remodel/prompt_03_architecture/).
+**NÃO integrar em `master`**: a Região II ainda não terminou.
+
+N06–N10 receberam arquitetura próxima e cinco landmarks exclusivos: ponte
+monumental, torre partida, queda de água, altar em ruínas e Torre dos Céus com
+lua de sangue. Tudo é visual (`Sprite2D`, `z < 0`, sem colisão). Os assets têm
+fontes preservadas e gerador reproduzível em
+`tools/gerar_arquitetura_regiao02.py`.
+
+Prova: baseline funcional global **100/100 idêntica**; verificador da
+arquitetura **5/5**; onze guardas dirigidas **11/11**; import e smoke sem erros
+novos. A suite acaba em 0 e não toca no save; os 30 erros tardios de teardown
+são exactamente os mesmos, linha por linha, no HEAD de entrada `5588b04d`.
+
+As capturas Vulkan reais confirmam os cinco marcos. A câmara inicial mantém a
+fracção de claros no N06/N07/N09, deixa N08 em 29,3 % (dentro da meta 20–30 %)
+e melhora N10 de 5,8 % para 6,5 %. **HUMAN PLAYTEST REQUIRED** para leitura em
+movimento e composição final.
+
+Próximo passo, sem o antecipar: **Prompt 4 — props, luz, anti-repetição e FX
+atmosféricos**. A build oficial `build/windows/Koliani.exe` não foi tocada.
+
+---
+
 ## Região III FECHADA — tecnicamente completa (20 set 2026) · PASS
 
 Branch `claude/region03-completion-pass`, integrada em `master`.

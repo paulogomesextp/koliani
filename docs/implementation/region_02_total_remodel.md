@@ -1,6 +1,7 @@
-# REGIÃO II — REMODEL TOTAL · PROMPT 2 · FUNDO E ALTITUDE
+# REGIÃO II — REMODEL TOTAL · PROMPTS 2–3 · FUNDO, ALTITUDE E ARQUITETURA
 
-**Branch:** `claude/region02-total-remodel` · **HEAD de entrada:** `a275af7e`
+**Branch:** `claude/region02-total-remodel` · **entrada Prompt 2:** `a275af7e` ·
+**entrada Prompt 3:** `5588b04d`
 **Plano:** [`REGION02_TOTAL_REMODEL_PLAN.md`](../art_direction/regions/region_02/REGION02_TOTAL_REMODEL_PLAN.md)
 **Evidência:** [`prompt_02_background/`](../playtests/region_02_total_remodel/prompt_02_background/)
 
@@ -180,3 +181,77 @@ Não foi tocado, e por construção: o `_gerar_parallax` tem RNG **próprio**
   perder o único nível que já lia como altitude.
 - Os FX que a prancha tem e o jogo não — **aurora no céu** e **raios
   distantes** — não entraram. São Prompt 4.
+
+---
+
+## 6. PROMPT 3 — ARQUITETURA E LANDMARKS
+
+O lote acrescenta arquitetura de primeiro plano comum ao Desfiladeiro e um
+landmark exclusivo, deliberadamente colocado, a cada nível:
+
+| nível | landmark | composição final |
+|---|---|---|
+| **N06** | ponte monumental | três arcos sobre a rota aberta |
+| **N07** | torre partida | silhueta quebrada na jornada, fora da casca fechada da sala authored |
+| **N08** | queda de água | cascata no vazio entre duas ilhas, sem criar chão |
+| **N09** | altar em ruínas | altar exposto e legível na aproximação |
+| **N10** | Torre dos Céus + lua de sangue | torre a enquadrar a arena, lua em segunda profundidade |
+
+As cinco peças maiores partem de fontes geradas para este lote, guardadas em
+`assets/sprites/pixel/arquitetura/desfiladeiro/_source/`. O script
+`tools/gerar_arquitetura_regiao02.py` recorta o alfa, limita a resolução e
+gera os PNGs usados pelo jogo; a lua é gerada deterministicamente pelo mesmo
+script. Os fallbacks desenhados no script permitem reconstruir o lote mesmo
+sem as fontes.
+
+`Atmosfera._arquitetura_altitude()` trata as salas authored: posições fixas,
+`Sprite2D`, `z_index` negativo e nenhuma física. A jornada procedural recebe o
+mesmo vocabulário de arcos, colunas, janelas e balaustradas através de
+`_rng_deco`; os quatro sorteios de `_rng` que existiam em `_coluna_fundo()`
+continuam exactamente no mesmo lugar e pela mesma ordem.
+
+### Prova visual
+
+Capturas finais com renderer Vulkan real:
+[`prompt_03_architecture/`](../playtests/region_02_total_remodel/prompt_03_architecture/).
+`FINAL_N06.png` a `FINAL_N10.png` mostram os landmarks; `INICIO_N06_inicio.png`
+a `INICIO_N10_inicio.png` repetem a câmara de medição do Prompt 2. A captura
+estática dos landmarks destaca a `Camera2D` da personagem e **não** é prova de
+travessia.
+
+| | luminância Prompt 2 → Prompt 3 | claros (`luma > 110`) Prompt 2 → Prompt 3 |
+|---|---:|---:|
+| **N06** | 53,7 → **49,7** | 13,5 % → **13,6 %** |
+| **N07** | 43,6 → **43,9** | 14,8 % → **14,8 %** |
+| **N08** | 86,9 → **83,0** | 31,1 % → **29,3 %** |
+| **N09** | 62,0 → **62,4** | 22,7 % → **22,7 %** |
+| **N10** | 43,3 → **44,0** | 5,8 % → **6,5 %** |
+
+N06 e N08 perdem luminância média porque a arquitetura opaca ocupa parte do
+céu, mas N06 preserva a fracção clara e N08 continua dentro da meta de
+20–30 %. N10 melhora ligeiramente e, sobretudo, recebe finalmente a composição
+torre + lua que faltava.
+
+### Prova funcional e estrutural
+
+- `tools/baseline_geometria.gd`, HEAD de entrada contra este lote:
+  **100 ficheiros, 100 iguais, 0 diferenças funcionais**. Isto inclui o N08
+  LOCKED e as 19 regiões fora do âmbito.
+- `tools/verifica_arquitetura_regiao02.gd`: **5 níveis, 0 falhas**. Confirma
+  landmark certo e exclusivo, pelo menos quatro peças por nível, texturas de
+  produção, `z_index < 0` e ausência de corpos/colisões.
+- Import Godot 4.7.2 e smoke N06–N10: **0 erros novos**.
+- Onze guardas dirigidas (`regras_bicho`, actores, jornada, mecânicas, alcance
+  dos 100 níveis, Aerion, baú, câmaras, spawn, vento da Região II e
+  arquitetura): **11/11, 0 falhas e 0 erros**.
+- Suite: código **0**, todos os testes `OK`, save real intacto. Os 30 erros de
+  teardown (`data.tree` nulo, instância libertada e RIDs) são **idênticos**, em
+  número e texto, no HEAD de entrada `5588b04d`; não foram introduzidos por
+  este lote.
+
+### Fecho do Prompt 3
+
+**PASS técnico do lote. HUMAN PLAYTEST REQUIRED** para composição, leitura em
+movimento e sensação do percurso. Não integrar em `master`: a Região II ainda
+tem os Prompts 4–6. Próximo passo, e só ele: **Prompt 4 — props, luz,
+anti-repetição e FX atmosféricos**.
