@@ -1,31 +1,29 @@
-## Pendente de DECISÃO — Região III, mecânicas canónicas (20 set 2026)
+## RESOLVIDO — Região III, dano colateral das mecânicas (20 set 2026)
 
-Branch `claude/region03-completion-pass`. Duas coisas que eu **não devia
-decidir sozinho**, ambas medidas e nenhuma escondida:
+Estava aqui: dar à Torre dos Ecos as mecânicas do cânone reescrevia doze
+níveis de outras regiões. **O Paulo decidiu: as mecânicas ficam, o dano
+colateral não, e a solução tem de ser arquitetural.** Foi feito.
 
-A. **Doze níveis de OUTRAS regiões mudaram de forma.** Para a Torre dos
-   Ecos ter as mecânicas do cânone (elevador no N12, engrenagens no N13,
-   plataformas ilusórias no N15), essas câmaras têm de desbloquear mais
-   cedo. E o desbloqueio é **global**: a `MECANICA_DO_NIVEL` dizia ao mesmo
-   tempo o que cada nível apresenta *e* a partir de quando cada câmara fica
-   disponível em todas as regiões — e o gerador ainda **duplica o peso** de
-   uma câmara nos 8 níveis seguintes à estreia. Resultado: os níveis
-   **20, 41-45, 51 e 56-60** saem com outro traçado.
+A `MECANICA_DO_NIVEL` fazia três coisas ao mesmo tempo, e só se percebeu
+isso a medir:
 
-   Nenhum deles regride: a suite, as 100 jornadas, o alcance de todas as
-   salas e o `spawn_livre` passam. Nenhuma dessas regiões teve ainda a sua
-   passagem de cânone. Mas são doze níveis que ninguém pediu para mexer.
-   **Se preferires zero dano colateral, o preço é a Região III ficar sem
-   elevadores, sem engrenagens e sem plataformas ilusórias** — ou seja,
-   sem o que o contrato §2 lhe dá.
+1. dizia que mecânica cada nível **apresenta**;
+2. por ser a primeira ocorrência, decidia quando cada câmara **desbloqueia
+   em todas as regiões** — e o gerador duplica o peso dela nos 8 níveis
+   seguintes;
+3. o `cam` de cada linha é também a **câmara-assinatura que o gerador força
+   na jornada desse nível**, e o `grau` diz quantas vezes.
 
-B. **A `gravidade` e as `serras` deixaram de ter nível onde são
-   APRESENTADAS.** Continuam a aparecer no jogo e o calendário de
-   desbloqueio delas está preso onde sempre esteve
-   (`DESBLOQUEIO_FIXO`), mas perderam o aviso de estreia. Apresentavam-se
-   no antigo "Observatório Lunar" e na antiga "Torre da Tempestade" —
-   níveis que o cânone renomeou para Campanário e Mecanismos Antigos. Dar-
-   lhes casa noutro sítio custava reconstruir mais níveis (ver A).
+Separou-se (1) de (2) com `DESBLOQUEIO_BASE` (calendário global congelado)
+mais `DESBLOQUEIO_REGIAO` (antecipação local à Região III). Para (3), os
+slots fora da Região III voltaram exactamente ao que eram.
+
+Fica **uma** consequência, pequena e nomeada: `serras` e `gravidade` já não
+têm nível onde sejam *apresentadas* (os slots delas eram o "Observatório
+Lunar" e a "Torre da Tempestade", que o cânone renomeou). Continuam a
+aparecer no jogo, no mesmo calendário de sempre; perderam o aviso de
+estreia. E o `elevador` é agora assinatura do N12 e do N16 — quem joga
+conhece-o no N12 e o N16 não o reapresenta, que é o comportamento certo.
 
 ## Pendente de DECISÃO — Região III, Torre dos Ecos (19 set 2026)
 

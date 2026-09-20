@@ -399,6 +399,10 @@ const PROPS_COM_LUZ := {
 	"lampiao_t": [Color(1.0, 0.84, 0.54), 0.70, 130.0],
 }
 
+## Quantas luzes uma unica plataforma pode acender (ver `_acender`).
+const MAX_LUZES_PLATAFORMA := 2
+var _luzes_nesta := 0
+
 ## Um degrade radial branco, feito UMA vez e partilhado por todas as luzes.
 ## Uma `GradientTexture2D` por prop seria centenas de texturas iguais numa
 ## jornada de dezenas de milhares de px.
@@ -427,6 +431,20 @@ static func _tex_luz() -> GradientTexture2D:
 func _acender(sp: Sprite2D, nome: String, tex: Texture2D, esc: float) -> void:
 	if not PROPS_COM_LUZ.has(nome):
 		return
+	# TECTO POR PLATAFORMA, como grade de seguranca. Uma plataforma de chao
+	# vai a 2000+ px e leva ate' `MAX_DECO` (9) props: sem tecto, uma so'
+	# laje podia acender nove luzes. Duas chegam para a leitura -- o que se
+	# quer sao pontos quentes espalhados, nao uma montra.
+	#
+	# CONTRIBUICAO MEDIDA (`tools/contar_luzes.gd`), para nao se andar a
+	# adivinhar: com estas luzes os niveis da regiao tem 78/110/107
+	# `PointLight2D`; sem elas, 63/95/84. Ou seja 15-23 por nivel, ~20% do
+	# total -- o grosso vem dos checkpoints, das alavancas e das luzes
+	# proprias da jornada. O tecto quase nao mexe na contagem; esta' aqui
+	# para o caso de uma laje muito larga, nao porque isto pesasse.
+	if _luzes_nesta >= MAX_LUZES_PLATAFORMA:
+		return
+	_luzes_nesta += 1
 	var cfg: Array = PROPS_COM_LUZ[nome]
 	var luz := PointLight2D.new()
 	luz.texture = _tex_luz()

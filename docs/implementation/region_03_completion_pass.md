@@ -1,5 +1,18 @@
 # REGIÃO III — TORRE DOS ECOS · PASSAGEM DE MIGRAÇÃO CANÓNICA
 
+> **NOTA DE ESTADO (20 set 2026).** Este relatório é o da **primeira**
+> passagem, que fechou em PARTIAL. O que se seguiu está em:
+>
+> - [`region_03_completion_continuation.md`](region_03_completion_continuation.md)
+>   — arquitetura de primeiro plano, props e mecânicas por nível;
+> - [`region_03_final_closure.md`](region_03_final_closure.md)
+>   — isolamento do RNG, auditoria eixo a eixo e legibilidade.
+>
+> Os dois eixos que aqui aparecem em **LOW** (arquitetura do primeiro
+> plano e props jogáveis) **já não estão em LOW** — ver a auditoria em
+> [`../playtests/region_03_visual_evidence/AUDITORIA_EIXOS.md`](../playtests/region_03_visual_evidence/AUDITORIA_EIXOS.md).
+
+
 **Estado: PARTIAL.** Não integrado em `master` — ver §6.
 
 **Branch:** `claude/region03-completion-pass`
