@@ -141,7 +141,7 @@ func _physics_process(dt: float) -> void:
 				var k := _obter_koliani()
 				var kx := k.global_position.x if k else global_position.x
 				_inv_para = Vector2(kx + signf(kx - global_position.x) * 200.0, _chao_cache - 40.0)
-				Som.toca("investida", -6.0, 0.9)
+				_som_ataque("investida", -6.0, 0.9)
 				_ataque_forte = 0.5
 				_ir(Fase.INVESTIDA)
 		Fase.INVESTIDA:
@@ -161,7 +161,7 @@ func _physics_process(dt: float) -> void:
 			if _t >= dur_tel * 1.1:
 				_piscar(false)
 				_stomp_x = global_position.x
-				Som.toca("investida", -5.0, 0.7)
+				_som_ataque("investida", -5.0, 0.7)
 				_ir(Fase.STOMP)
 		Fase.STOMP:
 			if not _exposto and global_position.y < _chao_cache - 46.0:
@@ -207,7 +207,7 @@ func _ve_koliani() -> bool:
 ## --- ataques ---------------------------------------------------------
 
 func _lancas() -> void:
-	Som.toca("gelo", -8.0, 1.3)
+	_som_ataque("gelo", -8.0, 1.3)
 	# aponta para onde a Koliani ESTAVA no início do telégrafo -> correr
 	# durante o aviso desvia mesmo
 	var base := (_mira_lancas - global_position).normalized()
@@ -250,7 +250,7 @@ func _lanca(dir: Vector2) -> void:
 
 
 func _tornados() -> void:
-	Som.toca("grito", -7.0, 1.4)
+	_som_ataque("grito", -7.0, 1.4)
 	var pai := get_parent()
 	if pai == null:
 		return
@@ -296,7 +296,7 @@ func _tornado(dir: float, atraso: float) -> void:
 ## --- pisão (STOMP) -------------------------------------------------
 
 func _stomp_impacto() -> void:
-	Som.toca("chefe_cai", -3.0, 0.85)
+	_som_impacto("esmagar", -5.0, 0.72)
 	_abanar_camera(10.0)
 	_onda_stomp(-1.0)
 	_onda_stomp(1.0)
@@ -336,7 +336,7 @@ func _onda_stomp(dir: float) -> void:
 
 func _entrar_fase2() -> void:
 	_fase2 = true
-	Som.toca("chefe_cai", -8.0, 0.7)
+	_som_fase("vento")
 	_abanar_camera(7.0)
 	dur_tel *= 0.9
 	dur_exposto *= 0.95

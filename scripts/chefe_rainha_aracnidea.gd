@@ -91,7 +91,7 @@ func _physics_process(dt: float) -> void:
 				_piscar(false)
 				velocity.x = _dir_para_koliani() * vel_investida
 				_ataque_forte = dur_investida + 0.2
-				Som.toca("garra", -8.0)
+				_som_ataque("garra", -8.0)
 				_ir(Fase.INVESTIDA)
 		Fase.INVESTIDA:
 			velocity.x = move_toward(velocity.x, 0.0, 520.0 * dt)
@@ -144,7 +144,7 @@ func _ve_koliani() -> bool:
 ## --- ataques ---------------------------------------------------------
 
 func _cuspir() -> void:
-	Som.toca("praga", -8.0, 0.7)
+	_som_ataque("praga", -8.0, 0.7)
 	var pai := get_parent()
 	if pai == null:
 		return
@@ -157,7 +157,7 @@ func _cuspir() -> void:
 
 
 func _por_ovos() -> void:
-	Som.toca("invocar", -9.0, 0.7)
+	_som_ataque("invocar", -9.0, 0.7)
 	var pai := get_parent()
 	if pai == null:
 		return
@@ -202,7 +202,7 @@ func _ovo_em(x: float, eclosao: float) -> void:
 
 func _entrar_fase2() -> void:
 	_fase2 = true
-	Som.toca("chefe_cai", -9.0, 0.7)
+	_som_fase("carne")
 	_abanar_camera(7.0)
 	dur_tel *= 0.7
 	dur_exposta *= 0.85

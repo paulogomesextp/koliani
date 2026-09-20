@@ -203,6 +203,34 @@ func _sortear_variante(nome: String) -> String:
 	return nome if i == 0 else "%s_v%d" % [nome, i + 1]
 
 
+## Ganho de COMPENSACAO por stream, em dB. Nao e' mistura artistica: e' a
+## correccao de ficheiros que foram masterizados muito abaixo do resto do
+## catalogo e que por isso chegavam ao jogo praticamente inaudiveis, por
+## mais que o callsite pedisse -6 dB.
+##
+## Medido com `ffmpeg -af ebur128/volumedetect` (Prompt 3A). O grosso dos
+## ataques do jogo vive entre -13 e -17 LUFS integrados; estes tres estavam
+## 15 a 22 dB abaixo disso:
+##
+##   chama         pico -24,3 dBFS   -35,4 LUFS   (sopro de fogo do Arauto)
+##   feixe_vil     pico -15,1 dBFS   -32,1 LUFS   (feixe do Olho / do Zeriko)
+##   chefe_magia   pico -14,6 dBFS   -31,1 LUFS   (magia de cinco chefes)
+##
+## O ganho abaixo poe cada um a ~-17/-18 LUFS, deixando pelo menos 1 dB de
+## margem de pico. Fazer isto aqui e nao nos dez callsites e' de proposito:
+## a compensacao e' uma propriedade do FICHEIRO, nao do sitio que o toca --
+## corrigi-la callsite a callsite garantia que o proximo uso voltava a
+## nascer surdo. Os tres sao exclusivos dos chefes.
+##
+## Isto NAO substitui normalizar os ficheiros de origem; e' o que se pode
+## fazer sem mexer nos assets. HUMAN LISTEN REQUIRED.
+const COMPENSACAO := {
+	"chama": 18.0,
+	"feixe_vil": 14.0,
+	"chefe_magia": 13.0,
+}
+
+
 ## Reproduz um SFX. `variacao_pitch` e' a UNICA variacao aplicada aqui; quem
 ## chama passa sempre o pitch BASE. `cooldown` usa uma chave semantica, que
 ## pode incluir o instance id para nao silenciar inimigos diferentes.
@@ -227,7 +255,7 @@ func toca(nome: String, volume_db := -6.0, pitch := 1.0,
 	var p := _pool[i]
 	_idx = (i + 1) % VOZES
 	p.stream = st
-	p.volume_db = volume_db
+	p.volume_db = volume_db + float(COMPENSACAO.get(nome, 0.0))
 	p.pitch_scale = pitch * (1.0 + _rng.randf_range(-variacao_pitch, variacao_pitch))
 	_prioridades[i] = prioridade
 	_ordem += 1

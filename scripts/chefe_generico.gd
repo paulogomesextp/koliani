@@ -241,7 +241,7 @@ func _agir() -> void:
 	match arquetipo:
 		Arquetipo.INVESTIDA:
 			_ataque_forte = 0.45          # o contacto magoa mais na investida
-			Som.toca("investida", -6.0)
+			_som_ataque("investida", -6.0)
 		Arquetipo.ATIRADOR:
 			_salva()
 		Arquetipo.SALTADOR:
@@ -255,7 +255,7 @@ func _agir() -> void:
 # --- ATIRADOR ---------------------------------------------------------
 
 func _salva() -> void:
-	Som.toca("chefe_magia", -8.0, 0.9)
+	_som_ataque("chefe_magia", -8.0, 0.9)
 	var n: int = maxi(1, tiros_por_salva)
 	if salva_radial:
 		for i in n:
@@ -287,7 +287,7 @@ func _tiro(dir: Vector2) -> void:
 ## A onda só apanha quem está NO CHÃO: saltar é a resposta, e é isso que
 ## a torna um ataque com solução em vez de dano garantido.
 func _onda_de_choque() -> void:
-	Som.toca("esmagar", -6.0)
+	_som_impacto("esmagar", -6.0)
 	var k := _obter_koliani()
 	if k and absf((k.global_position - global_position).x) <= raio_onda \
 			and k.is_on_floor():
@@ -314,7 +314,7 @@ func _onda_de_choque() -> void:
 # --- INVOCADOR --------------------------------------------------------
 
 func _invocar() -> void:
-	Som.toca("invocar", -7.0)
+	_som_ataque("invocar", -7.0)
 	# `filter()` devolve um `Array` sem tipo -- atribui-lo a um `Array[Node]`
 	# rebenta em runtime ("Trying to assign an array of type Array").
 	_lacaios.assign(_lacaios.filter(func(n: Node) -> bool: return is_instance_valid(n)))
@@ -337,7 +337,7 @@ func _invocar() -> void:
 ## Risco recto à frente do chefe: magoa uma vez quem estiver na faixa, e
 ## fica desenhado meio segundo para se perceber o que aconteceu.
 func _feixe() -> void:
-	Som.toca("feixe_vil", -6.0)
+	_som_ataque("feixe_vil", -6.0)
 	var dir := _dir_para_koliani()
 	var de := global_position + Vector2(dir * 40.0, -10.0)
 	var ate := de + Vector2(dir * feixe_alcance, 0.0)

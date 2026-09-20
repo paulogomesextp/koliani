@@ -177,7 +177,7 @@ func _vela_acesa_mais_perto() -> Node:
 ## --- ataques ---------------------------------------------------------
 
 func _velas_negras() -> void:
-	Som.toca("chama", -9.0, 0.6)
+	_som_ataque("chama", -9.0, 0.6)
 	var pai := get_parent()
 	if pai == null:
 		return
@@ -228,7 +228,7 @@ func _chama_negra(dir: Vector2) -> void:
 
 
 func _procissao() -> void:
-	Som.toca("invocar", -9.0, 0.6)
+	_som_ataque("invocar", -9.0, 0.6)
 	var pai := get_parent()
 	if pai == null:
 		return
@@ -252,7 +252,7 @@ func _procissao() -> void:
 
 
 func _soprar_tudo() -> void:
-	Som.toca("grito", -8.0, 0.6)
+	_som_ataque("grito", -8.0, 0.6)
 	_abanar_camera(5.0)
 	for v in get_tree().get_nodes_in_group("velas"):
 		if is_instance_valid(v) and v.acesa:
@@ -263,7 +263,7 @@ func _soprar_tudo() -> void:
 
 func _entrar_fase2() -> void:
 	_fase2 = true
-	Som.toca("chefe_cai", -8.0, 0.7)
+	_som_fase("magia")
 	_abanar_camera(7.0)
 	dur_tel *= 0.75
 	dur_exposta *= 0.88

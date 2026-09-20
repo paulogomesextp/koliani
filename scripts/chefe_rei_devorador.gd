@@ -86,7 +86,7 @@ func _physics_process(dt: float) -> void:
 			_piscar(true)
 			if _t >= dur_tel:
 				_piscar(false)
-				Som.toca("investida", -6.0, 0.9)
+				_som_ataque("investida", -6.0, 0.9)
 				_ataque_forte = 0.3
 				_ir(Fase.GARFADA)
 		Fase.GARFADA:
@@ -177,7 +177,7 @@ func _presa_perto() -> Node:
 ## --- ataques ---------------------------------------------------------
 
 func _garfo() -> void:
-	Som.toca("golpe_pesado", -7.0, 0.8)
+	_som_impacto("golpe_pesado", -7.0, 0.8)
 	var k := _obter_koliani()
 	if k == null:
 		return
@@ -187,7 +187,7 @@ func _garfo() -> void:
 
 
 func _pratos() -> void:
-	Som.toca("projetil", -8.0, 0.7)
+	_som_ataque("projetil", -8.0, 0.7)
 	var base := _vetor_para_koliani().normalized()
 	if base.length() < 0.5:
 		base = Vector2(_direcao, -0.1).normalized()
@@ -230,7 +230,7 @@ func _prato(dir: Vector2) -> void:
 
 
 func _servos() -> void:
-	Som.toca("invocar", -9.0, 0.6)
+	_som_ataque("invocar", -9.0, 0.6)
 	var pai := get_parent()
 	if pai == null:
 		return
@@ -251,8 +251,8 @@ func _devorar() -> void:
 	var presa := _presa_perto()
 	if presa == null:
 		return
-	Som.toca("chefe_cai", -10.0, 0.5)
-	Som.toca("conquista", -14.0, 0.7)
+	_som_impacto("praga", -8.0, 0.55)
+	_som_ataque("invocar", -13.0, 1.35, 0.03, 0.2)
 	# "come" o servo
 	if presa.has_method("soltar_estilhacos"):
 		presa.soltar_estilhacos()
@@ -268,7 +268,7 @@ func _devorar() -> void:
 
 func _entrar_fase2() -> void:
 	_fase2 = true
-	Som.toca("chefe_cai", -8.0, 0.7)
+	_som_fase("carne")
 	_abanar_camera(8.0)
 	dur_tel *= 0.8
 	dur_exposto *= 0.85

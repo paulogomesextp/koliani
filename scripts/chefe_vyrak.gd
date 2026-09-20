@@ -257,10 +257,10 @@ func _executar(a: Atk) -> void:
 	var dano := int(ATAQUES[a]["dano"])
 	match a:
 		Atk.GOLPE_SINO:
-			_som("ataque_forte", -6.0, 0.9)
+			_som("sino_ataque", -6.0, 0.62)
 			_golpe_em_arco(dano)
 		Atk.ONDA_ECO:
-			_som("ataque_forte", -6.0, 0.6)
+			_som("onda", -6.0, 0.72)
 			_abanar_camera(5.0)
 			_onda_de_choque(dano)
 		Atk.SINO_QUEDA:
@@ -346,7 +346,7 @@ func _sino_cai(x: float, dano: int, atraso: float) -> void:
 	t.tween_property(area, "global_position:y", _chao_cache - 22.0, 0.34) \
 		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	t.tween_callback(func() -> void:
-		_som("ataque_forte", -8.0, 0.5)
+		_som("sino_ataque", -8.0, 0.44)
 		_abanar_camera(3.0))
 	t.tween_property(poly, "modulate:a", 0.0, 0.34)
 	t.tween_callback(area.queue_free)
@@ -439,8 +439,7 @@ func _ritual_de_ativacao() -> void:
 	## transformada, mais sinos ativam-se." O colapso da torre fica para a
 	## DERROTA, que é onde a prancha o põe -- na versão antiga o chefe
 	## partia a torre a meio da luta e tirava plataformas ao jogador.
-	_som("boss", -4.0, 0.9)
-	_som("invocar", -5.0, 0.7)
+	_som_fase("sino")
 	_abanar_camera(9.0)
 	_mostrar_nucleo(false)
 	for p in get_tree().get_nodes_in_group("plataformas_pico"):
@@ -582,7 +581,7 @@ func _golpe_corpo(dano: int, alc_x: float, alc_y: float) -> void:
 
 
 func _som(nome: String, vol: float, tom: float) -> void:
-	Som.toca(nome, vol, tom)
+	_som_ataque(nome, vol, tom)
 
 
 ## --- núcleo / dano -----------------------------------------------------

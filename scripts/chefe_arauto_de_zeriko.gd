@@ -118,7 +118,7 @@ func _physics_process(dt: float) -> void:
 			_encarar_koliani(); _piscar(true)
 			if _t >= dur_tel:
 				_piscar(false); _inv_dir = _dir_para_koliani()
-				Som.toca("investida", -6.0, 1.0); _ataque_forte = 0.3
+				_som_ataque("investida", -6.0, 1.0); _ataque_forte = 0.3
 				_ir(Fase.C1_INV)
 		Fase.C1_INV:
 			velocity.x = _inv_dir * 560.0
@@ -256,7 +256,7 @@ func _ve_koliani() -> bool:
 ## --- ataques comuns ------------------------------------------------
 
 func _golpe_frontal(dano: int, alcance := 82.0) -> void:
-	Som.toca("golpe_pesado", -8.0, 1.1)
+	_som_impacto("golpe_pesado", -8.0, 1.1)
 	var k := _obter_koliani()
 	if k == null:
 		return
@@ -266,7 +266,7 @@ func _golpe_frontal(dano: int, alcance := 82.0) -> void:
 
 
 func _sopro_fogo() -> void:
-	Som.toca("chama", -6.0, 0.7)
+	_som_ataque("chama", -6.0, 0.7)
 	var pai := get_parent()
 	if pai == null:
 		return
@@ -296,7 +296,7 @@ func _sopro_fogo() -> void:
 
 
 func _dardos() -> void:
-	Som.toca("projetil", -9.0, 0.7)
+	_som_ataque("projetil", -9.0, 0.7)
 	var base := _dir_vec_para_koliani()
 	for a in [-0.28, 0.0, 0.28]:
 		_dardo(base.rotated(a))
@@ -330,7 +330,7 @@ func _dardo(dir: Vector2) -> void:
 
 
 func _nova() -> void:
-	Som.toca("grito", -4.0, 0.8)
+	_som_ataque("grito", -4.0, 0.8)
 	_abanar_camera(7.0)
 	var pai := get_parent()
 	if pai == null:
@@ -364,8 +364,7 @@ func _nova() -> void:
 
 func _mudar_forma(n: int) -> void:
 	_forma = n
-	Som.toca("chefe_cai", -5.0, 0.7)
-	Som.toca("mudar_forma", -6.0, 0.6)
+	_som_fase("fogo")
 	_abanar_camera(10.0)
 	dur_tel *= 0.85
 	dur_exposto *= 0.9

@@ -131,7 +131,7 @@ func _physics_process(dt: float) -> void:
 			if _t >= dur_tel:
 				_piscar(false)
 				_dash_dir = _dir_para_koliani()
-				Som.toca("investida", -6.0, 1.1)
+				_som_ataque("investida", -6.0, 1.1)
 				_ataque_forte = 0.4
 				_ir(Fase.DASH)
 		Fase.DASH:
@@ -257,7 +257,7 @@ func _ve_koliani() -> bool:
 ## --- ataques ---------------------------------------------------------
 
 func _golpe(dano: int, _empurrao := 40.0) -> void:
-	Som.toca("demonio_ataque", -8.0, 1.1)
+	_som_impacto("demonio_ataque", -8.0, 1.1)
 	var k := _obter_koliani()
 	if k == null:
 		return
@@ -277,7 +277,7 @@ func _dardo(de: Vector2, dir: Vector2) -> void:
 	var pai := get_parent()
 	if pai == null:
 		return
-	Som.toca("projetil", -10.0, 1.0)
+	_som_ataque("projetil", -10.0, 1.0)
 	var d := Area2D.new()
 	d.collision_layer = 0
 	d.collision_mask = 2
@@ -312,8 +312,7 @@ func _dardo(de: Vector2, dir: Vector2) -> void:
 
 func _virar_energia() -> void:
 	_fase2 = true
-	Som.toca("chefe_cai", -6.0, 0.8)
-	Som.toca("grito", -8.0, 0.7)
+	_som_fase("energia")
 	_abanar_camera(9.0)
 	dur_tel *= 0.72
 	dur_exposta *= 0.85

@@ -151,7 +151,7 @@ func _mandar_vento(sentido: Vector2) -> void:
 	_vento.duracao_pulso = 0.8
 	_vento.intervalo_pulso = 0.5
 	_vento.ativa = true
-	Som.toca("chefe_magia", -8.0, 1.05 if sentido.x >= 0.0 else 0.88)
+	_som_ataque("onda", -9.0, 1.28 if sentido.x >= 0.0 else 1.04, 0.03, 0.35)
 
 
 func _repor_vento() -> void:
@@ -279,7 +279,7 @@ func _physics_process(dt: float) -> void:
 			if _t >= _tel() * 1.3:
 				_piscar(false)
 				_limpar_marca()
-				Som.toca("investida", -6.0, 0.85)
+				_som_ataque("investida", -6.0, 0.82, 0.03, 0.2)
 				_ataque_forte = 0.5
 				_ir(Fase.QUEDA)
 		Fase.QUEDA:
@@ -399,7 +399,7 @@ func _lamina(de: Vector2, dir: Vector2) -> void:
 	var pai := get_parent()
 	if pai == null:
 		return
-	Som.toca("projetil", -10.0, 1.15)
+	_som_ataque("lamina_cair", -11.0, 1.42, 0.04)
 	var a := Area2D.new()
 	a.collision_layer = 0
 	a.collision_mask = 2
@@ -513,7 +513,7 @@ func _limpar_marca() -> void:
 
 ## Impacto da QUEDA: sopro curto no chão, só dentro da faixa marcada.
 func _impacto() -> void:
-	Som.toca("demonio_ataque", -6.0, 0.8)
+	_som_impacto("demonio_ataque", -5.0, 0.76)
 	_abanar_camera(8.0)
 	var k := _obter_koliani()
 	if k:
@@ -549,7 +549,7 @@ func _impacto() -> void:
 ## atingível.
 func _abrir_asas() -> void:
 	_fase2 = true
-	Som.toca("grito", -8.0, 1.1)
+	_som_fase("vento")
 	_abanar_camera(9.0)
 	dur_exposto = maxf(0.8, dur_exposto * 0.88)
 	dano_contacto = int(round(dano_contacto * 1.1))

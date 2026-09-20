@@ -94,7 +94,7 @@ func _physics_process(dt: float) -> void:
 			_piscar(true)
 			if _t >= dur_tel:
 				_piscar(false)
-				Som.toca("investida", -7.0, 0.9)
+				_som_ataque("investida", -7.0, 0.9)
 				_ataque_forte = 0.4
 				_ir(Fase.BENGALA)
 		Fase.BENGALA:
@@ -142,7 +142,7 @@ func _ve_koliani() -> bool:
 ## --- ataques ---------------------------------------------------------
 
 func _bengalada() -> void:
-	Som.toca("demonio_ataque", -7.0, 0.9)
+	_som_impacto("demonio_ataque", -7.0, 0.9)
 	var k := _obter_koliani()
 	if k == null:
 		return
@@ -152,7 +152,7 @@ func _bengalada() -> void:
 
 
 func _decretos() -> void:
-	Som.toca("projetil", -8.0, 0.9)
+	_som_ataque("projetil", -8.0, 0.9)
 	var pai := get_parent()
 	if pai == null:
 		return
@@ -186,7 +186,7 @@ func _decretos() -> void:
 
 
 func _largar_decoys() -> void:
-	Som.toca("invocar", -10.0, 1.5)
+	_som_ataque("invocar", -10.0, 1.5)
 	_limpar_decoys()
 	var pai := get_parent()
 	if pai == null:
@@ -242,7 +242,7 @@ func _limpar_decoys() -> void:
 
 func _entrar_fase2() -> void:
 	_fase2 = true
-	Som.toca("chefe_cai", -8.0, 0.7)
+	_som_fase("magia")
 	_abanar_camera(7.0)
 	dur_tel *= 0.78
 	dur_exposto *= 0.88

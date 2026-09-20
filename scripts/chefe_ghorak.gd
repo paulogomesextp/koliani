@@ -76,7 +76,7 @@ func _physics_process(dt: float) -> void:
 			if _t >= dur_tel:
 				_piscar(false)
 				velocity.y = -240.0  # pequeno salto antes do baque
-				Som.toca("investida", -10.0, 0.8)
+				_som_ataque("investida", -10.0, 0.8)
 				_ir(Fase.ESMAGA_BAQUE)
 		Fase.ESMAGA_BAQUE:
 			velocity.x = move_toward(velocity.x, 0.0, 1400.0 * dt)
@@ -139,7 +139,7 @@ func _ve_koliani() -> bool:
 ## --- ataques ---------------------------------------------------------
 
 func _baque() -> void:
-	Som.toca("esmagar", -5.0)
+	_som_impacto("esmagar", -5.0)
 	_abanar_camera(5.0)
 	var k := _obter_koliani()
 	if k and absf((k.global_position - global_position).x) <= raio_onda and k.is_on_floor():
@@ -151,7 +151,7 @@ func _baque() -> void:
 
 
 func _semear() -> void:
-	Som.toca("praga", -8.0)
+	_som_ataque("praga", -8.0)
 	var origem := global_position.x
 	var alvo := _x_koliani() + signf(_x_koliani() - origem) * 44.0
 	var passos := 5 if _fase2 else 4
@@ -174,7 +174,7 @@ func _plantar_em(x: float, atraso: float) -> void:
 
 func _entrar_fase2() -> void:
 	_fase2 = true
-	Som.toca("chefe_cai", -9.0, 0.7)  # rugido grave
+	_som_fase("carne")
 	_abanar_camera(7.0)
 	dur_tel *= 0.7
 	dur_semeia *= 0.7

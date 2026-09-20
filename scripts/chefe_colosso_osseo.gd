@@ -165,7 +165,7 @@ func _ve_koliani() -> bool:
 ## --- ataques ---------------------------------------------------------
 
 func _baque() -> void:
-	Som.toca("esmagar", -5.0, 0.8)
+	_som_impacto("esmagar", -5.0, 0.8)
 	_abanar_camera(6.0)
 	var k := _obter_koliani()
 	if k and absf(_vetor_para_koliani().x) <= raio_onda and k.is_on_floor():
@@ -174,7 +174,7 @@ func _baque() -> void:
 
 
 func _gadanha() -> void:
-	Som.toca("golpe_pesado", -6.0, 0.7)
+	_som_impacto("golpe_pesado", -6.0, 0.7)
 	var pai := get_parent()
 	if pai == null:
 		return
@@ -208,7 +208,7 @@ func _gadanha() -> void:
 
 
 func _lanca() -> void:
-	Som.toca("projetil", -6.0, 1.1)
+	_som_ataque("projetil", -6.0, 1.1)
 	var pai := get_parent()
 	if pai == null:
 		return
@@ -274,7 +274,7 @@ func _osso_do_teto() -> void:
 func _remodelar() -> void:
 	_camada += 1
 	_proximo_limiar = [0.75, 0.5, 0.25, -1.0][clampi(_camada, 0, 3)]
-	Som.toca("chefe_cai", -7.0, 0.8)
+	_som_fase("osso")
 	_abanar_camera(9.0)
 	dur_exposto = maxf(0.9, dur_exposto - 0.12)
 	_particulas(Vector2(0, -10), Color(0.8, 0.78, 0.62), 40)

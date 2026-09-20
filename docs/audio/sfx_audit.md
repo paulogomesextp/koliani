@@ -192,6 +192,13 @@ REQUIRED` para mobile e Web reais.
 
 ## Próxima ação
 
-**SFX PROMPT 3 — BOSSES + WORLD + PROGRESSION SOUND PASS.** Incluir subclasses
-de boss e ataques, wind, bells, mechanisms, chest, unlock, checkpoints e
-feedback de mundo. Não iniciado.
+**SFX PROMPT 3A — BOSS SOUND PASS: FEITO.** Ver
+[`boss_sfx_audit.md`](boss_sfx_audit.md). Em resumo: `chefe_cai` passou de 33
+callsites para 2 (só morte); dois chefes deixaram de tocar a fanfarra de
+vitória estando vivos; a fase 2 do Vyrak deixou de ser muda; `raio` e
+`olho_carregar` deixaram de ser o mesmo ficheiro; e os três ataques do
+Guardião dos Céus passaram a distinguir-se.
+
+**SFX PROMPT 3B — WORLD + PROGRESSION SOUND PASS.** Wind, bells ambientais,
+mechanisms, hazards, chest, unlock, checkpoints e feedback de mundo. Não
+iniciado.

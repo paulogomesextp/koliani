@@ -138,7 +138,7 @@ func _ve_koliani() -> bool:
 ## --- ataques ---------------------------------------------------------
 
 func _pa_de_carvao() -> void:
-	Som.toca("engrenagem", -6.0, 0.8)
+	_som_ataque("engrenagem", -6.0, 0.8)
 	var dir := _dir_para_koliani()
 	# arco corpo-a-corpo
 	var k := _obter_koliani()
@@ -164,7 +164,7 @@ func _pa_de_carvao() -> void:
 
 
 func _vapor() -> void:
-	Som.toca("engrenagem", -6.0, 1.4)
+	_som_ataque("engrenagem", -6.0, 1.4)
 	var pai := get_parent()
 	if pai == null:
 		return
@@ -197,7 +197,7 @@ func _vapor() -> void:
 
 
 func _apito() -> void:
-	Som.toca("selo", -4.0, 0.4)
+	_som_ataque("selo", -4.0, 0.4)
 	_abanar_camera(5.0)
 	var k := _obter_koliani()
 	if k and absf(_vetor_para_koliani().x) <= 220.0:
@@ -240,7 +240,7 @@ func _brasa_do_fumeiro() -> void:
 
 func _entrar_fase2() -> void:
 	_fase2 = true
-	Som.toca("chefe_cai", -8.0, 0.7)
+	_som_fase("metal")
 	_abanar_camera(8.0)
 	dur_tel *= 0.78
 	dur_exposto *= 0.85

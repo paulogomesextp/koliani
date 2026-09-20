@@ -158,7 +158,7 @@ func _ve_koliani() -> bool:
 ## --- laser ---------------------------------------------------------
 
 func _preparar_laser() -> void:
-	Som.toca("olho_carregar", -7.0, 1.0)
+	_som_ataque("olho_carregar", -7.0, 1.0)
 	var k := _obter_koliani()
 	var alvo := k.global_position if k else global_position + Vector2(_direcao * 200, 60)
 	var meio := (alvo - global_position).angle()
@@ -179,7 +179,7 @@ func _preparar_laser() -> void:
 
 
 func _disparar_laser() -> void:
-	Som.toca("feixe_vil", -5.0, 0.5)
+	_som_ataque("feixe_vil", -5.0, 0.5)
 	_abanar_camera(3.0)
 	if _feixe:
 		_feixe.width = 8.0
@@ -221,7 +221,7 @@ func _terminar_laser() -> void:
 ## --- outros ataques ----------------------------------------------
 
 func _apagar_falsas() -> void:
-	Som.toca("onda", -9.0, 1.2)
+	_som_ataque("onda", -9.0, 1.2)
 	var segundos := seg_falsas * (1.5 if _fase2 else 1.0)
 	for p in get_tree().get_nodes_in_group("plat_falsas"):
 		if not is_instance_valid(p):
@@ -245,7 +245,7 @@ func _apagar_falsas() -> void:
 
 
 func _largar_clones() -> void:
-	Som.toca("invocar", -9.0, 0.7)
+	_som_ataque("invocar", -9.0, 0.7)
 	var pai := get_parent()
 	if pai == null:
 		return
@@ -286,7 +286,7 @@ func _largar_clones() -> void:
 ## boneco andar ao contrário). Em vez disso, o Olho volta a largar clones
 ## -- mantém a pressão do ataque sem mexer nos comandos.
 func _inverter() -> void:
-	Som.toca("bloqueio", -6.0, 0.5)
+	_som_ataque("bloqueio", -6.0, 0.5)
 	_abanar_camera(4.0)
 	_largar_clones()
 
@@ -295,7 +295,7 @@ func _inverter() -> void:
 
 func _entrar_fase2() -> void:
 	_fase2 = true
-	Som.toca("chefe_cai", -8.0, 0.7)
+	_som_fase("energia")
 	_abanar_camera(8.0)
 	dur_tel *= 0.78
 	dur_exposto *= 0.88

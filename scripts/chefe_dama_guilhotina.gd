@@ -161,7 +161,7 @@ func _ve_koliani() -> bool:
 ## --- teleporte -------------------------------------------------------
 
 func _esvair(a_sair: bool) -> void:
-	Som.toca("projetil", -12.0, 0.5 if a_sair else 0.8)
+	_som_ataque("projetil", -12.0, 0.5 if a_sair else 0.8)
 	if _sprite == null:
 		return
 	var alvo := 0.15 if a_sair else 1.0
@@ -182,7 +182,7 @@ func _teleportar() -> void:
 ## --- ataques ---------------------------------------------------------
 
 func _lancar_laminas() -> void:
-	Som.toca("lamina_cair", -8.0, 1.3)
+	_som_ataque("lamina_cair", -8.0, 1.3)
 	var pai := get_parent()
 	if pai == null:
 		return
@@ -238,7 +238,7 @@ func _lamina(dir: float, y: float, atraso: float) -> void:
 
 
 func _cair_guilhotinas() -> void:
-	Som.toca("lamina_cair", -6.0, 0.8)
+	_som_ataque("lamina_cair", -6.0, 0.8)
 	_abanar_camera(4.0)
 	var gs := get_tree().get_nodes_in_group("guilhotinas_arena")
 	var i := 0
@@ -250,7 +250,7 @@ func _cair_guilhotinas() -> void:
 
 
 func _corte() -> void:
-	Som.toca("lamina_cair", -6.0, 0.7)
+	_som_ataque("lamina_cair", -6.0, 0.7)
 	_abanar_camera(3.0)
 	var dir := _dir_para_koliani()
 	var pai := get_parent()
@@ -287,7 +287,7 @@ func _corte() -> void:
 
 func _entrar_fase2() -> void:
 	_fase2 = true
-	Som.toca("chefe_cai", -9.0, 0.7)
+	_som_fase("metal")
 	_abanar_camera(7.0)
 	dur_tel *= 0.72
 	dur_exposta *= 0.85
