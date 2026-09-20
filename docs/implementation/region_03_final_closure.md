@@ -141,7 +141,21 @@ Os 100 níveis, "antes" com o gerador do `master` e "depois" com este
 HEAD, comparados entrada por entrada (colisões, corpos, perigos,
 checkpoints, spawn, porta, arena).
 
-<!--RESULTADO_GEOMETRIA-->
+| | |
+|---|---|
+| **UNCHANGED COUNT** | **95** |
+| **CHANGED COUNT** | **5** |
+| **CHANGED LIST** | **11, 12, 13, 14, 15** |
+| **CHANGED OUTSIDE REGION III** | **0** |
+
+Os cinco alterados são exactamente os cinco da Torre dos Ecos, que é onde
+as mecânicas canónicas entraram. **Nenhum outro nível do jogo mudou de
+traçado.**
+
+Para contexto do que isto custou a atingir: a primeira verificação
+(depois da correcção que o modelo analítico dava por boa) deu
+**90 iguais / 10 diferentes**, com 16, 26, 56, 77 e 99 fora da região. É
+a diferença entre um modelo e uma medição.
 
 ---
 
