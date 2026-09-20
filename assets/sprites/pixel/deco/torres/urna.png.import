@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bhw1phl3teopg"
-path="res://.godot/imported/lapide.png-c7687860864a69f19c24cef7b2ba2d54.ctex"
+uid="uid://bmeguw6224igo"
+path="res://.godot/imported/urna.png-57ade2d16aa78734fae9a1da24e99211.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/pixel/deco/torres/lapide.png"
-dest_files=["res://.godot/imported/lapide.png-c7687860864a69f19c24cef7b2ba2d54.ctex"]
+source_file="res://assets/sprites/pixel/deco/torres/urna.png"
+dest_files=["res://.godot/imported/urna.png-57ade2d16aa78734fae9a1da24e99211.ctex"]
 
 [params]
 

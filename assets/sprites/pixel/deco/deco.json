@@ -239,18 +239,6 @@
    "h": 38
   },
   {
-   "nome": "cruz",
-   "onde": "chao",
-   "w": 27,
-   "h": 40
-  },
-  {
-   "nome": "lapide",
-   "onde": "chao",
-   "w": 21,
-   "h": 37
-  },
-  {
    "nome": "lampiao_t",
    "onde": "pendurado",
    "w": 31,
@@ -273,6 +261,94 @@
    "onde": "pendurado",
    "w": 31,
    "h": 106
+  },
+  {
+   "nome": "sino_p",
+   "onde": "chao"
+  },
+  {
+   "nome": "sino_partido",
+   "onde": "chao"
+  },
+  {
+   "nome": "braseiro",
+   "onde": "chao"
+  },
+  {
+   "nome": "engrenagem",
+   "onde": "chao"
+  },
+  {
+   "nome": "memorial",
+   "onde": "chao"
+  },
+  {
+   "nome": "urna",
+   "onde": "chao"
+  },
+  {
+   "nome": "livros",
+   "onde": "chao"
+  },
+  {
+   "nome": "pedra_memoria",
+   "onde": "chao"
+  },
+  {
+   "nome": "detritos",
+   "onde": "chao"
+  },
+  {
+   "nome": "arco_grande",
+   "onde": "parede"
+  },
+  {
+   "nome": "arco_pequeno",
+   "onde": "parede"
+  },
+  {
+   "nome": "coluna_dupla",
+   "onde": "parede"
+  },
+  {
+   "nome": "vitral_alto",
+   "onde": "parede"
+  },
+  {
+   "nome": "vitral_partido",
+   "onde": "parede"
+  },
+  {
+   "nome": "estatua_anjo",
+   "onde": "parede"
+  },
+  {
+   "nome": "relogio_antigo",
+   "onde": "parede"
+  },
+  {
+   "nome": "sino_g",
+   "onde": "parede"
+  },
+  {
+   "nome": "candelabro",
+   "onde": "pendurado"
+  },
+  {
+   "nome": "gargula",
+   "onde": "pendurado"
+  },
+  {
+   "nome": "corrente_sino",
+   "onde": "pendurado"
+  },
+  {
+   "nome": "lanterna_eco",
+   "onde": "pendurado"
+  },
+  {
+   "nome": "sino_m",
+   "onde": "pendurado"
   }
  ],
  "catacumbas": [

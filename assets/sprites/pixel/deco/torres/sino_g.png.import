@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cuow1wqylosdy"
-path="res://.godot/imported/cruz.png-4e25cb1c308139a2a8251996056050aa.ctex"
+uid="uid://crmm16fmwkvh3"
+path="res://.godot/imported/sino_g.png-217195d63dc8b7b6373216c497a11344.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/pixel/deco/torres/cruz.png"
-dest_files=["res://.godot/imported/cruz.png-4e25cb1c308139a2a8251996056050aa.ctex"]
+source_file="res://assets/sprites/pixel/deco/torres/sino_g.png"
+dest_files=["res://.godot/imported/sino_g.png-217195d63dc8b7b6373216c497a11344.ctex"]
 
 [params]
 

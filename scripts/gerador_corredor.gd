@@ -720,6 +720,11 @@ var _dif := 0.0
 var _regiao := 0
 var _esp := "goblin"
 var _rng := RandomNumberGenerator.new()
+## Gerador SEPARADO so' para decoracao. O `_rng` acima faz o mundo, e tudo o
+## que dele sai depende da ORDEM dos sorteios -- por isso um prop novo nao
+## pode tirar de la'. Semeado a partir do mesmo nivel, portanto a decoracao
+## tambem e' reproduzivel.
+var _rng_deco := RandomNumberGenerator.new()
 var _cont_i := 0
 
 ## Espaço mínimo (px) entre checkpoints da jornada. Antes havia um a cada
@@ -889,6 +894,7 @@ func _construir() -> void:
 	# salto duplo, logo a espinha faz-se toda com salto simples.
 	_subida_max = SUBIDA_MAX if _idx >= NIVEL_SALTO_DUPLO else SUBIDA_SIMPLES
 	_rng.seed = hash("jornada4|%d" % _idx)
+	_rng_deco.seed = hash("deco4|%d" % _idx)
 	_esp = especie_inimigo if especie_inimigo != "" else _especie_do_nivel()
 	# PERFIL DE FORMA deste nível (redesenho 2 set 2026): tendência vertical,
 	# foco de câmaras e abertura da banda -- cada nível com a sua "cara".
@@ -1491,21 +1497,99 @@ func _coluna_fundo(par: Node2D, x: float) -> void:
 	var lista := _props("parede")
 	if lista.is_empty():
 		return
+	# ORDEM DOS SORTEIOS -- NAO MEXER. O `_rng` deste gerador e' UM SO' e
+	# sequencial: o mundo inteiro sai dele por ordem. Tirar ou acrescentar
+	# um sorteio aqui desloca tudo o que vem a seguir e muda a GEOMETRIA de
+	# todos os niveis de todas as regioes. Por isso estes quatro sorteios
+	# continuam a ser feitos sempre, na mesma ordem, mesmo quando a peca
+	# acaba por ser desenhada como arquitetura da frente (que usa o
+	# `_rng_deco`, um geradorSEPARADO, exactamente para nao tocar neste).
 	var cam: String = lista[_rng.randi() % lista.size()]
+	# O `return` da textura que nao carrega tem de ficar AQUI, antes dos
+	# outros tres sorteios -- era assim no original. Ao po-lo depois deles,
+	# uma textura em falta passava a consumir quatro sorteios em vez de um e
+	# deslocava o fluxo todo a partir dai': a baseline do nivel 1 (Floresta,
+	# que tem uma dessas) acusou logo uma colisao com `disabled` trocado.
 	var tex: Texture2D = load(cam) if ResourceLoader.exists(cam) else null
 	if tex == null:
 		return
+	var alvo := _rng.randf_range(260.0, 460.0)
+	var espelhar := _rng.randf() < 0.5
+	var alfa := _rng.randf_range(0.70, 0.92)
+
+	# REGIAO III -- TORRE DOS ECOS. O audit fechou com "arquitetura do
+	# primeiro plano: LOW": arcos, colunas e vitrais existiam, mas TODOS
+	# aqui, a `z_index = -3` e escurecidos -- ou seja, no fundo. A camada
+	# onde o jogador anda ficava tijolo liso, e o canone pede que ela seja a
+	# torre. Parte das pecas passa a ser plantada A` FRENTE, a` escala de
+	# quem passa por baixo delas. Continua a ser so' um `Sprite2D`: nao ha'
+	# colisao nenhuma nisto, e a baseline de geometria prova-o.
+	if _regiao == 2 and _rng_deco.randf() < 0.46:
+		_arquitetura_frente(par, x, lista, espelhar)
+		return
+
 	# tudo à mesma ALTURA aparente (~260-460 px): os packs vêm a resoluções
 	# muito diferentes e sem isto uma casa ficava do tamanho de uma vela
-	var alvo := _rng.randf_range(260.0, 460.0)
 	var esc: float = clampf(alvo / maxf(1.0, float(tex.get_height())), 0.8, 7.0)
 	var s := Sprite2D.new()
 	s.texture = tex
-	s.scale = Vector2(esc if _rng.randf() < 0.5 else -esc, esc)
+	s.scale = Vector2(esc if espelhar else -esc, esc)
 	s.z_index = -3
 	# recuado: mais escuro e mais azul, para ficar mesmo atrás da acção
-	s.modulate = Color(0.58, 0.56, 0.72, _rng.randf_range(0.70, 0.92))
+	s.modulate = Color(0.58, 0.56, 0.72, alfa)
 	s.position = Vector2(x, _chao_y - float(tex.get_height()) * esc * 0.5 + 34.0)
+	par.add_child(s)
+
+
+## ARQUITETURA JOGAVEL da Torre dos Ecos: a mesma peca do catalogo, mas
+## plantada no chao por onde se anda, grande o suficiente para se passar por
+## baixo, e com a luz da regiao em vez do tom recuado do fundo.
+##
+## `z_index = -1` poe-na ATRAS dos actores e das plataformas (que estao em 0)
+## e A` FRENTE do parallax -- e' a camada de cenario proximo. Se fosse 0 o
+## jogador desaparecia por tras de um arco; se fosse -3 voltava a ser fundo.
+func _arquitetura_frente(par: Node2D, x: float, lista: Array,
+		espelhar: bool) -> void:
+	# os arcos e as colunas sao o que ENQUADRA; os vitrais, as estatuas e o
+	# sino grande entram mais raramente, para nao virar montra
+	var preferidas: Array = []
+	for c in lista:
+		var f: String = String(c).get_file()
+		# o SINO grande entra aqui de proposito: a assinatura da regiao nao
+		# pode ficar so' no fundo, escurecida e chapada -- e' o objecto que
+		# da' nome a` torre e tem de se ver na camada onde se joga.
+		if f.begins_with("arco") or f.begins_with("coluna") \
+				or f.begins_with("sino"):
+			preferidas.append(c)
+	var cam: String = ""
+	if not preferidas.is_empty() and _rng_deco.randf() < 0.72:
+		cam = preferidas[_rng_deco.randi() % preferidas.size()]
+	else:
+		cam = lista[_rng_deco.randi() % lista.size()]
+	var tex: Texture2D = load(cam) if ResourceLoader.exists(cam) else null
+	if tex == null:
+		return
+	# altura de quem PASSA por baixo: 300-430 px le-se como vao (a Koliani
+	# tem ~100), nao como maqueta ao fundo.
+	#
+	# O TECTO DE 2.3 E' DE FIDELIDADE, nao de gosto: o contrato §6 pede
+	# pixel-perfect, e o terreno desta regiao desenha-se a ~2x. A primeira
+	# versao pedia 340-520 px e esticava o vitral (fonte de 132 px) a 3.9x --
+	# ao lado de uma plataforma a 2x os pixeis ficavam quase o dobro e
+	# lia-se um objecto de outro jogo colado por cima. Ver a prova em
+	# `docs/playtests/region_03_visual_evidence/`.
+	var alvo := _rng_deco.randf_range(300.0, 430.0)
+	var esc: float = clampf(alvo / maxf(1.0, float(tex.get_height())), 0.9, 2.3)
+	var s := Sprite2D.new()
+	s.texture = tex
+	s.scale = Vector2(esc if espelhar else -esc, esc)
+	# ATRAS dos actores e das plataformas (z 0) e A` FRENTE do parallax: e' a
+	# camada de cenario proximo. A 0 o jogador desaparecia por tras de um
+	# arco; a -3 voltava a ser fundo.
+	s.z_index = -1
+	s.modulate = Color(0.88, 0.90, 1.04, _rng_deco.randf_range(0.90, 1.0))
+	# assenta no chao por onde se anda
+	s.position = Vector2(x, _chao_y - float(tex.get_height()) * esc * 0.5 + 12.0)
 	par.add_child(s)
 
 
