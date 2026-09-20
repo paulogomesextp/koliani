@@ -312,9 +312,19 @@ var ligada := false
 		"SalaReescreve: com ela perto NAO reescreve (versao %d)"
 			% int(sr.get("_atual")))
 	kr.global_position = Vector2(25900.0, 0.0)  # bem longe
-	await _esperar(0.6)
-	_ok(int(sr.get("_atual")) != 0,
-		"SalaReescreve: longe dela, reescreve (versao %d)" % int(sr.get("_atual")))
+	var versao_antes := int(sr.get("_atual"))
+	var reescreveu := false
+	var limite_reescrita := 0.45
+	while limite_reescrita > 0.0:
+		var inicio_frame := Time.get_ticks_usec()
+		await process_frame
+		limite_reescrita -= float(Time.get_ticks_usec() - inicio_frame) / 1000000.0
+		if int(sr.get("_atual")) != versao_antes:
+			reescreveu = true
+			break
+	_ok(reescreveu,
+		"SalaReescreve: longe dela, ocorre uma transicao dentro da janela "
+			+ "(versao %d -> %d)" % [versao_antes, int(sr.get("_atual"))])
 	sr.queue_free()
 	kr.queue_free()
 	await process_frame
