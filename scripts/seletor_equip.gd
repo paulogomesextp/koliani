@@ -638,7 +638,8 @@ func _confirmar() -> void:
 	var c: Dictionary = _cartoes[_sel]
 	var id: String = c["id"]
 	if not _tem(id) or id == _equipado_id():
-		Som.toca("dano", -18.0, 0.8)
+		# ver `santuario.gd`: recusa de menu e' `ui_negado`, nao `dano`
+		Som.toca("ui_negado", -10.0)
 		var raiz := c["raiz"] as Control
 		var x := raiz.position.x
 		var t := create_tween()

@@ -94,9 +94,12 @@ func _ao_tocar(corpo: Node) -> void:
 	# pelo caminho e nao pelo IDENTIFICADOR: assim a Alavanca (e tudo o que
 	# herda dela, como a `PlacaPeso`) continua a compilar em `--script`, que
 	# e' onde as bancadas correm
+	# `selo` e' o CHECKPOINT (`checkpoint.gd`). Puxar uma alavanca e ouvir o
+	# selo ensinava ao jogador que tinha gravado. `mecanismo` e' metal a
+	# engatar -- o pitch continua a distinguir ligar de desligar.
 	var som := get_node_or_null("/root/Som")
 	if som and som.has_method("toca"):
-		som.call("toca", "selo", -10.0, 1.15 if ligada else 0.85)
+		som.call("toca", "mecanismo", -11.0, 1.12 if ligada else 0.86)
 	_aplicar(false)
 	mudou.emit(ligada)
 

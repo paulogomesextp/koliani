@@ -224,6 +224,15 @@ func _abrir() -> void:
 	if hab != "" and not EstadoJogo.tem_habilidade(hab):
 		# `desbloquear_habilidade` avisa a HUD e GRAVA -- sobrevive a morte,
 		# a reload, ao seletor de niveis e a fechar o jogo.
+		#
+		# SEM som proprio, de proposito (Fase 10): isto corre no instante em
+		# que o chefe morre, e nessa fraccao de segundo ja' tocam o
+		# `chefe_cai` e, 0,45 s depois, a `conquista` (6,1 s). Um
+		# `desbloqueio` no meio seria o terceiro jingle em cima dos outros
+		# dois -- o empilhamento exacto que esta fase manda evitar. A
+		# habilidade e' anunciada pela HUD e pelo bau que nasce a seguir.
+		# (O `Coletavel` com `habilidade_id`, esse toca `desbloqueio`: nao
+		# tem fanfarra de chefe nenhuma por cima.)
 		EstadoJogo.desbloquear_habilidade(hab)
 	_criar_bau.call_deferred()
 

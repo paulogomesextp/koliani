@@ -44,6 +44,21 @@ func receber_dano(_quantidade: int = 0, _dir: float = 0.0) -> void:
 
 
 func tocar() -> void:
+	# A BADALADA -- e o sino da torre NAO usa o som do sino do chefe.
+	#
+	# `sino_ataque.ogg` esta' em cinco callsites de chefe (Sino Vivo, Vyrak) e
+	# foi desenhado como golpe: bate e morre. Este sino faz o contrario --
+	# troca o estado do cenario inteiro e gela os inimigos. Com o mesmo
+	# ficheiro, a mecanica lia-se como "levei um ataque do sino".
+	# `sino_mecanismo` e' badalada limpa e longa: soa a ORDEM, nao a golpe.
+	#
+	# `recarga` ja' impede o mesmo golpe de disparar duas vezes; a chave de
+	# cooldown por INSTANCIA deixa dois sinos diferentes soarem juntos, que e'
+	# leitura correcta (sao duas seccoes do cenario a trocar).
+	var som := get_node_or_null("/root/Som")
+	if som and som.has_method("toca"):
+		som.call("toca", "sino_mecanismo", -8.0, 1.0, 0.03,
+			recarga, "sino_mecanismo_%d" % get_instance_id())
 	if _badalo:
 		var t := create_tween()
 		t.tween_property(_badalo, "rotation", 0.5, 0.06)

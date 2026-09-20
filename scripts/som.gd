@@ -107,6 +107,27 @@ const CAMINHOS := {
 	"mob_grande_ataque": "res://assets/audio/mob_grande_ataque.ogg",
 	"mob_grande_dano": "res://assets/audio/mob_grande_dano.ogg",
 	"mob_grande_morte": "res://assets/audio/mob_grande_morte.ogg",
+	# --- mundo e progressao (SFX Overhaul Prompt 3B) ----------------------
+	# Vinte e oito scripts de cenario nao tinham som NENHUM, e os poucos que
+	# tinham pediam-no emprestado ao checkpoint (`selo`) ou aos chefes
+	# (`onda`, `sino_ataque`). Ver `tools/gerar_sfx_3b.py` e
+	# `docs/audio/world_progression_sfx_audit.md`.
+	"vento_ciclo": "res://assets/audio/vento_ciclo.wav",
+	"vento_rajada": "res://assets/audio/vento_rajada.wav",
+	"mecanismo": "res://assets/audio/mecanismo.wav",
+	"mecanismo_ciclo": "res://assets/audio/mecanismo_ciclo.wav",
+	"portao_abre": "res://assets/audio/portao_abre.wav",
+	"portao_fecha": "res://assets/audio/portao_fecha.wav",
+	"sino_mecanismo": "res://assets/audio/sino_mecanismo.wav",
+	"pedra_racha": "res://assets/audio/pedra_racha.wav",
+	"pedra_parte": "res://assets/audio/pedra_parte.wav",
+	"lamina_passa": "res://assets/audio/lamina_passa.wav",
+	"fogo_sopro": "res://assets/audio/fogo_sopro.wav",
+	"raio_aviso": "res://assets/audio/raio_aviso.wav",
+	"raio_cai": "res://assets/audio/raio_cai.wav",
+	"bau_abrir": "res://assets/audio/bau_abrir.wav",
+	"recompensa": "res://assets/audio/recompensa.wav",
+	"desbloqueio": "res://assets/audio/desbloqueio.wav",
 }
 const VOZES := 8
 enum Prioridade { NORMAL, MEDIA, ALTA }
@@ -287,3 +308,134 @@ func definir_semente_teste(semente: int) -> void:
 	_rng.seed = semente
 	_ultima_variante.clear()
 	_cooldowns.clear()
+
+
+# ======================================================================
+# LACOS AMBIENTAIS (SFX Overhaul Prompt 3B)
+# ======================================================================
+#
+# O pool de 8 vozes e' de ONE-SHOTS: escolhe a voz mais antiga quando fica
+# sem vozes livres. Um laco de vento posto la' dentro seria cortado pelo
+# terceiro passo da Koliani -- e, pior, ao ser cortado por um `p.play()` de
+# outro som ficaria a ocupar uma voz para sempre em muitos casos.
+#
+# Por isso os lacos tem canal PROPRIO, fora do pool. Nao e' aumentar o pool:
+# sao dois players a mais, no mesmo bus "SFX", e o pool continua com 8 vozes
+# exactamente como estava.
+#
+# O que este canal garante (e que o harness `verificar_sfx_mundo.gd` prova):
+#
+#   * pedir o mesmo laco duas vezes NAO cria um segundo player -- so' repoe
+#     o volume. Era o vazamento obvio: uma `WindZone` com a Koliani a entrar
+#     e a sair empilhava um player por entrada;
+#   * `LACOS_MAX` e' um tecto duro. Havendo mais zonas ambientais do que
+#     canais, as que sobram ficam caladas em vez de comerem CPU de telemovel;
+#   * TROCAR DE CENA mata todos os lacos. Um laco e' do autoload, nao da
+#     cena, por isso nada morre com o `queue_free()` do nivel -- sem este
+#     guarda, o vento do N08 seguia para o menu.
+const LACOS_MAX := 3
+
+var _lacos := {}                  # nome -> AudioStreamPlayer
+var _cena_dos_lacos: Node = null  # a cena que estava de pe' quando abriram
+
+
+## Poe `nome` a tocar em ciclo, ou so' reajusta o volume se ja' estiver.
+## Devolve `true` se o laco esta' a tocar depois da chamada.
+func laco(nome: String, volume_db := -24.0, fade := 0.6) -> bool:
+	var p := _lacos.get(nome) as AudioStreamPlayer
+	if p != null and is_instance_valid(p):
+		_alvo_volume(p, volume_db, fade)
+		return true
+	if _lacos.size() >= LACOS_MAX:
+		return false
+	var st := _stream(nome)
+	if st == null:
+		return false
+	_marcar_ciclico(st)
+	p = AudioStreamPlayer.new()
+	p.bus = "SFX"
+	p.stream = st
+	p.volume_db = volume_db if fade <= 0.0 else volume_db - 24.0
+	add_child(p)
+	p.play()
+	_lacos[nome] = p
+	_cena_dos_lacos = get_tree().current_scene if is_inside_tree() else null
+	if fade > 0.0:
+		_alvo_volume(p, volume_db, fade)
+	return true
+
+
+## Desliga um laco. Com `fade > 0` desvanece e so' depois liberta o player --
+## a entrada no dicionario sai JA', para um `laco()` no meio do fade abrir um
+## player novo em vez de reanimar um que esta' a morrer.
+func parar_laco(nome: String, fade := 0.5) -> void:
+	var p := _lacos.get(nome) as AudioStreamPlayer
+	_lacos.erase(nome)
+	if p == null or not is_instance_valid(p):
+		return
+	if fade <= 0.0:
+		p.stop()
+		p.queue_free()
+		return
+	var tw := create_tween()
+	tw.tween_property(p, "volume_db", p.volume_db - 30.0, fade)
+	tw.tween_callback(func() -> void:
+		if is_instance_valid(p):
+			p.stop()
+			p.queue_free())
+
+
+func parar_lacos(fade := 0.0) -> void:
+	for nome: String in _lacos.keys():
+		parar_laco(nome, fade)
+
+
+## Quantos lacos estao mesmo a tocar. E' o numero que o harness conta.
+func lacos_ativos() -> int:
+	var n := 0
+	for nome: String in _lacos:
+		var p := _lacos[nome] as AudioStreamPlayer
+		if is_instance_valid(p) and p.playing:
+			n += 1
+	return n
+
+
+func _alvo_volume(p: AudioStreamPlayer, db: float, fade: float) -> void:
+	if fade <= 0.0:
+		p.volume_db = db
+		return
+	create_tween().tween_property(p, "volume_db", db, fade)
+
+
+## Os `.wav` do catalogo sao importados sem `loop_mode` -- tocariam uma vez
+## e calavam-se. Marca-se aqui, no recurso ja' em cache, e nao a mao no
+## `.import`: o `--import` do Godot reescreve esses ficheiros e a marca
+## perdia-se na primeira reimportacao de assets.
+func _marcar_ciclico(st: AudioStream) -> void:
+	var w := st as AudioStreamWAV
+	if w != null:
+		if w.loop_mode != AudioStreamWAV.LOOP_FORWARD:
+			w.loop_mode = AudioStreamWAV.LOOP_FORWARD
+			w.loop_begin = 0
+			# `loop_end = 0` NAO quer dizer "ate' ao fim": e' uma regiao de
+			# ciclo de comprimento zero, e o player arranca e para no mesmo
+			# frame. Media-se `playing == false` com `loop_mode == 1` --
+			# parecia um laco que nao arrancava e era um laco vazio.
+			w.loop_end = int(w.get_length() * float(w.mix_rate))
+		return
+	var o := st as AudioStreamOggVorbis
+	if o != null:
+		o.loop = true
+
+
+## Um laco pertence ao AUTOLOAD, nao a' cena que o pediu. Sem este guarda,
+## sair do nivel com `change_scene_to_file` deixava o vento a tocar por cima
+## do menu -- e a cena seguinte, ao pedir o seu proprio ambiente, batia no
+## `LACOS_MAX` com canais ocupados por um nivel que ja' nao existe.
+func _process(_dt: float) -> void:
+	if _lacos.is_empty():
+		return
+	var cena := get_tree().current_scene if is_inside_tree() else null
+	if cena != _cena_dos_lacos:
+		parar_lacos(0.0)
+		_cena_dos_lacos = cena
