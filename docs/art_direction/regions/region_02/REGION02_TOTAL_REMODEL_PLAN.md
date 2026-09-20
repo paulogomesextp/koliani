@@ -105,10 +105,14 @@ B−R nos N06/N08/N09 é consequência do céu em falta, não causa.
 - **N08** — laje suspensa com vazio por baixo e coluna alta: a ideia certa.
   Mas o "vazio" é rocha escura, não céu; o fundo são calhaus, não ilhas.
 - **N09** — brilho magenta forte, paredes altas de alvenaria e um bloco
-  com **cruz de campa**. Lê-se como cripta. (Verificado: `cruz` e `lapide`
-  **não** estão no catálogo `deco.json` do bioma — a cruz vem da camada de
-  fundo. A contaminação é real, a origem é outra. Não repetir o
-  diagnóstico da Região III sem medir.)
+  com **cruz de campa**. Lê-se como cripta.
+
+  > **CORRIGIDO no Prompt 2.** Aqui estava escrito que a cruz vinha da
+  > camada de fundo e **não** dos props, porque `cruz` e `lapide` não
+  > estão no `deco.json`. Estava errado: é o prop **`velas.png`**, um
+  > nicho de capela com uma cruz gravada por baixo, e **estava** no
+  > catálogo do bioma. Ter verificado só dois nomes e concluído a partir
+  > disso foi meia medição. Já saiu do `desfiladeiro`.
 - **N10** — setas de vento visíveis (o FX existe e lê-se bem), Guardião
   presente, plataformas em degraus. Falta a **Torre dos Céus**: a prancha
   dá-lhe `ambiente: torre celestial` e o jogo não tem landmark nenhum.
@@ -379,7 +383,14 @@ os FX de vento (o N10 prova que se lêem); o rig do Guardião.
 
 **Refazer (REBUILD):** o **tratamento** do mar de nuvens (R1) — o asset
 serve, o pipeline é que o apaga; as silhuetas de fundo, hoje uma só
-receita (`_forma_penhasco`) para os cinco níveis.
+receita para os cinco níveis.
+
+> **CORRIGIDO no Prompt 2.** Estava escrito que essa receita era o
+> `_forma_penhasco`. Não é: com `fundo_pack` preenchido — e estes cinco
+> níveis têm-no — o `_gerar_parallax` sai antes de lá chegar, e o
+> `_forma_penhasco` é código morto para a Região II. As silhuetas vêm das
+> texturas do pack, e a variação por nível fez-se a recompô-las
+> (`PERFIS_ALTITUDE`).
 
 **Extrair das pranchas:** variações de terreno com **vinhas vermelhas** e
 com **gelo**; **ponte com arcadas**; **queda de água**; **torre celestial**;
