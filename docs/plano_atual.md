@@ -1,3 +1,15 @@
+## Estado (20 set 2026)
+
+Região III — continuação do Super-Process B: **PARTIAL**, na branch
+`claude/region03-completion-pass`. Arquitetura de primeiro plano e props
+saíram de LOW; mecânicas canónicas implementadas nos cinco níveis; Vyrak
+com lore alinhada. Falta a auditoria eixo a eixo, a legibilidade, e a
+decisão do Paulo sobre os doze níveis de outras regiões que mudaram de
+traçado. Detalhe em
+`docs/implementation/region_03_completion_continuation.md`.
+
+---
+
 ## Super-Process A2 — remediação de fidelidade da Região II (18 set 2026)
 
 **Estado: quase completo.**

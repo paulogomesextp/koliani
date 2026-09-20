@@ -1,3 +1,54 @@
+## Região III — continuação do Super-Process B (20 set 2026) · PARTIAL
+
+Branch `claude/region03-completion-pass`, de `3c1ca794` (LOCAL == REMOTE
+confirmado). Relatório:
+[`region_03_completion_continuation.md`](implementation/region_03_completion_continuation.md).
+**NÃO integrado em master** — é PARTIAL, e o briefing só deixa integrar PASS.
+
+**Fechado:** os dois eixos que estavam LOW. Props do bioma `torres` de 12
+para **32** (`tools/gerar_props_torre_ecos.py`, desenhados — os packs de
+origem não vêm no Git), com a `cruz` e a `lapide` de cemitério fora; e 46 %
+da arquitetura (arcos, colunas, vitrais, sinos grandes) plantada em
+`z = -1`, à escala de quem passa por baixo, em vez de toda no fundo a
+`z = -3`. Mecânicas por nível pelo contrato §2: N12 elevador, N13
+engrenagens, N14 updraft, N15 plataformas ilusórias. Medido na região:
+ilusórias 0→20, rodas 0→6, elevadores 0→3, sinos 4→6. Vyrak sem lore de
+dragão nas 6 línguas.
+
+**O QUE PRECISA DE DECISÃO (é o que bloqueia):** dar à Torre dos Ecos as
+mecânicas do cânone reescreve **doze níveis de outras regiões** (20, 41-45,
+51, 56-60). Nenhum regride — suite, 100 jornadas, alcance e `spawn_livre`
+passam todos — mas ninguém pediu para lhes mexer. Está no `PRIORIDADES.md`.
+
+**TRÊS ARMADILHAS QUE CUSTARAM VOLTAS:**
+
+1. O `_rng` do gerador é **um só e sequencial**: um sorteio a mais na
+   decoração desloca tudo e muda a geometria de TODAS as regiões. A
+   decoração passou a ter `_rng_deco` próprio, e o `_coluna_fundo` continua
+   a consumir os mesmos quatro sorteios pela mesma ordem. Dentro dele, o
+   `return` da textura que não carrega tem de ficar ANTES dos outros três.
+2. `nivel_de_estreia()` devolve **0** para uma câmara fora da tabela. Tirar
+   `serras`/`gravidade`/`torre` dos sítios onde estreavam pô-las
+   disponíveis desde o nível 1 — a Floresta ganhou salas de serra e o
+   `spawn_livre` acusou "respawn não permite salto (8 px)", risco de
+   softlock. Daí o `DESBLOQUEIO_FIXO`.
+3. Não basta comparar QUE câmaras ficam disponíveis: o gerador **duplica o
+   peso** de uma câmara nos 8 níveis a seguir à estreia. A primeira análise
+   só comparou conjuntos, deu "zero afectados", e o nível 23 mudou 1372
+   linhas na mesma. O modelo tem de ser o multiconjunto pesado.
+
+**Método:** `tools/baseline_geometria.gd` (novo) grava o que é funcional e
+ignora o decorativo — é assim que se prova "0 alterações" numa jornada
+procedural. Congela `Engine.time_scale` senão as serras, que se movem,
+dão diffs de ruído. E só vale depois de um `--import` estável: a primeira
+baseline foi tirada logo após um `git stash` e deu falso positivo.
+
+**Por fazer:** auditoria de fidelidade eixo a eixo contra as pranchas
+APPROVED; legibilidade (há massa quase preta em todos os cinco níveis);
+onde é que `serras` e `gravidade` passam a ser apresentadas.
+
+---
+
 ## Região III — Torre dos Ecos: identidade canónica (19 set 2026)
 
 Branch `claude/region03-completion-pass`, a partir de `origin/master @
