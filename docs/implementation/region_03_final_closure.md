@@ -123,9 +123,11 @@ lanternas, braseiros, candelabros e vitrais desenhados e **zero**
 alavancas e das luzes próprias da jornada. No ecrã são 3-7 em vista.
 
 > Armadilha de método, registada porque quase passou: uma corrida da
-> suite levou 25 min (o normal é ~8) e eu atribuí isso às luzes. Era
-> **contenção de CPU** — o batch dos 100 níveis estava a correr ao mesmo
-> tempo. Medir antes de concluir.
+> suite levou 25 min e eu atribuí isso às luzes novas. Cronometrada
+> sozinha, **a suite leva 14 segundos**. Os 25 min eram inteiramente
+> **contenção de CPU** com o batch dos 100 níveis a correr em paralelo —
+> e o "~8 min" que eu usava como referência também era contenção, de
+> outra corrida. Medir sozinho, antes de concluir.
 
 ### A geometria não mudou com isto
 

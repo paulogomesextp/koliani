@@ -440,7 +440,8 @@ func _acender(sp: Sprite2D, nome: String, tex: Texture2D, esc: float) -> void:
 	# adivinhar: com estas luzes os niveis da regiao tem 78/110/107
 	# `PointLight2D`; sem elas, 63/95/84. Ou seja 15-23 por nivel, ~20% do
 	# total -- o grosso vem dos checkpoints, das alavancas e das luzes
-	# proprias da jornada. O tecto quase nao mexe na contagem; esta' aqui
+	# proprias da jornada. E a suite completa, cronometrada sozinha, leva
+	# 14 s com isto ligado. O tecto quase nao mexe na contagem; esta' aqui
 	# para o caso de uma laje muito larga, nao porque isto pesasse.
 	if _luzes_nesta >= MAX_LUZES_PLATAFORMA:
 		return

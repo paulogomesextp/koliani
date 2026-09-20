@@ -60,11 +60,16 @@ jogo tinha os props desenhados e **zero** `PointLight2D` neles — daí a
 "massa quase preta" que motivou o GATE 3. Agora acendem
 (`plataforma.gd::PROPS_COM_LUZ`).
 
-**Custo medido**, porque o jogo é mobile a 60fps: 78-112 luzes por nível
-(o tecto que o projeto já usa para as luzes próprias da jornada é 70).
-O que pesa é o que está no ecrã: com uma luz a cada ~190 px e um viewport
-de 1280 px são **3-7 em vista**, e as fotos confirmam três. `tools/contar_luzes.gd`
+**Custo medido**, porque o jogo é mobile a 60fps: com estas luzes os
+níveis da região têm 78/110/107 `PointLight2D`; **sem elas, 63/95/84** —
+ou seja 15-23 minhas, ~20% do total. O grosso vem dos checkpoints, das
+alavancas e das luzes próprias da jornada. O que pesa é o que está no
+ecrã: 3-7 em vista, e as fotos confirmam três. `tools/contar_luzes.gd`
 mede isto quando for preciso voltar a verificar.
+
+E o tempo: a suite completa, cronometrada sozinha, leva **14 segundos**
+com estas luzes. As corridas de 25 min que me assustaram eram contenção
+de CPU com os batches dos 100 níveis.
 
 ---
 
