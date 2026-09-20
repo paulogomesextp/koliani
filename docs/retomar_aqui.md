@@ -3058,3 +3058,19 @@ atual. Não repetir auditorias completas nesta retoma.
 - WER confirma o histórico `APPCRASH` do EXE 0.18.6 (`c0000005`, RVA `0x16b3420`), mas a queda nativa não foi reproduzida na base 0.18.7 nem na candidata. Estabilidade atual PROVEN; causa do crash histórico NOT ASSESSABLE.
 - QA crítico: portal/save/spawn PROVEN. Aviso de Camera2D e leaks ObjectDB dos arneses persistem fora do fluxo jogável. Combate completo, animações, mix, sensação e dispositivo mobile NOT ASSESSABLE. Banner central é PHASE C. Sem arte nova: NATIVE ART REQUIRED se houver lacuna.
 - Fases B–F não iniciadas; próximo passo é PHASE B após este commit/push.
+## SFX Overhaul Prompt 1 — audit + critical fixes (20 set 2026)
+
+- Worktree isolado `C:/Projetos/koliani-sfx`, branch `codex/sfx-overhaul`, base
+  `origin/master` `72ea2477`; worktree Região II não tocado. Auditoria em
+  `docs/audio/sfx_audit.md`; música regional intacta.
+- Corrigidos quatro defeitos objetivos: portal `onda`→`transicao`; morte fatal
+  da Koliani e de inimigo deixa de empilhar hurt+death; boss base separa
+  `chefe_cai` de `conquista` por 450 ms e baixa recompensa para −6 dB.
+- Godot real OpenGL: catálogo 79/79, eventos críticos/ checkpoint/UI PASS;
+  combate jogado 23/23 streams, combo 1× por passo, pico SFX −3,9 dB; percurso
+  fatal Ghorak + L1→L2 PASS (uma morte/entrada, 7 motes/70, recompensa única).
+- Suite geral imprime OK mas entra em ciclo por SceneTree nula nos testes R3
+  `run_tests.gd:3940–3983`; interrompida após três repetições, não PASS limpo.
+  HUMAN LISTEN/PLAYTEST e DEVICE VALIDATION continuam obrigatórios.
+- Próximo: SFX Prompt 2 — combat + player + enemy sound pass; depois bosses e
+  mundo. Não iniciar automaticamente.

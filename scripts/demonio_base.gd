@@ -1078,7 +1078,6 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0, critico := false,
 		_flinch_dir = signf(dir_empurrao)
 		anticipacao = 0.6
 		return
-	_voz("dano", -16.0, 1.15 if critico else 1.0)
 	var q := quantidade
 	if critico:
 		q = int(round(q * (CRIT_MULT + EstadoJogo.bonus("crit_mult"))))  # melhoria "furia"
@@ -1118,6 +1117,9 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0, critico := false,
 				soltar_estilhacos()
 			queue_free()
 	else:
+		# Na morte, `_morrer_anim()` toca a voz `morte`; nao somar tambem a
+		# voz `dano` no mesmo frame.
+		_voz("dano", -16.0, 1.15 if critico else 1.0)
 		if dir_empurrao != 0.0:
 			_flinch_dir = signf(dir_empurrao)
 		_flinch = 1.5 if critico else 1.0

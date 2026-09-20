@@ -2703,9 +2703,12 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0) -> void:
 			1.0, 0.0, _olha_para < 0.0, false, 41, 0.35)
 	_abanar(TREMOR_DANO)
 	_hitstop(HITSTOP_DANO)
-	Som.toca("dano", -7.0)
 	if vida <= 0:
 		_morrer()
+	else:
+		# Um golpe fatal tem a voz propria de morte; empilhar `dano` no mesmo
+		# frame mascarava esse evento e gastava duas vozes do pool.
+		Som.toca("dano", -7.0)
 
 
 ## Passos e raspar na parede. Sao os unicos sons dela em CICLO, por isso

@@ -483,8 +483,7 @@ func _soltar_essencia_chefe(cena: Node) -> void:
 func _cair_derrotado() -> void:
 	_ja_derrotado = true
 	_restaurar_musica()
-	Som.toca("chefe_cai", -6.0)
-	Som.toca("conquista", -4.0)  # som de "conquista", distinto de matar um inimigo
+	_tocar_som_derrota()
 	derrotado.emit()
 	_explodir_derrotado()
 	soltar_estilhacos()
@@ -681,8 +680,7 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0, critico := false,
 		if not falas_fim.is_empty():
 			_cair_com_falas()
 		else:
-			Som.toca("chefe_cai", -6.0)
-			Som.toca("conquista", -4.0)  # "conquista", distinto de matar um inimigo
+			_tocar_som_derrota()
 			derrotado.emit()
 			_explodir_derrotado()
 			soltar_estilhacos()
@@ -692,6 +690,15 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0, critico := false,
 		if anim and anim.sprite_frames and anim.sprite_frames.has_animation("hit"):
 			anim.play("hit")
 		piscar_dano()
+
+
+## Separa o peso da queda da recompensa. Antes os dois samples arrancavam no
+## mesmo frame e os graves/transientes mascaravam-se. O timer vive na arvore,
+## portanto a conquista toca mesmo depois de o chefe fazer `queue_free()`.
+func _tocar_som_derrota() -> void:
+	Som.toca("chefe_cai", -6.0)
+	get_tree().create_timer(0.45, true, false, true).timeout.connect(
+		func() -> void: Som.toca("conquista", -6.0))
 
 
 ## Morte dos chefes-história: congela o chefe, diz as últimas falas e só
