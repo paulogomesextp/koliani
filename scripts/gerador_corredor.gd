@@ -152,8 +152,17 @@ const POOL_REGIAO := {
 	1: ["saltos", "correntes", "elevador", "quebra", "guilhotinas", "serras",
 		"portal", "crossfire", "espinhos", "alavanca", "prensa", "velas",
 		"segredo"],
-	2: ["vento", "saltos", "gravidade", "pendulos", "trampolim", "ritmo",
-		"portal", "ferry", "sinos", "alavanca", "segredo"],
+	# III Torre dos Ecos: a torre e' uma MAQUINA de sinos, e a pool tem de
+	# o dizer. A antiga (`vento, saltos, gravidade, pendulos, trampolim,
+	# ritmo, portal, ferry, sinos, alavanca, segredo`) nao tinha elevador,
+	# nem engrenagens, nem vitral, nem plataformas ilusorias -- nenhuma das
+	# mecanicas que o contrato §2 da' aos cinco niveis -- e trazia
+	# `gravidade` (heranca do antigo "Observatorio Lunar", nome que o canone
+	# ja' substituiu por "Campanario") e `trampolim`, que e' a assinatura da
+	# Floresta. Todas as camaras abaixo ja' existiam no vocabulario.
+	2: ["sinos", "elevador", "engrenagens", "vitral", "espectral",
+		"correntes", "quebra", "orbita", "vento", "pendulos", "ritmo",
+		"saltos", "alavanca", "peso", "memoria", "portal", "segredo"],
 	3: ["gruta", "pedras", "elevador", "quebra", "guilhotinas", "pendulos",
 		"portal", "ferry", "espinhos", "velas", "prensa", "alavanca",
 		"segredo", "sinos"],
@@ -327,14 +336,32 @@ const MECANICA_DO_NIVEL := [
 	{"cam": "guilhotinas", "grau": 0},
 	{"cam": "arena", "grau": 0},
 	{"cam": "prensa", "grau": 1},
-	# --- niveis 11-15  (Regiao 3) ---
-	{"cam": "sinos", "grau": 0},
-	{"cam": "vento", "grau": 0},
-	{"cam": "serras", "grau": 0},
-	{"cam": "gravidade", "grau": 0},
-	{"cam": "torre", "grau": 1},
+	# --- niveis 11-15  (Regiao 3: Torre dos Ecos) ---
+	# A ESTREIA de cada nivel passa a ser a mecanica que o canone lhe da'
+	# (contrato §2). Era `sinos/vento/serras/gravidade/torre`: o N12 estreava
+	# VENTO, que e' a assinatura da Regiao II; o N13 estreava SERRAS num
+	# nivel chamado "Mecanismos Antigos"; e o N15 estreava "torre", que nao
+	# e' mecanica nenhuma. Todas as camaras usadas aqui ja' existiam no
+	# vocabulario do gerador -- nao se inventou nada fora das pranchas.
+	{"cam": "sinos", "grau": 0},        # N11 Entrada dos Ecos -- "aprende a ouvir"
+	{"cam": "elevador", "grau": 0},     # N12 Galerias Verticais -- elevador de coluna
+	{"cam": "engrenagens", "grau": 0},  # N13 Mecanismos Antigos -- rodas e alavancas
+	{"cam": "vento", "grau": 0},        # N14 Campanario -- o updraft do ar livre
+	# N15: o canone pede "ecos de memoria (plataformas ilusorias)". A
+	# camara `memoria` tem o NOME certo e a mecanica errada -- e' uma
+	# sala de memorial com varandas e velas, sem plataforma ilusoria
+	# nenhuma. `espectral` e' que constroi a `PlataformaEspectral`.
+	# Escolher pelo nome era a falsa fidelidade que o contrato §9
+	# proibe ("nao declarar HIGH porque a cor parece semelhante").
+	{"cam": "espectral", "grau": 1},  # N15 O Topo dos Ecos -- plataformas ilusorias
 	# --- niveis 16-20  (Regiao 4) ---
-	{"cam": "elevador", "grau": 0},
+	# N16 Cemiterio dos Reis: APRESENTAVA `elevador`, que a Torre dos Ecos
+	# reclamou para o N12 (canone: "elevador de coluna"). Os tumulos
+	# elevadores do N16 continuam la' -- `elevador` esta' na pool da Regiao
+	# IV e ja' desbloqueado --, o que muda e' qual a mecanica que o nivel
+	# APRESENTA. Fica com a `torre`, que nao esta' na pool de regiao nenhuma
+	# e por isso pode mudar de casa sem mexer no calendario de ninguem.
+	{"cam": "torre", "grau": 0},
 	{"cam": "quebra", "grau": 0},
 	{"cam": "velas", "grau": 0},
 	{"cam": "pedras", "grau": 0},
@@ -382,7 +409,7 @@ const MECANICA_DO_NIVEL := [
 	{"cam": "esporos", "grau": 1},
 	{"cam": "raizes", "grau": 1},
 	# --- niveis 56-60  (Regiao 12) ---
-	{"cam": "engrenagens", "grau": 1},
+	{"cam": "torre", "grau": 0},
 	{"cam": "peso", "grau": 1},  # estreia propria: era o `elevador` do 16 outra vez
 	{"cam": "replicantes", "grau": 1},
 	{"cam": "circuito", "grau": 1},
@@ -438,8 +465,34 @@ const MECANICA_DO_NIVEL := [
 ]
 
 
-## Nível (0-based) em que cada câmara ESTREIA. Derivado da tabela, uma vez.
-## Uma câmara que não esteja na tabela (torre/poço/descanso e as `TIER_EXTRA`,
+## DESBLOQUEIO FIXO -- e porque e' que isto teve de existir.
+##
+## A `MECANICA_DO_NIVEL` fazia DUAS coisas ao mesmo tempo: dizia que mecanica
+## cada nivel APRESENTA, e -- por ser a primeira ocorrencia -- decidia a
+## partir de que nivel cada camara fica DISPONIVEL em todas as regioes. Com
+## as duas presas uma a` outra, dar aos cinco niveis da Torre dos Ecos as
+## mecanicas do canone mexia no calendario de desbloqueio de regioes que
+## nada tem a ver com isto: a melhor permutacao possivel ainda reconstruia
+## dez niveis das Regioes VI e VIII.
+##
+## A `gravidade` e' o caso que sobra. Apresentava-se no N14 (que era o
+## "Observatorio Lunar" e passou a "Campanario"), mas continua na pool das
+## Regioes VI, VIII, XIII, XIV, XVI e XVIII -- e se o desbloqueio dela
+## escorregasse, esses niveis mudavam de forma. Fica presa no 13, que e'
+## onde sempre esteve.
+##
+## O PRECO, dito sem rodeios: a `gravidade` deixa de ter nivel onde seja
+## APRESENTADA ao jogador (continua a aparecer, so' nao leva o aviso de
+## estreia). E' o unico custo de nao reconstruir dez niveis de outras
+## regioes, e esta' anotado no PRIORIDADES.md para o Paulo decidir.
+const DESBLOQUEIO_FIXO := {
+	"serras": 12,
+	"gravidade": 13,
+}
+
+## Nível (0-based) em que cada câmara fica DISPONÍVEL. Derivado da tabela,
+## uma vez, com o `DESBLOQUEIO_FIXO` por cima.
+## Uma câmara que não esteja na tabela (poço/descanso e as `TIER_EXTRA`,
 ## que são escolhidas por outros ramos) devolve 0 -- sempre disponível.
 static var _estreia_cache: Dictionary = {}
 
@@ -449,6 +502,7 @@ static func nivel_de_estreia(cam: String) -> int:
 			var c: String = MECANICA_DO_NIVEL[i]["cam"]
 			if not _estreia_cache.has(c):
 				_estreia_cache[c] = i
+		_estreia_cache.merge(DESBLOQUEIO_FIXO, true)
 	return int(_estreia_cache.get(cam, 0))
 
 
@@ -546,7 +600,12 @@ const ASSIN_NIVEL := {
 	0: "raizes",   # n1  Caminho das Raízes -- raízes que irrompem do chão
 	2: "teias",    # n3  Ninho da Viúva Negra -- teias que prendem
 	3: "acido",    # n4  A Árvore que Chora -- lágrimas ácidas a pingar
-	12: "raio",    # n13 Torre da Tempestade -- raios em coluna, padrão previsível
+	# N13 "Mecanismos Antigos": o raio FICA, por decisao do briefing -- nao e'
+	# contradicao com o canone desde que se leia como a maquinaria da torre a
+	# descarregar, e nao como uma regiao eletrica a` parte. E' por isso que a
+	# ESTREIA do nivel passou a `engrenagens`: o que enquadra o raio sao as
+	# rodas e as alavancas a` volta dele.
+	12: "raio",    # n13 Mecanismos Antigos -- descarga da maquinaria, padrão previsível
 }
 
 ## PERFIL DE FORMA por nível (redesenho pedido pelo Paulo, 2 set 2026): cada
@@ -578,12 +637,15 @@ const PERFIL := [
 	{"v": 0, "f": "gauntlet", "a": 0.8},  # 7  Corredor das Execuções -- guilhotinas e lâminas
 	{"v": 0, "f": "combate", "a": 0.9},   # 8  Ala dos Mortos -- irmãos fantasma
 	{"v": 1, "f": "vertical", "a": 0.95}, # 9  A Cela Zero (chefe) -- labirinto vertical
-	# --- Região III  Torres Esquecidas (10-14) : verticalidade, banda ampla
-	{"v": 1, "f": "maquina", "a": 1.15},  # 10 Torre dos Sinos -- plataformas que mudam
-	{"v": 1, "f": "salto", "a": 1.22},    # 11 Torre dos Ventos -- correntes de ar, saltos longos
-	{"v": 1, "f": "gauntlet", "a": 1.15}, # 12 Torre da Tempestade -- raios em padrão
-	{"v": 1, "f": "maquina", "a": 1.22},  # 13 Observatório Lunar -- gravidade variável
-	{"v": 1, "f": "combate", "a": 1.0},   # 14 O Pico Esquecido (chefe) -- Vyrak
+	# --- Região III  Torre dos Ecos (10-14) : verticalidade, banda ampla --
+	# Os nomes nos comentarios eram os ANTIGOS (Torre dos Ventos, Torre da
+	# Tempestade, Observatorio Lunar): o canone renomeou-os e o foco de
+	# camaras seguia os nomes velhos.
+	{"v": 1, "f": "maquina", "a": 1.15},  # 10 N11 Entrada dos Ecos -- oscilantes e correntes
+	{"v": 1, "f": "vertical", "a": 1.22}, # 11 N12 Galerias Verticais -- "foco total na verticalidade"
+	{"v": 1, "f": "maquina", "a": 1.15},  # 12 N13 Mecanismos Antigos -- maquinaria, nao corredor de perigo
+	{"v": 1, "f": "maquina", "a": 1.22},  # 13 N14 Campanario -- sinos em movimento e vento
+	{"v": 1, "f": "combate", "a": 1.0},   # 14 N15 O Topo dos Ecos (chefe) -- Vyrak
 	# --- Região IV  Catacumbas do Abismo (15-19) : túneis apertados, a descer
 	{"v": -1, "f": "maquina", "a": 0.9},  # 15 Cemitério dos Reis -- túmulos elevadores
 	{"v": 0, "f": "gauntlet", "a": 0.8},  # 16 Galeria dos Ossos -- corredores de osso

@@ -2518,17 +2518,49 @@ func teste_mecanica_por_nivel() -> void:
 			"niveis %d e %d estreiam os dois '%s' -- seguidos nao pode"
 				% [k, k + 1, mec[k]])
 
-	# TODAS as camaras que o jogo sabe construir tem de estrear em algum
-	# nivel -- uma camara que exista e nunca estreie e' trabalho parado.
+	# TODAS as camaras que o jogo sabe construir tem de ter um nivel onde
+	# APARECEM -- uma camara que exista e nunca apareca e' trabalho parado.
 	# (o `descanso` fica de fora: e' o alivio entre camaras, nao uma estreia)
+	#
+	# 20 set 2026: a regra passa a ser "ou e' apresentada num nivel, OU tem
+	# desbloqueio fixo declarado". A `MECANICA_DO_NIVEL` fazia duas coisas ao
+	# mesmo tempo -- dizia o que cada nivel apresenta E, por ser a primeira
+	# ocorrencia, quando cada camara ficava disponivel em TODAS as regioes.
+	# Dar a` Torre dos Ecos as mecanicas do canone obrigava a mexer no
+	# calendario de desbloqueio de regioes que nada tem a ver com isto (a
+	# melhor permutacao possivel ainda reconstruia dez niveis das Regioes VI
+	# e VIII). O `DESBLOQUEIO_FIXO` prende o calendario dessas; o preco e'
+	# ficarem sem o aviso de estreia. A lista tem de ser PEQUENA e explicita
+	# -- e' por isso que o teste a le' do codigo em vez de a aceitar em
+	# silencio, e falha se alguem la' despejar camaras para calar o teste.
 	var estreadas: Dictionary = {}
 	for c in mec:
 		estreadas[c] = true
+	# le'-se do CODIGO-FONTE, como o resto deste teste
+	var fixas: Array[String] = []
+	var j := src.find("const DESBLOQUEIO_FIXO :=")
+	_ok(j >= 0, "falta a const DESBLOQUEIO_FIXO")
+	if j >= 0:
+		var bf := src.substr(j, src.find("\n}", j) - j)
+		for linha in bf.split("\n"):
+			var l := linha.strip_edges()
+			if not l.begins_with("\""):
+				continue
+			fixas.append(l.substr(1, l.find("\"", 1) - 1))
+	_ok(fixas.size() <= 3,
+		"DESBLOQUEIO_FIXO tem %d entradas: e' uma excepcao, nao uma gaveta"
+			% fixas.size())
 	for c: String in cams:
 		if c == "descanso":
 			continue
-		_ok(estreadas.has(c),
-			"a camara '%s' existe mas nunca estreia em nivel nenhum" % c)
+		_ok(estreadas.has(c) or fixas.has(c),
+			"a camara '%s' existe mas nunca aparece em nivel nenhum" % c)
+	for c: String in fixas:
+		_ok(c in cams,
+			"DESBLOQUEIO_FIXO prende '%s', que nem sequer existe" % c)
+		_ok(not estreadas.has(c),
+			"'%s' esta' no DESBLOQUEIO_FIXO e TAMBEM e' apresentada num" % c
+			+ " nivel -- uma das duas esta' a mais")
 
 	# e os primeiros 32 niveis estreiam 32 coisas diferentes: sem isto o
 	# jogo voltava a abrir tudo de uma vez logo no inicio

@@ -1,3 +1,32 @@
+## Pendente de DECISÃO — Região III, mecânicas canónicas (20 set 2026)
+
+Branch `claude/region03-completion-pass`. Duas coisas que eu **não devia
+decidir sozinho**, ambas medidas e nenhuma escondida:
+
+A. **Doze níveis de OUTRAS regiões mudaram de forma.** Para a Torre dos
+   Ecos ter as mecânicas do cânone (elevador no N12, engrenagens no N13,
+   plataformas ilusórias no N15), essas câmaras têm de desbloquear mais
+   cedo. E o desbloqueio é **global**: a `MECANICA_DO_NIVEL` dizia ao mesmo
+   tempo o que cada nível apresenta *e* a partir de quando cada câmara fica
+   disponível em todas as regiões — e o gerador ainda **duplica o peso** de
+   uma câmara nos 8 níveis seguintes à estreia. Resultado: os níveis
+   **20, 41-45, 51 e 56-60** saem com outro traçado.
+
+   Nenhum deles regride: a suite, as 100 jornadas, o alcance de todas as
+   salas e o `spawn_livre` passam. Nenhuma dessas regiões teve ainda a sua
+   passagem de cânone. Mas são doze níveis que ninguém pediu para mexer.
+   **Se preferires zero dano colateral, o preço é a Região III ficar sem
+   elevadores, sem engrenagens e sem plataformas ilusórias** — ou seja,
+   sem o que o contrato §2 lhe dá.
+
+B. **A `gravidade` e as `serras` deixaram de ter nível onde são
+   APRESENTADAS.** Continuam a aparecer no jogo e o calendário de
+   desbloqueio delas está preso onde sempre esteve
+   (`DESBLOQUEIO_FIXO`), mas perderam o aviso de estreia. Apresentavam-se
+   no antigo "Observatório Lunar" e na antiga "Torre da Tempestade" —
+   níveis que o cânone renomeou para Campanário e Mecanismos Antigos. Dar-
+   lhes casa noutro sítio custava reconstruir mais níveis (ver A).
+
 ## Pendente de DECISÃO — Região III, Torre dos Ecos (19 set 2026)
 
 Branch `claude/region03-completion-pass` (**PARTIAL, não integrada**).
