@@ -31,16 +31,27 @@ sessão, save, progressão, movimento, 9 verificadores do CI, spawn): 0 falhas.
    acusava regressões que mudavam de plataforma a cada corrida. Era da
    ferramenta, não do jogo.
 
-E uma de método: uma suite de 25 min (normal ~8) não eram as luzes novas
-— era **contenção de CPU** com o batch dos 100 níveis a correr em
-paralelo. Medido depois: as luzes de props são 15-23 por nível, ~20% do
-total. Medir antes de concluir.
+E uma de método: uma suite de 25 min não eram as luzes novas — era
+**contenção de CPU** com o batch dos 100 níveis a correr em paralelo. O
+"~8 min" que eu usava de referência era contenção também. Cronometrada
+sozinha, **a suite leva 14 segundos** (e 30 s no runner do CI). Medido
+depois: as luzes de props são 15-23 por nível, ~20% do total. Medir
+sozinho, antes de concluir.
 
 **A arquitetura que fechou isto:** apresentação e desbloqueio deixaram de
 ser a mesma coisa. `nivel_de_apresentacao()` (posição na tabela, só o
 aviso) vs `nivel_de_desbloqueio()` (`DESBLOQUEIO_BASE` global congelado +
 `DESBLOQUEIO_REGIAO` local). A Torre dos Ecos antecipa elevador,
 engrenagens e plataformas ilusórias só para si.
+
+**Produção (run #487, `7f789a18`):** os cinco jobs verdes — testes
+headless, Android, Windows, Web e Pages. Release `win-latest` reescrito
+às 09:54:40 com `Koliani-windows.zip` (131 168 223 bytes) do mesmo SHA;
+deployment de Pages verde do mesmo SHA. **MASTER == WINDOWS == PWA.**
+
+> A run #486 (`e4576f1e`) ficou encravada >40 min no passo "Correr suite
+> de testes" e nunca fechou. Não era código: o mesmo passo leva 14 s
+> local e correu em **30 s** na #487. Era o runner. A #487 substitui-a.
 
 **Fica para playtest humano:** a queda punitiva do N15 (não foi tocada,
 por decisão), e os eixos que ficaram em MEDIUM — midground, densidade

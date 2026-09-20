@@ -172,3 +172,51 @@ a diferença entre um modelo e uma medição.
   — uma segunda volta a falhar.
 - A queda punitiva do N15 **não foi tocada**: continua reservada para
   playtest humano, como mandado.
+
+---
+
+## PRODUÇÃO — o que ficou publicado, e o que não foi verificado
+
+`master` em `7f789a18`, versão **0.18.19**. Integração por
+**fast-forward** a partir de `17b90e28`: sem merge commit, sem force
+push, sem amend de commit publicado.
+
+| CI run #487 (`7f789a18`) | |
+|---|---|
+| Testes headless (suite + 9 verificadores) | **success** |
+| Build Android (APK debug) | **success** |
+| Build Windows (release) | **success** |
+| Build Web | **success** |
+| Publicar o Web no GitHub Pages | **success** |
+
+Release `win-latest` reescrito às 09:54:40 pelo job de Windows dessa run:
+`Koliani-windows.zip`, 131 168 223 bytes,
+`sha256:08d9a266794a7b8a71acbfdfe2982678498e9203f3a8c28285049c3ac45d36d9`.
+Corpo do release aponta o commit `7f789a187a3061f6ca3a369fa0f60e076f9d04aa`.
+**MASTER == WINDOWS SOURCE == PWA SOURCE**, os três no mesmo SHA.
+
+### A run que encravou, e porque não era do código
+
+A run #486 (`e4576f1e`) ficou **mais de 40 minutos** no passo "Correr
+suite de testes" e nunca fechou — o `updated_at` dela não avançou depois
+de 09:19:51. Era tentador chamar-lhe falha do código, porque esse passo
+é exactamente onde entraram as luzes novas. Não é:
+
+- a suite cronometrada sozinha nesta máquina leva **14 s**, saída 0;
+- o mesmo passo, no mesmo runner do GitHub, correu em **30 s** na #487
+  (09:48:56 → 09:49:26) com um HEAD que só difere da #486 em três
+  ficheiros de documentação.
+
+Um passo que passa de 30 s para >40 min sem alteração de código é
+infraestrutura. A #487 substitui-a.
+
+### O que NÃO foi verificado — dito por inteiro
+
+1. **O `.exe` não foi aberto em Windows.** O contentor não tem Windows
+   nem wine. O que se validou foi o `.pck` extraído do executável
+   exportado localmente do mesmo `master`: corre, imprime
+   `RUNTIME TRACE | build=0.18.19`, o menu desenha e os assets da torre
+   estão lá. Abrir o `.exe` a sério continua por fazer.
+2. **A PWA pública não foi aberta.** A rede deste contentor bloqueia
+   `github.io`. O que se reporta é o registo do deployment e o `head_sha`
+   — não uma visita à página. Não se inventa validação.
