@@ -63,9 +63,25 @@ func _ready() -> void:
 
 
 func _exit_tree() -> void:
+	# `is_instance_valid` TEM de ficar aqui e nao so' dentro do
+	# `_remover_do_corpo`: o parametro esta' tipado (`corpo: Node`), e o
+	# GDScript valida o tipo do argumento ANTES de entrar na funcao. Com um
+	# corpo ja' libertado, essa validacao rebenta antes de a guarda la' dentro
+	# chegar a correr --
+	#
+	#   Invalid type in function '_remover_do_corpo' in base 'Area2D
+	#   (WindZone)'. The Object-derived class of argument 1 (previously
+	#   freed) is not a subclass of the expected argument class.
+	#
+	# Acontece a serio: basta um inimigo com vento aplicado morrer dentro da
+	# zona, ou a Koliani ser libertada com o nivel, e o `_corpos` fica com uma
+	# referencia morta ate' ao descarregamento. O `_physics_process` poda a
+	# lista, mas o `_exit_tree` pode correr antes da poda seguinte.
 	for corpo in _corpos:
-		_remover_do_corpo(corpo)
+		if is_instance_valid(corpo):
+			_remover_do_corpo(corpo)
 	_corpos.clear()
+	_saudados.clear()
 	_parar_ambiente()
 
 

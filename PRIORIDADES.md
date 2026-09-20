@@ -1,3 +1,16 @@
+> **À espera do Paulo (SFX, 20 set 2026)** — o SFX Overhaul fechou a fase
+> automática (`READY_FOR_HUMAN_TEST`). Duas coisas dependem de ti:
+> 1. **Playtest de som** — checklist e percurso de 10–15 min em
+>    `docs/audio/HUMAN_SFX_PLAYTEST.md`; build em
+>    `build/qa/Koliani-SFX-QA.exe`.
+> 2. **Decidir o `esmagar.ogg`** — distorce (+7,3 dBFS, 16 callsites), mas
+>    corrigi-lo custa 1,4 dB do peso do som. Se distorcer ao ouvido:
+>    `python tools/corrigir_clipping_p4.py --forcar esmagar.ogg`.
+>
+> Por confirmar também: **áudio do Web** (arranca, mas não consegui provar
+> que sai som) e as **13 sobras de formato** em `assets/audio/` (143 KB de
+> `.ogg`/`.mp3` que nada toca — apagar ou deixar?).
+
 ## RESOLVIDO — Região III, dano colateral das mecânicas (20 set 2026)
 
 Estava aqui: dar à Torre dos Ecos as mecânicas do cânone reescrevia doze

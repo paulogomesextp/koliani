@@ -395,15 +395,25 @@ func _troca_de_cena() -> void:
 	zona.call("_ao_entrar", k)
 	await _assentar()
 	_checar(int(_som.call("lacos_ativos")) == 1, "o laco nao arrancou para o teste de cena")
-	# troca de cena a serio, sem ninguem chamar `parar_laco`
+	# Troca de cena A SERIO: a cena velha e' LIBERTADA antes de a nova entrar,
+	# que e' o que o `change_scene_to_file()` faz no jogo.
+	#
+	# A 1.a versao deste bloco so' trocava o `current_scene` com a cena velha
+	# ainda viva -- e passava, escondendo um defeito real: o guarda do `Som`
+	# comparava REFERENCIAS de cena, e em GDScript um `Object` libertado
+	# compara igual a `null`. Com a cena velha ja' morta, `null != <libertado>`
+	# dava FALSO e o guarda calava-se exactamente no caso para que existe: o
+	# vento seguia para o nivel seguinte. Hoje compara-se `instance_id`.
+	cena.queue_free()
+	await process_frame
 	var outra := Node2D.new()
 	root.add_child(outra)
 	current_scene = outra
 	await _assentar()
 	_checar(int(_som.call("lacos_ativos")) == 0,
 		"UM LACO SOBREVIVEU A' TROCA DE CENA (lacos=%d)" % int(_som.call("lacos_ativos")))
-	print("SFX CENA lacos_apos_troca=%d" % int(_som.call("lacos_ativos")))
-	cena.queue_free()
+	print("SFX CENA lacos_apos_troca=%d (cena velha libertada primeiro)"
+		% int(_som.call("lacos_ativos")))
 	outra.queue_free()
 	current_scene = null
 	await process_frame

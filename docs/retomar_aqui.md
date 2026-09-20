@@ -1,3 +1,50 @@
+## SFX Overhaul — Prompt 4 QA final + builds de teste (20 set 2026) · READY_FOR_HUMAN_TEST
+
+Branch `codex/sfx-overhaul`, HEAD inicial `61cb80f2`. Fecha a fase AUTOMÁTICA
+do overhaul: inventário completo, auditoria de clipping, QA de laços, builds
+de QA. A partir daqui **só se mexe com base no que o Paulo ouvir**.
+
+Inventário (`tools/inventario_audio.py`): 95 chaves, **0 missing, 0 unused,
+0 duplicados, 0 órfãos reais**; 13 sobras de formato (143 KB de `.ogg`/`.mp3`
+de chaves que hoje são `.wav`, não apagadas). Cuidado: o detector de callsites
+tem de cobrir três formas (directo, tabela, `%s` composto) — a 1.ª versão deu
+29 falsos "sem uso", incluindo as famílias de inimigos e o combo.
+
+**Clipping**: três samples descodificam ACIMA de 0 dBFS (`volumedetect`
+mentia — mede depois de cortar a int16; usar `astats`). `golpe_pesado`
+(+9,63) e `grito` (+1,90) corrigidos com limitador de janela + ganho de
+compensação, medidos contra o ficheiro CEIFADO (a referência honesta é o que
+o motor já entrega hoje, não o float cru). **`esmagar` (+7,26, 16 callsites)
+RECUSADO e por decidir**: tirar-lhe a distorção custa 1,4 dB do que se ouve
+— é decisão do Paulo, a um comando (`--forcar esmagar.ogg`). `raio.wav` já
+vem clipado de origem; não tocado.
+
+**Dois defeitos reais apanhados**: (1) em GDScript um `Object` libertado
+compara IGUAL a `null` — o guarda de troca de cena do Prompt 3B comparava
+referências e por isso NÃO matava os laços quando a cena velha era libertada
+primeiro, que é o que o `change_scene_to_file()` faz; o vento seguia para o
+nível seguinte. Agora compara `instance_id`. (2) `WindZone._exit_tree`
+rebentava com um corpo já libertado: o `is_instance_valid` estava dentro de
+uma função de parâmetro tipado, e o GDScript valida o tipo ANTES de entrar.
+
+Testes: 5 harnesses SFX a 0 falhas (criticos/combate/chefes/mundo/lacos_p4);
+suite geral OK. O erro de teardown da Região III foi **provado preexistente**
+com `git stash` + corrida no HEAD limpo — saída byte a byte igual.
+
+Builds: **Windows OK** (`build/qa/Koliani-SFX-QA.exe`), **Web arranca mas o
+ÁUDIO ficou POR PROVAR** (AudioContext `running`, sem erros, mas não consegui
+disparar som — teste inconclusivo, não negativo; "Web mudo" já foi defeito
+real na 9F), **Android BLOCKED BY ENVIRONMENT** (sem SDK nesta máquina).
+
+Nada integrado em `master`; PWA, `win-latest` e o `Koliani.exe` oficial
+intactos. Relatórios: [`docs/audio/final_audio_qa.md`](audio/final_audio_qa.md),
+[`docs/audio/final_sfx_inventory.md`](audio/final_sfx_inventory.md).
+Checklist do Paulo: [`docs/audio/HUMAN_SFX_PLAYTEST.md`](audio/HUMAN_SFX_PLAYTEST.md).
+
+Próximo passo: **playtest humano**. Não iniciar outro passe automático de SFX.
+
+---
+
 ## SFX Overhaul — Prompt 2 player/combat/enemies (20 set 2026) · PASS técnico
 
 Branch `codex/sfx-overhaul`, base/HEAD inicial `f8e73ed`. Normalizados player,

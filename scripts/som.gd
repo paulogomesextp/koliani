@@ -335,8 +335,12 @@ func definir_semente_teste(semente: int) -> void:
 #     guarda, o vento do N08 seguia para o menu.
 const LACOS_MAX := 3
 
-var _lacos := {}                  # nome -> AudioStreamPlayer
-var _cena_dos_lacos: Node = null  # a cena que estava de pe' quando abriram
+var _lacos := {}            # nome -> AudioStreamPlayer
+## ID da cena que estava de pe' quando os lacos abriram. Guarda-se o
+## `instance_id` e NAO a referencia: um `Object` ja' libertado compara IGUAL a
+## `null` em GDScript, e com a referencia o guarda de troca de cena nao
+## disparava justamente no caso que interessa (ver `_process`).
+var _cena_dos_lacos := 0
 
 
 ## Poe `nome` a tocar em ciclo, ou so' reajusta o volume se ja' estiver.
@@ -359,7 +363,7 @@ func laco(nome: String, volume_db := -24.0, fade := 0.6) -> bool:
 	add_child(p)
 	p.play()
 	_lacos[nome] = p
-	_cena_dos_lacos = get_tree().current_scene if is_inside_tree() else null
+	_cena_dos_lacos = _id_da_cena()
 	if fade > 0.0:
 		_alvo_volume(p, volume_db, fade)
 	return true
@@ -435,7 +439,28 @@ func _marcar_ciclico(st: AudioStream) -> void:
 func _process(_dt: float) -> void:
 	if _lacos.is_empty():
 		return
-	var cena := get_tree().current_scene if is_inside_tree() else null
-	if cena != _cena_dos_lacos:
+	var id := _id_da_cena()
+	if id != _cena_dos_lacos:
 		parar_lacos(0.0)
-		_cena_dos_lacos = cena
+		_cena_dos_lacos = id
+
+
+## O `instance_id` da cena actual, ou 0 se nao houver nenhuma.
+##
+## Porque nao se guarda a referencia: em GDScript um `Object` LIBERTADO
+## compara igual a `null`. O guarda comparava `cena != _cena_dos_lacos` com
+## uma referencia, e depois de a cena antiga ser libertada essa comparacao
+## dava `null != <libertado>` -> FALSO. Ou seja: o guarda calava-se
+## exactamente no caso para que foi feito.
+##
+## E e' o caso normal -- `change_scene_to_file()` liberta a cena antiga. O
+## defeito so' nao apareceu na bancada da 3B porque la' a cena velha ainda
+## estava viva quando a nova entrava. Com ele, sair de um nivel com vento
+## levava o vento para o nivel seguinte.
+##
+## Um inteiro nao tem este problema: um id nunca "vira null".
+func _id_da_cena() -> int:
+	if not is_inside_tree():
+		return 0
+	var cena := get_tree().current_scene
+	return cena.get_instance_id() if cena != null else 0
