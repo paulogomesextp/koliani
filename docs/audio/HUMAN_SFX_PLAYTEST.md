@@ -1,5 +1,24 @@
 # Playtest de som — checklist do Paulo
 
+## Escuta rápida do Prompt 5 — Koliani Signature (21 set 2026)
+
+Abrir `C:\Projetos\koliani-sfx\build\qa\Koliani-KolianiSFX-QA.exe`.
+Esta é uma build **nova**, só de QA: não é a oficial nem a PWA. No menu,
+entrar em **DEV** para ter todas as habilidades; no nível, carregar em **S**
+ou **SONS** para abrir o teclado e comparar eventos sem procurar inimigos.
+Depois jogar 2–3 minutos no N1 com música ligada.
+
+Ordem sugerida: salto → salto duplo → dash; golpes 1–4 → acerto/crítico;
+escudo ativar/impacto; hurt/morte; passos, rolamento e aterragem. Para cada
+grupo, dizer **BOM / BAIXO / ALTO / IRRITANTE / CONFUNDE-SE**. Importa sobretudo
+se o dash se confunde com vento e se o quarto golpe lê-se como remate.
+
+**HUMAN LISTEN REQUIRED. DEVICE VALIDATION REQUIRED** no altifalante real do
+telemóvel. O relatório técnico está em
+[`koliani_signature_prompt5.md`](koliani_signature_prompt5.md).
+
+---
+
 A fase automática do SFX Overhaul está fechada. O que falta é o que nenhuma
 medição resolve: **ouvir**.
 

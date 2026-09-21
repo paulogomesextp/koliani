@@ -1,5 +1,15 @@
 # Créditos de áudio
 
+## Koliani Signature — Prompt 5 (21 set 2026)
+
+Os 27 WAV de `koliani_signature/` são **síntese original** por
+`tools/gerar_sfx_koliani_signature.py`: ruído filtrado, transientes,
+varrimentos de frequência e ressonância Shadowblade. Não contêm samples de
+terceiros nem dependem de downloads. O script é a fonte; os WAV são saída
+reproduzível. Mono PCM 16-bit / 44,1 kHz. Os samples CC0 abaixo continuam
+no repositório para os restantes usos e como histórico; não foram reclamados
+como originais.
+
 As **camas** `ambiente.wav`, `menu.wav`, `boss.wav`, `assombracao.wav` e
 `game_over.wav` continuam sintetizadas por `tools/gerar_audio.py` (sem
 licenças). Os **SFX de combate/mobs/UI** abaixo (`scripts/som.gd`) foram

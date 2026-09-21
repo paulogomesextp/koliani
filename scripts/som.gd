@@ -1,27 +1,28 @@
 extends Node
 ## Autoload "Som": toca efeitos sonoros por nome, com um pool de vozes
-## para sons sobrepostos. Os SFX em `assets/audio/` são samples CC0 reais
-## (OpenGameArt -- ver `assets/audio/CREDITS.md`); só as camas antigas
-## (`ambiente.wav`, `menu.wav`, `boss.wav`, `assombracao.wav`, `game_over.wav`)
-## continuam sintetizadas por `tools/gerar_audio.py`.
+## para sons sobrepostos. O catalogo mistura samples CC0 creditados e sintese
+## original (Koliani: `tools/gerar_sfx_koliani_signature.py`); ver CREDITS.md.
 ##
 ## Carrega os streams à primeira utilização (não `preload`) para o script
 ## compilar mesmo antes de o Godot importar os ficheiros (fresh checkout / CI).
 
 const CAMINHOS := {
 	"salto": "res://assets/audio/salto.wav",
-	"salto_duplo": "res://assets/audio/salto_duplo.wav",
-	# Execution 9H.13: o combo tem QUATRO sons proprios, que crescem em peso.
-	# Ate' aqui os golpes 2 e 3 eram o `ataque` com `pitch_scale`
-	# diferente -- e um sample repetido com outro tom le-se logo como sample
-	# repetido. Ver `tools/gerar_sfx_9h13.py` (os tres eixos de crescimento).
-	"ataque": "res://assets/audio/ataque.wav",
-	"ataque2": "res://assets/audio/ataque2.wav",
-	"ataque3": "res://assets/audio/ataque3.wav",
-	"lancar": "res://assets/audio/lancar.ogg",
-	"acerto": "res://assets/audio/acerto.wav",
-	"dano": "res://assets/audio/dano.wav",
-	"aterrar": "res://assets/audio/aterrar.wav",
+	"koliani_salto": "res://assets/audio/koliani_signature/koliani_jump.wav",
+	"salto_duplo": "res://assets/audio/koliani_signature/koliani_double_jump.wav",
+	# Prompt 5: quatro vozes originais da mesma familia Shadowblade.
+	"ataque": "res://assets/audio/koliani_signature/shadowblade_swing_1.wav",
+	"ataque2": "res://assets/audio/koliani_signature/shadowblade_swing_2.wav",
+	"ataque3": "res://assets/audio/koliani_signature/shadowblade_swing_3.wav",
+	"lancar": "res://assets/audio/koliani_signature/shadowblade_energy_cast.wav",
+	"acerto": "res://assets/audio/koliani_signature/shadowblade_hit.wav",
+	"acerto_critico": "res://assets/audio/koliani_signature/shadowblade_critical.wav",
+	"pisao_koliani": "res://assets/audio/koliani_signature/koliani_stomp.wav",
+	"dano": "res://assets/audio/koliani_signature/koliani_hurt.wav",
+	"dano_pesado": "res://assets/audio/koliani_signature/koliani_hurt_heavy.wav",
+	"aterrar": "res://assets/audio/koliani_signature/koliani_land_soft.wav",
+	"aterrar_medio": "res://assets/audio/koliani_signature/koliani_land_medium.wav",
+	"aterrar_pesado": "res://assets/audio/koliani_signature/koliani_land_hard.wav",
 	"apanhar": "res://assets/audio/apanhar.wav",
 	"porta": "res://assets/audio/porta.wav",
 	"chefe_cai": "res://assets/audio/chefe_cai.wav",
@@ -41,8 +42,8 @@ const CAMINHOS := {
 	# codigo do jogo -- o `toca()` sorteia-as sozinho pelo nome base.
 	"ui_mover_v2": "res://assets/audio/ui_mover_v2.wav",
 	"ui_mover_v3": "res://assets/audio/ui_mover_v3.wav",
-	"acerto_v2": "res://assets/audio/acerto_v2.wav",
-	"acerto_v3": "res://assets/audio/acerto_v3.wav",
+	"acerto_v2": "res://assets/audio/koliani_signature/shadowblade_hit_v2.wav",
+	"acerto_v3": "res://assets/audio/koliani_signature/shadowblade_hit_v3.wav",
 	"transicao": "res://assets/audio/transicao.wav",
 	"carrossel": "res://assets/audio/carrossel.wav",
 	# --- vozes de interface (Execution 9H) --------------------------------
@@ -71,18 +72,19 @@ const CAMINHOS := {
 	"meteoro": "res://assets/audio/meteoro.wav",
 	"mudar_forma": "res://assets/audio/mudar_forma.wav",
 	"olho_carregar": "res://assets/audio/olho_carregar.wav",
-	# --- a Koliani a mexer-se (4 set 2026) --------------------------------
-	# "Faca um set de sons para a koliani quando faz animacoes, ataques,
-	# etc." -- pedido do Paulo. Construidos por `tools/preparar_sfx.py`.
-	"passo1": "res://assets/audio/passo1.wav",
-	"passo2": "res://assets/audio/passo2.wav",
-	"passo3": "res://assets/audio/passo3.wav",
-	"rolamento": "res://assets/audio/rolamento.wav",
-	"dash": "res://assets/audio/dash.wav",
-	"parede": "res://assets/audio/parede.ogg",
-	"agarrar": "res://assets/audio/agarrar.ogg",
-	"morte_koliani": "res://assets/audio/morte_koliani.wav",
-	"ataque_forte": "res://assets/audio/ataque_forte.wav",
+	# --- Koliani Signature (Prompt 5) --------------------------------------
+	# Sintese original, reconstruivel por `gerar_sfx_koliani_signature.py`.
+	"passo1": "res://assets/audio/koliani_signature/koliani_step_1.wav",
+	"passo2": "res://assets/audio/koliani_signature/koliani_step_2.wav",
+	"passo3": "res://assets/audio/koliani_signature/koliani_step_3.wav",
+	"rolamento": "res://assets/audio/koliani_signature/koliani_roll.wav",
+	"dash": "res://assets/audio/koliani_signature/koliani_dash.wav",
+	"parede": "res://assets/audio/koliani_signature/koliani_wall.wav",
+	"agarrar": "res://assets/audio/koliani_signature/koliani_grab.wav",
+	"morte_koliani": "res://assets/audio/koliani_signature/koliani_death.wav",
+	"ataque_forte": "res://assets/audio/koliani_signature/shadowblade_finisher.wav",
+	"escudo_ativar": "res://assets/audio/koliani_signature/shadow_shield_on.wav",
+	"escudo_impacto": "res://assets/audio/koliani_signature/shadow_shield_hit.wav",
 	# --- monstros, por ARQUETIPO ------------------------------------------
 	# "Faca com que os mobs facam sons apropriados ao tipo de monstro."
 	# As 19 especies mapeiam-se em sete familias -- ver `demonio_base.gd`.

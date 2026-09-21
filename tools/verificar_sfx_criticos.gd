@@ -114,7 +114,7 @@ func _provar_morte_koliani() -> void:
 	var antes := _contador()
 	k.call("receber_dano", 1)
 	_verificar(_avanco(antes) == 1, "morte da Koliani empilhou dano+morte")
-	_verificar(_ultimo_stream() == "morte_koliani.wav", "morte da Koliani usa stream errado")
+	_verificar(_ultimo_stream() == "koliani_death.wav", "morte da Koliani usa stream errado")
 	print("SFX MORTE KOLIANI vozes=1 stream=%s" % _ultimo_stream())
 	cena.queue_free()
 	current_scene = null
