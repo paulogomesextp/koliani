@@ -343,6 +343,8 @@ var _lacos := {}            # nome -> AudioStreamPlayer
 ## `null` em GDScript, e com a referencia o guarda de troca de cena nao
 ## disparava justamente no caso que interessa (ver `_process`).
 var _cena_dos_lacos := 0
+var _lacos_actores := {} # chave -> {"nome": String, "actor_id": int}
+const FADE_ACTOR_FORA_ECRA := 0.08
 
 
 ## Poe `nome` a tocar em ciclo, ou so' reajusta o volume se ja' estiver.
@@ -394,6 +396,78 @@ func parar_laco(nome: String, fade := 0.5) -> void:
 func parar_lacos(fade := 0.0) -> void:
 	for nome: String in _lacos.keys():
 		parar_laco(nome, fade)
+	_lacos_actores.clear()
+
+
+## Reproduz um one-shot emitido por um actor do mundo apenas quando a origem
+## está dentro do rectângulo actualmente visível pela Camera2D.
+##
+## A API normal `toca()` mantém-se deliberadamente sem esta regra para música,
+## UI e Koliani. Mobs/actors devem usar esta entrada central.
+func toca_actor(actor: Node2D, nome: String, volume_db := -6.0, pitch := 1.0,
+		variacao_pitch := 0.05, cooldown := 0.0, chave_cooldown := "",
+		prioridade := Prioridade.NORMAL) -> bool:
+	# A música/SFX de boss mantém o comportamento histórico da arena. Os
+	# inimigos comuns, incluindo os que herdam DemonioBase, usam a barreira.
+	if actor != null and actor.is_in_group("chefes"):
+		return toca(nome, volume_db, pitch, variacao_pitch, cooldown,
+			chave_cooldown, prioridade)
+	if not actor_visivel(actor):
+		return false
+	return toca(nome, volume_db, pitch, variacao_pitch, cooldown,
+		chave_cooldown, prioridade)
+
+
+## Loop de um actor do mundo. Se a origem sair do viewport, o canal é
+## desvanecido rapidamente e fica livre; chamar novamente quando voltar a
+## estar visível permite retomá-lo sem acoplar a regra aos actors.
+func laco_actor(actor: Node2D, nome: String, volume_db := -24.0,
+		fade := 0.6) -> bool:
+	if not actor_visivel(actor):
+		return false
+	var chave := "%s:%s" % [actor.get_instance_id(), nome]
+	var p := _lacos.get(chave) as AudioStreamPlayer
+	if p != null and is_instance_valid(p):
+		_alvo_volume(p, volume_db, fade)
+		return true
+	if _lacos.size() >= LACOS_MAX:
+		return false
+	var st := _stream(nome)
+	if st == null:
+		return false
+	_marcar_ciclico(st)
+	p = AudioStreamPlayer.new()
+	p.bus = "SFX"
+	p.stream = st
+	p.volume_db = volume_db if fade <= 0.0 else volume_db - 24.0
+	add_child(p)
+	p.play()
+	_lacos[chave] = p
+	_lacos_actores[chave] = {"nome": nome, "actor_id": actor.get_instance_id()}
+	_cena_dos_lacos = _id_da_cena()
+	if fade > 0.0:
+		_alvo_volume(p, volume_db, fade)
+	return true
+
+
+func parar_laco_actor(actor: Node2D, nome: String, fade := 0.08) -> void:
+	var chave := "%s:%s" % [actor.get_instance_id(), nome]
+	_lacos_actores.erase(chave)
+	parar_laco(chave, fade)
+
+
+## Verificação real contra a Camera2D/viewport, sem limiar de distância.
+func actor_visivel(actor: Node2D) -> bool:
+	if actor == null or not is_instance_valid(actor) or not actor.is_inside_tree():
+		return false
+	if not actor.is_visible_in_tree():
+		return false
+	var viewport := actor.get_viewport()
+	if viewport == null:
+		return false
+	var canvas := viewport.get_canvas_transform()
+	var rect := Rect2(Vector2.ZERO, viewport.get_visible_rect().size)
+	return rect.grow(1.0).has_point(canvas * actor.global_position)
 
 
 ## Quantos lacos estao mesmo a tocar. E' o numero que o harness conta.
@@ -439,12 +513,17 @@ func _marcar_ciclico(st: AudioStream) -> void:
 ## do menu -- e a cena seguinte, ao pedir o seu proprio ambiente, batia no
 ## `LACOS_MAX` com canais ocupados por um nivel que ja' nao existe.
 func _process(_dt: float) -> void:
-	if _lacos.is_empty():
-		return
-	var id := _id_da_cena()
-	if id != _cena_dos_lacos:
-		parar_lacos(0.0)
-		_cena_dos_lacos = id
+	if not _lacos.is_empty():
+		var id := _id_da_cena()
+		if id != _cena_dos_lacos:
+			parar_lacos(0.0)
+			_cena_dos_lacos = id
+	for chave: String in _lacos_actores.keys():
+		var info: Dictionary = _lacos_actores.get(chave, {})
+		var actor := instance_from_id(int(info.get("actor_id", 0))) as Node2D
+		if actor == null or not actor_visivel(actor):
+			_lacos_actores.erase(chave)
+			parar_laco(chave, FADE_ACTOR_FORA_ECRA)
 
 
 ## O `instance_id` da cena actual, ou 0 se nao houver nenhuma.

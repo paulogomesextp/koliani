@@ -3231,3 +3231,18 @@ integrar em master nem publicar PWA** antes do feedback. Próxima ação:
 publicação e Global Music Audit; não os iniciar automaticamente.
 
 ---
+## Quick audio/startup fix — intro removida e SFX de actors condicionados (22 set 2026)
+
+- Branch `codex/audio-redesign`, base `e5ebd6b8`. `project.godot` arranca
+  directamente em `MenuInicial.tscn`; `Intro.tscn`/`scripts/intro.gd` e o vídeo
+  foram preservados para uso futuro.
+- `Som.toca_actor()` valida a posição pela transformação real da viewport/câmara
+  e `Som.laco_actor()` termina loops de actors fora do ecrã com fade de 0,08 s.
+  `DemonioBase` usa a API central para voz, ataques, movimento e hurt; bosses
+  no grupo `chefes`, música, UI e Koliani mantêm a API anterior.
+- PASS: `test_audio_vertical_slice.tscn` (0 falhas),
+  `test_audio_actor_visibility.tscn` (0 falhas), arranque headless carregou
+  `MenuInicial.tscn` sem `Intro.tscn`, export Windows concluído.
+- Build QA actualizada em `build/qa/Koliani-Audio-Vertical-Slice-QA.exe`.
+  Próximo: ouvir/jogar a build em QA se for necessária confirmação humana;
+  sem alterações de gameplay/AI. Usage a confirmar no encerramento.

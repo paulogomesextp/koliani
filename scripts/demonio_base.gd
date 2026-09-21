@@ -487,7 +487,7 @@ func _voz(que: String, pitch := 1.0) -> void:
 	var passo: int = (int(_voz_variante.get(que, -1)) + 1) % VOZ_VARIANTES_PITCH.size()
 	_voz_variante[que] = passo
 	var pitch_final: float = pitch * (1.0 + VOZ_VARIANTES_PITCH[passo])
-	Som.toca("mob_%s_%s" % [fam, que], float(VOZ_VOLUME.get(que, -14.0)),
+	Som.toca_actor(self, "mob_%s_%s" % [fam, que], float(VOZ_VOLUME.get(que, -14.0)),
 		pitch_final, 0.0, float(VOZ_COOLDOWN.get(que, 0.0)),
 		"mob_%d_%s" % [get_instance_id(), que])
 
@@ -827,7 +827,7 @@ func _physics_process(dt: float) -> void:
 				_carga = 0.0
 				_acao_cd = randf_range(1.8, 3.0)
 				atordoar(0.85)
-				Som.toca("bloqueio", -10.0, 0.7, 0.02, 0.16,
+				Som.toca_actor(self, "bloqueio", -10.0, 0.7, 0.02, 0.16,
 					"mob_wall_%d" % get_instance_id())
 			elif _carga <= 0.0:
 				# investida falhou: recuo curto, ainda dá para rematar
@@ -864,7 +864,7 @@ func _physics_process(dt: float) -> void:
 			if _windup <= 0.0:
 				velocity = Vector2(_direcao * 175.0, -430.0)
 				_saltando = 0.75
-				Som.toca("salto", -20.0, 0.68)
+				Som.toca_actor(self, "salto", -20.0, 0.68)
 				move_and_slide()
 			return
 		if _acao_cd <= 0.0 and is_on_floor():
@@ -946,7 +946,7 @@ func _physics_process(dt: float) -> void:
 				b.dano = maxi(1, int(round(dano_contacto * 0.9)))
 				get_parent().add_child(b)
 				b.global_position = global_position + _dive_dir * 16.0
-				Som.toca("praga", -13.0, 0.9, 0.03, 0.18,
+				Som.toca_actor(self, "praga", -13.0, 0.9, 0.03, 0.18,
 					"cuspo_%d" % get_instance_id())
 				_acao_cd = randf_range(1.8, 2.8)
 				atordoar(0.35)  # recuo do cuspo -> janela curta de castigo
@@ -1075,7 +1075,7 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0, critico := false,
 	# INCORPÓREO: a lâmina passa através. Só o que vem de longe lhe toca --
 	# e o `_de_longe` só é verdade dentro de um `receber_tiro()`.
 	if so_tiro and not _de_longe:
-		Som.toca("bloqueio", -18.0, 1.45, 0.02, 0.14,
+		Som.toca_actor(self, "bloqueio", -18.0, 1.45, 0.02, 0.14,
 			"mob_incorporeo_%d" % get_instance_id())
 		_flinch = 0.22
 		return
@@ -1086,7 +1086,7 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0, critico := false,
 	# pós-rolamento / vulnerável) fura o escudo.
 	if comportamento == "escudeiro" and not critico and dir_empurrao != 0.0 \
 			and signf(dir_empurrao) == -_direcao:
-		Som.toca("bloqueio", -12.0, 0.9, 0.03, 0.14,
+		Som.toca_actor(self, "bloqueio", -12.0, 0.9, 0.03, 0.14,
 			"mob_escudo_%d" % get_instance_id())
 		_flinch = 0.4
 		_flinch_dir = signf(dir_empurrao)
