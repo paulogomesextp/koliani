@@ -162,6 +162,13 @@ var _de_longe := false
 ## Vida com que nasceu, para as copias do `divide_em` nao herdarem a vida
 ## a zero de quem se partiu.
 var _vida_ini := 0
+## Mobs comuns não simulam nada antes de a origem entrar no viewport pela
+## primeira vez. Chefes substituem `_usa_dormencia_de_visibilidade()`.
+var _activated := false
+var _dormencia_visibilidade := true
+var _camadas_colisao_originais := 0
+var _mascaras_colisao_originais := 0
+var _contacto_monitoring_original := true
 var _mat: ShaderMaterial
 ## true a partir do momento em que morre (toca a anim de morte e liberta-se).
 var _morto := false
@@ -219,7 +226,7 @@ var _atordoado := 0.0
 ## Gela este inimigo por `segundos` (a badalada do Sino, nível 11). Idempotente
 ## no sentido de ficar sempre com o maior tempo pendente.
 func congelar(segundos: float) -> void:
-	if _morto:
+	if _morto or not _activated:
 		return
 	_congelado = maxf(_congelado, segundos)
 	if _corpo:
@@ -229,7 +236,7 @@ func congelar(segundos: float) -> void:
 ## Põe este inimigo a arder: `dano_tick` a cada `QUEIMA_INTERVALO`, durante
 ## `segundos`. A chama alastra a quem estiver a `ALASTRA_RAIO`.
 func queimar(segundos: float, dano_tick := 3) -> void:
-	if _morto:
+	if _morto or not _activated:
 		return
 	_queimando = maxf(_queimando, segundos)
 	_queima_dano = maxi(_queima_dano, dano_tick)
@@ -237,7 +244,7 @@ func queimar(segundos: float, dano_tick := 3) -> void:
 
 ## Sangramento: `dano_tick` por tick, mais depressa enquanto ele anda.
 func sangrar(segundos: float, dano_tick := 4) -> void:
-	if _morto:
+	if _morto or not _activated:
 		return
 	_sangrando = maxf(_sangrando, segundos)
 	_sangra_dano = maxi(_sangra_dano, dano_tick)
@@ -245,7 +252,7 @@ func sangrar(segundos: float, dano_tick := 4) -> void:
 
 ## Atordoa: paralisa `segundos` (como o gelo, sem o tom azul).
 func atordoar(segundos: float) -> void:
-	if _morto:
+	if _morto or not _activated:
 		return
 	_atordoado = maxf(_atordoado, segundos)
 
@@ -257,13 +264,13 @@ func esta_a_arder() -> bool:
 ## true se um golpe da Koliani neste inimigo deve contar como CRÍTICO
 ## (gelado / a arder / a sangrar / atordoado) -- a "janela" da pegada Dead Cells.
 func esta_vulneravel() -> bool:
-	return not _morto and (_congelado > 0.0 or _queimando > 0.0 \
+	return _activated and not _morto and (_congelado > 0.0 or _queimando > 0.0 \
 		or _sangrando > 0.0 or _atordoado > 0.0)
 
 
 ## Dano que NÃO empurra nem re-telegrafa -- só corrói a vida (DoT).
 func _dano_periodico(q: int) -> void:
-	if _morto:
+	if _morto or not _activated:
 		return
 	vida -= maxi(1, q)
 	piscar_dano()
@@ -385,6 +392,16 @@ func _ready() -> void:
 
 	_sem_interpolacao_no_visual()
 	_vida_ini = vida
+	_dormencia_visibilidade = _usa_dormencia_de_visibilidade()
+	_activated = not _dormencia_visibilidade
+	if _dormencia_visibilidade:
+		_camadas_colisao_originais = collision_layer
+		_mascaras_colisao_originais = collision_mask
+		_contacto_monitoring_original = _area_contacto.monitoring if _area_contacto else true
+		collision_layer = 0
+		collision_mask = 0
+		if _area_contacto:
+			_area_contacto.set_deferred("monitoring", false)
 	if comportamento != "patrulha":
 		_acao_cd = randf_range(0.6, 1.8)
 	if comportamento == "escudeiro":
@@ -417,6 +434,27 @@ func _ready() -> void:
 ## ficarem todos do mesmo tamanho.
 func _altura_alvo() -> float:
 	return ALTURA_ALVO_INIMIGO * (0.86 if especie in ESPECIES_VOAM else 1.0)
+
+
+## Ponto único de extensão para classes que não são mobs comuns.
+func _usa_dormencia_de_visibilidade() -> bool:
+	return true
+
+
+func esta_ativado() -> bool:
+	return _activated
+
+
+func _activar_por_visibilidade() -> void:
+	if _activated or not _dormencia_visibilidade:
+		return
+	if not Som.actor_visivel(self):
+		return
+	_activated = true
+	collision_layer = _camadas_colisao_originais
+	collision_mask = _mascaras_colisao_originais
+	if _area_contacto and _contacto_monitoring_original:
+		_area_contacto.set_deferred("monitoring", true)
 
 
 ## Largura máxima do corpo no ecrã, ou 0 = sem tecto. Os bichos comuns não
@@ -596,6 +634,8 @@ func _add_tira(sf: SpriteFrames, nome: String, tex: Texture2D, n: int, fps: floa
 
 
 func _process(dt: float) -> void:
+	if _dormencia_visibilidade and not _activated:
+		return
 	if elite and not _morto:
 		_pulsar_aura(dt)
 	if _anim:
@@ -761,6 +801,11 @@ func _tem_anim(nome: String) -> bool:
 func _physics_process(dt: float) -> void:
 	if _morto:
 		return
+	if _dormencia_visibilidade and not _activated:
+		velocity = Vector2.ZERO
+		_activar_por_visibilidade()
+		if not _activated:
+			return
 	if dormente:
 		velocity.x = 0.0
 		if not is_on_floor():
@@ -1039,7 +1084,7 @@ func ha_chao_a_frente(dir: float) -> bool:
 
 
 func _ao_tocar(corpo: Node) -> void:
-	if _morto or dormente:
+	if _morto or dormente or not _activated:
 		return
 	if corpo is Koliani:
 		corpo.receber_dano(dano_contacto, signf(corpo.global_position.x - global_position.x))
@@ -1070,7 +1115,7 @@ func _vfx9g_morte() -> bool:
 ## crescentes -- é o que faz o remate ler-se como remate.
 func receber_dano(quantidade: int, dir_empurrao: float = 0.0, critico := false,
 		forca_recuo := 0.0) -> void:
-	if _morto:
+	if _morto or not _activated:
 		return
 	# INCORPÓREO: a lâmina passa através. Só o que vem de longe lhe toca --
 	# e o `_de_longe` só é verdade dentro de um `receber_tiro()`.
@@ -1181,6 +1226,8 @@ func _dividir() -> void:
 ## única maneira de o bicho saber que o que lhe tocou veio de longe.
 ## Quem não a chamar continua a bater como sempre (`receber_dano`).
 func receber_tiro(quantidade: int, dir_empurrao := 0.0) -> void:
+	if not _activated:
+		return
 	_de_longe = true
 	receber_dano(quantidade, dir_empurrao)
 	_de_longe = false
@@ -1189,7 +1236,7 @@ func receber_tiro(quantidade: int, dir_empurrao := 0.0) -> void:
 ## Larga ESSÊNCIA ao morrer. Comum: pouca (escala com a região). Elite:
 ## um monte. Os motes vão para a cena (sobrevivem ao `queue_free` do bicho).
 func _soltar_essencia() -> void:
-	if _e_chefe():
+	if not _activated or _e_chefe():
 		return  # os chefes tratam disto no ChefeBase
 	var cena := get_tree().current_scene
 	if cena == null or not cena.is_inside_tree():
@@ -1221,6 +1268,8 @@ func _pop_morte_elite() -> void:
 
 ## Toca a animação de morte e só então solta estilhaços e liberta-se.
 func _morrer_anim() -> void:
+	if not _activated:
+		return
 	_morto = true
 	_voz("morte")
 	velocity = Vector2.ZERO

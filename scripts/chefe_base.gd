@@ -238,6 +238,12 @@ func _ready() -> void:
 	call_deferred("_afinar_dificuldade")
 
 
+## Chefes preservam a simulação de arena desde o spawn. A dormência por
+## viewport é exclusiva dos mobs comuns.
+func _usa_dormencia_de_visibilidade() -> bool:
+	return false
+
+
 ## Corre depois do `_ready` do chefe concreto (que define `vida`). Sem a
 ## janela EXPOSTA a Koliani acerta ~3x mais vezes -> a vida sobe muito para
 ## a luta não acabar num instante, e os telégrafos/recuperações encurtam.

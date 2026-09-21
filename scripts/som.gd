@@ -407,12 +407,13 @@ func parar_lacos(fade := 0.0) -> void:
 func toca_actor(actor: Node2D, nome: String, volume_db := -6.0, pitch := 1.0,
 		variacao_pitch := 0.05, cooldown := 0.0, chave_cooldown := "",
 		prioridade := Prioridade.NORMAL) -> bool:
+	var visivel := actor != null and actor_visivel(actor)
 	# A música/SFX de boss mantém o comportamento histórico da arena. Os
 	# inimigos comuns, incluindo os que herdam DemonioBase, usam a barreira.
 	if actor != null and actor.is_in_group("chefes"):
 		return toca(nome, volume_db, pitch, variacao_pitch, cooldown,
 			chave_cooldown, prioridade)
-	if not actor_visivel(actor):
+	if not visivel:
 		return false
 	return toca(nome, volume_db, pitch, variacao_pitch, cooldown,
 		chave_cooldown, prioridade)

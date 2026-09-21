@@ -3246,3 +3246,19 @@ publicação e Global Music Audit; não os iniciar automaticamente.
 - Build QA actualizada em `build/qa/Koliani-Audio-Vertical-Slice-QA.exe`.
   Próximo: ouvir/jogar a build em QA se for necessária confirmação humana;
   sem alterações de gameplay/AI. Usage a confirmar no encerramento.
+
+## Dormancy de mobs — ghost rewards corrigidos (22 set 2026)
+
+- `DemonioBase` mantém mobs comuns dormant até à primeira entrada no viewport:
+  sem física, AI, dano, morte, SFX ou recompensa; colisão e contacto ficam
+  desligados e são restaurados uma vez na activação. `ChefeBase` preserva a
+  simulação normal da arena desde o spawn.
+- Guardas centrais cobrem dano directo, projécteis, DoT, estados, morte,
+  Essência e processamento visual. Logger temporário de SFX foi removido.
+- PASS: `test_mob_dormancy.tscn` (0 falhas), incluindo não-recompensa dormant
+  e recompensa normal após activação; `test_audio_vertical_slice.tscn` e
+  `test_audio_actor_visibility.tscn` continuam com 0 falhas.
+- O smoke headless confirma o menu no arranque; não houve emissão de actor
+  observável no arranque headless. HUMAN PLAYTEST REQUIRED para confirmar
+  auditivamente o percurso real do Nível 1. Build QA a actualizar nesta
+  execução; usage a confirmar no encerramento.
