@@ -867,6 +867,13 @@ func ganhar_essencia(n: int) -> void:
 	guardar()
 
 
+## Sincroniza o saldo persistente com o runtime/HUD. Não é uma recompensa,
+## não grava novamente e não dispara SFX de recolha.
+func sincronizar_essencia(total: int) -> void:
+	essencia = maxi(0, total)
+	essencia_mudou.emit(essencia)
+
+
 func rank_melhoria(id: String) -> int:
 	return int(melhorias.get(id, 0))
 
@@ -967,7 +974,7 @@ func de_dicionario(d: Dictionary) -> void:
 	concluidos.sort()
 	bosses_derrotados.assign(d.get("defeated_boss_ids", []))
 	recompensas_reclamadas.assign(d.get("claimed_reward_ids", []))
-	essencia = int(d.get("essencia", 0))
+	sincronizar_essencia(int(d.get("essencia", 0)))
 	melhorias.clear()
 	var ms: Dictionary = d.get("melhorias", {})
 	for k in ms:

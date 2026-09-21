@@ -3262,3 +3262,15 @@ publicação e Global Music Audit; não os iniciar automaticamente.
   observável no arranque headless. HUMAN PLAYTEST REQUIRED para confirmar
   auditivamente o percurso real do Nível 1. Build QA a actualizar nesta
   execução; usage a confirmar no encerramento.
+## Crystal sync — cache 26 fora do viewport corrigido (22 set 2026)
+
+- Root cause confirmada no Nível 1: `scenes/levels/Floresta_Putrefata.tscn`
+  instancia `CacheEssencia` em `(2060,302)` com `valor = 26`. Não era save
+  nem HUD: `Essencia._physics_process()` fazia homing fora da câmara e
+  `_apanhar()` chamava `ganhar_essencia(26)` e `Som.toca("apanhar")`.
+- Drops/caches de `Essencia` agora não simulam nem recolhem fora do viewport;
+  recolha visível mantém incremento e SFX. `EstadoJogo.sincronizar_essencia()`
+  separa set/sync persistente de `ganhar_essencia()` de recompensa.
+- PASS: `test_crystal_sync.tscn`, `test_audio_vertical_slice.tscn` e
+  `test_audio_actor_visibility.tscn`, todos com 0 falhas. Logger temporário
+  não foi mantido. HUMAN PLAYTEST REQUIRED para confirmação no dispositivo.

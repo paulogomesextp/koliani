@@ -63,6 +63,10 @@ func _ready() -> void:
 func _physics_process(dt: float) -> void:
 	if _apanhado:
 		return
+	# Caches e drops são actores do mundo: fora do viewport não simulam
+	# gravidade/homing e não podem auto-recolher nem tocar SFX.
+	if not Som.actor_visivel(self):
+		return
 	_t += dt
 	_koli = get_tree().get_first_node_in_group("koliani")
 	if _t >= _atraso and _koli:
