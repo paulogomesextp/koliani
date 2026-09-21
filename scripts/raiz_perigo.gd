@@ -65,7 +65,7 @@ func _loop_auto() -> void:
 		# O modo CENARIO tem a irrupcao escrita aqui dentro e NAO passa por
 		# `_irromper()` -- por isso as raizes do L1 continuavam mudas mesmo
 		# depois de o som estar ligado la'. Apanhado pela prova da 9H.16 E4.
-		Som.toca("raiz_irrompe", -7.0, randf_range(0.92, 1.09))
+		Som.toca_actor(self, "raiz_irrompe", -7.0, randf_range(0.92, 1.09))
 		var tc := create_tween()
 		tc.tween_property(_visual, "scale:y", 1.0, 0.12).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 		await tc.finished
@@ -113,7 +113,7 @@ func _telegrafar() -> void:
 	_racha.visible = true
 	# 9H.16 E4: o telegrafo era so' VISUAL -- quem estivesse a olhar para o
 	# inimigo levava com a raiz sem aviso nenhum.
-	Som.toca("raiz_aviso", -14.0, randf_range(0.94, 1.07))
+	Som.toca_actor(self, "raiz_aviso", -14.0, randf_range(0.94, 1.07))
 	_racha.modulate.a = 0.0
 	_racha.scale = Vector2(0.35, 0.35)
 	if _motes:
@@ -150,7 +150,7 @@ func _irromper() -> void:
 	_apagar_racha()
 	_visual.visible = true
 	monitoring = true
-	Som.toca("raiz_irrompe", -7.0, randf_range(0.92, 1.09))
+	Som.toca_actor(self, "raiz_irrompe", -7.0, randf_range(0.92, 1.09))
 	var t := create_tween()
 	t.tween_property(_visual, "scale:y", 1.0, 0.12).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	# quem ja estava em cima leva na mesma
