@@ -44,7 +44,7 @@ const NIVEIS_FLORESTA := 5
 ## precisamente o que o Game Master proibiu.
 const DIR_PRODUCAO := "res://assets/audio/musica/producao/"
 const DIR_APROVADO := "res://assets/audio/approved/"
-const MENU_APROVADO := DIR_APROVADO + "menu_cinematic_fantasy_dark.mp3"
+const MENU_APROVADO := DIR_APROVADO + "menu_cinematic_fantasy_dark_no_intro.ogg"
 const REGIAO_01_APROVADA := DIR_APROVADO + "region_01_midnight_forest.mp3"
 const BOSS_01_APROVADO := DIR_APROVADO + "boss_01_gothic_candlelight.mp3"
 const PRODUCAO := {

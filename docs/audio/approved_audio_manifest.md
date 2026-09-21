@@ -6,7 +6,7 @@ Aquisição no browser suportado, sem contornar login, CAPTCHA ou paywall. Os qu
 
 | Uso | Origem Pixabay | Ficheiro local | Aplicação / edição | Content ID |
 | --- | --- | --- | --- | --- |
-| Menu | [Cinematic Fantasy Dark — RomanSenykMusic](https://pixabay.com/music/fantasy-dreamy-childrens-cinematic-fantasy-dark-160932/) | `assets/audio/approved/menu_cinematic_fantasy_dark.mp3` | Menu, -8 dB no player Music; original sem edição | Sim |
+| Menu | [Cinematic Fantasy Dark — RomanSenykMusic](https://pixabay.com/music/fantasy-dreamy-childrens-cinematic-fantasy-dark-160932/) | `assets/audio/approved/menu_cinematic_fantasy_dark_no_intro.ogg` (derivada de `menu_cinematic_fantasy_dark.mp3`) | MENU MUSIC = versão derivada; -8 dB no player Music; primeiros 5,0 segundos removidos; loop/restart começa no novo início | Sim |
 | Região I (níveis 1–5) | [Midnight Forest — Syouki_Takahashi](https://pixabay.com/music/ambient-midnight-forest-184304/) | `assets/audio/approved/region_01_midnight_forest.mp3` | Exploração, -8 dB no player Music; original sem edição | Sim |
 | Boss 1 (Guardião Verde) | [Gothic Candlelight — JoelFazhari](https://pixabay.com/music/mystery-gothic-candlelight-gothic-mystery-soundtrack-1987/) | `assets/audio/approved/boss_01_gothic_candlelight.mp3` | Primeiro boss, -6 dB no player Music; original sem edição | Não indicado na página |
 | Dash Koliani | [wind magic (5) — Yodguard](https://pixabay.com/sound-effects/film-special-effects-wind-magic-5-378630/) | `assets/audio/approved/koliani_dash_wind_magic_5.wav` | Derivado do MP3 local `assets/audio/acquisition/sfx/wind_magic_5.mp3`: primeiros 0,7 s, fade-out 0,45–0,7 s, -6 dB, mono 44,1 kHz; callsite -11 dB no bus SFX | Não indicado |

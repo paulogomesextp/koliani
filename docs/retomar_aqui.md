@@ -3274,3 +3274,21 @@ publicação e Global Music Audit; não os iniciar automaticamente.
 - PASS: `test_crystal_sync.tscn`, `test_audio_vertical_slice.tscn` e
   `test_audio_actor_visibility.tscn`, todos com 0 falhas. Logger temporário
   não foi mantido. HUMAN PLAYTEST REQUIRED para confirmação no dispositivo.
+## Menu music skip intro — concluído tecnicamente (22 set 2026)
+
+- Branch `codex/audio-redesign`, HEAD inicial `5db89f254a8332e7a7334b7f5c8f558cc5435589`.
+- Original preservado: `assets/audio/approved/menu_cinematic_fantasy_dark.mp3`,
+  144,692219 s. Derivado OGG: `menu_cinematic_fantasy_dark_no_intro.ogg`,
+  139,692245 s; FFmpeg removeu exactamente 5,0 s, sem silêncio inicial detectado
+  e com `max_volume 0,0 dB`, igual ao original. Escuta humana continua necessária
+  para confirmar a limpeza perceptual do corte.
+- `scripts/musica.gd` liga apenas o menu ao derivado; Região I, bosses, volumes,
+  fades, gameplay e SFX não foram alterados. O loop do `AudioStreamOggVorbis` fica
+  activo no carregamento; o restart nunca inclui os 0–5 s originais.
+- `tests/test_audio_vertical_slice.tscn`: PASS, 0 falhas. Build QA actualizado em
+  `C:\Projetos\koliani-sfx\build\qa\Koliani-Audio-Vertical-Slice-QA.exe`.
+- `HUMAN LISTEN/PLAYTEST REQUIRED`: a janela do EXE ficou activa, mas o CUA desta
+  sessão não expôs a janela para observação. Confirmar manualmente menu, loop e
+  sair/voltar no build QA antes de promoção adicional.
+
+---

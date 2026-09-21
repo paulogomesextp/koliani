@@ -8,7 +8,7 @@ func _ready() -> void:
 func _verificar() -> void:
 	var falhas: Array[String] = []
 	var caminhos := [
-		"res://assets/audio/approved/menu_cinematic_fantasy_dark.mp3",
+		"res://assets/audio/approved/menu_cinematic_fantasy_dark_no_intro.ogg",
 		"res://assets/audio/approved/region_01_midnight_forest.mp3",
 		"res://assets/audio/approved/boss_01_gothic_candlelight.mp3",
 		"res://assets/audio/approved/koliani_dash_wind_magic_5.wav",
@@ -26,6 +26,11 @@ func _verificar() -> void:
 	Musica.menu()
 	if Musica._caminho_atual != caminhos[0]:
 		falhas.append("Menu nao usa a faixa aprovada")
+	var menu_stream := Musica._p.stream as AudioStreamOggVorbis
+	if menu_stream == null or not menu_stream.loop:
+		falhas.append("Menu nao esta configurado para loop")
+	if menu_stream == null or abs(menu_stream.get_length() - 139.692) > 0.02:
+		falhas.append("Duracao do menu trimmed inesperada")
 	Musica.ambiente(0)
 	if Musica._caminho_atual != caminhos[1]:
 		falhas.append("Ambiente nao trocou para a Regiao I")
