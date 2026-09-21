@@ -1,3 +1,13 @@
+## Audio Vertical Slice — candidato parcial de QA (22 set 2026)
+
+Branch `codex/audio-redesign`, partida de `74c6c95b`. No browser suportado foram obtidas e integradas as músicas aprovadas do menu, Região I e Boss 1. O `wind_magic_5.mp3` já existente foi validado e deu origem ao dash curto. Origens, ficheiros, volumes, edição e Content ID: `docs/audio/approved_audio_manifest.md`.
+
+Teste dirigido `tests/test_audio_vertical_slice.tscn`: 0 falhas; importação Godot e export Windows: exit 0. Candidato local: `build/qa/Koliani-Audio-Vertical-Slice-QA.exe`. Não é build oficial; sem alteração à master nem publicação PWA. Restam hurt, death, shield on/impact, energy shot/impact e sword impact aprovados sem download local verificável. A mistura ainda requer **HUMAN LISTEN REQUIRED** antes de qualquer promoção.
+
+Próximo passo: obter esses SFX pelo browser sem contornar bloqueios; testar os eventos e a mistura em jogo. Não declarar o pacote completo.
+
+---
+
 ## Publicacao do SFX Overhaul em master para playtest na PWA (21 set 2026) · PUBLICADO
 
 `master` **72ea2477 -> 2fd7bd92 -> dd0e5767** por FAST-FORWARD puro (sem

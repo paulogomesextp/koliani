@@ -78,7 +78,7 @@ const CAMINHOS := {
 	"passo2": "res://assets/audio/koliani_signature/koliani_step_2.wav",
 	"passo3": "res://assets/audio/koliani_signature/koliani_step_3.wav",
 	"rolamento": "res://assets/audio/koliani_signature/koliani_roll.wav",
-	"dash": "res://assets/audio/koliani_signature/koliani_dash.wav",
+	"dash": "res://assets/audio/approved/koliani_dash_wind_magic_5.wav",
 	"parede": "res://assets/audio/koliani_signature/koliani_wall.wav",
 	"agarrar": "res://assets/audio/koliani_signature/koliani_grab.wav",
 	"morte_koliani": "res://assets/audio/koliani_signature/koliani_death.wav",

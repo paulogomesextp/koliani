@@ -43,6 +43,10 @@ const NIVEIS_FLORESTA := 5
 ## regiões sem arte aprovada nem playtest seria fazer número, que foi
 ## precisamente o que o Game Master proibiu.
 const DIR_PRODUCAO := "res://assets/audio/musica/producao/"
+const DIR_APROVADO := "res://assets/audio/approved/"
+const MENU_APROVADO := DIR_APROVADO + "menu_cinematic_fantasy_dark.mp3"
+const REGIAO_01_APROVADA := DIR_APROVADO + "region_01_midnight_forest.mp3"
+const BOSS_01_APROVADO := DIR_APROVADO + "boss_01_gothic_candlelight.mp3"
 const PRODUCAO := {
 	"menu": DIR_PRODUCAO + "tema_menu.wav",
 	"exploracao": DIR_PRODUCAO + "regiao1_exploracao.wav",
@@ -73,7 +77,7 @@ const PASTA_CHEFES := "res://assets/audio/musica/chefes/boss_%02d.ogg"
 ## a música de combate entra quando o Zeriko ataca (ver `chefe_base.gd`).
 const PITCH_BIOMA := [1.0, 0.94, 1.06, 0.88]
 
-const VOL_CAMA := -12.0
+const VOL_CAMA := -8.0
 const VOL_BOSS := -6.0
 const VOL_ASSOMBRACAO := -19.0
 
@@ -149,6 +153,8 @@ func _reiniciar_audio_web() -> void:
 ## Qual a cama de EXPLORAÇÃO do nível `i`. Dentro da Região I é a peça de
 ## produção; fora dela, a faixa do ciclo de 20.
 static func faixa_de_nivel(i: int) -> String:
+	if i >= 0 and i < NIVEIS_PRODUCAO and ResourceLoader.exists(REGIAO_01_APROVADA):
+		return REGIAO_01_APROVADA
 	if i >= 0 and i < NIVEIS_PRODUCAO and ResourceLoader.exists(PRODUCAO["exploracao"]):
 		return PRODUCAO["exploracao"]
 	var caminho := PASTA_NIVEIS % ((i % N_FAIXAS) + 1)
@@ -158,6 +164,8 @@ static func faixa_de_nivel(i: int) -> String:
 ## Qual a cama de CHEFE do nível `i`. O Coração Putrefacto (1-5) tem tema
 ## próprio; os outros quatro guardiões da Região I partilham o dos guardiões.
 static func faixa_de_chefe(i: int) -> String:
+	if i == 0 and ResourceLoader.exists(BOSS_01_APROVADO):
+		return BOSS_01_APROVADO
 	if i >= 0 and i < NIVEIS_PRODUCAO:
 		var chave := "coracao" if i == NIVEL_CORACAO else "guardiao"
 		if ResourceLoader.exists(PRODUCAO[chave]):
@@ -169,7 +177,9 @@ static func faixa_de_chefe(i: int) -> String:
 ## Tema do menu inicial (lento, pad + melodia esparsa).
 func menu() -> void:
 	_combate_ate = 0.0
-	var cam: String = PRODUCAO["menu"]
+	var cam: String = MENU_APROVADO
+	if not ResourceLoader.exists(cam):
+		cam = PRODUCAO["menu"]
 	if not ResourceLoader.exists(cam):
 		cam = CAMINHO_MENU
 	_tocar(cam, 1.0, VOL_CAMA, true)

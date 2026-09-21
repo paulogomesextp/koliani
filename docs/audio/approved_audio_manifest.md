@@ -1,5 +1,22 @@
 # Manifesto de aquisição — pacote aprovado
 
+## Audio Vertical Slice — 22-09-2026
+
+Aquisição no browser suportado, sem contornar login, CAPTCHA ou paywall. Os quatro ficheiros abaixo foram validados por `ffprobe` e ligados ao runtime. Os três MP3 estão intactos; só o dash foi editado. A build local é candidata de QA, não substitui a publicação oficial.
+
+| Uso | Origem Pixabay | Ficheiro local | Aplicação / edição | Content ID |
+| --- | --- | --- | --- | --- |
+| Menu | [Cinematic Fantasy Dark — RomanSenykMusic](https://pixabay.com/music/fantasy-dreamy-childrens-cinematic-fantasy-dark-160932/) | `assets/audio/approved/menu_cinematic_fantasy_dark.mp3` | Menu, -8 dB no player Music; original sem edição | Sim |
+| Região I (níveis 1–5) | [Midnight Forest — Syouki_Takahashi](https://pixabay.com/music/ambient-midnight-forest-184304/) | `assets/audio/approved/region_01_midnight_forest.mp3` | Exploração, -8 dB no player Music; original sem edição | Sim |
+| Boss 1 (Guardião Verde) | [Gothic Candlelight — JoelFazhari](https://pixabay.com/music/mystery-gothic-candlelight-gothic-mystery-soundtrack-1987/) | `assets/audio/approved/boss_01_gothic_candlelight.mp3` | Primeiro boss, -6 dB no player Music; original sem edição | Não indicado na página |
+| Dash Koliani | [wind magic (5) — Yodguard](https://pixabay.com/sound-effects/film-special-effects-wind-magic-5-378630/) | `assets/audio/approved/koliani_dash_wind_magic_5.wav` | Derivado do MP3 local `assets/audio/acquisition/sfx/wind_magic_5.mp3`: primeiros 0,7 s, fade-out 0,45–0,7 s, -6 dB, mono 44,1 kHz; callsite -11 dB no bus SFX | Não indicado |
+
+Todas as páginas acima indicam utilização sob a Pixabay Content License. Não redistribuir os ficheiros de origem isoladamente. As faixas com Content ID poderão exigir certificado/licença em vídeos publicados.
+
+As tentativas seguintes abriram páginas aprovadas de SFX mas não produziram ficheiro local verificável no browser suportado: `soft-body-impact-295404`, `drop-sound-effect-240899`, `shield-block-shortsword-143940`, `deep-impact-sound-effect-176434`, `fireball-impact-351961`, `sword-blade-slicing-flesh-352708`. `musical-hit-94706` apresenta o título “Hit” e não foi integrado sem confirmação de identidade. Sem ficheiro, mantêm-se os SFX anteriores nesses eventos; não declarar estes downloads concluídos.
+
+### Histórico da tentativa anterior
+
 Execução batch em 2026-09-21: 85/85 URLs tentadas com concorrência 4. O asset previamente obtido permanece em `assets/audio/acquisition/sfx/wind_magic_5.mp3` (1/44 SFX). As 85 páginas retornaram HTTP 403 ao cliente Python; não foram contornadas.
 
 Execução batch: todas as URLs foram tentadas; nenhum asset foi integrado no código.
