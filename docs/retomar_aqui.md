@@ -1,3 +1,45 @@
+## Publicacao do SFX Overhaul em master para playtest na PWA (21 set 2026) · PARCIAL
+
+`master` **72ea2477 -> 2fd7bd92** por FAST-FORWARD puro (sem force, sem
+rebase, sem reset). Versao **0.18.19 -> 0.18.20**. Os quatro harnesses SFX
+passaram a 0 falhas antes de integrar. Worktree da Regiao II
+(`koliani-region02-remodel`, 804d22ba) NAO tocado.
+
+**A PWA NAO FOI ACTUALIZADA.** O CI run **#489** ficou pendurado no passo
+`Correr suite de testes` -- 5 h 10 m sem sair de `in_progress` num passo que
+normalmente demora ~2 min -- e por isso os jobs `Build Web` e
+`Publicar o Web no GitHub Pages` ficaram `skipped`. A PWA continua na versao
+anterior (cache `1789898528|8666416`).
+
+Diagnostico ate' agora (NAO concluido):
+
+- a mesma suite passa AQUI em 49 s (`tools/correr_testes.ps1`, exit 0) e em
+  36 s com `--audio-driver Dummy` -- portanto a hipotese "sem dispositivo de
+  audio no container" esta' **descartada**;
+- os `.import` dos dois `.ogg` re-codificados estao consistentes (o nome do
+  ficheiro importado deriva do CAMINHO, nao do conteudo);
+- a API do GitHub chegou a devolver `completed/failure` com os jobs
+  seguintes `skipped` e depois VOLTOU a `in_progress` -- essa inconsistencia,
+  mais 5 h sem uma linha de saida, aponta mais a runner encravado do que a
+  defeito de codigo. **Nao esta' provado.**
+
+Nota importante: o workflow so' corre em `main`/`master` e em PRs, por isso
+**nenhum dos 5 commits do SFX tinha passado pelo CI** -- esta publicacao foi
+a primeira exposicao deles. Se o problema for mesmo de codigo, esta' em
+qualquer um dos cinco, nao so' no Prompt 4.
+
+Nao ha' token da API nesta maquina (`gh` nao esta' instalado), por isso nao
+foi possivel cancelar nem repetir a run. O caminho seguido foi gravar este
+estado e deixar o push retriggar uma run limpa.
+
+Se a run nova tambem pendurar, e' codigo e ha' que bissectar os 5 commits do
+SFX. Se passar, era o runner e a PWA sobe sozinha.
+
+Nada foi revertido: reverter exigia force-push (proibido) ou desfazer a
+publicacao que o Paulo pediu.
+
+---
+
 ## SFX Overhaul — Prompt 4 QA final + builds de teste (20 set 2026) · READY_FOR_HUMAN_TEST
 
 Branch `codex/sfx-overhaul`, HEAD inicial `61cb80f2`. Fecha a fase AUTOMÁTICA

@@ -1,3 +1,9 @@
+> **PWA por publicar (21 set 2026)** — o `master` ja' tem o SFX Overhaul
+> (v0.18.20, fast-forward limpo), mas o **CI run #489 pendurou** no passo da
+> suite e o deploy do GitHub Pages ficou `skipped`. A PWA ainda serve a
+> versao antiga. A suite passa localmente em 40 s; suspeita-se de runner
+> encravado, mas nao esta' provado. Detalhe em `docs/retomar_aqui.md`.
+
 > **À espera do Paulo (SFX, 20 set 2026)** — o SFX Overhaul fechou a fase
 > automática (`READY_FOR_HUMAN_TEST`). Duas coisas dependem de ti:
 > 1. **Playtest de som** — checklist e percurso de 10–15 min em
