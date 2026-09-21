@@ -3197,3 +3197,27 @@ atual. Não repetir auditorias completas nesta retoma.
   HUMAN LISTEN/PLAYTEST e DEVICE VALIDATION continuam obrigatórios.
 - Próximo: SFX Prompt 2 — combat + player + enemy sound pass; depois bosses e
   mundo. Não iniciar automaticamente.
+## SFX Overhaul — Prompt 5 · Koliani Signature (21 set 2026) · PASS técnico
+
+Branch `codex/sfx-overhaul`, entrada `6dda2834` (= `origin/master` após
+fetch/ff-only). **27 SFX originais** sintetizados e roteados só para a
+Koliani: movimento, combo Shadowblade 1–4, impacto/crítico, escudo, dano e
+morte. Fonte reproduzível em `tools/gerar_sfx_koliani_signature.py`; método,
+QA e lista em [`koliani_signature_prompt5.md`](audio/koliani_signature_prompt5.md).
+
+FFmpeg: 27/27 mono 44,1 kHz, picos −10,0 a −3,0 dBFS, sem clipping; combo
+simulado com quatro impactos −6,40 dBFS. Harness Koliani com input real e
+crítico real: **0 falhas**. Regressões críticos/combate/chefes/mundo **4/4
+exit 0, falhas=0**; os erros tardios de chefes/mundo foram iguais aos do HEAD
+limpo. Suite geral exit 0 e save intacto. Build Windows QA:
+`C:\Projetos\koliani-sfx\build\qa\Koliani-KolianiSFX-QA.exe`, smoke exit 0.
+Build oficial `C:\Projetos\koliani\build\windows\Koliani.exe` intacta.
+
+**HUMAN LISTEN REQUIRED** para identidade, mistura e fadiga; **DEVICE
+VALIDATION REQUIRED** no telemóvel. Candidato local, não entrega: **não
+integrar em master nem publicar PWA** antes do feedback. Próxima ação:
+**Paulo testar rapidamente a Koliani** com
+[`HUMAN_SFX_PLAYTEST.md`](audio/HUMAN_SFX_PLAYTEST.md). Só depois decidir
+publicação e Global Music Audit; não os iniciar automaticamente.
+
+---

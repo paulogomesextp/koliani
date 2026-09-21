@@ -756,3 +756,25 @@ escalar antes da revisão visual humana.
 
 Execução encerrada tecnicamente. Não declarar aprovação visual nem começar o
 próximo lote: **HUMAN VISUAL REVIEW REQUIRED**.
+## SFX Overhaul — Prompt 5 · assinatura sonora Koliani (21 set 2026)
+
+- Objetivo: redesenhar a identidade sonora da Koliani: movimento, combo
+  Shadowblade, impactos, dano e escudo.
+- Âmbito: fontes de síntese e novos SFX mono 44,1 kHz, routing de áudio
+  da personagem, harness, QA FFmpeg, build Windows apenas para escuta e
+  documentação. Mecânicas, dano, física, cooldowns, prioridades, RNG de
+  gameplay, inimigos, bosses, mundo e música ficam congelados.
+- Critério técnico: assets carregam sem clipping; salto duplo/dash/escudo
+  distinguem-se; combo tem quatro perfis; fatal não empilha hurt; harness
+  da Koliani e regressões SFX passam; build QA exporta e arranca.
+- Limite: `HUMAN LISTEN REQUIRED` para identidade, mistura e legibilidade em
+  altifalante de telemóvel. Não integrar em `master` nem publicar PWA antes
+  dessa escuta; a build local é candidato QA, não entrega de produção.
+- Branch `codex/sfx-overhaul`; HEAD de entrada `6dda2834` igual a
+  `origin/master` e `origin/codex/sfx-overhaul` após fetch/ff-only.
+- Resultado: 27 WAV originais, 27/27 QA FFmpeg, harness Koliani 0 falhas,
+  regressões SFX 4/4, suite exit 0, build QA Windows exportada e smoke exit 0.
+  Relatório: `docs/audio/koliani_signature_prompt5.md`. A escuta humana e
+  o dispositivo mobile continuam pendentes.
+
+---

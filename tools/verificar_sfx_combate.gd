@@ -41,28 +41,30 @@ func _player(k: Node) -> void:
 		k.call("_iniciar_ataque")
 		sequencia.append(_ultimo_stream())
 	_checar(_contador() - antes == 4, "combo nao disparou quatro vozes")
-	_checar(sequencia == ["ataque.wav", "ataque2.wav", "ataque3.wav", "ataque_forte.wav"],
+	_checar(sequencia == ["shadowblade_swing_1.wav", "shadowblade_swing_2.wav",
+		"shadowblade_swing_3.wav", "shadowblade_finisher.wav"],
 		"sequencia do combo errada: %s" % str(sequencia))
 
 	antes = _contador()
 	k.call("_sfx_dash")
-	_checar(_contador() - antes == 1 and _ultimo_stream() == "dash.wav",
+	_checar(_contador() - antes == 1 and _ultimo_stream() == "koliani_dash.wav",
 		"dash nao disparou uma vez")
 
-	# Ativacao e impacto usam o mesmo material com perfis diferentes.
+	# Ativacao e impacto usam agora materiais proprios.
 	antes = _contador()
 	k.call("_sfx_ativar_escudo")
-	_checar(_contador() - antes == 1 and _ultimo_stream() == "bloqueio.wav",
+	_checar(_contador() - antes == 1 and _ultimo_stream() == "shadow_shield_on.wav",
 		"ativacao do escudo nao disparou uma vez")
 	var p_ativacao := _ultimo_player()
-	_checar(is_equal_approx(p_ativacao.volume_db, -18.0) and p_ativacao.pitch_scale > 1.2,
+	_checar(is_equal_approx(p_ativacao.volume_db, -18.0) and p_ativacao.pitch_scale > 0.9,
 		"perfil de ativacao do escudo incorreto")
 	antes = _contador()
 	k.call("_ao_bloquear")
 	k.call("_ao_bloquear")
 	_checar(_contador() - antes == 1, "cooldown do impacto de escudo falhou")
 	var p_impacto := _ultimo_player()
-	_checar(is_equal_approx(p_impacto.volume_db, -11.0) and p_impacto.pitch_scale < 1.0,
+	_checar(_ultimo_stream() == "shadow_shield_hit.wav"
+		and is_equal_approx(p_impacto.volume_db, -11.0),
 		"impacto do escudo nao se distingue da ativacao")
 
 	k._invulneravel = 0.0
@@ -70,7 +72,7 @@ func _player(k: Node) -> void:
 	k.vida = 50
 	antes = _contador()
 	k.call("receber_dano", 1)
-	_checar(_contador() - antes == 1 and _ultimo_stream() == "dano.wav",
+	_checar(_contador() - antes == 1 and _ultimo_stream() == "koliani_hurt.wav",
 		"hurt do player nao disparou uma vez")
 	print("SFX PLAYER combo=%s dash=1 shield=ativacao+impacto hurt=1" % str(sequencia))
 
@@ -119,7 +121,7 @@ func _inimigos() -> void:
 func _projeteis(k: Node) -> void:
 	var antes := _contador()
 	k.call("_lancar_projetil")
-	_checar(_contador() - antes == 1 and _ultimo_stream() == "lancar.ogg",
+	_checar(_contador() - antes == 1 and _ultimo_stream() == "shadowblade_energy_cast.wav",
 		"projetil de energia do player sem categoria lancar")
 
 	var e = load("res://scenes/actors/DemonioBase.tscn").instantiate()
