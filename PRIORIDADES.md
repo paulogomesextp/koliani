@@ -1,8 +1,7 @@
-> **PWA por publicar (21 set 2026)** — o `master` ja' tem o SFX Overhaul
-> (v0.18.20, fast-forward limpo), mas o **CI run #489 pendurou** no passo da
-> suite e o deploy do GitHub Pages ficou `skipped`. A PWA ainda serve a
-> versao antiga. A suite passa localmente em 40 s; suspeita-se de runner
-> encravado, mas nao esta' provado. Detalhe em `docs/retomar_aqui.md`.
+> **PWA publicada para playtest (21 set 2026)** — `master` em v0.18.20 com o
+> SFX Overhaul; PWA actualizada em <https://paulogomesextp.github.io/koliani/>
+> (cache novo, o telemovel nao serve assets velhos). O SFX continua
+> **POR APROVAR**: checklist em `docs/audio/HUMAN_SFX_PLAYTEST.md`.
 
 > **À espera do Paulo (SFX, 20 set 2026)** — o SFX Overhaul fechou a fase
 > automática (`READY_FOR_HUMAN_TEST`). Duas coisas dependem de ti:

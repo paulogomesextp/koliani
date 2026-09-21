@@ -1,42 +1,56 @@
-## Publicacao do SFX Overhaul em master para playtest na PWA (21 set 2026) · PARCIAL
+## Publicacao do SFX Overhaul em master para playtest na PWA (21 set 2026) · PUBLICADO
 
-`master` **72ea2477 -> 2fd7bd92** por FAST-FORWARD puro (sem force, sem
-rebase, sem reset). Versao **0.18.19 -> 0.18.20**. Os quatro harnesses SFX
-passaram a 0 falhas antes de integrar. Worktree da Regiao II
+`master` **72ea2477 -> 2fd7bd92 -> dd0e5767** por FAST-FORWARD puro (sem
+force, sem rebase, sem reset). Versao **0.18.19 -> 0.18.20**. Os quatro
+harnesses SFX passaram a 0 falhas antes de integrar. Worktree da Regiao II
 (`koliani-region02-remodel`, 804d22ba) NAO tocado.
 
-**A PWA NAO FOI ACTUALIZADA.** O CI run **#489** ficou pendurado no passo
-`Correr suite de testes` -- 5 h 10 m sem sair de `in_progress` num passo que
-normalmente demora ~2 min -- e por isso os jobs `Build Web` e
-`Publicar o Web no GitHub Pages` ficaram `skipped`. A PWA continua na versao
-anterior (cache `1789898528|8666416`).
+**PWA publicada**: deployment `6569021908`, sha `dd0e5767` == HEAD de
+`master`. Cache do service worker mudou de `1789898528|8666416` para
+`1789995857|9581525` -- o cache-busting do Godot deriva do conteudo do
+export, portanto o telemovel nao serve assets velhos. Nao foi preciso
+inventar mecanismo nenhum.
+<https://paulogomesextp.github.io/koliani/>
 
-Diagnostico ate' agora (NAO concluido):
+### O susto pelo caminho: run #489 pendurada 5 h
 
-- a mesma suite passa AQUI em 49 s (`tools/correr_testes.ps1`, exit 0) e em
-  36 s com `--audio-driver Dummy` -- portanto a hipotese "sem dispositivo de
-  audio no container" esta' **descartada**;
-- os `.import` dos dois `.ogg` re-codificados estao consistentes (o nome do
-  ficheiro importado deriva do CAMINHO, nao do conteudo);
+A primeira run (#489, sha `2fd7bd92`) ficou **5 h 10 m** em `in_progress` no
+passo `Correr suite de testes` -- um passo de ~2 min -- e por isso `Build
+Web` e `Pages` ficaram `skipped`. Era **runner encravado, nao codigo**, e
+ficou provado: a run #490, com o MESMO codigo mais um commit de docs, passou
+em **7 minutos** com os cinco jobs verdes.
+
+O que se mediu antes de concluir isso (vale a pena guardar, para nao repetir
+o diagnostico do zero):
+
+- a suite passa AQUI em 49 s (`tools/correr_testes.ps1`, exit 0) e em 36 s
+  com `--audio-driver Dummy` -> a hipotese "container sem dispositivo de
+  audio" ficou **descartada**;
+- os `.import` dos dois `.ogg` re-codificados estao consistentes -- o nome do
+  ficheiro importado deriva do CAMINHO, nao do conteudo;
 - a API do GitHub chegou a devolver `completed/failure` com os jobs
-  seguintes `skipped` e depois VOLTOU a `in_progress` -- essa inconsistencia,
-  mais 5 h sem uma linha de saida, aponta mais a runner encravado do que a
-  defeito de codigo. **Nao esta' provado.**
+  seguintes `skipped` e depois VOLTOU a `in_progress`. Essa inconsistencia,
+  mais 5 h sem uma linha de saida, era o sinal de runner encravado.
 
-Nota importante: o workflow so' corre em `main`/`master` e em PRs, por isso
-**nenhum dos 5 commits do SFX tinha passado pelo CI** -- esta publicacao foi
-a primeira exposicao deles. Se o problema for mesmo de codigo, esta' em
-qualquer um dos cinco, nao so' no Prompt 4.
+**Armadilha de metodo**: nao ha' `gh` nem token da API nesta maquina, por
+isso nao se consegue cancelar nem repetir uma run. A unica forma de forcar
+uma run nova e' empurrar um commit para `master`. E cuidado com watchers que
+buscam `runs?per_page=1`: a meio da espera esse indice passa a apontar para
+a run seguinte e o watcher troca de alvo sem avisar (aconteceu).
 
-Nao ha' token da API nesta maquina (`gh` nao esta' instalado), por isso nao
-foi possivel cancelar nem repetir a run. O caminho seguido foi gravar este
-estado e deixar o push retriggar uma run limpa.
+Nota: o workflow so' corre em `main`/`master` e em PRs, por isso **nenhum dos
+5 commits do SFX tinha passado pelo CI** ate' esta publicacao.
 
-Se a run nova tambem pendurar, e' codigo e ha' que bissectar os 5 commits do
-SFX. Se passar, era o runner e a PWA sobe sozinha.
+### O SFX continua POR APROVAR
 
-Nada foi revertido: reverter exigia force-push (proibido) ou desfazer a
-publicacao que o Paulo pediu.
+Isto foi um `publish para HUMAN TEST`, nao uma integracao de trabalho
+aprovado. Continuam em aberto, sem correccao automatica:
+`esmagar.ogg` (possivel distorcao, +7,26 dBFS), as compensacoes `chama` +18 /
+`feixe_vil` +14 / `chefe_magia` +13, `vento_ciclo`, `mecanismo_ciclo`,
+`sino_mecanismo`, `raio_cai`, as transicoes de fase dos chefes, e a
+confirmacao real do audio no Web.
+
+Checklist e percurso: [`docs/audio/HUMAN_SFX_PLAYTEST.md`](audio/HUMAN_SFX_PLAYTEST.md).
 
 ---
 
