@@ -19,6 +19,8 @@ func _verificar() -> void:
 			falhas.append("stream invalido: " + caminho)
 	if Musica.faixa_de_nivel(0) != caminhos[1] or Musica.faixa_de_nivel(4) != caminhos[1]:
 		falhas.append("Regiao I nao usa a faixa aprovada")
+	if FileAccess.get_sha256(caminhos[1]).to_upper() != "FFF5269D4C05BF3DB5454567E6C2CC47655E5572E0736AC4C4A2EE271AB408BB":
+		falhas.append("Conteudo da Regiao I nao corresponde ao Midnight Forest local aprovado")
 	if Musica.faixa_de_chefe(0) != caminhos[2]:
 		falhas.append("Boss 1 nao usa a faixa aprovada")
 	if Som.CAMINHOS.get("dash") != caminhos[3]:
@@ -34,6 +36,11 @@ func _verificar() -> void:
 	Musica.ambiente(0)
 	if Musica._caminho_atual != caminhos[1]:
 		falhas.append("Ambiente nao trocou para a Regiao I")
+	if Musica._p.stream == null or Musica._p.stream.resource_path != caminhos[1]:
+		falhas.append("Player da Regiao I nao recebeu o stream aprovado")
+	Musica.intensificar()
+	if Musica._p.stream == null or Musica._p.stream.resource_path != caminhos[1]:
+		falhas.append("Combate substituiu Midnight Forest por musica antiga")
 	EstadoJogo.indice_nivel = 0
 	Musica.boss()
 	if Musica._caminho_atual != caminhos[2]:

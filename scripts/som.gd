@@ -287,6 +287,8 @@ func toca(nome: String, volume_db := -6.0, pitch := 1.0,
 	if cooldown > 0.0:
 		_cooldowns[chave] = agora + cooldown
 	p.play()
+	if OS.get_cmdline_user_args().has("--audio-qa"):
+		print("[AUDIO_QA] event=%s stream=%s" % [nome, p.stream.resource_path])
 	return true
 
 

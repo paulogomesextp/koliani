@@ -1,3 +1,31 @@
+## Auditoria final de áudio aprovado — fontes SFX em falta (22 set 2026)
+
+Branch `codex/final-audio-polish` criada de `codex/final-integration-qa`
+(`98eb97a7`). O MP3 da Região 01 é byte idêntico ao download original
+`syouki_takahashi-midnight-forest-184304.mp3` (SHA-256 no manifesto), e o
+arranque real do Nível 1 entrega-o ao player. A troca para música antiga vinha
+de `Musica.intensificar()`, que substituía a faixa por `regiao1_combate.wav`
+depois de golpes. Com o aprovado presente, essa troca está desativada e o
+teste de regressão confirma stream e conteúdo antes/depois do combate.
+
+Auditoria dirigida dos 16 eventos de progressão/UI: os 16 ficheiros das
+referências Pixabay não foram localizados. Dez eventos ainda disparam WAVs
+antigos; seis não têm evento próprio identificado. `--audio-qa` ativa trace
+do stream real; sem a flag não acrescenta logs. O harness do mundo abriu um
+baú real (`bau_abrir.wav`, depois `recompensa.wav`) e mostrou a transição
+antiga do fim de nível (`transicao.wav`); o seu bloco da porta chama `Som`
+diretamente, pelo que a porta real ainda requer escuta. Detalhes, URLs,
+hashes e percurso: `docs/audio/approved_audio_manifest.md`.
+
+Import Godot e testes dirigidos de música, SFX críticos, mundo e UI deram
+exit 0/zero falhas; o teste do mundo também emitiu `Node not found: Col`
+em headless e avisos de recursos ao encerrar. Sem build QA final enquanto os
+SFX aprovados faltarem. Próximo passo: transferência manual dos 16 ficheiros,
+verificação por ID/hash/conteúdo, integração e teste em jogo; Windows e Web/PWA
+do mesmo commit antes de uma entrega, seguidos de escuta humana.
+
+---
+
 ## Integração QA final de áudio e selector (22 set 2026)
 
 - Branch isolada `codex/final-integration-qa` baseada em `b24dd258` e integrada

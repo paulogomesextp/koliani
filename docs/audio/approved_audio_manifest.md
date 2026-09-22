@@ -13,6 +13,67 @@ Aquisição no browser suportado, sem contornar login, CAPTCHA ou paywall. Os qu
 
 Todas as páginas acima indicam utilização sob a Pixabay Content License. Não redistribuir os ficheiros de origem isoladamente. As faixas com Content ID poderão exigir certificado/licença em vídeos publicados.
 
+## Auditoria dirigida de música e SFX de progressão/UI (22-09-2026)
+
+**Região 01.** O ficheiro `region_01_midnight_forest.mp3` tem 5 385 822 bytes,
+168,306938 s e SHA-256
+`FFF5269D4C05BF3DB5454567E6C2CC47655E5572E0736AC4C4A2EE271AB408BB`.
+É byte idêntico a `syouki_takahashi-midnight-forest-184304.mp3` em Downloads.
+`Main._ready()` chama `Musica.ambiente(0)` e o player recebe esse stream no
+arranque real do Nível 1. A substituição vinha de `Musica.intensificar()`, que
+tocava `regiao1_combate.wav` depois de golpes; com a faixa aprovada presente,
+essa troca foi desativada. O teste confirma o stream antes e depois de
+`intensificar()`. `-- --jogar --audio-qa` imprime o caminho recebido pelo player.
+Escuta humana do combate continua necessária.
+
+Os 16 URLs seguintes são **referências aprovadas**, mas os ficheiros
+correspondentes não estão identificáveis no repositório, `incoming_music/`,
+Downloads, Desktop ou Documents. O único SFX Pixabay de aquisição local é
+`wind_magic_5.mp3` (dash). `OLD_ASSET` e `MISSING_APPROVED_SOURCE` podem
+coexistir: o primeiro descreve o stream atual; o segundo, a fonte aprovada
+ausente. Nenhum item abaixo foi marcado `INTEGRATED`.
+
+| EVENT | STATUS | LOCAL ASSET / chamada real | SOURCE / REFERENCE |
+| --- | --- | --- | --- |
+| Chest open / reward | OLD_ASSET + MISSING_APPROVED_SOURCE | `BauChefe._som_do_bau()` → `bau_abrir.wav`, depois `recompensa.wav` | [Coin Drop](https://pixabay.com/sound-effects/film-special-effects-coin-drop-229314/) |
+| Level complete | OLD_ASSET + MISSING_APPROVED_SOURCE | `Porta._concluir()` → `transicao.wav` | [Soft Landing Intro Modern Stereo](https://pixabay.com/sound-effects/film-special-effects-soft-landing-intro-modern-stereo-332450/) |
+| Checkpoint | OLD_ASSET + MISSING_APPROVED_SOURCE | `Checkpoint` → `selo.wav` | [Fantasy Game Sword Cut 2](https://pixabay.com/sound-effects/film-special-effects-fantasy-game-sword-cut-sound-effect-2-get-more-on-my-patreon-339823/) |
+| Portal | OLD_ASSET + MISSING_APPROVED_SOURCE | `Portal` → `transicao.wav` | [Sci-Fi Portal Jump 04](https://pixabay.com/sound-effects/film-special-effects-sci-fi-portal-jump-04-416161/) |
+| Ability unlock | OLD_ASSET + MISSING_APPROVED_SOURCE | `Coletavel`/`Santuario` → `desbloqueio.wav` | [Unlock Stinger](https://pixabay.com/sound-effects/film-special-effects-unlock-stinger-289722/) |
+| Normal pickup | OLD_ASSET + MISSING_APPROVED_SOURCE | `Coletavel`/`Essencia` → `apanhar.wav` | [Item Pickup 1](https://pixabay.com/sound-effects/film-special-effects-item-pickup-1-540174/) |
+| Rare pickup | MISSING_APPROVED_SOURCE | Sem evento próprio identificado; `BauChefe` usa `recompensa.wav` | [Coin Collect 1](https://pixabay.com/sound-effects/film-special-effects-coin-collect-1-540179/) |
+| Unlock door | MISSING_APPROVED_SOURCE | Sem callsite de unlock door identificado; `porta.wav` só aparece no editor de layout | [Unlock the Door 2](https://pixabay.com/sound-effects/household-unlock-the-door-2-99745/) |
+| Heal | MISSING_APPROVED_SOURCE | Sem callsite de SFX de cura identificado | [Healing Magic 2](https://pixabay.com/sound-effects/film-special-effects-healing-magic-2-378663/) |
+| Save / autosave | MISSING_APPROVED_SOURCE | `EstadoJogo`/`SaveFoundation` sem callsite de SFX | [UI Success Chime](https://pixabay.com/sound-effects/technology-ui-success-chime-513565/) |
+| Respawn | MISSING_APPROVED_SOURCE | `Koliani.recuperar_no_checkpoint()` sem callsite de SFX | [Game Respawn](https://pixabay.com/sound-effects/film-special-effects-game-respawn-153317/) |
+| Menu / panel open-close | MISSING_APPROVED_SOURCE | Sem evento próprio de abertura/fecho identificado | [UI Menu Slide In](https://pixabay.com/sound-effects/film-special-effects-ui-menu-slide-in-516940/) |
+| UI confirm | OLD_ASSET + MISSING_APPROVED_SOURCE | `MenuInicial`/`SeletorNiveis` → `ui_confirmar.wav` | [Interface Click 2](https://pixabay.com/sound-effects/app-interface-click-2-476372/) |
+| UI hover | OLD_ASSET + MISSING_APPROVED_SOURCE | Foco/hover do `MenuInicial` → `ui_mover.wav` ou variantes `_v2`/`_v3` | [Minimalist Button Hover](https://pixabay.com/sound-effects/film-special-effects-minimalist-button-hover-sound-effect-399749/) |
+| UI back / cancel | OLD_ASSET + MISSING_APPROVED_SOURCE | `MenuInicial`/`SeletorNiveis` → `ui_voltar.wav` | [UI Button Cancel](https://pixabay.com/sound-effects/ui-button-sound-cancel-back-exit-continue-467877/) |
+| UI error | OLD_ASSET + MISSING_APPROVED_SOURCE | `SeletorNiveis`/`Santuario` → `ui_negado.wav` | [Error Notification 05](https://pixabay.com/sound-effects/film-special-effects-error-notification-05-199276/) |
+
+Para QA, `--audio-qa` após `--` ativa linhas
+`[AUDIO_QA] event=<event> stream=<resource_path>` nos players reais, sem
+logging em execução normal. No baú esperado há uma chamada `bau_abrir` e uma
+`recompensa` 0,36 s depois; na conclusão do nível, uma `transicao` disparada
+por `Porta._concluir()`. Os WAV atuais são sintetizados/legados do projeto,
+não os ficheiros dos URLs. Amostras medidas por `ffprobe`/SHA-256:
+`bau_abrir.wav` 0,780 s / `67496166C0AC662F39D38F558A2278A168A93BF29E91B6EDC04BEB8B73915701`;
+`recompensa.wav` 1,300 s / `0125FFC1FA88B34C990B6D9F10AF33C93FDB3C9088A47DF3845E4C08EBDE2E89`;
+`transicao.wav` 1,050 s / `4648D067E7C39C064D908AA9354BC0509A7A4BE524063B02BDD7A652304CBFE0`.
+
+### Percurso de escuta dirigido
+
+Arrancar a branch com `-- --jogar --audio-qa` e save de QA isolado. No Nível 1,
+confirmar no log `event=music stream=res://assets/audio/approved/region_01_midnight_forest.mp3`;
+combater e confirmar que não surge `regiao1_combate.wav`. Num baú real,
+confirmar exatamente um `event=bau_abrir` e um `event=recompensa`, nesta ordem,
+sem `apanhar` adicional. Ao atravessar a porta de fim de nível, confirmar
+exatamente um `event=transicao` emitido por essa porta; o portal independente
+também usa hoje `transicao.wav`, pelo que o log do evento tem de ser associado
+ao momento e ao callsite. Estes dois WAV continuam antigos até serem obtidos
+os ficheiros aprovados; este percurso valida o diagnóstico, não o aprova.
+
 ### SFX principais da Koliani — síntese original
 
 Os SFX `koliani_hurt`, `koliani_death`, `koliani_jump`, `koliani_double_jump`,

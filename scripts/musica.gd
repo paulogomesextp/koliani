@@ -233,6 +233,10 @@ func preparar_boss() -> void:
 func intensificar() -> void:
 	if EstadoJogo.indice_nivel >= NIVEIS_PRODUCAO:
 		return
+	# A Região I aprovada usa exclusivamente Midnight Forest durante a exploração.
+	# A camada de combate antiga substituía a faixa após o primeiro golpe.
+	if ResourceLoader.exists(REGIAO_01_APROVADA):
+		return
 	if _caminho_atual == faixa_de_chefe(EstadoJogo.indice_nivel):
 		return          # num combate de chefe manda o tema do chefe
 	_combate_ate = Time.get_ticks_msec() / 1000.0 + COMBATE_CAUDA
@@ -309,6 +313,8 @@ func _tocar(caminho: String, pitch: float, vol: float, com_assombracao: bool) ->
 	_caminho_atual = caminho
 	_pitch_atual = pitch
 	_p.play()
+	if OS.get_cmdline_user_args().has("--audio-qa"):
+		print("[AUDIO_QA] event=music stream=%s" % _p.stream.resource_path)
 	if cruzar:
 		create_tween().tween_property(_p, "volume_db", vol, CRUZAR)
 
