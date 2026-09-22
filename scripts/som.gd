@@ -9,7 +9,7 @@ extends Node
 const CAMINHOS := {
 	"salto": "res://assets/audio/salto.wav",
 	"koliani_salto": "res://assets/audio/koliani_signature/koliani_jump.wav",
-	"salto_duplo": "res://assets/audio/koliani_signature/koliani_double_jump.wav",
+	"salto_duplo": "res://assets/audio/koliani_signature/koliani_jump.wav",
 	# Prompt 5: quatro vozes originais da mesma familia Shadowblade.
 	"ataque": "res://assets/audio/koliani_signature/shadowblade_swing_1.wav",
 	"ataque2": "res://assets/audio/koliani_signature/shadowblade_swing_2.wav",

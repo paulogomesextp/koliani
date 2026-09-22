@@ -38,6 +38,11 @@ func _init() -> void:
 
 func _catalogo() -> void:
 	var faltas: Array[String] = []
+	var sfx_bus := AudioServer.get_bus_index("SFX")
+	var opcoes: Node = root.get_node("Opcoes")
+	_checar(sfx_bus >= 0 and is_equal_approx(AudioServer.get_bus_volume_db(sfx_bus),
+		opcoes.SFX_MIX_DB + linear_to_db(clampf(opcoes.vol_efeitos, 0.001, 1.0))),
+		"bus SFX nao aplica o headroom global aprovado")
 	for chave in _som.CAMINHOS:
 		if _som.call("_stream", chave) == null:
 			faltas.append(chave)
@@ -54,8 +59,11 @@ func _catalogo() -> void:
 		_checar(caminho.begins_with("res://assets/audio/koliani_signature/")
 			or (chave == "dash" and caminho == "res://assets/audio/approved/koliani_dash_wind_magic_5.wav"),
 			"asset fora da familia: %s" % chave)
-		_checar(not caminhos.has(caminho), "duas chaves partilham stream: %s" % chave)
+		if chave != "salto_duplo":
+			_checar(not caminhos.has(caminho), "duas chaves partilham stream: %s" % chave)
 		caminhos.append(caminho)
+	_checar(_som.CAMINHOS["salto_duplo"] == _som.CAMINHOS["koliani_salto"],
+		"double jump nao usa exactamente o stream do jump")
 	_checar(_som.CAMINHOS["salto"] != _som.CAMINHOS["koliani_salto"],
 		"salto dos inimigos foi alterado")
 	_checar(_som.CAMINHOS["bloqueio"] != _som.CAMINHOS["escudo_impacto"],
@@ -92,10 +100,10 @@ func _saltos(k: Node) -> void:
 	Input.action_release("saltar")
 	print("KOLIANI SALTO segundo vozes=%d stream=%s saltos=%d" % [
 		_contador() - antes, _ultimo_stream(), k._mov.saltos_dados])
-	_checar(_contar_stream_desde(antes, "koliani_double_jump.wav") == 1
-		and _ultimo_stream() == "koliani_double_jump.wav",
-		"double jump nao disparou exactamente uma voz distinta")
-	print("KOLIANI SALTO jump=1 double=1")
+	_checar(_contar_stream_desde(antes, "koliani_jump.wav") == 1
+		and _ultimo_stream() == "koliani_jump.wav",
+		"double jump nao reutilizou exactamente o stream do jump")
+	print("KOLIANI SALTO jump=1 double=1 mesma_assinatura=true")
 
 
 func _movimento(k: Node) -> void:

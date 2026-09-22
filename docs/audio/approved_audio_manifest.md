@@ -22,6 +22,12 @@ Os SFX `koliani_hurt`, `koliani_death`, `koliani_jump`, `koliani_double_jump`,
 e parciais sintéticas. Os URLs Pixabay abaixo continuam apenas como referência
 sonora; os downloads bloqueados por 403 não foram forçados nem redistribuídos.
 
+O double jump reutiliza exactamente `koliani_jump.wav` (sem variante/pitch).
+O bus central `SFX` recebe agora um headroom fixo de −6,0 dB; `Music` e todos
+os buses de música permanecem sem alteração. As famílias de inimigos e bosses
+reutilizam os mappings existentes por material, com hurt/death separados,
+cooldowns e prioridade de morte preservados.
+
 As tentativas seguintes abriram páginas aprovadas de SFX mas não produziram ficheiro local verificável no browser suportado: `soft-body-impact-295404`, `drop-sound-effect-240899`, `shield-block-shortsword-143940`, `deep-impact-sound-effect-176434`, `fireball-impact-351961`, `sword-blade-slicing-flesh-352708`. `musical-hit-94706` apresenta o título “Hit” e não foi integrado sem confirmação de identidade. Sem ficheiro, mantêm-se os SFX anteriores nesses eventos; não declarar estes downloads concluídos.
 
 ### Histórico da tentativa anterior

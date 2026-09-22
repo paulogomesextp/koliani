@@ -3311,3 +3311,19 @@ publicação e Global Music Audit; não os iniciar automaticamente.
   para mistura perceptual, embora o teste técnico do Paulo seja o gate final.
 
 ---
+## Player audio tweak + enemy/boss SFX — técnico PASS (22 set 2026)
+
+- Double jump passa a chamar exactamente `koliani_salto`, o mesmo stream de
+  `koliani_jump.wav`; não há variante nem pitch específico.
+- O bus central `SFX` aplica `SFX_MIX_DB = -6,0 dB` antes do volume relativo do
+  utilizador. `Music` mantém offset 0 dB. Música de menu/região/boss intacta.
+- Famílias de inimigos e mappings de boss existentes foram preservados e
+  validados: ataque/hurt/death por família, fatal sem hurt duplicado, energia
+  distinta de projéctil orgânico, fases/mortes/impactos pesados e prioridade.
+- PASS: `verificar_sfx_koliani.gd`, `verificar_sfx_chefes.gd`,
+  `verificar_sfx_criticos.gd`, `test_audio_actor_visibility.tscn`,
+  `test_crystal_sync.tscn`, `test_mob_dormancy.tscn` e vertical slice.
+- Build QA actualizado nesta execução. Falhas antigas do harness amplo de
+  combate ficam reportadas separadamente; não foram corrigidas neste lote.
+
+---

@@ -1597,7 +1597,7 @@ func _physics_process(dt: float) -> void:
 			and _mov.velocidade.y * _sinal_grav > 0.0
 		velocity = _mov.velocidade
 		if _mov.saltos_dados > saltos_antes:
-			Som.toca("salto_duplo" if _mov.saltos_dados >= 2 else "koliani_salto",
+			Som.toca("koliani_salto",
 				-10.0, 1.0, 0.03)
 			if _mov.saltos_dados >= 2:
 				_djump_t = 0.45  # mostra a animação do salto duplo
