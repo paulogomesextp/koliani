@@ -2,7 +2,7 @@
 
 ## Koliani Signature — Prompt 5 (21 set 2026)
 
-Os 27 WAV de `koliani_signature/` são **síntese original** por
+Os 28 WAV de `koliani_signature/` são **síntese original** por
 `tools/gerar_sfx_koliani_signature.py`: ruído filtrado, transientes,
 varrimentos de frequência e ressonância Shadowblade. Não contêm samples de
 terceiros nem dependem de downloads. O script é a fonte; os WAV são saída

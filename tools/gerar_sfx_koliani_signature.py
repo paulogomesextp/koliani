@@ -43,6 +43,7 @@ ALVO_CORPO = {
     "shadowblade_hit_v3": -9.1,
     "shadowblade_critical": -8.0,
     "shadowblade_energy_cast": -12.0,
+    "koliani_energy_hit": -11.0,
     "shadow_shield_on": -12.5,
     "shadow_shield_hit": -9.5,
     "koliani_hurt": -10.0,
@@ -293,6 +294,14 @@ def defesa_e_dano() -> None:
     sombra(b, 0.045, 0.35, 0.38, 0.62)
     ar(b, 0.13, 0.40, 0.15, 0.15, 181, True)
     finalizar("koliani_death", b, -3.6)
+
+    # Impacto do projétil de energia: magia curta e limpa, sem o transiente
+    # metálico do impacto da Shadowblade.
+    b = vazio(0.22)
+    pulso(b, 0.0, 0.036, 0.36, 0.16, 185)
+    varrer(b, 0.002, 0.14, 0.34, 720, 260, 6.8, 0.10)
+    sombra(b, 0.014, 0.15, 0.16, 1.55)
+    finalizar("koliani_energy_hit", b, -6.0)
 
     b = vazio(0.21)
     pulso(b, 0.0, 0.061, 0.58, 0.11, 190)

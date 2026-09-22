@@ -13,6 +13,15 @@ Aquisição no browser suportado, sem contornar login, CAPTCHA ou paywall. Os qu
 
 Todas as páginas acima indicam utilização sob a Pixabay Content License. Não redistribuir os ficheiros de origem isoladamente. As faixas com Content ID poderão exigir certificado/licença em vídeos publicados.
 
+### SFX principais da Koliani — síntese original
+
+Os SFX `koliani_hurt`, `koliani_death`, `koliani_jump`, `koliani_double_jump`,
+`koliani_energy_hit`, `shadow_shield_on/hit`, `shadowblade_swing_1..3`,
+`shadowblade_finisher` e `shadowblade_hit` são originais, gerados localmente por
+`tools/gerar_sfx_koliani_signature.py` com ruído filtrado, envelopes, varrimentos
+e parciais sintéticas. Os URLs Pixabay abaixo continuam apenas como referência
+sonora; os downloads bloqueados por 403 não foram forçados nem redistribuídos.
+
 As tentativas seguintes abriram páginas aprovadas de SFX mas não produziram ficheiro local verificável no browser suportado: `soft-body-impact-295404`, `drop-sound-effect-240899`, `shield-block-shortsword-143940`, `deep-impact-sound-effect-176434`, `fireball-impact-351961`, `sword-blade-slicing-flesh-352708`. `musical-hit-94706` apresenta o título “Hit” e não foi integrado sem confirmação de identidade. Sem ficheiro, mantêm-se os SFX anteriores nesses eventos; não declarar estes downloads concluídos.
 
 ### Histórico da tentativa anterior

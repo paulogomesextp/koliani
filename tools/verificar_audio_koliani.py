@@ -58,8 +58,8 @@ def main() -> int:
         lufs_txt = f"{integrado:.1f}" if integrado > -69.0 else "n/a (<400ms)"
         print(f"{caminho.name} | {duracao:.3f} | {stream['sample_rate']} | "
               f"{stream['channels']} | {pico:.2f} | {lufs_txt}")
-    if len(ficheiros) != 27:
-        falhas.append(f"quantidade={len(ficheiros)} (esperada 27)")
+    if len(ficheiros) != 28:
+        falhas.append(f"quantidade={len(ficheiros)} (esperada 28)")
     # Ensaio conservador: quatro golpes na cadencia real, cada um com impacto.
     # Nao substitui mistura ou audicao em jogo, mas encontra clipping obvio.
     eventos = (

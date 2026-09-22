@@ -15,6 +15,7 @@ const CAMINHOS := {
 	"ataque2": "res://assets/audio/koliani_signature/shadowblade_swing_2.wav",
 	"ataque3": "res://assets/audio/koliani_signature/shadowblade_swing_3.wav",
 	"lancar": "res://assets/audio/koliani_signature/shadowblade_energy_cast.wav",
+	"energia_impacto": "res://assets/audio/koliani_signature/koliani_energy_hit.wav",
 	"acerto": "res://assets/audio/koliani_signature/shadowblade_hit.wav",
 	"acerto_critico": "res://assets/audio/koliani_signature/shadowblade_critical.wav",
 	"pisao_koliani": "res://assets/audio/koliani_signature/koliani_stomp.wav",

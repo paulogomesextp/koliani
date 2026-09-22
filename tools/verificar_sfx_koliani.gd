@@ -47,11 +47,12 @@ func _catalogo() -> void:
 		"passo1", "passo2", "passo3", "ataque", "ataque2", "ataque3",
 		"ataque_forte", "acerto", "acerto_v2", "acerto_v3",
 		"acerto_critico", "lancar", "pisao_koliani", "escudo_ativar",
-		"escudo_impacto", "dano", "dano_pesado", "morte_koliani"]
+		"escudo_impacto", "energia_impacto", "dano", "dano_pesado", "morte_koliani"]
 	var caminhos: Array[String] = []
 	for chave in novos:
 		var caminho: String = _som.CAMINHOS[chave]
-		_checar(caminho.begins_with("res://assets/audio/koliani_signature/"),
+		_checar(caminho.begins_with("res://assets/audio/koliani_signature/")
+			or (chave == "dash" and caminho == "res://assets/audio/approved/koliani_dash_wind_magic_5.wav"),
 			"asset fora da familia: %s" % chave)
 		_checar(not caminhos.has(caminho), "duas chaves partilham stream: %s" % chave)
 		caminhos.append(caminho)
@@ -100,7 +101,7 @@ func _saltos(k: Node) -> void:
 func _movimento(k: Node) -> void:
 	var antes := _contador()
 	k.call("_sfx_dash")
-	_checar(_contador() - antes == 1 and _ultimo_stream() == "koliani_dash.wav",
+	_checar(_contador() - antes == 1 and _ultimo_stream() == "koliani_dash_wind_magic_5.wav",
 		"dash sem identidade propria")
 	for chave in ["aterrar", "aterrar_medio", "aterrar_pesado",
 			"rolamento", "parede", "agarrar", "passo1", "passo2", "passo3"]:
@@ -128,6 +129,8 @@ func _espada(k: Node) -> void:
 		"critico ainda reutiliza impacto comum")
 	_checar(_som.CAMINHOS["lancar"] != _som.CAMINHOS["ataque"],
 		"energia de projetil reutiliza golpe")
+	_checar(_som.CAMINHOS["energia_impacto"] != _som.CAMINHOS["acerto"],
+		"impacto de energia reutiliza impacto de espada")
 	var e = load("res://scenes/actors/DemonioBase.tscn").instantiate()
 	e.especie = "goblin"
 	current_scene.add_child(e)

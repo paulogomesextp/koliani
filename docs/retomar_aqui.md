@@ -3292,3 +3292,22 @@ publicação e Global Music Audit; não os iniciar automaticamente.
   sair/voltar no build QA antes de promoção adicional.
 
 ---
+## Core player SFX completion — technical PASS (22 set 2026)
+
+- Branch `codex/audio-redesign`, base `7fbf2f9c`. O lote original da Koliani
+  mantém hurt/death/jump/double-jump, escudo e combo Shadowblade; foi corrigida
+  a lacuna em que o impacto do projétil mágico reutilizava `acerto`.
+- Novo `assets/audio/koliani_signature/koliani_energy_hit.wav`, gerado por
+  síntese original no `tools/gerar_sfx_koliani_signature.py`: 0,220 s, mono
+  44,1 kHz, pico −6,0 dBFS. `projetil_koliani.gd` agora separa `lancar` de
+  `energia_impacto`; sem randomização adicional de pitch.
+- QA áudio: 28/28 streams válidos, sem clipping medido, combo simulado −6,40
+  dBFS. Harness `verificar_sfx_koliani.gd`: 0 falhas; `verificar_sfx_criticos.gd`:
+  0 falhas; teste vertical: 0 falhas.
+- O harness amplo `verificar_sfx_combate.gd` continua com falhas preexistentes
+  fora do âmbito (famílias de inimigos, projétil orgânico, dash esperado pelo
+  nome antigo); não foram alterados bosses, world/hazards ou música.
+- Build QA a actualizar nesta execução. HUMAN LISTEN/PLAYTEST continua necessário
+  para mistura perceptual, embora o teste técnico do Paulo seja o gate final.
+
+---
