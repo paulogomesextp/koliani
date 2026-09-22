@@ -124,14 +124,19 @@ func _botao(texto: String, tamanho: int) -> Button:
     b.focus_mode = Control.FOCUS_ALL
     b.clip_text = true
     Frontend9H.rotulo_menu(b, tamanho)
+    b.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
     return b
 
-func _caixa(cor: Color, borda: Color, raio := 8, largura := 2) -> StyleBoxFlat:
+func _caixa(cor: Color, borda: Color, raio := 8, largura := 1, sombra := false) -> StyleBoxFlat:
     var s := StyleBoxFlat.new()
     s.bg_color = cor
     s.border_color = borda
     s.set_border_width_all(largura)
     s.set_corner_radius_all(raio)
+    if sombra:
+        s.shadow_color = Color(0.02, 0.01, 0.04, 0.55)
+        s.shadow_size = 5
+        s.shadow_offset = Vector2(0, 2)
     s.content_margin_left = 12.0
     s.content_margin_right = 12.0
     s.content_margin_top = 8.0
@@ -139,18 +144,33 @@ func _caixa(cor: Color, borda: Color, raio := 8, largura := 2) -> StyleBoxFlat:
     return s
 
 func _estilo_cartao(b: Button, primaria: Color, ativo: bool, bloqueado: bool) -> void:
+    b.flat = false
     var fundo := Color(0.035, 0.026, 0.055, 0.94) if not bloqueado else Color(0.025, 0.025, 0.035, 0.82)
-    var linha := primaria if ativo else Color(0.28, 0.25, 0.36, 0.9)
+    var linha := primaria if ativo else Color(0.20, 0.18, 0.28, 0.72)
     if bloqueado:
-        linha = Color(0.22, 0.22, 0.27, 0.75)
-    b.add_theme_stylebox_override("normal", _caixa(fundo, linha, 8, 2))
-    b.add_theme_stylebox_override("hover", _caixa(fundo.lightened(0.10), primaria, 8, 2))
-    b.add_theme_stylebox_override("focus", _caixa(fundo.lightened(0.14), primaria, 8, 3))
-    b.add_theme_stylebox_override("pressed", _caixa(fundo.lightened(0.05), primaria, 8, 2))
+        linha = Color(0.14, 0.14, 0.19, 0.42)
+    var largura := 2 if ativo else 1
+    b.add_theme_stylebox_override("normal", _caixa(fundo, linha, 8, largura, ativo))
+    b.add_theme_stylebox_override("hover", _caixa(fundo.lightened(0.08), primaria, 8, 1, true))
+    b.add_theme_stylebox_override("focus", _caixa(fundo.lightened(0.10), primaria, 8, 2, true))
+    b.add_theme_stylebox_override("pressed", _caixa(fundo.lightened(0.04), primaria, 8, 2))
     b.add_theme_color_override("font_color", Frontend9H.TEXTO_APAGADO if bloqueado else Frontend9H.OSSO)
     b.add_theme_color_override("font_hover_color", Frontend9H.OSSO)
     b.add_theme_color_override("font_focus_color", Frontend9H.OSSO)
-    b.modulate = Color(0.62, 0.62, 0.70, 0.82) if bloqueado else Color.WHITE
+    b.modulate = Color(0.52, 0.52, 0.60, 0.76) if bloqueado else Color.WHITE
+    b.scale = Vector2(1.012, 1.012) if ativo else Vector2.ONE
+
+func _ligar_microinteracoes(b: Button) -> void:
+    b.pivot_offset = b.size / 2.0
+    b.mouse_entered.connect(_hover_cartao.bind(b, true))
+    b.mouse_exited.connect(_hover_cartao.bind(b, false))
+
+func _hover_cartao(b: Button, entrou: bool) -> void:
+    if not is_instance_valid(b) or not b.visible:
+        return
+    b.pivot_offset = b.size / 2.0
+    var escala := Vector2(1.018, 1.018) if entrou else Vector2.ONE
+    b.create_tween().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT).tween_property(b, "scale", escala, 0.10)
 
 func _montar_regioes() -> void:
     for r in EstadoJogo.REGIOES.size():
@@ -165,6 +185,7 @@ func _montar_regioes() -> void:
         Frontend9H.por(b, Rect2(62 + coluna * 306, 112 + linha * 108, CARTAO_REGIAO.x, CARTAO_REGIAO.y))
         _regioes_painel.add_child(b)
         _region_cards.append(b)
+        _ligar_microinteracoes(b)
     _abas = _region_cards
 
 func _montar_niveis() -> void:
@@ -182,6 +203,7 @@ func _montar_niveis() -> void:
         _niveis_painel.add_child(b)
         _level_cards.append(b)
         _nos.append({"botao": b, "indice": -1})
+        _ligar_microinteracoes(b)
     _detalhe = Label.new()
     Frontend9H.corpo(_detalhe, 16, Frontend9H.TEXTO)
     _detalhe.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -192,6 +214,11 @@ func _montar_niveis() -> void:
     Frontend9H.por(_estado, Rect2(76, 478, 760, 32))
     _niveis_painel.add_child(_estado)
     _jogar = _botao("", 20)
+    _jogar.flat = false
+    _jogar.add_theme_stylebox_override("normal", _caixa(Color(0.16, 0.08, 0.22, 0.96), Color(0.72, 0.42, 0.90), 8, 1, true))
+    _jogar.add_theme_stylebox_override("hover", _caixa(Color(0.22, 0.11, 0.30, 0.98), Color(0.95, 0.68, 0.98), 8, 2, true))
+    _jogar.add_theme_stylebox_override("focus", _caixa(Color(0.22, 0.11, 0.30, 0.98), Color(0.95, 0.68, 0.98), 8, 2, true))
+    _jogar.add_theme_stylebox_override("pressed", _caixa(Color(0.11, 0.06, 0.16, 0.98), Color(0.72, 0.42, 0.90), 8, 1))
     _jogar.pressed.connect(_confirmar)
     Frontend9H.por(_jogar, Rect2(900, 430, 280, 60))
     _niveis_painel.add_child(_jogar)
@@ -200,6 +227,7 @@ func _voltar_premido() -> void:
     if not _vista_regioes:
         _vista_regioes = true
         _actualizar()
+        _transitar_vista(_regioes_painel, _niveis_painel)
         return
     Som.toca("ui_voltar", -8.0)
     cancelado.emit()
@@ -220,6 +248,7 @@ func _abrir_regiao(r: int) -> void:
         return
     _vista_regioes = false
     _actualizar()
+    _transitar_vista(_niveis_painel, _regioes_painel)
 
 func _selecionar_nivel(pos: int) -> void:
     var ns: Array = EstadoJogo.REGIOES[_regiao]["niveis"]
@@ -253,7 +282,21 @@ func _estado_regiao(r: int) -> String:
     return "LOCKED"
 
 func _texto_estado(estado: String) -> String:
-    return estado
+    match estado:
+        "CURRENT": return "ATUAL"
+        "COMPLETED": return "CONCLUÍDO"
+        "UNLOCKED": return "DESBLOQUEADO"
+        _: return "BLOQUEADO"
+
+func _transitar_vista(entrar: Control, sair: Control) -> void:
+    if not is_instance_valid(entrar) or not is_instance_valid(sair):
+        return
+    entrar.modulate.a = 0.0
+    entrar.visible = true
+    var tween := create_tween().set_parallel(true).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+    tween.tween_property(entrar, "modulate:a", 1.0, 0.16)
+    tween.tween_property(sair, "modulate:a", 0.0, 0.12)
+    tween.chain().tween_callback(func() -> void: sair.visible = false)
 
 func _actualizar() -> void:
     if not _pronto:
@@ -282,7 +325,9 @@ func _actualizar() -> void:
         var nome := Textos.t(reg["chave"])
         if nome == reg["chave"]:
             nome = str(reg["nome"])
-        b.text = "%s  %s\n%s  ·  %s" % [ROMANOS[r], nome.to_upper(), _texto_estado(estado), "5/5" if EstadoJogo.regiao_esta_concluida(r) else "5 LEVELS"]
+        var estado_marca := "[ATUAL]" if estado == "CURRENT" else ("[OK]" if estado == "COMPLETED" else ("[LOCK]" if estado == "LOCKED" else "[OPEN]"))
+        var estado_linha := estado_marca
+        b.text = "REGIÃO %02d  ·  %s\n%s\n%s  ·  N01–N05  ·  BOSS N05" % [r + 1, ROMANOS[r], nome.to_upper(), estado_linha]
         _estilo_cartao(b, reg.get("cor", Color.WHITE), r == _regiao, estado == "LOCKED")
         b.tooltip_text = "LOCKED" if estado == "LOCKED" else nome
     var ns: Array = EstadoJogo.REGIOES[_regiao]["niveis"]
@@ -290,14 +335,18 @@ func _actualizar() -> void:
         var indice := int(ns[i])
         var estado := _estado_nivel(indice)
         var nome := _nome_nivel(indice)
-        _level_cards[i].text = "N%02d%s\n%s\n%s" % [i + 1, "  · BOSS" if i == 4 else "", nome.to_upper(), _texto_estado(estado)]
+        var marca := "[ATUAL]" if estado == "CURRENT" else ("[OK]" if estado == "COMPLETED" else ("[LOCK]" if estado == "LOCKED" else "[OPEN]"))
+        var estado_linha := marca
+        _level_cards[i].text = "N%02d%s\n%s" % [i + 1, "  · BOSS" if i == 4 else "", estado_linha]
         _estilo_cartao(_level_cards[i], tema.get("primaria", Color.WHITE), indice == _sel, estado == "LOCKED")
+        if i == 4 and estado != "LOCKED":
+            _level_cards[i].add_theme_color_override("font_color", Color(1.0, 0.84, 0.58))
         _level_cards[i].tooltip_text = "LOCKED" if estado == "LOCKED" else nome
         _nos[i]["indice"] = indice
     var passo: Array = EstadoJogo.passo_na_regiao(_sel)
     var sel_estado := _estado_nivel(_sel)
     _detalhe.text = "%s %d-%d · %s\n%s" % [Textos.t("selector.level"), _regiao + 1, int(passo[0]), "BOSS" if int(passo[0]) == 5 else "LEVEL", _nome_nivel(_sel)]
-    _estado.text = "STATE: %s%s" % [_texto_estado(sel_estado), " · %s" % _nome_chefe(_sel) if int(passo[0]) == 5 else ""]
+    _estado.text = "ESTADO  %s%s" % [_texto_estado(sel_estado), "  ·  %s" % _nome_chefe(_sel) if int(passo[0]) == 5 else ""]
     _jogar.text = Textos.t("selector.play")
     _jogar.disabled = sel_estado == "LOCKED"
     _jogar.modulate = Color(0.6, 0.6, 0.68) if _jogar.disabled else Color.WHITE

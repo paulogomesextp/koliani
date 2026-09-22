@@ -3350,3 +3350,10 @@ publicação e Global Music Audit; não os iniciar automaticamente.
 - Suite geral `tests/run_tests.tscn`: selector sem novas falhas; duas falhas preexistentes da base (`main_scene` não é intro e trilha 9H.1). O runner também chega a testes Região III sem SceneTree; não pertence a este passe.
 - Smoke visual por janela: runtime iniciou, mas o conector Windows não expôs a janela nesta sessão; não declarar PASS visual interativo. Controller físico/browser real: `DEVICE VALIDATION REQUIRED`.
 - Próximo: revisão humana da aparência/interação e validação em dispositivo/controller antes de fechar o gate visual. PARAR.
+## Pass 2 — polish visual do selector de níveis (22 set 2026)
+
+- Mantida a estrutura do Pass 1 e o contrato de `EstadoJogo`: sem alterações a unlock, save, mapping, navegação, loading, gameplay ou áudio.
+- `scripts/seletor_niveis.gd`: cards dark/góticos com hierarquia de região/nome/intervalo, estados `[LOCK]`, `[OPEN]`, `[OK]`, `[ATUAL]`, boss N05 subtilmente dourado, focus/hover/press leves e fade curto entre regiões e níveis. Botão JOGAR recebeu tratamento premium roxo.
+- Capturas no renderer Vulkan real em `build/qa/visual/`: 1280×720 e 1920×1080, regiões e níveis. Sem clipping ou sobreposição observados; nomes longos foram retirados dos cards de nível e permanecem no detalhe para garantir legibilidade.
+- QA `tests/qa_level_selector_pass1.tscn`: PASS após o polish. Controller físico continua `DEVICE VALIDATION REQUIRED`.
+- Próximo: gerar build QA final, commit `ui: polish level selector visuals`, push da branch. PARAR.
