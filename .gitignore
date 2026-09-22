@@ -92,3 +92,5 @@ tools/_bot.gd.uid
 # dezenas de MB; so se comitam as camas ja cortadas em assets/audio/musica/.
 # Reconstroi-se com `python tools/preparar_musica.py --descarregar`.
 assets/audio/incoming/**
+# MP3 originais do manifesto final; os assets aprovados estão em assets/audio/music/.
+incoming_music/**

@@ -1,3 +1,52 @@
+## Banda sonora final — pacote técnico completo (22 set 2026)
+
+Branch `codex/audio-redesign`. O ZIP canónico foi extraído para
+`work/final_music_manifest/`; as 38 faixas pendentes estão em `incoming_music/`.
+Todos os 38 IDs de URL coincidem com os ficheiros de origem e os MP3 finais
+foram confirmados por SHA-256, sem edição. Sete ficheiros novos fecharam
+Região 09 e Bosses 07–12. O runtime aponta para 20/20 regiões e 20/20 bosses;
+menu trimmed, Região 01 e Boss 01 mantêm os assets anteriores. Os originais
+em `incoming_music/` ficam locais e excluídos do export/Git.
+
+Godot importou os sete MP3 (exit 0). `test_music_pending_integration.tscn` e
+`test_audio_vertical_slice.tscn`: zero falhas. Os testes verificam streams,
+mapping por cinco níveis, loops e transições representativas, incluindo
+Boss 07, Boss 12 e Zeriko. `ffmpeg` mediu 40 faixas: com os ajustes de volume
+não destrutivos os picos individuais ficam abaixo de -4 dBFS. Região 19 tem
+1,0 s de silêncio inicial na fonte aprovada; intro mantida. Export Windows
+QA: exit 0, EXE arranca em headless; os MP3 originais não aparecem no pack.
+Detalhe de licenças, origens e ganhos: `docs/audio/approved_audio_manifest.md`.
+
+A suite geral ainda falha uma expectativa legada de `main_scene` (exige
+`Intro.tscn`, mas `MenuInicial.tscn` já está no HEAD); as duas expectativas
+legadas de música foram atualizadas e passaram. Há avisos de recursos em uso
+ao encerrar o Godot. **HUMAN LISTEN REQUIRED** para balanço artístico,
+transições percebidas e loops em dispositivo real. Próximo passo: escuta
+humana do build QA antes de publicação.
+
+---
+
+## Soundtrack final — bloqueado por 7 ficheiros em falta (22 set 2026)
+
+Na branch `codex/audio-redesign`, `incoming_music/` contém 37 MP3, mas só 31
+faixas distintas: seis são cópias byte idênticas. Das 38 pendentes, faltam
+Região 09 (355524) e Bosses 07–12 (440512, 527553, 422978, 508009, 9489,
+227548). O ZIP `KOLIANI_Final_Music_Manifest_38_Pending.zip` não foi
+encontrado localmente. As 31 faixas inequívocas foram copiadas para
+`assets/audio/music/{regions,bosses}/` e ligadas ao autoload `Musica` por
+região (cinco níveis cada). Menu, Região 01 e Boss 01 mantêm os aprovados.
+Detalhe e URLs: `docs/audio/approved_audio_manifest.md`.
+
+Godot importou os 31 ficheiros (exit 0). Os harnesses
+`test_music_pending_integration.tscn` e `test_audio_vertical_slice.tscn`
+passaram com zero falhas. Transições reais e mix ainda exigem escuta humana.
+Sem commit, push, export ou publicação deste lote incompleto. Próximo passo:
+colocar os sete MP3 em `incoming_music/` e fornecer o ZIP canónico; depois
+fechar o mapping, validar tudo, criar builds Windows e Web do mesmo commit
+e publicar a PWA conforme a regra de entrega.
+
+---
+
 ## Audio Vertical Slice — candidato parcial de QA (22 set 2026)
 
 Branch `codex/audio-redesign`, partida de `74c6c95b`. No browser suportado foram obtidas e integradas as músicas aprovadas do menu, Região I e Boss 1. O `wind_magic_5.mp3` já existente foi validado e deu origem ao dash curto. Origens, ficheiros, volumes, edição e Content ID: `docs/audio/approved_audio_manifest.md`.
