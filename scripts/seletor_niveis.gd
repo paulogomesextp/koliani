@@ -33,9 +33,8 @@ const FUNDO_REGIAO := [
     "res://assets/sprites/pixel/backgrounds/cidade/vila.png",
     "res://assets/sprites/pixel/backgrounds/luar/campo.png",
 ]
-const COLUNAS_REGIOES := 4
-const CARTAO_REGIAO := Vector2(286, 92)
-const CARTAO_NIVEL := Vector2(190, 136)
+const CARTAO_REGIAO := Vector2(252, 106)
+const CARTAO_NIVEL := Vector2(196, 92)
 
 var _respeitar_bloqueio := true
 var _sel := 0
@@ -60,6 +59,14 @@ var _jogar: Button
 var _estado: Label
 var _detalhe: Label
 var _santuario: Control
+var _regiao_detalhe: Panel
+var _regiao_nome: Label
+var _regiao_meta: Label
+var _regiao_estado: Label
+var _regiao_progresso: ProgressBar
+var _regiao_entrar: Button
+var _regiao_esquerda: Button
+var _regiao_direita: Button
 
 const SANTUARIO_CENA := preload("res://scenes/ui/Santuario.tscn")
 
@@ -91,21 +98,21 @@ func _montar() -> void:
     _palco.add_child(Frontend9H.vinheta())
     _voltar = _botao("", 15)
     _voltar.pressed.connect(_voltar_premido)
-    Frontend9H.por(_voltar, Rect2(28, 18, 180, 42))
+    Frontend9H.por(_voltar, Rect2(32, 22, 210, 42))
     _palco.add_child(_voltar)
     _santuario_botao = _botao("", 14)
     _santuario_botao.pressed.connect(_abrir_santuario)
-    Frontend9H.por(_santuario_botao, Rect2(1040, 18, 220, 42))
+    Frontend9H.por(_santuario_botao, Rect2(1015, 22, 233, 42))
     _palco.add_child(_santuario_botao)
     _titulo = Label.new()
     Frontend9H.cabecalho(_titulo, 29)
     _titulo.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-    Frontend9H.por(_titulo, Rect2(260, 24, 760, 42))
+    Frontend9H.por(_titulo, Rect2(270, 24, 740, 42))
     _palco.add_child(_titulo)
     _subtitulo = Label.new()
     Frontend9H.corpo(_subtitulo, 14, Frontend9H.TEXTO_APAGADO)
     _subtitulo.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-    Frontend9H.por(_subtitulo, Rect2(260, 66, 760, 26))
+    Frontend9H.por(_subtitulo, Rect2(270, 67, 740, 26))
     _palco.add_child(_subtitulo)
     _regioes_painel = Control.new()
     _regioes_painel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -146,7 +153,7 @@ func _caixa(cor: Color, borda: Color, raio := 8, largura := 1, sombra := false) 
 func _estilo_cartao(b: Button, primaria: Color, ativo: bool, bloqueado: bool) -> void:
     b.flat = false
     var fundo := Color(0.035, 0.026, 0.055, 0.94) if not bloqueado else Color(0.025, 0.025, 0.035, 0.82)
-    var linha := primaria if ativo else Color(0.20, 0.18, 0.28, 0.72)
+    var linha := Frontend9H.CARMESIM if ativo else Color(0.20, 0.18, 0.28, 0.72)
     if bloqueado:
         linha = Color(0.14, 0.14, 0.19, 0.42)
     var largura := 2 if ativo else 1
@@ -157,8 +164,8 @@ func _estilo_cartao(b: Button, primaria: Color, ativo: bool, bloqueado: bool) ->
     b.add_theme_color_override("font_color", Frontend9H.TEXTO_APAGADO if bloqueado else Frontend9H.OSSO)
     b.add_theme_color_override("font_hover_color", Frontend9H.OSSO)
     b.add_theme_color_override("font_focus_color", Frontend9H.OSSO)
-    b.modulate = Color(0.52, 0.52, 0.60, 0.76) if bloqueado else Color.WHITE
-    b.scale = Vector2(1.012, 1.012) if ativo else Vector2.ONE
+    b.modulate = Color(0.42, 0.42, 0.48, 0.66) if bloqueado else (Color.WHITE if ativo else Color(0.68, 0.66, 0.72, 0.82))
+    b.scale = Vector2(1.025, 1.025) if ativo else Vector2.ONE
 
 func _ligar_microinteracoes(b: Button) -> void:
     b.pivot_offset = b.size / 2.0
@@ -175,31 +182,71 @@ func _hover_cartao(b: Button, entrou: bool) -> void:
 func _montar_regioes() -> void:
     for r in EstadoJogo.REGIOES.size():
         var b := _botao("", 16)
-        b.alignment = HORIZONTAL_ALIGNMENT_LEFT
+        b.alignment = HORIZONTAL_ALIGNMENT_CENTER
         b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
         b.pressed.connect(_abrir_regiao.bind(r))
         b.focus_entered.connect(_selecionar_regiao.bind(r))
         b.mouse_entered.connect(_selecionar_regiao.bind(r))
-        var coluna := r % COLUNAS_REGIOES
-        var linha := r / COLUNAS_REGIOES
-        Frontend9H.por(b, Rect2(62 + coluna * 306, 112 + linha * 108, CARTAO_REGIAO.x, CARTAO_REGIAO.y))
+        Frontend9H.por(b, Rect2(0, 0, CARTAO_REGIAO.x, CARTAO_REGIAO.y))
         _regioes_painel.add_child(b)
         _region_cards.append(b)
         _ligar_microinteracoes(b)
     _abas = _region_cards
 
+    _regiao_esquerda = _botao("‹", 34)
+    _regiao_esquerda.pressed.connect(func() -> void: _mudar_regiao(-1))
+    Frontend9H.por(_regiao_esquerda, Rect2(82, 280, 60, 64))
+    _regioes_painel.add_child(_regiao_esquerda)
+    _regiao_direita = _botao("›", 34)
+    _regiao_direita.pressed.connect(func() -> void: _mudar_regiao(1))
+    Frontend9H.por(_regiao_direita, Rect2(1138, 280, 60, 64))
+    _regioes_painel.add_child(_regiao_direita)
+
+    _regiao_detalhe = Panel.new()
+    _regiao_detalhe.add_theme_stylebox_override("panel", Frontend9H.painel_liso(0.94))
+    Frontend9H.por(_regiao_detalhe, Rect2(286, 376, 708, 214))
+    _regioes_painel.add_child(_regiao_detalhe)
+    _regiao_nome = Label.new()
+    Frontend9H.cabecalho(_regiao_nome, 27)
+    _regiao_nome.position = Vector2(42, 24)
+    _regiao_nome.size = Vector2(624, 42)
+    _regiao_detalhe.add_child(_regiao_nome)
+    _regiao_meta = Label.new()
+    Frontend9H.corpo(_regiao_meta, 15, Frontend9H.TEXTO_APAGADO)
+    _regiao_meta.position = Vector2(44, 72)
+    _regiao_meta.size = Vector2(620, 28)
+    _regiao_detalhe.add_child(_regiao_meta)
+    _regiao_estado = Label.new()
+    Frontend9H.corpo(_regiao_estado, 15, Frontend9H.TEXTO)
+    _regiao_estado.position = Vector2(44, 104)
+    _regiao_estado.size = Vector2(360, 28)
+    _regiao_detalhe.add_child(_regiao_estado)
+    _regiao_progresso = ProgressBar.new()
+    _regiao_progresso.show_percentage = false
+    _regiao_progresso.add_theme_stylebox_override("background", _caixa(Color(0.08, 0.05, 0.09, 0.95), Color(0.22, 0.16, 0.25, 0.8), 3, 1))
+    _regiao_progresso.add_theme_stylebox_override("fill", _caixa(Color(0.55, 0.08, 0.15, 0.95), Frontend9H.CARMESIM, 3, 1, true))
+    _regiao_progresso.position = Vector2(44, 147)
+    _regiao_progresso.size = Vector2(350, 10)
+    _regiao_detalhe.add_child(_regiao_progresso)
+    _regiao_entrar = _botao("", 18)
+    Frontend9H.botao_placa(_regiao_entrar, 18)
+    _regiao_entrar.pressed.connect(func() -> void: _abrir_regiao(_regiao))
+    _regiao_entrar.position = Vector2(458, 104)
+    _regiao_entrar.size = Vector2(194, 58)
+    _regiao_detalhe.add_child(_regiao_entrar)
+
 func _montar_niveis() -> void:
-    var painel := ColorRect.new()
-    painel.color = Color(0.025, 0.018, 0.040, 0.92)
+    var painel := Panel.new()
+    painel.add_theme_stylebox_override("panel", Frontend9H.painel_liso(0.93))
     painel.mouse_filter = Control.MOUSE_FILTER_IGNORE
-    Frontend9H.por(painel, Rect2(48, 108, 1184, 264))
+    Frontend9H.por(painel, Rect2(72, 126, 1136, 200))
     _niveis_painel.add_child(painel)
     for i in 5:
         var b := _botao("", 19)
         b.alignment = HORIZONTAL_ALIGNMENT_CENTER
         b.pressed.connect(_selecionar_nivel.bind(i))
         b.focus_entered.connect(_selecionar_nivel.bind(i))
-        Frontend9H.por(b, Rect2(74 + i * 226, 142, CARTAO_NIVEL.x, CARTAO_NIVEL.y))
+        Frontend9H.por(b, Rect2(94 + i * 212, 180, CARTAO_NIVEL.x, CARTAO_NIVEL.y))
         _niveis_painel.add_child(b)
         _level_cards.append(b)
         _nos.append({"botao": b, "indice": -1})
@@ -207,18 +254,15 @@ func _montar_niveis() -> void:
     _detalhe = Label.new()
     Frontend9H.corpo(_detalhe, 16, Frontend9H.TEXTO)
     _detalhe.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-    Frontend9H.por(_detalhe, Rect2(76, 400, 760, 68))
+    Frontend9H.por(_detalhe, Rect2(112, 390, 720, 68))
     _niveis_painel.add_child(_detalhe)
     _estado = Label.new()
     Frontend9H.corpo(_estado, 16, Frontend9H.VERDE_ESTADO)
-    Frontend9H.por(_estado, Rect2(76, 478, 760, 32))
+    Frontend9H.por(_estado, Rect2(112, 470, 760, 32))
     _niveis_painel.add_child(_estado)
     _jogar = _botao("", 20)
     _jogar.flat = false
-    _jogar.add_theme_stylebox_override("normal", _caixa(Color(0.16, 0.08, 0.22, 0.96), Color(0.72, 0.42, 0.90), 8, 1, true))
-    _jogar.add_theme_stylebox_override("hover", _caixa(Color(0.22, 0.11, 0.30, 0.98), Color(0.95, 0.68, 0.98), 8, 2, true))
-    _jogar.add_theme_stylebox_override("focus", _caixa(Color(0.22, 0.11, 0.30, 0.98), Color(0.95, 0.68, 0.98), 8, 2, true))
-    _jogar.add_theme_stylebox_override("pressed", _caixa(Color(0.11, 0.06, 0.16, 0.98), Color(0.72, 0.42, 0.90), 8, 1))
+    Frontend9H.botao_placa(_jogar, 20)
     _jogar.pressed.connect(_confirmar)
     Frontend9H.por(_jogar, Rect2(900, 430, 280, 60))
     _niveis_painel.add_child(_jogar)
@@ -309,15 +353,16 @@ func _actualizar() -> void:
         _barras.modulate = Color(0.18, 0.12, 0.22, 1.0)
     if _vista_regioes:
         _titulo.text = "LEVEL SELECT"
-        _subtitulo.text = "20 REGIONS · 100 LEVELS"
+        _subtitulo.text = "20 REGIONS  ·  100 LEVELS  ·  SELECT A REGION"
         _voltar.text = Textos.t("selector.back_to_menu")
     else:
         _titulo.text = "%s %s — %s" % [Textos.t("selector.region"), ROMANOS[_regiao], Textos.t(EstadoJogo.REGIOES[_regiao]["chave"]).to_upper()]
-        _subtitulo.text = "5 LEVELS · N05 BOSS · %s" % _texto_estado(_estado_regiao(_regiao))
-        _voltar.text = "← REGIONS"
+        _subtitulo.text = "5 LEVELS  ·  BOSS N%02d  ·  %s" % [(_regiao + 1) * 5, _texto_estado(_estado_regiao(_regiao))]
+        _voltar.text = "←  REGIONS"
     _santuario_botao.text = Textos.t("shrine.open")
     _regioes_painel.visible = _vista_regioes
     _niveis_painel.visible = not _vista_regioes
+    _actualizar_carousel()
     for r in _region_cards.size():
         var b := _region_cards[r]
         var reg: Dictionary = EstadoJogo.REGIOES[r]
@@ -325,19 +370,21 @@ func _actualizar() -> void:
         var nome := Textos.t(reg["chave"])
         if nome == reg["chave"]:
             nome = str(reg["nome"])
-        var estado_marca := "[ATUAL]" if estado == "CURRENT" else ("[OK]" if estado == "COMPLETED" else ("[LOCK]" if estado == "LOCKED" else "[OPEN]"))
-        var estado_linha := estado_marca
-        b.text = "REGIÃO %02d  ·  %s\n%s\n%s  ·  N01–N05  ·  BOSS N05" % [r + 1, ROMANOS[r], nome.to_upper(), estado_linha]
+        var estado_marca := _texto_estado(estado)
+        var ns_regiao: Array = reg["niveis"]
+        var primeiro := int(ns_regiao[0]) + 1
+        var ultimo := int(ns_regiao[ns_regiao.size() - 1]) + 1
+        b.text = "%s  %02d\n%s\nN%02d–N%02d" % [ROMANOS[r], r + 1, nome.to_upper(), primeiro, ultimo]
         _estilo_cartao(b, reg.get("cor", Color.WHITE), r == _regiao, estado == "LOCKED")
         b.tooltip_text = "LOCKED" if estado == "LOCKED" else nome
+        b.visible = _vista_regioes and (r == _regiao or r == _regiao - 1 or r == _regiao + 1)
     var ns: Array = EstadoJogo.REGIOES[_regiao]["niveis"]
     for i in _level_cards.size():
         var indice := int(ns[i])
         var estado := _estado_nivel(indice)
         var nome := _nome_nivel(indice)
-        var marca := "[ATUAL]" if estado == "CURRENT" else ("[OK]" if estado == "COMPLETED" else ("[LOCK]" if estado == "LOCKED" else "[OPEN]"))
-        var estado_linha := marca
-        _level_cards[i].text = "N%02d%s\n%s" % [i + 1, "  · BOSS" if i == 4 else "", estado_linha]
+        var marca := _texto_estado(estado)
+        _level_cards[i].text = "N%02d%s\n%s" % [indice + 1, "  · BOSS" if i == 4 else "", marca]
         _estilo_cartao(_level_cards[i], tema.get("primaria", Color.WHITE), indice == _sel, estado == "LOCKED")
         if i == 4 and estado != "LOCKED":
             _level_cards[i].add_theme_color_override("font_color", Color(1.0, 0.84, 0.58))
@@ -345,24 +392,55 @@ func _actualizar() -> void:
         _nos[i]["indice"] = indice
     var passo: Array = EstadoJogo.passo_na_regiao(_sel)
     var sel_estado := _estado_nivel(_sel)
-    _detalhe.text = "%s %d-%d · %s\n%s" % [Textos.t("selector.level"), _regiao + 1, int(passo[0]), "BOSS" if int(passo[0]) == 5 else "LEVEL", _nome_nivel(_sel)]
-    _estado.text = "ESTADO  %s%s" % [_texto_estado(sel_estado), "  ·  %s" % _nome_chefe(_sel) if int(passo[0]) == 5 else ""]
+    _detalhe.text = "%s %02d  ·  %s\n%s" % [Textos.t("selector.level"), _sel + 1, "BOSS" if int(passo[0]) == 5 else "", _nome_nivel(_sel)]
+    _estado.text = "%s  ·  %s%s" % [_texto_estado(sel_estado), _nome_nivel(_sel), "  ·  %s" % _nome_chefe(_sel) if int(passo[0]) == 5 else ""]
     _jogar.text = Textos.t("selector.play")
     _jogar.disabled = sel_estado == "LOCKED"
     _jogar.modulate = Color(0.6, 0.6, 0.68) if _jogar.disabled else Color.WHITE
+
+func _actualizar_carousel() -> void:
+    if _region_cards.is_empty():
+        return
+    var posicoes := {
+        -1: Rect2(142, 266, 252, 106),
+        0: Rect2(514, 236, 252, 132),
+        1: Rect2(886, 266, 252, 106),
+    }
+    for r in _region_cards.size():
+        var delta := r - _regiao
+        var b := _region_cards[r]
+        if not posicoes.has(delta):
+            b.visible = false
+            continue
+        var alvo: Rect2 = posicoes[delta]
+        Frontend9H.por(b, alvo)
+        b.z_index = 3 if delta == 0 else 1
+        b.modulate.a = 1.0 if delta == 0 else 0.62
+        b.add_theme_font_size_override("font_size", 21 if delta == 0 else 15)
+    var reg: Dictionary = EstadoJogo.REGIOES[_regiao]
+    var nome := Textos.t(reg["chave"])
+    if nome == reg["chave"]:
+        nome = str(reg["nome"])
+    var estado := _estado_regiao(_regiao)
+    var ns: Array = reg["niveis"]
+    var feitos := 0
+    for indice in ns:
+        if EstadoJogo.nivel_esta_concluido(int(indice)):
+            feitos += 1
+    _regiao_nome.text = "%s  %s" % [ROMANOS[_regiao], nome.to_upper()]
+    _regiao_meta.text = "N%02d–N%02d  ·  5 LEVELS  ·  BOSS N%02d" % [int(ns[0]) + 1, int(ns[4]) + 1, int(ns[4]) + 1]
+    _regiao_estado.text = "%s  ·  %d / 5 COMPLETE" % [_texto_estado(estado), feitos]
+    _regiao_progresso.value = feitos * 20.0
+    _regiao_entrar.text = "VIEW LEVELS"
+    _regiao_entrar.disabled = _respeitar_bloqueio and not _regiao_aberta(_regiao)
+    _regiao_entrar.modulate = Color(0.55, 0.55, 0.60) if _regiao_entrar.disabled else Color.WHITE
+    _regiao_esquerda.disabled = _regiao == 0
+    _regiao_direita.disabled = _regiao == EstadoJogo.REGIOES.size() - 1
 
 func _mudar_regiao(dir: int) -> void:
     _regiao = clampi(_regiao + dir, 0, EstadoJogo.REGIOES.size() - 1)
     _sel = int(EstadoJogo.REGIOES[_regiao]["niveis"][0])
     _actualizar()
-
-func _mover_regiao_grid(dir: Vector2i) -> void:
-    var linha := _regiao / COLUNAS_REGIOES
-    var coluna := _regiao % COLUNAS_REGIOES
-    linha = clampi(linha + dir.y, 0, (EstadoJogo.REGIOES.size() - 1) / COLUNAS_REGIOES)
-    coluna = clampi(coluna + dir.x, 0, COLUNAS_REGIOES - 1)
-    _selecionar_regiao(clampi(linha * COLUNAS_REGIOES + coluna, 0, EstadoJogo.REGIOES.size() - 1))
-    _region_cards[_regiao].grab_focus()
 
 func _mover_nivel(dir: int) -> void:
     var ns: Array = EstadoJogo.REGIOES[_regiao]["niveis"]
@@ -386,13 +464,13 @@ func _unhandled_input(evento: InputEvent) -> void:
     if evento.is_action_pressed("ui_cancel"):
         accept_event(); _voltar_premido()
     elif _vista_regioes and evento.is_action_pressed("ui_left"):
-        accept_event(); _mover_regiao_grid(Vector2i.LEFT)
+        accept_event(); _mudar_regiao(-1)
     elif _vista_regioes and evento.is_action_pressed("ui_right"):
-        accept_event(); _mover_regiao_grid(Vector2i.RIGHT)
+        accept_event(); _mudar_regiao(1)
     elif _vista_regioes and evento.is_action_pressed("ui_up"):
-        accept_event(); _mover_regiao_grid(Vector2i.UP)
+        accept_event(); _abrir_regiao(_regiao)
     elif _vista_regioes and evento.is_action_pressed("ui_down"):
-        accept_event(); _mover_regiao_grid(Vector2i.DOWN)
+        accept_event(); _abrir_regiao(_regiao)
     elif not _vista_regioes and evento.is_action_pressed("ui_left"):
         accept_event(); _mover_nivel(-1)
     elif not _vista_regioes and evento.is_action_pressed("ui_right"):

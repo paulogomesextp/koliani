@@ -1266,6 +1266,25 @@ processo que fica vivo uns segundos depois de a janela fechar.
 
 # Retomar aqui — Koliani
 
+## Level Selector Redesign Prompt 3 — carousel + menu visual (22 set 2026)
+
+- Branch/worktree: `codex/level-selector-redesign`, worktree
+  `C:/Projetos/koliani/.worktrees/level-selector-redesign`.
+- Implementado exclusivamente em `scripts/seletor_niveis.gd`: carousel de
+  regiões com uma região focada e vizinhas laterais, painel de detalhe e
+  submenu de cinco níveis. Save, unlock, estados, campanha, bosses e input
+  lógico existentes preservados.
+- QA dirigido `tests/qa_level_selector_pass1.tscn`: PASS — 20 regiões, 100
+  níveis, sem duplicados/ausências, bosses N05…N100, estados e save.
+- Capturas reais 1280×720 e 1920×1080 sem clipping evidente; export Windows QA
+  em `work/qa_level_selector_redesign/Koliani-QA.exe` concluído. Smoke do EXE
+  não certificado por encaminhamento da flag de fotografia; não declarar PASS.
+- Relatório: `docs/execution_level_selector_redesign_prompt3.md`.
+- Commit isolado: `91dacd7b388e155cf8cd669b851e16db37e167e4`.
+- Estado: HUMAN PLAYTEST REQUIRED e DEVICE VALIDATION REQUIRED. Próximo passo:
+  revisão humana do carousel/transições e validação física; não integrar em
+  `master` sem essa validação.
+
 Índice de integração documental: [master_package_integration.md](master_package_integration.md).
 
 Atualizado em 12 de setembro de 2026 (9H.12E).
