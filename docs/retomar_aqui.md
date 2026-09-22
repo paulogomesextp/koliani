@@ -3341,3 +3341,12 @@ publicação e Global Music Audit; não os iniciar automaticamente.
   combate ficam reportadas separadamente; não foram corrigidas neste lote.
 
 ---
+## Pass 1 — redesign estrutural do selector de níveis (22 set 2026)
+
+- Branch `codex/level-selector-redesign`, baseada exactamente em `2cb1d4bca03712bcfcace92775dc7951c3318bd1` (`codex/audio-redesign`), em worktree isolada para preservar alterações locais alheias.
+- `scripts/seletor_niveis.gd` agora separa o fluxo em dois estados: ecrã principal com 20 cards de regiões e vista da região com N01–N05. Os cards mostram `LOCKED`, `UNLOCKED`, `COMPLETED` e `CURRENT`; N05 é identificado como `BOSS`.
+- Mapeamento continua a usar `EstadoJogo.REGIOES`/`NIVEIS`: 20 regiões × 5, N01–N100 sem duplicados. Mouse usa os `Button`; teclado/controller usam `ui_left/right/up/down/accept/cancel`. Bloqueio, loading, save e sinal `cancelado` foram preservados.
+- QA focado `tests/qa_level_selector_pass1.tscn`: PASS (20 regiões, 100 níveis, bosses 5/10/.../100, estados, bloqueio, confirmação, mouse por Button, teclado, controller pelo handler comum, voltar, save inalterado). Build Windows QA: `build/qa/Koliani_LevelSelector_QA.exe`.
+- Suite geral `tests/run_tests.tscn`: selector sem novas falhas; duas falhas preexistentes da base (`main_scene` não é intro e trilha 9H.1). O runner também chega a testes Região III sem SceneTree; não pertence a este passe.
+- Smoke visual por janela: runtime iniciou, mas o conector Windows não expôs a janela nesta sessão; não declarar PASS visual interativo. Controller físico/browser real: `DEVICE VALIDATION REQUIRED`.
+- Próximo: revisão humana da aparência/interação e validação em dispositivo/controller antes de fechar o gate visual. PARAR.

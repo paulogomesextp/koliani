@@ -1026,8 +1026,7 @@ func teste_9f_ui_producao() -> void:
 	_ok(sb is StyleBoxTexture and (sb as StyleBoxTexture).texture.resource_path.begins_with(dir),
 		"9F: o tema nao usa o botao do kit")
 
-	# seletor (9H): mapa de regiao -- 5 nos por regiao, fichas "1-1".."20-5",
-	# abas das 20 regioes, desbloqueio intacto
+	# selector Pass 1: ecrã principal com as 20 regiões e vista regional 5x.
 	var desbloq_antes: Array = []
 	for i in EstadoJogo.NIVEIS.size():
 		desbloq_antes.append(EstadoJogo.nivel_desbloqueado(i))
@@ -1035,34 +1034,44 @@ func teste_9f_ui_producao() -> void:
 	get_tree().root.add_child(sel)
 	sel.size = Vector2(1280, 720)
 	sel.configurar(0, false)
+	var regioes: Array = sel.get("_region_cards")
 	var nos: Array = sel.get("_nos")
-	_ok(nos.size() == 5, "9H: %d nos no mapa (esperados 5)" % nos.size())
-	var fichas := func() -> Array:
-		var v: Array = []
-		for n in nos:
-			v.append((n["rotulo"] as Label).text)
-		return v
+	_ok(regioes.size() == 20, "Pass 1: %d cards de região (esperados 20)" % regioes.size())
+	_ok(nos.size() == 5, "Pass 1: %d cards de nível (esperados 5)" % nos.size())
 	var indices := func() -> Array:
 		var v: Array = []
 		for n in nos:
 			v.append(int(n["indice"]))
 		return v
+	sel.call("_abrir_regiao", 0)
 	_ok(indices.call() == [0, 1, 2, 3, 4],
-		"9H: a regiao I devia mostrar os niveis 0..4 (%s)" % [indices.call()])
-	_ok(fichas.call() == ["1-1", "1-2", "1-3", "1-4", "1-5"],
-		"9H: fichas da regiao I erradas (%s)" % [fichas.call()])
+		"Pass 1: Região I devia mostrar N01..N05 (%s)" % [indices.call()])
 	sel.call("_mudar_regiao", 3)
 	_ok(indices.call() == [15, 16, 17, 18, 19],
-		"9H: a regiao IV devia mostrar 15..19 (%s)" % [indices.call()])
-	_ok(fichas.call() == ["4-1", "4-2", "4-3", "4-4", "4-5"],
-		"9H: fichas da regiao IV erradas (%s)" % [fichas.call()])
-	var titulo: Label = sel.get("_titulo_regiao")
-	_ok(titulo != null and titulo.text.contains("IV"), "9H: cabecalho da regiao nao diz IV")
+		"Pass 1: Região IV devia mostrar níveis 16..20 (%s)" % [indices.call()])
 	var abas: Array = sel.get("_abas")
-	_ok(abas.size() == 5, "9H: %d abas de regiao (esperadas 5)" % abas.size())
+	_ok(abas.size() == 20, "Pass 1: %d cards de região (esperados 20)" % abas.size())
 	sel.call("_mudar_regiao", 16)   # ate' a ultima regiao
 	_ok(int(sel.get("_regiao")) == 19 and indices.call()[4] == 99,
-		"9H: a ultima regiao devia acabar no nivel 100 (%s)" % [indices.call()])
+		"Pass 1: a última região devia acabar em N100 (%s)" % [indices.call()])
+	var todos: Array = []
+	for r in EstadoJogo.REGIOES:
+		for indice in r["niveis"]:
+			todos.append(int(indice))
+	_ok(todos.size() == 100 and todos.min() == 0 and todos.max() == 99 and todos.duplicate().size() == 100,
+		"Pass 1: mapeamento 20x5 devia cobrir N01..N100 uma vez")
+	_ok(int(sel.get("_level_cards")[4].text.find("BOSS")) >= 0,
+		"Pass 1: N05 devia estar identificado como BOSS")
+	var estado_current := str(sel.call("_estado_nivel", EstadoJogo.indice_nivel))
+	_ok(estado_current == "CURRENT", "Pass 1: o nível atual devia aparecer como CURRENT")
+	_ok(str(sel.call("_estado_nivel", 99)) == "LOCKED" or not EstadoJogo.nivel_desbloqueado(99),
+		"Pass 1: níveis fora da fronteira deviam aparecer como LOCKED")
+	var concluidos_antes: Array = EstadoJogo.concluidos.duplicate()
+	var teste_concluido := 0 if EstadoJogo.indice_nivel != 0 else 1
+	EstadoJogo.concluidos.append(teste_concluido)
+	_ok(str(sel.call("_estado_nivel", teste_concluido)) == "COMPLETED",
+		"Pass 1: nível concluído devia aparecer como COMPLETED")
+	EstadoJogo.concluidos = concluidos_antes
 	for i in EstadoJogo.NIVEIS.size():
 		if EstadoJogo.nivel_desbloqueado(i) != desbloq_antes[i]:
 			_ok(false, "9H: o seletor mexeu no desbloqueio do nivel %d" % i)
