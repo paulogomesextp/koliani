@@ -137,5 +137,5 @@ func _abanar(f: float) -> void:
 ## em `periodo`, e varios raios no mesmo nivel devem poder soar cada um o seu.
 func _tocar(nome: String, db: float, pitch: float,
 		prioridade := Som.Prioridade.NORMAL) -> void:
-	Som.toca(nome, db, pitch, 0.05, maxf(0.4, aviso * 0.5),
+	Som.toca_actor(self, nome, db, pitch, 0.05, maxf(0.4, aviso * 0.5),
 		"%s_%d" % [nome, get_instance_id()], prioridade)

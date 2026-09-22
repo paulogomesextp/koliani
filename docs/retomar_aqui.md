@@ -7,6 +7,20 @@ Teste dirigido `tests/test_audio_vertical_slice.tscn`: 0 falhas; importação Go
 Próximo passo: obter esses SFX pelo browser sem contornar bloqueios; testar os eventos e a mistura em jogo. Não declarar o pacote completo.
 
 ---
+## Global offscreen world SFX fix — técnico PASS (22 set 2026)
+
+- Corrigidos 3 callsites posicionais de world hazards para o helper central:
+  `PlataformaRitmada` (`plataforma_surge`), `PenduloLamina`
+  (`lamina_passa`) e `RaioTempestade` (`raio_aviso`/`raio_cai`).
+- `Som.toca_actor` bloqueia one-shots fora do viewport; `Som.laco_actor`
+  mantém loops com fade curto ao sair. O script `Guilhotina` não tinha
+  callsite de SFX próprio; os sons do ataque da boss continuam classificados
+  como áudio de boss e não foram alterados neste lote.
+- Harness `test_audio_actor_visibility.tscn`: 0 falhas. Build QA pendente
+  de actualizar nesta execução; smoke test de níveis com hazards requer
+  validação humana adicional.
+
+---
 
 ## Publicacao do SFX Overhaul em master para playtest na PWA (21 set 2026) · PUBLICADO
 

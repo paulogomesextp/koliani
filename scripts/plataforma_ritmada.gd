@@ -83,7 +83,7 @@ func _aplicar_estado(solida: bool, imediato: bool) -> void:
 	# So' na troca a serio (nao no arranque) e so' quando NASCE: um som em
 	# cada ponta, a esta cadencia, dava metronomo.
 	if not imediato and solida and not _solida_agora:
-		Som.toca("plataforma_surge", -13.0, randf_range(0.93, 1.08))
+		Som.toca_actor(self, "plataforma_surge", -13.0, randf_range(0.93, 1.08))
 	_solida_agora = solida
 	if _col:
 		_col.set_deferred("disabled", not solida)
