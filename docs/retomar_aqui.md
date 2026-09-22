@@ -1,3 +1,30 @@
+## Integração QA final de áudio e selector (22 set 2026)
+
+- Branch isolada `codex/final-integration-qa` baseada em `b24dd258` e integrada
+  com `52ea3394`. O único conflito de merge foi esta retoma; preservadas as
+  notas de ambas as fontes. O áudio e o selector conservam os respetivos
+  ficheiros aprovados sem diferenças face aos HEADs de origem.
+- Arranque em `MenuInicial.tscn`; expectativa obsoleta `Intro.tscn` corrigida
+  apenas em `tests/run_tests.gd`. Identificador QA visível e no log:
+  `0.18.20.1` (export Windows exige versão numérica).
+- Import Godot 4.7.2 e três harnesses de áudio: exit 0, zero falhas. QA do
+  selector: exit 0, PASS. Confirmados 20 fundos, 20 nomes e 20 assets de
+  framing de boss existentes. Harness musical verifica streams e mapping
+  regional/boss 20/20, incluindo Região 01 = Midnight Forest.
+- Suite geral: exit 0 e zero falhas de asserção, incluindo a expectativa da
+  cena inicial. O log contém erros de `get_tree()` nulo e instância já
+  libertada nos testes da Região III, além de avisos de recursos ao sair;
+  por isso o resultado não é certificado como PASS limpo. Esses testes e
+  cenas não foram alterados nesta integração. Logs QA ficam fora do Git.
+- Export Windows QA concluído em
+  `build/qa/Koliani-Final-Integration-QA.exe` (exit 0); smoke do EXE: exit 0,
+  `build=0.18.20.1` e `main_scene=res://scenes/ui/MenuInicial.tscn` no log.
+  O export é repetido após o commit final para fixar o HEAD exato.
+- Próximo: escuta e legibilidade subjetiva: **HUMAN PLAYTEST REQUIRED**.
+  Browser, comando e hardware reais: **DEVICE VALIDATION REQUIRED**.
+
+---
+
 ## Banda sonora final — pacote técnico completo (22 set 2026)
 
 Branch `codex/audio-redesign`. O ZIP canónico foi extraído para
@@ -44,6 +71,23 @@ Sem commit, push, export ou publicação deste lote incompleto. Próximo passo:
 colocar os sete MP3 em `incoming_music/` e fornecer o ZIP canónico; depois
 fechar o mapping, validar tudo, criar builds Windows e Web do mesmo commit
 e publicar a PWA conforme a regra de entrega.
+
+---
+
+## Level Selector Final Closure — execução em curso (22 set 2026)
+
+- O pacote aprovado por Paulo instala `region_01.png`–`region_20.png` em
+  `assets/ui/level_selector/regions/`. Estas artes são específicas de
+  apresentação do Level Selector e não substituem a autoridade visual do
+  gameplay das regiões.
+- O selector mantém carousel, submenu de cinco níveis, 20 regiões/100 níveis,
+  save/unlock, estados, input e loading. A mudança de região usa crossfade
+  curto sobre a arte correspondente.
+- O submenu apresenta framing do boss com sprites/arte canónica existente ou
+  derivados desses assets; não são criados bosses novos.
+- O blocker histórico `REGION SELECTOR THEME AUTHORITY MISSING` deixou de ser
+  aplicável ao selector após a aprovação deste pacote. Continua válido que a
+  arte de gameplay tem autoridade própria.
 
 ---
 
@@ -1314,6 +1358,25 @@ processo que fica vivo uns segundos depois de a janela fechar.
 - Próximo: obter briefing/sintoma atual; delimitar reprodução e critérios da PHASE A antes de editar. Retoma atualizada apenas neste worktree.
 
 # Retomar aqui — Koliani
+
+## Level Selector Redesign Prompt 3 — carousel + menu visual (22 set 2026)
+
+- Branch/worktree: `codex/level-selector-redesign`, worktree
+  `C:/Projetos/koliani/.worktrees/level-selector-redesign`.
+- Implementado exclusivamente em `scripts/seletor_niveis.gd`: carousel de
+  regiões com uma região focada e vizinhas laterais, painel de detalhe e
+  submenu de cinco níveis. Save, unlock, estados, campanha, bosses e input
+  lógico existentes preservados.
+- QA dirigido `tests/qa_level_selector_pass1.tscn`: PASS — 20 regiões, 100
+  níveis, sem duplicados/ausências, bosses N05…N100, estados e save.
+- Capturas reais 1280×720 e 1920×1080 sem clipping evidente; export Windows QA
+  em `work/qa_level_selector_redesign/Koliani-QA.exe` concluído. Smoke do EXE
+  não certificado por encaminhamento da flag de fotografia; não declarar PASS.
+- Relatório: `docs/execution_level_selector_redesign_prompt3.md`.
+- Commit isolado: `91dacd7b388e155cf8cd669b851e16db37e167e4`.
+- Estado: HUMAN PLAYTEST REQUIRED e DEVICE VALIDATION REQUIRED. Próximo passo:
+  revisão humana do carousel/transições e validação física; não integrar em
+  `master` sem essa validação.
 
 Índice de integração documental: [master_package_integration.md](master_package_integration.md).
 
@@ -3390,3 +3453,19 @@ publicação e Global Music Audit; não os iniciar automaticamente.
   combate ficam reportadas separadamente; não foram corrigidas neste lote.
 
 ---
+## Pass 1 — redesign estrutural do selector de níveis (22 set 2026)
+
+- Branch `codex/level-selector-redesign`, baseada exactamente em `2cb1d4bca03712bcfcace92775dc7951c3318bd1` (`codex/audio-redesign`), em worktree isolada para preservar alterações locais alheias.
+- `scripts/seletor_niveis.gd` agora separa o fluxo em dois estados: ecrã principal com 20 cards de regiões e vista da região com N01–N05. Os cards mostram `LOCKED`, `UNLOCKED`, `COMPLETED` e `CURRENT`; N05 é identificado como `BOSS`.
+- Mapeamento continua a usar `EstadoJogo.REGIOES`/`NIVEIS`: 20 regiões × 5, N01–N100 sem duplicados. Mouse usa os `Button`; teclado/controller usam `ui_left/right/up/down/accept/cancel`. Bloqueio, loading, save e sinal `cancelado` foram preservados.
+- QA focado `tests/qa_level_selector_pass1.tscn`: PASS (20 regiões, 100 níveis, bosses 5/10/.../100, estados, bloqueio, confirmação, mouse por Button, teclado, controller pelo handler comum, voltar, save inalterado). Build Windows QA: `build/qa/Koliani_LevelSelector_QA.exe`.
+- Suite geral `tests/run_tests.tscn`: selector sem novas falhas; duas falhas preexistentes da base (`main_scene` não é intro e trilha 9H.1). O runner também chega a testes Região III sem SceneTree; não pertence a este passe.
+- Smoke visual por janela: runtime iniciou, mas o conector Windows não expôs a janela nesta sessão; não declarar PASS visual interativo. Controller físico/browser real: `DEVICE VALIDATION REQUIRED`.
+- Próximo: revisão humana da aparência/interação e validação em dispositivo/controller antes de fechar o gate visual. PARAR.
+## Pass 2 — polish visual do selector de níveis (22 set 2026)
+
+- Mantida a estrutura do Pass 1 e o contrato de `EstadoJogo`: sem alterações a unlock, save, mapping, navegação, loading, gameplay ou áudio.
+- `scripts/seletor_niveis.gd`: cards dark/góticos com hierarquia de região/nome/intervalo, estados `[LOCK]`, `[OPEN]`, `[OK]`, `[ATUAL]`, boss N05 subtilmente dourado, focus/hover/press leves e fade curto entre regiões e níveis. Botão JOGAR recebeu tratamento premium roxo.
+- Capturas no renderer Vulkan real em `build/qa/visual/`: 1280×720 e 1920×1080, regiões e níveis. Sem clipping ou sobreposição observados; nomes longos foram retirados dos cards de nível e permanecem no detalhe para garantir legibilidade.
+- QA `tests/qa_level_selector_pass1.tscn`: PASS após o polish. Controller físico continua `DEVICE VALIDATION REQUIRED`.
+- Próximo: gerar build QA final, commit `ui: polish level selector visuals`, push da branch. PARAR.

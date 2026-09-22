@@ -778,3 +778,10 @@ próximo lote: **HUMAN VISUAL REVIEW REQUIRED**.
   o dispositivo mobile continuam pendentes.
 
 ---
+## Integração QA de áudio e selector (22 set 2026)
+
+- Objetivo: combinar os HEADs aprovados `b24dd258` (áudio) e `52ea3394` (selector) numa branch isolada, com arranque em `MenuInicial.tscn`.
+- Âmbito: resolver o conflito documental, corrigir apenas a expectativa obsoleta da cena inicial, validar áudio/UI/suite e exportar um Windows QA identificado.
+- Conclusão: evidência dos testes e mappings, executável exportado após o commit, branch publicada sem merge em master; playtest humano e dispositivo real ficam identificados separadamente.
+
+---
