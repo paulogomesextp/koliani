@@ -25,3 +25,15 @@ prioridades e dashboard.
 - A Vertical Slice prova apenas a Região I; não autoriza afirmar que a campanha
   completa tem o mesmo grau de acabamento.
 - O nível 12 continua `DEVICE VALIDATION REQUIRED` no iPhone Safari/PWA.
+# Level Selector — decisão canónica (22 set 2026)
+
+Paulo aprovou as 20 artes dedicadas do pacote
+`KOLIANI_LevelSelector_RegionBackgrounds_01-20.zip` para os backgrounds do
+Level Selector, nas regiões 1–20. São assets de apresentação do selector e
+não substituem automaticamente a autoridade visual canónica do gameplay das
+regiões.
+
+O framing dos níveis boss usa sprites/arte oficial já existente dos bosses ou
+derivados desses assets; não introduz designs novos.
+
+---

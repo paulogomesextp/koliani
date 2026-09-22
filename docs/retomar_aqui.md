@@ -1,3 +1,20 @@
+## Level Selector Final Closure — execução em curso (22 set 2026)
+
+- O pacote aprovado por Paulo instala `region_01.png`–`region_20.png` em
+  `assets/ui/level_selector/regions/`. Estas artes são específicas de
+  apresentação do Level Selector e não substituem a autoridade visual do
+  gameplay das regiões.
+- O selector mantém carousel, submenu de cinco níveis, 20 regiões/100 níveis,
+  save/unlock, estados, input e loading. A mudança de região usa crossfade
+  curto sobre a arte correspondente.
+- O submenu apresenta framing do boss com sprites/arte canónica existente ou
+  derivados desses assets; não são criados bosses novos.
+- O blocker histórico `REGION SELECTOR THEME AUTHORITY MISSING` deixou de ser
+  aplicável ao selector após a aprovação deste pacote. Continua válido que a
+  arte de gameplay tem autoridade própria.
+
+---
+
 ## Audio Vertical Slice — candidato parcial de QA (22 set 2026)
 
 Branch `codex/audio-redesign`, partida de `74c6c95b`. No browser suportado foram obtidas e integradas as músicas aprovadas do menu, Região I e Boss 1. O `wind_magic_5.mp3` já existente foi validado e deu origem ao dash curto. Origens, ficheiros, volumes, edição e Content ID: `docs/audio/approved_audio_manifest.md`.

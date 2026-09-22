@@ -35,6 +35,26 @@ const FUNDO_REGIAO := [
 ]
 const CARTAO_REGIAO := Vector2(252, 106)
 const CARTAO_NIVEL := Vector2(196, 92)
+const FUNDO_SELECTOR_DIR := "res://assets/ui/level_selector/regions/"
+const BOSS_NOMES := [
+    "Guardião Verde", "Guardião dos Céus", "Vyrak", "Guardião da Fornalha",
+    "Oráculo do Vento", "Mirage Eterna", "Rainha Espinhosa", "Devorador da Cripta",
+    "Abade Naufragado", "Arconte do Conhecimento", "Senhor das Marés", "Arauto da Pestilência",
+    "Soberano Invertido", "Oráculo Estelar", "Arquialquimista Morvak", "Malgor",
+    "Rainha do Sonho", "Colosso da Ruína", "Arquiteto do Limiar", "Zeriko",
+]
+const BOSS_ART := [
+    "res://assets/sprites/pixel/bosses/ghorak.png", "res://assets/sprites/pixel/bosses/aerion.png",
+    "res://assets/sprites/pixel/bosses/vyrak.png", "res://assets/sprites/pixel/bosses/magma.png",
+    "res://assets/sprites/pixel/bosses/voltaris.png", "res://assets/sprites/pixel/bosses/morvanna.png",
+    "res://assets/sprites/pixel/bosses/rainha.png", "res://assets/sprites/pixel/bosses/devorador.png",
+    "res://assets/sprites/pixel/bosses/abismo_oceanico.png", "res://assets/sprites/pixel/bosses/olho.png",
+    "res://assets/sprites/pixel/bosses/leviata.png", "res://assets/sprites/pixel/bosses/ghorak.png",
+    "res://assets/sprites/pixel/bosses/primeiro.png", "res://assets/sprites/pixel/bosses/sacerdotisa.png",
+    "res://assets/sprites/pixel/bosses/olho.png", "res://assets/sprites/pixel/bosses/vulkar.png",
+    "res://assets/sprites/pixel/bosses/morvanna.png", "res://assets/sprites/pixel/bosses/colosso.png",
+    "res://assets/sprites/pixel/bosses/arauto.png", "res://assets/sprites/pixel/bosses/zeriko.png",
+]
 
 var _respeitar_bloqueio := true
 var _sel := 0
@@ -67,6 +87,10 @@ var _regiao_progresso: ProgressBar
 var _regiao_entrar: Button
 var _regiao_esquerda: Button
 var _regiao_direita: Button
+var _boss_painel: Panel
+var _boss_arte: TextureRect
+var _boss_nome: Label
+var _fundo_regiao := -1
 
 const SANTUARIO_CENA := preload("res://scenes/ui/Santuario.tscn")
 
@@ -266,6 +290,22 @@ func _montar_niveis() -> void:
     _jogar.pressed.connect(_confirmar)
     Frontend9H.por(_jogar, Rect2(900, 430, 280, 60))
     _niveis_painel.add_child(_jogar)
+    _boss_painel = Panel.new()
+    _boss_painel.add_theme_stylebox_override("panel", _caixa(Color(0.025, 0.015, 0.045, 0.94), Frontend9H.CARMESIM, 8, 1, true))
+    Frontend9H.por(_boss_painel, Rect2(874, 342, 306, 76))
+    _niveis_painel.add_child(_boss_painel)
+    _boss_arte = TextureRect.new()
+    _boss_arte.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+    _boss_arte.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+    _boss_arte.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+    Frontend9H.por(_boss_arte, Rect2(10, 8, 62, 60))
+    _boss_painel.add_child(_boss_arte)
+    _boss_nome = Label.new()
+    Frontend9H.corpo(_boss_nome, 14, Frontend9H.OSSO)
+    _boss_nome.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+    _boss_nome.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+    Frontend9H.por(_boss_nome, Rect2(82, 8, 214, 60))
+    _boss_painel.add_child(_boss_nome)
 
 func _voltar_premido() -> void:
     if not _vista_regioes:
@@ -346,9 +386,7 @@ func _actualizar() -> void:
     if not _pronto:
         return
     var tema: Dictionary = TemaRegiao.do_indice(_regiao)
-    if _arte:
-        _arte.texture = TemaRegiao.textura("fundo_seletor", _regiao)
-        _arte.modulate = tema.get("tinta_fundo", Color.WHITE)
+    _actualizar_fundo(tema)
     if _barras:
         _barras.modulate = Color(0.18, 0.12, 0.22, 1.0)
     if _vista_regioes:
@@ -394,9 +432,34 @@ func _actualizar() -> void:
     var sel_estado := _estado_nivel(_sel)
     _detalhe.text = "%s %02d  ·  %s\n%s" % [Textos.t("selector.level"), _sel + 1, "BOSS" if int(passo[0]) == 5 else "", _nome_nivel(_sel)]
     _estado.text = "%s  ·  %s%s" % [_texto_estado(sel_estado), _nome_nivel(_sel), "  ·  %s" % _nome_chefe(_sel) if int(passo[0]) == 5 else ""]
+    var boss_visivel := int(passo[0]) == 5
+    _boss_painel.visible = boss_visivel
+    if boss_visivel:
+        _boss_arte.texture = load(BOSS_ART[_regiao]) as Texture2D
+        _boss_nome.text = "BOSS  ·  %s" % BOSS_NOMES[_regiao]
     _jogar.text = Textos.t("selector.play")
     _jogar.disabled = sel_estado == "LOCKED"
     _jogar.modulate = Color(0.6, 0.6, 0.68) if _jogar.disabled else Color.WHITE
+
+func _actualizar_fundo(tema: Dictionary) -> void:
+    if not _arte:
+        return
+    var novo := FUNDO_SELECTOR_DIR + "region_%02d.png" % (_regiao + 1)
+    var textura := load(novo) as Texture2D
+    var tinta: Color = tema.get("tinta_fundo", Color.WHITE)
+    if _fundo_regiao == _regiao:
+        _arte.modulate = tinta
+        return
+    _fundo_regiao = _regiao
+    var troca := create_tween().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+    troca.tween_property(_arte, "modulate:a", 0.72, 0.08)
+    troca.tween_callback(func() -> void:
+        _arte.texture = textura
+        _arte.modulate = tinta
+        if _barras:
+            _barras.texture = textura
+    )
+    troca.tween_property(_arte, "modulate:a", 1.0, 0.16)
 
 func _actualizar_carousel() -> void:
     if _region_cards.is_empty():
