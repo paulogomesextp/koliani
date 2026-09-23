@@ -84,6 +84,7 @@ var _koliani: Node2D
 ## Fica > 0 durante um golpe forte do chefe (o contacto magoa mais).
 var _ataque_forte := 0.0
 var _ja_derrotado := false
+var _sfx_dano_cd := 0.0
 ## true assim que o combate começa (troca a música para a do chefe). Fica
 ## false num chefe recém-instanciado (após morte/recarga), por isso a
 ## música só volta a mudar quando a luta recomeça de facto.
@@ -403,6 +404,8 @@ func _encurtar_fase_exposto() -> void:
 
 func _process(dt: float) -> void:
 	super._process(dt)
+	_sfx_dano_cd = maxf(0.0, _sfx_dano_cd - dt)
+	_sfx_fase_cd = maxf(0.0, _sfx_fase_cd - dt)
 	if is_on_floor():
 		_tocou_chao = true
 	if not _arena_ok:
@@ -483,8 +486,7 @@ func _soltar_essencia_chefe(cena: Node) -> void:
 func _cair_derrotado() -> void:
 	_ja_derrotado = true
 	_restaurar_musica()
-	Som.toca("chefe_cai", -6.0)
-	Som.toca("conquista", -4.0)  # som de "conquista", distinto de matar um inimigo
+	_tocar_som_derrota()
 	derrotado.emit()
 	_explodir_derrotado()
 	soltar_estilhacos()
@@ -681,17 +683,32 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0, critico := false,
 		if not falas_fim.is_empty():
 			_cair_com_falas()
 		else:
-			Som.toca("chefe_cai", -6.0)
-			Som.toca("conquista", -4.0)  # "conquista", distinto de matar um inimigo
+			_tocar_som_derrota()
 			derrotado.emit()
 			_explodir_derrotado()
 			soltar_estilhacos()
 			queue_free()
 	else:
+		# Resposta BASE, discreta e limitada. O impacto da Shadowblade continua
+		# a ser o primeiro plano; a voz grave apenas confirma que o boss sentiu.
+		if _sfx_dano_cd <= 0.0:
+			Som.toca("mob_grande_dano", -14.0, 0.82, 0.02, 0.0, "",
+				Som.Prioridade.MEDIA)
+			_sfx_dano_cd = 0.22
 		var anim := get_node_or_null("Sprite/Anim") as AnimatedSprite2D
 		if anim and anim.sprite_frames and anim.sprite_frames.has_animation("hit"):
 			anim.play("hit")
 		piscar_dano()
+
+
+## Separa o peso da queda da recompensa. Antes os dois samples arrancavam no
+## mesmo frame e os graves/transientes mascaravam-se. O timer vive na arvore,
+## portanto a conquista toca mesmo depois de o chefe fazer `queue_free()`.
+func _tocar_som_derrota() -> void:
+	Som.toca("chefe_cai", -6.0, 1.0, 0.02, 0.0, "", Som.Prioridade.ALTA)
+	get_tree().create_timer(0.45, true, false, true).timeout.connect(
+		func() -> void: Som.toca("conquista", -6.0, 1.0, 0.01, 0.0, "",
+			Som.Prioridade.ALTA))
 
 
 ## Morte dos chefes-história: congela o chefe, diz as últimas falas e só
@@ -701,10 +718,118 @@ func _cair_com_falas() -> void:
 		return
 	_fim_em_curso = true
 	set_physics_process(false)
-	Som.toca("chefe_cai", -6.0)
+	Som.toca("chefe_cai", -6.0, 1.0, 0.02, 0.0, "", Som.Prioridade.ALTA)
 	await Dialogo.correr(_com_alvo(falas_fim))
-	Som.toca("conquista", -4.0)
+	Som.toca("conquista", -6.0, 1.0, 0.01, 0.0, "", Som.Prioridade.ALTA)
 	derrotado.emit()
 	_explodir_derrotado()
 	soltar_estilhacos()
 	queue_free()
+
+
+## --- SOM DOS CHEFES, por SIGNIFICADO (Prompt 3A) ----------------------
+##
+## O defeito que este bloco corrige: `chefe_cai` -- o som de MORTE do chefe
+## -- estava em 33 callsites, e só DOIS eram morte (os dois acima). Os
+## outros 31 eram mudanças de fase e dois ataques pesados. Ou seja: a meio
+## de quase todas as lutas do jogo tocava o som de o chefe cair. Em dois
+## casos (`ReiDevorador._devorar`, `IrmaosCondenados._um_morre`) tocava
+## `chefe_cai` **+ `conquista`** -- a assinatura exacta da vitória, com o
+## chefe ainda vivo. Um falso "ganhaste" é pior que um som errado: mente ao
+## jogador sobre o estado da luta.
+##
+## `mudar_forma.wav` já existia no catálogo e só dois chefes o usavam --
+## e mesmo esses empilhavam-no com o `chefe_cai`. É o stream certo para
+## isto: 0,59 s contra 0,71 s do `chefe_cai`, e −12,7 LUFS contra −12,2,
+## portanto entra com o mesmo peso sem ser a mesma forma de onda.
+
+## Família sonora do chefe. Dá identidade à mudança de fase sem pedir um
+## stream por chefe: o material decide o tom e a camada de reforço.
+## Cada `Chefe*.tscn`/script põe a sua; o valor por omissão é o neutro.
+@export_enum("pedra", "osso", "carne", "metal", "magia", "vento", "fogo",
+	"sino", "energia") var familia_sonora := "pedra"
+
+## família -> [pitch da `mudar_forma`, camada de reforço, volume da camada]
+## A camada é um som que o chefe dessa família JÁ usa nos ataques, portanto
+## não há material novo -- só passa a haver uma assinatura por material.
+## Máximo DUAS vozes no frame: a base mais uma camada, nunca mais.
+const _FASE_POR_FAMILIA := {
+	"pedra":   [0.78, "esmagar", -13.0],
+	"osso":    [0.86, "esmagar", -14.0],
+	"carne":   [0.72, "praga", -12.0],
+	"metal":   [0.94, "engrenagem", -12.0],
+	"magia":   [1.06, "chefe_magia", -4.0],
+	"vento":   [1.14, "grito", -13.0],
+	"fogo":    [0.82, "chama", -1.0],
+	"sino":    [1.00, "sino_ataque", -13.0],
+	"energia": [1.10, "raio", -15.0],
+}
+
+var _sfx_fase_cd := 0.0
+
+
+## MUDANÇA DE FASE. Não é morte e não é ataque: é o chefe a virar-se do
+## avesso. Prioridade ALTA porque é informação de estado -- o jogador tem
+## de perceber que a luta mudou mesmo a meio de uma rajada.
+##
+## O `cooldown` de 600 ms é por instância: vários chefes avaliam o limiar de
+## fase dentro do `_physics_process` e podiam disparar duas vezes no mesmo
+## par de frames antes de a flag assentar.
+##
+## A família vem por argumento (e não só do `@export`) para cada chefe a
+## declarar na própria linha que a usa: a troca dos 31 callsites errados
+## fica a uma linha por chefe, sem mexer no `_ready` de 28 scripts.
+func _som_fase(familia := "") -> void:
+	if _sfx_fase_cd > 0.0:
+		return
+	_sfx_fase_cd = 0.6
+	var f := familia if familia != "" else familia_sonora
+	var p: Array = _FASE_POR_FAMILIA.get(f, _FASE_POR_FAMILIA["pedra"])
+	Som.toca("mudar_forma", -6.0, float(p[0]), 0.02, 0.6,
+		"fase_%d" % get_instance_id(), Som.Prioridade.ALTA)
+	# A camada entra 90 ms depois: a sobreposição exacta mascarava o
+	# transiente da base -- foi o mesmo motivo que separou queda de
+	# recompensa na morte (450 ms).
+	var camada := String(p[1])
+	var vol := float(p[2])
+	get_tree().create_timer(0.09, true, false, true).timeout.connect(
+		func() -> void: Som.toca(camada, vol, float(p[0]) * 0.9, 0.03, 0.0, "",
+			Som.Prioridade.MEDIA))
+
+
+## ANTI-REPETIÇÃO. Um chefe repete o mesmo ataque dezenas de vezes numa
+## luta; sem isto ouve-se A A A A A, que é metade do que se lê como "som
+## barato". É o MESMO ciclo que o `DemonioBase._voz` já usa nos inimigos
+## (`VOZ_VARIANTES_PITCH`), e de propósito: um ciclo DETERMINÍSTICO, não
+## um sorteio. Assim o harness pode afirmar a sequência exacta, e o RNG de
+## gameplay continua intocado.
+const ATK_CICLO_PITCH := [0.0, -0.035, 0.025]
+var _atk_variante: Dictionary = {}
+
+
+func _pitch_ciclico(nome: String, pitch: float) -> float:
+	var passo: int = (int(_atk_variante.get(nome, -1)) + 1) % ATK_CICLO_PITCH.size()
+	_atk_variante[nome] = passo
+	return pitch * (1.0 + ATK_CICLO_PITCH[passo])
+
+
+## ATAQUE de chefe. Um sítio só para o perfil: prioridade NORMAL (não pode
+## roubar voz a morte/fase) e cooldown por instância e por evento, para uma
+## máquina de estados que reentra não disparar o mesmo som duas vezes.
+##
+## `variacao` fica a 0: a variação de tom vem do ciclo determinístico acima,
+## não do sorteio central. Duas variações empilhadas foi o defeito que o
+## Prompt 2 corrigiu no player -- não vale a pena reintroduzi-lo nos chefes.
+func _som_ataque(nome: String, volume_db := -6.0, pitch := 1.0,
+		_variacao := 0.0, cooldown := 0.09) -> void:
+	Som.toca(nome, volume_db, _pitch_ciclico(nome, pitch), 0.0, cooldown,
+		"atk_%d_%s" % [get_instance_id(), nome], Som.Prioridade.NORMAL)
+
+
+## ATAQUE PESADO / impacto grande. Prioridade MEDIA: fica acima de
+## projéteis e passos, abaixo de fase e morte. Sem ciclo de tom -- um
+## impacto pesado deve soar igual a si próprio, é a âncora da leitura.
+func _som_impacto(nome: String, volume_db := -5.0, pitch := 1.0,
+		variacao := 0.02, cooldown := 0.12) -> void:
+	Som.toca(nome, volume_db, pitch, variacao, cooldown,
+		"imp_%d_%s" % [get_instance_id(), nome], Som.Prioridade.MEDIA)

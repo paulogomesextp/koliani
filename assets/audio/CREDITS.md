@@ -1,5 +1,15 @@
 # Créditos de áudio
 
+## Koliani Signature — Prompt 5 (21 set 2026)
+
+Os 28 WAV de `koliani_signature/` são **síntese original** por
+`tools/gerar_sfx_koliani_signature.py`: ruído filtrado, transientes,
+varrimentos de frequência e ressonância Shadowblade. Não contêm samples de
+terceiros nem dependem de downloads. O script é a fonte; os WAV são saída
+reproduzível. Mono PCM 16-bit / 44,1 kHz. Os samples CC0 abaixo continuam
+no repositório para os restantes usos e como histórico; não foram reclamados
+como originais.
+
 As **camas** `ambiente.wav`, `menu.wav`, `boss.wav`, `assombracao.wav` e
 `game_over.wav` continuam sintetizadas por `tools/gerar_audio.py` (sem
 licenças). Os **SFX de combate/mobs/UI** abaixo (`scripts/som.gd`) foram
@@ -186,3 +196,29 @@ mais forte), encurta os golpes e faz a progressao 1->4 por TIMBRE (o registo
 desce 2655 -> 1788 -> 838 Hz e entra distorcao suave), nao so' por volume.
 Resultado medido, legado -> v1 -> v2: `acerto` -10,4 -> -17,9 -> **-9,5**;
 passos -16,3 -> -22,5 -> **-17,1**; `bloqueio` -11,4 -> -12,7 -> **-9,6**.
+
+---
+
+## Mundo e progressao (SFX Overhaul, Prompt 3B)
+
+Os 16 sons abaixo foram feitos de raiz por `tools/gerar_sfx_3b.py`, com o
+mesmo metodo da 9H.13B: 100% sintetizados neste repositorio, sem samples de
+terceiros, sem numpy e **sem licencas** -- nada aqui precisa de atribuicao.
+
+```
+vento_ciclo     vento_rajada    mecanismo       mecanismo_ciclo
+portao_abre     portao_fecha    sino_mecanismo  pedra_racha
+pedra_parte     lamina_passa    fogo_sopro      raio_aviso
+raio_cai        bau_abrir       recompensa      desbloqueio
+```
+
+Existem porque 28 scripts de cenario (vento, sinos, elevadores, plataformas
+que esboroam, pedras, laminas pendulares, raios) nao faziam barulho nenhum, e
+os poucos que faziam pediam-no emprestado ao checkpoint (`selo`) ou aos
+chefes (`onda`, `sino_ataque`, `conquista`). A auditoria completa, com as
+medicoes e a hierarquia de sonoridade, esta' em
+`docs/audio/world_progression_sfx_audit.md`.
+
+`vento_ciclo` e `mecanismo_ciclo` sao os primeiros sons do jogo feitos para
+tocar em CICLO: costurados com um crossfade de potencia constante, com a
+juncao medida (0,02 e 0,30 dB) pelo proprio gerador.

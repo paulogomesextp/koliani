@@ -82,7 +82,11 @@ func _definir_aberta(v: bool) -> void:
 	_aberta = v
 	if _col:
 		_col.set_deferred("disabled", v)
-	Som.toca("porta" if v else "selo", -8.0, 0.9)
+	# `porta` e' a porta de FIM DE NIVEL (e o seletor de niveis) e `selo` e' o
+	# checkpoint: uma grade a subir nao e' nem uma coisa nem outra. Os dois
+	# sentidos existem mesmo na mecanica (a grade sobe e volta a descer), por
+	# isso ha' dois ficheiros, com o varrimento de atrito em sentidos opostos.
+	Som.toca("portao_abre" if v else "portao_fecha", -10.0, 1.0, 0.04)
 	var alvo_y := _altura_fechada - tamanho.y - 6.0 if v else _altura_fechada
 	var tw := create_tween().set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
 	tw.tween_property(self, "position:y", alvo_y, 0.45)

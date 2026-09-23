@@ -172,7 +172,7 @@ func _physics_process(dt: float) -> void:
 				_lunge_de = global_position
 				var k := _obter_koliani()
 				_lunge_para = (k.global_position + Vector2(0, -20)) if k else global_position
-				Som.toca("investida", -7.0, 0.9)
+				_som_ataque("investida", -7.0, 0.9)
 				_ataque_forte = dur_lunge + 0.1
 				_ir(Fase.LUNGE2 if _fase == Fase.LUNGE2_TEL else Fase.LUNGE)
 		Fase.LUNGE, Fase.LUNGE2:
@@ -255,7 +255,7 @@ func _dardo_do_longe() -> void:
 
 
 func _leque_de_dardos() -> void:
-	Som.toca("projetil", -9.0, 0.7)
+	_som_ataque("projetil", -9.0, 0.7)
 	var base := _dir_dardo_para_koliani(global_position)
 	for a in [-0.34, 0.0, 0.34]:
 		_disparar_dardo(global_position + Vector2(0, -16), base.rotated(a))
@@ -272,7 +272,7 @@ func _disparar_dardo(de: Vector2, dir: Vector2) -> void:
 	var pai := get_parent()
 	if pai == null:
 		return
-	Som.toca("projetil", -10.0, 0.9)
+	_som_ataque("projetil", -10.0, 0.9)
 	var d := Area2D.new()
 	d.collision_layer = 0
 	d.collision_mask = 2
@@ -308,8 +308,7 @@ func _disparar_dardo(de: Vector2, dir: Vector2) -> void:
 func _um_morre() -> void:
 	_fase2 = true
 	_longe_vivo = false
-	Som.toca("chefe_cai", -6.0, 0.9)
-	Som.toca("conquista", -10.0, 1.4)
+	_som_fase("energia")
 	_abanar_camera(8.0)
 	dur_tel *= 0.7
 	dur_exposto *= 0.82

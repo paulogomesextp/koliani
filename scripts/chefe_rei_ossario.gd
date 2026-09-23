@@ -95,7 +95,7 @@ func _physics_process(dt: float) -> void:
 			if _t >= dur_tel:
 				_piscar(false)
 				_carga_dir = _dir_para_koliani()
-				Som.toca("investida", -6.0, 0.7)
+				_som_ataque("investida", -6.0, 0.7)
 				_ataque_forte = 1.2
 				_ir(Fase.CARGA)
 		Fase.CARGA:
@@ -208,7 +208,7 @@ func _ve_koliani() -> bool:
 ## --- ataques ---------------------------------------------------------
 
 func _lancas() -> void:
-	Som.toca("projetil", -8.0, 1.3)
+	_som_ataque("projetil", -8.0, 1.3)
 	var pai := get_parent()
 	if pai == null:
 		return
@@ -247,7 +247,7 @@ func _lanca(dir: Vector2) -> void:
 
 
 func _convocar(n: int) -> void:
-	Som.toca("invocar", -8.0, 0.6)
+	_som_ataque("invocar", -8.0, 0.6)
 	var pai := get_parent()
 	if pai == null:
 		return
@@ -269,7 +269,7 @@ func _convocar(n: int) -> void:
 
 
 func _golpe_frontal(dano: int) -> void:
-	Som.toca("golpe_pesado", -7.0, 1.0)
+	_som_impacto("golpe_pesado", -7.0, 1.0)
 	var k := _obter_koliani()
 	if k == null:
 		return
@@ -279,7 +279,7 @@ func _golpe_frontal(dano: int) -> void:
 
 
 func _muro_de_ossos() -> void:
-	Som.toca("esmagar", -6.0, 0.7)
+	_som_impacto("esmagar", -6.0, 0.7)
 	_abanar_camera(4.0)
 	var pai := get_parent()
 	if pai == null:
@@ -320,7 +320,7 @@ func _muro_de_ossos() -> void:
 ## --- transição de fase ---------------------------------------------
 
 func _desmontar() -> void:
-	Som.toca("chefe_cai", -6.0, 0.7)
+	_som_fase("osso")
 	_abanar_camera(8.0)
 	dur_tel *= 0.75
 	dur_exposto *= 0.85

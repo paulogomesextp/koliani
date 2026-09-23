@@ -89,7 +89,7 @@ func _physics_process(dt: float) -> void:
 		Fase.SURGE:
 			if _t < dt:
 				_esvair(false)
-				Som.toca("raio", -8.0, 1.5)
+				_som_ataque("raio", -8.0, 1.5)
 			if _t >= 0.22:
 				_ir(_prox)
 		Fase.RAIOS_TEL:
@@ -146,7 +146,7 @@ func _ve_koliani() -> bool:
 func _esvair(a_sair: bool) -> void:
 	if _sprite == null:
 		return
-	Som.toca("raio", -12.0, 0.5 if a_sair else 0.9)
+	_som_ataque("raio", -12.0, 0.5 if a_sair else 0.9)
 	create_tween().tween_property(_sprite, "modulate:a", 0.1 if a_sair else 1.0, 0.18)
 
 
@@ -164,7 +164,7 @@ func _invocar_raios() -> void:
 	var pai := get_parent()
 	if pai == null:
 		return
-	Som.toca("raio", -8.0, 1.4)
+	_som_ataque("raio", -8.0, 1.4)
 	var n := 4 if _fase2 else 3
 	var passo := 90.0 if _fase2 else 130.0
 	var alvo := _x_koliani()
@@ -180,7 +180,7 @@ func _invocar_raios() -> void:
 
 
 func _largar_clones() -> void:
-	Som.toca("invocar", -8.0, 0.7)
+	_som_ataque("invocar", -8.0, 0.7)
 	var pai := get_parent()
 	if pai == null:
 		return
@@ -206,7 +206,7 @@ func _largar_clones() -> void:
 
 func _entrar_fase2() -> void:
 	_fase2 = true
-	Som.toca("chefe_cai", -8.0, 0.7)
+	_som_fase("energia")
 	_abanar_camera(8.0)
 	dur_tel *= 0.75
 	dur_exposto *= 0.85

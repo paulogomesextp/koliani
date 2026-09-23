@@ -64,7 +64,17 @@ func _ao_entrar(corpo: Node) -> void:
 func _concluir() -> void:
 	if pista_ao_atravessar != "":
 		EstadoJogo.registar_pista(pista_ao_atravessar)
-	Som.toca("transicao", -3.0)
+	# A porta de fim de nivel usa o MESMO `transicao.wav` do portal, que o
+	# Prompt 1 fixou em -10 dB. Estava aqui a -3 dB: 7 dB acima, e a fechar
+	# uma cadeia em que era o som mais alto de todos --
+	#
+	#   chefe cai -6  >  conquista -6  >  bau -9/-7  >  PORTA -3
+	#
+	# Sair do nivel nao e' o climax do nivel. -7 dB deixa-a acima do portal
+	# (atravessar um nivel e' mais do que atravessar uma sala) e abaixo da
+	# recompensa e da vitoria. A `conquista` de 6,1 s ja' acabou muito antes
+	# de a Koliani chegar aqui a pe', por isso nao ha' empilhamento.
+	Som.toca("transicao", -7.0)
 	var i := EstadoJogo.indice_nivel
 	EstadoJogo.marcar_nivel_concluido(i)
 	EstadoJogo.completar_sessao_nivel(

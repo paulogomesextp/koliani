@@ -94,7 +94,7 @@ func _cair(dt: float) -> void:
 
 
 func _onda() -> void:
-	Som.toca("esmagar", -6.0)
+	_som_impacto("esmagar", -6.0)
 	var k := _obter_koliani()
 	if k and absf((k.global_position - global_position).x) <= raio_onda \
 			and k.is_on_floor():

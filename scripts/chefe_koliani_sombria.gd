@@ -126,8 +126,8 @@ func _physics_process(dt: float) -> void:
 					# pestanejo: teleporta para o lado da Koliani
 					var x := clampf(_x_koliani() - _dash_dir * 80.0, _origem.x - 360.0, _origem.x + 360.0)
 					global_position.x = x
-					Som.toca("projetil", -10.0, 0.6)
-				Som.toca("investida", -6.0, 1.0)
+					_som_ataque("projetil", -10.0, 0.6)
+				_som_ataque("investida", -6.0, 1.0)
 				_ataque_forte = 0.3
 				_ir(Fase.DASH)
 		Fase.DASH:
@@ -228,7 +228,7 @@ func _ve_koliani() -> bool:
 ## --- ataques ---------------------------------------------------------
 
 func _golpe_frontal(dano: int, alcance := 82.0) -> void:
-	Som.toca("golpe_pesado", -8.0, 1.15)
+	_som_impacto("golpe_pesado", -8.0, 1.15)
 	var k := _obter_koliani()
 	if k == null:
 		return
@@ -238,7 +238,7 @@ func _golpe_frontal(dano: int, alcance := 82.0) -> void:
 
 
 func _onda_de_golpe() -> void:
-	Som.toca("onda", -6.0, 1.1)
+	_som_ataque("onda", -6.0, 1.1)
 	var pai := get_parent()
 	if pai == null:
 		return
@@ -267,7 +267,7 @@ func _onda_de_golpe() -> void:
 
 
 func _projeteis() -> void:
-	Som.toca("projetil", -9.0, 0.7)
+	_som_ataque("projetil", -9.0, 0.7)
 	var base := _dir_proj_para_koliani()
 	var esp := 0.24
 	for a in [-esp, 0.0, esp]:
@@ -331,7 +331,7 @@ func _disparar_proj(dir: Vector2, mult: float) -> void:
 
 func _virar_fase2() -> void:
 	_fase2 = true
-	Som.toca("chefe_cai", -6.0, 0.8)
+	_som_fase("energia")
 	_abanar_camera(8.0)
 	dur_tel *= 0.82
 	dur_exposto *= 0.85

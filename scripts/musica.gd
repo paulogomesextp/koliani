@@ -3,13 +3,9 @@ extends Node
 ## `ambiente(indice_nivel)` a cada nível; os chefes chamam `boss()` quando
 ## a Koliani se aproxima.
 ##
-## - Menu: `menu.wav` (lento, tema próprio).
-## - Níveis: 20 faixas em `assets/audio/musica/niveis/` (`indice_nivel % 20`,
-##   pedido do Paulo a 3 set 2026 -- antes só havia uma faixa `bg_niveis.mp3`
-##   para os 30+ níveis). O nível 21 volta à faixa do nível 1.
-## - Chefe (qualquer mundo): 20 faixas em `assets/audio/musica/chefes/`
-##   (mesmo `indice_nivel % 20`, para o chefe de cada nível ter sempre a
-##   mesma faixa). Só entra quando o **combate começa** (o chefe deteta a
+## - Menu: versão aprovada sem os primeiros 5 s.
+## - Níveis: uma faixa aprovada por região de cinco níveis (20 regiões).
+## - Chefes: uma faixa aprovada por região (20 bosses). Só entra quando o **combate começa** (o chefe deteta a
 ##   Koliani / troca o primeiro golpe), NÃO só por o ver. Cada chefe chama
 ##   `Musica.boss()` via `ChefeBase.provocar()`.
 ## - Por baixo (exceto no chefe): `assombracao.wav` -- casa assombrada.
@@ -38,11 +34,15 @@ const NIVEIS_FLORESTA := 5
 ## sem licenças, sem atribuição devida (ver
 ## `assets/audio/musica/producao/manifesto_trilha_9h1.json`).
 ##
-## Servem o FRONTEND e a REGIÃO I, que é a fatia que existe a sério. As
-## Regiões II-XX continuam nas 20+20 faixas CC0/CC-BY: compor 38 peças para
-## regiões sem arte aprovada nem playtest seria fazer número, que foi
-## precisamente o que o Game Master proibiu.
+## Algumas peças continuam a servir de camada de intensidade e pausa na
+## Região I. A cama principal da campanha usa as faixas Pixabay aprovadas.
 const DIR_PRODUCAO := "res://assets/audio/musica/producao/"
+const DIR_APROVADO := "res://assets/audio/approved/"
+const MENU_APROVADO := DIR_APROVADO + "menu_cinematic_fantasy_dark_no_intro.ogg"
+const REGIAO_01_APROVADA := DIR_APROVADO + "region_01_midnight_forest.mp3"
+const BOSS_01_APROVADO := DIR_APROVADO + "boss_01_gothic_candlelight.mp3"
+const PASTA_REGIOES_APROVADAS := "res://assets/audio/music/regions/region_%02d.mp3"
+const PASTA_BOSSES_APROVADOS := "res://assets/audio/music/bosses/boss_%02d.mp3"
 const PRODUCAO := {
 	"menu": DIR_PRODUCAO + "tema_menu.wav",
 	"exploracao": DIR_PRODUCAO + "regiao1_exploracao.wav",
@@ -62,8 +62,7 @@ const COMBATE_CAUDA := 7.0
 ## (as camas tocam em ciclo); o que se faz é cruzar as duas.
 const CRUZAR := 0.9
 
-## 20 faixas de nível / 20 de chefe, em ciclo (ver assets/audio/CREDITS.md
-## para a fonte de cada uma -- todas CC0/CC-BY do OpenGameArt).
+## Reserva legada para um asset ausente; não é o mapping aprovado.
 const N_FAIXAS := 20
 const PASTA_NIVEIS := "res://assets/audio/musica/niveis/nivel_%02d.ogg"
 const PASTA_CHEFES := "res://assets/audio/musica/chefes/boss_%02d.ogg"
@@ -73,9 +72,13 @@ const PASTA_CHEFES := "res://assets/audio/musica/chefes/boss_%02d.ogg"
 ## a música de combate entra quando o Zeriko ataca (ver `chefe_base.gd`).
 const PITCH_BIOMA := [1.0, 0.94, 1.06, 0.88]
 
-const VOL_CAMA := -12.0
+const VOL_CAMA := -8.0
 const VOL_BOSS := -6.0
 const VOL_ASSOMBRACAO := -19.0
+## Compensações de reprodução (dB) para os extremos medidos no pacote final.
+## Os MP3 originais mantêm-se intactos; o menu conserva exatamente -8 dB.
+const AJUSTES_REGIAO := {2: -3.0, 11: 4.0, 15: -4.0, 16: 3.0, 19: 3.0}
+const AJUSTES_BOSS := {1: 4.0, 3: 2.0, 4: -3.0, 9: 3.0, 14: -4.0, 15: -4.0, 16: -3.0, 19: -3.0}
 
 var _p: AudioStreamPlayer       # cama principal (menu / bioma / chefe)
 var _p2: AudioStreamPlayer      # cama a SAIR, enquanto dura o cruzamento
@@ -146,18 +149,28 @@ func _reiniciar_audio_web() -> void:
 		_amb.play()
 
 
-## Qual a cama de EXPLORAÇÃO do nível `i`. Dentro da Região I é a peça de
-## produção; fora dela, a faixa do ciclo de 20.
+## Qual a cama de exploração do nível `i`, agrupado em regiões de cinco.
 static func faixa_de_nivel(i: int) -> String:
+	var regiao := clampi(floori(i / 5.0) + 1, 1, 20)
+	if i >= 0 and i < NIVEIS_PRODUCAO and ResourceLoader.exists(REGIAO_01_APROVADA):
+		return REGIAO_01_APROVADA
+	var aprovada := PASTA_REGIOES_APROVADAS % regiao
+	if ResourceLoader.exists(aprovada):
+		return aprovada
 	if i >= 0 and i < NIVEIS_PRODUCAO and ResourceLoader.exists(PRODUCAO["exploracao"]):
 		return PRODUCAO["exploracao"]
 	var caminho := PASTA_NIVEIS % ((i % N_FAIXAS) + 1)
 	return caminho if ResourceLoader.exists(caminho) else CAMINHO
 
 
-## Qual a cama de CHEFE do nível `i`. O Coração Putrefacto (1-5) tem tema
-## próprio; os outros quatro guardiões da Região I partilham o dos guardiões.
+## Qual a cama de chefe do nível `i`, agrupado em regiões de cinco.
 static func faixa_de_chefe(i: int) -> String:
+	var regiao := clampi(floori(i / 5.0) + 1, 1, 20)
+	if regiao == 1 and ResourceLoader.exists(BOSS_01_APROVADO):
+		return BOSS_01_APROVADO
+	var aprovado := PASTA_BOSSES_APROVADOS % regiao
+	if ResourceLoader.exists(aprovado):
+		return aprovado
 	if i >= 0 and i < NIVEIS_PRODUCAO:
 		var chave := "coracao" if i == NIVEL_CORACAO else "guardiao"
 		if ResourceLoader.exists(PRODUCAO[chave]):
@@ -169,19 +182,21 @@ static func faixa_de_chefe(i: int) -> String:
 ## Tema do menu inicial (lento, pad + melodia esparsa).
 func menu() -> void:
 	_combate_ate = 0.0
-	var cam: String = PRODUCAO["menu"]
+	var cam: String = MENU_APROVADO
+	if not ResourceLoader.exists(cam):
+		cam = PRODUCAO["menu"]
 	if not ResourceLoader.exists(cam):
 		cam = CAMINHO_MENU
 	_tocar(cam, 1.0, VOL_CAMA, true)
 
 
-## Cama de exploração de um mundo: uma das 20 faixas de nível, em ciclo
-## (`indice_nivel % N_FAIXAS`). O combate de chefe troca para `boss()` por
+## Cama de exploração da região atual. O combate de chefe troca para `boss()` por
 ## cima disto; ao morrer/recarregar a cena volta-se aqui até o combate
 ## recomeçar.
 func ambiente(indice_nivel: int) -> void:
 	_combate_ate = 0.0
-	_tocar(faixa_de_nivel(indice_nivel), 1.0, VOL_CAMA, true)
+	var regiao := clampi(floori(indice_nivel / 5.0) + 1, 1, 20)
+	_tocar(faixa_de_nivel(indice_nivel), 1.0, VOL_CAMA + float(AJUSTES_REGIAO.get(regiao, 0.0)), true)
 
 
 ## Música de chefe -- chamada por `chefe_base.gd` quando o **combate
@@ -190,7 +205,8 @@ func ambiente(indice_nivel: int) -> void:
 ## tem sempre a mesma faixa.
 func boss() -> void:
 	_combate_ate = 0.0
-	_tocar(faixa_de_chefe(EstadoJogo.indice_nivel), 1.0, VOL_BOSS, false)
+	var regiao := clampi(floori(EstadoJogo.indice_nivel / 5.0) + 1, 1, 20)
+	_tocar(faixa_de_chefe(EstadoJogo.indice_nivel), 1.0, VOL_BOSS + float(AJUSTES_BOSS.get(regiao, 0.0)), false)
 
 
 ## Pede a faixa do chefe em SEGUNDO PLANO, para ela já estar em memória
@@ -216,6 +232,10 @@ func preparar_boss() -> void:
 ## meter aqui uma faixa do ciclo de 20 seria trocar de música por trocar.
 func intensificar() -> void:
 	if EstadoJogo.indice_nivel >= NIVEIS_PRODUCAO:
+		return
+	# A Região I aprovada usa exclusivamente Midnight Forest durante a exploração.
+	# A camada de combate antiga substituía a faixa após o primeiro golpe.
+	if ResourceLoader.exists(REGIAO_01_APROVADA):
 		return
 	if _caminho_atual == faixa_de_chefe(EstadoJogo.indice_nivel):
 		return          # num combate de chefe manda o tema do chefe
@@ -293,6 +313,8 @@ func _tocar(caminho: String, pitch: float, vol: float, com_assombracao: bool) ->
 	_caminho_atual = caminho
 	_pitch_atual = pitch
 	_p.play()
+	if OS.get_cmdline_user_args().has("--audio-qa"):
+		print("[AUDIO_QA] event=music stream=%s" % _p.stream.resource_path)
 	if cruzar:
 		create_tween().tween_property(_p, "volume_db", vol, CRUZAR)
 

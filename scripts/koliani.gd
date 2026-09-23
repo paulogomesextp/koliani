@@ -211,7 +211,7 @@ const AURA_ENERGIA := 0.85          # `energy` da LuzAura em repouso
 ## Movimento; estes valores visuais/sonoros ficam juntos para o playtest.
 const ATERRAGEM_SQUASH := [0.0, 0.24, 0.48, 0.78]
 const ATERRAGEM_TREMOR := [0.0, 0.0, 1.4, 2.8]
-const ATERRAGEM_VOLUME := [0.0, -21.0, -15.0, -10.0]
+const ATERRAGEM_VOLUME := [0.0, -8.0, -9.0, -9.0]
 
 @onready var _hitbox: Area2D = $HitboxAtaque
 @onready var _sprite: Node2D = $Sprite
@@ -246,6 +246,7 @@ var _dash_recarga := 0.0
 var _rolar_restante := 0.0
 ## contadores dos sons ciclicos (passos, raspar na parede)
 var _passo_t := 0.0
+var _passo_variante := -1
 var _parede_t := 0.0
 ## Conta-decrescente da janela pós-rolamento (ver `POS_ROLL_JANELA`).
 var _pos_roll_t := 0.0
@@ -359,7 +360,7 @@ func inverter_gravidade() -> float:
 	up_direction = Vector2(0.0, -_sinal_grav)
 	# quem vira o boneco é o `_animar()` (a escala dele é reescrita todos
 	# os frames); aqui só muda o sinal.
-	Som.toca("gelo", -10.0, 0.8 if _sinal_grav < 0.0 else 1.25)
+	Som.toca("gelo", -10.0, 0.8 if _sinal_grav < 0.0 else 1.25, 0.02)
 	return _sinal_grav
 
 ## --- ESTADOS que a apanham a ela (5 set 2026) -------------------------
@@ -1099,6 +1100,16 @@ func _vfx9g_dash() -> void:
 		0.8, 0.0, _olha_para > 0.0, _sinal_grav < 0.0, -1, 0.26)
 
 
+func _sfx_dash() -> void:
+	Som.toca("dash", -11.0, 1.0, 0.03)
+
+
+func _sfx_ativar_escudo() -> void:
+	# Preparacao energetica propria; o bloqueio tem outro asset e transiente.
+	Som.toca("escudo_ativar", -18.0, 1.0, 0.01, 0.18,
+		"player_shield_activation")
+
+
 ## 9G: a cúpula de energia da prancha 07 substitui os polígonos desenhados por
 ## código. Os polígonos ficam escondidos (não apagados: fora da Região I são
 ## eles que se veem). O clarão do bloqueio continua a vir do `_cupula_flash`.
@@ -1368,7 +1379,7 @@ func _physics_process(dt: float) -> void:
 			_escalando = false
 			_parede_lock = 0.28
 			_mov.saltos_dados = 0  # o salto de parede não gasta o salto do ar
-			Som.toca("salto", -10.0)
+			Som.toca("koliani_salto", -10.0, 1.0, 0.03)
 		move_and_slide()
 		_mov.velocidade = velocity
 		_estava_no_chao = false
@@ -1393,7 +1404,7 @@ func _physics_process(dt: float) -> void:
 			reset_physics_interpolation()
 			velocity = Vector2.ZERO
 			_mov.saltos_dados = 0
-			Som.toca("agarrar", -14.0, randf_range(0.96, 1.06))
+			Som.toca("agarrar", -14.0, 1.0, 0.04)
 
 	if _borda:
 		_olha_para = _borda_lado
@@ -1405,7 +1416,7 @@ func _physics_process(dt: float) -> void:
 			_mov.saltos_dados = 0
 			_borda = false
 			_borda_lock = 0.25
-			Som.toca("salto", -10.0)
+			Som.toca("koliani_salto", -10.0, 1.0, 0.03)
 		elif Input.is_action_pressed("mirar_baixo") \
 				or (dir != 0.0 and signf(dir) == -_borda_lado):
 			_borda = false
@@ -1430,17 +1441,20 @@ func _physics_process(dt: float) -> void:
 		_mov.saltos_dados = 0  # o chute de parede não gasta o salto do ar
 		_mov.velocidade = velocity
 		_olha_para = signf(wn.x)
-		Som.toca("salto", -9.0)
+		Som.toca("koliani_salto", -10.0, 1.0, 0.03)
 		move_and_slide()
 		_mov.velocidade = velocity
 		_estava_no_chao = false
 		return
 
 	# defesa: só com a habilidade "escudo", em pé, e não a meio de outra ação
+	var defendia := _defendendo
 	_defendendo = EstadoJogo.tem_habilidade("escudo") \
 		and Input.is_action_pressed("defender") \
 		and _rolar_restante <= 0.0 and _dash_restante <= 0.0 and _ataque_restante <= 0.0 \
 		and is_on_floor()
+	if _defendendo and not defendia:
+		_sfx_ativar_escudo()
 
 	# ataque leve -- bloqueado enquanto rola ou defende. Combo: um novo
 	# golpe a meio do atual fica bufferizado (`_combo_pedido`) e dispara
@@ -1498,7 +1512,7 @@ func _physics_process(dt: float) -> void:
 			_rolar_recarga, is_on_floor(), _rolar_restante, _dash_restante):
 		_rolar_restante = DUR_ROLAR
 		_rolar_recarga = RECARGA_ROLAR
-		Som.toca("rolamento", -13.0, randf_range(0.95, 1.06))
+		Som.toca("rolamento", -13.0, 1.0, 0.04)
 		if Vfx9G.ativo(self):
 			Vfx9G.tocar(self, "roll_dodge", global_position + Vector2(0.0, 6.0 * _sinal_grav),
 				1.0, 0.0, _olha_para < 0.0, _sinal_grav < 0.0, -1, DUR_ROLAR)
@@ -1516,7 +1530,7 @@ func _physics_process(dt: float) -> void:
 		_dash_restante = DUR_DASH
 		_dash_recarga = RECARGA_DASH
 		_acender_aura(0.8)
-		Som.toca("dash", -11.0, randf_range(0.97, 1.05))
+		_sfx_dash()
 		_vfx9g_dash()
 		_invulneravel = maxf(_invulneravel, DUR_DASH)
 	else:
@@ -1535,7 +1549,8 @@ func _physics_process(dt: float) -> void:
 		)
 		velocity = _mov.velocidade
 		if _mov.saltos_dados > saltos_antes:
-			Som.toca("salto_duplo" if _mov.saltos_dados >= 2 else "salto", -10.0)
+			Som.toca("koliani_salto",
+				-10.0, 1.0, 0.03)
 			if _mov.saltos_dados >= 2:
 				_djump_t = 0.45  # mostra a animação do salto duplo
 				_vfx_salto_duplo()
@@ -1597,7 +1612,7 @@ func _physics_process(dt: float) -> void:
 			_abanar(TREMOR_CRIT if crit_stomp else TREMOR_PISAO)
 			_hitstop(HITSTOP_CRIT if crit_stomp else HITSTOP_PISAO)
 			# pisão na carne: pancada surda, sem o silvo da espada
-			Som.toca("acerto", -10.0, randf_range(0.82, 0.94))
+			Som.toca("pisao_koliani", -10.0, 0.88, 0.03)
 			_pop_impacto(ep)
 			break
 
@@ -1622,7 +1637,7 @@ func _physics_process(dt: float) -> void:
 			_squash = maxf(_squash, 0.5)
 			_abanar(TREMOR_PISAO)
 			_hitstop(HITSTOP_PISAO)
-			Som.toca("acerto", -10.0, randf_range(0.94, 1.07))
+			Som.toca("pisao_koliani", -10.0, 1.0, 0.04)
 			_pop_impacto(global_position + Vector2(0.0, 24.0))
 
 	# passo em frente do golpe: empurra SEMPRE para a frente e nunca trava
@@ -1657,7 +1672,9 @@ func _physics_process(dt: float) -> void:
 		_squash = maxf(_squash, squash_tier)
 		if tremor_tier > 0.0:
 			_abanar(tremor_tier)
-		Som.toca("aterrar", volume_tier)
+		var som_aterragem: String = ["", "aterrar", "aterrar_medio", "aterrar_pesado"][tier_aterragem]
+		Som.toca(som_aterragem, volume_tier, 1.0, 0.02, 0.0, "",
+			Som.Prioridade.MEDIA if tier_aterragem >= 3 else Som.Prioridade.NORMAL)
 	_estava_no_chao = no_chao
 
 	# caiu num fosso sem fundo -> conta como morte (reaparece no checkpoint)
@@ -2075,15 +2092,11 @@ func _iniciar_ataque() -> void:
 	_avanco_vel = AVANCO_VEL[i_av] * (1.0 if is_on_floor() else AVANCO_NO_AR)
 	_avanco_dur = AVANCO_DUR[i_av]
 	_avanco_restante = _avanco_dur
-	# CADA golpe do combo tem som proprio (Execution 9H.13). Antes eram dois
-	# samples com `pitch_scale` por cima (`TOM_COMBO`) -- o mesmo golpe quatro
-	# vezes com outro tom, que e' exactamente o que soava a amador. Agora os
-	# quatro crescem em corpo, em sopro e em cauda; o volume tambem sobe, mas
-	# e' o que menos conta. `TOM_COMBO` fica so' como variacao ligeira.
+	# Quatro assets Shadowblade proprios (Prompt 5), com a mesma ressonancia
+	# mas transientes, cortes e envelopes diferentes. `TOM_COMBO` so' colore.
 	var tom: float = TOM_COMBO[clampi(_combo_passo, 0, TOM_COMBO.size() - 1)]
 	var i_som: int = clampi(_combo_passo, 0, SOM_COMBO.size() - 1)
-	Som.toca(SOM_COMBO[i_som], VOL_COMBO[i_som],
-		lerpf(1.0, tom, 0.35) * randf_range(0.98, 1.02))
+	Som.toca(SOM_COMBO[i_som], VOL_COMBO[i_som], lerpf(1.0, tom, 0.35), 0.02)
 	_marcar_combo()
 	_flash_golpe()
 	_disparar_vfx_golpe()
@@ -2234,7 +2247,7 @@ func _lancar_projetil() -> void:
 	p.global_position = global_position + aim * 20.0 + Vector2(0.0, -4.0)
 	p.lancar(aim, maxi(1, roundi(_dano_golpe() / 3.0)))
 	magia_lancada.emit()  # Ativa plataformas espectrais sem depender do feixe.
-	Som.toca("lancar", -9.0, randf_range(0.96, 1.08))
+	Som.toca("lancar", -9.0, 1.0, 0.04)
 	if _faiscas:
 		_faiscas.position.x = absf(_faiscas.position.x) * signf(aim.x if aim.x != 0.0 else _olha_para)
 		_faiscas.restart()
@@ -2281,9 +2294,9 @@ func _ao_acertar_corpo(corpo: Node) -> void:
 		# (só na Região I, e só fora do combate de chefe -- ver `Musica`).
 		Musica.intensificar()
 		if crit:
-			Som.toca("acerto", -5.0, randf_range(1.18, 1.32))
+			Som.toca("acerto_critico", -6.0, 1.0, 0.02, 0.0, "", Som.Prioridade.MEDIA)
 		else:
-			Som.toca("acerto", -8.0, randf_range(0.94, 1.07))
+			Som.toca("acerto", -8.0, 1.0, 0.04)
 
 
 ## "Frame de impacto": o anel pixel-art (`Impacto`) a abrir no ponto do
@@ -2355,7 +2368,8 @@ func _bloqueia(dir_empurrao: float) -> bool:
 func _ao_bloquear() -> void:
 	_invulneravel = maxf(_invulneravel, BLOQUEIO_IFRAMES)
 	_cupula_flash = 1.0
-	Som.toca("bloqueio", -15.0, randf_range(0.97, 1.06))
+	Som.toca("escudo_impacto", -11.0, 1.0, 0.02, 0.12, "player_shield_impact",
+		Som.Prioridade.MEDIA)
 	_abanar(2.5)
 	if _escudo:
 		_escudo.scale = Vector2(1.28, 1.16)
@@ -2412,7 +2426,7 @@ func alternar_voo() -> bool:
 		collision_mask = _mask_guardada if _mask_guardada != 0 else collision_mask
 		_mov.velocidade = Vector2.ZERO
 		_mov.saltos_dados = 0
-	Som.toca("salto_duplo" if _voando else "aterrar", -12.0)
+	Som.toca("salto_duplo" if _voando else "aterrar", -12.0, 1.0, 0.03)
 	return _voando
 
 
@@ -2475,7 +2489,7 @@ func engatar(ancora: Vector2, comprimento := 0.0) -> void:
 	_gancho_vel = clampf(velocity.dot(tangente) / maxf(24.0, _gancho_comp),
 		-Movimento.GANCHO_VEL_MAX, Movimento.GANCHO_VEL_MAX)
 	velocity = Vector2.ZERO
-	Som.toca("agarrar", -11.0, randf_range(0.95, 1.06))
+	Som.toca("agarrar", -11.0, 1.0, 0.04)
 
 
 ## Larga a trepadeira. Sai pela tangente do círculo mais um empurrão para
@@ -2490,7 +2504,7 @@ func largar_gancho() -> void:
 	velocity = Movimento.velocidade_ao_largar(_gancho_theta, _gancho_vel, _gancho_comp)
 	_mov.velocidade = velocity
 	_mov.saltos_dados = 1     # ainda lhe sobra o salto do ar
-	Som.toca("salto", -11.0)
+	Som.toca("koliani_salto", -11.0, 1.0, 0.03)
 
 
 func _passo_gancho(dt: float) -> void:
@@ -2536,9 +2550,14 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0) -> void:
 			1.0, 0.0, _olha_para < 0.0, false, 41, 0.35)
 	_abanar(TREMOR_DANO)
 	_hitstop(HITSTOP_DANO)
-	Som.toca("dano", -7.0)
 	if vida <= 0:
 		_morrer()
+	else:
+		# Um golpe fatal tem a voz propria de morte; empilhar `dano` no mesmo
+		# frame mascarava esse evento e gastava duas vozes do pool.
+		Som.toca("dano_pesado" if real >= maxi(2, int(_vida_max() * 0.25)) else "dano",
+			-7.0, 1.0, 0.02, 0.12, "player_hurt",
+			Som.Prioridade.MEDIA)
 
 
 ## Passos e raspar na parede. Sao os unicos sons dela em CICLO, por isso
@@ -2548,7 +2567,8 @@ func _sons_de_movimento(dt: float) -> void:
 		_passo_t -= dt * (absf(velocity.x) / VEL_PASSO_REF)
 		if _passo_t <= 0.0:
 			_passo_t = INTERVALO_PASSO
-			Som.toca("passo%d" % (randi() % 3 + 1), -24.0, randf_range(0.9, 1.12))
+			_passo_variante = (_passo_variante + 1) % 3
+			Som.toca("passo%d" % (_passo_variante + 1), -24.0, 1.0, 0.08)
 	else:
 		_passo_t = 0.0   # parada, o proximo passo sai logo ao arrancar
 
@@ -2556,7 +2576,7 @@ func _sons_de_movimento(dt: float) -> void:
 		_parede_t -= dt
 		if _parede_t <= 0.0:
 			_parede_t = INTERVALO_PAREDE
-			Som.toca("parede", -22.0, randf_range(0.94, 1.09))
+			Som.toca("parede", -22.0, 1.0, 0.06)
 	else:
 		_parede_t = 0.0
 
@@ -2567,7 +2587,7 @@ func _morrer() -> void:
 	_a_morrer = true
 	_cancelar_ataque(true)
 	_vfx_morte()
-	Som.toca("morte_koliani", -6.0)
+	Som.toca("morte_koliani", -6.0, 1.0, 0.02, 0.0, "", Som.Prioridade.ALTA)
 	Engine.time_scale = 1.0  # não deixar um hitstop pendente a segurar o tempo
 	set_physics_process(false)
 	morreu.emit()
@@ -2585,6 +2605,7 @@ func _morrer() -> void:
 func recuperar_no_checkpoint(posicao_segura: Vector2) -> void:
 	if _a_morrer or posicao_segura == Vector2.ZERO:
 		return
+	Som.toca("respawn", -9.0, 1.0, 0.01, 0.0, "", Som.Prioridade.MEDIA)
 	global_position = posicao_segura + Vector2(0.0, -ALTURA_SPAWN)
 	# Reaparecer é o teletransporte mais longo do jogo (fogueira do outro lado
 	# do nível). Sem este reset via-se um risco dela a atravessar o mapa.

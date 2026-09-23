@@ -132,7 +132,7 @@ func _ve_koliani() -> bool:
 ## --- ataques ---------------------------------------------------------
 
 func _cutelada() -> void:
-	Som.toca("golpe_pesado", -5.0, 0.7)
+	_som_impacto("golpe_pesado", -5.0, 0.7)
 	_abanar_camera(6.0)
 	_linha_choque(1.0)
 	_linha_choque(-1.0)
@@ -170,7 +170,7 @@ func _linha_choque(dir: float) -> void:
 
 
 func _arremessar() -> void:
-	Som.toca("projetil", -6.0, 1.2)
+	_som_ataque("projetil", -6.0, 1.2)
 	var n := 2 if _fase2 else 1
 	for i in n:
 		_cutelo_bumerangue(i * 0.12)
@@ -209,7 +209,7 @@ func _cutelo_bumerangue(atraso: float) -> void:
 
 
 func _gancho() -> void:
-	Som.toca("golpe_pesado", -6.0, 0.7)
+	_som_impacto("golpe_pesado", -6.0, 0.7)
 	var pai := get_parent()
 	if pai == null:
 		return
@@ -256,14 +256,14 @@ func _remexer_arena() -> void:
 		_moveis_estado[p] = not subiu
 		var tw := p.create_tween()
 		tw.tween_property(p, "position:y", p.position.y + dy, 0.4).set_trans(Tween.TRANS_SINE)
-		Som.toca("selo", -14.0, 1.2)
+		_som_ataque("selo", -14.0, 1.2)
 
 
 ## --- fase 2 --------------------------------------------------------
 
 func _entrar_fase2() -> void:
 	_fase2 = true
-	Som.toca("chefe_cai", -8.0, 0.7)
+	_som_fase("carne")
 	_abanar_camera(8.0)
 	dur_tel *= 0.78
 	dur_exposto *= 0.85

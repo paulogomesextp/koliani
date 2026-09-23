@@ -218,9 +218,15 @@ func _fazer_cartao(id: String) -> Dictionary:
 
 func _comprar(id: String) -> void:
 	if EstadoJogo.comprar_melhoria(id):
-		Som.toca("conquista", -8.0, 1.15)
+		# Era `conquista` -- a fanfarra de 6,1 s da VITORIA SOBRE UM CHEFE --
+		# num botao de loja que se carrega seis vezes seguidas. Fase 9:
+		# progressao permanente tem som proprio (`desbloqueio`), e nao pede
+		# emprestado o momento mais alto do jogo.
+		Som.toca("desbloqueio", -9.0, 1.06, 0.02)
 	else:
-		Som.toca("dano", -18.0, 0.8)
+		# `dano` e' o som de LEVAR DANO. Num menu isso le'-se como "perdi
+		# vida", nao como "nao da'". `ui_negado` existe para isto.
+		Som.toca("ui_negado", -9.0)
 
 
 func _refrescar() -> void:

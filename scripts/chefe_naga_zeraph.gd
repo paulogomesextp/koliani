@@ -147,7 +147,7 @@ func _ve_koliani() -> bool:
 ## --- ataques ---------------------------------------------------------
 
 func _cuspir() -> void:
-	Som.toca("praga", -8.0, 0.7)
+	_som_ataque("praga", -8.0, 0.7)
 	var base := _vetor_para_koliani().normalized()
 	if base.length() < 0.5:
 		base = Vector2(_direcao, -0.1).normalized()
@@ -190,7 +190,7 @@ func _jacto(dir: Vector2) -> void:
 
 
 func _levantar_cobras() -> void:
-	Som.toca("invocar", -8.0, 0.7)
+	_som_ataque("invocar", -8.0, 0.7)
 	var pai := get_parent()
 	if pai == null:
 		return
@@ -214,7 +214,7 @@ func _levantar_cobras() -> void:
 
 
 func _trocar_com_estatua() -> void:
-	Som.toca("onda", -9.0, 1.4)
+	_som_ataque("onda", -9.0, 1.4)
 	var estatuas := get_tree().get_nodes_in_group("estatuas_naga")
 	var destino: Vector2
 	if estatuas.is_empty():
@@ -229,7 +229,7 @@ func _trocar_com_estatua() -> void:
 
 
 func _poca_veneno() -> void:
-	Som.toca("praga", -7.0, 0.6)
+	_som_ataque("praga", -7.0, 0.6)
 	var pai := get_parent()
 	if pai == null:
 		return
@@ -279,7 +279,7 @@ func _poca_veneno() -> void:
 
 func _entrar_fase2() -> void:
 	_fase2 = true
-	Som.toca("chefe_cai", -8.0, 0.7)
+	_som_fase("carne")
 	_abanar_camera(7.0)
 	dur_tel *= 0.78
 	dur_exposta *= 0.88

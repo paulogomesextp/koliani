@@ -106,7 +106,7 @@ func _physics_process(dt: float) -> void:
 				_ir(Fase.ECLIPSE_ESCURO)
 		Fase.ECLIPSE_ESCURO:
 			if _t < dt:
-				Som.toca("grito", -10.0, 0.5)
+				_som_ataque("grito", -10.0, 0.5)
 				_abanar_camera(2.0)
 			if _t >= (0.5 if not _fase2 else 0.35):
 				_nova()
@@ -151,7 +151,7 @@ func _ve_koliani() -> bool:
 ## --- ataques ---------------------------------------------------------
 
 func _aneis() -> void:
-	Som.toca("projetil", -8.0, 0.6)
+	_som_ataque("projetil", -8.0, 0.6)
 	var n := 3 if _fase2 else 2
 	var base := _vetor_para_koliani().normalized()
 	if base.length() < 0.5:
@@ -195,7 +195,7 @@ func _anel(dir: Vector2) -> void:
 
 
 func _nova() -> void:
-	Som.toca("grito", -4.0, 0.8)
+	_som_ataque("grito", -4.0, 0.8)
 	_abanar_camera(7.0)
 	var pai := get_parent()
 	if pai == null:
@@ -228,7 +228,7 @@ func _nova() -> void:
 
 
 func _convidados() -> void:
-	Som.toca("invocar", -9.0, 0.6)
+	_som_ataque("invocar", -9.0, 0.6)
 	var pai := get_parent()
 	if pai == null:
 		return
@@ -255,7 +255,7 @@ func _convidados() -> void:
 
 func _entrar_fase2() -> void:
 	_fase2 = true
-	Som.toca("chefe_cai", -8.0, 0.7)
+	_som_fase("magia")
 	_abanar_camera(8.0)
 	dur_tel *= 0.8
 	dur_exposta *= 0.88

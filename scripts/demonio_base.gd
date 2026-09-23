@@ -139,6 +139,7 @@ var anticipacao := 0.0
 ## decai a zero). Não afeta a física -- só o "juice".
 var _flinch := 0.0
 var _flinch_dir := 1.0
+var _voz_variante := {"ataque": -1, "dano": -1, "morte": -1}
 ## RECUO a sério (9H.16 D). Até aqui levar um golpe era
 ## `global_position.x += dir * 8` -- um TELETRANSPORTE de 8 px, instantâneo
 ## e sem física: o bicho não recuava, piscava para o lado. Sem reação
@@ -414,9 +415,18 @@ const FAMILIA_SOM := {
 ## Toca `ataque`/`dano`/`morte` na voz da família desta espécie. Se por
 ## alguma razão a amostra não existir, o `Som` ignora e não se ouve nada --
 ## melhor isso do que voltar ao rosnado único de antes.
-func _voz(que: String, volume := -13.0, pitch := 1.0) -> void:
+const VOZ_VOLUME := {"ataque": -14.0, "dano": -16.0, "morte": -11.0}
+const VOZ_COOLDOWN := {"ataque": 0.12, "dano": 0.14, "morte": 0.0}
+const VOZ_VARIANTES_PITCH := [-0.035, 0.025, 0.0]
+
+func _voz(que: String, pitch := 1.0) -> void:
 	var fam: String = FAMILIA_SOM.get(especie, "humano")
-	Som.toca("mob_%s_%s" % [fam, que], volume, pitch * randf_range(0.94, 1.07))
+	var passo: int = (int(_voz_variante.get(que, -1)) + 1) % VOZ_VARIANTES_PITCH.size()
+	_voz_variante[que] = passo
+	var pitch_final: float = pitch * (1.0 + VOZ_VARIANTES_PITCH[passo])
+	Som.toca_actor(self, "mob_%s_%s" % [fam, que], float(VOZ_VOLUME.get(que, -14.0)),
+		pitch_final, 0.0, float(VOZ_COOLDOWN.get(que, 0.0)),
+		"mob_%d_%s" % [get_instance_id(), que])
 
 ## Altura-alvo (px) do CORPO opaco do inimigo no ecrã -- normaliza as
 ## espécies, que vêm de packs com densidades diferentes (LuizMelo 150px vs
@@ -734,7 +744,7 @@ func _physics_process(dt: float) -> void:
 			move_and_slide()
 			if _windup <= 0.0:
 				_carga = DUR_CARGA
-				_voz("ataque", -13.0, 0.8)
+				_voz("ataque", 0.8)
 			return
 		if _carga > 0.0:  # arranque comprometido -- não vira nem trava
 			_carga -= dt
@@ -747,7 +757,8 @@ func _physics_process(dt: float) -> void:
 				_carga = 0.0
 				_acao_cd = randf_range(1.8, 3.0)
 				atordoar(0.85)
-				Som.toca("bloqueio", -10.0, 0.7)
+				Som.toca_actor(self, "bloqueio", -10.0, 0.7, 0.02, 0.16,
+					"mob_wall_%d" % get_instance_id())
 			elif _carga <= 0.0:
 				# investida falhou: recuo curto, ainda dá para rematar
 				_acao_cd = randf_range(1.2, 2.0)
@@ -762,7 +773,7 @@ func _physics_process(dt: float) -> void:
 			_telegrafo = TELEGRAFO_CARGA
 			anticipacao = 1.0
 			velocity.x = 0.0
-			_voz("ataque", -14.0, 0.7)
+			_voz("ataque", 0.7)
 			return
 	elif comportamento == "saltador":
 		if _saltando > 0.0:  # no ar -- deixa a gravidade fazer o arco
@@ -783,7 +794,7 @@ func _physics_process(dt: float) -> void:
 			if _windup <= 0.0:
 				velocity = Vector2(_direcao * 175.0, -430.0)
 				_saltando = 0.75
-				Som.toca("salto", -20.0, 0.68)
+				Som.toca_actor(self, "salto", -20.0, 0.68)
 				move_and_slide()
 			return
 		if _acao_cd <= 0.0 and is_on_floor():
@@ -814,7 +825,7 @@ func _physics_process(dt: float) -> void:
 			if _windup <= 0.0:
 				velocity = _dive_dir * VEL_MERGULHO
 				_mergulho = 0.6
-				_voz("ataque", -13.0, 1.05)
+				_voz("ataque", 1.05)
 				move_and_slide()
 			return
 		var kv := get_tree().get_first_node_in_group("koliani")
@@ -846,7 +857,7 @@ func _physics_process(dt: float) -> void:
 					_sprite.scale.y = 1.0
 				velocity = Vector2(0.0, 240.0)
 				anticipacao = 1.0
-				_voz("ataque", -14.0, 0.9)
+				_voz("ataque", 0.9)
 				move_and_slide()
 				return
 		velocity = Vector2.ZERO
@@ -865,7 +876,8 @@ func _physics_process(dt: float) -> void:
 				b.dano = maxi(1, int(round(dano_contacto * 0.9)))
 				get_parent().add_child(b)
 				b.global_position = global_position + _dive_dir * 16.0
-				Som.toca("projetil", -13.0, 0.9)
+				Som.toca_actor(self, "praga", -13.0, 0.9, 0.03, 0.18,
+					"cuspo_%d" % get_instance_id())
 				_acao_cd = randf_range(1.8, 2.8)
 				atordoar(0.35)  # recuo do cuspo -> janela curta de castigo
 			return
@@ -883,7 +895,7 @@ func _physics_process(dt: float) -> void:
 					_telegrafo = TELEGRAFO_CUSPIR
 					anticipacao = 1.0
 					velocity.x = 0.0
-					_voz("ataque", -15.0, 0.7)
+					_voz("ataque", 0.7)
 					return
 
 	# --- patrulha normal ----------------------------------------------
@@ -905,7 +917,7 @@ func _revelar() -> void:
 	dormente = false
 	anticipacao = 1.0
 	_flinch = 1.0
-	_voz("ataque", -13.0, 1.15)
+	_voz("ataque", 1.15)
 	if _sprite:
 		var t := _sprite.create_tween()
 		t.tween_property(_sprite, "rotation", 0.25, 0.05)
@@ -961,7 +973,7 @@ func _ao_tocar(corpo: Node) -> void:
 		return
 	if corpo is Koliani:
 		corpo.receber_dano(dano_contacto, signf(corpo.global_position.x - global_position.x))
-		_voz("ataque", -15.0)
+		_voz("ataque")
 		anticipacao = 1.0  # dá um "bote" visual no ataque
 
 
@@ -993,7 +1005,8 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0, critico := false,
 	# INCORPÓREO: a lâmina passa através. Só o que vem de longe lhe toca --
 	# e o `_de_longe` só é verdade dentro de um `receber_tiro()`.
 	if so_tiro and not _de_longe:
-		Som.toca("bloqueio", -18.0, 1.45)
+		Som.toca_actor(self, "bloqueio", -18.0, 1.45, 0.02, 0.14,
+			"mob_incorporeo_%d" % get_instance_id())
 		_flinch = 0.22
 		return
 	_de_longe = false
@@ -1003,12 +1016,12 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0, critico := false,
 	# pós-rolamento / vulnerável) fura o escudo.
 	if comportamento == "escudeiro" and not critico and dir_empurrao != 0.0 \
 			and signf(dir_empurrao) == -_direcao:
-		Som.toca("bloqueio", -12.0, randf_range(0.85, 0.95))
+		Som.toca_actor(self, "bloqueio", -12.0, 0.9, 0.03, 0.14,
+			"mob_escudo_%d" % get_instance_id())
 		_flinch = 0.4
 		_flinch_dir = signf(dir_empurrao)
 		anticipacao = 0.6
 		return
-	_voz("dano", -16.0, 1.15 if critico else 1.0)
 	var q := quantidade
 	if critico:
 		q = int(round(q * (CRIT_MULT + EstadoJogo.bonus("crit_mult"))))  # melhoria "furia"
@@ -1048,6 +1061,9 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0, critico := false,
 				soltar_estilhacos()
 			queue_free()
 	else:
+		# Na morte, `_morrer_anim()` toca a voz `morte`; nao somar tambem a
+		# voz `dano` no mesmo frame.
+		_voz("dano", 1.15 if critico else 1.0)
 		if dir_empurrao != 0.0:
 			_flinch_dir = signf(dir_empurrao)
 		_flinch = 1.5 if critico else 1.0
@@ -1136,7 +1152,7 @@ func _pop_morte_elite() -> void:
 ## Toca a animação de morte e só então solta estilhaços e liberta-se.
 func _morrer_anim() -> void:
 	_morto = true
-	_voz("morte", -11.0)
+	_voz("morte")
 	velocity = Vector2.ZERO
 	_soltar_essencia()
 	# "pop" de morte: o mesmo anel do acerto, maior e na cor do rim do bioma

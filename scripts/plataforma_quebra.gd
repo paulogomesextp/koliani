@@ -22,6 +22,7 @@ var _col: CollisionShape2D
 var _vis: Polygon2D
 var _borda: Line2D
 var _deteta: Area2D
+var _som: Node
 
 
 func _ready() -> void:
@@ -29,6 +30,7 @@ func _ready() -> void:
 	collision_layer = 1
 	collision_mask = 0
 	_base = position
+	_som = get_node_or_null("/root/Som")
 	# Treme e cai no `_process`, com a posicao dela propria.
 	physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 	_montar()
@@ -89,6 +91,11 @@ func _ao_pisar(corpo: Node) -> void:
 	if _estado == FIRME and corpo is Koliani:
 		_estado = TREME
 		_t = 0.0
+		# TELEGRAFO. A plataforma ja' avisava com cor e trepidacao, mas quem
+		# estivesse a olhar para um inimigo nao via nada -- e o abanao e' a
+		# unica deixa que ela da'. Um evento por pisada; a maquina de estados
+		# ja' garante que so' se entra em TREME vindo de FIRME.
+		_tocar("pedra_racha", -14.0, 1.0)
 
 
 func _process(dt: float) -> void:
@@ -107,6 +114,10 @@ func _process(dt: float) -> void:
 				_estado = IDA
 				_t = 0.0
 				_col.set_deferred("disabled", true)
+				# ACTIVATION: o chao a ceder. Nao ha' terceiro som no fim da
+				# queda -- ela desaparece por fade, nao bate em lado nenhum,
+				# e um impacto que nao se ve' e' ruido.
+				_tocar("pedra_parte", -13.0, 1.18)
 		IDA:
 			_t += dt
 			position.y += 220.0 * _t
@@ -127,3 +138,11 @@ func _process(dt: float) -> void:
 				if _borda:
 					_borda.default_color = Color(0.5, 0.42, 0.5, 0.7)
 				_col.set_deferred("disabled", false)
+
+
+## Toca pelo CAMINHO do autoload, para a classe continuar a compilar em
+## `--script` (onde os autoloads nao existem e as bancadas correm).
+func _tocar(nome: String, db: float, pitch: float) -> void:
+	if _som and _som.has_method("toca"):
+		_som.call("toca", nome, db, pitch, 0.05,
+			0.25, "%s_%d" % [nome, get_instance_id()])

@@ -1,3 +1,26 @@
+## Integração limpa do áudio final (23 set 2026)
+
+- Branch `codex/integrate-final-audio`, criada diretamente de
+  `origin/codex/region-canon-integration` (`4e3ea01e`), transporta apenas o
+  runtime/callsites de SFX, assets e imports aprovados, música aprovada,
+  manifestos e QA de áudio do estado validado `6d6ee4a2`.
+- Confirmados em runtime: catálogo **110/110**, `respawn.mp3` em
+  `Koliani.recuperar_no_checkpoint()`, menus/Opções/pausa com
+  `menu_panel.mp3` e sequência de Opções `ui_confirm -> menu_panel`.
+  `save_success.mp3` permanece no catálogo, deliberadamente sem callsite de
+  save/autosave para não se sobrepor ao som de morte.
+- Godot 4.7.2 importou 103 sidecars transportados sem fonte/destino em falta.
+  Testes dirigidos de progressão, música, vertical slice, visibilidade de
+  atores, críticos, Koliani, combate e laços passaram; suite geral passou e
+  manteve o save real intacto. `git diff --check` passou.
+- Excluídos os sistemas e alterações independentes existentes nos 91 commits
+  da branch fonte: UI/level selector, arte, regiões, gameplay, balanceamento,
+  intro e dormência/recompensas de mobs. Os blocos de WindZone/Guardião nos
+  harnesses de mundo/chefes não foram transportados porque esses sistemas não
+  existem nesta base; o ensaio de laços regista explicitamente essa omissão.
+- Próximo passo: rever o PR desta branch contra
+  `codex/region-canon-integration`; não fazer merge sem revisão.
+
 ## Regra permanente — Windows e PWA sincronizados (14 set 2026)
 
 - Pedido do GM: todas as entregas atualizam Windows e PWA juntos, mesmo commit e versão. Regra acrescentada a AGENTS.md; o CI existente exporta ambos em cada push master.

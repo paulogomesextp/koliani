@@ -87,7 +87,7 @@ func _ao_bater(corpo: Node) -> void:
 		# o tiro mágico DEIXA A ARDER -> abre janela de crítico para a espada
 		if corpo.has_method("queimar"):
 			corpo.queimar(2.0, maxi(2, roundi(dano * 0.14)))
-		Som.toca("acerto", -9.0)
+		Som.toca("energia_impacto", -10.0, 1.0, 0.0)
 	_estoirar()
 
 

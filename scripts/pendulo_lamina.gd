@@ -18,10 +18,13 @@ var _braco: Node2D
 var _lamina_area: Area2D
 var _glint: Polygon2D
 var _luz: PointLight2D
+var _som: Node
+var _sinal_anterior := 0.0
 
 
 func _ready() -> void:
 	_t = fase * periodo
+	_som = get_node_or_null("/root/Som")
 	_montar_visual()
 
 
@@ -131,6 +134,27 @@ func _physics_process(dt: float) -> void:
 		_glint.color.a = 0.15 + 0.5 * vel
 	if _luz:
 		_luz.energy = 0.3 + 1.1 * vel
+	_som_passagem(ang)
+
+
+## O sopro so' no FUNDO do arco -- onde a lamina esta' mais depressa e onde
+## a Koliani tem de passar. Uma vez por travessia, nao por frame.
+##
+## O gatilho e' a mudanca de SINAL do angulo (a lamina a cruzar a vertical),
+## e nao um limiar de velocidade: com um limiar, um pendulo lento ficava
+## varios frames acima dele e disparava em rajada. O cooldown no `Som` e' a
+## segunda rede, com chave por instancia para varios pendulos lado a lado
+## soarem cada um o seu.
+##
+## Nada disto mexe no arco, no periodo nem no dano -- so' se le^ `ang`.
+func _som_passagem(ang: float) -> void:
+	var sinal := signf(ang)
+	var cruzou := sinal != 0.0 and _sinal_anterior != 0.0 and sinal != _sinal_anterior
+	_sinal_anterior = sinal
+	if not cruzou or _som == null or not _som.has_method("toca"):
+		return
+	_som.call("toca_actor", self, "lamina_passa", -14.0, 1.0, 0.06,
+		maxf(0.25, periodo * 0.35), "lamina_%d" % get_instance_id())
 
 
 func _ao_tocar(corpo: Node) -> void:

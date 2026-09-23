@@ -214,7 +214,7 @@ func _physics_process(dt: float) -> void:
 func _bater() -> void:
 	if not _combate or _ja_derrotado:
 		return
-	Som.toca("onda", -10.0, 0.7)
+	_som_ataque("onda", -10.0, 0.7)
 	_abanar_camera(3.0 + _nivel)
 	_mostrar_nucleo(true)
 	get_tree().create_timer(dur_exposta).timeout.connect(func() -> void:
@@ -257,7 +257,7 @@ func _atualiza_fase() -> void:
 			_erupcao()
 		if _nivel == 2:
 			_aura_fase2()
-		Som.toca("chefe_cai", -9.0, 0.7)
+		_som_fase("carne")
 		_abanar_camera(6.0)
 		if _nivel == 2:
 			periodo_batida *= 0.85
@@ -276,7 +276,7 @@ func _ve_koliani() -> bool:
 ## --- ataques -------------------------------------------------------
 
 func _raizes() -> void:
-	Som.toca("praga", -9.0, 1.2)
+	_som_ataque("praga", -9.0, 1.2)
 	var origem := global_position.x
 	var alvo := _x_koliani()
 	var n := 3 if _nivel == 1 else 4
@@ -299,7 +299,7 @@ func _salva_dirigida() -> void:
 	var k := _obter_koliani()
 	if k == null:
 		return
-	Som.toca("praga", -9.0, 0.9)
+	_som_ataque("praga", -9.0, 0.9)
 	var base := (k.global_position - global_position).normalized()
 	var n := 3 if _nivel == 1 else 5
 	for i in n:
@@ -308,7 +308,7 @@ func _salva_dirigida() -> void:
 
 
 func _leque_radial() -> void:
-	Som.toca("praga", -8.0, 0.7)
+	_som_ataque("praga", -8.0, 0.7)
 	var n := 8 if _nivel == 2 else 12
 	for i in n:
 		_tiro(Vector2.RIGHT.rotated(TAU * float(i) / float(n)))

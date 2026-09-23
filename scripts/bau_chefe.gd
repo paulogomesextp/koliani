@@ -52,8 +52,35 @@ func _abrir() -> void:
 			estado.ganhar_essencia(premio.valor)
 			descricao = "+%d " % int(premio.valor) + textos.t("chest.essence")
 	estado.marcar_recompensa_reclamada(reward_id)
-	get_node("/root/Som").toca("apanhar", -6.0)
+	_som_do_bau()
 	_mostrar(descricao)
+
+
+## OPEN CHEST e COLLECT REWARD, separados (Fase 7 do briefing).
+##
+## O bau do chefe -- o premio de um nivel inteiro -- tocava `apanhar`, o
+## MESMO evento e o MESMO volume da moeda de essencia que se apanha do chao
+## dez vezes por nivel. A hierarquia estava literalmente invertida: a porta
+## de fim de nivel (`transicao`, -3 dB) soava mais alto do que a recompensa.
+##
+## Agora sao dois eventos em sequencia, com a tampa primeiro e o premio
+## depois, e nenhum deles e' o `apanhar`:
+##
+##   bau_abrir   -12,0 dB de sonoridade   a lingueta e a madeira
+##   recompensa  -11,0 dB                 o acorde -- o premio
+##
+## Os 0,36 s de intervalo sao o corpo do `bau_abrir` (0,78 s no total, mas o
+## peso esta' nos primeiros 0,4): as duas vozes encadeiam-se em vez de se
+## empilharem. Fica abaixo da `conquista` (-10,4 LUFS), que continua a ser o
+## som mais alto do jogo e e' o da vitoria sobre o chefe.
+func _som_do_bau() -> void:
+	var som := get_node_or_null("/root/Som")
+	if som == null or not som.has_method("toca"):
+		return
+	# Coin Drop e' simultaneamente a abertura e a recompensa aprovadas.
+	# Um único evento evita empilhar o antigo acorde de recompensa.
+	som.call("toca", "bau_abrir", -7.0, 1.0, 0.01, 0.0, "",
+		som.Prioridade.MEDIA)
 
 func _mostrar(descricao: String) -> void:
 	var textos := get_node("/root/Textos")

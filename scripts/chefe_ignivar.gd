@@ -81,7 +81,7 @@ func _physics_process(dt: float) -> void:
 			if _t >= dur_tel:
 				_piscar(false)
 				velocity.y = -220.0
-				Som.toca("investida", -9.0, 0.7)
+				_som_ataque("investida", -9.0, 0.7)
 				_ir(Fase.MARTELO_BAQUE)
 		Fase.MARTELO_BAQUE:
 			velocity.x = 0.0
@@ -153,7 +153,7 @@ func _ve_koliani() -> bool:
 ## --- ataques ---------------------------------------------------------
 
 func _baque() -> void:
-	Som.toca("esmagar", -5.0)
+	_som_impacto("esmagar", -5.0)
 	_abanar_camera(5.0)
 	var k := _obter_koliani()
 	if k and absf(_vetor_para_koliani().x) <= raio_onda and k.is_on_floor():
@@ -165,7 +165,7 @@ func _forjar_lamina() -> void:
 	var pai := get_parent()
 	if pai == null:
 		return
-	Som.toca("chama", -8.0, 1.4)
+	_som_ataque("onda", -8.0, 1.4)
 	var dir := _dir_para_koliani()
 	var lamina := Area2D.new()
 	lamina.collision_layer = 0
@@ -204,7 +204,7 @@ func _forjar_lamina() -> void:
 
 
 func _lancar_brasas() -> void:
-	Som.toca("chama", -9.0, 0.8)
+	_som_ataque("onda", -9.0, 0.6)
 	var pai := get_parent()
 	if pai == null:
 		return
@@ -225,7 +225,7 @@ func _lancar_brasas() -> void:
 
 func _entrar_fase2() -> void:
 	_fase2 = true
-	Som.toca("chefe_cai", -9.0, 0.7)
+	_som_fase("fogo")
 	_abanar_camera(7.0)
 	dur_tel *= 0.72
 	dur_exposto *= 0.85

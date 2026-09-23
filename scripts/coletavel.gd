@@ -169,9 +169,16 @@ func _process(dt: float) -> void:
 func _ao_entrar(corpo: Node) -> void:
 	if not (corpo is Koliani):
 		return
+	# UNLOCK. Ganhar uma HABILIDADE permanente e apanhar um coletavel comum
+	# nao podem soar igual -- ate' aqui eram os dois `apanhar`, -6 dB. E o
+	# desbloqueio tambem nao pode ser a morte do chefe (`chefe_cai`) nem a
+	# `conquista`, que ja' tocam por cima quando vem de um chefe.
+	# `desbloqueio` e' um som proprio: acorde que ABRE, com sub por baixo.
 	if habilidade_id != "":
 		EstadoJogo.desbloquear_habilidade(habilidade_id)
-	Som.toca("apanhar", -6.0)
+		Som.toca("desbloqueio", -6.0, 1.0, 0.01, 0.0, "", Som.Prioridade.MEDIA)
+	else:
+		Som.toca("apanhar", -6.0)
 	if Vfx9G.ativo(self):
 		Vfx9G.tocar(self, "pickup", global_position, 1.1, 0.0, false, false, 38, 0.38)
 	apanhado.emit(pista_id, habilidade_id)

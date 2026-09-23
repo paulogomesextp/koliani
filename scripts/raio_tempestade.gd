@@ -55,6 +55,14 @@ func cair(atraso: float = -1.0) -> void:
 
 	_tel.visible = true
 	_alvo.visible = true
+	# TELEGRAFO -- o ar a carregar. Esta armadilha tem mesmo as tres fases que
+	# a Fase 5 do briefing distingue, e por isso ganha dois sons (o aviso e a
+	# descarga): `aviso` e' quase um segundo de nada, e uma coluna de 26 de
+	# dano nao pode cair so' com pisca-pisca a avisar.
+	#
+	# `raio.wav` NAO servia: e' o ataque do Voltaris e do Vyrak (6 callsites
+	# de chefe) e dura 5,6 s. `raio_aviso`/`raio_cai` sao proprios.
+	_tocar("raio_aviso", -17.0, 1.0)
 	var tw := create_tween().set_loops(int(maxf(2.0, espera / 0.14)))
 	tw.tween_property(_tel, "modulate:a", 0.85, 0.14)
 	tw.tween_property(_tel, "modulate:a", 0.2, 0.14)
@@ -67,6 +75,9 @@ func cair(atraso: float = -1.0) -> void:
 	if para:
 		para.descarregar_no_chefe()
 		_faisca(Color(0.7, 0.9, 1.0))
+		# Desviado para o para-raios: o raio CAI na mesma, so' que noutro
+		# sitio. Mesmo evento, mais abafado e mais grave -- diz "escapaste".
+		_tocar("raio_cai", -14.0, 0.82)
 		_ocupado = false
 		return
 
@@ -74,6 +85,9 @@ func cair(atraso: float = -1.0) -> void:
 	_bolt.modulate.a = 1.0
 	_area.monitoring = true
 	_abanar(4.0)
+	# ACTIVATION. Prioridade MEDIA: o pool tem 8 vozes e um raio nao pode ser
+	# comido por passos, mas tambem nao pode cortar a morte do jogador.
+	_tocar("raio_cai", -8.0, 1.0, Som.Prioridade.MEDIA)
 	for c in _area.get_overlapping_bodies():
 		if c is Koliani:
 			c.receber_dano(dano, signf(c.global_position.x - global_position.x))
@@ -117,3 +131,11 @@ func _abanar(f: float) -> void:
 	var cam := get_viewport().get_camera_2d()
 	if cam and cam.has_method("bater"):
 		cam.bater(f)
+
+
+## Toca com cooldown por instancia: `automatico = true` repete de `periodo`
+## em `periodo`, e varios raios no mesmo nivel devem poder soar cada um o seu.
+func _tocar(nome: String, db: float, pitch: float,
+		prioridade := Som.Prioridade.NORMAL) -> void:
+	Som.toca_actor(self, nome, db, pitch, 0.05, maxf(0.4, aviso * 0.5),
+		"%s_%d" % [nome, get_instance_id()], prioridade)

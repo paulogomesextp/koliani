@@ -116,6 +116,7 @@ func _process(dt: float) -> void:
 
 func _abrir() -> void:
 	_cd = 0.35
+	Som.toca("menu_painel", -12.0)
 	visible = true
 	get_tree().paused = true
 	# 9H.1: a cama desce e entra a ambiência da pausa. NÃO se pára a música --
@@ -126,6 +127,7 @@ func _abrir() -> void:
 
 func _fechar() -> void:
 	_cd = 0.35
+	Som.toca("menu_painel", -12.0, 0.92)
 	visible = false
 	get_tree().paused = false
 	Musica.pausa(false)
@@ -137,6 +139,7 @@ func _fechar() -> void:
 func _abrir_opcoes() -> void:
 	if _opcoes_inst != null:
 		return
+	Som.toca("menu_painel", -12.0)
 	_opcoes_inst = CENA_OPCOES.instantiate()
 	_opcoes_inst.process_mode = Node.PROCESS_MODE_ALWAYS  # funciona em pausa
 	_opcoes_inst.tree_exited.connect(_ao_fechar_opcoes)
@@ -156,6 +159,7 @@ func _ao_fechar_opcoes() -> void:
 func _abrir_santuario() -> void:
 	if _santuario_inst != null:
 		return
+	Som.toca("menu_painel", -12.0)
 	_santuario_inst = CENA_SANTUARIO.instantiate()
 	_santuario_inst.process_mode = Node.PROCESS_MODE_ALWAYS
 	if _santuario_inst.has_signal("fechado"):

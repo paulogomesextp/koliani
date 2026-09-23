@@ -172,7 +172,7 @@ func _physics_process(dt: float) -> void:
 			_piscar(true)
 			if _t < dt:
 				_x_picada = _x_koliani()
-				Som.toca("chefe_magia", -10.0, 1.2)
+				_som_ataque("chefe_magia", -10.0, 1.2)
 			if _t >= dur_picada_tel * (0.8 if _fase2 else 1.0):
 				_piscar(false)
 				_picada_ativa = true
@@ -186,7 +186,7 @@ func _physics_process(dt: float) -> void:
 			if _t >= dur_picada:
 				_picada_ativa = false
 				_abanar_camera(4.0)
-				Som.toca("chefe_cai", -10.0, 1.0)
+				_som_impacto("esmagar", -11.0, 1.15)
 				_ir(Fase.ATERRADA)
 		# JANELA DE MELEE. No chão, núcleo à mostra, sem dano de contacto e
 		# quieta: é aqui que a luta se ganha, e é longa o suficiente para
@@ -299,7 +299,7 @@ func _ve_koliani() -> bool:
 ## --- ataques ---------------------------------------------------------
 
 func _lancar_maos() -> void:
-	Som.toca("chefe_magia", -8.0, 1.5)
+	_som_ataque("chefe_magia", -8.0, 1.5)
 	_abanar_camera(3.0)
 	var n := 3 if _fase2 else 2
 	var alvo := _x_koliani()
@@ -359,7 +359,7 @@ func _invocar_mao(x: float, atraso: float) -> void:
 
 
 func _largar_clones() -> void:
-	Som.toca("invocar", -8.0, 0.7)
+	_som_ataque("invocar", -8.0, 0.7)
 	var pai := get_parent()
 	if pai == null:
 		return
@@ -384,7 +384,7 @@ func _largar_clones() -> void:
 
 
 func _apagar_plataformas() -> void:
-	Som.toca("grito", -7.0, 0.9)
+	_som_ataque("grito", -7.0, 0.9)
 	_abanar_camera(4.0)
 	var plats := get_tree().get_nodes_in_group("plataformas_flutuantes")
 	var segundos := dur_apaga * (1.4 if _fase2 else 1.0)
@@ -398,7 +398,7 @@ func _apagar_plataformas() -> void:
 
 func _entrar_fase2() -> void:
 	_fase2 = true
-	Som.toca("chefe_cai", -9.0, 0.7)
+	_som_fase("magia")
 	_abanar_camera(6.0)
 	dur_tel *= 0.7
 	dur_exposta *= 0.85
