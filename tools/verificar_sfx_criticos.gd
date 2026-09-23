@@ -20,6 +20,7 @@ func _init() -> void:
 	await _provar_morte_inimigo()
 	await _provar_derrota_chefe()
 	await _provar_morte_koliani()
+	await _provar_respawn()
 	print("SFX CRITICOS FINAL falhas=%d" % _falhas)
 	quit(0 if _falhas == 0 else 1)
 
@@ -94,9 +95,11 @@ func _provar_ui() -> void:
 		"movimento de UI nao disparou uma voz ui_mover")
 	antes = _contador()
 	opcoes.pressed.emit()
-	_verificar(_avanco(antes) == 1 and _ultimo_stream() == "ui_confirm.mp3",
-		"confirmacao de UI nao disparou uma voz ui_confirmar")
-	print("SFX UI mover=1 confirmar=1")
+	var sequencia := _streams_desde(antes)
+	_verificar(_avanco(antes) == 2
+		and sequencia == ["ui_confirm.mp3", "menu_panel.mp3"],
+		"opcoes nao disparou confirmacao seguida do painel: %s" % str(sequencia))
+	print("SFX UI mover=1 confirmar=1 painel=1")
 	cena.queue_free()
 	current_scene = null
 	await process_frame
@@ -116,6 +119,23 @@ func _provar_morte_koliani() -> void:
 	_verificar(_avanco(antes) == 1, "morte da Koliani empilhou dano+morte")
 	_verificar(_ultimo_stream() == "koliani_death.wav", "morte da Koliani usa stream errado")
 	print("SFX MORTE KOLIANI vozes=1 stream=%s" % _ultimo_stream())
+	cena.queue_free()
+	current_scene = null
+	await process_frame
+
+
+func _provar_respawn() -> void:
+	var cena := Node2D.new()
+	root.add_child(cena)
+	current_scene = cena
+	var k = load("res://scenes/actors/Koliani.tscn").instantiate()
+	cena.add_child(k)
+	await process_frame
+	var antes := _contador()
+	k.call("recuperar_no_checkpoint", Vector2(640.0, 360.0))
+	_verificar(_avanco(antes) == 1, "respawn nao disparou exactamente uma voz")
+	_verificar(_ultimo_stream() == "respawn.mp3", "respawn usa stream errado")
+	print("SFX RESPAWN vozes=1 stream=%s" % _ultimo_stream())
 	cena.queue_free()
 	current_scene = null
 	await process_frame
@@ -172,6 +192,23 @@ func _ultimo_stream() -> String:
 	var pool: Array = _som.get("_pool")
 	var p := pool[i] as AudioStreamPlayer
 	return p.stream.resource_path.get_file() if p and p.stream else ""
+
+
+func _streams_desde(ordem_inicial: int) -> Array[String]:
+	var eventos: Array = []
+	var pool: Array = _som.get("_pool")
+	var ordens: Array = _som.get("_ordem_vozes")
+	for i in pool.size():
+		if int(ordens[i]) <= ordem_inicial:
+			continue
+		var p := pool[i] as AudioStreamPlayer
+		var nome := p.stream.resource_path.get_file() if p and p.stream else ""
+		eventos.append([int(ordens[i]), nome])
+	eventos.sort_custom(func(a: Array, b: Array) -> bool: return int(a[0]) < int(b[0]))
+	var nomes: Array[String] = []
+	for evento: Array in eventos:
+		nomes.append(String(evento[1]))
+	return nomes
 
 
 func _verificar(ok: bool, mensagem: String) -> void:

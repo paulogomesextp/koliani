@@ -83,6 +83,12 @@ selecionados ficam em `incoming_sfx/` (fora do export) e cópias sem edição em
 `assets/audio/approved/sfx/`. O harness `test_approved_progression_sfx.tscn`
 confirma o SHA-256 de cada asset e o mapping do catálogo runtime.
 
+Ainda em 23-09-2026 foram entregues separadamente os dois ficheiros que
+faltavam: `game-respawn-153317` como `respawn.mp3` e
+`ui-menu-slide-in-516940` como `menu_panel.mp3`. Godot 4.7.2 importou ambos
+como `AudioStreamMP3`; o harness crítico prova os callsites reais de respawn e
+de abertura do painel de opções.
+
 | EVENT | STATUS | LOCAL ASSET | SOURCE / REFERENCE |
 | --- | --- | --- | --- |
 | Chest open / reward | APPROVED_EXACT | `approved/sfx/chest_coin_drop.mp3`; `BauChefe` dispara exatamente uma voz | [Coin Drop](https://pixabay.com/sound-effects/film-special-effects-coin-drop-229314/) |
@@ -95,16 +101,16 @@ confirma o SHA-256 de cada asset e o mapping do catálogo runtime.
 | Unlock door | APPROVED_EXACT | `approved/sfx/unlock_door.mp3`; `PortaTrancada` → `portao_abre` | [Unlock the Door 2](https://pixabay.com/sound-effects/household-unlock-the-door-2-99745/) |
 | Heal | WRONG_MAPPING | `approved/sfx/heal_magic.mp3` está no catálogo como `curar`, mas o jogo não tem callsite de cura do jogador | [Healing Magic 2](https://pixabay.com/sound-effects/film-special-effects-healing-magic-2-378663/) |
 | Save / autosave | WRONG_MAPPING | `approved/sfx/save_success.mp3` está no catálogo como `guardar`; não é disparado porque saves também ocorrem durante morte e empilhava sobre o SFX aprovado de morte | [UI Success Chime](https://pixabay.com/sound-effects/technology-ui-success-chime-513565/) |
-| Respawn | MISSING_APPROVED_SOURCE | — | [Game Respawn](https://pixabay.com/sound-effects/film-special-effects-game-respawn-153317/) |
-| Menu / panel open-close | MISSING_APPROVED_SOURCE | — | [UI Menu Slide In](https://pixabay.com/sound-effects/film-special-effects-ui-menu-slide-in-516940/) |
+| Respawn | APPROVED_EXACT | `approved/sfx/respawn.mp3`; `Koliani.recuperar_no_checkpoint()` dispara exatamente uma voz | [Game Respawn](https://pixabay.com/sound-effects/film-special-effects-game-respawn-153317/) |
+| Menu / panel open-close | APPROVED_EXACT | `approved/sfx/menu_panel.mp3`; menus inicial, opções e pausa usam `menu_painel` | [UI Menu Slide In](https://pixabay.com/sound-effects/film-special-effects-ui-menu-slide-in-516940/) |
 | UI confirm | APPROVED_EXACT | `approved/sfx/ui_confirm.mp3` | [Interface Click 2](https://pixabay.com/sound-effects/app-interface-click-2-476372/) |
 | UI hover | APPROVED_EXACT | `approved/sfx/ui_hover.mp3`; variantes antigas desativadas | [Minimalist Button Hover](https://pixabay.com/sound-effects/film-special-effects-minimalist-button-hover-sound-effect-399749/) |
 | UI back / cancel | APPROVED_EXACT | `approved/sfx/ui_back.mp3` | [UI Button Cancel](https://pixabay.com/sound-effects/ui-button-sound-cancel-back-exit-continue-467877/) |
 | UI error | APPROVED_EXACT | `approved/sfx/ui_error.mp3` | [Error Notification 05](https://pixabay.com/sound-effects/film-special-effects-error-notification-05-199276/) |
 
 Os três `WRONG_MAPPING` acima significam “fonte aprovada presente, sem evento
-runtime inequívoco”; não se inventou um callsite. Permanecem dois downloads
-manuais. O trace `--audio-qa` mostra os caminhos reais apenas em QA.
+runtime inequívoco”; não se inventou um callsite. Não permanecem downloads
+manuais deste lote. O trace `--audio-qa` mostra os caminhos reais apenas em QA.
 
 ### SFX principais da Koliani — síntese original
 

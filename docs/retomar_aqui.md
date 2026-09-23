@@ -1,17 +1,28 @@
-## SFX aprovados recebidos — integração parcial (23 set 2026)
+## Final audio polish — fecho técnico (23 set 2026)
 
-O Paulo colocou 17 MP3 em `C:\Projetos\koliani-sfx\incoming_sfx`: 14 conteúdos
-distintos e três duplicados. Os 14 foram validados, preservados em
-`incoming_sfx/` e copiados sem edição para `assets/audio/approved/sfx/`.
-Onze eventos reais usam agora o asset exato: baú/recompensa (uma única voz),
-fim de nível, checkpoint, portal, ability unlock, pickup normal, unlock door e
-as quatro vozes UI. Rare pickup, heal e save têm fonte e catálogo, mas não um
-callsite inequívoco; ligar save global empilhava sobre a morte da Koliani e foi
-rejeitado pelo harness. Faltam os downloads 153317 (respawn) e 516940
-(menu/panel). Detalhe, URLs e estados no manifesto aprovado.
+Os 14 conteúdos SFX distintos do lote anterior mantêm-se sem substituições.
+Os dois downloads finais foram acrescentados sem edição: `game-respawn-153317`
+como `approved/sfx/respawn.mp3` e `ui-menu-slide-in-516940` como
+`approved/sfx/menu_panel.mp3`. Godot 4.7.2 importou ambos como
+`AudioStreamMP3`; SHA-256, duração positiva, catálogo e ficheiros importados
+foram validados. O harness crítico prova uma voz `respawn.mp3` em
+`Koliani.recuperar_no_checkpoint()` e a sequência `ui_confirm.mp3` seguida de
+`menu_panel.mp3` ao abrir as opções.
 
-Próximo: obter os dois MP3 em falta e decidir os três eventos sem callsite;
-depois executar suite, escuta humana, builds Windows e Web/PWA do mesmo commit.
+Os seis harnesses dirigidos (`approved_progression_sfx`, música pendente,
+vertical slice, visibilidade de actores, crystal sync e mob dormancy) passaram
+com zero falhas. Passaram também Koliani, críticos, chefes, mundo e laços. O
+harness amplo de combate reproduz as 11 falhas antigas já documentadas e não
+foi alterado. A suite geral imprimiu `OK -- todos os testes passaram` em três
+ciclos, mas repetiu por causa do teardown preexistente da Região III com
+`SceneTree` nula; foi interrompida ao atingir o limite de repetição e o save
+real permaneceu intacto.
+
+O chime de save/autosave continua deliberadamente sem callsite porque o save
+durante a morte o sobrepunha ao SFX de morte. Rare pickup e heal continuam sem
+evento runtime inequívoco. Próximo passo: escuta humana da mistura e validação
+em dispositivo/browser real; não reabrir o mapeamento técnico deste lote sem
+nova evidência.
 
 ---
 
