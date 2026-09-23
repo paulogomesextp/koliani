@@ -77,12 +77,10 @@ func _som_do_bau() -> void:
 	var som := get_node_or_null("/root/Som")
 	if som == null or not som.has_method("toca"):
 		return
-	som.call("toca", "bau_abrir", -9.0, 1.0, 0.03)
-	var t := get_tree().create_timer(0.36)
-	t.timeout.connect(func() -> void:
-		if is_instance_valid(self) and som.has_method("toca"):
-			som.call("toca", "recompensa", -7.0, 1.0, 0.01,
-				0.0, "", som.Prioridade.MEDIA))
+	# Coin Drop e' simultaneamente a abertura e a recompensa aprovadas.
+	# Um único evento evita empilhar o antigo acorde de recompensa.
+	som.call("toca", "bau_abrir", -7.0, 1.0, 0.01, 0.0, "",
+		som.Prioridade.MEDIA)
 
 func _mostrar(descricao: String) -> void:
 	var textos := get_node("/root/Textos")

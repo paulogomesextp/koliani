@@ -168,7 +168,6 @@ func _forjar_lamina() -> void:
 	var pai := get_parent()
 	if pai == null:
 		return
-	# "chama" era a forja. O que ela dispara agora é vento.
 	_som_ataque("onda", -8.0, 1.4)
 	var dir := _dir_para_koliani()
 	var lamina := Area2D.new()

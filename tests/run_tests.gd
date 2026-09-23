@@ -3165,14 +3165,14 @@ func teste_9h1_trilha_de_producao() -> void:
 	# encaminhamento: as camas continuam nos buses do 9F
 	_ok(AudioServer.get_bus_index("Music") >= 0, "9H.1: bus Music desapareceu")
 	_ok(AudioServer.get_bus_index("SFX") >= 0, "9H.1: bus SFX desapareceu")
-	# o mapeamento aponta mesmo para as pecas novas DENTRO da Regiao I e
-	# mantem as faixas antigas fora dela
-	_ok(Musica.faixa_de_nivel(0).begins_with(Musica.DIR_PRODUCAO),
-		"9H.1: o nivel 1-1 devia usar a trilha de producao")
+	# A cama principal usa agora as seleções Pixabay aprovadas por região.
+	# As peças originais continuam nas camadas de intensidade e pausa.
+	_ok(Musica.faixa_de_nivel(0) == Musica.REGIAO_01_APROVADA,
+		"9H.1: o nivel 1-1 devia usar Midnight Forest")
 	_ok(not Musica.faixa_de_nivel(19).begins_with(Musica.DIR_PRODUCAO),
 		"9H.1: fora da Regiao I a trilha nova nao se aplica")
-	_ok(Musica.faixa_de_chefe(4).begins_with(Musica.DIR_PRODUCAO),
-		"9H.1: o Coracao Putrefacto devia ter tema proprio")
+	_ok(Musica.faixa_de_chefe(4) == Musica.BOSS_01_APROVADO,
+		"9H.1: o chefe da Regiao I devia usar Gothic Candlelight")
 
 
 ## Os quatro golpes do combo tem TIRAS PROPRIAS. O que isto guarda nao e' a

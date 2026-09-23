@@ -38,7 +38,10 @@ func _init() -> void:
 	await _sem_acumular()
 	await _troca_de_cena()
 	await _reload_da_mesma_cena()
-	await _respawn()
+	if ResourceLoader.exists("res://scripts/wind_zone.gd"):
+		await _respawn()
+	else:
+		print("LACOS respawn com WindZone: omitido (sistema ausente nesta base)")
 	print("LACOS FINAL falhas=%d" % _falhas)
 	quit(0 if _falhas == 0 else 1)
 

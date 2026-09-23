@@ -153,7 +153,7 @@ func _som_passagem(ang: float) -> void:
 	_sinal_anterior = sinal
 	if not cruzou or _som == null or not _som.has_method("toca"):
 		return
-	_som.call("toca", "lamina_passa", -14.0, 1.0, 0.06,
+	_som.call("toca_actor", self, "lamina_passa", -14.0, 1.0, 0.06,
 		maxf(0.25, periodo * 0.35), "lamina_%d" % get_instance_id())
 
 

@@ -130,4 +130,5 @@ func _escolher_idioma(loc: String) -> void:
 
 
 func _fechar() -> void:
+	Som.toca("menu_painel", -12.0, 0.92)
 	queue_free()

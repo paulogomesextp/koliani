@@ -1,3 +1,24 @@
+## Audio final integrado diretamente em master (24 set 2026)
+
+Por decisao do GM, entregas concluidas deixam de ficar apenas em branches de
+trabalho: o estado aprovado deve ser publicado diretamente em `master`. O lote
+final de audio foi transportado seletivamente de `fce155be` para a base atual
+de `master` (`6dda2834`), preservando as alteracoes posteriores da campanha e
+sem importar os 91 commits fora de scope da branch de origem.
+
+- catalogo SFX validado em **110/110**;
+- `respawn.mp3` ligado a `Koliani.recuperar_no_checkpoint()`;
+- `menu_panel.mp3` ligado a menus, Opcoes e pausa, incluindo a sequencia
+  `ui_confirm -> menu_painel` em Opcoes;
+- autosave/save continua deliberadamente sem callsite, para evitar a
+  sobreposicao anteriormente observada com o som de morte;
+- import headless e todos os harnesses dirigidos de audio passaram;
+- a suite geral chegou ao resumo `OK -- todos os testes passaram` e preservou
+  o save real; manteve mensagens de ciclo de vida dos testes da Regiao III,
+  sem falha atribuivel ao lote de audio.
+
+Proximo passo: confirmar o workflow de CI/PWA disparado pelo push de `master`.
+
 ## Publicacao do SFX Overhaul em master para playtest na PWA (21 set 2026) · PUBLICADO
 
 `master` **72ea2477 -> 2fd7bd92 -> dd0e5767** por FAST-FORWARD puro (sem

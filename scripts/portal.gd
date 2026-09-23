@@ -205,7 +205,7 @@ func _ao_entrar(corpo: Node) -> void:
 	alvo._fx(alvo.global_position)
 	# `onda` e' um ataque de chefe e dava ao teleporte a leitura errada.
 	# `transicao` foi desenhado precisamente como sopro de portal.
-	Som.toca("transicao", -10.0, 1.08)
+	Som.toca("portal", -10.0, 1.0, 0.02)
 
 
 ## O ponto onde ela pode MESMO aterrar. Se o destino cru estiver dentro do

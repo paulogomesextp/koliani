@@ -233,7 +233,7 @@ const AURA_ENERGIA := 0.85          # `energy` da LuzAura em repouso
 ## Movimento; estes valores visuais/sonoros ficam juntos para o playtest.
 const ATERRAGEM_SQUASH := [0.0, 0.24, 0.48, 0.78]
 const ATERRAGEM_TREMOR := [0.0, 0.0, 1.4, 2.8]
-const ATERRAGEM_VOLUME := [0.0, -21.0, -15.0, -10.0]
+const ATERRAGEM_VOLUME := [0.0, -8.0, -9.0, -9.0]
 
 @onready var _hitbox: Area2D = $HitboxAtaque
 @onready var _sprite: Node2D = $Sprite
@@ -1144,9 +1144,8 @@ func _sfx_dash() -> void:
 
 
 func _sfx_ativar_escudo() -> void:
-	# Ativacao: o mesmo metal disponivel, mas curto/agudo e discreto. O
-	# impacto confirmado vive em `_ao_bloquear`, mais grave e mais alto.
-	Som.toca("bloqueio", -18.0, 1.28, 0.01, 0.18,
+	# Preparacao energetica propria; o bloqueio tem outro asset e transiente.
+	Som.toca("escudo_ativar", -18.0, 1.0, 0.01, 0.18,
 		"player_shield_activation")
 
 
@@ -1423,7 +1422,7 @@ func _physics_process(dt: float) -> void:
 			_escalando = false
 			_parede_lock = 0.28
 			_mov.saltos_dados = 0  # o salto de parede não gasta o salto do ar
-			Som.toca("salto", -10.0, 1.0, 0.03)
+			Som.toca("koliani_salto", -10.0, 1.0, 0.03)
 		move_and_slide()
 		_mov.velocidade = velocity
 		_estava_no_chao = false
@@ -1460,7 +1459,7 @@ func _physics_process(dt: float) -> void:
 			_mov.saltos_dados = 0
 			_borda = false
 			_borda_lock = 0.25
-			Som.toca("salto", -10.0, 1.0, 0.03)
+			Som.toca("koliani_salto", -10.0, 1.0, 0.03)
 		elif Input.is_action_pressed("mirar_baixo") \
 				or (dir != 0.0 and signf(dir) == -_borda_lado):
 			_borda = false
@@ -1485,7 +1484,7 @@ func _physics_process(dt: float) -> void:
 		_mov.saltos_dados = 0  # o chute de parede não gasta o salto do ar
 		_mov.velocidade = velocity
 		_olha_para = signf(wn.x)
-		Som.toca("salto", -10.0, 1.0, 0.03)
+		Som.toca("koliani_salto", -10.0, 1.0, 0.03)
 		move_and_slide()
 		_mov.velocidade = velocity
 		_estava_no_chao = false
@@ -1598,7 +1597,7 @@ func _physics_process(dt: float) -> void:
 			and _mov.velocidade.y * _sinal_grav > 0.0
 		velocity = _mov.velocidade
 		if _mov.saltos_dados > saltos_antes:
-			Som.toca("salto_duplo" if _mov.saltos_dados >= 2 else "salto",
+			Som.toca("koliani_salto",
 				-10.0, 1.0, 0.03)
 			if _mov.saltos_dados >= 2:
 				_djump_t = 0.45  # mostra a animação do salto duplo
@@ -1663,7 +1662,7 @@ func _physics_process(dt: float) -> void:
 			_abanar(TREMOR_CRIT if crit_stomp else TREMOR_PISAO)
 			_hitstop(HITSTOP_CRIT if crit_stomp else HITSTOP_PISAO)
 			# pisão na carne: pancada surda, sem o silvo da espada
-			Som.toca("acerto", -10.0, 0.88, 0.03)
+			Som.toca("pisao_koliani", -10.0, 0.88, 0.03)
 			_pop_impacto(ep)
 			break
 
@@ -1688,7 +1687,7 @@ func _physics_process(dt: float) -> void:
 			_squash = maxf(_squash, 0.5)
 			_abanar(TREMOR_PISAO)
 			_hitstop(HITSTOP_PISAO)
-			Som.toca("acerto", -10.0, 1.0, 0.04)
+			Som.toca("pisao_koliani", -10.0, 1.0, 0.04)
 			_pop_impacto(global_position + Vector2(0.0, 24.0))
 
 	# passo em frente do golpe: empurra SEMPRE para a frente e nunca trava
@@ -1723,7 +1722,8 @@ func _physics_process(dt: float) -> void:
 		_squash = maxf(_squash, squash_tier)
 		if tremor_tier > 0.0:
 			_abanar(tremor_tier)
-		Som.toca("aterrar", volume_tier, 1.0, 0.02, 0.0, "",
+		var som_aterragem: String = ["", "aterrar", "aterrar_medio", "aterrar_pesado"][tier_aterragem]
+		Som.toca(som_aterragem, volume_tier, 1.0, 0.02, 0.0, "",
 			Som.Prioridade.MEDIA if tier_aterragem >= 3 else Som.Prioridade.NORMAL)
 	_estava_no_chao = no_chao
 
@@ -2144,11 +2144,8 @@ func _iniciar_ataque() -> void:
 	_avanco_vel = AVANCO_VEL[i_av] * (1.0 if is_on_floor() else AVANCO_NO_AR)
 	_avanco_dur = AVANCO_DUR[i_av]
 	_avanco_restante = _avanco_dur
-	# CADA golpe do combo tem som proprio (Execution 9H.13). Antes eram dois
-	# samples com `pitch_scale` por cima (`TOM_COMBO`) -- o mesmo golpe quatro
-	# vezes com outro tom, que e' exactamente o que soava a amador. Agora os
-	# quatro crescem em corpo, em sopro e em cauda; o volume tambem sobe, mas
-	# e' o que menos conta. `TOM_COMBO` fica so' como variacao ligeira.
+	# Quatro assets Shadowblade proprios (Prompt 5), com a mesma ressonancia
+	# mas transientes, cortes e envelopes diferentes. `TOM_COMBO` so' colore.
 	var tom: float = TOM_COMBO[clampi(_combo_passo, 0, TOM_COMBO.size() - 1)]
 	var i_som: int = clampi(_combo_passo, 0, SOM_COMBO.size() - 1)
 	Som.toca(SOM_COMBO[i_som], VOL_COMBO[i_som], lerpf(1.0, tom, 0.35), 0.02)
@@ -2349,7 +2346,7 @@ func _ao_acertar_corpo(corpo: Node) -> void:
 		# (só na Região I, e só fora do combate de chefe -- ver `Musica`).
 		Musica.intensificar()
 		if crit:
-			Som.toca("acerto", -6.0, 1.25, 0.04, 0.0, "", Som.Prioridade.MEDIA)
+			Som.toca("acerto_critico", -6.0, 1.0, 0.02, 0.0, "", Som.Prioridade.MEDIA)
 		else:
 			Som.toca("acerto", -8.0, 1.0, 0.04)
 
@@ -2423,7 +2420,7 @@ func _bloqueia(dir_empurrao: float) -> bool:
 func _ao_bloquear() -> void:
 	_invulneravel = maxf(_invulneravel, BLOQUEIO_IFRAMES)
 	_cupula_flash = 1.0
-	Som.toca("bloqueio", -11.0, 0.92, 0.02, 0.12, "player_shield_impact",
+	Som.toca("escudo_impacto", -11.0, 1.0, 0.02, 0.12, "player_shield_impact",
 		Som.Prioridade.MEDIA)
 	_abanar(2.5)
 	if _escudo:
@@ -2559,7 +2556,7 @@ func largar_gancho() -> void:
 	velocity = Movimento.velocidade_ao_largar(_gancho_theta, _gancho_vel, _gancho_comp)
 	_mov.velocidade = velocity
 	_mov.saltos_dados = 1     # ainda lhe sobra o salto do ar
-	Som.toca("salto", -11.0, 1.0, 0.03)
+	Som.toca("koliani_salto", -11.0, 1.0, 0.03)
 
 
 func _passo_gancho(dt: float) -> void:
@@ -2725,7 +2722,8 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0) -> void:
 	else:
 		# Um golpe fatal tem a voz propria de morte; empilhar `dano` no mesmo
 		# frame mascarava esse evento e gastava duas vozes do pool.
-		Som.toca("dano", -7.0, 1.0, 0.02, 0.12, "player_hurt",
+		Som.toca("dano_pesado" if real >= maxi(2, int(_vida_max() * 0.25)) else "dano",
+			-7.0, 1.0, 0.02, 0.12, "player_hurt",
 			Som.Prioridade.MEDIA)
 
 
@@ -2774,6 +2772,7 @@ func _morrer() -> void:
 func recuperar_no_checkpoint(posicao_segura: Vector2) -> void:
 	if _a_morrer or posicao_segura == Vector2.ZERO:
 		return
+	Som.toca("respawn", -9.0, 1.0, 0.01, 0.0, "", Som.Prioridade.MEDIA)
 	global_position = posicao_segura + Vector2(0.0, -ALTURA_SPAWN)
 	# Reaparecer é o teletransporte mais longo do jogo (fogueira do outro lado
 	# do nível). Sem este reset via-se um risco dela a atravessar o mapa.

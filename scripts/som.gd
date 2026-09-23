@@ -1,31 +1,39 @@
 extends Node
 ## Autoload "Som": toca efeitos sonoros por nome, com um pool de vozes
-## para sons sobrepostos. Os SFX em `assets/audio/` são samples CC0 reais
-## (OpenGameArt -- ver `assets/audio/CREDITS.md`); só as camas antigas
-## (`ambiente.wav`, `menu.wav`, `boss.wav`, `assombracao.wav`, `game_over.wav`)
-## continuam sintetizadas por `tools/gerar_audio.py`.
+## para sons sobrepostos. O catalogo mistura samples CC0 creditados e sintese
+## original (Koliani: `tools/gerar_sfx_koliani_signature.py`); ver CREDITS.md.
 ##
 ## Carrega os streams à primeira utilização (não `preload`) para o script
 ## compilar mesmo antes de o Godot importar os ficheiros (fresh checkout / CI).
 
 const CAMINHOS := {
 	"salto": "res://assets/audio/salto.wav",
-	"salto_duplo": "res://assets/audio/salto_duplo.wav",
-	# Execution 9H.13: o combo tem QUATRO sons proprios, que crescem em peso.
-	# Ate' aqui os golpes 2 e 3 eram o `ataque` com `pitch_scale`
-	# diferente -- e um sample repetido com outro tom le-se logo como sample
-	# repetido. Ver `tools/gerar_sfx_9h13.py` (os tres eixos de crescimento).
-	"ataque": "res://assets/audio/ataque.wav",
-	"ataque2": "res://assets/audio/ataque2.wav",
-	"ataque3": "res://assets/audio/ataque3.wav",
-	"lancar": "res://assets/audio/lancar.ogg",
-	"acerto": "res://assets/audio/acerto.wav",
-	"dano": "res://assets/audio/dano.wav",
-	"aterrar": "res://assets/audio/aterrar.wav",
-	"apanhar": "res://assets/audio/apanhar.wav",
+	"koliani_salto": "res://assets/audio/koliani_signature/koliani_jump.wav",
+	"salto_duplo": "res://assets/audio/koliani_signature/koliani_jump.wav",
+	# Prompt 5: quatro vozes originais da mesma familia Shadowblade.
+	"ataque": "res://assets/audio/koliani_signature/shadowblade_swing_1.wav",
+	"ataque2": "res://assets/audio/koliani_signature/shadowblade_swing_2.wav",
+	"ataque3": "res://assets/audio/koliani_signature/shadowblade_swing_3.wav",
+	"lancar": "res://assets/audio/koliani_signature/shadowblade_energy_cast.wav",
+	"energia_impacto": "res://assets/audio/koliani_signature/koliani_energy_hit.wav",
+	"acerto": "res://assets/audio/koliani_signature/shadowblade_hit.wav",
+	"acerto_critico": "res://assets/audio/koliani_signature/shadowblade_critical.wav",
+	"pisao_koliani": "res://assets/audio/koliani_signature/koliani_stomp.wav",
+	"dano": "res://assets/audio/koliani_signature/koliani_hurt.wav",
+	"dano_pesado": "res://assets/audio/koliani_signature/koliani_hurt_heavy.wav",
+	"aterrar": "res://assets/audio/koliani_signature/koliani_land_soft.wav",
+	"aterrar_medio": "res://assets/audio/koliani_signature/koliani_land_medium.wav",
+	"aterrar_pesado": "res://assets/audio/koliani_signature/koliani_land_hard.wav",
+	"apanhar": "res://assets/audio/approved/sfx/pickup_normal.mp3",
+	"apanhar_raro": "res://assets/audio/approved/sfx/pickup_rare.mp3",
+	"curar": "res://assets/audio/approved/sfx/heal_magic.mp3",
+	"guardar": "res://assets/audio/approved/sfx/save_success.mp3",
+	"respawn": "res://assets/audio/approved/sfx/respawn.mp3",
+	"menu_painel": "res://assets/audio/approved/sfx/menu_panel.mp3",
+	"portal": "res://assets/audio/approved/sfx/portal_jump.mp3",
 	"porta": "res://assets/audio/porta.wav",
 	"chefe_cai": "res://assets/audio/chefe_cai.wav",
-	"selo": "res://assets/audio/selo.wav",
+	"selo": "res://assets/audio/approved/sfx/checkpoint_sword_cut.mp3",
 	"projetil": "res://assets/audio/projetil.wav",
 	"investida": "res://assets/audio/investida.wav",
 	"onda": "res://assets/audio/onda.ogg",
@@ -41,18 +49,18 @@ const CAMINHOS := {
 	# codigo do jogo -- o `toca()` sorteia-as sozinho pelo nome base.
 	"ui_mover_v2": "res://assets/audio/ui_mover_v2.wav",
 	"ui_mover_v3": "res://assets/audio/ui_mover_v3.wav",
-	"acerto_v2": "res://assets/audio/acerto_v2.wav",
-	"acerto_v3": "res://assets/audio/acerto_v3.wav",
-	"transicao": "res://assets/audio/transicao.wav",
+	"acerto_v2": "res://assets/audio/koliani_signature/shadowblade_hit_v2.wav",
+	"acerto_v3": "res://assets/audio/koliani_signature/shadowblade_hit_v3.wav",
+	"transicao": "res://assets/audio/approved/sfx/level_complete_soft_landing.mp3",
 	"carrossel": "res://assets/audio/carrossel.wav",
 	# --- vozes de interface (Execution 9H) --------------------------------
 	# O frontend novo pedia um som próprio: o `carrossel` era um clique seco
 	# de interface e destoava do menu de fantasia escura. Sintetizados por
 	# `tools/gerar_audio_9h.py` (sino + sopro, sem licenças).
-	"ui_mover": "res://assets/audio/ui_mover.wav",
-	"ui_confirmar": "res://assets/audio/ui_confirmar.wav",
-	"ui_voltar": "res://assets/audio/ui_voltar.wav",
-	"ui_negado": "res://assets/audio/ui_negado.wav",
+	"ui_mover": "res://assets/audio/approved/sfx/ui_hover.mp3",
+	"ui_confirmar": "res://assets/audio/approved/sfx/ui_confirm.mp3",
+	"ui_voltar": "res://assets/audio/approved/sfx/ui_back.mp3",
+	"ui_negado": "res://assets/audio/approved/sfx/ui_error.mp3",
 	"chefe_magia": "res://assets/audio/chefe_magia.ogg",
 	# sons de habilidade por chefe (2 set 2026)
 	"esmagar": "res://assets/audio/esmagar.ogg",
@@ -71,18 +79,19 @@ const CAMINHOS := {
 	"meteoro": "res://assets/audio/meteoro.wav",
 	"mudar_forma": "res://assets/audio/mudar_forma.wav",
 	"olho_carregar": "res://assets/audio/olho_carregar.wav",
-	# --- a Koliani a mexer-se (4 set 2026) --------------------------------
-	# "Faca um set de sons para a koliani quando faz animacoes, ataques,
-	# etc." -- pedido do Paulo. Construidos por `tools/preparar_sfx.py`.
-	"passo1": "res://assets/audio/passo1.wav",
-	"passo2": "res://assets/audio/passo2.wav",
-	"passo3": "res://assets/audio/passo3.wav",
-	"rolamento": "res://assets/audio/rolamento.wav",
-	"dash": "res://assets/audio/dash.wav",
-	"parede": "res://assets/audio/parede.ogg",
-	"agarrar": "res://assets/audio/agarrar.ogg",
-	"morte_koliani": "res://assets/audio/morte_koliani.wav",
-	"ataque_forte": "res://assets/audio/ataque_forte.wav",
+	# --- Koliani Signature (Prompt 5) --------------------------------------
+	# Sintese original, reconstruivel por `gerar_sfx_koliani_signature.py`.
+	"passo1": "res://assets/audio/koliani_signature/koliani_step_1.wav",
+	"passo2": "res://assets/audio/koliani_signature/koliani_step_2.wav",
+	"passo3": "res://assets/audio/koliani_signature/koliani_step_3.wav",
+	"rolamento": "res://assets/audio/koliani_signature/koliani_roll.wav",
+	"dash": "res://assets/audio/approved/koliani_dash_wind_magic_5.wav",
+	"parede": "res://assets/audio/koliani_signature/koliani_wall.wav",
+	"agarrar": "res://assets/audio/koliani_signature/koliani_grab.wav",
+	"morte_koliani": "res://assets/audio/koliani_signature/koliani_death.wav",
+	"ataque_forte": "res://assets/audio/koliani_signature/shadowblade_finisher.wav",
+	"escudo_ativar": "res://assets/audio/koliani_signature/shadow_shield_on.wav",
+	"escudo_impacto": "res://assets/audio/koliani_signature/shadow_shield_hit.wav",
 	# --- monstros, por ARQUETIPO ------------------------------------------
 	# "Faca com que os mobs facam sons apropriados ao tipo de monstro."
 	# As 19 especies mapeiam-se em sete familias -- ver `demonio_base.gd`.
@@ -116,7 +125,7 @@ const CAMINHOS := {
 	"vento_rajada": "res://assets/audio/vento_rajada.wav",
 	"mecanismo": "res://assets/audio/mecanismo.wav",
 	"mecanismo_ciclo": "res://assets/audio/mecanismo_ciclo.wav",
-	"portao_abre": "res://assets/audio/portao_abre.wav",
+	"portao_abre": "res://assets/audio/approved/sfx/unlock_door.mp3",
 	"portao_fecha": "res://assets/audio/portao_fecha.wav",
 	"sino_mecanismo": "res://assets/audio/sino_mecanismo.wav",
 	"pedra_racha": "res://assets/audio/pedra_racha.wav",
@@ -125,9 +134,9 @@ const CAMINHOS := {
 	"fogo_sopro": "res://assets/audio/fogo_sopro.wav",
 	"raio_aviso": "res://assets/audio/raio_aviso.wav",
 	"raio_cai": "res://assets/audio/raio_cai.wav",
-	"bau_abrir": "res://assets/audio/bau_abrir.wav",
+	"bau_abrir": "res://assets/audio/approved/sfx/chest_coin_drop.mp3",
 	"recompensa": "res://assets/audio/recompensa.wav",
-	"desbloqueio": "res://assets/audio/desbloqueio.wav",
+	"desbloqueio": "res://assets/audio/approved/sfx/ability_unlock_stinger.mp3",
 }
 const VOZES := 8
 enum Prioridade { NORMAL, MEDIA, ALTA }
@@ -206,7 +215,7 @@ func aquecer(nomes: Array) -> void:
 ## repeticao e' metade do que se ouve como "som barato". Sao tres amostras
 ## mesmo diferentes (madeiras/frequencias diferentes), nao a mesma com outro
 ## tom; as variacoes ficam perto o suficiente para a identidade nao mudar.
-const VARIANTES := {"ui_mover": 3, "acerto": 3}
+const VARIANTES := {"acerto": 3}
 var _ultima_variante := {}
 
 
@@ -284,6 +293,8 @@ func toca(nome: String, volume_db := -6.0, pitch := 1.0,
 	if cooldown > 0.0:
 		_cooldowns[chave] = agora + cooldown
 	p.play()
+	if OS.get_cmdline_user_args().has("--audio-qa"):
+		print("[AUDIO_QA] event=%s stream=%s" % [nome, p.stream.resource_path])
 	return true
 
 
@@ -341,6 +352,8 @@ var _lacos := {}            # nome -> AudioStreamPlayer
 ## `null` em GDScript, e com a referencia o guarda de troca de cena nao
 ## disparava justamente no caso que interessa (ver `_process`).
 var _cena_dos_lacos := 0
+var _lacos_actores := {} # chave -> {"nome": String, "actor_id": int}
+const FADE_ACTOR_FORA_ECRA := 0.08
 
 
 ## Poe `nome` a tocar em ciclo, ou so' reajusta o volume se ja' estiver.
@@ -392,6 +405,79 @@ func parar_laco(nome: String, fade := 0.5) -> void:
 func parar_lacos(fade := 0.0) -> void:
 	for nome: String in _lacos.keys():
 		parar_laco(nome, fade)
+	_lacos_actores.clear()
+
+
+## Reproduz um one-shot emitido por um actor do mundo apenas quando a origem
+## está dentro do rectângulo actualmente visível pela Camera2D.
+##
+## A API normal `toca()` mantém-se deliberadamente sem esta regra para música,
+## UI e Koliani. Mobs/actors devem usar esta entrada central.
+func toca_actor(actor: Node2D, nome: String, volume_db := -6.0, pitch := 1.0,
+		variacao_pitch := 0.05, cooldown := 0.0, chave_cooldown := "",
+		prioridade := Prioridade.NORMAL) -> bool:
+	var visivel := actor != null and actor_visivel(actor)
+	# A música/SFX de boss mantém o comportamento histórico da arena. Os
+	# inimigos comuns, incluindo os que herdam DemonioBase, usam a barreira.
+	if actor != null and actor.is_in_group("chefes"):
+		return toca(nome, volume_db, pitch, variacao_pitch, cooldown,
+			chave_cooldown, prioridade)
+	if not visivel:
+		return false
+	return toca(nome, volume_db, pitch, variacao_pitch, cooldown,
+		chave_cooldown, prioridade)
+
+
+## Loop de um actor do mundo. Se a origem sair do viewport, o canal é
+## desvanecido rapidamente e fica livre; chamar novamente quando voltar a
+## estar visível permite retomá-lo sem acoplar a regra aos actors.
+func laco_actor(actor: Node2D, nome: String, volume_db := -24.0,
+		fade := 0.6) -> bool:
+	if not actor_visivel(actor):
+		return false
+	var chave := "%s:%s" % [actor.get_instance_id(), nome]
+	var p := _lacos.get(chave) as AudioStreamPlayer
+	if p != null and is_instance_valid(p):
+		_alvo_volume(p, volume_db, fade)
+		return true
+	if _lacos.size() >= LACOS_MAX:
+		return false
+	var st := _stream(nome)
+	if st == null:
+		return false
+	_marcar_ciclico(st)
+	p = AudioStreamPlayer.new()
+	p.bus = "SFX"
+	p.stream = st
+	p.volume_db = volume_db if fade <= 0.0 else volume_db - 24.0
+	add_child(p)
+	p.play()
+	_lacos[chave] = p
+	_lacos_actores[chave] = {"nome": nome, "actor_id": actor.get_instance_id()}
+	_cena_dos_lacos = _id_da_cena()
+	if fade > 0.0:
+		_alvo_volume(p, volume_db, fade)
+	return true
+
+
+func parar_laco_actor(actor: Node2D, nome: String, fade := 0.08) -> void:
+	var chave := "%s:%s" % [actor.get_instance_id(), nome]
+	_lacos_actores.erase(chave)
+	parar_laco(chave, fade)
+
+
+## Verificação real contra a Camera2D/viewport, sem limiar de distância.
+func actor_visivel(actor: Node2D) -> bool:
+	if actor == null or not is_instance_valid(actor) or not actor.is_inside_tree():
+		return false
+	if not actor.is_visible_in_tree():
+		return false
+	var viewport := actor.get_viewport()
+	if viewport == null:
+		return false
+	var canvas := viewport.get_canvas_transform()
+	var rect := Rect2(Vector2.ZERO, viewport.get_visible_rect().size)
+	return rect.grow(1.0).has_point(canvas * actor.global_position)
 
 
 ## Quantos lacos estao mesmo a tocar. E' o numero que o harness conta.
@@ -437,12 +523,17 @@ func _marcar_ciclico(st: AudioStream) -> void:
 ## do menu -- e a cena seguinte, ao pedir o seu proprio ambiente, batia no
 ## `LACOS_MAX` com canais ocupados por um nivel que ja' nao existe.
 func _process(_dt: float) -> void:
-	if _lacos.is_empty():
-		return
-	var id := _id_da_cena()
-	if id != _cena_dos_lacos:
-		parar_lacos(0.0)
-		_cena_dos_lacos = id
+	if not _lacos.is_empty():
+		var id := _id_da_cena()
+		if id != _cena_dos_lacos:
+			parar_lacos(0.0)
+			_cena_dos_lacos = id
+	for chave: String in _lacos_actores.keys():
+		var info: Dictionary = _lacos_actores.get(chave, {})
+		var actor := instance_from_id(int(info.get("actor_id", 0))) as Node2D
+		if actor == null or not actor_visivel(actor):
+			_lacos_actores.erase(chave)
+			parar_laco(chave, FADE_ACTOR_FORA_ECRA)
 
 
 ## O `instance_id` da cena actual, ou 0 se nao houver nenhuma.
