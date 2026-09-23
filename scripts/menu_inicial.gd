@@ -326,6 +326,7 @@ func _repor_botoes() -> void:
 
 func _abrir_opcoes() -> void:
 	_repor_botoes()
+	Som.toca("menu_painel", -12.0)
 	var o := CENA_OPCOES.instantiate()
 	o.tree_exited.connect(func() -> void:
 		if is_inside_tree():

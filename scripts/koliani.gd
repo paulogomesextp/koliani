@@ -2772,6 +2772,7 @@ func _morrer() -> void:
 func recuperar_no_checkpoint(posicao_segura: Vector2) -> void:
 	if _a_morrer or posicao_segura == Vector2.ZERO:
 		return
+	Som.toca("respawn", -9.0, 1.0, 0.01, 0.0, "", Som.Prioridade.MEDIA)
 	global_position = posicao_segura + Vector2(0.0, -ALTURA_SPAWN)
 	# Reaparecer é o teletransporte mais longo do jogo (fogueira do outro lado
 	# do nível). Sem este reset via-se um risco dela a atravessar o mapa.

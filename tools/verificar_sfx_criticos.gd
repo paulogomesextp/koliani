@@ -51,7 +51,7 @@ func _provar_portal() -> void:
 	var antes := _contador()
 	entrada.call("_ao_entrar", k)
 	_verificar(_avanco(antes) == 1, "portal nao disparou exactamente uma voz")
-	_verificar(_ultimo_stream() == "transicao.wav", "portal nao usa transicao.wav")
+	_verificar(_ultimo_stream() == "portal_jump.mp3", "portal nao usa o asset aprovado")
 	print("SFX PORTAL vozes=1 stream=%s" % _ultimo_stream())
 	cena.queue_free()
 	current_scene = null
@@ -73,7 +73,7 @@ func _provar_checkpoint() -> void:
 	var antes := _contador()
 	checkpoint.call("_ao_entrar", k)
 	_verificar(_avanco(antes) == 1, "checkpoint nao disparou exactamente uma voz")
-	_verificar(_ultimo_stream() == "selo.wav", "checkpoint usa stream errado")
+	_verificar(_ultimo_stream() == "checkpoint_sword_cut.mp3", "checkpoint usa stream errado")
 	print("SFX CHECKPOINT vozes=1 stream=%s" % _ultimo_stream())
 	cena.queue_free()
 	current_scene = null
@@ -90,11 +90,11 @@ func _provar_ui() -> void:
 	var opcoes: Button = menu.get("_botoes").get("opcoes")
 	var antes := _contador()
 	opcoes.focus_entered.emit()
-	_verificar(_avanco(antes) == 1 and _ultimo_stream().begins_with("ui_mover"),
+	_verificar(_avanco(antes) == 1 and _ultimo_stream() == "ui_hover.mp3",
 		"movimento de UI nao disparou uma voz ui_mover")
 	antes = _contador()
 	opcoes.pressed.emit()
-	_verificar(_avanco(antes) == 1 and _ultimo_stream() == "ui_confirmar.wav",
+	_verificar(_avanco(antes) == 1 and _ultimo_stream() == "ui_confirm.mp3",
 		"confirmacao de UI nao disparou uma voz ui_confirmar")
 	print("SFX UI mover=1 confirmar=1")
 	cena.queue_free()

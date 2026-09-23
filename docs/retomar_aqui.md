@@ -1,3 +1,20 @@
+## SFX aprovados recebidos — integração parcial (23 set 2026)
+
+O Paulo colocou 17 MP3 em `C:\Projetos\koliani-sfx\incoming_sfx`: 14 conteúdos
+distintos e três duplicados. Os 14 foram validados, preservados em
+`incoming_sfx/` e copiados sem edição para `assets/audio/approved/sfx/`.
+Onze eventos reais usam agora o asset exato: baú/recompensa (uma única voz),
+fim de nível, checkpoint, portal, ability unlock, pickup normal, unlock door e
+as quatro vozes UI. Rare pickup, heal e save têm fonte e catálogo, mas não um
+callsite inequívoco; ligar save global empilhava sobre a morte da Koliani e foi
+rejeitado pelo harness. Faltam os downloads 153317 (respawn) e 516940
+(menu/panel). Detalhe, URLs e estados no manifesto aprovado.
+
+Próximo: obter os dois MP3 em falta e decidir os três eventos sem callsite;
+depois executar suite, escuta humana, builds Windows e Web/PWA do mesmo commit.
+
+---
+
 ## Auditoria final de áudio aprovado — fontes SFX em falta (22 set 2026)
 
 Branch `codex/final-audio-polish` criada de `codex/final-integration-qa`

@@ -24,10 +24,16 @@ const CAMINHOS := {
 	"aterrar": "res://assets/audio/koliani_signature/koliani_land_soft.wav",
 	"aterrar_medio": "res://assets/audio/koliani_signature/koliani_land_medium.wav",
 	"aterrar_pesado": "res://assets/audio/koliani_signature/koliani_land_hard.wav",
-	"apanhar": "res://assets/audio/apanhar.wav",
+	"apanhar": "res://assets/audio/approved/sfx/pickup_normal.mp3",
+	"apanhar_raro": "res://assets/audio/approved/sfx/pickup_rare.mp3",
+	"curar": "res://assets/audio/approved/sfx/heal_magic.mp3",
+	"guardar": "res://assets/audio/approved/sfx/save_success.mp3",
+	"respawn": "res://assets/audio/approved/sfx/respawn.mp3",
+	"menu_painel": "res://assets/audio/approved/sfx/menu_panel.mp3",
+	"portal": "res://assets/audio/approved/sfx/portal_jump.mp3",
 	"porta": "res://assets/audio/porta.wav",
 	"chefe_cai": "res://assets/audio/chefe_cai.wav",
-	"selo": "res://assets/audio/selo.wav",
+	"selo": "res://assets/audio/approved/sfx/checkpoint_sword_cut.mp3",
 	"projetil": "res://assets/audio/projetil.wav",
 	"investida": "res://assets/audio/investida.wav",
 	"onda": "res://assets/audio/onda.ogg",
@@ -45,16 +51,16 @@ const CAMINHOS := {
 	"ui_mover_v3": "res://assets/audio/ui_mover_v3.wav",
 	"acerto_v2": "res://assets/audio/koliani_signature/shadowblade_hit_v2.wav",
 	"acerto_v3": "res://assets/audio/koliani_signature/shadowblade_hit_v3.wav",
-	"transicao": "res://assets/audio/transicao.wav",
+	"transicao": "res://assets/audio/approved/sfx/level_complete_soft_landing.mp3",
 	"carrossel": "res://assets/audio/carrossel.wav",
 	# --- vozes de interface (Execution 9H) --------------------------------
 	# O frontend novo pedia um som próprio: o `carrossel` era um clique seco
 	# de interface e destoava do menu de fantasia escura. Sintetizados por
 	# `tools/gerar_audio_9h.py` (sino + sopro, sem licenças).
-	"ui_mover": "res://assets/audio/ui_mover.wav",
-	"ui_confirmar": "res://assets/audio/ui_confirmar.wav",
-	"ui_voltar": "res://assets/audio/ui_voltar.wav",
-	"ui_negado": "res://assets/audio/ui_negado.wav",
+	"ui_mover": "res://assets/audio/approved/sfx/ui_hover.mp3",
+	"ui_confirmar": "res://assets/audio/approved/sfx/ui_confirm.mp3",
+	"ui_voltar": "res://assets/audio/approved/sfx/ui_back.mp3",
+	"ui_negado": "res://assets/audio/approved/sfx/ui_error.mp3",
 	"chefe_magia": "res://assets/audio/chefe_magia.ogg",
 	# sons de habilidade por chefe (2 set 2026)
 	"esmagar": "res://assets/audio/esmagar.ogg",
@@ -119,7 +125,7 @@ const CAMINHOS := {
 	"vento_rajada": "res://assets/audio/vento_rajada.wav",
 	"mecanismo": "res://assets/audio/mecanismo.wav",
 	"mecanismo_ciclo": "res://assets/audio/mecanismo_ciclo.wav",
-	"portao_abre": "res://assets/audio/portao_abre.wav",
+	"portao_abre": "res://assets/audio/approved/sfx/unlock_door.mp3",
 	"portao_fecha": "res://assets/audio/portao_fecha.wav",
 	"sino_mecanismo": "res://assets/audio/sino_mecanismo.wav",
 	"pedra_racha": "res://assets/audio/pedra_racha.wav",
@@ -128,9 +134,9 @@ const CAMINHOS := {
 	"fogo_sopro": "res://assets/audio/fogo_sopro.wav",
 	"raio_aviso": "res://assets/audio/raio_aviso.wav",
 	"raio_cai": "res://assets/audio/raio_cai.wav",
-	"bau_abrir": "res://assets/audio/bau_abrir.wav",
+	"bau_abrir": "res://assets/audio/approved/sfx/chest_coin_drop.mp3",
 	"recompensa": "res://assets/audio/recompensa.wav",
-	"desbloqueio": "res://assets/audio/desbloqueio.wav",
+	"desbloqueio": "res://assets/audio/approved/sfx/ability_unlock_stinger.mp3",
 }
 const VOZES := 8
 enum Prioridade { NORMAL, MEDIA, ALTA }
@@ -209,7 +215,7 @@ func aquecer(nomes: Array) -> void:
 ## repeticao e' metade do que se ouve como "som barato". Sao tres amostras
 ## mesmo diferentes (madeiras/frequencias diferentes), nao a mesma com outro
 ## tom; as variacoes ficam perto o suficiente para a identidade nao mudar.
-const VARIANTES := {"ui_mover": 3, "acerto": 3}
+const VARIANTES := {"acerto": 3}
 var _ultima_variante := {}
 
 

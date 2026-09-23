@@ -74,6 +74,38 @@ também usa hoje `transicao.wav`, pelo que o log do evento tem de ser associado
 ao momento e ao callsite. Estes dois WAV continuam antigos até serem obtidos
 os ficheiros aprovados; este percurso valida o diagnóstico, não o aprova.
 
+## Aquisição manual entregue pelo Paulo — 23-09-2026
+
+Foram recebidos 17 MP3 em `C:\Projetos\koliani-sfx\incoming_sfx`: 14 conteúdos
+distintos, três cópias de Coin Drop e duas de Soft Landing. `ffprobe` confirmou
+codec MP3, duração positiva, 2 canais e taxas de 24–48 kHz. Os 14 originais
+selecionados ficam em `incoming_sfx/` (fora do export) e cópias sem edição em
+`assets/audio/approved/sfx/`. O harness `test_approved_progression_sfx.tscn`
+confirma o SHA-256 de cada asset e o mapping do catálogo runtime.
+
+| EVENT | STATUS | LOCAL ASSET | SOURCE / REFERENCE |
+| --- | --- | --- | --- |
+| Chest open / reward | APPROVED_EXACT | `approved/sfx/chest_coin_drop.mp3`; `BauChefe` dispara exatamente uma voz | [Coin Drop](https://pixabay.com/sound-effects/film-special-effects-coin-drop-229314/) |
+| Level complete | APPROVED_EXACT | `approved/sfx/level_complete_soft_landing.mp3`; `Porta._concluir()` → `transicao` | [Soft Landing Intro Modern Stereo](https://pixabay.com/sound-effects/film-special-effects-soft-landing-intro-modern-stereo-332450/) |
+| Checkpoint | APPROVED_EXACT | `approved/sfx/checkpoint_sword_cut.mp3`; `Checkpoint` → `selo` | [Fantasy Game Sword Cut 2](https://pixabay.com/sound-effects/film-special-effects-fantasy-game-sword-cut-sound-effect-2-get-more-on-my-patreon-339823/) |
+| Portal | APPROVED_EXACT | `approved/sfx/portal_jump.mp3`; evento próprio `portal` | [Sci-Fi Portal Jump 04](https://pixabay.com/sound-effects/film-special-effects-sci-fi-portal-jump-04-416161/) |
+| Ability unlock | APPROVED_EXACT | `approved/sfx/ability_unlock_stinger.mp3` | [Unlock Stinger](https://pixabay.com/sound-effects/film-special-effects-unlock-stinger-289722/) |
+| Normal pickup | APPROVED_EXACT | `approved/sfx/pickup_normal.mp3` | [Item Pickup 1](https://pixabay.com/sound-effects/film-special-effects-item-pickup-1-540174/) |
+| Rare pickup | WRONG_MAPPING | `approved/sfx/pickup_rare.mp3` está no catálogo como `apanhar_raro`, mas não existe callsite raro inequívoco | [Coin Collect 1](https://pixabay.com/sound-effects/film-special-effects-coin-collect-1-540179/) |
+| Unlock door | APPROVED_EXACT | `approved/sfx/unlock_door.mp3`; `PortaTrancada` → `portao_abre` | [Unlock the Door 2](https://pixabay.com/sound-effects/household-unlock-the-door-2-99745/) |
+| Heal | WRONG_MAPPING | `approved/sfx/heal_magic.mp3` está no catálogo como `curar`, mas o jogo não tem callsite de cura do jogador | [Healing Magic 2](https://pixabay.com/sound-effects/film-special-effects-healing-magic-2-378663/) |
+| Save / autosave | WRONG_MAPPING | `approved/sfx/save_success.mp3` está no catálogo como `guardar`; não é disparado porque saves também ocorrem durante morte e empilhava sobre o SFX aprovado de morte | [UI Success Chime](https://pixabay.com/sound-effects/technology-ui-success-chime-513565/) |
+| Respawn | MISSING_APPROVED_SOURCE | — | [Game Respawn](https://pixabay.com/sound-effects/film-special-effects-game-respawn-153317/) |
+| Menu / panel open-close | MISSING_APPROVED_SOURCE | — | [UI Menu Slide In](https://pixabay.com/sound-effects/film-special-effects-ui-menu-slide-in-516940/) |
+| UI confirm | APPROVED_EXACT | `approved/sfx/ui_confirm.mp3` | [Interface Click 2](https://pixabay.com/sound-effects/app-interface-click-2-476372/) |
+| UI hover | APPROVED_EXACT | `approved/sfx/ui_hover.mp3`; variantes antigas desativadas | [Minimalist Button Hover](https://pixabay.com/sound-effects/film-special-effects-minimalist-button-hover-sound-effect-399749/) |
+| UI back / cancel | APPROVED_EXACT | `approved/sfx/ui_back.mp3` | [UI Button Cancel](https://pixabay.com/sound-effects/ui-button-sound-cancel-back-exit-continue-467877/) |
+| UI error | APPROVED_EXACT | `approved/sfx/ui_error.mp3` | [Error Notification 05](https://pixabay.com/sound-effects/film-special-effects-error-notification-05-199276/) |
+
+Os três `WRONG_MAPPING` acima significam “fonte aprovada presente, sem evento
+runtime inequívoco”; não se inventou um callsite. Permanecem dois downloads
+manuais. O trace `--audio-qa` mostra os caminhos reais apenas em QA.
+
 ### SFX principais da Koliani — síntese original
 
 Os SFX `koliani_hurt`, `koliani_death`, `koliani_jump`, `koliani_double_jump`,

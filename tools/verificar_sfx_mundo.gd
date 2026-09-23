@@ -56,7 +56,8 @@ func _catalogo() -> void:
 		"vento_ciclo", "vento_rajada", "mecanismo", "mecanismo_ciclo",
 		"portao_abre", "portao_fecha", "sino_mecanismo", "pedra_racha",
 		"pedra_parte", "lamina_passa", "fogo_sopro", "raio_aviso",
-		"raio_cai", "bau_abrir", "recompensa", "desbloqueio"]
+		"raio_cai", "bau_abrir", "recompensa", "desbloqueio", "portal",
+		"apanhar_raro", "curar", "guardar"]
 	var ausentes: Array[String] = []
 	for n in novos:
 		if _som.call("_stream", n) == null:
@@ -167,7 +168,7 @@ func _mecanismo_portao() -> void:
 	var antes := _contador()
 	portao.call("_definir_aberta", true)
 	_checar(_avanco(antes) == 1, "abrir o portao nao deu uma voz")
-	_checar(_ultimo_stream() == "portao_abre.wav",
+	_checar(_ultimo_stream() == "unlock_door.mp3",
 		"o portao a abrir usa stream errado: " + _ultimo_stream())
 	portao.call("_definir_aberta", false)
 	_checar(_avanco(antes) == 2, "fechar o portao nao deu uma voz")
@@ -298,7 +299,7 @@ func _checkpoint() -> void:
 	var antes := _contador()
 	checkpoint.call("_ao_entrar", k)
 	_checar(_avanco(antes) == 1, "o checkpoint deixou de disparar uma so' voz")
-	_checar(_ultimo_stream() == "selo.wav", "o checkpoint perdeu o selo")
+	_checar(_ultimo_stream() == "checkpoint_sword_cut.mp3", "o checkpoint perdeu o aprovado")
 	checkpoint.call("_ao_entrar", k)
 	_checar(_avanco(antes) == 1, "o checkpoint disparou duas vezes")
 	print("SFX CHECKPOINT (Prompt 1) stream=%s vozes=%d repetido=0" % [
@@ -317,14 +318,12 @@ func _bau() -> void:
 	var antes := _contador()
 	bau.call("_abrir")
 	_checar(_avanco(antes) == 1, "o bau nao deu o som de ABRIR")
-	_checar(_ultimo_stream() == "bau_abrir.wav",
+	_checar(_ultimo_stream() == "chest_coin_drop.mp3",
 		"o bau ainda depende do pickup generico: " + _ultimo_stream())
 	_checar(_ultimo_stream() != "apanhar.wav", "bau == essencia do chao")
 	await create_timer(0.55).timeout
-	_checar(_avanco(antes) == 2, "o premio do bau nao chegou a soar")
-	_checar(_ultimo_stream() == "recompensa.wav",
-		"o premio do bau usa stream errado: " + _ultimo_stream())
-	print("SFX BAU vozes=%d ultimo=%s atraso=0.36s" % [
+	_checar(_avanco(antes) == 1, "o bau empilhou mais de um evento")
+	print("SFX BAU vozes=%d ultimo=%s" % [
 		_avanco(antes), _ultimo_stream()])
 	await _fechar(cena)
 
@@ -337,7 +336,7 @@ func _pickup() -> void:
 	var antes := _contador()
 	ess.call("_apanhar")
 	_checar(_avanco(antes) == 1, "a essencia nao soou")
-	_checar(_ultimo_stream() == "apanhar.wav",
+	_checar(_ultimo_stream() == "pickup_normal.mp3",
 		"a essencia deixou de usar o pickup comum: " + _ultimo_stream())
 	print("SFX PICKUP comum=apanhar.wav (bau e desbloqueio tem os seus)")
 	await _fechar(cena)
@@ -357,7 +356,7 @@ func _desbloqueio() -> void:
 	var antes := _contador()
 	col.call("_ao_entrar", k)
 	_checar(_avanco(antes) == 1, "ganhar a habilidade nao deu exactamente uma voz")
-	_checar(_ultimo_stream() == "desbloqueio.wav",
+	_checar(_ultimo_stream() == "ability_unlock_stinger.mp3",
 		"o desbloqueio usa stream errado: " + _ultimo_stream())
 	# Fase 9: nunca a morte nem a vitoria do chefe
 	_checar(_ultimo_stream() != "chefe_cai.wav", "unlock == morte do chefe")

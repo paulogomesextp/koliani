@@ -94,3 +94,5 @@ tools/_bot.gd.uid
 assets/audio/incoming/**
 # MP3 originais do manifesto final; os assets aprovados estão em assets/audio/music/.
 incoming_music/**
+# MP3 originais dos SFX aprovados; as cópias runtime estão em assets/audio/approved/sfx/.
+incoming_sfx/**
