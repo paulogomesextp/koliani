@@ -4003,14 +4003,19 @@ func teste_r3_vyrak_leva_dano_muda_de_fase_e_morre() -> void:
 
 	# E tem de morrer -- um chefe que nao morre e' um softlock.
 	seguranca = 0
-	while int(chefe.get("vida")) > 0 and seguranca < 400:
+	while is_instance_valid(chefe) and int(chefe.get("vida")) > 0 and seguranca < 400:
 		chefe.call("receber_dano", 40, 1.0)
 		seguranca += 1
 	await get_tree().physics_frame
-	_ok(int(chefe.get("vida")) <= 0,
+	# O golpe fatal faz `receber_dano()` chamar `queue_free()` a si proprio
+	# (chefe_base.gd, sem `falas_fim`) -- por isso o `chefe` pode ficar
+	# invalido logo a seguir ao golpe, antes deste `await`. Instancia
+	# invalida E' a prova de morte; so' se le `vida` se ainda existir.
+	_ok(not is_instance_valid(chefe) or int(chefe.get("vida")) <= 0,
 		"R3: o Vyrak nao morreu ao fim de %d golpes" % seguranca)
-	chefe.queue_free()
-	await get_tree().process_frame
+	if is_instance_valid(chefe):
+		chefe.queue_free()
+		await get_tree().process_frame
 
 
 func teste_r3_bestiario_canonico() -> void:
