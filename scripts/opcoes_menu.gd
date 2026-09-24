@@ -66,15 +66,34 @@ func _ready() -> void:
 		_grelha.get_parent().move_child(_layout, _voltar.get_index())
 
 	_voltar.pressed.connect(_fechar)
-	# Execution 9F: kit de produção -- painel de ouro, botões da prancha 09,
-	# cursores na calha de energia; o idioma ativo fica "premido" (ouro).
-	UIProducao.vestir_ecra(self)
-	UIProducao.titulo(_titulo, 30)
-	UIProducao.seccao(_lbl_som)
-	UIProducao.seccao(_lbl_idioma)
+	# Mesma linguagem do menu principal e da Pausa (kit 9H: carmesim sobre
+	# carvão); o idioma ativo fica "premido" (carmesim).
+	Frontend9H.vestir(self)
+	($Painel as PanelContainer).add_theme_stylebox_override(
+		"panel", Frontend9H.painel_liso())
+	Frontend9H.cabecalho(_titulo, 32)
+	Frontend9H.capitular(_lbl_som, 15, Frontend9H.CARMESIM_CLARO)
+	Frontend9H.capitular(_lbl_idioma, 15, Frontend9H.CARMESIM_CLARO)
+	_lbl_som.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	_lbl_idioma.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	Frontend9H.corpo(_lbl_musica, 17)
+	Frontend9H.corpo(_lbl_efeitos, 17)
+	for s: String in ["Sep1", "Sep2"]:
+		var velho: Node = $Painel/Coluna.get_node(s)
+		var sep := Frontend9H.separador()
+		sep.custom_minimum_size = Vector2(0, 12)
+		sep.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		$Painel/Coluna.add_child(sep)
+		$Painel/Coluna.move_child(sep, velho.get_index())
+		velho.queue_free()
+	# botões pequenos: caixa lisa carmesim (a placa em losango parte-se em
+	# botões estreitos -- ver `Frontend9H.botao_placa`)
+	Frontend9H.botao_placa(_voltar, 22)
+	if _layout:
+		Frontend9H.botao_placa(_layout, 17)
 	for b: Button in _botoes_idioma.values():
 		b.toggle_mode = true
-		b.add_theme_font_size_override("font_size", 15)
+		Frontend9H.botao_placa(b, 16)
 	Textos.idioma_mudou.connect(func(_l: String) -> void: _traduzir())
 	_traduzir()
 	_preparar_hover_animado()

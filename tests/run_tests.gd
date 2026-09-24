@@ -1089,7 +1089,10 @@ func teste_9f_ui_producao() -> void:
 		for b in no.find_children("*", "Button", true, false):
 			var bt := b as Button
 			var st := bt.get_theme_stylebox("normal")
-			var vestido: bool = st is StyleBoxTexture or (
+			# `Frontend9H.botao_placa`: caixa lisa carmesim (fio vermelho)
+			var carmesim: bool = st is StyleBoxFlat and \
+				(st as StyleBoxFlat).border_color.r > (st as StyleBoxFlat).border_color.b * 3.0
+			var vestido: bool = st is StyleBoxTexture or carmesim or (
 				st is StyleBoxEmpty and bt.get_theme_stylebox("hover") is StyleBoxTexture)
 			_ok(vestido, "9F: %s -> botao '%s' ainda com estilo legado" % [cena.get_file(), b.name])
 		no.queue_free()
