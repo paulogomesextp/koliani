@@ -34,6 +34,12 @@ var _chama: CPUParticles2D
 var _brasas: CPUParticles2D
 var _nucleo: Polygon2D
 var _luz: PointLight2D
+## Rootbound Frame (Loja): visual alternativo; {} = fogueira original.
+var _rb: Dictionary = {}
+var _rb_brilho: Sprite2D
+var _rb_esporos: CPUParticles2D
+var _rb_fagulhas: CPUParticles2D
+var _nucleo_k := Vector2.ONE
 ## 9G: brilho de "pronta a usar" enquanto a fogueira está apagada.
 var _pronta9g: AnimatedSprite2D
 const Vfx9G := preload("res://scripts/vfx_regiao1.gd")
@@ -236,7 +242,87 @@ func _montar_visual() -> void:
 	_luz.scale = Vector2(0.9, 0.9)
 	_base.add_child(_luz)
 
+	_montar_rootbound()
+
 	# O toast traduzido do HUD confirma a ativação; sem rótulo world-space redundante.
+
+
+## Cosmético "Rootbound Frame": raízes e fungos à volta da base, brilho fúngico
+## FRACO enquanto apagada (e esporos lentos a subir), e ao acender uma chama
+## maior, com miolo bile e fagulhas púrpura. Só aparência: a ativação, o
+## respawn e a colisão não passam por aqui.
+func _montar_rootbound() -> void:
+	_rb = CosmeticosVisuais.checkpoint_visual()
+	if _rb.is_empty():
+		return
+	var base := Sprite2D.new()
+	base.name = "RootboundBase"
+	base.texture = _rb["base"]
+	base.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	base.position = Vector2(0.0, 12.0)
+	_base.add_child(base)
+	var cog := Sprite2D.new()
+	cog.name = "RootboundCogumelos"
+	cog.texture = _rb["cogumelos"]
+	cog.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	cog.position = Vector2(0.0, 15.0)
+	_base.add_child(cog)
+	# apagada: halo fúngico fraco a pulsar (valor baixo, forma pequena)
+	_rb_brilho = Sprite2D.new()
+	_rb_brilho.name = "RootboundBrilho"
+	_rb_brilho.texture = _rb["brilho"]
+	_rb_brilho.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	_rb_brilho.position = cog.position
+	_rb_brilho.modulate.a = 0.35
+	_base.add_child(_rb_brilho)
+	var pulso := _rb_brilho.create_tween().set_loops()
+	pulso.tween_property(_rb_brilho, "modulate:a", 0.75, 1.3)
+	pulso.tween_property(_rb_brilho, "modulate:a", 0.25, 1.3)
+	_rb_esporos = _particulas_rb(3, 2.8, Color("B8C24A", 0.55), 1.5, Vector2(0.0, -6.0), 8.0)
+	_rb_esporos.position = Vector2(0.0, 8.0)
+	_rb_esporos.emitting = true
+	# acesa: a mesma chama, maior e bile; fagulhas púrpura discretas
+	_chama.color_ramp.colors = _rb["chama"]
+	_nucleo.color = _rb["nucleo"]
+	_luz.color = _rb["luz"]
+	_rb_fagulhas = _particulas_rb(5, 1.2, Color(_rb["fagulhas"], 0.9), 1.6, Vector2(0.0, -34.0), 20.0)
+	_rb_fagulhas.position = Vector2(0.0, 2.0)
+	_rb_fagulhas.emitting = false
+
+
+func _particulas_rb(qtd: int, vida: float, cor: Color, tam: float, grav: Vector2, vel: float) -> CPUParticles2D:
+	var p := CPUParticles2D.new()
+	p.amount = qtd
+	p.lifetime = vida
+	p.local_coords = false
+	p.direction = Vector2(0, -1)
+	p.spread = 40.0
+	p.gravity = grav
+	p.initial_velocity_min = vel * 0.4
+	p.initial_velocity_max = vel
+	p.scale_amount_min = tam
+	p.scale_amount_max = tam * 1.4
+	p.color = cor
+	p.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	_base.add_child(p)
+	return p
+
+
+## Ao acender: mais alta e mais larga que a original (o estado lê-se por
+## forma e intensidade, não só por cor), esporos fora, fagulhas dentro.
+func _rootbound_acender() -> void:
+	if _rb.is_empty():
+		return
+	if _rb_brilho:
+		_rb_brilho.visible = false
+	if _rb_esporos:
+		_rb_esporos.emitting = false
+	if _rb_fagulhas:
+		_rb_fagulhas.emitting = true
+	_chama.amount = 34
+	_chama.scale_amount_max = 8.0
+	_chama.initial_velocity_max = 80.0
+	_nucleo_k = Vector2(1.35, 1.5)
 
 
 ## A fogueira tem de assentar no CHÃO, não ficar a pairar: o nó do
@@ -290,7 +376,7 @@ func _process(dt: float) -> void:
 	if _luz:
 		_luz.energy = 1.25 + bruxuleio
 	if _nucleo:
-		_nucleo.scale = Vector2(1.0 + bruxuleio * 0.5, 1.0 + bruxuleio * 0.9)
+		_nucleo.scale = Vector2(1.0 + bruxuleio * 0.5, 1.0 + bruxuleio * 0.9) * _nucleo_k
 		_nucleo.modulate.a = 0.8 + bruxuleio
 
 
@@ -309,6 +395,7 @@ func _ao_entrar(corpo: Node) -> void:
 
 func _ativar(instantaneo: bool) -> void:
 	_ativo = true
+	_rootbound_acender()
 	# 9G: o mesmo brilho de "interagir" da prancha 07 -- apagado, a fogueira
 	# pisca baixinho a dizer que dá para usar; ao acender, dá um estalo. Nada
 	# disto mexe no checkpoint em si (já foi registado no EstadoJogo).

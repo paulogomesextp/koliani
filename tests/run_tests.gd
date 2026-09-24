@@ -152,6 +152,7 @@ func _correr_tudo() -> void:
 	teste_loja_i18n()
 	teste_loja_cosmeticos_visuais()
 	teste_loja_colecao_regiao_i()
+	teste_rootbound_frame()
 
 	# --- Região III -- Torre dos Ecos (N11-N15) -----------------------
 	teste_r3_nomes_canonicos()
@@ -4473,3 +4474,56 @@ func teste_loja_colecao_regiao_i() -> void:
 	_ok(g.dano_ataque() == dano and g.vida_bonus_armadura() == bonus and g.vidas == vidas, "colecao: pack mexeu em stats")
 	for x in [e, a, b, c2, g]:
 		x.free()
+
+
+func teste_rootbound_frame() -> void:
+	const CV := preload("res://scripts/cosmeticos_visuais.gd")
+	const RB := "hud_moldura_raizes"
+	# default continua default (item inicial, sem equipar, id desconhecido, osso)
+	for id in ["", "nao_existe", "hud_moldura_osso", "skin_carmesim"]:
+		_ok(CV.caixa_hud("disco", Vector4(0, 0, 0, 0), [22, 22, 22, 22], id if id != "" else "hud_moldura_osso") == null,
+			"rootbound: '%s' devia deixar o HUD original (disco)" % id)
+		_ok(CV.checkpoint_visual(id if id != "" else "hud_moldura_osso").is_empty(), "rootbound: '%s' devia deixar a fogueira original" % id)
+	_ok(not CV.raizes_equipado("hud_moldura_osso") and CV.raizes_equipado(RB), "rootbound: identificacao do item")
+	# Rootbound aplica os recursos certos, com as margens pedidas (layout intacto)
+	var disco := CV.caixa_hud("disco", Vector4(0, 0, 0, 0), [22, 22, 22, 22], RB)
+	var placa := CV.caixa_hud("placa", Vector4(12, 6, 18, 6), [16, 14, 16, 14], RB)
+	_ok(disco != null and str(disco.texture.resource_path).ends_with("rootbound_frame.png"), "rootbound: disco usa rootbound_frame.png")
+	_ok(placa != null and str(placa.texture.resource_path).ends_with("rootbound_placa.png"), "rootbound: placa usa rootbound_placa.png")
+	_ok(disco.texture_margin_left == 22 and disco.content_margin_left == 0, "rootbound: margens do disco")
+	_ok(placa.content_margin_left == 12 and placa.content_margin_right == 18 and placa.texture_margin_top == 14, "rootbound: margens da placa")
+	var fog := CV.checkpoint_visual(RB)
+	_ok(not fog.is_empty() and fog.has("base") and fog.has("cogumelos") and fog.has("brilho") and fog["chama"].size() == 4,
+		"rootbound: recursos da fogueira")
+	# tamanhos dos assets (contrato do gerador)
+	for par in [["rootbound_frame", 88, 88], ["rootbound_placa", 128, 64], ["base_raizes", 48, 16],
+			["cogumelos", 56, 12], ["cogumelos_brilho", 56, 12], ["preview", 346, 130]]:
+		var t: Texture2D = load(CV.DIR_RAIZES + par[0] + ".png")
+		_ok(t != null and t.get_width() == par[1] and t.get_height() == par[2], "rootbound: asset %s %dx%d" % [par[0], par[1], par[2]])
+	# preview real so' neste item; os outros da colecao continuam ART PENDING
+	_ok(CV.preview_loja(RB) != null and CV.preview_loja("skin_coracao_podre") == null and CV.preview_loja("efeito_rasto_esporos") == null,
+		"rootbound: preview so' no Rootbound")
+	_ok(LojaCatalogo.item(RB)["placeholder"] == false and str(LojaCatalogo.item(RB)["preview"]).ends_with("preview.png"),
+		"rootbound: catalogo sem placeholder")
+	for id in ["skin_coracao_podre", "efeito_rasto_esporos", "pack_coracao_podre"]:
+		_ok(LojaCatalogo.item(id)["placeholder"] == true, "rootbound: %s continua placeholder" % id)
+	# precos/economia intactos
+	_ok(LojaCatalogo.preco(LojaCatalogo.item(RB), "k") == 300 and LojaCatalogo.preco(LojaCatalogo.item(RB), "v") == -1
+		and LojaCatalogo.item(RB)["raridade"] == "raro" and LojaCatalogo.item(RB)["regiao"] == 0, "rootbound: preco/raridade/desbloqueio")
+	# equipar/desequipar/save+load e stats
+	var e := _novo_estado()
+	e.ganhar_kolicoins(1000)
+	for i in 5:
+		e.marcar_nivel_concluido(i)
+	var dano: int = e.dano_ataque()
+	var bonus: Variant = e.vida_bonus_armadura()
+	var vidas: int = e.vidas
+	_ok(e.comprar_item(RB, "k")["ok"] and e.equipar_item(RB) and e.item_equipado(RB), "rootbound: comprar e equipar")
+	var f := _novo_estado()
+	f.de_dicionario(JSON.parse_string(JSON.stringify(e.para_dicionario())))
+	_ok(f.item_equipado(RB), "rootbound: save/load manteve o equipamento")
+	_ok(e.dano_ataque() == dano and e.vida_bonus_armadura() == bonus and e.vidas == vidas, "rootbound: mexeu em stats")
+	e.desequipar_categoria("hud_checkpoint")
+	_ok(e.equipado_na_categoria("hud_checkpoint") == "" and not e.item_equipado(RB), "rootbound: desequipar restaura o default")
+	e.free()
+	f.free()

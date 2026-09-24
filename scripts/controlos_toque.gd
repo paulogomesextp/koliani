@@ -286,8 +286,14 @@ func _montar_disco_arma() -> void:
 	# 9F: ranhura de ouro da prancha 09 (a moldura ornamentada em ponto
 	# pequeno); a cor da arma entra por tinta, como antes pela borda
 	_arma_disco.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
-	_arma_disco.add_theme_stylebox_override("panel", UIProducao.caixa("moldura_ornamentada",
-		Vector4(0, 0, 0, 0), Color.WHITE, [22, 22, 22, 22]))
+	var moldura_rb := CosmeticosVisuais.caixa_hud("disco", Vector4(0, 0, 0, 0), [22, 22, 22, 22])
+	if moldura_rb:
+		# Rootbound Frame (Loja): pixel-art, por isso sem o filtro LINEAR do kit
+		_arma_disco.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		_arma_disco.add_theme_stylebox_override("panel", moldura_rb)
+	else:
+		_arma_disco.add_theme_stylebox_override("panel", UIProducao.caixa("moldura_ornamentada",
+			Vector4(0, 0, 0, 0), Color.WHITE, [22, 22, 22, 22]))
 	_arma_disco.self_modulate = CosmeticosVisuais.tinta_moldura_hud()
 	add_child(_arma_disco)
 
@@ -313,7 +319,7 @@ func _atualizar_disco_arma() -> void:
 	_arma_disco.modulate.a = 1.0
 	var wi := Equipamento.indice_arma(EstadoJogo.arma_equipada)
 	var sb := _arma_disco.get_theme_stylebox("panel") as StyleBoxTexture
-	if sb and wi >= 0:
+	if sb and wi >= 0 and not CosmeticosVisuais.raizes_equipado():
 		sb.modulate_color = Color.WHITE.lerp(Equipamento.cor_arma(wi), 0.35)
 	var nome := Textos.t(Equipamento.arma(EstadoJogo.arma_equipada).get("nome", ""))
 	# iniciais da arma (placeholder até haver ícone pixel)
@@ -614,8 +620,13 @@ func _encher_cabecalho_nivel() -> void:
 	var placa := PanelContainer.new()
 	placa.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	placa.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
-	placa.add_theme_stylebox_override("panel", Frontend9H.caixa("aba_bloqueada",
-		Vector4(12, 6, 18, 6), Color(1, 1, 1, 0.96), [16, 14, 16, 14]))
+	var placa_rb := CosmeticosVisuais.caixa_hud("placa", Vector4(12, 6, 18, 6), [16, 14, 16, 14])
+	if placa_rb:
+		placa.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		placa.add_theme_stylebox_override("panel", placa_rb)
+	else:
+		placa.add_theme_stylebox_override("panel", Frontend9H.caixa("aba_bloqueada",
+			Vector4(12, 6, 18, 6), Color(1, 1, 1, 0.96), [16, 14, 16, 14]))
 	_cab_nivel.add_child(placa)
 
 	var linha := HBoxContainer.new()

@@ -50,3 +50,72 @@ static func tinta_moldura_hud(id := "") -> Color:
 ## Devolve `base` se não houver moldura equipada.
 static func cor_chama_checkpoint(base: Color, id := "") -> Color:
 	return COR_CHAMA_CHECKPOINT.get(id if id != "" else _equipado("hud_checkpoint"), base)
+
+
+## --- Rootbound Frame (hud_moldura_raizes): arte real, não tinta -------------
+## Coleção Relíquias do Coração Podre. Os assets vivem só nesta pasta e os
+## consumidores (HUD, checkpoint, preview) pedem-nos AQUI -- nunca leem o
+## catálogo, a posse ou o save.
+const ID_RAIZES := "hud_moldura_raizes"
+const DIR_RAIZES := "res://assets/ui/shop/heartrot/rootbound_frame/"
+static var _cache_raizes := {}
+
+
+static func _tex_raizes(nome: String) -> Texture2D:
+	if _cache_raizes.has(nome):
+		return _cache_raizes[nome]
+	var cam := DIR_RAIZES + nome + ".png"
+	var t: Texture2D = load(cam) if ResourceLoader.exists(cam) else null
+	_cache_raizes[nome] = t
+	return t
+
+
+static func raizes_equipado(id := "") -> bool:
+	return (id if id != "" else _equipado("hud_checkpoint")) == ID_RAIZES
+
+
+## Nine-patch da moldura para um slot do HUD ("disco" = ranhura da arma,
+## "placa" = placa do nível). null = HUD original, sem tocar em nada.
+static func caixa_hud(slot: String, conteudo: Vector4, margens: Array, id := "") -> StyleBoxTexture:
+	if not raizes_equipado(id):
+		return null
+	var t := _tex_raizes("rootbound_frame" if slot == "disco" else "rootbound_placa")
+	if t == null:
+		return null
+	var sb := StyleBoxTexture.new()
+	sb.texture = t
+	sb.texture_margin_left = margens[0]
+	sb.texture_margin_top = margens[1]
+	sb.texture_margin_right = margens[2]
+	sb.texture_margin_bottom = margens[3]
+	sb.content_margin_left = conteudo.x
+	sb.content_margin_top = conteudo.y
+	sb.content_margin_right = conteudo.z
+	sb.content_margin_bottom = conteudo.w
+	return sb
+
+
+## Visual da fogueira com a Rootbound Frame. {} = fogueira original.
+## chama = rampa de 4 cores (bile no miolo, musgo nas pontas); as fagulhas
+## são púrpura do coração e discretas.
+static func checkpoint_visual(id := "") -> Dictionary:
+	if not raizes_equipado(id):
+		return {}
+	var base := _tex_raizes("base_raizes")
+	var cog := _tex_raizes("cogumelos")
+	var brilho := _tex_raizes("cogumelos_brilho")
+	if base == null or cog == null or brilho == null:
+		return {}
+	return {
+		"base": base, "cogumelos": cog, "brilho": brilho,
+		"chama": PackedColorArray([
+			Color("E8F0A0", 0.95), Color("B8C24A", 0.9), Color("5E7A3A", 0.55), Color("1E1712", 0.0)]),
+		"nucleo": Color("B8C24A", 0.8),
+		"luz": Color("D8E08A"),
+		"fagulhas": Color("9B3FB0"),
+	}
+
+
+## Preview real da Loja para um item ("" = sem arte, fica o placeholder).
+static func preview_loja(id: String) -> Texture2D:
+	return _tex_raizes("preview") if id == ID_RAIZES else null

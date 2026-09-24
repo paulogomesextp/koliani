@@ -28,6 +28,7 @@ var _det_req: Label
 var _det_aviso: Label
 var _det_preview: PanelContainer
 var _det_ph: Label
+var _det_img: TextureRect
 var _btn_k: Button
 var _btn_v: Button
 var _btn_eq: Button
@@ -133,6 +134,14 @@ func _montar() -> void:
 	_det_ph.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	Frontend9H.capitular(_det_ph, 12, Frontend9H.TEXTO_APAGADO)
 	_det_preview.add_child(_det_ph)
+	# preview real (só nos itens com arte final; os outros ficam com o placeholder)
+	_det_img = TextureRect.new()
+	_det_img.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_det_img.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	_det_img.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	_det_img.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_det_img.visible = false
+	_det_preview.add_child(_det_img)
 
 	_det_nome = Label.new()
 	_det_nome.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -342,6 +351,7 @@ func _detalhe() -> void:
 	for b: Button in [_btn_k, _btn_v, _btn_eq]:
 		b.visible = false
 	_det_ph.text = ""
+	_det_img.visible = false
 	_det_raridade.text = ""
 	_det_req.text = ""
 	_det_aviso.text = ""
@@ -357,7 +367,11 @@ func _detalhe() -> void:
 	_det_estado.text = Textos.t("shop.state." + est)
 	_det_raridade.text = "◆ " + Textos.t("shop.rarity." + str(it["raridade"]))
 	_det_raridade.add_theme_color_override("font_color", cor_raridade(str(it["raridade"])))
-	if bool(it["placeholder"]):
+	var arte := CosmeticosVisuais.preview_loja(_sel)
+	if not bool(it["placeholder"]) and arte != null:
+		_det_img.texture = arte
+		_det_img.visible = true
+	elif bool(it["placeholder"]):
 		_det_ph.text = Textos.t("shop.placeholder")
 	var r := int(it["regiao"])
 	if r >= 0 and EstadoJogo.item_bloqueado(_sel):
