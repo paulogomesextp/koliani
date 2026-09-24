@@ -1,899 +1,569 @@
 class_name SeletorNiveis
 extends Control
-## MAPA DE REGIÃO (Execution 9H). Substitui o carrossel de cartões pelo
-## mapa aprovado em `10_menu_rebrand/02_level_selector_approved`: a vista da
-## região ao fundo, os cinco níveis como nós ligados por um trilho, um
-## painel de detalhe do nível escolhido e as abas das 20 regiões em baixo.
-##
-## Porque é que deixou de ser um carrossel: o carrossel mostrava 100 níveis
-## em fila e a região era uma pastilha ao lado. A prancha diz o contrário --
-## a REGIÃO é o ecrã, e os cinco níveis são o caminho que se faz nela. Isso
-## é também o que o jogo é (20 regiões x 5), e torna a Região I uma coisa
-## vista de frente e não um cartão entre cem.
-##
-## Reutilizável, com a MESMA interface de antes:
-##   - `MapaMundo` (modo normal): `configurar(indice, true)` -- respeita os
-##     bloqueios;
-##   - `DevBarra` (DEVELOPER MODE): `configurar(indice, false)` -- pode
-##     saltar para qualquer nível.
-##
-## Sinais: `escolhido(indice)` ao confirmar um nível jogável; `cancelado`
-## ao recuar.
-##
-## Todas as medidas são as da prancha reduzidas a 1280x720 e vivem dentro
-## de `palco()` (ver `Frontend9H`): a arte e a UI nunca se desencontram,
-## seja qual for a forma do ecrã.
+## Seletor da campanha: primeiro escolhe-se uma região, depois um dos seus
+## cinco níveis. A tabela canónica e o progresso continuam em EstadoJogo.
+## Esta cena só apresenta estado e emite `escolhido`; não possui save próprio.
 
 signal escolhido(indice: int)
 signal cancelado
 
-## Arte de fundo por região -- miniatura do nível no painel. Uma camada do
-## pack de parallax que o primeiro nível da região usa (`fundo_pack` no
-## `.tscn`). Regiões que partilham pack levam camadas diferentes.
-const FUNDO_REGIAO := [
-	"res://assets/sprites/pixel/backgrounds/floresta/middle.png",   # 01 Floresta
-	"res://assets/sprites/pixel/backgrounds/prisao/middle.png",     # 02 Prisão
-	"res://assets/sprites/pixel/backgrounds/montanhas/trees.png",   # 03 Torres
-	"res://assets/sprites/pixel/backgrounds/caverna/back-walls.png",# 04 Catacumbas
-	"res://assets/sprites/pixel/backgrounds/vilanoite/casario.png", # 05 Cidade
-	"res://assets/sprites/pixel/backgrounds/luar/serra.png",        # 06 Castelo
-	"res://assets/sprites/pixel/backgrounds/floresta/front.png",    # 07 Queimadas
-	"res://assets/sprites/pixel/backgrounds/vilanoite/vila.png",    # 08 Mar dos Mortos
-	"res://assets/sprites/pixel/backgrounds/pantano/mid1.png",      # 09 Gelo
-	"res://assets/sprites/pixel/backgrounds/rochoso/middle.png",    # 10 Deserto
-	"res://assets/sprites/pixel/backgrounds/floresta/back.png",     # 11 Jardins
-	"res://assets/sprites/pixel/backgrounds/masmorra/celas.png",    # 12 Máquinas
-	"res://assets/sprites/pixel/backgrounds/montanhas/far.png",     # 13 Céu Partido
-	"res://assets/sprites/pixel/backgrounds/vilanoite/serra.png",   # 14 Sonhos
-	"res://assets/sprites/pixel/backgrounds/prisao/near.png",       # 15 Cidade dos Mortos
-	"res://assets/sprites/pixel/backgrounds/pantano/trees.png",     # 16 Mar Vermelho
-	"res://assets/sprites/pixel/backgrounds/castelo_velho/salao.png",# 17 Inferno
-	"res://assets/sprites/pixel/backgrounds/rochoso/near.png",      # 18 O Vazio
-	"res://assets/sprites/pixel/backgrounds/cidade/vila.png",       # 19 Guerra
-	"res://assets/sprites/pixel/backgrounds/luar/campo.png",        # 20 Último Caminho
-]
-
-## Retrato do chefe por índice de nível (ver `_retrato_chefe`).
-const RETRATO_CHEFE := [
-	"minotauro", "bruxa", "horror", "folha", "demonio_lodo",              # 1-5
-	"guardiao_gelo", "cavaleiro_fogo", "verdugo", "monge", "prisioneiro", # 6-10
-	"mimico", "monge_celeste", "arqueiro", "sacerdotisa", "alado",        # 11-15
-	"rei_ossario", "ceifeiro", "feiticeiro_sombrio", "serpente", "olho_voador", # 16-20
-	"lanceiro", "carniceiro", "golem_pedra", "feiticeiro", "noiva",       # 21-25
-	"cavaleiro_negro", "koliani_sombria", "rei_devorador", "arauto", "colosso", # 26-30
-	# --- niveis 31-100 -- GERADO por tools/gerar_niveis_31_100.py --------
-	"vulkar", "magma", "forja", "dragao_lava", "estrela_caida",   # 31-35
-	"capitao_afogado", "leviata", "nereia", "devorador_baleias", "abismo_oceanico",   # 36-40
-	"frostfang", "skyrend", "prism_scarab", "cryo_sentinel", "ymiria",   # 41-45
-	"dune_stalker", "sandstone_colossus", "scorpion_empress", "sun_mummy", "forgotten_god",   # 46-50
-	"boss_51_roseira_viva", "boss_52_jardineiro_perdido", "boss_53_alma_errante", "boss_54_trepadeira", "boss_55_rei_botanico",   # 51-55
-	"boss_56_automato", "boss_57_foguista", "boss_58_homunculo", "boss_59_bobina_viva", "boss_60_maquina_rei",   # 56-60
-	"boss_61_guarda_nuvens", "boss_62_servo_do_trovao", "boss_63_anjo_corrompido", "boss_64_olho_lunar", "boss_65_astronomo",   # 61-65
-	"boss_66_sonhador", "boss_67_reflexo", "boss_68_boneca", "boss_69_medo", "boss_70_outra_koliani",   # 66-70
-	"boss_71_colecionador", "boss_72_coveiro", "boss_73_santo_corrompido", "boss_74_rei_morto", "boss_75_morte",   # 71-75
-	"boss_76_afogado_vermelho", "boss_77_serpente_vermelha", "boss_78_almirante_morto", "boss_79_tentaculo", "boss_80_o_mar",   # 76-80
-	"boss_81_sentinela_inferno", "boss_82_duque_infernal", "boss_83_barqueiro", "boss_84_princesa_demonio", "boss_85_rei_demonios",   # 81-85
-	"boss_86_sombra", "boss_87_nada", "boss_88_paradoxo", "boss_89_observador", "boss_90_entidade",   # 86-90
-	"boss_91_general_caos", "boss_92_dragao_primordial", "boss_93_ultimo_cavaleiro", "boss_94_arauto_final", "boss_95_campeao",   # 91-95
-	"boss_96_zeriko_jovem", "boss_97_primeiro_rei", "boss_98_zeriko_absoluto", "boss_99_entidade_purpura", "boss_100_zeriko_homem",   # 96-100
-]
-
 const ROMANOS := ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X",
-	"XI", "XII", "XIII", "XIV", "XV", "XVI", "XVII", "XVIII", "XIX", "XX"]
-
-## Onde ficam os cinco nós, em coordenadas do palco. Vêm dos centros
-## medidos na prancha (multiplicados por 1280/1672): o trilho não é uma
-## fila regular, sobe e desce com o relevo da vista, e é isso que o faz
-## parecer um caminho e não um menu.
-const NOS := [
-	{"p": Vector2(346, 264), "r": 44.0},
-	{"p": Vector2(504, 290), "r": 44.0},
-	{"p": Vector2(713, 321), "r": 50.0},
-	{"p": Vector2(897, 321), "r": 44.0},
-	{"p": Vector2(1105, 302), "r": 76.0},   # o chefe da região é maior
+    "XI", "XII", "XIII", "XIV", "XV", "XVI", "XVII", "XVIII", "XIX", "XX"]
+## Referência de arte mantida para as ferramentas existentes. O Pass 1 usa a
+## pele da região via TemaRegiao, sem alterar estes caminhos.
+const FUNDO_REGIAO := [
+    "res://assets/sprites/pixel/backgrounds/floresta/middle.png",
+    "res://assets/sprites/pixel/backgrounds/prisao/middle.png",
+    "res://assets/sprites/pixel/backgrounds/montanhas/trees.png",
+    "res://assets/sprites/pixel/backgrounds/caverna/back-walls.png",
+    "res://assets/sprites/pixel/backgrounds/vilanoite/casario.png",
+    "res://assets/sprites/pixel/backgrounds/luar/serra.png",
+    "res://assets/sprites/pixel/backgrounds/floresta/front.png",
+    "res://assets/sprites/pixel/backgrounds/vilanoite/vila.png",
+    "res://assets/sprites/pixel/backgrounds/pantano/mid1.png",
+    "res://assets/sprites/pixel/backgrounds/rochoso/middle.png",
+    "res://assets/sprites/pixel/backgrounds/floresta/back.png",
+    "res://assets/sprites/pixel/backgrounds/masmorra/celas.png",
+    "res://assets/sprites/pixel/backgrounds/montanhas/far.png",
+    "res://assets/sprites/pixel/backgrounds/vilanoite/serra.png",
+    "res://assets/sprites/pixel/backgrounds/prisao/near.png",
+    "res://assets/sprites/pixel/backgrounds/pantano/trees.png",
+    "res://assets/sprites/pixel/backgrounds/castelo_velho/salao.png",
+    "res://assets/sprites/pixel/backgrounds/rochoso/near.png",
+    "res://assets/sprites/pixel/backgrounds/cidade/vila.png",
+    "res://assets/sprites/pixel/backgrounds/luar/campo.png",
 ]
-## Pontos intermédios do trilho (a prancha curva-o entre os nós).
-const TRILHO := [Vector2(428, 273), Vector2(612, 308), Vector2(806, 328),
-	Vector2(1001, 308)]
-
-const R_PAINEL := Rect2(372, 387, 844, 210)
-const R_MINIATURA := Rect2(402, 406, 234, 168)
-const R_JOGAR := Rect2(660, 533, 271, 47)
-## As abas param em x=1110: a citação do canto vive a seguir, como na prancha.
-const R_ABAS := Rect2(20, 620, 1090, 70)
-const LARG_ABA := 178.0
-const PASSO_ABA := 228.0
+const CARTAO_REGIAO := Vector2(252, 106)
+const CARTAO_NIVEL := Vector2(196, 92)
+const FUNDO_SELECTOR_DIR := "res://assets/ui/level_selector/regions/"
+const BOSS_NOMES := [
+    "Guardião Verde", "Guardião dos Céus", "Vyrak", "Guardião da Fornalha",
+    "Oráculo do Vento", "Mirage Eterna", "Rainha Espinhosa", "Devorador da Cripta",
+    "Abade Naufragado", "Arconte do Conhecimento", "Senhor das Marés", "Arauto da Pestilência",
+    "Soberano Invertido", "Oráculo Estelar", "Arquialquimista Morvak", "Malgor",
+    "Rainha do Sonho", "Colosso da Ruína", "Arquiteto do Limiar", "Zeriko",
+]
+const BOSS_ART := [
+    "res://assets/sprites/pixel/bosses/ghorak.png", "res://assets/sprites/pixel/bosses/aerion.png",
+    "res://assets/sprites/pixel/bosses/vyrak.png", "res://assets/sprites/pixel/bosses/magma.png",
+    "res://assets/sprites/pixel/bosses/voltaris.png", "res://assets/sprites/pixel/bosses/morvanna.png",
+    "res://assets/sprites/pixel/bosses/rainha.png", "res://assets/sprites/pixel/bosses/devorador.png",
+    "res://assets/sprites/pixel/bosses/abismo_oceanico.png", "res://assets/sprites/pixel/bosses/olho.png",
+    "res://assets/sprites/pixel/bosses/leviata.png", "res://assets/sprites/pixel/bosses/ghorak.png",
+    "res://assets/sprites/pixel/bosses/primeiro.png", "res://assets/sprites/pixel/bosses/sacerdotisa.png",
+    "res://assets/sprites/pixel/bosses/olho.png", "res://assets/sprites/pixel/bosses/vulkar.png",
+    "res://assets/sprites/pixel/bosses/morvanna.png", "res://assets/sprites/pixel/bosses/colosso.png",
+    "res://assets/sprites/pixel/bosses/arauto.png", "res://assets/sprites/pixel/bosses/zeriko.png",
+]
 
 var _respeitar_bloqueio := true
-var _sel := 0            # índice global do nível selecionado
+var _sel := 0
 var _regiao := 0
+var _vista_regioes := true
 var _pronto := false
-
 var _palco: Control
 var _arte: TextureRect
 var _barras: TextureRect
-## Peças do frontend que trocam de pele com a região: [{no, peca}].
-var _pecas: Array[Dictionary] = []
-## Região cuja pele está montada (-1 = nenhuma ainda).
-var _tema_montado := -1
-var _veu_painel: TextureRect
-var _chao_painel: ColorRect
-var _titulo_regiao: Label
-var _citacao: Label
-var _nos: Array[Dictionary] = []      # [{botao, ficha, indice, jogavel}]
-var _trilho: Control
-var _painel: PanelContainer
-var _miniatura: TextureRect
-var _retrato: TextureRect
-var _nivel_titulo: Label
-var _nivel_nome: Label
-var _nivel_chefe: Label
-var _nivel_estado: Label
-var _linhas_info: Array[Label] = []
-var _jogar: Button
+var _titulo: Label
+var _subtitulo: Label
 var _voltar: Button
 var _santuario_botao: Button
-var _seta_esq: Button
-var _seta_dir: Button
+var _regioes_painel: Control
+var _niveis_painel: Control
+var _region_cards: Array[Button] = []
+var _level_cards: Array[Button] = []
+## Aliases de compatibilidade para ferramentas/testes antigos do selector.
 var _abas: Array[Button] = []
-var _citacao_canto: Label
+var _nos: Array[Dictionary] = []
+var _jogar: Button
+var _estado: Label
+var _detalhe: Label
+var _santuario: Control
+var _regiao_detalhe: Panel
+var _regiao_nome: Label
+var _regiao_meta: Label
+var _regiao_estado: Label
+var _regiao_progresso: ProgressBar
+var _regiao_entrar: Button
+var _regiao_esquerda: Button
+var _regiao_direita: Button
+var _boss_painel: Panel
+var _boss_arte: TextureRect
+var _boss_nome: Label
+var _fundo_regiao := -1
 
 const SANTUARIO_CENA := preload("res://scenes/ui/Santuario.tscn")
-var _santuario: Control
-
 
 func _ready() -> void:
-	process_mode = Node.PROCESS_MODE_ALWAYS
-	mouse_filter = Control.MOUSE_FILTER_STOP
-	set_anchors_preset(Control.PRESET_FULL_RECT)
-	Frontend9H.vestir(self)
-	_montar()
-	_pronto = true
-	Textos.idioma_mudou.connect(func(_l: String) -> void: _actualizar())
-	_actualizar()
+    process_mode = Node.PROCESS_MODE_ALWAYS
+    mouse_filter = Control.MOUSE_FILTER_STOP
+    set_anchors_preset(Control.PRESET_FULL_RECT)
+    Frontend9H.vestir(self)
+    _montar()
+    _pronto = true
+    Textos.idioma_mudou.connect(func(_l: String) -> void: _actualizar())
+    _actualizar()
 
-
-## Ponto de entrada. `indice_inicial` = nível a mostrar; `respeitar_bloqueio`
-## = se true, só deixa confirmar níveis desbloqueados (modo normal) e
-## arranca na fronteira se o índice pedido estiver trancado.
 func configurar(indice_inicial: int, respeitar_bloqueio: bool) -> void:
-	_respeitar_bloqueio = respeitar_bloqueio
-	var alvo := clampi(indice_inicial, 0, EstadoJogo.NIVEIS.size() - 1)
-	if respeitar_bloqueio and not EstadoJogo.nivel_desbloqueado(alvo):
-		alvo = EstadoJogo.fronteira()
-	_sel = alvo
-	_regiao = maxi(0, EstadoJogo.regiao_do_nivel(alvo))
-	if _pronto:
-		_actualizar()
-
-
-# ── montagem ─────────────────────────────────────────────────────────────
-
-## Imagem do frontend que ACOMPANHA a pele da região (ver `_aplicar_tema`).
-## Tudo o que é moldura passa por aqui; o que não passa fica carmesim para
-## sempre, e foi assim que a primeira montagem deixou as setas vermelhas num
-## ecrã verde.
-func _imagem(nome: String, tinta := Color.WHITE) -> TextureRect:
-	var tr := Frontend9H.imagem(nome, tinta)
-	tr.set_meta("peca", nome)
-	_pecas.append({"no": tr, "peca": nome})
-	return tr
-
-
-func _separador() -> TextureRect:
-	var tr := Frontend9H.separador()
-	tr.set_meta("peca", "separador_menu")
-	_pecas.append({"no": tr, "peca": "separador_menu"})
-	return tr
-
+    _respeitar_bloqueio = respeitar_bloqueio
+    var alvo := clampi(indice_inicial, 0, EstadoJogo.NIVEIS.size() - 1)
+    if _respeitar_bloqueio and not EstadoJogo.nivel_desbloqueado(alvo):
+        alvo = EstadoJogo.fronteira()
+    _sel = alvo
+    _regiao = maxi(0, EstadoJogo.regiao_do_nivel(alvo))
+    _vista_regioes = true
+    if _pronto:
+        _actualizar()
 
 func _montar() -> void:
-	_palco = Frontend9H.palco(self, "fundo_seletor")
-	_arte = _palco.get_node_or_null("Arte")
-	_barras = get_node_or_null("Barras") as TextureRect
-	_palco.add_child(Frontend9H.vinheta())
-	# véu por baixo do painel e das abas: a metade de baixo do ecrã é toda
-	# UI, e sem ele a arte competia com o texto
-	_veu_painel = Frontend9H.veu(Vector2(0, 0), Vector2(1280, 720), 0.0)
-	_veu_painel.texture = _degrade_vertical()
-	Frontend9H.por(_veu_painel, Rect2(0, 330, 1280, 390))
-	_palco.add_child(_veu_painel)
+    _palco = Frontend9H.palco(self, "fundo_seletor")
+    _arte = _palco.get_node_or_null("Arte") as TextureRect
+    _barras = get_node_or_null("Barras") as TextureRect
+    _palco.add_child(Frontend9H.vinheta())
+    _voltar = _botao("", 15)
+    _voltar.pressed.connect(_voltar_premido)
+    Frontend9H.por(_voltar, Rect2(32, 22, 210, 42))
+    _palco.add_child(_voltar)
+    _santuario_botao = _botao("", 14)
+    _santuario_botao.pressed.connect(_abrir_santuario)
+    Frontend9H.por(_santuario_botao, Rect2(1015, 22, 233, 42))
+    _palco.add_child(_santuario_botao)
+    _titulo = Label.new()
+    Frontend9H.cabecalho(_titulo, 29)
+    _titulo.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    Frontend9H.por(_titulo, Rect2(270, 24, 740, 42))
+    _palco.add_child(_titulo)
+    _subtitulo = Label.new()
+    Frontend9H.corpo(_subtitulo, 14, Frontend9H.TEXTO_APAGADO)
+    _subtitulo.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    Frontend9H.por(_subtitulo, Rect2(270, 67, 740, 26))
+    _palco.add_child(_subtitulo)
+    _regioes_painel = Control.new()
+    _regioes_painel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+    _regioes_painel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+    _palco.add_child(_regioes_painel)
+    _montar_regioes()
+    _niveis_painel = Control.new()
+    _niveis_painel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+    _niveis_painel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+    _palco.add_child(_niveis_painel)
+    _montar_niveis()
 
-	_trilho = Control.new()
-	_trilho.name = "Trilho"
-	_trilho.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_trilho.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	_trilho.draw.connect(_desenhar_trilho)
-	_palco.add_child(_trilho)
+func _botao(texto: String, tamanho: int) -> Button:
+    var b := Button.new()
+    b.text = texto
+    b.focus_mode = Control.FOCUS_ALL
+    b.clip_text = true
+    Frontend9H.rotulo_menu(b, tamanho)
+    b.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+    return b
 
-	_montar_topo()
-	_montar_nos()
-	_montar_painel()
-	_montar_abas()
+func _caixa(cor: Color, borda: Color, raio := 8, largura := 1, sombra := false) -> StyleBoxFlat:
+    var s := StyleBoxFlat.new()
+    s.bg_color = cor
+    s.border_color = borda
+    s.set_border_width_all(largura)
+    s.set_corner_radius_all(raio)
+    if sombra:
+        s.shadow_color = Color(0.02, 0.01, 0.04, 0.55)
+        s.shadow_size = 5
+        s.shadow_offset = Vector2(0, 2)
+    s.content_margin_left = 12.0
+    s.content_margin_right = 12.0
+    s.content_margin_top = 8.0
+    s.content_margin_bottom = 8.0
+    return s
 
+func _estilo_cartao(b: Button, primaria: Color, ativo: bool, bloqueado: bool) -> void:
+    b.flat = false
+    var fundo := Color(0.035, 0.026, 0.055, 0.94) if not bloqueado else Color(0.025, 0.025, 0.035, 0.82)
+    var linha := Frontend9H.CARMESIM if ativo else Color(0.20, 0.18, 0.28, 0.72)
+    if bloqueado:
+        linha = Color(0.14, 0.14, 0.19, 0.42)
+    var largura := 2 if ativo else 1
+    b.add_theme_stylebox_override("normal", _caixa(fundo, linha, 8, largura, ativo))
+    b.add_theme_stylebox_override("hover", _caixa(fundo.lightened(0.08), primaria, 8, 1, true))
+    b.add_theme_stylebox_override("focus", _caixa(fundo.lightened(0.10), primaria, 8, 2, true))
+    b.add_theme_stylebox_override("pressed", _caixa(fundo.lightened(0.04), primaria, 8, 2))
+    b.add_theme_color_override("font_color", Frontend9H.TEXTO_APAGADO if bloqueado else Frontend9H.OSSO)
+    b.add_theme_color_override("font_hover_color", Frontend9H.OSSO)
+    b.add_theme_color_override("font_focus_color", Frontend9H.OSSO)
+    b.modulate = Color(0.42, 0.42, 0.48, 0.66) if bloqueado else (Color.WHITE if ativo else Color(0.68, 0.66, 0.72, 0.82))
+    b.scale = Vector2(1.025, 1.025) if ativo else Vector2.ONE
 
-func _degrade_vertical() -> Texture2D:
-	var v: Color = TemaRegiao.do_indice(_regiao)["veu"]
-	var g := Gradient.new()
-	g.offsets = PackedFloat32Array([0.0, 0.45, 1.0])
-	g.colors = PackedColorArray([
-		Color(v.r, v.g, v.b, 0.0),
-		Color(v.r, v.g, v.b, 0.55),
-		Color(v.r, v.g, v.b, 0.86)])
-	var gt := GradientTexture2D.new()
-	gt.gradient = g
-	gt.width = 8
-	gt.height = 256
-	gt.fill_from = Vector2(0, 0)
-	gt.fill_to = Vector2(0, 1)
-	return gt
+func _ligar_microinteracoes(b: Button) -> void:
+    b.pivot_offset = b.size / 2.0
+    b.mouse_entered.connect(_hover_cartao.bind(b, true))
+    b.mouse_exited.connect(_hover_cartao.bind(b, false))
 
+func _hover_cartao(b: Button, entrou: bool) -> void:
+    if not is_instance_valid(b) or not b.visible:
+        return
+    b.pivot_offset = b.size / 2.0
+    var escala := Vector2(1.018, 1.018) if entrou else Vector2.ONE
+    b.create_tween().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT).tween_property(b, "scale", escala, 0.10)
 
-func _montar_topo() -> void:
-	_voltar = Button.new()
-	Frontend9H.rotulo_menu(_voltar, 13)
-	_voltar.autowrap_mode = TextServer.AUTOWRAP_WORD
-	_voltar.pressed.connect(func() -> void:
-		Som.toca("ui_voltar", -8.0)
-		cancelado.emit())
-	Frontend9H.por(_voltar, Rect2(48, 14, 130, 46))
-	_palco.add_child(_voltar)
-	var seta := _imagem("voltar_seta")
-	Frontend9H.por(seta, Rect2(14, 18, 34, 38))
-	_palco.add_child(seta)
+func _montar_regioes() -> void:
+    for r in EstadoJogo.REGIOES.size():
+        var b := _botao("", 16)
+        b.alignment = HORIZONTAL_ALIGNMENT_CENTER
+        b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+        b.pressed.connect(_abrir_regiao.bind(r))
+        b.focus_entered.connect(_selecionar_regiao.bind(r))
+        b.mouse_entered.connect(_selecionar_regiao.bind(r))
+        Frontend9H.por(b, Rect2(0, 0, CARTAO_REGIAO.x, CARTAO_REGIAO.y))
+        _regioes_painel.add_child(b)
+        _region_cards.append(b)
+        _ligar_microinteracoes(b)
+    _abas = _region_cards
 
-	_santuario_botao = Button.new()
-	Frontend9H.rotulo_menu(_santuario_botao, 14)
-	_santuario_botao.pressed.connect(_abrir_santuario)
-	Frontend9H.por(_santuario_botao, Rect2(1060, 14, 206, 34))
-	_palco.add_child(_santuario_botao)
+    _regiao_esquerda = _botao("‹", 34)
+    _regiao_esquerda.pressed.connect(func() -> void: _mudar_regiao(-1))
+    Frontend9H.por(_regiao_esquerda, Rect2(82, 280, 60, 64))
+    _regioes_painel.add_child(_regiao_esquerda)
+    _regiao_direita = _botao("›", 34)
+    _regiao_direita.pressed.connect(func() -> void: _mudar_regiao(1))
+    Frontend9H.por(_regiao_direita, Rect2(1138, 280, 60, 64))
+    _regioes_painel.add_child(_regiao_direita)
 
-	_titulo_regiao = Label.new()
-	Frontend9H.cabecalho(_titulo_regiao, 27)
-	_titulo_regiao.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_titulo_regiao.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	Frontend9H.por(_titulo_regiao, Rect2(340, 134, 600, 34))
-	_palco.add_child(_titulo_regiao)
+    _regiao_detalhe = Panel.new()
+    _regiao_detalhe.add_theme_stylebox_override("panel", Frontend9H.painel_liso(0.94))
+    Frontend9H.por(_regiao_detalhe, Rect2(286, 376, 708, 214))
+    _regioes_painel.add_child(_regiao_detalhe)
+    _regiao_nome = Label.new()
+    Frontend9H.cabecalho(_regiao_nome, 27)
+    _regiao_nome.position = Vector2(42, 24)
+    _regiao_nome.size = Vector2(624, 42)
+    _regiao_detalhe.add_child(_regiao_nome)
+    _regiao_meta = Label.new()
+    Frontend9H.corpo(_regiao_meta, 15, Frontend9H.TEXTO_APAGADO)
+    _regiao_meta.position = Vector2(44, 72)
+    _regiao_meta.size = Vector2(620, 28)
+    _regiao_detalhe.add_child(_regiao_meta)
+    _regiao_estado = Label.new()
+    Frontend9H.corpo(_regiao_estado, 15, Frontend9H.TEXTO)
+    _regiao_estado.position = Vector2(44, 104)
+    _regiao_estado.size = Vector2(360, 28)
+    _regiao_detalhe.add_child(_regiao_estado)
+    _regiao_progresso = ProgressBar.new()
+    _regiao_progresso.show_percentage = false
+    _regiao_progresso.add_theme_stylebox_override("background", _caixa(Color(0.08, 0.05, 0.09, 0.95), Color(0.22, 0.16, 0.25, 0.8), 3, 1))
+    _regiao_progresso.add_theme_stylebox_override("fill", _caixa(Color(0.55, 0.08, 0.15, 0.95), Frontend9H.CARMESIM, 3, 1, true))
+    _regiao_progresso.position = Vector2(44, 147)
+    _regiao_progresso.size = Vector2(350, 10)
+    _regiao_detalhe.add_child(_regiao_progresso)
+    _regiao_entrar = _botao("", 18)
+    Frontend9H.botao_placa(_regiao_entrar, 18)
+    _regiao_entrar.pressed.connect(func() -> void: _abrir_regiao(_regiao))
+    _regiao_entrar.position = Vector2(458, 104)
+    _regiao_entrar.size = Vector2(194, 58)
+    _regiao_detalhe.add_child(_regiao_entrar)
 
-	var orn := _separador()
-	Frontend9H.por(orn, Rect2(535, 168, 210, 12))
-	_palco.add_child(orn)
+func _montar_niveis() -> void:
+    var painel := Panel.new()
+    painel.add_theme_stylebox_override("panel", Frontend9H.painel_liso(0.93))
+    painel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+    Frontend9H.por(painel, Rect2(72, 126, 1136, 200))
+    _niveis_painel.add_child(painel)
+    for i in 5:
+        var b := _botao("", 19)
+        b.alignment = HORIZONTAL_ALIGNMENT_CENTER
+        b.pressed.connect(_selecionar_nivel.bind(i))
+        b.focus_entered.connect(_selecionar_nivel.bind(i))
+        Frontend9H.por(b, Rect2(94 + i * 212, 180, CARTAO_NIVEL.x, CARTAO_NIVEL.y))
+        _niveis_painel.add_child(b)
+        _level_cards.append(b)
+        _nos.append({"botao": b, "indice": -1})
+        _ligar_microinteracoes(b)
+    _detalhe = Label.new()
+    Frontend9H.corpo(_detalhe, 16, Frontend9H.TEXTO)
+    _detalhe.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+    Frontend9H.por(_detalhe, Rect2(112, 390, 720, 68))
+    _niveis_painel.add_child(_detalhe)
+    _estado = Label.new()
+    Frontend9H.corpo(_estado, 16, Frontend9H.VERDE_ESTADO)
+    Frontend9H.por(_estado, Rect2(112, 470, 760, 32))
+    _niveis_painel.add_child(_estado)
+    _jogar = _botao("", 20)
+    _jogar.flat = false
+    Frontend9H.botao_placa(_jogar, 20)
+    _jogar.pressed.connect(_confirmar)
+    Frontend9H.por(_jogar, Rect2(900, 430, 280, 60))
+    _niveis_painel.add_child(_jogar)
+    _boss_painel = Panel.new()
+    _boss_painel.add_theme_stylebox_override("panel", _caixa(Color(0.025, 0.015, 0.045, 0.94), Frontend9H.CARMESIM, 8, 1, true))
+    Frontend9H.por(_boss_painel, Rect2(874, 342, 306, 76))
+    _niveis_painel.add_child(_boss_painel)
+    _boss_arte = TextureRect.new()
+    _boss_arte.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+    _boss_arte.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+    _boss_arte.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+    Frontend9H.por(_boss_arte, Rect2(10, 8, 62, 60))
+    _boss_painel.add_child(_boss_arte)
+    _boss_nome = Label.new()
+    Frontend9H.corpo(_boss_nome, 14, Frontend9H.OSSO)
+    _boss_nome.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+    _boss_nome.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+    Frontend9H.por(_boss_nome, Rect2(82, 8, 214, 60))
+    _boss_painel.add_child(_boss_nome)
 
-	_citacao = Label.new()
-	Frontend9H.corpo(_citacao, 15, Frontend9H.TEXTO_APAGADO)
-	_citacao.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_citacao.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_citacao.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	Frontend9H.por(_citacao, Rect2(420, 184, 440, 42))
-	_palco.add_child(_citacao)
+func _voltar_premido() -> void:
+    if not _vista_regioes:
+        _vista_regioes = true
+        _actualizar()
+        _transitar_vista(_regioes_painel, _niveis_painel)
+        return
+    Som.toca("ui_voltar", -8.0)
+    cancelado.emit()
 
-	var orn2 := _separador()
-	Frontend9H.por(orn2, Rect2(535, 226, 210, 12))
-	_palco.add_child(orn2)
+func _selecionar_regiao(r: int) -> void:
+    if r < 0 or r >= EstadoJogo.REGIOES.size():
+        return
+    _regiao = r
+    var ns: Array = EstadoJogo.REGIOES[r]["niveis"]
+    if not ns.is_empty() and not (_sel in ns):
+        _sel = int(ns[0])
+    _actualizar()
 
-	_seta_esq = _montar_seta(false)
-	_seta_dir = _montar_seta(true)
+func _abrir_regiao(r: int) -> void:
+    _selecionar_regiao(r)
+    if _respeitar_bloqueio and not _regiao_aberta(r):
+        Som.toca("ui_negado", -8.0)
+        return
+    _vista_regioes = false
+    _actualizar()
+    _transitar_vista(_niveis_painel, _regioes_painel)
 
-	_citacao_canto = Label.new()
-	Frontend9H.corpo(_citacao_canto, 13, Frontend9H.TEXTO_APAGADO)
-	_citacao_canto.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	_citacao_canto.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_citacao_canto.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	Frontend9H.por(_citacao_canto, Rect2(1080, 630, 190, 46))
-	_palco.add_child(_citacao_canto)
+func _selecionar_nivel(pos: int) -> void:
+    var ns: Array = EstadoJogo.REGIOES[_regiao]["niveis"]
+    if pos < 0 or pos >= ns.size():
+        return
+    _sel = int(ns[pos])
+    _actualizar()
 
+func _regiao_aberta(r: int) -> bool:
+    if not _respeitar_bloqueio:
+        return true
+    var ns: Array = EstadoJogo.REGIOES[r]["niveis"]
+    return not ns.is_empty() and EstadoJogo.nivel_desbloqueado(int(ns[0]))
 
-func _montar_seta(direita: bool) -> Button:
-	var b := Button.new()
-	b.flat = true
-	b.focus_mode = Control.FOCUS_NONE
-	b.mouse_filter = Control.MOUSE_FILTER_STOP
-	for estado in ["normal", "hover", "pressed", "focus", "disabled"]:
-		b.add_theme_stylebox_override(estado, StyleBoxEmpty.new())
-	Frontend9H.por(b, Rect2(1216.0 if direita else 8.0, 286, 56, 100))
-	b.pressed.connect(func() -> void: _mudar_regiao(1 if direita else -1))
-	_palco.add_child(b)
+func _estado_nivel(indice: int) -> String:
+    if indice == EstadoJogo.indice_nivel:
+        return "CURRENT"
+    if EstadoJogo.nivel_esta_concluido(indice):
+        return "COMPLETED"
+    if not _respeitar_bloqueio or EstadoJogo.nivel_desbloqueado(indice):
+        return "UNLOCKED"
+    return "LOCKED"
 
-	var img := _imagem("seta_direita" if direita else "seta_esquerda")
-	Frontend9H.por(img, Rect2(1222.0 if direita else 14.0, 290, 44, 56))
-	_palco.add_child(img)
-	b.mouse_entered.connect(func() -> void: img.modulate = Color(1.4, 1.1, 1.1))
-	b.mouse_exited.connect(func() -> void: img.modulate = Color.WHITE)
+func _estado_regiao(r: int) -> String:
+    if r == EstadoJogo.regiao_atual():
+        return "CURRENT"
+    if EstadoJogo.regiao_esta_concluida(r):
+        return "COMPLETED"
+    if _regiao_aberta(r):
+        return "UNLOCKED"
+    return "LOCKED"
 
-	var l := Label.new()
-	Frontend9H.capitular(l, 11, Frontend9H.TEXTO_APAGADO)
-	l.autowrap_mode = TextServer.AUTOWRAP_WORD
-	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	l.name = "Rotulo"
-	Frontend9H.por(l, Rect2(1210.0 if direita else 4.0, 350, 66, 40))
-	_palco.add_child(l)
-	b.set_meta("rotulo", l)
-	b.set_meta("imagem", img)
-	return b
+func _texto_estado(estado: String) -> String:
+    match estado:
+        "CURRENT": return "ATUAL"
+        "COMPLETED": return "CONCLUÍDO"
+        "UNLOCKED": return "DESBLOQUEADO"
+        _: return "BLOQUEADO"
 
-
-func _montar_nos() -> void:
-	for i in NOS.size():
-		var dados: Dictionary = NOS[i]
-		var centro: Vector2 = dados["p"]
-		var raio: float = dados["r"]
-
-		var anel := _imagem("anel_normal")
-		Frontend9H.por(anel, Rect2(centro - Vector2(raio, raio) * 1.16, Vector2(raio, raio) * 2.32))
-		_palco.add_child(anel)
-
-		# o miolo do anel é uma LENTE para a vista que está por trás: é o
-		# que a prancha desenha (vê-se o cenário dentro do círculo) e evita
-		# inventar uma miniatura por nível que não existe
-		var b := Button.new()
-		b.flat = true
-		b.focus_mode = Control.FOCUS_ALL
-		for estado in ["normal", "hover", "pressed", "focus", "disabled"]:
-			b.add_theme_stylebox_override(estado, StyleBoxEmpty.new())
-		Frontend9H.por(b, Rect2(centro - Vector2(raio, raio), Vector2(raio, raio) * 2.0))
-		b.pressed.connect(_escolher_no.bind(i))
-		b.focus_entered.connect(_escolher_no.bind(i))
-		b.mouse_entered.connect(b.grab_focus)
-		_palco.add_child(b)
-
-		# A ficha é uma imagem ESCALADA, não uma nine-patch: as margens do
-		# losango (30 px de cada lado a 2x) comiam o miolo de uma peça de
-		# 36 px de alto e o que se via eram duas barras soltas.
-		var alt := 40.0
-		var ficha := _imagem("ficha_nivel")
-		ficha.stretch_mode = TextureRect.STRETCH_SCALE
-		Frontend9H.por(ficha, Rect2(centro.x - 50.0, centro.y + raio * 0.56, 100.0, alt))
-		_palco.add_child(ficha)
-		var rot := Label.new()
-		Frontend9H.corpo(rot, 17, Frontend9H.OSSO)
-		rot.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		rot.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		rot.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		Frontend9H.por(rot, Rect2(centro.x - 50.0, centro.y + raio * 0.56, 100.0, alt))
-		_palco.add_child(rot)
-
-		var trinco := _imagem("cadeado")
-		Frontend9H.por(trinco, Rect2(centro.x - 13.0, centro.y - 15.0, 26.0, 30.0))
-		trinco.visible = false
-		_palco.add_child(trinco)
-
-		_nos.append({"botao": b, "anel": anel, "ficha": ficha, "rotulo": rot,
-			"cadeado": trinco, "indice": i, "jogavel": true})
-
-
-func _montar_painel() -> void:
-	_painel = PanelContainer.new()
-	_painel.add_theme_stylebox_override("panel",
-		Frontend9H.caixa("painel_detalhe", Vector4(0, 0, 0, 0)))
-	_painel.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_painel.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
-	Frontend9H.por(_painel, R_PAINEL)
-	_palco.add_child(_painel)
-	# fundo do painel: a moldura da prancha é oca, e sem chão o texto ficava
-	# em cima da vista
-	var chao := ColorRect.new()
-	_chao_painel = chao
-	chao.color = Color(0.035, 0.016, 0.028, 0.86)
-	chao.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	Frontend9H.por(chao, Rect2(R_PAINEL.position + Vector2(8, 8), R_PAINEL.size - Vector2(16, 16)))
-	_palco.add_child(chao)
-	_palco.move_child(chao, _painel.get_index())
-
-	_miniatura = TextureRect.new()
-	_miniatura.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	_miniatura.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
-	_miniatura.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_miniatura.clip_contents = true
-	Frontend9H.por(_miniatura, R_MINIATURA)
-	_palco.add_child(_miniatura)
-
-	_retrato = TextureRect.new()
-	_retrato.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	_retrato.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	_retrato.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_retrato.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	Frontend9H.por(_retrato, Rect2(R_MINIATURA.position.x + 150, R_MINIATURA.position.y + 28,
-		96, 132))
-	_palco.add_child(_retrato)
-
-	var moldura := ColorRect.new()
-	moldura.color = Color(0, 0, 0, 0)
-	moldura.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_palco.add_child(moldura)
-
-	_nivel_titulo = Label.new()
-	Frontend9H.cabecalho(_nivel_titulo, 26)
-	_nivel_titulo.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	Frontend9H.por(_nivel_titulo, Rect2(660, 400, 330, 34))
-	_palco.add_child(_nivel_titulo)
-
-	_nivel_nome = Label.new()
-	Frontend9H.corpo(_nivel_nome, 18, Frontend9H.TEXTO)
-	_nivel_nome.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	Frontend9H.por(_nivel_nome, Rect2(660, 432, 330, 26))
-	_palco.add_child(_nivel_nome)
-
-	_nivel_chefe = Label.new()
-	Frontend9H.corpo(_nivel_chefe, 15, Frontend9H.TEXTO_APAGADO)
-	_nivel_chefe.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_nivel_chefe.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	Frontend9H.por(_nivel_chefe, Rect2(660, 462, 330, 44))
-	_palco.add_child(_nivel_chefe)
-
-	_nivel_estado = Label.new()
-	Frontend9H.corpo(_nivel_estado, 15, Frontend9H.VERDE_ESTADO)
-	_nivel_estado.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	Frontend9H.por(_nivel_estado, Rect2(660, 506, 330, 24))
-	_palco.add_child(_nivel_estado)
-
-	_jogar = Button.new()
-	Frontend9H.rotulo_menu(_jogar, 21)
-	_jogar.flat = false
-	_jogar.add_theme_stylebox_override("normal", Frontend9H.caixa("botao_jogar", Vector4(20, 6, 20, 6)))
-	_jogar.add_theme_stylebox_override("hover",
-		Frontend9H.caixa("botao_jogar", Vector4(20, 6, 20, 6), Color(1.45, 1.1, 1.1)))
-	_jogar.add_theme_stylebox_override("focus",
-		Frontend9H.caixa("botao_jogar", Vector4(20, 6, 20, 6), Color(1.45, 1.1, 1.1)))
-	_jogar.add_theme_stylebox_override("pressed",
-		Frontend9H.caixa("botao_jogar", Vector4(20, 6, 20, 6), Color(0.8, 0.7, 0.7)))
-	_jogar.pressed.connect(_confirmar)
-	Frontend9H.por(_jogar, R_JOGAR)
-	_palco.add_child(_jogar)
-
-	# três linhas de informação à direita, no sítio das estatísticas da
-	# prancha. Levam o que o jogo SABE mesmo -- guardião, passo na região,
-	# estado -- e não contadores que ainda não existem.
-	for i in 3:
-		var ico := _imagem("losango")
-		Frontend9H.por(ico, Rect2(994, 462.0 + i * 30.0, 18, 18))
-		ico.modulate = Color(1.2, 0.9, 0.95)
-		_palco.add_child(ico)
-		var l := Label.new()
-		Frontend9H.corpo(l, 13, Frontend9H.TEXTO)
-		l.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		l.clip_text = true
-		Frontend9H.por(l, Rect2(1016, 460.0 + i * 30.0, 194, 24))
-		_palco.add_child(l)
-		_linhas_info.append(l)
-
-
-func _montar_abas() -> void:
-	for i in 5:
-		var b := Button.new()
-		b.flat = true
-		b.focus_mode = Control.FOCUS_ALL
-		b.clip_text = true
-		b.autowrap_mode = TextServer.AUTOWRAP_WORD
-		Frontend9H.rotulo_menu(b, 14)
-		b.flat = false
-		Frontend9H.por(b, Rect2(R_ABAS.position.x + i * PASSO_ABA, R_ABAS.position.y,
-			LARG_ABA, R_ABAS.size.y))
-		b.pressed.connect(_ir_para_aba.bind(i))
-		_palco.add_child(b)
-		_abas.append(b)
-		if i < 4:
-			var d := _imagem("losango")
-			Frontend9H.por(d, Rect2(R_ABAS.position.x + i * PASSO_ABA + LARG_ABA + 14.0,
-				R_ABAS.position.y + 24.0, 22, 22))
-			_palco.add_child(d)
-
-
-## Veste o ecrã com a pele da região atual (ver `scripts/tema_regiao.gd`).
-##
-## Corre a cada `_actualizar`, mas só faz trabalho quando a região MUDA --
-## trocar dezenas de texturas a cada movimento do cursor seria caro e
-## visível. A Região I tem pele própria; todas as outras caem na
-## apresentação neutra, com a arte de marca dessaturada. Nada aqui mexe em
-## posições, navegação ou bloqueios: muda a cor e a moldura, mais nada.
-func _aplicar_tema() -> void:
-	if _tema_montado == _regiao:
-		return
-	_tema_montado = _regiao
-	var t := TemaRegiao.do_indice(_regiao)
-	var tinta: Color = t.get("tinta_pecas", Color.WHITE)
-
-	var fundo := TemaRegiao.textura("fundo_seletor", _regiao)
-	if _arte:
-		_arte.texture = fundo
-		_arte.modulate = t.get("tinta_fundo", Color.WHITE)
-	if _barras:
-		_barras.texture = fundo
-		# as barras laterais são o mesmo fundo, desfocado e escuro
-		var c: Color = t.get("tinta_fundo", Color.WHITE)
-		_barras.modulate = Color(c.r * 0.30, c.g * 0.26, c.b * 0.32, 1.0)
-
-	for d in _pecas:
-		var no := d["no"] as TextureRect
-		if not is_instance_valid(no):
-			continue
-		no.texture = TemaRegiao.textura(String(d["peca"]), _regiao)
-		no.modulate = tinta
-
-	if _painel:
-		_painel.add_theme_stylebox_override("panel",
-			TemaRegiao.caixa("painel_detalhe", _regiao, Vector4(0, 0, 0, 0)))
-	if _chao_painel:
-		var v: Color = t["veu"]
-		_chao_painel.color = Color(v.r, v.g, v.b, 0.86)
-	if _veu_painel:
-		_veu_painel.texture = _degrade_vertical()
-	if _jogar:
-		for estado in ["normal", "hover", "focus", "pressed"]:
-			var extra := Color.WHITE
-			if estado in ["hover", "focus"]:
-				extra = Color(1.45, 1.1, 1.1) if t.get("autoridade", false) 					else Color(1.25, 1.25, 1.28)
-			elif estado == "pressed":
-				extra = Color(0.8, 0.78, 0.8)
-			_jogar.add_theme_stylebox_override(estado,
-				TemaRegiao.caixa("botao_jogar", _regiao, Vector4(20, 6, 20, 6), extra))
-	# o brilho por trás dos cabeçalhos segue a cor da região
-	for l in [_titulo_regiao, _nivel_titulo]:
-		if l:
-			var p: Color = t["primaria"]
-			l.add_theme_color_override("font_shadow_color", Color(p.r, p.g, p.b, 0.5))
-
-
-# ── desenho do trilho ────────────────────────────────────────────────────
-
-func _desenhar_trilho() -> void:
-	var k := _trilho.size / Frontend9H.PALCO
-	var pontos := PackedVector2Array()
-	for i in NOS.size():
-		pontos.append(NOS[i]["p"] * k)
-		if i < TRILHO.size():
-			pontos.append(TRILHO[i] * k)
-	# ordena pelo x para o traço não saltar (os intermédios vêm intercalados)
-	var lista: Array[Vector2] = []
-	for p in pontos:
-		lista.append(p)
-	lista.sort_custom(func(a: Vector2, b: Vector2) -> bool: return a.x < b.x)
-	var suave := PackedVector2Array(lista)
-	# o trilho fica CLARO até onde se pode ir e apagado a seguir: é a
-	# leitura de progresso que a prancha faz com o brilho do caminho
-	var corte := 0
-	for i in _nos.size():
-		if _nos[i]["jogavel"]:
-			corte = i
-	var limite: float = NOS[corte]["p"].x * k.x
-	for i in suave.size() - 1:
-		var a := suave[i]
-		var b := suave[i + 1]
-		var aceso := b.x <= limite + 2.0
-		var t := TemaRegiao.do_indice(_regiao)
-		var cor: Color = t["trilho"] if aceso else Color(0.45, 0.42, 0.48, 0.32)
-		_trilho.draw_line(a, b, cor, 3.0 * k.y, true)
-		if aceso:
-			_trilho.draw_line(a, b, t["trilho_brilho"], 8.0 * k.y, true)
-
-
-# ── estado ───────────────────────────────────────────────────────────────
+func _transitar_vista(entrar: Control, sair: Control) -> void:
+    if not is_instance_valid(entrar) or not is_instance_valid(sair):
+        return
+    entrar.modulate.a = 0.0
+    entrar.visible = true
+    var tween := create_tween().set_parallel(true).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+    tween.tween_property(entrar, "modulate:a", 1.0, 0.16)
+    tween.tween_property(sair, "modulate:a", 0.0, 0.12)
+    tween.chain().tween_callback(func() -> void: sair.visible = false)
 
 func _actualizar() -> void:
-	if not _pronto:
-		return
-	_aplicar_tema()
-	var niveis: Array = EstadoJogo.REGIOES[_regiao]["niveis"]
-	if not (_sel in niveis):
-		_sel = niveis[0]
+    if not _pronto:
+        return
+    var tema: Dictionary = TemaRegiao.do_indice(_regiao)
+    _actualizar_fundo(tema)
+    if _barras:
+        _barras.modulate = Color(0.18, 0.12, 0.22, 1.0)
+    if _vista_regioes:
+        _titulo.text = "LEVEL SELECT"
+        _subtitulo.text = "20 REGIONS  ·  100 LEVELS  ·  SELECT A REGION"
+        _voltar.text = Textos.t("selector.back_to_menu")
+    else:
+        _titulo.text = "%s %s — %s" % [Textos.t("selector.region"), ROMANOS[_regiao], Textos.t(EstadoJogo.REGIOES[_regiao]["chave"]).to_upper()]
+        _subtitulo.text = "5 LEVELS  ·  BOSS N%02d  ·  %s" % [(_regiao + 1) * 5, _texto_estado(_estado_regiao(_regiao))]
+        _voltar.text = "←  REGIONS"
+    _santuario_botao.text = Textos.t("shrine.open")
+    _regioes_painel.visible = _vista_regioes
+    _niveis_painel.visible = not _vista_regioes
+    _actualizar_carousel()
+    for r in _region_cards.size():
+        var b := _region_cards[r]
+        var reg: Dictionary = EstadoJogo.REGIOES[r]
+        var estado := _estado_regiao(r)
+        var nome := Textos.t(reg["chave"])
+        if nome == reg["chave"]:
+            nome = str(reg["nome"])
+        var estado_marca := _texto_estado(estado)
+        var ns_regiao: Array = reg["niveis"]
+        var primeiro := int(ns_regiao[0]) + 1
+        var ultimo := int(ns_regiao[ns_regiao.size() - 1]) + 1
+        b.text = "%s  %02d\n%s\nN%02d–N%02d" % [ROMANOS[r], r + 1, nome.to_upper(), primeiro, ultimo]
+        _estilo_cartao(b, reg.get("cor", Color.WHITE), r == _regiao, estado == "LOCKED")
+        b.tooltip_text = "LOCKED" if estado == "LOCKED" else nome
+        b.visible = _vista_regioes and (r == _regiao or r == _regiao - 1 or r == _regiao + 1)
+    var ns: Array = EstadoJogo.REGIOES[_regiao]["niveis"]
+    for i in _level_cards.size():
+        var indice := int(ns[i])
+        var estado := _estado_nivel(indice)
+        var nome := _nome_nivel(indice)
+        var marca := _texto_estado(estado)
+        _level_cards[i].text = "N%02d%s\n%s" % [indice + 1, "  · BOSS" if i == 4 else "", marca]
+        _estilo_cartao(_level_cards[i], tema.get("primaria", Color.WHITE), indice == _sel, estado == "LOCKED")
+        if i == 4 and estado != "LOCKED":
+            _level_cards[i].add_theme_color_override("font_color", Color(1.0, 0.84, 0.58))
+        _level_cards[i].tooltip_text = "LOCKED" if estado == "LOCKED" else nome
+        _nos[i]["indice"] = indice
+    var passo: Array = EstadoJogo.passo_na_regiao(_sel)
+    var sel_estado := _estado_nivel(_sel)
+    _detalhe.text = "%s %02d  ·  %s\n%s" % [Textos.t("selector.level"), _sel + 1, "BOSS" if int(passo[0]) == 5 else "", _nome_nivel(_sel)]
+    _estado.text = "%s  ·  %s%s" % [_texto_estado(sel_estado), _nome_nivel(_sel), "  ·  %s" % _nome_chefe(_sel) if int(passo[0]) == 5 else ""]
+    var boss_visivel := int(passo[0]) == 5
+    _boss_painel.visible = boss_visivel
+    if boss_visivel:
+        _boss_arte.texture = load(BOSS_ART[_regiao]) as Texture2D
+        _boss_nome.text = "BOSS  ·  %s" % BOSS_NOMES[_regiao]
+    _jogar.text = Textos.t("selector.play")
+    _jogar.disabled = sel_estado == "LOCKED"
+    _jogar.modulate = Color(0.6, 0.6, 0.68) if _jogar.disabled else Color.WHITE
 
-	_voltar.text = Textos.t("selector.back_to_menu")
-	_santuario_botao.text = Textos.t("shrine.open")
-	_titulo_regiao.text = "%s %s — %s" % [Textos.t("selector.region"),
-		ROMANOS[_regiao], Textos.t(EstadoJogo.REGIOES[_regiao]["chave"]).to_upper()]
-	var chave_citacao := "selector.quote_region_%d" % (_regiao + 1)
-	var citacao := Textos.t(chave_citacao)
-	_citacao.text = citacao if citacao != chave_citacao else Textos.t("selector.quote_region")
-	_citacao_canto.text = Textos.t("selector.quote_corner")
-	(_seta_esq.get_meta("rotulo") as Label).text = Textos.t("selector.prev_region")
-	(_seta_dir.get_meta("rotulo") as Label).text = Textos.t("selector.next_region")
-	_seta_esq.disabled = _regiao <= 0
-	_seta_dir.disabled = _regiao >= EstadoJogo.REGIOES.size() - 1
-	(_seta_esq.get_meta("imagem") as Control).modulate.a = 0.28 if _seta_esq.disabled else 1.0
-	(_seta_dir.get_meta("imagem") as Control).modulate.a = 0.28 if _seta_dir.disabled else 1.0
+func _actualizar_fundo(tema: Dictionary) -> void:
+    if not _arte:
+        return
+    var novo := FUNDO_SELECTOR_DIR + "region_%02d.png" % (_regiao + 1)
+    var textura := load(novo) as Texture2D
+    var tinta: Color = tema.get("tinta_fundo", Color.WHITE)
+    if _fundo_regiao == _regiao:
+        _arte.modulate = tinta
+        return
+    _fundo_regiao = _regiao
+    var troca := create_tween().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+    troca.tween_property(_arte, "modulate:a", 0.72, 0.08)
+    troca.tween_callback(func() -> void:
+        _arte.texture = textura
+        _arte.modulate = tinta
+        if _barras:
+            _barras.texture = textura
+    )
+    troca.tween_property(_arte, "modulate:a", 1.0, 0.16)
 
-	# --- nós ---
-	for i in _nos.size():
-		var n: Dictionary = _nos[i]
-		var indice: int = niveis[i] if i < niveis.size() else -1
-		n["indice"] = indice
-		var jogavel := indice >= 0 and (not _respeitar_bloqueio
-			or EstadoJogo.nivel_desbloqueado(indice))
-		n["jogavel"] = jogavel
-		var concluido := indice in EstadoJogo.concluidos
-		var anel := n["anel"] as TextureRect
-		var qual := "anel_chefe" if i == NOS.size() - 1 else (
-			"anel_atual" if indice == _sel else "anel_normal")
-		anel.texture = TemaRegiao.textura(qual, _regiao)
-		anel.set_meta("peca", qual)
-		for d in _pecas:
-			if d["no"] == anel:
-				d["peca"] = qual
-		anel.modulate = Color(1, 1, 1, 1) if jogavel else Color(0.55, 0.52, 0.58, 0.7)
-		if indice == _sel:
-			# realce na cor da região (nas regiões sem pele fica em aço, não
-			# em rosa -- o realce era o último sítio por onde o carmesim
-			# fugia para um ecrã que já não é carmesim)
-			var pc: Color = TemaRegiao.do_indice(_regiao)["primaria_clara"]
-			anel.modulate = Color(0.7 + pc.r * 0.75, 0.7 + pc.g * 0.75,
-				0.7 + pc.b * 0.75, 1.0)
-		(n["rotulo"] as Label).text = "%d-%d" % [_regiao + 1, i + 1]
-		(n["rotulo"] as Label).add_theme_color_override("font_color",
-			Frontend9H.OSSO if jogavel else Frontend9H.TEXTO_APAGADO)
-		(n["ficha"] as Control).modulate = Color(1, 1, 1, 1) if jogavel else Color(0.6, 0.58, 0.62, 0.85)
-		(n["cadeado"] as Control).visible = not jogavel
-		(n["botao"] as Button).tooltip_text = _nome_nivel(indice) if jogavel \
-			else Textos.t("selector.unknown")
-		if concluido:
-			(n["rotulo"] as Label).add_theme_color_override("font_color", Frontend9H.VERDE_ESTADO)
-	_trilho.queue_redraw()
-	_pulsar_selecionado()
-
-	# --- painel ---
-	var passo: Array = EstadoJogo.passo_na_regiao(_sel)
-	var jogavel_sel := not _respeitar_bloqueio or EstadoJogo.nivel_desbloqueado(_sel)
-	_nivel_titulo.text = "%s %d-%d" % [Textos.t("selector.level"), _regiao + 1, int(passo[0])]
-	_nivel_nome.text = _nome_nivel(_sel) if jogavel_sel else Textos.t("selector.unknown")
-	var chefe := _nome_chefe(_sel)
-	_nivel_chefe.text = Textos.tf("sel.guard", [chefe]) if (chefe != "" and jogavel_sel) else ""
-	var estado_chave := "selector.state_locked"
-	var cor_estado := Frontend9H.TEXTO_APAGADO
-	if _sel in EstadoJogo.concluidos:
-		estado_chave = "selector.state_cleared"
-		cor_estado = Frontend9H.VERDE_ESTADO
-	elif jogavel_sel:
-		estado_chave = "selector.state_available"
-		cor_estado = Frontend9H.VERDE_ESTADO
-	_nivel_estado.text = "%s: %s" % [Textos.t("selector.state"), Textos.t(estado_chave)]
-	_nivel_estado.add_theme_color_override("font_color", cor_estado)
-	_jogar.text = Textos.t("selector.play")
-	_jogar.disabled = not jogavel_sel
-	_jogar.modulate = Color(1, 1, 1, 1) if jogavel_sel else Color(0.55, 0.52, 0.56, 0.75)
-
-	_linhas_info[0].text = "%s  %s" % [Textos.t("selector.guardian"),
-		chefe if jogavel_sel else Textos.t("selector.unknown")]
-	_linhas_info[1].text = "%s  %s %d/%d" % [Textos.t("selector.region"),
-		ROMANOS[_regiao], int(passo[0]), int(passo[1])]
-	_linhas_info[2].text = "%s  %s" % [Textos.t("selector.state"), Textos.t(estado_chave)]
-
-	_miniatura.texture = _fundo_regiao(_regiao) if jogavel_sel else null
-	_miniatura.modulate = Color(0.9, 0.85, 0.92) if jogavel_sel else Color(0.2, 0.2, 0.22)
-	_retrato.texture = _retrato_chefe(_sel) if jogavel_sel else null
-
-	# --- abas ---
-	var base := _janela_abas()
-	for i in _abas.size():
-		var r := base + i
-		var b := _abas[i]
-		var existe := r >= 0 and r < EstadoJogo.REGIOES.size()
-		b.visible = existe
-		if not existe:
-			continue
-		var aberta := _regiao_aberta(r)
-		b.text = "%s\n%s" % [ROMANOS[r],
-			Textos.t(EstadoJogo.REGIOES[r]["chave"]).to_upper() if aberta
-			else Textos.t("selector.unknown")]
-		b.add_theme_stylebox_override("normal",
-			TemaRegiao.caixa("aba_atual" if r == _regiao else "aba_bloqueada", _regiao,
-				Vector4(10, 6, 10, 6)))
-		b.add_theme_stylebox_override("hover",
-			TemaRegiao.caixa("aba_atual", _regiao, Vector4(10, 6, 10, 6), Color(1.3, 1.05, 1.05)))
-		b.add_theme_stylebox_override("focus",
-			TemaRegiao.caixa("aba_atual", _regiao, Vector4(10, 6, 10, 6), Color(1.3, 1.05, 1.05)))
-		b.add_theme_color_override("font_color",
-			Frontend9H.OSSO if r == _regiao else (
-				Frontend9H.TEXTO if aberta else Frontend9H.TEXTO_APAGADO))
-		b.modulate = Color(1, 1, 1, 1) if aberta else Color(0.8, 0.78, 0.82, 0.9)
-
-
-## Uma região está aberta quando o seu primeiro nível já se pode jogar.
-func _regiao_aberta(r: int) -> bool:
-	if not _respeitar_bloqueio:
-		return true
-	var ns: Array = EstadoJogo.REGIOES[r]["niveis"]
-	return not ns.is_empty() and EstadoJogo.nivel_desbloqueado(int(ns[0]))
-
-
-## Janela de 5 abas centrada na região atual, sem sair das pontas.
-func _janela_abas() -> int:
-	return clampi(_regiao - 2, 0, maxi(0, EstadoJogo.REGIOES.size() - 5))
-
-
-## Sopro lento no anel selecionado -- o único movimento do mapa, e o que
-## diz onde se está sem precisar de mais uma cor.
-func _pulsar_selecionado() -> void:
-	for n in _nos:
-		var anel := n["anel"] as TextureRect
-		anel.scale = Vector2.ONE
-		anel.pivot_offset = anel.size / 2.0
-		if int(n["indice"]) != _sel:
-			continue
-		var t := anel.create_tween().set_loops().set_trans(Tween.TRANS_SINE)
-		t.tween_property(anel, "scale", Vector2(1.045, 1.045), 1.0)
-		t.tween_property(anel, "scale", Vector2.ONE, 1.0)
-
-
-# ── navegação ────────────────────────────────────────────────────────────
-
-func _escolher_no(i: int) -> void:
-	var niveis: Array = EstadoJogo.REGIOES[_regiao]["niveis"]
-	if i < 0 or i >= niveis.size():
-		return
-	var novo: int = niveis[i]
-	if novo == _sel:
-		return
-	_sel = novo
-	Som.toca("ui_mover", -12.0, randf_range(0.97, 1.05))
-	_actualizar()
-
+func _actualizar_carousel() -> void:
+    if _region_cards.is_empty():
+        return
+    var posicoes := {
+        -1: Rect2(142, 266, 252, 106),
+        0: Rect2(514, 236, 252, 132),
+        1: Rect2(886, 266, 252, 106),
+    }
+    for r in _region_cards.size():
+        var delta := r - _regiao
+        var b := _region_cards[r]
+        if not posicoes.has(delta):
+            b.visible = false
+            continue
+        var alvo: Rect2 = posicoes[delta]
+        Frontend9H.por(b, alvo)
+        b.z_index = 3 if delta == 0 else 1
+        b.modulate.a = 1.0 if delta == 0 else 0.62
+        b.add_theme_font_size_override("font_size", 21 if delta == 0 else 15)
+    var reg: Dictionary = EstadoJogo.REGIOES[_regiao]
+    var nome := Textos.t(reg["chave"])
+    if nome == reg["chave"]:
+        nome = str(reg["nome"])
+    var estado := _estado_regiao(_regiao)
+    var ns: Array = reg["niveis"]
+    var feitos := 0
+    for indice in ns:
+        if EstadoJogo.nivel_esta_concluido(int(indice)):
+            feitos += 1
+    _regiao_nome.text = "%s  %s" % [ROMANOS[_regiao], nome.to_upper()]
+    _regiao_meta.text = "N%02d–N%02d  ·  5 LEVELS  ·  BOSS N%02d" % [int(ns[0]) + 1, int(ns[4]) + 1, int(ns[4]) + 1]
+    _regiao_estado.text = "%s  ·  %d / 5 COMPLETE" % [_texto_estado(estado), feitos]
+    _regiao_progresso.value = feitos * 20.0
+    _regiao_entrar.text = "VIEW LEVELS"
+    _regiao_entrar.disabled = _respeitar_bloqueio and not _regiao_aberta(_regiao)
+    _regiao_entrar.modulate = Color(0.55, 0.55, 0.60) if _regiao_entrar.disabled else Color.WHITE
+    _regiao_esquerda.disabled = _regiao == 0
+    _regiao_direita.disabled = _regiao == EstadoJogo.REGIOES.size() - 1
 
 func _mudar_regiao(dir: int) -> void:
-	var nova := clampi(_regiao + dir, 0, EstadoJogo.REGIOES.size() - 1)
-	if nova == _regiao:
-		return
-	_regiao = nova
-	_sel = int(EstadoJogo.REGIOES[_regiao]["niveis"][0])
-	Som.toca("ui_mover", -9.0, 0.90 if dir < 0 else 1.10)
-	_actualizar()
+    _regiao = clampi(_regiao + dir, 0, EstadoJogo.REGIOES.size() - 1)
+    _sel = int(EstadoJogo.REGIOES[_regiao]["niveis"][0])
+    _actualizar()
 
-
-func _ir_para_aba(i: int) -> void:
-	_mudar_regiao(_janela_abas() + i - _regiao)
-
-
-func _mover(dir: int) -> void:
-	var niveis: Array = EstadoJogo.REGIOES[_regiao]["niveis"]
-	var pos := niveis.find(_sel)
-	var novo := pos + dir
-	if novo < 0:
-		_mudar_regiao(-1)
-		var ns: Array = EstadoJogo.REGIOES[_regiao]["niveis"]
-		_sel = int(ns[ns.size() - 1])
-		_actualizar()
-		return
-	if novo >= niveis.size():
-		_mudar_regiao(1)
-		return
-	_escolher_no(novo)
-
+func _mover_nivel(dir: int) -> void:
+    var ns: Array = EstadoJogo.REGIOES[_regiao]["niveis"]
+    var pos := clampi(ns.find(_sel) + dir, 0, ns.size() - 1)
+    _selecionar_nivel(pos)
+    _level_cards[pos].grab_focus()
 
 func _confirmar() -> void:
-	if _respeitar_bloqueio and not EstadoJogo.nivel_desbloqueado(_sel):
-		Som.toca("ui_negado", -8.0)
-		var t := create_tween()
-		t.tween_property(_painel, "position:x", _painel.position.x + 7, 0.04)
-		t.tween_property(_painel, "position:x", _painel.position.x - 7, 0.04)
-		t.tween_property(_painel, "position:x", _painel.position.x, 0.04)
-		return
-	Som.toca("ui_confirmar", -5.0)
-	escolhido.emit(_sel)
-
+    if _vista_regioes:
+        _abrir_regiao(_regiao)
+        return
+    if _respeitar_bloqueio and not EstadoJogo.nivel_desbloqueado(_sel):
+        Som.toca("ui_negado", -8.0)
+        return
+    Som.toca("ui_confirmar", -5.0)
+    escolhido.emit(_sel)
 
 func _unhandled_input(evento: InputEvent) -> void:
-	if _santuario != null:
-		return
-	if evento.is_action_pressed("ui_cancel"):
-		accept_event()
-		Som.toca("ui_voltar", -8.0)
-		cancelado.emit()
-	elif evento.is_action_pressed("ui_left"):
-		accept_event()
-		_mover(-1)
-	elif evento.is_action_pressed("ui_right"):
-		accept_event()
-		_mover(1)
-	elif evento.is_action_pressed("ui_up"):
-		accept_event()
-		_mudar_regiao(-1)
-	elif evento.is_action_pressed("ui_down"):
-		accept_event()
-		_mudar_regiao(1)
-	elif evento.is_action_pressed("ui_accept"):
-		accept_event()
-		_confirmar()
+    if _santuario != null:
+        return
+    if evento.is_action_pressed("ui_cancel"):
+        accept_event(); _voltar_premido()
+    elif _vista_regioes and evento.is_action_pressed("ui_left"):
+        accept_event(); _mudar_regiao(-1)
+    elif _vista_regioes and evento.is_action_pressed("ui_right"):
+        accept_event(); _mudar_regiao(1)
+    elif _vista_regioes and evento.is_action_pressed("ui_up"):
+        accept_event(); _abrir_regiao(_regiao)
+    elif _vista_regioes and evento.is_action_pressed("ui_down"):
+        accept_event(); _abrir_regiao(_regiao)
+    elif not _vista_regioes and evento.is_action_pressed("ui_left"):
+        accept_event(); _mover_nivel(-1)
+    elif not _vista_regioes and evento.is_action_pressed("ui_right"):
+        accept_event(); _mover_nivel(1)
+    elif not _vista_regioes and evento.is_action_pressed("ui_up"):
+        accept_event(); _mudar_regiao(-1)
+    elif not _vista_regioes and evento.is_action_pressed("ui_down"):
+        accept_event(); _mudar_regiao(1)
+    elif evento.is_action_pressed("ui_accept"):
+        accept_event(); _confirmar()
 
-
-# ── santuário ────────────────────────────────────────────────────────────
-
-func _abrir_santuario() -> void:
-	if _santuario != null:
-		return
-	Som.toca("porta", -10.0, 1.1)
-	_santuario = SANTUARIO_CENA.instantiate()
-	_santuario.z_index = 100
-	add_child(_santuario)
-	_santuario.fechado.connect(func() -> void:
-		if is_instance_valid(_santuario):
-			_santuario.queue_free()
-		_santuario = null
-		_actualizar())
-
-
-# ── nomes / arte ─────────────────────────────────────────────────────────
-
-## Nome do nível: chave `level.n##` traduzida; se faltar, cai no nome do
-## ficheiro da cena com underscores -> espaços.
 func _nome_nivel(indice: int) -> String:
-	if indice < 0:
-		return ""
-	var chave := CatalogoCampanha.chave_nivel(indice)
-	var txt := Textos.t(chave)
-	if txt != chave:
-		return txt
-	if indice < EstadoJogo.NIVEIS.size():
-		return (EstadoJogo.NIVEIS[indice] as String).get_file().get_basename().replace("_", " ")
-	return chave
-
+    var chave := CatalogoCampanha.chave_nivel(indice)
+    var txt := Textos.t(chave)
+    if txt != chave:
+        return txt
+    return (EstadoJogo.NIVEIS[indice] as String).get_file().get_basename().replace("_", " ")
 
 func _nome_chefe(indice: int) -> String:
-	if indice < 0:
-		return ""
-	var chave := CatalogoCampanha.chave_chefe(indice)
-	return Textos.t(chave) if chave != "" else ""
+    var chave := CatalogoCampanha.chave_chefe(indice)
+    return Textos.t(chave) if chave != "" else ""
 
-
-## Miniatura do painel. Onde há arte de produção da região, é ELA que se vê
-## (a Região I tem o panorama da Árvore-Coração); fora disso volta-se à
-## camada de parallax de sempre. A `FUNDO_REGIAO[0]` era uma floresta de
-## OUTONO, laranja e vermelha, e num ecrã verde lia-se como um erro.
-func _fundo_regiao(r: int) -> Texture2D:
-	var t := TemaRegiao.do_indice(r)
-	var mini: String = String(t.get("miniatura", ""))
-	if mini != "" and ResourceLoader.exists(mini):
-		return load(mini)
-	if r < 0 or r >= FUNDO_REGIAO.size():
-		return null
-	var cam: String = FUNDO_REGIAO[r]
-	return load(cam) if ResourceLoader.exists(cam) else null
-
-
-func _retrato_chefe(indice: int) -> Texture2D:
-	if indice < 0 or indice >= RETRATO_CHEFE.size():
-		return null
-	var slug: String = RETRATO_CHEFE[indice]
-	if slug == "":
-		return null
-
-	var cam := "res://assets/sprites/pixel/bosses_anim/%s/idle.png" % slug
-	if ResourceLoader.exists(cam):
-		var cfg: Variant = ChefeBase._rigs().get(slug, null)
-		var n := 1
-		if cfg is Dictionary:
-			n = int(((cfg as Dictionary).get("estados", {}) as Dictionary).get("idle", 1))
-		return _frame0(cam, maxi(1, n))
-
-	cam = "res://assets/sprites/pixel/enemies/%s/idle.png" % slug
-	if ResourceLoader.exists(cam):
-		var esp: Dictionary = DemonioBase.ESPECIES.get(slug, {})
-		return _frame0(cam, maxi(1, int(esp.get("idle", 4))))
-
-	cam = "res://assets/sprites/pixel/bosses/%s.png" % slug
-	if FileAccess.file_exists(cam):
-		var folha := load(cam) as Texture2D
-		if folha == null:
-			return null
-		# Os bosses antigos usam tiras horizontais de quatro poses; os
-		# retratos novos são PNGs únicos quadrados.
-		return _frame0(cam, 4) if folha.get_width() > folha.get_height() * 1.5 else folha
-	cam = "res://assets/sprites/pixel/bosses/%s.svg" % slug
-	if FileAccess.file_exists(cam):
-		return load(cam)
-	return null
-
-
-## Primeiro frame de uma tira horizontal de `n` frames.
-func _frame0(caminho: String, n: int) -> Texture2D:
-	var folha: Texture2D = load(caminho)
-	if folha == null:
-		return null
-	var atlas := AtlasTexture.new()
-	atlas.atlas = folha
-	atlas.region = Rect2(0, 0, folha.get_width() / float(n), folha.get_height())
-	return atlas
-
-
-## Cor da região `r` (ordem de `EstadoJogo.REGIOES`). Mantida para quem a
-## usava de fora (testes e a HUD).
-func cor_regiao(r: int) -> Color:
-	if r < 0 or r >= EstadoJogo.REGIOES.size():
-		return Color(0.7, 0.7, 0.7)
-	return EstadoJogo.REGIOES[r].get("cor", Color(0.7, 0.7, 0.7))
+func _abrir_santuario() -> void:
+    if _santuario != null:
+        return
+    _santuario = SANTUARIO_CENA.instantiate()
+    _santuario.z_index = 100
+    add_child(_santuario)
+    _santuario.fechado.connect(func() -> void:
+        if is_instance_valid(_santuario):
+            _santuario.queue_free()
+        _santuario = null
+        _actualizar())

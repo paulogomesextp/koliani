@@ -15,6 +15,7 @@ prioridades e dashboard.
 | DEC-007 | A Região I, níveis 1–5, é a primeira Vertical Slice. | ACEITE |
 | DEC-008 | Validação desktop não fecha problemas específicos de dispositivo. | ACEITE |
 | DEC-009 | A Execution 2 não começa durante a Execution 1C. | ACEITE |
+| DEC-010 | Paulo aprovou as 20 artes dedicadas do pacote `KOLIANI_LevelSelector_RegionBackgrounds_01-20.zip` para os backgrounds do Level Selector das regiões 1–20 (commit fonte `52ea3394`, 22 set 2026). | ACEITE |
 
 ## Consequências atuais
 
