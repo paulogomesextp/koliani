@@ -3939,9 +3939,28 @@ func teste_r3_niveis_carregam() -> void:
 		_ok(cena != null, "R3: o N%d nao carrega" % [11 + i])
 		var raiz: Node = cena.instantiate()
 		get_tree().root.add_child(raiz)
+		# Este teste so' verifica ESTRUTURA (a Koliani e a Porta existem), mas
+		# a cena e' o nivel REAL, com armadilhas/inimigos vivos, e a Koliani
+		# arranca sem passar pelo `Main.tscn`/checkpoint normais -- pode
+		# morrer nos dois frames seguintes. `_morrer()` agenda
+		# `Transicao.fechar_e(get_tree().reload_current_scene)` (koliani.gd)
+		# num Tween que NAO esta' preso a `raiz` -- o `raiz.queue_free()` a
+		# seguir nao o cancela. Uns frames depois (a meio dos testes da
+		# Regiao III seguintes) esse Tween recarregava a CENA ATUAL, que e'
+		# o proprio `run_tests.tscn`: a corrida reiniciava a meio ("runner
+		# repetido"), e a instancia orfa desta corotina passava a chamar
+		# `get_tree()` sobre um no' ja fora da arvore -- daqui os
+		# `Cannot call method 'quit' on a null value` no fim da suite.
+		# `_a_morrer = true` faz `_morrer()` devolver logo (guarda-o tanto em
+		# `receber_dano()` como em `_dano_de_estado()`), sem mexer em
+		# `koliani.gd`: a Koliani fica presente para os dois `_ok()` a seguir,
+		# so' nao pode morrer durante o checkpoint.
+		var kol := raiz.get_node_or_null("Koliani")
+		if kol:
+			kol.set("_a_morrer", true)
 		await get_tree().process_frame
 		await get_tree().process_frame
-		_ok(raiz.get_node_or_null("Koliani") != null,
+		_ok(kol != null,
 			"R3: o N%d devia ter a Koliani" % [11 + i])
 		_ok(raiz.get_node_or_null("Porta") != null,
 			"R3: o N%d devia ter a saida" % [11 + i])
