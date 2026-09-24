@@ -7,9 +7,9 @@ Coração Podre, Região I). DETERMINÍSTICO: mexer AQUI e regerar, nunca nos PN
 Gera em assets/ui/shop/heartrot/rootbound_frame/:
   rootbound_frame.png   nine-patch do disco da arma   (88x88, pixel x2, margem 22)
   rootbound_placa.png   nine-patch da placa do nível  (128x64, pixel x2, margens 16/14/16/14)
-  base_raizes.png       raízes à volta da fogueira    (48x16, pixel x1)
-  cogumelos.png         fungos junto à base           (56x12, pixel x1)
-  cogumelos_brilho.png  halo fúngico (fogueira apagada) (56x12, pixel x1)
+  base_raizes.png       raízes à volta da fogueira    (56x20, pixel x1)
+  cogumelos.png         fungos junto à base           (64x14, pixel x1)
+  cogumelos_brilho.png  halo fúngico (fogueira apagada) (64x14, pixel x1)
   preview.png           preview da Loja, COMPOSTA a partir dos assets acima (340x130)
 
 Paleta canónica (aprovada): musgo #5E7A3A, bile #B8C24A, madeira #3A2A20,
@@ -227,68 +227,86 @@ def gerar_placa():
     return amp(im, 2)
 
 
+def raiz_g(im, pts):
+    """Raiz de 3 px (corpo duplicado) com fio de luz -- a base é para se ver."""
+    raiz(im, pts)
+    raiz(im, [(x, y + 1) for x, y in pts], luz=False)
+
+
 def gerar_base():
-    """Raízes que abraçam a roda de pedras: dois arcos nodosos, de baixo
-    para os lados; o centro fica livre para a chama."""
+    """Raízes que abraçam a lenha: cama grossa por baixo, duas garras a subir
+    de cada lado e raízes curtas a atravessar as pontas dos troncos. O centro
+    fica livre para a chama."""
     rng = random.Random(3)
-    im = nova(48, 16)
-    raiz(im, [(1, 13), (4, 11), (7, 12), (11, 10), (15, 12), (19, 13)])
-    raiz(im, [(46, 13), (43, 11), (40, 12), (36, 10), (32, 12), (28, 13)])
-    raiz(im, [(3, 14), (9, 14), (15, 15), (23, 14)], luz=False)
-    raiz(im, [(44, 14), (38, 14), (32, 15), (25, 14)], luz=False)
-    raiz(im, [(10, 10), (8, 7), (9, 5)], luz=False)          # garra a subir à esquerda
-    raiz(im, [(37, 10), (39, 7), (38, 5)], luz=False)        # e à direita
-    for cx, cy in [(5, 11), (12, 10), (36, 10), (43, 11), (24, 14)]:
-        musgo(im, cx, cy, rng, 4, 1)
-    osso(im, 20, 13, -1, 0) if False else None
-    # um osso pequeno metido entre as raízes da direita (o detalhe de osso)
-    pt(im, 30, 13, OSSO)
-    pt(im, 31, 13, OSSO)
-    pt(im, 32, 13, OSSO)
-    pt(im, 29, 12, OSSO)
-    pt(im, 33, 12, OSSO)
-    pt(im, 31, 14, OSSO_SOMBRA)
+    im = nova(56, 20)
+    # cama de raízes por baixo (dois arcos que se cruzam ao centro)
+    raiz_g(im, [(1, 17), (5, 16), (10, 18), (16, 17), (22, 18), (28, 17)])
+    raiz_g(im, [(54, 17), (50, 16), (45, 18), (39, 17), (33, 18), (28, 17)])
+    # garras laterais a subir e a curvar sobre a lenha
+    raiz_g(im, [(3, 16), (4, 12), (6, 8), (9, 6), (13, 6)])
+    raiz_g(im, [(52, 16), (51, 12), (49, 8), (46, 6), (42, 6)])
+    raiz_g(im, [(9, 17), (11, 13), (14, 11), (17, 11)])       # 2.ª raiz lateral
+    raiz_g(im, [(46, 17), (44, 13), (41, 11), (38, 11)])
+    # raízes curtas por cima das pontas dos troncos
+    raiz(im, [(15, 14), (19, 13), (23, 14)], luz=False)
+    raiz(im, [(40, 14), (36, 13), (32, 14)], luz=False)
+    for cx, cy in [(5, 15), (8, 7), (12, 17), (19, 17), (36, 17), (44, 17), (49, 9), (52, 16)]:
+        musgo(im, cx, cy, rng, 5, 1)
+    # osso pequeno metido entre as raízes da direita (o detalhe de osso)
+    for x in (30, 31, 32, 33):
+        pt(im, x, 16, OSSO)
+    pt(im, 29, 15, OSSO)
+    pt(im, 34, 15, OSSO)
+    pt(im, 31, 17, OSSO_SOMBRA)
     return im
 
 
-def _grupo_cogumelos(im, xs, brilho):
-    for x, y, cor in xs:
-        if brilho:
-            # halo pequeno e suave (a fogueira apagada brilha por aqui)
-            for dx, dy, a in [(0, 0, 200), (-1, 0, 120), (1, 0, 120), (0, -1, 120), (0, 1, 90),
-                              (-2, 0, 60), (2, 0, 60), (0, -2, 60)]:
-                pt(im, x + dx, y + dy, cor, a)
-        else:
-            cogumelo(im, x, y, cor)
+def cogumelo_g(im, x, y, cor=BILE):
+    """Cogumelo maior: chapéu de 5x2 com sombra, pé de 3 px."""
+    for dx in range(-2, 3):
+        pt(im, x + dx, y, cor)
+    for dx in (-1, 0, 1):
+        pt(im, x + dx, y - 1, cor)
+    for dx in range(-2, 3):
+        pt(im, x + dx, y + 1, MUSGO_ESC)
+    pt(im, x, y - 2, OSSO)                       # ponto claro no chapéu
+    for k in (2, 3, 4):
+        pt(im, x, y + k, OSSO if k < 4 else OSSO_SOMBRA)
 
 
-COGUMELOS = [(4, 6, BILE), (7, 8, MUSGO), (10, 5, BILE),
-             (45, 6, BILE), (48, 8, MUSGO), (51, 5, BILE)]
+COGUMELOS = [(5, 7, BILE), (11, 9, MUSGO), (15, 6, BILE), (20, 10, MUSGO),
+             (44, 10, MUSGO), (49, 6, BILE), (53, 9, MUSGO), (59, 7, BILE)]
 
 
 def gerar_cogumelos(brilho):
-    im = nova(56, 12)
-    _grupo_cogumelos(im, COGUMELOS, brilho)
-    if not brilho:
-        rng = random.Random(5)
-        for cx in (7, 48):
-            musgo(im, cx, 10, rng, 5, 2)
+    im = nova(64, 14)
+    for x, y, cor in COGUMELOS:
+        if brilho:
+            # halo suave (a fogueira apagada brilha por aqui): só nos bile
+            if cor == BILE:
+                for dx, dy, a in [(0, 0, 210), (-1, 0, 150), (1, 0, 150), (0, -1, 150), (-2, 0, 90), (2, 0, 90),
+                                  (0, -2, 90), (-1, -1, 70), (1, -1, 70), (0, 1, 70), (-3, 0, 45), (3, 0, 45)]:
+                    pt(im, x + dx, y + dy, BILE, a)
+        else:
+            cogumelo_g(im, x, y, cor)
     return im
 
 
 # --- preview da Loja: composta a partir dos assets acima ---------------------
 def chama(im, cx, base_y, alto, forte):
-    """Chama em pixel para o PREVIEW (no jogo é um sistema de partículas)."""
-    perfil = [(0, 7), (1, 9), (3, 8), (5, 7), (8, 5), (11, 3), (14, 1)]
-    for i, (d, larg) in enumerate(perfil):
+    """Chama em pixel para o PREVIEW, com a rampa REAL do jogo: núcleo bile,
+    exterior musgo, fagulhas púrpura (no jogo é um sistema de partículas)."""
+    perfil = [(0, 8), (1, 10), (3, 9), (5, 8), (8, 6), (11, 4), (14, 2), (17, 1)]
+    for d, larg in perfil:
         if d > alto:
             break
         y = base_y - d
         for dx in range(-larg // 2, larg // 2 + 1):
-            cor = MUSGO if abs(dx) * 2 >= larg - 1 else (BILE if d > 1 else (0xE8, 0xF0, 0xA0))
+            borda = abs(dx) * 2 >= larg - 1
+            cor = MUSGO if borda else ((0x8F, 0xA0, 0x43) if d > 5 else BILE)
             pt(im, cx + dx, y, cor, 235 if forte else 130)
     if forte:
-        for (dx, dy) in [(-4, -8), (3, -11), (5, -6), (-2, -14)]:
+        for (dx, dy) in [(-5, -10), (4, -14), (6, -7), (-3, -18)]:
             pt(im, cx + dx, base_y + dy, PURPURA)
 
 
@@ -301,29 +319,34 @@ def gerar_preview(slot, placa, base, cog, cog_b):
     im.alpha_composite(placa.resize((96, 48), Image.NEAREST), (74, 18))
     for i, (cor, larg) in enumerate([(CARMESIM, 62), ((0x3A, 0x6E, 0xC8), 40)]):
         y = 84 + i * 14
-        for xx in range(10, 10 + 160):
+        for xx in range(10, 10 + 142):
             for yy in range(y, y + 9):
                 pt(im, xx, yy, CASCA)
         for xx in range(11, 11 + larg * 2 - 2):
-            if xx >= 169:
+            if xx >= 151:
                 break
             for yy in range(y + 1, y + 8):
                 pt(im, xx, yy, cor)
     # direita: a mesma fogueira apagada e acesa (forma e altura, nao so' cor)
     for i, aceso in enumerate((False, True)):
-        g = nova(56, 40)
+        g = nova(64, 44)
         pedras = nova(36, 6)
         for k in range(5):
             for xx in range(k * 7 + 1, k * 7 + 6):
                 for yy in range(1, 5):
                     pt(pedras, xx, yy, (0x3C, 0x38, 0x44))
-        g.alpha_composite(pedras, (10, 32))
+        g.alpha_composite(pedras, (14, 34))
+        # lenha escura (a do jogo com Rootbound): três achas em madeira/casca
+        for (ox, oy, cor) in [(20, 30, MADEIRA), (24, 33, CASCA), (28, 31, MADEIRA)]:
+            for xx in range(ox, ox + 18):
+                for yy in range(oy, oy + 4):
+                    pt(g, xx, yy, cor)
         g.alpha_composite(base, (4, 24))
-        g.alpha_composite(cog, (0, 26))
+        g.alpha_composite(cog, (0, 28))
         if not aceso:
-            g.alpha_composite(cog_b, (0, 26))
-        chama(g, 28, 32, 14 if aceso else 2, aceso)
-        im.alpha_composite(g.resize((84, 60), Image.NEAREST), (178 + i * 84, 44))
+            g.alpha_composite(cog_b, (0, 28))
+        chama(g, 32, 34, 17 if aceso else 0, aceso)
+        im.alpha_composite(g.resize((92, 63), Image.NEAREST), (160 + i * 92, 42))
     return im
 
 

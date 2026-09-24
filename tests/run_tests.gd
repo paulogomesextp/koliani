@@ -4495,9 +4495,14 @@ func teste_rootbound_frame() -> void:
 	var fog := CV.checkpoint_visual(RB)
 	_ok(not fog.is_empty() and fog.has("base") and fog.has("cogumelos") and fog.has("brilho") and fog["chama"].size() == 4,
 		"rootbound: recursos da fogueira")
+	# lenha escura e sem halo: a fogueira Rootbound traz cores proprias
+	_ok(fog.has("lenha") and fog.has("lenha_acesa") and fog.has("brasas") and fog["lenha"].get_luminance() < 0.15,
+		"rootbound: lenha escura")
+	_ok(fog["chama"][0].get_luminance() < 0.75 and fog["chama"][0].g > fog["chama"][0].r * 0.95,
+		"rootbound: chama fungica (nucleo bile, sem branco-amarelo)")
 	# tamanhos dos assets (contrato do gerador)
-	for par in [["rootbound_frame", 88, 88], ["rootbound_placa", 128, 64], ["base_raizes", 48, 16],
-			["cogumelos", 56, 12], ["cogumelos_brilho", 56, 12], ["preview", 346, 130]]:
+	for par in [["rootbound_frame", 88, 88], ["rootbound_placa", 128, 64], ["base_raizes", 56, 20],
+			["cogumelos", 64, 14], ["cogumelos_brilho", 64, 14], ["preview", 346, 130]]:
 		var t: Texture2D = load(CV.DIR_RAIZES + par[0] + ".png")
 		_ok(t != null and t.get_width() == par[1] and t.get_height() == par[2], "rootbound: asset %s %dx%d" % [par[0], par[1], par[2]])
 	# preview real so' neste item; os outros da colecao continuam ART PENDING

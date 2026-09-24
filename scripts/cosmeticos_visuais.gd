@@ -108,11 +108,16 @@ static func checkpoint_visual(id := "") -> Dictionary:
 		return {}
 	return {
 		"base": base, "cogumelos": cog, "brilho": brilho,
+		# chama fúngica: núcleo bile, corpo musgo, sem branco-amarelo
 		"chama": PackedColorArray([
-			Color("E8F0A0", 0.95), Color("B8C24A", 0.9), Color("5E7A3A", 0.55), Color("1E1712", 0.0)]),
-		"nucleo": Color("B8C24A", 0.8),
-		"luz": Color("D8E08A"),
+			Color("B8C24A", 0.95), Color("8FA043", 0.9), Color("5E7A3A", 0.7), Color("1E1712", 0.0)]),
+		"nucleo": Color("B8C24A", 0.7),
+		"luz": Color("A8B860"),
+		"brasas": PackedColorArray([Color("B8C24A", 0.0), Color("B8C24A", 0.85), Color("5E7A3A", 0.0)]),
 		"fagulhas": Color("9B3FB0"),
+		# lenha escura (madeira podre / casca) em vez do laranja original
+		"lenha": Color("2A1E17"),
+		"lenha_acesa": Color("3A2A20"),
 	}
 
 
