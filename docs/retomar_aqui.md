@@ -19,6 +19,15 @@ sem importar os 91 commits fora de scope da branch de origem.
 
 Proximo passo: confirmar o workflow de CI/PWA disparado pelo push de `master`.
 
+### Regra de entrega a partir de 24 set 2026
+
+Por decisao do GM, todo lote concluido daqui para a frente tem duas saidas
+obrigatorias: commit e push diretos em `master`, e regeneracao do executavel
+Windows principal pelo preset `Windows Desktop`, em
+`build/windows/Koliani.exe`. O `.exe` e' artefacto de build e nao deve ser
+adicionado ao Git; deve corresponder ao HEAD de `master` entregue. Branches
+separadas deixam de ser o canal de publicacao do trabalho concluido.
+
 ## Publicacao do SFX Overhaul em master para playtest na PWA (21 set 2026) · PUBLICADO
 
 `master` **72ea2477 -> 2fd7bd92 -> dd0e5767** por FAST-FORWARD puro (sem
