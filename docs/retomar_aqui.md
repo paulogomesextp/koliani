@@ -1,3 +1,13 @@
+## Renovacao dos niveis — Regiao II retomada (25 set 2026)
+
+Regiao I: Golden Set (L1-L5) no master. **Regiao II era a primeira incompleta**
+(remodel a meio, fora do master). Integrado o remodel + R7 (anti-repeticao de props)
++ R6 (aurora/raios). Geometria N06-N10 identica, suite verde. Detalhe e polish em
+`docs/qa/renovacao/regiao_02/NOTAS.md`. **Proxima regiao: III** (tecnicamente
+completa, mas por rever contra as pranchas), depois IV. Falta playtest humano da II.
+
+---
+
 ## Audio final integrado diretamente em master (24 set 2026)
 
 Por decisao do GM, entregas concluidas deixam de ficar apenas em branches de

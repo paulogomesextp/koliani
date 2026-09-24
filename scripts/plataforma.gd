@@ -317,9 +317,24 @@ func _aplicar() -> void:
 static func _props_de(bioma: String, onde: String) -> Array:
 	var r: Array = []
 	for p in _props(bioma):
-		if p is Dictionary and p.get("onde", "") == onde:
+		if p is Dictionary and p.get("onde", "") == onde and _vale_no_nivel(p):
 			r.append(p)
 	return r
+
+
+## Anti-repeticao (Regiao II): um prop com `niveis` so' aparece nesses niveis
+## (numeros 1-based). Sem o campo vale em todos.
+static func _vale_no_nivel(p: Dictionary) -> bool:
+	var ns: Variant = p.get("niveis", null)
+	if not (ns is Array):
+		return true
+	# Por caminho (e nao pelo identificador global) para compilar tambem em
+	# `--script`, onde os autoloads nao existem.
+	var arv := Engine.get_main_loop() as SceneTree
+	var estado: Node = arv.root.get_node_or_null("EstadoJogo") if arv else null
+	if estado == null:
+		return true
+	return (ns as Array).has(float(int(estado.get("indice_nivel")) + 1))   # o JSON traz floats
 
 
 ## Catalogo de props da regiao (`tools/gerar_deco.py`), lido uma vez.

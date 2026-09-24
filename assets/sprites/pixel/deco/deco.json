@@ -668,145 +668,240 @@
 			"nome": "balaustrada",
 			"onde": "parede",
 			"w": 96,
-			"h": 57
+			"h": 57,
+			"niveis": [
+				6,
+				10
+			]
 		},
 		{
 			"nome": "tocha",
 			"onde": "parede",
 			"w": 38,
-			"h": 62
+			"h": 62,
+			"niveis": [
+				6,
+				9
+			]
 		},
 		{
 			"nome": "janela_gotica",
 			"onde": "parede",
 			"w": 38,
-			"h": 76
+			"h": 76,
+			"niveis": [
+				7
+			]
 		},
 		{
 			"nome": "coluna_igreja",
 			"onde": "parede",
 			"w": 136,
-			"h": 228
+			"h": 228,
+			"niveis": [
+				9,
+				10
+			]
 		},
 		{
 			"nome": "pedra_talhada",
 			"onde": "chao",
 			"w": 38,
-			"h": 38
+			"h": 38,
+			"niveis": [
+				6,
+				8
+			]
 		},
 		{
 			"nome": "lampiao_t",
 			"onde": "pendurado",
 			"w": 31,
-			"h": 97
+			"h": 97,
+			"niveis": [
+				7,
+				9
+			]
 		},
 		{
 			"nome": "corrente_t",
 			"onde": "pendurado",
 			"w": 10,
-			"h": 93
+			"h": 93,
+			"niveis": [
+				8,
+				10
+			]
 		},
 		{
 			"nome": "corrente_t2",
 			"onde": "pendurado",
 			"w": 10,
-			"h": 52
+			"h": 52,
+			"niveis": [
+				6,
+				8
+			]
 		},
 		{
 			"nome": "estatua",
 			"onde": "chao",
 			"w": 47,
-			"h": 96
+			"h": 96,
+			"niveis": [
+				7,
+				9
+			]
 		},
 		{
 			"nome": "bandeira",
 			"onde": "pendurado",
 			"w": 48,
-			"h": 100
+			"h": 100,
+			"niveis": [
+				6,
+				10
+			]
 		},
 		{
 			"nome": "correntes",
 			"onde": "pendurado",
 			"w": 34,
-			"h": 54
+			"h": 54,
+			"niveis": [
+				7,
+				8
+			]
 		},
 		{
 			"nome": "gargula",
 			"onde": "chao",
 			"w": 50,
-			"h": 82
+			"h": 82,
+			"niveis": [
+				6,
+				10
+			]
 		},
 		{
 			"nome": "lanterna",
 			"onde": "pendurado",
 			"w": 40,
-			"h": 91
+			"h": 91,
+			"niveis": [
+				8,
+				9
+			]
 		},
 		{
 			"nome": "gaiola",
 			"onde": "pendurado",
 			"w": 33,
-			"h": 100
+			"h": 100,
+			"niveis": [
+				7,
+				10
+			]
 		},
 		{
 			"nome": "coluna",
 			"onde": "parede",
 			"w": 21,
-			"h": 98
+			"h": 98,
+			"niveis": [
+				7,
+				10
+			]
 		},
 		{
 			"nome": "arco",
 			"onde": "parede",
 			"w": 46,
-			"h": 101
+			"h": 101,
+			"niveis": [
+				6,
+				8
+			]
 		},
 		{
 			"nome": "janela",
 			"onde": "parede",
 			"w": 45,
-			"h": 88
+			"h": 88,
+			"niveis": [
+				7,
+				9
+			]
 		},
 		{
 			"nome": "escombros",
 			"onde": "chao",
 			"w": 52,
-			"h": 54
+			"h": 54,
+			"niveis": [
+				8,
+				9
+			]
 		},
 		{
 			"nome": "vitral",
 			"onde": "parede",
 			"w": 36,
-			"h": 96
+			"h": 96,
+			"niveis": [
+				9,
+				10
+			]
 		},
 		{
 			"nome": "pedras",
 			"onde": "chao",
 			"w": 27,
-			"h": 40
+			"h": 40,
+			"niveis": [
+				6,
+				7
+			]
 		},
 		{
 			"nome": "cristais",
 			"onde": "chao",
 			"w": 22,
-			"h": 58
+			"h": 58,
+			"niveis": [
+				8,
+				10
+			]
 		},
 		{
 			"nome": "vegetacao_alta",
 			"onde": "chao",
 			"w": 37,
-			"h": 70
+			"h": 70,
+			"niveis": [
+				6,
+				9
+			]
 		},
 		{
 			"nome": "vegetacao_baixa",
 			"onde": "chao",
 			"w": 37,
-			"h": 46
+			"h": 46,
+			"niveis": [
+				7,
+				8
+			]
 		},
 		{
 			"nome": "arvore_seca",
 			"onde": "parede",
 			"w": 107,
-			"h": 101
+			"h": 101,
+			"niveis": [
+				6,
+				8
+			]
 		}
 	]
 }

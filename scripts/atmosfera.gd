@@ -409,6 +409,11 @@ const LUZ_REGIAO := [
 var _poeira: CPUParticles2D
 var _ceu_layer: ParallaxLayer
 var _ceu_tex: Sprite2D
+## FX do ceu de altitude (Regiao II): aurora e raios distantes.
+var _aurora: Sprite2D
+var _raio_longe: Sprite2D
+var _t_raio := 4.0
+var _rng_fx := RandomNumberGenerator.new()
 
 
 func _ready() -> void:
@@ -461,7 +466,8 @@ func _aplicar_arte_automatico() -> void:
 		neblina_fundo = maxf(neblina_fundo, 0.10)
 
 
-func _process(_dt: float) -> void:
+func _process(dt: float) -> void:
+	_animar_fx_ceu(dt)
 	if _poeira:
 		var cam := get_viewport().get_camera_2d()
 		if cam:
@@ -647,6 +653,77 @@ func _montar_ceu() -> void:
 	tex.fill_from = Vector2(0.0, 0.0)
 	tex.fill_to = Vector2(0.0, 1.0)
 	_ceu_tex.texture = tex
+	if perfil_altitude != "":
+		_montar_fx_ceu()
+
+
+## FX DO CEU DE ALTITUDE (`perfil_altitude`) -- os dois que a prancha da
+## Regiao II tem e o jogo nao tinha: AURORA no ceu e RAIOS DISTANTES. Sao luz
+## aditiva, fixa ao ecra, atras de tudo (na camada do ceu) e sem corpo nem
+## colisao; nao tocam no `_rng` funcional (o gerador tem o seu, este e' local).
+func _montar_fx_ceu() -> void:
+	if _ceu_layer == null or _aurora != null:
+		return
+	var ecra := get_viewport().get_visible_rect().size
+	_rng_fx.seed = hash("fx_ceu|%s" % perfil_altitude)
+	var add := CanvasItemMaterial.new()
+	add.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
+
+	# aurora: faixa larga e suave, verde-azulada -> lavanda, no terco de cima
+	var g := Gradient.new()
+	g.offsets = PackedFloat32Array([0.0, 0.5, 1.0])
+	g.colors = PackedColorArray([Color(0.55, 0.85, 1.0, 0.0),
+		Color(0.62, 0.55, 1.0, 1.0), Color(0.85, 0.55, 1.0, 0.0)])
+	var gt := GradientTexture2D.new()
+	gt.gradient = g
+	gt.width = 256
+	gt.height = 64
+	gt.fill_from = Vector2(0.0, 0.0)
+	gt.fill_to = Vector2(0.0, 1.0)
+	_aurora = Sprite2D.new()
+	_aurora.texture = gt
+	_aurora.centered = true
+	_aurora.scale = Vector2(ecra.x / 256.0 * 1.3, ecra.y * 0.34 / 64.0)
+	_aurora.position = Vector2(ecra.x * 0.5, ecra.y * 0.17)
+	_aurora.material = add
+	_aurora.modulate.a = 0.0
+	_ceu_layer.add_child(_aurora)
+
+	# raio distante: clarao redondo e suave, baixo no horizonte, entre as nuvens
+	var rg := Gradient.new()
+	rg.colors = PackedColorArray([Color(0.85, 0.88, 1.0, 1.0), Color(0.85, 0.88, 1.0, 0.0)])
+	var rt := GradientTexture2D.new()
+	rt.gradient = rg
+	rt.width = 128
+	rt.height = 128
+	rt.fill = GradientTexture2D.FILL_RADIAL
+	rt.fill_from = Vector2(0.5, 0.5)
+	rt.fill_to = Vector2(1.0, 0.5)
+	_raio_longe = Sprite2D.new()
+	_raio_longe.texture = rt
+	_raio_longe.scale = Vector2(ecra.x / 128.0 * 0.5, ecra.y * 0.45 / 128.0)
+	_raio_longe.position = Vector2(ecra.x * 0.5, ecra.y * 0.62)
+	_raio_longe.material = add
+	_raio_longe.modulate.a = 0.0
+	_ceu_layer.add_child(_raio_longe)
+
+
+func _animar_fx_ceu(dt: float) -> void:
+	if _aurora == null:
+		return
+	# respira devagar (periodo ~16 s), sempre discreta
+	var t := Time.get_ticks_msec() * 0.001
+	_aurora.modulate.a = 0.10 + 0.06 * sin(t * TAU / 16.0)
+	_t_raio -= dt
+	if _t_raio <= 0.0:
+		# dois clarões seguidos, como raio a bater longe, e nova espera
+		_t_raio = _rng_fx.randf_range(7.0, 15.0)
+		_raio_longe.position.x = get_viewport().get_visible_rect().size.x 			* _rng_fx.randf_range(0.15, 0.85)
+		var tw := create_tween()
+		tw.tween_property(_raio_longe, "modulate:a", 0.34, 0.05)
+		tw.tween_property(_raio_longe, "modulate:a", 0.06, 0.09)
+		tw.tween_property(_raio_longe, "modulate:a", 0.24, 0.05)
+		tw.tween_property(_raio_longe, "modulate:a", 0.0, 0.45)
 
 
 ## FRENTE: silhuetas escuras que pendem do topo do ecrã para dentro da cena
@@ -766,9 +843,20 @@ func _catalogo_parede() -> Array:
 	var lista: Variant = (d as Dictionary).get(bioma, [])
 	if lista is Array:
 		for p in lista:
-			if p is Dictionary and p.get("onde", "") == "parede":
+			if p is Dictionary and p.get("onde", "") == "parede" and _vale_no_nivel(p):
 				fora.append("res://assets/sprites/pixel/deco/%s/%s.png" % [bioma, p["nome"]])
 	return fora
+
+
+## Anti-repeticao (Regiao II): prop com `niveis` so' vale nesses niveis (1-based).
+func _vale_no_nivel(p: Dictionary) -> bool:
+	var ns: Variant = p.get("niveis", null)
+	if not (ns is Array):
+		return true
+	var estado := get_node_or_null("/root/EstadoJogo")
+	if estado == null:
+		return true
+	return (ns as Array).has(float(int(estado.get("indice_nivel")) + 1))   # o JSON traz floats
 
 
 ## Banda de mato/entulho colada ao fundo do ecrã, em qualquer bioma, para a

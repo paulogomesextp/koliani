@@ -1527,7 +1527,7 @@ func _bioma_atual() -> String:
 ## Props da região com o assento `onde` ("chao" ou "parede").
 func _props(onde: String) -> Array:
 	var bioma := _bioma_atual()
-	var chave := "%s|%s" % [bioma, onde]
+	var chave := "%s|%s|%d" % [bioma, onde, _idx]
 	if _deco_cache.has(chave):
 		return _deco_cache[chave]
 	var cat: Dictionary = {}
@@ -1540,7 +1540,9 @@ func _props(onde: String) -> Array:
 	var lista: Variant = cat.get(bioma, [])
 	if lista is Array:
 		for p in lista:
-			if p is Dictionary and p.get("onde", "") == onde:
+			# `niveis` (Regiao II, anti-repeticao): o JSON traz floats
+			var deste_nivel: bool = not p.has("niveis") or (p["niveis"] as Array).has(float(_idx + 1))
+			if p is Dictionary and p.get("onde", "") == onde and deste_nivel:
 				fora.append("res://assets/sprites/pixel/deco/%s/%s.png" % [bioma, p["nome"]])
 	_deco_cache[chave] = fora
 	return fora
