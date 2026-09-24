@@ -272,3 +272,77 @@ Medição técnica com `ffmpeg volumedetect` nos 40 MP3: médias de -22,0 a -8,4
 | Boss 18 | Epic Enemy | bearstockmusic | https://pixabay.com/music/orchestral-epic-enemy-578175/ | `assets/audio/music/bosses/boss_18.mp3` | INTEGRATED (local) |
 | Boss 19 | Return of The Gods | joelfazhari | https://pixabay.com/music/epic-classical-return-of-the-gods-dark-epic-free-soundtrack-2471/ | `assets/audio/music/bosses/boss_19.mp3` | INTEGRATED (local) |
 | Boss 20 | Final Battle II | nyxaurora | https://pixabay.com/music/main-title-final-battle-ii-epic-cinematic-battle-music-with-intense-orchestral-361155/ | `assets/audio/music/bosses/boss_20.mp3` | INTEGRATED (local) |
+
+## Verificação por hash local -- 24-09-2026
+
+A auditoria de 22-09-2026 (secção anterior) tinha cruzado as 38 faixas
+pendentes por **nome/URL**, sem ver `incoming_music`. Esta sessão corre num
+contentor cloud sem acesso a `C:\Projetos\koliani-sfx`; nas duas tentativas
+anteriores (22-09 e 24-09) isso ficou registado como
+`MAPPING NOT CONFIRMED por hash`, sobretudo para a Região 16/Bloodlust, cuja
+única fonte era uma linha de tabela sem SHA-256 próprio.
+
+O Paulo forneceu três anexos medidos no PC local:
+`incoming_music_hashes.csv` (nome, bytes e SHA-256 de cada ficheiro em
+`incoming_music`, gerado por `Get-FileHash`), `music_manifest.csv` e
+`music_manifest.json` (mapa índice -> título/artista/URL/`target_basename`,
+todos com `status: pending` nesse snapshot local -- desatualizado em relação
+ao runtime, que já tem tudo integrado).
+
+**Inventário do CSV** (só `.mp3`, ignorando `.mp3.import`): **44 ficheiros**,
+**38 SHA-256 únicos**, **6 pares duplicados byte a byte** (mesmo ficheiro
+descarregado duas vezes, sufixo ` (1)` no segundo): `23350895-gothic-horror-178468`,
+`echoes_of_lumen-epic-cinematic-music-powerful-583433`,
+`geoffharvey-the-rolling-mist-cinematic-background-410782`,
+`grand_project-desert-travels-391123`, `leberch-dark-578736`,
+`tideblue-garden-of-morning-dew-cinematic-ambient-instrumental-562308`.
+44 - 6 = 38 conteúdos únicos, confirmando a contagem "38 faixas" da secção
+anterior (que descrevia o **conteúdo**, não o número de ficheiros no disco
+do Paulo). "40 MP3" nessa secção referia-se à medição `ffmpeg volumedetect`
+sobre os 38 + Região 01 + Boss 01, já integrados antes desta verificação.
+
+**Cruzamento por hash** (recalculado nesta sessão com `sha256sum` sobre os
+assets do checkout, comparado byte a byte com o CSV): as **38 SHA-256
+únicas do CSV correspondem, uma a uma, sem sobra e sem falta**, às 19 faixas
+`assets/audio/music/regions/region_02.mp3`..`region_20.mp3` e às 19
+`assets/audio/music/bosses/boss_02.mp3`..`boss_20.mp3` atualmente no
+repositório -- nenhum SHA-256 do CSV ficou por explicar, nenhum destes 38
+assets runtime ficou sem origem no CSV. R02-20 e Boss02-20 estão portanto
+**CONFIRMED BY HASH (evidência do Paulo, cross-checada nesta sessão)**, já
+não apenas por nome/URL. Os índices/artistas/títulos do `music_manifest.csv`
+batem certo com o nome de cada ficheiro do CSV (ex.: índice 16 =
+`Cânion Sangrento, Bloodlust, Nightcast` = ficheiro
+`nightcast-bloodlust-176915.mp3`).
+
+**Região 16 / Bloodlust -- confirmação explícita pedida:**
+`nightcast-bloodlust-176915.mp3` no CSV do Paulo tem 8 064 940 bytes e
+SHA-256 `81E42127822002EDA4BDBD2549968FA57B5CC125D69E924CEAC992AC9B62F030`.
+`assets/audio/music/regions/region_16.mp3`, recalculado nesta sessão a
+partir do checkout, tem **exatamente** 8 064 940 bytes e SHA-256
+`81E42127822002EDA4BDBD2549968FA57B5CC125D69E924CEAC992AC9B62F030` -- match
+completo, os 64 carateres batem certo. A Região 16 deixa de ser
+`MAPPING NOT CONFIRMED` e passa a **CONFIRMED BY HASH**.
+
+**Assets runtime SEM correspondência no CSV** (esperado, não é
+inconsistência): `approved/menu_cinematic_fantasy_dark.mp3`,
+`approved/menu_cinematic_fantasy_dark_no_intro.ogg`,
+`approved/region_01_midnight_forest.mp3`,
+`approved/boss_01_gothic_candlelight.mp3` -- vieram de outra pasta
+(Downloads, aquisição de 22-09), não de `incoming_music`. `bg_menu.mp3` /
+`bg_niveis.mp3` são as reservas antigas do Paulo (secção "Música de fundo"
+do `CREDITS.md`), nunca fizeram parte deste lote.
+
+**Duplicado byte a byte confirmado no runtime:** `bg_boss.mp3` ==
+`assets/audio/music/bosses/boss_20.mp3` (mesmo SHA-256
+`743732EE...E1E7C603CB0E94F73`, 3 883 008 bytes) -- o `bg_boss.mp3` é a
+reserva legada, `boss_20.mp3` é o asset ativo; `nyxaurora-final-battle-ii...mp3`
+no CSV é a única cópia de origem para os dois.
+
+**Estado final:** 44 ficheiros locais / 38 conteúdos únicos / 6 duplicados
+locais confirmados; 38/38 conteúdos únicos ligados por hash a Região 02-20 +
+Boss 02-20; Região 16 confirmada por hash nos dois lados; nenhum
+ficheiro do CSV ficou por explicar; nenhum asset runtime dessas 38 faixas
+ficou sem origem. Nada foi copiado, movido, editado (além desta
+documentação), comitado ou apagado como parte desta verificação --
+`incoming_music` e os 6 duplicados locais permanecem intactos no PC do
+Paulo.

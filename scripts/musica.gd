@@ -13,10 +13,12 @@ extends Node
 ## Não recomeça a cama se já estiver a tocar a faixa certa, para não
 ## cortar entre recargas de cena. Tudo encaminha para o bus "Music".
 
-## Cama do menu, fornecida pelo Paulo (OneCinematicStudio -- ver
-## assets/audio/CREDITS.md). `CAMINHO`/`CAMINHO_BOSS` (únicas, antigas)
-## ficam de reserva -- usadas se por algum motivo as 20 faixas não
-## existirem (fresh checkout antes do `--import`, por ex.).
+## RESERVA LEGADA (não é o que toca por omissão -- ver `MENU_APROVADO` e
+## `DIR_APROVADO`/`PASTA_REGIOES_APROVADAS`/`PASTA_BOSSES_APROVADOS` abaixo,
+## que são as faixas Pixabay aprovadas de facto usadas). `CAMINHO`,
+## `CAMINHO_MENU` (fornecida pelo Paulo, OneCinematicStudio -- ver
+## assets/audio/CREDITS.md) e `CAMINHO_BOSS` só entram se as faixas
+## aprovadas não existirem (fresh checkout antes do `--import`, por ex.).
 const CAMINHO := "res://assets/audio/bg_niveis.mp3"       # "Shadow of the Forsaken"
 const CAMINHO_MENU := "res://assets/audio/bg_menu.mp3"    # "The Alchemist's Library"
 const CAMINHO_BOSS := "res://assets/audio/bg_boss.mp3"    # "Final Battle II" (Nyxaurora)

@@ -63,17 +63,82 @@ partilhavam todas os mesmos quatro rosnados. Refeitos: `ataque` e `lancar`.
 | [sfx100_2](https://opengameart.org/content/100-cc0-sfx-2) | rubberduck | CC0 |
 | [kenney](https://opengameart.org/content/50-rpg-sound-effects) | Kenney | CC0 |
 
-## Música de fundo -- tema do menu (fornecida pelo Paulo)
+## Música de fundo -- tema do menu (fornecida pelo Paulo) -- RESERVA
 
 - **`bg_menu.mp3`** — "The Alchemist's Library · Mysterious Dark Academia &
-  Fantasy" — OneCinematicStudio. Abertura do jogo / menu inicial
-  (`Musica.menu`).
-- **`bg_niveis.mp3`** / **`bg_boss.mp3`** — faixas antigas de fornecidas
-  pelo Paulo, ainda usadas como **reserva** por `musica.gd` (fresh
-  checkout antes do `--import`). Fora isso, substituídas pelas 20+20
-  faixas abaixo.
+  Fantasy" — OneCinematicStudio.
+- **`bg_niveis.mp3`** / **`bg_boss.mp3`** — faixas antigas fornecidas
+  pelo Paulo.
+
+Os três só tocam como **reserva** em `musica.gd` -- se as faixas aprovadas
+abaixo (secção seguinte) não existirem num fresh checkout antes do
+`--import`. Com o `--import` feito, quem toca no menu, nos níveis e nos
+chefes são as faixas aprovadas Pixabay. `bg_boss.mp3` é, byte a byte, a
+mesma faixa que `music/bosses/boss_20.mp3` ("Final Battle II", Nyxaurora) --
+cópia legada duplicada de propósito, para a reserva funcionar mesmo que só
+`bg_boss.mp3` sobreviva a uma limpeza futura.
 
 Ficheiros entregues pelo Paulo; licença/uso à responsabilidade dele.
+
+## Música de fundo aprovada -- menu + 20 regiões + 20 bosses (Pixabay Content License)
+
+As 41 escolhas musicais que tocam por omissão (assumindo `--import` feito).
+Proveniência confirmada por SHA-256: o menu e a Região 01/Boss 01 foram
+validados contra os ficheiros de aquisição originais em 22-09-2026 (ver
+`docs/audio/approved_audio_manifest.md`); as restantes 38 (Região 02-20 +
+Boss 02-20) foram confirmadas em 24-09-2026 por comparação byte a byte entre
+`C:\Projetos\koliani-sfx\incoming_music` (CSV de hashes fornecido pelo
+Paulo) e os assets em `assets/audio/music/`. Todas sob Pixabay Content
+License; não redistribuir os ficheiros de origem isoladamente.
+
+| Uso | Título | Artista | URL Pixabay | Asset runtime |
+| --- | --- | --- | --- | --- |
+| Menu | Cinematic Fantasy Dark | RomanSenykMusic | https://pixabay.com/music/fantasy-dreamy-childrens-cinematic-fantasy-dark-160932/ | `approved/menu_cinematic_fantasy_dark_no_intro.ogg` |
+| Região 01 (Floresta Corrompida) | Midnight Forest | Syouki_Takahashi | https://pixabay.com/music/ambient-midnight-forest-184304/ | `approved/region_01_midnight_forest.mp3` |
+| Região 02 (Desfiladeiro dos Ventos) | Desert Wind Meditation Atmosphere | low_atmos | https://pixabay.com/music/ambient-desert-wind-meditation-atmosphere-513281/ | `music/regions/region_02.mp3` |
+| Região 03 (Torres Esquecidas) | Church Choir | tunetank | https://pixabay.com/music/adventure-church-choir-349262/ | `music/regions/region_03.mp3` |
+| Região 04 (Catacumbas do Abismo) | A Sinister Power Rising | joelfazhari | https://pixabay.com/music/main-title-a-sinister-power-rising-epic-dark-gothic-soundtrack-15021/ | `music/regions/region_04.mp3` |
+| Região 05 (Cidade Corrompida) | Shadows Beneath the Keep | menieldm | https://pixabay.com/music/fantasy-dreamy-childrens-shadows-beneath-the-keep-495833/ | `music/regions/region_05.mp3` |
+| Região 06 (Castelo de Zeriko) | Desert Travels | grand_project | https://pixabay.com/music/mystery-desert-travels-391123/ | `music/regions/region_06.mp3` |
+| Região 07 (Terras Queimadas) | Garden of Morning Dew | tideblue | https://pixabay.com/music/orchestral-garden-of-morning-dew-cinematic-ambient-instrumental-562308/ | `music/regions/region_07.mp3` |
+| Região 08 (Mar dos Mortos) | Gothic Horror | 23350895 | https://pixabay.com/music/mystery-gothic-horror-178468/ | `music/regions/region_08.mp3` |
+| Região 09 (Reino do Gelo) | Epic Gregorian Choir | vjgalaxy | https://pixabay.com/music/choir-epic-gregorian-choir-cinematic-soundtrack-355524/ | `music/regions/region_09.mp3` |
+| Região 10 (Deserto dos Esquecidos) | October Knows | moonpetalmedia | https://pixabay.com/music/orchestral-october-knows-cinematic-gothic-halloween-instrumental-574713/ | `music/regions/region_10.mp3` |
+| Região 11 (Jardins do Rei) | The Rolling Mist | geoffharvey | https://pixabay.com/music/drama-scene-the-rolling-mist-cinematic-background-410782/ | `music/regions/region_11.mp3` |
+| Região 12 (Cidade das Máquinas) | Dark Ambient Cinematic | everything_is_dead | https://pixabay.com/music/orchestral-dark-ambient-cinematic-566702/ | `music/regions/region_12.mp3` |
+| Região 13 (Céu Partido) | Moving Staircases | tuck9 | https://pixabay.com/music/orchestral-moving-staircases-567993/ | `music/regions/region_13.mp3` |
+| Região 14 (Reino dos Sonhos) | Dark | leberch | https://pixabay.com/music/orchestral-dark-578736/ | `music/regions/region_14.mp3` |
+| Região 15 (Cidade dos Mortos) | Gothic Ritual | sonican | https://pixabay.com/music/choir-gothic-ritual-dramatic-cinematic-choral-473167/ | `music/regions/region_15.mp3` |
+| Região 16 (Mar Vermelho) | Bloodlust | Nightcast | https://pixabay.com/music/mystery-bloodlust-176915/ | `music/regions/region_16.mp3` |
+| Região 17 (Inferno) | Moonpetal Nocturne | moonpetalmedia | https://pixabay.com/music/modern-classical-moonpetal-nocturne-gothic-dream-pop-ballad-with-female-vocals-548586/ | `music/regions/region_17.mp3` |
+| Região 18 (O Vazio) | Empire's Fall | rubyzephyr | https://pixabay.com/music/epic-classical-empirex27s-fall-446040/ | `music/regions/region_18.mp3` |
+| Região 19 (Guerra dos Reinos) | The Dark Power | luis_humanoide | https://pixabay.com/music/main-title-the-dark-power-cinematic-orchestral-572891/ | `music/regions/region_19.mp3` |
+| Região 20 (O Último Caminho) | Esoteric Execution -- Epic Dark and Horror | joelfazhari | https://pixabay.com/music/mystery-esoteric-execution-epic-dark-and-horror-soundtrack-197591/ | `music/regions/region_20.mp3` |
+| Boss 01 (Guardião Verde) | Gothic Candlelight | JoelFazhari | https://pixabay.com/music/mystery-gothic-candlelight-gothic-mystery-soundtrack-1987/ | `approved/boss_01_gothic_candlelight.mp3` |
+| Boss 02 (Guardião dos Céus) | Epic Historical Orchestral | musicinmedia | https://pixabay.com/music/adventure-epic-historical-orchestral-244718/ | `music/bosses/boss_02.mp3` |
+| Boss 03 (Vyrak) | Gothic Choir -- Dark Epic Choral Atmosphere | sapan4 | https://pixabay.com/music/choir-gothic-choir-dark-epic-choral-atmosphere-404794/ | `music/bosses/boss_03.mp3` |
+| Boss 04 (Guardião da Fornalha) | Epic Cinematic Music Powerful | echoes_of_lumen | https://pixabay.com/music/orchestral-epic-cinematic-music-powerful-583433/ | `music/bosses/boss_04.mp3` |
+| Boss 05 (Oráculo do Vento) | Cinematic Epic | the_mountain | https://pixabay.com/music/main-title-cinematic-epic-317751/ | `music/bosses/boss_05.mp3` |
+| Boss 06 (Mirage Eterna) | Epic Anxious Dark Dramatic Tragic Mystical | denis-pavlov-music | https://pixabay.com/music/build-up-scenes-epic-anxious-dark-dramatic-tragic-mystical-233461/ | `music/bosses/boss_06.mp3` |
+| Boss 07 (Rainha Espinhosa) | Destiny Theme | joelfazhari | https://pixabay.com/music/main-title-destiny-theme-epic-orchestral-soundtrack-remastered-440512/ | `music/bosses/boss_07.mp3` |
+| Boss 08 (Devorador da Cripta) | Dark Cinematic Epic Orchestral Background 01 | vjgalaxy | https://pixabay.com/music/orchestral-dark-cinematic-epic-orchestral-background-01-527553/ | `music/bosses/boss_08.mp3` |
+| Boss 09 (Abade Naufragado) | Gothic Sacred Epic | soundsbyamelia | https://pixabay.com/music/adventure-gothic-sacred-epic-male-chant-female-choir-amp-bells-422978/ | `music/bosses/boss_09.mp3` |
+| Boss 10 (Arconte do Conhecimento) | Epic -- The Mountain | the_mountain | https://pixabay.com/music/epic-classical-epic-508009/ | `music/bosses/boss_10.mp3` |
+| Boss 11 (Senhor das Marés) | Epic Hollywood Trailer | good_b_music | https://pixabay.com/music/main-title-epic-hollywood-trailer-9489/ | `music/bosses/boss_11.mp3` |
+| Boss 12 (Arauto da Pestilência) | The Villain Wins | nickpanek | https://pixabay.com/music/build-up-scenes-the-villain-wins-dark-orchestral-piece-227548/ | `music/bosses/boss_12.mp3` |
+| Boss 13 (Soberano Invertido) | Dark Cinematic Epic Orchestral Background 02 | vjgalaxy | https://pixabay.com/music/adventure-dark-cinematic-epic-orchestral-background-02-527552/ | `music/bosses/boss_13.mp3` |
+| Boss 14 (Oráculo Estelar) | Epic Fight | alec_koff | https://pixabay.com/music/adventure-epic-fight-487416/ | `music/bosses/boss_14.mp3` |
+| Boss 15 (Arquialquimista Morvak) | Dark Cinematic | solarflex | https://pixabay.com/music/orchestral-dark-cinematic-558265/ | `music/bosses/boss_15.mp3` |
+| Boss 16 (Malgor) | Battle Boss Fight Game Music | alex-morgan | https://pixabay.com/music/orchestral-battle-boss-fight-game-music-583276/ | `music/bosses/boss_16.mp3` |
+| Boss 17 (Rainha do Sonho) | Epic Dark Cinematic Choir Music | desifreemusic | https://pixabay.com/music/choir-epic-dark-cinematic-choir-music-for-trailers-and-dramatic-scenes-428827/ | `music/bosses/boss_17.mp3` |
+| Boss 18 (Colosso da Ruína) | Epic Enemy | bearstockmusic | https://pixabay.com/music/orchestral-epic-enemy-578175/ | `music/bosses/boss_18.mp3` |
+| Boss 19 (Arquiteto do Limiar) | Return of The Gods | joelfazhari | https://pixabay.com/music/epic-classical-return-of-the-gods-dark-epic-free-soundtrack-2471/ | `music/bosses/boss_19.mp3` |
+| Boss 20 (Zeriko) | Final Battle II | nyxaurora | https://pixabay.com/music/main-title-final-battle-ii-epic-cinematic-battle-music-with-intense-orchestral-361155/ | `music/bosses/boss_20.mp3` |
+
+Detalhe completo da verificação por hash (44 MP3 em `incoming_music`, 38
+conteúdos únicos, 6 duplicados, e a tabela ficheiro-original -> SHA-256 ->
+asset) fica em `docs/audio/approved_audio_manifest.md`, secção "Verificação
+por hash local -- 24-09-2026", para não duplicar aqui.
 
 ## Música de níveis e de chefe — 20+20 em ciclo (refeitas a 4 set 2026)
 
