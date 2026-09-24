@@ -1617,6 +1617,15 @@ func _coluna_fundo(par: Node2D, x: float) -> void:
 	var espelhar := _rng.randf() < 0.5
 	var alfa := _rng.randf_range(0.70, 0.92)
 
+	# REGIAO II -- DESFILADEIRO DOS VENTOS. A prancha nao mostra uma
+	# masmorra com props ao fundo: mostra arcos, colunas e ruinas a' escala
+	# de quem atravessa as plataformas. A peca continua a ser apenas um
+	# Sprite2D (sem colisao) e usa exclusivamente `_rng_deco`; os quatro
+	# sorteios funcionais acima continuam intocados e na mesma ordem.
+	if _regiao == 1 and _rng_deco.randf() < 0.45:
+		_arquitetura_frente_desfiladeiro(par, x, lista, espelhar)
+		return
+
 	# REGIAO III -- TORRE DOS ECOS. O audit fechou com "arquitetura do
 	# primeiro plano: LOW": arcos, colunas e vitrais existiam, mas TODOS
 	# aqui, a `z_index = -3` e escurecidos -- ou seja, no fundo. A camada
@@ -1638,6 +1647,45 @@ func _coluna_fundo(par: Node2D, x: float) -> void:
 	# recuado: mais escuro e mais azul, para ficar mesmo atrás da acção
 	s.modulate = Color(0.58, 0.56, 0.72, alfa)
 	s.position = Vector2(x, _chao_y - float(tex.get_height()) * esc * 0.5 + 34.0)
+	par.add_child(s)
+
+
+## ARQUITETURA JOGAVEL do Desfiladeiro dos Ventos. O landmark de cada nivel
+## e' curado pela Atmosfera na sala authored; aqui planta-se o vocabulario
+## regional comum ao longo da jornada procedural, assente no seu chao real.
+func _arquitetura_frente_desfiladeiro(par: Node2D, x: float, lista: Array,
+		espelhar: bool) -> void:
+	var preferidas: Array = []
+	for c in lista:
+		var f: String = String(c).get_file()
+		if f.begins_with("arco") or f.begins_with("coluna") \
+				or f.begins_with("janela") or f.begins_with("balaustrada"):
+			preferidas.append(c)
+	var cam: String = ""
+	if not preferidas.is_empty() and _rng_deco.randf() < 0.82:
+		cam = preferidas[_rng_deco.randi() % preferidas.size()]
+	else:
+		cam = lista[_rng_deco.randi() % lista.size()]
+	var tex: Texture2D = load(cam) if ResourceLoader.exists(cam) else null
+	if tex == null:
+		return
+	# O terreno regional sai perto de 2x. Este intervalo deixa os vaos com
+	# 250-360 px sem esticar a pixel-art para outra grelha visual.
+	var alvo := _rng_deco.randf_range(250.0, 360.0)
+	var esc: float = clampf(alvo / maxf(1.0, float(tex.get_height())), 1.0, 2.8)
+	var s := Sprite2D.new()
+	s.texture = tex
+	s.scale = Vector2(esc if espelhar else -esc, esc)
+	s.z_index = -1
+	var tons := [
+		Color(0.82, 0.78, 1.04, 0.94),
+		Color(0.75, 0.82, 1.10, 0.94),
+		Color(0.90, 0.76, 1.02, 0.94),
+	]
+	var tom: Color = tons[clampi(_idx - 5, 0, tons.size() - 1) % tons.size()]
+	s.modulate = tom
+	s.position = Vector2(x,
+		_chao_y - float(tex.get_height()) * esc * 0.5 + 12.0)
 	par.add_child(s)
 
 

@@ -1,3 +1,32 @@
+## Região II — remodel total · Prompt 3 (20 set 2026)
+
+- Objetivo: dar a N06–N10 arquitetura de primeiro plano e um landmark
+  exclusivo por nível: ponte monumental, torre partida, queda de água,
+  altar em ruínas e Torre dos Céus com lua.
+- Âmbito: apresentação visual da Região II, geradores/assets-fonte,
+  verificadores, capturas e documentação. Colisões, gaps, checkpoints,
+  `WindZone`, planar do N08, inimigos, Guardião, progressão e restantes
+  regiões ficam congelados. Props/luz/anti-repetição continuam no Prompt 4.
+- Comportamento esperado: arquitetura regional em `z = -1`, sem tapar a rota;
+  cada landmark é exclusivo e legível no renderer real; N10 abre a composição
+  para a Torre dos Céus e a lua de sangue sem tocar na luta.
+- Prova por etapa: baseline funcional dos 100 níveis; import; smoke N06–N10;
+  capturas reais e inspeção; medição de luminância; verificadores dirigidos;
+  suite e `git diff --check`.
+- Critério: os cinco landmarks e a arquitetura ficam presentes e legíveis;
+  **0 alterações funcionais nos 100 níveis** e 0 falhas novas. Aparência,
+  sensação e percurso final: **HUMAN PLAYTEST REQUIRED**.
+- Branch: `claude/region02-total-remodel`; entrada `5588b04d`. Não integrar em
+  `master` nem substituir `build/windows/Koliani.exe` neste prompt.
+- Estado: **PASS técnico do Prompt 3**. Cinco landmarks presentes; baseline
+  funcional 100/100 idêntica; guardas dirigidas 11/11. A suite termina em 0 e
+  os seus 30 erros de teardown são idênticos no HEAD de entrada. Aparência e
+  leitura em movimento: **HUMAN PLAYTEST REQUIRED**.
+- Próximo passo: **Prompt 4 — props, luz, anti-repetição e FX atmosféricos**.
+  Não o iniciar nesta execução.
+
+---
+
 ## Estado (20 set 2026)
 
 **Região III — TECNICAMENTE COMPLETA.** Super-Process B fechado em PASS e
