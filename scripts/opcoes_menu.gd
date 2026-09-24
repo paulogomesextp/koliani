@@ -97,7 +97,39 @@ func _ready() -> void:
 	Textos.idioma_mudou.connect(func(_l: String) -> void: _traduzir())
 	_traduzir()
 	_preparar_hover_animado()
+	# o foco por teclado/comando não pode fugir para o menu que está atrás
+	get_viewport().gui_focus_changed.connect(_foco_mudou)
+	_ligar_foco()
 	_voltar.grab_focus()
+
+
+## Ordem vertical do foco: música, efeitos, grelha de idiomas, (layout), BACK.
+func _ligar_foco() -> void:
+	var idiomas: Array[Control] = []
+	for c in _grelha.get_children():
+		idiomas.append(c as Control)
+	var cols := _grelha.columns
+	var fim: Control = _layout if _layout else _voltar
+	_sld_musica.focus_neighbor_top = _sld_musica.get_path_to(_voltar)
+	_sld_musica.focus_neighbor_bottom = _sld_musica.get_path_to(_sld_efeitos)
+	_sld_efeitos.focus_neighbor_top = _sld_efeitos.get_path_to(_sld_musica)
+	_sld_efeitos.focus_neighbor_bottom = _sld_efeitos.get_path_to(idiomas[0])
+	for i in idiomas.size():
+		var b := idiomas[i]
+		b.focus_neighbor_top = b.get_path_to(_sld_efeitos if i < cols else idiomas[i - cols])
+		var abaixo: Control = fim if i + cols >= idiomas.size() else idiomas[i + cols]
+		b.focus_neighbor_bottom = b.get_path_to(abaixo)
+	if _layout:
+		_layout.focus_neighbor_top = _layout.get_path_to(idiomas[idiomas.size() - 1])
+		_layout.focus_neighbor_bottom = _layout.get_path_to(_voltar)
+	_voltar.focus_neighbor_top = _voltar.get_path_to(
+		_layout if _layout else idiomas[idiomas.size() - 1])
+	_voltar.focus_neighbor_bottom = _voltar.get_path_to(_sld_musica)
+
+
+func _foco_mudou(no: Control) -> void:
+	if is_inside_tree() and not is_ancestor_of(no) and not is_queued_for_deletion():
+		_voltar.grab_focus()
 
 
 ## Resposta de escala ao passar/focar o rato -- consistente com os outros ecrãs.
