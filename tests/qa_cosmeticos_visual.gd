@@ -117,8 +117,8 @@ func _loja() -> void:
 	await _clicar(l._btn_eq)
 	_check(EstadoJogo.item_equipado("hud_moldura_osso"), "rato: equipar Osso (pago em V)")
 	await _clicar(l._botoes_cat["packs"])
-	await _clicar(l._cartoes["pack_regiao_i"])
-	var est: String = EstadoJogo.estado_item_loja("pack_regiao_i")
+	await _clicar(l._cartoes["pack_coracao_podre"])
+	var est: String = EstadoJogo.estado_item_loja("pack_coracao_podre")
 	print("INFO pack regional estado=", est, " regiao0 concluida=", EstadoJogo.regiao_esta_concluida(0))
 	_check(est == ("disponivel" if EstadoJogo.regiao_esta_concluida(0) else "bloqueado"),
 		"pack regional coerente com progressao (%s)" % est)

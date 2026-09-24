@@ -151,6 +151,7 @@ func _correr_tudo() -> void:
 	teste_loja_progressao_regional_e_gameplay()
 	teste_loja_i18n()
 	teste_loja_cosmeticos_visuais()
+	teste_loja_colecao_regiao_i()
 
 	# --- Região III -- Torre dos Ecos (N11-N15) -----------------------
 	teste_r3_nomes_canonicos()
@@ -4124,7 +4125,7 @@ func teste_loja_catalogo() -> void:
 	_ok(LojaCatalogo.moedas_aceites(LojaCatalogo.item("skin_carmesim")) == ["k"], "loja: item so K")
 	_ok(LojaCatalogo.moedas_aceites(LojaCatalogo.item("skin_luar")) == ["v"], "loja: item so V")
 	_ok(LojaCatalogo.moedas_aceites(LojaCatalogo.item("efeito_rasto_brasa")) == ["k", "v"], "loja: item K ou V")
-	_ok(LojaCatalogo.item("pack_regiao_i")["regiao"] == 0, "loja: item regional")
+	_ok(LojaCatalogo.item("pack_coracao_podre")["regiao"] == 0, "loja: item regional")
 	_ok(LojaCatalogo.item("skin_koliani_base")["inicial"], "loja: item inicial")
 
 
@@ -4218,8 +4219,8 @@ func teste_loja_save_e_compatibilidade() -> void:
 func teste_loja_progressao_regional_e_gameplay() -> void:
 	var e := _novo_estado()
 	e.ganhar_kolicoins(5000)
-	_ok(e.estado_item_loja("pack_regiao_i") == "bloqueado", "loja: item regional devia estar bloqueado")
-	_ok(e.comprar_item("pack_regiao_i", "k")["erro"] == "bloqueado", "loja: comprou item bloqueado")
+	_ok(e.estado_item_loja("pack_coracao_podre") == "bloqueado", "loja: item regional devia estar bloqueado")
+	_ok(e.comprar_item("pack_coracao_podre", "k")["erro"] == "bloqueado", "loja: comprou item bloqueado")
 	var antes: int = e.kolicoins
 	for i in 5:
 		e.marcar_nivel_concluido(i)
@@ -4230,8 +4231,8 @@ func teste_loja_progressao_regional_e_gameplay() -> void:
 		"loja: recompensa de Kolicoins inesperada (%d)" % ganho)
 	e.marcar_nivel_concluido(0)
 	_ok(e.kolicoins - antes == ganho, "loja: Kolicoins repetidos ao reconcluir")
-	_ok(e.estado_item_loja("pack_regiao_i") == "disponivel", "loja: item regional nao desbloqueou")
-	_ok(e.comprar_item("pack_regiao_i", "k")["ok"], "loja: compra do item regional")
+	_ok(e.estado_item_loja("pack_coracao_podre") == "disponivel", "loja: item regional nao desbloqueou")
+	_ok(e.comprar_item("pack_coracao_podre", "k")["ok"], "loja: compra do item regional")
 	# nenhuma compra/equipamento premium mexe em gameplay
 	var e2 := _novo_estado()
 	e2.dev_dar_veracoins(5000)
@@ -4265,8 +4266,23 @@ func teste_loja_i18n() -> void:
 			_ok(en.has("shop.item.%s.%s" % [it["id"], suf]), "loja: falta texto %s.%s" % [it["id"], suf])
 	for c: String in LojaCatalogo.CATEGORIAS:
 		_ok(en.has("shop.cat." + c), "loja: falta nome da categoria " + c)
-	for est in ["bloqueado", "disponivel", "adquirido", "equipado"]:
+	for est in ["bloqueado", "disponivel", "adquirido", "equipado", "completo"]:
 		_ok(en.has("shop.state." + est), "loja: falta estado " + est)
+	for r: String in LojaCatalogo.RARIDADES:
+		_ok(en.has("shop.rarity." + r), "loja: falta raridade " + r)
+	for k in ["shop.pack_progress", "shop.pack_missing", "shop.placeholder"]:
+		_ok(en.has(k), "loja: falta chave " + k)
+	# traducoes reais das chaves da colecao nos 6 idiomas (nao podem ser iguais ao ingles)
+	var traduzidas := ["shop.item.skin_coracao_podre.name", "shop.item.skin_coracao_podre.desc",
+		"shop.item.efeito_rasto_esporos.name", "shop.item.efeito_rasto_esporos.desc",
+		"shop.item.hud_moldura_raizes.name", "shop.item.hud_moldura_raizes.desc",
+		"shop.item.pack_coracao_podre.name", "shop.item.pack_coracao_podre.desc",
+		"shop.rarity.comum", "shop.rarity.lendario", "shop.state.completo", "shop.pack_progress",
+		"shop.pack_missing", "shop.placeholder"]
+	for loc in ["pt", "es", "fr", "de", "zh"]:
+		var d: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://assets/i18n/%s.json" % loc))
+		for k: String in traduzidas:
+			_ok(d.has(k) and str(d[k]) != "" and str(d[k]) != str(en[k]), "loja: %s sem traducao real em %s" % [k, loc])
 	_ok(en.has("menu.shop"), "loja: falta menu.shop")
 
 
@@ -4326,3 +4342,134 @@ func teste_loja_cosmeticos_visuais() -> void:
 	f.free()
 	g.free()
 	e.free()
+
+
+func teste_loja_colecao_regiao_i() -> void:
+	const IDS := ["skin_coracao_podre", "efeito_rasto_esporos", "hud_moldura_raizes"]
+	const PACK := "pack_coracao_podre"
+	# 1-2. raridades validas; desconhecida rejeitada
+	for it: Dictionary in LojaCatalogo.todos():
+		_ok(str(it["raridade"]) in LojaCatalogo.RARIDADES, "colecao: raridade invalida em %s" % it["id"])
+	_ok(LojaCatalogo.RARIDADES == ["comum", "raro", "epico", "lendario"], "colecao: 4 raridades esperadas")
+	var lixo: Dictionary = LojaCatalogo.item("skin_carmesim").duplicate()
+	lixo["id"] = "teste_raridade_falsa"
+	lixo["raridade"] = "mitico"
+	var com_lixo: Array = LojaCatalogo.ITENS.duplicate()
+	com_lixo.append(lixo)
+	_ok(not LojaCatalogo.validar(com_lixo).is_empty(), "colecao: validar() aceitou raridade desconhecida")
+	_ok(LojaCatalogo.validar().is_empty(), "colecao: catalogo real invalido %s" % str(LojaCatalogo.validar()))
+	# mapa dos placeholders
+	_ok(LojaCatalogo.item("skin_carmesim")["raridade"] == "comum" and LojaCatalogo.item("hud_moldura_osso")["raridade"] == "comum"
+		and LojaCatalogo.item("efeito_rasto_brasa")["raridade"] == "raro" and LojaCatalogo.item("skin_luar")["raridade"] == "epico",
+		"colecao: raridades dos placeholders")
+	# 3-4. existem e exigem a Regiao I
+	for id: String in IDS + [PACK]:
+		_ok(LojaCatalogo.existe(id), "colecao: falta " + id)
+		_ok(int(LojaCatalogo.item(id)["regiao"]) == 0, "colecao: %s nao exige a Regiao I" % id)
+	_ok(LojaCatalogo.item(PACK)["raridade"] == "lendario" and LojaCatalogo.item("skin_coracao_podre")["raridade"] == "epico"
+		and LojaCatalogo.item("efeito_rasto_esporos")["raridade"] == "raro" and LojaCatalogo.item("hud_moldura_raizes")["raridade"] == "raro",
+		"colecao: raridades da colecao")
+	# 7-11. precos e moedas
+	var sk := LojaCatalogo.item("skin_coracao_podre")
+	var fx := LojaCatalogo.item("efeito_rasto_esporos")
+	var hu := LojaCatalogo.item("hud_moldura_raizes")
+	var pk := LojaCatalogo.item(PACK)
+	_ok(LojaCatalogo.preco(sk, "v") == 240 and LojaCatalogo.moedas_aceites(sk) == ["v"], "colecao: skin so V 240 (8)")
+	_ok(LojaCatalogo.preco(fx, "k") == 600 and LojaCatalogo.preco(fx, "v") == 120 and LojaCatalogo.moedas_aceites(fx) == ["k", "v"],
+		"colecao: efeito 600 K / 120 V")
+	_ok(LojaCatalogo.preco(hu, "k") == 300 and LojaCatalogo.moedas_aceites(hu) == ["k"], "colecao: HUD so K 300")
+	_ok(LojaCatalogo.moedas_aceites(pk) == ["k", "v"], "colecao: pack aceita K ou V")
+	_ok(int(sk["k_eq"]) == 960 and int(fx["k_eq"]) == 600 and int(hu["k_eq"]) == 300
+		and int(sk["v_eq"]) == 240 and int(fx["v_eq"]) == 120 and int(hu["v_eq"]) == 75, "colecao: equivalentes internos")
+	# 5-6. bloqueados ate concluir a Regiao I
+	var e := _novo_estado()
+	e.ganhar_kolicoins(9000)
+	e.dev_dar_veracoins(2000)
+	for id: String in IDS + [PACK]:
+		_ok(e.estado_item_loja(id) == "bloqueado", "colecao: %s devia estar bloqueado" % id)
+		_ok(e.comprar_item(id, "k")["erro"] in ["bloqueado", "moeda_invalida"] and not e.item_adquirido(id), "colecao: comprou %s bloqueado" % id)
+	_ok(e.comprar_item(PACK, "v")["erro"] == "bloqueado", "colecao: pack bloqueado comprado com V")
+	for i in 5:
+		e.marcar_nivel_concluido(i)
+	for id: String in IDS + [PACK]:
+		_ok(e.estado_item_loja(id) == "disponivel", "colecao: %s devia estar disponivel (%s)" % [id, e.estado_item_loja(id)])
+	# 12. pack completo: teto 1300 K / 300 V
+	_ok(e.preco_loja(PACK, "k") == 1300 and e.preco_loja(PACK, "v") == 300,
+		"colecao: pack completo %d K / %d V" % [e.preco_loja(PACK, "k"), e.preco_loja(PACK, "v")])
+	# 13-14. com 1 e 2 itens paga menos (valores esperados da formula 70% arredondada)
+	var casos := {
+		"nenhum": [[], 1300, 300],
+		"so_skin": [["skin_coracao_podre"], 625, 135],
+		"so_efeito": [["efeito_rasto_esporos"], 875, 220],
+		"so_hud": [["hud_moldura_raizes"], 1100, 250],
+		"skin_efeito": [["skin_coracao_podre", "efeito_rasto_esporos"], 200, 55],
+		"skin_hud": [["skin_coracao_podre", "hud_moldura_raizes"], 425, 85],
+		"efeito_hud": [["efeito_rasto_esporos", "hud_moldura_raizes"], 675, 170],
+	}
+	for nome: String in casos:
+		var c: Array = casos[nome]
+		var tem: Array = c[0]
+		var f := func(id: String) -> bool: return id in tem
+		var pk_ := LojaCatalogo.preco_pack(pk, "k", f)
+		var pv_ := LojaCatalogo.preco_pack(pk, "v", f)
+		print("PRECO PACK %-12s K=%d V=%d" % [nome, pk_, pv_])
+		_ok(pk_ == c[1] and pv_ == c[2], "colecao: pack %s = %d K / %d V (esperado %d / %d)" % [nome, pk_, pv_, c[1], c[2]])
+		_ok(pk_ % 25 == 0 and pv_ % 5 == 0, "colecao: arredondamento do pack %s" % nome)
+	_ok(LojaCatalogo.preco_pack(pk, "k", func(_id: String) -> bool: return true) == -1, "colecao: pack completo devia dar -1")
+	# 16-18. comprar so' cobra o que falta e nao duplica
+	var a := _novo_estado()
+	a.ganhar_kolicoins(9000)
+	a.dev_dar_veracoins(2000)
+	for i in 5:
+		a.marcar_nivel_concluido(i)
+	var k0: int = a.kolicoins
+	_ok(a.comprar_item("hud_moldura_raizes", "k")["ok"], "colecao: compra individual do HUD")
+	_ok(a.kolicoins == k0 - 300, "colecao: HUD custou %d" % (k0 - a.kolicoins))
+	var preco_esperado: int = a.preco_loja(PACK, "k")
+	_ok(preco_esperado == 1100, "colecao: pack com HUD = 1100 K (%d)" % preco_esperado)
+	var k1: int = a.kolicoins
+	_ok(a.comprar_item(PACK, "k")["ok"], "colecao: compra do pack (K)")
+	_ok(a.kolicoins == k1 - preco_esperado, "colecao: pack cobrou %d em vez de %d" % [k1 - a.kolicoins, preco_esperado])
+	for id: String in IDS:
+		_ok(a.item_adquirido(id), "colecao: pack nao deu " + id)
+	var vezes := {}
+	for id in a.itens_comprados:
+		vezes[id] = int(vezes.get(id, 0)) + 1
+	for id in vezes:
+		_ok(vezes[id] == 1, "colecao: %s duplicado em itens_comprados" % id)
+	_ok(not (PACK in a.itens_comprados), "colecao: o pack nao deve ficar na lista de comprados")
+	_ok(a.equipado_na_categoria("skins") == "skin_koliani_base" and a.equipado_na_categoria("efeitos") == ""
+		and a.equipado_na_categoria("hud_checkpoint") == "", "colecao: comprar o pack equipou algo sozinho")
+	# 15. completo: nada para comprar
+	_ok(a.estado_item_loja(PACK) == "completo", "colecao: pack devia estar COMPLETO (%s)" % a.estado_item_loja(PACK))
+	_ok(a.preco_loja(PACK, "k") == -1 and a.preco_loja(PACK, "v") == -1, "colecao: pack completo com preco comprável")
+	var k2: int = a.kolicoins
+	_ok(a.comprar_item(PACK, "k")["erro"] == "ja_adquirido" and a.kolicoins == k2, "colecao: pack completo voltou a cobrar")
+	# 20. save/load preserva o ownership vindo do pack
+	var b := _novo_estado()
+	b.de_dicionario(JSON.parse_string(JSON.stringify(a.para_dicionario())))
+	for id: String in IDS:
+		_ok(b.item_adquirido(id), "colecao: save/load perdeu " + id)
+	_ok(b.estado_item_loja(PACK) == "completo", "colecao: pack nao completo apos load")
+	# pack pago em V a partir do zero (skin so' via pack em K tambem e' possivel)
+	var c2 := _novo_estado()
+	c2.ganhar_kolicoins(1300)
+	for i in 5:
+		c2.marcar_nivel_concluido(i)
+	c2.kolicoins = 1300
+	_ok(c2.comprar_item(PACK, "k")["ok"] and c2.item_adquirido("skin_coracao_podre") and c2.kolicoins == 0,
+		"colecao: pack e' a via K para a skin")
+	# 19. nada disto mexe em stats
+	var g := _novo_estado()
+	g.ganhar_kolicoins(9000)
+	for i in 5:
+		g.marcar_nivel_concluido(i)
+	var dano: int = g.dano_ataque()
+	var bonus: Variant = g.vida_bonus_armadura()
+	var vidas: int = g.vidas
+	g.comprar_item(PACK, "k")
+	for id: String in IDS:
+		g.equipar_item(id)
+	_ok(g.dano_ataque() == dano and g.vida_bonus_armadura() == bonus and g.vidas == vidas, "colecao: pack mexeu em stats")
+	for x in [e, a, b, c2, g]:
+		x.free()

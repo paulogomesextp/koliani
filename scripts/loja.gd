@@ -21,6 +21,7 @@ var _botoes_cat := {}
 var _grelha: GridContainer
 var _cartoes := {}
 var _det_nome: Label
+var _det_raridade: Label
 var _det_desc: Label
 var _det_estado: Label
 var _det_req: Label
@@ -137,6 +138,10 @@ func _montar() -> void:
 	_det_nome.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	Frontend9H.cabecalho(_det_nome, 22)
 	col.add_child(_det_nome)
+	_det_raridade = Label.new()
+	Frontend9H.capitular(_det_raridade, 13, Frontend9H.OSSO)
+	_det_raridade.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	col.add_child(_det_raridade)
 	_det_estado = Label.new()
 	Frontend9H.capitular(_det_estado, 14, Frontend9H.CARMESIM_CLARO)
 	_det_estado.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
@@ -212,6 +217,17 @@ func _escolher_categoria(c: String) -> void:
 		Frontend9H.botao_placa(b, 15)
 		b.pressed.connect(func() -> void: _selecionar(id))
 		b.focus_entered.connect(func() -> void: _selecionar(id))
+		var traco := ColorRect.new()
+		traco.name = "TracoRaridade"
+		traco.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		traco.color = cor_raridade(str(it["raridade"]))
+		traco.set_anchors_preset(Control.PRESET_LEFT_WIDE)
+		traco.custom_minimum_size.x = largura_traco(str(it["raridade"]))
+		traco.offset_top = 6.0
+		traco.offset_bottom = -6.0
+		traco.offset_left = 6.0
+		traco.offset_right = 6.0 + largura_traco(str(it["raridade"]))
+		b.add_child(traco)
 		_grelha.add_child(b)
 		_cartoes[id] = b
 	_sel = str(itens[0]["id"]) if not itens.is_empty() else ""
@@ -254,12 +270,38 @@ func _selecionar(id: String) -> void:
 	_refrescar()
 
 
+## Cor do traço/etiqueta de cada raridade: osso, carmesim, carmesim vivo, ouro
+## (o ouro é só do tratamento de pack/lendário).
+static func cor_raridade(r: String) -> Color:
+	match r:
+		"raro":
+			return Frontend9H.CARMESIM
+		"epico":
+			return Frontend9H.CARMESIM_CLARO
+		"lendario":
+			return Color(0.95, 0.78, 0.35)
+	return Frontend9H.OSSO
+
+
+## Espessura do traço: quanto mais raro, mais forte (sem animação).
+static func largura_traco(r: String) -> float:
+	match r:
+		"raro":
+			return 4.0
+		"epico":
+			return 6.0
+		"lendario":
+			return 8.0
+	return 3.0
+
+
 func _texto_precos(it: Dictionary) -> String:
 	var partes := []
-	if LojaCatalogo.preco(it, KOLI) >= 0:
-		partes.append("%d K" % LojaCatalogo.preco(it, KOLI))
-	if LojaCatalogo.preco(it, VERA) >= 0:
-		partes.append("%d V" % LojaCatalogo.preco(it, VERA))
+	var id := str(it["id"])
+	if EstadoJogo.preco_loja(id, KOLI) >= 0:
+		partes.append("%d K" % EstadoJogo.preco_loja(id, KOLI))
+	if EstadoJogo.preco_loja(id, VERA) >= 0:
+		partes.append("%d V" % EstadoJogo.preco_loja(id, VERA))
 	return "  ·  ".join(partes)
 
 
@@ -272,10 +314,11 @@ func _refrescar() -> void:
 		var b: Button = _cartoes[id]
 		var it := LojaCatalogo.item(id)
 		var est := EstadoJogo.estado_item_loja(id)
-		var linha2 := Textos.t("shop.state." + est)
+		var linha2 := Textos.t("shop.rarity." + str(it["raridade"])) + "  ·  " + Textos.t("shop.state." + est)
+		var linha3 := ""
 		if est == "disponivel" or est == "bloqueado":
-			linha2 += "   " + _texto_precos(it)
-		b.text = Textos.t("shop.item.%s.name" % id) + "\n" + linha2
+			linha3 = "\n" + _texto_precos(it)
+		b.text = "      " + Textos.t("shop.item.%s.name" % id) + "\n      " + linha2 + (linha3.replace("\n", "\n      "))
 		b.add_theme_color_override("font_color", _cor_estado(est))
 		b.add_theme_color_override("font_hover_color", _cor_estado(est))
 		b.add_theme_color_override("font_focus_color", Frontend9H.OSSO)
@@ -287,7 +330,7 @@ func _cor_estado(est: String) -> Color:
 	match est:
 		"equipado":
 			return Frontend9H.VERDE_ESTADO
-		"adquirido":
+		"adquirido", "completo":
 			return Frontend9H.OSSO
 		"bloqueado":
 			return Frontend9H.TEXTO_APAGADO
@@ -299,6 +342,7 @@ func _detalhe() -> void:
 	for b: Button in [_btn_k, _btn_v, _btn_eq]:
 		b.visible = false
 	_det_ph.text = ""
+	_det_raridade.text = ""
 	_det_req.text = ""
 	_det_aviso.text = ""
 	if vazio:
@@ -311,6 +355,8 @@ func _detalhe() -> void:
 	_det_nome.text = Textos.t("shop.item.%s.name" % _sel)
 	_det_desc.text = Textos.t("shop.item.%s.desc" % _sel)
 	_det_estado.text = Textos.t("shop.state." + est)
+	_det_raridade.text = "◆ " + Textos.t("shop.rarity." + str(it["raridade"]))
+	_det_raridade.add_theme_color_override("font_color", cor_raridade(str(it["raridade"])))
 	if bool(it["placeholder"]):
 		_det_ph.text = Textos.t("shop.placeholder")
 	var r := int(it["regiao"])
@@ -321,7 +367,9 @@ func _detalhe() -> void:
 	if est == "disponivel" or est == "bloqueado":
 		for moeda in aceites:
 			var btn := _btn_k if moeda == KOLI else _btn_v
-			var p := LojaCatalogo.preco(it, moeda)
+			var p := EstadoJogo.preco_loja(_sel, moeda)
+			if p < 0:
+				continue
 			btn.text = Textos.tf("shop.buy_k" if moeda == KOLI else "shop.buy_v", [p])
 			btn.visible = true
 			btn.disabled = est == "bloqueado" or EstadoJogo.saldo_loja(moeda) < p
@@ -334,6 +382,15 @@ func _detalhe() -> void:
 		_btn_eq.visible = true
 		_btn_eq.text = Textos.t("shop.equipped" if est == "equipado" else "shop.equip")
 		_btn_eq.disabled = est == "equipado"
+	if LojaCatalogo.e_pack(it):
+		var dele := 0
+		for c: String in it["contem"]:
+			if EstadoJogo.item_adquirido(c):
+				dele += 1
+		var linha := Textos.tf("shop.pack_progress", [dele, it["contem"].size()])
+		if dele > 0 and dele < it["contem"].size():
+			linha += "\n" + Textos.t("shop.pack_missing")
+		_det_aviso.text = linha + ("\n" + _det_aviso.text if _det_aviso.text != "" else "")
 	_det_aviso.text += ("\n" if _det_aviso.text != "" else "") + Textos.t("shop.cosmetic_only")
 
 

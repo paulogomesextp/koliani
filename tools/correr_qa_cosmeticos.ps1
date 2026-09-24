@@ -37,6 +37,7 @@ try {
   Correr 'res://tests/qa_cosm_persist.tscn' @('--', 'verifica')
   Correr 'res://tests/qa_cosm_persist.tscn' @('--', 'desequipa')
   Correr 'res://tests/qa_cosm_persist.tscn' @('--', 'default')
+  Correr 'res://tests/qa_loja_colecao_visual.tscn' @()
 } finally { $env:APPDATA = $antigo }
 $depois = Hash-Save
 if ($antes -ne $depois) { Write-Output "ERRO: o save real mudou ($antes -> $depois)"; $falhou = $true }

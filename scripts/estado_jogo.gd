@@ -222,7 +222,15 @@ func saldo_loja(moeda: String) -> int:
 
 func item_adquirido(id: String) -> bool:
 	var it: Dictionary = _LOJA.item(id)
-	return not it.is_empty() and (bool(it["inicial"]) or id in itens_comprados)
+	if it.is_empty():
+		return false
+	if _LOJA.e_pack(it):
+		# um pack não é guardado: está "completo" quando os itens são todos teus
+		for c: String in it["contem"]:
+			if not item_adquirido(c):
+				return false
+		return true
+	return bool(it["inicial"]) or id in itens_comprados
 
 
 ## Item equipado no slot `categoria`; se nada foi escolhido, o item inicial.
@@ -250,12 +258,24 @@ func item_bloqueado(id: String) -> bool:
 	return r >= 0 and not regiao_esta_concluida(r)
 
 
-## Estado para a UI: "bloqueado" | "disponivel" | "adquirido" | "equipado".
+## Preço que o jogador paga por `id` em `moeda` (-1 = não aceita/nada a pagar).
+## Nos packs só conta o que ainda falta.
+func preco_loja(id: String, moeda: String) -> int:
+	var it: Dictionary = _LOJA.item(id)
+	if it.is_empty():
+		return -1
+	if _LOJA.e_pack(it):
+		return _LOJA.preco_pack(it, moeda, item_adquirido)
+	return _LOJA.preco(it, moeda)
+
+
+## Estado para a UI: "bloqueado" | "disponivel" | "adquirido" | "equipado" |
+## "completo" (pack com todos os itens já teus).
 func estado_item_loja(id: String) -> String:
 	if item_equipado(id):
 		return "equipado"
 	if item_adquirido(id):
-		return "adquirido"
+		return "completo" if _LOJA.e_pack(_LOJA.item(id)) else "adquirido"
 	if item_bloqueado(id):
 		return "bloqueado"
 	return "disponivel"
@@ -271,7 +291,7 @@ func comprar_item(id: String, moeda: String) -> Dictionary:
 		return {"ok": false, "erro": "ja_adquirido"}
 	if item_bloqueado(id):
 		return {"ok": false, "erro": "bloqueado"}
-	var preco: int = _LOJA.preco(it, moeda) if moeda in [_LOJA.KOLICOINS, _LOJA.VERACOINS] else -1
+	var preco: int = preco_loja(id, moeda) if moeda in [_LOJA.KOLICOINS, _LOJA.VERACOINS] else -1
 	if preco < 0:
 		return {"ok": false, "erro": "moeda_invalida"}
 	if saldo_loja(moeda) < preco:
@@ -280,9 +300,20 @@ func comprar_item(id: String, moeda: String) -> Dictionary:
 		kolicoins -= preco
 	else:
 		veracoins -= preco
-	itens_comprados.append(id)
+	# pack: concede só os itens em falta (o pack em si nunca fica na lista);
+	# não equipa nada por conta própria
+	var concedidos: Array = []
+	if _LOJA.e_pack(it):
+		for c: String in it["contem"]:
+			if not item_adquirido(c):
+				itens_comprados.append(c)
+				concedidos.append(c)
+	else:
+		itens_comprados.append(id)
+		concedidos.append(id)
 	moedas_loja_mudaram.emit()
-	item_loja_comprado.emit(id)
+	for c: String in concedidos:
+		item_loja_comprado.emit(c)
 	guardar()
 	return {"ok": true, "erro": ""}
 
