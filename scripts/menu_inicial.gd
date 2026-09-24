@@ -96,7 +96,7 @@ func _montar() -> void:
 	Frontend9H.por(_coluna, Rect2(EIXO - LARG_COLUNA * 0.5, Y_COLUNA, LARG_COLUNA, 320.0))
 	_palco.add_child(_coluna)
 
-	var chaves := ["continuar", "novo", "niveis", "opcoes", "sair"]
+	var chaves := ["continuar", "novo", "niveis", "loja", "opcoes", "sair"]
 	for i in chaves.size():
 		if i > 0:
 			var caixa := CenterContainer.new()
@@ -141,6 +141,7 @@ func _montar() -> void:
 	_botoes["continuar"].pressed.connect(_ao_continuar)
 	_botoes["novo"].pressed.connect(_ao_novo)
 	_botoes["niveis"].pressed.connect(_ao_niveis)
+	_botoes["loja"].pressed.connect(_abrir_loja)
 	_botoes["opcoes"].pressed.connect(_abrir_opcoes)
 	_botoes["sair"].pressed.connect(_ao_sair)
 
@@ -273,6 +274,7 @@ func _traduzir() -> void:
 	_botoes["continuar"].text = Textos.t("menu.continue")
 	_botoes["novo"].text = Textos.t("menu.new_game")
 	_botoes["niveis"].text = Textos.t("menu.select_level")
+	_botoes["loja"].text = Textos.t("menu.shop")
 	_botoes["opcoes"].text = Textos.t("menu.options")
 	_botoes["sair"].text = Textos.t("menu.quit")
 	_dev.text = Textos.t("menu.dev_mode")
@@ -322,6 +324,16 @@ func _repor_botoes() -> void:
 	_botoes["novo"].text = Textos.t("menu.new_game")
 	_aviso.visible = false
 	_premir.visible = true
+
+
+func _abrir_loja() -> void:
+	_repor_botoes()
+	Som.toca("menu_painel", -12.0)
+	var l := Loja.new()
+	l.tree_exited.connect(func() -> void:
+		if is_inside_tree():
+			_botoes["loja"].grab_focus())
+	add_child(l)
 
 
 func _abrir_opcoes() -> void:

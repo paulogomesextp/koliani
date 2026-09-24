@@ -23,6 +23,7 @@ var ultima_origem_save: String = ""
 ## `Equipamento`) porque este autoload é o 1.º a arrancar -- não pode
 ## depender do registo de classes globais ainda estar pronto.
 const _EQUIP := preload("res://scripts/equipamento.gd")
+const _LOJA := preload("res://scripts/loja_catalogo.gd")
 const _MELHORIAS := preload("res://scripts/melhorias.gd")
 
 ## Vidas com que se começa a campanha. Pedido do Paulo (4 set 2026): eram 3,
@@ -193,6 +194,117 @@ signal habilidade_desbloqueada(id: String)
 ## `GeradorCorredor.estreia_do_nivel`). A HUD explica-a durante 5 s.
 signal mecanica_estreou(cam: String)
 
+## --- Loja -----------------------------------------------------------------
+
+func ganhar_kolicoins(n: int, gravar := true) -> void:
+	if n <= 0:
+		return
+	kolicoins += n
+	moedas_loja_mudaram.emit()
+	if gravar:
+		guardar()
+
+
+## SÓ para QA/desenvolvimento: recusa fora do modo dev ou de teste, por isso
+## nunca existe como "Veracoins grátis" numa build normal. O modo dev não
+## grava saves, portanto este saldo nunca chega ao disco.
+func dev_dar_veracoins(n: int) -> bool:
+	if not (modo_dev or modo_teste) or n <= 0:
+		return false
+	veracoins += n
+	moedas_loja_mudaram.emit()
+	return true
+
+
+func saldo_loja(moeda: String) -> int:
+	return kolicoins if moeda == _LOJA.KOLICOINS else veracoins
+
+
+func item_adquirido(id: String) -> bool:
+	var it: Dictionary = _LOJA.item(id)
+	return not it.is_empty() and (bool(it["inicial"]) or id in itens_comprados)
+
+
+## Item equipado no slot `categoria`; se nada foi escolhido, o item inicial.
+func equipado_na_categoria(categoria: String) -> String:
+	var e := str(cosmeticos_equipados.get(categoria, ""))
+	if e != "" and item_adquirido(e):
+		return e
+	for it: Dictionary in _LOJA.da_categoria(categoria):
+		if bool(it["inicial"]):
+			return str(it["id"])
+	return ""
+
+
+func item_equipado(id: String) -> bool:
+	var it: Dictionary = _LOJA.item(id)
+	return not it.is_empty() and it["categoria"] in _LOJA.EQUIPAVEIS 		and equipado_na_categoria(str(it["categoria"])) == id
+
+
+## Bloqueado por progressão (região por concluir)?
+func item_bloqueado(id: String) -> bool:
+	var it: Dictionary = _LOJA.item(id)
+	if it.is_empty():
+		return true
+	var r := int(it["regiao"])
+	return r >= 0 and not regiao_esta_concluida(r)
+
+
+## Estado para a UI: "bloqueado" | "disponivel" | "adquirido" | "equipado".
+func estado_item_loja(id: String) -> String:
+	if item_equipado(id):
+		return "equipado"
+	if item_adquirido(id):
+		return "adquirido"
+	if item_bloqueado(id):
+		return "bloqueado"
+	return "disponivel"
+
+
+## Compra `id` com `moeda` ("k"/"v"). {"ok": bool, "erro": String}; erros:
+## desconhecido | ja_adquirido | bloqueado | moeda_invalida | saldo.
+func comprar_item(id: String, moeda: String) -> Dictionary:
+	var it: Dictionary = _LOJA.item(id)
+	if it.is_empty():
+		return {"ok": false, "erro": "desconhecido"}
+	if item_adquirido(id):
+		return {"ok": false, "erro": "ja_adquirido"}
+	if item_bloqueado(id):
+		return {"ok": false, "erro": "bloqueado"}
+	var preco: int = _LOJA.preco(it, moeda) if moeda in [_LOJA.KOLICOINS, _LOJA.VERACOINS] else -1
+	if preco < 0:
+		return {"ok": false, "erro": "moeda_invalida"}
+	if saldo_loja(moeda) < preco:
+		return {"ok": false, "erro": "saldo"}
+	if moeda == _LOJA.KOLICOINS:
+		kolicoins -= preco
+	else:
+		veracoins -= preco
+	itens_comprados.append(id)
+	moedas_loja_mudaram.emit()
+	item_loja_comprado.emit(id)
+	guardar()
+	return {"ok": true, "erro": ""}
+
+
+## Equipa um item adquirido de uma categoria equipável.
+func equipar_item(id: String) -> bool:
+	var it: Dictionary = _LOJA.item(id)
+	if it.is_empty() or not item_adquirido(id) or not (it["categoria"] in _LOJA.EQUIPAVEIS):
+		return false
+	cosmeticos_equipados[str(it["categoria"])] = id
+	item_loja_equipado.emit(str(it["categoria"]), id)
+	guardar()
+	return true
+
+
+## Volta ao item inicial do slot (ou fica vazio se não houver).
+func desequipar_categoria(categoria: String) -> void:
+	if cosmeticos_equipados.erase(categoria):
+		item_loja_equipado.emit(categoria, equipado_na_categoria(categoria))
+		guardar()
+
+
 ## Mecânicas cuja explicação já foi mostrada. Vive só nesta sessão (não vai
 ## para o save): o que ela evita é o texto voltar a aparecer quando se morre
 ## e a cena recarrega, que é o caso que acontece a sério. Reabrir o jogo e
@@ -202,6 +314,10 @@ var mecanicas_explicadas := {}
 ## Economia: total de essência mudou / uma melhoria subiu de rank.
 signal essencia_mudou(total: int)
 signal melhoria_comprada(id: String, rank: int)
+## Loja: saldo de Kolicoins/Veracoins mudou; item comprado; item equipado.
+signal moedas_loja_mudaram
+signal item_loja_comprado(id: String)
+signal item_loja_equipado(categoria: String, id: String)
 signal equipamento_ganho(tipo: String, id: String)
 ## Trocou-se a arma ou a armadura equipada.
 signal equipamento_mudou(tipo: String, id: String)
@@ -243,6 +359,18 @@ var recompensas_reclamadas: Array[String] = []
 var essencia: int = 0
 ## id da melhoria -> rank atual (int, 0..Melhorias.max_rank).
 var melhorias: Dictionary = {}
+
+## --- LOJA (cosméticos) ----------------------------------------------------
+## Estado da CONTA, não da campanha: `reiniciar_campanha()` NÃO lhe toca (um
+## "novo jogo" nunca pode apagar Veracoins nem compras).
+## Kolicoins: ganham-se a jogar (`ganhar_kolicoins`). Veracoins: premium, sem
+## qualquer pagamento implementado -- só há `dev_dar_veracoins` (modo dev/teste).
+var kolicoins: int = 0
+var veracoins: int = 0
+## ids do catálogo (`LojaCatalogo`) comprados.
+var itens_comprados: Array[String] = []
+## categoria -> id equipado (só categorias de `LojaCatalogo.EQUIPAVEIS`).
+var cosmeticos_equipados: Dictionary = {}
 
 ## Posto a true pelos testes (ver tests/run_tests.gd) para NÃO tocar no
 ## ficheiro de save real ao instanciar o estado fora do jogo.
@@ -323,6 +451,9 @@ func marcar_nivel_concluido(indice: int) -> void:
 		return
 	concluidos.append(indice)
 	concluidos.sort()
+	# BALANCE_PLACEHOLDER: recompensa provisória em Kolicoins, só à 1.ª conclusão
+	ganhar_kolicoins(_LOJA.KOLICOINS_POR_EXAME_REGIONAL if nivel_e_exame_regional(indice)
+		else _LOJA.KOLICOINS_POR_NIVEL, false)
 	# Só o quinto nível de cada região é boss/exame. IDs antigos dos níveis
 	# 1–4 continuam válidos para carregar saves legacy, mas um Guardião já não
 	# cria hoje uma nova derrota/recompensa de boss.
@@ -935,6 +1066,11 @@ func para_dicionario() -> Dictionary:
 		"armadura_equipada": armadura_equipada,
 		"essencia": essencia,
 		"melhorias": melhorias.duplicate(),
+		"loja": {
+			"kolicoins": kolicoins, "veracoins": veracoins,
+			"itens_comprados": itens_comprados.duplicate(),
+			"cosmeticos_equipados": cosmeticos_equipados.duplicate(),
+		},
 	}
 
 
@@ -972,6 +1108,33 @@ func de_dicionario(d: Dictionary) -> void:
 	var ms: Dictionary = d.get("melhorias", {})
 	for k in ms:
 		melhorias[str(k)] = int(ms[k])
+	_carregar_loja(d.get("loja", {}))
+
+
+## Lê o bloco `loja` do save com defaults seguros: saves anteriores à loja não
+## o têm, e um bloco malformado nunca deve deitar o save abaixo.
+func _carregar_loja(bloco: Variant) -> void:
+	kolicoins = 0
+	veracoins = 0
+	itens_comprados.clear()
+	cosmeticos_equipados.clear()
+	if not (bloco is Dictionary):
+		return
+	var b: Dictionary = bloco
+	kolicoins = maxi(0, int(b.get("kolicoins", 0)))
+	veracoins = maxi(0, int(b.get("veracoins", 0)))
+	var comprados: Variant = b.get("itens_comprados", [])
+	if comprados is Array:
+		for i in comprados:
+			var id := str(i)
+			if _LOJA.existe(id) and id not in itens_comprados:
+				itens_comprados.append(id)
+	var eq: Variant = b.get("cosmeticos_equipados", {})
+	if eq is Dictionary:
+		for c in eq:
+			var id := str(eq[c])
+			if str(c) in _LOJA.EQUIPAVEIS and _LOJA.existe(id) and item_adquirido(id):
+				cosmeticos_equipados[str(c)] = id
 
 
 func guardar() -> bool:

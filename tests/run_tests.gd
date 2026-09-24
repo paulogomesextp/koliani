@@ -144,6 +144,13 @@ func _correr_tudo() -> void:
 	teste_9h1_tema_do_seletor()
 	teste_9h1_repor_layout_apaga_mesmo()
 
+	# --- Loja (Kolicoins / Veracoins, so cosmeticos) ---------------------
+	teste_loja_catalogo()
+	teste_loja_compras_e_equipar()
+	teste_loja_save_e_compatibilidade()
+	teste_loja_progressao_regional_e_gameplay()
+	teste_loja_i18n()
+
 	# --- Região III -- Torre dos Ecos (N11-N15) -----------------------
 	teste_r3_nomes_canonicos()
 	teste_r3_vyrak_sem_lore_de_dragao()
@@ -4096,3 +4103,167 @@ func teste_r3_bestiario_canonico() -> void:
 				"R3: o elite `%s` do N%d usa `%s`, que nao e' da regiao"
 				% [n.name, 11 + i, n.get("especie")])
 		raiz.free()
+
+
+# --- Loja ------------------------------------------------------------------
+
+func teste_loja_catalogo() -> void:
+	var erros := LojaCatalogo.validar()
+	_ok(erros.is_empty(), "loja: catalogo invalido %s" % str(erros))
+	var ids := {}
+	for it: Dictionary in LojaCatalogo.todos():
+		_ok(not ids.has(it["id"]), "loja: id duplicado %s" % it["id"])
+		ids[it["id"]] = true
+		_ok(it["efeito"] == "cosmetico", "loja: %s nao e cosmetico" % it["id"])
+	_ok(ids.size() >= 6, "loja: catalogo MVP demasiado pequeno")
+	for c: String in LojaCatalogo.CATEGORIAS:
+		_ok(c == "packs" or c == "extras" or not LojaCatalogo.da_categoria(c).is_empty(),
+			"loja: categoria vazia %s" % c)
+	# cobertura dos casos: so K, so V, ambas, bloqueado por regiao, inicial
+	_ok(LojaCatalogo.moedas_aceites(LojaCatalogo.item("skin_carmesim")) == ["k"], "loja: item so K")
+	_ok(LojaCatalogo.moedas_aceites(LojaCatalogo.item("skin_luar")) == ["v"], "loja: item so V")
+	_ok(LojaCatalogo.moedas_aceites(LojaCatalogo.item("efeito_rasto_brasa")) == ["k", "v"], "loja: item K ou V")
+	_ok(LojaCatalogo.item("pack_regiao_i")["regiao"] == 0, "loja: item regional")
+	_ok(LojaCatalogo.item("skin_koliani_base")["inicial"], "loja: item inicial")
+
+
+func teste_loja_compras_e_equipar() -> void:
+	var e := _novo_estado()
+	_ok(e.kolicoins == 0 and e.veracoins == 0, "loja: saldos iniciais nao zero")
+	# saldo insuficiente
+	_ok(e.comprar_item("skin_carmesim", "k")["erro"] == "saldo", "loja: compra sem saldo devia falhar")
+	_ok(not e.item_adquirido("skin_carmesim") and e.kolicoins == 0, "loja: compra falhada mexeu no estado")
+	# Kolicoins
+	e.ganhar_kolicoins(1000)
+	_ok(e.comprar_item("skin_carmesim", "k")["ok"], "loja: compra K falhou")
+	_ok(e.kolicoins == 700 and e.item_adquirido("skin_carmesim"), "loja: K nao debitado (%d)" % e.kolicoins)
+	# nao se compra duas vezes
+	_ok(e.comprar_item("skin_carmesim", "k")["erro"] == "ja_adquirido" and e.kolicoins == 700,
+		"loja: comprou duas vezes")
+	# moeda nao aceite
+	_ok(e.comprar_item("skin_luar", "k")["erro"] == "moeda_invalida", "loja: item so-V aceitou K")
+	_ok(e.comprar_item("skin_luar", "x")["erro"] == "moeda_invalida", "loja: moeda inventada")
+	# Veracoins (so por mecanismo dev/teste)
+	_ok(e.dev_dar_veracoins(260), "loja: dev_dar_veracoins recusou em modo teste")
+	_ok(e.comprar_item("skin_luar", "v")["ok"] and e.veracoins == 110, "loja: V nao debitado (%d)" % e.veracoins)
+	# moeda alternativa: item K-ou-V pago com V
+	_ok(e.comprar_item("hud_moldura_osso", "v")["ok"] and e.veracoins == 50 and e.kolicoins == 700,
+		"loja: compra por moeda alternativa")
+	# desconhecido
+	_ok(e.comprar_item("nao_existe", "k")["erro"] == "desconhecido", "loja: item desconhecido")
+	# equipar: so adquiridos, so equipaveis, um por slot
+	_ok(e.estado_item_loja("skin_koliani_base") == "equipado", "loja: skin inicial devia vir equipada")
+	_ok(not e.equipar_item("efeito_rasto_brasa"), "loja: equipou item por comprar")
+	_ok(e.equipar_item("skin_carmesim") and e.item_equipado("skin_carmesim")
+		and not e.item_equipado("skin_koliani_base"), "loja: equipar skin")
+	_ok(e.equipar_item("skin_luar") and e.item_equipado("skin_luar") and not e.item_equipado("skin_carmesim"),
+		"loja: um so item por slot")
+	e.desequipar_categoria("skins")
+	_ok(e.item_equipado("skin_koliani_base"), "loja: desequipar devia voltar ao inicial")
+	e.ganhar_kolicoins(500)
+	e.comprar_item("extra_galeria_conceitos", "k")
+	_ok(not e.equipar_item("extra_galeria_conceitos"), "loja: extras nao sao equipaveis")
+	_ok(e.estado_item_loja("extra_galeria_conceitos") == "adquirido", "loja: estado adquirido")
+	# a dev-grant nunca funciona fora do modo dev/teste
+	var e2: Node = EstadoJogoScript.new()
+	_ok(not e2.dev_dar_veracoins(500) and e2.veracoins == 0, "loja: Veracoins gratis fora do modo dev/teste")
+	e2.free()
+	e.free()
+
+
+func teste_loja_save_e_compatibilidade() -> void:
+	var total: int = EstadoJogoScript.NIVEIS.size()
+	var e := _novo_estado()
+	e.ganhar_kolicoins(900)
+	e.dev_dar_veracoins(300)
+	e.comprar_item("skin_carmesim", "k")
+	e.comprar_item("efeito_rasto_brasa", "v")
+	e.equipar_item("skin_carmesim")
+	e.equipar_item("efeito_rasto_brasa")
+	var d: Dictionary = e.para_dicionario()
+	var r: Dictionary = SaveFoundation.validar_atual(d, total)
+	_ok(r.get("ok", false), "loja: save com bloco loja deixou de validar %s" % str(r))
+	var d2: Dictionary = JSON.parse_string(JSON.stringify(d))  # round-trip JSON como no disco
+	var f := _novo_estado()
+	f.de_dicionario(d2)
+	_ok(f.kolicoins == 600 and f.veracoins == 180, "loja: saldos nao persistiram (%d/%d)" % [f.kolicoins, f.veracoins])
+	_ok(f.item_adquirido("skin_carmesim") and f.item_adquirido("efeito_rasto_brasa"), "loja: compras nao persistiram")
+	_ok(f.item_equipado("skin_carmesim") and f.item_equipado("efeito_rasto_brasa"), "loja: equipado nao persistiu")
+	# save antigo (sem bloco `loja`) continua valido, com defaults seguros
+	var antigo: Dictionary = d2.duplicate(true)
+	antigo.erase("loja")
+	_ok(SaveFoundation.validar_atual(antigo, total).get("ok", false),
+		"loja: save antigo (sem loja) deixou de validar")
+	var g := _novo_estado()
+	g.ganhar_kolicoins(5)
+	g.de_dicionario(antigo)
+	_ok(g.kolicoins == 0 and g.veracoins == 0 and g.itens_comprados.is_empty(), "loja: save antigo sem defaults")
+	# bloco malformado nao deita nada abaixo
+	var mau: Dictionary = d2.duplicate(true)
+	mau["loja"] = {"kolicoins": -5, "veracoins": "x", "itens_comprados": ["nao_existe", "skin_luar", "skin_luar"],
+		"cosmeticos_equipados": {"skins": "skin_carmesim", "extras": "extra_galeria_conceitos"}}
+	var h := _novo_estado()
+	h.de_dicionario(mau)
+	_ok(h.kolicoins == 0 and h.veracoins == 0, "loja: saldos negativos/invalidos aceites")
+	_ok(h.itens_comprados == ["skin_luar"], "loja: itens invalidos/duplicados aceites %s" % str(h.itens_comprados))
+	_ok(h.cosmeticos_equipados.is_empty(), "loja: equipado sem posse ou em slot invalido aceite")
+	# novo jogo NAO apaga a conta
+	f.reiniciar_campanha()
+	_ok(f.veracoins == 180 and f.item_adquirido("skin_carmesim"), "loja: novo jogo apagou Veracoins/compras")
+	for x in [e, f, g, h]:
+		x.free()
+
+
+func teste_loja_progressao_regional_e_gameplay() -> void:
+	var e := _novo_estado()
+	e.ganhar_kolicoins(5000)
+	_ok(e.estado_item_loja("pack_regiao_i") == "bloqueado", "loja: item regional devia estar bloqueado")
+	_ok(e.comprar_item("pack_regiao_i", "k")["erro"] == "bloqueado", "loja: comprou item bloqueado")
+	var antes: int = e.kolicoins
+	for i in 5:
+		e.marcar_nivel_concluido(i)
+	_ok(e.regiao_esta_concluida(0), "loja: regiao I devia estar concluida")
+	# BALANCE_PLACEHOLDER: 4 niveis + 1 exame
+	var ganho: int = e.kolicoins - antes
+	_ok(ganho == 4 * LojaCatalogo.KOLICOINS_POR_NIVEL + LojaCatalogo.KOLICOINS_POR_EXAME_REGIONAL,
+		"loja: recompensa de Kolicoins inesperada (%d)" % ganho)
+	e.marcar_nivel_concluido(0)
+	_ok(e.kolicoins - antes == ganho, "loja: Kolicoins repetidos ao reconcluir")
+	_ok(e.estado_item_loja("pack_regiao_i") == "disponivel", "loja: item regional nao desbloqueou")
+	_ok(e.comprar_item("pack_regiao_i", "k")["ok"], "loja: compra do item regional")
+	# nenhuma compra/equipamento premium mexe em gameplay
+	var e2 := _novo_estado()
+	e2.dev_dar_veracoins(5000)
+	e2.ganhar_kolicoins(5000)
+	var chaves := ["vidas", "essencia", "melhorias", "habilidades", "armas", "armaduras",
+		"arma_equipada", "armadura_equipada", "indice_nivel", "concluidos"]
+	var antes_g := {}
+	for k in chaves:
+		var v: Variant = e2.get(k)
+		antes_g[k] = v.duplicate() if (v is Array or v is Dictionary) else v
+	var dano_antes: int = e2.dano_ataque()
+	var vida_antes: Variant = e2.vida_bonus_armadura()
+	for it: Dictionary in LojaCatalogo.todos():
+		var moedas := LojaCatalogo.moedas_aceites(it)
+		if not moedas.is_empty() and int(it["regiao"]) < 0:
+			e2.comprar_item(it["id"], moedas[moedas.size() - 1])
+		e2.equipar_item(it["id"])
+	for k in chaves:
+		var v: Variant = e2.get(k)
+		var agora: Variant = v.duplicate() if (v is Array or v is Dictionary) else v
+		_ok(agora == antes_g[k], "loja: comprar/equipar mexeu em gameplay (%s)" % k)
+	_ok(e2.dano_ataque() == dano_antes and e2.vida_bonus_armadura() == vida_antes, "loja: comprar/equipar mudou dano/vida")
+	e.free()
+	e2.free()
+
+
+func teste_loja_i18n() -> void:
+	var en: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://assets/i18n/en.json"))
+	for it: Dictionary in LojaCatalogo.todos():
+		for suf in ["name", "desc"]:
+			_ok(en.has("shop.item.%s.%s" % [it["id"], suf]), "loja: falta texto %s.%s" % [it["id"], suf])
+	for c: String in LojaCatalogo.CATEGORIAS:
+		_ok(en.has("shop.cat." + c), "loja: falta nome da categoria " + c)
+	for est in ["bloqueado", "disponivel", "adquirido", "equipado"]:
+		_ok(en.has("shop.state." + est), "loja: falta estado " + est)
+	_ok(en.has("menu.shop"), "loja: falta menu.shop")
