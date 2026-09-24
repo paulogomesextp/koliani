@@ -1092,7 +1092,7 @@ func _rasto_dash(dt: float) -> void:
 	eco.offset = _corpo.offset
 	eco.global_position = _corpo.global_position
 	eco.scale = _sprite.scale * _corpo.scale
-	eco.modulate = Color(COR_SHADOWBLADE, 0.55)
+	eco.modulate = Color(CosmeticosVisuais.cor_rasto_dash(COR_SHADOWBLADE), 0.55)
 	eco.z_index = -1
 	eco.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 	get_parent().add_child(eco)
@@ -2026,6 +2026,11 @@ const _BRILHO_CORPO := Color(1.4, 1.38, 1.5)
 const _BRILHO_SHADOW := Color(1.12, 1.10, 1.18)
 
 func _tint_armadura() -> Color:
+	# cosmético da Loja: só tinta visual por cima do resto
+	return _tint_armadura_base() * CosmeticosVisuais.tinta_skin()
+
+
+func _tint_armadura_base() -> Color:
 	if usar_prototipo_premium:
 		# O Level 1 tem luz verde intensa; sem esta compensacao os grafites do
 		# prototype ficam quase brancos e perdem a silhueta dark-fantasy.

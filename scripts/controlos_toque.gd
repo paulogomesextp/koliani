@@ -288,6 +288,7 @@ func _montar_disco_arma() -> void:
 	_arma_disco.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
 	_arma_disco.add_theme_stylebox_override("panel", UIProducao.caixa("moldura_ornamentada",
 		Vector4(0, 0, 0, 0), Color.WHITE, [22, 22, 22, 22]))
+	_arma_disco.self_modulate = CosmeticosVisuais.tinta_moldura_hud()
 	add_child(_arma_disco)
 
 	_arma_label = Label.new()

@@ -179,6 +179,10 @@ func _montar_visual() -> void:
 		Color(1.0, 0.98, 0.72, 0.95), Color(1.0, 0.78, 0.26, 0.9),
 		Color(0.92, 0.36, 0.1, 0.55), Color(0.35, 0.1, 0.05, 0.0),
 	])
+	# cosmético da Loja: a mesma rampa, na cor do item equipado (placeholder)
+	var cc: Color = CosmeticosVisuais.cor_chama_checkpoint(Color.BLACK)
+	if cc != Color.BLACK:
+		rampa.colors = PackedColorArray([Color(cc, 0.95), Color(cc, 0.9), Color(cc.darkened(0.4), 0.55), Color(cc.darkened(0.8), 0.0)])
 	_chama.color_ramp = rampa
 	_base.add_child(_chama)
 

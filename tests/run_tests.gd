@@ -150,6 +150,7 @@ func _correr_tudo() -> void:
 	teste_loja_save_e_compatibilidade()
 	teste_loja_progressao_regional_e_gameplay()
 	teste_loja_i18n()
+	teste_loja_cosmeticos_visuais()
 
 	# --- Região III -- Torre dos Ecos (N11-N15) -----------------------
 	teste_r3_nomes_canonicos()
@@ -4267,3 +4268,61 @@ func teste_loja_i18n() -> void:
 	for est in ["bloqueado", "disponivel", "adquirido", "equipado"]:
 		_ok(en.has("shop.state." + est), "loja: falta estado " + est)
 	_ok(en.has("menu.shop"), "loja: falta menu.shop")
+
+
+func teste_loja_cosmeticos_visuais() -> void:
+	const CV := preload("res://scripts/cosmeticos_visuais.gd")
+	var LOJA := preload("res://scripts/loja_catalogo.gd")
+	# default neutro; item equipado altera; desconhecido nao parte nada
+	_ok(CV.tinta_skin("skin_koliani_base") == Color.WHITE, "cosm: skin base devia ser neutra")
+	_ok(CV.tinta_skin("skin_carmesim") != Color.WHITE and CV.tinta_skin("skin_luar") != CV.tinta_skin("skin_carmesim"),
+		"cosm: skins sem efeito visual distinto")
+	_ok(CV.tinta_skin("nao_existe") == Color.WHITE, "cosm: id invalido devia dar neutro")
+	var base := Color(0.4, 0.3, 0.9)
+	_ok(CV.cor_rasto_dash(base, "efeito_rasto_brasa") != base and CV.cor_rasto_dash(base, "x") == base,
+		"cosm: rasto de brasa")
+	_ok(CV.tinta_moldura_hud("hud_moldura_osso") != Color.WHITE and CV.tinta_moldura_hud("x") == Color.WHITE,
+		"cosm: moldura de HUD")
+	_ok(CV.cor_chama_checkpoint(Color.BLACK, "hud_moldura_osso") != Color.BLACK, "cosm: chama do checkpoint")
+	# so' cosmeticos: nada de stats
+	var e := _novo_estado()
+	var dano0: int = e.dano_ataque()
+	var vidas0: int = e.vidas
+	e.ganhar_kolicoins(2000)
+	for id in ["skin_carmesim", "efeito_rasto_brasa", "hud_moldura_osso"]:
+		e.comprar_item(id, "k")
+		e.equipar_item(id)
+	_ok(e.dano_ataque() == dano0 and e.vidas == vidas0, "cosm: equipar mexeu nos stats")
+	# desequipar volta ao default
+	e.desequipar_categoria("skins")
+	_ok(CV.tinta_skin(e.equipado_na_categoria("skins")) == Color.WHITE, "cosm: desequipar nao restaura default")
+	# save/load mantem o equipado
+	var f := _novo_estado()
+	f.de_dicionario(JSON.parse_string(JSON.stringify(e.para_dicionario())))
+	_ok(f.item_equipado("efeito_rasto_brasa") and f.item_equipado("hud_moldura_osso")
+		and f.equipado_na_categoria("skins") == "skin_koliani_base", "cosm: save/load nao manteve equipado")
+	# item invalido no save nao parte o runtime
+	var d: Dictionary = e.para_dicionario()
+	d["cosmeticos_equipados"] = {"skins": "lixo", "efeitos": 7}
+	var g := _novo_estado()
+	g.de_dicionario(d)
+	_ok(CV.tinta_skin(g.equipado_na_categoria("skins")) == Color.WHITE, "cosm: save invalido quebrou o default")
+	# Novo Jogo nao apaga compras da conta
+	e.reiniciar_campanha()
+	_ok(e.item_adquirido("skin_carmesim"), "cosm: Novo Jogo apagou compras")
+	# Kolicoins: 1.a conclusao (+25), exame (+100), repeticao nao repete
+	var h := _novo_estado()
+	var k0: int = h.kolicoins
+	h.marcar_nivel_concluido(0)
+	_ok(h.kolicoins == k0 + LOJA.KOLICOINS_POR_NIVEL, "cosm: 1.a conclusao devia dar +25 (%d)" % h.kolicoins)
+	h.marcar_nivel_concluido(0)
+	_ok(h.kolicoins == k0 + LOJA.KOLICOINS_POR_NIVEL, "cosm: repetir nivel deu recompensa outra vez")
+	var k1: int = h.kolicoins
+	h.marcar_nivel_concluido(4)
+	_ok(h.kolicoins == k1 + LOJA.KOLICOINS_POR_EXAME_REGIONAL, "cosm: exame devia dar +100 (%d)" % (h.kolicoins - k1))
+	h.marcar_nivel_concluido(4)
+	_ok(h.kolicoins == k1 + LOJA.KOLICOINS_POR_EXAME_REGIONAL, "cosm: repetir exame deu recompensa")
+	h.free()
+	f.free()
+	g.free()
+	e.free()
