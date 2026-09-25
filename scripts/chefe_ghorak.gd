@@ -18,9 +18,11 @@ extends ChefeBase
 ##             EXPOSTO (janela grande). E' a "abertura" que a luta ensina.
 ##   RAIZES -- planta uma zona de raizes a volta da Koliani com o aviso
 ##             (racha no chao) VISIVEL antes de irromperem: obriga a sair dali.
-##             Sem janela de dano (a casca esta' fechada): e' movimento.
+##             Depois fica EXPOSTO (as raizes irrompem a meio da janela: bate-se
+##             e desvia-se).
 ##   CARGA  -- crava a pose, o rumo trava-se a meio do aviso, investe uma
 ##             distancia fixa e fica EXPOSTO por pouco tempo (castigo do esquiva).
+##   CICLO: atacar -> ficar EXPOSTO (ajoelhado, nucleo aberto, sem magoar) -> atacar...
 ##   CURTO  -- golpe curto e lento SO' quando a Koliani cola ao corpo: pune
 ##             quem fica encostado a bater (sem risco).
 ##
@@ -38,8 +40,8 @@ enum Fase { DORME, DECIDE, CURTO_TEL, CURTO, CURTO_REC, BAQUE_TEL, BAQUE, EXPOST
 ## Fracao do dano que a casca deixa passar fora das janelas.
 const RESIST_CASCA := 0.05
 ## Padroes por fase (indice ciclico). Fase 2 usa combos (`_encadear`).
-const PADRAO_F1 := ["BAQUE", "RAIZES", "BAQUE", "CARGA"]
-const PADRAO_F2 := ["RAIZES+CARGA", "BAQUE+RAIZES", "CARGA", "BAQUE"]
+const PADRAO_F1 := ["BAQUE", "RAIZES", "CARGA", "BAQUE"]
+const PADRAO_F2 := ["BAQUE+RAIZES", "CARGA", "RAIZES", "BAQUE+RAIZES"]
 
 @export var dist_deteta := 380.0
 @export var vel_passo := 34.0
@@ -48,15 +50,16 @@ const PADRAO_F2 := ["RAIZES+CARGA", "BAQUE+RAIZES", "CARGA", "BAQUE"]
 ## dur_exposto x0,85. Os valores base ja' tem isso em conta.
 @export var dur_tel := 0.75
 @export var dur_baque := 0.35
-@export var dur_exposto := 2.1
+@export var dur_exposto := 3.05
 ## Nao escalados.
 @export var dur_marcas_tel := 0.6
-@export var dur_marcas_rec := 0.95
-@export var atraso_raiz := 1.15
+@export var dur_marcas_rec := 0.4
+@export var dur_raizes_exposto := 1.8
+@export var atraso_raiz := 1.6
 @export var dur_carga_tel := 0.9
 @export var vel_carga := 560.0
 @export var dist_carga := 460.0
-@export var dur_carga_exposto := 1.4
+@export var dur_carga_exposto := 2.0
 @export var dur_curto_tel := 0.5
 @export var dur_curto_rec := 0.45
 @export var raio_onda := 280.0
@@ -116,7 +119,7 @@ func _process(dt: float) -> void:
 func _physics_process(dt: float) -> void:
 	_curto_cd = maxf(0.0, _curto_cd - dt)
 	if not _fase2 and not _ja_derrotado and vida <= int(_vida_max * 0.5) \
-			and _fase in [Fase.DECIDE, Fase.EXPOSTO, Fase.CARGA_EXPOSTO, Fase.MARCAS_REC, Fase.CURTO_REC]:
+			and _fase in [Fase.DECIDE, Fase.CURTO_REC]:
 		_entrar_fase2()
 
 	match _fase:
@@ -179,13 +182,9 @@ func _physics_process(dt: float) -> void:
 				_ir(Fase.MARCAS_REC)
 		Fase.MARCAS_REC:
 			_travar(dt)
-			if _t >= dur_marcas_rec * (0.85 if _fase2 else 1.0):
-				if _encadear == "CARGA":
-					_encadear = ""
-					_iniciar_carga_tel()
-				else:
-					_ciclos += 1
-					_ir(Fase.DECIDE)
+			if _t >= dur_marcas_rec:
+				# TODO ataque acaba numa janela: as raizes irrompem a meio dela
+				_abrir_janela(dur_raizes_exposto * (0.8 if _fase2 else 1.0), Fase.EXPOSTO)
 		Fase.CARGA_TEL:
 			_travar(dt)
 			# o rumo trava-se aos 60 % do aviso: ate' la' ainda acompanha
@@ -433,6 +432,15 @@ func _raizes_de_fundo() -> void:
 
 ## --- nucleo / dano -------------------------------------------------
 
+## Na janela o Ghorak esta' ABERTO e parado: encostar-se para bater NAO magoa
+## (era isto que tornava a luta impossivel -- a janela pedia a Koliani ao pe' do
+## corpo, e o contacto tirava-lhe vida). Fora da janela o contacto magoa.
+func _ao_tocar(corpo: Node) -> void:
+	if _vulneravel():
+		return
+	super._ao_tocar(corpo)
+
+
 ## Telegrafo -> frame 2 (bracos erguidos) da tira pixel-art.
 func _piscar(ligado: bool) -> void:
 	super._piscar(ligado)
@@ -440,7 +448,7 @@ func _piscar(ligado: bool) -> void:
 		_corpo.frame = 2 if ligado else 0
 	if not ligado and _sprite:
 		# o `super` repoe o branco: volta o tom da casca (fechada) / do nucleo (aberto)
-		_sprite.modulate = Color(1.2, 1.12, 1.05) if _nucleo_exposto else Color(0.9, 0.95, 0.9)
+		_sprite.modulate = Color(1.45, 1.25, 1.1) if _nucleo_exposto else Color(0.9, 0.95, 0.9)
 
 
 func _mostrar_nucleo(v: bool) -> void:
@@ -451,7 +459,7 @@ func _mostrar_nucleo(v: bool) -> void:
 	if _sprite and not v:
 		_sprite.modulate = Color(0.9, 0.95, 0.9)   # casca fechada: mais baço
 	elif _sprite:
-		_sprite.modulate = Color(1.2, 1.12, 1.05)  # aberto: quente
+		_sprite.modulate = Color(1.45, 1.25, 1.1)  # aberto: quente e claro
 	if _nucleo == null:
 		return
 	_nucleo.scale = Vector2.ONE * (1.0 if v else 0.5)

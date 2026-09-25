@@ -49,6 +49,14 @@ Vida: base 250 -> **700** (x3,2 x0,52 = 1165). NAO e' sponge: o combo da Koliani
 Estimativa de jogador real (60 % de eficiencia): ~30-40 s. **Janela media (1,4 s) e' menor que os 2-3 s pedidos**:
 mais tempo = mais de metade da vida numa abertura; afinar no playtest (`dur_exposto`, `dur_carga_exposto`, vida).
 
+### Rework 2 do Ghorak (26 set 2026, apos "impossivel de matar")
+Causa provada: a janela pedia a Koliani ao pe' do corpo e o CONTACTO tirava-lhe vida (agora `_ao_tocar` nao magoa na janela); janelas
+curtas (1,4 s) e vida alta (1165). Novo ciclo fixo: **atacar -> ficar EXPOSTO (aberto, parado, sem magoar) -> atacar ...**.
+TODO ataque acaba numa janela: BAQUE 2,6 s, RAIZES 1,5 s (as raizes irrompem a meio da janela: bate-se e desvia-se), CARGA 2,0 s
+(fase 2: x0,8). Padrao F1: BAQUE, RAIZES, CARGA, BAQUE; F2: BAQUE+RAIZES, CARGA, RAIZES, BAQUE+RAIZES. Fase 2 so' arranca fora das janelas.
+Vida base 550 (x3,2 x0,52 = 915). Medido (bot a 2 golpes/s so' nas janelas): TTK 20 s, 4 janelas de ~2,1-2,6 s; so' na casca: nao morre em 150 s.
+Teste exige: janelas 0,7-3,4 s, ataques <= janelas+1, fase 2, porta abre, nada preso.
+
 ## Assets
 - Aprovados e usados: kit 9C/`l1_hybrid_9h12e` (terreno, props, fundo panorama 08, corrupcao, nevoa), Koliani golden set,
   Ghorak (rig do motor de chefes).

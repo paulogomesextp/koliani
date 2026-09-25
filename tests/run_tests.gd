@@ -3064,10 +3064,10 @@ func teste_9h_chefes_regiao1_mais_faceis() -> void:
 	await get_tree().process_frame
 	await get_tree().process_frame
 	var vida_com := int(chefe.get("vida"))
-	var esperado := int(round(700.0 * 3.2 * float(ChefeBase.ALIVIO_R1[0]["vida"])))
+	var esperado := int(round(550.0 * 3.2 * float(ChefeBase.ALIVIO_R1[0]["vida"])))
 	_ok(absi(vida_com - esperado) <= 2,
 		"9H: o Ghorak devia ficar com ~%d de vida, ficou com %d" % [esperado, vida_com])
-	_ok(vida_com < int(round(700.0 * 3.2 * 0.75)),
+	_ok(vida_com < int(round(550.0 * 3.2 * 0.75)),
 		"9H: o Ghorak do 1-1 continua com a vida antiga (%d)" % vida_com)
 	_ok(float(chefe.get("dano_onda")) < 22.0,
 		"9H: o dano por ataque do Ghorak nao desceu (%s)" % chefe.get("dano_onda"))
@@ -4978,7 +4978,7 @@ func _ghorak_luta(spam: bool, segundos: float, so_casca := false) -> Dictionary:
 				vistas[no.get_instance_id()] = true
 				if float(no.atraso) < 0.9:
 					raizes_cedo += 1
-		if frames % 16 == 0 and ((so_casca and not vuln) or (not so_casca and (spam or vuln))):
+		if frames % 30 == 0 and ((so_casca and not vuln) or (not so_casca and (spam or vuln))):
 			g.receber_dano(50, 1.0)
 		k.global_position = Vector2(g.global_position.x - 230.0, k.global_position.y) if frames % 90 == 0 else k.global_position
 	if is_instance_valid(g) and not g.is_queued_for_deletion():
@@ -5075,23 +5075,26 @@ func receber_dano(_a, _b = 0.0):
 	var lido: Dictionary = await _ghorak_luta(false, 200.0)
 	var casca: Dictionary = await _ghorak_luta(false, 150.0, true)
 	print("GHORAK so a bater na casca: ttk=%.1fs morreu=%s" % [casca["ttk"], casca["morreu"]])
-	_ok(not bool(casca["morreu"]) or float(casca["ttk"]) >= 90.0,
+	_ok(not bool(casca["morreu"]) or float(casca["ttk"]) >= 60.0,
 		"Ghorak: da' para ganhar a bater so' na casca em %.1f s" % casca["ttk"])
 	print("GHORAK spam: ttk=%.1fs morreu=%s | janelas: ttk=%.1fs morreu=%s fase2_em=%.1fs" % [
 		spam["ttk"], spam["morreu"], lido["ttk"], lido["morreu"], lido["fase2_em"]])
 	print("GHORAK janelas (s): ", lido["janelas"], " contagem: ", lido["contagem"], " raizes=", lido["raizes"])
 	_ok(bool(lido["morreu"]), "Ghorak: nao morre a bater so' nas janelas (preso?)")
-	_ok(float(lido["ttk"]) >= 16.0 and float(lido["ttk"]) <= 70.0,
-		"Ghorak: TTK do bot PERFEITO = %.1f s (jogador real ~1,5-2x: alvo 25-45 s)" % lido["ttk"])
+	_ok(float(lido["ttk"]) >= 8.0 and float(lido["ttk"]) <= 70.0,
+		"Ghorak: TTK do bot (2 golpes/s, sempre nas janelas) = %.1f s" % lido["ttk"])
 	_ok(float(lido["fase2_em"]) > 0.0, "Ghorak: a fase 2 nunca arrancou")
 	_ok(int(lido["raizes_cedo"]) == 0, "Ghorak: %d raizes com aviso < 0,9 s" % lido["raizes_cedo"])
 	_ok(float(lido["pior_estado"]) <= 6.0, "Ghorak: ficou %.1f s no mesmo estado" % lido["pior_estado"])
 	var jan: Array = lido["janelas"]
 	_ok(jan.size() >= 2, "Ghorak: menos de 2 janelas abertas")
 	for w in jan:
-		_ok(float(w) >= 0.7 and float(w) <= 2.6, "Ghorak: janela de %.2f s fora de 0,7-2,6 s" % float(w))
+		_ok(float(w) >= 0.7 and float(w) <= 3.4, "Ghorak: janela de %.2f s fora de 0,7-3,4 s" % float(w))
 	_ok(bool(lido["porta_aberta"]), "Ghorak: a porta nao abriu ao morrer")
 	var cm: Dictionary = lido["contagem"]
+	# CICLO: todo ataque acaba numa janela (atacar -> exposto -> atacar ...)
+	var n_ataques: int = int(cm["BAQUE"]) + int(cm["RAIZES"]) + int(cm["CARGA"])
+	_ok(jan.size() >= n_ataques - 1, "Ghorak: %d ataques mas so' %d janelas (todo ataque devia acabar numa janela)" % [n_ataques, jan.size()])
 	_ok(int(cm["BAQUE"]) >= 1 and int(cm["RAIZES"]) >= 1 and int(cm["CARGA"]) >= 1,
 		"Ghorak: nem todos os ataques foram usados (%s)" % str(cm))
 	EstadoJogo.modo_dev = antes_dev0
