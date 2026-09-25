@@ -28,6 +28,9 @@ terminal usar a variante `..._console.exe`).
 # Paulo foi a zero assim). O script isola o `user://` num sandbox e confirma
 # por SHA256 que o save real ficou intacto.
 powershell -ExecutionPolicy Bypass -File tools/correr_testes.ps1
+# QUALQUER outro script/QA/bot que arranque o Godot: `python tools/godot_isolado.py
+# [--sandbox DIR] -- <args do Godot>`. NUNCA isolar com XDG_DATA_HOME: no Windows
+# o user:// resolve por %APPDATA% e o XDG e' ignorado (nao isola nada).
 
 # a forma crua -- so' quando o save nao importa; MEXE no save real
 "/c/Users/paulo/Desktop/Godot_v4.7.2-stable_win64_console.exe" --headless --path . res://tests/run_tests.tscn

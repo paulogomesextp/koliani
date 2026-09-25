@@ -1,3 +1,9 @@
+> **GAME DIRECTOR FASE 0 (25 set 2026)** — auditoria global fechada; conteúdo **CONGELADO até ao vertical
+> slice da Região I** (ver `docs/retomar_aqui.md`, `docs/vertical_slice_region01.md`, `docs/foundation_plan.md`).
+> **Pendentes de decisão do GM: 9** — `docs/game_director_decisions_pending.md` (os que tocam já no slice:
+> #5 nome da Região I, #12 calendário de verbos). Isolamento de save no Windows corrigido:
+> usar sempre `tools/godot_isolado.py`.
+
 > **PWA publicada para playtest (21 set 2026)** — `master` em v0.18.20 com o
 > SFX Overhaul; PWA actualizada em <https://paulogomesextp.github.io/koliani/>
 > (cache novo, o telemovel nao serve assets velhos). O SFX continua

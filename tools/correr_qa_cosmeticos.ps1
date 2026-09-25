@@ -1,7 +1,7 @@
 # QA VISUAL + PERSISTENCIA DOS COSMETICOS DA LOJA, em janela real (renderer
 # verdadeiro; --headless nao serve, o renderer e' dummy).
 #
-# Isolamento: o `user://` do Godot resolve por %APPDATA%; aponta-se a uma pasta
+# Isolamento: `tools/godot_isolado.py --sandbox` (APPDATA no Windows); aponta-se a uma pasta
 # descartavel NOVA em cada corrida (sem estado da anterior) e confirma-se por
 # SHA256 que o save real ficou intacto. O saldo de teste e' semeado la' dentro
 # pelo modo `semear` -- nada disto existe no runtime normal.
@@ -22,8 +22,8 @@ New-Item -ItemType Directory -Force -Path (Join-Path $sandbox "Godot\app_userdat
 $antigo = $env:APPDATA
 $falhou = $false
 function Correr($cena, $extra) {
-  $args = @('--path', $Projeto, '--windowed', '--resolution', '1280x720', '--screen', '1', $cena) + $extra
-  $saida = & $Godot @args 2>&1 | Where-Object { $_ -match '^(PASS|FALHOU|INFO|QA)' }
+  $args = @($iso, '--sandbox', $sandbox, '--', '--path', $Projeto, '--windowed', '--resolution', '1280x720', '--screen', '1', $cena) + $extra
+  $saida = & python @args 2>&1 | Where-Object { $_ -match '^(PASS|FALHOU|INFO|QA|ERRO|ISOLAMENTO)' }
   $saida | ForEach-Object { Write-Output $_ }
   if ($LASTEXITCODE -ne 0 -or ($saida -match '^FALHOU')) { $script:falhou = $true }
 }
@@ -39,7 +39,7 @@ try {
   Correr 'res://tests/qa_cosm_persist.tscn' @('--', 'default')
   Correr 'res://tests/qa_loja_colecao_visual.tscn' @()
   Correr 'res://tests/qa_rootbound_visual.tscn' @()
-} finally { $env:APPDATA = $antigo }
+} finally { }
 $depois = Hash-Save
 if ($antes -ne $depois) { Write-Output "ERRO: o save real mudou ($antes -> $depois)"; $falhou = $true }
 else { Write-Output "save real intacto ($depois)" }

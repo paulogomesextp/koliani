@@ -5,6 +5,9 @@
 #
 # Uso: tools/capturar_regiao3.sh <pasta_destino> [sufixo]
 set -uo pipefail
+# So' Linux (xvfb-run). XDG_DATA_HOME NAO isola nada no Windows -- aqui recusa
+# em vez de escrever no save real. Em Windows usar `tools/godot_isolado.py`.
+case "$(uname -s)" in Linux) ;; *) echo "capturar_regiao3.sh: so' Linux; no Windows use tools/godot_isolado.py" >&2; exit 97;; esac
 GODOT="${GODOT:-/tmp/godot/Godot_v4.7.2-stable_linux.x86_64}"
 PROJETO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 DEST="${1:?falta a pasta de destino}"; SUF="${2:-}"

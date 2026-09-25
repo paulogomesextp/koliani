@@ -17,7 +17,7 @@ import subprocess
 import sys
 import time
 
-GODOT = r"C:\Users\paulo\Desktop\Godot_v4.7.2-stable_win64_console.exe"
+# o Godot e o isolamento do user:// vivem em `tools/godot_isolado.py`
 RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
@@ -32,7 +32,8 @@ def correr(i: int, cena: str, segundos: float) -> dict:
     t0 = time.time()
     try:
         p = subprocess.run(
-            [GODOT, "--window", "--screen", "1", "--script",
+            [sys.executable, os.path.join(RAIZ, "tools", "godot_isolado.py"), "--",
+             "--window", "--screen", "1", "--script",
              "res://tools/bot_gauntlet.gd", "--", cena, str(segundos), str(i)],
             cwd=RAIZ, capture_output=True, text=True, errors="replace",
             timeout=segundos + 120)

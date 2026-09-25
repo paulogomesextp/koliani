@@ -1,3 +1,43 @@
+# >>> PONTO DE RETOMA ACTUAL — Game Director Fase 0 (25 set 2026) <<<
+
+**Ler primeiro.** Estado depois da auditoria global e da Fase 0.
+
+- **Auditoria concluída**: `docs/auditoria_global_game_director.md` + `docs/qa/global_audit/01..08`.
+  Causas-raiz (P-1..P-10): o nível é o gerador procedural (96/100 níveis iguais); sem pipeline de região;
+  canon de 15 set nunca chegou às cenas; progressão sem estrutura; movimento correcto mas inerte (salto
+  1,3 H, corte por tick, `land` de 1 frame); inimigos sem ataque/aggro; números presos no índice 29;
+  kit da Koliani sem custo (tiro ilimitado, Energia sem uso); 70 chefes genéricos; áudio sem direcção.
+- **Decisões fechadas** (`docs/game_director_decisions_pending.md`): 20 regiões x 5 = 100 mas pipeline
+  regional intencional; **20 bosses regionais** (os outros não são canon automático); **Zeriko NÃO morre
+  no N30** (legacy); stock musical = placeholder, direcção final dark/gótica/orgânica; **9 decisões
+  ainda pendentes do GM** (#1 tabela canon, #4 Aurora/Elara, #5 nome da R-I, #8 mistura, #9 âmbito 1.0,
+  #10 vidas, #11 moedas, #12 verbos, #13 chefes legados).
+- **FREEZE — `FROZEN PENDING VERTICAL SLICE`**: rebuild N13, rebuild N14, Região IV, N21-N100, novos
+  bosses/regiões, migração de bosses, troca de música. O commit do N12 (`1559d461`) é válido mas NÃO é o
+  quality target. Outros commits recentes relevantes: `15796dd8` (remove frames legados do arranque de
+  corrida), `bcac9fde` (suprime hazards/áudio fora do ecrã).
+- **Vertical slice escolhido**: Região I — N1 Floresta Putrefata + Ghorak (elite/mini-boss de sala no N1)
+  + N5 Coração da Floresta (boss Coração Putrefacto). Spec + barra de PASS: `docs/vertical_slice_region01.md`.
+- **Plano de fundação** (F1 movimento, F2 combate/Energia, F3 kit de inimigo, F4 pipeline de sala):
+  `docs/foundation_plan.md`. NADA implementado ainda.
+- **Próximo passo**: F1 — bancada de diagnóstico do movimento (sem alterar gameplay), depois afinar e medir.
+  Perguntar ao GM #5 (nome da R-I) e #12 (verbos) antes do N1/N5.
+
+## REGRA: NUNCA tocar no save real
+No Windows o `user://` resolve por `%APPDATA%\Godotpp_userdata\Koliani`. **`XDG_DATA_HOME` não isola
+nada no Windows** (provado: o Godot devolve o mesmo caminho real com e sem XDG) — era o isolamento dos
+`tools/correr_bot_r2.sh`, `correr_bot_r3.sh`, `capturar_regiao3.sh`, `correr_testes.sh`, e
+`correr_bot_todos.py` corria o bot sem isolamento nenhum. **Agora TODA a QA/teste/bot arranca o Godot por
+`python tools/godot_isolado.py [--sandbox DIR] -- <args do Godot>`**: sonda o `user://` real, cria sandbox
+por execução (APPDATA/LOCALAPPDATA no Windows, XDG no Linux, HOME no macOS), recusa correr (97) se o
+`user://` não cair no sandbox, e compara SHA256 dos `*.json/.bak/.cfg` do save real antes/depois (98 se
+mudou). Atalhos: `tools/correr_testes.ps1|.sh`, `tools/correr_qa_regiao1.ps1`,
+`tools/correr_qa_cosmeticos.ps1`. Prova desta sessão: 2 suites + QA R-I isoladas, save real com SHA
+idêntico (opcoes/progresso/progresso.json.bak), sandbox recebeu o `progresso.json` próprio. Qualquer novo
+script que arranque o Godot tem de passar por esta ferramenta.
+
+---
+
 ## Região III — N12 reconstruído (25 set 2026)
 
 Plano em `docs/rebuild_region_03_plan.md`; N12 implementado só com câmaras forçadas no N12 (`_n12_fila`

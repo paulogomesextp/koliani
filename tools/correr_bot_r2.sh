@@ -6,18 +6,17 @@
 # 3 perfis x 3 seeds x 6 niveis = 54 runs. As seeds sao DETERMINISTAS
 # (nivel*1000 + perfil*100 + run), portanto a bateria repete-se igual.
 #
-# O `user://` vai para um sandbox (XDG_DATA_HOME): a suite e o bot NUNCA
-# podem mexer no save real -- ver CLAUDE.md, "correr o Godot".
+# O `user://` de CADA run e' isolado por `tools/godot_isolado.py` (APPDATA no
+# Windows, XDG no Linux; fail-fast + SHA do save real). NAO usar XDG_DATA_HOME
+# a mao: no Windows nao isola nada.
 set -u
 SAIDA="${1:-work/bot_r2}"
 TMAX="${2:-900}"
 PAR="${3:-3}"
-GODOT="${GODOT:-godot}"
 RAIZ="$(cd "$(dirname "$0")/.." && pwd)"
+PY="$(command -v python3 || command -v python)"
 
 mkdir -p "$SAIDA"
-SANDBOX="$(mktemp -d)"
-export XDG_DATA_HOME="$SANDBOX"
 
 NIVEIS=(
   "n05:res://scenes/levels/Coracao_da_Floresta.tscn"
@@ -42,12 +41,11 @@ for entrada in "${NIVEIS[@]}"; do
       # cada run tem o seu `user://`: mortes gravam o save, e runs em
       # paralelo a partilhar o mesmo ficheiro contaminavam-se umas as outras
       (
-        export XDG_DATA_HOME="$SANDBOX/$nome-$perfil-$run"
-        mkdir -p "$XDG_DATA_HOME"
-        "$GODOT" --headless --fixed-fps 60 --path "$RAIZ" \
+        "$PY" "$RAIZ/tools/godot_isolado.py" -- --headless --fixed-fps 60 --path "$RAIZ" \
           --script res://tools/bot_humano_r2.gd -- \
           "$cena" "$perfil" "$seed" "$out" "$TMAX" >/dev/null 2>&1
-        echo "  ok $nome $perfil #$run (seed $seed)"
+        rc=$?
+        [ $rc -ge 96 ] && echo "  ERRO isolamento/save ($rc) $nome $perfil #$run" || echo "  ok $nome $perfil #$run (seed $seed)"
       ) &
       i=$((i + 1))
       if [ $((i % PAR)) -eq 0 ]; then wait; fi
@@ -56,5 +54,4 @@ for entrada in "${NIVEIS[@]}"; do
   done
 done
 wait
-rm -rf "$SANDBOX"
 echo "runs: $(ls -1 "$SAIDA"/*.json 2>/dev/null | wc -l)"
