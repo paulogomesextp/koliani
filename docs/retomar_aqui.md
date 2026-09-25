@@ -1,3 +1,23 @@
+# >>> PONTO DE RETOMA ACTUAL — F1 diagnóstico de movimento feito (25 set 2026) <<<
+
+**Ler primeiro.** O GM fechou #5 (Região I = **Floresta Corrompida**, boss regional **Coração Putrefacto**)
+e #12 (verbos, opção A: N1 base+salto+ataque+hazards · N2 Dash · N3 Pogo/ataque descendente · N4 Especial com
+custo de Energia combinando combate+dash+pogo · N5 exame; **wall-kick fora da R-I**).
+
+F1 diagnóstico entregue, **sem alterar gameplay**: `docs/f1_movimento_diagnostico.md` (bancada
+`tools/bench_movimento_f1.gd`, dados em `docs/qa/f1_movimento/`). Resumo: salto 82,9 px (barra 125–135),
+corte de salto por tick (×0,45 a cada tick), sem meia-gravidade no apex, terminal 1100 px/s (≤ 750),
+rolar encadeado 326 px/s (> correr 240), mantle só sobe com ≥ 12 ticks de botão e sem animação. Coyote 6
+e buffer 7 estão OK. **P0 = salto (altura/corte/apex) + queda; P1 = roll, mantle, arranque de dash/roll,
+deriva no ar.** Armadilha de método: premir input dentro do sinal `physics_frame` atrasa o `just_pressed`
+um tick; premir no fim do frame anterior (como o input real).
+
+**Próximo passo:** o GM aprovar as alterações recomendadas (§ "Alterações recomendadas") e só então afinar
+por ordem, medindo com a mesma bancada; re-correr `tools/verifica_alcance*.gd` a cada mudança de salto.
+Continuam pendentes do GM: #1, #4, #8, #9, #10, #11, #13.
+
+---
+
 # >>> PONTO DE RETOMA ACTUAL — Game Director Fase 0 (25 set 2026) <<<
 
 **Ler primeiro.** Estado depois da auditoria global e da Fase 0.

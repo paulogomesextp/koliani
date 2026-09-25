@@ -1,6 +1,6 @@
 # Decisões do Game Director — Anexo B (estado a 25 set 2026)
 
-Fonte: `docs/auditoria_global_game_director.md` §10.5 (13 decisões). Esta fase fechou 4; restam **9**
+Fonte: `docs/auditoria_global_game_director.md` §10.5 (13 decisões). Fechadas 6 (4 na Fase 0 + #5 e #12 a 25 set); restam **7**
 que exigem o Game Master. Nenhuma decisão narrativa/artística foi tomada pelo agente.
 
 ## RESOLVIDAS
@@ -10,13 +10,15 @@ que exigem o Game Master. Nenhuma decisão narrativa/artística foi tomada pelo 
 | 2 | Chefes: 20 regionais vs 85 | **20 bosses regionais**, 1 por região. Os restantes não são automaticamente canon: podem ser removidos, virar elite/mini-boss ou ser reaproveitados **só se servirem o design regional** | Migração NÃO feita agora (congelada) |
 | 3 | N30 / Zeriko | Zeriko **não** é derrotado definitivamente no N30; o conteúdo atual é **legacy**. N30 pode virar encontro/manifestação/confrontação parcial/foreshadowing/avatar subordinado; a resolução pertence ao arco final | NÃO implementado |
 | 6 | Guardiões N1–N4 | Na R-I o **Ghorak** é encontro/mini-boss (elite de sala no N1, recomendação em `vertical_slice_region01.md` §3) e o boss da região é só o do N5. Generalização a outras regiões decide-se após o slice | No slice |
+| 5 | Nome da Região I | **Floresta Corrompida**; boss regional mantém-se **Coração Putrefacto** (GM, 25 set 2026) | A propagar no i18n/canon ao produzir o slice |
+| 12 | Calendário de verbos | **Opção A**: N1 movimento base+salto+ataque básico+leitura de hazards · N2 Dash · N3 Pogo/ataque descendente · N4 Especial com custo de Energia (combate+dash+pogo) · N5 exame de tudo. **Wall-kick fora da R-I** (região posterior) (GM, 25 set 2026) | Por implementar (F2 desenha o custo do especial) |
 | 7 | Música | Stock = **placeholder** durante o desenvolvimento, não autoridade. Direção final = canon aprovado: dark, gótico, mais peso/tensão, instrumentação orgânica/orquestral/coral/acústica; evitar dungeon synth/soft | Nada substituído agora |
 
 Também fechado (estrutura): **20 regiões × 5 níveis = 100**, mas a jornada procedural quase igual deixa de
 ser aceitável como conteúdo principal; alvo = pipeline regional intencional. Vertical slice = Região I
 (N1, Ghorak, N5 Coração Putrefacto). Fora isso: `FROZEN PENDING VERTICAL SLICE` (ver `foundation_plan.md`).
 
-## AINDA PENDENTES (9)
+## AINDA PENDENTES (7)
 
 ### 1. Tabela única região → tema → mecânica → chefe
 - **Contexto**: o jogo segue a tabela de 3 set (`REGIOES`, `world.*`); o canon de 15 set
@@ -34,15 +36,6 @@ ser aceitável como conteúdo principal; alvo = pipeline regional intencional. V
 - **Consequências**: uma passagem única em i18n (6 línguas) + pistas; adiar deixa dois nomes no jogo.
 - **Recomendação**: fechar antes de mexer em intro/diálogos do slice; a escolha em si é narrativa.
 - **Necessário**: o nome canónico.
-
-### 5. Nome da Região I
-- **Contexto**: "Floresta Sagrada" (canon) vs "Floresta Corrompida" (PNG/jogo); o boss "Coração
-  Putrefacto" já foi decidido a 25/09 (o canon ainda diz Guardião Verde).
-- **A**: Floresta Sagrada. **B**: Floresta Corrompida (ou outro).
-- **Consequências**: aparece no menu, mapa, i18n, boards e intro do slice.
-- **Recomendação**: escolher antes de produzir o ecrã de fim de região do slice; atualizar o canon com
-  o Coração Putrefacto.
-- **Necessário**: o nome.
 
 ### 8. "Música claramente à frente" (`SFX_MIX_DB −6`)
 - **Contexto**: hoje o feedback de jogo (hit/dano/telégrafo) fica 5–24 dB abaixo da música.
@@ -73,14 +66,6 @@ ser aceitável como conteúdo principal; alvo = pipeline regional intencional. V
 - **Recomendação**: B.
 - **Necessário**: escolher.
 
-### 12. Calendário de verbos
-- **Contexto**: só 3 verbos na R-I; dash no N5; pogo nunca é dado; sem especial como sumidouro de Energia.
-- **A**: antecipar um verbo de traversal (dash/wall-kick) para N1–N2, dar o pogo, especial de volta com
-  custo. **B**: manter o calendário atual.
-- **Consequências**: A muda o exame do N5 e o desenho de F2; B mantém a R-I pobre em movimento.
-- **Recomendação**: A.
-- **Necessário**: escolher verbos e onde entram.
-
 ### 13. Koliani Sombria (N27) e outros chefes legados com valor narrativo
 - **Contexto**: dependente de #1 (tabela única) e do destino dos bosses não regionais.
 - **A**: cortar. **B**: reaproveitar como elites/momentos de história.
@@ -89,5 +74,4 @@ ser aceitável como conteúdo principal; alvo = pipeline regional intencional. V
 - **Necessário**: decisão caso a caso.
 
 ## Bloqueiam o slice?
-Só **#5** (nome da região) e **#12** (verbos) tocam directamente no N1/N5; os restantes não impedem
-começar F1–F4.
+Desde 25 set 2026 (#5 e #12 fechadas) **nenhuma** decisão pendente bloqueia F1–F4 nem o N1/N5.

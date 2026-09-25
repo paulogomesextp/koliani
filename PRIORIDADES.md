@@ -1,3 +1,8 @@
+> **F1 diagnóstico de movimento (25 set 2026)** — `docs/f1_movimento_diagnostico.md`. Decidido pelo GM:
+> #5 Floresta Corrompida + Coração Putrefacto; #12 verbos opção A (Dash N2, Pogo N3, Especial N4, sem
+> wall-kick). **Pendente de decisão:** aprovar as alterações recomendadas de F1 (P0: salto 82,9→125–135 px,
+> corte único, apex, terminal ≤ 750; P1: roll encadeado, mantle, arranque dash/roll) antes de qualquer tuning.
+
 > **GAME DIRECTOR FASE 0 (25 set 2026)** — auditoria global fechada; conteúdo **CONGELADO até ao vertical
 > slice da Região I** (ver `docs/retomar_aqui.md`, `docs/vertical_slice_region01.md`, `docs/foundation_plan.md`).
 > **Pendentes de decisão do GM: 9** — `docs/game_director_decisions_pending.md` (os que tocam já no slice:
