@@ -597,47 +597,95 @@ func e_roll() -> void:
 	R["roll"] = r
 
 
-func _mantle(toque: int) -> Dictionary:
-	await nova(-4500.0)
+## MANTLE (passagem 2): salta encostada a um bloco cujo topo fica `lip` px acima
+## do chão e diz o que aconteceu. O mantle é automático (a segurar contra a parede).
+func _mantle(lip: float) -> Dictionary:
+	await nova(-3100.0)
+	# bloco de teste com o topo `lip` acima do chão (o de 100 px do arena serve
+	# para 100; para outras alturas cria-se um bloco próprio ao lado)
+	var bloco := _bloco_devolve(Vector2(-3000, CHAO_Y - lip), Vector2(-2400, CHAO_Y))
 	var tr: Array = []
-	var agarrou := -1
-	for i in 120:
+	var t_mantle := -1
+	for i in 200:
 		var ac: Array = R_DIR.duplicate()
 		if i >= 30 and i < 60:
 			ac.append("saltar")
 		tr.append(await paso(ac))
-		if tr[-1]["borda"] and agarrou < 0:
-			agarrou = i
+		if tr[-1]["borda"] and t_mantle < 0:
+			t_mantle = i
+		if t_mantle >= 0 and tr[-1]["chao"] and i > t_mantle + 3:
 			break
-	var res := {"toque_ticks": toque, "agarrou_no_tick": agarrou}
-	if agarrou < 0:
-		return res
-	res["anims_antes"] = _runs(tr, "anim")
-	res["x_rel_face_ao_agarrar"] = snappedf(tr[-1]["x"] + 4400.0, 0.1)
-	res["y_ao_agarrar"] = tr[-1]["y"]
-	await passos(6, [])
-	var tr2: Array = []
-	for i in 60:
-		var ac2: Array = ["mover_direita"]
-		if i < toque:
-			ac2.append("saltar")
-		tr2.append(await paso(ac2))
-	var ymin := 1e9
-	for s in tr2:
-		ymin = minf(ymin, s["y"])
-	res["anims"] = _runs(tr2, "anim")
-	res["y_min"] = snappedf(ymin, 0.1)
-	res["x_final_rel_face"] = snappedf(tr2[-1]["x"] + 4400.0, 0.1)
-	res["y_final"] = snappedf(tr2[-1]["y"], 0.1)
-	res["acabou_em_cima"] = tr2[-1]["chao"] and tr2[-1]["y"] < rest_y - 90.0
-	return res
+	bloco.queue_free()
+	var last: Dictionary = tr[-1]
+	var em_cima: bool = last["chao"] and last["y"] < rest_y - lip + 8.0
+	var ticks_mantle := 0
+	var y_max := 1e9
+	for s in tr:
+		if s["borda"]:
+			ticks_mantle += 1
+		y_max = minf(y_max, s["y"])
+	var re_agarrou := 0
+	var ant := false
+	for s in tr:
+		if s["borda"] and not ant:
+			re_agarrou += 1
+		ant = s["borda"]
+	return {"rebordo_acima_do_chao": lip, "mantle_iniciou_no_tick": t_mantle,
+		"ticks_mantle": ticks_mantle, "agarres": re_agarrou, "acabou_em_cima": em_cima,
+		"x_final_rel_face": snappedf(last["x"] + 3000.0, 0.1),
+		"y_min": snappedf(y_max, 0.1), "anims_mantle": _runs(tr, "anim")}
 
 
 func e_borda_mantle() -> void:
 	var lista: Array = []
-	for t in [1, 3, 8, 12, 16, 24]:
-		lista.append(await _mantle(t))
-	R["borda_mantle"] = {"topo_bloco_y": CHAO_Y - 100.0, "por_toque": lista}
+	for lip in [60.0, 100.0, 120.0, 140.0, 150.0, 155.0, 158.0, 160.0, 170.0, 200.0]:
+		lista.append(await _mantle(lip))
+	R["borda_mantle"] = {"por_altura": lista}
+
+
+## WALL-JUMP: parede alta (sem rebordo à vista). Mede o salto de parede isolado
+## e uma cadeia a subir a parede a segurar contra ela e a saltar em cada toque.
+func _walljump(hold: int) -> Dictionary:
+	await nova(-1990.0)
+	var parede := _bloco_devolve(Vector2(-1960, CHAO_Y - 900), Vector2(-1500, CHAO_Y))
+	var tr: Array = []
+	var presses: Array = []
+	var cd := 0
+	var seg := 0
+	for i in 420:
+		var ac: Array = R_DIR.duplicate()
+		if i >= 20 and i < 50:
+			ac.append("saltar")
+		elif seg > 0:
+			ac.append("saltar")
+			seg -= 1
+		elif i >= 50 and cd <= 0 and k.is_on_wall_only() and k.velocity.y > -140.0:
+			ac.append("saltar")
+			seg = hold - 1
+			cd = 20
+			presses.append(i)
+		cd -= 1
+		tr.append(await paso(ac))
+	parede.queue_free()
+	var y_min := 1e9
+	for s in tr:
+		y_min = minf(y_min, s["y"])
+	var subida_1o := 0.0
+	if presses.size() > 0:
+		var a: int = presses[0]
+		var b: int = presses[1] if presses.size() > 1 else tr.size()
+		var ymin1 := 1e9
+		for j in range(a, b):
+			ymin1 = minf(ymin1, tr[j]["y"])
+		subida_1o = tr[a]["y"] - ymin1
+	return {"botao_premido_ticks": hold, "saltos_de_parede": presses.size(),
+		"subida_do_1o_px": snappedf(subida_1o, 0.1),
+		"altura_maxima_da_cadeia_px": snappedf(rest_y - y_min, 0.1)}
+
+
+func e_walljump() -> void:
+	R["walljump"] = {"walljump_const": Koliani.WALLJUMP, "toque_1_tick": await _walljump(1),
+		"segurado_14_ticks": await _walljump(14), "segurado_30_ticks": await _walljump(30)}
 
 
 func e_latencia() -> void:
@@ -941,10 +989,22 @@ func _regressao() -> Array:
 	chk.call(pg / alt >= 0.35 and pg / alt <= 0.5, "pogo/salto %.2f fora de 0,35-0,5" % (pg / alt))
 	chk.call(float(R["camera_queda"]["chao_visivel_antes_do_impacto_s"]) >= 0.35,
 		"chao so visivel %.2f s antes do impacto" % R["camera_queda"]["chao_visivel_antes_do_impacto_s"])
+	# MANTLE (passagem 2): 9 ticks, sem re-agarrar, alcance limitado
+	var mant := {}
+	for m in R["borda_mantle"]["por_altura"]:
+		mant[int(m["rebordo_acima_do_chao"])] = m
+	chk.call(bool(mant[150]["acabou_em_cima"]) and bool(mant[140]["acabou_em_cima"]),
+		"mantle nao completa um rebordo a 140-150 px")
+	var tm: int = int(mant[150]["ticks_mantle"])
+	chk.call(tm >= 8 and tm <= 10, "mantle dura %d ticks (esperado 9)" % tm)
+	for h in mant:
+		chk.call(int(mant[h]["agarres"]) <= 1, "mantle a %d px re-agarrou (%d agarres)" % [h, mant[h]["agarres"]])
+	chk.call(not bool(mant[170]["acabou_em_cima"]) and not bool(mant[200]["acabou_em_cima"]),
+		"salto+mantle sobe a 170-200 px (alcance excessivo)")
 	# envolvente nunca pode ENCOLHER face ao baseline da passagem 1 (tolerancia 10 px)
 	var ref_f := FileAccess.open("res://docs/qa/f1_movimento/f1_envolvente_antes_depois.json", FileAccess.READ)
 	if ref_f:
-		var ref: Dictionary = JSON.parse_string(ref_f.get_as_text())["depois"]
+		var ref: Dictionary = JSON.parse_string(ref_f.get_as_text())["passagem2"]
 		for tier in ["simples", "duplo"]:
 			for k in R["envolvente_salto"][tier]:
 				if ref[tier].has(k) and float(ref[tier][k]) >= 0.0:
@@ -969,7 +1029,7 @@ func _correr() -> void:
 	if regressao:
 		_reg_env = true
 		filtro = PackedStringArray(["salto", "queda", "ar", "coyote", "buffer", "dash",
-			"roll", "latencia", "roll_spam", "pogo", "camera", "envolvente"])
+			"roll", "latencia", "roll_spam", "pogo", "camera", "envolvente", "mantle", "walljump"])
 	elif args.size() > 1 and args[1] != "":
 		filtro = args[1].split(",")
 	var todas := {
@@ -978,7 +1038,7 @@ func _correr() -> void:
 		"queda": e_queda, "ar": e_ar, "coyote": e_coyote, "buffer": e_buffer,
 		"aterragem": e_aterragem, "dash": e_dash, "roll": e_roll,
 		"latencia": e_latencia, "roll_spam": e_roll_spam, "pogo": e_pogo,
-		"camera": e_camera_queda, "envolvente": e_envolvente, "mantle": e_borda_mantle,
+		"camera": e_camera_queda, "envolvente": e_envolvente, "mantle": e_borda_mantle, "walljump": e_walljump,
 	}
 	for nome in todas:
 		if _quer(nome, filtro):

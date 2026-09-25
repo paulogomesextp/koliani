@@ -66,10 +66,18 @@ const WALLJUMP := Vector2(330.0, -430.0)
 ## rente ao rebordo de uma plataforma, a Koliani agarra-se e fica pendurada.
 ## Saltar / ↑ = sobe para cima da plataforma; ↓ = larga. Perdoa saltos por
 ## um triz nas torres da jornada.
+## MANTLE (F1 passagem 2): quando a Koliani está a cair (ou quase parada) rente a
+## uma parede e o rebordo fica até `MANTLE_ALTURA` px ACIMA dos pés, sobe para
+## cima dele num movimento CURTO e FIXO (não depende de botões nem de
+## velocidade). O alcance vertical do mantle é só este degrau -- antes ela
+## pendurava-se com os pés 58 px abaixo do rebordo e o mantle somava ~70 px ao
+## salto (subida efetiva ~200 px com o salto de 128).
 const BORDA_ALCANCE := 24.0       # quão à frente se sente a parede
-const BORDA_PEITO := -30.0        # altura do sensor "há parede à frente"
-const BORDA_CABECA := -60.0       # altura do sensor "está livre por cima do rebordo"
-const BORDA_MANTLE := Vector2(150.0, -430.0)  # impulso ao subir para a plataforma
+const MANTLE_ALTURA := 32.0       # o rebordo tem de estar até tanto ACIMA dos pés...
+const MANTLE_MIN := 4.0           # ...e pelo menos tanto (senão é chão, não rebordo)
+const MANTLE_LIVRE := 48.0        # folga por cima do rebordo para o corpo de pé
+const MANTLE_META_X := 14.0       # o centro chega a tanto para dentro da face
+const MANTLE_DUR := 0.15          # 9 ticks: sobe (60 %) e depois avança (40 %)
 const DUR_ATAQUE := 0.18
 ## QUATRO golpes, desde a 9H.1. Eram três porque só havia arte para um: os
 ## golpes 2 e 3 repetiam os seis frames golden do `attack_basic` a velocidades
@@ -342,6 +350,10 @@ var _parede_lock := 0.0
 var _borda := false
 var _borda_lock := 0.0
 var _borda_lado := 1.0
+var _mantle_ativo := false
+var _mantle_t := 0.0
+var _mantle_ini := Vector2.ZERO
+var _mantle_alvo := Vector2.ZERO
 ## Agachada (segura S no chão, parada). Só bloqueia o andar -- visual.
 var _agachado := false
 ## Conta-decrescente para mostrar a animação do salto duplo.
@@ -1444,43 +1456,45 @@ func _physics_process(dt: float) -> void:
 		_estava_no_chao = false
 		return
 
-	# --- agarrar a borda (básico) -----------------------------------------
-	# a cair (ou quase parada no ar) rente ao rebordo de uma plataforma:
-	# agarra-se. Não corre se estiver a escalar, a rolar, a dar dash, ou
-	# logo a seguir a largar/subir.
-	if not _borda and _borda_lock <= 0.0 and not is_on_floor() \
-			and _rolar_restante <= 0.0 and _dash_restante <= 0.0 \
-			and _ataque_restante <= 0.0 and _preso <= 0.0 \
-			and velocity.y > -30.0:
+	# --- mantle (F1 passagem 2) ------------------------------------------------
+	# Condições geométricas (todas em `_detetar_mantle`): parede colada aos pés,
+	# rebordo entre MANTLE_MIN e MANTLE_ALTURA acima dos pés, folga por cima e
+	# chão no ponto de chegada. Intenção: a segurar contra a parede ou "cima".
+	# Só a cair (ou quase parada): a subir ela passa por cima sozinha.
+	if not _borda and _borda_lock <= 0.0 and not is_on_floor() and _sinal_grav > 0.0 			and _rolar_restante <= 0.0 and _dash_restante <= 0.0 			and _ataque_restante <= 0.0 and _preso <= 0.0 			and velocity.y > -30.0 			and (dir != 0.0 or Input.is_action_pressed("mirar_cima")):
 		var lado := signf(dir) if dir != 0.0 else _olha_para
-		var lip_y := _detetar_borda(lado)
-		if not is_nan(lip_y):
+		var meta := _detetar_mantle(lado)
+		if not meta.is_empty():
 			_borda = true
+			_mantle_ativo = true
 			_borda_lado = lado
-			global_position.y = lip_y + 34.0  # mãos ao nível do rebordo
-			# Salto de posição: sem isto a interpolação desenhava-a a subir
-			# desde onde estava, em vez de já agarrada ao rebordo.
-			reset_physics_interpolation()
+			_mantle_t = MANTLE_DUR
+			_mantle_ini = global_position
+			_mantle_alvo = meta["alvo"]
 			velocity = Vector2.ZERO
+			_mov.velocidade = velocity
 			_mov.saltos_dados = 0
 			Som.toca("agarrar", -14.0, 1.0, 0.04)
 
 	if _borda:
 		_olha_para = _borda_lado
 		velocity = Vector2.ZERO
-		if Input.is_action_just_pressed("saltar") or Input.is_action_just_pressed("mirar_cima"):
-			# sobe para cima da plataforma
-			velocity = Vector2(_borda_lado * BORDA_MANTLE.x, BORDA_MANTLE.y)
-			_mov.velocidade = velocity
-			_mov.saltos_dados = 0
-			_borda = false
-			_borda_lock = 0.25
-			Som.toca("koliani_salto", -10.0, 1.0, 0.03)
-		elif Input.is_action_pressed("mirar_baixo") \
-				or (dir != 0.0 and signf(dir) == -_borda_lado):
-			_borda = false
-			_borda_lock = 0.22
-		move_and_slide()
+		if _mantle_ativo:
+			# deslocamento determinístico: primeiro sobe junto à parede, depois
+			# avança para cima do rebordo (sem colisões pelo caminho: o corpo
+			# nunca atravessa mais do que os ~3 px do canto)
+			_mantle_t = maxf(0.0, _mantle_t - dt)
+			var f := 1.0 - _mantle_t / MANTLE_DUR
+			var fy := smoothstep(0.0, 1.0, clampf(f / 0.6, 0.0, 1.0))
+			var fx := smoothstep(0.0, 1.0, clampf((f - 0.6) / 0.4, 0.0, 1.0))
+			global_position = Vector2(lerpf(_mantle_ini.x, _mantle_alvo.x, fx),
+				lerpf(_mantle_ini.y, _mantle_alvo.y, fy))
+			if _mantle_t <= 0.0:
+				_mantle_ativo = false
+				_borda = false
+				_borda_lock = 0.3
+				velocity = Vector2(_borda_lado * 30.0, 0.0)
+				_mov.saltos_dados = 0
 		_mov.velocidade = velocity
 		_estava_no_chao = false
 		return
@@ -1781,34 +1795,42 @@ func _physics_process(dt: float) -> void:
 			receber_dano(vida)
 
 
-## Há um rebordo agarrável no lado `lado` (-1 esq / +1 dir)? Devolve o Y do
-## topo da plataforma, ou NAN se não houver. Dois sensores: parede à frente
-## à altura do peito E espaço livre à frente à altura da cabeça (= é mesmo
-## um rebordo, não uma parede alta). Depois varre para baixo para achar o topo.
-func _detetar_borda(lado: float) -> float:
+## Há um rebordo a que se possa subir no lado `lado` (-1 esq / +1 dir)? Devolve
+## `{"alvo": Vector2}` (centro da Koliani já em cima) ou `{}`. Quatro condições,
+## todas geométricas: (1) parede colada à altura dos pés; (2) topo do rebordo
+## entre `MANTLE_MIN` e `MANTLE_ALTURA` acima dos pés; (3) folga de
+## `MANTLE_LIVRE` por cima do rebordo; (4) chão no ponto de chegada.
+func _detetar_mantle(lado: float) -> Dictionary:
 	var espaco := get_world_2d().direct_space_state
+	var pes := global_position.y + 24.0
 	var qp := PhysicsRayQueryParameters2D.create(
-		global_position + Vector2(0.0, BORDA_PEITO),
-		global_position + Vector2(lado * BORDA_ALCANCE, BORDA_PEITO), 1)
+		Vector2(global_position.x, pes - 8.0),
+		Vector2(global_position.x + lado * BORDA_ALCANCE, pes - 8.0), 1)
 	qp.exclude = [self]
-	var peito := espaco.intersect_ray(qp)
-	if peito.is_empty():
-		return NAN
-	var qc := PhysicsRayQueryParameters2D.create(
-		global_position + Vector2(0.0, BORDA_CABECA),
-		global_position + Vector2(lado * BORDA_ALCANCE, BORDA_CABECA), 1)
-	qc.exclude = [self]
-	if not espaco.intersect_ray(qc).is_empty():
-		return NAN  # a parede continua acima -> não é um rebordo
-	var x_face: float = peito["position"].x + lado * 3.0
+	var parede := espaco.intersect_ray(qp)
+	if parede.is_empty():
+		return {}
+	var x_face: float = parede["position"].x
+	var x_topo := x_face + lado * 3.0
 	var qd := PhysicsRayQueryParameters2D.create(
-		Vector2(x_face, global_position.y + BORDA_CABECA),
-		Vector2(x_face, global_position.y + BORDA_PEITO + 8.0), 1)
+		Vector2(x_topo, pes - MANTLE_ALTURA), Vector2(x_topo, pes - MANTLE_MIN), 1)
 	qd.exclude = [self]
 	var topo := espaco.intersect_ray(qd)
 	if topo.is_empty():
-		return NAN
-	return topo["position"].y
+		return {}   # o rebordo está mais alto do que o alcance, ou já é chão
+	var y_topo: float = topo["position"].y
+	var x_alvo := x_face + lado * MANTLE_META_X
+	var qc := PhysicsRayQueryParameters2D.create(
+		Vector2(x_alvo, y_topo - 2.0), Vector2(x_alvo, y_topo - MANTLE_LIVRE), 1)
+	qc.exclude = [self]
+	if not espaco.intersect_ray(qc).is_empty():
+		return {}
+	var qs := PhysicsRayQueryParameters2D.create(
+		Vector2(x_alvo, y_topo - 6.0), Vector2(x_alvo, y_topo + 6.0), 1)
+	qs.exclude = [self]
+	if espaco.intersect_ray(qs).is_empty():
+		return {}
+	return {"alvo": Vector2(x_alvo, y_topo - 24.0 - 1.0)}
 
 
 func _process(dt: float) -> void:
@@ -2819,6 +2841,8 @@ func recuperar_no_checkpoint(posicao_segura: Vector2) -> void:
 	reset_physics_interpolation()
 	velocity = Vector2.ZERO
 	_mov.velocidade = Vector2.ZERO
+	_borda = false
+	_mantle_ativo = false
 	limpar_ventos()
 	# a zona que contenha a fogueira volta a conceder no frame seguinte
 	limpar_planar_contextual()

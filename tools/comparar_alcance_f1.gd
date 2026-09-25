@@ -1,5 +1,5 @@
 extends SceneTree
-## F1 passagem 1 -- ACESSIBILIDADE dos 100 níveis com a envolvente de salto
+## F1 passagens 1 e 2 -- ACESSIBILIDADE dos 100 níveis com a envolvente de salto
 ## ANTES vs DEPOIS da mudança de física.
 ##
 ## O `verifica_alcance.gd` usa números fixos (vão 210, subida 118) e por isso
@@ -29,6 +29,10 @@ const ANTES_D := {-140.0: 330.0, -60.0: 310.0, 0.0: 300.0, 64.0: 280.0, 100.0: 2
 	140.0: 250.0, 180.0: 230.0}
 const DEPOIS_D := {-140.0: 430.0, -60.0: 410.0, 0.0: 390.0, 64.0: 370.0, 100.0: 360.0,
 	140.0: 340.0, 180.0: 330.0, 200.0: 320.0}
+const P2_S := {-140.0: 260.0, -60.0: 240.0, 0.0: 220.0, 40.0: 200.0, 64.0: 190.0,
+	80.0: 190.0, 100.0: 180.0, 120.0: 160.0, 140.0: 150.0}
+const P2_D := {-140.0: 420.0, -60.0: 390.0, 0.0: 380.0, 64.0: 350.0, 100.0: 340.0,
+	140.0: 330.0, 180.0: 310.0, 200.0: 300.0}
 const NIVEL_SALTO_DUPLO := 5
 const MARGEM_PONTA := 26.0
 const QUEDA_MAX := 520.0
@@ -108,8 +112,7 @@ func _init() -> void:
 	var saida := String(args[0]) if args.size() > 0 else "res://work/comparar_alcance_f1.json"
 	var niveis: Array = estado.NIVEIS
 	var linhas: Array = []
-	var graves: Array = []
-	var tot_novas := 0
+	var sinais: Array = []
 	for n in niveis.size():
 		var cena := String(niveis[n])
 		if cena.get_file() == "O_Trono_de_Zeriko.tscn":
@@ -136,77 +139,62 @@ func _init() -> void:
 		if porta:
 			iP = CRIVO._plat_mais_perto(plats, porta.global_position + Vector2(0, 20))
 		var duplo := n >= NIVEL_SALTO_DUPLO
-		var tab_a: Dictionary = ANTES_D if duplo else ANTES_S
-		var tab_d: Dictionary = DEPOIS_D if duplo else DEPOIS_S
-		var d_a: Array = _bfs(plats, i0, tab_a) if i0 >= 0 else []
-		var pai_d: Array = []
-		var d_d: Array = _bfs(plats, i0, tab_d, pai_d) if i0 >= 0 else []
-		var alc_a := 0
-		var alc_d := 0
-		var novas: Array = []
-		for i in d_a.size():
-			if d_a[i] >= 0:
-				alc_a += 1
-			if d_d[i] >= 0:
-				alc_d += 1
-			if d_a[i] < 0 and d_d[i] >= 0:
-				novas.append(i)
-			if d_a[i] >= 0 and d_d[i] < 0:
-				graves.append("[%d] REGRESSAO: %s deixou de ser alcancavel" % [n + 1, plats[i].nome])
-		# 1.ª aresta nova (a mais perto do spawn): onde a física nova abre caminho
-		var primeira := ""
-		var melhor_d := 1000000
-		for i in novas:
-			if d_d[i] < melhor_d and pai_d[i] >= 0:
-				melhor_d = d_d[i]
-				var A2: Dictionary = plats[pai_d[i]]
-				var B2: Dictionary = plats[i]
-				var vao2 := maxf(maxf(float(B2.esq) - float(A2.dir), float(A2.esq) - float(B2.dir)), 0.0)
-				primeira = "%s@(%.0f,%.0f) -> %s@(%.0f,%.0f) vao=%.0f subida=%.0f" % [
-					A2.nome, float(A2.cx), float(A2.topo), B2.nome, float(B2.cx), float(B2.topo),
-					vao2, float(A2.topo) - float(B2.topo)]
-		if primeira != "" and (n < 5 or novas.size() > 40):
-			graves.append("[%d] 1.a aresta nova (%d plat. novas): %s" % [n + 1, novas.size(), primeira])
-		var h_a: int = d_a[iP] if iP >= 0 and not d_a.is_empty() else -2
-		var h_d: int = d_d[iP] if iP >= 0 and not d_d.is_empty() else -2
-		var linha := {"nivel": n + 1, "cena": cena.get_file(), "regime": "duplo" if duplo else "simples",
-			"plataformas": plats.size(), "alcancadas_antes": alc_a, "alcancadas_depois": alc_d,
-			"novas": novas.size(), "primeira_aresta_nova": primeira, "saltos_ate_porta_antes": h_a, "saltos_ate_porta_depois": h_d}
-		linhas.append(linha)
-		tot_novas += novas.size()
-		# atalho grave: menos de metade dos saltos até à porta (com pelo menos 6 antes)
-		if h_a >= 6 and h_d >= 0 and float(h_d) < float(h_a) * 0.5:
-			graves.append("[%d] ATALHO: saltos ate a porta %d -> %d" % [n + 1, h_a, h_d])
-		if h_a < 0 and h_d >= 0:
-			graves.append("[%d] PORTA passou de inalcancavel a alcancavel" % [n + 1])
-			# arestas do caminho novo que a envolvente ANTIGA não fazia
-			var no := iP
-			while no != i0 and no >= 0:
-				var pa: int = pai_d[no]
-				if pa < 0:
-					break
-				if not _aresta(plats[pa], plats[no], tab_a):
-					var A: Dictionary = plats[pa]
-					var B: Dictionary = plats[no]
-					var vao_e := maxf(float(B.esq) - float(A.dir), float(A.esq) - float(B.dir))
-					graves.append("      aresta nova: %s@(%.0f,%.0f) -> %s@(%.0f,%.0f)  vao=%.0f  subida=%.0f" % [
-						A.nome, float(A.cx), float(A.topo), B.nome, float(B.cx), float(B.topo),
-						maxf(vao_e, 0.0), float(A.topo) - float(B.topo)])
-				no = pa
-		if h_a >= 0 and h_d < 0:
-			graves.append("[%d] REGRESSAO: PORTA deixou de ser alcancavel" % [n + 1])
+		var tab_l: Dictionary = ANTES_D if duplo else ANTES_S
+		var tab_1: Dictionary = DEPOIS_D if duplo else DEPOIS_S
+		var tab_2: Dictionary = P2_D if duplo else P2_S
+		var d_l: Array = _bfs(plats, i0, tab_l) if i0 >= 0 else []
+		var d_1: Array = _bfs(plats, i0, tab_1) if i0 >= 0 else []
+		var d_2: Array = _bfs(plats, i0, tab_2) if i0 >= 0 else []
+		var nov1 := 0
+		var nov2 := 0
+		var perdas2 := 0
+		for i in d_l.size():
+			if d_l[i] < 0 and d_1[i] >= 0:
+				nov1 += 1
+			if d_l[i] < 0 and d_2[i] >= 0:
+				nov2 += 1
+			if d_l[i] >= 0 and d_2[i] < 0:
+				perdas2 += 1
+		var h_l: int = d_l[iP] if iP >= 0 and not d_l.is_empty() else -2
+		var h_1: int = d_1[iP] if iP >= 0 and not d_1.is_empty() else -2
+		var h_2: int = d_2[iP] if iP >= 0 and not d_2.is_empty() else -2
+		linhas.append({"nivel": n + 1, "cena": cena.get_file(), "regime": "duplo" if duplo else "simples",
+			"plataformas": plats.size(), "novas_p1": nov1, "novas_p2": nov2, "perdidas_p2": perdas2,
+			"saltos_porta_legado": h_l, "saltos_porta_p1": h_1, "saltos_porta_p2": h_2})
+		if perdas2 > 0:
+			sinais.append("[%d] REGRESSAO p2: %d plataformas deixaram de ser alcancaveis" % [n + 1, perdas2])
+		if h_l < 0 and h_2 >= 0:
+			sinais.append("[%d] PORTA so alcancavel a saltar na p2 (legado: nao)" % [n + 1])
+		if h_l >= 0 and h_2 < 0:
+			sinais.append("[%d] REGRESSAO p2: PORTA deixou de ser alcancavel" % [n + 1])
+		if h_l >= 6 and h_2 >= 0 and float(h_2) < float(h_l) * 0.5:
+			sinais.append("[%d] ATALHO p2: saltos ate a porta %d -> %d" % [n + 1, h_l, h_2])
 		raiz.queue_free()
 		await process_frame
 	var f := FileAccess.open(saida, FileAccess.WRITE)
 	if f:
-		f.store_string(JSON.stringify({"niveis": linhas, "sinais": graves, "novas_total": tot_novas}, "  "))
+		f.store_string(JSON.stringify({"niveis": linhas, "sinais": sinais}, "  "))
 		f.close()
-	var mais := 0
+	var c1 := 0
+	var c2 := 0
+	var t1 := 0
+	var t2 := 0
+	var p1 := 0
+	var p2 := 0
 	for l in linhas:
-		if int(l["novas"]) > 0:
-			mais += 1
-	print("=== ACESSIBILIDADE F1: %d niveis medidos | %d com plataformas novas alcancaveis (%d no total) | %d sinais" % [
-		linhas.size(), mais, tot_novas, graves.size()])
-	for g in graves:
-		print("  ", g)
+		if int(l["novas_p1"]) > 0:
+			c1 += 1
+		if int(l["novas_p2"]) > 0:
+			c2 += 1
+		t1 += int(l["novas_p1"])
+		t2 += int(l["novas_p2"])
+		if int(l["saltos_porta_legado"]) < 0 and int(l["saltos_porta_p1"]) >= 0:
+			p1 += 1
+		if int(l["saltos_porta_legado"]) < 0 and int(l["saltos_porta_p2"]) >= 0:
+			p2 += 1
+	print("=== ACESSIBILIDADE F1 (%d niveis, referencia = legado pre-F1)" % linhas.size())
+	print("    passagem 1: %d niveis com plataformas novas (%d), %d portas so a saltar" % [c1, t1, p1])
+	print("    passagem 2: %d niveis com plataformas novas (%d), %d portas so a saltar" % [c2, t2, p2])
+	for sn in sinais:
+		print("  ", sn)
 	quit(0)
