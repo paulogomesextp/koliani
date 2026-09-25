@@ -1,3 +1,11 @@
+# >>> Ghorak redesenhado (26 set 2026) <<<
+`scripts/chefe_ghorak.gd` reescrito: casca 5 % fora das janelas; estados BAQUE/MARCAS(raizes)/CARGA/CURTO; fase 2
+encadeada. Vida da cena 250 -> 700 (o teste 9H acompanha). Teste `teste_ghorak_n1` (bots: spam, so-casca, janelas).
+Armadilha: o boss mede a arena a partir de `_origem` (posicao no `_ready`) -- em testes, `position` ANTES do add_child.
+N2 continua por comecar; N1 continua a aguardar aprovacao final.
+
+---
+
 # >>> PONTO DE RETOMA ACTUAL — N1 autoral feito, à espera de playtest do GM (26 set 2026) <<<
 
 F1 fechada (b3ec700e wall-jump, 61a62735 câmara ≥0,6 s, 43032a50 offscreen). **N1 = nível autoral** (sem jornada):

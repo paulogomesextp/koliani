@@ -92,6 +92,7 @@ func _correr_tudo() -> void:
 	await teste_offscreen_hazards()
 	await teste_offscreen_global()
 	await teste_n1_autoral()
+	await teste_ghorak_n1()
 	teste_execution_9d_inimigos_regiao1()
 	teste_9d9e_crias_sem_goblin()
 	teste_9e2_coracao_producao_e_fases()
@@ -3062,10 +3063,10 @@ func teste_9h_chefes_regiao1_mais_faceis() -> void:
 	await get_tree().process_frame
 	await get_tree().process_frame
 	var vida_com := int(chefe.get("vida"))
-	var esperado := int(round(250.0 * 3.2 * float(ChefeBase.ALIVIO_R1[0]["vida"])))
+	var esperado := int(round(700.0 * 3.2 * float(ChefeBase.ALIVIO_R1[0]["vida"])))
 	_ok(absi(vida_com - esperado) <= 2,
 		"9H: o Ghorak devia ficar com ~%d de vida, ficou com %d" % [esperado, vida_com])
-	_ok(vida_com < int(round(250.0 * 3.2 * 0.75)),
+	_ok(vida_com < int(round(700.0 * 3.2 * 0.75)),
 		"9H: o Ghorak do 1-1 continua com a vida antiga (%d)" % vida_com)
 	_ok(float(chefe.get("dano_onda")) < 22.0,
 		"9H: o dano por ataque do Ghorak nao desceu (%s)" % chefe.get("dano_onda"))
@@ -4909,5 +4910,187 @@ func teste_n1_autoral() -> void:
 		_ok(chega, "N1: %s fora da envolvente do salto simples (%s)" % [b["nome"], melhor])
 	n.queue_free()
 	await get_tree().process_frame
+	EstadoJogo.indice_nivel = antes_idx
+	EstadoJogo.habilidades.assign(antes_hab)
+
+
+## Ghorak (mini-boss do N1): casca fora das janelas, janelas de vulnerabilidade,
+## raizes com aviso, fase 2, sem estados presos, porta abre ao morrer, nada arranca
+## fora do campo visual. NAO prova que a luta e' boa -- so' que as regras valem.
+func _ghorak_novo() -> Array:
+	var n := (load("res://scenes/levels/Floresta_Putrefata.tscn") as PackedScene).instantiate()
+	add_child(n)
+	for i in 8:
+		await get_tree().physics_frame
+	var g := n.get_node("Guardiao") as ChefeGhorak
+	var k := n.get_node("Koliani") as Node2D
+	k.global_position = Vector2(g.global_position.x - 230.0, g.global_position.y)
+	for i in 30:
+		await get_tree().physics_frame
+	return [n, g, k]
+
+
+## Corre a luta com um "bot" de golpes. `spam` = bate sempre; senao so' com a janela aberta.
+func _ghorak_luta(spam: bool, segundos: float, so_casca := false) -> Dictionary:
+	var antes_dev: bool = EstadoJogo.modo_dev
+	EstadoJogo.modo_dev = true   # a Koliani nao morre: mede-se o boss, nao o jogador
+	var r: Array = await _ghorak_novo()
+	var n: Node = r[0]
+	var g: ChefeGhorak = r[1]
+	var k: Node2D = r[2]
+	var t_ini := 0
+	var frames := 0
+	var pior_estado := 0.0
+	var ult_fase := int(g._fase)
+	var t_fase := 0
+	var raizes_cedo := 0
+	var vistas := {}
+	var janelas: Array = []
+	var jan_ini := -1
+	var fase2_em := -1.0
+	var limite := int(segundos * 60.0)
+	var morreu := false
+	var porta_aberta := false
+	var ultima_contagem := {}
+	while frames < limite:
+		await get_tree().physics_frame
+		frames += 1
+		if not is_instance_valid(g) or g.is_queued_for_deletion():
+			morreu = true
+			break
+		var vuln: bool = g._vulneravel()
+		ultima_contagem = g.contagem.duplicate()
+		if vuln and jan_ini < 0:
+			jan_ini = frames
+		if not vuln and jan_ini >= 0:
+			janelas.append(float(frames - jan_ini) / 60.0)
+			jan_ini = -1
+		if int(g._fase) != ult_fase:
+			pior_estado = maxf(pior_estado, float(t_fase) / 60.0) if ult_fase != int(ChefeGhorak.Fase.DORME) else pior_estado
+			ult_fase = int(g._fase)
+			t_fase = 0
+		t_fase += 1
+		if g._fase2 and fase2_em < 0.0:
+			fase2_em = float(frames) / 60.0
+		for no in n.get_children():
+			if no is RaizPerigo and not vistas.has(no.get_instance_id()):
+				vistas[no.get_instance_id()] = true
+				if float(no.atraso) < 0.9:
+					raizes_cedo += 1
+		if frames % 16 == 0 and ((so_casca and not vuln) or (not so_casca and (spam or vuln))):
+			g.receber_dano(50, 1.0)
+		k.global_position = Vector2(g.global_position.x - 230.0, k.global_position.y) if frames % 90 == 0 else k.global_position
+	if is_instance_valid(g) and not g.is_queued_for_deletion():
+		morreu = false
+	else:
+		morreu = true
+		await get_tree().process_frame
+		await get_tree().process_frame
+		var porta := n.get_node_or_null("Porta")
+		porta_aberta = porta != null and bool(porta.monitoring)
+	var res := {"ttk": float(frames) / 60.0, "morreu": morreu, "pior_estado": pior_estado,
+		"janelas": janelas, "raizes_cedo": raizes_cedo, "fase2_em": fase2_em,
+		"contagem": ultima_contagem,
+		"porta_aberta": porta_aberta, "raizes": vistas.size()}
+	n.queue_free()
+	await get_tree().process_frame
+	EstadoJogo.modo_dev = antes_dev
+	return res
+
+
+func teste_ghorak_n1() -> void:
+	var antes_idx: int = EstadoJogo.indice_nivel
+	var antes_hab: Array = EstadoJogo.habilidades.duplicate()
+	EstadoJogo.indice_nivel = 0
+	EstadoJogo.habilidades.assign([])
+	var vp := get_viewport().get_visible_rect().size
+	# 1) NADA arranca fora do campo visual: mesmo boss, mesmo alvo; muda so' a camera
+	var chao := StaticBody2D.new()
+	chao.collision_layer = 1
+	var cs := CollisionShape2D.new()
+	var rs := RectangleShape2D.new()
+	rs.size = Vector2(9000.0, 60.0)
+	cs.shape = rs
+	chao.add_child(cs)
+	add_child(chao)
+	chao.global_position = Vector2(4000.0, 560.0)
+	var kf := CharacterBody2D.new()
+	var sc_kf := GDScript.new()
+	sc_kf.source_code = "extends CharacterBody2D
+func receber_dano(_a, _b = 0.0):
+	pass
+"
+	sc_kf.reload()
+	kf.set_script(sc_kf)
+	kf.add_to_group("koliani")
+	add_child(kf)
+	var cam0 := Camera2D.new()
+	add_child(cam0)
+	cam0.global_position = Vector2(-3000.0, 300.0)   # longe: tudo fora do ecra
+	cam0.make_current()
+	var g0 := (load("res://scenes/actors/ChefeGhorak.tscn") as PackedScene).instantiate() as ChefeGhorak
+	g0.position = Vector2(4000.0, 500.0)   # antes do add_child: a arena mede-se a partir da origem
+	add_child(g0)
+	kf.global_position = g0.global_position + Vector2(-230.0, 0.0)
+	for i in 300:
+		await get_tree().physics_frame
+	var c0: Dictionary = g0.contagem
+	_ok(int(c0["BAQUE"]) + int(c0["RAIZES"]) + int(c0["CARGA"]) + int(c0["CURTO"]) == 0 and g0._fase == ChefeGhorak.Fase.DORME,
+		"Ghorak: iniciou um ataque fora do campo visual (%s, fase %d)" % [str(c0), int(g0._fase)])
+	cam0.global_position = g0.global_position
+	for i in 420:
+		await get_tree().physics_frame
+		await get_tree().process_frame
+	var c1: Dictionary = g0.contagem
+	_ok(int(c1["BAQUE"]) + int(c1["RAIZES"]) + int(c1["CARGA"]) + int(c1["CURTO"]) >= 1,
+		"Ghorak: a' vista nunca atacou (%s, fase %d)" % [str(c1), int(g0._fase)])
+	g0.queue_free()
+	kf.queue_free()
+	chao.queue_free()
+	cam0.queue_free()
+	await get_tree().process_frame
+
+	# 2) casca vs janela: mesmo golpe, dano muito diferente
+	var r: Array = await _ghorak_novo()
+	var n: Node = r[0]
+	var g: ChefeGhorak = r[1]
+	EstadoJogo.modo_dev = true
+	g._ir(ChefeGhorak.Fase.DECIDE)
+	var v0: int = g.vida
+	g.receber_dano(50, 1.0)
+	var dano_casca: int = v0 - g.vida
+	g._abrir_janela(2.0, ChefeGhorak.Fase.EXPOSTO)
+	v0 = g.vida
+	g.receber_dano(50, 1.0)
+	var dano_janela: int = v0 - g.vida
+	_ok(dano_casca >= 1 and dano_casca <= 10, "Ghorak: a casca deixou passar %d de 50" % dano_casca)
+	_ok(dano_janela >= 50, "Ghorak: a janela devia dar o golpe inteiro, deu %d" % dano_janela)
+	n.queue_free()
+	await get_tree().process_frame
+
+	# 3) spam nao ganha a luta; o jogador que le as janelas ganha em 20-60 s
+	var spam: Dictionary = await _ghorak_luta(true, 200.0)
+	var lido: Dictionary = await _ghorak_luta(false, 200.0)
+	var casca: Dictionary = await _ghorak_luta(false, 150.0, true)
+	print("GHORAK so a bater na casca: ttk=%.1fs morreu=%s" % [casca["ttk"], casca["morreu"]])
+	_ok(not bool(casca["morreu"]) or float(casca["ttk"]) >= 90.0,
+		"Ghorak: da' para ganhar a bater so' na casca em %.1f s" % casca["ttk"])
+	print("GHORAK spam: ttk=%.1fs morreu=%s | janelas: ttk=%.1fs morreu=%s fase2_em=%.1fs" % [
+		spam["ttk"], spam["morreu"], lido["ttk"], lido["morreu"], lido["fase2_em"]])
+	print("GHORAK janelas (s): ", lido["janelas"], " contagem: ", lido["contagem"], " raizes=", lido["raizes"])
+	_ok(bool(lido["morreu"]), "Ghorak: nao morre a bater so' nas janelas (preso?)")
+	_ok(float(lido["ttk"]) >= 16.0 and float(lido["ttk"]) <= 70.0,
+		"Ghorak: TTK do bot PERFEITO = %.1f s (jogador real ~1,5-2x: alvo 25-45 s)" % lido["ttk"])
+	_ok(float(lido["fase2_em"]) > 0.0, "Ghorak: a fase 2 nunca arrancou")
+	_ok(int(lido["raizes_cedo"]) == 0, "Ghorak: %d raizes com aviso < 0,9 s" % lido["raizes_cedo"])
+	_ok(float(lido["pior_estado"]) <= 6.0, "Ghorak: ficou %.1f s no mesmo estado" % lido["pior_estado"])
+	var jan: Array = lido["janelas"]
+	_ok(jan.size() >= 2, "Ghorak: menos de 2 janelas abertas")
+	for w in jan:
+		_ok(float(w) >= 0.7 and float(w) <= 2.6, "Ghorak: janela de %.2f s fora de 0,7-2,6 s" % float(w))
+	_ok(bool(lido["porta_aberta"]), "Ghorak: a porta nao abriu ao morrer")
+	var cm: Dictionary = lido["contagem"]
+	_ok(int(cm["BAQUE"]) >= 1 and int(cm["RAIZES"]) >= 1 and int(cm["CARGA"]) >= 1,
+		"Ghorak: nem todos os ataques foram usados (%s)" % str(cm))
 	EstadoJogo.indice_nivel = antes_idx
 	EstadoJogo.habilidades.assign(antes_hab)

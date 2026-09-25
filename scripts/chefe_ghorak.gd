@@ -1,30 +1,69 @@
 class_name ChefeGhorak
 extends ChefeBase
-## Regiao I / nivel 01 -- Ghorak, o Guardiao Raiz. Guerreiro de tronco,
-## ossos e raizes. Dois ataques:
-##   * ESMAGA -- ergue-se, baixa com um baque -> onda rasteira (so magoa
-##     quem esta no chao ao alcance) + uma raiz irrompe sob os pes da
-##     Koliani.
-##   * SEMEIA -- planta uma fila de raizes a varrer o chao ate a Koliani.
-## A seguir a qualquer ataque fica EXPOSTO por um instante: o nucleo purpura
-## do peito abre-se e SO nessa janela e' que leva dano (a dobrar). Fora
-## disso, a casca de raiz e osso aguenta os golpes.
-## A meio da vida entra em fase 2: telegrafos mais curtos, mais raizes, e a
-## arena e' tomada por raizes de fundo.
+## Regiao I / nivel 01 -- Ghorak, o Guardiao Raiz. MINI-BOSS do N1 (nao e' o
+## chefe regional: esse e' o Coracao Putrefacto, no N5).
+##
+## LOOP (F1/N1, so' com correr + saltar + ataque normal):
+##
+##   CASCA  -- fora das janelas a casca de raiz e osso aguenta o golpe
+##             (`RESIST_CASCA` do dano, sem recuo, som seco de bloqueio). Bater
+##             sem parar da' ~5 % do dano: a luta nao se ganha a fazer spam.
+##   EXPOSTO -- o nucleo purpura do peito abre-se (frame 3 + brilho a pulsar) e
+##             SO' ai' o golpe entra por inteiro. A janela fecha com o nucleo
+##             a piscar nos ultimos 0,4 s.
+##
+## ATAQUES (cada um: pose de aviso + som NO INICIO do aviso -> execucao -> recovery):
+##   BAQUE  -- ergue-se (aviso), salta, cai: onda rasteira que so' magoa quem
+##             esta' no chao ao alcance (salta-se por cima). Depois fica
+##             EXPOSTO (janela grande). E' a "abertura" que a luta ensina.
+##   RAIZES -- planta uma zona de raizes a volta da Koliani com o aviso
+##             (racha no chao) VISIVEL antes de irromperem: obriga a sair dali.
+##             Sem janela de dano (a casca esta' fechada): e' movimento.
+##   CARGA  -- crava a pose, o rumo trava-se a meio do aviso, investe uma
+##             distancia fixa e fica EXPOSTO por pouco tempo (castigo do esquiva).
+##   CURTO  -- golpe curto e lento SO' quando a Koliani cola ao corpo: pune
+##             quem fica encostado a bater (sem risco).
+##
+## FASE 2 (< 50 %): mesmo vocabulario, encadeado -- raizes seguidas de carga,
+## baque com raizes a nascer na janela (a ganancia paga-se), duas zonas de
+## raizes em vez de uma, avisos e janelas mais curtos, recovery da carga menor.
+##
+## Regra global: nada arranca fora do campo visual (`Som.em_vista`).
 
 const RAIZ := preload("res://scenes/actors/RaizPerigo.tscn")
 
-enum Fase { DORME, DECIDE, ESMAGA_TEL, ESMAGA_BAQUE, SEMEIA, EXPOSTO }
+enum Fase { DORME, DECIDE, CURTO_TEL, CURTO, CURTO_REC, BAQUE_TEL, BAQUE, EXPOSTO,
+		MARCAS_TEL, MARCAS_REC, CARGA_TEL, CARGA, CARGA_EXPOSTO, ROAR }
+
+## Fracao do dano que a casca deixa passar fora das janelas.
+const RESIST_CASCA := 0.05
+## Padroes por fase (indice ciclico). Fase 2 usa combos (`_encadear`).
+const PADRAO_F1 := ["BAQUE", "RAIZES", "BAQUE", "CARGA"]
+const PADRAO_F2 := ["RAIZES+CARGA", "BAQUE+RAIZES", "CARGA", "BAQUE"]
 
 @export var dist_deteta := 380.0
 @export var vel_passo := 34.0
-@export var dur_tel := 0.6
-@export var dur_baque := 0.32
-@export var dur_semeia := 0.66
-@export var dur_exposto := 1.3
-@export var raio_onda := 300.0
+@export var vel_aproxima := 95.0
+## Escalados pelo `ChefeBase` (alivio da Regiao I): dur_tel x1,06, dur_baque x0,92,
+## dur_exposto x0,85. Os valores base ja' tem isso em conta.
+@export var dur_tel := 0.75
+@export var dur_baque := 0.35
+@export var dur_exposto := 2.1
+## Nao escalados.
+@export var dur_marcas_tel := 0.6
+@export var dur_marcas_rec := 0.95
+@export var atraso_raiz := 1.15
+@export var dur_carga_tel := 0.9
+@export var vel_carga := 560.0
+@export var dist_carga := 460.0
+@export var dur_carga_exposto := 1.4
+@export var dur_curto_tel := 0.5
+@export var dur_curto_rec := 0.45
+@export var raio_onda := 280.0
 @export var dano_onda := 22
 @export var dano_raiz := 18
+@export var dano_carga := 24
+@export var dano_curto := 16
 
 var _fase: Fase = Fase.DORME
 var _t := 0.0
@@ -34,6 +73,18 @@ var _fase2 := false
 var _nucleo_exposto := false
 var _ciclos := 0
 var _vida_max := 420
+var _seguinte := ""            # o que a maquina decidiu fazer a seguir
+var _encadear := ""            # 2.o elo de um combo da fase 2
+var _dir_carga := 1.0
+var _x_carga_ini := 0.0
+var _carga_feriu := false
+var _curto_feriu := false
+var _curto_cd := 0.0
+var _piscou_fim := false
+var _dur_janela := 0.0         # duracao da janela EXPOSTO em curso
+var _casca_cd := 0.0
+## Diagnostico/testes: quantas vezes cada ataque arrancou.
+var contagem := {"BAQUE": 0, "RAIZES": 0, "CARGA": 0, "CURTO": 0}
 
 @onready var _nucleo: Node2D = get_node_or_null("Sprite/Nucleo")
 
@@ -49,60 +100,127 @@ func _ready() -> void:
 
 func _process(dt: float) -> void:
 	super._process(dt)
+	_casca_cd = maxf(0.0, _casca_cd - dt)
 	if _nucleo and _nucleo_exposto:
 		_pulso += dt
 		var p := 1.0 + 0.16 * sin(_pulso * 9.0)
 		_nucleo.scale = Vector2(p, p)
+		# a janela esta' a fechar: o nucleo pisca (aviso legivel)
+		var restante := _dur_janela - _t
+		if restante < 0.4 and _dur_janela > 0.0:
+			var brilho: CanvasItem = _nucleo.get_node_or_null("Brilho")
+			if brilho:
+				brilho.visible = int(_pulso * 12.0) % 2 == 0
 
 
 func _physics_process(dt: float) -> void:
-	if not _fase2 and not _ja_derrotado and vida <= int(_vida_max * 0.5):
+	_curto_cd = maxf(0.0, _curto_cd - dt)
+	if not _fase2 and not _ja_derrotado and vida <= int(_vida_max * 0.5) \
+			and _fase in [Fase.DECIDE, Fase.EXPOSTO, Fase.CARGA_EXPOSTO, Fase.MARCAS_REC, Fase.CURTO_REC]:
 		_entrar_fase2()
 
 	match _fase:
 		Fase.DORME:
 			super._physics_process(dt)  # patrulha lenta (DemonioBase)
-			if _ve_koliani():
+			# so' acorda com a Koliani perto E o boss a' vista
+			if _ve_koliani() and Som.em_vista(self):
 				_ir(Fase.DECIDE)
 		Fase.DECIDE:
+			_decidir(dt)
+		Fase.CURTO_TEL:
 			_travar(dt)
 			_encarar_koliani()
-			if _t >= 0.22:
-				_escolher()
-		Fase.ESMAGA_TEL:
+			if _t >= dur_curto_tel:
+				_piscar(false)
+				_ir(Fase.CURTO)
+		Fase.CURTO:
+			_travar(dt)
+			if not _curto_feriu:
+				_curto_feriu = true
+				_golpe_curto()
+			if _t >= 0.15:
+				_ir(Fase.CURTO_REC)
+		Fase.CURTO_REC:
+			_travar(dt)
+			if _t >= dur_curto_rec:
+				_ir(Fase.DECIDE)
+		Fase.BAQUE_TEL:
 			_travar(dt)
 			_encarar_koliani()
-			_piscar(true)
 			if _t >= dur_tel:
 				_piscar(false)
 				velocity.y = -240.0  # pequeno salto antes do baque
 				_som_ataque("investida", -10.0, 0.8)
-				_ir(Fase.ESMAGA_BAQUE)
-		Fase.ESMAGA_BAQUE:
+				_ir(Fase.BAQUE)
+		Fase.BAQUE:
 			velocity.x = move_toward(velocity.x, 0.0, 1400.0 * dt)
 			if not is_on_floor():
 				velocity.y += GRAVIDADE * dt
 			move_and_slide()
+			_prender_na_arena()
 			if is_on_floor() and _t > 0.06 and not _onda_feita:
 				_onda_feita = true
 				_baque()
 			if _onda_feita and _t >= dur_baque:
-				_ir(Fase.EXPOSTO)
-		Fase.SEMEIA:
-			_travar(dt)
-			_encarar_koliani()
-			_piscar(true)
-			if _t >= dur_semeia:
-				_piscar(false)
-				_semear()
-				_ir(Fase.EXPOSTO)
+				_abrir_janela(dur_exposto * (0.8 if _fase2 else 1.0), Fase.EXPOSTO)
 		Fase.EXPOSTO:
 			_travar(dt)
-			if not _nucleo_exposto:
-				_mostrar_nucleo(true)
-			if _t >= dur_exposto:
-				_mostrar_nucleo(false)
-				_ciclos += 1
+			if _fase2 and _encadear == "RAIZES" and _t >= 0.5:
+				# a ganancia paga-se: as raizes marcam-se A MEIO da janela
+				_encadear = ""
+				_plantar_zona(1.0)
+			if _t >= _dur_janela:
+				_fechar_janela()
+		Fase.MARCAS_TEL:
+			_travar(dt)
+			_encarar_koliani()
+			if _t >= dur_marcas_tel:
+				_piscar(false)
+				_ir(Fase.MARCAS_REC)
+		Fase.MARCAS_REC:
+			_travar(dt)
+			if _t >= dur_marcas_rec * (0.85 if _fase2 else 1.0):
+				if _encadear == "CARGA":
+					_encadear = ""
+					_iniciar_carga_tel()
+				else:
+					_ciclos += 1
+					_ir(Fase.DECIDE)
+		Fase.CARGA_TEL:
+			_travar(dt)
+			# o rumo trava-se aos 60 % do aviso: ate' la' ainda acompanha
+			if _t < dur_carga_tel * 0.6:
+				_encarar_koliani()
+				_dir_carga = _direcao
+			if _t >= dur_carga_tel:
+				_piscar(false)
+				_x_carga_ini = global_position.x
+				_carga_feriu = false
+				_ataque_forte = 1.0
+				_som_ataque("investida", -6.0, 0.62)
+				_abanar_camera(3.0)
+				_ir(Fase.CARGA)
+		Fase.CARGA:
+			velocity.x = _dir_carga * vel_carga
+			if not is_on_floor():
+				velocity.y += GRAVIDADE * dt
+			move_and_slide()
+			_prender_na_arena()
+			_ferir_na_carga()
+			var andou := absf(global_position.x - _x_carga_ini)
+			if andou >= dist_carga or _t > 1.3 or (is_on_wall() and _t > 0.1):
+				_ataque_forte = 0.0
+				velocity.x = 0.0
+				_abanar_camera(4.0)
+				_abrir_janela(dur_carga_exposto * (0.7 if _fase2 else 1.0), Fase.CARGA_EXPOSTO)
+		Fase.CARGA_EXPOSTO:
+			_travar(dt)
+			if _t >= _dur_janela:
+				_fechar_janela()
+		Fase.ROAR:
+			_travar(dt)
+			if _t >= 0.9:
+				_piscar(false)
 				_ir(Fase.DECIDE)
 	_t += dt
 
@@ -115,13 +233,87 @@ func _ir(f: Fase) -> void:
 	_onda_feita = false
 
 
-func _escolher() -> void:
+func _vulneravel() -> bool:
+	return _fase == Fase.EXPOSTO or _fase == Fase.CARGA_EXPOSTO
+
+
+func _abrir_janela(dur: float, f: Fase) -> void:
+	_dur_janela = dur
+	_mostrar_nucleo(true)
+	_ir(f)
+	# o som de "abre" chega com a pose: legivel sem olhar para o nucleo
+	Som.toca("mecanismo", -14.0, 1.5, 0.02, 0.2, "ghorak_abre", Som.Prioridade.NORMAL)
+
+
+func _fechar_janela() -> void:
+	_mostrar_nucleo(false)
+	_dur_janela = 0.0
+	_ciclos += 1
+	_ir(Fase.DECIDE)
+
+
+## DECIDE: aproxima-se, escolhe e ARRANCA o ataque (com o aviso). Nada disto
+## acontece com o boss fora do campo visual.
+func _decidir(dt: float) -> void:
+	_encarar_koliani()
+	if not Som.em_vista(self):
+		_travar(dt)
+		return
 	var dx := absf(_vetor_para_koliani().x)
-	# perto -> esmaga; longe -> semeia. Na fase 2 alterna para variar.
-	var esmaga := dx <= raio_onda * 0.75
-	if _fase2 and _ciclos % 2 == 1:
-		esmaga = not esmaga
-	_ir(Fase.ESMAGA_TEL if esmaga else Fase.SEMEIA)
+	if _seguinte == "":
+		_seguinte = _proximo_ataque()
+	# perto demais: golpe curto (pune o "encostado"), com cooldown proprio
+	if dx <= 110.0 and _curto_cd <= 0.0 and _t >= 0.15:
+		_curto_cd = 3.5
+		contagem["CURTO"] += 1
+		_curto_feriu = false
+		_piscar(true)
+		_som_ataque("garra", -9.0, 0.8)
+		_ir(Fase.CURTO_TEL)
+		return
+	# o BAQUE quer a Koliani ao alcance da onda: aproxima-se ate' la'
+	var precisa_perto := _seguinte.begins_with("BAQUE")
+	if precisa_perto and dx > raio_onda * 0.8 and _t < 1.6:
+		velocity.x = move_toward(velocity.x, _direcao * vel_aproxima, 900.0 * dt)
+		if not is_on_floor():
+			velocity.y += GRAVIDADE * dt
+		move_and_slide()
+		_prender_na_arena()
+		return
+	_travar(dt)
+	if _t < 0.35:
+		return
+	var a := _seguinte
+	_seguinte = ""
+	var partes := a.split("+")
+	_encadear = partes[1] if partes.size() > 1 else ""
+	match partes[0]:
+		"BAQUE":
+			contagem["BAQUE"] += 1
+			_piscar(true)
+			_som_ataque("olho_carregar", -9.0, 0.6)
+			_ir(Fase.BAQUE_TEL)
+		"RAIZES":
+			contagem["RAIZES"] += 1
+			_piscar(true)
+			_som_ataque("praga", -8.0)
+			_plantar_zona(1.0)
+			_ir(Fase.MARCAS_TEL)
+		"CARGA":
+			contagem["CARGA"] += 1
+			_iniciar_carga_tel()
+
+
+func _proximo_ataque() -> String:
+	var padrao: Array = PADRAO_F2 if _fase2 else PADRAO_F1
+	return String(padrao[_ciclos % padrao.size()])
+
+
+func _iniciar_carga_tel() -> void:
+	_piscar(true)
+	_som_ataque("grito", -7.0, 0.7)
+	_abanar_camera(1.5)
+	_ir(Fase.CARGA_TEL)
 
 
 func _travar(dt: float) -> void:
@@ -129,6 +321,7 @@ func _travar(dt: float) -> void:
 	if not is_on_floor():
 		velocity.y += GRAVIDADE * dt
 	move_and_slide()
+	_prender_na_arena()
 
 
 func _ve_koliani() -> bool:
@@ -145,42 +338,75 @@ func _baque() -> void:
 	if k and absf((k.global_position - global_position).x) <= raio_onda and k.is_on_floor():
 		k.receber_dano(dano_onda, signf(k.global_position.x - global_position.x))
 	_particulas_onda()
-	_plantar_em(_x_koliani(), 0.28)
+
+
+func _golpe_curto() -> void:
+	_som_impacto("esmagar", -12.0, 1.3)
+	var k := _obter_koliani()
+	if k == null:
+		return
+	var d := k.global_position - global_position
+	if absf(d.x) <= 150.0 and absf(d.y) <= 110.0 and signf(d.x) == _direcao:
+		k.receber_dano(dano_curto, signf(d.x))
+
+
+func _ferir_na_carga() -> void:
+	if _carga_feriu:
+		return
+	var k := _obter_koliani()
+	if k == null:
+		return
+	var d := k.global_position - global_position
+	if absf(d.x) <= 74.0 and absf(d.y) <= 110.0:
+		_carga_feriu = true
+		k.receber_dano(dano_carga, signf(d.x))
+
+
+## Uma ZONA de raizes: 3 raizes a volta da Koliani, com o aviso (racha no chao)
+## visivel `atraso_raiz` s antes de irromperem -- nunca nascem sem aviso. Na
+## fase 2 ha' uma 2.a zona, mais tarde, do lado oposto ao do boss.
+func _plantar_zona(_escala: float) -> void:
+	var x0 := _x_koliani()
+	for i in [-1, 0, 1]:
+		_plantar_em(x0 + float(i) * 105.0, atraso_raiz)
 	if _fase2:
-		_plantar_em(_x_koliani() + signf(_dir_para_koliani()) * 96.0, 0.44)
-
-
-func _semear() -> void:
-	_som_ataque("praga", -8.0)
-	var origem := global_position.x
-	var alvo := _x_koliani() + signf(_x_koliani() - origem) * 44.0
-	var passos := 5 if _fase2 else 4
-	for i in passos:
-		var f := float(i) / float(passos - 1)
-		_plantar_em(lerpf(origem, alvo, f), 0.12 + f * 0.5)
+		var lado := -signf(_dir_para_koliani())
+		if lado == 0.0:
+			lado = 1.0
+		_plantar_em(x0 + lado * 300.0, atraso_raiz + 0.45)
+		_plantar_em(x0 + lado * 405.0, atraso_raiz + 0.45)
 
 
 func _plantar_em(x: float, atraso: float) -> void:
 	var pai := get_parent()
 	if pai == null:
 		return
+	if _arena_ok:
+		x = clampf(x, _arena_esq + 30.0, _arena_dir - 30.0)
 	var r := RAIZ.instantiate()
 	pai.add_child(r)
 	r.global_position = Vector2(x, _chao_y(x))
-	r.avisar(int(round(dano_raiz * (1.15 if _fase2 else 1.0))), atraso)
+	r.avisar(int(round(dano_raiz * (1.15 if _fase2 else 1.0))), maxf(atraso, 0.9))
 
 
 ## --- fase 2 --------------------------------------------------------
 
 func _entrar_fase2() -> void:
 	_fase2 = true
+	_mostrar_nucleo(false)
 	_som_fase("carne")
 	_abanar_camera(7.0)
-	dur_tel *= 0.7
-	dur_semeia *= 0.7
-	dur_exposto *= 0.82
+	dur_tel *= 0.85
+	dur_carga_tel *= 0.85
+	dur_curto_tel *= 0.85
 	velocidade = vel_passo * 1.25
+	vel_aproxima *= 1.2
+	_ciclos = 0
+	_seguinte = ""
+	_encadear = ""
+	_piscar(true)
 	_raizes_de_fundo()
+	_ir(Fase.ROAR)
 
 
 func _raizes_de_fundo() -> void:
@@ -212,6 +438,9 @@ func _piscar(ligado: bool) -> void:
 	super._piscar(ligado)
 	if _corpo and not _nucleo_exposto:
 		_corpo.frame = 2 if ligado else 0
+	if not ligado and _sprite:
+		# o `super` repoe o branco: volta o tom da casca (fechada) / do nucleo (aberto)
+		_sprite.modulate = Color(1.2, 1.12, 1.05) if _nucleo_exposto else Color(0.9, 0.95, 0.9)
 
 
 func _mostrar_nucleo(v: bool) -> void:
@@ -219,12 +448,16 @@ func _mostrar_nucleo(v: bool) -> void:
 	_pulso = 0.0
 	if _corpo:
 		_corpo.frame = 3 if v else 0
+	if _sprite and not v:
+		_sprite.modulate = Color(0.9, 0.95, 0.9)   # casca fechada: mais baço
+	elif _sprite:
+		_sprite.modulate = Color(1.2, 1.12, 1.05)  # aberto: quente
 	if _nucleo == null:
 		return
 	_nucleo.scale = Vector2.ONE * (1.0 if v else 0.5)
 	var luz: PointLight2D = _nucleo.get_node_or_null("Luz")
 	if luz:
-		luz.energy = 1.6 if v else 0.15
+		luz.energy = 1.8 if v else 0.15
 	var brilho: CanvasItem = _nucleo.get_node_or_null("Brilho")
 	if brilho:
 		brilho.visible = v
@@ -235,7 +468,22 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0, critico := false,
 	if _ja_derrotado:
 		return
 	provocar()
-	super.receber_dano(quantidade, dir_empurrao, critico)
+	if _vulneravel() or _fase == Fase.DORME:
+		super.receber_dano(quantidade, dir_empurrao, critico)
+		return
+	# CASCA: o golpe entra so' em fracao, sem recuo e sem critico, com o
+	# feedback seco de "isto nao e' a janela".
+	var q := maxi(1, int(round(float(quantidade) * RESIST_CASCA)))
+	if vida - q <= 0:
+		super.receber_dano(quantidade, dir_empurrao, false)
+		return
+	vida -= q
+	vida_mudou.emit(maxi(vida, 0), _vida_maxima)
+	if _casca_cd <= 0.0:
+		_casca_cd = 0.1
+		Som.toca("bloqueio", -9.0, 0.85, 0.03, 0.0, "", Som.Prioridade.NORMAL)
+		Impacto.rebentar(self, global_position + Vector2(0.0, -30.0 * maxf(0.8, escala_visual)),
+			Color(0.62, 0.78, 0.55), 1.3)
 
 
 ## --- utilitarios --------------------------------------------------

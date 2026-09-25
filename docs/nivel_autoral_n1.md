@@ -29,10 +29,25 @@ Checkpoints (3, autorais): depois de aprender (380), depois do platforming e ant
 (4560, a 860 px da arena: repetir so' o Ghorak + uma caminhada curta; a luta em si nao e' trivializada).
 Todos os vaos <= 125 px (plano) / <= 110 px (a subir); subidas <= 60 px; mantle nunca necessario.
 
-## Ghorak -- funcao exata
-Elite/mini-boss de FECHO: primeira subida de tensao e exame do combate basico antes da porta. Vida 250 x3,2 x0,52
-(alivio R-I nivel 1) = **416** (~8 golpes de 50), telegrafo 0,6 s x0,85 x1,25, baque/semear/onda, fase 2 a meio da
-vida. **TTK nao medido a jogar** (estimativa: 8-9 golpes + janelas => 15-25 s). Nao compete com o Coracao Putrefacto (N5).
+## Ghorak -- funcao exata (redesenhado a 26 set 2026, apos o 1.o playtest: "demasiado passivo")
+Mini-boss de FECHO. Loop: **CASCA** fora das janelas (so' 5 % do dano passa, sem recuo, som `bloqueio` + faiscas
+verdes; sprite mais baco) e **EXPOSTO** (nucleo purpura aberto, frame 3, brilho a pulsar, pisca 0,4 s antes de
+fechar, tom quente) -- so' ai' o golpe entra por inteiro. Sem stun-lock: bater nao interrompe nada.
+| Ataque | Telegraph (SEE -> HEAR) | Execucao | Depois |
+|---|---|---|---|
+| BAQUE | pose bracos erguidos + aura corrupcao 0,8 s, som `olho_carregar` grave | salta e cai: onda rasteira a <= 280 px, **so' magoa no chao** (salta-se) | **EXPOSTO ~1,8 s** (fase 2: ~1,4 s) |
+| RAIZES | pose 0,6 s + som `praga`; racha visivel no chao 1,15 s antes de irromper | zona de 3 raizes a volta da Koliani (fase 2: +2.a zona do lado oposto, mais tarde) | recovery 0,95 s SEM janela (movimento, nao dano) |
+| CARGA | pose + aura 0,9 s + `grito`; o rumo trava aos 60 % do aviso | investe 460 px a 560 px/s (dano 24 x alivio) | **EXPOSTO ~1,4 s** (fase 2: ~1,0 s) |
+| CURTO | 0,5 s + `garra`, so' se a Koliani estiver a < 110 px (cooldown 3,5 s) | golpe curto a frente | recovery 0,45 s sem janela (pune quem cola ao corpo) |
+Fase 1: padrao BAQUE, RAIZES, BAQUE, CARGA. **Fase 2 (< 50 %)**: mesmo vocabulario encadeado -- RAIZES+CARGA,
+BAQUE+RAIZES (as raizes marcam-se a meio da janela: a ganancia paga-se), CARGA, BAQUE; avisos x0,85, janelas
+x0,8/0,7, rugido de 0,9 s a entrar. Nada arranca fora do campo visual (`Som.em_vista`).
+Vida: base 250 -> **700** (x3,2 x0,52 = 1165). NAO e' sponge: o combo da Koliani da' ~250 de dano em ~1 s
+(0,85+1+1,25+1,9 x 50), por isso a vida so' faz sentido com a casca fechada 80 % do tempo.
+**Medido (bot perfeito, Koliani invulneravel, `teste_ghorak_n1`)**: TTK 18,9 s lendo as janelas (4 janelas:
+1,8 / 1,2 / 0,98 / 1,43 s; media 1,36 s; fase 2 aos 7,5 s); so' a bater na casca: NAO morre em 150 s.
+Estimativa de jogador real (60 % de eficiencia): ~30-40 s. **Janela media (1,4 s) e' menor que os 2-3 s pedidos**:
+mais tempo = mais de metade da vida numa abertura; afinar no playtest (`dur_exposto`, `dur_carga_exposto`, vida).
 
 ## Assets
 - Aprovados e usados: kit 9C/`l1_hybrid_9h12e` (terreno, props, fundo panorama 08, corrupcao, nevoa), Koliani golden set,

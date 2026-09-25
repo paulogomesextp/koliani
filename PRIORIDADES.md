@@ -1,3 +1,7 @@
+> **Ghorak redesenhado (26 set 2026, sem push)** -- casca + janelas de vulnerabilidade, baque/raizes/carga/curto,
+> fase 2 encadeada (`docs/nivel_autoral_n1.md`). **A aguardar novo playtest do GM**: janela media 1,4 s (pedido 2-3 s),
+> TTK perfeito 18,9 s (real estimado 30-40 s), leitura dos telegraphs, raizes em fase 2.
+
 > **N1 AUTORAL feito (26 set 2026, commits locais sem push)** — `docs/nivel_autoral_n1.md`. **À espera do GM:**
 > playtest manual (telegraph, offscreen SEE→TELEGRAPH→HEAR, Ghorak, ritmo, arte); N1 NÃO está LOCKED. Decidir a
 > duração (travessia 26 s; ~2–3 min estimados, alvo 3–5). Arte em falta: raízes (RaizPerigo por polígonos), goblin
