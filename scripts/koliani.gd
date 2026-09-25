@@ -1509,11 +1509,11 @@ func _physics_process(dt: float) -> void:
 		_estava_no_chao = false
 		return
 
-	# wall-jump básico (sempre, não precisa da habilidade "escalar_paredes"):
-	# no ar, encostada a uma parede e a segurar CONTRA ela -> chuta para
-	# fora. Não gasta o salto do ar. Perde para o escalar quando este está
-	# ativo (esse já saiu acima com `return`).
-	if not is_on_floor() and is_on_wall_only() and _parede_lock <= 0.0 \
+	# wall-jump (decisão do GM, F1 p2): EXIGE a habilidade "escalar_paredes";
+	# sem ela as paredes são limites (Região I). No ar, encostada a uma
+	# parede e a segurar CONTRA ela -> chuta para fora. Não gasta o salto do
+	# ar. Perde para o escalar quando este está ativo (saiu acima com `return`).
+	if EstadoJogo.tem_habilidade("escalar_paredes") and not is_on_floor() and is_on_wall_only() and _parede_lock <= 0.0 \
 			and not _escalando and _dash_restante <= 0.0 and _rolar_restante <= 0.0 \
 			and velocity.y > -140.0 and dir != 0.0 \
 			and signf(dir) == -signf(get_wall_normal().x) \

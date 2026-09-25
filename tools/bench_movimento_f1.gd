@@ -645,8 +645,8 @@ func e_borda_mantle() -> void:
 
 ## WALL-JUMP: parede alta (sem rebordo à vista). Mede o salto de parede isolado
 ## e uma cadeia a subir a parede a segurar contra ela e a saltar em cada toque.
-func _walljump(hold: int) -> Dictionary:
-	await nova(-1990.0)
+func _walljump(hold: int, com_skill: bool = true) -> Dictionary:
+	await nova(-1990.0, ["dash", "pogo", "escalar_paredes"] if com_skill else ["dash", "pogo"])
 	var parede := _bloco_devolve(Vector2(-1960, CHAO_Y - 900), Vector2(-1500, CHAO_Y))
 	var tr: Array = []
 	var presses: Array = []
@@ -678,14 +678,24 @@ func _walljump(hold: int) -> Dictionary:
 		for j in range(a, b):
 			ymin1 = minf(ymin1, tr[j]["y"])
 		subida_1o = tr[a]["y"] - ymin1
-	return {"botao_premido_ticks": hold, "saltos_de_parede": presses.size(),
+	# chutes REAIS: a bancada carrega no botao sempre que toca na parede, por isso
+	# `presses` mede tentativas; o chute e' vx <= -0,9*WALLJUMP.x (parede a direita)
+	var chutes := 0
+	var ant_k := false
+	for s in tr:
+		var kick: bool = float(s["vx"]) <= -Koliani.WALLJUMP.x * 0.9
+		if kick and not ant_k:
+			chutes += 1
+		ant_k = kick
+	return {"botao_premido_ticks": hold, "tentativas": presses.size(), "saltos_de_parede": chutes,
 		"subida_do_1o_px": snappedf(subida_1o, 0.1),
 		"altura_maxima_da_cadeia_px": snappedf(rest_y - y_min, 0.1)}
 
 
 func e_walljump() -> void:
 	R["walljump"] = {"walljump_const": Koliani.WALLJUMP, "toque_1_tick": await _walljump(1),
-		"segurado_14_ticks": await _walljump(14), "segurado_30_ticks": await _walljump(30)}
+		"segurado_14_ticks": await _walljump(14), "segurado_30_ticks": await _walljump(30),
+		"sem_skill": await _walljump(1, false)}
 
 
 func e_latencia() -> void:
@@ -1009,6 +1019,11 @@ func _regressao() -> Array:
 		chk.call(int(r["ticks_anim_land"]) >= 4, "land parado dura menos de 4 ticks")
 	chk.call(Movimento.tier_aterragem(float(R["salto"]["por_ticks_premido"][-1]["vy_max_queda"])) == 1,
 		"um salto normal aterra com impacto acima de leve")
+	# WALL-JUMP (decisao GM): exige `escalar_paredes`
+	chk.call(int(R["walljump"]["sem_skill"]["saltos_de_parede"]) == 0,
+		"wall-jump executou SEM a habilidade escalar_paredes")
+	chk.call(int(R["walljump"]["toque_1_tick"]["saltos_de_parede"]) >= 1,
+		"wall-jump nao executa COM escalar_paredes")
 	# MANTLE (passagem 2): 9 ticks, sem re-agarrar, alcance limitado
 	var mant := {}
 	for m in R["borda_mantle"]["por_altura"]:
