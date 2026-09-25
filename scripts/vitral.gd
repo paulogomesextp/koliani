@@ -10,7 +10,12 @@ extends StaticBody2D
 @export var grupo_luz := "vitral_luz"
 @export var cor_luz := Color(0.7, 0.4, 1.0)
 
+## Pele aprovada (Regiao III): vazio = o desenho de sempre.
+@export var textura_inteiro: Texture2D
+@export var textura_partido: Texture2D
+
 var _partido := false
+var _pele: Sprite2D
 
 @onready var _corpo: CanvasItem = get_node_or_null("Corpo")
 @onready var _col: CollisionShape2D = get_node_or_null("Col")
@@ -19,6 +24,17 @@ var _partido := false
 
 func _ready() -> void:
 	add_to_group("vitrais")
+	if textura_inteiro != null:
+		if _corpo:
+			_corpo.visible = false
+		_pele = Sprite2D.new()
+		_pele.texture = textura_inteiro
+		add_child(_pele)
+		if _col and _col.shape is RectangleShape2D:
+			# o recurso e' partilhado entre instancias: duplicar antes de mexer
+			var forma := (_col.shape as RectangleShape2D).duplicate() as RectangleShape2D
+			forma.size = Vector2(forma.size.x, float(textura_inteiro.get_height()))
+			_col.shape = forma
 	if _luz:
 		_luz.energy = 0.0
 
@@ -50,6 +66,10 @@ func receber_dano(_quantidade: int = 0, _dir: float = 0.0) -> void:
 		_col.set_deferred("disabled", true)
 	if _corpo:
 		create_tween().tween_property(_corpo, "modulate:a", 0.12, 0.25)
+	if _pele and textura_partido != null:
+		_pele.texture = textura_partido
+		_pele.position.y = float(textura_inteiro.get_height() - textura_partido.get_height()) * 0.5
+		_pele.modulate.a = 0.75
 	# a luz passa a entrar
 	if _luz:
 		create_tween().tween_property(_luz, "energy", 1.1, 0.3)

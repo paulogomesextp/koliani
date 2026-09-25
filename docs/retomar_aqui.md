@@ -1,3 +1,13 @@
+## Região III — N12 reconstruído (25 set 2026)
+
+Plano em `docs/rebuild_region_03_plan.md`; N12 implementado só com câmaras forçadas no N12 (`_n12_fila`
+em `gerador_corredor.gd`, sem tocar no `_rng` dos outros níveis: baseline dos 100 níveis idêntica salvo N12).
+Fogo removido; sinos de sincronização, vitral, escadas, quebra, vento+queda, elevador. **Pendente:**
+N13 (remover raios — decisão do GM fechada), N14; arte do elevador de coluna (não extraída); Aerion legado.
+Armadilha: correr Godot fora do sandbox (`APPDATA`) grava no save real (`current_level_id`).
+
+---
+
 ## Renovacao dos niveis — Regiao II retomada (25 set 2026)
 
 Regiao I: Golden Set (L1-L5) no master. **Regiao II era a primeira incompleta**

@@ -22,13 +22,28 @@ extends StaticBody2D
 ## (útil para não baralhar outras secções).
 @export var so_congela := false
 
+## Pele aprovada (Regiao III): se preenchida, o sino desenhado por poligonos
+## (Corpo/Aro/Brilho/Badalo) esconde-se e mostra-se este sprite. Vazio = igual
+## a sempre, e e' o que todos os outros niveis usam.
+@export var textura: Texture2D
+
 var _cd := 0.0
+var _pele: Sprite2D
 
 @onready var _badalo: Node2D = get_node_or_null("Badalo")
 
 
 func _ready() -> void:
 	add_to_group("sinos")
+	if textura != null:
+		for nome in ["Corpo", "Aro", "Brilho", "Badalo"]:
+			var n := get_node_or_null(nome) as CanvasItem
+			if n:
+				n.visible = false
+		_pele = Sprite2D.new()
+		_pele.texture = textura
+		_pele.position = Vector2(0.0, -2.0)
+		add_child(_pele)
 
 
 func _process(dt: float) -> void:
@@ -59,6 +74,13 @@ func tocar() -> void:
 	if som and som.has_method("toca"):
 		som.call("toca", "sino_mecanismo", -8.0, 1.0, 0.03,
 			recarga, "sino_mecanismo_%d" % get_instance_id())
+	if _pele:
+		var tp := create_tween()
+		tp.tween_property(_pele, "rotation", 0.14, 0.06)
+		tp.tween_property(_pele, "rotation", -0.1, 0.12)
+		tp.tween_property(_pele, "rotation", 0.0, 0.3).set_trans(Tween.TRANS_SINE)
+		_pele.modulate = Color(1.6, 1.5, 1.2)
+		create_tween().tween_property(_pele, "modulate", Color.WHITE, 0.4)
 	if _badalo:
 		var t := create_tween()
 		t.tween_property(_badalo, "rotation", 0.5, 0.06)

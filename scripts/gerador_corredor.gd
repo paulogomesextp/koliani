@@ -61,6 +61,11 @@ const PORTA_TRANCADA := preload("res://scenes/actors/PortaTrancada.tscn")
 const PAREDE_FRAGIL := preload("res://scenes/actors/ParedeFragil.tscn")
 const PAREDE_MOVEL := preload("res://scenes/actors/ParedeMovel.tscn")
 const SINO := preload("res://scenes/actors/SinoTorre.tscn")
+## Pele APROVADA da Regiao III (recortes do atlas, ja' em `deco/torres`) para os
+## actores do N12 -- so' o N12 os preenche, os outros niveis nao mudam.
+const SINO_M_TEX := preload("res://assets/sprites/pixel/deco/torres/sino_m.png")
+const VITRAL_INT_TEX := preload("res://assets/sprites/pixel/deco/torres/vitral_alto.png")
+const VITRAL_PART_TEX := preload("res://assets/sprites/pixel/deco/torres/vitral_partido.png")
 const VELA := preload("res://scenes/actors/Vela.tscn")
 const PLAT_LUZ := preload("res://scenes/actors/PlataformaLuz.tscn")
 const ESPELHO := preload("res://scenes/actors/Espelho.tscn")
@@ -826,6 +831,11 @@ var _rng := RandomNumberGenerator.new()
 ## tambem e' reproduzivel.
 var _rng_deco := RandomNumberGenerator.new()
 var _cont_i := 0
+## REGIAO III / N12 (indice 11) -- camaras que o contrato LOCKED lhe atribui,
+## por ordem. Fila so' do N12: nos outros niveis fica vazia e nada muda.
+var _n12_fila: Array[String] = []
+## Camaras geradas, por ordem (diagnostico e testes; nao afecta a geracao).
+var camaras_geradas: Array[String] = []
 
 ## Espaço mínimo (px) entre checkpoints da jornada. Antes havia um a cada
 ## ~2 plataformas (~380 px) -- eram MUITOS. Passa a haver um a cada ~4000 px
@@ -995,6 +1005,10 @@ func _construir() -> void:
 	_subida_max = SUBIDA_MAX if _idx >= NIVEL_SALTO_DUPLO else SUBIDA_SIMPLES
 	_rng.seed = hash("jornada4|%d" % _idx)
 	_rng_deco.seed = hash("deco4|%d" % _idx)
+	_n12_fila.clear()
+	if _regiao == 2 and _idx == 11:
+		_n12_fila = ["elevador", "escadas", "sinos_sync", "vitral", "quebra",
+			"vento_queda"]
 	_esp = especie_inimigo if especie_inimigo != "" else _especie_do_nivel()
 	# PERFIL DE FORMA deste nível (redesenho 2 set 2026): tendência vertical,
 	# foco de câmaras e abertura da banda -- cada nível com a sua "cara".
@@ -1283,6 +1297,13 @@ func _construir() -> void:
 				if f == ant_flavour:
 					f = pool[(_rng.randi() + 1) % pool.size()]
 				_pos_intenso = f in INTENSAS
+			# N12 (Regiao III): as camaras do contrato entram a`s escondidas do
+			# sorteio -- uma por cada camara da janela 10-80 % da jornada (so'
+			# ha' umas 8). Nao ha' NENHUM sorteio aqui, e so' corre com a fila
+			# cheia (N12).
+			if not _n12_fila.is_empty() and prog >= 0.10 and prog <= 0.80:
+				f = _n12_fila.pop_front()
+				_pos_intenso = false
 			ant_flavour = f
 			_tipos_usados[f] = true
 			if f == _estreia_cam and estreia_x == INF:
@@ -1502,12 +1523,21 @@ func _perigo_no_vao(par: Node2D, x: float, y: float) -> void:
 			s.tempo = _rng.randf_range(1.1, 1.7)
 			par.add_child(s)
 		2:
-			var f := FOGO.instantiate()
-			f.position = Vector2(x + 95.0, y + 6.0)
-			f.intervalo = 2.3 - 0.6 * _dif
-			f.dur_ativa = 0.8 + 0.5 * _dif
-			f.fase = _rng.randf() * 1.5
-			par.add_child(f)
+			if _regiao == 2 and _idx == 11:
+				# N12 (Regiao III): o contrato da' "laminas verticais RAPIDAS" e
+				# nao fogo. Mesma peca `Serra` do tipo 1, com o ciclo curto.
+				var sr := SERRA.instantiate()
+				sr.position = Vector2(x + 95.0, y - 20.0)
+				sr.percurso = Vector2(0.0, -_rng.randf_range(90.0, 130.0))
+				sr.tempo = _rng.randf_range(0.7, 0.95)
+				par.add_child(sr)
+			else:
+				var f := FOGO.instantiate()
+				f.position = Vector2(x + 95.0, y + 6.0)
+				f.intervalo = 2.3 - 0.6 * _dif
+				f.dur_ativa = 0.8 + 0.5 * _dif
+				f.fase = _rng.randf() * 1.5
+				par.add_child(f)
 
 
 ## Catálogo de decoração da região (`tools/gerar_deco.py`), lido uma vez.
@@ -1904,7 +1934,11 @@ func _flavour(par: Node2D, tipo: String, x: float, y: float) -> Vector2:
 		# e fica no NO', para o `tools/onde_esta_camara.gd` o poder ler --
 		# um `print` nao se apanha de dentro do Godot
 		_mapa_camaras.append([tipo, x])
+	camaras_geradas.append(tipo)
 	match tipo:
+		"escadas": return _f_escadas(par, x, y)
+		"sinos_sync": return _f_sinos_sync(par, x, y)
+		"vento_queda": return _f_vento_queda(par, x, y)
 		"saltos": return _f_saltos(par, x, y)
 		"serras": return _f_serras(par, x, y)
 		"pendulos": return _f_pendulos(par, x, y)
@@ -2449,11 +2483,16 @@ func _f_gruta(par: Node2D, x: float, y: float) -> Vector2:
 func _f_quebra(par: Node2D, x: float, y: float) -> Vector2:
 	var n := 6 + int(_dif * 4.0)
 	var cy := clampf(y, _chao_y - 300.0, _chao_y - 130.0)
+	var alto := _chao_y - 380.0
+	if _regiao == 2 and _idx == 11:
+		# N12: parte da altura em que a espinha chega (sem queda de 600 px)
+		alto = _teto_y + 300.0
+		cy = clampf(y, alto, _chao_y - 130.0)
 	_plat(par, Vector2(x + 80.0, cy), Vector2(70.0, 16.0))
 	x += 80.0
 	for i in n:
 		x += _rng.randf_range(140.0, 168.0)
-		cy = clampf(cy - _rng.randf_range(-70.0, 60.0), _chao_y - 380.0, _chao_y - 110.0)
+		cy = clampf(cy - _rng.randf_range(-70.0, 60.0), alto, _chao_y - 110.0)
 		var q := PLAT_QUEBRA.instantiate()
 		q.tamanho = Vector2(92.0, 16.0)
 		q.atraso = 0.72 - 0.3 * _dif
@@ -2488,6 +2527,10 @@ func _f_correntes(par: Node2D, x: float, y: float) -> Vector2:
 
 func _f_elevador(par: Node2D, x: float, y: float) -> Vector2:
 	var cy := clampf(y, _chao_y - 160.0, _chao_y - 90.0)
+	if _regiao == 2 and _idx == 11:
+		# N12: o elevador arranca da altura em que a espinha chega, em vez de a
+		# atirar 700 px para baixo (queda longa e cega) -- so' o N12 muda.
+		cy = clampf(y, _teto_y + 420.0, _chao_y - 90.0)
 	for i in 3:
 		x += _rng.randf_range(180.0, 210.0)
 		var tu := TUMULO.instantiate()
@@ -2520,6 +2563,106 @@ func _f_vento(par: Node2D, x: float, y: float) -> Vector2:
 	_plat(par, Vector2(x, cy), Vector2(100.0, 16.0))
 	_checkpoint(x, cy)
 	return Vector2(x, cy)
+
+
+## ESCADAS QUEBRADAS (N12, contrato LOCKED): uma escadaria a subir feita so' de
+## plataformas, com degraus a menos. Cada degrau sobe menos que o salto simples
+## (`SUBIDA_SIMPLES`); o degrau em falta abre um vao maior mas SEM subida.
+## Nao ha' ator novo nem sistema novo -- e' espacamento e verticalidade.
+func _f_escadas(par: Node2D, x: float, y: float) -> Vector2:
+	var n := 8
+	var passo_y := 50.0
+	var cy: float = clampf(y, _teto_y + 120.0 + passo_y * float(n), _chao_y - 110.0)
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(150.0, 18.0))
+	_checkpoint(x, cy, true)
+	for i in n:
+		var quebrado := i % 3 == 2      # 3.o, 6.o degrau: falta um pedaco
+		x += 138.0 if quebrado else 104.0
+		if not quebrado:
+			cy -= passo_y
+		_plat(par, Vector2(x, cy), Vector2(84.0, 16.0))
+		if i == 3:
+			_checkpoint(x, cy)
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(140.0, 18.0))
+	_checkpoint(x, cy, true)
+	return Vector2(x, cy)
+
+
+## SINOS DE SINCRONIZACAO (N12, contrato LOCKED): dois sinos, cada um dono da
+## SUA ponte. O primeiro acorda a ponte que leva a` ilha; o segundo, que esta'
+## na ilha, acorda a ponte da saida. A ordem e' a do percurso (nao se chega ao
+## segundo sem o primeiro) e o efeito e' legivel: o fantasma ténue fica solido
+## e opaco a` badalada, com a onda de eco do sino. Dois grupos independentes,
+## o cais e a ilha sao chao solido: falhar so' custa cair, voltar ao
+## checkpoint e bater outra vez -- sem softlock possivel.
+func _f_sinos_sync(par: Node2D, x: float, y: float) -> Vector2:
+	var cy: float = clampf(y, _teto_y + 200.0, _chao_y - 96.0)
+	x += _rng.randf_range(150.0, 176.0)
+	var grupo_a := "sino_sync_a_%d_%d" % [_idx, _cont_i]
+	var grupo_b := "sino_sync_b_%d_%d" % [_idx, _cont_i]
+	_plat(par, Vector2(x, cy), Vector2(180.0, 20.0), 40.0)
+	_checkpoint(x, cy, true)
+	var sa := SINO.instantiate()
+	sa.alterna_grupo = grupo_a
+	sa.congelar_inimigos = 0.0
+	sa.textura = SINO_M_TEX
+	sa.position = Vector2(x + 44.0, cy - 60.0)
+	par.add_child(sa)
+	for i in 3:
+		x += 158.0
+		_plat_fantasma(par, Vector2(x, cy - 30.0 - 16.0 * float(i % 2)),
+			Vector2(104.0, 16.0), grupo_a)
+	x += 158.0
+	_plat(par, Vector2(x, cy), Vector2(180.0, 20.0), 40.0)    # a ilha
+	_checkpoint(x, cy, true)
+	var sb := SINO.instantiate()
+	sb.alterna_grupo = grupo_b
+	sb.congelar_inimigos = 0.0
+	sb.textura = SINO_M_TEX
+	sb.position = Vector2(x + 44.0, cy - 60.0)
+	par.add_child(sb)
+	for i in 3:
+		x += 158.0
+		_plat_fantasma(par, Vector2(x, cy - 30.0 - 16.0 * float(i % 2)),
+			Vector2(104.0, 16.0), grupo_b)
+	x += 158.0
+	_plat(par, Vector2(x, cy), Vector2(140.0, 18.0))
+	_checkpoint(x, cy)
+	return Vector2(x, cy)
+
+
+## VENTO + QUEDA CONTROLADA (N12, contrato LOCKED, fluxo C): entra-se numa
+## `CorrenteAr` (updraft), corrige-se no ar para os degraus, sai-se para um
+## patamar e depois DESCE-SE por patamares largos, sem perigo nenhum, ate' uma
+## zona segura. A queda e' em degraus de ~120 px: ver onde se cai e' o exame.
+func _f_vento_queda(par: Node2D, x: float, y: float) -> Vector2:
+	x += 150.0
+	# parte da altura a que a espinha chega (max. ~420 px de queda), para nao
+	# atirar a jogadora para o fundo antes do fluxo de ar
+	var cy: float = clampf(y, _teto_y + 520.0, _chao_y - 80.0)
+	_plat(par, Vector2(x, cy), Vector2(110.0, 16.0))
+	_checkpoint(x, cy, true)
+	var ca := CORRENTE_AR.instantiate()
+	ca.position = Vector2(x + 150.0, cy - 240.0)
+	ca.scale = Vector2(3.2, 5.0)
+	par.add_child(ca)
+	for i in 4:
+		_plat(par, Vector2(x + 110.0 + float(i % 2) * 150.0,
+			cy - 100.0 - float(i) * 105.0), Vector2(96.0, 16.0))
+	x += 340.0
+	var hy: float = clampf(cy - 300.0, _teto_y + 120.0, _chao_y - 160.0)
+	_plat(par, Vector2(x, hy), Vector2(120.0, 16.0))
+	_checkpoint(x, hy, true)
+	# a descida: tres patamares largos, cada um ~120 px abaixo do anterior
+	var dy := hy
+	for i in 3:
+		x += 210.0
+		dy = minf(dy + 120.0, _chao_y - 90.0)
+		_plat(par, Vector2(x, dy), Vector2(150.0, 16.0))
+	_checkpoint(x, dy)
+	return Vector2(x, dy)
 
 
 func _f_gravidade(par: Node2D, x: float, y: float) -> Vector2:
@@ -2982,6 +3125,9 @@ func _f_vitral(par: Node2D, x: float, y: float) -> Vector2:
 	var vt := VITRAL.instantiate()
 	vt.grupo_luz = grupo
 	vt.cor_luz = _cor_luz_regiao()
+	if _regiao == 2 and _idx == 11:
+		vt.textura_inteiro = VITRAL_INT_TEX
+		vt.textura_partido = VITRAL_PART_TEX
 	vt.position = Vector2(x + 118.0, cy - 70.0)
 	par.add_child(vt)
 

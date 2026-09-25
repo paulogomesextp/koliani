@@ -162,6 +162,7 @@ func _correr_tudo() -> void:
 	teste_r3_assinatura_e_de_sinos()
 	teste_r3_bestiario_canonico()
 	await teste_r3_niveis_carregam()
+	await teste_r3_n12_contrato()
 	await teste_r3_vyrak_identidade()
 	await teste_r3_vyrak_leva_dano_muda_de_fase_e_morre()
 
@@ -3979,6 +3980,128 @@ func teste_r3_niveis_carregam() -> void:
 			"R3: o N%d devia ter a saida" % [11 + i])
 		raiz.queue_free()
 		await get_tree().process_frame
+
+
+func _nos_recursivos(raiz: Node) -> Array[Node]:
+	var fora: Array[Node] = []
+	var pilha: Array[Node] = [raiz]
+	while not pilha.is_empty():
+		var n: Node = pilha.pop_back()
+		fora.append(n)
+		for f in n.get_children():
+			pilha.append(f)
+	return fora
+
+
+func _fantasmas_do_grupo(raiz: Node, grupo: String) -> Array[Node]:
+	var fora: Array[Node] = []
+	for n in _nos_recursivos(raiz):
+		if n.is_in_group(grupo):
+			fora.append(n)
+	return fora
+
+
+func _col_desligada(p: Node) -> bool:
+	var col := p.get_node_or_null("Col") as CollisionShape2D
+	return col != null and col.disabled
+
+
+## N12 (Regiao III) -- contrato LOCKED: elevadores, escadas quebradas, 2 sinos de
+## sincronizacao, vitral interactivo, plataformas que desaparecem, vento e queda
+## controlada, e NENHUM fogo. Prova estrutura E efeito (a badalada / o vitral
+## partido tornam solidas as plataformas fantasma).
+func teste_r3_n12_contrato() -> void:
+	var raiz: Node = (load(EstadoJogo.NIVEIS[R3_BASE + 1]) as PackedScene).instantiate()
+	EstadoJogo.indice_nivel = R3_BASE + 1
+	get_tree().root.add_child(raiz)
+	var kol := raiz.get_node_or_null("Koliani")
+	if kol:
+		kol.set("_a_morrer", true)
+	for i in 4:
+		await get_tree().process_frame
+	var ger: Node = null
+	for n in raiz.get_children():
+		if "camaras_geradas" in n:
+			ger = n
+	_ok(ger != null, "R3/N12: falta o gerador de jornada")
+	var cams: Array = ger.get("camaras_geradas") if ger else []
+	for c in ["elevador", "escadas", "sinos_sync", "vitral", "quebra", "vento_queda"]:
+		_ok(cams.has(c), "R3/N12: a camara '%s' do contrato nao foi gerada" % c)
+	var nos := _nos_recursivos(raiz)
+	var sinos_sync: Array[Node] = []
+	var vitrais: Array[Node] = []
+	var n_fogo := 0
+	var n_quebra := 0
+	var n_corrente := 0
+	var n_elevador := 0
+	for n in nos:
+		var f := String(n.scene_file_path)
+		if n is SinoTorre and String((n as SinoTorre).alterna_grupo).begins_with("sino_sync_"):
+			sinos_sync.append(n)
+		elif n is Vitral:
+			vitrais.append(n)
+		if f.ends_with("/Fogo.tscn"):
+			n_fogo += 1
+		elif f.ends_with("/PlataformaQuebra.tscn"):
+			n_quebra += 1
+		elif f.ends_with("/CorrenteAr.tscn"):
+			n_corrente += 1
+		elif f.ends_with("/TumuloElevador.tscn"):
+			n_elevador += 1
+	_ok(n_fogo == 0, "R3/N12: sobrou fogo herdado (%d)" % n_fogo)
+	_ok(n_quebra >= 1, "R3/N12: faltam plataformas que desaparecem")
+	_ok(n_corrente >= 1, "R3/N12: falta a corrente de ar")
+	_ok(n_elevador >= 1, "R3/N12: faltam elevadores")
+	_ok(sinos_sync.size() >= 2, "R3/N12: sao precisos 2 sinos de sincronizacao (%d)" % sinos_sync.size())
+	_ok(vitrais.size() >= 1, "R3/N12: falta o vitral interactivo")
+	for v in vitrais:
+		_ok((v as Vitral).textura_inteiro != null, "R3/N12: o vitral devia usar a arte aprovada")
+
+	# EFEITO da badalada: as plataformas fantasma do sino ficam solidas
+	if sinos_sync.size() >= 2:
+		var grupo := String((sinos_sync[0] as SinoTorre).alterna_grupo)
+		var plats := _fantasmas_do_grupo(raiz, grupo)
+		_ok(plats.size() >= 3, "R3/N12: cada sino devia ter a sua ponte (%d)" % plats.size())
+		var todas_fantasma := true
+		for p in plats:
+			todas_fantasma = todas_fantasma and _col_desligada(p)
+		_ok(todas_fantasma, "R3/N12: a ponte devia arrancar fantasma")
+		(sinos_sync[0] as SinoTorre).receber_dano(1, 1.0)
+		for i in 3:
+			await get_tree().process_frame
+		var todas_solidas := true
+		for p in plats:
+			todas_solidas = todas_solidas and not _col_desligada(p)
+		_ok(todas_solidas, "R3/N12: a badalada devia tornar a ponte solida")
+		# o segundo sino manda na OUTRA ponte (ordem do percurso)
+		var outra := _fantasmas_do_grupo(raiz,
+			String((sinos_sync[1] as SinoTorre).alterna_grupo))
+		var outra_intacta := not outra.is_empty()
+		for p in outra:
+			outra_intacta = outra_intacta and _col_desligada(p)
+		_ok(outra_intacta, "R3/N12: o 1.o sino nao devia mexer na ponte do 2.o")
+		# bater outra vez desfaz (retry possivel)
+		(sinos_sync[0] as SinoTorre)._cd = 0.0
+		(sinos_sync[0] as SinoTorre).receber_dano(1, 1.0)
+		for i in 3:
+			await get_tree().process_frame
+		var voltou := true
+		for p in plats:
+			voltou = voltou and _col_desligada(p)
+		_ok(voltou, "R3/N12: uma 2.a badalada devia desfazer a ponte")
+	# EFEITO do vitral: partir acende a ponte de luz
+	if vitrais.size() >= 1:
+		var luz := _fantasmas_do_grupo(raiz, String((vitrais[0] as Vitral).grupo_luz))
+		_ok(luz.size() >= 3, "R3/N12: o vitral devia ter a sua ponte de luz")
+		(vitrais[0] as Vitral).receber_dano(1, 1.0)
+		for i in 3:
+			await get_tree().process_frame
+		var acesas := true
+		for p in luz:
+			acesas = acesas and not _col_desligada(p)
+		_ok(acesas, "R3/N12: partir o vitral devia tornar solida a ponte de luz")
+	raiz.queue_free()
+	await get_tree().process_frame
 
 
 func teste_r3_vyrak_identidade() -> void:
