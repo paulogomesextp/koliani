@@ -902,8 +902,6 @@ func _montar_golden_set(sf: SpriteFrames) -> void:
 	_substituir_run_por_nativo(sf)
 	# Estados de locomoção da 5G, agora montados com poses golden existentes.
 	# NB: saem do `run` que ficou montado acima (nativo, se existir).
-	_animacao_golden(sf, "turn", _frames_de(sf, "run", [0, 1, 2, 3]), 12.0, false)
-	_animacao_golden(sf, "run_start", _frames_de(sf, "run", [0, 1, 2, 3, 4, 5]), 12.0, false)
 	# 9H.18: o travao e a aterragem DAVAM UM POP. Medido em largura de
 	# silhueta: o `run_brake` ia do frame mais aberto do ciclo (57 px) para o
 	# `idle` (37 px) num unico frame de 71 ms -- 20 px de silhueta a
@@ -929,6 +927,10 @@ func _montar_golden_set(sf: SpriteFrames) -> void:
 	for i in 10:
 		run_final.append("%s/frames/run_final/run_%03d.png" % [GOLDEN_DIR, i + 1])
 	_animacao_golden(sf, "run", run_final, _KOLI_ANIMS_GOLDEN["run"][2], true)
+	# `turn` derivado do run_final (ja montado acima) -- nunca do run antigo.
+	_animacao_golden(sf, "turn", _frames_de(sf, "run", [0, 1, 2, 3]), 12.0, false)
+	# `run_start`: NAO USADO no fluxo (Idle -> run directo); fica definido a partir do run_final so por compatibilidade.
+	_animacao_golden(sf, "run_start", _frames_de(sf, "run", [0, 1, 2, 3, 4, 5]), 12.0, false)
 	_montar_vfx_golpe()
 
 
@@ -1878,11 +1880,7 @@ func _anim_locomocao_piloto_5g(sf: SpriteFrames) -> String:
 			return "turn"
 		if _corpo.animation == &"turn" and _corpo.is_playing():
 			return "turn"
-		if not _piloto_5g_em_movimento:
-			_piloto_5g_em_movimento = true
-			return "run_start"
-		if _corpo.animation == &"run_start" and _corpo.is_playing():
-			return "run_start"
+		_piloto_5g_em_movimento = true
 		return "run"
 
 	if _piloto_5g_em_movimento:

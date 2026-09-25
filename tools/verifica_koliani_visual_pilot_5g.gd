@@ -63,7 +63,7 @@ func _ready() -> void:
 			koliani.set_process(false)
 			koliani.velocity.x = 100.0
 			koliani.call("_atualizar_anim")
-			_ok(corpo.animation == &"run_start", "arranque não escolheu run_start")
+			_ok(corpo.animation == &"run", "arranque deve ir directo a run (run_start legado fora do fluxo)")
 			corpo.stop()
 			koliani.call("_atualizar_anim")
 			_ok(corpo.animation == &"run", "fim de run_start não passou a run")
