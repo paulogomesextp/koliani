@@ -806,10 +806,13 @@ func e_camera_queda() -> void:
 	cam.zoom = Vector2(1.4, 1.4)
 	var meia_alt: float = 360.0 / cam.zoom.y
 	teleporta_altura(900.0)
+	# como se tivesse saido de uma borda a 900 px do chao: o "ultimo chao estavel" da camara e' o ponto de partida
+	cam.set("_chao_y", k.global_position.y)
 	var tr: Array = []
 	var pouso := -1
 	var vis := -1
 	var max_off := 0.0
+	var off_max := 0.0
 	var cy_ini := 0.0
 	for i in 140:
 		var s := await paso([])
@@ -820,6 +823,7 @@ func e_camera_queda() -> void:
 		if vis < 0 and CHAO_Y <= cy + meia_alt:
 			vis = i
 		max_off = maxf(max_off, (s["y"] + 24.0) - (cy + meia_alt))
+		off_max = maxf(off_max, cam.offset.y)
 		if s["chao"]:
 			pouso = i
 			break
@@ -827,8 +831,44 @@ func e_camera_queda() -> void:
 		"tick_chao_visivel": vis, "tick_pouso": pouso,
 		"chao_visivel_antes_do_impacto_s": snappedf(float(pouso - vis) / 60.0, 0.01) if vis >= 0 else -1.0,
 		"pes_fora_do_ecra_px_max": snappedf(max_off, 0.1),
+		"look_ahead_y_max_px": snappedf(off_max, 0.1),
 		"camera_y_inicial": cy_ini, "zoom": cam.zoom.y,
 		"suavizacao": cam.position_smoothing_enabled}
+
+
+## Look-ahead vertical em saltos e quedas curtas: nao pode disparar (so' a
+## velocidade proxima da terminal o leva ao maximo) e tem de voltar a ~0.
+func _off_camera(acoes_salto: int, altura: float) -> Dictionary:
+	await nova(0.0)
+	var cam: Camera2D = k.get_node("Camera2D")
+	cam.zoom = Vector2(1.4, 1.4)
+	if altura > 0.0:
+		teleporta_altura(altura)
+		cam.set("_chao_y", k.global_position.y)
+	var mx := -1e9
+	var mn := 1e9
+	var fim := 0.0
+	for i in 200:
+		var ac: Array = []
+		if i < acoes_salto:
+			ac.append("saltar")
+		await paso(ac)
+		mx = maxf(mx, cam.offset.y)
+		mn = minf(mn, cam.offset.y)
+		if i > 30 and k.is_on_floor():
+			for j in 90:
+				await paso([])
+			fim = cam.offset.y
+			break
+	return {"offset_max_px": snappedf(mx, 0.1), "offset_min_px": snappedf(mn, 0.1),
+		"offset_depois_de_pousar_1_5s_px": snappedf(fim, 0.1)}
+
+
+func e_camera_contexto() -> void:
+	R["camera_contexto"] = {"salto_normal": await _off_camera(40, 0.0),
+		"salto_curto": await _off_camera(4, 0.0),
+		"queda_curta_100px": await _off_camera(0, 100.0),
+		"queda_media_250px": await _off_camera(0, 250.0)}
 
 
 func _tenta_vao(yA: float, dy: float, vao: float, off: float, duplo: bool) -> bool:
@@ -997,8 +1037,16 @@ func _regressao() -> Array:
 	var pg: float = R["pogo"]["altura_ressalto_px"][1]
 	chk.call(pg >= 45.0 and pg <= 65.0, "pogo %.1f px fora de 45-65" % pg)
 	chk.call(pg / alt >= 0.35 and pg / alt <= 0.5, "pogo/salto %.2f fora de 0,35-0,5" % (pg / alt))
-	chk.call(float(R["camera_queda"]["chao_visivel_antes_do_impacto_s"]) >= 0.35,
-		"chao so visivel %.2f s antes do impacto" % R["camera_queda"]["chao_visivel_antes_do_impacto_s"])
+	chk.call(float(R["camera_queda"]["chao_visivel_antes_do_impacto_s"]) >= 0.6,
+		"chao so visivel %.2f s antes do impacto (barra 0,6)" % R["camera_queda"]["chao_visivel_antes_do_impacto_s"])
+	var cc: Dictionary = R["camera_contexto"]
+	for kk in ["salto_normal", "salto_curto", "queda_curta_100px"]:
+		chk.call(float(cc[kk]["offset_max_px"]) <= 75.0, "camera: %s com look-ahead %.0f px (queda so' em quedas rapidas)" % [kk, cc[kk]["offset_max_px"]])
+	for kk in cc:
+		chk.call(absf(float(cc[kk]["offset_depois_de_pousar_1_5s_px"])) <= 3.0, "camera: %s nao regressou ao enquadramento (%.1f px)" % [kk, cc[kk]["offset_depois_de_pousar_1_5s_px"]])
+	# parede de 900 px sem escalar_paredes nao se escala: so' a altura do salto
+	chk.call(float(R["walljump"]["sem_skill"]["altura_maxima_da_cadeia_px"]) <= 140.0,
+		"parede de 900 px escalada sem a habilidade (%.1f px)" % R["walljump"]["sem_skill"]["altura_maxima_da_cadeia_px"])
 	# ANIMAÇÃO (passagem 2): brake segue a física, turn sem flicker, land curto a correr
 	var brake_ticks := 0
 	for r in R["desaceleracao"]["anims"]:
@@ -1064,7 +1112,7 @@ func _correr() -> void:
 	if regressao:
 		_reg_env = true
 		filtro = PackedStringArray(["salto", "queda", "ar", "coyote", "buffer", "dash",
-			"roll", "latencia", "roll_spam", "pogo", "camera", "envolvente", "mantle", "walljump", "desaceleracao", "viragem",
+			"roll", "latencia", "roll_spam", "pogo", "camera", "camera_contexto", "envolvente", "mantle", "walljump", "desaceleracao", "viragem",
 			"aterragem"])
 	elif args.size() > 1 and args[1] != "":
 		filtro = args[1].split(",")
@@ -1074,7 +1122,7 @@ func _correr() -> void:
 		"queda": e_queda, "ar": e_ar, "coyote": e_coyote, "buffer": e_buffer,
 		"aterragem": e_aterragem, "dash": e_dash, "roll": e_roll,
 		"latencia": e_latencia, "roll_spam": e_roll_spam, "pogo": e_pogo,
-		"camera": e_camera_queda, "envolvente": e_envolvente, "mantle": e_borda_mantle, "walljump": e_walljump,
+		"camera": e_camera_queda, "camera_contexto": e_camera_contexto, "envolvente": e_envolvente, "mantle": e_borda_mantle, "walljump": e_walljump,
 	}
 	for nome in todas:
 		if _quer(nome, filtro):
