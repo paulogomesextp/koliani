@@ -90,6 +90,7 @@ func _correr_tudo() -> void:
 	teste_execution_9c_kit_ambiente_regiao1()
 	await teste_execution_9h7_fundo_regiao1()
 	await teste_offscreen_hazards()
+	await teste_offscreen_global()
 	teste_execution_9d_inimigos_regiao1()
 	teste_9d9e_crias_sem_goblin()
 	teste_9e2_coracao_producao_e_fases()
@@ -4733,3 +4734,109 @@ func teste_offscreen_hazards() -> void:
 			bolas += 1
 	_ok(bolas == 0, "offscreen: torreta fora do ecra disparou projetil")
 	t.queue_free()
+
+
+## Regra global offscreen (alem de `teste_offscreen_hazards`): zona extensa,
+## zoom da camara, vento, elevador (navegacao: simula mas cala), inimigo que
+## ataca so' a' vista.
+func teste_offscreen_global() -> void:
+	var vp := get_viewport().get_visible_rect().size
+	var dentro := Vector2(vp.x * 0.5, vp.y * 0.5)
+	var fora := Vector2(vp.x * 3.0, 100.0)
+	Som.parar_lacos(0.0)
+	# 1) origem extensa: basta uma parte no campo visual; toda fora nao conta
+	var no := Node2D.new()
+	add_child(no)
+	no.global_position = Vector2(vp.x + 100.0, dentro.y)
+	_ok(Som.em_vista_area(no, Vector2(200.0, 50.0)), "offscreen: area que invade o ecra tem de contar")
+	_ok(not Som.em_vista_area(no, Vector2(50.0, 50.0)), "offscreen: area toda fora contou como visivel")
+	# 2) zoom da camara: a mesma posicao deixa de estar visivel com zoom 2x
+	var cam := Camera2D.new()
+	add_child(cam)
+	cam.global_position = dentro
+	cam.make_current()
+	await get_tree().physics_frame
+	await get_tree().physics_frame
+	await get_tree().process_frame
+	no.global_position = dentro + Vector2(vp.x * 0.4, 0.0)
+	_ok(Som.em_vista(no), "offscreen: zoom 1x, ponto a 40% do ecra devia estar visivel")
+	cam.zoom = Vector2(2.0, 2.0)
+	await get_tree().physics_frame
+	await get_tree().physics_frame
+	await get_tree().process_frame
+	_ok(not Som.em_vista(no), "offscreen: zoom 2x, o mesmo ponto devia estar fora do campo visual")
+	cam.zoom = Vector2.ONE
+	await get_tree().physics_frame
+	await get_tree().physics_frame
+	await get_tree().process_frame
+	no.queue_free()
+	# 3) zona de vento: sem laco nem rajada fora do ecra
+	var zv := (load("res://scenes/actors/WindZone.tscn") as PackedScene).instantiate() as WindZone
+	add_child(zv)
+	zv.global_position = fora
+	zv._pedir_ambiente()
+	_ok(not zv._laco_pedido and Som.lacos_ativos() == 0, "offscreen: vento fora do ecra abriu laco")
+	zv.global_position = dentro
+	await get_tree().process_frame
+	zv._pedir_ambiente()
+	_ok(zv._laco_pedido and Som.lacos_ativos() == 1, "offscreen: vento a' vista devia abrir o laco")
+	zv._parar_ambiente()
+	zv.queue_free()
+	Som.parar_lacos(0.0)
+	# 4) elevador: simula (move-se) mas so' soa a' vista. Corpo com
+	# `sync_to_physics` nao se teletransporta: nasce no sitio e move-se a camara.
+	var ev := (load("res://scenes/actors/TumuloElevador.tscn") as PackedScene).instantiate()
+	ev.set("auto", true)
+	ev.position = dentro
+	add_child(ev)
+	cam.global_position = dentro + Vector2(vp.x * 4.0, 0.0)  # camara longe: elevador fora
+	await get_tree().physics_frame
+	await get_tree().physics_frame
+	await get_tree().process_frame
+	var y0: float = ev.global_position.y
+	for i in 40:
+		await get_tree().physics_frame
+	_ok(absf(ev.global_position.y - y0) > 5.0, "offscreen: elevador fora do ecra deixou de se mover (quebra o percurso)")
+	_ok(Som.lacos_ativos() == 0, "offscreen: elevador fora do ecra abriu laco")
+	cam.global_position = dentro
+	await get_tree().physics_frame
+	await get_tree().physics_frame
+	await get_tree().process_frame
+	for i in 30:
+		await get_tree().physics_frame
+	_ok(Som.em_vista(ev) and Som.lacos_ativos() == 1, "offscreen: elevador a' vista devia ter o laco de marcha")
+	cam.global_position = dentro + Vector2(vp.x * 4.0, 0.0)
+	for i in 30:
+		await get_tree().physics_frame
+	_ok(Som.lacos_ativos() == 0, "offscreen: laco do elevador continuou depois de sair do ecra")
+	ev.queue_free()
+	Som.parar_lacos(0.0)
+	cam.global_position = dentro
+	await get_tree().physics_frame
+	await get_tree().physics_frame
+	# 5) inimigo (mergulho do voador): fora do ecra nao inicia ataque; a' vista sim
+	var kf := Node2D.new()
+	kf.add_to_group("koliani")
+	add_child(kf)
+	var m := (load("res://scenes/actors/DemonioBase.tscn") as PackedScene).instantiate() as DemonioBase
+	m.comportamento = "voador"
+	add_child(m)
+	m.global_position = fora
+	kf.global_position = fora + Vector2(120.0, 0.0)
+	var iniciou := false
+	for i in 120:
+		await get_tree().physics_frame
+		if m._windup > 0.0 or m._mergulho > 0.0:
+			iniciou = true
+	_ok(not iniciou, "offscreen: inimigo fora do ecra iniciou um ataque")
+	m.global_position = dentro
+	kf.global_position = dentro + Vector2(120.0, 0.0)
+	for i in 240:
+		await get_tree().physics_frame
+		if m._windup > 0.0 or m._mergulho > 0.0:
+			iniciou = true
+	_ok(iniciou, "offscreen: inimigo a' vista nunca atacou (o teste nao morde)")
+	m.queue_free()
+	kf.queue_free()
+	cam.queue_free()
+

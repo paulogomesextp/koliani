@@ -172,6 +172,8 @@ func _ao_sair(corpo: Node) -> void:
 func _rajada(corpo: Node) -> void:
 	if _som == null or not _som.has_method("toca"):
 		return
+	if not _a_vista():
+		return  # origem fora do campo visual: nao se ouve o que nao se ve
 	if not ativa or multiplicador_atual() <= 0.0:
 		return  # zona desligada / a meio do intervalo do pulso: nao ha' o que anunciar
 	var agora := Time.get_ticks_msec() * 0.001
@@ -185,8 +187,16 @@ func _rajada(corpo: Node) -> void:
 		RECARGA_RAJADA, "vento_rajada_%d" % id)
 
 
+## Regra global offscreen: a zona so' soa se alguma parte dela esta' no campo
+## visual da camara (sem margem). Fisica e empurrao continuam a simular.
+func _a_vista() -> bool:
+	return _som != null and _som.has_method("em_vista_area") 		and bool(_som.call("em_vista_area", self, tamanho * 0.5))
+
+
 func _pedir_ambiente() -> void:
 	if _laco_pedido or _som == null or not _som.has_method("laco"):
+		return
+	if not _a_vista():
 		return
 	_laco_pedido = _som.call("laco", LACO_VENTO, -26.0, 0.9)
 

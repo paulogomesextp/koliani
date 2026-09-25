@@ -835,7 +835,7 @@ func _physics_process(dt: float) -> void:
 				atordoar(0.4)
 			return
 		var alvo_c := _dir_koliani_perto(320.0)
-		if alvo_c != 0.0 and _acao_cd <= 0.0 and is_on_floor():
+		if alvo_c != 0.0 and _acao_cd <= 0.0 and is_on_floor() and Som.em_vista(self):
 			_direcao = alvo_c
 			if _sprite:
 				_sprite.scale.x = _direcao
@@ -899,7 +899,7 @@ func _physics_process(dt: float) -> void:
 				move_and_slide()
 			return
 		var kv := get_tree().get_first_node_in_group("koliani")
-		if kv and _acao_cd <= 0.0:
+		if kv and _acao_cd <= 0.0 and Som.em_vista(self):
 			var d: Vector2 = (kv as Node2D).global_position - global_position
 			if d.length() < 300.0:
 				_dive_dir = d.normalized()

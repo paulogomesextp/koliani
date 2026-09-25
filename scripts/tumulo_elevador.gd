@@ -69,35 +69,44 @@ func _physics_process(dt: float) -> void:
 ## a laje ou anda ou nao anda, e chegar ao topo nao e' um evento (volta a
 ## descer assim que a Koliani sai).
 func _som_marcha(anda: bool) -> void:
-	if anda == _andava or _som == null:
+	if _som == null:
+		return
+	if anda and _andava:
+		# regra global offscreen: o laco e' POR elevador e so' existe a' vista
+		# (o `Som` funde-o sozinho quando o actor sai do campo visual); ao
+		# voltar a' vista retoma-se aqui, sem som retroactivo.
+		if _som.has_method("laco_actor"):
+			_som.call("laco_actor", self, LACO_MARCHA, -24.0, 0.35)
+		return
+	if anda == _andava:
 		return
 	_andava = anda
 	if anda:
+		# navegacao: continua a mover-se, mas em silencio fora do campo visual
+		if not _a_vista():
+			return
 		if _som.has_method("toca"):
 			_som.call("toca", "mecanismo", -15.0, 0.80, 0.03,
 				0.5, "elevador_%d" % get_instance_id())
-		if _som.has_method("laco"):
-			_som.call("laco", LACO_MARCHA, -24.0, 0.35)
+		if _som.has_method("laco_actor"):
+			_som.call("laco_actor", self, LACO_MARCHA, -24.0, 0.35)
 	else:
 		_parar_marcha()
 
 
-## O batente no fim do curso + fechar o laco. Nunca deixa o laco aberto: e'
-## chamado tanto ao parar como ao sair da arvore, e o `Som` so' fecha o canal
-## quando o ULTIMO elevador o larga.
+## O batente no fim do curso + fechar o laco (so' o DESTE elevador).
+func _a_vista() -> bool:
+	return _som != null and _som.has_method("em_vista") and bool(_som.call("em_vista", self))
+
+
 func _parar_marcha() -> void:
 	if _som == null:
 		return
-	if _som.has_method("toca"):
+	if _som.has_method("toca") and _a_vista():
 		_som.call("toca", "mecanismo", -17.0, 0.62, 0.03,
 			0.5, "elevador_fim_%d" % get_instance_id())
-	if not _som.has_method("parar_laco"):
-		return
-	if is_inside_tree():
-		for outro in get_tree().get_nodes_in_group("tumulos"):
-			if outro != self and is_instance_valid(outro) and outro.get("_andava"):
-				return
-	_som.call("parar_laco", LACO_MARCHA, 0.3)
+	if _som.has_method("parar_laco_actor"):
+		_som.call("parar_laco_actor", self, LACO_MARCHA, 0.3)
 
 
 func _exit_tree() -> void:

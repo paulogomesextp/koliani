@@ -143,6 +143,6 @@ func _process(dt: float) -> void:
 ## Toca pelo CAMINHO do autoload, para a classe continuar a compilar em
 ## `--script` (onde os autoloads nao existem e as bancadas correm).
 func _tocar(nome: String, db: float, pitch: float) -> void:
-	if _som and _som.has_method("toca"):
+	if _som and _som.has_method("toca") and _som.call("em_vista", self):
 		_som.call("toca", nome, db, pitch, 0.05,
 			0.25, "%s_%d" % [nome, get_instance_id()])

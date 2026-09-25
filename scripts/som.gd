@@ -495,6 +495,22 @@ func em_vista(actor: Node2D, margem := 0.0) -> bool:
 	return rect.grow(margem).has_point(canvas * actor.global_position)
 
 
+## Como `em_vista`, mas para uma origem EXTENSA (zona de vento, etc.): basta
+## que o rectangulo `meio_tamanho` (metade da largura/altura, em px de mundo,
+## centrado no actor) intersecte o campo visual. Ignora rotacao/escala.
+func em_vista_area(actor: Node2D, meio_tamanho: Vector2, margem := 0.0) -> bool:
+	if actor == null or not is_instance_valid(actor) or not actor.is_inside_tree():
+		return false
+	var viewport := actor.get_viewport()
+	if viewport == null:
+		return false
+	var canvas := viewport.get_canvas_transform()
+	var centro := canvas * actor.global_position
+	var meio := Vector2(absf(canvas.x.x), absf(canvas.y.y)) * meio_tamanho
+	var rect := Rect2(Vector2.ZERO, viewport.get_visible_rect().size).grow(margem)
+	return rect.intersects(Rect2(centro - meio, meio * 2.0))
+
+
 ## Suspende o chamador ate' o actor entrar no campo visual e depois espera
 ## `graca` s -- o hazard recomeca de uma fase segura e o telegrafo que se segue
 ## e' sempre visto ANTES do dano. Devolve true se teve de esperar (o chamador
