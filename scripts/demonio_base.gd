@@ -867,7 +867,7 @@ func _physics_process(dt: float) -> void:
 				Som.toca_actor(self, "salto", -20.0, 0.68)
 				move_and_slide()
 			return
-		if _acao_cd <= 0.0 and is_on_floor():
+		if _acao_cd <= 0.0 and is_on_floor() and Som.em_vista(self):
 			var alvo_s := _dir_koliani_perto(230.0)
 			if alvo_s != 0.0:
 				_direcao = alvo_s
@@ -951,7 +951,7 @@ func _physics_process(dt: float) -> void:
 				_acao_cd = randf_range(1.8, 2.8)
 				atordoar(0.35)  # recuo do cuspo -> janela curta de castigo
 			return
-		if _acao_cd <= 0.0 and is_on_floor():
+		if _acao_cd <= 0.0 and is_on_floor() and Som.em_vista(self):
 			var kk := get_tree().get_first_node_in_group("koliani")
 			if kk:
 				var d: Vector2 = (kk as Node2D).global_position - global_position

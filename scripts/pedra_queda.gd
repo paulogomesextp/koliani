@@ -113,7 +113,11 @@ func _physics_process(dt: float) -> void:
 					and k.global_position.y > global_position.y - 20.0:
 				arma = true
 			if automatico:
-				_t += dt
+				# fora do campo visual o relogio pára: nada racha nem cai la'
+				if _som and _som.call("em_vista", self):
+					_t += dt
+				else:
+					_t = 0.0
 				if _t >= periodo:
 					arma = true
 			if arma:
@@ -179,6 +183,6 @@ func _repor() -> void:
 ## Cooldown por instancia: `automatico = true` repete de `periodo` em
 ## `periodo` e duas pedras vizinhas devem poder soar juntas.
 func _tocar(nome: String, db: float, pitch: float) -> void:
-	if _som and _som.has_method("toca"):
-		_som.call("toca", nome, db, pitch, 0.07,
+	if _som and _som.has_method("toca_actor"):
+		_som.call("toca_actor", self, nome, db, pitch, 0.07,
 			0.3, "%s_%d" % [nome, get_instance_id()])

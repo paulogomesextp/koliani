@@ -56,6 +56,9 @@ func _loop_auto() -> void:
 	if fase > 0.0:
 		await get_tree().create_timer(fase).timeout
 	while is_instance_valid(self):
+		await Som.esperar_vista(self)
+		if not is_instance_valid(self):
+			return
 		await _telegrafar()
 		if not is_instance_valid(self):
 			return

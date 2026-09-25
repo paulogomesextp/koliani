@@ -73,6 +73,11 @@ func _montar_visual() -> void:
 
 
 func _process(dt: float) -> void:
+	# fora do campo visual a torreta nao arma nem dispara: o ciclo recomeca
+	# (com telegrafo) quando volta a estar a' vista
+	if not Som.em_vista(self):
+		_prox = maxf(_prox, maxf(0.6, intervalo))
+		return
 	_prox -= dt
 	var carga := clampf(1.0 - _prox / maxf(0.05, telegrafo), 0.0, 1.0) if _prox < telegrafo else 0.0
 	if _brasa:

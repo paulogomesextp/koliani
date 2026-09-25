@@ -480,6 +480,35 @@ func actor_visivel(actor: Node2D) -> bool:
 	return rect.grow(1.0).has_point(canvas * actor.global_position)
 
 
+## AUTORIDADE UNICA de "isto esta' a' vista da camara?" para hazards e mecanicas
+## ofensivas (sem distancia arbitraria ao jogador). Usa a Camera2D/viewport
+## reais, por isso serve qualquer resolucao/zoom e esquerda/direita. `margem`
+## (px de ecra) so' alarga o rectangulo -- 0 para audio e ataques.
+func em_vista(actor: Node2D, margem := 0.0) -> bool:
+	if actor == null or not is_instance_valid(actor) or not actor.is_inside_tree():
+		return false
+	var viewport := actor.get_viewport()
+	if viewport == null:
+		return false
+	var canvas := viewport.get_canvas_transform()
+	var rect := Rect2(Vector2.ZERO, viewport.get_visible_rect().size)
+	return rect.grow(margem).has_point(canvas * actor.global_position)
+
+
+## Suspende o chamador ate' o actor entrar no campo visual e depois espera
+## `graca` s -- o hazard recomeca de uma fase segura e o telegrafo que se segue
+## e' sempre visto ANTES do dano. Devolve true se teve de esperar (o chamador
+## deve descartar o tempo que "venceu" fora do ecra).
+func esperar_vista(actor: Node, graca := 0.35) -> bool:
+	var esperou := false
+	while is_instance_valid(actor) and actor.is_inside_tree() and not em_vista(actor as Node2D):
+		esperou = true
+		await get_tree().create_timer(0.1).timeout
+	if esperou and is_instance_valid(actor) and graca > 0.0:
+		await get_tree().create_timer(graca).timeout
+	return esperou
+
+
 ## Quantos lacos estao mesmo a tocar. E' o numero que o harness conta.
 func lacos_ativos() -> int:
 	var n := 0

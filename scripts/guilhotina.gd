@@ -38,6 +38,9 @@ func _ready() -> void:
 
 func _ciclo() -> void:
 	while is_instance_valid(self):
+		await Som.esperar_vista(self)
+		if not is_instance_valid(self):
+			return
 		await cair()
 		await get_tree().create_timer(periodo).timeout
 

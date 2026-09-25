@@ -89,6 +89,7 @@ func _correr_tudo() -> void:
 	teste_execution_9b4_pacote_golden_sem_legado()
 	teste_execution_9c_kit_ambiente_regiao1()
 	await teste_execution_9h7_fundo_regiao1()
+	await teste_offscreen_hazards()
 	teste_execution_9d_inimigos_regiao1()
 	teste_9d9e_crias_sem_goblin()
 	teste_9e2_coracao_producao_e_fases()
@@ -4655,3 +4656,80 @@ func teste_rootbound_frame() -> void:
 	_ok(e.equipado_na_categoria("hud_checkpoint") == "" and not e.item_equipado(RB), "rootbound: desequipar restaura o default")
 	e.free()
 	f.free()
+
+
+## Hazards e SFX de mecanicas fora do campo visual: nada ataca nem soa la';
+## ao entrar, o primeiro ataque so' chega depois de um telegrafo visto.
+func teste_offscreen_hazards() -> void:
+	var vp := get_viewport().get_visible_rect().size
+	var fora := Vector2(vp.x * 3.0, 100.0)
+	var dentro := Vector2(vp.x * 0.5, vp.y * 0.5)
+	var no := Node2D.new()
+	add_child(no)
+	no.global_position = dentro
+	_ok(Som.em_vista(no), "offscreen: ponto no centro tem de estar em vista")
+	no.global_position = fora
+	_ok(not Som.em_vista(no), "offscreen: ponto a 3 viewports (direita) esta' em vista")
+	no.global_position = Vector2(-vp.x * 2.0, 100.0)
+	_ok(not Som.em_vista(no), "offscreen: ponto a' esquerda esta' em vista")
+	no.global_position = dentro
+	no.global_position = fora
+	_ok(not Som.toca_actor(no, "raiz_aviso"), "offscreen: SFX de actor fora do ecra tocou")
+	no.queue_free()
+
+	var cena: PackedScene = load("res://scenes/actors/Guilhotina.tscn")
+	var g := cena.instantiate() as Guilhotina
+	g.automatico = true
+	g.fase = 0.0
+	g.atraso = 0.5
+	g.periodo = 1.0
+	add_child(g)
+	g.global_position = fora
+	var y0: float = g.get_node("Lamina").position.y
+	var atacou := false
+	for i in 150:
+		await get_tree().physics_frame
+		if g.monitoring or absf(g.get_node("Lamina").position.y - y0) > 1.0:
+			atacou = true
+	_ok(not atacou, "offscreen: guilhotina fora do ecra iniciou o ataque")
+	# entra no campo visual: nao pode estar ja a meio de uma queda, e o primeiro
+	# dano so' chega depois do telegrafo (atraso 0.5 s)
+	g.global_position = dentro
+	var dano_cedo := false
+	for i in 20:  # ~0,33 s
+		await get_tree().physics_frame
+		if g.monitoring:
+			dano_cedo = true
+	_ok(not dano_cedo, "offscreen: ao entrar em vista a guilhotina feriu antes do telegrafo")
+	var acabou := false
+	for i in 180:
+		await get_tree().physics_frame
+		if g.monitoring:
+			acabou = true
+	_ok(acabou, "offscreen: guilhotina em vista nunca atacou")
+	# sai e volta: recomeca do estado seguro
+	g.global_position = fora
+	for i in 120:
+		await get_tree().physics_frame
+	g.global_position = dentro
+	var instantaneo := false
+	for i in 12:
+		await get_tree().physics_frame
+		if g.monitoring:
+			instantaneo = true
+	_ok(not instantaneo, "offscreen: reentrada disparou instantaneamente")
+	g.queue_free()
+
+	var t := (load("res://scenes/actors/Torreta.tscn") as PackedScene).instantiate()
+	add_child(t)
+	t.global_position = fora
+	t.set("intervalo", 0.6)
+	var antes := get_child_count()
+	for i in 240:
+		await get_tree().physics_frame
+	var bolas := 0
+	for c in get_children():
+		if c is BolaFogo:
+			bolas += 1
+	_ok(bolas == 0, "offscreen: torreta fora do ecra disparou projetil")
+	t.queue_free()
