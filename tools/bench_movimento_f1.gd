@@ -24,6 +24,14 @@ const ACOES := ["mover_esquerda", "mover_direita", "saltar", "dash", "rolar",
 const R_ESQ := ["mover_esquerda"]
 const R_DIR := ["mover_direita"]
 
+## Alvo mínimo para o pisão/pogo: o `koliani.gd` só exige o grupo "inimigos"
+## e o método `receber_dano`.
+class Alvo extends Node2D:
+	var golpes := 0
+	func receber_dano(_d = 0, _e = 0.0, _c = false) -> void:
+		golpes += 1
+
+
 signal _fim_frame
 
 var k: Node = null
@@ -33,6 +41,7 @@ var _procs := 0
 var _fisicos := 0
 var rest_y := 0.0
 var R := {}
+var _reg_env := false
 
 
 func _ready() -> void:
@@ -94,7 +103,7 @@ func passos(n: int, acoes: Array = []) -> Array:
 	return out
 
 
-func nova(x: float, habilidades: Array = ["dash", "pogo"]) -> void:
+func nova(x: float, habilidades: Array = ["dash", "pogo"], y: float = CHAO_Y - 30.0) -> void:
 	_premir([])
 	if k != null and is_instance_valid(k):
 		k.queue_free()
@@ -104,7 +113,7 @@ func nova(x: float, habilidades: Array = ["dash", "pogo"]) -> void:
 	k = KOLI.instantiate()
 	k.usar_golden_set = true
 	mundo.add_child(k)
-	k.global_position = Vector2(x, CHAO_Y - 30.0)
+	k.global_position = Vector2(x, y)
 	for _i in 45:
 		await paso([])
 	rest_y = k.global_position.y
@@ -672,6 +681,178 @@ func e_latencia() -> void:
 	R["latencia_input"] = r
 
 
+func e_roll_spam() -> void:
+	var r := {}
+	for modo in ["parada", "lancada"]:
+		await nova(0.0)
+		if modo == "lancada":
+			await passos(45, R_DIR)
+		var x0: float = k.global_position.x
+		var tr_run := await passos(180, R_DIR)
+		var d_run: float = tr_run[-1]["x"] - x0
+		await nova(0.0)
+		if modo == "lancada":
+			await passos(45, R_DIR)
+		x0 = k.global_position.x
+		var n_rolls := 0
+		var ant := false
+		var tr_roll: Array = []
+		for i in 180:
+			var s := await paso(R_DIR + (["rolar"] if i % 2 == 0 else []))
+			tr_roll.append(s)
+			var ativo: bool = s["rolar"] > 0.0
+			if ativo and not ant:
+				n_rolls += 1
+			ant = ativo
+		var d_roll: float = tr_roll[-1]["x"] - x0
+		r[modo] = {"correr_3s_px": snappedf(d_run, 0.1), "roll_spam_3s_px": snappedf(d_roll, 0.1),
+			"rolls": n_rolls, "razao_roll_sobre_correr": snappedf(d_roll / d_run, 0.001)}
+	R["roll_spam"] = r
+
+
+func e_pogo() -> void:
+	# pisão num alvo parado: mede a altura do ressalto e o encadeamento
+	await nova(0.0)
+	var alvo := Alvo.new()
+	alvo.add_to_group("inimigos")
+	alvo.global_position = Vector2(k.global_position.x, CHAO_Y - 30.0)
+	mundo.add_child(alvo)
+	teleporta_altura(160.0)
+	var tr: Array = []
+	var toques: Array = []
+	var golpes_ant := 0
+	for i in 200:
+		tr.append(await paso([]))
+		if alvo.golpes != golpes_ant:
+			golpes_ant = alvo.golpes
+			toques.append(i)
+	var apexes: Array = []
+	# altura de cada ressalto: do ponto do toque ao mínimo de y antes do toque seguinte
+	for j in toques.size():
+		var a: int = toques[j]
+		var b: int = toques[j + 1] if j + 1 < toques.size() else tr.size()
+		var ymin := 1e9
+		for i in range(a, b):
+			ymin = minf(ymin, tr[i]["y"])
+		apexes.append(snappedf(tr[a]["y"] - ymin, 0.1))
+	R["pogo"] = {"toques_ticks": toques, "altura_ressalto_px": apexes,
+		"stomp_ressalto_const": Koliani.STOMP_RESSALTO,
+		"intervalo_toques_ticks": toques[1] - toques[0] if toques.size() > 1 else -1}
+	alvo.queue_free()
+
+
+func e_camera_queda() -> void:
+	await nova(0.0)
+	var cam: Camera2D = k.get_node("Camera2D")
+	# o headless tem um viewport maior que 1280x720 e o zoom automático sobe: fixa-se o de 16:9
+	cam.zoom = Vector2(1.4, 1.4)
+	var meia_alt: float = 360.0 / cam.zoom.y
+	teleporta_altura(900.0)
+	var tr: Array = []
+	var pouso := -1
+	var vis := -1
+	var max_off := 0.0
+	var cy_ini := 0.0
+	for i in 140:
+		var s := await paso([])
+		tr.append(s)
+		var cy: float = cam.get_screen_center_position().y
+		if i == 0:
+			cy_ini = cy
+		if vis < 0 and CHAO_Y <= cy + meia_alt:
+			vis = i
+		max_off = maxf(max_off, (s["y"] + 24.0) - (cy + meia_alt))
+		if s["chao"]:
+			pouso = i
+			break
+	R["camera_queda"] = {"altura_px": 900, "meia_altura_mundo_px": meia_alt,
+		"tick_chao_visivel": vis, "tick_pouso": pouso,
+		"chao_visivel_antes_do_impacto_s": snappedf(float(pouso - vis) / 60.0, 0.01) if vis >= 0 else -1.0,
+		"pes_fora_do_ecra_px_max": snappedf(max_off, 0.1),
+		"camera_y_inicial": cy_ini, "zoom": cam.zoom.y,
+		"suavizacao": cam.position_smoothing_enabled}
+
+
+func _tenta_vao(yA: float, dy: float, vao: float, off: float, duplo: bool) -> bool:
+	var xa0 := -2800.0
+	var larg := 220.0
+	var pa := _bloco_devolve(Vector2(xa0, yA), Vector2(xa0 + larg, yA + 24.0))
+	var xb0 := xa0 + larg + vao
+	var pb := _bloco_devolve(Vector2(xb0, yA - dy), Vector2(xb0 + 700.0, yA - dy + 24.0))
+	var hab: Array = ["dash", "pogo"] + (["salto_duplo"] if duplo else [])
+	await nova(xa0 + 20.0, hab, yA - 30.0)
+	var ponta := xa0 + larg
+	var saltou := false
+	var ok := false
+	var t_apex := -1
+	for i in 260:
+		var ac: Array = R_DIR.duplicate()
+		if not saltou and k.global_position.x >= ponta - off:
+			saltou = true
+		if saltou:
+			if not duplo or t_apex < 0:
+				if k.velocity.y <= 0.0:
+					ac.append("saltar")
+				elif duplo:
+					t_apex = 0
+			else:
+				# duplo: 1 tick solto e depois volta a premir enquanto sobe
+				if t_apex >= 1 and k.velocity.y <= 0.0 + (0.0 if t_apex > 1 else 1e9):
+					ac.append("saltar")
+				t_apex += 1
+		var s := await paso(ac)
+		if saltou and s["chao"] and s["x"] > ponta:
+			ok = absf(s["y"] - (yA - dy - 30.0)) < 30.0
+			break
+		if s["y"] > yA + 200.0:
+			break
+	pa.queue_free()
+	pb.queue_free()
+	return ok
+
+
+func _bloco_devolve(a: Vector2, b: Vector2) -> Node:
+	_bloco(a, b)
+	return mundo.get_child(mundo.get_child_count() - 1)
+
+
+func _alguma(yA: float, dy: float, vao: float, duplo: bool) -> bool:
+	for off in [26.0, 60.0, 100.0, 140.0]:
+		if await _tenta_vao(yA, dy, vao, off, duplo):
+			return true
+	return false
+
+
+## vão máximo (passos de 10 px) por subida; pesquisa binária com 4 pontos de salto
+func _vao_max(yA: float, dy: float, duplo: bool) -> float:
+	if not await _alguma(yA, dy, 0.0, duplo):
+		return -1.0
+	var lo := 0.0
+	var hi := 640.0
+	while hi - lo > 10.0:
+		var mid := snappedf((lo + hi) * 0.5, 10.0)
+		if mid <= lo:
+			mid = lo + 10.0
+		if await _alguma(yA, dy, mid, duplo):
+			lo = mid
+		else:
+			hi = mid
+	return lo
+
+
+func e_envolvente() -> void:
+	var yA := 300.0
+	var simples := {}
+	var duplo := {}
+	var dys_s := [-140.0, -60.0, 0.0, 64.0, 100.0, 140.0] if _reg_env else [-300.0, -240.0, -140.0, -60.0, 0.0, 40.0, 64.0, 80.0, 100.0, 120.0, 140.0, 160.0, 180.0, 200.0]
+	var dys_d := [-60.0, 0.0, 100.0, 180.0] if _reg_env else [-300.0, -240.0, -140.0, -60.0, 0.0, 64.0, 100.0, 140.0, 180.0, 200.0, 220.0, 260.0]
+	for dy in dys_s:
+		simples["dy_%d" % int(dy)] = await _vao_max(yA, dy, false)
+	for dy in dys_d:
+		duplo["dy_%d" % int(dy)] = await _vao_max(yA, dy, true)
+	R["envolvente_salto"] = {"simples": simples, "duplo": duplo}
+
+
 func e_animacoes_estaticas() -> void:
 	await nova(0.0)
 	var sf: SpriteFrames = k._corpo.sprite_frames
@@ -704,26 +885,104 @@ func e_animacoes_estaticas() -> void:
 	R["animacoes_estaticas"] = out
 
 
+## Limites da Passagem 1 (aprovados pelo GM, 25 set 2026). Cada linha é um
+## critério de PASS; a bancada é a única fonte dos números.
+func _regressao() -> Array:
+	var falhas: Array = []
+	var chk := func(ok: bool, msg: String) -> void:
+		if not ok:
+			falhas.append(msg)
+	var salto: Array = R["salto"]["por_ticks_premido"]
+	var alt: float = salto[-1]["altura_px"]
+	chk.call(alt >= 125.0 and alt <= 135.0, "altura do salto %.1f fora de 125-135" % alt)
+	# corte UM só: depois de cortado, cada tick só muda pela gravidade (< 40 px/s)
+	var vc: Array = R["salto"]["vy_por_tick_toque_3"]
+	for i in range(4, 9):
+		chk.call(absf(float(vc[i]) - float(vc[i - 1])) < 40.0,
+			"jump cut multiplicado por tick (vy %.1f -> %.1f no tick %d)" % [vc[i - 1], vc[i], i])
+	var vcheio: Array = R["salto"]["vy_por_tick_cheio"]
+	var apex := 0
+	for v in vcheio:
+		if absf(float(v)) < 60.0 and float(v) != 0.0:
+			apex += 1
+	chk.call(apex >= 6 and apex <= 14, "janela de apex de %d ticks fora de 6-14" % apex)
+	chk.call(float(R["queda"]["vy_max"]) <= 755.0, "velocidade terminal %.0f > 750" % R["queda"]["vy_max"])
+	chk.call(int(R["coyote"]["coyote_efetivo_ticks"]) == 6, "coyote %d != 6" % R["coyote"]["coyote_efetivo_ticks"])
+	chk.call(int(R["buffer"]["buffer_efetivo_ticks"]) >= 7, "buffer %d < 7" % R["buffer"]["buffer_efetivo_ticks"])
+	var ac: int = int(R["air_control"]["aceleracao"]["tick_vx_max_no_ar"]) - 3
+	var pa: int = int(R["air_control"]["desaceleracao"]["tick_vx_zero"]) - 3
+	var iv: int = int(R["air_control"]["viragem"]["tick_vx_menos_max_apos_3"])
+	chk.call(ac >= 8 and ac <= 10, "acelerar no ar %d ticks fora de 8-10" % ac)
+	chk.call(pa >= 10 and pa <= 12, "parar no ar %d ticks fora de 10-12" % pa)
+	chk.call(iv >= 10 and iv <= 12, "inverter no ar %d ticks fora de 10-12" % iv)
+	var dr: Dictionary = R["dash"]["repouso"]
+	chk.call(int(dr["tick_1a_velocidade_dash"]) == 0, "dash sem resposta no mesmo tick")
+	var n620 := 0
+	for v in dr["vx_por_tick"]:
+		if float(v) == Koliani.VEL_DASH:
+			n620 += 1
+	chk.call(n620 == 10, "burst do dash com %d ticks (esperado 10)" % n620)
+	chk.call(float(dr["distancia_ate_parar_px"]) <= 130.0, "dash desliza: %.1f px ate parar" % dr["distancia_ate_parar_px"])
+	var voltou := 99
+	var vxc: Array = R["dash"]["a_correr"]["vx_por_tick"]
+	for i in range(3, vxc.size()):
+		if float(vxc[i]) <= 241.0:
+			voltou = i
+			break
+	chk.call(voltou <= 12, "dash a correr so volta a 240 ao tick %d" % voltou)
+	chk.call(int(R["latencia_input"]["roll_1a_velocidade"]) == 0, "roll sem resposta no mesmo tick")
+	chk.call(Koliani.VEL_ROLAR > Movimento.VEL_CORRIDA, "o roll deixou de ser mais rapido que correr")
+	for m in ["parada", "lancada"]:
+		var rz: float = R["roll_spam"][m]["razao_roll_sobre_correr"]
+		chk.call(rz <= 1.0, "roll spam (%s) transporta mais que correr: razao %.3f" % [m, rz])
+		chk.call(rz >= 0.85, "roll spam (%s) punitivo: razao %.3f" % [m, rz])
+	var pg: float = R["pogo"]["altura_ressalto_px"][1]
+	chk.call(pg >= 45.0 and pg <= 65.0, "pogo %.1f px fora de 45-65" % pg)
+	chk.call(pg / alt >= 0.35 and pg / alt <= 0.5, "pogo/salto %.2f fora de 0,35-0,5" % (pg / alt))
+	chk.call(float(R["camera_queda"]["chao_visivel_antes_do_impacto_s"]) >= 0.35,
+		"chao so visivel %.2f s antes do impacto" % R["camera_queda"]["chao_visivel_antes_do_impacto_s"])
+	# envolvente nunca pode ENCOLHER face ao baseline da passagem 1 (tolerancia 10 px)
+	var ref_f := FileAccess.open("res://docs/qa/f1_movimento/f1_envolvente_antes_depois.json", FileAccess.READ)
+	if ref_f:
+		var ref: Dictionary = JSON.parse_string(ref_f.get_as_text())["depois"]
+		for tier in ["simples", "duplo"]:
+			for k in R["envolvente_salto"][tier]:
+				if ref[tier].has(k) and float(ref[tier][k]) >= 0.0:
+					var atual: float = R["envolvente_salto"][tier][k]
+					chk.call(atual >= float(ref[tier][k]) - 10.0,
+						"envolvente %s %s encolheu: %.0f < %.0f" % [tier, k, atual, ref[tier][k]])
+	return falhas
+
+
+func _quer(nome: String, filtro: PackedStringArray) -> bool:
+	return filtro.is_empty() or nome in filtro
+
+
 func _correr() -> void:
 	_arena()
 	await _fim_frame
 	var args := OS.get_cmdline_user_args()
 	var saida: String = args[0] if args.size() > 0 else ProjectSettings.globalize_path(
 		"res://work/f1_movimento.json")
-	await e_animacoes_estaticas()
-	await e_aceleracao()
-	await e_desaceleracao()
-	await e_viragem()
-	await e_salto()
-	await e_queda()
-	await e_ar()
-	await e_coyote()
-	await e_buffer()
-	await e_aterragem()
-	await e_dash()
-	await e_roll()
-	await e_latencia()
-	await e_borda_mantle()
+	var filtro: PackedStringArray = PackedStringArray()
+	var regressao := args.size() > 1 and args[1] == "regressao"
+	if regressao:
+		_reg_env = true
+		filtro = PackedStringArray(["salto", "queda", "ar", "coyote", "buffer", "dash",
+			"roll", "latencia", "roll_spam", "pogo", "camera", "envolvente"])
+	elif args.size() > 1 and args[1] != "":
+		filtro = args[1].split(",")
+	var todas := {
+		"animacoes": e_animacoes_estaticas, "aceleracao": e_aceleracao,
+		"desaceleracao": e_desaceleracao, "viragem": e_viragem, "salto": e_salto,
+		"queda": e_queda, "ar": e_ar, "coyote": e_coyote, "buffer": e_buffer,
+		"aterragem": e_aterragem, "dash": e_dash, "roll": e_roll,
+		"latencia": e_latencia, "roll_spam": e_roll_spam, "pogo": e_pogo,
+		"camera": e_camera_queda, "envolvente": e_envolvente, "mantle": e_borda_mantle,
+	}
+	for nome in todas:
+		if _quer(nome, filtro):
+			await (todas[nome] as Callable).call()
 	R["harness"] = {"frames_fisicos": _fisicos, "frames_process": _procs,
 		"fps_fisica": Engine.physics_ticks_per_second,
 		"constantes": {
@@ -739,4 +998,11 @@ func _correr() -> void:
 		f.store_string(JSON.stringify(R, "  "))
 		f.close()
 	print("bancada F1 -> ", saida)
+	if regressao:
+		var falhas := _regressao()
+		for f2 in falhas:
+			printerr("REGRESSAO F1 FALHOU: ", f2)
+		print("REGRESSAO F1: %d falha(s)" % falhas.size())
+		get_tree().quit(1 if not falhas.is_empty() else 0)
+		return
 	get_tree().quit(0)

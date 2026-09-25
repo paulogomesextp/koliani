@@ -69,8 +69,8 @@ static func executar() -> Array[String]:
 		h.velocidade, Vector2(2000.0, 0.0), 420.0, DT)
 	_verificar(falhas, h_vel.x > h.velocidade.x and is_equal_approx(h_vel.y, h.velocidade.y),
 		"H: vento lateral em planar empurra só na horizontal")
-	# vento contra 1600: mais forte do que a aceleração aérea (1350) mas não do
-	# que a viragem no ar (1800) -- a segurar em frente o planar ENCALHA à
+	# vento contra 1600: mais forte do que a aceleração aérea (1440) mas não do
+	# que a viragem no ar (4500) -- a segurar em frente o planar ENCALHA à
 	# volta de vx 0; sem direção recua até velocidade_max
 	var hc := _novo_no_ar(Vector2(MovimentoScript.VEL_CORRIDA, MovimentoScript.VEL_PLANAR))
 	for _i in int(1.5 / DT):

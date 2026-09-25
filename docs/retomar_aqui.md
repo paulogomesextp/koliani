@@ -1,3 +1,25 @@
+# >>> PONTO DE RETOMA ACTUAL — F1 Passagem 1 feita, PARADO antes da Passagem 2 (25 set 2026) <<<
+
+Física / game feel core aplicada e medida: `docs/f1_passagem1.md` (BEFORE→AFTER completo). Salto 82,9→127,5 px,
+corte único, apex 9 ticks, terminal 750, ar 9/11/11 ticks, dash no mesmo tick (deslize 186→121 px), roll com
+recuperação (spam 3 s = ×0,98 de correr), pogo 36→56 px (mesma proporção 0,44), câmara 0,27→0,38 s (barra 0,6 ✘).
+Regressão em teste: `tools/correr_regressao_movimento.ps1` (0 falhas; 25 no código antigo). Suite e 13
+verificadores verdes, save real intacto. **Commit local, SEM push** (pedido do GM).
+
+**PARAR — decisão do GM antes da Passagem 2:** a envolvente nova (salto simples: vão 180→230, subida máx. ~140→200
+com agarrar-borda; duplo: vão 300→390) abre atalhos sobre as ajudas dos níveis (trampolim/elevador/impulsor):
+46/99 níveis ganham plataformas alcançáveis (1 725/15 635) e 8 portas passam a alcançar-se só a saltar
+(N3, N15, N16, N20, N46, N49, N56, N60). Nada ficou inalcançável. Opções A/B/C em `docs/f1_passagem1.md`.
+Passagem 2 (mantle determinístico + landing/brake/turn) NÃO iniciada; commit separado quando avançar.
+
+Armadilhas desta passagem: (1) `ACEL_AR` tem de ficar entre 1440 e as rajadas contra da Região II (1500/1600),
+com `VIRAGEM_AR` acima — 1750 partiu `test_glide_region02`; (2) `verifica_alcance` usa números fixos e não vê
+mudanças de física — usar `tools/comparar_alcance_f1.gd`; (3) modelar descidas só até −60 px dava falsos
+"atalhos" (N3): medir e extrapolar as descidas fundas; (4) pilotos de envolvente com B estreito dão
+"impossível" por ultrapassagem no salto duplo (B tem de ser largo).
+
+---
+
 # >>> PONTO DE RETOMA ACTUAL — F1 diagnóstico de movimento feito (25 set 2026) <<<
 
 **Ler primeiro.** O GM fechou #5 (Região I = **Floresta Corrompida**, boss regional **Coração Putrefacto**)

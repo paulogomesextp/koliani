@@ -1,3 +1,8 @@
+> **F1 Passagem 1 feita (25 set 2026, commit local sem push)** — `docs/f1_passagem1.md`. **À espera do GM:**
+> a física nova abre atalhos sobre as ajudas dos níveis (8 portas alcançáveis só a saltar, incl. N3 da Região I).
+> Escolher A (manter 128 px e desenhar N1–N5 para a envolvente nova), B (salto ~110 px) ou C (limitar o mantle
+> na Passagem 2). Só depois arranca a Passagem 2 (mantle + landing/brake/turn).
+
 > **F1 diagnóstico de movimento (25 set 2026)** — `docs/f1_movimento_diagnostico.md`. Decidido pelo GM:
 > #5 Floresta Corrompida + Coração Putrefacto; #12 verbos opção A (Dash N2, Pogo N3, Especial N4, sem
 > wall-kick). **Pendente de decisão:** aprovar as alterações recomendadas de F1 (P0: salto 82,9→125–135 px,

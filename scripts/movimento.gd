@@ -16,21 +16,35 @@ extends RefCounted
 const GRAVIDADE := 1400.0
 const GRAVIDADE_SUBIDA := 1.0
 const GRAVIDADE_QUEDA := 1.22
-const VEL_MAX_QUEDA := 1100.0
+## F1 passagem 1: teto de queda 1100 -> 750 (GM). Sem fast-fall por agora.
+const VEL_MAX_QUEDA := 750.0
 const VEL_CORRIDA := 240.0
 const ACEL_CHAO := 2300.0
 const DESACEL_CHAO := 2200.0
 const VIRAGEM_CHAO := 3600.0
-const ACEL_AR := 1350.0
-const DESACEL_AR := 1050.0
-const VIRAGEM_AR := 1800.0
-const FORCA_SALTO := 470.0
+## F1 passagem 1: controlo aéreo mais firme mas não igual ao chão (medido a
+## 60 Hz: acelerar 9 ticks, parar 11, inverter 11; antes 10 / 13 / 18).
+## ATENÇÃO: `ACEL_AR` tem de ficar ABAIXO das rajadas contra da Região II
+## (1500 na A_Cela_Zero, 1600 no Corredor_das_Execucoes) e `VIRAGEM_AR` acima
+## delas -- é isso que faz a rajada "encalhar" quem segura em frente
+## (tests/test_glide_region02.gd, caso H). Com 1750 a rajada deixava de travar.
+const ACEL_AR := 1440.0
+const DESACEL_AR := 1300.0
+const VIRAGEM_AR := 4500.0
+## F1 passagem 1: 470 -> 584 px/s = ~129 px de salto (alvo GM 125-135, centro
+## ~128), já com a meia-gravidade do apex.
+const FORCA_SALTO := 584.0
 const COYOTE := 0.10          # segundos
 const BUFFER_SALTO := 0.12    # segundos
-const CORTE_SALTO := 0.45     # fração da velocidade vertical mantida ao largar
+const CORTE_SALTO := 0.45     # fração da velocidade vertical mantida ao largar (UMA vez por salto)
+## Meia-gravidade perto do apex de um SALTO (não de uma queda de rebordo):
+## abaixo deste |vy| a gravidade vale `APEX_GRAVIDADE`.
+const APEX_LIMIAR := 60.0
+const APEX_GRAVIDADE := 0.5
 const ATERRAGEM_LEVE := 180.0
 const ATERRAGEM_MEDIA := 430.0
-const ATERRAGEM_PESADA := 760.0
+## 760 -> 700: com o teto de queda a 750 o tier 3 deixava de ser alcançável.
+const ATERRAGEM_PESADA := 700.0
 ## PLANAR (habilidade "planar", nível 63): a descer, com o botão de saltar
 ## a segurar, a queda fica presa a este tecto em vez do `VEL_MAX_QUEDA`.
 ## Não é voar -- é cair devagar, e por isso o vão que se atravessa a planar
@@ -46,6 +60,15 @@ class Estado:
 	## Saltos já gastos desde que saiu do chão (o 1.º salto conta mesmo
 	## quando é feito no coyote time). Volta a 0 ao tocar no chão.
 	var saltos_dados := 0
+	## Estamos num SALTO (não numa queda de rebordo): vale a meia-gravidade do
+	## apex. Limpa ao tocar no chão.
+	var em_salto := false
+	## Este salto ainda está a SUBIR por causa do impulso do salto (limpa
+	## quando `vy` passa a descer). É o que distingue o jump cut de UM só
+	## corte da subida por forças externas (corrente de ar), que mantém o
+	## corte por tick de antes.
+	var salto_subindo := false
+	var corte_feito := false
 
 
 ## `saltos_max` = quantos saltos a Koliani pode encadear no ar antes de
@@ -66,6 +89,9 @@ static func passo(e: Estado, direcao: float, saltar_premido: bool, saltar_a_segu
 	if no_chao:
 		e.coyote_restante = COYOTE
 		e.saltos_dados = 0
+		e.em_salto = false
+		e.salto_subindo = false
+		e.corte_feito = false
 	else:
 		e.coyote_restante = maxf(0.0, e.coyote_restante - dt)
 	e.buffer_restante = maxf(0.0, e.buffer_restante - dt)
@@ -102,6 +128,9 @@ static func passo(e: Estado, direcao: float, saltar_premido: bool, saltar_a_segu
 	var pode_saltar_ar := e.saltos_dados > 0 and e.saltos_dados < saltos_max
 	if e.buffer_restante > 0.0 and (pode_saltar_chao or pode_saltar_ar):
 		e.velocidade.y = -FORCA_SALTO * sinal_grav
+		e.em_salto = true
+		e.salto_subindo = true
+		e.corte_feito = false
 		e.buffer_restante = 0.0
 		e.coyote_restante = 0.0
 		e.saltos_dados += 1
@@ -109,12 +138,26 @@ static func passo(e: Estado, direcao: float, saltar_premido: bool, saltar_a_segu
 	# gravidade (grav_escala < 1 = "gravidade lunar" do Observatório, nível
 	# 14; sinal_grav = -1 = gravidade invertida, nível 67)
 	if not no_chao:
+		var g_esc := grav_escala
+		if e.em_salto and absf(e.velocidade.y) < APEX_LIMIAR:
+			g_esc *= APEX_GRAVIDADE
 		e.velocidade.y = aplicar_gravidade(
-			e.velocidade.y, dt, grav_escala, sinal_grav)
+			e.velocidade.y, dt, g_esc, sinal_grav)
 
-	# corte de salto (`* sinal_grav` = "a subir", seja qual for o lado)
-	if e.velocidade.y * sinal_grav < 0.0 and not saltar_a_segurar:
-		e.velocidade.y *= CORTE_SALTO
+	# corte de salto (`* sinal_grav` = "a subir", seja qual for o lado). Num
+	# salto o corte é UM só (multiplica a velocidade uma vez ao largar o
+	# botão); a subida que não vem do salto (corrente de ar) continua a ser
+	# cortada a cada tick, como antes.
+	var a_subir := e.velocidade.y * sinal_grav < 0.0
+	if a_subir and not saltar_a_segurar:
+		if e.salto_subindo:
+			if not e.corte_feito:
+				e.velocidade.y *= CORTE_SALTO
+				e.corte_feito = true
+		else:
+			e.velocidade.y *= CORTE_SALTO
+	if e.velocidade.y * sinal_grav >= 0.0:
+		e.salto_subindo = false
 
 	# planar: a cair, com o botão a segurar, a queda prende-se ao tecto
 	# baixo. Vem DEPOIS do corte de salto de propósito -- ao contrário, o

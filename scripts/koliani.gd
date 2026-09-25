@@ -31,7 +31,15 @@ const VEL_VOO := 560.0
 const VEL_DASH := 620.0
 const DUR_DASH := 0.16
 const RECARGA_DASH := 0.55
-const VEL_ROLAR := 360.0
+## F1 passagem 1: o roll continua a ser um burst mais rápido que correr (340 vs
+## 240), mas paga uma recuperação lenta no fim -- assim repetir rolls NÃO
+## transporta mais do que correr (o roll ganha pela evasão, não pelo transporte).
+const VEL_ROLAR := 320.0
+const ROLAR_REC_DUR := 0.20         # janela de recuperação depois do rolamento
+const ROLAR_REC_VEL := 40.0         # teto de velocidade no chão nessa janela
+const ROLAR_REC_DESACEL := 4500.0   # curva de desaceleração até esse teto
+const DASH_SAIDA_DESACEL := 12000.0 # fim do dash: 620 -> corrida em ~2 ticks
+const DASH_SAIDA_DUR := 0.1
 const DUR_ROLAR := 0.30
 
 ## PASSOS e RASPAR NA PAREDE (4 set 2026, pedido do Paulo: "faca um set de
@@ -42,7 +50,7 @@ const DUR_ROLAR := 0.30
 const INTERVALO_PASSO := 0.32
 const VEL_PASSO_REF := Movimento.VEL_CORRIDA
 const INTERVALO_PAREDE := 0.22
-const RECARGA_ROLAR := 0.45
+const RECARGA_ROLAR := 0.5
 ## Janela logo a seguir a um rolamento em que o próximo golpe é CRÍTICO
 ## (pegada Dead Cells: rolar por dentro do inimigo e rematar).
 const POS_ROLL_JANELA := 0.28
@@ -198,6 +206,9 @@ const I_FRAMES := 0.6
 ## desenhado; o Paulo pediu METADE (3 set 2026). A 0.7x fica abaixo de um
 ## salto normal: chega para encadear pisões e para se afastar do bicho,
 ## sem perder o ecrã de vista.
+## F1 passagem 1: fórmula INALTERADA (0,7). Medido: o ressalto passa de 36 para
+## ~56 px, e continua a ser ~43 % da altura do salto (era 43 %). Ver
+## docs/f1_passagem1.md.
 const STOMP_RESSALTO := Movimento.FORCA_SALTO * 0.7
 ## Defesa (habilidade "escudo"): anda-se devagar de escudo erguido; um
 ## ataque que venha de frente é bloqueado (sem dano) com um som subtil.
@@ -280,6 +291,8 @@ var _avanco_vel := 0.0
 ## "corte de salto" do Movimento -- ver `aplicar_impulso`.
 var _impulso_externo_t := 0.0
 var _rolar_recarga := 0.0
+var _rolar_rec_t := 0.0
+var _dash_saida_t := 0.0
 var _ataque_restante := 0.0
 ## Duração do golpe atual (varia por passo do combo -- ver `DUR_COMBO`).
 var _ataque_dur := DUR_ATAQUE
@@ -1324,6 +1337,7 @@ func _pinta(n: Node, c: Color) -> void:
 func _physics_process(dt: float) -> void:
 	_dash_recarga = maxf(0.0, _dash_recarga - dt)
 	_rolar_recarga = maxf(0.0, _rolar_recarga - dt)
+	_rolar_rec_t = maxf(0.0, _rolar_rec_t - dt)
 	_pos_roll_t = maxf(0.0, _pos_roll_t - dt)
 	_invulneravel = maxf(0.0, _invulneravel - dt)
 	_impulso_externo_t = maxf(0.0, _impulso_externo_t - dt)
@@ -1536,6 +1550,7 @@ func _physics_process(dt: float) -> void:
 		_rolar_restante -= dt
 		if _rolar_restante <= 0.0:
 			_pos_roll_t = POS_ROLL_JANELA   # abre a janela de crítico pós-rolamento
+			_rolar_rec_t = ROLAR_REC_DUR
 		velocity.x = _olha_para * VEL_ROLAR
 		if not is_on_floor():
 			velocity.y = Movimento.aplicar_gravidade(
@@ -1544,6 +1559,8 @@ func _physics_process(dt: float) -> void:
 		_dash_restante -= dt
 		velocity.x = _olha_para * VEL_DASH
 		velocity.y = 0.0
+		if _dash_restante <= 0.0:
+			_dash_saida_t = DASH_SAIDA_DUR
 	elif _defendendo:
 		# escudo erguido: anda-se devagar, sem saltar/dash/rolar
 		velocity.x = move_toward(velocity.x, dir * VEL_DEFESA, Movimento.ACEL_CHAO * dt)
@@ -1555,8 +1572,11 @@ func _physics_process(dt: float) -> void:
 		_mov.velocidade = velocity
 	elif Input.is_action_just_pressed("rolar") and Movimento.pode_rolar(
 			_rolar_recarga, is_on_floor(), _rolar_restante, _dash_restante):
-		_rolar_restante = DUR_ROLAR
+		# a velocidade vale no PRÓPRIO tick do input (antes só no seguinte);
+		# o tick do gatilho conta como o 1.º do burst
+		_rolar_restante = DUR_ROLAR - dt
 		_rolar_recarga = RECARGA_ROLAR
+		velocity.x = _olha_para * VEL_ROLAR
 		Som.toca("rolamento", -13.0, 1.0, 0.04)
 		if Vfx9G.ativo(self):
 			Vfx9G.tocar(self, "roll_dodge", global_position + Vector2(0.0, 6.0 * _sinal_grav),
@@ -1572,8 +1592,12 @@ func _physics_process(dt: float) -> void:
 		# Ataque -> Dash corta recovery e a janela física antes de arrancar.
 		if _ataque_restante > 0.0:
 			_cancelar_ataque()
-		_dash_restante = DUR_DASH
+		# idem: velocidade no próprio tick, e o tick do gatilho conta como o 1.º
+		_dash_restante = DUR_DASH - dt
+		_dash_saida_t = 0.0
 		_dash_recarga = RECARGA_DASH
+		velocity.x = _olha_para * VEL_DASH
+		velocity.y = 0.0
 		_acender_aura(0.8)
 		_sfx_dash()
 		_vfx9g_dash()
@@ -1587,6 +1611,14 @@ func _physics_process(dt: float) -> void:
 		# ela já está a cair -- planar nunca acrescenta subida.
 		var planar_pedido := Input.is_action_pressed("saltar") \
 			and pode_planar() and _hurt_t <= 0.0
+		# fim do dash: a velocidade horizontal volta por uma curva curta a uma
+		# velocidade de corrida (antes deslizava 82 px a decair de 620)
+		if _dash_saida_t > 0.0:
+			_dash_saida_t -= dt
+			if absf(_mov.velocidade.x) > Movimento.VEL_CORRIDA:
+				_mov.velocidade.x = move_toward(_mov.velocidade.x,
+					signf(_mov.velocidade.x) * Movimento.VEL_CORRIDA,
+					DASH_SAIDA_DESACEL * dt)
 		_mov = Movimento.passo(
 			_mov, dir,
 			Input.is_action_just_pressed("saltar"),
@@ -1598,6 +1630,11 @@ func _physics_process(dt: float) -> void:
 		_planando = planar_pedido and not is_on_floor() \
 			and _mov.velocidade.y * _sinal_grav > 0.0
 		velocity = _mov.velocidade
+		# recuperação do rolamento: no chão a velocidade desce por uma curva
+		# até um teto baixo durante `ROLAR_REC_DUR`
+		if _rolar_rec_t > 0.0 and is_on_floor() and absf(velocity.x) > ROLAR_REC_VEL:
+			velocity.x = move_toward(velocity.x, signf(velocity.x) * ROLAR_REC_VEL,
+				ROLAR_REC_DESACEL * dt)
 		if _mov.saltos_dados > saltos_antes:
 			Som.toca("koliani_salto",
 				-10.0, 1.0, 0.03)
