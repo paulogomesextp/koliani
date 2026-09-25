@@ -1,3 +1,7 @@
+> **N3 autoral feito (26 set 2026, sem push)** -- `docs/nivel_autoral_n3.md`: Pogo (ressalto automatico em espinhos/inimigos) ensinado em tufos de dano baixo,
+> combinado com Dash e raizes, desafio final e guardiao inalterado. **A aguardar playtest do GM**: legibilidade dos espinhos, duracao (estimada 3-4 min),
+> pogo sem input proprio (decidir se se quer ataque descendente com botao). N4 NAO comecado.
+
 > **N2 autoral feito (26 set 2026, sem push)** -- `docs/nivel_autoral_n2.md`: o Dash ganha-se no altar, aprende-se num gate com poco de
 > retry e passa a ser exigido em 2 gates sob teto baixo. **A aguardar playtest do GM**; N3 (Pogo) NAO comecado.
 

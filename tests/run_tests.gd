@@ -94,6 +94,7 @@ func _correr_tudo() -> void:
 	await teste_n1_autoral()
 	await teste_ghorak_n1()
 	await teste_n2_autoral()
+	await teste_n3_autoral()
 	teste_execution_9d_inimigos_regiao1()
 	teste_9d9e_crias_sem_goblin()
 	teste_9e2_coracao_producao_e_fases()
@@ -5238,6 +5239,171 @@ func teste_n2_autoral() -> void:
 			com_dash = true
 			break
 	_ok(com_dash, "N2: com o dash o gate 1 nao se passa")
+	n.queue_free()
+	await get_tree().process_frame
+	EstadoJogo.modo_dev = antes_dev
+	EstadoJogo.indice_nivel = antes_idx
+	EstadoJogo.habilidades.assign(antes_hab)
+
+
+## N3 -- tentativa de atravessar a CamaPogo1 (espinhos de 2934 a 3206, ao nivel do chao). Devolve
+## {"chegou": bool, "dano": int}. Parte de x=2840 a correr; salta a `off` px antes da cama.
+func _n3_cama_trial(n: Node, k: CharacterBody2D, off: float) -> Dictionary:
+	k.global_position = Vector2(2840.0, 630.0)
+	k.velocity = Vector2.ZERO
+	k.vida = k._vida_max()
+	k.reset_physics_interpolation()
+	Input.action_release("mover_direita")
+	Input.action_release("saltar")
+	for i in 40:
+		await get_tree().physics_frame
+	k.vida = k._vida_max()
+	var vida0: int = k.vida
+	var feito := false
+	var chegou := false
+	var solto := false
+	for i in 360:
+		Input.action_press("mover_direita")
+		if not feito and k.global_position.x >= 2934.0 - off:
+			feito = true
+			Input.action_press("saltar")
+		elif feito and not solto and (k.velocity.y > 0.0 or i > 400):
+			solto = true
+			Input.action_release("saltar")
+		await get_tree().physics_frame
+		if feito and k.is_on_floor() and k.global_position.x > 3215.0:
+			chegou = true
+			break
+		if k.global_position.y > 860.0:
+			break
+	Input.action_release("mover_direita")
+	Input.action_release("saltar")
+	return {"chegou": chegou, "dano": vida0 - k.vida}
+
+
+func teste_n3_autoral() -> void:
+	var antes_dev: bool = EstadoJogo.modo_dev
+	EstadoJogo.modo_dev = false
+	var antes_idx: int = EstadoJogo.indice_nivel
+	var antes_hab: Array = EstadoJogo.habilidades.duplicate()
+	EstadoJogo.indice_nivel = 2
+	EstadoJogo.habilidades.assign(["dash"])
+	var n := (load("res://scenes/levels/Ninho_da_Viuva_Negra.tscn") as PackedScene).instantiate()
+	add_child(n)
+	for i in 6:
+		await get_tree().process_frame
+	_ok(not bool(n.get("corredor")) and bool(n.get("checkpoints_autorais")), "N3: nao e' autoral (corredor/checkpoints)")
+	_ok(n.get_node_or_null("CorredorAproximacao") == null, "N3: o gerador criou uma jornada")
+	_ok(n.get_node_or_null("Guardiao") != null and n.get_node_or_null("Porta") != null, "N3: sem Guardiao/Porta")
+	_ok(String(n.get("mecanica_anunciada")) == "pogo", "N3: a mecanica anunciada devia ser o pogo")
+	var chk := 0
+	for c in get_tree().get_nodes_in_group("checkpoints"):
+		if n.is_ancestor_of(c):
+			chk += 1
+	_ok(chk == 4, "N3: esperava 4 checkpoints autorais, ha %d" % chk)
+	# so' o Pogo e' novo: nada de Especial/wall-jump/mecanicas futuras/Regiao II
+	var proibidos := ["serra.gd", "fogo.gd", "guilhotina.gd", "pendulo_lamina.gd", "wind_zone.gd", "portal.gd",
+		"trampolim.gd", "tumulo_elevador.gd", "plataforma_ritmada.gd", "torreta.gd", "teia_prende.gd"]
+	var habs: Array = []
+	var altar_x := INF
+	var pogo_x: Array = []     # x de tudo o que o pogo toca (espinhos e inimigos)
+	for no in n.find_children("*", "", true, false):
+		var sc := no.get_script() as Script
+		if sc == null:
+			continue
+		for pr in proibidos:
+			_ok(not sc.resource_path.ends_with(pr), "N3: %s nao pertence ao N3" % no.name)
+		if sc.resource_path.ends_with("coletavel.gd"):
+			habs.append(String(no.get("habilidade_id")))
+			altar_x = (no as Node2D).position.x
+		if sc.resource_path.ends_with("espinhos.gd") or (no is DemonioBase and not no.is_in_group("chefes")):
+			pogo_x.append((no as Node2D).position.x)
+		if no is DemonioBase and not no.is_in_group("chefes"):
+			_ok(String(no.get("especie")) == "goblin", "N3: %s nao e' um inimigo ja' aprovado da Regiao I" % no.name)
+	_ok(habs == ["pogo"], "N3: os coletaveis de habilidade deviam ser so' [pogo], ha %s" % str(habs))
+	var antes_do_altar := 0
+	for x in pogo_x:
+		if x < altar_x:
+			antes_do_altar += 1
+	_ok(antes_do_altar == 0, "N3: %d alvos de pogo antes do altar (nada exige o pogo antes de ser ensinado)" % antes_do_altar)
+	_ok(pogo_x.size() >= 10, "N3: alvos de pogo a menos (%d)" % pogo_x.size())
+	# a primeira cama que o pogo atravessa (>= 200 px) vem bem depois do altar e depois dos tufos de teste
+	var camas: Array = []
+	for no in n.get_children():
+		var sc2 := no.get_script() as Script
+		if sc2 != null and sc2.resource_path.ends_with("espinhos.gd") and int(no.get("largura")) * 16 >= 190:
+			camas.append((no as Node2D).position.x)
+	camas.sort()
+	_ok(camas.size() >= 4 and float(camas[0]) - altar_x >= 1200.0, "N3: a 1a cama larga devia vir >= 1200 px depois do altar")
+	# geometria: vaos comuns dentro do salto simples; vaos > 125 so' sob teto baixo (dash, ja' ensinado no N2)
+	var pl: Array = []
+	var tetos: Array = []
+	for no in n.get_children():
+		if not (no is StaticBody2D) or no.get_script() == null:
+			continue
+		if not String((no.get_script() as Script).resource_path).ends_with("/plataforma.gd"):
+			continue
+		var t: Vector2 = no.get("tamanho")
+		var d := {"nome": String(no.name), "l": no.position.x - t.x * 0.5, "r": no.position.x + t.x * 0.5,
+			"top": no.position.y - t.y * 0.5, "base": no.position.y + t.y * 0.5}
+		if d["nome"].begins_with("Teto"):
+			tetos.append(d)
+		elif d["nome"] == "SegredoAlto":
+			_ok(665.0 - float(d["top"]) <= 130.0, "N3: o segredo alto excede salto + mantle")
+		else:
+			pl.append(d)
+	pl.sort_custom(func(a, b): return a["l"] < b["l"])
+	var gates := 0
+	for i in range(1, pl.size()):
+		var b: Dictionary = pl[i]
+		var chega := false
+		var e_gate := false
+		for j in i:
+			var a: Dictionary = pl[j]
+			var vao: float = b["l"] - a["r"]
+			var sub: float = a["top"] - b["top"]
+			if vao <= 0.0:
+				if sub <= 66.0:
+					chega = true
+				continue
+			var limite := 125.0 if sub <= 0.0 else 110.0
+			if vao <= limite and sub <= 64.0:
+				chega = true
+			elif vao > limite and vao <= 145.0 and absf(sub) <= 4.0:
+				var coberto := false
+				for tt in tetos:
+					var folga: float = float(a["top"]) - float(tt["base"])
+					if tt["l"] <= a["r"] and tt["r"] >= b["l"] and folga <= 70.0 and folga >= 50.0:
+						coberto = true
+				if coberto:
+					chega = true
+					e_gate = true
+		_ok(chega, "N3: %s inalcancavel pelo salto simples nem por gate de dash" % b["nome"])
+		if e_gate:
+			gates += 1
+	_ok(gates == 3, "N3: esperava 3 gates de dash, ha %d" % gates)
+	# dinamica da cama larga: sem pogo nao se atravessa sem dano; com pogo passa-se limpo
+	var altar_n := n.get_node_or_null("AltarPogo")
+	if altar_n:
+		altar_n.queue_free()
+	var k := n.get_node("Koliani") as CharacterBody2D
+	EstadoJogo.habilidades.assign(["dash"])
+	var limpo_sem := false
+	for off in [0.0, 12.0, 30.0, 60.0, 90.0]:
+		var r: Dictionary = await _n3_cama_trial(n, k, off)
+		print("N3 cama sem pogo off=%s: %s" % [off, str(r)])
+		if r["chegou"] and int(r["dano"]) == 0:
+			limpo_sem = true
+	_ok(not limpo_sem, "N3: a cama larga atravessa-se sem dano e sem pogo (o pogo nao e' preciso)")
+	EstadoJogo.habilidades.assign(["dash", "pogo"])
+	var limpo_com := 0
+	for off in [0.0, 12.0, 30.0, 60.0, 90.0, 120.0, 150.0]:
+		var r2: Dictionary = await _n3_cama_trial(n, k, off)
+		print("N3 cama com pogo off=%s: %s" % [off, str(r2)])
+		if r2["chegou"] and int(r2["dano"]) == 0:
+			limpo_com += 1
+	# janela de takeoff: pelo menos 2 dos 7 offsets (12 px de passo) atravessam limpos
+	_ok(limpo_com >= 2, "N3: com o pogo a cama larga so' passa limpa em %d/7 takeoffs" % limpo_com)
 	n.queue_free()
 	await get_tree().process_frame
 	EstadoJogo.modo_dev = antes_dev

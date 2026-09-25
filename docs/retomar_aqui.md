@@ -1,3 +1,11 @@
+# >>> N3 autoral feito, a aguardar playtest do GM (26 set 2026) <<<
+Ver `docs/nivel_autoral_n3.md` (mapa, medidas do pogo, pendentes). Cena `Ninho_da_Viuva_Negra.tscn` reescrita (jornada fora);
+pogo = ressalto AUTOMATICO ao cair em espinhos/inimigos (nao ha input descendente; fisica intacta). Teste `teste_n3_autoral`
+(piloto: sem pogo a cama larga custa dano, com pogo passa limpa). Nao comecar o N4. Sem push. Armadilha: `%g` nao existe
+em GDScript (o print sai literal e da' ERROR); usar `%s`.
+
+---
+
 # >>> N2 autoral feito, a aguardar playtest do GM (26 set 2026) <<<
 Ver `docs/nivel_autoral_n2.md`. Nao comecar o N3 antes do feedback. Armadilhas: `tudo_desbloqueado()` (modo_dev) faz `tem_habilidade` true -- os testes
 de habilidade tem de repor `modo_dev`; a agua mortal por baixo de um poco recarrega a cena de testes e pendura a suite; o Godot de um timeout anterior
