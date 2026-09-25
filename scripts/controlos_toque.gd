@@ -6,6 +6,7 @@ extends CanvasLayer
 ## chave de tradução do nome de cada habilidade (ver assets/i18n)
 const NOME_HABILIDADE := {
 	"salto_duplo": "hud.ability.salto_duplo",
+	"dash": "hud.ability.dash",
 	"dash_aereo": "hud.ability.dash_aereo",
 	"partir_paredes": "hud.ability.partir_paredes",
 	"escudo": "hud.ability.escudo",

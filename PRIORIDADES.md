@@ -1,3 +1,6 @@
+> **N2 autoral feito (26 set 2026, sem push)** -- `docs/nivel_autoral_n2.md`: o Dash ganha-se no altar, aprende-se num gate com poco de
+> retry e passa a ser exigido em 2 gates sob teto baixo. **A aguardar playtest do GM**; N3 (Pogo) NAO comecado.
+
 > **Ghorak redesenhado (26 set 2026, sem push)** -- casca + janelas de vulnerabilidade, baque/raizes/carga/curto,
 > fase 2 encadeada (`docs/nivel_autoral_n1.md`). **A aguardar novo playtest do GM**: janela media 1,4 s (pedido 2-3 s),
 > TTK perfeito 18,9 s (real estimado 30-40 s), leitura dos telegraphs, raizes em fase 2.

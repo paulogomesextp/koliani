@@ -93,6 +93,7 @@ func _correr_tudo() -> void:
 	await teste_offscreen_global()
 	await teste_n1_autoral()
 	await teste_ghorak_n1()
+	await teste_n2_autoral()
 	teste_execution_9d_inimigos_regiao1()
 	teste_9d9e_crias_sem_goblin()
 	teste_9e2_coracao_producao_e_fases()
@@ -4999,6 +5000,7 @@ func _ghorak_luta(spam: bool, segundos: float, so_casca := false) -> Dictionary:
 
 
 func teste_ghorak_n1() -> void:
+	var antes_dev0: bool = EstadoJogo.modo_dev
 	var antes_idx: int = EstadoJogo.indice_nivel
 	var antes_hab: Array = EstadoJogo.habilidades.duplicate()
 	EstadoJogo.indice_nivel = 0
@@ -5092,5 +5094,149 @@ func receber_dano(_a, _b = 0.0):
 	var cm: Dictionary = lido["contagem"]
 	_ok(int(cm["BAQUE"]) >= 1 and int(cm["RAIZES"]) >= 1 and int(cm["CARGA"]) >= 1,
 		"Ghorak: nem todos os ataques foram usados (%s)" % str(cm))
+	EstadoJogo.modo_dev = antes_dev0
+	EstadoJogo.indice_nivel = antes_idx
+	EstadoJogo.habilidades.assign(antes_hab)
+
+
+## N2 (Pantano dos Sussurros, DEVELOP: o Dash): nivel AUTORAL. O altar da' o dash; o
+## gate 1 tem chao macio; os vaos > 125 px so' existem SOB TETO BAIXO (onde o salto
+## nao chega e o dash sim); sem Pogo/Especial/wall-jump; e o dash e' de facto exigido.
+func _n2_trial(n: Node, k: CharacterBody2D, com_dash: bool, off: float) -> bool:
+	k.global_position = Vector2(1900.0, 630.0)
+	k.velocity = Vector2.ZERO
+	k.reset_physics_interpolation()
+	Input.action_release("mover_direita")
+	Input.action_release("saltar")
+	Input.action_release("dash")
+	for i in 40:
+		await get_tree().physics_frame
+	var feito := false
+	var chegou := false
+	var pressionar_ate := -1
+	for i in 300:
+		Input.action_press("mover_direita")
+		if not feito and k.global_position.x >= 2150.0 - off:
+			feito = true
+			pressionar_ate = i + 2
+			Input.action_press("dash" if com_dash else "saltar")
+		elif feito and i > pressionar_ate:
+			Input.action_release("dash")
+			if com_dash or k.velocity.y > 0.0:
+				Input.action_release("saltar")
+			else:
+				Input.action_press("saltar")
+		await get_tree().physics_frame
+		if feito and k.is_on_floor() and k.global_position.x > 2300.0:
+			chegou = true
+			break
+		if k.global_position.y > 860.0:
+			break   # antes da agua mortal (recarregaria a cena de testes)
+	Input.action_release("mover_direita")
+	Input.action_release("saltar")
+	Input.action_release("dash")
+	return chegou
+
+
+func teste_n2_autoral() -> void:
+	var antes_dev: bool = EstadoJogo.modo_dev
+	EstadoJogo.modo_dev = false
+	var antes_idx: int = EstadoJogo.indice_nivel
+	var antes_hab: Array = EstadoJogo.habilidades.duplicate()
+	EstadoJogo.indice_nivel = 1
+	EstadoJogo.habilidades.assign([])
+	var n := (load("res://scenes/levels/Pantano_dos_Sussurros.tscn") as PackedScene).instantiate()
+	add_child(n)
+	for i in 6:
+		await get_tree().process_frame
+	_ok(not bool(n.get("corredor")) and bool(n.get("checkpoints_autorais")), "N2: nao e' autoral (corredor/checkpoints)")
+	_ok(n.get_node_or_null("CorredorAproximacao") == null, "N2: o gerador criou uma jornada")
+	_ok(n.get_node_or_null("Guardiao") != null, "N2: sem o Guardiao (Morvanna)")
+	var chk := 0
+	for c in get_tree().get_nodes_in_group("checkpoints"):
+		if n.is_ancestor_of(c):
+			chk += 1
+	_ok(chk == 3, "N2: esperava 3 checkpoints autorais, ha %d" % chk)
+	# so' o Dash: nada de Pogo / Especial / wall-jump / mecanicas futuras
+	var proibidos := ["serra.gd", "fogo.gd", "guilhotina.gd", "pendulo_lamina.gd", "wind_zone.gd",
+		"portal.gd", "trampolim.gd", "tumulo_elevador.gd", "plataforma_ritmada.gd", "torreta.gd"]
+	var habs: Array = []
+	for no in n.find_children("*", "", true, false):
+		var sc := no.get_script() as Script
+		if sc != null:
+			for pr in proibidos:
+				_ok(not sc.resource_path.ends_with(pr), "N2: %s nao pertence ao N2" % no.name)
+			if sc.resource_path.ends_with("coletavel.gd"):
+				habs.append(String(no.get("habilidade_id")))
+	_ok(habs == ["dash"], "N2: os coletaveis de habilidade deviam ser so' [dash], ha %s" % str(habs))
+	# geometria: vaos comuns dentro do salto simples; vaos > 125 so' sob teto baixo
+	var pl: Array = []
+	var tetos: Array = []
+	for no in n.get_children():
+		if not (no is StaticBody2D) or no.get_script() == null:
+			continue
+		if not String((no.get_script() as Script).resource_path).ends_with("/plataforma.gd"):
+			continue
+		var t: Vector2 = no.get("tamanho")
+		var d := {"nome": String(no.name), "l": no.position.x - t.x * 0.5, "r": no.position.x + t.x * 0.5,
+			"top": no.position.y - t.y * 0.5, "base": no.position.y + t.y * 0.5}
+		if d["nome"].begins_with("Teto"):
+			tetos.append(d)
+		else:
+			pl.append(d)
+	pl.sort_custom(func(a, b): return a["l"] < b["l"])
+	var gates := 0
+	for i in range(1, pl.size()):
+		var b: Dictionary = pl[i]
+		var chega := false
+		var e_gate := false
+		for j in i:
+			var a: Dictionary = pl[j]
+			var vao: float = b["l"] - a["r"]
+			var sub: float = a["top"] - b["top"]
+			if vao <= 0.0:
+				if sub <= 66.0:
+					chega = true
+				continue
+			var limite := 125.0 if sub <= 0.0 else 110.0
+			if vao <= limite and sub <= 64.0:
+				chega = true
+			elif vao > limite and vao <= 145.0 and absf(sub) <= 4.0:
+				# gate de dash: TEM de haver teto baixo (folga <= 70 px) a cobrir o vao
+				var coberto := false
+				for tt in tetos:
+					if tt["l"] <= a["r"] and tt["r"] >= b["l"] and float(a["top"]) - float(tt["base"]) <= 70.0 							and float(a["top"]) - float(tt["base"]) >= 50.0:
+						coberto = true
+				if coberto:
+					chega = true
+					e_gate = true
+		_ok(chega, "N2: %s inalcancavel pelo salto simples nem por gate de dash" % b["nome"])
+		if e_gate:
+			gates += 1
+	_ok(gates >= 3, "N2: esperava >= 3 gates de dash (2 exigidos + segredo), ha %d" % gates)
+	# o altar esta NO caminho (numa plataforma do percurso principal)
+	var altar := n.get_node_or_null("AltarDash") as Node2D
+	_ok(altar != null and altar.position.x > 1400.0 and altar.position.x < 2100.0, "N2: altar fora do percurso")
+	# dinamica: sem dash o gate 1 NAO se passa (saltar), com dash passa-se
+	var altar_n := n.get_node_or_null("AltarDash")
+	if altar_n:
+		altar_n.queue_free()
+	var k := n.get_node("Koliani") as CharacterBody2D
+	EstadoJogo.habilidades.assign([])
+	var so_salto := false
+	for off in [0.0, 12.0, 30.0, 60.0]:
+		if await _n2_trial(n, k, false, off):
+			so_salto = true
+	_ok(not so_salto, "N2: o gate 1 passa-se so' a saltar (o dash nao e' exigido)")
+	EstadoJogo.habilidades.assign(["dash"])
+	var com_dash := false
+	for off in [0.0, 12.0, 30.0, 60.0]:
+		if await _n2_trial(n, k, true, off):
+			com_dash = true
+			break
+	_ok(com_dash, "N2: com o dash o gate 1 nao se passa")
+	n.queue_free()
+	await get_tree().process_frame
+	EstadoJogo.modo_dev = antes_dev
 	EstadoJogo.indice_nivel = antes_idx
 	EstadoJogo.habilidades.assign(antes_hab)

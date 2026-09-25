@@ -1,3 +1,10 @@
+# >>> N2 autoral feito, a aguardar playtest do GM (26 set 2026) <<<
+Ver `docs/nivel_autoral_n2.md`. Nao comecar o N3 antes do feedback. Armadilhas: `tudo_desbloqueado()` (modo_dev) faz `tem_habilidade` true -- os testes
+de habilidade tem de repor `modo_dev`; a agua mortal por baixo de um poco recarrega a cena de testes e pendura a suite; o Godot de um timeout anterior
+pode ficar vivo e atrasar a corrida seguinte.
+
+---
+
 # >>> Ghorak redesenhado (26 set 2026) <<<
 `scripts/chefe_ghorak.gd` reescrito: casca 5 % fora das janelas; estados BAQUE/MARCAS(raizes)/CARGA/CURTO; fase 2
 encadeada. Vida da cena 250 -> 700 (o teste 9H acompanha). Teste `teste_ghorak_n1` (bots: spam, so-casca, janelas).

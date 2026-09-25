@@ -871,6 +871,62 @@ func e_camera_contexto() -> void:
 		"queda_media_250px": await _off_camera(0, 250.0)}
 
 
+## N2 (Dash): vao sob um TETO baixo. `teto` = altura livre acima do chao. `modo`:
+## "salto" (so' salta), "dash" (so' dash), "dash_salto" (dash e segura o salto).
+func _vao_teto(vao: float, teto: float, modo: String, off: float) -> Dictionary:
+	var yA := CHAO_Y - 300.0
+	var xa0 := -2800.0
+	var larg := 220.0
+	var ponta := xa0 + larg
+	var pa := _bloco_devolve(Vector2(xa0, yA), Vector2(ponta, yA + 24.0))
+	var pb := _bloco_devolve(Vector2(ponta + vao, yA), Vector2(ponta + vao + 700.0, yA + 24.0))
+	var tt := _bloco_devolve(Vector2(ponta - 90.0, yA - 2000.0), Vector2(ponta + vao + 90.0, yA - teto))
+	await nova(xa0 + 20.0, ["dash"], yA - 30.0)
+	var feito := false
+	var ok := false
+	var x_max := 0.0
+	for i in 240:
+		var ac: Array = R_DIR.duplicate()
+		if not feito and k.global_position.x >= ponta - off:
+			feito = true
+			if modo != "salto":
+				ac.append("dash")
+			if modo != "dash":
+				ac.append("saltar")
+		elif feito and modo != "dash" and k.velocity.y <= 0.0:
+			ac.append("saltar")
+		var st := await paso(ac)
+		x_max = maxf(x_max, st["x"])
+		if feito and st["chao"] and st["x"] > ponta + vao + 6.0:
+			ok = true
+			break
+		if st["y"] > yA + 160.0:
+			break
+	pa.queue_free()
+	pb.queue_free()
+	tt.queue_free()
+	return {"ok": ok, "x_max_rel_ponta": snappedf(x_max - ponta, 1.0)}
+
+
+func e_dash_teto() -> void:
+	var out := {}
+	for teto in [64.0, 80.0, 100.0, 9999.0]:
+		for modo in ["salto", "dash", "dash_salto"]:
+			var maxvao := 0.0
+			for vao in [40.0, 60.0, 80.0, 100.0, 110.0, 120.0, 130.0, 140.0, 160.0, 180.0, 200.0, 230.0, 260.0, 290.0, 320.0]:
+				var passou := false
+				for off in [0.0, 12.0, 30.0, 60.0]:
+					if (await _vao_teto(vao, teto, modo, off))["ok"]:
+						passou = true
+						break
+				if passou:
+					maxvao = vao
+				elif vao > maxvao + 60.0:
+					break
+			out["%s_teto%d" % [modo, int(teto)]] = maxvao
+	R["dash_teto"] = out
+
+
 func _tenta_vao(yA: float, dy: float, vao: float, off: float, duplo: bool) -> bool:
 	var xa0 := -2800.0
 	var larg := 220.0
@@ -1122,7 +1178,7 @@ func _correr() -> void:
 		"queda": e_queda, "ar": e_ar, "coyote": e_coyote, "buffer": e_buffer,
 		"aterragem": e_aterragem, "dash": e_dash, "roll": e_roll,
 		"latencia": e_latencia, "roll_spam": e_roll_spam, "pogo": e_pogo,
-		"camera": e_camera_queda, "camera_contexto": e_camera_contexto, "envolvente": e_envolvente, "mantle": e_borda_mantle, "walljump": e_walljump,
+		"camera": e_camera_queda, "dash_teto": e_dash_teto, "camera_contexto": e_camera_contexto, "envolvente": e_envolvente, "mantle": e_borda_mantle, "walljump": e_walljump,
 	}
 	for nome in todas:
 		if _quer(nome, filtro):
