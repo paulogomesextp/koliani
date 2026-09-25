@@ -7,11 +7,20 @@ ticks, tier do salto normal 2→1), brake (18→6 ticks, segue a física), turn 
 níveis: 42 níveis/1 370 plataformas novas (P1: 46/1 725); portas só a saltar 8→6 (N15,16,20,46,49,60);
 **Região I: 0 novas em N1–N5**; 0 regressões. Regressão em teste 0 falhas (7 falham no código anterior).
 
-**ACHADO A DECIDIR (não alterado):** a cadeia de wall-jumps sobe agora paredes inteiras (15 saltos, 903 px
-com o botão premido 14 ticks; no legado 1 salto) por causa do controlo aéreo novo. Recomendação: limitar à
-mesma parede/lado até tocar no chão, ou exigir `escalar_paredes`.
+**DECISÕES DO GM (25 set 2026, depois da Passagem 2):**
+- **Wall-jump exige a habilidade `escalar_paredes`** (hoje é básico e a cadeia sobe paredes inteiras: 15 saltos,
+  903 px; no legado 1 salto). **Ainda NÃO implementado.**
+- **Mantle aprovado como está** (degrau ≤ 32 px, 9 ticks, subida máxima salto+mantle ~155 px). Falta só a
+  animação própria (**MANTLE ANIMATION ASSET MISSING**).
+- **Câmara em queda longa continua PENDENTE**: chão visível 0,38 s antes do impacto, barra do slice 0,6 s
+  (recomendação da Passagem 1: `LOOK_QUEDA_Y` 92 → ~190 em `camera_tremor.gd` e medir de novo).
+- **Ordem do vertical slice: N1 → N2 → N3 → N4 → N5** (Floresta Corrompida; boss Coração Putrefacto no N5).
 
-**Próximo:** decidir o wall-jump; depois level design N1–N5 para a nova envolvente (não iniciado).
+**PRÓXIMO PASSO:** (1) gating do wall-jump por `escalar_paredes` — medir de novo com a bancada `walljump`
+(cadeia deve deixar de subir sem a habilidade) e correr a regressão; (2) depois, level design do **N1**
+desenhado para a nova envolvente (`docs/qa/f1_movimento/f1_envolvente_antes_depois.json`, coluna
+`passagem2`), e seguir N2 → N3 → N4 → N5. Sem push até o GM dizer. Commits F1 locais:
+`2396a4b9` (física), `d93e0c1b` (mantle), `adf79dfc` (landing/brake/turn).
 
 ---
 
