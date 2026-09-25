@@ -91,6 +91,7 @@ func _correr_tudo() -> void:
 	await teste_execution_9h7_fundo_regiao1()
 	await teste_offscreen_hazards()
 	await teste_offscreen_global()
+	await teste_n1_autoral()
 	teste_execution_9d_inimigos_regiao1()
 	teste_9d9e_crias_sem_goblin()
 	teste_9e2_coracao_producao_e_fases()
@@ -4840,3 +4841,73 @@ func teste_offscreen_global() -> void:
 	kf.queue_free()
 	cam.queue_free()
 
+
+## N1 (Floresta Corrompida) e' um nivel AUTORAL: sem jornada procedural, sem
+## nenhuma habilidade por ensinar, alcance dentro da envolvente F1 do salto
+## SIMPLES (128 px), checkpoints intencionais que a poda nao apaga, Ghorak como
+## guardiao (mini-boss) e nao como chefe regional. Ver `docs/nivel_autoral_n1.md`.
+func teste_n1_autoral() -> void:
+	var ruta := "res://scenes/levels/Floresta_Putrefata.tscn"
+	var antes_idx: int = EstadoJogo.indice_nivel
+	var antes_hab: Array = EstadoJogo.habilidades.duplicate()
+	EstadoJogo.indice_nivel = 0
+	EstadoJogo.habilidades.assign([])
+	var n := (load(ruta) as PackedScene).instantiate()
+	add_child(n)
+	for i in 6:
+		await get_tree().process_frame
+	_ok(not bool(n.get("corredor")), "N1: ainda tem a jornada procedural ligada (corredor)")
+	_ok(n.get_node_or_null("CorredorAproximacao") == null, "N1: o gerador criou uma jornada")
+	_ok(bool(n.get("checkpoints_autorais")), "N1: checkpoints nao sao autorais")
+	var chk := 0
+	for c in get_tree().get_nodes_in_group("checkpoints"):
+		if n.is_ancestor_of(c):
+			chk += 1
+	_ok(chk == 3, "N1: esperava 3 checkpoints autorais, ha %d" % chk)
+	_ok(n.get_node_or_null("Guardiao") != null and n.get_node_or_null("Chefe") == null,
+		"N1: o Ghorak tem de ser Guardiao (mini-boss), nao Chefe regional")
+	_ok(n.get_node_or_null("Porta") != null, "N1: sem Porta")
+	# nada que exija (ou ensine) uma habilidade: sem dash/pogo/wall-jump/pickups
+	var proibidos := ["serra.gd", "fogo.gd", "guilhotina.gd", "pendulo_lamina.gd", "wind_zone.gd",
+		"portal.gd", "trampolim.gd", "tumulo_elevador.gd", "plataforma_ritmada.gd", "torreta.gd"]
+	for no in n.find_children("*", "", true, false):
+		var sc := no.get_script() as Script
+		if sc != null:
+			for pr in proibidos:
+				_ok(not sc.resource_path.ends_with(pr), "N1: %s nao pertence ao N1 (mecanica por ensinar)" % no.name)
+			_ok(not (sc.resource_path.ends_with("coletavel.gd") and String(no.get("habilidade_id")) != ""),
+				"N1: %s da uma habilidade" % no.name)
+	# alcance: envolvente do salto simples F1 com margem (nao vive na ponta)
+	var pl: Array = []
+	for no in n.get_children():
+		if no is StaticBody2D and no.get_script() != null 				and String((no.get_script() as Script).resource_path).ends_with("/plataforma.gd"):
+			var t: Vector2 = no.get("tamanho")
+			pl.append({"nome": String(no.name), "l": no.position.x - t.x * 0.5,
+				"r": no.position.x + t.x * 0.5, "top": no.position.y - t.y * 0.5})
+	pl.sort_custom(func(a, b): return a["l"] < b["l"])
+	_ok(pl.size() >= 15, "N1: plataformas a menos (%d)" % pl.size())
+	var pior_vao := 0.0
+	for i in range(1, pl.size()):
+		var b: Dictionary = pl[i]
+		# passa se ALGUMA plataforma anterior chega a esta com folga
+		var chega := false
+		var melhor := "nenhuma"
+		for j in i:
+			var a: Dictionary = pl[j]
+			var vao: float = b["l"] - a["r"]
+			var sub: float = a["top"] - b["top"]
+			if vao <= 0.0:
+				if sub <= 66.0 and b["l"] < a["r"]:
+					chega = true
+			else:
+				var limite := 125.0 if sub <= 0.0 else 110.0
+				if vao <= limite and sub <= 64.0:
+					chega = true
+					pior_vao = maxf(pior_vao, vao)
+				else:
+					melhor = "vao %.0f / sobe %.0f desde %s" % [vao, sub, a["nome"]]
+		_ok(chega, "N1: %s fora da envolvente do salto simples (%s)" % [b["nome"], melhor])
+	n.queue_free()
+	await get_tree().process_frame
+	EstadoJogo.indice_nivel = antes_idx
+	EstadoJogo.habilidades.assign(antes_hab)

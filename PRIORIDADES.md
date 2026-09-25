@@ -1,3 +1,8 @@
+> **N1 AUTORAL feito (26 set 2026, commits locais sem push)** — `docs/nivel_autoral_n1.md`. **À espera do GM:**
+> playtest manual (telegraph, offscreen SEE→TELEGRAPH→HEAR, Ghorak, ritmo, arte); N1 NÃO está LOCKED. Decidir a
+> duração (travessia 26 s; ~2–3 min estimados, alvo 3–5). Arte em falta: raízes (RaizPerigo por polígonos), goblin
+> legado, animação de mantle. Depois: N2 (Dash). Também: TTK do Ghorak por medir a jogar.
+
 > **F1 Passagem 2 feita (25 set 2026, commits locais sem push)** — `docs/f1_passagem2.md`. **Decidido pelo GM:**
 > wall-jump passa a exigir `escalar_paredes` (por implementar); mantle aprovado; câmara em queda longa
 > pendente. Próximo: gating do wall-jump e depois level design N1 → N2 → N3 → N4 → N5.

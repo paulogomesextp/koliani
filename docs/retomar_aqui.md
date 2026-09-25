@@ -1,3 +1,16 @@
+# >>> PONTO DE RETOMA ACTUAL — N1 autoral feito, à espera de playtest do GM (26 set 2026) <<<
+
+F1 fechada (b3ec700e wall-jump, 61a62735 câmara ≥0,6 s, 43032a50 offscreen). **N1 = nível autoral** (sem jornada):
+`docs/nivel_autoral_n1.md` (mapa das 7 secções, checkpoints, Ghorak, assets em falta). Padrão reutilizável:
+`nivel_com_chefe.gd` exports `checkpoints_autorais` / `estreia_x_autoral` + `corredor = false`. Teste
+`teste_n1_autoral` (envolvente do salto simples, sem mecânicas por ensinar, 3 checkpoints, Guardiao≠Chefe),
+bot `bot_gauntlet.gd ... sem_skills` (chega à porta em 26 s). Capturas: `docs/qa/n1_autoral/`.
+**Não fazer**: N2 antes da aprovação do GM; push. Armadilha desta sessão: o harness colapsa `\n` em `
+` dentro de
+scripts Python passados por heredoc (usar `chr(92)`); e o teste 9C procura o nó `ChaoInicio` no N1.
+
+---
+
 # >>> PONTO DE RETOMA ACTUAL — F1 Passagem 2 feita (25 set 2026) <<<
 
 Decisão do GM: A + C (salto ~128 px é a baseline; legado congelado e não "corrigido"). Feito, **sem push**:

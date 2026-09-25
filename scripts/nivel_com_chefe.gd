@@ -51,6 +51,15 @@ const DIST_MAX_ANTES_CHEFE := 260.0
 ## Esticão máximo no último nível (N1 = 1.0, N30 = 1.0 + isto).
 @export var alongar_ampl := 0.8
 
+## NÍVEL AUTORAL (`corredor = false`, sala desenhada à mão secção a secção,
+## p.ex. o N1): os checkpoints da cena são intencionais e NÃO se podam por
+## distância (`_reduzir_checkpoints`), e não se acrescenta nenhum perto do
+## chefe. Padrão a reutilizar nos N2–N5: ver `docs/nivel_autoral_n1.md`.
+@export var checkpoints_autorais := false
+## Onde (x do mundo) entra no ecrã a mecânica que este nível estreia, quando
+## não há jornada que o diga. INF = logo à entrada (comportamento antigo).
+@export var estreia_x_autoral := INF
+
 ## Candeeiros e tochas ao longo do percurso (ver `_iluminar`).
 @export var candeeiros := true
 ## Cor da luz dos candeeiros. Âmbar quente por omissão: as regiões são
@@ -149,6 +158,8 @@ func _anunciar_mecanica() -> void:
 	# aparecia logo à entrada, que é o que isto vem corrigir
 	if _gerador:
 		_tut_x = float(_gerador.get("estreia_x"))
+	elif estreia_x_autoral != INF:
+		_tut_x = estreia_x_autoral
 	var cam := mecanica_anunciada if mecanica_anunciada != "" \
 		else GERADOR.estreia_do_nivel(EstadoJogo.indice_nivel)
 	if cam == "" or EstadoJogo.mecanicas_explicadas.has(cam):
@@ -404,6 +415,8 @@ func _fazer_luz(rng: RandomNumberGenerator, tocha: bool) -> Node2D:
 ## Jornada (que gera os seus próprios checkpoints em `_construir`, chamada
 ## com `call_deferred` no `_ready` dela) de já ter acabado.
 func _reduzir_checkpoints() -> void:
+	if checkpoints_autorais:
+		return
 	await get_tree().process_frame
 	await get_tree().process_frame
 	if not is_inside_tree():
