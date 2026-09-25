@@ -989,6 +989,26 @@ func _regressao() -> Array:
 	chk.call(pg / alt >= 0.35 and pg / alt <= 0.5, "pogo/salto %.2f fora de 0,35-0,5" % (pg / alt))
 	chk.call(float(R["camera_queda"]["chao_visivel_antes_do_impacto_s"]) >= 0.35,
 		"chao so visivel %.2f s antes do impacto" % R["camera_queda"]["chao_visivel_antes_do_impacto_s"])
+	# ANIMAÇÃO (passagem 2): brake segue a física, turn sem flicker, land curto a correr
+	var brake_ticks := 0
+	for r in R["desaceleracao"]["anims"]:
+		if r[0] == "run_brake":
+			brake_ticks += int(r[1])
+	chk.call(brake_ticks >= 4 and brake_ticks <= 9, "run_brake dura %d ticks (fisica pára em ~6)" % brake_ticks)
+	chk.call(R["desaceleracao"]["anims"][0][0] == "run_brake", "o brake deveria começar ao largar a direção")
+	var turn_ticks := 0
+	for r in R["viragem"]["anims"]:
+		chk.call(r[0] != "run_brake", "flicker de run_brake na viragem")
+		if r[0] == "turn":
+			turn_ticks += int(r[1])
+	chk.call(turn_ticks >= 4 and turn_ticks <= 10, "turn dura %d ticks" % turn_ticks)
+	for r in R["aterragem"]["a_correr_dir_premida"]:
+		var lt: int = int(r["ticks_anim_land"])
+		chk.call(lt >= 4 and lt <= 6, "land a correr dura %d ticks (esperado 4-6)" % lt)
+	for r in R["aterragem"]["parado"]:
+		chk.call(int(r["ticks_anim_land"]) >= 4, "land parado dura menos de 4 ticks")
+	chk.call(Movimento.tier_aterragem(float(R["salto"]["por_ticks_premido"][-1]["vy_max_queda"])) == 1,
+		"um salto normal aterra com impacto acima de leve")
 	# MANTLE (passagem 2): 9 ticks, sem re-agarrar, alcance limitado
 	var mant := {}
 	for m in R["borda_mantle"]["por_altura"]:
@@ -1029,7 +1049,8 @@ func _correr() -> void:
 	if regressao:
 		_reg_env = true
 		filtro = PackedStringArray(["salto", "queda", "ar", "coyote", "buffer", "dash",
-			"roll", "latencia", "roll_spam", "pogo", "camera", "envolvente", "mantle", "walljump"])
+			"roll", "latencia", "roll_spam", "pogo", "camera", "envolvente", "mantle", "walljump", "desaceleracao", "viragem",
+			"aterragem"])
 	elif args.size() > 1 and args[1] != "":
 		filtro = args[1].split(",")
 	var todas := {

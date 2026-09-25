@@ -1,3 +1,20 @@
+# >>> PONTO DE RETOMA ACTUAL — F1 Passagem 2 feita (25 set 2026) <<<
+
+Decisão do GM: A + C (salto ~128 px é a baseline; legado congelado e não "corrigido"). Feito, **sem push**:
+`docs/f1_passagem2.md`. Mantle determinístico de degrau (alcance ≤ 32 px, 9 ticks, sem hang/re-agarre;
+subida máxima salto+mantle 200→~155 px; **MANTLE ANIMATION ASSET MISSING**), landing (`land` a correr 10→5
+ticks, tier do salto normal 2→1), brake (18→6 ticks, segue a física), turn (sem flicker). Alcance dos 100
+níveis: 42 níveis/1 370 plataformas novas (P1: 46/1 725); portas só a saltar 8→6 (N15,16,20,46,49,60);
+**Região I: 0 novas em N1–N5**; 0 regressões. Regressão em teste 0 falhas (7 falham no código anterior).
+
+**ACHADO A DECIDIR (não alterado):** a cadeia de wall-jumps sobe agora paredes inteiras (15 saltos, 903 px
+com o botão premido 14 ticks; no legado 1 salto) por causa do controlo aéreo novo. Recomendação: limitar à
+mesma parede/lado até tocar no chão, ou exigir `escalar_paredes`.
+
+**Próximo:** decidir o wall-jump; depois level design N1–N5 para a nova envolvente (não iniciado).
+
+---
+
 # >>> PONTO DE RETOMA ACTUAL — F1 Passagem 1 feita, PARADO antes da Passagem 2 (25 set 2026) <<<
 
 Física / game feel core aplicada e medida: `docs/f1_passagem1.md` (BEFORE→AFTER completo). Salto 82,9→127,5 px,

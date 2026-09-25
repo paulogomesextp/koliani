@@ -29,6 +29,12 @@ func _dano_golpe() -> int:
 ## Velocidade do FLYMODE (só DEVELOPER MODE -- ver `alternar_voo`).
 const VEL_VOO := 560.0
 const VEL_DASH := 620.0
+## Aterragem (F1 passagem 2): a pose `land` fica visível pelo menos ~4 ticks;
+## depois disso quem já se mexe (>24 px/s) cancela-a para a corrida.
+const ATERRAGEM_TEMPO := 0.16
+const ATERRAGEM_POSE_MIN := 4.0 / 60.0
+## Viragem: a pose `turn` acaba quando já vai a esta velocidade no sentido novo.
+const TURN_VEL_FIM := 120.0
 const DUR_DASH := 0.16
 const RECARGA_DASH := 0.55
 ## F1 passagem 1: o roll continua a ser um burst mais rápido que correr (340 vs
@@ -939,7 +945,7 @@ func _montar_golden_set(sf: SpriteFrames) -> void:
 	# tambem e' o gesto certo: bate, encolhe, levanta.
 	_animacao_golden(sf, "run_brake",
 		_frames_de(sf, "run", [9, 8, 2, 0]) + _frames_de(sf, "idle", [3, 0]),
-		20.0, false)
+		45.0, false)   # 45 fps = ~8 ticks: a travagem física demora 6
 	var aterrar: Array = _frames_de(sf, "fall", [2, 0])
 	aterrar += _frames_de(sf, "crouch", [0]) + _frames_de(sf, "idle", [0])
 	for nome in ["land", "aterrar"]:
@@ -953,7 +959,7 @@ func _montar_golden_set(sf: SpriteFrames) -> void:
 		run_final.append("%s/frames/run_final/run_%03d.png" % [GOLDEN_DIR, i + 1])
 	_animacao_golden(sf, "run", run_final, _KOLI_ANIMS_GOLDEN["run"][2], true)
 	# `turn` derivado do run_final (ja montado acima) -- nunca do run antigo.
-	_animacao_golden(sf, "turn", _frames_de(sf, "run", [0, 1, 2, 3]), 12.0, false)
+	_animacao_golden(sf, "turn", _frames_de(sf, "run", [0, 1, 2, 3]), 30.0, false)   # ~8 ticks
 	# `run_start`: NAO USADO no fluxo (Idle -> run directo); fica definido a partir do run_final so por compatibilidade.
 	_animacao_golden(sf, "run_start", _frames_de(sf, "run", [0, 1, 2, 3, 4, 5]), 12.0, false)
 	_montar_vfx_golpe()
@@ -1363,7 +1369,7 @@ func _physics_process(dt: float) -> void:
 	# aterragem: só depois de ter estado mesmo no ar
 	if is_on_floor():
 		if _no_ar_antes:
-			_aterrar_t = 0.16
+			_aterrar_t = ATERRAGEM_TEMPO
 		_no_ar_antes = false
 	elif _vy() > 120.0:
 		_no_ar_antes = true
@@ -1461,7 +1467,11 @@ func _physics_process(dt: float) -> void:
 	# rebordo entre MANTLE_MIN e MANTLE_ALTURA acima dos pés, folga por cima e
 	# chão no ponto de chegada. Intenção: a segurar contra a parede ou "cima".
 	# Só a cair (ou quase parada): a subir ela passa por cima sozinha.
-	if not _borda and _borda_lock <= 0.0 and not is_on_floor() and _sinal_grav > 0.0 			and _rolar_restante <= 0.0 and _dash_restante <= 0.0 			and _ataque_restante <= 0.0 and _preso <= 0.0 			and velocity.y > -30.0 			and (dir != 0.0 or Input.is_action_pressed("mirar_cima")):
+	if not _borda and _borda_lock <= 0.0 and not is_on_floor() and _sinal_grav > 0.0 \
+			and _rolar_restante <= 0.0 and _dash_restante <= 0.0 \
+			and _ataque_restante <= 0.0 and _preso <= 0.0 \
+			and velocity.y > -30.0 \
+			and (dir != 0.0 or Input.is_action_pressed("mirar_cima")):
 		var lado := signf(dir) if dir != 0.0 else _olha_para
 		var meta := _detetar_mantle(lado)
 		if not meta.is_empty():
@@ -1833,6 +1843,11 @@ func _detetar_mantle(lado: float) -> Dictionary:
 	return {"alvo": Vector2(x_alvo, y_topo - 24.0 - 1.0)}
 
 
+## A pose de aterragem já passou o mínimo (~4 ticks) e ela está a mexer-se.
+func _pose_aterrar_cancelavel() -> bool:
+	return absf(velocity.x) > 24.0 and _aterrar_t <= ATERRAGEM_TEMPO - ATERRAGEM_POSE_MIN
+
+
 func _process(dt: float) -> void:
 	# a escolha da tira vem PRIMEIRO: `_animar` precisa de saber que animação
 	# está a ser desenhada para decidir o flip (ver `_flip_sprite`)
@@ -1877,7 +1892,7 @@ func _atualizar_anim() -> void:
 			a = "jump"
 		else:
 			a = "fall"
-	elif _aterrar_t > 0.0 and sf.has_animation("aterrar"):
+	elif _aterrar_t > 0.0 and not _pose_aterrar_cancelavel() and sf.has_animation("aterrar"):
 		a = "aterrar"
 	elif absf(velocity.x) > 24.0:
 		a = "run"
@@ -1928,24 +1943,34 @@ func _anim_locomocao_piloto_5g(sf: SpriteFrames) -> String:
 		_piloto_5g_no_ar = false
 		_piloto_5g_em_movimento = false
 		return "land"
-	if _aterrar_t > 0.0 and _corpo.animation == &"land" and _corpo.is_playing():
+	if _aterrar_t > 0.0 and _corpo.animation == &"land" and _corpo.is_playing() \
+			and not _pose_aterrar_cancelavel():
 		return "land"
 
+	# F1 passagem 2: brake e turn seguem a física real. O brake dura enquanto a
+	# Koliani DESLIZA sem input (não depois de parar); o turn dura até já ir
+	# a `TURN_VEL_FIM` no sentido novo e atravessa o zero sem cair num brake.
+	var dir_in := Input.get_axis("mover_esquerda", "mover_direita") * _inverso
 	var em_movimento := absf(velocity.x) > 24.0
 	if em_movimento:
 		var virou := _piloto_5g_em_movimento and not is_equal_approx(_piloto_5g_facing, _olha_para)
 		_piloto_5g_facing = _olha_para
 		if virou:
 			return "turn"
-		if _corpo.animation == &"turn" and _corpo.is_playing():
+		if _corpo.animation == &"turn" and _corpo.is_playing() \
+				and not (signf(velocity.x) == _olha_para and absf(velocity.x) >= TURN_VEL_FIM):
 			return "turn"
 		_piloto_5g_em_movimento = true
+		if dir_in == 0.0:
+			return "run_brake"
 		return "run"
 
+	if dir_in != 0.0 and _corpo.animation == &"turn" and _corpo.is_playing():
+		return "turn"
 	if _piloto_5g_em_movimento:
 		_piloto_5g_em_movimento = false
-		return "run_brake"
-	if _corpo.animation == &"run_brake" and _corpo.is_playing():
+		return "run_brake" if absf(velocity.x) > 0.5 and dir_in == 0.0 else "idle"
+	if _corpo.animation == &"run_brake" and _corpo.is_playing() and absf(velocity.x) > 0.5:
 		return "run_brake"
 	return "idle"
 

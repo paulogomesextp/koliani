@@ -1,3 +1,7 @@
+> **F1 Passagem 2 feita (25 set 2026, commits locais sem push)** — `docs/f1_passagem2.md`. **À espera do GM:**
+> a cadeia de wall-jumps sobe agora paredes inteiras (efeito do controlo aéreo novo); limitar à mesma
+> parede/lado (recomendado) ou exigir `escalar_paredes`? Depois: level design N1–N5.
+
 > **F1 Passagem 1 feita (25 set 2026, commit local sem push)** — `docs/f1_passagem1.md`. **À espera do GM:**
 > a física nova abre atalhos sobre as ajudas dos níveis (8 portas alcançáveis só a saltar, incl. N3 da Região I).
 > Escolher A (manter 128 px e desenhar N1–N5 para a envolvente nova), B (salto ~110 px) ou C (limitar o mantle

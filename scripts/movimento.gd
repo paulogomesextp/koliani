@@ -42,9 +42,12 @@ const CORTE_SALTO := 0.45     # fração da velocidade vertical mantida ao larga
 const APEX_LIMIAR := 60.0
 const APEX_GRAVIDADE := 0.5
 const ATERRAGEM_LEVE := 180.0
-const ATERRAGEM_MEDIA := 430.0
+## F1 passagem 2: um salto normal (128 px) aterra a ~637 px/s e passava sempre a
+## "média" (430). Com 670 só quedas MAIS fundas do que o salto (>~130 px) dão
+## impacto médio, e >735 (~160 px) pesado (o teto de queda é 750).
+const ATERRAGEM_MEDIA := 670.0
 ## 760 -> 700: com o teto de queda a 750 o tier 3 deixava de ser alcançável.
-const ATERRAGEM_PESADA := 700.0
+const ATERRAGEM_PESADA := 735.0
 ## PLANAR (habilidade "planar", nível 63): a descer, com o botão de saltar
 ## a segurar, a queda fica presa a este tecto em vez do `VEL_MAX_QUEDA`.
 ## Não é voar -- é cair devagar, e por isso o vão que se atravessa a planar
