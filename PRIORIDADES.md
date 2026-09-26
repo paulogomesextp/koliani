@@ -1,3 +1,5 @@
+> **Combat Lab v1 (26 set 2026, sem push)** -- `docs/combat_lab_v1.md`. Decisoes do GM: spam vs goblin (hitstun/poise), alcance dos golpes (Koliani atravessa inimigos), PD so' para "ataques" antes de integrar, controlos tacteis, arte. N7 pausado. N06: 3 zonas de vento cobrem checkpoint/arena (isencoes em `test_region02_wind_levels.gd`) -- decidir.
+
 > **N6 autoral (26 set 2026, sem push)** -- `docs/nivel_autoral_n6.md`. A aguardar playtest: leitura/justica do vento (1500-1800), TTK do Golem (~609 vida), duracao. Decisoes futuras: renomear `ChefeCarcereiro`, destino do `dash_aereo`, rever a intensidade do vento em N7-N10 (420-520 sao imperceptiveis). N7 NAO comecado.
 
 > **Regiao II -- auditoria N6 (26 set 2026, sem push)** -- `docs/regiao_2_decisoes_e_n6_auditoria.md`. **Pendente do GM**: aprovar a reconstrucao do N6 (Carcereiro -> Guardiao, `dash_aereo` fora do N6, seccoes A-E); confirmar retirar os Coletaveis `escalar_paredes` de N7/N11.

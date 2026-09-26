@@ -12,6 +12,18 @@ const CENAS := {
 }
 
 
+## ISENCOES DO N06 (baseline authored `08c1e941`, congelada pelo GM para playtest): tres zonas de vento
+## cobrem um checkpoint ou a arena do Guardiao (ensino continuo em cima do `CheckInicio`, vento do
+## `CheckAntesPonte`, vento fraco da arena). A regra "vento nao cobre checkpoint/arena" continua a
+## valer para os outros niveis; e' o GM quem decide, depois do playtest, se o N06 a cumpre ou se a
+## regra abre excepcao para o vento fraco de ensino. NAO alargar esta lista sem essa decisao.
+const ISENCOES_N06 := [["VentoAprende1", "CheckInicio"], ["VentoAprende2", "CheckAntesPonte"], ["VentoArena", "arena"]]
+
+
+static func _isento_n06(nivel: String, zona: String, alvo: String) -> bool:
+	return nivel == "N06" and [zona, alvo] in ISENCOES_N06
+
+
 static func executar() -> Array[String]:
 	var falhas: Array[String] = []
 	var raizes := {}
@@ -70,11 +82,15 @@ static func executar() -> Array[String]:
 		var raiz: Node = raizes[nome]
 		for zona in _zonas(raiz):
 			for checkpoint in _filhos_por_prefixo(raiz, "Check"):
+				if _isento_n06(nome, zona.name, checkpoint.name):
+					continue
 				_verificar(falhas, not _contem_ponto(zona, checkpoint.position),
 					"%s: %s não cobre %s" % [nome, zona.name, checkpoint.name])
-			var chefe := raiz.get_node("Chefe") as Node2D
-			_verificar(falhas, not _contem_ponto(zona, chefe.position),
-				"%s: %s não cobre a arena/boss" % [nome, zona.name])
+			# N06 e' autoral: fecha com `Guardiao` em vez de `Chefe`
+			var chefe := (raiz.get_node_or_null("Chefe") if raiz.has_node("Chefe") else raiz.get_node("Guardiao")) as Node2D
+			if not _isento_n06(nome, zona.name, "arena"):
+				_verificar(falhas, not _contem_ponto(zona, chefe.position),
+					"%s: %s não cobre a arena/boss" % [nome, zona.name])
 		raiz.free()
 
 	falhas.append_array(_regiao_coerente())

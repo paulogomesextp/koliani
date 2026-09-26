@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3]
+
+; COMBAT LAB v1 -- Goblin de teste (leve, lancavel). Variante SO' do lab; nao mexe no DemonioBase.
+[ext_resource type="PackedScene" path="res://scenes/actors/DemonioBase.tscn" id="1_base"]
+[ext_resource type="Script" path="res://scripts/lab/lab_inimigo.gd" id="2_lab"]
+
+[node name="LabGoblin" instance=ExtResource("1_base")]
+script = ExtResource("2_lab")
+especie = "goblin"
+lab_tipo = "goblin"

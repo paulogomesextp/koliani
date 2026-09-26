@@ -1,3 +1,8 @@
+# >>> COMBAT LAB v1 criado (26 set 2026) -- N7 PAUSADO <<<
+Ver `docs/combat_lab_v1.md`. Arena isolada `scenes/lab/CombatLab.tscn` (`scripts/lab/`), componente opt-in `Koliani.ativar_combat_lab()`; niveis/bosses intactos. A aguardar playtest de combate do GM. CORRECAO: um SCRIPT ERROR em `test_region02_wind_levels.gd` (get_node("Chefe") no N06) escondia parte dessa bateria e as 3 regras "vento nao cobre checkpoint/arena" no N06 -- agora corrido, com ISENCOES_N06 explicitas (a decidir pelo GM). A suite completa demora >10 min (correr com timeout 1500). Sem push.
+
+---
+
 # >>> N6: baseline `08c1e941` CONGELADA para o playtest do GM (26 set 2026) <<<
 Nao alterar vento, layout, checkpoints, vida do Golem nem rota alta/baixa. Nao avancar para N7. O GM valida: vento a favor/contra, transicoes nas WindZones, rajadas pulsadas, ritmo das pontes, bifurcacao, Golem (sem HP sponge), duracao. **Se o vento parecer artificial/forte: rever o sistema GLOBAL de vento (vento <-> DESACEL_AR, ver `docs/nivel_autoral_n6.md`) ANTES de afinar N8/N9.** Depois da aprovacao humana: nova baseline authored do N6 -> N7 (remover o coletavel `escalar_paredes`). Sem push.
 

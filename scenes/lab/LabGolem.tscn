@@ -1,0 +1,11 @@
+[gd_scene load_steps=3 format=3]
+
+; COMBAT LAB v1 -- Golem de teste (pesado, nao lancavel, com guarda). Variante SO' do lab.
+[ext_resource type="PackedScene" path="res://scenes/actors/DemonioBase.tscn" id="1_base"]
+[ext_resource type="Script" path="res://scripts/lab/lab_inimigo.gd" id="2_lab"]
+
+[node name="LabGolem" instance=ExtResource("1_base")]
+scale = Vector2(1.5, 1.5)
+script = ExtResource("2_lab")
+especie = "golem_aereo"
+lab_tipo = "golem"

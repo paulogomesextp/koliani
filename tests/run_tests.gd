@@ -110,6 +110,9 @@ func _correr_tudo() -> void:
 	await teste_cartao_regiao1()
 	await teste_fluxo_fim_regiao1()
 	await teste_n6_autoral()
+	await teste_combat_lab()
+	await teste_combat_lab_combos()
+	await teste_combat_lab_pd_real()
 	teste_execution_9d_inimigos_regiao1()
 	teste_9d9e_crias_sem_goblin()
 	teste_9e2_coracao_producao_e_fases()
@@ -6206,3 +6209,582 @@ func _deriva_n6(k: CharacterBody2D, de: Vector2) -> float:
 	for i in 30:
 		await get_tree().physics_frame
 	return k.global_position.x - x0
+
+
+# ============================================================ COMBAT LAB v1 ====
+func _lab_novo() -> Node:
+	var cena := (load("res://scenes/lab/CombatLab.tscn") as PackedScene).instantiate()
+	add_child(cena)
+	for i in 4:
+		await get_tree().physics_frame
+	cena.limpar()
+	for i in 90:
+		await get_tree().physics_frame
+		if cena.koliani.is_on_floor():
+			break
+	await _lab_esperar(3)
+	return cena
+
+
+func _lab_fim(cena: Node) -> void:
+	Input.action_release("atacar")
+	Input.action_release("mirar_cima")
+	Input.action_release("mirar_baixo")
+	Input.action_release("rolar")
+	Input.action_release("dash")
+	Input.action_release("saltar")
+	Engine.time_scale = 1.0
+	cena.queue_free()
+	await get_tree().process_frame
+	await get_tree().process_frame
+
+
+func _lab_esperar(frames: int) -> void:
+	for i in frames:
+		await get_tree().physics_frame
+
+
+## Carrega `acao` durante `frames` (o Godot so' ve o "just pressed" 1 frame depois).
+func _lab_tap(acao: String, frames := 3) -> void:
+	Input.action_press(acao)
+	await _lab_esperar(frames)
+	Input.action_release(acao)
+
+
+func _lab_estados_estaveis(e: LabInimigo, k: Koliani) -> void:
+	# poe o alvo parado a` frente da Koliani, no chao
+	e.global_position = Vector2(k.global_position.x + 70.0, k.global_position.y)
+	e.velocity = Vector2.ZERO
+
+
+func teste_combat_lab() -> void:
+	var antes_dev: bool = EstadoJogo.modo_dev
+	var antes_hab: Array = EstadoJogo.habilidades.duplicate()
+	# --- 0. isolamento: uma Koliani normal nao tem lab; os niveis nao referenciam o lab
+	var k0 := (load("res://scenes/actors/Koliani.tscn") as PackedScene).instantiate()
+	_ok(k0._lab == null and not k0.lab_golpe_custom, "lab: a Koliani de producao nao tem lab")
+	k0.free()
+	for cena in ["res://scenes/levels/Floresta_Putrefata.tscn", "res://scenes/levels/Prisao_dos_Condenados.tscn",
+			"res://scenes/Main.tscn"]:
+		_ok(not FileAccess.get_file_as_string(cena).contains("scenes/lab/"), "lab: %s referencia o lab" % cena)
+
+	# --- 1. criacao e Launcher (goblin lancado, golem nao)
+	var cena := await _lab_novo()
+	var k: Koliani = cena.koliani
+	var lab: CombateLab = cena.lab
+	var m: LabMetricas = cena.metricas
+	_ok(k._lab == lab and lab != null, "lab: componente ligado")
+	var g: LabInimigo = cena.spawn_goblin(70.0)
+	await _lab_esperar(20)
+	_lab_estados_estaveis(g, k)
+	g.set_physics_process(false)          # parado para medir o golpe, sem IA a interferir
+	Input.action_press("mirar_cima")
+	await _lab_tap("atacar", 3)
+	Input.action_release("mirar_cima")
+	await _lab_esperar(14)
+	_ok(g.lab_estado == LabInimigo.E.LANCADO or g.velocity.y < -100.0 or m.contar("hit") > 0,
+		"launcher: o goblin devia levar o golpe")
+	g.set_physics_process(true)
+	_ok(m.contar("golpe") >= 1, "launcher: golpe do lab nao arrancou")
+	await _lab_esperar(6)
+	var ef := ""
+	for e in m.eventos:
+		if e["nome"] == "hit" and e["d"]["tipo"] == "launcher":
+			ef = String(e["d"]["efeito"])
+	_ok(ef == "lancado", "launcher: goblin nao foi lancado (efeito='%s')" % ef)
+	# golem nao e' lancado
+	g.queue_free()
+	var gol: LabInimigo = cena.spawn_golem(80.0)
+	await _lab_esperar(10)
+	gol.global_position = Vector2(k.global_position.x + 90.0, k.global_position.y - 20.0)
+	gol.set_physics_process(false)
+	m.limpar()
+	k._olha_para = 1.0
+	Input.action_press("mirar_cima")
+	await _lab_tap("atacar", 3)
+	Input.action_release("mirar_cima")
+	await _lab_esperar(20)
+	ef = ""
+	for e in m.eventos:
+		if e["nome"] == "hit" and e["d"]["tipo"] == "launcher":
+			ef = String(e["d"]["efeito"])
+	_ok(ef != "" and ef != "lancado" and gol.lab_estado != LabInimigo.E.LANCADO,
+		"launcher: o golem NAO pode ser lancado (efeito='%s')" % ef)
+	await _lab_fim(cena)
+
+	# --- 2. Air combo: launcher -> salto -> ar -> ar (maximo 2)
+	cena = await _lab_novo()
+	k = cena.koliani
+	lab = cena.lab
+	m = cena.metricas
+	g = cena.spawn_goblin(70.0)
+	await _lab_esperar(20)
+	_lab_estados_estaveis(g, k)
+	g.set_physics_process(false)
+	Input.action_press("mirar_cima")
+	await _lab_tap("atacar", 3)
+	Input.action_release("mirar_cima")
+	await _lab_esperar(4)
+	g.set_physics_process(true)
+	await _lab_tap("saltar", 12)
+	await _lab_esperar(2)
+	# o goblin esta' no ar a` frente/acima: posiciona-o ao alcance do golpe aereo
+	g.global_position = Vector2(k.global_position.x + 46.0, k.global_position.y - 6.0)
+	g.velocity = Vector2(0.0, -40.0)
+	var ar_antes := lab._ar_n
+	await _lab_tap("atacar", 3)
+	await _lab_esperar(9)
+	await _lab_tap("atacar", 3)
+	await _lab_esperar(9)
+	await _lab_tap("atacar", 3)   # o 3.o golpe aereo nao pode existir
+	await _lab_esperar(2)
+	_ok(lab._ar_n == 2, "air combo: esperava exactamente 2 golpes aereos, houve %d (antes %d)" % [lab._ar_n, ar_antes])
+	var ar_hits := 0
+	for e in m.eventos:
+		if e["nome"] == "hit" and bool(e["d"].get("efeito", "").begins_with("juggle")):
+			ar_hits += 1
+	_ok(ar_hits >= 1, "air combo: nenhum golpe aereo acertou o goblin no ar")
+	await _lab_fim(cena)
+
+	# --- 3. Shadow Cleave: guard break do golem; golpes normais nao quebram depressa
+	cena = await _lab_novo()
+	k = cena.koliani
+	lab = cena.lab
+	m = cena.metricas
+	gol = cena.spawn_golem(90.0)
+	await _lab_esperar(6)
+	gol.set_physics_process(false)
+	gol.global_position = Vector2(k.global_position.x + 88.0, k.global_position.y - 16.0)
+	gol._direcao = -1.0
+	gol.lab_estado = LabInimigo.E.IDLE   # guarda levantada
+	k._olha_para = 1.0
+	# 3 golpes normais: guardados
+	for i in 3:
+		await _lab_tap("atacar", 3)
+		await _lab_esperar(26)
+	var guardados := 0
+	for e in m.eventos:
+		if e["nome"] == "hit" and e["d"]["efeito"] == "guardado":
+			guardados += 1
+	_ok(guardados >= 2, "cleave: os golpes normais devem ser guardados (foram %d)" % guardados)
+	_ok(gol.lab_estado != LabInimigo.E.QUEBRADO, "cleave: 3 golpes normais nao quebram a guarda")
+	# carrega 0,55 s e larga
+	gol.lab_estado = LabInimigo.E.IDLE
+	Input.action_press("atacar")
+	await _lab_esperar(34)   # 0,57 s
+	_ok(lab.carga() >= 1.0, "cleave: a carga nao chegou a 100 %% (%.2f)" % lab.carga())
+	gol.global_position = Vector2(k.global_position.x + 80.0, k.global_position.y - 16.0)   # o avanço do 1.o golpe pode te-la passado
+	Input.action_release("atacar")
+	await _lab_esperar(30)
+	_ok(_lab_golpe(m, "cleave"), "cleave: golpe nao saiu")
+	_ok(_lab_efeito(m, "cleave") == "guarda_quebrada", "cleave: nao quebrou a guarda (%s)" % _lab_efeito(m, "cleave"))
+	_ok(gol.lab_estado == LabInimigo.E.QUEBRADO, "cleave: o golem devia ficar QUEBRADO")
+	# um toque curto NAO faz cleave
+	m.limpar()
+	gol.lab_estado = LabInimigo.E.IDLE
+	gol.guarda = LabInimigo.GOL_GUARDA
+	await _lab_esperar(40)
+	await _lab_tap("atacar", 4)
+	await _lab_esperar(40)
+	_ok(not _lab_golpe(m, "cleave"), "cleave: um toque curto nao pode disparar o cleave")
+	await _lab_fim(cena)
+
+	# --- 4. Dash Attack: liga movimento e combate; nao alarga o dash
+	cena = await _lab_novo()
+	k = cena.koliani
+	lab = cena.lab
+	m = cena.metricas
+	k._olha_para = 1.0
+	await _lab_esperar(20)
+	var x0 := k.global_position.x
+	await _lab_tap("dash", 3)
+	await _lab_esperar(40)
+	var dist_dash := k.global_position.x - x0
+	await _lab_esperar(30)
+	x0 = k.global_position.x
+	await _lab_tap("dash", 2)
+	await _lab_esperar(2)
+	await _lab_tap("atacar", 3)
+	await _lab_esperar(40)
+	var dist_dash_atk := k.global_position.x - x0
+	_ok(_lab_golpe(m, "dash"), "dash attack: o corte nao saiu")
+	_ok(dist_dash_atk <= dist_dash + 45.0, "dash attack: alargou o dash (%d vs %d)" % [dist_dash_atk, dist_dash])
+	# o dash attack liga ao combo normal (janela aberta)
+	_ok(k._combo_janela > 0.0 or k._ataque_restante > 0.0, "dash attack: nao abriu janela de combo")
+	await _lab_fim(cena)
+
+	# --- 5. Perfect Dodge: janela e cooldown
+	cena = await _lab_novo()
+	k = cena.koliani
+	lab = cena.lab
+	m = cena.metricas
+	await _lab_esperar(20)
+	var en0 := k.energia_actual()
+	k._energia = 10.0
+	# a) sem roll: nao ha PD
+	k._invulneravel = 0.3
+	k.receber_dano(10, 1.0)
+	_ok(m.contar("perfect_dodge") == 0, "PD: sem roll nao conta")
+	k._invulneravel = 0.0
+	# b) roll a meio da janela: PD
+	await _lab_tap("rolar", 3)
+	await _lab_esperar(4)
+	k.receber_dano(10, 1.0)
+	_ok(m.contar("perfect_dodge") == 1, "PD: golpe dentro da janela devia dar Perfect Dodge")
+	_ok(absf(k.energia_actual() - 35.0) < 2.0, "PD: energia esperada 35, foi %.1f" % k.energia_actual())
+	_ok(lab.janela_counter() > 0.5, "PD: janela do counter nao abriu")
+	# c) mesmo roll, mas 0,26 s depois (cedo demais / ja' fora da janela): nada de novo
+	await _lab_esperar(12)
+	k.receber_dano(10, 1.0)
+	_ok(m.contar("perfect_dodge") == 1, "PD: cooldown/janela deviam impedir 2.o PD")
+	await _lab_fim(cena)
+	cena = await _lab_novo()
+	k = cena.koliani
+	lab = cena.lab
+	m = cena.metricas
+	await _lab_esperar(20)
+	await _lab_tap("rolar", 3)
+	await _lab_esperar(19)   # ~0,32 s: fora da janela de 0,22 s
+	k._invulneravel = 0.2     # ainda protegida por outra causa
+	k._rolar_restante = 0.05  # roll quase a acabar
+	k.receber_dano(10, 1.0)
+	_ok(m.contar("perfect_dodge") == 0, "PD: golpe tarde no roll nao e' perfeito")
+	await _lab_fim(cena)
+
+	# --- 6. Shadow Counter: so' com input, so' na janela; quebra a guarda
+	cena = await _lab_novo()
+	k = cena.koliani
+	lab = cena.lab
+	m = cena.metricas
+	gol = cena.spawn_golem(90.0)
+	await _lab_esperar(6)
+	gol.set_physics_process(false)
+	gol.global_position = Vector2(k.global_position.x + 88.0, k.global_position.y - 16.0)
+	gol._direcao = -1.0
+	gol.lab_estado = LabInimigo.E.IDLE
+	k._olha_para = 1.0
+	await _lab_tap("rolar", 3)
+	await _lab_esperar(3)
+	k.receber_dano(20, 1.0)
+	_ok(m.contar("perfect_dodge") == 1, "counter: PD nao arrancou")
+	await _lab_esperar(30)
+	_ok(not _lab_golpe(m, "counter"), "counter: NAO pode ser automatico")
+	_ok(lab.janela_counter() > 0.0, "counter: a janela devia continuar aberta (%.2f)" % lab.janela_counter())
+	gol.global_position = Vector2(k.global_position.x + 88.0, k.global_position.y - 16.0)
+	await _lab_tap("atacar", 3)
+	await _lab_esperar(20)
+	_ok(_lab_golpe(m, "counter") and _lab_evento_tipo(m, "counter"), "counter: nao saiu dentro da janela")
+	_ok(_lab_efeito(m, "counter") == "guarda_quebrada", "counter: devia quebrar a guarda (%s)" % _lab_efeito(m, "counter"))
+	# fora da janela: nao ha counter
+	m.limpar()
+	await _lab_esperar(60)
+	lab._counter_t = 0.0
+	gol.lab_estado = LabInimigo.E.IDLE
+	await _lab_tap("atacar", 3)
+	await _lab_esperar(20)
+	_ok(not _lab_golpe(m, "counter"), "counter: fora da janela nao existe")
+	await _lab_fim(cena)
+
+	# --- 7. Anti stun-lock / juggle infinito (o goblin)
+	cena = await _lab_novo()
+	k = cena.koliani
+	m = cena.metricas
+	g = cena.spawn_goblin(70.0)
+	await _lab_esperar(20)
+	_lab_estados_estaveis(g, k)
+	var armaduras := 0
+	var frames_stun := 0
+	var frames_total := 0
+	g.vida = 99999
+	for i in 30:   # 30 golpes leves a cada 0,2 s = 6 s de spam
+		g.global_position.x = k.global_position.x + 60.0
+		var r := g.lab_hit({"tipo": "normal", "dano": 1, "dir": 1.0, "passo": 0, "ar": false})
+		if r["efeito"] == "armadura":
+			armaduras += 1
+		for j in 12:
+			await get_tree().physics_frame
+			frames_total += 1
+			if g.lab_estado == LabInimigo.E.HITSTUN:
+				frames_stun += 1
+	_ok(armaduras >= 1, "stunlock: a super-armadura nunca ligou em 6 s de spam")
+	_ok(float(frames_stun) / float(frames_total) < 0.85, "stunlock: %.0f %% do tempo em hitstun" % (100.0 * frames_stun / frames_total))
+	# juggle capado a 3 elevacoes
+	g.lab_estado = LabInimigo.E.LANCADO
+	g._juggle = 0
+	g.global_position = Vector2(k.global_position.x + 60.0, k.global_position.y - 150.0)
+	var lifts := 0
+	for i in 8:
+		var r2 := g.lab_hit({"tipo": "normal", "dano": 1, "dir": 1.0, "passo": 0, "ar": true})
+		if String(r2["efeito"]).begins_with("juggle") and r2["efeito"] != "juggle_max":
+			lifts += 1
+	_ok(lifts <= 3, "juggle: %d elevacoes (max 3)" % lifts)
+	await _lab_fim(cena)
+
+	# --- 8. Energia por accao + TTK medidos com bots simples (relatorio)
+	cena = await _lab_novo()
+	k = cena.koliani
+	m = cena.metricas
+	var ttk_g := await _lab_ttk_bot(cena, "goblin", false)
+	print("LAB goblin bot: ", m.resumo().replace("
+", " | "), " | goblin_acertou=", m.contar("goblin_acertou"))
+	_ok(ttk_g > 0.0 and ttk_g < 25.0, "TTK goblin fora do razoavel: %.1f" % ttk_g)
+	await _lab_fim(cena)
+	cena = await _lab_novo()
+	var ttk_gol := await _lab_ttk_bot(cena, "golem", true)
+	print("LAB golem bot: ", cena.metricas.resumo().replace("
+", " | "), " | golem_acertou=", cena.metricas.contar("golem_acertou"))
+	print("LAB TTK goblin=%.2fs golem(cleave+combo)=%.2fs" % [ttk_g, ttk_gol])
+	_ok(ttk_gol > 0.0, "TTK golem: o bot nao o derrotou")
+	await _lab_fim(cena)
+
+	EstadoJogo.modo_dev = antes_dev
+	EstadoJogo.habilidades.assign(antes_hab)
+
+
+func _lab_golpe(m: LabMetricas, nome: String) -> bool:
+	for e in m.eventos:
+		if e["nome"] == "golpe" and e["d"]["nome"] == nome:
+			return true
+	return false
+
+
+func _lab_evento_tipo(m: LabMetricas, tipo: String) -> bool:
+	for e in m.eventos:
+		if e["nome"] == "hit" and e["d"]["tipo"] == tipo:
+			return true
+	return false
+
+
+func _lab_efeito(m: LabMetricas, tipo: String) -> String:
+	for e in m.eventos:
+		if e["nome"] == "hit" and e["d"]["tipo"] == tipo:
+			return String(e["d"]["efeito"])
+	return ""
+
+
+## Bot minimo: aproxima-se, ataca em cadeia; para o golem usa cleave (segura 0,55 s) e depois
+## combo enquanto a guarda esta' partida. Devolve o TTK em segundos de simulacao (-1 se falhou).
+func _lab_ttk_bot(cena: Node, tipo: String, usa_cleave: bool) -> float:
+	var k: Koliani = cena.koliani
+	var alvo: LabInimigo = cena.spawn_goblin(200.0) if tipo == "goblin" else cena.spawn_golem(260.0)
+	alvo.lab_semente = 3
+	var t := 0.0
+	var dt := 1.0 / 60.0
+	var limite := 90.0
+	while t < limite and is_instance_valid(alvo) and not alvo._morto:
+		var dx := alvo.global_position.x - k.global_position.x
+		var lado := signf(dx)
+		# anda para o alvo ate' ficar a ~70 px
+		if absf(dx) > 72.0:
+			Input.action_press("mover_direita" if lado > 0 else "mover_esquerda")
+			Input.action_release("mover_esquerda" if lado > 0 else "mover_direita")
+		else:
+			Input.action_release("mover_direita")
+			Input.action_release("mover_esquerda")
+			k._olha_para = lado if lado != 0.0 else k._olha_para
+			if usa_cleave and alvo.lab_estado != LabInimigo.E.QUEBRADO and alvo.lab_estado != LabInimigo.E.WINDUP \
+					and alvo.lab_estado != LabInimigo.E.ATIVO:
+				# carrega o cleave
+				Input.action_press("atacar")
+				for i in 34:
+					await get_tree().physics_frame
+					t += dt
+				Input.action_release("atacar")
+				for i in 30:
+					await get_tree().physics_frame
+					t += dt
+				continue
+			# combo simples: toca a cada 0,3 s
+			Input.action_press("atacar")
+			for i in 3:
+				await get_tree().physics_frame
+				t += dt
+			Input.action_release("atacar")
+			for i in 15:
+				await get_tree().physics_frame
+				t += dt
+			continue
+		await get_tree().physics_frame
+		t += dt
+	Input.action_release("mover_direita")
+	Input.action_release("mover_esquerda")
+	if is_instance_valid(alvo) and not alvo._morto:
+		return -1.0
+	return t
+
+
+## Combos do briefing que nao estao em `teste_combat_lab`: N-N-N, Launcher->Air->Pogo, Cleave->combo,
+## Dash Attack->Launcher->Air Combo, Air->Pogo->reposicionar.
+func teste_combat_lab_combos() -> void:
+	var antes_dev: bool = EstadoJogo.modo_dev
+	var antes_hab: Array = EstadoJogo.habilidades.duplicate()
+	# --- 1. Ataque -> Ataque -> Ataque (passos 1, 2, 3 do combo base)
+	var cena := await _lab_novo()
+	var k: Koliani = cena.koliani
+	var lab: CombateLab = cena.lab
+	var m: LabMetricas = cena.metricas
+	var g: LabInimigo = cena.spawn_goblin(70.0)
+	await _lab_esperar(10)
+	g.set_physics_process(false)
+	g.vida = 99999
+	k._olha_para = 1.0
+	var passos := {}
+	for i in 3:
+		g.global_position = Vector2(k.global_position.x + 60.0, k.global_position.y - 16.0)
+		g.lab_estado = LabInimigo.E.APROX
+		await _lab_tap("atacar", 2)
+		await _lab_esperar(13)
+	for e in m.eventos:
+		if e["nome"] == "hit" and e["d"]["tipo"] == "normal":
+			passos[int(e["d"]["passo"])] = true
+	_ok(passos.has(0) and passos.has(1) and passos.has(2), "combo 1: N-N-N devia dar os passos 0,1,2 (deu %s)" % str(passos.keys()))
+	await _lab_fim(cena)
+
+	# --- 3 + 8. Launcher -> salto -> ar -> ar -> Pogo (repoe a cadeia aerea) -> novo golpe aereo
+	cena = await _lab_novo()
+	k = cena.koliani
+	lab = cena.lab
+	m = cena.metricas
+	g = cena.spawn_goblin(70.0)
+	await _lab_esperar(10)
+	g.set_physics_process(false)
+	g.vida = 99999
+	k._olha_para = 1.0
+	g.global_position = Vector2(k.global_position.x + 60.0, k.global_position.y - 16.0)
+	Input.action_press("mirar_cima")
+	await _lab_tap("atacar", 3)
+	Input.action_release("mirar_cima")
+	await _lab_esperar(3)
+	await _lab_tap("saltar", 12)
+	await _lab_esperar(2)
+	g.global_position = Vector2(k.global_position.x + 46.0, k.global_position.y - 6.0)
+	await _lab_tap("atacar", 3)
+	await _lab_esperar(9)
+	await _lab_tap("atacar", 3)
+	await _lab_esperar(3)
+	_ok(lab._ar_n == 2, "combo 3: esperava 2 golpes aereos (%d)" % lab._ar_n)
+	# pogo: BAIXO + ATAQUE com o alvo por baixo dos pes
+	g.global_position = Vector2(k.global_position.x, k.global_position.y + 60.0)
+	g.velocity = Vector2.ZERO
+	Input.action_press("mirar_baixo")
+	await _lab_tap("atacar", 3)
+	var pogo_ok := false
+	for i in 40:
+		await get_tree().physics_frame
+		g.global_position = Vector2(k.global_position.x, k.global_position.y + 60.0)
+		if k._pogo_estado == 3 or m.contar("pogo_acerto") > 0:
+			pogo_ok = true
+			break
+	Input.action_release("mirar_baixo")
+	await _lab_esperar(2)
+	_ok(pogo_ok, "combo 3: o pogo depois do air combo nao acertou")
+	_ok(lab._ar_n == 0, "combo 8: o pogo devia repor a cadeia aerea (ar=%d)" % lab._ar_n)
+	# reposicionamento: novo golpe aereo disponivel depois do pogo
+	await _lab_esperar(6)
+	g.global_position = Vector2(k.global_position.x + 46.0, k.global_position.y - 6.0)
+	await _lab_tap("atacar", 3)
+	await _lab_esperar(4)
+	_ok(lab._ar_n == 1 or k.is_on_floor(), "combo 8: nao houve golpe aereo depois do pogo (ar=%d)" % lab._ar_n)
+	await _lab_fim(cena)
+
+	# --- 5. Shadow Cleave -> combo normal
+	cena = await _lab_novo()
+	k = cena.koliani
+	lab = cena.lab
+	m = cena.metricas
+	g = cena.spawn_goblin(70.0)
+	await _lab_esperar(10)
+	g.set_physics_process(false)
+	g.vida = 99999
+	k._olha_para = 1.0
+	g.global_position = Vector2(k.global_position.x + 70.0, k.global_position.y - 16.0)
+	Input.action_press("atacar")
+	await _lab_esperar(34)
+	g.global_position = Vector2(k.global_position.x + 70.0, k.global_position.y - 16.0)
+	Input.action_release("atacar")
+	await _lab_esperar(14)   # dentro do cleave, depois do ativo
+	_ok(lab._move == "cleave" and lab._move_acertou, "combo 5: o cleave devia estar em curso e ter acertado")
+	await _lab_tap("atacar", 3)
+	var normal_apos := false
+	for i in 40:
+		await get_tree().physics_frame
+		if lab._move == "" and k._ataque_restante > 0.0 and not k.lab_golpe_custom:
+			normal_apos = true
+			break
+	_ok(normal_apos, "combo 5: cleave -> golpe normal nao ligou")
+	await _lab_fim(cena)
+
+	# --- 7. Dash Attack -> Launcher -> Air Combo
+	cena = await _lab_novo()
+	k = cena.koliani
+	lab = cena.lab
+	m = cena.metricas
+	g = cena.spawn_goblin(200.0)
+	await _lab_esperar(10)
+	g.set_physics_process(false)
+	g.vida = 99999
+	k._olha_para = 1.0
+	k._energia = 40.0
+	g.global_position = Vector2(k.global_position.x + 70.0, k.global_position.y - 16.0)
+	await _lab_tap("dash", 2)
+	await _lab_esperar(2)
+	await _lab_tap("atacar", 3)
+	g.global_position = Vector2(k.global_position.x + 55.0, k.global_position.y - 16.0)
+	await _lab_esperar(6)
+	_ok(lab._move == "dash", "combo 7: o dash attack nao arrancou")
+	await _lab_esperar(6)   # passa o ativo
+	g.global_position = Vector2(k.global_position.x + 55.0, k.global_position.y - 16.0)
+	Input.action_press("mirar_cima")
+	await _lab_tap("atacar", 3)
+	Input.action_release("mirar_cima")
+	await _lab_esperar(4)
+	_ok(lab._move == "launcher" or _lab_golpe(m, "launcher"), "combo 7: dash attack -> launcher nao ligou")
+	await _lab_tap("saltar", 12)
+	await _lab_esperar(2)
+	g.global_position = Vector2(k.global_position.x + 46.0, k.global_position.y - 6.0)
+	await _lab_tap("atacar", 3)
+	await _lab_esperar(4)
+	_ok(lab._ar_n >= 1, "combo 7: sem golpe aereo depois do launcher")
+	await _lab_fim(cena)
+
+	EstadoJogo.modo_dev = antes_dev
+	EstadoJogo.habilidades.assign(antes_hab)
+
+
+## Perfect Dodge contra os ataques REAIS do golem (nao so' `receber_dano` chamado a` mao).
+func teste_combat_lab_pd_real() -> void:
+	var antes_hab: Array = EstadoJogo.habilidades.duplicate()
+	var resultados := {}
+	for caso in ["certo", "cedo"]:
+		var cena := await _lab_novo()
+		var k: Koliani = cena.koliani
+		var m: LabMetricas = cena.metricas
+		k.global_position = Vector2(900.0, k.global_position.y)
+		var gol: LabInimigo = cena.spawn_golem(60.0)
+		gol.global_position.x = 960.0
+		gol._direcao = -1.0
+		await _lab_esperar(4)
+		var vida0 := k.vida
+		var rolou := false
+		for i in 400:
+			await get_tree().physics_frame
+			k._olha_para = -1.0
+			if not rolou and gol.lab_estado == LabInimigo.E.WINDUP:
+				var falta: float = float(gol._ataque["windup"]) - gol._t
+				if (caso == "certo" and falta <= 0.09) or (caso == "cedo" and falta <= 0.62):
+					Input.action_press("rolar")
+					await get_tree().physics_frame
+					await get_tree().physics_frame
+					Input.action_release("rolar")
+					rolou = true
+			if rolou and gol.lab_estado == LabInimigo.E.RECUP:
+				break
+		await _lab_esperar(10)
+		resultados[caso] = {"pd": m.contar("perfect_dodge"), "dano": vida0 - k.vida, "golem_acertou": m.contar("golem_acertou")}
+		await _lab_fim(cena)
+	print("LAB PD real: ", resultados)
+	_ok(int(resultados["certo"]["pd"]) == 1 and int(resultados["certo"]["dano"]) == 0,
+		"PD real: o roll a 0,09 s do golpe devia dar Perfect Dodge sem dano: %s" % str(resultados["certo"]))
+	_ok(int(resultados["cedo"]["pd"]) == 0,
+		"PD real: o roll a 0,62 s do golpe nao pode contar como perfeito: %s" % str(resultados["cedo"]))
+	EstadoJogo.habilidades.assign(antes_hab)

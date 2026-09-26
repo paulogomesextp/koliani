@@ -318,6 +318,12 @@ var _passo_variante := -1
 var _parede_t := 0.0
 ## Conta-decrescente da janela pós-rolamento (ver `POS_ROLL_JANELA`).
 var _pos_roll_t := 0.0
+## COMBAT LAB v1 (opt-in, isolado): componente que acrescenta Launcher, cadeia aerea,
+## Shadow Cleave, Dash Attack, Perfect Dodge e Shadow Counter. `null` nos niveis normais --
+## nada disto corre fora do lab. Ver `scripts/lab/combate_lab.gd`.
+var _lab: Node = null
+## true enquanto corre um golpe do lab: a hitbox normal fica desligada (acerta o proprio lab).
+var lab_golpe_custom := false
 ## Avanço do golpe a decorrer (ver `AVANCO_VEL`).
 var _avanco_restante := 0.0
 var _avanco_dur := 0.0
@@ -1573,7 +1579,13 @@ func _physics_process(dt: float) -> void:
 	# assim que este acabar, em vez de se perder.
 	if Input.is_action_just_pressed("especial"):
 		usar_especial()
-	if _pogo_estado == 0 and _pogo_pode_iniciar() and Input.is_action_just_pressed("atacar"):
+	var lab_consumiu := false
+	if _lab != null:
+		_lab.tick(dt)
+		lab_consumiu = _lab.tratar_input(dt)
+	if lab_consumiu:
+		pass
+	elif _pogo_estado == 0 and _pogo_pode_iniciar() and Input.is_action_just_pressed("atacar"):
 		_iniciar_pogo()
 	elif not _defendendo and _rolar_restante <= 0.0 and _pogo_estado == 0 and Input.is_action_just_pressed("atacar"):
 		# Dash -> ataque é um cancel explícito; não deixa o estado de dash
@@ -1581,7 +1593,7 @@ func _physics_process(dt: float) -> void:
 		if _dash_restante > 0.0:
 			_dash_restante = 0.0
 		if _ataque_restante > 0.0:
-			_combo_pedido = not _ataque_no_ar
+			_combo_pedido = (not _ataque_no_ar) if _lab == null else _lab.ar_pode_encadear()
 		else:
 			_iniciar_ataque()
 	if _ataque_restante > 0.0:
@@ -2301,12 +2313,24 @@ func _pogo_acertar() -> bool:
 	return true
 
 
+## Liga o Combat Lab a esta Koliani (so' o lab chama isto). Devolve o componente.
+func ativar_combat_lab() -> Node:
+	if _lab == null:
+		_lab = load("res://scripts/lab/combate_lab.gd").new()
+		_lab.name = "CombateLab"
+		add_child(_lab)
+		_lab.iniciar(self)
+	return _lab
+
+
 func _iniciar_ataque() -> void:
 	# encadeia o combo se ainda estamos na janela do golpe anterior;
 	# senão volta ao 1.º hit ("Single").
 	_ataque_no_ar = not is_on_floor()
 	_combo_passo = 0 if _ataque_no_ar else (
 		(_combo_passo + 1) % NUM_COMBO if _combo_janela > 0.0 else 0)
+	if _lab != null and _ataque_no_ar:
+		_combo_passo = _lab.ar_passo_seguinte()
 	# Os rigs com tiras extra apresentam os três golpes; no ar fica um golpe
 	# único e coerente mesmo quando só existe a animação `attack`.
 	var tem_combo := RIG == "cavaleiro" or RIG == "nova" or RIG == "shadowblade"
@@ -2381,6 +2405,10 @@ const SELO_COMBO_Y := -104.0
 
 
 func _atualizar_janela_ataque() -> void:
+	if lab_golpe_custom:
+		if _hitbox:
+			_hitbox.monitoring = false
+		return
 	if _hitbox == null or _ataque_dur <= 0.0:
 		return
 	var passo := clampi(_combo_passo, 0, NUM_COMBO - 1)
@@ -2394,6 +2422,7 @@ static func janela_ataque_ativa(passo: int, progresso: float) -> bool:
 
 
 func _desativar_hitbox_ataque() -> void:
+	lab_golpe_custom = false
 	if _hitbox:
 		_hitbox.monitoring = false
 	_alvos_atingidos_ataque.clear()
@@ -2547,6 +2576,8 @@ func _ao_acertar_corpo(corpo: Node) -> void:
 			crit = true
 		var passo := clampi(_combo_passo, 0, NUM_COMBO - 1)
 		var dano := maxi(1, roundi(_dano_golpe() * float(DANO_COMBO[passo])))
+		if _lab != null:
+			_lab.ao_acertar_normal(corpo, passo, _ataque_no_ar, dano)
 		corpo.receber_dano(dano, sign(_olha_para), crit, float(RECUO_COMBO[passo]))
 		# 3.º golpe: ATORDOA -- é o pagamento por arriscar o golpe lento.
 		if passo == NUM_COMBO - 2 and corpo.has_method("atordoar"):
@@ -2924,6 +2955,8 @@ func _descartar_planar_invalido(dt: float) -> void:
 
 func receber_dano(quantidade: int, dir_empurrao: float = 0.0) -> void:
 	if _invulneravel > 0.0:
+		if _lab != null:
+			_lab.tentativa_de_dano(quantidade)
 		return
 	if _defendendo and _bloqueia(dir_empurrao):
 		_ao_bloquear()
