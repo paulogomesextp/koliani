@@ -32,6 +32,15 @@ func _ready() -> void:
 
 
 func _correr_tudo() -> void:
+	# iteracao rapida: `SO_TESTE=teste_n5_autoral` corre so' essa funcao
+	var so_teste := OS.get_environment("SO_TESTE")
+	if so_teste != "":
+		await call(so_teste)
+		for f in _falhas:
+			printerr("FALHOU: ", f)
+		print("SO_TESTE terminou: %d falha(s)" % _falhas.size())
+		get_tree().quit(1 if not _falhas.is_empty() else 0)
+		return
 	for falha in TestesMovimentoCamera4A.executar():
 		_falhas.append(falha)
 	for falha in TestesWindSystem.executar():
@@ -97,6 +106,7 @@ func _correr_tudo() -> void:
 	await teste_n3_autoral()
 	await teste_pogo_intencional()
 	await teste_n4_autoral()
+	await teste_n5_autoral()
 	teste_execution_9d_inimigos_regiao1()
 	teste_9d9e_crias_sem_goblin()
 	teste_9e2_coracao_producao_e_fases()
@@ -1566,8 +1576,9 @@ func teste_execution_7_guardioes_e_boss_regional() -> void:
 	var exame := l5.instantiate() if l5 else null
 	_ok(exame != null and exame.get_node_or_null("Chefe") != null,
 		"Execution 7: L5 devia manter o boss regional")
-	_ok(exame != null and exame.get_node("ColBatida").habilidade_id == "dash",
-		"Execution 7: L5 devia desbloquear Dash")
+	# N5 autoral: o exame nao da' skills novas (o Dash vem do N2); ver `teste_n5_autoral`
+	_ok(exame != null and exame.get_node_or_null("ColBatida") == null,
+		"Execution 7: L5 nao devia desbloquear skills (exame regional)")
 	if exame:
 		exame.free()
 	_ok(ChefeCoracaoPutrefacto.fase_por_vida(51, 100) == 1
@@ -5452,8 +5463,6 @@ func _pogo_trial(k: CharacterBody2D, x: float, y0: float, carregar: bool, gatilh
 		elif premiu:
 			Input.action_release("atacar")
 		await get_tree().physics_frame
-		if premiu and i % 2 == 0 and OS.get_environment("POGO_DBG") != "":
-			print("  dbg st=%s y=%s vy=%s" % [k._pogo_estado, k.global_position.y, k.velocity.y])
 		if not ressaltou and k.velocity.y < -150.0:
 			ressaltou = true
 			y_contacto = k.global_position.y
@@ -5664,6 +5673,344 @@ func teste_n4_autoral() -> void:
 	_ok((lv1 or mortos1) and (lv2 or mortos2), "N4: a onda do Especial devia atravessar e ferir os dois goblins")
 	n.queue_free()
 	await get_tree().process_frame
+	EstadoJogo.modo_dev = antes_dev
+	EstadoJogo.indice_nivel = antes_idx
+	EstadoJogo.habilidades.assign(antes_hab)
+
+
+## ---- N5: Coracao Putrefacto (exame regional) -------------------------------------------------
+func _coracao_novo(dev := true) -> Array:
+	EstadoJogo.modo_dev = dev
+	var n := (load("res://scenes/levels/Coracao_da_Floresta.tscn") as PackedScene).instantiate()
+	add_child(n)
+	for i in 8:
+		await get_tree().physics_frame
+	var g := n.get_node("Chefe") as ChefeCoracaoPutrefacto
+	var k := n.get_node("Koliani") as CharacterBody2D
+	k.global_position = Vector2(g.global_position.x - 200.0, 630.0)   # o headless e' quadrado: so' ~250 px de cada lado estao a' vista
+	for i in 30:
+		await get_tree().physics_frame
+	return [n, g, k]
+
+
+## Bot de golpes (mesma convencao do Ghorak: 2 golpes de 50 por segundo). modo: "janelas" so' com o nucleo
+## aberto; "spam" sempre; "casca" so' fora da janela; "especial" = janelas + 3 Especiais (130) por janela aberta.
+func _coracao_luta(modo: String, segundos: float) -> Dictionary:
+	var antes_dev: bool = EstadoJogo.modo_dev
+	var r: Array = await _coracao_novo(true)
+	Engine.time_scale = 6.0   # o bot corre a 6x: a luta mede-se em segundos de JOGO (frames de fisica)
+	var n: Node = r[0]
+	var g: ChefeCoracaoPutrefacto = r[1]
+	var k: Node2D = r[2]
+	var frames := 0
+	var limite := int(segundos * 60.0)
+	var janelas: Array = []
+	var jan_ini := -1
+	var fase2_em := -1.0
+	var pior_estado := 0.0
+	var ult_fase := int(g._fase)
+	var t_fase := 0
+	var especiais := 0
+	var energia := 99.0
+	var raizes_cedo := 0
+	var vistas := {}
+	var tel_pulso: Array = []
+	var vida0: int = g.vida
+	var morreu := false
+	while frames < limite:
+		await get_tree().physics_frame
+		frames += 1
+		if frames % 45 == 0 and is_instance_valid(g):
+			k.global_position = Vector2(g.global_position.x - 200.0, 630.0)   # o pulso empurra: mantem-na a' vista
+		if not is_instance_valid(g) or g.is_queued_for_deletion():
+			morreu = true
+			break
+		var vuln: bool = g._vulneravel()
+		if vuln and jan_ini < 0:
+			jan_ini = frames
+			especiais = 0
+		if not vuln and jan_ini >= 0:
+			janelas.append(float(frames - jan_ini) / 60.0)
+			jan_ini = -1
+		if int(g._fase) != ult_fase:
+			if ult_fase != int(ChefeCoracaoPutrefacto.Fase.DORME):
+				pior_estado = maxf(pior_estado, float(t_fase) / 60.0)
+			if ult_fase == int(ChefeCoracaoPutrefacto.Fase.PULSO_TEL):
+				tel_pulso.append(float(t_fase) / 60.0)
+			ult_fase = int(g._fase)
+			t_fase = 0
+		t_fase += 1
+		if g._f2 and fase2_em < 0.0:
+			fase2_em = float(frames) / 60.0
+		for no in n.get_children():
+			if no is RaizPerigo and not vistas.has(no.get_instance_id()):
+				vistas[no.get_instance_id()] = true
+				if float(no.atraso) < 0.9:
+					raizes_cedo += 1
+		if frames % 30 == 0 and ((modo == "casca" and not vuln) or (modo != "casca" and (modo == "spam" or vuln))):
+			g.receber_dano(50, 1.0)
+		if modo == "especial":
+			energia = minf(99.0, energia + 0.2)      # regen 12/s (60 Hz)
+			if vuln and frames % 30 == 0:
+				energia = minf(99.0, energia + 5.0)   # +5 por golpe de espada
+			if vuln and energia >= 33.0 and frames % 40 == 20:
+				energia -= 33.0
+				g.receber_tiro(130, 1.0)   # o nucleo absorve 40 % da onda
+	var ultima_contagem := {}
+	if is_instance_valid(g) and not g.is_queued_for_deletion():
+		morreu = false
+		ultima_contagem = g.contagem.duplicate()
+	else:
+		morreu = true
+		await get_tree().process_frame
+		await get_tree().process_frame
+	var porta := n.get_node_or_null("Porta")
+	var res := {"ttk": float(frames) / 60.0, "morreu": morreu, "pior_estado": pior_estado, "janelas": janelas,
+		"fase2_em": fase2_em, "raizes_cedo": raizes_cedo, "tel_pulso": tel_pulso, "vida0": vida0,
+		"contagem": ultima_contagem,
+		"saida": n.get_node_or_null("BauChefe") != null or (porta != null and bool(porta.monitoring))}
+	Engine.time_scale = 1.0
+	n.queue_free()
+	await get_tree().process_frame
+	EstadoJogo.bosses_derrotados.clear()   # a morte do boss grava-se: sem isto o proximo nivel nasce sem Coracao
+	EstadoJogo.modo_dev = antes_dev
+	return res
+
+
+func teste_n5_autoral() -> void:
+	var antes_dev: bool = EstadoJogo.modo_dev
+	var antes_bosses: Array[String] = EstadoJogo.bosses_derrotados.duplicate()
+	EstadoJogo.bosses_derrotados.clear()
+	var antes_idx: int = EstadoJogo.indice_nivel
+	var antes_hab: Array = EstadoJogo.habilidades.duplicate()
+	EstadoJogo.indice_nivel = 4
+	EstadoJogo.habilidades.assign(["dash", "pogo", "especial"])
+	# --- estrutura ---
+	var n0 := (load("res://scenes/levels/Coracao_da_Floresta.tscn") as PackedScene).instantiate()
+	add_child(n0)
+	for i in 6:
+		await get_tree().process_frame
+	_ok(not bool(n0.get("corredor")) and bool(n0.get("checkpoints_autorais")), "N5: nao e' autoral")
+	_ok(n0.get_node_or_null("CorredorAproximacao") == null, "N5: o gerador criou uma jornada")
+	_ok(n0.get_node_or_null("Chefe") is ChefeCoracaoPutrefacto and n0.get_node_or_null("Porta") != null, "N5: sem Coracao/Porta")
+	var chk := 0
+	for c in get_tree().get_nodes_in_group("checkpoints"):
+		if n0.is_ancestor_of(c):
+			chk += 1
+	_ok(chk == 4, "N5: esperava 4 checkpoints, ha %d" % chk)
+	var proibidos := ["serra.gd", "fogo.gd", "guilhotina.gd", "pendulo_lamina.gd", "wind_zone.gd", "portal.gd",
+		"trampolim.gd", "tumulo_elevador.gd", "plataforma_ritmada.gd", "torreta.gd", "teia_prende.gd",
+		"raiz_elevatoria.gd", "alavanca.gd", "porta_trancada.gd", "gota_acida.gd", "zona_gravidade.gd", "coletavel.gd"]
+	var inimigos := 0
+	for no in n0.find_children("*", "", true, false):
+		var sc := no.get_script() as Script
+		if sc == null:
+			continue
+		for pr in proibidos:
+			_ok(not sc.resource_path.ends_with(pr), "N5: %s nao pertence ao N5 (skill/mecanica nova)" % no.name)
+		if no is DemonioBase and not no.is_in_group("chefes"):
+			inimigos += 1
+			_ok(String(no.get("especie")) in ["goblin", "gosma"], "N5: %s: especie fora da aprovada" % no.name)
+	_ok(inimigos >= 3 and inimigos <= 4, "N5: %d inimigos no exame (esperava 3-4)" % inimigos)
+	_ok(_gates_dash_autoral(n0, "N5") == 3, "N5: esperava 3 gates de dash")
+	# arena continua: nenhuma plataforma secundaria sobre o chao do boss
+	var chao_boss := n0.get_node("ChaoChefe") as Node2D
+	var sec := 0
+	for no in n0.get_children():
+		if no is StaticBody2D and no != chao_boss and no.position.x > chao_boss.position.x - 560.0 and no.position.y < 660.0:
+			sec += 1
+	_ok(sec == 0, "N5: %d plataformas na arena do boss" % sec)
+	n0.queue_free()
+	await get_tree().process_frame
+
+	# --- nada arranca fora do campo visual ---
+	var chao := StaticBody2D.new()
+	chao.collision_layer = 1
+	var cs := CollisionShape2D.new()
+	var rs := RectangleShape2D.new()
+	rs.size = Vector2(9000.0, 60.0)
+	cs.shape = rs
+	chao.add_child(cs)
+	add_child(chao)
+	chao.global_position = Vector2(4000.0, 560.0)
+	var kf := CharacterBody2D.new()
+	var sc_kf := GDScript.new()
+	sc_kf.source_code = "extends CharacterBody2D\nfunc receber_dano(_a, _b = 0.0):\n\tpass\n"
+	sc_kf.reload()
+	kf.set_script(sc_kf)
+	kf.add_to_group("koliani")
+	add_child(kf)
+	var cam0 := Camera2D.new()
+	add_child(cam0)
+	cam0.global_position = Vector2(-3000.0, 300.0)
+	cam0.make_current()
+	var g0 := (load("res://scenes/actors/ChefeCoracaoPutrefacto.tscn") as PackedScene).instantiate() as ChefeCoracaoPutrefacto
+	g0.position = Vector2(4000.0, 500.0)
+	add_child(g0)
+	kf.global_position = g0.global_position + Vector2(-230.0, 0.0)
+	for i in 300:
+		await get_tree().physics_frame
+	var c0: Dictionary = g0.contagem
+	_ok(int(c0["RAIZES"]) + int(c0["PULSO"]) + int(c0["BROTOS"]) == 0 and g0._fase == ChefeCoracaoPutrefacto.Fase.DORME,
+		"Coracao: iniciou um ataque fora do campo visual (%s)" % str(c0))
+	cam0.global_position = g0.global_position
+	for i in 420:
+		await get_tree().physics_frame
+		await get_tree().process_frame
+	var c1: Dictionary = g0.contagem
+	_ok(int(c1["RAIZES"]) + int(c1["PULSO"]) + int(c1["BROTOS"]) >= 1, "Coracao: a' vista nunca atacou (%s)" % str(c1))
+	g0.queue_free()
+	kf.queue_free()
+	chao.queue_free()
+	cam0.queue_free()
+	await get_tree().process_frame
+
+	# --- casca vs janela ---
+	var r: Array = await _coracao_novo(true)
+	var n: Node = r[0]
+	var g: ChefeCoracaoPutrefacto = r[1]
+	g._ir(ChefeCoracaoPutrefacto.Fase.DECIDE)
+	var v0: int = g.vida
+	g.receber_dano(50, 1.0)
+	var dano_casca: int = v0 - g.vida
+	g._abrir_janela(2.0)
+	v0 = g.vida
+	g.receber_dano(50, 1.0)
+	var dano_janela: int = v0 - g.vida
+	_ok(dano_casca >= 1 and dano_casca <= 10, "Coracao: a casca deixou passar %d de 50" % dano_casca)
+	_ok(dano_janela >= 50, "Coracao: a janela devia dar o golpe inteiro, deu %d" % dano_janela)
+	n.queue_free()
+	await get_tree().process_frame
+
+	# --- broto + pogo: abre o nucleo de imediato e alonga a janela ---
+	r = await _coracao_novo(true)
+	n = r[0]
+	g = r[1]
+	var k: CharacterBody2D = r[2]
+	g._ciclos = 2                                   # PADRAO_F1[2] = BROTOS
+	g._ir(ChefeCoracaoPutrefacto.Fase.DECIDE)
+	var t_espera := 0
+	while g._fase != ChefeCoracaoPutrefacto.Fase.BROTOS_ESPERA and t_espera < 600:
+		await get_tree().physics_frame
+		t_espera += 1
+	for i in 60:
+		await get_tree().physics_frame                # os brotos crescem em 0,7 s
+	var broto: Node2D = null
+	for b in g._brotos:
+		if is_instance_valid(b):
+			broto = b
+			break
+	_ok(broto != null and broto.is_in_group("pogavel"), "Coracao: sem broto pogavel na mecanica BROTOS")
+	if broto != null:
+		k.global_position = Vector2(broto.global_position.x, broto.global_position.y - 220.0)
+		k.velocity = Vector2.ZERO
+		var premiu := false
+		for i in 200:
+			if not premiu and k.velocity.y > 0.0 and k.global_position.y + 24.0 >= broto.global_position.y - 110.0:
+				premiu = true
+				Input.action_press("mirar_baixo")
+				Input.action_press("atacar")
+			elif premiu:
+				Input.action_release("atacar")
+			await get_tree().physics_frame
+			if int(g.contagem["BROTOS_ESTOURADOS"]) > 0:
+				break
+		Input.action_release("atacar")
+		Input.action_release("mirar_baixo")
+		await get_tree().physics_frame
+		print("N5 broto: estourados=", g.contagem["BROTOS_ESTOURADOS"], " fase=", g._fase, " janela=", snappedf(g._dur_janela, 0.01))
+		_ok(int(g.contagem["BROTOS_ESTOURADOS"]) == 1, "Coracao: o pogo num broto nao o estourou")
+		_ok(g._fase == ChefeCoracaoPutrefacto.Fase.EXPOSTO and g._dur_janela >= g.janela_aberta * 1.4,
+			"Coracao: estourar o broto devia abrir uma janela 50 por cento maior (fase %d, janela %.2f)" % [int(g._fase), g._dur_janela])
+	n.queue_free()
+	await get_tree().process_frame
+
+	# --- pulso: telegrafado, magoa quem fica no chao, evita-se com salto ou dash ---
+	var dano_parado := 0
+	var dano_salto := 999
+	var dano_dash := 999
+	for variante in ["parado", "salto", "dash"]:
+		for off in [0.0, 1.0, 2.0, 3.0]:
+			r = await _coracao_novo(false)
+			n = r[0]
+			g = r[1]
+			k = r[2]
+			k.set("_invulneravel", 0.0)
+			k.global_position = Vector2(g.global_position.x + 200.0, 630.0)
+			k.velocity = Vector2.ZERO
+			k.set("_olha_para", -1.0)
+			k.vida = k._vida_max()
+			g._ciclos = 1                             # PADRAO_F1[1] = PULSO
+			g._ir(ChefeCoracaoPutrefacto.Fase.DECIDE)
+			var esperou := 0
+			while g._fase != ChefeCoracaoPutrefacto.Fase.PULSO_LANCA and esperou < 600:
+				await get_tree().physics_frame
+				esperou += 1
+				if g._fase == ChefeCoracaoPutrefacto.Fase.PULSO_TEL and esperou % 5 == 0:
+					k.global_position.x = g.global_position.x + 330.0   # depois do aviso: afasta-se
+			var vida_ini: int = k.vida
+			var acao := false
+			var acao_n := 0
+			for i in 140:
+				var d := 1e9
+				for no in n.get_children():
+					if no is Area2D and no.get_child_count() > 0 and no.get_child(0) is CollisionShape2D \
+							and (no.get_child(0) as CollisionShape2D).shape is RectangleShape2D \
+							and ((no.get_child(0) as CollisionShape2D).shape as RectangleShape2D).size == Vector2(44.0, 40.0):
+						if no.global_position.x > k.global_position.x:
+							continue
+						d = minf(d, k.global_position.x - no.global_position.x)
+				if not acao and d <= (70.0 if variante == "salto" else 150.0) + off * 25.0 and variante != "parado":
+					acao = true
+					Input.action_press("saltar" if variante == "salto" else "dash")
+				elif acao and variante == "dash" and acao_n > 2:
+					Input.action_release("dash")
+				if acao:
+					acao_n += 1
+					if acao_n > 24:
+						Input.action_release("saltar")
+				await get_tree().physics_frame
+			Input.action_release("saltar")
+			Input.action_release("dash")
+			var dano: int = vida_ini - k.vida
+			if variante == "parado":
+				dano_parado = maxi(dano_parado, dano)
+			elif variante == "salto":
+				dano_salto = mini(dano_salto, dano)
+			else:
+				dano_dash = mini(dano_dash, dano)
+			n.queue_free()
+			await get_tree().process_frame
+	print("N5 pulso: dano parado=", dano_parado, " salto(min)=", dano_salto, " dash(min)=", dano_dash)
+	_ok(dano_parado > 0, "Coracao: o pulso nao magoou quem ficou parado no chao")
+	_ok(dano_salto == 0, "Coracao: saltar por cima do pulso nunca o evitou (min %d)" % dano_salto)
+	_ok(dano_dash == 0, "Coracao: o dash nunca atravessou o pulso (min %d)" % dano_dash)
+
+	# --- lutas simuladas (Koliani invulneravel: mede-se o boss) ---
+	EstadoJogo.modo_dev = true
+	var spam: Dictionary = await _coracao_luta("spam", 200.0)
+	var casca: Dictionary = await _coracao_luta("casca", 120.0)
+	var lido: Dictionary = await _coracao_luta("janelas", 300.0)
+	var esp: Dictionary = await _coracao_luta("especial", 300.0)
+	print("CORACAO vida=", lido["vida0"], " | spam ttk=", snappedf(spam["ttk"], 0.1), " morreu=", spam["morreu"], " | so casca ttk=", snappedf(casca["ttk"], 0.1), " morreu=", casca["morreu"])
+	print("CORACAO janelas: ttk=", snappedf(lido["ttk"], 0.1), " fase2_em=", snappedf(lido["fase2_em"], 0.1), " pior_estado=", snappedf(lido["pior_estado"], 0.1), " | com Especial: ttk=", snappedf(esp["ttk"], 0.1))
+	print("CORACAO janelas (s): ", lido["janelas"], " contagem: ", lido["contagem"], " tel_pulso: ", lido["tel_pulso"])
+	_ok(bool(lido["morreu"]), "Coracao: nao morre a bater so' nas janelas (preso?)")
+	_ok(not bool(casca["morreu"]) or float(casca["ttk"]) >= 90.0, "Coracao: da' para ganhar a bater so' na casca em %.1f s" % casca["ttk"])
+	_ok(not bool(spam["morreu"]) or float(spam["ttk"]) >= float(lido["ttk"]) * 0.7, "Coracao: spam (%.1f) ganha mais depressa do que ler as janelas (%.1f)" % [spam["ttk"], lido["ttk"]])
+	_ok(float(lido["ttk"]) >= 20.0 and float(lido["ttk"]) <= 50.0, "Coracao: TTK do bot perfeito = %.1f s (esperava 20-50; humano ~1,6x)" % lido["ttk"])
+	_ok(float(esp["ttk"]) < float(lido["ttk"]) * 0.95 and float(esp["ttk"]) > float(lido["ttk"]) * 0.55, "Coracao: o Especial devia ajudar sem resolver a luta (%.1f vs %.1f)" % [esp["ttk"], lido["ttk"]])
+	_ok(float(lido["fase2_em"]) > 0.0, "Coracao: a fase 2 nunca arrancou")
+	_ok(int(lido["raizes_cedo"]) == 0, "Coracao: %d raizes com aviso < 0,9 s" % lido["raizes_cedo"])
+	_ok(float(lido["pior_estado"]) <= 6.0, "Coracao: ficou %.1f s no mesmo estado" % lido["pior_estado"])
+	for w in lido["tel_pulso"]:
+		_ok(float(w) >= 0.6, "Coracao: pulso com aviso de %.2f s (< 0,6 s)" % float(w))
+	var jan: Array = lido["janelas"]
+	_ok(jan.size() >= 4, "Coracao: menos de 4 janelas (%d)" % jan.size())
+	for w in jan:
+		_ok(float(w) >= 1.2 and float(w) <= 4.6, "Coracao: janela de %.2f s fora de 1,2-4,6 s" % float(w))
+	_ok(bool(lido["saida"]), "Coracao: ao morrer nao apareceu o bau nem abriu a porta")
+	EstadoJogo.bosses_derrotados.assign(antes_bosses)
 	EstadoJogo.modo_dev = antes_dev
 	EstadoJogo.indice_nivel = antes_idx
 	EstadoJogo.habilidades.assign(antes_hab)

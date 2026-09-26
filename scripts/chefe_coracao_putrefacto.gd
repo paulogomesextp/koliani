@@ -1,31 +1,49 @@
 class_name ChefeCoracaoPutrefacto
 extends ChefeBase
-## Região I / nível 05 -- O Coração Putrefacto. Um coração púrpura gigante
-## preso num emaranhado de raízes e cadáveres, no centro da arena. Não se
-## desloca: pulsa. Toda a luta anda ao ritmo da "batida da floresta" (o
-## mesmo relógio das `PlataformaRitmada`).
+## Regiao I / nivel 05 -- O Coracao Putrefacto: BOSS REGIONAL, o exame da Floresta Corrompida.
+## Nao se desloca: e' uma massa no centro da arena, e a luta e' um ciclo legivel
 ##
-## A cada SÍSTOLE o núcleo abre-se por um instante -- é a ÚNICA janela de
-## dano, e a dobrar. Entre batidas, ataca conforme a fase:
-##   * Fase 1 (vida > 50%): raízes sob os pés da Koliani (`RaizPerigo`) +
-##     salvas de projéteis dirigidos (`ProjetilZeriko`).
-##   * Fase 2 (vida <= 50%): combina o padrão base com um leque radial em
-##     cada batida e ALIVIA a gravidade da Koliani
-##     (`Koliani.flutuar`) -- "o coração bate e altera a gravidade".
-## A plataforma principal permanece contínua: o desafio cresce por padrão e
-## combinação, não por retirar chão ao jogador.
+##   PROTEGIDO -> MECANICA -> EXPOSTO (PUNISH) -> RECOVER -> PROTEGIDO ...
+##
+## PROTEGIDO  a casca de corrupcao aguenta o golpe (`RESIST_CASCA` do dano, sem recuo); a luta nao
+##            se ganha a fazer spam. A pele fica baca e escura.
+## MECANICA   um ataque SEMPRE com aviso (o coracao pisca e o aviso desenha-se no chao) antes de
+##            haver dano:
+##   RAIZES   marcas no chao (racha visivel 1,5 s) em volta da Koliani -> sai-se dali (movimento/salto).
+##   PULSO    o coracao brilha e duas ondas rasteiras (uma para cada lado) percorrem o chao:
+##            salta-se por cima OU atravessa-se de DASH (invulneravel). E' a janela do Dash.
+##   BROTOS   dois brotos crescem no chao (alvos de POGO): ressaltar num broto (BAIXO+ATAQUE em cima
+##            dele) rebenta-o, abre o nucleo de imediato e alonga a janela em 50 %. Ignora-los nao
+##            castiga: o nucleo abre na mesma, so' que mais tarde e mais curto.
+## EXPOSTO    o nucleo abre-se (brilho + pulso), o coracao NAO magoa por contacto; e' aqui que a
+##            espada entra por inteiro e que o ESPECIAL rende (a onda atravessa e da' 2,6x). A
+##            Energia decide QUANDO gastar: 3 cargas, ~130 cada. Nao chega para ganhar sozinho.
+## RECOVER    o nucleo pisca 0,4 s antes de fechar (aviso legivel).
+##
+## FASE 2 (< 50 %): o mesmo vocabulario encadeado (raizes + pulso, pulso duplo, raizes + brotos),
+## avisos ~15 % mais curtos, janela ~20 % mais curta, uma 2.a zona de raizes. Nao ha' tiros nem
+## gravidade alterada. Regra global: nada arranca fora do campo visual (`Som.em_vista`).
 
 const RAIZ := preload("res://scenes/actors/RaizPerigo.tscn")
-const TIRO := preload("res://scenes/actors/ProjetilZeriko.tscn")
+const BROTO := preload("res://scripts/broto_coracao.gd")
 
-enum Fase { DORME, ENTRE, RAIZES_TEL, RAIZES, TIROS_TEL, TIROS }
+enum Fase { DORME, DECIDE, RAIZES_MARCAS, PULSO_TEL, PULSO_LANCA, BROTOS_TEL, BROTOS_ESPERA, EXPOSTO, ROAR }
 
-@export var periodo_batida := 2.0
-@export var dur_exposta := 0.72
-@export var dur_tel := 0.55
+## Fracao do dano que a casca deixa passar fora da janela.
+const RESIST_CASCA := 0.05
+const PADRAO_F1 := ["RAIZES", "PULSO", "BROTOS", "PULSO"]
+const PADRAO_F2 := ["RAIZES+PULSO", "BROTOS", "PULSO+PULSO", "RAIZES+BROTOS"]
+
+## Tempos proprios (nao levam o escalonamento `dur_*` do ChefeBase).
+@export var t_marcas := 0.7
+@export var t_pulso_tel := 0.95
+@export var t_brotos_tel := 0.6
+@export var t_brotos_espera := 1.7
+@export var janela_aberta := 2.6
+@export var atraso_raiz := 1.5
+@export var vel_onda := 400.0
 @export var dano_raiz := 18
-@export var dano_tiro := 15
-@export var dano_entulho := 20
+@export var dano_pulso := 20
 
 var _fase: Fase = Fase.DORME
 var _t := 0.0
@@ -34,8 +52,17 @@ var _nivel := 1  ## 1 ou 2
 var _nucleo_exposto := false
 var _ciclos := 0
 var _vida_max := 460
-var _ultimo_frac := 0.0
 var _combate := false
+var _f2 := false
+var _seq: Array = []          # mecanicas ainda por fazer neste ciclo
+var _dur_janela := 0.0
+var _broto_estourado := false
+var _brotos: Array = []
+var _marcas_pulso: Array = []
+var _casca_cd := 0.0
+## Diagnostico/testes: quantas vezes arrancou cada mecanica, e o historico de estados.
+var contagem := {"RAIZES": 0, "PULSO": 0, "BROTOS": 0, "JANELAS": 0, "BROTOS_ESTOURADOS": 0}
+var historico: Array = []
 
 @onready var _nucleo: Node2D = get_node_or_null("Sprite/Nucleo")
 
@@ -155,101 +182,145 @@ func _aura_fase2() -> void:
 
 func _process(dt: float) -> void:
 	super._process(dt)
+	_casca_cd = maxf(0.0, _casca_cd - dt)
 	_pulso += dt
 	if _sprite:
-		# pulsar constante do coração (bombeia mais forte quando exposto)
-		var amp := 0.05 if not _nucleo_exposto else 0.14
-		var p := 1.0 + amp * sin(_pulso * (PI * 2.0 / periodo_batida) * (2.0 if _nucleo_exposto else 1.0))
+		var amp := 0.05 if not _nucleo_exposto else 0.12
+		var p := 1.0 + amp * sin(_pulso * (PI * 2.0 / 2.0) * (2.0 if _nucleo_exposto else 1.0))
 		_sprite.scale = Vector2(_direcao * escala_visual * p, escala_visual * p)
 	if _nucleo and _nucleo_exposto:
 		var q := 1.0 + 0.18 * sin(_pulso * 12.0)
 		_nucleo.scale = Vector2(q, q)
+		# RECOVER: a janela esta' a fechar, o nucleo pisca (aviso legivel)
+		if _dur_janela - _t < 0.4 and _dur_janela > 0.0:
+			var brilho: CanvasItem = _nucleo.get_node_or_null("Brilho")
+			if brilho:
+				brilho.visible = int(_pulso * 12.0) % 2 == 0
 
 
 func _physics_process(dt: float) -> void:
 	_ataque_forte = maxf(0.0, _ataque_forte - dt)
 	_atualiza_fase()
-
-	if _fase == Fase.DORME:
-		if _ve_koliani():
-			provocar()
-			_combate = true
-			_ir(Fase.ENTRE)
-		_t += dt
-		return
-
-	# batida partilhada com as plataformas (mesmo relógio Time.get_ticks_msec)
-	var f := fmod(Time.get_ticks_msec() / 1000.0 / maxf(0.1, periodo_batida), 1.0)
-	if f < _ultimo_frac:
-		_bater()
-	_ultimo_frac = f
-
 	match _fase:
-		Fase.ENTRE:
-			if _t >= periodo_batida * 0.5:
-				_escolher()
-		Fase.RAIZES_TEL:
-			_piscar(true)
-			if _t >= dur_tel:
+		Fase.DORME:
+			if _ve_koliani() and Som.em_vista(self):
+				provocar()
+				_combate = true
+				_ir(Fase.DECIDE)
+		Fase.DECIDE:
+			# PROTEGIDO: nada arranca com o boss fora do campo visual
+			if _t >= 0.55 and Som.em_vista(self):
+				_arrancar()
+		Fase.RAIZES_MARCAS:
+			if _t >= t_marcas:
 				_piscar(false)
-				_raizes()
-				_ir(Fase.RAIZES)
-		Fase.RAIZES:
-			if _t >= 0.5:
-				_ir(Fase.ENTRE)
-		Fase.TIROS_TEL:
-			_piscar(true)
-			if _t >= dur_tel:
+				_mecanica_feita()
+		Fase.PULSO_TEL:
+			# o aviso: brilho + marcas no chao dos dois lados, ate' as ondas partirem
+			if _t >= t_pulso_tel:
 				_piscar(false)
-				_salva_dirigida()
-				_ir(Fase.TIROS)
-		Fase.TIROS:
+				_lancar_ondas()
+				_ir(Fase.PULSO_LANCA)
+		Fase.PULSO_LANCA:
 			if _t >= 0.5:
-				_ir(Fase.ENTRE)
+				_mecanica_feita()
+		Fase.BROTOS_TEL:
+			if _t >= t_brotos_tel:
+				_piscar(false)
+				_criar_brotos()
+				_ir(Fase.BROTOS_ESPERA)
+		Fase.BROTOS_ESPERA:
+			if _broto_estourado:
+				_abrir_janela(janela_aberta * 1.5 * (0.8 if _f2 else 1.0))
+			elif _t >= t_brotos_espera * (0.8 if _f2 else 1.0):
+				_mecanica_feita()
+		Fase.EXPOSTO:
+			if _t >= _dur_janela:
+				_fechar_janela()
+		Fase.ROAR:
+			if _t >= 0.9:
+				_piscar(false)
+				_ir(Fase.DECIDE)
 	_t += dt
 
 
-## --- ritmo -----------------------------------------------------------
-
-func _bater() -> void:
-	if not _combate or _ja_derrotado:
-		return
-	_som_ataque("onda", -10.0, 0.7)
-	_abanar_camera(3.0 + _nivel)
-	_mostrar_nucleo(true)
-	get_tree().create_timer(dur_exposta).timeout.connect(func() -> void:
-		if is_instance_valid(self):
-			_mostrar_nucleo(false))
-
-	if _nivel >= 2:
-		var k := _obter_koliani()
-		if k and k.has_method("flutuar"):
-			k.flutuar(periodo_batida * 0.8)
-		_leque_radial()
-
-
-## --- máquina de estados / fases -------------------------------------
+## --- maquina de estados ---------------------------------------------
 
 func _ir(f: Fase) -> void:
 	_fase = f
 	_t = 0.0
+	historico.append(int(f))
 
 
-func _escolher() -> void:
+func _vulneravel() -> bool:
+	return _fase == Fase.EXPOSTO
+
+
+func _proxima_mecanica() -> String:
+	var padrao: Array = PADRAO_F2 if _f2 else PADRAO_F1
+	return String(padrao[_ciclos % padrao.size()])
+
+
+## Escolhe o padrao do ciclo e arranca a 1.a mecanica (com o aviso).
+func _arrancar() -> void:
+	_seq = Array(_proxima_mecanica().split("+"))
+	_broto_estourado = false
+	_iniciar_mecanica(String(_seq.pop_front()))
+
+
+func _iniciar_mecanica(nome: String) -> void:
+	match nome:
+		"RAIZES":
+			contagem["RAIZES"] += 1
+			_piscar(true)
+			_som_ataque("praga", -8.0, 1.0)
+			_plantar_zona()
+			_ir(Fase.RAIZES_MARCAS)
+		"PULSO":
+			contagem["PULSO"] += 1
+			_piscar(true)
+			_som_ataque("olho_carregar", -8.0, 0.6)
+			_abanar_camera(1.5)
+			_marcar_ondas(true)
+			_ir(Fase.PULSO_TEL)
+		"BROTOS":
+			contagem["BROTOS"] += 1
+			_piscar(true)
+			_som_ataque("praga", -9.0, 0.8)
+			_ir(Fase.BROTOS_TEL)
+
+
+## Fim de uma mecanica: se o ciclo tem outra encadeada arranca-a, senao abre a janela.
+func _mecanica_feita() -> void:
+	_limpar_brotos()
+	if not _seq.is_empty():
+		_iniciar_mecanica(String(_seq.pop_front()))
+		return
+	_abrir_janela(janela_aberta * (0.8 if _f2 else 1.0))
+
+
+func _abrir_janela(dur: float) -> void:
+	_dur_janela = dur
+	contagem["JANELAS"] += 1
+	_mostrar_nucleo(true)
+	_ir(Fase.EXPOSTO)
+	Som.toca("mecanismo", -14.0, 1.5, 0.02, 0.2, "coracao_abre", Som.Prioridade.NORMAL)
+
+
+func _fechar_janela() -> void:
+	_mostrar_nucleo(false)
+	_limpar_brotos()
+	_dur_janela = 0.0
 	_ciclos += 1
-	# alterna pressão de chão e espaçamento; a fase 2 combina o pulso radial
-	# previsível com este mesmo padrão em vez de apenas multiplicar dano.
-	if _ciclos % 2 == 0:
-		_ir(Fase.RAIZES_TEL)
-	else:
-		_ir(Fase.TIROS_TEL)
+	_ir(Fase.DECIDE)
 
 
 func _atualiza_fase() -> void:
 	if _ja_derrotado:
 		return
 	var novo := fase_por_vida(vida, _vida_max)
-	if novo != _nivel:
+	# a fase 2 so' arranca com o ciclo resolvido (nunca a meio de uma mecanica ou de uma janela)
+	if novo != _nivel and _fase in [Fase.DORME, Fase.DECIDE, Fase.ROAR]:
 		_nivel = novo
 		_atualizar_frame()
 		if _prod and _nivel == 2:
@@ -257,11 +328,25 @@ func _atualiza_fase() -> void:
 			_erupcao()
 		if _nivel == 2:
 			_aura_fase2()
+			_entrar_fase2()
 		_som_fase("carne")
 		_abanar_camera(6.0)
-		if _nivel == 2:
-			periodo_batida *= 0.85
-			dur_tel *= 0.8
+
+
+## Fase 2: o mesmo vocabulario, avisos e janela mais curtos. So' comeca com o ciclo em curso
+## resolvido -- se calhar a meio de uma mecanica, esta acaba e o ROAR entra a seguir.
+func _entrar_fase2() -> void:
+	_f2 = true
+	t_marcas *= 0.85
+	t_pulso_tel *= 0.85
+	t_brotos_tel *= 0.85
+	_ciclos = 0
+	_seq.clear()
+	_limpar_brotos()
+	_marcar_ondas(false)
+	_mostrar_nucleo(false)
+	_piscar(true)
+	_ir(Fase.ROAR)
 
 
 static func fase_por_vida(vida_atual: int, vida_maxima: int) -> int:
@@ -273,107 +358,133 @@ func _ve_koliani() -> bool:
 	return d != Vector2.ZERO and absf(d.x) <= 520.0 and absf(d.y) <= 320.0
 
 
-## --- ataques -------------------------------------------------------
+## --- mecanicas ---------------------------------------------------------
 
-func _raizes() -> void:
-	_som_ataque("praga", -9.0, 1.2)
-	var origem := global_position.x
-	var alvo := _x_koliani()
-	var n := 3 if _nivel == 1 else 4
-	for i in n:
-		var fr := float(i) / float(maxi(1, n - 1))
-		_raiz_em(lerpf(origem + signf(alvo - origem) * 60.0, alvo, fr), 0.12 + fr * 0.4)
+## RAIZES: 3 raizes em volta da Koliani com o racha visivel `atraso_raiz` s antes de irromperem
+## (nunca nascem sem aviso); na fase 2 ha' mais 2 do lado oposto, mais tarde.
+func _plantar_zona() -> void:
+	var x0 := _x_koliani()
+	for i in [-1, 0, 1]:
+		_raiz_em(x0 + float(i) * 105.0, atraso_raiz)
+	if _f2:
+		var lado := -signf(_dir_para_koliani())
+		if lado == 0.0:
+			lado = 1.0
+		_raiz_em(x0 + lado * 300.0, atraso_raiz + 0.45)
+		_raiz_em(x0 + lado * 405.0, atraso_raiz + 0.45)
 
 
 func _raiz_em(x: float, atraso: float) -> void:
 	var pai := get_parent()
 	if pai == null:
 		return
+	if _arena_ok:
+		x = clampf(x, _arena_esq + 30.0, _arena_dir - 30.0)
 	var r := RAIZ.instantiate()
 	pai.add_child(r)
 	r.global_position = Vector2(x, _chao_y(x))
-	r.avisar(int(round(dano_raiz * (1.0 + 0.1 * (_nivel - 1)))), atraso)
+	r.avisar(int(round(dano_raiz * (1.15 if _f2 else 1.0))), maxf(atraso, 0.9))
 
 
-func _salva_dirigida() -> void:
-	var k := _obter_koliani()
-	if k == null:
+## PULSO: marcas no chao (tira magenta a piscar) dos dois lados durante o aviso.
+func _marcar_ondas(ligado: bool) -> void:
+	for m in _marcas_pulso:
+		if is_instance_valid(m):
+			m.queue_free()
+	_marcas_pulso.clear()
+	if not ligado:
 		return
-	_som_ataque("praga", -9.0, 0.9)
-	var base := (k.global_position - global_position).normalized()
-	var n := 3 if _nivel == 1 else 5
-	for i in n:
-		var ang := deg_to_rad((i - (n - 1) * 0.5) * 12.0)
-		_tiro(base.rotated(ang))
-
-
-func _leque_radial() -> void:
-	_som_ataque("praga", -8.0, 0.7)
-	var n := 8 if _nivel == 2 else 12
-	for i in n:
-		_tiro(Vector2.RIGHT.rotated(TAU * float(i) / float(n)))
-
-
-func _tiro(dir: Vector2) -> void:
 	var pai := get_parent()
 	if pai == null:
 		return
-	var t := TIRO.instantiate()
-	t.dano = dano_tiro
-	t.velocidade = 240.0 + 40.0 * _nivel
-	pai.add_child(t)
-	t.global_position = global_position + dir * 34.0
-	t.lancar(dir)
+	for lado in [-1.0, 1.0]:
+		var m := Polygon2D.new()   # PLACEHOLDER: falta a arte aprovada do aviso de onda
+		m.polygon = PackedVector2Array([Vector2(0, -3), Vector2(320, -3), Vector2(320, 3), Vector2(0, 3)])
+		m.color = Color(1.0, 0.35, 0.85, 0.85)
+		m.scale.x = 1.0 if lado > 0.0 else -1.0
+		m.global_position = Vector2(global_position.x + lado * 60.0, _chao_y(global_position.x + lado * 80.0) - 2.0)
+		m.z_index = 5
+		pai.add_child(m)
+		var t := m.create_tween().set_loops()
+		t.tween_property(m, "modulate:a", 0.25, 0.14)
+		t.tween_property(m, "modulate:a", 1.0, 0.14)
+		_marcas_pulso.append(m)
 
 
-func _queda_entulho(x: float) -> void:
+func _lancar_ondas() -> void:
+	_marcar_ondas(false)
+	_som_impacto("esmagar", -6.0, 0.8)
+	_abanar_camera(4.0)
+	_onda(-1.0, vel_onda)
+	_onda(1.0, vel_onda)
+
+
+## Onda rasteira (44x40): so' magoa quem a apanhar no chao -- salta-se por cima ou atravessa-se de
+## Dash (invulneravel). Cada onda fere no maximo uma vez.
+func _onda(dir: float, vel: float) -> void:
 	var pai := get_parent()
 	if pai == null:
 		return
-	var topo_y := global_position.y - 260.0
-	var chao := _chao_y(x)
-
-	var bloco := Area2D.new()
-	bloco.collision_layer = 0
-	bloco.collision_mask = 2
-	bloco.global_position = Vector2(x, topo_y)
-	pai.add_child(bloco)
-
+	var esq := _arena_esq if _arena_ok else global_position.x - 460.0
+	var dr := _arena_dir if _arena_ok else global_position.x + 460.0
+	var x0 := global_position.x + dir * 70.0
+	var alvo := (dr + 40.0) if dir > 0.0 else (esq - 40.0)
+	var a := Area2D.new()
+	a.collision_layer = 0
+	a.collision_mask = 2
 	var forma := CollisionShape2D.new()
 	var rs := RectangleShape2D.new()
-	rs.size = Vector2(34, 34)
+	rs.size = Vector2(44.0, 40.0)
 	forma.shape = rs
-	bloco.add_child(forma)
-
-	var poly := Polygon2D.new()
-	poly.color = Color(0.14, 0.1, 0.12, 1.0)
-	poly.polygon = PackedVector2Array([Vector2(-18, -16), Vector2(16, -18), Vector2(19, 15), Vector2(-16, 18)])
-	bloco.add_child(poly)
-
+	a.add_child(forma)
+	var poly := Polygon2D.new()   # PLACEHOLDER: falta a arte aprovada da onda de esporos
+	poly.polygon = PackedVector2Array([Vector2(-22, 20), Vector2(-14, -10), Vector2(0, -20), Vector2(14, -10), Vector2(22, 20)])
+	poly.color = Color(0.95, 0.3, 0.8, 0.9)
+	a.add_child(poly)
+	pai.add_child(a)
+	a.global_position = Vector2(x0, _chao_y(x0) - 20.0)
+	var dano := int(round(dano_pulso * (1.15 if _f2 else 1.0)))
 	var bateu := [false]
-	bloco.body_entered.connect(func(corpo: Node) -> void:
+	a.body_entered.connect(func(corpo: Node) -> void:
 		if not bateu[0] and corpo is Koliani:
 			bateu[0] = true
-			corpo.receber_dano(dano_entulho, 0.0)
-			bloco.queue_free())
-
-	var tw := bloco.create_tween()
-	tw.tween_property(bloco, "global_position:y", chao, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
-	tw.parallel().tween_property(bloco, "rotation", randf_range(-1.5, 1.5), 0.5)
-	tw.tween_property(poly, "modulate:a", 0.0, 0.25)
-	tw.tween_callback(bloco.queue_free)
+			corpo.receber_dano(dano, dir))
+	var tw := a.create_tween()
+	tw.tween_property(a, "global_position:x", alvo, absf(alvo - x0) / maxf(vel, 1.0))
+	tw.tween_callback(a.queue_free)
 
 
-func _desmoronar_um_pedaco() -> void:
-	var plats := get_tree().get_nodes_in_group("plataformas_coracao")
-	for p in plats:
-		if is_instance_valid(p) and p.visible:
-			p.visible = false  # marca para não repetir
-			var tw := p.create_tween()
-			tw.tween_property(p, "modulate:a", 0.0, 0.35)
-			tw.tween_callback(p.queue_free)
-			_abanar_camera(4.0)
-			return
+## BROTOS: dois brotos nos flancos (alvos de Pogo, sem dano).
+func _criar_brotos() -> void:
+	_limpar_brotos()
+	var pai := get_parent()
+	if pai == null:
+		return
+	for lado in [-1.0, 1.0]:
+		var x: float = global_position.x + lado * 240.0
+		if _arena_ok:
+			x = clampf(x, _arena_esq + 40.0, _arena_dir - 40.0)
+		var b: Area2D = BROTO.new()
+		pai.add_child(b)
+		b.global_position = Vector2(x, _chao_y(x))
+		b.estourou.connect(_ao_broto_estourar)
+		_brotos.append(b)
+
+
+func _ao_broto_estourar() -> void:
+	if _fase != Fase.BROTOS_ESPERA:
+		return
+	contagem["BROTOS_ESTOURADOS"] += 1
+	_broto_estourado = true
+	_abanar_camera(3.0)
+	_som_impacto("esmagar", -8.0, 1.2)
+
+
+func _limpar_brotos() -> void:
+	for b in _brotos:
+		if is_instance_valid(b):
+			b.murchar()
+	_brotos.clear()
 
 
 ## --- núcleo / dano ----------------------------------------------------
@@ -392,6 +503,8 @@ func _atualizar_frame() -> void:
 func _mostrar_nucleo(v: bool) -> void:
 	_nucleo_exposto = v
 	_atualizar_frame()
+	if _sprite:
+		_sprite.modulate = Color(1.35, 1.2, 1.1) if v else Color(0.88, 0.9, 0.95)
 	if _nucleo == null:
 		return
 	_nucleo.scale = Vector2.ONE * (1.0 if v else 0.4)
@@ -403,15 +516,50 @@ func _mostrar_nucleo(v: bool) -> void:
 		brilho.visible = v
 
 
+## O nucleo absorve parte da onda espectral (Especial/tiro): 60 % do dano. Assim o Especial ajuda na
+## janela sem resolver a luta -- e gasta-lo com o coracao PROTEGIDO desperdica a Energia.
+const RESIST_TIRO := 0.6
+
+
+func receber_tiro(quantidade: int, dir_empurrao := 0.0) -> void:
+	receber_dano(maxi(1, int(round(float(quantidade) * RESIST_TIRO))), dir_empurrao)
+
+
+## Na janela o coracao esta' ABERTO: encostar-se para bater nao magoa. Fora dela o contacto magoa.
+func _ao_tocar(corpo: Node) -> void:
+	if _vulneravel():
+		return
+	super._ao_tocar(corpo)
+
+
+func _piscar(ligado: bool) -> void:
+	super._piscar(ligado)
+	if not ligado and _sprite:
+		_sprite.modulate = Color(1.35, 1.2, 1.1) if _nucleo_exposto else Color(0.88, 0.9, 0.95)
+
+
 func receber_dano(quantidade: int, dir_empurrao: float = 0.0, critico := false,
 		_forca_recuo := 0.0) -> void:
 	if _ja_derrotado:
 		return
 	provocar()
-	super.receber_dano(quantidade, dir_empurrao, critico)
-	if _prod and _nivel >= 2 and _anim and _anim.animation == "hit" \
-			and _anim.sprite_frames.has_animation("hit_f2"):
-		_anim.play("hit_f2")
+	if _vulneravel() or _fase == Fase.DORME:
+		super.receber_dano(quantidade, dir_empurrao, critico)
+		if _prod and _nivel >= 2 and _anim and _anim.animation == "hit" 				and _anim.sprite_frames.has_animation("hit_f2"):
+			_anim.play("hit_f2")
+		return
+	# CASCA: o golpe entra so' em fracao, sem recuo e sem critico
+	var q := maxi(1, int(round(float(quantidade) * RESIST_CASCA)))
+	if vida - q <= 0:
+		super.receber_dano(quantidade, dir_empurrao, false)
+		return
+	vida -= q
+	vida_mudou.emit(maxi(vida, 0), _vida_maxima)
+	if _casca_cd <= 0.0:
+		_casca_cd = 0.1
+		Som.toca("bloqueio", -9.0, 0.85, 0.03, 0.0, "", Som.Prioridade.NORMAL)
+		Impacto.rebentar(self, global_position + Vector2(0.0, -30.0 * maxf(0.8, escala_visual)),
+			Color(0.62, 0.4, 0.62), 1.3)
 
 
 ## --- utilitários ----------------------------------------------------

@@ -1,3 +1,8 @@
+# >>> N5 autoral + Coracao Putrefacto reescrito (26 set 2026) <<<
+Ver `docs/nivel_autoral_n5.md`. Ciclo PROTEGIDO->MECANICA->EXPOSTO; pulso (dash/salto), brotos (pogo), raizes; fase 2 encadeada. TTK bot 35,5 s (humano ~57-71). Iteracao rapida de testes: `SO_TESTE=teste_n5_autoral python tools/godot_isolado.py -- --headless --path . res://tests/run_tests.tscn`. Armadilhas: o headless e' QUADRADO (so' ~250 px a' vista); a morte do boss grava em `bosses_derrotados` (limpar nos testes); `Engine.time_scale` acelera os bots; jogar `saltar` 1 frame = salto cortado. Regiao I completa (N1-N5) para playtest do GM. Sem push; Regiao II nao comecada.
+
+---
+
 # >>> N4 autoral feito + ESPECIAL com custo de Energia (26 set 2026) <<<
 Ver `docs/nivel_autoral_n4.md`. Especial = tecla Q, 33 de 99, atravessa inimigos; Energia +5/golpe, +8/pogo, regen 12/s. N4 e N3 NAO locked; sem push; N5 nao comecado. Armadilha: `.get_children()` de uma cena autoral nao inclui filhos de filhos; e o teste do especial precisa de `_especial_cd=0` entre usos.
 

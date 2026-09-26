@@ -1,3 +1,5 @@
+> **N5 autoral + Coracao Putrefacto (26 set 2026, sem push)** -- `docs/nivel_autoral_n5.md`. A aguardar playtest: legibilidade dos telegraphs (pulso/raizes), pogo nos brotos, TTK humano (est. 57-71 s), Especial vs casca, arte placeholder (broto/onda), decisao: manter `salto_duplo` como premio do boss? e ecra de fecho da Regiao I. Regiao II NAO comecada.
+
 > **N4 autoral + Especial com Energia (26 set 2026, sem push)** -- `docs/nivel_autoral_n4.md`. A aguardar playtest do GM: custo 33/uso, ganhos +5/+8, dano 2,6x, botao tactil novo, arte do Especial (usa o laser do tiro), encontro de gestao de Energia. N5 NAO comecado.
 
 > **N3 autoral feito (26 set 2026, sem push)** -- `docs/nivel_autoral_n3.md`: Pogo (ressalto automatico em espinhos/inimigos) ensinado em tufos de dano baixo,

@@ -2273,6 +2273,8 @@ func _pogo_acertar() -> bool:
 		for h in get_world_2d().direct_space_state.intersect_shape(q, 8):
 			if (h["collider"] as Node).is_in_group("pogavel"):
 				pogavel = true
+				if (h["collider"] as Node).has_method("pogo_acertado"):
+					(h["collider"] as Node).call("pogo_acertado")   # alvos authored (brotos do N5)
 				break
 	if alvo == null and not pogavel:
 		return false
