@@ -1,3 +1,8 @@
+# >>> N6: baseline `08c1e941` CONGELADA para o playtest do GM (26 set 2026) <<<
+Nao alterar vento, layout, checkpoints, vida do Golem nem rota alta/baixa. Nao avancar para N7. O GM valida: vento a favor/contra, transicoes nas WindZones, rajadas pulsadas, ritmo das pontes, bifurcacao, Golem (sem HP sponge), duracao. **Se o vento parecer artificial/forte: rever o sistema GLOBAL de vento (vento <-> DESACEL_AR, ver `docs/nivel_autoral_n6.md`) ANTES de afinar N8/N9.** Depois da aprovacao humana: nova baseline authored do N6 -> N7 (remover o coletavel `escalar_paredes`). Sem push.
+
+---
+
 # >>> N6 AUTORAL feito, a aguardar playtest do GM (26 set 2026) <<<
 Ver `docs/nivel_autoral_n6.md`. Golem das Falesias = Guardiao (actor `ChefeCarcereiro.tscn`, ja' era o golem; `vida_minima` novo), `dash_aereo` fora, sem skills. **ACHADO: o vento so' se sente com intensidade > 1300** (DESACEL_AR): 420 -> 7 px/s. N6 usa 1500-1800; N7-N10 tem o mesmo problema latente. Teste `teste_n6_autoral`; suite PASS; bot chega a` porta. Sem push. N7 NAO comecado (tira o coletavel `escalar_paredes` quando for reconstruido).
 
