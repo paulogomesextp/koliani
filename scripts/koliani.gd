@@ -1745,6 +1745,9 @@ func _physics_process(dt: float) -> void:
 			velocity.x = maxf(velocity.x, empurrao)
 		else:
 			velocity.x = minf(velocity.x, empurrao)
+	# Combat Lab v1.1: durante um golpe o avanco nao leva a Koliani atraves do alvo
+	if _lab != null and _ataque_restante > 0.0:
+		velocity.x = _lab.limitar_x(velocity.x, dt)
 
 	var vel_queda := _vy()
 	move_and_slide()
@@ -2953,10 +2956,13 @@ func _descartar_planar_invalido(dt: float) -> void:
 			_planar_contextos[id] = entrada
 
 
-func receber_dano(quantidade: int, dir_empurrao: float = 0.0) -> void:
+## `origem` (Combat Lab v1.1): "" = contacto/desconhecido (omissao -- todos os chamadores de producao),
+## "ataque" = golpe/projectil de um inimigo, "hazard_ataque" = armadilha que ataca. So' as duas
+## ultimas podem dar Perfect Dodge (ver `CombateLab.tentativa_de_dano`).
+func receber_dano(quantidade: int, dir_empurrao: float = 0.0, origem := "") -> void:
 	if _invulneravel > 0.0:
 		if _lab != null:
-			_lab.tentativa_de_dano(quantidade)
+			_lab.tentativa_de_dano(quantidade, origem)
 		return
 	if _defendendo and _bloqueia(dir_empurrao):
 		_ao_bloquear()

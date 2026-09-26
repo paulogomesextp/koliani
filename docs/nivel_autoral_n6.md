@@ -1,6 +1,6 @@
 # N6 -- As Falesias Abertas (nivel AUTORAL, Regiao II: o VENTO como mecanica regional)
 
-Estado: **PRONTO PARA PLAYTEST DO GM -- NAO LOCKED** (26 set 2026, sem push). Cena `scenes/levels/Prisao_dos_Condenados.tscn`
+Estado: **PRONTO PARA PLAYTEST DO GM -- NAO LOCKED** (v1.1: so' as duas zonas de ensino do vento foram aparadas -- ver `docs/combat_lab_v1_1.md` seccao 4) (26 set 2026, sem push). Cena `scenes/levels/Prisao_dos_Condenados.tscn`
 (nome de ficheiro legacy mantido: mudar partia saves/testes; o jogador le "The Open Cliffs"). Gerada uma vez por script; agora edita-se a cena.
 Padrao N1-N5: `corredor = false`, `checkpoints_autorais`, `estreia_x_autoral = 260`, `mecanica_anunciada = "rajada"` (chaves `mec.rajada.*` nos 6 i18n).
 Aprovado pelo GM: Golem das Falesias como GUARDIAO, `dash_aereo` fora, sem skills novas. N7-N10 intactos.
@@ -25,7 +25,7 @@ mexer (atrito 2200), no ar desloca 40-60 px por salto. **Aviso para N7-N10**: as
 ## Mapa (x do mundo; chao y 700 (topo 670); 6 100 px; vazio = mar de nuvens, cair = morte)
 | Sec. | x | Papel | Conteudo | Checkpoint |
 |---|---|---|---|---|
-| A Teach | 0-1000 | ler o vento sem risco | chao firme; 2 zonas CONTINUAS fracas (a favor 300-700, contra 700-1000, 1500/120); 2 degraus de ensaio (saltar e VER a deriva); nada mata | `CheckInicio` 300 |
+| A Teach | 0-1000 | ler o vento sem risco | chao firme; 2 zonas CONTINUAS fracas (a favor 340-700, contra 700-920, 1500/120; aparadas em v1.1 para nao cobrirem `CheckInicio`/`CheckAntesPonte`); 2 degraus de ensaio (saltar e VER a deriva); nada mata | `CheckInicio` 300 |
 | B Develop | 1000-2350 | vento + salto | 4 pontes estreitas (150 px, vaos 120) sobre o vazio; rajada a favor PULSADA (1,6 s on/1,2 s off, 1700/170); descanso 300 px | `CheckAntesPonte` 960, `CheckPonte` 2130 |
 | C Combine | 2350-3590 | vento + combate | bifurcacao: ALTA (4 plataformas, vento contra pulsado 1800/150, `CacheAlta` 24 Essencia) / BAIXA (abrigada, laje 420 px com elite golem de carga, 165); morcego a voar no meio | `CheckReencontro` 3420 |
 | D Challenge | 3590-4900 | prova final | ponte longa: 2 plataformas em vento a favor, UMA plataforma movel fora do vento, 2 plataformas em vento contra; morcego sobre a ponte | (o anterior) |

@@ -12,12 +12,11 @@ const CENAS := {
 }
 
 
-## ISENCOES DO N06 (baseline authored `08c1e941`, congelada pelo GM para playtest): tres zonas de vento
-## cobrem um checkpoint ou a arena do Guardiao (ensino continuo em cima do `CheckInicio`, vento do
-## `CheckAntesPonte`, vento fraco da arena). A regra "vento nao cobre checkpoint/arena" continua a
-## valer para os outros niveis; e' o GM quem decide, depois do playtest, se o N06 a cumpre ou se a
-## regra abre excepcao para o vento fraco de ensino. NAO alargar esta lista sem essa decisao.
-const ISENCOES_N06 := [["VentoAprende1", "CheckInicio"], ["VentoAprende2", "CheckAntesPonte"], ["VentoArena", "arena"]]
+## ISENCAO DO N06 (unica): o `VentoArena` cobre a arena do Guardiao de PROPOSITO (mecanica authored:
+## vento fraco pulsado, guia visivel, comeca 250 px antes do Golem, longe do `CheckFinal`). O contrato
+## dele e' verificado em `teste_n6_autoral`. As zonas de ensino ja' NAO cobrem checkpoints (v1.1).
+## NAO alargar esta lista sem decisao do GM.
+const ISENCOES_N06 := [["VentoArena", "arena"]]
 
 
 static func _isento_n06(nivel: String, zona: String, alvo: String) -> bool:

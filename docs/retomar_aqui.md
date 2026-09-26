@@ -1,3 +1,8 @@
+# >>> COMBAT LAB v1.1 (26 set 2026) -- isolado, NAO integrado <<<
+Ver `docs/combat_lab_v1_1.md`: anti-spam do goblin (4.o golpe leve -> hitstun x0,25 + armadura 0,9 s + recuo + contra-bote), clamp de avanco (0/16 atravessamentos, era 6/16), contrato do PD (`receber_dano(q, dir, origem)`; contacto nunca da' PD), isencoes N6 reduzidas a `VentoArena` (zonas de ensino aparadas). ACHADO: o spam nunca prendeu o goblin (nem na v1); domina por dps -- decisao do GM. Sem push.
+
+---
+
 # >>> COMBAT LAB v1 criado (26 set 2026) -- N7 PAUSADO <<<
 Ver `docs/combat_lab_v1.md`. Arena isolada `scenes/lab/CombatLab.tscn` (`scripts/lab/`), componente opt-in `Koliani.ativar_combat_lab()`; niveis/bosses intactos. A aguardar playtest de combate do GM. CORRECAO: um SCRIPT ERROR em `test_region02_wind_levels.gd` (get_node("Chefe") no N06) escondia parte dessa bateria e as 3 regras "vento nao cobre checkpoint/arena" no N06 -- agora corrido, com ISENCOES_N06 explicitas (a decidir pelo GM). A suite completa demora >10 min (correr com timeout 1500). Sem push.
 

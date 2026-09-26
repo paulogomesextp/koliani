@@ -110,19 +110,19 @@ cor_base = Color(0.2, 0.24, 0.32, 1)
 cor_topo = Color(0.42, 0.54, 0.68, 1)
 
 [node name="VentoAprende1" parent="." instance=ExtResource("14_wind")]
-position = Vector2(500, 600)
+position = Vector2(520, 600)
 direcao = Vector2(1, 0)
 intensidade = 1500.0
 velocidade_max = 120.0
-tamanho = Vector2(400, 220)
+tamanho = Vector2(360, 220)
 cor_guia = Color(0.62, 0.82, 1, 0.34)
 
 [node name="VentoAprende2" parent="." instance=ExtResource("14_wind")]
-position = Vector2(850, 600)
+position = Vector2(810, 600)
 direcao = Vector2(-1, 0)
 intensidade = 1500.0
 velocidade_max = 120.0
-tamanho = Vector2(300, 220)
+tamanho = Vector2(220, 220)
 cor_guia = Color(0.62, 0.82, 1, 0.34)
 
 ; ===== B. DEVELOP (1000-2350): ponte estreita sobre o vazio, rajada a favor PULSADA =====

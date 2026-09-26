@@ -14,7 +14,7 @@ extends DemonioBase
 
 signal lab_estado_mudou(estado: String)
 
-enum E { APROX, WINDUP, ATIVO, RECUP, HITSTUN, LANCADO, CAIDO, QUEBRADO, IDLE }
+enum E { APROX, WINDUP, ATIVO, RECUP, HITSTUN, LANCADO, CAIDO, QUEBRADO, IDLE, ESCAPE }
 
 @export_enum("goblin", "golem") var lab_tipo := "goblin"
 ## Semente do sorteio de ataques do golem (testes usam valor fixo).
@@ -35,6 +35,18 @@ const GOB_CAIDO := 0.5
 const GOB_IMUNE_LANCA := 1.2
 const HITSTUN := {"normal0": 0.22, "normal1": 0.26, "normal2": 0.34, "normal3": 0.40,
 	"launcher": 0.30, "dash": 0.30, "cleave": 0.80, "counter": 1.00, "pogo": 0.30}
+# ANTI-SPAM v1.1: depois de 3 golpes LEVES terrestres seguidos (janela 0,8 s entre golpes) o 4.o mal o
+# prende (hitstun x0,25) e o goblin ganha super-armadura (0,9 s) e RECUA (0,28 s) para retomar a
+# iniciativa. Launcher / Cleave / Counter e golpes no ar NAO contam nem sao travados pela armadura.
+const SEQ_JANELA := 0.8
+const SEQ_LIVRES := 3
+const ESCAPE_HITSTUN_MULT := 0.25
+const ESCAPE_ARMADURA_T := 0.9
+const ESCAPE_RECUO_VEL := 340.0
+const ESCAPE_DUR := 0.32
+const GOLPES_LEVES := ["normal", "dash", "pogo"]
+const ESCAPE_WINDUP := 0.30   # o contra-bote apos o escape e' mais curto (mas telegrafado)
+# regra v1 (so' para MEDIR o antes/depois): encolher 25 % por hitstun seguido em 2 s; armadura ao 4.o
 const STUN_ENCOLHE := 0.75
 const STUN_JANELA := 2.0
 const STUN_ARMADURA_APOS := 4
@@ -63,9 +75,18 @@ var _cd := 0.0
 var _juggle := 0
 var _g_mult := 1.0
 var _imune_lanca_t := 0.0
+var _seq_hits := 0
+var _seq_ult_t := -99.0
+var _armadura_t := 0.0
+var _escape_pendente := false
+var escapes := 0
+var _windup_dur := GOB_WINDUP
 var _stun_stacks := 0
 var _stun_ult_t := -99.0
-var _armadura_t := 0.0
+@export var regra_v1 := false
+## Dano de CONTACTO (nao e' um ataque): 0 por omissao; os testes ligam-no para provar que o
+## Perfect Dodge nao conta contacto.
+@export var lab_contato_dano := 0
 # golem
 var guarda := GOL_GUARDA
 var _quebra_imune_t := 0.0
@@ -93,8 +114,10 @@ func _ready() -> void:
 		_entrar(E.APROX)
 
 
-func _ao_tocar(_corpo: Node) -> void:
-	pass   # o lab so' fere com ataques telegrafados
+func _ao_tocar(corpo: Node) -> void:
+	# O CONTACTO nao e' um ataque: fere (se ligado nos testes) SEM origem "ataque" => nunca da' Perfect Dodge.
+	if lab_contato_dano > 0 and not _morto and corpo is Koliani:
+		corpo.receber_dano(lab_contato_dano, signf(corpo.global_position.x - global_position.x))
 
 
 func lab_vida_max() -> int:
@@ -185,15 +208,18 @@ func _ia_goblin(dt: float, k: Node2D) -> void:
 					and absf(k.global_position.y - global_position.y) < 60.0:
 				velocity.x = 0.0
 				_acertou_neste_ataque = false
+				_windup_dur = GOB_WINDUP
 				_telegrafo_visual(true)
+				get_tree().call_group("lab_metricas", "registar", "goblin_windup", {})
 				_entrar(E.WINDUP)
 		E.WINDUP:
 			velocity.x = 0.0
 			if k:
 				_encarar(k)
 			_fisica_base(dt)
-			if _t >= GOB_WINDUP:
+			if _t >= _windup_dur:
 				_telegrafo_visual(false)
+				get_tree().call_group("lab_metricas", "registar", "goblin_bote", {})
 				_entrar(E.ATIVO)
 		E.ATIVO:
 			velocity.x = _direcao * GOB_LUNGE
@@ -202,7 +228,7 @@ func _ia_goblin(dt: float, k: Node2D) -> void:
 				_acertou_neste_ataque = true
 				get_tree().call_group("lab_metricas", "registar", "goblin_acertou",
 					{"dano": GOB_DANO})
-				k.receber_dano(GOB_DANO, _direcao)
+				k.receber_dano(GOB_DANO, _direcao, "ataque")
 			if _t >= GOB_ATIVO:
 				velocity.x = 0.0
 				_entrar(E.RECUP)
@@ -216,7 +242,23 @@ func _ia_goblin(dt: float, k: Node2D) -> void:
 			velocity.x = move_toward(velocity.x, 0.0, RECUO_ATRITO * dt)
 			_fisica_base(dt)
 			if _t >= _hitstun_dur:
-				_entrar(E.APROX)
+				if _escape_pendente:
+					_escape_pendente = false
+					_entrar(E.ESCAPE)
+				else:
+					_entrar(E.APROX)
+		E.ESCAPE:
+			# recua e retoma a iniciativa: super-armadura activa, ataca logo que possa
+			velocity.x = -_direcao * ESCAPE_RECUO_VEL * (1.0 - _t / ESCAPE_DUR)
+			_fisica_base(dt)
+			if _t >= ESCAPE_DUR:
+				# retoma a INICIATIVA: contra-bote telegrafado (0,30 s) para quem continua a martelar parado
+				velocity.x = 0.0
+				_acertou_neste_ataque = false
+				_windup_dur = ESCAPE_WINDUP
+				_telegrafo_visual(true)
+				get_tree().call_group("lab_metricas", "registar", "goblin_windup", {"escape": true})
+				_entrar(E.WINDUP)
 		E.LANCADO:
 			velocity.x = move_toward(velocity.x, 0.0, 200.0 * dt)
 			_fisica_base(dt)
@@ -281,7 +323,7 @@ func _ia_golem(dt: float, k: Node2D) -> void:
 				_acertou_neste_ataque = true
 				get_tree().call_group("lab_metricas", "registar", "golem_acertou",
 					{"dano": int(_ataque["dano"]), "ataque": "sweep" if _ataque["baixo"] else "slam"})
-				k.receber_dano(int(_ataque["dano"]), _direcao)
+				k.receber_dano(int(_ataque["dano"]), _direcao, "ataque")
 			if _t >= float(_ataque["ativo"]):
 				_entrar(E.RECUP)
 		E.RECUP:
@@ -364,8 +406,7 @@ func lab_hit(info: Dictionary) -> Dictionary:
 	return res
 
 
-func _stun_dur(base: float, forte: bool) -> float:
-	# anti stun-lock: golpes leves em sequencia encolhem; forte (cleave/counter) ignora o encolher
+func _stun_dur_v1(base: float, forte: bool) -> float:
 	var agora := _tempo
 	if agora - _stun_ult_t <= STUN_JANELA:
 		_stun_stacks += 1
@@ -411,11 +452,35 @@ func _goblin_recebe(tipo: String, dano: float, dir: float, info: Dictionary) -> 
 		return res
 	if tipo == "launcher":
 		res["efeito"] = "lanca_imune"
-	if _armadura_t > 0.0:
+	var leve: bool = tipo in GOLPES_LEVES
+	if regra_v1:
+		if _armadura_t > 0.0:
+			res["efeito"] = "armadura"
+			return res
+		_hitstun_dur = _stun_dur_v1(base, tipo in ["cleave", "counter"])
+		var f1: float = {"cleave": 300.0, "counter": 520.0, "dash": 200.0}.get(tipo, 90.0 + 40.0 * float(info.get("passo", 0)))
+		velocity.x = dir * f1
+		_telegrafo_visual(false)
+		_entrar(E.HITSTUN)
+		res["efeito"] = "hitstun v1 %.2f" % _hitstun_dur
+		return res
+	if leve and _armadura_t > 0.0:
 		res["efeito"] = "armadura"
 		return res
-	var forte := tipo in ["cleave", "counter"]
-	_hitstun_dur = _stun_dur(base, forte)
+	_hitstun_dur = base
+	if leve:
+		if _tempo - _seq_ult_t > SEQ_JANELA:
+			_seq_hits = 0
+		_seq_ult_t = _tempo
+		_seq_hits += 1
+		if _seq_hits > SEQ_LIVRES:
+			# o 4.o golpe leve seguido: quase nao prende, da' armadura e faz o goblin recuar
+			_hitstun_dur = base * ESCAPE_HITSTUN_MULT
+			_armadura_t = ESCAPE_ARMADURA_T
+			_escape_pendente = true
+			escapes += 1
+			_seq_hits = 0
+			res["efeito"] = "escape"
 	var f: float = {"cleave": 300.0, "counter": 520.0, "dash": 200.0}.get(tipo, 90.0 + 40.0 * float(info.get("passo", 0)))
 	velocity.x = dir * f
 	_telegrafo_visual(false)

@@ -113,6 +113,9 @@ func _correr_tudo() -> void:
 	await teste_combat_lab()
 	await teste_combat_lab_combos()
 	await teste_combat_lab_pd_real()
+	await teste_combat_lab_pd_contrato()
+	await teste_combat_lab_clamp()
+	await teste_combat_lab_antispam()
 	teste_execution_9d_inimigos_regiao1()
 	teste_9d9e_crias_sem_goblin()
 	teste_9e2_coracao_producao_e_fases()
@@ -6147,6 +6150,22 @@ func teste_n6_autoral() -> void:
 	_ok(teach.modo == WindZone.Modo.CONTINUO and n.get_node("VentoAprende2").modo == WindZone.Modo.CONTINUO,
 		"N6: o ensino do vento tem de ser continuo")
 	_ok(continuas == 2 and teach.velocidade_max <= 140.0, "N6: so' o ensino (2) e' continuo e fraco")
+	# zonas de ensino nao cobrem checkpoints (spawn/checkpoint = area segura e previsivel)
+	for nome_z in ["VentoAprende1", "VentoAprende2"]:
+		var zc := n.get_node(nome_z) as WindZone
+		var caixa := Rect2(zc.position - zc.tamanho * 0.5, zc.tamanho)
+		for nome_c in ["CheckInicio", "CheckAntesPonte"]:
+			_ok(not caixa.has_point((n.get_node(nome_c) as Node2D).position), "N6: %s cobre %s" % [nome_z, nome_c])
+		_ok(not caixa.has_point((n.get_node("Koliani") as Node2D).position), "N6: %s cobre o spawn" % nome_z)
+	# VentoArena: mecanica authored e legivel (guia visivel, fraco, pulsado, comeca bem antes do Golem, longe do checkpoint)
+	var va := n.get_node("VentoArena") as WindZone
+	var cf := n.get_node("CheckFinal") as Node2D
+	var gg := n.get_node("Guardiao") as Node2D
+	_ok(va.mostrar_guia and va.modo == WindZone.Modo.PULSADO and va.intensidade <= 1500.0 and va.velocidade_max <= 140.0,
+		"N6: VentoArena tem de ter guia visivel, ser pulsado e fraco")
+	_ok(va.position.x - va.tamanho.x * 0.5 >= cf.position.x + 100.0, "N6: o VentoArena nao pode cobrir/rodear o CheckFinal")
+	_ok(gg.position.x - (va.position.x - va.tamanho.x * 0.5) >= 200.0, "N6: o vento tem de se ver 200+ px antes do Golem")
+	_ok(va.fase_inicial == 0.0 and va.duracao_pulso >= 1.0, "N6: o vento da arena tem de comecar visivel")
 	# ensino em chao firme: as zonas de ensino sobrepoem so' o ChaoInicio
 	var chao_i := n.get_node("ChaoInicio") as Node2D
 	_ok(chao_i.position.x - chao_i.tamanho.x * 0.5 <= 0.0 and chao_i.position.x + chao_i.tamanho.x * 0.5 >= 1000.0,
@@ -6189,7 +6208,7 @@ func teste_n6_autoral() -> void:
 	for i in 6:
 		await get_tree().process_frame
 	var k := n2.get_node("Koliani") as CharacterBody2D
-	var dx_favor := await _deriva_n6(k, Vector2(330, 510))
+	var dx_favor := await _deriva_n6(k, Vector2(430, 510))
 	_ok(dx_favor > 8.0, "N6: o vento a favor nao empurra a Koliani no ar (dx=%s)" % str(snappedf(dx_favor, 0.1)))
 	var dx_contra := await _deriva_n6(k, Vector2(740, 510))
 	_ok(dx_contra < -8.0, "N6: o vento contra nao empurra a Koliani no ar (dx=%s)" % str(snappedf(dx_contra, 0.1)))
@@ -6423,19 +6442,19 @@ func teste_combat_lab() -> void:
 	k._energia = 10.0
 	# a) sem roll: nao ha PD
 	k._invulneravel = 0.3
-	k.receber_dano(10, 1.0)
+	k.receber_dano(10, 1.0, "ataque")
 	_ok(m.contar("perfect_dodge") == 0, "PD: sem roll nao conta")
 	k._invulneravel = 0.0
 	# b) roll a meio da janela: PD
 	await _lab_tap("rolar", 3)
 	await _lab_esperar(4)
-	k.receber_dano(10, 1.0)
+	k.receber_dano(10, 1.0, "ataque")
 	_ok(m.contar("perfect_dodge") == 1, "PD: golpe dentro da janela devia dar Perfect Dodge")
 	_ok(absf(k.energia_actual() - 35.0) < 2.0, "PD: energia esperada 35, foi %.1f" % k.energia_actual())
 	_ok(lab.janela_counter() > 0.5, "PD: janela do counter nao abriu")
 	# c) mesmo roll, mas 0,26 s depois (cedo demais / ja' fora da janela): nada de novo
 	await _lab_esperar(12)
-	k.receber_dano(10, 1.0)
+	k.receber_dano(10, 1.0, "ataque")
 	_ok(m.contar("perfect_dodge") == 1, "PD: cooldown/janela deviam impedir 2.o PD")
 	await _lab_fim(cena)
 	cena = await _lab_novo()
@@ -6447,7 +6466,7 @@ func teste_combat_lab() -> void:
 	await _lab_esperar(19)   # ~0,32 s: fora da janela de 0,22 s
 	k._invulneravel = 0.2     # ainda protegida por outra causa
 	k._rolar_restante = 0.05  # roll quase a acabar
-	k.receber_dano(10, 1.0)
+	k.receber_dano(10, 1.0, "ataque")
 	_ok(m.contar("perfect_dodge") == 0, "PD: golpe tarde no roll nao e' perfeito")
 	await _lab_fim(cena)
 
@@ -6465,7 +6484,7 @@ func teste_combat_lab() -> void:
 	k._olha_para = 1.0
 	await _lab_tap("rolar", 3)
 	await _lab_esperar(3)
-	k.receber_dano(20, 1.0)
+	k.receber_dano(20, 1.0, "ataque")
 	_ok(m.contar("perfect_dodge") == 1, "counter: PD nao arrancou")
 	await _lab_esperar(30)
 	_ok(not _lab_golpe(m, "counter"), "counter: NAO pode ser automatico")
@@ -6507,7 +6526,8 @@ func teste_combat_lab() -> void:
 			if g.lab_estado == LabInimigo.E.HITSTUN:
 				frames_stun += 1
 	_ok(armaduras >= 1, "stunlock: a super-armadura nunca ligou em 6 s de spam")
-	_ok(float(frames_stun) / float(frames_total) < 0.85, "stunlock: %.0f %% do tempo em hitstun" % (100.0 * frames_stun / frames_total))
+	_ok(g.escapes >= 1, "stunlock: o goblin nunca escapou (escapes=%d)" % g.escapes)
+	_ok(float(frames_stun) / float(frames_total) < 0.6, "stunlock: %.0f %% do tempo em hitstun" % (100.0 * frames_stun / frames_total))
 	# juggle capado a 3 elevacoes
 	g.lab_estado = LabInimigo.E.LANCADO
 	g._juggle = 0
@@ -6788,3 +6808,258 @@ func teste_combat_lab_pd_real() -> void:
 	_ok(int(resultados["cedo"]["pd"]) == 0,
 		"PD real: o roll a 0,62 s do golpe nao pode contar como perfeito: %s" % str(resultados["cedo"]))
 	EstadoJogo.habilidades.assign(antes_hab)
+
+
+# ============================================================ COMBAT LAB v1.1 ====
+## Contacto corporal nunca da' Perfect Dodge; so' origem "ataque"/"hazard_ataque".
+func teste_combat_lab_pd_contrato() -> void:
+	var antes_hab: Array = EstadoJogo.habilidades.duplicate()
+	var cena := await _lab_novo()
+	var k: Koliani = cena.koliani
+	var m: LabMetricas = cena.metricas
+	var lab: CombateLab = cena.lab
+	await _lab_esperar(10)
+	# roll dentro da janela, mas o dano e' CONTACTO (origem omissa): nao ha' PD
+	await _lab_tap("rolar", 3)
+	await _lab_esperar(3)
+	k.receber_dano(8, 1.0)
+	_ok(m.contar("perfect_dodge") == 0, "PD contrato: dano sem origem (contacto) nao pode dar PD")
+	_ok(m.contar("pd_ignorado") == 1, "PD contrato: o contacto devia ficar registado como ignorado")
+	# contacto REAL do goblin (lab_contato_dano) enquanto rola
+	var g: LabInimigo = cena.spawn_goblin(60.0)
+	g.lab_contato_dano = 8
+	g.set_physics_process(false)
+	g._ao_tocar(k)
+	_ok(m.contar("perfect_dodge") == 0, "PD contrato: contacto do goblin nao pode dar PD")
+	# o mesmo roll com um ATAQUE dentro da janela: PD
+	k.receber_dano(8, 1.0, "ataque")
+	_ok(m.contar("perfect_dodge") == 1, "PD contrato: origem 'ataque' na janela devia dar PD")
+	# hazard que ataca: tambem conta (depois do cooldown)
+	await _lab_esperar(60)
+	await _lab_tap("rolar", 3)
+	await _lab_esperar(3)
+	lab._pd_cd = 0.0
+	k.receber_dano(8, 1.0, "hazard_ataque")
+	_ok(m.contar("perfect_dodge") == 2, "PD contrato: 'hazard_ataque' na janela devia dar PD")
+	# os ataques telegrafados do lab identificam-se como ataque (teste real esta' em teste_combat_lab_pd_real)
+	_ok(FileAccess.get_file_as_string("res://scripts/lab/lab_inimigo.gd").count("\"ataque\")") >= 2,
+		"PD contrato: bote/slam/sweep tem de passar origem 'ataque'")
+	await _lab_fim(cena)
+	EstadoJogo.habilidades.assign(antes_hab)
+
+
+## Atravessamento: o avanco dos golpes nao leva a Koliani ao outro lado do alvo (goblin pequeno e golem grande).
+func teste_combat_lab_clamp() -> void:
+	var antes_hab: Array = EstadoJogo.habilidades.duplicate()
+	var relatorio := {}
+	for com_clamp in [false, true]:
+		var cruzou := 0
+		var total := 0
+		var acertos := 0
+		for alvo_tipo in ["goblin", "golem"]:
+			for golpe in ["launcher", "cleave", "dash", "normal3"]:
+				for dist in [50.0, 90.0]:
+					var cena := await _lab_novo()
+					var k: Koliani = cena.koliani
+					var lab: CombateLab = cena.lab
+					var m: LabMetricas = cena.metricas
+					lab.clamp_avanco = com_clamp
+					k._olha_para = 1.0
+					var x0 := k.global_position.x
+					var alvo: LabInimigo = cena.spawn_goblin(dist) if alvo_tipo == "goblin" else cena.spawn_golem(dist)
+					await _lab_esperar(3)
+					alvo.set_physics_process(false)
+					alvo.vida = 99999
+					alvo.global_position = Vector2(x0 + dist, k.global_position.y - (16.0 if alvo_tipo == "golem" else 10.0))
+					alvo.lab_estado = LabInimigo.E.IDLE
+					if golpe == "dash":
+						await _lab_tap("dash", 2)
+						await _lab_esperar(1)
+						await _lab_tap("atacar", 2)
+					elif golpe == "normal3":
+						for i in 3:
+							await _lab_tap("atacar", 2)
+							await _lab_esperar(12)
+					else:
+						lab._iniciar_move(golpe)
+					var min_rel := INF
+					for i in 40:
+						await get_tree().physics_frame
+						min_rel = minf(min_rel, alvo.global_position.x - k.global_position.x)
+					total += 1
+					if min_rel < 0.0:
+						cruzou += 1
+					acertos += 1 if m.contar("hit") > 0 else 0
+					if com_clamp:
+						_ok(min_rel >= 0.0, "clamp: %s / %s a %d px atravessou o alvo (rel=%.1f)" % [golpe, alvo_tipo, dist, min_rel])
+					await _lab_fim(cena)
+		relatorio["com_clamp" if com_clamp else "sem_clamp"] = {"cruzou": cruzou, "de": total, "acertaram": acertos}
+	print("LAB clamp: ", relatorio)
+	_ok(int(relatorio["com_clamp"]["cruzou"]) == 0, "clamp: com clamp nenhum golpe atravessa")
+	_ok(int(relatorio["sem_clamp"]["cruzou"]) > 0, "clamp: o teste tem de morder (sem clamp devia haver atravessamento)")
+	_ok(int(relatorio["com_clamp"]["acertaram"]) >= int(relatorio["sem_clamp"]["acertaram"]) - 2,
+		"clamp: nao pode perder acertos (%s)" % str(relatorio))
+	EstadoJogo.habilidades.assign(antes_hab)
+
+
+## Anti-spam do goblin: BEFORE (v1) vs AFTER (v1.1), spam parado, combo correto e launcher -> air combo.
+func teste_combat_lab_antispam() -> void:
+	var antes_hab: Array = EstadoJogo.habilidades.duplicate()
+	var res := {}
+	var antes := {}
+	for modo in ["spam", "parado", "combo3_launcher", "launcher_ar", "spam_v1", "parado_v1", "combo3_launcher_v1", "launcher_ar_v1"]:
+		var cena := await _lab_novo()
+		var g: LabInimigo = cena.spawn_goblin(200.0)
+		g.lab_semente = 5
+		g.regra_v1 = modo.ends_with("_v1")
+		var r := await _lab_bot_goblin(cena, g, modo.trim_suffix("_v1"))
+		if modo.ends_with("_v1"):
+			antes[modo.trim_suffix("_v1")] = r
+		else:
+			res[modo] = r
+		await _lab_fim(cena)
+	# PRENDER ATE' MORRER: mede-se com vida infinita durante 12 s (o TTK depende do dano; o "lock" nao)
+	var lock := {}
+	for modo in ["spam", "parado"]:
+		for v1 in [true, false]:
+			var cena2 := await _lab_novo()
+			var g2: LabInimigo = cena2.spawn_goblin(200.0)
+			g2.lab_semente = 5
+			g2.regra_v1 = v1
+			g2.vida = 999999
+			var r2 := await _lab_bot_goblin(cena2, g2, modo, 12.0)
+			lock["%s_%s" % [modo, "v1" if v1 else "v1.1"]] = {"hitstun_frac": snappedf(float(r2["hitstun_frac"]), 0.001), "botes": r2["botes"], "goblin_acertou": r2["goblin_acertou"], "escapes": r2["escapes"], "golpes": r2["golpes"]}
+			await _lab_fim(cena2)
+	print("LAB antispam LOCK 12s vida infinita: ", lock)
+	# NAO ha' prisao ate' morrer: em 12 s de spam (vida infinita) o goblin completa botes e fica < 50 % preso
+	for chave in ["spam_v1.1", "parado_v1.1"]:
+		_ok(int(lock[chave]["botes"]) >= 3, "anti-spam: %s - o goblin devia completar >= 3 botes em 12 s (%d)" % [chave, int(lock[chave]["botes"])])
+		_ok(float(lock[chave]["hitstun_frac"]) < 0.5, "anti-spam: %s - goblin preso %.0f %% do tempo" % [chave, 100.0 * float(lock[chave]["hitstun_frac"])])
+		_ok(int(lock[chave]["escapes"]) >= 3, "anti-spam: %s - o escape devia disparar (>= 3 em 12 s): %d" % [chave, int(lock[chave]["escapes"])])
+	print("LAB antispam AFTER (v1.1): ", res)
+	print("LAB antispam BEFORE (regra v1, mesmo bot): ", antes)
+	# spam parado: deixa de ser dominante -- o goblin tem de ter feito algo (escape e/ou acertado)
+	_ok(int(res["spam"]["escapes"]) >= 1, "anti-spam: o goblin nunca escapou ao spam")
+	# combo correto: 3 golpes + launcher lanca (nao e' travado pela armadura) e o goblin morre
+	_ok(float(res["combo3_launcher"]["ttk"]) > 0.0, "anti-spam: N-N-N + launcher nao matou o goblin")
+	_ok(int(res["combo3_launcher"]["lancamentos"]) >= 1, "anti-spam: o launcher depois de 3 golpes nao lancou")
+	_ok(float(res["launcher_ar"]["ttk"]) > 0.0 and int(res["launcher_ar"]["golpes_ar"]) >= 2, "anti-spam: launcher -> air combo nao funciona")
+	EstadoJogo.habilidades.assign(antes_hab)
+
+
+## Bots de medicao contra o goblin com IA real. Devolve {ttk, goblin_acertou, golpes, lancamentos, golpes_ar}.
+func _lab_bot_goblin(cena: Node, g: LabInimigo, modo: String, limite := 60.0) -> Dictionary:
+	var k: Koliani = cena.koliani
+	var lab: CombateLab = cena.lab
+	var m: LabMetricas = cena.metricas
+	var t := 0.0
+	var dt := 1.0 / 60.0
+	var frames_stun := 0
+	var frames_lut := 0
+	while t < limite and is_instance_valid(g) and not g._morto:
+		var dx := g.global_position.x - k.global_position.x
+		var lado := signf(dx)
+		k._olha_para = lado if lado != 0.0 else k._olha_para
+		if g.lab_estado == LabInimigo.E.HITSTUN:
+			frames_stun += 1
+		frames_lut += 1
+		if k._energia < 60.0:
+			k._energia = 60.0
+		if modo == "parado":
+			# spam PARADO: nao anda; so' martela ATAQUE a cada 0,3 s (o goblin e' que vem ter com ela)
+			Input.action_press("atacar")
+			for i in 3:
+				await get_tree().physics_frame
+				t += dt
+			Input.action_release("atacar")
+			for i in 15:
+				await get_tree().physics_frame
+				t += dt
+			continue
+		if absf(dx) > 70.0:
+			Input.action_press("mover_direita" if lado > 0 else "mover_esquerda")
+			Input.action_release("mover_esquerda" if lado > 0 else "mover_direita")
+			await get_tree().physics_frame
+			t += dt
+			continue
+		Input.action_release("mover_direita")
+		Input.action_release("mover_esquerda")
+		if modo == "spam":
+			Input.action_press("atacar")
+			for i in 3:
+				await get_tree().physics_frame
+				t += dt
+			Input.action_release("atacar")
+			for i in 15:
+				await get_tree().physics_frame
+				t += dt
+		elif modo == "combo3_launcher":
+			# N-N-N e depois LAUNCHER (com o goblin ainda na janela) e mais N-N-N...
+			for i in 3:
+				Input.action_press("atacar")
+				for j in 3:
+					await get_tree().physics_frame
+					t += dt
+				Input.action_release("atacar")
+				for j in 10:
+					await get_tree().physics_frame
+					t += dt
+			Input.action_press("mirar_cima")
+			Input.action_press("atacar")
+			for j in 3:
+				await get_tree().physics_frame
+				t += dt
+			Input.action_release("atacar")
+			Input.action_release("mirar_cima")
+			for j in 30:
+				await get_tree().physics_frame
+				t += dt
+		else:   # launcher -> salto -> ar -> ar
+			if g.lab_estado != LabInimigo.E.LANCADO and k.is_on_floor():
+				Input.action_press("mirar_cima")
+				Input.action_press("atacar")
+				for j in 3:
+					await get_tree().physics_frame
+					t += dt
+				Input.action_release("atacar")
+				Input.action_release("mirar_cima")
+				for j in 5:
+					await get_tree().physics_frame
+					t += dt
+			if g.lab_estado == LabInimigo.E.LANCADO and k.is_on_floor():
+				Input.action_press("saltar")
+				for j in 12:
+					await get_tree().physics_frame
+					t += dt
+				Input.action_release("saltar")
+				for j in 2:
+					await get_tree().physics_frame
+					t += dt
+			for n in 2:
+				if not k.is_on_floor() and absf(g.global_position.x - k.global_position.x) < 100.0:
+					Input.action_press("atacar")
+					for j in 3:
+						await get_tree().physics_frame
+						t += dt
+					Input.action_release("atacar")
+					for j in 9:
+						await get_tree().physics_frame
+						t += dt
+			for j in 20:
+				await get_tree().physics_frame
+				t += dt
+	Input.action_release("mover_direita")
+	Input.action_release("mover_esquerda")
+	var lanc := 0
+	var golpes_ar := 0
+	var esc := 0
+	for e in m.eventos:
+		if e["nome"] == "hit" and String(e["d"]["efeito"]).contains("escape"):
+			esc += 1
+		if e["nome"] == "hit" and e["d"]["efeito"] == "lancado":
+			lanc += 1
+		if e["nome"] == "hit" and bool(e["d"]["efeito"].begins_with("juggle")):
+			golpes_ar += 1
+	return {"ttk": t if (not is_instance_valid(g) or g._morto) else -1.0, "windups": m.contar("goblin_windup"),
+		"botes": m.contar("goblin_bote"), "hitstun_frac": float(frames_stun) / maxf(1.0, float(frames_lut)), "escapes": esc, "goblin_acertou": m.contar("goblin_acertou"),
+		"golpes": m.contar("hit"), "lancamentos": lanc, "golpes_ar": golpes_ar}

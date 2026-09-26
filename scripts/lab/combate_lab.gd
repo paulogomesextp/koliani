@@ -20,6 +20,11 @@ const COUNTER_JANELA := 0.60     # s depois do Perfect Dodge
 const CARGA_T := 0.50            # s a segurar para o Shadow Cleave
 const AR_MAX := 2                # golpes aereos por "salto"
 const BUFFER_T := 0.14           # s de buffer de input entre golpes do lab
+## Clamp do avanco (v1.1): a Koliani nao atravessa o CENTRO do alvo; para a uma distancia natural de
+## combate (meia largura do alvo + meia largura dela - tolerancia) e nunca e' empurrada para tras.
+const CLAMP_TOLERANCIA := 10.0   # px que pode entrar no corpo do alvo (evita whiffs visuais injustos)
+const K_MEIA_LARGURA := 10.0
+var clamp_avanco := true
 
 const ENERGIA_PD := 25.0
 const ENERGIA_CLEAVE := 8.0
@@ -97,6 +102,25 @@ func janela_counter() -> float:
 
 func carga() -> float:
 	return clampf(_hold_t / CARGA_T, 0.0, 1.0) if _hold_ativo else 0.0
+
+
+## Limita a velocidade horizontal de um golpe em curso para nao passar do centro de um inimigo a` frente
+## (mesma faixa vertical). Nao ha' magnetismo: so' trava; quem esta' alem do centro nao e' tocado.
+func limitar_x(vx: float, dt: float) -> float:
+	if not clamp_avanco or vx == 0.0 or dt <= 0.0:
+		return vx
+	var dir := signf(vx)
+	var maxv := absf(vx)
+	for e in inimigos():
+		var hb: Rect2 = e.hurtbox() if e.has_method("hurtbox") else Rect2(e.global_position - Vector2(20, 40), Vector2(40, 48))
+		if absf(k.global_position.y - hb.get_center().y) > hb.size.y * 0.5 + 30.0:
+			continue
+		var rel := (hb.get_center().x - k.global_position.x) * dir
+		if rel <= 0.0:
+			continue
+		var dmin := hb.size.x * 0.5 + K_MEIA_LARGURA - CLAMP_TOLERANCIA
+		maxv = minf(maxv, maxf(0.0, rel - dmin) / dt)
+	return dir * maxv
 
 
 func inimigos() -> Array[Node2D]:
@@ -327,8 +351,13 @@ func _aplicar_golpe(d: Dictionary) -> void:
 
 # ---------------------------------------------------------------- Perfect Dodge
 ## Chamado pela Koliani quando um golpe inimigo chega enquanto ela esta' invulneravel.
-func tentativa_de_dano(quantidade: int) -> void:
+func tentativa_de_dano(quantidade: int, origem := "") -> void:
 	if k._rolar_restante <= 0.0 or _pd_cd > 0.0:
+		return
+	# CONTRATO: so' um ATAQUE identificado (origem "ataque" / "hazard_ataque") pode dar Perfect Dodge.
+	# Contacto corporal (origem "") e dano de origem desconhecida seguem as regras normais.
+	if origem != "ataque" and origem != "hazard_ataque":
+		_metr("pd_ignorado", {"origem": origem, "dano": quantidade})
 		return
 	var decorrido: float = Koliani.DUR_ROLAR - k._rolar_restante
 	if decorrido > PD_JANELA:
