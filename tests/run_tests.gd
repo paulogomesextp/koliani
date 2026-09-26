@@ -116,6 +116,7 @@ func _correr_tudo() -> void:
 	await teste_combat_lab_pd_contrato()
 	await teste_combat_lab_clamp()
 	await teste_combat_lab_antispam()
+	await teste_combat_lab_balanco()
 	teste_execution_9d_inimigos_regiao1()
 	teste_9d9e_crias_sem_goblin()
 	teste_9e2_coracao_producao_e_fases()
@@ -6568,6 +6569,14 @@ func _lab_golpe(m: LabMetricas, nome: String) -> bool:
 	return false
 
 
+## TTK medido pelo proprio alvo (do 1.o golpe recebido ate' morrer), sem a cauda do bot; -1 se nao morreu.
+func _lab_ttk_evento(m: LabMetricas, _t: float) -> float:
+	for e in m.eventos:
+		if e["nome"] == "morreu":
+			return float(e["d"]["ttk"])
+	return -1.0
+
+
 func _lab_evento_tipo(m: LabMetricas, tipo: String) -> bool:
 	for e in m.eventos:
 		if e["nome"] == "hit" and e["d"]["tipo"] == tipo:
@@ -7014,6 +7023,56 @@ func _lab_bot_goblin(cena: Node, g: LabInimigo, modo: String, limite := 60.0) ->
 			for j in 30:
 				await get_tree().physics_frame
 				t += dt
+		elif modo == "dash_launcher_ar":
+			# execucao "ideal": Dash Attack -> Launcher (cancel) -> salto -> Air x2
+			if g.lab_estado != LabInimigo.E.LANCADO and k.is_on_floor():
+				Input.action_press("dash")
+				for j in 2:
+					await get_tree().physics_frame
+					t += dt
+				Input.action_release("dash")
+				await get_tree().physics_frame
+				t += dt
+				Input.action_press("atacar")
+				for j in 3:
+					await get_tree().physics_frame
+					t += dt
+				Input.action_release("atacar")
+				for j in 11:
+					await get_tree().physics_frame
+					t += dt
+				Input.action_press("mirar_cima")
+				Input.action_press("atacar")
+				for j in 3:
+					await get_tree().physics_frame
+					t += dt
+				Input.action_release("atacar")
+				Input.action_release("mirar_cima")
+				for j in 5:
+					await get_tree().physics_frame
+					t += dt
+			if g.lab_estado == LabInimigo.E.LANCADO and k.is_on_floor():
+				Input.action_press("saltar")
+				for j in 12:
+					await get_tree().physics_frame
+					t += dt
+				Input.action_release("saltar")
+				for j in 2:
+					await get_tree().physics_frame
+					t += dt
+			for n in 2:
+				if not k.is_on_floor() and absf(g.global_position.x - k.global_position.x) < 100.0:
+					Input.action_press("atacar")
+					for j in 3:
+						await get_tree().physics_frame
+						t += dt
+					Input.action_release("atacar")
+					for j in 9:
+						await get_tree().physics_frame
+						t += dt
+			for j in 20:
+				await get_tree().physics_frame
+				t += dt
 		else:   # launcher -> salto -> ar -> ar
 			if g.lab_estado != LabInimigo.E.LANCADO and k.is_on_floor():
 				Input.action_press("mirar_cima")
@@ -7060,6 +7119,131 @@ func _lab_bot_goblin(cena: Node, g: LabInimigo, modo: String, limite := 60.0) ->
 			lanc += 1
 		if e["nome"] == "hit" and bool(e["d"]["efeito"].begins_with("juggle")):
 			golpes_ar += 1
-	return {"ttk": t if (not is_instance_valid(g) or g._morto) else -1.0, "windups": m.contar("goblin_windup"),
+	return {"ttk": _lab_ttk_evento(m, t), "windups": m.contar("goblin_windup"),
 		"botes": m.contar("goblin_bote"), "hitstun_frac": float(frames_stun) / maxf(1.0, float(frames_lut)), "escapes": esc, "goblin_acertou": m.contar("goblin_acertou"),
 		"golpes": m.contar("hit"), "lancamentos": lanc, "golpes_ar": golpes_ar}
+
+
+## Execucao "bem feita" (jogador que le o estado): [Dash Attack -> Launcher -> Air x2] enquanto o goblin
+## pode ser lancado; durante a imunidade a launcher faz N-N-N no chao. TTK vem do proprio alvo.
+func _lab_bot_ideal(cena: Node, g: LabInimigo, limite := 40.0) -> Dictionary:
+	var k: Koliani = cena.koliani
+	var m: LabMetricas = cena.metricas
+	var t := 0.0
+	var dt := 1.0 / 60.0
+	var ciclos_launcher := 0
+	while t < limite and is_instance_valid(g) and not g._morto:
+		if k._energia < 60.0:
+			k._energia = 60.0
+		var dx := g.global_position.x - k.global_position.x
+		var lado := signf(dx)
+		if lado != 0.0:
+			k._olha_para = lado
+		if not k.is_on_floor():
+			await get_tree().physics_frame
+			t += dt
+			continue
+		if absf(dx) > 64.0:
+			Input.action_press("mover_direita" if lado > 0 else "mover_esquerda")
+			Input.action_release("mover_esquerda" if lado > 0 else "mover_direita")
+			await get_tree().physics_frame
+			t += dt
+			continue
+		Input.action_release("mover_direita")
+		Input.action_release("mover_esquerda")
+		if g.lab_estado in [LabInimigo.E.LANCADO, LabInimigo.E.CAIDO]:
+			await get_tree().physics_frame
+			t += dt
+			continue
+		if g._imune_lanca_t <= 0.0 and g.lab_estado != LabInimigo.E.ESCAPE:
+			# Dash Attack -> Launcher
+			Input.action_press("dash")
+			for j in 2:
+				await get_tree().physics_frame
+				t += dt
+			Input.action_release("dash")
+			await get_tree().physics_frame
+			t += dt
+			Input.action_press("atacar")
+			for j in 2:
+				await get_tree().physics_frame
+				t += dt
+			Input.action_release("atacar")
+			for j in 9:
+				await get_tree().physics_frame
+				t += dt
+			Input.action_press("mirar_cima")
+			Input.action_press("atacar")
+			for j in 3:
+				await get_tree().physics_frame
+				t += dt
+			Input.action_release("atacar")
+			Input.action_release("mirar_cima")
+			var esperou := 0
+			while g.lab_estado != LabInimigo.E.LANCADO and esperou < 14 and is_instance_valid(g):
+				await get_tree().physics_frame
+				t += dt
+				esperou += 1
+			if is_instance_valid(g) and g.lab_estado == LabInimigo.E.LANCADO:
+				ciclos_launcher += 1
+				Input.action_press("saltar")
+				for j in 8:
+					await get_tree().physics_frame
+					t += dt
+				Input.action_release("saltar")
+				for n in 2:
+					var esp := 0
+					while is_instance_valid(g) and (absf(g.global_position.x - k.global_position.x) > 90.0 or k.is_on_floor()) and esp < 20:
+						await get_tree().physics_frame
+						t += dt
+						esp += 1
+					Input.action_press("atacar")
+					for j in 3:
+						await get_tree().physics_frame
+						t += dt
+					Input.action_release("atacar")
+					for j in 8:
+						await get_tree().physics_frame
+						t += dt
+		else:
+			# enquanto o goblin esta' imune a launcher: N-N-N
+			for i in 3:
+				Input.action_press("atacar")
+				for j in 3:
+					await get_tree().physics_frame
+					t += dt
+				Input.action_release("atacar")
+				for j in 11:
+					await get_tree().physics_frame
+					t += dt
+	Input.action_release("mover_direita")
+	Input.action_release("mover_esquerda")
+	return {"ttk": _lab_ttk_evento(m, t), "botes": m.contar("goblin_bote"),
+		"goblin_acertou": m.contar("goblin_acertou"), "ciclos": ciclos_launcher}
+
+
+## Hierarquia de dano v1.2: BASIC SPAM < COMBO INTENCIONAL, medida no mesmo goblin de 500 HP.
+func teste_combat_lab_balanco() -> void:
+	var antes_hab: Array = EstadoJogo.habilidades.duplicate()
+	var r := {}
+	for modo in ["spam", "parado", "ideal"]:
+		var cena := await _lab_novo()
+		var g: LabInimigo = cena.spawn_goblin(200.0)
+		g.lab_semente = 5
+		_ok(g.vida == 500, "balanco: o goblin tem de continuar a ter 500 HP")
+		if modo == "ideal":
+			r[modo] = await _lab_bot_ideal(cena, g, 40.0)
+		else:
+			r[modo] = await _lab_bot_goblin(cena, g, modo, 40.0)
+		await _lab_fim(cena)
+	print("LAB balanco TTK (do 1.o golpe ao ultimo): spam_com_deslocacao=%.2f spam_parado=%.2f combo_ideal=%.2f | botes/acertos do goblin: spam %d/%d parado %d/%d ideal %d/%d" % [
+		float(r["spam"]["ttk"]), float(r["parado"]["ttk"]), float(r["ideal"]["ttk"]),
+		int(r["spam"]["botes"]), int(r["spam"]["goblin_acertou"]), int(r["parado"]["botes"]), int(r["parado"]["goblin_acertou"]),
+		int(r["ideal"]["botes"]), int(r["ideal"]["goblin_acertou"])])
+	_ok(float(r["parado"]["ttk"]) >= 3.6 and float(r["parado"]["ttk"]) <= 6.5, "balanco: spam parado fora de 3,6-6,5 s: %.2f" % float(r["parado"]["ttk"]))
+	_ok(float(r["spam"]["ttk"]) >= 4.0 and float(r["spam"]["ttk"]) <= 6.5, "balanco: spam com deslocacao fora de 4-6,5 s: %.2f" % float(r["spam"]["ttk"]))
+	_ok(float(r["ideal"]["ttk"]) >= 3.0 and float(r["ideal"]["ttk"]) <= 4.6, "balanco: combo ideal fora de 3-4,6 s: %.2f" % float(r["ideal"]["ttk"]))
+	_ok(float(r["ideal"]["ttk"]) < float(r["parado"]["ttk"]) and float(r["ideal"]["ttk"]) < float(r["spam"]["ttk"]),
+		"balanco: o combo intencional tem de matar mais depressa que o spam")
+	_ok(float(r["ideal"]["ttk"]) > 2.5, "balanco: power creep -- o combo ideal mata em menos de 2,5 s")
+	EstadoJogo.habilidades.assign(antes_hab)

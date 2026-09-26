@@ -324,6 +324,8 @@ var _pos_roll_t := 0.0
 var _lab: Node = null
 ## true enquanto corre um golpe do lab: a hitbox normal fica desligada (acerta o proprio lab).
 var lab_golpe_custom := false
+## Recuperacao extra (s) do golpe normal em curso, so' com o lab (v1.2).
+var _lab_extra_recup := 0.0
 ## Avanço do golpe a decorrer (ver `AVANCO_VEL`).
 var _avanco_restante := 0.0
 var _avanco_dur := 0.0
@@ -2339,6 +2341,12 @@ func _iniciar_ataque() -> void:
 	var tem_combo := RIG == "cavaleiro" or RIG == "nova" or RIG == "shadowblade"
 	_ataque_dur = DUR_COMBO[_combo_passo] if tem_combo else DUR_ATAQUE
 	_ataque_restante = _ataque_dur
+	_lab_extra_recup = 0.0
+	if _lab != null:
+		# Combat Lab v1.2: recuperacao extra (o 4.o golpe) SEM mexer na janela activa
+		_lab_extra_recup = _lab.recup_extra(_combo_passo, _ataque_no_ar)
+		_ataque_dur += _lab_extra_recup
+		_ataque_restante = _ataque_dur
 	_combo_janela = 0.0 if _ataque_no_ar else _ataque_dur + JANELA_COMBO
 	_combo_pedido = false
 	_alvos_atingidos_ataque.clear()
@@ -2415,7 +2423,8 @@ func _atualizar_janela_ataque() -> void:
 	if _hitbox == null or _ataque_dur <= 0.0:
 		return
 	var passo := clampi(_combo_passo, 0, NUM_COMBO - 1)
-	var progresso := clampf(1.0 - _ataque_restante / _ataque_dur, 0.0, 1.0)
+	# (com `_lab_extra_recup` = 0 e' exactamente 1 - restante/dur)
+	var progresso := clampf((_ataque_dur - _ataque_restante) / maxf(_ataque_dur - _lab_extra_recup, 0.001), 0.0, 1.0)
 	_hitbox.monitoring = janela_ataque_ativa(passo, progresso)
 
 
@@ -2580,7 +2589,7 @@ func _ao_acertar_corpo(corpo: Node) -> void:
 		var passo := clampi(_combo_passo, 0, NUM_COMBO - 1)
 		var dano := maxi(1, roundi(_dano_golpe() * float(DANO_COMBO[passo])))
 		if _lab != null:
-			_lab.ao_acertar_normal(corpo, passo, _ataque_no_ar, dano)
+			dano = _lab.ao_acertar_normal(corpo, passo, _ataque_no_ar, dano)
 		corpo.receber_dano(dano, sign(_olha_para), crit, float(RECUO_COMBO[passo]))
 		# 3.º golpe: ATORDOA -- é o pagamento por arriscar o golpe lento.
 		if passo == NUM_COMBO - 2 and corpo.has_method("atordoar"):

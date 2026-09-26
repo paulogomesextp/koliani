@@ -1,3 +1,8 @@
+# >>> COMBAT LAB v1.2 (26 set 2026) -- hierarquia de dano, isolado <<<
+Ver `docs/combat_lab_v1_2.md`. Goblin 500 HP: spam parado 4,48 s, spam com deslocacao 4,93 s, combo ideal 3,60 s (era ~2,4-2,9 s de spam). Base do combo 0,30/0,35/0,43/0,60 (era 0,85/1/1,25/1,9), N4 recup +0,12 s e sem cancel gratis, air 1,4/1,6, launcher/dash 1,3, cleave 2,3, counter 2,7. Risco de feel: golpes basicos 15-30 dano. Nada em producao. Sem push. Regra do Paulo: ao terminar um nivel, abrir o jogo nele (`--nivel=N`).
+
+---
+
 # >>> COMBAT LAB v1.1 (26 set 2026) -- isolado, NAO integrado <<<
 Ver `docs/combat_lab_v1_1.md`: anti-spam do goblin (4.o golpe leve -> hitstun x0,25 + armadura 0,9 s + recuo + contra-bote), clamp de avanco (0/16 atravessamentos, era 6/16), contrato do PD (`receber_dano(q, dir, origem)`; contacto nunca da' PD), isencoes N6 reduzidas a `VentoArena` (zonas de ensino aparadas). ACHADO: o spam nunca prendeu o goblin (nem na v1); domina por dps -- decisao do GM. Sem push.
 

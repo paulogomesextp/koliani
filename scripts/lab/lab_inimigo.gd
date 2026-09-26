@@ -32,7 +32,7 @@ const GOB_LANCA_V := 560.0
 const GOB_LIFT_V := 170.0
 const GOB_JUGGLE_MAX := 3
 const GOB_CAIDO := 0.5
-const GOB_IMUNE_LANCA := 1.2
+const GOB_IMUNE_LANCA := 0.8
 const HITSTUN := {"normal0": 0.22, "normal1": 0.26, "normal2": 0.34, "normal3": 0.40,
 	"launcher": 0.30, "dash": 0.30, "cleave": 0.80, "counter": 1.00, "pogo": 0.30}
 # ANTI-SPAM v1.1: depois de 3 golpes LEVES terrestres seguidos (janela 0,8 s entre golpes) o 4.o mal o
@@ -481,7 +481,8 @@ func _goblin_recebe(tipo: String, dano: float, dir: float, info: Dictionary) -> 
 			escapes += 1
 			_seq_hits = 0
 			res["efeito"] = "escape"
-	var f: float = {"cleave": 300.0, "counter": 520.0, "dash": 200.0}.get(tipo, 90.0 + 40.0 * float(info.get("passo", 0)))
+	# v1.2: o recuo do combo basico e' curto e crescente-suave; o 4.o golpe NAO atira o goblin para fora do golpe seguinte
+	var f: float = {"cleave": 300.0, "counter": 520.0, "dash": 200.0}.get(tipo, [70.0, 80.0, 90.0, 100.0][clampi(int(info.get("passo", 0)), 0, 3)])
 	velocity.x = dir * f
 	_telegrafo_visual(false)
 	_entrar(E.HITSTUN)

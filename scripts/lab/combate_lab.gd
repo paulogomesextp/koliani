@@ -24,6 +24,13 @@ const BUFFER_T := 0.14           # s de buffer de input entre golpes do lab
 ## combate (meia largura do alvo + meia largura dela - tolerancia) e nunca e' empurrada para tras.
 const CLAMP_TOLERANCIA := 10.0   # px que pode entrar no corpo do alvo (evita whiffs visuais injustos)
 const K_MEIA_LARGURA := 10.0
+## HIERARQUIA DE DANO v1.2 (multiplicadores do dano base da espada). Producao: combo 0,85/1,0/1,25/1,9.
+## O martelar do combo basico paga menos; as sequencias intencionais pagam mais (moderado, sem power creep).
+## multiplicadores dos golpes especiais (afinaveis; os valores de `MOVES[..].mult` sao os da v1)
+var mult_golpe := {"launcher": 1.3, "dash": 1.3, "cleave": 2.3, "counter": 2.7}
+var base_dano_mult: Array = [0.30, 0.35, 0.43, 0.60]
+var ar_dano_mult: Array = [1.4, 1.6]         # air 1 / air 2 (producao: 0,85 / 1,0)
+var recup_extra_remate := 0.12               # s a mais de recuperacao no 4.o golpe (a janela activa nao muda)
 var clamp_avanco := true
 
 const ENERGIA_PD := 25.0
@@ -35,16 +42,16 @@ const ENERGIA_LAUNCHER := 5.0
 ## Frame data em segundos (a 60 Hz: 1 frame = 0,0167 s). rect: em px, relativo ao centro da
 ## Koliani, com x a apontar para onde ela olha.
 const MOVES := {
-	"launcher": {"startup": 0.10, "ativo": 0.10, "recup": 0.24, "mult": 0.9, "guard_break": false,
+	"launcher": {"startup": 0.10, "ativo": 0.10, "recup": 0.24, "mult": 1.3, "guard_break": false,
 		"rect": Rect2(-10.0, -104.0, 92.0, 132.0), "energia": ENERGIA_LAUNCHER, "passo_visual": 2,
 		"avanco": 0.0, "avanco_dur": 0.0, "hitstop": 0.014},
-	"dash": {"startup": 0.04, "ativo": 0.10, "recup": 0.22, "mult": 1.15, "guard_break": false,
+	"dash": {"startup": 0.04, "ativo": 0.10, "recup": 0.22, "mult": 1.3, "guard_break": false,
 		"rect": Rect2(-6.0, -44.0, 96.0, 76.0), "energia": ENERGIA_DASH_ATK, "passo_visual": 0,
 		"avanco": 300.0, "avanco_dur": 0.14, "hitstop": 0.012},
-	"cleave": {"startup": 0.14, "ativo": 0.12, "recup": 0.40, "mult": 2.0, "guard_break": true,
+	"cleave": {"startup": 0.14, "ativo": 0.12, "recup": 0.40, "mult": 2.3, "guard_break": true,
 		"rect": Rect2(-10.0, -56.0, 128.0, 90.0), "energia": ENERGIA_CLEAVE, "passo_visual": 3,
 		"avanco": 160.0, "avanco_dur": 0.12, "hitstop": 0.030},
-	"counter": {"startup": 0.06, "ativo": 0.12, "recup": 0.16, "mult": 2.4, "guard_break": true,
+	"counter": {"startup": 0.06, "ativo": 0.12, "recup": 0.16, "mult": 2.7, "guard_break": true,
 		"rect": Rect2(-10.0, -56.0, 140.0, 90.0), "energia": ENERGIA_COUNTER, "passo_visual": 3,
 		"avanco": 520.0, "avanco_dur": 0.14, "hitstop": 0.040},
 }
@@ -143,12 +150,21 @@ func ar_passo_seguinte() -> int:
 	return p
 
 
-func ao_acertar_normal(corpo: Node, passo: int, no_ar: bool, dano: int) -> void:
+## Devolve o dano AJUSTADO (hierarquia v1.2: o combo basico sustentado paga menos que as sequencias intencionais).
+func ao_acertar_normal(corpo: Node, passo: int, no_ar: bool, dano: int) -> int:
 	corpo.set_meta("lab_passo", passo)
 	corpo.set_meta("lab_ar", no_ar)
 	_metr("energia", {"fonte": "normal_ar" if no_ar else "normal%d" % passo, "pedido": Koliani.ENERGIA_POR_GOLPE,
 		"ganho": Koliani.ENERGIA_POR_GOLPE})
 	_nota("%s%d" % ["AR" if no_ar else "N", passo + 1])
+	var mult: float = float((ar_dano_mult if no_ar else base_dano_mult)[clampi(passo, 0, 3 if not no_ar else 1)])
+	var base := float(dano) / float(Koliani.DANO_COMBO[clampi(passo, 0, 3)])   # dano da espada sem multiplicador
+	return maxi(1, roundi(base * mult))
+
+
+## Recuperacao extra do golpe normal (v1.2): so' o 4.o (remate), no chao.
+func recup_extra(passo: int, no_ar: bool) -> float:
+	return recup_extra_remate if (passo >= 3 and not no_ar) else 0.0
 
 
 # ------------------------------------------------------------------- tick -----
@@ -255,6 +271,8 @@ func tratar_input(_dt: float) -> bool:
 func _normal_cancelavel() -> bool:
 	if k._ataque_dur <= 0.0 or k._alvos_atingidos_ataque.is_empty():
 		return false
+	if k._combo_passo >= Koliani.NUM_COMBO - 1:
+		return false   # o remate compromete: nao se cancela gratis para o launcher
 	var passo := clampi(k._combo_passo, 0, Koliani.NUM_COMBO - 1)
 	var prog := 1.0 - k._ataque_restante / k._ataque_dur
 	return prog >= float(Koliani.ATAQUE_ATIVO_FIM[passo]) or prog >= 0.5
@@ -332,7 +350,7 @@ func _aplicar_golpe(d: Dictionary) -> void:
 			continue
 		_move_atingidos[id] = true
 		_move_acertou = true
-		var dano := maxi(1, roundi(k._dano_golpe() * float(d["mult"])))
+		var dano := maxi(1, roundi(k._dano_golpe() * float(mult_golpe[_move])))
 		var crit := k._pos_roll_t > 0.0
 		var info := {"tipo": _move, "dano": dano, "dir": signf(k._olha_para), "critico": crit,
 			"guard_break": bool(d["guard_break"]), "passo": 0, "ar": false}
