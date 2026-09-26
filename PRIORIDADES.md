@@ -1,3 +1,5 @@
+> **N6 autoral (26 set 2026, sem push)** -- `docs/nivel_autoral_n6.md`. A aguardar playtest: leitura/justica do vento (1500-1800), TTK do Golem (~609 vida), duracao. Decisoes futuras: renomear `ChefeCarcereiro`, destino do `dash_aereo`, rever a intensidade do vento em N7-N10 (420-520 sao imperceptiveis). N7 NAO comecado.
+
 > **Regiao II -- auditoria N6 (26 set 2026, sem push)** -- `docs/regiao_2_decisoes_e_n6_auditoria.md`. **Pendente do GM**: aprovar a reconstrucao do N6 (Carcereiro -> Guardiao, `dash_aereo` fora do N6, seccoes A-E); confirmar retirar os Coletaveis `escalar_paredes` de N7/N11.
 
 > **Regiao I = vertical slice (26 set 2026, sem push)** -- `docs/regiao_1_vertical_slice.md`; cartao "FLORESTA CORROMPIDA CONCLUIDA" feito. **Pendente do GM**: aprovar `docs/plano_migracao_regiao_2.md` (ordem N6->N10, skill no exame, cartao region.2). `SPECIAL BOSS DPS -- REVIEW DURING GLOBAL COMBAT BALANCE` (bot com Especial 19,7 s vs 35,5 s) registado, nao alterado.

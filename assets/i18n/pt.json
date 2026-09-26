@@ -558,6 +558,8 @@
   "mec.dash.txt": "Carrega em Dash para uma rajada curta de velocidade. Não podes ser ferida enquanto dura. Sob um teto baixo, o dash atravessa vãos que um salto não vence.",
   "mec.pogo.nome": "Pogo",
   "mec.pogo.txt": "No ar, mantém Baixo e carrega em Atacar para mergulhar. Acerta o mergulho em espinhos ou num inimigo para ressaltar. Um mergulho que não acerta em nada não dá ressalto.",
+  "mec.rajada.nome": "Rajadas",
+  "mec.rajada.txt": "O vento empurra-te para os lados. Le as linhas-guia: aproveita as rajadas, salta contra elas e nao te deixes apanhar sobre o vazio.",
   "mec.especial.nome": "Especial",
   "mec.especial.txt": "Carrega em Especial para lançar uma onda que atravessa todos os inimigos. Custa um terço da Energia. A Energia regressa com o tempo e sempre que acertas um golpe.",
   "mec.gruta.nome": "Gruta Apertada",

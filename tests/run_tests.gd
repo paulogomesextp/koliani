@@ -109,6 +109,7 @@ func _correr_tudo() -> void:
 	await teste_n5_autoral()
 	await teste_cartao_regiao1()
 	await teste_fluxo_fim_regiao1()
+	await teste_n6_autoral()
 	teste_execution_9d_inimigos_regiao1()
 	teste_9d9e_crias_sem_goblin()
 	teste_9e2_coracao_producao_e_fases()
@@ -6082,3 +6083,126 @@ func teste_fluxo_fim_regiao1() -> void:
 	EstadoJogo.recompensas_reclamadas.assign(antes_rec)
 	EstadoJogo.habilidades.assign(antes_hab)
 	EstadoJogo.indice_nivel = antes_idx
+
+
+## N6 -- As Falesias Abertas (nivel AUTORAL da Regiao II: o VENTO, sem skill nova, Golem das Falesias como Guardiao).
+func teste_n6_autoral() -> void:
+	var antes_dev: bool = EstadoJogo.modo_dev
+	var antes_hab: Array = EstadoJogo.habilidades.duplicate()
+	var antes_bosses: Array[String] = EstadoJogo.bosses_derrotados.duplicate()
+	var antes_idx: int = EstadoJogo.indice_nivel
+	EstadoJogo.modo_dev = false
+	EstadoJogo.indice_nivel = 5
+	EstadoJogo.habilidades.assign(["dash", "pogo", "especial", "salto_duplo"])
+	var n := (load("res://scenes/levels/Prisao_dos_Condenados.tscn") as PackedScene).instantiate()
+	add_child(n)
+	for i in 6:
+		await get_tree().process_frame
+	# --- estrutura: authored, sem jornada, guardiao (nao boss), sem skills novas ---
+	_ok(not bool(n.get("corredor")) and bool(n.get("checkpoints_autorais")), "N6: nao e' autoral")
+	_ok(n.get_node_or_null("CorredorAproximacao") == null, "N6: o gerador criou uma jornada")
+	_ok(n.get_node_or_null("Guardiao") is ChefeCarcereiro and n.get_node_or_null("Chefe") == null,
+		"N6: tem de fechar com o Golem como Guardiao, sem Chefe regional")
+	_ok(n.get_node_or_null("Porta") != null, "N6: sem Porta")
+	var chk := 0
+	for c in get_tree().get_nodes_in_group("checkpoints"):
+		if n.is_ancestor_of(c):
+			chk += 1
+	_ok(chk == 5, "N6: esperava 5 checkpoints, ha %d" % chk)
+	var proibidos := ["serra.gd", "fogo.gd", "guilhotina.gd", "pendulo_lamina.gd", "portal.gd", "trampolim.gd",
+		"tumulo_elevador.gd", "plataforma_ritmada.gd", "torreta.gd", "teia_prende.gd", "raiz_elevatoria.gd",
+		"alavanca.gd", "porta_trancada.gd", "gota_acida.gd", "zona_gravidade.gd", "coletavel.gd", "corrente_ar.gd"]
+	var correntes := 0
+	var zonas: Array[WindZone] = []
+	for no in n.find_children("*", "", true, false):
+		var sc := no.get_script() as Script
+		if sc == null:
+			continue
+		for pr in proibidos:
+			_ok(not sc.resource_path.ends_with(pr), "N6: %s nao pertence ao N6 (skill/mecanica alheia)" % no.name)
+		if sc.resource_path.ends_with("plataforma_corrente.gd"):
+			correntes += 1
+		if no is WindZone:
+			zonas.append(no)
+	_ok(correntes == 1, "N6: esperava UMA plataforma movel, ha %d" % correntes)
+	_ok(n.find_children("*", "Coletavel", true, false).is_empty(), "N6: nao ensina skills (sem Coletavel)")
+	# --- vento: 7 zonas, as duas direcoes, ensino continuo antes do pulsado ---
+	_ok(zonas.size() == 7, "N6: esperava 7 zonas de vento, ha %d" % zonas.size())
+	var dir_pos := 0
+	var dir_neg := 0
+	var continuas := 0
+	for z in zonas:
+		if z.direcao.x > 0.0:
+			dir_pos += 1
+		elif z.direcao.x < 0.0:
+			dir_neg += 1
+		if z.modo == WindZone.Modo.CONTINUO:
+			continuas += 1
+		_ok(absf(z.direcao.y) < 0.001, "N6: %s deve ser horizontal" % z.name)
+	_ok(dir_pos > 0 and dir_neg > 0, "N6: faltam rajadas nas duas direcoes")
+	var teach := n.get_node("VentoAprende1") as WindZone
+	_ok(teach.modo == WindZone.Modo.CONTINUO and n.get_node("VentoAprende2").modo == WindZone.Modo.CONTINUO,
+		"N6: o ensino do vento tem de ser continuo")
+	_ok(continuas == 2 and teach.velocidade_max <= 140.0, "N6: so' o ensino (2) e' continuo e fraco")
+	# ensino em chao firme: as zonas de ensino sobrepoem so' o ChaoInicio
+	var chao_i := n.get_node("ChaoInicio") as Node2D
+	_ok(chao_i.position.x - chao_i.tamanho.x * 0.5 <= 0.0 and chao_i.position.x + chao_i.tamanho.x * 0.5 >= 1000.0,
+		"N6: o chao do ensino tem de cobrir 0-1000")
+	# --- geometria: vaos e subidas dentro do salto simples (o vento so' os desloca) ---
+	for cadeia in [["ChaoInicio", "Ponte1", "Ponte2", "Ponte3", "Ponte4", "Descanso"],
+			["Descanso", "Cima1", "Cima2", "Cima3", "Cima4", "Reencontro"],
+			["Descanso", "Baixo1", "LajeElite", "Reencontro"],
+			["Reencontro", "P1", "P2"], ["P3", "P4", "ChaoChefe"]]:
+		for i in range(cadeia.size() - 1):
+			var a := n.get_node(cadeia[i]) as Node2D
+			var b := n.get_node(cadeia[i + 1]) as Node2D
+			var vao: float = (b.position.x - b.tamanho.x * 0.5) - (a.position.x + a.tamanho.x * 0.5)
+			var sobe: float = (a.position.y - a.tamanho.y * 0.5) - (b.position.y - b.tamanho.y * 0.5)
+			_ok(vao <= 140.0, "N6: vao %s->%s = %d (max 140)" % [cadeia[i], cadeia[i + 1], vao])
+			_ok(sobe <= 104.0, "N6: subida %s->%s = %d (max 104)" % [cadeia[i], cadeia[i + 1], sobe])
+	# ponte D1->corrente->P3: a plataforma movel cobre o vao maior fora do vento
+	var cor_d := n.get_node("CorrenteD") as Node2D
+	for nome_z in ["VentoD1", "VentoD2"]:
+		var zz := n.get_node(nome_z) as WindZone
+		_ok(absf(zz.position.x - cor_d.position.x) > zz.tamanho.x * 0.5 + 60.0,
+			"N6: a plataforma movel esta' dentro do %s" % nome_z)
+	# --- Guardiao: elite regional-lite, sela a porta e nao e' boss ---
+	var g := n.get_node("Guardiao") as ChefeCarcereiro
+	var porta := n.get_node("Porta") as Area2D
+	_ok(g.vida >= 400 and g.vida <= 900, "N6: vida do Guardiao %d fora de 400-900 (nao pode competir com o boss)" % g.vida)
+	_ok(not porta.monitoring, "N6: porta selada com o Guardiao vivo")
+	g.queue_free()
+	for i in 4:
+		await get_tree().process_frame
+	_ok(porta.monitoring, "N6: a porta abre quando o Guardiao cai")
+	_ok(EstadoJogo.bosses_derrotados == antes_bosses, "N6: o Guardiao nao pode gravar boss derrotado")
+	_ok(not EstadoJogo.tem_habilidade("escalar_paredes") and not EstadoJogo.tem_habilidade("dash_aereo"),
+		"N6: nao concede habilidades")
+	# --- o vento MEXE mesmo na Koliani no AR (no chao o atrito come-o): a favor no ensino 1, contra no 2 ---
+	n.queue_free()
+	await get_tree().process_frame
+	var n2 := (load("res://scenes/levels/Prisao_dos_Condenados.tscn") as PackedScene).instantiate()
+	add_child(n2)
+	for i in 6:
+		await get_tree().process_frame
+	var k := n2.get_node("Koliani") as CharacterBody2D
+	var dx_favor := await _deriva_n6(k, Vector2(330, 510))
+	_ok(dx_favor > 8.0, "N6: o vento a favor nao empurra a Koliani no ar (dx=%s)" % str(snappedf(dx_favor, 0.1)))
+	var dx_contra := await _deriva_n6(k, Vector2(740, 510))
+	_ok(dx_contra < -8.0, "N6: o vento contra nao empurra a Koliani no ar (dx=%s)" % str(snappedf(dx_contra, 0.1)))
+	n2.queue_free()
+	await get_tree().process_frame
+	EstadoJogo.modo_dev = antes_dev
+	EstadoJogo.habilidades.assign(antes_hab)
+	EstadoJogo.bosses_derrotados.assign(antes_bosses)
+	EstadoJogo.indice_nivel = antes_idx
+
+
+## Larga a Koliani no ar e mede quanto o vento a desloca em ~0,5 s.
+func _deriva_n6(k: CharacterBody2D, de: Vector2) -> float:
+	k.global_position = de
+	k.velocity = Vector2.ZERO
+	var x0 := k.global_position.x
+	for i in 30:
+		await get_tree().physics_frame
+	return k.global_position.x - x0

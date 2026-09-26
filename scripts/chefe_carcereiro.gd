@@ -23,6 +23,8 @@ enum Fase { APROXIMA, TELEGRAFO, SALTO, IMPACTO, RECUPERA }
 @export var dur_recupera := 0.5
 ## Hipótese de encadear um 2.º baque em vez de recuperar (combo pesado).
 @export var hip_duplo_baque := 0.45
+## Vida base minima. O Golem e' o GUARDIAO do N6 (nao o boss regional): a cena baixa isto.
+@export var vida_minima := 540
 
 var _fase: Fase = Fase.APROXIMA
 var _t := 0.0
@@ -32,7 +34,7 @@ var _baques_seguidos := 0
 
 func _ready() -> void:
 	super._ready()
-	vida = maxi(vida, 540)
+	vida = maxi(vida, vida_minima)
 
 
 func _physics_process(dt: float) -> void:

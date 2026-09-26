@@ -1,3 +1,8 @@
+# >>> N6 AUTORAL feito, a aguardar playtest do GM (26 set 2026) <<<
+Ver `docs/nivel_autoral_n6.md`. Golem das Falesias = Guardiao (actor `ChefeCarcereiro.tscn`, ja' era o golem; `vida_minima` novo), `dash_aereo` fora, sem skills. **ACHADO: o vento so' se sente com intensidade > 1300** (DESACEL_AR): 420 -> 7 px/s. N6 usa 1500-1800; N7-N10 tem o mesmo problema latente. Teste `teste_n6_autoral`; suite PASS; bot chega a` porta. Sem push. N7 NAO comecado (tira o coletavel `escalar_paredes` quando for reconstruido).
+
+---
+
 # >>> REGIAO II: decisoes do GM + AUDITORIA DO N6 (26 set 2026) <<<
 Ver `docs/regiao_2_decisoes_e_n6_auditoria.md`. Suite completa PASS + save intacto + fluxo real N5 testado (`teste_fluxo_fim_regiao1`). Canon = DESFILADEIRO DOS VENTOS (legacy so' fornece sistemas). N10 dara `escalar_paredes` + cartao `DESFILADEIRO DOS VENTOS CONCLUIDO` (por fazer na execucao do N10). ACHADO: N7 e N11 tem Coletavel `escalar_paredes` (viola a regra). N6 auditado (11 desvios, 5 seccoes propostas); NADA de N6-N10 alterado; aguarda aprovacao da tabela. Sem push.
 

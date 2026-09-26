@@ -558,6 +558,8 @@
   "mec.dash.txt": "Press Dash for a short burst of speed. You cannot be hurt while it lasts. Under a low ceiling, a dash crosses gaps a jump cannot.",
   "mec.pogo.nome": "Pogo",
   "mec.pogo.txt": "In the air, hold Down and press Attack to dive. Land the dive on spikes or an enemy to bounce back up. A dive that hits nothing gives no bounce.",
+  "mec.rajada.nome": "Gusts",
+  "mec.rajada.txt": "Wind pushes you sideways. Read the guide lines: ride the gusts, jump against them, and don't get caught over the void.",
   "mec.especial.nome": "Special",
   "mec.especial.txt": "Press Special to fire a wave that pierces every enemy in its path. It costs a third of your Energy. Energy refills over time and every time you land a hit.",
   "mec.gruta.nome": "Low Cave",

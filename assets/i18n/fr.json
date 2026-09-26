@@ -558,6 +558,8 @@
   "mec.dash.txt": "Appuie sur Dash pour une brève poussée de vitesse. Tu es intouchable pendant ce temps. Sous un plafond bas, le dash franchit des vides qu'un saut ne passe pas.",
   "mec.pogo.nome": "Pogo",
   "mec.pogo.txt": "En l'air, maintiens Bas et appuie sur Attaquer pour plonger. Touche des pics ou un ennemi pour rebondir. Un plongeon qui ne touche rien ne fait pas rebondir.",
+  "mec.rajada.nome": "Rafales",
+  "mec.rajada.txt": "Le vent te pousse sur les cotes. Lis les lignes guides : profite des rafales, saute contre elles et ne te fais pas surprendre au-dessus du vide.",
   "mec.especial.nome": "Spécial",
   "mec.especial.txt": "Appuie sur Spécial pour lancer une onde qui traverse tous les ennemis. Coûte un tiers de l'Énergie. L'Énergie revient avec le temps et à chaque coup porté.",
   "mec.gruta.nome": "Grotte Basse",

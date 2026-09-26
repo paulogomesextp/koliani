@@ -558,6 +558,8 @@
   "mec.dash.txt": "Drücke Dash für einen kurzen Geschwindigkeitsschub. Währenddessen bist du unverwundbar. Unter niedriger Decke überquert der Dash Lücken, die ein Sprung nicht schafft.",
   "mec.pogo.nome": "Pogo",
   "mec.pogo.txt": "Halte in der Luft Runter gedrückt und drücke Angriff, um abzutauchen. Triffst du Stacheln oder einen Gegner, prallst du ab. Ein Sturzangriff ins Leere gibt keinen Abpraller.",
+  "mec.rajada.nome": "Windstosse",
+  "mec.rajada.txt": "Der Wind schiebt dich zur Seite. Lies die Leitlinien: nutze die Stosse, spring gegen sie und lass dich nicht uber dem Abgrund erwischen.",
   "mec.especial.nome": "Spezial",
   "mec.especial.txt": "Drücke Spezial, um eine Welle abzufeuern, die alle Gegner durchdringt. Kostet ein Drittel der Energie. Energie lädt sich mit der Zeit und bei jedem Treffer wieder auf.",
   "mec.gruta.nome": "Enge Höhle",

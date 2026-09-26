@@ -558,6 +558,8 @@
   "mec.dash.txt": "Pulsa Dash para una ráfaga corta de velocidad. No puedes recibir daño mientras dura. Bajo un techo bajo, el dash cruza huecos que un salto no salva.",
   "mec.pogo.nome": "Pogo",
   "mec.pogo.txt": "En el aire, mantén Abajo y pulsa Atacar para lanzarte en picado. Acierta sobre pinchos o un enemigo para rebotar. Si no aciertas nada, no hay rebote.",
+  "mec.rajada.nome": "Rachas",
+  "mec.rajada.txt": "El viento te empuja de lado. Lee las lineas guia: aprovecha las rachas, salta contra ellas y no te dejes atrapar sobre el vacio.",
   "mec.especial.nome": "Especial",
   "mec.especial.txt": "Pulsa Especial para lanzar una onda que atraviesa a todos los enemigos. Cuesta un tercio de la Energía. La Energía se recupera con el tiempo y al acertar golpes.",
   "mec.gruta.nome": "Cueva Baja",

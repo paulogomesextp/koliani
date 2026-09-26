@@ -26,17 +26,29 @@ static func executar() -> Array[String]:
 			"%s: spawn preservado" % nome)
 		_verificar(falhas, raiz.get_node_or_null("Porta") != null,
 			"%s: porta preservada" % nome)
-		_verificar(falhas, raiz.get_node_or_null("Chefe") != null,
-			"%s: boss existente preservado" % nome)
-		_verificar(falhas, _filhos_por_prefixo(raiz, "Check").size() == 3,
-			"%s: três checkpoints preservados" % nome)
+		# N06 e' AUTORAL desde 26 set 2026: fecha com um Guardiao (Golem das Falesias),
+		# nao com um Chefe, e tem 5 checkpoints intencionais (ver `teste_n6_autoral`).
+		if nome == "N06":
+			_verificar(falhas, raiz.get_node_or_null("Guardiao") != null
+				and raiz.get_node_or_null("Chefe") == null, "N06: fecha com Guardiao, sem Chefe")
+			_verificar(falhas, _filhos_por_prefixo(raiz, "Check").size() == 5,
+				"N06: cinco checkpoints autorais")
+		else:
+			_verificar(falhas, raiz.get_node_or_null("Chefe") != null,
+				"%s: boss existente preservado" % nome)
+			_verificar(falhas, _filhos_por_prefixo(raiz, "Check").size() == 3,
+				"%s: três checkpoints preservados" % nome)
 
 	if raizes.has("N06"):
 		var zonas06 := _zonas(raizes["N06"])
-		_verificar(falhas, zonas06.size() == 2, "N06: duas rajadas")
+		_verificar(falhas, zonas06.size() == 7, "N06: sete zonas de vento (2 de ensino continuas + 5 pulsadas)")
 		_verificar(falhas, _direcoes_x(zonas06).has(-1.0)
 			and _direcoes_x(zonas06).has(1.0), "N06: rajadas opostas")
-		_verificar(falhas, _todas_pulsadas(zonas06), "N06: rajadas pulsadas")
+		var continuas06 := 0
+		for z06 in zonas06:
+			if z06.modo == WindZone.Modo.CONTINUO:
+				continuas06 += 1
+		_verificar(falhas, continuas06 == 2, "N06: so' o ensino (2 zonas) e' continuo; o resto e' pulsado")
 	if raizes.has("N07"):
 		var zonas07 := _zonas(raizes["N07"])
 		_verificar(falhas, zonas07.size() == 3, "N07: três updrafts")
