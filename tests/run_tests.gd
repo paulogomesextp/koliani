@@ -108,6 +108,7 @@ func _correr_tudo() -> void:
 	await teste_n4_autoral()
 	await teste_n5_autoral()
 	await teste_cartao_regiao1()
+	await teste_fluxo_fim_regiao1()
 	teste_execution_9d_inimigos_regiao1()
 	teste_9d9e_crias_sem_goblin()
 	teste_9e2_coracao_producao_e_fases()
@@ -6036,3 +6037,48 @@ func teste_cartao_regiao1() -> void:
 	(cartao.find_children("*", "Button", true, false)[0] as Button).pressed.emit()
 	_ok(fechou[0], "cartao: Continuar fecha")
 	pai.queue_free()
+
+
+## Fluxo real do N5: boss derrotado -> salto duplo -> bau -> cartao -> Continuar -> porta aberta.
+func teste_fluxo_fim_regiao1() -> void:
+	var antes_bosses: Array[String] = EstadoJogo.bosses_derrotados.duplicate()
+	var antes_rec: Array = EstadoJogo.recompensas_reclamadas.duplicate()
+	var antes_hab: Array = EstadoJogo.habilidades.duplicate()
+	var antes_idx: int = EstadoJogo.indice_nivel
+	EstadoJogo.bosses_derrotados.clear()
+	EstadoJogo.recompensas_reclamadas.clear()
+	EstadoJogo.habilidades.assign(["dash", "pogo", "especial"])
+	EstadoJogo.indice_nivel = 4
+	var nivel := (load("res://scenes/levels/Coracao_da_Floresta.tscn") as PackedScene).instantiate()
+	add_child(nivel)
+	for i in 6:
+		await get_tree().process_frame
+	var porta := nivel.get_node("Porta") as Area2D
+	_ok(not porta.monitoring, "fluxo R1: porta selada antes do boss")
+	_ok(not EstadoJogo.tem_habilidade("salto_duplo"), "fluxo R1: salto duplo so' depois do boss")
+	nivel.get_node("Chefe").derrotado.emit()
+	for i in 4:
+		await get_tree().process_frame
+	_ok(EstadoJogo.tem_habilidade("salto_duplo"), "fluxo R1: boss derrotado desbloqueia salto duplo")
+	var bau := nivel.get_node_or_null("BauChefe")
+	_ok(bau != null, "fluxo R1: bau nasce")
+	_ok(not porta.monitoring, "fluxo R1: porta continua selada com o bau por abrir")
+	if bau:
+		bau._abrir()
+		var botoes: Array = bau._painel.find_children("*", "Button", true, false)
+		_ok(not botoes.is_empty(), "fluxo R1: painel do bau tem Continuar")
+		(botoes[0] as Button).pressed.emit()
+		await get_tree().process_frame
+		var cartao := nivel.get_node_or_null("CartaoRegiao")
+		_ok(cartao != null, "fluxo R1: cartao de fim de regiao aparece")
+		_ok(not porta.monitoring, "fluxo R1: porta selada enquanto o cartao esta' aberto")
+		if cartao:
+			(cartao.find_children("*", "Button", true, false)[0] as Button).pressed.emit()
+			await get_tree().process_frame
+			_ok(porta.monitoring, "fluxo R1: Continuar abre a porta")
+	nivel.queue_free()
+	await get_tree().process_frame
+	EstadoJogo.bosses_derrotados.assign(antes_bosses)
+	EstadoJogo.recompensas_reclamadas.assign(antes_rec)
+	EstadoJogo.habilidades.assign(antes_hab)
+	EstadoJogo.indice_nivel = antes_idx
