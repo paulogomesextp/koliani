@@ -225,6 +225,11 @@ func _abrir_guardiao() -> void:
 ## foram esvaziadas e nunca ninguem lhe deu uma porta de entrada.
 const HABILIDADE_DO_CHEFE := {4: "salto_duplo"}
 
+## Cartao de fim de regiao (so' a Regiao I por agora): indice do nivel -> chave i18n.
+const REGIAO_CONCLUIDA := {4: "region.1.complete"}
+## Habilidade ganha NESTA vitoria (para o cartao); "" se ja' a tinha.
+var _hab_ganha := ""
+
 
 func _abrir() -> void:
 	if _bau_criado:
@@ -245,6 +250,7 @@ func _abrir() -> void:
 		# (O `Coletavel` com `habilidade_id`, esse toca `desbloqueio`: nao
 		# tem fanfarra de chefe nenhuma por cima.)
 		EstadoJogo.desbloquear_habilidade(hab)
+		_hab_ganha = hab
 	_criar_bau.call_deferred()
 
 func _criar_bau() -> void:
@@ -270,8 +276,19 @@ func _criar_bau() -> void:
 		return
 	var hit := mundo.direct_space_state.intersect_ray(raio)
 	bau.position = to_local(hit.position if not hit.is_empty() else _porta.global_position)
-	bau.recolhido.connect(func() -> void: _selar(false))
+	bau.recolhido.connect(_ao_bau_recolhido)
 	add_child(bau)
+
+
+## Bau -> (cartao de fim de regiao, se for o exame regional) -> porta aberta.
+## A porta so' abre depois de Continuar, para o cartao nao ser ultrapassado.
+func _ao_bau_recolhido() -> void:
+	var chave: String = REGIAO_CONCLUIDA.get(EstadoJogo.indice_nivel, "")
+	if chave == "" or not is_inside_tree():
+		_selar(false)
+		return
+	var cartao := preload("res://scripts/cartao_regiao.gd").mostrar(self, chave, _hab_ganha)
+	cartao.fechado.connect(_selar.bind(false))
 
 
 ## Espalha CANDEEIROS e TOCHAS pelo nível. O Paulo: "o jogo está um bocado

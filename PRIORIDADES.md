@@ -1,3 +1,5 @@
+> **Regiao I = vertical slice (26 set 2026, sem push)** -- `docs/regiao_1_vertical_slice.md`; cartao "FLORESTA CORROMPIDA CONCLUIDA" feito. **Pendente do GM**: aprovar `docs/plano_migracao_regiao_2.md` (ordem N6->N10, skill no exame, cartao region.2). `SPECIAL BOSS DPS -- REVIEW DURING GLOBAL COMBAT BALANCE` (bot com Especial 19,7 s vs 35,5 s) registado, nao alterado.
+
 > **N5 autoral + Coracao Putrefacto (26 set 2026, sem push)** -- `docs/nivel_autoral_n5.md`. A aguardar playtest: legibilidade dos telegraphs (pulso/raizes), pogo nos brotos, TTK humano (est. 57-71 s), Especial vs casca, arte placeholder (broto/onda), decisao: manter `salto_duplo` como premio do boss? e ecra de fecho da Regiao I. Regiao II NAO comecada.
 
 > **N4 autoral + Especial com Energia (26 set 2026, sem push)** -- `docs/nivel_autoral_n4.md`. A aguardar playtest do GM: custo 33/uso, ganhos +5/+8, dano 2,6x, botao tactil novo, arte do Especial (usa o laser do tiro), encontro de gestao de Energia. N5 NAO comecado.

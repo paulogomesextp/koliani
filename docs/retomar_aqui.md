@@ -1,3 +1,8 @@
+# >>> REGIAO I = VERTICAL SLICE + cartao de fim de regiao (26 set 2026) <<<
+Ver `docs/regiao_1_vertical_slice.md` (decisoes, regras/padroes, divida, nota SPECIAL BOSS DPS -- so' registada) e `docs/plano_migracao_regiao_2.md` (PLANO, nada construido; aguarda GM). Novo: `scripts/cartao_regiao.gd` + `REGIAO_CONCLUIDA` em `nivel_com_chefe.gd` (bau -> cartao -> porta); teste `teste_cartao_regiao1`. Salto duplo mantido como premio do N5. Sem push. Nao comecar N6-N10.
+
+---
+
 # >>> N5 autoral + Coracao Putrefacto reescrito (26 set 2026) <<<
 Ver `docs/nivel_autoral_n5.md`. Ciclo PROTEGIDO->MECANICA->EXPOSTO; pulso (dash/salto), brotos (pogo), raizes; fase 2 encadeada. TTK bot 35,5 s (humano ~57-71). Iteracao rapida de testes: `SO_TESTE=teste_n5_autoral python tools/godot_isolado.py -- --headless --path . res://tests/run_tests.tscn`. Armadilhas: o headless e' QUADRADO (so' ~250 px a' vista); a morte do boss grava em `bosses_derrotados` (limpar nos testes); `Engine.time_scale` acelera os bots; jogar `saltar` 1 frame = salto cortado. Regiao I completa (N1-N5) para playtest do GM. Sem push; Regiao II nao comecada.
 

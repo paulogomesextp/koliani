@@ -107,6 +107,7 @@ func _correr_tudo() -> void:
 	await teste_pogo_intencional()
 	await teste_n4_autoral()
 	await teste_n5_autoral()
+	await teste_cartao_regiao1()
 	teste_execution_9d_inimigos_regiao1()
 	teste_9d9e_crias_sem_goblin()
 	teste_9e2_coracao_producao_e_fases()
@@ -6014,3 +6015,24 @@ func teste_n5_autoral() -> void:
 	EstadoJogo.modo_dev = antes_dev
 	EstadoJogo.indice_nivel = antes_idx
 	EstadoJogo.habilidades.assign(antes_hab)
+
+
+## Fim da Regiao I: o cartao mostra a regiao + a habilidade, e Continuar emite `fechado`.
+func teste_cartao_regiao1() -> void:
+	var pai := Node.new()
+	get_tree().root.add_child(pai)
+	var cartao: Node = preload("res://scripts/cartao_regiao.gd").mostrar(pai, "region.1.complete", "salto_duplo")
+	await get_tree().process_frame
+	var textos: Array[String] = []
+	for n in cartao.find_children("*", "Label", true, false):
+		textos.append((n as Label).text)
+	var junto := " | ".join(textos)
+	_ok(junto.contains(Textos.t("region.1.complete")), "cartao: mostra o nome da regiao")
+	_ok(junto.contains(Textos.tf("region.ability_unlocked", [Textos.t("hud.ability.salto_duplo")])), "cartao: SALTO DUPLO DESBLOQUEADO")
+	_ok(Textos.t("region.1.complete") != "region.1.complete", "cartao: chave i18n existe")
+	_ok(preload("res://scripts/nivel_com_chefe.gd").REGIAO_CONCLUIDA.get(4, "") == "region.1.complete", "cartao: ligado ao nivel 5")
+	var fechou := [false]
+	cartao.fechado.connect(func() -> void: fechou[0] = true)
+	(cartao.find_children("*", "Button", true, false)[0] as Button).pressed.emit()
+	_ok(fechou[0], "cartao: Continuar fecha")
+	pai.queue_free()
