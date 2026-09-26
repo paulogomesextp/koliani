@@ -1,3 +1,8 @@
+# >>> REGIAO II: decisoes do GM + AUDITORIA DO N6 (26 set 2026) <<<
+Ver `docs/regiao_2_decisoes_e_n6_auditoria.md`. Suite completa PASS + save intacto + fluxo real N5 testado (`teste_fluxo_fim_regiao1`). Canon = DESFILADEIRO DOS VENTOS (legacy so' fornece sistemas). N10 dara `escalar_paredes` + cartao `DESFILADEIRO DOS VENTOS CONCLUIDO` (por fazer na execucao do N10). ACHADO: N7 e N11 tem Coletavel `escalar_paredes` (viola a regra). N6 auditado (11 desvios, 5 seccoes propostas); NADA de N6-N10 alterado; aguarda aprovacao da tabela. Sem push.
+
+---
+
 # >>> REGIAO I = VERTICAL SLICE + cartao de fim de regiao (26 set 2026) <<<
 Ver `docs/regiao_1_vertical_slice.md` (decisoes, regras/padroes, divida, nota SPECIAL BOSS DPS -- so' registada) e `docs/plano_migracao_regiao_2.md` (PLANO, nada construido; aguarda GM). Novo: `scripts/cartao_regiao.gd` + `REGIAO_CONCLUIDA` em `nivel_com_chefe.gd` (bau -> cartao -> porta); teste `teste_cartao_regiao1`. Salto duplo mantido como premio do N5. Sem push. Nao comecar N6-N10.
 
