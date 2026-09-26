@@ -33,6 +33,9 @@ func _ready() -> void:
 	add_child(metricas)
 	koliani = KOLIANI_CENA.instantiate()
 	koliani.position = Vector2(400, CHAO_Y - 70.0)
+	# mesma Koliani dos niveis de producao (golden set + prototipo premium)
+	koliani.usar_prototipo_premium = true
+	koliani.usar_golden_set = true
 	add_child(koliani)
 	lab = koliani.ativar_combat_lab()
 	hud = LabHud.new()
