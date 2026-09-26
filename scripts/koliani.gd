@@ -224,6 +224,15 @@ const I_FRAMES := 0.6
 ## ~56 px, e continua a ser ~43 % da altura do salto (era 43 %). Ver
 ## docs/f1_passagem1.md.
 const STOMP_RESSALTO := Movimento.FORCA_SALTO * 0.7
+## Pogo INTENCIONAL (BAIXO + ATAQUE no ar). ANTES: ressalto automatico de 0,7 x salto (~60 px).
+## DEPOIS: 0,88 x salto (~97 px), so' com acerto valido; um salto normal faz ~122 px.
+const POGO_RESSALTO := Movimento.FORCA_SALTO * 0.88
+const POGO_STARTUP := 0.07        # s: preparacao legivel (4 frames a 60 Hz), ainda sem hitbox
+const POGO_ATIVO := 0.20          # s: janela activa; mergulha a >= POGO_MERGULHO
+const POGO_RECUP_FALHA := 0.30    # s: sem acerto fica preso (nao ha spam sem consequencia)
+const POGO_RECUP_ACERTO := 0.08   # s: com acerto quase nenhuma (permite encadear)
+const POGO_MERGULHO := 420.0
+const POGO_TRAVAO := 260.0        # px/s: velocidade vertical maxima durante a preparacao
 ## Defesa (habilidade "escudo"): anda-se devagar de escudo erguido; um
 ## ataque que venha de frente é bloqueado (sem dano) com um som subtil.
 const VEL_DEFESA := 70.0
@@ -333,6 +342,10 @@ var _piloto_5g_em_movimento := false
 var _piloto_5g_no_ar := false
 var _piloto_5g_facing := 1.0
 var _stomp_cd := 0.0
+var _pogo_estado := 0   # 0 livre, 1 startup, 2 activo, 3 recuperacao
+var _pogo_t := 0.0
+var _pogo_cd := 0.0
+var _pogo_lamina: Polygon2D = null
 var _estava_no_chao := true
 var _defendendo := false
 ## true a partir da 1.ª chamada a `_morrer()` -- evita mortes a dobrar
@@ -1542,7 +1555,9 @@ func _physics_process(dt: float) -> void:
 	# ataque leve -- bloqueado enquanto rola ou defende. Combo: um novo
 	# golpe a meio do atual fica bufferizado (`_combo_pedido`) e dispara
 	# assim que este acabar, em vez de se perder.
-	if not _defendendo and _rolar_restante <= 0.0 and Input.is_action_just_pressed("atacar"):
+	if _pogo_estado == 0 and _pogo_pode_iniciar() and Input.is_action_just_pressed("atacar"):
+		_iniciar_pogo()
+	elif not _defendendo and _rolar_restante <= 0.0 and _pogo_estado == 0 and Input.is_action_just_pressed("atacar"):
 		# Dash -> ataque é um cancel explícito; não deixa o estado de dash
 		# continuar por baixo do golpe nem duplica a hitbox.
 		if _dash_restante > 0.0:
@@ -1686,72 +1701,9 @@ func _physics_process(dt: float) -> void:
 
 	_aplicar_ventos_externos(dt)
 
-	# cair em cima de um inimigo = golpe de espada + pulo automático (estilo
-	# Mario). Janela GENEROSA: basta vir a descer e apanhar o bicho grosso
-	# modo por cima -- serve para inimigos de vários tamanhos. Encadeia:
-	# cada pisão devolve os saltos de ar todos.
-	_stomp_cd = maxf(0.0, _stomp_cd - dt)
-	if EstadoJogo.tem_habilidade("pogo") and _stomp_cd <= 0.0 \
-			and _vy() > 40.0 and not is_on_floor() and _dash_restante <= 0.0:
-		var pes := global_position.y + 24.0
-		for e in get_tree().get_nodes_in_group("inimigos"):
-			if not is_instance_valid(e) or not (e as Node).has_method("receber_dano"):
-				continue
-			if "vida" in e and e.vida <= 0:
-				continue
-			# CHEFES NÃO SE PISAM (pedido do Paulo, 3 set 2026): nem dano, nem
-			# ressalto. A banda de aceitação deles era generosa (210 px de
-			# altura) e saltar-lhes para cima era a maneira mais barata de os
-			# despachar -- ainda por cima atirava a Koliani ecrã acima, para
-			# fora do cenário desenhado. A luta de chefe faz-se com espada e
-			# tiro; encostar-se a um custa dano de contacto, como a qualquer
-			# outro bicho.
-			if (e as Node).is_in_group("chefes"):
-				continue
-			var ep: Vector2 = (e as Node2D).global_position
-			if absf(ep.x - global_position.x) > 46.0:
-				continue
-			# a Koliani vem a descer por cima e os pés dela na banda do topo
-			if global_position.y > ep.y + 6.0 or pes < ep.y - 52.0 or pes > ep.y + 30.0:
-				continue
-			var crit_stomp: bool = e.has_method("esta_vulneravel") and e.esta_vulneravel()
-			e.receber_dano(_dano_golpe(), 0.0, crit_stomp)
-			# pulo automático ALTO, imune ao corte de salto (ver aplicar_impulso)
-			aplicar_impulso(Vector2(0.0, -STOMP_RESSALTO), true)
-			_invulneravel = maxf(_invulneravel, 0.3)
-			_stomp_cd = 0.22
-			_pop = 1.0
-			_squash = maxf(_squash, 0.5)
-			_abanar(TREMOR_CRIT if crit_stomp else TREMOR_PISAO)
-			_hitstop(HITSTOP_CRIT if crit_stomp else HITSTOP_PISAO)
-			# pisão na carne: pancada surda, sem o silvo da espada
-			Som.toca("pisao_koliani", -10.0, 0.88, 0.03)
-			_pop_impacto(ep)
-			break
-
-	# pogo: cair em cima de uma serra / espinhos (grupo "pogavel", layer 6)
-	# -> ressalta em vez de levar o golpe (os i-frames apanham o toque desse
-	# frame). Só a descer a sério e pela parte de cima.
-	if EstadoJogo.tem_habilidade("pogo") and _stomp_cd <= 0.0 \
-			and _vy() > 90.0 and not is_on_floor() and _dash_restante <= 0.0:
-		var esp := get_world_2d().direct_space_state
-		var rq := PhysicsRayQueryParameters2D.create(
-			global_position + Vector2(0.0, 16.0), global_position + Vector2(0.0, 46.0), 1 << 5)
-		rq.collide_with_areas = true
-		rq.collide_with_bodies = false
-		rq.hit_from_inside = true
-		rq.exclude = [self]
-		var ph := esp.intersect_ray(rq)
-		if not ph.is_empty() and (ph["collider"] as Node).is_in_group("pogavel"):
-			aplicar_impulso(Vector2(0.0, -STOMP_RESSALTO), true)
-			_invulneravel = maxf(_invulneravel, 0.35)
-			_stomp_cd = 0.22
-			_pop = 1.0
-			_squash = maxf(_squash, 0.5)
-			_abanar(TREMOR_PISAO)
-			_hitstop(HITSTOP_PISAO)
-			Som.toca("pisao_koliani", -10.0, 1.0, 0.04)
-			_pop_impacto(global_position + Vector2(0.0, 24.0))
+	# Pogo (habilidade "pogo"): ataque descendente INTENCIONAL (BAIXO + ATAQUE no ar).
+	# Sem toque automatico: so' ressalta quem acerta num alvo valido.
+	_tratar_pogo(dt)
 
 	# passo em frente do golpe: empurra SEMPRE para a frente e nunca trava
 	# quem já vai mais depressa (correr a atacar continua a correr).
@@ -1875,6 +1827,8 @@ func _atualizar_anim() -> void:
 		a = "borda"
 	elif _escalando or _borda:
 		a = "wallslide"
+	elif _pogo_estado == 1 or _pogo_estado == 2:
+		a = "attack"  # PLACEHOLDER: falta a pose propria do ataque descendente
 	elif _ataque_restante > 0.0:
 		a = _anim_ataque()
 	elif _defendendo and sf.has_animation("defesa"):
@@ -2207,6 +2161,123 @@ func _hitstop(segundos: float) -> void:
 	# O timer vive na árvore e o Callable não segura `self`.
 	get_tree().create_timer(segundos, true, false, true).timeout.connect(
 		func() -> void: Engine.time_scale = 1.0)
+
+
+func _pogo_pode_iniciar() -> bool:
+	return EstadoJogo.tem_habilidade("pogo") and _pogo_cd <= 0.0 and not is_on_floor() 		and Input.is_action_pressed("mirar_baixo") and not _defendendo and _rolar_restante <= 0.0 		and _dash_restante <= 0.0 and not _voando and not _escalando and not _borda
+
+
+func _iniciar_pogo() -> void:
+	_cancelar_ataque()
+	_pogo_estado = 1
+	_pogo_t = POGO_STARTUP
+	Som.toca(SOM_COMBO[0], VOL_COMBO[0], 0.75, 0.02)
+	_pogo_visual(true)
+
+
+func _fim_pogo(cd := 0.0) -> void:
+	_pogo_estado = 0
+	_pogo_t = 0.0
+	_pogo_cd = cd
+	_pogo_visual(false)
+
+
+## Lamina descendente: PLACEHOLDER (triangulo), nao e' arte final.
+func _pogo_visual(ligado: bool) -> void:
+	if _pogo_lamina == null:
+		if not ligado:
+			return
+		_pogo_lamina = Polygon2D.new()
+		_pogo_lamina.name = "PogoLamina"
+		_pogo_lamina.polygon = PackedVector2Array([Vector2(-11, 22), Vector2(11, 22), Vector2(0, 60)])
+		_pogo_lamina.color = Color(0.78, 0.52, 1.0, 0.85)
+		_pogo_lamina.z_index = 20
+		add_child(_pogo_lamina)
+	_pogo_lamina.visible = ligado
+	if ligado:
+		_pogo_lamina.modulate.a = 0.45 if _pogo_estado == 1 else 1.0
+
+
+func _tratar_pogo(dt: float) -> void:
+	_pogo_cd = maxf(0.0, _pogo_cd - dt)
+	if _pogo_estado == 0:
+		return
+	if is_on_floor() or _voando or _escalando or _borda:
+		_fim_pogo(0.12 if _pogo_estado != 3 else 0.0)
+		return
+	_pogo_t -= dt
+	if _pogo_estado == 1:
+		# preparacao: trava a queda (legivel e justo mesmo a velocidade terminal)
+		velocity.y = minf(velocity.y, POGO_TRAVAO)
+		if _pogo_t <= 0.0:
+			_pogo_estado = 2
+			_pogo_t = POGO_ATIVO
+			velocity.y = POGO_MERGULHO
+			_pogo_visual(true)
+	elif _pogo_estado == 2:
+		# janela activa: a lamina protege (o alvo e' atingido antes de o contacto ferir)
+		_invulneravel = maxf(_invulneravel, 0.05)
+		if _pogo_acertar():
+			return
+		if _pogo_t <= 0.0:
+			_pogo_estado = 3
+			_pogo_t = POGO_RECUP_FALHA
+			_pogo_visual(false)
+	elif _pogo_t <= 0.0:
+		_fim_pogo()
+
+
+## Procura um alvo valido debaixo dos pes: inimigo nao-chefe (dano + ressalto) ou algo `pogavel`
+## (espinhos/serra: so' ressalto). Os chefes continuam a nao ser pisaveis (decisao de 3 set 2026).
+func _pogo_acertar() -> bool:
+	var pes := global_position.y + 24.0
+	var alvo: Node2D = null
+	for e in get_tree().get_nodes_in_group("inimigos"):
+		if not is_instance_valid(e) or not (e as Node).has_method("receber_dano"):
+			continue
+		if ("vida" in e and e.vida <= 0) or (e as Node).is_in_group("chefes"):
+			continue
+		var ep: Vector2 = (e as Node2D).global_position
+		if absf(ep.x - global_position.x) > 46.0 or global_position.y > ep.y + 6.0 				or pes < ep.y - 90.0 or pes > ep.y + 30.0:
+			continue
+		alvo = e
+		break
+	var pogavel := false
+	if alvo == null:
+		var q := PhysicsShapeQueryParameters2D.new()
+		var rs := RectangleShape2D.new()
+		rs.size = Vector2(40.0, 34.0)
+		q.shape = rs
+		q.transform = Transform2D(0.0, global_position + Vector2(0.0, 30.0))
+		q.collision_mask = 1 << 5
+		q.collide_with_areas = true
+		q.collide_with_bodies = false
+		for h in get_world_2d().direct_space_state.intersect_shape(q, 8):
+			if (h["collider"] as Node).is_in_group("pogavel"):
+				pogavel = true
+				break
+	if alvo == null and not pogavel:
+		return false
+	var pos := global_position + Vector2(0.0, 24.0)
+	if alvo != null:
+		pos = alvo.global_position
+		var crit: bool = alvo.has_method("esta_vulneravel") and alvo.esta_vulneravel()
+		alvo.receber_dano(_dano_golpe(), 0.0, crit)
+		_abanar(TREMOR_CRIT if crit else TREMOR_PISAO)
+		_hitstop(HITSTOP_CRIT if crit else HITSTOP_PISAO)
+	else:
+		_abanar(TREMOR_PISAO)
+		_hitstop(HITSTOP_PISAO)
+	aplicar_impulso(Vector2(0.0, -POGO_RESSALTO), true)
+	_invulneravel = maxf(_invulneravel, 0.3)
+	_pop = 1.0
+	_squash = maxf(_squash, 0.5)
+	Som.toca("pisao_koliani", -10.0, 0.95, 0.03)
+	_pop_impacto(pos)
+	_pogo_estado = 3
+	_pogo_t = POGO_RECUP_ACERTO
+	_pogo_visual(false)
+	return true
 
 
 func _iniciar_ataque() -> void:
@@ -2796,6 +2867,8 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0) -> void:
 	_invulneravel = I_FRAMES
 	_hurt_t = 0.24
 	Musica.intensificar()   # 9H.1: levar dano também é combate
+	if _pogo_estado != 0:
+		_fim_pogo(0.2)
 	_cancelar_ataque(true)  # dano corta ataque/combo e desliga a hitbox imediatamente
 	vida_mudou.emit(vida, _vida_max())
 	_flash_branco()

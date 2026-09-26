@@ -123,12 +123,12 @@ habilidade_id = "pogo"
 [node name="TufoTeste1" parent="." instance=ExtResource("13_esp")]
 position = Vector2(1960, 665)
 largura = 4
-dano = 6
+dano = 3
 
 [node name="TufoTeste2" parent="." instance=ExtResource("13_esp")]
 position = Vector2(2190, 665)
 largura = 4
-dano = 6
+dano = 3
 
 [node name="TufoSeq1" parent="." instance=ExtResource("13_esp")]
 position = Vector2(2470, 665)

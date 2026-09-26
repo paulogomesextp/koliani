@@ -1,3 +1,8 @@
+# >>> Pogo passou a INTENCIONAL (BAIXO+ATAQUE) — 26 set 2026 <<<
+Ver `docs/nivel_autoral_n3.md` (seccao Pogo revisto: frame data, 60->90 px). N3 continua NAO LOCKED. Placeholder de arte. Sem push.
+
+---
+
 # >>> N3 autoral feito, a aguardar playtest do GM (26 set 2026) <<<
 Ver `docs/nivel_autoral_n3.md` (mapa, medidas do pogo, pendentes). Cena `Ninho_da_Viuva_Negra.tscn` reescrita (jornada fora);
 pogo = ressalto AUTOMATICO ao cair em espinhos/inimigos (nao ha input descendente; fisica intacta). Teste `teste_n3_autoral`

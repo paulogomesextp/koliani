@@ -552,7 +552,7 @@
   "mec.dash.nome": "Dash",
   "mec.dash.txt": "Carrega em Dash para uma rajada curta de velocidade. Não podes ser ferida enquanto dura. Sob um teto baixo, o dash atravessa vãos que um salto não vence.",
   "mec.pogo.nome": "Pogo",
-  "mec.pogo.txt": "Cai em cima de espinhos ou inimigos e ressaltas para cima. Continua a mover-te para os lados para encadear ressaltos por cima de camas de espinhos que um salto não vence.",
+  "mec.pogo.txt": "No ar, mantém Baixo e carrega em Atacar para mergulhar. Acerta o mergulho em espinhos ou num inimigo para ressaltar. Um mergulho que não acerta em nada não dá ressalto.",
   "mec.gruta.nome": "Gruta Apertada",
   "mec.gruta.txt": "O tecto baixa: desce ao túnel e volta a subir. Caem estalactites — não pares.",
   "mec.guilhotinas.nome": "Guilhotinas",

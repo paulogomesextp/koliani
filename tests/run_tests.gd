@@ -95,6 +95,7 @@ func _correr_tudo() -> void:
 	await teste_ghorak_n1()
 	await teste_n2_autoral()
 	await teste_n3_autoral()
+	await teste_pogo_intencional()
 	teste_execution_9d_inimigos_regiao1()
 	teste_9d9e_crias_sem_goblin()
 	teste_9e2_coracao_producao_e_fases()
@@ -5248,7 +5249,7 @@ func teste_n2_autoral() -> void:
 
 ## N3 -- tentativa de atravessar a CamaPogo1 (espinhos de 2934 a 3206, ao nivel do chao). Devolve
 ## {"chegou": bool, "dano": int}. Parte de x=2840 a correr; salta a `off` px antes da cama.
-func _n3_cama_trial(n: Node, k: CharacterBody2D, off: float) -> Dictionary:
+func _n3_cama_trial(n: Node, k: CharacterBody2D, off: float, pogo := false) -> Dictionary:
 	k.global_position = Vector2(2840.0, 630.0)
 	k.velocity = Vector2.ZERO
 	k.vida = k._vida_max()
@@ -5270,6 +5271,11 @@ func _n3_cama_trial(n: Node, k: CharacterBody2D, off: float) -> Dictionary:
 		elif feito and not solto and (k.velocity.y > 0.0 or i > 400):
 			solto = true
 			Input.action_release("saltar")
+		if pogo and feito and not k.is_on_floor() and k.velocity.y > 0.0 and k.global_position.y >= 575.0 				and k.global_position.x > 2900.0 and k.global_position.x < 3230.0 and not Input.is_action_pressed("atacar"):
+			Input.action_press("mirar_baixo")
+			Input.action_press("atacar")
+		else:
+			Input.action_release("atacar")
 		await get_tree().physics_frame
 		if feito and k.is_on_floor() and k.global_position.x > 3215.0:
 			chegou = true
@@ -5278,6 +5284,8 @@ func _n3_cama_trial(n: Node, k: CharacterBody2D, off: float) -> Dictionary:
 			break
 	Input.action_release("mover_direita")
 	Input.action_release("saltar")
+	Input.action_release("atacar")
+	Input.action_release("mirar_baixo")
 	return {"chegou": chegou, "dano": vida0 - k.vida}
 
 
@@ -5398,12 +5406,118 @@ func teste_n3_autoral() -> void:
 	EstadoJogo.habilidades.assign(["dash", "pogo"])
 	var limpo_com := 0
 	for off in [0.0, 12.0, 30.0, 60.0, 90.0, 120.0, 150.0]:
-		var r2: Dictionary = await _n3_cama_trial(n, k, off)
+		var r2: Dictionary = await _n3_cama_trial(n, k, off, true)
 		print("N3 cama com pogo off=%s: %s" % [off, str(r2)])
 		if r2["chegou"] and int(r2["dano"]) == 0:
 			limpo_com += 1
 	# janela de takeoff: pelo menos 2 dos 7 offsets (12 px de passo) atravessam limpos
 	_ok(limpo_com >= 2, "N3: com o pogo a cama larga so' passa limpa em %d/7 takeoffs" % limpo_com)
+	n.queue_free()
+	await get_tree().process_frame
+	EstadoJogo.modo_dev = antes_dev
+	EstadoJogo.indice_nivel = antes_idx
+	EstadoJogo.habilidades.assign(antes_hab)
+
+
+## Pogo intencional: larga a Koliani de `y0` sobre `x`, opcionalmente carrega BAIXO+ATAQUE quando os pes ficam a
+## `gatilho` px do topo `topo_y`. Devolve dano, se ressaltou (vy < -150), subida do ressalto em px e frames de aceleracao.
+func _pogo_trial(k: CharacterBody2D, x: float, y0: float, carregar: bool, gatilho := 60.0, topo_y := 665.0, seguir: Node2D = null) -> Dictionary:
+	k.global_position = Vector2(x, y0)
+	k.velocity = Vector2.ZERO
+	k.vida = k._vida_max()
+	k._invulneravel = 0.0
+	k.reset_physics_interpolation()
+	for i in 20:
+		await get_tree().physics_frame
+	k.global_position = Vector2(x, y0)
+	k.velocity = Vector2.ZERO
+	k.vida = k._vida_max()
+	k._invulneravel = 0.0
+	var vida0: int = k.vida
+	var hp_alvo := -1
+	if seguir != null and "vida" in seguir:
+		hp_alvo = int(seguir.vida)
+	var ressaltou := false
+	var y_contacto := 0.0
+	var y_topo := 1e9
+	var premiu := false
+	for i in 150:
+		if seguir != null:
+			k.global_position.x = seguir.global_position.x
+		if carregar and not premiu and k.velocity.y > 0.0 and k.global_position.y + 24.0 >= topo_y - gatilho:
+			premiu = true
+			Input.action_press("mirar_baixo")
+			Input.action_press("atacar")
+		elif premiu:
+			Input.action_release("atacar")
+		await get_tree().physics_frame
+		if premiu and i % 2 == 0 and OS.get_environment("POGO_DBG") != "":
+			print("  dbg st=%s y=%s vy=%s" % [k._pogo_estado, k.global_position.y, k.velocity.y])
+		if not ressaltou and k.velocity.y < -150.0:
+			ressaltou = true
+			y_contacto = k.global_position.y
+		if ressaltou:
+			y_topo = minf(y_topo, k.global_position.y)
+			if k.velocity.y > 0.0:
+				break
+		if k.is_on_floor() and i > 30:
+			break
+	Input.action_release("atacar")
+	Input.action_release("mirar_baixo")
+	var dvida := 0
+	if hp_alvo >= 0:
+		dvida = hp_alvo - int(seguir.vida)
+	return {"dano": vida0 - k.vida, "ressaltou": ressaltou, "subida": (y_contacto - y_topo) if ressaltou else 0.0, "dano_alvo": dvida}
+
+
+func teste_pogo_intencional() -> void:
+	var antes_dev: bool = EstadoJogo.modo_dev
+	EstadoJogo.modo_dev = false
+	var antes_idx: int = EstadoJogo.indice_nivel
+	var antes_hab: Array = EstadoJogo.habilidades.duplicate()
+	EstadoJogo.indice_nivel = 2
+	EstadoJogo.habilidades.assign(["dash", "pogo"])
+	var n := (load("res://scenes/levels/Ninho_da_Viuva_Negra.tscn") as PackedScene).instantiate()
+	add_child(n)
+	for i in 6:
+		await get_tree().process_frame
+	var altar_n := n.get_node_or_null("AltarPogo")
+	if altar_n:
+		altar_n.queue_free()
+	var k := n.get_node("Koliani") as CharacterBody2D
+	# 1) toque sem input: NAO ressalta (e leva o golpe)
+	var a: Dictionary = await _pogo_trial(k, 1960.0, 480.0, false)
+	print("POGO sem input nos espinhos: ", a)
+	_ok(not a["ressaltou"] and int(a["dano"]) > 0, "Pogo: cair nos espinhos sem input devia dar dano e nao ressaltar")
+	# 2) input no sitio certo: ressalta, sem dano; subida medida
+	var b: Dictionary = await _pogo_trial(k, 1960.0, 480.0, true)
+	print("POGO com input nos espinhos: ", b)
+	_ok(b["ressaltou"] and int(b["dano"]) == 0, "Pogo: BAIXO+ATAQUE sobre espinhos devia ressaltar sem dano")
+	_ok(float(b["subida"]) >= 85.0 and float(b["subida"]) <= 115.0, "Pogo: subida do ressalto fora de 85-115 px: %s" % str(b["subida"]))
+	# 3) input sobre chao vazio: ataque executado mas SEM ressalto gratuito
+	var c: Dictionary = await _pogo_trial(k, 1700.0, 480.0, true)
+	print("POGO no vazio: ", c)
+	_ok(not c["ressaltou"], "Pogo: o ataque descendente sem alvo ressaltou (ressalto gratuito)")
+	# 4) inimigo: dano + ressalto; sem input, so' contacto
+	var g := n.get_node("GoblinA") as Node2D
+	g.set("alcance_patrulha", 0.0)
+	var gy: float = g.global_position.y
+	print("POGO goblin pos=", g.global_position, " grupos inimigos=", g.is_in_group("inimigos"), " vida=", g.get("vida"), " chefe=", g.is_in_group("chefes"))
+	var d: Dictionary = await _pogo_trial(k, g.global_position.x, gy - 170.0, true, 110.0, gy - 30.0, g)
+	print("POGO no goblin: ", d)
+	_ok(d["ressaltou"] and int(d["dano_alvo"]) > 0, "Pogo: o ataque descendente devia ferir o goblin e ressaltar")
+	# 5) spam: 2 falhas seguidas -> a 2.a nao arranca durante a recuperacao
+	k.global_position = Vector2(1700.0, 480.0)
+	k.velocity = Vector2.ZERO
+	await get_tree().physics_frame
+	Input.action_press("mirar_baixo")
+	Input.action_press("atacar")
+	for i in 3:
+		await get_tree().physics_frame
+	Input.action_release("atacar")
+	var estado_1: int = k._pogo_estado
+	_ok(estado_1 != 0, "Pogo: o input nao iniciou o ataque descendente no ar")
+	Input.action_release("mirar_baixo")
 	n.queue_free()
 	await get_tree().process_frame
 	EstadoJogo.modo_dev = antes_dev

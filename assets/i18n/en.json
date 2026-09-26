@@ -552,7 +552,7 @@
   "mec.dash.nome": "Dash",
   "mec.dash.txt": "Press Dash for a short burst of speed. You cannot be hurt while it lasts. Under a low ceiling, a dash crosses gaps a jump cannot.",
   "mec.pogo.nome": "Pogo",
-  "mec.pogo.txt": "Fall onto spikes or enemies from above and you bounce back up. Keep drifting sideways to chain bounces across beds of spikes a jump cannot clear.",
+  "mec.pogo.txt": "In the air, hold Down and press Attack to dive. Land the dive on spikes or an enemy to bounce back up. A dive that hits nothing gives no bounce.",
   "mec.gruta.nome": "Low Cave",
   "mec.gruta.txt": "The ceiling drops: go down into the tunnel and back up. Stalactites fall — keep moving.",
   "mec.guilhotinas.nome": "Guillotines",

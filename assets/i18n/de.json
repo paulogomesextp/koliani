@@ -552,7 +552,7 @@
   "mec.dash.nome": "Dash",
   "mec.dash.txt": "Drücke Dash für einen kurzen Geschwindigkeitsschub. Währenddessen bist du unverwundbar. Unter niedriger Decke überquert der Dash Lücken, die ein Sprung nicht schafft.",
   "mec.pogo.nome": "Pogo",
-  "mec.pogo.txt": "Falle von oben auf Stacheln oder Gegner und du prallst nach oben ab. Bewege dich seitwärts weiter, um Abpraller über Stachelbetten zu verketten, die ein Sprung nicht schafft.",
+  "mec.pogo.txt": "Halte in der Luft Runter gedrückt und drücke Angriff, um abzutauchen. Triffst du Stacheln oder einen Gegner, prallst du ab. Ein Sturzangriff ins Leere gibt keinen Abpraller.",
   "mec.gruta.nome": "Enge Höhle",
   "mec.gruta.txt": "Die Decke sinkt: geh in den Tunnel hinab und wieder hoch. Stalaktiten fallen — bleib in Bewegung.",
   "mec.guilhotinas.nome": "Fallbeile",
