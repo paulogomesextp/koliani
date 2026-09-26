@@ -36,7 +36,7 @@ const VIDAS_POR_NIVEL := 1
 const VIDAS_MAX := 99
 
 ## Todas as habilidades da campanha (o modo dev desbloqueia-as de uma vez).
-const HABILIDADES_TODAS := ["dash", "salto_duplo", "dash_aereo", "pogo", "partir_paredes", "escudo", "projetil", "escalar_paredes", "planar"]
+const HABILIDADES_TODAS := ["dash", "salto_duplo", "dash_aereo", "pogo", "partir_paredes", "escudo", "projetil", "escalar_paredes", "planar", "especial"]
 ## No nível 1 a Koliani dispõe apenas de correr, saltar e ataque base. Os
 ## desbloqueios permanentes entram pela progressão da campanha; saves antigos
 ## mantêm as habilidades que já possuíam, sem revogação destrutiva.

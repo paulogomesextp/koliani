@@ -96,6 +96,7 @@ func _correr_tudo() -> void:
 	await teste_n2_autoral()
 	await teste_n3_autoral()
 	await teste_pogo_intencional()
+	await teste_n4_autoral()
 	teste_execution_9d_inimigos_regiao1()
 	teste_9d9e_crias_sem_goblin()
 	teste_9e2_coracao_producao_e_fases()
@@ -5518,6 +5519,149 @@ func teste_pogo_intencional() -> void:
 	var estado_1: int = k._pogo_estado
 	_ok(estado_1 != 0, "Pogo: o input nao iniciou o ataque descendente no ar")
 	Input.action_release("mirar_baixo")
+	n.queue_free()
+	await get_tree().process_frame
+	EstadoJogo.modo_dev = antes_dev
+	EstadoJogo.indice_nivel = antes_idx
+	EstadoJogo.habilidades.assign(antes_hab)
+
+
+## Geometria das cenas autorais com gates de Dash (mesma regra do N2/N3): vaos comuns dentro do salto simples,
+## vaos > 125 px so' sob teto baixo. Devolve o n.o de gates de Dash.
+func _gates_dash_autoral(n: Node, rotulo: String) -> int:
+	var pl: Array = []
+	var tetos: Array = []
+	for no in n.get_children():
+		if not (no is StaticBody2D) or no.get_script() == null:
+			continue
+		if not String((no.get_script() as Script).resource_path).ends_with("/plataforma.gd"):
+			continue
+		var t: Vector2 = no.get("tamanho")
+		var d := {"nome": String(no.name), "l": no.position.x - t.x * 0.5, "r": no.position.x + t.x * 0.5,
+			"top": no.position.y - t.y * 0.5, "base": no.position.y + t.y * 0.5}
+		if d["nome"].begins_with("Teto"):
+			tetos.append(d)
+		else:
+			pl.append(d)
+	pl.sort_custom(func(a, b): return a["l"] < b["l"])
+	var gates := 0
+	for i in range(1, pl.size()):
+		var b: Dictionary = pl[i]
+		var chega := false
+		var e_gate := false
+		for j in i:
+			var a: Dictionary = pl[j]
+			var vao: float = b["l"] - a["r"]
+			var sub: float = a["top"] - b["top"]
+			if vao <= 0.0:
+				if sub <= 66.0:
+					chega = true
+				continue
+			var limite := 125.0 if sub <= 0.0 else 110.0
+			if vao <= limite and sub <= 64.0:
+				chega = true
+			elif vao > limite and vao <= 145.0 and absf(sub) <= 4.0:
+				for tt in tetos:
+					var folga: float = float(a["top"]) - float(tt["base"])
+					if tt["l"] <= a["r"] and tt["r"] >= b["l"] and folga <= 70.0 and folga >= 50.0:
+						chega = true
+						e_gate = true
+		_ok(chega, "%s: %s inalcancavel pelo salto simples nem por gate de dash" % [rotulo, b["nome"]])
+		if e_gate:
+			gates += 1
+	return gates
+
+
+func teste_n4_autoral() -> void:
+	var antes_dev: bool = EstadoJogo.modo_dev
+	EstadoJogo.modo_dev = false
+	var antes_idx: int = EstadoJogo.indice_nivel
+	var antes_hab: Array = EstadoJogo.habilidades.duplicate()
+	EstadoJogo.indice_nivel = 3
+	EstadoJogo.habilidades.assign(["dash", "pogo"])
+	var n := (load("res://scenes/levels/A_Arvore_que_Chora.tscn") as PackedScene).instantiate()
+	add_child(n)
+	for i in 6:
+		await get_tree().process_frame
+	_ok(not bool(n.get("corredor")) and bool(n.get("checkpoints_autorais")), "N4: nao e' autoral")
+	_ok(n.get_node_or_null("CorredorAproximacao") == null, "N4: o gerador criou uma jornada")
+	_ok(n.get_node_or_null("Guardiao") != null and n.get_node_or_null("Porta") != null, "N4: sem Guardiao/Porta")
+	_ok(String(n.get("mecanica_anunciada")) == "especial", "N4: a mecanica anunciada devia ser o especial")
+	var chk := 0
+	for c in get_tree().get_nodes_in_group("checkpoints"):
+		if n.is_ancestor_of(c):
+			chk += 1
+	_ok(chk == 5, "N4: esperava 5 checkpoints autorais, ha %d" % chk)
+	# so' o Especial e' novo; nada de wall-jump nem mecanicas futuras
+	var proibidos := ["serra.gd", "fogo.gd", "guilhotina.gd", "pendulo_lamina.gd", "wind_zone.gd", "portal.gd",
+		"trampolim.gd", "tumulo_elevador.gd", "plataforma_ritmada.gd", "torreta.gd", "teia_prende.gd",
+		"raiz_elevatoria.gd", "alavanca.gd", "porta_trancada.gd", "gota_acida.gd"]
+	var habs: Array = []
+	var inimigos := 0
+	for no in n.find_children("*", "", true, false):
+		var sc := no.get_script() as Script
+		if sc == null:
+			continue
+		for pr in proibidos:
+			_ok(not sc.resource_path.ends_with(pr), "N4: %s nao pertence ao N4" % no.name)
+		if sc.resource_path.ends_with("coletavel.gd"):
+			habs.append(String(no.get("habilidade_id")))
+		if no is DemonioBase and not no.is_in_group("chefes"):
+			inimigos += 1
+			_ok(String(no.get("especie")) in ["goblin", "gosma"], "N4: %s: especie fora da Regiao I aprovada" % no.name)
+			_ok(int(no.get("vida")) <= 200, "N4: %s: vida > 200 (dificuldade nao vem de HP)" % no.name)
+	_ok(habs == ["especial"], "N4: os coletaveis de habilidade deviam ser so' [especial], ha %s" % str(habs))
+	_ok(inimigos >= 6 and inimigos <= 9, "N4: %d inimigos (esperava 6-9, poucos encontros)" % inimigos)
+	_ok(_gates_dash_autoral(n, "N4") == 4, "N4: esperava 4 gates de dash")
+	# --- Especial / Energia ---
+	var k := n.get_node("Koliani") as CharacterBody2D
+	k.set("_energia", 99.0)
+	_ok(not k.usar_especial(), "N4: o Especial disparou sem a habilidade")
+	_ok(is_equal_approx(k.energia_actual(), 99.0), "N4: sem a habilidade a Energia mudou")
+	EstadoJogo.habilidades.assign(["dash", "pogo", "especial"])
+	var gastos: Array = []
+	for i in 3:
+		k.set("_especial_cd", 0.0)
+		var e0: float = k.energia_actual()
+		_ok(k.usar_especial(), "N4: o Especial %d nao disparou com Energia" % (i + 1))
+		gastos.append(snappedf(e0 - k.energia_actual(), 0.1))
+	print("N4 especial: gastos por uso ", gastos, " energia final ", k.energia_actual())
+	_ok(gastos == [33.0, 33.0, 33.0] and k.energia_actual() >= 0.0, "N4: o Especial devia gastar 33 por uso e nunca deixar a Energia negativa")
+	k.set("_especial_cd", 0.0)
+	_ok(not k.usar_especial() and k.energia_actual() >= 0.0, "N4: com a barra vazia o Especial nao devia disparar")
+	# recuperacao: passiva (sem ficar preso) + a acertar golpes
+	var t_regen := 0
+	while k.energia_actual() < 33.0 and t_regen < 900:
+		await get_tree().physics_frame
+		t_regen += 1
+	print("N4 especial: 1.o uso outra vez apos ", t_regen, " frames (", snappedf(t_regen / 60.0, 0.1), " s)")
+	_ok(k.energia_actual() >= 33.0, "N4: a Energia nao recupera sozinha (softlock por Energia vazia)")
+	k.set("_energia", 10.0)
+	var g := n.get_node("GoblinE1")
+	k.call("_ao_acertar_corpo", g)
+	_ok(is_equal_approx(k.energia_actual(), 15.0), "N4: acertar um golpe devia dar +5 Energia, deu %s" % str(k.energia_actual()))
+	# a onda atravessa: dois goblins alinhados levam ambos
+	var g1 := n.get_node("GoblinE1")
+	var g2 := n.get_node("GoblinE2")
+	g1.set("alcance_patrulha", 0.0)
+	g2.set("alcance_patrulha", 0.0)
+	var v1: int = g1.vida
+	var v2: int = g2.vida
+	k.global_position = Vector2(g1.global_position.x - 120.0, 630.0)
+	k.velocity = Vector2.ZERO
+	k.set("_olha_para", 1.0)
+	k.set("_energia", 99.0)
+	k.set("_especial_cd", 0.0)
+	k.set("_invulneravel", 5.0)
+	_ok(k.usar_especial(), "N4: o Especial nao disparou junto aos goblins")
+	for i in 60:
+		await get_tree().physics_frame
+	var lv1: bool = is_instance_valid(g1) and g1.vida < v1
+	var lv2: bool = is_instance_valid(g2) and g2.vida < v2
+	var mortos1: bool = not is_instance_valid(g1) or g1.vida <= 0
+	var mortos2: bool = not is_instance_valid(g2) or g2.vida <= 0
+	print("N4 especial: dano do Especial = ", roundi(k._dano_golpe() * k.ESPECIAL_DANO_MULT), " | goblin1 ", lv1 or mortos1, " goblin2 ", lv2 or mortos2)
+	_ok((lv1 or mortos1) and (lv2 or mortos2), "N4: a onda do Especial devia atravessar e ferir os dois goblins")
 	n.queue_free()
 	await get_tree().process_frame
 	EstadoJogo.modo_dev = antes_dev

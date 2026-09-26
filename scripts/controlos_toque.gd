@@ -11,6 +11,7 @@ const NOME_HABILIDADE := {
 	"partir_paredes": "hud.ability.partir_paredes",
 	"escudo": "hud.ability.escudo",
 	"projetil": "hud.ability.projetil",
+	"especial": "hud.ability.especial",
 	"escalar_paredes": "hud.ability.escalar_paredes",
 }
 
@@ -63,7 +64,7 @@ func _ready() -> void:
 		_toque.visible = DisplayServer.is_touchscreen_available()
 	# a barra de Energia só aparece depois de apanhar a habilidade "projetil"
 	if _barra_energia:
-		_barra_energia.get_parent().visible = EstadoJogo.tem_habilidade("projetil")
+		_barra_energia.get_parent().visible = EstadoJogo.tem_habilidade("projetil") or EstadoJogo.tem_habilidade("especial")
 	EstadoJogo.vidas_mudaram.connect(_atualizar_vidas)
 	EstadoJogo.habilidade_desbloqueada.connect(_ao_habilidade)
 	EstadoJogo.pista_encontrada.connect(_ao_pista)
@@ -74,6 +75,9 @@ func _ready() -> void:
 		koliani.vida_mudou.connect(_atualizar_barra_vida)
 	if koliani and koliani.has_signal("energia_mudou"):
 		koliani.energia_mudou.connect(_atualizar_energia)
+	if koliani and koliani.has_signal("energia_insuficiente"):
+		koliani.energia_insuficiente.connect(_piscar_energia)
+	_marcar_custo_especial()
 
 	_vestir_barras()
 	_montar_barra_chefe()
@@ -728,7 +732,7 @@ func _atualizar_vidas(vidas: int) -> void:
 
 
 func _ao_habilidade(id: String) -> void:
-	if id == "projetil" and _barra_energia:
+	if (id == "projetil" or id == "especial") and _barra_energia:
 		_barra_energia.get_parent().visible = true
 	var nome: String = Textos.t(NOME_HABILIDADE.get(id, id))
 	_aviso(Textos.tf("hud.new_ability", [nome]),
@@ -982,3 +986,29 @@ func _arrumar_para_toque() -> void:
 		if n is Control:
 			n.offset_top -= DESVIO_TOQUE
 			n.offset_bottom -= DESVIO_TOQUE
+
+
+## Marcas a 1/3 e 2/3 da barra: cada segmento e' um uso do Especial (custo 33 de 99).
+func _marcar_custo_especial() -> void:
+	if _barra_energia == null:
+		return
+	for f in [1.0 / 3.0, 2.0 / 3.0]:
+		var m := ColorRect.new()
+		m.color = Color(1.0, 0.9, 1.0, 0.75)
+		m.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		m.anchor_left = f
+		m.anchor_right = f
+		m.anchor_top = 0.0
+		m.anchor_bottom = 1.0
+		m.offset_left = -1.0
+		m.offset_right = 1.0
+		_barra_energia.add_child(m)
+
+
+## Sem Energia para o Especial: a barra pisca em vermelho.
+func _piscar_energia() -> void:
+	if _barra_energia == null:
+		return
+	var t := create_tween()
+	_barra_energia.modulate = Color(1.0, 0.35, 0.35)
+	t.tween_property(_barra_energia, "modulate", Color(1, 1, 1), 0.35)

@@ -8,6 +8,8 @@ extends CharacterBody2D
 signal morreu
 signal vida_mudou(atual: int, maximo: int)
 signal energia_mudou(atual: float, maximo: float)
+## Tentou o Especial sem Energia suficiente (o HUD pisca a barra).
+signal energia_insuficiente()
 ## Emitido sempre que lança o projétil mágico -- a Ala dos Mortos (nível 09)
 ## usa-o para materializar as plataformas espectrais.
 signal magia_lancada
@@ -243,6 +245,16 @@ const DUR_LANCAR := 0.16
 const PROJETIL_MAGICO := preload("res://scenes/actors/ProjetilKoliani.tscn")
 const ENERGIA_MAX := 99.0
 const REGEN_ENERGIA := 12.0       # por segundo (barra cheia em ~8 s)
+## ESPECIAL (habilidade "especial", tecla Q): onda espectral que atravessa os inimigos.
+## Custa 1/3 da barra (3 usos de barra cheia). A Energia volta sozinha (REGEN_ENERGIA, depois de
+## uma pausa curta) e sobe a acertar golpes: espada + ENERGIA_POR_GOLPE, pogo + ENERGIA_POR_POGO.
+const ESPECIAL_CUSTO := 33.0
+const ESPECIAL_CD := 0.45
+const ESPECIAL_DANO_MULT := 2.6
+const ESPECIAL_ESCALA := 1.8
+const ESPECIAL_PAUSA_REGEN := 0.6
+const ENERGIA_POR_GOLPE := 5.0
+const ENERGIA_POR_POGO := 8.0
 ## Abaixo deste Y considera-se que caiu no vazio (fosso sem fundo).
 const Y_MORTE := 1200.0
 const TEX_IMPACTO := preload("res://assets/sprites/impacto.svg")
@@ -353,6 +365,8 @@ var _defendendo := false
 ## empilhavam transições e deixavam o ecrã preso a preto.
 var _a_morrer := false
 var _energia := ENERGIA_MAX
+var _especial_cd := 0.0
+var _regen_pausa := 0.0
 ## FLYMODE ligado (só DEVELOPER MODE). Enquanto true: voo livre, atravessa
 ## paredes, sem gravidade nem dano de fosso.
 var _voando := false
@@ -1400,7 +1414,9 @@ func _physics_process(dt: float) -> void:
 			_inverso = 1.0
 
 	# a barra de Energia regenera-se sozinha depois de usada
-	if _energia < ENERGIA_MAX:
+	_especial_cd = maxf(0.0, _especial_cd - dt)
+	_regen_pausa = maxf(0.0, _regen_pausa - dt)
+	if _energia < ENERGIA_MAX and _regen_pausa <= 0.0:
 		_energia = minf(ENERGIA_MAX, _energia + REGEN_ENERGIA * (1.0 + EstadoJogo.bonus("regen_energia")) * dt)  # melhoria "foco"
 		energia_mudou.emit(_energia, ENERGIA_MAX)
 
@@ -1555,6 +1571,8 @@ func _physics_process(dt: float) -> void:
 	# ataque leve -- bloqueado enquanto rola ou defende. Combo: um novo
 	# golpe a meio do atual fica bufferizado (`_combo_pedido`) e dispara
 	# assim que este acabar, em vez de se perder.
+	if Input.is_action_just_pressed("especial"):
+		usar_especial()
 	if _pogo_estado == 0 and _pogo_pode_iniciar() and Input.is_action_just_pressed("atacar"):
 		_iniciar_pogo()
 	elif not _defendendo and _rolar_restante <= 0.0 and _pogo_estado == 0 and Input.is_action_just_pressed("atacar"):
@@ -2268,6 +2286,7 @@ func _pogo_acertar() -> bool:
 	else:
 		_abanar(TREMOR_PISAO)
 		_hitstop(HITSTOP_PISAO)
+	ganhar_energia(ENERGIA_POR_POGO)
 	aplicar_impulso(Vector2(0.0, -POGO_RESSALTO), true)
 	_invulneravel = maxf(_invulneravel, 0.3)
 	_pop = 1.0
@@ -2440,6 +2459,50 @@ func _tratar_lancar(_dt: float) -> void:
 		_lancar_projetil()
 
 
+## Energia actual (so' leitura; testes e HUD).
+func energia_actual() -> float:
+	return _energia
+
+
+func ganhar_energia(qtd: float) -> void:
+	_energia = clampf(_energia + qtd, 0.0, ENERGIA_MAX)
+	energia_mudou.emit(_energia, ENERGIA_MAX)
+
+
+## Especial: gasta ESPECIAL_CUSTO e lanca a onda espectral (atravessa inimigos, ESPECIAL_DANO_MULT x o
+## golpe). Sem Energia suficiente NAO faz nada (a Energia nunca fica negativa) e avisa o HUD.
+func usar_especial() -> bool:
+	if not EstadoJogo.tem_habilidade("especial") or _defendendo or _rolar_restante > 0.0 \
+			or _dash_restante > 0.0 or _especial_cd > 0.0 or _pogo_estado != 0:
+		return false
+	if _energia < ESPECIAL_CUSTO:
+		_especial_cd = 0.25
+		energia_insuficiente.emit()
+		Som.toca("bloqueio", -14.0, 0.8, 0.02)
+		return false
+	_energia = maxf(0.0, _energia - ESPECIAL_CUSTO)
+	_regen_pausa = ESPECIAL_PAUSA_REGEN
+	_especial_cd = ESPECIAL_CD
+	energia_mudou.emit(_energia, ENERGIA_MAX)
+	_lancar_restante = DUR_LANCAR * 1.6
+	if _corpo and _corpo.sprite_frames and _corpo.sprite_frames.has_animation("lancar"):
+		_corpo.play("lancar")
+		_corpo.set_frame_and_progress(0, 0.0)
+	_pop = 1.0
+	_acender_aura(1.0)
+	_abanar(TREMOR_GOLPE)
+	var aim := Vector2(_olha_para, 0.0)
+	var p := PROJETIL_MAGICO.instantiate()
+	get_parent().add_child(p)
+	p.scale = Vector2(ESPECIAL_ESCALA, ESPECIAL_ESCALA)
+	p.perfura = true
+	p.global_position = global_position + aim * 24.0 + Vector2(0.0, -4.0)
+	p.lancar(aim, maxi(1, roundi(_dano_golpe() * ESPECIAL_DANO_MULT)))
+	magia_lancada.emit()
+	Som.toca("lancar", -3.0, 0.7, 0.03)
+	return true
+
+
 ## Lança um tiro mágico numa das 8 direções (mira = eixos de movimento + W/S;
 ## sem mira, para onde está virada). Ilimitado, dá 1/3 do dano do golpe.
 func _lancar_projetil() -> void:
@@ -2469,6 +2532,7 @@ func _ao_acertar_corpo(corpo: Node) -> void:
 		if _alvos_atingidos_ataque.has(alvo_id):
 			return
 		_alvos_atingidos_ataque[alvo_id] = true
+		ganhar_energia(ENERGIA_POR_GOLPE)
 		# CRÍTICO (pegada Dead Cells): inimigo vulnerável (gelo/fogo/sangue/
 		# atordoado), golpe logo a seguir a um rolamento, ou golpe pelas costas.
 		var crit := false
