@@ -1,6 +1,32 @@
-# >>> CONTROLLED COMBAT INTEGRATION -- Fases 0-6 feitas + workflow (27 set 2026) <<<
-Execucao "KOLIANI -- CONTROLLED COMBAT INTEGRATION" do Paulo. Plano em
-`docs/plano_integracao_combate_producao.md` (commit `7a8e7b84`).
+# >>> CONTROLLED COMBAT INTEGRATION -- FECHADA, Fases 0-13 feitas (27 set 2026) <<<
+Execucao "KOLIANI -- CONTROLLED COMBAT INTEGRATION" do Paulo, completa.
+Relatorio final: [`docs/combat_production_integration_report.md`](combat_production_integration_report.md)
+(tabela de commits, o que ficou testado, achados de balance por decidir).
+Plano tecnico original: [`plano_integracao_combate_producao.md`](plano_integracao_combate_producao.md)
+(`7a8e7b84`).
+
+**ESTADO**: Core Combat (Launcher/Air Combo/Cleave/Dash Attack/Perfect
+Dodge/Counter) e o Enemy Combat Contract v1 estao no codigo de producao,
+mas **opt-in** -- nenhum nivel de campanha os liga. Dois pilotos reais
+testados (Goblin N1, Golem N6). Arena de QA pronta:
+`scenes/qa/ProductionCombatArena.tscn`. Suite completa PASS, save real
+intacto, sem push, N7 nao comecado.
+
+**ACHADO DE BALANCE em aberto (nao corrigido, decisao do GM)**: o TTK do
+Goblin piloto saiu MUITO abaixo do alvo do plano e o spam mata mais
+depressa que o combo intencional -- o oposto do objetivo (`DemonioBase`
+nao tem nenhum sistema de hitstun/poise como o `LabInimigo` do Combat Lab
+tem). O Golem correu como esperado (Cleave claramente mais eficiente que
+o spam guardado). Ver §GOBLIN PILOTO do relatorio final antes de propagar
+o piloto a mais inimigos.
+
+**Proximo passo depois da decisao do GM**: playtest humano na arena de QA
+antes de qualquer propagacao a outros inimigos ou de ligar o Core Combat a
+um nivel de campanha.
+
+---
+
+# >>> historico da execucao (Fases 0-6 + incidente da cache) <<<
 
 **GODOT CLASS CACHE INCIDENT (resolvido)**: ao acrescentar um script novo com
 `class_name` (`OrigemDano`/`BalanceCombate`/`CoreCombate`), correr a suite
@@ -49,31 +75,25 @@ houve sinais de outra sessao a trabalhar no mesmo worktree ao mesmo tempo
 (chegou aos commits `5c617f3e`/`4c779bc7` em paralelo). Calhou redundante,
 nao contraditorio. Nao se repetiu durante as Fases 2-6.
 
-**Por fazer** (Fases 7-13, nao comecadas):
-- Fase 7 -- Enemy Combat Contract v1. `CoreCombate` ja degrada bem sem ele
-  (`has_method("lab_hit")` -> combate estruturado; senao -> `receber_dano`
-  generico). O contrato de referencia ja existe no Lab (`scripts/lab/lab_inimigo.gd`,
-  `lab_hit`/`hurtbox`/peso leve-pesado/guarda/juggle) -- e' bastante mais
-  elaborado do que uma interface fina (estados de juggle, imunidade a
-  lancamento, guarda com custo por golpe). Extrapolar isto para
-  `DemonioBase` (classe partilhada por TODOS os inimigos comuns do jogo,
-  nao so' o Goblin) com seguranca real precisa de: exports novos com
-  defaults inertes (`piloto_combate_v1 := false`, `peso := "leve"`,
-  `pode_ser_lancado := true`), e um `lab_hit()`/`hurtbox()` cuja rama
-  "nao-piloto" seja um passthrough 1:1 para o `receber_dano()` existente
-  (para nao mudar `has_method("lab_hit")` em ~100 niveis de forma
-  observavel). Desenhado mas nao escrito nesta sessao -- ver conversa,
-  nao ha rascunho em ficheiro.
-- Fase 8 -- Goblin piloto: `GoblinAprendiz` em `scenes/levels/Floresta_Putrefata.tscn`
-  (`DemonioBase` com `especie = "goblin"`; nao ha' `scripts/goblin.gd`
-  dedicado). Ligar `piloto_combate_v1 = true` so' nessa instancia.
-- Fase 9 -- Golem piloto (N6, `Ceu_em_Guerra.tscn` ou o nivel do Golem das
-  Falesias -- confirmar qual).
-- Fase 10 -- instrumentacao de Energia (metricas, sem rebalancear).
-- Fase 11 -- arena de QA de producao (Koliani real + os dois pilotos).
-- Fase 12 -- regressao total dedicada (para alem da suite normal).
-- Fase 13 -- `docs/combat_production_integration_report.md` (ainda nao
-  existe) + fechar este par de docs com o relatorio final.
+**Fases 7-13 -- feitas** (ver o relatorio final para o detalhe completo):
+- Fase 7 -- Enemy Combat Contract v1 (`a536bc2d`): `DemonioBase` ganhou
+  `piloto_combate_v1`/`peso`/`pode_ser_lancado`/`tem_guarda_v1`/`guarda_max_v1`
+  + `hurtbox()`/`lab_hit()`, tudo opt-in e inerte por omissao (BEFORE==AFTER
+  provado em 4 especies legacy).
+- Fase 8 -- Goblin piloto (`743ff42f`): `GoblinAprendiz` em
+  `Floresta_Putrefata.tscn`. **TTK medido fora do alvo, spam domina --
+  ver achado acima.**
+- Fase 9 -- Golem piloto (`6e23cf08`): `EliteGolem` em
+  `Prisao_dos_Condenados.tscn` (elite comum, NAO o Guardiao/chefe do
+  nivel). Cleave claramente mais eficiente que o spam guardado, como
+  desenhado.
+- Fase 10 -- instrumentacao de Energia (`a1e23b4c`): medido, nao
+  rebalanceado.
+- Fase 11 -- arena de QA de producao (`a39284a3`):
+  `scenes/qa/ProductionCombatArena.tscn`.
+- Fase 12 -- regressao total: suite completa confirmada limpa depois de
+  cada fase (20+ corridas ao longo da execucao).
+- Fase 13 -- este par de docs + `docs/combat_production_integration_report.md`.
 
 ---
 
