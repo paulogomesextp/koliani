@@ -1063,7 +1063,14 @@ func _ao_tocar(corpo: Node) -> void:
 	if _morto or dormente:
 		return
 	if corpo is Koliani:
-		corpo.receber_dano(dano_contacto, signf(corpo.global_position.x - global_position.x), OrigemDano.CONTATO)
+		# Fase 8 (piloto opt-in): a INVESTIDA telegrafada do comportamento "carga"
+		# conta como um ataque real (pode dar Perfect Dodge); o toque de patrulha
+		# comum continua CONTATO. So' se aplica com `piloto_combate_v1` ligado --
+		# nao muda nenhum inimigo legacy (todos ficam com `_carga <= 0.0` sempre,
+		# ou nunca tem `piloto_combate_v1` ligado).
+		var origem := OrigemDano.ATAQUE if (piloto_combate_v1 and comportamento == "carga" and _carga > 0.0) \
+			else OrigemDano.CONTATO
+		corpo.receber_dano(dano_contacto, signf(corpo.global_position.x - global_position.x), origem)
 		_voz("ataque")
 		anticipacao = 1.0  # dá um "bote" visual no ataque
 

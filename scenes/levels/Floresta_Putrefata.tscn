@@ -147,6 +147,10 @@ cor_topo = Color(0.42, 0.64, 0.29, 1)
 position = Vector2(3370, 636)
 especie = "goblin"
 alcance_patrulha = 110.0
+comportamento = "carga"
+piloto_combate_v1 = true
+peso = "leve"
+pode_ser_lancado = true
 
 [node name="AltaOpc1" parent="." instance=ExtResource("9_pl")]
 position = Vector2(3095, 614)

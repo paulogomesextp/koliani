@@ -119,6 +119,10 @@ func _correr_tudo() -> void:
 	await teste_enemy_contract_legado_inerte()
 	await teste_enemy_contract_hurtbox()
 	await teste_enemy_contract_guarda_opt_in()
+	await teste_goblin_piloto_estrutura()
+	await teste_goblin_piloto_isolamento()
+	await teste_goblin_piloto_comportamento()
+	await teste_goblin_piloto_ttk()
 	await teste_combat_lab_clamp()
 	await teste_combat_lab_antispam()
 	await teste_combat_lab_balanco()
@@ -7084,6 +7088,179 @@ func teste_enemy_contract_guarda_opt_in() -> void:
 	_ok(not res2.get("lancado", true), "contrato inimigo: peso pesado + pode_ser_lancado=false nunca lanca")
 	g.queue_free()
 	await get_tree().process_frame
+
+
+## Fase 8 -- Goblin piloto da Regiao I. So' a instancia "GoblinAprendiz" (N1,
+## Floresta_Putrefata.tscn) liga o contrato -- nenhum outro goblin do jogo.
+func teste_goblin_piloto_estrutura() -> void:
+	var nivel := (load("res://scenes/levels/Floresta_Putrefata.tscn") as PackedScene).instantiate()
+	var g := nivel.get_node_or_null("GoblinAprendiz") as DemonioBase
+	_ok(g != null, "goblin piloto: GoblinAprendiz existe em Floresta_Putrefata.tscn")
+	if g != null:
+		_ok(g.piloto_combate_v1, "goblin piloto: piloto_combate_v1 ligado so' nesta instancia")
+		_ok(g.peso == "leve", "goblin piloto: peso leve")
+		_ok(g.pode_ser_lancado, "goblin piloto: lancavel")
+		_ok(g.comportamento == "carga", "goblin piloto: bote telegrafado (comportamento carga)")
+		_ok(not g.tem_guarda_v1, "goblin piloto: leve nao tem guarda")
+	nivel.queue_free()
+	await get_tree().process_frame
+
+
+## Contra-prova: nenhum OUTRO goblin/inimigo comum do jogo ganhou o contrato por
+## a classe partilhada ter os campos novos (teria de vir explicito na cena dele).
+func teste_goblin_piloto_isolamento() -> void:
+	var amostras := [
+		"res://scenes/levels/Pantano_dos_Sussurros.tscn",
+		"res://scenes/levels/Ninho_da_Viuva_Negra.tscn",
+		"res://scenes/levels/A_Arvore_que_Chora.tscn",
+	]
+	for caminho: String in amostras:
+		var nivel := (load(caminho) as PackedScene).instantiate()
+		for filho in nivel.get_children():
+			if filho is DemonioBase and filho.name != "GoblinAprendiz":
+				_ok(not (filho as DemonioBase).piloto_combate_v1,
+					"goblin piloto: %s/%s nao devia ter o contrato ligado" % [caminho.get_file(), filho.name])
+		nivel.queue_free()
+		await get_tree().process_frame
+
+
+## Comportamento funcional do piloto: bote telegrafado = origem ATAQUE (pode dar PD), contacto de
+## patrulha comum = CONTATO, Launcher lanca (leve), sem juggle infinito.
+func teste_goblin_piloto_comportamento() -> void:
+	var antes_hab: Array = EstadoJogo.habilidades.duplicate()
+	EstadoJogo.habilidades.assign(["dash", "pogo", "salto_duplo", "especial", "projetil"])
+	var m := LabMetricas.new()
+	add_child(m)
+	var chao := (load("res://scenes/actors/Plataforma.tscn") as PackedScene).instantiate()
+	chao.position = Vector2(1300.0, 730.0)
+	chao.tamanho = Vector2(2600.0, 60.0)
+	add_child(chao)
+	var k := (load("res://scenes/actors/Koliani.tscn") as PackedScene).instantiate() as Koliani
+	k.position = Vector2(400.0, 630.0)
+	k.usar_prototipo_premium = true
+	k.usar_golden_set = true
+	add_child(k)
+	for i in 90:
+		await get_tree().physics_frame
+		if k.is_on_floor():
+			break
+	var core := k.ativar_core_combate()
+	# mesma configuracao exportada do GoblinAprendiz de producao (Fase 8), isolado (sem carregar o nivel inteiro)
+	var g := (load("res://scenes/actors/DemonioBase.tscn") as PackedScene).instantiate() as DemonioBase
+	g.especie = "goblin"
+	g.comportamento = "carga"
+	g.piloto_combate_v1 = true
+	g.peso = "leve"
+	g.pode_ser_lancado = true
+	g.global_position = k.global_position + Vector2(70.0, 0.0)
+	add_child(g)
+	await get_tree().physics_frame
+
+	# bote (a meio da investida): origem ATAQUE -- dentro da janela do roll, da' Perfect Dodge
+	await _lab_tap("rolar", 3)
+	await _lab_esperar(3)
+	g._carga = 0.3
+	g._ao_tocar(k)
+	_ok(m.contar("perfect_dodge") == 1, "goblin piloto: o bote telegrafado (carga) da' Perfect Dodge")
+	# contacto de patrulha comum (fora da investida): CONTATO -- nao da' PD mesmo na janela
+	await _lab_esperar(60)
+	await _lab_tap("rolar", 3)
+	await _lab_esperar(3)
+	g._carga = 0.0
+	g._ao_tocar(k)
+	_ok(m.contar("perfect_dodge") == 1, "goblin piloto: o contacto de patrulha comum NAO da' Perfect Dodge")
+
+	# Launcher: leve + lancavel -- lanca; segundo Launcher imediato NAO relanca (anti-juggle)
+	var res1 := g.lab_hit({"tipo": "launcher", "dano": 10, "dir": 1.0, "critico": false, "guard_break": false})
+	_ok(res1.get("lancado", false), "goblin piloto: Launcher lanca (leve, lancavel)")
+	var res2 := g.lab_hit({"tipo": "launcher", "dano": 10, "dir": 1.0, "critico": false, "guard_break": false})
+	_ok(not res2.get("lancado", true), "goblin piloto: sem juggle infinito (2.o Launcher imediato nao relanca)")
+
+	g.queue_free()
+	k.queue_free()
+	chao.queue_free()
+	m.queue_free()
+	await get_tree().process_frame
+	await get_tree().process_frame
+	Input.action_release("atacar")
+	Input.action_release("rolar")
+	EstadoJogo.habilidades.assign(antes_hab)
+
+
+## TTK do Goblin piloto (spam vs combo intencional) -- MEDIDO, nao imposto. Objetivo aproximado do
+## plano: spam ~4-6s, combo ~3-4,5s (nao perseguir os numeros se o comportamento de producao diferir).
+func _ttk_goblin_piloto(k: Koliani, g: DemonioBase, modo: String, limite := 15.0) -> float:
+	var t := 0.0
+	var dt := 1.0 / 60.0
+	while t < limite and is_instance_valid(g) and not g._morto:
+		if modo == "spam":
+			Input.action_press("atacar")
+			for i in 3:
+				await get_tree().physics_frame
+				t += dt
+			Input.action_release("atacar")
+			for i in 15:
+				await get_tree().physics_frame
+				t += dt
+		else:   # "combo": 4 toques certos (janela do combo) + pausa, repete
+			for i in 4:
+				Input.action_press("atacar")
+				for j in 3:
+					await get_tree().physics_frame
+					t += dt
+				Input.action_release("atacar")
+				for j in 10:
+					await get_tree().physics_frame
+					t += dt
+			for j in 20:
+				await get_tree().physics_frame
+				t += dt
+	Input.action_release("atacar")
+	return t
+
+
+func teste_goblin_piloto_ttk() -> void:
+	var antes_hab: Array = EstadoJogo.habilidades.duplicate()
+	EstadoJogo.habilidades.assign(["dash", "pogo", "salto_duplo", "especial", "projetil"])
+	var resultado := {}
+	for modo in ["spam", "combo"]:
+		var chao := (load("res://scenes/actors/Plataforma.tscn") as PackedScene).instantiate()
+		chao.position = Vector2(1300.0, 730.0)
+		chao.tamanho = Vector2(2600.0, 60.0)
+		add_child(chao)
+		var k := (load("res://scenes/actors/Koliani.tscn") as PackedScene).instantiate() as Koliani
+		k.position = Vector2(400.0, 630.0)
+		k.usar_prototipo_premium = true
+		k.usar_golden_set = true
+		add_child(k)
+		for i in 90:
+			await get_tree().physics_frame
+			if k.is_on_floor():
+				break
+		k.ativar_core_combate()
+		var g := (load("res://scenes/actors/DemonioBase.tscn") as PackedScene).instantiate() as DemonioBase
+		g.especie = "goblin"
+		g.comportamento = "carga"
+		g.piloto_combate_v1 = true
+		g.peso = "leve"
+		g.pode_ser_lancado = true
+		g.set_physics_process(false)   # nao anda/investe sozinho -- so' se mede o TTK da espada
+		g.global_position = k.global_position + Vector2(60.0, 0.0)
+		add_child(g)
+		await get_tree().physics_frame
+		k._olha_para = 1.0
+		var t := await _ttk_goblin_piloto(k, g, modo)
+		resultado[modo] = {"ttk": snappedf(t, 0.01), "morreu": g._morto if is_instance_valid(g) else true, "vida_inicial": 58}
+		if is_instance_valid(g):
+			g.queue_free()
+		k.queue_free()
+		chao.queue_free()
+		await get_tree().process_frame
+		await get_tree().process_frame
+	print("GOBLIN PILOTO ttk: ", resultado)
+	_ok(bool(resultado["spam"]["morreu"]), "goblin piloto: o goblin morre a spam dentro do limite de tempo")
+	_ok(bool(resultado["combo"]["morreu"]), "goblin piloto: o goblin morre a combo intencional dentro do limite de tempo")
+	EstadoJogo.habilidades.assign(antes_hab)
 
 
 ## Atravessamento: o avanco dos golpes nao leva a Koliani ao outro lado do alvo (goblin pequeno e golem grande).
