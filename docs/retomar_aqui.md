@@ -1,3 +1,83 @@
+# >>> N9 AUTORAL -- "Desfiladeiro dos Ventos", CHALLENGE (28 set 2026, sem push) <<<
+Estrutura regional: N6=Teach, N7=Develop/Test, N8=Combine, **N09=Challenge**,
+N10=Boss/Exame. Ver `docs/nivel_autoral_n9.md` para o mapa completo. Cena
+`scenes/levels/Ala_dos_Mortos.tscn` (nome de ficheiro legacy mantido).
+
+**Feito**: reconstruído do zero como nível AUTORAL (`corredor = false`,
+`checkpoints_autorais`), sem jornada procedural. 6 secções A-F: reentrada
+sem risco + reintrodução do vento (fraco, contínuo) -> vento variável (3
+zonas consecutivas com comportamentos diferentes: contra contínuo / favor
+pulsado / contra pulsado com ritmo distinto) -> vento pulsado + inimigo
+simples legível (`sentinela_flutuante`, sem projéteis) -> `PlataformaCorrente`
+atravessa vento contínuo forte + `morcego_dos_ventos` (pressão) -> bifurcação
+opcional segura/arriscada (vento a favor + Pogo authored opcional + Essência
+26) -> pré-exame combinando as duas direções de vento + salto duplo + Dash
+(com `FDashApoio`) + 2 inimigos simples (`golem_aereo`, `gosma`), SEM chefe.
+6 checkpoints, nenhum dentro de vento perigoso (`VentoArena`, exceção
+documentada como em N6/N7/N8). ≥9 `WindZone` (mais variedade que o N8: mistura
+CONTÍNUO+PULSADO, não só um ou outro). Fecha com um Guardião
+(`golem_aereo`, `DemonioBase`, vida 235, elite, NÃO boss -- sela a porta, não
+grava boss derrotado).
+
+**AUDITORIA DO LEGACY ("Ala dos Mortos")**: a cena anterior tinha QUATRO
+problemas herdados, todos corrigidos nesta execução:
+1. `corredor` nunca era `false` -- o `_ready()` de `nivel_com_chefe.gd`
+   continuava a prepender a jornada procedural à frente do conteúdo
+   desenhado à mão (o mesmo bug que N6-N8 já tinham corrigido). Corrigido.
+2. Um `Chefe` real (`ChefeIrmaosCondenados.tscn`, com sinal `derrotado`, baú
+   e gravação de boss) -- mas N9 é Challenge, não Boss/Exame (só o N10). A
+   identidade "Espectros Gémeos" continua no `CatalogoCampanha` (por índice,
+   não pelo nó da cena) -- não foi tocada. Removido; fecha agora com
+   `Guardiao` elite, mesmo padrão do N6-N8.
+3. Um `Coletavel` `partir_paredes` a meio do nível -- a região só concede
+   habilidade no N10; nenhum coletável aparece em N6/N7/N8. Removido para
+   alinhar com o resto da região.
+4. `CascaMasmorra` (tijolo fechado) -- o resto da região é desfiladeiro
+   ABERTO com queda para o mar de nuvens. Removida por coerência visual.
+5. As três `WindZone` do legacy usavam intensidade 360-520 (muito abaixo da
+   faixa validada > 1300, achado já medido em N6). Reconstruídas com os
+   parâmetros já validados em N6-N8 (1400-1800 / vel 110-170). **Não** era o
+   bug partilhado de sub-recurso da `WindZone` -- esse já estava corrigido
+   em `wind_zone.gd::_configurar_forma` (o comentário lá cita este mesmo
+   nível como o caso que o revelou); era só o autor da cena legacy ter usado
+   números fracos.
+
+**Testes**: `teste_n9_autoral` novo (estrutura, ≥9 zonas mistas
+contínuo/pulsado, Guardião≠Chefe, 4-6 checkpoints, sem `Coletavel`/
+`ZonaPlanar`/`Casca`, contrato secção a secção B-F, geometria vãos ≤380 nas
+cadeias estáticas -- a secção D fica de fora, como a rota rápida do N8,
+porque a travessia é pela `PlataformaCorrente`). `tests/
+test_region02_wind_levels.gd` atualizado: bloco N09 deixa de assumir o
+contrato legacy (3 zonas/Chefe) e passa a Guardião+4-6 checkpoints+≥9 zonas;
+isenção de `VentoArena` alargada a N09.
+
+**Suite completa**: corrida via `tools/correr_testes.ps1` (isolamento de
+save) -- **0 falhas** (`OK -- todos os testes passaram`, exit code 0); o
+flake conhecido do N5 (`teste_9h_chefes_regiao1_mais_faceis`) não disparou
+nesta corrida. Save real intacto (`[isolado] save real intacto (3 ficheiros
+verificados)`).
+
+**Build**: `build/windows/Koliani.exe` reexportado (preset "Windows
+Desktop"); lançado com `-- --nivel=9 --devmode` para o Paulo testar
+toque/performance reais e a curva A-F.
+
+**Não feito, por instrução**: N10 não começado; Combat Core novo não
+tocado/ligado; N8 não alterado; física F1 não alterada; nenhum boss
+alterado; sem arte final; **sem push** (só commit local). Resíduo não
+tocado (mesmo padrão do `verifica_rota_n08.gd` do N8): `tools/
+verifica_casca.gd` ainda lista "Ala_dos_Mortos" como devendo ter `Casca`
+(já não tem, por desenho); `tools/geometria_regiao02.gd` e `tests/
+run_region02_wind_shapes.gd` são ferramentas avulsas fora da suite,
+apontam ao ficheiro mas não foram corridas/verificadas nesta execução.
+
+**Próximo passo**: playtest humano do GM no N9 (duração real, se a rota
+arriscada da secção E compensa o risco, legibilidade dos 3 comportamentos
+de vento da secção B, TTK do Guardião e pressão dos 4 inimigos simples). Só
+depois, N10 (Guardião dos Céus + `escalar_paredes` + cartão de fim de
+região).
+
+---
+
 # >>> N8 AUTORAL -- "Desfiladeiro dos Ventos", COMBINE (27 set 2026, commit local `59a023a9`, sem push) <<<
 Estrutura regional: N6=Teach, N7=Develop/Test, **N08=Combine**, N9=Challenge,
 N10=Boss/Exame. Ver `docs/nivel_autoral_n8.md` para o mapa completo. Cena
