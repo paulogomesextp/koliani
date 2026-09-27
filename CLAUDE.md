@@ -15,7 +15,8 @@ Não há `godot` no PATH. Binário:
 terminal usar a variante `..._console.exe`).
 
 ```bash
-# reimportar recursos (SEMPRE depois de acrescentar/mudar assets)
+# reimportar recursos (SEMPRE depois de acrescentar/mudar assets, e SEMPRE
+# depois de criar/apagar/renomear um `class_name` -- ver nota abaixo)
 "/c/Users/paulo/Desktop/Godot_v4.7.2-stable_win64_console.exe" --headless --import
 
 # suite de testes headless (sai != 0 se falhar). E' uma CENA, nao um
@@ -31,6 +32,16 @@ powershell -ExecutionPolicy Bypass -File tools/correr_testes.ps1
 # QUALQUER outro script/QA/bot que arranque o Godot: `python tools/godot_isolado.py
 # [--sandbox DIR] -- <args do Godot>`. NUNCA isolar com XDG_DATA_HOME: no Windows
 # o user:// resolve por %APPDATA% e o XDG e' ignorado (nao isola nada).
+#
+# INCIDENTE "cache de classes" (27 set 2026): um `class_name` novo/apagado so'
+# fica visivel a outros scripts depois de um `--headless --import` reescrever
+# `.godot/global_script_class_cache.cfg` (pasta fora do git). Sem isso, um
+# script que referencie a classe nova falha a compilar; se for uma classe-base
+# (ex. `chefe_base.gd`), arrasta consigo TODOS os que dela herdam, com o
+# sintoma enganador "Nonexistent function '_process' in base 'Nil'" -- pareceu
+# uma regressao de 79 testes quando era so' a cache por atualizar. Por isso o
+# `correr_testes.ps1` faz sempre esse `--import` antes da suite -- nao repetir
+# a investigacao nem depender de alguem se lembrar de o fazer a mao.
 
 # a forma crua -- so' quando o save nao importa; MEXE no save real
 "/c/Users/paulo/Desktop/Godot_v4.7.2-stable_win64_console.exe" --headless --path . res://tests/run_tests.tscn
