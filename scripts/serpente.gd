@@ -105,6 +105,6 @@ func _physics_process(dt: float) -> void:
 		for c in a.get_overlapping_bodies():
 			if c.has_method("receber_dano"):
 				c.receber_dano(dano,
-					signf(c.global_position.x - a.global_position.x))
+					signf(c.global_position.x - a.global_position.x), OrigemDano.ATAQUE)
 				_cd = 0.7
 				return

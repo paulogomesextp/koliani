@@ -49,7 +49,7 @@ func _physics_process(dt: float) -> void:
 
 func _ao_bater(corpo: Node) -> void:
 	if corpo is Koliani:
-		corpo.receber_dano(dano, signf(_dir.x))
+		corpo.receber_dano(dano, signf(_dir.x), OrigemDano.ATAQUE)
 	_estoirar()
 
 

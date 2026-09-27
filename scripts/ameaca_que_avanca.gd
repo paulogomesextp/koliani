@@ -94,6 +94,6 @@ func _physics_process(dt: float) -> void:
 		return
 	for c in get_overlapping_bodies():
 		if c.has_method("receber_dano"):
-			c.receber_dano(dano, signf(direcao.x) if direcao.x != 0.0 else 1.0)
+			c.receber_dano(dano, signf(direcao.x) if direcao.x != 0.0 else 1.0, OrigemDano.ATAQUE)
 			_cd = recarga
 			break

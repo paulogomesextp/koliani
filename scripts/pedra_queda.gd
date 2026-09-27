@@ -152,7 +152,7 @@ func _physics_process(dt: float) -> void:
 func _ao_tocar(corpo: Node) -> void:
 	if _estado == CAI and corpo is Koliani:
 		var dir := signf(corpo.global_position.x - global_position.x)
-		corpo.receber_dano(dano, dir if dir != 0.0 else 1.0)
+		corpo.receber_dano(dano, dir if dir != 0.0 else 1.0, OrigemDano.HAZARD_ATAQUE)
 
 
 func _esfarelar() -> void:

@@ -93,7 +93,7 @@ func cair(atraso: float = -1.0) -> void:
 	_tocar("raio_cai", -8.0, 1.0, Som.Prioridade.MEDIA)
 	for c in _area.get_overlapping_bodies():
 		if c is Koliani:
-			c.receber_dano(dano, signf(c.global_position.x - global_position.x))
+			c.receber_dano(dano, signf(c.global_position.x - global_position.x), OrigemDano.HAZARD_ATAQUE)
 	var t := create_tween()
 	t.tween_interval(0.09)
 	t.tween_callback(func() -> void: _area.monitoring = false)

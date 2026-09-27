@@ -660,7 +660,7 @@ func _ao_tocar(corpo: Node) -> void:
 	if corpo is Koliani:
 		provocar()  # trocar o primeiro golpe = combate a sério
 		var dano := int(round(dano_contacto * (1.8 if _ataque_forte > 0.0 else 1.0)))
-		corpo.receber_dano(dano, signf(corpo.global_position.x - global_position.x))
+		corpo.receber_dano(dano, signf(corpo.global_position.x - global_position.x), OrigemDano.CONTATO)
 
 
 func receber_dano(quantidade: int, dir_empurrao: float = 0.0, critico := false,

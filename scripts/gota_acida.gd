@@ -123,7 +123,7 @@ func _largar() -> void:
 			return
 		if corpo is Koliani:
 			atingiu[0] = true
-			corpo.receber_dano(dano, 0.0)  # vem de cima -> escudo bloqueia
+			corpo.receber_dano(dano, 0.0, OrigemDano.HAZARD_ATAQUE)  # vem de cima -> escudo bloqueia
 			# add_child/monitoring durante o flush de física -> diferir
 			_salpicar.call_deferred(pai, Vector2(gota.global_position.x, gota.global_position.y))
 			gota.queue_free())
@@ -168,13 +168,13 @@ func _salpicar(pai: Node, pos: Vector2) -> void:
 	var fim := Time.get_ticks_msec() + int(dur_poca * 1000.0)
 	poca.body_entered.connect(func(corpo: Node) -> void:
 		if corpo is Koliani and Time.get_ticks_msec() < fim:
-			corpo.receber_dano(dano, signf(corpo.global_position.x - pos.x)))
+			corpo.receber_dano(dano, signf(corpo.global_position.x - pos.x), OrigemDano.HAZARD_ATAQUE))
 	# "quem já lá estava" só se pode consultar depois de um frame de física
 	await get_tree().physics_frame
 	if is_instance_valid(poca):
 		for c in poca.get_overlapping_bodies():
 			if c is Koliani:
-				c.receber_dano(dano, signf(c.global_position.x - pos.x))
+				c.receber_dano(dano, signf(c.global_position.x - pos.x), OrigemDano.HAZARD_ATAQUE)
 
 	if not is_instance_valid(poca):
 		return

@@ -124,6 +124,6 @@ func _morder() -> void:
 		return
 	for c in get_overlapping_bodies():
 		if c.has_method("receber_dano"):
-			c.receber_dano(dano, signf(c.global_position.x - global_position.x))
+			c.receber_dano(dano, signf(c.global_position.x - global_position.x), OrigemDano.ATAQUE)
 			_cd = recarga
 			break

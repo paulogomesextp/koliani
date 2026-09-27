@@ -1042,7 +1042,7 @@ func _ao_tocar(corpo: Node) -> void:
 	if _morto or dormente:
 		return
 	if corpo is Koliani:
-		corpo.receber_dano(dano_contacto, signf(corpo.global_position.x - global_position.x))
+		corpo.receber_dano(dano_contacto, signf(corpo.global_position.x - global_position.x), OrigemDano.CONTATO)
 		_voz("ataque")
 		anticipacao = 1.0  # dá um "bote" visual no ataque
 

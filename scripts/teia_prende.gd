@@ -82,7 +82,7 @@ func _ao_tocar(corpo: Node) -> void:
 	if _ativa and corpo is Koliani:
 		corpo.prender(dur_preso)
 		if dano > 0:
-			corpo.receber_dano(dano)
+			corpo.receber_dano(dano, 0.0, OrigemDano.HAZARD_ATAQUE)
 
 
 ## 9H.17 CONTINUATION -- A TEIA PASSOU A SER UMA TEIA.

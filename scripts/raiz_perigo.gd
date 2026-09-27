@@ -173,7 +173,7 @@ func _ao_tocar(corpo: Node) -> void:
 		var dir := _dir_empurrao
 		if dir == 0.0:
 			dir = signf(corpo.global_position.x - global_position.x)
-		corpo.receber_dano(dano, dir)
+		corpo.receber_dano(dano, dir, OrigemDano.HAZARD_ATAQUE)
 		return
 	# 9H.16 D5 -- IDENTIDADE DO NIVEL 1. A raiz tambem espeta INIMIGOS: com
 	# o recuo novo da espada (ver `DANO_COMBO`/`RECUO_COMBO`), o remate

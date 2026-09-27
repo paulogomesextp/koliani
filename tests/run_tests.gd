@@ -114,6 +114,7 @@ func _correr_tudo() -> void:
 	await teste_combat_lab_combos()
 	await teste_combat_lab_pd_real()
 	await teste_combat_lab_pd_contrato()
+	teste_contrato_dano_producao()
 	await teste_combat_lab_clamp()
 	await teste_combat_lab_antispam()
 	await teste_combat_lab_balanco()
@@ -6841,20 +6842,68 @@ func teste_combat_lab_pd_contrato() -> void:
 	g._ao_tocar(k)
 	_ok(m.contar("perfect_dodge") == 0, "PD contrato: contacto do goblin nao pode dar PD")
 	# o mesmo roll com um ATAQUE dentro da janela: PD
-	k.receber_dano(8, 1.0, "ataque")
+	k.receber_dano(8, 1.0, OrigemDano.ATAQUE)
 	_ok(m.contar("perfect_dodge") == 1, "PD contrato: origem 'ataque' na janela devia dar PD")
 	# hazard que ataca: tambem conta (depois do cooldown)
 	await _lab_esperar(60)
 	await _lab_tap("rolar", 3)
 	await _lab_esperar(3)
 	lab._pd_cd = 0.0
-	k.receber_dano(8, 1.0, "hazard_ataque")
+	k.receber_dano(8, 1.0, OrigemDano.HAZARD_ATAQUE)
 	_ok(m.contar("perfect_dodge") == 2, "PD contrato: 'hazard_ataque' na janela devia dar PD")
+	# ambiente (DoT) nunca pode dar PD, mesmo dentro da janela
+	await _lab_esperar(60)
+	await _lab_tap("rolar", 3)
+	await _lab_esperar(3)
+	lab._pd_cd = 0.0
+	k.receber_dano(8, 1.0, OrigemDano.AMBIENTE)
+	_ok(m.contar("perfect_dodge") == 2, "PD contrato: 'ambiente' nunca pode dar PD")
 	# os ataques telegrafados do lab identificam-se como ataque (teste real esta' em teste_combat_lab_pd_real)
 	_ok(FileAccess.get_file_as_string("res://scripts/lab/lab_inimigo.gd").count("\"ataque\")") >= 2,
 		"PD contrato: bote/slam/sweep tem de passar origem 'ataque'")
+	# Fase 5 -- contrato formalizado: os 4 valores nao podem colidir entre si
+	_ok(OrigemDano.CONTATO != OrigemDano.ATAQUE and OrigemDano.CONTATO != OrigemDano.HAZARD_ATAQUE
+		and OrigemDano.AMBIENTE != OrigemDano.ATAQUE and OrigemDano.AMBIENTE != OrigemDano.HAZARD_ATAQUE
+		and OrigemDano.ATAQUE != OrigemDano.HAZARD_ATAQUE,
+		"OrigemDano: os 4 valores tem de ser distintos entre si")
 	await _lab_fim(cena)
 	EstadoJogo.habilidades.assign(antes_hab)
+
+
+## Fase 5 (integracao do combate em producao) -- prova ESTATICA de que os
+## 13 sistemas de producao listados no plano (`docs/plano_integracao_combate_producao.md`
+## §3) passam mesmo a origem certa a `receber_dano`. Nao mexe em cena: so'
+## le o texto dos scripts (o mesmo padrao ja' usado acima para `lab_inimigo.gd`).
+## Isto NAO muda comportamento (em producao `_lab` e' sempre null: ver
+## `Koliani.receber_dano`), so' prova que a migracao mecanica ficou completa
+## e nao ha' chamador esquecido a usar a string errada.
+func teste_contrato_dano_producao() -> void:
+	var hazard_ataque := {
+		"res://scripts/armadilha.gd": 1, "res://scripts/chao_quente.gd": 1,
+		"res://scripts/gota_acida.gd": 3, "res://scripts/guilhotina.gd": 1,
+		"res://scripts/pedra_queda.gd": 1, "res://scripts/pendulo_lamina.gd": 1,
+		"res://scripts/raiz_perigo.gd": 1, "res://scripts/raio_tempestade.gd": 1,
+		"res://scripts/teia_prende.gd": 1, "res://scripts/ceifa.gd": 1,
+	}
+	for caminho: String in hazard_ataque:
+		var txt := FileAccess.get_file_as_string(caminho)
+		_ok(txt.count("OrigemDano.HAZARD_ATAQUE") >= int(hazard_ataque[caminho]),
+			"contrato de dano: %s devia marcar hazard_ataque" % caminho)
+	var ataque := {
+		"res://scripts/projetil_zeriko.gd": 1, "res://scripts/serpente.gd": 1,
+		"res://scripts/sombra_atrasada.gd": 1, "res://scripts/ameaca_que_avanca.gd": 1,
+		"res://scripts/bola_fogo.gd": 1,
+	}
+	for caminho: String in ataque:
+		var txt := FileAccess.get_file_as_string(caminho)
+		_ok(txt.count("OrigemDano.ATAQUE") >= int(ataque[caminho]),
+			"contrato de dano: %s devia marcar ataque" % caminho)
+	_ok(FileAccess.get_file_as_string("res://scripts/demonio_base.gd").count("OrigemDano.CONTATO") >= 1,
+		"contrato de dano: demonio_base (contacto de corpo) devia marcar contato")
+	_ok(FileAccess.get_file_as_string("res://scripts/chefe_base.gd").count("OrigemDano.CONTATO") >= 1,
+		"contrato de dano: chefe_base (contacto de corpo) devia marcar contato")
+	_ok(FileAccess.get_file_as_string("res://scripts/zona_sem_ar.gd").count("OrigemDano.AMBIENTE") >= 1,
+		"contrato de dano: zona_sem_ar (DoT) devia marcar ambiente, nunca esquivavel")
 
 
 ## Atravessamento: o avanco dos golpes nao leva a Koliani ao outro lado do alvo (goblin pequeno e golem grande).
