@@ -8,6 +8,7 @@ extends RefCounted
 const CENAS := {
 	"N06": "res://scenes/levels/Prisao_dos_Condenados.tscn",
 	"N07": "res://scenes/levels/Fornalha_dos_Pecadores.tscn",
+	"N08": "res://scenes/levels/Corredor_das_Execucoes.tscn",
 	"N09": "res://scenes/levels/Ala_dos_Mortos.tscn",
 }
 
@@ -19,7 +20,8 @@ const CENAS := {
 ## proposito (`teste_n7_autoral`) -- nao e' um alargamento ad-hoc, e' o mesmo
 ## contrato aplicado ao mesmo tipo de encontro. NAO alargar a outros niveis
 ## sem decisao do GM.
-const ISENCOES_ARENA := [["N06", "VentoArena", "arena"], ["N07", "VentoArena", "arena"]]
+const ISENCOES_ARENA := [["N06", "VentoArena", "arena"], ["N07", "VentoArena", "arena"],
+	["N08", "VentoArena", "arena"]]
 
 
 static func _isento_n06(nivel: String, zona: String, alvo: String) -> bool:
@@ -53,6 +55,15 @@ static func executar() -> Array[String]:
 				and raiz.get_node_or_null("Chefe") == null, "N07: fecha com Guardiao, sem Chefe")
 			_verificar(falhas, _filhos_por_prefixo(raiz, "Check").size() == 5,
 				"N07: cinco checkpoints autorais")
+		elif nome == "N08":
+			_verificar(falhas, raiz.get_node_or_null("Guardiao") != null
+				and raiz.get_node_or_null("Chefe") == null, "N08: fecha com Guardiao, sem Chefe (Combine, nao Boss)")
+			_verificar(falhas, _filhos_por_prefixo(raiz, "Check").size() == 6,
+				"N08: seis checkpoints autorais")
+			_verificar(falhas, raiz.find_children("*", "ZonaPlanar", true, false).is_empty(),
+				"N08: a ZonaPlanar (Process 11) devia ter sido removida -- planar nao e' skill do N08")
+			_verificar(falhas, raiz.find_children("*", "Coletavel", true, false).is_empty(),
+				"N08: nao pode ensinar/dar escalar_paredes (Coletavel encontrado)")
 		else:
 			_verificar(falhas, raiz.get_node_or_null("Chefe") != null,
 				"%s: boss existente preservado" % nome)
@@ -81,6 +92,17 @@ static func executar() -> Array[String]:
 		for zona in zonas07:
 			_verificar(falhas, absf(zona.direcao.y) < 0.001,
 				"N07: %s deve ser horizontal" % zona.name)
+	if raizes.has("N08"):
+		# N08 e' AUTORAL desde 27 set 2026 (COMBINE: vento + salto duplo/Dash/Pogo,
+		# sem chefe, sem ZonaPlanar/planar legacy). Ver `teste_n8_autoral` para o
+		# contrato completo.
+		var zonas08 := _zonas(raizes["N08"])
+		_verificar(falhas, zonas08.size() == 8, "N08: oito zonas de vento")
+		_verificar(falhas, _direcoes_x(zonas08).has(-1.0)
+			and _direcoes_x(zonas08).has(1.0), "N08: rajadas opostas")
+		for zona in zonas08:
+			_verificar(falhas, absf(zona.direcao.y) < 0.001,
+				"N08: %s deve ser horizontal" % zona.name)
 	if raizes.has("N09"):
 		var zonas09 := _zonas(raizes["N09"])
 		_verificar(falhas, zonas09.size() == 3, "N09: três zonas variáveis")
@@ -245,7 +267,7 @@ static func _regiao_coerente() -> Array[String]:
 	var assinatura := {
 		"N06": "horizontal pulsada",   # rajadas horizontais
 		"N07": "ascendente",           # correntes ascendentes
-		"N08": "mista + planar",       # ilhas suspensas + planar
+		"N08": "combinada dirigida",   # vento + salto duplo/Dash/Pogo (Combine)
 		"N09": "variável",             # vento variável + inimigos
 		"N10": "exame + chefe",        # o Guardião comanda o vento
 	}
