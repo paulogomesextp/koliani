@@ -322,6 +322,14 @@ var _pos_roll_t := 0.0
 ## Shadow Cleave, Dash Attack, Perfect Dodge e Shadow Counter. `null` nos niveis normais --
 ## nada disto corre fora do lab. Ver `scripts/lab/combate_lab.gd`.
 var _lab: Node = null
+## CORE COMBAT (opt-in, produção): a mesma logica do Combat Lab, mas lida de
+## `BalanceCombate` (Fase 1) em vez de constantes soltas -- ver
+## `scripts/combate/core_combate.gd`. `null` na campanha; so' a arena de QA de
+## produção (Fase 11) o liga, via `ativar_core_combate()`. Nunca coexiste com
+## `_lab` na prática (o Combat Lab e a arena de produção sao cenas diferentes),
+## mas `_combate_extra()` trata os dois como intermutaveis para nao duplicar
+## os 7 pontos de despacho abaixo.
+var _core: CoreCombate = null
 ## true enquanto corre um golpe do lab: a hitbox normal fica desligada (acerta o proprio lab).
 var lab_golpe_custom := false
 ## Recuperacao extra (s) do golpe normal em curso, so' com o lab (v1.2).
@@ -1582,9 +1590,10 @@ func _physics_process(dt: float) -> void:
 	if Input.is_action_just_pressed("especial"):
 		usar_especial()
 	var lab_consumiu := false
-	if _lab != null:
-		_lab.tick(dt)
-		lab_consumiu = _lab.tratar_input(dt)
+	var _cx := _combate_extra()
+	if _cx != null:
+		_cx.tick(dt)
+		lab_consumiu = _cx.tratar_input(dt)
 	if lab_consumiu:
 		pass
 	elif _pogo_estado == 0 and _pogo_pode_iniciar() and Input.is_action_just_pressed("atacar"):
@@ -1595,7 +1604,7 @@ func _physics_process(dt: float) -> void:
 		if _dash_restante > 0.0:
 			_dash_restante = 0.0
 		if _ataque_restante > 0.0:
-			_combo_pedido = (not _ataque_no_ar) if _lab == null else _lab.ar_pode_encadear()
+			_combo_pedido = (not _ataque_no_ar) if _combate_extra() == null else _combate_extra().ar_pode_encadear()
 		else:
 			_iniciar_ataque()
 	if _ataque_restante > 0.0:
@@ -1748,8 +1757,8 @@ func _physics_process(dt: float) -> void:
 		else:
 			velocity.x = minf(velocity.x, empurrao)
 	# Combat Lab v1.1: durante um golpe o avanco nao leva a Koliani atraves do alvo
-	if _lab != null and _ataque_restante > 0.0:
-		velocity.x = _lab.limitar_x(velocity.x, dt)
+	if _combate_extra() != null and _ataque_restante > 0.0:
+		velocity.x = _combate_extra().limitar_x(velocity.x, dt)
 
 	var vel_queda := _vy()
 	move_and_slide()
@@ -2328,23 +2337,41 @@ func ativar_combat_lab() -> Node:
 	return _lab
 
 
+## Liga o Core Combat de producao a esta Koliani (so' a arena de QA da Fase 11 chama isto;
+## nenhum nivel de campanha o faz). `balance` por omissao carrega o recurso v1 do Combat Lab.
+func ativar_core_combate(balance: BalanceCombate = null) -> CoreCombate:
+	if _core == null:
+		_core = CoreCombate.new()
+		_core.name = "CoreCombate"
+		add_child(_core)
+		_core.iniciar(self, balance if balance != null else BalanceCombate.new())
+	return _core
+
+
+## Os dois componentes (`_lab`/`_core`) expoem a mesma interface e nunca coexistem na pratica
+## (Combat Lab e arena de producao sao cenas diferentes) -- este helper evita duplicar os
+## pontos de despacho abaixo por cada um.
+func _combate_extra() -> Object:
+	return _lab if _lab != null else _core
+
+
 func _iniciar_ataque() -> void:
 	# encadeia o combo se ainda estamos na janela do golpe anterior;
 	# senão volta ao 1.º hit ("Single").
 	_ataque_no_ar = not is_on_floor()
 	_combo_passo = 0 if _ataque_no_ar else (
 		(_combo_passo + 1) % NUM_COMBO if _combo_janela > 0.0 else 0)
-	if _lab != null and _ataque_no_ar:
-		_combo_passo = _lab.ar_passo_seguinte()
+	if _combate_extra() != null and _ataque_no_ar:
+		_combo_passo = _combate_extra().ar_passo_seguinte()
 	# Os rigs com tiras extra apresentam os três golpes; no ar fica um golpe
 	# único e coerente mesmo quando só existe a animação `attack`.
 	var tem_combo := RIG == "cavaleiro" or RIG == "nova" or RIG == "shadowblade"
 	_ataque_dur = DUR_COMBO[_combo_passo] if tem_combo else DUR_ATAQUE
 	_ataque_restante = _ataque_dur
 	_lab_extra_recup = 0.0
-	if _lab != null:
+	if _combate_extra() != null:
 		# Combat Lab v1.2: recuperacao extra (o 4.o golpe) SEM mexer na janela activa
-		_lab_extra_recup = _lab.recup_extra(_combo_passo, _ataque_no_ar)
+		_lab_extra_recup = _combate_extra().recup_extra(_combo_passo, _ataque_no_ar)
 		_ataque_dur += _lab_extra_recup
 		_ataque_restante = _ataque_dur
 	_combo_janela = 0.0 if _ataque_no_ar else _ataque_dur + JANELA_COMBO
@@ -2588,8 +2615,8 @@ func _ao_acertar_corpo(corpo: Node) -> void:
 			crit = true
 		var passo := clampi(_combo_passo, 0, NUM_COMBO - 1)
 		var dano := maxi(1, roundi(_dano_golpe() * float(DANO_COMBO[passo])))
-		if _lab != null:
-			dano = _lab.ao_acertar_normal(corpo, passo, _ataque_no_ar, dano)
+		if _combate_extra() != null:
+			dano = _combate_extra().ao_acertar_normal(corpo, passo, _ataque_no_ar, dano)
 		corpo.receber_dano(dano, sign(_olha_para), crit, float(RECUO_COMBO[passo]))
 		# 3.º golpe: ATORDOA -- é o pagamento por arriscar o golpe lento.
 		if passo == NUM_COMBO - 2 and corpo.has_method("atordoar"):
@@ -2970,8 +2997,8 @@ func _descartar_planar_invalido(dt: float) -> void:
 ## ultimas podem dar Perfect Dodge (ver `CombateLab.tentativa_de_dano`).
 func receber_dano(quantidade: int, dir_empurrao: float = 0.0, origem := "") -> void:
 	if _invulneravel > 0.0:
-		if _lab != null:
-			_lab.tentativa_de_dano(quantidade, origem)
+		if _combate_extra() != null:
+			_combate_extra().tentativa_de_dano(quantidade, origem)
 		return
 	if _defendendo and _bloqueia(dir_empurrao):
 		_ao_bloquear()

@@ -115,6 +115,7 @@ func _correr_tudo() -> void:
 	await teste_combat_lab_pd_real()
 	await teste_combat_lab_pd_contrato()
 	teste_contrato_dano_producao()
+	await teste_core_combate_producao()
 	await teste_combat_lab_clamp()
 	await teste_combat_lab_antispam()
 	await teste_combat_lab_balanco()
@@ -6284,6 +6285,7 @@ func teste_combat_lab() -> void:
 	# --- 0. isolamento: uma Koliani normal nao tem lab; os niveis nao referenciam o lab
 	var k0 := (load("res://scenes/actors/Koliani.tscn") as PackedScene).instantiate()
 	_ok(k0._lab == null and not k0.lab_golpe_custom, "lab: a Koliani de producao nao tem lab")
+	_ok(k0._core == null and k0._combate_extra() == null, "core combat: a Koliani de producao nao tem core combate por omissao")
 	k0.free()
 	for cena in ["res://scenes/levels/Floresta_Putrefata.tscn", "res://scenes/levels/Prisao_dos_Condenados.tscn",
 			"res://scenes/Main.tscn"]:
@@ -6904,6 +6906,71 @@ func teste_contrato_dano_producao() -> void:
 		"contrato de dano: chefe_base (contacto de corpo) devia marcar contato")
 	_ok(FileAccess.get_file_as_string("res://scripts/zona_sem_ar.gd").count("OrigemDano.AMBIENTE") >= 1,
 		"contrato de dano: zona_sem_ar (DoT) devia marcar ambiente, nunca esquivavel")
+
+
+## Fases 2/3/4/6 -- CoreCombate ligado a uma Koliani de PRODUCAO real (nao ao Combat Lab).
+## Prova funcional (nao so' "nao regride"): Launcher dispara com CIMA+ATAQUE e Perfect Dodge
+## dispara com origem OrigemDano.ATAQUE, exactamente como no Combat Lab -- mas fora dele, com
+## `ativar_core_combate()` em vez de `ativar_combat_lab()`. Opt-in: nenhum nivel de campanha
+## chama isto (ver o isolamento verificado em `teste_combat_lab` acima).
+func teste_core_combate_producao() -> void:
+	var antes_hab: Array = EstadoJogo.habilidades.duplicate()
+	EstadoJogo.habilidades.assign(["dash", "pogo", "salto_duplo", "especial", "projetil"])
+	var m := LabMetricas.new()
+	add_child(m)
+	var chao := (load("res://scenes/actors/Plataforma.tscn") as PackedScene).instantiate()
+	chao.position = Vector2(1300.0, 730.0)
+	chao.tamanho = Vector2(2600.0, 60.0)
+	add_child(chao)
+	var k := (load("res://scenes/actors/Koliani.tscn") as PackedScene).instantiate() as Koliani
+	k.position = Vector2(400.0, 630.0)
+	k.usar_prototipo_premium = true
+	k.usar_golden_set = true
+	add_child(k)
+	for i in 90:
+		await get_tree().physics_frame
+		if k.is_on_floor():
+			break
+	_ok(k.is_on_floor(), "core combat: a Koliani de producao chegou ao chao da arena de teste")
+	_ok(k._lab == null, "core combat: sem lab -- isolamento do Combat Lab mantido")
+	var core := k.ativar_core_combate()
+	_ok(core == k.ativar_core_combate(), "core combat: ativar_core_combate e' idempotente")
+	_ok(k._combate_extra() == core, "core combat: _combate_extra devolve o core quando nao ha' lab")
+
+	var g := (load("res://scenes/lab/LabGoblin.tscn") as PackedScene).instantiate() as LabInimigo
+	g.position = Vector2(k.global_position.x + 70.0, k.global_position.y)
+	g.lab_arena_x = Vector2(60.0, 2600.0 - 60.0)
+	add_child(g)
+	for i in 6:
+		await get_tree().physics_frame
+
+	# Launcher: CIMA + ATAQUE no chao (decisao fechada do GD: o BOTAO usado determina a accao;
+	# CIMA + tiro continua a mirar -- nao ha' atalho novo nem conflito de accao).
+	Input.action_press("mirar_cima")
+	await _lab_tap("atacar", 3)
+	Input.action_release("mirar_cima")
+	await _lab_esperar(4)
+	_ok(core.log_ultimos.has("LAUNCHER"), "core combat: Launcher disparou em producao com CIMA+ATAQUE")
+	await _lab_esperar(50)
+
+	# Perfect Dodge: so' com origem ATAQUE/HAZARD_ATAQUE, dentro da janela do roll (contrato Fase 5).
+	await _lab_tap("rolar", 3)
+	await _lab_esperar(3)
+	k.receber_dano(8, 1.0, OrigemDano.ATAQUE)
+	_ok(m.contar("perfect_dodge") == 1, "core combat: Perfect Dodge disparou em producao com origem ATAQUE")
+	k.receber_dano(8, 1.0, OrigemDano.CONTATO)
+	_ok(m.contar("perfect_dodge") == 1, "core combat: origem CONTATO nao pode dar PD em producao (contagem nao subiu)")
+
+	Input.action_release("atacar")
+	Input.action_release("mirar_cima")
+	Input.action_release("rolar")
+	g.queue_free()
+	k.queue_free()
+	chao.queue_free()
+	m.queue_free()
+	await get_tree().process_frame
+	await get_tree().process_frame
+	EstadoJogo.habilidades.assign(antes_hab)
 
 
 ## Atravessamento: o avanco dos golpes nao leva a Koliani ao outro lado do alvo (goblin pequeno e golem grande).
