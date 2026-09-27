@@ -1,3 +1,72 @@
+# >>> N8 AUTORAL -- "Desfiladeiro dos Ventos", COMBINE (27 set 2026, commit local `59a023a9`, sem push) <<<
+Estrutura regional: N6=Teach, N7=Develop/Test, **N08=Combine**, N9=Challenge,
+N10=Boss/Exame. Ver `docs/nivel_autoral_n8.md` para o mapa completo. Cena
+`scenes/levels/Corredor_das_Execucoes.tscn` (nome de ficheiro legacy
+mantido).
+
+**Feito**: reconstruído do zero como nível AUTORAL (`corredor = false`,
+`checkpoints_autorais`), sem jornada procedural. 6 secções A-F (reentrada
+sem risco -> vento contra contínuo + salto duplo -> vento contra contínuo +
+Dash com `DashApoio` -> bifurcação segura/rápida com recompensa -> vento
+pulsado + inimigo simples + Pogo authored opcional -> mini-exame que
+combina tudo, sem boss). 6 checkpoints, nenhum dentro de vento perigoso
+(`VentoArena` é exceção documentada, como no N6/N7). 8 `WindZone`. Fecha
+com um Guardião (`elemental_do_vento`, `DemonioBase`, vida 210, elite, NÃO
+boss -- sela a porta, não grava boss derrotado).
+
+**AUDITORIA DO LEGACY ("Process 11" -- Ilhas Suspensas)**: a cena anterior
+tinha uma `ZonaPlanar` (planar CONTEXTUAL, só ali) e um `Chefe`
+(`ChefeDamaGuilhotina`, "Feiticeira dos Ventos"). Ambos **removidos**: o
+planar não está na lista de combinações pedida pelo Paulo
+(vento/dash/salto-duplo/pogo/especial) e o briefing pediu para não
+introduzir nenhuma skill principal nova no N8 (o planar permanente
+continua a abrir só no N63, mecânica de `Movimento.gd` intocada); o
+`Chefe` tinha um piso de vida cozido no script (`vida = maxi(vida, 490)`)
+que competiria com o boss do N10 depois da escala regional -- o MESMO
+raciocínio que o N07 já tinha aplicado ao `ChefeIgnivar`. Não havia
+`Coletavel` `escalar_paredes` nem conteúdo temático de Prisão/Fornalha na
+cena legacy (já tinha sido adaptada a "ilhas suspensas" numa execução
+anterior).
+
+**Testes**: `teste_n8_autoral` novo (estrutura, 8 zonas, geometria,
+Guardião≠Chefe, 6 checkpoints, sem `ZonaPlanar`/`Coletavel`). O teste
+dedicado antigo `tests/test_region02_n08_level.gd` (contrato do "Process
+11") foi **removido** -- mesmo padrão de quando N06/N07 passaram a
+autorais (não há `test_region02_n06/n07_level.gd`). `tests/test_
+region02_wind_levels.gd` atualizado: N08 entra em `CENAS` (8 zonas,
+6 checkpoints, Guardião), isenção de `VentoArena` alargada, assinatura da
+região passa a "combinada dirigida" (distinta das outras quatro).
+
+**Suite completa**: corrida via `tools/correr_testes.ps1` (isolamento de
+save) -- **1 falha**, `Coracao: o Especial devia ajudar sem resolver a
+luta (20.0 vs 39.5)` (`teste_9h_chefes_regiao1_mais_faceis`), sobre o
+boss do N5 (Coração Putrefacto), **não tocado nesta execução**. Confirmado
+**flake pré-existente**: isolado sozinho via `SO_TESTE=teste_9h_chefes_
+regiao1_mais_faceis python tools/godot_isolado.py -- --headless --path .
+res://tests/run_tests.tscn` dá **0 falhas** -- é o mesmo flake já
+documentado na sessão do N7 (limiar exato da razão 0.55, sensível a ruído
+do bot). `teste_n7_autoral` corrido isolado depois desta execução: 0
+falhas, N7 intacto. `teste_n8_autoral` isolado: 0 falhas. Save real
+intacto em todas as corridas (SHA256 confirmado pelo `godot_isolado.py`).
+
+**Build**: `build/windows/Koliani.exe` reexportado (preset "Windows
+Desktop") do HEAD `59a023a9`; lançado com `-- --nivel=8 --devmode` para o
+Paulo testar toque/performance reais e a curva A-F.
+
+**Não feito, por instrução**: N9 não começado; Combat Core novo não
+tocado/ligado; N7 não alterado; física F1 não alterada; Energia não
+rebalanceada; nenhum boss alterado (nem o `ChefeDamaGuilhotina`, só
+deixou de ser usado no N8); sem arte final; **sem push** (só commits
+locais). Resíduo não tocado: `tools/verifica_rota_n08.gd` ainda descreve a
+rota do N08 legacy -- ferramenta avulsa, fora da suite, fica para limpeza
+futura.
+
+**Próximo passo**: playtest humano do GM no N8 (duração real alvo 4-6 min,
+se a rota rápida da secção D compensa o risco, legibilidade do Pogo
+opcional, TTK do Guardião). Só depois, N9.
+
+---
+
 # >>> N7 AUTORAL -- "The Rising Gorge" (27 set 2026, commits locais, sem push) <<<
 Estrutura regional aprovada: N6=Teach, **N07=Develop/Test**, N08=Combine,
 N09=Challenge, N10=Boss/Exame. Ver `docs/nivel_autoral_n7.md` para o mapa
