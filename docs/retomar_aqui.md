@@ -1,43 +1,79 @@
-# >>> CONTROLLED COMBAT INTEGRATION -- Fases 0/1/5 feitas (27 set 2026) <<<
+# >>> CONTROLLED COMBAT INTEGRATION -- Fases 0-6 feitas + workflow (27 set 2026) <<<
 Execucao "KOLIANI -- CONTROLLED COMBAT INTEGRATION" do Paulo. Plano em
-`docs/plano_integracao_combate_producao.md` (commit `7a8e7b84`). Feito e
-commitado: Fase 0 (preflight, sem achados), Fase 1 -- `scripts/combate/balance_combate.gd`
-(`BalanceCombate`, Resource com os numeros do Combat Lab v1.2; nada o le
-ainda, `combate_lab.gd` continua congelado) -- commit `5c617f3e`, e Fase 5 --
-`scripts/combate/origem_dano.gd` (`OrigemDano`: CONTATO/ATAQUE/HAZARD_ATAQUE/AMBIENTE)
-migrado para os 20 call-sites mapeados no plano (§3) -- commit `4c779bc7` +
-`2b8599d5` (fix dos `.uid` em falta). **Em producao isto ainda nao muda
-comportamento nenhum**: `Koliani.receber_dano` so chama `_lab.tentativa_de_dano`
-quando `_lab != null`, e `_lab` so existe dentro do Combat Lab.
+`docs/plano_integracao_combate_producao.md` (commit `7a8e7b84`).
 
-**ACHADO IMPORTANTE (nao e' regressao, e' armadilha de processo)**: ao
-acrescentar um script novo com `class_name` (como `OrigemDano`/`BalanceCombate`),
-correr a suite ANTES de `--headless --import` da' um falso positivo de
-regressao grave -- `chefe_base.gd` falha a compilar em silencio e arrasta
-consigo TODOS os chefes que dele herdam, com o sintoma enganador
-`SCRIPT ERROR: Invalid call. Nonexistent function '_process'`. Medido: baseline
-sem os ficheiros = 0 falhas; com os ficheiros sem reimportar = **79 falhas**;
-com os ficheiros + `--headless --import` = 0 falhas outra vez. Qualquer
-commit futuro que acrescente um `class_name` novo tem de correr
-`--headless --import` antes de correr a suite, ou perde-se tempo a
-investigar uma "regressao" que nao existe.
+**GODOT CLASS CACHE INCIDENT (resolvido)**: ao acrescentar um script novo com
+`class_name` (`OrigemDano`/`BalanceCombate`/`CoreCombate`), correr a suite
+ANTES de `--headless --import` da' um falso positivo de regressao grave --
+`chefe_base.gd` falha a compilar em silencio e arrasta consigo TODOS os
+chefes que dele herdam, com o sintoma enganador `SCRIPT ERROR: Invalid call.
+Nonexistent function '_process'`. Medido: baseline sem os ficheiros = 0
+falhas; com os ficheiros sem reimportar = **79 falhas**; com os ficheiros +
+`--headless --import` = 0 falhas outra vez. **CORRIGIDO NO WORKFLOW**:
+`tools/correr_testes.ps1` agora corre sempre `--headless --import` antes da
+suite (commit `b81887b3`), incondicional e idempotente -- nao depende de
+ninguem se lembrar. Nota espelhada no `CLAUDE.md`. Nao repetir esta
+investigacao.
 
-**ACHADO OPERACIONAL**: durante esta execucao houve sinais fortes de
-**outra sessao a trabalhar no mesmo worktree ao mesmo tempo** (chegou aos
-commits `5c617f3e`/`4c779bc7` em paralelo, com a mesma analise; um stash
-meu desapareceu sozinho da lista partilhada). Desta vez o trabalho calhou
-redundante, nao contraditorio -- mas para as Fases 2-13 (que mexem em
-`koliani.gd`, 3147 linhas, e nos inimigos-piloto) uma colisao a serio e'
-mais provavel. Confirmar com o Paulo se ha duas sessoes abertas antes de
-continuar.
+**Feito e commitado**:
+- Fase 0 (preflight, sem achados).
+- Fase 1 -- `scripts/combate/balance_combate.gd` (`BalanceCombate`, Resource
+  com os numeros do Combat Lab v1.2) -- commit `5c617f3e`.
+- Fase 5 -- `scripts/combate/origem_dano.gd` (`OrigemDano`:
+  CONTATO/ATAQUE/HAZARD_ATAQUE/AMBIENTE) migrado para os 20 call-sites
+  mapeados no plano (§3) -- commit `4c779bc7` + `2b8599d5` (fix `.uid`).
+- Workflow -- `correr_testes.ps1` reimporta sempre -- commit `b81887b3`.
+- Fases 2/3/4/6 -- `scripts/combate/core_combate.gd` (`CoreCombate`): a
+  mesma logica validada do Combat Lab (`combate_lab.gd`, congelado, nao
+  tocado), mas lida de `BalanceCombate`/`OrigemDano` em vez de constantes
+  soltas. Landed num commit so (as 6 mecanicas partilham uma maquina de
+  estados so no Lab original; separar duplicaria a mesma fonte de verdade
+  quatro vezes). Wiring em `koliani.gd`: `_core` + `ativar_core_combate()`
+  (espelha `ativar_combat_lab()`), os 7 pontos de despacho que liam `_lab`
+  passam por `_combate_extra()` (`_lab` se existir, senao `_core`; nunca
+  coexistem na pratica). **Prova funcional** (nao so' "nao regride"):
+  `teste_core_combate_producao` instancia `Koliani.tscn` de PRODUCAO (fora
+  do Combat Lab), liga `ativar_core_combate()`, confirma Launcher a
+  disparar com CIMA+ATAQUE e Perfect Dodge a disparar com origem
+  `OrigemDano.ATAQUE` (nao com CONTATO) -- commit `601f1e30`. `CLEAVE FINAL
+  ART DEBT` e `PERFECT DODGE VFX DEBT` marcados no ficheiro. **Em campanha
+  isto ainda nao muda comportamento nenhum**: nenhum nivel chama
+  `ativar_core_combate()`, so a arena de QA da Fase 11 o fara.
 
-**Por fazer** (Fases 2-13 da execucao, nao comecadas): Launcher + Air
-Combo, Shadow Cleave, Dash Attack + clamp, Perfect Dodge + Counter em
-producao (tudo atras de gates seguros), Enemy Combat Contract v1, piloto
-Goblin (Regiao I), piloto Golem (N6), instrumentacao de Energia, arena de
-QA de producao, regressao total dedicada, e este proprio par de docs por
-fechar com o relatorio final (`docs/combat_production_integration_report.md`
-ainda nao existe). Sem push. N7 nao comecado. Regiao II nao tocada.
+Suite completa confirmada PASS varias vezes ao longo desta execucao
+(0 falhas, save real intacto). Sem push. N7 nao comecado. Regiao II nao
+tocada.
+
+**ACHADO OPERACIONAL (historico, ja resolvido)**: no inicio desta execucao
+houve sinais de outra sessao a trabalhar no mesmo worktree ao mesmo tempo
+(chegou aos commits `5c617f3e`/`4c779bc7` em paralelo). Calhou redundante,
+nao contraditorio. Nao se repetiu durante as Fases 2-6.
+
+**Por fazer** (Fases 7-13, nao comecadas):
+- Fase 7 -- Enemy Combat Contract v1. `CoreCombate` ja degrada bem sem ele
+  (`has_method("lab_hit")` -> combate estruturado; senao -> `receber_dano`
+  generico). O contrato de referencia ja existe no Lab (`scripts/lab/lab_inimigo.gd`,
+  `lab_hit`/`hurtbox`/peso leve-pesado/guarda/juggle) -- e' bastante mais
+  elaborado do que uma interface fina (estados de juggle, imunidade a
+  lancamento, guarda com custo por golpe). Extrapolar isto para
+  `DemonioBase` (classe partilhada por TODOS os inimigos comuns do jogo,
+  nao so' o Goblin) com seguranca real precisa de: exports novos com
+  defaults inertes (`piloto_combate_v1 := false`, `peso := "leve"`,
+  `pode_ser_lancado := true`), e um `lab_hit()`/`hurtbox()` cuja rama
+  "nao-piloto" seja um passthrough 1:1 para o `receber_dano()` existente
+  (para nao mudar `has_method("lab_hit")` em ~100 niveis de forma
+  observavel). Desenhado mas nao escrito nesta sessao -- ver conversa,
+  nao ha rascunho em ficheiro.
+- Fase 8 -- Goblin piloto: `GoblinAprendiz` em `scenes/levels/Floresta_Putrefata.tscn`
+  (`DemonioBase` com `especie = "goblin"`; nao ha' `scripts/goblin.gd`
+  dedicado). Ligar `piloto_combate_v1 = true` so' nessa instancia.
+- Fase 9 -- Golem piloto (N6, `Ceu_em_Guerra.tscn` ou o nivel do Golem das
+  Falesias -- confirmar qual).
+- Fase 10 -- instrumentacao de Energia (metricas, sem rebalancear).
+- Fase 11 -- arena de QA de producao (Koliani real + os dois pilotos).
+- Fase 12 -- regressao total dedicada (para alem da suite normal).
+- Fase 13 -- `docs/combat_production_integration_report.md` (ainda nao
+  existe) + fechar este par de docs com o relatorio final.
 
 ---
 
