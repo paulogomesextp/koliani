@@ -127,6 +127,7 @@ func _correr_tudo() -> void:
 	await teste_golem_piloto_comportamento()
 	await teste_golem_piloto_ttk()
 	await teste_energy_instrumentation()
+	await teste_qa_arena_producao()
 	await teste_combat_lab_clamp()
 	await teste_combat_lab_antispam()
 	await teste_combat_lab_balanco()
@@ -7618,6 +7619,59 @@ func teste_energy_instrumentation() -> void:
 	_ok(float(relatorio["combo_intencional"]["energia_final"]) > 0.0, "energy: combo intencional gera Energia mensuravel")
 	EstadoJogo.habilidades.assign(antes_hab)
 	EstadoJogo.modo_dev = antes_dev
+
+
+## Fase 11 -- PRODUCTION COMBAT QA ARENA. Prova que a arena usa a Koliani REAL (nao uma copia),
+## liga o Core Combat, e os dois pilotos nascidos pela arena tem EXACTAMENTE a mesma configuracao
+## das instancias reais de producao (Fases 8/9) -- nao e' uma reconstrucao aproximada.
+func teste_qa_arena_producao() -> void:
+	var cena := (load("res://scenes/qa/ProductionCombatArena.tscn") as PackedScene).instantiate()
+	add_child(cena)
+	for i in 4:
+		await get_tree().physics_frame
+	_ok(cena.koliani is Koliani, "arena QA: a Koliani e' a cena de producao real")
+	_ok(cena.koliani._lab == null, "arena QA: nao usa o Combat Lab -- so' o Core Combat")
+	_ok(cena.core is CoreCombate, "arena QA: ativou o Core Combat")
+	_ok(cena.koliani._combate_extra() == cena.core, "arena QA: _combate_extra devolve o core da arena")
+	# nasce logo com um Goblin (ver _ready) -- confirmar a configuracao IDENTICA a Floresta_Putrefata.tscn
+	var goblins := 0
+	for e in get_tree().get_nodes_in_group("inimigos"):
+		if e is DemonioBase and (e as DemonioBase).especie == "goblin":
+			goblins += 1
+			var d := e as DemonioBase
+			_ok(d.piloto_combate_v1 and d.peso == "leve" and d.pode_ser_lancado and d.comportamento == "carga",
+				"arena QA: o Goblin nascido tem a config identica ao GoblinAprendiz de producao")
+	_ok(goblins >= 1, "arena QA: nasce com um Goblin a partida")
+	# 2 -> golem
+	cena.spawn_golem()
+	await get_tree().physics_frame
+	var golems := 0
+	# `_ready()` escala vida pela curva de dificuldade (`EstadoJogo.indice_nivel`, N6=5); a arena
+	# fixa o indice antes de instanciar (ver production_combat_arena.gd) para nascer EXACTAMENTE
+	# como em producao -- a mesma formula, aqui, so' para o "165" base virar o valor certo em N6.
+	var f_n6 := float(clampi(5, 0, 29)) / 29.0
+	var vida_esperada_n6 := maxi(1, int(round(165.0 * (0.8 + 0.6 * f_n6))))
+	for e in get_tree().get_nodes_in_group("inimigos"):
+		if e is DemonioBase and (e as DemonioBase).especie == "golem_aereo":
+			golems += 1
+			var d := e as DemonioBase
+			_ok(d.piloto_combate_v1 and d.peso == "pesado" and not d.pode_ser_lancado and d.tem_guarda_v1,
+				"arena QA: o Golem nascido tem a config identica ao EliteGolem de producao")
+			_ok(d.vida == vida_esperada_n6,
+				"arena QA: o Golem nascido escala a vida pela dificuldade de N6 (esperado %d, foi %d)"
+					% [vida_esperada_n6, d.vida])
+	_ok(golems >= 1, "arena QA: spawn_golem() funciona")
+	# reset limpa os inimigos e devolve a Koliani ao ponto de partida com Energia cheia
+	cena.limpar()
+	await get_tree().physics_frame
+	var restantes := 0
+	for e in get_tree().get_nodes_in_group("inimigos"):
+		if is_instance_valid(e) and e != cena.koliani:
+			restantes += 1
+	_ok(restantes == 0, "arena QA: limpar() remove os pilotos nascidos")
+	cena.queue_free()
+	await get_tree().process_frame
+	await get_tree().process_frame
 
 
 ## Atravessamento: o avanco dos golpes nao leva a Koliani ao outro lado do alvo (goblin pequeno e golem grande).
