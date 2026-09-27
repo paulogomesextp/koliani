@@ -126,6 +126,7 @@ func _correr_tudo() -> void:
 	await teste_golem_piloto_estrutura()
 	await teste_golem_piloto_comportamento()
 	await teste_golem_piloto_ttk()
+	await teste_energy_instrumentation()
 	await teste_combat_lab_clamp()
 	await teste_combat_lab_antispam()
 	await teste_combat_lab_balanco()
@@ -7450,6 +7451,173 @@ func teste_golem_piloto_ttk() -> void:
 	_ok(float(resultado["cleave_repetido"]["ttk"]) < float(resultado["spam_frontal"]["ttk"]) or bool(resultado["cleave_repetido"]["morreu"]),
 		"golem piloto: Cleave (quebra guarda) tem de ser mais eficiente que o spam frontal guardado")
 	EstadoJogo.habilidades.assign(antes_hab)
+
+
+## Fase 10 -- ENERGY INSTRUMENTATION. So' MEDE (janelas de 10s por cenario contra um alvo durao'vel);
+## NAO mexe em REGEN_ENERGIA, ESPECIAL_CUSTO nem nos ganhos actuais. "especiais" conta quantas vezes
+## `usar_especial()` disparou de verdade dentro da janela (o jogador gasta assim que pode pagar --
+## e' a leitura mais realista, inclui a pausa de regen do proprio Especial). Se algum numero for
+## absurdo, o teste so' o REGISTA (print) -- nao falha a suite por isso (nao e' um "bug", e' um
+## achado de balance para o GM decidir, como o plano pede).
+func teste_energy_instrumentation() -> void:
+	var antes_hab: Array = EstadoJogo.habilidades.duplicate()
+	var antes_dev: bool = EstadoJogo.modo_dev
+	EstadoJogo.habilidades.assign(["dash", "pogo", "salto_duplo", "especial", "projetil"])
+	# INVENCIVEL: o cenario "pd_counter" da' dano de contacto REAL de propósito (o bote do
+	# LabGoblin) para poder medir a Energia do Perfect Dodge -- sem isto, hits repetidos podiam
+	# matar a Koliani e `_morrer()` chama `Transicao.fechar_e(get_tree().reload_current_scene)`,
+	# que recarrega A CENA INTEIRA da suite a meio do teste (corrompe todos os testes seguintes).
+	EstadoJogo.modo_dev = true
+	var janela := 10.0
+	var dt := 1.0 / 60.0
+	var relatorio := {}
+
+	# baseline: regen passiva pura, sem input nenhum
+	var k0 := (load("res://scenes/actors/Koliani.tscn") as PackedScene).instantiate() as Koliani
+	add_child(k0)
+	await get_tree().physics_frame
+	var especiais0 := 0
+	var t0_especial := -1.0
+	var t := 0.0
+	while t < janela:
+		if k0.energia_actual() >= Koliani.ESPECIAL_CUSTO and k0.usar_especial():
+			especiais0 += 1
+			if t0_especial < 0.0:
+				t0_especial = t
+		await get_tree().physics_frame
+		t += dt
+	relatorio["passiva_regen"] = {"energia_final": snappedf(k0.energia_actual(), 0.1),
+		"especiais": especiais0, "1o_especial_em": snappedf(t0_especial, 0.1) if t0_especial >= 0.0 else -1.0}
+	k0.queue_free()
+	await get_tree().process_frame
+
+	for cenario in ["spam_basico", "combo_intencional", "launcher_air", "pogo", "pd_counter", "mistura_realista"]:
+		var chao := (load("res://scenes/actors/Plataforma.tscn") as PackedScene).instantiate()
+		chao.position = Vector2(1300.0, 730.0)
+		chao.tamanho = Vector2(2600.0, 60.0)
+		add_child(chao)
+		var k := (load("res://scenes/actors/Koliani.tscn") as PackedScene).instantiate() as Koliani
+		k.position = Vector2(400.0, 630.0)
+		k.usar_prototipo_premium = true
+		k.usar_golden_set = true
+		add_child(k)
+		for i in 90:
+			await get_tree().physics_frame
+			if k.is_on_floor():
+				break
+		k.ativar_core_combate()
+		k._olha_para = 1.0
+		var g := (load("res://scenes/lab/LabGoblin.tscn") as PackedScene).instantiate() as LabInimigo
+		g.vida = 999999
+		g.set_physics_process(false)   # alvo estatico e duravel -- so' se mede a Energia da Koliani
+		g.global_position = k.global_position + Vector2(70.0, 0.0)
+		add_child(g)
+		await get_tree().physics_frame
+
+		var especiais := 0
+		var t1_especial := -1.0
+		t = 0.0
+		while t < janela:
+			if k.energia_actual() >= Koliani.ESPECIAL_CUSTO and k.usar_especial():
+				especiais += 1
+				if t1_especial < 0.0:
+					t1_especial = t
+			match cenario:
+				"spam_basico":
+					Input.action_press("atacar")
+					await get_tree().physics_frame; t += dt
+					Input.action_release("atacar")
+					for i in 8:
+						await get_tree().physics_frame
+						t += dt
+				"combo_intencional":
+					for i in 4:
+						Input.action_press("atacar")
+						for j in 3:
+							await get_tree().physics_frame
+							t += dt
+						Input.action_release("atacar")
+						for j in 10:
+							await get_tree().physics_frame
+							t += dt
+					for j in 15:
+						await get_tree().physics_frame
+						t += dt
+				"launcher_air":
+					Input.action_press("mirar_cima")
+					await _lab_tap("atacar", 3)
+					Input.action_release("mirar_cima")
+					for i in 6:
+						await get_tree().physics_frame
+						t += dt
+					if not k.is_on_floor():
+						await _lab_tap("atacar", 3)
+					for i in 40:
+						await get_tree().physics_frame
+						t += dt
+						if k.is_on_floor():
+							break
+				"pogo":
+					if EstadoJogo.tem_habilidade("pogo"):
+						Input.action_press("mirar_baixo")
+					await get_tree().physics_frame; t += dt
+					for i in 20:
+						await get_tree().physics_frame
+						t += dt
+					Input.action_release("mirar_baixo")
+				"pd_counter":
+					await _lab_tap("rolar", 3)
+					await _lab_esperar(3)
+					t += 6.0 * dt
+					g._ao_tocar(k)   # bote generico do goblin do lab (ja' e' origem "ataque")
+					for i in 6:
+						await get_tree().physics_frame
+						t += dt
+					if k._combate_extra() != null and k._combate_extra().janela_counter() > 0.0:
+						await _lab_tap("atacar", 3)
+					for i in 25:
+						await get_tree().physics_frame
+						t += dt
+				"mistura_realista":
+					# spam curto -> combo -> launcher -> pausa (o "jogador medio" real)
+					Input.action_press("atacar")
+					for i in 3:
+						await get_tree().physics_frame
+						t += dt
+					Input.action_release("atacar")
+					for i in 10:
+						await get_tree().physics_frame
+						t += dt
+					Input.action_press("mirar_cima")
+					await _lab_tap("atacar", 3)
+					Input.action_release("mirar_cima")
+					for i in 15:
+						await get_tree().physics_frame
+						t += dt
+		Input.action_release("atacar")
+		Input.action_release("mirar_cima")
+		Input.action_release("mirar_baixo")
+		Input.action_release("rolar")
+		relatorio[cenario] = {"energia_final": snappedf(k.energia_actual(), 0.1), "especiais": especiais,
+			"1o_especial_em": snappedf(t1_especial, 0.1) if t1_especial >= 0.0 else -1.0}
+		if is_instance_valid(g):
+			g.queue_free()
+		if is_instance_valid(k):
+			k.queue_free()
+		chao.queue_free()
+		await get_tree().process_frame
+		await get_tree().process_frame
+	print("ENERGY instrumentation (janelas de %.0fs, ESPECIAL_CUSTO=%.0f, REGEN_ENERGIA=%.0f/s): " % [janela, Koliani.ESPECIAL_CUSTO, Koliani.REGEN_ENERGIA], relatorio)
+	# Especiais/min estimados (extrapolacao linear da janela de 10s -- so' leitura, nao regra):
+	var por_min := {}
+	for cenario in relatorio.keys():
+		por_min[cenario] = snappedf(float(relatorio[cenario]["especiais"]) * (60.0 / janela), 0.1)
+	print("ENERGY especiais/min estimados (fraco~spam_basico, medio~combo_intencional/pogo, eficiente~mistura_realista/pd_counter): ", por_min)
+	# Nao falha a suite por numeros de balance -- so' prova que a instrumentacao MEDE algo real
+	# (a Koliani ganhou Energia nalgum cenario de combate, para alem da regen passiva a zeros).
+	_ok(float(relatorio["combo_intencional"]["energia_final"]) > 0.0, "energy: combo intencional gera Energia mensuravel")
+	EstadoJogo.habilidades.assign(antes_hab)
+	EstadoJogo.modo_dev = antes_dev
 
 
 ## Atravessamento: o avanco dos golpes nao leva a Koliani ao outro lado do alvo (goblin pequeno e golem grande).
