@@ -123,6 +123,9 @@ func _correr_tudo() -> void:
 	await teste_goblin_piloto_isolamento()
 	await teste_goblin_piloto_comportamento()
 	await teste_goblin_piloto_ttk()
+	await teste_golem_piloto_estrutura()
+	await teste_golem_piloto_comportamento()
+	await teste_golem_piloto_ttk()
 	await teste_combat_lab_clamp()
 	await teste_combat_lab_antispam()
 	await teste_combat_lab_balanco()
@@ -7113,13 +7116,15 @@ func teste_goblin_piloto_isolamento() -> void:
 		"res://scenes/levels/Pantano_dos_Sussurros.tscn",
 		"res://scenes/levels/Ninho_da_Viuva_Negra.tscn",
 		"res://scenes/levels/A_Arvore_que_Chora.tscn",
+		"res://scenes/levels/Prisao_dos_Condenados.tscn",   # tem o Golem piloto (Fase 9); o resto tem de continuar legacy
 	]
+	var pilotos_conhecidos := ["GoblinAprendiz", "EliteGolem"]
 	for caminho: String in amostras:
 		var nivel := (load(caminho) as PackedScene).instantiate()
 		for filho in nivel.get_children():
-			if filho is DemonioBase and filho.name != "GoblinAprendiz":
+			if filho is DemonioBase and not (filho.name in pilotos_conhecidos):
 				_ok(not (filho as DemonioBase).piloto_combate_v1,
-					"goblin piloto: %s/%s nao devia ter o contrato ligado" % [caminho.get_file(), filho.name])
+					"pilotos: %s/%s nao devia ter o contrato ligado" % [caminho.get_file(), filho.name])
 		nivel.queue_free()
 		await get_tree().process_frame
 
@@ -7260,6 +7265,190 @@ func teste_goblin_piloto_ttk() -> void:
 	print("GOBLIN PILOTO ttk: ", resultado)
 	_ok(bool(resultado["spam"]["morreu"]), "goblin piloto: o goblin morre a spam dentro do limite de tempo")
 	_ok(bool(resultado["combo"]["morreu"]), "goblin piloto: o goblin morre a combo intencional dentro do limite de tempo")
+	EstadoJogo.habilidades.assign(antes_hab)
+
+
+## Fase 9 -- Golem piloto do N6 (EliteGolem, Prisao_dos_Condenados.tscn). NAO e' o
+## Guardiao/chefe do nivel (esse e' ChefeCarcereiro, fora de escopo desta fase) --
+## e' o elite comum (DemonioBase, especie golem_aereo) que ja patrulha por ali.
+func teste_golem_piloto_estrutura() -> void:
+	var nivel := (load("res://scenes/levels/Prisao_dos_Condenados.tscn") as PackedScene).instantiate()
+	var g := nivel.get_node_or_null("EliteGolem") as DemonioBase
+	_ok(g != null, "golem piloto: EliteGolem existe em Prisao_dos_Condenados.tscn")
+	if g != null:
+		_ok(g.piloto_combate_v1, "golem piloto: piloto_combate_v1 ligado so' nesta instancia")
+		_ok(g.peso == "pesado", "golem piloto: peso pesado")
+		_ok(not g.pode_ser_lancado, "golem piloto: nao lancavel")
+		_ok(g.tem_guarda_v1 and g.guarda_max_v1 > 0.0, "golem piloto: tem guarda/postura")
+		_ok(g.comportamento == "carga", "golem piloto: ja tinha um ataque telegrafado (carga) -- reaproveitado, nao inventado")
+	nivel.queue_free()
+	await get_tree().process_frame
+
+
+## Comportamento funcional do Golem piloto: guarda absorve golpes normais pela frente, Cleave/Counter
+## quebram-na, a JANELA DE EXPOSICAO (a meio/logo apos o proprio ataque) desliga a guarda, Launcher
+## nunca lanca (pesado), o bote da' PD (origem ATAQUE) e o contacto comum nao, e guard_break repetido
+## nao entra em loop (fica so' a 0, nunca "quebra" outra vez do nada).
+func teste_golem_piloto_comportamento() -> void:
+	var antes_hab: Array = EstadoJogo.habilidades.duplicate()
+	EstadoJogo.habilidades.assign(["dash", "pogo", "salto_duplo", "especial", "projetil"])
+	var m := LabMetricas.new()
+	add_child(m)
+	var chao := (load("res://scenes/actors/Plataforma.tscn") as PackedScene).instantiate()
+	chao.position = Vector2(1300.0, 730.0)
+	chao.tamanho = Vector2(2600.0, 60.0)
+	add_child(chao)
+	var k := (load("res://scenes/actors/Koliani.tscn") as PackedScene).instantiate() as Koliani
+	k.position = Vector2(400.0, 630.0)
+	k.usar_prototipo_premium = true
+	k.usar_golden_set = true
+	add_child(k)
+	for i in 90:
+		await get_tree().physics_frame
+		if k.is_on_floor():
+			break
+	k.ativar_core_combate()
+	k._olha_para = 1.0
+	# mesma configuracao exportada do EliteGolem de producao (Fase 9), isolado
+	var g := (load("res://scenes/actors/DemonioBase.tscn") as PackedScene).instantiate() as DemonioBase
+	g.especie = "golem_aereo"
+	g.elite = true
+	g.vida = 165
+	g.comportamento = "carga"
+	g.piloto_combate_v1 = true
+	g.peso = "pesado"
+	g.pode_ser_lancado = false
+	g.tem_guarda_v1 = true
+	g.guarda_max_v1 = 100.0
+	g._direcao = 1.0
+	g.global_position = k.global_position + Vector2(70.0, 0.0)
+	add_child(g)
+	await get_tree().physics_frame
+
+	# guarda ATIVA (parado, sem carga em curso, nao vulneravel): golpe normal frontal so' passa 20%
+	var vida0 := g.vida
+	var res_guarda := g.lab_hit({"tipo": "normal", "dano": 20, "dir": 1.0, "critico": false, "guard_break": false})
+	_ok(res_guarda.get("efeito", "") == "guardado", "golem piloto: guarda absorve golpe normal frontal parado")
+	_ok(vida0 - g.vida == 4, "golem piloto: golpe guardado so' passa 20%% do dano")
+
+	# JANELA DE EXPOSICAO: golem atordoado (esta_vulneravel()==true) -- a guarda NAO se aplica
+	g.atordoar(1.0)
+	var vida1 := g.vida
+	var res_exposto := g.lab_hit({"tipo": "normal", "dano": 20, "dir": 1.0, "critico": false, "guard_break": false})
+	_ok(res_exposto.get("efeito", "") != "guardado", "golem piloto: atordoado (janela de exposicao) nao guarda")
+	_ok(vida1 - g.vida == 20, "golem piloto: janela de exposicao leva dano cheio")
+
+	# Cleave/Counter (guard_break) quebram a guarda -- dano cheio, guarda vai a 0 e fica la' (sem loop)
+	g.vida = 165
+	g._guarda_v1 = g.guarda_max_v1
+	var vida2 := g.vida
+	g.lab_hit({"tipo": "cleave", "dano": 25, "dir": 1.0, "critico": false, "guard_break": true})
+	_ok(vida2 - g.vida == 25, "golem piloto: Cleave (guard_break) ignora a guarda -- dano cheio")
+	_ok(g._guarda_v1 == 0.0, "golem piloto: Cleave esgota a guarda")
+	g.lab_hit({"tipo": "counter", "dano": 30, "dir": 1.0, "critico": false, "guard_break": true})
+	_ok(g._guarda_v1 == 0.0, "golem piloto: guard_break repetido nao faz a guarda oscilar (fica a 0, sem loop)")
+
+	# Launcher: pesado -- nunca lanca
+	g.vida = 165
+	var res_launcher := g.lab_hit({"tipo": "launcher", "dano": 10, "dir": 1.0, "critico": false, "guard_break": false})
+	_ok(not res_launcher.get("lancado", true), "golem piloto: peso pesado nunca lanca")
+
+	# Bote telegrafado (carga) = ATAQUE, pode dar PD; contacto comum = CONTATO, nunca da'
+	await _lab_tap("rolar", 3)
+	await _lab_esperar(3)
+	g._carga = 0.3
+	g._atordoado = 0.0
+	g._ao_tocar(k)
+	_ok(m.contar("perfect_dodge") == 1, "golem piloto: o bote (carga) da' Perfect Dodge")
+	await _lab_esperar(60)
+	await _lab_tap("rolar", 3)
+	await _lab_esperar(3)
+	g._carga = 0.0
+	g._ao_tocar(k)
+	_ok(m.contar("perfect_dodge") == 1, "golem piloto: contacto comum NAO da' Perfect Dodge")
+
+	g.queue_free()
+	k.queue_free()
+	chao.queue_free()
+	m.queue_free()
+	await get_tree().process_frame
+	await get_tree().process_frame
+	Input.action_release("atacar")
+	Input.action_release("rolar")
+	EstadoJogo.habilidades.assign(antes_hab)
+
+
+## TTK do Golem piloto (spam normal vs Cleave) -- MEDIDO, nao imposto. O spam frontal deve ser fraco
+## (guarda absorve 80%); o Cleave, que quebra guarda, deve ser claramente mais eficiente.
+func teste_golem_piloto_ttk() -> void:
+	var antes_hab: Array = EstadoJogo.habilidades.duplicate()
+	EstadoJogo.habilidades.assign(["dash", "pogo", "salto_duplo", "especial", "projetil"])
+	var resultado := {}
+	for modo in ["spam_frontal", "cleave_repetido"]:
+		var chao := (load("res://scenes/actors/Plataforma.tscn") as PackedScene).instantiate()
+		chao.position = Vector2(1300.0, 730.0)
+		chao.tamanho = Vector2(2600.0, 60.0)
+		add_child(chao)
+		var k := (load("res://scenes/actors/Koliani.tscn") as PackedScene).instantiate() as Koliani
+		k.position = Vector2(400.0, 630.0)
+		k.usar_prototipo_premium = true
+		k.usar_golden_set = true
+		add_child(k)
+		for i in 90:
+			await get_tree().physics_frame
+			if k.is_on_floor():
+				break
+		var core := k.ativar_core_combate()
+		var g := (load("res://scenes/actors/DemonioBase.tscn") as PackedScene).instantiate() as DemonioBase
+		g.especie = "golem_aereo"
+		g.elite = true
+		g.vida = 165
+		g.comportamento = "carga"
+		g.piloto_combate_v1 = true
+		g.peso = "pesado"
+		g.pode_ser_lancado = false
+		g.tem_guarda_v1 = true
+		g.guarda_max_v1 = 100.0
+		g.set_physics_process(false)   # nao investe sozinho -- so' se mede o TTK da espada/Cleave
+		g._direcao = 1.0
+		g.global_position = k.global_position + Vector2(60.0, 0.0)
+		add_child(g)
+		await get_tree().physics_frame
+		k._olha_para = 1.0
+		var t := 0.0
+		var dt := 1.0 / 60.0
+		var limite := 20.0
+		while t < limite and is_instance_valid(g) and not g._morto:
+			if modo == "spam_frontal":
+				Input.action_press("atacar")
+				for i in 3:
+					await get_tree().physics_frame
+					t += dt
+				Input.action_release("atacar")
+				for i in 15:
+					await get_tree().physics_frame
+					t += dt
+			else:   # cleave_repetido: segura ATAQUE ate' carregar (carga_cleave_t), larga, repete
+				Input.action_press("atacar")
+				for i in int(core.bal.carga_cleave_t * 60.0) + 4:
+					await get_tree().physics_frame
+					t += dt
+				Input.action_release("atacar")
+				for i in 22:
+					await get_tree().physics_frame
+					t += dt
+		Input.action_release("atacar")
+		resultado[modo] = {"ttk": snappedf(t, 0.01), "morreu": is_instance_valid(g) and g._morto,
+			"guarda_final": g._guarda_v1 if is_instance_valid(g) else -1.0}
+		if is_instance_valid(g):
+			g.queue_free()
+		k.queue_free()
+		chao.queue_free()
+		await get_tree().process_frame
+		await get_tree().process_frame
+	print("GOLEM PILOTO ttk: ", resultado)
+	_ok(float(resultado["cleave_repetido"]["ttk"]) < float(resultado["spam_frontal"]["ttk"]) or bool(resultado["cleave_repetido"]["morreu"]),
+		"golem piloto: Cleave (quebra guarda) tem de ser mais eficiente que o spam frontal guardado")
 	EstadoJogo.habilidades.assign(antes_hab)
 
 

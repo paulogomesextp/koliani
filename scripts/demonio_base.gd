@@ -1209,8 +1209,13 @@ func lab_hit(info: Dictionary) -> Dictionary:
 	var guard_break := bool(info.get("guard_break", false))
 	var de_frente := dir_golpe != 0.0 and signf(dir_golpe) == _direcao
 	# guarda: golpes pela FRENTE sem guard_break custam guarda em vez de dano
-	# cheio; Cleave/Counter (guard_break) ou um golpe pelas costas ignoram-na.
-	if tem_guarda_v1 and _guarda_v1 > 0.0 and de_frente and not guard_break:
+	# cheio; Cleave/Counter (guard_break), um golpe pelas costas, OU a JANELA DE
+	# EXPOSICAO (a meio do proprio ataque telegrafado, ou atordoado por o ter
+	# falhado -- `esta_vulneravel()`) ignoram-na. E' a mesma janela que ja' da'
+	# CRITICO ao combo normal (`Koliani._ao_acertar_corpo`); aqui so' a
+	# reaproveita para a guarda cair no momento certo.
+	if tem_guarda_v1 and _guarda_v1 > 0.0 and de_frente and not guard_break \
+			and _carga <= 0.0 and not esta_vulneravel():
 		var dano_pedido := float(info.get("dano", 0))
 		_guarda_v1 = maxf(0.0, _guarda_v1 - dano_pedido * 0.35)
 		receber_dano(maxi(1, roundi(dano_pedido * 0.2)), dir_golpe, false, 0.0)

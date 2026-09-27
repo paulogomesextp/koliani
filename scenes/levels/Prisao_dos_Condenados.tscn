@@ -249,6 +249,11 @@ dano_contacto = 22
 comportamento = "carga"
 alcance_patrulha = 150.0
 cor_rim = Color(0.6, 0.55, 1.0, 1)
+piloto_combate_v1 = true
+peso = "pesado"
+pode_ser_lancado = false
+tem_guarda_v1 = true
+guarda_max_v1 = 100.0
 
 [node name="MorcegoMeio" parent="." instance=ExtResource("2_dem")]
 position = Vector2(2700, 560)
