@@ -114,6 +114,7 @@ func _correr_tudo() -> void:
 	await teste_n6_autoral()
 	await teste_n7_autoral()
 	await teste_n8_autoral()
+	await teste_n9_autoral()
 	await teste_combat_lab()
 	await teste_combat_lab_combos()
 	await teste_combat_lab_pd_real()
@@ -6513,6 +6514,170 @@ func teste_n8_autoral() -> void:
 	var k := n.get_node("Koliani") as CharacterBody2D
 	var dx_contra := await _deriva_n6(k, Vector2(715, 480))
 	_ok(absf(dx_contra) > 8.0, "N8: o vento da seccao B nao empurra a Koliani no ar (dx=%s)" % str(snappedf(dx_contra, 0.1)))
+	n.queue_free()
+	await get_tree().process_frame
+	EstadoJogo.modo_dev = antes_dev
+	EstadoJogo.habilidades.assign(antes_hab)
+	EstadoJogo.bosses_derrotados.assign(antes_bosses)
+	EstadoJogo.indice_nivel = antes_idx
+
+
+func teste_n9_autoral() -> void:
+	var antes_dev: bool = EstadoJogo.modo_dev
+	var antes_hab: Array = EstadoJogo.habilidades.duplicate()
+	var antes_bosses: Array[String] = EstadoJogo.bosses_derrotados.duplicate()
+	var antes_idx: int = EstadoJogo.indice_nivel
+	EstadoJogo.modo_dev = false
+	EstadoJogo.indice_nivel = 8
+	EstadoJogo.habilidades.assign(["dash", "pogo", "especial", "salto_duplo"])
+	var n := (load("res://scenes/levels/Ala_dos_Mortos.tscn") as PackedScene).instantiate()
+	add_child(n)
+	for i in 6:
+		await get_tree().process_frame
+	# --- estrutura: authored, sem jornada, Guardiao (nao boss/chefe), sem skill nova ---
+	_ok(not bool(n.get("corredor")) and bool(n.get("checkpoints_autorais")), "N9: nao e' autoral")
+	_ok(n.get_node_or_null("CorredorAproximacao") == null, "N9: o gerador criou uma jornada (legacy `corredor=true` nao corrigido)")
+	_ok(n.get_node_or_null("Guardiao") is DemonioBase and n.get_node_or_null("Chefe") == null,
+		"N9: e' Challenge -- fecha com um Guardiao (elite), nao com um Chefe/boss regional")
+	var porta := n.get_node_or_null("Porta") as Area2D
+	_ok(porta != null, "N9: sem Porta")
+	_ok(not porta.monitoring, "N9: porta selada com o Guardiao vivo")
+	var chk := 0
+	for c in get_tree().get_nodes_in_group("checkpoints"):
+		if n.is_ancestor_of(c):
+			chk += 1
+	_ok(chk >= 4 and chk <= 6, "N9: esperava 4-6 checkpoints, ha %d" % chk)
+	_ok(n.find_children("*", "Coletavel", true, false).is_empty(),
+		"N9: nao pode ensinar/dar habilidade (Coletavel encontrado, o unico ponto de concessao da regiao e' o N10)")
+	_ok(n.find_children("*", "ZonaPlanar", true, false).is_empty(),
+		"N9: a ZonaPlanar nao e' skill do N9")
+	_ok(n.get_node_or_null("Casca") == null,
+		"N9: a CascaMasmorra (legacy 'Ala dos Mortos') devia ter sido removida -- a regiao e' desfiladeiro aberto")
+	var proibidos := ["serra.gd", "fogo.gd", "guilhotina.gd", "pendulo_lamina.gd", "portal.gd", "trampolim.gd",
+		"tumulo_elevador.gd", "plataforma_ritmada.gd", "torreta.gd", "teia_prende.gd", "raiz_elevatoria.gd",
+		"alavanca.gd", "porta_trancada.gd", "gota_acida.gd", "zona_gravidade.gd", "coletavel.gd",
+		"corrente_ar.gd", "zona_planar.gd", "plataforma_espectral.gd"]
+	var correntes := 0
+	var inimigos := 0
+	var elites := 0
+	var zonas: Array[WindZone] = []
+	for no in n.find_children("*", "", true, false):
+		var sc := no.get_script() as Script
+		if no is DemonioBase:
+			inimigos += 1
+			if (no as DemonioBase).elite:
+				elites += 1
+		if sc == null:
+			continue
+		for pr in proibidos:
+			_ok(not sc.resource_path.ends_with(pr), "N9: %s nao pertence ao N9 (skill/mecanica alheia)" % no.name)
+		if sc.resource_path.ends_with("plataforma_corrente.gd"):
+			correntes += 1
+		if no is WindZone:
+			zonas.append(no)
+	_ok(correntes == 1, "N9: esperava UMA plataforma movel (secao D), ha %d" % correntes)
+	_ok(elites == 1, "N9: so' o Guardiao pode ser elite (ha %d elites)" % elites)
+	_ok(inimigos >= 4 and inimigos <= 7, "N9: esperava poucos inimigos bem colocados (4-7, incl. Guardiao), ha %d" % inimigos)
+	# --- wall-jump: nunca exigido, nunca prometido; sem skill nova ---
+	_ok(not EstadoJogo.tem_habilidade("escalar_paredes"), "N9: escalar_paredes nao pode estar concedida a esta altura da campanha")
+	# --- vento: mais zonas/variedade que o N8 (Challenge > Combine), as duas direcoes, tudo horizontal ---
+	_ok(zonas.size() >= 9, "N9: esperava pelo menos 9 zonas de vento (mais variedade que o N8), ha %d" % zonas.size())
+	var dir_pos := 0
+	var dir_neg := 0
+	var continuas := 0
+	var pulsadas := 0
+	for z in zonas:
+		if z.direcao.x > 0.0:
+			dir_pos += 1
+		elif z.direcao.x < 0.0:
+			dir_neg += 1
+		_ok(absf(z.direcao.y) < 0.001, "N9: %s deve ser horizontal" % z.name)
+		if z.modo == WindZone.Modo.CONTINUO:
+			continuas += 1
+		else:
+			pulsadas += 1
+	_ok(dir_pos > 0 and dir_neg > 0, "N9: faltam rajadas nas duas direcoes")
+	_ok(continuas > 0 and pulsadas > 0, "N9: secao B tem de combinar continuo e pulsado (comportamentos diferentes)")
+	# --- checkpoints nunca dentro de vento perigoso (VentoArena e' excecao, mesmo padrao do N6/N7/N8) ---
+	for nome_z in ["WindB1", "WindB2", "WindB3", "WindC", "WindD", "WindRiscoE", "WindF1", "WindF2", "WindF3"]:
+		var zc := n.get_node(nome_z) as WindZone
+		var caixa := Rect2(zc.position - zc.tamanho * 0.5, zc.tamanho)
+		for c in get_tree().get_nodes_in_group("checkpoints"):
+			if n.is_ancestor_of(c) and c is Node2D:
+				_ok(not caixa.has_point((c as Node2D).position), "N9: %s cobre um checkpoint" % nome_z)
+	# --- secao B: tres comportamentos diferentes e consecutivos ---
+	var windb1 := n.get_node("WindB1") as WindZone
+	var windb2 := n.get_node("WindB2") as WindZone
+	var windb3 := n.get_node("WindB3") as WindZone
+	_ok(windb1.modo == WindZone.Modo.CONTINUO and windb1.direcao.x < 0.0, "N9: WindB1 tem de ser continuo e contra")
+	_ok(windb2.modo == WindZone.Modo.PULSADO and windb2.direcao.x > 0.0, "N9: WindB2 tem de ser pulsado e a favor")
+	_ok(windb3.modo == WindZone.Modo.PULSADO and windb3.direcao.x < 0.0, "N9: WindB3 tem de ser pulsado e contra (ritmo diferente do B2)")
+	_ok(not is_equal_approx(windb2.duracao_pulso, windb3.duracao_pulso) or not is_equal_approx(windb2.intervalo_pulso, windb3.intervalo_pulso),
+		"N9: WindB2 e WindB3 tem de ter ritmos de pulso distintos")
+	# --- secao C: vento pulsado + inimigo simples (nao elite), legivel ---
+	var windc := n.get_node("WindC") as WindZone
+	_ok(windc.modo == WindZone.Modo.PULSADO, "N9: WindC (inimigo) tem de ser pulsado (le-se antes de agir)")
+	var sentinela := n.get_node_or_null("SentinelaC") as DemonioBase
+	_ok(sentinela != null and not sentinela.elite, "N9: o inimigo da seccao C tem de ser simples, nao elite")
+	_ok(sentinela.comportamento != "cuspidor", "N9: sem projeteis sem leitura durante saltos criticos (seccao C)")
+	# --- secao D: plataforma movel atravessa vento continuo forte + inimigo de pressao ---
+	var windd := n.get_node("WindD") as WindZone
+	_ok(windd.modo == WindZone.Modo.CONTINUO, "N9: WindD (secao D) tem de ser continuo -- a pressao vem de sustentar, nao de picos")
+	var corrented := n.get_node_or_null("CorrenteD")
+	_ok(corrented != null, "N9: falta a plataforma movel da seccao D")
+	var morcegod := n.get_node_or_null("MorcegoD") as DemonioBase
+	_ok(morcegod != null and not morcegod.elite, "N9: o inimigo da seccao D tem de ser simples, nao elite")
+	# --- secao E: escolha opcional -- segura sem vento vs arriscada com vento+pogo+recompensa ---
+	_ok(n.get_node_or_null("SeguroE1") != null and n.get_node_or_null("SeguroE2") != null,
+		"N9: falta a rota segura da seccao E")
+	var windriscoe := n.get_node("WindRiscoE") as WindZone
+	_ok(windriscoe.modo == WindZone.Modo.PULSADO and windriscoe.direcao.x > 0.0,
+		"N9: WindRiscoE (rota arriscada) tem de ser pulsado e a favor")
+	var seguro_e1 := n.get_node("SeguroE1") as Node2D
+	var caixa_risco := Rect2(windriscoe.position - windriscoe.tamanho * 0.5, windriscoe.tamanho)
+	_ok(not caixa_risco.has_point(seguro_e1.position), "N9: a rota segura nao pode estar dentro do vento da rota arriscada")
+	_ok(n.get_node_or_null("AlvoPogoE") != null and n.get_node_or_null("PlatAlvoE") != null,
+		"N9: falta o alvo de pogo authored (opcional) da seccao E")
+	_ok(n.get_node_or_null("CacheRiscoE") != null, "N9: falta a recompensa (Essencia) da rota arriscada")
+	_ok(n.get_node_or_null("ConvergeE") != null, "N9: as duas rotas tem de convergir sem grande backtracking")
+	# --- secao F: pre-exame -- vento (favor+contra) + salto duplo + Dash + 2 inimigos simples, SEM boss ---
+	var windf1 := n.get_node("WindF1") as WindZone
+	var windf2 := n.get_node("WindF2") as WindZone
+	_ok(windf1.direcao.x > 0.0 and windf2.direcao.x < 0.0,
+		"N9: o pre-exame tem de combinar as duas direcoes de vento")
+	_ok(n.get_node_or_null("FDashApoio") != null, "N9: falta o apoio de Dash do pre-exame")
+	var golemf := n.get_node_or_null("GolemF") as DemonioBase
+	var gosmaf := n.get_node_or_null("GosmaF") as DemonioBase
+	_ok(golemf != null and not golemf.elite and gosmaf != null and not gosmaf.elite,
+		"N9: o pre-exame tem de ter pressao de 2 inimigos simples, nao elite")
+	# --- Guardiao: elite regional-lite, sela a porta, nao e' boss, sem piso de vida de chefe ---
+	var g := n.get_node("Guardiao") as DemonioBase
+	_ok(g.vida >= 100 and g.vida <= 320, "N9: vida do Guardiao %d fora de 100-320 (nao pode competir com o boss do N10)" % g.vida)
+	var va := n.get_node("VentoArena") as WindZone
+	_ok(va.mostrar_guia and va.modo == WindZone.Modo.PULSADO and va.intensidade <= 1500.0 and va.velocidade_max <= 140.0,
+		"N9: VentoArena tem de ter guia visivel, ser pulsado e fraco")
+	_ok(g.position.x - (va.position.x - va.tamanho.x * 0.5) >= 200.0, "N9: o vento tem de se ver 200+ px antes do Guardiao")
+	g.queue_free()
+	for i in 4:
+		await get_tree().process_frame
+	_ok(porta.monitoring, "N9: a porta abre quando o Guardiao cai")
+	_ok(EstadoJogo.bosses_derrotados == antes_bosses, "N9: o Guardiao nao pode gravar boss derrotado")
+	_ok(not EstadoJogo.tem_habilidade("escalar_paredes") and not EstadoJogo.tem_habilidade("dash_aereo"),
+		"N9: nao pode conceder habilidades")
+	# --- geometria: vaos dentro do envolvente do salto simples/duplo (a travessia D e' pela ---
+	# plataforma movel, por isso fica de fora desta cadeia, tal como o N8 fazia a` rota rapida) ---
+	for cadeia in [["ChaoInicio", "ChaoReintro", "IlhaB1", "IlhaB2", "IlhaB3", "DescansoB", "PousoC1", "PlatSentinela", "PousoC2"],
+			["SeguroE1", "SeguroE2", "ConvergeE"],
+			["ConvergeE", "F1"], ["F1", "F2", "F3", "F4", "ChaoFinal"]]:
+		for i in range(cadeia.size() - 1):
+			var a := n.get_node(cadeia[i]) as Node2D
+			var b := n.get_node(cadeia[i + 1]) as Node2D
+			var vao: float = (b.position.x - b.tamanho.x * 0.5) - (a.position.x + a.tamanho.x * 0.5)
+			_ok(vao <= 380.0, "N9: vao %s->%s = %d (max 380, salto duplo)" % [cadeia[i], cadeia[i + 1], vao])
+	# --- o vento MEXE mesmo na Koliani no AR: contra na seccao B ---
+	var k := n.get_node("Koliani") as CharacterBody2D
+	var dx_contra := await _deriva_n6(k, Vector2(930, 480))
+	_ok(absf(dx_contra) > 8.0, "N9: o vento da seccao B nao empurra a Koliani no ar (dx=%s)" % str(snappedf(dx_contra, 0.1)))
 	n.queue_free()
 	await get_tree().process_frame
 	EstadoJogo.modo_dev = antes_dev

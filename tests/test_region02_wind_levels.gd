@@ -21,7 +21,7 @@ const CENAS := {
 ## contrato aplicado ao mesmo tipo de encontro. NAO alargar a outros niveis
 ## sem decisao do GM.
 const ISENCOES_ARENA := [["N06", "VentoArena", "arena"], ["N07", "VentoArena", "arena"],
-	["N08", "VentoArena", "arena"]]
+	["N08", "VentoArena", "arena"], ["N09", "VentoArena", "arena"]]
 
 
 static func _isento_n06(nivel: String, zona: String, alvo: String) -> bool:
@@ -64,6 +64,17 @@ static func executar() -> Array[String]:
 				"N08: a ZonaPlanar (Process 11) devia ter sido removida -- planar nao e' skill do N08")
 			_verificar(falhas, raiz.find_children("*", "Coletavel", true, false).is_empty(),
 				"N08: nao pode ensinar/dar escalar_paredes (Coletavel encontrado)")
+		elif nome == "N09":
+			_verificar(falhas, raiz.get_node_or_null("Guardiao") != null
+				and raiz.get_node_or_null("Chefe") == null, "N09: fecha com Guardiao, sem Chefe (Challenge, nao Boss)")
+			var chk09 := _filhos_por_prefixo(raiz, "Check").size()
+			_verificar(falhas, chk09 >= 4 and chk09 <= 6, "N09: esperava 4-6 checkpoints autorais, ha %d" % chk09)
+			_verificar(falhas, raiz.find_children("*", "Coletavel", true, false).is_empty(),
+				"N09: nao pode ensinar/dar habilidade (Coletavel encontrado) -- so' o N10 concede na regiao")
+			_verificar(falhas, raiz.get_node_or_null("Casca") == null,
+				"N09: a CascaMasmorra legacy devia ter sido removida -- a regiao e' desfiladeiro aberto")
+			_verificar(falhas, bool(raiz.get("checkpoints_autorais")) and not bool(raiz.get("corredor")),
+				"N09: tem de ser autoral (corredor=false, checkpoints_autorais=true)")
 		else:
 			_verificar(falhas, raiz.get_node_or_null("Chefe") != null,
 				"%s: boss existente preservado" % nome)
@@ -104,15 +115,21 @@ static func executar() -> Array[String]:
 			_verificar(falhas, absf(zona.direcao.y) < 0.001,
 				"N08: %s deve ser horizontal" % zona.name)
 	if raizes.has("N09"):
+		# N09 e' AUTORAL desde a execucao "N9 Challenge" (27 set 2026): vento
+		# variavel (continuo E pulsado, nao so' pulsado) + inimigos + plataformas,
+		# mais zonas/variedade que o N08 (Combine). Ver `teste_n9_autoral` para
+		# o contrato completo.
 		var zonas09 := _zonas(raizes["N09"])
-		_verificar(falhas, zonas09.size() == 3, "N09: três zonas variáveis")
+		_verificar(falhas, zonas09.size() >= 9, "N09: pelo menos nove zonas de vento (mais variedade que o N08)")
 		_verificar(falhas, _direcoes_x(zonas09).has(-1.0)
 			and _direcoes_x(zonas09).has(1.0), "N09: direção varia")
 		var intensidades := {}
 		for zona in zonas09:
 			intensidades[zona.intensidade] = true
 		_verificar(falhas, intensidades.size() >= 2, "N09: intensidade varia")
-		_verificar(falhas, _todas_pulsadas(zonas09), "N09: vento pulsado")
+		for zona in zonas09:
+			_verificar(falhas, absf(zona.direcao.y) < 0.001,
+				"N09: %s deve ser horizontal" % zona.name)
 
 	for nome: String in raizes:
 		var raiz: Node = raizes[nome]
