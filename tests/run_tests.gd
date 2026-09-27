@@ -110,6 +110,7 @@ func _correr_tudo() -> void:
 	await teste_cartao_regiao1()
 	await teste_fluxo_fim_regiao1()
 	await teste_n6_autoral()
+	await teste_n7_autoral()
 	await teste_combat_lab()
 	await teste_combat_lab_combos()
 	await teste_combat_lab_pd_real()
@@ -6243,6 +6244,136 @@ func _deriva_n6(k: CharacterBody2D, de: Vector2) -> float:
 	for i in 30:
 		await get_tree().physics_frame
 	return k.global_position.x - x0
+
+
+## N07 -- "The Rising Gorge": DESENVOLVIMENTO do vento ensinado no N06.
+## Autoral, sem jornada, sem escalar_paredes, fecha com um GUARDIAO (elite
+## que sela a porta -- NAO um chefe regional; o unico boss da Regiao II e'
+## o Guardiao dos Ceus no N10). Ver `docs/nivel_autoral_n7.md`.
+func teste_n7_autoral() -> void:
+	var antes_dev: bool = EstadoJogo.modo_dev
+	var antes_hab: Array = EstadoJogo.habilidades.duplicate()
+	var antes_bosses: Array[String] = EstadoJogo.bosses_derrotados.duplicate()
+	var antes_idx: int = EstadoJogo.indice_nivel
+	EstadoJogo.modo_dev = false
+	EstadoJogo.indice_nivel = 6
+	EstadoJogo.habilidades.assign(["dash", "pogo", "especial", "salto_duplo"])
+	var n := (load("res://scenes/levels/Fornalha_dos_Pecadores.tscn") as PackedScene).instantiate()
+	add_child(n)
+	for i in 6:
+		await get_tree().process_frame
+	# --- estrutura: authored, sem jornada, Guardiao (nao boss), sem skills novas ---
+	_ok(not bool(n.get("corredor")) and bool(n.get("checkpoints_autorais")), "N7: nao e' autoral")
+	_ok(n.get_node_or_null("CorredorAproximacao") == null, "N7: o gerador criou uma jornada")
+	_ok(n.get_node_or_null("Guardiao") is DemonioBase and n.get_node_or_null("Chefe") == null,
+		"N7: N07 e' Develop/Test -- fecha com um Guardiao (elite), nao com um Chefe regional")
+	var porta := n.get_node_or_null("Porta") as Area2D
+	_ok(porta != null, "N7: sem Porta")
+	_ok(not porta.monitoring, "N7: porta selada com o Guardiao vivo")
+	var chk := 0
+	for c in get_tree().get_nodes_in_group("checkpoints"):
+		if n.is_ancestor_of(c):
+			chk += 1
+	_ok(chk >= 4 and chk <= 5, "N7: esperava 4-5 checkpoints, ha %d" % chk)
+	_ok(n.find_children("*", "Coletavel", true, false).is_empty(),
+		"N7: nao pode ensinar/dar escalar_paredes (Coletavel encontrado)")
+	var proibidos := ["serra.gd", "fogo.gd", "guilhotina.gd", "pendulo_lamina.gd", "portal.gd", "trampolim.gd",
+		"tumulo_elevador.gd", "plataforma_ritmada.gd", "torreta.gd", "teia_prende.gd", "raiz_elevatoria.gd",
+		"alavanca.gd", "porta_trancada.gd", "gota_acida.gd", "zona_gravidade.gd", "coletavel.gd", "corrente_ar.gd"]
+	var correntes := 0
+	var zonas: Array[WindZone] = []
+	for no in n.find_children("*", "", true, false):
+		var sc := no.get_script() as Script
+		if sc == null:
+			continue
+		for pr in proibidos:
+			_ok(not sc.resource_path.ends_with(pr), "N7: %s nao pertence ao N7 (skill/mecanica alheia)" % no.name)
+		if sc.resource_path.ends_with("plataforma_corrente.gd"):
+			correntes += 1
+		if no is WindZone:
+			zonas.append(no)
+	_ok(correntes == 1, "N7: esperava UMA plataforma movel, ha %d" % correntes)
+	# --- vento: as duas direcoes, ensino continuo e fraco, mudanca de direcao legivel ---
+	_ok(zonas.size() == 9, "N7: esperava 9 zonas de vento, ha %d" % zonas.size())
+	var dir_pos := 0
+	var dir_neg := 0
+	var continuas := 0
+	for z in zonas:
+		if z.direcao.x > 0.0:
+			dir_pos += 1
+		elif z.direcao.x < 0.0:
+			dir_neg += 1
+		if z.modo == WindZone.Modo.CONTINUO:
+			continuas += 1
+		_ok(absf(z.direcao.y) < 0.001, "N7: %s deve ser horizontal" % z.name)
+	_ok(dir_pos > 0 and dir_neg > 0, "N7: faltam rajadas nas duas direcoes")
+	var reintro := n.get_node("VentoReintro") as WindZone
+	_ok(reintro.modo == WindZone.Modo.CONTINUO and reintro.velocidade_max <= 140.0,
+		"N7: a reintro tem de ser continua e fraca, so' para relembrar")
+	# reintro nao cobre o CheckInicio nem o spawn (area segura e previsivel)
+	var caixa_reintro := Rect2(reintro.position - reintro.tamanho * 0.5, reintro.tamanho)
+	_ok(not caixa_reintro.has_point((n.get_node("CheckInicio") as Node2D).position),
+		"N7: VentoReintro cobre o CheckInicio")
+	_ok(not caixa_reintro.has_point((n.get_node("Koliani") as Node2D).position),
+		"N7: VentoReintro cobre o spawn")
+	# mudanca de direcao: as duas zonas de C tem direcoes opostas e sao legiveis (guia + pulsado)
+	var favor := n.get_node("WindDirFavor") as WindZone
+	var contra := n.get_node("WindDirContra") as WindZone
+	_ok(favor.direcao.x > 0.0 and contra.direcao.x < 0.0, "N7: a seccao C tem de alternar direcao")
+	_ok(favor.mostrar_guia and contra.mostrar_guia, "N7: a mudanca de direcao tem de ter guia visivel")
+	_ok(favor.modo == WindZone.Modo.PULSADO and contra.modo == WindZone.Modo.PULSADO,
+		"N7: a seccao C tem de ser pulsada (le-se o intervalo)")
+	# dash + vento: continuo contra, mas ha' apoio sem precisao pixel-perfect
+	var wdash := n.get_node("WindDash") as WindZone
+	_ok(wdash.modo == WindZone.Modo.CONTINUO and wdash.direcao.x < 0.0,
+		"N7: WindDash tem de ser continuo e contra (e' o que torna o Dash util)")
+	_ok(n.get_node_or_null("DashApoio") != null, "N7: falta a plataforma de apoio (sem exigir Dash pixel-perfect)")
+	# checkpoints nunca dentro de vento perigoso (so' o VentoReintro, fraco, e' tolerado -- ja verificado acima)
+	for nome_z in ["VentoDesenvolve", "WindDirFavor", "WindDirContra", "WindDash", "WindCombo",
+			"WindFechoFavor", "WindFechoContra", "VentoArena"]:
+		var zc := n.get_node(nome_z) as WindZone
+		var caixa := Rect2(zc.position - zc.tamanho * 0.5, zc.tamanho)
+		for c in get_tree().get_nodes_in_group("checkpoints"):
+			if n.is_ancestor_of(c) and c is Node2D:
+				_ok(not caixa.has_point((c as Node2D).position), "N7: %s cobre um checkpoint" % nome_z)
+	# VentoArena: mecanica authored e legivel (guia visivel, fraco, pulsado, comeca bem antes do Guardiao)
+	var va := n.get_node("VentoArena") as WindZone
+	var gg := n.get_node("Guardiao") as Node2D
+	_ok(va.mostrar_guia and va.modo == WindZone.Modo.PULSADO and va.intensidade <= 1500.0 and va.velocidade_max <= 140.0,
+		"N7: VentoArena tem de ter guia visivel, ser pulsado e fraco")
+	_ok(gg.position.x - (va.position.x - va.tamanho.x * 0.5) >= 200.0, "N7: o vento tem de se ver 200+ px antes do Guardiao")
+	# --- geometria: vaos e subidas dentro do salto simples (o vento so' os desloca) ---
+	for cadeia in [["ChaoInicio", "Ponte1", "Ponte2", "Ponte3", "Descanso"],
+			["Descanso", "Dir1", "Dir2", "Dir3", "Dir4", "ReencontroDir"],
+			["ReencontroDir", "DashA", "DashApoio", "DashB", "PousoD"],
+			["ComboB", "Fecho1", "Fecho2", "Fecho3", "ChaoFinal"]]:
+		for i in range(cadeia.size() - 1):
+			var a := n.get_node(cadeia[i]) as Node2D
+			var b := n.get_node(cadeia[i + 1]) as Node2D
+			var vao: float = (b.position.x - b.tamanho.x * 0.5) - (a.position.x + a.tamanho.x * 0.5)
+			var sobe: float = (a.position.y - a.tamanho.y * 0.5) - (b.position.y - b.tamanho.y * 0.5)
+			_ok(vao <= 140.0, "N7: vao %s->%s = %d (max 140)" % [cadeia[i], cadeia[i + 1], vao])
+			_ok(sobe <= 104.0, "N7: subida %s->%s = %d (max 104)" % [cadeia[i], cadeia[i + 1], sobe])
+	# --- Guardiao: elite regional-lite, sela a porta e nao e' boss ---
+	var g := n.get_node("Guardiao") as DemonioBase
+	_ok(g.vida >= 100 and g.vida <= 300, "N7: vida do Guardiao %d fora de 100-300 (nao pode competir com o boss)" % g.vida)
+	g.queue_free()
+	for i in 4:
+		await get_tree().process_frame
+	_ok(porta.monitoring, "N7: a porta abre quando o Guardiao cai")
+	_ok(EstadoJogo.bosses_derrotados == antes_bosses, "N7: o Guardiao nao pode gravar boss derrotado")
+	_ok(not EstadoJogo.tem_habilidade("escalar_paredes") and not EstadoJogo.tem_habilidade("dash_aereo"),
+		"N7: nao pode conceder habilidades")
+	# --- o vento MEXE mesmo na Koliani no AR: a favor na reintro ---
+	var k := n.get_node("Koliani") as CharacterBody2D
+	var dx_favor := await _deriva_n6(k, Vector2(600, 480))
+	_ok(dx_favor > 8.0, "N7: o vento de reintro nao empurra a Koliani no ar (dx=%s)" % str(snappedf(dx_favor, 0.1)))
+	n.queue_free()
+	await get_tree().process_frame
+	EstadoJogo.modo_dev = antes_dev
+	EstadoJogo.habilidades.assign(antes_hab)
+	EstadoJogo.bosses_derrotados.assign(antes_bosses)
+	EstadoJogo.indice_nivel = antes_idx
 
 
 # ============================================================ COMBAT LAB v1 ====

@@ -12,15 +12,18 @@ const CENAS := {
 }
 
 
-## ISENCAO DO N06 (unica): o `VentoArena` cobre a arena do Guardiao de PROPOSITO (mecanica authored:
-## vento fraco pulsado, guia visivel, comeca 250 px antes do Golem, longe do `CheckFinal`). O contrato
-## dele e' verificado em `teste_n6_autoral`. As zonas de ensino ja' NAO cobrem checkpoints (v1.1).
-## NAO alargar esta lista sem decisao do GM.
-const ISENCOES_N06 := [["VentoArena", "arena"]]
+## ISENCAO do `VentoArena`: cobre a arena do Guardiao de PROPOSITO (mecanica
+## authored: vento fraco pulsado, guia visivel, ve-se bem antes do Guardiao,
+## longe do checkpoint mais proximo). O padrao nasceu no N06 (`teste_n6_autoral`)
+## e o N07, ao fechar com o mesmo tipo de Guardiao (27 set 2026), repete-o de
+## proposito (`teste_n7_autoral`) -- nao e' um alargamento ad-hoc, e' o mesmo
+## contrato aplicado ao mesmo tipo de encontro. NAO alargar a outros niveis
+## sem decisao do GM.
+const ISENCOES_ARENA := [["N06", "VentoArena", "arena"], ["N07", "VentoArena", "arena"]]
 
 
 static func _isento_n06(nivel: String, zona: String, alvo: String) -> bool:
-	return nivel == "N06" and [zona, alvo] in ISENCOES_N06
+	return [nivel, zona, alvo] in ISENCOES_ARENA
 
 
 static func executar() -> Array[String]:
@@ -37,13 +40,19 @@ static func executar() -> Array[String]:
 			"%s: spawn preservado" % nome)
 		_verificar(falhas, raiz.get_node_or_null("Porta") != null,
 			"%s: porta preservada" % nome)
-		# N06 e' AUTORAL desde 26 set 2026: fecha com um Guardiao (Golem das Falesias),
-		# nao com um Chefe, e tem 5 checkpoints intencionais (ver `teste_n6_autoral`).
+		# N06 e' AUTORAL desde 26 set 2026 e N07 desde 27 set 2026: fecham com um
+		# Guardiao (elite), nao com um Chefe, e tem checkpoints intencionais
+		# (ver `teste_n6_autoral` / `teste_n7_autoral`).
 		if nome == "N06":
 			_verificar(falhas, raiz.get_node_or_null("Guardiao") != null
 				and raiz.get_node_or_null("Chefe") == null, "N06: fecha com Guardiao, sem Chefe")
 			_verificar(falhas, _filhos_por_prefixo(raiz, "Check").size() == 5,
 				"N06: cinco checkpoints autorais")
+		elif nome == "N07":
+			_verificar(falhas, raiz.get_node_or_null("Guardiao") != null
+				and raiz.get_node_or_null("Chefe") == null, "N07: fecha com Guardiao, sem Chefe")
+			_verificar(falhas, _filhos_por_prefixo(raiz, "Check").size() == 5,
+				"N07: cinco checkpoints autorais")
 		else:
 			_verificar(falhas, raiz.get_node_or_null("Chefe") != null,
 				"%s: boss existente preservado" % nome)
@@ -61,11 +70,17 @@ static func executar() -> Array[String]:
 				continuas06 += 1
 		_verificar(falhas, continuas06 == 2, "N06: so' o ensino (2 zonas) e' continuo; o resto e' pulsado")
 	if raizes.has("N07"):
+		# N07 e' AUTORAL desde 27 set 2026 (DESENVOLVIMENTO do vento do N06):
+		# 9 zonas horizontais (a reintro e a arena sao fracas/continuas ou
+		# pulsadas fracas; o resto ensina mudanca de direcao, dash-contra-vento
+		# e combinacao). Ver `teste_n7_autoral` para o contrato completo.
 		var zonas07 := _zonas(raizes["N07"])
-		_verificar(falhas, zonas07.size() == 3, "N07: três updrafts")
+		_verificar(falhas, zonas07.size() == 9, "N07: nove zonas de vento")
+		_verificar(falhas, _direcoes_x(zonas07).has(-1.0)
+			and _direcoes_x(zonas07).has(1.0), "N07: rajadas opostas")
 		for zona in zonas07:
-			_verificar(falhas, zona.direcao == Vector2.UP,
-				"N07: %s aponta para cima" % zona.name)
+			_verificar(falhas, absf(zona.direcao.y) < 0.001,
+				"N07: %s deve ser horizontal" % zona.name)
 	if raizes.has("N09"):
 		var zonas09 := _zonas(raizes["N09"])
 		_verificar(falhas, zonas09.size() == 3, "N09: três zonas variáveis")

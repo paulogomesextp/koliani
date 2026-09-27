@@ -1,3 +1,64 @@
+# >>> N7 AUTORAL -- "The Rising Gorge" (27 set 2026, commits locais, sem push) <<<
+Estrutura regional aprovada: N6=Teach, **N07=Develop/Test**, N08=Combine,
+N09=Challenge, N10=Boss/Exame. Ver `docs/nivel_autoral_n7.md` para o mapa
+completo. Cena `scenes/levels/Fornalha_dos_Pecadores.tscn` (nome de
+ficheiro legacy mantido).
+
+**Feito**: reconstruído do zero como nível AUTORAL (`corredor = false`,
+`checkpoints_autorais`), sem jornada procedural. 6 secções A-F (reintro
+curta -> desenvolvimento com ponte real -> mudança de direção -> Dash +
+vento contínuo contra, com `DashApoio` para não exigir precisão
+pixel-perfect -> combinação plataforma-móvel + vento + `EliteCombo` ->
+fecho com as duas direções outra vez + Guardião numa arena). 5
+checkpoints, nenhum dentro de vento perigoso. 9 `WindZone` horizontais
+(a reintro e a arena são fracas, o resto ensina timing/direção/dash).
+
+**Removido**: o `Coletavel` `escalar_paredes` (a habilidade só entra na
+Região III, após o boss do N10); o `Chefe` persistente `ChefeIgnivar`
+(gravava boss derrotado e dava baú -- errado para Develop/Test, e o único
+boss da região é o N10); 3 `Fogo` (tema de fornalha/prisão incompatível
+com "Desfiladeiro dos Ventos").
+
+**ACHADO**: `ChefeIgnivar` tem um piso de vida cozido no script
+(`vida = maxi(vida, 560)`) para o seu uso como chefe/exame -- reutilizá-lo
+como Guardião (mesmo com vida baixa no `.tscn`) dava vida efetiva ~1977
+após a escala regional (`ChefeBase._afinar_dificuldade`, ×3.53 no índice
+6), competindo com o boss do N10. Em vez disso o Guardião do N7 é uma
+Sentinela Flutuante elite (`DemonioBase`, vida 230 crua, ~212 efetiva) --
+vida sob controlo total, sem tocar em nenhum script de chefe.
+
+**Testes**: `teste_n7_autoral` novo (estrutura, 9 zonas, geometria,
+Guardião, checkpoints fora do vento). `tests/test_region02_wind_levels.gd`
+atualizado (N07 passa a Guardião+5 checkpoints+9 zonas horizontais, em vez
+do contrato legacy Chefe+3 checkpoints+3 updrafts verticais; isenção de
+`VentoArena` alargada a N07, mesmo padrão do N06).
+
+**ACHADO OPERACIONAL**: `tools/correr_testes.ps1` ficou instável nesta
+sessão -- depois de UMA corrida integral completar normalmente (achou os
+2 problemas reais listados acima, ambos corrigidos), as corridas
+seguintes penduraram repetidamente (processo Godot preso a 0% CPU, mesmo
+sintoma "Godot pendura" já documentado). Contornado correndo cada teste
+isoladamente via `python tools/godot_isolado.py -- --headless --path .
+res://tests/run_tests.tscn` com `SO_TESTE=<nome>` (mesmo isolamento de
+save): `teste_n1_autoral` .. `teste_n7_autoral`, `teste_fluxo_fim_regiao1`,
+`teste_cartao_regiao1`, e `TestesRegion02WindLevels.executar()` (via
+wrapper temporário, removido depois) -- todos **0 falhas**, save real
+intacto em cada corrida. O único falhanço da corrida integral
+(`Coracao: o Especial devia ajudar sem resolver a luta`, em
+`teste_9h_chefes_regiao1_mais_faceis`) é sobre o N5/Coração Putrefacto
+(não tocado aqui) e foi confirmado **flake pré-existente** (0 falhas
+isolado -- está no limiar exato do rácio 0.55 do teste).
+
+**Não feito, por instrução**: N8 não começado; Combat Core novo não
+tocado/ligado; N6 não alterado; física F1 não alterada; nenhum boss
+alterado; sem arte final; **sem push** (só commits locais).
+
+**Próximo passo**: playtest humano do GM no N7 (duração real, legibilidade
+das cores de guia favor/quente=contra, TTK do Guardião/EliteCombo). Só
+depois, N8.
+
+---
+
 # >>> CONTROLLED COMBAT INTEGRATION -- FECHADA, Fases 0-13 feitas (27 set 2026) <<<
 Execucao "KOLIANI -- CONTROLLED COMBAT INTEGRATION" do Paulo, completa.
 Relatorio final: [`docs/combat_production_integration_report.md`](combat_production_integration_report.md)
