@@ -1,3 +1,46 @@
+# >>> CONTROLLED COMBAT INTEGRATION -- Fases 0/1/5 feitas (27 set 2026) <<<
+Execucao "KOLIANI -- CONTROLLED COMBAT INTEGRATION" do Paulo. Plano em
+`docs/plano_integracao_combate_producao.md` (commit `7a8e7b84`). Feito e
+commitado: Fase 0 (preflight, sem achados), Fase 1 -- `scripts/combate/balance_combate.gd`
+(`BalanceCombate`, Resource com os numeros do Combat Lab v1.2; nada o le
+ainda, `combate_lab.gd` continua congelado) -- commit `5c617f3e`, e Fase 5 --
+`scripts/combate/origem_dano.gd` (`OrigemDano`: CONTATO/ATAQUE/HAZARD_ATAQUE/AMBIENTE)
+migrado para os 20 call-sites mapeados no plano (§3) -- commit `4c779bc7` +
+`2b8599d5` (fix dos `.uid` em falta). **Em producao isto ainda nao muda
+comportamento nenhum**: `Koliani.receber_dano` so chama `_lab.tentativa_de_dano`
+quando `_lab != null`, e `_lab` so existe dentro do Combat Lab.
+
+**ACHADO IMPORTANTE (nao e' regressao, e' armadilha de processo)**: ao
+acrescentar um script novo com `class_name` (como `OrigemDano`/`BalanceCombate`),
+correr a suite ANTES de `--headless --import` da' um falso positivo de
+regressao grave -- `chefe_base.gd` falha a compilar em silencio e arrasta
+consigo TODOS os chefes que dele herdam, com o sintoma enganador
+`SCRIPT ERROR: Invalid call. Nonexistent function '_process'`. Medido: baseline
+sem os ficheiros = 0 falhas; com os ficheiros sem reimportar = **79 falhas**;
+com os ficheiros + `--headless --import` = 0 falhas outra vez. Qualquer
+commit futuro que acrescente um `class_name` novo tem de correr
+`--headless --import` antes de correr a suite, ou perde-se tempo a
+investigar uma "regressao" que nao existe.
+
+**ACHADO OPERACIONAL**: durante esta execucao houve sinais fortes de
+**outra sessao a trabalhar no mesmo worktree ao mesmo tempo** (chegou aos
+commits `5c617f3e`/`4c779bc7` em paralelo, com a mesma analise; um stash
+meu desapareceu sozinho da lista partilhada). Desta vez o trabalho calhou
+redundante, nao contraditorio -- mas para as Fases 2-13 (que mexem em
+`koliani.gd`, 3147 linhas, e nos inimigos-piloto) uma colisao a serio e'
+mais provavel. Confirmar com o Paulo se ha duas sessoes abertas antes de
+continuar.
+
+**Por fazer** (Fases 2-13 da execucao, nao comecadas): Launcher + Air
+Combo, Shadow Cleave, Dash Attack + clamp, Perfect Dodge + Counter em
+producao (tudo atras de gates seguros), Enemy Combat Contract v1, piloto
+Goblin (Regiao I), piloto Golem (N6), instrumentacao de Energia, arena de
+QA de producao, regressao total dedicada, e este proprio par de docs por
+fechar com o relatorio final (`docs/combat_production_integration_report.md`
+ainda nao existe). Sem push. N7 nao comecado. Regiao II nao tocada.
+
+---
+
 # >>> COMBAT LAB v1.2 (26 set 2026) -- hierarquia de dano, isolado <<<
 Ver `docs/combat_lab_v1_2.md`. Goblin 500 HP: spam parado 4,48 s, spam com deslocacao 4,93 s, combo ideal 3,60 s (era ~2,4-2,9 s de spam). Base do combo 0,30/0,35/0,43/0,60 (era 0,85/1/1,25/1,9), N4 recup +0,12 s e sem cancel gratis, air 1,4/1,6, launcher/dash 1,3, cleave 2,3, counter 2,7. Risco de feel: golpes basicos 15-30 dano. Nada em producao. Sem push. Regra do Paulo: ao terminar um nivel, abrir o jogo nele (`--nivel=N`).
 
