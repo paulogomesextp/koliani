@@ -75,6 +75,25 @@ var _dive_dir := Vector2.ZERO
 ## ELITE (1 por nível na campanha à mão): aura a pulsar + barra de vida por
 ## cima da cabeça + rebentamento maior na morte. Lê-se como "este é o grande".
 @export var elite := false
+
+## --- ENEMY COMBAT CONTRACT v1 (Fase 7, opt-in) --------------------------
+## 100% inerte por omissão: nenhum inimigo legacy muda de comportamento só
+## por estes campos existirem, porque `lab_hit`/`hurtbox` só são chamados
+## pelo `CoreCombate`/`CombateLab` (opt-in eles próprios; nenhum nível de
+## campanha os liga), NUNCA pelo combo normal (`Koliani._ao_acertar_corpo`
+## chama sempre `receber_dano` diretamente). Ver
+## `docs/plano_integracao_combate_producao.md` §4.
+@export var piloto_combate_v1 := false
+@export_enum("leve", "medio", "pesado") var peso := "leve"
+@export var pode_ser_lancado := true
+## Guarda opcional (Golem-like): custa dano cheio até esgotar; um golpe com
+## `guard_break` (Cleave/Counter) ou um golpe pelas costas ignora-a.
+@export var tem_guarda_v1 := false
+@export var guarda_max_v1 := 100.0
+var _guarda_v1 := -1.0   # -1.0 = por armar (1.a chamada de lab_hit arma para guarda_max_v1)
+## Janela de imunidade a um NOVO lançamento depois de aterrar do último (evita
+## juggle infinito -- mesma ideia do `_imune_lanca_t` do Combat Lab).
+var _imune_lancamento_t := 0.0
 ## Que monstro pixel-art usar (pack CC0 LuizMelo "Monsters Creatures
 ## Fantasy"). Pastas em `assets/sprites/pixel/enemies/<especie>/`.
 @export_enum("goblin", "mushroom", "esqueleto", "olho",
@@ -288,6 +307,8 @@ func _dano_periodico(q: int) -> void:
 func _tick_status(dt: float) -> void:
 	if _morto:
 		return
+	if _imune_lancamento_t > 0.0:
+		_imune_lancamento_t -= dt
 	if _queimando > 0.0:
 		_queimando -= dt
 		_queima_cd -= dt
@@ -1144,6 +1165,60 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0, critico := false,
 		piscar_dano()
 		if elite:
 			_atualizar_barra_elite()
+
+
+## Hurtbox lida pelo CoreCombate/CombateLab (clamp de avanço, deteção dos golpes
+## especiais). Usa a MESMA CollisionShape2D do corpo -- os golpes normais já
+## acertam por essa forma via a hitbox de ataque da Koliani; isto só a expõe.
+func hurtbox() -> Rect2:
+	var cs := get_node_or_null("CollisionShape2D") as CollisionShape2D
+	if cs != null and cs.shape is RectangleShape2D:
+		var sz: Vector2 = (cs.shape as RectangleShape2D).size
+		return Rect2(global_position + cs.position - sz * 0.5, sz)
+	return Rect2(global_position - Vector2(20.0, 40.0), Vector2(40.0, 48.0))  # fallback (igual ao do CoreCombate)
+
+
+## Entrada ÚNICA dos golpes especiais do Core Combat/Combat Lab (Launcher, Air
+## Combo, Cleave, Dash Attack, Counter) -- ver `CoreCombate._aplicar_golpe`.
+## `info`: tipo/dano/dir/critico/guard_break/passo/ar.
+##
+## RAMO NÃO-PILOTO (omissão, `piloto_combate_v1 == false`): passthrough 1:1
+## para `receber_dano` -- o MESMO efeito que aconteceria se este método não
+## existisse (nesse caso o `CoreCombate` cairia para
+## `e.receber_dano(dano, dir, critico, 200.0)` por `has_method("lab_hit")` ser
+## falso). NÃO acrescenta peso, guarda, stagger novo, super-armadura nem
+## hooks de Perfect Dodge a nenhum inimigo legacy -- só ao piloto que ligar
+## este export explicitamente (Fase 8/9).
+func lab_hit(info: Dictionary) -> Dictionary:
+	if not piloto_combate_v1:
+		receber_dano(int(info.get("dano", 0)), float(info.get("dir", 0.0)),
+			bool(info.get("critico", false)), 200.0)
+		return {"aplicado": true, "efeito": "", "lancado": false}
+	# --- PILOTO opt-in -------------------------------------------------------
+	if _guarda_v1 < 0.0:
+		_guarda_v1 = guarda_max_v1   # 1.a chamada: arma a guarda
+	var tipo := String(info.get("tipo", "normal"))
+	var dir_golpe := float(info.get("dir", 0.0))
+	var guard_break := bool(info.get("guard_break", false))
+	var de_frente := dir_golpe != 0.0 and signf(dir_golpe) == _direcao
+	# guarda: golpes pela FRENTE sem guard_break custam guarda em vez de dano
+	# cheio; Cleave/Counter (guard_break) ou um golpe pelas costas ignoram-na.
+	if tem_guarda_v1 and _guarda_v1 > 0.0 and de_frente and not guard_break:
+		var dano_pedido := float(info.get("dano", 0))
+		_guarda_v1 = maxf(0.0, _guarda_v1 - dano_pedido * 0.35)
+		receber_dano(maxi(1, roundi(dano_pedido * 0.2)), dir_golpe, false, 0.0)
+		return {"aplicado": true, "efeito": "guardado" if _guarda_v1 > 0.0 else "guarda_esgotada",
+			"lancado": false}
+	if guard_break:
+		_guarda_v1 = 0.0
+	var lancado := false
+	if tipo == "launcher" and pode_ser_lancado and is_on_floor() and _imune_lancamento_t <= 0.0:
+		velocity.y = -360.0
+		_imune_lancamento_t = 1.2
+		lancado = true
+	receber_dano(int(info.get("dano", 0)), dir_golpe, bool(info.get("critico", false)),
+		0.0 if lancado else 200.0)
+	return {"aplicado": true, "efeito": "lancado" if lancado else "", "lancado": lancado}
 
 
 ## Parte-se em cópias mais pequenas (nível 58). As filhas nascem com

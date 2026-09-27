@@ -116,6 +116,9 @@ func _correr_tudo() -> void:
 	await teste_combat_lab_pd_contrato()
 	teste_contrato_dano_producao()
 	await teste_core_combate_producao()
+	await teste_enemy_contract_legado_inerte()
+	await teste_enemy_contract_hurtbox()
+	await teste_enemy_contract_guarda_opt_in()
 	await teste_combat_lab_clamp()
 	await teste_combat_lab_antispam()
 	await teste_combat_lab_balanco()
@@ -6971,6 +6974,116 @@ func teste_core_combate_producao() -> void:
 	await get_tree().process_frame
 	await get_tree().process_frame
 	EstadoJogo.habilidades.assign(antes_hab)
+
+
+## Fase 7 -- Enemy Combat Contract v1, 100% opt-in. Prova BEFORE == AFTER numa
+## amostra representativa de inimigos LEGACY (varias especies/comportamentos):
+## o mesmo golpe, aplicado por `receber_dano` direto (como o combo normal de
+## producao sempre fez) e por `lab_hit` (a nova entrada do CoreCombate), tem
+## de dar EXACTAMENTE o mesmo resultado quando `piloto_combate_v1` fica no
+## default (`false`). Corre ANTES de qualquer piloto (Fases 8/9).
+func teste_enemy_contract_legado_inerte() -> void:
+	var amostra := [
+		{"especie": "goblin", "comportamento": "patrulha"},
+		{"especie": "mushroom", "comportamento": "saltador"},
+		{"especie": "esqueleto", "comportamento": "escudeiro"},
+		{"especie": "olho", "comportamento": "voador"},
+	]
+	for caso: Dictionary in amostra:
+		var a := (load("res://scenes/actors/DemonioBase.tscn") as PackedScene).instantiate() as DemonioBase
+		var b := (load("res://scenes/actors/DemonioBase.tscn") as PackedScene).instantiate() as DemonioBase
+		for e in [a, b]:
+			e.especie = String(caso["especie"])
+			e.comportamento = String(caso["comportamento"])
+			e.vida = 60
+			e.global_position = Vector2(500.0, 400.0)
+			add_child(e)
+		await get_tree().physics_frame
+		_ok(not a.piloto_combate_v1 and not b.piloto_combate_v1,
+			"contrato inimigo: piloto_combate_v1 tem de ser false por omissao (%s)" % caso["especie"])
+		# golpe 1: receber_dano DIRETO (o caminho do combo normal de producao, sempre foi assim)
+		# forca_recuo=200.0 -- o MESMO valor que o CoreCombate manda no ramo generico (sem lab_hit)
+		a.receber_dano(9, 1.0, false, 200.0)
+		# golpe 2: a MESMA chamada, mas atraves de lab_hit (a nova entrada do CoreCombate)
+		b.lab_hit({"tipo": "normal", "dano": 9, "dir": 1.0, "critico": false, "guard_break": false})
+		_ok(a.vida == b.vida, "contrato inimigo (%s): vida apos o golpe tem de ser identica (a=%d b=%d)"
+			% [caso["especie"], a.vida, b.vida])
+		_ok(is_equal_approx(a._recuo_vel, b._recuo_vel),
+			"contrato inimigo (%s): recuo identico (a=%.2f b=%.2f)" % [caso["especie"], a._recuo_vel, b._recuo_vel])
+		_ok(is_equal_approx(a._flinch, b._flinch), "contrato inimigo (%s): flinch identico" % caso["especie"])
+		_ok(a._morto == b._morto, "contrato inimigo (%s): morte identica" % caso["especie"])
+		# golpe fatal: os dois tem de morrer da MESMA forma (queue_free, sem lab_hit a "salvar" ninguem)
+		var c := (load("res://scenes/actors/DemonioBase.tscn") as PackedScene).instantiate() as DemonioBase
+		var d := (load("res://scenes/actors/DemonioBase.tscn") as PackedScene).instantiate() as DemonioBase
+		for e in [c, d]:
+			e.especie = String(caso["especie"])
+			e.comportamento = String(caso["comportamento"])
+			e.vida = 5
+			e.global_position = Vector2(500.0, 400.0)
+			add_child(e)
+		await get_tree().physics_frame
+		c.receber_dano(50, 1.0, false, 200.0)
+		var res := d.lab_hit({"tipo": "normal", "dano": 50, "dir": 1.0, "critico": false, "guard_break": false})
+		_ok(res.get("aplicado", false) and res.get("efeito", "x") == "" and not res.get("lancado", true),
+			"contrato inimigo (%s): lab_hit nao-piloto devolve o contrato passthrough (aplicado/efeito vazio/nao lancado)"
+				% caso["especie"])
+		_ok(not is_instance_valid(c) or c._morto, "contrato inimigo (%s): morte por receber_dano direto" % caso["especie"])
+		_ok(not is_instance_valid(d) or d._morto, "contrato inimigo (%s): morte por lab_hit identica" % caso["especie"])
+		if is_instance_valid(a):
+			a.queue_free()
+		if is_instance_valid(b):
+			b.queue_free()
+	await get_tree().process_frame
+	await get_tree().process_frame
+
+
+## Fase 7 -- hurtbox() dos inimigos comuns le' a CollisionShape2D real do corpo
+## (a mesma que o combo normal ja' usa), nao um valor inventado.
+func teste_enemy_contract_hurtbox() -> void:
+	var e := (load("res://scenes/actors/DemonioBase.tscn") as PackedScene).instantiate() as DemonioBase
+	e.global_position = Vector2(700.0, 400.0)
+	add_child(e)
+	await get_tree().physics_frame
+	var hb := e.hurtbox()
+	_ok(hb.size == Vector2(40.0, 64.0), "contrato inimigo: hurtbox le' o tamanho real da CollisionShape2D (40x64)")
+	_ok(hb.get_center().distance_to(e.global_position + Vector2(0.0, -13.0)) < 0.5,
+		"contrato inimigo: hurtbox centrada na posicao real da CollisionShape2D")
+	e.queue_free()
+	await get_tree().process_frame
+
+
+## Fase 7 -- guarda opt-in: so' quando `tem_guarda_v1` fica ligado (piloto), nunca por omissao.
+func teste_enemy_contract_guarda_opt_in() -> void:
+	var g := (load("res://scenes/actors/DemonioBase.tscn") as PackedScene).instantiate() as DemonioBase
+	g.especie = "esqueleto"
+	g.vida = 200
+	g.global_position = Vector2(500.0, 400.0)
+	g.piloto_combate_v1 = true
+	g.peso = "pesado"
+	g.pode_ser_lancado = false
+	g.tem_guarda_v1 = true
+	g.guarda_max_v1 = 40.0
+	g._direcao = 1.0
+	add_child(g)
+	await get_tree().physics_frame
+	var vida_antes := g.vida
+	# golpe de FRENTE sem guard_break: custa guarda, so' 20% do dano passa
+	var res1 := g.lab_hit({"tipo": "normal", "dano": 20, "dir": 1.0, "critico": false, "guard_break": false})
+	_ok(res1.get("efeito", "") == "guardado", "contrato inimigo: guarda absorve golpe frontal sem guard_break")
+	_ok(vida_antes - g.vida == 4, "contrato inimigo: golpe guardado so' passa 20%% do dano (esperado 4, foi %d)"
+		% (vida_antes - g.vida))
+	_ok(g._guarda_v1 < g.guarda_max_v1, "contrato inimigo: a guarda gastou-se")
+	# Cleave/Counter (guard_break) ignora a guarda -- dano cheio
+	var vida_antes2 := g.vida
+	g.lab_hit({"tipo": "cleave", "dano": 20, "dir": 1.0, "critico": false, "guard_break": true})
+	_ok(vida_antes2 - g.vida == 20, "contrato inimigo: guard_break ignora a guarda (dano cheio)")
+	_ok(g._guarda_v1 == 0.0, "contrato inimigo: guard_break esgota a guarda")
+	# Launcher: pesado + pode_ser_lancado=false -- nunca lanca
+	g.vida = 200
+	var res2 := g.lab_hit({"tipo": "launcher", "dano": 5, "dir": 1.0, "critico": false, "guard_break": false})
+	_ok(not res2.get("lancado", true), "contrato inimigo: peso pesado + pode_ser_lancado=false nunca lanca")
+	g.queue_free()
+	await get_tree().process_frame
 
 
 ## Atravessamento: o avanco dos golpes nao leva a Koliani ao outro lado do alvo (goblin pequeno e golem grande).
