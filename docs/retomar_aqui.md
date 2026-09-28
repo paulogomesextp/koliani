@@ -1,3 +1,98 @@
+# >>> N11 -- "Entrada dos Ecos", introducao da Regiao III (28 set 2026, sem push) <<<
+Estrutura regional (mesma logica do N6-N10): **N11 = Introducao/Teach** da
+Torre dos Ecos. Briefing do GM: "auditar e construir/reconstruir o N11" --
+SEM boss, SEM miniboss disfarcado (Vyrak so' aparece no N15), a ensinar
+`escalar_paredes` (ja concedida no N10) + a linguagem dos sinos. **NAO
+COMECAR O N12** (respeitado).
+
+**Auditoria primeiro**: `Torre_dos_Sinos.tscn` ja existia, com boa forma
+vertical (bifurcacao escadaria O/E, dois `SinoTorre`, elite Acolito do Eco,
+2 checkpoints) mas com dois problemas reais:
+  1. um `Chefe` (`ChefeSinoVivo`, "O Sino Vivo") a selar a porta -- viola
+     "sem boss" explicito do briefing. **Removido** da cena (a cena/script
+     do Sino Vivo NAO foi apagada, fica disponivel para a regiao decidir);
+  2. um `Coletavel` `habilidade_id="escalar_paredes"` a meio do nivel --
+     redundante, a habilidade ja e' concedida (incondicional) ao vencer o
+     chefe do N10. **Removido**.
+Tambem tinha `corredor` por omissao (`true`, nao sobreposto na cena) -- a
+jornada procedural continuava a prepender-se ao conteudo a mao, o que o GM
+pediu explicitamente para tirar. **Feito**: `corredor = false`,
+`checkpoints_autorais = true`.
+
+**O que faltava mesmo**: o grupo `"sino_alterna"` do `SinoTorre` (alterna
+plataformas ao tocar) **existia no script desde sempre mas nenhum nivel do
+jogo o usava** -- os sinos so' congelavam inimigos, nunca mexiam no
+cenario. Sem isso o "primeiro sino" do jogo nao tinha consequencia nenhuma
+visivel (viola "consequencia imediatamente percetivel" do briefing). Feito
+nesta execucao: `scripts/plataforma_sino.gd` (`PlataformaSino`, nova classe
+que extends `Plataforma`, nasce fantasma e so' fica solida quando um
+`SinoTorre` do mesmo grupo toca) + `scenes/actors/PlataformaSino.tscn`.
+Ligado a dois pontos da cena: `EcoBaixo` (junto do primeiro sino, grupo
+`"sino_alterna"`) e `EcoAlto` (junto do segundo sino, grupo proprio
+`"sino_alterna_alto"` para cada sino ficar legivel por si). Nenhum dos dois
+e' obrigatorio -- sao atalhos/bonus, zero risco de softlock se a colisao
+nao alternar como esperado.
+
+**Estrutura A-F** (tudo dentro da sala ja existente, reorganizada, nao
+reconstruida do zero): A) Entrada (ChaoInicio, atmosfera, sem pressao).
+B) Primeira escalada (`ParedeSubida`, muro novo ~180px sobre chao solido,
+fora do alcance de qualquer inimigo -- ver auditoria de distancias abaixo).
+C) Primeiro sino (`SinoBaixo` + `EcoBaixo`). D) Plataformas oscilantes
+(`O2` e `SubidaOeste2` passaram de `Plataforma` estatica para
+`PlataformaFlutuante` -- baloico vertical simples primeiro, deriva
+horizontal na segunda). E) Sino + movimento (`SinoAlto` + `EcoAlto` junto
+da oscilante `E2`, ramo leste). F) Mini-teste (resto do ramo ate' ao
+`ChaoChefe`, sem boss).
+
+**Conflito com decisao anterior encontrado e resolvido**: um teste
+(`teste_r3_um_so_chefe_na_regiao`) tinha fixado "o Sino Vivo fica no N11
+como guardiao" numa sessao anterior, e `CatalogoCampanha.CHEFE_KEY[10]`
+era `"guard.sino_vivo"` -- a HUD mostrava "Guardian: The Living Bell" no
+cabecalho do nivel mesmo sem chefe nenhum na cena (visto por screenshot,
+`docs/qa/n11_check.png`, ANTES da correcao). **Corrigido**:
+`CHEFE_KEY[10] = ""` (a HUD deixa de mostrar linha de chefe/guardiao no
+N11 -- `docs/qa/n11_check2.png` confirma), teste atualizado com comentario
+a explicar a supersessao. **Por decidir com o GM**: o "Sino Vivo" muda de
+nivel dentro da regiao (N12-N14, ainda sem auditoria) ou fica so' como
+recurso disponivel? Os docs antigos (`docs/art_direction/regions/region_03/`,
+`docs/rebuild_region_03_plan.md`, etc.) ainda descrevem o plano velho --
+NAO reescritos nesta execucao (fora de escopo, so' o N11).
+
+`world.towers` (nome da Regiao III) passou de "Torres Esquecidas"/"Forgotten
+Towers" para "Torre dos Ecos"/"Tower of Echoes" nos 6 idiomas -- so' texto,
+nao mexe em `REGIOES[2]["niveis"]` nem em nenhum nivel de N12-N15.
+
+**Testes**: `tests/test_region03_n11_level.gd` novo (`TestesRegion03N11`,
+na suite) -- valida cena carrega, sem `Chefe`/`Guardiao`, sem chefe antigo
+instanciado, `escalar_paredes` ja disponivel (nao re-concedida), textos
+i18n do tutorial existem, muro de escalada pequeno (120-320px) sobre chao
+solido, nenhum inimigo a menos de 140px (distancia 2D, nao so' x -- e' uma
+TORRE vertical) do muro/1o sino/aterragem das oscilantes, `EcoBaixo`/
+`EcoAlto` nascem fantasma no grupo certo, >=2 checkpoints autorais fora de
+plataformas moveis, bioma/fundo corretos, Koliani canonica. Achado do
+proprio teste (2 falhas na 1a corrida): o `EliteAcolito` pre-existente
+ficava a d=84/120px do muro/sino medindo so' por X -- corrigido para
+distancia 2D real (o elite estava genuinamente longe em Y, o teste e' que
+media mal).
+
+`teste_catalogo_campanha` e `teste_r3_um_so_chefe_na_regiao` (`run_tests.gd`)
+atualizados para a excecao do N11 (unico indice com `CHEFE_KEY == ""`).
+
+**Suite completa: 0 falhas, save real intacto** (confirmado 2x, a 1a com os
+2 falsos-positivos do teste novo, a 2a e a 3a limpas). `.exe` Windows
+reexportado (`build/windows/Koliani.exe`) e lancado no N11
+(`--nivel=11 --devmode`, `--screen 1`) para o Paulo testar. Screenshot de
+verificacao visual: `docs/qa/n11_check2.png` (entrada da torre, sino de
+fundo, HUD sem linha de chefe).
+
+**Pendente do GM**: playtest humano completo (a escalada e' mesmo "pequena"
+e legivel? as duas plataformas oscilantes tem velocidade/trajetoria
+confortaveis num telemovel? o atalho do EcoBaixo/EcoAlto aparece com
+clareza suficiente? decidir o destino do Sino Vivo dentro da regiao). So'
+depois decidir a Regiao III alem do N11. **N12 NAO comecado.**
+
+---
+
 # >>> N10 -- exame final + Guardiao dos Ceus, recompensa ligada (28 set 2026, sem push) <<<
 Estrutura regional: N6=Teach, N7=Develop/Test, N8=Combine, N9=Challenge,
 **N10=Boss/Exame (fechado)**. Briefing do GM: "construir/reconstruir o N10,
