@@ -1,3 +1,80 @@
+# >>> N10 -- exame final + Guardiao dos Ceus, recompensa ligada (28 set 2026, sem push) <<<
+Estrutura regional: N6=Teach, N7=Develop/Test, N8=Combine, N9=Challenge,
+**N10=Boss/Exame (fechado)**. Briefing do GM: "construir/reconstruir o N10,
+clímax da Região II". **Auditoria primeiro** (regra do briefing): o N10 já
+existia, tecnicamente completo desde o Process 12 (17 set 2026) e revisto no
+Super-Process A/Prompt 4 (arte canónica, `docs/implementation/
+region_02_n10_guardian_skies.md`, `docs/plano_atual.md`) -- **APPROVED por
+playtest humano** na build Windows na altura. Cena `A_Cela_Zero.tscn`
+(nome de ficheiro legacy): poço em ziguezague authored (`corredor = false`),
+bifurcação esquerda/direita com as duas leituras de vento da região (corrente
+ascendente vs. rajada contra pulsada), elite `elemental_do_vento`, 2
+checkpoints (`CheckInicio`, `CheckMeio` -- o `CheckMeio` fica ~250 px antes da
+sala do chefe, mesma ordem de grandeza que o `CheckExame` do N9 antes do
+Guardião elite; não fica dentro da arena), sala do chefe numa laje contínua
+única (`ChaoChefe`, sem plataformas secundárias), `Chefe` = `ChefeGuardiaoDosCeus`
+(3 ataques telegrafados -- LÂMINA/COMANDO DO VENTO/QUEDA --, `EXPOSTO` sempre
+alcançável, fase 2 aos 50% de vida encadeando vento->lâmina sem inflacionar
+HP), `Porta` selada até `derrotado`. Não havia nada para reconstruir de
+raiz -- reconstruir do zero teria destruído trabalho aprovado sem motivo
+técnico.
+
+**O que faltava mesmo (a auditoria encontrou isto, não inventado)**: a
+decisão do GM #3 em `docs/regiao_2_decisoes_e_n6_auditoria.md` ("o boss do
+N10 concede `escalar_paredes`") estava só documentada -- `HABILIDADE_DO_CHEFE`
+em `nivel_com_chefe.gd` só tinha `{4: "salto_duplo"}`, sem entrada para o
+índice 9. Não havia cartão de fim de região (`REGIAO_CONCLUIDA` também só
+tinha o índice 4) nem a chave i18n `region.2.complete` nos 6 idiomas. **Feito
+nesta execução**: `HABILIDADE_DO_CHEFE[9] = "escalar_paredes"`,
+`REGIAO_CONCLUIDA[9] = "region.2.complete"`, chave nova em
+`assets/i18n/{en,pt,es,fr,de,zh}.json`. O grant é incondicional (dispara no
+`_abrir()` do baú do chefe, não depende de nenhum `Coletavel`) -- por isso já
+cumpre sozinho a regra global "skill sempre aprendida ao concluir o nível
+mesmo sem apanhar o pickup", sem precisar do sistema de reconciliação de
+saves antigos (que continua por implementar; não é preciso aqui porque não
+há pickup nenhum no caminho desta recompensa). Idempotente por construção:
+`_abrir()` sai cedo se `_bau_criado` já for `true`, e o próprio
+`desbloquear_habilidade` só corre se `not tem_habilidade(hab)`.
+
+**Testes**: `tests/test_region02_n10_level.gd` (`TestesRegion02N10`, já na
+suite) ganhou 4 verificações novas (mapeamento `HABILIDADE_DO_CHEFE`/
+`REGIAO_CONCLUIDA` do índice 9, texto i18n do cartão e da habilidade). Novo
+`teste_fluxo_fim_regiao2` em `tests/run_tests.gd` (espelha
+`teste_fluxo_fim_regiao1`): porta selada -> `escalar_paredes` ausente ->
+`Chefe.derrotado.emit()` -> `escalar_paredes` concedida -> reconceder não
+duplica a entrada em `habilidades` -> baú -> cartão `region.2.complete`
+(texto confirmado) -> Continuar -> porta abre; e confirma que
+`EstadoJogo.NIVEIS[10]` continua a ser `Torre_dos_Sinos.tscn` (Região III não
+arrancou nesta execução).
+
+**Suite completa**: `tools/correr_testes.ps1` -- **1 falha**,
+`FALHOU: offscreen: zoom 2x, o mesmo ponto devia estar fora do campo visual`
+(`teste_offscreen_global`), **sem relação com o N10** (câmara/zoom, ficheiro
+não tocado nesta execução). Confirmado flake isolando via `SO_TESTE=
+teste_offscreen_global python tools/godot_isolado.py -- --headless --path .
+res://tests/run_tests.tscn`: falhou numa asserção DIFERENTE ("zoom 1x" em vez
+de "zoom 2x") -- sensível a timing do `Camera2D`/interpolação física, não ao
+código mexido aqui. `teste_fluxo_fim_regiao2` isolado: **0 falhas**. Save
+real intacto (`[isolado] save real intacto (3 ficheiros verificados)`) em
+todas as corridas.
+
+**Build**: `build/windows/Koliani.exe` reexportado (preset "Windows
+Desktop") e lançado com `-- --nivel=10 --devmode` para o Paulo testar
+toque/performance reais e a luta completa.
+
+**Não feito, por instrução**: N11 não começado; Região III não começada;
+N6-N9 não tocados (só `nivel_com_chefe.gd`, script partilhado, só ganhou
+entradas de dicionário para o índice 9 -- os índices 4..8 ficaram
+bit-a-bit iguais); nenhuma arte nova (o passe canónico já tinha sido feito
+no Super-Process A); vida/dano/telégrafos do Guardião não afinados (já
+estavam aprovados em playtest humano); **sem push** (só commit local).
+
+**Próximo passo**: playtest humano do GM no N10 completo -- confirmar que a
+recompensa `escalar_paredes` e o cartão `DESFILADEIRO DOS VENTOS CONCLUÍDO`
+aparecem como esperado a seguir ao baú, e só depois decidir Região III.
+
+---
+
 # >>> N9 AUTORAL -- "Desfiladeiro dos Ventos", CHALLENGE (28 set 2026, sem push) <<<
 Estrutura regional: N6=Teach, N7=Develop/Test, N8=Combine, **N09=Challenge**,
 N10=Boss/Exame. Ver `docs/nivel_autoral_n9.md` para o mapa completo. Cena
