@@ -223,10 +223,19 @@ func _abrir_guardiao() -> void:
 ## `tools/verifica_mobilidade_9h17.gd`). Antes desta entrada o salto duplo
 ## nao se ganhava em SITIO NENHUM da campanha: as `HABILIDADES_INICIAIS`
 ## foram esvaziadas e nunca ninguem lhe deu uma porta de entrada.
-const HABILIDADE_DO_CHEFE := {4: "salto_duplo"}
+## N10 (indice 9, Guardiao dos Ceus) acrescentado na execucao do N10: decisao
+## do GM em `docs/regiao_2_decisoes_e_n6_auditoria.md` (#3) -- a Regiao II
+## concede `escalar_paredes` (wall-jump) ao derrotar o boss regional. Nao e'
+## ensinada nem exigida dentro da Regiao II; so' passa a fazer falta a partir
+## da Regiao III. O grant e' incondicional (nao depende de apanhar nenhum
+## `Coletavel`) -- por isso ja' cumpre sozinho a regra global "skill sempre
+## aprendida ao concluir o nivel", sem precisar do sistema de reconciliacao
+## de saves antigos (que continua por implementar; ver nota em
+## `docs/retomar_aqui.md` da execucao N10).
+const HABILIDADE_DO_CHEFE := {4: "salto_duplo", 9: "escalar_paredes"}
 
-## Cartao de fim de regiao (so' a Regiao I por agora): indice do nivel -> chave i18n.
-const REGIAO_CONCLUIDA := {4: "region.1.complete"}
+## Cartao de fim de regiao: indice do nivel -> chave i18n.
+const REGIAO_CONCLUIDA := {4: "region.1.complete", 9: "region.2.complete"}
 ## Habilidade ganha NESTA vitoria (para o cartao); "" se ja' a tinha.
 var _hab_ganha := ""
 

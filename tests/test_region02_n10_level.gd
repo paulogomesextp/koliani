@@ -149,6 +149,23 @@ static func executar() -> Array[String]:
 		if filho.get("habilidade_id") == "planar":
 			falhas.append("N10: %s dava a habilidade permanente planar" % filho.name)
 
+	# --- recompensa do exame regional: escalar_paredes -------------------
+	# Decisao do GM (`docs/regiao_2_decisoes_e_n6_auditoria.md`, #3): o boss
+	# do N10 concede o wall-jump, incondicional (nao depende de nenhum
+	# `Coletavel`) -- por isso o grant e' sempre idempotente e nunca duplicado,
+	# ver `NivelComChefe._abrir()`.
+	var script_niv := load("res://scripts/nivel_com_chefe.gd")
+	_verificar(falhas,
+		script_niv.HABILIDADE_DO_CHEFE.get(INDICE_N10, "") == "escalar_paredes",
+		"N10: o boss concede escalar_paredes (wall-jump) ao ser derrotado")
+	_verificar(falhas,
+		script_niv.REGIAO_CONCLUIDA.get(INDICE_N10, "") == "region.2.complete",
+		"N10: fecha a Região II com o cartão region.2.complete")
+	_verificar(falhas, Textos.t("region.2.complete") != "region.2.complete",
+		"N10: o cartão de fim de região tem texto em i18n")
+	_verificar(falhas, Textos.t("hud.ability.escalar_paredes") != "hud.ability.escalar_paredes",
+		"N10: o nome da habilidade escalar_paredes tem texto em i18n")
+
 	# --- Koliani canónica ----------------------------------------------
 	var k := raiz.get_node_or_null("Koliani")
 	if k:

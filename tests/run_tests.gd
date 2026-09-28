@@ -115,6 +115,7 @@ func _correr_tudo() -> void:
 	await teste_n7_autoral()
 	await teste_n8_autoral()
 	await teste_n9_autoral()
+	await teste_fluxo_fim_regiao2()
 	await teste_combat_lab()
 	await teste_combat_lab_combos()
 	await teste_combat_lab_pd_real()
@@ -6519,6 +6520,73 @@ func teste_n8_autoral() -> void:
 	EstadoJogo.modo_dev = antes_dev
 	EstadoJogo.habilidades.assign(antes_hab)
 	EstadoJogo.bosses_derrotados.assign(antes_bosses)
+	EstadoJogo.indice_nivel = antes_idx
+
+
+## Fluxo real do N10 (execucao N10, Guardiao dos Ceus): porta selada -> boss
+## derrotado -> escalar_paredes desbloqueado -> bau -> cartao "region.2.complete"
+## -> Continuar -> porta aberta. Espelha `teste_fluxo_fim_regiao1`. Prova em
+## cima do nivel REAL (nao um duplo local) que a recompensa e' idempotente
+## (nao concede duas vezes) e que a Regiao III nao arranca sozinha.
+func teste_fluxo_fim_regiao2() -> void:
+	var antes_bosses: Array[String] = EstadoJogo.bosses_derrotados.duplicate()
+	var antes_rec: Array = EstadoJogo.recompensas_reclamadas.duplicate()
+	var antes_hab: Array = EstadoJogo.habilidades.duplicate()
+	var antes_idx: int = EstadoJogo.indice_nivel
+	EstadoJogo.bosses_derrotados.clear()
+	EstadoJogo.recompensas_reclamadas.clear()
+	EstadoJogo.habilidades.assign(["dash", "pogo", "especial", "salto_duplo", "projetil"])
+	EstadoJogo.indice_nivel = 9
+	var nivel := (load("res://scenes/levels/A_Cela_Zero.tscn") as PackedScene).instantiate()
+	add_child(nivel)
+	for i in 6:
+		await get_tree().process_frame
+	var porta := nivel.get_node("Porta") as Area2D
+	_ok(not porta.monitoring, "fluxo R2: porta selada antes do boss")
+	_ok(not EstadoJogo.tem_habilidade("escalar_paredes"), "fluxo R2: escalar_paredes so' depois do boss")
+	var chefe := nivel.get_node("Chefe")
+	chefe.derrotado.emit()
+	for i in 4:
+		await get_tree().process_frame
+	_ok(EstadoJogo.tem_habilidade("escalar_paredes"), "fluxo R2: boss derrotado desbloqueia escalar_paredes")
+	# idempotencia: emitir outra vez (ex.: reload a meio do bau) nao pode
+	# reconceder nem duplicar a entrada em `habilidades`.
+	var n_antes: int = EstadoJogo.habilidades.count("escalar_paredes")
+	if nivel.has_method("_abrir"):
+		nivel._abrir()
+	_ok(EstadoJogo.habilidades.count("escalar_paredes") == n_antes,
+		"fluxo R2: reconceder escalar_paredes nao duplica a habilidade")
+	var bau := nivel.get_node_or_null("BauChefe")
+	_ok(bau != null, "fluxo R2: bau nasce")
+	_ok(not porta.monitoring, "fluxo R2: porta continua selada com o bau por abrir")
+	if bau:
+		bau._abrir()
+		var botoes: Array = bau._painel.find_children("*", "Button", true, false)
+		_ok(not botoes.is_empty(), "fluxo R2: painel do bau tem Continuar")
+		(botoes[0] as Button).pressed.emit()
+		await get_tree().process_frame
+		var cartao := nivel.get_node_or_null("CartaoRegiao")
+		_ok(cartao != null, "fluxo R2: cartao de fim de regiao aparece")
+		_ok(not porta.monitoring, "fluxo R2: porta selada enquanto o cartao esta' aberto")
+		if cartao:
+			var textos: Array[String] = []
+			for lab in cartao.find_children("*", "Label", true, false):
+				textos.append((lab as Label).text)
+			var junto := " | ".join(textos)
+			_ok(junto.contains(Textos.t("region.2.complete")), "fluxo R2: cartao mostra DESFILADEIRO DOS VENTOS CONCLUIDO")
+			(cartao.find_children("*", "Button", true, false)[0] as Button).pressed.emit()
+			await get_tree().process_frame
+			_ok(porta.monitoring, "fluxo R2: Continuar abre a porta")
+	# Regiao III nao arranca sozinha: o proximo indice da campanha (10) tem
+	# de continuar a ser um nivel valido da NIVEIS, nao uma cena nova criada
+	# por esta execucao.
+	_ok(EstadoJogo.NIVEIS.size() > 10 and EstadoJogo.NIVEIS[10] == "res://scenes/levels/Torre_dos_Sinos.tscn",
+		"fluxo R2: N11 continua a ser a cena existente (Regiao III nao comecada aqui)")
+	nivel.queue_free()
+	await get_tree().process_frame
+	EstadoJogo.bosses_derrotados.assign(antes_bosses)
+	EstadoJogo.recompensas_reclamadas.assign(antes_rec)
+	EstadoJogo.habilidades.assign(antes_hab)
 	EstadoJogo.indice_nivel = antes_idx
 
 
