@@ -648,6 +648,8 @@
   "mec.serras.txt": "锯片沿着平台上下的轨道往返。踩着它们的节奏跳。",
   "mec.sinos.nome": "敲钟",
   "mec.sinos.txt": "桥是虚影，直到你敲响钟。需要几次就敲几次。",
+  "mec.escalar_paredes.nome": "攀爬墙壁",
+  "mec.escalar_paredes.txt": "跳向墙壁并按住朝向它的方向以贴住墙面。按住上可以往上爬，再次跳跃可以蹬开。",
   "mec.sombra.nome": "你的影子",
   "mec.sombra.txt": "它沿你的路径延迟三秒行走。打不掉也甩不脱——千万别折返。",
   "mec.tapete.nome": "水流",
@@ -813,7 +815,7 @@
   "world.machines": "机械之城",
   "world.redsea": "赤海",
   "world.sky": "碎裂之天",
-  "world.towers": "被遗忘之塔",
+  "world.towers": "回声之塔",
   "world.unknown": "?",
   "world.void": "虚无",
   "world.war": "王国之战"

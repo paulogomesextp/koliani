@@ -648,6 +648,8 @@
   "mec.serras.txt": "Las sierras corren por raíles arriba y abajo de las plataformas. Salta a su ritmo.",
   "mec.sinos.nome": "Toca la Campana",
   "mec.sinos.txt": "El puente es fantasma hasta que golpeas la campana. Tócala las veces que haga falta.",
+  "mec.escalar_paredes.nome": "Escala el Muro",
+  "mec.escalar_paredes.txt": "Salta contra un muro y mantén la dirección hacia él para agarrarte. Mantén arriba para escalar, o salta de nuevo para soltarte.",
   "mec.sombra.nome": "Tu Sombra",
   "mec.sombra.txt": "Recorre tu camino tres segundos después. No se combate ni se despista: no vuelvas atrás.",
   "mec.tapete.nome": "Corrientes de Agua",
@@ -813,7 +815,7 @@
   "world.machines": "Ciudad de las Maquinas",
   "world.redsea": "Mar Rojo",
   "world.sky": "Cielo Roto",
-  "world.towers": "Torres Olvidadas",
+  "world.towers": "Torre de los Ecos",
   "world.unknown": "?",
   "world.void": "El Vacio",
   "world.war": "Guerra de los Reinos"

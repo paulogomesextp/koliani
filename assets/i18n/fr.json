@@ -648,6 +648,8 @@
   "mec.serras.txt": "Les scies filent sur des rails au-dessus et en dessous. Saute à leur rythme.",
   "mec.sinos.nome": "Sonne la Cloche",
   "mec.sinos.txt": "Le pont est fantôme tant que la cloche n'a pas sonné. Frappe-la autant que nécessaire.",
+  "mec.escalar_paredes.nome": "Grimpe au Mur",
+  "mec.escalar_paredes.txt": "Saute contre un mur et maintiens la direction vers lui pour t'accrocher. Maintiens le haut pour grimper, ou saute à nouveau pour t'en détacher.",
   "mec.sombra.nome": "Ton Ombre",
   "mec.sombra.txt": "Elle suit ton chemin trois secondes plus tard. Ni combat ni semis — ne reviens jamais sur tes pas.",
   "mec.tapete.nome": "Courants",
@@ -813,7 +815,7 @@
   "world.machines": "Cite des Machines",
   "world.redsea": "Mer Rouge",
   "world.sky": "Ciel Brise",
-  "world.towers": "Tours Oubliées",
+  "world.towers": "Tour des Échos",
   "world.unknown": "?",
   "world.void": "Le Vide",
   "world.war": "Guerre des Royaumes"

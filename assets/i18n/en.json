@@ -648,6 +648,8 @@
   "mec.serras.txt": "Saws run along rails above and below the platforms. Jump on their beat.",
   "mec.sinos.nome": "Ring the Bell",
   "mec.sinos.txt": "The bridge is a ghost until you strike the bell. Hit it as often as you need.",
+  "mec.escalar_paredes.nome": "Climb the Wall",
+  "mec.escalar_paredes.txt": "Jump into a wall and hold toward it to cling. Hold up to climb, or jump again to push off.",
   "mec.sombra.nome": "Your Shadow",
   "mec.sombra.txt": "It walks your path three seconds late. It cannot be fought or shaken — just never double back.",
   "mec.tapete.nome": "Currents",
@@ -813,7 +815,7 @@
   "world.machines": "City of Machines",
   "world.redsea": "Red Sea",
   "world.sky": "Broken Sky",
-  "world.towers": "Forgotten Towers",
+  "world.towers": "Tower of Echoes",
   "world.unknown": "?",
   "world.void": "The Void",
   "world.war": "War of the Realms"

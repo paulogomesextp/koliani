@@ -648,6 +648,8 @@
   "mec.serras.txt": "Sägen laufen auf Schienen über und unter den Plattformen. Spring in ihrem Takt.",
   "mec.sinos.nome": "Läute die Glocke",
   "mec.sinos.txt": "Die Brücke ist ein Geist, bis du die Glocke schlägst. Schlag sie, so oft du willst.",
+  "mec.escalar_paredes.nome": "Klettere die Wand hoch",
+  "mec.escalar_paredes.txt": "Spring in eine Wand und halte die Richtung zu ihr, um dich festzuhalten. Halte hoch, um zu klettern, oder spring erneut, um dich abzustoßen.",
   "mec.sombra.nome": "Dein Schatten",
   "mec.sombra.txt": "Er geht deinen Weg drei Sekunden später. Nicht bekämpfbar, nicht abzuhängen — geh nie zurück.",
   "mec.tapete.nome": "Strömungen",
@@ -813,7 +815,7 @@
   "world.machines": "Stadt der Maschinen",
   "world.redsea": "Rotes Meer",
   "world.sky": "Zerbrochener Himmel",
-  "world.towers": "Vergessene Türme",
+  "world.towers": "Turm der Echos",
   "world.unknown": "?",
   "world.void": "Die Leere",
   "world.war": "Krieg der Reiche"

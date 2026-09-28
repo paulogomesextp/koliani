@@ -648,6 +648,8 @@
   "mec.serras.txt": "As serras correm em calhas por cima e por baixo das plataformas. Salta no ritmo delas.",
   "mec.sinos.nome": "Toca o Sino",
   "mec.sinos.txt": "A ponte está fantasma até bateres no sino. Toca-lhe as vezes que forem precisas.",
+  "mec.escalar_paredes.nome": "Escala a Parede",
+  "mec.escalar_paredes.txt": "Salta para uma parede e segura na direção dela para te agarrares. Segura para cima para escalar, ou salta outra vez para te afastares.",
   "mec.sombra.nome": "A Tua Sombra",
   "mec.sombra.txt": "Anda pelo teu caminho três segundos depois. Não se combate nem se despista — não voltes atrás.",
   "mec.tapete.nome": "Correntes de Água",
@@ -813,7 +815,7 @@
   "world.machines": "Cidade das Maquinas",
   "world.redsea": "Mar Vermelho",
   "world.sky": "Ceu Partido",
-  "world.towers": "Torres Esquecidas",
+  "world.towers": "Torre dos Ecos",
   "world.unknown": "?",
   "world.void": "O Vazio",
   "world.war": "Guerra dos Reinos"

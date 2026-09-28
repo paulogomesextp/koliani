@@ -167,7 +167,7 @@ const REGIOES := [
 	# Regiao II -- Desfiladeiro dos Ventos. A cor e' a luz-chave do N06,
 	# como manda o comentario acima; era o azul-ferro da masmorra.
 	{"id": "desfiladeiro", "nome": "Desfiladeiro dos Ventos", "niveis": [5, 6, 7, 8, 9], "chave": "world.gorge", "cor": Color(0.78, 0.60, 1.00)},
-	{"id": "torres", "nome": "Torres Esquecidas", "niveis": [10, 11, 12, 13, 14], "chave": "world.towers", "cor": Color(1.00, 0.74, 0.46)},
+	{"id": "torres", "nome": "Torre dos Ecos", "niveis": [10, 11, 12, 13, 14], "chave": "world.towers", "cor": Color(1.00, 0.74, 0.46)},
 	{"id": "catacumbas", "nome": "Catacumbas do Abismo", "niveis": [15, 16, 17, 18, 19], "chave": "world.catacombs", "cor": Color(0.86, 0.70, 0.78)},
 	{"id": "cidade", "nome": "Cidade Corrompida", "niveis": [20, 21, 22, 23, 24], "chave": "world.city", "cor": Color(1.00, 0.62, 0.72)},
 	{"id": "castelo", "nome": "Castelo de Zeriko", "niveis": [25, 26, 27, 28, 29], "chave": "world.castle", "cor": Color(1.00, 0.44, 0.96)},

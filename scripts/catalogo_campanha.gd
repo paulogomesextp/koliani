@@ -38,7 +38,16 @@ const CHEFE_KEY: Array[String] = [
 	# encontros intermédios são GUARDIÕES, como já se fez na Região II.
 	# Os nomes dos ficheiros das cenas ficam como estão: mudá-los partia
 	# saves e checkpoints. O que o jogador lê é a chave `level.n##`.
-	"guard.sino_vivo",           # 10 N11 -- Entrada dos Ecos
+	#
+	# N11 (auditoria GM, 28 set 2026): o plano antigo tinha aqui o
+	# "guard.sino_vivo" a selar a porta, mas o briefing desta execução foi
+	# explícito -- "SEM BOSS, SEM MINIBOSS DISFARÇADO" no N11, que é só a
+	# INTRODUÇÃO da região (o Sino Vivo saiu do nível, ver Torre_dos_Sinos.tscn).
+	# "" = a HUD não mostra nenhuma linha de chefe/guardião neste nível
+	# (`controlos_toque.gd::_encher_cabecalho_nivel`, `if ck != "":`).
+	# Por decidir com o GM: se o "Sino Vivo" muda de nível dentro da região
+	# (N12-N14 ainda não têm este audit) ou se fica só como recurso disponível.
+	"",                          # 10 N11 -- Entrada dos Ecos (sem guardião/chefe)
 	"guard.aerion",              # 11 N12 -- Galerias Verticais
 	"guard.voltaris",            # 12 N13 -- Mecanismos Antigos
 	"guard.sacerdotisa_lunar",   # 13 N14 -- Campanário

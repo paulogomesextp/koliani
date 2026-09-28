@@ -25,6 +25,7 @@ const TestesGlideRegiao02 := preload("res://tests/test_glide_region02.gd")
 ## `teste_n8_autoral` (abaixo) + os blocos N08 de `test_region02_wind_levels.gd`,
 ## o mesmo padrao usado quando N06/N07 passaram a autorais.
 const TestesRegion02N10 := preload("res://tests/test_region02_n10_level.gd")
+const TestesRegion03N11 := preload("res://tests/test_region03_n11_level.gd")
 const TestesKolianiCanonicaNiveis := preload("res://tests/test_koliani_canonica_niveis.gd")
 const DT := 1.0 / 60.0
 
@@ -54,6 +55,8 @@ func _correr_tudo() -> void:
 	for falha in TestesGlideRegiao02.executar():
 		_falhas.append(falha)
 	for falha in TestesRegion02N10.executar():
+		_falhas.append(falha)
+	for falha in TestesRegion03N11.executar():
 		_falhas.append(falha)
 	for falha in TestesKolianiCanonicaNiveis.executar():
 		_falhas.append(falha)
@@ -794,9 +797,15 @@ func teste_catalogo_campanha() -> void:
 	_ok(CatalogoCampanha.CHEFE_KEY.size() == n,
 		"CatalogoCampanha.CHEFE_KEY devia ter uma entrada por nível (%d)" % n)
 	var vistas := {}
-	for k in CatalogoCampanha.CHEFE_KEY:
+	for idx in CatalogoCampanha.CHEFE_KEY.size():
+		var k: String = CatalogoCampanha.CHEFE_KEY[idx]
 		# nem todo o nível acaba num chefe: os que acabam num guardião levam
-		# `guard.*` (ver `CatalogoCampanha.tem_chefe`)
+		# `guard.*` (ver `CatalogoCampanha.tem_chefe`). O N11 (índice 10) é a
+		# ÚNICA exceção canónica: introdução da Região III, sem chefe nem
+		# guardião (auditoria GM, 28 set 2026) -- ver `teste_r3_um_so_chefe_na_regiao`.
+		if idx == 10:
+			_ok(k == "", "N11 (índice 10) devia ser '' (sem chefe/guardião), é '%s'" % k)
+			continue
 		_ok(k.begins_with("boss.") or k.begins_with("guard."),
 			"chave de fim de nível mal formada: '%s'" % k)
 		_ok(not vistas.has(k), "chave de chefe repetida: '%s'" % k)
@@ -812,6 +821,8 @@ func teste_catalogo_campanha() -> void:
 		_ok(false, "en.json devia ser um objecto")
 		return
 	for k in CatalogoCampanha.CHEFE_KEY:
+		if k == "":
+			continue
 		_ok(en.has(k), "en.json sem o nome do chefe '%s'" % k)
 	for i in n:
 		var lk := CatalogoCampanha.chave_nivel(i)
@@ -3948,18 +3959,25 @@ func teste_r3_vyrak_sem_lore_de_dragao() -> void:
 
 
 func teste_r3_um_so_chefe_na_regiao() -> void:
-	# O canone da Regiao III admite UM confronto -- o Vyrak, no N15. Os
-	# quatro encontros intermedios sao GUARDIOES, como na Regiao II.
-	for i in 4:
+	# O canone da Regiao III admite UM confronto -- o Vyrak, no N15.
+	#
+	# Auditoria N11 (GM, 28 set 2026): o briefing desta execucao foi
+	# explicito -- "SEM BOSS, SEM MINIBOSS DISFARCADO" no N11, que e' so' a
+	# INTRODUCAO da regiao. Isto SUPERSEDE a decisao anterior desta mesma
+	# funcao ("o Sino Vivo fica no N11 como guardiao"): o Sino Vivo saiu da
+	# cena (`Torre_dos_Sinos.tscn`) e `CHEFE_KEY[R3_BASE]` passou a "" (sem
+	# linha de chefe/guardiao na HUD). N12-N14 ainda nao tiveram este audit
+	# -- continuam guardioes ate' alguem decidir o contrario.
+	for i in [1, 2, 3]:
 		var chave: String = CatalogoCampanha.CHEFE_KEY[R3_BASE + i]
 		_ok(chave.begins_with("guard."),
 			"R3: o N%d devia ser guardiao, e' `%s`" % [11 + i, chave])
 	_ok(CatalogoCampanha.CHEFE_KEY[R3_BASE + 4] == "boss.vyrak",
 		"R3: o N15 devia ser `boss.vyrak`, e' `%s`" % [
 			CatalogoCampanha.CHEFE_KEY[R3_BASE + 4]])
-	# O Sino Vivo fica -- um chefe-sino numa torre de sinos e' canonico.
-	_ok(CatalogoCampanha.CHEFE_KEY[R3_BASE] == "guard.sino_vivo",
-		"R3: o Sino Vivo do N11 devia manter-se (como guardiao)")
+	_ok(CatalogoCampanha.CHEFE_KEY[R3_BASE] == "",
+		"R3: o N11 (introducao) nao tem chefe nem guardiao, e' `%s`" % [
+			CatalogoCampanha.CHEFE_KEY[R3_BASE]])
 
 
 func teste_r3_fundo_proprio_da_torre() -> void:
