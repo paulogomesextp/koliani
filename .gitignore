@@ -2,6 +2,8 @@
 .godot/
 /android/
 /build/
+# builds de playtest isoladas (Super-Process A) -- nunca vao para o Git
+/builds/
 export_presets.cfg.bak
 
 # Editor do Godot (binarios locais, nao versionar)
@@ -12,6 +14,9 @@ export_presets.cfg.bak
 
 # Import cache
 *.import.bak
+# Traducoes COMPILADAS a partir dos .csv rastreados (o Godot regera-as no
+# `--import`). Sao binarios derivados: o repo nunca rastreou nenhuma.
+*.translation
 
 # Sistema
 .DS_Store
@@ -87,3 +92,7 @@ tools/_bot.gd.uid
 # dezenas de MB; so se comitam as camas ja cortadas em assets/audio/musica/.
 # Reconstroi-se com `python tools/preparar_musica.py --descarregar`.
 assets/audio/incoming/**
+# MP3 originais do manifesto final; os assets aprovados estão em assets/audio/music/.
+incoming_music/**
+# MP3 originais dos SFX aprovados; as cópias runtime estão em assets/audio/approved/sfx/.
+incoming_sfx/**

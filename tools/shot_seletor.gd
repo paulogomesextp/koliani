@@ -17,6 +17,7 @@ func _init() -> void:
 	var saida: String = args[0] if args.size() > 0 else "user://seletor.png"
 	var indice: int = int(args[1]) if args.size() > 1 else 0
 	var tudo: bool = (args.size() < 3) or args[2] == "1"
+	var abrir_regiao: int = int(args[3]) if args.size() > 3 else -1
 
 	await process_frame
 	await process_frame
@@ -24,6 +25,8 @@ func _init() -> void:
 	get_root().add_child(no)
 	no.set_anchors_preset(Control.PRESET_FULL_RECT)
 	no.configurar(indice, not tudo)
+	if abrir_regiao >= 0:
+		no.call("_abrir_regiao", abrir_regiao)
 	for _i in 40:
 		await process_frame
 	await create_timer(0.6).timeout

@@ -1,6 +1,7 @@
 extends SceneTree
 ## Verifica folga dos volumes e fotografa as dez masmorras numa folha.
-const INDICES := [5, 6, 7, 8, 9, 15, 16, 17, 18, 19]
+## O N08 (índice 7) saiu no Process 11: passou a Ilhas Suspensas, sem Casca.
+const INDICES := [5, 6, 8, 9, 15, 16, 17, 18, 19]
 
 func _init() -> void:
 	await process_frame

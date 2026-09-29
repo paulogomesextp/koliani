@@ -1,0 +1,393 @@
+class_name TestesRegion02WindLevels
+extends RefCounted
+## Contrato estrutural do Process 10, alargado no Super-Process A à
+## COERÊNCIA da região: os cinco níveis têm de ler-se como o mesmo sítio
+## (mesmo bioma, mesmo pack de fundo) e, ao mesmo tempo, ter cada um o seu
+## papel. Não certifica feel nem substitui jogar os níveis.
+
+const CENAS := {
+	"N06": "res://scenes/levels/Prisao_dos_Condenados.tscn",
+	"N07": "res://scenes/levels/Fornalha_dos_Pecadores.tscn",
+	"N08": "res://scenes/levels/Corredor_das_Execucoes.tscn",
+	"N09": "res://scenes/levels/Ala_dos_Mortos.tscn",
+}
+
+
+## ISENCAO do `VentoArena`: cobre a arena do Guardiao de PROPOSITO (mecanica
+## authored: vento fraco pulsado, guia visivel, ve-se bem antes do Guardiao,
+## longe do checkpoint mais proximo). O padrao nasceu no N06 (`teste_n6_autoral`)
+## e o N07, ao fechar com o mesmo tipo de Guardiao (27 set 2026), repete-o de
+## proposito (`teste_n7_autoral`) -- nao e' um alargamento ad-hoc, e' o mesmo
+## contrato aplicado ao mesmo tipo de encontro. NAO alargar a outros niveis
+## sem decisao do GM.
+const ISENCOES_ARENA := [["N06", "VentoArena", "arena"], ["N07", "VentoArena", "arena"],
+	["N08", "VentoArena", "arena"], ["N09", "VentoArena", "arena"]]
+
+
+static func _isento_n06(nivel: String, zona: String, alvo: String) -> bool:
+	return [nivel, zona, alvo] in ISENCOES_ARENA
+
+
+static func executar() -> Array[String]:
+	var falhas: Array[String] = []
+	var raizes := {}
+	for nome: String in CENAS:
+		var cena := load(CENAS[nome]) as PackedScene
+		_verificar(falhas, cena != null, "%s: cena carrega" % nome)
+		if cena == null:
+			continue
+		var raiz := cena.instantiate()
+		raizes[nome] = raiz
+		_verificar(falhas, raiz.get_node_or_null("Koliani") != null,
+			"%s: spawn preservado" % nome)
+		_verificar(falhas, raiz.get_node_or_null("Porta") != null,
+			"%s: porta preservada" % nome)
+		# N06 e' AUTORAL desde 26 set 2026 e N07 desde 27 set 2026: fecham com um
+		# Guardiao (elite), nao com um Chefe, e tem checkpoints intencionais
+		# (ver `teste_n6_autoral` / `teste_n7_autoral`).
+		if nome == "N06":
+			_verificar(falhas, raiz.get_node_or_null("Guardiao") != null
+				and raiz.get_node_or_null("Chefe") == null, "N06: fecha com Guardiao, sem Chefe")
+			_verificar(falhas, _filhos_por_prefixo(raiz, "Check").size() == 5,
+				"N06: cinco checkpoints autorais")
+		elif nome == "N07":
+			_verificar(falhas, raiz.get_node_or_null("Guardiao") != null
+				and raiz.get_node_or_null("Chefe") == null, "N07: fecha com Guardiao, sem Chefe")
+			_verificar(falhas, _filhos_por_prefixo(raiz, "Check").size() == 5,
+				"N07: cinco checkpoints autorais")
+		elif nome == "N08":
+			_verificar(falhas, raiz.get_node_or_null("Guardiao") != null
+				and raiz.get_node_or_null("Chefe") == null, "N08: fecha com Guardiao, sem Chefe (Combine, nao Boss)")
+			_verificar(falhas, _filhos_por_prefixo(raiz, "Check").size() == 6,
+				"N08: seis checkpoints autorais")
+			_verificar(falhas, raiz.find_children("*", "ZonaPlanar", true, false).is_empty(),
+				"N08: a ZonaPlanar (Process 11) devia ter sido removida -- planar nao e' skill do N08")
+			_verificar(falhas, raiz.find_children("*", "Coletavel", true, false).is_empty(),
+				"N08: nao pode ensinar/dar escalar_paredes (Coletavel encontrado)")
+		elif nome == "N09":
+			_verificar(falhas, raiz.get_node_or_null("Guardiao") != null
+				and raiz.get_node_or_null("Chefe") == null, "N09: fecha com Guardiao, sem Chefe (Challenge, nao Boss)")
+			var chk09 := _filhos_por_prefixo(raiz, "Check").size()
+			_verificar(falhas, chk09 >= 4 and chk09 <= 6, "N09: esperava 4-6 checkpoints autorais, ha %d" % chk09)
+			_verificar(falhas, raiz.find_children("*", "Coletavel", true, false).is_empty(),
+				"N09: nao pode ensinar/dar habilidade (Coletavel encontrado) -- so' o N10 concede na regiao")
+			_verificar(falhas, raiz.get_node_or_null("Casca") == null,
+				"N09: a CascaMasmorra legacy devia ter sido removida -- a regiao e' desfiladeiro aberto")
+			_verificar(falhas, bool(raiz.get("checkpoints_autorais")) and not bool(raiz.get("corredor")),
+				"N09: tem de ser autoral (corredor=false, checkpoints_autorais=true)")
+		else:
+			_verificar(falhas, raiz.get_node_or_null("Chefe") != null,
+				"%s: boss existente preservado" % nome)
+			_verificar(falhas, _filhos_por_prefixo(raiz, "Check").size() == 3,
+				"%s: três checkpoints preservados" % nome)
+
+	if raizes.has("N06"):
+		var zonas06 := _zonas(raizes["N06"])
+		_verificar(falhas, zonas06.size() == 7, "N06: sete zonas de vento (2 de ensino continuas + 5 pulsadas)")
+		_verificar(falhas, _direcoes_x(zonas06).has(-1.0)
+			and _direcoes_x(zonas06).has(1.0), "N06: rajadas opostas")
+		var continuas06 := 0
+		for z06 in zonas06:
+			if z06.modo == WindZone.Modo.CONTINUO:
+				continuas06 += 1
+		_verificar(falhas, continuas06 == 2, "N06: so' o ensino (2 zonas) e' continuo; o resto e' pulsado")
+	if raizes.has("N07"):
+		# N07 e' AUTORAL desde 27 set 2026 (DESENVOLVIMENTO do vento do N06):
+		# 9 zonas horizontais (a reintro e a arena sao fracas/continuas ou
+		# pulsadas fracas; o resto ensina mudanca de direcao, dash-contra-vento
+		# e combinacao). Ver `teste_n7_autoral` para o contrato completo.
+		var zonas07 := _zonas(raizes["N07"])
+		_verificar(falhas, zonas07.size() == 9, "N07: nove zonas de vento")
+		_verificar(falhas, _direcoes_x(zonas07).has(-1.0)
+			and _direcoes_x(zonas07).has(1.0), "N07: rajadas opostas")
+		for zona in zonas07:
+			_verificar(falhas, absf(zona.direcao.y) < 0.001,
+				"N07: %s deve ser horizontal" % zona.name)
+	if raizes.has("N08"):
+		# N08 e' AUTORAL desde 27 set 2026 (COMBINE: vento + salto duplo/Dash/Pogo,
+		# sem chefe, sem ZonaPlanar/planar legacy). Ver `teste_n8_autoral` para o
+		# contrato completo.
+		var zonas08 := _zonas(raizes["N08"])
+		_verificar(falhas, zonas08.size() == 8, "N08: oito zonas de vento")
+		_verificar(falhas, _direcoes_x(zonas08).has(-1.0)
+			and _direcoes_x(zonas08).has(1.0), "N08: rajadas opostas")
+		for zona in zonas08:
+			_verificar(falhas, absf(zona.direcao.y) < 0.001,
+				"N08: %s deve ser horizontal" % zona.name)
+	if raizes.has("N09"):
+		# N09 e' AUTORAL desde a execucao "N9 Challenge" (27 set 2026): vento
+		# variavel (continuo E pulsado, nao so' pulsado) + inimigos + plataformas,
+		# mais zonas/variedade que o N08 (Combine). Ver `teste_n9_autoral` para
+		# o contrato completo.
+		var zonas09 := _zonas(raizes["N09"])
+		_verificar(falhas, zonas09.size() >= 9, "N09: pelo menos nove zonas de vento (mais variedade que o N08)")
+		_verificar(falhas, _direcoes_x(zonas09).has(-1.0)
+			and _direcoes_x(zonas09).has(1.0), "N09: direção varia")
+		var intensidades := {}
+		for zona in zonas09:
+			intensidades[zona.intensidade] = true
+		_verificar(falhas, intensidades.size() >= 2, "N09: intensidade varia")
+		for zona in zonas09:
+			_verificar(falhas, absf(zona.direcao.y) < 0.001,
+				"N09: %s deve ser horizontal" % zona.name)
+
+	for nome: String in raizes:
+		var raiz: Node = raizes[nome]
+		for zona in _zonas(raiz):
+			for checkpoint in _filhos_por_prefixo(raiz, "Check"):
+				if _isento_n06(nome, zona.name, checkpoint.name):
+					continue
+				_verificar(falhas, not _contem_ponto(zona, checkpoint.position),
+					"%s: %s não cobre %s" % [nome, zona.name, checkpoint.name])
+			# N06 e' autoral: fecha com `Guardiao` em vez de `Chefe`
+			var chefe := (raiz.get_node_or_null("Chefe") if raiz.has_node("Chefe") else raiz.get_node("Guardiao")) as Node2D
+			if not _isento_n06(nome, zona.name, "arena"):
+				_verificar(falhas, not _contem_ponto(zona, chefe.position),
+					"%s: %s não cobre a arena/boss" % [nome, zona.name])
+		raiz.free()
+
+	falhas.append_array(_regiao_coerente())
+	falhas.append_array(_encontros_canonicos())
+	return falhas
+
+
+## Os QUATRO encontros intermédios da Região II (N06-N09).
+##
+## Depois de a região passar a Desfiladeiro dos Ventos ficaram cá dentro o
+## Carcereiro, Ignivar (o Ferreiro Maldito), a Dama da Guilhotina e os
+## Irmãos Condenados: quatro CHEFES com identidade de prisão e de forja, a
+## disputar o lugar do único chefe canónico da região, o Guardião dos Céus.
+## Isto prende as três coisas ao mesmo tempo -- são GUARDIÕES, o nome não
+## traz vocabulário da região antiga, e o rig já não é o da silhueta antiga.
+const INTERMEDIOS := {
+	5: {
+		"chave": "guard.golem_falesias",
+		"rig": "golem_falesias",
+		"cena": "res://scenes/actors/ChefeCarcereiro.tscn",
+	},
+	6: {
+		"chave": "guard.vigia_desfiladeiro",
+		"rig": "vigia_desfiladeiro",
+		"cena": "res://scenes/actors/ChefeIgnivar.tscn",
+	},
+	7: {
+		"chave": "guard.feiticeira_ventos",
+		"rig": "feiticeira_ventos",
+		"cena": "res://scenes/actors/ChefeDamaGuilhotina.tscn",
+	},
+	8: {
+		"chave": "guard.espectros_gemeos",
+		"rig": "espectros_gemeos",
+		"cena": "res://scenes/actors/ChefeIrmaosCondenados.tscn",
+	},
+}
+
+## Vocabulário que a Região II deixou para trás. Fica no teste, não no
+## código: é a lista que diz o que NÃO pode voltar a aparecer no nome de um
+## encontro da região, em nenhum dos seis idiomas.
+const PROIBIDO := [
+	"jailer", "carcereiro", "guillotine", "guilhotina", "condemned",
+	"condenados", "smith", "ferreiro", "forge", "forja", "prison",
+	"prisão", "prisao", "damned", "gaoler", "warden",
+]
+
+const IDIOMAS := ["en", "pt", "es", "fr", "de", "zh"]
+
+
+static func _encontros_canonicos() -> Array[String]:
+	var falhas: Array[String] = []
+	# Os ficheiros LIDOS DO DISCO, não `Textos.t()`: o `t()` cai para o
+	# inglês quando a chave falta, por isso passaria com a chave ausente em
+	# cinco dos seis idiomas.
+	var dicionarios := {}
+	for idioma: String in IDIOMAS:
+		var texto := FileAccess.get_file_as_string("res://assets/i18n/%s.json" % idioma)
+		var dados: Variant = JSON.parse_string(texto)
+		if dados is Dictionary:
+			dicionarios[idioma] = dados
+		else:
+			falhas.append("assets/i18n/%s.json não é JSON" % idioma)
+	for indice: int in INTERMEDIOS:
+		var esperado: Dictionary = INTERMEDIOS[indice]
+		var chave := CatalogoCampanha.chave_chefe(indice)
+		_verificar(falhas, chave == esperado["chave"],
+			"nível %02d: a chave do encontro é '%s', esperava '%s'"
+				% [indice + 1, chave, esperado["chave"]])
+		# GUARDIÃO, não chefe: o carrossel lê isto para escolher o rótulo, e
+		# quatro "Chefe:" antes do N10 tiram-lhe o peso de final de região
+		_verificar(falhas, not CatalogoCampanha.tem_chefe(indice),
+			"nível %02d ainda se anuncia como CHEFE" % [indice + 1])
+		# o nome, nos seis idiomas
+		for idioma: String in dicionarios:
+			var dicionario: Dictionary = dicionarios[idioma]
+			_verificar(falhas, dicionario.has(chave),
+				"%s.json não tem '%s'" % [idioma, chave])
+			if not dicionario.has(chave):
+				continue
+			var nome := String(dicionario[chave])
+			var minusculas := nome.to_lower()
+			for palavra: String in PROIBIDO:
+				_verificar(falhas, not minusculas.contains(palavra),
+					"%s: o nível %02d ainda se chama '%s'"
+						% [idioma, indice + 1, nome])
+			# e a chave antiga não pode ter ficado para trás a apodrecer
+			for velha: String in ["boss.carcereiro", "boss.ignivar",
+					"boss.dama_guilhotina", "boss.irmaos_condenados"]:
+				_verificar(falhas, not dicionario.has(velha),
+					"%s.json ainda tem a chave antiga '%s'" % [idioma, velha])
+		# e a silhueta: o rig antigo era a identidade antiga desenhada
+		var cena := load(esperado["cena"]) as PackedScene
+		if cena == null:
+			falhas.append("%s não carrega" % esperado["cena"])
+			continue
+		var chefe := cena.instantiate()
+		_verificar(falhas, str(chefe.get("rig")) == esperado["rig"],
+			"%s usa o rig '%s', esperava '%s'"
+				% [esperado["cena"], chefe.get("rig"), esperado["rig"]])
+		_verificar(falhas, ResourceLoader.exists(
+				"res://assets/sprites/pixel/bosses_anim/%s/idle.png" % esperado["rig"]),
+			"o rig '%s' não tem tira de sprites" % esperado["rig"])
+		chefe.free()
+
+	# ... e o N10 continua a ser o ÚNICO chefe da região
+	_verificar(falhas, CatalogoCampanha.chave_chefe(9) == "boss.guardiao_dos_ceus",
+		"o N10 deixou de ser o Guardião dos Céus")
+	_verificar(falhas, CatalogoCampanha.tem_chefe(9),
+		"o N10 deixou de se anunciar como chefe")
+	var chefes := 0
+	for indice in range(5, 10):
+		if CatalogoCampanha.tem_chefe(indice):
+			chefes += 1
+	_verificar(falhas, chefes == 1,
+		"a Região II tem %d chefes -- só pode ter um, o do N10" % chefes)
+	return falhas
+
+
+## As CINCO cenas da Região II como uma sequência.
+##
+## O cânone (`docs/art_direction/regions/region_02/`) dá a cada nível um
+## papel distinto e à região uma identidade só. Antes do Super-Process A
+## os cinco corriam com `bioma = "prisao"` e dois packs de masmorra: liam-se
+## como a prisão de onde vieram, não como o Desfiladeiro dos Ventos.
+static func _regiao_coerente() -> Array[String]:
+	var falhas: Array[String] = []
+	var todas := {
+		"N06": "res://scenes/levels/Prisao_dos_Condenados.tscn",
+		"N07": "res://scenes/levels/Fornalha_dos_Pecadores.tscn",
+		"N08": "res://scenes/levels/Corredor_das_Execucoes.tscn",
+		"N09": "res://scenes/levels/Ala_dos_Mortos.tscn",
+		"N10": "res://scenes/levels/A_Cela_Zero.tscn",
+	}
+	## O papel de cada nível, do painel `EXEMPLOS DE GAMEPLAY` da prancha
+	## `concept_environment_01.png`. A assinatura é a DIREÇÃO dominante do
+	## vento: nenhum par de níveis pode ter a mesma.
+	var assinatura := {
+		"N06": "horizontal pulsada",   # rajadas horizontais
+		"N07": "ascendente",           # correntes ascendentes
+		"N08": "combinada dirigida",   # vento + salto duplo/Dash/Pogo (Combine)
+		"N09": "variável",             # vento variável + inimigos
+		"N10": "exame + chefe",        # o Guardião comanda o vento
+	}
+	var luzes := {}
+	for nome: String in todas:
+		var cena := load(todas[nome]) as PackedScene
+		if cena == null:
+			falhas.append("%s: cena não carrega" % nome)
+			continue
+		var raiz := cena.instantiate()
+		var atm := raiz.get_node_or_null("Atmosfera")
+		if atm == null:
+			falhas.append("%s: sem nó Atmosfera" % nome)
+			raiz.free()
+			continue
+		# identidade da REGIÃO: o sítio é o mesmo nos cinco
+		_verificar(falhas, str(atm.get("bioma")) == "desfiladeiro",
+			"%s: bioma é '%s', esperava 'desfiladeiro'"
+				% [nome, atm.get("bioma")])
+		_verificar(falhas, str(atm.get("fundo_pack")) == "desfiladeiro",
+			"%s: fundo_pack é '%s', esperava 'desfiladeiro'"
+				% [nome, atm.get("fundo_pack")])
+		# identidade do NÍVEL: a luz-chave não se repete, senão os cinco
+		# leem-se como a mesma sala
+		var luz: Variant = atm.get("cor_luz")
+		if luz is Color:
+			var chave := "%.2f|%.2f|%.2f" % [(luz as Color).r,
+				(luz as Color).g, (luz as Color).b]
+			_verificar(falhas, not luzes.has(chave),
+				"%s: tem a mesma luz-chave que %s -- a região fica toda igual"
+					% [nome, luzes.get(chave, "?")])
+			luzes[chave] = nome
+		# a casca fechada, quando existe, usa a pedra do desfiladeiro
+		var casca := raiz.get_node_or_null("Casca")
+		if casca != null:
+			_verificar(falhas, str(casca.get("estilo")) == "desfiladeiro",
+				"%s: a Casca ainda usa tijolo de masmorra" % nome)
+		raiz.free()
+
+	# O NOME DA REGIÃO. Isto escapou a todos os testes e só apareceu numa
+	# captura da build exportada: o cabeçalho da HUD dizia "PRISON OF THE
+	# DAMNED" por cima de "The Eternal Winds". A HUD e as pastilhas do
+	# carrossel leem `EstadoJogo.REGIOES`, que ninguém verificava.
+	var regiao: Dictionary = EstadoJogo.REGIOES[1]
+	_verificar(falhas, regiao.get("chave", "") == "world.gorge",
+		"a Região II aponta a chave i18n '%s'" % regiao.get("chave", ""))
+	_verificar(falhas, Textos.t("world.gorge") != "world.gorge",
+		"'world.gorge' não está traduzido")
+	var nome_regiao := String(Textos.t("world.gorge")).to_lower()
+	for proibida in ["prison", "prisão", "prisao", "damned", "condenados",
+			"kerker", "gefängnis", "监狱", "牢狱"]:
+		_verificar(falhas, not nome_regiao.contains(proibida),
+			"o nome da Região II ainda diz '%s': %s" % [proibida, nome_regiao])
+	_verificar(falhas, (regiao.get("niveis", []) as Array) == [5, 6, 7, 8, 9],
+		"a Região II deixou de cobrir os níveis 06-10")
+
+	_verificar(falhas, assinatura.size() == 5,
+		"a Região II tem de ter cinco níveis com papéis distintos")
+	var vistos := {}
+	for nome: String in assinatura:
+		_verificar(falhas, not vistos.has(assinatura[nome]),
+			"%s repete a assinatura de %s" % [nome, vistos.get(assinatura[nome], "?")])
+		vistos[assinatura[nome]] = nome
+	return falhas
+
+
+static func _zonas(raiz: Node) -> Array[WindZone]:
+	var resultado: Array[WindZone] = []
+	for filho in raiz.get_children():
+		if filho is WindZone:
+			resultado.append(filho)
+	return resultado
+
+
+static func _filhos_por_prefixo(raiz: Node, prefixo: String) -> Array[Node2D]:
+	var resultado: Array[Node2D] = []
+	for filho in raiz.get_children():
+		if filho is Node2D and filho.name.begins_with(prefixo):
+			resultado.append(filho)
+	return resultado
+
+
+static func _direcoes_x(zonas: Array[WindZone]) -> Array[float]:
+	var resultado: Array[float] = []
+	for zona in zonas:
+		resultado.append(signf(zona.direcao.x))
+	return resultado
+
+
+static func _todas_pulsadas(zonas: Array[WindZone]) -> bool:
+	for zona in zonas:
+		if zona.modo != WindZone.Modo.PULSADO:
+			return false
+	return true
+
+
+static func _contem_ponto(zona: WindZone, ponto: Vector2) -> bool:
+	var local := ponto - zona.position
+	return absf(local.x) <= zona.tamanho.x * 0.5 \
+		and absf(local.y) <= zona.tamanho.y * 0.5
+
+
+static func _verificar(falhas: Array[String], condicao: bool,
+		mensagem: String) -> void:
+	if not condicao:
+		falhas.append(mensagem)

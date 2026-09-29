@@ -23,6 +23,9 @@ var _corpo9g: AnimatedSprite2D
 const ESCALA := 0.75
 
 var dano := 25
+## Especial: atravessa inimigos (cada um leva o dano uma vez).
+var perfura := false
+var _atingidos := {}
 var _dir := Vector2.RIGHT
 var _tempo_de_vida := 2.2
 var _t := 0.0
@@ -76,6 +79,10 @@ func _physics_process(dt: float) -> void:
 
 func _ao_bater(corpo: Node) -> void:
 	if corpo.has_method("receber_dano") and not (corpo is Koliani):
+		if perfura:
+			if _atingidos.has(corpo.get_instance_id()):
+				return
+			_atingidos[corpo.get_instance_id()] = true
 		# `receber_tiro` em vez de `receber_dano`: é o que diz ao bicho
 		# que isto veio de longe -- os incorpóreos (nível 73) só levam
 		# dano por aqui. Quem não a tiver leva na mesma.
@@ -87,7 +94,10 @@ func _ao_bater(corpo: Node) -> void:
 		# o tiro mágico DEIXA A ARDER -> abre janela de crítico para a espada
 		if corpo.has_method("queimar"):
 			corpo.queimar(2.0, maxi(2, roundi(dano * 0.14)))
-		Som.toca("acerto", -9.0)
+		Som.toca("energia_impacto", -10.0, 1.0, 0.0)
+		if perfura:
+			Impacto.rebentar(self, corpo.global_position, COR, 1.2)
+			return
 	_estoirar()
 
 

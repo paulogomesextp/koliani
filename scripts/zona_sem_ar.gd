@@ -118,4 +118,4 @@ func _physics_process(dt: float) -> void:
 		return
 	_cd = intervalo
 	if _alvo.has_method("receber_dano"):
-		_alvo.receber_dano(dano, 0.0)
+		_alvo.receber_dano(dano, 0.0, OrigemDano.AMBIENTE)

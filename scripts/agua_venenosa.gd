@@ -22,6 +22,22 @@ extends Armadilha
 ## Variante "lava": brasas a subir + superfície mais quente/luminosa
 ## (Fornalha dos Pecadores). Sem isto é a poça de veneno normal.
 @export var brasas := false
+## Força dos véus da `superficie_textura` (1 = como sempre foi).
+##
+## O Desfiladeiro dos Ventos precisa disto: o fundo dele não é uma poça, é o
+## MAR DE NUVENS, e a banda lisa cor-de-ameixa era "o elemento com mais ar de
+## placeholder" do audit -- ~15% do ecrã sem textura nem profundidade. Os
+## véus existiam desde 9H.12D mas entram a 12-20% de alfa, que sobre uma
+## banda escura não se vê. Fica em `@export` e não numa constante nova
+## porque é decisão POR POÇA: a do pântano e a lava continuam a 1.
+@export_range(0.5, 4.0, 0.1) var veu_forca := 1.0
+## Onde na `superficie_textura` e' que o veu comeca a amostrar (0 = topo).
+##
+## A `nuvens.png` do Desfiladeiro tem o ceu ESCURO no topo e a massa de nuvem
+## nos 60% de baixo; a amostrar de y=0 o veu trazia o ceu, ou seja quase
+## nada. Fica em `@export` porque depende da textura, e a de 9H.12D e' toda
+## util de cima a baixo. 0 = como sempre foi.
+@export_range(0.0, 0.9, 0.05) var veu_origem := 0.0
 
 ## Comprimento de uma vaga da linha de água. O perfil é construído com uma
 ## vaga a mais de cada lado, para o `_process` o poder deslizar sem que as
@@ -148,12 +164,14 @@ func _montar_veu(hw: float, hh: float) -> void:
 		s.texture_repeat = CanvasItem.TEXTURE_REPEAT_ENABLED
 		s.region_enabled = true
 		# uma vaga a mais de cada lado: o deslize nunca descobre as pontas
-		s.region_rect = Rect2(Vector2.ZERO, Vector2(largura + VAGA * 2.0, altura_veu))
+		var y_tex := float(superficie_textura.get_height()) * veu_origem
+		s.region_rect = Rect2(Vector2(0.0, y_tex),
+			Vector2(largura + VAGA * 2.0, altura_veu))
 		s.position = Vector2(-hw - VAGA, -hh)
 		# a de baixo é mais funda, mais lenta e mais apagada: dá profundidade
 		var perto := i == 0
 		s.modulate = cor.lightened(0.55 if perto else 0.30)
-		s.modulate.a = 0.20 if perto else 0.12
+		s.modulate.a = (0.20 if perto else 0.12) * veu_forca
 		s.z_index = 1 if perto else 0
 		s.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 		add_child(s)

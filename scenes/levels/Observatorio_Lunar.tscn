@@ -1,6 +1,7 @@
 [gd_scene load_steps=12 format=3 uid="uid://bkolianiobservatorio14"]
 
-; REGIAO III / nivel 14 -- Observatorio Lunar.
+; REGIAO III / nivel 14 -- CAMPANARIO (`level.n13`).
+; O nome do ficheiro fica: muda-lo partia saves e checkpoints.
 ; Sala final FEITA A MAO (a JORNADA, que cresce com o nivel, vem antes) e VERTICAL. Bolsas de GRAVIDADE
 ; LUNAR (ZonaGravidade) onde a Koliani salta altissimo e cai devagar --
 ; usam-se para vencer os grandes vaos verticais. Bifurcacao: coluna lunar
@@ -38,19 +39,20 @@ fill_to = Vector2(1, 0.5)
 script = ExtResource("7_niv")
 
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
-cor_ambiente = Color(0.94, 0.94, 1, 1)
-cor_fundo = Color(0.07, 0.06, 0.14, 1)
-cor_silhueta = Color(0.1, 0.1, 0.18, 1)
-cor_luz = Color(0.88, 0.9, 1, 1)
-cor_poeira = Color(0.94, 0.96, 1, 1)
-densidade_poeira = 1.3
+cor_ambiente = Color(0.92, 0.95, 1.06, 1)
+cor_fundo = Color(0.05, 0.07, 0.17, 1)
+cor_silhueta = Color(0.09, 0.12, 0.24, 1)
+cor_luz = Color(0.96, 0.88, 0.66, 1)
+cor_poeira = Color(1, 0.98, 0.88, 1)
+densidade_poeira = 2.6
 bioma = "torres"
 largura_nivel = 2600.0
-fundo_pack = "rochoso"
-tinta_fundo = Color(0.9, 0.92, 1.14, 1)
-neblina_fundo = 0.18
+fundo_pack = "torre_ecos"
+tinta_fundo = Color(0.86, 0.94, 1.24, 1)
+neblina_fundo = 0.4
 dessaturar_fundo = 0.16
 seed_ambiente = 1481
+luzes_horizonte = true
 
 [node name="Vazio" parent="." instance=ExtResource("11_vazio")]
 position = Vector2(650, 1120)
@@ -93,11 +95,13 @@ altura_visual = 40.0
 cor_base = Color(0.24, 0.25, 0.32, 1)
 cor_topo = Color(0.52, 0.54, 0.66, 1)
 
-[node name="EliteWogol" parent="." instance=ExtResource("2_dem")]
+; N14: o Monge "puxa o jogador"; a `carga` ja' era esse encontro. So' muda a IDENTIDADE: vida, dano,
+; comportamento e posicao ficam como estavam.
+[node name="EliteMonge" parent="." instance=ExtResource("2_dem")]
 position = Vector2(680, 512)
 scale = Vector2(1.4, 1.4)
 elite = true
-especie = "wogol"
+especie = "monge_das_correntes"
 vida = 170
 dano_contacto = 24
 comportamento = "carga"
@@ -211,6 +215,8 @@ scale = Vector2(2.9, 1.7)
 
 [node name="Koliani" parent="." instance=ExtResource("1_kol")]
 position = Vector2(200, 830)
+usar_prototipo_premium = true
+usar_golden_set = true
 
 [node name="CheckInicio" type="Area2D" parent="."]
 position = Vector2(460, 836)

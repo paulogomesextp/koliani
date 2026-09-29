@@ -78,8 +78,10 @@ static func _testar_salto_queda_ar(falhas: Array[String]) -> void:
 static func _testar_aterragem(falhas: Array[String]) -> void:
 	_ok(Movimento.tier_aterragem(179.0) == 0, "queda mínima não dá landing", falhas)
 	_ok(Movimento.tier_aterragem(180.0) == 1, "landing leve", falhas)
-	_ok(Movimento.tier_aterragem(430.0) == 2, "landing média", falhas)
-	_ok(Movimento.tier_aterragem(760.0) == 3, "landing pesada", falhas)
+	_ok(Movimento.tier_aterragem(670.0) == 2, "landing média", falhas)
+	_ok(Movimento.tier_aterragem(735.0) == 3, "landing pesada", falhas)
+	# F1 passagem 2: o salto normal (~637 px/s) NÃO dá impacto médio
+	_ok(Movimento.tier_aterragem(640.0) == 1, "um salto normal aterra leve", falhas)
 
 
 static func _testar_camera(falhas: Array[String]) -> void:

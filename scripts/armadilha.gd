@@ -39,7 +39,7 @@ func _ferir(corpo: Node) -> void:
 			dir = signf(corpo.global_position.x - global_position.x)
 			if dir == 0.0:
 				dir = 1.0
-		corpo.receber_dano(dano, dir)
+		corpo.receber_dano(dano, dir, OrigemDano.HAZARD_ATAQUE)
 
 
 ## Re-testa quem ja esta dentro (chamar quando a armadilha "liga").

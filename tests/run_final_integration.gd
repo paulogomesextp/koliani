@@ -92,7 +92,7 @@ func _executar() -> void:
 	Input.action_release("mover_direita")
 	await _passos(40, "plataforma_paragem")
 	_ok("idle" in _anims("idle"), "IDLE inicial não observado")
-	_ok("run_start" in _anims("arranque_corrida") and "run" in _anims("arranque_corrida"), "IDLE→RUN não observado")
+	_ok("run" in _anims("arranque_corrida") and not ("run_start" in _anims("arranque_corrida")), "IDLE→RUN não observado (ou run_start legado voltou)")
 	_ok("idle" in _anims("paragem"), "RUN→IDLE não observado")
 	var inverteu := false
 	for v in dados:

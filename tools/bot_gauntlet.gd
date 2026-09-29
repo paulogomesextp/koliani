@@ -36,8 +36,13 @@ func _init() -> void:
 		es.checkpoint = Vector2.ZERO
 		es.indice_nivel = int(args[2]) if args.size() > 2 else 8
 		# simula um jogador com o kit permanente já ganho
-		es.habilidades.assign(["salto_duplo", "dash_aereo", "escalar_paredes",
-			"projetil", "escudo", "planar"])
+		# 4.o argumento `sem_skills`: NENHUMA habilidade (contrato do N1: nem
+		# salto duplo, nem dash, nem pogo, nem escalar paredes)
+		if args.size() > 3 and args[3] == "sem_skills":
+			es.habilidades.assign([])
+		else:
+			es.habilidades.assign(["salto_duplo", "dash_aereo", "escalar_paredes",
+				"projetil", "escudo", "planar"])
 		# só nos interessa a TRAVESSIA -- sem dano, o bot só pára se estiver
 		# geometricamente bloqueado (softlock).
 		es.modo_dev = true

@@ -1,6 +1,402 @@
+> **N13 autoral -- "Mecanismos Antigos" (29 set 2026, branch `claude/project-thread-6jbrqw`, sem push)** -- `docs/nivel_autoral_n13.md`. Jornada procedural + sala do Voltaris substituidas por 3 andares de maquinaria feitos a mao (`tools/construir_n13_mecanismos.py`): engrenagens, alavancas multiplas, pontes reconfiguraveis sob tecto baixo, ponte movel, contrapesos, mecanismo de 3 sinos com padrao, Guardiao = Construto Vitral elite. Arte recortada da coluna N13 da prancha (capturas em `docs/qa/n13_autoral/`). **Pendente do Paulo**: autorizar o push; playtest humano. Depois N14.
+
+> **Skins da Koliani = 3 simples + 2 premium, Anjo e Demonio (29 set 2026, branch `claude/project-thread-u5wewl`, sem push)** -- `docs/execution_skins_koliani.md`. As 3 so' de paleta (Brasa da Fornalha, Abadia Afogada, Planicies Celestiais) ficam intactas. Os 4 conjuntos anteriores foram recusados ("copia das primeiras") e apagados. Novas: **Arcanjo** (prata+ouro, 2 asas de penas, aureola, olhos de luz, espada sagrada) e **Arquidemonio** (obsidiana com lava, cornos, olhos em brasa, capa rasgada, cauda, espadao serrilhado), ambas com couraca e capa, nos 84 frames. Loja toda gratis em desenvolvimento (`LojaCatalogo.GRATIS_EM_DESENVOLVIMENTO`, precos reais preservados; decidir precos no fim). **Pendente do Paulo**: aprovar o visual; precos; autorizar push.
+
+> **N12 autoral -- "Galerias Verticais" (29 set 2026, branch `claude/project-thread-6jbrqw`, fundido em master pelo PR #3)** -- `docs/nivel_autoral_n12.md`. **Passe de arte feito** (merge do PR #1 + interior da torre, pecas da prancha, props geometricos substituidos; capturas em `docs/qa/n12_autoral/`). Jornada procedural + sala do Aerion substituidas por sala feita a mao (~2960x2700, gerada por `tools/construir_n12_galerias.py`), fluxo A-D da prancha: elevadores de coluna com corrente (peso e vaivem), 2 sinos de sincronizacao, vitral que revela a ponte de eco, escadas quebradas, plataformas que desaparecem, coluna de ar + queda contra o vento, laminas rapidas; Guardiao = Automato do Sino elite. 3 segredos, 5 checkpoints. Portoes medidos contra o salto real e contra `escalar_paredes`. **Decidido**: o Sino Vivo fica fora da campanha (contrato: um so' confronto na regiao). **Pendente do Paulo**: autorizar o push; playtest humano (duracao, leitura dos sinos/vitral, serra B2->B3, TTK do Guardiao). Depois N13, N14.
+
+> **Loja -- cosméticos com arte + Galeria de Conceitos (29 set 2026, branch `claude/project-thread-mbzvi6`, PR #2)** -- `docs/execution_loja_cosmeticos_arte.md`. Molduras HUD+fogueira: **Moldura do Ossário** e **Gaiola de Aurora** (nova). Rastos do dash: **Brasa**, **Esporos** e **Mariposas Lunares** (novo). Pack **Luar de Aurora**. **Galeria de Conceitos** agora abre (botão VER na Loja): 25 páginas de arte de produção, desbloqueadas região a região. Suite verde; QA visual real (loja arte 32/32, galeria 11/11). Pendente: o Paulo testar no Windows e fazer merge do PR #2; preços definem-se no fim. A Galeria soma ~10 MB ao export (JPG 1536 px) -- baixar a qualidade em `tools/preparar_galeria.py` se o Web/APK pesar.
+
+> **Arte das pranchas -- Regioes I a III (29 set 2026, branch `claude/project-thread-8ipy7k`, sem push)** -- `docs/execution_arte_pranchas_regioes_1_3.md`. N6-N15 passam a ter fundo, terreno e (III) props recortados 1:1 das pranchas aprovadas; N1-N5 sem o corte da copa no topo. **Pendente do Paulo**: ver no Windows e autorizar o push/PR; decidir se a seguir se faz a pele do SinoTorre/Vitral (mexe na colisao do Vitral) ou a superficie do pantano/abismo.
+
+> **N11 -- passe de enriquecimento, arte de terreno ainda plana (29 set 2026)** -- `docs/retomar_aqui.md` (topo). O Paulo achou o N11 pequeno/sem mecanicas/sem arte. Acrescentado sem reconstruir: Sino Flutuante e Arqueiro das Sombras (faltavam 2 dos 3 "inimigos principais" do contrato LOCKED da Regiao III, sprites ja' existiam), Sentinela da Torre, hazard de espinhos, mecanica "correntes moveis" (`PlataformaCorrente`+`PlataformaQuebra`+`PenduloLamina`) num ramo opcional, 2 segredos, 2 props ancora aprovados (sino partido + vitral iluminado). Suite 0 falhas, save intacto. **Causa raiz por resolver, medida mas nao corrigida**: as plataformas de toda a Regiao III (nao so' o N11) desenham-se por um mosaico CC0 de 192px sem silhueta organica nem VFX -- a Regiao I tem um sistema `Kit`/`HybridL1` (terreno HD, x3 escala, silhueta propria) que resolve isto mas e' exclusivo dela (`scripts/regiao1_kit.gd`). Para a Regiao III ficar ao nivel da I precisa de um kit HD proprio (pedra gotica, sem vegetacao/raizes) -- trabalho de motor/pipeline, nao so' desta cena. **Pendente de decisao do Paulo**: vale a pena esse investimento agora, ou o N11 fica assim ate' ao proximo passe de arte da regiao? N12 continua NAO comecado.
+
+> **N11 -- "Entrada dos Ecos", introducao da Regiao III / Torre dos Ecos (28 set 2026, sem push)** -- `docs/retomar_aqui.md` (topo). Briefing do GM: auditar/reconstruir o N11, sem boss nem miniboss (Vyrak so' no N15), a ensinar `escalar_paredes` (ja concedida no N10) + a linguagem dos sinos. Auditoria: `Torre_dos_Sinos.tscn` ja existia com boa forma vertical mas tinha um `Chefe` (Sino Vivo) a selar a porta e um `Coletavel` a re-conceder `escalar_paredes` -- ambos removidos. `corredor` passou a `false` (a jornada procedural que ainda prependia foi tirada). O grupo `"sino_alterna"` do `SinoTorre` existia no script desde sempre mas nenhum nivel o usava -- ligado pela primeira vez via `PlataformaSino` (script+cena novos), com um atalho junto de cada sino (`EcoBaixo`/`EcoAlto`, cada um no seu grupo). 6 secoes A-F: entrada, primeira escalada (muro novo, seguro), primeiro sino, plataformas oscilantes (`PlataformaFlutuante` em 2 pontos), sino+movimento, mini-teste. **Conflito encontrado e resolvido**: um teste antigo tinha fixado "o Sino Vivo fica no N11 como guardiao" (`CatalogoCampanha.CHEFE_KEY[10] = "guard.sino_vivo"`) -- a HUD mostrava "Guardian: The Living Bell" sem chefe nenhum na cena. Corrigido para `""` (confirmado por screenshot antes/depois), teste atualizado com nota a explicar a supersessao pelo briefing desta execucao. `world.towers` renomeado "Torre dos Ecos"/"Tower of Echoes" nos 6 idiomas. Teste dedicado novo `TestesRegion03N11`. Suite completa: 0 falhas, save intacto. `.exe` Windows reexportado e lancado no N11 (`--nivel=11 --devmode`) para o Paulo testar. **Pendente do GM**: playtest humano (escalada legivel? oscilantes confortaveis no telemovel? atalhos dos sinos claros?), e decidir o destino do "Sino Vivo" dentro da regiao (N12-N14 ainda sem auditoria) antes de tocar no N12. **N12 NAO comecado.**
+
+> **N10 -- exame final + Guardiao dos Ceus, recompensa ligada (28 set 2026, sem push)** -- `docs/retomar_aqui.md` (topo). Briefing do GM: construir/reconstruir o N10 (clímax da Região II). Auditoria primeiro: o N10 (`A_Cela_Zero.tscn`, `ChefeGuardiaoDosCeus`) já estava tecnicamente completo e **aprovado em playtest humano** desde o Process 12/Super-Process A -- não havia motivo técnico para reconstruir do zero. O que faltava mesmo: a recompensa `escalar_paredes` (decisão do GM #3 em `docs/regiao_2_decisoes_e_n6_auditoria.md`) estava só documentada, nunca ligada. Feito: `HABILIDADE_DO_CHEFE[9] = "escalar_paredes"` e `REGIAO_CONCLUIDA[9] = "region.2.complete"` em `nivel_com_chefe.gd` + chave i18n nova nos 6 idiomas. Grant incondicional e idempotente (não depende de pickup nenhum). Testes novos: `TestesRegion02N10` ganhou 4 verificações, `teste_fluxo_fim_regiao2` novo (fluxo completo: boss -> skill -> bau -> cartão -> porta; Região III não arranca). Suite completa: 1 falha, `teste_offscreen_global` (câmara/zoom, não relacionado, confirmado flake isolado). `.exe` Windows reexportado e lançado no N10 (`--nivel=10 --devmode`) para o Paulo testar. **Pendente do GM**: playtest humano completo do N10 (a recompensa e o cartão de fim de região aparecem como esperado?), e só depois decidir Região III. N11 NÃO começado.
+
+> **N9 autoral -- "Desfiladeiro dos Ventos", CHALLENGE (28 set 2026, sem push)** -- `docs/nivel_autoral_n9.md`. Regiao II N06(Teach)->N07(Develop/Test)->N08(Combine)->**N09(Challenge)**->N10(Boss). Reconstruido do zero (cena `Ala_dos_Mortos.tscn`, `corredor=false`): reentrada+reintroducao do vento, secao B com 3 zonas de vento CONSECUTIVAS de comportamento diferente (contra continuo/favor pulsado/contra pulsado), secao C vento+inimigo simples legivel (`sentinela_flutuante`, sem projeteis), secao D `PlataformaCorrente` atravessa vento continuo forte + `morcego_dos_ventos` (pressao), secao E bifurcacao opcional segura/arriscada (vento a favor + Pogo authored opcional + Essencia 26), secao F pre-exame com as duas direcoes de vento + salto duplo + Dash (com `FDashApoio`) + 2 inimigos simples, SEM chefe. 6 checkpoints, >=9 zonas de vento (mais variedade que o N8). Fecha com Guardiao (`golem_aereo` elite, vida 235, nao boss). **Legacy corrigido**: `corredor` nunca era `false` (a jornada procedural continuava a prepender-se ao conteudo a mao -- bug que N6-N8 ja tinham corrigido); `Chefe` real (`ChefeIrmaosCondenados`) removido (N9 e' Challenge, nao Boss -- so' o N10 tem chefe); `Coletavel` `partir_paredes` removido (so' o N10 concede habilidade na regiao); `CascaMasmorra` fechada removida (regiao e' desfiladeiro aberto); 3 `WindZone` reconstruidas de intensidade 360-520 (imperceptivel) para 1400-1800 (faixa validada em N6-N8). Teste dedicado antigo/legacy substituido por `teste_n9_autoral` + bloco N09 reescrito em `test_region02_wind_levels.gd`. Suite completa: **0 falhas**, save intacto. `.exe` Windows reexportado e lancado no N9 (`--nivel=9 --devmode`) para o Paulo testar. **Pendente do GM**: playtest humano (duracao real, legibilidade dos 3 comportamentos de vento da seccao B, se a rota arriscada da seccao E compensa o risco, TTK do Guardiao e pressao dos 4 inimigos simples). NAO comecar N10.
+
+> **N8 autoral -- "Desfiladeiro dos Ventos", COMBINE (27 set 2026, commit local `59a023a9`, sem push)** -- `docs/nivel_autoral_n8.md`. Regiao II N06(Teach)->N07(Develop/Test)->**N08(Combine)**->N09->N10(Boss). Reconstruido do zero (`corredor=false`): vento+salto duplo, vento+Dash (com `DashApoio`), bifurcacao segura/rapida com recompensa, vento+inimigo simples+Pogo authored opcional, mini-exame final sem boss. 6 checkpoints, 8 zonas de vento. Fecha com Guardiao (`elemental_do_vento` elite, vida 210, nao boss). Legacy "Process 11" (Ilhas Suspensas: `ZonaPlanar` + `Chefe` `ChefeDamaGuilhotina`) removido -- planar nao estava na lista de combinacoes pedida e o `Chefe` tinha piso de vida que competiria com o N10 (mesmo raciocinio do N07 com o `ChefeIgnivar`). Teste dedicado antigo `tests/test_region02_n08_level.gd` removido, substituido por `teste_n8_autoral` + blocos N08 em `test_region02_wind_levels.gd`. Suite completa: 1 falha (`Coracao`/N5, flake pre-existente ja documentado no N7, confirmado 0 falhas isolado), save intacto. `.exe` Windows reexportado e lancado no N8 para o Paulo testar. **Pendente do GM**: playtest humano (duracao real 4-6 min, se a rota rapida compensa o risco, legibilidade do Pogo opcional, TTK do Guardiao). NAO comecar N9.
+
+> **N7 autoral -- "The Rising Gorge" (27 set 2026, commits locais, sem push)** -- `docs/nivel_autoral_n7.md`. Regiao II N06(Teach)->**N07(Develop/Test)**->N08->N09->N10(Boss). Reconstruido do zero como nivel authored (`corredor=false`): 6 seccoes A-F (reintro/desenvolvimento/mudanca de direcao/dash+vento/combinacao/fecho), 5 checkpoints, 9 zonas de vento horizontais, sem `escalar_paredes` (Coletavel removido), sem Chefe persistente (o `ChefeIgnivar`/Fogo legacy saiu -- tinha piso de vida cozido no script que dava ~1977 de vida efetiva, competindo com o boss do N10). Fecha com um Guardiao (Sentinela Flutuante elite, `DemonioBase`, vida 230, nao boss). Novo teste `teste_n7_autoral` + `test_region02_wind_levels.gd` atualizado para o novo contrato do N07. **Pendente do GM**: playtest humano (duracao real, legibilidade das cores de guia favor/contra, TTK do Guardiao/EliteCombo). **Achado operacional**: `tools/correr_testes.ps1` ficou instavel nesta sessao (hangs repetidos do processo Godot a 0% CPU); 1 corrida integral completou e achou os 2 problemas reais (ambos corrigidos), depois disso usou-se `python tools/godot_isolado.py -- --headless --path . res://tests/run_tests.tscn` com `SO_TESTE=<nome>` para confirmar N1-N7 + region02 + fluxo fim regiao1 + cartao regiao1, todos 0 falhas, save intacto. NAO comecar N8.
+
+> **Controlled Combat Integration -- FECHADA (27 set 2026, sem push)** -- `docs/combat_production_integration_report.md` (relatorio completo) + `docs/retomar_aqui.md` (topo). Core Combat + Enemy Combat Contract v1 no codigo de producao, opt-in (nenhum nivel liga). Dois pilotos reais testados: Goblin (N1, `GoblinAprendiz`) e Golem (N6, `EliteGolem`). Arena de QA pronta: `scenes/qa/ProductionCombatArena.tscn`. Suite completa PASS, save intacto, N7 nao comecado. **Pendente do GM**: decisao de balance sobre o TTK do Goblin piloto (saiu muito abaixo do alvo do plano e o spam mata mais depressa que o combo intencional -- o oposto do desejado; nao corrigido silenciosamente) antes de qualquer propagacao a mais inimigos ou playtest humano na arena.
+
+> **Combat Lab v1 (26 set 2026, sem push)** -- `docs/combat_lab_v1.md`. Decisoes do GM: spam vs goblin (hitstun/poise), alcance dos golpes (Koliani atravessa inimigos), PD so' para "ataques" antes de integrar, controlos tacteis, arte. N7 pausado. N06: 3 zonas de vento cobrem checkpoint/arena (isencoes em `test_region02_wind_levels.gd`) -- decidir.
+
+> **N6 autoral (26 set 2026, sem push)** -- `docs/nivel_autoral_n6.md`. A aguardar playtest: leitura/justica do vento (1500-1800), TTK do Golem (~609 vida), duracao. Decisoes futuras: renomear `ChefeCarcereiro`, destino do `dash_aereo`, rever a intensidade do vento em N7-N10 (420-520 sao imperceptiveis). N7 NAO comecado.
+
+> **Regiao II -- auditoria N6 (26 set 2026, sem push)** -- `docs/regiao_2_decisoes_e_n6_auditoria.md`. **Pendente do GM**: aprovar a reconstrucao do N6 (Carcereiro -> Guardiao, `dash_aereo` fora do N6, seccoes A-E); confirmar retirar os Coletaveis `escalar_paredes` de N7/N11.
+
+> **Regiao I = vertical slice (26 set 2026, sem push)** -- `docs/regiao_1_vertical_slice.md`; cartao "FLORESTA CORROMPIDA CONCLUIDA" feito. **Pendente do GM**: aprovar `docs/plano_migracao_regiao_2.md` (ordem N6->N10, skill no exame, cartao region.2). `SPECIAL BOSS DPS -- REVIEW DURING GLOBAL COMBAT BALANCE` (bot com Especial 19,7 s vs 35,5 s) registado, nao alterado.
+
+> **N5 autoral + Coracao Putrefacto (26 set 2026, sem push)** -- `docs/nivel_autoral_n5.md`. A aguardar playtest: legibilidade dos telegraphs (pulso/raizes), pogo nos brotos, TTK humano (est. 57-71 s), Especial vs casca, arte placeholder (broto/onda), decisao: manter `salto_duplo` como premio do boss? e ecra de fecho da Regiao I. Regiao II NAO comecada.
+
+> **N4 autoral + Especial com Energia (26 set 2026, sem push)** -- `docs/nivel_autoral_n4.md`. A aguardar playtest do GM: custo 33/uso, ganhos +5/+8, dano 2,6x, botao tactil novo, arte do Especial (usa o laser do tiro), encontro de gestao de Energia. N5 NAO comecado.
+
+> **N3 autoral feito (26 set 2026, sem push)** -- `docs/nivel_autoral_n3.md`: Pogo (ressalto automatico em espinhos/inimigos) ensinado em tufos de dano baixo,
+> combinado com Dash e raizes, desafio final e guardiao inalterado. **A aguardar playtest do GM**: legibilidade dos espinhos, duracao (estimada 3-4 min),
+> pogo sem input proprio (decidir se se quer ataque descendente com botao). N4 NAO comecado.
+
+> **N2 autoral feito (26 set 2026, sem push)** -- `docs/nivel_autoral_n2.md`: o Dash ganha-se no altar, aprende-se num gate com poco de
+> retry e passa a ser exigido em 2 gates sob teto baixo. **A aguardar playtest do GM**; N3 (Pogo) NAO comecado.
+
+> **Ghorak redesenhado (26 set 2026, sem push)** -- casca + janelas de vulnerabilidade, baque/raizes/carga/curto,
+> fase 2 encadeada (`docs/nivel_autoral_n1.md`). **A aguardar novo playtest do GM**: janela media 1,4 s (pedido 2-3 s),
+> TTK perfeito 18,9 s (real estimado 30-40 s), leitura dos telegraphs, raizes em fase 2.
+
+> **N1 AUTORAL feito (26 set 2026, commits locais sem push)** — `docs/nivel_autoral_n1.md`. **À espera do GM:**
+> playtest manual (telegraph, offscreen SEE→TELEGRAPH→HEAR, Ghorak, ritmo, arte); N1 NÃO está LOCKED. Decidir a
+> duração (travessia 26 s; ~2–3 min estimados, alvo 3–5). Arte em falta: raízes (RaizPerigo por polígonos), goblin
+> legado, animação de mantle. Depois: N2 (Dash). Também: TTK do Ghorak por medir a jogar.
+
+> **F1 Passagem 2 feita (25 set 2026, commits locais sem push)** — `docs/f1_passagem2.md`. **Decidido pelo GM:**
+> wall-jump passa a exigir `escalar_paredes` (por implementar); mantle aprovado; câmara em queda longa
+> pendente. Próximo: gating do wall-jump e depois level design N1 → N2 → N3 → N4 → N5.
+
+> **F1 Passagem 1 feita (25 set 2026, commit local sem push)** — `docs/f1_passagem1.md`. **À espera do GM:**
+> a física nova abre atalhos sobre as ajudas dos níveis (8 portas alcançáveis só a saltar, incl. N3 da Região I).
+> Escolher A (manter 128 px e desenhar N1–N5 para a envolvente nova), B (salto ~110 px) ou C (limitar o mantle
+> na Passagem 2). Só depois arranca a Passagem 2 (mantle + landing/brake/turn).
+
+> **F1 diagnóstico de movimento (25 set 2026)** — `docs/f1_movimento_diagnostico.md`. Decidido pelo GM:
+> #5 Floresta Corrompida + Coração Putrefacto; #12 verbos opção A (Dash N2, Pogo N3, Especial N4, sem
+> wall-kick). **Pendente de decisão:** aprovar as alterações recomendadas de F1 (P0: salto 82,9→125–135 px,
+> corte único, apex, terminal ≤ 750; P1: roll encadeado, mantle, arranque dash/roll) antes de qualquer tuning.
+
+> **GAME DIRECTOR FASE 0 (25 set 2026)** — auditoria global fechada; conteúdo **CONGELADO até ao vertical
+> slice da Região I** (ver `docs/retomar_aqui.md`, `docs/vertical_slice_region01.md`, `docs/foundation_plan.md`).
+> **Pendentes de decisão do GM: 9** — `docs/game_director_decisions_pending.md` (os que tocam já no slice:
+> #5 nome da Região I, #12 calendário de verbos). Isolamento de save no Windows corrigido:
+> usar sempre `tools/godot_isolado.py`.
+
+> **PWA publicada para playtest (21 set 2026)** — `master` em v0.18.20 com o
+> SFX Overhaul; PWA actualizada em <https://paulogomesextp.github.io/koliani/>
+> (cache novo, o telemovel nao serve assets velhos). O SFX continua
+> **POR APROVAR**: checklist em `docs/audio/HUMAN_SFX_PLAYTEST.md`.
+
+> **À espera do Paulo (SFX, 20 set 2026)** — o SFX Overhaul fechou a fase
+> automática (`READY_FOR_HUMAN_TEST`). Duas coisas dependem de ti:
+> 1. **Playtest de som** — checklist e percurso de 10–15 min em
+>    `docs/audio/HUMAN_SFX_PLAYTEST.md`; build em
+>    `build/qa/Koliani-SFX-QA.exe`.
+> 2. **Decidir o `esmagar.ogg`** — distorce (+7,3 dBFS, 16 callsites), mas
+>    corrigi-lo custa 1,4 dB do peso do som. Se distorcer ao ouvido:
+>    `python tools/corrigir_clipping_p4.py --forcar esmagar.ogg`.
+>
+> Por confirmar também: **áudio do Web** (arranca, mas não consegui provar
+> que sai som) e as **13 sobras de formato** em `assets/audio/` (143 KB de
+> `.ogg`/`.mp3` que nada toca — apagar ou deixar?).
+
+## RESOLVIDO — Região III, dano colateral das mecânicas (20 set 2026)
+
+Estava aqui: dar à Torre dos Ecos as mecânicas do cânone reescrevia doze
+níveis de outras regiões. **O Paulo decidiu: as mecânicas ficam, o dano
+colateral não, e a solução tem de ser arquitetural.** Foi feito.
+
+A `MECANICA_DO_NIVEL` fazia três coisas ao mesmo tempo, e só se percebeu
+isso a medir:
+
+1. dizia que mecânica cada nível **apresenta**;
+2. por ser a primeira ocorrência, decidia quando cada câmara **desbloqueia
+   em todas as regiões** — e o gerador duplica o peso dela nos 8 níveis
+   seguintes;
+3. o `cam` de cada linha é também a **câmara-assinatura que o gerador força
+   na jornada desse nível**, e o `grau` diz quantas vezes.
+
+Separou-se (1) de (2) com `DESBLOQUEIO_BASE` (calendário global congelado)
+mais `DESBLOQUEIO_REGIAO` (antecipação local à Região III). Para (3), os
+slots fora da Região III voltaram exactamente ao que eram.
+
+Fica **uma** consequência, pequena e nomeada: `serras` e `gravidade` já não
+têm nível onde sejam *apresentadas* (os slots delas eram o "Observatório
+Lunar" e a "Torre da Tempestade", que o cânone renomeou). Continuam a
+aparecer no jogo, no mesmo calendário de sempre; perderam o aviso de
+estreia. E o `elevador` é agora assinatura do N12 e do N16 — quem joga
+conhece-o no N12 e o N16 não o reapresenta, que é o comportamento certo.
+
+## Pendente de DECISÃO — Região III, Torre dos Ecos (19 set 2026)
+
+Branch `claude/region03-completion-pass` (**PARTIAL, não integrada**).
+Relatório: `docs/implementation/region_03_completion_pass.md`.
+
+A identidade da região está feita e testada: nomes canónicos, um só chefe,
+sinos como assinatura, fundo próprio, os 10 inimigos da prancha e o Vyrak
+refeito. A suite passa e a Região II não regride. O que falta é a
+**arquitetura do primeiro plano** e as **mecânicas por nível** — e são
+esses dois que mantêm fidelidade LOW.
+
+Três coisas para o Paulo decidir:
+
+A. **O Vyrak deixou de ser dragão.** A prancha APPROVED
+   (`boss_pack.png`) mostra "A Voz dos Ecos", um guardião humanoide de
+   sinos, 2 fases. O `docs/niveis.md` e o `docs/progresso_agente.md`
+   chamavam-lhe "o Dragão das Sombras" e ficaram desatualizados de
+   propósito — a prancha é a fonte de verdade, mas **confirma-se que o
+   texto antigo é que estava errado, e não o contrário?**
+
+B. **O N13 continua a ser de raios.** O nível chama-se agora "Mecanismos
+   Antigos" e o cânone dele é engrenagens, alavancas e plataformas
+   rotativas. A cena mantém `RaioTempestade`/`ParaRaios` e o guardião
+   Voltaris. Trocar isso é refazer o nível — fica para decisão.
+
+C. **O N15 tem queda punitiva.** O bot morre 53 vezes por run ali e 0 nos
+   outros quatro. Pode ser do bot (não sabe subir), pode ser real. **Vale
+   um playtest humano do N15 antes de se mexer na geometria.**
+
+---
+
+## Pendente de DECISÃO — DEV MODE sem PIN (19 set 2026)
+
+Branch `claude/remove-devmode-pin`. Relatório:
+`docs/execution_devmode_sem_pin.md`. O PIN saiu como pedido e o DEV MODE
+ficou intacto. Duas coisas para o Paulo decidir:
+
+A. **O DEV MODE fica visível em builds de loja?** Hoje quem manda é o
+   interruptor `koliani/qa/entrada_dev` no `project.godot`, e ele está
+   `true`. Enquanto o PIN existia, dava para argumentar que era uma segunda
+   tranca; agora é a ÚNICA. Se alguma build pública não deve ter o botão,
+   esse interruptor tem de ir a `false` no preset dessa build — não é uma
+   decisão que eu deva tomar sozinho.
+
+B. **O bug do ESPAÇO estava vivo, e não era o que se pensava.** A
+   correcção de 18 set (`7a4e586a`) atacou o foco do botão; a causa era o
+   `SeletorNiveis` escondido a continuar a ouvir `ui_accept`. Está
+   corrigido e provado nos dois sentidos. **Vale a pena o Paulo confirmar
+   no Windows dele**, porque a queixa original veio de lá: em DEV MODE,
+   saltar repetidamente já não recarrega o nível.
+
+## Pendente de DECISÃO — depois do Super-Process A2 (18 set 2026)
+
+Branch `claude/region02-fidelity-remediation`. **Super-Process A2 fechado:**
+relatório final em `docs/execution_a2_regiao02_fidelidade.md` (detalhe
+técnico em `docs/implementation/region_02_fidelity_remediation.md`). A suite,
+o harness do chefe e os 7 harnesses avulso estão **todos verdes**.
+
+**Corrigido e provado:** o NaN do N06 (era o `Engine.time_scale = 0.0` do
+hitstop, e afectava as **nove** plataformas `AnimatableBody2D` do jogo
+inteiro); o pico de mortes do N10 (200,7 → 18,5 mortes/1000 px); o bestiário
+(0/10 canónicos → 5 espécies recortadas da prancha, 100% dos inimigos comuns
+da região); o ambiente (nuvens, props, folhagem carmesim, abismo); e o
+Guardião (asas abertas + a paleta ciano que o contrato proíbe, que estava em
+cinco sítios).
+
+O que fica para o Paulo decidir:
+
+A. **O N10 ficou fácil demais?** 200,7 → 18,5 mortes/1000 px. O alvo era a
+   ordem do N08 (24,2) e cumpriu-se, mas quem decide se o exame final quer
+   mais mordida é o playtest humano. A laje `ChaoResgate` cobre x 540-880 e
+   o comentário na cena tem as três variantes medidas.
+B. **Contraste.** O mar de nuvens foi clareado de propósito (realces 39-53%
+   → 57-68%; a textura foi pintada a 51,9%). Se algum nível parecer LAVADO,
+   o botão é o 5.º campo da tabela `PACKS` em `atmosfera.gd`.
+C. **Os quatro guardiões intermédios não foram tocados** — Golem LOW, Vigia
+   MEDIUM, Feiticeira MEDIUM, Espectros MEDIUM. O Vigia continua a CAMINHAR
+   e a `TORRE VIGIA` da prancha é uma estrutura fixa. É o maior bloco de
+   trabalho que sobra.
+D. **A lua de sangue continua a não entrar no enquadramento.** Está na
+   `ceu.png` mas essa camada é aplicada a 320 px de altura e o disco fica
+   muito acima da câmara; tentou-se recortá-la por cor e não sai limpa (o
+   `realcar_lua` tinge-a). O caminho é um elemento próprio na camada `Ceu`
+   do `atmosfera.gd`, que tem `motion_scale = 0` e portanto fica fixa à
+   câmara. Era prioridade BAIXA (#15) no audit.
+E. **As outras cinco criaturas canónicas** (serpente eólica, espectro das
+   ruínas, arqueiro eólico, torre vigia, mago do vento como inimigo comum).
+F. **A build de Windows não está no Git** e o contentor onde foi feita é
+   efémero. Chega ao Paulo pelo CI, que corre em cada push.
+
+---
+
+## Pendente de DECISÃO — depois do audit de fidelidade da Região II (18 set 2026)
+
+Branch `claude/region02-humanlike-bot-playtest`. Relatório completo em
+`docs/playtests/region_02_bot_humanlike_playtest.md`. **Nada foi corrigido**:
+a execução era observação, prova e crítica. O que fica para o Paulo decidir:
+
+1. **O bestiário da Região II.** Censo medido em jogo: **0 dos 10 inimigos
+   canónicos** em N06-N10. `ESP_REGIAO[1]` em `gerador_corredor.gd` ainda diz
+   `# II Prisão`. O jogo já tem `abutre` e `olho` com arte completa e já
+   marcadas como voadoras — é uma linha de tabela. **Decisão:** apontar já a
+   Região II a estas duas, ou esperar pelas criaturas desenhadas da prancha?
+2. **O projéctil das PENAS CORTANTES viola o contrato do Guardião.** É
+   `Color(0.72, 0.92, 1.0)` = `#B8EBFF` (`chefe_guardiao_dos_ceus.gd:399`),
+   que é a paleta ciano/gelo do `monge_celeste` que L3 **proíbe**; e é um
+   losango, não uma pena. Correcção de uma linha.
+3. **O mar de nuvens chega ao ecrã com 10-24% da luminância com que foi
+   pintado** (53% na origem). Não falta asset — é `neblina_fundo`,
+   `dessaturar_fundo` e `cor_fundo` nas cinco cenas. **Decisão:** clarear,
+   e quanto? É o que diz ALTITUDE.
+4. **O ácido do N10.** 76% das mortes do nível num único ponto (x≈700), 99%
+   na faixa x=600-820, e mata de vida cheia. **Decisão:** encurtar o ácido,
+   pôr uma saliência de recuperação por baixo do ziguezague, ou deixar como
+   exame final duro?
+5. **A pose do Guardião dos Céus.** A escala CUMPRE o contrato (2,46x altura,
+   3,6x largura); a silhueta não — as asas estão espalmadas, e a prancha
+   define a leitura à distância pelas asas ABERTAS. Abri-las obriga a rever
+   o tecto de 240 px de largura. **Decisão do Paulo, é arte.**
+6. **Terreno sem vegetação.** O material `desfiladeiro` é tijolo liso e o
+   catálogo de props da região tem 12 entradas (3 de chão, duas das quais
+   são `cruz` e `lapide`, de cemitério). A Região I tem 17 props e 8 de chão,
+   com folhagem carmesim em todas as bordas. É o item mais caro e o que mais
+   fecha a distância à prancha.
+7. **A jornada procedural.** Em N06/N07/N09 ela é ~75% do nível e não tem
+   uma única zona de vento — a mecânica que dá nome à região vive só na sala
+   final. **Decisão:** levar o vento à jornada, ou encurtar a jornada?
+
+**Respondido, não precisa de decisão:** as asas do Guardião **não** tapam a
+Koliani na arena (mas também não fazem trabalho de silhueta), e as asas não
+darem dano **lê-se bem**.
+
+**A investigar:** em 3 das 9 runs do N06 a posição da Koliani foi NaN em pelo
+menos um frame. Não diagnosticado.
+
+---
+
+## Pendente — Super-Process A, Região II fechada (17 set 2026)
+
+Branch `claude/region02-completion-pass`. Tudo o que estava em aberto do
+Process 11 e 12 sobre arte, vento e lore está feito; o que sobra é humano.
+
+1. **PLAYTEST HUMANO DA REGIÃO II INTEIRA (N06–N10).** É o único gate que
+   falta. Build Windows isolada com launcher por nível em
+   `builds/windows/` (save próprio, não toca no save real).
+2. **A largura do Guardião** é a primeira coisa a julgar: 235 px numa
+   plataforma de arena de 560. As asas tapam a Koliani? Elas não dão dano —
+   isso lê-se, ou parece injusto?
+3. **N06/N07/N09 vão jogar-se diferente.** As zonas de vento ficaram com o
+   tamanho desenhado (o N09 passa de 300 px de largo para 680/650). Está
+   certo em relação ao que foi authored, mas nunca foi jogado assim.
+4. ~~**Os chefes intermédios ainda se chamam The Jailer / The Guillotine
+   Lady / The Condemned Brothers / Ignivar the Cursed Smith.**~~ **FEITO**
+   (18 set 2026, `8431d887`). Passaram a Golem das Falésias, Vigia do
+   Desfiladeiro, Feiticeira dos Ventos e Espectros Gémeos — GUARDIÕES
+   (`guard.*`), não chefes, cada um a traduzir um arquétipo da prancha
+   aprovada da região. As quatro silhuetas foram redesenhadas; o gameplay
+   não mudou. **Por julgar no playtest:** as criaturas novas leem-se à
+   escala de jogo? O N07 perdeu o laranja todo — a arena ficou legível ou
+   ficou monótona?
+5. **Os inimigos não são da região** (esqueleto, chort, imp, mastim, orc; o
+   cânone pede morcego dos ventos, sentinela flutuante, gaivota sombria,
+   golem aéreo, mago do vento). Trocar só o aspeto parte a leitura
+   silhueta→comportamento — precisa de lote próprio, com gameplay.
+6. **N06/N07/N09 ainda têm jornada procedural** (`corredor = true`) e N08/N10
+   não. Inconsistência de estrutura da região; é gameplay.
+7. Quatro ataques canónicos do Guardião por implementar: RAJADA DE VENTO,
+   CHOQUE AÉREO, METEOROS CELESTIAIS, INVOCAR GAIVOTAS SOMBRIAS.
+
+## Pendente -- Process 12, N10 Guardião dos Céus (17 set 2026)
+
+1. **PLAYTEST HUMANO do N10** (branch `claude/region02-n10-guardian-skies`).
+   O que interessa: os tres telegrafos leem-se? o vento comandado na arena e'
+   pressao ou estorvo? o EXPOSTO de 1,35 s chega para responder?
+2. **Arte do Guardiao dos Ceus** e' rig de pack (`monge_celeste`) -- passe
+   canonico da Regiao II fica para o Process 13.
+3. A lore da Cela Zero ainda fala do Primeiro Prisioneiro (pistas dormentes);
+   alinhar quando a Regiao II levar passe narrativo.
+
+## Process 11, N08 Ilhas Suspensas -- FECHADO (17 set 2026)
+
+Playtest humano no Windows **APPROVED**; Process 11 COMPLETE, gameplay LOCKED.
+Fica pendente, sem bloquear:
+
+1. **Art pass canonico da Regiao II** por fazer.
+2. **Bug do `WindZone`: as zonas de uma cena partilham a forma de colisao.**
+   Afeta N06/N07/N09 (N09 com duas zonas a 300x220 em vez de 680x240/650x270),
+   NAO o N08. Corrigir = duplicar a forma no `wind_zone.gd` + repetir o
+   playtest de N06/N07/N09. Lote proprio.
+3. **`tools/correr_testes.ps1` rebenta no Windows PowerShell 5.1** -- tratar a
+   parte.
+4. Validacao manual device/PWA: ja' nao e' precisa para fechar o gameplay.
+5. (Nota de design, sem decisao pendente depois da aprovacao) com salto duplo
+   + dash dois vaos do N08 fazem-se sem planar.
+
+## Pendente de decisao do Paulo -- 9H.18 (13 set 2026)
+
+1. **A CORRIDA PRECISA DE ARTE DESENHADA -- nao ha' volta a dar.** Medido
+   com um crivo novo e independente (`tools/validar_run_nativo_9h18.py`): nos
+   10 frames golden o pe' de tras percorre **7 px** em todo o ciclo e o da
+   frente 29, e nenhum dos dois atravessa a linha da anca. A pose do segundo
+   contacto **nao esta' desenhada** -- nenhum `fps`, `speed_scale`, espelho
+   ou particula a cria. Procuradas todas as fontes do repo, do master package
+   e dos 15 ramos: so' o **piloto 5G** tem passada a serio, e e' outra
+   Koliani (cabelo roxo, saia de chama, sem lenco vermelho).
+   **Decisao:** encomenda-se o ciclo novo (a spec ja' esta' escrita em
+   `docs/spec_run_nativo_koliani.md`, e o jogo ja' o aceita como drop-in), ou
+   aceita-se mudar a personagem para a do piloto 5G?
+2. **Os SFX do menu e do combate foram refeitos -- falta OUVIR.** 22
+   ficheiros novos, todos dentro de alvos de forma medidos (navegar passou de
+   160 ms para 55; o remate do combo deixou de chegar 70 ms atrasado; golpear
+   e acertar deixaram de ter o mesmo timbre). Mas quem os fez **nao os ouve**.
+   Teclado de sons no modo Dev, **tecla S** -- os ~40 eventos a um toque, com
+   os volumes reais. **HUMAN LISTEN REQUIRED** antes de se dar isto por bom.
+3. **Sons ainda por refazer (ja' auditados).** `porta` (1000 ms, com o pico
+   aos 236 ms), `transicao`, `apanhar`, `selo`, `conquista`, `projetil`,
+   `investida`, `chefe_cai`, `dano`, `bloqueio`, `morte_koliani`, `raiz_*`,
+   `plataforma_surge` e os 21 `mob_*`. Ficaram de fora por prioridade -- o
+   Game Master nomeou o menu e o combate. Seguem na proxima passagem?
+
+## Pendente de decisao do Paulo -- 9H.17 CONTINUATION (13 set 2026)
+
+1. **QA jogado nao certificou nenhum nivel.** A Koliani chega a` arena do
+   chefe do 1-1 com input real, mas o Ghorak mata-a e a run reinicia.
+   Conduzir um combate de chefe as cegas (rajada de teclas -> fotografia) nao
+   converge. Decisao: aperta-se o laco observacao-accao (caro), joga-se o
+   percurso a mao, ou aceita-se certificar so' a TRAVESSIA sem o chefe?
+2. **"DEVELOPER MODE" aparece no menu da build de RELEASE.** A 9H.17 D pos a
+   entrada Dev disponivel em release para o QA. Para uma build que va' para o
+   playtester isto parece errado -- tirar, ou manter enquanto houver QA?
+3. **NOVO JOGO destruiu a campanha do Paulo nesta sessao.** Corrigido o buraco
+   (sair do botao desarma) e reposto o save por SHA256. Fica a pergunta maior:
+   quer saves multiplos / um slot separado de QA, ou basta esta proteccao?
+
+## Pendente de decisao do Paulo -- 9H.17 (13 set 2026)
+
+1. **NATIVE ART REQUIRED -- corrida da Koliani.** Os 10 frames golden nao tem
+   passada alternada: a abertura das pernas nunca fecha (38,40,39,38,38,53,
+   44,46,43,56) e o centro de massa nao troca de lado. Nao ha' outra fonte no
+   repo nem no historico, e nao se fabricam frames espelhados.
+2. **NATIVE ART REQUIRED -- fundo HD do L2.** A autoridade de arte da Regiao I
+   inteira e' uma prancha de 1536x1024; tudo o que no repo se chama "HD" e'
+   reamostragem dela, incluindo o `_hd_x4` e as camadas de 1920 (declaradas
+   como ampliadas pelo proprio manifesto). Entretanto o L2 passou a compor
+   recortes nativos em vez de esticar uma tira -- melhora, mas nao e' nativo.
+3. **NATIVE ART REQUIRED -- faixa de superficie do chao/pantano.** O leito ja'
+   esta' feito com arte aprovada; a faixa palida na base do ecra permanece e a
+   origem dela nao se identificou nesta execucao.
+4. **Estender o passe Hybrid aos niveis 1-3/1-4/1-5?** Eles ficaram na
+   apresentacao antiga (plataformas rectangulares, emendas no fundo) porque o
+   `L1Hybrid.serve()` so' cobre os perfis 1 e 2. O corte visual dentro da
+   Regiao I nao desapareceu, mudou de sitio. Nao se estendeu porque o briefing
+   da 9H.17 congelou "L2-L5 REMASTER STARTED: NO" -- e' uma linha, e e'
+   decisao tua.
+5. **Export publico:** desligar `koliani/qa/entrada_dev` no `project.godot`
+   antes de uma apresentacao final -- e' o que fecha a entrada "DEVELOPER
+   MODE" do menu.
+6. **As 2 falhas de teste que restam** (Execution 9C: o L1 usar o kit 9C e as
+   camadas da 08) sao decisao do nivel Golden: o passe Hybrid superou as duas.
+   Decidir se os testes se actualizam ou se o L1 volta atras.
+
 # Prioridades — Koliani
 
 ## Agora
+
+00000000000000000. **9H.16 FEITO -- L1 como Golden Level (fases B-F). TRES
+   DECISOES DO PAULO.** Ramo `codex/9h16-l1-perfection`, v0.18.8. Relatorio:
+   `docs/execution_9h16_l1_golden.md`. Feito: Phase B fechada com QA nativo
+   (isolamento do save provado byte a byte), ajudas fora do centro do ecra,
+   cadeia de espada com funcao por golpe (0,85x/1,0x/1,25x/1,9x de dano,
+   90/150/230/470 px/s de recuo FISICO, o 3.o atordoa e o 4.o sangra), a raiz
+   da floresta passou a espetar inimigos, remates organicos nas plataformas e
+   som para as duas mecanicas-assinatura do L1 (estavam MUDAS).
+   **DECISAO 1: PERCURSO HUMANO DO L1.** O input sintetico so' cobriu o
+   primeiro terco -- falta o percurso ate' ao Ghorak e a travessia L1->L2, a
+   sensacao do combate depois da mudanca, e ouvir os SFX novos.
+   **DECISAO 2: KOLIANI RUN NATIVE FRAMES** (confirmado por medicao; e' o
+   mesmo PENDENTE 1 da 9H.13/14).
+   **DECISAO 3: CHAO/PANTANO NATIVE ART** -- a faixa palida no fundo do L1
+   esta' medida (o `LiquidoMortal` do corredor triplica a luminancia da banda)
+   mas nao se isolou correccao com prova; a hipotese do veu foi revertida.
+
 
 0000000000000000. **9H.13/14 FEITO -- SFX, corrida e tremor do L2. DUAS
    DECISOES DO PAULO.** Ramo `claude/9h13-14-audio-koliani-l2`, por integrar.

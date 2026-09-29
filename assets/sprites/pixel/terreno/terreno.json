@@ -82,5 +82,19 @@
    0.6,
    1.0
   ]
+ },
+ "desfiladeiro": {
+  "superficie": 8,
+  "fonte": "torres (recolorido)",
+  "escura": [
+   26,
+   24,
+   44
+  ],
+  "rim": [
+   0.78,
+   0.54,
+   0.98
+  ]
  }
 }

@@ -36,7 +36,15 @@ func _rig_da_forma() -> String:
 		"boss_85_rei_demonios": "cavaleiro_fogo", "boss_86_sombra": "cavaleiro_negro",
 		"boss_87_nada": "olho_do_abismo", "boss_88_paradoxo": "irmaos_condenados",
 		"boss_89_observador": "olho_do_abismo", "boss_90_entidade": "horror",
-		"boss_91_general_caos": "colosso", "boss_92_dragao_primordial": "vyrak",
+		"boss_91_general_caos": "colosso",
+		# O "Dragao Primordial" usava o rig `vyrak`, e isso deixou de
+		# fazer sentido quando o Vyrak foi refeito segundo a prancha
+		# aprovada: era uma besta alada roxa e passou a ser um guardiao
+		# HUMANOIDE de sinos ("A Voz dos Ecos"). O dragao do nivel 92
+		# ficou, sem ninguem dar por isso, a aparecer como guardiao de
+		# sinos. `serpente` e' o rig reptiliano que resta, e e' o que
+		# ja' veste a Serpente Vermelha do 77.
+		"boss_92_dragao_primordial": "serpente",
 		"boss_93_ultimo_cavaleiro": "primeiro_prisioneiro", "boss_94_arauto_final": "arauto",
 		"boss_95_campeao": "cavaleiro_fogo", "boss_96_zeriko_jovem": "cavaleiro_negro",
 		"boss_97_primeiro_rei": "rei_ossario", "boss_98_zeriko_absoluto": "cavaleiro_fogo",

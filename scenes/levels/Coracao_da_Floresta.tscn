@@ -1,25 +1,22 @@
-[gd_scene load_steps=16 format=3 uid="uid://bkolianicoracao05"]
+[gd_scene load_steps=19 format=3 uid="uid://bkolianicoracao05"]
 
-; REGIAO I / nivel 5 -- Coracao da Floresta (chefe da regiao).
-; Sala final FEITA A MAO (a JORNADA, que cresce com o nivel, vem antes). Travessia sobre plataformas
-; "batimento" (PlataformaRitmada em sincronia) com ancoras solidas pelo
-; meio. Bifurcacao: POCO DE GRAVIDADE LUNAR (saltos enormes) / rota solida
-; segura. Elite: lodo de CARGA. Poca de podridao em baixo (morte). Chefe:
-; O Coracao Putrefacto -- a arena bate, mas mantém o chão principal contínuo.
+; REGIAO I / nivel 5 -- Coracao da Floresta (N5, EXAME REGIONAL + BOSS). NIVEL AUTORAL: sem jornada procedural
+; (`corredor = false`). Parte A: exame curto que combina Dash, Pogo, hazard, combate e uma pequena decisao de Energia
+; (nenhuma skill nova). Parte B: arena continua e o Coracao Putrefacto (`chefe_coracao_putrefacto.gd`).
+; Mapa e razoes em `docs/nivel_autoral_n5.md`.
 
 [ext_resource type="PackedScene" uid="uid://bkolianiactor01" path="res://scenes/actors/Koliani.tscn" id="1_kol"]
 [ext_resource type="PackedScene" uid="uid://bdemoniobase01" path="res://scenes/actors/DemonioBase.tscn" id="2_dem"]
-[ext_resource type="PackedScene" uid="uid://bkolianicoletavel01" path="res://scenes/actors/Coletavel.tscn" id="3_col"]
 [ext_resource type="PackedScene" uid="uid://bkolianiporta01" path="res://scenes/actors/Porta.tscn" id="4_porta"]
 [ext_resource type="Script" path="res://scripts/checkpoint.gd" id="5_chk"]
 [ext_resource type="PackedScene" uid="uid://bkolianichefecoracao05" path="res://scenes/actors/ChefeCoracaoPutrefacto.tscn" id="6_chefe"]
 [ext_resource type="Script" path="res://scripts/nivel_com_chefe.gd" id="7_niv"]
 [ext_resource type="PackedScene" uid="uid://bkolianiatmosfera01" path="res://scenes/fx/Atmosfera.tscn" id="8_atm"]
 [ext_resource type="PackedScene" uid="uid://bkolianiplataforma01" path="res://scenes/actors/Plataforma.tscn" id="9_pl"]
-[ext_resource type="PackedScene" uid="uid://bkolianiplatritmada05" path="res://scenes/actors/PlataformaRitmada.tscn" id="10_ritmo"]
 [ext_resource type="PackedScene" uid="uid://bkolianiaguavenenosa01" path="res://scenes/actors/AguaVenenosa.tscn" id="11_agua"]
-[ext_resource type="PackedScene" uid="uid://bkolianizonagrav14" path="res://scenes/actors/ZonaGravidade.tscn" id="12_grav"]
 [ext_resource type="PackedScene" uid="uid://bkolianiraizperigo01" path="res://scenes/actors/RaizPerigo.tscn" id="13_raiz"]
+[ext_resource type="PackedScene" uid="uid://bkolianiespinhos01" path="res://scenes/actors/Espinhos.tscn" id="14_esp"]
+[ext_resource type="PackedScene" uid="uid://bkolianiessencia01" path="res://scenes/actors/Essencia.tscn" id="99_ess"]
 [ext_resource type="PackedScene" path="res://scenes/fx/Region1HybridVisualTarget.tscn" id="100_target"]
 
 [sub_resource type="RectangleShape2D" id="rs_chk"]
@@ -39,6 +36,10 @@ fill_to = Vector2(1, 0.5)
 
 [node name="Coracao_da_Floresta" type="Node2D"]
 script = ExtResource("7_niv")
+corredor = false
+alongar_plataformas = false
+candeeiros = false
+checkpoints_autorais = true
 
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
 cor_ambiente = Color(0.82, 0.88, 0.84, 1)
@@ -48,256 +49,240 @@ cor_luz = Color(0.94, 0.42, 1, 1)
 cor_poeira = Color(0.9, 0.66, 1, 1)
 densidade_poeira = 2
 bioma = "floresta"
-largura_nivel = 3400.0
+largura_nivel = 4800.0
 fundo_pack = "pantano"
 tinta_fundo = Color(0.9, 0.84, 1.06, 1)
 neblina_fundo = 0.44
 dessaturar_fundo = 0.36
 seed_ambiente = 1148
 
-; Execution 8 — panorama aprovado da Região I, sem formas específicas do L1.
+; Execution 8 -- panorama aprovado da Regiao I, sem formas especificas do L1.
 [node name="Region1HybridVisualTarget" parent="." instance=ExtResource("100_target")]
 perfil = 5
-limite_direito = 3450.0
-landmark_visto_em = 3060.0
+limite_esquerdo = -800.0
+limite_direito = 5300.0
+landmark_visto_em = 4010.0
 
 [node name="Podridao" parent="." instance=ExtResource("11_agua")]
-position = Vector2(1650, 970)
-largura = 3900.0
+position = Vector2(2400, 1070)
+largura = 5800.0
 altura = 320.0
 cor = Color(0.3, 0.16, 0.3, 0.93)
 
-; ===================  travessia "batimento"  ====================
+; ===== A1 -- Dash + plataformas: gate sob teto com poco de retry =====
 [node name="ChaoInicio" parent="." instance=ExtResource("9_pl")]
-position = Vector2(300, 700)
-tamanho = Vector2(480, 70)
-altura_visual = 120.0
-cor_base = Color(0.17, 0.22, 0.12, 1)
-cor_topo = Color(0.4, 0.58, 0.3, 1)
-
-[node name="Ancora1" parent="." instance=ExtResource("9_pl")]
-position = Vector2(620, 648)
-tamanho = Vector2(130, 22)
-altura_visual = 40.0
-cor_base = Color(0.17, 0.22, 0.12, 1)
-cor_topo = Color(0.4, 0.58, 0.3, 1)
-
-[node name="Bat1" parent="." instance=ExtResource("10_ritmo")]
-position = Vector2(760, 588)
-tamanho = Vector2(120, 18)
-altura_visual = 24.0
-periodo = 2.2
-solida_seg = 2.6
-fantasma_seg = 1.3
-fase = 0.0
-cor_base = Color(0.3, 0.12, 0.3, 1)
-cor_topo = Color(0.7, 0.34, 0.7, 1)
-
-[node name="Ancora2" parent="." instance=ExtResource("9_pl")]
-position = Vector2(900, 636)
-tamanho = Vector2(130, 22)
-altura_visual = 40.0
-cor_base = Color(0.17, 0.22, 0.12, 1)
-cor_topo = Color(0.4, 0.58, 0.3, 1)
-
-[node name="Bat2" parent="." instance=ExtResource("10_ritmo")]
-position = Vector2(1040, 576)
-tamanho = Vector2(120, 18)
-altura_visual = 24.0
-periodo = 2.2
-solida_seg = 2.6
-fantasma_seg = 1.3
-fase = 0.5
-cor_base = Color(0.3, 0.12, 0.3, 1)
-cor_topo = Color(0.7, 0.34, 0.7, 1)
-
-[node name="Ancora3" parent="." instance=ExtResource("9_pl")]
-position = Vector2(1180, 628)
-tamanho = Vector2(140, 22)
-altura_visual = 40.0
-cor_base = Color(0.17, 0.22, 0.12, 1)
-cor_topo = Color(0.4, 0.58, 0.3, 1)
-
-[node name="Bat3" parent="." instance=ExtResource("10_ritmo")]
-position = Vector2(1330, 572)
-tamanho = Vector2(120, 18)
-altura_visual = 24.0
-periodo = 2.2
-solida_seg = 2.6
-fantasma_seg = 1.3
-fase = 0.25
-cor_base = Color(0.3, 0.12, 0.3, 1)
-cor_topo = Color(0.7, 0.34, 0.7, 1)
-
-[node name="Ancora4" parent="." instance=ExtResource("9_pl")]
-position = Vector2(1470, 624)
-tamanho = Vector2(140, 22)
-altura_visual = 40.0
-cor_base = Color(0.17, 0.22, 0.12, 1)
-cor_topo = Color(0.4, 0.58, 0.3, 1)
-
-; ===================  ilha central + elite  ====================
-[node name="ChaoMeio" parent="." instance=ExtResource("9_pl")]
-position = Vector2(1700, 700)
-tamanho = Vector2(380, 70)
+position = Vector2(400, 700)
+tamanho = Vector2(800, 70)
 altura_visual = 120.0
 cor_base = Color(0.17, 0.22, 0.12, 1)
 cor_topo = Color(0.38, 0.56, 0.28, 1)
 
-[node name="EliteLodo" parent="." instance=ExtResource("2_dem")]
-position = Vector2(1700, 636)
-scale = Vector2(1.45, 1.45)
-elite = true
-especie = "lodo"
-vida = 170
-dano_contacto = 22
-comportamento = "carga"
-alcance_patrulha = 110.0
-cor_rim = Color(1.0, 0.5, 0.95, 1)
-
-[node name="RaizMeio" parent="." instance=ExtResource("13_raiz")]
-position = Vector2(1800, 664)
-auto = true
-intervalo = 2.5
-fase = 0.7
-dano = 14
-
-; ===================  BIFURCACAO  =============================
-; -- POCO DE GRAVIDADE LUNAR (rota vertical rapida: salto alto, queda lenta) --
-[node name="ZonaLunar" parent="." instance=ExtResource("12_grav")]
-position = Vector2(2050, 430)
-escala = 0.4
-
-[node name="G1" parent="." instance=ExtResource("9_pl")]
-position = Vector2(1900, 600)
-tamanho = Vector2(120, 18)
-altura_visual = 24.0
-cor_base = Color(0.18, 0.14, 0.2, 1)
-cor_topo = Color(0.5, 0.34, 0.56, 1)
-
-[node name="G2" parent="." instance=ExtResource("9_pl")]
-position = Vector2(2000, 490)
-tamanho = Vector2(120, 18)
-altura_visual = 24.0
-cor_base = Color(0.18, 0.14, 0.2, 1)
-cor_topo = Color(0.5, 0.34, 0.56, 1)
-
-[node name="G3" parent="." instance=ExtResource("9_pl")]
-position = Vector2(2150, 380)
-tamanho = Vector2(130, 18)
-altura_visual = 24.0
-cor_base = Color(0.18, 0.14, 0.2, 1)
-cor_topo = Color(0.5, 0.34, 0.56, 1)
-
-[node name="G4" parent="." instance=ExtResource("9_pl")]
-position = Vector2(2360, 440)
-tamanho = Vector2(130, 18)
-altura_visual = 24.0
-cor_base = Color(0.18, 0.14, 0.2, 1)
-cor_topo = Color(0.5, 0.34, 0.56, 1)
-
-; -- rota SOLIDA (segura, degraus curtos) --
-[node name="S1" parent="." instance=ExtResource("9_pl")]
-position = Vector2(1920, 654)
-tamanho = Vector2(150, 20)
-altura_visual = 34.0
+[node name="Teto1" parent="." instance=ExtResource("9_pl")]
+position = Vector2(865, 590)
+tamanho = Vector2(190, 22)
+altura_visual = 30.0
 cor_base = Color(0.17, 0.22, 0.12, 1)
-cor_topo = Color(0.4, 0.58, 0.3, 1)
+cor_topo = Color(0.38, 0.56, 0.28, 1)
 
-[node name="S2" parent="." instance=ExtResource("9_pl")]
-position = Vector2(2110, 606)
-tamanho = Vector2(150, 20)
-altura_visual = 34.0
+[node name="ChaoPoco1" parent="." instance=ExtResource("9_pl")]
+position = Vector2(865, 845)
+tamanho = Vector2(130, 30)
+altura_visual = 60.0
 cor_base = Color(0.17, 0.22, 0.12, 1)
-cor_topo = Color(0.4, 0.58, 0.3, 1)
+cor_topo = Color(0.38, 0.56, 0.28, 1)
 
-[node name="S3" parent="." instance=ExtResource("9_pl")]
-position = Vector2(2300, 556)
-tamanho = Vector2(150, 20)
-altura_visual = 34.0
+[node name="DegrauPoco11" parent="." instance=ExtResource("9_pl")]
+position = Vector2(830, 779)
+tamanho = Vector2(60, 18)
+altura_visual = 26.0
 cor_base = Color(0.17, 0.22, 0.12, 1)
-cor_topo = Color(0.4, 0.58, 0.3, 1)
+cor_topo = Color(0.38, 0.56, 0.28, 1)
 
-[node name="S4" parent="." instance=ExtResource("9_pl")]
-position = Vector2(2480, 512)
-tamanho = Vector2(150, 20)
-altura_visual = 34.0
+[node name="DegrauPoco21" parent="." instance=ExtResource("9_pl")]
+position = Vector2(815, 724)
+tamanho = Vector2(30, 18)
+altura_visual = 26.0
 cor_base = Color(0.17, 0.22, 0.12, 1)
-cor_topo = Color(0.4, 0.58, 0.3, 1)
+cor_topo = Color(0.38, 0.56, 0.28, 1)
 
-; -- reencontro --
-[node name="Reencontro" parent="." instance=ExtResource("9_pl")]
-position = Vector2(2660, 470)
-tamanho = Vector2(200, 26)
-altura_visual = 44.0
-cor_base = Color(0.17, 0.22, 0.12, 1)
-cor_topo = Color(0.4, 0.58, 0.3, 1)
-
-[node name="ColBatida" parent="." instance=ExtResource("3_col")]
-position = Vector2(2660, 434)
-habilidade_id = "dash"
-
-; ===================  arena do chefe  ========================
-[node name="ChaoChefe" parent="." instance=ExtResource("9_pl")]
-position = Vector2(3040, 700)
-tamanho = Vector2(620, 70)
+; ===== A2 -- Pogo + travessia: cama de espinhos, ilha com raiz (hazard + movimento); A4 -- combate: elite de carga =====
+[node name="ChaoA" parent="." instance=ExtResource("9_pl")]
+position = Vector2(1415, 700)
+tamanho = Vector2(970, 70)
 altura_visual = 120.0
 cor_base = Color(0.17, 0.22, 0.12, 1)
 cor_topo = Color(0.38, 0.56, 0.28, 1)
 
-[node name="BatArena1" parent="." instance=ExtResource("10_ritmo")]
-position = Vector2(2950, 560)
-tamanho = Vector2(130, 18)
-altura_visual = 24.0
-periodo = 2.0
-solida_seg = 3.0
-fantasma_seg = 1.4
-fase = 0.0
-cor_base = Color(0.3, 0.12, 0.3, 1)
-cor_topo = Color(0.7, 0.34, 0.7, 1)
+[node name="CamaA" parent="." instance=ExtResource("14_esp")]
+position = Vector2(1200, 665)
+largura = 17
+dano = 10
 
-[node name="BatArena2" parent="." instance=ExtResource("10_ritmo")]
-position = Vector2(3250, 540)
-tamanho = Vector2(130, 18)
-altura_visual = 24.0
-periodo = 2.0
-solida_seg = 3.0
-fantasma_seg = 1.4
-fase = 0.5
-cor_base = Color(0.3, 0.12, 0.3, 1)
-cor_topo = Color(0.7, 0.34, 0.7, 1)
-
-[node name="RaizChefe" parent="." instance=ExtResource("13_raiz")]
-position = Vector2(3160, 664)
+[node name="RaizA" parent="." instance=ExtResource("13_raiz")]
+position = Vector2(1420, 664)
 auto = true
 intervalo = 2.6
-fase = 0.4
-dano = 16
+fase = 0.5
+dano = 12
+
+[node name="EliteCarga" parent="." instance=ExtResource("2_dem")]
+position = Vector2(1720, 636)
+scale = Vector2(1.4, 1.4)
+elite = true
+especie = "goblin"
+vida = 140
+dano_contacto = 20
+comportamento = "carga"
+alcance_patrulha = 110.0
+
+[node name="Teto2" parent="." instance=ExtResource("9_pl")]
+position = Vector2(1965, 590)
+tamanho = Vector2(190, 22)
+altura_visual = 30.0
+cor_base = Color(0.17, 0.22, 0.12, 1)
+cor_topo = Color(0.38, 0.56, 0.28, 1)
+
+[node name="ChaoPoco2" parent="." instance=ExtResource("9_pl")]
+position = Vector2(1965, 845)
+tamanho = Vector2(130, 30)
+altura_visual = 60.0
+cor_base = Color(0.17, 0.22, 0.12, 1)
+cor_topo = Color(0.38, 0.56, 0.28, 1)
+
+[node name="DegrauPoco12" parent="." instance=ExtResource("9_pl")]
+position = Vector2(1930, 779)
+tamanho = Vector2(60, 18)
+altura_visual = 26.0
+cor_base = Color(0.17, 0.22, 0.12, 1)
+cor_topo = Color(0.38, 0.56, 0.28, 1)
+
+[node name="DegrauPoco22" parent="." instance=ExtResource("9_pl")]
+position = Vector2(1915, 724)
+tamanho = Vector2(30, 18)
+altura_visual = 26.0
+cor_base = Color(0.17, 0.22, 0.12, 1)
+cor_topo = Color(0.38, 0.56, 0.28, 1)
+
+; ===== A5 -- decisao de Energia: goblin + elite gosma (150). A6 -- combinacao final: cama, ilha com raiz, gate =====
+[node name="ChaoB" parent="." instance=ExtResource("9_pl")]
+position = Vector2(2680, 700)
+tamanho = Vector2(1300, 70)
+altura_visual = 120.0
+cor_base = Color(0.17, 0.22, 0.12, 1)
+cor_topo = Color(0.38, 0.56, 0.28, 1)
+
+[node name="RaizB" parent="." instance=ExtResource("13_raiz")]
+position = Vector2(2250, 664)
+auto = true
+intervalo = 2.6
+fase = 0.9
+dano = 12
+
+[node name="GoblinB" parent="." instance=ExtResource("2_dem")]
+position = Vector2(2450, 636)
+especie = "goblin"
+vida = 58
+dano_contacto = 14
+alcance_patrulha = 60
+
+[node name="EliteGosma" parent="." instance=ExtResource("2_dem")]
+position = Vector2(2700, 636)
+scale = Vector2(1.4, 1.4)
+elite = true
+especie = "gosma"
+vida = 150
+dano_contacto = 19
+alcance_patrulha = 40
+comportamento = "saltador"
+
+[node name="CamaC" parent="." instance=ExtResource("14_esp")]
+position = Vector2(3060, 665)
+largura = 17
+dano = 10
+
+[node name="RaizC" parent="." instance=ExtResource("13_raiz")]
+position = Vector2(3260, 664)
+auto = true
+intervalo = 2.6
+fase = 1.3
+dano = 12
+
+[node name="Teto3" parent="." instance=ExtResource("9_pl")]
+position = Vector2(3395, 590)
+tamanho = Vector2(190, 22)
+altura_visual = 30.0
+cor_base = Color(0.17, 0.22, 0.12, 1)
+cor_topo = Color(0.38, 0.56, 0.28, 1)
+
+[node name="ChaoPoco3" parent="." instance=ExtResource("9_pl")]
+position = Vector2(3395, 845)
+tamanho = Vector2(130, 30)
+altura_visual = 60.0
+cor_base = Color(0.17, 0.22, 0.12, 1)
+cor_topo = Color(0.38, 0.56, 0.28, 1)
+
+[node name="DegrauPoco13" parent="." instance=ExtResource("9_pl")]
+position = Vector2(3360, 779)
+tamanho = Vector2(60, 18)
+altura_visual = 26.0
+cor_base = Color(0.17, 0.22, 0.12, 1)
+cor_topo = Color(0.38, 0.56, 0.28, 1)
+
+[node name="DegrauPoco23" parent="." instance=ExtResource("9_pl")]
+position = Vector2(3345, 724)
+tamanho = Vector2(30, 18)
+altura_visual = 26.0
+cor_base = Color(0.17, 0.22, 0.12, 1)
+cor_topo = Color(0.38, 0.56, 0.28, 1)
+
+; ===== B -- arena continua do Coracao Putrefacto (~1 100 px, sem plataformas) =====
+[node name="ChaoChefe" parent="." instance=ExtResource("9_pl")]
+position = Vector2(4010, 700)
+tamanho = Vector2(1100, 70)
+altura_visual = 120.0
+cor_base = Color(0.17, 0.22, 0.12, 1)
+cor_topo = Color(0.38, 0.56, 0.28, 1)
+
+[node name="CacheRecompensa" parent="." instance=ExtResource("99_ess")]
+position = Vector2(4400, 630)
+valor = 60
+espalhar = false
 
 [node name="Chefe" parent="." instance=ExtResource("6_chefe")]
-position = Vector2(3080, 624)
+position = Vector2(4010, 624)
 
-; ===================  luzes / checkpoints / porta  ===========
+[node name="Porta" parent="." instance=ExtResource("4_porta")]
+position = Vector2(4490, 626)
+pista_ao_atravessar = ""
+
+; ===== luzes / checkpoints =====
 [node name="LuzInicio" type="PointLight2D" parent="."]
 position = Vector2(280, 640)
 texture = SubResource("tex_luz")
-energy = 0.55
-color = Color(0.8, 0.4, 0.9, 1)
-scale = Vector2(1.9, 1.3)
+energy = 0.9
+color = Color(0.95, 0.4, 1.0, 1)
+scale = Vector2(1.3, 1.3)
 
-[node name="LuzMeio" type="PointLight2D" parent="."]
-position = Vector2(1700, 640)
+[node name="LuzPogo" type="PointLight2D" parent="."]
+position = Vector2(1200, 620)
 texture = SubResource("tex_luz")
-energy = 0.5
-color = Color(0.85, 0.42, 0.92, 1)
-scale = Vector2(1.8, 1.3)
+energy = 0.6
+color = Color(0.9, 0.5, 1.0, 1)
+scale = Vector2(2.0, 1.2)
 
-[node name="LuzChefe" type="PointLight2D" parent="."]
-position = Vector2(3040, 630)
+[node name="LuzEnergia" type="PointLight2D" parent="."]
+position = Vector2(2600, 630)
 texture = SubResource("tex_luz")
-energy = 0.65
-color = Color(0.95, 0.45, 1.0, 1)
-scale = Vector2(2.8, 1.7)
+energy = 0.6
+color = Color(0.9, 0.5, 1.0, 1)
+scale = Vector2(2.2, 1.2)
+
+[node name="LuzArena" type="PointLight2D" parent="."]
+position = Vector2(4010, 630)
+texture = SubResource("tex_luz")
+energy = 0.8
+color = Color(0.95, 0.4, 1.0, 1)
+scale = Vector2(3.2, 1.8)
 
 [node name="Koliani" parent="." instance=ExtResource("1_kol")]
 position = Vector2(150, 620)
@@ -305,7 +290,7 @@ usar_prototipo_premium = true
 usar_golden_set = true
 
 [node name="CheckInicio" type="Area2D" parent="."]
-position = Vector2(430, 636)
+position = Vector2(300, 636)
 collision_layer = 16
 collision_mask = 2
 script = ExtResource("5_chk")
@@ -313,8 +298,17 @@ script = ExtResource("5_chk")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CheckInicio"]
 shape = SubResource("rs_chk")
 
+[node name="CheckPogo" type="Area2D" parent="."]
+position = Vector2(1560, 636)
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("5_chk")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckPogo"]
+shape = SubResource("rs_chk")
+
 [node name="CheckMeio" type="Area2D" parent="."]
-position = Vector2(1700, 636)
+position = Vector2(2150, 636)
 collision_layer = 16
 collision_mask = 2
 script = ExtResource("5_chk")
@@ -322,15 +316,11 @@ script = ExtResource("5_chk")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CheckMeio"]
 shape = SubResource("rs_chk")
 
-[node name="CheckReencontro" type="Area2D" parent="."]
-position = Vector2(2660, 442)
+[node name="CheckFinal" type="Area2D" parent="."]
+position = Vector2(3550, 636)
 collision_layer = 16
 collision_mask = 2
 script = ExtResource("5_chk")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckReencontro"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckFinal"]
 shape = SubResource("rs_chk")
-
-[node name="Porta" parent="." instance=ExtResource("4_porta")]
-position = Vector2(3280, 626)
-pista_ao_atravessar = ""

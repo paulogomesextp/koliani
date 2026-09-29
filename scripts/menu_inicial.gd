@@ -30,7 +30,6 @@ const CENA_OPCOES := preload("res://scenes/ui/Opcoes.tscn")
 ## coluna é o mesmo do logótipo: x=805.
 const EIXO := 805.0
 const LARG_COLUNA := 330.0
-const Y_SUBTITULO := 216.0
 const Y_COLUNA := 280.0
 const ALT_BOTAO := 46.0
 const ALT_SEPARADOR := 12.0
@@ -38,7 +37,6 @@ const Y_RODAPE := 604.0
 
 var _palco: Control
 var _coluna: VBoxContainer
-var _subtitulo: Label
 var _aviso: Label
 var _premir: Label
 var _versao: Label
@@ -56,13 +54,9 @@ func _ready() -> void:
 		str(ProjectSettings.get_setting("application/config/version", "0.0.0")),
 		str(ProjectSettings.get_setting("application/run/main_scene", "?"))])
 
-	# voltar ao menu sai do "DEV MODE" -- recarrega o save real do disco
+	# Voltar ao menu repõe a sessão legítima em memória, sem escrever saves.
 	if EstadoJogo.modo_dev:
-		EstadoJogo.modo_dev = false
-		if FileAccess.file_exists(EstadoJogo.CAMINHO_SAVE):
-			EstadoJogo.carregar()
-		else:
-			EstadoJogo.reiniciar_campanha()
+		EstadoJogo.desativar_modo_dev()
 
 	if _tratar_atalhos_dev():
 		return
@@ -75,6 +69,7 @@ func _ready() -> void:
 	_focar_principal()
 	_pronto_para_som = true
 	_agendar_prova_runtime()
+	_atualizar_pwa()
 
 
 # ── montagem ─────────────────────────────────────────────────────────────
@@ -86,16 +81,11 @@ func _montar() -> void:
 	_palco.add_child(Frontend9H.veu(Vector2(EIXO - 330.0, 0.0), Vector2(EIXO + 330.0, 720.0), 0.5))
 	_palco.add_child(Frontend9H.vinheta())
 
-	_subtitulo = Label.new()
-	Frontend9H.capitular(_subtitulo, 17, Frontend9H.TEXTO)
-	_subtitulo.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	Frontend9H.por(_subtitulo, Rect2(EIXO - 300.0, Y_SUBTITULO, 600.0, 30.0))
-	_palco.add_child(_subtitulo)
-	for lado in [-1.0, 1.0]:
-		var risca := Frontend9H.separador()
-		risca.modulate = Color(2.0, 1.7, 1.7, 1.0)
-		Frontend9H.por(risca, Rect2(EIXO + lado * 235.0 - 55.0, Y_SUBTITULO + 6.0, 110.0, 16.0))
-		_palco.add_child(risca)
+	# 9H.17 E: o Game Master congelou o menu com o logotipo SOZINHO. O
+	# subtitulo ("FLORESTA SAGRADA") saiu, e com ele as duas riscas que o
+	# ladeavam -- sem texto no meio ficavam dois tracos orfaos a meio do ar.
+	# A chave `menu.tagline` fica nos 6 i18n (nao se mexe nas chaves por um
+	# rotulo que pode voltar).
 
 	_realce = Frontend9H.realce()
 	_realce.modulate.a = 0.0
@@ -107,7 +97,7 @@ func _montar() -> void:
 	Frontend9H.por(_coluna, Rect2(EIXO - LARG_COLUNA * 0.5, Y_COLUNA, LARG_COLUNA, 320.0))
 	_palco.add_child(_coluna)
 
-	var chaves := ["continuar", "novo", "niveis", "opcoes", "sair"]
+	var chaves := ["continuar", "novo", "niveis", "loja", "opcoes", "sair"]
 	for i in chaves.size():
 		if i > 0:
 			var caixa := CenterContainer.new()
@@ -127,6 +117,21 @@ func _montar() -> void:
 		b.mouse_entered.connect(b.grab_focus)
 		b.focus_entered.connect(func() -> void:
 			_mover_realce(b)
+			# 9H.17 CONTINUATION -- DESARMAR AO SAIR DO BOTAO.
+			#
+			# O NOVO JOGO ja pedia confirmacao em dois passos, com aviso e com o
+			# foco preso ao botao. O que faltava era o fim do estado armado:
+			# `_armado` so era limpo DENTRO das accoes, nunca ao navegar. Ou
+			# seja, bastava armar o NOVO JOGO, percorrer o menu e voltar la para
+			# a campanha ser apagada a` primeira tecla -- sem segundo aviso, e
+			# com o aviso laranja ainda no ecra colado a outro item. Foi assim
+			# que esta sessao apagou o save do Paulo durante o QA.
+			#
+			# Sair do botao e' arrependimento: desarma. Vale para o teclado e
+			# para o rato (o `mouse_entered` acima tambem da foco), que e' a
+			# proteccao contra o clique acidental que faltava.
+			if _armado != "" and _botoes.get(_armado) != b:
+				_repor_botoes()
 			if _pronto_para_som:
 				Som.toca("ui_mover", -13.0, randf_range(0.97, 1.04)))
 		b.pressed.connect(func() -> void: Som.toca("ui_confirmar", -8.0))
@@ -137,6 +142,7 @@ func _montar() -> void:
 	_botoes["continuar"].pressed.connect(_ao_continuar)
 	_botoes["novo"].pressed.connect(_ao_novo)
 	_botoes["niveis"].pressed.connect(_ao_niveis)
+	_botoes["loja"].pressed.connect(_abrir_loja)
 	_botoes["opcoes"].pressed.connect(_abrir_opcoes)
 	_botoes["sair"].pressed.connect(_ao_sair)
 
@@ -149,13 +155,27 @@ func _montar() -> void:
 	Frontend9H.por(_aviso, Rect2(EIXO - 300.0, Y_RODAPE + 18.0, 600.0, 40.0))
 	_palco.add_child(_aviso)
 
-	# A entrada de desenvolvimento pertence ao editor/export-debug.
+	# 9H.17 D -- A ENTRADA DE DESENVOLVIMENTO. Ela ja' ca' estava; o que nao
+	# estava era VISIVEL. Vivia atras de `OS.is_debug_build()`, e a build que
+	# o Game Master abre e' de RELEASE -- por isso, do lado dele, o modo Dev
+	# simplesmente nao existia. Um export de release nao deixa de ser uma
+	# build de QA so' porque foi exportado sem debug.
+	#
+	# Passa a mandar um interruptor proprio, `koliani/qa/entrada_dev`, para a
+	# visibilidade nao depender de como a build foi exportada. Fica LIGADO
+	# aqui; a apresentacao publica final exporta com ele desligado.
+	#
+	# E sai do meio para o canto INFERIOR ESQUERDO: e' para se encontrar, nao
+	# para competir com a coluna dos botoes nem com o logotipo.
 	_dev = Button.new()
-	_dev.visible = OS.is_debug_build()
-	Frontend9H.rotulo_menu(_dev, 14)
-	_dev.add_theme_color_override("font_color", Color(0.85, 0.72, 0.35, 0.8))
+	_dev.name = "DevMode"
+	_dev.visible = EstadoJogo.entrada_dev_disponivel()
+	Frontend9H.rotulo_menu(_dev, 13)
+	_dev.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	_dev.add_theme_color_override("font_color", Color(0.78, 0.66, 0.34, 0.62))
+	_dev.add_theme_color_override("font_hover_color", Color(1.0, 0.86, 0.46, 1.0))
 	_dev.pressed.connect(_ao_dev_mode)
-	Frontend9H.por(_dev, Rect2(EIXO - 120.0, 572.0, 240.0, 24.0))
+	Frontend9H.por(_dev, Rect2(22.0, 676.0, 190.0, 26.0))
 	_palco.add_child(_dev)
 
 	var orn := Frontend9H.separador("ornamento_rodape")
@@ -250,12 +270,12 @@ func _focar_principal() -> void:
 # ── texto ────────────────────────────────────────────────────────────────
 
 func _traduzir() -> void:
-	_subtitulo.text = Frontend9H.espacar(Textos.t("menu.tagline"), 1)
 	var ha := EstadoJogo.ha_progresso()
 	_botoes["continuar"].visible = ha
 	_botoes["continuar"].text = Textos.t("menu.continue")
 	_botoes["novo"].text = Textos.t("menu.new_game")
 	_botoes["niveis"].text = Textos.t("menu.select_level")
+	_botoes["loja"].text = Textos.t("menu.shop")
 	_botoes["opcoes"].text = Textos.t("menu.options")
 	_botoes["sair"].text = Textos.t("menu.quit")
 	_dev.text = Textos.t("menu.dev_mode")
@@ -307,8 +327,19 @@ func _repor_botoes() -> void:
 	_premir.visible = true
 
 
+func _abrir_loja() -> void:
+	_repor_botoes()
+	Som.toca("menu_painel", -12.0)
+	var l := Loja.new()
+	l.tree_exited.connect(func() -> void:
+		if is_inside_tree():
+			_botoes["loja"].grab_focus())
+	add_child(l)
+
+
 func _abrir_opcoes() -> void:
 	_repor_botoes()
+	Som.toca("menu_painel", -12.0)
 	var o := CENA_OPCOES.instantiate()
 	o.tree_exited.connect(func() -> void:
 		if is_inside_tree():
@@ -316,11 +347,22 @@ func _abrir_opcoes() -> void:
 	add_child(o)
 
 
+## DEV MODE. Entra directamente -- NÃO há PIN nem qualquer outra etapa de
+## autenticação (19 set 2026, pedido do Paulo). A porta continua a ser o
+## interruptor de build `koliani/qa/entrada_dev`: é ele que decide se este
+## botão sequer existe, e é ele que fica `false` numa build de loja. Um PIN
+## de quatro dígitos escrito no código-fonte de um jogo público nunca foi
+## uma credencial -- era um atrito para quem desenvolve e mais nada.
+##
+## `ativar_modo_dev()` guarda a campanha legítima antes de mexer em nada; a
+## sessão normal volta intacta em `desativar_modo_dev()` (o `_ready` deste
+## menu chama-o sempre que se volta cá).
 func _ao_dev_mode() -> void:
-	if not OS.is_debug_build():
+	if not EstadoJogo.entrada_dev_disponivel():
 		return
 	_repor_botoes()
 	EstadoJogo.ativar_modo_dev()
+	Som.toca("ui_confirmar", -8.0)
 	_ir_jogar()
 
 
@@ -339,6 +381,30 @@ func _ao_sair() -> void:
 		JavaScriptBridge.eval(JS_FECHAR, true)
 		await get_tree().create_timer(0.45).timeout
 	get_tree().quit()
+
+
+## PWA presa na versao antiga (29 set 2026). O service worker do Godot serve
+## tudo da cache PRIMEIRO, e a versao nova que o GitHub Pages publica so' fica
+## "a espera" -- so' entra quando todas as janelas do jogo fecham, coisa que
+## numa PWA instalada no telemovel quase nunca acontece. Resultado: o Paulo
+## continuava a ouvir os SFX antigos com o master ja' com o audio aprovado.
+## O motor so' troca de versao quando o jogo pede (`pwa_update`), e ninguem
+## pedia. Aqui, no menu (nunca a meio de um nivel), se houver versao nova,
+## recarrega-se para ela.
+func _atualizar_pwa() -> void:
+	if not OS.has_feature("web"):
+		return
+	if JavaScriptBridge.pwa_needs_update():
+		_ao_haver_pwa_nova()
+	elif not JavaScriptBridge.pwa_update_available.is_connected(_ao_haver_pwa_nova):
+		JavaScriptBridge.pwa_update_available.connect(_ao_haver_pwa_nova)
+
+
+func _ao_haver_pwa_nova() -> void:
+	if not is_inside_tree():
+		return
+	print("PWA | versao nova disponivel -- a recarregar")
+	JavaScriptBridge.pwa_update()
 
 
 ## Entrada normal na campanha: retoma a sessão se houver, senão abre o mapa.
@@ -361,7 +427,7 @@ func _tratar_atalhos_dev() -> bool:
 	for a in OS.get_cmdline_user_args():
 		if a == "--jogar" or a == "--foto" or a.begins_with("--foto="):
 			saltar = true
-		elif a == "--devmode" and OS.is_debug_build():
+		elif a == "--devmode" and EstadoJogo.entrada_dev_disponivel():
 			saltar = true
 			devmode = true
 		elif a.begins_with("--nivel="):
@@ -369,6 +435,7 @@ func _tratar_atalhos_dev() -> bool:
 			nivel = int(a.get_slice("=", 1)) - 1
 	if not saltar:
 		return false
+	# `--devmode` entra já em DEV MODE: sem PIN, como o botão do menu.
 	if devmode:
 		EstadoJogo.ativar_modo_dev()
 	if nivel >= 0:

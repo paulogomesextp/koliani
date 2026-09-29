@@ -77,7 +77,7 @@ func _physics_process(dt: float) -> void:
 
 func _ao_tocar(corpo: Node) -> void:
 	if corpo is Koliani:
-		corpo.receber_dano(dano, signf(velocidade.x if velocidade.x != 0.0 else 1.0))
+		corpo.receber_dano(dano, signf(velocidade.x if velocidade.x != 0.0 else 1.0), OrigemDano.ATAQUE)
 		_apagar()
 
 

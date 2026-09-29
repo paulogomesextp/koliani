@@ -1,4 +1,232 @@
+## Região II — remodel total · Prompt 3 (20 set 2026)
+
+- Objetivo: dar a N06–N10 arquitetura de primeiro plano e um landmark
+  exclusivo por nível: ponte monumental, torre partida, queda de água,
+  altar em ruínas e Torre dos Céus com lua.
+- Âmbito: apresentação visual da Região II, geradores/assets-fonte,
+  verificadores, capturas e documentação. Colisões, gaps, checkpoints,
+  `WindZone`, planar do N08, inimigos, Guardião, progressão e restantes
+  regiões ficam congelados. Props/luz/anti-repetição continuam no Prompt 4.
+- Comportamento esperado: arquitetura regional em `z = -1`, sem tapar a rota;
+  cada landmark é exclusivo e legível no renderer real; N10 abre a composição
+  para a Torre dos Céus e a lua de sangue sem tocar na luta.
+- Prova por etapa: baseline funcional dos 100 níveis; import; smoke N06–N10;
+  capturas reais e inspeção; medição de luminância; verificadores dirigidos;
+  suite e `git diff --check`.
+- Critério: os cinco landmarks e a arquitetura ficam presentes e legíveis;
+  **0 alterações funcionais nos 100 níveis** e 0 falhas novas. Aparência,
+  sensação e percurso final: **HUMAN PLAYTEST REQUIRED**.
+- Branch: `claude/region02-total-remodel`; entrada `5588b04d`. Não integrar em
+  `master` nem substituir `build/windows/Koliani.exe` neste prompt.
+- Estado: **PASS técnico do Prompt 3**. Cinco landmarks presentes; baseline
+  funcional 100/100 idêntica; guardas dirigidas 11/11. A suite termina em 0 e
+  os seus 30 erros de teardown são idênticos no HEAD de entrada. Aparência e
+  leitura em movimento: **HUMAN PLAYTEST REQUIRED**.
+- Próximo passo: **Prompt 4 — props, luz, anti-repetição e FX atmosféricos**.
+  Não o iniciar nesta execução.
+
+---
+
+## Estado (20 set 2026)
+
+**Região III — TECNICAMENTE COMPLETA.** Super-Process B fechado em PASS e
+integrado em `master` (v0.18.19). Zero alterações de geometria fora da
+região, auditoria eixo a eixo sem nenhum LOW, legibilidade corrigida com
+medição. Detalhe em
+`docs/implementation/region_03_final_closure.md`.
+
+Próximo passo: **playtest humano da Região III**. Não iniciar a Região IV
+antes disso.
+
+---
+
+## Estado (20 set 2026)
+
+Região III — continuação do Super-Process B: **PARTIAL**, na branch
+`claude/region03-completion-pass`. Arquitetura de primeiro plano e props
+saíram de LOW; mecânicas canónicas implementadas nos cinco níveis; Vyrak
+com lore alinhada. Falta a auditoria eixo a eixo, a legibilidade, e a
+decisão do Paulo sobre os doze níveis de outras regiões que mudaram de
+traçado. Detalhe em
+`docs/implementation/region_03_completion_continuation.md`.
+
+---
+
+## Super-Process A2 — remediação de fidelidade da Região II (18 set 2026)
+
+**Estado: quase completo.**
+Branch `claude/region02-fidelity-remediation` @ `77b4c891`.
+Relatório: `docs/implementation/region_02_fidelity_remediation.md`.
+
+| Fase | Estado |
+|---|---|
+| GATE 1 — NaN do N06 | **FEITO e provado** (`84b409e9`) |
+| GATE 2 — pico de mortes do N10 | **FEITO e medido** (`5187b52c`) |
+| Fase 3 — inimigos canónicos | **FEITO** — 0/10 → 5 espécies da prancha, 100% dos comuns canónicos (`74b487e8`) |
+| Fase 3 — guardiões N06-N09 | **NÃO FEITO** — Golem LOW, Vigia MEDIUM, Feiticeira MEDIUM, Espectros MEDIUM, como estavam |
+| Fase 4 — ambiente N06-N10 | **FEITO** (`a74152ec`, `cbf640bf`, `77b4c891`) |
+| Fase 5 — Guardião dos Céus | **FEITO** — asas abertas, paleta do contrato (`8c59be26`, `a74152ec`) |
+| Fase 5 — arena do N10 | **PARCIAL** — 6 dos 8 elementos; falta a lua de sangue |
+| Fase 6 — re-audit visual | **FEITO** — 19 fotografias novas, reclassificado |
+| Fase 7 — re-run do bot | **FEITO** — 30 runs, 0 NaN, N10 200,7 → 18,5 |
+| Fase 8 — revisão no Godot real | **FEITO** — fotografias reais em cada passe |
+| Fase 9 — build Windows + launchers | **FEITO** — fora do Git, contentor efémero |
+| Relatório final | **POR FAZER** |
+| Harnesses avulso, um a um | **POR FAZER** |
+
+**Região III: não.** Continua fora de âmbito.
+
+---
+
+## Super-Process A — encontros intermédios da Região II (18 set 2026)
+
+- Objetivo: fechar a **única** contradição canónica que sobrava na Região
+  II antes do playtest humano — os quatro encontros do meio (N06–N09)
+  ainda eram chefes da Prisão dos Condenados. **Região III não.**
+- Âmbito: identidade — nome, função, silhueta, apresentação. Sem art pass
+  novo, sem tocar no N08 aprovado, sem redesenhar o Guardião dos Céus.
+- Decisão de fundo: os quatro passam a **GUARDIÕES** (`guard.*`), não a
+  quatro chefes novos, para o único chefe da região continuar a ser o
+  Guardião dos Céus no N10. Cada um traduz um arquétipo já desenhado na
+  prancha aprovada da região — não se inventou lore.
+- Regra que se seguiu: **preservar gameplay sempre que possível**. Saldo:
+  zero alterações a vida, dano, telégrafos, arena, recompensa, progressão,
+  save, checkpoints e colisão.
+- **FEITO.** Estado e o que falta: `docs/retomar_aqui.md`.
+
+---
+
+## Super-Process A — passe de fecho da Região II (17 set 2026)
+
+- Objetivo: fechar a Região II — Desfiladeiro dos Ventos — como bloco
+  coerente, canónico e pronto para playtest humano. **Região III não.**
+- Âmbito: contrato visual do Guardião + arte dele, passe de arte canónico
+  de N06–N10, o bug das zonas de vento partilhadas, e o texto que
+  contradizia o cânone. Gameplay do N08 LOCKED; lógica do N10 preservada.
+- Decisão de fundo: a região ganha material PRÓPRIO em vez de emprestar o
+  da Região III. Os packs certos em matéria (`montanhas`, `rochoso`) são
+  dela, e a regra "um pack nunca aparece em duas regiões" vale — é a
+  mudança de região que o jogador tem de sentir.
+- Decisão de método: um passe de arte tem de PROVAR que não mexeu em
+  gameplay. `tools/geometria_regiao02.tscn` fotografa os 248 nós que o
+  jogador toca e compara antes/depois.
+- Resultado técnico: tudo PASS, 0 falhas novas, save real intacto.
+  Estado: **HUMAN PLAYTEST REQUIRED**.
+- Seguinte: playtest humano da Região II. Depois, e só depois, Região III.
+
+## Process 12 — N10 exame final + Guardião dos Céus (17 set 2026)
+
+- Objetivo: fechar a Região II no N10 -- exame cumulativo das leituras de
+  vento e chefe regional canónico no lugar do Primeiro Prisioneiro.
+- Âmbito: `A_Cela_Zero.tscn`, `chefe_guardiao_dos_ceus.gd` +
+  `ChefeGuardiaoDosCeus.tscn`, `definir_direcao()` no `wind_zone.gd`, chave
+  do carrossel, i18n do chefe, testes e docs. N06–N09, física, save,
+  progressão, UI, SFX e arte global congelados.
+- Decisão: vento sempre FORÇA EXTERNA (nada de levitação -- isso é da
+  Região V); o chefe voa mas desce a cada recuperação.
+- Resultado técnico: tudo PASS. Estado: **HUMAN PLAYTEST REQUIRED**.
+- Seguinte: Process 13 — passe canónico de arte da Região II.
+
+## Process 11 — N08 Ilhas Suspensas + planar (17 set 2026)
+
+- Objetivo: migrar só o N08 para a identidade canónica (ilhas suspensas +
+  planar controlado + vento como força externa), jogável do início ao fim em
+  progressão normal.
+- Âmbito: `Corredor_das_Execucoes.tscn`, `ZonaPlanar` nova, planar contextual
+  em `koliani.gd`, `mecanica_anunciada` em `nivel_com_chefe.gd`, crivo de
+  alcance com planar/vento, bot de rota do N08, testes e docs. N06/N07/N09/N10,
+  `wind_zone.gd`, chefes, inimigos, UI, SFX, arte, saves e progressão
+  congelados.
+- Decisão: planar LOCAL (a habilidade permanente é do N63).
+- Prova: suite, harness glide A–O, WindZone, Movement+Camera, smoke, CI
+  (alcance/jornada/mecânicas/baú/spawn…), rota automática sem Dev,
+  contrafactual sem planar, mutações a provar que os testes mordem.
+- Resultado técnico: tudo PASS. Playtest humano na build Windows:
+  **APPROVED** (humano). Estado: **COMPLETE / APPROVED**, gameplay LOCKED.
+- Seguinte: Process 12 — N10 Final Exam + Guardião dos Céus.
+
+## Process 10 — aplicar vento a N06/N07/N09 (16 set 2026)
+
+- Objetivo: aplicar o `WindZone` do Process 09 às três cenas authored da
+  Região II: rajadas horizontais em N06, updrafts em N07 e vento variável em
+  N09.
+- Âmbito exato: `Prisao_dos_Condenados.tscn`,
+  `Fornalha_dos_Pecadores.tscn`, `Ala_dos_Mortos.tscn`, testes dirigidos e
+  documentação. N08/N10, gerador, bosses, inimigos, UI, SFX, arte, saves e
+  progressão ficam congelados.
+- Comportamento esperado: N06 usa zonas pulsadas nas travessias antes do
+  reencontro; N07 usa colunas ascendentes contínuas alinhadas com a rota alta;
+  N09 usa zonas sequenciais com direções/intensidades alternadas, sem vento na
+  arena. Checkpoints ficam fora das zonas e mantêm a topologia existente.
+- Hipóteses: instâncias authored acompanham a sala quando a jornada é
+  prepended; forças moderadas preservam os vãos atuais; excluir checkpoints e
+  arenas evita respawn/bosses sob influência residual.
+- Prova por etapa: baseline e final de alcance nas três cenas; import/smoke
+  individual; verificador estrutural de direção, intensidade, cobertura,
+  checkpoints, inimigos, bosses e scope; targeted WindZone e Movement+Camera;
+  suite completa com save isolado; `git diff --check`.
+- Critério: zero alteração estrutural fora das três cenas, portas/checkpoints
+  e bosses preservados, zonas sem sobrepor checkpoints/arenas, cenas e testes
+  sem erro fatal ou falha nova. Alcance estático e automação não substituem
+  percurso/sensação humana: `HUMAN PLAYTEST REQUIRED` para certificação final.
+- Base: `6005177f`, branch `codex/region02-wind-system`, worktree
+  `C:/Users/sarac/Koliani/koliani_region02`.
+- Resultado técnico: WindZone A–L, Movement+Camera, suite, smokes e alcance
+  PASS. Bot anti-softlock chegou às três portas, com uma paragem resolvida de
+  26,1 s em N09.
+- Resultado humano: N06/N07/N09 percorridos sem problemas e sem cheats;
+  checkpoint/morte/respawn PASS nos três; combate/knockback e o ponto perto de
+  `x≈954` em N09 PASS.
+- Estado: **PASS**. Gate humano fechado pelo Game Master em 16 set 2026.
+
+## Process 09 — Região II: sistema reutilizável de vento (16 set 2026)
+
+- Objetivo: componente de vento horizontal/vertical reutilizável, aplicado à
+  Koliani como força externa e validado isoladamente.
+- Âmbito: `WindZone`, integração mínima no player, testes A–L e documentação;
+  sem alterar cenas N06–N10, glide, boss, arte, áudio, inimigos, UI ou saves.
+- Critério: baseline de movimento preservada fora das zonas; enter/exit,
+  múltiplas zonas, dash e respawn sem força residual; targeted Godot e suite
+  geral sem novas falhas; commit/push dedicado com HEAD local=remoto.
+- Worktree `C:/Users/sarac/Koliani/koliani_region02`, branch
+  `codex/region02-wind-system`, base `4e3ea01e`.
+
+## 9H.19 — áudio vertical slice: paragem no gate de fontes
+
+- Objetivo: 12 candidatos físicos/orgânicos, música candidata, A/B Dev e Windows validado, sem propagação antes de escuta humana.
+- Âmbito exclusivo de áudio; preservar mixer/save e restantes sistemas.
+- Hipóteses dirigidas: packs locais, arquivos/histórico, instrumentos/stems.
+- Auditoria/brief concluídos em `docs/execution_9h19_audio_vertical_slice.md`; adequação profissional não estabelecida. PROFESSIONAL PRODUCTION ASSET REQUIRED.
+- Critério de retoma: fontes selecionadas por escuta e proveniência/licença suficiente; depois produzir B. B–F não iniciadas; execução INCOMPLETE.
+
+## 9H.16 — L1 Perfection: PHASE A em curso (13 set 2026)
+
+- Briefing autoritativo recebido no anexo pasted-text; ordem A→B→C→D→E→F, sem avanço antes do fecho/commit/push da fase. Base f29b8f5c, branch codex/9h16-l1-perfection, worktree C:/Projetos/koliani-9h16.
+- Objetivo A: reproduzir/classificar/corrigir fecho Windows após derrotar Ghorak e atravessar L1→L2. Scope: callbacks/colisões/recompensa de morte/Porta/EstadoJogo/spawn L2. Sem arte nova ou mudanças de design.
+- Hipóteses: divergência da build; mutação de física na morte; transição/spawn/resource failure. WER confirma crash nativo c0000005 (versões PE 0.18.6 e 0.18.2, RVA 0x16b3420). EXE no destino foi substituído antes desta execução: SHA256 fe7de41f1 no sufixo, versão runtime 0.18.7; crash anterior ainda não reproduzido nesta base.
+- Prova dirigida Ghorak vida=1, ataque por input, aproximação contínua da morte ao portal: reproduz sete area_set_shape_disabled em _soltar_essencia_chefe/cena.add_child durante callback _ao_acertar_corpo. L2 ainda carrega nesta prova (headless e Vulkan real). Não atribuir ao crash causalidade sem evidência.
+- Alteração técnica delimitada: adiar inserção de Essencia inteira em ChefeBase e DemonioBase; sem alterar valores nem assets. Critério local: morte por hitbox real, recompensa exata e ausência de flushing queries.
+- Aceitação da fase: EXE Windows real, cinco entradas (normal/corrida/salto+dash/efeitos/novo processo), L2 spawn válido, sem crash/softlock/flushing queries; zero falhas novas além das 26 baseline; QA crítico com limites, commit/push isolados só após fase concluída.
+- B–F não iniciadas. NATIVE ART REQUIRED se faltar fonte. HUMAN PLAYTEST REQUIRED e DEVICE VALIDATION REQUIRED nos pontos dependentes de sensação/hardware mobile.
+
 # Plano atual — Execution 9H: frontend de produção + slice final da Região I
+
+## 9H.16 continuação — Phase B (13 setembro 2026)
+
+- Objetivo: Dev Mode temporário com progresso normal isolado em memória.
+- Âmbito: estado, dano/HP Dev, barra periférica, traduções e provas dirigidas.
+- Conclusão: B1–B7 cobertos, QA com input no export Windows limpo, zero
+  poluição de save, testes sem regressões além das 26 falhas visuais antigas;
+  só então commit/push da fase e avanço para C. A fechada em 9eda04e0.
+- Histórico reutilizado: b59f0b8d (sandbox/seletor), ab78a04b (FlyMode),
+  scripts atuais. Nenhum desenvolvimento em L2+; L20/50/100 só QA Dev pedido.
+- Checkpoint técnico validado; fase continua INCOMPLETE. Provas sintéticas e
+  Vulkan registadas na retoma; build Dev separada em C:/Temp. Paragem perto do
+  limite usage. Próximo: critérios restantes B e HUMAN PLAYTEST REQUIRED.
+- Continuação após 9af93695: HP duplicado, animação de voo e sobreposições
+  Dev corrigidos/validados; quatro direções e seletor 100 níveis provados.
+  Runtime Windows sky disponível; input nativo aguarda resposta sobre foco
+  temporário devido à restrição explícita do briefing. B continua aberta.
 
 ## Estado — 12 de setembro de 2026
 

@@ -138,7 +138,7 @@ func _ve_koliani() -> bool:
 ## --- ataques ---------------------------------------------------------
 
 func _lancar_luas() -> void:
-	Som.toca("gelo", -8.0, 0.7)
+	_som_ataque("gelo", -8.0, 0.7)
 	var n := 4 if _fase2 else 2
 	var base := _dir_para_koliani_vec()
 	for i in n:
@@ -190,7 +190,7 @@ func _crescente(dir: Vector2) -> void:
 
 
 func _mare_lunar() -> void:
-	Som.toca("gelo", -8.0, 0.5)
+	_som_ataque("gelo", -8.0, 0.5)
 	_abanar_camera(4.0)
 	var k := _obter_koliani()
 	if k and k.has_method("definir_grav_escala"):
@@ -267,7 +267,7 @@ func _dir_para_koliani_vec() -> Vector2:
 
 func _entrar_fase2() -> void:
 	_fase2 = true
-	Som.toca("chefe_cai", -8.0, 0.7)
+	_som_fase("magia")
 	_abanar_camera(8.0)
 	dur_tel *= 0.75
 	dur_exposta *= 0.85
@@ -299,7 +299,8 @@ func _mostrar_nucleo(v: bool) -> void:
 			brilho.visible = v
 
 
-func receber_dano(quantidade: int, dir_empurrao: float = 0.0, critico := false) -> void:
+func receber_dano(quantidade: int, dir_empurrao: float = 0.0, critico := false,
+		_forca_recuo := 0.0) -> void:
 	if _ja_derrotado:
 		return
 	provocar()

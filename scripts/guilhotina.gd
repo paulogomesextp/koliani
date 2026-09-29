@@ -38,6 +38,9 @@ func _ready() -> void:
 
 func _ciclo() -> void:
 	while is_instance_valid(self):
+		await Som.esperar_vista(self)
+		if not is_instance_valid(self):
+			return
 		await cair()
 		await get_tree().create_timer(periodo).timeout
 
@@ -85,7 +88,7 @@ func cair(atraso_: float = -1.0) -> void:
 
 func _ao_tocar(corpo: Node) -> void:
 	if monitoring and corpo is Koliani:
-		corpo.receber_dano(dano, signf(corpo.global_position.x - global_position.x))
+		corpo.receber_dano(dano, signf(corpo.global_position.x - global_position.x), OrigemDano.HAZARD_ATAQUE)
 
 
 func _abanar(f: float) -> void:

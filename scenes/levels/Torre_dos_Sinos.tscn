@@ -1,22 +1,94 @@
-[gd_scene load_steps=12 format=3 uid="uid://bkolianitorresinos11"]
+[gd_scene load_steps=21 format=3 uid="uid://bkolianitorresinos11"]
 
-; REGIAO III / nivel 11 -- Torre dos Sinos.
-; Sala final FEITA A MAO (a JORNADA, que cresce com o nivel, vem antes) e VERTICAL: sobe-se a torre. Sinos
-; (SinoTorre) que se tocam para CONGELAR os inimigos e ganhar a subida.
-; Bifurcacao: escadaria oeste / escadaria este. Elite: xamane cuspidor.
-; Vazio (trevas) em baixo -- cair = morte. Chefe: O Sino Vivo.
+; REGIAO III / nivel 11 -- ENTRADA DOS ECOS (`level.n10`), primeiro nivel da
+; TORRE DOS ECOS. O nome do ficheiro fica: muda-lo partia saves e checkpoints.
+;
+; PASSE DE ENRIQUECIMENTO (29 set 2026): a reconstrucao de 28 set (auditoria
+; GM, ver historico) tinha a forma A-F certa mas ficava curta face ao
+; contrato aprovado (`docs/art_direction/regions/region_03/
+; REGION03_VISUAL_GAMEPLAY_CONTRACT.md`, LOCKED): so' 1 dos 3 "inimigos
+; principais" do nivel estava presente (faltavam Sino Flutuante e Arqueiro
+; das Sombras -- ambos ja' tinham sprite extraido e `especie` registada,
+; nunca usados em nivel nenhum), faltava a mecanica "correntes moveis" e o
+; hazard "laminas de sino rotativas lentas", e nao havia nenhum segredo.
+; Este passe ACRESCENTA sobre a sala existente (nao a reconstroi do zero):
+;   - Espinhos logo na entrada (hazard "espinhos simples" do contrato,
+;     vocabulario que o jogo ja' tem desde o N1 -- nao e' ensino novo);
+;   - Sino Flutuante (voador) a flutuar na bifurcacao O, rota curta, fora
+;     do unico caminho obrigatorio;
+;   - um RAMO OPCIONAL a partir de E1 (passarela quebrada -> corrente movel
+;     -> lamina de sino lenta a guardar o topo) que e' o Segredo 2 -- ZERO
+;     risco de softlock porque nao e' preciso para progredir, e a
+;     PlataformaQuebra tem respawn;
+;   - Segredo 1: um bonus de Essencia mesmo por cima do salto dos espinhos,
+;     visivel mas exige um salto um pouco mais alto que o minimo;
+;   - Arqueiro das Sombras (cuspidor, elevado) e Sentinela da Torre
+;     (escudeiro, patrulha) no F) MINI-TESTE, reprise leve de combate com o
+;     que ja' foi ensinado (Acolito), condizente com o racio 70/30 do
+;     contrato;
+;   - dois props ancora desenhados a proposito para a Regiao III
+;     (`tools/gerar_props_torre_ecos.py`): um sino partido junto a entrada
+;     (flavor -- algo ja' caiu desta torre) e um vitral alto iluminado por
+;     tras da 1a escalada (o par luz-fria-da-lua/luz-dourada-dos-sinos que
+;     o contrato pede como tracos LOCKED). O resto da decoracao continua
+;     automatico por `plataforma.gd` (bioma "torres" ja' estava ligado).
+; Nada do A-F original mudou de posicao; nada do que ja' estava testado foi
+; removido. Sem boss, sem miniboss disfarcado -- decisao do GM de 28 set
+; continua de pe.
+;
+; Reconstrucao N11 (auditoria GM, 28 set 2026): nivel AUTORAL, sala feita a
+; mao (`corredor = false` -- a jornada procedural que vinha antes foi
+; retirada, o GM pediu "SEM procedural journey"). Achados da auditoria:
+;   - a sala ja existia e ja tinha boa forma vertical (bifurcacao O/E,
+;     sinos, elite) -- REAPROVEITADA quase por inteiro, so' reorganizada;
+;   - tinha um CHEFE (ChefeSinoVivo, "O Sino Vivo") a selar a porta -- REMOVIDO:
+;     o N11 e' introducao da regiao, Vyrak (o chefe real da Regiao III) so'
+;     aparece no N15, e o GM foi explicito em "sem boss, sem miniboss
+;     disfarcado" neste nivel. A cena/script do Sino Vivo NAO foi apagada
+;     (fica disponivel para outro nivel da regiao decidir);
+;   - tinha um `Coletavel` a voltar a dar `escalar_paredes` a meio do nivel --
+;     REMOVIDO: a habilidade ja e' concedida (incondicional) ao vencer o
+;     chefe do N10 (ver `nivel_com_chefe.gd`, HABILIDADE_DO_CHEFE[9]), por
+;     isso um 2o coletavel da mesma habilidade era so' ruido/redundancia;
+;   - o grupo "sino_alterna" do `SinoTorre` (alterna plataformas ao tocar)
+;     existia no script desde sempre mas NENHUM nivel o usava -- os sinos
+;     so' congelavam inimigos. Este e' o primeiro nivel a ligar a serio
+;     (ver `PlataformaSino` / `scripts/plataforma_sino.gd`).
+;
+; Estrutura A-F (GM): A) ENTRADA -- ChaoInicio, atmosfera, sem pressao.
+; B) PRIMEIRA ESCALADA -- ParedeSubida, zona segura (chao mesmo por baixo,
+; sem vazio). C) PRIMEIRO SINO -- SinoBaixo liberta EcoBaixo (plataforma
+; fantasma -> solida), consequencia imediata e visivel. D) PLATAFORMAS
+; OSCILANTES -- O2 (introducao simples) e SubidaOeste2 (com deriva, perto do
+; fim do ramo oeste). E) SINO + MOVIMENTO -- SinoAlto liberta EcoAlto junto
+; da plataforma oscilante E2 no ramo leste. F) MINI-TESTE -- o resto do
+; ramo escolhido (leste ou oeste) ate' ao ChaoChefe, so' com o que ja' foi
+; ensinado; sem chefe, sem miniboss.
+;
+; Bifurcacao: escadaria oeste / escadaria este (convergem no ChaoChefe).
+; Elite: Acolito do Eco (cuspidor) -- fora da 1a escalada, do 1o sino e da
+; aterragem das plataformas oscilantes, como o GM pediu.
+; Vazio (trevas) em baixo -- cair = morte, mas nenhuma secao nova obriga a
+; arriscar isso (a escalada e' sempre sobre chao solido).
 
 [ext_resource type="PackedScene" uid="uid://bkolianiactor01" path="res://scenes/actors/Koliani.tscn" id="1_kol"]
 [ext_resource type="PackedScene" uid="uid://bdemoniobase01" path="res://scenes/actors/DemonioBase.tscn" id="2_dem"]
-[ext_resource type="PackedScene" uid="uid://bkolianicoletavel01" path="res://scenes/actors/Coletavel.tscn" id="3_col"]
 [ext_resource type="PackedScene" uid="uid://bkolianiporta01" path="res://scenes/actors/Porta.tscn" id="4_porta"]
 [ext_resource type="Script" path="res://scripts/checkpoint.gd" id="5_chk"]
-[ext_resource type="PackedScene" uid="uid://bkolianichefesino11" path="res://scenes/actors/ChefeSinoVivo.tscn" id="6_chefe"]
 [ext_resource type="Script" path="res://scripts/nivel_com_chefe.gd" id="7_niv"]
 [ext_resource type="PackedScene" uid="uid://bkolianiatmosfera01" path="res://scenes/fx/Atmosfera.tscn" id="8_atm"]
 [ext_resource type="PackedScene" uid="uid://bkolianiplataforma01" path="res://scenes/actors/Plataforma.tscn" id="9_pl"]
 [ext_resource type="PackedScene" uid="uid://bkolianisinotorre11" path="res://scenes/actors/SinoTorre.tscn" id="10_sino"]
 [ext_resource type="PackedScene" uid="uid://bkolianiaguavenenosa01" path="res://scenes/actors/AguaVenenosa.tscn" id="11_vazio"]
+[ext_resource type="PackedScene" uid="uid://bkolianiplatflutuante01" path="res://scenes/actors/PlataformaFlutuante.tscn" id="12_flut"]
+[ext_resource type="PackedScene" uid="uid://bkolianiplatsino11" path="res://scenes/actors/PlataformaSino.tscn" id="13_eco"]
+[ext_resource type="PackedScene" uid="uid://bkolianiespinhos01" path="res://scenes/actors/Espinhos.tscn" id="14_esp"]
+[ext_resource type="PackedScene" uid="uid://bkolianipendulolamina01" path="res://scenes/actors/PenduloLamina.tscn" id="15_pend"]
+[ext_resource type="PackedScene" uid="uid://bkolianiplatcorrente06" path="res://scenes/actors/PlataformaCorrente.tscn" id="16_corr"]
+[ext_resource type="PackedScene" uid="uid://bkolianiplataquebra01" path="res://scenes/actors/PlataformaQuebra.tscn" id="17_quebra"]
+[ext_resource type="PackedScene" uid="uid://bkolianiessencia01" path="res://scenes/actors/Essencia.tscn" id="18_ess"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/sino_partido.png" id="19_sinop"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/vitral_alto.png" id="20_vitral"]
 
 [sub_resource type="RectangleShape2D" id="rs_chk"]
 size = Vector2(44, 96)
@@ -35,20 +107,23 @@ fill_to = Vector2(1, 0.5)
 
 [node name="Torre_dos_Sinos" type="Node2D"]
 script = ExtResource("7_niv")
+corredor = false
+checkpoints_autorais = true
+estreia_x_autoral = 760.0
 
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
-cor_ambiente = Color(0.96, 0.9, 0.86, 1)
-cor_fundo = Color(0.09, 0.07, 0.11, 1)
-cor_silhueta = Color(0.14, 0.11, 0.14, 1)
-cor_luz = Color(1, 0.74, 0.46, 1)
-cor_poeira = Color(1, 0.88, 0.68, 1)
+cor_ambiente = Color(0.9, 0.92, 1, 1)
+cor_fundo = Color(0.05, 0.06, 0.14, 1)
+cor_silhueta = Color(0.09, 0.1, 0.2, 1)
+cor_luz = Color(1, 0.78, 0.48, 1)
+cor_poeira = Color(1, 0.9, 0.72, 1)
 densidade_poeira = 1.1
 bioma = "torres"
 largura_nivel = 2600.0
-fundo_pack = "montanhas"
-tinta_fundo = Color(1.06, 0.9, 0.94, 1)
+fundo_pack = "torre_ecos"
+tinta_fundo = Color(0.88, 0.94, 1.16, 1)
 neblina_fundo = 0.3
-dessaturar_fundo = 0.22
+dessaturar_fundo = 0.18
 seed_ambiente = 1370
 luzes_horizonte = true
 
@@ -58,7 +133,7 @@ largura = 3000.0
 altura = 340.0
 cor = Color(0.06, 0.05, 0.12, 0.96)
 
-; ===================  base da torre  =======================
+; ===================  A) ENTRADA NA TORRE  ==================
 [node name="ChaoInicio" parent="." instance=ExtResource("9_pl")]
 position = Vector2(340, 900)
 tamanho = Vector2(460, 60)
@@ -66,12 +141,58 @@ altura_visual = 110.0
 cor_base = Color(0.24, 0.2, 0.26, 1)
 cor_topo = Color(0.5, 0.44, 0.54, 1)
 
-[node name="B1" parent="." instance=ExtResource("9_pl")]
-position = Vector2(580, 820)
-tamanho = Vector2(150, 22)
-altura_visual = 34.0
-cor_base = Color(0.24, 0.2, 0.26, 1)
-cor_topo = Color(0.5, 0.44, 0.54, 1)
+; Sino partido junto a entrada -- flavor: algo ja' caiu desta torre antes
+; da Koliani chegar. So' visual, sem colisao.
+[node name="SinoPartidoEntrada" type="Sprite2D" parent="."]
+position = Vector2(230, 866)
+scale = Vector2(2.2, 2.2)
+texture = ExtResource("19_sinop")
+centered = false
+z_index = -1
+
+; Hazard "espinhos simples" do contrato -- vocabulario que o jogo ja' usa
+; desde o N1, nao e' ensino novo. Chao solido dos dois lados (ChaoInicio),
+; sem vazio por baixo: salto trivial, so' introduz o hazard nesta regiao.
+[node name="EspinhosEntrada" parent="." instance=ExtResource("14_esp")]
+position = Vector2(470, 870)
+largura = 2
+
+; Segredo 1: Essencia mesmo por cima dos espinhos -- visivel, exige um
+; salto um pouco mais alto que o minimo para apanhar (nao bloqueia nada).
+[node name="EssenciaSegredoBaixo" parent="." instance=ExtResource("18_ess")]
+position = Vector2(470, 795)
+valor = 15
+
+; ===================  B) PRIMEIRA ESCALADA  ==================
+; Muro estreito logo a seguir ao chao de entrada: chao solido por baixo e
+; dos dois lados (nao ha vazio aqui), sem inimigos, sem precisao
+; frame-perfect. So' se sobe se se segurar na parede (`escalar_paredes`,
+; ja concedida no N10) -- um salto normal nao chega ao topo.
+[node name="ParedeSubida" parent="." instance=ExtResource("9_pl")]
+position = Vector2(596, 790)
+tamanho = Vector2(28, 200)
+altura_visual = 0.0
+cor_base = Color(0.22, 0.19, 0.24, 1)
+cor_topo = Color(0.48, 0.42, 0.52, 1)
+
+; Vitral alto iluminado atras da escalada -- o par "luz fria da lua / luz
+; dourada dos sinos" que o contrato marca LOCKED. So' visual (parede),
+; com a mesma luz que `plataforma.gd._acender` da' aos vitrais no resto
+; do jogo, para nao destoar do resto da regiao.
+[node name="VitralEscalada" type="Sprite2D" parent="."]
+position = Vector2(690, 760)
+scale = Vector2(2.4, 2.4)
+texture = ExtResource("20_vitral")
+centered = false
+z_index = -2
+modulate = Color(0.85, 0.9, 1, 0.9)
+
+[node name="LuzVitral" type="PointLight2D" parent="VitralEscalada"]
+position = Vector2(55, -150)
+texture = SubResource("tex_luz")
+energy = 0.4
+color = Color(0.55, 0.7, 1.0, 1)
+scale = Vector2(1.3, 1.7)
 
 [node name="B2" parent="." instance=ExtResource("9_pl")]
 position = Vector2(800, 740)
@@ -80,8 +201,20 @@ altura_visual = 34.0
 cor_base = Color(0.24, 0.2, 0.26, 1)
 cor_topo = Color(0.5, 0.44, 0.54, 1)
 
+; ===================  C) PRIMEIRO SINO  ======================
+; SinoBaixo: primeiro sino do jogo. Tocar-lhe faz o EcoBaixo (fantasma ate'
+; la') ficar solido -- consequencia imediata, visivel e junto do proprio
+; sino. Nao e' obrigatorio (o B3 continua alcancavel em salto normal): serve
+; para o sino ENSINAR sem arriscar nenhum softlock se algo correr mal.
 [node name="SinoBaixo" parent="." instance=ExtResource("10_sino")]
 position = Vector2(800, 680)
+
+[node name="EcoBaixo" parent="." instance=ExtResource("13_eco")]
+position = Vector2(700, 616)
+tamanho = Vector2(110, 20)
+altura_visual = 16.0
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
 
 [node name="B3" parent="." instance=ExtResource("9_pl")]
 position = Vector2(600, 660)
@@ -97,11 +230,14 @@ altura_visual = 42.0
 cor_base = Color(0.24, 0.2, 0.26, 1)
 cor_topo = Color(0.5, 0.44, 0.54, 1)
 
-[node name="EliteXamane" parent="." instance=ExtResource("2_dem")]
+; N11: o `cuspidor` e' literalmente o "orbe sonoro" do Acolito. So' muda a IDENTIDADE: vida, dano,
+; comportamento e posicao ficam como estavam. Fora da 1a escalada, do 1o sino e da aterragem das
+; plataformas oscilantes (pedido do GM).
+[node name="EliteAcolito" parent="." instance=ExtResource("2_dem")]
 position = Vector2(680, 512)
 scale = Vector2(1.4, 1.4)
 elite = true
-especie = "xamane"
+especie = "acolito_do_eco"
 vida = 175
 dano_contacto = 24
 comportamento = "cuspidor"
@@ -116,10 +252,25 @@ altura_visual = 24.0
 cor_base = Color(0.24, 0.2, 0.26, 1)
 cor_topo = Color(0.5, 0.44, 0.54, 1)
 
-[node name="O2" parent="." instance=ExtResource("9_pl")]
+; Sino Flutuante (2o "inimigo principal" do contrato p/ N11): rota fixa
+; curta no vao entre O2/O3, fora do unico caminho obrigatorio (da' para
+; evitar so' com o timing dos saltos que a seccao D ja pede).
+[node name="SinoFlutuanteOeste" parent="." instance=ExtResource("2_dem")]
+position = Vector2(480, 450)
+especie = "sino_flutuante"
+comportamento = "voador"
+vida = 45
+dano_contacto = 12
+alcance_patrulha = 70.0
+cor_rim = Color(1.0, 0.85, 0.6, 1)
+
+; D) PLATAFORMAS OSCILANTES -- introducao simples: so' baloico vertical,
+; sem deriva horizontal, trajetoria e velocidade bem legiveis.
+[node name="O2" parent="." instance=ExtResource("12_flut")]
 position = Vector2(560, 400)
-tamanho = Vector2(120, 18)
-altura_visual = 24.0
+largura = 120.0
+balanco = 12.0
+periodo = 2.6
 cor_base = Color(0.24, 0.2, 0.26, 1)
 cor_topo = Color(0.5, 0.44, 0.54, 1)
 
@@ -137,13 +288,59 @@ altura_visual = 24.0
 cor_base = Color(0.24, 0.2, 0.26, 1)
 cor_topo = Color(0.5, 0.44, 0.54, 1)
 
+; --------- RAMO OPCIONAL (Segredo 2), a partir de E1 ---------
+; Passarela quebrada -> corrente movel -> lamina de sino lenta a guardar
+; o topo. Inteiramente OPCIONAL: quem nao entrar aqui segue o caminho
+; original (SinoAlto/E2/E3) sem perder nada. Zero risco de softlock --
+; a PlataformaQuebra tem respawn e ninguem fica preso.
+[node name="PassarelaQuebrada" parent="." instance=ExtResource("17_quebra")]
+position = Vector2(900, 460)
+tamanho = Vector2(110, 18)
+
+[node name="CorrenteEco" parent="." instance=ExtResource("16_corr")]
+position = Vector2(960, 400)
+modo = "vertical"
+amplitude = 36.0
+periodo = 3.2
+comprimento = 70.0
+largura = 100.0
+
+[node name="LaminaSino" parent="." instance=ExtResource("15_pend")]
+position = Vector2(960, 250)
+comprimento = 130.0
+amplitude_graus = 52.0
+periodo = 3.4
+fase = 0.3
+dano = 16
+
+[node name="EssenciaSegredoAlto" parent="." instance=ExtResource("18_ess")]
+position = Vector2(960, 355)
+valor = 20
+
+; ===================  E) SINO + MOVIMENTO  ==================
+; SinoAlto controla o seu proprio grupo (nao o do SinoBaixo, para cada sino
+; ficar legivel por si -- tocar o de baixo nao mexe aqui em cima). O
+; EcoAlto e' um atalho curto junto da plataforma oscilante E2: ring +
+; navegacao, os dois sistemas ja ensinados a combinarem-se.
 [node name="SinoAlto" parent="." instance=ExtResource("10_sino")]
 position = Vector2(940, 450)
+alterna_grupo = "sino_alterna_alto"
 
-[node name="E2" parent="." instance=ExtResource("9_pl")]
+[node name="EcoAlto" parent="." instance=ExtResource("13_eco")]
+position = Vector2(1005, 470)
+tamanho = Vector2(90, 18)
+altura_visual = 14.0
+grupo_alternar = "sino_alterna_alto"
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+
+[node name="E2" parent="." instance=ExtResource("12_flut")]
 position = Vector2(970, 420)
-tamanho = Vector2(120, 18)
-altura_visual = 24.0
+largura = 120.0
+balanco = 14.0
+periodo = 2.3
+deriva = 40.0
+periodo_deriva = 3.4
 cor_base = Color(0.24, 0.2, 0.26, 1)
 cor_topo = Color(0.5, 0.44, 0.54, 1)
 
@@ -154,7 +351,7 @@ altura_visual = 24.0
 cor_base = Color(0.24, 0.2, 0.26, 1)
 cor_topo = Color(0.5, 0.44, 0.54, 1)
 
-; ===================  campanario do chefe  ================
+; ===================  F) MINI-TESTE -- topo da torre  =======
 ; --- degraus para o cimo: o ChaoChefe vai de x=380 a x=940 e e' TECTO
 ; para quem sobe por baixo. Estes ficam FORA desse intervalo.
 [node name="SubidaOeste1" parent="." instance=ExtResource("9_pl")]
@@ -164,10 +361,16 @@ altura_visual = 24.0
 cor_base = Color(0.24, 0.2, 0.26, 1)
 cor_topo = Color(0.5, 0.44, 0.54, 1)
 
-[node name="SubidaOeste2" parent="." instance=ExtResource("9_pl")]
+; Ultima plataforma oscilante do nivel, com um pouco de deriva horizontal --
+; a pequena progressao de dificuldade que o GM pediu para a seccao D, mesmo
+; assim sem nada frame-perfect (o ChaoChefe a seguir e' um alvo largo).
+[node name="SubidaOeste2" parent="." instance=ExtResource("12_flut")]
 position = Vector2(250, 240)
-tamanho = Vector2(100, 18)
-altura_visual = 24.0
+largura = 100.0
+balanco = 10.0
+periodo = 2.8
+deriva = 50.0
+periodo_deriva = 3.8
 cor_base = Color(0.24, 0.2, 0.26, 1)
 cor_topo = Color(0.5, 0.44, 0.54, 1)
 
@@ -185,19 +388,37 @@ altura_visual = 24.0
 cor_base = Color(0.24, 0.2, 0.26, 1)
 cor_topo = Color(0.5, 0.44, 0.54, 1)
 
+; Arqueiro das Sombras (3o "inimigo principal" do contrato p/ N11): posicao
+; elevada, mantem distancia -- exactamente o `cuspidor` que ja' existe,
+; so' com a identidade nova. Nao elite: reprise leve, nao um segundo
+; Acolito.
+[node name="ArqueiroSombras" parent="." instance=ExtResource("2_dem")]
+position = Vector2(1000, 300)
+especie = "arqueiro_das_sombras"
+comportamento = "cuspidor"
+vida = 50
+dano_contacto = 14
+alcance_patrulha = 60.0
+cor_rim = Color(0.55, 0.4, 0.8, 1)
+
+; Sentinela da Torre -- o "ritmo base" da regiao (contrato): patrulheiro
+; comum em N11-N12 mesmo sem estar na lista de "principais". `escudeiro`
+; bloqueia por instantes, o mais proximo do que o contrato descreve.
+[node name="SentinelaTorre" parent="." instance=ExtResource("2_dem")]
+position = Vector2(780, 175)
+especie = "sentinela_da_torre"
+comportamento = "escudeiro"
+vida = 60
+dano_contacto = 16
+alcance_patrulha = 80.0
+cor_rim = Color(0.6, 0.65, 0.85, 1)
+
 [node name="ChaoChefe" parent="." instance=ExtResource("9_pl")]
 position = Vector2(660, 260)
 tamanho = Vector2(560, 60)
 altura_visual = 100.0
 cor_base = Color(0.24, 0.2, 0.26, 1)
 cor_topo = Color(0.5, 0.44, 0.54, 1)
-
-[node name="ColEscalar" parent="." instance=ExtResource("3_col")]
-position = Vector2(660, 224)
-habilidade_id = "escalar_paredes"
-
-[node name="Chefe" parent="." instance=ExtResource("6_chefe")]
-position = Vector2(780, 184)
 
 ; ===================  luzes / checkpoints / porta  =======
 [node name="LuzBaixo" type="PointLight2D" parent="."]
@@ -223,7 +444,13 @@ scale = Vector2(2.9, 1.7)
 
 [node name="Koliani" parent="." instance=ExtResource("1_kol")]
 position = Vector2(200, 830)
+usar_prototipo_premium = true
+usar_golden_set = true
 
+; checkpoints_autorais = true: estes tres sao intencionais e nao se podam
+; por distancia. Nenhum fica numa plataforma movel, encostado a uma parede
+; ou a meio de uma queda -- morrer depois de tocar um sino devolve a um
+; estado coerente (o sino nao se desliga, so' se pode voltar a tocar).
 [node name="CheckInicio" type="Area2D" parent="."]
 position = Vector2(460, 836)
 collision_layer = 16
@@ -240,6 +467,15 @@ collision_mask = 2
 script = ExtResource("5_chk")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CheckMeio"]
+shape = SubResource("rs_chk")
+
+[node name="CheckTopo" type="Area2D" parent="."]
+position = Vector2(450, 236)
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("5_chk")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckTopo"]
 shape = SubResource("rs_chk")
 
 [node name="Porta" parent="." instance=ExtResource("4_porta")]

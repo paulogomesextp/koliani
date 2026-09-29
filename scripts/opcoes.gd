@@ -26,7 +26,10 @@ var vol_musica := 1.0    # 0.0 .. 1.0 (linear)
 ## `vol_musica` 0,45 -- escolhas dele, com apenas 1,1 dB entre as duas. O
 ## buraco de 6,9 dB so' existe em instalacao NOVA, e e' so' isso que esta
 ## linha corrige. Um save existente continua a mandar.
-var vol_efeitos := 0.90
+## Headroom global aprovado pelo Paulo: a música fica claramente à frente;
+## o slider continua a controlar o SFX relativamente a esta base.
+const SFX_MIX_DB := -6.0
+var vol_efeitos := 1.0
 var idioma := "en"
 
 
@@ -56,16 +59,16 @@ func _criar_buses() -> void:
 
 func aplicar() -> void:
 	_aplicar_volume("Music", vol_musica)
-	_aplicar_volume("SFX", vol_efeitos)
+	_aplicar_volume("SFX", vol_efeitos, SFX_MIX_DB)
 	Textos.definir_idioma(idioma)
 
 
-func _aplicar_volume(bus: String, v: float) -> void:
+func _aplicar_volume(bus: String, v: float, offset_db := 0.0) -> void:
 	var i := AudioServer.get_bus_index(bus)
 	if i < 0:
 		return
 	AudioServer.set_bus_mute(i, v <= 0.001)
-	AudioServer.set_bus_volume_db(i, linear_to_db(clampf(v, 0.001, 1.0)))
+	AudioServer.set_bus_volume_db(i, linear_to_db(clampf(v, 0.001, 1.0)) + offset_db)
 
 
 func definir_musica(v: float) -> void:
@@ -76,7 +79,7 @@ func definir_musica(v: float) -> void:
 
 func definir_efeitos(v: float) -> void:
 	vol_efeitos = clampf(v, 0.0, 1.0)
-	_aplicar_volume("SFX", vol_efeitos)
+	_aplicar_volume("SFX", vol_efeitos, SFX_MIX_DB)
 	guardar()
 
 

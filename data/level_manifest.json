@@ -370,7 +370,7 @@
       "ownership": "authored",
       "boss_ref": {
         "boss_id": "boss_level_010",
-        "scene": "res://scenes/actors/ChefePrimeiroPrisioneiro.tscn"
+        "scene": "res://scenes/actors/ChefeGuardiaoDosCeus.tscn"
       },
       "auto_regenerate": false
     },

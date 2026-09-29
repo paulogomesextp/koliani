@@ -61,6 +61,11 @@ const PORTA_TRANCADA := preload("res://scenes/actors/PortaTrancada.tscn")
 const PAREDE_FRAGIL := preload("res://scenes/actors/ParedeFragil.tscn")
 const PAREDE_MOVEL := preload("res://scenes/actors/ParedeMovel.tscn")
 const SINO := preload("res://scenes/actors/SinoTorre.tscn")
+## Pele APROVADA da Regiao III (recortes do atlas, ja' em `deco/torres`) para os
+## actores do N12 -- so' o N12 os preenche, os outros niveis nao mudam.
+const SINO_M_TEX := preload("res://assets/sprites/pixel/deco/torres/sino_m.png")
+const VITRAL_INT_TEX := preload("res://assets/sprites/pixel/deco/torres/vitral_alto.png")
+const VITRAL_PART_TEX := preload("res://assets/sprites/pixel/deco/torres/vitral_partido.png")
 const VELA := preload("res://scenes/actors/Vela.tscn")
 const PLAT_LUZ := preload("res://scenes/actors/PlataformaLuz.tscn")
 const ESPELHO := preload("res://scenes/actors/Espelho.tscn")
@@ -112,8 +117,18 @@ const LIQUIDO := {
 	# Floresta CORROMPIDA: o que está na água é corrupção, e a corrupção da
 	# região é violeta/magenta em todo o lado (VFX, cristais, Árvore). Só cor --
 	# a geometria, a colisão e o dano não mudam.
-	0: [Color(0.26, 0.16, 0.42, 0.94), false],   # seiva corrompida
-	1: [Color(0.26, 0.42, 0.14, 0.93), false],   # ácido
+	# 9H.17 I2 -- alfa 0,94 -> 0,72. Por baixo deste poligono passou a estar
+	# ARTE (`_leito_pintado`, a poca de corrupcao pintada do kit), e um
+	# poligono quase opaco em cima dela devolvia exactamente a tira palida e
+	# chapada que o review reclamou. Nao se pintou nada: destapou-se.
+	0: [Color(0.26, 0.16, 0.42, 0.72), false],   # seiva corrompida
+	# Super-Process A -- a MESMA "faixa verde-oliva chapada" que a 9H.12D
+	# tirou da Região I estava aqui, na II. O Desfiladeiro dos Ventos não
+	# tem ácido nenhum: o que está lá em baixo é o ABISMO. Fica no vinho
+	# carmesim da região (a cor da lua e dos estandartes da prancha), que
+	# se lê como perigo contra o índigo de tudo o resto. Só cor -- a
+	# geometria, a colisão e o dano não mudam.
+	1: [Color(0.46, 0.14, 0.28, 0.90), false],   # o abismo do Desfiladeiro
 	2: [Color(0.06, 0.05, 0.12, 0.96), false],   # trevas / vazio
 	3: [Color(0.05, 0.03, 0.09, 0.97), false],   # trevas do abismo
 	4: [Color(0.34, 0.40, 0.12, 0.93), false],   # ácido citrino
@@ -142,8 +157,17 @@ const POOL_REGIAO := {
 	1: ["saltos", "correntes", "elevador", "quebra", "guilhotinas", "serras",
 		"portal", "crossfire", "espinhos", "alavanca", "prensa", "velas",
 		"segredo"],
-	2: ["vento", "saltos", "gravidade", "pendulos", "trampolim", "ritmo",
-		"portal", "ferry", "sinos", "alavanca", "segredo"],
+	# III Torre dos Ecos: a torre e' uma MAQUINA de sinos, e a pool tem de
+	# o dizer. A antiga (`vento, saltos, gravidade, pendulos, trampolim,
+	# ritmo, portal, ferry, sinos, alavanca, segredo`) nao tinha elevador,
+	# nem engrenagens, nem vitral, nem plataformas ilusorias -- nenhuma das
+	# mecanicas que o contrato §2 da' aos cinco niveis -- e trazia
+	# `gravidade` (heranca do antigo "Observatorio Lunar", nome que o canone
+	# ja' substituiu por "Campanario") e `trampolim`, que e' a assinatura da
+	# Floresta. Todas as camaras abaixo ja' existiam no vocabulario.
+	2: ["sinos", "elevador", "engrenagens", "vitral", "espectral",
+		"correntes", "quebra", "orbita", "vento", "pendulos", "ritmo",
+		"saltos", "alavanca", "peso", "memoria", "portal", "segredo"],
 	3: ["gruta", "pedras", "elevador", "quebra", "guilhotinas", "pendulos",
 		"portal", "ferry", "espinhos", "velas", "prensa", "alavanca",
 		"segredo", "sinos"],
@@ -317,14 +341,32 @@ const MECANICA_DO_NIVEL := [
 	{"cam": "guilhotinas", "grau": 0},
 	{"cam": "arena", "grau": 0},
 	{"cam": "prensa", "grau": 1},
-	# --- niveis 11-15  (Regiao 3) ---
-	{"cam": "sinos", "grau": 0},
-	{"cam": "vento", "grau": 0},
-	{"cam": "serras", "grau": 0},
-	{"cam": "gravidade", "grau": 0},
-	{"cam": "torre", "grau": 1},
+	# --- niveis 11-15  (Regiao 3: Torre dos Ecos) ---
+	# A ESTREIA de cada nivel passa a ser a mecanica que o canone lhe da'
+	# (contrato §2). Era `sinos/vento/serras/gravidade/torre`: o N12 estreava
+	# VENTO, que e' a assinatura da Regiao II; o N13 estreava SERRAS num
+	# nivel chamado "Mecanismos Antigos"; e o N15 estreava "torre", que nao
+	# e' mecanica nenhuma. Todas as camaras usadas aqui ja' existiam no
+	# vocabulario do gerador -- nao se inventou nada fora das pranchas.
+	{"cam": "sinos", "grau": 0},        # N11 Entrada dos Ecos -- "aprende a ouvir"
+	{"cam": "elevador", "grau": 0},     # N12 Galerias Verticais -- elevador de coluna
+	{"cam": "engrenagens", "grau": 0},  # N13 Mecanismos Antigos -- rodas e alavancas
+	{"cam": "vento", "grau": 0},        # N14 Campanario -- o updraft do ar livre
+	# N15: o canone pede "ecos de memoria (plataformas ilusorias)". A
+	# camara `memoria` tem o NOME certo e a mecanica errada -- e' uma
+	# sala de memorial com varandas e velas, sem plataforma ilusoria
+	# nenhuma. `espectral` e' que constroi a `PlataformaEspectral`.
+	# Escolher pelo nome era a falsa fidelidade que o contrato §9
+	# proibe ("nao declarar HIGH porque a cor parece semelhante").
+	{"cam": "espectral", "grau": 1},  # N15 O Topo dos Ecos -- plataformas ilusorias
 	# --- niveis 16-20  (Regiao 4) ---
-	{"cam": "elevador", "grau": 0},
+	# O `cam` de cada linha NAO e' so' o aviso de tutorial: e' a camara de
+	# ASSINATURA que o gerador FORCA na jornada deste nivel. Trocar o do N16
+	# de `elevador` para outra coisa mudou-lhe 832 linhas de geometria (e o
+	# do 56, 848) -- medido na verificacao dos 100 niveis. Por isso os slots
+	# fora da Regiao III ficam exactamente como estavam, e a Torre dos Ecos
+	# usa os seus (10-14) mais o desbloqueio local.
+	{"cam": "elevador", "grau": 0},   # N16 Cemiterio dos Reis -- tumulos elevadores
 	{"cam": "quebra", "grau": 0},
 	{"cam": "velas", "grau": 0},
 	{"cam": "pedras", "grau": 0},
@@ -428,18 +470,83 @@ const MECANICA_DO_NIVEL := [
 ]
 
 
-## Nível (0-based) em que cada câmara ESTREIA. Derivado da tabela, uma vez.
-## Uma câmara que não esteja na tabela (torre/poço/descanso e as `TIER_EXTRA`,
-## que são escolhidas por outros ramos) devolve 0 -- sempre disponível.
+## APRESENTACAO vs DESBLOQUEIO -- e porque e' que tiveram de se separar.
+##
+## A `MECANICA_DO_NIVEL` fazia DUAS coisas ao mesmo tempo:
+##   1. dizia que mecanica cada nivel APRESENTA (o aviso de tutorial);
+##   2. por ser a primeira ocorrencia, decidia a partir de que nivel cada
+##      camara fica DISPONIVEL -- em TODAS as regioes.
+##
+## Presas uma a` outra, dar aos cinco niveis da Torre dos Ecos as mecanicas
+## do canone reescrevia o tracado de niveis que nada tem a ver com isto. E
+## nao era por consumo de sorteios: era a POOL a mudar de conteudo. O
+## `_pool_permitida()` filtra pelo desbloqueio E duplica o peso de uma
+## camara nos 8 niveis a seguir -- por isso antecipar o `elevador` de 15
+## para 11 tirava o peso dobrado ao nivel 20, que passava a sortear outra
+## coisa e a construir outra geometria. Medido: 12 niveis (20, 41-45, 51,
+## 56-60) mudavam de forma.
+##
+## Agora sao duas coisas separadas:
+##   - APRESENTACAO  = posicao na `MECANICA_DO_NIVEL`. So' controla o aviso.
+##   - DESBLOQUEIO   = `DESBLOQUEIO_BASE`, com antecipacao LOCAL por regiao.
+##
+## Mexer no que um nivel apresenta deixou de poder mexer na geometria de
+## ninguem.
+
+## Calendario GLOBAL de desbloqueio, CONGELADO nos valores historicos. So'
+## precisa de entrada quem se apresenta noutro sitio que nao o seu
+## desbloqueio -- para os outros, a posicao na tabela serve.
+const DESBLOQUEIO_BASE := {
+	# a Torre dos Ecos reclamou estes slots de apresentacao; o calendario
+	# GLOBAL deles fica onde sempre esteve, senao mudava o resto do jogo
+	"vento": 11,
+	"elevador": 15,
+	"espectral": 43,
+	"engrenagens": 55,
+	# estas perderam o slot de apresentacao para o canone da Regiao III
+	# (era o "Observatorio Lunar" e a "Torre da Tempestade"). Continuam a
+	# aparecer no jogo, no mesmo calendario; o que perderam foi o aviso.
+	"serras": 12,
+	"gravidade": 13,
+	"torre": 14,
+}
+
+## ANTECIPACAO LOCAL. A Regiao III precisa destas mais cedo porque o canone
+## lhas da' (contrato §2: elevador de coluna no N12, rodas de engrenagem no
+## N13, plataformas ilusorias no N15). Vale SO' dentro da regiao -- e' isso
+## que permite a Torre dos Ecos ter as suas mecanicas sem tocar em ninguem.
+const DESBLOQUEIO_REGIAO := {
+	2: {"elevador": 10, "engrenagens": 10, "espectral": 10},
+}
+
 static var _estreia_cache: Dictionary = {}
 
-static func nivel_de_estreia(cam: String) -> int:
+## Primeira posição na `MECANICA_DO_NIVEL` -- é o que decide o AVISO.
+static func nivel_de_apresentacao(cam: String) -> int:
 	if _estreia_cache.is_empty():
 		for i in MECANICA_DO_NIVEL.size():
 			var c: String = MECANICA_DO_NIVEL[i]["cam"]
 			if not _estreia_cache.has(c):
 				_estreia_cache[c] = i
-	return int(_estreia_cache.get(cam, 0))
+	return int(_estreia_cache.get(cam, -1))
+
+
+## Nível a partir do qual a câmara pode APARECER. `regiao` < 0 = o
+## calendário global; caso contrário aplica-se a antecipação local.
+static func nivel_de_desbloqueio(cam: String, regiao := -1) -> int:
+	if regiao >= 0:
+		var loc: Dictionary = DESBLOQUEIO_REGIAO.get(regiao, {})
+		if loc.has(cam):
+			return int(loc[cam])
+	if DESBLOQUEIO_BASE.has(cam):
+		return int(DESBLOQUEIO_BASE[cam])
+	var a := nivel_de_apresentacao(cam)
+	return a if a >= 0 else 0
+
+
+## Mantida para quem já a chamava. É o calendário GLOBAL.
+static func nivel_de_estreia(cam: String) -> int:
+	return nivel_de_desbloqueio(cam)
 
 
 ## A câmara que ESTREIA neste nível (0-based), ou "" se o nível repete uma
@@ -450,7 +557,7 @@ static func estreia_do_nivel(indice: int) -> String:
 	if indice < 0 or indice >= MECANICA_DO_NIVEL.size():
 		return ""
 	var cam: String = MECANICA_DO_NIVEL[indice]["cam"]
-	return cam if nivel_de_estreia(cam) == indice else ""
+	return cam if nivel_de_apresentacao(cam) == indice else ""
 
 
 ## Câmaras que não vivem na pool de nenhuma região (são escolhidas por outro
@@ -503,7 +610,11 @@ const CAMARAS_FLAVOUR := [
 const ASSINATURA := {
 	0: "trampolim",    # Floresta -- ricochete
 	1: "guilhotinas",  # Prisão -- execuções
-	2: "vento",        # Torres -- correntes de ar
+	# Regiao III Torre dos Ecos: o cânone das pranchas APPROVED diz que o
+	# elemento central sao os SINOS E ECOS -- era "vento", que e' a
+	# assinatura da Regiao II (Desfiladeiro dos Ventos) e que no cânone da
+	# III aparece so' como seccao do N14. `sinos` ja' estava na pool.
+	2: "sinos",        # Torre dos Ecos -- a badalada que move a torre
 	3: "gruta",        # Catacumbas -- túneis escuros
 	4: "impulso",      # Cidade -- máquinas
 	5: "fogo",         # Castelo -- lava
@@ -532,7 +643,12 @@ const ASSIN_NIVEL := {
 	0: "raizes",   # n1  Caminho das Raízes -- raízes que irrompem do chão
 	2: "teias",    # n3  Ninho da Viúva Negra -- teias que prendem
 	3: "acido",    # n4  A Árvore que Chora -- lágrimas ácidas a pingar
-	12: "raio",    # n13 Torre da Tempestade -- raios em coluna, padrão previsível
+	# N13 "Mecanismos Antigos": o raio FICA, por decisao do briefing -- nao e'
+	# contradicao com o canone desde que se leia como a maquinaria da torre a
+	# descarregar, e nao como uma regiao eletrica a` parte. E' por isso que a
+	# ESTREIA do nivel passou a `engrenagens`: o que enquadra o raio sao as
+	# rodas e as alavancas a` volta dele.
+	12: "raio",    # n13 Mecanismos Antigos -- descarga da maquinaria, padrão previsível
 }
 
 ## PERFIL DE FORMA por nível (redesenho pedido pelo Paulo, 2 set 2026): cada
@@ -564,12 +680,15 @@ const PERFIL := [
 	{"v": 0, "f": "gauntlet", "a": 0.8},  # 7  Corredor das Execuções -- guilhotinas e lâminas
 	{"v": 0, "f": "combate", "a": 0.9},   # 8  Ala dos Mortos -- irmãos fantasma
 	{"v": 1, "f": "vertical", "a": 0.95}, # 9  A Cela Zero (chefe) -- labirinto vertical
-	# --- Região III  Torres Esquecidas (10-14) : verticalidade, banda ampla
-	{"v": 1, "f": "maquina", "a": 1.15},  # 10 Torre dos Sinos -- plataformas que mudam
-	{"v": 1, "f": "salto", "a": 1.22},    # 11 Torre dos Ventos -- correntes de ar, saltos longos
-	{"v": 1, "f": "gauntlet", "a": 1.15}, # 12 Torre da Tempestade -- raios em padrão
-	{"v": 1, "f": "maquina", "a": 1.22},  # 13 Observatório Lunar -- gravidade variável
-	{"v": 1, "f": "combate", "a": 1.0},   # 14 O Pico Esquecido (chefe) -- Vyrak
+	# --- Região III  Torre dos Ecos (10-14) : verticalidade, banda ampla --
+	# Os nomes nos comentarios eram os ANTIGOS (Torre dos Ventos, Torre da
+	# Tempestade, Observatorio Lunar): o canone renomeou-os e o foco de
+	# camaras seguia os nomes velhos.
+	{"v": 1, "f": "maquina", "a": 1.15},  # 10 N11 Entrada dos Ecos -- oscilantes e correntes
+	{"v": 1, "f": "vertical", "a": 1.22}, # 11 N12 Galerias Verticais -- "foco total na verticalidade"
+	{"v": 1, "f": "maquina", "a": 1.15},  # 12 N13 Mecanismos Antigos -- maquinaria, nao corredor de perigo
+	{"v": 1, "f": "maquina", "a": 1.22},  # 13 N14 Campanario -- sinos em movimento e vento
+	{"v": 1, "f": "combate", "a": 1.0},   # 14 N15 O Topo dos Ecos (chefe) -- Vyrak
 	# --- Região IV  Catacumbas do Abismo (15-19) : túneis apertados, a descer
 	{"v": -1, "f": "maquina", "a": 0.9},  # 15 Cemitério dos Reis -- túmulos elevadores
 	{"v": 0, "f": "gauntlet", "a": 0.8},  # 16 Galeria dos Ossos -- corredores de osso
@@ -706,7 +825,17 @@ var _dif := 0.0
 var _regiao := 0
 var _esp := "goblin"
 var _rng := RandomNumberGenerator.new()
+## Gerador SEPARADO so' para decoracao. O `_rng` acima faz o mundo, e tudo o
+## que dele sai depende da ORDEM dos sorteios -- por isso um prop novo nao
+## pode tirar de la'. Semeado a partir do mesmo nivel, portanto a decoracao
+## tambem e' reproduzivel.
+var _rng_deco := RandomNumberGenerator.new()
 var _cont_i := 0
+## REGIAO III / N12 (indice 11) -- camaras que o contrato LOCKED lhe atribui,
+## por ordem. Fila so' do N12: nos outros niveis fica vazia e nada muda.
+var _n12_fila: Array[String] = []
+## Camaras geradas, por ordem (diagnostico e testes; nao afecta a geracao).
+var camaras_geradas: Array[String] = []
 
 ## Espaço mínimo (px) entre checkpoints da jornada. Antes havia um a cada
 ## ~2 plataformas (~380 px) -- eram MUITOS. Passa a haver um a cada ~4000 px
@@ -763,10 +892,43 @@ var _dif_especial := 0.0
 var _falta_nova := 0
 const CICLO_VARIEDADE := 2
 
-## Subida máxima (px) de um degrau para o seguinte -- um salto + duplo salto
-## da Koliani. Nenhuma plataforma da jornada fica mais alta que isto face à
-## anterior (descer é livre). Descer/cair pode ser muito mais.
+## Subida máxima (px) de um degrau para o seguinte. Nenhuma plataforma da
+## jornada fica mais alta que isto face à anterior (descer é livre).
+##
+## 9H.17 A: HAVIA DOIS TECTOS E SÓ ESTAVA CÁ UM. Os 104 px são o salto +
+## DUPLO salto -- e o salto duplo só se ganha ao derrubar o chefe do nível 5.
+## Na Região I (níveis 1-5) o degrau de 104 px é FISICAMENTE IMPOSSÍVEL, e
+## era esse o bloqueio que o Game Master apanhou no 1-3. Medido com a física
+## do jogo (`tests/run_alcance_9h17.tscn`, agarrar-borda incluído):
+##
+##   subida   0 px -> vão até 140 px      subida  72 px -> vão até  80 px
+##   subida  64 px -> vão até 110 px      subida  88 px -> NUNCA, a qualquer vão
+##
+## O tecto real do salto simples está entre 80 e 88 px. `SUBIDA_SIMPLES` fica
+## nos 64 px: dentro da envolvente com folga, e ainda um degrau que se lê.
 const SUBIDA_MAX := 104.0
+## Tecto com salto simples (Regiao I). Ver acima.
+## 60 e nao 64: a fronteira da tabela medida esta' nos 64, e a diferenca de
+## espessura entre duas plataformas (18 px contra 15 px) chegava para um
+## degrau nominal de 64 aterrar do lado de la' da fronteira.
+const SUBIDA_SIMPLES := 60.0
+## Tecto FISICO do salto simples (medido: 80 passa, 88 nao). E' o limite do
+## que se consegue; a `SUBIDA_SIMPLES` e' o que se DESENHA, com folga.
+const TECTO_FISICO_SIMPLES := 80.0
+## Índice do primeiro nível que já pode assumir o salto duplo na travessia
+## obrigatória (contrato congelado pelo Game Master: o salto duplo abre ao
+## derrubar o chefe do nível 5, portanto o nível 6 -- índice 5 -- é o
+## primeiro que o pode exigir).
+const NIVEL_SALTO_DUPLO := 5
+## Tecto de subida em uso nesta jornada (ver `_construir`).
+var _subida_max := SUBIDA_MAX
+## Um degrau para cima, dentro do tecto desta jornada. `minimo` é a altura
+## mínima pedida por quem chama; se o tecto for mais baixo que ela (Região I),
+## encolhe-se o mínimo em vez de estourar a envolvente do salto.
+func _subida(minimo: float) -> float:
+	return _rng.randf_range(minf(minimo, _subida_max * 0.62), _subida_max)
+
+
 ## Topo da banda vertical jogável (definido em `_construir`). Quanto maior a
 ## dificuldade, mais alto -> jornadas com torres e poços a sério, não só uma
 ## fita de plataformas quase em linha.
@@ -835,7 +997,18 @@ func _construir() -> void:
 	_idx = EstadoJogo.indice_nivel
 	_dif = _dificuldade(_idx)
 	_regiao = maxi(0, EstadoJogo.regiao_atual())
+	# 9H.17 A -- CONTRATO DE MOBILIDADE. O tecto do degrau vem do que a
+	# jogadora PODE ter neste ponto da campanha, não do save que está na
+	# máquina: o modo Dev dá tudo, e uma jornada desenhada com base nisso
+	# ficaria intransponível para quem joga a sério. Até ao nível 5 não há
+	# salto duplo, logo a espinha faz-se toda com salto simples.
+	_subida_max = SUBIDA_MAX if _idx >= NIVEL_SALTO_DUPLO else SUBIDA_SIMPLES
 	_rng.seed = hash("jornada4|%d" % _idx)
+	_rng_deco.seed = hash("deco4|%d" % _idx)
+	_n12_fila.clear()
+	if _regiao == 2 and _idx == 11:
+		_n12_fila = ["elevador", "escadas", "sinos_sync", "vitral", "quebra",
+			"vento_queda"]
 	_esp = especie_inimigo if especie_inimigo != "" else _especie_do_nivel()
 	# PERFIL DE FORMA deste nível (redesenho 2 set 2026): tendência vertical,
 	# foco de câmaras e abertura da banda -- cada nível com a sua "cara".
@@ -884,6 +1057,8 @@ func _construir() -> void:
 	agua.brasas = liq[1]
 	agua.position = Vector2((x0 + ancora.x) * 0.5, _chao_y + 230.0)
 	add_child(agua)
+	if _regiao == 0:
+		_leito_pintado(x0, ancora.x)
 
 	# parede de fundo (não se sai pela esquerda). É o "fim do mundo": tem de
 	# ler como maciço de rocha, não como uma parede a partir/trepar com
@@ -1004,7 +1179,7 @@ func _construir() -> void:
 		# --- passo da espinha: caminha para a altitude-alvo, mas NUNCA sobe
 		#     mais que um salto de cada vez (descer/cair pode ser muito mais) ---
 		var passo_y := clampf((alvo_y - y) * 0.5 + _rng.randf_range(-32.0, 32.0),
-			-SUBIDA_MAX, 300.0)
+			-_subida_max, 300.0)
 		y = clampf(y + passo_y, _teto_y, _chao_y - 66.0)
 		# plataformas mais largas e ligadas (pedido do Paulo, 2 set 2026):
 		# menos "saltar de pedra em pedra minúscula", mais chão que dá para
@@ -1104,7 +1279,7 @@ func _construir() -> void:
 				f = _escolher_tom_novo(pool)
 				_pos_intenso = true
 			elif prog >= 0.28 and prog <= 0.82 and sig != "" \
-					and nivel_de_estreia(sig) <= _idx \
+					and nivel_de_desbloqueio(sig, _regiao) <= _idx \
 					and _rng.randf() < 0.3:
 				f = sig                 # ACTO 2: a assinatura do bioma
 				_pos_intenso = sig in ["guilhotinas", "fogo"]
@@ -1122,6 +1297,13 @@ func _construir() -> void:
 				if f == ant_flavour:
 					f = pool[(_rng.randi() + 1) % pool.size()]
 				_pos_intenso = f in INTENSAS
+			# N12 (Regiao III): as camaras do contrato entram a`s escondidas do
+			# sorteio -- uma por cada camara da janela 10-80 % da jornada (so'
+			# ha' umas 8). Nao ha' NENHUM sorteio aqui, e so' corre com a fila
+			# cheia (N12).
+			if not _n12_fila.is_empty() and prog >= 0.10 and prog <= 0.80:
+				f = _n12_fila.pop_front()
+				_pos_intenso = false
 			ant_flavour = f
 			_tipos_usados[f] = true
 			if f == _estreia_cam and estreia_x == INF:
@@ -1148,6 +1330,7 @@ func _construir() -> void:
 	# ... e só no fim, com a jornada toda montada, é que se pode ver o que
 	# ficou POR CIMA de cada checkpoint
 	_afastar_checkpoints_do_tecto()
+	_garantir_alcance()
 
 
 ## Um checkpoint com uma plataforma logo por cima é uma armadilha: ela
@@ -1213,7 +1396,7 @@ func _pool_permitida() -> Array:
 	var base: Array = POOL_REGIAO.get(_regiao, POOL_REGIAO[0])
 	var out: Array = []
 	for f: String in base:
-		var e := nivel_de_estreia(f)
+		var e := nivel_de_desbloqueio(f, _regiao)
 		if e > _idx:
 			continue          # ainda não estreou -- não pode aparecer
 		out.append(f)
@@ -1340,12 +1523,21 @@ func _perigo_no_vao(par: Node2D, x: float, y: float) -> void:
 			s.tempo = _rng.randf_range(1.1, 1.7)
 			par.add_child(s)
 		2:
-			var f := FOGO.instantiate()
-			f.position = Vector2(x + 95.0, y + 6.0)
-			f.intervalo = 2.3 - 0.6 * _dif
-			f.dur_ativa = 0.8 + 0.5 * _dif
-			f.fase = _rng.randf() * 1.5
-			par.add_child(f)
+			if _regiao == 2 and _idx == 11:
+				# N12 (Regiao III): o contrato da' "laminas verticais RAPIDAS" e
+				# nao fogo. Mesma peca `Serra` do tipo 1, com o ciclo curto.
+				var sr := SERRA.instantiate()
+				sr.position = Vector2(x + 95.0, y - 20.0)
+				sr.percurso = Vector2(0.0, -_rng.randf_range(90.0, 130.0))
+				sr.tempo = _rng.randf_range(0.7, 0.95)
+				par.add_child(sr)
+			else:
+				var f := FOGO.instantiate()
+				f.position = Vector2(x + 95.0, y + 6.0)
+				f.intervalo = 2.3 - 0.6 * _dif
+				f.dur_ativa = 0.8 + 0.5 * _dif
+				f.fase = _rng.randf() * 1.5
+				par.add_child(f)
 
 
 ## Catálogo de decoração da região (`tools/gerar_deco.py`), lido uma vez.
@@ -1365,7 +1557,7 @@ func _bioma_atual() -> String:
 ## Props da região com o assento `onde` ("chao" ou "parede").
 func _props(onde: String) -> Array:
 	var bioma := _bioma_atual()
-	var chave := "%s|%s" % [bioma, onde]
+	var chave := "%s|%s|%d" % [bioma, onde, _idx]
 	if _deco_cache.has(chave):
 		return _deco_cache[chave]
 	var cat: Dictionary = {}
@@ -1378,7 +1570,9 @@ func _props(onde: String) -> Array:
 	var lista: Variant = cat.get(bioma, [])
 	if lista is Array:
 		for p in lista:
-			if p is Dictionary and p.get("onde", "") == onde:
+			# `niveis` (Regiao II, anti-repeticao): o JSON traz floats
+			var deste_nivel: bool = not p.has("niveis") or (p["niveis"] as Array).has(float(_idx + 1))
+			if p is Dictionary and p.get("onde", "") == onde and deste_nivel:
 				fora.append("res://assets/sprites/pixel/deco/%s/%s.png" % [bioma, p["nome"]])
 	_deco_cache[chave] = fora
 	return fora
@@ -1435,21 +1629,147 @@ func _coluna_fundo(par: Node2D, x: float) -> void:
 	var lista := _props("parede")
 	if lista.is_empty():
 		return
+	# ORDEM DOS SORTEIOS -- NAO MEXER. O `_rng` deste gerador e' UM SO' e
+	# sequencial: o mundo inteiro sai dele por ordem. Tirar ou acrescentar
+	# um sorteio aqui desloca tudo o que vem a seguir e muda a GEOMETRIA de
+	# todos os niveis de todas as regioes. Por isso estes quatro sorteios
+	# continuam a ser feitos sempre, na mesma ordem, mesmo quando a peca
+	# acaba por ser desenhada como arquitetura da frente (que usa o
+	# `_rng_deco`, um geradorSEPARADO, exactamente para nao tocar neste).
 	var cam: String = lista[_rng.randi() % lista.size()]
+	# O `return` da textura que nao carrega tem de ficar AQUI, antes dos
+	# outros tres sorteios -- era assim no original. Ao po-lo depois deles,
+	# uma textura em falta passava a consumir quatro sorteios em vez de um e
+	# deslocava o fluxo todo a partir dai': a baseline do nivel 1 (Floresta,
+	# que tem uma dessas) acusou logo uma colisao com `disabled` trocado.
 	var tex: Texture2D = load(cam) if ResourceLoader.exists(cam) else null
 	if tex == null:
 		return
+	var alvo := _rng.randf_range(260.0, 460.0)
+	var espelhar := _rng.randf() < 0.5
+	var alfa := _rng.randf_range(0.70, 0.92)
+
+	# REGIAO II -- DESFILADEIRO DOS VENTOS. A prancha nao mostra uma
+	# masmorra com props ao fundo: mostra arcos, colunas e ruinas a' escala
+	# de quem atravessa as plataformas. A peca continua a ser apenas um
+	# Sprite2D (sem colisao) e usa exclusivamente `_rng_deco`; os quatro
+	# sorteios funcionais acima continuam intocados e na mesma ordem.
+	if _regiao == 1 and _rng_deco.randf() < 0.45:
+		_arquitetura_frente_desfiladeiro(par, x, lista, espelhar)
+		return
+
+	# REGIAO III -- TORRE DOS ECOS. O audit fechou com "arquitetura do
+	# primeiro plano: LOW": arcos, colunas e vitrais existiam, mas TODOS
+	# aqui, a `z_index = -3` e escurecidos -- ou seja, no fundo. A camada
+	# onde o jogador anda ficava tijolo liso, e o canone pede que ela seja a
+	# torre. Parte das pecas passa a ser plantada A` FRENTE, a` escala de
+	# quem passa por baixo delas. Continua a ser so' um `Sprite2D`: nao ha'
+	# colisao nenhuma nisto, e a baseline de geometria prova-o.
+	if _regiao == 2 and _rng_deco.randf() < 0.46:
+		_arquitetura_frente(par, x, lista, espelhar)
+		return
+
 	# tudo à mesma ALTURA aparente (~260-460 px): os packs vêm a resoluções
 	# muito diferentes e sem isto uma casa ficava do tamanho de uma vela
-	var alvo := _rng.randf_range(260.0, 460.0)
 	var esc: float = clampf(alvo / maxf(1.0, float(tex.get_height())), 0.8, 7.0)
 	var s := Sprite2D.new()
 	s.texture = tex
-	s.scale = Vector2(esc if _rng.randf() < 0.5 else -esc, esc)
+	s.scale = Vector2(esc if espelhar else -esc, esc)
 	s.z_index = -3
 	# recuado: mais escuro e mais azul, para ficar mesmo atrás da acção
-	s.modulate = Color(0.58, 0.56, 0.72, _rng.randf_range(0.70, 0.92))
+	s.modulate = Color(0.58, 0.56, 0.72, alfa)
 	s.position = Vector2(x, _chao_y - float(tex.get_height()) * esc * 0.5 + 34.0)
+	par.add_child(s)
+
+
+## ARQUITETURA JOGAVEL do Desfiladeiro dos Ventos. O landmark de cada nivel
+## e' curado pela Atmosfera na sala authored; aqui planta-se o vocabulario
+## regional comum ao longo da jornada procedural, assente no seu chao real.
+func _arquitetura_frente_desfiladeiro(par: Node2D, x: float, lista: Array,
+		espelhar: bool) -> void:
+	var preferidas: Array = []
+	for c in lista:
+		var f: String = String(c).get_file()
+		if f.begins_with("arco") or f.begins_with("coluna") \
+				or f.begins_with("janela") or f.begins_with("balaustrada"):
+			preferidas.append(c)
+	var cam: String = ""
+	if not preferidas.is_empty() and _rng_deco.randf() < 0.82:
+		cam = preferidas[_rng_deco.randi() % preferidas.size()]
+	else:
+		cam = lista[_rng_deco.randi() % lista.size()]
+	var tex: Texture2D = load(cam) if ResourceLoader.exists(cam) else null
+	if tex == null:
+		return
+	# O terreno regional sai perto de 2x. Este intervalo deixa os vaos com
+	# 250-360 px sem esticar a pixel-art para outra grelha visual.
+	var alvo := _rng_deco.randf_range(250.0, 360.0)
+	var esc: float = clampf(alvo / maxf(1.0, float(tex.get_height())), 1.0, 2.8)
+	var s := Sprite2D.new()
+	s.texture = tex
+	s.scale = Vector2(esc if espelhar else -esc, esc)
+	s.z_index = -1
+	var tons := [
+		Color(0.82, 0.78, 1.04, 0.94),
+		Color(0.75, 0.82, 1.10, 0.94),
+		Color(0.90, 0.76, 1.02, 0.94),
+	]
+	var tom: Color = tons[clampi(_idx - 5, 0, tons.size() - 1) % tons.size()]
+	s.modulate = tom
+	s.position = Vector2(x,
+		_chao_y - float(tex.get_height()) * esc * 0.5 + 12.0)
+	par.add_child(s)
+
+
+## ARQUITETURA JOGAVEL da Torre dos Ecos: a mesma peca do catalogo, mas
+## plantada no chao por onde se anda, grande o suficiente para se passar por
+## baixo, e com a luz da regiao em vez do tom recuado do fundo.
+##
+## `z_index = -1` poe-na ATRAS dos actores e das plataformas (que estao em 0)
+## e A` FRENTE do parallax -- e' a camada de cenario proximo. Se fosse 0 o
+## jogador desaparecia por tras de um arco; se fosse -3 voltava a ser fundo.
+func _arquitetura_frente(par: Node2D, x: float, lista: Array,
+		espelhar: bool) -> void:
+	# os arcos e as colunas sao o que ENQUADRA; os vitrais, as estatuas e o
+	# sino grande entram mais raramente, para nao virar montra
+	var preferidas: Array = []
+	for c in lista:
+		var f: String = String(c).get_file()
+		# o SINO grande entra aqui de proposito: a assinatura da regiao nao
+		# pode ficar so' no fundo, escurecida e chapada -- e' o objecto que
+		# da' nome a` torre e tem de se ver na camada onde se joga.
+		if f.begins_with("arco") or f.begins_with("coluna") \
+				or f.begins_with("sino"):
+			preferidas.append(c)
+	var cam: String = ""
+	if not preferidas.is_empty() and _rng_deco.randf() < 0.72:
+		cam = preferidas[_rng_deco.randi() % preferidas.size()]
+	else:
+		cam = lista[_rng_deco.randi() % lista.size()]
+	var tex: Texture2D = load(cam) if ResourceLoader.exists(cam) else null
+	if tex == null:
+		return
+	# altura de quem PASSA por baixo: 300-430 px le-se como vao (a Koliani
+	# tem ~100), nao como maqueta ao fundo.
+	#
+	# O TECTO DE 2.3 E' DE FIDELIDADE, nao de gosto: o contrato §6 pede
+	# pixel-perfect, e o terreno desta regiao desenha-se a ~2x. A primeira
+	# versao pedia 340-520 px e esticava o vitral (fonte de 132 px) a 3.9x --
+	# ao lado de uma plataforma a 2x os pixeis ficavam quase o dobro e
+	# lia-se um objecto de outro jogo colado por cima. Ver a prova em
+	# `docs/playtests/region_03_visual_evidence/`.
+	var alvo := _rng_deco.randf_range(300.0, 430.0)
+	var esc: float = clampf(alvo / maxf(1.0, float(tex.get_height())), 0.9, 2.3)
+	var s := Sprite2D.new()
+	s.texture = tex
+	s.scale = Vector2(esc if espelhar else -esc, esc)
+	# ATRAS dos actores e das plataformas (z 0) e A` FRENTE do parallax: e' a
+	# camada de cenario proximo. A 0 o jogador desaparecia por tras de um
+	# arco; a -3 voltava a ser fundo.
+	s.z_index = -1
+	s.modulate = Color(0.88, 0.90, 1.04, _rng_deco.randf_range(0.90, 1.0))
+	# assenta no chao por onde se anda
+	s.position = Vector2(x, _chao_y - float(tex.get_height()) * esc * 0.5 + 12.0)
 	par.add_child(s)
 
 
@@ -1495,8 +1815,22 @@ func _inimigo_em(par: Node2D, pos: Vector2, elite := false) -> void:
 
 const ESP_REGIAO := {
 	0: ["goblin", "mushroom", "lodo", "besouro", "gosma"],
-	1: ["esqueleto", "chort", "orc", "imp", "mastim"],
-	2: ["xamane", "wogol", "olho", "abutre", "imp"],
+	# REGIAO II -- bestiario CANONICO da prancha aprovada (18 set 2026).
+	# Era `["esqueleto", "chort", "orc", "imp", "mastim"]`, comentado
+	# "# II Prisao": cinco bichos TERRESTRES de masmorra numa regiao cuja
+	# identidade e' o ar. O audit mediu 0 dos 10 canonicos em N06-N10.
+	# Estes cinco vem do `enemy_gameplay_pack.png` e voam, levitam ou SAO
+	# vento, que e' o que a prancha manda.
+	1: ["morcego_dos_ventos", "sentinela_flutuante", "gaivota_sombria",
+		"golem_aereo", "elemental_do_vento"],
+	# REGIAO III -- bestiario CANONICO da prancha aprovada. Era
+	# `["xamane", "wogol", "olho", "abutre", "imp"]`, comentado "# III
+	# Torres": demonios genericos herdados das regioes anteriores numa
+	# torre de sinos. A auditoria mediu 0 dos 10 canonicos em N11-N15.
+	# Estes vem do `enemy_gameplay_pack.png` da Regiao III, recortados por
+	# `tools/extrair_inimigos_regiao03.py`.
+	2: ["sentinela_da_torre", "acolito_do_eco", "automato_do_sino",
+		"espirito_do_eco", "corvo_do_sino"],
 	3: ["esqueleto", "necromante", "chort", "ogro", "gosma"],
 	4: ["orc", "abobora", "xamane", "raptor", "mastim"],
 	5: ["demonio_grande", "ogro", "chort", "olho", "raptor"],
@@ -1522,8 +1856,18 @@ const ESP_REGIAO := {
 ## na jornada desse nível; o resto vem da pool da região.
 const ESP_ASSINATURA := [
 	"goblin", "mushroom", "besouro", "gosma", "lodo",              # I  Floresta
-	"esqueleto", "imp", "chort", "mastim", "orc",                  # II Prisão
-	"xamane", "abutre", "olho", "wogol", "imp",                    # III Torres
+	# II Desfiladeiro dos Ventos -- uma criatura canonica por nivel (N06-N10)
+	"morcego_dos_ventos", "sentinela_flutuante", "gaivota_sombria",
+	"golem_aereo", "elemental_do_vento",
+	# III Torre dos Ecos -- os "INIMIGOS PRINCIPAIS" que o `layout_usage.png`
+	# da' a cada nivel. A prancha e' clara nesta lista, ao contrario da
+	# tabela "progressao de aparicao" do `enemy_gameplay_pack.png`, que tem
+	# os pontos desalinhados meia-linha e nao serve como fonte.
+	"acolito_do_eco",       # N11 Entrada dos Ecos
+	"gargula_vitral",       # N12 Galerias Verticais
+	"construto_vitral",     # N13 Mecanismos Antigos
+	"monge_das_correntes",  # N14 Campanario
+	"sino_flutuante",       # N15 O Topo dos Ecos
 	"necromante", "esqueleto", "gosma", "wogol", "ogro",           # IV Catacumbas
 	"abobora", "orc", "mastim", "raptor", "xamane",                # V  Cidade
 	"demonio_grande", "chort", "raptor", "ogro", "olho",           # VI Castelo
@@ -1590,7 +1934,11 @@ func _flavour(par: Node2D, tipo: String, x: float, y: float) -> Vector2:
 		# e fica no NO', para o `tools/onde_esta_camara.gd` o poder ler --
 		# um `print` nao se apanha de dentro do Godot
 		_mapa_camaras.append([tipo, x])
+	camaras_geradas.append(tipo)
 	match tipo:
+		"escadas": return _f_escadas(par, x, y)
+		"sinos_sync": return _f_sinos_sync(par, x, y)
+		"vento_queda": return _f_vento_queda(par, x, y)
 		"saltos": return _f_saltos(par, x, y)
 		"serras": return _f_serras(par, x, y)
 		"pendulos": return _f_pendulos(par, x, y)
@@ -1757,7 +2105,7 @@ func _f_espinhos(par: Node2D, x: float, y: float) -> Vector2:
 	var hy_alvo: float = maxf(_teto_y + 40.0, cy - _rng.randf_range(150.0, 180.0))
 	for _i in n:
 		hx += _rng.randf_range(150.0, 176.0)
-		hy = maxf(hy_alvo, hy - SUBIDA_MAX)
+		hy = maxf(hy_alvo, hy - _subida_max)
 		_plat(par, Vector2(hx, hy), Vector2(84.0, 15.0))
 	# reencontro
 	var jx: float = maxf(lx, hx) + _rng.randf_range(150.0, 176.0)
@@ -1854,7 +2202,7 @@ func _f_cripta(par: Node2D, x: float, y: float) -> Vector2:
 	if _dif > 0.2:
 		_inimigo_em(par, Vector2(x + 224.0, cy - 30.0))
 	x += 280.0 + _rng.randf_range(150.0, 176.0)
-	var ny: float = maxf(_teto_y + 40.0, cy - _rng.randf_range(-30.0, SUBIDA_MAX))
+	var ny: float = maxf(_teto_y + 40.0, cy - _rng.randf_range(-30.0, _subida_max))
 	_plat(par, Vector2(x, ny), Vector2(100.0, 18.0))
 	return Vector2(x, ny)
 
@@ -1875,7 +2223,7 @@ func _f_arena(par: Node2D, x: float, y: float) -> Vector2:
 		# a partir do meio da campanha, um dos bichos da arena é ELITE
 		_inimigo_em(par, Vector2(ex, cy - 30.0), _dif > 0.42 and i == n / 2)
 	x += larg + _rng.randf_range(148.0, 176.0)
-	var ny: float = maxf(_teto_y + 40.0, cy - _rng.randf_range(-40.0, SUBIDA_MAX))
+	var ny: float = maxf(_teto_y + 40.0, cy - _rng.randf_range(-40.0, _subida_max))
 	_plat(par, Vector2(x, ny), Vector2(104.0, 18.0))
 	_checkpoint(x, ny)
 	return Vector2(x, ny)
@@ -1925,7 +2273,7 @@ func _f_forquilha(par: Node2D, x: float, y: float) -> Vector2:
 	var bx := x + 60.0
 	var hy := y
 	for i in n:
-		hy = maxf(_teto_y + 40.0, hy - _rng.randf_range(72.0, SUBIDA_MAX))
+		hy = maxf(_teto_y + 40.0, hy - _subida(72.0))
 		_plat(par, Vector2(bx + passo * float(i + 1), hy), Vector2(72.0, 15.0))
 		if i < n - 1 and _rng.randf() < 0.5 + 0.3 * _dif:
 			_perigo_no_vao(par, bx + passo * float(i + 1), hy)
@@ -1948,7 +2296,7 @@ func _f_torre(par: Node2D, x: float, y: float) -> Vector2:
 	var cy := y
 	for i in n:
 		x += _rng.randf_range(62.0, 106.0)
-		cy = maxf(_teto_y, cy - _rng.randf_range(84.0, SUBIDA_MAX))
+		cy = maxf(_teto_y, cy - _subida(84.0))
 		_plat(par, Vector2(x, cy), Vector2(_rng.randf_range(58.0, 80.0), 16.0))
 		if i > 0 and i < n - 1 and _rng.randf() < 0.16 + 0.4 * _dif:
 			_perigo_no_vao(par, x, cy)
@@ -1977,7 +2325,7 @@ func _f_poco(par: Node2D, x: float, y: float) -> Vector2:
 	var alvo := maxf(_teto_y + 120.0, y - _rng.randf_range(140.0, 380.0))
 	for _i in 6:
 		x += _rng.randf_range(70.0, 116.0)
-		cy = maxf(alvo, cy - _rng.randf_range(86.0, SUBIDA_MAX))
+		cy = maxf(alvo, cy - _subida(86.0))
 		_plat(par, Vector2(x, cy), Vector2(_rng.randf_range(58.0, 80.0), 16.0))
 		if cy <= alvo + 6.0:
 			break
@@ -1995,7 +2343,7 @@ func _f_pilares(par: Node2D, x: float, y: float) -> Vector2:
 	var cy := y
 	for i in n:
 		x += _rng.randf_range(150.0, 184.0)
-		cy = clampf(cy - _rng.randf_range(-96.0, SUBIDA_MAX), _teto_y + 40.0, _chao_y - 150.0)
+		cy = clampf(cy - _rng.randf_range(-96.0, _subida_max), _teto_y + 40.0, _chao_y - 150.0)
 		_coluna_fundo(par, x)  # o "pilar" é só um sprite de fundo, não bloqueia
 		_plat(par, Vector2(x, cy), Vector2(_rng.randf_range(74.0, 100.0), 16.0))  # o topo (sólido)
 		if i > 0 and _rng.randf() < 0.24 + 0.36 * _dif:
@@ -2135,11 +2483,16 @@ func _f_gruta(par: Node2D, x: float, y: float) -> Vector2:
 func _f_quebra(par: Node2D, x: float, y: float) -> Vector2:
 	var n := 6 + int(_dif * 4.0)
 	var cy := clampf(y, _chao_y - 300.0, _chao_y - 130.0)
+	var alto := _chao_y - 380.0
+	if _regiao == 2 and _idx == 11:
+		# N12: parte da altura em que a espinha chega (sem queda de 600 px)
+		alto = _teto_y + 300.0
+		cy = clampf(y, alto, _chao_y - 130.0)
 	_plat(par, Vector2(x + 80.0, cy), Vector2(70.0, 16.0))
 	x += 80.0
 	for i in n:
 		x += _rng.randf_range(140.0, 168.0)
-		cy = clampf(cy - _rng.randf_range(-70.0, 60.0), _chao_y - 380.0, _chao_y - 110.0)
+		cy = clampf(cy - _rng.randf_range(-70.0, 60.0), alto, _chao_y - 110.0)
 		var q := PLAT_QUEBRA.instantiate()
 		q.tamanho = Vector2(92.0, 16.0)
 		q.atraso = 0.72 - 0.3 * _dif
@@ -2174,6 +2527,10 @@ func _f_correntes(par: Node2D, x: float, y: float) -> Vector2:
 
 func _f_elevador(par: Node2D, x: float, y: float) -> Vector2:
 	var cy := clampf(y, _chao_y - 160.0, _chao_y - 90.0)
+	if _regiao == 2 and _idx == 11:
+		# N12: o elevador arranca da altura em que a espinha chega, em vez de a
+		# atirar 700 px para baixo (queda longa e cega) -- so' o N12 muda.
+		cy = clampf(y, _teto_y + 420.0, _chao_y - 90.0)
 	for i in 3:
 		x += _rng.randf_range(180.0, 210.0)
 		var tu := TUMULO.instantiate()
@@ -2206,6 +2563,106 @@ func _f_vento(par: Node2D, x: float, y: float) -> Vector2:
 	_plat(par, Vector2(x, cy), Vector2(100.0, 16.0))
 	_checkpoint(x, cy)
 	return Vector2(x, cy)
+
+
+## ESCADAS QUEBRADAS (N12, contrato LOCKED): uma escadaria a subir feita so' de
+## plataformas, com degraus a menos. Cada degrau sobe menos que o salto simples
+## (`SUBIDA_SIMPLES`); o degrau em falta abre um vao maior mas SEM subida.
+## Nao ha' ator novo nem sistema novo -- e' espacamento e verticalidade.
+func _f_escadas(par: Node2D, x: float, y: float) -> Vector2:
+	var n := 8
+	var passo_y := 50.0
+	var cy: float = clampf(y, _teto_y + 120.0 + passo_y * float(n), _chao_y - 110.0)
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(150.0, 18.0))
+	_checkpoint(x, cy, true)
+	for i in n:
+		var quebrado := i % 3 == 2      # 3.o, 6.o degrau: falta um pedaco
+		x += 138.0 if quebrado else 104.0
+		if not quebrado:
+			cy -= passo_y
+		_plat(par, Vector2(x, cy), Vector2(84.0, 16.0))
+		if i == 3:
+			_checkpoint(x, cy)
+	x += _rng.randf_range(150.0, 176.0)
+	_plat(par, Vector2(x, cy), Vector2(140.0, 18.0))
+	_checkpoint(x, cy, true)
+	return Vector2(x, cy)
+
+
+## SINOS DE SINCRONIZACAO (N12, contrato LOCKED): dois sinos, cada um dono da
+## SUA ponte. O primeiro acorda a ponte que leva a` ilha; o segundo, que esta'
+## na ilha, acorda a ponte da saida. A ordem e' a do percurso (nao se chega ao
+## segundo sem o primeiro) e o efeito e' legivel: o fantasma ténue fica solido
+## e opaco a` badalada, com a onda de eco do sino. Dois grupos independentes,
+## o cais e a ilha sao chao solido: falhar so' custa cair, voltar ao
+## checkpoint e bater outra vez -- sem softlock possivel.
+func _f_sinos_sync(par: Node2D, x: float, y: float) -> Vector2:
+	var cy: float = clampf(y, _teto_y + 200.0, _chao_y - 96.0)
+	x += _rng.randf_range(150.0, 176.0)
+	var grupo_a := "sino_sync_a_%d_%d" % [_idx, _cont_i]
+	var grupo_b := "sino_sync_b_%d_%d" % [_idx, _cont_i]
+	_plat(par, Vector2(x, cy), Vector2(180.0, 20.0), 40.0)
+	_checkpoint(x, cy, true)
+	var sa := SINO.instantiate()
+	sa.alterna_grupo = grupo_a
+	sa.congelar_inimigos = 0.0
+	sa.textura = SINO_M_TEX
+	sa.position = Vector2(x + 44.0, cy - 60.0)
+	par.add_child(sa)
+	for i in 3:
+		x += 158.0
+		_plat_fantasma(par, Vector2(x, cy - 30.0 - 16.0 * float(i % 2)),
+			Vector2(104.0, 16.0), grupo_a)
+	x += 158.0
+	_plat(par, Vector2(x, cy), Vector2(180.0, 20.0), 40.0)    # a ilha
+	_checkpoint(x, cy, true)
+	var sb := SINO.instantiate()
+	sb.alterna_grupo = grupo_b
+	sb.congelar_inimigos = 0.0
+	sb.textura = SINO_M_TEX
+	sb.position = Vector2(x + 44.0, cy - 60.0)
+	par.add_child(sb)
+	for i in 3:
+		x += 158.0
+		_plat_fantasma(par, Vector2(x, cy - 30.0 - 16.0 * float(i % 2)),
+			Vector2(104.0, 16.0), grupo_b)
+	x += 158.0
+	_plat(par, Vector2(x, cy), Vector2(140.0, 18.0))
+	_checkpoint(x, cy)
+	return Vector2(x, cy)
+
+
+## VENTO + QUEDA CONTROLADA (N12, contrato LOCKED, fluxo C): entra-se numa
+## `CorrenteAr` (updraft), corrige-se no ar para os degraus, sai-se para um
+## patamar e depois DESCE-SE por patamares largos, sem perigo nenhum, ate' uma
+## zona segura. A queda e' em degraus de ~120 px: ver onde se cai e' o exame.
+func _f_vento_queda(par: Node2D, x: float, y: float) -> Vector2:
+	x += 150.0
+	# parte da altura a que a espinha chega (max. ~420 px de queda), para nao
+	# atirar a jogadora para o fundo antes do fluxo de ar
+	var cy: float = clampf(y, _teto_y + 520.0, _chao_y - 80.0)
+	_plat(par, Vector2(x, cy), Vector2(110.0, 16.0))
+	_checkpoint(x, cy, true)
+	var ca := CORRENTE_AR.instantiate()
+	ca.position = Vector2(x + 150.0, cy - 240.0)
+	ca.scale = Vector2(3.2, 5.0)
+	par.add_child(ca)
+	for i in 4:
+		_plat(par, Vector2(x + 110.0 + float(i % 2) * 150.0,
+			cy - 100.0 - float(i) * 105.0), Vector2(96.0, 16.0))
+	x += 340.0
+	var hy: float = clampf(cy - 300.0, _teto_y + 120.0, _chao_y - 160.0)
+	_plat(par, Vector2(x, hy), Vector2(120.0, 16.0))
+	_checkpoint(x, hy, true)
+	# a descida: tres patamares largos, cada um ~120 px abaixo do anterior
+	var dy := hy
+	for i in 3:
+		x += 210.0
+		dy = minf(dy + 120.0, _chao_y - 90.0)
+		_plat(par, Vector2(x, dy), Vector2(150.0, 16.0))
+	_checkpoint(x, dy)
+	return Vector2(x, dy)
 
 
 func _f_gravidade(par: Node2D, x: float, y: float) -> Vector2:
@@ -2592,7 +3049,7 @@ func _f_lava_sobe(par: Node2D, x: float, y: float) -> Vector2:
 	var cy := base_y
 	for _i in n:
 		x += _rng.randf_range(150.0, 174.0)
-		cy = maxf(_teto_y + 60.0, cy - _rng.randf_range(58.0, SUBIDA_MAX))
+		cy = maxf(_teto_y + 60.0, cy - _subida(58.0))
 		_plat(par, Vector2(x, cy), Vector2(96.0, 16.0))
 	x += _rng.randf_range(150.0, 176.0)
 	_plat(par, Vector2(x, cy), Vector2(130.0, 18.0))
@@ -2668,6 +3125,9 @@ func _f_vitral(par: Node2D, x: float, y: float) -> Vector2:
 	var vt := VITRAL.instantiate()
 	vt.grupo_luz = grupo
 	vt.cor_luz = _cor_luz_regiao()
+	if _regiao == 2 and _idx == 11:
+		vt.textura_inteiro = VITRAL_INT_TEX
+		vt.textura_partido = VITRAL_PART_TEX
 	vt.position = Vector2(x + 118.0, cy - 70.0)
 	par.add_child(vt)
 
@@ -3379,7 +3839,7 @@ func _f_assalto(par: Node2D, x: float, y: float) -> Vector2:
 	var x0 := x
 	for i in n:
 		x += _rng.randf_range(78.0, 118.0)
-		cy = maxf(_teto_y + 40.0, cy - _rng.randf_range(84.0, SUBIDA_MAX))
+		cy = maxf(_teto_y + 40.0, cy - _subida(84.0))
 		_plat(par, Vector2(x, cy), Vector2(_rng.randf_range(70.0, 92.0), 16.0))
 		if i % 2 == 0:
 			var tr := TORRETA.instantiate()
@@ -3749,7 +4209,7 @@ func _f_revisao(par: Node2D, x: float, y: float) -> Vector2:
 	for i in 4:
 		var opc: Array[String] = []
 		for c in REVER:
-			if nivel_de_estreia(c) <= _idx and not (c in vistas):
+			if nivel_de_desbloqueio(c, _regiao) <= _idx and not (c in vistas):
 				opc.append(c)
 		if opc.is_empty():
 			break
@@ -4782,3 +5242,287 @@ func _cor_luz_regiao() -> Color:
 	var liq: Array = LIQUIDO.get(_regiao, LIQUIDO[0])
 	var c: Color = liq[0]
 	return Color(c.r * 0.5 + 0.5, c.g * 0.4 + 0.4, c.b * 0.5 + 0.5)
+
+
+## ENVOLVENTE DE SALTO, medida na física do jogo com `tests/run_alcance_9h17.tscn`
+## (agarrar-borda incluído, que é básico e está sempre lá). Diz o vão MÁXIMO
+## entre bordas para uma dada subida. `-1` = não há salto que o faça.
+##
+## Salto simples (Região I):  subida 0 -> 140 | <=64 -> 110 | <=72 -> 80 |
+## <=80 -> 60 | acima de 80 -> nunca.
+static func vao_possivel(subida: float, tecto: float) -> float:
+	if subida > tecto:
+		return -1.0
+	# O regime escolhe-se pelo TECTO FISICO, nao pelo tecto de DESENHO: a
+	# `SUBIDA_SIMPLES` (60) fica de proposito abaixo do que o salto simples
+	# aguenta (80), e comparar com ela metia a tabela do salto duplo a
+	# responder por saltos simples.
+	if tecto > TECTO_FISICO_SIMPLES:
+		return 210.0 if subida <= 0.0 else 195.0
+	if subida <= 0.0:
+		return 140.0
+	if subida <= 64.0:
+		return 110.0
+	if subida <= 72.0:
+		return 80.0
+	return 60.0
+
+
+## REPARAÇÃO DA ESPINHA. A jornada promete, na cabeça deste ficheiro, que
+## "cada plataforma está ao alcance de salto da anterior" -- mas até aqui
+## isso era uma INTENÇÃO espalhada por dezenas de sítios que escolhiam o
+## passo em x e a subida em y sem se falarem. Com salto duplo sobrava
+## folga que tapava a conta; com salto SIMPLES (Regiao I) um degrau que
+## sobe 64 px e afasta 83 px deixa de se fazer -- e era assim que se chegava
+## a um nível intransponível por 3 px.
+##
+## Aqui percorre-se a espinha da esquerda para a direita e, sempre que um
+## degrau estático fica fora da envolvente, BAIXA-SE esse degrau até voltar
+## a estar ao alcance. Baixar (e não criar plataformas novas) mantém a
+## composição: a peça é a mesma, a arte é a mesma, só assenta mais baixo.
+##
+## Só se mexe em plataformas ESTÁTICAS (`Plataforma`): as móveis, os
+## trampolins e os elevadores têm regras próprias e passam a ser apenas
+## origem de salto, nunca destino a corrigir.
+func _garantir_alcance() -> void:
+	_ajudas = _ajudas_verticais()
+	var plats: Array = []
+	for n in get_children():
+		_recolher_plats(n, plats)
+	if plats.size() < 3:
+		return
+	plats.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+		return float(a.cx) < float(b.cx))
+	var n_p := plats.size()
+	var alcancado: Array[bool] = []
+	alcancado.resize(n_p)
+	alcancado[0] = true          # onde a jornada comeca
+	var corrigidas := 0
+	# PONTO FIXO, e nao uma passagem da esquerda para a direita: uma
+	# plataforma larga pode comecar antes de outra e acabar depois dela, e
+	# com uma ordem fixa ficava-se a julgar inalcancavel um degrau cuja
+	# origem ainda nao tinha sido visitada. Aqui alastra-se o alcance ate'
+	# estabilizar; so' depois se baixa UM degrau, e alastra-se outra vez.
+	for _ronda in 60:
+		_alastrar(plats, alcancado)
+		var pior := -1
+		var pior_topo := INF
+		for k in n_p:
+			if alcancado[k] or bool(plats[k].movel):
+				continue
+			var alvo := _topo_alcancavel(plats, alcancado, k)
+			if alvo == INF:
+				continue
+			if pior < 0 or float(plats[k].cx) < float(plats[pior].cx):
+				pior = k
+				pior_topo = alvo
+		if pior < 0:
+			break
+		var b: Dictionary = plats[pior]
+		var alvo_topo: float = minf(pior_topo, _chao_y - 56.0)  # fora do liquido
+		var desce := alvo_topo - float(b.topo)
+		if desce <= 1.0:
+			alcancado[pior] = true      # ja' la' esta': nao ha' nada a baixar
+			continue
+		(b.no as Node2D).position.y += desce
+		b.topo = float(b.topo) + desce
+		b.base = float(b.base) + desce
+		alcancado[pior] = true
+		corrigidas += 1
+	if OS.has_feature("editor") or OS.is_debug_build():
+		var falta := 0
+		var pior_x := 0.0
+		for k in n_p:
+			if not alcancado[k]:
+				falta += 1
+				pior_x = minf(pior_x, float(plats[k].cx)) if falta > 1 else float(plats[k].cx)
+		print("[jornada N%d] espinha: %d baixadas, %d/%d por alcancar (1.a em x=%.0f)" % [
+			_idx + 1, corrigidas, falta, n_p, pior_x])
+
+
+## Alastra o alcance pelo grafo ate' estabilizar.
+func _alastrar(plats: Array, alcancado: Array) -> void:
+	var mudou := true
+	while mudou:
+		mudou = false
+		for j in plats.size():
+			if alcancado[j]:
+				continue
+			var b: Dictionary = plats[j]
+			for i in plats.size():
+				if i == j or not alcancado[i]:
+					continue
+				var a: Dictionary = plats[i]
+				var vao := _vao_entre(a, b)
+				var subida: float = float(a.topo) - float(b.topo)
+				if subida < -QUEDA_LIVRE:
+					continue
+				if subida > 0.0 and not _fora_da_sombra(a, b):
+					continue    # debaixo da barriga dela: o corpo dela e' tecto
+				if vao <= vao_possivel(maxf(subida, 0.0), _subida_max) 						or (bool(b.movel) and vao <= 210.0 and subida <= 150.0) 						or (subida > SUBIDA_TORRE and _tem_ajuda_entre(a, b)):
+					alcancado[j] = true
+					mudou = true
+					break
+
+
+## O topo mais ALTO a que a plataforma `k` pode ser posta e ainda ficar ao
+## alcance de alguma plataforma ja' alcancada. `INF` = nao ha' origem.
+func _topo_alcancavel(plats: Array, alcancado: Array, k: int) -> float:
+	var b: Dictionary = plats[k]
+	var melhor := INF
+	for i in plats.size():
+		if i == k or not alcancado[i]:
+			continue
+		var a: Dictionary = plats[i]
+		var vao := _vao_entre(a, b)
+		if vao > 260.0 or not _fora_da_sombra(a, b):
+			continue
+		var sub_ok := _subida_max
+		while sub_ok > 0.0 and vao > vao_possivel(sub_ok, _subida_max):
+			sub_ok -= 4.0
+		# FOLGA: nao se poe o degrau EM CIMA do limite. Sem isto o degrau
+		# corrigido ficava a raspar e a espessura das pecas voltava a
+		# atira'-lo para fora.
+		sub_ok -= FOLGA
+		if sub_ok > 0.0:
+			melhor = minf(melhor, float(a.topo) - sub_ok)
+	return melhor
+
+
+## Folga (px) com que se baixa um degrau corrigido.
+const FOLGA := 8.0
+## A partir daqui ja' nao e' um degrau, e' uma TORRE: so' ai e' que um
+## trampolim/elevador por perto justifica deixar o desnivel em paz. Abaixo
+## disto o degrau tem de se fazer a salto, haja la' o que houver ao lado --
+## era assim que um degrau de 76 px se safava por ter uma plataforma
+## ritmada no mesmo pedaco de mapa.
+const SUBIDA_TORRE := 120.0
+## Alcance (px) de um trampolim / impulsor / elevador: um degrau alto que
+## tenha um deles a` mao NAO e' um bloqueio -- e' a mecanica dele. O crivo
+## estatico nao os sabe simular, por isso limita-se a nao lhes mexer.
+const ALCANCE_AJUDA := 240.0
+
+
+## Onde e' que a jornada pos trampolins, impulsores e elevadores.
+func _ajudas_verticais() -> Array[Vector2]:
+	var out: Array[Vector2] = []
+	_recolher_ajudas(self, out)
+	return out
+
+
+func _recolher_ajudas(no: Node, out: Array[Vector2]) -> void:
+	var e: Script = no.get_script()
+	if e:
+		var f := e.resource_path.get_file()
+		if f in ["trampolim.gd", "impulsor.gd", "tumulo_elevador.gd",
+				"plataforma_corrente.gd", "raiz_elevatoria.gd"]:
+			out.append((no as Node2D).global_position)
+	for c in no.get_children():
+		_recolher_ajudas(c, out)
+
+
+## Descer e' de graca ate' aqui (acima disto ja' e' um poco, nao um degrau).
+const QUEDA_LIVRE := 520.0
+## Quanto e' que a plataforma de baixo tem de sobrar para fora da sombra da
+## de cima para se poder saltar da ponta em vez de bater com a cabeca na
+## barriga dela. E' a regra que falta va aqui e que ja' custou ao projeto
+## dois niveis com o chefe inacessivel (ver `tools/verifica_alcance.gd`).
+const MARGEM_PONTA := 26.0
+
+
+## `a` sobra para fora da sombra de `b`?
+static func _fora_da_sombra(a: Dictionary, b: Dictionary) -> bool:
+	return float(b.esq) - float(a.esq) >= MARGEM_PONTA 		or float(a.dir) - float(b.dir) >= MARGEM_PONTA
+var _ajudas: Array[Vector2] = []
+
+
+## Ha' um trampolim/impulsor/elevador no vao entre `a` e `b`?
+func _tem_ajuda_entre(a: Dictionary, b: Dictionary) -> bool:
+	var x0: float = minf(float(a.cx), float(b.cx)) - ALCANCE_AJUDA
+	var x1: float = maxf(float(a.cx), float(b.cx)) + ALCANCE_AJUDA
+	for pos in _ajudas:
+		if pos.x >= x0 and pos.x <= x1 and pos.y <= float(a.base) + 80.0 				and pos.y >= float(b.topo) - 80.0:
+			return true
+	return false
+
+
+static func _vao_entre(a: Dictionary, b: Dictionary) -> float:
+	if float(b.esq) > float(a.dir):
+		return float(b.esq) - float(a.dir)
+	if float(a.esq) > float(b.dir):
+		return float(a.esq) - float(b.dir)
+	return 0.0
+
+
+## Apanha as plataformas da jornada com a AABB do topo. `movel` marca as que
+## nao se podem baixar (flutuantes, ritmadas, de corrente, elevadores).
+func _recolher_plats(no: Node, out: Array) -> void:
+	var e: Script = no.get_script()
+	var caminho := ""
+	if e:
+		caminho = e.resource_path
+	if caminho.get_file().begins_with("plataforma"):
+		var tv: Variant = no.get("tamanho")
+		var tam: Vector2 = tv if tv != null else Vector2(200, 40)
+		var p := no as Node2D
+		if p != null and tam.x > 1.0:
+			out.append({
+				"no": p, "movel": caminho.get_file() != "plataforma.gd",
+				"cx": p.global_position.x,
+				"esq": p.global_position.x - tam.x * 0.5,
+				"dir": p.global_position.x + tam.x * 0.5,
+				"topo": p.global_position.y - tam.y * 0.5,
+				"base": p.global_position.y + tam.y * 0.5,
+			})
+	for f in no.get_children():
+		_recolher_plats(f, out)
+
+
+## LEITO PINTADO DA REGIAO I (9H.17 I2).
+##
+## O review dizia que a transicao chao/pantano "le'-se demasiado plana e
+## palida e separa o plano de jogo do ambiente". A hipotese do veu foi
+## testada na 9H.16 e revertida -- nao se repete aqui.
+##
+## A peca que faltava estava produzida e nunca fora usada:
+## `terrain_hd/corrupcao.png` (199x290) -- uma poca de corrupcao PINTADA,
+## com linha de agua luminosa, nevoa a subir, raizes e folhagem escura e o
+## fundo a reflectir. Medida, a linha de agua esta' a 29,3% da altura da
+## peca; e' por ai que ela se alinha com a superficie do liquido.
+##
+## Nao e' um degrade nem um poligono: e' arte de producao aprovada, posta
+## ATRAS do liquido, a dar-lhe leito. Para nao se ver a repeticao numa
+## extensao de milhares de px, as instancias alternam o espelho e variam de
+## escala e de alfa.
+const LEITO_LINHA_AGUA := 0.293
+
+func _leito_pintado(x0: float, x1: float) -> void:
+	var t: Texture2D = load("res://assets/art/regions/region_01_forest/production/l1_hybrid_9h12e/terrain_hd/corrupcao.png")
+	if t == null:
+		return
+	var leito := Node2D.new()
+	leito.name = "LeitoPintado"
+	leito.z_index = -6          # atras do liquido, a` frente do parallax
+	add_child(leito)
+	# a superficie do liquido: o poligono e' desenhado de `-altura * 0.5`,
+	# e a agua esta' em `_chao_y + 230` com 460 de altura -> a linha de agua
+	# cai exactamente em `_chao_y`.
+	var y_agua := _chao_y
+	var x := x0 - 200.0
+	var i := 0
+	while x < x1 + 400.0:
+		var esc: float = 1.55 + float(i % 3) * 0.22
+		var s := Sprite2D.new()
+		s.texture = t
+		s.centered = false
+		s.scale = Vector2(esc, esc)
+		s.flip_h = i % 2 == 1
+		s.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+		# a linha de agua da peca assenta na superficie do liquido
+		s.position = Vector2(x, y_agua - float(t.get_height()) * esc * LEITO_LINHA_AGUA)
+		s.modulate = Color(0.72, 0.68, 0.82, 0.86 - 0.06 * float(i % 3))
+		leito.add_child(s)
+		# sobrepoem-se ~28%: com 12% via-se a aresta direita da peca como uma
+		# linha vertical no meio do pantano
+		x += float(t.get_width()) * esc * 0.72
+		i += 1

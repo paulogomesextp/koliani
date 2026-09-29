@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3]
+
+; Zona de vento sem arte final. Ajustar tamanho/direção/intensidade no
+; Inspector; feedback visual/áudio liga-se aos sinais do script.
+
+[ext_resource type="Script" path="res://scripts/wind_zone.gd" id="1_wind"]
+
+[sub_resource type="RectangleShape2D" id="rs_wind"]
+size = Vector2(320, 160)
+
+[node name="WindZone" type="Area2D"]
+collision_layer = 0
+collision_mask = 2
+script = ExtResource("1_wind")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("rs_wind")

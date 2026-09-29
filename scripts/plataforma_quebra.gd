@@ -12,6 +12,17 @@ extends StaticBody2D
 @export var atraso := 0.6
 ## Segundos até voltar a formar-se.
 @export var respawn := 2.6
+## Pele de TERRENO (opt-in, N12 da Regiao III): em vez da laje cinzenta
+## chapada, a plataforma veste o miolo do material do bioma do nivel (o
+## mesmo `corpo` que a `Plataforma` usa, via `Plataforma._tex`), com uma
+## aresta de pedra clara por cima. O aviso a vermelho continua a ler-se:
+## tinge a textura em vez de a trocar. `false` = igual a sempre.
+@export var pele_terreno := false
+
+const PLATAFORMA := preload("res://scripts/plataforma.gd")
+const COR_LISA := Color(0.32, 0.29, 0.34)
+const COR_AVISO := Color(0.95, 0.35, 0.12)
+var _cor_repouso := COR_LISA
 
 enum { FIRME, TREME, IDA, FORA }
 
@@ -22,6 +33,7 @@ var _col: CollisionShape2D
 var _vis: Polygon2D
 var _borda: Line2D
 var _deteta: Area2D
+var _som: Node
 
 
 func _ready() -> void:
@@ -29,6 +41,7 @@ func _ready() -> void:
 	collision_layer = 1
 	collision_mask = 0
 	_base = position
+	_som = get_node_or_null("/root/Som")
 	# Treme e cai no `_process`, com a posicao dela propria.
 	physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 	_montar()
@@ -46,8 +59,33 @@ func _montar() -> void:
 	_vis = Polygon2D.new()
 	_vis.polygon = PackedVector2Array([
 		Vector2(-hw, -hh), Vector2(hw, -hh), Vector2(hw, hh), Vector2(-hw, hh)])
-	_vis.color = Color(0.32, 0.29, 0.34)
+	_vis.color = COR_LISA
+	if pele_terreno:
+		var tex := _textura_terreno()
+		if tex:
+			_vis.texture = tex
+			_vis.texture_repeat = CanvasItem.TEXTURE_REPEAT_ENABLED
+			# ancora a textura ao mundo: degraus vizinhos nao repetem o
+			# mesmo recorte do mosaico
+			_vis.texture_offset = Vector2(fposmod(position.x * 0.5, 192.0), fposmod(position.y * 0.5, 192.0))
+			_vis.texture_scale = Vector2.ONE
+			_cor_repouso = Color(1.0, 0.96, 1.0)
+			_vis.color = _cor_repouso
 	add_child(_vis)
+	var capa := _textura_terreno("topo") if pele_terreno else null
+	if capa:
+		# capa do terreno por cima (a mesma das plataformas: le-se como pedra
+		# da torre partida, nao como caixa); fica filha do `_vis` para o
+		# aviso e o desaparecer a levarem junto
+		var cs_topo := Sprite2D.new()
+		cs_topo.texture = capa
+		cs_topo.centered = false
+		cs_topo.texture_repeat = CanvasItem.TEXTURE_REPEAT_ENABLED
+		cs_topo.region_enabled = true
+		cs_topo.region_rect = Rect2(fposmod(position.x, float(capa.get_width())), 0.0,
+			tamanho.x, float(capa.get_height()))
+		cs_topo.position = Vector2(-hw, -hh - 8.0)
+		_vis.add_child(cs_topo)
 	# "fissuras"
 	var fiss := Line2D.new()
 	fiss.points = PackedVector2Array([
@@ -55,6 +93,7 @@ func _montar() -> void:
 		Vector2(hw * 0.1, -hh * 0.4), Vector2(hw * 0.5, hh)])
 	fiss.width = 1.5
 	fiss.default_color = Color(0.12, 0.1, 0.14, 0.8)
+	fiss.visible = capa == null
 	add_child(fiss)
 	_borda = Line2D.new()
 	_borda.points = _vis.polygon
@@ -62,6 +101,9 @@ func _montar() -> void:
 	_borda.width = 2.0
 	_borda.default_color = Color(0.5, 0.42, 0.5, 0.7)
 	add_child(_borda)
+	if capa:
+		# com pele, a borda so' aparece no aviso (ver `_process`)
+		_borda.visible = false
 
 	_deteta = Area2D.new()
 	_deteta.collision_layer = 0
@@ -89,6 +131,11 @@ func _ao_pisar(corpo: Node) -> void:
 	if _estado == FIRME and corpo is Koliani:
 		_estado = TREME
 		_t = 0.0
+		# TELEGRAFO. A plataforma ja' avisava com cor e trepidacao, mas quem
+		# estivesse a olhar para um inimigo nao via nada -- e o abanao e' a
+		# unica deixa que ela da'. Um evento por pisada; a maquina de estados
+		# ja' garante que so' se entra em TREME vindo de FIRME.
+		_tocar("pedra_racha", -14.0, 1.0)
 
 
 func _process(dt: float) -> void:
@@ -99,7 +146,7 @@ func _process(dt: float) -> void:
 			var trepidar := 1.0 + aviso * 2.0  # o abanão cresce -- lê-se "vai cair"
 			position = _base + Vector2(randf_range(-2.0, 2.0), randf_range(-1.0, 1.0)) * trepidar
 			if _vis:
-				_vis.color = Color(0.32, 0.29, 0.34).lerp(Color(0.95, 0.35, 0.12), aviso)
+				_vis.color = _cor_repouso.lerp(COR_AVISO, aviso)
 			if _borda:
 				_borda.default_color = Color(0.5, 0.42, 0.5).lerp(Color(1.0, 0.5, 0.2), aviso)
 				_borda.default_color.a = 0.7 + 0.3 * sin(_t * 40.0)
@@ -107,6 +154,10 @@ func _process(dt: float) -> void:
 				_estado = IDA
 				_t = 0.0
 				_col.set_deferred("disabled", true)
+				# ACTIVATION: o chao a ceder. Nao ha' terceiro som no fim da
+				# queda -- ela desaparece por fade, nao bate em lado nenhum,
+				# e um impacto que nao se ve' e' ruido.
+				_tocar("pedra_parte", -13.0, 1.18)
 		IDA:
 			_t += dt
 			position.y += 220.0 * _t
@@ -123,7 +174,32 @@ func _process(dt: float) -> void:
 				modulate.a = 1.0
 				visible = true
 				if _vis:
-					_vis.color = Color(0.32, 0.29, 0.34)
+					_vis.color = _cor_repouso
 				if _borda:
 					_borda.default_color = Color(0.5, 0.42, 0.5, 0.7)
 				_col.set_deferred("disabled", false)
+
+
+## O `corpo` do bioma do nivel (le-se do no' do grupo "atmosfera", como a
+## `Plataforma`). `null` fora de uma cena com Atmosfera -> fica a laje lisa.
+func _textura_terreno(peca := "corpo") -> Texture2D:
+	if not is_inside_tree():
+		return null
+	var atm := get_tree().get_first_node_in_group("atmosfera")
+	if atm == null or not ("bioma" in atm):
+		return null
+	# o `fundo_pack` pode pedir material proprio (`Plataforma.MATERIAL_POR_PACK`:
+	# a Torre dos Ecos usa o terreno da prancha) -- o degrau veste o MESMO
+	# material que as plataformas a' volta
+	var material := String(atm.bioma)
+	if "fundo_pack" in atm and PLATAFORMA.MATERIAL_POR_PACK.has(atm.fundo_pack):
+		material = PLATAFORMA.MATERIAL_POR_PACK[atm.fundo_pack]
+	return PLATAFORMA._tex(material, peca)
+
+
+## Toca pelo CAMINHO do autoload, para a classe continuar a compilar em
+## `--script` (onde os autoloads nao existem e as bancadas correm).
+func _tocar(nome: String, db: float, pitch: float) -> void:
+	if _som and _som.has_method("toca") and _som.call("em_vista", self):
+		_som.call("toca", nome, db, pitch, 0.05,
+			0.25, "%s_%d" % [nome, get_instance_id()])

@@ -6,10 +6,12 @@ extends CanvasLayer
 ## chave de tradução do nome de cada habilidade (ver assets/i18n)
 const NOME_HABILIDADE := {
 	"salto_duplo": "hud.ability.salto_duplo",
+	"dash": "hud.ability.dash",
 	"dash_aereo": "hud.ability.dash_aereo",
 	"partir_paredes": "hud.ability.partir_paredes",
 	"escudo": "hud.ability.escudo",
 	"projetil": "hud.ability.projetil",
+	"especial": "hud.ability.especial",
 	"escalar_paredes": "hud.ability.escalar_paredes",
 }
 
@@ -62,7 +64,7 @@ func _ready() -> void:
 		_toque.visible = DisplayServer.is_touchscreen_available()
 	# a barra de Energia só aparece depois de apanhar a habilidade "projetil"
 	if _barra_energia:
-		_barra_energia.get_parent().visible = EstadoJogo.tem_habilidade("projetil")
+		_barra_energia.get_parent().visible = EstadoJogo.tem_habilidade("projetil") or EstadoJogo.tem_habilidade("especial")
 	EstadoJogo.vidas_mudaram.connect(_atualizar_vidas)
 	EstadoJogo.habilidade_desbloqueada.connect(_ao_habilidade)
 	EstadoJogo.pista_encontrada.connect(_ao_pista)
@@ -73,6 +75,9 @@ func _ready() -> void:
 		koliani.vida_mudou.connect(_atualizar_barra_vida)
 	if koliani and koliani.has_signal("energia_mudou"):
 		koliani.energia_mudou.connect(_atualizar_energia)
+	if koliani and koliani.has_signal("energia_insuficiente"):
+		koliani.energia_insuficiente.connect(_piscar_energia)
+	_marcar_custo_especial()
 
 	_vestir_barras()
 	_montar_barra_chefe()
@@ -286,8 +291,15 @@ func _montar_disco_arma() -> void:
 	# 9F: ranhura de ouro da prancha 09 (a moldura ornamentada em ponto
 	# pequeno); a cor da arma entra por tinta, como antes pela borda
 	_arma_disco.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
-	_arma_disco.add_theme_stylebox_override("panel", UIProducao.caixa("moldura_ornamentada",
-		Vector4(0, 0, 0, 0), Color.WHITE, [22, 22, 22, 22]))
+	var moldura_rb := CosmeticosVisuais.caixa_hud("disco", Vector4(0, 0, 0, 0), [22, 22, 22, 22])
+	if moldura_rb:
+		# Rootbound Frame (Loja): pixel-art, por isso sem o filtro LINEAR do kit
+		_arma_disco.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		_arma_disco.add_theme_stylebox_override("panel", moldura_rb)
+	else:
+		_arma_disco.add_theme_stylebox_override("panel", UIProducao.caixa("moldura_ornamentada",
+			Vector4(0, 0, 0, 0), Color.WHITE, [22, 22, 22, 22]))
+	_arma_disco.self_modulate = CosmeticosVisuais.tinta_moldura_hud()
 	add_child(_arma_disco)
 
 	_arma_label = Label.new()
@@ -312,7 +324,7 @@ func _atualizar_disco_arma() -> void:
 	_arma_disco.modulate.a = 1.0
 	var wi := Equipamento.indice_arma(EstadoJogo.arma_equipada)
 	var sb := _arma_disco.get_theme_stylebox("panel") as StyleBoxTexture
-	if sb and wi >= 0:
+	if sb and wi >= 0 and not CosmeticosVisuais.moldura_arte_equipada():
 		sb.modulate_color = Color.WHITE.lerp(Equipamento.cor_arma(wi), 0.35)
 	var nome := Textos.t(Equipamento.arma(EstadoJogo.arma_equipada).get("nome", ""))
 	# iniciais da arma (placeholder até haver ícone pixel)
@@ -613,8 +625,13 @@ func _encher_cabecalho_nivel() -> void:
 	var placa := PanelContainer.new()
 	placa.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	placa.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
-	placa.add_theme_stylebox_override("panel", Frontend9H.caixa("aba_bloqueada",
-		Vector4(12, 6, 18, 6), Color(1, 1, 1, 0.96), [16, 14, 16, 14]))
+	var placa_rb := CosmeticosVisuais.caixa_hud("placa", Vector4(12, 6, 18, 6), [16, 14, 16, 14])
+	if placa_rb:
+		placa.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		placa.add_theme_stylebox_override("panel", placa_rb)
+	else:
+		placa.add_theme_stylebox_override("panel", Frontend9H.caixa("aba_bloqueada",
+			Vector4(12, 6, 18, 6), Color(1, 1, 1, 0.96), [16, 14, 16, 14]))
 	_cab_nivel.add_child(placa)
 
 	var linha := HBoxContainer.new()
@@ -715,7 +732,7 @@ func _atualizar_vidas(vidas: int) -> void:
 
 
 func _ao_habilidade(id: String) -> void:
-	if id == "projetil" and _barra_energia:
+	if (id == "projetil" or id == "especial") and _barra_energia:
 		_barra_energia.get_parent().visible = true
 	var nome: String = Textos.t(NOME_HABILIDADE.get(id, id))
 	_aviso(Textos.tf("hud.new_ability", [nome]),
@@ -731,9 +748,11 @@ func _ao_pista(_id: String, total: int) -> void:
 ## meio da acção (quando a mecânica entra no ecrã) e a 5 s não dava para a
 ## ler sem deixar de jogar.
 const TUTORIAL_SEGUNDOS := 10.0
-## Largura da placa. Uma linha comprida a meio do ecrã lê-se de relance; um
-## bloco estreito e alto obriga a parar o jogo para o ler.
-const TUTORIAL_LARGURA := 560.0
+## Largura da placa. Era 560 quando a placa vivia ao MEIO do ecrã. Desde a
+## 9H.16 C vive no canto superior-esquerdo, fora da zona de acção: aí uma
+## caixa larga voltaria a invadir o meio, por isso encolheu para 380 -- o
+## texto ganha uma linha ou duas, mas nunca tapa a Koliani.
+const TUTORIAL_LARGURA := 380.0
 
 
 ## A mecânica deste nível estreia aqui: diz o nome e como funciona.
@@ -763,8 +782,11 @@ func _criar_tutorial(nome: String, txt: String) -> PanelContainer:
 	var caixa := PanelContainer.new()
 	caixa.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
 	caixa.add_theme_stylebox_override("panel", UIProducao.caixa("caixa_dialogo",
-		Vector4(28, 20, 28, 22)))
+		Vector4(18, 12, 18, 14)))
 	caixa.size = Vector2(largura, 0.0)
+	# Semitransparente: lê-se, mas deixa ver o jogo por baixo.
+	caixa.modulate.a = 0.9
+	# Não bloqueia input (o toque atravessa para os controlos).
 	caixa.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 	var col := VBoxContainer.new()
@@ -774,22 +796,22 @@ func _criar_tutorial(nome: String, txt: String) -> PanelContainer:
 	var l_nome := Label.new()
 	l_nome.text = nome
 	l_nome.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	l_nome.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	l_nome.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	l_nome.add_theme_color_override("font_color", UIProducao.OURO)
 	l_nome.add_theme_color_override("font_outline_color", Color(0.05, 0.01, 0.06))
 	l_nome.add_theme_constant_override("outline_size", 4)
-	l_nome.add_theme_font_size_override("font_size", 22)
+	l_nome.add_theme_font_size_override("font_size", 18)
 	col.add_child(l_nome)
 
 	var l_txt := Label.new()
 	l_txt.text = txt
-	l_txt.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	l_txt.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	l_txt.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	l_txt.custom_minimum_size.x = largura - 56.0
 	l_txt.add_theme_color_override("font_color", Color(0.94, 0.88, 1))
 	l_txt.add_theme_color_override("font_outline_color", Color(0.05, 0.01, 0.06))
 	l_txt.add_theme_constant_override("outline_size", 3)
-	l_txt.add_theme_font_size_override("font_size", 17)
+	l_txt.add_theme_font_size_override("font_size", 15)
 	col.add_child(l_txt)
 
 	return caixa
@@ -809,6 +831,31 @@ var _fila_ativa := false
 var _notificacao_suspensa := false
 
 
+## Segundos que uma placa de tutorial espera por uma pausa no combate.
+const ESPERA_COMBATE := 6.0
+## Distância (px) a que um inimigo vivo já conta como "estou em combate".
+const RAIO_COMBATE := 460.0
+
+
+## Verdadeiro quando há um chefe em cena ou um inimigo vivo perto da
+## Koliani -- momento em que uma caixa grande é estorvo, não ajuda.
+func _em_combate() -> bool:
+	if not is_inside_tree():
+		return false
+	if not get_tree().get_nodes_in_group("chefes").is_empty():
+		return true
+	var k := get_tree().get_first_node_in_group("koliani") as Node2D
+	if k == null:
+		return false
+	for no in get_tree().get_nodes_in_group("inimigos"):
+		var d := no as Node2D
+		if d == null or bool(d.get("_morto")):
+			continue
+		if d.global_position.distance_to(k.global_position) < RAIO_COMBATE:
+			return true
+	return false
+
+
 func _dialogo_visivel() -> bool:
 	for balao in get_tree().get_nodes_in_group("dialogo_ui"):
 		if balao.visible:
@@ -817,6 +864,8 @@ func _dialogo_visivel() -> bool:
 
 
 func _enfileirar_notificacao(dados: Dictionary) -> void:
+	if not is_inside_tree():
+		return
 	_fila_notificacoes.append(dados)
 	if not _fila_ativa:
 		_consumir_notificacoes()
@@ -827,35 +876,80 @@ func _consumir_notificacoes() -> void:
 	while not _fila_notificacoes.is_empty():
 		while _dialogo_visivel():
 			await get_tree().process_frame
+			if not is_inside_tree():
+				return
 		var dados: Dictionary = _fila_notificacoes.pop_front()
 		var tutorial: bool = dados.get("tutorial", false)
+		# "Durante combate: sem banners grandes." A placa da mecânica espera
+		# que o combate acalme -- mas no máximo `ESPERA_COMBATE` segundos,
+		# senão numa arena longa a explicação nunca chegava a aparecer.
+		if tutorial:
+			var esperou := 0.0
+			while _em_combate() and esperou < ESPERA_COMBATE:
+				await get_tree().process_frame
+				if not is_inside_tree():
+					return
+				esperou += get_process_delta_time()
 		_notificacao = _criar_tutorial(dados.nome, dados.txt) if tutorial else UIProducao.toast(dados.txt, dados.icone, dados.estilo)
 		if not tutorial:
 			var texto: Label = _notificacao.get_child(0).get_child(_notificacao.get_child(0).get_child_count() - 1)
-			texto.custom_minimum_size.x = minf(texto.get_minimum_size().x, get_viewport().get_visible_rect().size.x - 168.0)
+			# 9H.16 C: era `larg - 168` (1112 px em 1280!) -- uma faixa que
+			# atravessava o ecrã todo. No canto, o toast tem de ser estreito.
+			texto.custom_minimum_size.x = minf(texto.get_minimum_size().x,
+				get_viewport().get_visible_rect().size.x * 0.30)
 			texto.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			_notificacao.modulate.a = 0.92
 		_notificacao.name = "NotificacaoAtiva"
 		_notificacao_suspensa = false
 		add_child(_notificacao)
 		await get_tree().process_frame
+		# A Porta pode substituir a cena no mesmo frame. A continuação da
+		# fila não pode usar o viewport do HUD que acabou de sair da árvore.
+		if not is_inside_tree() or not is_instance_valid(_notificacao):
+			return
 		_notificacao.reset_size()
 		_posicionar_notificacao()
 		_notificacao_tween = _notificacao.create_tween()
 		_notificacao_tween.tween_interval(TUTORIAL_SEGUNDOS - 0.6 if tutorial else 1.8)
 		_notificacao_tween.tween_property(_notificacao, "modulate:a", 0.0, 0.6)
 		await _notificacao_tween.finished
+		if not is_inside_tree() or not is_instance_valid(_notificacao):
+			return
 		_notificacao.queue_free()
 		_notificacao = null
 		await get_tree().process_frame
+		if not is_inside_tree():
+			return
 	_fila_ativa = false
 
 
+## 9H.16 C -- a placa vivia CENTRADA a meio do ecrã (`(larg - size.x) * 0.5`
+## a y >= 160): em 1280x720 isso é exactamente por cima da Koliani, dos
+## inimigos e das plataformas onde se aterra. Passa a encostar ao canto
+## SUPERIOR-ESQUERDO, debaixo do cabeçalho do nível, e nunca entra na banda
+## central da acção (`FRACAO_ACAO` da largura, ao centro).
+const MARGEM_SEGURA := 24.0
+## Metade da banda central que a notificação não pode invadir (fracção da
+## largura do ecrã). 0.34 => os 34% do meio ficam sempre livres.
+const FRACAO_ACAO := 0.34
+
+
 func _posicionar_notificacao() -> void:
-	var larg := get_viewport().get_visible_rect().size.x
-	var topo := 160.0
+	if not is_inside_tree() or not is_instance_valid(_notificacao):
+		return
+	var ecra := get_viewport().get_visible_rect().size
+	var topo := MARGEM_SEGURA
 	if _cab_nivel:
-		topo = maxf(topo, _cab_nivel.position.y + _cab_nivel.size.y + 12.0)
-	_notificacao.position = Vector2(roundf((larg - _notificacao.size.x) * 0.5), topo)
+		topo = maxf(topo, _cab_nivel.position.y + _cab_nivel.size.y + 10.0)
+	# Nunca tapar o HUD de baixo (barras/equipamento) nem sair do ecrã.
+	topo = minf(topo, maxf(MARGEM_SEGURA, ecra.y - _notificacao.size.y - 200.0))
+	var esquerda := MARGEM_SEGURA
+	# Se ainda assim a caixa fosse larga ao ponto de entrar no meio do ecrã,
+	# encolhe-se a caixa -- não se empurra para o centro.
+	var limite := ecra.x * (0.5 - FRACAO_ACAO * 0.5) - MARGEM_SEGURA
+	if _notificacao.size.x > limite and limite > 160.0:
+		_notificacao.size.x = limite
+	_notificacao.position = Vector2(roundf(esquerda), roundf(topo))
 
 
 func _process(_dt: float) -> void:
@@ -892,3 +986,29 @@ func _arrumar_para_toque() -> void:
 		if n is Control:
 			n.offset_top -= DESVIO_TOQUE
 			n.offset_bottom -= DESVIO_TOQUE
+
+
+## Marcas a 1/3 e 2/3 da barra: cada segmento e' um uso do Especial (custo 33 de 99).
+func _marcar_custo_especial() -> void:
+	if _barra_energia == null:
+		return
+	for f in [1.0 / 3.0, 2.0 / 3.0]:
+		var m := ColorRect.new()
+		m.color = Color(1.0, 0.9, 1.0, 0.75)
+		m.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		m.anchor_left = f
+		m.anchor_right = f
+		m.anchor_top = 0.0
+		m.anchor_bottom = 1.0
+		m.offset_left = -1.0
+		m.offset_right = 1.0
+		_barra_energia.add_child(m)
+
+
+## Sem Energia para o Especial: a barra pisca em vermelho.
+func _piscar_energia() -> void:
+	if _barra_energia == null:
+		return
+	var t := create_tween()
+	_barra_energia.modulate = Color(1.0, 0.35, 0.35)
+	t.tween_property(_barra_energia, "modulate", Color(1, 1, 1), 0.35)

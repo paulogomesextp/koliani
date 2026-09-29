@@ -54,6 +54,8 @@ raio_onda = 340.0
 
 [node name="Koliani" parent="." instance=ExtResource("1_kol")]
 position = Vector2(360, 616)
+usar_prototipo_premium = true
+usar_golden_set = true
 
 [node name="CheckInicio" type="Area2D" parent="."]
 position = Vector2(430, 632)

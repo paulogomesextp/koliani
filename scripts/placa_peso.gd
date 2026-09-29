@@ -79,7 +79,8 @@ func _mudar(v: bool) -> void:
 	# dizer "falhou a compilar" em vez de medir a placa.
 	var som := get_node_or_null("/root/Som")
 	if som and som.has_method("toca"):
-		som.call("toca", "selo", -12.0, 1.15 if v else 0.85)
+		# ver `alavanca.gd`: `selo` e' o checkpoint, nao um interruptor
+		som.call("toca", "mecanismo", -13.0, 1.22 if v else 0.92)
 	_pintar()
 	mudou.emit(ligada)
 

@@ -91,4 +91,4 @@ func _physics_process(dt: float) -> void:
 	_cd = intervalo
 	for c in _dentro:
 		if c.has_method("receber_dano"):
-			c.receber_dano(dano, 0.0)
+			c.receber_dano(dano, 0.0, OrigemDano.HAZARD_ATAQUE)

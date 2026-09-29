@@ -45,7 +45,7 @@ func acender() -> void:
 	if acesa:
 		return
 	acesa = true
-	Som.toca("selo", -16.0, 1.6)
+	Som.toca("mecanismo", -19.0, 1.7)
 	_aplicar(false)
 
 
@@ -54,7 +54,10 @@ func apagar() -> void:
 		return
 	acesa = false
 	_contacto = 0.0
-	Som.toca("onda", -18.0, 0.8)
+	# `onda` esta' em nove callsites de chefe -- apagar uma vela nao e' uma
+	# onda de choque. Fica o mesmo `mecanismo`, grave: o mesmo gesto ao
+	# contrario.
+	Som.toca("mecanismo", -21.0, 0.72)
 	_aplicar(false)
 
 

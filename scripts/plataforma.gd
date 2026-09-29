@@ -39,7 +39,20 @@ const SUPERFICIE := 8.0
 
 const BIOMAS := [
 	"floresta", "prisao", "torres", "catacumbas", "cidade", "castelo",
+	# Regiao II -- Desfiladeiro dos Ventos. Tem material proprio
+	# (`tools/gerar_terreno_prancha.py`, da prancha aprovada) porque o
+	# `prisao` era tijolo de cela e o `torres` ja' e' da Regiao III.
+	"desfiladeiro",
+	# Regiao III -- Torre dos Ecos (N11-N15), tambem da prancha aprovada.
+	# Nao e' um bioma da `Atmosfera`: entra por `MATERIAL_POR_PACK`.
+	"torre_ecos",
 ]
+
+## Material de terreno escolhido pelo `fundo_pack` da `Atmosfera`, por cima
+## do bioma. A Regiao III corre com bioma `torres`, que mais 18 niveis de
+## outras regioes partilham; o material da prancha da Torre dos Ecos so' pode
+## entrar nos cinco niveis dela, e sao esses que usam o pack `torre_ecos`.
+const MATERIAL_POR_PACK := {"torre_ecos": "torre_ecos"}
 
 @export var tamanho := Vector2(200.0, 40.0) : set = _set_tamanho
 ## Altura do visual (0 = igual a colisao). Maior => "slab" de chao grosso
@@ -65,7 +78,10 @@ const MAX_PENDURA := 3
 ## que se ve' o fundo por baixo -- e' onde a pendura mais faz falta. Mas de um
 ## degrau fino nao pende uma corrente de 12 elos: so' pecas curtas, uma de
 ## cada vez.
-const PENDURA_ALT_MIN := 16.0
+## 9H.17 H: 16 px deixava pendurar coisas de uma tabua sem corpo nenhum --
+## a peca era maior do que o bloco de onde saia. O passe Hybrid do L1 ja'
+## usava 34 (`l1_hybrid_9h12e.decorar`); a Regiao I passa a usar o mesmo.
+const PENDURA_ALT_MIN := 34.0
 ## Acima disto a plataforma tem corpo a serio (slab de chao, lasca de rocha).
 const PENDURA_ALT_GROSSA := 34.0
 ## Altura maxima (px) de um prop pendurado num degrau fino.
@@ -100,6 +116,16 @@ func _nome_bioma() -> String:
 	if atm and "bioma" in atm and BIOMAS.has(atm.bioma):
 		return atm.bioma
 	return "floresta"
+
+
+## Material das TEXTURAS do terreno: o bioma, salvo quando o `fundo_pack`
+## pede um material proprio (`MATERIAL_POR_PACK`). Os props continuam a vir
+## do catalogo do bioma.
+func _nome_material(bioma: String) -> String:
+	var atm := get_tree().get_first_node_in_group("atmosfera") if is_inside_tree() else null
+	if atm and "fundo_pack" in atm and MATERIAL_POR_PACK.has(atm.fundo_pack):
+		return MATERIAL_POR_PACK[atm.fundo_pack]
+	return bioma
 
 
 static func _tex(bioma: String, peca: String) -> Texture2D:
@@ -168,6 +194,7 @@ func _aplicar() -> void:
 		f.queue_free()
 
 	var bioma := _nome_bioma()
+	var material := _nome_material(bioma)
 	var largura: float = tamanho.x
 	var alt: float = maxf(tamanho.y, altura_visual)
 	var x0 := -largura * 0.5
@@ -179,12 +206,30 @@ func _aplicar() -> void:
 	var dy := float(rng.randi_range(0, 191))
 
 	var kit := Kit.alvo(self)
-	var hybrid_l1: bool = kit != null and int(kit.get("perfil")) == 1
+	# 9H.17 H: o corpo HD e os remates organicos passam a servir tambem o L2.
+	# Era o L2 que o Game Master via com "uma laje de rocha por cima e
+	# vegetacao a flutuar por baixo": o bloco do kit 9C e' um rectangulo
+	# chapado, e a capa de 56 px em cima de uma colisao de 18 le'-se como uma
+	# laje pousada. O corpo `terrain_hd` tem silhueta, e o `rematar_bordas`
+	# quebra-lhe as pontas com raizes.
+	var hybrid_l1: bool = kit != null and HybridL1.serve(int(kit.get("perfil")))
 	vis.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR if hybrid_l1 else CanvasItem.TEXTURE_FILTER_PARENT_NODE
-	var corpo: Texture2D = Kit.terreno(Kit.HD_CORPO, "terreno/terreno_corpo.png") if kit else _tex(bioma, "corpo")
+	var corpo: Texture2D = Kit.terreno(Kit.HD_CORPO, "terreno/terreno_corpo.png") if kit else _tex(material, "corpo")
 	if hybrid_l1:
 		corpo = HybridL1.tex("terrain_hd/corpo")
 	if corpo == null:                        # terreno por gerar -> nao pinta nada
+		return
+
+	# 9H.17 I3 -- CORPO ORGANICO. Nos perfis Hybrid o bloco deixa de ser um
+	# mosaico de `corpo.png` com uma capa por cima: passa a ser a peca
+	# `terrain_hd/plataforma.png`, que ja' estava produzida e nunca tinha
+	# sido usada, em tres fatias (ponta / meio repetido / ponta espelhada).
+	# Traz silhueta irregular, vegetacao EM CIMA e barriga de raiz por baixo
+	# -- as tres coisas que o review pedia. As camadas antigas (miolo,
+	# sombra, valor, lados, franja, capa, rim) nao entram: eram elas que
+	# faziam o rectangulo.
+	if hybrid_l1 and HybridL1.corpo_organico(vis, largura, y0, alt):
+		HybridL1.decorar(vis, largura, y0, alt, rng)
 		return
 
 	# 1. miolo
@@ -218,7 +263,7 @@ func _aplicar() -> void:
 
 	# 3. cortes laterais
 	# (o lado do kit tem o contorno na coluna 10: fica 2 px para fora da colisao)
-	var lado: Texture2D = Kit.terreno(Kit.HD_LADO, "terreno/terreno_lado.png") if kit else _tex(bioma, "lado")
+	var lado: Texture2D = Kit.terreno(Kit.HD_LADO, "terreno/terreno_lado.png") if kit else _tex(material, "lado")
 	if hybrid_l1:
 		lado = HybridL1.tex("terrain_hd/lado")
 	if lado:
@@ -230,18 +275,22 @@ func _aplicar() -> void:
 		vis.add_child(ld)
 
 	# 4. franja de baixo -- so' quando a plataforma tem corpo que valha a pena
-	var base: Texture2D = Kit.terreno(Kit.HD_BASE, "terreno/terreno_base.png") if kit else _tex(bioma, "base")
+	var base: Texture2D = Kit.terreno(Kit.HD_BASE, "terreno/terreno_base.png") if kit else _tex(material, "base")
 	if hybrid_l1:
 		base = HybridL1.tex("terrain_hd/base")
 	if base and alt >= 26.0:
 		# a franja do kit comeca 12 px acima do fim do bloco (sao as pedras
 		# arredondadas de baixo, nao um remate solto)
 		var yb := y0 + alt - (12.0 if kit else 0.0)
-		var bh: float = Kit.ALTURA_BASE if kit else 24.0
+		# fora do kit, a altura e' a da propria textura: era 24 fixo, e a
+		# franja da Regiao II tirada da prancha (`tools/gerar_terreno_prancha.py`)
+		# e' a barriga de pedra a escorrer, mais alta. Os outros materiais
+		# continuam com 24 px, portanto nao mudam.
+		var bh: float = Kit.ALTURA_BASE if kit else float(base.get_height())
 		vis.add_child(_mosaico(base, Vector2(x0, yb), Vector2(largura, bh), Vector2(dx, 0)))
 
 	# 5. a capa, por cima de tudo (e a sobressair para cima do plano de pouso)
-	var topo: Texture2D = Kit.topo(rng) if kit else _tex(bioma, "topo")
+	var topo: Texture2D = Kit.topo(rng) if kit else _tex(material, "topo")
 	if hybrid_l1:
 		topo = HybridL1.tex("terrain_hd/topo")
 	if topo:
@@ -270,8 +319,18 @@ func _aplicar() -> void:
 			HybridL1.decorar(vis, largura, y0, alt, rng)
 			return
 		Kit.decorar(vis, largura, y0, rng, Kit.perfil_de(kit))
+		# 9H.17 H -- o LABIO VISIVEL, e nao o fundo da colisao. A capa desce
+		# ate' `y0 - SUPERFICIE + ALTURA_TOPO` e a franja ate' `y0 + alt +
+		# ALTURA_BASE - 12`: num degrau de 18 px de colisao isso sao mais 30
+		# px de pedra desenhada. Pendurar pelo fundo da colisao punha a peca
+		# a nascer 30 px acima do sitio onde a pedra acaba -- e o que se via
+		# era a ponta solta, a flutuar debaixo de uma laje.
+		var labio: float = y0 + alt
+		if alt >= 26.0:
+			labio = maxf(labio, y0 + alt + Kit.ALTURA_BASE - 12.0)
+		labio = maxf(labio, y0 - SUPERFICIE + Kit.ALTURA_TOPO)
 		if alt >= PENDURA_ALT_MIN:
-			Kit.pendurar(vis, largura, y0 + alt, alt >= PENDURA_ALT_GROSSA, rng)
+			Kit.pendurar(vis, largura, labio, alt >= PENDURA_ALT_GROSSA, rng)
 		return
 	_decorar(vis, bioma, largura, y0, rng)
 	if alt >= PENDURA_ALT_MIN:
@@ -282,9 +341,24 @@ func _aplicar() -> void:
 static func _props_de(bioma: String, onde: String) -> Array:
 	var r: Array = []
 	for p in _props(bioma):
-		if p is Dictionary and p.get("onde", "") == onde:
+		if p is Dictionary and p.get("onde", "") == onde and _vale_no_nivel(p):
 			r.append(p)
 	return r
+
+
+## Anti-repeticao (Regiao II): um prop com `niveis` so' aparece nesses niveis
+## (numeros 1-based). Sem o campo vale em todos.
+static func _vale_no_nivel(p: Dictionary) -> bool:
+	var ns: Variant = p.get("niveis", null)
+	if not (ns is Array):
+		return true
+	# Por caminho (e nao pelo identificador global) para compilar tambem em
+	# `--script`, onde os autoloads nao existem.
+	var arv := Engine.get_main_loop() as SceneTree
+	var estado: Node = arv.root.get_node_or_null("EstadoJogo") if arv else null
+	if estado == null:
+		return true
+	return (ns as Array).has(float(int(estado.get("indice_nivel")) + 1))   # o JSON traz floats
 
 
 ## Catalogo de props da regiao (`tools/gerar_deco.py`), lido uma vez.
@@ -341,6 +415,87 @@ func _decorar(vis: Node, bioma: String, largura: float, y0: float, rng: RandomNu
 			s.position.x += tex.get_width() * e
 		s.z_index = -1                 # atras da Koliani e dos inimigos
 		vis.add_child(s)
+		_acender(s, String(p["nome"]), tex, e)
+
+
+## PROPS QUE DAO LUZ -- nome -> (cor, forca, raio em px).
+##
+## A prancha aprovada da Regiao III (`concept_environment.png`) e' azul-noite
+## POLVILHADA DE LUZ QUENTE: lanternas, braseiros, candelabros e vitrais
+## acesos, um a cada poucos metros. O jogo tinha os props mas nenhum deles
+## dava luz, e o resultado media-se a olho: metade do ecra' era massa quase
+## preta e nao se distinguia plataforma de fundo. Isto nao clareia a regiao
+## -- acende os pontos que a referencia ja' tinha acesos.
+const PROPS_COM_LUZ := {
+	"braseiro": [Color(1.0, 0.70, 0.36), 0.95, 150.0],
+	"candelabro": [Color(1.0, 0.82, 0.52), 0.80, 140.0],
+	"lanterna_eco": [Color(0.62, 0.80, 1.0), 0.75, 120.0],
+	"vitral_alto": [Color(0.50, 0.68, 1.0), 0.62, 190.0],
+	"vitral_partido": [Color(0.50, 0.68, 1.0), 0.45, 150.0],
+	"pedra_memoria": [Color(0.66, 0.84, 1.0), 0.55, 100.0],
+	"velas": [Color(1.0, 0.86, 0.58), 0.62, 110.0],
+	"tocha": [Color(1.0, 0.72, 0.38), 0.90, 150.0],
+	"lampiao_t": [Color(1.0, 0.84, 0.54), 0.70, 130.0],
+}
+
+## Quantas luzes uma unica plataforma pode acender (ver `_acender`).
+const MAX_LUZES_PLATAFORMA := 2
+var _luzes_nesta := 0
+
+## Um degrade radial branco, feito UMA vez e partilhado por todas as luzes.
+## Uma `GradientTexture2D` por prop seria centenas de texturas iguais numa
+## jornada de dezenas de milhares de px.
+static var _tex_luz_partilhada: GradientTexture2D = null
+
+static func _tex_luz() -> GradientTexture2D:
+	if _tex_luz_partilhada != null:
+		return _tex_luz_partilhada
+	var g := Gradient.new()
+	g.offsets = PackedFloat32Array([0.0, 1.0])
+	g.colors = PackedColorArray([Color(1, 1, 1, 1), Color(1, 1, 1, 0)])
+	var t := GradientTexture2D.new()
+	t.gradient = g
+	t.width = 180
+	t.height = 180
+	t.fill = GradientTexture2D.FILL_RADIAL
+	t.fill_from = Vector2(0.5, 0.5)
+	t.fill_to = Vector2(1.0, 0.5)
+	_tex_luz_partilhada = t
+	return t
+
+
+## Acende o prop, se for dos que dao luz. Nao sorteia nada: na referencia
+## TODOS os braseiros estao acesos, e um sorteio aqui mexia na decoracao
+## desta plataforma sem necessidade nenhuma.
+func _acender(sp: Sprite2D, nome: String, tex: Texture2D, esc: float) -> void:
+	if not PROPS_COM_LUZ.has(nome):
+		return
+	# TECTO POR PLATAFORMA, como grade de seguranca. Uma plataforma de chao
+	# vai a 2000+ px e leva ate' `MAX_DECO` (9) props: sem tecto, uma so'
+	# laje podia acender nove luzes. Duas chegam para a leitura -- o que se
+	# quer sao pontos quentes espalhados, nao uma montra.
+	#
+	# CONTRIBUICAO MEDIDA (`tools/contar_luzes.gd`), para nao se andar a
+	# adivinhar: com estas luzes os niveis da regiao tem 78/110/107
+	# `PointLight2D`; sem elas, 63/95/84. Ou seja 15-23 por nivel, ~20% do
+	# total -- o grosso vem dos checkpoints, das alavancas e das luzes
+	# proprias da jornada. E a suite completa, cronometrada sozinha, leva
+	# 14 s com isto ligado. O tecto quase nao mexe na contagem; esta' aqui
+	# para o caso de uma laje muito larga, nao porque isto pesasse.
+	if _luzes_nesta >= MAX_LUZES_PLATAFORMA:
+		return
+	_luzes_nesta += 1
+	var cfg: Array = PROPS_COM_LUZ[nome]
+	var luz := PointLight2D.new()
+	luz.texture = _tex_luz()
+	luz.color = cfg[0]
+	luz.energy = float(cfg[1])
+	luz.texture_scale = float(cfg[2]) / 90.0
+	luz.blend_mode = Light2D.BLEND_MODE_ADD
+	# o prop e' desenhado com `centered = false`, portanto o centro dele
+	# esta' a meia largura/altura do canto
+	luz.position = Vector2(tex.get_width() * 0.5, tex.get_height() * 0.45)
+	sp.add_child(luz)
 
 
 ## Pendura props por baixo da plataforma (`y_base` = o fundo do visual).
@@ -402,3 +557,5 @@ func _pendurar(vis: Node, bioma: String, largura: float, y_base: float,
 			s.position.x += tex.get_width() * e
 		s.z_index = -2                 # ATRAS do terreno e dos actores
 		vis.add_child(s)
+		# o candelabro e a lanterna tambem pendem, e na prancha estao acesos
+		_acender(s, String(p["nome"]), tex, e)

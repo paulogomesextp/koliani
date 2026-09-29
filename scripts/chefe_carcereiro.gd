@@ -1,9 +1,15 @@
 class_name ChefeCarcereiro
 extends ChefeBase
-## Chefe do mundo 2 -- o Carcereiro. Pesado e lento: aproxima-se da
-## Koliani, e quando a tem ao alcance ergue-se (telegrafo), salta e cai
-## com um baque que manda uma **onda de choque** rasteira -- só magoa quem
-## estiver no chão dentro do raio. Depois recupera, vulnerável.
+## Região II / N06 -- o GOLEM DAS FALÉSIAS (`guard.golem_falesias`).
+## Arquétipo "Golem Aéreo" da prancha aprovada da região. Pesado e lento:
+## aproxima-se da Koliani, e quando a tem ao alcance junta-se no ar
+## (telégrafo), salta e cai com um baque que manda uma **onda de choque**
+## rasteira -- só magoa quem estiver no chão dentro do raio. Depois
+## recupera, vulnerável.
+##
+## A classe ainda se chama `ChefeCarcereiro` por causa das cenas e dos
+## uids que lhe apontam; a identidade do Carcereiro (a CHAVE por cabeça,
+## as correntes-chicote) saiu toda -- ver `tools/gerar_chefes_anim.py`.
 
 enum Fase { APROXIMA, TELEGRAFO, SALTO, IMPACTO, RECUPERA }
 
@@ -17,6 +23,8 @@ enum Fase { APROXIMA, TELEGRAFO, SALTO, IMPACTO, RECUPERA }
 @export var dur_recupera := 0.5
 ## Hipótese de encadear um 2.º baque em vez de recuperar (combo pesado).
 @export var hip_duplo_baque := 0.45
+## Vida base minima. O Golem e' o GUARDIAO do N6 (nao o boss regional): a cena baixa isto.
+@export var vida_minima := 540
 
 var _fase: Fase = Fase.APROXIMA
 var _t := 0.0
@@ -26,7 +34,7 @@ var _baques_seguidos := 0
 
 func _ready() -> void:
 	super._ready()
-	vida = maxi(vida, 540)
+	vida = maxi(vida, vida_minima)
 
 
 func _physics_process(dt: float) -> void:
@@ -94,7 +102,7 @@ func _cair(dt: float) -> void:
 
 
 func _onda() -> void:
-	Som.toca("esmagar", -6.0)
+	_som_impacto("esmagar", -6.0)
 	var k := _obter_koliani()
 	if k and absf((k.global_position - global_position).x) <= raio_onda \
 			and k.is_on_floor():
@@ -114,6 +122,7 @@ func _onda() -> void:
 	p.initial_velocity_max = 380.0
 	p.scale_amount_min = 2.0
 	p.scale_amount_max = 4.0
-	p.color = Color(0.55, 0.7, 0.95)
+	# pó e lasca de pedra do desfiladeiro, não faísca azul de masmorra
+	p.color = Color(0.58, 0.56, 0.72)
 	add_sibling(p)
 	p.get_tree().create_timer(1.0).timeout.connect(p.queue_free)

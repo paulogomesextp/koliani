@@ -34,6 +34,14 @@ var _chama: CPUParticles2D
 var _brasas: CPUParticles2D
 var _nucleo: Polygon2D
 var _luz: PointLight2D
+## Moldura da Loja com arte (Rootbound, Ossário, Gaiola de Aurora): visual
+## alternativo; {} = fogueira original.
+var _rb: Dictionary = {}
+var _rb_brilho: Sprite2D
+var _rb_esporos: CPUParticles2D
+var _rb_fagulhas: CPUParticles2D
+var _nucleo_k := Vector2.ONE
+var _cor_lenha_acesa := COR_LENHA_ACESA
 ## 9G: brilho de "pronta a usar" enquanto a fogueira está apagada.
 var _pronta9g: AnimatedSprite2D
 const Vfx9G := preload("res://scripts/vfx_regiao1.gd")
@@ -179,6 +187,10 @@ func _montar_visual() -> void:
 		Color(1.0, 0.98, 0.72, 0.95), Color(1.0, 0.78, 0.26, 0.9),
 		Color(0.92, 0.36, 0.1, 0.55), Color(0.35, 0.1, 0.05, 0.0),
 	])
+	# cosmético da Loja: a mesma rampa, na cor do item equipado (placeholder)
+	var cc: Color = CosmeticosVisuais.cor_chama_checkpoint(Color.BLACK)
+	if cc != Color.BLACK:
+		rampa.colors = PackedColorArray([Color(cc, 0.95), Color(cc, 0.9), Color(cc.darkened(0.4), 0.55), Color(cc.darkened(0.8), 0.0)])
 	_chama.color_ramp = rampa
 	_base.add_child(_chama)
 
@@ -232,7 +244,105 @@ func _montar_visual() -> void:
 	_luz.scale = Vector2(0.9, 0.9)
 	_base.add_child(_luz)
 
+	_montar_rootbound()
+
 	# O toast traduzido do HUD confirma a ativação; sem rótulo world-space redundante.
+
+
+## Molduras da Loja com arte (Rootbound, Ossário, Gaiola de Aurora -- os
+## nós mantêm o nome "Rootbound*" da primeira): peças à volta da base, brilho
+## FRACO enquanto apagada (e partículas lentas a subir), e ao acender uma
+## chama maior com as cores da moldura. Só aparência: a ativação, o respawn e
+## a colisão não passam por aqui.
+func _montar_rootbound() -> void:
+	_rb = CosmeticosVisuais.checkpoint_visual()
+	if _rb.is_empty():
+		return
+	var base := Sprite2D.new()
+	base.name = "RootboundBase"
+	base.texture = _rb["base"]
+	base.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	base.position = _rb["pos_base"]
+	_base.add_child(base)
+	var cog := Sprite2D.new()
+	cog.name = "RootboundCogumelos"
+	cog.texture = _rb["cogumelos"]
+	cog.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	cog.position = _rb["pos_frente"]
+	_base.add_child(cog)
+	# apagada: halo fúngico fraco a pulsar (valor baixo, forma pequena)
+	_rb_brilho = Sprite2D.new()
+	_rb_brilho.name = "RootboundBrilho"
+	_rb_brilho.texture = _rb["brilho"]
+	_rb_brilho.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	_rb_brilho.position = _rb["pos_brilho"]
+	_rb_brilho.modulate.a = 0.35
+	_base.add_child(_rb_brilho)
+	var pulso := _rb_brilho.create_tween().set_loops()
+	pulso.tween_property(_rb_brilho, "modulate:a", 0.75, 1.3)
+	pulso.tween_property(_rb_brilho, "modulate:a", 0.25, 1.3)
+	_rb_esporos = _particulas_rb(3, 2.8, _rb["ocioso"], 1.5, Vector2(0.0, -6.0), 8.0)
+	_rb_esporos.position = Vector2(0.0, 8.0)
+	_rb_esporos.emitting = true
+	# lenha escura e sem o halo púrpura de "pronta" do kit 9G (que competia com
+	# as peças da moldura); só com moldura de arte -- o default não passa por aqui
+	for acha in _lenha.get_children():
+		if acha is Polygon2D:
+			(acha as Polygon2D).color = _rb["lenha"]
+	_cor_lenha_acesa = _rb["lenha_acesa"]
+	if _pronta9g:
+		_pronta9g.queue_free()
+		_pronta9g = null
+	# acesa: a mesma chama, maior e bile; fagulhas púrpura discretas
+	_brasas.color_ramp.colors = _rb["brasas"]
+	_chama.color_ramp.colors = _rb["chama"]
+	# a luz da fogueira (energia > 1) sobre-iluminava as partículas e empurrava o
+	# bile para amarelo: sem sombreamento a chama mantém a cor da rampa
+	var sem_luz := CanvasItemMaterial.new()
+	sem_luz.light_mode = CanvasItemMaterial.LIGHT_MODE_UNSHADED
+	_chama.material = sem_luz
+	_brasas.material = sem_luz
+	_nucleo.material = sem_luz
+	_nucleo.color = _rb["nucleo"]
+	_luz.color = _rb["luz"]
+	_rb_fagulhas = _particulas_rb(5, 1.2, Color(_rb["fagulhas"], 0.9), 1.6, Vector2(0.0, -34.0), 20.0)
+	_rb_fagulhas.position = Vector2(0.0, 2.0)
+	_rb_fagulhas.emitting = false
+
+
+func _particulas_rb(qtd: int, vida: float, cor: Color, tam: float, grav: Vector2, vel: float) -> CPUParticles2D:
+	var p := CPUParticles2D.new()
+	p.amount = qtd
+	p.lifetime = vida
+	p.local_coords = false
+	p.direction = Vector2(0, -1)
+	p.spread = 40.0
+	p.gravity = grav
+	p.initial_velocity_min = vel * 0.4
+	p.initial_velocity_max = vel
+	p.scale_amount_min = tam
+	p.scale_amount_max = tam * 1.4
+	p.color = cor
+	p.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	_base.add_child(p)
+	return p
+
+
+## Ao acender: mais alta e mais larga que a original (o estado lê-se por
+## forma e intensidade, não só por cor), esporos fora, fagulhas dentro.
+func _rootbound_acender() -> void:
+	if _rb.is_empty():
+		return
+	if _rb_brilho:
+		_rb_brilho.visible = false
+	if _rb_esporos:
+		_rb_esporos.emitting = false
+	if _rb_fagulhas:
+		_rb_fagulhas.emitting = true
+	_chama.amount = 34
+	_chama.scale_amount_max = 8.0
+	_chama.initial_velocity_max = 80.0
+	_nucleo_k = Vector2(1.35, 1.5)
 
 
 ## A fogueira tem de assentar no CHÃO, não ficar a pairar: o nó do
@@ -286,7 +396,7 @@ func _process(dt: float) -> void:
 	if _luz:
 		_luz.energy = 1.25 + bruxuleio
 	if _nucleo:
-		_nucleo.scale = Vector2(1.0 + bruxuleio * 0.5, 1.0 + bruxuleio * 0.9)
+		_nucleo.scale = Vector2(1.0 + bruxuleio * 0.5, 1.0 + bruxuleio * 0.9) * _nucleo_k
 		_nucleo.modulate.a = 0.8 + bruxuleio
 
 
@@ -305,6 +415,7 @@ func _ao_entrar(corpo: Node) -> void:
 
 func _ativar(instantaneo: bool) -> void:
 	_ativo = true
+	_rootbound_acender()
 	# 9G: o mesmo brilho de "interagir" da prancha 07 -- apagado, a fogueira
 	# pisca baixinho a dizer que dá para usar; ao acender, dá um estalo. Nada
 	# disto mexe no checkpoint em si (já foi registado no EstadoJogo).
@@ -325,9 +436,9 @@ func _ativar(instantaneo: bool) -> void:
 		for acha in _lenha.get_children():
 			if acha is Polygon2D:
 				if instantaneo:
-					(acha as Polygon2D).color = COR_LENHA_ACESA
+					(acha as Polygon2D).color = _cor_lenha_acesa
 				else:
-					create_tween().tween_property(acha, "color", COR_LENHA_ACESA, 0.3)
+					create_tween().tween_property(acha, "color", _cor_lenha_acesa, 0.3)
 	if instantaneo:
 		if _luz:
 			_luz.energy = 1.25

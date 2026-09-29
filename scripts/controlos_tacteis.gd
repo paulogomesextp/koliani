@@ -39,6 +39,7 @@ class_name ControlosTacteis
 const BOTOES := [
 	{"accao": "defender", "r": 40.0, "dx": -172.0, "dy": -228.0, "icone": "escudo"},
 	{"accao": "atacar", "r": 44.0, "dx": -262.0, "dy": -110.0, "icone": "espada"},
+	{"accao": "especial", "r": 46.0, "dx": -330.0, "dy": -226.0, "icone": "projetil"},
 	{"accao": "lancar", "r": 62.0, "dx": -40.0, "dy": -170.0, "icone": "projetil"},
 	{"accao": "dash", "r": 62.0, "dx": -150.0, "dy": -46.0, "icone": "dash"},
 	{"accao": "saltar", "r": 70.0, "dx": 0.0, "dy": 0.0, "icone": "salto"},

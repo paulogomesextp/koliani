@@ -66,19 +66,70 @@ func _ready() -> void:
 		_grelha.get_parent().move_child(_layout, _voltar.get_index())
 
 	_voltar.pressed.connect(_fechar)
-	# Execution 9F: kit de produção -- painel de ouro, botões da prancha 09,
-	# cursores na calha de energia; o idioma ativo fica "premido" (ouro).
-	UIProducao.vestir_ecra(self)
-	UIProducao.titulo(_titulo, 30)
-	UIProducao.seccao(_lbl_som)
-	UIProducao.seccao(_lbl_idioma)
+	# Mesma linguagem do menu principal e da Pausa (kit 9H: carmesim sobre
+	# carvão); o idioma ativo fica "premido" (carmesim).
+	Frontend9H.vestir(self)
+	($Painel as PanelContainer).add_theme_stylebox_override(
+		"panel", Frontend9H.painel_liso())
+	Frontend9H.cabecalho(_titulo, 32)
+	Frontend9H.capitular(_lbl_som, 15, Frontend9H.CARMESIM_CLARO)
+	Frontend9H.capitular(_lbl_idioma, 15, Frontend9H.CARMESIM_CLARO)
+	_lbl_som.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	_lbl_idioma.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	Frontend9H.corpo(_lbl_musica, 17)
+	Frontend9H.corpo(_lbl_efeitos, 17)
+	for s: String in ["Sep1", "Sep2"]:
+		var velho: Node = $Painel/Coluna.get_node(s)
+		var sep := Frontend9H.separador()
+		sep.custom_minimum_size = Vector2(0, 12)
+		sep.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		$Painel/Coluna.add_child(sep)
+		$Painel/Coluna.move_child(sep, velho.get_index())
+		velho.queue_free()
+	# botões pequenos: caixa lisa carmesim (a placa em losango parte-se em
+	# botões estreitos -- ver `Frontend9H.botao_placa`)
+	Frontend9H.botao_placa(_voltar, 22)
+	if _layout:
+		Frontend9H.botao_placa(_layout, 17)
 	for b: Button in _botoes_idioma.values():
 		b.toggle_mode = true
-		b.add_theme_font_size_override("font_size", 15)
+		Frontend9H.botao_placa(b, 16)
 	Textos.idioma_mudou.connect(func(_l: String) -> void: _traduzir())
 	_traduzir()
 	_preparar_hover_animado()
+	# o foco por teclado/comando não pode fugir para o menu que está atrás
+	get_viewport().gui_focus_changed.connect(_foco_mudou)
+	_ligar_foco()
 	_voltar.grab_focus()
+
+
+## Ordem vertical do foco: música, efeitos, grelha de idiomas, (layout), BACK.
+func _ligar_foco() -> void:
+	var idiomas: Array[Control] = []
+	for c in _grelha.get_children():
+		idiomas.append(c as Control)
+	var cols := _grelha.columns
+	var fim: Control = _layout if _layout else _voltar
+	_sld_musica.focus_neighbor_top = _sld_musica.get_path_to(_voltar)
+	_sld_musica.focus_neighbor_bottom = _sld_musica.get_path_to(_sld_efeitos)
+	_sld_efeitos.focus_neighbor_top = _sld_efeitos.get_path_to(_sld_musica)
+	_sld_efeitos.focus_neighbor_bottom = _sld_efeitos.get_path_to(idiomas[0])
+	for i in idiomas.size():
+		var b := idiomas[i]
+		b.focus_neighbor_top = b.get_path_to(_sld_efeitos if i < cols else idiomas[i - cols])
+		var abaixo: Control = fim if i + cols >= idiomas.size() else idiomas[i + cols]
+		b.focus_neighbor_bottom = b.get_path_to(abaixo)
+	if _layout:
+		_layout.focus_neighbor_top = _layout.get_path_to(idiomas[idiomas.size() - 1])
+		_layout.focus_neighbor_bottom = _layout.get_path_to(_voltar)
+	_voltar.focus_neighbor_top = _voltar.get_path_to(
+		_layout if _layout else idiomas[idiomas.size() - 1])
+	_voltar.focus_neighbor_bottom = _voltar.get_path_to(_sld_musica)
+
+
+func _foco_mudou(no: Control) -> void:
+	if is_inside_tree() and not is_ancestor_of(no) and not is_queued_for_deletion():
+		_voltar.grab_focus()
 
 
 ## Resposta de escala ao passar/focar o rato -- consistente com os outros ecrãs.
@@ -130,4 +181,5 @@ func _escolher_idioma(loc: String) -> void:
 
 
 func _fechar() -> void:
+	Som.toca("menu_painel", -12.0, 0.92)
 	queue_free()

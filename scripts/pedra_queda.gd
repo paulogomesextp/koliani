@@ -35,10 +35,12 @@ var _corpo: Polygon2D
 var _area: Area2D
 var _poeira: CPUParticles2D
 var _koliani: Node2D
+var _som: Node
 
 
 func _ready() -> void:
 	add_to_group("pedras_queda")
+	_som = get_node_or_null("/root/Som")
 	_y0 = position.y
 	_x0 = position.x
 	_montar_visual()
@@ -111,12 +113,20 @@ func _physics_process(dt: float) -> void:
 					and k.global_position.y > global_position.y - 20.0:
 				arma = true
 			if automatico:
-				_t += dt
+				# fora do campo visual o relogio pára: nada racha nem cai la'
+				if _som and _som.call("em_vista", self):
+					_t += dt
+				else:
+					_t = 0.0
 				if _t >= periodo:
 					arma = true
 			if arma:
 				_estado = AVISO
 				_t = 0.0
+				# TELEGRAFO: a estalactite a rachar. `aviso` (0,55 s por
+				# omissao) e' o unico tempo que o jogador tem para sair de
+				# baixo, e ate' aqui so' o tremor o dizia.
+				_tocar("pedra_racha", -15.0, 1.14)
 		AVISO:
 			_t += dt
 			_shake = 2.2
@@ -142,12 +152,16 @@ func _physics_process(dt: float) -> void:
 func _ao_tocar(corpo: Node) -> void:
 	if _estado == CAI and corpo is Koliani:
 		var dir := signf(corpo.global_position.x - global_position.x)
-		corpo.receber_dano(dano, dir if dir != 0.0 else 1.0)
+		corpo.receber_dano(dano, dir if dir != 0.0 else 1.0, OrigemDano.HAZARD_ATAQUE)
 
 
 func _esfarelar() -> void:
 	_estado = MORTA
 	_t = 0.0
+	# IMPACTO. Nao ha' som na LARGADA (entre o aviso e o impacto): a pedra em
+	# queda livre nao faz barulho, e mais um evento no meio tirava peso ao
+	# unico que interessa. Dois eventos por ciclo, nao tres.
+	_tocar("pedra_parte", -12.0, 1.0)
 	_area.monitoring = false
 	if _corpo:
 		_corpo.visible = false
@@ -163,3 +177,12 @@ func _repor() -> void:
 	position = Vector2(_x0, _y0)
 	if _corpo:
 		_corpo.visible = true
+
+
+## Toca pelo CAMINHO do autoload (a classe tem de compilar em `--script`).
+## Cooldown por instancia: `automatico = true` repete de `periodo` em
+## `periodo` e duas pedras vizinhas devem poder soar juntas.
+func _tocar(nome: String, db: float, pitch: float) -> void:
+	if _som and _som.has_method("toca_actor"):
+		_som.call("toca_actor", self, nome, db, pitch, 0.07,
+			0.3, "%s_%d" % [nome, get_instance_id()])

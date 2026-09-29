@@ -54,6 +54,12 @@ func _ciclo() -> void:
 		await get_tree().create_timer(intervalo).timeout
 		if not is_instance_valid(self):
 			return
+		# fora do campo visual nao ha' ataque nem som: espera a entrada e so'
+		# depois telegrafa (o telegrafo e' visto antes da chama)
+		if not Som.em_vista(self):
+			await Som.esperar_vista(self)
+			if not is_instance_valid(self):
+				return
 		# telegrafo: a luz cresce um bocado antes da chama
 		create_tween().tween_property(_luz, "energy", 0.5, 0.18)
 		await get_tree().create_timer(0.24).timeout
@@ -62,8 +68,18 @@ func _ciclo() -> void:
 		_anim.play("on")
 		ativa = true
 		_luz.energy = 1.1
-		# sem som -- so' os efeitos do character/bosses/musica tocam (o
-		# jato repetia "investida" a cada ciclo e soava a dano constante).
+		# ACTIVATION. O comentario antigo dizia bem porque e' que o som saiu:
+		# era `investida`, o som de uma INVESTIDA DE CHEFE, e a cada 3,2 s
+		# soava a dano constante. O problema era o ficheiro, nao o evento --
+		# um jato de fogo que acende sem barulho nenhum tambem nao se le^.
+		# `fogo_sopro` e' gas a pegar: ignicao curta e sopro que abre, sem
+		# nada de percussivo. Cooldown por instancia (o ciclo minimo util e'
+		# `intervalo` + `dur_ativa`), e nada toca ao APAGAR: a chama a morrer
+		# nao e' informacao que o jogador precise de ouvir.
+		var som := get_node_or_null("/root/Som")
+		if som and som.has_method("toca_actor"):
+			som.call("toca_actor", self, "fogo_sopro", -16.0, 1.0, 0.06,
+				maxf(0.6, intervalo * 0.5), "fogo_%d" % get_instance_id())
 		_ferir_presentes()
 		await get_tree().create_timer(dur_ativa).timeout
 		ativa = false

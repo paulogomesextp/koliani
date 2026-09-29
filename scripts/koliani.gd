@@ -8,6 +8,8 @@ extends CharacterBody2D
 signal morreu
 signal vida_mudou(atual: int, maximo: int)
 signal energia_mudou(atual: float, maximo: float)
+## Tentou o Especial sem Energia suficiente (o HUD pisca a barra).
+signal energia_insuficiente()
 ## Emitido sempre que lança o projétil mágico -- a Ala dos Mortos (nível 09)
 ## usa-o para materializar as plataformas espectrais.
 signal magia_lancada
@@ -29,9 +31,23 @@ func _dano_golpe() -> int:
 ## Velocidade do FLYMODE (só DEVELOPER MODE -- ver `alternar_voo`).
 const VEL_VOO := 560.0
 const VEL_DASH := 620.0
+## Aterragem (F1 passagem 2): a pose `land` fica visível pelo menos ~4 ticks;
+## depois disso quem já se mexe (>24 px/s) cancela-a para a corrida.
+const ATERRAGEM_TEMPO := 0.16
+const ATERRAGEM_POSE_MIN := 4.0 / 60.0
+## Viragem: a pose `turn` acaba quando já vai a esta velocidade no sentido novo.
+const TURN_VEL_FIM := 120.0
 const DUR_DASH := 0.16
 const RECARGA_DASH := 0.55
-const VEL_ROLAR := 360.0
+## F1 passagem 1: o roll continua a ser um burst mais rápido que correr (340 vs
+## 240), mas paga uma recuperação lenta no fim -- assim repetir rolls NÃO
+## transporta mais do que correr (o roll ganha pela evasão, não pelo transporte).
+const VEL_ROLAR := 320.0
+const ROLAR_REC_DUR := 0.20         # janela de recuperação depois do rolamento
+const ROLAR_REC_VEL := 40.0         # teto de velocidade no chão nessa janela
+const ROLAR_REC_DESACEL := 4500.0   # curva de desaceleração até esse teto
+const DASH_SAIDA_DESACEL := 12000.0 # fim do dash: 620 -> corrida em ~2 ticks
+const DASH_SAIDA_DUR := 0.1
 const DUR_ROLAR := 0.30
 
 ## PASSOS e RASPAR NA PAREDE (4 set 2026, pedido do Paulo: "faca um set de
@@ -42,7 +58,7 @@ const DUR_ROLAR := 0.30
 const INTERVALO_PASSO := 0.32
 const VEL_PASSO_REF := Movimento.VEL_CORRIDA
 const INTERVALO_PAREDE := 0.22
-const RECARGA_ROLAR := 0.45
+const RECARGA_ROLAR := 0.5
 ## Janela logo a seguir a um rolamento em que o próximo golpe é CRÍTICO
 ## (pegada Dead Cells: rolar por dentro do inimigo e rematar).
 const POS_ROLL_JANELA := 0.28
@@ -58,10 +74,18 @@ const WALLJUMP := Vector2(330.0, -430.0)
 ## rente ao rebordo de uma plataforma, a Koliani agarra-se e fica pendurada.
 ## Saltar / ↑ = sobe para cima da plataforma; ↓ = larga. Perdoa saltos por
 ## um triz nas torres da jornada.
+## MANTLE (F1 passagem 2): quando a Koliani está a cair (ou quase parada) rente a
+## uma parede e o rebordo fica até `MANTLE_ALTURA` px ACIMA dos pés, sobe para
+## cima dele num movimento CURTO e FIXO (não depende de botões nem de
+## velocidade). O alcance vertical do mantle é só este degrau -- antes ela
+## pendurava-se com os pés 58 px abaixo do rebordo e o mantle somava ~70 px ao
+## salto (subida efetiva ~200 px com o salto de 128).
 const BORDA_ALCANCE := 24.0       # quão à frente se sente a parede
-const BORDA_PEITO := -30.0        # altura do sensor "há parede à frente"
-const BORDA_CABECA := -60.0       # altura do sensor "está livre por cima do rebordo"
-const BORDA_MANTLE := Vector2(150.0, -430.0)  # impulso ao subir para a plataforma
+const MANTLE_ALTURA := 32.0       # o rebordo tem de estar até tanto ACIMA dos pés...
+const MANTLE_MIN := 4.0           # ...e pelo menos tanto (senão é chão, não rebordo)
+const MANTLE_LIVRE := 48.0        # folga por cima do rebordo para o corpo de pé
+const MANTLE_META_X := 14.0       # o centro chega a tanto para dentro da face
+const MANTLE_DUR := 0.15          # 9 ticks: sobe (60 %) e depois avança (40 %)
 const DUR_ATAQUE := 0.18
 ## QUATRO golpes, desde a 9H.1. Eram três porque só havia arte para um: os
 ## golpes 2 e 3 repetiam os seis frames golden do `attack_basic` a velocidades
@@ -93,8 +117,8 @@ const ATAQUE_ATIVO_FIM := [0.68, 0.7, 0.74, 0.72]
 ## PESO DO IMPACTO -- reafinado a 4 set 2026.
 ##
 ## O Paulo: "quando a Koliani ataca com espada o ecra treme e gera frame
-## drop". Nao era impressao. O `_hitstop` poe `Engine.time_scale = 0.0`,
-## ou seja PARA o jogo: cada acerto parava 50 ms (crit 110 ms), o remate
+## drop". Nao era impressao. O `_hitstop` punha `Engine.time_scale` a
+## zero, ou seja PARAVA o jogo: cada acerto parava 50 ms (crit 110 ms), o remate
 ## do combo parava mais 50 ms **no balanco**, e o proprio `_flash_golpe`
 ## ja' abanava a camara 1,8 px sem sequer acertar em nada. Num combo de
 ## quatro acertos dava ~340 ms de jogo parado dentro de 1,5 s -- 23% do
@@ -126,6 +150,28 @@ const HITSTOP_REMATE := 0.018      # 3.o golpe do combo -- ~3 frames
 const HITSTOP_CRIT := 0.024        # ~4 frames, so' em critico
 const HITSTOP_PISAO := 0.014       # ~2,3 frames
 const HITSTOP_DANO := 0.020        # ~3,3 frames -- levar dano ja' tem tremor
+## A escala de tempo do hitstop. NAO E' ZERO, e o motivo nao e' estetico.
+##
+## Ate' 18 set 2026 isto era `Engine.time_scale = 0.0`. Com o tempo a zero o
+## Godot chama `PhysicsServer2D.step(physics_step * time_scale)` com passo
+## ZERO, e a integracao de um corpo cinematico (`AnimatableBody2D` com
+## `sync_to_physics`) calcula a velocidade dele por
+## `linear_velocity = motion / passo`. Parado e com passo zero isso e'
+## 0/0 = **NaN**. A Koliani em cima da plataforma le' essa velocidade em
+## `move_and_slide()` (velocidade da plataforma), e sai de la' com
+## `global_position` e `velocity` a NaN -- ela desaparece do nivel.
+##
+## Foi assim que o NaN do N06 aconteceu: a `CorrenteC` (horizontal, x=1970)
+## tem um `chort` a 110 px, e bastava um acerto com a Koliani em cima da
+## laje. Nas 9 runs do bot deu em 3 -- e o mesmo valia para as outras oito
+## plataformas `AnimatableBody2D` do jogo (elevadores, roda, parede movel,
+## raiz elevatoria...), portanto isto NAO era um defeito da Regiao II.
+##
+## 0,0005 congela o jogo na pratica (uma paragem de 24 ms deixa passar
+## 0,012 ms de jogo) e mantem o passo de fisica diferente de zero, que e' o
+## que a divisao precisa. O `Engine.time_scale < 0.5` que marca "estou em
+## hitstop" continua a dar verdadeiro.
+const HITSTOP_ESCALA_TEMPO := 0.0005
 const TREMOR_GOLPE := 2.0
 const TREMOR_REMATE := 3.2
 const TREMOR_CRIT := 4.5
@@ -141,6 +187,30 @@ const TREMOR_DANO := 5.0
 ## a Koliani para fora das plataformas a meio de um combo.
 const AVANCO_VEL := [330.0, 370.0, 390.0, 470.0]
 const AVANCO_DUR := [0.13, 0.13, 0.16, 0.19]
+
+## 9H.16 D -- O QUE CADA GOLPE FAZ.
+##
+## Até aqui os quatro golpes davam o MESMO dano (`_dano_golpe()` não olhava
+## para `_combo_passo`) e o único empurrão era um salto de 8 px. O 4.º
+## golpe é o que mais compromete -- 0,26 s, janela activa só a 34% da
+## animação -- e não pagava nada por isso. Carregar quatro vezes no mesmo
+## botão valia tanto como carregar uma; daí "o combate é básico".
+##
+## Agora a cadeia tem uma curva:
+##   1 ABERTURA    -- rápido e barato; pouco dano, quase sem empurrão
+##   2 CONTINUIDADE-- dano de referência, empurrão curto, avança
+##   3 COMPROMISSO -- mais lento e mais forte; ATORDOA, abrindo a janela
+##                    de castigo (é aqui que se decide encadear ou sair)
+##   4 REMATE      -- dano a dobrar, empurrão que ATIRA o inimigo, sangra
+##
+## O dano dos outros golpes (tiro, pisão) continua a sair de `_dano_golpe()`
+## sem multiplicador -- só a espada tem cadeia.
+const DANO_COMBO := [0.85, 1.0, 1.25, 1.9]
+## Empurrão por golpe, em px/s (ver `DemonioBase.receber_dano`).
+const RECUO_COMBO := [90.0, 150.0, 230.0, 470.0]
+## O 3.º golpe atordoa: é o que transforma o combo numa DECISÃO (arriscar o
+## golpe lento para ganhar a janela) em vez de um martelar de botão.
+const ATORDOA_COMBO := 0.38
 const AVANCO_NO_AR := 0.5
 const I_FRAMES := 0.6
 ## Ressalto ao cair em cima de um inimigo (Mario-style): pulo AUTOMÁTICO --
@@ -152,7 +222,19 @@ const I_FRAMES := 0.6
 ## desenhado; o Paulo pediu METADE (3 set 2026). A 0.7x fica abaixo de um
 ## salto normal: chega para encadear pisões e para se afastar do bicho,
 ## sem perder o ecrã de vista.
+## F1 passagem 1: fórmula INALTERADA (0,7). Medido: o ressalto passa de 36 para
+## ~56 px, e continua a ser ~43 % da altura do salto (era 43 %). Ver
+## docs/f1_passagem1.md.
 const STOMP_RESSALTO := Movimento.FORCA_SALTO * 0.7
+## Pogo INTENCIONAL (BAIXO + ATAQUE no ar). ANTES: ressalto automatico de 0,7 x salto (~60 px).
+## DEPOIS: 0,88 x salto (~97 px), so' com acerto valido; um salto normal faz ~122 px.
+const POGO_RESSALTO := Movimento.FORCA_SALTO * 0.88
+const POGO_STARTUP := 0.07        # s: preparacao legivel (4 frames a 60 Hz), ainda sem hitbox
+const POGO_ATIVO := 0.20          # s: janela activa; mergulha a >= POGO_MERGULHO
+const POGO_RECUP_FALHA := 0.30    # s: sem acerto fica preso (nao ha spam sem consequencia)
+const POGO_RECUP_ACERTO := 0.08   # s: com acerto quase nenhuma (permite encadear)
+const POGO_MERGULHO := 420.0
+const POGO_TRAVAO := 260.0        # px/s: velocidade vertical maxima durante a preparacao
 ## Defesa (habilidade "escudo"): anda-se devagar de escudo erguido; um
 ## ataque que venha de frente é bloqueado (sem dano) com um som subtil.
 const VEL_DEFESA := 70.0
@@ -163,6 +245,16 @@ const DUR_LANCAR := 0.16
 const PROJETIL_MAGICO := preload("res://scenes/actors/ProjetilKoliani.tscn")
 const ENERGIA_MAX := 99.0
 const REGEN_ENERGIA := 12.0       # por segundo (barra cheia em ~8 s)
+## ESPECIAL (habilidade "especial", tecla Q): onda espectral que atravessa os inimigos.
+## Custa 1/3 da barra (3 usos de barra cheia). A Energia volta sozinha (REGEN_ENERGIA, depois de
+## uma pausa curta) e sobe a acertar golpes: espada + ENERGIA_POR_GOLPE, pogo + ENERGIA_POR_POGO.
+const ESPECIAL_CUSTO := 33.0
+const ESPECIAL_CD := 0.45
+const ESPECIAL_DANO_MULT := 2.6
+const ESPECIAL_ESCALA := 1.8
+const ESPECIAL_PAUSA_REGEN := 0.6
+const ENERGIA_POR_GOLPE := 5.0
+const ENERGIA_POR_POGO := 8.0
 ## Abaixo deste Y considera-se que caiu no vazio (fosso sem fundo).
 const Y_MORTE := 1200.0
 const TEX_IMPACTO := preload("res://assets/sprites/impacto.svg")
@@ -187,7 +279,7 @@ const AURA_ENERGIA := 0.85          # `energy` da LuzAura em repouso
 ## Movimento; estes valores visuais/sonoros ficam juntos para o playtest.
 const ATERRAGEM_SQUASH := [0.0, 0.24, 0.48, 0.78]
 const ATERRAGEM_TREMOR := [0.0, 0.0, 1.4, 2.8]
-const ATERRAGEM_VOLUME := [0.0, -21.0, -15.0, -10.0]
+const ATERRAGEM_VOLUME := [0.0, -8.0, -9.0, -9.0]
 
 @onready var _hitbox: Area2D = $HitboxAtaque
 @onready var _sprite: Node2D = $Sprite
@@ -222,9 +314,26 @@ var _dash_recarga := 0.0
 var _rolar_restante := 0.0
 ## contadores dos sons ciclicos (passos, raspar na parede)
 var _passo_t := 0.0
+var _passo_variante := -1
 var _parede_t := 0.0
 ## Conta-decrescente da janela pós-rolamento (ver `POS_ROLL_JANELA`).
 var _pos_roll_t := 0.0
+## COMBAT LAB v1 (opt-in, isolado): componente que acrescenta Launcher, cadeia aerea,
+## Shadow Cleave, Dash Attack, Perfect Dodge e Shadow Counter. `null` nos niveis normais --
+## nada disto corre fora do lab. Ver `scripts/lab/combate_lab.gd`.
+var _lab: Node = null
+## CORE COMBAT (opt-in, produção): a mesma logica do Combat Lab, mas lida de
+## `BalanceCombate` (Fase 1) em vez de constantes soltas -- ver
+## `scripts/combate/core_combate.gd`. `null` na campanha; so' a arena de QA de
+## produção (Fase 11) o liga, via `ativar_core_combate()`. Nunca coexiste com
+## `_lab` na prática (o Combat Lab e a arena de produção sao cenas diferentes),
+## mas `_combate_extra()` trata os dois como intermutaveis para nao duplicar
+## os 7 pontos de despacho abaixo.
+var _core: CoreCombate = null
+## true enquanto corre um golpe do lab: a hitbox normal fica desligada (acerta o proprio lab).
+var lab_golpe_custom := false
+## Recuperacao extra (s) do golpe normal em curso, so' com o lab (v1.2).
+var _lab_extra_recup := 0.0
 ## Avanço do golpe a decorrer (ver `AVANCO_VEL`).
 var _avanco_restante := 0.0
 var _avanco_dur := 0.0
@@ -233,6 +342,8 @@ var _avanco_vel := 0.0
 ## "corte de salto" do Movimento -- ver `aplicar_impulso`.
 var _impulso_externo_t := 0.0
 var _rolar_recarga := 0.0
+var _rolar_rec_t := 0.0
+var _dash_saida_t := 0.0
 var _ataque_restante := 0.0
 ## Duração do golpe atual (varia por passo do combo -- ver `DUR_COMBO`).
 var _ataque_dur := DUR_ATAQUE
@@ -259,6 +370,10 @@ var _piloto_5g_em_movimento := false
 var _piloto_5g_no_ar := false
 var _piloto_5g_facing := 1.0
 var _stomp_cd := 0.0
+var _pogo_estado := 0   # 0 livre, 1 startup, 2 activo, 3 recuperacao
+var _pogo_t := 0.0
+var _pogo_cd := 0.0
+var _pogo_lamina: Polygon2D = null
 var _estava_no_chao := true
 var _defendendo := false
 ## true a partir da 1.ª chamada a `_morrer()` -- evita mortes a dobrar
@@ -266,6 +381,8 @@ var _defendendo := false
 ## empilhavam transições e deixavam o ecrã preso a preto.
 var _a_morrer := false
 var _energia := ENERGIA_MAX
+var _especial_cd := 0.0
+var _regen_pausa := 0.0
 ## FLYMODE ligado (só DEVELOPER MODE). Enquanto true: voo livre, atravessa
 ## paredes, sem gravidade nem dano de fosso.
 var _voando := false
@@ -282,6 +399,10 @@ var _parede_lock := 0.0
 var _borda := false
 var _borda_lock := 0.0
 var _borda_lado := 1.0
+var _mantle_ativo := false
+var _mantle_t := 0.0
+var _mantle_ini := Vector2.ZERO
+var _mantle_alvo := Vector2.ZERO
 ## Agachada (segura S no chão, parada). Só bloqueia o andar -- visual.
 var _agachado := false
 ## Conta-decrescente para mostrar a animação do salto duplo.
@@ -335,7 +456,7 @@ func inverter_gravidade() -> float:
 	up_direction = Vector2(0.0, -_sinal_grav)
 	# quem vira o boneco é o `_animar()` (a escala dele é reescrita todos
 	# os frames); aqui só muda o sinal.
-	Som.toca("gelo", -10.0, 0.8 if _sinal_grav < 0.0 else 1.25)
+	Som.toca("gelo", -10.0, 0.8 if _sinal_grav < 0.0 else 1.25, 0.02)
 	return _sinal_grav
 
 ## --- ESTADOS que a apanham a ela (5 set 2026) -------------------------
@@ -362,6 +483,23 @@ var _inverso_restante := 0.0
 var _vento_restante := 0.0
 var _vento_forca := 0.0
 var _vento_alvo := 0.0
+## Influências reutilizáveis de vento. Cada zona renova a sua entrada por
+## frame e remove-a no exit; o TTL é a rede para teleporte/queue_free/sinais
+## perdidos. A chave é o instance_id da zona, por isso sobreposições somam sem
+## um booleano global que possa ficar preso.
+var _ventos_externos: Dictionary = {}
+const VENTO_EXTERNO_TTL := 0.12
+## PLANAR CONTEXTUAL (Região II / N08, Ilhas Suspensas). Não é a habilidade
+## permanente "planar" (essa só abre no N63): é concedido por uma
+## `ZonaPlanar` enquanto a Koliani lá está. Mesmo contrato do vento -- uma
+## entrada por zona, renovada por frame, com TTL de rede para teleporte,
+## queue_free ou sinal de saída perdido. Nada disto é gravado no save.
+var _planar_contextos: Dictionary = {}
+const PLANAR_CONTEXTO_TTL := 0.12
+## Verdadeiro no frame em que o planar está mesmo a segurar a queda (no ar,
+## a descer, botão seguro). Só leitura -- feedback e testes; a física não
+## depende dele.
+var _planando := false
 
 # animação procedural (visual, corre em _process)
 var _mat: ShaderMaterial
@@ -819,6 +957,7 @@ const VFX9G_COMBO_POS := Vector2(20.0, -10.0)
 ## golden (diretos, ou derivados sem píxeis novos na 9B.3/9B.4).
 func _montar_golden_set(sf: SpriteFrames) -> void:
 	_golden_anims.clear()
+	_dir_skin = CosmeticosVisuais.dir_skin()
 	for nome: String in _KOLI_ANIMS_GOLDEN:
 		var c: Array = _KOLI_ANIMS_GOLDEN[nome]
 		var base: String = String(c[0]).get_file()
@@ -832,13 +971,29 @@ func _montar_golden_set(sf: SpriteFrames) -> void:
 		if sf.has_animation(nome) and sf.get_frame_count(nome) > 0:
 			continue
 		_animacao_golden(sf, nome, ataque, _GOLDEN_COMBO_FPS[nome], false)
+	# Execution 9H.18: se a arte NATIVA da corrida estiver no repo, e' ela que
+	# manda. Ver `docs/spec_run_nativo_koliani.md` -- e' um drop-in: chega
+	# largar os frames na pasta e reimportar, sem tocar em codigo.
+	_substituir_run_por_nativo(sf)
 	# Estados de locomoção da 5G, agora montados com poses golden existentes.
-	_animacao_golden(sf, "turn", _frames_de(sf, "run", [0, 1, 2, 3]), 12.0, false)
-	_animacao_golden(sf, "run_start", _frames_de(sf, "run", [0, 1, 2, 3, 4, 5]), 12.0, false)
-	_animacao_golden(sf, "run_brake", _frames_de(sf, "run", [7, 8, 9]) + _frames_de(sf, "idle", [0]), 14.0, false)
-	var aterrar: Array = _frames_de(sf, "fall", [2]) + _frames_de(sf, "idle", [0])
+	# NB: saem do `run` que ficou montado acima (nativo, se existir).
+	# 9H.18: o travao e a aterragem DAVAM UM POP. Medido em largura de
+	# silhueta: o `run_brake` ia do frame mais aberto do ciclo (57 px) para o
+	# `idle` (37 px) num unico frame de 71 ms -- 20 px de silhueta a
+	# desaparecer de repente, que se le' como um salto, nao como uma
+	# derrapagem. O `land` fazia o mesmo de 49 para 37.
+	#
+	# Nao ha' frames novos aqui -- ha' os MESMOS frames escolhidos por
+	# largura, a fechar por degraus. O travao passa a 57-51-48-46-43-37
+	# (degrau maximo 6 px) e a aterragem a 49-44-38-37 (maximo 6), que
+	# tambem e' o gesto certo: bate, encolhe, levanta.
+	_animacao_golden(sf, "run_brake",
+		_frames_de(sf, "run", [9, 8, 2, 0]) + _frames_de(sf, "idle", [3, 0]),
+		45.0, false)   # 45 fps = ~8 ticks: a travagem física demora 6
+	var aterrar: Array = _frames_de(sf, "fall", [2, 0])
+	aterrar += _frames_de(sf, "crouch", [0]) + _frames_de(sf, "idle", [0])
 	for nome in ["land", "aterrar"]:
-		_animacao_golden(sf, nome, aterrar, 12.0, false)
+		_animacao_golden(sf, nome, aterrar, 16.0, false)
 	# `jump` só é pedido pelo caminho de locomoção antigo; fica golden na mesma.
 	_animacao_golden(sf, "jump", _frames_de(sf, "jump_start", [1, 2, 3]), 12.0, false)
 	# RUN final aprovada: substituir só depois de preservar os derivados anteriores.
@@ -847,7 +1002,60 @@ func _montar_golden_set(sf: SpriteFrames) -> void:
 	for i in 10:
 		run_final.append("%s/frames/run_final/run_%03d.png" % [GOLDEN_DIR, i + 1])
 	_animacao_golden(sf, "run", run_final, _KOLI_ANIMS_GOLDEN["run"][2], true)
+	# `turn` derivado do run_final (ja montado acima) -- nunca do run antigo.
+	_animacao_golden(sf, "turn", _frames_de(sf, "run", [0, 1, 2, 3]), 30.0, false)   # ~8 ticks
+	# `run_start`: NAO USADO no fluxo (Idle -> run directo); fica definido a partir do run_final so por compatibilidade.
+	_animacao_golden(sf, "run_start", _frames_de(sf, "run", [0, 1, 2, 3, 4, 5]), 12.0, false)
 	_montar_vfx_golpe()
+
+
+## Pasta onde a arte NATIVA da corrida entra, quando existir. Enquanto nao
+## existir, o jogo corre com o `run` da folha golden -- que NAO tem passada
+## de duas pernas (medido na 9H.18: o pe' de tras varre 7 px e o da frente
+## 29; `tools/validar_run_nativo_9h18.py` reprova-o). O contrato do ficheiro
+## esta' em `docs/spec_run_nativo_koliani.md`.
+const GOLDEN_RUN_NATIVO_DIR := "res://assets/sprites/koliani_golden_set/frames/run_native"
+
+
+## Troca o `run` pela tira nativa, se ela estiver no repo. Silenciosa e sem
+## efeito nenhum quando a pasta nao existe -- e' so' isso que separa o jogo
+## de hoje do jogo com a corrida boa.
+func _substituir_run_por_nativo(sf: SpriteFrames) -> void:
+	if not DirAccess.dir_exists_absolute(GOLDEN_RUN_NATIVO_DIR):
+		return
+	var dir := DirAccess.open(GOLDEN_RUN_NATIVO_DIR)
+	if dir == null:
+		return
+	var nomes: Array[String] = []
+	for f in dir.get_files():
+		# depois do export so' ha' `.ctex`; em editor ha' `.png` e `.png.import`.
+		if f.ends_with(".import") or f.ends_with(".ctex"):
+			f = f.get_basename()
+		if f.get_extension().to_lower() == "png" and not nomes.has(f):
+			nomes.append(f)
+	nomes.sort()
+	if nomes.size() < 6:
+		push_warning("run nativo com %d frames -- sao precisos 8 a 12; fica o golden"
+			% nomes.size())
+		return
+	var quadros: Array = []
+	for n in nomes:
+		quadros.append("%s/%s" % [GOLDEN_RUN_NATIVO_DIR, n])
+	# O ciclo dura o mesmo que o golden (0,75 s), para nao mexer na cadencia
+	# nem no `speed_scale` que acompanha a velocidade.
+	_animacao_golden(sf, "run", quadros, float(nomes.size()) / DUR_CICLO_CORRIDA, true)
+
+
+## Skin da Loja com arte real: o mesmo frame, lido da pasta da skin (espelho
+## de `GOLDEN_DIR/frames`). Frame que a skin não tenha -> o do Golden Set.
+## Resolvido uma vez por nível (`_montar_frames`); o VFX do golpe não muda.
+var _dir_skin := ""
+
+func _caminho_skin(caminho: String) -> String:
+	if _dir_skin == "" or not caminho.begins_with(GOLDEN_DIR + "/frames/"):
+		return caminho
+	var alt := _dir_skin + caminho.substr(GOLDEN_DIR.length())
+	return alt if ResourceLoader.exists(alt) else caminho
 
 
 ## Cria (ou substitui) uma animação a partir de caminhos res:// ou texturas já
@@ -859,7 +1067,7 @@ func _animacao_golden(sf: SpriteFrames, nome: String, quadros: Array, fps: float
 	sf.set_animation_speed(nome, fps)
 	sf.set_animation_loop(nome, loop)
 	for q in quadros:
-		var tex: Texture2D = load(q) if q is String else q
+		var tex: Texture2D = load(_caminho_skin(q)) if q is String else q
 		if tex:
 			sf.add_frame(nome, tex)
 	_golden_anims[nome] = true
@@ -952,6 +1160,7 @@ func _disparar_vfx_golpe() -> void:
 ## golden nunca leva efeito pintado dentro. Nascem no pai da Koliani (o nível),
 ## por isso ficam para trás no mundo e saem com a cena.
 const COR_SHADOWBLADE := Color(0.78, 0.32, 1.0)
+const RastoCosmetico := preload("res://scripts/rasto_cosmetico.gd")
 const RASTO_INTERVALO := 0.035
 var _rasto_t := 0.0
 
@@ -973,10 +1182,16 @@ func _rasto_dash(dt: float) -> void:
 	eco.offset = _corpo.offset
 	eco.global_position = _corpo.global_position
 	eco.scale = _sprite.scale * _corpo.scale
-	eco.modulate = Color(COR_SHADOWBLADE, 0.55)
+	eco.modulate = Color(CosmeticosVisuais.cor_rasto_dash(COR_SHADOWBLADE), 0.55)
 	eco.z_index = -1
 	eco.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 	get_parent().add_child(eco)
+	# rasto da Loja com arte: eco em silhueta luminosa + partículas pixel-art
+	var rv := CosmeticosVisuais.rasto_visual()
+	if not rv.is_empty():
+		eco.material = RastoCosmetico.material_eco(rv)
+		eco.modulate = Color(1.0, 1.0, 1.0, 0.5)
+		RastoCosmetico.emitir(get_parent(), _corpo.global_position, _olha_para, _sinal_grav, rv)
 	var t := eco.create_tween()
 	t.tween_property(eco, "modulate:a", 0.0, 0.18)
 	t.tween_callback(eco.queue_free)
@@ -1015,9 +1230,19 @@ func _vfx9g_dash() -> void:
 	if not Vfx9G.ativo(self):
 		return
 	Vfx9G.tocar(self, "dash_trail", global_position + Vector2(-10.0 * _olha_para, -6.0),
-		1.0, 0.0, _olha_para > 0.0, _sinal_grav < 0.0, -1, DUR_DASH)
+		1.0, 0.0, _olha_para > 0.0, _sinal_grav < 0.0, -1, DUR_DASH, CosmeticosVisuais.tinta_vfx_dash())
 	Vfx9G.tocar(self, "dash_impact", global_position + Vector2(-16.0 * _olha_para, 10.0 * _sinal_grav),
-		0.8, 0.0, _olha_para > 0.0, _sinal_grav < 0.0, -1, 0.26)
+		0.8, 0.0, _olha_para > 0.0, _sinal_grav < 0.0, -1, 0.26, CosmeticosVisuais.tinta_vfx_dash())
+
+
+func _sfx_dash() -> void:
+	Som.toca("dash", -11.0, 1.0, 0.03)
+
+
+func _sfx_ativar_escudo() -> void:
+	# Preparacao energetica propria; o bloqueio tem outro asset e transiente.
+	Som.toca("escudo_ativar", -18.0, 1.0, 0.01, 0.18,
+		"player_shield_activation")
 
 
 ## 9G: a cúpula de energia da prancha 07 substitui os polígonos desenhados por
@@ -1193,16 +1418,21 @@ func _pinta(n: Node, c: Color) -> void:
 func _physics_process(dt: float) -> void:
 	_dash_recarga = maxf(0.0, _dash_recarga - dt)
 	_rolar_recarga = maxf(0.0, _rolar_recarga - dt)
+	_rolar_rec_t = maxf(0.0, _rolar_rec_t - dt)
 	_pos_roll_t = maxf(0.0, _pos_roll_t - dt)
 	_invulneravel = maxf(0.0, _invulneravel - dt)
 	_impulso_externo_t = maxf(0.0, _impulso_externo_t - dt)
 	_hurt_t = maxf(0.0, _hurt_t - dt)
+	# planar é estado de UM frame: só volta a verdadeiro no ramo do movimento
+	# normal (dash, rolamento, escudo, gancho e voo nunca planam)
+	_planando = false
+	_descartar_planar_invalido(dt)
 	_tick_estados(dt)
 	_aterrar_t = maxf(0.0, _aterrar_t - dt)
 	# aterragem: só depois de ter estado mesmo no ar
 	if is_on_floor():
 		if _no_ar_antes:
-			_aterrar_t = 0.16
+			_aterrar_t = ATERRAGEM_TEMPO
 		_no_ar_antes = false
 	elif _vy() > 120.0:
 		_no_ar_antes = true
@@ -1220,7 +1450,9 @@ func _physics_process(dt: float) -> void:
 			_inverso = 1.0
 
 	# a barra de Energia regenera-se sozinha depois de usada
-	if _energia < ENERGIA_MAX:
+	_especial_cd = maxf(0.0, _especial_cd - dt)
+	_regen_pausa = maxf(0.0, _regen_pausa - dt)
+	if _energia < ENERGIA_MAX and _regen_pausa <= 0.0:
 		_energia = minf(ENERGIA_MAX, _energia + REGEN_ENERGIA * (1.0 + EstadoJogo.bonus("regen_energia")) * dt)  # melhoria "foco"
 		energia_mudou.emit(_energia, ENERGIA_MAX)
 
@@ -1289,58 +1521,64 @@ func _physics_process(dt: float) -> void:
 			_escalando = false
 			_parede_lock = 0.28
 			_mov.saltos_dados = 0  # o salto de parede não gasta o salto do ar
-			Som.toca("salto", -10.0)
+			Som.toca("koliani_salto", -10.0, 1.0, 0.03)
 		move_and_slide()
 		_mov.velocidade = velocity
 		_estava_no_chao = false
 		return
 
-	# --- agarrar a borda (básico) -----------------------------------------
-	# a cair (ou quase parada no ar) rente ao rebordo de uma plataforma:
-	# agarra-se. Não corre se estiver a escalar, a rolar, a dar dash, ou
-	# logo a seguir a largar/subir.
-	if not _borda and _borda_lock <= 0.0 and not is_on_floor() \
+	# --- mantle (F1 passagem 2) ------------------------------------------------
+	# Condições geométricas (todas em `_detetar_mantle`): parede colada aos pés,
+	# rebordo entre MANTLE_MIN e MANTLE_ALTURA acima dos pés, folga por cima e
+	# chão no ponto de chegada. Intenção: a segurar contra a parede ou "cima".
+	# Só a cair (ou quase parada): a subir ela passa por cima sozinha.
+	if not _borda and _borda_lock <= 0.0 and not is_on_floor() and _sinal_grav > 0.0 \
 			and _rolar_restante <= 0.0 and _dash_restante <= 0.0 \
 			and _ataque_restante <= 0.0 and _preso <= 0.0 \
-			and velocity.y > -30.0:
+			and velocity.y > -30.0 \
+			and (dir != 0.0 or Input.is_action_pressed("mirar_cima")):
 		var lado := signf(dir) if dir != 0.0 else _olha_para
-		var lip_y := _detetar_borda(lado)
-		if not is_nan(lip_y):
+		var meta := _detetar_mantle(lado)
+		if not meta.is_empty():
 			_borda = true
+			_mantle_ativo = true
 			_borda_lado = lado
-			global_position.y = lip_y + 34.0  # mãos ao nível do rebordo
-			# Salto de posição: sem isto a interpolação desenhava-a a subir
-			# desde onde estava, em vez de já agarrada ao rebordo.
-			reset_physics_interpolation()
+			_mantle_t = MANTLE_DUR
+			_mantle_ini = global_position
+			_mantle_alvo = meta["alvo"]
 			velocity = Vector2.ZERO
+			_mov.velocidade = velocity
 			_mov.saltos_dados = 0
-			Som.toca("agarrar", -14.0, randf_range(0.96, 1.06))
+			Som.toca("agarrar", -14.0, 1.0, 0.04)
 
 	if _borda:
 		_olha_para = _borda_lado
 		velocity = Vector2.ZERO
-		if Input.is_action_just_pressed("saltar") or Input.is_action_just_pressed("mirar_cima"):
-			# sobe para cima da plataforma
-			velocity = Vector2(_borda_lado * BORDA_MANTLE.x, BORDA_MANTLE.y)
-			_mov.velocidade = velocity
-			_mov.saltos_dados = 0
-			_borda = false
-			_borda_lock = 0.25
-			Som.toca("salto", -10.0)
-		elif Input.is_action_pressed("mirar_baixo") \
-				or (dir != 0.0 and signf(dir) == -_borda_lado):
-			_borda = false
-			_borda_lock = 0.22
-		move_and_slide()
+		if _mantle_ativo:
+			# deslocamento determinístico: primeiro sobe junto à parede, depois
+			# avança para cima do rebordo (sem colisões pelo caminho: o corpo
+			# nunca atravessa mais do que os ~3 px do canto)
+			_mantle_t = maxf(0.0, _mantle_t - dt)
+			var f := 1.0 - _mantle_t / MANTLE_DUR
+			var fy := smoothstep(0.0, 1.0, clampf(f / 0.6, 0.0, 1.0))
+			var fx := smoothstep(0.0, 1.0, clampf((f - 0.6) / 0.4, 0.0, 1.0))
+			global_position = Vector2(lerpf(_mantle_ini.x, _mantle_alvo.x, fx),
+				lerpf(_mantle_ini.y, _mantle_alvo.y, fy))
+			if _mantle_t <= 0.0:
+				_mantle_ativo = false
+				_borda = false
+				_borda_lock = 0.3
+				velocity = Vector2(_borda_lado * 30.0, 0.0)
+				_mov.saltos_dados = 0
 		_mov.velocidade = velocity
 		_estava_no_chao = false
 		return
 
-	# wall-jump básico (sempre, não precisa da habilidade "escalar_paredes"):
-	# no ar, encostada a uma parede e a segurar CONTRA ela -> chuta para
-	# fora. Não gasta o salto do ar. Perde para o escalar quando este está
-	# ativo (esse já saiu acima com `return`).
-	if not is_on_floor() and is_on_wall_only() and _parede_lock <= 0.0 \
+	# wall-jump (decisão do GM, F1 p2): EXIGE a habilidade "escalar_paredes";
+	# sem ela as paredes são limites (Região I). No ar, encostada a uma
+	# parede e a segurar CONTRA ela -> chuta para fora. Não gasta o salto do
+	# ar. Perde para o escalar quando este está ativo (saiu acima com `return`).
+	if EstadoJogo.tem_habilidade("escalar_paredes") and not is_on_floor() and is_on_wall_only() and _parede_lock <= 0.0 \
 			and not _escalando and _dash_restante <= 0.0 and _rolar_restante <= 0.0 \
 			and velocity.y > -140.0 and dir != 0.0 \
 			and signf(dir) == -signf(get_wall_normal().x) \
@@ -1351,28 +1589,42 @@ func _physics_process(dt: float) -> void:
 		_mov.saltos_dados = 0  # o chute de parede não gasta o salto do ar
 		_mov.velocidade = velocity
 		_olha_para = signf(wn.x)
-		Som.toca("salto", -9.0)
+		Som.toca("koliani_salto", -10.0, 1.0, 0.03)
 		move_and_slide()
 		_mov.velocidade = velocity
 		_estava_no_chao = false
 		return
 
 	# defesa: só com a habilidade "escudo", em pé, e não a meio de outra ação
+	var defendia := _defendendo
 	_defendendo = EstadoJogo.tem_habilidade("escudo") \
 		and Input.is_action_pressed("defender") \
 		and _rolar_restante <= 0.0 and _dash_restante <= 0.0 and _ataque_restante <= 0.0 \
 		and is_on_floor()
+	if _defendendo and not defendia:
+		_sfx_ativar_escudo()
 
 	# ataque leve -- bloqueado enquanto rola ou defende. Combo: um novo
 	# golpe a meio do atual fica bufferizado (`_combo_pedido`) e dispara
 	# assim que este acabar, em vez de se perder.
-	if not _defendendo and _rolar_restante <= 0.0 and Input.is_action_just_pressed("atacar"):
+	if Input.is_action_just_pressed("especial"):
+		usar_especial()
+	var lab_consumiu := false
+	var _cx := _combate_extra()
+	if _cx != null:
+		_cx.tick(dt)
+		lab_consumiu = _cx.tratar_input(dt)
+	if lab_consumiu:
+		pass
+	elif _pogo_estado == 0 and _pogo_pode_iniciar() and Input.is_action_just_pressed("atacar"):
+		_iniciar_pogo()
+	elif not _defendendo and _rolar_restante <= 0.0 and _pogo_estado == 0 and Input.is_action_just_pressed("atacar"):
 		# Dash -> ataque é um cancel explícito; não deixa o estado de dash
 		# continuar por baixo do golpe nem duplica a hitbox.
 		if _dash_restante > 0.0:
 			_dash_restante = 0.0
 		if _ataque_restante > 0.0:
-			_combo_pedido = not _ataque_no_ar
+			_combo_pedido = (not _ataque_no_ar) if _combate_extra() == null else _combate_extra().ar_pode_encadear()
 		else:
 			_iniciar_ataque()
 	if _ataque_restante > 0.0:
@@ -1398,6 +1650,7 @@ func _physics_process(dt: float) -> void:
 		_rolar_restante -= dt
 		if _rolar_restante <= 0.0:
 			_pos_roll_t = POS_ROLL_JANELA   # abre a janela de crítico pós-rolamento
+			_rolar_rec_t = ROLAR_REC_DUR
 		velocity.x = _olha_para * VEL_ROLAR
 		if not is_on_floor():
 			velocity.y = Movimento.aplicar_gravidade(
@@ -1406,6 +1659,8 @@ func _physics_process(dt: float) -> void:
 		_dash_restante -= dt
 		velocity.x = _olha_para * VEL_DASH
 		velocity.y = 0.0
+		if _dash_restante <= 0.0:
+			_dash_saida_t = DASH_SAIDA_DUR
 	elif _defendendo:
 		# escudo erguido: anda-se devagar, sem saltar/dash/rolar
 		velocity.x = move_toward(velocity.x, dir * VEL_DEFESA, Movimento.ACEL_CHAO * dt)
@@ -1417,9 +1672,12 @@ func _physics_process(dt: float) -> void:
 		_mov.velocidade = velocity
 	elif Input.is_action_just_pressed("rolar") and Movimento.pode_rolar(
 			_rolar_recarga, is_on_floor(), _rolar_restante, _dash_restante):
-		_rolar_restante = DUR_ROLAR
+		# a velocidade vale no PRÓPRIO tick do input (antes só no seguinte);
+		# o tick do gatilho conta como o 1.º do burst
+		_rolar_restante = DUR_ROLAR - dt
 		_rolar_recarga = RECARGA_ROLAR
-		Som.toca("rolamento", -13.0, randf_range(0.95, 1.06))
+		velocity.x = _olha_para * VEL_ROLAR
+		Som.toca("rolamento", -13.0, 1.0, 0.04)
 		if Vfx9G.ativo(self):
 			Vfx9G.tocar(self, "roll_dodge", global_position + Vector2(0.0, 6.0 * _sinal_grav),
 				1.0, 0.0, _olha_para < 0.0, _sinal_grav < 0.0, -1, DUR_ROLAR)
@@ -1434,29 +1692,52 @@ func _physics_process(dt: float) -> void:
 		# Ataque -> Dash corta recovery e a janela física antes de arrancar.
 		if _ataque_restante > 0.0:
 			_cancelar_ataque()
-		_dash_restante = DUR_DASH
+		# idem: velocidade no próprio tick, e o tick do gatilho conta como o 1.º
+		_dash_restante = DUR_DASH - dt
+		_dash_saida_t = 0.0
 		_dash_recarga = RECARGA_DASH
+		velocity.x = _olha_para * VEL_DASH
+		velocity.y = 0.0
 		_acender_aura(0.8)
-		Som.toca("dash", -11.0, randf_range(0.97, 1.05))
+		_sfx_dash()
 		_vfx9g_dash()
 		_invulneravel = maxf(_invulneravel, DUR_DASH)
 	else:
 		var saltos_max := 2 if EstadoJogo.tem_habilidade("salto_duplo") else 1
 		var saltos_antes := _mov.saltos_dados
+		# PLANAR: habilidade permanente (N63) OU uma `ZonaPlanar` (N08), e
+		# só a segurar o botão. Durante o atordoamento do dano fica suspenso
+		# (o golpe lê-se como queda a sério). O `Movimento` é que decide se
+		# ela já está a cair -- planar nunca acrescenta subida.
+		var planar_pedido := Input.is_action_pressed("saltar") \
+			and pode_planar() and _hurt_t <= 0.0
+		# fim do dash: a velocidade horizontal volta por uma curva curta a uma
+		# velocidade de corrida (antes deslizava 82 px a decair de 620)
+		if _dash_saida_t > 0.0:
+			_dash_saida_t -= dt
+			if absf(_mov.velocidade.x) > Movimento.VEL_CORRIDA:
+				_mov.velocidade.x = move_toward(_mov.velocidade.x,
+					signf(_mov.velocidade.x) * Movimento.VEL_CORRIDA,
+					DASH_SAIDA_DESACEL * dt)
 		_mov = Movimento.passo(
 			_mov, dir,
 			Input.is_action_just_pressed("saltar"),
 			Input.is_action_pressed("saltar") or _impulso_externo_t > 0.0,
 			is_on_floor(), dt, saltos_max, _grav_escala, _acel_escala,
-			# PLANAR (nível 63): só com a habilidade, e só a segurar o
-			# botão. O `Movimento` e' que decide se ela ja' esta' a cair.
-			Input.is_action_pressed("saltar")
-				and EstadoJogo.tem_habilidade("planar"),
+			planar_pedido,
 			_sinal_grav,
 		)
+		_planando = planar_pedido and not is_on_floor() \
+			and _mov.velocidade.y * _sinal_grav > 0.0
 		velocity = _mov.velocidade
+		# recuperação do rolamento: no chão a velocidade desce por uma curva
+		# até um teto baixo durante `ROLAR_REC_DUR`
+		if _rolar_rec_t > 0.0 and is_on_floor() and absf(velocity.x) > ROLAR_REC_VEL:
+			velocity.x = move_toward(velocity.x, signf(velocity.x) * ROLAR_REC_VEL,
+				ROLAR_REC_DESACEL * dt)
 		if _mov.saltos_dados > saltos_antes:
-			Som.toca("salto_duplo" if _mov.saltos_dados >= 2 else "salto", -10.0)
+			Som.toca("koliani_salto",
+				-10.0, 1.0, 0.03)
 			if _mov.saltos_dados >= 2:
 				_djump_t = 0.45  # mostra a animação do salto duplo
 				_vfx_salto_duplo()
@@ -1479,72 +1760,11 @@ func _physics_process(dt: float) -> void:
 	elif _vento_restante > 0.0:
 		_vento_restante -= dt
 
-	# cair em cima de um inimigo = golpe de espada + pulo automático (estilo
-	# Mario). Janela GENEROSA: basta vir a descer e apanhar o bicho grosso
-	# modo por cima -- serve para inimigos de vários tamanhos. Encadeia:
-	# cada pisão devolve os saltos de ar todos.
-	_stomp_cd = maxf(0.0, _stomp_cd - dt)
-	if EstadoJogo.tem_habilidade("pogo") and _stomp_cd <= 0.0 \
-			and _vy() > 40.0 and not is_on_floor() and _dash_restante <= 0.0:
-		var pes := global_position.y + 24.0
-		for e in get_tree().get_nodes_in_group("inimigos"):
-			if not is_instance_valid(e) or not (e as Node).has_method("receber_dano"):
-				continue
-			if "vida" in e and e.vida <= 0:
-				continue
-			# CHEFES NÃO SE PISAM (pedido do Paulo, 3 set 2026): nem dano, nem
-			# ressalto. A banda de aceitação deles era generosa (210 px de
-			# altura) e saltar-lhes para cima era a maneira mais barata de os
-			# despachar -- ainda por cima atirava a Koliani ecrã acima, para
-			# fora do cenário desenhado. A luta de chefe faz-se com espada e
-			# tiro; encostar-se a um custa dano de contacto, como a qualquer
-			# outro bicho.
-			if (e as Node).is_in_group("chefes"):
-				continue
-			var ep: Vector2 = (e as Node2D).global_position
-			if absf(ep.x - global_position.x) > 46.0:
-				continue
-			# a Koliani vem a descer por cima e os pés dela na banda do topo
-			if global_position.y > ep.y + 6.0 or pes < ep.y - 52.0 or pes > ep.y + 30.0:
-				continue
-			var crit_stomp: bool = e.has_method("esta_vulneravel") and e.esta_vulneravel()
-			e.receber_dano(_dano_golpe(), 0.0, crit_stomp)
-			# pulo automático ALTO, imune ao corte de salto (ver aplicar_impulso)
-			aplicar_impulso(Vector2(0.0, -STOMP_RESSALTO), true)
-			_invulneravel = maxf(_invulneravel, 0.3)
-			_stomp_cd = 0.22
-			_pop = 1.0
-			_squash = maxf(_squash, 0.5)
-			_abanar(TREMOR_CRIT if crit_stomp else TREMOR_PISAO)
-			_hitstop(HITSTOP_CRIT if crit_stomp else HITSTOP_PISAO)
-			# pisão na carne: pancada surda, sem o silvo da espada
-			Som.toca("acerto", -10.0, randf_range(0.82, 0.94))
-			_pop_impacto(ep)
-			break
+	_aplicar_ventos_externos(dt)
 
-	# pogo: cair em cima de uma serra / espinhos (grupo "pogavel", layer 6)
-	# -> ressalta em vez de levar o golpe (os i-frames apanham o toque desse
-	# frame). Só a descer a sério e pela parte de cima.
-	if EstadoJogo.tem_habilidade("pogo") and _stomp_cd <= 0.0 \
-			and _vy() > 90.0 and not is_on_floor() and _dash_restante <= 0.0:
-		var esp := get_world_2d().direct_space_state
-		var rq := PhysicsRayQueryParameters2D.create(
-			global_position + Vector2(0.0, 16.0), global_position + Vector2(0.0, 46.0), 1 << 5)
-		rq.collide_with_areas = true
-		rq.collide_with_bodies = false
-		rq.hit_from_inside = true
-		rq.exclude = [self]
-		var ph := esp.intersect_ray(rq)
-		if not ph.is_empty() and (ph["collider"] as Node).is_in_group("pogavel"):
-			aplicar_impulso(Vector2(0.0, -STOMP_RESSALTO), true)
-			_invulneravel = maxf(_invulneravel, 0.35)
-			_stomp_cd = 0.22
-			_pop = 1.0
-			_squash = maxf(_squash, 0.5)
-			_abanar(TREMOR_PISAO)
-			_hitstop(HITSTOP_PISAO)
-			Som.toca("acerto", -10.0, randf_range(0.94, 1.07))
-			_pop_impacto(global_position + Vector2(0.0, 24.0))
+	# Pogo (habilidade "pogo"): ataque descendente INTENCIONAL (BAIXO + ATAQUE no ar).
+	# Sem toque automatico: so' ressalta quem acerta num alvo valido.
+	_tratar_pogo(dt)
 
 	# passo em frente do golpe: empurra SEMPRE para a frente e nunca trava
 	# quem já vai mais depressa (correr a atacar continua a correr).
@@ -1556,6 +1776,9 @@ func _physics_process(dt: float) -> void:
 			velocity.x = maxf(velocity.x, empurrao)
 		else:
 			velocity.x = minf(velocity.x, empurrao)
+	# Combat Lab v1.1: durante um golpe o avanco nao leva a Koliani atraves do alvo
+	if _combate_extra() != null and _ataque_restante > 0.0:
+		velocity.x = _combate_extra().limitar_x(velocity.x, dt)
 
 	var vel_queda := _vy()
 	move_and_slide()
@@ -1578,7 +1801,9 @@ func _physics_process(dt: float) -> void:
 		_squash = maxf(_squash, squash_tier)
 		if tremor_tier > 0.0:
 			_abanar(tremor_tier)
-		Som.toca("aterrar", volume_tier)
+		var som_aterragem: String = ["", "aterrar", "aterrar_medio", "aterrar_pesado"][tier_aterragem]
+		Som.toca(som_aterragem, volume_tier, 1.0, 0.02, 0.0, "",
+			Som.Prioridade.MEDIA if tier_aterragem >= 3 else Som.Prioridade.NORMAL)
 	_estava_no_chao = no_chao
 
 	# caiu num fosso sem fundo -> conta como morte (reaparece no checkpoint)
@@ -1596,34 +1821,47 @@ func _physics_process(dt: float) -> void:
 			receber_dano(vida)
 
 
-## Há um rebordo agarrável no lado `lado` (-1 esq / +1 dir)? Devolve o Y do
-## topo da plataforma, ou NAN se não houver. Dois sensores: parede à frente
-## à altura do peito E espaço livre à frente à altura da cabeça (= é mesmo
-## um rebordo, não uma parede alta). Depois varre para baixo para achar o topo.
-func _detetar_borda(lado: float) -> float:
+## Há um rebordo a que se possa subir no lado `lado` (-1 esq / +1 dir)? Devolve
+## `{"alvo": Vector2}` (centro da Koliani já em cima) ou `{}`. Quatro condições,
+## todas geométricas: (1) parede colada à altura dos pés; (2) topo do rebordo
+## entre `MANTLE_MIN` e `MANTLE_ALTURA` acima dos pés; (3) folga de
+## `MANTLE_LIVRE` por cima do rebordo; (4) chão no ponto de chegada.
+func _detetar_mantle(lado: float) -> Dictionary:
 	var espaco := get_world_2d().direct_space_state
+	var pes := global_position.y + 24.0
 	var qp := PhysicsRayQueryParameters2D.create(
-		global_position + Vector2(0.0, BORDA_PEITO),
-		global_position + Vector2(lado * BORDA_ALCANCE, BORDA_PEITO), 1)
+		Vector2(global_position.x, pes - 8.0),
+		Vector2(global_position.x + lado * BORDA_ALCANCE, pes - 8.0), 1)
 	qp.exclude = [self]
-	var peito := espaco.intersect_ray(qp)
-	if peito.is_empty():
-		return NAN
-	var qc := PhysicsRayQueryParameters2D.create(
-		global_position + Vector2(0.0, BORDA_CABECA),
-		global_position + Vector2(lado * BORDA_ALCANCE, BORDA_CABECA), 1)
-	qc.exclude = [self]
-	if not espaco.intersect_ray(qc).is_empty():
-		return NAN  # a parede continua acima -> não é um rebordo
-	var x_face: float = peito["position"].x + lado * 3.0
+	var parede := espaco.intersect_ray(qp)
+	if parede.is_empty():
+		return {}
+	var x_face: float = parede["position"].x
+	var x_topo := x_face + lado * 3.0
 	var qd := PhysicsRayQueryParameters2D.create(
-		Vector2(x_face, global_position.y + BORDA_CABECA),
-		Vector2(x_face, global_position.y + BORDA_PEITO + 8.0), 1)
+		Vector2(x_topo, pes - MANTLE_ALTURA), Vector2(x_topo, pes - MANTLE_MIN), 1)
 	qd.exclude = [self]
 	var topo := espaco.intersect_ray(qd)
 	if topo.is_empty():
-		return NAN
-	return topo["position"].y
+		return {}   # o rebordo está mais alto do que o alcance, ou já é chão
+	var y_topo: float = topo["position"].y
+	var x_alvo := x_face + lado * MANTLE_META_X
+	var qc := PhysicsRayQueryParameters2D.create(
+		Vector2(x_alvo, y_topo - 2.0), Vector2(x_alvo, y_topo - MANTLE_LIVRE), 1)
+	qc.exclude = [self]
+	if not espaco.intersect_ray(qc).is_empty():
+		return {}
+	var qs := PhysicsRayQueryParameters2D.create(
+		Vector2(x_alvo, y_topo - 6.0), Vector2(x_alvo, y_topo + 6.0), 1)
+	qs.exclude = [self]
+	if espaco.intersect_ray(qs).is_empty():
+		return {}
+	return {"alvo": Vector2(x_alvo, y_topo - 24.0 - 1.0)}
+
+
+## A pose de aterragem já passou o mínimo (~4 ticks) e ela está a mexer-se.
+func _pose_aterrar_cancelavel() -> bool:
+	return absf(velocity.x) > 24.0 and _aterrar_t <= ATERRAGEM_TEMPO - ATERRAGEM_POSE_MIN
 
 
 func _process(dt: float) -> void:
@@ -1643,6 +1881,8 @@ func _atualizar_anim() -> void:
 		a = "morte"
 	elif _hurt_t > 0.0 and sf.has_animation("hurt"):
 		a = "hurt"
+	elif _voando:
+		a = "idle"  # Voo Dev sem queda infinita; preserva a reação ao dano.
 	elif _rolar_restante > 0.0 and sf.has_animation("roll"):
 		a = "roll"
 	elif _dash_restante > 0.0 and sf.has_animation("dash"):
@@ -1651,6 +1891,8 @@ func _atualizar_anim() -> void:
 		a = "borda"
 	elif _escalando or _borda:
 		a = "wallslide"
+	elif _pogo_estado == 1 or _pogo_estado == 2:
+		a = "attack"  # PLACEHOLDER: falta a pose propria do ataque descendente
 	elif _ataque_restante > 0.0:
 		a = _anim_ataque()
 	elif _defendendo and sf.has_animation("defesa"):
@@ -1668,7 +1910,7 @@ func _atualizar_anim() -> void:
 			a = "jump"
 		else:
 			a = "fall"
-	elif _aterrar_t > 0.0 and sf.has_animation("aterrar"):
+	elif _aterrar_t > 0.0 and not _pose_aterrar_cancelavel() and sf.has_animation("aterrar"):
 		a = "aterrar"
 	elif absf(velocity.x) > 24.0:
 		a = "run"
@@ -1719,28 +1961,34 @@ func _anim_locomocao_piloto_5g(sf: SpriteFrames) -> String:
 		_piloto_5g_no_ar = false
 		_piloto_5g_em_movimento = false
 		return "land"
-	if _aterrar_t > 0.0 and _corpo.animation == &"land" and _corpo.is_playing():
+	if _aterrar_t > 0.0 and _corpo.animation == &"land" and _corpo.is_playing() \
+			and not _pose_aterrar_cancelavel():
 		return "land"
 
+	# F1 passagem 2: brake e turn seguem a física real. O brake dura enquanto a
+	# Koliani DESLIZA sem input (não depois de parar); o turn dura até já ir
+	# a `TURN_VEL_FIM` no sentido novo e atravessa o zero sem cair num brake.
+	var dir_in := Input.get_axis("mover_esquerda", "mover_direita") * _inverso
 	var em_movimento := absf(velocity.x) > 24.0
 	if em_movimento:
 		var virou := _piloto_5g_em_movimento and not is_equal_approx(_piloto_5g_facing, _olha_para)
 		_piloto_5g_facing = _olha_para
 		if virou:
 			return "turn"
-		if _corpo.animation == &"turn" and _corpo.is_playing():
+		if _corpo.animation == &"turn" and _corpo.is_playing() \
+				and not (signf(velocity.x) == _olha_para and absf(velocity.x) >= TURN_VEL_FIM):
 			return "turn"
-		if not _piloto_5g_em_movimento:
-			_piloto_5g_em_movimento = true
-			return "run_start"
-		if _corpo.animation == &"run_start" and _corpo.is_playing():
-			return "run_start"
+		_piloto_5g_em_movimento = true
+		if dir_in == 0.0:
+			return "run_brake"
 		return "run"
 
+	if dir_in != 0.0 and _corpo.animation == &"turn" and _corpo.is_playing():
+		return "turn"
 	if _piloto_5g_em_movimento:
 		_piloto_5g_em_movimento = false
-		return "run_brake"
-	if _corpo.animation == &"run_brake" and _corpo.is_playing():
+		return "run_brake" if absf(velocity.x) > 0.5 and dir_in == 0.0 else "idle"
+	if _corpo.animation == &"run_brake" and _corpo.is_playing() and absf(velocity.x) > 0.5:
 		return "run_brake"
 	return "idle"
 
@@ -1878,6 +2126,11 @@ const _BRILHO_CORPO := Color(1.4, 1.38, 1.5)
 const _BRILHO_SHADOW := Color(1.12, 1.10, 1.18)
 
 func _tint_armadura() -> Color:
+	# cosmético da Loja: só tinta visual por cima do resto
+	return _tint_armadura_base() * CosmeticosVisuais.tinta_skin()
+
+
+func _tint_armadura_base() -> Color:
 	if usar_prototipo_premium:
 		# O Level 1 tem luz verde intensa; sem esta compensacao os grafites do
 		# prototype ficam quase brancos e perdem a silhueta dark-fantasy.
@@ -1961,15 +2214,165 @@ func _abanar(forca: float) -> void:
 
 
 ## Pequena paragem de tempo real ("hitstop") para dar peso ao impacto.
+##
+## Nao poe o tempo a ZERO -- ver `HITSTOP_ESCALA_TEMPO`.
 func _hitstop(segundos: float) -> void:
 	if Engine.time_scale < 0.5:
 		return
-	Engine.time_scale = 0.0
+	Engine.time_scale = HITSTOP_ESCALA_TEMPO
 	# NÃO usar `await` aqui: se a Koliani for libertada (reload de cena) a
 	# meio, a corrotina morre e o time_scale ficava preso em 0 = freeze.
 	# O timer vive na árvore e o Callable não segura `self`.
 	get_tree().create_timer(segundos, true, false, true).timeout.connect(
 		func() -> void: Engine.time_scale = 1.0)
+
+
+func _pogo_pode_iniciar() -> bool:
+	return EstadoJogo.tem_habilidade("pogo") and _pogo_cd <= 0.0 and not is_on_floor() 		and Input.is_action_pressed("mirar_baixo") and not _defendendo and _rolar_restante <= 0.0 		and _dash_restante <= 0.0 and not _voando and not _escalando and not _borda
+
+
+func _iniciar_pogo() -> void:
+	_cancelar_ataque()
+	_pogo_estado = 1
+	_pogo_t = POGO_STARTUP
+	Som.toca(SOM_COMBO[0], VOL_COMBO[0], 0.75, 0.02)
+	_pogo_visual(true)
+
+
+func _fim_pogo(cd := 0.0) -> void:
+	_pogo_estado = 0
+	_pogo_t = 0.0
+	_pogo_cd = cd
+	_pogo_visual(false)
+
+
+## Lamina descendente: PLACEHOLDER (triangulo), nao e' arte final.
+func _pogo_visual(ligado: bool) -> void:
+	if _pogo_lamina == null:
+		if not ligado:
+			return
+		_pogo_lamina = Polygon2D.new()
+		_pogo_lamina.name = "PogoLamina"
+		_pogo_lamina.polygon = PackedVector2Array([Vector2(-11, 22), Vector2(11, 22), Vector2(0, 60)])
+		_pogo_lamina.color = Color(0.78, 0.52, 1.0, 0.85)
+		_pogo_lamina.z_index = 20
+		add_child(_pogo_lamina)
+	_pogo_lamina.visible = ligado
+	if ligado:
+		_pogo_lamina.modulate.a = 0.45 if _pogo_estado == 1 else 1.0
+
+
+func _tratar_pogo(dt: float) -> void:
+	_pogo_cd = maxf(0.0, _pogo_cd - dt)
+	if _pogo_estado == 0:
+		return
+	if is_on_floor() or _voando or _escalando or _borda:
+		_fim_pogo(0.12 if _pogo_estado != 3 else 0.0)
+		return
+	_pogo_t -= dt
+	if _pogo_estado == 1:
+		# preparacao: trava a queda (legivel e justo mesmo a velocidade terminal)
+		velocity.y = minf(velocity.y, POGO_TRAVAO)
+		if _pogo_t <= 0.0:
+			_pogo_estado = 2
+			_pogo_t = POGO_ATIVO
+			velocity.y = POGO_MERGULHO
+			_pogo_visual(true)
+	elif _pogo_estado == 2:
+		# janela activa: a lamina protege (o alvo e' atingido antes de o contacto ferir)
+		_invulneravel = maxf(_invulneravel, 0.05)
+		if _pogo_acertar():
+			return
+		if _pogo_t <= 0.0:
+			_pogo_estado = 3
+			_pogo_t = POGO_RECUP_FALHA
+			_pogo_visual(false)
+	elif _pogo_t <= 0.0:
+		_fim_pogo()
+
+
+## Procura um alvo valido debaixo dos pes: inimigo nao-chefe (dano + ressalto) ou algo `pogavel`
+## (espinhos/serra: so' ressalto). Os chefes continuam a nao ser pisaveis (decisao de 3 set 2026).
+func _pogo_acertar() -> bool:
+	var pes := global_position.y + 24.0
+	var alvo: Node2D = null
+	for e in get_tree().get_nodes_in_group("inimigos"):
+		if not is_instance_valid(e) or not (e as Node).has_method("receber_dano"):
+			continue
+		if ("vida" in e and e.vida <= 0) or (e as Node).is_in_group("chefes"):
+			continue
+		var ep: Vector2 = (e as Node2D).global_position
+		if absf(ep.x - global_position.x) > 46.0 or global_position.y > ep.y + 6.0 				or pes < ep.y - 90.0 or pes > ep.y + 30.0:
+			continue
+		alvo = e
+		break
+	var pogavel := false
+	if alvo == null:
+		var q := PhysicsShapeQueryParameters2D.new()
+		var rs := RectangleShape2D.new()
+		rs.size = Vector2(40.0, 34.0)
+		q.shape = rs
+		q.transform = Transform2D(0.0, global_position + Vector2(0.0, 30.0))
+		q.collision_mask = 1 << 5
+		q.collide_with_areas = true
+		q.collide_with_bodies = false
+		for h in get_world_2d().direct_space_state.intersect_shape(q, 8):
+			if (h["collider"] as Node).is_in_group("pogavel"):
+				pogavel = true
+				if (h["collider"] as Node).has_method("pogo_acertado"):
+					(h["collider"] as Node).call("pogo_acertado")   # alvos authored (brotos do N5)
+				break
+	if alvo == null and not pogavel:
+		return false
+	var pos := global_position + Vector2(0.0, 24.0)
+	if alvo != null:
+		pos = alvo.global_position
+		var crit: bool = alvo.has_method("esta_vulneravel") and alvo.esta_vulneravel()
+		alvo.receber_dano(_dano_golpe(), 0.0, crit)
+		_abanar(TREMOR_CRIT if crit else TREMOR_PISAO)
+		_hitstop(HITSTOP_CRIT if crit else HITSTOP_PISAO)
+	else:
+		_abanar(TREMOR_PISAO)
+		_hitstop(HITSTOP_PISAO)
+	ganhar_energia(ENERGIA_POR_POGO)
+	aplicar_impulso(Vector2(0.0, -POGO_RESSALTO), true)
+	_invulneravel = maxf(_invulneravel, 0.3)
+	_pop = 1.0
+	_squash = maxf(_squash, 0.5)
+	Som.toca("pisao_koliani", -10.0, 0.95, 0.03)
+	_pop_impacto(pos)
+	_pogo_estado = 3
+	_pogo_t = POGO_RECUP_ACERTO
+	_pogo_visual(false)
+	return true
+
+
+## Liga o Combat Lab a esta Koliani (so' o lab chama isto). Devolve o componente.
+func ativar_combat_lab() -> Node:
+	if _lab == null:
+		_lab = load("res://scripts/lab/combate_lab.gd").new()
+		_lab.name = "CombateLab"
+		add_child(_lab)
+		_lab.iniciar(self)
+	return _lab
+
+
+## Liga o Core Combat de producao a esta Koliani (so' a arena de QA da Fase 11 chama isto;
+## nenhum nivel de campanha o faz). `balance` por omissao carrega o recurso v1 do Combat Lab.
+func ativar_core_combate(balance: BalanceCombate = null) -> CoreCombate:
+	if _core == null:
+		_core = CoreCombate.new()
+		_core.name = "CoreCombate"
+		add_child(_core)
+		_core.iniciar(self, balance if balance != null else BalanceCombate.new())
+	return _core
+
+
+## Os dois componentes (`_lab`/`_core`) expoem a mesma interface e nunca coexistem na pratica
+## (Combat Lab e arena de producao sao cenas diferentes) -- este helper evita duplicar os
+## pontos de despacho abaixo por cada um.
+func _combate_extra() -> Object:
+	return _lab if _lab != null else _core
 
 
 func _iniciar_ataque() -> void:
@@ -1978,11 +2381,19 @@ func _iniciar_ataque() -> void:
 	_ataque_no_ar = not is_on_floor()
 	_combo_passo = 0 if _ataque_no_ar else (
 		(_combo_passo + 1) % NUM_COMBO if _combo_janela > 0.0 else 0)
+	if _combate_extra() != null and _ataque_no_ar:
+		_combo_passo = _combate_extra().ar_passo_seguinte()
 	# Os rigs com tiras extra apresentam os três golpes; no ar fica um golpe
 	# único e coerente mesmo quando só existe a animação `attack`.
 	var tem_combo := RIG == "cavaleiro" or RIG == "nova" or RIG == "shadowblade"
 	_ataque_dur = DUR_COMBO[_combo_passo] if tem_combo else DUR_ATAQUE
 	_ataque_restante = _ataque_dur
+	_lab_extra_recup = 0.0
+	if _combate_extra() != null:
+		# Combat Lab v1.2: recuperacao extra (o 4.o golpe) SEM mexer na janela activa
+		_lab_extra_recup = _combate_extra().recup_extra(_combo_passo, _ataque_no_ar)
+		_ataque_dur += _lab_extra_recup
+		_ataque_restante = _ataque_dur
 	_combo_janela = 0.0 if _ataque_no_ar else _ataque_dur + JANELA_COMBO
 	_combo_pedido = false
 	_alvos_atingidos_ataque.clear()
@@ -1994,15 +2405,11 @@ func _iniciar_ataque() -> void:
 	_avanco_vel = AVANCO_VEL[i_av] * (1.0 if is_on_floor() else AVANCO_NO_AR)
 	_avanco_dur = AVANCO_DUR[i_av]
 	_avanco_restante = _avanco_dur
-	# CADA golpe do combo tem som proprio (Execution 9H.13). Antes eram dois
-	# samples com `pitch_scale` por cima (`TOM_COMBO`) -- o mesmo golpe quatro
-	# vezes com outro tom, que e' exactamente o que soava a amador. Agora os
-	# quatro crescem em corpo, em sopro e em cauda; o volume tambem sobe, mas
-	# e' o que menos conta. `TOM_COMBO` fica so' como variacao ligeira.
+	# Quatro assets Shadowblade proprios (Prompt 5), com a mesma ressonancia
+	# mas transientes, cortes e envelopes diferentes. `TOM_COMBO` so' colore.
 	var tom: float = TOM_COMBO[clampi(_combo_passo, 0, TOM_COMBO.size() - 1)]
 	var i_som: int = clampi(_combo_passo, 0, SOM_COMBO.size() - 1)
-	Som.toca(SOM_COMBO[i_som], VOL_COMBO[i_som],
-		lerpf(1.0, tom, 0.35) * randf_range(0.98, 1.02))
+	Som.toca(SOM_COMBO[i_som], VOL_COMBO[i_som], lerpf(1.0, tom, 0.35), 0.02)
 	_marcar_combo()
 	_flash_golpe()
 	_disparar_vfx_golpe()
@@ -2056,10 +2463,15 @@ const SELO_COMBO_Y := -104.0
 
 
 func _atualizar_janela_ataque() -> void:
+	if lab_golpe_custom:
+		if _hitbox:
+			_hitbox.monitoring = false
+		return
 	if _hitbox == null or _ataque_dur <= 0.0:
 		return
 	var passo := clampi(_combo_passo, 0, NUM_COMBO - 1)
-	var progresso := clampf(1.0 - _ataque_restante / _ataque_dur, 0.0, 1.0)
+	# (com `_lab_extra_recup` = 0 e' exactamente 1 - restante/dur)
+	var progresso := clampf((_ataque_dur - _ataque_restante) / maxf(_ataque_dur - _lab_extra_recup, 0.001), 0.0, 1.0)
 	_hitbox.monitoring = janela_ataque_ativa(passo, progresso)
 
 
@@ -2069,6 +2481,7 @@ static func janela_ataque_ativa(passo: int, progresso: float) -> bool:
 
 
 func _desativar_hitbox_ataque() -> void:
+	lab_golpe_custom = false
 	if _hitbox:
 		_hitbox.monitoring = false
 	_alvos_atingidos_ataque.clear()
@@ -2136,6 +2549,50 @@ func _tratar_lancar(_dt: float) -> void:
 		_lancar_projetil()
 
 
+## Energia actual (so' leitura; testes e HUD).
+func energia_actual() -> float:
+	return _energia
+
+
+func ganhar_energia(qtd: float) -> void:
+	_energia = clampf(_energia + qtd, 0.0, ENERGIA_MAX)
+	energia_mudou.emit(_energia, ENERGIA_MAX)
+
+
+## Especial: gasta ESPECIAL_CUSTO e lanca a onda espectral (atravessa inimigos, ESPECIAL_DANO_MULT x o
+## golpe). Sem Energia suficiente NAO faz nada (a Energia nunca fica negativa) e avisa o HUD.
+func usar_especial() -> bool:
+	if not EstadoJogo.tem_habilidade("especial") or _defendendo or _rolar_restante > 0.0 \
+			or _dash_restante > 0.0 or _especial_cd > 0.0 or _pogo_estado != 0:
+		return false
+	if _energia < ESPECIAL_CUSTO:
+		_especial_cd = 0.25
+		energia_insuficiente.emit()
+		Som.toca("bloqueio", -14.0, 0.8, 0.02)
+		return false
+	_energia = maxf(0.0, _energia - ESPECIAL_CUSTO)
+	_regen_pausa = ESPECIAL_PAUSA_REGEN
+	_especial_cd = ESPECIAL_CD
+	energia_mudou.emit(_energia, ENERGIA_MAX)
+	_lancar_restante = DUR_LANCAR * 1.6
+	if _corpo and _corpo.sprite_frames and _corpo.sprite_frames.has_animation("lancar"):
+		_corpo.play("lancar")
+		_corpo.set_frame_and_progress(0, 0.0)
+	_pop = 1.0
+	_acender_aura(1.0)
+	_abanar(TREMOR_GOLPE)
+	var aim := Vector2(_olha_para, 0.0)
+	var p := PROJETIL_MAGICO.instantiate()
+	get_parent().add_child(p)
+	p.scale = Vector2(ESPECIAL_ESCALA, ESPECIAL_ESCALA)
+	p.perfura = true
+	p.global_position = global_position + aim * 24.0 + Vector2(0.0, -4.0)
+	p.lancar(aim, maxi(1, roundi(_dano_golpe() * ESPECIAL_DANO_MULT)))
+	magia_lancada.emit()
+	Som.toca("lancar", -3.0, 0.7, 0.03)
+	return true
+
+
 ## Lança um tiro mágico numa das 8 direções (mira = eixos de movimento + W/S;
 ## sem mira, para onde está virada). Ilimitado, dá 1/3 do dano do golpe.
 func _lancar_projetil() -> void:
@@ -2153,7 +2610,7 @@ func _lancar_projetil() -> void:
 	p.global_position = global_position + aim * 20.0 + Vector2(0.0, -4.0)
 	p.lancar(aim, maxi(1, roundi(_dano_golpe() / 3.0)))
 	magia_lancada.emit()  # Ativa plataformas espectrais sem depender do feixe.
-	Som.toca("lancar", -9.0, randf_range(0.96, 1.08))
+	Som.toca("lancar", -9.0, 1.0, 0.04)
 	if _faiscas:
 		_faiscas.position.x = absf(_faiscas.position.x) * signf(aim.x if aim.x != 0.0 else _olha_para)
 		_faiscas.restart()
@@ -2165,6 +2622,7 @@ func _ao_acertar_corpo(corpo: Node) -> void:
 		if _alvos_atingidos_ataque.has(alvo_id):
 			return
 		_alvos_atingidos_ataque[alvo_id] = true
+		ganhar_energia(ENERGIA_POR_GOLPE)
 		# CRÍTICO (pegada Dead Cells): inimigo vulnerável (gelo/fogo/sangue/
 		# atordoado), golpe logo a seguir a um rolamento, ou golpe pelas costas.
 		var crit := false
@@ -2175,25 +2633,36 @@ func _ao_acertar_corpo(corpo: Node) -> void:
 		elif corpo is Node2D and corpo.get("_direcao") != null \
 				and signf(global_position.x - (corpo as Node2D).global_position.x) == -float(corpo._direcao):
 			crit = true
-		corpo.receber_dano(_dano_golpe(), sign(_olha_para), crit)
-		# remate do combo (3.º golpe) -> deixa o inimigo a SANGRAR
-		if _combo_passo >= NUM_COMBO - 1 and corpo.has_method("sangrar"):
-			corpo.sangrar(2.6, maxi(3, roundi(_dano_golpe() * 0.16)))
+		var passo := clampi(_combo_passo, 0, NUM_COMBO - 1)
+		var dano := maxi(1, roundi(_dano_golpe() * float(DANO_COMBO[passo])))
+		if _combate_extra() != null:
+			dano = _combate_extra().ao_acertar_normal(corpo, passo, _ataque_no_ar, dano)
+		corpo.receber_dano(dano, sign(_olha_para), crit, float(RECUO_COMBO[passo]))
+		# 3.º golpe: ATORDOA -- é o pagamento por arriscar o golpe lento.
+		if passo == NUM_COMBO - 2 and corpo.has_method("atordoar"):
+			corpo.atordoar(ATORDOA_COMBO)
+		# remate do combo (4.º golpe) -> deixa o inimigo a SANGRAR
+		if passo >= NUM_COMBO - 1 and corpo.has_method("sangrar"):
+			corpo.sangrar(2.6, maxi(3, roundi(dano * 0.16)))
 		if _faiscas:
 			_faiscas.position.x = absf(_faiscas.position.x) * _olha_para
 			_faiscas.restart()
-		var remate := _combo_passo >= NUM_COMBO - 1
+		var remate := passo >= NUM_COMBO - 1
+		# Os dois golpes do fim da cadeia (o que atordoa e o remate) pesam
+		# mais. Continuam dentro da regra de 8.1C: <=2 frames a 165 Hz no
+		# que acontece a toda a hora, <=4 no que é raro.
+		var pesado := passo >= NUM_COMBO - 2
 		_pop_impacto((corpo as Node2D).global_position if corpo is Node2D else global_position,
 			crit or remate)
-		_abanar(TREMOR_CRIT if crit else (TREMOR_REMATE if remate else TREMOR_GOLPE))
-		_hitstop(HITSTOP_CRIT if crit else (HITSTOP_REMATE if remate else HITSTOP_GOLPE))
+		_abanar(TREMOR_CRIT if crit else (TREMOR_REMATE if pesado else TREMOR_GOLPE))
+		_hitstop(HITSTOP_CRIT if crit else (HITSTOP_REMATE if pesado else HITSTOP_GOLPE))
 		# 9H.1: acertar num inimigo levanta a camada de intensidade da música
 		# (só na Região I, e só fora do combate de chefe -- ver `Musica`).
 		Musica.intensificar()
 		if crit:
-			Som.toca("acerto", -5.0, randf_range(1.18, 1.32))
+			Som.toca("acerto_critico", -6.0, 1.0, 0.02, 0.0, "", Som.Prioridade.MEDIA)
 		else:
-			Som.toca("acerto", -8.0, randf_range(0.94, 1.07))
+			Som.toca("acerto", -8.0, 1.0, 0.04)
 
 
 ## "Frame de impacto": o anel pixel-art (`Impacto`) a abrir no ponto do
@@ -2265,7 +2734,8 @@ func _bloqueia(dir_empurrao: float) -> bool:
 func _ao_bloquear() -> void:
 	_invulneravel = maxf(_invulneravel, BLOQUEIO_IFRAMES)
 	_cupula_flash = 1.0
-	Som.toca("bloqueio", -15.0, randf_range(0.97, 1.06))
+	Som.toca("escudo_impacto", -11.0, 1.0, 0.02, 0.12, "player_shield_impact",
+		Som.Prioridade.MEDIA)
 	_abanar(2.5)
 	if _escudo:
 		_escudo.scale = Vector2(1.28, 1.16)
@@ -2322,7 +2792,7 @@ func alternar_voo() -> bool:
 		collision_mask = _mask_guardada if _mask_guardada != 0 else collision_mask
 		_mov.velocidade = Vector2.ZERO
 		_mov.saltos_dados = 0
-	Som.toca("salto_duplo" if _voando else "aterrar", -12.0)
+	Som.toca("salto_duplo" if _voando else "aterrar", -12.0, 1.0, 0.03)
 	return _voando
 
 
@@ -2385,7 +2855,7 @@ func engatar(ancora: Vector2, comprimento := 0.0) -> void:
 	_gancho_vel = clampf(velocity.dot(tangente) / maxf(24.0, _gancho_comp),
 		-Movimento.GANCHO_VEL_MAX, Movimento.GANCHO_VEL_MAX)
 	velocity = Vector2.ZERO
-	Som.toca("agarrar", -11.0, randf_range(0.95, 1.06))
+	Som.toca("agarrar", -11.0, 1.0, 0.04)
 
 
 ## Larga a trepadeira. Sai pela tangente do círculo mais um empurrão para
@@ -2400,7 +2870,7 @@ func largar_gancho() -> void:
 	velocity = Movimento.velocidade_ao_largar(_gancho_theta, _gancho_vel, _gancho_comp)
 	_mov.velocidade = velocity
 	_mov.saltos_dados = 1     # ainda lhe sobra o salto do ar
-	Som.toca("salto", -11.0)
+	Som.toca("koliani_salto", -11.0, 1.0, 0.03)
 
 
 func _passo_gancho(dt: float) -> void:
@@ -2427,19 +2897,139 @@ func soprar_para_cima(forca: float, alvo: float) -> void:
 	_vento_restante = 0.12  # renova-se enquanto a área a alimentar
 
 
-func receber_dano(quantidade: int, dir_empurrao: float = 0.0) -> void:
-	if _invulneravel > 0.0:
+## Regista ou renova uma força de vento proveniente de uma zona concreta.
+## A direção está embutida em `aceleracao`; a velocidade máxima limita apenas
+## o sentido dessa influência. Não altera gravidade, corrida ou aceleração.
+func atualizar_vento(fonte: Object, aceleracao: Vector2,
+		velocidade_max: float, duracao := VENTO_EXTERNO_TTL) -> void:
+	if fonte == null or aceleracao.is_zero_approx():
+		if fonte != null:
+			remover_vento(fonte)
 		return
-	if EstadoJogo.modo_dev:  # modo de testes: não perde vida
+	_ventos_externos[fonte.get_instance_id()] = {
+		"fonte": weakref(fonte),
+		"aceleracao": aceleracao,
+		"velocidade_max": maxf(0.0, velocidade_max),
+		"restante": maxf(duracao, 0.0),
+	}
+
+
+func remover_vento(fonte: Object) -> void:
+	if fonte != null:
+		_ventos_externos.erase(fonte.get_instance_id())
+
+
+func limpar_ventos() -> void:
+	_ventos_externos.clear()
+
+
+func quantidade_ventos_ativos() -> int:
+	_descartar_ventos_invalidos(0.0)
+	return _ventos_externos.size()
+
+
+func aceleracao_vento_resultante() -> Vector2:
+	_descartar_ventos_invalidos(0.0)
+	var resultado := Vector2.ZERO
+	for entrada: Dictionary in _ventos_externos.values():
+		resultado += entrada["aceleracao"] as Vector2
+	return resultado
+
+
+func _aplicar_ventos_externos(dt: float) -> void:
+	_descartar_ventos_invalidos(dt)
+	var ids := _ventos_externos.keys()
+	ids.sort()
+	for id in ids:
+		var entrada: Dictionary = _ventos_externos[id]
+		velocity = Movimento.aplicar_forca_externa(
+			velocity,
+			entrada["aceleracao"] as Vector2,
+			float(entrada["velocidade_max"]),
+			dt,
+		)
+
+
+func _descartar_ventos_invalidos(dt: float) -> void:
+	for id in _ventos_externos.keys():
+		var entrada: Dictionary = _ventos_externos[id]
+		var fonte_fraca: WeakRef = entrada["fonte"]
+		entrada["restante"] = float(entrada["restante"]) - dt
+		if fonte_fraca.get_ref() == null or float(entrada["restante"]) <= 0.0:
+			_ventos_externos.erase(id)
+		else:
+			_ventos_externos[id] = entrada
+
+
+## Regista ou renova o planar concedido por uma zona concreta (`ZonaPlanar`).
+func atualizar_planar_contextual(fonte: Object,
+		duracao := PLANAR_CONTEXTO_TTL) -> void:
+	if fonte == null:
+		return
+	_planar_contextos[fonte.get_instance_id()] = {
+		"fonte": weakref(fonte),
+		"restante": maxf(duracao, 0.0),
+	}
+
+
+func remover_planar_contextual(fonte: Object) -> void:
+	if fonte != null:
+		_planar_contextos.erase(fonte.get_instance_id())
+
+
+func limpar_planar_contextual() -> void:
+	_planar_contextos.clear()
+	_planando = false
+
+
+func quantidade_planar_contextual() -> int:
+	_descartar_planar_invalido(0.0)
+	return _planar_contextos.size()
+
+
+## Pode planar AGORA? Habilidade permanente ou contexto de zona. Uma
+## `ZonaSemPoder` que suspenda "planar" desliga as duas fontes.
+func pode_planar() -> bool:
+	if EstadoJogo.tem_habilidade("planar"):
+		return true
+	if "planar" in EstadoJogo.habilidades_suspensas:
+		return false
+	return quantidade_planar_contextual() > 0
+
+
+func esta_a_planar() -> bool:
+	return _planando
+
+
+func _descartar_planar_invalido(dt: float) -> void:
+	for id in _planar_contextos.keys():
+		var entrada: Dictionary = _planar_contextos[id]
+		var fonte_fraca: WeakRef = entrada["fonte"]
+		entrada["restante"] = float(entrada["restante"]) - dt
+		if fonte_fraca.get_ref() == null or float(entrada["restante"]) <= 0.0:
+			_planar_contextos.erase(id)
+		else:
+			_planar_contextos[id] = entrada
+
+
+## `origem` (Combat Lab v1.1): "" = contacto/desconhecido (omissao -- todos os chamadores de producao),
+## "ataque" = golpe/projectil de um inimigo, "hazard_ataque" = armadilha que ataca. So' as duas
+## ultimas podem dar Perfect Dodge (ver `CombateLab.tentativa_de_dano`).
+func receber_dano(quantidade: int, dir_empurrao: float = 0.0, origem := "") -> void:
+	if _invulneravel > 0.0:
+		if _combate_extra() != null:
+			_combate_extra().tentativa_de_dano(quantidade, origem)
 		return
 	if _defendendo and _bloqueia(dir_empurrao):
 		_ao_bloquear()
 		return
 	var real := int(round(quantidade * (1.0 - EstadoJogo.reducao_armadura())))
-	vida = maxi(0, vida - maxi(1, real))
+	vida = _vida_max() if EstadoJogo.modo_dev else maxi(0, vida - maxi(1, real))
 	_invulneravel = I_FRAMES
 	_hurt_t = 0.24
 	Musica.intensificar()   # 9H.1: levar dano também é combate
+	if _pogo_estado != 0:
+		_fim_pogo(0.2)
 	_cancelar_ataque(true)  # dano corta ataque/combo e desliga a hitbox imediatamente
 	vida_mudou.emit(vida, _vida_max())
 	_flash_branco()
@@ -2448,9 +3038,14 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0) -> void:
 			1.0, 0.0, _olha_para < 0.0, false, 41, 0.35)
 	_abanar(TREMOR_DANO)
 	_hitstop(HITSTOP_DANO)
-	Som.toca("dano", -7.0)
 	if vida <= 0:
 		_morrer()
+	else:
+		# Um golpe fatal tem a voz propria de morte; empilhar `dano` no mesmo
+		# frame mascarava esse evento e gastava duas vozes do pool.
+		Som.toca("dano_pesado" if real >= maxi(2, int(_vida_max() * 0.25)) else "dano",
+			-7.0, 1.0, 0.02, 0.12, "player_hurt",
+			Som.Prioridade.MEDIA)
 
 
 ## Passos e raspar na parede. Sao os unicos sons dela em CICLO, por isso
@@ -2460,7 +3055,8 @@ func _sons_de_movimento(dt: float) -> void:
 		_passo_t -= dt * (absf(velocity.x) / VEL_PASSO_REF)
 		if _passo_t <= 0.0:
 			_passo_t = INTERVALO_PASSO
-			Som.toca("passo%d" % (randi() % 3 + 1), -24.0, randf_range(0.9, 1.12))
+			_passo_variante = (_passo_variante + 1) % 3
+			Som.toca("passo%d" % (_passo_variante + 1), -24.0, 1.0, 0.08)
 	else:
 		_passo_t = 0.0   # parada, o proximo passo sai logo ao arrancar
 
@@ -2468,7 +3064,7 @@ func _sons_de_movimento(dt: float) -> void:
 		_parede_t -= dt
 		if _parede_t <= 0.0:
 			_parede_t = INTERVALO_PAREDE
-			Som.toca("parede", -22.0, randf_range(0.94, 1.09))
+			Som.toca("parede", -22.0, 1.0, 0.06)
 	else:
 		_parede_t = 0.0
 
@@ -2479,7 +3075,7 @@ func _morrer() -> void:
 	_a_morrer = true
 	_cancelar_ataque(true)
 	_vfx_morte()
-	Som.toca("morte_koliani", -6.0)
+	Som.toca("morte_koliani", -6.0, 1.0, 0.02, 0.0, "", Som.Prioridade.ALTA)
 	Engine.time_scale = 1.0  # não deixar um hitstop pendente a segurar o tempo
 	set_physics_process(false)
 	morreu.emit()
@@ -2497,11 +3093,18 @@ func _morrer() -> void:
 func recuperar_no_checkpoint(posicao_segura: Vector2) -> void:
 	if _a_morrer or posicao_segura == Vector2.ZERO:
 		return
+	Som.toca("respawn", -9.0, 1.0, 0.01, 0.0, "", Som.Prioridade.MEDIA)
 	global_position = posicao_segura + Vector2(0.0, -ALTURA_SPAWN)
 	# Reaparecer é o teletransporte mais longo do jogo (fogueira do outro lado
 	# do nível). Sem este reset via-se um risco dela a atravessar o mapa.
 	reset_physics_interpolation()
 	velocity = Vector2.ZERO
+	_mov.velocidade = Vector2.ZERO
+	_borda = false
+	_mantle_ativo = false
+	limpar_ventos()
+	# a zona que contenha a fogueira volta a conceder no frame seguinte
+	limpar_planar_contextual()
 	_desencravar()
 	_pos_inicial = global_position
 
@@ -2570,6 +3173,10 @@ func _desencravar() -> void:
 ## todo o ciclo e o da frente 34 px, e em nenhum dos 10 frames o pe' esquerdo
 ## passa a' frente do direito. Isso precisa de frames nativos -- ver o
 ## relatorio da 9H.13/14 (KOLIANI RUN NATIVE FRAMES REQUIRED).
+## Duracao do ciclo de corrida, em segundos. Os 10 frames golden a 13,33 fps
+## dao exactamente isto, e a tira nativa tem de dar o mesmo para a cadencia
+## por velocidade continuar a bater certo.
+const DUR_CICLO_CORRIDA := 0.75
 const CADENCIA_MIN := 0.55
 const CADENCIA_MAX := 1.85
 

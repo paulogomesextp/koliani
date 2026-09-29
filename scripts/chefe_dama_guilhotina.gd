@@ -1,21 +1,26 @@
 class_name ChefeDamaGuilhotina
 extends ChefeBase
-## Região II / nível 08 -- A Dama da Guilhotina. Executora fantasma que
-## paira no Corredor das Execuções. Não anda: TELEPORTA-SE (esvai-se e
-## reaparece noutro ponto do corredor, a uma distância segura da Koliani).
-## Três ataques:
-##   * LAMINAS    -- arremessa 2-3 lâminas giratórias que voam na horizontal
+## Região II / N08 -- a FEITICEIRA DOS VENTOS (`guard.feiticeira_ventos`).
+## Arquétipo "Mago do Vento" da prancha aprovada da região -- "lança magia
+## de vento, teleporta-se", que é letra por letra o que este encontro já
+## fazia. Não anda: TELEPORTA-SE (esvai-se e reaparece noutro ponto das
+## ruínas, a uma distância segura da Koliani). Três ataques:
+##   * LAMINAS    -- arremessa 2-3 lâminas de vento que voam na horizontal
 ##                   à altura da Koliani.
-##   * GUILHOTINAS-- faz cair várias `Guilhotina` do grupo "guilhotinas_arena"
-##                   ao mesmo tempo (cada uma com o seu atraso).
-##   * CORTE      -- teleporta-se para cima da Koliani e baixa a lâmina num
+##   * LAMINAS DE VENTO -- faz cair várias `Guilhotina` do grupo
+##                   "guilhotinas_arena" ao mesmo tempo (cada uma com o seu
+##                   atraso). É o hazard "LÂMINAS DE VENTO" da prancha.
+##   * CORTE      -- teleporta-se para cima da Koliani e desce o cajado num
 ##                   arco rasteiro (dano ao chão à frente).
 ## Depois de cada ataque MATERIALIZA-SE por instantes (estado EXPOSTA): o
-## manto solidifica, o crânio fica à vista -- única janela de dano, a
-## dobrar. Fora disso é etérea e as lâminas da Koliani atravessam-na.
-## Fase 2 (< 50% vida): "arena quase toda vertical" -- sobe as plataformas
-## do grupo "plataformas_execucoes", teleporta-se mais, telégrafos curtos,
-## mais lâminas.
+## manto solidifica -- única janela de dano, a dobrar. Fora disso é etérea
+## e as lâminas da Koliani atravessam-na.
+## Fase 2 (< 50% vida): sobe as plataformas do grupo
+## "plataformas_execucoes", teleporta-se mais, telégrafos curtos, mais
+## lâminas.
+##
+## Era A Dama da Guilhotina, do Corredor das Execuções. O N08 está LOCKED:
+## nada aqui mudou de tempo, dano ou posição -- só o que se vê e o nome.
 
 enum Fase { DORME, DECIDE, SOME, SURGE, LAMINAS_TEL, LAMINAS, GUILHO_TEL, GUILHO, CORTE_TEL, CORTE, EXPOSTA }
 
@@ -156,7 +161,7 @@ func _ve_koliani() -> bool:
 ## --- teleporte -------------------------------------------------------
 
 func _esvair(a_sair: bool) -> void:
-	Som.toca("projetil", -12.0, 0.5 if a_sair else 0.8)
+	_som_ataque("projetil", -12.0, 0.5 if a_sair else 0.8)
 	if _sprite == null:
 		return
 	var alvo := 0.15 if a_sair else 1.0
@@ -177,7 +182,7 @@ func _teleportar() -> void:
 ## --- ataques ---------------------------------------------------------
 
 func _lancar_laminas() -> void:
-	Som.toca("lamina_cair", -8.0, 1.3)
+	_som_ataque("lamina_cair", -8.0, 1.3)
 	var pai := get_parent()
 	if pai == null:
 		return
@@ -208,14 +213,14 @@ func _lamina(dir: float, y: float, atraso: float) -> void:
 	lam.add_child(forma)
 
 	var poly := Polygon2D.new()
-	poly.color = Color(0.62, 0.68, 0.82, 1.0)
+	poly.color = Color(0.72, 0.62, 0.92, 1.0)
 	poly.polygon = PackedVector2Array([Vector2(-16, 0), Vector2(0, -8), Vector2(16, 0), Vector2(0, 8)])
 	lam.add_child(poly)
 
 	var luz := PointLight2D.new()
 	luz.texture = _tex_luz()
 	luz.energy = 0.6
-	luz.color = Color(0.7, 0.85, 1.0)
+	luz.color = Color(0.72, 0.5, 0.95)
 	luz.scale = Vector2(0.4, 0.35)
 	lam.add_child(luz)
 
@@ -233,7 +238,7 @@ func _lamina(dir: float, y: float, atraso: float) -> void:
 
 
 func _cair_guilhotinas() -> void:
-	Som.toca("lamina_cair", -6.0, 0.8)
+	_som_ataque("lamina_cair", -6.0, 0.8)
 	_abanar_camera(4.0)
 	var gs := get_tree().get_nodes_in_group("guilhotinas_arena")
 	var i := 0
@@ -245,7 +250,7 @@ func _cair_guilhotinas() -> void:
 
 
 func _corte() -> void:
-	Som.toca("lamina_cair", -6.0, 0.7)
+	_som_ataque("lamina_cair", -6.0, 0.7)
 	_abanar_camera(3.0)
 	var dir := _dir_para_koliani()
 	var pai := get_parent()
@@ -262,7 +267,7 @@ func _corte() -> void:
 	forma.shape = rs
 	golpe.add_child(forma)
 	var arco := Polygon2D.new()
-	arco.color = Color(0.75, 0.85, 1.0, 0.5)
+	arco.color = Color(0.62, 0.78, 0.98, 0.5)
 	arco.polygon = PackedVector2Array([Vector2(-48, 14), Vector2(48, 14), Vector2(40, -14), Vector2(-40, -6)])
 	golpe.add_child(arco)
 	var dano := int(round(dano_corte * (1.15 if _fase2 else 1.0)))
@@ -282,7 +287,7 @@ func _corte() -> void:
 
 func _entrar_fase2() -> void:
 	_fase2 = true
-	Som.toca("chefe_cai", -9.0, 0.7)
+	_som_fase("metal")
 	_abanar_camera(7.0)
 	dur_tel *= 0.72
 	dur_exposta *= 0.85
@@ -320,7 +325,8 @@ func _mostrar_nucleo(v: bool) -> void:
 		brilho.visible = v
 
 
-func receber_dano(quantidade: int, dir_empurrao: float = 0.0, critico := false) -> void:
+func receber_dano(quantidade: int, dir_empurrao: float = 0.0, critico := false,
+		_forca_recuo := 0.0) -> void:
 	if _ja_derrotado:
 		return
 	provocar()

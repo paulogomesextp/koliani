@@ -72,6 +72,10 @@ jobs:
         run: godot --headless --script res://tools/verifica_camaras_novas.gd
       - name: Nascer no checkpoint sem ficar preso
         run: godot --headless --path . res://tools/verifica_spawn_livre.tscn
+      # As zonas de vento partilhavam o RectangleShape2D da PackedScene: a
+      # ultima a arrancar impunha o tamanho a todas as outras da cena.
+      - name: Zonas de vento com forma propria
+        run: godot --headless --path . res://tests/run_region02_wind_shapes.tscn
 
   web:
     name: Build Web

@@ -1,0 +1,1592 @@
+{
+  "aceleracao": {
+    "anims": [
+      [
+        "run",
+        50
+      ]
+    ],
+    "distancia_ate_vx_max_px": 17.4166679382324,
+    "tick_1a_velocidade": 0,
+    "tick_anim_run": 0,
+    "tick_vx_24": 0,
+    "tick_vx_max": 6,
+    "tick_vx_metade": 3,
+    "vx_max": 240.0,
+    "vx_por_tick": [
+      38.33,
+      76.67,
+      115.0,
+      153.33,
+      191.67,
+      230.0,
+      240.0,
+      240.0,
+      240.0,
+      240.0,
+      240.0,
+      240.0,
+      240.0,
+      240.0,
+      240.0,
+      240.0,
+      240.0,
+      240.0,
+      240.0,
+      240.0
+    ]
+  },
+  "air_control": {
+    "aceleracao": {
+      "tick_1a_velocidade": 3,
+      "tick_sai_do_chao": 0,
+      "tick_vx_max_no_ar": 13,
+      "vx_por_tick": [
+        0.0,
+        0.0,
+        0.0,
+        22.5,
+        45.0,
+        67.5,
+        90.0,
+        112.5,
+        135.0,
+        157.5,
+        180.0,
+        202.5,
+        225.0,
+        240.0,
+        240.0,
+        240.0,
+        240.0,
+        240.0,
+        240.0,
+        240.0
+      ]
+    },
+    "desaceleracao": {
+      "tick_1a_reducao": 3,
+      "tick_vx_zero": 16,
+      "vx_por_tick": [
+        240.0,
+        240.0,
+        240.0,
+        222.5,
+        205.0,
+        187.5,
+        170.0,
+        152.5,
+        135.0,
+        117.5,
+        100.0,
+        82.5,
+        65.0,
+        47.5,
+        30.0,
+        12.5,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "viragem": {
+      "tick_vx_cruza_zero_apos_3": 7,
+      "tick_vx_menos_max_apos_3": 18,
+      "vx_por_tick": [
+        240.0,
+        240.0,
+        240.0,
+        210.0,
+        180.0,
+        150.0,
+        120.0,
+        90.0,
+        60.0,
+        30.0,
+        0.0,
+        -22.5,
+        -45.0,
+        -67.5,
+        -90.0,
+        -112.5,
+        -135.0,
+        -157.5,
+        -180.0,
+        -202.5
+      ]
+    }
+  },
+  "animacoes_estaticas": {
+    "aterrar": {
+      "duracao_ticks": 15.0,
+      "ficheiros": [
+        "fall_003.png",
+        "fall_001.png",
+        "crouch_001.png",
+        "idle_001.png"
+      ],
+      "fps": 16.0,
+      "frames": 4,
+      "golden": true,
+      "loop": false,
+      "origem_frame0": "fall_003.png"
+    },
+    "attack": {
+      "duracao_ticks": 10.8,
+      "ficheiros": [
+        "attack_basic_001.png",
+        "attack_basic_002.png",
+        "attack_basic_003.png",
+        "attack_basic_004.png",
+        "attack_basic_005.png",
+        "attack_basic_006.png"
+      ],
+      "fps": 33.33,
+      "frames": 6,
+      "golden": true,
+      "loop": false,
+      "origem_frame0": "attack_basic_001.png"
+    },
+    "attack2": {
+      "duracao_ticks": 12.0,
+      "ficheiros": [
+        "attack_2_001.png",
+        "attack_2_002.png",
+        "attack_2_003.png",
+        "attack_2_004.png",
+        "attack_2_005.png",
+        "attack_2_006.png"
+      ],
+      "fps": 30.0,
+      "frames": 6,
+      "golden": true,
+      "loop": false,
+      "origem_frame0": "attack_2_001.png"
+    },
+    "attack3": {
+      "duracao_ticks": 18.0,
+      "ficheiros": [
+        "attack_3_001.png",
+        "attack_3_002.png",
+        "attack_3_003.png",
+        "attack_3_004.png",
+        "attack_3_005.png",
+        "attack_3_006.png"
+      ],
+      "fps": 20.0,
+      "frames": 6,
+      "golden": true,
+      "loop": false,
+      "origem_frame0": "attack_3_001.png"
+    },
+    "attack4": {
+      "duracao_ticks": 15.6,
+      "ficheiros": [
+        "attack_4_001.png",
+        "attack_4_002.png",
+        "attack_4_003.png",
+        "attack_4_004.png",
+        "attack_4_005.png",
+        "attack_4_006.png"
+      ],
+      "fps": 23.08,
+      "frames": 6,
+      "golden": true,
+      "loop": false,
+      "origem_frame0": "attack_4_001.png"
+    },
+    "borda": {
+      "duracao_ticks": 12.0,
+      "ficheiros": [
+        "borda_001.png"
+      ],
+      "fps": 5.0,
+      "frames": 1,
+      "golden": true,
+      "loop": true,
+      "origem_frame0": "borda_001.png"
+    },
+    "crouch": {
+      "duracao_ticks": 10.0,
+      "ficheiros": [
+        "crouch_001.png"
+      ],
+      "fps": 6.0,
+      "frames": 1,
+      "golden": true,
+      "loop": true,
+      "origem_frame0": "crouch_001.png"
+    },
+    "dash": {
+      "duracao_ticks": 9.6,
+      "ficheiros": [
+        "dash_001.png",
+        "dash_002.png",
+        "dash_003.png"
+      ],
+      "fps": 18.75,
+      "frames": 3,
+      "golden": true,
+      "loop": false,
+      "origem_frame0": "dash_001.png"
+    },
+    "defesa": {
+      "duracao_ticks": 10.0,
+      "ficheiros": [
+        "defesa_001.png"
+      ],
+      "fps": 6.0,
+      "frames": 1,
+      "golden": true,
+      "loop": true,
+      "origem_frame0": "defesa_001.png"
+    },
+    "djump": {
+      "duracao_ticks": 24.0,
+      "ficheiros": [
+        "djump_001.png",
+        "djump_002.png",
+        "djump_003.png",
+        "djump_004.png"
+      ],
+      "fps": 10.0,
+      "frames": 4,
+      "golden": true,
+      "loop": false,
+      "origem_frame0": "djump_001.png"
+    },
+    "fall": {
+      "duracao_ticks": 30.0,
+      "ficheiros": [
+        "fall_001.png",
+        "fall_002.png",
+        "fall_003.png"
+      ],
+      "fps": 6.0,
+      "frames": 3,
+      "golden": true,
+      "loop": true,
+      "origem_frame0": "fall_001.png"
+    },
+    "hurt": {
+      "duracao_ticks": 14.4,
+      "ficheiros": [
+        "hurt_001.png",
+        "hurt_002.png"
+      ],
+      "fps": 8.33,
+      "frames": 2,
+      "golden": true,
+      "loop": false,
+      "origem_frame0": "hurt_001.png"
+    },
+    "idle": {
+      "duracao_ticks": 52.5,
+      "ficheiros": [
+        "idle_001.png",
+        "idle_002.png",
+        "idle_003.png",
+        "idle_004.png",
+        "idle_005.png",
+        "idle_006.png",
+        "idle_007.png"
+      ],
+      "fps": 8.0,
+      "frames": 7,
+      "golden": true,
+      "loop": true,
+      "origem_frame0": "idle_001.png"
+    },
+    "jump": {
+      "duracao_ticks": 15.0,
+      "ficheiros": [
+        "jump_start_002.png",
+        "jump_start_003.png",
+        "jump_start_004.png"
+      ],
+      "fps": 12.0,
+      "frames": 3,
+      "golden": true,
+      "loop": false,
+      "origem_frame0": "jump_start_002.png"
+    },
+    "jump_loop": {
+      "duracao_ticks": 30.0,
+      "ficheiros": [
+        "jump_loop_001.png",
+        "jump_loop_002.png",
+        "jump_loop_003.png"
+      ],
+      "fps": 6.0,
+      "frames": 3,
+      "golden": true,
+      "loop": true,
+      "origem_frame0": "jump_loop_001.png"
+    },
+    "jump_start": {
+      "duracao_ticks": 20.0,
+      "ficheiros": [
+        "jump_start_001.png",
+        "jump_start_002.png",
+        "jump_start_003.png",
+        "jump_start_004.png"
+      ],
+      "fps": 12.0,
+      "frames": 4,
+      "golden": true,
+      "loop": false,
+      "origem_frame0": "jump_start_001.png"
+    },
+    "lancar": {
+      "duracao_ticks": 9.6,
+      "ficheiros": [
+        "attack_basic_001.png",
+        "attack_basic_002.png",
+        "attack_basic_003.png",
+        "attack_basic_004.png",
+        "attack_basic_005.png",
+        "attack_basic_006.png"
+      ],
+      "fps": 37.5,
+      "frames": 6,
+      "golden": true,
+      "loop": false,
+      "origem_frame0": "attack_basic_001.png"
+    },
+    "land": {
+      "duracao_ticks": 15.0,
+      "ficheiros": [
+        "fall_003.png",
+        "fall_001.png",
+        "crouch_001.png",
+        "idle_001.png"
+      ],
+      "fps": 16.0,
+      "frames": 4,
+      "golden": true,
+      "loop": false,
+      "origem_frame0": "fall_003.png"
+    },
+    "morte": {
+      "duracao_ticks": 12.9,
+      "ficheiros": [
+        "morte_001.png",
+        "morte_002.png",
+        "morte_003.png"
+      ],
+      "fps": 14.0,
+      "frames": 3,
+      "golden": true,
+      "loop": false,
+      "origem_frame0": "morte_001.png"
+    },
+    "roll": {
+      "duracao_ticks": 18.0,
+      "ficheiros": [
+        "roll_001.png",
+        "roll_002.png",
+        "roll_003.png",
+        "roll_004.png",
+        "roll_005.png",
+        "roll_006.png"
+      ],
+      "fps": 20.0,
+      "frames": 6,
+      "golden": true,
+      "loop": false,
+      "origem_frame0": "roll_001.png"
+    },
+    "run": {
+      "duracao_ticks": 45.0,
+      "ficheiros": [
+        "run_001.png",
+        "run_002.png",
+        "run_003.png",
+        "run_004.png",
+        "run_005.png",
+        "run_006.png",
+        "run_007.png",
+        "run_008.png",
+        "run_009.png",
+        "run_010.png"
+      ],
+      "fps": 13.33,
+      "frames": 10,
+      "golden": true,
+      "loop": true,
+      "origem_frame0": "run_001.png"
+    },
+    "run_brake": {
+      "duracao_ticks": 18.0,
+      "ficheiros": [
+        "run_010.png",
+        "run_009.png",
+        "run_003.png",
+        "run_001.png",
+        "idle_004.png",
+        "idle_001.png"
+      ],
+      "fps": 20.0,
+      "frames": 6,
+      "golden": true,
+      "loop": false,
+      "origem_frame0": "run_010.png"
+    },
+    "run_start": {
+      "duracao_ticks": 30.0,
+      "ficheiros": [
+        "run_001.png",
+        "run_002.png",
+        "run_003.png",
+        "run_004.png",
+        "run_005.png",
+        "run_006.png"
+      ],
+      "fps": 12.0,
+      "frames": 6,
+      "golden": true,
+      "loop": false,
+      "origem_frame0": "run_001.png"
+    },
+    "turn": {
+      "duracao_ticks": 20.0,
+      "ficheiros": [
+        "run_001.png",
+        "run_002.png",
+        "run_003.png",
+        "run_004.png"
+      ],
+      "fps": 12.0,
+      "frames": 4,
+      "golden": true,
+      "loop": false,
+      "origem_frame0": "run_001.png"
+    },
+    "wallslide": {
+      "duracao_ticks": 20.0,
+      "ficheiros": [
+        "wallslide_001.png",
+        "wallslide_002.png"
+      ],
+      "fps": 6.0,
+      "frames": 2,
+      "golden": true,
+      "loop": true,
+      "origem_frame0": "wallslide_001.png"
+    }
+  },
+  "aterragem": {
+    "a_correr_dir_premida": [
+      {
+        "altura_px": 60.0,
+        "anims": [
+          [
+            "land",
+            10
+          ],
+          [
+            "run",
+            30
+          ]
+        ],
+        "aterrar_t_inicial": 0.16,
+        "squash_inicial": 0.31,
+        "tick_1o_land": 0,
+        "tick_anim_run_apos_pouso": 10,
+        "tick_vx_ge_24": 0,
+        "ticks_anim_land": 10,
+        "tier": 1,
+        "vy_max": 421.9,
+        "vy_pre_pouso": 421.9
+      },
+      {
+        "altura_px": 250.0,
+        "anims": [
+          [
+            "land",
+            10
+          ],
+          [
+            "run",
+            30
+          ]
+        ],
+        "aterrar_t_inicial": 0.16,
+        "squash_inicial": 0.61,
+        "tick_1o_land": 0,
+        "tick_anim_run_apos_pouso": 10,
+        "tick_vx_ge_24": 0,
+        "ticks_anim_land": 10,
+        "tier": 3,
+        "vy_max": 905.8,
+        "vy_pre_pouso": 905.8
+      }
+    ],
+    "parado": [
+      {
+        "altura_px": 30.0,
+        "anims": [
+          [
+            "land",
+            10
+          ],
+          [
+            "idle",
+            30
+          ]
+        ],
+        "aterrar_t_inicial": 0.16,
+        "squash_inicial": 0.07,
+        "tick_1o_land": 0,
+        "tick_anim_run_apos_pouso": -1,
+        "tick_vx_ge_24": -1,
+        "ticks_anim_land": 10,
+        "tier": 1,
+        "vy_max": 279.5,
+        "vy_pre_pouso": 279.5
+      },
+      {
+        "altura_px": 60.0,
+        "anims": [
+          [
+            "land",
+            10
+          ],
+          [
+            "idle",
+            30
+          ]
+        ],
+        "aterrar_t_inicial": 0.16,
+        "squash_inicial": 0.31,
+        "tick_1o_land": 0,
+        "tick_anim_run_apos_pouso": -1,
+        "tick_vx_ge_24": -1,
+        "ticks_anim_land": 10,
+        "tier": 1,
+        "vy_max": 421.9,
+        "vy_pre_pouso": 421.9
+      },
+      {
+        "altura_px": 120.0,
+        "anims": [
+          [
+            "land",
+            10
+          ],
+          [
+            "idle",
+            30
+          ]
+        ],
+        "aterrar_t_inicial": 0.16,
+        "squash_inicial": 0.31,
+        "tick_1o_land": 0,
+        "tick_anim_run_apos_pouso": -1,
+        "tick_vx_ge_24": -1,
+        "ticks_anim_land": 10,
+        "tier": 2,
+        "vy_max": 621.1,
+        "vy_pre_pouso": 621.1
+      },
+      {
+        "altura_px": 250.0,
+        "anims": [
+          [
+            "land",
+            10
+          ],
+          [
+            "idle",
+            30
+          ]
+        ],
+        "aterrar_t_inicial": 0.16,
+        "squash_inicial": 0.61,
+        "tick_1o_land": 0,
+        "tick_anim_run_apos_pouso": -1,
+        "tick_vx_ge_24": -1,
+        "ticks_anim_land": 10,
+        "tier": 3,
+        "vy_max": 905.8,
+        "vy_pre_pouso": 905.8
+      },
+      {
+        "altura_px": 500.0,
+        "anims": [
+          [
+            "land",
+            10
+          ],
+          [
+            "idle",
+            30
+          ]
+        ],
+        "aterrar_t_inicial": 0.16,
+        "squash_inicial": 0.61,
+        "tick_1o_land": 0,
+        "tick_anim_run_apos_pouso": -1,
+        "tick_vx_ge_24": -1,
+        "ticks_anim_land": 10,
+        "tier": 3,
+        "vy_max": 1100.0,
+        "vy_pre_pouso": 1100.0
+      },
+      {
+        "altura_px": 900.0,
+        "anims": [
+          [
+            "land",
+            10
+          ],
+          [
+            "idle",
+            30
+          ]
+        ],
+        "aterrar_t_inicial": 0.16,
+        "squash_inicial": 0.61,
+        "tick_1o_land": 0,
+        "tick_anim_run_apos_pouso": -1,
+        "tick_vx_ge_24": -1,
+        "ticks_anim_land": 10,
+        "tier": 3,
+        "vy_max": 1100.0,
+        "vy_pre_pouso": 1100.0
+      }
+    ]
+  },
+  "borda_mantle": {
+    "por_toque": [
+      {
+        "acabou_em_cima": false,
+        "agarrou_no_tick": 63,
+        "anims": [
+          [
+            "jump_loop",
+            5
+          ],
+          [
+            "fall",
+            11
+          ],
+          [
+            "borda",
+            44
+          ]
+        ],
+        "anims_antes": [
+          [
+            "run",
+            25
+          ],
+          [
+            "run_brake",
+            5
+          ],
+          [
+            "jump_start",
+            20
+          ],
+          [
+            "jump_loop",
+            1
+          ],
+          [
+            "fall",
+            12
+          ],
+          [
+            "borda",
+            1
+          ]
+        ],
+        "toque_ticks": 1,
+        "x_final_rel_face": -10.1,
+        "x_rel_face_ao_agarrar": -10.1,
+        "y_ao_agarrar": 534.0,
+        "y_final": 534.0,
+        "y_min": 522.2
+      },
+      {
+        "acabou_em_cima": false,
+        "agarrou_no_tick": 63,
+        "anims": [
+          [
+            "jump_loop",
+            7
+          ],
+          [
+            "fall",
+            9
+          ],
+          [
+            "borda",
+            44
+          ]
+        ],
+        "anims_antes": [
+          [
+            "run",
+            25
+          ],
+          [
+            "run_brake",
+            5
+          ],
+          [
+            "jump_start",
+            20
+          ],
+          [
+            "jump_loop",
+            1
+          ],
+          [
+            "fall",
+            12
+          ],
+          [
+            "borda",
+            1
+          ]
+        ],
+        "toque_ticks": 3,
+        "x_final_rel_face": -10.1,
+        "x_rel_face_ao_agarrar": -10.1,
+        "y_ao_agarrar": 534.0,
+        "y_final": 534.0,
+        "y_min": 509.6
+      },
+      {
+        "acabou_em_cima": false,
+        "agarrou_no_tick": 63,
+        "anims": [
+          [
+            "jump_loop",
+            12
+          ],
+          [
+            "fall",
+            13
+          ],
+          [
+            "borda",
+            35
+          ]
+        ],
+        "anims_antes": [
+          [
+            "run",
+            25
+          ],
+          [
+            "run_brake",
+            5
+          ],
+          [
+            "jump_start",
+            20
+          ],
+          [
+            "jump_loop",
+            1
+          ],
+          [
+            "fall",
+            12
+          ],
+          [
+            "borda",
+            1
+          ]
+        ],
+        "toque_ticks": 8,
+        "x_final_rel_face": -10.1,
+        "x_rel_face_ao_agarrar": -10.1,
+        "y_ao_agarrar": 534.0,
+        "y_final": 534.0,
+        "y_min": 485.0
+      },
+      {
+        "acabou_em_cima": true,
+        "agarrou_no_tick": 63,
+        "anims": [
+          [
+            "jump_loop",
+            15
+          ],
+          [
+            "fall",
+            4
+          ],
+          [
+            "land",
+            11
+          ],
+          [
+            "run",
+            30
+          ]
+        ],
+        "anims_antes": [
+          [
+            "run",
+            25
+          ],
+          [
+            "run_brake",
+            5
+          ],
+          [
+            "jump_start",
+            20
+          ],
+          [
+            "jump_loop",
+            1
+          ],
+          [
+            "fall",
+            12
+          ],
+          [
+            "borda",
+            1
+          ]
+        ],
+        "toque_ticks": 12,
+        "x_final_rel_face": 166.8,
+        "x_rel_face_ao_agarrar": -10.1,
+        "y_ao_agarrar": 534.0,
+        "y_final": 477.9,
+        "y_min": 472.2
+      },
+      {
+        "acabou_em_cima": true,
+        "agarrou_no_tick": 63,
+        "anims": [
+          [
+            "jump_loop",
+            18
+          ],
+          [
+            "fall",
+            6
+          ],
+          [
+            "land",
+            11
+          ],
+          [
+            "run",
+            25
+          ]
+        ],
+        "anims_antes": [
+          [
+            "run",
+            25
+          ],
+          [
+            "run_brake",
+            5
+          ],
+          [
+            "jump_start",
+            20
+          ],
+          [
+            "jump_loop",
+            1
+          ],
+          [
+            "fall",
+            12
+          ],
+          [
+            "borda",
+            1
+          ]
+        ],
+        "toque_ticks": 16,
+        "x_final_rel_face": 166.6,
+        "x_rel_face_ao_agarrar": -10.1,
+        "y_ao_agarrar": 534.0,
+        "y_final": 477.9,
+        "y_min": 465.6
+      },
+      {
+        "acabou_em_cima": true,
+        "agarrou_no_tick": 63,
+        "anims": [
+          [
+            "jump_loop",
+            20
+          ],
+          [
+            "fall",
+            6
+          ],
+          [
+            "land",
+            11
+          ],
+          [
+            "run",
+            23
+          ]
+        ],
+        "anims_antes": [
+          [
+            "run",
+            25
+          ],
+          [
+            "run_brake",
+            5
+          ],
+          [
+            "jump_start",
+            20
+          ],
+          [
+            "jump_loop",
+            1
+          ],
+          [
+            "fall",
+            12
+          ],
+          [
+            "borda",
+            1
+          ]
+        ],
+        "toque_ticks": 24,
+        "x_final_rel_face": 166.6,
+        "x_rel_face_ao_agarrar": -10.1,
+        "y_ao_agarrar": 534.0,
+        "y_final": 477.9,
+        "y_min": 464.3
+      }
+    ],
+    "topo_bloco_y": 500.0
+  },
+  "buffer": {
+    "buffer_constante_s": 0.12,
+    "buffer_constante_ticks": 7.2,
+    "buffer_efetivo_ticks": 7,
+    "tick_pouso": 19,
+    "toque_de_1_tick_k_antes": [
+      [
+        0,
+        true
+      ],
+      [
+        1,
+        true
+      ],
+      [
+        2,
+        true
+      ],
+      [
+        3,
+        true
+      ],
+      [
+        4,
+        true
+      ],
+      [
+        5,
+        true
+      ],
+      [
+        6,
+        true
+      ],
+      [
+        7,
+        false
+      ],
+      [
+        8,
+        false
+      ],
+      [
+        9,
+        false
+      ],
+      [
+        10,
+        false
+      ],
+      [
+        11,
+        false
+      ],
+      [
+        12,
+        false
+      ],
+      [
+        13,
+        false
+      ],
+      [
+        14,
+        false
+      ],
+      [
+        15,
+        false
+      ]
+    ]
+  },
+  "coyote": {
+    "coyote_constante_s": 0.1,
+    "coyote_constante_ticks": 6.0,
+    "coyote_efetivo_ticks": 6,
+    "rebordo_x": 2000.0,
+    "salto_apos_k_ticks": [
+      [
+        0,
+        true
+      ],
+      [
+        1,
+        true
+      ],
+      [
+        2,
+        true
+      ],
+      [
+        3,
+        true
+      ],
+      [
+        4,
+        true
+      ],
+      [
+        5,
+        true
+      ],
+      [
+        6,
+        false
+      ],
+      [
+        7,
+        false
+      ],
+      [
+        8,
+        false
+      ],
+      [
+        9,
+        false
+      ],
+      [
+        10,
+        false
+      ],
+      [
+        11,
+        false
+      ],
+      [
+        12,
+        false
+      ],
+      [
+        13,
+        false
+      ]
+    ],
+    "tick_perde_chao": 92,
+    "x_ao_perder_chao": 2011.41674804688
+  },
+  "dash": {
+    "a_correr": {
+      "vx_por_tick": [
+        240.0,
+        620.0,
+        620.0,
+        620.0,
+        620.0,
+        620.0,
+        620.0,
+        620.0,
+        620.0,
+        620.0,
+        620.0,
+        581.67,
+        543.33,
+        505.0,
+        466.67,
+        428.33,
+        390.0,
+        351.67,
+        313.33,
+        275.0
+      ]
+    },
+    "no_ar_sem_dash_aereo_dispara": false,
+    "recarga": {
+      "intervalo_ticks": 34,
+      "recarga_const_s": 0.55,
+      "ticks_de_arranque": [
+        0,
+        34,
+        68
+      ]
+    },
+    "repouso": {
+      "anims": [
+        [
+          "dash",
+          10
+        ],
+        [
+          "run",
+          17
+        ],
+        [
+          "run_brake",
+          13
+        ]
+      ],
+      "distancia_ate_parar_px": 185.6,
+      "distancia_durante_estado_px": 103.3,
+      "dur_dash_const_s": 0.16,
+      "tick_1a_velocidade_dash": 1,
+      "tick_estado_dash_comeca": 0,
+      "tick_vx_zero_apos_dash": 27,
+      "ticks_estado_dash": 10,
+      "ticks_invulneravel": 10,
+      "vx_dash_const": 620.0,
+      "vx_por_tick": [
+        0.0,
+        620.0,
+        620.0,
+        620.0,
+        620.0,
+        620.0,
+        620.0,
+        620.0,
+        620.0,
+        620.0,
+        620.0,
+        583.33,
+        546.67,
+        510.0,
+        473.33,
+        436.67,
+        400.0,
+        363.33,
+        326.67,
+        290.0,
+        253.33,
+        216.67,
+        180.0,
+        143.33,
+        106.67,
+        70.0,
+        33.33,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "vy_max_abs_no_dash": 0.0
+    }
+  },
+  "desaceleracao": {
+    "anims": [
+      [
+        "run",
+        5
+      ],
+      [
+        "run_brake",
+        18
+      ],
+      [
+        "idle",
+        17
+      ]
+    ],
+    "derrapagem_px": 11.1666564941406,
+    "tick_1a_reducao": 0,
+    "tick_vx_lt_24": 5,
+    "tick_vx_zero": 6,
+    "vx_ao_largar": 240.0,
+    "vx_por_tick": [
+      203.33,
+      166.67,
+      130.0,
+      93.33,
+      56.67,
+      20.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  "harness": {
+    "constantes": {
+      "ACEL_AR": 1350.0,
+      "ACEL_CHAO": 2300.0,
+      "CORTE_SALTO": 0.45,
+      "DESACEL_AR": 1050.0,
+      "DESACEL_CHAO": 2200.0,
+      "FORCA_SALTO": 470.0,
+      "GRAVIDADE": 1400.0,
+      "GRAV_QUEDA": 1.22,
+      "GRAV_SUBIDA": 1.0,
+      "VEL_CORRIDA": 240.0,
+      "VEL_MAX_QUEDA": 1100.0,
+      "VIRAGEM_AR": 1800.0,
+      "VIRAGEM_CHAO": 3600.0
+    },
+    "fps_fisica": 60,
+    "frames_fisicos": 9127,
+    "frames_process": 9127
+  },
+  "latencia_input": {
+    "dash_1a_velocidade": 1,
+    "dash_estado_comeca": 0,
+    "roll_1a_velocidade": 1,
+    "roll_estado_comeca": 0,
+    "salto_premido_no_process_1a_subida": 0,
+    "salto_via_paso_1a_subida": 0
+  },
+  "queda": {
+    "altura_do_viewport_px": 720,
+    "altura_px": 900,
+    "altura_visivel_mundo_px": 514.285714285714,
+    "px_ultimos_0_6s": 636.7,
+    "tick_vy_750": 27,
+    "tick_vy_max": 39,
+    "ticks_ate_pouso": 69,
+    "vy_max": 1100.0,
+    "y_inicial": -322.006042480469,
+    "zoom_camara": 1.4
+  },
+  "roll": {
+    "encadeado": {
+      "arranques_ticks": [
+        0,
+        28,
+        56,
+        84,
+        112,
+        140,
+        168,
+        196,
+        224
+      ],
+      "correr_4s_px": 960.0,
+      "distancia_4s_px": 1311.3,
+      "i_frames_cobertura": "ver ticks_invulneravel (rolamento) x recarga",
+      "intervalo_ticks": 28,
+      "vel_correr_px_s": 240.0,
+      "velocidade_media_px_s": 326.1
+    },
+    "repouso": {
+      "anims": [
+        [
+          "roll",
+          19
+        ],
+        [
+          "run",
+          10
+        ],
+        [
+          "run_brake",
+          11
+        ]
+      ],
+      "distancia_ate_parar_px": 140.5,
+      "distancia_durante_estado_px": 114.0,
+      "dur_rolar_const_s": 0.3,
+      "recarga_const_s": 0.45,
+      "tick_estado_rolar_comeca": 0,
+      "ticks_estado_rolar": 19,
+      "ticks_invulneravel": 19,
+      "vel_rolar_const": 360.0,
+      "vx_por_tick": [
+        0.0,
+        360.0,
+        360.0,
+        360.0,
+        360.0,
+        360.0,
+        360.0,
+        360.0,
+        360.0,
+        360.0,
+        360.0,
+        360.0,
+        360.0,
+        360.0,
+        360.0,
+        360.0,
+        360.0,
+        360.0,
+        360.0,
+        360.0,
+        323.33,
+        286.67,
+        250.0,
+        213.33,
+        176.67,
+        140.0,
+        103.33,
+        66.67,
+        30.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  },
+  "salto": {
+    "por_ticks_premido": [
+      {
+        "altura_px": 13.0,
+        "premido_ticks": 1,
+        "tempo_no_ar_ticks": 12,
+        "tick_1a_subida": 0,
+        "tick_apex": 4,
+        "vy_max_queda": 193.2
+      },
+      {
+        "altura_px": 20.2,
+        "premido_ticks": 2,
+        "tempo_no_ar_ticks": 14,
+        "tick_1a_subida": 0,
+        "tick_apex": 5,
+        "vy_max_queda": 222.6
+      },
+      {
+        "altura_px": 26.9,
+        "premido_ticks": 3,
+        "tempo_no_ar_ticks": 17,
+        "tick_1a_subida": 0,
+        "tick_apex": 5,
+        "vy_max_queda": 286.8
+      },
+      {
+        "altura_px": 33.3,
+        "premido_ticks": 4,
+        "tempo_no_ar_ticks": 19,
+        "tick_1a_subida": 0,
+        "tick_apex": 6,
+        "vy_max_queda": 317.4
+      },
+      {
+        "altura_px": 44.9,
+        "premido_ticks": 6,
+        "tempo_no_ar_ticks": 22,
+        "tick_1a_subida": 0,
+        "tick_apex": 8,
+        "vy_max_queda": 350.1
+      },
+      {
+        "altura_px": 54.9,
+        "premido_ticks": 8,
+        "tempo_no_ar_ticks": 26,
+        "tick_1a_subida": 0,
+        "tick_apex": 10,
+        "vy_max_queda": 411.3
+      },
+      {
+        "altura_px": 63.4,
+        "premido_ticks": 10,
+        "tempo_no_ar_ticks": 29,
+        "tick_1a_subida": 0,
+        "tick_apex": 12,
+        "vy_max_queda": 444.0
+      },
+      {
+        "altura_px": 77.9,
+        "premido_ticks": 15,
+        "tempo_no_ar_ticks": 35,
+        "tick_1a_subida": 0,
+        "tick_apex": 16,
+        "vy_max_queda": 493.5
+      },
+      {
+        "altura_px": 82.9,
+        "premido_ticks": 20,
+        "tempo_no_ar_ticks": 39,
+        "tick_1a_subida": 0,
+        "tick_apex": 20,
+        "vy_max_queda": 505.8
+      },
+      {
+        "altura_px": 82.9,
+        "anims": [
+          [
+            "jump_start",
+            20
+          ],
+          [
+            "jump_loop",
+            1
+          ],
+          [
+            "fall",
+            18
+          ],
+          [
+            "land",
+            11
+          ],
+          [
+            "idle",
+            40
+          ]
+        ],
+        "premido_ticks": 90,
+        "tempo_no_ar_ticks": 39,
+        "tick_1a_subida": 0,
+        "tick_apex": 20,
+        "vy_max_queda": 503.9
+      }
+    ],
+    "vy_por_tick_cheio": [
+      -470.0,
+      -446.67,
+      -423.33,
+      -400.0,
+      -376.67,
+      -353.33,
+      -330.0,
+      -306.67,
+      -283.33,
+      -260.0,
+      -236.67,
+      -213.33,
+      -190.0,
+      -166.67,
+      -143.33,
+      -120.0,
+      -96.67,
+      -73.33,
+      -50.0,
+      -26.67,
+      -3.33,
+      20.0,
+      48.47,
+      76.93,
+      105.4,
+      133.87,
+      162.33,
+      190.8,
+      219.27,
+      247.73,
+      276.2,
+      304.67,
+      333.13,
+      361.6,
+      390.07,
+      418.53,
+      447.0,
+      475.47,
+      503.93,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "vy_por_tick_toque_3": [
+      -470.0,
+      -446.67,
+      -423.33,
+      -180.0,
+      -70.5,
+      -21.22,
+      2.11,
+      30.58,
+      59.04,
+      87.51,
+      115.97,
+      144.44,
+      172.91,
+      201.37
+    ]
+  },
+  "viragem": {
+    "anims": [
+      [
+        "turn",
+        3
+      ],
+      [
+        "run_brake",
+        1
+      ],
+      [
+        "run",
+        36
+      ]
+    ],
+    "px_ate_cruzar_zero": 6.0,
+    "tick_vx_cruza_zero": 3,
+    "tick_vx_menos_24": 4,
+    "tick_vx_menos_max": 10,
+    "vx_por_tick": [
+      180.0,
+      120.0,
+      60.0,
+      0.0,
+      -38.33,
+      -76.67,
+      -115.0,
+      -153.33,
+      -191.67,
+      -230.0,
+      -240.0,
+      -240.0,
+      -240.0,
+      -240.0
+    ]
+  }
+}

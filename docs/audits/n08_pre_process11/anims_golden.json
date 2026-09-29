@@ -1,0 +1,311 @@
+{
+	"collision": "(20.0, 44.0)",
+	"dash_visto": true,
+	"estados": [
+		{
+			"anim": "idle",
+			"fase": "idle",
+			"fps": 8.0,
+			"frames": 7,
+			"frames_vistos": [
+				3,
+				4,
+				5,
+				6,
+				0,
+				1
+			],
+			"offset": "(0.0, -18.0)",
+			"path0": "res://assets/sprites/koliani_golden_set/frames/idle/idle_004.png",
+			"scale": "(1.0, 1.0)",
+			"size": "(128.0, 128.0)"
+		},
+		{
+			"anim": "idle",
+			"fase": "run",
+			"fps": 8.0,
+			"frames": 7,
+			"frames_vistos": [
+				1
+			],
+			"offset": "(0.0, -18.0)",
+			"path0": "res://assets/sprites/koliani_golden_set/frames/idle/idle_002.png",
+			"scale": "(1.0, 1.0)",
+			"size": "(128.0, 128.0)"
+		},
+		{
+			"anim": "run_start",
+			"fase": "run",
+			"fps": 12.0,
+			"frames": 6,
+			"frames_vistos": [
+				1,
+				2,
+				3,
+				4,
+				5
+			],
+			"offset": "(0.0, -18.0)",
+			"path0": "res://assets/sprites/koliani_golden_set/frames/run/run_002.png",
+			"scale": "(1.0, 1.0)",
+			"size": "(128.0, 128.0)"
+		},
+		{
+			"anim": "run",
+			"fase": "run",
+			"fps": 13.333333,
+			"frames": 10,
+			"frames_vistos": [
+				0,
+				1,
+				2
+			],
+			"offset": "(0.0, -18.0)",
+			"path0": "res://assets/sprites/koliani_golden_set/frames/run_final/run_001.png",
+			"scale": "(1.0, 1.0)",
+			"size": "(128.0, 128.0)"
+		},
+		{
+			"anim": "run",
+			"fase": "paragem",
+			"fps": 13.333333,
+			"frames": 10,
+			"frames_vistos": [
+				2
+			],
+			"offset": "(0.0, -18.0)",
+			"path0": "res://assets/sprites/koliani_golden_set/frames/run_final/run_003.png",
+			"scale": "(1.0, 1.0)",
+			"size": "(128.0, 128.0)"
+		},
+		{
+			"anim": "run_brake",
+			"fase": "paragem",
+			"fps": 20.0,
+			"frames": 6,
+			"frames_vistos": [
+				0,
+				1,
+				2,
+				3,
+				4,
+				5
+			],
+			"offset": "(0.0, -18.0)",
+			"path0": "res://assets/sprites/koliani_golden_set/frames/run/run_010.png",
+			"scale": "(1.0, 1.0)",
+			"size": "(128.0, 128.0)"
+		},
+		{
+			"anim": "idle",
+			"fase": "paragem",
+			"fps": 8.0,
+			"frames": 7,
+			"frames_vistos": [
+				0,
+				1,
+				2
+			],
+			"offset": "(0.0, -18.0)",
+			"path0": "res://assets/sprites/koliani_golden_set/frames/idle/idle_001.png",
+			"scale": "(1.0, 1.0)",
+			"size": "(128.0, 128.0)"
+		},
+		{
+			"anim": "idle",
+			"fase": "jump",
+			"fps": 8.0,
+			"frames": 7,
+			"frames_vistos": [
+				2
+			],
+			"offset": "(0.0, -18.0)",
+			"path0": "res://assets/sprites/koliani_golden_set/frames/idle/idle_003.png",
+			"scale": "(1.0, 1.0)",
+			"size": "(128.0, 128.0)"
+		},
+		{
+			"anim": "jump_start",
+			"fase": "jump",
+			"fps": 12.0,
+			"frames": 4,
+			"frames_vistos": [
+				0,
+				1,
+				2
+			],
+			"offset": "(0.0, -18.0)",
+			"path0": "res://assets/sprites/koliani_golden_set/frames/jump_start/jump_start_001.png",
+			"scale": "(1.0, 1.0)",
+			"size": "(128.0, 128.0)"
+		},
+		{
+			"anim": "fall",
+			"fase": "queda_aterrar",
+			"fps": 6.0,
+			"frames": 3,
+			"frames_vistos": [
+				0,
+				1
+			],
+			"offset": "(0.0, -18.0)",
+			"path0": "res://assets/sprites/koliani_golden_set/frames/fall/fall_001.png",
+			"scale": "(1.0, 1.0)",
+			"size": "(128.0, 128.0)"
+		},
+		{
+			"anim": "idle",
+			"fase": "queda_aterrar",
+			"fps": 8.0,
+			"frames": 7,
+			"frames_vistos": [
+				0,
+				1,
+				2,
+				3,
+				4,
+				5,
+				6
+			],
+			"offset": "(0.0, -18.0)",
+			"path0": "res://assets/sprites/koliani_golden_set/frames/idle/idle_001.png",
+			"scale": "(1.0, 1.0)",
+			"size": "(128.0, 128.0)"
+		},
+		{
+			"anim": "idle",
+			"fase": "dash",
+			"fps": 8.0,
+			"frames": 7,
+			"frames_vistos": [
+				3
+			],
+			"offset": "(0.0, -18.0)",
+			"path0": "res://assets/sprites/koliani_golden_set/frames/idle/idle_004.png",
+			"scale": "(1.0, 1.0)",
+			"size": "(128.0, 128.0)"
+		},
+		{
+			"anim": "dash",
+			"fase": "dash",
+			"fps": 18.75,
+			"frames": 3,
+			"frames_vistos": [
+				0,
+				1
+			],
+			"offset": "(0.0, -18.0)",
+			"path0": "res://assets/sprites/koliani_golden_set/frames/dash/dash_001.png",
+			"scale": "(1.0, 1.0)",
+			"size": "(128.0, 128.0)"
+		},
+		{
+			"anim": "dash",
+			"fase": "pos_dash",
+			"fps": 18.75,
+			"frames": 3,
+			"frames_vistos": [
+				1
+			],
+			"offset": "(0.0, -18.0)",
+			"path0": "res://assets/sprites/koliani_golden_set/frames/dash/dash_002.png",
+			"scale": "(1.0, 1.0)",
+			"size": "(128.0, 128.0)"
+		},
+		{
+			"anim": "run_start",
+			"fase": "pos_dash",
+			"fps": 12.0,
+			"frames": 6,
+			"frames_vistos": [
+				1,
+				2,
+				3
+			],
+			"offset": "(0.0, -18.0)",
+			"path0": "res://assets/sprites/koliani_golden_set/frames/run/run_002.png",
+			"scale": "(1.0, 1.0)",
+			"size": "(128.0, 128.0)"
+		},
+		{
+			"anim": "morte",
+			"fase": "morte",
+			"fps": 14.0,
+			"frames": 3,
+			"frames_vistos": [
+				0,
+				1
+			],
+			"offset": "(0.0, -18.0)",
+			"path0": "res://assets/sprites/koliani_golden_set/frames/morte/morte_001.png",
+			"scale": "(1.0, 1.0)",
+			"size": "(128.0, 128.0)"
+		},
+		{
+			"anim": "morte",
+			"fase": "respawn",
+			"fps": 14.0,
+			"frames": 3,
+			"frames_vistos": [
+				1
+			],
+			"offset": "(0.0, -18.0)",
+			"path0": "res://assets/sprites/koliani_golden_set/frames/morte/morte_002.png",
+			"scale": "(1.0, 1.0)",
+			"size": "(128.0, 128.0)"
+		},
+		{
+			"anim": "run_brake",
+			"fase": "respawn",
+			"fps": 20.0,
+			"frames": 6,
+			"frames_vistos": [
+				1,
+				2,
+				3,
+				4,
+				5
+			],
+			"offset": "(0.0, -18.0)",
+			"path0": "res://assets/sprites/koliani_golden_set/frames/run/run_009.png",
+			"scale": "(1.0, 1.0)",
+			"size": "(128.0, 128.0)"
+		},
+		{
+			"anim": "idle",
+			"fase": "respawn",
+			"fps": 8.0,
+			"frames": 7,
+			"frames_vistos": [
+				0,
+				1,
+				2
+			],
+			"offset": "(0.0, -18.0)",
+			"path0": "res://assets/sprites/koliani_golden_set/frames/idle/idle_001.png",
+			"scale": "(1.0, 1.0)",
+			"size": "(128.0, 128.0)"
+		}
+	],
+	"filtro_nearest": true,
+	"flags": [
+		true,
+		true
+	],
+	"golden": true,
+	"run_fps": 13.333333,
+	"run_loop": true,
+	"run_paths": [
+		"res://assets/sprites/koliani_golden_set/frames/run_final/run_001.png",
+		"res://assets/sprites/koliani_golden_set/frames/run_final/run_002.png",
+		"res://assets/sprites/koliani_golden_set/frames/run_final/run_003.png",
+		"res://assets/sprites/koliani_golden_set/frames/run_final/run_004.png",
+		"res://assets/sprites/koliani_golden_set/frames/run_final/run_005.png",
+		"res://assets/sprites/koliani_golden_set/frames/run_final/run_006.png",
+		"res://assets/sprites/koliani_golden_set/frames/run_final/run_007.png",
+		"res://assets/sprites/koliani_golden_set/frames/run_final/run_008.png",
+		"res://assets/sprites/koliani_golden_set/frames/run_final/run_009.png",
+		"res://assets/sprites/koliani_golden_set/frames/run_final/run_010.png"
+	],
+	"tem_morte": true
+}

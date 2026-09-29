@@ -22,16 +22,43 @@ const CHEFE_KEY: Array[String] = [
 	"guard.rainha_aracnidea",     # 02 Ninho da Viúva Negra
 	"guard.entrevane",            # 03 A Árvore que Chora
 	"boss.coracao_putrefacto",   # 04 Coração da Floresta
-	"boss.carcereiro",           # 05 Prisão dos Condenados
-	"boss.ignivar",              # 06 Fornalha dos Pecadores
-	"boss.dama_guilhotina",      # 07 Corredor das Execuções
-	"boss.irmaos_condenados",    # 08 Ala dos Mortos
-	"boss.primeiro_prisioneiro", # 09 A Cela Zero
-	"boss.sino_vivo",            # 10 Torre dos Sinos
-	"boss.aerion",               # 11 Torre dos Ventos
-	"boss.voltaris",             # 12 Torre da Tempestade
-	"boss.sacerdotisa_lunar",    # 13 Observatório Lunar
-	"boss.vyrak",                # 14 O Pico Esquecido
+	# Região II -- Desfiladeiro dos Ventos. Os quatro encontros
+	# intermédios são GUARDIÕES, não chefes: o único chefe da região é o
+	# Guardião dos Céus, no N10. Os ficheiros das cenas ainda têm nomes de
+	# prisão (mudá-los partia saves e checkpoints); o que o jogador lê é a
+	# chave `level.n##` e estas.
+	"guard.golem_falesias",      # 05 N06 -- arquétipo Golem Aéreo
+	"guard.vigia_desfiladeiro",  # 06 N07 -- arquétipo Torre Vigia
+	"guard.feiticeira_ventos",   # 07 N08 -- arquétipo Mago do Vento
+	"guard.espectros_gemeos",    # 08 N09 -- arquétipo Espectro das Ruínas
+	"boss.guardiao_dos_ceus",    # 09 N10 -- o chefe da Região II
+	# Região III -- Torre dos Ecos (pranchas APPROVED em
+	# docs/art_direction/regions/region_03/). O cânone só admite UM
+	# confronto na região -- o Vyrak, no N15 -- por isso os quatro
+	# encontros intermédios são GUARDIÕES, como já se fez na Região II.
+	# Os nomes dos ficheiros das cenas ficam como estão: mudá-los partia
+	# saves e checkpoints. O que o jogador lê é a chave `level.n##`.
+	#
+	# N11 (auditoria GM, 28 set 2026): o plano antigo tinha aqui o
+	# "guard.sino_vivo" a selar a porta, mas o briefing desta execução foi
+	# explícito -- "SEM BOSS, SEM MINIBOSS DISFARÇADO" no N11, que é só a
+	# INTRODUÇÃO da região (o Sino Vivo saiu do nível, ver Torre_dos_Sinos.tscn).
+	# "" = a HUD não mostra nenhuma linha de chefe/guardião neste nível
+	# (`controlos_toque.gd::_encher_cabecalho_nivel`, `if ck != "":`).
+	# O "Sino Vivo" fica FORA da campanha (decisão da execução N12, 29 set
+	# 2026, ver docs/nivel_autoral_n12.md): o contrato LOCKED só admite um
+	# confronto na região e os guardiões intermédios saem do roster aprovado.
+	"",                          # 10 N11 -- Entrada dos Ecos (sem guardião/chefe)
+	# N12 autoral (29 set 2026): o Aerion (cavaleiro do vento, fora do
+	# contrato da Torre dos Ecos) saiu; fecha com o Autómato do Sino elite,
+	# um dos três inimigos principais do N12 na prancha aprovada.
+	"guard.automato_do_sino",    # 11 N12 -- Galerias Verticais
+	# N13 autoral: o Voltaris (chefe de tempestade, fora do contrato) saiu;
+	# fecha com o Construto Vitral elite a guardar o nucleo, inimigo
+	# principal do N13 na prancha aprovada.
+	"guard.construto_vitral",    # 12 N13 -- Mecanismos Antigos
+	"guard.sacerdotisa_lunar",   # 13 N14 -- Campanário
+	"boss.vyrak",                # 14 N15 -- O Topo dos Ecos (o chefe da Região III)
 	"boss.rei_ossario",          # 15 Cemitério dos Reis
 	"boss.colosso_osseo",        # 16 Galeria dos Ossos
 	"boss.freira_negra",         # 17 Cripta das Mil Velas

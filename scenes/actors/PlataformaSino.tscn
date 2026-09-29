@@ -1,0 +1,23 @@
+[gd_scene load_steps=3 format=3 uid="uid://bkolianiplatsino11"]
+
+; Plataforma que só solidifica quando um SinoTorre do mesmo `alterna_grupo`
+; é tocado (ver scripts/plataforma_sino.gd). Herda Plataforma: mesma API
+; `tamanho`, mesmos tiles por bioma. Fica em contorno ténue até o sino tocar.
+
+[ext_resource type="Script" path="res://scripts/plataforma_sino.gd" id="1_pls"]
+
+[sub_resource type="RectangleShape2D" id="rs_pls"]
+size = Vector2(150, 24)
+
+[node name="PlataformaSino" type="StaticBody2D"]
+collision_layer = 1
+collision_mask = 0
+script = ExtResource("1_pls")
+tamanho = Vector2(150, 24)
+
+[node name="Visual" type="Node2D" parent="."]
+modulate = Color(1, 0.9, 0.72, 0.16)
+
+[node name="Col" type="CollisionShape2D" parent="."]
+disabled = true
+shape = SubResource("rs_pls")

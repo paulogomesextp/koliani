@@ -14,8 +14,17 @@ extends Node2D
 ## geometria de plataformas/chão feita à mão -- só emoldura o nível.
 
 const TSET := preload("res://assets/tiles/masmorra.tres")
+## Variante da Regiao II: a MESMA folha de tiles, recolorida para a pedra
+## do Desfiladeiro (`tools/gerar_tileset_regiao02.py`). As coordenadas de
+## atlas e os poligonos de fisica sao identicos aos do `masmorra.tres`,
+## portanto trocar de `estilo` NAO mexe em colisao nenhuma -- so' na cor.
+const TSET_DESFILADEIRO := preload("res://assets/tiles/desfiladeiro.tres")
 const ESCALA := 2
 const CEL := 16 * ESCALA          # 32 px por célula no mundo
+
+## Qual das folhas usar. "masmorra" (omissao) mantem tudo como estava; a
+## Regiao II poe "desfiladeiro". So' arte: ver `_folha()`.
+@export_enum("masmorra", "desfiladeiro") var estilo := "masmorra"
 
 @export var largura := 3600.0
 @export var altura := 660.0
@@ -58,7 +67,7 @@ func _construir() -> void:
 
 	var tml := TileMapLayer.new()
 	tml.name = "Tiles"
-	tml.tile_set = TSET
+	tml.tile_set = _folha()
 	tml.scale = Vector2(ESCALA, ESCALA)
 	tml.z_index = -2   # à frente do parallax, atrás dos atores/plataformas
 	tml.position = Vector2(esquerda, topo)
@@ -181,6 +190,12 @@ func abrir_esquerda(novo_x: float) -> void:
 				tml.set_cell(Vector2i(cx, y0), 0, T_TOPO)
 				for cy in range(y0 + 1, y0 + 1 + b):
 					tml.set_cell(Vector2i(cx, cy), 0, T_FLOOR)
+
+
+## A folha de tiles do estilo pedido. As duas tem as mesmas coordenadas e
+## a mesma fisica; muda so' a textura.
+func _folha() -> TileSet:
+	return TSET_DESFILADEIRO if estilo == "desfiladeiro" else TSET
 
 
 func _parede(nome: String, centro: Vector2, tam: Vector2) -> void:

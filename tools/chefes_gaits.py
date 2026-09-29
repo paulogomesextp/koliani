@@ -525,12 +525,30 @@ def objeto(estado: str, i: int, n: int, cfg: dict) -> Pose:
     return p
 
 
+def ave(estado: str, i: int, n: int, cfg: dict) -> Pose:
+    """O corvideo usa o gait do `alado`, com uma correccao.
+
+    No plano `ave` a asa da FRENTE esta' ESPELHADA no desenho (abre para
+    +x, nao para -x). Se as duas levassem a mesma rotacao, batiam em
+    sentidos contrarios: uma subia e a outra descia. Trocar o sinal da
+    asa da frente po'e as duas a bater juntas.
+    """
+    p = alado(estado, i, n, cfg)
+    for k in ("asa_f1", "asa_f2"):
+        if k in p:
+            dx, dy, r = p[k]
+            p[k] = (-dx, dy, -r)
+    return p
+
+
 PLANOS = {
     "humanoide": humanoide,
     "flutuante": flutuante,
     "aracnideo": aracnideo,
     "serpente": serpente,
     "alado": alado,
+    # o corvideo usa os mesmos nomes de junta -- ver `ave` em chefes_corpos
+    "ave": ave,
     "quadrupede": quadrupede,
     "objeto": objeto,
 }

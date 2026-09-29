@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3]
+
+; FASE 11 -- PRODUCTION COMBAT QA ARENA. Correr:
+;   Godot --path . res://scenes/qa/ProductionCombatArena.tscn
+; Nao esta' ligada a nenhum nivel nem ao menu -- isolada, so' para playtest do GM.
+; Ver docs/plano_integracao_combate_producao.md e docs/combat_production_integration_report.md.
+[ext_resource type="Script" path="res://scripts/qa/production_combat_arena.gd" id="1_cena"]
+
+[node name="ProductionCombatArena" type="Node2D"]
+script = ExtResource("1_cena")

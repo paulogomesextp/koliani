@@ -31,16 +31,76 @@ var _travada := false
 
 @onready var _forma: CollisionShape2D = $Col
 @onready var _visual: Polygon2D = $Visual
+
+## Cor da laje e da corrente. Branco (omissao) deixa a arte da cena como
+## esta'. A Regiao II usa isto para a laje deixar de ser cinzento de
+## prisao e passar a ser a pedra do Desfiladeiro -- so' cor, a colisao e o
+## movimento nao mudam.
+@export var tinta := Color(1, 1, 1, 1)
 @onready var _corrente: Line2D = $Corrente
+
+## Opt-in (N13, "pontes moveis"): a laje veste o terreno da regiao (o
+## material do `fundo_pack`, como a `Plataforma`) e a corrente uma textura
+## em mosaico. Os niveis que nao os definem nao mudam.
+@export var pele_terreno := false
+@export var textura_corrente: Texture2D
+## Opt-in (N13): no modo "horizontal" a ancora anda com a laje (um carro num
+## trilho do tecto) -- a corrente fica sempre a prumo em vez de inclinar.
+@export var ancora_no_trilho := false
 
 
 func _ready() -> void:
+	# A tinta tem de entrar nas CORES DOS VERTICES, nao no `color` do
+	# Polygon2D: o `_reconstruir()` reescreve `vertex_colors` a partir de
+	# `cor_topo`/`cor_base` e por cima delas o `color` nao se ve'. (A
+	# primeira tentativa tingiu o `color` e as lajes continuaram cinzentas.)
+	if not tinta.is_equal_approx(Color(1, 1, 1, 1)):
+		cor_topo = cor_topo * tinta
+		cor_base = cor_base * tinta
+		var lin := get_node_or_null("Corrente") as Line2D
+		if lin:
+			lin.default_color = lin.default_color * tinta
 	add_to_group("plataformas_correntes")
 	sync_to_physics = true
 	_base = global_position
 	_ancora = _base + Vector2(0.0, -comprimento)
 	_t = fase
 	_reconstruir()
+	_vestir()
+
+
+func _vestir() -> void:
+	if textura_corrente and _corrente:
+		_corrente.texture = textura_corrente
+		_corrente.texture_mode = Line2D.LINE_TEXTURE_TILE
+		_corrente.width = float(textura_corrente.get_width())
+		_corrente.default_color = Color(1.0, 0.86, 0.6)
+		_corrente.texture_repeat = CanvasItem.TEXTURE_REPEAT_ENABLED
+	if not pele_terreno or _visual == null:
+		return
+	var atm := get_tree().get_first_node_in_group("atmosfera")
+	if atm == null or not ("bioma" in atm):
+		return
+	var plat := load("res://scripts/plataforma.gd")
+	var material := String(atm.bioma)
+	if "fundo_pack" in atm and plat.MATERIAL_POR_PACK.has(atm.fundo_pack):
+		material = plat.MATERIAL_POR_PACK[atm.fundo_pack]
+	var corpo: Texture2D = plat._tex(material, "corpo")
+	if corpo:
+		_visual.texture = corpo
+		_visual.texture_repeat = CanvasItem.TEXTURE_REPEAT_ENABLED
+		_visual.vertex_colors = PackedColorArray()
+		_visual.color = Color(1, 1, 1)
+	var capa: Texture2D = plat._tex(material, "topo")
+	if capa:
+		var s := Sprite2D.new()
+		s.texture = capa
+		s.centered = false
+		s.texture_repeat = CanvasItem.TEXTURE_REPEAT_ENABLED
+		s.region_enabled = true
+		s.region_rect = Rect2(0.0, 0.0, largura, float(capa.get_height()))
+		s.position = Vector2(-largura * 0.5, -17.0)
+		_visual.add_child(s)
 
 
 func _physics_process(dt: float) -> void:
@@ -56,7 +116,10 @@ func _physics_process(dt: float) -> void:
 			var ang := deg_to_rad(amplitude) * s
 			global_position = _ancora + Vector2(sin(ang), cos(ang)) * comprimento
 	if _corrente:
-		_corrente.points = PackedVector2Array([to_local(_ancora), Vector2(0.0, -8.0)])
+		if ancora_no_trilho and modo == "horizontal":
+			_corrente.points = PackedVector2Array([Vector2(0.0, -comprimento), Vector2(0.0, -8.0)])
+		else:
+			_corrente.points = PackedVector2Array([to_local(_ancora), Vector2(0.0, -8.0)])
 
 
 ## O Carcereiro prende a plataforma por uns segundos (fica imóvel + tom frio).

@@ -75,12 +75,37 @@ var _dive_dir := Vector2.ZERO
 ## ELITE (1 por nível na campanha à mão): aura a pulsar + barra de vida por
 ## cima da cabeça + rebentamento maior na morte. Lê-se como "este é o grande".
 @export var elite := false
+
+## --- ENEMY COMBAT CONTRACT v1 (Fase 7, opt-in) --------------------------
+## 100% inerte por omissão: nenhum inimigo legacy muda de comportamento só
+## por estes campos existirem, porque `lab_hit`/`hurtbox` só são chamados
+## pelo `CoreCombate`/`CombateLab` (opt-in eles próprios; nenhum nível de
+## campanha os liga), NUNCA pelo combo normal (`Koliani._ao_acertar_corpo`
+## chama sempre `receber_dano` diretamente). Ver
+## `docs/plano_integracao_combate_producao.md` §4.
+@export var piloto_combate_v1 := false
+@export_enum("leve", "medio", "pesado") var peso := "leve"
+@export var pode_ser_lancado := true
+## Guarda opcional (Golem-like): custa dano cheio até esgotar; um golpe com
+## `guard_break` (Cleave/Counter) ou um golpe pelas costas ignora-a.
+@export var tem_guarda_v1 := false
+@export var guarda_max_v1 := 100.0
+var _guarda_v1 := -1.0   # -1.0 = por armar (1.a chamada de lab_hit arma para guarda_max_v1)
+## Janela de imunidade a um NOVO lançamento depois de aterrar do último (evita
+## juggle infinito -- mesma ideia do `_imune_lanca_t` do Combat Lab).
+var _imune_lancamento_t := 0.0
 ## Que monstro pixel-art usar (pack CC0 LuizMelo "Monsters Creatures
 ## Fantasy"). Pastas em `assets/sprites/pixel/enemies/<especie>/`.
 @export_enum("goblin", "mushroom", "esqueleto", "olho",
 	"imp", "chort", "orc", "xamane", "demonio_grande", "ogro",
 	"abobora", "wogol", "necromante", "lodo",
-	"besouro", "raptor", "mastim", "gosma", "abutre") var especie := "goblin"
+	"besouro", "raptor", "mastim", "gosma", "abutre",
+	"morcego_dos_ventos", "sentinela_flutuante", "gaivota_sombria",
+	"golem_aereo", "elemental_do_vento",
+	"sentinela_da_torre", "acolito_do_eco", "automato_do_sino",
+	"gargula_vitral", "sino_flutuante", "arqueiro_das_sombras",
+	"monge_das_correntes", "espirito_do_eco", "construto_vitral",
+	"corvo_do_sino") var especie := "goblin"
 ## Só a ARTE (Execution 9D+9E): quem a define veste-se com a arte de produção
 ## desta identidade em vez da da `especie`, que continua a mandar no som, no
 ## tamanho e em tudo o resto. É o que faz os clones da Morvanna parecerem
@@ -107,6 +132,35 @@ const ESPECIES := {
 	"lodo":           {"idle": 4, "run": 4, "hit": 4, "dead": 4},
 	# pack CC0 ansimuz "Enemies Pack" (tools/extrair_inimigos_pack.gd). O
 	# `hit` é o idle (o pisca do dano é do shader) e o `dead` é gerado.
+	# --- REGIAO II, bestiario CANONICO (Super-Process A2, 18 set 2026) ------
+	# Recortadas da prancha aprovada `enemy_gameplay_pack.png` por
+	# `tools/extrair_inimigos_regiao02.py` -- nao sao desenho novo, sao as
+	# poses que a prancha ja' tinha, com os estados que ela ja' nomeava.
+	# Ate' aqui a Regiao II usava o pool da antiga Prisao (esqueleto, chort,
+	# orc, imp, mastim): bichos terrestres de masmorra num sitio cuja
+	# identidade e' o AR. Censo do audit: 0 dos 10 canonicos em N06-N10.
+	"morcego_dos_ventos":  {"idle": 2, "run": 2, "hit": 1, "dead": 1},
+	"sentinela_flutuante": {"idle": 2, "run": 2, "hit": 1, "dead": 1},
+	# --- REGIAO III, bestiario CANONICO ------------------------------------
+	# Recortadas da prancha aprovada `enemy_gameplay_pack.png` da Regiao III
+	# por `tools/extrair_inimigos_regiao03.py`. Mesmo metodo da Regiao II --
+	# nao e' desenho novo, sao as poses que a prancha ja' tinha, com os
+	# cinco estados que ela ja' nomeava (IDLE/ANDA/ATAQUE/DANO/MORTE).
+	# Ate' aqui a Torre dos Ecos usava `xamane, wogol, olho, abutre, imp`:
+	# demonios genericos herdados. Censo da auditoria: 0 dos 10 canonicos.
+	"sentinela_da_torre":   {"idle": 2, "run": 2, "hit": 1, "dead": 1},
+	"acolito_do_eco":       {"idle": 2, "run": 2, "hit": 1, "dead": 1},
+	"automato_do_sino":     {"idle": 2, "run": 2, "hit": 1, "dead": 1},
+	"gargula_vitral":       {"idle": 2, "run": 2, "hit": 1, "dead": 1},
+	"sino_flutuante":       {"idle": 2, "run": 2, "hit": 1, "dead": 1},
+	"arqueiro_das_sombras": {"idle": 2, "run": 2, "hit": 1, "dead": 1},
+	"monge_das_correntes":  {"idle": 2, "run": 2, "hit": 1, "dead": 1},
+	"espirito_do_eco":      {"idle": 2, "run": 2, "hit": 1, "dead": 1},
+	"construto_vitral":     {"idle": 2, "run": 2, "hit": 1, "dead": 1},
+	"corvo_do_sino":        {"idle": 2, "run": 2, "hit": 1, "dead": 1},
+	"gaivota_sombria":     {"idle": 2, "run": 2, "hit": 1, "dead": 1},
+	"golem_aereo":         {"idle": 2, "run": 2, "hit": 1, "dead": 1},
+	"elemental_do_vento":  {"idle": 2, "run": 2, "hit": 1, "dead": 1},
 	"besouro":        {"idle": 4, "run": 4, "hit": 4, "dead": 4},
 	"raptor":         {"idle": 4, "run": 7, "hit": 4, "dead": 4},
 	"mastim":         {"idle": 6, "run": 4, "hit": 6, "dead": 4},
@@ -139,6 +193,19 @@ var anticipacao := 0.0
 ## decai a zero). Não afeta a física -- só o "juice".
 var _flinch := 0.0
 var _flinch_dir := 1.0
+var _voz_variante := {"ataque": -1, "dano": -1, "morte": -1}
+## RECUO a sério (9H.16 D). Até aqui levar um golpe era
+## `global_position.x += dir * 8` -- um TELETRANSPORTE de 8 px, instantâneo
+## e sem física: o bicho não recuava, piscava para o lado. Sem reação
+## visível, qualquer combo se lê como bater num saco. Agora o golpe deixa
+## uma velocidade que decai por atrito, e enquanto ela durar a IA não manda
+## no movimento.
+var _recuo_vel := 0.0
+var _recuo_t := 0.0
+## Atrito do recuo (px/s por segundo). Alto = trava depressa.
+const RECUO_ATRITO := 1250.0
+## Quanto este inimigo resiste ao empurrão. 1 = normal; >1 = pesado.
+@export var resistencia_recuo := 1.0
 ## Segundos que ainda está congelado (Torre dos Sinos: a badalada gela os
 ## inimigos comuns). Enquanto > 0 não patrulha nem persegue.
 var _congelado := 0.0
@@ -240,6 +307,8 @@ func _dano_periodico(q: int) -> void:
 func _tick_status(dt: float) -> void:
 	if _morto:
 		return
+	if _imune_lancamento_t > 0.0:
+		_imune_lancamento_t -= dt
 	if _queimando > 0.0:
 		_queimando -= dt
 		_queima_cd -= dt
@@ -378,8 +447,27 @@ func _largura_alvo() -> float:
 	return 0.0
 
 
+## Quem tem POSE DE ATAQUE propria, e com quantos quadros. Fica em tabela a
+## parte (e nao dentro de `ESPECIES`) porque o formato de `ESPECIES` esta'
+## travado por um teste que o le' com expressao regular; e porque ter ou nao
+## pose de ataque e' uma propriedade de quem tem a arte, nao de todos.
+const ATAQUE_FRAMES := {
+	"morcego_dos_ventos": 1,      # INVESTIDA
+	"sentinela_flutuante": 1,
+	"gaivota_sombria": 2,         # MERGULHO + ATAQUE
+	"golem_aereo": 1,             # ATAQUE
+	"elemental_do_vento": 1,
+}
+
 ## Espécies que voam -- não se alinham os pés ao chão.
-const ESPECIES_VOAM := ["olho", "abutre"]
+const ESPECIES_VOAM := ["olho", "abutre",
+	# as cinco canonicas da Regiao II voam, levitam ou SAO vento -- e' a
+	# definicao da regiao ("Nenhum e' um bicho de masmorra terrestre")
+	"morcego_dos_ventos", "sentinela_flutuante", "gaivota_sombria",
+	"golem_aereo", "elemental_do_vento",
+	# Regiao III: a gargula patrulha EM VOO, o sino flutua, o corvo voa e o
+	# espirito atravessa plataformas -- a prancha diz isso de cada um.
+	"gargula_vitral", "sino_flutuante", "corvo_do_sino", "espirito_do_eco"]
 
 ## A que FAMILIA de som pertence cada espécie (4 set 2026, pedido do Paulo:
 ## "faça com que os mobs façam sons apropriados ao tipo de monstro"). Até
@@ -394,17 +482,35 @@ const FAMILIA_SOM := {
 	"mastim": "besta", "raptor": "besta",
 	"besouro": "insecto",
 	"olho": "voador", "abutre": "voador",
+	"morcego_dos_ventos": "voador", "gaivota_sombria": "voador",
+	"elemental_do_vento": "voador",
+	"sentinela_flutuante": "morto", "golem_aereo": "grande",
 	"demonio_grande": "grande", "ogro": "grande",
 	"xamane": "grande", "abobora": "grande",
+	# Regiao III -- Torre dos Ecos
+	"sentinela_da_torre": "humano", "arqueiro_das_sombras": "humano",
+	"monge_das_correntes": "humano", "acolito_do_eco": "morto",
+	"espirito_do_eco": "morto", "sino_flutuante": "morto",
+	"gargula_vitral": "voador", "corvo_do_sino": "voador",
+	"automato_do_sino": "grande", "construto_vitral": "grande",
 }
 
 
 ## Toca `ataque`/`dano`/`morte` na voz da família desta espécie. Se por
 ## alguma razão a amostra não existir, o `Som` ignora e não se ouve nada --
 ## melhor isso do que voltar ao rosnado único de antes.
-func _voz(que: String, volume := -13.0, pitch := 1.0) -> void:
+const VOZ_VOLUME := {"ataque": -14.0, "dano": -16.0, "morte": -11.0}
+const VOZ_COOLDOWN := {"ataque": 0.12, "dano": 0.14, "morte": 0.0}
+const VOZ_VARIANTES_PITCH := [-0.035, 0.025, 0.0]
+
+func _voz(que: String, pitch := 1.0) -> void:
 	var fam: String = FAMILIA_SOM.get(especie, "humano")
-	Som.toca("mob_%s_%s" % [fam, que], volume, pitch * randf_range(0.94, 1.07))
+	var passo: int = (int(_voz_variante.get(que, -1)) + 1) % VOZ_VARIANTES_PITCH.size()
+	_voz_variante[que] = passo
+	var pitch_final: float = pitch * (1.0 + VOZ_VARIANTES_PITCH[passo])
+	Som.toca_actor(self, "mob_%s_%s" % [fam, que], float(VOZ_VOLUME.get(que, -14.0)),
+		pitch_final, 0.0, float(VOZ_COOLDOWN.get(que, 0.0)),
+		"mob_%d_%s" % [get_instance_id(), que])
 
 ## Altura-alvo (px) do CORPO opaco do inimigo no ecrã -- normaliza as
 ## espécies, que vêm de packs com densidades diferentes (LuizMelo 150px vs
@@ -485,6 +591,13 @@ func _montar_frames() -> void:
 	_add_tira(sf, "run", load("%s/run.png" % base), int(cfg["run"]), 11.0, true)
 	_add_tira(sf, "hit", load("%s/hit.png" % base), int(cfg["hit"]), 14.0, false)
 	_add_tira(sf, "dead", load("%s/dead.png" % base), int(cfg["dead"]), 11.0, false)
+	# A tira de ATAQUE e' opcional e so' existe para quem esta' em
+	# `ATAQUE_FRAMES`. O `_estado_anim` ja' pedia "attack" no telegrafo
+	# (`_tem_anim("attack")`) desde sempre -- o que nunca existiu foi quem a
+	# montasse. As especies antigas nao tem `attack.png` e continuam iguais.
+	if ATAQUE_FRAMES.has(especie):
+		_add_tira(sf, "attack", load("%s/attack.png" % base),
+			int(ATAQUE_FRAMES[especie]), 10.0, false)
 	_anim.sprite_frames = sf
 
 
@@ -681,6 +794,18 @@ func _physics_process(dt: float) -> void:
 	_tick_status(dt)
 	if _morto:  # um DoT pode tê-lo morto
 		return
+	# Enquanto o recuo dura, ele manda no movimento -- senão a IA reescrevia
+	# `velocity.x` no frame seguinte e o empurrão não se via.
+	if _recuo_t > 0.0:
+		_recuo_t = maxf(0.0, _recuo_t - dt)
+		_congelado = maxf(0.0, _congelado - dt)
+		_atordoado = maxf(0.0, _atordoado - dt)
+		velocity.x = _recuo_vel
+		_recuo_vel = move_toward(_recuo_vel, 0.0, RECUO_ATRITO * dt)
+		if not is_on_floor():
+			velocity.y += GRAVIDADE * dt
+		move_and_slide()
+		return
 	if _congelado > 0.0 or _atordoado > 0.0:
 		_congelado = maxf(0.0, _congelado - dt)
 		_atordoado = maxf(0.0, _atordoado - dt)
@@ -710,7 +835,7 @@ func _physics_process(dt: float) -> void:
 			move_and_slide()
 			if _windup <= 0.0:
 				_carga = DUR_CARGA
-				_voz("ataque", -13.0, 0.8)
+				_voz("ataque", 0.8)
 			return
 		if _carga > 0.0:  # arranque comprometido -- não vira nem trava
 			_carga -= dt
@@ -723,14 +848,15 @@ func _physics_process(dt: float) -> void:
 				_carga = 0.0
 				_acao_cd = randf_range(1.8, 3.0)
 				atordoar(0.85)
-				Som.toca("bloqueio", -10.0, 0.7)
+				Som.toca_actor(self, "bloqueio", -10.0, 0.7, 0.02, 0.16,
+					"mob_wall_%d" % get_instance_id())
 			elif _carga <= 0.0:
 				# investida falhou: recuo curto, ainda dá para rematar
 				_acao_cd = randf_range(1.2, 2.0)
 				atordoar(0.4)
 			return
 		var alvo_c := _dir_koliani_perto(320.0)
-		if alvo_c != 0.0 and _acao_cd <= 0.0 and is_on_floor():
+		if alvo_c != 0.0 and _acao_cd <= 0.0 and is_on_floor() and Som.em_vista(self):
 			_direcao = alvo_c
 			if _sprite:
 				_sprite.scale.x = _direcao
@@ -738,7 +864,7 @@ func _physics_process(dt: float) -> void:
 			_telegrafo = TELEGRAFO_CARGA
 			anticipacao = 1.0
 			velocity.x = 0.0
-			_voz("ataque", -14.0, 0.7)
+			_voz("ataque", 0.7)
 			return
 	elif comportamento == "saltador":
 		if _saltando > 0.0:  # no ar -- deixa a gravidade fazer o arco
@@ -759,10 +885,10 @@ func _physics_process(dt: float) -> void:
 			if _windup <= 0.0:
 				velocity = Vector2(_direcao * 175.0, -430.0)
 				_saltando = 0.75
-				Som.toca("salto", -20.0, 0.68)
+				Som.toca_actor(self, "salto", -20.0, 0.68)
 				move_and_slide()
 			return
-		if _acao_cd <= 0.0 and is_on_floor():
+		if _acao_cd <= 0.0 and is_on_floor() and Som.em_vista(self):
 			var alvo_s := _dir_koliani_perto(230.0)
 			if alvo_s != 0.0:
 				_direcao = alvo_s
@@ -790,11 +916,11 @@ func _physics_process(dt: float) -> void:
 			if _windup <= 0.0:
 				velocity = _dive_dir * VEL_MERGULHO
 				_mergulho = 0.6
-				_voz("ataque", -13.0, 1.05)
+				_voz("ataque", 1.05)
 				move_and_slide()
 			return
 		var kv := get_tree().get_first_node_in_group("koliani")
-		if kv and _acao_cd <= 0.0:
+		if kv and _acao_cd <= 0.0 and Som.em_vista(self):
 			var d: Vector2 = (kv as Node2D).global_position - global_position
 			if d.length() < 300.0:
 				_dive_dir = d.normalized()
@@ -822,7 +948,7 @@ func _physics_process(dt: float) -> void:
 					_sprite.scale.y = 1.0
 				velocity = Vector2(0.0, 240.0)
 				anticipacao = 1.0
-				_voz("ataque", -14.0, 0.9)
+				_voz("ataque", 0.9)
 				move_and_slide()
 				return
 		velocity = Vector2.ZERO
@@ -841,11 +967,12 @@ func _physics_process(dt: float) -> void:
 				b.dano = maxi(1, int(round(dano_contacto * 0.9)))
 				get_parent().add_child(b)
 				b.global_position = global_position + _dive_dir * 16.0
-				Som.toca("projetil", -13.0, 0.9)
+				Som.toca_actor(self, "praga", -13.0, 0.9, 0.03, 0.18,
+					"cuspo_%d" % get_instance_id())
 				_acao_cd = randf_range(1.8, 2.8)
 				atordoar(0.35)  # recuo do cuspo -> janela curta de castigo
 			return
-		if _acao_cd <= 0.0 and is_on_floor():
+		if _acao_cd <= 0.0 and is_on_floor() and Som.em_vista(self):
 			var kk := get_tree().get_first_node_in_group("koliani")
 			if kk:
 				var d: Vector2 = (kk as Node2D).global_position - global_position
@@ -859,7 +986,7 @@ func _physics_process(dt: float) -> void:
 					_telegrafo = TELEGRAFO_CUSPIR
 					anticipacao = 1.0
 					velocity.x = 0.0
-					_voz("ataque", -15.0, 0.7)
+					_voz("ataque", 0.7)
 					return
 
 	# --- patrulha normal ----------------------------------------------
@@ -881,7 +1008,7 @@ func _revelar() -> void:
 	dormente = false
 	anticipacao = 1.0
 	_flinch = 1.0
-	_voz("ataque", -13.0, 1.15)
+	_voz("ataque", 1.15)
 	if _sprite:
 		var t := _sprite.create_tween()
 		t.tween_property(_sprite, "rotation", 0.25, 0.05)
@@ -936,8 +1063,15 @@ func _ao_tocar(corpo: Node) -> void:
 	if _morto or dormente:
 		return
 	if corpo is Koliani:
-		corpo.receber_dano(dano_contacto, signf(corpo.global_position.x - global_position.x))
-		_voz("ataque", -15.0)
+		# Fase 8 (piloto opt-in): a INVESTIDA telegrafada do comportamento "carga"
+		# conta como um ataque real (pode dar Perfect Dodge); o toque de patrulha
+		# comum continua CONTATO. So' se aplica com `piloto_combate_v1` ligado --
+		# nao muda nenhum inimigo legacy (todos ficam com `_carga <= 0.0` sempre,
+		# ou nunca tem `piloto_combate_v1` ligado).
+		var origem := OrigemDano.ATAQUE if (piloto_combate_v1 and comportamento == "carga" and _carga > 0.0) \
+			else OrigemDano.CONTATO
+		corpo.receber_dano(dano_contacto, signf(corpo.global_position.x - global_position.x), origem)
+		_voz("ataque")
 		anticipacao = 1.0  # dá um "bote" visual no ataque
 
 
@@ -959,13 +1093,18 @@ func _vfx9g_morte() -> bool:
 		clampf(alt / 60.0, 0.7, 2.2), 0.0, false, false, 39, 0.8)
 	return true
 
-func receber_dano(quantidade: int, dir_empurrao: float = 0.0, critico := false) -> void:
+## `forca_recuo` (9H.16 D) é a velocidade do empurrão em px/s. 0 = sem
+## recuo (pisão, dano por estado). Os golpes do combo mandam valores
+## crescentes -- é o que faz o remate ler-se como remate.
+func receber_dano(quantidade: int, dir_empurrao: float = 0.0, critico := false,
+		forca_recuo := 0.0) -> void:
 	if _morto:
 		return
 	# INCORPÓREO: a lâmina passa através. Só o que vem de longe lhe toca --
 	# e o `_de_longe` só é verdade dentro de um `receber_tiro()`.
 	if so_tiro and not _de_longe:
-		Som.toca("bloqueio", -18.0, 1.45)
+		Som.toca_actor(self, "bloqueio", -18.0, 1.45, 0.02, 0.14,
+			"mob_incorporeo_%d" % get_instance_id())
 		_flinch = 0.22
 		return
 	_de_longe = false
@@ -975,12 +1114,12 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0, critico := false) 
 	# pós-rolamento / vulnerável) fura o escudo.
 	if comportamento == "escudeiro" and not critico and dir_empurrao != 0.0 \
 			and signf(dir_empurrao) == -_direcao:
-		Som.toca("bloqueio", -12.0, randf_range(0.85, 0.95))
+		Som.toca_actor(self, "bloqueio", -12.0, 0.9, 0.03, 0.14,
+			"mob_escudo_%d" % get_instance_id())
 		_flinch = 0.4
 		_flinch_dir = signf(dir_empurrao)
 		anticipacao = 0.6
 		return
-	_voz("dano", -16.0, 1.15 if critico else 1.0)
 	var q := quantidade
 	if critico:
 		q = int(round(q * (CRIT_MULT + EstadoJogo.bonus("crit_mult"))))  # melhoria "furia"
@@ -991,7 +1130,20 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0, critico := false) 
 			_tom_estado = ""
 		Impacto.rebentar(self, global_position + Vector2(0.0, -12.0), Color(1, 1, 1), 3.2)
 	vida -= q
-	global_position.x += dir_empurrao * (12.0 if critico else 8.0)
+	if forca_recuo > 0.0 and dir_empurrao != 0.0:
+		var f := forca_recuo * (1.35 if critico else 1.0) / maxf(0.2, resistencia_recuo)
+		_recuo_vel = signf(dir_empurrao) * f
+		_recuo_t = clampf(f / RECUO_ATRITO, 0.08, 0.45)
+		# Remate: além de empurrar, LEVANTA do chão. É o que dá ao 4.º
+		# golpe um remate que se vê sem olhar para a barra de vida.
+		if f >= 380.0 and is_on_floor():
+			velocity.y = -195.0
+		_flinch = maxf(_flinch, 1.2)
+		_flinch_dir = signf(dir_empurrao)
+	else:
+		# sem recuo pedido: fica o toque de antes, para não mudar o pisão
+		# nem o dano por estado.
+		global_position.x += dir_empurrao * (12.0 if critico else 8.0)
 	if vida <= 0:
 		_dividir()
 		if elite:
@@ -1007,6 +1159,9 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0, critico := false) 
 				soltar_estilhacos()
 			queue_free()
 	else:
+		# Na morte, `_morrer_anim()` toca a voz `morte`; nao somar tambem a
+		# voz `dano` no mesmo frame.
+		_voz("dano", 1.15 if critico else 1.0)
 		if dir_empurrao != 0.0:
 			_flinch_dir = signf(dir_empurrao)
 		_flinch = 1.5 if critico else 1.0
@@ -1017,6 +1172,65 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0, critico := false) 
 		piscar_dano()
 		if elite:
 			_atualizar_barra_elite()
+
+
+## Hurtbox lida pelo CoreCombate/CombateLab (clamp de avanço, deteção dos golpes
+## especiais). Usa a MESMA CollisionShape2D do corpo -- os golpes normais já
+## acertam por essa forma via a hitbox de ataque da Koliani; isto só a expõe.
+func hurtbox() -> Rect2:
+	var cs := get_node_or_null("CollisionShape2D") as CollisionShape2D
+	if cs != null and cs.shape is RectangleShape2D:
+		var sz: Vector2 = (cs.shape as RectangleShape2D).size
+		return Rect2(global_position + cs.position - sz * 0.5, sz)
+	return Rect2(global_position - Vector2(20.0, 40.0), Vector2(40.0, 48.0))  # fallback (igual ao do CoreCombate)
+
+
+## Entrada ÚNICA dos golpes especiais do Core Combat/Combat Lab (Launcher, Air
+## Combo, Cleave, Dash Attack, Counter) -- ver `CoreCombate._aplicar_golpe`.
+## `info`: tipo/dano/dir/critico/guard_break/passo/ar.
+##
+## RAMO NÃO-PILOTO (omissão, `piloto_combate_v1 == false`): passthrough 1:1
+## para `receber_dano` -- o MESMO efeito que aconteceria se este método não
+## existisse (nesse caso o `CoreCombate` cairia para
+## `e.receber_dano(dano, dir, critico, 200.0)` por `has_method("lab_hit")` ser
+## falso). NÃO acrescenta peso, guarda, stagger novo, super-armadura nem
+## hooks de Perfect Dodge a nenhum inimigo legacy -- só ao piloto que ligar
+## este export explicitamente (Fase 8/9).
+func lab_hit(info: Dictionary) -> Dictionary:
+	if not piloto_combate_v1:
+		receber_dano(int(info.get("dano", 0)), float(info.get("dir", 0.0)),
+			bool(info.get("critico", false)), 200.0)
+		return {"aplicado": true, "efeito": "", "lancado": false}
+	# --- PILOTO opt-in -------------------------------------------------------
+	if _guarda_v1 < 0.0:
+		_guarda_v1 = guarda_max_v1   # 1.a chamada: arma a guarda
+	var tipo := String(info.get("tipo", "normal"))
+	var dir_golpe := float(info.get("dir", 0.0))
+	var guard_break := bool(info.get("guard_break", false))
+	var de_frente := dir_golpe != 0.0 and signf(dir_golpe) == _direcao
+	# guarda: golpes pela FRENTE sem guard_break custam guarda em vez de dano
+	# cheio; Cleave/Counter (guard_break), um golpe pelas costas, OU a JANELA DE
+	# EXPOSICAO (a meio do proprio ataque telegrafado, ou atordoado por o ter
+	# falhado -- `esta_vulneravel()`) ignoram-na. E' a mesma janela que ja' da'
+	# CRITICO ao combo normal (`Koliani._ao_acertar_corpo`); aqui so' a
+	# reaproveita para a guarda cair no momento certo.
+	if tem_guarda_v1 and _guarda_v1 > 0.0 and de_frente and not guard_break \
+			and _carga <= 0.0 and not esta_vulneravel():
+		var dano_pedido := float(info.get("dano", 0))
+		_guarda_v1 = maxf(0.0, _guarda_v1 - dano_pedido * 0.35)
+		receber_dano(maxi(1, roundi(dano_pedido * 0.2)), dir_golpe, false, 0.0)
+		return {"aplicado": true, "efeito": "guardado" if _guarda_v1 > 0.0 else "guarda_esgotada",
+			"lancado": false}
+	if guard_break:
+		_guarda_v1 = 0.0
+	var lancado := false
+	if tipo == "launcher" and pode_ser_lancado and is_on_floor() and _imune_lancamento_t <= 0.0:
+		velocity.y = -360.0
+		_imune_lancamento_t = 1.2
+		lancado = true
+	receber_dano(int(info.get("dano", 0)), dir_golpe, bool(info.get("critico", false)),
+		0.0 if lancado else 200.0)
+	return {"aplicado": true, "efeito": "lancado" if lancado else "", "lancado": lancado}
 
 
 ## Parte-se em cópias mais pequenas (nível 58). As filhas nascem com
@@ -1076,7 +1290,9 @@ func _soltar_essencia() -> void:
 		var m := ESSENCIA.instantiate()
 		m.valor = maxi(1, total / n + (1 if i < total % n else 0))
 		m.global_position = global_position + Vector2(randf_range(-10.0, 10.0), -14.0)
-		cena.add_child(m)
+		# O golpe fatal pode correr no flush da física. Adiar a inserção da
+		# Area2D inteira, não apenas o monitoring da essência.
+		cena.add_child.call_deferred(m)
 
 
 ## Rebentamento GRANDE quando um elite cai (2 anéis da cor do rim + clarão).
@@ -1093,7 +1309,7 @@ func _pop_morte_elite() -> void:
 ## Toca a animação de morte e só então solta estilhaços e liberta-se.
 func _morrer_anim() -> void:
 	_morto = true
-	_voz("morte", -11.0)
+	_voz("morte")
 	velocity = Vector2.ZERO
 	_soltar_essencia()
 	# "pop" de morte: o mesmo anel do acerto, maior e na cor do rim do bioma

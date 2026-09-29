@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=3]
+
+; COMBAT LAB v1 -- arena ISOLADA e descartavel. Correr:
+;   Godot --path . res://scenes/lab/CombatLab.tscn
+; Nao esta' ligada a nenhum nivel nem ao menu. Ver docs/combat_lab_v1.md.
+[ext_resource type="Script" path="res://scripts/lab/combat_lab_cena.gd" id="1_cena"]
+
+[node name="CombatLab" type="Node2D"]
+script = ExtResource("1_cena")

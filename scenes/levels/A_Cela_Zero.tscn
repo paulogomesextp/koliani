@@ -1,25 +1,45 @@
-[gd_scene load_steps=12 format=3 uid="uid://bkolianicelazero10"]
+[gd_scene load_steps=17 format=3 uid="uid://bkolianicelazero10"]
 
-; REGIAO II / nivel 10 -- A Cela Zero.
-; Sala final FEITA A MAO (a JORNADA, que cresce com o nivel, vem antes) e VERTICAL: um poco-labirinto de
-; celas em ziguezague. Bifurcacao no meio (poco esquerdo / poco direito).
-; Elite: orc de carga na ledge central. Acido no fundo (morte). Chefe: O
-; Primeiro Prisioneiro -- espada como a da Koliani, imita-a. Dialogos.
+; REGIAO II / nivel 10 -- A Cela Zero, EXAME FINAL da Regiao II (Process 12).
+; Sala FEITA A MAO (sem jornada procedural) e VERTICAL: um poco-labirinto de
+; celas em ziguezague, agora atravessado pelo VENTO que a regiao ensinou --
+; rajada a favor em baixo, corrente ascendente no poco esquerdo e rajada
+; CONTRA pulsada no poco direito (a bifurcacao passa a ser uma escolha entre
+; duas leituras de vento). Bifurcacao no meio, elite orc de carga na ledge
+; central, acido no fundo (morte).
+; Chefe: GUARDIAO DOS CEUS -- o confronto regional canonico; manda no vento
+; da arena (`VentoArena`, parada ate' ele a acordar). Substituiu "O Primeiro
+; Prisioneiro" (Process 12). ARTE: passe canonico da Regiao II fica para o
+; Process 13.
 
 [ext_resource type="PackedScene" uid="uid://bkolianiactor01" path="res://scenes/actors/Koliani.tscn" id="1_kol"]
 [ext_resource type="PackedScene" uid="uid://bdemoniobase01" path="res://scenes/actors/DemonioBase.tscn" id="2_dem"]
 [ext_resource type="PackedScene" uid="uid://bkolianicoletavel01" path="res://scenes/actors/Coletavel.tscn" id="3_col"]
 [ext_resource type="PackedScene" uid="uid://bkolianiporta01" path="res://scenes/actors/Porta.tscn" id="4_porta"]
 [ext_resource type="Script" path="res://scripts/checkpoint.gd" id="5_chk"]
-[ext_resource type="PackedScene" uid="uid://bkolianichefeprimeiro10" path="res://scenes/actors/ChefePrimeiroPrisioneiro.tscn" id="6_chefe"]
+[ext_resource type="PackedScene" uid="uid://bkolianichefeguardiaoceus10" path="res://scenes/actors/ChefeGuardiaoDosCeus.tscn" id="6_chefe"]
 [ext_resource type="Script" path="res://scripts/nivel_com_chefe.gd" id="7_niv"]
 [ext_resource type="PackedScene" uid="uid://bkolianiatmosfera01" path="res://scenes/fx/Atmosfera.tscn" id="8_atm"]
 [ext_resource type="PackedScene" uid="uid://bkolianiplataforma01" path="res://scenes/actors/Plataforma.tscn" id="9_pl"]
 [ext_resource type="PackedScene" uid="uid://bkolianicascamasmorra01" path="res://scenes/actors/CascaMasmorra.tscn" id="10_casca"]
 [ext_resource type="PackedScene" uid="uid://bkolianiaguavenenosa01" path="res://scenes/actors/AguaVenenosa.tscn" id="11_acido"]
+[ext_resource type="PackedScene" path="res://scenes/actors/WindZone.tscn" id="12_wind"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/backgrounds/desfiladeiro/nuvens.png" id="90_nuvens"]
 
 [sub_resource type="RectangleShape2D" id="rs_chk"]
 size = Vector2(44, 96)
+
+[sub_resource type="RectangleShape2D" id="rs_RajadaFavor"]
+size = Vector2(360, 130)
+
+[sub_resource type="RectangleShape2D" id="rs_CorrenteEsq"]
+size = Vector2(190, 320)
+
+[sub_resource type="RectangleShape2D" id="rs_RajadaContra"]
+size = Vector2(230, 270)
+
+[sub_resource type="RectangleShape2D" id="rs_VentoArena"]
+size = Vector2(640, 210)
 
 [sub_resource type="Gradient" id="grad_luz"]
 offsets = PackedFloat32Array(0, 1)
@@ -35,23 +55,32 @@ fill_to = Vector2(1, 0.5)
 
 [node name="A_Cela_Zero" type="Node2D"]
 script = ExtResource("7_niv")
+corredor = false
+alongar_plataformas = false
+mecanica_anunciada = "vento"
 
+; N10 -- o exame, sob a lua de sangue: violeta fundo e neblina densa.
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
-cor_ambiente = Color(0.76, 0.76, 0.94, 1)
-cor_fundo = Color(0.05, 0.04, 0.11, 1)
-cor_silhueta = Color(0.08, 0.07, 0.15, 1)
-cor_luz = Color(0.74, 0.44, 1, 1)
-cor_poeira = Color(0.82, 0.62, 1, 1)
-densidade_poeira = 1.4
-bioma = "prisao"
+cor_ambiente = Color(0.74, 0.7, 0.94, 1)
+cor_fundo = Color(0.05, 0.03, 0.12, 1)
+cor_silhueta = Color(0.09, 0.06, 0.17, 1)
+cor_luz = Color(0.78, 0.44, 1, 1)
+cor_poeira = Color(0.88, 0.6, 1, 1)
+densidade_poeira = 1.5
+bioma = "desfiladeiro"
 largura_nivel = 2400.0
-fundo_pack = "prisao"
-tinta_fundo = Color(0.78, 0.7, 1.2, 1)
-neblina_fundo = 0.5
-dessaturar_fundo = 0.6
+fundo_pack = "desfiladeiro"
+tinta_fundo = Color(0.86, 0.66, 1.22, 1)
+neblina_fundo = 0.52
+dessaturar_fundo = 0.36
+perfil_altitude = "n10"
 seed_ambiente = 1333
 
 [node name="Casca" parent="." instance=ExtResource("10_casca")]
+; a agua morta do fundo da Casca segue o mesmo abismo dos niveis
+agua_cor = Color(0.4, 0.13, 0.26, 0.62)
+; pedra do Desfiladeiro em vez de tijolo de cela (mesma colisao)
+estilo = "desfiladeiro"
 topo = -448.0
 altura = 2200.0
 largura = 1484.0
@@ -60,17 +89,63 @@ esquerda = -120.0
 chao = false
 agua = false
 
+; O fundo do Desfiladeiro e' o MAR DE NUVENS, nao uma poca. A banda
+; lisa cor-de-ameixa era "o elemento com mais ar de placeholder" do
+; audit -- ~15%% do ecra, sem textura, sem profundidade e sem
+; transicao para o que esta' por cima. A `superficie_textura` (que o
+; `agua_venenosa.gd` ja' sabia usar desde 9H.12D) recebe a MESMA
+; `nuvens.png` do parallax: duas veus a deslizar a velocidades
+; diferentes por cima da linha. Mesma colisao, mesmo `dano`.
 [node name="Acido" parent="." instance=ExtResource("11_acido")]
 position = Vector2(600, 1080)
 largura = 2800.0
 altura = 320.0
-cor = Color(0.24, 0.4, 0.16, 0.92)
+; o fundo do desfiladeiro e' o abismo, nao acido nem lava
+cor = Color(0.46, 0.14, 0.28, 0.9)
 
 ; ===================  poco em ziguezague  ==================
+veu_forca = 2.6
+veu_origem = 0.5
+superficie_textura = ExtResource("90_nuvens")
+
 [node name="ChaoInicio" parent="." instance=ExtResource("9_pl")]
 position = Vector2(320, 880)
 tamanho = Vector2(440, 60)
 altura_visual = 100.0
+cor_base = Color(0.2, 0.24, 0.32, 1)
+cor_topo = Color(0.42, 0.54, 0.68, 1)
+
+; GATE 2 -- SALIENCIA DE RECUPERACAO DA SUBIDA BAIXA.
+;
+; O problema medido: 76% das mortes do nivel num unico ponto (x~700) e 99%
+; na faixa x=600-820 -- o vao entre a `L1` (acaba em 635) e a `R1` (comeca
+; em 705). Por baixo dele so' havia acido, que mata de vida cheia. Dai o
+; N10 dar 200,7 mortes/1000 px contra 4,7-23,8 nos outros quatro, e faze-lo
+; com 58,8 de dano por run contra 3465-6604: o nivel nao feria, executava.
+;
+; A causa nao e' o salto. Com salto duplo a envolvente da' 195 px de vao
+; para uma subida de 80, e o vao L1->R1 sao 70. E' a CONSEQUENCIA: falhar
+; um salto a meio de uma subida era morte instantanea de vida cheia.
+;
+; Esta laje fecha o fundo debaixo da subida BAIXA -- x 540-880, encostada
+; ao `ChaoInicio` (acaba em 540) e a cobrir a faixa das mortes com folga.
+; Quem falha cai aqui e perde a subida toda, que e' castigo a serio, mas
+; nao perde uma vida.
+;
+; NAO fecha o poco todo, de proposito. De x=880 para a direita o acido
+; continua vivo, e e' para la' que cai quem falha a subida ALTA (RR2,
+; SubidaDir1/2). Essa metade ja' esta' depois do `CheckMeio` (660,516),
+; portanto morrer la' custa pouco -- e a torre continua a ser uma torre de
+; onde se cai. Duas tentativas descartadas antes desta:
+;   * 260 px (x 600-860): o aglomerado mudou-se para a ponta direita dela
+;     (73,5% das mortes em x~900) -- so' se muda a borda de sitio;
+;   * 580 px (x 540-1120): apagou as mortes todas mas virou um atractor de
+;     navegacao no fundo do poco -- o bot passou a SUBIR MENOS (204 px
+;     contra 497) e nenhuma run voltou a chegar ao chefe.
+[node name="ChaoResgate" parent="." instance=ExtResource("9_pl")]
+position = Vector2(710, 872)
+tamanho = Vector2(340, 44)
+altura_visual = 60.0
 cor_base = Color(0.2, 0.24, 0.32, 1)
 cor_topo = Color(0.42, 0.54, 0.68, 1)
 
@@ -102,11 +177,13 @@ altura_visual = 40.0
 cor_base = Color(0.2, 0.24, 0.32, 1)
 cor_topo = Color(0.42, 0.54, 0.68, 1)
 
+; Regiao II canonica: era `orc` (bicho terrestre da antiga Prisao).
+; N10 e' a Torre dos Ceus: o exame final guarda-se com vento puro. O nome do no fica como estava.
 [node name="EliteOrc" parent="." instance=ExtResource("2_dem")]
 position = Vector2(660, 512)
 scale = Vector2(1.45, 1.45)
 elite = true
-especie = "orc"
+especie = "elemental_do_vento"
 vida = 175
 dano_contacto = 24
 comportamento = "carga"
@@ -194,6 +271,68 @@ altura_visual = 100.0
 cor_base = Color(0.2, 0.24, 0.32, 1)
 cor_topo = Color(0.42, 0.54, 0.68, 1)
 
+; ===================  EXAME DE VENTO (Regiao II)  =========================
+; 1. A FAVOR, em baixo: leva quem corre para a direita ate' ao ziguezague.
+; GATE 2 (18 set 2026) -- a rajada ACABA onde o `ChaoInicio` acaba (x=540).
+; Media antes: x 180-620, ou seja soprava 80 px para alem do chao que
+; existe, e empurrava para uma queda mortal antes de haver onde pousar.
+; Agora x 180-540. O impulso de corrida continua inteiro.
+[node name="RajadaFavor" parent="." instance=ExtResource("12_wind")]
+position = Vector2(360, 820)
+direcao = Vector2(1, 0)
+intensidade = 1400
+velocidade_max = 360
+tamanho = Vector2(360, 130)
+cor_guia = Color(0.68, 0.9, 1, 0.42)
+
+[node name="CollisionShape2D" parent="RajadaFavor"]
+shape = SubResource("rs_RajadaFavor")
+
+; 2. CORRENTE ASCENDENTE, poco ESQUERDO: sobe as ledges pequenas de quem
+; segura saltar (a leitura do N07/N08).
+[node name="CorrenteEsq" parent="." instance=ExtResource("12_wind")]
+position = Vector2(500, 420)
+direcao = Vector2(0, -1)
+intensidade = 2500
+velocidade_max = 330
+tamanho = Vector2(190, 320)
+cor_guia = Color(0.72, 0.92, 1, 0.44)
+
+[node name="CollisionShape2D" parent="CorrenteEsq"]
+shape = SubResource("rs_CorrenteEsq")
+
+; 3. CONTRA, poco DIREITO: pulsada (0,9 s a empurrar / 1,6 s de pausa) --
+; sobe-se na pausa, como no N08. O poco esquerdo e' a rota de leitura
+; vertical, o direito a de paciencia: nenhuma delas e' obrigatoria.
+[node name="RajadaContra" parent="." instance=ExtResource("12_wind")]
+position = Vector2(900, 420)
+direcao = Vector2(-1, 0)
+intensidade = 1500
+velocidade_max = 150
+tamanho = Vector2(230, 270)
+modo = 1
+duracao_pulso = 0.9
+intervalo_pulso = 1.6
+cor_guia = Color(1, 0.82, 0.72, 0.46)
+
+[node name="CollisionShape2D" parent="RajadaContra"]
+shape = SubResource("rs_RajadaContra")
+
+; ARENA: parada (`ativa = false`) ate' o Guardiao a acordar; e' ELE que lhe
+; da' sentido e forca, sempre depois de anunciar. A guia so' aparece com
+; vento a soprar.
+[node name="VentoArena" parent="." instance=ExtResource("12_wind")]
+position = Vector2(640, 160)
+direcao = Vector2(1, 0)
+intensidade = 0.0
+velocidade_max = 260
+tamanho = Vector2(640, 210)
+ativa = false
+cor_guia = Color(0.74, 0.93, 1, 0.5)
+
+[node name="CollisionShape2D" parent="VentoArena"]
+shape = SubResource("rs_VentoArena")
+
 [node name="ColProjetil" parent="." instance=ExtResource("3_col")]
 position = Vector2(640, 234)
 habilidade_id = "projetil"
@@ -225,6 +364,8 @@ scale = Vector2(2.8, 1.7)
 
 [node name="Koliani" parent="." instance=ExtResource("1_kol")]
 position = Vector2(180, 810)
+usar_prototipo_premium = true
+usar_golden_set = true
 
 [node name="CheckInicio" type="Area2D" parent="."]
 position = Vector2(440, 816)

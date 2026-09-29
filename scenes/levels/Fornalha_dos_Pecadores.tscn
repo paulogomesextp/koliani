@@ -1,25 +1,43 @@
-[gd_scene load_steps=14 format=3 uid="uid://bkolianifornalha07"]
+[gd_scene load_steps=16 format=3 uid="uid://bkolianifornalha07"]
 
-; REGIAO II / nivel 7 -- Fornalha dos Pecadores.
-; Sala final FEITA A MAO (a JORNADA, que cresce com o nivel, vem antes). Fabrica infernal: LAVA em baixo
-; (morte), plataformas moveis por cima, jatos de fogo. Bifurcacao: correntes
-; a subir pela chamine / passadico lateral com serras. Elite: imp cuspidor.
-; Chefe: Ignivar, o Ferreiro Maldito.
+; REGIAO II / N07 -- "The Rising Gorge" (`level.n06`), DESENVOLVIMENTO do vento
+; ensinado no N06. Nivel AUTORAL (`corredor = false`, `checkpoints_autorais`):
+; sem jornada procedural, sem `escalar_paredes` (essa habilidade so' entra na
+; Regiao III, apos o boss do N10), sem CHEFE regional -- o unico BOSS da
+; Regiao II e' o Guardiao dos Ceus no N10. Fecha com um GUARDIAO (elite que
+; sela a porta, nao boss: nao grava boss derrotado, nao da' bau nem
+; habilidade -- ver `nivel_com_chefe.gd`), como o Golem das Falesias no N06.
+; E' uma SENTINELA FLUTUANTE (o mesmo arquetipo "Torre Vigia" da chave i18n
+; `guard.vigia_desfiladeiro`, `CatalogoCampanha.CHEFE_KEY[6]`) e nao um actor
+; de chefe: `ChefeIgnivar` tem um piso de vida (560) cozido no script para o
+; seu uso como chefe/exame algures -- usa-lo aqui inflacionava o Guardiao
+; para ~1977 de vida apos a escala regional, competindo com o boss do N10.
+; Mexer nesse piso seria mexer num boss (fora de ambito desta execucao). Curva interna:
+;   A Reintro (chao firme, vento continuo fraco -- so' relembra)
+;   B Desenvolvimento (ponte real sobre o vazio, rajada a favor pulsada)
+;   C Mudanca de direcao (duas zonas pulsadas com direcoes opostas: o
+;     jogador tem de LER qual sopra antes de saltar)
+;   D Dash + vento (vazio maior com vento continuo contra; ha' uma
+;     plataforma de apoio mais baixa para quem nao usa o Dash -- nunca
+;     obriga precisao pixel-perfect)
+;   E Combinacao (plataforma movel + vento pulsado + elite conhecido do N06)
+;   F Fecho (troco curto com as duas direcoes outra vez + Guardiao/arena)
+; O NOME DO FICHEIRO ficou da Fornalha dos Pecadores: muda-lo partia os
+; saves e os checkpoints.
 
 [ext_resource type="PackedScene" uid="uid://bkolianiactor01" path="res://scenes/actors/Koliani.tscn" id="1_kol"]
 [ext_resource type="PackedScene" uid="uid://bdemoniobase01" path="res://scenes/actors/DemonioBase.tscn" id="2_dem"]
-[ext_resource type="PackedScene" uid="uid://bkolianicoletavel01" path="res://scenes/actors/Coletavel.tscn" id="3_col"]
 [ext_resource type="PackedScene" uid="uid://bkolianiporta01" path="res://scenes/actors/Porta.tscn" id="4_porta"]
 [ext_resource type="Script" path="res://scripts/checkpoint.gd" id="5_chk"]
-[ext_resource type="PackedScene" uid="uid://bkolianichefeignivar07" path="res://scenes/actors/ChefeIgnivar.tscn" id="6_chefe"]
+[ext_resource type="PackedScene" uid="uid://bkolianiessencia01" path="res://scenes/actors/Essencia.tscn" id="99_ess"]
 [ext_resource type="Script" path="res://scripts/nivel_com_chefe.gd" id="7_niv"]
 [ext_resource type="PackedScene" uid="uid://bkolianiatmosfera01" path="res://scenes/fx/Atmosfera.tscn" id="8_atm"]
 [ext_resource type="PackedScene" uid="uid://bkolianiplataforma01" path="res://scenes/actors/Plataforma.tscn" id="9_pl"]
 [ext_resource type="PackedScene" uid="uid://bkolianicascamasmorra01" path="res://scenes/actors/CascaMasmorra.tscn" id="10_casca"]
 [ext_resource type="PackedScene" uid="uid://bkolianiplatcorrente06" path="res://scenes/actors/PlataformaCorrente.tscn" id="11_corr"]
-[ext_resource type="PackedScene" uid="uid://bkolianifogo01" path="res://scenes/actors/Fogo.tscn" id="12_fogo"]
 [ext_resource type="PackedScene" uid="uid://bkolianiaguavenenosa01" path="res://scenes/actors/AguaVenenosa.tscn" id="13_lava"]
-[ext_resource type="PackedScene" uid="uid://bkolianiserra01" path="res://scenes/actors/Serra.tscn" id="14_serra"]
+[ext_resource type="PackedScene" path="res://scenes/actors/WindZone.tscn" id="15_wind"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/backgrounds/desfiladeiro/nuvens.png" id="90_nuvens"]
 
 [sub_resource type="RectangleShape2D" id="rs_chk"]
 size = Vector2(44, 96)
@@ -38,230 +56,76 @@ fill_to = Vector2(1, 0.5)
 
 [node name="Fornalha_dos_Pecadores" type="Node2D"]
 script = ExtResource("7_niv")
+corredor = false
+alongar_plataformas = false
+candeeiros = false
+checkpoints_autorais = true
+estreia_x_autoral = 0.0
+mecanica_anunciada = "rajada"
 
+; N07 -- a subida continua: a nuvem fecha-se e a luz arrefece (ainda
+; violeta, nunca laranja de fornalha -- isso era o tema antigo).
 [node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
-cor_ambiente = Color(0.98, 0.86, 0.78, 1)
-cor_fundo = Color(0.13, 0.05, 0.04, 1)
-cor_silhueta = Color(0.18, 0.08, 0.06, 1)
-cor_luz = Color(1, 0.58, 0.26, 1)
-cor_poeira = Color(1, 0.76, 0.44, 1)
-densidade_poeira = 2.4
-bioma = "prisao"
-largura_nivel = 3400.0
-fundo_pack = "masmorra"
-tinta_fundo = Color(1.14, 0.72, 0.62, 1)
-neblina_fundo = 0.28
-dessaturar_fundo = 0.44
+cor_ambiente = Color(0.78, 0.8, 0.98, 1)
+cor_fundo = Color(0.05, 0.05, 0.14, 1)
+cor_silhueta = Color(0.08, 0.09, 0.2, 1)
+cor_luz = Color(0.66, 0.72, 1, 1)
+cor_poeira = Color(0.8, 0.86, 1, 1)
+densidade_poeira = 2.2
+bioma = "desfiladeiro"
+largura_nivel = 7000.0
+fundo_pack = "desfiladeiro"
+tinta_fundo = Color(0.78, 0.82, 1.2, 1)
+neblina_fundo = 0.46
+dessaturar_fundo = 0.4
+perfil_altitude = "n07"
 seed_ambiente = 1222
-luzes_horizonte = true
 
 [node name="Casca" parent="." instance=ExtResource("10_casca")]
-topo = -128.0
+agua_cor = Color(0.4, 0.13, 0.26, 0.62)
+estilo = "desfiladeiro"
+topo = -160.0
 altura = 2200.0
-largura = 3612.0
-volumes_interiores = Array[Rect2]([Rect2(8, -128, 576, 352), Rect2(584, -128, 576, 448), Rect2(1160, -128, 576, 320), Rect2(1736, -128, 576, 320), Rect2(2312, -128, 576, 320), Rect2(2888, -128, 576, 416)])
+largura = 7000.0
 esquerda = -120.0
 chao = false
 agua = false
+volumes_interiores = Array[Rect2]([Rect2(8, -160, 480, 448), Rect2(488, -160, 480, 416), Rect2(968, -160, 480, 384), Rect2(1448, -160, 480, 320), Rect2(1928, -160, 480, 320), Rect2(2408, -160, 480, 320), Rect2(2888, -160, 480, 320), Rect2(3368, -160, 480, 320), Rect2(3848, -160, 480, 320), Rect2(4328, -160, 480, 384), Rect2(4808, -160, 480, 416), Rect2(5288, -160, 480, 448)])
 
-[node name="Lava" parent="." instance=ExtResource("13_lava")]
-position = Vector2(1700, 980)
-largura = 3900.0
+; O fundo do Desfiladeiro e' o MAR DE NUVENS: cair e' morte e volta ao checkpoint.
+[node name="FundoDoAbismo" parent="." instance=ExtResource("13_lava")]
+position = Vector2(3400, 980)
+largura = 7300.0
 altura = 340.0
-cor = Color(0.62, 0.22, 0.08, 0.94)
-brasas = true
+cor = Color(0.46, 0.14, 0.28, 0.9)
+brasas = false
+veu_forca = 2.6
+veu_origem = 0.5
+superficie_textura = ExtResource("90_nuvens")
 
-; ===================  entrada + descida  =======================
+; INTENSIDADES: o vento so' se sente no AR e so' se a forca passar a
+; desaceleracao do ar (1300 px/s2 em `movimento.gd`); abaixo disso o
+; proprio controlo da Koliani anula-o (medido no N06: 420 -> 7 px/s,
+; 1600 -> ~160 px/s aos 0,4 s). Usam-se aqui os mesmos 1500-1800 do N06.
+
+; ===== A. REINTRO (0-900): chao firme, vento CONTINUO e fraco, so' relembra =====
 [node name="ChaoInicio" parent="." instance=ExtResource("9_pl")]
-position = Vector2(280, 640)
-tamanho = Vector2(420, 60)
+position = Vector2(450, 700)
+tamanho = Vector2(900, 60)
 altura_visual = 110.0
-cor_base = Color(0.24, 0.16, 0.12, 1)
-cor_topo = Color(0.5, 0.32, 0.2, 1)
+cor_base = Color(0.2, 0.24, 0.32, 1)
+cor_topo = Color(0.42, 0.54, 0.68, 1)
 
-[node name="D1" parent="." instance=ExtResource("9_pl")]
-position = Vector2(600, 680)
-tamanho = Vector2(140, 22)
-altura_visual = 36.0
-cor_base = Color(0.24, 0.16, 0.12, 1)
-cor_topo = Color(0.48, 0.3, 0.2, 1)
-
-[node name="D2" parent="." instance=ExtResource("9_pl")]
-position = Vector2(820, 720)
-tamanho = Vector2(150, 22)
-altura_visual = 36.0
-cor_base = Color(0.24, 0.16, 0.12, 1)
-cor_topo = Color(0.48, 0.3, 0.2, 1)
-
-[node name="FogoD2" parent="." instance=ExtResource("12_fogo")]
-position = Vector2(820, 688)
-fase = 0.2
-intervalo = 2.0
-dur_ativa = 1.1
-
-[node name="D3" parent="." instance=ExtResource("9_pl")]
-position = Vector2(1040, 760)
-tamanho = Vector2(150, 22)
-altura_visual = 36.0
-cor_base = Color(0.24, 0.16, 0.12, 1)
-cor_topo = Color(0.48, 0.3, 0.2, 1)
-
-[node name="ChaoMeio" parent="." instance=ExtResource("9_pl")]
-position = Vector2(1360, 780)
-tamanho = Vector2(360, 60)
-altura_visual = 110.0
-cor_base = Color(0.24, 0.16, 0.12, 1)
-cor_topo = Color(0.46, 0.3, 0.2, 1)
-
-[node name="EliteImp" parent="." instance=ExtResource("2_dem")]
-position = Vector2(1360, 716)
-scale = Vector2(1.35, 1.35)
-elite = true
-especie = "imp"
-vida = 160
-dano_contacto = 22
-comportamento = "cuspidor"
-alcance_patrulha = 60.0
-cor_rim = Color(1.0, 0.55, 0.3, 1)
-
-; ===================  BIFURCACAO -- chamine / passadico  =======
-; -- chamine: correntes a subir --
-[node name="C1" parent="." instance=ExtResource("9_pl")]
-position = Vector2(1560, 720)
-tamanho = Vector2(130, 18)
-altura_visual = 24.0
-cor_base = Color(0.24, 0.16, 0.12, 1)
-cor_topo = Color(0.48, 0.3, 0.2, 1)
-
-[node name="CorrenteSobe" parent="." instance=ExtResource("11_corr")]
-position = Vector2(1700, 620)
-modo = "vertical"
-amplitude = 90.0
-periodo = 3.2
-largura = 130.0
-
-[node name="C2" parent="." instance=ExtResource("9_pl")]
-position = Vector2(1840, 600)
-tamanho = Vector2(140, 18)
-altura_visual = 24.0
-cor_base = Color(0.24, 0.16, 0.12, 1)
-cor_topo = Color(0.48, 0.3, 0.2, 1)
-
-[node name="C3" parent="." instance=ExtResource("9_pl")]
-position = Vector2(2040, 540)
-tamanho = Vector2(150, 18)
-altura_visual = 24.0
-cor_base = Color(0.24, 0.16, 0.12, 1)
-cor_topo = Color(0.48, 0.3, 0.2, 1)
-
-[node name="C4" parent="." instance=ExtResource("9_pl")]
-position = Vector2(2250, 560)
-tamanho = Vector2(150, 18)
-altura_visual = 24.0
-cor_base = Color(0.24, 0.16, 0.12, 1)
-cor_topo = Color(0.48, 0.3, 0.2, 1)
-
-; -- passadico lateral com serras --
-[node name="P1" parent="." instance=ExtResource("9_pl")]
-position = Vector2(1580, 780)
-tamanho = Vector2(150, 20)
-altura_visual = 32.0
-cor_base = Color(0.24, 0.16, 0.12, 1)
-cor_topo = Color(0.46, 0.3, 0.2, 1)
-
-[node name="SerraP1" parent="." instance=ExtResource("14_serra")]
-position = Vector2(1700, 740)
-percurso = Vector2(0, 90)
-tempo = 1.5
-
-[node name="P2" parent="." instance=ExtResource("9_pl")]
-position = Vector2(1800, 760)
-tamanho = Vector2(150, 20)
-altura_visual = 32.0
-cor_base = Color(0.24, 0.16, 0.12, 1)
-cor_topo = Color(0.46, 0.3, 0.2, 1)
-
-[node name="P3" parent="." instance=ExtResource("9_pl")]
-position = Vector2(2010, 720)
-tamanho = Vector2(150, 20)
-altura_visual = 32.0
-cor_base = Color(0.24, 0.16, 0.12, 1)
-cor_topo = Color(0.46, 0.3, 0.2, 1)
-
-[node name="GoblinP" parent="." instance=ExtResource("2_dem")]
-position = Vector2(2010, 694)
-especie = "chort"
-alcance_patrulha = 80.0
-
-[node name="P4" parent="." instance=ExtResource("9_pl")]
-position = Vector2(2220, 680)
-tamanho = Vector2(150, 20)
-altura_visual = 32.0
-cor_base = Color(0.24, 0.16, 0.12, 1)
-cor_topo = Color(0.46, 0.3, 0.2, 1)
-
-; -- reencontro --
-[node name="Reencontro" parent="." instance=ExtResource("9_pl")]
-position = Vector2(2440, 620)
-tamanho = Vector2(200, 24)
-altura_visual = 42.0
-cor_base = Color(0.24, 0.16, 0.12, 1)
-cor_topo = Color(0.5, 0.32, 0.2, 1)
-
-[node name="ColEscalar" parent="." instance=ExtResource("3_col")]
-position = Vector2(2440, 584)
-habilidade_id = "escalar_paredes"
-
-; ===================  forja do chefe  ========================
-[node name="ChaoChefe" parent="." instance=ExtResource("9_pl")]
-position = Vector2(2900, 700)
-tamanho = Vector2(600, 60)
-altura_visual = 110.0
-cor_base = Color(0.24, 0.16, 0.12, 1)
-cor_topo = Color(0.46, 0.3, 0.2, 1)
-
-[node name="FogoChefe1" parent="." instance=ExtResource("12_fogo")]
-position = Vector2(2780, 668)
-fase = 0.0
-intervalo = 2.4
-dur_ativa = 1.4
-
-[node name="FogoChefe2" parent="." instance=ExtResource("12_fogo")]
-position = Vector2(3120, 668)
-fase = 0.7
-intervalo = 2.4
-dur_ativa = 1.4
-
-[node name="Chefe" parent="." instance=ExtResource("6_chefe")]
-position = Vector2(3020, 624)
-
-; ===================  luzes / checkpoints / porta  ==========
-[node name="LuzInicio" type="PointLight2D" parent="."]
-position = Vector2(260, 580)
-texture = SubResource("tex_luz")
-energy = 0.6
-color = Color(1.0, 0.55, 0.25, 1)
-scale = Vector2(2.0, 1.3)
-
-[node name="LuzMeio" type="PointLight2D" parent="."]
-position = Vector2(1360, 720)
-texture = SubResource("tex_luz")
-energy = 0.6
-color = Color(1.0, 0.5, 0.2, 1)
-scale = Vector2(1.9, 1.3)
-
-[node name="LuzChefe" type="PointLight2D" parent="."]
-position = Vector2(2900, 630)
-texture = SubResource("tex_luz")
-energy = 0.75
-color = Color(1.0, 0.5, 0.2, 1)
-scale = Vector2(3.0, 1.8)
-
-[node name="Koliani" parent="." instance=ExtResource("1_kol")]
-position = Vector2(150, 560)
+[node name="VentoReintro" parent="." instance=ExtResource("15_wind")]
+position = Vector2(600, 610)
+direcao = Vector2(1, 0)
+intensidade = 1500.0
+velocidade_max = 120.0
+tamanho = Vector2(340, 220)
+cor_guia = Color(0.62, 0.82, 1, 0.34)
 
 [node name="CheckInicio" type="Area2D" parent="."]
-position = Vector2(420, 576)
+position = Vector2(300, 660)
 collision_layer = 16
 collision_mask = 2
 script = ExtResource("5_chk")
@@ -269,24 +133,362 @@ script = ExtResource("5_chk")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CheckInicio"]
 shape = SubResource("rs_chk")
 
-[node name="CheckMeio" type="Area2D" parent="."]
-position = Vector2(1360, 716)
+; ===== B. DESENVOLVIMENTO (900-1980): ponte real sobre o vazio, rajada a favor PULSADA =====
+[node name="Ponte1" parent="." instance=ExtResource("9_pl")]
+position = Vector2(1000, 650)
+tamanho = Vector2(150, 22)
+altura_visual = 40.0
+cor_base = Color(0.2, 0.24, 0.32, 1)
+cor_topo = Color(0.42, 0.54, 0.68, 1)
+
+[node name="Ponte2" parent="." instance=ExtResource("9_pl")]
+position = Vector2(1270, 640)
+tamanho = Vector2(150, 22)
+altura_visual = 40.0
+cor_base = Color(0.2, 0.24, 0.32, 1)
+cor_topo = Color(0.42, 0.54, 0.68, 1)
+
+[node name="Ponte3" parent="." instance=ExtResource("9_pl")]
+position = Vector2(1540, 650)
+tamanho = Vector2(150, 22)
+altura_visual = 40.0
+cor_base = Color(0.2, 0.24, 0.32, 1)
+cor_topo = Color(0.42, 0.54, 0.68, 1)
+
+[node name="VentoDesenvolve" parent="." instance=ExtResource("15_wind")]
+position = Vector2(1270, 585)
+direcao = Vector2(1, 0)
+intensidade = 1700.0
+velocidade_max = 170.0
+tamanho = Vector2(750, 300)
+modo = 1
+duracao_pulso = 1.6
+intervalo_pulso = 1.2
+cor_guia = Color(0.66, 0.84, 1, 0.4)
+
+[node name="Descanso" parent="." instance=ExtResource("9_pl")]
+position = Vector2(1830, 700)
+tamanho = Vector2(300, 60)
+altura_visual = 110.0
+cor_base = Color(0.2, 0.24, 0.32, 1)
+cor_topo = Color(0.42, 0.54, 0.68, 1)
+
+[node name="CheckDesenvolve" type="Area2D" parent="."]
+position = Vector2(800, 660)
 collision_layer = 16
 collision_mask = 2
 script = ExtResource("5_chk")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckMeio"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckDesenvolve"]
 shape = SubResource("rs_chk")
 
-[node name="CheckReencontro" type="Area2D" parent="."]
-position = Vector2(2440, 592)
+; ===== C. MUDANCA DE DIRECAO (1980-3330): duas zonas pulsadas com direcoes =====
+; opostas -- o jogador tem de LER qual delas sopra antes de saltar (cores da
+; guia distintas: fria = a favor, quente = contra).
+[node name="Dir1" parent="." instance=ExtResource("9_pl")]
+position = Vector2(2080, 600)
+tamanho = Vector2(150, 20)
+altura_visual = 34.0
+cor_base = Color(0.2, 0.24, 0.32, 1)
+cor_topo = Color(0.42, 0.54, 0.68, 1)
+
+[node name="Dir2" parent="." instance=ExtResource("9_pl")]
+position = Vector2(2350, 560)
+tamanho = Vector2(150, 20)
+altura_visual = 34.0
+cor_base = Color(0.2, 0.24, 0.32, 1)
+cor_topo = Color(0.42, 0.54, 0.68, 1)
+
+[node name="WindDirFavor" parent="." instance=ExtResource("15_wind")]
+position = Vector2(2215, 555)
+direcao = Vector2(1, 0)
+intensidade = 1700.0
+velocidade_max = 160.0
+tamanho = Vector2(480, 250)
+modo = 1
+duracao_pulso = 1.3
+intervalo_pulso = 1.0
+cor_guia = Color(0.62, 0.9, 1, 0.4)
+
+[node name="Dir3" parent="." instance=ExtResource("9_pl")]
+position = Vector2(2620, 560)
+tamanho = Vector2(150, 20)
+altura_visual = 34.0
+cor_base = Color(0.2, 0.24, 0.32, 1)
+cor_topo = Color(0.42, 0.54, 0.68, 1)
+
+[node name="Dir4" parent="." instance=ExtResource("9_pl")]
+position = Vector2(2890, 600)
+tamanho = Vector2(150, 20)
+altura_visual = 34.0
+cor_base = Color(0.2, 0.24, 0.32, 1)
+cor_topo = Color(0.42, 0.54, 0.68, 1)
+
+[node name="WindDirContra" parent="." instance=ExtResource("15_wind")]
+position = Vector2(2755, 555)
+direcao = Vector2(-1, 0)
+intensidade = 1800.0
+velocidade_max = 150.0
+tamanho = Vector2(480, 250)
+modo = 1
+duracao_pulso = 1.3
+intervalo_pulso = 1.0
+fase_inicial = 0.65
+cor_guia = Color(1.0, 0.55, 0.65, 0.42)
+
+[node name="ReencontroDir" parent="." instance=ExtResource("9_pl")]
+position = Vector2(3170, 700)
+tamanho = Vector2(320, 60)
+altura_visual = 110.0
+cor_base = Color(0.2, 0.24, 0.32, 1)
+cor_topo = Color(0.42, 0.54, 0.68, 1)
+
+[node name="MorcegoDirecao" parent="." instance=ExtResource("2_dem")]
+position = Vector2(2620, 526)
+especie = "morcego_dos_ventos"
+comportamento = "voador"
+alcance_patrulha = 90.0
+
+[node name="CheckDirecao" type="Area2D" parent="."]
+position = Vector2(1770, 660)
 collision_layer = 16
 collision_mask = 2
 script = ExtResource("5_chk")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckReencontro"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckDirecao"]
 shape = SubResource("rs_chk")
+
+; ===== D. DASH + VENTO (3330-3960): vazio maior com vento CONTINUO contra; =====
+; ha' uma plataforma de apoio mais baixa (DashApoio) para quem nao usa o
+; Dash -- nunca obriga precisao pixel-perfect, so' recompensa quem usa.
+[node name="DashA" parent="." instance=ExtResource("9_pl")]
+position = Vector2(3445, 650)
+tamanho = Vector2(150, 22)
+altura_visual = 40.0
+cor_base = Color(0.2, 0.24, 0.32, 1)
+cor_topo = Color(0.42, 0.54, 0.68, 1)
+
+[node name="DashApoio" parent="." instance=ExtResource("9_pl")]
+position = Vector2(3615, 700)
+tamanho = Vector2(110, 18)
+altura_visual = 30.0
+cor_base = Color(0.2, 0.24, 0.32, 1)
+cor_topo = Color(0.4, 0.5, 0.62, 1)
+
+[node name="DashB" parent="." instance=ExtResource("9_pl")]
+position = Vector2(3785, 650)
+tamanho = Vector2(150, 22)
+altura_visual = 40.0
+cor_base = Color(0.2, 0.24, 0.32, 1)
+cor_topo = Color(0.42, 0.54, 0.68, 1)
+
+[node name="WindDash" parent="." instance=ExtResource("15_wind")]
+position = Vector2(3615, 585)
+direcao = Vector2(-1, 0)
+intensidade = 1750.0
+velocidade_max = 160.0
+tamanho = Vector2(700, 300)
+cor_guia = Color(1.0, 0.6, 0.4, 0.42)
+
+[node name="CheckDash" type="Area2D" parent="."]
+position = Vector2(3170, 660)
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("5_chk")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckDash"]
+shape = SubResource("rs_chk")
+
+; ===== E. COMBINACAO (3960-5290): plataforma movel + vento pulsado + elite =====
+; conhecido (o mesmo `golem_aereo`/`morcego_dos_ventos` do N06).
+[node name="PousoD" parent="." instance=ExtResource("9_pl")]
+position = Vector2(4050, 700)
+tamanho = Vector2(300, 60)
+altura_visual = 110.0
+cor_base = Color(0.2, 0.24, 0.32, 1)
+cor_topo = Color(0.42, 0.54, 0.68, 1)
+
+[node name="CorrenteE" parent="." instance=ExtResource("11_corr")]
+tinta = Color(1.05, 0.86, 1.35, 1)
+position = Vector2(4690, 650)
+modo = "horizontal"
+amplitude = 60.0
+periodo = 3.0
+largura = 130.0
+
+[node name="ComboB" parent="." instance=ExtResource("9_pl")]
+position = Vector2(4990, 700)
+tamanho = Vector2(300, 60)
+altura_visual = 110.0
+cor_base = Color(0.2, 0.24, 0.32, 1)
+cor_topo = Color(0.42, 0.54, 0.68, 1)
+
+[node name="WindCombo" parent="." instance=ExtResource("15_wind")]
+position = Vector2(4690, 560)
+direcao = Vector2(1, 0)
+intensidade = 1600.0
+velocidade_max = 140.0
+tamanho = Vector2(700, 260)
+modo = 1
+duracao_pulso = 1.4
+intervalo_pulso = 1.2
+cor_guia = Color(0.62, 0.82, 1, 0.36)
+
+[node name="EliteCombo" parent="." instance=ExtResource("2_dem")]
+position = Vector2(4990, 636)
+scale = Vector2(1.3, 1.3)
+elite = true
+especie = "golem_aereo"
+vida = 140
+dano_contacto = 20
+comportamento = "carga"
+alcance_patrulha = 130.0
+cor_rim = Color(0.6, 0.55, 1.0, 1)
+
+[node name="MorcegoCombo" parent="." instance=ExtResource("2_dem")]
+position = Vector2(4690, 540)
+especie = "morcego_dos_ventos"
+comportamento = "voador"
+alcance_patrulha = 90.0
+
+[node name="CacheCombo" parent="." instance=ExtResource("99_ess")]
+position = Vector2(4690, 470)
+valor = 20
+espalhar = false
+
+[node name="CheckCombinacao" type="Area2D" parent="."]
+position = Vector2(4050, 660)
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("5_chk")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckCombinacao"]
+shape = SubResource("rs_chk")
+
+; ===== F. FECHO (5290-6400): troco curto com as duas direcoes outra vez, =====
+; SEM chefe/guardiao -- N07 e' Develop/Test, nao o exame regional (esse e'
+; o N10). Uma pequena prova que combina o que o nivel ensinou.
+[node name="Fecho1" parent="." instance=ExtResource("9_pl")]
+position = Vector2(5255, 660)
+tamanho = Vector2(150, 20)
+altura_visual = 34.0
+cor_base = Color(0.2, 0.24, 0.32, 1)
+cor_topo = Color(0.42, 0.54, 0.68, 1)
+
+[node name="Fecho2" parent="." instance=ExtResource("9_pl")]
+position = Vector2(5525, 610)
+tamanho = Vector2(150, 20)
+altura_visual = 34.0
+cor_base = Color(0.2, 0.24, 0.32, 1)
+cor_topo = Color(0.42, 0.54, 0.68, 1)
+
+[node name="WindFechoFavor" parent="." instance=ExtResource("15_wind")]
+position = Vector2(5390, 580)
+direcao = Vector2(1, 0)
+intensidade = 1600.0
+velocidade_max = 140.0
+tamanho = Vector2(320, 230)
+modo = 1
+duracao_pulso = 1.1
+intervalo_pulso = 0.9
+cor_guia = Color(0.62, 0.9, 1, 0.4)
+
+[node name="Fecho3" parent="." instance=ExtResource("9_pl")]
+position = Vector2(5795, 660)
+tamanho = Vector2(150, 20)
+altura_visual = 34.0
+cor_base = Color(0.2, 0.24, 0.32, 1)
+cor_topo = Color(0.42, 0.54, 0.68, 1)
+
+[node name="WindFechoContra" parent="." instance=ExtResource("15_wind")]
+position = Vector2(5660, 580)
+direcao = Vector2(-1, 0)
+intensidade = 1700.0
+velocidade_max = 140.0
+tamanho = Vector2(320, 230)
+modo = 1
+duracao_pulso = 1.1
+intervalo_pulso = 0.9
+fase_inicial = 0.5
+cor_guia = Color(1.0, 0.55, 0.65, 0.42)
+
+[node name="ChaoFinal" parent="." instance=ExtResource("9_pl")]
+position = Vector2(6150, 700)
+tamanho = Vector2(500, 60)
+altura_visual = 110.0
+cor_base = Color(0.2, 0.24, 0.32, 1)
+cor_topo = Color(0.46, 0.3, 0.2, 1)
+
+; Arena do Guardiao: vento FRACO e pulsado, com guia visivel -- so' para
+; nao ficar "morto" (nunca ameaca sozinho); ve-se bem antes do Guardiao e
+; nao cobre nenhum checkpoint (o mais proximo, CheckCombinacao, fica a
+; 2100+ px daqui).
+[node name="VentoArena" parent="." instance=ExtResource("15_wind")]
+position = Vector2(5950, 590)
+direcao = Vector2(1, 0)
+intensidade = 1500.0
+velocidade_max = 120.0
+tamanho = Vector2(500, 220)
+modo = 1
+duracao_pulso = 1.4
+intervalo_pulso = 1.4
+cor_guia = Color(0.62, 0.82, 1, 0.34)
+
+[node name="CacheFinal" parent="." instance=ExtResource("99_ess")]
+position = Vector2(6150, 630)
+valor = 28
+espalhar = false
+
+; Guardiao (nao boss): sela a porta ate' cair; nao grava boss derrotado,
+; nao da' bau nem habilidade (ver `_abrir_guardiao` em `nivel_com_chefe.gd`).
+; A Vigia do Desfiladeiro -- sentinela flutuante elite (o mesmo arquetipo do
+; `EliteImp`/sentinela que ja' abria esta sala antes desta execucao), vida
+; controlada directamente (sem piso escondido de chefe).
+[node name="Guardiao" parent="." instance=ExtResource("2_dem")]
+position = Vector2(6150, 624)
+scale = Vector2(1.5, 1.5)
+elite = true
+especie = "sentinela_flutuante"
+vida = 230
+dano_contacto = 24
+comportamento = "cuspidor"
+alcance_patrulha = 150.0
+cor_rim = Color(1.0, 0.55, 0.3, 1)
 
 [node name="Porta" parent="." instance=ExtResource("4_porta")]
-position = Vector2(3180, 626)
+position = Vector2(6350, 626)
 pista_ao_atravessar = ""
+
+; ===================  luzes  ==========
+[node name="LuzInicio" type="PointLight2D" parent="."]
+position = Vector2(260, 640)
+texture = SubResource("tex_luz")
+energy = 0.5
+color = Color(0.58, 0.48, 1.0, 1)
+scale = Vector2(1.9, 1.3)
+
+[node name="LuzDesenvolve" type="PointLight2D" parent="."]
+position = Vector2(1830, 640)
+texture = SubResource("tex_luz")
+energy = 0.5
+color = Color(0.58, 0.48, 1.0, 1)
+scale = Vector2(1.9, 1.3)
+
+[node name="LuzCombinacao" type="PointLight2D" parent="."]
+position = Vector2(4050, 640)
+texture = SubResource("tex_luz")
+energy = 0.5
+color = Color(0.58, 0.48, 1.0, 1)
+scale = Vector2(1.9, 1.3)
+
+[node name="LuzFinal" type="PointLight2D" parent="."]
+position = Vector2(6150, 640)
+texture = SubResource("tex_luz")
+energy = 0.6
+color = Color(0.58, 0.48, 1.0, 1)
+scale = Vector2(2.5, 1.6)
+
+[node name="Koliani" parent="." instance=ExtResource("1_kol")]
+position = Vector2(150, 620)
+usar_prototipo_premium = true
+usar_golden_set = true

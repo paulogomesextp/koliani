@@ -12,16 +12,29 @@ extends Node2D
 @export var periodo := 2.2
 @export var fase := 0.0
 @export var dano := 20
+## Opt-in: desenho da lamina (corrente + foice) como UMA textura pintada, em
+## vez dos poligonos. A textura e' esticada para caber de eixo a' ponta da
+## lamina (`comprimento` + 16). Os niveis que nao a definem nao mudam.
+@export var textura: Texture2D
+## Opt-in (N13): em vez de UMA textura esticada ao comprimento (que num
+## pendulo comprido fica gigante), uma corrente em mosaico (`textura_haste`)
+## e a lamina da prancha (`textura_lamina`) no fim, a escala fixa.
+@export var textura_haste: Texture2D
+@export var textura_lamina: Texture2D
+@export var escala_lamina := 0.5
 
 var _t := 0.0
 var _braco: Node2D
 var _lamina_area: Area2D
 var _glint: Polygon2D
 var _luz: PointLight2D
+var _som: Node
+var _sinal_anterior := 0.0
 
 
 func _ready() -> void:
 	_t = fase * periodo
+	_som = get_node_or_null("/root/Som")
 	_montar_visual()
 
 
@@ -40,11 +53,45 @@ func _montar_visual() -> void:
 	_braco = Node2D.new()
 	add_child(_braco)
 
+	if textura:
+		eixo.visible = false
+		perno.visible = false
+		var spr := Sprite2D.new()
+		spr.texture = textura
+		spr.centered = false
+		var alt := comprimento + 16.0
+		var esc := alt / float(textura.get_height())
+		spr.scale = Vector2(esc, esc)
+		spr.position = Vector2(-textura.get_width() * esc * 0.5, 0.0)
+		_braco.add_child(spr)
+
+	if textura_haste and textura_lamina:
+		eixo.visible = false
+		perno.visible = false
+		var haste := Sprite2D.new()
+		haste.texture = textura_haste
+		haste.centered = false
+		haste.texture_repeat = CanvasItem.TEXTURE_REPEAT_ENABLED
+		haste.region_enabled = true
+		var ew := 0.7
+		haste.scale = Vector2(ew, ew)
+		haste.region_rect = Rect2(0.0, 0.0, float(textura_haste.get_width()), comprimento / ew)
+		haste.position = Vector2(-textura_haste.get_width() * ew * 0.5, 0.0)
+		haste.modulate = Color(1.0, 0.86, 0.6)
+		_braco.add_child(haste)
+		var lam := Sprite2D.new()
+		lam.texture = textura_lamina
+		lam.scale = Vector2(escala_lamina, escala_lamina)
+		lam.position = Vector2(0.0, comprimento - textura_lamina.get_height() * escala_lamina * 0.2)
+		_braco.add_child(lam)
+	var com_pele := textura != null or (textura_haste != null and textura_lamina != null)
+
 	var corrente := Line2D.new()
 	corrente.points = PackedVector2Array([Vector2.ZERO, Vector2(0, comprimento - 18.0)])
 	corrente.width = 4.0
 	corrente.default_color = Color(0.28, 0.26, 0.3)
 	_braco.add_child(corrente)
+	corrente.visible = not com_pele
 
 	# foice / lamina no fundo do braco
 	var lamina := Polygon2D.new()
@@ -54,6 +101,7 @@ func _montar_visual() -> void:
 		Vector2(30, 6), Vector2(0, 14), Vector2(-30, 6)])
 	lamina.color = Color(0.75, 0.78, 0.86)
 	_braco.add_child(lamina)
+	lamina.visible = not com_pele
 
 	var fio := Line2D.new()
 	fio.position = Vector2(0, comprimento)
@@ -61,6 +109,7 @@ func _montar_visual() -> void:
 	fio.width = 2.0
 	fio.default_color = Color(1, 1, 1, 0.9)
 	_braco.add_child(fio)
+	fio.visible = not com_pele
 
 	_glint = Polygon2D.new()
 	_glint.position = Vector2(0, comprimento)
@@ -131,6 +180,27 @@ func _physics_process(dt: float) -> void:
 		_glint.color.a = 0.15 + 0.5 * vel
 	if _luz:
 		_luz.energy = 0.3 + 1.1 * vel
+	_som_passagem(ang)
+
+
+## O sopro so' no FUNDO do arco -- onde a lamina esta' mais depressa e onde
+## a Koliani tem de passar. Uma vez por travessia, nao por frame.
+##
+## O gatilho e' a mudanca de SINAL do angulo (a lamina a cruzar a vertical),
+## e nao um limiar de velocidade: com um limiar, um pendulo lento ficava
+## varios frames acima dele e disparava em rajada. O cooldown no `Som` e' a
+## segunda rede, com chave por instancia para varios pendulos lado a lado
+## soarem cada um o seu.
+##
+## Nada disto mexe no arco, no periodo nem no dano -- so' se le^ `ang`.
+func _som_passagem(ang: float) -> void:
+	var sinal := signf(ang)
+	var cruzou := sinal != 0.0 and _sinal_anterior != 0.0 and sinal != _sinal_anterior
+	_sinal_anterior = sinal
+	if not cruzou or _som == null or not _som.has_method("toca"):
+		return
+	_som.call("toca_actor", self, "lamina_passa", -14.0, 1.0, 0.06,
+		maxf(0.25, periodo * 0.35), "lamina_%d" % get_instance_id())
 
 
 func _ao_tocar(corpo: Node) -> void:
@@ -138,4 +208,4 @@ func _ao_tocar(corpo: Node) -> void:
 		var dir := signf(corpo.global_position.x - global_position.x)
 		if dir == 0.0:
 			dir = 1.0
-		corpo.receber_dano(dano, dir)
+		corpo.receber_dano(dano, dir, OrigemDano.HAZARD_ATAQUE)

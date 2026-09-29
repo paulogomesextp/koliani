@@ -1,26 +1,132 @@
-[gd_scene load_steps=13 format=3 uid="uid://bkolianitorretempestade13"]
+[gd_scene load_steps=73 format=3 uid="uid://bkolianitorretempestade13"]
 
-; REGIAO III / nivel 13 -- Torre da Tempestade.
-; Sala final FEITA A MAO (a JORNADA, que cresce com o nivel, vem antes) e VERTICAL. RAIOS (RaioTempestade
-; automatico) caem em colunas com padrao previsivel sobre a subida; ha
-; PARA-RAIOS para armar e desviar. Bifurcacao: rampa oeste / rampa este.
-; Elite: olho voador. Vazio em baixo. Chefe: Voltaris.
+; REGIAO III / nivel 13 -- MECANISMOS ANTIGOS (`level.n12`), "O Coracao da Torre".
+; O nome do ficheiro fica: muda-lo partia saves e checkpoints.
+;
+; GERADO por `tools/construir_n13_mecanismos.py` -- editar la', nao aqui.
+; Desenho, medicoes e o que ficou por decidir: `docs/nivel_autoral_n13.md`.
+;
+; Nivel AUTORAL (`corredor = false`): a jornada procedural e a sala do
+; Voltaris (chefe de tempestade, fora do contrato LOCKED) sairam. Tres
+; andares de maquinaria (A-D do contrato):
+;   A) Introducao     -- 1.a alavanca abre a 1.a porta de bronze;
+;   B) Engrenagens    -- sala das engrenagens (bracos que rodam sobre um
+;                        fosso com serra), alavancas multiplas, piso que
+;                        colapsa, laminas em pendulo, elevador de contrapeso;
+;   C) Sinos e plat.  -- pontes reconfiguraveis sob tecto baixo, ponte movel
+;                        num trilho, correntes com peso, alavanca so' do
+;                        braco de uma engrenagem, 2.o elevador;
+;   D) Nucleo central -- o mecanismo de 3 sinos (padrao) abre a sala do
+;                        GUARDIAO (Construto Vitral elite).
+; 3 segredos, 6 checkpoints; inimigos: Autómato do Sino, Construto Vitral,
+; Espirito do Eco.
 
 [ext_resource type="PackedScene" uid="uid://bkolianiactor01" path="res://scenes/actors/Koliani.tscn" id="1_kol"]
 [ext_resource type="PackedScene" uid="uid://bdemoniobase01" path="res://scenes/actors/DemonioBase.tscn" id="2_dem"]
-[ext_resource type="PackedScene" uid="uid://bkolianicoletavel01" path="res://scenes/actors/Coletavel.tscn" id="3_col"]
-[ext_resource type="PackedScene" uid="uid://bkolianiporta01" path="res://scenes/actors/Porta.tscn" id="4_porta"]
-[ext_resource type="Script" path="res://scripts/checkpoint.gd" id="5_chk"]
-[ext_resource type="PackedScene" uid="uid://bkolianichefevoltaris13" path="res://scenes/actors/ChefeVoltaris.tscn" id="6_chefe"]
-[ext_resource type="Script" path="res://scripts/nivel_com_chefe.gd" id="7_niv"]
-[ext_resource type="PackedScene" uid="uid://bkolianiatmosfera01" path="res://scenes/fx/Atmosfera.tscn" id="8_atm"]
-[ext_resource type="PackedScene" uid="uid://bkolianiplataforma01" path="res://scenes/actors/Plataforma.tscn" id="9_pl"]
-[ext_resource type="PackedScene" uid="uid://bkolianiraiotemp13" path="res://scenes/actors/RaioTempestade.tscn" id="10_raio"]
-[ext_resource type="PackedScene" uid="uid://bkolianipararaios13" path="res://scenes/actors/ParaRaios.tscn" id="11_para"]
-[ext_resource type="PackedScene" uid="uid://bkolianiaguavenenosa01" path="res://scenes/actors/AguaVenenosa.tscn" id="12_vazio"]
+[ext_resource type="PackedScene" uid="uid://bkolianiporta01" path="res://scenes/actors/Porta.tscn" id="3_porta"]
+[ext_resource type="Script" path="res://scripts/checkpoint.gd" id="4_chk"]
+[ext_resource type="Script" path="res://scripts/nivel_com_chefe.gd" id="5_niv"]
+[ext_resource type="PackedScene" uid="uid://bkolianiatmosfera01" path="res://scenes/fx/Atmosfera.tscn" id="6_atm"]
+[ext_resource type="PackedScene" uid="uid://bkolianiplataforma01" path="res://scenes/actors/Plataforma.tscn" id="7_pl"]
+[ext_resource type="PackedScene" uid="uid://bkolianisinotorre11" path="res://scenes/actors/SinoTorre.tscn" id="8_sino"]
+[ext_resource type="PackedScene" uid="uid://bkolianiplatsino11" path="res://scenes/actors/PlataformaSino.tscn" id="9_eco"]
+[ext_resource type="PackedScene" uid="uid://bkolianipendulolamina01" path="res://scenes/actors/PenduloLamina.tscn" id="10_pend"]
+[ext_resource type="PackedScene" uid="uid://bkolianiplataquebra01" path="res://scenes/actors/PlataformaQuebra.tscn" id="11_quebra"]
+[ext_resource type="PackedScene" uid="uid://bkolianiessencia01" path="res://scenes/actors/Essencia.tscn" id="12_ess"]
+[ext_resource type="PackedScene" uid="uid://bkolianitumuloelev16" path="res://scenes/actors/TumuloElevador.tscn" id="13_elev"]
+[ext_resource type="Script" path="res://scripts/elevador_coluna.gd" id="14_elevcol"]
+[ext_resource type="PackedScene" uid="uid://bkolianiserra01" path="res://scenes/actors/Serra.tscn" id="15_serra"]
+[ext_resource type="PackedScene" uid="uid://bkolianiespinhos01" path="res://scenes/actors/Espinhos.tscn" id="16_espinhos"]
+[ext_resource type="PackedScene" uid="uid://bkolianialavanca01" path="res://scenes/actors/Alavanca.tscn" id="17_alav"]
+[ext_resource type="PackedScene" uid="uid://bkolianiportatrancada01" path="res://scenes/actors/PortaTrancada.tscn" id="18_grade"]
+[ext_resource type="PackedScene" uid="uid://bkolianiplatcorrente06" path="res://scenes/actors/PlataformaCorrente.tscn" id="19_pcorr"]
+[ext_resource type="Script" path="res://scripts/plataforma_roda.gd" id="20_roda"]
+[ext_resource type="Script" path="res://scripts/mecanismo_sinos.gd" id="21_mecsin"]
+[ext_resource type="Script" path="res://scripts/engrenagem_deco.gd" id="22_gira"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/vitral_alto.png" id="23_t_vitral_alto"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/arco_grande.png" id="28_t_arco_grande"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/lanterna_eco.png" id="30_t_lanterna_eco"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/candelabro.png" id="31_t_candelabro"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/estatua_anjo.png" id="32_t_estatua_anjo"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/pedra_memoria.png" id="33_t_pedra_memoria"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/relogio_antigo.png" id="34_t_relogio_antigo"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/tocha.png" id="35_t_tocha"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/lampiao_t.png" id="36_t_lampiao_t"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/urna.png" id="37_t_urna"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/livros.png" id="38_t_livros"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/p_parede.png" id="39_t_p_parede"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/p_parede_vitral.png" id="40_t_p_parede_vitral"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/p_vitral_dourado.png" id="41_t_p_vitral_dourado"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/p_rosacea.png" id="42_t_p_rosacea"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/p_suporte.png" id="45_t_p_suporte"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/p_brilho_sino.png" id="50_t_p_brilho_sino"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/p_raios_luz.png" id="51_t_p_raios_luz"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/p_neblina.png" id="52_t_p_neblina"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/p_heras.png" id="53_t_p_heras"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/p_detritos.png" id="54_t_p_detritos"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/p_poeira_chao.png" id="55_t_p_poeira_chao"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/m_roda.png" id="56_t_m_roda"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/m_sino_padrao.png" id="57_t_m_sino_padrao"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/m_ponte_movel.png" id="59_t_m_ponte_movel"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/m_engrenagem.png" id="60_t_m_engrenagem"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/m_contrapeso.png" id="61_t_m_contrapeso"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/m_engrenagem_mortal.png" id="62_t_m_engrenagem_mortal"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/m_corrente_peso.png" id="63_t_m_corrente_peso"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/m_lamina_pendulo.png" id="64_t_m_lamina_pendulo"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/m_alavanca.png" id="65_t_m_alavanca"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/m_mecanismo_sino.png" id="67_t_m_mecanismo_sino"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/m_ponte_reconfig.png" id="70_t_m_ponte_reconfig"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/m_tex_metal.png" id="72_t_m_tex_metal"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/m_tex_bronze.png" id="73_t_m_tex_bronze"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/m_tex_correntes.png" id="75_t_m_tex_correntes"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/terreno/torre_ecos/corpo.png" id="76_t_corpo_te"]
+[sub_resource type="RectangleShape2D" id="rs_ParedeOeste"]
+size = Vector2(260, 2260)
+
+[sub_resource type="RectangleShape2D" id="rs_ParedeLeste"]
+size = Vector2(260, 2260)
+
+[sub_resource type="RectangleShape2D" id="rs_Telhado"]
+size = Vector2(3600, 230)
 
 [sub_resource type="RectangleShape2D" id="rs_chk"]
 size = Vector2(44, 96)
+
+[sub_resource type="CanvasItemMaterial" id="mat_add"]
+blend_mode = 1
+
+[sub_resource type="Gradient" id="grad_massa"]
+offsets = PackedFloat32Array(0, 0.35, 1)
+colors = PackedColorArray(0.02, 0.02, 0.05, 0.25, 0.02, 0.02, 0.05, 0.78, 0.01, 0.01, 0.03, 0.9)
+
+[sub_resource type="GradientTexture2D" id="tex_massa"]
+gradient = SubResource("grad_massa")
+width = 64
+height = 64
+fill_from = Vector2(0, 0)
+fill_to = Vector2(0, 1)
+
+[sub_resource type="Gradient" id="grad_massa_cima"]
+offsets = PackedFloat32Array(0, 0.7, 1)
+colors = PackedColorArray(0.01, 0.01, 0.03, 0.92, 0.02, 0.02, 0.05, 0.75, 0.02, 0.02, 0.05, 0.2)
+
+[sub_resource type="GradientTexture2D" id="tex_massa_cima"]
+gradient = SubResource("grad_massa_cima")
+width = 64
+height = 64
+fill_from = Vector2(0, 0)
+fill_to = Vector2(0, 1)
+
+[sub_resource type="Gradient" id="grad_sombra"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(0.01, 0.01, 0.04, 0.7, 0.01, 0.01, 0.04, 0)
+
+[sub_resource type="GradientTexture2D" id="tex_sombra"]
+gradient = SubResource("grad_sombra")
+width = 64
+height = 64
+fill_from = Vector2(0, 0)
+fill_to = Vector2(0, 1)
 
 [sub_resource type="Gradient" id="grad_luz"]
 offsets = PackedFloat32Array(0, 1)
@@ -35,219 +141,3272 @@ fill_from = Vector2(0.5, 0.5)
 fill_to = Vector2(1, 0.5)
 
 [node name="Torre_da_Tempestade" type="Node2D"]
-script = ExtResource("7_niv")
+script = ExtResource("5_niv")
+corredor = false
+alongar_plataformas = false
+checkpoints_autorais = true
+mecanica_anunciada = "engrenagens"
+estreia_x_autoral = 1300.0
 
-[node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
-cor_ambiente = Color(0.86, 0.9, 1, 1)
-cor_fundo = Color(0.04, 0.06, 0.13, 1)
-cor_silhueta = Color(0.07, 0.1, 0.18, 1)
-cor_luz = Color(0.7, 0.88, 1, 1)
-cor_poeira = Color(0.8, 0.94, 1, 1)
-densidade_poeira = 2.3
+[node name="Atmosfera" parent="." instance=ExtResource("6_atm")]
+cor_ambiente = Color(1, 0.92, 0.8, 1)
+cor_fundo = Color(0.07, 0.06, 0.12, 1)
+cor_silhueta = Color(0.12, 0.1, 0.16, 1)
+cor_luz = Color(1, 0.72, 0.38, 1)
+cor_poeira = Color(1, 0.86, 0.62, 1)
+densidade_poeira = 2.2
 bioma = "torres"
-largura_nivel = 2600.0
-fundo_pack = "montanhas"
-tinta_fundo = Color(0.74, 0.88, 1.2, 1)
-neblina_fundo = 0.46
-dessaturar_fundo = 0.34
+largura_nivel = 3600.0
+fundo_pack = "torre_ecos"
+tinta_fundo = Color(1.04, 0.92, 0.94, 1)
+neblina_fundo = 0.28
+dessaturar_fundo = 0.2
 seed_ambiente = 1444
+luzes_horizonte = true
 
-[node name="Vazio" parent="." instance=ExtResource("12_vazio")]
-position = Vector2(650, 1120)
-largura = 3000.0
-altura = 340.0
-cor = Color(0.06, 0.05, 0.12, 0.96)
+; A CASCA: paredes exteriores a toda a altura e as lajes GROSSAS entre andares
+; (250 px -- o chao de um andar e' o tecto do de baixo). Os furos nas lajes
+; sao os pocos dos elevadores, SEMPRE depois de uma porta.
+[node name="ParedeOeste" type="StaticBody2D" parent="."]
+position = Vector2(-130, 30)
 
-[node name="ChaoInicio" parent="." instance=ExtResource("9_pl")]
-position = Vector2(340, 900)
-tamanho = Vector2(460, 60)
-altura_visual = 110.0
-cor_base = Color(0.22, 0.22, 0.28, 1)
-cor_topo = Color(0.48, 0.5, 0.6, 1)
+[node name="Col" type="CollisionShape2D" parent="ParedeOeste"]
+shape = SubResource("rs_ParedeOeste")
 
-[node name="T1" parent="." instance=ExtResource("9_pl")]
-position = Vector2(580, 820)
-tamanho = Vector2(150, 22)
-altura_visual = 32.0
-cor_base = Color(0.22, 0.22, 0.28, 1)
-cor_topo = Color(0.48, 0.5, 0.6, 1)
+[node name="Visual" type="Sprite2D" parent="ParedeOeste"]
+position = Vector2(-130, -1130)
+centered = false
+texture = ExtResource("76_t_corpo_te")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 260, 2260)
+modulate = Color(0.3, 0.3, 0.44, 1)
 
-[node name="RaioT1" parent="." instance=ExtResource("10_raio")]
-position = Vector2(580, 820)
-automatico = true
-periodo = 3.0
-fase = 0.0
-dano = 20
+[node name="Massa" type="Sprite2D" parent="ParedeOeste"]
+position = Vector2(-130, -1130)
+centered = false
+scale = Vector2(4.0625, 35.3125)
+texture = SubResource("tex_massa")
 
-[node name="T2" parent="." instance=ExtResource("9_pl")]
-position = Vector2(800, 740)
-tamanho = Vector2(150, 22)
-altura_visual = 32.0
-cor_base = Color(0.22, 0.22, 0.28, 1)
-cor_topo = Color(0.48, 0.5, 0.6, 1)
+[node name="ParedeLeste" type="StaticBody2D" parent="."]
+position = Vector2(3730, 30)
 
-[node name="T3" parent="." instance=ExtResource("9_pl")]
-position = Vector2(600, 660)
-tamanho = Vector2(150, 22)
-altura_visual = 32.0
-cor_base = Color(0.22, 0.22, 0.28, 1)
-cor_topo = Color(0.48, 0.5, 0.6, 1)
+[node name="Col" type="CollisionShape2D" parent="ParedeLeste"]
+shape = SubResource("rs_ParedeLeste")
 
-[node name="RaioT3" parent="." instance=ExtResource("10_raio")]
-position = Vector2(600, 660)
-automatico = true
-periodo = 3.0
-fase = 1.5
-dano = 20
+[node name="Visual" type="Sprite2D" parent="ParedeLeste"]
+position = Vector2(-130, -1130)
+centered = false
+texture = ExtResource("76_t_corpo_te")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 260, 2260)
+modulate = Color(0.3, 0.3, 0.44, 1)
 
-[node name="CentroLedge" parent="." instance=ExtResource("9_pl")]
-position = Vector2(680, 580)
-tamanho = Vector2(240, 26)
-altura_visual = 40.0
-cor_base = Color(0.22, 0.22, 0.28, 1)
-cor_topo = Color(0.48, 0.5, 0.6, 1)
+[node name="Massa" type="Sprite2D" parent="ParedeLeste"]
+position = Vector2(-130, -1130)
+centered = false
+scale = Vector2(4.0625, 35.3125)
+texture = SubResource("tex_massa")
 
-[node name="ParaMeio" parent="." instance=ExtResource("11_para")]
-position = Vector2(760, 556)
+[node name="Telhado" type="StaticBody2D" parent="."]
+position = Vector2(1800, -985)
 
-[node name="EliteOlho" parent="." instance=ExtResource("2_dem")]
-position = Vector2(620, 440)
-scale = Vector2(1.35, 1.35)
-elite = true
-especie = "olho"
-vida = 155
-dano_contacto = 22
-comportamento = "voador"
-cor_rim = Color(0.7, 0.85, 1.0, 1)
+[node name="Col" type="CollisionShape2D" parent="Telhado"]
+shape = SubResource("rs_Telhado")
 
-; -- BIFURCACAO --
-[node name="RO1" parent="." instance=ExtResource("9_pl")]
-position = Vector2(490, 490)
-tamanho = Vector2(120, 18)
-altura_visual = 22.0
-cor_base = Color(0.22, 0.22, 0.28, 1)
-cor_topo = Color(0.48, 0.5, 0.6, 1)
+[node name="Visual" type="Sprite2D" parent="Telhado"]
+position = Vector2(-1800, -115)
+centered = false
+texture = ExtResource("76_t_corpo_te")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 3600, 230)
+modulate = Color(0.3, 0.3, 0.44, 1)
 
-[node name="RO2" parent="." instance=ExtResource("9_pl")]
-position = Vector2(560, 400)
-tamanho = Vector2(120, 18)
-altura_visual = 22.0
-cor_base = Color(0.22, 0.22, 0.28, 1)
-cor_topo = Color(0.48, 0.5, 0.6, 1)
+[node name="Massa" type="Sprite2D" parent="Telhado"]
+position = Vector2(-1800, -115)
+centered = false
+scale = Vector2(56.25, 3.59375)
+texture = SubResource("tex_massa")
 
-[node name="RO3" parent="." instance=ExtResource("9_pl")]
-position = Vector2(450, 320)
-tamanho = Vector2(120, 18)
-altura_visual = 22.0
-cor_base = Color(0.22, 0.22, 0.28, 1)
-cor_topo = Color(0.48, 0.5, 0.6, 1)
+; INTERIOR DA TORRE -- "o coracao da torre" das pranchas (`layout_usage.png`,
+; set pieces e faixa de paleta do N13): cantaria azul-noite, pilares, e em
+; cada vao entre pilares OU uma janela gotica com a lua a entrar, OU uma
+; maquina de ouro velho a rodar (engrenagens em sentidos opostos, como numa
+; caixa de velocidades) com correntes douradas a pender. Chamas nos pilares
+; com brilho pintado (sem PointLight2D -- sao dezenas).
+[node name="ParedeFundo0" type="Sprite2D" parent="."]
+position = Vector2(0, 510)
+scale = Vector2(1, 1)
+centered = false
+texture = ExtResource("76_t_corpo_te")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 3600, 640)
+z_index = -12
+modulate = Color(0.2, 0.21, 0.36, 1)
 
-[node name="RE1" parent="." instance=ExtResource("9_pl")]
-position = Vector2(850, 500)
-tamanho = Vector2(120, 18)
-altura_visual = 22.0
-cor_base = Color(0.22, 0.22, 0.28, 1)
-cor_topo = Color(0.48, 0.5, 0.6, 1)
+[node name="Pilar0_1" type="Sprite2D" parent="."]
+position = Vector2(586, 510)
+scale = Vector2(1.1, 1.1)
+centered = false
+texture = ExtResource("39_t_p_parede")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 61.8182, 400)
+z_index = -9
+modulate = Color(0.46, 0.46, 0.7, 1)
 
-[node name="RaioRE" parent="." instance=ExtResource("10_raio")]
-position = Vector2(970, 430)
-automatico = true
-periodo = 2.6
-fase = 0.8
-dano = 22
+[node name="Misula0_1" type="Sprite2D" parent="."]
+position = Vector2(620, 587.9)
+scale = Vector2(1.05, 1.05)
+texture = ExtResource("45_t_p_suporte")
+z_index = -8
+modulate = Color(0.46, 0.46, 0.7, 1)
 
-[node name="RE2" parent="." instance=ExtResource("9_pl")]
-position = Vector2(970, 430)
-tamanho = Vector2(120, 18)
-altura_visual = 22.0
-cor_base = Color(0.22, 0.22, 0.28, 1)
-cor_topo = Color(0.48, 0.5, 0.6, 1)
+[node name="Tocha0_1" type="Sprite2D" parent="."]
+position = Vector2(620, 647.9)
+scale = Vector2(1.1, 1.1)
+texture = ExtResource("35_t_tocha")
+z_index = -7
 
-[node name="RE3" parent="." instance=ExtResource("9_pl")]
-position = Vector2(850, 350)
-tamanho = Vector2(120, 18)
-altura_visual = 22.0
-cor_base = Color(0.22, 0.22, 0.28, 1)
-cor_topo = Color(0.48, 0.5, 0.6, 1)
+[node name="BrilhoTocha0_1" type="Sprite2D" parent="."]
+position = Vector2(620, 630)
+scale = Vector2(0.9, 0.9)
+texture = ExtResource("50_t_p_brilho_sino")
+z_index = -7
+modulate = Color(1, 0.62, 0.3, 0.45)
+material = SubResource("mat_add")
 
-; --- degraus para o cimo: o ChaoChefe vai de x=380 a x=940 e e' TECTO
-; para quem sobe por baixo. Estes ficam FORA desse intervalo.
-[node name="SubidaOeste1" parent="." instance=ExtResource("9_pl")]
-position = Vector2(310, 322)
-tamanho = Vector2(110, 18)
-altura_visual = 24.0
-cor_base = Color(0.22, 0.22, 0.28, 1)
-cor_topo = Color(0.48, 0.5, 0.6, 1)
+[node name="Pilar0_2" type="Sprite2D" parent="."]
+position = Vector2(1206, 510)
+scale = Vector2(1.1, 1.1)
+centered = false
+texture = ExtResource("39_t_p_parede")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 61.8182, 400)
+z_index = -9
+modulate = Color(0.46, 0.46, 0.7, 1)
 
-[node name="SubidaOeste2" parent="." instance=ExtResource("9_pl")]
-position = Vector2(250, 250)
-tamanho = Vector2(100, 18)
-altura_visual = 24.0
-cor_base = Color(0.22, 0.22, 0.28, 1)
-cor_topo = Color(0.48, 0.5, 0.6, 1)
+[node name="Misula0_2" type="Sprite2D" parent="."]
+position = Vector2(1240, 587.9)
+scale = Vector2(1.05, 1.05)
+texture = ExtResource("45_t_p_suporte")
+z_index = -8
+modulate = Color(0.46, 0.46, 0.7, 1)
 
-[node name="SubidaLeste1" parent="." instance=ExtResource("9_pl")]
-position = Vector2(1035, 345)
-tamanho = Vector2(110, 18)
-altura_visual = 24.0
-cor_base = Color(0.22, 0.22, 0.28, 1)
-cor_topo = Color(0.48, 0.5, 0.6, 1)
+[node name="Tocha0_2" type="Sprite2D" parent="."]
+position = Vector2(1240, 647.9)
+scale = Vector2(1.1, 1.1)
+texture = ExtResource("35_t_tocha")
+z_index = -7
 
-[node name="SubidaLeste2" parent="." instance=ExtResource("9_pl")]
-position = Vector2(1065, 267)
-tamanho = Vector2(100, 18)
-altura_visual = 24.0
-cor_base = Color(0.22, 0.22, 0.28, 1)
-cor_topo = Color(0.48, 0.5, 0.6, 1)
+[node name="BrilhoTocha0_2" type="Sprite2D" parent="."]
+position = Vector2(1240, 630)
+scale = Vector2(0.9, 0.9)
+texture = ExtResource("50_t_p_brilho_sino")
+z_index = -7
+modulate = Color(1, 0.62, 0.3, 0.45)
+material = SubResource("mat_add")
 
-[node name="ChaoChefe" parent="." instance=ExtResource("9_pl")]
-position = Vector2(660, 270)
-tamanho = Vector2(560, 60)
-altura_visual = 100.0
-cor_base = Color(0.22, 0.22, 0.28, 1)
-cor_topo = Color(0.48, 0.5, 0.6, 1)
+[node name="Pilar0_3" type="Sprite2D" parent="."]
+position = Vector2(1926, 510)
+scale = Vector2(1.1, 1.1)
+centered = false
+texture = ExtResource("39_t_p_parede")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 61.8182, 400)
+z_index = -9
+modulate = Color(0.46, 0.46, 0.7, 1)
 
-[node name="ParaChefe" parent="." instance=ExtResource("11_para")]
-position = Vector2(560, 236)
+[node name="Misula0_3" type="Sprite2D" parent="."]
+position = Vector2(1960, 587.9)
+scale = Vector2(1.05, 1.05)
+texture = ExtResource("45_t_p_suporte")
+z_index = -8
+modulate = Color(0.46, 0.46, 0.7, 1)
 
-[node name="Chefe" parent="." instance=ExtResource("6_chefe")]
-position = Vector2(780, 194)
+[node name="Tocha0_3" type="Sprite2D" parent="."]
+position = Vector2(1960, 647.9)
+scale = Vector2(1.1, 1.1)
+texture = ExtResource("35_t_tocha")
+z_index = -7
 
-[node name="LuzBaixo" type="PointLight2D" parent="."]
-position = Vector2(340, 840)
-texture = SubResource("tex_luz")
-energy = 0.55
-color = Color(0.68, 0.82, 1.0, 1)
-scale = Vector2(2.0, 1.3)
+[node name="BrilhoTocha0_3" type="Sprite2D" parent="."]
+position = Vector2(1960, 630)
+scale = Vector2(0.9, 0.9)
+texture = ExtResource("50_t_p_brilho_sino")
+z_index = -7
+modulate = Color(1, 0.62, 0.3, 0.45)
+material = SubResource("mat_add")
 
-[node name="LuzChefe" type="PointLight2D" parent="."]
-position = Vector2(660, 250)
-texture = SubResource("tex_luz")
-energy = 0.65
-color = Color(0.75, 0.88, 1.0, 1)
-scale = Vector2(2.9, 1.7)
+[node name="Pilar0_4" type="Sprite2D" parent="."]
+position = Vector2(2606, 510)
+scale = Vector2(1.1, 1.1)
+centered = false
+texture = ExtResource("39_t_p_parede")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 61.8182, 400)
+z_index = -9
+modulate = Color(0.46, 0.46, 0.7, 1)
 
+[node name="Misula0_4" type="Sprite2D" parent="."]
+position = Vector2(2640, 587.9)
+scale = Vector2(1.05, 1.05)
+texture = ExtResource("45_t_p_suporte")
+z_index = -8
+modulate = Color(0.46, 0.46, 0.7, 1)
+
+[node name="Tocha0_4" type="Sprite2D" parent="."]
+position = Vector2(2640, 647.9)
+scale = Vector2(1.1, 1.1)
+texture = ExtResource("35_t_tocha")
+z_index = -7
+
+[node name="BrilhoTocha0_4" type="Sprite2D" parent="."]
+position = Vector2(2640, 630)
+scale = Vector2(0.9, 0.9)
+texture = ExtResource("50_t_p_brilho_sino")
+z_index = -7
+modulate = Color(1, 0.62, 0.3, 0.45)
+material = SubResource("mat_add")
+
+[node name="Pilar0_5" type="Sprite2D" parent="."]
+position = Vector2(3186, 510)
+scale = Vector2(1.1, 1.1)
+centered = false
+texture = ExtResource("39_t_p_parede")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 61.8182, 400)
+z_index = -9
+modulate = Color(0.46, 0.46, 0.7, 1)
+
+[node name="Misula0_5" type="Sprite2D" parent="."]
+position = Vector2(3220, 587.9)
+scale = Vector2(1.05, 1.05)
+texture = ExtResource("45_t_p_suporte")
+z_index = -8
+modulate = Color(0.46, 0.46, 0.7, 1)
+
+[node name="Tocha0_5" type="Sprite2D" parent="."]
+position = Vector2(3220, 647.9)
+scale = Vector2(1.1, 1.1)
+texture = ExtResource("35_t_tocha")
+z_index = -7
+
+[node name="BrilhoTocha0_5" type="Sprite2D" parent="."]
+position = Vector2(3220, 630)
+scale = Vector2(0.9, 0.9)
+texture = ExtResource("50_t_p_brilho_sino")
+z_index = -7
+modulate = Color(1, 0.62, 0.3, 0.45)
+material = SubResource("mat_add")
+
+[node name="SombraTecto0" type="Sprite2D" parent="."]
+position = Vector2(0, 510)
+centered = false
+scale = Vector2(56.25, 3.4375)
+texture = SubResource("tex_sombra")
+z_index = -8
+
+[node name="FrisoTecto0" type="Sprite2D" parent="."]
+position = Vector2(0, 510)
+scale = Vector2(0.5, 0.5)
+centered = false
+texture = ExtResource("72_t_m_tex_metal")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 7200, 28)
+z_index = -7
+modulate = Color(0.7, 0.56, 0.42, 1)
+
+[node name="ParedeFundo1" type="Sprite2D" parent="."]
+position = Vector2(0, -180)
+scale = Vector2(1, 1)
+centered = false
+texture = ExtResource("76_t_corpo_te")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 3600, 640)
+z_index = -12
+modulate = Color(0.2, 0.21, 0.36, 1)
+
+[node name="Pilar1_1" type="Sprite2D" parent="."]
+position = Vector2(586, -180)
+scale = Vector2(1.1, 1.1)
+centered = false
+texture = ExtResource("39_t_p_parede")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 61.8182, 400)
+z_index = -9
+modulate = Color(0.46, 0.46, 0.7, 1)
+
+[node name="Misula1_1" type="Sprite2D" parent="."]
+position = Vector2(620, -102.1)
+scale = Vector2(1.05, 1.05)
+texture = ExtResource("45_t_p_suporte")
+z_index = -8
+modulate = Color(0.46, 0.46, 0.7, 1)
+
+[node name="Tocha1_1" type="Sprite2D" parent="."]
+position = Vector2(620, -42.1)
+scale = Vector2(1.1, 1.1)
+texture = ExtResource("35_t_tocha")
+z_index = -7
+
+[node name="BrilhoTocha1_1" type="Sprite2D" parent="."]
+position = Vector2(620, -60)
+scale = Vector2(0.9, 0.9)
+texture = ExtResource("50_t_p_brilho_sino")
+z_index = -7
+modulate = Color(1, 0.62, 0.3, 0.45)
+material = SubResource("mat_add")
+
+[node name="Pilar1_2" type="Sprite2D" parent="."]
+position = Vector2(1206, -180)
+scale = Vector2(1.1, 1.1)
+centered = false
+texture = ExtResource("39_t_p_parede")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 61.8182, 400)
+z_index = -9
+modulate = Color(0.46, 0.46, 0.7, 1)
+
+[node name="Misula1_2" type="Sprite2D" parent="."]
+position = Vector2(1240, -102.1)
+scale = Vector2(1.05, 1.05)
+texture = ExtResource("45_t_p_suporte")
+z_index = -8
+modulate = Color(0.46, 0.46, 0.7, 1)
+
+[node name="Tocha1_2" type="Sprite2D" parent="."]
+position = Vector2(1240, -42.1)
+scale = Vector2(1.1, 1.1)
+texture = ExtResource("35_t_tocha")
+z_index = -7
+
+[node name="BrilhoTocha1_2" type="Sprite2D" parent="."]
+position = Vector2(1240, -60)
+scale = Vector2(0.9, 0.9)
+texture = ExtResource("50_t_p_brilho_sino")
+z_index = -7
+modulate = Color(1, 0.62, 0.3, 0.45)
+material = SubResource("mat_add")
+
+[node name="Pilar1_3" type="Sprite2D" parent="."]
+position = Vector2(1926, -180)
+scale = Vector2(1.1, 1.1)
+centered = false
+texture = ExtResource("39_t_p_parede")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 61.8182, 400)
+z_index = -9
+modulate = Color(0.46, 0.46, 0.7, 1)
+
+[node name="Misula1_3" type="Sprite2D" parent="."]
+position = Vector2(1960, -102.1)
+scale = Vector2(1.05, 1.05)
+texture = ExtResource("45_t_p_suporte")
+z_index = -8
+modulate = Color(0.46, 0.46, 0.7, 1)
+
+[node name="Tocha1_3" type="Sprite2D" parent="."]
+position = Vector2(1960, -42.1)
+scale = Vector2(1.1, 1.1)
+texture = ExtResource("35_t_tocha")
+z_index = -7
+
+[node name="BrilhoTocha1_3" type="Sprite2D" parent="."]
+position = Vector2(1960, -60)
+scale = Vector2(0.9, 0.9)
+texture = ExtResource("50_t_p_brilho_sino")
+z_index = -7
+modulate = Color(1, 0.62, 0.3, 0.45)
+material = SubResource("mat_add")
+
+[node name="Pilar1_4" type="Sprite2D" parent="."]
+position = Vector2(2606, -180)
+scale = Vector2(1.1, 1.1)
+centered = false
+texture = ExtResource("39_t_p_parede")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 61.8182, 400)
+z_index = -9
+modulate = Color(0.46, 0.46, 0.7, 1)
+
+[node name="Misula1_4" type="Sprite2D" parent="."]
+position = Vector2(2640, -102.1)
+scale = Vector2(1.05, 1.05)
+texture = ExtResource("45_t_p_suporte")
+z_index = -8
+modulate = Color(0.46, 0.46, 0.7, 1)
+
+[node name="Tocha1_4" type="Sprite2D" parent="."]
+position = Vector2(2640, -42.1)
+scale = Vector2(1.1, 1.1)
+texture = ExtResource("35_t_tocha")
+z_index = -7
+
+[node name="BrilhoTocha1_4" type="Sprite2D" parent="."]
+position = Vector2(2640, -60)
+scale = Vector2(0.9, 0.9)
+texture = ExtResource("50_t_p_brilho_sino")
+z_index = -7
+modulate = Color(1, 0.62, 0.3, 0.45)
+material = SubResource("mat_add")
+
+[node name="Pilar1_5" type="Sprite2D" parent="."]
+position = Vector2(3186, -180)
+scale = Vector2(1.1, 1.1)
+centered = false
+texture = ExtResource("39_t_p_parede")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 61.8182, 400)
+z_index = -9
+modulate = Color(0.46, 0.46, 0.7, 1)
+
+[node name="Misula1_5" type="Sprite2D" parent="."]
+position = Vector2(3220, -102.1)
+scale = Vector2(1.05, 1.05)
+texture = ExtResource("45_t_p_suporte")
+z_index = -8
+modulate = Color(0.46, 0.46, 0.7, 1)
+
+[node name="Tocha1_5" type="Sprite2D" parent="."]
+position = Vector2(3220, -42.1)
+scale = Vector2(1.1, 1.1)
+texture = ExtResource("35_t_tocha")
+z_index = -7
+
+[node name="BrilhoTocha1_5" type="Sprite2D" parent="."]
+position = Vector2(3220, -60)
+scale = Vector2(0.9, 0.9)
+texture = ExtResource("50_t_p_brilho_sino")
+z_index = -7
+modulate = Color(1, 0.62, 0.3, 0.45)
+material = SubResource("mat_add")
+
+[node name="SombraTecto1" type="Sprite2D" parent="."]
+position = Vector2(0, -180)
+centered = false
+scale = Vector2(56.25, 3.4375)
+texture = SubResource("tex_sombra")
+z_index = -8
+
+[node name="FrisoTecto1" type="Sprite2D" parent="."]
+position = Vector2(0, -180)
+scale = Vector2(0.5, 0.5)
+centered = false
+texture = ExtResource("72_t_m_tex_metal")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 7200, 28)
+z_index = -7
+modulate = Color(0.7, 0.56, 0.42, 1)
+
+[node name="ParedeFundo2" type="Sprite2D" parent="."]
+position = Vector2(0, -870)
+scale = Vector2(1, 1)
+centered = false
+texture = ExtResource("76_t_corpo_te")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 3600, 640)
+z_index = -12
+modulate = Color(0.2, 0.21, 0.36, 1)
+
+[node name="Pilar2_1" type="Sprite2D" parent="."]
+position = Vector2(586, -870)
+scale = Vector2(1.1, 1.1)
+centered = false
+texture = ExtResource("39_t_p_parede")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 61.8182, 400)
+z_index = -9
+modulate = Color(0.46, 0.46, 0.7, 1)
+
+[node name="Misula2_1" type="Sprite2D" parent="."]
+position = Vector2(620, -792.1)
+scale = Vector2(1.05, 1.05)
+texture = ExtResource("45_t_p_suporte")
+z_index = -8
+modulate = Color(0.46, 0.46, 0.7, 1)
+
+[node name="Tocha2_1" type="Sprite2D" parent="."]
+position = Vector2(620, -732.1)
+scale = Vector2(1.1, 1.1)
+texture = ExtResource("35_t_tocha")
+z_index = -7
+
+[node name="BrilhoTocha2_1" type="Sprite2D" parent="."]
+position = Vector2(620, -750)
+scale = Vector2(0.9, 0.9)
+texture = ExtResource("50_t_p_brilho_sino")
+z_index = -7
+modulate = Color(1, 0.62, 0.3, 0.45)
+material = SubResource("mat_add")
+
+[node name="Pilar2_2" type="Sprite2D" parent="."]
+position = Vector2(1206, -870)
+scale = Vector2(1.1, 1.1)
+centered = false
+texture = ExtResource("39_t_p_parede")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 61.8182, 400)
+z_index = -9
+modulate = Color(0.46, 0.46, 0.7, 1)
+
+[node name="Misula2_2" type="Sprite2D" parent="."]
+position = Vector2(1240, -792.1)
+scale = Vector2(1.05, 1.05)
+texture = ExtResource("45_t_p_suporte")
+z_index = -8
+modulate = Color(0.46, 0.46, 0.7, 1)
+
+[node name="Tocha2_2" type="Sprite2D" parent="."]
+position = Vector2(1240, -732.1)
+scale = Vector2(1.1, 1.1)
+texture = ExtResource("35_t_tocha")
+z_index = -7
+
+[node name="BrilhoTocha2_2" type="Sprite2D" parent="."]
+position = Vector2(1240, -750)
+scale = Vector2(0.9, 0.9)
+texture = ExtResource("50_t_p_brilho_sino")
+z_index = -7
+modulate = Color(1, 0.62, 0.3, 0.45)
+material = SubResource("mat_add")
+
+[node name="Pilar2_3" type="Sprite2D" parent="."]
+position = Vector2(1926, -870)
+scale = Vector2(1.1, 1.1)
+centered = false
+texture = ExtResource("39_t_p_parede")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 61.8182, 400)
+z_index = -9
+modulate = Color(0.46, 0.46, 0.7, 1)
+
+[node name="Misula2_3" type="Sprite2D" parent="."]
+position = Vector2(1960, -792.1)
+scale = Vector2(1.05, 1.05)
+texture = ExtResource("45_t_p_suporte")
+z_index = -8
+modulate = Color(0.46, 0.46, 0.7, 1)
+
+[node name="Tocha2_3" type="Sprite2D" parent="."]
+position = Vector2(1960, -732.1)
+scale = Vector2(1.1, 1.1)
+texture = ExtResource("35_t_tocha")
+z_index = -7
+
+[node name="BrilhoTocha2_3" type="Sprite2D" parent="."]
+position = Vector2(1960, -750)
+scale = Vector2(0.9, 0.9)
+texture = ExtResource("50_t_p_brilho_sino")
+z_index = -7
+modulate = Color(1, 0.62, 0.3, 0.45)
+material = SubResource("mat_add")
+
+[node name="Pilar2_4" type="Sprite2D" parent="."]
+position = Vector2(2606, -870)
+scale = Vector2(1.1, 1.1)
+centered = false
+texture = ExtResource("39_t_p_parede")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 61.8182, 400)
+z_index = -9
+modulate = Color(0.46, 0.46, 0.7, 1)
+
+[node name="Misula2_4" type="Sprite2D" parent="."]
+position = Vector2(2640, -792.1)
+scale = Vector2(1.05, 1.05)
+texture = ExtResource("45_t_p_suporte")
+z_index = -8
+modulate = Color(0.46, 0.46, 0.7, 1)
+
+[node name="Tocha2_4" type="Sprite2D" parent="."]
+position = Vector2(2640, -732.1)
+scale = Vector2(1.1, 1.1)
+texture = ExtResource("35_t_tocha")
+z_index = -7
+
+[node name="BrilhoTocha2_4" type="Sprite2D" parent="."]
+position = Vector2(2640, -750)
+scale = Vector2(0.9, 0.9)
+texture = ExtResource("50_t_p_brilho_sino")
+z_index = -7
+modulate = Color(1, 0.62, 0.3, 0.45)
+material = SubResource("mat_add")
+
+[node name="Pilar2_5" type="Sprite2D" parent="."]
+position = Vector2(3186, -870)
+scale = Vector2(1.1, 1.1)
+centered = false
+texture = ExtResource("39_t_p_parede")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 61.8182, 400)
+z_index = -9
+modulate = Color(0.46, 0.46, 0.7, 1)
+
+[node name="Misula2_5" type="Sprite2D" parent="."]
+position = Vector2(3220, -792.1)
+scale = Vector2(1.05, 1.05)
+texture = ExtResource("45_t_p_suporte")
+z_index = -8
+modulate = Color(0.46, 0.46, 0.7, 1)
+
+[node name="Tocha2_5" type="Sprite2D" parent="."]
+position = Vector2(3220, -732.1)
+scale = Vector2(1.1, 1.1)
+texture = ExtResource("35_t_tocha")
+z_index = -7
+
+[node name="BrilhoTocha2_5" type="Sprite2D" parent="."]
+position = Vector2(3220, -750)
+scale = Vector2(0.9, 0.9)
+texture = ExtResource("50_t_p_brilho_sino")
+z_index = -7
+modulate = Color(1, 0.62, 0.3, 0.45)
+material = SubResource("mat_add")
+
+[node name="SombraTecto2" type="Sprite2D" parent="."]
+position = Vector2(0, -870)
+centered = false
+scale = Vector2(56.25, 3.4375)
+texture = SubResource("tex_sombra")
+z_index = -8
+
+[node name="FrisoTecto2" type="Sprite2D" parent="."]
+position = Vector2(0, -870)
+scale = Vector2(0.5, 0.5)
+centered = false
+texture = ExtResource("72_t_m_tex_metal")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 7200, 28)
+z_index = -7
+modulate = Color(0.7, 0.56, 0.42, 1)
+
+[node name="Janela0" type="Sprite2D" parent="."]
+position = Vector2(310, 685)
+scale = Vector2(1.26263, 1.26263)
+texture = ExtResource("41_t_p_vitral_dourado")
+z_index = -10
+modulate = Color(0.72, 0.8, 1, 0.95)
+
+[node name="ArcoJanela0" type="Sprite2D" parent="."]
+position = Vector2(310, 671.75)
+scale = Vector2(1.75, 1.75)
+texture = ExtResource("28_t_arco_grande")
+z_index = -11
+modulate = Color(0.42, 0.44, 0.7, 1)
+
+[node name="RaiosJanela0" type="Sprite2D" parent="."]
+position = Vector2(350, 840)
+scale = Vector2(1.4, 1.4)
+texture = ExtResource("51_t_p_raios_luz")
+z_index = -9
+modulate = Color(0.62, 0.74, 1, 0.32)
+material = SubResource("mat_add")
+
+[node name="MaquinaFundo1" type="Sprite2D" parent="."]
+position = Vector2(930, 680)
+scale = Vector2(1, 1)
+texture = ExtResource("56_t_m_roda")
+z_index = -10
+modulate = Color(0.62, 0.5, 0.38, 1)
+script = ExtResource("22_gira")
+velocidade = 0.14
+
+[node name="MaquinaFundoB1" type="Sprite2D" parent="."]
+position = Vector2(1080, 800)
+scale = Vector2(0.62, 0.62)
+texture = ExtResource("60_t_m_engrenagem")
+z_index = -10
+modulate = Color(0.55, 0.44, 0.34, 1)
+script = ExtResource("22_gira")
+velocidade = -0.23
+
+[node name="CorrenteFundoA1" type="Sprite2D" parent="."]
+position = Vector2(773.7, 524)
+scale = Vector2(0.7, 0.7)
+texture_repeat = 2
+texture = ExtResource("75_t_m_tex_correntes")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 18, 437.143)
+z_index = -10
+modulate = Color(0.7, 0.56, 0.36, 0.9)
+
+[node name="CorrenteFundoB1" type="Sprite2D" parent="."]
+position = Vector2(813.7, 524)
+scale = Vector2(0.7, 0.7)
+texture_repeat = 2
+texture = ExtResource("75_t_m_tex_correntes")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 18, 322.857)
+z_index = -10
+modulate = Color(0.7, 0.56, 0.36, 0.9)
+
+[node name="Janela3" type="Sprite2D" parent="."]
+position = Vector2(2300, 685)
+scale = Vector2(1.52439, 1.52439)
+texture = ExtResource("40_t_p_parede_vitral")
+z_index = -10
+modulate = Color(0.72, 0.8, 1, 0.95)
+
+[node name="ArcoJanela3" type="Sprite2D" parent="."]
+position = Vector2(2300, 671.75)
+scale = Vector2(1.75, 1.75)
+texture = ExtResource("28_t_arco_grande")
+z_index = -11
+modulate = Color(0.42, 0.44, 0.7, 1)
+
+[node name="RaiosJanela3" type="Sprite2D" parent="."]
+position = Vector2(2340, 840)
+scale = Vector2(1.4, 1.4)
+texture = ExtResource("51_t_p_raios_luz")
+z_index = -9
+modulate = Color(0.62, 0.74, 1, 0.32)
+material = SubResource("mat_add")
+
+[node name="MaquinaFundo4" type="Sprite2D" parent="."]
+position = Vector2(2930, 680)
+scale = Vector2(1, 1)
+texture = ExtResource("60_t_m_engrenagem")
+z_index = -10
+modulate = Color(0.62, 0.5, 0.38, 1)
+script = ExtResource("22_gira")
+velocidade = -0.14
+
+[node name="MaquinaFundoB4" type="Sprite2D" parent="."]
+position = Vector2(3080, 800)
+scale = Vector2(0.62, 0.62)
+texture = ExtResource("56_t_m_roda")
+z_index = -10
+modulate = Color(0.55, 0.44, 0.34, 1)
+script = ExtResource("22_gira")
+velocidade = 0.23
+
+[node name="CorrenteFundoA4" type="Sprite2D" parent="."]
+position = Vector2(2773.7, 524)
+scale = Vector2(0.7, 0.7)
+texture_repeat = 2
+texture = ExtResource("75_t_m_tex_correntes")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 18, 437.143)
+z_index = -10
+modulate = Color(0.7, 0.56, 0.36, 0.9)
+
+[node name="CorrenteFundoB4" type="Sprite2D" parent="."]
+position = Vector2(2813.7, 524)
+scale = Vector2(0.7, 0.7)
+texture_repeat = 2
+texture = ExtResource("75_t_m_tex_correntes")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 18, 322.857)
+z_index = -10
+modulate = Color(0.7, 0.56, 0.36, 0.9)
+
+[node name="CorrenteFundoC5_-60" type="Sprite2D" parent="."]
+position = Vector2(3343.7, 524)
+scale = Vector2(0.7, 0.7)
+texture_repeat = 2
+texture = ExtResource("75_t_m_tex_correntes")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 18, 522.857)
+z_index = -10
+modulate = Color(0.7, 0.56, 0.36, 0.9)
+
+[node name="CorrenteFundoC5_60" type="Sprite2D" parent="."]
+position = Vector2(3463.7, 524)
+scale = Vector2(0.7, 0.7)
+texture_repeat = 2
+texture = ExtResource("75_t_m_tex_correntes")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 18, 522.857)
+z_index = -10
+modulate = Color(0.7, 0.56, 0.36, 0.9)
+
+[node name="Janela6" type="Sprite2D" parent="."]
+position = Vector2(310, -5)
+scale = Vector2(1.52439, 1.52439)
+texture = ExtResource("40_t_p_parede_vitral")
+z_index = -10
+modulate = Color(0.72, 0.8, 1, 0.95)
+
+[node name="ArcoJanela6" type="Sprite2D" parent="."]
+position = Vector2(310, -18.25)
+scale = Vector2(1.75, 1.75)
+texture = ExtResource("28_t_arco_grande")
+z_index = -11
+modulate = Color(0.42, 0.44, 0.7, 1)
+
+[node name="RaiosJanela6" type="Sprite2D" parent="."]
+position = Vector2(350, 150)
+scale = Vector2(1.4, 1.4)
+texture = ExtResource("51_t_p_raios_luz")
+z_index = -9
+modulate = Color(0.62, 0.74, 1, 0.32)
+material = SubResource("mat_add")
+
+[node name="MaquinaFundo7" type="Sprite2D" parent="."]
+position = Vector2(930, -10)
+scale = Vector2(1, 1)
+texture = ExtResource("56_t_m_roda")
+z_index = -10
+modulate = Color(0.62, 0.5, 0.38, 1)
+script = ExtResource("22_gira")
+velocidade = -0.14
+
+[node name="MaquinaFundoB7" type="Sprite2D" parent="."]
+position = Vector2(1080, 110)
+scale = Vector2(0.62, 0.62)
+texture = ExtResource("60_t_m_engrenagem")
+z_index = -10
+modulate = Color(0.55, 0.44, 0.34, 1)
+script = ExtResource("22_gira")
+velocidade = 0.23
+
+[node name="CorrenteFundoA7" type="Sprite2D" parent="."]
+position = Vector2(773.7, -166)
+scale = Vector2(0.7, 0.7)
+texture_repeat = 2
+texture = ExtResource("75_t_m_tex_correntes")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 18, 437.143)
+z_index = -10
+modulate = Color(0.7, 0.56, 0.36, 0.9)
+
+[node name="CorrenteFundoB7" type="Sprite2D" parent="."]
+position = Vector2(813.7, -166)
+scale = Vector2(0.7, 0.7)
+texture_repeat = 2
+texture = ExtResource("75_t_m_tex_correntes")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 18, 322.857)
+z_index = -10
+modulate = Color(0.7, 0.56, 0.36, 0.9)
+
+[node name="MaquinaFundo8" type="Sprite2D" parent="."]
+position = Vector2(1600, -10)
+scale = Vector2(1, 1)
+texture = ExtResource("60_t_m_engrenagem")
+z_index = -10
+modulate = Color(0.62, 0.5, 0.38, 1)
+script = ExtResource("22_gira")
+velocidade = 0.14
+
+[node name="MaquinaFundoB8" type="Sprite2D" parent="."]
+position = Vector2(1750, 110)
+scale = Vector2(0.62, 0.62)
+texture = ExtResource("56_t_m_roda")
+z_index = -10
+modulate = Color(0.55, 0.44, 0.34, 1)
+script = ExtResource("22_gira")
+velocidade = -0.23
+
+[node name="CorrenteFundoA8" type="Sprite2D" parent="."]
+position = Vector2(1443.7, -166)
+scale = Vector2(0.7, 0.7)
+texture_repeat = 2
+texture = ExtResource("75_t_m_tex_correntes")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 18, 437.143)
+z_index = -10
+modulate = Color(0.7, 0.56, 0.36, 0.9)
+
+[node name="CorrenteFundoB8" type="Sprite2D" parent="."]
+position = Vector2(1483.7, -166)
+scale = Vector2(0.7, 0.7)
+texture_repeat = 2
+texture = ExtResource("75_t_m_tex_correntes")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 18, 322.857)
+z_index = -10
+modulate = Color(0.7, 0.56, 0.36, 0.9)
+
+[node name="Janela9" type="Sprite2D" parent="."]
+position = Vector2(2300, -5)
+scale = Vector2(1.26263, 1.26263)
+texture = ExtResource("41_t_p_vitral_dourado")
+z_index = -10
+modulate = Color(0.72, 0.8, 1, 0.95)
+
+[node name="ArcoJanela9" type="Sprite2D" parent="."]
+position = Vector2(2300, -18.25)
+scale = Vector2(1.75, 1.75)
+texture = ExtResource("28_t_arco_grande")
+z_index = -11
+modulate = Color(0.42, 0.44, 0.7, 1)
+
+[node name="RaiosJanela9" type="Sprite2D" parent="."]
+position = Vector2(2340, 150)
+scale = Vector2(1.4, 1.4)
+texture = ExtResource("51_t_p_raios_luz")
+z_index = -9
+modulate = Color(0.62, 0.74, 1, 0.32)
+material = SubResource("mat_add")
+
+[node name="Janela11" type="Sprite2D" parent="."]
+position = Vector2(3410, -5)
+scale = Vector2(1.26263, 1.26263)
+texture = ExtResource("41_t_p_vitral_dourado")
+z_index = -10
+modulate = Color(0.72, 0.8, 1, 0.95)
+
+[node name="ArcoJanela11" type="Sprite2D" parent="."]
+position = Vector2(3410, -18.25)
+scale = Vector2(1.75, 1.75)
+texture = ExtResource("28_t_arco_grande")
+z_index = -11
+modulate = Color(0.42, 0.44, 0.7, 1)
+
+[node name="RaiosJanela11" type="Sprite2D" parent="."]
+position = Vector2(3450, 150)
+scale = Vector2(1.4, 1.4)
+texture = ExtResource("51_t_p_raios_luz")
+z_index = -9
+modulate = Color(0.62, 0.74, 1, 0.32)
+material = SubResource("mat_add")
+
+[node name="Janela12" type="Sprite2D" parent="."]
+position = Vector2(310, -695)
+scale = Vector2(1.26263, 1.26263)
+texture = ExtResource("41_t_p_vitral_dourado")
+z_index = -10
+modulate = Color(0.72, 0.8, 1, 0.95)
+
+[node name="ArcoJanela12" type="Sprite2D" parent="."]
+position = Vector2(310, -708.25)
+scale = Vector2(1.75, 1.75)
+texture = ExtResource("28_t_arco_grande")
+z_index = -11
+modulate = Color(0.42, 0.44, 0.7, 1)
+
+[node name="RaiosJanela12" type="Sprite2D" parent="."]
+position = Vector2(350, -540)
+scale = Vector2(1.4, 1.4)
+texture = ExtResource("51_t_p_raios_luz")
+z_index = -9
+modulate = Color(0.62, 0.74, 1, 0.32)
+material = SubResource("mat_add")
+
+[node name="Janela13" type="Sprite2D" parent="."]
+position = Vector2(930, -695)
+scale = Vector2(1.52439, 1.52439)
+texture = ExtResource("40_t_p_parede_vitral")
+z_index = -10
+modulate = Color(0.72, 0.8, 1, 0.95)
+
+[node name="ArcoJanela13" type="Sprite2D" parent="."]
+position = Vector2(930, -708.25)
+scale = Vector2(1.75, 1.75)
+texture = ExtResource("28_t_arco_grande")
+z_index = -11
+modulate = Color(0.42, 0.44, 0.7, 1)
+
+[node name="RaiosJanela13" type="Sprite2D" parent="."]
+position = Vector2(970, -540)
+scale = Vector2(1.4, 1.4)
+texture = ExtResource("51_t_p_raios_luz")
+z_index = -9
+modulate = Color(0.62, 0.74, 1, 0.32)
+material = SubResource("mat_add")
+
+[node name="Janela14" type="Sprite2D" parent="."]
+position = Vector2(1600, -695)
+scale = Vector2(1.26263, 1.26263)
+texture = ExtResource("41_t_p_vitral_dourado")
+z_index = -10
+modulate = Color(0.72, 0.8, 1, 0.95)
+
+[node name="ArcoJanela14" type="Sprite2D" parent="."]
+position = Vector2(1600, -708.25)
+scale = Vector2(1.75, 1.75)
+texture = ExtResource("28_t_arco_grande")
+z_index = -11
+modulate = Color(0.42, 0.44, 0.7, 1)
+
+[node name="RaiosJanela14" type="Sprite2D" parent="."]
+position = Vector2(1640, -540)
+scale = Vector2(1.4, 1.4)
+texture = ExtResource("51_t_p_raios_luz")
+z_index = -9
+modulate = Color(0.62, 0.74, 1, 0.32)
+material = SubResource("mat_add")
+
+[node name="Janela16" type="Sprite2D" parent="."]
+position = Vector2(2930, -695)
+scale = Vector2(1.26263, 1.26263)
+texture = ExtResource("41_t_p_vitral_dourado")
+z_index = -10
+modulate = Color(0.72, 0.8, 1, 0.95)
+
+[node name="ArcoJanela16" type="Sprite2D" parent="."]
+position = Vector2(2930, -708.25)
+scale = Vector2(1.75, 1.75)
+texture = ExtResource("28_t_arco_grande")
+z_index = -11
+modulate = Color(0.42, 0.44, 0.7, 1)
+
+[node name="RaiosJanela16" type="Sprite2D" parent="."]
+position = Vector2(2970, -540)
+scale = Vector2(1.4, 1.4)
+texture = ExtResource("51_t_p_raios_luz")
+z_index = -9
+modulate = Color(0.62, 0.74, 1, 0.32)
+material = SubResource("mat_add")
+
+; ===================  ANDAR 1 -- A) INTRODUCAO  e  B) SALAS DE ENGRENAGENS ===
+[node name="Chao1" parent="." instance=ExtResource("7_pl")]
+position = Vector2(575, 1055)
+tamanho = Vector2(1150, 210)
+altura_visual = 0
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+
+[node name="Chao1Caixa" type="Sprite2D" parent="."]
+position = Vector2(40, 1030)
+scale = Vector2(1, 1)
+centered = false
+texture = ExtResource("76_t_corpo_te")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 1070, 85)
+z_index = 2
+modulate = Color(0.07, 0.07, 0.12, 1)
+
+[node name="Chao1Carril0" type="Sprite2D" parent="."]
+position = Vector2(34, 1022)
+scale = Vector2(0.4, 0.4)
+centered = false
+texture = ExtResource("72_t_m_tex_metal")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 2705, 25)
+z_index = 3
+modulate = Color(0.62, 0.5, 0.38, 1)
+
+[node name="Chao1Carril1" type="Sprite2D" parent="."]
+position = Vector2(34, 1113)
+scale = Vector2(0.4, 0.4)
+centered = false
+texture = ExtResource("72_t_m_tex_metal")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 2705, 25)
+z_index = 3
+modulate = Color(0.62, 0.5, 0.38, 1)
+
+[node name="Chao1Engr0" type="Sprite2D" parent="."]
+position = Vector2(129.167, 1072.5)
+scale = Vector2(0.46, 0.46)
+texture = ExtResource("60_t_m_engrenagem")
+z_index = 2
+modulate = Color(0.5, 0.4, 0.3, 1)
+script = ExtResource("22_gira")
+velocidade = 0.5
+
+[node name="Chao1Engr1" type="Sprite2D" parent="."]
+position = Vector2(307.5, 1072.5)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("56_t_m_roda")
+z_index = 2
+modulate = Color(0.5, 0.4, 0.3, 1)
+script = ExtResource("22_gira")
+velocidade = -0.5
+
+[node name="Chao1Engr2" type="Sprite2D" parent="."]
+position = Vector2(485.833, 1072.5)
+scale = Vector2(0.46, 0.46)
+texture = ExtResource("60_t_m_engrenagem")
+z_index = 2
+modulate = Color(0.5, 0.4, 0.3, 1)
+script = ExtResource("22_gira")
+velocidade = 0.5
+
+[node name="Chao1Engr3" type="Sprite2D" parent="."]
+position = Vector2(664.167, 1072.5)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("56_t_m_roda")
+z_index = 2
+modulate = Color(0.5, 0.4, 0.3, 1)
+script = ExtResource("22_gira")
+velocidade = -0.5
+
+[node name="Chao1Engr4" type="Sprite2D" parent="."]
+position = Vector2(842.5, 1072.5)
+scale = Vector2(0.46, 0.46)
+texture = ExtResource("60_t_m_engrenagem")
+z_index = 2
+modulate = Color(0.5, 0.4, 0.3, 1)
+script = ExtResource("22_gira")
+velocidade = 0.5
+
+[node name="Chao1Engr5" type="Sprite2D" parent="."]
+position = Vector2(1020.83, 1072.5)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("56_t_m_roda")
+z_index = 2
+modulate = Color(0.5, 0.4, 0.3, 1)
+script = ExtResource("22_gira")
+velocidade = -0.5
+
+[node name="Chao1Massa" type="Sprite2D" parent="."]
+position = Vector2(0, 984)
+centered = false
+scale = Vector2(17.9688, 2.59375)
+texture = SubResource("tex_massa")
+z_index = 1
+
+[node name="Chao2a" parent="." instance=ExtResource("7_pl")]
+position = Vector2(2150, 1055)
+tamanho = Vector2(400, 210)
+altura_visual = 0
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+
+[node name="Chao2aCaixa" type="Sprite2D" parent="."]
+position = Vector2(1990, 1030)
+scale = Vector2(1, 1)
+centered = false
+texture = ExtResource("76_t_corpo_te")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 320, 85)
+z_index = 2
+modulate = Color(0.07, 0.07, 0.12, 1)
+
+[node name="Chao2aCarril0" type="Sprite2D" parent="."]
+position = Vector2(1984, 1022)
+scale = Vector2(0.4, 0.4)
+centered = false
+texture = ExtResource("72_t_m_tex_metal")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 830, 25)
+z_index = 3
+modulate = Color(0.62, 0.5, 0.38, 1)
+
+[node name="Chao2aCarril1" type="Sprite2D" parent="."]
+position = Vector2(1984, 1113)
+scale = Vector2(0.4, 0.4)
+centered = false
+texture = ExtResource("72_t_m_tex_metal")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 830, 25)
+z_index = 3
+modulate = Color(0.62, 0.5, 0.38, 1)
+
+[node name="Chao2aEngr0" type="Sprite2D" parent="."]
+position = Vector2(2150, 1072.5)
+scale = Vector2(0.46, 0.46)
+texture = ExtResource("60_t_m_engrenagem")
+z_index = 2
+modulate = Color(0.5, 0.4, 0.3, 1)
+script = ExtResource("22_gira")
+velocidade = 0.5
+
+[node name="Chao2aMassa" type="Sprite2D" parent="."]
+position = Vector2(1950, 984)
+centered = false
+scale = Vector2(6.25, 2.59375)
+texture = SubResource("tex_massa")
+z_index = 1
+
+[node name="Chao2b" parent="." instance=ExtResource("7_pl")]
+position = Vector2(3175, 1055)
+tamanho = Vector2(850, 210)
+altura_visual = 0
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+
+[node name="Chao2bCaixa" type="Sprite2D" parent="."]
+position = Vector2(2790, 1030)
+scale = Vector2(1, 1)
+centered = false
+texture = ExtResource("76_t_corpo_te")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 770, 85)
+z_index = 2
+modulate = Color(0.07, 0.07, 0.12, 1)
+
+[node name="Chao2bCarril0" type="Sprite2D" parent="."]
+position = Vector2(2784, 1022)
+scale = Vector2(0.4, 0.4)
+centered = false
+texture = ExtResource("72_t_m_tex_metal")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 1955, 25)
+z_index = 3
+modulate = Color(0.62, 0.5, 0.38, 1)
+
+[node name="Chao2bCarril1" type="Sprite2D" parent="."]
+position = Vector2(2784, 1113)
+scale = Vector2(0.4, 0.4)
+centered = false
+texture = ExtResource("72_t_m_tex_metal")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 1955, 25)
+z_index = 3
+modulate = Color(0.62, 0.5, 0.38, 1)
+
+[node name="Chao2bEngr0" type="Sprite2D" parent="."]
+position = Vector2(2886.25, 1072.5)
+scale = Vector2(0.46, 0.46)
+texture = ExtResource("60_t_m_engrenagem")
+z_index = 2
+modulate = Color(0.5, 0.4, 0.3, 1)
+script = ExtResource("22_gira")
+velocidade = 0.5
+
+[node name="Chao2bEngr1" type="Sprite2D" parent="."]
+position = Vector2(3078.75, 1072.5)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("56_t_m_roda")
+z_index = 2
+modulate = Color(0.5, 0.4, 0.3, 1)
+script = ExtResource("22_gira")
+velocidade = -0.5
+
+[node name="Chao2bEngr2" type="Sprite2D" parent="."]
+position = Vector2(3271.25, 1072.5)
+scale = Vector2(0.46, 0.46)
+texture = ExtResource("60_t_m_engrenagem")
+z_index = 2
+modulate = Color(0.5, 0.4, 0.3, 1)
+script = ExtResource("22_gira")
+velocidade = 0.5
+
+[node name="Chao2bEngr3" type="Sprite2D" parent="."]
+position = Vector2(3463.75, 1072.5)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("56_t_m_roda")
+z_index = 2
+modulate = Color(0.5, 0.4, 0.3, 1)
+script = ExtResource("22_gira")
+velocidade = -0.5
+
+[node name="Chao2bMassa" type="Sprite2D" parent="."]
+position = Vector2(2750, 984)
+centered = false
+scale = Vector2(13.2812, 2.59375)
+texture = SubResource("tex_massa")
+z_index = 1
+
+[node name="Laje12a" parent="." instance=ExtResource("7_pl")]
+position = Vector2(720, 385)
+tamanho = Vector2(1440, 250)
+altura_visual = 0
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+
+[node name="Laje12aCaixa" type="Sprite2D" parent="."]
+position = Vector2(40, 340)
+scale = Vector2(1, 1)
+centered = false
+texture = ExtResource("76_t_corpo_te")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 1360, 85)
+z_index = 2
+modulate = Color(0.07, 0.07, 0.12, 1)
+
+[node name="Laje12aCarril0" type="Sprite2D" parent="."]
+position = Vector2(34, 332)
+scale = Vector2(0.4, 0.4)
+centered = false
+texture = ExtResource("72_t_m_tex_metal")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 3430, 25)
+z_index = 3
+modulate = Color(0.62, 0.5, 0.38, 1)
+
+[node name="Laje12aCarril1" type="Sprite2D" parent="."]
+position = Vector2(34, 423)
+scale = Vector2(0.4, 0.4)
+centered = false
+texture = ExtResource("72_t_m_tex_metal")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 3430, 25)
+z_index = 3
+modulate = Color(0.62, 0.5, 0.38, 1)
+
+[node name="Laje12aEngr0" type="Sprite2D" parent="."]
+position = Vector2(125, 382.5)
+scale = Vector2(0.46, 0.46)
+texture = ExtResource("60_t_m_engrenagem")
+z_index = 2
+modulate = Color(0.5, 0.4, 0.3, 1)
+script = ExtResource("22_gira")
+velocidade = 0.5
+
+[node name="Laje12aEngr1" type="Sprite2D" parent="."]
+position = Vector2(295, 382.5)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("56_t_m_roda")
+z_index = 2
+modulate = Color(0.5, 0.4, 0.3, 1)
+script = ExtResource("22_gira")
+velocidade = -0.5
+
+[node name="Laje12aEngr2" type="Sprite2D" parent="."]
+position = Vector2(465, 382.5)
+scale = Vector2(0.46, 0.46)
+texture = ExtResource("60_t_m_engrenagem")
+z_index = 2
+modulate = Color(0.5, 0.4, 0.3, 1)
+script = ExtResource("22_gira")
+velocidade = 0.5
+
+[node name="Laje12aEngr3" type="Sprite2D" parent="."]
+position = Vector2(635, 382.5)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("56_t_m_roda")
+z_index = 2
+modulate = Color(0.5, 0.4, 0.3, 1)
+script = ExtResource("22_gira")
+velocidade = -0.5
+
+[node name="Laje12aEngr4" type="Sprite2D" parent="."]
+position = Vector2(805, 382.5)
+scale = Vector2(0.46, 0.46)
+texture = ExtResource("60_t_m_engrenagem")
+z_index = 2
+modulate = Color(0.5, 0.4, 0.3, 1)
+script = ExtResource("22_gira")
+velocidade = 0.5
+
+[node name="Laje12aEngr5" type="Sprite2D" parent="."]
+position = Vector2(975, 382.5)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("56_t_m_roda")
+z_index = 2
+modulate = Color(0.5, 0.4, 0.3, 1)
+script = ExtResource("22_gira")
+velocidade = -0.5
+
+[node name="Laje12aEngr6" type="Sprite2D" parent="."]
+position = Vector2(1145, 382.5)
+scale = Vector2(0.46, 0.46)
+texture = ExtResource("60_t_m_engrenagem")
+z_index = 2
+modulate = Color(0.5, 0.4, 0.3, 1)
+script = ExtResource("22_gira")
+velocidade = 0.5
+
+[node name="Laje12aEngr7" type="Sprite2D" parent="."]
+position = Vector2(1315, 382.5)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("56_t_m_roda")
+z_index = 2
+modulate = Color(0.5, 0.4, 0.3, 1)
+script = ExtResource("22_gira")
+velocidade = -0.5
+
+[node name="Laje12aMassa" type="Sprite2D" parent="."]
+position = Vector2(0, 294)
+centered = false
+scale = Vector2(22.5, 3.21875)
+texture = SubResource("tex_massa")
+z_index = 1
+
+[node name="Laje12b" parent="." instance=ExtResource("7_pl")]
+position = Vector2(2150, 385)
+tamanho = Vector2(300, 250)
+altura_visual = 0
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+
+[node name="Laje12bCaixa" type="Sprite2D" parent="."]
+position = Vector2(2040, 340)
+scale = Vector2(1, 1)
+centered = false
+texture = ExtResource("76_t_corpo_te")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 220, 85)
+z_index = 2
+modulate = Color(0.07, 0.07, 0.12, 1)
+
+[node name="Laje12bCarril0" type="Sprite2D" parent="."]
+position = Vector2(2034, 332)
+scale = Vector2(0.4, 0.4)
+centered = false
+texture = ExtResource("72_t_m_tex_metal")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 580, 25)
+z_index = 3
+modulate = Color(0.62, 0.5, 0.38, 1)
+
+[node name="Laje12bCarril1" type="Sprite2D" parent="."]
+position = Vector2(2034, 423)
+scale = Vector2(0.4, 0.4)
+centered = false
+texture = ExtResource("72_t_m_tex_metal")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 580, 25)
+z_index = 3
+modulate = Color(0.62, 0.5, 0.38, 1)
+
+[node name="Laje12bEngr0" type="Sprite2D" parent="."]
+position = Vector2(2150, 382.5)
+scale = Vector2(0.46, 0.46)
+texture = ExtResource("60_t_m_engrenagem")
+z_index = 2
+modulate = Color(0.5, 0.4, 0.3, 1)
+script = ExtResource("22_gira")
+velocidade = 0.5
+
+[node name="Laje12bMassa" type="Sprite2D" parent="."]
+position = Vector2(2000, 294)
+centered = false
+scale = Vector2(4.6875, 3.21875)
+texture = SubResource("tex_massa")
+z_index = 1
+
+[node name="Laje12c" parent="." instance=ExtResource("7_pl")]
+position = Vector2(3120, 385)
+tamanho = Vector2(340, 250)
+altura_visual = 0
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+
+[node name="Laje12cCaixa" type="Sprite2D" parent="."]
+position = Vector2(2990, 340)
+scale = Vector2(1, 1)
+centered = false
+texture = ExtResource("76_t_corpo_te")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 260, 85)
+z_index = 2
+modulate = Color(0.07, 0.07, 0.12, 1)
+
+[node name="Laje12cCarril0" type="Sprite2D" parent="."]
+position = Vector2(2984, 332)
+scale = Vector2(0.4, 0.4)
+centered = false
+texture = ExtResource("72_t_m_tex_metal")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 680, 25)
+z_index = 3
+modulate = Color(0.62, 0.5, 0.38, 1)
+
+[node name="Laje12cCarril1" type="Sprite2D" parent="."]
+position = Vector2(2984, 423)
+scale = Vector2(0.4, 0.4)
+centered = false
+texture = ExtResource("72_t_m_tex_metal")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 680, 25)
+z_index = 3
+modulate = Color(0.62, 0.5, 0.38, 1)
+
+[node name="Laje12cEngr0" type="Sprite2D" parent="."]
+position = Vector2(3120, 382.5)
+scale = Vector2(0.46, 0.46)
+texture = ExtResource("60_t_m_engrenagem")
+z_index = 2
+modulate = Color(0.5, 0.4, 0.3, 1)
+script = ExtResource("22_gira")
+velocidade = 0.5
+
+[node name="Laje12cMassa" type="Sprite2D" parent="."]
+position = Vector2(2950, 294)
+centered = false
+scale = Vector2(5.3125, 3.21875)
+texture = SubResource("tex_massa")
+z_index = 1
+
+; A) Introducao aos mecanismos. Sala segura, sem inimigos: a PRIMEIRA ALAVANCA
+; abre a PRIMEIRA PORTA de bronze -- a relacao le-se de uma vez (a porta esta'
+; a' vista da alavanca, a corrente dourada liga-as pelo tecto).
 [node name="Koliani" parent="." instance=ExtResource("1_kol")]
-position = Vector2(200, 830)
+position = Vector2(150, 910)
+usar_prototipo_premium = true
+usar_golden_set = true
 
 [node name="CheckInicio" type="Area2D" parent="."]
-position = Vector2(460, 836)
+position = Vector2(280, 916)
 collision_layer = 16
 collision_mask = 2
-script = ExtResource("5_chk")
+script = ExtResource("4_chk")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CheckInicio"]
 shape = SubResource("rs_chk")
 
-[node name="CheckMeio" type="Area2D" parent="."]
-position = Vector2(680, 516)
+[node name="AlavancaA" parent="." instance=ExtResource("17_alav")]
+position = Vector2(660, 934)
+id = "a"
+so_liga = true
+textura = ExtResource("65_t_m_alavanca")
+escala_textura = 0.42
+
+[node name="PortaA" parent="." instance=ExtResource("18_grade")]
+position = Vector2(1080, 730)
+id = "a"
+tamanho = Vector2(52, 440)
+textura = ExtResource("73_t_m_tex_bronze")
+textura_moldura = ExtResource("72_t_m_tex_metal")
+escala_textura = 0.5
+
+[node name="PortaARoda" type="Sprite2D" parent="."]
+position = Vector2(1080, 540)
+scale = Vector2(0.36, 0.36)
+texture = ExtResource("60_t_m_engrenagem")
+z_index = -3
+modulate = Color(0.85, 0.7, 0.55, 1)
+script = ExtResource("22_gira")
+velocidade = 0
+
+[node name="PortaAOmbreiraE" type="Sprite2D" parent="."]
+position = Vector2(1022, 510)
+scale = Vector2(0.9, 0.9)
+centered = false
+texture = ExtResource("39_t_p_parede")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 31.1111, 488.889)
+z_index = -4
+modulate = Color(0.5, 0.48, 0.66, 1)
+
+[node name="PortaAOmbreiraD" type="Sprite2D" parent="."]
+position = Vector2(1110, 510)
+scale = Vector2(0.9, 0.9)
+centered = false
+texture = ExtResource("39_t_p_parede")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 31.1111, 488.889)
+z_index = -4
+modulate = Color(0.5, 0.48, 0.66, 1)
+
+[node name="MecanismoSinoA" type="Sprite2D" parent="."]
+position = Vector2(330, 872.35)
+scale = Vector2(0.9, 0.9)
+texture = ExtResource("67_t_m_mecanismo_sino")
+z_index = -3
+modulate = Color(0.85, 0.82, 0.9, 1)
+
+[node name="CandelabroA" type="Sprite2D" parent="."]
+position = Vector2(560, 910)
+scale = Vector2(1.2, 1.2)
+texture = ExtResource("31_t_candelabro")
+z_index = -1
+
+[node name="LuzA" type="PointLight2D" parent="."]
+position = Vector2(600, 890)
+texture = SubResource("tex_luz")
+energy = 0.6
+color = Color(1.0, 0.74, 0.42, 1)
+scale = Vector2(2.2, 1.4)
+
+[node name="LampiaoA" type="Sprite2D" parent="."]
+position = Vector2(900, 591.9)
+scale = Vector2(1.4, 1.4)
+texture = ExtResource("36_t_lampiao_t")
+z_index = -2
+
+[node name="RelogioA" type="Sprite2D" parent="."]
+position = Vector2(180, 908.5)
+scale = Vector2(1.5, 1.5)
+texture = ExtResource("34_t_relogio_antigo")
+z_index = -3
+modulate = Color(0.8, 0.78, 0.9, 1)
+
+; SALA DAS ENGRENAGENS (set piece). Fosso largo (800 px, fora de qualquer
+; salto) com espinhos e uma SERRA-ENGRENAGEM a rolar no fundo. Atravessa-se
+; nos BRACOS de duas engrenagens em cruz que rodam devagar: sobe-se num braco
+; quando esta' em baixo e salta-se antes de ele subir. Por cima, colada ao
+; tecto, a prateleira do SEGREDO 1 -- so' se chega do cimo de um braco.
+[node name="FossoEngrFundo" parent="." instance=ExtResource("7_pl")]
+position = Vector2(1550, 1145)
+tamanho = Vector2(800, 30)
+altura_visual = 0
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+
+[node name="FossoEngrDegrauE" parent="." instance=ExtResource("7_pl")]
+position = Vector2(1185, 1050)
+tamanho = Vector2(70, 20)
+altura_visual = 20
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+
+[node name="FossoEngrDegrauD" parent="." instance=ExtResource("7_pl")]
+position = Vector2(1915, 1050)
+tamanho = Vector2(70, 20)
+altura_visual = 20
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+
+[node name="FossoEngrEspinhosE" parent="." instance=ExtResource("16_espinhos")]
+position = Vector2(1342, 1130)
+largura = 14
+
+[node name="FossoEngrEspinhosD" parent="." instance=ExtResource("16_espinhos")]
+position = Vector2(1768, 1130)
+largura = 12
+
+[node name="RodaA1" type="AnimatableBody2D" parent="."]
+position = Vector2(1340, 910)
+script = ExtResource("20_roda")
+amplitude_graus = 0.0
+periodo = 5.0
+fase = 0
+comprimento = 200.0
+espessura = 18.0
+bracos = 2
+textura_roda = ExtResource("60_t_m_engrenagem")
+textura_braco = ExtResource("72_t_m_tex_metal")
+
+[node name="RodaA2" type="AnimatableBody2D" parent="."]
+position = Vector2(1780, 910)
+script = ExtResource("20_roda")
+amplitude_graus = 0.0
+periodo = 5.0
+fase = 0.37
+comprimento = 200.0
+espessura = 18.0
+bracos = 2
+textura_roda = ExtResource("60_t_m_engrenagem")
+textura_braco = ExtResource("72_t_m_tex_metal")
+
+[node name="PoleiroEngr" parent="." instance=ExtResource("7_pl")]
+position = Vector2(1560, 1055)
+tamanho = Vector2(92, 210)
+altura_visual = 0
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+
+[node name="PoleiroEngrMassa" type="Sprite2D" parent="."]
+position = Vector2(1514, 984)
+centered = false
+scale = Vector2(1.4375, 2.59375)
+texture = SubResource("tex_massa")
+z_index = 1
+
+[node name="SerraFosso" parent="." instance=ExtResource("15_serra")]
+position = Vector2(1300, 1096)
+percurso = Vector2(500, 0)
+tempo = 2.6
+textura = ExtResource("62_t_m_engrenagem_mortal")
+escala_textura = 0.42
+giro_por_seg = 5.0
+
+[node name="EngrenFundoB1" type="Sprite2D" parent="."]
+position = Vector2(1555, 640)
+scale = Vector2(1.1, 1.1)
+texture = ExtResource("56_t_m_roda")
+z_index = -10
+modulate = Color(0.5, 0.4, 0.3, 1)
+script = ExtResource("22_gira")
+velocidade = 0.1
+
+[node name="EngrenFundoB2" type="Sprite2D" parent="."]
+position = Vector2(1340, 590)
+scale = Vector2(0.62, 0.62)
+texture = ExtResource("60_t_m_engrenagem")
+z_index = -10
+modulate = Color(0.42, 0.34, 0.3, 1)
+script = ExtResource("22_gira")
+velocidade = -0.19
+
+[node name="EngrenFundoB3" type="Sprite2D" parent="."]
+position = Vector2(1775, 600)
+scale = Vector2(0.62, 0.62)
+texture = ExtResource("60_t_m_engrenagem")
+z_index = -10
+modulate = Color(0.42, 0.34, 0.3, 1)
+script = ExtResource("22_gira")
+velocidade = -0.19
+
+[node name="CorrenteEngrE" type="Sprite2D" parent="."]
+position = Vector2(1193.7, 524)
+scale = Vector2(0.7, 0.7)
+texture_repeat = 2
+texture = ExtResource("75_t_m_tex_correntes")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 18, 537.143)
+z_index = -10
+modulate = Color(0.7, 0.56, 0.36, 0.9)
+
+[node name="CorrenteEngrD" type="Sprite2D" parent="."]
+position = Vector2(1903.7, 524)
+scale = Vector2(0.7, 0.7)
+texture_repeat = 2
+texture = ExtResource("75_t_m_tex_correntes")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 18, 508.571)
+z_index = -10
+modulate = Color(0.7, 0.56, 0.36, 0.9)
+
+[node name="Segredo1" parent="." instance=ExtResource("7_pl")]
+position = Vector2(1460, 671)
+tamanho = Vector2(80, 22)
+altura_visual = 34
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+
+[node name="EssenciaSegredo1" parent="." instance=ExtResource("12_ess")]
+position = Vector2(1455, 624)
+valor = 20
+
+[node name="UrnaSegredo1" type="Sprite2D" parent="."]
+position = Vector2(1490, 643.3)
+scale = Vector2(1.1, 1.1)
+texture = ExtResource("37_t_urna")
+z_index = -1
+
+[node name="LuzSegredo1" type="PointLight2D" parent="."]
+position = Vector2(1460, 630)
+texture = SubResource("tex_luz")
+energy = 0.35
+color = Color(0.72, 0.5, 1.0, 1)
+scale = Vector2(0.9, 0.8)
+
+[node name="LuzEngr" type="PointLight2D" parent="."]
+position = Vector2(1550, 900)
+texture = SubResource("tex_luz")
+energy = 0.3
+color = Color(1.0, 0.74, 0.42, 1)
+scale = Vector2(3, 1.6)
+
+; B) Alavancas multiplas: a PORTA B so' abre com as DUAS alavancas (uma no
+; chao, outra numa varanda). Entre elas, o PISO QUE COLAPSA por cima de um
+; fosso, com duas LAMINAS EM PENDULO a varrer a passagem. Autómato do Sino a
+; guardar a porta.
+[node name="CheckA" type="Area2D" parent="."]
+position = Vector2(2030, 916)
 collision_layer = 16
 collision_mask = 2
-script = ExtResource("5_chk")
+script = ExtResource("4_chk")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckMeio"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckA"]
 shape = SubResource("rs_chk")
 
-[node name="Porta" parent="." instance=ExtResource("4_porta")]
-position = Vector2(900, 246)
+[node name="AlavancaB1" parent="." instance=ExtResource("17_alav")]
+position = Vector2(2230, 934)
+id = "b"
+so_liga = true
+textura = ExtResource("65_t_m_alavanca")
+escala_textura = 0.42
+
+[node name="FossoQuebraFundo" parent="." instance=ExtResource("7_pl")]
+position = Vector2(2550, 1145)
+tamanho = Vector2(400, 30)
+altura_visual = 0
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+
+[node name="FossoQuebraDegrauE" parent="." instance=ExtResource("7_pl")]
+position = Vector2(2385, 1050)
+tamanho = Vector2(70, 20)
+altura_visual = 20
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+
+[node name="FossoQuebraDegrauD" parent="." instance=ExtResource("7_pl")]
+position = Vector2(2715, 1050)
+tamanho = Vector2(70, 20)
+altura_visual = 20
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+
+[node name="FossoQuebraEspinhos" parent="." instance=ExtResource("16_espinhos")]
+position = Vector2(2550, 1130)
+largura = 15
+
+[node name="PisoQuebra1" parent="." instance=ExtResource("11_quebra")]
+position = Vector2(2400, 959)
+tamanho = Vector2(100, 18)
+pele_terreno = true
+
+[node name="PisoQuebra2" parent="." instance=ExtResource("11_quebra")]
+position = Vector2(2500, 959)
+tamanho = Vector2(100, 18)
+pele_terreno = true
+
+[node name="PisoQuebra3" parent="." instance=ExtResource("11_quebra")]
+position = Vector2(2600, 959)
+tamanho = Vector2(100, 18)
+pele_terreno = true
+
+[node name="PisoQuebra4" parent="." instance=ExtResource("11_quebra")]
+position = Vector2(2700, 959)
+tamanho = Vector2(100, 18)
+pele_terreno = true
+
+[node name="PenduloB1" parent="." instance=ExtResource("10_pend")]
+position = Vector2(2470, 514)
+comprimento = 300.0
+amplitude_graus = 52.0
+periodo = 2.4
+dano = 20
+textura_haste = ExtResource("75_t_m_tex_correntes")
+textura_lamina = ExtResource("64_t_m_lamina_pendulo")
+escala_lamina = 0.55
+
+[node name="PenduloB2" parent="." instance=ExtResource("10_pend")]
+position = Vector2(2640, 514)
+comprimento = 300.0
+amplitude_graus = 52.0
+periodo = 2.4
+fase = 0.5
+dano = 20
+textura_haste = ExtResource("75_t_m_tex_correntes")
+textura_lamina = ExtResource("64_t_m_lamina_pendulo")
+escala_lamina = 0.55
+
+[node name="VarandaB" parent="." instance=ExtResource("7_pl")]
+position = Vector2(2990, 792)
+tamanho = Vector2(180, 24)
+altura_visual = 34
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+
+[node name="AlavancaB2" parent="." instance=ExtResource("17_alav")]
+position = Vector2(3000, 764)
+id = "b"
+so_liga = true
+textura = ExtResource("65_t_m_alavanca")
+escala_textura = 0.42
+
+[node name="HerasVarandaB" type="Sprite2D" parent="."]
+position = Vector2(2930, 856.8)
+scale = Vector2(0.7, 0.7)
+texture = ExtResource("53_t_p_heras")
+z_index = 1
+modulate = Color(0.78, 0.84, 1, 1)
+
+[node name="PortaB" parent="." instance=ExtResource("18_grade")]
+position = Vector2(3240, 730)
+id = "b"
+tamanho = Vector2(52, 440)
+textura = ExtResource("73_t_m_tex_bronze")
+textura_moldura = ExtResource("72_t_m_tex_metal")
+escala_textura = 0.5
+exige_todas = true
+
+[node name="PortaBRoda" type="Sprite2D" parent="."]
+position = Vector2(3240, 540)
+scale = Vector2(0.36, 0.36)
+texture = ExtResource("60_t_m_engrenagem")
+z_index = -3
+modulate = Color(0.85, 0.7, 0.55, 1)
+script = ExtResource("22_gira")
+velocidade = 0
+
+[node name="PortaBOmbreiraE" type="Sprite2D" parent="."]
+position = Vector2(3182, 510)
+scale = Vector2(0.9, 0.9)
+centered = false
+texture = ExtResource("39_t_p_parede")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 31.1111, 488.889)
+z_index = -4
+modulate = Color(0.5, 0.48, 0.66, 1)
+
+[node name="PortaBOmbreiraD" type="Sprite2D" parent="."]
+position = Vector2(3270, 510)
+scale = Vector2(0.9, 0.9)
+centered = false
+texture = ExtResource("39_t_p_parede")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 31.1111, 488.889)
+z_index = -4
+modulate = Color(0.5, 0.48, 0.66, 1)
+
+[node name="AutomatoB" parent="." instance=ExtResource("2_dem")]
+position = Vector2(3050, 895)
+scale = Vector2(1.2, 1.2)
+especie = "automato_do_sino"
+vida = 110
+dano_contacto = 20
+comportamento = "escudeiro"
+alcance_patrulha = 120
+cor_rim = Color(1.0, 0.78, 0.45, 1)
+
+[node name="LampiaoB1" type="Sprite2D" parent="."]
+position = Vector2(2150, 591.9)
+scale = Vector2(1.4, 1.4)
+texture = ExtResource("36_t_lampiao_t")
+z_index = -2
+
+[node name="LuzB" type="PointLight2D" parent="."]
+position = Vector2(2150, 640)
+texture = SubResource("tex_luz")
+energy = 0.55
+color = Color(1.0, 0.74, 0.42, 1)
+scale = Vector2(2, 1.6)
+
+[node name="CandelabroB" type="Sprite2D" parent="."]
+position = Vector2(3140, 910)
+scale = Vector2(1.2, 1.2)
+texture = ExtResource("31_t_candelabro")
+z_index = -1
+
+; 1.o ELEVADOR DE CONTRAPESO (peso): a plataforma sobe pela laje, o
+; contrapeso de bronze desce do outro lado da roldana. Depois da porta B.
+[node name="Elevador1" parent="." instance=ExtResource("13_elev")]
+position = Vector2(3395, 932)
+script = ExtResource("14_elevcol")
+curso = Vector2(0, -664)
+velocidade = 110.0
+largura = 190
+altura_ancora = 150.0
+textura_contrapeso = ExtResource("61_t_m_contrapeso")
+escala_contrapeso = 0.55
+lado_contrapeso = 1
+
+[node name="LuzRoldana1" type="PointLight2D" parent="."]
+position = Vector2(3395, 110)
+texture = SubResource("tex_luz")
+energy = 0.5
+color = Color(1.0, 0.74, 0.42, 1)
+scale = Vector2(1.3, 1.1)
+
+; ===================  ANDAR 2 -- C) SINOS E PLATAFORMAS  (volta para oeste) ==
+[node name="Laje23a" parent="." instance=ExtResource("7_pl")]
+position = Vector2(90, -305)
+tamanho = Vector2(180, 250)
+altura_visual = 0
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+
+[node name="Laje23aMassa" type="Sprite2D" parent="."]
+position = Vector2(0, -396)
+centered = false
+scale = Vector2(2.8125, 3.21875)
+texture = SubResource("tex_massa")
+z_index = 1
+
+[node name="Laje23b" parent="." instance=ExtResource("7_pl")]
+position = Vector2(660, -305)
+tamanho = Vector2(280, 250)
+altura_visual = 0
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+
+[node name="Laje23bMassa" type="Sprite2D" parent="."]
+position = Vector2(520, -396)
+centered = false
+scale = Vector2(4.375, 3.21875)
+texture = SubResource("tex_massa")
+z_index = 1
+
+[node name="Laje23c" parent="." instance=ExtResource("7_pl")]
+position = Vector2(2400, -305)
+tamanho = Vector2(2400, 250)
+altura_visual = 0
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+
+[node name="Laje23cCaixa" type="Sprite2D" parent="."]
+position = Vector2(1240, -350)
+scale = Vector2(1, 1)
+centered = false
+texture = ExtResource("76_t_corpo_te")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 2320, 85)
+z_index = 2
+modulate = Color(0.07, 0.07, 0.12, 1)
+
+[node name="Laje23cCarril0" type="Sprite2D" parent="."]
+position = Vector2(1234, -358)
+scale = Vector2(0.4, 0.4)
+centered = false
+texture = ExtResource("72_t_m_tex_metal")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 5830, 25)
+z_index = 3
+modulate = Color(0.62, 0.5, 0.38, 1)
+
+[node name="Laje23cCarril1" type="Sprite2D" parent="."]
+position = Vector2(1234, -267)
+scale = Vector2(0.4, 0.4)
+centered = false
+texture = ExtResource("72_t_m_tex_metal")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 5830, 25)
+z_index = 3
+modulate = Color(0.62, 0.5, 0.38, 1)
+
+[node name="Laje23cEngr0" type="Sprite2D" parent="."]
+position = Vector2(1329.23, -307.5)
+scale = Vector2(0.46, 0.46)
+texture = ExtResource("60_t_m_engrenagem")
+z_index = 2
+modulate = Color(0.5, 0.4, 0.3, 1)
+script = ExtResource("22_gira")
+velocidade = 0.5
+
+[node name="Laje23cEngr1" type="Sprite2D" parent="."]
+position = Vector2(1507.69, -307.5)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("56_t_m_roda")
+z_index = 2
+modulate = Color(0.5, 0.4, 0.3, 1)
+script = ExtResource("22_gira")
+velocidade = -0.5
+
+[node name="Laje23cEngr2" type="Sprite2D" parent="."]
+position = Vector2(1686.15, -307.5)
+scale = Vector2(0.46, 0.46)
+texture = ExtResource("60_t_m_engrenagem")
+z_index = 2
+modulate = Color(0.5, 0.4, 0.3, 1)
+script = ExtResource("22_gira")
+velocidade = 0.5
+
+[node name="Laje23cEngr3" type="Sprite2D" parent="."]
+position = Vector2(1864.62, -307.5)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("56_t_m_roda")
+z_index = 2
+modulate = Color(0.5, 0.4, 0.3, 1)
+script = ExtResource("22_gira")
+velocidade = -0.5
+
+[node name="Laje23cEngr4" type="Sprite2D" parent="."]
+position = Vector2(2043.08, -307.5)
+scale = Vector2(0.46, 0.46)
+texture = ExtResource("60_t_m_engrenagem")
+z_index = 2
+modulate = Color(0.5, 0.4, 0.3, 1)
+script = ExtResource("22_gira")
+velocidade = 0.5
+
+[node name="Laje23cEngr5" type="Sprite2D" parent="."]
+position = Vector2(2221.54, -307.5)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("56_t_m_roda")
+z_index = 2
+modulate = Color(0.5, 0.4, 0.3, 1)
+script = ExtResource("22_gira")
+velocidade = -0.5
+
+[node name="Laje23cEngr6" type="Sprite2D" parent="."]
+position = Vector2(2400, -307.5)
+scale = Vector2(0.46, 0.46)
+texture = ExtResource("60_t_m_engrenagem")
+z_index = 2
+modulate = Color(0.5, 0.4, 0.3, 1)
+script = ExtResource("22_gira")
+velocidade = 0.5
+
+[node name="Laje23cEngr7" type="Sprite2D" parent="."]
+position = Vector2(2578.46, -307.5)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("56_t_m_roda")
+z_index = 2
+modulate = Color(0.5, 0.4, 0.3, 1)
+script = ExtResource("22_gira")
+velocidade = -0.5
+
+[node name="Laje23cEngr8" type="Sprite2D" parent="."]
+position = Vector2(2756.92, -307.5)
+scale = Vector2(0.46, 0.46)
+texture = ExtResource("60_t_m_engrenagem")
+z_index = 2
+modulate = Color(0.5, 0.4, 0.3, 1)
+script = ExtResource("22_gira")
+velocidade = 0.5
+
+[node name="Laje23cEngr9" type="Sprite2D" parent="."]
+position = Vector2(2935.38, -307.5)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("56_t_m_roda")
+z_index = 2
+modulate = Color(0.5, 0.4, 0.3, 1)
+script = ExtResource("22_gira")
+velocidade = -0.5
+
+[node name="Laje23cEngr10" type="Sprite2D" parent="."]
+position = Vector2(3113.85, -307.5)
+scale = Vector2(0.46, 0.46)
+texture = ExtResource("60_t_m_engrenagem")
+z_index = 2
+modulate = Color(0.5, 0.4, 0.3, 1)
+script = ExtResource("22_gira")
+velocidade = 0.5
+
+[node name="Laje23cEngr11" type="Sprite2D" parent="."]
+position = Vector2(3292.31, -307.5)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("56_t_m_roda")
+z_index = 2
+modulate = Color(0.5, 0.4, 0.3, 1)
+script = ExtResource("22_gira")
+velocidade = -0.5
+
+[node name="Laje23cEngr12" type="Sprite2D" parent="."]
+position = Vector2(3470.77, -307.5)
+scale = Vector2(0.46, 0.46)
+texture = ExtResource("60_t_m_engrenagem")
+z_index = 2
+modulate = Color(0.5, 0.4, 0.3, 1)
+script = ExtResource("22_gira")
+velocidade = 0.5
+
+[node name="Laje23cMassa" type="Sprite2D" parent="."]
+position = Vector2(1200, -396)
+centered = false
+scale = Vector2(37.5, 3.21875)
+texture = SubResource("tex_massa")
+z_index = 1
+
+[node name="CheckB" type="Area2D" parent="."]
+position = Vector2(3150, 226)
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("4_chk")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckB"]
+shape = SubResource("rs_chk")
+
+; C1 -- PONTES RECONFIGURAVEIS. Fosso de 650 px sob um TECTO BAIXO (110 px de
+; folga: nao ha' arco de salto nem salto duplo). A meio, um pilar com uma
+; alavanca: pisa-la troca as pontes -- a da direita some-se, a da esquerda
+; aparece. Um Espirito do Eco anda por cima do fosso.
+[node name="FossoPontesFundo" parent="." instance=ExtResource("7_pl")]
+position = Vector2(2625, 475)
+tamanho = Vector2(650, 70)
+altura_visual = 0
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+
+[node name="FossoPontesDegrauE" parent="." instance=ExtResource("7_pl")]
+position = Vector2(2335, 360)
+tamanho = Vector2(70, 20)
+altura_visual = 20
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+
+[node name="FossoPontesDegrauD" parent="." instance=ExtResource("7_pl")]
+position = Vector2(2915, 360)
+tamanho = Vector2(70, 20)
+altura_visual = 20
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+
+[node name="FossoPontesEspinhosE" parent="." instance=ExtResource("16_espinhos")]
+position = Vector2(2447.5, 440)
+largura = 8
+
+[node name="FossoPontesEspinhosD" parent="." instance=ExtResource("16_espinhos")]
+position = Vector2(2802.5, 440)
+largura = 8
+
+[node name="PilarPontes" parent="." instance=ExtResource("7_pl")]
+position = Vector2(2625, 350)
+tamanho = Vector2(100, 180)
+altura_visual = 0
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+
+[node name="PilarPontesMassa" type="Sprite2D" parent="."]
+position = Vector2(2575, 294)
+centered = false
+scale = Vector2(1.5625, 2.125)
+texture = SubResource("tex_massa")
+z_index = 1
+
+[node name="TetoBaixo" parent="." instance=ExtResource("7_pl")]
+position = Vector2(2625, -15)
+tamanho = Vector2(770, 330)
+altura_visual = 0
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+
+[node name="TetoBaixoMassa" type="Sprite2D" parent="."]
+position = Vector2(2240, -180)
+centered = false
+scale = Vector2(12.0312, 4.53125)
+texture = SubResource("tex_massa_cima")
+z_index = 1
+
+[node name="VigaTetoBaixo" type="Sprite2D" parent="."]
+position = Vector2(2240, 128)
+scale = Vector2(0.5, 0.5)
+centered = false
+texture = ExtResource("72_t_m_tex_metal")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 1540, 44)
+z_index = 1
+modulate = Color(0.62, 0.5, 0.4, 1)
+
+[node name="PonteDireita" parent="." instance=ExtResource("9_eco")]
+position = Vector2(2812.5, 270)
+tamanho = Vector2(275, 20)
+altura_visual = 18
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+grupo_alternar = "pontes_c1"
+comeca_solida = true
+alpha_fantasma = 0.22
+
+[node name="PonteEsquerda" parent="." instance=ExtResource("9_eco")]
+position = Vector2(2437.5, 270)
+tamanho = Vector2(275, 20)
+altura_visual = 18
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+grupo_alternar = "pontes_c1"
+alpha_fantasma = 0.22
+
+[node name="AlavancaPontes" parent="." instance=ExtResource("17_alav")]
+position = Vector2(2625, 244)
+id = "pontes_c1"
+so_liga = false
+textura = ExtResource("65_t_m_alavanca")
+escala_textura = 0.42
+alterna_grupo = "pontes_c1"
+
+[node name="PonteReconf0" type="Sprite2D" parent="."]
+position = Vector2(2380, 185.8)
+scale = Vector2(0.9, 0.9)
+texture = ExtResource("70_t_m_ponte_reconfig")
+z_index = -3
+modulate = Color(0.8, 0.72, 0.64, 1)
+
+[node name="PonteReconf1" type="Sprite2D" parent="."]
+position = Vector2(2540, 185.8)
+scale = Vector2(0.9, 0.9)
+texture = ExtResource("70_t_m_ponte_reconfig")
+z_index = -3
+modulate = Color(0.8, 0.72, 0.64, 1)
+
+[node name="PonteReconf2" type="Sprite2D" parent="."]
+position = Vector2(2740, 185.8)
+scale = Vector2(0.9, 0.9)
+texture = ExtResource("70_t_m_ponte_reconfig")
+z_index = -3
+modulate = Color(0.8, 0.72, 0.64, 1)
+
+[node name="PonteReconf3" type="Sprite2D" parent="."]
+position = Vector2(2900, 185.8)
+scale = Vector2(0.9, 0.9)
+texture = ExtResource("70_t_m_ponte_reconfig")
+z_index = -3
+modulate = Color(0.8, 0.72, 0.64, 1)
+
+[node name="EspiritoC1" parent="." instance=ExtResource("2_dem")]
+position = Vector2(2620, 200)
+especie = "espirito_do_eco"
+vida = 45
+dano_contacto = 14
+comportamento = "voador"
+alcance_patrulha = 180
+cor_rim = Color(0.6, 0.75, 1.0, 1)
+
+; C2 -- PONTE MOVEL (set piece): uma laje num carro que corre num trilho do
+; tecto, de um lado ao outro de um fosso de 560 px. Por cima, correntes com
+; peso a baloicar. Construto Vitral do outro lado.
+[node name="FossoMovelFundo" parent="." instance=ExtResource("7_pl")]
+position = Vector2(1720, 475)
+tamanho = Vector2(560, 70)
+altura_visual = 0
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+
+[node name="FossoMovelDegrauE" parent="." instance=ExtResource("7_pl")]
+position = Vector2(1475, 360)
+tamanho = Vector2(70, 20)
+altura_visual = 20
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+
+[node name="FossoMovelDegrauD" parent="." instance=ExtResource("7_pl")]
+position = Vector2(1965, 360)
+tamanho = Vector2(70, 20)
+altura_visual = 20
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+
+[node name="FossoMovelEspinhos" parent="." instance=ExtResource("16_espinhos")]
+position = Vector2(1720, 440)
+largura = 25
+
+[node name="PonteMovel" parent="." instance=ExtResource("19_pcorr")]
+position = Vector2(1720, 269)
+modo = "horizontal"
+amplitude = 190.0
+periodo = 5.2
+comprimento = 300.0
+largura = 150.0
+pele_terreno = true
+ancora_no_trilho = true
+textura_corrente = ExtResource("75_t_m_tex_correntes")
+
+[node name="TrilhoMovel" type="Sprite2D" parent="."]
+position = Vector2(1440, -174)
+scale = Vector2(0.5, 0.5)
+centered = false
+texture = ExtResource("72_t_m_tex_metal")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 1120, 44)
+z_index = -2
+modulate = Color(0.85, 0.7, 0.5, 1)
+
+[node name="PesoC1" parent="." instance=ExtResource("10_pend")]
+position = Vector2(1600, -152)
+comprimento = 190.0
+amplitude_graus = 40.0
+periodo = 2.8
+dano = 16
+textura = ExtResource("63_t_m_corrente_peso")
+
+[node name="PesoC2" parent="." instance=ExtResource("10_pend")]
+position = Vector2(1860, -152)
+comprimento = 190.0
+amplitude_graus = 40.0
+periodo = 2.8
+fase = 0.5
+dano = 16
+textura = ExtResource("63_t_m_corrente_peso")
+
+[node name="PonteMovelPintada" type="Sprite2D" parent="."]
+position = Vector2(1720, -70)
+scale = Vector2(1.3, 1.3)
+texture = ExtResource("59_t_m_ponte_movel")
+z_index = -9
+modulate = Color(0.5, 0.44, 0.46, 1)
+
+; C3 -- a alavanca C numa prateleira alta (330 px acima do chao, fora do
+; salto duplo): so' se chega do braco de uma engrenagem. Construto Vitral a
+; patrulhar. SEGREDO 2 por tras da engrenagem, do lado do tecto.
+[node name="ConstrutoC3" parent="." instance=ExtResource("2_dem")]
+position = Vector2(1100, 200)
+scale = Vector2(1.2, 1.2)
+especie = "construto_vitral"
+vida = 120
+dano_contacto = 20
+comportamento = "carga"
+alcance_patrulha = 200
+cor_rim = Color(0.62, 0.72, 1.0, 1)
+
+[node name="RodaC" type="AnimatableBody2D" parent="."]
+position = Vector2(1200, 110)
+script = ExtResource("20_roda")
+amplitude_graus = 0.0
+periodo = 5.0
+comprimento = 200.0
+espessura = 18.0
+bracos = 2
+textura_roda = ExtResource("56_t_m_roda")
+textura_braco = ExtResource("72_t_m_tex_metal")
+
+[node name="PrateleiraC" parent="." instance=ExtResource("7_pl")]
+position = Vector2(960, -59)
+tamanho = Vector2(160, 22)
+altura_visual = 34
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+
+[node name="AlavancaC" parent="." instance=ExtResource("17_alav")]
+position = Vector2(960, -86)
+id = "c"
+so_liga = true
+textura = ExtResource("65_t_m_alavanca")
+escala_textura = 0.42
+
+[node name="Segredo2" parent="." instance=ExtResource("7_pl")]
+position = Vector2(1405, -69)
+tamanho = Vector2(90, 22)
+altura_visual = 34
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+
+[node name="EssenciaSegredo2" parent="." instance=ExtResource("12_ess")]
+position = Vector2(1405, -116)
+valor = 25
+
+[node name="LuzSegredo2" type="PointLight2D" parent="."]
+position = Vector2(1405, -110)
+texture = SubResource("tex_luz")
+energy = 0.35
+color = Color(0.72, 0.5, 1.0, 1)
+scale = Vector2(0.9, 0.8)
+
+[node name="PortaC" parent="." instance=ExtResource("18_grade")]
+position = Vector2(620, 40)
+id = "c"
+tamanho = Vector2(52, 440)
+textura = ExtResource("73_t_m_tex_bronze")
+textura_moldura = ExtResource("72_t_m_tex_metal")
+escala_textura = 0.5
+
+[node name="PortaCRoda" type="Sprite2D" parent="."]
+position = Vector2(620, -150)
+scale = Vector2(0.36, 0.36)
+texture = ExtResource("60_t_m_engrenagem")
+z_index = -3
+modulate = Color(0.85, 0.7, 0.55, 1)
+script = ExtResource("22_gira")
+velocidade = 0
+
+[node name="PortaCOmbreiraE" type="Sprite2D" parent="."]
+position = Vector2(562, -180)
+scale = Vector2(0.9, 0.9)
+centered = false
+texture = ExtResource("39_t_p_parede")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 31.1111, 488.889)
+z_index = -4
+modulate = Color(0.5, 0.48, 0.66, 1)
+
+[node name="PortaCOmbreiraD" type="Sprite2D" parent="."]
+position = Vector2(650, -180)
+scale = Vector2(0.9, 0.9)
+centered = false
+texture = ExtResource("39_t_p_parede")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 31.1111, 488.889)
+z_index = -4
+modulate = Color(0.5, 0.48, 0.66, 1)
+
+[node name="CheckC" type="Area2D" parent="."]
+position = Vector2(1380, 226)
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("4_chk")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckC"]
+shape = SubResource("rs_chk")
+
+[node name="LampiaoC1" type="Sprite2D" parent="."]
+position = Vector2(820, -98.1)
+scale = Vector2(1.4, 1.4)
+texture = ExtResource("36_t_lampiao_t")
+z_index = -2
+
+[node name="LuzC" type="PointLight2D" parent="."]
+position = Vector2(900, 20)
+texture = SubResource("tex_luz")
+energy = 0.55
+color = Color(1.0, 0.74, 0.42, 1)
+scale = Vector2(2, 1.6)
+
+; 2.o ELEVADOR (vaivem continuo): ensina a esperar em vez de chamar.
+[node name="Elevador2" parent="." instance=ExtResource("13_elev")]
+position = Vector2(310, 242)
+script = ExtResource("14_elevcol")
+curso = Vector2(0, -664)
+auto = true
+velocidade = 85.0
+largura = 240
+altura_ancora = 150.0
+textura_contrapeso = ExtResource("61_t_m_contrapeso")
+escala_contrapeso = 0.55
+lado_contrapeso = 1
+
+[node name="LuzRoldana2" type="PointLight2D" parent="."]
+position = Vector2(310, -580)
+texture = SubResource("tex_luz")
+energy = 0.5
+color = Color(1.0, 0.74, 0.42, 1)
+scale = Vector2(1.3, 1.1)
+
+[node name="UrnaE2" type="Sprite2D" parent="."]
+position = Vector2(520, 239.9)
+scale = Vector2(1.3, 1.3)
+texture = ExtResource("37_t_urna")
+z_index = -1
+
+; ===================  ANDAR 3 -- D) NUCLEO CENTRAL  (elemento chave)  =========
+[node name="CheckD" type="Area2D" parent="."]
+position = Vector2(560, -464)
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("4_chk")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckD"]
+shape = SubResource("rs_chk")
+
+; D1 -- piso que colapsa sobre um fosso, duas laminas em pendulo e dois
+; Espiritos do Eco a atravessar.
+[node name="FossoD1Fundo" parent="." instance=ExtResource("7_pl")]
+position = Vector2(1000, -215)
+tamanho = Vector2(400, 70)
+altura_visual = 0
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+
+[node name="FossoD1DegrauE" parent="." instance=ExtResource("7_pl")]
+position = Vector2(835, -330)
+tamanho = Vector2(70, 20)
+altura_visual = 20
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+
+[node name="FossoD1DegrauD" parent="." instance=ExtResource("7_pl")]
+position = Vector2(1165, -330)
+tamanho = Vector2(70, 20)
+altura_visual = 20
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+
+[node name="FossoD1Espinhos" parent="." instance=ExtResource("16_espinhos")]
+position = Vector2(1000, -250)
+largura = 15
+
+[node name="PisoD1" parent="." instance=ExtResource("11_quebra")]
+position = Vector2(850, -421)
+tamanho = Vector2(100, 18)
+pele_terreno = true
+
+[node name="PisoD2" parent="." instance=ExtResource("11_quebra")]
+position = Vector2(950, -421)
+tamanho = Vector2(100, 18)
+pele_terreno = true
+
+[node name="PisoD3" parent="." instance=ExtResource("11_quebra")]
+position = Vector2(1050, -421)
+tamanho = Vector2(100, 18)
+pele_terreno = true
+
+[node name="PisoD4" parent="." instance=ExtResource("11_quebra")]
+position = Vector2(1150, -421)
+tamanho = Vector2(100, 18)
+pele_terreno = true
+
+[node name="PenduloD1" parent="." instance=ExtResource("10_pend")]
+position = Vector2(900, -866)
+comprimento = 320.0
+amplitude_graus = 50.0
+periodo = 2.2
+dano = 20
+textura_haste = ExtResource("75_t_m_tex_correntes")
+textura_lamina = ExtResource("64_t_m_lamina_pendulo")
+escala_lamina = 0.55
+
+[node name="PenduloD2" parent="." instance=ExtResource("10_pend")]
+position = Vector2(1100, -866)
+comprimento = 320.0
+amplitude_graus = 50.0
+periodo = 2.2
+fase = 0.5
+dano = 20
+textura_haste = ExtResource("75_t_m_tex_correntes")
+textura_lamina = ExtResource("64_t_m_lamina_pendulo")
+escala_lamina = 0.55
+
+[node name="EspiritoD1" parent="." instance=ExtResource("2_dem")]
+position = Vector2(1000, -600)
+especie = "espirito_do_eco"
+vida = 45
+dano_contacto = 14
+comportamento = "voador"
+alcance_patrulha = 200
+cor_rim = Color(0.6, 0.75, 1.0, 1)
+
+[node name="EspiritoD2" parent="." instance=ExtResource("2_dem")]
+position = Vector2(1500, -630)
+especie = "espirito_do_eco"
+vida = 45
+dano_contacto = 14
+comportamento = "voador"
+alcance_patrulha = 160
+cor_rim = Color(0.6, 0.75, 1.0, 1)
+
+; D2 -- NUCLEO CENTRAL. O MECANISMO DE 3 SINOS: com a Koliani perto, ele toca
+; o PADRAO (os sinos brilham e soam por ordem). Toca-los pela mesma ordem
+; liga o nucleo e abre a porta do guardiao. Errar apaga tudo e o eco repete.
+; Sino pequeno a' esquerda, grande ao centro (em cima de um estrado), medio
+; a' direita. SEGREDO 3 por cima do estrado.
+[node name="CheckNucleo" type="Area2D" parent="."]
+position = Vector2(1380, -464)
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("4_chk")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckNucleo"]
+shape = SubResource("rs_chk")
+
+[node name="Nucleo" parent="." instance=ExtResource("17_alav")]
+position = Vector2(2080, -690)
+script = ExtResource("21_mecsin")
+id = "nucleo"
+sinos = [NodePath("../SinoP"), NodePath("../SinoG"), NodePath("../SinoM")]
+ordem = PackedInt32Array(1, 0, 2)
+raio_eco = 700.0
+textura_mecanismo = ExtResource("42_t_p_rosacea")
+escala_mecanismo = 1.3
+
+[node name="RodaNucleo" type="Sprite2D" parent="."]
+position = Vector2(2080, -690)
+scale = Vector2(1.25, 1.25)
+texture = ExtResource("56_t_m_roda")
+z_index = -10
+modulate = Color(0.6, 0.48, 0.36, 1)
+script = ExtResource("22_gira")
+velocidade = 0.06
+
+[node name="RodaNucleoFora" type="Sprite2D" parent="."]
+position = Vector2(2080, -690)
+scale = Vector2(1.6, 1.6)
+texture = ExtResource("60_t_m_engrenagem")
+z_index = -11
+modulate = Color(0.34, 0.28, 0.26, 1)
+script = ExtResource("22_gira")
+velocidade = -0.035
+
+[node name="TraveSinos" type="Sprite2D" parent="."]
+position = Vector2(1600, -800)
+scale = Vector2(0.5, 0.5)
+centered = false
+texture = ExtResource("72_t_m_tex_metal")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 1920, 44)
+z_index = -2
+modulate = Color(0.9, 0.74, 0.52, 1)
+
+[node name="Estrado" parent="." instance=ExtResource("7_pl")]
+position = Vector2(2080, -545)
+tamanho = Vector2(220, 30)
+altura_visual = 40
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+
+[node name="DegrauEstrado" parent="." instance=ExtResource("7_pl")]
+position = Vector2(1895, -479)
+tamanho = Vector2(90, 22)
+altura_visual = 34
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+
+[node name="SinoP" parent="." instance=ExtResource("8_sino")]
+position = Vector2(1680, -492)
+scale = Vector2(0.62, 0.62)
+so_congela = true
+alterna_grupo = ""
+textura = ExtResource("57_t_m_sino_padrao")
+
+[node name="CorrenteSinoP" type="Sprite2D" parent="."]
+position = Vector2(1673.7, -790)
+scale = Vector2(0.7, 0.7)
+texture_repeat = 2
+texture = ExtResource("75_t_m_tex_correntes")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 18, 363.714)
+z_index = -3
+modulate = Color(0.95, 0.8, 0.5, 0.95)
+
+[node name="BrilhoSinoP" type="Sprite2D" parent="."]
+position = Vector2(1680, -502)
+scale = Vector2(1, 1)
+texture = ExtResource("50_t_p_brilho_sino")
+z_index = -1
+modulate = Color(1, 0.85, 0.6, 0.45)
+material = SubResource("mat_add")
+
+[node name="SinoG" parent="." instance=ExtResource("8_sino")]
+position = Vector2(2080, -635)
+scale = Vector2(0.8, 0.8)
+so_congela = true
+alterna_grupo = ""
+textura = ExtResource("57_t_m_sino_padrao")
+
+[node name="CorrenteSinoG" type="Sprite2D" parent="."]
+position = Vector2(2073.7, -790)
+scale = Vector2(0.7, 0.7)
+texture_repeat = 2
+texture = ExtResource("75_t_m_tex_correntes")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 18, 141.429)
+z_index = -3
+modulate = Color(0.95, 0.8, 0.5, 0.95)
+
+[node name="BrilhoSinoG" type="Sprite2D" parent="."]
+position = Vector2(2080, -645)
+scale = Vector2(1, 1)
+texture = ExtResource("50_t_p_brilho_sino")
+z_index = -1
+modulate = Color(1, 0.85, 0.6, 0.45)
+material = SubResource("mat_add")
+
+[node name="SinoM" parent="." instance=ExtResource("8_sino")]
+position = Vector2(2480, -496)
+scale = Vector2(0.7, 0.7)
+so_congela = true
+alterna_grupo = ""
+textura = ExtResource("57_t_m_sino_padrao")
+
+[node name="CorrenteSinoM" type="Sprite2D" parent="."]
+position = Vector2(2473.7, -790)
+scale = Vector2(0.7, 0.7)
+texture_repeat = 2
+texture = ExtResource("75_t_m_tex_correntes")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 18, 350)
+z_index = -3
+modulate = Color(0.95, 0.8, 0.5, 0.95)
+
+[node name="BrilhoSinoM" type="Sprite2D" parent="."]
+position = Vector2(2480, -506)
+scale = Vector2(1, 1)
+texture = ExtResource("50_t_p_brilho_sino")
+z_index = -1
+modulate = Color(1, 0.85, 0.6, 0.45)
+material = SubResource("mat_add")
+
+[node name="Segredo3" parent="." instance=ExtResource("7_pl")]
+position = Vector2(2330, -659)
+tamanho = Vector2(120, 22)
+altura_visual = 34
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+
+[node name="EssenciaSegredo3" parent="." instance=ExtResource("12_ess")]
+position = Vector2(2330, -706)
+valor = 30
+
+[node name="MemorialSegredo3" type="Sprite2D" parent="."]
+position = Vector2(2370, -692)
+scale = Vector2(1.2, 1.2)
+texture = ExtResource("33_t_pedra_memoria")
+z_index = -1
+
+[node name="LuzSegredo3" type="PointLight2D" parent="."]
+position = Vector2(2330, -750)
+texture = SubResource("tex_luz")
+energy = 0.35
+color = Color(0.72, 0.5, 1.0, 1)
+scale = Vector2(0.9, 0.8)
+
+[node name="LuzNucleo" type="PointLight2D" parent="."]
+position = Vector2(2080, -600)
+texture = SubResource("tex_luz")
+energy = 0.4
+color = Color(1.0, 0.74, 0.42, 1)
+scale = Vector2(3, 2)
+
+[node name="PortaNucleo" parent="." instance=ExtResource("18_grade")]
+position = Vector2(2860, -650)
+id = "nucleo"
+tamanho = Vector2(52, 440)
+textura = ExtResource("73_t_m_tex_bronze")
+textura_moldura = ExtResource("72_t_m_tex_metal")
+escala_textura = 0.5
+
+[node name="PortaNucleoRoda" type="Sprite2D" parent="."]
+position = Vector2(2860, -840)
+scale = Vector2(0.36, 0.36)
+texture = ExtResource("60_t_m_engrenagem")
+z_index = -3
+modulate = Color(0.85, 0.7, 0.55, 1)
+script = ExtResource("22_gira")
+velocidade = 0
+
+[node name="PortaNucleoOmbreiraE" type="Sprite2D" parent="."]
+position = Vector2(2802, -870)
+scale = Vector2(0.9, 0.9)
+centered = false
+texture = ExtResource("39_t_p_parede")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 31.1111, 488.889)
+z_index = -4
+modulate = Color(0.5, 0.48, 0.66, 1)
+
+[node name="PortaNucleoOmbreiraD" type="Sprite2D" parent="."]
+position = Vector2(2890, -870)
+scale = Vector2(0.9, 0.9)
+centered = false
+texture = ExtResource("39_t_p_parede")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 31.1111, 488.889)
+z_index = -4
+modulate = Color(0.5, 0.48, 0.66, 1)
+
+; D3 -- sala do GUARDIAO: o Construto Vitral elite. A porta final so' abre
+; quando ele cai.
+[node name="Guardiao" parent="." instance=ExtResource("2_dem")]
+position = Vector2(3250, -510)
+scale = Vector2(1.6, 1.6)
+elite = true
+especie = "construto_vitral"
+vida = 280
+dano_contacto = 24
+comportamento = "carga"
+alcance_patrulha = 180
+cor_rim = Color(0.62, 0.72, 1.0, 1)
+
+[node name="EstatuaArena1" type="Sprite2D" parent="."]
+position = Vector2(2980, -540.2)
+scale = Vector2(1.7, 1.7)
+texture = ExtResource("32_t_estatua_anjo")
+z_index = -3
+
+[node name="EstatuaArena2" type="Sprite2D" parent="."]
+position = Vector2(3520, -540.2)
+scale = Vector2(1.7, 1.7)
+texture = ExtResource("32_t_estatua_anjo")
+z_index = -3
+flip_h = true
+
+[node name="VitralArena" type="Sprite2D" parent="."]
+position = Vector2(3250, -681.6)
+scale = Vector2(2.4, 2.4)
+texture = ExtResource("23_t_vitral_alto")
+z_index = -6
+modulate = Color(0.85, 0.9, 1, 0.9)
+
+[node name="LuzArena" type="PointLight2D" parent="."]
+position = Vector2(3250, -490)
+texture = SubResource("tex_luz")
+energy = 0.7
+color = Color(1.0, 0.74, 0.42, 1)
+scale = Vector2(3, 1.7)
+
+[node name="Porta" parent="." instance=ExtResource("3_porta")]
+position = Vector2(3500, -424)
 pista_ao_atravessar = ""
+
+[node name="DetritosA" type="Sprite2D" parent="."]
+position = Vector2(40, 909.1)
+scale = Vector2(0.55, 0.55)
+texture = ExtResource("54_t_p_detritos")
+z_index = 0
+modulate = Color(0.8, 0.8, 0.95, 1)
+
+[node name="PoeiraA" type="Sprite2D" parent="."]
+position = Vector2(900, 912.4)
+scale = Vector2(0.55, 0.55)
+texture = ExtResource("55_t_p_poeira_chao")
+z_index = 0
+modulate = Color(0.8, 0.8, 0.95, 1)
+
+[node name="DetritosB" type="Sprite2D" parent="."]
+position = Vector2(3560, 913)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("54_t_p_detritos")
+z_index = 0
+modulate = Color(0.8, 0.8, 0.95, 1)
+
+[node name="PoeiraC" type="Sprite2D" parent="."]
+position = Vector2(3300, 222.4)
+scale = Vector2(0.55, 0.55)
+texture = ExtResource("55_t_p_poeira_chao")
+z_index = 0
+modulate = Color(0.8, 0.8, 0.95, 1)
+
+[node name="DetritosC" type="Sprite2D" parent="."]
+position = Vector2(60, 223)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("54_t_p_detritos")
+z_index = 0
+modulate = Color(0.8, 0.8, 0.95, 1)
+
+[node name="PoeiraD" type="Sprite2D" parent="."]
+position = Vector2(400, -467.6)
+scale = Vector2(0.55, 0.55)
+texture = ExtResource("55_t_p_poeira_chao")
+z_index = 0
+modulate = Color(0.8, 0.8, 0.95, 1)
+
+[node name="DetritosD" type="Sprite2D" parent="."]
+position = Vector2(3560, -467)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("54_t_p_detritos")
+z_index = 0
+modulate = Color(0.8, 0.8, 0.95, 1)
+
+[node name="NeblinaEngr" type="Sprite2D" parent="."]
+position = Vector2(1550, 1070)
+scale = Vector2(3, 3)
+texture = ExtResource("52_t_p_neblina")
+z_index = 1
+modulate = Color(0.7, 0.6, 0.8, 0.4)
+material = SubResource("mat_add")
+
+[node name="NeblinaQuebra" type="Sprite2D" parent="."]
+position = Vector2(2550, 1070)
+scale = Vector2(2.6, 2.6)
+texture = ExtResource("52_t_p_neblina")
+z_index = 1
+modulate = Color(0.7, 0.6, 0.8, 0.4)
+material = SubResource("mat_add")
+
+[node name="NeblinaPontes" type="Sprite2D" parent="."]
+position = Vector2(2620, 390)
+scale = Vector2(2.6, 2.6)
+texture = ExtResource("52_t_p_neblina")
+z_index = 1
+modulate = Color(0.7, 0.6, 0.8, 0.4)
+material = SubResource("mat_add")
+
+[node name="NeblinaMovel" type="Sprite2D" parent="."]
+position = Vector2(1720, 390)
+scale = Vector2(2.6, 2.6)
+texture = ExtResource("52_t_p_neblina")
+z_index = 1
+modulate = Color(0.7, 0.6, 0.8, 0.4)
+material = SubResource("mat_add")
+
+[node name="NeblinaD1" type="Sprite2D" parent="."]
+position = Vector2(1000, -300)
+scale = Vector2(2.4, 2.4)
+texture = ExtResource("52_t_p_neblina")
+z_index = 1
+modulate = Color(0.7, 0.6, 0.8, 0.4)
+material = SubResource("mat_add")
+
+; Primeiro plano: correntes e pilares em silhueta, quase pretos, a' frente da
+; Koliani (z alto). Dao a profundidade das pranchas. Nunca por cima de uma
+; alavanca, sino, porta ou fosso -- so' onde nao ha' nada para ler.
+[node name="FrenteCorrenteA" type="Sprite2D" parent="."]
+position = Vector2(243.7, 510)
+scale = Vector2(0.7, 0.7)
+texture_repeat = 2
+texture = ExtResource("75_t_m_tex_correntes")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 18, 500)
+z_index = 6
+modulate = Color(0.07, 0.06, 0.1, 1)
+
+[node name="FrenteCorrenteAb" type="Sprite2D" parent="."]
+position = Vector2(269.7, 510)
+scale = Vector2(0.7, 0.7)
+texture_repeat = 2
+texture = ExtResource("75_t_m_tex_correntes")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 18, 414.286)
+z_index = 6
+modulate = Color(0.07, 0.06, 0.1, 1)
+
+[node name="FrenteCorrenteB" type="Sprite2D" parent="."]
+position = Vector2(2073.7, 510)
+scale = Vector2(0.7, 0.7)
+texture_repeat = 2
+texture = ExtResource("75_t_m_tex_correntes")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 18, 500)
+z_index = 6
+modulate = Color(0.07, 0.06, 0.1, 1)
+
+[node name="FrenteCorrenteBb" type="Sprite2D" parent="."]
+position = Vector2(2099.7, 510)
+scale = Vector2(0.7, 0.7)
+texture_repeat = 2
+texture = ExtResource("75_t_m_tex_correntes")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 18, 414.286)
+z_index = 6
+modulate = Color(0.07, 0.06, 0.1, 1)
+
+[node name="FrenteCorrenteC" type="Sprite2D" parent="."]
+position = Vector2(3143.7, -180)
+scale = Vector2(0.7, 0.7)
+texture_repeat = 2
+texture = ExtResource("75_t_m_tex_correntes")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 18, 500)
+z_index = 6
+modulate = Color(0.07, 0.06, 0.1, 1)
+
+[node name="FrenteCorrenteCb" type="Sprite2D" parent="."]
+position = Vector2(3169.7, -180)
+scale = Vector2(0.7, 0.7)
+texture_repeat = 2
+texture = ExtResource("75_t_m_tex_correntes")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 18, 414.286)
+z_index = 6
+modulate = Color(0.07, 0.06, 0.1, 1)
+
+[node name="FrenteCorrenteD" type="Sprite2D" parent="."]
+position = Vector2(893.7, -180)
+scale = Vector2(0.7, 0.7)
+texture_repeat = 2
+texture = ExtResource("75_t_m_tex_correntes")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 18, 500)
+z_index = 6
+modulate = Color(0.07, 0.06, 0.1, 1)
+
+[node name="FrenteCorrenteDb" type="Sprite2D" parent="."]
+position = Vector2(919.7, -180)
+scale = Vector2(0.7, 0.7)
+texture_repeat = 2
+texture = ExtResource("75_t_m_tex_correntes")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 18, 414.286)
+z_index = 6
+modulate = Color(0.07, 0.06, 0.1, 1)
+
+[node name="FrenteCorrenteE" type="Sprite2D" parent="."]
+position = Vector2(463.7, -870)
+scale = Vector2(0.7, 0.7)
+texture_repeat = 2
+texture = ExtResource("75_t_m_tex_correntes")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 18, 500)
+z_index = 6
+modulate = Color(0.07, 0.06, 0.1, 1)
+
+[node name="FrenteCorrenteEb" type="Sprite2D" parent="."]
+position = Vector2(489.7, -870)
+scale = Vector2(0.7, 0.7)
+texture_repeat = 2
+texture = ExtResource("75_t_m_tex_correntes")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 18, 414.286)
+z_index = 6
+modulate = Color(0.07, 0.06, 0.1, 1)
+
+[node name="FrenteCorrenteF" type="Sprite2D" parent="."]
+position = Vector2(2993.7, -870)
+scale = Vector2(0.7, 0.7)
+texture_repeat = 2
+texture = ExtResource("75_t_m_tex_correntes")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 18, 500)
+z_index = 6
+modulate = Color(0.07, 0.06, 0.1, 1)
+
+[node name="FrenteCorrenteFb" type="Sprite2D" parent="."]
+position = Vector2(3019.7, -870)
+scale = Vector2(0.7, 0.7)
+texture_repeat = 2
+texture = ExtResource("75_t_m_tex_correntes")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 18, 414.286)
+z_index = 6
+modulate = Color(0.07, 0.06, 0.1, 1)
+
+[node name="FrentePilarA" type="Sprite2D" parent="."]
+position = Vector2(1930, 510)
+scale = Vector2(1.3, 1.3)
+centered = false
+texture = ExtResource("39_t_p_parede")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 46.1538, 369.231)
+z_index = 6
+modulate = Color(0.07, 0.06, 0.1, 1)
+
+[node name="FrentePilarB" type="Sprite2D" parent="."]
+position = Vector2(1210, -180)
+scale = Vector2(1.3, 1.3)
+centered = false
+texture = ExtResource("39_t_p_parede")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 46.1538, 369.231)
+z_index = 6
+modulate = Color(0.07, 0.06, 0.1, 1)
+
+[node name="FrentePilarC" type="Sprite2D" parent="."]
+position = Vector2(1210, -870)
+scale = Vector2(1.3, 1.3)
+centered = false
+texture = ExtResource("39_t_p_parede")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 46.1538, 369.231)
+z_index = 6
+modulate = Color(0.07, 0.06, 0.1, 1)
+
+[node name="LivrosA" type="Sprite2D" parent="."]
+position = Vector2(470, 938.8)
+scale = Vector2(1.2, 1.2)
+texture = ExtResource("38_t_livros")
+z_index = -1
+
+[node name="UrnaA" type="Sprite2D" parent="."]
+position = Vector2(820, 931.6)
+scale = Vector2(1.2, 1.2)
+texture = ExtResource("37_t_urna")
+z_index = -1
+
+[node name="LanternaB" type="Sprite2D" parent="."]
+position = Vector2(2060, 912.8)
+scale = Vector2(1.4, 1.4)
+texture = ExtResource("30_t_lanterna_eco")
+z_index = -1
+
+[node name="LivrosB" type="Sprite2D" parent="."]
+position = Vector2(2800, 938.8)
+scale = Vector2(1.2, 1.2)
+texture = ExtResource("38_t_livros")
+z_index = -1
+
+[node name="UrnaC" type="Sprite2D" parent="."]
+position = Vector2(3450, 241.6)
+scale = Vector2(1.2, 1.2)
+texture = ExtResource("37_t_urna")
+z_index = -1
+
+[node name="LanternaC" type="Sprite2D" parent="."]
+position = Vector2(2080, 222.8)
+scale = Vector2(1.4, 1.4)
+texture = ExtResource("30_t_lanterna_eco")
+z_index = -1
+
+[node name="LivrosC" type="Sprite2D" parent="."]
+position = Vector2(1300, 249.9)
+scale = Vector2(1.1, 1.1)
+texture = ExtResource("38_t_livros")
+z_index = -1
+
+[node name="RelogioC" type="Sprite2D" parent="."]
+position = Vector2(760, 221.4)
+scale = Vector2(1.4, 1.4)
+texture = ExtResource("34_t_relogio_antigo")
+z_index = -1
+
+[node name="LanternaD" type="Sprite2D" parent="."]
+position = Vector2(1330, -467.2)
+scale = Vector2(1.4, 1.4)
+texture = ExtResource("30_t_lanterna_eco")
+z_index = -1
+
+[node name="UrnaD" type="Sprite2D" parent="."]
+position = Vector2(2700, -448.4)
+scale = Vector2(1.2, 1.2)
+texture = ExtResource("37_t_urna")
+z_index = -1
+
+[node name="PecaA" type="Sprite2D" parent="."]
+position = Vector2(930, 932.24)
+scale = Vector2(0.22, 0.22)
+rotation = 0.4
+texture = ExtResource("60_t_m_engrenagem")
+z_index = -1
+modulate = Color(0.8, 0.66, 0.5, 1)
+
+[node name="PecaB" type="Sprite2D" parent="."]
+position = Vector2(3090, 934.4)
+scale = Vector2(0.2, 0.2)
+rotation = 1.1
+texture = ExtResource("60_t_m_engrenagem")
+z_index = -1
+modulate = Color(0.8, 0.66, 0.5, 1)
+
+[node name="PecaC" type="Sprite2D" parent="."]
+position = Vector2(2200, 240.08)
+scale = Vector2(0.24, 0.24)
+rotation = 0.2
+texture = ExtResource("60_t_m_engrenagem")
+z_index = -1
+modulate = Color(0.8, 0.66, 0.5, 1)
+
+[node name="PecaD" type="Sprite2D" parent="."]
+position = Vector2(600, -445.6)
+scale = Vector2(0.2, 0.2)
+rotation = 0.9
+texture = ExtResource("60_t_m_engrenagem")
+z_index = -1
+modulate = Color(0.8, 0.66, 0.5, 1)
+
+[node name="PecaE" type="Sprite2D" parent="."]
+position = Vector2(2760, -447.76)
+scale = Vector2(0.22, 0.22)
+rotation = 0.3
+texture = ExtResource("60_t_m_engrenagem")
+z_index = -1
+modulate = Color(0.8, 0.66, 0.5, 1)
+
+[node name="HerasPoco1" type="Sprite2D" parent="."]
+position = Vector2(3270, 571.2)
+scale = Vector2(0.8, 0.8)
+texture = ExtResource("53_t_p_heras")
+z_index = 1
+flip_h = true
+modulate = Color(0.78, 0.84, 1, 1)
+
+[node name="HerasPoco2" type="Sprite2D" parent="."]
+position = Vector2(540, -118.8)
+scale = Vector2(0.8, 0.8)
+texture = ExtResource("53_t_p_heras")
+z_index = 1
+modulate = Color(0.78, 0.84, 1, 1)
+
+[node name="HerasEngr" type="Sprite2D" parent="."]
+position = Vector2(1180, 562.8)
+scale = Vector2(0.7, 0.7)
+texture = ExtResource("53_t_p_heras")
+z_index = 1
+modulate = Color(0.78, 0.84, 1, 1)
+
+[node name="HerasNucleo" type="Sprite2D" parent="."]
+position = Vector2(2980, -808.8)
+scale = Vector2(0.8, 0.8)
+texture = ExtResource("53_t_p_heras")
+z_index = 1
+flip_h = true
+modulate = Color(0.78, 0.84, 1, 1)
+
+[node name="HerasPontes" type="Sprite2D" parent="."]
+position = Vector2(2270, 194.4)
+scale = Vector2(0.6, 0.6)
+texture = ExtResource("53_t_p_heras")
+z_index = 1
+modulate = Color(0.78, 0.84, 1, 1)

@@ -10,6 +10,7 @@ extends AnimatableBody2D
 ## "plataformas_flutuantes".
 
 const Kit := preload("res://scripts/regiao1_kit.gd")
+const Hybrid := preload("res://scripts/l1_hybrid_9h12e.gd")
 
 @export var largura := 150.0 : set = _set_largura
 ## Amplitude e período do baloiço vertical (px / segundos).
@@ -96,10 +97,22 @@ func _vestir_kit_regiao1(hw: float) -> void:
 	for f in _visual.get_children():
 		if f.has_meta("kit_9c"):
 			f.free()
-	if Kit.alvo(self) == null:
+	var alvo_kit := Kit.alvo(self)
+	if alvo_kit == null:
 		_visual.self_modulate.a = 1.0
 		return
 	_visual.self_modulate.a = 0.0
+	# 9H.17 I3: nos perfis Hybrid a laje e' a mesma peca organica das
+	# plataformas fixas. A rota baixa do L2 e' feita destas, e ve-las com o
+	# degrau chapado do kit 9C ao lado das outras era a pior mistura de
+	# todas -- dois estilos no mesmo ecra, a dois metros uma da outra.
+	if Hybrid.serve(int(alvo_kit.get("perfil"))):
+		var org := Node2D.new()
+		org.set_meta("kit_9c", true)
+		_visual.add_child(org)
+		if Hybrid.corpo_organico(org, largura, -10.0, 26.0):
+			return
+		org.free()
 	var pecas := [
 		# textura, posição, tamanho
 		[Kit.tex("terreno/terreno_corpo.png"), Vector2(-hw, -10.0), Vector2(largura, 20.0)],

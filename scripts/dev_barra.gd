@@ -11,18 +11,29 @@ const CENA_SELETOR := preload("res://scenes/ui/SeletorNiveis.tscn")
 
 var _painel: Control
 var _seletor: SeletorNiveis
+## Execution 9H.18 Phase C: teclado de sons (tecla S). So' no modo Dev.
+const CENA_SONS := preload("res://scripts/dev_sons.gd")
+var _sons: Control
 
 
 func _ready() -> void:
 	layer = 20
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	if not OS.is_debug_build() or not EstadoJogo.modo_dev:
+	if not EstadoJogo.entrada_dev_disponivel() or not EstadoJogo.modo_dev:
 		queue_free()
 		return
 	_montar_botao_topo()
 	_montar_botao_flymode()
-	_montar_botao_testes()
+	var estado := Label.new()
+	estado.name = "EstadoDev"
+	estado.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+	estado.position = Vector2(-234, 74)
+	estado.add_theme_font_size_override("font_size", 13)
+	estado.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(estado)
 	_montar_painel()
+	_sons = CENA_SONS.new()
+	add_child(_sons)
 	Textos.idioma_mudou.connect(func(_l: String) -> void: _traduzir())
 	_traduzir()
 
@@ -41,12 +52,20 @@ func _input(evento: InputEvent) -> void:
 		_abrir()
 
 
-## Tecla F (só developer mode) faz o mesmo que o botão FLYMODE.
+## Teclas do developer mode: F liga/desliga o FLYMODE, S abre o teclado de
+## sons (Execution 9H.18 -- para se poder ouvir cada evento sem ter de o
+## provocar em jogo).
 func _unhandled_key_input(evento: InputEvent) -> void:
-	if evento is InputEventKey and evento.pressed and not evento.echo \
-			and (evento as InputEventKey).keycode == KEY_F:
-		get_viewport().set_input_as_handled()
-		_alternar_flymode()
+	if not (evento is InputEventKey) or not evento.pressed or evento.echo:
+		return
+	match (evento as InputEventKey).keycode:
+		KEY_F:
+			get_viewport().set_input_as_handled()
+			_alternar_flymode()
+		KEY_S:
+			get_viewport().set_input_as_handled()
+			if _sons:
+				_sons.alternar()
 
 
 func _montar_botao_topo() -> void:
@@ -55,10 +74,17 @@ func _montar_botao_topo() -> void:
 	# Texto inicial para o botão já ter tamanho mesmo antes do autoload
 	# Textos terminar de carregar a tradução.
 	b.text = "TESTAR OUTRO NÍVEL"
-	b.set_anchors_preset(Control.PRESET_CENTER_TOP)
-	b.position = Vector2(-110, 6)
+	b.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+	b.position = Vector2(-234, 98)
 	b.custom_minimum_size = Vector2(220, 30)
 	b.add_theme_font_size_override("font_size", 13)
+	# SEM FOCO (como o FLYMODE e o BOSS TEST, que ja' o tinham). O ESPACO e'
+	# `saltar` E `ui_accept` ao mesmo tempo: se este botao ficasse com o foco
+	# depois de um clique, cada salto voltava a carregar nele -- abria o
+	# selector de niveis, e o salto seguinte escolhia um nivel, o que em jogo
+	# se le como "o espaco da' reset ao nivel". Quem joga a comando tem o
+	# atalho do botao SELECT em `_input`.
+	b.focus_mode = Control.FOCUS_NONE
 	b.add_theme_color_override("font_color", Color(1, 0.85, 0.4))
 	var sb := StyleBoxFlat.new()
 	sb.bg_color = Color(0.08, 0.04, 0.11, 0.9)
@@ -74,11 +100,7 @@ func _montar_botao_topo() -> void:
 	b.add_theme_stylebox_override("pressed", sb)
 	b.add_theme_stylebox_override("focus", sb)
 	b.pressed.connect(_abrir)
-	# O seletor fica junto dos controlos de developer, por cima do Flymode.
-	# A âncora tem de ser definida antes de adicionar ao CanvasLayer (que não
-	# tem tamanho próprio); depois disso uma âncora inferior cairia em y=0.
-	b.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
-	b.position = Vector2(14, -182)
+	# Controlos periféricos abaixo do contador de essências do HUD.
 	add_child(b)
 
 
@@ -90,8 +112,8 @@ var _btn_boss: Button
 func _montar_botao_flymode() -> void:
 	_btn_fly = Button.new()
 	_btn_fly.name = "BotaoFlymode"
-	_btn_fly.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
-	_btn_fly.position = Vector2(14, -148)
+	_btn_fly.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+	_btn_fly.position = Vector2(-234, 134)
 	_btn_fly.custom_minimum_size = Vector2(132, 28)
 	_btn_fly.focus_mode = Control.FOCUS_NONE
 	_btn_fly.add_theme_font_size_override("font_size", 13)
@@ -132,7 +154,7 @@ func _estilo_botao_teste(btn: Button) -> void:
 func _estilo_flymode(ativo: bool) -> void:
 	if _btn_fly == null:
 		return
-	_btn_fly.text = "FLYMODE: ON" if ativo else "FLYMODE"
+	_btn_fly.text = Textos.t("dev.fly_on" if ativo else "dev.fly_off")
 	var sb := StyleBoxFlat.new()
 	sb.bg_color = Color(0.1, 0.35, 0.18, 0.92) if ativo else Color(0.08, 0.04, 0.11, 0.9)
 	sb.border_color = Color(0.5, 1.0, 0.55, 0.95) if ativo else Color(0.95, 0.7, 0.3, 0.9)
@@ -185,6 +207,14 @@ func _montar_painel() -> void:
 	_painel.name = "Painel"
 	_painel.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_painel.visible = false
+	# ESCONDER NAO CHEGA. Em Godot, `visible = false` cala o `_gui_input`,
+	# mas NAO cala o `_unhandled_input` -- e o `SeletorNiveis` trata la'
+	# dentro o `ui_accept`. Como o ESPACO e' `saltar` E `ui_accept` ao mesmo
+	# tempo, e saltar nao consome o evento, cada salto em DEV MODE chegava ao
+	# selector INVISIVEL, que confirmava o nivel seleccionado e o recarregava.
+	# Em jogo lia-se exactamente como a queixa do playtest: "o espaco da'
+	# reset ao nivel". Desligado, o painel e' mesmo como se nao estivesse ca'.
+	_painel.process_mode = Node.PROCESS_MODE_DISABLED
 	add_child(_painel)
 
 	var fundo := ColorRect.new()
@@ -204,14 +234,24 @@ func _montar_painel() -> void:
 
 	_seletor = CENA_SELETOR.instantiate()
 	_painel.add_child(_seletor)
+	# E' PRECISO DESLIGAR O SELECTOR, NAO SO' O PAINEL: o `SeletorNiveis`
+	# poe-se a si proprio em `PROCESS_MODE_ALWAYS` (precisa disso para
+	# responder com o jogo em pausa), e `ALWAYS` ignora de proposito o estado
+	# dos antepassados -- desligar o painel-pai nao lhe toca.
+	_seletor.process_mode = Node.PROCESS_MODE_DISABLED
 	_seletor.escolhido.connect(_ir_para)
 	_seletor.cancelado.connect(_fechar)
 
 
 func _traduzir() -> void:
+	var estado := get_node_or_null("EstadoDev") as Label
+	if estado:
+		estado.text = Textos.t("dev.status") % (EstadoJogo.indice_nivel + 1)
 	var bt := get_node_or_null("BotaoTopo") as Button
 	if bt:
 		bt.text = Textos.t("dev.test_level")
+	var k := get_tree().get_first_node_in_group("koliani")
+	_estilo_flymode(k != null and bool(k.get("_voando")))
 	if _painel:
 		var titulo := _painel.find_child("Titulo", true, false) as Label
 		if titulo:
@@ -220,8 +260,12 @@ func _traduzir() -> void:
 
 func _abrir() -> void:
 	if _painel:
+		# volta a INHERIT (= ALWAYS, herdado desta barra), para o selector
+		# continuar a responder com a arvore em pausa, como sempre respondeu.
+		_painel.process_mode = Node.PROCESS_MODE_INHERIT
 		_painel.visible = true
 	if _seletor:
+		_seletor.process_mode = Node.PROCESS_MODE_ALWAYS
 		_seletor.configurar(EstadoJogo.indice_nivel, false)
 	get_tree().paused = true
 
@@ -229,6 +273,14 @@ func _abrir() -> void:
 func _fechar() -> void:
 	if _painel:
 		_painel.visible = false
+		_painel.process_mode = Node.PROCESS_MODE_DISABLED
+	if _seletor:
+		_seletor.process_mode = Node.PROCESS_MODE_DISABLED
+	# Defesa em profundidade: se algum controlo do painel ficou com o foco,
+	# o ESPACO seguinte era consumido por ele em vez de saltar.
+	var focado := get_viewport().gui_get_focus_owner()
+	if focado:
+		focado.release_focus()
 	get_tree().paused = false
 
 

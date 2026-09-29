@@ -39,6 +39,31 @@ extends Node2D
 ## Cold Corridors virar pedra de masmorra e o Mountain Dusk virar serra ao
 ## luar é preciso desaturar primeiro (`assets/shaders/fundo_bioma.gdshader`).
 @export_range(0.0, 1.0) var dessaturar_fundo := 0.0
+
+## PERFIL DE ALTITUDE (Região II). Vazio = comportamento exactamente como
+## antes, e e' o que todos os outros biomas usam -- nada aqui lhes toca.
+##
+## Preenchido ("n06".."n10"), troca DUAS coisas que a medicao apontou como
+## causa de o mar de nuvens nao chegar ao ecra (ver
+## `docs/implementation/region_02_total_remodel.md`):
+##
+##   1. o CEU. O `_montar_ceu` normal faz um degrade entre `cor_fundo`
+##      clareada 16% e `cor_fundo` escurecida 40% -- com a `cor_fundo` da
+##      Regiao II (0.06,0.05,0.13) isso da' um substrato quase preto. Medido:
+##      o ceu por tras das nuvens chega ao ecra a 34.9 de luminancia, e como
+##      20% da textura das nuvens e' alfa PARCIAL, essa parte mistura-se com
+##      o preto e a media da nuvem cai para 55 quando a fonte tem 132.5.
+##      Nao e' falta de ganho: o pico ja' chega aos 170.7. E' o substrato.
+##
+##   2. a COMPOSICAO. A camada de nuvens ocupa 15.2% do ecra e so' o terco
+##      de cima -- le'-se como neblina alta. Na prancha o mar de nuvens e'
+##      ~35% e e' o CHAO DO MUNDO: esta' por baixo de quem joga. Por isso o
+##      perfil acrescenta um segundo banco, mais baixo e maior.
+##
+## Nao mexe em geometria, colisoes nem RNG funcional: o `_gerar_parallax`
+## tem RNG proprio (`seed_ambiente|bioma`), que nunca toca no `_rng` do
+## `gerador_corredor`.
+@export var perfil_altitude := ""
 ## Até onde gerar cenário de fundo (o nível mais largo anda pelos ~3400).
 @export var largura_nivel := 3400.0
 ## Até onde gerar cenário de fundo para a ESQUERDA (x negativo). A JORNADA de
@@ -55,10 +80,121 @@ const CHAO := 900.0  # base das silhuetas, bem abaixo do chão jogável
 
 const BG_DIR := "res://assets/sprites/pixel/backgrounds"
 const SHADER_FUNDO := preload("res://assets/shaders/fundo_bioma.gdshader")
+const ARQ_R2_DIR := "res://assets/sprites/pixel/arquitetura/desfiladeiro"
+const DECO_R2_DIR := "res://assets/sprites/pixel/deco/desfiladeiro"
+
+## Arquitectura authored da Regiao II. Formato de cada peca:
+## [caminho, x, base_y, altura_aparente, z_index, espelhar].
+##
+## O gerador de jornada planta o vocabulario comum ao longo do percurso; esta
+## tabela trata as salas feitas a mao e, sobretudo, o LANDMARK unico de cada
+## nivel. Tudo fica em z=-1 (lua em -2), sem corpo nem colisao.
+const ARQUITETURA_ALTITUDE := {
+	"n06": [
+		[ARQ_R2_DIR + "/ponte_monumental.png", 1900.0, 560.0, 230.0, -1, false],
+		[DECO_R2_DIR + "/arco.png", 520.0, 540.0, 260.0, -1, false],
+		[DECO_R2_DIR + "/coluna.png", 1060.0, 540.0, 250.0, -1, true],
+		[DECO_R2_DIR + "/balaustrada.png", 2820.0, 540.0, 190.0, -1, false],
+	],
+	"n07": [
+		# A sala authored e' fechada pela Casca; o landmark vive na jornada
+		# aberta, onde a fractura se recorta contra o ceu.
+		[ARQ_R2_DIR + "/torre_partida.png", -4500.0, 520.0, 430.0, -1, false],
+		[DECO_R2_DIR + "/arco.png", 420.0, 500.0, 270.0, -1, true],
+		[DECO_R2_DIR + "/coluna.png", 1040.0, 500.0, 270.0, -1, false],
+		[DECO_R2_DIR + "/janela.png", 2510.0, 500.0, 250.0, -1, false],
+		[DECO_R2_DIR + "/arco.png", 3090.0, 500.0, 270.0, -1, false],
+	],
+	"n08": [
+		# No x=3570 a massa rochosa tapava-a por inteiro. Aqui cai no vao
+		# entre duas ilhas, sem lhes acrescentar colisao.
+		[ARQ_R2_DIR + "/queda_agua.png", 1500.0, 920.0, 500.0, -1, false],
+		[DECO_R2_DIR + "/arco.png", 430.0, 710.0, 250.0, -1, false],
+		[DECO_R2_DIR + "/coluna.png", 2050.0, 800.0, 270.0, -1, true],
+		[DECO_R2_DIR + "/arco.png", 4280.0, 700.0, 260.0, -1, true],
+		[DECO_R2_DIR + "/balaustrada.png", 5300.0, 810.0, 190.0, -1, false],
+	],
+	"n09": [
+		[ARQ_R2_DIR + "/altar_ruinas.png", 2220.0, 540.0, 200.0, -1, false],
+		[DECO_R2_DIR + "/arco.png", 460.0, 530.0, 270.0, -1, false],
+		[DECO_R2_DIR + "/coluna.png", 1110.0, 530.0, 260.0, -1, true],
+		[DECO_R2_DIR + "/janela.png", 2820.0, 530.0, 250.0, -1, false],
+	],
+	"n10": [
+		[ARQ_R2_DIR + "/lua_sangue.png", 1090.0, 350.0, 230.0, -2, false],
+		[ARQ_R2_DIR + "/torre_ceus.png", 850.0, 730.0, 430.0, -1, false],
+		[DECO_R2_DIR + "/arco.png", 260.0, 880.0, 280.0, -1, true],
+		[DECO_R2_DIR + "/coluna.png", 1320.0, 880.0, 280.0, -1, false],
+	],
+}
 
 ## Packs de fundo pixel-art (Ansimuz, CC0). Cada entrada:
 ##   [ficheiro, camada_parallax, y_da_base(px), escala]
 ## camada: "Fundo" (mais lenta) -> "Longe" -> "Meio" -> "Perto" (mais rápida)
+## Camadas de fundo por nivel da Regiao II. Substituem o `PACKS`
+## ["desfiladeiro"] quando `perfil_altitude` esta' preenchido.
+##
+## Formato igual ao do `PACKS` -- [ficheiro, camada, y_base, escala, ganho?]
+## -- mais uma entrada nova: o SEGUNDO banco de nuvens ("Perto"), maior e
+## mais baixo, que e' o que faz o mar de nuvens ler como chao do mundo em
+## vez de neblina no topo do ecra.
+##
+## Cada nivel tem a sua composicao, porque a prancha
+## `level_mechanics_and_layout.png` nomeia um ambiente proprio a cada um:
+## falesias abertas (6), torres destruidas (7), ilhas flutuantes (8),
+## ruinas atmosfericas (9), torre celestial (10). Continuam todos a sair
+## das MESMAS quatro texturas -- e' recomposicao, nao cinco biomas.
+const PERFIS_ALTITUDE := {
+	# 29 set 2026 -- os cinco perfis passaram a usar os PANORAMAS DAS
+	# PRANCHAS APROVADAS (`tools/gerar_fundos_regiao02_prancha.py`) em vez do
+	# pack CC0 recolorido (ceu/serras/nuvens/falesias, 240 px desenhados a
+	# 4-7x, aos blocos). A auditoria desse dia pos o N6 ao lado de
+	# `concept_environment_01.png`: faltavam as ilhas, as quedas de agua, as
+	# pontes, a cidadela e a lua -- tudo o que a prancha tem e o jogo nao.
+	#
+	# Formato: [ficheiro, camada, y_base, escala, ganho, arte_aprovada].
+	# `arte_aprovada = true` => filtro linear (o PNG ja' vem ampliado a 2x com
+	# Lanczos, como o panorama da Regiao I) e SEM desaturar: a cor e' a da
+	# prancha, a regiao so' lhe da' um toque de tinta (`_TINTA_PRANCHA`).
+	#
+	# A = `concept_environment_01` (lua, cidadela, pontes, estatuas);
+	# B = `concept_environment_02` (cidadela, queda de agua, ilhas, ponte).
+	# As outras camadas (Longe/Meio/Perto) ficam vazias: o panorama ja' tem a
+	# profundidade toda pintada, e as silhuetas CC0 por cima so' a tapavam.
+	#
+	# N06 CHEGADA -- falesias abertas, ceu frio (prancha: "ceu frio").
+	"n06": [
+		["prancha_b.png", "Fundo", 620.0, 0.75, 1.0, true],
+		["prancha_b_nuvens.png", "MarBaixo", 1500.0, 1.9, 1.0, true],
+	],
+	# N07 SUBIDA -- torres destruidas, ventos luminosos. Mesmo panorama do
+	# N6 mas mais alto no ecra: a cidadela fica por cima de quem sobe.
+	"n07": [
+		["prancha_b.png", "Fundo", 640.0, 0.8, 1.0, true],
+		["prancha_b_nuvens.png", "MarBaixo", 1460.0, 1.8, 1.0, true],
+	],
+	# N08 PONTO MAIS ALTO -- ilhas flutuantes; gameplay LOCKED, so' fundo.
+	"n08": [
+		["prancha_a.png", "Fundo", 600.0, 0.75, 1.0, true],
+		["prancha_a_nuvens.png", "MarBaixo", 1440.0, 2.0, 1.0, true],
+	],
+	# N09 O VENTO VIRA -- ruinas ao crepusculo, lua vermelha.
+	"n09": [
+		["prancha_a.png", "Fundo", 620.0, 0.75, 0.94, true],
+		["prancha_a_nuvens.png", "MarBaixo", 1460.0, 1.9, 1.0, true],
+	],
+	# N10 TORRE CELESTIAL -- lua vermelha e a cidadela; a arena e o landmark
+	# jogavel nao se tocam.
+	"n10": [
+		["prancha_a.png", "Fundo", 600.0, 0.8, 1.0, true],
+		["prancha_a_nuvens.png", "MarBaixo", 1430.0, 2.0, 1.0, true],
+	],
+}
+## Quanto da tinta da regiao entra por cima de uma camada `arte_aprovada`.
+## Pouco: a cor ja' e' a da prancha, isto so' a casa com a luz do nivel.
+const _TINTA_PRANCHA := 0.3
+
+
 const PACKS := {
 	# NB: as camadas de arvores tinham a base em y=1180/1250 -- quase toda a
 	# mata caia ABAIXO do chao jogavel (~700) e a floresta lia-se como um
@@ -73,6 +209,24 @@ const PACKS := {
 		["mid1.png", "Longe", 890.0, 3.6],
 		["mid2.png", "Meio", 905.0, 3.6],
 		["trees.png", "Perto", 950.0, 3.8],
+	],
+	# Região III -- Torre dos Ecos. Pack PRÓPRIO, gerado por
+	# `tools/gerar_fundo_torre_ecos.py`. Os cinco níveis usavam "montanhas",
+	# que tem uma camada `trees.png` de PINHEIROS: a torre de sinos lia-se
+	# como floresta ao entardecer (prova em
+	# docs/playtests/region_03_visual_evidence/antes/). As pranchas APPROVED
+	# nomeiam cinco camadas -- silhueta próxima / torres distantes /
+	# catedral da cidade / montanhas e nuvens / lua e céu -- e como só há
+	# quatro ranhuras (uma entrada por camada, senão a seguinte limpa a
+	# anterior), as nuvens vão dentro do `ceu.png`, como nos outros packs.
+	"torre_ecos": [
+		# 29 set 2026: o pack gerado (silhuetas chapadas de sinos, casas e
+		# torres) deu lugar ao PANORAMA DA PRANCHA APROVADA -- o painel
+		# "CONCEITO DA REGIAO" de `region_03/concept_environment.png`
+		# (`tools/gerar_fundos_regiao02_prancha.py`). Mesmo formato dos
+		# perfis de altitude da Regiao II; ver `PERFIS_ALTITUDE`.
+		["prancha.png", "Fundo", 720.0, 1.1, 1.0, true],
+		["prancha_nuvens.png", "MarBaixo", 1500.0, 1.9, 1.0, true],
 	],
 	# Região II -- Prisão dos Condenados (ansimuz "Cold Corridors", CC0).
 	"prisao": [
@@ -96,6 +250,38 @@ const PACKS := {
 		["parede.png", "Fundo", 980.0, 3.0],
 		["celas.png", "Longe", 1010.0, 2.4],
 		["arcada.png", "Meio", 1045.0, 2.2],
+	],
+	# Região II -- Desfiladeiro dos Ventos. Composto por
+	# `tools/gerar_fundos_regiao02.py` a partir de camadas CC0 que já cá
+	# estavam, recolorido para a paleta da prancha aprovada. A região
+	# corria com `prisao`/`masmorra` -- paredes de cela num sítio que o
+	# cânone descreve como falésias abertas ao céu.
+	#
+	# As quatro camadas são as que `concept_environment_01.png` nomeia.
+	# A `nuvens` é a que faz o trabalho todo: é o mar de nuvens que diz
+	# ALTITUDE, e sem ele isto era só mais uma serra à noite.
+	"desfiladeiro": [
+		["ceu.png", "Fundo", 320.0, 5.6],
+		# As serras sao pintadas a 18% de luminancia e a camada "Longe" leva
+		# 62% da neblina: chegavam ao ecra como manchas pretas, e era isso
+		# que o audit via ("as ilhas do fundo sao blocos de rocha"). Um ganho
+		# pequeno devolve-lhes a leitura de cumeada sem as trazer para a
+		# frente do mar de nuvens.
+		["serras.png", "Longe", 830.0, 4.4, 1.12],
+		# GANHO 1.6 no mar de nuvens (Super-Process A2). O audit mediu a
+		# `nuvens.png` a chegar ao ecra com 10-24% de luminancia contra os
+		# ~52% com que foi pintada -- lia-se como rocha, nao como nuvem. Nao
+		# faltava asset: era tratamento. A camada "Meio" leva `_gradacao` +
+		# `dessaturar_fundo` + o `CanvasModulate` do bioma por cima, e as
+		# tres juntas comiam-lhe dois tercos do brilho.
+		#
+		# O mar de nuvens NAO e' uma nevoa distante: as pranchas da Regiao II
+		# poem-no como elemento ESTRUTURAL -- e' ele que diz ALTITUDE, e e' o
+		# que separa "desfiladeiro" de "masmorra a' noite". Por isso leva
+		# ganho proprio em vez de se clarear a regiao toda, que lavava o
+		# terreno e os inimigos com ela.
+		["nuvens.png", "Meio", 900.0, 3.6, 1.7],
+		["falesias.png", "Perto", 960.0, 3.8],
 	],
 	# Região IV -- Catacumbas do Abismo (ansimuz "Caverns", CC0) + túmulos e
 	# pilar da "Gothicvania Church" em primeiro plano (a gruta sozinha era só
@@ -180,8 +366,13 @@ const PACKS := {
 ## identidade visual própria a cada capítulo de cinco níveis.
 const PACKS_POR_REGIAO := [
 	["floresta", "pantano", "luar", "horror", "montanhas"],
-	["prisao", "masmorra", "igreja", "castelo_velho", "caverna"],
-	["montanhas", "rochoso", "luar", "horror", "cidade"],
+	# Região II -- Desfiladeiro dos Ventos: o pack próprio primeiro; os
+	# outros quatro só aparecem se um nível os pedir à mão (nenhum pede).
+	["desfiladeiro", "desfiladeiro", "desfiladeiro", "desfiladeiro",
+		"desfiladeiro"],
+	# Região III -- Torre dos Ecos: pack próprio nos cinco níveis, como se
+	# fez na Região II com o `desfiladeiro`.
+	["torre_ecos", "torre_ecos", "torre_ecos", "torre_ecos", "torre_ecos"],
 	["caverna", "gruta", "masmorra", "luar", "castelo_velho"],
 	["cidade", "vilanoite", "horror", "igreja", "luar"],
 	["igreja", "castelo_velho", "luar", "horror", "cidade"],
@@ -205,7 +396,9 @@ const PACKS_POR_REGIAO := [
 ## preservar a arte original e, ao mesmo tempo, separar gelo, máquinas,
 ## sonhos, guerra e o caminho final.
 const LUZ_REGIAO := [
-	Color(0.62, 1.00, 0.72), Color(0.60, 0.68, 1.00), Color(1.00, 0.74, 0.46),
+	# A II era `0.60, 0.68, 1.00` -- azul-ferro de masmorra. A prancha da
+	# Região II é violeta de luar com a lua de sangue ao fundo.
+	Color(0.62, 1.00, 0.72), Color(0.78, 0.54, 0.98), Color(1.00, 0.74, 0.46),
 	Color(0.86, 0.70, 0.78), Color(1.00, 0.62, 0.72), Color(1.00, 0.44, 0.96),
 	Color(1.00, 0.52, 0.18), Color(0.42, 0.90, 0.98), Color(0.80, 0.96, 1.00),
 	Color(1.00, 0.86, 0.48), Color(0.90, 0.30, 0.52), Color(0.55, 0.85, 1.00),
@@ -217,6 +410,11 @@ const LUZ_REGIAO := [
 var _poeira: CPUParticles2D
 var _ceu_layer: ParallaxLayer
 var _ceu_tex: Sprite2D
+## FX do ceu de altitude (Regiao II): aurora e raios distantes.
+var _aurora: Sprite2D
+var _raio_longe: Sprite2D
+var _t_raio := 4.0
+var _rng_fx := RandomNumberGenerator.new()
 
 
 func _ready() -> void:
@@ -269,7 +467,8 @@ func _aplicar_arte_automatico() -> void:
 		neblina_fundo = maxf(neblina_fundo, 0.10)
 
 
-func _process(_dt: float) -> void:
+func _process(dt: float) -> void:
+	_animar_fx_ceu(dt)
 	if _poeira:
 		var cam := get_viewport().get_camera_2d()
 		if cam:
@@ -298,8 +497,12 @@ func atualizar_extensao(nova_largura: float, nova_esquerda: float) -> void:
 ## Remove tudo o que `_gerar_parallax` já gerou antes (marcado com o meta
 ## "gerado"), para a função poder ser chamada de novo em segurança.
 func _limpar_gerado() -> void:
+	# A "MarBaixo" entra aqui como as outras: e' criada por codigo e os
+	# seus sprites levam meta "gerado", portanto sem isto acumulavam-se a
+	# cada nova geracao do parallax (um banco de nuvens por cima do outro).
 	for caminho in ["Parallax/Fundo", "Parallax/Longe", "Parallax/Meio",
-			"Parallax/Perto", "Parallax/PropsRegiao"]:
+			"Parallax/MarBaixo", "Parallax/Perto", "Parallax/PropsRegiao",
+			"ArquiteturaAltitude"]:
 		var layer := get_node_or_null(caminho) as Node2D
 		if layer == null:
 			continue
@@ -312,6 +515,7 @@ func _gerar_parallax() -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = hash("%d|%s" % [seed_ambiente, bioma])
 	_limpar_gerado()
+	_arquitetura_altitude()
 
 	# pack pixel-art: camadas reais em vez das silhuetas geradas
 	if fundo_pack != "" and PACKS.has(fundo_pack):
@@ -362,6 +566,37 @@ func _gerar_parallax() -> void:
 		_brilho_horizonte(rng)
 
 
+## LANDMARKS e arquitectura proxima das salas authored da Regiao II.
+## Um RNG proprio nem sequer e' necessario: as posicoes sao deliberadas e
+## fixas para cada composicao. O no pode ser reconstruido quando a jornada
+## alarga a Atmosfera sem acumular sprites, porque todos levam meta `gerado`.
+func _arquitetura_altitude() -> void:
+	if not ARQUITETURA_ALTITUDE.has(perfil_altitude):
+		return
+	var camada := get_node_or_null("ArquiteturaAltitude") as Node2D
+	if camada == null:
+		camada = Node2D.new()
+		camada.name = "ArquiteturaAltitude"
+		add_child(camada)
+	for item: Array in ARQUITETURA_ALTITUDE[perfil_altitude]:
+		var caminho: String = item[0]
+		var tex: Texture2D = load(caminho) if ResourceLoader.exists(caminho) else null
+		if tex == null:
+			continue
+		var altura: float = float(item[3])
+		var esc: float = altura / maxf(1.0, float(tex.get_height()))
+		var s := Sprite2D.new()
+		s.name = caminho.get_file().get_basename()
+		s.texture = tex
+		s.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		s.scale = Vector2(-esc if bool(item[5]) else esc, esc)
+		s.position = Vector2(float(item[1]), float(item[2]) - altura * 0.5)
+		s.z_index = int(item[4])
+		s.modulate = Color(0.92, 0.88, 1.04, 0.96)
+		s.set_meta("gerado", true)
+		camada.add_child(s)
+
+
 ## Fundo do "céu" (gradiente vertical) fixo relativamente à CÂMARA (não ao
 ## mundo): uma `ParallaxLayer` com `motion_scale = 0` dentro do próprio
 ## `ParallaxBackground` -- não dá para usar um `CanvasLayer` normal aqui
@@ -394,7 +629,23 @@ func _montar_ceu() -> void:
 		base.visible = false  # o novo céu substitui este "slab" placeholder
 
 	var grad := Gradient.new()
-	grad.colors = PackedColorArray([cor_fundo.lerp(cor_luz, 0.16), cor_fundo.darkened(0.4)])
+	if perfil_altitude != "":
+		# CEU DE ALTITUDE. O degrade normal e' escuro em cima E em baixo --
+		# faz sentido numa masmorra, onde o "ceu" e' tecto. Aqui o que esta'
+		# em baixo e' AR, e e' contra ele que as nuvens se recortam: com o
+		# substrato a 34.9 de luminancia, os 20% de alfa parcial da textura
+		# misturavam-se com preto e afundavam a media da nuvem de 132.5 para
+		# 55. Tres paragens -- zenite escuro, meio, horizonte claro -- em vez
+		# de duas, e o horizonte puxado para a `cor_luz` da regiao para nao
+		# inventar cor nenhuma fora da paleta do nivel.
+		grad.offsets = PackedFloat32Array([0.0, 0.52, 1.0])
+		grad.colors = PackedColorArray([
+			cor_fundo.lerp(cor_luz, 0.20),
+			cor_fundo.lerp(cor_luz, 0.46),
+			cor_fundo.lerp(cor_luz, 0.86),
+		])
+	else:
+		grad.colors = PackedColorArray([cor_fundo.lerp(cor_luz, 0.16), cor_fundo.darkened(0.4)])
 	var tex := GradientTexture2D.new()
 	tex.gradient = grad
 	tex.width = 4
@@ -403,6 +654,77 @@ func _montar_ceu() -> void:
 	tex.fill_from = Vector2(0.0, 0.0)
 	tex.fill_to = Vector2(0.0, 1.0)
 	_ceu_tex.texture = tex
+	if perfil_altitude != "":
+		_montar_fx_ceu()
+
+
+## FX DO CEU DE ALTITUDE (`perfil_altitude`) -- os dois que a prancha da
+## Regiao II tem e o jogo nao tinha: AURORA no ceu e RAIOS DISTANTES. Sao luz
+## aditiva, fixa ao ecra, atras de tudo (na camada do ceu) e sem corpo nem
+## colisao; nao tocam no `_rng` funcional (o gerador tem o seu, este e' local).
+func _montar_fx_ceu() -> void:
+	if _ceu_layer == null or _aurora != null:
+		return
+	var ecra := get_viewport().get_visible_rect().size
+	_rng_fx.seed = hash("fx_ceu|%s" % perfil_altitude)
+	var add := CanvasItemMaterial.new()
+	add.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
+
+	# aurora: faixa larga e suave, verde-azulada -> lavanda, no terco de cima
+	var g := Gradient.new()
+	g.offsets = PackedFloat32Array([0.0, 0.5, 1.0])
+	g.colors = PackedColorArray([Color(0.55, 0.85, 1.0, 0.0),
+		Color(0.62, 0.55, 1.0, 1.0), Color(0.85, 0.55, 1.0, 0.0)])
+	var gt := GradientTexture2D.new()
+	gt.gradient = g
+	gt.width = 256
+	gt.height = 64
+	gt.fill_from = Vector2(0.0, 0.0)
+	gt.fill_to = Vector2(0.0, 1.0)
+	_aurora = Sprite2D.new()
+	_aurora.texture = gt
+	_aurora.centered = true
+	_aurora.scale = Vector2(ecra.x / 256.0 * 1.3, ecra.y * 0.34 / 64.0)
+	_aurora.position = Vector2(ecra.x * 0.5, ecra.y * 0.17)
+	_aurora.material = add
+	_aurora.modulate.a = 0.0
+	_ceu_layer.add_child(_aurora)
+
+	# raio distante: clarao redondo e suave, baixo no horizonte, entre as nuvens
+	var rg := Gradient.new()
+	rg.colors = PackedColorArray([Color(0.85, 0.88, 1.0, 1.0), Color(0.85, 0.88, 1.0, 0.0)])
+	var rt := GradientTexture2D.new()
+	rt.gradient = rg
+	rt.width = 128
+	rt.height = 128
+	rt.fill = GradientTexture2D.FILL_RADIAL
+	rt.fill_from = Vector2(0.5, 0.5)
+	rt.fill_to = Vector2(1.0, 0.5)
+	_raio_longe = Sprite2D.new()
+	_raio_longe.texture = rt
+	_raio_longe.scale = Vector2(ecra.x / 128.0 * 0.5, ecra.y * 0.45 / 128.0)
+	_raio_longe.position = Vector2(ecra.x * 0.5, ecra.y * 0.62)
+	_raio_longe.material = add
+	_raio_longe.modulate.a = 0.0
+	_ceu_layer.add_child(_raio_longe)
+
+
+func _animar_fx_ceu(dt: float) -> void:
+	if _aurora == null:
+		return
+	# respira devagar (periodo ~16 s), sempre discreta
+	var t := Time.get_ticks_msec() * 0.001
+	_aurora.modulate.a = 0.10 + 0.06 * sin(t * TAU / 16.0)
+	_t_raio -= dt
+	if _t_raio <= 0.0:
+		# dois clarões seguidos, como raio a bater longe, e nova espera
+		_t_raio = _rng_fx.randf_range(7.0, 15.0)
+		_raio_longe.position.x = get_viewport().get_visible_rect().size.x 			* _rng_fx.randf_range(0.15, 0.85)
+		var tw := create_tween()
+		tw.tween_property(_raio_longe, "modulate:a", 0.34, 0.05)
+		tw.tween_property(_raio_longe, "modulate:a", 0.06, 0.09)
+		tw.tween_property(_raio_longe, "modulate:a", 0.24, 0.05)
+		tw.tween_property(_raio_longe, "modulate:a", 0.0, 0.45)
 
 
 ## FRENTE: silhuetas escuras que pendem do topo do ecrã para dentro da cena
@@ -420,7 +742,10 @@ func _frente_ambiente(rng: RandomNumberGenerator) -> void:
 		n.free()
 	# alguns biomas são céu aberto -- pouca ou nenhuma frente
 	var densidade: float = {"floresta": 620.0, "prisao": 720.0, "catacumbas": 620.0,
-		"cidade": 820.0, "castelo": 680.0, "torres": 1600.0}.get(bioma, 820.0)
+		"cidade": 820.0, "castelo": 680.0, "torres": 1600.0,
+		# céu aberto: uma frente cerrada tapava o mar de nuvens, que é
+		# justamente o que diz que isto é alto
+		"desfiladeiro": 1900.0}.get(bioma, 820.0)
 	var cor := cor_silhueta.darkened(0.2).lerp(cor_fundo, 0.1)
 	var x := extensao_esquerda + rng.randf_range(0.0, densidade)
 	while x < largura_nivel + 200.0:
@@ -519,9 +844,20 @@ func _catalogo_parede() -> Array:
 	var lista: Variant = (d as Dictionary).get(bioma, [])
 	if lista is Array:
 		for p in lista:
-			if p is Dictionary and p.get("onde", "") == "parede":
+			if p is Dictionary and p.get("onde", "") == "parede" and _vale_no_nivel(p):
 				fora.append("res://assets/sprites/pixel/deco/%s/%s.png" % [bioma, p["nome"]])
 	return fora
+
+
+## Anti-repeticao (Regiao II): prop com `niveis` so' vale nesses niveis (1-based).
+func _vale_no_nivel(p: Dictionary) -> bool:
+	var ns: Variant = p.get("niveis", null)
+	if not (ns is Array):
+		return true
+	var estado := get_node_or_null("/root/EstadoJogo")
+	if estado == null:
+		return true
+	return (ns as Array).has(float(int(estado.get("indice_nivel")) + 1))   # o JSON traz floats
 
 
 ## Banda de mato/entulho colada ao fundo do ecrã, em qualquer bioma, para a
@@ -556,11 +892,48 @@ func _faixa_rasteira(rng: RandomNumberGenerator) -> void:
 ## posicionar cópias "à mão" ao longo de x0..x1 deixa de bater certo com a
 ## posição real na tela por causa do motion_scale baixo desta camada).
 func _montar_fundo_pack(_rng: RandomNumberGenerator) -> void:
-	for item: Array in PACKS[fundo_pack]:
+	var camadas: Array = PERFIS_ALTITUDE.get(perfil_altitude,
+		PACKS[fundo_pack])
+	var so_prancha := false
+	for item: Array in camadas:
+		if item.size() > 5 and bool(item[5]):
+			so_prancha = true
+	if so_prancha:
+		# Os panoramas das pranchas so' preenchem algumas camadas; as outras
+		# tinham as silhuetas-placeholder do `Atmosfera.tscn` (L1..P2), que
+		# ficavam por cima do panorama da prancha.
+		for nome in ["Longe", "Meio", "Perto"]:
+			var vazia := get_node_or_null("Parallax/%s" % nome)
+			if vazia == null:
+				continue
+			for n in vazia.get_children():
+				if n.name != "Fundo":
+					n.free()
+	for item: Array in camadas:
 		var tex: Texture2D = load("%s/%s/%s" % [BG_DIR, fundo_pack, item[0]])
 		if tex == null:
 			continue
 		var layer := get_node_or_null("Parallax/%s" % item[1]) as ParallaxLayer
+		if layer == null and item[1] == "MarBaixo":
+			# O SEGUNDO BANCO DE NUVENS tem camada PROPRIA de proposito, e
+			# nao mais um sprite na "Perto", por duas razoes que custaram
+			# uma volta: (1) o ciclo limpa os filhos da camada a cada item,
+			# portanto dois sprites na mesma camada apagam-se um ao outro;
+			# (2) o `motion_mirroring` e' propriedade DA CAMADA -- dois
+			# sprites com escalas diferentes nao podem partilhar o mesmo.
+			layer = ParallaxLayer.new()
+			layer.name = "MarBaixo"
+			layer.motion_scale = Vector2(0.52, 0.52)
+			var par := get_node_or_null("Parallax") as ParallaxBackground
+			if par == null:
+				continue
+			par.add_child(layer)
+			# entre a "Meio" e a "Perto": o mar baixo fica a' frente das
+			# serras e ATRAS das falesias, que e' o que o poe por baixo de
+			# quem joga em vez de em cima.
+			var meio := get_node_or_null("Parallax/Meio")
+			if meio:
+				par.move_child(layer, meio.get_index() + 1)
 		if layer == null:
 			continue
 		# fora as silhuetas geradas desta camada (deixa sky/bruma)
@@ -579,14 +952,31 @@ func _montar_fundo_pack(_rng: RandomNumberGenerator) -> void:
 		# A gradação da camada entra pelo shader (desatura o pack ANTES de o
 		# pintar); sem desaturação basta o `modulate`, que é mais barato.
 		var cor := _gradacao(item[1])
-		if dessaturar_fundo > 0.0:
+		# 5.o campo OPCIONAL da tabela: ganho de brilho desta camada. Serve
+		# as camadas que sao CONTEUDO e nao ar -- ver o mar de nuvens do
+		# Desfiladeiro. Sem 5.o campo nada muda (todos os outros biomas).
+		# Vai em uniform PROPRIO e nao dobrado na tinta: a `tinta` do shader
+		# e' `source_color` e fica grampeada a 1.0.
+		var ganho: float = float(item[4]) if item.size() > 4 else 1.0
+		var aprovada: bool = item.size() > 5 and bool(item[5])
+		# cor com que as bandas acima/abaixo continuam a camada: tem de ser a
+		# MESMA que a imagem leva, senao ve'-se a linha onde ela acaba.
+		var cor_banda := cor
+		if aprovada:
+			spr.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+			var t := Color.WHITE.lerp(cor, _TINTA_PRANCHA)
+			spr.modulate = Color(t.r * ganho, t.g * ganho, t.b * ganho, 1.0)
+			cor_banda = spr.modulate
+		elif dessaturar_fundo > 0.0:
 			var mat := ShaderMaterial.new()
 			mat.shader = SHADER_FUNDO
 			mat.set_shader_parameter("dessaturar", dessaturar_fundo)
 			mat.set_shader_parameter("tinta", cor)
+			mat.set_shader_parameter("ganho", ganho)
 			spr.material = mat
 		else:
-			spr.modulate = cor
+			spr.modulate = Color(cor.r * ganho, cor.g * ganho,
+				cor.b * ganho, cor.a)
 		spr.set_meta("gerado", true)
 		layer.add_child(spr)
 		# BANDA POR CIMA (3 set 2026 -- bug do "ecrã preto" no nível 7): a
@@ -598,8 +988,8 @@ func _montar_fundo_pack(_rng: RandomNumberGenerator) -> void:
 		# cima até se perder no fundo. Só na camada mais funda (as outras
 		# ficariam sobrepostas e a escurecer o dobro).
 		if item[1] == "Fundo":
-			_banda_acima(layer, tw, y_base - th, cor, tex)
-			_banda_abaixo(layer, tw, y_base, cor)
+			_banda_acima(layer, tw, y_base - th, cor_banda, tex)
+			_banda_abaixo(layer, tw, y_base, cor_banda)
 		# Repetição: SEMPRE na horizontal (o nível é muito mais largo do que
 		# a imagem). Na vertical só a camada mais funda, e essa leva também a
 		# `_banda_acima` -- é a que não pode deixar buraco, porque atrás dela
@@ -633,7 +1023,13 @@ func _banda_acima(layer: Node, largura: float, topo_y: float, cor: Color,
 	var topo_img: Variant = _cor_topo(tex)
 	if topo_img != null:
 		encosto = (topo_img as Color) * cor
-	g.offsets = PackedFloat32Array([0.0, 0.90, 1.0])
+	# A paragem do `encosto` cai EXACTAMENTE no topo da imagem (estava a
+	# 0.90, ~80 px acima): ai' a banda ja' ia a meio do esbatimento antes de
+	# a imagem comecar, o ceu de tras via-se por ela e ficava um degrau recto
+	# no sitio onde a imagem acaba. Com os panoramas das pranchas da Regiao
+	# II (29 set 2026) esse degrau lia-se em todos os niveis.
+	g.offsets = PackedFloat32Array([0.0,
+		ALTURA_BANDA / (ALTURA_BANDA + SOBREPOR), 1.0])
 	g.colors = PackedColorArray([
 		cor_fundo.darkened(0.2),
 		encosto,
@@ -708,7 +1104,8 @@ func _banda_abaixo(layer: Node, largura: float, base_y: float, cor: Color) -> vo
 
 ## Quanto cada camada do parallax está "longe" (1 = fundo, 0 = colada à
 ## acção) -- alimenta a profundidade atmosférica de `_gradacao`.
-const PROFUNDIDADE := {"Fundo": 1.0, "Longe": 0.62, "Meio": 0.32, "Perto": 0.0}
+const PROFUNDIDADE := {"Fundo": 1.0, "Longe": 0.62, "Meio": 0.32,
+	"MarBaixo": 0.18, "Perto": 0.0}
 
 
 ## Cor por que se multiplica a camada `camada` de um `fundo_pack`: a tinta da
@@ -771,6 +1168,8 @@ func _formas(b: String, perto: bool, rng: RandomNumberGenerator, larg: float, h:
 	match b:
 		"prisao", "catacumbas":
 			return _forma_pilar(rng, larg, h, b == "prisao")
+		"desfiladeiro":
+			return _forma_penhasco(rng, larg, h)
 		"torres":
 			return _forma_torre(rng, larg, h)
 		"cidade":
@@ -779,6 +1178,43 @@ func _formas(b: String, perto: bool, rng: RandomNumberGenerator, larg: float, h:
 			return _forma_arco(rng, larg, h)
 		_:
 			return _forma_arvore(rng, larg, h, perto)
+
+
+## Penhasco: uma agulha de rocha com o topo partido e, uma vez por outra,
+## um coto de torre gótica em cima. É a silhueta da Região II -- pedra
+## exposta e ruína, não o pilar de alvenaria da prisão.
+func _forma_penhasco(rng: RandomNumberGenerator, larg: float, h: float) -> Array:
+	var base: float = larg * rng.randf_range(0.2, 0.34)
+	var topo: float = base * rng.randf_range(0.28, 0.52)
+	var alt: float = h * rng.randf_range(0.6, 0.95)
+	var inclina: float = larg * rng.randf_range(-0.09, 0.09)
+	# a aresta de cima é partida: dois degraus a alturas diferentes
+	var degrau: float = alt * rng.randf_range(0.06, 0.16)
+	var agulha := PackedVector2Array([
+		Vector2(-base, CHAO),
+		Vector2(-base * 0.74, CHAO - alt * 0.42),
+		Vector2(-topo + inclina, CHAO - alt + degrau),
+		Vector2(inclina * 0.5, CHAO - alt),
+		Vector2(topo + inclina, CHAO - alt * 0.94),
+		Vector2(base * 0.82, CHAO - alt * 0.38),
+		Vector2(base, CHAO),
+	])
+	var formas: Array = [agulha]
+	# uma em cada três leva ruína em cima: é o que separa um desfiladeiro
+	# vazio de um desfiladeiro com passado
+	if rng.randf() < 0.34:
+		var tw: float = topo * rng.randf_range(0.5, 0.9)
+		var th: float = alt * rng.randf_range(0.18, 0.32)
+		var y0: float = CHAO - alt
+		formas.append(PackedVector2Array([
+			Vector2(inclina - tw, y0),
+			Vector2(inclina - tw, y0 - th),
+			Vector2(inclina - tw * 0.3, y0 - th * rng.randf_range(0.6, 1.0)),
+			Vector2(inclina + tw * 0.3, y0 - th),
+			Vector2(inclina + tw, y0 - th * rng.randf_range(0.7, 1.0)),
+			Vector2(inclina + tw, y0),
+		]))
+	return formas
 
 
 func _forma_arvore(rng: RandomNumberGenerator, larg: float, h: float, perto: bool) -> Array:
@@ -891,3 +1327,11 @@ func _forma_arco(rng: RandomNumberGenerator, larg: float, h: float) -> Array:
 	pts.append(Vector2(w, ombro))
 	pts.append(Vector2(w, CHAO))
 	return [pts]
+
+
+## LUA DE SANGUE do N10. A prancha `level_mechanics_and_layout.png` poe uma
+## lua vermelha grande no ceu do ultimo nivel da regiao, e e' o unico dos
+## cinco que a tem -- e' ela que anuncia o chefe.
+##
+## So' APRESENTACAO DISTANTE: vai na camada "Longe", z negativo, sem
+## colisao e sem luz. A Torre Celestial jogavel e a arena sao do Prompt 3.

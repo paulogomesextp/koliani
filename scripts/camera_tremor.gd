@@ -23,7 +23,16 @@ const LOOK_AHEAD_RESPOSTA := 3.8
 const DEADZONE_VERTICAL := 68.0
 const QUEDA_LOOK_LIMIAR := 300.0
 const QUEDA_DISTANCIA_LIMIAR := 84.0
-const LOOK_QUEDA_Y := 92.0
+## F1: a 750 px/s (terminal) o chao tem de aparecer >= 0,6 s antes do impacto,
+## ou seja ~450 px abaixo dos pes; a meia altura visivel e' ~257 px, logo o
+## look-ahead vertical chega a ~200 px -- mas so' a velocidade terminal e
+## cresce com ela (saltos e quedas curtas nao o veem).
+const LOOK_QUEDA_Y := 235.0
+const QUEDA_VEL_TERMINAL := 750.0
+const LOOK_QUEDA_RESPOSTA := 14.0
+## px/s: teto da velocidade a que o look-ahead vertical se move (subida ou volta)
+const REGRESSO_MAX_VEL := 460.0
+const REGRESSO_RESPOSTA := 7.0
 const LOOK_VERTICAL_RESPOSTA := 5.0
 
 ## SEM `position_smoothing` (Execution 9H.13/14) -- e e' de proposito.
@@ -151,15 +160,29 @@ func passo_seguimento(dt: float, input_x: float, velocidade: Vector2,
 		if deslocamento_chao > QUEDA_DISTANCIA_LIMIAR \
 				and velocidade.y * sinal_grav > QUEDA_LOOK_LIMIAR:
 			var por_distancia := clampf(
-				(deslocamento_chao - QUEDA_DISTANCIA_LIMIAR) / 180.0, 0.0, 1.0)
+				(deslocamento_chao - QUEDA_DISTANCIA_LIMIAR) / 80.0, 0.0, 1.0)
 			var por_velocidade := clampf(
-				(velocidade.y * sinal_grav - QUEDA_LOOK_LIMIAR) / 420.0, 0.0, 1.0)
+				(velocidade.y * sinal_grav - QUEDA_LOOK_LIMIAR) / (QUEDA_VEL_TERMINAL - QUEDA_LOOK_LIMIAR), 0.0, 1.0)
 			# Os dois sinais têm de entrar no blend: assim cruzar um limiar com o
 			# outro já alto não provoca um salto súbito do alvo vertical.
 			var peso_queda := minf(por_distancia, por_velocidade)
 			alvo_grav_y = lerpf(-DEADZONE_VERTICAL, LOOK_QUEDA_Y, peso_queda)
-	var peso_y := 1.0 - exp(-LOOK_VERTICAL_RESPOSTA * dt)
-	_seguimento.y = lerpf(_seguimento.y, alvo_grav_y * sinal_grav, peso_y)
+	# a olhar para baixo em queda rapida a resposta e' mais viva (o alvo cresce
+	# com a velocidade); a volta ao enquadramento normal usa a resposta suave
+	var resposta_y := LOOK_VERTICAL_RESPOSTA
+	if alvo_grav_y * sinal_grav > _seguimento.y * sinal_grav and alvo_grav_y * sinal_grav > 0.0:
+		resposta_y = LOOK_QUEDA_RESPOSTA
+	var peso_y := 1.0 - exp(-resposta_y * dt)
+	var voltando := absf(alvo_grav_y) < absf(_seguimento.y) and alvo_grav_y * sinal_grav < _seguimento.y * sinal_grav
+	if voltando and _seguimento.y * sinal_grav > 0.0:
+		peso_y = 1.0 - exp(-REGRESSO_RESPOSTA * dt)
+	var novo_y := lerpf(_seguimento.y, alvo_grav_y * sinal_grav, peso_y)
+	# a volta ao enquadramento apos uma queda rapida (offset grande) nao pode
+	# ser um estalo: limita a velocidade de regresso da camara
+	var passo_y := novo_y - _seguimento.y
+	if voltando and _seguimento.y * sinal_grav > 0.0:
+		passo_y = clampf(passo_y, -REGRESSO_MAX_VEL * dt, REGRESSO_MAX_VEL * dt)
+	_seguimento.y = _seguimento.y + passo_y
 	return _seguimento
 
 

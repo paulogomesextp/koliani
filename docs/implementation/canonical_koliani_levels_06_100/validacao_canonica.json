@@ -1,0 +1,1095 @@
+{
+	"L001": {
+		"anim_morte": "morte",
+		"anims_vistas": {
+			"dash": [
+				"idle",
+				"dash"
+			],
+			"idle": [
+				"idle"
+			],
+			"jump": [
+				"idle",
+				"jump_start"
+			],
+			"paragem": [
+				"run",
+				"run_brake",
+				"idle"
+			],
+			"pos_dash": [
+				"dash",
+				"run_start"
+			],
+			"queda": [
+				"jump_start",
+				"fall",
+				"land",
+				"idle"
+			],
+			"respawn": [
+				"fall",
+				"land"
+			],
+			"run": [
+				"idle",
+				"run_start",
+				"run"
+			]
+		},
+		"cena": "res://scenes/levels/Floresta_Putrefata.tscn",
+		"colisao": "(20.0, 44.0)",
+		"dash_ativo": true,
+		"fisica_vs_antigo": {
+			"amostras": 194,
+			"anims_antigo_run_frames": 5,
+			"colisao_antigo": "(20.0, 44.0)",
+			"difs": [
+				[
+					105,
+					"y",
+					-56.9761962890625,
+					-56.58837890625,
+					"queda"
+				],
+				[
+					106,
+					"y",
+					-56.5184936523438,
+					-56.1295776367188,
+					"queda"
+				],
+				[
+					107,
+					"y",
+					-55.6551513671875,
+					-55.2662353515625,
+					"queda"
+				],
+				[
+					108,
+					"y",
+					-54.3173828125,
+					-53.928466796875,
+					"queda"
+				],
+				[
+					109,
+					"y",
+					-52.5051879882813,
+					-52.1162719726563,
+					"queda"
+				],
+				[
+					110,
+					"y",
+					-50.218505859375,
+					-49.82958984375,
+					"queda"
+				],
+				[
+					111,
+					"y",
+					-47.4573974609375,
+					-47.0684814453125,
+					"queda"
+				],
+				[
+					112,
+					"y",
+					-44.2218627929688,
+					-43.8329467773438,
+					"queda"
+				],
+				[
+					113,
+					"y",
+					-40.5118408203125,
+					-40.1229248046875,
+					"queda"
+				],
+				[
+					114,
+					"y",
+					-36.327392578125,
+					-35.9384765625,
+					"queda"
+				],
+				[
+					115,
+					"y",
+					-31.6685180664063,
+					-31.2796020507813,
+					"queda"
+				],
+				[
+					116,
+					"y",
+					-26.53515625,
+					-26.146240234375,
+					"queda"
+				]
+			],
+			"idle0_antigo": "atlas:res://assets/sprites/pixel/koliani_shadowblade/idle.png",
+			"inicio_antigo": "(150.0, 642.9822)",
+			"inicio_igual": true,
+			"mask_layer_antigo": [
+				1,
+				2
+			],
+			"max_delta_xy_vxvy": 0.388916015625,
+			"mesmo_n": true
+		},
+		"flags": [
+			true,
+			true
+		],
+		"idle0": "res://assets/sprites/koliani_golden_set/frames/idle/idle_001.png",
+		"idle_frames": 7,
+		"inicio_txt": "(150.0, 642.9822)",
+		"mask_layer": [
+			1,
+			2
+		],
+		"morte_path0": "res://assets/sprites/koliani_golden_set/frames/morte/morte_001.png",
+		"offset": "(0.0, -18.0)",
+		"offset_final": "(0.0, -18.0)",
+		"run_fps": 13.333333,
+		"run_frames": 10,
+		"run_loop": true,
+		"run_paths": [
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_001.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_002.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_003.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_004.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_005.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_006.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_007.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_008.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_009.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_010.png"
+		],
+		"scale": "(1.0, 1.0)",
+		"scale_final": "(1.0, 1.0)",
+		"tem_dash": true,
+		"tem_morte": true
+	},
+	"L005": {
+		"anim_morte": "morte",
+		"anims_vistas": {
+			"dash": [
+				"idle",
+				"dash"
+			],
+			"idle": [
+				"idle"
+			],
+			"jump": [
+				"idle",
+				"jump_start"
+			],
+			"paragem": [
+				"run",
+				"run_brake",
+				"idle"
+			],
+			"pos_dash": [
+				"dash",
+				"run_start"
+			],
+			"queda": [
+				"jump_start",
+				"fall",
+				"land",
+				"idle"
+			],
+			"respawn": [
+				"fall",
+				"land"
+			],
+			"run": [
+				"idle",
+				"run_start",
+				"run"
+			]
+		},
+		"cena": "res://scenes/levels/Coracao_da_Floresta.tscn",
+		"colisao": "(20.0, 44.0)",
+		"dash_ativo": true,
+		"fisica_vs_antigo": {
+			"amostras": 194,
+			"anims_antigo_run_frames": 5,
+			"colisao_antigo": "(20.0, 44.0)",
+			"difs": [],
+			"idle0_antigo": "atlas:res://assets/sprites/pixel/koliani_shadowblade/idle.png",
+			"inicio_antigo": "(150.0, 642.9822)",
+			"inicio_igual": true,
+			"mask_layer_antigo": [
+				1,
+				2
+			],
+			"max_delta_xy_vxvy": 0.0,
+			"mesmo_n": true
+		},
+		"flags": [
+			true,
+			true
+		],
+		"idle0": "res://assets/sprites/koliani_golden_set/frames/idle/idle_001.png",
+		"idle_frames": 7,
+		"inicio_txt": "(150.0, 642.9822)",
+		"mask_layer": [
+			1,
+			2
+		],
+		"morte_path0": "res://assets/sprites/koliani_golden_set/frames/morte/morte_001.png",
+		"offset": "(0.0, -18.0)",
+		"offset_final": "(0.0, -18.0)",
+		"run_fps": 13.333333,
+		"run_frames": 10,
+		"run_loop": true,
+		"run_paths": [
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_001.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_002.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_003.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_004.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_005.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_006.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_007.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_008.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_009.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_010.png"
+		],
+		"scale": "(1.0, 1.0)",
+		"scale_final": "(1.0, 1.0)",
+		"tem_dash": true,
+		"tem_morte": true
+	},
+	"L006": {
+		"anim_morte": "morte",
+		"anims_vistas": {
+			"dash": [
+				"idle",
+				"dash"
+			],
+			"idle": [
+				"idle"
+			],
+			"jump": [
+				"idle",
+				"jump_start"
+			],
+			"paragem": [
+				"run",
+				"run_brake",
+				"idle"
+			],
+			"pos_dash": [
+				"dash",
+				"run_start"
+			],
+			"queda": [
+				"jump_start",
+				"fall",
+				"land",
+				"idle"
+			],
+			"respawn": [
+				"fall",
+				"land"
+			],
+			"run": [
+				"idle",
+				"run_start",
+				"run"
+			]
+		},
+		"cena": "res://scenes/levels/Prisao_dos_Condenados.tscn",
+		"colisao": "(20.0, 44.0)",
+		"dash_ativo": true,
+		"fisica_vs_antigo": {
+			"amostras": 194,
+			"anims_antigo_run_frames": 5,
+			"colisao_antigo": "(20.0, 44.0)",
+			"difs": [],
+			"idle0_antigo": "atlas:res://assets/sprites/pixel/koliani_shadowblade/idle.png",
+			"inicio_antigo": "(150.0, 647.986)",
+			"inicio_igual": true,
+			"mask_layer_antigo": [
+				1,
+				2
+			],
+			"max_delta_xy_vxvy": 0.0,
+			"mesmo_n": true
+		},
+		"flags": [
+			true,
+			true
+		],
+		"idle0": "res://assets/sprites/koliani_golden_set/frames/idle/idle_001.png",
+		"idle_frames": 7,
+		"inicio_txt": "(150.0, 647.986)",
+		"mask_layer": [
+			1,
+			2
+		],
+		"morte_path0": "res://assets/sprites/koliani_golden_set/frames/morte/morte_001.png",
+		"offset": "(0.0, -18.0)",
+		"offset_final": "(0.0, -18.0)",
+		"run_fps": 13.333333,
+		"run_frames": 10,
+		"run_loop": true,
+		"run_paths": [
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_001.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_002.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_003.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_004.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_005.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_006.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_007.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_008.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_009.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_010.png"
+		],
+		"scale": "(1.0, 1.0)",
+		"scale_final": "(1.0, 1.0)",
+		"tem_dash": true,
+		"tem_morte": true
+	},
+	"L007": {
+		"anim_morte": "morte",
+		"anims_vistas": {
+			"dash": [
+				"idle",
+				"dash"
+			],
+			"idle": [
+				"idle"
+			],
+			"jump": [
+				"idle",
+				"jump_start"
+			],
+			"paragem": [
+				"run",
+				"run_brake",
+				"idle"
+			],
+			"pos_dash": [
+				"dash",
+				"run_start"
+			],
+			"queda": [
+				"jump_start",
+				"fall",
+				"land",
+				"idle"
+			],
+			"respawn": [
+				"fall",
+				"land"
+			],
+			"run": [
+				"idle",
+				"run_start",
+				"run"
+			]
+		},
+		"cena": "res://scenes/levels/Fornalha_dos_Pecadores.tscn",
+		"colisao": "(20.0, 44.0)",
+		"dash_ativo": true,
+		"fisica_vs_antigo": {
+			"amostras": 194,
+			"anims_antigo_run_frames": 5,
+			"colisao_antigo": "(20.0, 44.0)",
+			"difs": [],
+			"idle0_antigo": "atlas:res://assets/sprites/pixel/koliani_shadowblade/idle.png",
+			"inicio_antigo": "(150.0, 587.986)",
+			"inicio_igual": true,
+			"mask_layer_antigo": [
+				1,
+				2
+			],
+			"max_delta_xy_vxvy": 0.0,
+			"mesmo_n": true
+		},
+		"flags": [
+			true,
+			true
+		],
+		"idle0": "res://assets/sprites/koliani_golden_set/frames/idle/idle_001.png",
+		"idle_frames": 7,
+		"inicio_txt": "(150.0, 587.986)",
+		"mask_layer": [
+			1,
+			2
+		],
+		"morte_path0": "res://assets/sprites/koliani_golden_set/frames/morte/morte_001.png",
+		"offset": "(0.0, -18.0)",
+		"offset_final": "(0.0, -18.0)",
+		"run_fps": 13.333333,
+		"run_frames": 10,
+		"run_loop": true,
+		"run_paths": [
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_001.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_002.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_003.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_004.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_005.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_006.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_007.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_008.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_009.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_010.png"
+		],
+		"scale": "(1.0, 1.0)",
+		"scale_final": "(1.0, 1.0)",
+		"tem_dash": true,
+		"tem_morte": true
+	},
+	"L008": {
+		"anim_morte": "morte",
+		"anims_vistas": {
+			"dash": [
+				"idle",
+				"dash"
+			],
+			"idle": [
+				"idle"
+			],
+			"jump": [
+				"idle",
+				"jump_start"
+			],
+			"paragem": [
+				"run",
+				"run_brake",
+				"idle"
+			],
+			"pos_dash": [
+				"dash",
+				"run_start"
+			],
+			"queda": [
+				"jump_start",
+				"fall",
+				"land",
+				"idle"
+			],
+			"respawn": [
+				"fall",
+				"land"
+			],
+			"run": [
+				"idle",
+				"run_start",
+				"run"
+			]
+		},
+		"cena": "res://scenes/levels/Corredor_das_Execucoes.tscn",
+		"colisao": "(20.0, 44.0)",
+		"dash_ativo": true,
+		"fisica_vs_antigo": {
+			"amostras": 194,
+			"anims_antigo_run_frames": 5,
+			"colisao_antigo": "(20.0, 44.0)",
+			"difs": [],
+			"idle0_antigo": "atlas:res://assets/sprites/pixel/koliani_shadowblade/idle.png",
+			"inicio_antigo": "(150.0, 627.986)",
+			"inicio_igual": true,
+			"mask_layer_antigo": [
+				1,
+				2
+			],
+			"max_delta_xy_vxvy": 0.0,
+			"mesmo_n": true
+		},
+		"flags": [
+			true,
+			true
+		],
+		"idle0": "res://assets/sprites/koliani_golden_set/frames/idle/idle_001.png",
+		"idle_frames": 7,
+		"inicio_txt": "(150.0, 627.986)",
+		"mask_layer": [
+			1,
+			2
+		],
+		"morte_path0": "res://assets/sprites/koliani_golden_set/frames/morte/morte_001.png",
+		"offset": "(0.0, -18.0)",
+		"offset_final": "(0.0, -18.0)",
+		"run_fps": 13.333333,
+		"run_frames": 10,
+		"run_loop": true,
+		"run_paths": [
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_001.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_002.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_003.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_004.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_005.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_006.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_007.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_008.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_009.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_010.png"
+		],
+		"scale": "(1.0, 1.0)",
+		"scale_final": "(1.0, 1.0)",
+		"tem_dash": true,
+		"tem_morte": true
+	},
+	"L009": {
+		"anim_morte": "morte",
+		"anims_vistas": {
+			"dash": [
+				"idle",
+				"dash"
+			],
+			"idle": [
+				"idle"
+			],
+			"jump": [
+				"idle",
+				"jump_start"
+			],
+			"paragem": [
+				"run",
+				"run_brake",
+				"idle"
+			],
+			"pos_dash": [
+				"dash",
+				"run_start"
+			],
+			"queda": [
+				"jump_start",
+				"fall",
+				"land",
+				"idle"
+			],
+			"respawn": [
+				"fall",
+				"land"
+			],
+			"run": [
+				"idle",
+				"run_start",
+				"run"
+			]
+		},
+		"cena": "res://scenes/levels/Ala_dos_Mortos.tscn",
+		"colisao": "(20.0, 44.0)",
+		"dash_ativo": true,
+		"fisica_vs_antigo": {
+			"amostras": 194,
+			"anims_antigo_run_frames": 5,
+			"colisao_antigo": "(20.0, 44.0)",
+			"difs": [],
+			"idle0_antigo": "atlas:res://assets/sprites/pixel/koliani_shadowblade/idle.png",
+			"inicio_antigo": "(150.0, 637.986)",
+			"inicio_igual": true,
+			"mask_layer_antigo": [
+				1,
+				2
+			],
+			"max_delta_xy_vxvy": 0.0,
+			"mesmo_n": true
+		},
+		"flags": [
+			true,
+			true
+		],
+		"idle0": "res://assets/sprites/koliani_golden_set/frames/idle/idle_001.png",
+		"idle_frames": 7,
+		"inicio_txt": "(150.0, 637.986)",
+		"mask_layer": [
+			1,
+			2
+		],
+		"morte_path0": "res://assets/sprites/koliani_golden_set/frames/morte/morte_001.png",
+		"offset": "(0.0, -18.0)",
+		"offset_final": "(0.0, -18.0)",
+		"run_fps": 13.333333,
+		"run_frames": 10,
+		"run_loop": true,
+		"run_paths": [
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_001.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_002.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_003.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_004.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_005.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_006.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_007.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_008.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_009.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_010.png"
+		],
+		"scale": "(1.0, 1.0)",
+		"scale_final": "(1.0, 1.0)",
+		"tem_dash": true,
+		"tem_morte": true
+	},
+	"L010": {
+		"anim_morte": "morte",
+		"anims_vistas": {
+			"dash": [
+				"idle",
+				"dash"
+			],
+			"idle": [
+				"idle"
+			],
+			"jump": [
+				"idle",
+				"jump_start",
+				"fall"
+			],
+			"paragem": [
+				"run",
+				"run_brake",
+				"idle"
+			],
+			"pos_dash": [
+				"dash",
+				"run_start"
+			],
+			"queda": [
+				"fall",
+				"land",
+				"idle"
+			],
+			"respawn": [
+				"fall",
+				"borda"
+			],
+			"run": [
+				"idle",
+				"run_start",
+				"run"
+			]
+		},
+		"cena": "res://scenes/levels/A_Cela_Zero.tscn",
+		"colisao": "(20.0, 44.0)",
+		"dash_ativo": true,
+		"fisica_vs_antigo": {
+			"amostras": 194,
+			"anims_antigo_run_frames": 5,
+			"colisao_antigo": "(20.0, 44.0)",
+			"difs": [],
+			"idle0_antigo": "atlas:res://assets/sprites/pixel/koliani_shadowblade/idle.png",
+			"inicio_antigo": "(180.0, 827.9974)",
+			"inicio_igual": true,
+			"mask_layer_antigo": [
+				1,
+				2
+			],
+			"max_delta_xy_vxvy": 0.0,
+			"mesmo_n": true
+		},
+		"flags": [
+			true,
+			true
+		],
+		"idle0": "res://assets/sprites/koliani_golden_set/frames/idle/idle_001.png",
+		"idle_frames": 7,
+		"inicio_txt": "(180.0, 827.9974)",
+		"mask_layer": [
+			1,
+			2
+		],
+		"morte_path0": "res://assets/sprites/koliani_golden_set/frames/morte/morte_001.png",
+		"offset": "(0.0, -18.0)",
+		"offset_final": "(0.0, -18.0)",
+		"run_fps": 13.333333,
+		"run_frames": 10,
+		"run_loop": true,
+		"run_paths": [
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_001.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_002.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_003.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_004.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_005.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_006.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_007.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_008.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_009.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_010.png"
+		],
+		"scale": "(1.0, 1.0)",
+		"scale_final": "(1.0, 1.0)",
+		"tem_dash": true,
+		"tem_morte": true
+	},
+	"L030": {
+		"anim_morte": "morte",
+		"anims_vistas": {
+			"dash": [
+				"idle",
+				"dash"
+			],
+			"idle": [
+				"idle"
+			],
+			"jump": [
+				"idle",
+				"jump_start"
+			],
+			"paragem": [
+				"run",
+				"run_brake",
+				"idle"
+			],
+			"pos_dash": [
+				"dash",
+				"run_start"
+			],
+			"queda": [
+				"jump_start",
+				"fall",
+				"land",
+				"idle"
+			],
+			"respawn": [
+				"fall",
+				"land"
+			],
+			"run": [
+				"idle",
+				"run_start",
+				"run"
+			]
+		},
+		"cena": "res://scenes/levels/O_Trono_de_Zeriko.tscn",
+		"colisao": "(20.0, 44.0)",
+		"dash_ativo": true,
+		"fisica_vs_antigo": {
+			"amostras": 194,
+			"anims_antigo_run_frames": 5,
+			"colisao_antigo": "(20.0, 44.0)",
+			"difs": [],
+			"idle0_antigo": "atlas:res://assets/sprites/pixel/koliani_shadowblade/idle.png",
+			"inicio_antigo": "(150.0, 613.9746)",
+			"inicio_igual": true,
+			"mask_layer_antigo": [
+				1,
+				2
+			],
+			"max_delta_xy_vxvy": 0.0,
+			"mesmo_n": true
+		},
+		"flags": [
+			true,
+			true
+		],
+		"idle0": "res://assets/sprites/koliani_golden_set/frames/idle/idle_001.png",
+		"idle_frames": 7,
+		"inicio_txt": "(150.0, 613.9746)",
+		"mask_layer": [
+			1,
+			2
+		],
+		"morte_path0": "res://assets/sprites/koliani_golden_set/frames/morte/morte_001.png",
+		"offset": "(0.0, -18.0)",
+		"offset_final": "(0.0, -18.0)",
+		"run_fps": 13.333333,
+		"run_frames": 10,
+		"run_loop": true,
+		"run_paths": [
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_001.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_002.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_003.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_004.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_005.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_006.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_007.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_008.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_009.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_010.png"
+		],
+		"scale": "(1.0, 1.0)",
+		"scale_final": "(1.0, 1.0)",
+		"tem_dash": true,
+		"tem_morte": true
+	},
+	"L031": {
+		"anim_morte": "morte",
+		"anims_vistas": {
+			"dash": [
+				"idle",
+				"dash"
+			],
+			"idle": [
+				"idle"
+			],
+			"jump": [
+				"idle",
+				"jump_start"
+			],
+			"paragem": [
+				"run",
+				"run_brake",
+				"idle"
+			],
+			"pos_dash": [
+				"dash",
+				"run_start",
+				"hurt"
+			],
+			"queda": [
+				"jump_start",
+				"fall",
+				"land",
+				"idle"
+			],
+			"respawn": [
+				"hurt",
+				"fall",
+				"land"
+			],
+			"run": [
+				"idle",
+				"run_start",
+				"run"
+			]
+		},
+		"cena": "res://scenes/levels/Estrada_das_Cinzas.tscn",
+		"colisao": "(20.0, 44.0)",
+		"dash_ativo": true,
+		"fisica_vs_antigo": {
+			"amostras": 194,
+			"anims_antigo_run_frames": 5,
+			"colisao_antigo": "(20.0, 44.0)",
+			"difs": [],
+			"idle0_antigo": "atlas:res://assets/sprites/pixel/koliani_shadowblade/idle.png",
+			"inicio_antigo": "(360.0, 647.9932)",
+			"inicio_igual": true,
+			"mask_layer_antigo": [
+				1,
+				2
+			],
+			"max_delta_xy_vxvy": 0.0,
+			"mesmo_n": true
+		},
+		"flags": [
+			true,
+			true
+		],
+		"idle0": "res://assets/sprites/koliani_golden_set/frames/idle/idle_001.png",
+		"idle_frames": 7,
+		"inicio_txt": "(360.0, 647.9932)",
+		"mask_layer": [
+			1,
+			2
+		],
+		"morte_path0": "res://assets/sprites/koliani_golden_set/frames/morte/morte_001.png",
+		"offset": "(0.0, -18.0)",
+		"offset_final": "(0.0, -18.0)",
+		"run_fps": 13.333333,
+		"run_frames": 10,
+		"run_loop": true,
+		"run_paths": [
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_001.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_002.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_003.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_004.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_005.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_006.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_007.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_008.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_009.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_010.png"
+		],
+		"scale": "(1.0, 1.0)",
+		"scale_final": "(1.0, 1.0)",
+		"tem_dash": true,
+		"tem_morte": true
+	},
+	"L063": {
+		"anim_morte": "morte",
+		"anims_vistas": {
+			"dash": [
+				"idle",
+				"dash"
+			],
+			"idle": [
+				"idle"
+			],
+			"jump": [
+				"idle",
+				"jump_start"
+			],
+			"paragem": [
+				"run",
+				"run_brake",
+				"idle"
+			],
+			"pos_dash": [
+				"dash",
+				"run_start",
+				"hurt"
+			],
+			"queda": [
+				"jump_start",
+				"fall",
+				"hurt",
+				"land",
+				"idle"
+			],
+			"respawn": [
+				"hurt",
+				"fall",
+				"land"
+			],
+			"run": [
+				"idle",
+				"run_start",
+				"run"
+			]
+		},
+		"cena": "res://scenes/levels/Cidade_dos_Anjos_Mortos.tscn",
+		"colisao": "(20.0, 44.0)",
+		"dash_ativo": true,
+		"fisica_vs_antigo": {
+			"amostras": 194,
+			"anims_antigo_run_frames": 5,
+			"colisao_antigo": "(20.0, 44.0)",
+			"difs": [],
+			"idle0_antigo": "atlas:res://assets/sprites/pixel/koliani_shadowblade/idle.png",
+			"inicio_antigo": "(360.0, 647.9932)",
+			"inicio_igual": true,
+			"mask_layer_antigo": [
+				1,
+				2
+			],
+			"max_delta_xy_vxvy": 0.0,
+			"mesmo_n": true
+		},
+		"flags": [
+			true,
+			true
+		],
+		"idle0": "res://assets/sprites/koliani_golden_set/frames/idle/idle_001.png",
+		"idle_frames": 7,
+		"inicio_txt": "(360.0, 647.9932)",
+		"mask_layer": [
+			1,
+			2
+		],
+		"morte_path0": "res://assets/sprites/koliani_golden_set/frames/morte/morte_001.png",
+		"offset": "(0.0, -18.0)",
+		"offset_final": "(0.0, -18.0)",
+		"run_fps": 13.333333,
+		"run_frames": 10,
+		"run_loop": true,
+		"run_paths": [
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_001.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_002.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_003.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_004.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_005.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_006.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_007.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_008.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_009.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_010.png"
+		],
+		"scale": "(1.0, 1.0)",
+		"scale_final": "(1.0, 1.0)",
+		"tem_dash": true,
+		"tem_morte": true
+	},
+	"L100": {
+		"anim_morte": "morte",
+		"anims_vistas": {
+			"dash": [
+				"idle",
+				"dash"
+			],
+			"idle": [
+				"idle"
+			],
+			"jump": [
+				"idle",
+				"jump_start"
+			],
+			"paragem": [
+				"run",
+				"run_brake",
+				"idle"
+			],
+			"pos_dash": [
+				"dash",
+				"run_start",
+				"hurt"
+			],
+			"queda": [
+				"jump_start",
+				"fall",
+				"land",
+				"idle"
+			],
+			"respawn": [
+				"hurt",
+				"fall",
+				"land"
+			],
+			"run": [
+				"idle",
+				"run_start",
+				"run"
+			]
+		},
+		"cena": "res://scenes/levels/O_Ultimo_Salto.tscn",
+		"colisao": "(20.0, 44.0)",
+		"dash_ativo": true,
+		"fisica_vs_antigo": {
+			"amostras": 194,
+			"anims_antigo_run_frames": 5,
+			"colisao_antigo": "(20.0, 44.0)",
+			"difs": [],
+			"idle0_antigo": "atlas:res://assets/sprites/pixel/koliani_shadowblade/idle.png",
+			"inicio_antigo": "(360.0, 647.9932)",
+			"inicio_igual": true,
+			"mask_layer_antigo": [
+				1,
+				2
+			],
+			"max_delta_xy_vxvy": 0.0,
+			"mesmo_n": true
+		},
+		"flags": [
+			true,
+			true
+		],
+		"idle0": "res://assets/sprites/koliani_golden_set/frames/idle/idle_001.png",
+		"idle_frames": 7,
+		"inicio_txt": "(360.0, 647.9932)",
+		"mask_layer": [
+			1,
+			2
+		],
+		"morte_path0": "res://assets/sprites/koliani_golden_set/frames/morte/morte_001.png",
+		"offset": "(0.0, -18.0)",
+		"offset_final": "(0.0, -18.0)",
+		"run_fps": 13.333333,
+		"run_frames": 10,
+		"run_loop": true,
+		"run_paths": [
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_001.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_002.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_003.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_004.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_005.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_006.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_007.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_008.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_009.png",
+			"res://assets/sprites/koliani_golden_set/frames/run_final/run_010.png"
+		],
+		"scale": "(1.0, 1.0)",
+		"scale_final": "(1.0, 1.0)",
+		"tem_dash": true,
+		"tem_morte": true
+	}
+}

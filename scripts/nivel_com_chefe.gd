@@ -51,11 +51,26 @@ const DIST_MAX_ANTES_CHEFE := 260.0
 ## Esticão máximo no último nível (N1 = 1.0, N30 = 1.0 + isto).
 @export var alongar_ampl := 0.8
 
+## NÍVEL AUTORAL (`corredor = false`, sala desenhada à mão secção a secção,
+## p.ex. o N1): os checkpoints da cena são intencionais e NÃO se podam por
+## distância (`_reduzir_checkpoints`), e não se acrescenta nenhum perto do
+## chefe. Padrão a reutilizar nos N2–N5: ver `docs/nivel_autoral_n1.md`.
+@export var checkpoints_autorais := false
+## Onde (x do mundo) entra no ecrã a mecânica que este nível estreia, quando
+## não há jornada que o diga. INF = logo à entrada (comportamento antigo).
+@export var estreia_x_autoral := INF
+
 ## Candeeiros e tochas ao longo do percurso (ver `_iluminar`).
 @export var candeeiros := true
 ## Cor da luz dos candeeiros. Âmbar quente por omissão: as regiões são
 ## roxas/azuis e é o contraste quente/frio que faz a luz ler-se.
 @export var cor_candeeiro := Color(1.0, 0.76, 0.45)
+
+## Mecânica explicada por este nível quando a sala feita à mão ensina outra
+## coisa que não a estreia da jornada (`GERADOR.estreia_do_nivel`). Vazio =
+## usa a da jornada. Ex.: o N08 (Ilhas Suspensas) sem jornada ensina o
+## planar contextual com o texto "asas".
+@export var mecanica_anunciada := ""
 
 ## Entrada "fresca" no nível (não é um respawn num checkpoint a meio). É
 ## capturado em `_enter_tree`, ANTES de a Koliani correr o seu `_ready` (que
@@ -143,7 +158,10 @@ func _anunciar_mecanica() -> void:
 	# aparecia logo à entrada, que é o que isto vem corrigir
 	if _gerador:
 		_tut_x = float(_gerador.get("estreia_x"))
-	var cam := GERADOR.estreia_do_nivel(EstadoJogo.indice_nivel)
+	elif estreia_x_autoral != INF:
+		_tut_x = estreia_x_autoral
+	var cam := mecanica_anunciada if mecanica_anunciada != "" \
+		else GERADOR.estreia_do_nivel(EstadoJogo.indice_nivel)
 	if cam == "" or EstadoJogo.mecanicas_explicadas.has(cam):
 		return
 	_tut_cam = cam
@@ -195,11 +213,53 @@ func _abrir_guardiao() -> void:
 	# o contrato persistente reservado ao exame do quinto nível.
 	_selar(false)
 
+## A habilidade PERMANENTE que cada chefe regional larga. Isto e' progressao,
+## nao saque: o bau do chefe sorteia arma/armadura/melhoria, e um sorteio nao
+## pode decidir se o jogo continua a ser jogavel.
+##
+## 9H.17 C -- contrato congelado pelo Game Master: o SALTO DUPLO abre ao
+## derrubar o chefe do nivel 5 e nao antes. Ate' la' a Regiao I inteira
+## faz-se com salto simples (ver `GeradorCorredor.NIVEL_SALTO_DUPLO` e
+## `tools/verifica_mobilidade_9h17.gd`). Antes desta entrada o salto duplo
+## nao se ganhava em SITIO NENHUM da campanha: as `HABILIDADES_INICIAIS`
+## foram esvaziadas e nunca ninguem lhe deu uma porta de entrada.
+## N10 (indice 9, Guardiao dos Ceus) acrescentado na execucao do N10: decisao
+## do GM em `docs/regiao_2_decisoes_e_n6_auditoria.md` (#3) -- a Regiao II
+## concede `escalar_paredes` (wall-jump) ao derrotar o boss regional. Nao e'
+## ensinada nem exigida dentro da Regiao II; so' passa a fazer falta a partir
+## da Regiao III. O grant e' incondicional (nao depende de apanhar nenhum
+## `Coletavel`) -- por isso ja' cumpre sozinho a regra global "skill sempre
+## aprendida ao concluir o nivel", sem precisar do sistema de reconciliacao
+## de saves antigos (que continua por implementar; ver nota em
+## `docs/retomar_aqui.md` da execucao N10).
+const HABILIDADE_DO_CHEFE := {4: "salto_duplo", 9: "escalar_paredes"}
+
+## Cartao de fim de regiao: indice do nivel -> chave i18n.
+const REGIAO_CONCLUIDA := {4: "region.1.complete", 9: "region.2.complete"}
+## Habilidade ganha NESTA vitoria (para o cartao); "" se ja' a tinha.
+var _hab_ganha := ""
+
+
 func _abrir() -> void:
 	if _bau_criado:
 		return
 	_bau_criado = true
 	EstadoJogo.marcar_chefe_derrotado_por_nivel(EstadoJogo.indice_nivel)
+	var hab: String = HABILIDADE_DO_CHEFE.get(EstadoJogo.indice_nivel, "")
+	if hab != "" and not EstadoJogo.tem_habilidade(hab):
+		# `desbloquear_habilidade` avisa a HUD e GRAVA -- sobrevive a morte,
+		# a reload, ao seletor de niveis e a fechar o jogo.
+		#
+		# SEM som proprio, de proposito (Fase 10): isto corre no instante em
+		# que o chefe morre, e nessa fraccao de segundo ja' tocam o
+		# `chefe_cai` e, 0,45 s depois, a `conquista` (6,1 s). Um
+		# `desbloqueio` no meio seria o terceiro jingle em cima dos outros
+		# dois -- o empilhamento exacto que esta fase manda evitar. A
+		# habilidade e' anunciada pela HUD e pelo bau que nasce a seguir.
+		# (O `Coletavel` com `habilidade_id`, esse toca `desbloqueio`: nao
+		# tem fanfarra de chefe nenhuma por cima.)
+		EstadoJogo.desbloquear_habilidade(hab)
+		_hab_ganha = hab
 	_criar_bau.call_deferred()
 
 func _criar_bau() -> void:
@@ -225,8 +285,19 @@ func _criar_bau() -> void:
 		return
 	var hit := mundo.direct_space_state.intersect_ray(raio)
 	bau.position = to_local(hit.position if not hit.is_empty() else _porta.global_position)
-	bau.recolhido.connect(func() -> void: _selar(false))
+	bau.recolhido.connect(_ao_bau_recolhido)
 	add_child(bau)
+
+
+## Bau -> (cartao de fim de regiao, se for o exame regional) -> porta aberta.
+## A porta so' abre depois de Continuar, para o cartao nao ser ultrapassado.
+func _ao_bau_recolhido() -> void:
+	var chave: String = REGIAO_CONCLUIDA.get(EstadoJogo.indice_nivel, "")
+	if chave == "" or not is_inside_tree():
+		_selar(false)
+		return
+	var cartao := preload("res://scripts/cartao_regiao.gd").mostrar(self, chave, _hab_ganha)
+	cartao.fechado.connect(_selar.bind(false))
 
 
 ## Espalha CANDEEIROS e TOCHAS pelo nível. O Paulo: "o jogo está um bocado
@@ -370,6 +441,8 @@ func _fazer_luz(rng: RandomNumberGenerator, tocha: bool) -> Node2D:
 ## Jornada (que gera os seus próprios checkpoints em `_construir`, chamada
 ## com `call_deferred` no `_ready` dela) de já ter acabado.
 func _reduzir_checkpoints() -> void:
+	if checkpoints_autorais:
+		return
 	await get_tree().process_frame
 	await get_tree().process_frame
 	if not is_inside_tree():

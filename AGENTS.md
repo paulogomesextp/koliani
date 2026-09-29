@@ -70,3 +70,10 @@ Na primeira interação do dia, executar `git fetch origin master` e resumir
 `git log origin/master --since="1 day ago"` antes de avançar. No fim, atualizar
 a retoma com factos e próximo passo e indicar usage disponível; se estiver
 indisponível, dizê-lo sem reutilizar números antigos.
+
+## Entregas Windows e PWA — decisão do GM
+
+- Cada alteração destinada a entrega exige atualizar Windows e Web/PWA no mesmo lote, a partir do mesmo commit e da mesma versão em project.godot.
+- Exportar e validar ambos; publicar a PWA e disponibilizar o Windows correspondente. Não concluir uma entrega só numa plataforma.
+- Um candidato local incompleto não é uma entrega. Se um build ou publicação falhar, reportar a divergência e o bloqueio; não declarar paridade apenas pelo número de versão.
+- Preservar userdata/saves em ambas as plataformas. Validação no telemóvel mantém DEVICE VALIDATION REQUIRED até evidência no dispositivo.
