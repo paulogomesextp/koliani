@@ -92,13 +92,13 @@ static func medir(st: SceneTree, caminho: String, indice: int) -> Dictionary:
 	for _i in 8:
 		await st.process_frame
 
-	var resultado := _medir_arvore(st, raiz)
+	var resultado := _medir_arvore(st, raiz, indice)
 	raiz.queue_free()
 	await st.process_frame
 	return resultado
 
 
-static func _medir_arvore(st: SceneTree, raiz: Node) -> Dictionary:
+static func _medir_arvore(st: SceneTree, raiz: Node, indice := -1) -> Dictionary:
 	# --- apanha plataformas (AABB do topo) ---
 	var plats: Array = []
 	_recolher(raiz, plats)
@@ -118,6 +118,7 @@ static func _medir_arvore(st: SceneTree, raiz: Node) -> Dictionary:
 
 	# --- ar: planar contextual e vento (Região II, Process 11) ---
 	var ar := _recolher_ar(raiz)
+	ar["duplo"] = indice >= NIVEL_SALTO_DUPLO
 
 	# --- grafo de alcance ---
 	var n := plats.size()
@@ -315,6 +316,8 @@ static func _da_para_saltar(a: Dictionary, b: Dictionary, ar: Dictionary = {}) -
 		return true
 	if ar.is_empty():
 		return false
+	if bool(ar.get("duplo", false)) and _da_para_saltar_duplo(a, b, ar):
+		return true
 	var a_topo := float(a.topo)
 	var b_topo := float(b.topo)
 	# corrente ascendente
@@ -388,3 +391,70 @@ static func _da_para_saltar_a_pe(a: Dictionary, b: Dictionary) -> bool:
 	if dsub < -QUEDA_MAX:
 		return false
 	return true
+
+
+## SALTO DUPLO (a partir do N6: o duplo e' dado pelo chefe do N5, indice 4
+## em `nivel_com_chefe.gd`). Os 210 px do `VAO_MAX` sao o salto SIMPLES; os
+## niveis da Regiao II em diante sao desenhados para o duplo, e sem isto o
+## crivo dava o N7 e o N8 por mortos quando se passam (medido com a Koliani
+## real em `tools/bench_vao.gd`, 29 set 2026).
+##
+## So' ALARGA O VAO -- a subida continua limitada a `SUBIDA_MAX` e a regra da
+## barriga mantem-se (e' o que apanha os bugs das torres do N10/N12).
+## Envolvente: `P2_D` do `tools/comparar_alcance_f1.gd` (F1 passagem 2,
+## vao maximo borda a borda por subida, a correr com o botao segurado).
+## Confirmada na bancada: duplo a direito percorre 352 px de origem a
+## origem (+ a largura do corpo ~ 380 borda a borda); no N7, PousoD ->
+## CorrenteE (365 px, 28 acima) passa, e so' com a laje no extremo esquerdo.
+##
+## VENTO CONTRA continuo sobre o vao encolhe muito o duplo (bancada, N8,
+## velocidade_max 130): 352 px sem vento, 305 a 1550, 238 a 1800, 183 a
+## 2200. So' ha' medida certa ate' `VENTO_CONTRA_MEDIDO`: ai' o alcance
+## escala por 305/352; acima disso o duplo NAO conta (fica a regra base).
+## Pulsos nao contam nem a favor nem contra: espera-se a pausa.
+const NIVEL_SALTO_DUPLO := 5
+const ENVOLVENTE_DUPLO := {-140.0: 420.0, -60.0: 390.0, 0.0: 380.0, 64.0: 350.0,
+	100.0: 340.0, 140.0: 330.0}
+const VENTO_CONTRA_MEDIDO := 1550.0
+const FATOR_VENTO_CONTRA := 305.0 / 352.0
+
+
+static func _da_para_saltar_duplo(a: Dictionary, b: Dictionary, ar: Dictionary) -> bool:
+	var dsub := float(a.topo) - float(b.topo)   # >0 => b esta' ACIMA de a
+	if dsub > SUBIDA_MAX or dsub < -QUEDA_MAX:
+		return false
+	if dsub > 0.0 and float(b.esq) - float(a.esq) < MARGEM_PONTA \
+			and float(a.dir) - float(b.dir) < MARGEM_PONTA:
+		return false
+	var vao := _vao_entre(float(a.esq), float(a.dir), float(b.esq), float(b.dir))
+	var limite := _envolvente(ENVOLVENTE_DUPLO, dsub)
+	var para_direita := float(b.esq) > float(a.dir)
+	var sentido := 1.0 if para_direita else -1.0
+	var x0 := minf(float(a.dir), float(b.esq)) if para_direita else float(b.dir)
+	var x1 := maxf(float(a.dir), float(b.esq)) if para_direita else float(a.esq)
+	var banda := float(a.topo) - 60.0
+	for f: Dictionary in ar.get("favor", []):
+		var r: Rect2 = f["ret"]
+		if float(f["sentido"]) == sentido or banda < r.position.y or banda > r.end.y:
+			continue
+		if minf(x1, r.end.x) <= maxf(x0, r.position.x):
+			continue   # a zona nao apanha o vao
+		if float(f["intensidade"]) > VENTO_CONTRA_MEDIDO:
+			return false
+		limite *= FATOR_VENTO_CONTRA
+	return vao <= limite
+
+
+## Vao maximo para a subida `dy` (interpolacao linear; abaixo da descida
+## mais funda medida, fica no valor dela -- nao se extrapola a favor).
+static func _envolvente(tab: Dictionary, dy: float) -> float:
+	var ks: Array = tab.keys()
+	ks.sort()
+	if dy <= float(ks[0]):
+		return float(tab[ks[0]])
+	for i in range(1, ks.size()):
+		if dy <= float(ks[i]):
+			var k0: float = ks[i - 1]
+			var k1: float = ks[i]
+			return lerpf(float(tab[k0]), float(tab[k1]), (dy - k0) / (k1 - k0))
+	return float(tab[ks[-1]])
