@@ -36,7 +36,9 @@ var _pele: Sprite2D
 func _ready() -> void:
 	add_to_group("sinos")
 	if textura != null:
-		for nome in ["Corpo", "Aro", "Brilho", "Badalo"]:
+		# com pele pintada, tambem o suporte e a corda de placeholder saem: o
+		# nivel pendura o sino com a sua propria corrente
+		for nome in ["Corpo", "Aro", "Brilho", "Badalo", "Suporte", "Corda"]:
 			var n := get_node_or_null(nome) as CanvasItem
 			if n:
 				n.visible = false

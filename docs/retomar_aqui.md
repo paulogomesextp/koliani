@@ -20,6 +20,73 @@ frames rodados do rolamento vestem-se no `jump_loop_003` e rodam-se; o
 Suite com sandbox limpo (ver relatorio). **Pendente**: aprovacao do Paulo,
 precos finais (hoje 400 V cada, tudo gratis em dev), push.
 
+# >>> N12 -- "Galerias Verticais", autoral (29 set 2026, branch `claude/project-thread-6jbrqw`, SEM push) <<<
+
+**Passe de arte (29 set, depois de "quero niveis com arte detalhada, isso e'
+o mais importante")**: a branch do PR #1 (`claude/project-thread-8ipy7k`)
+foi integrada por merge (conflitos so' nos docs). O N12 ganhou o interior
+da torre (pilares, arcadas, vitrais em arco, rosaceas, raios de lua, tochas),
+24 pecas novas da prancha (`tools/gerar_props_n12_prancha.py`), os 9 props
+geometricos que sobravam no catalogo `torres` recortados da prancha (vale
+para toda a Regiao III), e peles opt-in para coluna de ar, laminas, sinos e
+degraus quebradicos. Capturas: `docs/qa/n12_autoral/`. Armadilha: o
+`gerar_props_torre_ecos.py` desfaz os props se correr depois -- correr
+`gerar_props_prancha.py` e `gerar_props_n12_prancha.py` a seguir.
+Pedido do Paulo: "continuar o desenvolvimento dos niveis conforme as artes
+aprovadas" (o coordenador escolheu: N12 a seguir, autoral, um nivel por
+commit). Relatorio completo: `docs/nivel_autoral_n12.md`.
+
+**Feito**: `Torre_dos_Ventos.tscn` deixou de ser jornada procedural + sala do
+Aerion e passou a sala FEITA A MAO (~2960 x 2700 px), gerada por
+`tools/construir_n12_galerias.py` (editar la', nao no `.tscn`). Contrato A-D
+da prancha: A) base com Elevador 1 (peso) + Sino A de sincronizacao, sem
+inimigos e com rede; B) escadas quebradas, lamina rapida, 3 plataformas que
+desaparecem, Elevador 2 em vaivem, VITRAL que revela a ponte de eco;
+C) coluna de ar + descida quebradica contra o vento; D) Automato + Sino B
+(ponte + gela) + serra vertical rapida, Guardiao = Automato do Sino elite
+(`guard.automato_do_sino`, 6 idiomas). 3 segredos, 5 checkpoints. Inimigos
+principais do contrato: Gargula Vitral, Automato do Sino, Monge das Correntes.
+
+**Arte**: `ElevadorColuna` (script novo sobre `TumuloElevador.tscn`: pedra do
+bioma, friso dourado, 2 correntes que encurtam, roldana fixa que gira);
+`PlataformaQuebra.pele_terreno` e `CorrenteAr.tamanho` (opt-in, nenhum outro
+nivel muda); sinos/vitrais com as peles aprovadas; props da regiao colocados
+a mao. Tudo por NOME de ficheiro/bioma -- quando o PR #1 (arte I-III) entrar,
+o N12 herda props/terreno/fundo novos sem tocar na cena. Sobreposicao com o
+PR #1 em ficheiros: so' `docs/retomar_aqui.md`, `PRIORIDADES.md` e
+`tests/run_tests.gd` (zonas diferentes); nenhuma cena em comum.
+
+**Sino Vivo -- decidido**: fica FORA da campanha (cena/script intactos). O
+contrato so' admite um confronto na regiao (Vyrak, N15); os guardioes vem do
+roster aprovado.
+
+**Aerion**: saiu da campanha; a regressao dele no CI (`tools/verifica_aerion.gd`)
+corre agora em `scenes/qa/ArenaAerion.tscn` com a geometria antiga (4/4 OK).
+
+**Portoes medidos** contra o salto real (salto duplo via `Movimento` + mantle
+32 + folga) e contra `escalar_paredes` (sobe QUALQUER parede sem limite: uma
+face ao alcance da cabeca e' atalho). Testes: `TestesRegion03N12` (novo),
+`teste_r3_n12_contrato` (reescrito, com FISICA real: elevador leva ao A2 e
+volta; coluna de ar leva acima do C1), `teste_r3_n12_portoes_no_crivo` (novo:
+tirar cada portao corta a porta). `tools/verifica_alcance.gd` aprendeu
+elevadores, `CorrenteAr` e `PlataformaSino`.
+
+**ARMADILHAS (custaram tempo)**:
+  - `koliani.gd::Y_MORTE = 1200` -- abaixo disso morre-se, e a morte faz
+    `reload_current_scene`: num teste recarrega o PROPRIO corredor de testes
+    (sintoma: `get_tree()` nulo a meio de um `await`, nenhuma mensagem de
+    morte). O gerador desenha com o chao a 2400 e desloca tudo -1400.
+  - Fora do `Main`, a Koliani nasce com a FISICA DESLIGADA -- testes de
+    fisica e capturas tem de fazer `set_physics_process(true)`.
+  - Neste contentor Linux ha' Godot 4.7.2 (download oficial) + xvfb para
+    capturas; `tools/shot_plataforma.gd` nao move a Koliani (fisica
+    desligada) -- captura sempre o spawn.
+
+**Por fazer**: playtest humano (duracao, leitura dos sinos/vitral, dureza da
+serra B2->B3, TTK do Guardiao). Depois N13 (Mecanismos Antigos) e N14
+(Campanario) com o mesmo tratamento -- ainda tem jornada + guardioes fora do
+contrato (`guard.voltaris`, `guard.sacerdotisa_lunar`).
+
 # >>> Loja -- cosméticos com arte + Galeria de Conceitos (29 set 2026, branch `claude/project-thread-mbzvi6`, PR #2) <<<
 Relatório: `docs/execution_loja_cosmeticos_arte.md`.
 - Molduras com arte (HUD + fogueira) e rastos do dash passaram a
@@ -43,6 +110,18 @@ Relatório: `docs/execution_loja_cosmeticos_arte.md`.
   Esc volta à Loja), ambas no `tools/correr_qa_cosmeticos.ps1`.
 - Não tocado: skins da Koliani, preços/interruptor grátis (outra sessão),
   fundos/terreno, N11.
+
+# >>> ARTE DAS PRANCHAS -- Regioes I a III (29 set 2026, branch `claude/project-thread-8ipy7k`, sem push) <<<
+O Paulo achou a arte dos niveis "muito fraca" face as pranchas aprovadas.
+Relatorio completo: `docs/execution_arte_pranchas_regioes_1_3.md`.
+  - Regiao II (N6-N10): fundo, terreno e casca recortados 1:1 das pranchas.
+  - Regiao III (N11-N15): fundo, terreno (material novo `torre_ecos`, so'
+    para o `fundo_pack` torre_ecos) e 21 props recortados das pranchas.
+    **Isto resolve a "causa raiz por resolver" do N11 abaixo** (mosaico CC0
+    de 192 px) sem mexer na cena do N11.
+  - Regiao I: tirado o corte a direito da copa no topo do ecra.
+Por fazer: SinoTorre/Vitral ainda poligonos, superficie do pantano/abismo
+chapada, N16-N100 intactos. Push/PR so' com autorizacao do Paulo.
 
 # >>> N11 -- passe de enriquecimento (29 set 2026, commitado, nao empurrado ainda) <<<
 Pedido do Paulo apos ver o N11 (28 set): "esta pequeno, so' uma subida, sem

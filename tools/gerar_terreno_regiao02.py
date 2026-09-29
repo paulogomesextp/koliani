@@ -24,6 +24,10 @@ frio, e a aresta de luz e' o `#c68af9` do nucleo do Guardiao.
 
   python tools/gerar_terreno_regiao02.py
   (depois: godot --headless --import)
+
+29 set 2026: o TERRENO (`terreno/desfiladeiro/*.png`) passou a sair de
+`tools/gerar_terreno_prancha.py`, recortado da prancha aprovada. Se correres
+este script, corre esse a seguir, senao o terreno volta ao tijolo recolorido.
 """
 
 from __future__ import annotations
