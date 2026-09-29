@@ -30,6 +30,10 @@ coluna dupla, vitral, pedra de memoria, detritos.
 
   python3 tools/gerar_props_torre_ecos.py
   (depois: godot --headless --import)
+
+29 set 2026: 21 destes props passaram a ser recortados da prancha aprovada
+por `tools/gerar_props_prancha.py`. Se correres este script, corre esse a
+seguir, senao voltam as formas geometricas.
 """
 from __future__ import annotations
 
