@@ -62,6 +62,19 @@ const ITENS := [
 		"inicial": false, "destaque": false, "preview": "", "placeholder": true, "efeito": "cosmetico"},
 	{"id": "extra_galeria_conceitos", "categoria": "extras", "k": 400, "v": -1, "regiao": -1, "raridade": "comum",
 		"inicial": false, "destaque": false, "preview": "", "placeholder": true, "efeito": "cosmetico"},
+	# --- Skins com arte real (Golden Set com a paleta trocada) ---------------
+	# `tools/gerar_skins_koliani.py`; a pasta de cada uma está em
+	# `CosmeticosVisuais.DIR_SKIN`. Temas das regiões IV, IX e XIV, mas à venda
+	# desde o início (`regiao` -1): não fazem parte das coleções regionais.
+	{"id": "skin_fornalha", "categoria": "skins", "k": 600, "v": -1, "regiao": -1, "raridade": "raro",
+		"inicial": false, "destaque": true, "preview": "res://assets/sprites/koliani_skins/fornalha/preview.png",
+		"placeholder": false, "efeito": "cosmetico"},
+	{"id": "skin_abadia_afogada", "categoria": "skins", "k": 900, "v": 180, "regiao": -1, "raridade": "epico",
+		"inicial": false, "destaque": true, "preview": "res://assets/sprites/koliani_skins/abadia_afogada/preview.png",
+		"placeholder": false, "efeito": "cosmetico"},
+	{"id": "skin_celestial", "categoria": "skins", "k": -1, "v": 250, "regiao": -1, "raridade": "lendario",
+		"inicial": false, "destaque": true, "preview": "res://assets/sprites/koliani_skins/celestial/preview.png",
+		"placeholder": false, "efeito": "cosmetico"},
 	# --- Coleção Região I: Relíquias do Coração Podre (Heartrot Relics) ------
 	{"id": "skin_coracao_podre", "categoria": "skins", "k": -1, "v": 240, "regiao": 0, "raridade": "epico",
 		"k_eq": 960, "v_eq": 240,

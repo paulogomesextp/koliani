@@ -202,6 +202,7 @@ func _correr_tudo() -> void:
 	teste_loja_progressao_regional_e_gameplay()
 	teste_loja_i18n()
 	teste_loja_cosmeticos_visuais()
+	teste_skins_arte_real()
 	teste_loja_colecao_regiao_i()
 	teste_rootbound_frame()
 
@@ -4475,6 +4476,76 @@ func teste_loja_i18n() -> void:
 		for k: String in traduzidas:
 			_ok(d.has(k) and str(d[k]) != "" and str(d[k]) != str(en[k]), "loja: %s sem traducao real em %s" % [k, loc])
 	_ok(en.has("menu.shop"), "loja: falta menu.shop")
+
+
+## Skins com arte real (`tools/gerar_skins_koliani.py`): cada uma espelha o
+## Golden Set frame a frame, com a MESMA silhueta (alfa igual) e cores outras,
+## e a Koliani equipada com ela monta os frames da pasta da skin.
+func teste_skins_arte_real() -> void:
+	const CV := preload("res://scripts/cosmeticos_visuais.gd")
+	const GOLD := "res://assets/sprites/koliani_golden_set/frames/"
+	_ok(CV.DIR_SKIN.size() >= 3, "skins: devia haver pelo menos 3 skins com arte")
+	_ok(CV.dir_skin("skin_koliani_base") == "" and CV.dir_skin("skin_carmesim") == "",
+		"skins: base/tinta nao tem pasta de arte")
+	var golden: Array[String] = []
+	for anim in DirAccess.get_directories_at(GOLD):
+		for f in DirAccess.get_files_at(GOLD + anim):
+			if f.get_extension() == "png":
+				golden.append(anim + "/" + f)
+	_ok(golden.size() >= 80, "skins: Golden Set com %d frames?" % golden.size())
+	for id: String in CV.DIR_SKIN:
+		var it := LojaCatalogo.item(id)
+		_ok(not it.is_empty() and it["categoria"] == "skins" and it["placeholder"] == false,
+			"skins: %s no catalogo com arte" % id)
+		_ok(CV.preview_loja(id) != null and CV.dir_skin(id) == CV.DIR_SKIN[id], "skins: %s sem preview" % id)
+		_ok(CV.tinta_skin(id) == Color.WHITE, "skins: %s nao deve levar tinta por cima da arte" % id)
+		var faltam := 0
+		for rel in golden:
+			if not ResourceLoader.exists(CV.DIR_SKIN[id] + "/frames/" + rel):
+				faltam += 1
+		_ok(faltam == 0, "skins: %s sem %d frames do Golden Set" % [id, faltam])
+		# a mesma silhueta, outras cores
+		var a := (load(GOLD + "idle/idle_001.png") as Texture2D).get_image()
+		var b := (load(CV.DIR_SKIN[id] + "/frames/idle/idle_001.png") as Texture2D).get_image()
+		var alfa_igual := a.get_size() == b.get_size()
+		var cores_dif := 0
+		if alfa_igual:
+			for y in a.get_height():
+				for x in a.get_width():
+					var ca := a.get_pixel(x, y)
+					var cb := b.get_pixel(x, y)
+					if absf(ca.a - cb.a) > 0.004:
+						alfa_igual = false
+					elif ca.a > 0.0 and not ca.is_equal_approx(cb):
+						cores_dif += 1
+		_ok(alfa_igual, "skins: %s mudou a silhueta" % id)
+		_ok(cores_dif > 400, "skins: %s quase igual ao original (%d px)" % [id, cores_dif])
+	# a Koliani com a skin equipada monta os frames da pasta dela
+	var ids: Array = CV.DIR_SKIN.keys()
+	var id0: String = ids[0]
+	var comprados_antes: Array = EstadoJogo.itens_comprados.duplicate()
+	var equipados_antes: Dictionary = EstadoJogo.cosmeticos_equipados.duplicate()
+	EstadoJogo.itens_comprados.append(id0)
+	EstadoJogo.cosmeticos_equipados["skins"] = id0   # sem equipar_item: nao grava
+	var k: Koliani = preload("res://scenes/actors/Koliani.tscn").instantiate()
+	k.usar_golden_set = true
+	add_child(k)
+	var corpo := k.get_node_or_null("Sprite/Corpo") as AnimatedSprite2D
+	var sf := corpo.sprite_frames if corpo else null
+	_ok(sf != null and sf.get_frame_texture("idle", 0).resource_path.begins_with(CV.DIR_SKIN[id0]),
+		"skins: Koliani com %s devia ler os frames da skin" % id0)
+	_ok(sf != null and sf.get_frame_texture("run", 0).resource_path.begins_with(CV.DIR_SKIN[id0]),
+		"skins: run_final tambem da skin")
+	k.free()
+	EstadoJogo.itens_comprados.assign(comprados_antes)
+	EstadoJogo.cosmeticos_equipados = equipados_antes
+	var k2: Koliani = preload("res://scenes/actors/Koliani.tscn").instantiate()
+	k2.usar_golden_set = true
+	add_child(k2)
+	var c2 := k2.get_node_or_null("Sprite/Corpo") as AnimatedSprite2D
+	_ok(c2 != null and c2.sprite_frames.get_frame_texture("idle", 0).resource_path.begins_with(GOLD),
+		"skins: sem skin equipada volta ao Golden Set")
+	k2.free()
 
 
 func teste_loja_cosmeticos_visuais() -> void:

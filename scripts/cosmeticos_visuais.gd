@@ -13,6 +13,15 @@ const TINTA_SKIN := {
 	"skin_carmesim": Color(1.35, 0.62, 0.7),
 	"skin_luar": Color(0.75, 0.9, 1.35),
 }
+## id do item -> pasta de uma skin com ARTE real: um espelho do Golden Set
+## (`frames/<anim>/<png>`, mesmo contrato de canvas) com a paleta trocada por
+## `tools/gerar_skins_koliani.py`. O `koliani.gd` lê daqui os frames que a
+## pasta tiver e cai no Golden Set para os que faltarem.
+const DIR_SKIN := {
+	"skin_fornalha": "res://assets/sprites/koliani_skins/fornalha",
+	"skin_abadia_afogada": "res://assets/sprites/koliani_skins/abadia_afogada",
+	"skin_celestial": "res://assets/sprites/koliani_skins/celestial",
+}
 ## id -> cor do rasto do dash (o base é `koliani.COR_SHADOWBLADE`).
 const COR_RASTO := {
 	"efeito_rasto_brasa": Color(1.0, 0.5, 0.12),
@@ -36,6 +45,11 @@ static func _equipado(categoria: String) -> String:
 
 static func tinta_skin(id := "") -> Color:
 	return TINTA_SKIN.get(id if id != "" else _equipado("skins"), NEUTRO)
+
+
+## Pasta da skin equipada (ou de `id`); "" = Golden Set original.
+static func dir_skin(id := "") -> String:
+	return DIR_SKIN.get(id if id != "" else _equipado("skins"), "")
 
 
 ## Devolve `base` se não houver rasto equipado.
@@ -123,4 +137,9 @@ static func checkpoint_visual(id := "") -> Dictionary:
 
 ## Preview real da Loja para um item ("" = sem arte, fica o placeholder).
 static func preview_loja(id: String) -> Texture2D:
-	return _tex_raizes("preview") if id == ID_RAIZES else null
+	if id == ID_RAIZES:
+		return _tex_raizes("preview")
+	if DIR_SKIN.has(id):
+		var cam: String = DIR_SKIN[id] + "/preview.png"
+		return load(cam) if ResourceLoader.exists(cam) else null
+	return null
