@@ -48,7 +48,7 @@ func _ok(cond: bool, msg: String) -> void:
 func _duble(pos: Vector2) -> CharacterBody2D:
 	var gd := GDScript.new()
 	gd.source_code = "extends CharacterBody2D\nvar _olha_para := 1.0\nvar levou := 0\n" \
-		+ "func receber_dano(q: int, _d: float = 0.0) -> void:\n\tlevou += q\n"
+		+ "func receber_dano(q: int, _d: float = 0.0, _origem: String = \"\") -> void:\n\tlevou += q\n"
 	gd.reload()
 	var c := CharacterBody2D.new()
 	c.set_script(gd)
