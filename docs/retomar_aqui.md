@@ -1,3 +1,59 @@
+# >>> N11 -- passe de enriquecimento (29 set 2026, commitado, nao empurrado ainda) <<<
+Pedido do Paulo apos ver o N11 (28 set): "esta pequeno, so' uma subida, sem
+mecanicas, sem arte de jeito" -- depois esclareceu que "arte de jeito" nao
+exige tudo desenhado de origem (CC0 tematico serve) e por fim apontou o
+problema real: **as plataformas em si sao planas, sem VFX, sem detalhe,
+"nada como o aprovado anteriormente"**.
+
+**O que foi feito nesta sessao** (`scenes/levels/Torre_dos_Sinos.tscn`,
+por cima da estrutura A-F testada, nada apagado):
+  - Espinhos na entrada (hazard "espinhos simples" do contrato, vocabulario
+    que o jogo ja' tem desde o N1) + Essencia bonus por cima (Segredo 1);
+  - **Sino Flutuante** (voador) e **Arqueiro das Sombras** (cuspidor,
+    elevado) -- os 2 dos 3 "inimigos principais" do N11 no contrato LOCKED
+    (`docs/art_direction/regions/region_03/
+    REGION03_VISUAL_GAMEPLAY_CONTRACT.md`) que faltavam; os sprites ja'
+    estavam extraidos e registados em `demonio_base.gd`, nunca usados em
+    nivel nenhum;
+  - **Sentinela da Torre** (escudeiro) no mini-teste final -- o "ritmo
+    base" da regiao que o contrato pede mesmo fora da lista de principais;
+  - ramo OPCIONAL a partir de E1: `PlataformaQuebra` -> `PlataformaCorrente`
+    (mecanica "correntes moveis" do contrato, ainda nao usada em nivel
+    nenhum) -> `PenduloLamina` lenta a guardar `EssenciaSegredoAlto`
+    (Segredo 2) -- zero risco de softlock, e' inteiramente opcional;
+  - 2 props ancora do pack aprovado da regiao (`sino_partido.png` e
+    `vitral_alto.png` de `tools/gerar_props_torre_ecos.py`, ja' geradas
+    numa sessao anterior e nunca colocadas em nivel nenhum) com luz no
+    vitral (mesma formula de `plataforma.gd::_acender`).
+Suite completa: **0 falhas, save intacto** (`tools/correr_testes.ps1`,
+exit 0). Teste estrutural `TestesRegion03N11` continua a passar (distancias
+aos elementos de ensino verificadas a mao para cada novo inimigo).
+
+**O que NAO ficou resolvido -- o Paulo tem razao, e a causa esta' medida**:
+as plataformas de N11 (e de toda a Regiao III, e de todas as regioes
+excepto a I) desenham-se por `Plataforma._tex(bioma, peca)`, que carrega
+`assets/sprites/pixel/terreno/torres/corpo.png` -- um mosaico de **192x192
+px recortado do pack CC0 "church"**, tingido pela paleta do contrato mas
+SEM silhueta organica, SEM antialiasing, SEM VFX. A Regiao I tem um
+sistema `Kit`/`HybridL1` (`scripts/regiao1_kit.gd` +
+`scripts/l1_hybrid_9h12e.gd`) que resolve exactamente este problema --
+terreno HD (`terreno_corpo_hd.png`, escala x3, desenhado quase a 1:1 no
+ecra' em vez de ampliado por interpolacao) com silhueta irregular,
+vegetacao por cima, raiz por baixo -- mas **e' exclusivo da Regiao I**: o
+no' que o liga (`Kit.alvo()`) procura um grupo que so' existe nas cenas do
+N1-N5. Nenhuma outra regiao foi migrada para ele, e o "corpo_hd" e'
+literalmente rocha/vegetacao de floresta -- nao daria para pintar por cima
+com pedra gotica sem reconstruir a peca.
+
+**A seguir (nao comecado)**: gerar um kit HD equivalente para o bioma
+"torres" (pedra talhada + dourado, sem vegetacao/raizes -- iconografia
+gotica, nao floresta), no mesmo espirito do `l1_hybrid_9h12e.gd` mas com
+arte propria da regiao, e ligar `Plataforma._aplicar()` a usa-lo quando o
+bioma for "torres" (ou generalizar o sistema `Kit` para aceitar bioma em
+vez de assumir Regiao I). Isto e' trabalho de MOTOR/PIPELINE de arte, nao
+so' desta cena -- se resolvido, melhora as 5 cenas da Regiao III de uma
+vez, nao so' o N11. **NAO comecar o N12** (continua a valer).
+
 # >>> N11 -- "Entrada dos Ecos", introducao da Regiao III (28 set 2026, sem push) <<<
 Estrutura regional (mesma logica do N6-N10): **N11 = Introducao/Teach** da
 Torre dos Ecos. Briefing do GM: "auditar e construir/reconstruir o N11" --
