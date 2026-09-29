@@ -11,6 +11,8 @@ escala 1.0): física, câmara, colisão e hitbox não mudam. **Não editar os PN
 | `fornalha/` | `skin_fornalha` (Guardiã da Forja) | cornos com fendas de brasa, ombreira de ferro com espigão, montante de brasa |
 | `abadia_afogada/` | `skin_abadia_afogada` (Abadessa Afogada) | capuz fundo com orla verde-água, tridente |
 | `celestial/` | `skin_celestial` (Serafim Celestial) | asas de penas (batem), auréola, ombreira de ouro em asa, espada solar |
+| `vazio/` | `skin_vazio` (Arauta do Vazio) | coroa de espinhos, capa rasgada (esvoaça), foice |
+| `brasa/`, `mare/`, `marfim/` | `skin_brasa`, `skin_mare`, `skin_marfim` | **só paleta** (as cores da Forja/Abadia/Celestial), silhueta do Golden Set |
 
 - `pecas/` — cada peça solta (cabeça, ombreira, asa, arma), para rever e para
   ícones futuros.

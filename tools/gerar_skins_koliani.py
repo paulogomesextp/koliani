@@ -98,7 +98,28 @@ SKINS: dict[str, dict] = {
 									"guarda": "F4BE36", "punho": "6A4A12"}),
 		},
 	},
+	# Regiao XIX -- Portal Dimensional. Roxo do vazio e magenta a brilhar (o
+	# tema da key art); coroa de espinhos, capa rasgada e foice.
+	"vazio": {
+		"acento": [(0.00, "12041A"), (0.22, "3A0C4A"), (0.42, "7A1A90"),
+				   (0.62, "C83CD8"), (0.85, "F29AF8"), (1.00, "FFE6FF")],
+		"tecido": [(0.00, "08060C"), (0.12, "141020"), (0.24, "221A34"),
+				   (0.40, "3A2C54"), (0.70, "6A5890")],
+		"forca_tecido": 0.9,
+		"gema": "FF6AF0",
+		"conjunto": {
+			"costas_capa": (["0A0810", "1A1428", "2C2244", "3E3260", "B86AD8", "F29AF8"], "FF6AF0"),
+			"cabeca": ("COROA_ESPINHOS", ["2A1A34", "4A3460", "6A5090", "9A80C0", "D0C0F0", "FFFFFF"], "FF6AF0"),
+			"arma": ("foice", {"lamina": "C8C0E0", "gume": "FF6AF0", "fio": "FFFFFF",
+							   "guarda": "4A3460", "punho": "2A1E30"}),
+		},
+	},
 }
+
+# Skins SO' de paleta (o Paulo aceita algumas, 29 set): as mesmas rampas dos
+# conjuntos, sem pecas. Mantem a silhueta do Golden Set.
+for _nome, _base in (("brasa", "fornalha"), ("mare", "abadia_afogada"), ("marfim", "celestial")):
+	SKINS[_nome] = {k: v for k, v in SKINS[_base].items() if k != "conjunto"}
 
 # Brilho abaixo do qual o pixel e' contorno e nao muda (a silhueta).
 CONTORNO_V = 0.07
@@ -224,6 +245,11 @@ def vestir(orig: Image.Image, skin: dict, indice: int = 0) -> Image.Image:
 		# bate as asas: abre e fecha de frame para frame
 		asa = T.asa(cj["costas"][1], CONTORNO_PECAS, 1.0 if (indice // 2) % 2 == 0 else 0.45)
 		im = T.colar(im, *asa, (cara[0] - 6, cara[1] + 9), False)
+	if "costas_capa" in cj:
+		rampa, brilho = cj["costas_capa"]
+		vento = 0.0 if indice < 0 else (0.25 if (indice // 2) % 2 == 0 else 0.45)
+		cp = T.capa(rampa, CONTORNO_PECAS, brilho, vento)
+		im = T.colar(im, *cp, (cara[0] - 4, cara[1] + 6), False)
 	if "ombreira" in cj:
 		o = T.ancora_ombro(orig, cara)
 		if o:
@@ -262,12 +288,14 @@ def exportar_pecas() -> None:
 	dest = os.path.join(DEST, "pecas")
 	os.makedirs(dest, exist_ok=True)
 	for nome, skin in SKINS.items():
-		cj = skin["conjunto"]
+		cj = skin.get("conjunto", {})
 		if "cabeca" in cj:
 			_peca_cabeca(cj["cabeca"])[0].save(os.path.join(dest, f"{nome}_cabeca.png"))
 		if "ombreira" in cj:
 			g, rampa, brilho = cj["ombreira"]
 			T.ombreira(getattr(T, g), rampa, CONTORNO_PECAS, brilho)[0].save(os.path.join(dest, f"{nome}_ombreira.png"))
+		if "costas_capa" in cj:
+			T.capa(cj["costas_capa"][0], CONTORNO_PECAS, cj["costas_capa"][1])[0].save(os.path.join(dest, f"{nome}_capa.png"))
 		if "costas" in cj:
 			T.asa(cj["costas"][1], CONTORNO_PECAS, 1.0)[0].save(os.path.join(dest, f"{nome}_asa.png"))
 		if "arma" in cj:
@@ -275,7 +303,7 @@ def exportar_pecas() -> None:
 			tela = Image.new("RGBA", (40, 12), (0, 0, 0, 0))
 			d = ImageDraw.Draw(tela)
 			tipo, cores = cj["arma"]
-			comp = 24 if tipo != "lanca_mare" else 18
+			comp = {"lanca_mare": 18, "foice": 16}.get(tipo, 24)
 			T.ARMAS[tipo](d, (6.0, 6.0), (1.0, 0.0), comp, {k: T._hx(v) for k, v in cores.items()})
 			T.contornar(tela, T._hx(CONTORNO_PECAS)).save(os.path.join(dest, f"{nome}_arma_{tipo}.png"))
 

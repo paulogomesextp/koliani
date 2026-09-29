@@ -543,3 +543,88 @@ def ombreira(grelha: list[str], rampa: list[str], contorno: str, brilho: str) ->
 		im, _x, _y = desenhar(grelha + ["@"], rampa, contorno, brilho)
 		return im.crop((0, 0, im.width, len(grelha))), ax, ay
 	return desenhar(g, rampa, contorno, brilho)
+
+
+# --------------------------------------------------------------------------
+# Arauta do Vazio: coroa de espinhos, capa rasgada, foice.
+# --------------------------------------------------------------------------
+
+COROA_ESPINHOS = [
+	"..K.....K....K.....",
+	".K5K...K6K..K5K....",
+	".K4K..K65K..K4K..K.",
+	".K43KK4E43KK43K.K5K",
+	"..K3KK3443KK33KK43K",
+	"..K3333333333333K3K",
+	"...K222E222222E22K.",
+	"....KKKKKKKKKKKKKK.",
+	"...................",
+	"...................",
+	"...................",
+	"...................",
+	"...................",
+	"...................",
+	"...................",
+	"...........@.......",
+]
+
+
+def capa(rampa: list[str], contorno: str, brilho: str, vento: float = 0.0) -> tuple[Image.Image, int, int]:
+	"""Capa presa aos ombros a cair para tras, com a bainha rasgada em
+	dentes. Ancora = nuca. `vento` 0..1 levanta a bainha (corrida/salto)."""
+	from PIL import ImageDraw
+	W, H = 44, 52
+	ax, ay = 34, 6
+	im = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+	d = ImageDraw.Draw(im)
+	c = [_hx(x) for x in rampa]
+	queda = 40 - 14 * vento      # quanto desce
+	recuo = 14 + 18 * vento      # quanto vai para tras
+	topo = [(ax + 2, ay), (ax - 6, ay - 1)]
+	fundo_tras = (ax - 6 - recuo, ay + queda)
+	fundo_frente = (ax - 2 - recuo * 0.35, ay + queda + 4)
+	corpo = [topo[0], topo[1], (ax - 10 - recuo * 0.6, ay + queda * 0.55), fundo_tras]
+	# bainha em dentes, de tras para a frente
+	dentes = []
+	n = 6
+	for i in range(n + 1):
+		t = i / n
+		x = fundo_tras[0] + (fundo_frente[0] - fundo_tras[0]) * t
+		y = fundo_tras[1] + (fundo_frente[1] - fundo_tras[1]) * t
+		dentes.append((x, y + (4 if i % 2 else -2)))
+	pts = corpo + dentes + [(ax + 1, ay + queda * 0.6), (ax + 3, ay + 4)]
+	d.polygon(pts, fill=c[1])
+	# dobras: faixas mais claras a descer
+	for k, f in enumerate((0.25, 0.5, 0.75)):
+		x0 = ax - 6 * (1 - f) - 2
+		d.line([(x0, ay + 2), (x0 - recuo * 0.8 * f - 4, ay + queda * 0.95)], fill=c[2 + (k % 2)], width=2)
+	# forro visivel junto a gola + fecho brilhante
+	d.line([(ax - 6, ay), (ax + 2, ay)], fill=c[4], width=2)
+	im.putpixel((ax + 1, ay + 1), _hx(brilho))
+	return contornar(im, _hx(contorno)), ax, ay
+
+
+def _foice(d, p, u, comp, c):
+	"""Foice de cabo comprido: a lamina curva nasce na ponta, para tras."""
+	n = (-u[1], u[0])
+	L = max(10.0, comp - 2)
+	_quad(d, _ao_longo(p, u, -10), _ao_longo(p, u, L), 1.6, 1.6, c["punho"])
+	topo = _ao_longo(p, u, L)
+	# lamina: arco de ~12 px virado para o lado "n" e para tras
+	pts = []
+	for i in range(9):
+		t = i / 8
+		ang = math.pi * 0.9 * t
+		r = 13
+		x = topo[0] + n[0] * r * math.sin(ang) - u[0] * r * (1 - math.cos(ang)) * 0.6
+		y = topo[1] + n[1] * r * math.sin(ang) - u[1] * r * (1 - math.cos(ang)) * 0.6
+		pts.append((x, y))
+	for i in range(len(pts) - 1):
+		w = 4.2 - 3.2 * i / (len(pts) - 1)
+		_quad(d, pts[i], pts[i + 1], w, max(0.8, w - 0.4), c["lamina"])
+	for i in range(len(pts) - 2):
+		_quad(d, pts[i], pts[i + 1], 0.9, 0.9, c["fio"])
+	d.point([topo], fill=c["gume"])
+
+
+ARMAS["foice"] = _foice
