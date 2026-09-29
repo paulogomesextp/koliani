@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3]
+
+; Provador de skins da Koliani -- ver provador_skins.gd
+
+[ext_resource type="Script" path="res://tools/provador_skins.gd" id="1_prov"]
+
+[node name="ProvadorSkins" type="Node2D"]
+script = ExtResource("1_prov")
