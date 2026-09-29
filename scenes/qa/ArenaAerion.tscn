@@ -1,0 +1,35 @@
+[gd_scene load_steps=6 format=3 uid="uid://bkolianiqaarenaaerion"]
+
+; Arena de QA do Aerion (o antigo guardiao do N12). O N12 passou a nivel
+; AUTORAL da Torre dos Ecos (29 set 2026) e o Aerion -- cavaleiro do vento,
+; fora do contrato LOCKED da Regiao III -- saiu da campanha. O chefe continua
+; no jogo (cena/script intactos) e a regressao do `tools/verifica_aerion.gd`
+; (chao medido antes da sincronizacao da fisica) continua a correr AQUI, com
+; a mesma geometria que a sala antiga tinha: chao da arena com topo a 240.
+
+[ext_resource type="PackedScene" uid="uid://bkolianiactor01" path="res://scenes/actors/Koliani.tscn" id="1_kol"]
+[ext_resource type="PackedScene" uid="uid://bkolianiporta01" path="res://scenes/actors/Porta.tscn" id="2_porta"]
+[ext_resource type="PackedScene" uid="uid://bkolianichefeaerion12" path="res://scenes/actors/ChefeAerion.tscn" id="3_chefe"]
+[ext_resource type="Script" path="res://scripts/nivel_com_chefe.gd" id="4_niv"]
+[ext_resource type="PackedScene" uid="uid://bkolianiplataforma01" path="res://scenes/actors/Plataforma.tscn" id="5_pl"]
+
+[node name="ArenaAerion" type="Node2D"]
+script = ExtResource("4_niv")
+corredor = false
+alongar_plataformas = false
+checkpoints_autorais = true
+
+[node name="ChaoChefe" parent="." instance=ExtResource("5_pl")]
+position = Vector2(660, 270)
+tamanho = Vector2(560, 60)
+altura_visual = 100.0
+
+[node name="Chefe" parent="." instance=ExtResource("3_chefe")]
+position = Vector2(780, 194)
+
+[node name="Koliani" parent="." instance=ExtResource("1_kol")]
+position = Vector2(480, 200)
+
+[node name="Porta" parent="." instance=ExtResource("2_porta")]
+position = Vector2(900, 246)
+pista_ao_atravessar = ""

@@ -27,6 +27,10 @@ extends StaticBody2D
 ## a sempre, e e' o que todos os outros niveis usam.
 @export var textura: Texture2D
 
+## Cada badalada (golpe ou projetil). O `MecanismoSinos` do N13 escuta-a
+## para ler o padrao.
+signal badalada(sino: Node)
+
 var _cd := 0.0
 var _pele: Sprite2D
 
@@ -36,7 +40,9 @@ var _pele: Sprite2D
 func _ready() -> void:
 	add_to_group("sinos")
 	if textura != null:
-		for nome in ["Corpo", "Aro", "Brilho", "Badalo"]:
+		# com pele pintada, tambem o suporte e a corda de placeholder saem: o
+		# nivel pendura o sino com a sua propria corrente
+		for nome in ["Corpo", "Aro", "Brilho", "Badalo", "Suporte", "Corda"]:
 			var n := get_node_or_null(nome) as CanvasItem
 			if n:
 				n.visible = false
@@ -56,6 +62,16 @@ func receber_dano(_quantidade: int = 0, _dir: float = 0.0) -> void:
 		return
 	_cd = recarga
 	tocar()
+
+
+## So' o brilho da badalada, sem som nem efeito no cenario: o `MecanismoSinos`
+## usa-o para MOSTRAR a ordem (o eco do padrao) e para marcar os ja' certos.
+func brilhar(forca := 1.0) -> void:
+	var alvo: CanvasItem = _pele if _pele else get_node_or_null("Corpo") as CanvasItem
+	if alvo == null:
+		return
+	alvo.modulate = Color(1.0 + 0.7 * forca, 1.0 + 0.55 * forca, 1.0 + 0.2 * forca)
+	create_tween().tween_property(alvo, "modulate", Color.WHITE, 0.55)
 
 
 func tocar() -> void:
@@ -87,6 +103,7 @@ func tocar() -> void:
 		t.tween_property(_badalo, "rotation", -0.4, 0.12)
 		t.tween_property(_badalo, "rotation", 0.0, 0.3).set_trans(Tween.TRANS_SINE)
 	_onda()
+	badalada.emit(self)
 	if not so_congela:
 		for p in get_tree().get_nodes_in_group(alterna_grupo):
 			_alternar(p)

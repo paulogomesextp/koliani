@@ -26,6 +26,8 @@ const TestesGlideRegiao02 := preload("res://tests/test_glide_region02.gd")
 ## o mesmo padrao usado quando N06/N07 passaram a autorais.
 const TestesRegion02N10 := preload("res://tests/test_region02_n10_level.gd")
 const TestesRegion03N11 := preload("res://tests/test_region03_n11_level.gd")
+const TestesRegion03N12 := preload("res://tests/test_region03_n12_level.gd")
+const TestesRegion03N13 := preload("res://tests/test_region03_n13_level.gd")
 const TestesKolianiCanonicaNiveis := preload("res://tests/test_koliani_canonica_niveis.gd")
 const DT := 1.0 / 60.0
 
@@ -37,6 +39,9 @@ func _ready() -> void:
 
 
 func _correr_tudo() -> void:
+	# os testes da Loja verificam os precos REAIS; o interruptor de "tudo gratis
+	# em desenvolvimento" tem o seu proprio teste (`teste_loja_gratis_dev`)
+	LojaCatalogo.gratis = false
 	# iteracao rapida: `SO_TESTE=teste_n5_autoral` corre so' essa funcao
 	var so_teste := OS.get_environment("SO_TESTE")
 	if so_teste != "":
@@ -57,6 +62,10 @@ func _correr_tudo() -> void:
 	for falha in TestesRegion02N10.executar():
 		_falhas.append(falha)
 	for falha in TestesRegion03N11.executar():
+		_falhas.append(falha)
+	for falha in TestesRegion03N12.executar():
+		_falhas.append(falha)
+	for falha in TestesRegion03N13.executar():
 		_falhas.append(falha)
 	for falha in TestesKolianiCanonicaNiveis.executar():
 		_falhas.append(falha)
@@ -198,12 +207,16 @@ func _correr_tudo() -> void:
 	# --- Loja (Kolicoins / Veracoins, so cosmeticos) ---------------------
 	teste_loja_catalogo()
 	teste_loja_compras_e_equipar()
+	teste_loja_gratis_dev()
 	teste_loja_save_e_compatibilidade()
 	teste_loja_progressao_regional_e_gameplay()
 	teste_loja_i18n()
 	teste_loja_cosmeticos_visuais()
+	teste_skins_arte_real()
 	teste_loja_colecao_regiao_i()
 	teste_rootbound_frame()
+	teste_loja_arte_molduras_rastos()
+	teste_galeria_conceitos()
 
 	# --- Região III -- Torre dos Ecos (N11-N15) -----------------------
 	teste_r3_nomes_canonicos()
@@ -214,6 +227,9 @@ func _correr_tudo() -> void:
 	teste_r3_bestiario_canonico()
 	await teste_r3_niveis_carregam()
 	await teste_r3_n12_contrato()
+	await teste_r3_n12_portoes_no_crivo()
+	await teste_r3_n13_mecanismos()
+	await teste_r3_n13_elevadores_no_crivo()
 	await teste_r3_vyrak_identidade()
 	await teste_r3_vyrak_leva_dano_muda_de_fase_e_morre()
 
@@ -2784,7 +2800,9 @@ func teste_packs_de_fundo_existem() -> void:
 				% [pack_atual, ml.get_string(1)]
 			_ok(FileAccess.file_exists(caminho),
 				"pack '%s': falta %s" % [pack_atual, caminho])
-			_ok(ml.get_string(2) in ["Fundo", "Longe", "Meio", "Perto"],
+			# "MarBaixo" nao esta' na cena: o `atmosfera.gd` cria-a por
+			# codigo quando um pack a pede (segundo banco de nuvens).
+			_ok(ml.get_string(2) in ["Fundo", "Longe", "Meio", "Perto", "MarBaixo"],
 				"pack '%s': camada '%s' nao existe no Parallax"
 					% [pack_atual, ml.get_string(2)])
 	_ok(packs.size() >= 7, "atmosfera.gd: so' li %d packs" % packs.size())
@@ -4076,24 +4094,23 @@ func _col_desligada(p: Node) -> bool:
 ## N12 (Regiao III) -- contrato LOCKED: elevadores, escadas quebradas, 2 sinos de
 ## sincronizacao, vitral interactivo, plataformas que desaparecem, vento e queda
 ## controlada, e NENHUM fogo. Prova estrutura E efeito (a badalada / o vitral
-## partido tornam solidas as plataformas fantasma).
+## partido tornam solidas as plataformas fantasma) E FISICA: o elevador leva
+## mesmo a Koliani ao A2 e a coluna de ar leva-a mesmo ao C1.
+##
+## Execucao N12 autoral (29 set 2026): o nivel deixou de ter jornada
+## procedural -- as camaras do contrato sao agora a sala feita a mao
+## (`tools/construir_n12_galerias.py`), por isso deixou de se exigir o
+## gerador e as `camaras_geradas`. Estrutura fina: `TestesRegion03N12`.
 func teste_r3_n12_contrato() -> void:
 	var raiz: Node = (load(EstadoJogo.NIVEIS[R3_BASE + 1]) as PackedScene).instantiate()
 	EstadoJogo.indice_nivel = R3_BASE + 1
+	EstadoJogo.checkpoint = Vector2.ZERO
 	get_tree().root.add_child(raiz)
 	var kol := raiz.get_node_or_null("Koliani")
 	if kol:
 		kol.set("_a_morrer", true)
 	for i in 4:
 		await get_tree().process_frame
-	var ger: Node = null
-	for n in raiz.get_children():
-		if "camaras_geradas" in n:
-			ger = n
-	_ok(ger != null, "R3/N12: falta o gerador de jornada")
-	var cams: Array = ger.get("camaras_geradas") if ger else []
-	for c in ["elevador", "escadas", "sinos_sync", "vitral", "quebra", "vento_queda"]:
-		_ok(cams.has(c), "R3/N12: a camara '%s' do contrato nao foi gerada" % c)
 	var nos := _nos_recursivos(raiz)
 	var sinos_sync: Array[Node] = []
 	var vitrais: Array[Node] = []
@@ -4123,6 +4140,8 @@ func teste_r3_n12_contrato() -> void:
 	_ok(vitrais.size() >= 1, "R3/N12: falta o vitral interactivo")
 	for v in vitrais:
 		_ok((v as Vitral).textura_inteiro != null, "R3/N12: o vitral devia usar a arte aprovada")
+	for s in sinos_sync:
+		_ok((s as SinoTorre).textura != null, "R3/N12: o sino %s devia usar a arte aprovada" % s.name)
 
 	# EFEITO da badalada: as plataformas fantasma do sino ficam solidas
 	if sinos_sync.size() >= 2:
@@ -4156,19 +4175,240 @@ func teste_r3_n12_contrato() -> void:
 		for p in plats:
 			voltou = voltou and _col_desligada(p)
 		_ok(voltou, "R3/N12: uma 2.a badalada devia desfazer a ponte")
-	# EFEITO do vitral: partir acende a ponte de luz
-	if vitrais.size() >= 1:
-		var luz := _fantasmas_do_grupo(raiz, String((vitrais[0] as Vitral).grupo_luz))
-		_ok(luz.size() >= 3, "R3/N12: o vitral devia ter a sua ponte de luz")
-		(vitrais[0] as Vitral).receber_dano(1, 1.0)
+	# EFEITO do vitral: partir acende a ponte de luz. O vitral da ponte e' o
+	# primeiro com grupo proprio de plataformas (o do segredo so' da' luz).
+	var vit_ponte: Vitral = null
+	for v in vitrais:
+		if _fantasmas_do_grupo(raiz, String((v as Vitral).grupo_luz)).size() >= 3:
+			vit_ponte = v
+	_ok(vit_ponte != null, "R3/N12: o vitral devia ter a sua ponte de luz")
+	if vit_ponte:
+		var luz := _fantasmas_do_grupo(raiz, String(vit_ponte.grupo_luz))
+		vit_ponte.receber_dano(1, 1.0)
 		for i in 3:
 			await get_tree().process_frame
 		var acesas := true
 		for p in luz:
 			acesas = acesas and not _col_desligada(p)
 		_ok(acesas, "R3/N12: partir o vitral devia tornar solida a ponte de luz")
+		var col_v := vit_ponte.get_node_or_null("Col") as CollisionShape2D
+		_ok(col_v != null and col_v.disabled, "R3/N12: o vitral partido deixa de ser parede")
 	raiz.queue_free()
 	await get_tree().process_frame
+	await _r3_n12_fisica()
+
+
+## FISICA do N12 com a Koliani real: o elevador de peso leva-a do chao ao A2,
+## volta a descer quando ela sai, e a coluna de ar leva-a da Ponte Alta ao C1.
+## Corre a 4x (`Engine.time_scale`) -- so' se mede onde ela chega.
+## Corre a 4x (`Engine.time_scale`) -- so' se mede onde ela chega.
+func _r3_n12_fisica() -> void:
+	var raiz: Node = (load(EstadoJogo.NIVEIS[R3_BASE + 1]) as PackedScene).instantiate()
+	EstadoJogo.indice_nivel = R3_BASE + 1
+	EstadoJogo.checkpoint = Vector2.ZERO
+	get_tree().root.add_child(raiz)
+	var kol := raiz.get_node("Koliani") as CharacterBody2D
+	var elev := raiz.get_node("Elevador1") as Node2D
+	var a2_topo: float = (raiz.get_node("A2") as Node2D).position.y \
+		- float((raiz.get_node("A2").get("tamanho") as Vector2).y) * 0.5
+	for i in 6:
+		await get_tree().physics_frame
+	var escala := Engine.time_scale
+	Engine.time_scale = 4.0
+	# fora do jogo (sem o Main a arrancar o nivel) a Koliani nasce parada
+	kol.set_physics_process(true)
+	kol.global_position = elev.global_position + Vector2(0, -40)
+	kol.velocity = Vector2.ZERO
+	var t := 0.0
+	# a origem da Koliani fica PES - 22 px
+	while t < 6.0 and kol.global_position.y + 22.0 > a2_topo + 2.0:
+		await get_tree().physics_frame
+		t += 1.0 / 60.0   # cada passo de fisica = 1/60 s de JOGO
+	_ok(absf(kol.global_position.y + 22.0 - a2_topo) < 8.0,
+		"R3/N12: o elevador 1 devia levar a Koliani ao A2 (y=%.0f, A2=%.0f)" % [
+			kol.global_position.y, a2_topo])
+	# sai para o A2 -> o elevador volta ao chao
+	kol.global_position = Vector2(1100, a2_topo - 24)
+	kol.velocity = Vector2.ZERO
+	var base_y := float((elev.get("_base") as Vector2).y)
+	t = 0.0
+	while t < 7.0 and absf(elev.global_position.y - base_y) > 2.0:
+		await get_tree().physics_frame
+		t += 1.0 / 60.0   # cada passo de fisica = 1/60 s de JOGO
+	_ok(absf(elev.global_position.y - base_y) <= 2.0,
+		"R3/N12: sem peso o elevador 1 devia voltar ao chao")
+	# coluna de ar: da ponta da Ponte Alta ate' acima do C1
+	var c1_topo: float = (raiz.get_node("C1") as Node2D).position.y \
+		- float((raiz.get_node("C1").get("tamanho") as Vector2).y) * 0.5
+	# na ponta direita da Ponte Alta, ja' dentro da coluna
+	var ponte := raiz.get_node("PonteAlta") as Node2D
+	kol.global_position = ponte.position + Vector2(
+		float((ponte.get("tamanho") as Vector2).x) * 0.5 + 40.0, -40.0)
+	kol.velocity = Vector2.ZERO
+	var min_y := kol.global_position.y
+	t = 0.0
+	while t < 4.0:
+		await get_tree().physics_frame
+		t += 1.0 / 60.0   # cada passo de fisica = 1/60 s de JOGO
+		min_y = minf(min_y, kol.global_position.y)
+	_ok(min_y < c1_topo - 40.0,
+		"R3/N12: a coluna de ar devia levar a Koliani acima do C1 (min y=%.0f, C1=%.0f)" % [
+			min_y, c1_topo])
+	Engine.time_scale = escala
+	raiz.queue_free()
+	await get_tree().process_frame
+
+
+## Cada PORTAO do N12 e' mesmo preciso: tirando-o da sala, o crivo de alcance
+## (`tools/verifica_alcance.gd`) deixa de chegar a' porta. Complementa o
+## `TestesRegion03N12` (que mede os portoes com o salto real): aqui prova-se
+## que nao ha' um caminho alternativo esquecido a contornar cada um.
+func teste_r3_n12_portoes_no_crivo() -> void:
+	const CRIVO := preload("res://tools/verifica_alcance.gd")
+	var casos := {
+		"": [],
+		"elevador 1": ["Elevador1"],
+		"sino A": ["PonteA1", "PonteA2", "PonteA3"],
+		"escadas quebradas": ["Degrau1", "Degrau2", "Degrau3", "Degrau4"],
+		"plataformas que desaparecem": ["Ritmo1", "Ritmo2", "Ritmo3"],
+		"elevador 2": ["Elevador2"],
+		"vitral": ["PonteLuz1", "PonteLuz2", "PonteLuz3"],
+		"coluna de ar": ["ColunaDeAr"],
+		"queda controlada": ["Queda1", "Queda2", "Queda3"],
+		"sino B": ["PonteB1", "PonteB2", "PonteB3"],
+	}
+	EstadoJogo.indice_nivel = R3_BASE + 1
+	EstadoJogo.checkpoint = Vector2.ZERO
+	for portao: String in casos:
+		var raiz: Node = (load(EstadoJogo.NIVEIS[R3_BASE + 1]) as PackedScene).instantiate()
+		for n: String in casos[portao]:
+			var x := raiz.get_node_or_null(n)
+			_ok(x != null, "R3/N12: falta o no' %s" % n)
+			if x:
+				raiz.remove_child(x)
+				x.free()
+		var kol := raiz.get_node_or_null("Koliani")
+		if kol:
+			kol.set("_a_morrer", true)
+		get_tree().root.add_child(raiz)
+		for i in 4:
+			await get_tree().physics_frame
+		var r: Dictionary = CRIVO._medir_arvore(get_tree(), raiz)
+		if portao == "":
+			_ok(bool(r.get("ok_porta", false)) and (r.get("orfas", []) as Array).is_empty(),
+				"R3/N12: a sala inteira devia chegar a' porta sem ilhas (%s %s)" % [
+					r.get("porque", ""), r.get("orfas", [])])
+		else:
+			_ok(not bool(r.get("ok_porta", true)),
+				"R3/N12: o portao '%s' contorna-se -- a porta alcanca-se sem ele" % portao)
+		raiz.queue_free()
+		await get_tree().process_frame
+
+
+## N13 (Mecanismos Antigos) em FISICA: a cena inteira na arvore, as
+## alavancas puxadas como a Koliani as puxa (tocar), o padrao dos 3 sinos
+## tocado como ela o toca (badalada). Prova que a logica liga mesmo:
+## alavanca -> porta, duas alavancas -> porta que exige as duas, alavanca
+## das pontes -> uma some e a outra aparece, padrao certo -> nucleo liga ->
+## porta do guardiao abre; padrao errado -> recomeca.
+func teste_r3_n13_mecanismos() -> void:
+	EstadoJogo.indice_nivel = R3_BASE + 2
+	EstadoJogo.checkpoint = Vector2.ZERO
+	var raiz: Node = (load(EstadoJogo.NIVEIS[R3_BASE + 2]) as PackedScene).instantiate()
+	var kol := raiz.get_node_or_null("Koliani")
+	if kol:
+		kol.set("_a_morrer", true)
+	get_tree().root.add_child(raiz)
+	for i in 6:
+		await get_tree().physics_frame
+	var k: Node = raiz.get_node("Koliani")
+	var fechada := func(nome: String) -> bool:
+		return not (raiz.get_node(nome).get_node("Col") as CollisionShape2D).disabled
+
+	# A) uma alavanca, uma porta
+	_ok(fechada.call("PortaA"), "R3/N13: a porta A devia arrancar fechada")
+	raiz.get_node("AlavancaA")._ao_tocar(k)
+	await get_tree().physics_frame
+	await get_tree().physics_frame
+	_ok(not fechada.call("PortaA"), "R3/N13: a alavanca A devia abrir a porta A")
+
+	# B) alavancas multiplas: so' com as duas
+	raiz.get_node("AlavancaB1")._ao_tocar(k)
+	await get_tree().physics_frame
+	await get_tree().physics_frame
+	_ok(fechada.call("PortaB"), "R3/N13: a porta B abriu so' com uma das duas alavancas")
+	raiz.get_node("AlavancaB2")._ao_tocar(k)
+	await get_tree().physics_frame
+	await get_tree().physics_frame
+	_ok(not fechada.call("PortaB"), "R3/N13: as duas alavancas deviam abrir a porta B")
+
+	# C1) pontes reconfiguraveis: a direita arranca solida, a esquerda fantasma
+	var solida := func(nome: String) -> bool:
+		return not (raiz.get_node(nome).get_node("Col") as CollisionShape2D).disabled
+	_ok(solida.call("PonteDireita") and not solida.call("PonteEsquerda"),
+		"R3/N13: as pontes deviam arrancar direita solida / esquerda fantasma")
+	raiz.get_node("AlavancaPontes")._ao_tocar(k)
+	await get_tree().physics_frame
+	await get_tree().physics_frame
+	_ok(not solida.call("PonteDireita") and solida.call("PonteEsquerda"),
+		"R3/N13: a alavanca das pontes devia trocar qual das duas esta' solida")
+	_ok(not fechada.call("PortaA"), "R3/N13: a alavanca das pontes nao mexe em portas")
+
+	# D) o padrao dos 3 sinos
+	var nucleo: Node = raiz.get_node("Nucleo")
+	var ordem: PackedInt32Array = nucleo.get("ordem")
+	var nomes := ["SinoP", "SinoG", "SinoM"]
+	_ok(fechada.call("PortaNucleo"), "R3/N13: a porta do nucleo devia arrancar fechada")
+	# errado: comeca pelo sino que NAO e' o primeiro
+	var errado: int = ordem[1]
+	raiz.get_node(nomes[errado]).tocar()
+	await get_tree().physics_frame
+	_ok(int(nucleo.get("_certos")) == 0, "R3/N13: um sino fora de ordem devia apagar o padrao")
+	for i in ordem.size():
+		var s: Node = raiz.get_node(nomes[ordem[i]])
+		s.set("_cd", 0.0)
+		s.tocar()
+		await get_tree().physics_frame
+	await get_tree().physics_frame
+	await get_tree().physics_frame
+	_ok(bool(nucleo.get("ligada")), "R3/N13: o padrao certo devia ligar o nucleo")
+	_ok(not fechada.call("PortaNucleo"), "R3/N13: o nucleo ligado devia abrir a porta do guardiao")
+	raiz.queue_free()
+	await get_tree().process_frame
+
+
+## Os dois elevadores de contrapeso sao os UNICOS caminhos entre andares:
+## sem eles o crivo de alcance nao chega a' porta. (As portas de alavanca, o
+## crivo nao as ve -- essas prova-as o teste de fisica acima.)
+func teste_r3_n13_elevadores_no_crivo() -> void:
+	const CRIVO := preload("res://tools/verifica_alcance.gd")
+	var casos := {"": [], "elevador 1": ["Elevador1"], "elevador 2": ["Elevador2"]}
+	EstadoJogo.indice_nivel = R3_BASE + 2
+	EstadoJogo.checkpoint = Vector2.ZERO
+	for portao: String in casos:
+		var raiz: Node = (load(EstadoJogo.NIVEIS[R3_BASE + 2]) as PackedScene).instantiate()
+		for n: String in casos[portao]:
+			var x := raiz.get_node_or_null(n)
+			_ok(x != null, "R3/N13: falta o no' %s" % n)
+			if x:
+				raiz.remove_child(x)
+				x.free()
+		var kol := raiz.get_node_or_null("Koliani")
+		if kol:
+			kol.set("_a_morrer", true)
+		get_tree().root.add_child(raiz)
+		for i in 4:
+			await get_tree().physics_frame
+		var r: Dictionary = CRIVO._medir_arvore(get_tree(), raiz)
+		if portao == "":
+			_ok(bool(r.get("ok_porta", false)) and (r.get("orfas", []) as Array).is_empty(),
+				"R3/N13: o nivel inteiro devia chegar a' porta sem ilhas (%s %s)" % [
+					r.get("porque", ""), r.get("orfas", [])])
+		else:
+			_ok(not bool(r.get("ok_porta", true)),
+				"R3/N13: o '%s' contorna-se -- a porta alcanca-se sem ele" % portao)
+		raiz.queue_free()
+		await get_tree().process_frame
 
 
 func teste_r3_vyrak_identidade() -> void:
@@ -4364,6 +4604,37 @@ func teste_loja_compras_e_equipar() -> void:
 	e.free()
 
 
+## Interruptor de desenvolvimento (Paulo, 29 set): tudo custa 0 para testar
+## e trocar, sem gastar moedas e sem tocar nos precos reais do catalogo.
+func teste_loja_gratis_dev() -> void:
+	_ok(LojaCatalogo.GRATIS_EM_DESENVOLVIMENTO, "loja: em desenvolvimento a Loja devia ser gratis")
+	var antes := LojaCatalogo.gratis
+	LojaCatalogo.gratis = true
+	var e := _novo_estado()
+	_ok(e.kolicoins == 0 and e.veracoins == 0, "gratis: saldos iniciais")
+	# precos reais intactos no catalogo; o que se paga e' 0
+	_ok(int(LojaCatalogo.item("skin_anjo")["v"]) > 0 and e.preco_loja("skin_anjo", "v") == 0,
+		"gratis: preco real devia ficar no catalogo e o pago ser 0")
+	_ok(e.preco_loja("skin_anjo", "k") == -1, "gratis: moeda nao aceite continua nao aceite")
+	for id: String in ["skin_anjo", "skin_demonio", "skin_fornalha", "hud_moldura_osso"]:
+		var moeda := "k" if e.preco_loja(id, "k") == 0 else "v"
+		_ok(e.comprar_item(id, moeda)["ok"] and e.item_adquirido(id), "gratis: nao obteve %s sem moedas" % id)
+	_ok(e.kolicoins == 0 and e.veracoins == 0, "gratis: gastou moedas (%d K, %d V)" % [e.kolicoins, e.veracoins])
+	_ok(e.comprar_item("skin_anjo", "v")["erro"] == "ja_adquirido", "gratis: obteve duas vezes")
+	# trocar a vontade entre as skins obtidas
+	_ok(e.equipar_item("skin_anjo") and e.item_equipado("skin_anjo"), "gratis: equipar Arcanjo")
+	_ok(e.equipar_item("skin_demonio") and e.item_equipado("skin_demonio") and not e.item_equipado("skin_anjo"),
+		"gratis: trocar para o Arquidemonio")
+	_ok(e.equipar_item("skin_fornalha") and e.item_equipado("skin_fornalha"), "gratis: trocar para uma simples")
+	# requisitos de regiao continuam (so' o preco muda)
+	_ok(e.comprar_item("pack_coracao_podre", "k")["erro"] == "bloqueado", "gratis: desbloqueou item regional")
+	# desligado, volta a cobrar
+	LojaCatalogo.gratis = false
+	_ok(e.preco_loja("skin_demonio", "v") == int(LojaCatalogo.item("skin_demonio")["v"]), "gratis: desligar nao repos o preco")
+	LojaCatalogo.gratis = antes
+	e.free()
+
+
 func teste_loja_save_e_compatibilidade() -> void:
 	var total: int = EstadoJogoScript.NIVEIS.size()
 	var e := _novo_estado()
@@ -4477,6 +4748,106 @@ func teste_loja_i18n() -> void:
 	_ok(en.has("menu.shop"), "loja: falta menu.shop")
 
 
+## Skins com arte real (`tools/gerar_skins_koliani.py`): cada uma espelha o
+## Golden Set frame a frame com um conjunto de armadura + arma por cima, e a
+## Koliani equipada com ela monta os frames da pasta da skin.
+func teste_skins_arte_real() -> void:
+	const CV := preload("res://scripts/cosmeticos_visuais.gd")
+	const GOLD := "res://assets/sprites/koliani_golden_set/frames/"
+	_ok(CV.DIR_SKIN.size() >= 3, "skins: devia haver pelo menos 3 skins com arte")
+	_ok(CV.SKIN_SO_PALETA.size() == 3, "skins: as simples fecharam-se em tres (Paulo, 29 set)")
+	_ok(CV.DIR_SKIN.size() - CV.SKIN_SO_PALETA.size() >= 2, "skins: faltam as premium (Anjo e Demonio)")
+	_ok(CV.dir_skin("skin_koliani_base") == "" and CV.dir_skin("skin_carmesim") == "",
+		"skins: base/tinta nao tem pasta de arte")
+	var golden: Array[String] = []
+	for anim in DirAccess.get_directories_at(GOLD):
+		for f in DirAccess.get_files_at(GOLD + anim):
+			if f.get_extension() == "png":
+				golden.append(anim + "/" + f)
+	_ok(golden.size() >= 80, "skins: Golden Set com %d frames?" % golden.size())
+	for id: String in CV.DIR_SKIN:
+		var it := LojaCatalogo.item(id)
+		_ok(not it.is_empty() and it["categoria"] == "skins" and it["placeholder"] == false,
+			"skins: %s no catalogo com arte" % id)
+		_ok(CV.preview_loja(id) != null and CV.dir_skin(id) == CV.DIR_SKIN[id], "skins: %s sem preview" % id)
+		_ok(CV.tinta_skin(id) == Color.WHITE, "skins: %s nao deve levar tinta por cima da arte" % id)
+		var faltam := 0
+		for rel in golden:
+			if not ResourceLoader.exists(CV.DIR_SKIN[id] + "/frames/" + rel):
+				faltam += 1
+		_ok(faltam == 0, "skins: %s sem %d frames do Golden Set" % [id, faltam])
+		# nada toca a borda do canvas (a ponta de uma arma comprida ficava cortada)
+		var na_borda := 0
+		for rel in golden:
+			var im := (load(CV.DIR_SKIN[id] + "/frames/" + rel) as Texture2D).get_image()
+			var w := im.get_width()
+			var h := im.get_height()
+			for i in w:
+				for q: Vector2i in [Vector2i(i, 0), Vector2i(i, h - 1), Vector2i(0, i), Vector2i(w - 1, i)]:
+					if im.get_pixelv(q).a > 0.0:
+						na_borda += 1
+		_ok(na_borda == 0 or id in CV.SKIN_SO_PALETA, "skins: %s com %d px cortados na borda" % [id, na_borda])
+		# conjunto de armadura: a silhueta CRESCE (cornos/capuz/asas) sem
+		# perder o corpo, e a arma magenta do Golden Set foi trocada
+		var a := (load(GOLD + "idle/idle_001.png") as Texture2D).get_image()
+		var b := (load(CV.DIR_SKIN[id] + "/frames/idle/idle_001.png") as Texture2D).get_image()
+		var novos := 0
+		var perdidos := 0
+		for y in a.get_height():
+			for x in a.get_width():
+				var oa := a.get_pixel(x, y).a > 0.5
+				var ob := b.get_pixel(x, y).a > 0.5
+				if ob and not oa:
+					novos += 1
+				elif oa and not ob:
+					perdidos += 1
+		if id in CV.SKIN_SO_PALETA:
+			# so' paleta: silhueta exatamente a do Golden Set
+			_ok(novos == 0 and perdidos == 0, "skins: %s (so' paleta) mudou a silhueta" % id)
+			continue
+		_ok(novos > 40, "skins: %s sem pecas novas na silhueta (%d px)" % [id, novos])
+		_ok(perdidos < 10, "skins: %s perdeu corpo (%d px)" % [id, perdidos])
+		var golpe := (load(CV.DIR_SKIN[id] + "/frames/attack_basic/attack_basic_003.png") as Texture2D).get_image()
+		var golpe0 := (load(GOLD + "attack_basic/attack_basic_003.png") as Texture2D).get_image()
+		# onde o Golden Set tem a lamina magenta, a skin ja' nao pode ter magenta
+		# (so' se olha para esses pixeis: uma paleta pode ter magenta de proposito)
+		var magenta := 0
+		for y in golpe.get_height():
+			for x in golpe.get_width():
+				var c0 := golpe0.get_pixel(x, y)
+				var c := golpe.get_pixel(x, y)
+				var era_lamina := c0.a > 0.3 and c0.s > 0.3 and c0.v > 0.3 and c0.h > 0.77 and c0.h < 0.95
+				if era_lamina and c.a > 0.3 and c.s > 0.35 and c.v > 0.35 and c.h > 0.78 and c.h < 0.94:
+					magenta += 1
+		_ok(magenta < 6, "skins: %s ainda tem a lamina magenta (%d px)" % [id, magenta])
+	# a Koliani com a skin equipada monta os frames da pasta dela
+	var ids: Array = CV.DIR_SKIN.keys()
+	var id0: String = ids[0]
+	var comprados_antes: Array = EstadoJogo.itens_comprados.duplicate()
+	var equipados_antes: Dictionary = EstadoJogo.cosmeticos_equipados.duplicate()
+	EstadoJogo.itens_comprados.append(id0)
+	EstadoJogo.cosmeticos_equipados["skins"] = id0   # sem equipar_item: nao grava
+	var k: Koliani = preload("res://scenes/actors/Koliani.tscn").instantiate()
+	k.usar_golden_set = true
+	add_child(k)
+	var corpo := k.get_node_or_null("Sprite/Corpo") as AnimatedSprite2D
+	var sf := corpo.sprite_frames if corpo else null
+	_ok(sf != null and sf.get_frame_texture("idle", 0).resource_path.begins_with(CV.DIR_SKIN[id0]),
+		"skins: Koliani com %s devia ler os frames da skin" % id0)
+	_ok(sf != null and sf.get_frame_texture("run", 0).resource_path.begins_with(CV.DIR_SKIN[id0]),
+		"skins: run_final tambem da skin")
+	k.free()
+	EstadoJogo.itens_comprados.assign(comprados_antes)
+	EstadoJogo.cosmeticos_equipados = equipados_antes
+	var k2: Koliani = preload("res://scenes/actors/Koliani.tscn").instantiate()
+	k2.usar_golden_set = true
+	add_child(k2)
+	var c2 := k2.get_node_or_null("Sprite/Corpo") as AnimatedSprite2D
+	_ok(c2 != null and c2.sprite_frames.get_frame_texture("idle", 0).resource_path.begins_with(GOLD),
+		"skins: sem skin equipada volta ao Golden Set")
+	k2.free()
+
+
 func teste_loja_cosmeticos_visuais() -> void:
 	const CV := preload("res://scripts/cosmeticos_visuais.gd")
 	var LOJA := preload("res://scripts/loja_catalogo.gd")
@@ -4488,9 +4859,11 @@ func teste_loja_cosmeticos_visuais() -> void:
 	var base := Color(0.4, 0.3, 0.9)
 	_ok(CV.cor_rasto_dash(base, "efeito_rasto_brasa") != base and CV.cor_rasto_dash(base, "x") == base,
 		"cosm: rasto de brasa")
-	_ok(CV.tinta_moldura_hud("hud_moldura_osso") != Color.WHITE and CV.tinta_moldura_hud("x") == Color.WHITE,
-		"cosm: moldura de HUD")
-	_ok(CV.cor_chama_checkpoint(Color.BLACK, "hud_moldura_osso") != Color.BLACK, "cosm: chama do checkpoint")
+	# a moldura de osso deixou de ser tinta: tem arte propria (Ossario)
+	_ok(CV.caixa_hud("disco", Vector4.ZERO, [22, 22, 22, 22], "hud_moldura_osso") != null
+		and CV.caixa_hud("disco", Vector4.ZERO, [22, 22, 22, 22], "x") == null, "cosm: moldura de HUD")
+	_ok(not CV.checkpoint_visual("hud_moldura_osso").is_empty() and CV.checkpoint_visual("x").is_empty(),
+		"cosm: fogueira da moldura")
 	# so' cosmeticos: nada de stats
 	var e := _novo_estado()
 	var dano0: int = e.dano_ataque()
@@ -4666,14 +5039,109 @@ func teste_loja_colecao_regiao_i() -> void:
 		x.free()
 
 
+## Molduras (Ossario, Gaiola de Aurora) e rastos (Brasa, Esporos, Mariposas)
+## com arte: contratos do gerador `tools/gerar_cosmeticos_loja.py`, o que o
+## jogo consome, o pack novo, e nada de stats.
+## Galeria de Conceitos (extra da Loja): imagens no export, sem spoilers,
+## navegação e zoom. Mexe no autoload EstadoJogo e repõe-no no fim.
+func teste_galeria_conceitos() -> void:
+	const G := preload("res://scripts/galeria.gd")
+	var it := LojaCatalogo.item(G.ITEM)
+	_ok(not bool(it["placeholder"]) and CosmeticosVisuais.preview_loja(G.ITEM) != null
+		and CosmeticosVisuais.preview_loja(G.ITEM).get_size() == Vector2(346, 130), "galeria: preview 346x130 na loja")
+	for i in G.PAGINAS.size():
+		_ok(ResourceLoader.exists(G.caminho(i)), "galeria: imagem da pagina %d existe (%s)" % [i, G.caminho(i)])
+		_ok(G.titulo_pagina(i) != "" and not G.titulo_pagina(i).begins_with("gallery."), "galeria: titulo da pagina %d" % i)
+	var concl: Array = EstadoJogo.concluidos.duplicate()
+	var dev: bool = EstadoJogo.modo_dev
+	EstadoJogo.modo_dev = false
+	EstadoJogo.concluidos = []
+	_ok(G.pagina_aberta(0) and G.pagina_aberta(1), "galeria: key art e folha da Koliani sempre abertas")
+	_ok(not G.pagina_aberta(2), "galeria: Regiao II fechada sem concluir a I")
+	EstadoJogo.concluidos = [0, 1, 2, 3, 4]
+	_ok(G.pagina_aberta(2) and G.pagina_aberta(4), "galeria: Regiao II abre depois da I")
+	_ok(not G.pagina_aberta(5), "galeria: Regiao III continua fechada")
+	var g: Control = G.new()
+	get_tree().root.add_child(g)
+	_ok(g.get_node("Vista/Imagem").texture != null, "galeria: primeira pagina carregada")
+	g.ampliar(9.0, Vector2(100, 100))
+	_ok(is_equal_approx(g.zoom, G.ZOOM_MAX), "galeria: zoom limitado")
+	g.ir(-1)
+	_ok(g.pagina == G.PAGINAS.size() - 1 and is_equal_approx(g.zoom, 1.0), "galeria: da' a volta e repoe o zoom")
+	_ok(g.get_node("Vista/Imagem").texture == null and g.get_node("Vista/Cadeado").text != "",
+		"galeria: pagina fechada nao carrega a imagem")
+	g.ir(g.pagina + 1)
+	_ok(g.pagina == 0, "galeria: da' a volta para a frente")
+	g.free()
+	EstadoJogo.concluidos = concl
+	EstadoJogo.modo_dev = dev
+
+
+func teste_loja_arte_molduras_rastos() -> void:
+	const CV := preload("res://scripts/cosmeticos_visuais.gd")
+	const RC := preload("res://scripts/rasto_cosmetico.gd")
+	_ok(LojaCatalogo.validar().is_empty(), "arte: catalogo valido (%s)" % str(LojaCatalogo.validar()))
+	for id: String in ["hud_moldura_osso", "hud_moldura_gaiola"]:
+		var disco := CV.caixa_hud("disco", Vector4.ZERO, [22, 22, 22, 22], id)
+		var placa := CV.caixa_hud("placa", Vector4(12, 6, 18, 6), [16, 14, 16, 14], id)
+		_ok(disco != null and disco.texture.get_size() == Vector2(88, 88), "arte %s: disco 88x88" % id)
+		_ok(placa != null and placa.texture.get_size() == Vector2(128, 64), "arte %s: placa 128x64" % id)
+		_ok(disco.content_margin_left == 0 and placa.content_margin_right == 18, "arte %s: margens intactas" % id)
+		var fog := CV.checkpoint_visual(id)
+		_ok(fog.has("base") and fog.has("cogumelos") and fog.has("brilho") and fog["chama"].size() == 4
+			and fog["brasas"].size() == 3 and fog.has("pos_base") and fog.has("ocioso"), "arte %s: fogueira completa" % id)
+		_ok(CV.moldura_arte_equipada(id) and not CV.raizes_equipado(id), "arte %s: identificacao" % id)
+		_ok(CV.preview_loja(id) != null and CV.preview_loja(id).get_size() == Vector2(346, 130), "arte %s: preview 346x130" % id)
+		_ok(not bool(LojaCatalogo.item(id)["placeholder"]), "arte %s: sem placeholder no catalogo" % id)
+	# a lenha do Ossario sao os femures desenhados: a poligonal fica invisivel
+	_ok(CV.checkpoint_visual("hud_moldura_osso")["lenha"].a == 0.0, "arte: lenha do Ossario escondida")
+	_ok(CV.rasto_visual("nao_existe").is_empty() and CV.rasto_visual("hud_moldura_osso").is_empty(), "arte: rasto desconhecido = original")
+	for id: String in ["efeito_rasto_brasa", "efeito_rasto_esporos", "efeito_rasto_mariposas"]:
+		var rv := CV.rasto_visual(id)
+		_ok(not rv.is_empty() and rv["a"].has("tex") and rv["b"].has("tex"), "arte %s: folhas carregadas" % id)
+		for f in ["a", "b"]:
+			var t: Texture2D = rv[f]["tex"]
+			var n := int(rv[f]["frames"])
+			_ok(t.get_width() % n == 0 and t.get_width() / n == t.get_height() or id == "efeito_rasto_mariposas" and f == "a",
+				"arte %s/%s: tira de %d frames certos" % [id, f, n])
+		_ok(CV.cor_rasto_dash(Color.BLACK, id) != Color.BLACK and CV.tinta_vfx_dash(id) != Color.WHITE, "arte %s: cores" % id)
+		_ok(RC.material_eco(rv) != null and RC.material_eco(rv) == RC.material_eco(rv), "arte %s: material do eco em cache" % id)
+		_ok(CV.preview_loja(id) != null, "arte %s: preview real" % id)
+	# emitir cria sprites e nao parte sem pai/rasto
+	var pai := Node2D.new()
+	get_tree().root.add_child(pai)
+	RC.emitir(pai, Vector2.ZERO, 1.0, 1.0, CV.rasto_visual("efeito_rasto_brasa"))
+	_ok(pai.get_child_count() == 4, "arte: brasa emite 3+1 particulas por eco (%d)" % pai.get_child_count())
+	RC.emitir(null, Vector2.ZERO, 1.0, 1.0, CV.rasto_visual("efeito_rasto_brasa"))
+	RC.emitir(pai, Vector2.ZERO, 1.0, 1.0, {})
+	_ok(pai.get_child_count() == 4, "arte: emitir sem pai/rasto nao faz nada")
+	pai.free()
+	# pack Luar de Aurora: preco so' do que falta, teto respeitado
+	var pk := LojaCatalogo.item("pack_luar_aurora")
+	_ok(pk["contem"] == ["hud_moldura_gaiola", "efeito_rasto_mariposas"] and pk["raridade"] == "lendario", "arte: pack Luar de Aurora")
+	_ok(LojaCatalogo.preco_pack(pk, "k", func(_i: String) -> bool: return false) == 1200
+		and LojaCatalogo.preco_pack(pk, "v", func(_i: String) -> bool: return false) == 250, "arte: pack completo no teto")
+	_ok(LojaCatalogo.preco_pack(pk, "k", func(i: String) -> bool: return i == "hud_moldura_gaiola") == 550,
+		"arte: pack so' com as mariposas em falta")
+	# equipar nao mexe em stats
+	var e := _novo_estado()
+	e.ganhar_kolicoins(5000)
+	var dano: int = e.dano_ataque()
+	var vidas: int = e.vidas
+	for id in ["hud_moldura_gaiola", "efeito_rasto_mariposas"]:
+		_ok(e.comprar_item(id, "k")["ok"] and e.equipar_item(id), "arte: comprar e equipar %s" % id)
+	_ok(e.dano_ataque() == dano and e.vidas == vidas, "arte: equipar mexeu em stats")
+	e.free()
+
+
 func teste_rootbound_frame() -> void:
 	const CV := preload("res://scripts/cosmeticos_visuais.gd")
 	const RB := "hud_moldura_raizes"
 	# default continua default (item inicial, sem equipar, id desconhecido, osso)
-	for id in ["", "nao_existe", "hud_moldura_osso", "skin_carmesim"]:
-		_ok(CV.caixa_hud("disco", Vector4(0, 0, 0, 0), [22, 22, 22, 22], id if id != "" else "hud_moldura_osso") == null,
+	for id in ["", "nao_existe", "extra_galeria_conceitos", "skin_carmesim"]:
+		_ok(CV.caixa_hud("disco", Vector4(0, 0, 0, 0), [22, 22, 22, 22], id if id != "" else "skin_carmesim") == null,
 			"rootbound: '%s' devia deixar o HUD original (disco)" % id)
-		_ok(CV.checkpoint_visual(id if id != "" else "hud_moldura_osso").is_empty(), "rootbound: '%s' devia deixar a fogueira original" % id)
+		_ok(CV.checkpoint_visual(id if id != "" else "skin_carmesim").is_empty(), "rootbound: '%s' devia deixar a fogueira original" % id)
 	_ok(not CV.raizes_equipado("hud_moldura_osso") and CV.raizes_equipado(RB), "rootbound: identificacao do item")
 	# Rootbound aplica os recursos certos, com as margens pedidas (layout intacto)
 	var disco := CV.caixa_hud("disco", Vector4(0, 0, 0, 0), [22, 22, 22, 22], RB)
@@ -4695,12 +5163,12 @@ func teste_rootbound_frame() -> void:
 			["cogumelos", 64, 14], ["cogumelos_brilho", 64, 14], ["preview", 346, 130]]:
 		var t: Texture2D = load(CV.DIR_RAIZES + par[0] + ".png")
 		_ok(t != null and t.get_width() == par[1] and t.get_height() == par[2], "rootbound: asset %s %dx%d" % [par[0], par[1], par[2]])
-	# preview real so' neste item; os outros da colecao continuam ART PENDING
-	_ok(CV.preview_loja(RB) != null and CV.preview_loja("skin_coracao_podre") == null and CV.preview_loja("efeito_rasto_esporos") == null,
-		"rootbound: preview so' no Rootbound")
+	# preview real no Rootbound e no Spore Wake; a skin e o pack continuam ART PENDING
+	_ok(CV.preview_loja(RB) != null and CV.preview_loja("skin_coracao_podre") == null and CV.preview_loja("efeito_rasto_esporos") != null,
+		"rootbound: previews da colecao")
 	_ok(LojaCatalogo.item(RB)["placeholder"] == false and str(LojaCatalogo.item(RB)["preview"]).ends_with("preview.png"),
 		"rootbound: catalogo sem placeholder")
-	for id in ["skin_coracao_podre", "efeito_rasto_esporos", "pack_coracao_podre"]:
+	for id in ["skin_coracao_podre", "pack_coracao_podre"]:
 		_ok(LojaCatalogo.item(id)["placeholder"] == true, "rootbound: %s continua placeholder" % id)
 	# precos/economia intactos
 	_ok(LojaCatalogo.preco(LojaCatalogo.item(RB), "k") == 300 and LojaCatalogo.preco(LojaCatalogo.item(RB), "v") == -1

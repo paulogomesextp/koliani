@@ -45,11 +45,18 @@ const CHEFE_KEY: Array[String] = [
 	# INTRODUÇÃO da região (o Sino Vivo saiu do nível, ver Torre_dos_Sinos.tscn).
 	# "" = a HUD não mostra nenhuma linha de chefe/guardião neste nível
 	# (`controlos_toque.gd::_encher_cabecalho_nivel`, `if ck != "":`).
-	# Por decidir com o GM: se o "Sino Vivo" muda de nível dentro da região
-	# (N12-N14 ainda não têm este audit) ou se fica só como recurso disponível.
+	# O "Sino Vivo" fica FORA da campanha (decisão da execução N12, 29 set
+	# 2026, ver docs/nivel_autoral_n12.md): o contrato LOCKED só admite um
+	# confronto na região e os guardiões intermédios saem do roster aprovado.
 	"",                          # 10 N11 -- Entrada dos Ecos (sem guardião/chefe)
-	"guard.aerion",              # 11 N12 -- Galerias Verticais
-	"guard.voltaris",            # 12 N13 -- Mecanismos Antigos
+	# N12 autoral (29 set 2026): o Aerion (cavaleiro do vento, fora do
+	# contrato da Torre dos Ecos) saiu; fecha com o Autómato do Sino elite,
+	# um dos três inimigos principais do N12 na prancha aprovada.
+	"guard.automato_do_sino",    # 11 N12 -- Galerias Verticais
+	# N13 autoral: o Voltaris (chefe de tempestade, fora do contrato) saiu;
+	# fecha com o Construto Vitral elite a guardar o nucleo, inimigo
+	# principal do N13 na prancha aprovada.
+	"guard.construto_vitral",    # 12 N13 -- Mecanismos Antigos
 	"guard.sacerdotisa_lunar",   # 13 N14 -- Campanário
 	"boss.vyrak",                # 14 N15 -- O Topo dos Ecos (o chefe da Região III)
 	"boss.rei_ossario",          # 15 Cemitério dos Reis

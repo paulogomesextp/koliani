@@ -19,6 +19,9 @@ extends "res://scripts/plataforma.gd"
 ## diferentes do mesmo nível podem controlar secções diferentes -- basta
 ## combinar este campo com o `alterna_grupo` do `SinoTorre` certo.
 @export var grupo_alternar := "sino_alterna"
+## Opt-in (N13, pontes reconfiguraveis): comeca SOLIDA em vez de fantasma --
+## a primeira badalada/alavanca e' que a faz sumir.
+@export var comeca_solida := false
 
 @onready var _col: CollisionShape2D = get_node_or_null("Col")
 
@@ -28,6 +31,14 @@ func _ready() -> void:
 	if Engine.is_editor_hint():
 		return
 	add_to_group(grupo_alternar)
+	if comeca_solida:
+		# a cena traz o `Col` desligado e o `Visual` tenue: acender os dois
+		if _col:
+			_col.set_deferred("disabled", false)
+		var v := get_node_or_null("Visual") as CanvasItem
+		if v:
+			v.modulate = Color(1, 1, 1, 1)
+		return
 	if _col:
 		_col.set_deferred("disabled", true)
 	var vis := get_node_or_null("Visual") as CanvasItem

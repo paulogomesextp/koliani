@@ -1,3 +1,150 @@
+# >>> N13 -- "Mecanismos Antigos", autoral (29 set 2026, branch `claude/project-thread-6jbrqw`, SEM push) <<<
+
+Mesmo criterio do N12 ("arte detalhada primeiro"). `Torre_da_Tempestade.tscn`
+deixou de ser jornada procedural + sala do Voltaris e passou a 3 andares de
+maquinaria feitos a mao (3600 x 2250), gerados por
+`tools/construir_n13_mecanismos.py`. A) 1.a alavanca/porta; B) sala das
+engrenagens (bracos em cruz sobre fosso com serra, poleiro), porta B de duas
+alavancas, piso que colapsa + pendulos, elevador de contrapeso; C) pontes
+reconfiguraveis sob tecto baixo (alavanca troca a ponte), ponte movel num
+trilho, correntes com peso, alavanca C so' do braco de uma engrenagem,
+elevador em vaivem; D) mecanismo de 3 sinos (toca o padrao sozinho; a ordem
+certa abre a porta do guardiao) e Guardiao = Construto Vitral elite
+(`guard.construto_vitral`, 6 idiomas). 3 segredos, 6 checkpoints, 12 luzes.
+Pecas da coluna N13 do `level_mechanics.png` + texturas de material do atlas
+(`tools/gerar_props_n13_prancha.py`, prefixo `m_`). Peles/opcoes opt-in em
+Alavanca, PortaTrancada, PlataformaRoda, PlataformaCorrente, PlataformaSino,
+ElevadorColuna, PenduloLamina, SinoTorre; `MecanismoSinos` novo. Testes:
+`TestesRegion03N13`, `teste_r3_n13_mecanismos` (fisica),
+`teste_r3_n13_elevadores_no_crivo`. Relatorio: `docs/nivel_autoral_n13.md`;
+capturas `docs/qa/n13_autoral/`. **Pendente do Paulo**: autorizar o push;
+playtest (padrao dos sinos, ritmo das engrenagens, tecto baixo, Guardiao).
+
+# >>> Skins da Koliani = 3 simples + 2 premium, Anjo e Demonio (29 set 2026, branch `claude/project-thread-u5wewl`, sem push) <<<
+Relatorio: `docs/execution_skins_koliani.md`. Historia curta: paleta so'
+(recusada como "elaborada", mas as 3 ficaram como as UNICAS simples:
+`skin_fornalha`, `skin_abadia_afogada`, `skin_celestial`, ids/nomes
+originais, bytes iguais ao 85ef70e) -> 4 conjuntos "pecas por cima da
+paleta" (Guardia/Abadessa/Serafim/Vazio) -- **recusados**: "sao literalmente
+uma copia das primeiras" -- apagados. Agora: **`skin_anjo` (Arcanjo) e
+`skin_demonio` (Arquidemonio)**, premium, `tools/trajes_premium.py`:
+material proprio no corpo (filigrana de ouro nas bordas da roupa / veios de
+lava em ruido ancorado a cara), olhos emissivos (pixeis quase pretos rodeados
+de pele), arma nova, 2 asas de 3 camadas / capa com forro + cauda,
+aureola com raios / 2 cornos bezier, couraca (peito), capa, aura de brilho de
+1-2 px; armas encurtadas para nunca tocarem a borda do canvas.
+**Loja gratis em desenvolvimento**: `LojaCatalogo.GRATIS_EM_DESENVOLVIMENTO`
+(true); precos reais intactos; por a false no fim.
+**Armadilhas**: detetar a lamina ANTES da paleta; cabelo e roupa tem a mesma
+cor (nao ha' segmentacao por cor -- usar geometria relativa a cara); os 3
+frames rodados do rolamento vestem-se no `jump_loop_003` e rodam-se; o
+`sort_keys` nos i18n baralha o ficheiro todo (inserir no sitio).
+Suite com sandbox limpo (ver relatorio). **Pendente**: aprovacao do Paulo,
+precos finais (hoje 400 V cada, tudo gratis em dev), push.
+
+# >>> N12 -- "Galerias Verticais", autoral (29 set 2026, branch `claude/project-thread-6jbrqw`, fundido em master pelo PR #3) <<<
+
+**Passe de arte (29 set, depois de "quero niveis com arte detalhada, isso e'
+o mais importante")**: a branch do PR #1 (`claude/project-thread-8ipy7k`)
+foi integrada por merge (conflitos so' nos docs). O N12 ganhou o interior
+da torre (pilares, arcadas, vitrais em arco, rosaceas, raios de lua, tochas),
+24 pecas novas da prancha (`tools/gerar_props_n12_prancha.py`), os 9 props
+geometricos que sobravam no catalogo `torres` recortados da prancha (vale
+para toda a Regiao III), e peles opt-in para coluna de ar, laminas, sinos e
+degraus quebradicos. Capturas: `docs/qa/n12_autoral/`. Armadilha: o
+`gerar_props_torre_ecos.py` desfaz os props se correr depois -- correr
+`gerar_props_prancha.py` e `gerar_props_n12_prancha.py` a seguir.
+Pedido do Paulo: "continuar o desenvolvimento dos niveis conforme as artes
+aprovadas" (o coordenador escolheu: N12 a seguir, autoral, um nivel por
+commit). Relatorio completo: `docs/nivel_autoral_n12.md`.
+
+**Feito**: `Torre_dos_Ventos.tscn` deixou de ser jornada procedural + sala do
+Aerion e passou a sala FEITA A MAO (~2960 x 2700 px), gerada por
+`tools/construir_n12_galerias.py` (editar la', nao no `.tscn`). Contrato A-D
+da prancha: A) base com Elevador 1 (peso) + Sino A de sincronizacao, sem
+inimigos e com rede; B) escadas quebradas, lamina rapida, 3 plataformas que
+desaparecem, Elevador 2 em vaivem, VITRAL que revela a ponte de eco;
+C) coluna de ar + descida quebradica contra o vento; D) Automato + Sino B
+(ponte + gela) + serra vertical rapida, Guardiao = Automato do Sino elite
+(`guard.automato_do_sino`, 6 idiomas). 3 segredos, 5 checkpoints. Inimigos
+principais do contrato: Gargula Vitral, Automato do Sino, Monge das Correntes.
+
+**Arte**: `ElevadorColuna` (script novo sobre `TumuloElevador.tscn`: pedra do
+bioma, friso dourado, 2 correntes que encurtam, roldana fixa que gira);
+`PlataformaQuebra.pele_terreno` e `CorrenteAr.tamanho` (opt-in, nenhum outro
+nivel muda); sinos/vitrais com as peles aprovadas; props da regiao colocados
+a mao. Tudo por NOME de ficheiro/bioma -- quando o PR #1 (arte I-III) entrar,
+o N12 herda props/terreno/fundo novos sem tocar na cena. Sobreposicao com o
+PR #1 em ficheiros: so' `docs/retomar_aqui.md`, `PRIORIDADES.md` e
+`tests/run_tests.gd` (zonas diferentes); nenhuma cena em comum.
+
+**Sino Vivo -- decidido**: fica FORA da campanha (cena/script intactos). O
+contrato so' admite um confronto na regiao (Vyrak, N15); os guardioes vem do
+roster aprovado.
+
+**Aerion**: saiu da campanha; a regressao dele no CI (`tools/verifica_aerion.gd`)
+corre agora em `scenes/qa/ArenaAerion.tscn` com a geometria antiga (4/4 OK).
+
+**Portoes medidos** contra o salto real (salto duplo via `Movimento` + mantle
+32 + folga) e contra `escalar_paredes` (sobe QUALQUER parede sem limite: uma
+face ao alcance da cabeca e' atalho). Testes: `TestesRegion03N12` (novo),
+`teste_r3_n12_contrato` (reescrito, com FISICA real: elevador leva ao A2 e
+volta; coluna de ar leva acima do C1), `teste_r3_n12_portoes_no_crivo` (novo:
+tirar cada portao corta a porta). `tools/verifica_alcance.gd` aprendeu
+elevadores, `CorrenteAr` e `PlataformaSino`.
+
+**ARMADILHAS (custaram tempo)**:
+  - `koliani.gd::Y_MORTE = 1200` -- abaixo disso morre-se, e a morte faz
+    `reload_current_scene`: num teste recarrega o PROPRIO corredor de testes
+    (sintoma: `get_tree()` nulo a meio de um `await`, nenhuma mensagem de
+    morte). O gerador desenha com o chao a 2400 e desloca tudo -1400.
+  - Fora do `Main`, a Koliani nasce com a FISICA DESLIGADA -- testes de
+    fisica e capturas tem de fazer `set_physics_process(true)`.
+  - Neste contentor Linux ha' Godot 4.7.2 (download oficial) + xvfb para
+    capturas; `tools/shot_plataforma.gd` nao move a Koliani (fisica
+    desligada) -- captura sempre o spawn.
+
+**Por fazer**: playtest humano (duracao, leitura dos sinos/vitral, dureza da
+serra B2->B3, TTK do Guardiao). Depois N13 (Mecanismos Antigos) e N14
+(Campanario) com o mesmo tratamento -- ainda tem jornada + guardioes fora do
+contrato (`guard.voltaris`, `guard.sacerdotisa_lunar`).
+
+# >>> Loja -- cosméticos com arte + Galeria de Conceitos (29 set 2026, branch `claude/project-thread-mbzvi6`, PR #2) <<<
+Relatório: `docs/execution_loja_cosmeticos_arte.md`.
+- Molduras com arte (HUD + fogueira) e rastos do dash passaram a
+  data-driven em `scripts/cosmeticos_visuais.gd` (`MOLDURAS_ARTE`,
+  `RASTOS`); partículas do rasto em `scripts/rasto_cosmetico.gd`.
+- Itens com arte nova: Moldura do Ossário, Gaiola de Aurora (nova), Rasto de
+  Brasas, Rasto de Esporos, Rasto de Mariposas Lunares (novo), pack Luar de
+  Aurora (novo). Arte: `tools/gerar_cosmeticos_loja.py` (regerar, nunca
+  editar PNG).
+- **Galeria de Conceitos** (extra) já funciona: `scripts/galeria.gd`
+  (`class_name Galeria`), aberta pelo botão VER no detalhe do item na Loja
+  (gancho de ~14 linhas em `loja.gd`). 25 páginas: key art (`menu_bg`),
+  folha de modelo da Koliani, conceitos + folha do chefe das Regiões II-IV e
+  a prancha de produção das V-XX. Sem spoilers: as páginas de uma região só
+  abrem depois de concluída a anterior (modo dev abre tudo); página fechada
+  não carrega a imagem. As imagens vêm de `docs/art_direction/` (fora do
+  export) -- `tools/preparar_galeria.py` copia-as para
+  `assets/ui/galeria/*.jpg` (1536 px, q80, ~10 MB) e gera o preview da loja.
+- QA visual: `tests/qa_loja_arte_visual.tscn` (dash em câmara lenta) e
+  `tests/qa_galeria_visual.tscn` (Loja -> VER -> páginas, zoom, cadeado,
+  Esc volta à Loja), ambas no `tools/correr_qa_cosmeticos.ps1`.
+- Não tocado: skins da Koliani, preços/interruptor grátis (outra sessão),
+  fundos/terreno, N11.
+
+# >>> ARTE DAS PRANCHAS -- Regioes I a III (29 set 2026, branch `claude/project-thread-8ipy7k`, sem push) <<<
+O Paulo achou a arte dos niveis "muito fraca" face as pranchas aprovadas.
+Relatorio completo: `docs/execution_arte_pranchas_regioes_1_3.md`.
+  - Regiao II (N6-N10): fundo, terreno e casca recortados 1:1 das pranchas.
+  - Regiao III (N11-N15): fundo, terreno (material novo `torre_ecos`, so'
+    para o `fundo_pack` torre_ecos) e 21 props recortados das pranchas.
+    **Isto resolve a "causa raiz por resolver" do N11 abaixo** (mosaico CC0
+    de 192 px) sem mexer na cena do N11.
+  - Regiao I: tirado o corte a direito da copa no topo do ecra.
+Por fazer: SinoTorre/Vitral ainda poligonos, superficie do pantano/abismo
+chapada, N16-N100 intactos. Push/PR so' com autorizacao do Paulo.
+
 # >>> N11 -- passe de enriquecimento (29 set 2026, commitado, nao empurrado ainda) <<<
 Pedido do Paulo apos ver o N11 (28 set): "esta pequeno, so' uma subida, sem
 mecanicas, sem arte de jeito" -- depois esclareceu que "arte de jeito" nao

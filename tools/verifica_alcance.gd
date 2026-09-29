@@ -15,9 +15,14 @@ extends SceneTree
 ##   * NAO se sobe para cima de uma plataforma estando debaixo dela
 ##   * onde a cena tem `ZonaPlanar`/`WindZone` contínua: vãos de planar,
 ##     rajada a favor e corrente ascendente (ver `_da_para_saltar`)
-## Plataformas de corrente entram como amostras do percurso (`_recolher_corrente`).
-## Nao modela as outras plataformas moveis nem vento pulsado -- e' um crivo de
-## "ilha morta".
+##   * ELEVADORES (`TumuloElevador`/`ElevadorColuna`): base e fim do curso;
+##     num elevador de peso o fim so' se alcanca a subir nele
+##   * `CorrenteAr` (coluna ascendente) conta como a corrente das `WindZone`
+##   * `PlataformaSino`: fantasma ate' se chegar a um sino do grupo dela
+##   * `PlataformaCorrente`/`PlataformaFlutuante`: amostras do percurso
+##   * salto duplo a partir do N6 e escalar paredes a partir do N11
+## Nao modela as outras plataformas moveis nem vento pulsado -- e' um crivo
+## de "ilha morta".
 
 const VAO_MAX := 210.0
 const SUBIDA_MAX := 118.0
@@ -133,6 +138,16 @@ static func _medir_arvore(st: SceneTree, raiz: Node, indice := -1) -> Dictionary
 		for j in n:
 			if i == j:
 				continue
+			var pj: Dictionary = plats[j]
+			if pj.has("elevador") and bool(pj["fim"]) and not bool(pj["auto"]):
+				# topo de um elevador de peso: so' se chega la' a subir nele
+				if i == int(pj["elevador"]):
+					adj[i].append(j)
+				continue
+			if plats[i].has("elevador") and pj.has("elevador") \
+					and int(plats[i]["elevador"]) == int(pj["elevador"]):
+				adj[i].append(j)   # base <-> topo do mesmo elevador
+				continue
 			if _mesmo_grupo(plats[i], plats[j]) or _da_para_saltar(plats[i], plats[j], ar):
 				adj[i].append(j)
 
@@ -239,7 +254,31 @@ static func _recolher(no: Node, out: Array) -> void:
 			_recolher_corrente(f as Node2D, out)
 		elif s.ends_with("plataforma_flutuante.gd"):
 			_recolher_flutuante(f as Node2D, out)
+		elif f.is_in_group("tumulos") and f.get("_base") != null:
+			_recolher_elevador(f, out)
 		_recolher(f, out)
+
+
+## ELEVADORES (`TumuloElevador` e o `ElevadorColuna` da Regiao III): duas
+## pseudo-plataformas, a base e o fim do curso, ligadas uma a' outra. Num
+## elevador de PESO (`auto = false`) o fim do curso so' existe para quem
+## sobe nele -- por isso a unica entrada no "topo" e' a partir da "base"
+## (ver `_medir_arvore`). Num de vaivem, os dois extremos valem como
+## plataformas normais (espera-se por ele).
+static func _recolher_elevador(f: Node, out: Array) -> void:
+	var base: Vector2 = f.get("_base")
+	var curso: Vector2 = f.get("curso")
+	var hw := float(f.get("largura")) * 0.5
+	var auto := bool(f.get("auto"))
+	var i_base := out.size()
+	for fim in [false, true]:
+		var p: Vector2 = base + (curso if fim else Vector2.ZERO)
+		out.append({
+			"nome": "%s:%s" % [String(f.name), "topo" if fim else "base"],
+			"cx": p.x, "topo": p.y - 8.0,
+			"esq": p.x - hw, "dir": p.x + hw, "base": p.y + 18.0,
+			"elevador": i_base, "fim": fim, "auto": auto,
+		})
 
 
 ## PLATAFORMA DE CORRENTE (`plataforma_corrente.gd`, Regiao II). Anda num
@@ -373,6 +412,14 @@ static func _recolher_ar(raiz: Node) -> Dictionary:
 	while not pilha.is_empty():
 		var no: Node = pilha.pop_back()
 		pilha.append_array(no.get_children())
+		if no.is_in_group("correntes_ar"):
+			# `CorrenteAr` (Regiao III): coluna ascendente sempre ligada. So'
+			# conta se empurrar mais do que a gravidade de queda puxa.
+			var cs := no.get_node_or_null("CollisionShape2D") as CollisionShape2D
+			if cs and cs.shape is RectangleShape2D and float(no.get("forca")) > QUEDA_REF:
+				var ts: Vector2 = (cs.shape as RectangleShape2D).size
+				sobe.append(Rect2(cs.global_position - ts * 0.5, ts))
+			continue
 		if no.is_in_group("zonas_planar") and bool(no.get("ativa")):
 			var tp: Vector2 = no.get("tamanho")
 			planar.append(Rect2((no as Node2D).global_position - tp * 0.5, tp))
@@ -575,8 +622,9 @@ static func _da_para_escalar(a: Dictionary, b: Dictionary) -> bool:
 	return float(b.base) >= float(a.topo) - SUBIDA_MAX
 
 
-## SINOS (`sino_torre.gd`): tocam-se ao bater-lhes (golpe ou projetil) e
-## tornam solidas as plataformas do `alterna_grupo`. Aproximacao: conta-se
+## SINOS (`sino_torre.gd`) e VITRAIS (`vitral.gd`): tocam-se/partem-se ao
+## bater-lhes (golpe ou projetil) e tornam solidas as plataformas do grupo
+## deles (`alterna_grupo` / `grupo_luz`). Aproximacao: conta-se
 ## como tocado se estiver por cima de uma plataforma alcancada (60 px para
 ## os lados, ate' 150 acima do topo -- golpe no ar a meio de um salto).
 ## Nao conta com o projetil de longe nem com o sino a alternar de volta.
@@ -590,6 +638,10 @@ static func _recolher_sinos(raiz: Node) -> Array:
 		if e and e.resource_path.ends_with("sino_torre.gd"):
 			out.append({"pos": (no as Node2D).global_position,
 				"grupo": String(no.get("alterna_grupo"))})
+		elif e and e.resource_path.ends_with("vitral.gd") and String(no.get("grupo_luz")) != "":
+			# o vitral partido (golpe ou tiro) revela o grupo dele, como o sino
+			out.append({"pos": (no as Node2D).global_position,
+				"grupo": String(no.get("grupo_luz"))})
 	return out
 
 

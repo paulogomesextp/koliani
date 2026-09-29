@@ -307,6 +307,8 @@ static func largura_traco(r: String) -> float:
 func _texto_precos(it: Dictionary) -> String:
 	var partes := []
 	var id := str(it["id"])
+	if LojaCatalogo.gratis and (EstadoJogo.preco_loja(id, KOLI) == 0 or EstadoJogo.preco_loja(id, VERA) == 0):
+		return Textos.t("shop.free")
 	if EstadoJogo.preco_loja(id, KOLI) >= 0:
 		partes.append("%d K" % EstadoJogo.preco_loja(id, KOLI))
 	if EstadoJogo.preco_loja(id, VERA) >= 0:
@@ -382,12 +384,13 @@ func _detalhe() -> void:
 		for moeda in aceites:
 			var btn := _btn_k if moeda == KOLI else _btn_v
 			var p := EstadoJogo.preco_loja(_sel, moeda)
-			if p < 0:
+			# grátis (desenvolvimento): um botão chega, não um por moeda
+			if p < 0 or (p == 0 and (_btn_k.visible or _btn_v.visible)):
 				continue
-			btn.text = Textos.tf("shop.buy_k" if moeda == KOLI else "shop.buy_v", [p])
+			btn.text = Textos.tf("shop.buy_k" if moeda == KOLI else "shop.buy_v", [p]) if p > 0 else Textos.t("shop.buy_free")
 			btn.visible = true
 			btn.disabled = est == "bloqueado" or EstadoJogo.saldo_loja(moeda) < p
-		if aceites.size() > 1:
+		if aceites.size() > 1 and not LojaCatalogo.gratis:
 			_det_aviso.text = Textos.t("shop.either")
 		elif est == "disponivel" and (_btn_k.disabled and _btn_k.visible or _btn_v.disabled and _btn_v.visible):
 			_det_aviso.text = Textos.tf("shop.no_funds", [Textos.t(
@@ -396,6 +399,9 @@ func _detalhe() -> void:
 		_btn_eq.visible = true
 		_btn_eq.text = Textos.t("shop.equipped" if est == "equipado" else "shop.equip")
 		_btn_eq.disabled = est == "equipado"
+	elif est == "adquirido" and _sel == Galeria.ITEM:
+		_btn_eq.visible = true
+		_btn_eq.text = Textos.t("shop.view")
 	if LojaCatalogo.e_pack(it):
 		var dele := 0
 		for c: String in it["contem"]:
@@ -418,10 +424,21 @@ func _comprar(moeda: String) -> void:
 
 
 func _equipar() -> void:
+	if _sel == Galeria.ITEM:
+		_abrir_galeria()
+		return
 	if _sel != "" and EstadoJogo.equipar_item(_sel):
 		Som.toca("ui_confirmar", -8.0)
 	_refrescar()
 	_refocar()
+
+
+## O extra "Galeria de Conceitos" não se equipa: o botão abre-a por cima.
+func _abrir_galeria() -> void:
+	Som.toca("menu_painel", -12.0)
+	var g := Galeria.new()
+	g.fechado.connect(func() -> void: _cartoes.get(_sel, _botoes_cat[_cat]).grab_focus())
+	add_child(g)
 
 
 ## Depois de comprar/equipar o botão que tinha o foco pode ter desaparecido

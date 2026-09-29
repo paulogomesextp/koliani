@@ -259,14 +259,14 @@ func item_bloqueado(id: String) -> bool:
 
 
 ## Preço que o jogador paga por `id` em `moeda` (-1 = não aceita/nada a pagar).
-## Nos packs só conta o que ainda falta.
+## Nos packs só conta o que ainda falta. Com `LojaCatalogo.gratis` (em
+## desenvolvimento) o que se venderia custa 0 -- o preço real fica no catálogo.
 func preco_loja(id: String, moeda: String) -> int:
 	var it: Dictionary = _LOJA.item(id)
 	if it.is_empty():
 		return -1
-	if _LOJA.e_pack(it):
-		return _LOJA.preco_pack(it, moeda, item_adquirido)
-	return _LOJA.preco(it, moeda)
+	var p: int = _LOJA.preco_pack(it, moeda, item_adquirido) if _LOJA.e_pack(it) else _LOJA.preco(it, moeda)
+	return 0 if p >= 0 and _LOJA.gratis else p
 
 
 ## Estado para a UI: "bloqueado" | "disponivel" | "adquirido" | "equipado" |
