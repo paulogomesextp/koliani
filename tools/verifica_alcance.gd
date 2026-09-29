@@ -15,7 +15,12 @@ extends SceneTree
 ##   * NAO se sobe para cima de uma plataforma estando debaixo dela
 ##   * onde a cena tem `ZonaPlanar`/`WindZone` contínua: vãos de planar,
 ##     rajada a favor e corrente ascendente (ver `_da_para_saltar`)
-## Nao modela plataformas moveis nem vento pulsado -- e' um crivo de "ilha morta".
+##   * ELEVADORES (`TumuloElevador`/`ElevadorColuna`): base e fim do curso;
+##     num elevador de peso o fim so' se alcanca a subir nele
+##   * `CorrenteAr` (coluna ascendente) conta como a corrente das `WindZone`
+##   * `PlataformaSino` conta como solida (o sino esta' sempre ao alcance)
+## Nao modela as outras plataformas moveis nem vento pulsado -- e' um crivo
+## de "ilha morta".
 
 const VAO_MAX := 210.0
 const SUBIDA_MAX := 118.0
@@ -126,6 +131,16 @@ static func _medir_arvore(st: SceneTree, raiz: Node) -> Dictionary:
 		for j in n:
 			if i == j:
 				continue
+			var pj: Dictionary = plats[j]
+			if pj.has("elevador") and bool(pj["fim"]) and not bool(pj["auto"]):
+				# topo de um elevador de peso: so' se chega la' a subir nele
+				if i == int(pj["elevador"]):
+					adj[i].append(j)
+				continue
+			if plats[i].has("elevador") and pj.has("elevador") \
+					and int(plats[i]["elevador"]) == int(pj["elevador"]):
+				adj[i].append(j)   # base <-> topo do mesmo elevador
+				continue
 			if _da_para_saltar(plats[i], plats[j], ar):
 				adj[i].append(j)
 
@@ -173,7 +188,7 @@ static func _recolher(no: Node, out: Array) -> void:
 			s = e.resource_path
 		if s.ends_with("plataforma.gd") or s.ends_with("plataforma_ritmada.gd") \
 				or s.ends_with("plataforma_quebra.gd") or s.ends_with("plataforma_espectral.gd") \
-				or s.ends_with("plataforma_luz.gd"):
+				or s.ends_with("plataforma_luz.gd") or s.ends_with("plataforma_sino.gd"):
 			var tv: Variant = f.get("tamanho")
 			var tam: Vector2 = tv if tv != null else Vector2(200, 40)
 			var p := f as Node2D
@@ -185,7 +200,31 @@ static func _recolher(no: Node, out: Array) -> void:
 				"dir": p.global_position.x + tam.x * 0.5,
 				"base": p.global_position.y + tam.y * 0.5,
 			})
+		elif f.is_in_group("tumulos") and f.get("_base") != null:
+			_recolher_elevador(f, out)
 		_recolher(f, out)
+
+
+## ELEVADORES (`TumuloElevador` e o `ElevadorColuna` da Regiao III): duas
+## pseudo-plataformas, a base e o fim do curso, ligadas uma a' outra. Num
+## elevador de PESO (`auto = false`) o fim do curso so' existe para quem
+## sobe nele -- por isso a unica entrada no "topo" e' a partir da "base"
+## (ver `_medir_arvore`). Num de vaivem, os dois extremos valem como
+## plataformas normais (espera-se por ele).
+static func _recolher_elevador(f: Node, out: Array) -> void:
+	var base: Vector2 = f.get("_base")
+	var curso: Vector2 = f.get("curso")
+	var hw := float(f.get("largura")) * 0.5
+	var auto := bool(f.get("auto"))
+	var i_base := out.size()
+	for fim in [false, true]:
+		var p: Vector2 = base + (curso if fim else Vector2.ZERO)
+		out.append({
+			"nome": "%s:%s" % [String(f.name), "topo" if fim else "base"],
+			"cx": p.x, "topo": p.y - 8.0,
+			"esq": p.x - hw, "dir": p.x + hw, "base": p.y + 18.0,
+			"elevador": i_base, "fim": fim, "auto": auto,
+		})
 
 
 static func _plat_mais_perto(plats: Array, pos: Vector2) -> int:
@@ -234,6 +273,14 @@ static func _recolher_ar(raiz: Node) -> Dictionary:
 	while not pilha.is_empty():
 		var no: Node = pilha.pop_back()
 		pilha.append_array(no.get_children())
+		if no.is_in_group("correntes_ar"):
+			# `CorrenteAr` (Regiao III): coluna ascendente sempre ligada. So'
+			# conta se empurrar mais do que a gravidade de queda puxa.
+			var cs := no.get_node_or_null("CollisionShape2D") as CollisionShape2D
+			if cs and cs.shape is RectangleShape2D and float(no.get("forca")) > QUEDA_REF:
+				var ts: Vector2 = (cs.shape as RectangleShape2D).size
+				sobe.append(Rect2(cs.global_position - ts * 0.5, ts))
+			continue
 		if no.is_in_group("zonas_planar") and bool(no.get("ativa")):
 			var tp: Vector2 = no.get("tamanho")
 			planar.append(Rect2((no as Node2D).global_position - tp * 0.5, tp))
