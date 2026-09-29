@@ -15,7 +15,9 @@ extends SceneTree
 ##   * NAO se sobe para cima de uma plataforma estando debaixo dela
 ##   * onde a cena tem `ZonaPlanar`/`WindZone` contínua: vãos de planar,
 ##     rajada a favor e corrente ascendente (ver `_da_para_saltar`)
-## Nao modela plataformas moveis nem vento pulsado -- e' um crivo de "ilha morta".
+## Plataformas de corrente entram como amostras do percurso (`_recolher_corrente`).
+## Nao modela as outras plataformas moveis nem vento pulsado -- e' um crivo de
+## "ilha morta".
 
 const VAO_MAX := 210.0
 const SUBIDA_MAX := 118.0
@@ -126,7 +128,7 @@ static func _medir_arvore(st: SceneTree, raiz: Node) -> Dictionary:
 		for j in n:
 			if i == j:
 				continue
-			if _da_para_saltar(plats[i], plats[j], ar):
+			if _mesmo_grupo(plats[i], plats[j]) or _da_para_saltar(plats[i], plats[j], ar):
 				adj[i].append(j)
 
 	# BFS do spawn
@@ -185,7 +187,51 @@ static func _recolher(no: Node, out: Array) -> void:
 				"dir": p.global_position.x + tam.x * 0.5,
 				"base": p.global_position.y + tam.y * 0.5,
 			})
+		elif s.ends_with("plataforma_corrente.gd"):
+			_recolher_corrente(f as Node2D, out)
 		_recolher(f, out)
+
+
+## PLATAFORMA DE CORRENTE (`plataforma_corrente.gd`, Regiao II). Anda num
+## percurso fixo e carrega a Koliani, por isso entra no grafo como varias
+## "fotografias" do percurso, todas do mesmo `grupo` (ligadas entre si:
+## quem esta' em cima vai onde ela for). Colisao: largura x 22 com o centro
+## 3 px abaixo da origem -> topo = y - 8. O percurso vem da posicao de
+## repouso (`_base`, apanhada no `_ready`), nao da atual -- ao fim dos 8
+## frames do `medir` ela ja' andou.
+const AMOSTRAS_CORRENTE := 7
+
+
+static func _recolher_corrente(p: Node2D, out: Array) -> void:
+	var base: Vector2 = p.get("_base")
+	var largura := float(p.get("largura"))
+	var amp := float(p.get("amplitude"))
+	var comp := float(p.get("comprimento"))
+	var modo := String(p.get("modo"))
+	for k in AMOSTRAS_CORRENTE:
+		var s := lerpf(-1.0, 1.0, float(k) / float(AMOSTRAS_CORRENTE - 1))
+		var pos := base
+		match modo:
+			"vertical":
+				pos = base + Vector2(0.0, s * amp)
+			"horizontal":
+				pos = base + Vector2(s * amp, 0.0)
+			_:  # pendulo: arco de raio `comprimento` a volta da ancora
+				var ang := deg_to_rad(amp) * s
+				pos = base + Vector2(0.0, -comp) + Vector2(sin(ang), cos(ang)) * comp
+		out.append({
+			"nome": "%s~%d" % [p.name, k],
+			"grupo": String(p.get_path()),
+			"cx": pos.x,
+			"topo": pos.y - 8.0,
+			"esq": pos.x - largura * 0.5,
+			"dir": pos.x + largura * 0.5,
+			"base": pos.y + 14.0,
+		})
+
+
+static func _mesmo_grupo(a: Dictionary, b: Dictionary) -> bool:
+	return a.has("grupo") and String(a.get("grupo")) == String(b.get("grupo", ""))
 
 
 static func _plat_mais_perto(plats: Array, pos: Vector2) -> int:
