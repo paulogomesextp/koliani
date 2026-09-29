@@ -12,6 +12,10 @@ extends Node2D
 @export var periodo := 2.2
 @export var fase := 0.0
 @export var dano := 20
+## Opt-in: desenho da lamina (corrente + foice) como UMA textura pintada, em
+## vez dos poligonos. A textura e' esticada para caber de eixo a' ponta da
+## lamina (`comprimento` + 16). Os niveis que nao a definem nao mudam.
+@export var textura: Texture2D
 
 var _t := 0.0
 var _braco: Node2D
@@ -43,11 +47,24 @@ func _montar_visual() -> void:
 	_braco = Node2D.new()
 	add_child(_braco)
 
+	if textura:
+		eixo.visible = false
+		perno.visible = false
+		var spr := Sprite2D.new()
+		spr.texture = textura
+		spr.centered = false
+		var alt := comprimento + 16.0
+		var esc := alt / float(textura.get_height())
+		spr.scale = Vector2(esc, esc)
+		spr.position = Vector2(-textura.get_width() * esc * 0.5, 0.0)
+		_braco.add_child(spr)
+
 	var corrente := Line2D.new()
 	corrente.points = PackedVector2Array([Vector2.ZERO, Vector2(0, comprimento - 18.0)])
 	corrente.width = 4.0
 	corrente.default_color = Color(0.28, 0.26, 0.3)
 	_braco.add_child(corrente)
+	corrente.visible = textura == null
 
 	# foice / lamina no fundo do braco
 	var lamina := Polygon2D.new()
@@ -57,6 +74,7 @@ func _montar_visual() -> void:
 		Vector2(30, 6), Vector2(0, 14), Vector2(-30, 6)])
 	lamina.color = Color(0.75, 0.78, 0.86)
 	_braco.add_child(lamina)
+	lamina.visible = textura == null
 
 	var fio := Line2D.new()
 	fio.position = Vector2(0, comprimento)
@@ -64,6 +82,7 @@ func _montar_visual() -> void:
 	fio.width = 2.0
 	fio.default_color = Color(1, 1, 1, 0.9)
 	_braco.add_child(fio)
+	fio.visible = textura == null
 
 	_glint = Polygon2D.new()
 	_glint.position = Vector2(0, comprimento)

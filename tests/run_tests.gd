@@ -26,6 +26,7 @@ const TestesGlideRegiao02 := preload("res://tests/test_glide_region02.gd")
 ## o mesmo padrao usado quando N06/N07 passaram a autorais.
 const TestesRegion02N10 := preload("res://tests/test_region02_n10_level.gd")
 const TestesRegion03N11 := preload("res://tests/test_region03_n11_level.gd")
+const TestesRegion03N12 := preload("res://tests/test_region03_n12_level.gd")
 const TestesKolianiCanonicaNiveis := preload("res://tests/test_koliani_canonica_niveis.gd")
 const DT := 1.0 / 60.0
 
@@ -57,6 +58,8 @@ func _correr_tudo() -> void:
 	for falha in TestesRegion02N10.executar():
 		_falhas.append(falha)
 	for falha in TestesRegion03N11.executar():
+		_falhas.append(falha)
+	for falha in TestesRegion03N12.executar():
 		_falhas.append(falha)
 	for falha in TestesKolianiCanonicaNiveis.executar():
 		_falhas.append(falha)
@@ -216,6 +219,7 @@ func _correr_tudo() -> void:
 	teste_r3_bestiario_canonico()
 	await teste_r3_niveis_carregam()
 	await teste_r3_n12_contrato()
+	await teste_r3_n12_portoes_no_crivo()
 	await teste_r3_vyrak_identidade()
 	await teste_r3_vyrak_leva_dano_muda_de_fase_e_morre()
 
@@ -4080,24 +4084,23 @@ func _col_desligada(p: Node) -> bool:
 ## N12 (Regiao III) -- contrato LOCKED: elevadores, escadas quebradas, 2 sinos de
 ## sincronizacao, vitral interactivo, plataformas que desaparecem, vento e queda
 ## controlada, e NENHUM fogo. Prova estrutura E efeito (a badalada / o vitral
-## partido tornam solidas as plataformas fantasma).
+## partido tornam solidas as plataformas fantasma) E FISICA: o elevador leva
+## mesmo a Koliani ao A2 e a coluna de ar leva-a mesmo ao C1.
+##
+## Execucao N12 autoral (29 set 2026): o nivel deixou de ter jornada
+## procedural -- as camaras do contrato sao agora a sala feita a mao
+## (`tools/construir_n12_galerias.py`), por isso deixou de se exigir o
+## gerador e as `camaras_geradas`. Estrutura fina: `TestesRegion03N12`.
 func teste_r3_n12_contrato() -> void:
 	var raiz: Node = (load(EstadoJogo.NIVEIS[R3_BASE + 1]) as PackedScene).instantiate()
 	EstadoJogo.indice_nivel = R3_BASE + 1
+	EstadoJogo.checkpoint = Vector2.ZERO
 	get_tree().root.add_child(raiz)
 	var kol := raiz.get_node_or_null("Koliani")
 	if kol:
 		kol.set("_a_morrer", true)
 	for i in 4:
 		await get_tree().process_frame
-	var ger: Node = null
-	for n in raiz.get_children():
-		if "camaras_geradas" in n:
-			ger = n
-	_ok(ger != null, "R3/N12: falta o gerador de jornada")
-	var cams: Array = ger.get("camaras_geradas") if ger else []
-	for c in ["elevador", "escadas", "sinos_sync", "vitral", "quebra", "vento_queda"]:
-		_ok(cams.has(c), "R3/N12: a camara '%s' do contrato nao foi gerada" % c)
 	var nos := _nos_recursivos(raiz)
 	var sinos_sync: Array[Node] = []
 	var vitrais: Array[Node] = []
@@ -4127,6 +4130,8 @@ func teste_r3_n12_contrato() -> void:
 	_ok(vitrais.size() >= 1, "R3/N12: falta o vitral interactivo")
 	for v in vitrais:
 		_ok((v as Vitral).textura_inteiro != null, "R3/N12: o vitral devia usar a arte aprovada")
+	for s in sinos_sync:
+		_ok((s as SinoTorre).textura != null, "R3/N12: o sino %s devia usar a arte aprovada" % s.name)
 
 	# EFEITO da badalada: as plataformas fantasma do sino ficam solidas
 	if sinos_sync.size() >= 2:
@@ -4160,19 +4165,134 @@ func teste_r3_n12_contrato() -> void:
 		for p in plats:
 			voltou = voltou and _col_desligada(p)
 		_ok(voltou, "R3/N12: uma 2.a badalada devia desfazer a ponte")
-	# EFEITO do vitral: partir acende a ponte de luz
-	if vitrais.size() >= 1:
-		var luz := _fantasmas_do_grupo(raiz, String((vitrais[0] as Vitral).grupo_luz))
-		_ok(luz.size() >= 3, "R3/N12: o vitral devia ter a sua ponte de luz")
-		(vitrais[0] as Vitral).receber_dano(1, 1.0)
+	# EFEITO do vitral: partir acende a ponte de luz. O vitral da ponte e' o
+	# primeiro com grupo proprio de plataformas (o do segredo so' da' luz).
+	var vit_ponte: Vitral = null
+	for v in vitrais:
+		if _fantasmas_do_grupo(raiz, String((v as Vitral).grupo_luz)).size() >= 3:
+			vit_ponte = v
+	_ok(vit_ponte != null, "R3/N12: o vitral devia ter a sua ponte de luz")
+	if vit_ponte:
+		var luz := _fantasmas_do_grupo(raiz, String(vit_ponte.grupo_luz))
+		vit_ponte.receber_dano(1, 1.0)
 		for i in 3:
 			await get_tree().process_frame
 		var acesas := true
 		for p in luz:
 			acesas = acesas and not _col_desligada(p)
 		_ok(acesas, "R3/N12: partir o vitral devia tornar solida a ponte de luz")
+		var col_v := vit_ponte.get_node_or_null("Col") as CollisionShape2D
+		_ok(col_v != null and col_v.disabled, "R3/N12: o vitral partido deixa de ser parede")
 	raiz.queue_free()
 	await get_tree().process_frame
+	await _r3_n12_fisica()
+
+
+## FISICA do N12 com a Koliani real: o elevador de peso leva-a do chao ao A2,
+## volta a descer quando ela sai, e a coluna de ar leva-a da Ponte Alta ao C1.
+## Corre a 4x (`Engine.time_scale`) -- so' se mede onde ela chega.
+## Corre a 4x (`Engine.time_scale`) -- so' se mede onde ela chega.
+func _r3_n12_fisica() -> void:
+	var raiz: Node = (load(EstadoJogo.NIVEIS[R3_BASE + 1]) as PackedScene).instantiate()
+	EstadoJogo.indice_nivel = R3_BASE + 1
+	EstadoJogo.checkpoint = Vector2.ZERO
+	get_tree().root.add_child(raiz)
+	var kol := raiz.get_node("Koliani") as CharacterBody2D
+	var elev := raiz.get_node("Elevador1") as Node2D
+	var a2_topo: float = (raiz.get_node("A2") as Node2D).position.y \
+		- float((raiz.get_node("A2").get("tamanho") as Vector2).y) * 0.5
+	for i in 6:
+		await get_tree().physics_frame
+	var escala := Engine.time_scale
+	Engine.time_scale = 4.0
+	# fora do jogo (sem o Main a arrancar o nivel) a Koliani nasce parada
+	kol.set_physics_process(true)
+	kol.global_position = elev.global_position + Vector2(0, -40)
+	kol.velocity = Vector2.ZERO
+	var t := 0.0
+	# a origem da Koliani fica PES - 22 px
+	while t < 6.0 and kol.global_position.y + 22.0 > a2_topo + 2.0:
+		await get_tree().physics_frame
+		t += 1.0 / 60.0   # cada passo de fisica = 1/60 s de JOGO
+	_ok(absf(kol.global_position.y + 22.0 - a2_topo) < 8.0,
+		"R3/N12: o elevador 1 devia levar a Koliani ao A2 (y=%.0f, A2=%.0f)" % [
+			kol.global_position.y, a2_topo])
+	# sai para o A2 -> o elevador volta ao chao
+	kol.global_position = Vector2(1100, a2_topo - 24)
+	kol.velocity = Vector2.ZERO
+	var base_y := float((elev.get("_base") as Vector2).y)
+	t = 0.0
+	while t < 7.0 and absf(elev.global_position.y - base_y) > 2.0:
+		await get_tree().physics_frame
+		t += 1.0 / 60.0   # cada passo de fisica = 1/60 s de JOGO
+	_ok(absf(elev.global_position.y - base_y) <= 2.0,
+		"R3/N12: sem peso o elevador 1 devia voltar ao chao")
+	# coluna de ar: da ponta da Ponte Alta ate' acima do C1
+	var c1_topo: float = (raiz.get_node("C1") as Node2D).position.y \
+		- float((raiz.get_node("C1").get("tamanho") as Vector2).y) * 0.5
+	# na ponta direita da Ponte Alta, ja' dentro da coluna
+	var ponte := raiz.get_node("PonteAlta") as Node2D
+	kol.global_position = ponte.position + Vector2(
+		float((ponte.get("tamanho") as Vector2).x) * 0.5 + 40.0, -40.0)
+	kol.velocity = Vector2.ZERO
+	var min_y := kol.global_position.y
+	t = 0.0
+	while t < 4.0:
+		await get_tree().physics_frame
+		t += 1.0 / 60.0   # cada passo de fisica = 1/60 s de JOGO
+		min_y = minf(min_y, kol.global_position.y)
+	_ok(min_y < c1_topo - 40.0,
+		"R3/N12: a coluna de ar devia levar a Koliani acima do C1 (min y=%.0f, C1=%.0f)" % [
+			min_y, c1_topo])
+	Engine.time_scale = escala
+	raiz.queue_free()
+	await get_tree().process_frame
+
+
+## Cada PORTAO do N12 e' mesmo preciso: tirando-o da sala, o crivo de alcance
+## (`tools/verifica_alcance.gd`) deixa de chegar a' porta. Complementa o
+## `TestesRegion03N12` (que mede os portoes com o salto real): aqui prova-se
+## que nao ha' um caminho alternativo esquecido a contornar cada um.
+func teste_r3_n12_portoes_no_crivo() -> void:
+	const CRIVO := preload("res://tools/verifica_alcance.gd")
+	var casos := {
+		"": [],
+		"elevador 1": ["Elevador1"],
+		"sino A": ["PonteA1", "PonteA2", "PonteA3"],
+		"escadas quebradas": ["Degrau1", "Degrau2", "Degrau3", "Degrau4"],
+		"plataformas que desaparecem": ["Ritmo1", "Ritmo2", "Ritmo3"],
+		"elevador 2": ["Elevador2"],
+		"vitral": ["PonteLuz1", "PonteLuz2", "PonteLuz3"],
+		"coluna de ar": ["ColunaDeAr"],
+		"queda controlada": ["Queda1", "Queda2", "Queda3"],
+		"sino B": ["PonteB1", "PonteB2", "PonteB3"],
+	}
+	EstadoJogo.indice_nivel = R3_BASE + 1
+	EstadoJogo.checkpoint = Vector2.ZERO
+	for portao: String in casos:
+		var raiz: Node = (load(EstadoJogo.NIVEIS[R3_BASE + 1]) as PackedScene).instantiate()
+		for n: String in casos[portao]:
+			var x := raiz.get_node_or_null(n)
+			_ok(x != null, "R3/N12: falta o no' %s" % n)
+			if x:
+				raiz.remove_child(x)
+				x.free()
+		var kol := raiz.get_node_or_null("Koliani")
+		if kol:
+			kol.set("_a_morrer", true)
+		get_tree().root.add_child(raiz)
+		for i in 4:
+			await get_tree().physics_frame
+		var r: Dictionary = CRIVO._medir_arvore(get_tree(), raiz)
+		if portao == "":
+			_ok(bool(r.get("ok_porta", false)) and (r.get("orfas", []) as Array).is_empty(),
+				"R3/N12: a sala inteira devia chegar a' porta sem ilhas (%s %s)" % [
+					r.get("porque", ""), r.get("orfas", [])])
+		else:
+			_ok(not bool(r.get("ok_porta", true)),
+				"R3/N12: o portao '%s' contorna-se -- a porta alcanca-se sem ele" % portao)
+		raiz.queue_free()
+		await get_tree().process_frame
 
 
 func teste_r3_vyrak_identidade() -> void:

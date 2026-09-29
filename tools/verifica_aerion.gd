@@ -2,6 +2,11 @@ extends SceneTree
 ## Regressão: Aerion media o chão antes da sincronização da física e
 ## guardava o valor de recurso (494), embora a arena estivesse a 240.
 ## Uso: Godot --headless --script res://tools/verifica_aerion.gd
+##
+## Desde 29 set 2026 corre na arena de QA (`scenes/qa/ArenaAerion.tscn`), com
+## a geometria da sala antiga: o N12 passou a ser o nivel autoral da Torre
+## dos Ecos e o Aerion saiu da campanha (ver docs/nivel_autoral_n12.md).
+const ARENA := "res://scenes/qa/ArenaAerion.tscn"
 
 var falhas := 0
 
@@ -11,7 +16,7 @@ func _init() -> void:
 	estado.modo_teste = true
 	estado.indice_nivel = 11
 	estado.checkpoint = Vector2.ZERO
-	var cena: PackedScene = load("res://scenes/levels/Torre_dos_Ventos.tscn")
+	var cena: PackedScene = load(ARENA)
 	var nivel := cena.instantiate()
 	root.add_child(nivel)
 	await create_timer(0.5).timeout
