@@ -5,8 +5,11 @@ Pedidos do Paulo, pela ordem:
 2. "skins a sério, não trocas de cor ou de brilho";
 3. "novos assets de armaduras e armas que possam ser aplicados ao modelo da
    Koliani, usando o Golden Model dela";
-4. "pode ter algumas com palete trocada" -- ficam 4 com conjunto e 3 só de
-   paleta (a minoria).
+4. "pode ter algumas com palete trocada" / "esses exemplos eu gostei" /
+   "mas simples ficam só essas, depois quero mais elaborado" -- as 3 de
+   paleta do 1.º passe VOLTAM com os ids e nomes originais (Brasa da
+   Fornalha, Abadia Afogada, Planícies Celestiais) e são as únicas simples;
+   os conjuntos ganham ids próprios.
 
 ## Como estava
 - Skins da Loja = só tinta (`CosmeticosVisuais.TINTA_SKIN`), placeholder.
@@ -17,21 +20,23 @@ Pedidos do Paulo, pela ordem:
 - **Descartado**: usar os rigs antigos (`koliani_nova`, `shadowblade`,
   `cavaleiro`) como skins -- têm 64-72 px de célula, outro estilo, ficam
   pequenos ao lado do Golden Set.
-- **Descartado (1.ª tentativa, commit `85ef70e`)**: só troca de paleta. O
-  Paulo rejeitou -- a silhueta ficava igual.
+- **1.ª tentativa (commit `85ef70e`)**: só troca de paleta. Não chegava
+  como skin elaborada, mas o Paulo gostou e ficaram como as 3 simples.
 
 ## O que foi feito
 Uma skin = Golden Set + paleta + CONJUNTO de peças desenhadas:
 
 | Skin | Cabeça | Ombro | Costas | Arma |
 |---|---|---|---|---|
-| Guardiã da Forja (`skin_fornalha`) | cornos com fendas de brasa | ferro com espigão | -- | montante de brasa |
-| Abadessa Afogada (`skin_abadia_afogada`) | capuz fundo, orla verde-água | -- | -- | tridente |
-| Serafim Celestial (`skin_celestial`) | auréola | ouro em asa | asas de penas (batem) | espada solar |
+| Guardiã da Forja (`skin_guardia_forja`) | cornos com fendas de brasa | ferro com espigão | -- | montante de brasa |
+| Abadessa Afogada (`skin_abadessa_afogada`) | capuz fundo, orla verde-água | -- | -- | tridente |
+| Serafim Celestial (`skin_serafim_celestial`) | auréola | ouro em asa | asas de penas (batem) | espada solar |
 | Arauta do Vazio (`skin_vazio`, Região XIX) | coroa de espinhos | -- | capa rasgada (esvoaça) | foice |
 
-Só paleta (sem peças, silhueta do Golden Set): `skin_brasa`, `skin_mare`,
-`skin_marfim` -- as rampas da Forja, Abadia e Celestial. O teste exige que
+Só paleta (sem peças, silhueta do Golden Set), aprovadas pelo Paulo e as
+únicas simples: `skin_fornalha` (Brasa da Fornalha), `skin_abadia_afogada`
+(Abadia Afogada), `skin_celestial` (Planícies Celestiais) -- frames iguais
+byte a byte aos do 1.º passe (`85ef70e`). O teste exige que
 sejam a minoria (`CosmeticosVisuais.SKIN_SO_PALETA`).
 
 - `tools/trajes_koliani.py` -- as peças (grelhas de texto e desenho
