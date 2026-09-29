@@ -25,13 +25,15 @@ extends SceneTree
 ##
 ## `alvo` e' o NOME do no' onde tem de aterrar (serve para plataformas
 ## moveis: conta a colisao com esse corpo), ou `porta` (conta tocar na area
-## da Porta, 48x96 -- a porta muda de cena ao toque, mesmo no ar).
+## da Porta pelo `body_entered` dela -- a porta muda de cena ao toque,
+## mesmo no ar).
 
 const DT := 1.0 / 60.0
 
 var _estado: Node
 var _p := {}
 var _info := ""
+var _tocou_porta := false
 
 
 func _init() -> void:
@@ -93,6 +95,8 @@ func _tentar(estrategia: String, espera: float) -> String:
 		k = await _nova_koliani()
 		if k == null:
 			return "sem Koliani"
+	if String(_p["alvo"]) == "porta":
+		_preparar_porta()
 	var parte := String(_p["parte"]).split(",")
 	k.global_position = Vector2(float(parte[0]), float(parte[1]))
 	k.call("reset_physics_interpolation")
@@ -129,6 +133,7 @@ func _tentar(estrategia: String, espera: float) -> String:
 		if x >= salto_x * sentido or (dash_feito and not bool(k.call("is_on_floor"))):
 			break
 	# 2. salto (+ duplo no topo do arco), segurando a direcao
+	_tocou_porta = false
 	Input.action_press("saltar")
 	var duplo := estrategia != "simples"
 	var saiu := false
@@ -157,6 +162,8 @@ func _tentar(estrategia: String, espera: float) -> String:
 			return "alcance %.0f" % absf(p.x - x_saida)
 		if alvo == "porta" and _toca_porta(p):
 			_soltar()
+			_info = "toca a porta em x=%.0f y=%.0f (%s)" % [p.x, p.y,
+				"no chao" if chao else "no ar"]
 			return "ok"
 		if duplo and saiu and v.y > -30.0:
 			Input.action_release("saltar")
@@ -177,13 +184,28 @@ func _tentar(estrategia: String, espera: float) -> String:
 	return "?"
 
 
-func _toca_porta(p: Vector2) -> bool:
-	var porta := current_scene.get_node_or_null("Porta") as Node2D
+## Conta o `body_entered` REAL da Porta (a fisica decide, nao uma caixa a
+## olho). Na bancada a porta fica aberta (como com o Guardiao morto) e o
+## handler dela e' desligado, para o toque nao mudar de nivel a meio da
+## varredura.
+func _preparar_porta() -> void:
+	var porta := current_scene.get_node_or_null("Porta") as Area2D
 	if porta == null:
-		return false
-	# area da porta 48x96 (centro +2 em y); corpo da Koliani ~ 24x48
-	return absf(p.x - porta.global_position.x) < 24.0 + 12.0 \
-		and absf(p.y - (porta.global_position.y + 2.0)) < 48.0 + 24.0
+		return
+	if porta.has_method("_ao_entrar") and porta.body_entered.is_connected(porta._ao_entrar):
+		porta.body_entered.disconnect(porta._ao_entrar)
+	if not porta.body_entered.is_connected(_porta_tocada):
+		porta.body_entered.connect(_porta_tocada)
+	porta.set_deferred("monitoring", true)
+
+
+func _porta_tocada(corpo: Node) -> void:
+	if corpo.is_in_group("koliani"):
+		_tocou_porta = true
+
+
+func _toca_porta(_p: Vector2) -> bool:
+	return _tocou_porta
 
 
 func _chao_de(k: CharacterBody2D) -> String:

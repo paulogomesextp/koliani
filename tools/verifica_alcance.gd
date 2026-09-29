@@ -114,6 +114,8 @@ static func _medir_arvore(st: SceneTree, raiz: Node, indice := -1) -> Dictionary
 	var i_spawn := _plat_mais_perto(plats, kol.global_position + Vector2(0, 20))
 	var i_porta := _plat_mais_perto(plats, porta.global_position + Vector2(0, 20))
 	if i_spawn < 0 or i_porta < 0:
+		if i_spawn >= 0:
+			return {"erro": _porta_no_ar(plats, porta.global_position)}
 		return {"erro": "spawn ou porta sem plataforma por baixo"}
 
 	# --- ar: planar contextual e vento (Região II, Process 11) ---
@@ -229,6 +231,24 @@ static func _recolher_corrente(p: Node2D, out: Array) -> void:
 			"dir": pos.x + largura * 0.5,
 			"base": pos.y + 14.0,
 		})
+
+
+## A porta nao tem chao por baixo. Nao e' o crivo a falhar: e' o nivel. A
+## Porta abre ao toque (`body_entered`), por isso pode dar para lhe tocar a
+## saltar -- mas ai' quem la' chega a andar cai no buraco. Diz-se onde acaba
+## o chao mais perto, para o erro ser accionavel.
+static func _porta_no_ar(plats: Array, pos: Vector2) -> String:
+	var melhor := ""
+	var melhor_d := 1.0e9
+	for p: Dictionary in plats:
+		if float(p.topo) < pos.y - 40.0 or float(p.topo) > pos.y + 120.0:
+			continue
+		var d := _vao_entre(float(p.esq), float(p.dir), pos.x, pos.x)
+		if d < melhor_d:
+			melhor_d = d
+			melhor = "%s (%.0f..%.0f)" % [p.nome, float(p.esq), float(p.dir)]
+	return "PORTA SEM CHAO -- porta em x=%.0f, o chao mais perto e' %s, a %.0f px" % [
+		pos.x, melhor, melhor_d]
 
 
 static func _mesmo_grupo(a: Dictionary, b: Dictionary) -> bool:
