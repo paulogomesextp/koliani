@@ -15,6 +15,16 @@ signal mudou(ligada: bool)
 @export var so_liga := false
 ## Começa já ligada.
 @export var ligada := false
+## Opt-in: alavanca pintada (uma textura; ligar espelha-a e acende-a). Vazio =
+## a alavanca de poligonos de sempre.
+@export var textura: Texture2D
+@export var escala_textura := 0.4
+## Opt-in: ao mudar, alterna as plataformas deste grupo como a badalada do
+## `SinoTorre` (as solidas somem, as fantasma ficam solidas) -- as "pontes
+## reconfiguraveis" do N13. Vazio = so' portas.
+@export var alterna_grupo := ""
+
+var _pele: Sprite2D
 
 const COR_OFF := Color(0.55, 0.5, 0.4)
 const COR_ON := Color(0.5, 1.0, 0.7)
@@ -29,6 +39,16 @@ func _ready() -> void:
 	add_to_group("alavancas")
 	body_entered.connect(_ao_tocar)
 	_montar_visual()
+	if textura:
+		for c in get_children():
+			if c is Polygon2D:
+				(c as Polygon2D).visible = false
+		_pele = Sprite2D.new()
+		_pele.texture = textura
+		_pele.scale = Vector2(escala_textura, escala_textura)
+		# a base assenta no chao (a origem da alavanca e' o pe' do poste)
+		_pele.position = Vector2(0.0, 16.0 - textura.get_height() * escala_textura * 0.5)
+		add_child(_pele)
 	_aplicar(true)
 
 
@@ -102,9 +122,36 @@ func _ao_tocar(corpo: Node) -> void:
 		som.call("toca", "mecanismo", -11.0, 1.12 if ligada else 0.86)
 	_aplicar(false)
 	mudou.emit(ligada)
+	if alterna_grupo != "":
+		for p in get_tree().get_nodes_in_group(alterna_grupo):
+			_alternar(p)
+
+
+## O mesmo alternar da badalada do `SinoTorre` (colisao + visual).
+func _alternar(p: Node) -> void:
+	var col := p.get_node_or_null("Col") as CollisionShape2D
+	if col == null:
+		return
+	var vai_ficar_solida := col.disabled
+	col.set_deferred("disabled", not col.disabled)
+	var vis := p.get_node_or_null("Visual") as CanvasItem
+	if vis:
+		var a: float = float(p.get("alpha_fantasma")) if p.get("alpha_fantasma") != null else 0.16
+		create_tween().tween_property(vis, "modulate:a", 1.0 if vai_ficar_solida else a, 0.14)
 
 
 func _aplicar(instantaneo: bool) -> void:
+	if _pele:
+		# desligada o manipulo aponta para tras; ligada, para a frente e acesa
+		_pele.flip_h = not ligada
+		var alvo := Color(1.25, 1.2, 1.05) if ligada else Color(0.85, 0.85, 0.9)
+		if instantaneo:
+			_pele.modulate = alvo
+		else:
+			_pele.scale = Vector2(escala_textura * 1.12, escala_textura * 0.9)
+			var tp := create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+			tp.tween_property(_pele, "scale", Vector2(escala_textura, escala_textura), 0.2)
+			tp.parallel().tween_property(_pele, "modulate", alvo, 0.2)
 	if _manipulo == null:
 		return
 	var ang := deg_to_rad(-32.0) if ligada else deg_to_rad(32.0)

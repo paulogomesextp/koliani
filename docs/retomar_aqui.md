@@ -1,3 +1,25 @@
+# >>> N13 -- "Mecanismos Antigos", autoral (29 set 2026, branch `claude/project-thread-6jbrqw`, SEM push) <<<
+
+Mesmo criterio do N12 ("arte detalhada primeiro"). `Torre_da_Tempestade.tscn`
+deixou de ser jornada procedural + sala do Voltaris e passou a 3 andares de
+maquinaria feitos a mao (3600 x 2250), gerados por
+`tools/construir_n13_mecanismos.py`. A) 1.a alavanca/porta; B) sala das
+engrenagens (bracos em cruz sobre fosso com serra, poleiro), porta B de duas
+alavancas, piso que colapsa + pendulos, elevador de contrapeso; C) pontes
+reconfiguraveis sob tecto baixo (alavanca troca a ponte), ponte movel num
+trilho, correntes com peso, alavanca C so' do braco de uma engrenagem,
+elevador em vaivem; D) mecanismo de 3 sinos (toca o padrao sozinho; a ordem
+certa abre a porta do guardiao) e Guardiao = Construto Vitral elite
+(`guard.construto_vitral`, 6 idiomas). 3 segredos, 6 checkpoints, 12 luzes.
+Pecas da coluna N13 do `level_mechanics.png` + texturas de material do atlas
+(`tools/gerar_props_n13_prancha.py`, prefixo `m_`). Peles/opcoes opt-in em
+Alavanca, PortaTrancada, PlataformaRoda, PlataformaCorrente, PlataformaSino,
+ElevadorColuna, PenduloLamina, SinoTorre; `MecanismoSinos` novo. Testes:
+`TestesRegion03N13`, `teste_r3_n13_mecanismos` (fisica),
+`teste_r3_n13_elevadores_no_crivo`. Relatorio: `docs/nivel_autoral_n13.md`;
+capturas `docs/qa/n13_autoral/`. **Pendente do Paulo**: autorizar o push;
+playtest (padrao dos sinos, ritmo das engrenagens, tecto baixo, Guardiao).
+
 # >>> Skins da Koliani = 3 simples + 2 premium, Anjo e Demonio (29 set 2026, branch `claude/project-thread-u5wewl`, sem push) <<<
 Relatorio: `docs/execution_skins_koliani.md`. Historia curta: paleta so'
 (recusada como "elaborada", mas as 3 ficaram como as UNICAS simples:
@@ -20,7 +42,7 @@ frames rodados do rolamento vestem-se no `jump_loop_003` e rodam-se; o
 Suite com sandbox limpo (ver relatorio). **Pendente**: aprovacao do Paulo,
 precos finais (hoje 400 V cada, tudo gratis em dev), push.
 
-# >>> N12 -- "Galerias Verticais", autoral (29 set 2026, branch `claude/project-thread-6jbrqw`, SEM push) <<<
+# >>> N12 -- "Galerias Verticais", autoral (29 set 2026, branch `claude/project-thread-6jbrqw`, fundido em master pelo PR #3) <<<
 
 **Passe de arte (29 set, depois de "quero niveis com arte detalhada, isso e'
 o mais importante")**: a branch do PR #1 (`claude/project-thread-8ipy7k`)

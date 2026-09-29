@@ -16,6 +16,12 @@ extends Node2D
 ## vez dos poligonos. A textura e' esticada para caber de eixo a' ponta da
 ## lamina (`comprimento` + 16). Os niveis que nao a definem nao mudam.
 @export var textura: Texture2D
+## Opt-in (N13): em vez de UMA textura esticada ao comprimento (que num
+## pendulo comprido fica gigante), uma corrente em mosaico (`textura_haste`)
+## e a lamina da prancha (`textura_lamina`) no fim, a escala fixa.
+@export var textura_haste: Texture2D
+@export var textura_lamina: Texture2D
+@export var escala_lamina := 0.5
 
 var _t := 0.0
 var _braco: Node2D
@@ -59,12 +65,33 @@ func _montar_visual() -> void:
 		spr.position = Vector2(-textura.get_width() * esc * 0.5, 0.0)
 		_braco.add_child(spr)
 
+	if textura_haste and textura_lamina:
+		eixo.visible = false
+		perno.visible = false
+		var haste := Sprite2D.new()
+		haste.texture = textura_haste
+		haste.centered = false
+		haste.texture_repeat = CanvasItem.TEXTURE_REPEAT_ENABLED
+		haste.region_enabled = true
+		var ew := 0.7
+		haste.scale = Vector2(ew, ew)
+		haste.region_rect = Rect2(0.0, 0.0, float(textura_haste.get_width()), comprimento / ew)
+		haste.position = Vector2(-textura_haste.get_width() * ew * 0.5, 0.0)
+		haste.modulate = Color(1.0, 0.86, 0.6)
+		_braco.add_child(haste)
+		var lam := Sprite2D.new()
+		lam.texture = textura_lamina
+		lam.scale = Vector2(escala_lamina, escala_lamina)
+		lam.position = Vector2(0.0, comprimento - textura_lamina.get_height() * escala_lamina * 0.2)
+		_braco.add_child(lam)
+	var com_pele := textura != null or (textura_haste != null and textura_lamina != null)
+
 	var corrente := Line2D.new()
 	corrente.points = PackedVector2Array([Vector2.ZERO, Vector2(0, comprimento - 18.0)])
 	corrente.width = 4.0
 	corrente.default_color = Color(0.28, 0.26, 0.3)
 	_braco.add_child(corrente)
-	corrente.visible = textura == null
+	corrente.visible = not com_pele
 
 	# foice / lamina no fundo do braco
 	var lamina := Polygon2D.new()
@@ -74,7 +101,7 @@ func _montar_visual() -> void:
 		Vector2(30, 6), Vector2(0, 14), Vector2(-30, 6)])
 	lamina.color = Color(0.75, 0.78, 0.86)
 	_braco.add_child(lamina)
-	lamina.visible = textura == null
+	lamina.visible = not com_pele
 
 	var fio := Line2D.new()
 	fio.position = Vector2(0, comprimento)
@@ -82,7 +109,7 @@ func _montar_visual() -> void:
 	fio.width = 2.0
 	fio.default_color = Color(1, 1, 1, 0.9)
 	_braco.add_child(fio)
-	fio.visible = textura == null
+	fio.visible = not com_pele
 
 	_glint = Polygon2D.new()
 	_glint.position = Vector2(0, comprimento)

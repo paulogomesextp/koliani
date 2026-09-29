@@ -31,6 +31,11 @@ extends AnimatableBody2D
 ## Quantos braços. 1 = uma prancha; 4 = uma cruz de engrenagem.
 @export var bracos := 1
 @export var cor := Color(0.35, 0.29, 0.24)
+## Opt-in (N13): roda de engrenagem pintada por tras dos bracos, com o
+## diametro do `comprimento`, a girar com eles. Vazio = so' os bracos.
+@export var textura_roda: Texture2D
+## Opt-in: textura dos bracos (em mosaico), em vez da cor chapada.
+@export var textura_braco: Texture2D
 
 var _t := 0.0
 
@@ -54,6 +59,10 @@ func _ready() -> void:
 			Vector2(-h.x, -h.y), Vector2(h.x, -h.y), Vector2(h.x, h.y), Vector2(-h.x, h.y)])
 		tab.color = cor
 		tab.rotation = ang
+		if textura_braco:
+			tab.texture = textura_braco
+			tab.texture_repeat = CanvasItem.TEXTURE_REPEAT_ENABLED
+			tab.color = Color(0.92, 0.8, 0.64)   # ouro velho, nao latao novo
 		add_child(tab)
 	# o eixo, ao meio: é o que diz de que lado está o pivô
 	var eixo := Polygon2D.new()
@@ -64,6 +73,15 @@ func _ready() -> void:
 	eixo.polygon = pts
 	eixo.color = Color(0.52, 0.48, 0.44)
 	add_child(eixo)
+	if textura_roda:
+		eixo.visible = false
+		var roda := Sprite2D.new()
+		roda.name = "Roda"
+		roda.texture = textura_roda
+		var esc := comprimento * 1.08 / float(maxi(textura_roda.get_width(), textura_roda.get_height()))
+		roda.scale = Vector2(esc, esc)
+		roda.z_index = -1
+		add_child(roda)
 	_t = fase * periodo
 	_aplicar()
 
