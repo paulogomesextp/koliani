@@ -53,6 +53,16 @@ RECORTES = {
 	"prancha_a": ("concept_environment_01.png", (640, 2, 1366, 332)),
 	"prancha_b": ("concept_environment_02.png", (660, 2, 1366, 343)),
 }
+# Regiao III (Torre dos Ecos) -- mesmo metodo, pack `torre_ecos`. O painel
+# "CONCEITO DA REGIAO" tem o rotulo no canto de cima (ate' y=35): o recorte
+# comeca por baixo dele. Nao ha' Koliani nesta prancha.
+PRANCHAS_R3 = os.path.join(RAIZ, "docs", "art_direction", "regions",
+	"region_03")
+DEST_R3 = os.path.join(RAIZ, "assets", "sprites", "pixel", "backgrounds",
+	"torre_ecos")
+RECORTES_R3 = {
+	"prancha": ("concept_environment.png", (292, 38, 948, 312)),
+}
 FATOR = 2
 # Igual ao da Regiao I (`nitidez_panorama_9h.py`): aresta com contraste sem
 # halo claro a' volta das ruinas.
@@ -123,14 +133,20 @@ def nuvens(im: Image.Image) -> Image.Image:
 
 
 def main() -> None:
-	os.makedirs(DEST, exist_ok=True)
-	for nome, (fonte, caixa) in RECORTES.items():
-		src = Image.open(os.path.join(PRANCHAS, fonte)).convert("RGB")
+	for pranchas, dest, recortes in ((PRANCHAS, DEST, RECORTES),
+			(PRANCHAS_R3, DEST_R3, RECORTES_R3)):
+		gerar(pranchas, dest, recortes)
+
+
+def gerar(pranchas: str, dest: str, recortes: dict) -> None:
+	os.makedirs(dest, exist_ok=True)
+	for nome, (fonte, caixa) in recortes.items():
+		src = Image.open(os.path.join(pranchas, fonte)).convert("RGB")
 		rec = esbater_topo(espelhado(src.crop(caixa)))
 		pano = ampliar(rec)
-		pano.save(os.path.join(DEST, nome + ".png"), optimize=True)
+		pano.save(os.path.join(dest, nome + ".png"), optimize=True)
 		nv = nuvens(pano)
-		nv.save(os.path.join(DEST, nome + "_nuvens.png"), optimize=True)
+		nv.save(os.path.join(dest, nome + "_nuvens.png"), optimize=True)
 		print("%s: %dx%d (de %s %s)" % (nome, pano.width, pano.height,
 			fonte, caixa))
 

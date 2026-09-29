@@ -75,6 +75,23 @@ REGIOES = {
 		# bloco em vez de flutuar por baixo dele
 		"base": (505, 178, 570, 198),
 	},
+	# Regiao III -- Torre dos Ecos (N11-N15). Material NOVO (`torre_ecos`):
+	# o `torres` e' partilhado por mais 18 niveis de outras regioes, que nao
+	# se mexem. Escolhido pelo `plataforma.gd` a partir do `fundo_pack`.
+	# Fonte: "TILES DE TERRENO" de `region_03/concept_environment.png` (a do
+	# `asset_atlas.png` tem pedras de 10 px, pequenas demais).
+	"torre_ecos": {
+		"prancha": "docs/art_direction/regions/region_03/concept_environment.png",
+		# "CHAO NORMAL" (juntas x 38/53/62, y 364/381/393) e "CHAO COM
+		# FENDAS" (juntas x 172/201), cada um de junta a junta
+		"corpo": [(38, 364, 62, 393), (172, 364, 201, 393)],
+		# a fiada clara de cima dos tres chaos; pedra comeca em y=348
+		"topo_y": (344, 360),
+		"topo_x": [(21, 73), (92, 143), (162, 212)],
+		"lado": (15, 358, 23, 406),
+		# os cotos de pilar por baixo da "PLATAFORMA DE PEDRA"
+		"base": (232, 364, 278, 384),
+	},
 }
 
 # Fundo escuro das pranchas (~ (1, 11, 20)): tudo o que e' perto dele e'

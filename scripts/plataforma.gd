@@ -40,10 +40,19 @@ const SUPERFICIE := 8.0
 const BIOMAS := [
 	"floresta", "prisao", "torres", "catacumbas", "cidade", "castelo",
 	# Regiao II -- Desfiladeiro dos Ventos. Tem material proprio
-	# (`tools/gerar_terreno_regiao02.py`) porque o `prisao` era tijolo de
-	# cela e o `torres` ja' e' da Regiao III.
+	# (`tools/gerar_terreno_prancha.py`, da prancha aprovada) porque o
+	# `prisao` era tijolo de cela e o `torres` ja' e' da Regiao III.
 	"desfiladeiro",
+	# Regiao III -- Torre dos Ecos (N11-N15), tambem da prancha aprovada.
+	# Nao e' um bioma da `Atmosfera`: entra por `MATERIAL_POR_PACK`.
+	"torre_ecos",
 ]
+
+## Material de terreno escolhido pelo `fundo_pack` da `Atmosfera`, por cima
+## do bioma. A Regiao III corre com bioma `torres`, que mais 18 niveis de
+## outras regioes partilham; o material da prancha da Torre dos Ecos so' pode
+## entrar nos cinco niveis dela, e sao esses que usam o pack `torre_ecos`.
+const MATERIAL_POR_PACK := {"torre_ecos": "torre_ecos"}
 
 @export var tamanho := Vector2(200.0, 40.0) : set = _set_tamanho
 ## Altura do visual (0 = igual a colisao). Maior => "slab" de chao grosso
@@ -107,6 +116,16 @@ func _nome_bioma() -> String:
 	if atm and "bioma" in atm and BIOMAS.has(atm.bioma):
 		return atm.bioma
 	return "floresta"
+
+
+## Material das TEXTURAS do terreno: o bioma, salvo quando o `fundo_pack`
+## pede um material proprio (`MATERIAL_POR_PACK`). Os props continuam a vir
+## do catalogo do bioma.
+func _nome_material(bioma: String) -> String:
+	var atm := get_tree().get_first_node_in_group("atmosfera") if is_inside_tree() else null
+	if atm and "fundo_pack" in atm and MATERIAL_POR_PACK.has(atm.fundo_pack):
+		return MATERIAL_POR_PACK[atm.fundo_pack]
+	return bioma
 
 
 static func _tex(bioma: String, peca: String) -> Texture2D:
@@ -175,6 +194,7 @@ func _aplicar() -> void:
 		f.queue_free()
 
 	var bioma := _nome_bioma()
+	var material := _nome_material(bioma)
 	var largura: float = tamanho.x
 	var alt: float = maxf(tamanho.y, altura_visual)
 	var x0 := -largura * 0.5
@@ -194,7 +214,7 @@ func _aplicar() -> void:
 	# quebra-lhe as pontas com raizes.
 	var hybrid_l1: bool = kit != null and HybridL1.serve(int(kit.get("perfil")))
 	vis.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR if hybrid_l1 else CanvasItem.TEXTURE_FILTER_PARENT_NODE
-	var corpo: Texture2D = Kit.terreno(Kit.HD_CORPO, "terreno/terreno_corpo.png") if kit else _tex(bioma, "corpo")
+	var corpo: Texture2D = Kit.terreno(Kit.HD_CORPO, "terreno/terreno_corpo.png") if kit else _tex(material, "corpo")
 	if hybrid_l1:
 		corpo = HybridL1.tex("terrain_hd/corpo")
 	if corpo == null:                        # terreno por gerar -> nao pinta nada
@@ -243,7 +263,7 @@ func _aplicar() -> void:
 
 	# 3. cortes laterais
 	# (o lado do kit tem o contorno na coluna 10: fica 2 px para fora da colisao)
-	var lado: Texture2D = Kit.terreno(Kit.HD_LADO, "terreno/terreno_lado.png") if kit else _tex(bioma, "lado")
+	var lado: Texture2D = Kit.terreno(Kit.HD_LADO, "terreno/terreno_lado.png") if kit else _tex(material, "lado")
 	if hybrid_l1:
 		lado = HybridL1.tex("terrain_hd/lado")
 	if lado:
@@ -255,7 +275,7 @@ func _aplicar() -> void:
 		vis.add_child(ld)
 
 	# 4. franja de baixo -- so' quando a plataforma tem corpo que valha a pena
-	var base: Texture2D = Kit.terreno(Kit.HD_BASE, "terreno/terreno_base.png") if kit else _tex(bioma, "base")
+	var base: Texture2D = Kit.terreno(Kit.HD_BASE, "terreno/terreno_base.png") if kit else _tex(material, "base")
 	if hybrid_l1:
 		base = HybridL1.tex("terrain_hd/base")
 	if base and alt >= 26.0:
@@ -270,7 +290,7 @@ func _aplicar() -> void:
 		vis.add_child(_mosaico(base, Vector2(x0, yb), Vector2(largura, bh), Vector2(dx, 0)))
 
 	# 5. a capa, por cima de tudo (e a sobressair para cima do plano de pouso)
-	var topo: Texture2D = Kit.topo(rng) if kit else _tex(bioma, "topo")
+	var topo: Texture2D = Kit.topo(rng) if kit else _tex(material, "topo")
 	if hybrid_l1:
 		topo = HybridL1.tex("terrain_hd/topo")
 	if topo:

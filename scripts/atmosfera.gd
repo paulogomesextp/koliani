@@ -220,10 +220,13 @@ const PACKS := {
 	# quatro ranhuras (uma entrada por camada, senão a seguinte limpa a
 	# anterior), as nuvens vão dentro do `ceu.png`, como nos outros packs.
 	"torre_ecos": [
-		["ceu.png", "Fundo", 320.0, 5.6],
-		["catedral.png", "Longe", 880.0, 3.6, 1.18],
-		["torres.png", "Meio", 930.0, 3.4, 1.12],
-		["silhueta.png", "Perto", 1000.0, 3.4],
+		# 29 set 2026: o pack gerado (silhuetas chapadas de sinos, casas e
+		# torres) deu lugar ao PANORAMA DA PRANCHA APROVADA -- o painel
+		# "CONCEITO DA REGIAO" de `region_03/concept_environment.png`
+		# (`tools/gerar_fundos_regiao02_prancha.py`). Mesmo formato dos
+		# perfis de altitude da Regiao II; ver `PERFIS_ALTITUDE`.
+		["prancha.png", "Fundo", 720.0, 1.1, 1.0, true],
+		["prancha_nuvens.png", "MarBaixo", 1500.0, 1.9, 1.0, true],
 	],
 	# Região II -- Prisão dos Condenados (ansimuz "Cold Corridors", CC0).
 	"prisao": [
@@ -891,8 +894,12 @@ func _faixa_rasteira(rng: RandomNumberGenerator) -> void:
 func _montar_fundo_pack(_rng: RandomNumberGenerator) -> void:
 	var camadas: Array = PERFIS_ALTITUDE.get(perfil_altitude,
 		PACKS[fundo_pack])
-	if PERFIS_ALTITUDE.has(perfil_altitude):
-		# Os perfis da Regiao II so' preenchem algumas camadas; as outras
+	var so_prancha := false
+	for item: Array in camadas:
+		if item.size() > 5 and bool(item[5]):
+			so_prancha = true
+	if so_prancha:
+		# Os panoramas das pranchas so' preenchem algumas camadas; as outras
 		# tinham as silhuetas-placeholder do `Atmosfera.tscn` (L1..P2), que
 		# ficavam por cima do panorama da prancha.
 		for nome in ["Longe", "Meio", "Perto"]:
