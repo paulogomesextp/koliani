@@ -4485,6 +4485,7 @@ func teste_skins_arte_real() -> void:
 	const CV := preload("res://scripts/cosmeticos_visuais.gd")
 	const GOLD := "res://assets/sprites/koliani_golden_set/frames/"
 	_ok(CV.DIR_SKIN.size() >= 3, "skins: devia haver pelo menos 3 skins com arte")
+	_ok(CV.SKIN_SO_PALETA.size() * 2 < CV.DIR_SKIN.size(), "skins: as so' de paleta deviam ser a minoria")
 	_ok(CV.dir_skin("skin_koliani_base") == "" and CV.dir_skin("skin_carmesim") == "",
 		"skins: base/tinta nao tem pasta de arte")
 	var golden: Array[String] = []
@@ -4518,14 +4519,23 @@ func teste_skins_arte_real() -> void:
 					novos += 1
 				elif oa and not ob:
 					perdidos += 1
+		if id in CV.SKIN_SO_PALETA:
+			# so' paleta: silhueta exatamente a do Golden Set
+			_ok(novos == 0 and perdidos == 0, "skins: %s (so' paleta) mudou a silhueta" % id)
+			continue
 		_ok(novos > 40, "skins: %s sem pecas novas na silhueta (%d px)" % [id, novos])
 		_ok(perdidos < 10, "skins: %s perdeu corpo (%d px)" % [id, perdidos])
 		var golpe := (load(CV.DIR_SKIN[id] + "/frames/attack_basic/attack_basic_003.png") as Texture2D).get_image()
+		var golpe0 := (load(GOLD + "attack_basic/attack_basic_003.png") as Texture2D).get_image()
+		# onde o Golden Set tem a lamina magenta, a skin ja' nao pode ter magenta
+		# (a paleta do Vazio e' magenta, por isso so' se olha para esses pixeis)
 		var magenta := 0
 		for y in golpe.get_height():
 			for x in golpe.get_width():
+				var c0 := golpe0.get_pixel(x, y)
 				var c := golpe.get_pixel(x, y)
-				if c.a > 0.3 and c.s > 0.35 and c.v > 0.35 and c.h > 0.78 and c.h < 0.94:
+				var era_lamina := c0.a > 0.3 and c0.s > 0.3 and c0.v > 0.3 and c0.h > 0.77 and c0.h < 0.95
+				if era_lamina and c.a > 0.3 and c.s > 0.35 and c.v > 0.35 and c.h > 0.78 and c.h < 0.94:
 					magenta += 1
 		_ok(magenta < 6, "skins: %s ainda tem a lamina magenta (%d px)" % [id, magenta])
 	# a Koliani com a skin equipada monta os frames da pasta dela

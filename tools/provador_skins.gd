@@ -16,7 +16,8 @@ const ANIMS := [
 	["djump", 10.0, true], ["dash", 10.0, true], ["roll", 14.0, true],
 	["wallslide", 6.0, true], ["hurt", 6.0, true], ["morte", 5.0, true],
 ]
-const ESCALA := 3.0
+const ESCALA := 2.0
+const POR_LINHA := 4
 
 var _sprites: Array[AnimatedSprite2D] = []
 var _anim := 0
@@ -29,7 +30,10 @@ func _ready() -> void:
 	var fontes: Array = [["skin_koliani_base", GOLD]]
 	for id: String in CosmeticosVisuais.DIR_SKIN:
 		fontes.append([id, CosmeticosVisuais.DIR_SKIN[id] + "/frames/"])
-	var largura := 1280.0 / fontes.size()
+	var colunas := mini(POR_LINHA, fontes.size())
+	var linhas := ceili(fontes.size() / float(POR_LINHA))
+	var largura := 1280.0 / colunas
+	var altura := 640.0 / linhas
 	for i in fontes.size():
 		var sf := SpriteFrames.new()
 		sf.remove_animation("default")
@@ -45,15 +49,17 @@ func _ready() -> void:
 		s.sprite_frames = sf
 		s.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 		s.scale = Vector2(ESCALA, ESCALA)
-		s.position = Vector2(largura * (i + 0.5), 330.0)
+		var col := i % POR_LINHA
+		var lin := i / POR_LINHA
+		s.position = Vector2(largura * (col + 0.5), 60.0 + altura * lin + altura * 0.45)
 		add_child(s)
 		_sprites.append(s)
 		var nome := Label.new()
 		nome.text = Textos.t("shop.item.%s.name" % fontes[i][0])
-		nome.add_theme_font_size_override("font_size", 22)
+		nome.add_theme_font_size_override("font_size", 18)
 		nome.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		nome.size = Vector2(largura, 30)
-		nome.position = Vector2(largura * i, 560)
+		nome.position = Vector2(largura * col, 60.0 + altura * lin + altura * 0.82)
 		add_child(nome)
 	_rotulo = Label.new()
 	_rotulo.add_theme_font_size_override("font_size", 18)
