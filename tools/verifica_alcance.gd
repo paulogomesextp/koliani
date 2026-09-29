@@ -121,6 +121,8 @@ static func _medir_arvore(st: SceneTree, raiz: Node, indice := -1) -> Dictionary
 	# --- ar: planar contextual e vento (Região II, Process 11) ---
 	var ar := _recolher_ar(raiz)
 	ar["duplo"] = indice >= NIVEL_SALTO_DUPLO
+	ar["escalar"] = indice >= NIVEL_ESCALAR
+	var sinos := _recolher_sinos(raiz)
 
 	# --- grafo de alcance ---
 	var n := plats.size()
@@ -134,16 +136,35 @@ static func _medir_arvore(st: SceneTree, raiz: Node, indice := -1) -> Dictionary
 			if _mesmo_grupo(plats[i], plats[j]) or _da_para_saltar(plats[i], plats[j], ar):
 				adj[i].append(j)
 
-	# BFS do spawn
+	# BFS do spawn. As plataformas de sino (`plataforma_sino.gd`) sao
+	# fantasmas ate' se tocar num sino do grupo delas: repete-se o BFS
+	# enquanto se chegar a um sino novo.
+	var ativos := {}
 	var vis := {}
-	var fila := [i_spawn]
-	vis[i_spawn] = true
-	while not fila.is_empty():
-		var a: int = int(fila.pop_front())
-		for b in adj[a]:
-			if not vis.has(b):
-				vis[b] = true
-				fila.append(b)
+	while true:
+		vis = {}
+		var fila := [i_spawn]
+		vis[i_spawn] = -1
+		while not fila.is_empty():
+			var a: int = int(fila.pop_front())
+			for b in adj[a]:
+				var pb: Dictionary = plats[b]
+				if pb.has("sino") and not ativos.has(pb["sino"]):
+					continue
+				if not vis.has(b):
+					vis[b] = a
+					fila.append(b)
+		var novos := 0
+		for sino: Dictionary in sinos:
+			if ativos.has(sino["grupo"]):
+				continue
+			for i in vis.keys():
+				if _toca_sino(plats[i], sino["pos"]):
+					ativos[sino["grupo"]] = true
+					novos += 1
+					break
+		if novos == 0:
+			break
 
 	var orfas: Array = []
 	for i in n:
@@ -152,6 +173,16 @@ static func _medir_arvore(st: SceneTree, raiz: Node, indice := -1) -> Dictionary
 			orfas.append("%s@(%.0f,%.0f)" % [pi.nome, float(pi.cx), float(pi.topo)])
 
 	var ok_porta: bool = vis.has(i_porta)
+	# ALCANCE_CAMINHO=1 imprime o caminho spawn -> porta (para ver porque passa)
+	if ok_porta and OS.has_environment("ALCANCE_CAMINHO"):
+		var passos: Array[String] = []
+		var i := i_porta
+		while i >= 0:
+			passos.push_front(String(plats[i].nome))
+			i = int(vis[i])
+		print("  caminho: " + " > ".join(passos))
+		if not ativos.is_empty():
+			print("  sinos tocados: " + ", ".join(ativos.keys()))
 	var porque := ""
 	if not ok_porta:
 		# diz qual o degrau que falta: plataforma alcancada mais a' direita
@@ -189,9 +220,25 @@ static func _recolher(no: Node, out: Array) -> void:
 				"esq": p.global_position.x - tam.x * 0.5,
 				"dir": p.global_position.x + tam.x * 0.5,
 				"base": p.global_position.y + tam.y * 0.5,
+				"parede": tam.y >= 3.0 * tam.x,
+			})
+		elif s.ends_with("plataforma_sino.gd"):
+			# fantasma ate' um sino do grupo dela ser tocado (ver `_bfs`)
+			var ts: Vector2 = f.get("tamanho")
+			var ps := f as Node2D
+			out.append({
+				"nome": String(f.name),
+				"cx": ps.global_position.x,
+				"topo": ps.global_position.y - ts.y * 0.5,
+				"esq": ps.global_position.x - ts.x * 0.5,
+				"dir": ps.global_position.x + ts.x * 0.5,
+				"base": ps.global_position.y + ts.y * 0.5,
+				"sino": String(f.get("grupo_alternar")),
 			})
 		elif s.ends_with("plataforma_corrente.gd"):
 			_recolher_corrente(f as Node2D, out)
+		elif s.ends_with("plataforma_flutuante.gd"):
+			_recolher_flutuante(f as Node2D, out)
 		_recolher(f, out)
 
 
@@ -249,6 +296,31 @@ static func _porta_no_ar(plats: Array, pos: Vector2) -> String:
 			melhor = "%s (%.0f..%.0f)" % [p.nome, float(p.esq), float(p.dir)]
 	return "PORTA SEM CHAO -- porta em x=%.0f, o chao mais perto e' %s, a %.0f px" % [
 		pos.x, melhor, melhor_d]
+
+
+## PLATAFORMA FLUTUANTE (`plataforma_flutuante.gd`): baloico vertical de
+## +-`balanco` e deriva horizontal de `deriva` no total, a volta de `_base`.
+## Colisao largura x 24 com o centro 4 px abaixo -> topo = y - 8. Entra como
+## os cantos e o centro do percurso, do mesmo `grupo` (ver corrente).
+static func _recolher_flutuante(p: Node2D, out: Array) -> void:
+	var base: Vector2 = p.get("_base")
+	var largura := float(p.get("largura"))
+	var bal := float(p.get("balanco"))
+	var der := float(p.get("deriva")) * 0.5
+	var k := 0
+	for d in [Vector2.ZERO, Vector2(-der, -bal), Vector2(-der, bal),
+			Vector2(der, -bal), Vector2(der, bal)]:
+		var pos: Vector2 = base + d
+		out.append({
+			"nome": "%s~%d" % [p.name, k],
+			"grupo": String(p.get_path()),
+			"cx": pos.x,
+			"topo": pos.y - 8.0,
+			"esq": pos.x - largura * 0.5,
+			"dir": pos.x + largura * 0.5,
+			"base": pos.y + 16.0,
+		})
+		k += 1
 
 
 static func _mesmo_grupo(a: Dictionary, b: Dictionary) -> bool:
@@ -336,6 +408,8 @@ static func _da_para_saltar(a: Dictionary, b: Dictionary, ar: Dictionary = {}) -
 		return true
 	if ar.is_empty():
 		return false
+	if bool(ar.get("escalar", false)) and _da_para_escalar(a, b):
+		return true
 	if bool(ar.get("duplo", false)) and _da_para_saltar_duplo(a, b, ar):
 		return true
 	var a_topo := float(a.topo)
@@ -478,3 +552,47 @@ static func _envolvente(tab: Dictionary, dy: float) -> float:
 			var k1: float = ks[i]
 			return lerpf(float(tab[k0]), float(tab[k1]), (dy - k0) / (k1 - k0))
 	return float(tab[ks[-1]])
+
+
+## ESCALAR PAREDES (a partir do N11: dada pelo chefe do N10, indice 9 em
+## `nivel_com_chefe.gd`). Encostada a uma parede e com a direcao para ela,
+## a Koliani sobe a `VEL_ESCALAR` sem limite de tempo e faz o mantle no topo
+## (`koliani.gd`). Por isso chega-se ao TOPO de uma parede (plataforma alta
+## e estreita, `parede`) desde que se consiga agarrar a face: a face esta' a
+## um salto na horizontal (`VAO_MAX`) e desce ate' ao alcance de um salto
+## (a base da parede nao fica mais de `SUBIDA_MAX` acima de onde se parte).
+## Nao modela wall-jumps entre paredes.
+const NIVEL_ESCALAR := 10
+
+
+static func _da_para_escalar(a: Dictionary, b: Dictionary) -> bool:
+	if not bool(b.get("parede", false)):
+		return false
+	if float(b.topo) >= float(a.topo):
+		return false   # nao e' subida: ja' cabe nas regras a pe'
+	if _vao_entre(float(a.esq), float(a.dir), float(b.esq), float(b.dir)) > VAO_MAX:
+		return false
+	return float(b.base) >= float(a.topo) - SUBIDA_MAX
+
+
+## SINOS (`sino_torre.gd`): tocam-se ao bater-lhes (golpe ou projetil) e
+## tornam solidas as plataformas do `alterna_grupo`. Aproximacao: conta-se
+## como tocado se estiver por cima de uma plataforma alcancada (60 px para
+## os lados, ate' 150 acima do topo -- golpe no ar a meio de um salto).
+## Nao conta com o projetil de longe nem com o sino a alternar de volta.
+static func _recolher_sinos(raiz: Node) -> Array:
+	var out: Array = []
+	var pilha: Array[Node] = [raiz]
+	while not pilha.is_empty():
+		var no: Node = pilha.pop_back()
+		pilha.append_array(no.get_children())
+		var e: Script = no.get_script()
+		if e and e.resource_path.ends_with("sino_torre.gd"):
+			out.append({"pos": (no as Node2D).global_position,
+				"grupo": String(no.get("alterna_grupo"))})
+	return out
+
+
+static func _toca_sino(p: Dictionary, pos: Vector2) -> bool:
+	return pos.x >= float(p.esq) - 60.0 and pos.x <= float(p.dir) + 60.0 \
+		and pos.y >= float(p.topo) - 150.0 and pos.y <= float(p.topo) + 10.0
