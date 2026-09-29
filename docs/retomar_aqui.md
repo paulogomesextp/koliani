@@ -1,16 +1,18 @@
-# >>> Skins da Koliani com arte real (29 set 2026, branch `claude/project-thread-u5wewl`, sem push) <<<
-Pedido do Paulo: novos assets de skins. Relatorio: `docs/execution_skins_koliani.md`.
-As skins da Loja eram so' tinta (`modulate`); agora ha' 3 com arte real,
-geradas por `tools/gerar_skins_koliani.py` a partir do Golden Set (84 frames,
-paleta trocada por material, pele e contorno intactos): `skin_fornalha`
-(Regiao IV), `skin_abadia_afogada` (IX), `skin_celestial` (XIV).
-Ligacao: `CosmeticosVisuais.DIR_SKIN` -> `koliani.gd::_caminho_skin`.
+# >>> Skins da Koliani = conjuntos de armadura + arma (29 set 2026, branch `claude/project-thread-u5wewl`, sem push) <<<
+Relatorio: `docs/execution_skins_koliani.md`. O Paulo rejeitou skins so' de
+paleta e pediu armaduras e armas aplicadas ao Golden Model. Feito: 3 skins
+(Guardia da Forja / Abadessa Afogada / Serafim Celestial) = Golden Set + pecas
+desenhadas (cornos, capuz, aureola, asas, ombreiras) + arma nova no lugar da
+lamina magenta (montante, tridente, espada solar), nos 84 frames.
+Pecas e ancoras: `tools/trajes_koliani.py`; composicao:
+`tools/gerar_skins_koliani.py`; runtime: `CosmeticosVisuais.DIR_SKIN`.
 Ver no Windows: `Godot.exe --path . res://tools/ProvadorSkins.tscn`.
-Suite: 0 falhas. **Pendente**: precos/raridades provisorios; decidir se as
-skins ficam presas a regioes; se as tintas antigas passam a arte real.
-**Armadilha**: se o Golden Set mudar (ex. `run_native`), regerar as skins --
-o runtime cai no frame original quando a skin nao o tem, por isso nao parte,
-mas a skin fica "incompleta" nessa animacao.
+**Armadilhas**: detetar a lamina ANTES de trocar a paleta (a paleta pinta-a);
+so' o maior aglomerado magenta conta; os 3 frames rodados do rolamento
+vestem-se no `jump_loop_003` e rodam-se. Se o Golden Set mudar, regerar.
+Suite: 0 falhas com sandbox limpo (com sandbox reutilizado o
+`teste_golem_piloto_ttk` falha por causa do save que a suite deixa -- nao e' das skins).
+**Pendente**: aprovar o visual; ligar as pecas ao `Equipamento`?
 
 # >>> N11 -- passe de enriquecimento (29 set 2026, commitado, nao empurrado ainda) <<<
 Pedido do Paulo apos ver o N11 (28 set): "esta pequeno, so' uma subida, sem

@@ -1,52 +1,75 @@
-# Execução — Skins da Koliani com arte real (29 set 2026)
+# Execução — Skins da Koliani: conjuntos de armadura + arma (29 set 2026)
 
-Pedido do Paulo: "quero que faça novos assets para skins da Koliani".
+Pedidos do Paulo, pela ordem:
+1. "novos assets para skins da Koliani";
+2. "skins a sério, não trocas de cor ou de brilho";
+3. "novos assets de armaduras e armas que possam ser aplicados ao modelo da
+   Koliani, usando o Golden Model dela".
 
 ## Como estava
-- A Loja já tinha a categoria `skins`, mas todas eram **placeholder**: o
-  `skin_carmesim` e o `skin_luar` são só uma tinta (`modulate`) por cima do
-  corpo (`CosmeticosVisuais.TINTA_SKIN`); o `skin_coracao_podre` nem tinta tem.
-- O corpo da Koliani em **todos os 100 níveis** é o Golden Set
-  (`assets/sprites/koliani_golden_set/frames/`, 84 PNGs 128×128, pés em y=104),
-  montado em `koliani.gd::_montar_golden_set` / `_animacao_golden`.
-- A arte do Golden Set **não é indexada** (~1200 cores por frame): trocar a
-  paleta por tabela de cores não serve.
+- Skins da Loja = só tinta (`CosmeticosVisuais.TINTA_SKIN`), placeholder.
+- O corpo em todos os 100 níveis é o Golden Set (84 PNG 128×128, pés y=104,
+  `koliani.gd::_montar_golden_set`). A arte não é indexada (~1200 cores/frame).
+- A lâmina da Koliani está pintada DENTRO dos frames, magenta, e só aparece
+  nos golpes (25 frames: `attack_*`, `defesa`).
+- **Descartado**: usar os rigs antigos (`koliani_nova`, `shadowblade`,
+  `cavaleiro`) como skins -- têm 64-72 px de célula, outro estilo, ficam
+  pequenos ao lado do Golden Set.
+- **Descartado (1.ª tentativa, commit `85ef70e`)**: só troca de paleta. O
+  Paulo rejeitou -- a silhueta ficava igual.
 
 ## O que foi feito
-1. `tools/gerar_skins_koliani.py` — troca a paleta por MATERIAL, classificado
-   em HSV com pesos suaves: `acento` (vermelhos: lenço, pontas do cabelo,
-   fivelas), `pele` (nunca muda), `gema` (cristal ciano do cinto) e `tecido`
-   (roupa/cabelo/botas). Cada material passa por uma rampa de cores indexada
-   pelo brilho original; pixels abaixo de V=0,07 (contorno) ficam iguais.
-   Resultado: mesma silhueta (alfa idêntico, verificado no teste), 84 frames
-   por skin, ~700 KB cada.
-2. Três skins, temas das regiões:
-   - `skin_fornalha` — Região IV: brasa/metal fundido sobre ferro queimado
-     (600 K, raro);
-   - `skin_abadia_afogada` — Região IX: verde-água sobre azul-ardósia
-     (900 K ou 180 V, épico);
-   - `skin_celestial` — Região XIV: marfim/prata com ouro (250 V, lendário).
-   Todas `regiao: -1` (à venda desde o início) e `destaque: true`.
-3. Runtime: `CosmeticosVisuais.DIR_SKIN` + `dir_skin()`; `koliani.gd::_caminho_skin`
-   troca cada caminho `GOLDEN_DIR/frames/...` pelo da skin (cai no Golden Set
-   se o ficheiro não existir, ex. um `run_native` futuro antes de regerar).
-   O VFX do golpe não muda. A skin resolve-se ao montar a Koliani (ao entrar
-   num nível), não a meio.
-4. Loja: `preview_loja()` devolve o `preview.png` da skin, `placeholder: false`.
-5. i18n: nome + descrição nos 6 idiomas (traduções reais).
-6. `tools/ProvadorSkins.tscn` — as 4 Koliani lado a lado, animações a rodar.
-7. Teste `teste_skins_arte_real`: catálogo/preview, 84/84 frames por skin,
-   alfa igual e cores diferentes, Koliani com a skin equipada lê os frames da
-   pasta dela, sem skin volta ao Golden Set.
+Uma skin = Golden Set + paleta + CONJUNTO de peças desenhadas:
 
-## Números
-- Suite completa (Linux headless, Godot 4.7.2): **0 falhas**.
-- Gerador: ~10 s para as 3 skins.
+| Skin | Cabeça | Ombro | Costas | Arma |
+|---|---|---|---|---|
+| Guardiã da Forja (`skin_fornalha`) | cornos com fendas de brasa | ferro com espigão | -- | montante de brasa |
+| Abadessa Afogada (`skin_abadia_afogada`) | capuz fundo, orla verde-água | -- | -- | tridente |
+| Serafim Celestial (`skin_celestial`) | auréola | ouro em asa | asas de penas (batem) | espada solar |
 
-## Decisões que ficaram por tomar (Paulo)
-- Preços/raridades são **provisórios** (mesma escala dos itens existentes).
-- As skins não estão presas às regiões (`regiao` -1). Se as quiserem como
-  recompensa regional, é mudar o campo no catálogo.
-- As skins antigas só-tinta (`skin_carmesim`, `skin_luar`) continuam; podem
-  passar a arte real com o mesmo gerador (é acrescentar uma entrada em `SKINS`
-  e em `DIR_SKIN`).
+- `tools/trajes_koliani.py` -- as peças (grelhas de texto e desenho
+  procedural) e as âncoras por frame:
+  - **cara**: média da pele nas 8 linhas abaixo da pele mais alta (validado
+    à vista nos 84 frames);
+  - **ombro**: pele do braço logo abaixo da cara, o ponto mais para trás;
+  - **lâmina**: maior aglomerado magenta (vizinhança de 2 px; brilhos soltos
+    no cabelo desviavam a reta), PCA -> reta; o punho é a ponta mais perto do
+    corpo. Apaga-se (+ halo rosa) e desenha-se a arma nova na mesma reta,
+    maior ou igual, para tapar o que se apagou.
+- **Rolamento**: `roll_003/004/005` são o `jump_loop_003` rodado 270/180/90°
+  (confirmado pixel a pixel). Veste-se o original e roda-se o resultado,
+  alinhado pelo corpo -- cornos, asas e arma rodam com ela.
+- `tools/gerar_skins_koliani.py` -- compõe as 3 skins (84 frames cada),
+  `preview.png` (um golpe, para mostrar a arma) e `pecas/` (as peças soltas).
+- Runtime sem mudanças desde o 1.º passe: `CosmeticosVisuais.DIR_SKIN` ->
+  `koliani.gd::_caminho_skin`. Hitbox/colisão intactas.
+- i18n: nomes/descrições novos nos 6 idiomas.
+- Teste `teste_skins_arte_real`: 84/84 frames, a silhueta CRESCE (>40 px
+  novos no idle) sem perder corpo (<10 px), sem lâmina magenta no golpe, a
+  Koliani equipada lê os frames da skin, sem skin volta ao Golden Set.
+- Provador: `res://tools/ProvadorSkins.tscn`.
+
+## Testes
+- Suite completa (Linux headless, Godot 4.7.2, sandbox `user://` limpo):
+  **0 falhas**.
+- **Armadilha de método**: com um sandbox REUTILIZADO entre corridas, o
+  `teste_golem_piloto_ttk` falhou 3/3 (TTK do cleave 2,8-9,3 s em vez de
+  0,93 s). A causa é o `progresso.json` que a própria suite deixa no
+  `user://`: com sandbox limpo passa sempre, e o commit anterior às skins
+  passa igual. Correr sempre com sandbox novo (`tools/correr_testes.ps1` já
+  o faz).
+
+## Limites conhecidos
+- A arma só se vê nos golpes -- é assim no Golden Set (fora dos golpes não
+  há lâmina desenhada).
+- Algumas pontas de arma tocam a borda do canvas (x=127), como já acontecia
+  com a lâmina original; no rolamento os cornos/asas passam por baixo dos pés
+  durante 1 frame.
+- O VFX do golpe (arco magenta) não muda.
+- As peças de corpo são só ombreiras: pernas e tronco continuam o fato do
+  Golden Set com a paleta da skin.
+
+## Decisões para o Paulo
+- Aprovar o visual. Preços/raridades provisórios.
+- Ligar estas peças ao `Equipamento` (armas/armaduras de gameplay, hoje
+  invisíveis no Golden Set)? A biblioteca de peças serve para isso.
