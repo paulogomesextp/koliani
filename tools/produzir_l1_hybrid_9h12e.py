@@ -144,6 +144,23 @@ def esbater_baixo(p, frac=0.22):
 	return p
 
 
+def esbater_baixo_ondulado(p, frac=0.35):
+	"""Como o `esbater_baixo`, mas a altura do degradê varia por coluna.
+	29 set 2026: os `ramos`/`ramo_curvo` saíam da prancha com a folhagem
+	cortada a direito na borda de baixo do recorte (39% da última linha
+	opaca), e no jogo lia-se uma linha horizontal no topo do ecrã."""
+	w, h = p.size
+	px = p.load()
+	for x in range(w):
+		n = max(1, int(h * frac * _onda(x, w, 0.30, 2.3)))
+		for i in range(min(n, h)):
+			y = h - 1 - i
+			f = i / n
+			r, g, b, a = px[x, y]
+			px[x, y] = (r, g, b, int(a * f * f))
+	return p
+
+
 def limpar_alfa(p, mediana=3, desfoque=0.7):
 	"""Mata a serrilha/franja preta: mediana no alfa e um fio de desfoque."""
 	r, g, b, a = p.split()
@@ -288,7 +305,10 @@ CARVAO = {
 }
 for nome, caixa in CARVAO.items():
 	p = matte_carvao(IM.crop(caixa))
-	guardar(limpar_alfa(p, 3, 0.6), 'elementos', nome, list(caixa))
+	p = limpar_alfa(p, 3, 0.6)
+	if nome in ('ramos', 'ramo_curvo'):  # copa pendurada: cortada em baixo
+		p = esbater_baixo_ondulado(p, 0.40)
+	guardar(p, 'elementos', nome, list(caixa))
 
 # ------------------------------------------------------- terreno HD --------
 # Recortes NATIVOS 1:1 das colunas de rocha da prancha (linha 4). Sem upscale:

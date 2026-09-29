@@ -18,7 +18,12 @@ mesmos poligonos -- a colisao e' identica por construcao, e ha' um teste
 que o prova.
 
   python tools/gerar_tileset_regiao02.py
+  python tools/gerar_terreno_prancha.py desfiladeiro   # SEMPRE a seguir
   (depois: godot --headless --import)
+
+29 set 2026: as celulas que a `CascaMasmorra` usa passaram a ser repintadas
+com pedra da prancha aprovada por `tools/gerar_terreno_prancha.py`. Correr
+so' este script devolve-lhes o tijolo recolorido -- correr o outro depois.
 """
 
 from __future__ import annotations
