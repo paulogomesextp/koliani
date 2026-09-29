@@ -22,6 +22,18 @@ Relatório: `docs/execution_loja_cosmeticos_arte.md`.
 - Não tocado: skins da Koliani, preços/interruptor grátis (outra sessão),
   fundos/terreno, N11.
 
+# >>> ARTE DAS PRANCHAS -- Regioes I a III (29 set 2026, branch `claude/project-thread-8ipy7k`, sem push) <<<
+O Paulo achou a arte dos niveis "muito fraca" face as pranchas aprovadas.
+Relatorio completo: `docs/execution_arte_pranchas_regioes_1_3.md`.
+  - Regiao II (N6-N10): fundo, terreno e casca recortados 1:1 das pranchas.
+  - Regiao III (N11-N15): fundo, terreno (material novo `torre_ecos`, so'
+    para o `fundo_pack` torre_ecos) e 21 props recortados das pranchas.
+    **Isto resolve a "causa raiz por resolver" do N11 abaixo** (mosaico CC0
+    de 192 px) sem mexer na cena do N11.
+  - Regiao I: tirado o corte a direito da copa no topo do ecra.
+Por fazer: SinoTorre/Vitral ainda poligonos, superficie do pantano/abismo
+chapada, N16-N100 intactos. Push/PR so' com autorizacao do Paulo.
+
 # >>> N11 -- passe de enriquecimento (29 set 2026, commitado, nao empurrado ainda) <<<
 Pedido do Paulo apos ver o N11 (28 set): "esta pequeno, so' uma subida, sem
 mecanicas, sem arte de jeito" -- depois esclareceu que "arte de jeito" nao
