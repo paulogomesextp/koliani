@@ -904,6 +904,45 @@ script que arranque o Godot tem de passar por esta ferramenta.
 
 ---
 
+## Musica "igual em todos os niveis" -- era a ambiencia antiga (29 set 2026)
+
+Provado a correr (Godot 4.7.2 Linux, no editor e a partir do `.pck` exportado
+com o preset Windows): N1-N100 e os chefes tocam a faixa aprovada da regiao
+(41 faixas: menu + 20 regioes + 20 chefes; os 44 mp3 de `incoming_music` sao
+38 unicos + 6 duplicados, todos ja' no repo por SHA-256). O que se repetia em
+todo o lado era a camada `_amb` do `musica.gd`: `assombracao.wav` (N6-N100) e
+`ambiente_floresta.wav` (N1-N5), de 29 ago, nunca aprovadas. Desligadas por
+decisao do Paulo com `Musica.AMBIENCIA_ANTIGA_LIGADA = false` (ficheiros
+mantidos; reverter = `true`). Teste: `teste_musica_so_aprovada`.
+
+Pendente: 27 SFX Pixabay aprovados (combate/dano/passos/impactos) nunca
+chegaram ao repo (403 na cloud a 21 set). Lista em
+`/mnt/project-files/sfx_aprovados/em_falta.md`; descarga pedida a sessao no PC.
+
+## SFX "igual ao antigo" -- a PWA ficava presa na versao velha (29 set 2026)
+
+Investigado: **nenhum trabalho de SFX ficou fora do master.** Comparados os
+38 ramos remotos com `origin/master` (arvore contra arvore -- o clone e'
+shallow e o master foi re-enraizado a 25 set, por isso `merge-base` falha).
+Os ramos 9H.13B / region02 / region03 tem versoes MAIS ANTIGAS dos mesmos
+ficheiros; o master tem o lote final (integrado a 24 set a partir de
+`fce155be`): 16 SFX Pixabay aprovados em `assets/audio/approved/sfx/`, o
+dash aprovado e o kit `koliani_signature/`. Os 120 caminhos de `som.gd` e
+`musica.gd` existem no git com `.import`; o log do export Web do CI mostra-os
+a entrar no `.pck`.
+
+Causa provavel do que o Paulo ouviu: o service worker do Godot serve da cache
+primeiro e a versao nova so' entra quando todas as janelas fecham ou quando o
+jogo chama `JavaScriptBridge.pwa_update()` -- e o jogo nunca chamava. Uma PWA
+instalada no telemovel ficava assim na build antiga. Correccao:
+`menu_inicial.gd::_atualizar_pwa()` recarrega para a versao nova ao entrar no
+menu (nunca a meio de um nivel). **A primeira abertura depois deste push
+ainda pode ser a antiga** (o SW velho nao tem este codigo); a seguinte ja'
+actualiza sozinha.
+
+Ainda legados (nunca houve substituto aprovado): sons de monstros, chefes e
+mundo/armadilhas. O kit `koliani_signature` continua "HUMAN LISTEN REQUIRED".
+
 ## Região III — N12 reconstruído (25 set 2026)
 
 Plano em `docs/rebuild_region_03_plan.md`; N12 implementado só com câmaras forçadas no N12 (`_n12_fila`
