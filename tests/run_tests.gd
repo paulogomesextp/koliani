@@ -4479,8 +4479,8 @@ func teste_loja_i18n() -> void:
 
 
 ## Skins com arte real (`tools/gerar_skins_koliani.py`): cada uma espelha o
-## Golden Set frame a frame, com a MESMA silhueta (alfa igual) e cores outras,
-## e a Koliani equipada com ela monta os frames da pasta da skin.
+## Golden Set frame a frame com um conjunto de armadura + arma por cima, e a
+## Koliani equipada com ela monta os frames da pasta da skin.
 func teste_skins_arte_real() -> void:
 	const CV := preload("res://scripts/cosmeticos_visuais.gd")
 	const GOLD := "res://assets/sprites/koliani_golden_set/frames/"
@@ -4504,22 +4504,30 @@ func teste_skins_arte_real() -> void:
 			if not ResourceLoader.exists(CV.DIR_SKIN[id] + "/frames/" + rel):
 				faltam += 1
 		_ok(faltam == 0, "skins: %s sem %d frames do Golden Set" % [id, faltam])
-		# a mesma silhueta, outras cores
+		# conjunto de armadura: a silhueta CRESCE (cornos/capuz/asas) sem
+		# perder o corpo, e a arma magenta do Golden Set foi trocada
 		var a := (load(GOLD + "idle/idle_001.png") as Texture2D).get_image()
 		var b := (load(CV.DIR_SKIN[id] + "/frames/idle/idle_001.png") as Texture2D).get_image()
-		var alfa_igual := a.get_size() == b.get_size()
-		var cores_dif := 0
-		if alfa_igual:
-			for y in a.get_height():
-				for x in a.get_width():
-					var ca := a.get_pixel(x, y)
-					var cb := b.get_pixel(x, y)
-					if absf(ca.a - cb.a) > 0.004:
-						alfa_igual = false
-					elif ca.a > 0.0 and not ca.is_equal_approx(cb):
-						cores_dif += 1
-		_ok(alfa_igual, "skins: %s mudou a silhueta" % id)
-		_ok(cores_dif > 400, "skins: %s quase igual ao original (%d px)" % [id, cores_dif])
+		var novos := 0
+		var perdidos := 0
+		for y in a.get_height():
+			for x in a.get_width():
+				var oa := a.get_pixel(x, y).a > 0.5
+				var ob := b.get_pixel(x, y).a > 0.5
+				if ob and not oa:
+					novos += 1
+				elif oa and not ob:
+					perdidos += 1
+		_ok(novos > 40, "skins: %s sem pecas novas na silhueta (%d px)" % [id, novos])
+		_ok(perdidos < 10, "skins: %s perdeu corpo (%d px)" % [id, perdidos])
+		var golpe := (load(CV.DIR_SKIN[id] + "/frames/attack_basic/attack_basic_003.png") as Texture2D).get_image()
+		var magenta := 0
+		for y in golpe.get_height():
+			for x in golpe.get_width():
+				var c := golpe.get_pixel(x, y)
+				if c.a > 0.3 and c.s > 0.35 and c.v > 0.35 and c.h > 0.78 and c.h < 0.94:
+					magenta += 1
+		_ok(magenta < 6, "skins: %s ainda tem a lamina magenta (%d px)" % [id, magenta])
 	# a Koliani com a skin equipada monta os frames da pasta dela
 	var ids: Array = CV.DIR_SKIN.keys()
 	var id0: String = ids[0]
