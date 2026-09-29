@@ -30,6 +30,12 @@ const CAMINHO_ASSOMBRACAO := "res://assets/audio/assombracao.wav"
 const CAMINHO_AMB_FLORESTA := "res://assets/audio/ambiente_floresta.wav"
 ## Quantos níveis da campanha usam a ambiência de floresta (a Região I).
 const NIVEIS_FLORESTA := 5
+## DESLIGADA a 29 set 2026 (decisão do Paulo). Estas duas camadas (de 29 ago,
+## nunca aprovadas) tocavam por baixo de TODAS as faixas aprovadas -- a
+## `assombracao` igual do N6 ao N100 -- e era isso que ele ouvia "igual em
+## praticamente todos os níveis". Os ficheiros ficam no projeto; para voltar
+## atrás basta pôr `true`.
+const AMBIENCIA_ANTIGA_LIGADA := false
 
 ## TRILHA DE PRODUÇÃO (Execution 9H.1). Seis peças originais do projeto,
 ## compostas por `tools/compor_trilha_9h1.py` -- sem amostras de terceiros,
@@ -328,6 +334,11 @@ var _amb_caminho := ""
 
 
 func _escolher_ambiencia() -> void:
+	if not AMBIENCIA_ANTIGA_LIGADA:
+		_amb.stop()
+		_amb.stream = null
+		_amb_caminho = ""
+		return
 	var quer := CAMINHO_AMB_FLORESTA if EstadoJogo.indice_nivel < NIVEIS_FLORESTA 		else CAMINHO_ASSOMBRACAO
 	if not ResourceLoader.exists(quer):
 		quer = CAMINHO_ASSOMBRACAO

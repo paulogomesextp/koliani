@@ -199,6 +199,7 @@ func _correr_tudo() -> void:
 	teste_paineis_nao_trazem_o_vizinho()
 	teste_sala_labirinto_deterministica()
 	teste_9h1_trilha_de_producao()
+	teste_musica_so_aprovada()
 	teste_9h1_combo_com_poses_proprias()
 	teste_9h1_criaturas_com_movimento()
 	teste_9h1_tema_do_seletor()
@@ -3294,6 +3295,38 @@ func teste_9h1_trilha_de_producao() -> void:
 		"9H.1: fora da Regiao I a trilha nova nao se aplica")
 	_ok(Musica.faixa_de_chefe(4) == Musica.BOSS_01_APROVADO,
 		"9H.1: o chefe da Regiao I devia usar Gothic Candlelight")
+
+
+## 29 set 2026: o Paulo ouvia a musica "igual em praticamente todos os niveis".
+## A faixa aprovada tocava certa; o que se repetia era a ambiencia antiga por
+## baixo (`assombracao` do N6 ao N100). Guarda as duas coisas: nenhuma regiao
+## nem chefe cai numa faixa antiga, e a ambiencia antiga nao volta a tocar em
+## nivel, chefe, menu ou pausa.
+func teste_musica_so_aprovada() -> void:
+	var antigas := [Musica.CAMINHO, Musica.CAMINHO_BOSS, Musica.CAMINHO_MENU]
+	for i in 100:
+		for cam: String in [Musica.faixa_de_nivel(i), Musica.faixa_de_chefe(i)]:
+			var aprovada := cam.begins_with(Musica.DIR_APROVADO) \
+					or cam.begins_with("res://assets/audio/music/")
+			_ok(aprovada and not antigas.has(cam),
+				"musica: N%d toca uma faixa nao aprovada (%s)" % [i + 1, cam])
+	_ok(not Musica.AMBIENCIA_ANTIGA_LIGADA,
+		"musica: a ambiencia antiga (assombracao/floresta) voltou a estar ligada")
+	var guardado := EstadoJogo.indice_nivel
+	for i in [0, 4, 5, 11, 50, 99]:
+		EstadoJogo.indice_nivel = i
+		Musica.ambiente(i)
+		_ok(not Musica._amb.playing and Musica._amb.stream == null,
+			"musica: ambiencia antiga a tocar no N%d" % (i + 1))
+		Musica.boss()
+		_ok(not Musica._amb.playing, "musica: ambiencia antiga no chefe do N%d" % (i + 1))
+	Musica.pausa(true)
+	_ok(not Musica._amb.playing, "musica: ambiencia antiga na pausa")
+	Musica.pausa(false)
+	Musica.menu()
+	_ok(not Musica._amb.playing, "musica: ambiencia antiga no menu")
+	Musica.parar()
+	EstadoJogo.indice_nivel = guardado
 
 
 ## Os quatro golpes do combo tem TIRAS PROPRIAS. O que isto guarda nao e' a
