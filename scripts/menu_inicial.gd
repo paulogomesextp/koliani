@@ -69,6 +69,7 @@ func _ready() -> void:
 	_focar_principal()
 	_pronto_para_som = true
 	_agendar_prova_runtime()
+	_atualizar_pwa()
 
 
 # ── montagem ─────────────────────────────────────────────────────────────
@@ -380,6 +381,30 @@ func _ao_sair() -> void:
 		JavaScriptBridge.eval(JS_FECHAR, true)
 		await get_tree().create_timer(0.45).timeout
 	get_tree().quit()
+
+
+## PWA presa na versao antiga (29 set 2026). O service worker do Godot serve
+## tudo da cache PRIMEIRO, e a versao nova que o GitHub Pages publica so' fica
+## "a espera" -- so' entra quando todas as janelas do jogo fecham, coisa que
+## numa PWA instalada no telemovel quase nunca acontece. Resultado: o Paulo
+## continuava a ouvir os SFX antigos com o master ja' com o audio aprovado.
+## O motor so' troca de versao quando o jogo pede (`pwa_update`), e ninguem
+## pedia. Aqui, no menu (nunca a meio de um nivel), se houver versao nova,
+## recarrega-se para ela.
+func _atualizar_pwa() -> void:
+	if not OS.has_feature("web"):
+		return
+	if JavaScriptBridge.pwa_needs_update():
+		_ao_haver_pwa_nova()
+	elif not JavaScriptBridge.pwa_update_available.is_connected(_ao_haver_pwa_nova):
+		JavaScriptBridge.pwa_update_available.connect(_ao_haver_pwa_nova)
+
+
+func _ao_haver_pwa_nova() -> void:
+	if not is_inside_tree():
+		return
+	print("PWA | versao nova disponivel -- a recarregar")
+	JavaScriptBridge.pwa_update()
 
 
 ## Entrada normal na campanha: retoma a sessão se houver, senão abre o mapa.
