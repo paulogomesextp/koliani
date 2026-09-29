@@ -3,7 +3,9 @@ Relatorio: `docs/execution_skins_koliani.md`. O Paulo rejeitou skins so' de
 paleta e pediu armaduras e armas aplicadas ao Golden Model. Feito: 3 skins
 (Guardia da Forja / Abadessa Afogada / Serafim Celestial) = Golden Set + pecas
 desenhadas (cornos, capuz, aureola, asas, ombreiras) + arma nova no lugar da
-lamina magenta (montante, tridente, espada solar), nos 84 frames.
+lamina magenta (montante, tridente, espada solar), nos 84 frames. Depois o
+Paulo aceitou "algumas" so' de paleta: +Arauta do Vazio (coroa, capa, foice)
+e 3 so' de paleta (Brasa, Mare, Marfim) = 4 com conjunto + 3 paleta.
 Pecas e ancoras: `tools/trajes_koliani.py`; composicao:
 `tools/gerar_skins_koliani.py`; runtime: `CosmeticosVisuais.DIR_SKIN`.
 Ver no Windows: `Godot.exe --path . res://tools/ProvadorSkins.tscn`.

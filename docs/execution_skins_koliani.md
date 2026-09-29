@@ -4,7 +4,9 @@ Pedidos do Paulo, pela ordem:
 1. "novos assets para skins da Koliani";
 2. "skins a sério, não trocas de cor ou de brilho";
 3. "novos assets de armaduras e armas que possam ser aplicados ao modelo da
-   Koliani, usando o Golden Model dela".
+   Koliani, usando o Golden Model dela";
+4. "pode ter algumas com palete trocada" -- ficam 4 com conjunto e 3 só de
+   paleta (a minoria).
 
 ## Como estava
 - Skins da Loja = só tinta (`CosmeticosVisuais.TINTA_SKIN`), placeholder.
@@ -26,6 +28,11 @@ Uma skin = Golden Set + paleta + CONJUNTO de peças desenhadas:
 | Guardiã da Forja (`skin_fornalha`) | cornos com fendas de brasa | ferro com espigão | -- | montante de brasa |
 | Abadessa Afogada (`skin_abadia_afogada`) | capuz fundo, orla verde-água | -- | -- | tridente |
 | Serafim Celestial (`skin_celestial`) | auréola | ouro em asa | asas de penas (batem) | espada solar |
+| Arauta do Vazio (`skin_vazio`, Região XIX) | coroa de espinhos | -- | capa rasgada (esvoaça) | foice |
+
+Só paleta (sem peças, silhueta do Golden Set): `skin_brasa`, `skin_mare`,
+`skin_marfim` -- as rampas da Forja, Abadia e Celestial. O teste exige que
+sejam a minoria (`CosmeticosVisuais.SKIN_SO_PALETA`).
 
 - `tools/trajes_koliani.py` -- as peças (grelhas de texto e desenho
   procedural) e as âncoras por frame:
@@ -45,7 +52,7 @@ Uma skin = Golden Set + paleta + CONJUNTO de peças desenhadas:
   `koliani.gd::_caminho_skin`. Hitbox/colisão intactas.
 - i18n: nomes/descrições novos nos 6 idiomas.
 - Teste `teste_skins_arte_real`: 84/84 frames, a silhueta CRESCE (>40 px
-  novos no idle) sem perder corpo (<10 px), sem lâmina magenta no golpe, a
+  novos no idle) sem perder corpo (<10 px), sem magenta onde estava a lâmina (a paleta do Vazio é magenta, por isso só se olham esses pixéis); as só-paleta têm a silhueta exatamente igual, a
   Koliani equipada lê os frames da skin, sem skin volta ao Golden Set.
 - Provador: `res://tools/ProvadorSkins.tscn`.
 
