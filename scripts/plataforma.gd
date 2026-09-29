@@ -262,7 +262,11 @@ func _aplicar() -> void:
 		# a franja do kit comeca 12 px acima do fim do bloco (sao as pedras
 		# arredondadas de baixo, nao um remate solto)
 		var yb := y0 + alt - (12.0 if kit else 0.0)
-		var bh: float = Kit.ALTURA_BASE if kit else 24.0
+		# fora do kit, a altura e' a da propria textura: era 24 fixo, e a
+		# franja da Regiao II tirada da prancha (`tools/gerar_terreno_prancha.py`)
+		# e' a barriga de pedra a escorrer, mais alta. Os outros materiais
+		# continuam com 24 px, portanto nao mudam.
+		var bh: float = Kit.ALTURA_BASE if kit else float(base.get_height())
 		vis.add_child(_mosaico(base, Vector2(x0, yb), Vector2(largura, bh), Vector2(dx, 0)))
 
 	# 5. a capa, por cima de tudo (e a sobressair para cima do plano de pouso)
