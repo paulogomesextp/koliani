@@ -1,3 +1,19 @@
+# >>> Loja -- cosméticos com arte além das skins (29 set 2026, commit local, sem push) <<<
+Relatório: `docs/execution_loja_cosmeticos_arte.md`. Branch
+`claude/project-thread-mbzvi6`.
+- Molduras com arte (HUD + fogueira) e rastos do dash passaram a
+  data-driven em `scripts/cosmeticos_visuais.gd` (`MOLDURAS_ARTE`,
+  `RASTOS`); partículas do rasto em `scripts/rasto_cosmetico.gd`.
+- Itens com arte nova: Moldura do Ossário, Gaiola de Aurora (nova), Rasto de
+  Brasas, Rasto de Esporos, Rasto de Mariposas Lunares (novo), pack Luar de
+  Aurora (novo). Arte: `tools/gerar_cosmeticos_loja.py` (regerar, nunca
+  editar PNG).
+- QA visual: `tests/qa_loja_arte_visual.tscn` (janela real; usa
+  `Engine.time_scale = 0.1` para apanhar o dash de 0,16 s).
+- **Falta decidir**: Galeria de Conceitos (extras) continua sem efeito.
+- Não tocado: skins da Koliani, preços/interruptor grátis (outra sessão),
+  `loja.gd`, fundos/terreno, N11.
+
 # >>> N11 -- passe de enriquecimento (29 set 2026, commitado, nao empurrado ainda) <<<
 Pedido do Paulo apos ver o N11 (28 set): "esta pequeno, so' uma subida, sem
 mecanicas, sem arte de jeito" -- depois esclareceu que "arte de jeito" nao

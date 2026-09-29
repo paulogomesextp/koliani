@@ -204,6 +204,7 @@ func _correr_tudo() -> void:
 	teste_loja_cosmeticos_visuais()
 	teste_loja_colecao_regiao_i()
 	teste_rootbound_frame()
+	teste_loja_arte_molduras_rastos()
 
 	# --- Região III -- Torre dos Ecos (N11-N15) -----------------------
 	teste_r3_nomes_canonicos()
@@ -4488,9 +4489,11 @@ func teste_loja_cosmeticos_visuais() -> void:
 	var base := Color(0.4, 0.3, 0.9)
 	_ok(CV.cor_rasto_dash(base, "efeito_rasto_brasa") != base and CV.cor_rasto_dash(base, "x") == base,
 		"cosm: rasto de brasa")
-	_ok(CV.tinta_moldura_hud("hud_moldura_osso") != Color.WHITE and CV.tinta_moldura_hud("x") == Color.WHITE,
-		"cosm: moldura de HUD")
-	_ok(CV.cor_chama_checkpoint(Color.BLACK, "hud_moldura_osso") != Color.BLACK, "cosm: chama do checkpoint")
+	# a moldura de osso deixou de ser tinta: tem arte propria (Ossario)
+	_ok(CV.caixa_hud("disco", Vector4.ZERO, [22, 22, 22, 22], "hud_moldura_osso") != null
+		and CV.caixa_hud("disco", Vector4.ZERO, [22, 22, 22, 22], "x") == null, "cosm: moldura de HUD")
+	_ok(not CV.checkpoint_visual("hud_moldura_osso").is_empty() and CV.checkpoint_visual("x").is_empty(),
+		"cosm: fogueira da moldura")
 	# so' cosmeticos: nada de stats
 	var e := _novo_estado()
 	var dano0: int = e.dano_ataque()
@@ -4666,14 +4669,74 @@ func teste_loja_colecao_regiao_i() -> void:
 		x.free()
 
 
+## Molduras (Ossario, Gaiola de Aurora) e rastos (Brasa, Esporos, Mariposas)
+## com arte: contratos do gerador `tools/gerar_cosmeticos_loja.py`, o que o
+## jogo consome, o pack novo, e nada de stats.
+func teste_loja_arte_molduras_rastos() -> void:
+	const CV := preload("res://scripts/cosmeticos_visuais.gd")
+	const RC := preload("res://scripts/rasto_cosmetico.gd")
+	_ok(LojaCatalogo.validar().is_empty(), "arte: catalogo valido (%s)" % str(LojaCatalogo.validar()))
+	for id: String in ["hud_moldura_osso", "hud_moldura_gaiola"]:
+		var disco := CV.caixa_hud("disco", Vector4.ZERO, [22, 22, 22, 22], id)
+		var placa := CV.caixa_hud("placa", Vector4(12, 6, 18, 6), [16, 14, 16, 14], id)
+		_ok(disco != null and disco.texture.get_size() == Vector2(88, 88), "arte %s: disco 88x88" % id)
+		_ok(placa != null and placa.texture.get_size() == Vector2(128, 64), "arte %s: placa 128x64" % id)
+		_ok(disco.content_margin_left == 0 and placa.content_margin_right == 18, "arte %s: margens intactas" % id)
+		var fog := CV.checkpoint_visual(id)
+		_ok(fog.has("base") and fog.has("cogumelos") and fog.has("brilho") and fog["chama"].size() == 4
+			and fog["brasas"].size() == 3 and fog.has("pos_base") and fog.has("ocioso"), "arte %s: fogueira completa" % id)
+		_ok(CV.moldura_arte_equipada(id) and not CV.raizes_equipado(id), "arte %s: identificacao" % id)
+		_ok(CV.preview_loja(id) != null and CV.preview_loja(id).get_size() == Vector2(346, 130), "arte %s: preview 346x130" % id)
+		_ok(not bool(LojaCatalogo.item(id)["placeholder"]), "arte %s: sem placeholder no catalogo" % id)
+	# a lenha do Ossario sao os femures desenhados: a poligonal fica invisivel
+	_ok(CV.checkpoint_visual("hud_moldura_osso")["lenha"].a == 0.0, "arte: lenha do Ossario escondida")
+	_ok(CV.rasto_visual("nao_existe").is_empty() and CV.rasto_visual("hud_moldura_osso").is_empty(), "arte: rasto desconhecido = original")
+	for id: String in ["efeito_rasto_brasa", "efeito_rasto_esporos", "efeito_rasto_mariposas"]:
+		var rv := CV.rasto_visual(id)
+		_ok(not rv.is_empty() and rv["a"].has("tex") and rv["b"].has("tex"), "arte %s: folhas carregadas" % id)
+		for f in ["a", "b"]:
+			var t: Texture2D = rv[f]["tex"]
+			var n := int(rv[f]["frames"])
+			_ok(t.get_width() % n == 0 and t.get_width() / n == t.get_height() or id == "efeito_rasto_mariposas" and f == "a",
+				"arte %s/%s: tira de %d frames certos" % [id, f, n])
+		_ok(CV.cor_rasto_dash(Color.BLACK, id) != Color.BLACK and CV.tinta_vfx_dash(id) != Color.WHITE, "arte %s: cores" % id)
+		_ok(RC.material_eco(rv) != null and RC.material_eco(rv) == RC.material_eco(rv), "arte %s: material do eco em cache" % id)
+		_ok(CV.preview_loja(id) != null, "arte %s: preview real" % id)
+	# emitir cria sprites e nao parte sem pai/rasto
+	var pai := Node2D.new()
+	get_tree().root.add_child(pai)
+	RC.emitir(pai, Vector2.ZERO, 1.0, 1.0, CV.rasto_visual("efeito_rasto_brasa"))
+	_ok(pai.get_child_count() == 4, "arte: brasa emite 3+1 particulas por eco (%d)" % pai.get_child_count())
+	RC.emitir(null, Vector2.ZERO, 1.0, 1.0, CV.rasto_visual("efeito_rasto_brasa"))
+	RC.emitir(pai, Vector2.ZERO, 1.0, 1.0, {})
+	_ok(pai.get_child_count() == 4, "arte: emitir sem pai/rasto nao faz nada")
+	pai.free()
+	# pack Luar de Aurora: preco so' do que falta, teto respeitado
+	var pk := LojaCatalogo.item("pack_luar_aurora")
+	_ok(pk["contem"] == ["hud_moldura_gaiola", "efeito_rasto_mariposas"] and pk["raridade"] == "lendario", "arte: pack Luar de Aurora")
+	_ok(LojaCatalogo.preco_pack(pk, "k", func(_i: String) -> bool: return false) == 1200
+		and LojaCatalogo.preco_pack(pk, "v", func(_i: String) -> bool: return false) == 250, "arte: pack completo no teto")
+	_ok(LojaCatalogo.preco_pack(pk, "k", func(i: String) -> bool: return i == "hud_moldura_gaiola") == 550,
+		"arte: pack so' com as mariposas em falta")
+	# equipar nao mexe em stats
+	var e := _novo_estado()
+	e.ganhar_kolicoins(5000)
+	var dano: int = e.dano_ataque()
+	var vidas: int = e.vidas
+	for id in ["hud_moldura_gaiola", "efeito_rasto_mariposas"]:
+		_ok(e.comprar_item(id, "k")["ok"] and e.equipar_item(id), "arte: comprar e equipar %s" % id)
+	_ok(e.dano_ataque() == dano and e.vidas == vidas, "arte: equipar mexeu em stats")
+	e.free()
+
+
 func teste_rootbound_frame() -> void:
 	const CV := preload("res://scripts/cosmeticos_visuais.gd")
 	const RB := "hud_moldura_raizes"
 	# default continua default (item inicial, sem equipar, id desconhecido, osso)
-	for id in ["", "nao_existe", "hud_moldura_osso", "skin_carmesim"]:
-		_ok(CV.caixa_hud("disco", Vector4(0, 0, 0, 0), [22, 22, 22, 22], id if id != "" else "hud_moldura_osso") == null,
+	for id in ["", "nao_existe", "extra_galeria_conceitos", "skin_carmesim"]:
+		_ok(CV.caixa_hud("disco", Vector4(0, 0, 0, 0), [22, 22, 22, 22], id if id != "" else "skin_carmesim") == null,
 			"rootbound: '%s' devia deixar o HUD original (disco)" % id)
-		_ok(CV.checkpoint_visual(id if id != "" else "hud_moldura_osso").is_empty(), "rootbound: '%s' devia deixar a fogueira original" % id)
+		_ok(CV.checkpoint_visual(id if id != "" else "skin_carmesim").is_empty(), "rootbound: '%s' devia deixar a fogueira original" % id)
 	_ok(not CV.raizes_equipado("hud_moldura_osso") and CV.raizes_equipado(RB), "rootbound: identificacao do item")
 	# Rootbound aplica os recursos certos, com as margens pedidas (layout intacto)
 	var disco := CV.caixa_hud("disco", Vector4(0, 0, 0, 0), [22, 22, 22, 22], RB)
@@ -4695,12 +4758,12 @@ func teste_rootbound_frame() -> void:
 			["cogumelos", 64, 14], ["cogumelos_brilho", 64, 14], ["preview", 346, 130]]:
 		var t: Texture2D = load(CV.DIR_RAIZES + par[0] + ".png")
 		_ok(t != null and t.get_width() == par[1] and t.get_height() == par[2], "rootbound: asset %s %dx%d" % [par[0], par[1], par[2]])
-	# preview real so' neste item; os outros da colecao continuam ART PENDING
-	_ok(CV.preview_loja(RB) != null and CV.preview_loja("skin_coracao_podre") == null and CV.preview_loja("efeito_rasto_esporos") == null,
-		"rootbound: preview so' no Rootbound")
+	# preview real no Rootbound e no Spore Wake; a skin e o pack continuam ART PENDING
+	_ok(CV.preview_loja(RB) != null and CV.preview_loja("skin_coracao_podre") == null and CV.preview_loja("efeito_rasto_esporos") != null,
+		"rootbound: previews da colecao")
 	_ok(LojaCatalogo.item(RB)["placeholder"] == false and str(LojaCatalogo.item(RB)["preview"]).ends_with("preview.png"),
 		"rootbound: catalogo sem placeholder")
-	for id in ["skin_coracao_podre", "efeito_rasto_esporos", "pack_coracao_podre"]:
+	for id in ["skin_coracao_podre", "pack_coracao_podre"]:
 		_ok(LojaCatalogo.item(id)["placeholder"] == true, "rootbound: %s continua placeholder" % id)
 	# precos/economia intactos
 	_ok(LojaCatalogo.preco(LojaCatalogo.item(RB), "k") == 300 and LojaCatalogo.preco(LojaCatalogo.item(RB), "v") == -1

@@ -121,9 +121,10 @@ func _ready() -> void:
 	await get_tree().create_timer(0.3).timeout
 	await _foto("C_loja_rootbound_detalhe")
 	_check(l._det_img.visible and l._det_ph.text == "", "Loja: preview real e sem 'ART PENDING' no Rootbound Frame")
-	l._selecionar("hud_moldura_osso")
+	l._escolher_categoria("extras")
+	l._selecionar("extra_galeria_conceitos")
 	await get_tree().create_timer(0.2).timeout
-	_check(not l._det_img.visible and l._det_ph.text != "", "Loja: outro item continua com placeholder")
+	_check(not l._det_img.visible and l._det_ph.text != "", "Loja: item sem arte continua com placeholder")
 	l._escolher_categoria("skins")
 	l._selecionar("skin_coracao_podre")
 	await get_tree().create_timer(0.2).timeout
@@ -131,7 +132,7 @@ func _ready() -> void:
 	l._escolher_categoria("efeitos")
 	l._selecionar("efeito_rasto_esporos")
 	await get_tree().create_timer(0.2).timeout
-	_check(not l._det_img.visible and l._det_ph.text.contains("PENDING"), "Loja: Spore Wake continua ART PENDING")
+	_check(l._det_img.visible and l._det_ph.text == "", "Loja: Spore Wake com preview real")
 	l.queue_free()
 	# --- restaurar default
 	EstadoJogo.desequipar_categoria("hud_checkpoint")
