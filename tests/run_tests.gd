@@ -2784,7 +2784,9 @@ func teste_packs_de_fundo_existem() -> void:
 				% [pack_atual, ml.get_string(1)]
 			_ok(FileAccess.file_exists(caminho),
 				"pack '%s': falta %s" % [pack_atual, caminho])
-			_ok(ml.get_string(2) in ["Fundo", "Longe", "Meio", "Perto"],
+			# "MarBaixo" nao esta' na cena: o `atmosfera.gd` cria-a por
+			# codigo quando um pack a pede (segundo banco de nuvens).
+			_ok(ml.get_string(2) in ["Fundo", "Longe", "Meio", "Perto", "MarBaixo"],
 				"pack '%s': camada '%s' nao existe no Parallax"
 					% [pack_atual, ml.get_string(2)])
 	_ok(packs.size() >= 7, "atmosfera.gd: so' li %d packs" % packs.size())

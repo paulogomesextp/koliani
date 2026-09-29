@@ -74,4 +74,15 @@ textura fora do kit da Região I).
   escura chapada no N1 e no N5 e na faixa cinzenta das torres.
 - N16-N100 não foram tocados.
 
-Suite completa na cabeça da branch: ver `docs/retomar_aqui.md`.
+## Testes
+
+Suite completa na cabeça da branch: 2 falhas, ambas explicadas.
+- `pack 'torre_ecos': camada 'MarBaixo' nao existe no Parallax` -- o teste
+  só aceitava as camadas da cena; a `MarBaixo` é criada por código pelo
+  `atmosfera.gd`. Teste actualizado.
+- `golem piloto: Cleave ... mais eficiente que o spam` -- **não é
+  regressão**: com um `user://` novo passa (ttk 1,5 / 0,93, igual ao
+  master); falha só a reutilizar o sandbox de uma corrida completa
+  anterior (ttk do cleave 7-9 s). É o estado gravado pela própria suite a
+  contaminar o teste (o mesmo mecanismo do aviso do CLAUDE.md). Correr a
+  suite sempre com o sandbox limpo (`tools/correr_testes.ps1` já o faz).
