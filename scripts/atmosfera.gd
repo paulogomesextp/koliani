@@ -145,56 +145,54 @@ const ARQUITETURA_ALTITUDE := {
 ## ruinas atmosfericas (9), torre celestial (10). Continuam todos a sair
 ## das MESMAS quatro texturas -- e' recomposicao, nao cinco biomas.
 const PERFIS_ALTITUDE := {
-	# N06 CHEGADA -- o mais aberto dos cinco. As serras recuam e sobem, o
-	# mar de nuvens vem grande e baixo: a primeira coisa que se ve' da
-	# regiao e' que o chao acabou. Era o nivel com 0.6% de pixeis claros.
+	# 29 set 2026 -- os cinco perfis passaram a usar os PANORAMAS DAS
+	# PRANCHAS APROVADAS (`tools/gerar_fundos_regiao02_prancha.py`) em vez do
+	# pack CC0 recolorido (ceu/serras/nuvens/falesias, 240 px desenhados a
+	# 4-7x, aos blocos). A auditoria desse dia pos o N6 ao lado de
+	# `concept_environment_01.png`: faltavam as ilhas, as quedas de agua, as
+	# pontes, a cidadela e a lua -- tudo o que a prancha tem e o jogo nao.
+	#
+	# Formato: [ficheiro, camada, y_base, escala, ganho, arte_aprovada].
+	# `arte_aprovada = true` => filtro linear (o PNG ja' vem ampliado a 2x com
+	# Lanczos, como o panorama da Regiao I) e SEM desaturar: a cor e' a da
+	# prancha, a regiao so' lhe da' um toque de tinta (`_TINTA_PRANCHA`).
+	#
+	# A = `concept_environment_01` (lua, cidadela, pontes, estatuas);
+	# B = `concept_environment_02` (cidadela, queda de agua, ilhas, ponte).
+	# As outras camadas (Longe/Meio/Perto) ficam vazias: o panorama ja' tem a
+	# profundidade toda pintada, e as silhuetas CC0 por cima so' a tapavam.
+	#
+	# N06 CHEGADA -- falesias abertas, ceu frio (prancha: "ceu frio").
 	"n06": [
-		["ceu.png", "Fundo", 320.0, 5.6],
-		["serras.png", "Longe", 760.0, 4.0, 1.30],
-		["nuvens.png", "Meio", 880.0, 4.2, 2.10],
-		["nuvens.png", "MarBaixo", 1560.0, 6.4, 1.95],
-		["falesias.png", "Perto", 980.0, 3.6],
+		["prancha_b.png", "Fundo", 620.0, 0.75, 1.0, true],
+		["prancha_b_nuvens.png", "MarBaixo", 1500.0, 1.9, 1.0, true],
 	],
-	# N07 SUBIDA -- a silhueta ja' estava classificada KEEP na auditoria,
-	# por isso mexe-se o menos possivel: as falesias ficam onde estavam e
-	# so' o mar ganha corpo. Era o unico ja' com 8% de claros.
+	# N07 SUBIDA -- torres destruidas, ventos luminosos. Mesmo panorama do
+	# N6 mas mais alto no ecra: a cidadela fica por cima de quem sobe.
 	"n07": [
-		["ceu.png", "Fundo", 300.0, 5.6],
-		["serras.png", "Longe", 830.0, 4.6, 1.26],
-		["nuvens.png", "Meio", 900.0, 3.8, 1.95],
-		["nuvens.png", "MarBaixo", 1500.0, 5.8, 1.80],
-		["falesias.png", "Perto", 960.0, 3.8],
+		["prancha_b.png", "Fundo", 640.0, 0.8, 1.0, true],
+		["prancha_b_nuvens.png", "MarBaixo", 1460.0, 1.8, 1.0, true],
 	],
-	# N08 PONTO MAIS ALTO -- gameplay LOCKED, so' fundo. As mesmas ilhas
-	# tem de parecer suspensas sobre um mundo enorme, portanto o mar sobe
-	# ate' quase encostar ao chao jogavel e as serras afundam-se nele.
+	# N08 PONTO MAIS ALTO -- ilhas flutuantes; gameplay LOCKED, so' fundo.
 	"n08": [
-		["ceu.png", "Fundo", 280.0, 6.0],
-		["serras.png", "Longe", 700.0, 3.6, 1.34],
-		["nuvens.png", "Meio", 840.0, 4.4, 2.15],
-		["nuvens.png", "MarBaixo", 1440.0, 6.8, 2.00],
-		["falesias.png", "Perto", 940.0, 3.4],
+		["prancha_a.png", "Fundo", 600.0, 0.75, 1.0, true],
+		["prancha_a_nuvens.png", "MarBaixo", 1440.0, 2.0, 1.0, true],
 	],
-	# N09 O VENTO VIRA -- ceu mais fechado e mais alto, o mar puxado para
-	# baixo: da' tensao sem fechar a leitura. Continua desfiladeiro.
+	# N09 O VENTO VIRA -- ruinas ao crepusculo, lua vermelha.
 	"n09": [
-		["ceu.png", "Fundo", 340.0, 5.4],
-		["serras.png", "Longe", 720.0, 3.7, 1.30],
-		["nuvens.png", "Meio", 860.0, 4.3, 2.05],
-		["nuvens.png", "MarBaixo", 1460.0, 6.6, 1.95],
-		["falesias.png", "Perto", 950.0, 3.5],
+		["prancha_a.png", "Fundo", 620.0, 0.75, 0.94, true],
+		["prancha_a_nuvens.png", "MarBaixo", 1460.0, 1.9, 1.0, true],
 	],
-	# N10 TORRE CELESTIAL -- a prancha da'-lhe lua vermelha e uma torre ao
-	# fundo. Aqui so' a APRESENTACAO DISTANTE: a lua e a silhueta longe. O
-	# landmark jogavel e a arena sao do Prompt 3 e nao se tocam.
+	# N10 TORRE CELESTIAL -- lua vermelha e a cidadela; a arena e o landmark
+	# jogavel nao se tocam.
 	"n10": [
-		["ceu.png", "Fundo", 300.0, 5.8],
-		["serras.png", "Longe", 690.0, 3.5, 1.32],
-		["nuvens.png", "Meio", 850.0, 4.5, 2.15],
-		["nuvens.png", "MarBaixo", 1430.0, 6.9, 2.00],
-		["falesias.png", "Perto", 930.0, 3.3],
+		["prancha_a.png", "Fundo", 600.0, 0.8, 1.0, true],
+		["prancha_a_nuvens.png", "MarBaixo", 1430.0, 2.0, 1.0, true],
 	],
 }
+## Quanto da tinta da regiao entra por cima de uma camada `arte_aprovada`.
+## Pouco: a cor ja' e' a da prancha, isto so' a casa com a luz do nivel.
+const _TINTA_PRANCHA := 0.3
 
 
 const PACKS := {
@@ -893,6 +891,17 @@ func _faixa_rasteira(rng: RandomNumberGenerator) -> void:
 func _montar_fundo_pack(_rng: RandomNumberGenerator) -> void:
 	var camadas: Array = PERFIS_ALTITUDE.get(perfil_altitude,
 		PACKS[fundo_pack])
+	if PERFIS_ALTITUDE.has(perfil_altitude):
+		# Os perfis da Regiao II so' preenchem algumas camadas; as outras
+		# tinham as silhuetas-placeholder do `Atmosfera.tscn` (L1..P2), que
+		# ficavam por cima do panorama da prancha.
+		for nome in ["Longe", "Meio", "Perto"]:
+			var vazia := get_node_or_null("Parallax/%s" % nome)
+			if vazia == null:
+				continue
+			for n in vazia.get_children():
+				if n.name != "Fundo":
+					n.free()
 	for item: Array in camadas:
 		var tex: Texture2D = load("%s/%s/%s" % [BG_DIR, fundo_pack, item[0]])
 		if tex == null:
@@ -942,7 +951,16 @@ func _montar_fundo_pack(_rng: RandomNumberGenerator) -> void:
 		# Vai em uniform PROPRIO e nao dobrado na tinta: a `tinta` do shader
 		# e' `source_color` e fica grampeada a 1.0.
 		var ganho: float = float(item[4]) if item.size() > 4 else 1.0
-		if dessaturar_fundo > 0.0:
+		var aprovada: bool = item.size() > 5 and bool(item[5])
+		# cor com que as bandas acima/abaixo continuam a camada: tem de ser a
+		# MESMA que a imagem leva, senao ve'-se a linha onde ela acaba.
+		var cor_banda := cor
+		if aprovada:
+			spr.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+			var t := Color.WHITE.lerp(cor, _TINTA_PRANCHA)
+			spr.modulate = Color(t.r * ganho, t.g * ganho, t.b * ganho, 1.0)
+			cor_banda = spr.modulate
+		elif dessaturar_fundo > 0.0:
 			var mat := ShaderMaterial.new()
 			mat.shader = SHADER_FUNDO
 			mat.set_shader_parameter("dessaturar", dessaturar_fundo)
@@ -963,8 +981,8 @@ func _montar_fundo_pack(_rng: RandomNumberGenerator) -> void:
 		# cima até se perder no fundo. Só na camada mais funda (as outras
 		# ficariam sobrepostas e a escurecer o dobro).
 		if item[1] == "Fundo":
-			_banda_acima(layer, tw, y_base - th, cor, tex)
-			_banda_abaixo(layer, tw, y_base, cor)
+			_banda_acima(layer, tw, y_base - th, cor_banda, tex)
+			_banda_abaixo(layer, tw, y_base, cor_banda)
 		# Repetição: SEMPRE na horizontal (o nível é muito mais largo do que
 		# a imagem). Na vertical só a camada mais funda, e essa leva também a
 		# `_banda_acima` -- é a que não pode deixar buraco, porque atrás dela
@@ -998,7 +1016,13 @@ func _banda_acima(layer: Node, largura: float, topo_y: float, cor: Color,
 	var topo_img: Variant = _cor_topo(tex)
 	if topo_img != null:
 		encosto = (topo_img as Color) * cor
-	g.offsets = PackedFloat32Array([0.0, 0.90, 1.0])
+	# A paragem do `encosto` cai EXACTAMENTE no topo da imagem (estava a
+	# 0.90, ~80 px acima): ai' a banda ja' ia a meio do esbatimento antes de
+	# a imagem comecar, o ceu de tras via-se por ela e ficava um degrau recto
+	# no sitio onde a imagem acaba. Com os panoramas das pranchas da Regiao
+	# II (29 set 2026) esse degrau lia-se em todos os niveis.
+	g.offsets = PackedFloat32Array([0.0,
+		ALTURA_BANDA / (ALTURA_BANDA + SOBREPOR), 1.0])
 	g.colors = PackedColorArray([
 		cor_fundo.darkened(0.2),
 		encosto,
