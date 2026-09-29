@@ -37,6 +37,9 @@ func _ready() -> void:
 
 
 func _correr_tudo() -> void:
+	# os testes da Loja verificam os precos REAIS; o interruptor de "tudo gratis
+	# em desenvolvimento" tem o seu proprio teste (`teste_loja_gratis_dev`)
+	LojaCatalogo.gratis = false
 	# iteracao rapida: `SO_TESTE=teste_n5_autoral` corre so' essa funcao
 	var so_teste := OS.get_environment("SO_TESTE")
 	if so_teste != "":
@@ -198,6 +201,7 @@ func _correr_tudo() -> void:
 	# --- Loja (Kolicoins / Veracoins, so cosmeticos) ---------------------
 	teste_loja_catalogo()
 	teste_loja_compras_e_equipar()
+	teste_loja_gratis_dev()
 	teste_loja_save_e_compatibilidade()
 	teste_loja_progressao_regional_e_gameplay()
 	teste_loja_i18n()
@@ -4365,6 +4369,37 @@ func teste_loja_compras_e_equipar() -> void:
 	e.free()
 
 
+## Interruptor de desenvolvimento (Paulo, 29 set): tudo custa 0 para testar
+## e trocar, sem gastar moedas e sem tocar nos precos reais do catalogo.
+func teste_loja_gratis_dev() -> void:
+	_ok(LojaCatalogo.GRATIS_EM_DESENVOLVIMENTO, "loja: em desenvolvimento a Loja devia ser gratis")
+	var antes := LojaCatalogo.gratis
+	LojaCatalogo.gratis = true
+	var e := _novo_estado()
+	_ok(e.kolicoins == 0 and e.veracoins == 0, "gratis: saldos iniciais")
+	# precos reais intactos no catalogo; o que se paga e' 0
+	_ok(int(LojaCatalogo.item("skin_anjo")["v"]) > 0 and e.preco_loja("skin_anjo", "v") == 0,
+		"gratis: preco real devia ficar no catalogo e o pago ser 0")
+	_ok(e.preco_loja("skin_anjo", "k") == -1, "gratis: moeda nao aceite continua nao aceite")
+	for id: String in ["skin_anjo", "skin_demonio", "skin_fornalha", "hud_moldura_osso"]:
+		var moeda := "k" if e.preco_loja(id, "k") == 0 else "v"
+		_ok(e.comprar_item(id, moeda)["ok"] and e.item_adquirido(id), "gratis: nao obteve %s sem moedas" % id)
+	_ok(e.kolicoins == 0 and e.veracoins == 0, "gratis: gastou moedas (%d K, %d V)" % [e.kolicoins, e.veracoins])
+	_ok(e.comprar_item("skin_anjo", "v")["erro"] == "ja_adquirido", "gratis: obteve duas vezes")
+	# trocar a vontade entre as skins obtidas
+	_ok(e.equipar_item("skin_anjo") and e.item_equipado("skin_anjo"), "gratis: equipar Arcanjo")
+	_ok(e.equipar_item("skin_demonio") and e.item_equipado("skin_demonio") and not e.item_equipado("skin_anjo"),
+		"gratis: trocar para o Arquidemonio")
+	_ok(e.equipar_item("skin_fornalha") and e.item_equipado("skin_fornalha"), "gratis: trocar para uma simples")
+	# requisitos de regiao continuam (so' o preco muda)
+	_ok(e.comprar_item("pack_coracao_podre", "k")["erro"] == "bloqueado", "gratis: desbloqueou item regional")
+	# desligado, volta a cobrar
+	LojaCatalogo.gratis = false
+	_ok(e.preco_loja("skin_demonio", "v") == int(LojaCatalogo.item("skin_demonio")["v"]), "gratis: desligar nao repos o preco")
+	LojaCatalogo.gratis = antes
+	e.free()
+
+
 func teste_loja_save_e_compatibilidade() -> void:
 	var total: int = EstadoJogoScript.NIVEIS.size()
 	var e := _novo_estado()
@@ -4485,7 +4520,8 @@ func teste_skins_arte_real() -> void:
 	const CV := preload("res://scripts/cosmeticos_visuais.gd")
 	const GOLD := "res://assets/sprites/koliani_golden_set/frames/"
 	_ok(CV.DIR_SKIN.size() >= 3, "skins: devia haver pelo menos 3 skins com arte")
-	_ok(CV.SKIN_SO_PALETA.size() * 2 < CV.DIR_SKIN.size(), "skins: as so' de paleta deviam ser a minoria")
+	_ok(CV.SKIN_SO_PALETA.size() == 3, "skins: as simples fecharam-se em tres (Paulo, 29 set)")
+	_ok(CV.DIR_SKIN.size() - CV.SKIN_SO_PALETA.size() >= 2, "skins: faltam as premium (Anjo e Demonio)")
 	_ok(CV.dir_skin("skin_koliani_base") == "" and CV.dir_skin("skin_carmesim") == "",
 		"skins: base/tinta nao tem pasta de arte")
 	var golden: Array[String] = []
@@ -4505,6 +4541,17 @@ func teste_skins_arte_real() -> void:
 			if not ResourceLoader.exists(CV.DIR_SKIN[id] + "/frames/" + rel):
 				faltam += 1
 		_ok(faltam == 0, "skins: %s sem %d frames do Golden Set" % [id, faltam])
+		# nada toca a borda do canvas (a ponta de uma arma comprida ficava cortada)
+		var na_borda := 0
+		for rel in golden:
+			var im := (load(CV.DIR_SKIN[id] + "/frames/" + rel) as Texture2D).get_image()
+			var w := im.get_width()
+			var h := im.get_height()
+			for i in w:
+				for q: Vector2i in [Vector2i(i, 0), Vector2i(i, h - 1), Vector2i(0, i), Vector2i(w - 1, i)]:
+					if im.get_pixelv(q).a > 0.0:
+						na_borda += 1
+		_ok(na_borda == 0 or id in CV.SKIN_SO_PALETA, "skins: %s com %d px cortados na borda" % [id, na_borda])
 		# conjunto de armadura: a silhueta CRESCE (cornos/capuz/asas) sem
 		# perder o corpo, e a arma magenta do Golden Set foi trocada
 		var a := (load(GOLD + "idle/idle_001.png") as Texture2D).get_image()
@@ -4528,7 +4575,7 @@ func teste_skins_arte_real() -> void:
 		var golpe := (load(CV.DIR_SKIN[id] + "/frames/attack_basic/attack_basic_003.png") as Texture2D).get_image()
 		var golpe0 := (load(GOLD + "attack_basic/attack_basic_003.png") as Texture2D).get_image()
 		# onde o Golden Set tem a lamina magenta, a skin ja' nao pode ter magenta
-		# (a paleta do Vazio e' magenta, por isso so' se olha para esses pixeis)
+		# (so' se olha para esses pixeis: uma paleta pode ter magenta de proposito)
 		var magenta := 0
 		for y in golpe.get_height():
 			for x in golpe.get_width():

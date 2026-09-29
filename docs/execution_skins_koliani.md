@@ -85,3 +85,47 @@ sejam a minoria (`CosmeticosVisuais.SKIN_SO_PALETA`).
 - Aprovar o visual. Preços/raridades provisórios.
 - Ligar estas peças ao `Equipamento` (armas/armaduras de gameplay, hoje
   invisíveis no Golden Set)? A biblioteca de peças serve para isso.
+
+## Passe 3 — 2 premium: Anjo e Demónio (29 set 2026, tarde)
+Pedido: "pense como consumidor se comprava essa skin assim. Primeiro são
+literalmente uma cópia das primeiras. [...] faça 2 skins com essas temáticas
+e mais pormenorizadas." Os 4 conjuntos acima (Guardiã, Abadessa, Serafim,
+Vazio) foram **apagados** (pastas, catálogo, `DIR_SKIN`, i18n). As 3 simples
+ficam intactas (regeneradas byte a byte iguais).
+
+| | Arcanjo (`skin_anjo`) | Arquidemónio (`skin_demonio`) |
+|---|---|---|
+| Corpo | prata/marfim + **filigrana de ouro** nas bordas da roupa junto à pele | obsidiana + **veios de lava** (ruído de valor no espaço da cara, não desliza entre frames) |
+| Olhos | luz ciano | brasa amarela |
+| Peito | **couraça de prata** com orla de ouro, costura e gema no esterno | **couraça de aço negro** com orla em brasa e gema |
+| Costas | **2 asas** (longe mais escura), primárias/secundárias/cobertas, batem + **capa inteira** com dobras e bainha de ouro | **capa rasgada** com forro carmim e buracos (esvoaça) + **cauda** em S com ponta (balança) |
+| Cabeça | auréola com 8 raios | 2 cornos bezier com anéis e luz no dorso |
+| Ombro | ombreira alada de ouro | (cortada: nesta âncora tapava a couraça) |
+| Arma | espada sagrada, guarda em asas duplas | espadão serrilhado, guarda em chifres, veio de lava |
+| Aura | brilho 1-2 px à volta de tudo o que emite | idem |
+
+**Descartado neste passe** (visto em preview e cortado): saiote de penas
+(tapava as pernas como uma caixa), diadema alado (arco de ouro atrás da
+cabeça sem leitura), espiral de carneiro (lia-se como caracol/disco a tapar
+a cara), friso horizontal de ouro (riscas), olhos por matiz vermelha
+(pintava a boca e o cabelo).
+
+**Armadilhas**: cabelo e roupa têm a mesma cor no Golden Set -> não há
+segmentação por cor, tudo é geometria relativa à cara; ao reescrever os i18n
+não usar `sort_keys` (baralha o ficheiro inteiro).
+
+Depois do primeiro passe: couraça (`peitoral`, pinta só o pano escuro do
+peito, o lenço vermelho fica como gola), capa inteira no Arcanjo
+(`capa_nobre`), capa do demónio com dobras e bainha chamuscada, segundo corno
+visível, e as armas **nunca tocam a borda do canvas** (`trocar_arma` encurta
+a lâmina até caber; havia 3 frames de golpe por skin com a ponta cortada).
+Teste novo: 0 px na borda em todas as premium.
+
+## Loja grátis em desenvolvimento (pedido do Paulo, 29 set)
+`LojaCatalogo.GRATIS_EM_DESENVOLVIMENTO = true` (uma linha): o que se paga
+(`EstadoJogo.preco_loja`) passa a 0, os preços reais ficam nos ITENS. A UI
+mostra "Grátis (desenvolvimento)" e um só botão "OBTER · GRÁTIS". Requisitos
+de região e posse não mudam. No fim: pôr a `false`. Os testes da Loja correm
+com os preços reais (`LojaCatalogo.gratis = false` no arranque da suite) e
+`teste_loja_gratis_dev` cobre o modo grátis (obter sem gastar, trocar entre
+skins, item regional continua bloqueado, desligar repõe o preço).

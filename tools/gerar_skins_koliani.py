@@ -1,22 +1,22 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Gera as SKINS da Koliani (Loja > Skins): o Golden Set com um CONJUNTO de
-armadura e arma por cima.
+"""Gera as SKINS da Koliani (Loja > Skins) a partir do Golden Set.
 
 Uma skin e' o Golden Set INTEIRO (`assets/sprites/koliani_golden_set/frames/`,
-84 frames, todas as animacoes) vestido com pecas desenhadas a proposito
-(`tools/trajes_koliani.py`), mesmo contrato de canvas (128x128, pes em
-y=104). A colisao, os tempos e a hitbox nao mudam: o `koliani.gd` so' troca a
-pasta de onde le os frames (`CosmeticosVisuais.DIR_SKIN`).
+84 frames, todas as animacoes) repintado, mesmo contrato de canvas (128x128,
+pes em y=104). A colisao, os tempos e a hitbox nao mudam: o `koliani.gd` so'
+troca a pasta de onde le os frames (`CosmeticosVisuais.DIR_SKIN`).
 
-Por frame:
-  1. ancora -- centro da cara e topo do ombro (pele), lamina (magenta);
-  2. paleta -- troca por material (acento/tecido/gema; a pele nunca muda);
-  3. arma -- apaga a lamina magenta e desenha a arma nova na mesma reta;
-  4. pecas -- ombreira e cabeca por cima, asas por baixo do corpo.
+Dois tipos:
+  - SO' PALETA (fornalha, abadia_afogada, celestial): troca por material
+	(acento/tecido/gema; a pele nunca muda), silhueta igual. O Paulo fechou
+	as simples nestas tres (29 set) -- nao se fazem mais.
+  - PREMIUM (anjo, demonio): paleta + conjunto completo desenhado por
+	`tools/trajes_premium.py` -- material da armadura, olhos, arma nova,
+	asas/capa/cauda, aureola/cornos, ombreira, brilho.
 Os tres frames rodados do rolamento vestem-se no original e rodam-se juntos.
 
-  python tools/gerar_skins_koliani.py            # grava as 3 skins + pecas/
+  python tools/gerar_skins_koliani.py            # grava as 5 skins + pecas/
   python tools/gerar_skins_koliani.py --preview  # + folha em work/skins_koliani/
 
 Saida: `assets/sprites/koliani_skins/<skin>/frames/<anim>/<png>` +
@@ -34,6 +34,7 @@ from PIL import Image
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import trajes_koliani as T  # noqa: E402
+import trajes_premium as P  # noqa: E402
 
 RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 GOLDEN = os.path.join(RAIZ, "assets", "sprites", "koliani_golden_set", "frames")
@@ -59,12 +60,6 @@ SKINS: dict[str, dict] = {
 				   (0.40, "54392A"), (0.70, "8A6A50")],
 		"forca_tecido": 0.85,
 		"gema": "FFD040",
-		"conjunto": {
-			"cabeca": ("cornos", ["2A1E1A", "4A3A32", "A89478", "D8C8A8", "F4ECD8", "FFFFFF"], "FFB030"),
-			"ombreira": ("OMBREIRA_ESPIGAO", ["1A1414", "2E2624", "4A3E3A", "6E625C", "9A8A80", "D8C8B8"], "FF9020"),
-			"arma": ("espada_brasa", {"lamina": "2A2220", "gume": "FF8A1E", "fio": "FFE08A",
-									  "guarda": "5A4A40", "punho": "3A2A20"}),
-		},
 	},
 	# Regiao IX -- Abadia Afogada. Agua funda: acentos verde-agua a brilhar,
 	# roupa azul-ardosia como pano encharcado.
@@ -75,11 +70,6 @@ SKINS: dict[str, dict] = {
 				   (0.40, "2E4462"), (0.70, "5A7898")],
 		"forca_tecido": 0.9,
 		"gema": "F2F6FF",
-		"conjunto": {
-			"cabeca": ("CAPUZ", ["0C1A26", "1C3446", "2E5068", "4A7490", "8CEBD6", "E0FFF6"], "5CE0C8"),
-			"arma": ("lanca_mare", {"lamina": "8CEBD6", "gume": "35B8A8", "fio": "E0FFF6",
-									"guarda": "2E5068", "punho": "4A3A30"}),
-		},
 	},
 	# Regiao XIV -- Planicies Celestiais. A inversa das outras: roupa marfim e
 	# prata, acentos ouro. O contorno fica escuro para ela nao se perder no ceu.
@@ -90,39 +80,33 @@ SKINS: dict[str, dict] = {
 				   (0.20, "A8A4B8"), (0.30, "D2CEDD"), (0.50, "F0EEF6")],
 		"forca_tecido": 1.0,
 		"gema": "7FD8FF",
-		"conjunto": {
-			"costas": ("asa", ["2C2A36", "6E6A7C", "B8B4C8", "DCD8E6", "F0EEF6", "FFFFFF"]),
-			"ombreira": ("OMBREIRA_ASA", ["6A4A12", "A87420", "D8A030", "F4BE36", "FFE680", "FFFBE0"], "FFFFFF"),
-			"cabeca": ("AUREOLA", ["C8861A", "C8861A", "C8861A", "C8861A", "C8861A", "FFF4C0"], "FFE680"),
-			"arma": ("espada_sol", {"lamina": "F4F4FA", "gume": "FFE680", "fio": "E0BE4A",
-									"guarda": "F4BE36", "punho": "6A4A12"}),
-		},
 	},
 	# Regiao XIX -- Portal Dimensional. Roxo do vazio e magenta a brilhar (o
 	# tema da key art); coroa de espinhos, capa rasgada e foice.
-	"vazio": {
-		"acento": [(0.00, "12041A"), (0.22, "3A0C4A"), (0.42, "7A1A90"),
-				   (0.62, "C83CD8"), (0.85, "F29AF8"), (1.00, "FFE6FF")],
-		"tecido": [(0.00, "08060C"), (0.12, "141020"), (0.24, "221A34"),
-				   (0.40, "3A2C54"), (0.70, "6A5890")],
-		"forca_tecido": 0.9,
-		"gema": "FF6AF0",
-		"conjunto": {
-			"costas_capa": (["0A0810", "1A1428", "2C2244", "3E3260", "B86AD8", "F29AF8"], "FF6AF0"),
-			"cabeca": ("COROA_ESPINHOS", ["2A1A34", "4A3460", "6A5090", "9A80C0", "D0C0F0", "FFFFFF"], "FF6AF0"),
-			"arma": ("foice", {"lamina": "C8C0E0", "gume": "FF6AF0", "fio": "FFFFFF",
-							   "guarda": "4A3460", "punho": "2A1E30"}),
-		},
+	# --- PREMIUM: conjunto completo desenhado (`tools/trajes_premium.py`) ---
+	# Anjo: armadura de prata com filigrana de ouro, duas asas de penas,
+	# aureola com raios, olhos de luz e espada sagrada.
+	"anjo": {
+		"acento": [(0.00, "2A1404"), (0.22, "74420A"), (0.42, "C8861A"),
+				   (0.62, "F4BE36"), (0.85, "FFE680"), (1.00, "FFFBE0")],
+		"tecido": [(0.00, "1A1826"), (0.07, "3A3850"), (0.12, "7C7A94"),
+				   (0.20, "B4B2C8"), (0.30, "DCDAE8"), (0.50, "F6F4FC")],
+		"forca_tecido": 1.0,
+		"gema": "7FD8FF",
+		"premium": "anjo",
+	},
+	# Demonio: armadura de obsidiana rachada com lava por dentro, cornos,
+	# olhos em brasa, capa rasgada com forro carmim, cauda e espadao serrilhado.
+	"demonio": {
+		"acento": [(0.00, "1A0402"), (0.22, "5A0A06"), (0.42, "A8180C"),
+				   (0.62, "C8281A"), (0.85, "E8502A"), (1.00, "FF9A60")],
+		"tecido": [(0.00, "060406"), (0.12, "0E0A0E"), (0.24, "1C1418"),
+				   (0.40, "30222A"), (0.70, "54404A")],
+		"forca_tecido": 1.0,
+		"gema": "FF5A1A",
+		"premium": "demonio",
 	},
 }
-
-# Os conjuntos (pecas desenhadas) usam as mesmas rampas que as tres skins SO'
-# de paleta que o Paulo aprovou (29 set): essas ficam com a pasta/id originais
-# (fornalha, abadia_afogada, celestial) e os conjuntos ganham pasta propria.
-for _novo, _base in (("guardia_forja", "fornalha"), ("abadessa_afogada", "abadia_afogada"),
-					 ("serafim_celestial", "celestial")):
-	SKINS[_novo] = dict(SKINS[_base])
-	SKINS[_base] = {k: v for k, v in SKINS[_base].items() if k != "conjunto"}
 
 # Brilho abaixo do qual o pixel e' contorno e nao muda (a silhueta).
 CONTORNO_V = 0.07
@@ -226,41 +210,15 @@ RODADOS = {
 }
 
 
-def _peca_cabeca(spec) -> tuple:
-	nome, rampa, brilho = spec
-	if nome == "cornos":
-		return T.cornos(rampa, CONTORNO_PECAS, brilho)
-	return T.desenhar(getattr(T, nome), rampa, CONTORNO_PECAS, brilho)
-
-
 def vestir(orig: Image.Image, skin: dict, indice: int = 0) -> Image.Image:
-	"""Golden Set -> skin: paleta + conjunto (arma, ombreira, cabeca, costas)."""
+	"""Golden Set -> skin: paleta e, nas premium, o conjunto desenhado."""
 	orig = orig.convert("RGBA")
 	cara = T.ancora_cara(orig)
 	lam = T.lamina(orig, cara) if cara else None
 	im = recolorir(orig, skin)
-	cj = skin.get("conjunto", {})
-	if cara is None:
+	if cara is None or "premium" not in skin:
 		return im
-	if "arma" in cj:
-		im = T.trocar_arma(im, lam, cj["arma"][0], cj["arma"][1], CONTORNO_PECAS)
-	if "costas" in cj:
-		# bate as asas: abre e fecha de frame para frame
-		asa = T.asa(cj["costas"][1], CONTORNO_PECAS, 1.0 if (indice // 2) % 2 == 0 else 0.45)
-		im = T.colar(im, *asa, (cara[0] - 6, cara[1] + 9), False)
-	if "costas_capa" in cj:
-		rampa, brilho = cj["costas_capa"]
-		vento = 0.0 if indice < 0 else (0.25 if (indice // 2) % 2 == 0 else 0.45)
-		cp = T.capa(rampa, CONTORNO_PECAS, brilho, vento)
-		im = T.colar(im, *cp, (cara[0] - 4, cara[1] + 6), False)
-	if "ombreira" in cj:
-		o = T.ancora_ombro(orig, cara)
-		if o:
-			g, rampa, brilho = cj["ombreira"]
-			im = T.colar(im, *T.ombreira(getattr(T, g), rampa, CONTORNO_PECAS, brilho), o, True)
-	if "cabeca" in cj:
-		im = T.colar(im, *_peca_cabeca(cj["cabeca"]), cara, True)
-	return im
+	return P.VESTIR[skin["premium"]](orig, im, cara, lam, indice)
 
 
 def _rodar_como(vestida_fonte: Image.Image, fonte: Image.Image, alvo: Image.Image, ang: int) -> Image.Image:
@@ -290,25 +248,8 @@ def exportar_pecas() -> None:
 	"""As pecas soltas (x1), para rever e para futuros icones."""
 	dest = os.path.join(DEST, "pecas")
 	os.makedirs(dest, exist_ok=True)
-	for nome, skin in SKINS.items():
-		cj = skin.get("conjunto", {})
-		if "cabeca" in cj:
-			_peca_cabeca(cj["cabeca"])[0].save(os.path.join(dest, f"{nome}_cabeca.png"))
-		if "ombreira" in cj:
-			g, rampa, brilho = cj["ombreira"]
-			T.ombreira(getattr(T, g), rampa, CONTORNO_PECAS, brilho)[0].save(os.path.join(dest, f"{nome}_ombreira.png"))
-		if "costas_capa" in cj:
-			T.capa(cj["costas_capa"][0], CONTORNO_PECAS, cj["costas_capa"][1])[0].save(os.path.join(dest, f"{nome}_capa.png"))
-		if "costas" in cj:
-			T.asa(cj["costas"][1], CONTORNO_PECAS, 1.0)[0].save(os.path.join(dest, f"{nome}_asa.png"))
-		if "arma" in cj:
-			from PIL import ImageDraw
-			tela = Image.new("RGBA", (40, 12), (0, 0, 0, 0))
-			d = ImageDraw.Draw(tela)
-			tipo, cores = cj["arma"]
-			comp = {"lanca_mare": 18, "foice": 16}.get(tipo, 24)
-			T.ARMAS[tipo](d, (6.0, 6.0), (1.0, 0.0), comp, {k: T._hx(v) for k, v in cores.items()})
-			T.contornar(tela, T._hx(CONTORNO_PECAS)).save(os.path.join(dest, f"{nome}_arma_{tipo}.png"))
+	for nome, im in P.pecas_soltas().items():
+		im.save(os.path.join(dest, f"{nome}.png"))
 
 
 def gerar() -> None:

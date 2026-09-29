@@ -1,23 +1,24 @@
-# >>> Skins da Koliani = conjuntos de armadura + arma (29 set 2026, branch `claude/project-thread-u5wewl`, sem push) <<<
-Relatorio: `docs/execution_skins_koliani.md`. O Paulo rejeitou skins so' de
-paleta e pediu armaduras e armas aplicadas ao Golden Model. Feito: 3 skins
-(Guardia da Forja / Abadessa Afogada / Serafim Celestial) = Golden Set + pecas
-desenhadas (cornos, capuz, aureola, asas, ombreiras) + arma nova no lugar da
-lamina magenta (montante, tridente, espada solar), nos 84 frames. Depois o
-Paulo gostou das 3 so' de paleta do 1.o passe: voltaram com os ids/nomes
-originais (`skin_fornalha` Brasa da Fornalha, `skin_abadia_afogada`,
-`skin_celestial`) e sao as UNICAS simples -- tudo o que vier a seguir e'
-elaborado. Conjuntos: `skin_guardia_forja`, `skin_abadessa_afogada`,
-`skin_serafim_celestial`, `skin_vazio` (coroa, capa, foice).
-Pecas e ancoras: `tools/trajes_koliani.py`; composicao:
-`tools/gerar_skins_koliani.py`; runtime: `CosmeticosVisuais.DIR_SKIN`.
-Ver no Windows: `Godot.exe --path . res://tools/ProvadorSkins.tscn`.
-**Armadilhas**: detetar a lamina ANTES de trocar a paleta (a paleta pinta-a);
-so' o maior aglomerado magenta conta; os 3 frames rodados do rolamento
-vestem-se no `jump_loop_003` e rodam-se. Se o Golden Set mudar, regerar.
-Suite: 0 falhas com sandbox limpo (com sandbox reutilizado o
-`teste_golem_piloto_ttk` falha por causa do save que a suite deixa -- nao e' das skins).
-**Pendente**: aprovar o visual; ligar as pecas ao `Equipamento`?
+# >>> Skins da Koliani = 3 simples + 2 premium, Anjo e Demonio (29 set 2026, branch `claude/project-thread-u5wewl`, sem push) <<<
+Relatorio: `docs/execution_skins_koliani.md`. Historia curta: paleta so'
+(recusada como "elaborada", mas as 3 ficaram como as UNICAS simples:
+`skin_fornalha`, `skin_abadia_afogada`, `skin_celestial`, ids/nomes
+originais, bytes iguais ao 85ef70e) -> 4 conjuntos "pecas por cima da
+paleta" (Guardia/Abadessa/Serafim/Vazio) -- **recusados**: "sao literalmente
+uma copia das primeiras" -- apagados. Agora: **`skin_anjo` (Arcanjo) e
+`skin_demonio` (Arquidemonio)**, premium, `tools/trajes_premium.py`:
+material proprio no corpo (filigrana de ouro nas bordas da roupa / veios de
+lava em ruido ancorado a cara), olhos emissivos (pixeis quase pretos rodeados
+de pele), arma nova, 2 asas de 3 camadas / capa com forro + cauda,
+aureola com raios / 2 cornos bezier, couraca (peito), capa, aura de brilho de
+1-2 px; armas encurtadas para nunca tocarem a borda do canvas.
+**Loja gratis em desenvolvimento**: `LojaCatalogo.GRATIS_EM_DESENVOLVIMENTO`
+(true); precos reais intactos; por a false no fim.
+**Armadilhas**: detetar a lamina ANTES da paleta; cabelo e roupa tem a mesma
+cor (nao ha' segmentacao por cor -- usar geometria relativa a cara); os 3
+frames rodados do rolamento vestem-se no `jump_loop_003` e rodam-se; o
+`sort_keys` nos i18n baralha o ficheiro todo (inserir no sitio).
+Suite com sandbox limpo (ver relatorio). **Pendente**: aprovacao do Paulo,
+precos finais (hoje 400 V cada, tudo gratis em dev), push.
 
 # >>> N11 -- passe de enriquecimento (29 set 2026, commitado, nao empurrado ainda) <<<
 Pedido do Paulo apos ver o N11 (28 set): "esta pequeno, so' uma subida, sem

@@ -15,20 +15,18 @@ const TINTA_SKIN := {
 }
 ## id do item -> pasta de uma skin com ARTE real: um espelho do Golden Set
 ## (`frames/<anim>/<png>`, mesmo contrato de canvas) vestido por
-## `tools/gerar_skins_koliani.py` (conjunto de armadura + arma, ou só
-## paleta). O `koliani.gd` lê daqui os frames que a pasta tiver e cai no
+## `tools/gerar_skins_koliani.py` (só paleta, ou premium: conjunto completo
+## de `tools/trajes_premium.py`). O `koliani.gd` lê daqui os frames que a pasta tiver e cai no
 ## Golden Set para os que faltarem.
 const DIR_SKIN := {
 	"skin_fornalha": "res://assets/sprites/koliani_skins/fornalha",
 	"skin_abadia_afogada": "res://assets/sprites/koliani_skins/abadia_afogada",
 	"skin_celestial": "res://assets/sprites/koliani_skins/celestial",
-	"skin_guardia_forja": "res://assets/sprites/koliani_skins/guardia_forja",
-	"skin_abadessa_afogada": "res://assets/sprites/koliani_skins/abadessa_afogada",
-	"skin_serafim_celestial": "res://assets/sprites/koliani_skins/serafim_celestial",
-	"skin_vazio": "res://assets/sprites/koliani_skins/vazio",
+	"skin_anjo": "res://assets/sprites/koliani_skins/anjo",
+	"skin_demonio": "res://assets/sprites/koliani_skins/demonio",
 }
-## As que são só paleta (silhueta igual à do Golden Set); as outras trazem
-## conjunto de armadura + arma. O Paulo fechou as simples nestas três.
+## As que são só paleta (silhueta igual à do Golden Set); as outras são
+## premium (armadura, arma, asas/cornos...). O Paulo fechou as simples nestas três.
 const SKIN_SO_PALETA := ["skin_fornalha", "skin_abadia_afogada", "skin_celestial"]
 ## id -> cor do rasto do dash (o base é `koliani.COR_SHADOWBLADE`).
 const COR_RASTO := {

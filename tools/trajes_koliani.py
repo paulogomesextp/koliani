@@ -476,7 +476,16 @@ def trocar_arma(im: Image.Image, lam: dict | None, tipo: str, cores: dict, conto
 	d = ImageDraw.Draw(camada)
 	p, t = lam["punho"], lam["ponta"]
 	u = ((t[0] - p[0]) / lam["comp"], (t[1] - p[1]) / lam["comp"])
-	ARMAS[tipo](d, p, u, lam["comp"], {k: _hx(v) for k, v in cores.items()})
+	# a ponta nunca toca a borda do canvas (ficava cortada no jogo): encurta
+	# a lamina ate' caber, com 2 px de folga + contorno
+	lim = 1e9
+	for c, uc, n in ((p[0], u[0], im.width), (p[1], u[1], im.height)):
+		if uc > 1e-6:
+			lim = min(lim, (n - 3 - c) / uc)
+		elif uc < -1e-6:
+			lim = min(lim, (2 - c) / uc)
+	comp = min(lam["comp"], lim - 8)
+	ARMAS[tipo](d, p, u, comp, {k: _hx(v) for k, v in cores.items()})
 	camada = contornar(camada, _hx(contorno))
 	return Image.alpha_composite(im, camada)
 
