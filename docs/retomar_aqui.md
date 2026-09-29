@@ -1,4 +1,15 @@
 # >>> N12 -- "Galerias Verticais", autoral (29 set 2026, branch `claude/project-thread-6jbrqw`, SEM push) <<<
+
+**Passe de arte (29 set, depois de "quero niveis com arte detalhada, isso e'
+o mais importante")**: a branch do PR #1 (`claude/project-thread-8ipy7k`)
+foi integrada por merge (conflitos so' nos docs). O N12 ganhou o interior
+da torre (pilares, arcadas, vitrais em arco, rosaceas, raios de lua, tochas),
+24 pecas novas da prancha (`tools/gerar_props_n12_prancha.py`), os 9 props
+geometricos que sobravam no catalogo `torres` recortados da prancha (vale
+para toda a Regiao III), e peles opt-in para coluna de ar, laminas, sinos e
+degraus quebradicos. Capturas: `docs/qa/n12_autoral/`. Armadilha: o
+`gerar_props_torre_ecos.py` desfaz os props se correr depois -- correr
+`gerar_props_prancha.py` e `gerar_props_n12_prancha.py` a seguir.
 Pedido do Paulo: "continuar o desenvolvimento dos niveis conforme as artes
 aprovadas" (o coordenador escolheu: N12 a seguir, autoral, um nivel por
 commit). Relatorio completo: `docs/nivel_autoral_n12.md`.

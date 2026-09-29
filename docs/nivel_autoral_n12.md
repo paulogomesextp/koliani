@@ -40,30 +40,47 @@ gerador desloca tudo −1400 ao escrever, porque a Koliani morre abaixo de
 Guardião: `CatalogoCampanha.CHEFE_KEY[11] = "guard.automato_do_sino"` (novo,
 nos 6 idiomas). O Autómato comum da secção D ensina-lhe o ponto fraco antes.
 
-## Arte (sem mexer em PNGs)
+## Arte (sem PNGs editados à mão)
 
-- `ElevadorColuna` (`scripts/elevador_coluna.gd`, novo) — a mecânica do
-  `TumuloElevador` com a leitura do contrato: pedra do bioma + friso dourado,
-  **duas correntes que encurtam** ao subir e **roldana fixa** que gira. Instancia
-  `TumuloElevador.tscn` com o script por cima, para os verificadores da câmara
-  "elevador" continuarem a reconhecê-lo.
-- `PlataformaQuebra.pele_terreno` (opt-in, novo) — os degraus quebradiços
-  vestem o `corpo` do bioma em vez da laje cinzenta lisa; o aviso a vermelho
-  tinge a textura. Nenhum outro nível muda.
-- `CorrenteAr.tamanho` (opt-in, novo) — coluna de ar com o tamanho que a sala
-  pede (a forma da cena é partilhada; duplica-se antes de mexer).
-- Sinos e vitrais com as peles aprovadas (`sino_m`, `vitral_alto` /
-  `vitral_partido`); props da região colocados à mão (colunas, arcos,
-  estátuas de anjo, sino grande da arena, vitrais iluminados, velas,
-  candelabros, flâmulas, correntes douradas) com luz fria nos vitrais e
-  quente nos sinos — o par LOCKED "lua / ouro".
-- **Nave da torre** (só visual, atrás de tudo): o pack de fundo `torre_ecos`
-  só cobre a banda de baixo, e acima dela 2700 px de torre ficavam pretos.
-  Pilares de pedra do bioma a toda a altura, frisos a marcar os andares e
-  janelas altas com luz de lua entre os pilares.
-- Todos os props vêm de `assets/sprites/pixel/deco/torres/` pelo nome, e o
-  terreno pelo bioma `torres`: quando o PR #1 (arte das Regiões I–III) entrar,
-  o N12 herda os props, o terreno e o fundo novos sem mexer na cena.
+**Passe de arte (29 set, depois do pedido do Paulo "níveis com arte
+detalhada, isso é o mais importante")** — a branch do PR #1 (arte das
+pranchas) foi integrada por *merge*: o N12 herda o panorama da prancha, o
+terreno `torre_ecos` e os props recortados. Por cima disso, o N12 ganhou:
+
+- **Interior da torre** (a parede do fundo, só visual): pilares de cantaria
+  a toda a altura, arcadas de galeria a cada andar (o céu vê-se pelos vãos),
+  e por cima delas a torre fechada com **vitrais emoldurados em arcos de
+  pedra com friso dourado**, rosáceas sobre os pilares e **raios de luz de
+  lua** a cair dos vitrais; tochas nos pilares (ouro quente) — o par LOCKED
+  "lua / ouro". Antes, acima da banda do panorama, cada ecrã era metade céu
+  liso.
+- **24 peças novas recortadas da prancha** (`tools/gerar_props_n12_prancha.py`,
+  mesmo método do PR #1, ficheiros novos `p_*`): paredes, vitrais, rosácea,
+  arcadas, mísulas, lâminas, anéis do vento ascendente, raios de luz, poeira,
+  névoa, heras, entulho.
+- **Os 9 props que ainda eram formas geométricas** no catálogo `torres`
+  (braseiro, memorial, pedra talhada, detritos, velas, janela gótica,
+  balaustrada, arco pequeno, corrente do sino) — a `Plataforma` espalha-os
+  sozinha e eram os "cubos roxos" que sobravam — passam a vir da prancha,
+  com a mesma altura. Era o que o relatório do PR #1 deixou por fazer; vale
+  para toda a Região III.
+- Mecânicas vestidas com a prancha (tudo **opt-in**, os outros níveis não
+  mudam): `CorrenteAr.pele` (anéis de vento a subir, em vez do retângulo),
+  `PenduloLamina.textura`, `Serra.textura` (lâmina ornamentada que gira),
+  `SinoTorre` com pele esconde também o suporte/corda de placeholder,
+  `PlataformaQuebra.pele_terreno` e `ElevadorColuna` usam o **material do
+  pack** (`Plataforma.MATERIAL_POR_PACK`) e a capa do terreno — os degraus
+  quebradiços leem-se como pedra partida da torre, não como caixas.
+- Vento contra: rajadas de partículas + névoa em vez das setas-guia.
+- Heras a pender das galerias, entulho nos cantos, poeira de luz nos
+  vitrais de jogo, brilho dourado nos sinos.
+- Desempenho: as tochas e os vitrais da nave **não** têm `PointLight2D`
+  (seriam ~45); o nível fica com 18 luzes, cada uma só custa quando está no
+  ecrã.
+
+Da versão anterior mantêm-se: `ElevadorColuna` (`scripts/elevador_coluna.gd`)
+— correntes douradas que encurtam, roldana fixa que gira; sinos e vitrais
+de jogo com as peles aprovadas; props da região colocados à mão.
 
 ## Portões — medidos, não estimados
 
@@ -118,6 +135,8 @@ roster aprovado (N12 = Autómato do Sino). O "sino gigante" do N14 é um *set
 piece* do cenário, não um chefe.
 
 ## Por fazer / por decidir
+
+- Capturas das 4 secções: `docs/qa/n12_autoral/`.
 
 - **Playtest humano**: duração (não medida — só a jogar se sabe), leitura dos
   sinos e do vitral sem texto, dureza da serra B2→B3, TTK do Guardião.
