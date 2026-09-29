@@ -1160,6 +1160,7 @@ func _disparar_vfx_golpe() -> void:
 ## golden nunca leva efeito pintado dentro. Nascem no pai da Koliani (o nível),
 ## por isso ficam para trás no mundo e saem com a cena.
 const COR_SHADOWBLADE := Color(0.78, 0.32, 1.0)
+const RastoCosmetico := preload("res://scripts/rasto_cosmetico.gd")
 const RASTO_INTERVALO := 0.035
 var _rasto_t := 0.0
 
@@ -1185,6 +1186,12 @@ func _rasto_dash(dt: float) -> void:
 	eco.z_index = -1
 	eco.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 	get_parent().add_child(eco)
+	# rasto da Loja com arte: eco em silhueta luminosa + partículas pixel-art
+	var rv := CosmeticosVisuais.rasto_visual()
+	if not rv.is_empty():
+		eco.material = RastoCosmetico.material_eco(rv)
+		eco.modulate = Color(1.0, 1.0, 1.0, 0.5)
+		RastoCosmetico.emitir(get_parent(), _corpo.global_position, _olha_para, _sinal_grav, rv)
 	var t := eco.create_tween()
 	t.tween_property(eco, "modulate:a", 0.0, 0.18)
 	t.tween_callback(eco.queue_free)
@@ -1223,9 +1230,9 @@ func _vfx9g_dash() -> void:
 	if not Vfx9G.ativo(self):
 		return
 	Vfx9G.tocar(self, "dash_trail", global_position + Vector2(-10.0 * _olha_para, -6.0),
-		1.0, 0.0, _olha_para > 0.0, _sinal_grav < 0.0, -1, DUR_DASH)
+		1.0, 0.0, _olha_para > 0.0, _sinal_grav < 0.0, -1, DUR_DASH, CosmeticosVisuais.tinta_vfx_dash())
 	Vfx9G.tocar(self, "dash_impact", global_position + Vector2(-16.0 * _olha_para, 10.0 * _sinal_grav),
-		0.8, 0.0, _olha_para > 0.0, _sinal_grav < 0.0, -1, 0.26)
+		0.8, 0.0, _olha_para > 0.0, _sinal_grav < 0.0, -1, 0.26, CosmeticosVisuais.tinta_vfx_dash())
 
 
 func _sfx_dash() -> void:

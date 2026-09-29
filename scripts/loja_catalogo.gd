@@ -66,11 +66,14 @@ const ITENS := [
 	{"id": "skin_luar", "categoria": "skins", "k": -1, "v": 150, "regiao": -1, "raridade": "epico",
 		"inicial": false, "destaque": true, "preview": "", "placeholder": true, "efeito": "cosmetico"},
 	{"id": "efeito_rasto_brasa", "categoria": "efeitos", "k": 500, "v": 120, "regiao": -1, "raridade": "raro",
-		"inicial": false, "destaque": true, "preview": "", "placeholder": true, "efeito": "cosmetico"},
+		"inicial": false, "destaque": true, "preview": "res://assets/ui/shop/rastos/brasa/preview.png",
+		"placeholder": false, "efeito": "cosmetico"},
 	{"id": "hud_moldura_osso", "categoria": "hud_checkpoint", "k": 250, "v": 60, "regiao": -1, "raridade": "comum",
-		"inicial": false, "destaque": false, "preview": "", "placeholder": true, "efeito": "cosmetico"},
+		"inicial": false, "destaque": false, "preview": "res://assets/ui/shop/ossario/preview.png",
+		"placeholder": false, "efeito": "cosmetico"},
 	{"id": "extra_galeria_conceitos", "categoria": "extras", "k": 400, "v": -1, "regiao": -1, "raridade": "comum",
-		"inicial": false, "destaque": false, "preview": "", "placeholder": true, "efeito": "cosmetico"},
+		"inicial": false, "destaque": false, "preview": "res://assets/ui/shop/galeria/preview.png",
+		"placeholder": false, "efeito": "cosmetico"},
 	# --- Skins com arte real (`tools/gerar_skins_koliani.py`) -----------------
 	# A pasta de cada uma está em `CosmeticosVisuais.DIR_SKIN`. Temas das regiões
 	# IV, IX e XIV + Anjo e Demónio, à venda desde o início (`regiao` -1): não
@@ -97,7 +100,8 @@ const ITENS := [
 		"inicial": false, "destaque": true, "preview": "", "placeholder": true, "efeito": "cosmetico"},
 	{"id": "efeito_rasto_esporos", "categoria": "efeitos", "k": 600, "v": 120, "regiao": 0, "raridade": "raro",
 		"k_eq": 600, "v_eq": 120,
-		"inicial": false, "destaque": false, "preview": "", "placeholder": true, "efeito": "cosmetico"},
+		"inicial": false, "destaque": false, "preview": "res://assets/ui/shop/rastos/esporos/preview.png",
+		"placeholder": false, "efeito": "cosmetico"},
 	{"id": "hud_moldura_raizes", "categoria": "hud_checkpoint", "k": 300, "v": -1, "regiao": 0, "raridade": "raro",
 		"k_eq": 300, "v_eq": 75,
 		"inicial": false, "destaque": false, "preview": "res://assets/ui/shop/heartrot/rootbound_frame/preview.png",
@@ -105,6 +109,19 @@ const ITENS := [
 	{"id": "pack_coracao_podre", "categoria": "packs", "k": 1300, "v": 300, "regiao": 0, "raridade": "lendario",
 		"contem": ["skin_coracao_podre", "efeito_rasto_esporos", "hud_moldura_raizes"],
 		"inicial": false, "destaque": true, "preview": "", "placeholder": true, "efeito": "cosmetico"},
+	# --- Coleção Luar de Aurora (Aurora's Moonlight) -------------------------
+	{"id": "hud_moldura_gaiola", "categoria": "hud_checkpoint", "k": 900, "v": 200, "regiao": -1, "raridade": "epico",
+		"k_eq": 900, "v_eq": 200,
+		"inicial": false, "destaque": true, "preview": "res://assets/ui/shop/gaiola_aurora/preview.png",
+		"placeholder": false, "efeito": "cosmetico"},
+	{"id": "efeito_rasto_mariposas", "categoria": "efeitos", "k": 800, "v": 160, "regiao": -1, "raridade": "epico",
+		"k_eq": 800, "v_eq": 160,
+		"inicial": false, "destaque": true, "preview": "res://assets/ui/shop/rastos/mariposas/preview.png",
+		"placeholder": false, "efeito": "cosmetico"},
+	{"id": "pack_luar_aurora", "categoria": "packs", "k": 1200, "v": 250, "regiao": -1, "raridade": "lendario",
+		"contem": ["hud_moldura_gaiola", "efeito_rasto_mariposas"],
+		"inicial": false, "destaque": false, "preview": "res://assets/ui/shop/pack_luar_aurora/preview.png",
+		"placeholder": false, "efeito": "cosmetico"},
 ]
 
 
