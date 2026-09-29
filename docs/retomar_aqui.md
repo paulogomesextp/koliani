@@ -1,4 +1,32 @@
-# >>> N13 -- "Mecanismos Antigos", autoral (29 set 2026, branch `claude/project-thread-6jbrqw`, SEM push) <<<
+# >>> N14 -- "Campanario", autoral (29 set 2026, branch `claude/project-thread-6jbrqw`, junto no master) <<<
+
+Mesmo criterio do N12/N13 ("arte detalhada primeiro"). `Observatorio_Lunar.tscn`
+deixou de ser a sala da Sacerdotisa Lunar (chefe fora do contrato) + um
+Coletavel de `projetil` (ja' concedido no N10) e passou a uma torre feita a
+mao, 3400 x 3450, gerada por `tools/construir_n14_campanario.py`, a subir de
+baixo para cima: A) base (sinos em queda, 1.o baloico sobre fosso -- ensina,
+nao e' portao); B) camara dos sinos (3 sinos acendem plataformas
+TEMPORIZADAS em sequencia ate' a' coluna de ar que sai pelo furo do tecto);
+C) ar livre (2 baloicos grandes contra o vento, roda de 3 plataformas
+circulares com laminas em cruz no cubo, corrente que muda de direcao ao som
+do sino); D) sala do sino gigante (pendulo com dano) e Guardiao = Monge das
+Correntes elite (`guard.monge_das_correntes`, 6 idiomas). 3 segredos, 6
+checkpoints. Pecas da coluna N14 do `level_mechanics.png`
+(`tools/gerar_props_n14_prancha.py`, prefixo `c_`). Novos:
+`PlataformaBalanco`, `PlataformaOrbita`; opt-in em PlataformaSino
+(`duracao_solida`), SinoTorre (`ao_badalar`), ElevadorColuna (`grupo_sino`),
+CorrenteLateral (`pele`/`alfa_pele`), PedraQueda, PenduloLamina, engrenagem_deco.
+Portoes medidos contra `escalar_paredes` (coluna de ar a 480 px das paredes,
+ar livre sem paredes, chao D preso a' parede leste). Testes:
+`TestesRegion03N14`, `teste_r3_n14_sinos` (fisica),
+`teste_r3_n14_portoes_no_crivo`. Relatorio: `docs/nivel_autoral_n14.md`;
+capturas `docs/qa/n14_autoral/`. **Armadilhas**: `p_neblina` tem aresta dura
+(usar degrade radial); peles aditivas precisam de bordas esbatidas; o
+degrade `Massa` do N13 fica buraco preto contra o ceu. **Pendente**: playtest
+humano (tempo das temporizadas, vento sobre os baloicos, ritmo da roda, TTK
+do Guardiao). A seguir: N15 (Vyrak).
+
+# >>> N13 -- "Mecanismos Antigos", autoral (29 set 2026, branch `claude/project-thread-6jbrqw`, junto no master pelo PR #5) <<<
 
 Mesmo criterio do N12 ("arte detalhada primeiro"). `Torre_da_Tempestade.tscn`
 deixou de ser jornada procedural + sala do Voltaris e passou a 3 andares de
