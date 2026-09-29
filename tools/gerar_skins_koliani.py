@@ -1,32 +1,27 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Gera as SKINS da Koliani (Loja > Skins) a partir do Golden Set.
+"""Gera as SKINS da Koliani (Loja > Skins): o Golden Set com um CONJUNTO de
+armadura e arma por cima.
 
 Uma skin e' o Golden Set INTEIRO (`assets/sprites/koliani_golden_set/frames/`,
-todas as animacoes) com a paleta trocada -- mesma silhueta, mesmos frames,
-mesmo contrato de canvas (128x128, pes em y=104). Por isso nao ha' nada a
-afinar no codigo por skin: o `koliani.gd` so' troca a pasta de onde le os
-frames (`CosmeticosVisuais.dir_skin`).
+84 frames, todas as animacoes) vestido com pecas desenhadas a proposito
+(`tools/trajes_koliani.py`), mesmo contrato de canvas (128x128, pes em
+y=104). A colisao, os tempos e a hitbox nao mudam: o `koliani.gd` so' troca a
+pasta de onde le os frames (`CosmeticosVisuais.DIR_SKIN`).
 
-A arte do Golden Set nao e' indexada (~1200 cores por frame), por isso a troca
-e' por MATERIAL, classificado em HSV com pesos suaves (sem serrilha nas
-fronteiras):
+Por frame:
+  1. ancora -- centro da cara e topo do ombro (pele), lamina (magenta);
+  2. paleta -- troca por material (acento/tecido/gema; a pele nunca muda);
+  3. arma -- apaga a lamina magenta e desenha a arma nova na mesma reta;
+  4. pecas -- ombreira e cabeca por cima, asas por baixo do corpo.
+Os tres frames rodados do rolamento vestem-se no original e rodam-se juntos.
 
-  acento  -- os vermelhos (lenco, pontas do cabelo, fivelas): hue >= 295 ou < 10
-  pele    -- hue 10..45, claro: NUNCA se mexe (a Koliani continua a ser ela)
-  gema    -- o cristal ciano do cinto: hue 140..210
-  tecido  -- o resto (roupa, cabelo, botas; quase sem saturacao)
+  python tools/gerar_skins_koliani.py            # grava as 3 skins + pecas/
+  python tools/gerar_skins_koliani.py --preview  # + folha em work/skins_koliani/
 
-Cada material passa por uma RAMPA de cores da skin indexada pelo brilho do
-pixel original -- como uma rampa de pixel-art -- e o contorno (muito escuro)
-fica intacto para a silhueta ler igual em qualquer cenario.
-
-  python tools/gerar_skins_koliani.py            # grava as 3 skins
-  python tools/gerar_skins_koliani.py --preview  # + folha de previews em work/
-
-Saida por skin: `assets/sprites/koliani_skins/<pasta>/frames/<anim>/<png>`
-(espelho do Golden Set) + `preview.png` (o cartao da Loja).
-Depois: `godot --headless --import` para gerar os `.import`.
+Saida: `assets/sprites/koliani_skins/<skin>/frames/<anim>/<png>` +
+`preview.png` (cartao da Loja) e `assets/sprites/koliani_skins/pecas/`
+(as pecas soltas). Depois: `godot --headless --import`.
 """
 
 from __future__ import annotations
@@ -36,6 +31,9 @@ import os
 import sys
 
 from PIL import Image
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import trajes_koliani as T  # noqa: E402
 
 RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 GOLDEN = os.path.join(RAIZ, "assets", "sprites", "koliani_golden_set", "frames")
@@ -61,6 +59,12 @@ SKINS: dict[str, dict] = {
 				   (0.40, "54392A"), (0.70, "8A6A50")],
 		"forca_tecido": 0.85,
 		"gema": "FFD040",
+		"conjunto": {
+			"cabeca": ("cornos", ["2A1E1A", "4A3A32", "A89478", "D8C8A8", "F4ECD8", "FFFFFF"], "FFB030"),
+			"ombreira": ("OMBREIRA_ESPIGAO", ["1A1414", "2E2624", "4A3E3A", "6E625C", "9A8A80", "D8C8B8"], "FF9020"),
+			"arma": ("espada_brasa", {"lamina": "2A2220", "gume": "FF8A1E", "fio": "FFE08A",
+									  "guarda": "5A4A40", "punho": "3A2A20"}),
+		},
 	},
 	# Regiao IX -- Abadia Afogada. Agua funda: acentos verde-agua a brilhar,
 	# roupa azul-ardosia como pano encharcado.
@@ -71,6 +75,11 @@ SKINS: dict[str, dict] = {
 				   (0.40, "2E4462"), (0.70, "5A7898")],
 		"forca_tecido": 0.9,
 		"gema": "F2F6FF",
+		"conjunto": {
+			"cabeca": ("CAPUZ", ["0C1A26", "1C3446", "2E5068", "4A7490", "8CEBD6", "E0FFF6"], "5CE0C8"),
+			"arma": ("lanca_mare", {"lamina": "8CEBD6", "gume": "35B8A8", "fio": "E0FFF6",
+									"guarda": "2E5068", "punho": "4A3A30"}),
+		},
 	},
 	# Regiao XIV -- Planicies Celestiais. A inversa das outras: roupa marfim e
 	# prata, acentos ouro. O contorno fica escuro para ela nao se perder no ceu.
@@ -81,6 +90,13 @@ SKINS: dict[str, dict] = {
 				   (0.20, "A8A4B8"), (0.30, "D2CEDD"), (0.50, "F0EEF6")],
 		"forca_tecido": 1.0,
 		"gema": "7FD8FF",
+		"conjunto": {
+			"costas": ("asa", ["2C2A36", "6E6A7C", "B8B4C8", "DCD8E6", "F0EEF6", "FFFFFF"]),
+			"ombreira": ("OMBREIRA_ASA", ["6A4A12", "A87420", "D8A030", "F4BE36", "FFE680", "FFFBE0"], "FFFFFF"),
+			"cabeca": ("AUREOLA", ["C8861A", "C8861A", "C8861A", "C8861A", "C8861A", "FFF4C0"], "FFE680"),
+			"arma": ("espada_sol", {"lamina": "F4F4FA", "gume": "FFE680", "fio": "E0BE4A",
+									"guarda": "F4BE36", "punho": "6A4A12"}),
+		},
 	},
 }
 
@@ -174,27 +190,117 @@ def _pngs(raiz: str):
 				yield os.path.join(d, f)
 
 
+CONTORNO_PECAS = "0A0808"
+
+# Frames do rolamento que sao o `jump_loop_003` RODADO (derivados na 9B.4 por
+# rotacao exata; confirmado por comparacao pixel a pixel). Veste-se o original
+# e roda-se o resultado -- assim cornos, asas e arma rodam com o corpo.
+RODADOS = {
+	"roll/roll_003.png": ("jump_loop/jump_loop_003.png", 270),
+	"roll/roll_004.png": ("jump_loop/jump_loop_003.png", 180),
+	"roll/roll_005.png": ("jump_loop/jump_loop_003.png", 90),
+}
+
+
+def _peca_cabeca(spec) -> tuple:
+	nome, rampa, brilho = spec
+	if nome == "cornos":
+		return T.cornos(rampa, CONTORNO_PECAS, brilho)
+	return T.desenhar(getattr(T, nome), rampa, CONTORNO_PECAS, brilho)
+
+
+def vestir(orig: Image.Image, skin: dict, indice: int = 0) -> Image.Image:
+	"""Golden Set -> skin: paleta + conjunto (arma, ombreira, cabeca, costas)."""
+	orig = orig.convert("RGBA")
+	cara = T.ancora_cara(orig)
+	lam = T.lamina(orig, cara) if cara else None
+	im = recolorir(orig, skin)
+	cj = skin.get("conjunto", {})
+	if cara is None:
+		return im
+	if "arma" in cj:
+		im = T.trocar_arma(im, lam, cj["arma"][0], cj["arma"][1], CONTORNO_PECAS)
+	if "costas" in cj:
+		# bate as asas: abre e fecha de frame para frame
+		asa = T.asa(cj["costas"][1], CONTORNO_PECAS, 1.0 if (indice // 2) % 2 == 0 else 0.45)
+		im = T.colar(im, *asa, (cara[0] - 6, cara[1] + 9), False)
+	if "ombreira" in cj:
+		o = T.ancora_ombro(orig, cara)
+		if o:
+			g, rampa, brilho = cj["ombreira"]
+			im = T.colar(im, *T.ombreira(getattr(T, g), rampa, CONTORNO_PECAS, brilho), o, True)
+	if "cabeca" in cj:
+		im = T.colar(im, *_peca_cabeca(cj["cabeca"]), cara, True)
+	return im
+
+
+def _rodar_como(vestida_fonte: Image.Image, fonte: Image.Image, alvo: Image.Image, ang: int) -> Image.Image:
+	"""Roda `vestida_fonte` `ang` graus e alinha-a pelo corpo original, para o
+	corpo cair exatamente onde esta' no frame derivado `alvo`."""
+	rv = vestida_fonte.rotate(ang, expand=True)
+	rf = fonte.rotate(ang, expand=True)
+	# o corpo (sem pecas) dentro da imagem rodada
+	bf = rf.getbbox()
+	ba = alvo.getbbox()
+	dx, dy = ba[0] - bf[0], ba[1] - bf[1]
+	out = Image.new("RGBA", alvo.size, (0, 0, 0, 0))
+	out.paste(rv, (dx, dy), rv)
+	return out
+
+
 def preview_loja(skin_dir: str) -> Image.Image:
-	"""Cartao da Loja: o idle_001 recortado a caixa da figura, com folga."""
-	im = Image.open(os.path.join(skin_dir, "frames", "idle", "idle_001.png")).convert("RGBA")
+	"""Cartao da Loja: um golpe (mostra a arma) recortado a figura, com folga."""
+	im = Image.open(os.path.join(skin_dir, "frames", "attack_basic", "attack_basic_003.png")).convert("RGBA")
 	x0, y0, x1, y1 = im.getbbox()
-	lado = max(x1 - x0, y1 - y0) + 8
+	lado = max(x1 - x0, y1 - y0) + 6
 	cx, cy = (x0 + x1) // 2, (y0 + y1) // 2
 	return im.crop((cx - lado // 2, cy - lado // 2, cx - lado // 2 + lado, cy - lado // 2 + lado))
 
 
+def exportar_pecas() -> None:
+	"""As pecas soltas (x1), para rever e para futuros icones."""
+	dest = os.path.join(DEST, "pecas")
+	os.makedirs(dest, exist_ok=True)
+	for nome, skin in SKINS.items():
+		cj = skin["conjunto"]
+		if "cabeca" in cj:
+			_peca_cabeca(cj["cabeca"])[0].save(os.path.join(dest, f"{nome}_cabeca.png"))
+		if "ombreira" in cj:
+			g, rampa, brilho = cj["ombreira"]
+			T.ombreira(getattr(T, g), rampa, CONTORNO_PECAS, brilho)[0].save(os.path.join(dest, f"{nome}_ombreira.png"))
+		if "costas" in cj:
+			T.asa(cj["costas"][1], CONTORNO_PECAS, 1.0)[0].save(os.path.join(dest, f"{nome}_asa.png"))
+		if "arma" in cj:
+			from PIL import ImageDraw
+			tela = Image.new("RGBA", (40, 12), (0, 0, 0, 0))
+			d = ImageDraw.Draw(tela)
+			tipo, cores = cj["arma"]
+			comp = 24 if tipo != "lanca_mare" else 18
+			T.ARMAS[tipo](d, (6.0, 6.0), (1.0, 0.0), comp, {k: T._hx(v) for k, v in cores.items()})
+			T.contornar(tela, T._hx(CONTORNO_PECAS)).save(os.path.join(dest, f"{nome}_arma_{tipo}.png"))
+
+
 def gerar() -> None:
+	fontes = {os.path.relpath(f, GOLDEN).replace(os.sep, "/"): f for f in _pngs(GOLDEN)}
 	for nome, skin in SKINS.items():
 		base = os.path.join(DEST, nome)
-		n = 0
-		for f in _pngs(GOLDEN):
-			rel = os.path.relpath(f, GOLDEN)
+		vestidas = {}
+		for i, (rel, f) in enumerate(sorted(fontes.items())):
+			if rel in RODADOS:
+				continue
+			num = int(os.path.splitext(rel)[0].rsplit("_", 1)[-1]) if rel[-7:-4].isdigit() else i
+			vestidas[rel] = vestir(Image.open(f), skin, num)
+		for rel, (fonte, ang) in RODADOS.items():
+			if rel in fontes and fonte in vestidas:
+				vestidas[rel] = _rodar_como(vestidas[fonte], Image.open(fontes[fonte]).convert("RGBA"),
+										   Image.open(fontes[rel]).convert("RGBA"), ang)
+		for rel, im in vestidas.items():
 			dst = os.path.join(base, "frames", rel)
 			os.makedirs(os.path.dirname(dst), exist_ok=True)
-			recolorir(Image.open(f), skin).save(dst, optimize=True)
-			n += 1
+			im.save(dst, optimize=True)
 		preview_loja(base).save(os.path.join(base, "preview.png"), optimize=True)
-		print(f"skin {nome}: {n} frames")
+		print(f"skin {nome}: {len(vestidas)} frames")
+	exportar_pecas()
 
 
 def folha_previews(saida: str) -> None:

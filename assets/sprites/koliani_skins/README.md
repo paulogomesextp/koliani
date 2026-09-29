@@ -1,21 +1,23 @@
 # Skins da Koliani (Loja > Skins)
 
-Cada pasta é o **Golden Set inteiro** (`../koliani_golden_set/frames/`, todas
-as animações, 84 frames) com a paleta trocada. Mesma silhueta, mesmo contrato
-de canvas (128×128, pés em y=104, escala 1.0) — nada de física, câmara ou
-colisão muda. **Não editar os PNGs à mão**: são gerados.
+Cada skin é o **Golden Set inteiro** (`../koliani_golden_set/frames/`, 84
+frames, todas as animações) vestido com um **conjunto de armadura + arma**
+desenhado de propósito. Mesmo contrato de canvas (128×128, pés em y=104,
+escala 1.0): física, câmara, colisão e hitbox não mudam. **Não editar os PNGs
+à mão**: são gerados.
 
-| Pasta | Item da Loja | Tema |
+| Pasta | Item da Loja | Conjunto |
 |---|---|---|
-| `fornalha/` | `skin_fornalha` | Região IV — Fornalha: brasa/metal fundido sobre ferro queimado |
-| `abadia_afogada/` | `skin_abadia_afogada` | Região IX — Abadia Afogada: verde-água sobre azul-ardósia |
-| `celestial/` | `skin_celestial` | Região XIV — Planícies Celestiais: marfim/prata com ouro |
+| `fornalha/` | `skin_fornalha` (Guardiã da Forja) | cornos com fendas de brasa, ombreira de ferro com espigão, montante de brasa |
+| `abadia_afogada/` | `skin_abadia_afogada` (Abadessa Afogada) | capuz fundo com orla verde-água, tridente |
+| `celestial/` | `skin_celestial` (Serafim Celestial) | asas de penas (batem), auréola, ombreira de ouro em asa, espada solar |
 
-- Gerador: `python tools/gerar_skins_koliani.py [--preview]` (rampas por
-  material em `SKINS`; `--preview` grava `work/skins_koliani/folha_skins.png`).
-  Depois `--headless --import`.
-- Runtime: `CosmeticosVisuais.DIR_SKIN` -> `koliani.gd::_caminho_skin` lê cada
-  frame da pasta da skin (cai no Golden Set se faltar algum).
+- `pecas/` — cada peça solta (cabeça, ombreira, asa, arma), para rever e para
+  ícones futuros.
+- Peças: `tools/trajes_koliani.py` (grelhas de texto + desenho procedural).
+  Composição: `python tools/gerar_skins_koliani.py [--preview]`, depois
+  `--headless --import`.
+- Runtime: `CosmeticosVisuais.DIR_SKIN` -> `koliani.gd::_caminho_skin`.
 - Ver todas lado a lado: `res://tools/ProvadorSkins.tscn`.
-- Licença: derivadas da arte da Koliani do projeto (Golden Set); nenhum asset
+- Licença: arte do projeto (Golden Set + peças desenhadas aqui); nenhum asset
   de terceiros.
