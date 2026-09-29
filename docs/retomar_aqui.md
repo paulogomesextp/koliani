@@ -65,6 +65,30 @@ serra B2->B3, TTK do Guardiao). Depois N13 (Mecanismos Antigos) e N14
 (Campanario) com o mesmo tratamento -- ainda tem jornada + guardioes fora do
 contrato (`guard.voltaris`, `guard.sacerdotisa_lunar`).
 
+# >>> Loja -- cosméticos com arte + Galeria de Conceitos (29 set 2026, branch `claude/project-thread-mbzvi6`, PR #2) <<<
+Relatório: `docs/execution_loja_cosmeticos_arte.md`.
+- Molduras com arte (HUD + fogueira) e rastos do dash passaram a
+  data-driven em `scripts/cosmeticos_visuais.gd` (`MOLDURAS_ARTE`,
+  `RASTOS`); partículas do rasto em `scripts/rasto_cosmetico.gd`.
+- Itens com arte nova: Moldura do Ossário, Gaiola de Aurora (nova), Rasto de
+  Brasas, Rasto de Esporos, Rasto de Mariposas Lunares (novo), pack Luar de
+  Aurora (novo). Arte: `tools/gerar_cosmeticos_loja.py` (regerar, nunca
+  editar PNG).
+- **Galeria de Conceitos** (extra) já funciona: `scripts/galeria.gd`
+  (`class_name Galeria`), aberta pelo botão VER no detalhe do item na Loja
+  (gancho de ~14 linhas em `loja.gd`). 25 páginas: key art (`menu_bg`),
+  folha de modelo da Koliani, conceitos + folha do chefe das Regiões II-IV e
+  a prancha de produção das V-XX. Sem spoilers: as páginas de uma região só
+  abrem depois de concluída a anterior (modo dev abre tudo); página fechada
+  não carrega a imagem. As imagens vêm de `docs/art_direction/` (fora do
+  export) -- `tools/preparar_galeria.py` copia-as para
+  `assets/ui/galeria/*.jpg` (1536 px, q80, ~10 MB) e gera o preview da loja.
+- QA visual: `tests/qa_loja_arte_visual.tscn` (dash em câmara lenta) e
+  `tests/qa_galeria_visual.tscn` (Loja -> VER -> páginas, zoom, cadeado,
+  Esc volta à Loja), ambas no `tools/correr_qa_cosmeticos.ps1`.
+- Não tocado: skins da Koliani, preços/interruptor grátis (outra sessão),
+  fundos/terreno, N11.
+
 # >>> ARTE DAS PRANCHAS -- Regioes I a III (29 set 2026, branch `claude/project-thread-8ipy7k`, sem push) <<<
 O Paulo achou a arte dos niveis "muito fraca" face as pranchas aprovadas.
 Relatorio completo: `docs/execution_arte_pranchas_regioes_1_3.md`.
