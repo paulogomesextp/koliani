@@ -107,7 +107,6 @@ body {
 			<div id="status-notice"></div>
 		</div>
 
-		<script>$KOLIANI_INTRO</script>
 		<script src="$GODOT_URL"></script>
 		<script>
 const GODOT_CONFIG = $GODOT_CONFIG;
@@ -198,7 +197,7 @@ const engine = new Engine(GODOT_CONFIG);
 		}
 	} else {
 		setStatusMode('progress');
-		window.kolianiArranqueIntro(engine, GODOT_CONFIG, {
+		engine.startGame({
 			'onProgress': function (current, total) {
 				if (current > 0 && total > 0) {
 					statusProgress.value = current;

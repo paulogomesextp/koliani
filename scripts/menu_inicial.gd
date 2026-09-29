@@ -1,6 +1,6 @@
 extends Control
-## Menu inicial (é a cena que a intro abre, e a `main_scene` quando não há
-## intro). Execution 9H: refeito sobre a prancha aprovada
+## Menu inicial -- a `main_scene`: o jogo arranca direto aqui (a abertura
+## em vídeo da 9H foi retirada a 29 set 2026). Execution 9H: refeito sobre a prancha aprovada
 ## `10_menu_rebrand/01_main_menu_approved` -- arte limpa por baixo
 ## (`fundo_menu`, a prancha com a UI pintada retirada) e a UI viva por cima,
 ## nas coordenadas da própria prancha.

@@ -3080,11 +3080,31 @@ func teste_9h_frontend_producao() -> void:
 			"botao_jogar", "aba_atual", "anel_normal", "anel_atual", "anel_chefe",
 			"ficha_nivel", "losango", "cadeado"]:
 		_ok(Frontend9H.textura(peca) != null, "9H: falta a peca `%s` do kit" % peca)
-	# a intro e' a cena de arranque, e o menu e' a que ela abre
-	_ok(str(ProjectSettings.get_setting("application/run/main_scene", ""))
-		== "res://scenes/ui/Intro.tscn", "9H: a `main_scene` nao e a intro")
-	_ok(ResourceLoader.exists("res://assets/video/intro_koliani.ogv"),
-		"9H: falta o video da intro em Ogg Theora")
+	# sem video de abertura (pedido do Paulo, 29 set 2026): no Windows e na
+	# PWA o arranque vai direto ao menu principal
+	var cena_arranque := str(ProjectSettings.get_setting("application/run/main_scene", ""))
+	_ok(cena_arranque == "res://scenes/ui/MenuInicial.tscn",
+		"arranque: a `main_scene` nao e o menu principal (%s)" % cena_arranque)
+	_ok(not ResourceLoader.exists("res://scenes/ui/Intro.tscn")
+		and not ResourceLoader.exists("res://assets/video/intro_koliani.ogv"),
+		"arranque: a intro em video voltou ao projeto")
+	var arranque := load(cena_arranque) as PackedScene
+	_ok(arranque != null, "arranque: a cena do menu nao carrega")
+	if arranque:
+		var estado := arranque.get_state()
+		var ha_video := false
+		for i in estado.get_node_count():
+			if estado.get_node_type(i) == &"VideoStreamPlayer":
+				ha_video = true
+		_ok(not ha_video, "arranque: o menu tem um VideoStreamPlayer")
+	var preset := FileAccess.get_file_as_string("res://export_presets.cfg")
+	_ok(preset.contains("res://web/shell.html\"")
+		and FileAccess.file_exists("res://web/shell.html"),
+		"arranque: o export Web nao usa o shell sem intro")
+	var shell := FileAccess.get_file_as_string("res://web/shell.html")
+	_ok(shell.contains("engine.startGame(") and not shell.contains("kolianiIntro")
+		and not shell.contains(".mp4"),
+		"arranque: o shell Web ainda passa por uma intro em video")
 	_ok(str(ProjectSettings.get_setting("application/config/icon", ""))
 		== "res://icon.png", "9H: o icone do projeto nao e o do rebrand")
 	# sem texto a` mao nos ecras novos
