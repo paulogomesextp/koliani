@@ -1,3 +1,25 @@
+# >>> Skins da Koliani = 3 simples + 2 premium, Anjo e Demonio (29 set 2026, branch `claude/project-thread-u5wewl`, sem push) <<<
+Relatorio: `docs/execution_skins_koliani.md`. Historia curta: paleta so'
+(recusada como "elaborada", mas as 3 ficaram como as UNICAS simples:
+`skin_fornalha`, `skin_abadia_afogada`, `skin_celestial`, ids/nomes
+originais, bytes iguais ao 85ef70e) -> 4 conjuntos "pecas por cima da
+paleta" (Guardia/Abadessa/Serafim/Vazio) -- **recusados**: "sao literalmente
+uma copia das primeiras" -- apagados. Agora: **`skin_anjo` (Arcanjo) e
+`skin_demonio` (Arquidemonio)**, premium, `tools/trajes_premium.py`:
+material proprio no corpo (filigrana de ouro nas bordas da roupa / veios de
+lava em ruido ancorado a cara), olhos emissivos (pixeis quase pretos rodeados
+de pele), arma nova, 2 asas de 3 camadas / capa com forro + cauda,
+aureola com raios / 2 cornos bezier, couraca (peito), capa, aura de brilho de
+1-2 px; armas encurtadas para nunca tocarem a borda do canvas.
+**Loja gratis em desenvolvimento**: `LojaCatalogo.GRATIS_EM_DESENVOLVIMENTO`
+(true); precos reais intactos; por a false no fim.
+**Armadilhas**: detetar a lamina ANTES da paleta; cabelo e roupa tem a mesma
+cor (nao ha' segmentacao por cor -- usar geometria relativa a cara); os 3
+frames rodados do rolamento vestem-se no `jump_loop_003` e rodam-se; o
+`sort_keys` nos i18n baralha o ficheiro todo (inserir no sitio).
+Suite com sandbox limpo (ver relatorio). **Pendente**: aprovacao do Paulo,
+precos finais (hoje 400 V cada, tudo gratis em dev), push.
+
 # >>> N12 -- "Galerias Verticais", autoral (29 set 2026, branch `claude/project-thread-6jbrqw`, SEM push) <<<
 
 **Passe de arte (29 set, depois de "quero niveis com arte detalhada, isso e'

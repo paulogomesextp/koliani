@@ -957,6 +957,7 @@ const VFX9G_COMBO_POS := Vector2(20.0, -10.0)
 ## golden (diretos, ou derivados sem píxeis novos na 9B.3/9B.4).
 func _montar_golden_set(sf: SpriteFrames) -> void:
 	_golden_anims.clear()
+	_dir_skin = CosmeticosVisuais.dir_skin()
 	for nome: String in _KOLI_ANIMS_GOLDEN:
 		var c: Array = _KOLI_ANIMS_GOLDEN[nome]
 		var base: String = String(c[0]).get_file()
@@ -1045,6 +1046,18 @@ func _substituir_run_por_nativo(sf: SpriteFrames) -> void:
 	_animacao_golden(sf, "run", quadros, float(nomes.size()) / DUR_CICLO_CORRIDA, true)
 
 
+## Skin da Loja com arte real: o mesmo frame, lido da pasta da skin (espelho
+## de `GOLDEN_DIR/frames`). Frame que a skin não tenha -> o do Golden Set.
+## Resolvido uma vez por nível (`_montar_frames`); o VFX do golpe não muda.
+var _dir_skin := ""
+
+func _caminho_skin(caminho: String) -> String:
+	if _dir_skin == "" or not caminho.begins_with(GOLDEN_DIR + "/frames/"):
+		return caminho
+	var alt := _dir_skin + caminho.substr(GOLDEN_DIR.length())
+	return alt if ResourceLoader.exists(alt) else caminho
+
+
 ## Cria (ou substitui) uma animação a partir de caminhos res:// ou texturas já
 ## carregadas, e marca-a como golden para o contrato de escala.
 func _animacao_golden(sf: SpriteFrames, nome: String, quadros: Array, fps: float, loop: bool) -> void:
@@ -1054,7 +1067,7 @@ func _animacao_golden(sf: SpriteFrames, nome: String, quadros: Array, fps: float
 	sf.set_animation_speed(nome, fps)
 	sf.set_animation_loop(nome, loop)
 	for q in quadros:
-		var tex: Texture2D = load(q) if q is String else q
+		var tex: Texture2D = load(_caminho_skin(q)) if q is String else q
 		if tex:
 			sf.add_frame(nome, tex)
 	_golden_anims[nome] = true

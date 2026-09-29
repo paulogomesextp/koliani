@@ -2,8 +2,8 @@ class_name CosmeticosVisuais
 extends RefCounted
 ## REGISTRY DOS COSMÉTICOS VISUAIS. Único sítio que traduz
 ## `EstadoJogo.cosmeticos_equipados` em aparência; koliani/HUD/checkpoint só
-## perguntam aqui e nunca têm `if item == ...`. As skins de paleta ainda são
-## tinta; as molduras e os rastos com arte vivem em MOLDURAS_ARTE / RASTOS.
+## perguntam aqui e nunca têm `if item == ...`. As skins com arte vivem em
+## DIR_SKIN (as antigas de tinta em TINTA_SKIN); as molduras e os rastos com arte vivem em MOLDURAS_ARTE / RASTOS.
 ## Nada toca em stats, colisão ou tempos.
 ## Item desconhecido ou por equipar => neutro (o visual default).
 
@@ -14,6 +14,22 @@ const TINTA_SKIN := {
 	"skin_carmesim": Color(1.35, 0.62, 0.7),
 	"skin_luar": Color(0.75, 0.9, 1.35),
 }
+## id do item -> pasta de uma skin com ARTE real: um espelho do Golden Set
+## (`frames/<anim>/<png>`, mesmo contrato de canvas) vestido por
+## `tools/gerar_skins_koliani.py` (só paleta, ou premium: conjunto completo
+## de `tools/trajes_premium.py`). O `koliani.gd` lê daqui os frames que a
+## pasta tiver e cai no Golden Set para os que faltarem. O cartão da Loja vem
+## do campo `preview` do catálogo, como os outros itens com arte.
+const DIR_SKIN := {
+	"skin_fornalha": "res://assets/sprites/koliani_skins/fornalha",
+	"skin_abadia_afogada": "res://assets/sprites/koliani_skins/abadia_afogada",
+	"skin_celestial": "res://assets/sprites/koliani_skins/celestial",
+	"skin_anjo": "res://assets/sprites/koliani_skins/anjo",
+	"skin_demonio": "res://assets/sprites/koliani_skins/demonio",
+}
+## As que são só paleta (silhueta igual à do Golden Set); as outras são
+## premium (armadura, arma, asas/cornos...). O Paulo fechou as simples nestas três.
+const SKIN_SO_PALETA := ["skin_fornalha", "skin_abadia_afogada", "skin_celestial"]
 
 
 static func _equipado(categoria: String) -> String:
@@ -53,6 +69,11 @@ const RASTOS := {
 	},
 }
 static var _cache_rastos := {}
+
+
+## Pasta da skin equipada (ou de `id`); "" = Golden Set original.
+static func dir_skin(id := "") -> String:
+	return DIR_SKIN.get(id if id != "" else _equipado("skins"), "")
 
 
 ## Cor do eco do dash. Devolve `base` se não houver rasto equipado.

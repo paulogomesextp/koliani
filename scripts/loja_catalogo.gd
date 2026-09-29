@@ -18,6 +18,15 @@ extends RefCounted
 const KOLICOINS := "k"
 const VERACOINS := "v"
 
+## INTERRUPTOR DE DESENVOLVIMENTO (pedido do Paulo, 29 set 2026): enquanto o
+## jogo está em desenvolvimento TUDO na Loja custa 0, para se poder testar e
+## trocar à vontade. Os preços reais nos ITENS não mudam -- no fim, pôr isto a
+## `false` e a Loja volta a cobrar. Só mexe no que o jogador paga
+## (`EstadoJogo.preco_loja`); requisitos de região e posse ficam iguais.
+const GRATIS_EM_DESENVOLVIMENTO := true
+## Cópia mutável do interruptor (os testes dos preços reais desligam-na).
+static var gratis := GRATIS_EM_DESENVOLVIMENTO
+
 ## Ordem de apresentação das categorias. "destaques" é derivada (itens com
 ## `destaque = true`), não guarda itens próprios.
 const CATEGORIAS := ["destaques", "skins", "efeitos", "hud_checkpoint", "extras", "packs"]
@@ -64,6 +73,26 @@ const ITENS := [
 		"placeholder": false, "efeito": "cosmetico"},
 	{"id": "extra_galeria_conceitos", "categoria": "extras", "k": 400, "v": -1, "regiao": -1, "raridade": "comum",
 		"inicial": false, "destaque": false, "preview": "res://assets/ui/shop/galeria/preview.png",
+		"placeholder": false, "efeito": "cosmetico"},
+	# --- Skins com arte real (`tools/gerar_skins_koliani.py`) -----------------
+	# A pasta de cada uma está em `CosmeticosVisuais.DIR_SKIN`. Temas das regiões
+	# IV, IX e XIV + Anjo e Demónio, à venda desde o início (`regiao` -1): não
+	# fazem parte das coleções regionais. As três primeiras são só paleta (as
+	# simples que o Paulo aprovou); Anjo e Demónio são as premium.
+	{"id": "skin_fornalha", "categoria": "skins", "k": 600, "v": -1, "regiao": -1, "raridade": "raro",
+		"inicial": false, "destaque": true, "preview": "res://assets/sprites/koliani_skins/fornalha/preview.png",
+		"placeholder": false, "efeito": "cosmetico"},
+	{"id": "skin_abadia_afogada", "categoria": "skins", "k": 900, "v": 180, "regiao": -1, "raridade": "epico",
+		"inicial": false, "destaque": true, "preview": "res://assets/sprites/koliani_skins/abadia_afogada/preview.png",
+		"placeholder": false, "efeito": "cosmetico"},
+	{"id": "skin_celestial", "categoria": "skins", "k": -1, "v": 250, "regiao": -1, "raridade": "lendario",
+		"inicial": false, "destaque": true, "preview": "res://assets/sprites/koliani_skins/celestial/preview.png",
+		"placeholder": false, "efeito": "cosmetico"},
+	{"id": "skin_anjo", "categoria": "skins", "k": -1, "v": 400, "regiao": -1, "raridade": "lendario",
+		"inicial": false, "destaque": true, "preview": "res://assets/sprites/koliani_skins/anjo/preview.png",
+		"placeholder": false, "efeito": "cosmetico"},
+	{"id": "skin_demonio", "categoria": "skins", "k": -1, "v": 400, "regiao": -1, "raridade": "lendario",
+		"inicial": false, "destaque": true, "preview": "res://assets/sprites/koliani_skins/demonio/preview.png",
 		"placeholder": false, "efeito": "cosmetico"},
 	# --- Coleção Região I: Relíquias do Coração Podre (Heartrot Relics) ------
 	{"id": "skin_coracao_podre", "categoria": "skins", "k": -1, "v": 240, "regiao": 0, "raridade": "epico",
