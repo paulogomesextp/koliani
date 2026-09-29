@@ -1,3 +1,17 @@
+# >>> Skins da Koliani com arte real (29 set 2026, branch `claude/project-thread-u5wewl`, sem push) <<<
+Pedido do Paulo: novos assets de skins. Relatorio: `docs/execution_skins_koliani.md`.
+As skins da Loja eram so' tinta (`modulate`); agora ha' 3 com arte real,
+geradas por `tools/gerar_skins_koliani.py` a partir do Golden Set (84 frames,
+paleta trocada por material, pele e contorno intactos): `skin_fornalha`
+(Regiao IV), `skin_abadia_afogada` (IX), `skin_celestial` (XIV).
+Ligacao: `CosmeticosVisuais.DIR_SKIN` -> `koliani.gd::_caminho_skin`.
+Ver no Windows: `Godot.exe --path . res://tools/ProvadorSkins.tscn`.
+Suite: 0 falhas. **Pendente**: precos/raridades provisorios; decidir se as
+skins ficam presas a regioes; se as tintas antigas passam a arte real.
+**Armadilha**: se o Golden Set mudar (ex. `run_native`), regerar as skins --
+o runtime cai no frame original quando a skin nao o tem, por isso nao parte,
+mas a skin fica "incompleta" nessa animacao.
+
 # >>> N11 -- passe de enriquecimento (29 set 2026, commitado, nao empurrado ainda) <<<
 Pedido do Paulo apos ver o N11 (28 set): "esta pequeno, so' uma subida, sem
 mecanicas, sem arte de jeito" -- depois esclareceu que "arte de jeito" nao
