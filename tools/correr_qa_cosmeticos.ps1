@@ -40,6 +40,7 @@ try {
   Correr 'res://tests/qa_loja_colecao_visual.tscn' @()
   Correr 'res://tests/qa_rootbound_visual.tscn' @()
   Correr 'res://tests/qa_loja_arte_visual.tscn' @()
+  Correr 'res://tests/qa_galeria_visual.tscn' @()
 } finally { }
 $depois = Hash-Save
 if ($antes -ne $depois) { Write-Output "ERRO: o save real mudou ($antes -> $depois)"; $falhou = $true }

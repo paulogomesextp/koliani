@@ -205,6 +205,7 @@ func _correr_tudo() -> void:
 	teste_loja_colecao_regiao_i()
 	teste_rootbound_frame()
 	teste_loja_arte_molduras_rastos()
+	teste_galeria_conceitos()
 
 	# --- Região III -- Torre dos Ecos (N11-N15) -----------------------
 	teste_r3_nomes_canonicos()
@@ -4672,6 +4673,41 @@ func teste_loja_colecao_regiao_i() -> void:
 ## Molduras (Ossario, Gaiola de Aurora) e rastos (Brasa, Esporos, Mariposas)
 ## com arte: contratos do gerador `tools/gerar_cosmeticos_loja.py`, o que o
 ## jogo consome, o pack novo, e nada de stats.
+## Galeria de Conceitos (extra da Loja): imagens no export, sem spoilers,
+## navegação e zoom. Mexe no autoload EstadoJogo e repõe-no no fim.
+func teste_galeria_conceitos() -> void:
+	const G := preload("res://scripts/galeria.gd")
+	var it := LojaCatalogo.item(G.ITEM)
+	_ok(not bool(it["placeholder"]) and CosmeticosVisuais.preview_loja(G.ITEM) != null
+		and CosmeticosVisuais.preview_loja(G.ITEM).get_size() == Vector2(346, 130), "galeria: preview 346x130 na loja")
+	for i in G.PAGINAS.size():
+		_ok(ResourceLoader.exists(G.caminho(i)), "galeria: imagem da pagina %d existe (%s)" % [i, G.caminho(i)])
+		_ok(G.titulo_pagina(i) != "" and not G.titulo_pagina(i).begins_with("gallery."), "galeria: titulo da pagina %d" % i)
+	var concl: Array = EstadoJogo.concluidos.duplicate()
+	var dev: bool = EstadoJogo.modo_dev
+	EstadoJogo.modo_dev = false
+	EstadoJogo.concluidos = []
+	_ok(G.pagina_aberta(0) and G.pagina_aberta(1), "galeria: key art e folha da Koliani sempre abertas")
+	_ok(not G.pagina_aberta(2), "galeria: Regiao II fechada sem concluir a I")
+	EstadoJogo.concluidos = [0, 1, 2, 3, 4]
+	_ok(G.pagina_aberta(2) and G.pagina_aberta(4), "galeria: Regiao II abre depois da I")
+	_ok(not G.pagina_aberta(5), "galeria: Regiao III continua fechada")
+	var g: Control = G.new()
+	get_tree().root.add_child(g)
+	_ok(g.get_node("Vista/Imagem").texture != null, "galeria: primeira pagina carregada")
+	g.ampliar(9.0, Vector2(100, 100))
+	_ok(is_equal_approx(g.zoom, G.ZOOM_MAX), "galeria: zoom limitado")
+	g.ir(-1)
+	_ok(g.pagina == G.PAGINAS.size() - 1 and is_equal_approx(g.zoom, 1.0), "galeria: da' a volta e repoe o zoom")
+	_ok(g.get_node("Vista/Imagem").texture == null and g.get_node("Vista/Cadeado").text != "",
+		"galeria: pagina fechada nao carrega a imagem")
+	g.ir(g.pagina + 1)
+	_ok(g.pagina == 0, "galeria: da' a volta para a frente")
+	g.free()
+	EstadoJogo.concluidos = concl
+	EstadoJogo.modo_dev = dev
+
+
 func teste_loja_arte_molduras_rastos() -> void:
 	const CV := preload("res://scripts/cosmeticos_visuais.gd")
 	const RC := preload("res://scripts/rasto_cosmetico.gd")

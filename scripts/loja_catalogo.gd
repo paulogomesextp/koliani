@@ -63,7 +63,8 @@ const ITENS := [
 		"inicial": false, "destaque": false, "preview": "res://assets/ui/shop/ossario/preview.png",
 		"placeholder": false, "efeito": "cosmetico"},
 	{"id": "extra_galeria_conceitos", "categoria": "extras", "k": 400, "v": -1, "regiao": -1, "raridade": "comum",
-		"inicial": false, "destaque": false, "preview": "", "placeholder": true, "efeito": "cosmetico"},
+		"inicial": false, "destaque": false, "preview": "res://assets/ui/shop/galeria/preview.png",
+		"placeholder": false, "efeito": "cosmetico"},
 	# --- Coleção Região I: Relíquias do Coração Podre (Heartrot Relics) ------
 	{"id": "skin_coracao_podre", "categoria": "skins", "k": -1, "v": 240, "regiao": 0, "raridade": "epico",
 		"k_eq": 960, "v_eq": 240,

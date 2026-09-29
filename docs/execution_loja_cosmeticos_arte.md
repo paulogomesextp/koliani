@@ -16,7 +16,7 @@ e não foram tocados aqui.
 | efeitos | Rasto de Esporos | placeholder, sem efeito nenhum |
 | HUD / fogueira | Moldura de Osso | só tinta branca no disco e chama azulada |
 | HUD / fogueira | Moldura de Raízes (Rootbound) | arte real (única) |
-| extras | Galeria de Conceitos | placeholder, comprar não faz nada |
+| extras | Galeria de Conceitos | placeholder, comprar não faz nada (feita a seguir, ver abaixo) |
 | packs | Relíquias do Coração Podre | placeholder |
 
 ## O que ficou feito
@@ -93,11 +93,34 @@ K800/V160, pack teto K1200/V250 (paga só o que falta). Textos nos 6 idiomas
   Os irmãos com nome repetido são renomeados pelo Godot para `@Sprite2D@N`:
   contar partículas pela textura, não pelo nome.
 
+## Galeria de Conceitos (decisão do Paulo: "Push e Galeria")
+
+- Ecrã `scripts/galeria.gd` (`class_name Galeria`), por cima da Loja: o
+  detalhe do item comprado mostra **VER** em vez de EQUIPAR (extras não se
+  equipam). Gancho em `loja.gd`: um ramo no `_detalhe`, um no `_equipar` e
+  `_abrir_galeria` (o foco volta ao cartão ao fechar).
+- 25 páginas: key art (`assets/branding/menu_bg.png` -- a `key_art.png` é
+  uma captura de ecrã com botões da loja de apps, não serve), folha de
+  modelo da Koliani (`koliani_ref_nova.png`), Regiões II-IV com os conceitos
+  de cenário e a folha do chefe, Regiões V-XX com a prancha de produção.
+  A Região I não tem prancha em `docs/art_direction/`.
+- Sem spoilers: página de uma região só abre com a anterior concluída (modo
+  dev abre tudo); fechada, não carrega a imagem, mostra "Conclui X para
+  abrir esta página".
+- Controlos: ANTERIOR/SEGUINTE, setas, deslizar (>= 80 px, só sem zoom),
+  duplo toque/clique amplia 2,5x no ponto tocado, arrastar move, roda amplia
+  (1-3x). Esc/BACK fecha só a Galeria (é tratado no `_input`, antes da Loja).
+- Imagens: `tools/preparar_galeria.py` -> `assets/ui/galeria/*.jpg` (o
+  export exclui `docs/**`). 1536 px porque as pranchas são densas e o zoom
+  precisa do detalhe; ~10 MB no total. Também gera o preview da loja
+  (`assets/ui/shop/galeria/preview.png`, três provas: Koliani, Vyrak, Arauto
+  da Pestilência).
+- Teste `teste_galeria_conceitos` (imagens existem, desbloqueio por região,
+  volta nas pontas, zoom limitado, página fechada sem textura) e QA real
+  `tests/qa_galeria_visual.tscn` 11/11.
+
 ## Por fazer / decisão
 
-- **Galeria de Conceitos** (extras): comprar ainda não faz nada. Precisa de
-  um ecrã de galeria e de escolher o conteúdo (key art, pranchas das regiões
-  em `docs/art_direction/regions/`, pacotes de chefes). Decisão do Paulo.
 - Rasto de Brasas mantém o nome "Ember Trail"; o impacto magenta do kit 9G
   do dash é só tingido (mistura aditiva), não recolorido.
 - Pack Coração Podre continua placeholder (depende da skin, que é da outra
