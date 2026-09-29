@@ -876,6 +876,21 @@ script que arranque o Godot tem de passar por esta ferramenta.
 
 ---
 
+## Musica "igual em todos os niveis" -- era a ambiencia antiga (29 set 2026)
+
+Provado a correr (Godot 4.7.2 Linux, no editor e a partir do `.pck` exportado
+com o preset Windows): N1-N100 e os chefes tocam a faixa aprovada da regiao
+(41 faixas: menu + 20 regioes + 20 chefes; os 44 mp3 de `incoming_music` sao
+38 unicos + 6 duplicados, todos ja' no repo por SHA-256). O que se repetia em
+todo o lado era a camada `_amb` do `musica.gd`: `assombracao.wav` (N6-N100) e
+`ambiente_floresta.wav` (N1-N5), de 29 ago, nunca aprovadas. Desligadas por
+decisao do Paulo com `Musica.AMBIENCIA_ANTIGA_LIGADA = false` (ficheiros
+mantidos; reverter = `true`). Teste: `teste_musica_so_aprovada`.
+
+Pendente: 27 SFX Pixabay aprovados (combate/dano/passos/impactos) nunca
+chegaram ao repo (403 na cloud a 21 set). Lista em
+`/mnt/project-files/sfx_aprovados/em_falta.md`; descarga pedida a sessao no PC.
+
 ## SFX "igual ao antigo" -- a PWA ficava presa na versao velha (29 set 2026)
 
 Investigado: **nenhum trabalho de SFX ficou fora do master.** Comparados os
