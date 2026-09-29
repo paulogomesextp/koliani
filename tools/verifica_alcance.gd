@@ -238,9 +238,11 @@ static func _recolher(no: Node, out: Array) -> void:
 				"parede": tam.y >= 3.0 * tam.x,
 			})
 		elif s.ends_with("plataforma_sino.gd"):
-			# fantasma ate' um sino do grupo dela ser tocado (ver `_bfs`)
+			# fantasma ate' um sino do grupo dela ser tocado (ver `_medir_arvore`),
+			# a nao ser que comece solida (`comeca_solida`, N13)
 			var ts: Vector2 = f.get("tamanho")
 			var ps := f as Node2D
+			var fantasma := not bool(f.get("comeca_solida"))
 			out.append({
 				"nome": String(f.name),
 				"cx": ps.global_position.x,
@@ -248,8 +250,10 @@ static func _recolher(no: Node, out: Array) -> void:
 				"esq": ps.global_position.x - ts.x * 0.5,
 				"dir": ps.global_position.x + ts.x * 0.5,
 				"base": ps.global_position.y + ts.y * 0.5,
-				"sino": String(f.get("grupo_alternar")),
+				"sino": String(f.get("grupo_alternar")) if fantasma else "",
 			})
+			if not fantasma:
+				out[-1].erase("sino")
 		elif s.ends_with("plataforma_corrente.gd"):
 			_recolher_corrente(f as Node2D, out)
 		elif s.ends_with("plataforma_flutuante.gd"):
