@@ -116,10 +116,13 @@ SKINS: dict[str, dict] = {
 	},
 }
 
-# Skins SO' de paleta (o Paulo aceita algumas, 29 set): as mesmas rampas dos
-# conjuntos, sem pecas. Mantem a silhueta do Golden Set.
-for _nome, _base in (("brasa", "fornalha"), ("mare", "abadia_afogada"), ("marfim", "celestial")):
-	SKINS[_nome] = {k: v for k, v in SKINS[_base].items() if k != "conjunto"}
+# Os conjuntos (pecas desenhadas) usam as mesmas rampas que as tres skins SO'
+# de paleta que o Paulo aprovou (29 set): essas ficam com a pasta/id originais
+# (fornalha, abadia_afogada, celestial) e os conjuntos ganham pasta propria.
+for _novo, _base in (("guardia_forja", "fornalha"), ("abadessa_afogada", "abadia_afogada"),
+					 ("serafim_celestial", "celestial")):
+	SKINS[_novo] = dict(SKINS[_base])
+	SKINS[_base] = {k: v for k, v in SKINS[_base].items() if k != "conjunto"}
 
 # Brilho abaixo do qual o pixel e' contorno e nao muda (a silhueta).
 CONTORNO_V = 0.07

@@ -22,14 +22,14 @@ const DIR_SKIN := {
 	"skin_fornalha": "res://assets/sprites/koliani_skins/fornalha",
 	"skin_abadia_afogada": "res://assets/sprites/koliani_skins/abadia_afogada",
 	"skin_celestial": "res://assets/sprites/koliani_skins/celestial",
+	"skin_guardia_forja": "res://assets/sprites/koliani_skins/guardia_forja",
+	"skin_abadessa_afogada": "res://assets/sprites/koliani_skins/abadessa_afogada",
+	"skin_serafim_celestial": "res://assets/sprites/koliani_skins/serafim_celestial",
 	"skin_vazio": "res://assets/sprites/koliani_skins/vazio",
-	"skin_brasa": "res://assets/sprites/koliani_skins/brasa",
-	"skin_mare": "res://assets/sprites/koliani_skins/mare",
-	"skin_marfim": "res://assets/sprites/koliani_skins/marfim",
 }
 ## As que são só paleta (silhueta igual à do Golden Set); as outras trazem
-## conjunto de armadura + arma.
-const SKIN_SO_PALETA := ["skin_brasa", "skin_mare", "skin_marfim"]
+## conjunto de armadura + arma. O Paulo fechou as simples nestas três.
+const SKIN_SO_PALETA := ["skin_fornalha", "skin_abadia_afogada", "skin_celestial"]
 ## id -> cor do rasto do dash (o base é `koliani.COR_SHADOWBLADE`).
 const COR_RASTO := {
 	"efeito_rasto_brasa": Color(1.0, 0.5, 0.12),

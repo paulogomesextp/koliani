@@ -62,10 +62,11 @@ const ITENS := [
 		"inicial": false, "destaque": false, "preview": "", "placeholder": true, "efeito": "cosmetico"},
 	{"id": "extra_galeria_conceitos", "categoria": "extras", "k": 400, "v": -1, "regiao": -1, "raridade": "comum",
 		"inicial": false, "destaque": false, "preview": "", "placeholder": true, "efeito": "cosmetico"},
-	# --- Skins com arte real: Golden Set + conjunto de armadura e arma --------
-	# `tools/gerar_skins_koliani.py`; a pasta de cada uma está em
-	# `CosmeticosVisuais.DIR_SKIN`. Temas das regiões IV, IX, XIV e XIX, mas à
-	# venda desde o início (`regiao` -1): não fazem parte das coleções regionais.
+	# --- Skins com arte real (`tools/gerar_skins_koliani.py`) -----------------
+	# A pasta de cada uma está em `CosmeticosVisuais.DIR_SKIN`. Temas das regiões
+	# IV, IX, XIV e XIX, à venda desde o início (`regiao` -1): não fazem parte
+	# das coleções regionais. As três primeiras são só paleta (as simples que o
+	# Paulo aprovou); as seguintes trazem conjunto de armadura + arma.
 	{"id": "skin_fornalha", "categoria": "skins", "k": 600, "v": -1, "regiao": -1, "raridade": "raro",
 		"inicial": false, "destaque": true, "preview": "res://assets/sprites/koliani_skins/fornalha/preview.png",
 		"placeholder": false, "efeito": "cosmetico"},
@@ -75,18 +76,17 @@ const ITENS := [
 	{"id": "skin_celestial", "categoria": "skins", "k": -1, "v": 250, "regiao": -1, "raridade": "lendario",
 		"inicial": false, "destaque": true, "preview": "res://assets/sprites/koliani_skins/celestial/preview.png",
 		"placeholder": false, "efeito": "cosmetico"},
+	{"id": "skin_guardia_forja", "categoria": "skins", "k": 1200, "v": 240, "regiao": -1, "raridade": "epico",
+		"inicial": false, "destaque": true, "preview": "res://assets/sprites/koliani_skins/guardia_forja/preview.png",
+		"placeholder": false, "efeito": "cosmetico"},
+	{"id": "skin_abadessa_afogada", "categoria": "skins", "k": 1200, "v": 240, "regiao": -1, "raridade": "epico",
+		"inicial": false, "destaque": true, "preview": "res://assets/sprites/koliani_skins/abadessa_afogada/preview.png",
+		"placeholder": false, "efeito": "cosmetico"},
+	{"id": "skin_serafim_celestial", "categoria": "skins", "k": -1, "v": 300, "regiao": -1, "raridade": "lendario",
+		"inicial": false, "destaque": true, "preview": "res://assets/sprites/koliani_skins/serafim_celestial/preview.png",
+		"placeholder": false, "efeito": "cosmetico"},
 	{"id": "skin_vazio", "categoria": "skins", "k": -1, "v": 300, "regiao": -1, "raridade": "lendario",
 		"inicial": false, "destaque": true, "preview": "res://assets/sprites/koliani_skins/vazio/preview.png",
-		"placeholder": false, "efeito": "cosmetico"},
-	# Só paleta (sem peças): a mesma Koliani com as cores dos conjuntos acima.
-	{"id": "skin_brasa", "categoria": "skins", "k": 300, "v": -1, "regiao": -1, "raridade": "comum",
-		"inicial": false, "destaque": false, "preview": "res://assets/sprites/koliani_skins/brasa/preview.png",
-		"placeholder": false, "efeito": "cosmetico"},
-	{"id": "skin_mare", "categoria": "skins", "k": 350, "v": -1, "regiao": -1, "raridade": "comum",
-		"inicial": false, "destaque": false, "preview": "res://assets/sprites/koliani_skins/mare/preview.png",
-		"placeholder": false, "efeito": "cosmetico"},
-	{"id": "skin_marfim", "categoria": "skins", "k": 400, "v": -1, "regiao": -1, "raridade": "comum",
-		"inicial": false, "destaque": false, "preview": "res://assets/sprites/koliani_skins/marfim/preview.png",
 		"placeholder": false, "efeito": "cosmetico"},
 	# --- Coleção Região I: Relíquias do Coração Podre (Heartrot Relics) ------
 	{"id": "skin_coracao_podre", "categoria": "skins", "k": -1, "v": 240, "regiao": 0, "raridade": "epico",
