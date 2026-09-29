@@ -34,7 +34,8 @@ var _chama: CPUParticles2D
 var _brasas: CPUParticles2D
 var _nucleo: Polygon2D
 var _luz: PointLight2D
-## Rootbound Frame (Loja): visual alternativo; {} = fogueira original.
+## Moldura da Loja com arte (Rootbound, Ossário, Gaiola de Aurora): visual
+## alternativo; {} = fogueira original.
 var _rb: Dictionary = {}
 var _rb_brilho: Sprite2D
 var _rb_esporos: CPUParticles2D
@@ -248,10 +249,11 @@ func _montar_visual() -> void:
 	# O toast traduzido do HUD confirma a ativação; sem rótulo world-space redundante.
 
 
-## Cosmético "Rootbound Frame": raízes e fungos à volta da base, brilho fúngico
-## FRACO enquanto apagada (e esporos lentos a subir), e ao acender uma chama
-## maior, com miolo bile e fagulhas púrpura. Só aparência: a ativação, o
-## respawn e a colisão não passam por aqui.
+## Molduras da Loja com arte (Rootbound, Ossário, Gaiola de Aurora -- os
+## nós mantêm o nome "Rootbound*" da primeira): peças à volta da base, brilho
+## FRACO enquanto apagada (e partículas lentas a subir), e ao acender uma
+## chama maior com as cores da moldura. Só aparência: a ativação, o respawn e
+## a colisão não passam por aqui.
 func _montar_rootbound() -> void:
 	_rb = CosmeticosVisuais.checkpoint_visual()
 	if _rb.is_empty():
@@ -260,30 +262,30 @@ func _montar_rootbound() -> void:
 	base.name = "RootboundBase"
 	base.texture = _rb["base"]
 	base.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	base.position = Vector2(0.0, 12.0)
+	base.position = _rb["pos_base"]
 	_base.add_child(base)
 	var cog := Sprite2D.new()
 	cog.name = "RootboundCogumelos"
 	cog.texture = _rb["cogumelos"]
 	cog.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	cog.position = Vector2(0.0, 16.0)
+	cog.position = _rb["pos_frente"]
 	_base.add_child(cog)
 	# apagada: halo fúngico fraco a pulsar (valor baixo, forma pequena)
 	_rb_brilho = Sprite2D.new()
 	_rb_brilho.name = "RootboundBrilho"
 	_rb_brilho.texture = _rb["brilho"]
 	_rb_brilho.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	_rb_brilho.position = cog.position
+	_rb_brilho.position = _rb["pos_brilho"]
 	_rb_brilho.modulate.a = 0.35
 	_base.add_child(_rb_brilho)
 	var pulso := _rb_brilho.create_tween().set_loops()
 	pulso.tween_property(_rb_brilho, "modulate:a", 0.75, 1.3)
 	pulso.tween_property(_rb_brilho, "modulate:a", 0.25, 1.3)
-	_rb_esporos = _particulas_rb(3, 2.8, Color("B8C24A", 0.55), 1.5, Vector2(0.0, -6.0), 8.0)
+	_rb_esporos = _particulas_rb(3, 2.8, _rb["ocioso"], 1.5, Vector2(0.0, -6.0), 8.0)
 	_rb_esporos.position = Vector2(0.0, 8.0)
 	_rb_esporos.emitting = true
 	# lenha escura e sem o halo púrpura de "pronta" do kit 9G (que competia com
-	# os fungos); só para a Rootbound -- o default não passa por aqui
+	# as peças da moldura); só com moldura de arte -- o default não passa por aqui
 	for acha in _lenha.get_children():
 		if acha is Polygon2D:
 			(acha as Polygon2D).color = _rb["lenha"]

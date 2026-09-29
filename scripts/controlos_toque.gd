@@ -324,7 +324,7 @@ func _atualizar_disco_arma() -> void:
 	_arma_disco.modulate.a = 1.0
 	var wi := Equipamento.indice_arma(EstadoJogo.arma_equipada)
 	var sb := _arma_disco.get_theme_stylebox("panel") as StyleBoxTexture
-	if sb and wi >= 0 and not CosmeticosVisuais.raizes_equipado():
+	if sb and wi >= 0 and not CosmeticosVisuais.moldura_arte_equipada():
 		sb.modulate_color = Color.WHITE.lerp(Equipamento.cor_arma(wi), 0.35)
 	var nome := Textos.t(Equipamento.arma(EstadoJogo.arma_equipada).get("nome", ""))
 	# iniciais da arma (placeholder até haver ícone pixel)

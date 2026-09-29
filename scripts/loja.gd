@@ -396,6 +396,9 @@ func _detalhe() -> void:
 		_btn_eq.visible = true
 		_btn_eq.text = Textos.t("shop.equipped" if est == "equipado" else "shop.equip")
 		_btn_eq.disabled = est == "equipado"
+	elif est == "adquirido" and _sel == Galeria.ITEM:
+		_btn_eq.visible = true
+		_btn_eq.text = Textos.t("shop.view")
 	if LojaCatalogo.e_pack(it):
 		var dele := 0
 		for c: String in it["contem"]:
@@ -418,10 +421,21 @@ func _comprar(moeda: String) -> void:
 
 
 func _equipar() -> void:
+	if _sel == Galeria.ITEM:
+		_abrir_galeria()
+		return
 	if _sel != "" and EstadoJogo.equipar_item(_sel):
 		Som.toca("ui_confirmar", -8.0)
 	_refrescar()
 	_refocar()
+
+
+## O extra "Galeria de Conceitos" não se equipa: o botão abre-a por cima.
+func _abrir_galeria() -> void:
+	Som.toca("menu_painel", -12.0)
+	var g := Galeria.new()
+	g.fechado.connect(func() -> void: _cartoes.get(_sel, _botoes_cat[_cat]).grab_focus())
+	add_child(g)
 
 
 ## Depois de comprar/equipar o botão que tinha o foco pode ter desaparecido
