@@ -102,12 +102,17 @@ func _vestir() -> void:
 		# a' volta), para o elevador ler-se como pedra da torre e nao como
 		# um poligono chapado
 		var atm := get_tree().get_first_node_in_group("atmosfera")
-		var tex: Texture2D = PLATAFORMA._tex(String(atm.bioma), "corpo") \
-			if atm and "bioma" in atm else null
+		var tex: Texture2D = null
+		if atm and "bioma" in atm:
+			# o mesmo material das plataformas a' volta (`MATERIAL_POR_PACK`)
+			var material := String(atm.bioma)
+			if "fundo_pack" in atm and PLATAFORMA.MATERIAL_POR_PACK.has(atm.fundo_pack):
+				material = PLATAFORMA.MATERIAL_POR_PACK[atm.fundo_pack]
+			tex = PLATAFORMA._tex(material, "corpo")
 		if tex:
 			vis.texture = tex
 			vis.texture_repeat = CanvasItem.TEXTURE_REPEAT_ENABLED
-			vis.texture_scale = Vector2(2.0, 2.0)
+			vis.texture_scale = Vector2.ONE
 			vis.color = Color(1.0, 0.95, 1.0)
 	var runa := get_node_or_null("Runa") as Line2D
 	if runa:

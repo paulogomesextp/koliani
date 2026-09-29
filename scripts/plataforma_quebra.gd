@@ -68,10 +68,24 @@ func _montar() -> void:
 			# ancora a textura ao mundo: degraus vizinhos nao repetem o
 			# mesmo recorte do mosaico
 			_vis.texture_offset = Vector2(fposmod(position.x * 0.5, 192.0), fposmod(position.y * 0.5, 192.0))
-			_vis.texture_scale = Vector2(2.0, 2.0)
+			_vis.texture_scale = Vector2.ONE
 			_cor_repouso = Color(1.0, 0.96, 1.0)
 			_vis.color = _cor_repouso
 	add_child(_vis)
+	var capa := _textura_terreno("topo") if pele_terreno else null
+	if capa:
+		# capa do terreno por cima (a mesma das plataformas: le-se como pedra
+		# da torre partida, nao como caixa); fica filha do `_vis` para o
+		# aviso e o desaparecer a levarem junto
+		var cs_topo := Sprite2D.new()
+		cs_topo.texture = capa
+		cs_topo.centered = false
+		cs_topo.texture_repeat = CanvasItem.TEXTURE_REPEAT_ENABLED
+		cs_topo.region_enabled = true
+		cs_topo.region_rect = Rect2(fposmod(position.x, float(capa.get_width())), 0.0,
+			tamanho.x, float(capa.get_height()))
+		cs_topo.position = Vector2(-hw, -hh - 8.0)
+		_vis.add_child(cs_topo)
 	# "fissuras"
 	var fiss := Line2D.new()
 	fiss.points = PackedVector2Array([
@@ -79,6 +93,7 @@ func _montar() -> void:
 		Vector2(hw * 0.1, -hh * 0.4), Vector2(hw * 0.5, hh)])
 	fiss.width = 1.5
 	fiss.default_color = Color(0.12, 0.1, 0.14, 0.8)
+	fiss.visible = capa == null
 	add_child(fiss)
 	_borda = Line2D.new()
 	_borda.points = _vis.polygon
@@ -86,6 +101,9 @@ func _montar() -> void:
 	_borda.width = 2.0
 	_borda.default_color = Color(0.5, 0.42, 0.5, 0.7)
 	add_child(_borda)
+	if capa:
+		# com pele, a borda so' aparece no aviso (ver `_process`)
+		_borda.visible = false
 
 	_deteta = Area2D.new()
 	_deteta.collision_layer = 0
@@ -164,13 +182,19 @@ func _process(dt: float) -> void:
 
 ## O `corpo` do bioma do nivel (le-se do no' do grupo "atmosfera", como a
 ## `Plataforma`). `null` fora de uma cena com Atmosfera -> fica a laje lisa.
-func _textura_terreno() -> Texture2D:
+func _textura_terreno(peca := "corpo") -> Texture2D:
 	if not is_inside_tree():
 		return null
 	var atm := get_tree().get_first_node_in_group("atmosfera")
 	if atm == null or not ("bioma" in atm):
 		return null
-	return PLATAFORMA._tex(String(atm.bioma), "corpo")
+	# o `fundo_pack` pode pedir material proprio (`Plataforma.MATERIAL_POR_PACK`:
+	# a Torre dos Ecos usa o terreno da prancha) -- o degrau veste o MESMO
+	# material que as plataformas a' volta
+	var material := String(atm.bioma)
+	if "fundo_pack" in atm and PLATAFORMA.MATERIAL_POR_PACK.has(atm.fundo_pack):
+		material = PLATAFORMA.MATERIAL_POR_PACK[atm.fundo_pack]
+	return PLATAFORMA._tex(material, peca)
 
 
 ## Toca pelo CAMINHO do autoload, para a classe continuar a compilar em
