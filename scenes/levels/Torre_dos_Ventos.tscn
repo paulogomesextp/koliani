@@ -1,23 +1,69 @@
-[gd_scene load_steps=12 format=3 uid="uid://bkolianitorreventos12"]
+[gd_scene load_steps=46 format=3 uid="uid://bkolianitorreventos12"]
 
-; REGIAO III / nivel 12 -- GALERIAS VERTICAIS (`level.n11`).
+; REGIAO III / nivel 12 -- GALERIAS VERTICAIS (`level.n11`), "A Ascensao".
 ; O nome do ficheiro fica: muda-lo partia saves e checkpoints.
-; Sala final FEITA A MAO (a JORNADA, que cresce com o nivel, vem antes) e VERTICAL. CORRENTES DE AR
-; ascendentes (CorrenteAr) entre os degraus -- sobem-se ao sabor do vento.
-; Bifurcacao: coluna de ar oeste / degraus este. Elite: abutre voador.
-; Vazio em baixo. Chefe: Aerion, o Cavaleiro Alado.
+;
+; GERADO por `tools/construir_n12_galerias.py` -- editar la', nao aqui.
+; Desenho, medicoes e o que ficou por decidir: `docs/nivel_autoral_n12.md`.
+;
+; Nivel AUTORAL (`corredor = false`): a jornada procedural e a sala antiga
+; do Aerion (chefe de vento sem lugar no contrato LOCKED da Regiao III)
+; sairam. Estrutura do contrato (A-D), lida como ensinar/desenvolver/testar:
+;   A) Base das galerias  -- elevador de coluna (peso) + 1.o sino de
+;                            sincronizacao, tudo com rede, sem inimigos;
+;   B) Ascensao           -- escadas quebradas, lamina rapida, plataformas
+;                            que desaparecem, elevador em vaivem, VITRAL que
+;                            revela a ponte de eco;
+;   C) Vento e queda      -- coluna de ar ascendente + descida por degraus
+;                            quebradicos contra o vento;
+;   D) Galerias superiores-- Autómato + 2.o sino (ponte + gelar) + lamina
+;                            vertical rapida, e o GUARDIAO (Autómato do Sino
+;                            elite) a selar a porta.
+; 3 segredos, 5 checkpoints, inimigos principais do contrato: Gargula
+; Vitral, Autómato do Sino, Monge das Correntes.
 
 [ext_resource type="PackedScene" uid="uid://bkolianiactor01" path="res://scenes/actors/Koliani.tscn" id="1_kol"]
 [ext_resource type="PackedScene" uid="uid://bdemoniobase01" path="res://scenes/actors/DemonioBase.tscn" id="2_dem"]
-[ext_resource type="PackedScene" uid="uid://bkolianicoletavel01" path="res://scenes/actors/Coletavel.tscn" id="3_col"]
-[ext_resource type="PackedScene" uid="uid://bkolianiporta01" path="res://scenes/actors/Porta.tscn" id="4_porta"]
-[ext_resource type="Script" path="res://scripts/checkpoint.gd" id="5_chk"]
-[ext_resource type="PackedScene" uid="uid://bkolianichefeaerion12" path="res://scenes/actors/ChefeAerion.tscn" id="6_chefe"]
-[ext_resource type="Script" path="res://scripts/nivel_com_chefe.gd" id="7_niv"]
-[ext_resource type="PackedScene" uid="uid://bkolianiatmosfera01" path="res://scenes/fx/Atmosfera.tscn" id="8_atm"]
-[ext_resource type="PackedScene" uid="uid://bkolianiplataforma01" path="res://scenes/actors/Plataforma.tscn" id="9_pl"]
-[ext_resource type="PackedScene" uid="uid://bkolianicorrentear12" path="res://scenes/actors/CorrenteAr.tscn" id="10_ar"]
-[ext_resource type="PackedScene" uid="uid://bkolianiaguavenenosa01" path="res://scenes/actors/AguaVenenosa.tscn" id="11_vazio"]
+[ext_resource type="PackedScene" uid="uid://bkolianiporta01" path="res://scenes/actors/Porta.tscn" id="3_porta"]
+[ext_resource type="Script" path="res://scripts/checkpoint.gd" id="4_chk"]
+[ext_resource type="Script" path="res://scripts/nivel_com_chefe.gd" id="5_niv"]
+[ext_resource type="PackedScene" uid="uid://bkolianiatmosfera01" path="res://scenes/fx/Atmosfera.tscn" id="6_atm"]
+[ext_resource type="PackedScene" uid="uid://bkolianiplataforma01" path="res://scenes/actors/Plataforma.tscn" id="7_pl"]
+[ext_resource type="PackedScene" uid="uid://bkolianisinotorre11" path="res://scenes/actors/SinoTorre.tscn" id="8_sino"]
+[ext_resource type="PackedScene" uid="uid://bkolianiaguavenenosa01" path="res://scenes/actors/AguaVenenosa.tscn" id="9_vazio"]
+[ext_resource type="PackedScene" uid="uid://bkolianiplatsino11" path="res://scenes/actors/PlataformaSino.tscn" id="10_eco"]
+[ext_resource type="PackedScene" uid="uid://bkolianipendulolamina01" path="res://scenes/actors/PenduloLamina.tscn" id="11_pend"]
+[ext_resource type="PackedScene" uid="uid://bkolianiplataquebra01" path="res://scenes/actors/PlataformaQuebra.tscn" id="12_quebra"]
+[ext_resource type="PackedScene" uid="uid://bkolianiplatritmada05" path="res://scenes/actors/PlataformaRitmada.tscn" id="13_ritmo"]
+[ext_resource type="PackedScene" uid="uid://bkolianiessencia01" path="res://scenes/actors/Essencia.tscn" id="14_ess"]
+[ext_resource type="PackedScene" uid="uid://bkolianitumuloelev16" path="res://scenes/actors/TumuloElevador.tscn" id="15_elev"]
+[ext_resource type="Script" path="res://scripts/elevador_coluna.gd" id="16_elevcol"]
+[ext_resource type="PackedScene" uid="uid://bkolianicorrentear12" path="res://scenes/actors/CorrenteAr.tscn" id="17_ar"]
+[ext_resource type="PackedScene" path="res://scenes/actors/WindZone.tscn" id="18_vento"]
+[ext_resource type="PackedScene" uid="uid://bkolianivitral24" path="res://scenes/actors/Vitral.tscn" id="19_vitral"]
+[ext_resource type="PackedScene" uid="uid://bkolianiserra01" path="res://scenes/actors/Serra.tscn" id="20_serra"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/vitral_alto.png" id="21_t_vitral_alto"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/vitral_partido.png" id="22_t_vitral_partido"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/sino_m.png" id="23_t_sino_m"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/sino_g.png" id="24_t_sino_g"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/coluna_igreja.png" id="25_t_coluna_igreja"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/coluna_dupla.png" id="26_t_coluna_dupla"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/arco_grande.png" id="27_t_arco_grande"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/corrente_t.png" id="29_t_corrente_t"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/lanterna_eco.png" id="31_t_lanterna_eco"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/candelabro.png" id="32_t_candelabro"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/velas.png" id="33_t_velas"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/estatua_anjo.png" id="34_t_estatua_anjo"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/flamula.png" id="35_t_flamula"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/janela_gotica.png" id="36_t_janela_gotica"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/pedra_memoria.png" id="37_t_pedra_memoria"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/memorial.png" id="38_t_memorial"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/balaustrada.png" id="39_t_balaustrada"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/gargula.png" id="40_t_gargula"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/sino_partido.png" id="43_t_sino_partido"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/livros.png" id="44_t_livros"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/urna.png" id="45_t_urna"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/terreno/torres/corpo.png" id="46_t_corpo"]
 
 [sub_resource type="RectangleShape2D" id="rs_chk"]
 size = Vector2(44, 96)
@@ -35,207 +81,1157 @@ fill_from = Vector2(0.5, 0.5)
 fill_to = Vector2(1, 0.5)
 
 [node name="Torre_dos_Ventos" type="Node2D"]
-script = ExtResource("7_niv")
+script = ExtResource("5_niv")
+corredor = false
+alongar_plataformas = false
+checkpoints_autorais = true
+mecanica_anunciada = "elevador_coluna"
+estreia_x_autoral = 835.0
 
-[node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
-cor_ambiente = Color(0.86, 0.9, 1.04, 1)
-cor_fundo = Color(0.04, 0.06, 0.15, 1)
-cor_silhueta = Color(0.08, 0.1, 0.21, 1)
-cor_luz = Color(0.74, 0.86, 1, 1)
-cor_poeira = Color(0.84, 0.92, 1, 1)
-densidade_poeira = 1.6
+[node name="Atmosfera" parent="." instance=ExtResource("6_atm")]
+cor_ambiente = Color(0.88, 0.9, 1.04, 1)
+cor_fundo = Color(0.04, 0.05, 0.13, 1)
+cor_silhueta = Color(0.08, 0.09, 0.2, 1)
+cor_luz = Color(1, 0.8, 0.52, 1)
+cor_poeira = Color(1, 0.9, 0.74, 1)
+densidade_poeira = 1.3
 bioma = "torres"
-largura_nivel = 2600.0
+largura_nivel = 3000.0
 fundo_pack = "torre_ecos"
-tinta_fundo = Color(0.8, 0.9, 1.22, 1)
-neblina_fundo = 0.36
-dessaturar_fundo = 0.22
-seed_ambiente = 1407
+tinta_fundo = Color(0.84, 0.9, 1.18, 1)
+neblina_fundo = 0.32
+dessaturar_fundo = 0.18
+seed_ambiente = 1412
+luzes_horizonte = true
 
-[node name="Vazio" parent="." instance=ExtResource("11_vazio")]
-position = Vector2(650, 1120)
-largura = 3000.0
+; NAVE DA TORRE (so' visual, z muito atras). O pack de fundo `torre_ecos` so'
+; cobre a banda de baixo: acima dela uma torre de 2700 px ficava preta e
+; vazia. Pilares de pedra da regiao a toda a altura, frisos a marcar os
+; andares e janelas altas com luz de lua entre os pilares -- os "interiores
+; altos, vitrais, luz divina filtrada" da paleta LOCKED do N12.
+[node name="PilarNave0" type="Polygon2D" parent="."]
+z_index = -9
+color = Color(0.3, 0.31, 0.47, 1)
+texture = ExtResource("46_t_corpo")
+texture_repeat = 2
+texture_offset = Vector2(149.45, 0)
+texture_scale = Vector2(0.5, 0.5)
+polygon = PackedVector2Array(-115, -2160, -5, -2160, -5, 1120, -115, 1120)
+
+[node name="PilarNave1" type="Polygon2D" parent="."]
+z_index = -9
+color = Color(0.3, 0.31, 0.47, 1)
+texture = ExtResource("46_t_corpo")
+texture_repeat = 2
+texture_offset = Vector2(153.55, 0)
+texture_scale = Vector2(0.5, 0.5)
+polygon = PackedVector2Array(415, -2160, 525, -2160, 525, 1120, 415, 1120)
+
+[node name="PilarNave2" type="Polygon2D" parent="."]
+z_index = -9
+color = Color(0.3, 0.31, 0.47, 1)
+texture = ExtResource("46_t_corpo")
+texture_repeat = 2
+texture_offset = Vector2(43.35, 0)
+texture_scale = Vector2(0.5, 0.5)
+polygon = PackedVector2Array(1155, -2160, 1265, -2160, 1265, 1120, 1155, 1120)
+
+[node name="PilarNave3" type="Polygon2D" parent="."]
+z_index = -9
+color = Color(0.3, 0.31, 0.47, 1)
+texture = ExtResource("46_t_corpo")
+texture_repeat = 2
+texture_offset = Vector2(139.95, 0)
+texture_scale = Vector2(0.5, 0.5)
+polygon = PackedVector2Array(1935, -2160, 2045, -2160, 2045, 1120, 1935, 1120)
+
+[node name="PilarNave4" type="Polygon2D" parent="."]
+z_index = -9
+color = Color(0.3, 0.31, 0.47, 1)
+texture = ExtResource("46_t_corpo")
+texture_repeat = 2
+texture_offset = Vector2(26.05, 0)
+texture_scale = Vector2(0.5, 0.5)
+polygon = PackedVector2Array(2665, -2160, 2775, -2160, 2775, 1120, 2665, 1120)
+
+[node name="PilarNave5" type="Polygon2D" parent="."]
+z_index = -9
+color = Color(0.3, 0.31, 0.47, 1)
+texture = ExtResource("46_t_corpo")
+texture_repeat = 2
+texture_offset = Vector2(159.25, 0)
+texture_scale = Vector2(0.5, 0.5)
+polygon = PackedVector2Array(3025, -2160, 3135, -2160, 3135, 1120, 3025, 1120)
+
+[node name="FrisoNave0" type="Polygon2D" parent="."]
+z_index = -9
+color = Color(0.24, 0.24, 0.38, 1)
+texture = ExtResource("46_t_corpo")
+texture_repeat = 2
+texture_offset = Vector2(147.6, 0)
+texture_scale = Vector2(0.5, 0.5)
+polygon = PackedVector2Array(-120, -1520, 3140, -1520, 3140, -1494, -120, -1494)
+
+[node name="FrisoNave1" type="Polygon2D" parent="."]
+z_index = -9
+color = Color(0.24, 0.24, 0.38, 1)
+texture = ExtResource("46_t_corpo")
+texture_repeat = 2
+texture_offset = Vector2(147.6, 0)
+texture_scale = Vector2(0.5, 0.5)
+polygon = PackedVector2Array(-120, -840, 3140, -840, 3140, -814, -120, -814)
+
+[node name="FrisoNave2" type="Polygon2D" parent="."]
+z_index = -9
+color = Color(0.24, 0.24, 0.38, 1)
+texture = ExtResource("46_t_corpo")
+texture_repeat = 2
+texture_offset = Vector2(147.6, 0)
+texture_scale = Vector2(0.5, 0.5)
+polygon = PackedVector2Array(-120, -160, 3140, -160, 3140, -134, -120, -134)
+
+[node name="FrisoNave3" type="Polygon2D" parent="."]
+z_index = -9
+color = Color(0.24, 0.24, 0.38, 1)
+texture = ExtResource("46_t_corpo")
+texture_repeat = 2
+texture_offset = Vector2(147.6, 0)
+texture_scale = Vector2(0.5, 0.5)
+polygon = PackedVector2Array(-120, 520, 3140, 520, 3140, 546, -120, 546)
+
+[node name="JanelaNave0" type="Sprite2D" parent="."]
+position = Vector2(205, -1176.4)
+scale = Vector2(2.4, 2.4)
+texture = ExtResource("21_t_vitral_alto")
+z_index = -8
+modulate = Color(0.55, 0.62, 0.95, 0.75)
+
+[node name="LuzJanelaNave0" type="PointLight2D" parent="."]
+position = Vector2(205, -1178.4)
+texture = SubResource("tex_luz")
+energy = 0.3
+color = Color(0.55, 0.7, 1.0, 1)
+scale = Vector2(1.3, 2.2)
+
+[node name="JanelaNave1" type="Sprite2D" parent="."]
+position = Vector2(1600, -1132)
+scale = Vector2(3, 3)
+texture = ExtResource("36_t_janela_gotica")
+z_index = -8
+modulate = Color(0.55, 0.62, 0.95, 0.75)
+
+[node name="LuzJanelaNave1" type="PointLight2D" parent="."]
+position = Vector2(1600, -1134)
+texture = SubResource("tex_luz")
+energy = 0.3
+color = Color(0.55, 0.7, 1.0, 1)
+scale = Vector2(1.3, 2.2)
+
+[node name="JanelaNave2" type="Sprite2D" parent="."]
+position = Vector2(2900, -1176.4)
+scale = Vector2(2.4, 2.4)
+texture = ExtResource("21_t_vitral_alto")
+z_index = -8
+modulate = Color(0.55, 0.62, 0.95, 0.75)
+
+[node name="LuzJanelaNave2" type="PointLight2D" parent="."]
+position = Vector2(2900, -1178.4)
+texture = SubResource("tex_luz")
+energy = 0.3
+color = Color(0.55, 0.7, 1.0, 1)
+scale = Vector2(1.3, 2.2)
+
+[node name="JanelaNave3" type="Sprite2D" parent="."]
+position = Vector2(840, -452)
+scale = Vector2(3, 3)
+texture = ExtResource("36_t_janela_gotica")
+z_index = -8
+modulate = Color(0.55, 0.62, 0.95, 0.75)
+
+[node name="LuzJanelaNave3" type="PointLight2D" parent="."]
+position = Vector2(840, -454)
+texture = SubResource("tex_luz")
+energy = 0.3
+color = Color(0.55, 0.7, 1.0, 1)
+scale = Vector2(1.3, 2.2)
+
+[node name="JanelaNave4" type="Sprite2D" parent="."]
+position = Vector2(2355, -496.4)
+scale = Vector2(2.4, 2.4)
+texture = ExtResource("21_t_vitral_alto")
+z_index = -8
+modulate = Color(0.55, 0.62, 0.95, 0.75)
+
+[node name="LuzJanelaNave4" type="PointLight2D" parent="."]
+position = Vector2(2355, -498.4)
+texture = SubResource("tex_luz")
+energy = 0.3
+color = Color(0.55, 0.7, 1.0, 1)
+scale = Vector2(1.3, 2.2)
+
+[node name="JanelaNave5" type="Sprite2D" parent="."]
+position = Vector2(205, 228)
+scale = Vector2(3, 3)
+texture = ExtResource("36_t_janela_gotica")
+z_index = -8
+modulate = Color(0.55, 0.62, 0.95, 0.75)
+
+[node name="LuzJanelaNave5" type="PointLight2D" parent="."]
+position = Vector2(205, 226)
+texture = SubResource("tex_luz")
+energy = 0.3
+color = Color(0.55, 0.7, 1.0, 1)
+scale = Vector2(1.3, 2.2)
+
+[node name="JanelaNave6" type="Sprite2D" parent="."]
+position = Vector2(1600, 183.6)
+scale = Vector2(2.4, 2.4)
+texture = ExtResource("21_t_vitral_alto")
+z_index = -8
+modulate = Color(0.55, 0.62, 0.95, 0.75)
+
+[node name="LuzJanelaNave6" type="PointLight2D" parent="."]
+position = Vector2(1600, 181.6)
+texture = SubResource("tex_luz")
+energy = 0.3
+color = Color(0.55, 0.7, 1.0, 1)
+scale = Vector2(1.3, 2.2)
+
+[node name="JanelaNave7" type="Sprite2D" parent="."]
+position = Vector2(2900, 228)
+scale = Vector2(3, 3)
+texture = ExtResource("36_t_janela_gotica")
+z_index = -8
+modulate = Color(0.55, 0.62, 0.95, 0.75)
+
+[node name="LuzJanelaNave7" type="PointLight2D" parent="."]
+position = Vector2(2900, 226)
+texture = SubResource("tex_luz")
+energy = 0.3
+color = Color(0.55, 0.7, 1.0, 1)
+scale = Vector2(1.3, 2.2)
+
+[node name="JanelaNave8" type="Sprite2D" parent="."]
+position = Vector2(840, 823.6)
+scale = Vector2(2.4, 2.4)
+texture = ExtResource("21_t_vitral_alto")
+z_index = -8
+modulate = Color(0.55, 0.62, 0.95, 0.75)
+
+[node name="LuzJanelaNave8" type="PointLight2D" parent="."]
+position = Vector2(840, 821.6)
+texture = SubResource("tex_luz")
+energy = 0.3
+color = Color(0.55, 0.7, 1.0, 1)
+scale = Vector2(1.3, 2.2)
+
+[node name="JanelaNave9" type="Sprite2D" parent="."]
+position = Vector2(2355, 868)
+scale = Vector2(3, 3)
+texture = ExtResource("36_t_janela_gotica")
+z_index = -8
+modulate = Color(0.55, 0.62, 0.95, 0.75)
+
+[node name="LuzJanelaNave9" type="PointLight2D" parent="."]
+position = Vector2(2355, 866)
+texture = SubResource("tex_luz")
+energy = 0.3
+color = Color(0.55, 0.7, 1.0, 1)
+scale = Vector2(1.3, 2.2)
+
+; Cair ao fundo do poco = morte. Tudo o resto tem rede por baixo.
+[node name="Vazio" parent="." instance=ExtResource("9_vazio")]
+position = Vector2(1450, 1380)
+largura = 3600.0
 altura = 340.0
-cor = Color(0.06, 0.05, 0.12, 0.96)
+cor = Color(0.05, 0.04, 0.11, 0.97)
 
-[node name="ChaoInicio" parent="." instance=ExtResource("9_pl")]
-position = Vector2(340, 900)
-tamanho = Vector2(460, 60)
-altura_visual = 110.0
-cor_base = Color(0.24, 0.22, 0.24, 1)
-cor_topo = Color(0.52, 0.48, 0.5, 1)
+; ===================  A) BASE DAS GALERIAS  (ensinar)  ==================
+; Chao largo, sem inimigos. Primeiro ELEVADOR DE COLUNA: a roldana ve-se la'
+; em cima antes de subir. O bloco A2 fecha o poco pela direita -- o unico
+; caminho e' subir na plataforma (440 px, fora do alcance do salto duplo).
+[node name="ChaoBase" parent="." instance=ExtResource("7_pl")]
+position = Vector2(1070, 1030)
+tamanho = Vector2(2140, 60)
+altura_visual = 130
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
 
-[node name="V1" parent="." instance=ExtResource("9_pl")]
-position = Vector2(580, 820)
-tamanho = Vector2(140, 22)
-altura_visual = 30.0
-cor_base = Color(0.24, 0.22, 0.24, 1)
-cor_topo = Color(0.52, 0.48, 0.5, 1)
+[node name="ColunaBase1" type="Sprite2D" parent="."]
+position = Vector2(90, 751.2)
+scale = Vector2(2.2, 2.2)
+texture = ExtResource("25_t_coluna_igreja")
+z_index = -3
+modulate = Color(0.72, 0.74, 0.92, 1)
 
-[node name="ArBaixo" parent="." instance=ExtResource("10_ar")]
-position = Vector2(700, 720)
+[node name="VitralBase" type="Sprite2D" parent="."]
+position = Vector2(330, 680.4)
+scale = Vector2(2.6, 2.6)
+texture = ExtResource("21_t_vitral_alto")
+z_index = -4
+modulate = Color(0.85, 0.9, 1, 0.95)
 
-[node name="V2" parent="." instance=ExtResource("9_pl")]
-position = Vector2(760, 730)
-tamanho = Vector2(140, 22)
-altura_visual = 30.0
-cor_base = Color(0.24, 0.22, 0.24, 1)
-cor_topo = Color(0.52, 0.48, 0.5, 1)
-
-[node name="V3" parent="." instance=ExtResource("9_pl")]
-position = Vector2(600, 650)
-tamanho = Vector2(140, 22)
-altura_visual = 30.0
-cor_base = Color(0.24, 0.22, 0.24, 1)
-cor_topo = Color(0.52, 0.48, 0.5, 1)
-
-[node name="CentroLedge" parent="." instance=ExtResource("9_pl")]
-position = Vector2(680, 570)
-tamanho = Vector2(240, 26)
-altura_visual = 40.0
-cor_base = Color(0.24, 0.22, 0.24, 1)
-cor_topo = Color(0.52, 0.48, 0.5, 1)
-
-; N12: a Gargula e' a "predadora aerea" da prancha; `voador` fica igual. So' muda a IDENTIDADE: vida, dano,
-; comportamento e posicao ficam como estavam.
-[node name="EliteGargula" parent="." instance=ExtResource("2_dem")]
-position = Vector2(760, 430)
-scale = Vector2(1.35, 1.35)
-elite = true
-especie = "gargula_vitral"
-vida = 150
-dano_contacto = 22
-comportamento = "voador"
-cor_rim = Color(1.0, 0.82, 0.55, 1)
-
-; -- BIFURCACAO: coluna de ar O / degraus E --
-[node name="AO1" parent="." instance=ExtResource("9_pl")]
-position = Vector2(500, 490)
-tamanho = Vector2(120, 18)
-altura_visual = 22.0
-cor_base = Color(0.24, 0.22, 0.24, 1)
-cor_topo = Color(0.52, 0.48, 0.5, 1)
-
-[node name="ArOeste" parent="." instance=ExtResource("10_ar")]
-position = Vector2(500, 360)
-
-[node name="AO2" parent="." instance=ExtResource("9_pl")]
-position = Vector2(560, 380)
-tamanho = Vector2(120, 18)
-altura_visual = 22.0
-cor_base = Color(0.24, 0.22, 0.24, 1)
-cor_topo = Color(0.52, 0.48, 0.5, 1)
-
-[node name="AO3" parent="." instance=ExtResource("9_pl")]
-position = Vector2(460, 300)
-tamanho = Vector2(120, 18)
-altura_visual = 22.0
-cor_base = Color(0.24, 0.22, 0.24, 1)
-cor_topo = Color(0.52, 0.48, 0.5, 1)
-
-[node name="AE1" parent="." instance=ExtResource("9_pl")]
-position = Vector2(850, 500)
-tamanho = Vector2(120, 18)
-altura_visual = 22.0
-cor_base = Color(0.24, 0.22, 0.24, 1)
-cor_topo = Color(0.52, 0.48, 0.5, 1)
-
-[node name="AE2" parent="." instance=ExtResource("9_pl")]
-position = Vector2(970, 430)
-tamanho = Vector2(120, 18)
-altura_visual = 22.0
-cor_base = Color(0.24, 0.22, 0.24, 1)
-cor_topo = Color(0.52, 0.48, 0.5, 1)
-
-[node name="AE3" parent="." instance=ExtResource("9_pl")]
-position = Vector2(850, 350)
-tamanho = Vector2(120, 18)
-altura_visual = 22.0
-cor_base = Color(0.24, 0.22, 0.24, 1)
-cor_topo = Color(0.52, 0.48, 0.5, 1)
-
-; --- degraus para o cimo: o ChaoChefe vai de x=380 a x=940 e e' TECTO
-; para quem sobe por baixo (o AO3 e o AE3 ficam-lhe debaixo da barriga).
-; Estes ficam FORA desse intervalo, dois de cada lado -- como no nivel 10.
-[node name="SubidaOeste1" parent="." instance=ExtResource("9_pl")]
-position = Vector2(310, 322)
-tamanho = Vector2(110, 18)
-altura_visual = 24.0
-cor_base = Color(0.24, 0.22, 0.24, 1)
-cor_topo = Color(0.52, 0.48, 0.5, 1)
-
-[node name="SubidaOeste2" parent="." instance=ExtResource("9_pl")]
-position = Vector2(250, 250)
-tamanho = Vector2(100, 18)
-altura_visual = 24.0
-cor_base = Color(0.24, 0.22, 0.24, 1)
-cor_topo = Color(0.52, 0.48, 0.5, 1)
-
-[node name="SubidaLeste1" parent="." instance=ExtResource("9_pl")]
-position = Vector2(1035, 345)
-tamanho = Vector2(110, 18)
-altura_visual = 24.0
-cor_base = Color(0.24, 0.22, 0.24, 1)
-cor_topo = Color(0.52, 0.48, 0.5, 1)
-
-[node name="SubidaLeste2" parent="." instance=ExtResource("9_pl")]
-position = Vector2(1065, 267)
-tamanho = Vector2(100, 18)
-altura_visual = 24.0
-cor_base = Color(0.24, 0.22, 0.24, 1)
-cor_topo = Color(0.52, 0.48, 0.5, 1)
-
-[node name="ChaoChefe" parent="." instance=ExtResource("9_pl")]
-position = Vector2(660, 270)
-tamanho = Vector2(560, 60)
-altura_visual = 100.0
-cor_base = Color(0.24, 0.22, 0.24, 1)
-cor_topo = Color(0.52, 0.48, 0.5, 1)
-
-[node name="ColProjetil" parent="." instance=ExtResource("3_col")]
-position = Vector2(660, 234)
-habilidade_id = "projetil"
-
-[node name="Chefe" parent="." instance=ExtResource("6_chefe")]
-position = Vector2(780, 194)
-
-[node name="LuzBaixo" type="PointLight2D" parent="."]
-position = Vector2(340, 840)
+[node name="LuzVitralBase" type="PointLight2D" parent="."]
+position = Vector2(330, 680)
 texture = SubResource("tex_luz")
 energy = 0.55
-color = Color(1.0, 0.8, 0.55, 1)
-scale = Vector2(2.0, 1.3)
+color = Color(0.55, 0.7, 1.0, 1)
+scale = Vector2(1.6, 2.4)
 
-[node name="LuzChefe" type="PointLight2D" parent="."]
-position = Vector2(660, 250)
+[node name="ColunaBase2" type="Sprite2D" parent="."]
+position = Vector2(560, 751.2)
+scale = Vector2(2.2, 2.2)
+texture = ExtResource("25_t_coluna_igreja")
+z_index = -3
+modulate = Color(0.72, 0.74, 0.92, 1)
+
+[node name="SinoPartidoBase" type="Sprite2D" parent="."]
+position = Vector2(230, 956)
+scale = Vector2(2, 2)
+texture = ExtResource("43_t_sino_partido")
+z_index = -1
+
+[node name="VelasBase" type="Sprite2D" parent="."]
+position = Vector2(470, 948.8)
+scale = Vector2(1.4, 1.4)
+texture = ExtResource("33_t_velas")
+z_index = -1
+
+[node name="LuzVelasBase" type="PointLight2D" parent="."]
+position = Vector2(470, 960)
 texture = SubResource("tex_luz")
-energy = 0.65
-color = Color(1.0, 0.85, 0.6, 1)
-scale = Vector2(2.9, 1.7)
+energy = 0.5
+color = Color(1.0, 0.76, 0.45, 1)
+scale = Vector2(1.4, 1)
+
+[node name="Elevador1" parent="." instance=ExtResource("15_elev")]
+position = Vector2(835, 982)
+script = ExtResource("16_elevcol")
+curso = Vector2(0, -334)
+velocidade = 95.0
+largura = 150
+altura_ancora = 150.0
+
+[node name="LuzRoldana1" type="PointLight2D" parent="."]
+position = Vector2(835, 498)
+texture = SubResource("tex_luz")
+energy = 0.55
+color = Color(1.0, 0.76, 0.45, 1)
+scale = Vector2(1.3, 1.1)
+
+; A2: galeria FINA a 360 px do chao (fora do alcance do salto duplo, ~250
+; px, e SEM face de parede para escalar -- `escalar_paredes` ja' existe e
+; uma parede alta aqui tornava o elevador opcional). Por baixo, o salao
+; inferior (ChaoBase2). A2 continua para a direita por baixo da ponte do
+; sino: e' a REDE do ensino do sino (cair da ponte = aterrar aqui).
+[node name="ColunaSalao1" type="Sprite2D" parent="."]
+position = Vector2(1180, 823.5)
+scale = Vector2(1.7, 1.7)
+texture = ExtResource("26_t_coluna_dupla")
+z_index = -3
+modulate = Color(0.72, 0.74, 0.92, 1)
+
+[node name="ColunaSalao2" type="Sprite2D" parent="."]
+position = Vector2(1700, 823.5)
+scale = Vector2(1.7, 1.7)
+texture = ExtResource("26_t_coluna_dupla")
+z_index = -3
+modulate = Color(0.72, 0.74, 0.92, 1)
+
+[node name="ArcoSalao" type="Sprite2D" parent="."]
+position = Vector2(1440, 821.5)
+scale = Vector2(1.9, 1.9)
+texture = ExtResource("27_t_arco_grande")
+z_index = -4
+modulate = Color(0.7, 0.72, 0.9, 1)
+
+[node name="UrnaSalao" type="Sprite2D" parent="."]
+position = Vector2(1960, 976.5)
+scale = Vector2(1.5, 1.5)
+texture = ExtResource("45_t_urna")
+z_index = -1
+
+[node name="A2" parent="." instance=ExtResource("7_pl")]
+position = Vector2(1525, 655)
+tamanho = Vector2(1230, 30)
+altura_visual = 34
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+
+[node name="CandelabroA2" type="Sprite2D" parent="."]
+position = Vector2(1020, 586)
+scale = Vector2(1.6, 1.6)
+texture = ExtResource("32_t_candelabro")
+z_index = -1
+
+[node name="LuzCandA2" type="PointLight2D" parent="."]
+position = Vector2(1020, 580)
+texture = SubResource("tex_luz")
+energy = 0.5
+color = Color(1.0, 0.76, 0.45, 1)
+scale = Vector2(1.5, 1.1)
+
+; SEGREDO 1 -- a alcova da roldana. So' se chega saltando do elevador JA' em
+; cima (20 px de vao, 100 de subida). Do chao nao se ve o que la' esta'.
+[node name="Segredo1" parent="." instance=ExtResource("7_pl")]
+position = Vector2(675, 551)
+tamanho = Vector2(110, 22)
+altura_visual = 34
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+
+[node name="EssenciaSegredo1" parent="." instance=ExtResource("14_ess")]
+position = Vector2(675, 504)
+valor = 20
+
+[node name="MemorialSegredo1" type="Sprite2D" parent="."]
+position = Vector2(705, 518)
+scale = Vector2(1.6, 1.6)
+texture = ExtResource("37_t_pedra_memoria")
+z_index = -1
+
+[node name="LuzSegredo1" type="PointLight2D" parent="."]
+position = Vector2(675, 510)
+texture = SubResource("tex_luz")
+energy = 0.35
+color = Color(0.72, 0.5, 1.0, 1)
+scale = Vector2(0.9, 0.8)
+
+; PRIMEIRO SINO DE SINCRONIZACAO. Tocar-lhe faz aparecer a ponte S1-S3 (tres
+; degraus fantasma, grupo `sino_sync_a`). Tocar outra vez desfaz: e' o
+; retry. Por baixo da ponte esta' o A2 inteiro -- errar custa 3 s, nao a vida.
+[node name="SinoA" parent="." instance=ExtResource("8_sino")]
+position = Vector2(1250, 585)
+scale = Vector2(1.3, 1.3)
+alterna_grupo = "sino_sync_a"
+textura = ExtResource("23_t_sino_m")
+
+[node name="LuzSinoA" type="PointLight2D" parent="."]
+position = Vector2(1250, 570)
+texture = SubResource("tex_luz")
+energy = 0.6
+color = Color(1.0, 0.76, 0.45, 1)
+scale = Vector2(1.3, 1.2)
+
+[node name="CorrenteSinoA" type="Sprite2D" parent="."]
+position = Vector2(1245, 380)
+texture_repeat = 2
+texture = ExtResource("29_t_corrente_t")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 10, 170)
+z_index = -3
+modulate = Color(0.95, 0.8, 0.5, 0.9)
+
+[node name="PonteA1" parent="." instance=ExtResource("10_eco")]
+position = Vector2(1380, 560)
+tamanho = Vector2(100, 20)
+altura_visual = 16
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+grupo_alternar = "sino_sync_a"
+
+[node name="PonteA2" parent="." instance=ExtResource("10_eco")]
+position = Vector2(1510, 470)
+tamanho = Vector2(100, 20)
+altura_visual = 16
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+grupo_alternar = "sino_sync_a"
+
+[node name="PonteA3" parent="." instance=ExtResource("10_eco")]
+position = Vector2(1640, 380)
+tamanho = Vector2(100, 20)
+altura_visual = 16
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+grupo_alternar = "sino_sync_a"
+
+[node name="A3" parent="." instance=ExtResource("7_pl")]
+position = Vector2(1930, 272)
+tamanho = Vector2(420, 24)
+altura_visual = 60
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+
+[node name="VitralA3" type="Sprite2D" parent="."]
+position = Vector2(1850, 50.2)
+scale = Vector2(2.3, 2.3)
+texture = ExtResource("21_t_vitral_alto")
+z_index = -4
+modulate = Color(0.85, 0.9, 1, 0.95)
+
+[node name="LuzVitralA3" type="PointLight2D" parent="."]
+position = Vector2(1850, 50)
+texture = SubResource("tex_luz")
+energy = 0.5
+color = Color(0.55, 0.7, 1.0, 1)
+scale = Vector2(1.4, 2.2)
+
+[node name="FlamulaA3" type="Sprite2D" parent="."]
+position = Vector2(2100, 86.6)
+scale = Vector2(1.8, 1.8)
+texture = ExtResource("35_t_flamula")
+z_index = -3
+
+; ===================  B) ASCENSAO POR PLATAFORMAS  (desenvolver)  ===========
+; Monge das Correntes na galeria A3 (longe da aterragem da ponte: 280 px).
+[node name="MongeA3" parent="." instance=ExtResource("2_dem")]
+position = Vector2(2000, 210)
+especie = "monge_das_correntes"
+vida = 70
+dano_contacto = 16
+comportamento = "carga"
+alcance_patrulha = 80
+cor_rim = Color(0.85, 0.7, 0.45, 1)
+
+; ESCADAS QUEBRADAS -- degraus `PlataformaQuebra` em ziguezague num poco com
+; rede (PisoPoco) por baixo. Os degraus voltam (respawn 2,6 s).
+[node name="Degrau1" parent="." instance=ExtResource("12_quebra")]
+position = Vector2(2215, 179)
+tamanho = Vector2(90, 18)
+pele_terreno = true
+
+[node name="Degrau2" parent="." instance=ExtResource("12_quebra")]
+position = Vector2(2345, 99)
+tamanho = Vector2(90, 18)
+pele_terreno = true
+
+[node name="Patamar1" parent="." instance=ExtResource("7_pl")]
+position = Vector2(2500, 25)
+tamanho = Vector2(160, 30)
+altura_visual = 34
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+
+[node name="Degrau3" parent="." instance=ExtResource("12_quebra")]
+position = Vector2(2335, -61)
+tamanho = Vector2(90, 18)
+pele_terreno = true
+
+[node name="Degrau4" parent="." instance=ExtResource("12_quebra")]
+position = Vector2(2195, -141)
+tamanho = Vector2(90, 18)
+pele_terreno = true
+
+[node name="R2" parent="." instance=ExtResource("7_pl")]
+position = Vector2(2045, -215)
+tamanho = Vector2(170, 30)
+altura_visual = 34
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+
+[node name="PisoPoco" parent="." instance=ExtResource("7_pl")]
+position = Vector2(2450, 390)
+tamanho = Vector2(620, 40)
+altura_visual = 90
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+
+[node name="GargulaPoco" parent="." instance=ExtResource("2_dem")]
+position = Vector2(2560, 200)
+especie = "gargula_vitral"
+vida = 50
+dano_contacto = 14
+comportamento = "voador"
+alcance_patrulha = 90
+cor_rim = Color(0.6, 0.7, 1.0, 1)
+
+[node name="CorrentePoco1" type="Sprite2D" parent="."]
+position = Vector2(2275, -210)
+texture_repeat = 2
+texture = ExtResource("29_t_corrente_t")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 10, 570)
+z_index = -4
+modulate = Color(0.95, 0.8, 0.5, 0.9)
+
+[node name="CorrentePoco2" type="Sprite2D" parent="."]
+position = Vector2(2465, -210)
+texture_repeat = 2
+texture = ExtResource("29_t_corrente_t")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 10, 570)
+z_index = -4
+modulate = Color(0.95, 0.8, 0.5, 0.9)
+
+[node name="ColunaPoco" type="Sprite2D" parent="."]
+position = Vector2(2700, 120)
+scale = Vector2(2.4, 2.4)
+texture = ExtResource("26_t_coluna_dupla")
+z_index = -4
+modulate = Color(0.7, 0.72, 0.9, 1)
+
+[node name="LuzPoco" type="PointLight2D" parent="."]
+position = Vector2(2400, 320)
+texture = SubResource("tex_luz")
+energy = 0.5
+color = Color(1.0, 0.76, 0.45, 1)
+scale = Vector2(2.2, 1.2)
+
+; LAMINA DE SINO RAPIDA a guardar o lado direito do Patamar1 -- e o vitral do
+; SEGREDO 2 que la' esta'. Quem so' quer subir usa a ponta esquerda do
+; patamar, fora do arco.
+[node name="LaminaPatamar" parent="." instance=ExtResource("11_pend")]
+position = Vector2(2530, -120)
+comprimento = 90.0
+amplitude_graus = 58.0
+periodo = 1.5
+dano = 18
+
+[node name="VitralSegredo" parent="." instance=ExtResource("19_vitral")]
+position = Vector2(2600, -56)
+grupo_luz = "vitral_segredo"
+cor_luz = Color(0.55, 0.7, 1.0, 1)
+textura_inteiro = ExtResource("21_t_vitral_alto")
+textura_partido = ExtResource("22_t_vitral_partido")
+
+[node name="Segredo2" parent="." instance=ExtResource("7_pl")]
+position = Vector2(2690, 25)
+tamanho = Vector2(140, 30)
+altura_visual = 34
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+
+; Tecto da alcova: o vitral encosta-lhe, nao se salta por cima dele.
+[node name="TectoSegredo2" parent="." instance=ExtResource("7_pl")]
+position = Vector2(2685, -144)
+tamanho = Vector2(190, 40)
+altura_visual = 0
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+
+[node name="EssenciaSegredo2" parent="." instance=ExtResource("14_ess")]
+position = Vector2(2700, -26)
+valor = 25
+
+[node name="UrnaSegredo2" type="Sprite2D" parent="."]
+position = Vector2(2740, -13.5)
+scale = Vector2(1.5, 1.5)
+texture = ExtResource("45_t_urna")
+z_index = -1
+
+[node name="LivrosSegredo2" type="Sprite2D" parent="."]
+position = Vector2(2650, -4.5)
+scale = Vector2(1.5, 1.5)
+texture = ExtResource("44_t_livros")
+z_index = -1
+
+[node name="LuzSegredo2" type="PointLight2D" parent="."]
+position = Vector2(2690, -30)
+texture = SubResource("tex_luz")
+energy = 0.35
+color = Color(0.72, 0.5, 1.0, 1)
+scale = Vector2(0.9, 0.8)
+
+; R2: patamar seguro no topo das escadas. CheckB.
+[node name="LanternaR2" type="Sprite2D" parent="."]
+position = Vector2(2100, -272.8)
+scale = Vector2(1.6, 1.6)
+texture = ExtResource("31_t_lanterna_eco")
+z_index = -1
+
+[node name="LuzR2" type="PointLight2D" parent="."]
+position = Vector2(2100, -280)
+texture = SubResource("tex_luz")
+energy = 0.55
+color = Color(1.0, 0.76, 0.45, 1)
+scale = Vector2(1.4, 1.1)
+
+; PLATAFORMAS QUE DESAPARECEM -- tres `PlataformaRitmada` em fase escalonada
+; (0 / 0,8 / 1,6 s). Aviso de 0,5 s antes de sumirem. Rede (Balcao) por
+; baixo das duas primeiras: cair devolve ao R2, nao ao fundo.
+[node name="Ritmo1" parent="." instance=ExtResource("13_ritmo")]
+position = Vector2(1830, -219)
+tamanho = Vector2(100, 22)
+altura_visual = 34
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+periodo = 2.4
+fantasma_seg = 1.0
+fase = 0
+aviso = 0.5
+
+[node name="Ritmo2" parent="." instance=ExtResource("13_ritmo")]
+position = Vector2(1650, -229)
+tamanho = Vector2(100, 22)
+altura_visual = 34
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+periodo = 2.4
+fantasma_seg = 1.0
+fase = 0.8
+aviso = 0.5
+
+[node name="Ritmo3" parent="." instance=ExtResource("13_ritmo")]
+position = Vector2(1470, -239)
+tamanho = Vector2(100, 22)
+altura_visual = 34
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+periodo = 2.4
+fantasma_seg = 1.0
+fase = 1.6
+aviso = 0.5
+
+[node name="Balcao" parent="." instance=ExtResource("7_pl")]
+position = Vector2(1770, -107)
+tamanho = Vector2(260, 26)
+altura_visual = 34
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+
+[node name="BalaustradaBalcao" type="Sprite2D" parent="."]
+position = Vector2(1770, -163.6)
+scale = Vector2(1.6, 1.6)
+texture = ExtResource("39_t_balaustrada")
+z_index = 1
+
+[node name="R3" parent="." instance=ExtResource("7_pl")]
+position = Vector2(1220, -255)
+tamanho = Vector2(240, 30)
+altura_visual = 34
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+
+[node name="GargulaR3" type="Sprite2D" parent="."]
+position = Vector2(1320, -308.5)
+scale = Vector2(1.5, 1.5)
+texture = ExtResource("40_t_gargula")
+z_index = -1
+
+; 2.o ELEVADOR -- vaivem continuo (`auto`), mais lento. Ensina a ESPERAR
+; pelo elevador em vez de o chamar. Leva ao R4, onde esta' o vitral.
+[node name="Elevador2" parent="." instance=ExtResource("15_elev")]
+position = Vector2(1030, -262)
+script = ExtResource("16_elevcol")
+curso = Vector2(0, -400)
+velocidade = 80.0
+auto = true
+largura = 130
+altura_ancora = 120.0
+
+[node name="LuzRoldana2" type="PointLight2D" parent="."]
+position = Vector2(1030, -790)
+texture = SubResource("tex_luz")
+energy = 0.5
+color = Color(1.0, 0.76, 0.45, 1)
+scale = Vector2(1.2, 1)
+
+; R4 + VITRAL INTERACTIVO: parti-lo (golpe ou tiro) deixa entrar a luz e
+; REVELA a ponte de eco L1-L3 (grupo `vitral_n12`). Sem o partir, o vitral e'
+; parede e a ponte e' fantasma.
+[node name="R4" parent="." instance=ExtResource("7_pl")]
+position = Vector2(870, -655)
+tamanho = Vector2(180, 30)
+altura_visual = 34
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+
+[node name="VitralGalerias" parent="." instance=ExtResource("19_vitral")]
+position = Vector2(792, -756)
+scale = Vector2(1.3, 1.3)
+grupo_luz = "vitral_n12"
+cor_luz = Color(0.72, 0.5, 1.0, 1)
+textura_inteiro = ExtResource("21_t_vitral_alto")
+textura_partido = ExtResource("22_t_vitral_partido")
+
+[node name="PonteLuz1" parent="." instance=ExtResource("10_eco")]
+position = Vector2(680, -730)
+tamanho = Vector2(100, 20)
+altura_visual = 16
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+grupo_alternar = "vitral_n12"
+alpha_fantasma = 0.1
+
+[node name="PonteLuz2" parent="." instance=ExtResource("10_eco")]
+position = Vector2(540, -800)
+tamanho = Vector2(100, 20)
+altura_visual = 16
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+grupo_alternar = "vitral_n12"
+alpha_fantasma = 0.1
+
+[node name="PonteLuz3" parent="." instance=ExtResource("10_eco")]
+position = Vector2(400, -870)
+tamanho = Vector2(100, 20)
+altura_visual = 16
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+grupo_alternar = "vitral_n12"
+alpha_fantasma = 0.1
+
+[node name="VarandaOeste" parent="." instance=ExtResource("7_pl")]
+position = Vector2(530, -555)
+tamanho = Vector2(460, 30)
+altura_visual = 34
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+
+[node name="JanelaVaranda" type="Sprite2D" parent="."]
+position = Vector2(520, -671.6)
+scale = Vector2(2.2, 2.2)
+texture = ExtResource("36_t_janela_gotica")
+z_index = -4
+modulate = Color(0.8, 0.86, 1, 0.9)
+
+[node name="LuzVaranda" type="PointLight2D" parent="."]
+position = Vector2(520, -700)
+texture = SubResource("tex_luz")
+energy = 0.4
+color = Color(0.55, 0.7, 1.0, 1)
+scale = Vector2(1.3, 1.5)
+
+; ===================  C) SECCAO DE VENTO E QUEDA CONTROLADA  ============
+; R5 (galeria oeste alta, CheckC) -> Ponte alta (Monge) -> COLUNA DE AR
+; ascendente -> C1 no alto -> descida por degraus quebradicos com VENTO
+; CONTRA a empurrar para tras. Rede por baixo encostada a' coluna: cair
+; devolve ao ar, nao ao inicio.
+[node name="R5" parent="." instance=ExtResource("7_pl")]
+position = Vector2(170, -945)
+tamanho = Vector2(260, 30)
+altura_visual = 34
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+
+[node name="EstatuaR5" type="Sprite2D" parent="."]
+position = Vector2(110, -1070.2)
+scale = Vector2(1.7, 1.7)
+texture = ExtResource("34_t_estatua_anjo")
+z_index = -2
+
+[node name="LuzR5" type="PointLight2D" parent="."]
+position = Vector2(110, -1070)
+texture = SubResource("tex_luz")
+energy = 0.45
+color = Color(0.55, 0.7, 1.0, 1)
+scale = Vector2(1.2, 1.6)
+
+[node name="PonteAlta" parent="." instance=ExtResource("7_pl")]
+position = Vector2(490, -1007)
+tamanho = Vector2(300, 26)
+altura_visual = 34
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+
+[node name="MongePonte" parent="." instance=ExtResource("2_dem")]
+position = Vector2(520, -1070)
+especie = "monge_das_correntes"
+vida = 70
+dano_contacto = 16
+comportamento = "carga"
+alcance_patrulha = 70
+cor_rim = Color(0.85, 0.7, 0.45, 1)
+
+[node name="ColunaDeAr" parent="." instance=ExtResource("17_ar")]
+position = Vector2(710, -1305)
+tamanho = Vector2(100, 710)
+forca = 3000.0
+vel_alvo = 460.0
+
+[node name="C1" parent="." instance=ExtResource("7_pl")]
+position = Vector2(880, -1525)
+tamanho = Vector2(200, 30)
+altura_visual = 34
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+
+[node name="SinoGrandeC1" type="Sprite2D" parent="."]
+position = Vector2(880, -1605.2)
+scale = Vector2(1.4, 1.4)
+texture = ExtResource("24_t_sino_g")
+z_index = -2
+
+; SEGREDO 3 -- no cimo da coluna, do lado de la'. Sobe-se ate' ao fim do
+; ar e salta-se para a esquerda.
+[node name="Segredo3" parent="." instance=ExtResource("7_pl")]
+position = Vector2(605, -1689)
+tamanho = Vector2(90, 22)
+altura_visual = 34
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+
+[node name="EssenciaSegredo3" parent="." instance=ExtResource("14_ess")]
+position = Vector2(605, -1736)
+valor = 30
+
+[node name="MemorialSegredo3" type="Sprite2D" parent="."]
+position = Vector2(620, -1728)
+scale = Vector2(1.5, 1.5)
+texture = ExtResource("38_t_memorial")
+z_index = -1
+
+[node name="LuzSegredo3" type="PointLight2D" parent="."]
+position = Vector2(605, -1730)
+texture = SubResource("tex_luz")
+energy = 0.35
+color = Color(0.72, 0.5, 1.0, 1)
+scale = Vector2(0.9, 0.8)
+
+[node name="VentoContra" parent="." instance=ExtResource("18_vento")]
+position = Vector2(1270, -1460)
+direcao = Vector2(-1, 0)
+intensidade = 1300.0
+velocidade_max = 140.0
+tamanho = Vector2(520, 360)
+
+[node name="Queda1" parent="." instance=ExtResource("12_quebra")]
+position = Vector2(1085, -1451)
+tamanho = Vector2(90, 18)
+pele_terreno = true
+
+[node name="Queda2" parent="." instance=ExtResource("12_quebra")]
+position = Vector2(1235, -1371)
+tamanho = Vector2(90, 18)
+pele_terreno = true
+
+[node name="Queda3" parent="." instance=ExtResource("12_quebra")]
+position = Vector2(1385, -1291)
+tamanho = Vector2(90, 18)
+pele_terreno = true
+
+[node name="Rede" parent="." instance=ExtResource("7_pl")]
+position = Vector2(1140, -827)
+tamanho = Vector2(660, 26)
+altura_visual = 34
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+
+[node name="BalaustradaRede" type="Sprite2D" parent="."]
+position = Vector2(1300, -883.6)
+scale = Vector2(1.6, 1.6)
+texture = ExtResource("39_t_balaustrada")
+z_index = 1
+
+; ===================  D) GALERIAS SUPERIORES  (testar)  =================
+; D1: Autómato do Sino (tanque, escudo a' frente -- fraco nas COSTAS) e o 2.o
+; sino de sincronizacao MESMO ao lado dele: tocar o sino ergue a ponte E
+; gela o Autómato 2,6 s. Ponte B com LAMINA VERTICAL RAPIDA (serra) a cortar
+; o salto entre B2 e B3. Rede (Varanda) por baixo, devolve ao D1.
+[node name="D1" parent="." instance=ExtResource("7_pl")]
+position = Vector2(1670, -1200)
+tamanho = Vector2(380, 40)
+altura_visual = 100
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+
+[node name="AutomatoD1" parent="." instance=ExtResource("2_dem")]
+position = Vector2(1740, -1275)
+scale = Vector2(1.2, 1.2)
+especie = "automato_do_sino"
+vida = 110
+dano_contacto = 20
+comportamento = "escudeiro"
+alcance_patrulha = 60
+cor_rim = Color(1.0, 0.78, 0.45, 1)
+
+[node name="GargulaD1" parent="." instance=ExtResource("2_dem")]
+position = Vector2(1640, -1360)
+especie = "gargula_vitral"
+vida = 50
+dano_contacto = 14
+comportamento = "voador"
+alcance_patrulha = 100
+cor_rim = Color(0.6, 0.7, 1.0, 1)
+
+[node name="SinoB" parent="." instance=ExtResource("8_sino")]
+position = Vector2(1830, -1272)
+scale = Vector2(1.3, 1.3)
+alterna_grupo = "sino_sync_b"
+textura = ExtResource("23_t_sino_m")
+
+[node name="CorrenteSinoB" type="Sprite2D" parent="."]
+position = Vector2(1825, -1460)
+texture_repeat = 2
+texture = ExtResource("29_t_corrente_t")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 10, 156)
+z_index = -3
+modulate = Color(0.95, 0.8, 0.5, 0.9)
+
+[node name="LuzSinoB" type="PointLight2D" parent="."]
+position = Vector2(1830, -1290)
+texture = SubResource("tex_luz")
+energy = 0.6
+color = Color(1.0, 0.76, 0.45, 1)
+scale = Vector2(1.3, 1.2)
+
+[node name="PonteB1" parent="." instance=ExtResource("10_eco")]
+position = Vector2(1945, -1260)
+tamanho = Vector2(90, 20)
+altura_visual = 16
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+grupo_alternar = "sino_sync_b"
+
+[node name="PonteB2" parent="." instance=ExtResource("10_eco")]
+position = Vector2(2085, -1310)
+tamanho = Vector2(90, 20)
+altura_visual = 16
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+grupo_alternar = "sino_sync_b"
+
+[node name="PonteB3" parent="." instance=ExtResource("10_eco")]
+position = Vector2(2225, -1350)
+tamanho = Vector2(90, 20)
+altura_visual = 16
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+grupo_alternar = "sino_sync_b"
+
+[node name="LaminaVertical" parent="." instance=ExtResource("20_serra")]
+position = Vector2(2155, -1260)
+percurso = Vector2(0, -170)
+tempo = 0.8
+
+[node name="VarandaD" parent="." instance=ExtResource("7_pl")]
+position = Vector2(2080, -987)
+tamanho = Vector2(400, 26)
+altura_visual = 34
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+
+; Arena do GUARDIAO -- laje continua unica, sem plataformas secundarias.
+[node name="GaleriaSuperior" parent="." instance=ExtResource("7_pl")]
+position = Vector2(2630, -1370)
+tamanho = Vector2(660, 60)
+altura_visual = 150
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+
+[node name="EstatuaArena1" type="Sprite2D" parent="."]
+position = Vector2(2360, -1516.8)
+scale = Vector2(1.8, 1.8)
+texture = ExtResource("34_t_estatua_anjo")
+z_index = -3
+
+[node name="EstatuaArena2" type="Sprite2D" parent="."]
+position = Vector2(2900, -1516.8)
+scale = Vector2(1.8, 1.8)
+texture = ExtResource("34_t_estatua_anjo")
+z_index = -3
+flip_h = true
+
+[node name="SinoArena" type="Sprite2D" parent="."]
+position = Vector2(2630, -1634)
+scale = Vector2(2, 2)
+texture = ExtResource("24_t_sino_g")
+z_index = -3
+
+[node name="CorrenteArena" type="Sprite2D" parent="."]
+position = Vector2(2625, -1920)
+texture_repeat = 2
+texture = ExtResource("29_t_corrente_t")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 10, 194)
+z_index = -4
+modulate = Color(0.95, 0.8, 0.5, 0.9)
+
+[node name="VitralArena1" type="Sprite2D" parent="."]
+position = Vector2(2480, -1609.6)
+scale = Vector2(2.6, 2.6)
+texture = ExtResource("21_t_vitral_alto")
+z_index = -5
+modulate = Color(0.85, 0.9, 1, 0.9)
+
+[node name="VitralArena2" type="Sprite2D" parent="."]
+position = Vector2(2780, -1609.6)
+scale = Vector2(2.6, 2.6)
+texture = ExtResource("21_t_vitral_alto")
+z_index = -5
+modulate = Color(0.85, 0.9, 1, 0.9)
+
+[node name="LuzVitralArena1" type="PointLight2D" parent="."]
+position = Vector2(2480, -1620)
+texture = SubResource("tex_luz")
+energy = 0.5
+color = Color(0.55, 0.7, 1.0, 1)
+scale = Vector2(1.4, 2.4)
+
+[node name="LuzVitralArena2" type="PointLight2D" parent="."]
+position = Vector2(2780, -1620)
+texture = SubResource("tex_luz")
+energy = 0.5
+color = Color(0.55, 0.7, 1.0, 1)
+scale = Vector2(1.4, 2.4)
+
+[node name="LuzArena" type="PointLight2D" parent="."]
+position = Vector2(2630, -1430)
+texture = SubResource("tex_luz")
+energy = 0.7
+color = Color(1.0, 0.76, 0.45, 1)
+scale = Vector2(3.2, 1.7)
+
+[node name="Guardiao" parent="." instance=ExtResource("2_dem")]
+position = Vector2(2660, -1470)
+scale = Vector2(1.6, 1.6)
+elite = true
+especie = "automato_do_sino"
+vida = 260
+dano_contacto = 24
+comportamento = "escudeiro"
+alcance_patrulha = 150
+cor_rim = Color(1.0, 0.72, 0.4, 1)
 
 [node name="Koliani" parent="." instance=ExtResource("1_kol")]
-position = Vector2(200, 830)
+position = Vector2(160, 960)
 usar_prototipo_premium = true
 usar_golden_set = true
 
+; checkpoints_autorais = true: cinco, intencionais. Nenhum em plataforma
+; movel, fantasma ou quebradica; cada um antes de um passo novo.
 [node name="CheckInicio" type="Area2D" parent="."]
-position = Vector2(460, 836)
+position = Vector2(300, 966)
 collision_layer = 16
 collision_mask = 2
-script = ExtResource("5_chk")
+script = ExtResource("4_chk")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CheckInicio"]
 shape = SubResource("rs_chk")
 
-[node name="CheckMeio" type="Area2D" parent="."]
-position = Vector2(680, 506)
+[node name="CheckA" type="Area2D" parent="."]
+position = Vector2(1000, 606)
 collision_layer = 16
 collision_mask = 2
-script = ExtResource("5_chk")
+script = ExtResource("4_chk")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckMeio"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckA"]
 shape = SubResource("rs_chk")
 
-[node name="Porta" parent="." instance=ExtResource("4_porta")]
-position = Vector2(900, 246)
+[node name="CheckB" type="Area2D" parent="."]
+position = Vector2(2040, -264)
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("4_chk")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckB"]
+shape = SubResource("rs_chk")
+
+[node name="CheckC" type="Area2D" parent="."]
+position = Vector2(170, -994)
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("4_chk")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckC"]
+shape = SubResource("rs_chk")
+
+[node name="CheckD" type="Area2D" parent="."]
+position = Vector2(1530, -1254)
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("4_chk")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckD"]
+shape = SubResource("rs_chk")
+
+[node name="Porta" parent="." instance=ExtResource("3_porta")]
+position = Vector2(2900, -1394)
 pista_ao_atravessar = ""
