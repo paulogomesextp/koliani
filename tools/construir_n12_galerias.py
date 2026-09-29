@@ -56,17 +56,29 @@ EXT = [
     ("PackedScene", "uid://bkolianivitral24", "res://scenes/actors/Vitral.tscn", "vitral"),
     ("PackedScene", "uid://bkolianiserra01", "res://scenes/actors/Serra.tscn", "serra"),
 ]
-# texturas (props aprovados da regiao, `tools/gerar_props_torre_ecos.py`)
+# texturas: props da prancha aprovada (`tools/gerar_props_prancha.py` e
+# `tools/gerar_props_n12_prancha.py`). Os props antigos ainda geometricos do
+# catalogo (velas, janela_gotica, balaustrada, arco_pequeno, memorial) NAO
+# entram no N12.
 TEXTURAS = [
     "vitral_alto", "vitral_partido", "sino_m", "sino_g", "coluna_igreja",
-    "coluna_dupla", "arco_grande", "arco_pequeno", "corrente_t", "corrente_sino",
-    "lanterna_eco", "candelabro", "velas", "estatua_anjo", "flamula",
-    "janela_gotica", "pedra_memoria", "memorial", "balaustrada", "gargula",
-    "relogio_antigo", "tocha", "sino_partido", "livros", "urna",
+    "coluna_dupla", "arco_grande", "corrente_t",
+    "lanterna_eco", "candelabro", "estatua_anjo", "flamula",
+    "pedra_memoria", "gargula",
+    "relogio_antigo", "tocha", "sino_partido", "livros", "urna", "lampiao_t",
+    # pecas da prancha so' do N12 (`tools/gerar_props_n12_prancha.py`)
+    "p_parede", "p_parede_gasta", "p_parede_vitral", "p_torre_lateral",
+    "p_parede_destruida", "p_vitral_dourado", "p_rosacea", "p_vitral_pequeno",
+    "p_plat_corrente", "p_updraft", "p_estrutura_vertical", "p_passarela",
+    "p_suporte", "p_lamina_pendular", "p_lamina_rotativa", "p_particulas_luz",
+    "p_poeira_ar", "p_brilho_sino", "p_raios_luz", "p_neblina", "p_heras",
+    "p_detritos", "p_poeira_chao",
 ]
 for t in TEXTURAS:
     EXT.append(("Texture2D", None, f"res://assets/sprites/pixel/deco/torres/{t}.png", "t_" + t))
-EXT.append(("Texture2D", None, "res://assets/sprites/pixel/terreno/torres/corpo.png", "t_corpo"))
+# miolo do terreno da prancha (feito para repetir sem costura): parede da nave
+EXT.append(("Texture2D", None, "res://assets/sprites/pixel/terreno/torre_ecos/corpo.png",
+            "t_corpo_te"))
 
 ID = {}
 linhas_ext = []
@@ -153,16 +165,16 @@ def inimigo(nome: str, x: float, y: float, especie: str, comp: str, vida: int,
     no(nome, c, inst="dem")
 
 
-TAM_TEX = {
-    "vitral_alto": (46, 132), "vitral_partido": (40, 92), "sino_m": (38, 48),
-    "sino_g": (76, 96), "coluna_igreja": (136, 228), "coluna_dupla": (72, 210),
-    "arco_grande": (120, 190), "arco_pequeno": (64, 104), "corrente_t": (10, 93),
-    "corrente_sino": (24, 96), "lanterna_eco": (24, 56), "candelabro": (46, 70),
-    "velas": (38, 76), "estatua_anjo": (78, 132), "flamula": (31, 106),
-    "janela_gotica": (38, 76), "pedra_memoria": (28, 30), "memorial": (34, 40),
-    "balaustrada": (96, 57), "gargula": (46, 54), "relogio_antigo": (44, 58),
-    "tocha": (38, 62), "sino_partido": (40, 46), "livros": (30, 22), "urna": (26, 34),
-}
+# tamanho real de cada PNG (lido do disco: os props mudam quando se regeram
+# a partir da prancha -- `tools/gerar_props_prancha.py`)
+def _tam_png(caminho: str) -> tuple:
+    with open(caminho, "rb") as f:
+        cab = f.read(24)
+    return int.from_bytes(cab[16:20], "big"), int.from_bytes(cab[20:24], "big")
+
+
+TAM_TEX = {t: _tam_png(os.path.join(RAIZ, "assets/sprites/pixel/deco/torres", f"{t}.png"))
+           for t in TEXTURAS}
 
 
 def assente(nome: str, tex: str, x: float, base_y: float, esc: float = 2.0,
@@ -207,6 +219,39 @@ def luz(nome: str, x: float, y: float, energia: float, cor: str, esc: tuple,
        tipo="PointLight2D", pai=pai)
 
 
+def mosaico(nome: str, tex: str, x0: float, y0: float, x1: float, y1: float,
+            esc: float = 1.0, z: int = -9, mod: str = "", add: bool = False) -> None:
+    """Textura repetida a encher o retangulo (x0,y0)-(x1,y1) do mundo."""
+    w, h = (x1 - x0) / esc, (y1 - y0) / esc
+    c = (f"position = {v(x0, y0)}\nscale = {v(esc, esc)}\ncentered = false\n"
+         f'texture = ExtResource("{ID["t_" + tex]}")\ntexture_repeat = 2\n'
+         f"region_enabled = true\nregion_rect = Rect2(0, 0, {w:g}, {h:g})\nz_index = {z}")
+    if mod:
+        c += f"\nmodulate = {mod}"
+    if add:
+        c += '\nmaterial = SubResource("mat_add")'
+    no(nome, c, tipo="Sprite2D")
+
+
+def fx(nome: str, tex: str, x: float, y: float, esc: float = 1.0, z: int = 2,
+       mod: str = "Color(1, 1, 1, 0.8)", rot: float = 0.0) -> None:
+    """Efeito pintado da prancha (raios de luz, poeira, particulas) em ADD."""
+    c = (f"position = {v(x, y)}\nscale = {v(esc, esc)}\n"
+         f'texture = ExtResource("{ID["t_" + tex]}")\nz_index = {z}\nmodulate = {mod}\n'
+         'material = SubResource("mat_add")')
+    if rot:
+        c += f"\nrotation = {rot:g}"
+    no(nome, c, tipo="Sprite2D")
+
+
+def heras(nome: str, x: float, topo_y: float, esc: float = 0.8, flip: bool = False) -> None:
+    """Heras a pender da aresta de baixo de uma plataforma (a' frente dela)."""
+    pendurado(nome, "p_heras", x, topo_y - 6, esc=esc, z=1,
+              mod="Color(0.78, 0.84, 1, 1)")
+    if flip:
+        nos[-2] += "\nflip_h = true"
+
+
 OURO = "Color(1.0, 0.76, 0.45, 1)"
 LUA = "Color(0.55, 0.7, 1.0, 1)"
 ROXO = "Color(0.72, 0.5, 1.0, 1)"
@@ -240,47 +285,75 @@ luzes_horizonte = true""", inst="atm")
 #  NAVE DA TORRE -- a parede do fundo
 # ======================================================================
 com("""
-NAVE DA TORRE (so' visual, z muito atras). O pack de fundo `torre_ecos` so'
-cobre a banda de baixo: acima dela uma torre de 2700 px ficava preta e
-vazia. Pilares de pedra da regiao a toda a altura, frisos a marcar os
-andares e janelas altas com luz de lua entre os pilares -- os "interiores
-altos, vitrais, luz divina filtrada" da paleta LOCKED do N12.
+NAVE DA TORRE -- a parede do fundo, SO' visual, atras de tudo. O panorama
+do pack `torre_ecos` (prancha) e' o ceu e a cidade la' fora; isto e' a
+torre por dentro, como nas pranchas "Galerias com vitrais" / "Poco
+vertical": pilares de cantaria a toda a altura, arcadas de galeria a cada
+andar (o ceu ve-se pelos vaos), vitrais com raios de luz de lua a cair.
+Tudo recortado da prancha aprovada (`tools/gerar_props_n12_prancha.py`),
+escurecido para recuar e nao competir com o que se pisa.
 """)
-PILARES = [-60, 470, 1210, 1990, 2720, 3080]
-TOPO_NAVE, BASE_NAVE = -760.0, 2520.0
-NAVE = "Color(0.3, 0.31, 0.47, 1)"
+# fora dos pontos de leitura do jogo (sinos 1250/1830, elevadores 835/1030,
+# coluna de ar 710, vitral 792, sino da arena 2630)
+PILARES = [-40, 560, 1480, 2230, 3040]
+TOPO_NAVE, BASE_NAVE = -700.0, 2520.0
+ANDARES = [2400, 1740, 1060, 380, -300]      # linhas de galeria (desenho)
+PILAR = "Color(0.34, 0.37, 0.6, 1)"
+ARCADA = "Color(0.32, 0.35, 0.6, 1)"
+PAREDE = "Color(0.13, 0.14, 0.25, 1)"   # sombra: o ornamento e' que da' a leitura
 
-
-def poligono_textura(nome: str, x0: float, y0: float, x1: float, y1: float,
-                     cor: str, z: int) -> None:
-    c = (f"z_index = {z}\ncolor = {cor}\n"
-         f'texture = ExtResource("{ID["t_corpo"]}")\ntexture_repeat = 2\n'
-         f"texture_offset = Vector2({(x0 * 0.37) % 192:g}, 0)\n"
-         f"texture_scale = Vector2(0.5, 0.5)\n"
-         f"polygon = PackedVector2Array({x0:g}, {y0 + DY:g}, {x1:g}, {y0 + DY:g}, "
-         f"{x1:g}, {y1 + DY:g}, {x0:g}, {y1 + DY:g})")
-    no(nome, c, tipo="Polygon2D")
-
+# parede de cada andar ACIMA da arcada (a arcada deixa ver o ceu; por cima
+# dela e' torre fechada, com os vitrais) -- sem isto metade de cada ecra
+# era ceu liso
+for j, y in enumerate(ANDARES[1:], start=1):
+    y_topo = ANDARES[j + 1] if j + 1 < len(ANDARES) else TOPO_NAVE
+    mosaico(f"ParedeNave{j}", "corpo_te", -120, y_topo, 3140, y - 224,
+            esc=1.0, z=-11, mod=PAREDE)
 
 for i, x in enumerate(PILARES):
-    poligono_textura(f"PilarNave{i}", x - 55, TOPO_NAVE, x + 55, BASE_NAVE, NAVE, -9)
-for j, y in enumerate([-120, 560, 1240, 1920]):
-    poligono_textura(f"FrisoNave{j}", -120, y, 3140, y + 26,
-                     "Color(0.24, 0.24, 0.38, 1)", -9)
-# janelas altas entre os pilares, uma por vao e por andar (alternadas para
-# nao ler como grelha), com luz fria
-n_jan = 0
-for j, y in enumerate([380, 1060, 1740, 2380]):
+    # tochas nos pilares, uma por andar: os pontos de ouro quente da prancha.
+    # SEM PointLight2D (nem nos vitrais da nave): sao dezenas, e luzes 2D sao
+    # o que mais pesa no telemovel -- a chama e os raios pintados chegam.
+    for j, y in enumerate(ANDARES):
+        assente(f"TochaNave{i}_{j}", "tocha", x, y - 250, esc=1.0, z=-8)
+    mosaico(f"PilarNave{i}", "p_parede", x - 40, TOPO_NAVE, x + 40, BASE_NAVE,
+            esc=1.18, z=-9, mod=PILAR)
+    for j, y in enumerate(ANDARES):
+        # capitel/misula a segurar a galeria em cada andar
+        pendurado(f"MisulaNave{i}_{j}", "p_suporte", x, y - 150, esc=1.15, z=-8,
+                  mod=PILAR)
+# arcadas: uma por vao e por andar (ceu pelos vaos)
+for j, y in enumerate(ANDARES[1:], start=1):
     for i in range(len(PILARES) - 1):
-        if (i + j) % 2:
-            continue
-        x = (PILARES[i] + PILARES[i + 1]) / 2.0
-        tex = "vitral_alto" if (i + j) % 4 == 0 else "janela_gotica"
-        esc = 2.4 if tex == "vitral_alto" else 3.0
-        assente(f"JanelaNave{n_jan}", tex, x, y, esc=esc, z=-8,
-                mod="Color(0.55, 0.62, 0.95, 0.75)")
-        luz(f"LuzJanelaNave{n_jan}", x, y - TAM_TEX[tex][1] * esc * 0.5, 0.3, LUA, (1.3, 2.2))
-        n_jan += 1
+        x0, x1 = PILARES[i] + 40, PILARES[i + 1] - 40
+        mosaico(f"ArcadaNave{j}_{i}", "p_passarela", x0, y - 224, x1, y,
+                esc=1.4, z=-10, mod=ARCADA)
+# vitrais altos entre os pilares (dois modelos da prancha, alternados), com
+# os raios de lua a cair deles. Vaos largos levam dois.
+n_jan = 0
+for j, y in enumerate(ANDARES):
+    for i in range(len(PILARES) - 1):
+        a, b = PILARES[i], PILARES[i + 1]
+        n = 2 if b - a > 780 else 1
+        for k in range(n):
+            x = a + (b - a) * (k + 1) / (n + 1)
+            topo_jan = y - 600 if j == 0 else y - 520
+            tex = "p_vitral_dourado" if (i + j + k) % 2 == 0 else "p_parede_vitral"
+            esc = 1.6
+            pendurado(f"VitralNave{n_jan}", tex, x, topo_jan, esc=esc, z=-8,
+                      mod="Color(0.78, 0.84, 1, 0.95)")
+            h = TAM_TEX[tex][1] * esc
+            # arco de pedra com friso dourado a emoldurar o vitral
+            assente(f"ArcoNave{n_jan}", "arco_grande", x, topo_jan + h + 24, esc=2.15, z=-9,
+                    mod="Color(0.5, 0.52, 0.78, 1)")
+            fx(f"RaiosNave{n_jan}", "p_raios_luz", x + 46, topo_jan + h + 56, esc=1.5, z=-7,
+               mod="Color(0.7, 0.8, 1, 0.4)")
+            n_jan += 1
+# rosaceas sobre cada pilar, a meio da parede de cada andar
+for j, y in enumerate(ANDARES[1:], start=1):
+    for i, x in enumerate(PILARES[1:-1], start=1):
+        assente(f"RosaceaNave{j}_{i}", "p_rosacea", x, y - 330, esc=1.2, z=-8,
+                mod="Color(0.72, 0.78, 1, 0.9)")
 
 com("""Cair ao fundo do poco = morte. Tudo o resto tem rede por baixo.""")
 no("Vazio", "position = Vector2(1450, 2780)\nlargura = 3600.0\naltura = 340.0\n"
@@ -296,15 +369,15 @@ em cima antes de subir. O bloco A2 fecha o poco pela direita -- o unico
 caminho e' subir na plataforma (440 px, fora do alcance do salto duplo).
 """)
 plat("ChaoBase", 0, 2140, 2400, h=60, av=130)
-assente("ColunaBase1", "coluna_igreja", 90, 2400, esc=2.2, z=-3,
+assente("ColunaBase1", "coluna_igreja", 90, 2400, esc=1.6, z=-3,
         mod="Color(0.72, 0.74, 0.92, 1)")
 assente("VitralBase", "vitral_alto", 330, 2250, esc=2.6, z=-4,
         mod="Color(0.85, 0.9, 1, 0.95)")
 luz("LuzVitralBase", 330, 2080, 0.55, LUA, (1.6, 2.4))
-assente("ColunaBase2", "coluna_igreja", 560, 2400, esc=2.2, z=-3,
+assente("ColunaBase2", "coluna_igreja", 560, 2400, esc=1.6, z=-3,
         mod="Color(0.72, 0.74, 0.92, 1)")
 assente("SinoPartidoBase", "sino_partido", 230, 2400, esc=2.0, z=-1)
-assente("VelasBase", "velas", 470, 2400, esc=1.4, z=-1)
+assente("VelasBase", "candelabro", 470, 2400, esc=1.1, z=-1)
 luz("LuzVelasBase", 470, 2360, 0.5, OURO, (1.4, 1.0))
 
 # Elevador 1 -- peso (sobe com a Koliani em cima, desce quando ela sai).
@@ -387,7 +460,7 @@ inimigo("GargulaPoco", 2560, 1600, "gargula_vitral", "voador", 50, 14, 90,
         "Color(0.6, 0.7, 1.0, 1)")
 corrente("CorrentePoco1", 2280, 1190, 1760, z=-4)
 corrente("CorrentePoco2", 2470, 1190, 1760, z=-4)
-assente("ColunaPoco", "coluna_dupla", 2700, 1770, esc=2.4, z=-4,
+assente("ColunaPoco", "coluna_dupla", 2700, 1770, esc=1.6, z=-4,
         mod="Color(0.7, 0.72, 0.9, 1)")
 luz("LuzPoco", 2400, 1720, 0.5, OURO, (2.2, 1.2))
 
@@ -397,7 +470,8 @@ SEGREDO 2 que la' esta'. Quem so' quer subir usa a ponta esquerda do
 patamar, fora do arco.
 """)
 no("LaminaPatamar", f"position = {v(2530, 1280)}\ncomprimento = 90.0\n"
-                    "amplitude_graus = 58.0\nperiodo = 1.5\ndano = 18", inst="pend")
+                    "amplitude_graus = 58.0\nperiodo = 1.5\ndano = 18\n"
+                    f'textura = ExtResource("{ID["t_p_lamina_pendular"]}")', inst="pend")
 no("VitralSegredo", f"position = {v(2600, 1344)}\n"
                     'grupo_luz = "vitral_segredo"\ncor_luz = Color(0.55, 0.7, 1.0, 1)\n'
                     f'textura_inteiro = ExtResource("{ID["t_vitral_alto"]}")\n'
@@ -423,7 +497,6 @@ for i, (e, t, f) in enumerate([(1780, 1170, 0.0), (1600, 1160, 0.8), (1420, 1150
     plat(f"Ritmo{i}", e, e + 100, t, h=22, inst="ritmo",
          extra=f"periodo = 2.4\nfantasma_seg = 1.0\nfase = {f:g}\naviso = 0.5")
 plat("Balcao", 1640, 1900, 1280, h=26)
-assente("BalaustradaBalcao", "balaustrada", 1770, 1280, esc=1.6, z=1)
 
 plat("R3", 1100, 1340, 1130, h=30)
 assente("GargulaR3", "gargula", 1320, 1130, esc=1.5, z=-1)
@@ -452,7 +525,7 @@ for i, (e, t) in enumerate([(630, 660), (490, 590), (350, 520)], start=1):
     plat(f"PonteLuz{i}", e, e + 100, t, h=20, av=16, inst="eco",
          extra='grupo_alternar = "vitral_n12"\nalpha_fantasma = 0.1')
 plat("VarandaOeste", 300, 760, 830, h=30)
-assente("JanelaVaranda", "janela_gotica", 520, 810, esc=2.2, z=-4,
+assente("JanelaVaranda", "p_vitral_pequeno", 520, 810, esc=1.6, z=-4,
         mod="Color(0.8, 0.86, 1, 0.9)")
 luz("LuzVaranda", 520, 700, 0.4, LUA, (1.3, 1.5))
 
@@ -473,24 +546,34 @@ plat("PonteAlta", 340, 640, 380, h=26)
 inimigo("MongePonte", 520, 330, "monge_das_correntes", "carga", 70, 16, 70,
         "Color(0.85, 0.7, 0.45, 1)")
 no("ColunaDeAr", f"position = {v(710, 95)}\ntamanho = {v(100, 710)}\n"
-                 "forca = 3000.0\nvel_alvo = 460.0", inst="ar")
+                 "forca = 3000.0\nvel_alvo = 460.0\n"
+                 f'pele = ExtResource("{ID["t_p_updraft"]}")', inst="ar")
 plat("C1", 780, 980, -140, h=30)
 assente("SinoGrandeC1", "sino_g", 880, -140, esc=1.4, z=-2)
 com("""SEGREDO 3 -- no cimo da coluna, do lado de la'. Sobe-se ate' ao fim do
 ar e salta-se para a esquerda.""")
 plat("Segredo3", 560, 650, -300)
 ess("EssenciaSegredo3", 605, -300, 30)
-assente("MemorialSegredo3", "memorial", 620, -300, esc=1.5, z=-1)
+assente("MemorialSegredo3", "pedra_memoria", 620, -300, esc=1.3, z=-1)
 luz("LuzSegredo3", 605, -330, 0.35, ROXO, (0.9, 0.8))
 
 no("VentoContra", f"position = {v(1270, -60)}\ndirecao = Vector2(-1, 0)\n"
                   "intensidade = 1300.0\nvelocidade_max = 140.0\n"
-                  f"tamanho = {v(520, 360)}", inst="vento")
+                  f"tamanho = {v(520, 360)}\nmostrar_guia = false", inst="vento")
+com("""O vento contra le-se por rajadas de poeira de luz a varrer para a
+esquerda (em vez das setas-guia genericas da WindZone).""")
+no("RajadasVento", f"position = {v(1270, -60)}\nz_index = 3\namount = 70\nlifetime = 1.4\n"
+   "preprocess = 2.0\nemission_shape = 3\nemission_rect_extents = Vector2(260, 170)\n"
+   "direction = Vector2(-1, 0)\nspread = 4.0\ngravity = Vector2(0, 0)\n"
+   "initial_velocity_min = 300.0\ninitial_velocity_max = 460.0\n"
+   "scale_amount_min = 2.0\nscale_amount_max = 4.0\n"
+   "color = Color(0.72, 0.84, 1, 0.35)", tipo="CPUParticles2D")
+fx("NeblinaVento1", "p_neblina", 1120, -120, esc=2.2, z=2, mod="Color(0.7, 0.8, 1, 0.45)")
+fx("NeblinaVento2", "p_neblina", 1400, 10, esc=2.0, z=2, mod="Color(0.7, 0.8, 1, 0.4)")
 quebra("Queda1", 1040, 1130, -60)
 quebra("Queda2", 1190, 1280, 20)
 quebra("Queda3", 1340, 1430, 100)
 plat("Rede", 810, 1470, 560, h=26)
-assente("BalaustradaRede", "balaustrada", 1300, 560, esc=1.6, z=1)
 
 # ======================================================================
 #  D) CHEGADA AS GALERIAS SUPERIORES -- TESTE + GUARDIAO
@@ -515,7 +598,8 @@ luz("LuzSinoB", 1830, 110, 0.6, OURO, (1.3, 1.2))
 for i, (e, t) in enumerate([(1900, 130), (2040, 80), (2180, 40)], start=1):
     plat(f"PonteB{i}", e, e + 90, t, h=20, av=16, inst="eco",
          extra='grupo_alternar = "sino_sync_b"')
-no("LaminaVertical", f"position = {v(2155, 140)}\npercurso = {v(0, -170)}\ntempo = 0.8",
+no("LaminaVertical", f"position = {v(2155, 140)}\npercurso = {v(0, -170)}\ntempo = 0.8\n"
+                     f'textura = ExtResource("{ID["t_p_lamina_rotativa"]}")\nescala_textura = 0.42',
    inst="serra")
 plat("VarandaD", 1880, 2280, 400, h=26)
 
@@ -534,6 +618,42 @@ luz("LuzVitralArena2", 2780, -220, 0.5, LUA, (1.4, 2.4))
 luz("LuzArena", 2630, -30, 0.7, OURO, (3.2, 1.7))
 inimigo("Guardiao", 2660, -70, "automato_do_sino", "escudeiro", 260, 24, 150,
         "Color(1.0, 0.72, 0.4, 1)", elite=True, escala=1.6)
+
+# ======================================================================
+#  VIDA DA TORRE -- heras, detritos, poeira e brilhos (so' visual)
+# ======================================================================
+com("""
+Detalhe da prancha ("Vegetacao e detritos", "FX e particulas"): heras a
+pender das galerias, entulho nos cantos, poeira de luz junto aos vitrais e
+brilho dourado nos sinos. Nada em cima de onde se aterra.
+""")
+# heras: aresta de baixo das lajes (topo + altura da plataforma)
+for nome, x, y, e, f in [
+        ("HerasA2a", 960, 2040 + 30, 0.9, False), ("HerasA2b", 1990, 2040 + 30, 0.75, True),
+        ("HerasA3", 2090, 1660 + 24, 0.8, False), ("HerasPatamar", 2560, 1410 + 30, 0.7, True),
+        ("HerasR3", 1130, 1130 + 30, 0.8, False), ("HerasBalcao", 1870, 1280 + 26, 0.7, True),
+        ("HerasVaranda", 330, 830 + 30, 0.9, False), ("HerasVaranda2", 700, 830 + 30, 0.7, True),
+        ("HerasPonteAlta", 380, 380 + 26, 0.75, True), ("HerasRede", 1440, 560 + 26, 0.8, False),
+        ("HerasD1", 1500, 180 + 40, 0.9, False), ("HerasVarandaD", 2250, 400 + 26, 0.7, True),
+        ("HerasArena", 2330, 0 + 60, 1.0, False), ("HerasR5", 60, 440 + 30, 0.8, True)]:
+    heras(nome, x, y, esc=e, flip=f)
+# entulho e poeira no chao, junto a' parede/cantos
+for nome, tex, x, y, e in [
+        ("DetritosBase", "p_detritos", 40, 2400, 0.55), ("PoeiraBase", "p_poeira_chao", 2060, 2400, 0.6),
+        ("DetritosPoco", "p_detritos", 2730, 1770, 0.5), ("PoeiraPoco", "p_poeira_chao", 2200, 1770, 0.55),
+        ("DetritosR5", "p_detritos", 270, 440, 0.45), ("PoeiraArena", "p_poeira_chao", 2340, 0, 0.55),
+        ("DetritosC1", "p_detritos", 960, -140, 0.45)]:
+    assente(nome, tex, x, y, esc=e, z=0, mod="Color(0.8, 0.82, 1, 1)")
+# poeira de luz a flutuar nos raios dos vitrais de jogo e brilho nos sinos
+fx("LuzVitralGalerias", "p_particulas_luz", 800, 560, esc=1.3, z=3, mod="Color(0.8, 0.7, 1, 0.7)")
+fx("LuzVitralSegredo", "p_particulas_luz", 2600, 1280, esc=1.0, z=3, mod="Color(0.7, 0.8, 1, 0.6)")
+fx("BrilhoSinoA", "p_brilho_sino", 1250, 1970, esc=1.0, z=-1, mod="Color(1, 0.85, 0.6, 0.55)")
+fx("BrilhoSinoB", "p_brilho_sino", 1830, 112, esc=1.0, z=-1, mod="Color(1, 0.85, 0.6, 0.55)")
+fx("BrilhoSinoArena", "p_brilho_sino", 2630, -250, esc=1.6, z=-2, mod="Color(1, 0.85, 0.6, 0.5)")
+fx("PoeiraArCol", "p_poeira_ar", 700, -250, esc=1.8, z=-1, mod="Color(0.75, 0.8, 1, 0.35)")
+fx("NeblinaPoco", "p_neblina", 2450, 1740, esc=3.0, z=1, mod="Color(0.6, 0.7, 1, 0.35)")
+fx("NeblinaBase1", "p_neblina", 700, 2380, esc=3.2, z=1, mod="Color(0.6, 0.7, 1, 0.3)")
+fx("NeblinaBase2", "p_neblina", 1650, 2385, esc=3.0, z=1, mod="Color(0.6, 0.7, 1, 0.3)")
 
 # ======================================================================
 #  Koliani, checkpoints, porta
@@ -564,7 +684,7 @@ nos = [_deslocar(l) if "\n" not in l else "\n".join(_deslocar(x) for x in l.spli
 corpo_nos = "\n".join(nos)
 usados = [l for l in linhas_ext if 'ExtResource("%s")' % l.split(' id="')[1][:-2] in corpo_nos]
 linhas_ext = usados
-cab = f'[gd_scene load_steps={len(linhas_ext) + 4} format=3 uid="uid://bkolianitorreventos12"]'
+cab = f'[gd_scene load_steps={len(linhas_ext) + 5} format=3 uid="uid://bkolianitorreventos12"]'
 topo = """
 ; REGIAO III / nivel 12 -- GALERIAS VERTICAIS (`level.n11`), "A Ascensao".
 ; O nome do ficheiro fica: muda-lo partia saves e checkpoints.
@@ -591,6 +711,9 @@ topo = """
 subs = """
 [sub_resource type="RectangleShape2D" id="rs_chk"]
 size = Vector2(44, 96)
+
+[sub_resource type="CanvasItemMaterial" id="mat_add"]
+blend_mode = 1
 
 [sub_resource type="Gradient" id="grad_luz"]
 offsets = PackedFloat32Array(0, 1)
