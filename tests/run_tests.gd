@@ -27,6 +27,7 @@ const TestesGlideRegiao02 := preload("res://tests/test_glide_region02.gd")
 const TestesRegion02N10 := preload("res://tests/test_region02_n10_level.gd")
 const TestesRegion03N11 := preload("res://tests/test_region03_n11_level.gd")
 const TestesRegion03N12 := preload("res://tests/test_region03_n12_level.gd")
+const TestesRegion03N13 := preload("res://tests/test_region03_n13_level.gd")
 const TestesKolianiCanonicaNiveis := preload("res://tests/test_koliani_canonica_niveis.gd")
 const DT := 1.0 / 60.0
 
@@ -63,6 +64,8 @@ func _correr_tudo() -> void:
 	for falha in TestesRegion03N11.executar():
 		_falhas.append(falha)
 	for falha in TestesRegion03N12.executar():
+		_falhas.append(falha)
+	for falha in TestesRegion03N13.executar():
 		_falhas.append(falha)
 	for falha in TestesKolianiCanonicaNiveis.executar():
 		_falhas.append(falha)
@@ -225,6 +228,8 @@ func _correr_tudo() -> void:
 	await teste_r3_niveis_carregam()
 	await teste_r3_n12_contrato()
 	await teste_r3_n12_portoes_no_crivo()
+	await teste_r3_n13_mecanismos()
+	await teste_r3_n13_elevadores_no_crivo()
 	await teste_r3_vyrak_identidade()
 	await teste_r3_vyrak_leva_dano_muda_de_fase_e_morre()
 
@@ -4296,6 +4301,112 @@ func teste_r3_n12_portoes_no_crivo() -> void:
 		else:
 			_ok(not bool(r.get("ok_porta", true)),
 				"R3/N12: o portao '%s' contorna-se -- a porta alcanca-se sem ele" % portao)
+		raiz.queue_free()
+		await get_tree().process_frame
+
+
+## N13 (Mecanismos Antigos) em FISICA: a cena inteira na arvore, as
+## alavancas puxadas como a Koliani as puxa (tocar), o padrao dos 3 sinos
+## tocado como ela o toca (badalada). Prova que a logica liga mesmo:
+## alavanca -> porta, duas alavancas -> porta que exige as duas, alavanca
+## das pontes -> uma some e a outra aparece, padrao certo -> nucleo liga ->
+## porta do guardiao abre; padrao errado -> recomeca.
+func teste_r3_n13_mecanismos() -> void:
+	EstadoJogo.indice_nivel = R3_BASE + 2
+	EstadoJogo.checkpoint = Vector2.ZERO
+	var raiz: Node = (load(EstadoJogo.NIVEIS[R3_BASE + 2]) as PackedScene).instantiate()
+	var kol := raiz.get_node_or_null("Koliani")
+	if kol:
+		kol.set("_a_morrer", true)
+	get_tree().root.add_child(raiz)
+	for i in 6:
+		await get_tree().physics_frame
+	var k: Node = raiz.get_node("Koliani")
+	var fechada := func(nome: String) -> bool:
+		return not (raiz.get_node(nome).get_node("Col") as CollisionShape2D).disabled
+
+	# A) uma alavanca, uma porta
+	_ok(fechada.call("PortaA"), "R3/N13: a porta A devia arrancar fechada")
+	raiz.get_node("AlavancaA")._ao_tocar(k)
+	await get_tree().physics_frame
+	await get_tree().physics_frame
+	_ok(not fechada.call("PortaA"), "R3/N13: a alavanca A devia abrir a porta A")
+
+	# B) alavancas multiplas: so' com as duas
+	raiz.get_node("AlavancaB1")._ao_tocar(k)
+	await get_tree().physics_frame
+	await get_tree().physics_frame
+	_ok(fechada.call("PortaB"), "R3/N13: a porta B abriu so' com uma das duas alavancas")
+	raiz.get_node("AlavancaB2")._ao_tocar(k)
+	await get_tree().physics_frame
+	await get_tree().physics_frame
+	_ok(not fechada.call("PortaB"), "R3/N13: as duas alavancas deviam abrir a porta B")
+
+	# C1) pontes reconfiguraveis: a direita arranca solida, a esquerda fantasma
+	var solida := func(nome: String) -> bool:
+		return not (raiz.get_node(nome).get_node("Col") as CollisionShape2D).disabled
+	_ok(solida.call("PonteDireita") and not solida.call("PonteEsquerda"),
+		"R3/N13: as pontes deviam arrancar direita solida / esquerda fantasma")
+	raiz.get_node("AlavancaPontes")._ao_tocar(k)
+	await get_tree().physics_frame
+	await get_tree().physics_frame
+	_ok(not solida.call("PonteDireita") and solida.call("PonteEsquerda"),
+		"R3/N13: a alavanca das pontes devia trocar qual das duas esta' solida")
+	_ok(not fechada.call("PortaA"), "R3/N13: a alavanca das pontes nao mexe em portas")
+
+	# D) o padrao dos 3 sinos
+	var nucleo: Node = raiz.get_node("Nucleo")
+	var ordem: PackedInt32Array = nucleo.get("ordem")
+	var nomes := ["SinoP", "SinoG", "SinoM"]
+	_ok(fechada.call("PortaNucleo"), "R3/N13: a porta do nucleo devia arrancar fechada")
+	# errado: comeca pelo sino que NAO e' o primeiro
+	var errado: int = ordem[1]
+	raiz.get_node(nomes[errado]).tocar()
+	await get_tree().physics_frame
+	_ok(int(nucleo.get("_certos")) == 0, "R3/N13: um sino fora de ordem devia apagar o padrao")
+	for i in ordem.size():
+		var s: Node = raiz.get_node(nomes[ordem[i]])
+		s.set("_cd", 0.0)
+		s.tocar()
+		await get_tree().physics_frame
+	await get_tree().physics_frame
+	await get_tree().physics_frame
+	_ok(bool(nucleo.get("ligada")), "R3/N13: o padrao certo devia ligar o nucleo")
+	_ok(not fechada.call("PortaNucleo"), "R3/N13: o nucleo ligado devia abrir a porta do guardiao")
+	raiz.queue_free()
+	await get_tree().process_frame
+
+
+## Os dois elevadores de contrapeso sao os UNICOS caminhos entre andares:
+## sem eles o crivo de alcance nao chega a' porta. (As portas de alavanca, o
+## crivo nao as ve -- essas prova-as o teste de fisica acima.)
+func teste_r3_n13_elevadores_no_crivo() -> void:
+	const CRIVO := preload("res://tools/verifica_alcance.gd")
+	var casos := {"": [], "elevador 1": ["Elevador1"], "elevador 2": ["Elevador2"]}
+	EstadoJogo.indice_nivel = R3_BASE + 2
+	EstadoJogo.checkpoint = Vector2.ZERO
+	for portao: String in casos:
+		var raiz: Node = (load(EstadoJogo.NIVEIS[R3_BASE + 2]) as PackedScene).instantiate()
+		for n: String in casos[portao]:
+			var x := raiz.get_node_or_null(n)
+			_ok(x != null, "R3/N13: falta o no' %s" % n)
+			if x:
+				raiz.remove_child(x)
+				x.free()
+		var kol := raiz.get_node_or_null("Koliani")
+		if kol:
+			kol.set("_a_morrer", true)
+		get_tree().root.add_child(raiz)
+		for i in 4:
+			await get_tree().physics_frame
+		var r: Dictionary = CRIVO._medir_arvore(get_tree(), raiz)
+		if portao == "":
+			_ok(bool(r.get("ok_porta", false)) and (r.get("orfas", []) as Array).is_empty(),
+				"R3/N13: o nivel inteiro devia chegar a' porta sem ilhas (%s %s)" % [
+					r.get("porque", ""), r.get("orfas", [])])
+		else:
+			_ok(not bool(r.get("ok_porta", true)),
+				"R3/N13: o '%s' contorna-se -- a porta alcanca-se sem ele" % portao)
 		raiz.queue_free()
 		await get_tree().process_frame
 

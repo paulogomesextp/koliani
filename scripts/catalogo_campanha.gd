@@ -53,7 +53,10 @@ const CHEFE_KEY: Array[String] = [
 	# contrato da Torre dos Ecos) saiu; fecha com o Autómato do Sino elite,
 	# um dos três inimigos principais do N12 na prancha aprovada.
 	"guard.automato_do_sino",    # 11 N12 -- Galerias Verticais
-	"guard.voltaris",            # 12 N13 -- Mecanismos Antigos
+	# N13 autoral: o Voltaris (chefe de tempestade, fora do contrato) saiu;
+	# fecha com o Construto Vitral elite a guardar o nucleo, inimigo
+	# principal do N13 na prancha aprovada.
+	"guard.construto_vitral",    # 12 N13 -- Mecanismos Antigos
 	"guard.sacerdotisa_lunar",   # 13 N14 -- Campanário
 	"boss.vyrak",                # 14 N15 -- O Topo dos Ecos (o chefe da Região III)
 	"boss.rei_ossario",          # 15 Cemitério dos Reis

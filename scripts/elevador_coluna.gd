@@ -28,6 +28,15 @@ const PLATAFORMA := preload("res://scripts/plataforma.gd")
 ## envelhecido).
 @export var cor_pedra := Color(0.27, 0.26, 0.36)
 @export var cor_friso := Color(0.86, 0.66, 0.3)
+## Opt-in (N13, "contrapesos"): peso pendurado do outro lado da roldana, a
+## descer quando a plataforma sobe -- le-se de longe que e' uma balanca.
+@export var textura_contrapeso: Texture2D
+@export var escala_contrapeso := 0.6
+## Lado da roldana onde fica o contrapeso (-1 esquerda, 1 direita).
+@export var lado_contrapeso := 1.0
+
+var _contrapeso: Sprite2D
+var _corda_peso: Sprite2D
 
 var _correntes: Array[Sprite2D] = []
 var _roldana: Sprite2D
@@ -74,6 +83,22 @@ func _ready() -> void:
 	trave.z_index = -2
 	add_child(trave)
 	_y_antes = global_position.y
+	if textura_contrapeso:
+		_corda_peso = Sprite2D.new()
+		_corda_peso.texture = TEX_CORRENTE
+		_corda_peso.top_level = true
+		_corda_peso.centered = false
+		_corda_peso.texture_repeat = CanvasItem.TEXTURE_REPEAT_ENABLED
+		_corda_peso.region_enabled = true
+		_corda_peso.modulate = Color(1.0, 0.84, 0.52)
+		_corda_peso.z_index = -1
+		add_child(_corda_peso)
+		_contrapeso = Sprite2D.new()
+		_contrapeso.texture = textura_contrapeso
+		_contrapeso.top_level = true
+		_contrapeso.scale = Vector2(escala_contrapeso, escala_contrapeso)
+		_contrapeso.z_index = -1
+		add_child(_contrapeso)
 	_esticar()
 
 
@@ -92,6 +117,14 @@ func _esticar() -> void:
 	for c in _correntes:
 		c.position.y = -12.0 - comp
 		c.region_rect = Rect2(0.0, 0.0, float(TEX_CORRENTE.get_width()), comp)
+	if _contrapeso:
+		# o peso desce o que a plataforma sobe (mesma corda pela roldana)
+		var subido := _base.y - global_position.y
+		var x := _base.x + lado_contrapeso * (largura * 0.5 + 34.0)
+		var y_peso := _ancora_y + 60.0 + subido
+		_contrapeso.global_position = Vector2(x, y_peso + textura_contrapeso.get_height() * escala_contrapeso * 0.5)
+		_corda_peso.global_position = Vector2(x - TEX_CORRENTE.get_width() * 0.5, _ancora_y)
+		_corda_peso.region_rect = Rect2(0.0, 0.0, float(TEX_CORRENTE.get_width()), maxf(1.0, y_peso - _ancora_y))
 
 
 func _vestir() -> void:
