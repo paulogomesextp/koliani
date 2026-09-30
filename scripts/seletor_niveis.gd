@@ -87,6 +87,8 @@ var _regiao_progresso: ProgressBar
 var _regiao_entrar: Button
 var _regiao_esquerda: Button
 var _regiao_direita: Button
+var _niveis_esquerda: Button
+var _niveis_direita: Button
 var _boss_painel: Panel
 var _boss_arte: TextureRect
 var _boss_nome: Label
@@ -208,9 +210,11 @@ func _montar_regioes() -> void:
         var b := _botao("", 16)
         b.alignment = HORIZONTAL_ALIGNMENT_CENTER
         b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-        b.pressed.connect(_abrir_regiao.bind(r))
-        b.focus_entered.connect(_selecionar_regiao.bind(r))
-        b.mouse_entered.connect(_selecionar_regiao.bind(r))
+        b.pressed.connect(_clicar_regiao.bind(r))
+        # Passar o rato (ou o foco) por um cartão lateral NÃO troca de região:
+        # o carrossel deslizava o cartão seguinte para baixo do rato parado e
+        # avançava várias regiões de seguida. Troca-se pelos botões ‹ › ou por
+        # um CLIQUE num cartão lateral (só ao largar o botão, uma região).
         Frontend9H.por(b, Rect2(0, 0, CARTAO_REGIAO.x, CARTAO_REGIAO.y))
         _regioes_painel.add_child(b)
         _region_cards.append(b)
@@ -275,6 +279,15 @@ func _montar_niveis() -> void:
         _level_cards.append(b)
         _nos.append({"botao": b, "indice": -1})
         _ligar_microinteracoes(b)
+    # Trocar de região também dentro da vista de níveis, só por botão.
+    _niveis_esquerda = _botao("‹", 34)
+    _niveis_esquerda.pressed.connect(func() -> void: _mudar_regiao(-1))
+    Frontend9H.por(_niveis_esquerda, Rect2(14, 194, 52, 64))
+    _niveis_painel.add_child(_niveis_esquerda)
+    _niveis_direita = _botao("›", 34)
+    _niveis_direita.pressed.connect(func() -> void: _mudar_regiao(1))
+    Frontend9H.por(_niveis_direita, Rect2(1214, 194, 52, 64))
+    _niveis_painel.add_child(_niveis_direita)
     _detalhe = Label.new()
     Frontend9H.corpo(_detalhe, 16, Frontend9H.TEXTO)
     _detalhe.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -324,6 +337,14 @@ func _selecionar_regiao(r: int) -> void:
     if not ns.is_empty() and not (_sel in ns):
         _sel = int(ns[0])
     _actualizar()
+
+## Clique num cartão de região: o central abre-a, um lateral só a traz ao
+## centro (um passo, como as setas).
+func _clicar_regiao(r: int) -> void:
+    if r == _regiao:
+        _abrir_regiao(r)
+    else:
+        _mudar_regiao(signi(r - _regiao))
 
 func _abrir_regiao(r: int) -> void:
     _selecionar_regiao(r)
@@ -478,6 +499,9 @@ func _actualizar_carousel() -> void:
         var alvo: Rect2 = posicoes[delta]
         Frontend9H.por(b, alvo)
         b.z_index = 3 if delta == 0 else 1
+        # Todos se clicam (central abre, lateral vem para o centro), mas só o
+        # central recebe foco: o foco num lateral não pode mover o carrossel.
+        b.focus_mode = Control.FOCUS_ALL if delta == 0 else Control.FOCUS_NONE
         b.modulate.a = 1.0 if delta == 0 else 0.62
         b.add_theme_font_size_override("font_size", 21 if delta == 0 else 15)
     var reg: Dictionary = EstadoJogo.REGIOES[_regiao]
@@ -499,6 +523,8 @@ func _actualizar_carousel() -> void:
     _regiao_entrar.modulate = Color(0.55, 0.55, 0.60) if _regiao_entrar.disabled else Color.WHITE
     _regiao_esquerda.disabled = _regiao == 0
     _regiao_direita.disabled = _regiao == EstadoJogo.REGIOES.size() - 1
+    _niveis_esquerda.disabled = _regiao_esquerda.disabled
+    _niveis_direita.disabled = _regiao_direita.disabled
 
 func _mudar_regiao(dir: int) -> void:
     _regiao = clampi(_regiao + dir, 0, EstadoJogo.REGIOES.size() - 1)

@@ -28,6 +28,28 @@ do Guardiao). A seguir: N15 (Vyrak).
 
 # >>> N13 -- "Mecanismos Antigos", autoral (29 set 2026, branch `claude/project-thread-6jbrqw`, junto no master pelo PR #5) <<<
 
+# >>> Shop — modernização UI (30 set 2026, commit local, SEM push) <<<
+
+Relatório: `docs/execution_shop_modernizacao.md`. `Loja` continua montada por
+`scripts/loja.gd` sobre MenuInicial; agora usa containers, tabs horizontais,
+Hero grande, grid de cinco colunas, detalhe fixo e scroll só do catálogo.
+Novos `ShopTheme` e `ShopItemCard`. Catálogo, economia, saves e sprites não
+foram alterados. Fundo e previews são assets existentes.
+
+QA dirigido: quatro resoluções (1920×1080, 1600×900, 1366×768, 1280×720),
+compra grátis, ownership, equip/troca, round-trip/reabertura, Galeria e tabs
+PASS; 10 testes de Loja PASS; persistência em cinco processos PASS; save real
+intacto (três ficheiros). Suite geral ficou sem progresso antes dos testes
+de Loja e foi interrompida: não há PASS global. Capturas/fluxos produziram
+avisos de ObjectDB no encerramento e, em algumas execuções, um recurso ainda
+em uso. Estes avisos não estão resolvidos nem classificados como regressão.
+
+Próximo passo: revisão visual humana e teste físico de comando/toque. A
+ornamentação/fonte/cenário diferem da referência; os placeholders do catálogo
+continuam sem arte nova. Publicação Windows/PWA não foi realizada.
+
+# >>> N13 -- "Mecanismos Antigos", autoral (29 set 2026, branch `claude/project-thread-6jbrqw`, SEM push) <<<
+
 Mesmo criterio do N12 ("arte detalhada primeiro"). `Torre_da_Tempestade.tscn`
 deixou de ser jornada procedural + sala do Voltaris e passou a 3 andares de
 maquinaria feitos a mao (3600 x 2250), gerados por
@@ -903,6 +925,26 @@ idêntico (opcoes/progresso/progresso.json.bak), sandbox recebeu o `progresso.js
 script que arranque o Godot tem de passar por esta ferramenta.
 
 ---
+
+## SFX de combate aprovados ligados (30 set 2026)
+
+Os 27 SFX Pixabay aprovados que nunca tinham chegado ao repo (403 na cloud)
+foram descarregados no PC do Paulo (`assets/audio/acquisition/sfx/combate/`,
+originais intactos + README com hashes) e ligados no `som.gd`. Como varios
+sao longos demais (porta de forno 52 s, fogo 8 s), `tools/preparar_sfx_combate.py`
+CORTA, faz fade-out e iguala o pico a -3 dBFS -> `approved/sfx/combate/*.ogg`
+(24 cortes). Passos 1-3, golpes 1-3 e `acerto` v1-3 sao o MESMO som aprovado
+com tom 0,94 / 1,0 / 1,06 (para nao repetir identico). Eventos: passos,
+ataque x3, acerto x3, critico, pisao, dano, morte, bloqueio, parede,
+investida, golpe pesado, esmagar, garra, chama, magia de chefe, raio, impacto
+de energia, olho a carregar, pedra, praga, mecanismo, sino, lamina e
+`chefe_entrada` (novo, toca 1x em `ChefeBase.provocar()`). O evento de cada um
+foi deduzido do nome -- HUMAN LISTEN REQUIRED; trocar = mudar a linha em
+`CORTES` e o mapeamento em `som.gd`. Mantidos do kit sintetico: salto,
+aterragem, escudo, dano pesado, finisher, lancar, rolamento, agarrar.
+`verificar_sfx_*.gd` actualizados para os nomes novos; `verificar_sfx_mundo`
+continua com 10 falhas que ja' existiam no master (portao/bau/selo/etc.).
+Teste: `teste_sfx_combate_aprovados`. Suite completa: OK.
 
 ## Musica "igual em todos os niveis" -- era a ambiencia antiga (29 set 2026)
 
