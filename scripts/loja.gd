@@ -43,6 +43,13 @@ var _hero_botao: Button
 var _hero_tag: Label
 var _area_esquerda: VBoxContainer
 var _painel_detalhe: PanelContainer
+const CARROSSEL_INTERVALO := 5.0
+const CARROSSEL_FADE := 0.3
+var _hero_id := ""
+var _hero_linha: HBoxContainer
+var _carrossel_ids: Array[String] = []
+var _carrossel_timer: Timer
+var _carrossel_tween: Tween
 
 
 func _ready() -> void:
@@ -50,6 +57,7 @@ func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	Frontend9H.vestir(self)
 	_montar()
+	_montar_carrossel()
 	EstadoJogo.moedas_loja_mudaram.connect(_refrescar)
 	EstadoJogo.item_loja_equipado.connect(func(_c: String, _i: String) -> void: _refrescar())
 	Textos.idioma_mudou.connect(func(_l: String) -> void: _traduzir())
@@ -57,6 +65,8 @@ func _ready() -> void:
 	get_viewport().size_changed.connect(_ajustar_responsivo)
 	_traduzir()
 	_escolher_categoria("destaques")
+	if _cartoes.has("skin_shadowblade"):
+		_selecionar("skin_shadowblade")
 	_botoes_cat["destaques"].grab_focus()
 	call_deferred("_ajustar_responsivo")
 
@@ -243,6 +253,7 @@ func _montar_hero(pai: VBoxContainer) -> void:
 	margem.add_theme_constant_override("margin_bottom", 13)
 	painel.add_child(margem)
 	var linha := HBoxContainer.new()
+	_hero_linha = linha
 	linha.add_theme_constant_override("separation", 12)
 	margem.add_child(linha)
 	var copy := VBoxContainer.new()
@@ -411,6 +422,7 @@ func _traduzir() -> void:
 
 
 func _escolher_categoria(c: String) -> void:
+	_cancelar_transicao_carrossel()
 	_cat = c
 	for k: String in _botoes_cat:
 		var tab := _botoes_cat[k] as Button
@@ -440,9 +452,11 @@ func _escolher_categoria(c: String) -> void:
 			Textos.t("shop.state." + est))
 		_cartoes[id] = cartao
 	_sel = str(itens[0]["id"]) if not itens.is_empty() else ""
+	_hero_id = _sel
 	_ligar_foco()
 	_refrescar()
 	_rolo.scroll_vertical = 0
+	_reiniciar_carrossel()
 
 
 func _ligar_foco() -> void:
@@ -479,7 +493,10 @@ func _selecionar(id: String) -> void:
 	if id == "" or not _cartoes.has(id):
 		return
 	_sel = id
+	_cancelar_transicao_carrossel()
+	_hero_id = id
 	_refrescar()
+	_reiniciar_carrossel()
 
 
 func _texto_precos(it: Dictionary) -> String:
@@ -513,7 +530,8 @@ func _refrescar() -> void:
 
 
 func _hero() -> void:
-	if _sel == "":
+	var id := _hero_id if _cat == "destaques" else _sel
+	if id == "":
 		_hero_nome.text = ""
 		_hero_raridade.text = ""
 		_hero_estado.text = ""
@@ -521,15 +539,15 @@ func _hero() -> void:
 		_hero_img.visible = false
 		_hero_ph.text = Textos.t("shop.pick")
 		return
-	var it := LojaCatalogo.item(_sel)
-	var arte := CosmeticosVisuais.preview_loja(_sel)
-	_hero_nome.text = Textos.t("shop.item.%s.name" % _sel)
+	var it := LojaCatalogo.item(id)
+	var arte := CosmeticosVisuais.splash_loja(id)
+	_hero_nome.text = Textos.t("shop.item.%s.name" % id)
 	_hero_raridade.text = "◆  " + Textos.t("shop.rarity." + str(it["raridade"]))
 	_hero_raridade.add_theme_color_override("font_color", ShopTheme.raridade(str(it["raridade"])))
-	var estado := EstadoJogo.estado_item_loja(_sel)
+	var estado := EstadoJogo.estado_item_loja(id)
 	_hero_estado.text = Textos.t("shop.state." + estado)
 	_hero_estado.add_theme_color_override("font_color", ShopTheme.estado(estado))
-	_hero_desc.text = Textos.t("shop.item.%s.desc" % _sel)
+	_hero_desc.text = Textos.t("shop.item.%s.desc" % id)
 	_hero_img.texture = arte
 	_hero_img.visible = arte != null
 	_hero_ph.visible = arte == null
@@ -601,6 +619,8 @@ func _detalhe() -> void:
 
 
 func _focar_detalhe() -> void:
+	if _cat == "destaques" and _hero_id != "" and _hero_id != _sel:
+		_selecionar(_hero_id)
 	for b: Button in [_btn_k, _btn_v, _btn_eq]:
 		if b.visible and not b.disabled:
 			b.grab_focus()
@@ -678,3 +698,50 @@ func _fechar() -> void:
 	Som.toca("menu_painel", -12.0, 0.92)
 	fechado.emit()
 	queue_free()
+
+
+func _montar_carrossel() -> void:
+	# Apenas skins epicas/lendarias com splash real; futuras entram pelo catalogo.
+	for it: Dictionary in LojaCatalogo.da_categoria("destaques"):
+		var cam := str(it.get("splash", ""))
+		if it["categoria"] == "skins" and it["raridade"] in ["epico", "lendario"] \
+				and cam != "" and ResourceLoader.exists(cam):
+			_carrossel_ids.append(str(it["id"]))
+	_carrossel_timer = Timer.new()
+	_carrossel_timer.wait_time = CARROSSEL_INTERVALO
+	_carrossel_timer.timeout.connect(_avancar_carrossel)
+	add_child(_carrossel_timer)
+
+
+func _reiniciar_carrossel() -> void:
+	if _carrossel_timer == null:
+		return
+	_carrossel_timer.stop()
+	if _cat == "destaques" and _carrossel_ids.size() > 1:
+		_carrossel_timer.start()
+
+
+func _cancelar_transicao_carrossel() -> void:
+	if _carrossel_tween and _carrossel_tween.is_valid():
+		_carrossel_tween.kill()
+	if _hero_linha:
+		_hero_linha.modulate.a = 1.0
+	if _hero_botao:
+		_hero_botao.disabled = false
+
+
+func _avancar_carrossel() -> void:
+	if _cat != "destaques" or not is_visible_in_tree() or _carrossel_ids.size() < 2:
+		return
+	_cancelar_transicao_carrossel()
+	var indice := _carrossel_ids.find(_hero_id)
+	var proximo := _carrossel_ids[(indice+1) % _carrossel_ids.size()]
+	_hero_botao.disabled = true
+	_carrossel_tween = create_tween()
+	_carrossel_tween.tween_property(_hero_linha, "modulate:a", 0.0, CARROSSEL_FADE)
+	_carrossel_tween.tween_callback(func() -> void:
+		_hero_id = proximo
+		_hero()
+	)
+	_carrossel_tween.tween_property(_hero_linha, "modulate:a", 1.0, CARROSSEL_FADE)
+	_carrossel_tween.tween_callback(func() -> void: _hero_botao.disabled = false)

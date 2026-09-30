@@ -1103,10 +1103,15 @@ func _montar_vfx_golpe() -> void:
 	sf.remove_animation("default")
 	sf.add_animation("slash")
 	sf.set_animation_loop("slash", false)
-	for i in GOLDEN_VFX_FRAMES:
-		var tex: Texture2D = load("%s/vfx/vfx_slash_basic/vfx_slash_basic_%03d.png" % [GOLDEN_DIR, i + 1])
-		if tex:
-			sf.add_frame("slash", tex)
+	# skin com VFX próprio (Shadowblade): mesmos 6 frames/geometria, repintados
+	var sf_skin := VfxSkin.frames_golpe()
+	if sf_skin != null:
+		sf = sf_skin
+	else:
+		for i in GOLDEN_VFX_FRAMES:
+			var tex: Texture2D = load("%s/vfx/vfx_slash_basic/vfx_slash_basic_%03d.png" % [GOLDEN_DIR, i + 1])
+			if tex:
+				sf.add_frame("slash", tex)
 	_slash_vfx = AnimatedSprite2D.new()
 	_slash_vfx.name = "SlashVFX"
 	_slash_vfx.sprite_frames = sf
@@ -1126,7 +1131,7 @@ func _disparar_vfx_golpe() -> void:
 	if _vfx_combo and is_instance_valid(_vfx_combo):
 		_vfx_combo.queue_free()
 	_vfx_combo = null
-	if _combo_passo >= 0 and not _ataque_no_ar and Vfx9G.ativo(self):
+	if _combo_passo >= 0 and not _ataque_no_ar and Vfx9G.ativo(self) and VfxSkin.pasta() == "":
 		var d: Dictionary = ARCO_COMBO[clampi(_combo_passo, 0, ARCO_COMBO.size() - 1)]
 		_vfx_combo = Vfx9G.novo(str(d["fam"]))
 		if _vfx_combo:
@@ -1139,6 +1144,7 @@ func _disparar_vfx_golpe() -> void:
 			_vfx_combo.position = Vector2((VFX9G_COMBO_POS.x + desl.x) * _olha_para,
 				(VFX9G_COMBO_POS.y + desl.y) * _sinal_grav)
 			_vfx_combo.rotation_degrees = float(d["giro"]) * _olha_para * _sinal_grav
+			VfxPosicionamento.alinhar(_vfx_combo, _corpo, _anim_ataque(), _olha_para)
 			_vfx_combo.modulate = d["cor"]
 			_vfx_combo.z_index = 1
 			_vfx_combo.animation_finished.connect(_vfx_combo.queue_free)
@@ -1154,6 +1160,7 @@ func _disparar_vfx_golpe() -> void:
 	_slash_vfx.visible = true
 	_slash_vfx.play("slash")
 	_slash_vfx.set_frame_and_progress(0, 0.0)
+	VfxPosicionamento.alinhar(_slash_vfx, _corpo, _anim_ataque(), _olha_para)
 
 
 ## VFX do pacote 9B.4 -- todos à parte do corpo, como o `SlashVFX`: o frame
@@ -1200,6 +1207,9 @@ func _rasto_dash(dt: float) -> void:
 ## Explosão curta de partículas nos pés, no 2.º salto.
 func _vfx_salto_duplo() -> void:
 	if not usar_golden_set:
+		return
+	if VfxSkin.tocar(self, "double_jump_ring", global_position + VfxSkin.desloc("double_jump_ring") * Vector2(1.0, _sinal_grav), _sinal_grav < 0.0):
+		VfxSkin.particulas(self, global_position + Vector2(0.0, 20.0 * _sinal_grav), 8, Vector2(0.0, _sinal_grav), 60.0)
 		return
 	# 9G: o "dash impact" da prancha, rodado para baixo -- o impulso sai dos
 	# pés. Rotação exacta e viragem, sem redesenhar nada.
@@ -1701,6 +1711,8 @@ func _physics_process(dt: float) -> void:
 		_acender_aura(0.8)
 		_sfx_dash()
 		_vfx9g_dash()
+		VfxSkin.particulas(self, global_position + Vector2(-10.0 * _olha_para, 6.0 * _sinal_grav), 10,
+			Vector2(-_olha_para, 0.0), 80.0)
 		_invulneravel = maxf(_invulneravel, DUR_DASH)
 	else:
 		var saltos_max := 2 if EstadoJogo.tem_habilidade("salto_duplo") else 1
@@ -1790,7 +1802,9 @@ func _physics_process(dt: float) -> void:
 		if no_chao and not _estava_no_chao else 0
 	if tier_aterragem > 0:
 		if tier_aterragem >= 2:
-			if Vfx9G.ativo(self):
+			if VfxSkin.tocar(self, "land_impact", global_position + VfxSkin.desloc("land_impact") * Vector2(1.0, _sinal_grav), _sinal_grav < 0.0):
+				VfxSkin.particulas(self, global_position + Vector2(0.0, 22.0 * _sinal_grav), 8, Vector2(0.0, -_sinal_grav), 70.0)
+			elif Vfx9G.ativo(self):
 				Vfx9G.tocar(self, "land_impact", global_position + Vector2(0.0, 22.0 * _sinal_grav),
 					1.0, 0.0, false, _sinal_grav < 0.0, -1, 0.4)
 			elif _po:
@@ -2340,6 +2354,7 @@ func _pogo_acertar() -> bool:
 	_pop = 1.0
 	_squash = maxf(_squash, 0.5)
 	Som.toca("pisao_koliani", -10.0, 0.95, 0.03)
+	VfxSkin.tocar(self, "pogo_impact", pos, _sinal_grav < 0.0)   # so' skins com VFX proprio
 	_pop_impacto(pos)
 	_pogo_estado = 3
 	_pogo_t = POGO_RECUP_ACERTO
@@ -2533,6 +2548,8 @@ const COR_GLOW_GOLPE := Color(0.4, 0.13, 0.6)
 func _flash_golpe() -> void:
 	if _luz_golpe == null:
 		return
+	# O pai Sprite ja' acompanha o espelho; a luz nasce na ponta da espada.
+	_luz_golpe.position.x = VfxPosicionamento.frente_espada(_corpo, _anim_ataque()) + 2.0
 	_luz_golpe.color = COR_GLOW_GOLPE
 	_luz_golpe.energy = 0.0
 	var tl := _luz_golpe.create_tween()
@@ -2712,12 +2729,16 @@ func _animar_cupula() -> void:
 func _animar_aura() -> void:
 	var respira := 0.5 + 0.5 * sin(_anim_t * 2.3)
 	var f := _aura_flash
+	var forca_skin := VfxSkin.forca_glow_corpo()
+	VfxSkin.atualizar_aura(self, _corpo, f, _anim_t)
+	if _corpo:
+		_corpo.light_mask = VfxSkin.mascara_luz_corpo()
 	if _halo:
 		var e := 1.0 + AURA_RESPIRA * respira + 0.35 * f
 		_halo.scale = Vector2(0.62, 0.78) * e
-		_halo.modulate.a = AURA_ALPHA * (0.8 + 0.2 * respira) + 0.4 * f
+		_halo.modulate.a = (AURA_ALPHA * (0.8 + 0.2 * respira) + 0.4 * f) * forca_skin
 	if _luz_aura:
-		_luz_aura.energy = AURA_ENERGIA * (0.85 + 0.15 * respira) + 1.1 * f
+		_luz_aura.energy = (AURA_ENERGIA * (0.85 + 0.15 * respira) + 1.1 * f) * forca_skin
 
 
 ## Acende a aura (0..1). Chamado quando ela golpeia, faz dash ou lança.

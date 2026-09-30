@@ -26,6 +26,7 @@ const DIR_SKIN := {
 	"skin_celestial": "res://assets/sprites/koliani_skins/celestial",
 	"skin_anjo": "res://assets/sprites/koliani_skins/anjo",
 	"skin_demonio": "res://assets/sprites/koliani_skins/demonio",
+	"skin_shadowblade": "res://assets/sprites/koliani_skins/shadowblade",
 }
 ## As que são só paleta (silhueta igual à do Golden Set); as outras são
 ## premium (armadura, arma, asas/cornos...). O Paulo fechou as simples nestas três.
@@ -236,6 +237,15 @@ static func checkpoint_visual(id := "") -> Dictionary:
 
 ## Preview real da Loja para um item ("" = sem arte, fica o placeholder).
 ## Vem do campo `preview` do catálogo, mas só para itens SEM `placeholder`.
+static func splash_loja(id: String) -> Texture2D:
+	var cam := str(LojaCatalogo.item(id).get("splash", ""))
+	if cam == "" or not ResourceLoader.exists(cam):
+		return preview_loja(id)
+	if not _cache_arte.has(cam):
+		_cache_arte[cam] = load(cam)
+	return _cache_arte[cam]
+
+
 static func preview_loja(id: String) -> Texture2D:
 	var it := LojaCatalogo.item(id)
 	if it.is_empty() or bool(it.get("placeholder", true)):
