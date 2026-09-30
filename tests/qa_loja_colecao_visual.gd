@@ -56,6 +56,9 @@ func _texto_cortado() -> Array:
 
 
 func _ready() -> void:
+	# Este QA mede os preços/reduções reais; o runtime continua grátis durante
+	# desenvolvimento. A alteração é local a este processo isolado.
+	LojaCatalogo.gratis = false
 	_dir = OS.get_user_data_dir() + "/qa_colecao/"
 	DirAccess.make_dir_recursive_absolute(_dir)
 	await get_tree().create_timer(0.4).timeout
@@ -110,4 +113,5 @@ func _ready() -> void:
 	await _foto("c09_skin_adquirida")
 	_check(_loja._btn_eq.visible and not EstadoJogo.item_equipado("skin_coracao_podre"), "skin do pack adquirida e NAO auto-equipada")
 	print("QA COLECAO: %s (%d falhas)" % ["PASS" if falhas == 0 else "FAIL", falhas])
+	LojaCatalogo.gratis = LojaCatalogo.GRATIS_EM_DESENVOLVIMENTO
 	get_tree().quit(0 if falhas == 0 else 1)

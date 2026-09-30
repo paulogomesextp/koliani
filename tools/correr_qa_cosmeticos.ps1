@@ -14,6 +14,7 @@ param(
   [switch]$Manter
 )
 $ErrorActionPreference = 'Continue'   # o Godot escreve avisos em stderr
+$iso      = Join-Path $Projeto "tools\godot_isolado.py"
 $sandbox  = Join-Path ([IO.Path]::GetTempPath()) ("kolqa_" + [Guid]::NewGuid().ToString("N").Substring(0, 8))
 $saveReal = Join-Path $env:APPDATA "Godot\app_userdata\Koliani\progresso.json"
 function Hash-Save { if (Test-Path $saveReal) { (Get-FileHash $saveReal -Algorithm SHA256).Hash } else { "(sem save)" } }

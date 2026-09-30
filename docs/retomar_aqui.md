@@ -1,3 +1,23 @@
+# >>> Shop — modernização UI (30 set 2026, commit local, SEM push) <<<
+
+Relatório: `docs/execution_shop_modernizacao.md`. `Loja` continua montada por
+`scripts/loja.gd` sobre MenuInicial; agora usa containers, tabs horizontais,
+Hero grande, grid de cinco colunas, detalhe fixo e scroll só do catálogo.
+Novos `ShopTheme` e `ShopItemCard`. Catálogo, economia, saves e sprites não
+foram alterados. Fundo e previews são assets existentes.
+
+QA dirigido: quatro resoluções (1920×1080, 1600×900, 1366×768, 1280×720),
+compra grátis, ownership, equip/troca, round-trip/reabertura, Galeria e tabs
+PASS; 10 testes de Loja PASS; persistência em cinco processos PASS; save real
+intacto (três ficheiros). Suite geral ficou sem progresso antes dos testes
+de Loja e foi interrompida: não há PASS global. Capturas/fluxos produziram
+avisos de ObjectDB no encerramento e, em algumas execuções, um recurso ainda
+em uso. Estes avisos não estão resolvidos nem classificados como regressão.
+
+Próximo passo: revisão visual humana e teste físico de comando/toque. A
+ornamentação/fonte/cenário diferem da referência; os placeholders do catálogo
+continuam sem arte nova. Publicação Windows/PWA não foi realizada.
+
 # >>> N13 -- "Mecanismos Antigos", autoral (29 set 2026, branch `claude/project-thread-6jbrqw`, SEM push) <<<
 
 Mesmo criterio do N12 ("arte detalhada primeiro"). `Torre_da_Tempestade.tscn`
