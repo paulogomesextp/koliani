@@ -29,6 +29,10 @@ extends "res://scripts/plataforma.gd"
 @export var comeca_solida := true
 ## Janela (segundos) de piscar antes de cada troca de estado.
 @export var aviso := 0.5
+## Opt-in (N15, "ecos de memoria"): a moldura da prancha pendurada por baixo
+## da laje (o glifo de eco). Acende e apaga com ela.
+@export var textura_eco: Texture2D
+@export var escala_eco := 1.0
 
 var _solida_agora := true
 var _caiu := false
@@ -41,6 +45,16 @@ func _ready() -> void:
 	if Engine.is_editor_hint():
 		return
 	add_to_group("plataformas_ritmadas")
+	if textura_eco:
+		var vis0 := get_node_or_null("Visual")
+		if vis0:
+			var s := Sprite2D.new()
+			s.name = "Eco"
+			s.texture = textura_eco
+			s.scale = Vector2(escala_eco, escala_eco)
+			s.position = Vector2(0.0, tamanho.y * 0.5 + textura_eco.get_height() * escala_eco * 0.5 - 14.0)
+			s.z_index = -1
+			vis0.add_child(s)
 	_aplicar_estado(_calcula_solida(), true)
 
 

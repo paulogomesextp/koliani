@@ -29,6 +29,7 @@ const TestesRegion03N11 := preload("res://tests/test_region03_n11_level.gd")
 const TestesRegion03N12 := preload("res://tests/test_region03_n12_level.gd")
 const TestesRegion03N13 := preload("res://tests/test_region03_n13_level.gd")
 const TestesRegion03N14 := preload("res://tests/test_region03_n14_level.gd")
+const TestesRegion03N15 := preload("res://tests/test_region03_n15_level.gd")
 const TestesKolianiCanonicaNiveis := preload("res://tests/test_koliani_canonica_niveis.gd")
 const DT := 1.0 / 60.0
 
@@ -69,6 +70,8 @@ func _correr_tudo() -> void:
 	for falha in TestesRegion03N13.executar():
 		_falhas.append(falha)
 	for falha in TestesRegion03N14.executar():
+		_falhas.append(falha)
+	for falha in TestesRegion03N15.executar():
 		_falhas.append(falha)
 	for falha in TestesKolianiCanonicaNiveis.executar():
 		_falhas.append(falha)
@@ -237,6 +240,9 @@ func _correr_tudo() -> void:
 	await teste_r3_n13_elevadores_no_crivo()
 	await teste_r3_n14_sinos()
 	await teste_r3_n14_portoes_no_crivo()
+	await teste_r3_n15_fragmentos_e_escada()
+	await teste_r3_n15_ritual_ergue_a_fase2()
+	await teste_r3_n15_portoes_no_crivo()
 	await teste_r3_vyrak_identidade()
 	await teste_r3_vyrak_leva_dano_muda_de_fase_e_morre()
 
@@ -4600,6 +4606,119 @@ func teste_r3_n14_portoes_no_crivo() -> void:
 		else:
 			_ok(not bool(r.get("ok_porta", true)),
 				"R3/N14: o portao '%s' contorna-se -- a porta alcanca-se sem ele" % portao)
+		raiz.queue_free()
+		await get_tree().process_frame
+
+
+## N15 (O Topo dos Ecos) em FISICA: o sino celestial e' surdo ate' os tres
+## fragmentos de eco estarem recolhidos; depois uma badalada ergue a escada de
+## ecos (os 4 degraus) e so' uma vez. Os fragmentos recolhem-se por contacto.
+func teste_r3_n15_fragmentos_e_escada() -> void:
+	EstadoJogo.indice_nivel = R3_BASE + 4
+	EstadoJogo.checkpoint = Vector2.ZERO
+	var raiz: Node = (load(EstadoJogo.NIVEIS[R3_BASE + 4]) as PackedScene).instantiate()
+	var kol := raiz.get_node_or_null("Koliani")
+	if kol:
+		kol.set("_a_morrer", true)
+	get_tree().root.add_child(raiz)
+	for i in 6:
+		await get_tree().physics_frame
+	var solida := func(nome: String) -> bool:
+		return not (raiz.get_node(nome).get_node("Col") as CollisionShape2D).disabled
+	var sino := raiz.get_node("SinoCelestial") as SinoTorre
+	var degraus := ["Degrau1", "Degrau2", "Degrau3", "Degrau4"]
+	for d in degraus:
+		_ok(not solida.call(d), "R3/N15: %s devia arrancar apagado" % d)
+	_ok(sino.fragmentos_em_falta() == 3, "R3/N15: o nivel devia ter 3 fragmentos por recolher")
+	# surdo: sem fragmentos nao acende nada
+	sino.receber_dano(1, 0.0)
+	await get_tree().physics_frame
+	await get_tree().physics_frame
+	for d in degraus:
+		_ok(not solida.call(d), "R3/N15: o sino celestial sem fragmentos nao devia acender %s" % d)
+	# recolher os tres (contacto da Koliani)
+	var k := raiz.get_node("Koliani")
+	for nome in ["FragmentoN", "FragmentoE", "FragmentoNE"]:
+		var f := raiz.get_node(nome)
+		f.call("_ao_entrar", k)
+		_ok(bool(f.get("coletado")), "R3/N15: %s devia ficar recolhido" % nome)
+	_ok(sino.fragmentos_em_falta() == 0, "R3/N15: com os tres recolhidos nao devia faltar nenhum")
+	sino.set("_cd", 0.0)
+	sino.receber_dano(1, 0.0)
+	await get_tree().physics_frame
+	await get_tree().physics_frame
+	for d in degraus:
+		_ok(solida.call(d), "R3/N15: o sino celestial devia erguer %s" % d)
+	# uma vez so': nova badalada nao volta a apagar a escada
+	sino.set("_cd", 0.0)
+	sino.receber_dano(1, 0.0)
+	await get_tree().physics_frame
+	await get_tree().physics_frame
+	for d in degraus:
+		_ok(solida.call(d), "R3/N15: a escada de ecos nao devia voltar atras (%s)" % d)
+	raiz.queue_free()
+	await get_tree().process_frame
+
+
+## O ritual de Vyrak (aos 50 %) ergue as plataformas da fase 2, que ate' la'
+## sao fantasmas.
+func teste_r3_n15_ritual_ergue_a_fase2() -> void:
+	EstadoJogo.indice_nivel = R3_BASE + 4
+	EstadoJogo.checkpoint = Vector2.ZERO
+	var raiz: Node = (load(EstadoJogo.NIVEIS[R3_BASE + 4]) as PackedScene).instantiate()
+	var kol := raiz.get_node_or_null("Koliani")
+	if kol:
+		kol.set("_a_morrer", true)
+	get_tree().root.add_child(raiz)
+	for i in 6:
+		await get_tree().physics_frame
+	var nomes := ["Fase2a", "Fase2b", "Fase2c"]
+	for nome in nomes:
+		_ok((raiz.get_node(nome).get_node("Col") as CollisionShape2D).disabled,
+			"R3/N15: %s devia arrancar fantasma (so' se ergue no ritual)" % nome)
+	raiz.get_node("Chefe").call("_ritual_de_ativacao")
+	await get_tree().physics_frame
+	await get_tree().physics_frame
+	for nome in nomes:
+		_ok(not (raiz.get_node(nome).get_node("Col") as CollisionShape2D).disabled,
+			"R3/N15: o ritual devia erguer %s" % nome)
+	raiz.queue_free()
+	await get_tree().process_frame
+
+
+## Cada PORTAO do N15 e' mesmo preciso: tirando-o, o crivo de alcance deixa
+## de chegar a' porta. (Os baloicos, o elevador e os ecos do F3 so' levam aos
+## fragmentos e aos segredos: o crivo nao os modela como portao da porta.)
+func teste_r3_n15_portoes_no_crivo() -> void:
+	const CRIVO := preload("res://tools/verifica_alcance.gd")
+	var casos := {"": [], "degraus do sino 1": ["Seq1a", "Seq1b", "Seq1c", "Seq1d"],
+		"ecos de memoria": ["Eco1", "Eco2", "Eco3", "Eco4", "Eco5", "Eco6"],
+		"pedras em colapso": ["Colapso1", "Colapso2", "Colapso3", "Colapso4"],
+		"coluna de ar": ["ArAltar"], "escada de ecos": ["Degrau1", "Degrau2", "Degrau3", "Degrau4"]}
+	EstadoJogo.indice_nivel = R3_BASE + 4
+	EstadoJogo.checkpoint = Vector2.ZERO
+	for portao: String in casos:
+		var raiz: Node = (load(EstadoJogo.NIVEIS[R3_BASE + 4]) as PackedScene).instantiate()
+		for n: String in casos[portao]:
+			var x := raiz.get_node_or_null(n)
+			_ok(x != null, "R3/N15: falta o no' %s" % n)
+			if x:
+				raiz.remove_child(x)
+				x.free()
+		var kol := raiz.get_node_or_null("Koliani")
+		if kol:
+			kol.set("_a_morrer", true)
+		get_tree().root.add_child(raiz)
+		for i in 4:
+			await get_tree().physics_frame
+		var r: Dictionary = CRIVO._medir_arvore(get_tree(), raiz)
+		if portao == "":
+			_ok(bool(r.get("ok_porta", false)) and (r.get("orfas", []) as Array).is_empty(),
+				"R3/N15: o nivel inteiro devia chegar a' porta sem ilhas (%s %s)" % [
+					r.get("porque", ""), r.get("orfas", [])])
+		else:
+			_ok(not bool(r.get("ok_porta", true)),
+				"R3/N15: o portao '%s' contorna-se -- a porta alcanca-se sem ele" % portao)
 		raiz.queue_free()
 		await get_tree().process_frame
 
@@ -9252,3 +9371,4 @@ func teste_combat_lab_balanco() -> void:
 		"balanco: o combo intencional tem de matar mais depressa que o spam")
 	_ok(float(r["ideal"]["ttk"]) > 2.5, "balanco: power creep -- o combo ideal mata em menos de 2,5 s")
 	EstadoJogo.habilidades.assign(antes_hab)
+

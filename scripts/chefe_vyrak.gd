@@ -447,6 +447,10 @@ func _ritual_de_ativacao() -> void:
 			continue
 		var tw := (p as Node).create_tween()
 		tw.tween_property(p, "modulate", Color(1.25, 1.12, 0.86), 0.5)
+	# as plataformas finais da arena erguem-se (opt-in do N15)
+	for q in get_tree().get_nodes_in_group("plataformas_fase2"):
+		if is_instance_valid(q) and q.has_method("ativar_fase2"):
+			q.ativar_fase2()
 	# aura da fase 2
 	if _sprite:
 		var tw2 := create_tween()
