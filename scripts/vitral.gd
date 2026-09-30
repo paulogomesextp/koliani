@@ -39,7 +39,15 @@ func _ready() -> void:
 		_luz.energy = 0.0
 
 
-func receber_dano(_quantidade: int = 0, _dir: float = 0.0) -> void:
+func _process(_dt: float) -> void:
+	# o vitral-portao pulsa de leve: e' a deixa de que se parte (no N12 era
+	# lido como cenario e a Koliani ficava presa a' "parede")
+	if _partido or _luz == null or textura_inteiro == null:
+		return
+	_luz.energy = 0.3 + 0.22 * sin(Time.get_ticks_msec() * 0.004)
+
+
+func receber_dano(_quantidade: int = 0, _dir: float = 0.0, _critico := false, _recuo := 0.0) -> void:
 	if _partido:
 		return
 	_partido = true

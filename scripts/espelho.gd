@@ -21,7 +21,7 @@ func _ready() -> void:
 	add_to_group("espelhos")
 
 
-func receber_dano(_quantidade: int = 0, _dir: float = 0.0) -> void:
+func receber_dano(_quantidade: int = 0, _dir: float = 0.0, _critico := false, _recuo := 0.0) -> void:
 	if _partido:
 		return
 	_partido = true
