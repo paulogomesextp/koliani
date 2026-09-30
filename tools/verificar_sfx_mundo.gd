@@ -130,7 +130,7 @@ func _sino() -> void:
 	var antes := _contador()
 	sino.call("receber_dano", 1)
 	_checar(_avanco(antes) == 1, "a badalada nao deu exactamente uma voz")
-	_checar(_ultimo_stream() == "sino_mecanismo.wav",
+	_checar(_ultimo_stream() == "sino_mecanismo.ogg",
 		"o sino da torre ainda usa o som do chefe: " + _ultimo_stream())
 	_checar(_ultimo_stream() != "sino_ataque.ogg", "sino mecanico == sino de chefe")
 	# a recarga do proprio sino bloqueia o segundo golpe
@@ -152,7 +152,7 @@ func _mecanismo_alavanca() -> void:
 	var antes := _contador()
 	alavanca.call("_ao_tocar", k)
 	_checar(_avanco(antes) == 1, "a alavanca nao deu exactamente uma voz")
-	_checar(_ultimo_stream() == "mecanismo.wav",
+	_checar(_ultimo_stream() == "mecanismo.ogg",
 		"a alavanca ainda rouba o selo do checkpoint: " + _ultimo_stream())
 	_checar(_ultimo_stream() != "selo.wav", "alavanca == checkpoint")
 	print("SFX ALAVANCA stream=%s vozes=%d" % [_ultimo_stream(), _avanco(antes)])
@@ -224,7 +224,7 @@ func _perigo_plataforma() -> void:
 	_checar(_avanco(antes) == 1, "a plataforma repetiu o telegrafo enquanto tremia")
 	await create_timer(0.45).timeout
 	_checar(_avanco(antes) == 2, "a plataforma caiu sem som")
-	_checar(_ultimo_stream() == "pedra_parte.wav",
+	_checar(_ultimo_stream() == "pedra_parte.ogg",
 		"queda da plataforma com stream errado: " + _ultimo_stream())
 	print("SFX PLATAFORMA telegrafo+queda=%d vozes ultimo=%s" % [
 		_avanco(antes), _ultimo_stream()])
@@ -257,7 +257,7 @@ func _perigo_pedra() -> void:
 	for _i in 60:
 		await physics_frame
 	_checar(_avanco(antes) == 2, "a pedra caiu sem impacto (%d vozes)" % _avanco(antes))
-	_checar(_ultimo_stream() == "pedra_parte.wav",
+	_checar(_ultimo_stream() == "pedra_parte.ogg",
 		"impacto da pedra errado: " + _ultimo_stream())
 	print("SFX PEDRA aviso+impacto=%d vozes ultimo=%s" % [
 		_avanco(antes), _ultimo_stream()])

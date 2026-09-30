@@ -450,6 +450,7 @@ func provocar() -> void:
 	_musica_boss = true
 	_garantir_vida_maxima()
 	Musica.boss()
+	Som.toca("chefe_entrada", -8.0, 1.0, 0.0, 0.0, "", Som.Prioridade.ALTA)
 	combate_iniciado.emit(self)
 	vida_mudou.emit(vida, _vida_maxima)
 

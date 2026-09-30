@@ -896,6 +896,26 @@ script que arranque o Godot tem de passar por esta ferramenta.
 
 ---
 
+## SFX de combate aprovados ligados (30 set 2026)
+
+Os 27 SFX Pixabay aprovados que nunca tinham chegado ao repo (403 na cloud)
+foram descarregados no PC do Paulo (`assets/audio/acquisition/sfx/combate/`,
+originais intactos + README com hashes) e ligados no `som.gd`. Como varios
+sao longos demais (porta de forno 52 s, fogo 8 s), `tools/preparar_sfx_combate.py`
+CORTA, faz fade-out e iguala o pico a -3 dBFS -> `approved/sfx/combate/*.ogg`
+(24 cortes). Passos 1-3, golpes 1-3 e `acerto` v1-3 sao o MESMO som aprovado
+com tom 0,94 / 1,0 / 1,06 (para nao repetir identico). Eventos: passos,
+ataque x3, acerto x3, critico, pisao, dano, morte, bloqueio, parede,
+investida, golpe pesado, esmagar, garra, chama, magia de chefe, raio, impacto
+de energia, olho a carregar, pedra, praga, mecanismo, sino, lamina e
+`chefe_entrada` (novo, toca 1x em `ChefeBase.provocar()`). O evento de cada um
+foi deduzido do nome -- HUMAN LISTEN REQUIRED; trocar = mudar a linha em
+`CORTES` e o mapeamento em `som.gd`. Mantidos do kit sintetico: salto,
+aterragem, escudo, dano pesado, finisher, lancar, rolamento, agarrar.
+`verificar_sfx_*.gd` actualizados para os nomes novos; `verificar_sfx_mundo`
+continua com 10 falhas que ja' existiam no master (portao/bau/selo/etc.).
+Teste: `teste_sfx_combate_aprovados`. Suite completa: OK.
+
 ## Musica "igual em todos os niveis" -- era a ambiencia antiga (29 set 2026)
 
 Provado a correr (Godot 4.7.2 Linux, no editor e a partir do `.pck` exportado
