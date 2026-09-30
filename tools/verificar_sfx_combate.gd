@@ -41,8 +41,8 @@ func _player(k: Node) -> void:
 		k.call("_iniciar_ataque")
 		sequencia.append(_ultimo_stream())
 	_checar(_contador() - antes == 4, "combo nao disparou quatro vozes")
-	_checar(sequencia == ["shadowblade_swing_1.wav", "shadowblade_swing_2.wav",
-		"shadowblade_swing_3.wav", "shadowblade_finisher.wav"],
+	_checar(sequencia == ["ataque.ogg", "ataque2.ogg",
+		"ataque3.ogg", "shadowblade_finisher.wav"],
 		"sequencia do combo errada: %s" % str(sequencia))
 
 	antes = _contador()
@@ -73,7 +73,7 @@ func _player(k: Node) -> void:
 	k.vida = 50
 	antes = _contador()
 	k.call("receber_dano", 1)
-	_checar(_contador() - antes == 1 and _ultimo_stream() == "koliani_hurt.wav",
+	_checar(_contador() - antes == 1 and _ultimo_stream() == "dano.ogg",
 		"hurt do player nao disparou uma vez")
 	print("SFX PLAYER combo=%s dash=1 shield=ativacao+impacto hurt=1" % str(sequencia))
 
