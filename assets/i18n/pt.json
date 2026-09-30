@@ -854,5 +854,7 @@
   "world.towers": "Torre dos Ecos",
   "world.unknown": "?",
   "world.void": "O Vazio",
-  "world.war": "Guerra dos Reinos"
+  "world.war": "Guerra dos Reinos",
+  "shop.item.skin_shadowblade.name": "Shadowblade Koliani",
+  "shop.item.skin_shadowblade.desc": "Assassina de cabelo prateado em armadura negra e roxo profundo, cornos e capa de sombra, lâmina curva de energia violeta e VFX de sombra a condizer. Puramente cosmética: mesmos movimentos, mesmas hitboxes."
 }

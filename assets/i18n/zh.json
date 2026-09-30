@@ -854,5 +854,7 @@
   "world.towers": "回声之塔",
   "world.unknown": "?",
   "world.void": "虚无",
-  "world.war": "王国之战"
+  "world.war": "王国之战",
+  "shop.item.skin_shadowblade.name": "影刃 Koliani",
+  "shop.item.skin_shadowblade.desc": "银发刺客,身着黑色与深紫色铠甲,配有暗影之角与披风、紫色能量弯刃以及相配的暗影特效。纯外观:动作与判定完全不变。"
 }
