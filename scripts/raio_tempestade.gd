@@ -17,6 +17,10 @@ extends Node2D
 @export var fase := 0.0
 @export var automatico := false
 @export var raio_atrai := 150.0
+## Opt-in (N15, "feixes de luz"): o feixe da prancha, esticado ao longo da
+## descarga (aditivo). Vazio = so' o relampago de sempre.
+@export var textura_feixe: Texture2D
+@export var cor_feixe := Color(0.8, 0.85, 1.0, 0.9)
 
 var _ocupado := false
 
@@ -36,6 +40,17 @@ func _ready() -> void:
 	_forma.position = Vector2(0, -altura * 0.5 + 8.0)
 	_bolt.points = PackedVector2Array([Vector2(0, -altura), Vector2(-6, -altura * 0.6), Vector2(5, -altura * 0.3), Vector2(0, 0)])
 	_tel.points = _bolt.points
+	if textura_feixe:
+		var sp := Sprite2D.new()
+		sp.texture = textura_feixe
+		sp.scale = Vector2(largura * 1.7 / textura_feixe.get_width(),
+			altura / textura_feixe.get_height())
+		sp.position = Vector2(0, -altura * 0.5)
+		sp.modulate = cor_feixe
+		var m := CanvasItemMaterial.new()
+		m.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
+		sp.material = m
+		_bolt.add_child(sp)
 	if automatico:
 		_loop()
 

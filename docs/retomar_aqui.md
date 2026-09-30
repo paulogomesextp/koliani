@@ -1,5 +1,12 @@
 # >>> N14 -- "Campanario", autoral (29 set 2026, branch `claude/project-thread-6jbrqw`, junto no master) <<<
 
+# N15 "O Topo dos Ecos" refeito (30 set 2026)
+Cena `O_Pico_Esquecido.tscn` gerada por `tools/construir_n15_topo.py`; desenho em
+`docs/nivel_autoral_n15.md`. Novidades opt-in: FragmentoEco, sino celestial
+(`fragmentos_necessarios`), PlataformaFase2, `textura_eco`, `textura_feixe`.
+Falta: playtest humano; Regiao III completa (sem cartao `region.3.complete`).
+
+
 Mesmo criterio do N12/N13 ("arte detalhada primeiro"). `Observatorio_Lunar.tscn`
 deixou de ser a sala da Sacerdotisa Lunar (chefe fora do contrato) + um
 Coletavel de `projetil` (ja' concedido no N10) e passou a uma torre feita a
