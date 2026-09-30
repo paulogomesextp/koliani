@@ -17,6 +17,14 @@ extends SceneTree
 ##     kit=dash,salto_duplo parte=<x>,<y> salto=<x> alvo=<no'|porta> \
 ##     [estrategia=duplo|dash_duplo|simples] [varrer=<s>] [sentido=1|-1]
 ##
+## `sobe=<dy>` (com `alvo=medir`): em vez de voltar a' altura de partida, mede
+## o percurso ate' a descer pela altura `dy` px ACIMA dela (negativo = abaixo):
+## e' o alcance para uma plataforma `dy` mais alta.
+##
+## `duplo_vy=<n>` (omissao -30 = no topo do arco): dispara o salto duplo
+## quando a velocidade vertical passa de `n` (negativo = ainda a subir), para
+## medir quanta folga de TIMING o vao deixa a quem nao tem reflexos perfeitos.
+##
 ## `alvo=medir` nao procura alvo: da' o percurso horizontal da ORIGEM da
 ## Koliani desde que sai do chao ate' voltar a' mesma altura (o vao borda a
 ## borda que isso cobre e' um pouco maior: o corpo tem largura). `vento=off`
@@ -157,7 +165,7 @@ func _tentar(estrategia: String, espera: float) -> String:
 			saiu = true
 			x_saida = p.x
 			y_saida = p.y
-		if alvo == "medir" and saiu and v.y > 0.0 and p.y >= y_saida:
+		if alvo == "medir" and saiu and v.y > 0.0 and p.y >= y_saida - float(_p.get("sobe", "0")):
 			_soltar()
 			return "alcance %.0f" % absf(p.x - x_saida)
 		if alvo == "porta" and _toca_porta(p):
@@ -165,7 +173,7 @@ func _tentar(estrategia: String, espera: float) -> String:
 			_info = "toca a porta em x=%.0f y=%.0f (%s)" % [p.x, p.y,
 				"no chao" if chao else "no ar"]
 			return "ok"
-		if duplo and saiu and v.y > -30.0:
+		if duplo and saiu and v.y > float(_p.get("duplo_vy", "-30")):
 			Input.action_release("saltar")
 			await physics_frame
 			Input.action_press("saltar")
