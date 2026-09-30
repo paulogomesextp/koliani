@@ -55,6 +55,15 @@ mecânicas, vãos medidos com o salto duplo real) + crivo de alcance
 (`porta_alcancavel=true`, sem plataformas órfãs). Capturas em
 `docs/qa/n16_autoral/`.
 
+## Travessia real (regra do Paulo, 30 set 2026)
+`tools/correr_travessia.sh <cena> [perfis]` pilota a Koliani real (fisica,
+mecanicas, portoes) com `bot_humano_r2.gd` do inicio a' porta e sai != 0 se
+algum perfil nao chegar. N16: **experiente, normal e casual chegam todos a'
+porta** (34-74 s, 2-5 mortes). As mortes de 2 perfis concentram-se em x~2300
+(carrinho sobre a lava B) e x~3100 (salto do tunel); uma queda repetida do perfil
+experiente em x~1630 (y 1212) nao foi explicada -- o chao ali e' solido; a
+reter para o playtest humano.
+
 ## Por fazer
 Playtest humano (legibilidade do piso quente, dano da lava, TTK do Operário);
 polimento opcional do terreno (veios de magma). N17–N20 seguem o mesmo pipeline.
