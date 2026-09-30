@@ -151,8 +151,11 @@ velocidade_max = 130
 tamanho = Vector2(430, 260)
 cor_guia = Color(1.0, 0.6, 0.42, 0.42)
 
+; IlhaB2 aproximada 70 px (era x=1350): o vao de 190 px, 70 acima, contra o
+; vento da WindB2 so' se passava com o 2.o salto perfeito (bench_vao: 140 px de
+; alcance com o 2.o salto ~0,15 s cedo). Com 120 px passa com folga.
 [node name="IlhaB2" parent="." instance=ExtResource("9_pl")]
-position = Vector2(1350, 590)
+position = Vector2(1280, 590)
 tamanho = Vector2(220, 50)
 altura_visual = 90
 cor_base = Color(0.2, 0.24, 0.32, 1)
