@@ -63,7 +63,7 @@ def cabelo_prata(orig: Image.Image, im: Image.Image, cara) -> Image.Image:
 	po, px = orig.load(), im.load()
 	fx, fy = cara
 	W, H = im.size
-	for y in range(max(0, fy - 16), min(H, fy + 30)):
+	for y in range(max(0, fy - 46), min(H, fy + 30)):
 		for x in range(max(0, fx - 52), min(W, fx + 16)):
 			r, g, b, a = po[x, y]
 			if a < 40 or T._pele(r, g, b):
@@ -72,7 +72,9 @@ def cabelo_prata(orig: Image.Image, im: Image.Image, cara) -> Image.Image:
 			dx, dy = x - fx, y - fy
 			cabeca = -9 <= dx <= 8 and -14 <= dy <= 4
 			vermelho = s > 0.35 and (h * 360 >= 320 or h * 360 <= 8)
-			cascata = dx < -3 and -6 <= dy <= 26 and (vermelho or (dy <= 12 and v < 0.2))
+			cascata = (dx < -3 and -6 <= dy <= 26 and (vermelho or (dy <= 12 and v < 0.2))) \
+				or (vermelho and -44 <= dy < -6 and dx < 40) \
+				or (dy < -4 and v < 0.3)
 			# lenco/gola: junto ao pescoco, sob o queixo, fica roxo (nao prata)
 			pescoco = -6 <= dx <= 7 and 4 < dy <= 10
 			if pescoco and not cabeca:
@@ -84,9 +86,7 @@ def cabelo_prata(orig: Image.Image, im: Image.Image, cara) -> Image.Image:
 				px[x, y] = (18, 10, 30, a)
 				continue
 			# brilho original 0.06..0.7 -> luz do cabelo; vermelho vivo (pontas) = claro
-			t = 0.18 + min(1.0, v / 0.62) * 0.82
-			if s > 0.5 and v > 0.3:
-				t = min(1.0, t + 0.15)
+			t = 0.12 + min(1.0, v / 0.9) * 0.62
 			cr, cg, cb = _rampa(PRATA, t)
 			px[x, y] = (cr, cg, cb, a)
 	return im
@@ -102,8 +102,8 @@ def cornos_sombra() -> tuple[Image.Image, int, int]:
 	im, ax, ay = P.cornos_carneiro(SOMBRA, K, LILAS)
 	# escala 0.75 no sitio, preservando a ancora
 	w, h = im.size
-	im = im.resize((max(1, int(w * 0.78)), max(1, int(h * 0.78))), Image.NEAREST)
-	return im, int(ax * 0.78), int(ay * 0.78)
+	im = im.resize((max(1, int(w * 0.62)), max(1, int(h * 0.62))), Image.NEAREST)
+	return im, int(ax * 0.62), int(ay * 0.62)
 
 
 def capa_penas(vento: float) -> tuple[Image.Image, int, int]:
@@ -159,10 +159,18 @@ ARMA_CORES = {"lamina": "140A22", "gume": "F0D0FF", "fio": "A040FF",
 			  "guarda": "A88428", "punho": "241238"}
 
 
+def _veios_tronco(orig, im, cara):
+	"""Veios de energia so' no tronco/ombros: nas pernas ficavam a ruido."""
+	com = P.veios_lava(orig, im, cara, ["7A22D8", "A040FF", "E0A0FF"])
+	fora = im.copy()
+	corte = cara[1] + 16
+	fora.paste(com.crop((0, 0, im.width, corte)), (0, 0))
+	return fora
+
+
 def vestir_shadowblade(orig: Image.Image, im: Image.Image, cara, lam, indice: int) -> Image.Image:
 	im = cabelo_prata(orig, im, cara)
-	im = P.veios_lava(orig, im, cara, ["7A22D8", "A040FF", "E0A0FF"])
-	im = P.orla_ouro(orig, im, cara, "7A5A1C", "4A3410")
+	im = _veios_tronco(orig, im, cara)
 	im = P.peitoral(orig, im, cara, NOITE, "C8A040", ROXO_NEON)
 	im = P.olhos(im, cara, "E070FF", orig)
 	im = T.trocar_arma(im, lam, "lamina_sombra", ARMA_CORES, K)

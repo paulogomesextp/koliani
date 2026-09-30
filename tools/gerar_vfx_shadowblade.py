@@ -61,6 +61,7 @@ def anel() -> None:
 		d = ImageDraw.Draw(im)
 		rx, ry = 8 + 22 * t, 3 + 9 * t
 		a = int(255 * (1 - t) ** 0.8)
+		d.ellipse([32 - rx, 16 - ry, 32 + rx, 16 + ry], fill=(90, 20, 170, int(70 * (1 - t))))
 		for k, (dw, col) in enumerate(((3, (110, 30, 200)), (2, (176, 64, 255)), (1, (240, 200, 255)))):
 			d.ellipse([32 - rx - (2 - k), 16 - ry - (2 - k) * 0.5, 32 + rx + (2 - k), 16 + ry + (2 - k) * 0.5],
 					  outline=col + (a,), width=dw)
