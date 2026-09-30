@@ -27,19 +27,6 @@ var _chefe_barra: ProgressBar
 var _chefe_fim := false
 var _chefe_tween: Tween
 
-## Disco da arma atual (canto inferior-esquerdo, sobre as barras).
-var _arma_disco: Panel
-var _arma_label: Label
-
-## Botões WEAPONS / ARMOR por cima da barra de vida + o ecrã que abrem.
-const CENA_SELETOR_EQUIP := preload("res://scenes/ui/SeletorEquip.tscn")
-var _btn_armas: Button
-var _btn_armaduras: Button
-var _seletor_equip: SeletorEquip
-## Selo "UPGRADE AVAILABLE" por cima do botão WEAPONS / ARMOR quando há no
-## inventário algo melhor do que o que está equipado.
-var _selo_arma: Label
-var _selo_armadura: Label
 
 ## Legenda dos controlos, no topo do ecrã (só sem ecrã táctil -- em táctil
 ## os botões de toque já bastam). Cada linha: [chave i18n, ação no InputMap].
@@ -88,20 +75,6 @@ func _ready() -> void:
 		chefe.derrotado.connect(_ao_chefe_derrotado)
 		chefe.tree_exited.connect(_ao_chefe_derrotado)
 
-	_montar_disco_arma()
-	_montar_botoes_equip()
-	_montar_selos_upgrade()
-	EstadoJogo.equipamento_mudou.connect(func(_t: String, _i: String) -> void:
-		_atualizar_disco_arma()
-		_atualizar_selos_upgrade())
-	EstadoJogo.equipamento_ganho.connect(_ao_equipamento_ganho)
-	Textos.idioma_mudou.connect(func(_l: String) -> void:
-		_traduzir_equip()
-		_atualizar_selos_upgrade())
-	_atualizar_disco_arma()
-	_traduzir_equip()
-	_atualizar_selos_upgrade()
-
 	_montar_contador_essencia()
 	EstadoJogo.essencia_mudou.connect(_atualizar_essencia)
 	_atualizar_essencia(EstadoJogo.essencia)
@@ -134,214 +107,6 @@ func _vestir_barras() -> void:
 		ic.position = Vector2(0, 3)
 		_label_vidas.get_parent().add_child(ic)
 		_label_vidas.position.x = 28
-
-
-## Dois botões pequenos (WEAPONS / ARMOR) por cima da barra de vida.
-func _montar_botoes_equip() -> void:
-	_btn_armas = _fazer_botao_equip("arma")
-	_btn_armaduras = _fazer_botao_equip("armadura")
-	add_child(_btn_armas)
-	add_child(_btn_armaduras)
-
-
-func _fazer_botao_equip(tipo: String) -> Button:
-	var b := Button.new()
-	b.name = "Btn_" + tipo
-	b.focus_mode = Control.FOCUS_NONE
-	b.anchor_left = 0.0
-	b.anchor_right = 0.0
-	b.anchor_top = 1.0
-	b.anchor_bottom = 1.0
-	b.offset_left = 92.0 if tipo == "arma" else 192.0
-	b.offset_right = b.offset_left + 96.0
-	b.offset_top = -116.0
-	b.offset_bottom = -92.0
-	b.add_theme_font_size_override("font_size", 11)
-	# Execution 9H: caixa lisa da paleta nova. Um botão de 24 px de altura
-	# não cabe em nenhuma nine-patch da prancha (as molduras têm 10-30 px de
-	# margem de cada lado); o que se lê aqui é a cor, não a moldura.
-	b.add_theme_color_override("font_color", Frontend9H.TEXTO)
-	b.add_theme_color_override("font_hover_color", Frontend9H.OSSO)
-	b.add_theme_color_override("font_pressed_color", Frontend9H.CARMESIM_CLARO)
-	b.add_theme_color_override("font_outline_color", Frontend9H.CONTORNO)
-	b.add_theme_constant_override("outline_size", 4)
-	for estado in ["normal", "hover", "pressed", "hover_pressed"]:
-		var sb := StyleBoxFlat.new()
-		var forte: bool = estado != "normal"
-		sb.bg_color = Color(0.12, 0.045, 0.07, 0.92 if forte else 0.74)
-		sb.border_color = Color(Frontend9H.CARMESIM.r, Frontend9H.CARMESIM.g,
-			Frontend9H.CARMESIM.b, 0.95 if forte else 0.40)
-		sb.set_border_width_all(1)
-		sb.border_width_top = 2
-		sb.set_corner_radius_all(2)
-		sb.content_margin_left = 8
-		sb.content_margin_right = 8
-		sb.content_margin_top = 2
-		sb.content_margin_bottom = 2
-		b.add_theme_stylebox_override(estado, sb)
-	b.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
-	b.pressed.connect(_abrir_equip.bind(tipo))
-	return b
-
-
-## --- selo "UPGRADE AVAILABLE" -------------------------------------
-
-func _montar_selos_upgrade() -> void:
-	_selo_arma = _fazer_selo(92.0)
-	_selo_armadura = _fazer_selo(192.0)
-	add_child(_selo_arma)
-	add_child(_selo_armadura)
-
-
-func _fazer_selo(x: float) -> Label:
-	var l := Label.new()
-	l.anchor_top = 1.0
-	l.anchor_bottom = 1.0
-	l.offset_left = x - 2.0
-	l.offset_right = x + 94.0
-	l.offset_top = -140.0
-	l.offset_bottom = -120.0
-	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	l.add_theme_font_size_override("font_size", 9)
-	l.add_theme_color_override("font_color", UIProducao.OURO_CLARO)
-	l.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
-	# 9F: a moldura de ouro do botão selecionado, em ponto pequeno
-	l.add_theme_stylebox_override("normal", UIProducao.caixa("botao_selecionado",
-		Vector4(8, 1, 8, 1), Color.WHITE, [10, 7, 10, 7]))
-	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	l.visible = false
-	return l
-
-
-## Há no inventário uma arma/armadura melhor (índice mais alto na lista de
-## poder) do que a equipada?
-func _ha_upgrade(tipo: String) -> bool:
-	if tipo == "arma":
-		var eq := Equipamento.indice_arma(EstadoJogo.arma_equipada)
-		for id in EstadoJogo.armas:
-			if Equipamento.indice_arma(id) > eq:
-				return true
-	else:
-		var eq := Equipamento.indice_armadura(EstadoJogo.armadura_equipada)
-		for id in EstadoJogo.armaduras:
-			if Equipamento.indice_armadura(id) > eq:
-				return true
-	return false
-
-
-func _atualizar_selos_upgrade() -> void:
-	for par in [[_selo_arma, "arma"], [_selo_armadura, "armadura"]]:
-		var l: Label = par[0]
-		if l == null:
-			continue
-		l.text = Textos.t("hud.upgrade_available")
-		var mostra := _ha_upgrade(par[1])
-		if mostra and not l.visible:
-			l.visible = true
-			l.modulate.a = 0.0
-			var t := l.create_tween().set_loops()
-			t.tween_property(l, "modulate:a", 1.0, 0.5)
-			t.tween_property(l, "modulate:a", 0.55, 0.5)
-			l.set_meta("tw", t)
-		elif not mostra and l.visible:
-			l.visible = false
-			var tw = l.get_meta("tw", null)
-			if tw and is_instance_valid(tw):
-				tw.kill()
-
-
-func _traduzir_equip() -> void:
-	if _btn_armas:
-		_btn_armas.text = Textos.t("gear.menu.weapons")
-	if _btn_armaduras:
-		_btn_armaduras.text = Textos.t("gear.menu.armor")
-	_atualizar_disco_arma()
-
-
-func _abrir_equip(tipo: String) -> void:
-	if _seletor_equip and is_instance_valid(_seletor_equip):
-		return
-	_seletor_equip = CENA_SELETOR_EQUIP.instantiate()
-	add_child(_seletor_equip)
-	_seletor_equip.configurar(tipo)
-	_seletor_equip.fechado.connect(_fechar_equip)
-	get_tree().paused = true
-
-
-func _fechar_equip() -> void:
-	if _seletor_equip and is_instance_valid(_seletor_equip):
-		_seletor_equip.queue_free()
-	_seletor_equip = null
-	get_tree().paused = false
-
-
-# --- disco da arma atual + troca ------------------------------------
-
-func _montar_disco_arma() -> void:
-	_arma_disco = Panel.new()
-	_arma_disco.custom_minimum_size = Vector2(64, 64)
-	_arma_disco.size = Vector2(64, 64)
-	_arma_disco.anchor_top = 1.0
-	_arma_disco.anchor_bottom = 1.0
-	_arma_disco.offset_left = 20.0
-	_arma_disco.offset_right = 84.0
-	_arma_disco.offset_top = -84.0
-	_arma_disco.offset_bottom = -20.0
-	# 9F: ranhura de ouro da prancha 09 (a moldura ornamentada em ponto
-	# pequeno); a cor da arma entra por tinta, como antes pela borda
-	_arma_disco.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
-	var moldura_rb := CosmeticosVisuais.caixa_hud("disco", Vector4(0, 0, 0, 0), [22, 22, 22, 22])
-	if moldura_rb:
-		# Rootbound Frame (Loja): pixel-art, por isso sem o filtro LINEAR do kit
-		_arma_disco.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-		_arma_disco.add_theme_stylebox_override("panel", moldura_rb)
-	else:
-		_arma_disco.add_theme_stylebox_override("panel", UIProducao.caixa("moldura_ornamentada",
-			Vector4(0, 0, 0, 0), Color.WHITE, [22, 22, 22, 22]))
-	_arma_disco.self_modulate = CosmeticosVisuais.tinta_moldura_hud()
-	add_child(_arma_disco)
-
-	_arma_label = Label.new()
-	_arma_label.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_arma_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_arma_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	_arma_label.autowrap_mode = TextServer.AUTOWRAP_OFF
-	_arma_label.add_theme_font_size_override("font_size", 22)
-	_arma_label.add_theme_color_override("font_color", Color(1, 0.9, 0.98))
-	_arma_disco.add_child(_arma_label)
-	# o disco só mostra a arma equipada -- trocar de arma faz-se no menu WEAPONS
-
-
-func _atualizar_disco_arma() -> void:
-	if _arma_disco == null:
-		return
-	# sem arma -> disco discreto (punhos)
-	if EstadoJogo.arma_equipada == "":
-		_arma_label.text = "✊"
-		_arma_disco.modulate.a = 0.6
-		return
-	_arma_disco.modulate.a = 1.0
-	var wi := Equipamento.indice_arma(EstadoJogo.arma_equipada)
-	var sb := _arma_disco.get_theme_stylebox("panel") as StyleBoxTexture
-	if sb and wi >= 0 and not CosmeticosVisuais.moldura_arte_equipada():
-		sb.modulate_color = Color.WHITE.lerp(Equipamento.cor_arma(wi), 0.35)
-	var nome := Textos.t(Equipamento.arma(EstadoJogo.arma_equipada).get("nome", ""))
-	# iniciais da arma (placeholder até haver ícone pixel)
-	var ini := ""
-	for palavra in nome.split(" ", false):
-		if palavra.length() > 0 and palavra[0].to_upper() != palavra[0].to_lower():
-			ini += palavra[0].to_upper()
-		if ini.length() >= 2:
-			break
-	_arma_label.text = ini if ini != "" else nome.substr(0, 2)
-
-
-func _ao_equipamento_ganho(tipo: String, id: String) -> void:
-	var item: Dictionary = Equipamento.arma(id) if tipo == "arma" else Equipamento.armadura(id)
-	var nome := Textos.t(item.get("nome", id))
-	_aviso(Textos.tf("hud.gear_weapon" if tipo == "arma" else "hud.gear_armor", [nome]))
-	_atualizar_selos_upgrade()
 
 
 # --- barra de vida do chefe ------------------------------------------
@@ -981,8 +746,7 @@ func _arrumar_para_toque() -> void:
 	if _desviado or _toque == null or not _toque.visible:
 		return
 	_desviado = true
-	for n in [$Vida, $Energia, $Vidas, _arma_disco, _btn_armas, _btn_armaduras,
-			_selo_arma, _selo_armadura]:
+	for n in [$Vida, $Energia, $Vidas]:
 		if n is Control:
 			n.offset_top -= DESVIO_TOQUE
 			n.offset_bottom -= DESVIO_TOQUE

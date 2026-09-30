@@ -102,8 +102,7 @@ func _correr_tudo() -> void:
 	await teste_dev_barra_salto_nao_abre_seletor()
 	await teste_dev_mode_sem_pin()
 	await teste_9h17_novo_jogo_desarma_ao_sair()
-	teste_equipamento_dados()
-	teste_equipamento_estado()
+	teste_sem_equipamento_nem_santuario()
 	teste_estado_tres_mortes_sem_vidas()
 	teste_estado_vida_por_nivel()
 	teste_estado_reiniciar_run()
@@ -223,6 +222,7 @@ func _correr_tudo() -> void:
 	teste_loja_i18n()
 	teste_loja_cosmeticos_visuais()
 	teste_skins_arte_real()
+	teste_shadowblade_paridade()
 	teste_loja_colecao_regiao_i()
 	teste_rootbound_frame()
 	teste_loja_arte_molduras_rastos()
@@ -862,98 +862,34 @@ func teste_catalogo_campanha() -> void:
 		_ok(en.has(k), "en.json sem a chave do carrossel '%s'" % k)
 
 
-## Equipamento: 20 armas (uma por cada 5 níveis) + 10 armaduras (uma por
-## cada 10); as curvas sobem sempre; `recompensas_do_nivel` mapeia o índice
-## do nível para o item certo -- e dá DOIS nos múltiplos de 10; e o en.json
-## tem os nomes todos.
-func teste_equipamento_dados() -> void:
-	_ok(Equipamento.ARMAS.size() == 20, "deviam ser 20 armas")
-	_ok(Equipamento.ARMADURAS.size() == 10, "deviam ser 10 armaduras")
-	for i in Equipamento.ARMAS.size():
-		_ok(int(Equipamento.ARMAS[i]["nivel"]) == Equipamento.NIVEIS_POR_ARMA * (i + 1),
-			"a arma %d devia desbloquear no nível %d" % [i, Equipamento.NIVEIS_POR_ARMA * (i + 1)])
-		if i > 0:
-			_ok(int(Equipamento.ARMAS[i]["dano"]) >= int(Equipamento.ARMAS[i - 1]["dano"]),
-				"o dano das armas devia ser não-decrescente")
-	for i in Equipamento.ARMADURAS.size():
-		_ok(int(Equipamento.ARMADURAS[i]["nivel"]) == Equipamento.NIVEIS_POR_ARMADURA * (i + 1),
-			"a armadura %d devia desbloquear no nível %d" % [i, Equipamento.NIVEIS_POR_ARMADURA * (i + 1)])
-		# a célula da tira tem de existir (a tira tem 15 frames)
-		var cel := int(Equipamento.ARMADURAS[i]["celula"])
-		_ok(cel >= 0 and cel < 15, "a armadura %d aponta para a célula %d, fora da tira" % [i, cel])
-		if i > 0:
-			_ok(int(Equipamento.ARMADURAS[i]["vida_bonus"]) >= int(Equipamento.ARMADURAS[i - 1]["vida_bonus"]),
-				"o vida_bonus das armaduras devia ser não-decrescente")
-			_ok(float(Equipamento.ARMADURAS[i]["reducao"]) >= float(Equipamento.ARMADURAS[i - 1]["reducao"]),
-				"a redução das armaduras devia ser não-decrescente")
-	# o último de cada tipo cai no nível 100: a campanha inteira está coberta
-	_ok(int(Equipamento.ARMAS[19]["nivel"]) == 100, "a última arma é do nível 100")
-	_ok(int(Equipamento.ARMADURAS[9]["nivel"]) == 100, "a última armadura é do nível 100")
-
-	_ok(Equipamento.recompensas_do_nivel(0).is_empty(), "o nível 1 não dá equipamento")
-	_ok(Equipamento.recompensas_do_nivel(3).is_empty(), "o nível 4 não dá equipamento")
-	var r4 := Equipamento.recompensas_do_nivel(4)      # nível 5
-	_ok(r4.size() == 1 and r4[0]["tipo"] == "arma" and r4[0]["id"] == Equipamento.ARMAS[0]["id"],
-		"acabar o nível 5 dá só a 1.ª arma")
-	var r9 := Equipamento.recompensas_do_nivel(9)      # nível 10
-	_ok(r9.size() == 2, "acabar o nível 10 dá DOIS prémios (arma + armadura)")
-	if r9.size() == 2:
-		_ok(r9[0]["id"] == Equipamento.ARMAS[1]["id"], "o nível 10 dá a 2.ª arma")
-		_ok(r9[1]["id"] == Equipamento.ARMADURAS[0]["id"], "o nível 10 dá a 1.ª armadura")
-	var r99 := Equipamento.recompensas_do_nivel(99)    # nível 100
-	_ok(r99.size() == 2 and r99[0]["id"] == Equipamento.ARMAS[19]["id"]
-		and r99[1]["id"] == Equipamento.ARMADURAS[9]["id"],
-		"acabar o nível 100 dá a última arma e a última armadura")
-	_ok(Equipamento.recompensas_do_nivel(200).is_empty(), "índice fora de alcance não dá nada")
-
-	var f := FileAccess.open("res://assets/i18n/en.json", FileAccess.READ)
-	if f == null:
-		_ok(false, "en.json devia existir")
-		return
-	var en: Variant = JSON.parse_string(f.get_as_text())
-	f.close()
-	for a in Equipamento.ARMAS:
-		_ok(en.has(a["nome"]), "en.json sem o nome da arma '%s'" % a["nome"])
-	for a in Equipamento.ARMADURAS:
-		_ok(en.has(a["nome"]), "en.json sem o nome da armadura '%s'" % a["nome"])
-	for k in ["gear.menu.weapons", "gear.menu.armor", "gear.locked", "gear.equip", "gear.equipped"]:
-		_ok(en.has(k), "en.json sem a chave de menu '%s'" % k)
-
-
-## EstadoJogo: acabar um nível concede o equipamento e equipa-o; os helpers
-## de stat refletem o equipado; `reiniciar_campanha` limpa; o save
-## sobrevive ao ida-e-volta.
-func teste_equipamento_estado() -> void:
+## Armas, armaduras e Santuário saíram do jogo: os ficheiros já não existem,
+## o save já não os escreve, mas um save antigo que ainda traga essas chaves
+## continua a validar e a carregar (as chaves são ignoradas).
+func teste_sem_equipamento_nem_santuario() -> void:
+	for caminho: String in ["res://scripts/equipamento.gd", "res://scripts/melhorias.gd",
+			"res://scripts/santuario.gd", "res://scripts/seletor_equip.gd",
+			"res://scenes/ui/Santuario.tscn", "res://scenes/ui/SeletorEquip.tscn"]:
+		_ok(not FileAccess.file_exists(caminho), "%s devia ter sido removido" % caminho)
 	var e := _novo_estado()
-	_ok(e.armas.is_empty() and e.armaduras.is_empty(), "arranque limpo: sem equipamento")
-	_ok(e.dano_ataque() == e.DANO_BASE, "sem arma -> dano base")
-	_ok(e.vida_bonus_armadura() == 0 and is_equal_approx(e.reducao_armadura(), 0.0),
-		"sem armadura -> sem bónus")
-
-	e.marcar_nivel_concluido(0)  # nível 1 -> nada (a cadência é de 5 em 5)
-	_ok(e.armas.is_empty() and e.armaduras.is_empty(),
-		"acabar o nível 1 já não dá equipamento")
-
-	e.marcar_nivel_concluido(4)  # nível 5 -> 1.ª arma, equipada
-	_ok(e.armas.size() == 1, "acabar o nível 5 dá 1 arma")
-	_ok(e.arma_equipada == Equipamento.ARMAS[0]["id"], "a arma nova é equipada logo")
-	_ok(e.dano_ataque() == int(Equipamento.ARMAS[0]["dano"]), "dano_ataque segue a arma equipada")
-
-	e.marcar_nivel_concluido(9)  # nível 10 -> 2.ª arma E 1.ª armadura
-	_ok(e.armas.size() == 2, "acabar o nível 10 dá também a arma seguinte")
-	_ok(e.armaduras.size() == 1, "acabar o nível 10 dá a 1.ª armadura")
-	_ok(e.armadura_equipada == Equipamento.ARMADURAS[0]["id"], "armadura nova equipada")
-
-	e.marcar_nivel_concluido(4)  # repetir não duplica
-	_ok(e.armas.size() == 2, "reconcluir o nível não duplica o prémio")
-
+	_ok(e.dano_ataque() == e.DANO_BASE, "dano_ataque é sempre o base")
+	e.marcar_nivel_concluido(4)
+	e.marcar_nivel_concluido(9)
+	var d: Dictionary = e.para_dicionario()
+	for chave: String in ["armas", "armaduras", "arma_equipada", "armadura_equipada", "melhorias"]:
+		_ok(not d.has(chave), "o save atual já não devia escrever '%s'" % chave)
+	# save antigo: as chaves velhas continuam a ser aceites e ignoradas
+	var antigo: Dictionary = d.duplicate(true)
+	antigo["armas"] = ["lamina_gasta"]
+	antigo["armaduras"] = ["trapos_de_viajante"]
+	antigo["arma_equipada"] = "lamina_gasta"
+	antigo["armadura_equipada"] = "trapos_de_viajante"
+	antigo["melhorias"] = {"furia": 2}
+	_ok(SaveFoundation.validar_atual(antigo, e.NIVEIS.size()).get("ok", false),
+		"save com chaves de equipamento/melhorias devia continuar a validar")
 	var copia := _novo_estado()
-	copia.de_dicionario(e.para_dicionario())
-	_ok(copia.armas == e.armas and copia.armaduras == e.armaduras, "equipamento sobrevive ao save")
-	_ok(copia.arma_equipada == e.arma_equipada, "arma equipada sobrevive ao save")
-
-	e.reiniciar_campanha()
-	_ok(e.armas.is_empty() and e.arma_equipada == "", "reiniciar_campanha limpa o equipamento")
+	copia.de_dicionario(antigo)
+	_ok(copia.concluidos == e.concluidos and copia.dano_ataque() == e.DANO_BASE,
+		"save antigo carrega sem afetar progresso nem dano")
 	e.free()
 	copia.free()
 
@@ -2023,10 +1959,7 @@ func teste_save_roundtrip_campos() -> void:
 	original.pistas.assign(["castelo_aurora_livre"])
 	for indice in [0, 1, 2]:
 		original.marcar_nivel_concluido(indice)
-	original.armas.assign(["shadowblade"])
-	original.arma_equipada = "shadowblade"
 	original.essencia = 29
-	original.melhorias = {"furia": 2}
 	_ok(original.guardar_em(base, base + ".bak", base + ".tmp"),
 		"roundtrip devia gravar estado valido")
 	var copia := _novo_estado()
@@ -2036,11 +1969,8 @@ func teste_save_roundtrip_campos() -> void:
 		and copia.habilidades == original.habilidades
 		and copia.pistas == original.pistas
 		and copia.concluidos == original.concluidos
-		and copia.armas == original.armas
-		and copia.arma_equipada == original.arma_equipada
-		and copia.essencia == original.essencia
-		and copia.melhorias == original.melhorias,
-		"roundtrip devia preservar campanha/equipment/economy/abilities")
+		and copia.essencia == original.essencia,
+		"roundtrip devia preservar campanha/economy/abilities")
 	original.free()
 	copia.free()
 	_limpar_save_teste(base)
@@ -2227,14 +2157,14 @@ func _save_v2_do_estado(e: Node) -> Dictionary:
 		"habilidades": e.habilidades.duplicate(),
 		"pistas": e.pistas.duplicate(),
 		"concluidos": e.concluidos.duplicate(),
-		"armas": e.armas.duplicate(),
-		"armaduras": e.armaduras.duplicate(),
-		"arma_equipada": e.arma_equipada,
-		"armadura_equipada": e.armadura_equipada,
+		"armas": [],
+		"armaduras": [],
+		"arma_equipada": "",
+		"armadura_equipada": "",
 		"hardcore": false,
 		"hardcore_tempo_restante": -1.0,
 		"essencia": e.essencia,
-		"melhorias": e.melhorias.duplicate(),
+		"melhorias": {},
 	}
 
 
@@ -4048,15 +3978,13 @@ func teste_r3_nomes_canonicos() -> void:
 ## disso e' o guardiao de sinos da prancha aprovada.
 ##
 ## As CHAVES continuam a chamar-se `...escama...` e `...presa...` de
-## proposito: mudar a chave partia o `equipamento.gd` (que guarda o `id`
-## separado) e os saves. O que conta e' o que se le' no ecra.
+## proposito: mudar a chave partia os saves. O que conta e' o que se le' no ecra.
 func teste_r3_vyrak_sem_lore_de_dragao() -> void:
 	var proibidas := ["dragon", "dragão", "dragao", "dragón", "drache",
 		"scale", "escama", "écaille", "schuppe", "fang", "presa", "croc",
 		"reißzahn", "巨龙", "龙", "鳞"]
 	var chaves := ["boss.vyrak", "clue.pico_escama_de_vyrak.title",
-		"clue.pico_escama_de_vyrak.body", "gear.w.presa_de_vyrak",
-		"gear.a.escamas_de_vyrak"]
+		"clue.pico_escama_de_vyrak.body"]
 	for lang: String in ["en", "pt", "es", "fr", "de", "zh"]:
 		var d: Dictionary = _json_de("res://assets/i18n/%s.json" % lang)
 		for chave: String in chaves:
@@ -5013,14 +4941,12 @@ func teste_loja_progressao_regional_e_gameplay() -> void:
 	var e2 := _novo_estado()
 	e2.dev_dar_veracoins(5000)
 	e2.ganhar_kolicoins(5000)
-	var chaves := ["vidas", "essencia", "melhorias", "habilidades", "armas", "armaduras",
-		"arma_equipada", "armadura_equipada", "indice_nivel", "concluidos"]
+	var chaves := ["vidas", "essencia", "habilidades", "indice_nivel", "concluidos"]
 	var antes_g := {}
 	for k in chaves:
 		var v: Variant = e2.get(k)
 		antes_g[k] = v.duplicate() if (v is Array or v is Dictionary) else v
 	var dano_antes: int = e2.dano_ataque()
-	var vida_antes: Variant = e2.vida_bonus_armadura()
 	for it: Dictionary in LojaCatalogo.todos():
 		var moedas := LojaCatalogo.moedas_aceites(it)
 		if not moedas.is_empty() and int(it["regiao"]) < 0:
@@ -5030,7 +4956,7 @@ func teste_loja_progressao_regional_e_gameplay() -> void:
 		var v: Variant = e2.get(k)
 		var agora: Variant = v.duplicate() if (v is Array or v is Dictionary) else v
 		_ok(agora == antes_g[k], "loja: comprar/equipar mexeu em gameplay (%s)" % k)
-	_ok(e2.dano_ataque() == dano_antes and e2.vida_bonus_armadura() == vida_antes, "loja: comprar/equipar mudou dano/vida")
+	_ok(e2.dano_ataque() == dano_antes, "loja: comprar/equipar mudou o dano")
 	e.free()
 	e2.free()
 
@@ -5160,6 +5086,71 @@ func teste_skins_arte_real() -> void:
 	_ok(c2 != null and c2.sprite_frames.get_frame_texture("idle", 0).resource_path.begins_with(GOLD),
 		"skins: sem skin equipada volta ao Golden Set")
 	k2.free()
+
+
+## Shadowblade = pura pele: as animacoes da Koliani com a skin equipada sao
+## IDENTICAS as do Golden Set (nomes, n.o de frames, fps, loop, escala,
+## offset, tamanho de frame), incl. o `run` (= run_final, 10 frames).
+func teste_shadowblade_paridade() -> void:
+	const CV := preload("res://scripts/cosmeticos_visuais.gd")
+	const ID := "skin_shadowblade"
+	_ok(CV.DIR_SKIN.has(ID) and not (ID in CV.SKIN_SO_PALETA), "shadowblade: registada como premium")
+	_ok(not LojaCatalogo.item(ID).is_empty() and LojaCatalogo.item(ID)["categoria"] == "skins"
+		and LojaCatalogo.item(ID)["raridade"] == "lendario", "shadowblade: no catalogo (lendaria)")
+	_ok(Textos.t("shop.item.skin_shadowblade.name") != "shop.item.skin_shadowblade.name", "shadowblade: nome i18n")
+	var comprados_antes: Array = EstadoJogo.itens_comprados.duplicate()
+	var equipados_antes: Dictionary = EstadoJogo.cosmeticos_equipados.duplicate()
+	var ref: Koliani = preload("res://scenes/actors/Koliani.tscn").instantiate()
+	ref.usar_golden_set = true
+	add_child(ref)
+	EstadoJogo.itens_comprados.append(ID)
+	EstadoJogo.cosmeticos_equipados["skins"] = ID
+	var sk: Koliani = preload("res://scenes/actors/Koliani.tscn").instantiate()
+	sk.usar_golden_set = true
+	add_child(sk)
+	var cr := ref.get_node("Sprite/Corpo") as AnimatedSprite2D
+	var cs := sk.get_node("Sprite/Corpo") as AnimatedSprite2D
+	var a := cr.sprite_frames
+	var b := cs.sprite_frames
+	var nomes_a := Array(a.get_animation_names())
+	nomes_a.sort()
+	var nomes_b := Array(b.get_animation_names())
+	nomes_b.sort()
+	_ok(nomes_a == nomes_b, "shadowblade: mesmas animacoes")
+	var difere := 0
+	for n: String in a.get_animation_names():
+		if a.get_frame_count(n) != b.get_frame_count(n) or a.get_animation_speed(n) != b.get_animation_speed(n) \
+				or a.get_animation_loop(n) != b.get_animation_loop(n):
+			difere += 1
+			continue
+		for i in a.get_frame_count(n):
+			var ta := a.get_frame_texture(n, i)
+			var tb := b.get_frame_texture(n, i)
+			if ta.get_size() != tb.get_size() or a.get_frame_duration(n, i) != b.get_frame_duration(n, i):
+				difere += 1
+				break
+	_ok(difere == 0, "shadowblade: %d animacoes com n.o frames/fps/loop/tamanho/duracao diferentes" % difere)
+	_ok(b.get_frame_count("run") == 10 and b.get_animation_loop("run"), "shadowblade: run = run_final (10 frames, loop)")
+	for i in 10:
+		_ok(b.get_frame_texture("run", i).resource_path == CV.DIR_SKIN[ID] + "/frames/run_final/run_%03d.png" % (i + 1),
+			"shadowblade: run frame %d nao e' o run_final da skin (ordem)" % i)
+	_ok(cr.offset == cs.offset and cr.scale == cs.scale and ref.scale == sk.scale, "shadowblade: offset/escala iguais")
+	_ok(ref.get_node("CollisionShape2D") != null and (ref.get_node("CollisionShape2D") as CollisionShape2D).shape.get_rect()
+		== (sk.get_node("CollisionShape2D") as CollisionShape2D).shape.get_rect(), "shadowblade: hitbox igual")
+	# VFX proprio: slots da skin existem; sem skin, nao ha' VFX de skin
+	_ok(VfxSkin.pasta(ID) != "" and VfxSkin.frames_golpe() != null and VfxSkin.frames_golpe().get_frame_count("slash") == 6,
+		"shadowblade: arco do golpe (6 frames)")
+	for slot: String in VfxSkin.SLOTS:
+		_ok(VfxSkin.frames(slot, int(VfxSkin.SLOTS[slot]["n"])) != null, "shadowblade: VFX %s" % slot)
+	sk.free()
+	EstadoJogo.itens_comprados.assign(comprados_antes)
+	EstadoJogo.cosmeticos_equipados = equipados_antes
+	_ok(VfxSkin.pasta() == "" and VfxSkin.frames_golpe() == null, "shadowblade: sem skin nao ha' VFX de skin (fallback)")
+	# skin invalida/inexistente: cai no default
+	EstadoJogo.cosmeticos_equipados["skins"] = "skin_que_nao_existe"
+	_ok(CV.dir_skin() == "", "shadowblade: skin invalida cai no default")
+	EstadoJogo.cosmeticos_equipados = equipados_antes
+	ref.free()
 
 
 func teste_loja_cosmeticos_visuais() -> void:
@@ -5343,12 +5334,11 @@ func teste_loja_colecao_regiao_i() -> void:
 	for i in 5:
 		g.marcar_nivel_concluido(i)
 	var dano: int = g.dano_ataque()
-	var bonus: Variant = g.vida_bonus_armadura()
 	var vidas: int = g.vidas
 	g.comprar_item(PACK, "k")
 	for id: String in IDS:
 		g.equipar_item(id)
-	_ok(g.dano_ataque() == dano and g.vida_bonus_armadura() == bonus and g.vidas == vidas, "colecao: pack mexeu em stats")
+	_ok(g.dano_ataque() == dano and g.vidas == vidas, "colecao: pack mexeu em stats")
 	for x in [e, a, b, c2, g]:
 		x.free()
 
@@ -5493,13 +5483,12 @@ func teste_rootbound_frame() -> void:
 	for i in 5:
 		e.marcar_nivel_concluido(i)
 	var dano: int = e.dano_ataque()
-	var bonus: Variant = e.vida_bonus_armadura()
 	var vidas: int = e.vidas
 	_ok(e.comprar_item(RB, "k")["ok"] and e.equipar_item(RB) and e.item_equipado(RB), "rootbound: comprar e equipar")
 	var f := _novo_estado()
 	f.de_dicionario(JSON.parse_string(JSON.stringify(e.para_dicionario())))
 	_ok(f.item_equipado(RB), "rootbound: save/load manteve o equipamento")
-	_ok(e.dano_ataque() == dano and e.vida_bonus_armadura() == bonus and e.vidas == vidas, "rootbound: mexeu em stats")
+	_ok(e.dano_ataque() == dano and e.vidas == vidas, "rootbound: mexeu em stats")
 	e.desequipar_categoria("hud_checkpoint")
 	_ok(e.equipado_na_categoria("hud_checkpoint") == "" and not e.item_equipado(RB), "rootbound: desequipar restaura o default")
 	e.free()

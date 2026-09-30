@@ -41,16 +41,11 @@ func _initialize() -> void:
 	var abs_dir := ProjectSettings.globalize_path(DIR)
 	DirAccess.make_dir_recursive_absolute(abs_dir)
 	DirAccess.make_dir_recursive_absolute(abs_dir + "/bosses")
-	DirAccess.make_dir_recursive_absolute(abs_dir + "/gear")
 	DirAccess.make_dir_recursive_absolute(abs_dir + "/koliani")
 	_koliani()
 	_koliani_anim()   # tiras de animacao (idle/run/jump/attack/crouch/wallslide/djump)
 	_ghorak()
 	_demonio()
-	# a tira de armas vem agora do pack CC0 `thewisehedgehog` via
-	# `tools/extrair_armas.gd` (nao regenerar aqui). `_armas()` fica como
-	# fallback procedural.
-	_armaduras()  # tira de 15 armaduras (icones do menu)
 	# chefes da regiao I em pixel-art animado (tiras horizontais de 4 frames:
 	# 0 idle A, 1 idle B, 2 telegrafo/ataque, 3 exposto). A tematica vem do
 	# nome do nivel -- ver docs/niveis.md.
@@ -93,137 +88,6 @@ func _initialize() -> void:
 	_boss_zeriko()   # nivel 30 -- final
 	print("OK -- sprites pixel-art em ", DIR)
 	quit(0)
-
-
-## --- armas & armaduras (tiras de 15 frames de 18x26) ----------------
-## Cor por TIER: rampa de 3 paragens aço-frio -> violeta -> magenta,
-## conforme o índice do item (0..14). `koliani.gd` usa o `frame` = índice.
-
-## Rampa de 3 paragens: a=frio, b=meio, c=quente. `i` em 0..14.
-func _tier(i: int, a: Color, b: Color, c: Color) -> Color:
-	var t := clampf(float(i) / 14.0, 0.0, 1.0)
-	return a.lerp(b, t * 2.0) if t < 0.5 else b.lerp(c, (t - 0.5) * 2.0)
-
-
-## Cada arma = cabo + guarda + cabeça conforme o "tipo", com lâmina
-## sombreada (base + realce numa aresta + faísca na ponta). A Koliani
-## segura isto na mão (ver Koliani.tscn / koliani.gd).
-func _armas() -> void:
-	# tipo: 0 espada 1 foice 2 garra 3 lança/espeto 4 martelo 5 ceptro/orbe
-	var tipos := [0, 1, 2, 3, 4, 0, 4, 3, 1, 2, 5, 0, 0, 3, 5]
-	var fw := 18
-	var fh := 26
-	_novo(fw * tipos.size(), fh)
-	for i in tipos.size():
-		_ox = i * fw
-		var tipo: int = tipos[i]
-		var lam := _tier(i, Color("9aa6bf"), Color("8f63d6"), Color("ff5bf0"))
-		var lam_hi := lam.lerp(Color("ffffff"), 0.5)
-		var lam_lo := lam.darkened(0.4)
-		var faisca := lam.lerp(Color("ffffff"), 0.85)
-		var cabo := Color("241d2c")
-		var wrap := Color("4a3d63").lerp(lam_lo, clampf(float(i) / 14.0, 0.0, 0.5))
-		var metal := Color("b9c0d0").lerp(lam, clampf(float(i) / 14.0 - 0.4, 0.0, 0.5))
-
-		# cabo + pommel + grip wrap (comum)
-		_linha(4, 23, 9, 14, 3, cabo)
-		_rect(3, 23, 3, 3, metal)                 # pommel
-		for k in 3:
-			_px(6 + k, 20 - k, wrap)              # espiral do punho
-
-		match tipo:
-			0:  # espada
-				_rect(6, 13, 7, 2, metal)         # guarda
-				_linha(9, 13, 16, 2, 4, lam_lo)   # corpo da lâmina
-				_linha(9, 13, 16, 2, 2, lam)
-				_linha(10, 12, 16, 3, 1, lam_hi)  # fio iluminado
-				_px(16, 2, faisca); _px(15, 3, faisca)
-			1:  # foice
-				_rect(7, 13, 5, 2, metal)
-				_linha(9, 12, 15, 7, 2, lam_lo)
-				_linha(15, 7, 8, 2, 2, lam)
-				_linha(14, 6, 9, 2, 1, lam_hi)
-				_px(8, 2, faisca)
-			2:  # garra (3 lâminas)
-				_rect(6, 13, 6, 2, metal)
-				for k in 3:
-					_linha(8 + k, 14, 13 + k * 2, 5 - k * 2, 2, lam_lo)
-					_linha(8 + k, 14, 13 + k * 2, 5 - k * 2, 1, lam)
-				_px(17, 1, faisca)
-			3:  # lança / espeto
-				_rect(7, 14, 4, 2, metal)
-				_linha(9, 14, 16, 1, 3, lam_lo)
-				_linha(9, 14, 16, 1, 1, lam_hi)
-				_px(16, 1, faisca); _px(15, 2, faisca)
-			4:  # martelo
-				_linha(9, 14, 12, 9, 3, cabo)
-				_rect(8, 3, 8, 7, lam_lo)         # cabeça
-				_rect(9, 4, 6, 3, lam)
-				_rect(9, 4, 6, 1, lam_hi)
-				_px(8, 3, faisca); _px(15, 3, faisca)
-			5:  # ceptro / orbe
-				_linha(9, 14, 11, 9, 2, cabo)
-				_elipse(12, 6, 4.2, 4.2, lam_lo)
-				_elipse(12, 6, 2.6, 2.6, lam)
-				_px(11, 4, lam_hi); _px(10, 5, lam_hi)
-				_px(14, 8, faisca)
-	_guardar("gear/armas")
-
-
-## Tira de 15 armaduras (18x26) -- ícones do menu E referência da cor que
-## `koliani.gd` aplica ao corpo. tipo: 0 trapos 1 couro 2 manto 3 casaco
-## 4 placas 5 vestido/batina.
-func _armaduras() -> void:
-	var tipos := [0, 1, 2, 3, 4, 4, 2, 4, 5, 4, 4, 3, 5, 5, 4]
-	var fw := 18
-	var fh := 26
-	_novo(fw * tipos.size(), fh)
-	for i in tipos.size():
-		_ox = i * fw
-		var tipo: int = tipos[i]
-		var pano := _tier(i, Color("7a6f63"), Color("6a5aa8"), Color("d38af0"))
-		var pano_d := pano.darkened(0.4)
-		var pano_h := pano.lerp(Color("ffffff"), 0.35)
-		var metal := Color("c2c8d6").lerp(pano, 0.25)
-		var metal_h := metal.lerp(Color("ffffff"), 0.4)
-
-		# manequim comum: ombros + peito + cintura
-		_rect(5, 6, 8, 12, pano)
-		_rect(4, 7, 1, 9, pano_d)
-		_rect(13, 7, 1, 9, pano_d)
-		_rect(6, 6, 6, 1, pano_h)              # luz no cimo do peito
-		_rect(4, 4, 3, 3, pano)                # ombro esq
-		_rect(11, 4, 3, 3, pano)               # ombro dir
-
-		match tipo:
-			0:  # trapos
-				_px(5, 12, pano_d); _px(12, 14, pano_d)
-				_rect(6, 17, 5, 3, pano_d)     # bainha rasgada
-				_px(7, 20, pano_d); _px(10, 21, pano_d)
-			1:  # couro
-				_rect(4, 12, 10, 2, pano_d)    # cinto
-				_px(9, 12, metal_h)
-				_rect(6, 9, 6, 1, pano_h)
-			2:  # manto / capa
-				_rect(3, 4, 12, 3, pano)       # gola larga
-				_rect(3, 5, 1, 12, pano_d)
-				_rect(6, 17, 6, 6, pano_d)     # cair do manto
-			3:  # casaco
-				_rect(8, 6, 1, 13, pano_d)     # abertura ao centro
-				_rect(5, 17, 8, 5, pano)
-				_px(6, 10, metal_h); _px(6, 13, metal_h)  # botões
-			4:  # placas
-				_rect(3, 4, 4, 4, metal)
-				_rect(11, 4, 4, 4, metal)
-				_rect(5, 7, 8, 7, metal)       # peitoral
-				_rect(6, 8, 6, 1, metal_h)
-				_rect(5, 14, 8, 2, metal.darkened(0.25))
-				_px(8, 10, metal_h)
-			5:  # vestido / batina
-				_rect(7, 5, 4, 2, pano_h)      # decote
-				for k in 7:
-					_rect(maxi(5 - k / 2, 2), 16 + k, 8 + k, 1, pano if k % 2 else pano_d)
-	_guardar("gear/armaduras")
 
 
 ## --- utilitarios de desenho ------------------------------------------
