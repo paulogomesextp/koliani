@@ -34,7 +34,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0d0814;
 overscroll-behavior:none;-webkit-user-select:none;user-select:none;
 -webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
 #canvas{width:100%;height:100%;touch-action:none}
-#koliani-intro-layer::backdrop{background:transparent}
 
 /* 3. HORIZONTAL SEMPRE ---------------------------------------------
    O iOS ignora o `orientation` do manifest e não tem
@@ -131,8 +130,6 @@ flex-direction:column;gap:5vmin;padding:8vmin}
       + meio + 'AgAZGF0YQcAAACAgICAgICAAAA=';
   };
   var abrirCanalIOS = function(){
-    /* Durante a intro, o vídeo é o único HTML media com som. */
-    if (window.kolianiIntroAtiva) return;
     if (!ios || canalIOSAtivo) return;
     try{
       if (!canalIOS){
@@ -195,7 +192,6 @@ flex-direction:column;gap:5vmin;padding:8vmin}
     }
     pintar();
   };
-  /* A intro reutiliza este desbloqueio dentro do primeiro gesto DOM. */
   window.kolianiAudioAcordar = acordar;
   /* Browsers e versoes de iOS divergem no evento reconhecido como activacao.
      Em captura, a tentativa chega antes de o canvas consumir o evento. */

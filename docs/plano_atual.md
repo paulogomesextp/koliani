@@ -1,3 +1,29 @@
+## Shop — modernização dark-gothic premium (30 set 2026)
+
+- Objetivo: transformar apenas a apresentação da Loja para a composição da
+  referência aprovada: header/currencies, tabs horizontais, Featured Hero,
+  catálogo visual e painel permanente de detalhe.
+- Âmbito: UI/UX da Loja, componentes de apresentação, estilos, foco,
+  responsividade, testes e captura. Catálogo, IDs, preços, moedas, ownership,
+  equip, saves, sprites cosméticos, animação e gameplay ficam congelados.
+- Estratégia: manter `LojaCatalogo`, `EstadoJogo` e `CosmeticosVisuais` como
+  fontes únicas; a nova UI apenas lê estado e chama as operações existentes.
+- Prova: carga/smoke da Loja, fluxos de categoria/seleção/compra/equip/fecho,
+  testes de save e catálogo, capturas a 1920×1080, 1600×900, 1366×768 e
+  1280×720, suite aplicável e `git diff --check`.
+- Critério: nenhuma sobreposição/corte nas quatro resoluções, conteúdo com
+  preview dominante, painel direito fixo, catálogo com scroll próprio e
+  nenhuma regressão funcional observável. Fidelidade estética final:
+  **HUMAN VISUAL REVIEW REQUIRED**.
+- Entrega: commit local; não fazer push sem autorização explícita.
+- Estado: implementação UI concluída; QA dirigido passou nas quatro
+  resoluções, 10 testes de Loja passaram e persistência entre processos
+  passou. Suite geral interrompida sem resultado final; avisos de teardown
+  registados em `docs/execution_shop_modernizacao.md`. Revisão estética
+  humana e dispositivo real continuam pendentes. Sem publicação/export.
+
+---
+
 ## Região II — remodel total · Prompt 3 (20 set 2026)
 
 - Objetivo: dar a N06–N10 arquitetura de primeiro plano e um landmark

@@ -199,6 +199,8 @@ func _correr_tudo() -> void:
 	teste_paineis_nao_trazem_o_vizinho()
 	teste_sala_labirinto_deterministica()
 	teste_9h1_trilha_de_producao()
+	teste_musica_so_aprovada()
+	teste_sfx_combate_aprovados()
 	teste_9h1_combo_com_poses_proprias()
 	teste_9h1_criaturas_com_movimento()
 	teste_9h1_tema_do_seletor()
@@ -3080,11 +3082,31 @@ func teste_9h_frontend_producao() -> void:
 			"botao_jogar", "aba_atual", "anel_normal", "anel_atual", "anel_chefe",
 			"ficha_nivel", "losango", "cadeado"]:
 		_ok(Frontend9H.textura(peca) != null, "9H: falta a peca `%s` do kit" % peca)
-	# a intro e' a cena de arranque, e o menu e' a que ela abre
-	_ok(str(ProjectSettings.get_setting("application/run/main_scene", ""))
-		== "res://scenes/ui/Intro.tscn", "9H: a `main_scene` nao e a intro")
-	_ok(ResourceLoader.exists("res://assets/video/intro_koliani.ogv"),
-		"9H: falta o video da intro em Ogg Theora")
+	# sem video de abertura (pedido do Paulo, 29 set 2026): no Windows e na
+	# PWA o arranque vai direto ao menu principal
+	var cena_arranque := str(ProjectSettings.get_setting("application/run/main_scene", ""))
+	_ok(cena_arranque == "res://scenes/ui/MenuInicial.tscn",
+		"arranque: a `main_scene` nao e o menu principal (%s)" % cena_arranque)
+	_ok(not ResourceLoader.exists("res://scenes/ui/Intro.tscn")
+		and not ResourceLoader.exists("res://assets/video/intro_koliani.ogv"),
+		"arranque: a intro em video voltou ao projeto")
+	var arranque := load(cena_arranque) as PackedScene
+	_ok(arranque != null, "arranque: a cena do menu nao carrega")
+	if arranque:
+		var estado := arranque.get_state()
+		var ha_video := false
+		for i in estado.get_node_count():
+			if estado.get_node_type(i) == &"VideoStreamPlayer":
+				ha_video = true
+		_ok(not ha_video, "arranque: o menu tem um VideoStreamPlayer")
+	var preset := FileAccess.get_file_as_string("res://export_presets.cfg")
+	_ok(preset.contains("res://web/shell.html\"")
+		and FileAccess.file_exists("res://web/shell.html"),
+		"arranque: o export Web nao usa o shell sem intro")
+	var shell := FileAccess.get_file_as_string("res://web/shell.html")
+	_ok(shell.contains("engine.startGame(") and not shell.contains("kolianiIntro")
+		and not shell.contains(".mp4"),
+		"arranque: o shell Web ainda passa por uma intro em video")
 	_ok(str(ProjectSettings.get_setting("application/config/icon", ""))
 		== "res://icon.png", "9H: o icone do projeto nao e o do rebrand")
 	# sem texto a` mao nos ecras novos
@@ -3274,6 +3296,71 @@ func teste_9h1_trilha_de_producao() -> void:
 		"9H.1: fora da Regiao I a trilha nova nao se aplica")
 	_ok(Musica.faixa_de_chefe(4) == Musica.BOSS_01_APROVADO,
 		"9H.1: o chefe da Regiao I devia usar Gothic Candlelight")
+
+
+## 29 set 2026: o Paulo ouvia a musica "igual em praticamente todos os niveis".
+## A faixa aprovada tocava certa; o que se repetia era a ambiencia antiga por
+## baixo (`assombracao` do N6 ao N100). Guarda as duas coisas: nenhuma regiao
+## nem chefe cai numa faixa antiga, e a ambiencia antiga nao volta a tocar em
+## nivel, chefe, menu ou pausa.
+func teste_musica_so_aprovada() -> void:
+	var antigas := [Musica.CAMINHO, Musica.CAMINHO_BOSS, Musica.CAMINHO_MENU]
+	for i in 100:
+		for cam: String in [Musica.faixa_de_nivel(i), Musica.faixa_de_chefe(i)]:
+			var aprovada := cam.begins_with(Musica.DIR_APROVADO) \
+					or cam.begins_with("res://assets/audio/music/")
+			_ok(aprovada and not antigas.has(cam),
+				"musica: N%d toca uma faixa nao aprovada (%s)" % [i + 1, cam])
+	_ok(not Musica.AMBIENCIA_ANTIGA_LIGADA,
+		"musica: a ambiencia antiga (assombracao/floresta) voltou a estar ligada")
+	var guardado := EstadoJogo.indice_nivel
+	for i in [0, 4, 5, 11, 50, 99]:
+		EstadoJogo.indice_nivel = i
+		Musica.ambiente(i)
+		_ok(not Musica._amb.playing and Musica._amb.stream == null,
+			"musica: ambiencia antiga a tocar no N%d" % (i + 1))
+		Musica.boss()
+		_ok(not Musica._amb.playing, "musica: ambiencia antiga no chefe do N%d" % (i + 1))
+	Musica.pausa(true)
+	_ok(not Musica._amb.playing, "musica: ambiencia antiga na pausa")
+	Musica.pausa(false)
+	Musica.menu()
+	_ok(not Musica._amb.playing, "musica: ambiencia antiga no menu")
+	Musica.parar()
+	EstadoJogo.indice_nivel = guardado
+
+
+## 30 set 2026: os 27 SFX Pixabay de combate aprovados pelo Paulo nunca tinham
+## chegado ao jogo. Cada evento abaixo tem de apontar para o seu corte
+## aprovado (`approved/sfx/combate/`), o stream tem de carregar e ter uma
+## duracao de efeito (nao os 52 s da porta de forno), e o comeco de um
+## combate de chefe tem de tocar a entrada aprovada.
+func teste_sfx_combate_aprovados() -> void:
+	var eventos := ["passo1", "passo2", "passo3", "ataque", "ataque2", "ataque3",
+		"acerto", "acerto_v2", "acerto_v3", "acerto_critico", "pisao_koliani", "dano",
+		"morte_koliani", "bloqueio", "parede", "investida", "golpe_pesado", "esmagar",
+		"garra", "chama", "chefe_magia", "raio", "energia_impacto", "olho_carregar",
+		"pedra_parte", "praga", "mecanismo", "sino_mecanismo", "lamina_cair",
+		"chefe_entrada"]
+	for ev: String in eventos:
+		var cam: String = Som.CAMINHOS.get(ev, "")
+		_ok(cam.begins_with("res://assets/audio/approved/sfx/combate/"),
+			"sfx combate: '%s' nao usa o som aprovado (%s)" % [ev, cam])
+		var st: AudioStream = Som._stream(ev)
+		_ok(st != null and st.get_length() > 0.2 and st.get_length() < 4.5,
+			"sfx combate: '%s' nao carrega ou tem duracao de efeito errada" % ev)
+	var visto := ""
+	var b: Node = preload("res://scenes/actors/ChefeAerion.tscn").instantiate() \
+			if ResourceLoader.exists("res://scenes/actors/ChefeAerion.tscn") else null
+	if b != null:
+		add_child(b)
+		var antes: int = Som._ordem
+		b.provocar()
+		visto = Som._pool[(Som._idx + Som.VOZES - 1) % Som.VOZES].stream.resource_path.get_file() \
+				if Som._ordem > antes else ""
+		_ok(visto == "chefe_entrada.ogg",
+			"sfx combate: provocar() nao tocou a entrada do chefe (%s)" % visto)
+		b.queue_free()
 
 
 ## Os quatro golpes do combo tem TIRAS PROPRIAS. O que isto guarda nao e' a

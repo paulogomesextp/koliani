@@ -56,7 +56,9 @@ func _catalogo() -> void:
 	var caminhos: Array[String] = []
 	for chave in novos:
 		var caminho: String = _som.CAMINHOS[chave]
+		# 30 set 2026: parte do kit passou aos SFX Pixabay aprovados (combate/)
 		_checar(caminho.begins_with("res://assets/audio/koliani_signature/")
+			or caminho.begins_with("res://assets/audio/approved/sfx/combate/")
 			or (chave == "dash" and caminho == "res://assets/audio/approved/koliani_dash_wind_magic_5.wav"),
 			"asset fora da familia: %s" % chave)
 		if chave != "salto_duplo":
@@ -130,8 +132,8 @@ func _espada(k: Node) -> void:
 		k.call("_iniciar_ataque")
 		_checar(_contador() - antes == 1, "passo do combo disparou numero errado de vozes")
 		seq.append(_ultimo_stream())
-	_checar(seq == ["shadowblade_swing_1.wav", "shadowblade_swing_2.wav",
-		"shadowblade_swing_3.wav", "shadowblade_finisher.wav"],
+	_checar(seq == ["ataque.ogg", "ataque2.ogg",
+		"ataque3.ogg", "shadowblade_finisher.wav"],
 		"combo nao tem quatro vozes: %s" % str(seq))
 	_checar(_som.CAMINHOS["acerto"] != _som.CAMINHOS["acerto_critico"],
 		"critico ainda reutiliza impacto comum")
@@ -149,7 +151,7 @@ func _espada(k: Node) -> void:
 	k._pos_roll_t = 1.0
 	var antes := _contador()
 	k.call("_ao_acertar_corpo", e)
-	_checar(_contador() > antes and _ultimo_stream() == "shadowblade_critical.wav",
+	_checar(_contador() > antes and _ultimo_stream() == "acerto_critico.ogg",
 		"critico real nao usa stream proprio")
 	e.queue_free()
 	var impactos: Array[String] = []
@@ -181,7 +183,7 @@ func _dano(k: Node) -> void:
 	k.vida = 100
 	var antes := _contador()
 	k.call("receber_dano", 1)
-	_checar(_contador() - antes == 1 and _ultimo_stream() == "koliani_hurt.wav",
+	_checar(_contador() - antes == 1 and _ultimo_stream() == "dano.ogg",
 		"hurt leve falhou")
 	await create_timer(0.15).timeout
 	k._invulneravel = 0.0
@@ -196,7 +198,7 @@ func _dano(k: Node) -> void:
 	k.vida = 1
 	antes = _contador()
 	k.call("receber_dano", 999)
-	_checar(_contador() - antes == 1 and _ultimo_stream() == "koliani_death.wav",
+	_checar(_contador() - antes == 1 and _ultimo_stream() == "morte_koliani.ogg",
 		"fatal voltou a empilhar hurt + death")
 	print("KOLIANI DANO leve=1 pesado=1 fatal=death sem hurt")
 
