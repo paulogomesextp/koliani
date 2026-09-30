@@ -245,6 +245,7 @@ func _correr_tudo() -> void:
 	await teste_r3_n15_fragmentos_e_escada()
 	await teste_r3_n15_ritual_ergue_a_fase2()
 	await teste_r3_n15_portoes_no_crivo()
+	await teste_golpe_real_parte_vitral_e_toca_sino()
 	await teste_r3_vyrak_identidade()
 	await teste_r3_vyrak_leva_dano_muda_de_fase_e_morre()
 
@@ -4651,6 +4652,62 @@ func teste_r3_n15_portoes_no_crivo() -> void:
 				"R3/N15: o portao '%s' contorna-se -- a porta alcanca-se sem ele" % portao)
 		raiz.queue_free()
 		await get_tree().process_frame
+
+
+## REGRESSAO (bug do Paulo no exe, 30 set 2026: "parede invisivel" no 3-2): o
+## golpe corpo-a-corpo da Koliani chama `receber_dano(dano, dir, crit, recuo)`
+## com QUATRO argumentos, e o vitral, o sino da torre, o espelho e o pára-raios
+## so' aceitavam dois -- o golpe dava erro de script e NAO fazia nada (so' o
+## projetil, que chama com dois, funcionava). O vitral partivel do N12 e' um
+## portao: sem tiro, a Koliani ficava presa a uma "parede" sem arte de parede.
+## Prova com a Koliani real e a hitbox real.
+func teste_golpe_real_parte_vitral_e_toca_sino() -> void:
+	var raiz: Node = (load(EstadoJogo.NIVEIS[R3_BASE + 1]) as PackedScene).instantiate()
+	EstadoJogo.indice_nivel = R3_BASE + 1
+	EstadoJogo.checkpoint = Vector2.ZERO
+	get_tree().root.add_child(raiz)
+	var kol := raiz.get_node("Koliani") as CharacterBody2D
+	var vit := raiz.get_node("VitralGalerias") as Vitral
+	var r4 := raiz.get_node("R4") as Node2D
+	for i in 6:
+		await get_tree().physics_frame
+	kol.set_physics_process(true)
+	# encostada ao vitral, em cima do R4, a olhar para ele
+	kol.global_position = Vector2(vit.global_position.x + 38.0, r4.global_position.y - 40.0)
+	kol.velocity = Vector2.ZERO
+	for i in 20:
+		await get_tree().physics_frame
+	kol.set("_olha_para", -1.0)
+	kol.call("_iniciar_ataque")
+	for i in 40:
+		await get_tree().physics_frame
+	_ok(bool(vit.get("_partido")), "golpe real: devia partir o vitral do N12 (era uma parede sem saida)")
+	# o mesmo golpe toca o sino da torre
+	var sino := raiz.get_node("SinoA") as SinoTorre
+	var toques := [0]
+	sino.badalada.connect(func(_s: Node) -> void: toques[0] += 1)
+	kol.global_position = Vector2(sino.global_position.x - 30.0, sino.global_position.y)
+	kol.velocity = Vector2.ZERO
+	kol.set("_olha_para", 1.0)
+	kol.set("_alvos_atingidos_ataque", {})
+	kol.call("_cancelar_ataque", true)
+	for i in 30:
+		await get_tree().physics_frame
+	kol.call("_iniciar_ataque")
+	for i in 40:
+		await get_tree().physics_frame
+	_ok(toques[0] >= 1, "golpe real: devia tocar o sino da torre")
+	# todas as coisas golpeaveis aceitam a chamada de 4 argumentos do golpe
+	for caminho in ["res://scripts/vitral.gd", "res://scripts/sino_torre.gd",
+			"res://scripts/espelho.gd", "res://scripts/para_raios.gd"]:
+		var esc := load(caminho) as Script
+		var ok := false
+		for m in esc.get_script_method_list():
+			if m["name"] == "receber_dano":
+				ok = (m["args"] as Array).size() >= 4
+		_ok(ok, "%s.receber_dano tem de aceitar (dano, dir, crit, recuo) como o golpe da Koliani" % caminho.get_file())
+	raiz.queue_free()
+	await get_tree().process_frame
 
 
 func teste_r3_vyrak_identidade() -> void:
@@ -9362,4 +9419,5 @@ func teste_combat_lab_balanco() -> void:
 		"balanco: o combo intencional tem de matar mais depressa que o spam")
 	_ok(float(r["ideal"]["ttk"]) > 2.5, "balanco: power creep -- o combo ideal mata em menos de 2,5 s")
 	EstadoJogo.habilidades.assign(antes_hab)
+
 
