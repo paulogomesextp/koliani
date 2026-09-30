@@ -789,5 +789,7 @@
   "world.towers": "Tour des Échos",
   "world.unknown": "?",
   "world.void": "Le Vide",
-  "world.war": "Guerre des Royaumes"
+  "world.war": "Guerre des Royaumes",
+  "shop.item.skin_shadowblade.name": "Shadowblade Koliani",
+  "shop.item.skin_shadowblade.desc": "Assassine aux cheveux argentés, armure noire et violet profond, cornes et cape d'ombre, lame courbe d'énergie violette et VFX d'ombre assortis. Purement cosmétique : mêmes mouvements, mêmes hitbox."
 }

@@ -26,6 +26,7 @@ const DIR_SKIN := {
 	"skin_celestial": "res://assets/sprites/koliani_skins/celestial",
 	"skin_anjo": "res://assets/sprites/koliani_skins/anjo",
 	"skin_demonio": "res://assets/sprites/koliani_skins/demonio",
+	"skin_shadowblade": "res://assets/sprites/koliani_skins/shadowblade",
 }
 ## As que são só paleta (silhueta igual à do Golden Set); as outras são
 ## premium (armadura, arma, asas/cornos...). O Paulo fechou as simples nestas três.

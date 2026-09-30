@@ -220,6 +220,7 @@ func _correr_tudo() -> void:
 	teste_loja_i18n()
 	teste_loja_cosmeticos_visuais()
 	teste_skins_arte_real()
+	teste_shadowblade_paridade()
 	teste_loja_colecao_regiao_i()
 	teste_rootbound_frame()
 	teste_loja_arte_molduras_rastos()
@@ -5083,6 +5084,71 @@ func teste_skins_arte_real() -> void:
 	_ok(c2 != null and c2.sprite_frames.get_frame_texture("idle", 0).resource_path.begins_with(GOLD),
 		"skins: sem skin equipada volta ao Golden Set")
 	k2.free()
+
+
+## Shadowblade = pura pele: as animacoes da Koliani com a skin equipada sao
+## IDENTICAS as do Golden Set (nomes, n.o de frames, fps, loop, escala,
+## offset, tamanho de frame), incl. o `run` (= run_final, 10 frames).
+func teste_shadowblade_paridade() -> void:
+	const CV := preload("res://scripts/cosmeticos_visuais.gd")
+	const ID := "skin_shadowblade"
+	_ok(CV.DIR_SKIN.has(ID) and not (ID in CV.SKIN_SO_PALETA), "shadowblade: registada como premium")
+	_ok(not LojaCatalogo.item(ID).is_empty() and LojaCatalogo.item(ID)["categoria"] == "skins"
+		and LojaCatalogo.item(ID)["raridade"] == "lendario", "shadowblade: no catalogo (lendaria)")
+	_ok(Textos.t("shop.item.skin_shadowblade.name") != "shop.item.skin_shadowblade.name", "shadowblade: nome i18n")
+	var comprados_antes: Array = EstadoJogo.itens_comprados.duplicate()
+	var equipados_antes: Dictionary = EstadoJogo.cosmeticos_equipados.duplicate()
+	var ref: Koliani = preload("res://scenes/actors/Koliani.tscn").instantiate()
+	ref.usar_golden_set = true
+	add_child(ref)
+	EstadoJogo.itens_comprados.append(ID)
+	EstadoJogo.cosmeticos_equipados["skins"] = ID
+	var sk: Koliani = preload("res://scenes/actors/Koliani.tscn").instantiate()
+	sk.usar_golden_set = true
+	add_child(sk)
+	var cr := ref.get_node("Sprite/Corpo") as AnimatedSprite2D
+	var cs := sk.get_node("Sprite/Corpo") as AnimatedSprite2D
+	var a := cr.sprite_frames
+	var b := cs.sprite_frames
+	var nomes_a := Array(a.get_animation_names())
+	nomes_a.sort()
+	var nomes_b := Array(b.get_animation_names())
+	nomes_b.sort()
+	_ok(nomes_a == nomes_b, "shadowblade: mesmas animacoes")
+	var difere := 0
+	for n: String in a.get_animation_names():
+		if a.get_frame_count(n) != b.get_frame_count(n) or a.get_animation_speed(n) != b.get_animation_speed(n) \
+				or a.get_animation_loop(n) != b.get_animation_loop(n):
+			difere += 1
+			continue
+		for i in a.get_frame_count(n):
+			var ta := a.get_frame_texture(n, i)
+			var tb := b.get_frame_texture(n, i)
+			if ta.get_size() != tb.get_size() or a.get_frame_duration(n, i) != b.get_frame_duration(n, i):
+				difere += 1
+				break
+	_ok(difere == 0, "shadowblade: %d animacoes com n.o frames/fps/loop/tamanho/duracao diferentes" % difere)
+	_ok(b.get_frame_count("run") == 10 and b.get_animation_loop("run"), "shadowblade: run = run_final (10 frames, loop)")
+	for i in 10:
+		_ok(b.get_frame_texture("run", i).resource_path == CV.DIR_SKIN[ID] + "/frames/run_final/run_%03d.png" % (i + 1),
+			"shadowblade: run frame %d nao e' o run_final da skin (ordem)" % i)
+	_ok(cr.offset == cs.offset and cr.scale == cs.scale and ref.scale == sk.scale, "shadowblade: offset/escala iguais")
+	_ok(ref.get_node("CollisionShape2D") != null and (ref.get_node("CollisionShape2D") as CollisionShape2D).shape.get_rect()
+		== (sk.get_node("CollisionShape2D") as CollisionShape2D).shape.get_rect(), "shadowblade: hitbox igual")
+	# VFX proprio: slots da skin existem; sem skin, nao ha' VFX de skin
+	_ok(VfxSkin.pasta(ID) != "" and VfxSkin.frames_golpe() != null and VfxSkin.frames_golpe().get_frame_count("slash") == 6,
+		"shadowblade: arco do golpe (6 frames)")
+	for slot: String in VfxSkin.SLOTS:
+		_ok(VfxSkin.frames(slot, int(VfxSkin.SLOTS[slot]["n"])) != null, "shadowblade: VFX %s" % slot)
+	sk.free()
+	EstadoJogo.itens_comprados.assign(comprados_antes)
+	EstadoJogo.cosmeticos_equipados = equipados_antes
+	_ok(VfxSkin.pasta() == "" and VfxSkin.frames_golpe() == null, "shadowblade: sem skin nao ha' VFX de skin (fallback)")
+	# skin invalida/inexistente: cai no default
+	EstadoJogo.cosmeticos_equipados["skins"] = "skin_que_nao_existe"
+	_ok(CV.dir_skin() == "", "shadowblade: skin invalida cai no default")
+	EstadoJogo.cosmeticos_equipados = equipados_antes
+	ref.free()
 
 
 func teste_loja_cosmeticos_visuais() -> void:

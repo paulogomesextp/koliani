@@ -789,5 +789,7 @@
   "world.towers": "Tower of Echoes",
   "world.unknown": "?",
   "world.void": "The Void",
-  "world.war": "War of the Realms"
+  "world.war": "War of the Realms",
+  "shop.item.skin_shadowblade.name": "Shadowblade Koliani",
+  "shop.item.skin_shadowblade.desc": "Silver-haired assassin in black and deep-purple armor, shadow horns and cloak, a curved blade of violet energy and matching shadow VFX. Purely cosmetic: same moves, same hitboxes."
 }

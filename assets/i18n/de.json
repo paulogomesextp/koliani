@@ -789,5 +789,7 @@
   "world.towers": "Turm der Echos",
   "world.unknown": "?",
   "world.void": "Die Leere",
-  "world.war": "Krieg der Reiche"
+  "world.war": "Krieg der Reiche",
+  "shop.item.skin_shadowblade.name": "Shadowblade Koliani",
+  "shop.item.skin_shadowblade.desc": "Silberhaarige Assassine in schwarzer und tiefvioletter Rüstung, Schattenhörner und -umhang, gebogene Klinge aus violetter Energie und passende Schatten-VFX. Rein kosmetisch: gleiche Bewegungen, gleiche Hitboxen."
 }

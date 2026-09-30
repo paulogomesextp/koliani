@@ -26,3 +26,20 @@ simples) e pediu **duas premium, Anjo e Demónio, pormenorizadas**.
 - Ver todas lado a lado: `res://tools/ProvadorSkins.tscn`.
 - Licença: arte do projeto (Golden Set + peças desenhadas aqui); nenhum asset
   de terceiros.
+
+## Shadowblade Koliani (`shadowblade/`, `skin_shadowblade`, lendária)
+Skin **puramente visual** sobre o Golden Set final (movimento LOCKED): mesmos
+84 frames, mesmo canvas/pés/pivot, `run_final` incluído. Gerada por
+`tools/gerar_skin_shadowblade.py` (peças em `tools/trajes_shadowblade.py`,
+independente de `trajes_premium.py`): cabelo prata/marfim (por geometria
+relativa à cara), roupa preto-roxo, veios roxos, orla de metal fosco, olhos
+violeta, cornos e capa de sombra, ombreira, lâmina curva de energia (mesma
+reta da lâmina original). Nada da skin fica abaixo da linha do chão do
+original. VFX (camadas separadas) em `shadowblade/vfx/`, gerados por
+`tools/gerar_vfx_shadowblade.py` e tocados por `scripts/vfx_skin.gd`:
+arco do golpe (os 6 frames do Golden Set repintados), anel do salto duplo,
+impacto de aterragem, impacto de pogo, partículas (dash/salto/aterragem).
+Rasto do dash: eco roxo já existente + partículas. Validação:
+`python tools/validar_paridade_skin.py shadowblade` e
+`teste_shadowblade_paridade`. `apresentacao/` = recorte da arte de referência
+do pacote (não usado no jogo).
