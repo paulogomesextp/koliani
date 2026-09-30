@@ -62,9 +62,9 @@ visible = false
 texture_filter = 1
 
 [node name="LuzAsas" type="PointLight2D" parent="Sprite"]
-position = Vector2(0, -52)
+position = Vector2(0, -14)
 texture = SubResource("tex_luz")
-energy = 0.55
+energy = 0.3
 color = Color(0.7, 0.5, 0.95, 1)
 scale = Vector2(1.3, 1.3)
 
@@ -72,11 +72,11 @@ scale = Vector2(1.3, 1.3)
 ; NÚCLEO": não há diamante no peito, há uma cabeça que brilha. O olho
 ; está DESENHADO no rig; este nó é só a luz que o faz pulsar quando o
 ; chefe fica EXPOSTO -- que é a leitura que o jogador precisa de ter.
-; Medido no rig (escala final 1.067): o olho fica 134 px acima dos pés e
-; 37 px à frente do centro; com os pés na base da colisão (y=+44) dá
-; (37, -90).
+; Rig novo (recortado da prancha, `tools/extrair_guardiao_dos_ceus.py`):
+; no frame idle o olho fica 50 px acima da base do corpo e ao centro;
+; com a base na colisão (y=+44) dá (0, -6).
 [node name="Nucleo" type="Node2D" parent="Sprite"]
-position = Vector2(37, -90)
+position = Vector2(0, -6)
 scale = Vector2(0.35, 0.35)
 
 [node name="Brilho" type="Sprite2D" parent="Sprite/Nucleo"]
