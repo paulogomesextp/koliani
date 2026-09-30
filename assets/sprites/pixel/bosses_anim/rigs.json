@@ -1018,9 +1018,9 @@
   }
  },
  "guardiao_dos_ceus": {
-  "w": 368,
-  "h": 318,
-  "pes_y": 294,
+  "w": 340,
+  "h": 280,
+  "pes_y": 235,
   "estados": {
    "idle": 6,
    "walk": 8,
@@ -1031,15 +1031,15 @@
   "fps": {
    "idle": 7.0,
    "walk": 11.0,
-   "attack": 14.0,
+   "attack": 12.0,
    "hurt": 12.0,
-   "death": 10.0
+   "death": 9.0
   }
  },
  "golem_falesias": {
-  "w": 190,
-  "h": 192,
-  "pes_y": 160,
+  "w": 272,
+  "h": 264,
+  "pes_y": 214,
   "estados": {
    "idle": 6,
    "walk": 8,
@@ -1049,10 +1049,10 @@
   },
   "fps": {
    "idle": 7.0,
-   "walk": 11.0,
+   "walk": 10.0,
    "attack": 14.0,
    "hurt": 12.0,
-   "death": 10.0
+   "death": 9.0
   }
  },
  "vigia_desfiladeiro": {
