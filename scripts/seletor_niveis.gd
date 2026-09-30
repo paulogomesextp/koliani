@@ -67,7 +67,6 @@ var _barras: TextureRect
 var _titulo: Label
 var _subtitulo: Label
 var _voltar: Button
-var _santuario_botao: Button
 var _regioes_painel: Control
 var _niveis_painel: Control
 var _region_cards: Array[Button] = []
@@ -78,7 +77,6 @@ var _nos: Array[Dictionary] = []
 var _jogar: Button
 var _estado: Label
 var _detalhe: Label
-var _santuario: Control
 var _regiao_detalhe: Panel
 var _regiao_nome: Label
 var _regiao_meta: Label
@@ -94,7 +92,6 @@ var _boss_arte: TextureRect
 var _boss_nome: Label
 var _fundo_regiao := -1
 
-const SANTUARIO_CENA := preload("res://scenes/ui/Santuario.tscn")
 
 func _ready() -> void:
     process_mode = Node.PROCESS_MODE_ALWAYS
@@ -126,10 +123,6 @@ func _montar() -> void:
     _voltar.pressed.connect(_voltar_premido)
     Frontend9H.por(_voltar, Rect2(32, 22, 210, 42))
     _palco.add_child(_voltar)
-    _santuario_botao = _botao("", 14)
-    _santuario_botao.pressed.connect(_abrir_santuario)
-    Frontend9H.por(_santuario_botao, Rect2(1015, 22, 233, 42))
-    _palco.add_child(_santuario_botao)
     _titulo = Label.new()
     Frontend9H.cabecalho(_titulo, 29)
     _titulo.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -418,7 +411,6 @@ func _actualizar() -> void:
         _titulo.text = "%s %s — %s" % [Textos.t("selector.region"), ROMANOS[_regiao], Textos.t(EstadoJogo.REGIOES[_regiao]["chave"]).to_upper()]
         _subtitulo.text = "5 LEVELS  ·  BOSS N%02d  ·  %s" % [(_regiao + 1) * 5, _texto_estado(_estado_regiao(_regiao))]
         _voltar.text = "←  REGIONS"
-    _santuario_botao.text = Textos.t("shrine.open")
     _regioes_painel.visible = _vista_regioes
     _niveis_painel.visible = not _vista_regioes
     _actualizar_carousel()
@@ -548,8 +540,6 @@ func _confirmar() -> void:
     escolhido.emit(_sel)
 
 func _unhandled_input(evento: InputEvent) -> void:
-    if _santuario != null:
-        return
     if evento.is_action_pressed("ui_cancel"):
         accept_event(); _voltar_premido()
     elif _vista_regioes and evento.is_action_pressed("ui_left"):
@@ -581,15 +571,3 @@ func _nome_nivel(indice: int) -> String:
 func _nome_chefe(indice: int) -> String:
     var chave := CatalogoCampanha.chave_chefe(indice)
     return Textos.t(chave) if chave != "" else ""
-
-func _abrir_santuario() -> void:
-    if _santuario != null:
-        return
-    _santuario = SANTUARIO_CENA.instantiate()
-    _santuario.z_index = 100
-    add_child(_santuario)
-    _santuario.fechado.connect(func() -> void:
-        if is_instance_valid(_santuario):
-            _santuario.queue_free()
-        _santuario = null
-        _actualizar())

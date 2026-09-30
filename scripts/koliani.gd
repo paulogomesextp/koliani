@@ -15,17 +15,17 @@ signal energia_insuficiente()
 signal magia_lancada
 
 const VIDA_MAXIMA := 100
-## Dano corpo-a-corpo SEM arma equipada (ver EstadoJogo.dano_ataque()).
+## Dano corpo-a-corpo (ver EstadoJogo.dano_ataque()).
 ## Duplicado a pedido do Paulo (ago 2026) -- espada e tiros o dobro.
 const DANO_ATAQUE := 50
 
 
-## Vida máxima efetiva = base + bónus da armadura equipada.
+## Vida máxima efetiva.
 func _vida_max() -> int:
-	return VIDA_MAXIMA + EstadoJogo.vida_bonus_armadura()
+	return VIDA_MAXIMA
 
 
-## Dano do golpe = arma equipada, ou a base se não houver arma.
+## Dano do golpe.
 func _dano_golpe() -> int:
 	return EstadoJogo.dano_ataque()
 ## Velocidade do FLYMODE (só DEVELOPER MODE -- ver `alternar_voo`).
@@ -284,7 +284,6 @@ const ATERRAGEM_VOLUME := [0.0, -8.0, -9.0, -9.0]
 @onready var _hitbox: Area2D = $HitboxAtaque
 @onready var _sprite: Node2D = $Sprite
 @onready var _corpo: AnimatedSprite2D = $Sprite/Corpo
-@onready var _arma: Sprite2D = $Sprite/Arma
 @onready var _escudo: Node2D = $Sprite/Escudo
 @onready var _escudo_glow: CanvasItem = $Sprite/Escudo/Glow
 @onready var _escudo_cupula: CanvasItem = $Sprite/Escudo/Cupula
@@ -294,7 +293,6 @@ const ATERRAGEM_VOLUME := [0.0, -8.0, -9.0, -9.0]
 @onready var _luz_carga: PointLight2D = $Sprite/LuzCarga
 @onready var _luz_golpe: PointLight2D = $Sprite/LuzGolpe
 @onready var _luz_lamina: PointLight2D = $Sprite/LuzLamina
-@onready var _armadura: Node2D = $Sprite/Armadura
 @onready var _camera: Camera2D = $Camera2D
 @onready var _faiscas: CPUParticles2D = $FaiscasAtaque
 @onready var _po: CPUParticles2D = $PoAterragem
@@ -503,9 +501,6 @@ var _planando := false
 
 # animação procedural (visual, corre em _process)
 var _mat: ShaderMaterial
-## Shader de troca de paleta do rig (arma/armadura) -- ver
-## `_montar_material_equipamento`.
-var _mat_equip: ShaderMaterial
 var _anim_t := 0.0
 var _squash := 0.0   # impulso da aterragem
 var _pop := 0.0      # impulso do ataque
@@ -538,11 +533,13 @@ func _ready() -> void:
 		_hitbox.body_entered.connect(_ao_acertar_corpo)
 	if _corpo:
 		_montar_frames()
-	vida = _vida_max()  # nível novo começa cheio (inclui bónus de armadura)
+	vida = _vida_max()  # nível novo começa cheio
 	vida_mudou.emit(vida, _vida_max())
 	energia_mudou.emit(_energia, ENERGIA_MAX)
-	_aplicar_equipamento()
-	EstadoJogo.equipamento_mudou.connect(func(_t: String, _i: String) -> void: _aplicar_equipamento())
+	if _luz_lamina:
+		_luz_lamina.color = _cor_golpe()
+	if _corpo:
+		_corpo.modulate = _tint_armadura()
 
 
 ## Rig do sprite:
@@ -830,37 +827,27 @@ func _montar_frames() -> void:
 	if premium:
 		_corpo.scale = Vector2(PREMIUM_ESCALA, PREMIUM_ESCALA)
 		_corpo.offset = Vector2(0.0, PREMIUM_OFFSET_Y)
-		if _armadura:
-			_armadura.visible = false
 		if _luz_lamina:
 			_luz_lamina.enabled = true
 	elif shadow:
 		_corpo.scale = Vector2(SHADOW_ESCALA, SHADOW_ESCALA)
 		_corpo.offset = Vector2(0.0, SHADOW_OFFSET_Y)
-		if _armadura:
-			_armadura.visible = false   # a arte ja' traz o fato todo
 		if _luz_lamina:
 			_luz_lamina.enabled = true  # a lamina e' roxa e brilha: acompanha
 	if nova:
 		_corpo.scale = Vector2(NOVA_ESCALA, NOVA_ESCALA)
 		_corpo.offset = Vector2(0.0, NOVA_OFFSET_Y)
-		if _armadura:
-			_armadura.visible = false   # a arte já traz o manto
 		if _luz_lamina:
 			_luz_lamina.enabled = false  # o clarão do golpe já vem no frame
 	if cavaleiro:
 		_corpo.scale = Vector2(CAV_ESCALA, CAV_ESCALA)
 		_corpo.offset = Vector2(0.0, CAV_OFFSET_Y)
-		if _armadura:
-			_armadura.visible = false  # o rig já traz armadura
 		# a espada e o escudo já estão desenhados nos frames
 		if _luz_lamina:
 			_luz_lamina.enabled = false
 	if gothic:
 		_corpo.scale = Vector2(1.05, 1.05)
 		_corpo.offset = Vector2(0.0, 4.0)  # baixa o sprite -> pés no chão
-		if _armadura:
-			_armadura.visible = false  # o rig já traz roupa
 		# o rig não tem "lâmina que brilha" -- desliga o glow que fica preso
 		# ao sprite (o clarão do GOLPE continua a disparar nos acertos)
 		if _luz_lamina:
@@ -873,8 +860,6 @@ func _montar_frames() -> void:
 		# premium_v1 nem o rig do script chegam a ser carregados, por isso não há
 		# estado nenhum que possa cair de volta noutra Koliani.
 		anims = {}
-		if _armadura:
-			_armadura.visible = false
 	var sf := SpriteFrames.new()
 	sf.remove_animation("default")
 	for nome: String in anims:
@@ -903,7 +888,6 @@ func _montar_frames() -> void:
 		_corpo.animation_changed.connect(_aplicar_contrato_visual)
 	_corpo.play("idle")
 	_aplicar_contrato_visual()
-	_montar_material_equipamento()
 
 
 ## Nomes servidos pelo Golden Set (inclui os derivados só de frames golden).
@@ -1334,87 +1318,6 @@ func _montar_fallbacks_piloto_5g(sf: SpriteFrames) -> void:
 		sf.add_frame(nome, sf.get_frame_texture("idle", 0))
 
 
-## Pousa no `Corpo` o shader que troca as duas rampas de cinzento do rig
-## pelas cores da arma/armadura equipadas (ver `equipamento.gdshader`).
-## Só faz sentido nos rigs onde a lâmina e as placas estão pintadas dentro
-## do frame -- no rig "codigo" a arma é um nó à parte e a armadura é
-## vetorial, e aí o shader não tem nada para apanhar.
-const RIGS_COM_PALETA := ["cavaleiro"]
-
-func _montar_material_equipamento() -> void:
-	if _corpo == null or not RIGS_COM_PALETA.has(RIG):
-		return
-	var sh: Shader = load("res://assets/shaders/equipamento.gdshader")
-	if sh == null:
-		return
-	_mat_equip = ShaderMaterial.new()
-	_mat_equip.shader = sh
-	_corpo.material = _mat_equip
-
-
-## Mostra o que está equipado no boneco (pedido do Paulo, 3 set 2026).
-##
-## Dois caminhos, conforme o rig:
-##  - rig "codigo": a `Arma` é um Sprite2D à parte (tira de 20 lâminas) e a
-##    armadura são polígonos vetoriais -- basta ligá-los e recolori-los.
-##  - rigs prontos ("cavaleiro"): a lâmina e as placas estão pintadas DENTRO
-##    de cada frame, em sítios diferentes por frame. Pôr a `Arma` por cima
-##    dava duas espadas; o que funciona é trocar a paleta pelo shader
-##    (`_mat_equip`) -- o fio da lâmina fica da cor da arma e as placas da
-##    cor da armadura, em todos os 18 estados e sem tabelas de posição.
-func _aplicar_equipamento() -> void:
-	var wi := Equipamento.indice_arma(EstadoJogo.arma_equipada)
-	var ai := Equipamento.indice_armadura(EstadoJogo.armadura_equipada)
-	if _arma:
-		# nos rigs prontos a lâmina já está desenhada no frame
-		_arma.visible = wi >= 0 and RIG == "codigo"
-		if wi >= 0:
-			_arma.frame = wi
-	if _mat_equip:
-		_mat_equip.set_shader_parameter("cor_arma", Equipamento.cor_arma(wi))
-		_mat_equip.set_shader_parameter("peso_arma", 1.0 if wi >= 0 else 0.0)
-		_mat_equip.set_shader_parameter("cor_armadura", Equipamento.cor_armadura(ai))
-		_mat_equip.set_shader_parameter("peso_armadura", 1.0 if ai >= 0 else 0.0)
-	if _luz_lamina:
-		_luz_lamina.color = _cor_golpe()
-	if _corpo:
-		_corpo.modulate = _tint_armadura()
-	_aplicar_visual_armadura()
-
-
-## Recolore (e "engorda") as placas de armadura vetoriais que vivem sob o
-## `Sprite` -- herdam o squash/stretch/flip da animação procedural.
-func _aplicar_visual_armadura() -> void:
-	if _armadura == null:
-		return
-	if RIG != "codigo":
-		_armadura.visible = false  # os rigs prontos já trazem roupa própria
-		return
-	var ai := Equipamento.indice_armadura(EstadoJogo.armadura_equipada)
-	_armadura.visible = ai >= 0
-	if ai < 0:
-		return
-	var base := Equipamento.cor_armadura(ai)
-	var esc := base.darkened(0.34)
-	var clr := base.lerp(Color.WHITE, 0.45)
-	var t := float(ai) / 9.0   # 10 armaduras (era 15)
-	_pinta(_armadura.get_node_or_null("Peito"), Color(base.r, base.g, base.b, 0.93))
-	_pinta(_armadura.get_node_or_null("OmbroEsq"), Color(clr.r, clr.g, clr.b, 0.96))
-	_pinta(_armadura.get_node_or_null("OmbroDir"), Color(clr.r, clr.g, clr.b, 0.96))
-	_pinta(_armadura.get_node_or_null("Cinto"), Color(esc.r, esc.g, esc.b, 0.96))
-	var trim := _armadura.get_node_or_null("Trim")
-	if trim:
-		var tc := clr.lerp(Color.WHITE, 0.4)
-		trim.default_color = Color(tc.r, tc.g, tc.b, 0.55)
-	var bulk := 1.0 + 0.16 * t
-	_armadura.scale = Vector2(bulk, bulk)
-
-
-func _pinta(n: Node, c: Color) -> void:
-	if n and "color" in n:
-		n.color = c
-
-
 func _physics_process(dt: float) -> void:
 	_dash_recarga = maxf(0.0, _dash_recarga - dt)
 	_rolar_recarga = maxf(0.0, _rolar_recarga - dt)
@@ -1453,7 +1356,7 @@ func _physics_process(dt: float) -> void:
 	_especial_cd = maxf(0.0, _especial_cd - dt)
 	_regen_pausa = maxf(0.0, _regen_pausa - dt)
 	if _energia < ENERGIA_MAX and _regen_pausa <= 0.0:
-		_energia = minf(ENERGIA_MAX, _energia + REGEN_ENERGIA * (1.0 + EstadoJogo.bonus("regen_energia")) * dt)  # melhoria "foco"
+		_energia = minf(ENERGIA_MAX, _energia + REGEN_ENERGIA * dt)
 		energia_mudou.emit(_energia, ENERGIA_MAX)
 
 	# FLYMODE (só DEVELOPER MODE, botão na DevBarra): voa livre e atravessa
@@ -1681,7 +1584,7 @@ func _physics_process(dt: float) -> void:
 		if Vfx9G.ativo(self):
 			Vfx9G.tocar(self, "roll_dodge", global_position + Vector2(0.0, 6.0 * _sinal_grav),
 				1.0, 0.0, _olha_para < 0.0, _sinal_grav < 0.0, -1, DUR_ROLAR)
-		_invulneravel = maxf(_invulneravel, DUR_ROLAR + EstadoJogo.bonus("iframes_roll"))  # melhoria "agilidade"
+		_invulneravel = maxf(_invulneravel, DUR_ROLAR)
 		# roll-cancel (pegada Dead Cells): o rolamento corta o recovery do
 		# ataque -> encadeia-se ataque -> rolar -> ataque sem esperar
 		if _ataque_restante > 0.0:
@@ -1920,24 +1823,6 @@ func _atualizar_anim() -> void:
 		_corpo.play(a)
 	_passo_cadencia_locomocao(a)
 
-	# a arma acompanha grosso modo a pose: balanço no ataque, recolhida no ar
-	# a Arma tem `offset` a pôr o punho na origem do nó -> roda pelo punho.
-	# As lâminas da tira já apontam para cima-frente; rotation 0 = "em guarda".
-	if _arma and _arma.visible:
-		var rot := -0.15
-		var off := Vector2(10, -5)
-		if a.begins_with("attack"):
-			var f := clampf(1.0 - _ataque_restante / maxf(_ataque_dur, 0.001), 0.0, 1.0)
-			rot = lerpf(-1.1, 0.8, f)
-			off = Vector2(9, -5)
-		elif a == "wallslide":
-			rot = 0.5
-			off = Vector2(6, 0)
-		elif a in ["jump", "jump_start", "jump_loop", "djump"]:
-			rot = -0.7
-			off = Vector2(7, -6)
-		_arma.rotation = rot
-		_arma.position = off
 
 
 ## Seleção estritamente visual dos estados 5G. Só observa o estado físico já
@@ -2139,12 +2024,7 @@ func _tint_armadura_base() -> Color:
 		return Color.WHITE  # o rig já vem recolorido -- não pintar por cima
 	if RIG == "shadowblade":
 		return _BRILHO_SHADOW
-	if RIGS_COM_PALETA.has(RIG):
-		# a cor da armadura já vai às PLACAS pelo shader; puxá-la também para
-		# o modulate pintava a pele e o cabelo e dava um boneco monocromático.
-		return _BRILHO_CORPO
-	var ai: int = Equipamento.indice_armadura(EstadoJogo.armadura_equipada)
-	return _BRILHO_CORPO if ai < 0 else _BRILHO_CORPO.lerp(Equipamento.cor_armadura(ai), 0.3)
+	return _BRILHO_CORPO
 
 
 ## A tinta de base com o estado por cima: verde envenenada, azul gelada. O
@@ -2176,13 +2056,11 @@ func _tick_estados(dt: float) -> void:
 
 
 ## Dano de ESTADO: sem i-frames, sem escudo, sem tremor de ecra. O que ele
-## partilha com o dano normal e' a morte -- e a reducao da armadura, que e'
-## do equipamento e vale sempre.
+## partilha com o dano normal e' a morte.
 func _dano_de_estado(q: int) -> void:
 	if EstadoJogo.modo_dev or _a_morrer:
 		return
-	var real := int(round(q * (1.0 - EstadoJogo.reducao_armadura())))
-	vida = maxi(0, vida - maxi(1, real))
+	vida = maxi(0, vida - maxi(1, q))
 	vida_mudou.emit(vida, _vida_max())
 	if vida <= 0:
 		_morrer()
@@ -2514,12 +2392,11 @@ func _anim_ataque() -> String:
 	return "attack"
 
 
-## Cor do golpe -- aço frio -> magenta conforme o tier da arma equipada.
+## Cor do golpe.
 const COR_GOLPE_BASE := Color(0.96, 0.55, 1.0)
 
 func _cor_golpe() -> Color:
-	var wi := Equipamento.indice_arma(EstadoJogo.arma_equipada)
-	return COR_GOLPE_BASE if wi < 0 else Equipamento.cor_arma(wi).lerp(Color.WHITE, 0.4)
+	return COR_GOLPE_BASE
 
 
 ## Glow do golpe: um brilho ROXO ESCURO, curto e discreto. Pedido do Paulo
@@ -3023,8 +2900,8 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0, origem := "") -> v
 	if _defendendo and _bloqueia(dir_empurrao):
 		_ao_bloquear()
 		return
-	var real := int(round(quantidade * (1.0 - EstadoJogo.reducao_armadura())))
-	vida = _vida_max() if EstadoJogo.modo_dev else maxi(0, vida - maxi(1, real))
+	var real := maxi(1, quantidade)
+	vida = _vida_max() if EstadoJogo.modo_dev else maxi(0, vida - real)
 	_invulneravel = I_FRAMES
 	_hurt_t = 0.24
 	Musica.intensificar()   # 9H.1: levar dano também é combate
