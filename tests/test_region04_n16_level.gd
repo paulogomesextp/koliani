@@ -76,6 +76,11 @@ static func executar() -> Array[String]:
 		_verificar(falhas, vao <= alc, "N16: vao %s->%s = %.0f > alcance %.0f" % [par[0], par[1], vao, alc])
 		_verificar(falhas, absf(float(a.topo) - float(b.topo)) <= 118.0,
 			"N16: degrau %s->%s demasiado alto" % par)
+	# --- paredes dos lagos: quem cai na lava nao passa por baixo das lajes -----
+	for muro in ["MuroA", "MuroB1", "MuroB2", "MuroC1", "MuroD"]:
+		var m := N12._caixa(raiz, muro)
+		_verificar(falhas, not m.is_empty() and float(m.base) >= 740.0,
+			"N16: %s devia fechar o vao ate' ao fundo do lago" % muro)
 	raiz.free()
 	return falhas
 
