@@ -455,7 +455,12 @@ static func _vao_entre(e0: float, d0: float, e1: float, d1: float) -> float:
 
 
 static func _da_para_saltar(a: Dictionary, b: Dictionary, ar: Dictionary = {}) -> bool:
-	if _da_para_saltar_a_pe(a, b):
+	# A regra base (vao <= 210) e' a de ar parado. Com vento CONTRA continuo
+	# sobre o vao, quem decide e' o salto duplo medido (`_da_para_saltar_duplo`):
+	# o N8 chegou ao Paulo com um vao de 190 px (+70 acima) que a regra base
+	# dava por feito e que na pratica so' se passa com o 2.o salto perfeito.
+	var contra := _intensidade_contra(a, b, ar)
+	if not (contra > 0.0 and bool(ar.get("duplo", false))) and _da_para_saltar_a_pe(a, b):
 		return true
 	if ar.is_empty():
 		return false
@@ -552,16 +557,27 @@ static func _da_para_saltar_a_pe(a: Dictionary, b: Dictionary) -> bool:
 ## origem (+ a largura do corpo ~ 380 borda a borda); no N7, PousoD ->
 ## CorrenteE (365 px, 28 acima) passa, e so' com a laje no extremo esquerdo.
 ##
-## VENTO CONTRA continuo sobre o vao encolhe muito o duplo (bancada, N8,
-## velocidade_max 130): 352 px sem vento, 305 a 1550, 238 a 1800, 183 a
-## 2200. So' ha' medida certa ate' `VENTO_CONTRA_MEDIDO`: ai' o alcance
-## escala por 305/352; acima disso o duplo NAO conta (fica a regra base).
-## Pulsos nao contam nem a favor nem contra: espera-se a pausa.
+## VENTO CONTRA continuo sobre o vao (bancada `tools/bench_vao.gd`, N8, vento
+## 1500..1800, segundo salto dado ate' ~0,15 s cedo -- `duplo_vy=-220`, que e'
+## o que faz quem nao tem reflexos perfeitos):
+##   * o alcance cai ~30 px por cada 100 de intensidade (266 px a 1500, 179 a
+##     1800, a +35 de subida);
+##   * a SUBIDA custa muito mais do que parece: B1->B2 do N8 (vao 190, +70,
+##     vento 1600) so' alcanca 140 px com o 2.o salto cedo e 243 com ele
+##     perfeito -- e foi o vao que o Paulo nao conseguia passar. Com o topo
+##     do arco a chegar mais cedo, ha' menos tempo de voo contra o vento.
+## Pontos que passam com o 2.o salto cedo (`duplo_vy=-220`): vao 230 a +15
+## (vento 1550), vao 240 a -65 (1750), vao 165 a -22 (1800). Recta usada:
+## `LIMITE_CONTRA - COEF_SOBE_CONTRA * subida`, por (vao 230, +15) e (140, +70):
+## 255 - 1,64 * subida. E' um AJUSTE a dois pontos medidos, confirmado pelos
+## outros dois; acima de `VENTO_CONTRA_MAX` (ultimo valor medido) nao conta.
+## Pulsos nao contam nem a favor nem contra: espera-se pela pausa.
 const NIVEL_SALTO_DUPLO := 5
 const ENVOLVENTE_DUPLO := {-140.0: 420.0, -60.0: 390.0, 0.0: 380.0, 64.0: 350.0,
 	100.0: 340.0, 140.0: 330.0}
-const VENTO_CONTRA_MEDIDO := 1550.0
-const FATOR_VENTO_CONTRA := 305.0 / 352.0
+const VENTO_CONTRA_MAX := 1800.0
+const LIMITE_CONTRA := 255.0
+const COEF_SOBE_CONTRA := 1.64
 
 
 static func _da_para_saltar_duplo(a: Dictionary, b: Dictionary, ar: Dictionary) -> bool:
@@ -573,21 +589,30 @@ static func _da_para_saltar_duplo(a: Dictionary, b: Dictionary, ar: Dictionary) 
 		return false
 	var vao := _vao_entre(float(a.esq), float(a.dir), float(b.esq), float(b.dir))
 	var limite := _envolvente(ENVOLVENTE_DUPLO, dsub)
+	var contra := _intensidade_contra(a, b, ar)
+	if contra > 0.0:
+		if contra > VENTO_CONTRA_MAX:
+			return false
+		limite = clampf(LIMITE_CONTRA - COEF_SOBE_CONTRA * dsub, 100.0, limite)
+	return vao <= limite
+
+
+## Maior intensidade de vento CONTRA continuo que apanha o vao (0 = nenhum).
+static func _intensidade_contra(a: Dictionary, b: Dictionary, ar: Dictionary) -> float:
 	var para_direita := float(b.esq) > float(a.dir)
 	var sentido := 1.0 if para_direita else -1.0
 	var x0 := minf(float(a.dir), float(b.esq)) if para_direita else float(b.dir)
 	var x1 := maxf(float(a.dir), float(b.esq)) if para_direita else float(a.esq)
 	var banda := float(a.topo) - 60.0
+	var maior := 0.0
 	for f: Dictionary in ar.get("favor", []):
 		var r: Rect2 = f["ret"]
 		if float(f["sentido"]) == sentido or banda < r.position.y or banda > r.end.y:
 			continue
 		if minf(x1, r.end.x) <= maxf(x0, r.position.x):
 			continue   # a zona nao apanha o vao
-		if float(f["intensidade"]) > VENTO_CONTRA_MEDIDO:
-			return false
-		limite *= FATOR_VENTO_CONTRA
-	return vao <= limite
+		maior = maxf(maior, float(f["intensidade"]))
+	return maior
 
 
 ## Vao maximo para a subida `dy` (interpolacao linear; abaixo da descida
