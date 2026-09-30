@@ -1,6 +1,6 @@
 # SFX de combate aprovados (Pixabay)
 
-Originais sem alteração, descarregados em 29 set 2026 (2 pelo cliente Python, 24 à mão pelo Paulo no browser).
+Originais sem alteração, descarregados em 29-30 set 2026 (2 pelo cliente Python, 25 à mão pelo Paulo no browser).
 Licença: Pixabay Content License (uso livre, sem atribuição obrigatória). Ainda não ligados a eventos no `som.gd`.
 
 | Ficheiro | Título na Pixabay | Autor | Evento provável | Página | SHA256 |
@@ -31,7 +31,4 @@ Licença: Pixabay Content License (uso livre, sem atribuição obrigatória). Ai
 | `6184.mp3` | bubbling | freesound_community | gosma | [link](https://pixabay.com/sound-effects/nature-bubbling-6184/) | `dbb99e453712ec89` |
 | `543682.mp3` | hurt amp death pain gurgle | applehillstudios | morte | [link](https://pixabay.com/sound-effects/people-hurt-amp-death-pain-gurgle-543682/) | `7382a6558d332da9` |
 | `295404.mp3` | soft body impact | homemade_sfx | pisao da Koliani | [link](https://pixabay.com/sound-effects/people-soft-body-impact-295404/) | `97e63dae66d57f40` |
-
-## Em falta
-
-- `184276` https://pixabay.com/sound-effects/film-special-effects-biodynamic-impact-braam-tonal-dark-184276/ (biodynamic impact braam tonal dark): entrada de chefe
+| `184276.mp3` | biodynamic impact braam tonal dark | bryansantosbreton | entrada de chefe | [link](https://pixabay.com/sound-effects/film-special-effects-biodynamic-impact-braam-tonal-dark-184276/) | `81b67566f214dd6d` |
