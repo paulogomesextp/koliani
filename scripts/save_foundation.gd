@@ -196,9 +196,8 @@ static func _validar_campos_legacy(d: Dictionary, total_niveis: int,
 		exigir_completo: bool) -> Dictionary:
 	var obrigatorios := ["vidas", "indice_nivel", "checkpoint", "habilidades"]
 	if exigir_completo:
-		obrigatorios.append_array(["pistas", "concluidos", "armas", "armaduras",
-			"arma_equipada", "armadura_equipada", "hardcore",
-			"hardcore_tempo_restante", "essencia", "melhorias"])
+		obrigatorios.append_array(["pistas", "concluidos", "hardcore",
+			"hardcore_tempo_restante", "essencia"])
 	for chave in obrigatorios:
 		if not d.has(chave):
 			return _falha("invalid_structure", "Campo obrigatorio em falta: %s" % chave)
@@ -210,7 +209,7 @@ static func _validar_campos_legacy(d: Dictionary, total_niveis: int,
 		return _falha("invalid_structure", "indice_nivel invalido")
 	if not _vetor_json(d.get("checkpoint")):
 		return _falha("invalid_structure", "checkpoint invalido")
-	for chave in ["habilidades", "pistas", "armas", "armaduras"]:
+	for chave in ["habilidades", "pistas"]:
 		if d.has(chave) and not _array_strings(d[chave]):
 			return _falha("invalid_structure", "%s nao e array de strings" % chave)
 	if d.has("concluidos"):
@@ -219,31 +218,19 @@ static func _validar_campos_legacy(d: Dictionary, total_niveis: int,
 		for indice in d["concluidos"]:
 			if not _inteiro(indice) or int(indice) < 0 or int(indice) >= total_niveis:
 				return _falha("invalid_structure", "indice concluido invalido")
-	for chave in ["arma_equipada", "armadura_equipada"]:
-		if d.has(chave) and not (d[chave] is String):
-			return _falha("invalid_structure", "%s nao e string" % chave)
 	if d.has("hardcore") and not (d["hardcore"] is bool):
 		return _falha("invalid_structure", "hardcore nao e booleano")
 	if d.has("hardcore_tempo_restante") and not _numero_finito(d["hardcore_tempo_restante"]):
 		return _falha("invalid_structure", "hardcore_tempo_restante invalido")
 	if d.has("essencia") and (not _inteiro(d["essencia"]) or int(d["essencia"]) < 0):
 		return _falha("invalid_structure", "essencia invalida")
-	if d.has("melhorias"):
-		if not (d["melhorias"] is Dictionary):
-			return _falha("invalid_structure", "melhorias nao e dicionario")
-		for chave in d["melhorias"]:
-			if not (chave is String) or not _inteiro(d["melhorias"][chave]) \
-					or int(d["melhorias"][chave]) < 0:
-				return _falha("invalid_structure", "rank de melhoria invalido")
 	return {"ok": true}
 
 
 static func _validar_campos_v3(d: Dictionary, total_niveis: int) -> Dictionary:
 	var obrigatorios := ["vidas", "current_level_id", "checkpoint", "ability_ids",
 		"collectible_ids", "completed_level_ids", "defeated_boss_ids",
-		"claimed_reward_ids", "armas", "armaduras", "arma_equipada",
-		"armadura_equipada", "hardcore", "hardcore_tempo_restante", "essencia",
-		"melhorias"]
+		"claimed_reward_ids", "hardcore", "hardcore_tempo_restante", "essencia"]
 	for chave in obrigatorios:
 		if not d.has(chave):
 			return _falha("invalid_structure", "Campo obrigatorio em falta: %s" % chave)
@@ -284,24 +271,12 @@ static func _validar_campos_v3(d: Dictionary, total_niveis: int) -> Dictionary:
 		if reward_id != "" and reward_id not in d["claimed_reward_ids"]:
 			return _falha("incompatible_progression_reference",
 				"Nivel concluido sem recompensa correspondente: %s" % level_id)
-	for chave in ["armas", "armaduras"]:
-		if not _array_strings(d[chave]):
-			return _falha("invalid_structure", "%s nao e array de strings" % chave)
-	for chave in ["arma_equipada", "armadura_equipada"]:
-		if not (d[chave] is String):
-			return _falha("invalid_structure", "%s nao e string" % chave)
 	if not (d["hardcore"] is bool):
 		return _falha("invalid_structure", "hardcore nao e booleano")
 	if not _numero_finito(d["hardcore_tempo_restante"]):
 		return _falha("invalid_structure", "hardcore_tempo_restante invalido")
 	if not _inteiro(d["essencia"]) or int(d["essencia"]) < 0:
 		return _falha("invalid_structure", "essencia invalida")
-	if not (d["melhorias"] is Dictionary):
-		return _falha("invalid_structure", "melhorias nao e dicionario")
-	for chave in d["melhorias"]:
-		if not (chave is String) or not _inteiro(d["melhorias"][chave]) \
-				or int(d["melhorias"][chave]) < 0:
-			return _falha("invalid_structure", "rank de melhoria invalido")
 	return {"ok": true}
 
 
@@ -373,9 +348,8 @@ static func _migrar_passo(d: Dictionary, versao: int) -> Dictionary:
 			# Defaults já usados por EstadoJogo antes do versionamento. Mantêm a
 			# compatibilidade sem reinterpretar nenhum campo legacy existente.
 			var defaults := {
-				"pistas": [], "concluidos": [], "armas": [], "armaduras": [],
-				"arma_equipada": "", "armadura_equipada": "", "hardcore": false,
-				"hardcore_tempo_restante": -1.0, "essencia": 0, "melhorias": {},
+				"pistas": [], "concluidos": [], "hardcore": false,
+				"hardcore_tempo_restante": -1.0, "essencia": 0,
 			}
 			for chave in defaults:
 				if not out.has(chave):

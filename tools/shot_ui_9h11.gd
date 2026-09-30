@@ -1,5 +1,5 @@
 extends SceneTree
-## 9H.11 -- fotografa os ecrãs de UI (Pausa / Santuário) para revisão visual.
+## 9H.11 -- fotografa os ecrãs de UI (Pausa, HUD) para revisão visual.
 ## `godot --screen 1 --resolution 1280x720 --script res://tools/shot_ui_9h11.gd -- <qual> <saida.png>`
 
 func _initialize() -> void:
@@ -23,9 +23,6 @@ func _initialize() -> void:
 			await process_frame
 		if h.has_method("_ao_combate_chefe"):
 			h.call("_ao_combate_chefe", null)
-	else:
-		var s: Control = load("res://scenes/ui/Santuario.tscn").instantiate()
-		root.add_child(s)
 	for i in 40:
 		await process_frame
 	var img := root.get_texture().get_image()

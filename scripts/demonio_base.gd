@@ -1122,7 +1122,7 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0, critico := false,
 		return
 	var q := quantidade
 	if critico:
-		q = int(round(q * (CRIT_MULT + EstadoJogo.bonus("crit_mult"))))  # melhoria "furia"
+		q = int(round(q * CRIT_MULT))
 		# gelo + crítico = ESTILHAÇA: bónus e limpa o congelamento
 		if _congelado > 0.0:
 			q += int(round(quantidade * 0.6))

@@ -234,14 +234,6 @@ CC0 não exige atribuição; fica aqui à mesma por cortesia.
   ficam no repo porque `koliani.gd` ainda sabe montá-las (`RIG =
   "cavaleiro"`), mas o jogo já não as usa.
 
-## thewisehedgehog — pack de armas pixel-art
-- https://thewisehedgehog.itch.io/  (URL exato + licença POR CONFIRMAR pelo Paulo em incoming/LICENSES.md)
-- Uso: as 15 lâminas que a Koliani segura (`assets/sprites/pixel/gear/armas.png`,
-  15 frames de 32x32) — extraídas da grelha 6x5 de `File (1).png` por
-  `tools/extrair_armas.gd`. A cor dominante de cada lâmina alimenta
-  `Equipamento.COR_ARMA`, e o brilho/efeitos do golpe (`koliani.gd`) seguem
-  essa cor.
-
 ## bdragon1727 — "Free Effect and Bullet 16x16"
 - https://bdragon1727.itch.io/free-effect-and-bullet-16x16
 - Licença: grátis ("name your own price"). Uso não-comercial livre; uso
