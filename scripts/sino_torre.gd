@@ -118,6 +118,11 @@ func tocar() -> void:
 
 
 func _alternar(p: Node) -> void:
+	# Opt-in (N14): quem sabe responder a' badalada por si (plataformas
+	# temporizadas, a corrente do elevador que muda de direcao) fa-lo; os
+	# outros alternam o `Col`/`Visual` como sempre.
+	if p.has_method("ao_badalar") and bool(p.call("ao_badalar")):
+		return
 	var col := p.get_node_or_null("Col") as CollisionShape2D
 	if col == null:
 		return

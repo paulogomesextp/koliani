@@ -34,6 +34,13 @@ const PLATAFORMA := preload("res://scripts/plataforma.gd")
 @export var escala_contrapeso := 0.6
 ## Lado da roldana onde fica o contrapeso (-1 esquerda, 1 direita).
 @export var lado_contrapeso := 1.0
+## Opt-in (N14, "correntes que mudam direcao"): o elevador deixa de subir
+## com peso e passa a obedecer a um SINO -- cada badalada do `SinoTorre`
+## com este `alterna_grupo` manda a corrente para o outro extremo. Vazio =
+## o elevador de sempre.
+@export var grupo_sino := ""
+
+var _no_fim := false
 
 var _contrapeso: Sprite2D
 var _corda_peso: Sprite2D
@@ -46,6 +53,8 @@ var _y_antes := 0.0
 
 func _ready() -> void:
 	super._ready()
+	if grupo_sino != "":
+		add_to_group(grupo_sino)
 	_vestir()
 	_ancora_y = _base.y + minf(curso.y, 0.0) - altura_ancora
 	var hw := largura * 0.5
@@ -100,6 +109,23 @@ func _ready() -> void:
 		_contrapeso.z_index = -1
 		add_child(_contrapeso)
 	_esticar()
+
+
+## A badalada do sino do grupo: a corrente muda de direcao.
+func ao_badalar() -> bool:
+	if grupo_sino == "":
+		return false
+	_no_fim = not _no_fim
+	return true
+
+
+func _physics_process(dt: float) -> void:
+	if grupo_sino == "":
+		super._physics_process(dt)
+		return
+	var alvo := (_base + curso) if _no_fim else _base
+	_som_marcha(global_position.distance_to(alvo) > PARADO)
+	global_position = global_position.move_toward(alvo, velocidade * dt)
 
 
 func _process(_dt: float) -> void:

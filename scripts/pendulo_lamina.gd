@@ -22,6 +22,9 @@ extends Node2D
 @export var textura_haste: Texture2D
 @export var textura_lamina: Texture2D
 @export var escala_lamina := 0.5
+## Opt-in (N14, sino gigante em movimento): tamanho da zona que magoa, em
+## px, centrada na lamina. ZERO = a capsula de sempre (14 x 60).
+@export var area_lamina := Vector2.ZERO
 
 var _t := 0.0
 var _braco: Node2D
@@ -133,11 +136,16 @@ func _montar_visual() -> void:
 	_lamina_area.collision_mask = 2
 	_lamina_area.position = Vector2(0, comprimento)
 	var cs := CollisionShape2D.new()
-	var forma := CapsuleShape2D.new()
-	forma.radius = 14.0
-	forma.height = 60.0
-	cs.shape = forma
-	cs.rotation = PI / 2.0
+	if area_lamina != Vector2.ZERO:
+		var ret := RectangleShape2D.new()
+		ret.size = area_lamina
+		cs.shape = ret
+	else:
+		var forma := CapsuleShape2D.new()
+		forma.radius = 14.0
+		forma.height = 60.0
+		cs.shape = forma
+		cs.rotation = PI / 2.0
 	_lamina_area.add_child(cs)
 	_lamina_area.body_entered.connect(_ao_tocar)
 	_braco.add_child(_lamina_area)

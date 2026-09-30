@@ -20,6 +20,10 @@ extends Node2D
 @export var fase := 0.0
 ## Tamanho da pedra (raio aproximado, px).
 @export var tam := 16.0
+## Opt-in (N14, "sinos em queda"): a pedra passa a ser esta pintura (o sino
+## da prancha). Vazio = a pedra de sempre.
+@export var textura: Texture2D
+@export var escala_textura := 1.0
 
 const GRAV := 1500.0
 
@@ -84,6 +88,16 @@ func _montar_visual() -> void:
 	_poeira.initial_velocity_max = 80.0
 	_poeira.color = Color(0.55, 0.5, 0.55, 0.8)
 	add_child(_poeira)
+
+	if textura:
+		raiz.visible = false
+		_corpo.color = Color(1, 1, 1, 0)
+		aresta.visible = false
+		var pele := Sprite2D.new()
+		pele.texture = textura
+		pele.scale = Vector2(escala_textura, escala_textura)
+		_corpo.add_child(pele)
+		_poeira.color = Color(0.95, 0.78, 0.5, 0.85)
 
 	_area = Area2D.new()
 	_area.collision_layer = 0
