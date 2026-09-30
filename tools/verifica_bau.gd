@@ -6,7 +6,11 @@ var falhas := 0
 func _init() -> void:
 	await process_frame
 	var args := OS.get_cmdline_user_args()
-	var indice_nivel := int(args[0]) if not args.is_empty() else 11
+	# Nivel de referencia: precisa de um CHEFE de verdade (grupo "chefes") e de
+	# nenhuma habilidade nem cartao de regiao a atrasar a saida. O indice 11
+	# (N12) deixou de servir quando o N12 passou a ter um guardiao elite, sem
+	# chefe; N5 e N10 concedem habilidade/cartao. N14 cumpre os dois.
+	var indice_nivel := int(args[0]) if not args.is_empty() else 13
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 1234
 	var tipos := {}

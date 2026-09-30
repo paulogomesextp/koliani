@@ -22,8 +22,16 @@ extends Area2D
 ## trás sem ela poder fazer nada.
 @export var vel_max := 210.0
 @export var cor := Color(0.55, 0.75, 1.0, 0.16)
+## Opt-in (N14, "vento que empurra"): o sopro pintado da prancha em mosaico
+## horizontal, a correr no sentido do empurrao. Substitui o retangulo e as
+## riscas de placeholder. Vazio = igual a sempre.
+@export var pele: Texture2D
+@export var vel_pele := 160.0
+## Opacidade da pele (aditiva): o vento le'-se sem tapar o cenario.
+@export var alfa_pele := 0.55
 
 var _dentro: Array[Node] = []
+var _pele_spr: Sprite2D
 
 
 func _ready() -> void:
@@ -48,6 +56,9 @@ func _ready() -> void:
 ## Riscas a correr no sentido do empurrão -- sem isto a correnteza era
 ## invisível e o jogador levava com ela sem perceber porquê.
 func _montar_visual() -> void:
+	if pele:
+		_vestir_pele()
+		return
 	var fundo := ColorRect.new()
 	fundo.color = cor
 	fundo.size = tamanho
@@ -81,3 +92,51 @@ func _physics_process(dt: float) -> void:
 			corpo.velocity.x = maxf(v, minf(corpo.velocity.x, -vel_max))
 		else:
 			corpo.velocity.x = minf(v, maxf(corpo.velocity.x, vel_max))
+
+
+const _SHADER_PELE_CODIGO := """
+shader_type canvas_item;
+render_mode blend_add;
+uniform vec2 meio = vec2(1.0);
+uniform float borda = 0.22;
+varying vec2 p;
+void vertex() { p = VERTEX / meio; }
+void fragment() {
+	vec4 c = texture(TEXTURE, UV) * COLOR;
+	float fx = smoothstep(1.0, 1.0 - borda * 2.0, abs(p.x));
+	float fy = smoothstep(1.0, 1.0 - borda * 2.0, abs(p.y));
+	COLOR = vec4(c.rgb, c.a * fx * fy);
+}
+"""
+static var _SHADER_PELE: Shader = null
+
+
+func _vestir_pele() -> void:
+	if _SHADER_PELE == null:
+		_SHADER_PELE = Shader.new()
+		_SHADER_PELE.code = _SHADER_PELE_CODIGO
+	var esc := tamanho.y / float(pele.get_height())
+	_pele_spr = Sprite2D.new()
+	_pele_spr.name = "Pele"
+	_pele_spr.texture = pele
+	_pele_spr.texture_repeat = CanvasItem.TEXTURE_REPEAT_ENABLED
+	_pele_spr.region_enabled = true
+	_pele_spr.region_rect = Rect2(0.0, 0.0, tamanho.x / esc, float(pele.get_height()))
+	_pele_spr.scale = Vector2(esc, esc)
+	_pele_spr.modulate = Color(0.8, 0.9, 1.0, alfa_pele)
+	# aditiva e com as bordas esbatidas: o sopro nasce e morre no ar, sem se
+	# ver o rectangulo da area
+	var m := ShaderMaterial.new()
+	m.shader = _SHADER_PELE
+	m.set_shader_parameter("meio", _pele_spr.region_rect.size * 0.5)
+	_pele_spr.material = m
+	add_child(_pele_spr)
+
+
+func _process(dt: float) -> void:
+	if _pele_spr:
+		# o sopro corre no sentido do empurrao: desliza a janela do mosaico
+		var r := _pele_spr.region_rect
+		r.position.x = fposmod(r.position.x - signf(empurrao) * vel_pele * dt / _pele_spr.scale.x,
+			float(pele.get_width()))
+		_pele_spr.region_rect = r

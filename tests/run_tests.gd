@@ -28,6 +28,7 @@ const TestesRegion02N10 := preload("res://tests/test_region02_n10_level.gd")
 const TestesRegion03N11 := preload("res://tests/test_region03_n11_level.gd")
 const TestesRegion03N12 := preload("res://tests/test_region03_n12_level.gd")
 const TestesRegion03N13 := preload("res://tests/test_region03_n13_level.gd")
+const TestesRegion03N14 := preload("res://tests/test_region03_n14_level.gd")
 const TestesKolianiCanonicaNiveis := preload("res://tests/test_koliani_canonica_niveis.gd")
 const DT := 1.0 / 60.0
 
@@ -66,6 +67,8 @@ func _correr_tudo() -> void:
 	for falha in TestesRegion03N12.executar():
 		_falhas.append(falha)
 	for falha in TestesRegion03N13.executar():
+		_falhas.append(falha)
+	for falha in TestesRegion03N14.executar():
 		_falhas.append(falha)
 	for falha in TestesKolianiCanonicaNiveis.executar():
 		_falhas.append(falha)
@@ -233,6 +236,8 @@ func _correr_tudo() -> void:
 	await teste_r3_n12_portoes_no_crivo()
 	await teste_r3_n13_mecanismos()
 	await teste_r3_n13_elevadores_no_crivo()
+	await teste_r3_n14_sinos()
+	await teste_r3_n14_portoes_no_crivo()
 	await teste_r3_vyrak_identidade()
 	await teste_r3_vyrak_leva_dano_muda_de_fase_e_morre()
 
@@ -4495,6 +4500,107 @@ func teste_r3_n13_elevadores_no_crivo() -> void:
 		else:
 			_ok(not bool(r.get("ok_porta", true)),
 				"R3/N13: o '%s' contorna-se -- a porta alcanca-se sem ele" % portao)
+		raiz.queue_free()
+		await get_tree().process_frame
+
+
+## N14 (Campanario) em FISICA: a cena inteira na arvore e os sinos tocados
+## como a Koliani os toca. Prova que a badalada acende as plataformas
+## temporizadas do seu grupo (so' as dele), que elas se apagam quando o tempo
+## acaba, e que o sino da corrente muda o sentido da corrente D (sobe/desce).
+func teste_r3_n14_sinos() -> void:
+	EstadoJogo.indice_nivel = R3_BASE + 3
+	EstadoJogo.checkpoint = Vector2.ZERO
+	var raiz: Node = (load(EstadoJogo.NIVEIS[R3_BASE + 3]) as PackedScene).instantiate()
+	var kol := raiz.get_node_or_null("Koliani")
+	if kol:
+		kol.set("_a_morrer", true)
+	get_tree().root.add_child(raiz)
+	for i in 6:
+		await get_tree().physics_frame
+	var solida := func(nome: String) -> bool:
+		return not (raiz.get_node(nome).get_node("Col") as CollisionShape2D).disabled
+
+	# B) sinos em sequencia: tudo apagado ate' se tocar
+	for nome in ["Seq1a", "Seq1d", "Seq2a", "Seq3a"]:
+		_ok(not solida.call(nome), "R3/N14: %s devia arrancar apagada" % nome)
+	raiz.get_node("Sino1").tocar()
+	await get_tree().physics_frame
+	await get_tree().physics_frame
+	for nome in ["Seq1a", "Seq1b", "Seq1c", "Seq1d"]:
+		_ok(solida.call(nome), "R3/N14: o Sino1 devia acender %s" % nome)
+	_ok(not solida.call("Seq2a") and not solida.call("Seq3a"),
+		"R3/N14: o Sino1 so' acende a 1.a sequencia")
+	# tocar outra vez nao as apaga (temporizadas: a badalada da' tempo)
+	var s1: Node = raiz.get_node("Sino1")
+	s1.set("_cd", 0.0)
+	s1.tocar()
+	await get_tree().physics_frame
+	await get_tree().physics_frame
+	_ok(solida.call("Seq1a"), "R3/N14: a 2.a badalada devia manter a sequencia acesa")
+	# o tempo acaba -> apagam-se
+	for nome in ["Seq1a", "Seq1b", "Seq1c", "Seq1d"]:
+		raiz.get_node(nome).set("_resta", 0.02)
+	# o relogio das temporizadas corre no `_process`: esperar frames de
+	# desenho (e um de fisica para o `set_deferred` da colisao)
+	for i in 6:
+		await get_tree().process_frame
+	await get_tree().physics_frame
+	_ok(not solida.call("Seq1a") and not solida.call("Seq1d"),
+		"R3/N14: as temporizadas deviam apagar-se quando o tempo acaba")
+
+	# C) a corrente que muda de direcao: o sino leva-a ao alto e traz de volta
+	var cd := raiz.get_node("CorrenteD") as Node2D
+	var y0 := cd.global_position.y
+	raiz.get_node("SinoCorrente1").tocar()
+	for i in 90:
+		await get_tree().physics_frame
+	_ok(cd.global_position.y < y0 - 150.0,
+		"R3/N14: o sino devia pôr a corrente D a subir (%.0f -> %.0f)" % [y0, cd.global_position.y])
+	var sc2: Node = raiz.get_node("SinoCorrente2")
+	sc2.set("_cd", 0.0)
+	sc2.tocar()
+	var y1 := cd.global_position.y
+	for i in 60:
+		await get_tree().physics_frame
+	_ok(cd.global_position.y > y1 + 100.0,
+		"R3/N14: o outro sino devia inverter a corrente D (%.0f -> %.0f)" % [y1, cd.global_position.y])
+	raiz.queue_free()
+	await get_tree().process_frame
+
+
+## Cada PORTAO do N14 e' mesmo preciso: tirando-o, o crivo de alcance deixa
+## de chegar a' porta. (O baloico A nao entra: ensina a mecanica por cima de
+## um fosso de que se sai a escalar -- leva ao segredo 1, nao a' porta.)
+func teste_r3_n14_portoes_no_crivo() -> void:
+	const CRIVO := preload("res://tools/verifica_alcance.gd")
+	var casos := {"": [], "3.a sequencia": ["Seq3a", "Seq3b"], "coluna de ar": ["ArCamara"],
+		"ar do telhado": ["ArC1"], "baloico C1": ["BalancoC1"], "baloico C2": ["BalancoC2"],
+		"roda": ["RodaC3_0", "RodaC3_1", "RodaC3_2"], "corrente D": ["CorrenteD"]}
+	EstadoJogo.indice_nivel = R3_BASE + 3
+	EstadoJogo.checkpoint = Vector2.ZERO
+	for portao: String in casos:
+		var raiz: Node = (load(EstadoJogo.NIVEIS[R3_BASE + 3]) as PackedScene).instantiate()
+		for n: String in casos[portao]:
+			var x := raiz.get_node_or_null(n)
+			_ok(x != null, "R3/N14: falta o no' %s" % n)
+			if x:
+				raiz.remove_child(x)
+				x.free()
+		var kol := raiz.get_node_or_null("Koliani")
+		if kol:
+			kol.set("_a_morrer", true)
+		get_tree().root.add_child(raiz)
+		for i in 4:
+			await get_tree().physics_frame
+		var r: Dictionary = CRIVO._medir_arvore(get_tree(), raiz)
+		if portao == "":
+			_ok(bool(r.get("ok_porta", false)) and (r.get("orfas", []) as Array).is_empty(),
+				"R3/N14: o nivel inteiro devia chegar a' porta sem ilhas (%s %s)" % [
+					r.get("porque", ""), r.get("orfas", [])])
+		else:
+			_ok(not bool(r.get("ok_porta", true)),
+				"R3/N14: o portao '%s' contorna-se -- a porta alcanca-se sem ele" % portao)
 		raiz.queue_free()
 		await get_tree().process_frame
 
