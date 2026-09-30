@@ -626,7 +626,7 @@ static func _da_para_escalar(a: Dictionary, b: Dictionary) -> bool:
 	return float(b.base) >= float(a.topo) - SUBIDA_MAX
 
 
-## SINOS (`sino_torre.gd`) e VITRAIS (`vitral.gd`): tocam-se/partem-se ao
+## SINOS (`sino_torre.gd`), ALAVANCAS (`alavanca.gd`) e VITRAIS (`vitral.gd`): tocam-se/partem-se ao
 ## bater-lhes (golpe ou projetil) e tornam solidas as plataformas do grupo
 ## deles (`alterna_grupo` / `grupo_luz`). Aproximacao: conta-se
 ## como tocado se estiver por cima de uma plataforma alcancada (60 px para
@@ -640,6 +640,10 @@ static func _recolher_sinos(raiz: Node) -> Array:
 		pilha.append_array(no.get_children())
 		var e: Script = no.get_script()
 		if e and e.resource_path.ends_with("sino_torre.gd"):
+			out.append({"pos": (no as Node2D).global_position,
+				"grupo": String(no.get("alterna_grupo"))})
+		elif e and e.resource_path.ends_with("alavanca.gd") and String(no.get("alterna_grupo")) != "":
+			# a alavanca (Area2D) liga-se ao toque e alterna o grupo dela (N13)
 			out.append({"pos": (no as Node2D).global_position,
 				"grupo": String(no.get("alterna_grupo"))})
 		elif e and e.resource_path.ends_with("vitral.gd") and String(no.get("grupo_luz")) != "":
