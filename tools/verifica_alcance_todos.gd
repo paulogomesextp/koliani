@@ -48,7 +48,10 @@ func _init() -> void:
 			continue
 		var r: Dictionary = await CRIVO.medir(self, cena, n)
 		if not bool(r.get("ok_porta", false)):
-			maus.append("  [%2d] %-30s %s" % [n + 1, ficheiro, r.get("porque", "")])
+			# `erro` = a sala nem deu para medir (ex.: a porta sem chao por
+			# baixo) -- sem isto a linha saia em branco e nao dizia porque
+			maus.append("  [%2d] %-30s %s" % [n + 1, ficheiro,
+				r.get("erro", r.get("porque", ""))])
 	print("")
 	print("=== ALCANCE: %d niveis, %d fora da conta, %d com a porta inalcancavel"
 		% [niveis.size(), saltados, maus.size()])

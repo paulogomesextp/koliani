@@ -53,7 +53,8 @@ func _correr() -> void:
 	var checks := _checks_da_cena(cena)
 	print("ATIVOS APOS REDUCAO: %d checkpoints: %s" % [
 		checks.size(), ", ".join(checks.map(func(c): return str(c.name)))])
-	for nome in ["CheckInicio", "CheckMeio", "CheckReencontro"]:
+	# o N5 autoral (b22dd1c0) tem Inicio, Pogo, Meio e Final; ja nao ha Reencontro
+	for nome in ["CheckInicio", "CheckPogo", "CheckMeio", "CheckFinal"]:
 		if not nomes_declarados.has(nome):
 			_falhar("%s autoral nao foi enumerado semanticamente" % nome)
 	if checks.is_empty():
