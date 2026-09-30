@@ -1,27 +1,61 @@
-[gd_scene load_steps=13 format=3 uid="uid://bkolianicemiterio16"]
+[gd_scene load_steps=43 format=3 uid="uid://bkolianicemiterio16"]
 
-; REGIAO IV / nivel 16 -- Cemiterio dos Reis.
-; Sala final FEITA A MAO (a JORNADA, que cresce com o nivel, vem antes). Catacumba a DESCER. Tumulos que
-; funcionam como ELEVADORES (TumuloElevador auto) entre os patamares.
-; Bifurcacao: galeria de cima / cova de baixo. Elite: necromante cuspidor.
-; Trevas do abismo por baixo (morte). Chefe: Rei Ossario.
+; REGIAO IV / nivel 16 -- ENTRADA DA FORNALHA (`level.n15`), "O calor comeca a falar".
+; O nome do ficheiro fica (era o Cemiterio dos Reis): mudá-lo partia saves.
+;
+; GERADO por `tools/construir_n16_entrada.py` -- editar la', nao aqui.
+; Desenho, medicoes e o que ficou por decidir: `docs/nivel_autoral_n16.md`.
+;
+; Nivel AUTORAL (`corredor = false`). Contrato: `region_04/level_mechanics.png`
+; (N16) + `layout_usage.png`: A entrada e tutorial (piso quente e lava rasa),
+; B primeiros fornos e plataformas (carrinho de minerio sobre lava), C area
+; de maquinas simples (segundo piso quente, jatos de fogo, passagem inferior),
+; D saida para a fundicao (Operario Blindado elite a guardar o portao).
+; 2 segredos, 4 checkpoints.
 
-[ext_resource type="PackedScene" uid="uid://bkolianiactor01" path="res://scenes/actors/Koliani.tscn" id="1_kol"]
-[ext_resource type="PackedScene" uid="uid://bdemoniobase01" path="res://scenes/actors/DemonioBase.tscn" id="2_dem"]
-[ext_resource type="PackedScene" uid="uid://bkolianicoletavel01" path="res://scenes/actors/Coletavel.tscn" id="3_col"]
-[ext_resource type="PackedScene" uid="uid://bkolianiporta01" path="res://scenes/actors/Porta.tscn" id="4_porta"]
-[ext_resource type="Script" path="res://scripts/checkpoint.gd" id="5_chk"]
-[ext_resource type="PackedScene" uid="uid://bkolianichefereiossario16" path="res://scenes/actors/ChefeReiOssario.tscn" id="6_chefe"]
-[ext_resource type="Script" path="res://scripts/nivel_com_chefe.gd" id="7_niv"]
-[ext_resource type="PackedScene" uid="uid://bkolianiatmosfera01" path="res://scenes/fx/Atmosfera.tscn" id="8_atm"]
-[ext_resource type="PackedScene" uid="uid://bkolianiplataforma01" path="res://scenes/actors/Plataforma.tscn" id="9_pl"]
-[ext_resource type="PackedScene" uid="uid://bkolianitumuloelev16" path="res://scenes/actors/TumuloElevador.tscn" id="10_tumulo"]
-[ext_resource type="PackedScene" uid="uid://bkolianiaguavenenosa01" path="res://scenes/actors/AguaVenenosa.tscn" id="11_trevas"]
-
-[ext_resource type="PackedScene" path="res://scenes/actors/CascaMasmorra.tscn" id="interior_casca"]
+[ext_resource type="Script" path="res://scripts/nivel_com_chefe.gd" id="1_s_nivel_com_chefe.gd"]
+[ext_resource type="PackedScene" uid="uid://bkolianiatmosfera01" path="res://scenes/fx/Atmosfera.tscn" id="2_c_Atmosfera.tscn"]
+[ext_resource type="PackedScene" uid="uid://bkolianiplataforma01" path="res://scenes/actors/Plataforma.tscn" id="3_a_pl"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/fornalha/r4_portao_forja.png" id="4_t_r4_portao_forja"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/fornalha/r4_brasas.png" id="5_t_r4_brasas"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/fornalha/r4_coluna.png" id="6_t_r4_coluna"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/fornalha/r4_bandeira.png" id="7_t_r4_bandeira"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/fornalha/r4_bigorna.png" id="8_t_r4_bigorna"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/fornalha/r4_grelha_incandescente.png" id="9_t_r4_grelha_incandescente"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/fornalha/r4_caixa.png" id="10_t_r4_caixa"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/fornalha/r4_piso_quente.png" id="11_t_r4_piso_quente"]
+[ext_resource type="Script" path="res://scripts/piso_quente.gd" id="12_s_piso_quente.gd"]
+[ext_resource type="PackedScene" uid="uid://bdemoniobase01" path="res://scenes/actors/DemonioBase.tscn" id="13_a_dem"]
+[ext_resource type="Script" path="res://scripts/checkpoint.gd" id="14_s_checkpoint.gd"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/fornalha/r4_lava_estatica.png" id="15_t_r4_lava_estatica"]
+[ext_resource type="PackedScene" uid="uid://bkolianilavafornalha04" path="res://scenes/actors/LavaFornalha.tscn" id="16_c_LavaFornalha.tscn"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/fornalha/r4_queda_lava.png" id="17_t_r4_queda_lava"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/fornalha/r4_forno.png" id="18_t_r4_forno"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/fornalha/r4_arco_gotico.png" id="19_t_r4_arco_gotico"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/fornalha/r4_carrinho_minerio.png" id="20_t_r4_carrinho_minerio"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/fornalha/r4_minerio_pilha.png" id="21_t_r4_minerio_pilha"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/fornalha/r4_corrente_fina.png" id="22_t_r4_corrente_fina"]
+[ext_resource type="PackedScene" uid="uid://bkolianiplatcorrente06" path="res://scenes/actors/PlataformaCorrente.tscn" id="23_a_corr"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/fornalha/r4_trilho_minerio.png" id="24_t_r4_trilho_minerio"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/fornalha/r4_tubo_lava.png" id="25_t_r4_tubo_lava"]
+[ext_resource type="PackedScene" uid="uid://bkolianiessencia01" path="res://scenes/actors/Essencia.tscn" id="26_a_ess"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/fornalha/r4_maquina.png" id="27_t_r4_maquina"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/fornalha/r4_caldeira.png" id="28_t_r4_caldeira"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/fornalha/r4_jato_fogo.png" id="29_t_r4_jato_fogo"]
+[ext_resource type="Script" path="res://scripts/jato_fornalha.gd" id="30_s_jato_fornalha.gd"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/fornalha/r4_valvula_roda.png" id="31_t_r4_valvula_roda"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/fornalha/r4_pistao_h.png" id="32_t_r4_pistao_h"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/fornalha/r4_arco_a.png" id="33_t_r4_arco_a"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/fornalha/r4_fornalha.png" id="34_t_r4_fornalha"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/fornalha/r4_corrente.png" id="35_t_r4_corrente"]
+[ext_resource type="PackedScene" uid="uid://bkolianiactor01" path="res://scenes/actors/Koliani.tscn" id="36_a_kol"]
+[ext_resource type="PackedScene" uid="uid://bkolianiporta01" path="res://scenes/actors/Porta.tscn" id="37_a_porta"]
 
 [sub_resource type="RectangleShape2D" id="rs_chk"]
 size = Vector2(44, 96)
+
+[sub_resource type="CanvasItemMaterial" id="mat_add"]
+blend_mode = 1
 
 [sub_resource type="Gradient" id="grad_luz"]
 offsets = PackedFloat32Array(0, 1)
@@ -35,209 +69,954 @@ fill = 1
 fill_from = Vector2(0.5, 0.5)
 fill_to = Vector2(1, 0.5)
 
+[sub_resource type="Gradient" id="ramp_brasa"]
+offsets = PackedFloat32Array(0, 0.4, 1)
+colors = PackedColorArray(1, 0.9, 0.45, 0, 1, 0.5, 0.14, 0.95, 0.5, 0.1, 0.04, 0)
+
+[sub_resource type="Gradient" id="ramp_fumo"]
+offsets = PackedFloat32Array(0, 0.3, 1)
+colors = PackedColorArray(0.2, 0.17, 0.17, 0, 0.26, 0.2, 0.2, 0.28, 0.12, 0.1, 0.1, 0)
+
 [node name="Cemiterio_dos_Reis" type="Node2D"]
-script = ExtResource("7_niv")
+script = ExtResource("1_s_nivel_com_chefe.gd")
+corredor = false
+candeeiros = false
+alongar_plataformas = false
+checkpoints_autorais = true
+mecanica_anunciada = "piso_quente"
+estreia_x_autoral = 430.0
 
-[node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
-cor_ambiente = Color(0.88, 0.88, 0.92, 1)
-cor_fundo = Color(0.07, 0.04, 0.1, 1)
-cor_silhueta = Color(0.11, 0.09, 0.13, 1)
-cor_luz = Color(0.86, 0.7, 0.78, 1)
-cor_poeira = Color(0.96, 0.88, 0.9, 1)
-densidade_poeira = 1.4
-bioma = "catacumbas"
-largura_nivel = 3200.0
-fundo_pack = "caverna"
-tinta_fundo = Color(1, 0.84, 0.96, 1)
-neblina_fundo = 0.26
-dessaturar_fundo = 0.14
-seed_ambiente = 1555
+[node name="Atmosfera" parent="." instance=ExtResource("2_c_Atmosfera.tscn")]
+cor_ambiente = Color(1.0, 0.86, 0.8, 1)
+cor_fundo = Color(0.09, 0.03, 0.03, 1)
+cor_silhueta = Color(0.14, 0.06, 0.05, 1)
+cor_luz = Color(1, 0.6, 0.3, 1)
+cor_poeira = Color(1, 0.62, 0.3, 1)
+densidade_poeira = 1.6
+bioma = "fornalha"
+largura_nivel = 4600.0
+fundo_pack = "fornalha"
+tinta_fundo = Color(1.0, 0.9, 0.85, 1)
+neblina_fundo = 0.12
+dessaturar_fundo = 0.0
+seed_ambiente = 1601
+luzes_horizonte = true
 
-[node name="Trevas" parent="." instance=ExtResource("11_trevas")]
-position = Vector2(1600, 1000)
-largura = 3700.0
-altura = 340.0
-cor = Color(0.05, 0.03, 0.09, 0.97)
+; ===================  A) ENTRADA E TUTORIAL DO CALOR  ===================
+; O Portao da Forja atras de quem chega; chao largo e frio; UM piso quente
+; no meio do caminho, a mostrar o ciclo (frio / aviso / quente) com folga dos
+; dois lados; um Trabalhador Corrompido a guardar o fim da sala. A seguir, a
+; primeira lava: rasa, com degraus de pedra -- cair nela magoa, nao mata.
+[node name="ChaoA" parent="." instance=ExtResource("3_a_pl")]
+position = Vector2(500, 635)
+tamanho = Vector2(1000, 70)
+altura_visual = 130
+cor_base = Color(0.2, 0.16, 0.16, 1)
+cor_topo = Color(0.42, 0.3, 0.26, 1)
 
-[node name="ChaoInicio" parent="." instance=ExtResource("9_pl")]
-position = Vector2(300, 640)
-tamanho = Vector2(440, 60)
-altura_visual = 110.0
-cor_base = Color(0.2, 0.22, 0.24, 1)
-cor_topo = Color(0.44, 0.5, 0.48, 1)
+[node name="PortaoForja" type="Sprite2D" parent="."]
+position = Vector2(150, 474.5)
+scale = Vector2(1.25, 1.25)
+texture = ExtResource("4_t_r4_portao_forja")
+z_index = -6
 
-[node name="D1" parent="." instance=ExtResource("9_pl")]
-position = Vector2(560, 680)
-tamanho = Vector2(150, 22)
-altura_visual = 32.0
-cor_base = Color(0.2, 0.22, 0.24, 1)
-cor_topo = Color(0.42, 0.48, 0.46, 1)
-
-[node name="TumuloA" parent="." instance=ExtResource("10_tumulo")]
-position = Vector2(690, 700)
-auto = true
-curso = Vector2(0, -140)
-velocidade = 80.0
-largura = 120.0
-
-[node name="D1b" parent="." instance=ExtResource("9_pl")]
-position = Vector2(770, 700)
-tamanho = Vector2(140, 22)
-altura_visual = 32.0
-cor_base = Color(0.2, 0.22, 0.24, 1)
-cor_topo = Color(0.42, 0.48, 0.46, 1)
-
-[node name="D2" parent="." instance=ExtResource("9_pl")]
-position = Vector2(970, 720)
-tamanho = Vector2(150, 22)
-altura_visual = 32.0
-cor_base = Color(0.2, 0.22, 0.24, 1)
-cor_topo = Color(0.42, 0.48, 0.46, 1)
-
-[node name="ChaoMeio" parent="." instance=ExtResource("9_pl")]
-position = Vector2(1280, 760)
-tamanho = Vector2(360, 60)
-altura_visual = 110.0
-cor_base = Color(0.2, 0.22, 0.24, 1)
-cor_topo = Color(0.42, 0.48, 0.46, 1)
-
-[node name="EliteNecro" parent="." instance=ExtResource("2_dem")]
-position = Vector2(1280, 696)
-scale = Vector2(1.4, 1.4)
-elite = true
-especie = "necromante"
-vida = 185
-dano_contacto = 24
-comportamento = "cuspidor"
-alcance_patrulha = 60.0
-cor_rim = Color(0.6, 0.85, 0.72, 1)
-
-; -- BIFURCACAO: galeria de CIMA / cova de BAIXO --
-[node name="Cima1" parent="." instance=ExtResource("9_pl")]
-position = Vector2(1500, 660)
-tamanho = Vector2(140, 20)
-altura_visual = 26.0
-cor_base = Color(0.2, 0.22, 0.24, 1)
-cor_topo = Color(0.42, 0.48, 0.46, 1)
-
-[node name="Cima2" parent="." instance=ExtResource("9_pl")]
-position = Vector2(1700, 600)
-tamanho = Vector2(140, 20)
-altura_visual = 26.0
-cor_base = Color(0.2, 0.22, 0.24, 1)
-cor_topo = Color(0.42, 0.48, 0.46, 1)
-
-[node name="Cima3" parent="." instance=ExtResource("9_pl")]
-position = Vector2(1900, 620)
-tamanho = Vector2(140, 20)
-altura_visual = 26.0
-cor_base = Color(0.2, 0.22, 0.24, 1)
-cor_topo = Color(0.42, 0.48, 0.46, 1)
-
-[node name="Baixo1" parent="." instance=ExtResource("9_pl")]
-position = Vector2(1520, 780)
-tamanho = Vector2(150, 20)
-altura_visual = 30.0
-cor_base = Color(0.2, 0.22, 0.24, 1)
-cor_topo = Color(0.42, 0.48, 0.46, 1)
-
-[node name="TumuloB" parent="." instance=ExtResource("10_tumulo")]
-position = Vector2(1720, 760)
-auto = true
-curso = Vector2(160, 0)
-velocidade = 90.0
-largura = 130.0
-
-[node name="Baixo2" parent="." instance=ExtResource("9_pl")]
-position = Vector2(1920, 760)
-tamanho = Vector2(150, 20)
-altura_visual = 30.0
-cor_base = Color(0.2, 0.22, 0.24, 1)
-cor_topo = Color(0.42, 0.48, 0.46, 1)
-
-[node name="GoblinBaixo" parent="." instance=ExtResource("2_dem")]
-position = Vector2(1920, 734)
-especie = "esqueleto"
-alcance_patrulha = 80.0
-
-; -- reencontro --
-[node name="Reencontro" parent="." instance=ExtResource("9_pl")]
-position = Vector2(2120, 680)
-tamanho = Vector2(200, 24)
-altura_visual = 40.0
-cor_base = Color(0.2, 0.22, 0.24, 1)
-cor_topo = Color(0.44, 0.5, 0.48, 1)
-
-[node name="ColPartir" parent="." instance=ExtResource("3_col")]
-position = Vector2(2120, 644)
-habilidade_id = "partir_paredes"
-
-; ===================  cripta do chefe  ===================
-[node name="ChaoChefe" parent="." instance=ExtResource("9_pl")]
-position = Vector2(2560, 740)
-tamanho = Vector2(560, 60)
-altura_visual = 110.0
-cor_base = Color(0.2, 0.22, 0.24, 1)
-cor_topo = Color(0.42, 0.48, 0.46, 1)
-
-[node name="Chefe" parent="." instance=ExtResource("6_chefe")]
-position = Vector2(2680, 664)
-
-[node name="LuzInicio" type="PointLight2D" parent="."]
-position = Vector2(280, 580)
-texture = SubResource("tex_luz")
-energy = 0.5
-color = Color(0.55, 0.75, 0.65, 1)
-scale = Vector2(1.9, 1.3)
-
-[node name="LuzChefe" type="PointLight2D" parent="."]
-position = Vector2(2560, 660)
-texture = SubResource("tex_luz")
-energy = 0.6
-color = Color(0.6, 0.8, 0.7, 1)
-scale = Vector2(2.9, 1.7)
-
-[node name="Koliani" parent="." instance=ExtResource("1_kol")]
+[node name="BrilhoPortao" type="Sprite2D" parent="."]
 position = Vector2(150, 560)
-usar_prototipo_premium = true
-usar_golden_set = true
+scale = Vector2(1.6, 1.6)
+texture = ExtResource("5_t_r4_brasas")
+z_index = -5
+modulate = Color(1, 0.6, 0.3, 0.7)
+material = SubResource("mat_add")
+
+[node name="ColunaA1" type="Sprite2D" parent="."]
+position = Vector2(40, 453.8)
+scale = Vector2(1.3, 1.3)
+texture = ExtResource("6_t_r4_coluna")
+z_index = -4
+modulate = Color(0.42, 0.34, 0.36, 1)
+
+[node name="ColunaA2" type="Sprite2D" parent="."]
+position = Vector2(270, 453.8)
+scale = Vector2(1.3, 1.3)
+texture = ExtResource("6_t_r4_coluna")
+z_index = -4
+modulate = Color(0.42, 0.34, 0.36, 1)
+
+[node name="BandeiraA1" type="Sprite2D" parent="."]
+position = Vector2(40, 247)
+scale = Vector2(1, 1)
+texture = ExtResource("7_t_r4_bandeira")
+z_index = -3
+
+[node name="BigornaA" type="Sprite2D" parent="."]
+position = Vector2(350, 533.75)
+scale = Vector2(0.7, 0.7)
+texture = ExtResource("8_t_r4_bigorna")
+z_index = -1
+
+[node name="BraseiroA" type="Sprite2D" parent="."]
+position = Vector2(600, 551.4)
+scale = Vector2(0.55, 0.55)
+texture = ExtResource("9_t_r4_grelha_incandescente")
+z_index = -1
+
+[node name="LuzBraseiroA" type="PointLight2D" parent="."]
+position = Vector2(600, 570)
+texture = SubResource("tex_luz")
+energy = 0.8
+color = Color(1.0, 0.56, 0.22, 1)
+scale = Vector2(1.4, 1)
+
+[node name="LuzPortao" type="PointLight2D" parent="."]
+position = Vector2(150, 540)
+texture = SubResource("tex_luz")
+energy = 0.9
+color = Color(1.0, 0.56, 0.22, 1)
+scale = Vector2(2.4, 1.6)
+
+[node name="CaixaA" type="Sprite2D" parent="."]
+position = Vector2(880, 570.5)
+scale = Vector2(0.7, 0.7)
+texture = ExtResource("10_t_r4_caixa")
+z_index = -1
+
+; PISO QUENTE 1 (270 px): o primeiro. 2,4 s frio, 1,0 s a avisar, 1,6 s quente.
+; Atravessa-se de sobra no frio; a zona fria dos dois lados e' o refugio.
+[node name="PisoQuente1" type="Area2D" parent="."]
+script = ExtResource("12_s_piso_quente.gd")
+position = Vector2(565, 600)
+largura = 270
+frio_seg = 2.4
+aviso_seg = 1
+quente_seg = 1.6
+fase = 0
+textura_brilho = ExtResource("11_t_r4_piso_quente")
+
+[node name="BrasasPiso1" type="CPUParticles2D" parent="."]
+position = Vector2(565, 594)
+z_index = 3
+amount = 12
+lifetime = 2.2
+preprocess = 2.0
+local_coords = false
+emission_shape = 3
+emission_rect_extents = Vector2(135, 4)
+direction = Vector2(0, -1)
+spread = 22.0
+gravity = Vector2(0, -34)
+initial_velocity_min = 20.0
+initial_velocity_max = 70.0
+scale_amount_min = 1.6
+scale_amount_max = 3.6
+color_ramp = SubResource("ramp_brasa")
+
+[node name="TrabalhadorA" parent="." instance=ExtResource("13_a_dem")]
+position = Vector2(830, 550)
+especie = "trabalhador_corrompido"
+vida = 40
+dano_contacto = 12
+comportamento = "patrulha"
+alcance_patrulha = 110
+cor_rim = Color(1.0, 0.52, 0.16, 1)
 
 [node name="CheckInicio" type="Area2D" parent="."]
-position = Vector2(420, 576)
+position = Vector2(330, 566)
 collision_layer = 16
 collision_mask = 2
-script = ExtResource("5_chk")
+script = ExtResource("14_s_checkpoint.gd")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CheckInicio"]
 shape = SubResource("rs_chk")
 
-[node name="CheckMeio" type="Area2D" parent="."]
-position = Vector2(1280, 696)
+; LAVA RASA 1 -- 400 px, com DOIS degraus de pedra a meio. A lava fica 40 px
+; abaixo do chao e o fundo da poca a 120: cair magoa (22 por toque, repetido)
+; mas sai-se a saltar. Ensina que a lava e' perigo, nao morte subita.
+[node name="LavaA" parent="." instance=ExtResource("16_c_LavaFornalha.tscn")]
+position = Vector2(1200, 680)
+largura = 400
+altura = 80
+cor = Color(1.0, 0.34, 0.08, 0.93)
+brasas = true
+letal = false
+dano_lava = 22
+textura_lava = ExtResource("15_t_r4_lava_estatica")
+z_index = -1
+
+[node name="FundoLavaA" parent="." instance=ExtResource("3_a_pl")]
+position = Vector2(1200, 740)
+tamanho = Vector2(400, 40)
+altura_visual = 60
+cor_base = Color(0.2, 0.16, 0.16, 1)
+cor_topo = Color(0.42, 0.3, 0.26, 1)
+
+[node name="Pedra1" parent="." instance=ExtResource("3_a_pl")]
+position = Vector2(1115, 620)
+tamanho = Vector2(90, 40)
+altura_visual = 70
+cor_base = Color(0.2, 0.16, 0.16, 1)
+cor_topo = Color(0.42, 0.3, 0.26, 1)
+
+[node name="Pedra2" parent="." instance=ExtResource("3_a_pl")]
+position = Vector2(1285, 610)
+tamanho = Vector2(90, 40)
+altura_visual = 70
+cor_base = Color(0.2, 0.16, 0.16, 1)
+cor_topo = Color(0.42, 0.3, 0.26, 1)
+
+[node name="ColunaLavaA" type="Sprite2D" parent="."]
+position = Vector2(1010, 488)
+scale = Vector2(1, 1)
+texture = ExtResource("6_t_r4_coluna")
+z_index = -4
+modulate = Color(0.42, 0.34, 0.36, 1)
+
+[node name="ColunaLavaB" type="Sprite2D" parent="."]
+position = Vector2(1385, 488)
+scale = Vector2(1, 1)
+texture = ExtResource("6_t_r4_coluna")
+z_index = -4
+modulate = Color(0.42, 0.34, 0.36, 1)
+
+[node name="QuedaLavaA" type="Sprite2D" parent="."]
+position = Vector2(1200, 470)
+scale = Vector2(1.15, 1.15)
+texture = ExtResource("17_t_r4_queda_lava")
+z_index = -6
+modulate = Color(1, 0.7, 0.45, 0.8)
+material = SubResource("mat_add")
+
+[node name="FumoLavaA" type="CPUParticles2D" parent="."]
+position = Vector2(1200, 630)
+z_index = 1
+amount = 12
+lifetime = 4.0
+preprocess = 4.0
+local_coords = false
+emission_shape = 3
+emission_rect_extents = Vector2(190, 4)
+direction = Vector2(0, -1)
+spread = 14.0
+gravity = Vector2(6, -14)
+initial_velocity_min = 8.0
+initial_velocity_max = 24.0
+scale_amount_min = 9.0
+scale_amount_max = 20.0
+color_ramp = SubResource("ramp_fumo")
+
+; ===================  B) PRIMEIROS FORNOS  ===============================
+; Sala do forno: um Trabalhador a patrulhar e um ARQUEIRO da Fornalha numa
+; laje alta (100 px acima, dentro do salto). A seguir, o lago de lava: um
+; degrau fixo, o CARRINHO DE MINERIO num trilho do tecto (vai e vem) e o chao
+; do outro lado.
+[node name="ChaoB" parent="." instance=ExtResource("3_a_pl")]
+position = Vector2(1650, 635)
+tamanho = Vector2(500, 70)
+altura_visual = 130
+cor_base = Color(0.2, 0.16, 0.16, 1)
+cor_topo = Color(0.42, 0.3, 0.26, 1)
+
+[node name="FornoB" type="Sprite2D" parent="."]
+position = Vector2(1560, 446.375)
+scale = Vector2(1.25, 1.25)
+texture = ExtResource("18_t_r4_forno")
+z_index = -5
+
+[node name="LuzFornoB" type="PointLight2D" parent="."]
+position = Vector2(1560, 530)
+texture = SubResource("tex_luz")
+energy = 1
+color = Color(1.0, 0.56, 0.22, 1)
+scale = Vector2(2.6, 1.8)
+
+[node name="ChamaFornoB" type="Sprite2D" parent="."]
+position = Vector2(1560, 560)
+scale = Vector2(1.5, 1.5)
+texture = ExtResource("5_t_r4_brasas")
+z_index = -4
+modulate = Color(1, 0.6, 0.3, 0.8)
+material = SubResource("mat_add")
+
+[node name="BrasasFornoB" type="CPUParticles2D" parent="."]
+position = Vector2(1560, 480)
+z_index = 3
+amount = 14
+lifetime = 2.2
+preprocess = 2.0
+local_coords = false
+emission_shape = 3
+emission_rect_extents = Vector2(50, 4)
+direction = Vector2(0, -1)
+spread = 22.0
+gravity = Vector2(0, -34)
+initial_velocity_min = 20.0
+initial_velocity_max = 70.0
+scale_amount_min = 1.6
+scale_amount_max = 3.6
+color_ramp = SubResource("ramp_brasa")
+
+[node name="ColunaB1" type="Sprite2D" parent="."]
+position = Vector2(1430, 453.8)
+scale = Vector2(1.3, 1.3)
+texture = ExtResource("6_t_r4_coluna")
+z_index = -4
+modulate = Color(0.42, 0.34, 0.36, 1)
+
+[node name="ArcoB" type="Sprite2D" parent="."]
+position = Vector2(1700, 419.6)
+scale = Vector2(1.6, 1.6)
+texture = ExtResource("19_t_r4_arco_gotico")
+z_index = -7
+modulate = Color(0.42, 0.34, 0.36, 1)
+
+[node name="BandeiraB" type="Sprite2D" parent="."]
+position = Vector2(1660, 187)
+scale = Vector2(1, 1)
+texture = ExtResource("7_t_r4_bandeira")
+z_index = -3
+
+[node name="CarrinhoB" type="Sprite2D" parent="."]
+position = Vector2(1470, 570.5)
+scale = Vector2(0.7, 0.7)
+texture = ExtResource("20_t_r4_carrinho_minerio")
+z_index = -1
+
+[node name="MinerioB" type="Sprite2D" parent="."]
+position = Vector2(1850, 568.4)
+scale = Vector2(0.8, 0.8)
+texture = ExtResource("21_t_r4_minerio_pilha")
+z_index = -1
+
+[node name="PlatArq" parent="." instance=ExtResource("3_a_pl")]
+position = Vector2(1780, 512)
+tamanho = Vector2(160, 24)
+altura_visual = 40
+cor_base = Color(0.2, 0.16, 0.16, 1)
+cor_topo = Color(0.42, 0.3, 0.26, 1)
+
+[node name="ArqueiroB" parent="." instance=ExtResource("13_a_dem")]
+position = Vector2(1780, 450)
+especie = "arqueiro_da_fornalha"
+vida = 30
+dano_contacto = 10
+comportamento = "cuspidor"
+alcance_patrulha = 60
+cor_rim = Color(1.0, 0.52, 0.16, 1)
+
+[node name="TrabalhadorB" parent="." instance=ExtResource("13_a_dem")]
+position = Vector2(1560, 550)
+especie = "trabalhador_corrompido"
+vida = 40
+dano_contacto = 12
+comportamento = "patrulha"
+alcance_patrulha = 90
+cor_rim = Color(1.0, 0.52, 0.16, 1)
+
+[node name="CheckB" type="Area2D" parent="."]
+position = Vector2(1450, 566)
 collision_layer = 16
 collision_mask = 2
-script = ExtResource("5_chk")
+script = ExtResource("14_s_checkpoint.gd")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckMeio"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckB"]
 shape = SubResource("rs_chk")
 
-[node name="CheckReencontro" type="Area2D" parent="."]
-position = Vector2(2120, 652)
+; LAGO DE LAVA 2 (520 px) -- lava rasa; degrau fixo + carrinho no trilho.
+[node name="LavaB" parent="." instance=ExtResource("16_c_LavaFornalha.tscn")]
+position = Vector2(2160, 680)
+largura = 520
+altura = 80
+cor = Color(1.0, 0.34, 0.08, 0.93)
+brasas = true
+letal = false
+dano_lava = 22
+textura_lava = ExtResource("15_t_r4_lava_estatica")
+z_index = -1
+
+[node name="FundoLavaB" parent="." instance=ExtResource("3_a_pl")]
+position = Vector2(2160, 740)
+tamanho = Vector2(520, 40)
+altura_visual = 60
+cor_base = Color(0.2, 0.16, 0.16, 1)
+cor_topo = Color(0.42, 0.3, 0.26, 1)
+
+[node name="PlatL1" parent="." instance=ExtResource("3_a_pl")]
+position = Vector2(2010, 620)
+tamanho = Vector2(100, 40)
+altura_visual = 70
+cor_base = Color(0.2, 0.16, 0.16, 1)
+cor_topo = Color(0.42, 0.3, 0.26, 1)
+
+[node name="Carrinho" parent="." instance=ExtResource("23_a_corr")]
+position = Vector2(2230, 609)
+modo = "horizontal"
+amplitude = 70.0
+periodo = 4.2
+comprimento = 160.0
+largura = 120.0
+pele_terreno = true
+ancora_no_trilho = true
+textura_corrente = ExtResource("22_t_r4_corrente_fina")
+
+[node name="TrilhoB" type="Sprite2D" parent="."]
+position = Vector2(1900, 426)
+scale = Vector2(0.45, 0.45)
+centered = false
+texture = ExtResource("24_t_r4_trilho_minerio")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 1155.56, 62.2222)
+z_index = -2
+modulate = Color(0.85, 0.7, 0.6, 1)
+
+[node name="TuboLavaB" type="Sprite2D" parent="."]
+position = Vector2(2150, 259.5)
+scale = Vector2(1, 1)
+texture = ExtResource("25_t_r4_tubo_lava")
+z_index = -5
+modulate = Color(0.42, 0.34, 0.36, 1)
+
+[node name="QuedaLavaB" type="Sprite2D" parent="."]
+position = Vector2(2150, 480)
+scale = Vector2(1.35, 1.35)
+texture = ExtResource("17_t_r4_queda_lava")
+z_index = -6
+modulate = Color(1, 0.7, 0.45, 0.85)
+material = SubResource("mat_add")
+
+[node name="FumoLavaB" type="CPUParticles2D" parent="."]
+position = Vector2(2160, 630)
+z_index = 1
+amount = 12
+lifetime = 4.0
+preprocess = 4.0
+local_coords = false
+emission_shape = 3
+emission_rect_extents = Vector2(250, 4)
+direction = Vector2(0, -1)
+spread = 14.0
+gravity = Vector2(6, -14)
+initial_velocity_min = 8.0
+initial_velocity_max = 24.0
+scale_amount_min = 9.0
+scale_amount_max = 20.0
+color_ramp = SubResource("ramp_fumo")
+
+; SEGREDO 1 -- acima do lago: degrau a 110 px do degrau fixo, depois a laje do
+; segredo. So' se ve' quem olha para cima; o carrinho nao e' preciso.
+[node name="DegrauSeg" parent="." instance=ExtResource("3_a_pl")]
+position = Vector2(2135, 501)
+tamanho = Vector2(70, 22)
+altura_visual = 40
+cor_base = Color(0.2, 0.16, 0.16, 1)
+cor_topo = Color(0.42, 0.3, 0.26, 1)
+
+[node name="SegredoA" parent="." instance=ExtResource("3_a_pl")]
+position = Vector2(2285, 411)
+tamanho = Vector2(110, 22)
+altura_visual = 40
+cor_base = Color(0.2, 0.16, 0.16, 1)
+cor_topo = Color(0.42, 0.3, 0.26, 1)
+
+[node name="EssenciaSegredoA" parent="." instance=ExtResource("26_a_ess")]
+position = Vector2(2285, 364)
+valor = 25
+
+[node name="FornoSegA" type="Sprite2D" parent="."]
+position = Vector2(2305, 358.125)
+scale = Vector2(0.45, 0.45)
+texture = ExtResource("8_t_r4_bigorna")
+z_index = -1
+
+; ===================  C) AREA DE MAQUINAS SIMPLES  =======================
+; Segundo piso quente (outra fase: quando um esta' frio o outro vai a
+; avisar), Trabalhador e Arqueiro. No fim um vao de 90 px: cai-se na
+; PASSAGEM INFERIOR -- um tunel por baixo do chao com o SEGREDO 2 a oeste e
+; a saida em degraus para a sala dos jatos.
+[node name="ChaoC" parent="." instance=ExtResource("3_a_pl")]
+position = Vector2(2710, 635)
+tamanho = Vector2(580, 70)
+altura_visual = 130
+cor_base = Color(0.2, 0.16, 0.16, 1)
+cor_topo = Color(0.42, 0.3, 0.26, 1)
+
+[node name="CheckC" type="Area2D" parent="."]
+position = Vector2(2470, 566)
 collision_layer = 16
 collision_mask = 2
-script = ExtResource("5_chk")
+script = ExtResource("14_s_checkpoint.gd")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckReencontro"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckC"]
 shape = SubResource("rs_chk")
 
-[node name="Porta" parent="." instance=ExtResource("4_porta")]
-position = Vector2(2820, 666)
+[node name="PisoQuente2" type="Area2D" parent="."]
+script = ExtResource("12_s_piso_quente.gd")
+position = Vector2(2710, 600)
+largura = 280
+frio_seg = 2.4
+aviso_seg = 1
+quente_seg = 1.6
+fase = 1.7
+textura_brilho = ExtResource("11_t_r4_piso_quente")
+
+[node name="BrasasPiso2" type="CPUParticles2D" parent="."]
+position = Vector2(2710, 594)
+z_index = 3
+amount = 12
+lifetime = 2.2
+preprocess = 2.0
+local_coords = false
+emission_shape = 3
+emission_rect_extents = Vector2(140, 4)
+direction = Vector2(0, -1)
+spread = 22.0
+gravity = Vector2(0, -34)
+initial_velocity_min = 20.0
+initial_velocity_max = 70.0
+scale_amount_min = 1.6
+scale_amount_max = 3.6
+color_ramp = SubResource("ramp_brasa")
+
+[node name="ColunaC1" type="Sprite2D" parent="."]
+position = Vector2(2440, 453.8)
+scale = Vector2(1.3, 1.3)
+texture = ExtResource("6_t_r4_coluna")
+z_index = -4
+modulate = Color(0.42, 0.34, 0.36, 1)
+
+[node name="MaquinaC" type="Sprite2D" parent="."]
+position = Vector2(2620, 423.5)
+scale = Vector2(1, 1)
+texture = ExtResource("27_t_r4_maquina")
+z_index = -4
+modulate = Color(0.42, 0.34, 0.36, 1)
+
+[node name="CaldeiraC" type="Sprite2D" parent="."]
+position = Vector2(2890, 410)
+scale = Vector2(1, 1)
+texture = ExtResource("28_t_r4_caldeira")
+z_index = -5
+modulate = Color(0.42, 0.34, 0.36, 1)
+
+[node name="BandeiraC" type="Sprite2D" parent="."]
+position = Vector2(2540, 207)
+scale = Vector2(1, 1)
+texture = ExtResource("7_t_r4_bandeira")
+z_index = -3
+
+[node name="TrabalhadorC" parent="." instance=ExtResource("13_a_dem")]
+position = Vector2(2560, 550)
+especie = "trabalhador_corrompido"
+vida = 40
+dano_contacto = 12
+comportamento = "patrulha"
+alcance_patrulha = 80
+cor_rim = Color(1.0, 0.52, 0.16, 1)
+
+[node name="PlatArqC" parent="." instance=ExtResource("3_a_pl")]
+position = Vector2(2930, 512)
+tamanho = Vector2(140, 24)
+altura_visual = 40
+cor_base = Color(0.2, 0.16, 0.16, 1)
+cor_topo = Color(0.42, 0.3, 0.26, 1)
+
+[node name="ArqueiroC" parent="." instance=ExtResource("13_a_dem")]
+position = Vector2(2930, 450)
+especie = "arqueiro_da_fornalha"
+vida = 30
+dano_contacto = 10
+comportamento = "cuspidor"
+alcance_patrulha = 50
+cor_rim = Color(1.0, 0.52, 0.16, 1)
+
+; TUNEL (passagem inferior): chao a 800, tecto = barriga do ChaoC. Segredo 2
+; a oeste, vigiado por um Trabalhador. Saida: degrau T1 (700) -> ChaoC2.
+[node name="Tunel" parent="." instance=ExtResource("3_a_pl")]
+position = Vector2(2765, 830)
+tamanho = Vector2(650, 60)
+altura_visual = 80
+cor_base = Color(0.2, 0.16, 0.16, 1)
+cor_topo = Color(0.42, 0.3, 0.26, 1)
+
+[node name="TunelT1" parent="." instance=ExtResource("3_a_pl")]
+position = Vector2(3050, 715)
+tamanho = Vector2(80, 30)
+altura_visual = 40
+cor_base = Color(0.2, 0.16, 0.16, 1)
+cor_topo = Color(0.42, 0.3, 0.26, 1)
+
+[node name="TrabalhadorT" parent="." instance=ExtResource("13_a_dem")]
+position = Vector2(2700, 750)
+especie = "trabalhador_corrompido"
+vida = 40
+dano_contacto = 12
+comportamento = "patrulha"
+alcance_patrulha = 120
+cor_rim = Color(1.0, 0.52, 0.16, 1)
+
+[node name="SegredoB" parent="." instance=ExtResource("3_a_pl")]
+position = Vector2(2505, 815)
+tamanho = Vector2(110, 30)
+altura_visual = 40
+cor_base = Color(0.2, 0.16, 0.16, 1)
+cor_topo = Color(0.42, 0.3, 0.26, 1)
+
+[node name="EssenciaSegredoB" parent="." instance=ExtResource("26_a_ess")]
+position = Vector2(2500, 764)
+valor = 25
+
+[node name="CaixasSegB" type="Sprite2D" parent="."]
+position = Vector2(2540, 775)
+scale = Vector2(0.6, 0.6)
+texture = ExtResource("10_t_r4_caixa")
+z_index = -1
+
+[node name="CarrinhoSegB" type="Sprite2D" parent="."]
+position = Vector2(2470, 775)
+scale = Vector2(0.6, 0.6)
+texture = ExtResource("20_t_r4_carrinho_minerio")
+z_index = -1
+
+[node name="LuzTunel" type="PointLight2D" parent="."]
+position = Vector2(2600, 740)
+texture = SubResource("tex_luz")
+energy = 0.7
+color = Color(1.0, 0.56, 0.22, 1)
+scale = Vector2(2, 1)
+
+[node name="LuzTunel2" type="PointLight2D" parent="."]
+position = Vector2(2950, 740)
+texture = SubResource("tex_luz")
+energy = 0.6
+color = Color(1.0, 0.56, 0.22, 1)
+scale = Vector2(1.6, 1)
+
+; SALA DOS JATOS: dois jatos de fogo desencontrados (meio ciclo). Entre eles
+; ha' chao seguro. Cada jato avisa 0,8 s: o bocal brilha e a chama cresce.
+[node name="ChaoC2" parent="." instance=ExtResource("3_a_pl")]
+position = Vector2(3295, 635)
+tamanho = Vector2(410, 70)
+altura_visual = 130
+cor_base = Color(0.2, 0.16, 0.16, 1)
+cor_topo = Color(0.42, 0.3, 0.26, 1)
+
+[node name="Jato1" type="Area2D" parent="."]
+script = ExtResource("30_s_jato_fornalha.gd")
+position = Vector2(3230, 600)
+alcance = 230
+intervalo = 2.2
+aviso_seg = 0.8
+dur_ativa = 1.4
+fase = 0
+invertido = false
+textura_jato = ExtResource("29_t_r4_jato_fogo")
+textura_bocal = ExtResource("11_t_r4_piso_quente")
+
+[node name="Jato2" type="Area2D" parent="."]
+script = ExtResource("30_s_jato_fornalha.gd")
+position = Vector2(3390, 600)
+alcance = 230
+intervalo = 2.2
+aviso_seg = 0.8
+dur_ativa = 1.4
+fase = 2.2
+invertido = false
+textura_jato = ExtResource("29_t_r4_jato_fogo")
+textura_bocal = ExtResource("11_t_r4_piso_quente")
+
+[node name="CanoJato1" type="Sprite2D" parent="."]
+position = Vector2(3170, 577.025)
+scale = Vector2(0.45, 0.45)
+texture = ExtResource("31_t_r4_valvula_roda")
+z_index = -1
+
+[node name="PistaoC" type="Sprite2D" parent="."]
+position = Vector2(3450, 483.35)
+scale = Vector2(0.7, 0.7)
+texture = ExtResource("32_t_r4_pistao_h")
+z_index = -4
+modulate = Color(0.42, 0.34, 0.36, 1)
+
+[node name="ArcoC" type="Sprite2D" parent="."]
+position = Vector2(3310, 436.4)
+scale = Vector2(1.6, 1.6)
+texture = ExtResource("33_t_r4_arco_a")
+z_index = -8
+modulate = Color(0.42, 0.34, 0.36, 1)
+
+; LAGO DE LAVA 3 (360 px): o carrinho de minerio do fim -- amplitude maior.
+[node name="LavaC" parent="." instance=ExtResource("16_c_LavaFornalha.tscn")]
+position = Vector2(3680, 680)
+largura = 360
+altura = 80
+cor = Color(1.0, 0.34, 0.08, 0.93)
+brasas = true
+letal = false
+dano_lava = 22
+textura_lava = ExtResource("15_t_r4_lava_estatica")
+z_index = -1
+
+[node name="FundoLavaC" parent="." instance=ExtResource("3_a_pl")]
+position = Vector2(3680, 740)
+tamanho = Vector2(360, 40)
+altura_visual = 60
+cor_base = Color(0.2, 0.16, 0.16, 1)
+cor_topo = Color(0.42, 0.3, 0.26, 1)
+
+[node name="Carrinho2" parent="." instance=ExtResource("23_a_corr")]
+position = Vector2(3680, 609)
+modo = "horizontal"
+amplitude = 100.0
+periodo = 4.6
+comprimento = 160.0
+largura = 130.0
+pele_terreno = true
+ancora_no_trilho = true
+textura_corrente = ExtResource("22_t_r4_corrente_fina")
+
+[node name="TrilhoC" type="Sprite2D" parent="."]
+position = Vector2(3500, 426)
+scale = Vector2(0.45, 0.45)
+centered = false
+texture = ExtResource("24_t_r4_trilho_minerio")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 800, 62.2222)
+z_index = -2
+modulate = Color(0.85, 0.7, 0.6, 1)
+
+[node name="QuedaLavaC" type="Sprite2D" parent="."]
+position = Vector2(3680, 480)
+scale = Vector2(1.3, 1.3)
+texture = ExtResource("17_t_r4_queda_lava")
+z_index = -6
+modulate = Color(1, 0.7, 0.45, 0.8)
+material = SubResource("mat_add")
+
+[node name="FumoLavaC" type="CPUParticles2D" parent="."]
+position = Vector2(3680, 630)
+z_index = 1
+amount = 12
+lifetime = 4.0
+preprocess = 4.0
+local_coords = false
+emission_shape = 3
+emission_rect_extents = Vector2(170, 4)
+direction = Vector2(0, -1)
+spread = 14.0
+gravity = Vector2(6, -14)
+initial_velocity_min = 8.0
+initial_velocity_max = 24.0
+scale_amount_min = 9.0
+scale_amount_max = 20.0
+color_ramp = SubResource("ramp_fumo")
+
+; ===================  D) SAIDA PARA A FUNDICAO  ==========================
+; Checkpoint antes do guardiao. Piso quente a abrir a sala, e o OPERARIO
+; BLINDADO (elite, escudo a' frente -- fraco nas costas) a guardar o portao.
+[node name="ChaoD" parent="." instance=ExtResource("3_a_pl")]
+position = Vector2(4210, 635)
+tamanho = Vector2(700, 70)
+altura_visual = 130
+cor_base = Color(0.2, 0.16, 0.16, 1)
+cor_topo = Color(0.42, 0.3, 0.26, 1)
+
+[node name="CheckD" type="Area2D" parent="."]
+position = Vector2(3930, 566)
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("14_s_checkpoint.gd")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckD"]
+shape = SubResource("rs_chk")
+
+[node name="PisoQuente3" type="Area2D" parent="."]
+script = ExtResource("12_s_piso_quente.gd")
+position = Vector2(4120, 600)
+largura = 220
+frio_seg = 2.4
+aviso_seg = 1
+quente_seg = 1.6
+fase = 0.6
+textura_brilho = ExtResource("11_t_r4_piso_quente")
+
+[node name="BrasasPiso3" type="CPUParticles2D" parent="."]
+position = Vector2(4120, 594)
+z_index = 3
+amount = 10
+lifetime = 2.2
+preprocess = 2.0
+local_coords = false
+emission_shape = 3
+emission_rect_extents = Vector2(110, 4)
+direction = Vector2(0, -1)
+spread = 22.0
+gravity = Vector2(0, -34)
+initial_velocity_min = 20.0
+initial_velocity_max = 70.0
+scale_amount_min = 1.6
+scale_amount_max = 3.6
+color_ramp = SubResource("ramp_brasa")
+
+[node name="ColunaD1" type="Sprite2D" parent="."]
+position = Vector2(3890, 453.8)
+scale = Vector2(1.3, 1.3)
+texture = ExtResource("6_t_r4_coluna")
+z_index = -4
+modulate = Color(0.42, 0.34, 0.36, 1)
+
+[node name="FornoD" type="Sprite2D" parent="."]
+position = Vector2(4010, 483.2)
+scale = Vector2(1.1, 1.1)
+texture = ExtResource("34_t_r4_fornalha")
+z_index = -5
+
+[node name="LuzFornoD" type="PointLight2D" parent="."]
+position = Vector2(4010, 530)
+texture = SubResource("tex_luz")
+energy = 0.9
+color = Color(1.0, 0.56, 0.22, 1)
+scale = Vector2(2.2, 1.6)
+
+[node name="BandeiraD1" type="Sprite2D" parent="."]
+position = Vector2(4290, 167)
+scale = Vector2(1, 1)
+texture = ExtResource("7_t_r4_bandeira")
+z_index = -3
+
+[node name="BandeiraD2" type="Sprite2D" parent="."]
+position = Vector2(4480, 167)
+scale = Vector2(1, 1)
+texture = ExtResource("7_t_r4_bandeira")
+z_index = -3
+
+[node name="OperarioGuardiao" parent="." instance=ExtResource("13_a_dem")]
+position = Vector2(4360, 540)
+scale = Vector2(1.25, 1.25)
+elite = true
+especie = "operario_blindado"
+vida = 170
+dano_contacto = 18
+comportamento = "escudeiro"
+alcance_patrulha = 70
+cor_rim = Color(1.0, 0.52, 0.16, 1)
+
+[node name="PortaoSaida" type="Sprite2D" parent="."]
+position = Vector2(4500, 479.6)
+scale = Vector2(1.2, 1.2)
+texture = ExtResource("4_t_r4_portao_forja")
+z_index = -6
+
+[node name="LuzPortaoSaida" type="PointLight2D" parent="."]
+position = Vector2(4500, 520)
+texture = SubResource("tex_luz")
+energy = 1
+color = Color(1.0, 0.56, 0.22, 1)
+scale = Vector2(2.6, 1.8)
+
+[node name="BrilhoPortaoSaida" type="Sprite2D" parent="."]
+position = Vector2(4500, 560)
+scale = Vector2(1.5, 1.5)
+texture = ExtResource("5_t_r4_brasas")
+z_index = -5
+modulate = Color(1, 0.6, 0.3, 0.7)
+material = SubResource("mat_add")
+
+[node name="CorrenteTeto0" type="Sprite2D" parent="."]
+position = Vector2(687.13, -20)
+scale = Vector2(0.22, 0.22)
+texture_repeat = 2
+texture = ExtResource("35_t_r4_corrente")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 117, 1318.18)
+z_index = -7
+modulate = Color(0.7, 0.5, 0.4, 0.8)
+
+[node name="CorrenteTeto1" type="Sprite2D" parent="."]
+position = Vector2(1787.13, -20)
+scale = Vector2(0.22, 0.22)
+texture_repeat = 2
+texture = ExtResource("35_t_r4_corrente")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 117, 1318.18)
+z_index = -7
+modulate = Color(0.7, 0.5, 0.4, 0.8)
+
+[node name="CorrenteTeto2" type="Sprite2D" parent="."]
+position = Vector2(2637.13, -20)
+scale = Vector2(0.22, 0.22)
+texture_repeat = 2
+texture = ExtResource("35_t_r4_corrente")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 117, 1318.18)
+z_index = -7
+modulate = Color(0.7, 0.5, 0.4, 0.8)
+
+[node name="CorrenteTeto3" type="Sprite2D" parent="."]
+position = Vector2(3337.13, -20)
+scale = Vector2(0.22, 0.22)
+texture_repeat = 2
+texture = ExtResource("35_t_r4_corrente")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 117, 1318.18)
+z_index = -7
+modulate = Color(0.7, 0.5, 0.4, 0.8)
+
+[node name="CorrenteTeto4" type="Sprite2D" parent="."]
+position = Vector2(4137.13, -20)
+scale = Vector2(0.22, 0.22)
+texture_repeat = 2
+texture = ExtResource("35_t_r4_corrente")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 117, 1318.18)
+z_index = -7
+modulate = Color(0.7, 0.5, 0.4, 0.8)
+
+[node name="FumoA" type="CPUParticles2D" parent="."]
+position = Vector2(450, 610)
+z_index = 1
+amount = 10
+lifetime = 4.0
+preprocess = 4.0
+local_coords = false
+emission_shape = 3
+emission_rect_extents = Vector2(350, 4)
+direction = Vector2(0, -1)
+spread = 14.0
+gravity = Vector2(6, -14)
+initial_velocity_min = 8.0
+initial_velocity_max = 24.0
+scale_amount_min = 9.0
+scale_amount_max = 20.0
+color_ramp = SubResource("ramp_fumo")
+
+[node name="FumoD" type="CPUParticles2D" parent="."]
+position = Vector2(4200, 610)
+z_index = 1
+amount = 10
+lifetime = 4.0
+preprocess = 4.0
+local_coords = false
+emission_shape = 3
+emission_rect_extents = Vector2(350, 4)
+direction = Vector2(0, -1)
+spread = 14.0
+gravity = Vector2(6, -14)
+initial_velocity_min = 8.0
+initial_velocity_max = 24.0
+scale_amount_min = 9.0
+scale_amount_max = 20.0
+color_ramp = SubResource("ramp_fumo")
+
+[node name="Koliani" parent="." instance=ExtResource("36_a_kol")]
+position = Vector2(170, 560)
+usar_prototipo_premium = true
+usar_golden_set = true
+
+[node name="Porta" parent="." instance=ExtResource("37_a_porta")]
+position = Vector2(4500, 594)
 pista_ao_atravessar = ""
-
-[node name="Casca" parent="." instance=ExtResource("interior_casca")]
-topo = -96.0
-altura = 2200.0
-largura = 3252.0
-volumes_interiores = Array[Rect2]([Rect2(8, -96, 640, 320), Rect2(648, -96, 640, 416), Rect2(1288, -96, 640, 352), Rect2(1928, -96, 640, 352), Rect2(2568, -96, 640, 416)])
-esquerda = -120.0
-chao = false
-agua = false

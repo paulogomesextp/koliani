@@ -92,6 +92,24 @@ REGIOES = {
 		# os cotos de pilar por baixo da "PLATAFORMA DE PEDRA"
 		"base": (232, 364, 278, 384),
 	},
+	# Regiao IV -- Fornalha (N16-N20). Material NOVO (`fornalha`): pedra
+	# vulcanica escura com veios de magma e a capa com o lábio de brasa da
+	# prancha. Escolhido pelo `plataforma.gd` a partir do `fundo_pack`.
+	# Fonte: `region_04/concept_environment.png` ("PALETA DE CORES E
+	# MATERIAIS": pedra vulcanica e ferro forjado, pedras grandes e legiveis)
+	# e `region_04/asset_atlas.png` ("TILES -- PEDRA E TERRENO": o "chao base"
+	# com o labio de brasa em cima, pedras de ~15 px).
+	"fornalha": {
+		"prancha": "docs/art_direction/regions/region_04/concept_environment.png",
+		# as pedras da prancha sao irregulares (sem fiadas nem juntas
+		# alinhadas), por isso o corpo e' feito por ESPELHO 2x2: sem costura
+		"espelho": [(22, 354, 88, 409), (175, 354, 241, 409)],
+		"topo_prancha": "docs/art_direction/regions/region_04/asset_atlas.png",
+		"topo_y": (233, 248),
+		"topo_x": [(17, 68), (72, 124), (126, 140)],
+		"lado": (15, 360, 23, 406),
+		"base": (22, 392, 88, 409),
+	},
 }
 
 # Fundo escuro das pranchas (~ (1, 11, 20)): tudo o que e' perto dele e'
@@ -158,6 +176,39 @@ def corpo(src: Image.Image, caixas: list) -> Image.Image:
 	return out
 
 
+def sem_costura(im: Image.Image) -> Image.Image:
+	"""Torna um recorte repetivel nos dois eixos: mistura-o com ele proprio
+	deslocado de meio lado, com uma janela (cos^2) que e' 1 no centro e 0 nas
+	bordas -- nas bordas fica so' a versao deslocada, que por construcao
+	encaixa na propria borda oposta."""
+	import numpy as np
+	a = np.asarray(im.convert("RGB"), dtype=np.float32)
+	h, w, _ = a.shape
+	rolado = np.roll(np.roll(a, h // 2, axis=0), w // 2, axis=1)
+	jx = np.sin(np.linspace(0.0, np.pi, w, endpoint=False)) ** 2
+	jy = np.sin(np.linspace(0.0, np.pi, h, endpoint=False)) ** 2
+	m = (jy[:, None] * jx[None, :])[:, :, None]
+	out = a * m + rolado * (1.0 - m)
+	return Image.fromarray(np.clip(out, 0, 255).astype(np.uint8)).convert("RGBA")
+
+
+def corpo_espelho(src: Image.Image, caixas: list) -> Image.Image:
+	"""Miolo para pedra IRREGULAR (Regiao IV): cada recorte, ampliado, e' feito
+	repetivel por `sem_costura` (espelhar dava um caleidoscopio). Os dois
+	recortes vao lado a lado e trocam de ordem na segunda fiada."""
+	pecas = [sem_costura(ampliar(src.crop(cx))) for cx in caixas]
+	alt = max(p.height for p in pecas)
+	pecas = [p.resize((max(1, round(p.width * alt / p.height)), alt), Image.Resampling.LANCZOS)
+		for p in pecas]
+	out = Image.new("RGBA", (sum(p.width for p in pecas), alt * 2))
+	for fila, ordem in enumerate([pecas, pecas[::-1]]):
+		x = 0
+		for p in ordem:
+			out.paste(p, (x, fila * alt))
+			x += p.width
+	return out
+
+
 def topo(src: Image.Image, ys: tuple, xs: list) -> Image.Image:
 	"""As capas de varios blocos lado a lado (o mosaico repete a tira toda,
 	portanto a largura nao tem de ser 96)."""
@@ -208,9 +259,12 @@ def gerar(nome: str, cfg: dict) -> None:
 	src = Image.open(os.path.join(RAIZ, cfg["prancha"])).convert("RGB")
 	dest = os.path.join(DEST, nome)
 	os.makedirs(dest, exist_ok=True)
+	src_topo = Image.open(os.path.join(RAIZ, cfg["topo_prancha"])).convert("RGB") \
+		if "topo_prancha" in cfg else src
 	pecas = {
-		"corpo": corpo(src, cfg["corpo"]),
-		"topo": topo(src, cfg["topo_y"], cfg["topo_x"]),
+		"corpo": corpo_espelho(src, cfg["espelho"]) if "espelho" in cfg
+			else corpo(src, cfg["corpo"]),
+		"topo": topo(src_topo, cfg["topo_y"], cfg["topo_x"]),
 		"lado": com_alfa(ampliar(src.crop(cfg["lado"]))),
 		"base": franja(ampliar(src.crop(cfg["base"]))),
 	}

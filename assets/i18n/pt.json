@@ -379,7 +379,7 @@
   "level.n12": "Mecanismos Antigos",
   "level.n13": "Campanário",
   "level.n14": "O Topo dos Ecos",
-  "level.n15": "Cemitério dos Reis",
+  "level.n15": "Entrada da Fornalha",
   "level.n16": "Galeria dos Ossos",
   "level.n17": "Cripta das Mil Velas",
   "level.n18": "Templo da Serpente",
@@ -855,5 +855,8 @@
   "world.towers": "Torre dos Ecos",
   "world.unknown": "?",
   "world.void": "O Vazio",
-  "world.war": "Guerra dos Reinos"
+  "world.war": "Guerra dos Reinos",
+  "guard.operario_blindado": "Operário Blindado",
+  "mec.piso_quente.nome": "Piso Quente",
+  "mec.piso_quente.txt": "As placas de ferro brilham antes de queimar. Atravessa-as enquanto estão frias ou salta quando ficarem vermelhas."
 }

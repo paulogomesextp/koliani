@@ -1,3 +1,5 @@
+> **N16 "Entrada da Fornalha" (30 set 2026, branch `claude/project-thread-lu210k`)** -- `docs/nivel_autoral_n16.md`. Regiao IV comecada: arte das pranchas (terreno, fundo, props, 8 inimigos) + piso quente, jatos de fogo, lava rasa, carrinhos de minerio; guardiao Operario Blindado elite. **Pendente do Paulo**: playtest humano. Depois N17-N20.
+
 > **N14 autoral -- "Campanario" (29 set 2026, branch `claude/project-thread-6jbrqw`, junto no master)** -- `docs/nivel_autoral_n14.md`. Sala da Sacerdotisa Lunar substituida por uma torre feita a mao (`tools/construir_n14_campanario.py`): sinos em sequencia com plataformas temporizadas, baloicos grandes, coluna de ar, vento que empurra, roda de plataformas circulares com laminas em cruz, corrente que muda de direcao ao som do sino, sinos em queda, sala do sino gigante; Guardiao = Monge das Correntes elite. Arte recortada da coluna N14 da prancha (capturas em `docs/qa/n14_autoral/`). **Pendente do Paulo**: playtest humano. Depois N15.
 
 - **N15 refeito** (Topo dos Ecos): pendente playtest humano (ecos, feixes, balanços com vento, Vyrak fase 2). Sem `region.3.complete` ainda.

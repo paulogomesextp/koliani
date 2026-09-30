@@ -379,7 +379,7 @@
   "level.n12": "Ancient Mechanisms",
   "level.n13": "The Belfry",
   "level.n14": "The Summit of Echoes",
-  "level.n15": "Graveyard of Kings",
+  "level.n15": "Furnace Gate",
   "level.n16": "Gallery of Bones",
   "level.n17": "Crypt of a Thousand Candles",
   "level.n18": "Temple of the Serpent",
@@ -855,5 +855,8 @@
   "world.towers": "Turm der Echos",
   "world.unknown": "?",
   "world.void": "Die Leere",
-  "world.war": "Krieg der Reiche"
+  "world.war": "Krieg der Reiche",
+  "guard.operario_blindado": "Armored Foreman",
+  "mec.piso_quente.nome": "Hot Floor",
+  "mec.piso_quente.txt": "The iron plates glow before they burn. Cross them while they are cold, or jump clear when they turn red."
 }
