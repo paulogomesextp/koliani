@@ -59,10 +59,15 @@ mecânicas, vãos medidos com o salto duplo real) + crivo de alcance
 `tools/correr_travessia.sh <cena> [perfis]` pilota a Koliani real (fisica,
 mecanicas, portoes) com `bot_humano_r2.gd` do inicio a' porta e sai != 0 se
 algum perfil nao chegar. N16: **experiente, normal e casual chegam todos a'
-porta** (34-74 s, 2-5 mortes). As mortes de 2 perfis concentram-se em x~2300
-(carrinho sobre a lava B) e x~3100 (salto do tunel); uma queda repetida do perfil
-experiente em x~1630 (y 1212) nao foi explicada -- o chao ali e' solido; a
-reter para o playtest humano.
+porta** (25-49 s, 1-2 mortes).
+
+**Defeito apanhado pelo bot e corrigido**: o perfil experiente caiu 3x em
+x~1630 (y 1212) com chao solido. Causa provada por trace: caia na lava A,
+andava pelo fundo do lago (y 720) ate' ao fim e passava POR BAIXO do ChaoB
+(barriga a 670, vao de 50 px) para o vazio. Correcao: paredes `MuroA/B1/B2/C1/D`
+(`tools/construir_n16_entrada.py`) fecham o vao em cada lado dos lagos; o lado
+leste do lago B fica aberto porque dai' entra-se no tunel. Teste:
+`TestesRegion04N16` exige as 5 paredes. Depois da correcao nao ha' quedas.
 
 ## Por fazer
 Playtest humano (legibilidade do piso quente, dano da lava, TTK do Operário);
