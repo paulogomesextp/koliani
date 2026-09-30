@@ -1,3 +1,10 @@
+# >>> Regiao IV -- N16 "Entrada da Fornalha" refeito (30 set 2026, branch `claude/project-thread-lu210k`) <<<
+Cena `Cemiterio_dos_Reis.tscn` gerada por `tools/construir_n16_entrada.py` (+ `tools/r4_lib.py`); desenho em
+`docs/nivel_autoral_n16.md`. Pipeline de arte da Regiao IV montado a partir das 7 pranchas (terreno `fornalha`,
+fundo panoramico, ~76 props `r4_*`, 8 inimigos novos no `DemonioBase`). Mecanicas opt-in novas: PisoQuente,
+JatoFornalha, LavaFornalha. Suite verde (exit 0, save intacto), crivo `porta_alcancavel=true`.
+Falta: playtest humano; N17-N20 (mesmo pipeline; N20 precisa do Guardiao da Fornalha, 2 fases).
+
 # >>> N14 -- "Campanario", autoral (29 set 2026, branch `claude/project-thread-6jbrqw`, junto no master) <<<
 
 # N15 "O Topo dos Ecos" refeito (30 set 2026)

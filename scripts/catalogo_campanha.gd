@@ -62,7 +62,7 @@ const CHEFE_KEY: Array[String] = [
 	# inimigo principal do N14 na prancha aprovada.
 	"guard.monge_das_correntes", # 13 N14 -- Campanário
 	"boss.vyrak",                # 14 N15 -- O Topo dos Ecos (o chefe da Região III)
-	"boss.rei_ossario",          # 15 Cemitério dos Reis
+	"guard.operario_blindado",    # 15 N16 -- Entrada da Fornalha (Região IV)
 	"boss.colosso_osseo",        # 16 Galeria dos Ossos
 	"boss.freira_negra",         # 17 Cripta das Mil Velas
 	"boss.naga_zeraph",          # 18 Templo da Serpente
