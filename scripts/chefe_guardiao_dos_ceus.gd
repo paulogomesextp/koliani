@@ -378,12 +378,14 @@ func _origem_asa() -> Vector2:
 ## ler como ave. Medido no rig: 304x150 -> a 160 de alto fica com 324 de
 ## largo, ou seja ~2,5x a altura da Koliani, dentro do contrato (2,6x
 ## +-10%). Só o VISUAL cresce -- a colisão continua 40x88.
+## Rig novo (recortado da prancha): asa aberta a 240 px de largo, o tecto
+## que o teste de rigs impõe para não tapar a arena do N10.
 func _altura_alvo() -> float:
 	return 160.0
 
 
 func _largura_alvo() -> float:
-	return 340.0
+	return 240.0
 
 
 func _dir_para(de: Vector2) -> Vector2:
