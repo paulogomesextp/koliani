@@ -35,7 +35,7 @@ func _abrir() -> void:
 	var valor := 35 + mini(maxi(estado.indice_nivel, 0), 99) * 3
 	var textos := get_node("/root/Textos")
 	estado.ganhar_essencia(valor)
-	var descricao := "+%d " % valor + textos.t("chest.essence")
+	var descricao: String = "+%d " % valor + textos.t("chest.essence")
 	estado.marcar_recompensa_reclamada(reward_id)
 	_som_do_bau()
 	_mostrar(descricao)

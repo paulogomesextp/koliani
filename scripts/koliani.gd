@@ -2900,7 +2900,8 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0, origem := "") -> v
 	if _defendendo and _bloqueia(dir_empurrao):
 		_ao_bloquear()
 		return
-	vida = _vida_max() if EstadoJogo.modo_dev else maxi(0, vida - maxi(1, quantidade))
+	var real := maxi(1, quantidade)
+	vida = _vida_max() if EstadoJogo.modo_dev else maxi(0, vida - real)
 	_invulneravel = I_FRAMES
 	_hurt_t = 0.24
 	Musica.intensificar()   # 9H.1: levar dano também é combate
