@@ -33,6 +33,8 @@ const CAMINHOS := {
 	"portal": "res://assets/audio/approved/sfx/portal_jump.mp3",
 	"porta": "res://assets/audio/porta.wav",
 	"chefe_cai": "res://assets/audio/chefe_cai.wav",
+	# entrada de chefe: o braam aprovado toca uma vez, quando a luta comeca
+	"chefe_entrada": "res://assets/audio/approved/sfx/combate/chefe_entrada.ogg",
 	"selo": "res://assets/audio/approved/sfx/checkpoint_sword_cut.mp3",
 	"projetil": "res://assets/audio/projetil.wav",
 	"investida": "res://assets/audio/approved/sfx/combate/investida.ogg",

@@ -60,6 +60,7 @@ CORTES = {
 	"mecanismo": ("74847", 1.35, 1.00),
 	"sino_mecanismo": ("352062", 0.0, 2.50),
 	"lamina_cair": ("103800", 0.0, None),
+	"chefe_entrada": ("184276", 0.30, 3.80),
 }
 
 

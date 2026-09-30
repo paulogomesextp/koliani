@@ -200,6 +200,7 @@ func _correr_tudo() -> void:
 	teste_sala_labirinto_deterministica()
 	teste_9h1_trilha_de_producao()
 	teste_musica_so_aprovada()
+	teste_sfx_combate_aprovados()
 	teste_9h1_combo_com_poses_proprias()
 	teste_9h1_criaturas_com_movimento()
 	teste_9h1_tema_do_seletor()
@@ -3327,6 +3328,39 @@ func teste_musica_so_aprovada() -> void:
 	_ok(not Musica._amb.playing, "musica: ambiencia antiga no menu")
 	Musica.parar()
 	EstadoJogo.indice_nivel = guardado
+
+
+## 30 set 2026: os 27 SFX Pixabay de combate aprovados pelo Paulo nunca tinham
+## chegado ao jogo. Cada evento abaixo tem de apontar para o seu corte
+## aprovado (`approved/sfx/combate/`), o stream tem de carregar e ter uma
+## duracao de efeito (nao os 52 s da porta de forno), e o comeco de um
+## combate de chefe tem de tocar a entrada aprovada.
+func teste_sfx_combate_aprovados() -> void:
+	var eventos := ["passo1", "passo2", "passo3", "ataque", "ataque2", "ataque3",
+		"acerto", "acerto_v2", "acerto_v3", "acerto_critico", "pisao_koliani", "dano",
+		"morte_koliani", "bloqueio", "parede", "investida", "golpe_pesado", "esmagar",
+		"garra", "chama", "chefe_magia", "raio", "energia_impacto", "olho_carregar",
+		"pedra_parte", "praga", "mecanismo", "sino_mecanismo", "lamina_cair",
+		"chefe_entrada"]
+	for ev: String in eventos:
+		var cam: String = Som.CAMINHOS.get(ev, "")
+		_ok(cam.begins_with("res://assets/audio/approved/sfx/combate/"),
+			"sfx combate: '%s' nao usa o som aprovado (%s)" % [ev, cam])
+		var st: AudioStream = Som._stream(ev)
+		_ok(st != null and st.get_length() > 0.2 and st.get_length() < 4.5,
+			"sfx combate: '%s' nao carrega ou tem duracao de efeito errada" % ev)
+	var visto := ""
+	var b: Node = preload("res://scenes/actors/ChefeAerion.tscn").instantiate() \
+			if ResourceLoader.exists("res://scenes/actors/ChefeAerion.tscn") else null
+	if b != null:
+		add_child(b)
+		var antes: int = Som._ordem
+		b.provocar()
+		visto = Som._pool[(Som._idx + Som.VOZES - 1) % Som.VOZES].stream.resource_path.get_file() \
+				if Som._ordem > antes else ""
+		_ok(visto == "chefe_entrada.ogg",
+			"sfx combate: provocar() nao tocou a entrada do chefe (%s)" % visto)
+		b.queue_free()
 
 
 ## Os quatro golpes do combo tem TIRAS PROPRIAS. O que isto guarda nao e' a
