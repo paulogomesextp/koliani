@@ -32,6 +32,18 @@ var _onda_feita := false
 var _baques_seguidos := 0
 
 
+## Rig extraido da prancha aprovada (`tools/extrair_golem_falesias.py`): ja' vem
+## a escala final, por isso o corpo fica a 130 px (= 100 x 1.3 de antes) e a
+## cena usa `escala_visual = 1.0`. As lajes abertas sao mais largas que o
+## tecto comum dos chefes.
+func _altura_alvo() -> float:
+	return 130.0
+
+
+func _largura_alvo() -> float:
+	return 200.0
+
+
 func _ready() -> void:
 	super._ready()
 	vida = maxi(vida, vida_minima)
