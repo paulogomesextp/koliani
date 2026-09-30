@@ -86,7 +86,7 @@ func fragmentos_em_falta() -> int:
 	return vivos
 
 
-func receber_dano(_quantidade: int = 0, _dir: float = 0.0) -> void:
+func receber_dano(_quantidade: int = 0, _dir: float = 0.0, _critico := false, _recuo := 0.0) -> void:
 	if _cd > 0.0:
 		return
 	_cd = recarga
