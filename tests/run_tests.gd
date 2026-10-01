@@ -1140,9 +1140,14 @@ func teste_9f_ui_producao() -> void:
 	# HUD: calha/enchimento das barras do kit
 	var hud: Node = load("res://scenes/ui/HUD.tscn").instantiate()
 	get_tree().root.add_child(hud)
-	var calha := hud.get_node_or_null("Vida/Barra/CalhaMeio") as TextureRect
-	_ok(calha != null and (calha.texture as AtlasTexture).atlas.resource_path == dir + "barra_vida_calha.png",
-		"9F: a barra de vida da HUD nao usa a calha do kit")
+	# HUD moderno: barras proprias (`BarraHud`) dentro do bloco `Vitais`
+	var b_vida := hud.get_node_or_null("Vitais/BarraVida")
+	var b_en := hud.get_node_or_null("Vitais/BarraEnergia")
+	_ok(b_vida != null and b_en != null and hud.get_node_or_null("Kolicoins") != null,
+		"HUD: faltam o bloco Vitais (vida/energia) ou o contador de Kolicoins")
+	if b_vida:
+		b_vida.definir(40.0, 100.0)
+		_ok(is_equal_approx(b_vida.fracao(), 0.4), "HUD: a barra de vida nao segue o valor")
 	hud.queue_free()
 
 ##  - "os controlos do telefone movimenta-se ao utilizar, não pode
