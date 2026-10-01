@@ -136,14 +136,16 @@ const ESPECIES := {
 	# pack CC0 ansimuz "Enemies Pack" (tools/extrair_inimigos_pack.gd). O
 	# `hit` é o idle (o pisca do dano é do shader) e o `dead` é gerado.
 	# --- REGIAO II, bestiario CANONICO (Super-Process A2, 18 set 2026) ------
+	# Animacoes revistas a 1 out 2026 (`tools/animar_regiao02.py`): idle 8, run 8,
+	# attack 6, hit 4, dead 8 para as quatro especies abaixo (derivadas da pose aprovada).
 	# Recortadas da prancha aprovada `enemy_gameplay_pack.png` por
 	# `tools/extrair_inimigos_regiao02.py` -- nao sao desenho novo, sao as
 	# poses que a prancha ja' tinha, com os estados que ela ja' nomeava.
 	# Ate' aqui a Regiao II usava o pool da antiga Prisao (esqueleto, chort,
 	# orc, imp, mastim): bichos terrestres de masmorra num sitio cuja
 	# identidade e' o AR. Censo do audit: 0 dos 10 canonicos em N06-N10.
-	"morcego_dos_ventos":  {"idle": 2, "run": 2, "hit": 1, "dead": 1},
-	"sentinela_flutuante": {"idle": 2, "run": 2, "hit": 1, "dead": 1},
+	"morcego_dos_ventos":  {"idle": 8, "run": 8, "hit": 4, "dead": 8},
+	"sentinela_flutuante": {"idle": 8, "run": 8, "hit": 4, "dead": 8},
 	# --- REGIAO III, bestiario CANONICO ------------------------------------
 	# Recortadas da prancha aprovada `enemy_gameplay_pack.png` da Regiao III
 	# por `tools/extrair_inimigos_regiao03.py`. Mesmo metodo da Regiao II --
@@ -174,8 +176,8 @@ const ESPECIES := {
 	"sentinela_de_pressao":   {"idle": 2, "run": 2, "hit": 1, "dead": 1},
 	"coloso_de_metal":        {"idle": 2, "run": 2, "hit": 1, "dead": 1},
 	"gaivota_sombria":     {"idle": 2, "run": 2, "hit": 1, "dead": 1},
-	"golem_aereo":         {"idle": 2, "run": 2, "hit": 1, "dead": 1},
-	"elemental_do_vento":  {"idle": 2, "run": 2, "hit": 1, "dead": 1},
+	"golem_aereo":         {"idle": 8, "run": 8, "hit": 4, "dead": 8},
+	"elemental_do_vento":  {"idle": 8, "run": 8, "hit": 4, "dead": 8},
 	"besouro":        {"idle": 4, "run": 4, "hit": 4, "dead": 4},
 	"raptor":         {"idle": 4, "run": 7, "hit": 4, "dead": 4},
 	"mastim":         {"idle": 6, "run": 4, "hit": 6, "dead": 4},
@@ -467,14 +469,14 @@ func _largura_alvo() -> float:
 ## travado por um teste que o le' com expressao regular; e porque ter ou nao
 ## pose de ataque e' uma propriedade de quem tem a arte, nao de todos.
 const ATAQUE_FRAMES := {
-	"morcego_dos_ventos": 1,      # INVESTIDA
-	"sentinela_flutuante": 1,
+	"morcego_dos_ventos": 6,      # INVESTIDA
+	"sentinela_flutuante": 6,
 	"gaivota_sombria": 2,         # MERGULHO + ATAQUE
-	"golem_aereo": 1,             # ATAQUE
+	"golem_aereo": 6,             # ATAQUE
 	"trabalhador_corrompido": 1, "arqueiro_da_fornalha": 1, "operario_blindado": 1,
 	"lanca_chamas": 1, "automato_de_fundicao": 1, "drone_de_lava": 1,
 	"sentinela_de_pressao": 1, "coloso_de_metal": 1,
-	"elemental_do_vento": 1,
+	"elemental_do_vento": 6,
 }
 
 ## Espécies que voam -- não se alinham os pés ao chão.
