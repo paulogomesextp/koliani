@@ -21,6 +21,10 @@ const CENA_OPCOES := preload("res://scenes/ui/Opcoes.tscn")
 ## Instância do ecrã de Opções sobreposto (ou null). Enquanto existe, é ele
 ## que trata o Esc -- o menu de pausa por baixo fica congelado.
 var _opcoes_inst: Control = null
+var _painel: PanelContainer
+var _palco: Control
+var _realce: TextureRect
+var _realce_tween: Tween
 
 
 func _ready() -> void:
@@ -35,20 +39,69 @@ func _ready() -> void:
 	_recomecar.visible = false
 	Textos.idioma_mudou.connect(func(_l: String) -> void: _traduzir())
 	_traduzir()
-	# Execution 9H.11: o painel passa do kit de ouro/ciano da 9F para a
-	# linguagem do menu principal (carmesim sobre carvão). O foco/hover
-	# desenha a placa em losango, tal como no frontend.
-	Frontend9H.vestir($Painel)
-	($Painel as PanelContainer).add_theme_stylebox_override(
-		"panel", Frontend9H.painel_liso())
-	Frontend9H.cabecalho(_titulo, 32)
+	_montar_frontend()
+	for b: Button in [_continuar, _opcoes_btn, _mapa, _menu]:
+		Frontend9H.rotulo_menu(b, 26)
+		b.custom_minimum_size = Vector2(0, 46)
+		b.mouse_entered.connect(b.grab_focus)
+		b.focus_entered.connect(func() -> void: _mover_realce(b))
+		b.resized.connect(func() -> void:
+			if b.has_focus():
+				_mover_realce(b))
+	var botoes := [_continuar, _opcoes_btn, _mapa, _menu]
+	for i in botoes.size():
+		botoes[i].focus_neighbor_top = botoes[i].get_path_to(botoes[posmod(i - 1, botoes.size())])
+		botoes[i].focus_neighbor_bottom = botoes[i].get_path_to(botoes[(i + 1) % botoes.size()])
+
+
+## A mesma prancha e os mesmos componentes do menu inicial, sem a caixa antiga.
+func _montar_frontend() -> void:
+	_painel = $Painel
+	$Fundo.hide()
+	var raiz := Control.new()
+	raiz.name = "FrontendPausa"
+	raiz.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	add_child(raiz)
+	_palco = Frontend9H.palco(raiz, "fundo_menu")
+	Frontend9H.vestir(raiz)
+	_palco.add_child(Frontend9H.veu(Vector2(475, 0), Vector2(1135, 720), 0.5))
+	_palco.add_child(Frontend9H.vinheta())
+	_realce = Frontend9H.realce()
+	_realce.modulate.a = 0.0
+	_palco.add_child(_realce)
+	_painel.reparent(_palco)
+	_painel.add_theme_stylebox_override("panel", StyleBoxEmpty.new())
+	Frontend9H.por(_painel, Rect2(640, 260, 330, 330))
+	var coluna := _titulo.get_parent() as VBoxContainer
+	coluna.add_theme_constant_override("separation", 0)
+	Frontend9H.capitular(_titulo, 20, Frontend9H.TEXTO_APAGADO)
 	_ornamentar()
-	for b: Button in [_continuar, _opcoes_btn, _mapa, _recomecar, _menu]:
-		b.resized.connect(func() -> void: b.pivot_offset = b.size / 2.0)
-		b.mouse_entered.connect(func() -> void: _animar_escala(b, 1.03))
-		b.mouse_exited.connect(func() -> void: _animar_escala(b, 1.0))
-		b.focus_entered.connect(func() -> void: _animar_escala(b, 1.03))
-		b.focus_exited.connect(func() -> void: _animar_escala(b, 1.0))
+	for b: Button in [_opcoes_btn, _mapa, _menu]:
+		var sep := Frontend9H.separador()
+		sep.custom_minimum_size = Vector2(0, 12)
+		coluna.add_child(sep)
+		coluna.move_child(sep, b.get_index())
+	var rodape := Frontend9H.separador("ornamento_rodape")
+	Frontend9H.por(rodape, Rect2(600, 604, 410, 20))
+	_palco.add_child(rodape)
+
+
+func _mover_realce(botao: Button) -> void:
+	await get_tree().process_frame
+	if not is_instance_valid(botao) or not botao.is_inside_tree():
+		return
+	var posicao := botao.global_position - _palco.global_position - Vector2(12, 5)
+	var tamanho := botao.size + Vector2(24, 10)
+	if _realce_tween and _realce_tween.is_valid():
+		_realce_tween.kill()
+	if _realce.modulate.a < 0.05:
+		_realce.position = posicao
+		_realce.size = tamanho
+		_realce.modulate.a = 1.0
+		return
+	_realce_tween = create_tween().set_parallel().set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	_realce_tween.tween_property(_realce, "position", posicao, 0.17)
+	_realce_tween.tween_property(_realce, "size", tamanho, 0.17)
 
 
 ## Losango do frontend por baixo do título -- o mesmo ornamento que separa
@@ -66,11 +119,6 @@ func _ornamentar() -> void:
 		velho.visible = false
 	col.add_child(sep)
 	col.move_child(sep, _titulo.get_index() + 1)
-
-
-func _animar_escala(botao: Button, alvo: float) -> void:
-	var t := create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_BACK)
-	t.tween_property(botao, "scale", Vector2(alvo, alvo), 0.16)
 
 
 func _traduzir() -> void:
@@ -113,8 +161,7 @@ func _abrir() -> void:
 	Som.toca("menu_painel", -12.0)
 	visible = true
 	get_tree().paused = true
-	# 9H.1: a cama desce e entra a ambiência da pausa. NÃO se pára a música --
-	# pará-la e recomeçá-la punha a faixa de volta ao princípio a cada pausa.
+	# Menu silencioso; a faixa do nível fica suspensa, sem voltar ao início.
 	Musica.pausa(true)
 	_continuar.grab_focus()
 
@@ -138,17 +185,20 @@ func _abrir_opcoes() -> void:
 	_opcoes_inst.process_mode = Node.PROCESS_MODE_ALWAYS  # funciona em pausa
 	_opcoes_inst.tree_exited.connect(_ao_fechar_opcoes)
 	add_child(_opcoes_inst)
-	$Painel.visible = false  # o Fundo do próprio Opcoes já escurece o ecrã
+	_painel.visible = false
+	_realce.visible = false
 
 
 func _ao_fechar_opcoes() -> void:
 	_opcoes_inst = null
 	if visible:
-		$Painel.visible = true
+		_painel.visible = true
+		_realce.visible = true
 		_continuar.grab_focus()
 
 
 func _ao_recomecar() -> void:
+	Musica.pausa(false)
 	get_tree().paused = false
 	Transicao.fechar_e(get_tree().reload_current_scene)
 
@@ -156,12 +206,14 @@ func _ao_recomecar() -> void:
 ## Sai para o Mapa do Mundo sem guardar progresso do nível (o nível recomeça
 ## do início da próxima vez).
 func _ao_mapa() -> void:
+	Musica.pausa(false)
 	get_tree().paused = false
 	EstadoJogo.abandonar_sessao_nivel()
 	Transicao.fechar_e(func() -> void: get_tree().change_scene_to_file(CENA_MAPA))
 
 
 func _ao_menu() -> void:
+	Musica.pausa(false)
 	get_tree().paused = false
 	EstadoJogo.abandonar_sessao_nivel()
 	Transicao.fechar_e(func() -> void: get_tree().change_scene_to_file(CENA_MENU))

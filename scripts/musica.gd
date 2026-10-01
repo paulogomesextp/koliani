@@ -100,6 +100,7 @@ var _caminho_atual := ""
 var _pitch_atual := -1.0
 var _web_audio_callback: JavaScriptObject
 var _web_reinicio_agendado := false
+var _em_pausa := false
 
 
 func _ready() -> void:
@@ -253,25 +254,19 @@ func intensificar() -> void:
 		_tocar(cam, 1.0, VOL_CAMA + 1.0, true)
 
 
-## Ambiência da pausa: baixa a cama e põe por cima a peça de pausa. Não PARA
-## a cama -- pará-la e recomeçá-la ao fechar o menu punha a música de volta
-## ao princípio a cada pausa.
+## Pausa silenciosa: suspende as camas sem perder a posição de reprodução.
 func pausa(ligada: bool) -> void:
-	if _p == null:
-		return
-	_p.volume_db = (_vol_cama_atual - 11.0) if ligada else _vol_cama_atual
-	var cam: String = PRODUCAO["pausa"]
-	if not ResourceLoader.exists(cam) or _pausa_p == null:
-		return
-	if ligada:
-		if _pausa_p.stream == null:
-			_pausa_p.stream = _carregar_loop(cam)
-		_pausa_p.play()
-	else:
+	_em_pausa = ligada
+	for player in [_p, _p2, _amb]:
+		if player != null:
+			player.stream_paused = ligada
+	if _pausa_p != null:
 		_pausa_p.stop()
 
 
 func _process(_dt: float) -> void:
+	if _em_pausa:
+		return
 	if _combate_ate <= 0.0:
 		return
 	if Time.get_ticks_msec() / 1000.0 < _combate_ate:
