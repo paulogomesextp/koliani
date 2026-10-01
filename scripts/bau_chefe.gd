@@ -34,8 +34,8 @@ func _abrir() -> void:
 	queue_redraw()
 	var valor := 35 + mini(maxi(estado.indice_nivel, 0), 99) * 3
 	var textos := get_node("/root/Textos")
-	estado.ganhar_essencia(valor)
-	var descricao: String = "+%d " % valor + textos.t("chest.essence")
+	estado.ganhar_kolicoins(valor)
+	var descricao: String = "+%d " % valor + textos.t("chest.kolicoins")
 	estado.marcar_recompensa_reclamada(reward_id)
 	_som_do_bau()
 	_mostrar(descricao)
