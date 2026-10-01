@@ -171,7 +171,7 @@ const REGIOES := [
 	{"id": "gelo", "nome": "Reino do Gelo", "niveis": [40, 41, 42, 43, 44], "chave": "world.ice", "cor": Color(0.80, 0.96, 1.00)},
 	{"id": "deserto", "nome": "Deserto dos Esquecidos", "niveis": [45, 46, 47, 48, 49], "chave": "world.desert", "cor": Color(1.00, 0.86, 0.48)},
 	{"id": "jardins", "nome": "Jardins do Rei", "niveis": [50, 51, 52, 53, 54], "chave": "world.gardens", "cor": Color(0.90, 0.30, 0.52)},
-	{"id": "maquinas", "nome": "Cidade das Máquinas", "niveis": [55, 56, 57, 58, 59], "chave": "world.machines", "cor": Color(0.55, 0.85, 1.00)},
+	{"id": "maquinas", "nome": "Terras Envenenadas", "niveis": [55, 56, 57, 58, 59], "chave": "world.machines", "cor": Color(0.55, 0.9, 0.3)},
 	{"id": "ceu", "nome": "Céu Partido", "niveis": [60, 61, 62, 63, 64], "chave": "world.sky", "cor": Color(0.62, 0.70, 1.00)},
 	{"id": "sonhos", "nome": "Reino dos Sonhos", "niveis": [65, 66, 67, 68, 69], "chave": "world.dreams", "cor": Color(0.92, 0.66, 0.96)},
 	{"id": "mortos", "nome": "Cidade dos Mortos", "niveis": [70, 71, 72, 73, 74], "chave": "world.deadcity", "cor": Color(0.72, 0.92, 0.80)},

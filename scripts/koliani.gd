@@ -2089,6 +2089,14 @@ func envenenar(segundos: float, dano_tick := 4) -> void:
 		_veneno_tick = VENENO_INTERVALO
 
 
+## Tira o veneno (`ZonaLimpa`, Regiao XII). Deixa um resto minimo para o
+## proximo `_tick_estados` repor a tinta de base, sem mais um tick de dano.
+func limpar_veneno() -> void:
+	if _veneno > 0.0:
+		_veneno = 0.0001
+		_veneno_tick = VENENO_INTERVALO
+
+
 ## FRIO (nivel 45, Coracao do Inverno): abranda-a por tempo. Usa o mesmo
 ## `_acel_escala` do gelo -- sair da nevoa nao chega, e' preciso esperar.
 func congelar_parcial(segundos: float, escala := 0.35) -> void:

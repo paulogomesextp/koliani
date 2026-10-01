@@ -108,7 +108,10 @@ var _imune_lancamento_t := 0.0
 	"corvo_do_sino",
 	"trabalhador_corrompido", "arqueiro_da_fornalha", "operario_blindado",
 	"lanca_chamas", "automato_de_fundicao", "drone_de_lava",
-	"sentinela_de_pressao", "coloso_de_metal") var especie := "goblin"
+	"sentinela_de_pressao", "coloso_de_metal",
+	"rato_pestilento", "espreitador_fungico", "besteiro_corrompido",
+	"leproso_das_ruinas", "mosca_acida", "carcaca_envenenada",
+	"xama_da_praga", "guardiao_toxico") var especie := "goblin"
 ## Só a ARTE (Execution 9D+9E): quem a define veste-se com a arte de produção
 ## desta identidade em vez da da `especie`, que continua a mandar no som, no
 ## tamanho e em tudo o resto. É o que faz os clones da Morvanna parecerem
@@ -175,6 +178,18 @@ const ESPECIES := {
 	"drone_de_lava":          {"idle": 2, "run": 2, "hit": 1, "dead": 1},
 	"sentinela_de_pressao":   {"idle": 2, "run": 2, "hit": 1, "dead": 1},
 	"coloso_de_metal":        {"idle": 2, "run": 2, "hit": 1, "dead": 1},
+	# --- REGIAO XII, bestiario CANONICO (Terras Envenenadas) -------------------
+	# Retratos de `region_12/master_production_board.png`
+	# (`tools/extrair_inimigos_regiao12.py`); idem Regiao IV: um retrato por
+	# criatura, movimento procedural.
+	"rato_pestilento":        {"idle": 4, "run": 6, "hit": 2, "dead": 5},
+	"espreitador_fungico":    {"idle": 4, "run": 6, "hit": 2, "dead": 5},
+	"besteiro_corrompido":    {"idle": 4, "run": 6, "hit": 2, "dead": 5},
+	"leproso_das_ruinas":     {"idle": 4, "run": 6, "hit": 2, "dead": 5},
+	"mosca_acida":            {"idle": 4, "run": 6, "hit": 2, "dead": 5},
+	"carcaca_envenenada":     {"idle": 4, "run": 6, "hit": 2, "dead": 5},
+	"xama_da_praga":          {"idle": 4, "run": 6, "hit": 2, "dead": 5},
+	"guardiao_toxico":        {"idle": 4, "run": 6, "hit": 2, "dead": 5},
 	"gaivota_sombria":     {"idle": 2, "run": 2, "hit": 1, "dead": 1},
 	"golem_aereo":         {"idle": 8, "run": 8, "hit": 4, "dead": 8},
 	"elemental_do_vento":  {"idle": 8, "run": 8, "hit": 4, "dead": 8},
@@ -476,6 +491,9 @@ const ATAQUE_FRAMES := {
 	"trabalhador_corrompido": 1, "arqueiro_da_fornalha": 1, "operario_blindado": 1,
 	"lanca_chamas": 1, "automato_de_fundicao": 1, "drone_de_lava": 1,
 	"sentinela_de_pressao": 1, "coloso_de_metal": 1,
+	"rato_pestilento": 4, "espreitador_fungico": 4, "besteiro_corrompido": 4,
+	"leproso_das_ruinas": 4, "mosca_acida": 4, "carcaca_envenenada": 4,
+	"xama_da_praga": 4, "guardiao_toxico": 4,
 	"elemental_do_vento": 6,
 }
 
@@ -489,7 +507,9 @@ const ESPECIES_VOAM := ["olho", "abutre",
 	# espirito atravessa plataformas -- a prancha diz isso de cada um.
 	"gargula_vitral", "sino_flutuante", "corvo_do_sino", "espirito_do_eco",
 	# Regiao IV: o drone de lava voa
-	"drone_de_lava"]
+	"drone_de_lava",
+	# Regiao XII: a mosca acida voa
+	"mosca_acida"]
 
 ## A que FAMILIA de som pertence cada espécie (4 set 2026, pedido do Paulo:
 ## "faça com que os mobs façam sons apropriados ao tipo de monstro"). Até
@@ -520,6 +540,11 @@ const FAMILIA_SOM := {
 	"operario_blindado": "grande", "lanca_chamas": "humano",
 	"automato_de_fundicao": "grande", "drone_de_lava": "voador",
 	"sentinela_de_pressao": "grande", "coloso_de_metal": "grande",
+	# Regiao XII -- Terras Envenenadas
+	"rato_pestilento": "morto", "espreitador_fungico": "grande",
+	"besteiro_corrompido": "humano", "leproso_das_ruinas": "humano",
+	"mosca_acida": "voador", "carcaca_envenenada": "grande",
+	"xama_da_praga": "humano", "guardiao_toxico": "grande",
 }
 
 
