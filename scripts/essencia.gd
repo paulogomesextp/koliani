@@ -91,7 +91,7 @@ func _apanhar() -> void:
 	if _apanhado:
 		return
 	_apanhado = true
-	EstadoJogo.ganhar_essencia(valor)
+	EstadoJogo.ganhar_kolicoins(valor)
 	if Vfx9G.ativo(self):
 		Vfx9G.tocar(self, "pickup", global_position, 0.7, 0.0, false, false, 38, 0.28)
 	Som.toca("apanhar", -14.0, randf_range(1.15, 1.4))
