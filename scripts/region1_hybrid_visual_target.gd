@@ -66,65 +66,6 @@ var _restauro_hud: Array[Dictionary] = []
 var _hud_aplicado := false
 
 
-class AssinaturaLamina:
-	extends Node2D
-	var alvo: Node
-	var limite_esquerdo := -300.0
-	var limite_direito := 1250.0
-	var pulso := 0.0
-	var luz: PointLight2D
-
-	func _ready() -> void:
-		z_index = 8
-		luz = PointLight2D.new()
-		luz.texture = _textura_luz()
-		luz.color = Color("c49cff")
-		luz.energy = 1.15
-		luz.scale = Vector2(0.72, 0.58)
-		luz.position = Vector2(18, -7)
-		add_child(luz)
-		visible = false
-
-	func _process(dt: float) -> void:
-		if alvo == null or not is_instance_valid(alvo):
-			visible = false
-			return
-		pulso += dt
-		var valor_restante: Variant = alvo.get("_ataque_restante")
-		var restante := float(valor_restante) \
-			if typeof(valor_restante) in [TYPE_FLOAT, TYPE_INT] else 0.0
-		visible = restante > 0.0 and alvo.global_position.x >= limite_esquerdo \
-			and alvo.global_position.x <= limite_direito
-		if visible:
-			luz.energy = 1.0 + sin(pulso * 18.0) * 0.18
-			queue_redraw()
-
-	func _draw() -> void:
-		var centro := Vector2(11, -8)
-		draw_arc(centro, 38.0, -1.28, 1.12, 28,
-			Color(0.62, 0.30, 1.0, 0.23), 11.0, true)
-		draw_arc(centro, 36.0, -1.25, 1.08, 28,
-			Color("bb8cff"), 5.0, true)
-		draw_arc(centro, 34.0, -1.20, 1.02, 28,
-			Color("f1e5ff"), 1.7, true)
-		draw_circle(Vector2(38, -27), 4.2, Color("f1e5ff"))
-
-	func _textura_luz() -> GradientTexture2D:
-		var grad := Gradient.new()
-		grad.offsets = PackedFloat32Array([0.0, 0.42, 1.0])
-		grad.colors = PackedColorArray([
-			Color(1, 1, 1, 0.95), Color(0.75, 0.45, 1, 0.32), Color(0.5, 0.2, 1, 0),
-		])
-		var tex := GradientTexture2D.new()
-		tex.gradient = grad
-		tex.width = 192
-		tex.height = 192
-		tex.fill = 1
-		tex.fill_from = Vector2(0.5, 0.5)
-		tex.fill_to = Vector2(1.0, 0.5)
-		return tex
-
-
 func _enter_tree() -> void:
 	# No _enter_tree (e não no _ready) porque as plataformas do nível fazem o
 	# `_ready` antes de este nó acabar o dele, e perguntam pelo grupo nessa hora.
@@ -166,8 +107,6 @@ func _ready() -> void:
 	_esconder_legado.call_deferred()
 	if not Hybrid.serve(perfil):
 		_montar_primeiro_plano.call_deferred()
-	if perfil == 1:
-		_ligar_shadowblade.call_deferred()
 
 
 func _exit_tree() -> void:
@@ -608,20 +547,6 @@ func _esconder_legado() -> void:
 			n.visible = false
 			escondidos.append(nome)
 	set_meta("legado_escondido", escondidos)
-
-
-func _ligar_shadowblade() -> void:
-	if not ativo or not is_inside_tree():
-		return
-	var koliani := get_tree().get_first_node_in_group("koliani")
-	if koliani == null:
-		return
-	var assinatura := AssinaturaLamina.new()
-	assinatura.name = "HybridShadowbladeSignature"
-	assinatura.alvo = koliani
-	assinatura.limite_esquerdo = limite_esquerdo
-	assinatura.limite_direito = limite_direito
-	koliani.add_child(assinatura)
 
 
 func _restaurar_skin_hud() -> void:
