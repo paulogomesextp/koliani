@@ -103,33 +103,72 @@ def tira(quadros):
     return t
 
 
+def pose(q, larg, alt, rot=0.0, sx=1.0, sy=1.0, dx=0, dy=0, shear=0.0, brilho=1.0, alfa=1.0):
+    """Quadro (larg x alt) com o retrato achatado/esticado (pivo no pe'),
+    inclinado, deslocado e com cisalhamento (balanco do tronco)."""
+    w, h = max(1, round(q.width * sx)), max(1, round(q.height * sy))
+    r = q.resize((w, h), Image.LANCZOS)
+    if shear:
+        r = r.transform((w + int(abs(shear) * h) + 2, h), Image.AFFINE,
+                        (1, shear, -shear * h if shear > 0 else 0, 0, 1, 0), Image.BICUBIC)
+    if brilho != 1.0:
+        r = clarear(r, brilho)
+    if alfa != 1.0:
+        a = r.getchannel("A").point(lambda v: int(v * alfa))
+        r.putalpha(a)
+    big = Image.new("RGBA", (larg * 2, alt * 2), (0, 0, 0, 0))
+    big.paste(r, ((big.width - r.width) // 2, big.height - r.height - 4), r)
+    if rot:
+        big = big.rotate(rot, resample=Image.BICUBIC, center=(big.width // 2, big.height - 4))
+    bb = big.getbbox()
+    quadro = Image.new("RGBA", (larg, alt), (0, 0, 0, 0))
+    if bb:
+        big = big.crop(bb)
+        quadro.paste(big, ((larg - big.width) // 2 + dx, alt - big.height + dy), big)
+    return quadro
+
+
+def tiras_animadas(q, larg, alt, voa):
+    """Ciclos com mais movimento a partir de um so' retrato."""
+    P = lambda **k: pose(q, larg, alt, **k)
+    if voa:
+        idle = [P(dy=-3), P(dy=-1, sy=1.02), P(dy=2, sy=0.98), P(dy=0, sy=1.02)]
+        run = [P(dy=-4, rot=4), P(dy=-1, rot=0, sx=1.04), P(dy=3, rot=-4), P(dy=0, rot=0, sx=0.96),
+               P(dy=-3, rot=3), P(dy=1, rot=-2)]
+        ataque = [P(dx=-4, rot=8, sx=0.95), P(dx=-2, rot=12, brilho=1.15),
+                  P(dx=8, rot=-14, sx=1.1, brilho=1.45), P(dx=3, rot=-4)]
+    else:
+        idle = [P(), P(sy=1.025, sx=0.99, dy=-1), P(sy=1.04, sx=0.98, dy=-1, shear=0.02), P(sy=1.02, dy=0)]
+        run = [P(rot=4, dy=-2, sy=1.03), P(rot=1, dy=0, sy=0.97, sx=1.03), P(rot=-3, dy=-3, sy=1.04),
+               P(rot=-4, dy=-2, sy=1.03), P(rot=-1, dy=0, sy=0.97, sx=1.03), P(rot=3, dy=-3, sy=1.04)]
+        ataque = [P(rot=6, sy=0.93, sx=1.06, dx=-3, brilho=1.1),     # antecipacao: recua e acacha
+                  P(rot=10, sy=0.9, sx=1.08, dx=-5, brilho=1.2),
+                  P(rot=-14, sy=1.05, sx=1.1, dx=9, brilho=1.5),     # golpe: lanca-se em frente
+                  P(rot=-5, dx=3, sy=0.98)]                          # recupera
+    hit = [P(rot=-9, dx=-4, sx=0.94, brilho=1.9), P(rot=5, dx=-2, brilho=1.3)]
+    morte = [P(rot=-8, dx=-3, brilho=1.7), P(rot=-26, dx=-6, sy=0.9, brilho=1.2),
+             P(rot=-58, dx=-8, sy=0.85, brilho=0.8), tombado(q, larg, alt),
+             pose(tombado(q, larg, alt), larg, alt, alfa=0.55, brilho=0.6)]
+    return idle, run, ataque, hit, morte
+
+
 def main() -> int:
     px = Image.open(PRANCHA).convert("RGB").load()
     folha = []
     for especie, (caixa, alvo) in CRIATURAS.items():
         q = retrato(px, caixa, alvo)
-        larg = int(q.width * 1.25) + 4
-        alt = q.height + 6
-        base = Image.new("RGBA", (larg, alt), (0, 0, 0, 0))
-        base.paste(q, ((larg - q.width) // 2, alt - q.height), q)
-        respira = Image.new("RGBA", (larg, alt), (0, 0, 0, 0))
-        respira.paste(q, ((larg - q.width) // 2, alt - q.height + 1), q)
-        if especie in VOAM:
-            idle = [base, respira]
-            run = [base, respira]
-        else:
-            idle = [base, respira]
-            run = [inclinar(q, 3, larg, alt), inclinar(q, -3, larg, alt)]
-        ataque = inclinar(clarear(q, 1.25), -7, larg, alt)
+        larg = int(q.width * 1.4) + 6
+        alt = int(q.height * 1.15) + 8
+        idle, run, ataque, hit, morte = tiras_animadas(q, larg, alt, especie in VOAM)
         pasta = os.path.join(DESTINO, especie)
         os.makedirs(pasta, exist_ok=True)
         tira(idle).save(os.path.join(pasta, "idle.png"))
         tira(run).save(os.path.join(pasta, "run.png"))
-        ataque.save(os.path.join(pasta, "attack.png"))
-        clarear(base, 1.9).save(os.path.join(pasta, "hit.png"))
-        tombado(q, larg, alt).save(os.path.join(pasta, "dead.png"))
+        tira(ataque).save(os.path.join(pasta, "attack.png"))
+        tira(hit).save(os.path.join(pasta, "hit.png"))
+        tira(morte).save(os.path.join(pasta, "dead.png"))
         print("  %-24s quadro %dx%d" % (especie, larg, alt))
-        folha.append((especie, idle[0], run[0], ataque, tombado(q, larg, alt)))
+        folha.append((especie, idle[0], run[2], ataque[2], morte[3]))
     if "--preview" in sys.argv:
         alt = max(f[1].height for f in folha)
         larg = max(f[1].width for f in folha)

@@ -182,14 +182,14 @@ const ESPECIES := {
 	# Retratos de `region_12/master_production_board.png`
 	# (`tools/extrair_inimigos_regiao12.py`); idem Regiao IV: um retrato por
 	# criatura, movimento procedural.
-	"rato_pestilento":        {"idle": 2, "run": 2, "hit": 1, "dead": 1},
-	"espreitador_fungico":    {"idle": 2, "run": 2, "hit": 1, "dead": 1},
-	"besteiro_corrompido":    {"idle": 2, "run": 2, "hit": 1, "dead": 1},
-	"leproso_das_ruinas":     {"idle": 2, "run": 2, "hit": 1, "dead": 1},
-	"mosca_acida":            {"idle": 2, "run": 2, "hit": 1, "dead": 1},
-	"carcaca_envenenada":     {"idle": 2, "run": 2, "hit": 1, "dead": 1},
-	"xama_da_praga":          {"idle": 2, "run": 2, "hit": 1, "dead": 1},
-	"guardiao_toxico":        {"idle": 2, "run": 2, "hit": 1, "dead": 1},
+	"rato_pestilento":        {"idle": 4, "run": 6, "hit": 2, "dead": 5},
+	"espreitador_fungico":    {"idle": 4, "run": 6, "hit": 2, "dead": 5},
+	"besteiro_corrompido":    {"idle": 4, "run": 6, "hit": 2, "dead": 5},
+	"leproso_das_ruinas":     {"idle": 4, "run": 6, "hit": 2, "dead": 5},
+	"mosca_acida":            {"idle": 4, "run": 6, "hit": 2, "dead": 5},
+	"carcaca_envenenada":     {"idle": 4, "run": 6, "hit": 2, "dead": 5},
+	"xama_da_praga":          {"idle": 4, "run": 6, "hit": 2, "dead": 5},
+	"guardiao_toxico":        {"idle": 4, "run": 6, "hit": 2, "dead": 5},
 	"gaivota_sombria":     {"idle": 2, "run": 2, "hit": 1, "dead": 1},
 	"golem_aereo":         {"idle": 8, "run": 8, "hit": 4, "dead": 8},
 	"elemental_do_vento":  {"idle": 8, "run": 8, "hit": 4, "dead": 8},
@@ -491,9 +491,9 @@ const ATAQUE_FRAMES := {
 	"trabalhador_corrompido": 1, "arqueiro_da_fornalha": 1, "operario_blindado": 1,
 	"lanca_chamas": 1, "automato_de_fundicao": 1, "drone_de_lava": 1,
 	"sentinela_de_pressao": 1, "coloso_de_metal": 1,
-	"rato_pestilento": 1, "espreitador_fungico": 1, "besteiro_corrompido": 1,
-	"leproso_das_ruinas": 1, "mosca_acida": 1, "carcaca_envenenada": 1,
-	"xama_da_praga": 1, "guardiao_toxico": 1,
+	"rato_pestilento": 4, "espreitador_fungico": 4, "besteiro_corrompido": 4,
+	"leproso_das_ruinas": 4, "mosca_acida": 4, "carcaca_envenenada": 4,
+	"xama_da_praga": 4, "guardiao_toxico": 4,
 	"elemental_do_vento": 6,
 }
 
