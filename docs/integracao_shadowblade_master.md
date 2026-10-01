@@ -1,6 +1,6 @@
 # Shadowblade e Featured em master — 1 outubro 2026
 
-Pedido do Paulo: colocar a Shadowblade e a loja em master e terminar com Windows jogável. Integração seletiva sobre b31821b8; não inclui níveis nem remoção de equipamento do ramo de origem. Os documentos locais anteriores foram preservados.
+Pedido do Paulo: colocar a Shadowblade e a loja em master e terminar com Windows jogável. Integração cosmética inicial sobre b31821b8; a prova do save revelou formato atual incompatível com essa base antiga. Foi necessário juntar o master já aprovado a3b059dc, incluindo as suas decisões de equipamento e níveis, sem novas edições desses sistemas. Os documentos locais anteriores foram preservados.
 
 ## Conteúdo integrado
 
@@ -22,3 +22,6 @@ Pedido do Paulo: colocar a Shadowblade e a loja em master e terminar com Windows
 Backup das fontes anteriores: work/integracao_shadowblade_backup_20261001 (ignorado pelo editor). Build Windows/Web será exportada deste mesmo master local/version 0.18.20 e o arranque final verificado antes da conclusão. Sem push ou publicação online.
 
 HUMAN PLAYTEST REQUIRED para qualidade percebida; DEVICE VALIDATION REQUIRED para telemóvel. Outras skins conceptuais aguardam identificação do Paulo devido às decisões anteriores de descarte.
+
+## Fecho da base compatível
+Leitura primária do save real aceite após juntar a3b059dc; três saves reais preservados. Carrossel repetido funcionalmente PASS, com um recurso ativo ao encerrar o arnés (limitação conhecida). Perfil base/premium/regresso validado no renderer e 12 capturas reais sem VFX. Não se declara teste de percurso dos níveis recebidos do upstream. Um aviso de blank line no fim de tests/run_tests.gd já vem do master aprovado; ficheiro preservado.

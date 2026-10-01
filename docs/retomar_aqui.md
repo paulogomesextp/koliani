@@ -1,3 +1,47 @@
+# >>> Regiao IV -- N16 "Entrada da Fornalha" refeito (30 set 2026, branch `claude/project-thread-lu210k`) <<<
+Cena `Cemiterio_dos_Reis.tscn` gerada por `tools/construir_n16_entrada.py` (+ `tools/r4_lib.py`); desenho em
+`docs/nivel_autoral_n16.md`. Pipeline de arte da Regiao IV montado a partir das 7 pranchas (terreno `fornalha`,
+fundo panoramico, ~76 props `r4_*`, 8 inimigos novos no `DemonioBase`). Mecanicas opt-in novas: PisoQuente,
+JatoFornalha, LavaFornalha. Suite verde (exit 0, save intacto), crivo `porta_alcancavel=true`.
+Falta: playtest humano; N17-N20 (mesmo pipeline; N20 precisa do Guardiao da Fornalha, 2 fases).
+
+# >>> N14 -- "Campanario", autoral (29 set 2026, branch `claude/project-thread-6jbrqw`, junto no master) <<<
+
+# N15 "O Topo dos Ecos" refeito (30 set 2026)
+Cena `O_Pico_Esquecido.tscn` gerada por `tools/construir_n15_topo.py`; desenho em
+`docs/nivel_autoral_n15.md`. Novidades opt-in: FragmentoEco, sino celestial
+(`fragmentos_necessarios`), PlataformaFase2, `textura_eco`, `textura_feixe`.
+Falta: playtest humano; Regiao III completa (sem cartao `region.3.complete`).
+
+
+Mesmo criterio do N12/N13 ("arte detalhada primeiro"). `Observatorio_Lunar.tscn`
+deixou de ser a sala da Sacerdotisa Lunar (chefe fora do contrato) + um
+Coletavel de `projetil` (ja' concedido no N10) e passou a uma torre feita a
+mao, 3400 x 3450, gerada por `tools/construir_n14_campanario.py`, a subir de
+baixo para cima: A) base (sinos em queda, 1.o baloico sobre fosso -- ensina,
+nao e' portao); B) camara dos sinos (3 sinos acendem plataformas
+TEMPORIZADAS em sequencia ate' a' coluna de ar que sai pelo furo do tecto);
+C) ar livre (2 baloicos grandes contra o vento, roda de 3 plataformas
+circulares com laminas em cruz no cubo, corrente que muda de direcao ao som
+do sino); D) sala do sino gigante (pendulo com dano) e Guardiao = Monge das
+Correntes elite (`guard.monge_das_correntes`, 6 idiomas). 3 segredos, 6
+checkpoints. Pecas da coluna N14 do `level_mechanics.png`
+(`tools/gerar_props_n14_prancha.py`, prefixo `c_`). Novos:
+`PlataformaBalanco`, `PlataformaOrbita`; opt-in em PlataformaSino
+(`duracao_solida`), SinoTorre (`ao_badalar`), ElevadorColuna (`grupo_sino`),
+CorrenteLateral (`pele`/`alfa_pele`), PedraQueda, PenduloLamina, engrenagem_deco.
+Portoes medidos contra `escalar_paredes` (coluna de ar a 480 px das paredes,
+ar livre sem paredes, chao D preso a' parede leste). Testes:
+`TestesRegion03N14`, `teste_r3_n14_sinos` (fisica),
+`teste_r3_n14_portoes_no_crivo`. Relatorio: `docs/nivel_autoral_n14.md`;
+capturas `docs/qa/n14_autoral/`. **Armadilhas**: `p_neblina` tem aresta dura
+(usar degrade radial); peles aditivas precisam de bordas esbatidas; o
+degrade `Massa` do N13 fica buraco preto contra o ceu. **Pendente**: playtest
+humano (tempo das temporizadas, vento sobre os baloicos, ritmo da roda, TTK
+do Guardiao). A seguir: N15 (Vyrak).
+
+# >>> N13 -- "Mecanismos Antigos", autoral (29 set 2026, branch `claude/project-thread-6jbrqw`, junto no master pelo PR #5) <<<
+
 # >>> Shop — modernização UI (30 set 2026, commit local, SEM push) <<<
 
 Relatório: `docs/execution_shop_modernizacao.md`. `Loja` continua montada por
@@ -895,6 +939,26 @@ idêntico (opcoes/progresso/progresso.json.bak), sandbox recebeu o `progresso.js
 script que arranque o Godot tem de passar por esta ferramenta.
 
 ---
+
+## SFX de combate aprovados ligados (30 set 2026)
+
+Os 27 SFX Pixabay aprovados que nunca tinham chegado ao repo (403 na cloud)
+foram descarregados no PC do Paulo (`assets/audio/acquisition/sfx/combate/`,
+originais intactos + README com hashes) e ligados no `som.gd`. Como varios
+sao longos demais (porta de forno 52 s, fogo 8 s), `tools/preparar_sfx_combate.py`
+CORTA, faz fade-out e iguala o pico a -3 dBFS -> `approved/sfx/combate/*.ogg`
+(24 cortes). Passos 1-3, golpes 1-3 e `acerto` v1-3 sao o MESMO som aprovado
+com tom 0,94 / 1,0 / 1,06 (para nao repetir identico). Eventos: passos,
+ataque x3, acerto x3, critico, pisao, dano, morte, bloqueio, parede,
+investida, golpe pesado, esmagar, garra, chama, magia de chefe, raio, impacto
+de energia, olho a carregar, pedra, praga, mecanismo, sino, lamina e
+`chefe_entrada` (novo, toca 1x em `ChefeBase.provocar()`). O evento de cada um
+foi deduzido do nome -- HUMAN LISTEN REQUIRED; trocar = mudar a linha em
+`CORTES` e o mapeamento em `som.gd`. Mantidos do kit sintetico: salto,
+aterragem, escudo, dano pesado, finisher, lancar, rolamento, agarrar.
+`verificar_sfx_*.gd` actualizados para os nomes novos; `verificar_sfx_mundo`
+continua com 10 falhas que ja' existiam no master (portao/bau/selo/etc.).
+Teste: `teste_sfx_combate_aprovados`. Suite completa: OK.
 
 ## Musica "igual em todos os niveis" -- era a ambiencia antiga (29 set 2026)
 

@@ -105,7 +105,10 @@ var _imune_lancamento_t := 0.0
 	"sentinela_da_torre", "acolito_do_eco", "automato_do_sino",
 	"gargula_vitral", "sino_flutuante", "arqueiro_das_sombras",
 	"monge_das_correntes", "espirito_do_eco", "construto_vitral",
-	"corvo_do_sino") var especie := "goblin"
+	"corvo_do_sino",
+	"trabalhador_corrompido", "arqueiro_da_fornalha", "operario_blindado",
+	"lanca_chamas", "automato_de_fundicao", "drone_de_lava",
+	"sentinela_de_pressao", "coloso_de_metal") var especie := "goblin"
 ## Só a ARTE (Execution 9D+9E): quem a define veste-se com a arte de produção
 ## desta identidade em vez da da `especie`, que continua a mandar no som, no
 ## tamanho e em tudo o resto. É o que faz os clones da Morvanna parecerem
@@ -158,6 +161,18 @@ const ESPECIES := {
 	"espirito_do_eco":      {"idle": 2, "run": 2, "hit": 1, "dead": 1},
 	"construto_vitral":     {"idle": 2, "run": 2, "hit": 1, "dead": 1},
 	"corvo_do_sino":        {"idle": 2, "run": 2, "hit": 1, "dead": 1},
+	# --- REGIAO IV, bestiario CANONICO (Fornalha) -----------------------------
+	# Retratos da prancha `region_04/enemy_gameplay_pack.png`
+	# (`tools/extrair_inimigos_regiao04.py`); so' ha' um retrato por criatura,
+	# por isso os estados saem todos dele e o movimento e' procedural.
+	"trabalhador_corrompido": {"idle": 2, "run": 2, "hit": 1, "dead": 1},
+	"arqueiro_da_fornalha":   {"idle": 2, "run": 2, "hit": 1, "dead": 1},
+	"operario_blindado":      {"idle": 2, "run": 2, "hit": 1, "dead": 1},
+	"lanca_chamas":           {"idle": 2, "run": 2, "hit": 1, "dead": 1},
+	"automato_de_fundicao":   {"idle": 2, "run": 2, "hit": 1, "dead": 1},
+	"drone_de_lava":          {"idle": 2, "run": 2, "hit": 1, "dead": 1},
+	"sentinela_de_pressao":   {"idle": 2, "run": 2, "hit": 1, "dead": 1},
+	"coloso_de_metal":        {"idle": 2, "run": 2, "hit": 1, "dead": 1},
 	"gaivota_sombria":     {"idle": 2, "run": 2, "hit": 1, "dead": 1},
 	"golem_aereo":         {"idle": 2, "run": 2, "hit": 1, "dead": 1},
 	"elemental_do_vento":  {"idle": 2, "run": 2, "hit": 1, "dead": 1},
@@ -456,6 +471,9 @@ const ATAQUE_FRAMES := {
 	"sentinela_flutuante": 1,
 	"gaivota_sombria": 2,         # MERGULHO + ATAQUE
 	"golem_aereo": 1,             # ATAQUE
+	"trabalhador_corrompido": 1, "arqueiro_da_fornalha": 1, "operario_blindado": 1,
+	"lanca_chamas": 1, "automato_de_fundicao": 1, "drone_de_lava": 1,
+	"sentinela_de_pressao": 1, "coloso_de_metal": 1,
 	"elemental_do_vento": 1,
 }
 
@@ -467,7 +485,9 @@ const ESPECIES_VOAM := ["olho", "abutre",
 	"golem_aereo", "elemental_do_vento",
 	# Regiao III: a gargula patrulha EM VOO, o sino flutua, o corvo voa e o
 	# espirito atravessa plataformas -- a prancha diz isso de cada um.
-	"gargula_vitral", "sino_flutuante", "corvo_do_sino", "espirito_do_eco"]
+	"gargula_vitral", "sino_flutuante", "corvo_do_sino", "espirito_do_eco",
+	# Regiao IV: o drone de lava voa
+	"drone_de_lava"]
 
 ## A que FAMILIA de som pertence cada espécie (4 set 2026, pedido do Paulo:
 ## "faça com que os mobs façam sons apropriados ao tipo de monstro"). Até
@@ -493,6 +513,11 @@ const FAMILIA_SOM := {
 	"espirito_do_eco": "morto", "sino_flutuante": "morto",
 	"gargula_vitral": "voador", "corvo_do_sino": "voador",
 	"automato_do_sino": "grande", "construto_vitral": "grande",
+	# Regiao IV -- Fornalha
+	"trabalhador_corrompido": "humano", "arqueiro_da_fornalha": "humano",
+	"operario_blindado": "grande", "lanca_chamas": "humano",
+	"automato_de_fundicao": "grande", "drone_de_lava": "voador",
+	"sentinela_de_pressao": "grande", "coloso_de_metal": "grande",
 }
 
 
@@ -1122,7 +1147,7 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0, critico := false,
 		return
 	var q := quantidade
 	if critico:
-		q = int(round(q * (CRIT_MULT + EstadoJogo.bonus("crit_mult"))))  # melhoria "furia"
+		q = int(round(q * CRIT_MULT))
 		# gelo + crítico = ESTILHAÇA: bónus e limpa o congelamento
 		if _congelado > 0.0:
 			q += int(round(quantidade * 0.6))

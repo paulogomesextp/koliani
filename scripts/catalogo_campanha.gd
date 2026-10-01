@@ -57,9 +57,12 @@ const CHEFE_KEY: Array[String] = [
 	# fecha com o Construto Vitral elite a guardar o nucleo, inimigo
 	# principal do N13 na prancha aprovada.
 	"guard.construto_vitral",    # 12 N13 -- Mecanismos Antigos
-	"guard.sacerdotisa_lunar",   # 13 N14 -- Campanário
+	# N14 autoral: a Sacerdotisa Lunar (fora do contrato da Torre dos Ecos)
+	# saiu; fecha com o Monge das Correntes elite debaixo do sino gigante,
+	# inimigo principal do N14 na prancha aprovada.
+	"guard.monge_das_correntes", # 13 N14 -- Campanário
 	"boss.vyrak",                # 14 N15 -- O Topo dos Ecos (o chefe da Região III)
-	"boss.rei_ossario",          # 15 Cemitério dos Reis
+	"guard.operario_blindado",    # 15 N16 -- Entrada da Fornalha (Região IV)
 	"boss.colosso_osseo",        # 16 Galeria dos Ossos
 	"boss.freira_negra",         # 17 Cripta das Mil Velas
 	"boss.naga_zeraph",          # 18 Templo da Serpente

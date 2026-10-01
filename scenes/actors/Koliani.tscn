@@ -8,7 +8,6 @@
 [ext_resource type="Script" path="res://scripts/koliani.gd" id="1_kol"]
 [ext_resource type="Script" path="res://scripts/camera_tremor.gd" id="2_cam"]
 [ext_resource type="Shader" path="res://assets/shaders/personagem.gdshader" id="4_sh"]
-[ext_resource type="Texture2D" uid="uid://dq08033qahrj6" path="res://assets/sprites/pixel/gear/armas.png" id="5_armas"]
 
 [sub_resource type="ShaderMaterial" id="mat_kol"]
 resource_local_to_scene = true
@@ -79,41 +78,6 @@ scale = Vector2(0.62, 0.78)
 [node name="Corpo" type="AnimatedSprite2D" parent="Sprite"]
 texture_filter = 1
 position = Vector2(0, -2)
-
-[node name="Armadura" type="Node2D" parent="Sprite"]
-visible = false
-
-[node name="Peito" type="Polygon2D" parent="Sprite/Armadura"]
-color = Color(0.8, 0.75, 0.66, 0.93)
-polygon = PackedVector2Array(-5, -7, 5, -7, 6, -3, 4, 4, 2, 6, -2, 6, -4, 4, -6, -3)
-
-[node name="OmbroEsq" type="Polygon2D" parent="Sprite/Armadura"]
-position = Vector2(-5, -7)
-color = Color(0.88, 0.84, 0.78, 0.96)
-polygon = PackedVector2Array(-2, -2, 2, -3, 3, 1, -1, 2)
-
-[node name="OmbroDir" type="Polygon2D" parent="Sprite/Armadura"]
-position = Vector2(5, -7)
-color = Color(0.88, 0.84, 0.78, 0.96)
-polygon = PackedVector2Array(-3, -3, 2, -2, 1, 2, -3, 1)
-
-[node name="Cinto" type="Polygon2D" parent="Sprite/Armadura"]
-color = Color(0.5, 0.46, 0.4, 0.96)
-polygon = PackedVector2Array(-5, 3, 5, 3, 5, 6, -5, 6)
-
-[node name="Trim" type="Line2D" parent="Sprite/Armadura"]
-points = PackedVector2Array(0, -6, 0, 3)
-width = 1.2
-default_color = Color(1, 0.96, 0.85, 0.55)
-
-[node name="Arma" type="Sprite2D" parent="Sprite"]
-texture_filter = 1
-position = Vector2(11, 1)
-offset = Vector2(10, -10)
-scale = Vector2(0.8, 0.8)
-texture = ExtResource("5_armas")
-hframes = 20
-visible = false
 
 [node name="LuzLamina" type="PointLight2D" parent="Sprite"]
 position = Vector2(-18, 0)

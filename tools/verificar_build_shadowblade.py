@@ -24,7 +24,7 @@ assert estado_real()==antes, 'Save real alterado'
 texto = log.read_text(encoding='utf-8') if log.exists() else resultado.stdout.decode(errors='replace')
 assert resultado.returncode==0 and 'SCRIPT ERROR' not in texto and '\nERROR:' not in texto, texto[-4000:]
 manifesto = {'base':subprocess.check_output(['git','rev-parse','HEAD'],cwd=raiz).decode().strip(),
-             'candidato_local_sem_commit':True,'versao':'0.18.20','save_real_intacto':len(antes),
+             'candidato_local_sem_commit':bool(subprocess.check_output(['git','diff','HEAD','--','scripts','assets','project.godot'],cwd=raiz).strip()),'versao':'0.18.20','save_real_intacto':len(antes),
              'windows_sha256':hashlib.sha256(exe.read_bytes()).hexdigest(),
              'web':{p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in (raiz/'build/web').glob('*') if p.is_file()}}
 (raiz/'work/shadowblade_fidelity/builds_manifesto.json').write_text(json.dumps(manifesto,indent=2),encoding='utf-8')

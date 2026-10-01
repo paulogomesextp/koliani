@@ -63,6 +63,17 @@ DEST_R3 = os.path.join(RAIZ, "assets", "sprites", "pixel", "backgrounds",
 RECORTES_R3 = {
 	"prancha": ("concept_environment.png", (292, 38, 948, 312)),
 }
+# Regiao IV (Fornalha) -- mesmo metodo, pack `fornalha`. O painel "CONCEITO
+# DA REGIAO" (a fundicao com a roda dentada e as quedas de lava) ocupa o
+# topo da prancha, de x=388 ate' ao painel de texto; a Koliani esta' na
+# esquerda (x<390) e fica de fora.
+PRANCHAS_R4 = os.path.join(RAIZ, "docs", "art_direction", "regions",
+	"region_04")
+DEST_R4 = os.path.join(RAIZ, "assets", "sprites", "pixel", "backgrounds",
+	"fornalha")
+RECORTES_R4 = {
+	"prancha": ("concept_environment.png", (392, 8, 1040, 250)),
+}
 FATOR = 2
 # Igual ao da Regiao I (`nitidez_panorama_9h.py`): aresta com contraste sem
 # halo claro a' volta das ruinas.
@@ -134,7 +145,8 @@ def nuvens(im: Image.Image) -> Image.Image:
 
 def main() -> None:
 	for pranchas, dest, recortes in ((PRANCHAS, DEST, RECORTES),
-			(PRANCHAS_R3, DEST_R3, RECORTES_R3)):
+			(PRANCHAS_R3, DEST_R3, RECORTES_R3),
+			(PRANCHAS_R4, DEST_R4, RECORTES_R4)):
 		gerar(pranchas, dest, recortes)
 
 
@@ -145,6 +157,10 @@ def gerar(pranchas: str, dest: str, recortes: dict) -> None:
 		rec = esbater_topo(espelhado(src.crop(caixa)))
 		pano = ampliar(rec)
 		pano.save(os.path.join(dest, nome + ".png"), optimize=True)
+		if dest == DEST_R4:   # a fundicao nao tem mar de nuvens
+			print("%s: %dx%d (de %s %s)" % (nome, pano.width, pano.height,
+				fonte, caixa))
+			continue
 		nv = nuvens(pano)
 		nv.save(os.path.join(dest, nome + "_nuvens.png"), optimize=True)
 		print("%s: %dx%d (de %s %s)" % (nome, pano.width, pano.height,

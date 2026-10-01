@@ -450,6 +450,7 @@ func provocar() -> void:
 	_musica_boss = true
 	_garantir_vida_maxima()
 	Musica.boss()
+	Som.toca("chefe_entrada", -8.0, 1.0, 0.0, 0.0, "", Som.Prioridade.ALTA)
 	combate_iniciado.emit(self)
 	vida_mudou.emit(vida, _vida_maxima)
 
@@ -672,7 +673,7 @@ func receber_dano(quantidade: int, dir_empurrao: float = 0.0, critico := false,
 	var q := quantidade
 	if critico:
 		# golpe critico no chefe (pos-rolamento / pelas costas / vulneravel)
-		q = int(round(q * (1.5 + EstadoJogo.bonus("crit_mult"))))  # melhoria "furia"
+		q = int(round(q * 1.5))
 		Impacto.rebentar(self, global_position + Vector2(0.0, -20.0 * maxf(0.8, escala_visual)), Color(1, 1, 1), 3.4)
 	vida -= q
 	global_position.x += dir_empurrao * (4.0 if critico else 3.0)

@@ -30,7 +30,7 @@ func provar() -> void:
 			barra._fechar()
 			print("9H16 DEV SELETOR: 100 niveis com nome e sem bloqueio PASS")
 		assert(k != null and k.vida == k._vida_max())
-		assert(k._vida_max() == k.VIDA_MAXIMA + EstadoJogo.vida_bonus_armadura())
+		assert(k._vida_max() == k.VIDA_MAXIMA)
 		assert(not k._voando)
 		if indice == 0 and DisplayServer.get_name() != "headless":
 			await RenderingServer.frame_post_draw

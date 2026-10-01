@@ -214,7 +214,7 @@ func _abrir_guardiao() -> void:
 	_selar(false)
 
 ## A habilidade PERMANENTE que cada chefe regional larga. Isto e' progressao,
-## nao saque: o bau do chefe sorteia arma/armadura/melhoria, e um sorteio nao
+## nao saque: o bau do chefe da essencia, e um sorteio nao
 ## pode decidir se o jogo continua a ser jogavel.
 ##
 ## 9H.17 C -- contrato congelado pelo Game Master: o SALTO DUPLO abre ao

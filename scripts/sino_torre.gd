@@ -26,6 +26,10 @@ extends StaticBody2D
 ## (Corpo/Aro/Brilho/Badalo) esconde-se e mostra-se este sprite. Vazio = igual
 ## a sempre, e e' o que todos os outros niveis usam.
 @export var textura: Texture2D
+## Opt-in (N15, "sinos celestiais"): so' responde depois de recolhidos TODOS os
+## `FragmentoEco` do nivel (0 = responde sempre, como em todos os outros
+## niveis). Antes disso soa surdo e nao mexe em nada.
+@export var fragmentos_necessarios := 0
 
 ## Cada badalada (golpe ou projetil). O `MecanismoSinos` do N13 escuta-a
 ## para ler o padrao.
@@ -33,12 +37,17 @@ signal badalada(sino: Node)
 
 var _cd := 0.0
 var _pele: Sprite2D
+var _fragmentos_total := 0
+var _usado := false
 
 @onready var _badalo: Node2D = get_node_or_null("Badalo")
 
 
 func _ready() -> void:
 	add_to_group("sinos")
+	if fragmentos_necessarios > 0:
+		# os fragmentos do nivel: contam-se no arranque (nascem todos com a cena)
+		_fragmentos_total = get_tree().get_nodes_in_group("fragmentos_eco").size()
 	if textura != null:
 		# com pele pintada, tambem o suporte e a corda de placeholder saem: o
 		# nivel pendura o sino com a sua propria corrente
@@ -57,10 +66,43 @@ func _process(dt: float) -> void:
 		_cd -= dt
 
 
+## Chamado por cada `FragmentoEco` recolhido: o sino acende-se com o ultimo.
+func fragmento_recolhido() -> void:
+	if fragmentos_necessarios <= 0 or _pele == null:
+		return
+	var feitos := maxi(0, _fragmentos_total - fragmentos_em_falta())
+	var f := clampf(float(feitos) / float(maxi(1, _fragmentos_total)), 0.0, 1.0)
+	create_tween().tween_property(_pele, "modulate",
+		Color(0.8 + 0.7 * f, 0.8 + 0.6 * f, 1.0 + 0.9 * f), 0.4)
+
+
+func fragmentos_em_falta() -> int:
+	if fragmentos_necessarios <= 0:
+		return 0
+	var vivos := 0
+	for fr in get_tree().get_nodes_in_group("fragmentos_eco"):
+		if is_instance_valid(fr) and not bool(fr.get("coletado")):
+			vivos += 1
+	return vivos
+
+
 func receber_dano(_quantidade: int = 0, _dir: float = 0.0) -> void:
 	if _cd > 0.0:
 		return
 	_cd = recarga
+	if fragmentos_em_falta() > 0:
+		# surdo: sem os fragmentos, o sino nao acorda
+		_onda()
+		var som0 := get_node_or_null("/root/Som")
+		if som0 and som0.has_method("toca"):
+			som0.call("toca", "sino_mecanismo", -20.0, 0.6, 0.03, recarga,
+				"sino_surdo_%d" % get_instance_id())
+		return
+	if fragmentos_necessarios > 0:
+		# o sino celestial acorda UMA vez: a escada de ecos nao volta atras
+		if _usado:
+			return
+		_usado = true
 	tocar()
 
 
@@ -118,6 +160,11 @@ func tocar() -> void:
 
 
 func _alternar(p: Node) -> void:
+	# Opt-in (N14): quem sabe responder a' badalada por si (plataformas
+	# temporizadas, a corrente do elevador que muda de direcao) fa-lo; os
+	# outros alternam o `Col`/`Visual` como sempre.
+	if p.has_method("ao_badalar") and bool(p.call("ao_badalar")):
+		return
 	var col := p.get_node_or_null("Col") as CollisionShape2D
 	if col == null:
 		return

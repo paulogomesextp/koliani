@@ -19,12 +19,7 @@ const CURRENT_SAVE_VERSION := _SAVE.CURRENT_SAVE_VERSION
 var ultimo_erro_save: String = ""
 var ultima_origem_save: String = ""
 
-## Tabela do equipamento. `preload` por caminho (e não o nome global
-## `Equipamento`) porque este autoload é o 1.º a arrancar -- não pode
-## depender do registo de classes globais ainda estar pronto.
-const _EQUIP := preload("res://scripts/equipamento.gd")
 const _LOJA := preload("res://scripts/loja_catalogo.gd")
-const _MELHORIAS := preload("res://scripts/melhorias.gd")
 
 ## Vidas com que se começa a campanha. Pedido do Paulo (4 set 2026): eram 3,
 ## passam a 5, e cada nível concluído dá +1 (ver `avancar_nivel`).
@@ -341,19 +336,14 @@ func desequipar_categoria(categoria: String) -> void:
 ## e a cena recarrega, que é o caso que acontece a sério. Reabrir o jogo e
 ## ver a explicação outra vez não faz mal a ninguém.
 var mecanicas_explicadas := {}
-## Ganhou-se um equipamento ao acabar um nível (`tipo` = "arma"|"armadura").
-## Economia: total de essência mudou / uma melhoria subiu de rank.
+## Economia: total de essência mudou.
 signal essencia_mudou(total: int)
-signal melhoria_comprada(id: String, rank: int)
 ## Loja: saldo de Kolicoins/Veracoins mudou; item comprado; item equipado.
 signal moedas_loja_mudaram
 signal item_loja_comprado(id: String)
 signal item_loja_equipado(categoria: String, id: String)
-signal equipamento_ganho(tipo: String, id: String)
-## Trocou-se a arma ou a armadura equipada.
-signal equipamento_mudou(tipo: String, id: String)
 
-## Dano do ataque corpo-a-corpo sem arma equipada (punhos/lâmina base).
+## Dano do ataque corpo-a-corpo.
 ## Dano-base DUPLICADO a pedido do Paulo (ago 2026) -- espada e tiros o dobro.
 const DANO_BASE := 50
 
@@ -368,12 +358,6 @@ var level_session: Dictionary = _LEVEL_SESSION.vazia()
 var _spawn_inicio_sessao: Vector2 = Vector2.ZERO
 var habilidades: Array[String] = HABILIDADES_INICIAIS.duplicate()
 var pistas: Array[String] = []
-## Equipamento ganho ao longo da campanha (ids de `Equipamento.ARMAS` /
-## `.ARMADURAS`). `*_equipada` = o que está a ser usado ("" = nada).
-var armas: Array[String] = []
-var armaduras: Array[String] = []
-var arma_equipada: String = ""
-var armadura_equipada: String = ""
 ## Indices de `NIVEIS` ja concluidos (Porta atravessada). Sobrevive ao save;
 ## `reiniciar_campanha()` limpa. E' o que o mapa de regioes usa para marcar
 ## niveis/regioes como feitos.
@@ -385,11 +369,9 @@ var recompensas_reclamadas: Array[String] = []
 
 ## --- ECONOMIA -------------------------------------------------------------
 ## Essência: moeda mágica largada por inimigos + em caches nas alcovas dos
-## níveis. Gasta-se no Santuário em MELHORIAS permanentes (`melhorias.gd`).
+## níveis.
 ## NÃO se perde na morte (jogo por níveis). `reiniciar_campanha()` zera.
 var essencia: int = 0
-## id da melhoria -> rank atual (int, 0..Melhorias.max_rank).
-var melhorias: Dictionary = {}
 
 ## --- LOJA (cosméticos) ----------------------------------------------------
 ## Estado da CONTA, não da campanha: `reiniciar_campanha()` NÃO lhe toca (um
@@ -491,7 +473,6 @@ func marcar_nivel_concluido(indice: int) -> void:
 	if nivel_e_exame_regional(indice):
 		_registar_chefe_do_nivel_sem_guardar(indice)
 		_registar_recompensa_do_nivel_sem_guardar(indice)
-	conceder_recompensa(indice)
 	guardar()
 
 
@@ -543,98 +524,9 @@ func _registar_recompensa_do_nivel_sem_guardar(indice: int) -> bool:
 	return true
 
 
-## --- Equipamento (armas / armaduras) -------------------------------------
-
-## Dá o equipamento por acabar o nível `indice` (0-based). Equipa-o já se o
-## slot estiver vazio ou se for melhor que o atual. Idempotente por id.
-##
-## Desde 3 set 2026 um nível pode dar DOIS prémios (nos múltiplos de 10 cai
-## uma arma e uma armadura) -- ver `Equipamento.recompensas_do_nivel`.
-func conceder_recompensa(indice: int) -> void:
-	var houve := false
-	for r: Dictionary in _EQUIP.recompensas_do_nivel(indice):
-		if _conceder_um(r):
-			houve = true
-	if houve:
-		guardar()
-
-
-## Um prémio. Devolve `true` se era novo (e portanto vale a pena gravar).
-func _conceder_um(r: Dictionary) -> bool:
-	var id: String = r["id"]
-	if r["tipo"] == "arma":
-		if id in armas:
-			return false
-		armas.append(id)
-		var atual: Dictionary = _EQUIP.arma(arma_equipada)
-		var nova: Dictionary = _EQUIP.arma(id)
-		if arma_equipada == "" or int(nova.get("dano", 0)) >= int(atual.get("dano", 0)):
-			arma_equipada = id
-			equipamento_mudou.emit("arma", id)
-	else:
-		if id in armaduras:
-			return false
-		armaduras.append(id)
-		var atual2: Dictionary = _EQUIP.armadura(armadura_equipada)
-		var nova2: Dictionary = _EQUIP.armadura(id)
-		if armadura_equipada == "" or int(nova2.get("vida_bonus", 0)) >= int(atual2.get("vida_bonus", 0)):
-			armadura_equipada = id
-			equipamento_mudou.emit("armadura", id)
-	equipamento_ganho.emit(r["tipo"], id)
-	return true
-
-
-func tem_arma(id: String) -> bool:
-	return id in armas
-
-
-func tem_armadura(id: String) -> bool:
-	return id in armaduras
-
-
-func equipar_arma(id: String) -> void:
-	if id in armas and id != arma_equipada:
-		arma_equipada = id
-		equipamento_mudou.emit("arma", id)
-		guardar()
-
-
-func equipar_armadura(id: String) -> void:
-	if id in armaduras and id != armadura_equipada:
-		armadura_equipada = id
-		equipamento_mudou.emit("armadura", id)
-		guardar()
-
-
-## Arma seguinte / anterior na lista das que já se têm (troca em jogo).
-func ciclar_arma(passo: int) -> void:
-	if armas.size() < 2:
-		return
-	var ordem: Array[String] = []
-	for a in _EQUIP.ARMAS:
-		if a["id"] in armas:
-			ordem.append(a["id"])
-	var i := ordem.find(arma_equipada)
-	if i < 0:
-		i = 0
-	equipar_arma(ordem[(i + passo + ordem.size()) % ordem.size()])
-
-
-## Dano do ataque corpo-a-corpo (arma equipada ou base).
+## Dano do ataque corpo-a-corpo.
 func dano_ataque() -> int:
-	var a: Dictionary = _EQUIP.arma(arma_equipada)
-	var base: int = int(a.get("dano", DANO_BASE)) if not a.is_empty() else DANO_BASE
-	return maxi(1, int(round(base * (1.0 + bonus("dano_mult")))))  # melhoria "forca"
-
-
-## Vida máxima extra dada pela armadura equipada + melhoria "vitalidade".
-func vida_bonus_armadura() -> int:
-	return int(_EQUIP.armadura(armadura_equipada).get("vida_bonus", 0)) + int(bonus("vida_max"))
-
-
-## Fração (0..1) de dano recebido que a armadura equipada corta.
-func reducao_armadura() -> float:
-	return float(_EQUIP.armadura(armadura_equipada).get("reducao", 0.0))
+	return DANO_BASE
 
 
 func nivel_esta_concluido(indice: int) -> bool:
@@ -787,25 +679,10 @@ func ativar_modo_dev() -> void:
 	level_session = _LEVEL_SESSION.vazia()
 	_limpar_jornada_ancora()
 	habilidades.assign(HABILIDADES_TODAS)
-	# modo dev: também todo o equipamento desbloqueado (a arma/armadura mais
-	# fortes equipadas)
-	armas.clear()
-	for a in _EQUIP.ARMAS:
-		armas.append(a["id"])
-	armaduras.clear()
-	for a in _EQUIP.ARMADURAS:
-		armaduras.append(a["id"])
-	arma_equipada = _EQUIP.ARMAS[_EQUIP.ARMAS.size() - 1]["id"]
-	armadura_equipada = _EQUIP.ARMADURAS[_EQUIP.ARMADURAS.size() - 1]["id"]
 	essencia = 1000000
-	melhorias.clear()
-	for id: String in _MELHORIAS.CATALOGO:
-		melhorias[id] = _MELHORIAS.max_rank(id)
 	vidas_mudaram.emit(vidas)
 	for h in HABILIDADES_TODAS:
 		habilidade_desbloqueada.emit(h)
-	equipamento_mudou.emit("arma", arma_equipada)
-	equipamento_mudou.emit("armadura", armadura_equipada)
 
 
 ## Sai sem restaurar/escrever ficheiros: repõe apenas a memória legítima.
@@ -827,7 +704,7 @@ func desativar_modo_dev() -> void:
 
 ## Modo normal: gastaram-se as vidas todas, MAS o progresso fica. Volta-se
 ## ao início do nível actual (o seguinte ao último chefe morto) com as
-## vidas cheias -- habilidades, pistas, níveis concluídos e equipamento
+## vidas cheias -- habilidades, pistas, níveis concluídos
 ## mantêm-se.
 ##
 ## As vidas voltam ao valor de PARTIDA para o ponto onde ele já vai -- não a
@@ -859,12 +736,7 @@ func reiniciar_campanha() -> void:
 	concluidos.clear()
 	bosses_derrotados.clear()
 	recompensas_reclamadas.clear()
-	armas.clear()
-	armaduras.clear()
-	arma_equipada = ""
-	armadura_equipada = ""
 	essencia = 0
-	melhorias.clear()
 	_limpar_jornada_ancora()
 	vidas_mudaram.emit(vidas)
 	guardar()
@@ -1019,7 +891,7 @@ func registar_pista(id: String) -> void:
 	guardar()
 
 
-## --- Economia / Melhorias ---------------------------------------------
+## --- Economia ---------------------------------------------
 
 func ganhar_essencia(n: int) -> void:
 	if n <= 0:
@@ -1028,43 +900,6 @@ func ganhar_essencia(n: int) -> void:
 	essencia_mudou.emit(essencia)
 	guardar()
 
-
-func rank_melhoria(id: String) -> int:
-	return int(melhorias.get(id, 0))
-
-
-## Custo da próxima subida de rank de `id`. -1 = no máximo.
-func custo_melhoria(id: String) -> int:
-	return _MELHORIAS.custo(id, rank_melhoria(id))
-
-
-func pode_comprar_melhoria(id: String) -> bool:
-	var c := custo_melhoria(id)
-	return c >= 0 and essencia >= c
-
-
-## Compra 1 rank da melhoria `id`. Devolve true se comprou.
-func comprar_melhoria(id: String) -> bool:
-	if not pode_comprar_melhoria(id):
-		return false
-	essencia -= custo_melhoria(id)
-	melhorias[id] = rank_melhoria(id) + 1
-	essencia_mudou.emit(essencia)
-	melhoria_comprada.emit(id, melhorias[id])
-	guardar()
-	return true
-
-
-## Soma o efeito de TODAS as melhorias cujo `efeito` é `chave`. A Koliani
-## chama isto para os bónus: "vida_max", "dano_mult", "regen_energia",
-## "iframes_roll", "crit_mult", "escudo_cargas".
-func bonus(chave: String) -> float:
-	var total := 0.0
-	for id: String in melhorias:
-		var cfg: Dictionary = _MELHORIAS.CATALOGO.get(id, {})
-		if cfg.get("efeito", "") == chave:
-			total += _MELHORIAS.efeito_total(id, int(melhorias[id]))
-	return total
 
 
 ## --- Persistencia ------------------------------------------------------
@@ -1091,12 +926,7 @@ func para_dicionario() -> Dictionary:
 		"completed_level_ids": completed_level_ids,
 		"defeated_boss_ids": bosses_derrotados,
 		"claimed_reward_ids": recompensas_reclamadas,
-		"armas": armas,
-		"armaduras": armaduras,
-		"arma_equipada": arma_equipada,
-		"armadura_equipada": armadura_equipada,
 		"essencia": essencia,
-		"melhorias": melhorias.duplicate(),
 		"loja": {
 			"kolicoins": kolicoins, "veracoins": veracoins,
 			"itens_comprados": itens_comprados.duplicate(),
@@ -1122,10 +952,6 @@ func de_dicionario(d: Dictionary) -> void:
 		if h not in habilidades:
 			habilidades.append(h)
 	pistas.assign(d.get("collectible_ids", []))
-	armas.assign(d.get("armas", []))
-	armaduras.assign(d.get("armaduras", []))
-	arma_equipada = str(d.get("arma_equipada", ""))
-	armadura_equipada = str(d.get("armadura_equipada", ""))
 	concluidos.clear()
 	for level_id: String in d.get("completed_level_ids", []):
 		var indice := _IDS.indice_do_level_id(level_id)
@@ -1135,10 +961,6 @@ func de_dicionario(d: Dictionary) -> void:
 	bosses_derrotados.assign(d.get("defeated_boss_ids", []))
 	recompensas_reclamadas.assign(d.get("claimed_reward_ids", []))
 	essencia = int(d.get("essencia", 0))
-	melhorias.clear()
-	var ms: Dictionary = d.get("melhorias", {})
-	for k in ms:
-		melhorias[str(k)] = int(ms[k])
 	_carregar_loja(d.get("loja", {}))
 
 

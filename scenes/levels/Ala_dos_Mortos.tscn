@@ -509,9 +509,11 @@ vida = 45
 dano_contacto = 12
 alcance_patrulha = 50.0
 
+; O chao vai ate' ao MuroFim (6620): a porta (x=6600) ficava sobre um
+; buraco de 100 px -- so' se lhe tocava a saltar e quem ia a andar caia.
 [node name="ChaoFinal" parent="." instance=ExtResource("9_pl")]
-position = Vector2(6000, 700)
-tamanho = Vector2(1000, 80)
+position = Vector2(6060, 700)
+tamanho = Vector2(1120, 80)
 altura_visual = 110
 cor_base = Color(0.2, 0.22, 0.3, 1)
 cor_topo = Color(0.42, 0.5, 0.66, 1)

@@ -228,6 +228,14 @@ const PACKS := {
 		["prancha.png", "Fundo", 720.0, 1.1, 1.0, true],
 		["prancha_nuvens.png", "MarBaixo", 1500.0, 1.9, 1.0, true],
 	],
+	# Região IV -- Fornalha (N16-N20). O painel "CONCEITO DA REGIÃO" de
+	# `region_04/concept_environment.png` (fundição com a roda dentada, as
+	# pontes de ferro e as quedas de lava), pelo mesmo método da Região III
+	# (`tools/gerar_fundos_regiao02_prancha.py`). Uma só camada: o panorama já
+	# traz a profundidade toda pintada.
+	"fornalha": [
+		["prancha.png", "Fundo", 550.0, 1.0, 1.0, true],
+	],
 	# Região II -- Prisão dos Condenados (ansimuz "Cold Corridors", CC0).
 	"prisao": [
 		["back.png", "Fundo", 900.0, 4.4],
@@ -373,7 +381,8 @@ const PACKS_POR_REGIAO := [
 	# Região III -- Torre dos Ecos: pack próprio nos cinco níveis, como se
 	# fez na Região II com o `desfiladeiro`.
 	["torre_ecos", "torre_ecos", "torre_ecos", "torre_ecos", "torre_ecos"],
-	["caverna", "gruta", "masmorra", "luar", "castelo_velho"],
+	# Região IV -- Fornalha: pack próprio nos cinco níveis (N16-N20).
+	["fornalha", "fornalha", "fornalha", "fornalha", "fornalha"],
 	["cidade", "vilanoite", "horror", "igreja", "luar"],
 	["igreja", "castelo_velho", "luar", "horror", "cidade"],
 	["horror", "castelo_velho", "montanhas", "rochoso", "luar"],
