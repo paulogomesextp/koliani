@@ -794,5 +794,6 @@
   "shop.item.skin_shadowblade.desc": "Assassina de cabelo prateado em armadura negra e roxo profundo, cornos e capa de sombra, lâmina curva de energia violeta e VFX de sombra a condizer. Puramente cosmética: mesmos movimentos, mesmas hitboxes.",
   "guard.operario_blindado": "Operário Blindado",
   "mec.piso_quente.nome": "Piso Quente",
-  "mec.piso_quente.txt": "As placas de ferro brilham antes de queimar. Atravessa-as enquanto estão frias ou salta quando ficarem vermelhas."
+  "mec.piso_quente.txt": "As placas de ferro brilham antes de queimar. Atravessa-as enquanto estão frias ou salta quando ficarem vermelhas.",
+  "combat.perfect_dodge": "ESQUIVA PERFEITA"
 }

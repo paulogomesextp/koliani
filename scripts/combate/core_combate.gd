@@ -8,9 +8,9 @@ extends Node
 ## de strings à mão.
 ##
 ## Componente OPT-IN (filho da Koliani, criado só por `Koliani.ativar_core_combate()`).
-## Nenhum nível de campanha o cria: sem ele, o `koliani.gd` corre exactamente
-## como antes -- é o mesmo padrão não-invasivo que o `_lab` já usa (ver
-## `Koliani.ativar_combat_lab()`). Só a arena de QA de produção (Fase 11) o liga.
+## Main liga-o ao carregar os níveis da campanha; a arena de QA também o usa.
+## Instâncias fora desse fluxo mantêm a ativação explícita. O Combat Lab
+## continua separado, via `Koliani.ativar_combat_lab()`.
 ##
 ## Fases combinadas neste ficheiro em vez de separadas: Launcher, Air Combo,
 ## Cleave, Dash Attack, Perfect Dodge e Counter partilham UMA máquina de
@@ -376,7 +376,6 @@ func _mostrar_pd() -> void:
 	# [PERFECT DODGE VFX DEBT] -- Label temporario, sem arte final (ver plano §6).
 	if _pd_flash == null:
 		_pd_flash = Label.new()
-		_pd_flash.text = "PERFECT DODGE"
 		_pd_flash.add_theme_font_size_override("font_size", 18)
 		_pd_flash.add_theme_color_override("font_color", Color(0.75, 0.95, 1.0))
 		_pd_flash.add_theme_color_override("font_outline_color", Color(0.05, 0.02, 0.15))
@@ -384,6 +383,7 @@ func _mostrar_pd() -> void:
 		_pd_flash.position = Vector2(-70, -132)
 		_pd_flash.z_index = 40
 		k.add_child(_pd_flash)
+	_pd_flash.text = Textos.t("combat.perfect_dodge")
 	_pd_flash.visible = true
 	_pd_flash.modulate.a = 1.0
 	var t := create_tween()

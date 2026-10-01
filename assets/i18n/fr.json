@@ -794,5 +794,6 @@
   "shop.item.skin_shadowblade.desc": "Assassine aux cheveux argentés, armure noire et violet profond, cornes et cape d'ombre, lame courbe d'énergie violette et VFX d'ombre assortis. Purement cosmétique : mêmes mouvements, mêmes hitbox.",
   "guard.operario_blindado": "Armored Foreman",
   "mec.piso_quente.nome": "Hot Floor",
-  "mec.piso_quente.txt": "The iron plates glow before they burn. Cross them while they are cold, or jump clear when they turn red."
+  "mec.piso_quente.txt": "The iron plates glow before they burn. Cross them while they are cold, or jump clear when they turn red.",
+  "combat.perfect_dodge": "ESQUIVE PARFAITE"
 }

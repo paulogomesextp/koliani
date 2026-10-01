@@ -31,6 +31,12 @@ func _ready() -> void:
 		return
 	var nivel := cena_nivel.instantiate()
 	add_child(nivel)
+	# O combate 1.2 aprovado deixa de estar limitado à arena de QA.
+	var koliani := nivel.get_node_or_null("Koliani") as Koliani
+	if koliani:
+		koliani.ativar_core_combate()
+	else:
+		push_error("Combate 1.2: Koliani ausente no nível %s" % caminho)
 	var boss_id := "boss_level_005" if EstadoJogo.indice_nivel == 4 else "none"
 	print("RUNTIME TRACE | build=%s | main_scene=res://scenes/Main.tscn | level_id=level_%03d | level_scene=%s | player_scene=res://scenes/actors/Koliani.tscn | boss_id=%s" % [
 		str(ProjectSettings.get_setting("application/config/version", "0.0.0")),

@@ -322,8 +322,8 @@ var _pos_roll_t := 0.0
 var _lab: Node = null
 ## CORE COMBAT (opt-in, produção): a mesma logica do Combat Lab, mas lida de
 ## `BalanceCombate` (Fase 1) em vez de constantes soltas -- ver
-## `scripts/combate/core_combate.gd`. `null` na campanha; so' a arena de QA de
-## produção (Fase 11) o liga, via `ativar_core_combate()`. Nunca coexiste com
+## `scripts/combate/core_combate.gd`. Main e a arena de QA de produção ligam-no
+## via `ativar_core_combate()`. Nunca coexiste com
 ## `_lab` na prática (o Combat Lab e a arena de produção sao cenas diferentes),
 ## mas `_combate_extra()` trata os dois como intermutaveis para nao duplicar
 ## os 7 pontos de despacho abaixo.
@@ -2250,8 +2250,8 @@ func ativar_combat_lab() -> Node:
 	return _lab
 
 
-## Liga o Core Combat de producao a esta Koliani (so' a arena de QA da Fase 11 chama isto;
-## nenhum nivel de campanha o faz). `balance` por omissao carrega o recurso v1 do Combat Lab.
+## Liga o combate 1.2 na campanha e na arena de QA. A omissao usa os valores
+## aprovados do Combat Lab, definidos em BalanceCombate.
 func ativar_core_combate(balance: BalanceCombate = null) -> CoreCombate:
 	if _core == null:
 		_core = CoreCombate.new()

@@ -794,5 +794,6 @@
   "shop.item.skin_shadowblade.desc": "Silver-haired assassin in black and deep-purple armor, shadow horns and cloak, a curved blade of violet energy and matching shadow VFX. Purely cosmetic: same moves, same hitboxes.",
   "guard.operario_blindado": "Armored Foreman",
   "mec.piso_quente.nome": "Hot Floor",
-  "mec.piso_quente.txt": "The iron plates glow before they burn. Cross them while they are cold, or jump clear when they turn red."
+  "mec.piso_quente.txt": "The iron plates glow before they burn. Cross them while they are cold, or jump clear when they turn red.",
+  "combat.perfect_dodge": "PERFECT DODGE"
 }
