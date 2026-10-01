@@ -76,8 +76,8 @@ func _ready() -> void:
 		chefe.tree_exited.connect(_ao_chefe_derrotado)
 
 	_montar_contador_essencia()
-	EstadoJogo.essencia_mudou.connect(_atualizar_essencia)
-	_atualizar_essencia(EstadoJogo.essencia)
+	EstadoJogo.moedas_loja_mudaram.connect(func() -> void: _atualizar_essencia(EstadoJogo.kolicoins))
+	_atualizar_essencia(EstadoJogo.kolicoins)
 
 	_arrumar_para_toque()
 	_montar_legenda_controlos()
@@ -215,7 +215,7 @@ func _ao_chefe_derrotado() -> void:
 
 # --- legenda dos controlos (topo do ecrã) --------------------------
 
-## Contador de ESSÊNCIA no canto sup. direito (✦ 1234). Pisa e treme quando
+## Contador de KOLICOINS no canto sup. direito (✦ 1234). Pisa e treme quando
 ## sobe.
 var _ess_label: Label
 

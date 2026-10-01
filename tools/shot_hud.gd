@@ -22,7 +22,7 @@ func _init() -> void:
 	var estado := root.get_node_or_null("EstadoJogo")
 	if estado:
 		estado.indice_nivel = clampi(indice, 0, estado.NIVEIS.size() - 1)
-		estado.essencia = 1240
+		estado.kolicoins = 1240
 		estado.vidas = 5
 		# LIMPAR O CHECKPOINT. Ele fica gravado do save anterior, que e' de
 		# outro nivel: a Koliani nascia dentro do liquido mortal e o PNG saia

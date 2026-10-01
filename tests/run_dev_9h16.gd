@@ -10,7 +10,7 @@ func provar() -> void:
 	root.add_child(e)
 	var base := "user://prova_dev_9h16.json"
 	e.indice_nivel = 2
-	e.essencia = 42
+	e.kolicoins = 42
 	e.checkpoint = Vector2(120, 90)
 	var normal: Dictionary = e.para_dicionario().duplicate(true)
 	assert(e.guardar_em(base, base + ".bak", base + ".tmp"))
@@ -20,7 +20,7 @@ func provar() -> void:
 	for i in [0, 19, 49, 99]:
 		e.indice_nivel = i
 		e.iniciar_sessao_nivel(true)
-		e.ganhar_essencia(99)
+		e.ganhar_kolicoins(99)
 		e.marcar_nivel_concluido(i)
 		e.marcar_chefe_derrotado_por_nivel(i)
 		assert(not e.guardar())

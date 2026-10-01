@@ -2,6 +2,12 @@
 `tools/animar_regiao02.py` refez idle/run/attack/hit/dead das 4 espécies da Região II e o idle do Guardião dos Céus.
 Relatório: `docs/execution_animacoes_regiao2.md`; GIFs antes/depois em `docs/qa/animacoes_r2/`. Falta: playtest humano do ritmo.
 
+# >>> Regiao IV -- N17 "Fundicao" refeito (1 out 2026, branch `claude/project-thread-lu210k`) <<<
+Cena `Galeria_dos_Ossos.tscn` gerada por `tools/construir_n17_fundicao.py`; desenho em `docs/nivel_autoral_n17.md`.
+Dois niveis (800/500): lajes que desabam, 2 elevadores de corrente (ElevadorColuna com pele propria opt-in),
+carrinhos + jatos de teto sobre a poca grande, rota baixa pela lava com degraus de saida, Automato de Fundicao elite.
+Travessia real (`tools/correr_travessia.sh`) passa nos 3 perfis; suite verde. Falta: playtest humano; N18-N20.
+
 # >>> Regiao IV -- N16 "Entrada da Fornalha" refeito (30 set 2026, branch `claude/project-thread-lu210k`) <<<
 Cena `Cemiterio_dos_Reis.tscn` gerada por `tools/construir_n16_entrada.py` (+ `tools/r4_lib.py`); desenho em
 `docs/nivel_autoral_n16.md`. Pipeline de arte da Regiao IV montado a partir das 7 pranchas (terreno `fornalha`,

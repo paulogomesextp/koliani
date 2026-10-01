@@ -39,8 +39,18 @@ const PLATAFORMA := preload("res://scripts/plataforma.gd")
 ## com este `alterna_grupo` manda a corrente para o outro extremo. Vazio =
 ## o elevador de sempre.
 @export var grupo_sino := ""
+## Opt-in (Regiao IV): pele propria da corrente e da roldana. Vazio = as da
+## Torre dos Ecos.
+@export var textura_corrente: Texture2D
+@export var textura_roldana: Texture2D
+@export var escala_roldana := 1.0
 
 var _no_fim := false
+
+
+func _tex_c() -> Texture2D:
+	return textura_corrente if textura_corrente else TEX_CORRENTE
+
 
 var _contrapeso: Sprite2D
 var _corda_peso: Sprite2D
@@ -61,24 +71,24 @@ func _ready() -> void:
 	for lado in [-1.0, 1.0]:
 		var c := Sprite2D.new()
 		c.name = "Corrente"
-		c.texture = TEX_CORRENTE
+		c.texture = _tex_c()
 		c.texture_repeat = CanvasItem.TEXTURE_REPEAT_ENABLED
 		c.region_enabled = true
 		c.centered = false
 		c.z_index = -1
-		c.modulate = Color(1.0, 0.84, 0.52)  # ouro envelhecido (paleta LOCKED)
-		c.position = Vector2(lado * (hw - 16.0) - TEX_CORRENTE.get_width() * 0.5, 0.0)
+		c.modulate = Color(1.0, 0.84, 0.52) if not textura_corrente else Color(1, 1, 1)  # ouro envelhecido (paleta LOCKED)
+		c.position = Vector2(lado * (hw - 16.0) - _tex_c().get_width() * 0.5, 0.0)
 		add_child(c)
 		_correntes.append(c)
 	# A roldana e' FIXA no mundo: `top_level` desliga-a da transformada da
 	# plataforma, que continua a ser o seu pai so' para morrer com ela.
 	_roldana = Sprite2D.new()
 	_roldana.name = "Roldana"
-	_roldana.texture = TEX_ROLDANA
+	_roldana.texture = textura_roldana if textura_roldana else TEX_ROLDANA
 	_roldana.top_level = true
-	_roldana.scale = Vector2(1.6, 1.6)
+	_roldana.scale = Vector2(1.6, 1.6) * escala_roldana
 	_roldana.z_index = -1
-	_roldana.modulate = Color(1.0, 0.88, 0.6)
+	_roldana.modulate = Color(1.0, 0.88, 0.6) if not textura_roldana else Color(1, 1, 1)
 	_roldana.global_position = Vector2(_base.x, _ancora_y)
 	add_child(_roldana)
 	var trave := Line2D.new()
@@ -94,7 +104,7 @@ func _ready() -> void:
 	_y_antes = global_position.y
 	if textura_contrapeso:
 		_corda_peso = Sprite2D.new()
-		_corda_peso.texture = TEX_CORRENTE
+		_corda_peso.texture = _tex_c()
 		_corda_peso.top_level = true
 		_corda_peso.centered = false
 		_corda_peso.texture_repeat = CanvasItem.TEXTURE_REPEAT_ENABLED
@@ -142,15 +152,15 @@ func _esticar() -> void:
 	var comp := maxf(0.0, (global_position.y - 12.0) - _ancora_y)
 	for c in _correntes:
 		c.position.y = -12.0 - comp
-		c.region_rect = Rect2(0.0, 0.0, float(TEX_CORRENTE.get_width()), comp)
+		c.region_rect = Rect2(0.0, 0.0, float(_tex_c().get_width()), comp)
 	if _contrapeso:
 		# o peso desce o que a plataforma sobe (mesma corda pela roldana)
 		var subido := _base.y - global_position.y
 		var x := _base.x + lado_contrapeso * (largura * 0.5 + 34.0)
 		var y_peso := _ancora_y + 60.0 + subido
 		_contrapeso.global_position = Vector2(x, y_peso + textura_contrapeso.get_height() * escala_contrapeso * 0.5)
-		_corda_peso.global_position = Vector2(x - TEX_CORRENTE.get_width() * 0.5, _ancora_y)
-		_corda_peso.region_rect = Rect2(0.0, 0.0, float(TEX_CORRENTE.get_width()), maxf(1.0, y_peso - _ancora_y))
+		_corda_peso.global_position = Vector2(x - _tex_c().get_width() * 0.5, _ancora_y)
+		_corda_peso.region_rect = Rect2(0.0, 0.0, float(_tex_c().get_width()), maxf(1.0, y_peso - _ancora_y))
 
 
 func _vestir() -> void:
