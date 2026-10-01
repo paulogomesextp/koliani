@@ -236,6 +236,14 @@ const PACKS := {
 	"fornalha": [
 		["prancha.png", "Fundo", 550.0, 1.0, 1.0, true],
 	],
+	# Região XII -- Terras Envenenadas (N56-N60). Um pack por nível: o mural
+	# de cada cartão de `region_12/master_production_board.png`
+	# (`tools/gerar_r12_prancha.py`), pelo mesmo método da Região IV.
+	"terras_n56": [["prancha.png", "Fundo", 440.0, 1.0, 1.0, true]],
+	"terras_n57": [["prancha.png", "Fundo", 440.0, 1.0, 1.0, true]],
+	"terras_n58": [["prancha.png", "Fundo", 440.0, 1.0, 1.0, true]],
+	"terras_n59": [["prancha.png", "Fundo", 440.0, 1.0, 1.0, true]],
+	"terras_n60": [["prancha.png", "Fundo", 440.0, 1.0, 1.0, true]],
 	# Região II -- Prisão dos Condenados (ansimuz "Cold Corridors", CC0).
 	"prisao": [
 		["back.png", "Fundo", 900.0, 4.4],
@@ -390,7 +398,8 @@ const PACKS_POR_REGIAO := [
 	["montanhas", "gruta", "caverna", "rochoso", "horror"],
 	["rochoso", "luar", "montanhas", "caverna", "horror"],
 	["floresta", "pantano", "luar", "vilanoite", "horror"],
-	["cidade", "vilanoite", "castelo_velho", "igreja", "rochoso"],
+	# Região XII -- Terras Envenenadas: um pack por nível (N56-N60).
+	["terras_n56", "terras_n57", "terras_n58", "terras_n59", "terras_n60"],
 	["montanhas", "rochoso", "luar", "horror", "caverna"],
 	["luar", "horror", "vilanoite", "castelo_velho", "cidade"],
 	["luar", "castelo_velho", "caverna", "horror", "masmorra"],

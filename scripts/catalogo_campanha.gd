@@ -112,11 +112,12 @@ const CHEFE_KEY: Array[String] = [
 	"boss.trepadeira",         # 53 Estufa Maldita
 	"boss.rei_botanico",        # 54 Arvore do Rei
 	# --- Regiao XII  Cidade das Maquinas ---
-	"boss.automato",           # 55 Distrito das Engrenagens
-	"boss.foguista",           # 56 Linha 13
-	"boss.homunculo",          # 57 Fabrica dos Homunculos
-	"boss.bobina_viva",        # 58 Torre Electrica
-	"boss.maquina_rei",         # 59 Coracao da Maquina
+	# (Terras Envenenadas, N56-N60 -- reformulada a partir da prancha aprovada)
+	"guard.espreitador_fungico",   # 55 N56 -- Fronteira Corrompida
+	"guard.carcaca_envenenada",    # 56 N57 -- Bosque Doente
+	"guard.xama_da_praga",         # 57 N58 -- Pantano Alquimico
+	"guard.guardiao_toxico",       # 58 N59 -- Vila da Praga
+	"boss.arauto_da_pestilencia",  # 59 N60 -- Coracao Pestilento
 	# --- Regiao XIII  Ceu Partido ---
 	"boss.guarda_nuvens",      # 60 Ilhas Flutuantes
 	"boss.servo_do_trovao",    # 61 Templo do Trovao

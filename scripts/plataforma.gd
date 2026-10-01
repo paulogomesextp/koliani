@@ -48,13 +48,20 @@ const BIOMAS := [
 	"torre_ecos",
 	# Regiao IV -- Fornalha (N16-N20), idem (`fundo_pack` "fornalha").
 	"fornalha",
+	# Regiao XII -- Terras Envenenadas (N56-N60), idem (`fundo_pack` "terras_nXX").
+	"terras_envenenadas",
 ]
 
 ## Material de terreno escolhido pelo `fundo_pack` da `Atmosfera`, por cima
 ## do bioma. A Regiao III corre com bioma `torres`, que mais 18 niveis de
 ## outras regioes partilham; o material da prancha da Torre dos Ecos so' pode
 ## entrar nos cinco niveis dela, e sao esses que usam o pack `torre_ecos`.
-const MATERIAL_POR_PACK := {"torre_ecos": "torre_ecos", "fornalha": "fornalha"}
+const MATERIAL_POR_PACK := {
+	"torre_ecos": "torre_ecos", "fornalha": "fornalha",
+	"terras_n56": "terras_envenenadas", "terras_n57": "terras_envenenadas",
+	"terras_n58": "terras_envenenadas", "terras_n59": "terras_envenenadas",
+	"terras_n60": "terras_envenenadas",
+}
 
 @export var tamanho := Vector2(200.0, 40.0) : set = _set_tamanho
 ## Altura do visual (0 = igual a colisao). Maior => "slab" de chao grosso

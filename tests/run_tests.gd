@@ -75,6 +75,8 @@ func _correr_tudo() -> void:
 		_falhas.append(falha)
 	for falha in TestesRegion04N16.executar():
 		_falhas.append(falha)
+	for falha in TestesRegion12N56.executar():
+		_falhas.append(falha)
 	for falha in TestesKolianiCanonicaNiveis.executar():
 		_falhas.append(falha)
 	teste_movimento_salto_com_coyote()
