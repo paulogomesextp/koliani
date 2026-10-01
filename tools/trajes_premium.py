@@ -532,7 +532,8 @@ def vestir_anjo(orig: Image.Image, im: Image.Image, cara, lam, indice: int) -> I
 	if o:
 		im = T.colar(im, *T.ombreira(T.OMBREIRA_ASA, OURO, K, "FFFFFF"), o, True)
 	im = T.colar(im, *aureola_raios(OURO, K), cara, True)
-	return brilho(im, ["7FD8FF", "FFE680", "FFFBE0"], 70, "FFF4C0")
+	# Brilho vive na aura do runtime, nunca na textura do corpo.
+	return im
 
 
 def vestir_demonio(orig: Image.Image, im: Image.Image, cara, lam, indice: int) -> Image.Image:
@@ -546,7 +547,7 @@ def vestir_demonio(orig: Image.Image, im: Image.Image, cara, lam, indice: int) -
 	h = _anca(orig, cara)
 	im = T.colar(im, *cauda(OBSIDIANA, K, "FF5A1A", (indice % 4) / 4), (h[0] - 3, h[1]), False)
 	im = T.colar(im, *cornos_carneiro(OSSO, K, "FF5A1A"), cara, True)
-	return brilho(im, ["FF5A1A", "FFB040", "FFD040"], 80, "FF5A1A")
+	return im
 
 
 VESTIR = {"anjo": vestir_anjo, "demonio": vestir_demonio}

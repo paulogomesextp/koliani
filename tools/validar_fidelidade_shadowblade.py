@@ -6,15 +6,16 @@ Nao altera assets nem substitui o teste existente de paridade/movimento.
 """
 from pathlib import Path
 import json
+import sys
 import numpy as np
 from PIL import Image
 
 RAIZ = Path(__file__).resolve().parents[1]
 
 
-def validar():
+def validar(nome='shadowblade'):
     golden = RAIZ / 'assets/sprites/koliani_golden_set/frames'
-    skin = RAIZ / 'assets/sprites/koliani_skins/shadowblade/frames'
+    skin = RAIZ / 'assets/sprites/koliani_skins' / nome / 'frames'
     fontes = {p.relative_to(golden).as_posix(): p for p in golden.rglob('*.png')}
     derivados = {p.relative_to(skin).as_posix(): p for p in skin.rglob('*.png')}
     falhas, frames = [], []
@@ -43,7 +44,8 @@ def validar():
                        'alfa_parcial': int(((ab > 0) & (ab < 255)).sum())})
     resultado = {'frames': frames, 'falhas': falhas,
                  'legibilidade_subjetiva': 'HUMAN PLAYTEST REQUIRED'}
-    pasta = RAIZ / 'work/shadowblade_fidelity'
+    pasta = RAIZ / ('work/shadowblade_fidelity' if nome == 'shadowblade'
+                    else 'work/skins_premium_20261001/' + nome)
     pasta.mkdir(parents=True, exist_ok=True)
     (pasta / 'fidelidade.json').write_text(json.dumps(resultado, indent=2))
     print(f'FIDELIDADE ESTRUTURAL: {len(frames)} frames, {len(falhas)} falhas')
@@ -53,4 +55,4 @@ def validar():
 
 
 if __name__ == '__main__':
-    raise SystemExit(validar())
+    raise SystemExit(validar(sys.argv[1] if len(sys.argv) > 1 else 'shadowblade'))

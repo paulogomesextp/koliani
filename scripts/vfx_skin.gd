@@ -1,6 +1,6 @@
 class_name VfxSkin
 extends RefCounted
-## VFX COSMETICOS DA SKIN EQUIPADA (hoje: Shadowblade). Camadas separadas do
+## VFX COSMETICOS DA SKIN EQUIPADA. Camadas separadas do
 ## corpo: nascem no pai da Koliani, nunca dentro dos frames, e nao tocam em
 ## fisica, hitbox, tempos nem input. Tudo o que a skin nao tiver devolve
 ## `false`/vazio e o jogo cai no VFX original -- por isso e' seguro sem arte.
@@ -13,11 +13,21 @@ const SLOTS := {
 	"pogo_impact": {"n": 6, "fps": 24.0, "escala": 1.0, "desloc": Vector2.ZERO},
 }
 static var _cache := {}
+## Perfis visuais aprovados; a Shadowblade conserva o seu perfil original.
+const PERFIS := {
+	"anjo": {"cor": Color("f4c95d"), "luz": Color("d6f5ff"), "tema": "penas"},
+	"demonio": {"cor": Color("f45b28"), "luz": Color("ffe3a0"), "tema": "brasas"},
+	"abadia_afogada": {"cor": Color("25baa9"), "luz": Color("bcfff4"), "tema": "agua"},
+	"celestial": {"cor": Color("dcb350"), "luz": Color("fff2bc"), "tema": "estrelas"},
+}
+
+static func perfil() -> Dictionary:
+	return PERFIS.get(CosmeticosVisuais.dir_skin().get_file(), {})
 
 ## Cabelo prata: o corpo usa a propria paleta, sem saturacao pelas luzes
 ## roxas do cenario. Os efeitos separados continuam iluminados normalmente.
 static func forca_glow_corpo() -> float:
-	return 0.55 if CosmeticosVisuais.dir_skin() == CosmeticosVisuais.DIR_SKIN["skin_shadowblade"] else 1.0
+	return 0.55 if not perfil().is_empty() or CosmeticosVisuais.dir_skin() == CosmeticosVisuais.DIR_SKIN["skin_shadowblade"] else 1.0
 
 static func mascara_luz_corpo() -> int:
 	return 0 if forca_glow_corpo() < 1.0 else 1
@@ -29,11 +39,21 @@ static func atualizar_aura(k: Node2D, corpo: AnimatedSprite2D, flash: float, tem
 	var aura := pai.get_node_or_null("ShadowbladeAura")
 	if mascara_luz_corpo() != 0:
 		if aura:
+			pai.remove_child(aura)
 			aura.queue_free()
 		return
+	var tipo := "premium" if not perfil().is_empty() else "shadowblade"
+	if aura != null and aura.get_meta("tipo_skin", "shadowblade") != tipo:
+		pai.remove_child(aura)
+		aura.queue_free()
+		aura = null
 	if aura == null:
-		aura = load("res://scripts/shadowblade_aura.gd").new()
+		aura = load("res://scripts/skins_premium_aura.gd" if tipo == "premium" else "res://scripts/shadowblade_aura.gd").new()
+		aura.set_meta("tipo_skin", tipo)
 		pai.add_child(aura)
+	# Equipar em runtime tambem atualiza a cor, sem guardar estado no save.
+	if aura.has_method("configurar"):
+		aura.configurar(perfil())
 	aura.atualizar(corpo, flash, tempo)
 
 

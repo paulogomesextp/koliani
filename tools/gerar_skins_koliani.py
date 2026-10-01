@@ -231,7 +231,8 @@ def _rodar_como(vestida_fonte: Image.Image, fonte: Image.Image, alvo: Image.Imag
 	ba = alvo.getbbox()
 	dx, dy = ba[0] - bf[0], ba[1] - bf[1]
 	out = Image.new("RGBA", alvo.size, (0, 0, 0, 0))
-	out.paste(rv, (dx, dy), rv)
+	# Compor uma unica vez preserva o alfa das mechas/contornos.
+	out.alpha_composite(rv, (dx, dy))
 	return out
 
 
@@ -252,9 +253,11 @@ def exportar_pecas() -> None:
 		im.save(os.path.join(dest, f"{nome}.png"))
 
 
-def gerar() -> None:
+def gerar(nomes: list[str] | None = None) -> None:
 	fontes = {os.path.relpath(f, GOLDEN).replace(os.sep, "/"): f for f in _pngs(GOLDEN)}
 	for nome, skin in SKINS.items():
+		if nomes is not None and nome not in nomes:
+			continue
 		base = os.path.join(DEST, nome)
 		vestidas = {}
 		for i, (rel, f) in enumerate(sorted(fontes.items())):
@@ -267,12 +270,20 @@ def gerar() -> None:
 				vestidas[rel] = _rodar_como(vestidas[fonte], Image.open(fontes[fonte]).convert("RGBA"),
 										   Image.open(fontes[rel]).convert("RGBA"), ang)
 		for rel, im in vestidas.items():
+			if "premium" in skin and not rel.startswith(("roll/", "attack", "defesa")):
+				# Faixa dos pes LOCKED: pecas nao mudam a passada nem o chao.
+				orig = Image.open(fontes[rel]).convert("RGBA")
+				bb = orig.getbbox()
+				if bb:
+					base_corpo = recolorir(orig, skin)
+					im.paste(base_corpo.crop((0, bb[3]-8, im.width, im.height)), (0, bb[3]-8))
 			dst = os.path.join(base, "frames", rel)
 			os.makedirs(os.path.dirname(dst), exist_ok=True)
 			im.save(dst, optimize=True)
 		preview_loja(base).save(os.path.join(base, "preview.png"), optimize=True)
 		print(f"skin {nome}: {len(vestidas)} frames")
-	exportar_pecas()
+	if nomes is None:
+		exportar_pecas()
 
 
 def folha_previews(saida: str) -> None:
@@ -293,6 +304,11 @@ def folha_previews(saida: str) -> None:
 
 
 if __name__ == "__main__":
-	gerar()
+	import argparse
+	parser = argparse.ArgumentParser(description=__doc__)
+	parser.add_argument("--skins", nargs="+", choices=list(SKINS))
+	parser.add_argument("--preview", action="store_true")
+	args = parser.parse_args()
+	gerar(args.skins)
 	if "--preview" in sys.argv:
 		folha_previews(os.path.join(RAIZ, "work", "skins_koliani", "folha_skins.png"))
