@@ -75,6 +75,8 @@ func _correr_tudo() -> void:
 		_falhas.append(falha)
 	for falha in TestesRegion04N16.executar():
 		_falhas.append(falha)
+	for falha in TestesRegion04N17.executar():
+		_falhas.append(falha)
 	for falha in TestesKolianiCanonicaNiveis.executar():
 		_falhas.append(falha)
 	teste_movimento_salto_com_coyote()
@@ -270,7 +272,7 @@ func teste_save_nao_repete_leitura_do_manifesto() -> void:
 	ProgressionIDs.aquecer()
 	ProgressionIDs.zerar_diagnostico()
 	var e := _novo_estado()
-	e.essencia = 7
+	e.kolicoins = 7
 	_ok(e.guardar_em(base, base + ".bak", base + ".tmp"),
 		"cache do manifesto: a gravacao devia continuar a funcionar")
 	var diag := ProgressionIDs.diagnostico()
@@ -421,7 +423,7 @@ func teste_level_session_invalid_checkpoint_fallback() -> void:
 	var e := _novo_estado()
 	e.indice_nivel = 4
 	e.marcar_nivel_concluido(0)
-	e.ganhar_essencia(37)
+	e.ganhar_kolicoins(37)
 	var d: Dictionary = e.para_dicionario()
 	d["level_session"] = {
 		"active": true, "level_id": "level_005", "checkpoint_id": "invalido"}
@@ -432,7 +434,7 @@ func teste_level_session_invalid_checkpoint_fallback() -> void:
 	_ok(seguro.get("level_session", {}).get("checkpoint_id", "") \
 		== "checkpoint_level_005_start", "checkpoint inválido devia usar fallback seguro")
 	_ok(seguro.get("completed_level_ids", []) == ["level_001"] \
-		and seguro.get("essencia", 0) == 37,
+		and seguro.get("loja", {}).get("kolicoins", 0) >= 37,
 		"fallback de sessão não devia perder campaign progress")
 	e.free()
 
@@ -1939,14 +1941,14 @@ func teste_save_fresh_write_load() -> void:
 	_limpar_save_teste(base)
 	var original := _novo_estado()
 	original.vidas = 4
-	original.essencia = 17
+	original.kolicoins = 17
 	_ok(original.guardar_em(base, base + ".bak", base + ".tmp"),
 		"fresh save devia ser escrito e verificado")
 	_ok(SaveFoundation.ler(base + ".bak", original.NIVEIS.size()).get("ok", false),
 		"fresh save devia criar logo um backup valido")
 	var copia := _novo_estado()
 	_ok(copia.carregar_de(base, base + ".bak"), "fresh save devia carregar")
-	_ok(copia.vidas == 4 and copia.essencia == 17,
+	_ok(copia.vidas == 4 and copia.kolicoins == 17,
 		"fresh save devia preservar os dados no load")
 	_ok(copia.ultima_origem_save == "primary", "fresh save devia vir do primary")
 	original.free()
@@ -1965,7 +1967,7 @@ func teste_save_roundtrip_campos() -> void:
 	original.pistas.assign(["castelo_aurora_livre"])
 	for indice in [0, 1, 2]:
 		original.marcar_nivel_concluido(indice)
-	original.essencia = 29
+	original.kolicoins = 29
 	_ok(original.guardar_em(base, base + ".bak", base + ".tmp"),
 		"roundtrip devia gravar estado valido")
 	var copia := _novo_estado()
@@ -1975,7 +1977,7 @@ func teste_save_roundtrip_campos() -> void:
 		and copia.habilidades == original.habilidades
 		and copia.pistas == original.pistas
 		and copia.concluidos == original.concluidos
-		and copia.essencia == original.essencia,
+		and copia.kolicoins == original.kolicoins,
 		"roundtrip devia preservar campanha/economy/abilities")
 	original.free()
 	copia.free()
@@ -1984,7 +1986,6 @@ func teste_save_roundtrip_campos() -> void:
 
 func teste_save_legacy_migration() -> void:
 	var e := _novo_estado()
-	e.essencia = 41
 	var legacy: Dictionary = _save_v2_do_estado(e)
 	legacy.erase("save_version")
 	legacy.erase("save_kind")
@@ -1995,6 +1996,10 @@ func teste_save_legacy_migration() -> void:
 		"legacy migrado devia ficar na versao atual")
 	_ok(atual.get("essencia") == 41,
 		"migration legacy devia preservar progresso permanente")
+	var convertido := _novo_estado()
+	convertido.de_dicionario(atual)
+	_ok(convertido.kolicoins == 41, "a essência de um save antigo converte-se 1:1 em Kolicoins")
+	convertido.free()
 	_ok(not atual.has("hardcore") and not atual.has("hardcore_tempo_restante"),
 		"migration legacy não devia reativar Hardcore no schema atual")
 	var arbitrario := SaveFoundation.processar({"foo": "bar"}, e.NIVEIS.size())
@@ -2048,16 +2053,16 @@ func teste_save_primary_corrupto_backup_valido() -> void:
 	var base := "res://work/teste_save_foundation_recovery.json"
 	_limpar_save_teste(base)
 	var e := _novo_estado()
-	e.essencia = 11
+	e.kolicoins = 11
 	_ok(e.guardar_em(base, base + ".bak", base + ".tmp"), "primeiro save devia passar")
-	e.essencia = 22
+	e.kolicoins = 22
 	_ok(e.guardar_em(base, base + ".bak", base + ".tmp"),
 		"segundo save devia criar backup do primeiro")
 	_escrever_save_teste(base, "{corrompido")
 	var copia := _novo_estado()
 	_ok(copia.carregar_de(base, base + ".bak"),
 		"primary corrupto devia recuperar pelo backup")
-	_ok(copia.essencia == 11 and copia.ultima_origem_save == "backup",
+	_ok(copia.kolicoins == 11 and copia.ultima_origem_save == "backup",
 		"recovery devia aplicar o ultimo primary anteriormente validado")
 	e.free()
 	copia.free()
@@ -2068,7 +2073,7 @@ func teste_save_escrita_nova_invalida_preserva_anterior() -> void:
 	var base := "res://work/teste_save_foundation_invalid_write.json"
 	_limpar_save_teste(base)
 	var e := _novo_estado()
-	e.essencia = 7
+	e.kolicoins = 7
 	_ok(e.guardar_em(base, base + ".bak", base + ".tmp"), "save base devia passar")
 	var antes := FileAccess.get_file_as_string(base)
 	var invalido: Dictionary = e.para_dicionario()
@@ -2088,7 +2093,7 @@ func teste_save_temp_invalido_nao_promovido() -> void:
 	var base := "res://work/teste_save_foundation_invalid_temp.json"
 	_limpar_save_teste(base)
 	var e := _novo_estado()
-	e.essencia = 13
+	e.kolicoins = 13
 	_ok(e.guardar_em(base, base + ".bak", base + ".tmp"), "save base devia passar")
 	var antes := FileAccess.get_file_as_string(base)
 	_escrever_save_teste(base + ".tmp", "{temp incompleto")
@@ -2169,7 +2174,7 @@ func _save_v2_do_estado(e: Node) -> Dictionary:
 		"armadura_equipada": "",
 		"hardcore": false,
 		"hardcore_tempo_restante": -1.0,
-		"essencia": e.essencia,
+		"essencia": 41,
 		"melhorias": {},
 	}
 
@@ -5003,7 +5008,7 @@ func teste_loja_progressao_regional_e_gameplay() -> void:
 	var e2 := _novo_estado()
 	e2.dev_dar_veracoins(5000)
 	e2.ganhar_kolicoins(5000)
-	var chaves := ["vidas", "essencia", "habilidades", "indice_nivel", "concluidos"]
+	var chaves := ["vidas", "habilidades", "indice_nivel", "concluidos"]
 	var antes_g := {}
 	for k in chaves:
 		var v: Variant = e2.get(k)
