@@ -336,8 +336,6 @@ func desequipar_categoria(categoria: String) -> void:
 ## e a cena recarrega, que é o caso que acontece a sério. Reabrir o jogo e
 ## ver a explicação outra vez não faz mal a ninguém.
 var mecanicas_explicadas := {}
-## Economia: total de essência mudou.
-signal essencia_mudou(total: int)
 ## Loja: saldo de Kolicoins/Veracoins mudou; item comprado; item equipado.
 signal moedas_loja_mudaram
 signal item_loja_comprado(id: String)
@@ -367,16 +365,11 @@ var concluidos: Array[int] = []
 var bosses_derrotados: Array[String] = []
 var recompensas_reclamadas: Array[String] = []
 
-## --- ECONOMIA -------------------------------------------------------------
-## Essência: moeda mágica largada por inimigos + em caches nas alcovas dos
-## níveis.
-## NÃO se perde na morte (jogo por níveis). `reiniciar_campanha()` zera.
-var essencia: int = 0
-
 ## --- LOJA (cosméticos) ----------------------------------------------------
 ## Estado da CONTA, não da campanha: `reiniciar_campanha()` NÃO lhe toca (um
 ## "novo jogo" nunca pode apagar Veracoins nem compras).
-## Kolicoins: ganham-se a jogar (`ganhar_kolicoins`). Veracoins: premium, sem
+## Kolicoins: ganham-se a jogar (níveis, motes de essência largados pelos
+## inimigos/chefes e caches, baú do chefe -- `ganhar_kolicoins`). Veracoins: premium, sem
 ## qualquer pagamento implementado -- só há `dev_dar_veracoins` (modo dev/teste).
 var kolicoins: int = 0
 var veracoins: int = 0
@@ -679,7 +672,6 @@ func ativar_modo_dev() -> void:
 	level_session = _LEVEL_SESSION.vazia()
 	_limpar_jornada_ancora()
 	habilidades.assign(HABILIDADES_TODAS)
-	essencia = 1000000
 	vidas_mudaram.emit(vidas)
 	for h in HABILIDADES_TODAS:
 		habilidade_desbloqueada.emit(h)
@@ -736,7 +728,6 @@ func reiniciar_campanha() -> void:
 	concluidos.clear()
 	bosses_derrotados.clear()
 	recompensas_reclamadas.clear()
-	essencia = 0
 	_limpar_jornada_ancora()
 	vidas_mudaram.emit(vidas)
 	guardar()
@@ -891,16 +882,6 @@ func registar_pista(id: String) -> void:
 	guardar()
 
 
-## --- Economia ---------------------------------------------
-
-func ganhar_essencia(n: int) -> void:
-	if n <= 0:
-		return
-	essencia += n
-	essencia_mudou.emit(essencia)
-	guardar()
-
-
 
 ## --- Persistencia ------------------------------------------------------
 
@@ -926,7 +907,6 @@ func para_dicionario() -> Dictionary:
 		"completed_level_ids": completed_level_ids,
 		"defeated_boss_ids": bosses_derrotados,
 		"claimed_reward_ids": recompensas_reclamadas,
-		"essencia": essencia,
 		"loja": {
 			"kolicoins": kolicoins, "veracoins": veracoins,
 			"itens_comprados": itens_comprados.duplicate(),
@@ -960,8 +940,9 @@ func de_dicionario(d: Dictionary) -> void:
 	concluidos.sort()
 	bosses_derrotados.assign(d.get("defeated_boss_ids", []))
 	recompensas_reclamadas.assign(d.get("claimed_reward_ids", []))
-	essencia = int(d.get("essencia", 0))
 	_carregar_loja(d.get("loja", {}))
+	# Essência foi fundida nas Kolicoins: saldo de saves antigos converte 1:1.
+	kolicoins += maxi(0, int(d.get("essencia", 0)))
 
 
 ## Lê o bloco `loja` do save com defaults seguros: saves anteriores à loja não

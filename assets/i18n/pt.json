@@ -92,7 +92,7 @@
   "region.1.complete": "FLORESTA CORROMPIDA CONCLUÍDA",
   "region.2.complete": "DESFILADEIRO DOS VENTOS CONCLUÍDO",
   "chest.continue": "Continuar",
-  "chest.essence": "Essência",
+  "chest.kolicoins": "Kolicoins",
   "chest.title": "Recompensa do chefe",
   "clue.abismo_o_que_esta_la_em_baixo.body": "O Olho não tem corpo nem nome próprio — é uma tampa. O poder de Zeriko nunca foi dele; foi puxado para fora deste poço, e o Olho vigia para que não venha mais nada e ninguém desça a ver. Deixou a Aurora passar com uma condição, riscada na rocha: que não olhasse para baixo. Ela continuou a andar. Não olhou.",
   "clue.abismo_o_que_esta_la_em_baixo.title": "O que o Olho guarda",
@@ -331,7 +331,7 @@
   "level.n13": "Campanário",
   "level.n14": "O Topo dos Ecos",
   "level.n15": "Entrada da Fornalha",
-  "level.n16": "Galeria dos Ossos",
+  "level.n16": "Fundição",
   "level.n17": "Cripta das Mil Velas",
   "level.n18": "Templo da Serpente",
   "level.n19": "O Abismo",
@@ -801,5 +801,6 @@
   "shop.item.skin_shadowblade.desc": "Assassina de cabelo prateado em armadura negra e roxo profundo, cornos e capa de sombra, lâmina curva de energia violeta e VFX de sombra a condizer. Puramente cosmética: mesmos movimentos, mesmas hitboxes.",
   "guard.operario_blindado": "Operário Blindado",
   "mec.piso_quente.nome": "Piso Quente",
-  "mec.piso_quente.txt": "As placas de ferro brilham antes de queimar. Atravessa-as enquanto estão frias ou salta quando ficarem vermelhas."
+  "mec.piso_quente.txt": "As placas de ferro brilham antes de queimar. Atravessa-as enquanto estão frias ou salta quando ficarem vermelhas.",
+  "guard.automato_de_fundicao": "Autómato de Fundição"
 }

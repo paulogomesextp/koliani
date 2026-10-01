@@ -15,10 +15,17 @@ const NOME_HABILIDADE := {
 	"escalar_paredes": "hud.ability.escalar_paredes",
 }
 
-@onready var _barra_vida: ProgressBar = $Vida/Barra
-@onready var _barra_energia: ProgressBar = $Energia/Barra
-@onready var _label_vidas: Label = $Vidas/Label
+const BarraHud := preload("res://scripts/barra_hud.gd")
+
 @onready var _toque: Control = $Toque
+
+## Bloco de estado da Koliani (canto sup. esquerdo): retrato, vida, energia, vidas.
+var _vitais: Control
+var _barra_vida: Control
+var _barra_energia: Control
+var _label_vidas: Label
+var _retrato: Control
+var _vida_anterior := -1
 
 ## Barra de vida do chefe (construída em runtime, ao fundo do ecrã).
 var _chefe_caixa: Control
@@ -56,6 +63,7 @@ func _ready() -> void:
 	EstadoJogo.habilidade_desbloqueada.connect(_ao_habilidade)
 	EstadoJogo.pista_encontrada.connect(_ao_pista)
 	EstadoJogo.mecanica_estreou.connect(_ao_mecanica)
+	_montar_vitais()
 	_atualizar_vidas(EstadoJogo.vidas)
 	var koliani := get_tree().get_first_node_in_group("koliani")
 	if koliani and koliani.has_signal("vida_mudou"):
@@ -64,9 +72,6 @@ func _ready() -> void:
 		koliani.energia_mudou.connect(_atualizar_energia)
 	if koliani and koliani.has_signal("energia_insuficiente"):
 		koliani.energia_insuficiente.connect(_piscar_energia)
-	_marcar_custo_especial()
-
-	_vestir_barras()
 	_montar_barra_chefe()
 	var chefe := get_tree().get_first_node_in_group("chefes")
 	if chefe and chefe.has_signal("combate_iniciado"):
@@ -75,9 +80,9 @@ func _ready() -> void:
 		chefe.derrotado.connect(_ao_chefe_derrotado)
 		chefe.tree_exited.connect(_ao_chefe_derrotado)
 
-	_montar_contador_essencia()
-	EstadoJogo.essencia_mudou.connect(_atualizar_essencia)
-	_atualizar_essencia(EstadoJogo.essencia)
+	_montar_contador_moedas()
+	EstadoJogo.moedas_loja_mudaram.connect(_atualizar_moedas)
+	_atualizar_moedas()
 
 	_arrumar_para_toque()
 	_montar_legenda_controlos()
@@ -85,28 +90,6 @@ func _ready() -> void:
 	Textos.idioma_mudou.connect(func(_l: String) -> void:
 		_encher_legenda()
 		_encher_cabecalho_nivel())
-
-
-## Troca as caixas lisas das barras de Vida/Energia pela calha e pelo
-## enchimento de pixel-art (`assets/ui/`), e põe um coração à frente da vida
-## e outro no contador de vidas. As barras em si (posição, tamanho, sinais)
-## continuam a vir do `HUD.tscn`.
-func _vestir_barras() -> void:
-	# Execution 9F: calhas com gema e enchimentos da prancha 09 (secção 2).
-	if _barra_vida:
-		UIProducao.vestir_barra(_barra_vida, "vida")
-	if _barra_energia:
-		UIProducao.vestir_barra(_barra_energia, "energia")
-
-	# o contador de vidas passa de "x3" a "♥ x3". O coração fica ao lado do
-	# número, DENTRO da caixa `Vidas` -- à esquerda dela está o disco da arma,
-	# e um ícone posto para fora ficava por baixo do disco.
-	if _label_vidas:
-		var ic := UIProducao.icone("ico_coracao", 20)
-		ic.name = "IconeVidas"
-		ic.position = Vector2(0, 3)
-		_label_vidas.get_parent().add_child(ic)
-		_label_vidas.position.x = 28
 
 
 # --- barra de vida do chefe ------------------------------------------
@@ -215,58 +198,188 @@ func _ao_chefe_derrotado() -> void:
 
 # --- legenda dos controlos (topo do ecrã) --------------------------
 
-## Contador de ESSÊNCIA no canto sup. direito (✦ 1234). Pisa e treme quando
-## sobe.
-var _ess_label: Label
+## Contador de KOLICOINS (a moeda da Loja, ganha a jogar) no canto sup.
+## direito: pastilha de vidro com uma moeda de ouro desenhada à mão. Pisa e
+## treme quando sobe.
+var _moedas_label: Label
+var _moedas_caixa: PanelContainer
+var _moedas_total := -1
 
-func _montar_contador_essencia() -> void:
+func _montar_contador_moedas() -> void:
 	var caixa := PanelContainer.new()
-	caixa.name = "Essencia"
+	caixa.name = "Kolicoins"
+	_moedas_caixa = caixa
 	caixa.anchor_left = 1.0
 	caixa.anchor_right = 1.0
-	caixa.anchor_top = 0.0
-	caixa.anchor_bottom = 0.0
-	caixa.offset_left = -176.0
-	caixa.offset_right = -18.0
-	caixa.offset_top = 16.0
-	caixa.offset_bottom = 54.0
+	caixa.offset_top = 14.0
+	caixa.offset_right = -16.0
+	caixa.grow_horizontal = Control.GROW_DIRECTION_BEGIN
 	caixa.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	caixa.pivot_offset = Vector2(79, 19)
-	# Execution 9F: placa do kit + o cristal de Essência da prancha 09
-	caixa.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
-	# Execution 9H: a placa passou a ser a aba do rebrand -- o contador é a
-	# única coisa no canto superior direito e tinha de ser da mesma família
-	# que o cabeçalho do nível.
-	caixa.add_theme_stylebox_override("panel", Frontend9H.caixa("aba_bloqueada",
-		Vector4(18, 4, 20, 4), Color(1, 1, 1, 0.96), [16, 12, 16, 12]))
+	caixa.add_theme_stylebox_override("panel", _vidro(20, Vector4(10, 5, 16, 5)))
 	add_child(caixa)
 
 	var linha := HBoxContainer.new()
-	linha.alignment = BoxContainer.ALIGNMENT_CENTER
 	linha.add_theme_constant_override("separation", 8)
 	linha.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	caixa.add_child(linha)
-	linha.add_child(UIProducao.icone("ico_cristal", 26))
 
-	_ess_label = Label.new()
-	_ess_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	_ess_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	_ess_label.add_theme_font_size_override("font_size", 18)
-	_ess_label.add_theme_color_override("font_color", Frontend9H.OSSO)
-	_ess_label.add_theme_color_override("font_outline_color", Color(0.05, 0.01, 0.06))
-	_ess_label.add_theme_constant_override("outline_size", 4)
-	linha.add_child(_ess_label)
+	var moeda := Control.new()
+	moeda.custom_minimum_size = Vector2(26, 26)
+	moeda.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	moeda.draw.connect(func() -> void:
+		var c := Vector2(13, 13)
+		moeda.draw_circle(c, 12.0, Color(0.62, 0.38, 0.08))
+		moeda.draw_circle(c, 10.6, Color(0.98, 0.78, 0.28))
+		moeda.draw_arc(c, 7.4, 0.0, TAU, 28, Color(0.72, 0.46, 0.1), 1.6, true)
+		moeda.draw_circle(c + Vector2(-3.5, -4.0), 2.4, Color(1, 0.96, 0.78, 0.8)))
+	linha.add_child(moeda)
+
+	_moedas_label = Label.new()
+	_moedas_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_moedas_label.custom_minimum_size.x = 36
+	_moedas_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	_moedas_label.add_theme_font_size_override("font_size", 19)
+	_moedas_label.add_theme_color_override("font_color", Color(1.0, 0.93, 0.7))
+	_moedas_label.add_theme_color_override("font_outline_color", Color(0.05, 0.02, 0.04))
+	_moedas_label.add_theme_constant_override("outline_size", 4)
+	linha.add_child(_moedas_label)
 
 
-func _atualizar_essencia(total: int) -> void:
-	if _ess_label == null:
+func _atualizar_moedas() -> void:
+	if _moedas_label == null:
 		return
-	_ess_label.text = "%d" % total
-	var caixa := _ess_label.get_parent().get_parent() as Control
-	if caixa:
+	var total: int = EstadoJogo.kolicoins
+	_moedas_label.text = "%d" % total
+	if _moedas_total >= 0 and total > _moedas_total and _moedas_caixa and is_inside_tree():
+		_moedas_caixa.pivot_offset = _moedas_caixa.size * 0.5
 		var t := create_tween()
-		t.tween_property(caixa, "scale", Vector2(1.14, 1.14), 0.06)
-		t.tween_property(caixa, "scale", Vector2.ONE, 0.12).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		t.tween_property(_moedas_caixa, "scale", Vector2(1.14, 1.14), 0.06)
+		t.tween_property(_moedas_caixa, "scale", Vector2.ONE, 0.12).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	_moedas_total = total
+
+
+## Caixa de "vidro" escuro e arredondado: a base de todas as peças do HUD novo.
+func _vidro(raio: int, margens := Vector4(12, 6, 12, 6), cor_borda := Color(1, 1, 1, 0.14)) -> StyleBoxFlat:
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0.03, 0.02, 0.07, 0.72)
+	sb.set_corner_radius_all(raio)
+	sb.set_border_width_all(1)
+	sb.border_color = cor_borda
+	sb.anti_aliasing = true
+	sb.shadow_color = Color(0, 0, 0, 0.35)
+	sb.shadow_size = 6
+	sb.content_margin_left = margens.x
+	sb.content_margin_top = margens.y
+	sb.content_margin_right = margens.z
+	sb.content_margin_bottom = margens.w
+	return sb
+
+
+# --- bloco de estado da Koliani (canto sup. esquerdo) ---------------
+
+const VITAIS_TAM := Vector2(330.0, 84.0)
+
+func _montar_vitais() -> void:
+	var cor_regiao := EstadoJogo.cor_regiao_do_nivel(EstadoJogo.indice_nivel)
+	_vitais = Control.new()
+	_vitais.name = "Vitais"
+	_vitais.position = Vector2(16.0, 14.0)
+	_vitais.size = VITAIS_TAM
+	_vitais.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_vitais)
+
+	# retrato redondo: o rosto da Koliani (com a skin equipada) numa moldura
+	# com o aro na cor da região
+	var disco := Panel.new()
+	disco.name = "Retrato"
+	disco.position = Vector2(0, 0)
+	disco.size = Vector2(76, 76)
+	disco.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0.08, 0.05, 0.13, 0.95)
+	sb.set_corner_radius_all(38)
+	sb.anti_aliasing = true
+	disco.add_theme_stylebox_override("panel", sb)
+	disco.clip_children = CanvasItem.CLIP_CHILDREN_AND_DRAW
+	_vitais.add_child(disco)
+	_retrato = disco
+	var tex := _textura_retrato()
+	if tex:
+		var tr := TextureRect.new()
+		tr.texture = tex
+		tr.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		tr.stretch_mode = TextureRect.STRETCH_SCALE
+		tr.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		tr.position = Vector2(-4, -2)
+		tr.size = Vector2(84, 84)
+		tr.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		disco.add_child(tr)
+	var aro := Control.new()
+	aro.set_anchors_preset(Control.PRESET_FULL_RECT)
+	aro.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	aro.draw.connect(func() -> void:
+		aro.draw_arc(Vector2(38, 38), 36.0, 0.0, TAU, 56, Color(0.02, 0.01, 0.05, 0.9), 5.0, true)
+		aro.draw_arc(Vector2(38, 38), 36.0, 0.0, TAU, 56, cor_regiao.lightened(0.25), 3.0, true))
+	_vitais.add_child(aro)
+
+	# insígnia das vidas, a morder o canto do retrato
+	var insignia := Control.new()
+	insignia.position = Vector2(48, 50)
+	insignia.size = Vector2(34, 30)
+	insignia.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_vitais.add_child(insignia)
+	var fundo := Panel.new()
+	fundo.set_anchors_preset(Control.PRESET_FULL_RECT)
+	fundo.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	fundo.add_theme_stylebox_override("panel", _vidro(15, Vector4(0, 0, 0, 0), Color(1, 0.6, 0.65, 0.5)))
+	insignia.add_child(fundo)
+	var ic := UIProducao.icone("ico_coracao", 14)
+	ic.position = Vector2(5, 8)
+	insignia.add_child(ic)
+	_label_vidas = Label.new()
+	_label_vidas.position = Vector2(20, 3)
+	_label_vidas.size = Vector2(14, 24)
+	_label_vidas.add_theme_font_size_override("font_size", 15)
+	_label_vidas.add_theme_color_override("font_color", Color(1, 0.92, 0.94))
+	_label_vidas.add_theme_color_override("font_outline_color", Color(0.05, 0.01, 0.02))
+	_label_vidas.add_theme_constant_override("outline_size", 4)
+	insignia.add_child(_label_vidas)
+
+	# barra de vida (larga) e de energia (fina) ao lado do retrato
+	_barra_vida = BarraHud.new()
+	_barra_vida.name = "BarraVida"
+	_barra_vida.position = Vector2(88, 12)
+	_barra_vida.size = Vector2(238, 24)
+	_barra_vida.cor = Color(0.9, 0.17, 0.27)
+	_vitais.add_child(_barra_vida)
+
+	_barra_energia = BarraHud.new()
+	_barra_energia.name = "BarraEnergia"
+	_barra_energia.position = Vector2(88, 42)
+	_barra_energia.size = Vector2(176, 12)
+	_barra_energia.cor = Color(0.33, 0.62, 1.0)
+	_barra_energia.cor_baixa = Color(0.33, 0.62, 1.0)
+	_barra_energia.mostrar_numero = false
+	# cada terço e' um uso do Especial (custo 33 de 99)
+	_barra_energia.marcas.assign([1.0 / 3.0, 2.0 / 3.0])
+	_vitais.add_child(_barra_energia)
+
+
+## Primeiro fotograma de `idle` do corpo da Koliani (segue a skin equipada).
+func _textura_retrato() -> Texture2D:
+	var k := get_tree().get_first_node_in_group("koliani")
+	var corpo := k.get_node_or_null("Sprite/Corpo") as AnimatedSprite2D if k else null
+	if corpo == null or corpo.sprite_frames == null:
+		return null
+	var anim: StringName = "idle" if corpo.sprite_frames.has_animation("idle") else corpo.animation
+	var tex := corpo.sprite_frames.get_frame_texture(anim, 0)
+	if tex == null:
+		return null
+	# recorte da cabeça e ombros (o fotograma é 128x128, a figura ocupa o meio)
+	var at := AtlasTexture.new()
+	at.atlas = tex
+	at.region = Rect2(41, 31, 46, 46)
+	return at
 
 
 func _montar_legenda_controlos() -> void:
@@ -363,10 +476,13 @@ func _primeira_tecla(accao: String) -> String:
 var _cab_pastilhas: HBoxContainer
 
 func _montar_cabecalho_nivel() -> void:
+	# pastilha de vidro centrada no topo; cresce para os dois lados
 	_cab_nivel = VBoxContainer.new()
 	_cab_nivel.name = "CabecalhoNivel"
-	_cab_nivel.set_anchors_preset(Control.PRESET_TOP_LEFT)
-	_cab_nivel.position = Vector2(12.0, 8.0)
+	_cab_nivel.anchor_left = 0.5
+	_cab_nivel.anchor_right = 0.5
+	_cab_nivel.offset_top = 12.0
+	_cab_nivel.grow_horizontal = Control.GROW_DIRECTION_BOTH
 	_cab_nivel.add_theme_constant_override("separation", 1)
 	_cab_nivel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_cab_nivel)
@@ -383,80 +499,67 @@ func _encher_cabecalho_nivel() -> void:
 	var cor := EstadoJogo.cor_regiao_do_nivel(i)
 	var passo: Array[int] = EstadoJogo.passo_na_regiao(i)
 
-	# a placa: pedra tingida com a cor da região, mas escura -- é fundo de
-	# texto, não pode competir com o cenário
-	# 9F: placa escura do kit da prancha 09 -- fundo de texto discreto, não
-	# compete com o cenário da 9C; o número é o "região-nível" (1-3)
 	var placa := PanelContainer.new()
 	placa.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	placa.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
-	var placa_rb := CosmeticosVisuais.caixa_hud("placa", Vector4(12, 6, 18, 6), [16, 14, 16, 14])
-	if placa_rb:
-		placa.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-		placa.add_theme_stylebox_override("panel", placa_rb)
-	else:
-		placa.add_theme_stylebox_override("panel", Frontend9H.caixa("aba_bloqueada",
-			Vector4(12, 6, 18, 6), Color(1, 1, 1, 0.96), [16, 14, 16, 14]))
+	placa.add_theme_stylebox_override("panel", _vidro(22, Vector4(8, 6, 22, 8),
+		cor.lightened(0.2) * Color(1, 1, 1, 0.55)))
 	_cab_nivel.add_child(placa)
 
 	var linha := HBoxContainer.new()
 	linha.add_theme_constant_override("separation", 10)
+	linha.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	placa.add_child(linha)
 
-	# selo com o número do nível
+	# selo com o número "região-passo", na cor da região
 	var selo := PanelContainer.new()
-	selo.custom_minimum_size = Vector2(56, 44)
+	selo.custom_minimum_size = Vector2(52, 40)
 	selo.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	selo.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
-	selo.add_theme_stylebox_override("panel", Frontend9H.caixa("ficha_nivel",
-		Vector4(6, 2, 6, 2), Color.WHITE, [16, 10, 16, 10]))
+	selo.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = cor.darkened(0.35)
+	sb.set_corner_radius_all(16)
+	sb.anti_aliasing = true
+	sb.set_border_width_all(1)
+	sb.border_color = cor.lightened(0.4)
+	selo.add_theme_stylebox_override("panel", sb)
 	linha.add_child(selo)
 	var num := Label.new()
 	num.text = "%d-%d" % [EstadoJogo.regiao_do_nivel(i) + 1, passo[0]] if passo[1] > 0 else "%02d" % (i + 1)
 	num.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	num.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	num.add_theme_font_size_override("font_size", 20)
-	num.add_theme_color_override("font_color", Frontend9H.OSSO)
+	num.add_theme_font_size_override("font_size", 19)
+	num.add_theme_color_override("font_color", Color(1, 0.97, 1))
 	num.add_theme_color_override("font_outline_color", Color(0.04, 0.01, 0.06))
-	num.add_theme_constant_override("outline_size", 5)
+	num.add_theme_constant_override("outline_size", 4)
 	selo.add_child(num)
 
 	var col := VBoxContainer.new()
 	col.add_theme_constant_override("separation", 0)
 	col.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	col.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	linha.add_child(col)
 
-	# região + passo dentro dela
-	var cabecalho := Textos.t(EstadoJogo.chave_regiao_do_nivel(i)).to_upper()
+	# nome do nível, e por baixo a região + passo dela
+	col.add_child(_linha_cab(Textos.t(CatalogoCampanha.chave_nivel(i)), 18, Color(1, 0.96, 1)))
+	var regiao := Textos.t(EstadoJogo.chave_regiao_do_nivel(i)).to_upper()
 	if passo[1] > 0:
-		cabecalho += "   ·   " + Textos.tf("hud.region_step", [passo[0], passo[1]])
-	col.add_child(_linha_cab(cabecalho, 12, Frontend9H.CARMESIM_CLARO, false))
-	# nome do nível
-	col.add_child(_linha_cab(Textos.t(CatalogoCampanha.chave_nivel(i)), 18,
-		Color(1, 0.96, 1), false))
-	# chefe (ou guardião), com caveira à frente
-	var ck := CatalogoCampanha.chave_chefe(i)
-	if ck != "":
-		var lc := HBoxContainer.new()
-		lc.add_theme_constant_override("separation", 5)
-		lc.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		lc.add_child(UI.icone("ico_caveira", 13, Color(1, 0.72, 0.74)))
-		var rotulo := "sel.boss" if CatalogoCampanha.tem_chefe(i) else "sel.guard"
-		lc.add_child(_linha_cab(Textos.tf(rotulo, [Textos.t(ck)]), 12,
-			Color(0.98, 0.72, 0.74), false))
-		col.add_child(lc)
+		regiao += "  ·  " + Textos.tf("hud.region_step", [passo[0], passo[1]])
+	col.add_child(_linha_cab(regiao, 11, cor.lightened(0.45)))
 
-	# pastilhas: um traço por nível da região
+	# pastilhas: um traço por nível da região (feito, agora, por fazer)
 	_cab_pastilhas = HBoxContainer.new()
-	_cab_pastilhas.add_theme_constant_override("separation", 4)
+	_cab_pastilhas.add_theme_constant_override("separation", 3)
 	_cab_pastilhas.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_cab_pastilhas.custom_minimum_size.y = 8
 	col.add_child(_cab_pastilhas)
 	for n in passo[1]:
 		var p := ColorRect.new()
-		p.custom_minimum_size = Vector2(18, 4)
+		p.custom_minimum_size = Vector2(20, 3)
+		p.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		var feito := n < passo[0] - 1
-		p.color = UIProducao.OURO if n == passo[0] - 1 else (
-			UIProducao.OURO * 0.55 if feito else Color(0.2, 0.24, 0.32, 0.9))
+		p.color = Color(1, 0.95, 0.8) if n == passo[0] - 1 else (
+			cor.lightened(0.2) * Color(1, 1, 1, 0.75) if feito else Color(1, 1, 1, 0.16))
+		p.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		_cab_pastilhas.add_child(p)
 
 
@@ -479,26 +582,26 @@ func _input(evento: InputEvent) -> void:
 
 func _atualizar_barra_vida(atual: int, maximo: int) -> void:
 	if _barra_vida:
-		_barra_vida.max_value = maximo
-		_barra_vida.value = atual
-		UI.ajustar_barra(_barra_vida)
+		_barra_vida.definir(atual, maximo)
+	# a levar dano: o retrato fica vermelho por um instante
+	if _vida_anterior >= 0 and atual < _vida_anterior and _retrato and is_inside_tree():
+		var t := create_tween()
+		_retrato.modulate = Color(1.0, 0.35, 0.35)
+		t.tween_property(_retrato, "modulate", Color.WHITE, 0.4)
+	_vida_anterior = atual
 
 
 func _atualizar_energia(atual: float, maximo: float) -> void:
 	if _barra_energia:
-		_barra_energia.max_value = maximo
-		_barra_energia.value = atual
-		UI.ajustar_barra(_barra_energia)
+		_barra_energia.definir(atual, maximo)
 
 
 func _atualizar_vidas(vidas: int) -> void:
 	if _label_vidas:
-		_label_vidas.text = "x%d" % vidas
+		_label_vidas.text = "%d" % vidas
 
 
 func _ao_habilidade(id: String) -> void:
-	if (id == "projetil" or id == "especial") and _barra_energia:
-		_barra_energia.get_parent().visible = true
 	var nome: String = Textos.t(NOME_HABILIDADE.get(id, id))
 	_aviso(Textos.tf("hud.new_ability", [nome]),
 		UIProducao.ICONE_HABILIDADE.get(id, ""), "habilidade")
@@ -706,6 +809,8 @@ func _posicionar_notificacao() -> void:
 	var topo := MARGEM_SEGURA
 	if _cab_nivel:
 		topo = maxf(topo, _cab_nivel.position.y + _cab_nivel.size.y + 10.0)
+	if _vitais:
+		topo = maxf(topo, _vitais.position.y + _vitais.size.y + 10.0)
 	# Nunca tapar o HUD de baixo (barras/equipamento) nem sair do ecrã.
 	topo = minf(topo, maxf(MARGEM_SEGURA, ecra.y - _notificacao.size.y - 200.0))
 	var esquerda := MARGEM_SEGURA
@@ -731,47 +836,15 @@ func _process(_dt: float) -> void:
 		_notificacao_suspensa = suspensa
 
 
-## Com os controlos de toque ligados, o canto de baixo à esquerda é do
-## JOYSTICK -- e era exactamente onde viviam as barras, o disco da arma e os
-## botões de equipamento. Sobem todos acima do aro do stick.
-##
-## Sobem por deslocação e não por âncora nova: estas peças estão todas
-## presas ao fundo (`anchor_top/bottom = 1.0`) com deslocamentos negativos,
-## portanto tirar 230 a cada um mantém a arrumação entre elas.
-const DESVIO_TOQUE := 285.0
-var _desviado := false
-
-
+## Com os controlos de toque ligados o canto de baixo à esquerda é do
+## JOYSTICK; o bloco de estado vive no topo, por isso não há nada a arrumar.
 func _arrumar_para_toque() -> void:
-	if _desviado or _toque == null or not _toque.visible:
-		return
-	_desviado = true
-	for n in [$Vida, $Energia, $Vidas]:
-		if n is Control:
-			n.offset_top -= DESVIO_TOQUE
-			n.offset_bottom -= DESVIO_TOQUE
-
-
-## Marcas a 1/3 e 2/3 da barra: cada segmento e' um uso do Especial (custo 33 de 99).
-func _marcar_custo_especial() -> void:
-	if _barra_energia == null:
-		return
-	for f in [1.0 / 3.0, 2.0 / 3.0]:
-		var m := ColorRect.new()
-		m.color = Color(1.0, 0.9, 1.0, 0.75)
-		m.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		m.anchor_left = f
-		m.anchor_right = f
-		m.anchor_top = 0.0
-		m.anchor_bottom = 1.0
-		m.offset_left = -1.0
-		m.offset_right = 1.0
-		_barra_energia.add_child(m)
+	pass
 
 
 ## Sem Energia para o Especial: a barra pisca em vermelho.
 func _piscar_energia() -> void:
-	if _barra_energia == null:
+	if _barra_energia == null or not is_inside_tree():
 		return
 	var t := create_tween()
 	_barra_energia.modulate = Color(1.0, 0.35, 0.35)

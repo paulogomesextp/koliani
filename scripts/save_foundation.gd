@@ -197,7 +197,7 @@ static func _validar_campos_legacy(d: Dictionary, total_niveis: int,
 	var obrigatorios := ["vidas", "indice_nivel", "checkpoint", "habilidades"]
 	if exigir_completo:
 		obrigatorios.append_array(["pistas", "concluidos", "hardcore",
-			"hardcore_tempo_restante", "essencia"])
+			"hardcore_tempo_restante"])
 	for chave in obrigatorios:
 		if not d.has(chave):
 			return _falha("invalid_structure", "Campo obrigatorio em falta: %s" % chave)
@@ -230,7 +230,7 @@ static func _validar_campos_legacy(d: Dictionary, total_niveis: int,
 static func _validar_campos_v3(d: Dictionary, total_niveis: int) -> Dictionary:
 	var obrigatorios := ["vidas", "current_level_id", "checkpoint", "ability_ids",
 		"collectible_ids", "completed_level_ids", "defeated_boss_ids",
-		"claimed_reward_ids", "hardcore", "hardcore_tempo_restante", "essencia"]
+		"claimed_reward_ids", "hardcore", "hardcore_tempo_restante"]
 	for chave in obrigatorios:
 		if not d.has(chave):
 			return _falha("invalid_structure", "Campo obrigatorio em falta: %s" % chave)
@@ -275,7 +275,7 @@ static func _validar_campos_v3(d: Dictionary, total_niveis: int) -> Dictionary:
 		return _falha("invalid_structure", "hardcore nao e booleano")
 	if not _numero_finito(d["hardcore_tempo_restante"]):
 		return _falha("invalid_structure", "hardcore_tempo_restante invalido")
-	if not _inteiro(d["essencia"]) or int(d["essencia"]) < 0:
+	if d.has("essencia") and (not _inteiro(d["essencia"]) or int(d["essencia"]) < 0):
 		return _falha("invalid_structure", "essencia invalida")
 	return {"ok": true}
 
@@ -349,7 +349,7 @@ static func _migrar_passo(d: Dictionary, versao: int) -> Dictionary:
 			# compatibilidade sem reinterpretar nenhum campo legacy existente.
 			var defaults := {
 				"pistas": [], "concluidos": [], "hardcore": false,
-				"hardcore_tempo_restante": -1.0, "essencia": 0,
+				"hardcore_tempo_restante": -1.0,
 			}
 			for chave in defaults:
 				if not out.has(chave):
