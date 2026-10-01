@@ -1,3 +1,7 @@
+# >>> Animações dos inimigos da Região II (1 out 2026, branch `claude/animacoes-regiao-ii-nsx9ab`) <<<
+`tools/animar_regiao02.py` refez idle/run/attack/hit/dead das 4 espécies da Região II e o idle do Guardião dos Céus.
+Relatório: `docs/execution_animacoes_regiao2.md`; GIFs antes/depois em `docs/qa/animacoes_r2/`. Falta: playtest humano do ritmo.
+
 # >>> Regiao IV -- N16 "Entrada da Fornalha" refeito (30 set 2026, branch `claude/project-thread-lu210k`) <<<
 Cena `Cemiterio_dos_Reis.tscn` gerada por `tools/construir_n16_entrada.py` (+ `tools/r4_lib.py`); desenho em
 `docs/nivel_autoral_n16.md`. Pipeline de arte da Regiao IV montado a partir das 7 pranchas (terreno `fornalha`,
