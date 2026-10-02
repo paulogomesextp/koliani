@@ -332,7 +332,7 @@
   "level.n14": "O Topo dos Ecos",
   "level.n15": "Entrada da Fornalha",
   "level.n16": "Galeria dos Ossos",
-  "level.n17": "Cripta das Mil Velas",
+  "level.n17": "Câmara da Lava",
   "level.n18": "Templo da Serpente",
   "level.n19": "O Abismo",
   "level.n20": "Vila dos Sem-Rosto",
@@ -793,6 +793,7 @@
   "shop.item.skin_shadowblade.name": "Shadowblade Koliani",
   "shop.item.skin_shadowblade.desc": "Assassina de cabelo prateado em armadura negra e roxo profundo, cornos e capa de sombra, lâmina curva de energia violeta e VFX de sombra a condizer. Puramente cosmética: mesmos movimentos, mesmas hitboxes.",
   "guard.operario_blindado": "Operário Blindado",
+  "guard.automato_de_fundicao": "Autómato de Fundição",
   "mec.piso_quente.nome": "Piso Quente",
   "mec.piso_quente.txt": "As placas de ferro brilham antes de queimar. Atravessa-as enquanto estão frias ou salta quando ficarem vermelhas.",
   "combat.perfect_dodge": "ESQUIVA PERFEITA"

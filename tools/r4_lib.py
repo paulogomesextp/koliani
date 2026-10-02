@@ -137,16 +137,18 @@ class Cena:
                         f'textura_brilho = ExtResource("{self.tex("r4_piso_quente")}")')
 
     def jato(self, nome: str, x: float, y: float, alcance: float = 220.0, intervalo: float = 2.2,
-             aviso: float = 0.8, dur: float = 1.4, fase: float = 0.0, invertido: bool = False) -> None:
+             aviso: float = 0.8, dur: float = 1.4, fase: float = 0.0, invertido: bool = False,
+             rot: float = 0.0) -> None:
         self.com_script(nome, "Area2D", "res://scripts/jato_fornalha.gd",
-                        f"position = {v(x, y)}\nalcance = {alcance:g}\nintervalo = {intervalo:g}\n"
+                        f"position = {v(x, y)}\n" + (f"rotation = {rot:g}\n" if rot else "")
+                        + f"alcance = {alcance:g}\nintervalo = {intervalo:g}\n"
                         f"aviso_seg = {aviso:g}\ndur_ativa = {dur:g}\nfase = {fase:g}\n"
                         f"invertido = {str(invertido).lower()}\n"
                         f'textura_jato = ExtResource("{self.tex("r4_jato_fogo")}")\n'
                         f'textura_bocal = ExtResource("{self.tex("r4_piso_quente")}")')
 
     def lava(self, nome: str, esq: float, dir: float, topo: float, prof: float = 80.0,
-             letal: bool = False, dano: int = 22) -> None:
+             letal: bool = False, dano: int = 22, extra: str = "") -> None:
         """Poca de lava: `topo` = linha da superficie; `prof` = altura."""
         self.no(nome, f"position = {v((esq + dir) / 2, topo + prof / 2)}\nlargura = {dir - esq:g}\n"
                       f"altura = {prof:g}\ncor = Color(1.0, 0.34, 0.08, 0.93)\nbrasas = true\n"

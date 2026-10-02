@@ -332,7 +332,7 @@
   "level.n14": "The Summit of Echoes",
   "level.n15": "Furnace Gate",
   "level.n16": "Gallery of Bones",
-  "level.n17": "Crypt of a Thousand Candles",
+  "level.n17": "Lava Chamber",
   "level.n18": "Temple of the Serpent",
   "level.n19": "The Abyss",
   "level.n20": "Village of the Faceless",
@@ -793,6 +793,7 @@
   "shop.item.skin_shadowblade.name": "Shadowblade Koliani",
   "shop.item.skin_shadowblade.desc": "Silver-haired assassin in black and deep-purple armor, shadow horns and cloak, a curved blade of violet energy and matching shadow VFX. Purely cosmetic: same moves, same hitboxes.",
   "guard.operario_blindado": "Armored Foreman",
+  "guard.automato_de_fundicao": "Foundry Automaton",
   "mec.piso_quente.nome": "Hot Floor",
   "mec.piso_quente.txt": "The iron plates glow before they burn. Cross them while they are cold, or jump clear when they turn red.",
   "combat.perfect_dodge": "PERFECT DODGE"
