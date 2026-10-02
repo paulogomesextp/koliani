@@ -333,7 +333,7 @@
   "level.n15": "Entrada da Fornalha",
   "level.n16": "Fundição",
   "level.n17": "Câmara da Lava",
-  "level.n18": "Templo da Serpente",
+  "level.n18": "Sala das Pressões",
   "level.n19": "O Abismo",
   "level.n20": "Vila dos Sem-Rosto",
   "level.n21": "Mercado da Carne",
@@ -798,5 +798,8 @@
   "mec.piso_quente.txt": "As placas de ferro brilham antes de queimar. Atravessa-as enquanto estão frias ou salta quando ficarem vermelhas.",
   "guard.automato_de_fundicao": "Autómato de Fundição",
   "guard.sentinela_de_pressao": "Sentinela de Pressão",
+  "guard.lanca_chamas": "Lança-Chamas",
+  "mec.pistao.nome": "Pistões Esmagadores",
+  "mec.pistao.txt": "A cabeça do pistão treme e brilha antes de cair. Espera que suba e atravessa. As válvulas mudam a máquina.",
   "combat.perfect_dodge": "ESQUIVA PERFEITA"
 }

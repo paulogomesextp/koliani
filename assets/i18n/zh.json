@@ -333,7 +333,7 @@
   "level.n15": "Furnace Gate",
   "level.n16": "Foundry",
   "level.n17": "熔岩之室",
-  "level.n18": "Temple of the Serpent",
+  "level.n18": "压力室",
   "level.n19": "The Abyss",
   "level.n20": "Village of the Faceless",
   "level.n21": "Meat Market",
@@ -798,5 +798,8 @@
   "mec.piso_quente.txt": "The iron plates glow before they burn. Cross them while they are cold, or jump clear when they turn red.",
   "guard.automato_de_fundicao": "Foundry Automaton",
   "guard.sentinela_de_pressao": "压力哨兵",
+  "guard.lanca_chamas": "喷火兵",
+  "mec.pistao.nome": "压碎活塞",
+  "mec.pistao.txt": "活塞头在落下前会抖动并发光。等它升起再通过。阀门可以改变机器的运转。",
   "combat.perfect_dodge": "完美闪避"
 }

@@ -65,7 +65,7 @@ const CHEFE_KEY: Array[String] = [
 	"guard.operario_blindado",    # 15 N16 -- Entrada da Fornalha (Região IV)
 	"guard.automato_de_fundicao",  # 16 N17 -- Fundição (Região IV)
 	"guard.sentinela_de_pressao", # 17 N18 -- Câmara da Lava (Região IV; guardião a confirmar)
-	"boss.naga_zeraph",          # 18 Templo da Serpente
+	"guard.lanca_chamas",        # 18 N19 -- Sala das Pressões (Região IV; guardião PLACEHOLDER, decisão de canon pendente)
 	"boss.olho_do_abismo",       # 19 O Abismo
 	"boss.prefeito_sem_rosto",   # 20 Vila dos Sem-Rosto
 	"boss.acougueiro_real",      # 21 Mercado da Carne
