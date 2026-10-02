@@ -1,3 +1,7 @@
+# >>> N19 Sala das Pressoes feito (3 out 2026, branch `claude/region04-n19`, worktree `C:\Projetos\koliani-n19`, sem push) <<<
+3 commits locais (c2064210 pistao/valvula, 11f3c801 nivel, 18054961 docs). Desenho e medicoes: `docs/nivel_autoral_n19.md`. Suite = 9 falhas pre-existentes, 0 novas; piloto fisico 0 toques; alcance 100 niveis OK; baseline: so' o N19 muda.
+Falta: HUMAN PLAYTEST; canon do Guardiao N18/N19 (Lanca-Chamas e' placeholder); decidir push/PR (nao feito). Nao iniciar N20.
+
 # >>> Animações dos inimigos da Região II (1 out 2026, branch `claude/animacoes-regiao-ii-nsx9ab`) <<<
 `tools/animar_regiao02.py` refez idle/run/attack/hit/dead das 4 espécies da Região II e o idle do Guardião dos Céus.
 Relatório: `docs/execution_animacoes_regiao2.md`; GIFs antes/depois em `docs/qa/animacoes_r2/`. Falta: playtest humano do ritmo.
