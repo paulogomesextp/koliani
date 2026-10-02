@@ -79,6 +79,10 @@ func _correr_tudo() -> void:
 		_falhas.append(falha)
 	for falha in TestesRegion04N18.executar():
 		_falhas.append(falha)
+	for falha in TestesRegion04PistaoValvula.executar():
+		_falhas.append(falha)
+	for falha in TestesRegion04N19.executar():
+		_falhas.append(falha)
 	for falha in TestesKolianiCanonicaNiveis.executar():
 		_falhas.append(falha)
 	teste_movimento_salto_com_coyote()
@@ -125,6 +129,8 @@ func _correr_tudo() -> void:
 	await teste_execution_9h7_fundo_regiao1()
 	await teste_offscreen_hazards()
 	await teste_offscreen_global()
+	for falha in await TestesRegion04PistaoValvula.contacto(self):
+		_falhas.append(falha)
 	await teste_n1_autoral()
 	await teste_ghorak_n1()
 	await teste_n2_autoral()

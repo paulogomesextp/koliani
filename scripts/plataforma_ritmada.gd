@@ -33,9 +33,20 @@ extends "res://scripts/plataforma.gd"
 ## da laje (o glifo de eco). Acende e apaga com ela.
 @export var textura_eco: Texture2D
 @export var escala_eco := 1.0
+## Opt-in (N19, `ValvulaFornalha`): grupo da valvula que a governa ("" = nenhuma).
+## `efeito_valvula`: "solida" = enquanto a valvula esta' aberta fica SEMPRE
+## solida; "so_aberta" = so' existe (cicla) enquanto a valvula esta' aberta.
+## Ao abrir/fechar o ciclo recomeca no inicio do periodo solido -- nunca ha'
+## queda surpresa: quem la' estiver tem o periodo solido inteiro (+ o aviso).
+@export var grupo_valvula := ""
+@export_enum("solida", "so_aberta") var efeito_valvula := "solida"
+## Opt-in: o ciclo conta desde o arranque (reaparecer repete o ritmo).
+@export var relogio_local := false
 
 var _solida_agora := true
 var _caiu := false
+var _valvula_aberta := false
+var _desloc_s := 0.0
 
 @onready var _col: CollisionShape2D = get_node_or_null("Col")
 
@@ -45,6 +56,10 @@ func _ready() -> void:
 	if Engine.is_editor_hint():
 		return
 	add_to_group("plataformas_ritmadas")
+	if grupo_valvula != "":
+		add_to_group("valvula_" + grupo_valvula)
+	if relogio_local:
+		_desloc_s = -RelogioFornalha.agora()
 	if textura_eco:
 		var vis0 := get_node_or_null("Visual")
 		if vis0:
@@ -82,13 +97,28 @@ func _ciclo() -> float:
 
 ## Segundos decorridos dentro do ciclo actual (já com a `fase` aplicada).
 func _t_no_ciclo() -> float:
-	var t := Time.get_ticks_msec() / 1000.0
-	return fmod(t + fase * _ciclo(), _ciclo())
+	var t := RelogioFornalha.agora()
+	return fposmod(t + _desloc_s + fase * _ciclo(), _ciclo())
 
 
 func _calcula_solida() -> bool:
+	if grupo_valvula != "":
+		if efeito_valvula == "solida" and _valvula_aberta:
+			return true
+		if efeito_valvula == "so_aberta" and not _valvula_aberta:
+			return false
 	var solida := _t_no_ciclo() < _dur_solida()
 	return solida if comeca_solida else not solida
+
+
+## Chamado pela `ValvulaFornalha` do `grupo_valvula`: ao abrir ou fechar, o ciclo
+## recomeca no INICIO do periodo solido (a `fase` de arranque perde-se: o que
+## importa e' que quem la' estiver tenha o periodo solido inteiro, nunca uma
+## queda surpresa).
+func valvula_mudou(aberta: bool) -> void:
+	_valvula_aberta = aberta
+	var inicio := 0.0 if comeca_solida else _dur_solida()
+	_desloc_s = inicio - RelogioFornalha.agora() - fase * _ciclo()
 
 
 func _aplicar_estado(solida: bool, imediato: bool) -> void:

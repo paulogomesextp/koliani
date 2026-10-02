@@ -147,6 +147,54 @@ class Cena:
                         f'textura_jato = ExtResource("{self.tex("r4_jato_fogo")}")\n'
                         f'textura_bocal = ExtResource("{self.tex("r4_piso_quente")}")')
 
+    def pistao(self, nome: str, x: float, chao: float, curso: float = 230.0, larg: float = 78.0,
+               rep: float = 2.2, aviso: float = 0.9, ext: float = 0.22, perm: float = 0.8,
+               ret: float = 0.7, fase: float = 0.0, grupo: str = "", fase_retoma: float = -1.0,
+               efeito: str = "pausa", direcao: str = "Vector2(0, 1)", escala: float = 0.58) -> None:
+        """Pistao esmagador (`PistaoFornalha`). `chao` = onde a cabeca bate; a origem do
+        no' (face recolhida) fica `curso` px antes, no sentido contrario ao da extensao."""
+        corpo = (f"position = {v(x, chao - curso)}\ndirecao = {direcao}\ncurso = {curso:g}\n"
+                 f"largura = {larg:g}\nrepouso_seg = {rep:g}\naviso_seg = {aviso:g}\n"
+                 f"extensao_seg = {ext:g}\npermanece_seg = {perm:g}\nretracao_seg = {ret:g}\n"
+                 f"fase = {fase:g}\n")
+        if grupo:
+            corpo += (f'grupo_valvula = "{grupo}"\nfase_retoma = {fase_retoma:g}\n'
+                      f'efeito_valvula = "{efeito}"\n')
+        corpo += (f"escala_textura = {escala:g}\n"
+                  f'textura_cabeca = ExtResource("{self.tex("r4_pistao_h")}")')
+        self.com_script(nome, "Area2D", "res://scripts/pistao_fornalha.gd", corpo)
+
+    def jato_n19(self, nome: str, x: float, y: float, alcance: float, intervalo: float, aviso: float,
+                 dur: float, fase: float = 0.0, grupo: str = "", fase_retoma: float = -1.0) -> None:
+        """Jato de fogo do N19: o ciclo conta desde o arranque (`relogio_local`) para
+        ficar em sincronia exacta com os pistoes e as plataformas."""
+        corpo = (f"position = {v(x, y)}\nalcance = {alcance:g}\nintervalo = {intervalo:g}\n"
+                 f"aviso_seg = {aviso:g}\ndur_ativa = {dur:g}\nfase = {fase:g}\nrelogio_local = true\n")
+        if grupo:
+            corpo += f'grupo_valvula = "{grupo}"\nfase_retoma = {fase_retoma:g}\n'
+        corpo += (f'textura_jato = ExtResource("{self.tex("r4_jato_fogo")}")\n'
+                  f'textura_bocal = ExtResource("{self.tex("r4_piso_quente")}")')
+        self.com_script(nome, "Area2D", "res://scripts/jato_fornalha.gd", corpo)
+
+    def ritmada(self, nome: str, esq: float, dir: float, topo: float, solida: float, fantasma: float,
+                fase: float = 0.0, grupo: str = "", efeito: str = "solida", aviso: float = 0.5,
+                comeca_solida: bool = True, h: float = 22.0) -> None:
+        """Plataforma ritmada (`PlataformaRitmada`) com o ciclo contado desde o arranque."""
+        extra = (f"solida_seg = {solida:g}\nfantasma_seg = {fantasma:g}\nfase = {fase:g}\n"
+                 f"aviso = {aviso:g}\ncomeca_solida = {str(comeca_solida).lower()}\nrelogio_local = true")
+        if grupo:
+            extra += f'\ngrupo_valvula = "{grupo}"\nefeito_valvula = "{efeito}"'
+        self.plat(nome, esq, dir, topo, h=h, av=34.0, inst="ritmo", extra=extra)
+
+    def valvula(self, nome: str, x: float, topo: float, grupo: str, modo: str = "temporaria",
+                janela: float = 9.0, aviso_fim: float = 2.0, cor: str = "Color(0.45, 0.8, 1.0, 1)") -> None:
+        """Valvula de pressao (`ValvulaFornalha`); `topo` = superficie onde assenta."""
+        corpo = (f"position = {v(x, topo)}\ngrupo = \"{grupo}\"\n"
+                 f'modo = "{modo}"\n'
+                 f"janela_seg = {janela:g}\naviso_fim_seg = {aviso_fim:g}\ncor_ligacao = {cor}\n"
+                 f'textura = ExtResource("{self.tex("r4_valvula_roda")}")')
+        self.com_script(nome, "Area2D", "res://scripts/valvula_fornalha.gd", corpo)
+
     def lava(self, nome: str, esq: float, dir: float, topo: float, prof: float = 80.0,
              letal: bool = False, dano: int = 22, extra: str = "") -> None:
         """Poca de lava: `topo` = linha da superficie; `prof` = altura."""

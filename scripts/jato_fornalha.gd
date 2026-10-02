@@ -23,6 +23,14 @@ enum Estado { DORME, AVISO, ATIVO }
 @export var invertido := false
 @export var textura_jato: Texture2D
 @export var textura_bocal: Texture2D
+## Opt-in (N19, `ValvulaFornalha`): grupo da valvula que o governa ("" = nenhuma).
+## Enquanto aberta o jato DORME (sem aviso, sem fogo); ao fechar recomeca o
+## ciclo em `fase_retoma` (-1 = `fase`), que tem de cair no `intervalo`.
+@export var grupo_valvula := ""
+@export var fase_retoma := -1.0
+## Opt-in: o ciclo conta desde o arranque do no' (reaparecer repete o ritmo) em
+## vez do relogio global do jogo. Omissao `false` = comportamento de sempre.
+@export var relogio_local := false
 
 var estado := Estado.DORME
 var _forma: CollisionShape2D
@@ -31,6 +39,8 @@ var _bocal: Sprite2D
 var _faiscas: CPUParticles2D
 var _estado_anterior := -1
 var _t_dano := 0.0
+var pausado := false
+var _desloc := 0.0
 
 
 func _set_alcance(v: float) -> void:
@@ -42,6 +52,10 @@ func _set_alcance(v: float) -> void:
 func _pronto() -> void:
 	dano = maxi(dano, 20)
 	ativa = false
+	if grupo_valvula != "":
+		add_to_group("valvula_" + grupo_valvula)
+	if relogio_local:
+		_desloc = -_ahora()
 	var mat := CanvasItemMaterial.new()
 	mat.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
 	_forma = CollisionShape2D.new()
@@ -116,16 +130,29 @@ func estado_em(t_seg: float) -> int:
 	return Estado.ATIVO
 
 
+func _ahora() -> float:
+	return RelogioFornalha.agora()
+
+
+## Chamado pela `ValvulaFornalha` do `grupo_valvula`.
+func valvula_mudou(aberta: bool) -> void:
+	if aberta:
+		pausado = true
+	elif pausado:
+		pausado = false
+		_desloc = (fase_retoma if fase_retoma >= 0.0 else fase) - fase - _ahora()
+
+
 func _process(dt: float) -> void:
-	var t := Time.get_ticks_msec() * 0.001
-	estado = estado_em(t) as Estado
+	var t := _ahora() + _desloc
+	estado = Estado.DORME if pausado else estado_em(t) as Estado
 	if estado != _estado_anterior:
 		_aplicar()
 	var f := fposmod(t + fase, _ciclo())
 	var pulso := 0.5 + 0.5 * sin(t * 30.0)
 	match estado:
 		Estado.DORME:
-			_bocal.modulate = Color(0.35, 0.1, 0.04, 0.7)
+			_bocal.modulate = Color(0.4, 0.75, 1.0, 0.85) if pausado else Color(0.35, 0.1, 0.04, 0.7)
 			_coluna.modulate.a = 0.0
 		Estado.AVISO:
 			# a chama pequena cresce ate' um quarto do alcance: le-se de longe
