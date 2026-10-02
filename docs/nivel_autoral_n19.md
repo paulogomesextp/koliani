@@ -6,7 +6,7 @@ parte saves) · **Gerada por:** `tools/construir_n19_sala_pressoes.py` +
 `tools/r4_lib.py` (editar lá, nunca no `.tscn`). Chave i18n: `level.n18`
 (os índices de `level.nXX` andam 1 atrás do número do nível; ver N18).
 
-**Estado: HUMAN PLAYTEST REQUIRED.** Tudo o que é técnico está provado (testes,
+**Estado: FECHADO tecnicamente (3 out 2026); playtest humano feito pelo Paulo.** Tudo o que é técnico está provado (testes,
 piloto físico, crivo dos 100 níveis); a justiça dos tempos, a dificuldade e a
 sensação de toque só se decidem a jogar.
 
@@ -24,11 +24,10 @@ sincronizada → D Sala das Pressões → Guardião. Seguiu-se o briefing **dent
 do contrato (mecânicas e props são os do contrato; nada inventado).
 
 ### Decisões que divergem ou ficam em aberto
-1. **Guardião — DECISÃO DE CANON PENDENTE DO PAULO.** Os quatro inimigos
+1. **Guardião — DECISÃO FECHADA (3 out 2026): Lança-Chamas elite é canónico para o N19.** Os quatro inimigos
    principais do N19 na prancha (Válvula Viva, Assassino Ígneo, Torreta de
    Plasma, Gárgula de Fogo) **não têm espécie extraída**; o Autómato de
-   Fundição é do N17 e a Sentinela de Pressão do N18. Usado como **placeholder
-   técnico** o **Lança-Chamas elite** (espécie já extraída, escala 1,6; chave
+   Fundição é do N17 e a Sentinela de Pressão do N18. Usado, e agora formalizado, o **Lança-Chamas elite** (espécie já extraída, escala 1,6; chave
    `guard.lanca_chamas` nas 6 línguas). Nenhuma espécie nova foi inventada.
 2. **Inimigos**: só espécies extraídas da Região IV (Trabalhador Corrompido,
    Arqueiro da Fornalha, Lança-Chamas). O contrato diz combate 50 % — o N19
@@ -144,10 +143,9 @@ passa de pequena a ≥ 2,5 s (testado).
 
 ## Por fazer / risco
 - **HUMAN PLAYTEST REQUIRED** (checklist no relatório final).
-- Guardião: canon pendente (Lança-Chamas é placeholder).
-- Combate abaixo dos 50 % do contrato.
+- Guardião: fechado (Lança-Chamas elite; as 4 espécies do contrato não têm arte e não se improvisou nenhuma).
+- Combate: reforçado de forma moderada (+2 Trabalhadores em chão sem perigos, `TrabalhadorB` 1930 e `TrabalhadorD` 5040; total 4 + elite). Ficou abaixo dos 50 % do contrato de propósito: o foco é a máquina (pistões/válvulas/jatos já ocupam a atenção) e mais inimigos pioravam a leitura.
 - `level.n18` nas línguas não-pt/en estava em inglês ("Temple of the Serpent"):
   agora traduzido para as 6; as chaves `guard.automato_de_fundicao` aparecem
-  duas vezes em cada `*.json` (herdado do merge do N17; a 2.ª, em inglês,
-  ganha nas línguas não-inglesas) — **não tocado** aqui.
+  duas vezes em cada `*.json` — **CORRIGIDO** (removida a duplicada em inglês; `tests/test_i18n_sem_chaves_duplicadas.gd` impede o regresso).
 - Pistão horizontal (`direcao` ≠ baixo): geometria testada, sem nível a usá-lo.

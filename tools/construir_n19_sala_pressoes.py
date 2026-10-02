@@ -216,6 +216,9 @@ usar as valvulas -- so' sai mais caro sem elas.
 """)
 c.plat("ChaoB1", 1500, 2440, CH, h=70, av=130)
 c.valvula("ValvulaB1", 1620, CH, "b1", janela=10.0, aviso_fim=2.0, cor=FOGO)
+# combate moderado (decisao de fecho): 1 trabalhador no corredor B1, antes dos pistoes,
+# num chao sem perigos -- le-se sem competir com a maquina
+c.inimigo("TrabalhadorB", 1930, CH - 50, "trabalhador_corrompido", "patrulha", 40, 12, 40)
 c.assente("ColunaB1", "r4_coluna", 1560, CH, esc=1.2, z=-4, mod=SOMBRA)
 c.assente("TuboV1", "r4_tubo_l", 1670, CH - 130, esc=0.6, z=-5, mod=SOMBRA)
 c.luz("LuzV1", 1620, CH - 50, 0.7, "Color(1.0, 0.5, 0.25, 1)", (1.4, 1.1))
@@ -319,6 +322,7 @@ blocos criticos. SEGREDO 3: V5 faz aparecer a StepD ate' uma alcova sobre o
 fosso (esperar na entrada em vez de correr).
 """)
 c.plat("ChaoD0", 4900, 5160, CH, h=70, av=130)
+c.inimigo("TrabalhadorD", 5040, CH - 50, "trabalhador_corrompido", "patrulha", 40, 12, 40)
 D0 = 5160
 c.valvula("ValvulaD", 5040, CH, "d", janela=12.0, aviso_fim=2.0, cor=GELO)
 c.assente("ColunaD0", "r4_coluna", 4930, CH, esc=1.3, z=-4, mod=SOMBRA)

@@ -19,7 +19,10 @@ legado — mudá-lo parte saves) · **Gerada por:** `tools/construir_n18_camara.
 3. **Guardião**: o contrato não nomeia o do N18. Usada a **Sentinela de Pressão**
    elite (um dos 4 inimigos principais do N18 na prancha; o Autómato de Fundição
    já é o guardião do N17). Marcado:
-   **GUARDIÃO N18 — NECESSITA DECISÃO DO PAULO.**
+   **GUARDIÃO N18 — DECISÃO FECHADA (3 out 2026): Sentinela de Pressão é canónica.**
+   Razões: espécie extraída e com arte (prancha `enemy_gameplay_pack.png`: "Suporte e controlo — deteta o
+   jogador, ativa alarmes/mecanismos"), encaixa na Câmara da Lava (mecanismos + jatos), não repete o N17
+   (Autómato) nem o N19 (Lança-Chamas) e não obriga a inventar arte.
 4. "Elemento de Lava" (contrato) não tem espécie extraída; não se inventou.
 5. Dimensão: **6800 px** de largura (briefing: 4200–4800 de referência). Razão:
    4 secções + poço + arena com vãos ≤ envelope do salto duplo. A altura útil
@@ -67,9 +70,9 @@ magma" da prancha) a marcar a poça A e o poço C.
 - Capturas reais: `docs/qa/n18_autoral/`.
 
 ## Por fazer / risco
-- **HUMAN PLAYTEST REQUIRED**: justiça dos timings (ciclo da lava C, jatos,
+- Playtest humano feito; ficam apenas como pontos de afinação futura: justiça dos timings (ciclo da lava C, jatos,
   elevadores sem pausa nas pontas), dificuldade de C3, TTK do Guardião.
 - Largura 6800 px acima da referência do briefing.
 - Lava do poço é não letal (20/0,6 s) mas cair no fundo é "queda sem retorno":
   o CP trata.
-- Guardião a confirmar.
+- Guardião: fechado (Sentinela de Pressão). Playtest humano do N18 já feito pelo Paulo (3 out 2026).

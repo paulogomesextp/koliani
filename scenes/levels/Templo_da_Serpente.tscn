@@ -32,16 +32,16 @@
 [ext_resource type="Script" path="res://scripts/checkpoint.gd" id="19_s_checkpoint.gd"]
 [ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/fornalha/r4_valvula_roda.png" id="20_t_r4_valvula_roda"]
 [ext_resource type="Script" path="res://scripts/valvula_fornalha.gd" id="21_s_valvula_fornalha.gd"]
-[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/fornalha/r4_tubo_l.png" id="22_t_r4_tubo_l"]
-[ext_resource type="PackedScene" uid="uid://bkolianiplatritmada05" path="res://scenes/actors/PlataformaRitmada.tscn" id="23_a_ritmo"]
-[ext_resource type="PackedScene" uid="uid://bkolianiessencia01" path="res://scenes/actors/Essencia.tscn" id="24_a_ess"]
-[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/fornalha/r4_lava_estatica.png" id="25_t_r4_lava_estatica"]
-[ext_resource type="PackedScene" uid="uid://bkolianilavafornalha04" path="res://scenes/actors/LavaFornalha.tscn" id="26_c_LavaFornalha.tscn"]
-[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/fornalha/r4_queda_lava.png" id="27_t_r4_queda_lava"]
-[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/fornalha/r4_lava_eruptiva.png" id="28_t_r4_lava_eruptiva"]
-[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/fornalha/r4_caldeira.png" id="29_t_r4_caldeira"]
-[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/fornalha/r4_bandeira.png" id="30_t_r4_bandeira"]
-[ext_resource type="PackedScene" uid="uid://bdemoniobase01" path="res://scenes/actors/DemonioBase.tscn" id="31_a_dem"]
+[ext_resource type="PackedScene" uid="uid://bdemoniobase01" path="res://scenes/actors/DemonioBase.tscn" id="22_a_dem"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/fornalha/r4_tubo_l.png" id="23_t_r4_tubo_l"]
+[ext_resource type="PackedScene" uid="uid://bkolianiplatritmada05" path="res://scenes/actors/PlataformaRitmada.tscn" id="24_a_ritmo"]
+[ext_resource type="PackedScene" uid="uid://bkolianiessencia01" path="res://scenes/actors/Essencia.tscn" id="25_a_ess"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/fornalha/r4_lava_estatica.png" id="26_t_r4_lava_estatica"]
+[ext_resource type="PackedScene" uid="uid://bkolianilavafornalha04" path="res://scenes/actors/LavaFornalha.tscn" id="27_c_LavaFornalha.tscn"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/fornalha/r4_queda_lava.png" id="28_t_r4_queda_lava"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/fornalha/r4_lava_eruptiva.png" id="29_t_r4_lava_eruptiva"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/fornalha/r4_caldeira.png" id="30_t_r4_caldeira"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/fornalha/r4_bandeira.png" id="31_t_r4_bandeira"]
 [ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/fornalha/r4_forno.png" id="32_t_r4_forno"]
 [ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/fornalha/r4_eng_grande.png" id="33_t_r4_eng_grande"]
 [ext_resource type="Script" path="res://scripts/gira_devagar.gd" id="34_s_gira_devagar.gd"]
@@ -363,6 +363,15 @@ aviso_fim_seg = 2
 cor_ligacao = Color(1.0, 0.5, 0.2, 1)
 textura = ExtResource("20_t_r4_valvula_roda")
 
+[node name="TrabalhadorB" parent="." instance=ExtResource("22_a_dem")]
+position = Vector2(1930, 550)
+especie = "trabalhador_corrompido"
+vida = 40
+dano_contacto = 12
+comportamento = "patrulha"
+alcance_patrulha = 40
+cor_rim = Color(1.0, 0.52, 0.16, 1)
+
 [node name="ColunaB1" type="Sprite2D" parent="."]
 position = Vector2(1560, 465.2)
 scale = Vector2(1.2, 1.2)
@@ -373,7 +382,7 @@ modulate = Color(0.42, 0.34, 0.36, 1)
 [node name="TuboV1" type="Sprite2D" parent="."]
 position = Vector2(1670, 370.3)
 scale = Vector2(0.6, 0.6)
-texture = ExtResource("22_t_r4_tubo_l")
+texture = ExtResource("23_t_r4_tubo_l")
 z_index = -5
 modulate = Color(0.42, 0.34, 0.36, 1)
 
@@ -386,7 +395,7 @@ scale = Vector2(1.4, 1.1)
 
 ; SEGREDO 1 -- a StepB1 so' existe com a valvula V1 aberta (10 s): sobe-se
 ; para a alcova a 175 px. Regresso: cair para o chao.
-[node name="StepB1" parent="." instance=ExtResource("23_a_ritmo")]
+[node name="StepB1" parent="." instance=ExtResource("24_a_ritmo")]
 position = Vector2(1775, 521)
 tamanho = Vector2(60, 22)
 altura_visual = 34
@@ -408,7 +417,7 @@ altura_visual = 40
 cor_base = Color(0.2, 0.16, 0.16, 1)
 cor_topo = Color(0.42, 0.3, 0.26, 1)
 
-[node name="EssenciaSegredoA" parent="." instance=ExtResource("24_a_ess")]
+[node name="EssenciaSegredoA" parent="." instance=ExtResource("25_a_ess")]
 position = Vector2(1875, 389)
 valor = 25
 
@@ -539,7 +548,7 @@ texture = ExtResource("6_t_r4_coluna")
 z_index = -4
 modulate = Color(0.42, 0.34, 0.36, 1)
 
-[node name="LavaB2" parent="." instance=ExtResource("26_c_LavaFornalha.tscn")]
+[node name="LavaB2" parent="." instance=ExtResource("27_c_LavaFornalha.tscn")]
 position = Vector2(2670, 680)
 largura = 460
 altura = 80
@@ -547,7 +556,7 @@ cor = Color(1.0, 0.34, 0.08, 0.93)
 brasas = true
 letal = false
 dano_lava = 22
-textura_lava = ExtResource("25_t_r4_lava_estatica")
+textura_lava = ExtResource("26_t_r4_lava_estatica")
 z_index = -1
 
 [node name="FundoLavaB2" parent="." instance=ExtResource("3_a_pl")]
@@ -571,7 +580,7 @@ altura_visual = 0
 cor_base = Color(0.2, 0.16, 0.16, 1)
 cor_topo = Color(0.42, 0.3, 0.26, 1)
 
-[node name="RitmadaB1" parent="." instance=ExtResource("23_a_ritmo")]
+[node name="RitmadaB1" parent="." instance=ExtResource("24_a_ritmo")]
 position = Vector2(2530, 611)
 tamanho = Vector2(100, 22)
 altura_visual = 34
@@ -586,7 +595,7 @@ relogio_local = true
 grupo_valvula = "b2"
 efeito_valvula = "solida"
 
-[node name="RitmadaB2" parent="." instance=ExtResource("23_a_ritmo")]
+[node name="RitmadaB2" parent="." instance=ExtResource("24_a_ritmo")]
 position = Vector2(2666, 611)
 tamanho = Vector2(100, 22)
 altura_visual = 34
@@ -601,7 +610,7 @@ relogio_local = true
 grupo_valvula = "b2"
 efeito_valvula = "solida"
 
-[node name="RitmadaB3" parent="." instance=ExtResource("23_a_ritmo")]
+[node name="RitmadaB3" parent="." instance=ExtResource("24_a_ritmo")]
 position = Vector2(2802, 611)
 tamanho = Vector2(100, 22)
 altura_visual = 34
@@ -637,7 +646,7 @@ color_ramp = SubResource("ramp_fumo")
 [node name="QuedaB2" type="Sprite2D" parent="."]
 position = Vector2(2670, 490)
 scale = Vector2(1.3, 1.3)
-texture = ExtResource("27_t_r4_queda_lava")
+texture = ExtResource("28_t_r4_queda_lava")
 z_index = -6
 modulate = Color(1, 0.7, 0.45, 0.8)
 material = SubResource("mat_add")
@@ -645,7 +654,7 @@ material = SubResource("mat_add")
 [node name="MarcadorLavaB" type="Sprite2D" parent="."]
 position = Vector2(2670, 619.4)
 scale = Vector2(0.9, 0.9)
-texture = ExtResource("28_t_r4_lava_eruptiva")
+texture = ExtResource("29_t_r4_lava_eruptiva")
 z_index = -6
 modulate = Color(1, 0.7, 0.5, 0.8)
 
@@ -676,7 +685,7 @@ shape = SubResource("rs_chk")
 [node name="CaldeiraC" type="Sprite2D" parent="."]
 position = Vector2(3010, 429.2)
 scale = Vector2(0.9, 0.9)
-texture = ExtResource("29_t_r4_caldeira")
+texture = ExtResource("30_t_r4_caldeira")
 z_index = -5
 modulate = Color(0.42, 0.34, 0.36, 1)
 
@@ -693,7 +702,7 @@ textura = ExtResource("20_t_r4_valvula_roda")
 [node name="BandeiraC" type="Sprite2D" parent="."]
 position = Vector2(3000, 207)
 scale = Vector2(1, 1)
-texture = ExtResource("30_t_r4_bandeira")
+texture = ExtResource("31_t_r4_bandeira")
 z_index = -3
 
 [node name="PistaoC1" type="Area2D" parent="."]
@@ -819,7 +828,7 @@ aviso_fim_seg = 2
 cor_ligacao = Color(0.45, 0.8, 1.0, 1)
 textura = ExtResource("20_t_r4_valvula_roda")
 
-[node name="LavaC2" parent="." instance=ExtResource("26_c_LavaFornalha.tscn")]
+[node name="LavaC2" parent="." instance=ExtResource("27_c_LavaFornalha.tscn")]
 position = Vector2(3995, 680)
 largura = 710
 altura = 80
@@ -827,7 +836,7 @@ cor = Color(1.0, 0.34, 0.08, 0.93)
 brasas = true
 letal = false
 dano_lava = 22
-textura_lava = ExtResource("25_t_r4_lava_estatica")
+textura_lava = ExtResource("26_t_r4_lava_estatica")
 z_index = -1
 
 [node name="FundoLavaC2" parent="." instance=ExtResource("3_a_pl")]
@@ -851,7 +860,7 @@ altura_visual = 0
 cor_base = Color(0.2, 0.16, 0.16, 1)
 cor_topo = Color(0.42, 0.3, 0.26, 1)
 
-[node name="RitmadaC1" parent="." instance=ExtResource("23_a_ritmo")]
+[node name="RitmadaC1" parent="." instance=ExtResource("24_a_ritmo")]
 position = Vector2(3720, 611)
 tamanho = Vector2(80, 22)
 altura_visual = 34
@@ -866,7 +875,7 @@ relogio_local = true
 grupo_valvula = "c2"
 efeito_valvula = "solida"
 
-[node name="RitmadaC2" parent="." instance=ExtResource("23_a_ritmo")]
+[node name="RitmadaC2" parent="." instance=ExtResource("24_a_ritmo")]
 position = Vector2(3841, 611)
 tamanho = Vector2(90, 22)
 altura_visual = 34
@@ -881,7 +890,7 @@ relogio_local = true
 grupo_valvula = "c2"
 efeito_valvula = "solida"
 
-[node name="RitmadaC3" parent="." instance=ExtResource("23_a_ritmo")]
+[node name="RitmadaC3" parent="." instance=ExtResource("24_a_ritmo")]
 position = Vector2(4152, 611)
 tamanho = Vector2(80, 22)
 altura_visual = 34
@@ -896,7 +905,7 @@ relogio_local = true
 grupo_valvula = "c2"
 efeito_valvula = "solida"
 
-[node name="RitmadaC4" parent="." instance=ExtResource("23_a_ritmo")]
+[node name="RitmadaC4" parent="." instance=ExtResource("24_a_ritmo")]
 position = Vector2(4268, 611)
 tamanho = Vector2(80, 22)
 altura_visual = 34
@@ -977,14 +986,14 @@ color_ramp = SubResource("ramp_fumo")
 [node name="QuedaC2" type="Sprite2D" parent="."]
 position = Vector2(3995, 490)
 scale = Vector2(1.3, 1.3)
-texture = ExtResource("27_t_r4_queda_lava")
+texture = ExtResource("28_t_r4_queda_lava")
 z_index = -6
 modulate = Color(1, 0.7, 0.45, 0.8)
 material = SubResource("mat_add")
 
 ; SEGREDO 2 -- a StepC so' existe com a valvula V4 aberta: escada ate' a alcova
 ; (425). Regresso: cair para a RC1/RC2 (ou para o fosso, que e' nao letal).
-[node name="StepC" parent="." instance=ExtResource("23_a_ritmo")]
+[node name="StepC" parent="." instance=ExtResource("24_a_ritmo")]
 position = Vector2(3699.5, 521)
 tamanho = Vector2(55, 22)
 altura_visual = 34
@@ -1006,7 +1015,7 @@ altura_visual = 40
 cor_base = Color(0.2, 0.16, 0.16, 1)
 cor_topo = Color(0.42, 0.3, 0.26, 1)
 
-[node name="EssenciaSegredoB" parent="." instance=ExtResource("24_a_ess")]
+[node name="EssenciaSegredoB" parent="." instance=ExtResource("25_a_ess")]
 position = Vector2(3764, 389)
 valor = 25
 
@@ -1031,7 +1040,7 @@ altura_visual = 40
 cor_base = Color(0.2, 0.16, 0.16, 1)
 cor_topo = Color(0.42, 0.3, 0.26, 1)
 
-[node name="ArqueiroC" parent="." instance=ExtResource("31_a_dem")]
+[node name="ArqueiroC" parent="." instance=ExtResource("22_a_dem")]
 position = Vector2(4720, 450)
 especie = "arqueiro_da_fornalha"
 vida = 30
@@ -1040,7 +1049,7 @@ comportamento = "cuspidor"
 alcance_patrulha = 40
 cor_rim = Color(1.0, 0.52, 0.16, 1)
 
-[node name="TrabalhadorC" parent="." instance=ExtResource("31_a_dem")]
+[node name="TrabalhadorC" parent="." instance=ExtResource("22_a_dem")]
 position = Vector2(4470, 550)
 especie = "trabalhador_corrompido"
 vida = 40
@@ -1086,6 +1095,15 @@ altura_visual = 130
 cor_base = Color(0.2, 0.16, 0.16, 1)
 cor_topo = Color(0.42, 0.3, 0.26, 1)
 
+[node name="TrabalhadorD" parent="." instance=ExtResource("22_a_dem")]
+position = Vector2(5040, 550)
+especie = "trabalhador_corrompido"
+vida = 40
+dano_contacto = 12
+comportamento = "patrulha"
+alcance_patrulha = 40
+cor_rim = Color(1.0, 0.52, 0.16, 1)
+
 [node name="ValvulaD" type="Area2D" parent="."]
 script = ExtResource("21_s_valvula_fornalha.gd")
 position = Vector2(5040, 600)
@@ -1104,7 +1122,7 @@ z_index = -4
 modulate = Color(0.42, 0.34, 0.36, 1)
 
 ; SEGREDO 3 -- StepD (so' com V5 aberta) -> alcova SegredoC sobre o fosso.
-[node name="StepD" parent="." instance=ExtResource("23_a_ritmo")]
+[node name="StepD" parent="." instance=ExtResource("24_a_ritmo")]
 position = Vector2(5120, 521)
 tamanho = Vector2(60, 22)
 altura_visual = 34
@@ -1126,11 +1144,11 @@ altura_visual = 40
 cor_base = Color(0.2, 0.16, 0.16, 1)
 cor_topo = Color(0.42, 0.3, 0.26, 1)
 
-[node name="EssenciaSegredoC" parent="." instance=ExtResource("24_a_ess")]
+[node name="EssenciaSegredoC" parent="." instance=ExtResource("25_a_ess")]
 position = Vector2(5210, 389)
 valor = 40
 
-[node name="LavaD" parent="." instance=ExtResource("26_c_LavaFornalha.tscn")]
+[node name="LavaD" parent="." instance=ExtResource("27_c_LavaFornalha.tscn")]
 position = Vector2(5566, 680)
 largura = 812
 altura = 80
@@ -1138,7 +1156,7 @@ cor = Color(1.0, 0.34, 0.08, 0.93)
 brasas = true
 letal = false
 dano_lava = 22
-textura_lava = ExtResource("25_t_r4_lava_estatica")
+textura_lava = ExtResource("26_t_r4_lava_estatica")
 z_index = -1
 
 [node name="FundoLavaD" parent="." instance=ExtResource("3_a_pl")]
@@ -1162,7 +1180,7 @@ altura_visual = 0
 cor_base = Color(0.2, 0.16, 0.16, 1)
 cor_topo = Color(0.42, 0.3, 0.26, 1)
 
-[node name="RitmadaD1" parent="." instance=ExtResource("23_a_ritmo")]
+[node name="RitmadaD1" parent="." instance=ExtResource("24_a_ritmo")]
 position = Vector2(5240, 611)
 tamanho = Vector2(80, 22)
 altura_visual = 34
@@ -1177,7 +1195,7 @@ relogio_local = true
 grupo_valvula = "d"
 efeito_valvula = "solida"
 
-[node name="RitmadaD2" parent="." instance=ExtResource("23_a_ritmo")]
+[node name="RitmadaD2" parent="." instance=ExtResource("24_a_ritmo")]
 position = Vector2(5361, 611)
 tamanho = Vector2(90, 22)
 altura_visual = 34
@@ -1242,7 +1260,7 @@ fase_retoma = 0
 textura_jato = ExtResource("15_t_r4_jato_fogo")
 textura_bocal = ExtResource("16_t_r4_piso_quente")
 
-[node name="RitmadaD3" parent="." instance=ExtResource("23_a_ritmo")]
+[node name="RitmadaD3" parent="." instance=ExtResource("24_a_ritmo")]
 position = Vector2(5680, 611)
 tamanho = Vector2(80, 22)
 altura_visual = 34
@@ -1257,7 +1275,7 @@ relogio_local = true
 grupo_valvula = "d"
 efeito_valvula = "solida"
 
-[node name="RitmadaD4" parent="." instance=ExtResource("23_a_ritmo")]
+[node name="RitmadaD4" parent="." instance=ExtResource("24_a_ritmo")]
 position = Vector2(5791, 611)
 tamanho = Vector2(70, 22)
 altura_visual = 34
@@ -1272,7 +1290,7 @@ relogio_local = true
 grupo_valvula = "d"
 efeito_valvula = "solida"
 
-[node name="RitmadaD5" parent="." instance=ExtResource("23_a_ritmo")]
+[node name="RitmadaD5" parent="." instance=ExtResource("24_a_ritmo")]
 position = Vector2(5897, 611)
 tamanho = Vector2(70, 22)
 altura_visual = 34
@@ -1366,7 +1384,7 @@ color_ramp = SubResource("ramp_fumo")
 [node name="QuedaD" type="Sprite2D" parent="."]
 position = Vector2(5566, 490)
 scale = Vector2(1.4, 1.4)
-texture = ExtResource("27_t_r4_queda_lava")
+texture = ExtResource("28_t_r4_queda_lava")
 z_index = -6
 modulate = Color(1, 0.7, 0.45, 0.8)
 material = SubResource("mat_add")
@@ -1374,7 +1392,7 @@ material = SubResource("mat_add")
 [node name="MarcadorLavaD" type="Sprite2D" parent="."]
 position = Vector2(5566, 562.4)
 scale = Vector2(1.4, 1.4)
-texture = ExtResource("28_t_r4_lava_eruptiva")
+texture = ExtResource("29_t_r4_lava_eruptiva")
 z_index = -6
 modulate = Color(1, 0.7, 0.5, 0.8)
 
@@ -1548,7 +1566,7 @@ region_rect = Rect2(0, 0, 117, 1340.91)
 z_index = -7
 modulate = Color(0.7, 0.5, 0.4, 0.8)
 
-[node name="GuardiaoN19" parent="." instance=ExtResource("31_a_dem")]
+[node name="GuardiaoN19" parent="." instance=ExtResource("22_a_dem")]
 position = Vector2(6392, 530)
 scale = Vector2(1.6, 1.6)
 elite = true
