@@ -1022,14 +1022,14 @@
   "h": 280,
   "pes_y": 235,
   "estados": {
-   "idle": 6,
+   "idle": 10,
    "walk": 8,
    "attack": 10,
    "hurt": 4,
    "death": 10
   },
   "fps": {
-   "idle": 7.0,
+   "idle": 10.0,
    "walk": 11.0,
    "attack": 12.0,
    "hurt": 12.0,

@@ -28,7 +28,7 @@ func _process(dt: float) -> void:
 			_ponta.modulate = Color(1, 1, 1)
 
 
-func receber_dano(_quantidade: int = 0, _dir: float = 0.0) -> void:
+func receber_dano(_quantidade: int = 0, _dir: float = 0.0, _critico := false, _recuo := 0.0) -> void:
 	_armado = dur_armado
 
 

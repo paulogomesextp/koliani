@@ -1177,7 +1177,8 @@ scale = Vector2(1.3, 1.1)
 ; Chao a 450. SEGURO | QUENTE | SEGURO | QUENTE | SEGURO. As duas faixas quentes
 ; ciclam em contra-fase (5 s de ciclo, desfasadas 2,5 s: nunca ardem as duas ao
 ; mesmo tempo) e sao propriedade da ARENA -- nada no Guardiao as controla. Pontas
-; sempre seguras. Guardiao = Automato de Fundicao elite (a confirmar pelo Paulo).
+; sempre seguras. Guardiao = Sentinela de Pressao elite (a confirmar pelo Paulo; o Automato de
+; Fundicao ja e o guardiao do N17).
 [node name="ChaoArena" parent="." instance=ExtResource("3_a_pl")]
 position = Vector2(6325, 485)
 tamanho = Vector2(910, 70)
@@ -1252,9 +1253,9 @@ color_ramp = SubResource("ramp_brasa")
 
 [node name="GuardiaoN18" parent="." instance=ExtResource("16_a_dem")]
 position = Vector2(6325, 380)
-scale = Vector2(1.3, 1.3)
+scale = Vector2(1.6, 1.6)
 elite = true
-especie = "automato_de_fundicao"
+especie = "sentinela_de_pressao"
 vida = 230
 dano_contacto = 20
 comportamento = "patrulha"
@@ -1418,3 +1419,77 @@ usar_golden_set = true
 [node name="Porta" parent="." instance=ExtResource("41_a_porta")]
 position = Vector2(6730, 444)
 pista_ao_atravessar = ""
+
+; MUROS DOS FOSSOS: sem eles, quem cai na lava anda pelo fundo do fosso e
+; passa por baixo do chao (barriga a 670, fundo a 720/760) -- o defeito que o bot
+; achou no N16. Cada muro fecha o vao sob a ponta do chao (do lado do CHAO, nao
+; do fosso: nao toca nos carrinhos nem nas lajes).
+[node name="MuroA1" parent="." instance=ExtResource("3_a_pl")]
+position = Vector2(1110, 695)
+tamanho = Vector2(40, 190)
+altura_visual = 0
+cor_base = Color(0.2, 0.16, 0.16, 1)
+cor_topo = Color(0.42, 0.3, 0.26, 1)
+
+[node name="MuroA2" parent="." instance=ExtResource("3_a_pl")]
+position = Vector2(1500, 695)
+tamanho = Vector2(40, 190)
+altura_visual = 0
+cor_base = Color(0.2, 0.16, 0.16, 1)
+cor_topo = Color(0.42, 0.3, 0.26, 1)
+
+[node name="MuroB1a" parent="." instance=ExtResource("3_a_pl")]
+position = Vector2(1600, 695)
+tamanho = Vector2(40, 190)
+altura_visual = 0
+cor_base = Color(0.2, 0.16, 0.16, 1)
+cor_topo = Color(0.42, 0.3, 0.26, 1)
+
+[node name="MuroB1b" parent="." instance=ExtResource("3_a_pl")]
+position = Vector2(1920, 695)
+tamanho = Vector2(40, 190)
+altura_visual = 0
+cor_base = Color(0.2, 0.16, 0.16, 1)
+cor_topo = Color(0.42, 0.3, 0.26, 1)
+
+[node name="MuroB2a" parent="." instance=ExtResource("3_a_pl")]
+position = Vector2(2080, 695)
+tamanho = Vector2(40, 190)
+altura_visual = 0
+cor_base = Color(0.2, 0.16, 0.16, 1)
+cor_topo = Color(0.42, 0.3, 0.26, 1)
+
+[node name="MuroB2b" parent="." instance=ExtResource("3_a_pl")]
+position = Vector2(2990, 695)
+tamanho = Vector2(40, 190)
+altura_visual = 0
+cor_base = Color(0.2, 0.16, 0.16, 1)
+cor_topo = Color(0.42, 0.3, 0.26, 1)
+
+[node name="MuroC1" parent="." instance=ExtResource("3_a_pl")]
+position = Vector2(3280, 710)
+tamanho = Vector2(40, 220)
+altura_visual = 0
+cor_base = Color(0.2, 0.16, 0.16, 1)
+cor_topo = Color(0.42, 0.3, 0.26, 1)
+
+[node name="MuroC2" parent="." instance=ExtResource("3_a_pl")]
+position = Vector2(4690, 710)
+tamanho = Vector2(40, 220)
+altura_visual = 0
+cor_base = Color(0.2, 0.16, 0.16, 1)
+cor_topo = Color(0.42, 0.3, 0.26, 1)
+
+[node name="MuroD1" parent="." instance=ExtResource("3_a_pl")]
+position = Vector2(5230, 695)
+tamanho = Vector2(40, 190)
+altura_visual = 0
+cor_base = Color(0.2, 0.16, 0.16, 1)
+cor_topo = Color(0.42, 0.3, 0.26, 1)
+
+[node name="MuroD2" parent="." instance=ExtResource("3_a_pl")]
+position = Vector2(5610, 695)
+tamanho = Vector2(40, 190)
+altura_visual = 0
+cor_base = Color(0.2, 0.16, 0.16, 1)
+cor_topo = Color(0.42, 0.3, 0.26, 1)

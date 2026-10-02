@@ -63,8 +63,8 @@ const CHEFE_KEY: Array[String] = [
 	"guard.monge_das_correntes", # 13 N14 -- Campanário
 	"boss.vyrak",                # 14 N15 -- O Topo dos Ecos (o chefe da Região III)
 	"guard.operario_blindado",    # 15 N16 -- Entrada da Fornalha (Região IV)
-	"boss.colosso_osseo",        # 16 Galeria dos Ossos
-	"guard.automato_de_fundicao", # 17 N18 -- Camara da Lava (Regiao IV; guardiao a confirmar)
+	"guard.automato_de_fundicao",  # 16 N17 -- Fundição (Região IV)
+	"guard.sentinela_de_pressao", # 17 N18 -- Câmara da Lava (Região IV; guardião a confirmar)
 	"boss.naga_zeraph",          # 18 Templo da Serpente
 	"boss.olho_do_abismo",       # 19 O Abismo
 	"boss.prefeito_sem_rosto",   # 20 Vila dos Sem-Rosto

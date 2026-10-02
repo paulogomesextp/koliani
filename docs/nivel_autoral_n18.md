@@ -5,8 +5,8 @@ legado — mudá-lo parte saves) · **Gerada por:** `tools/construir_n18_camara.
 + `tools/r4_lib.py` (editar lá, nunca no `.tscn`). Chave i18n: `level.n17`.
 
 ## Decisões que divergiram do briefing (contrato LOCKED ganha)
-1. **N17 não existe** no repo (ainda é a "Galeria dos Ossos" legada). Não se
-   construiu: o N18 reutiliza só as peças que já existiam (carrinhos
+1. **O N17 não existia** quando o N18 foi construído (entretanto o colega publicou-o
+   no master e o merge foi feito). O N18 reutiliza só peças que já existiam (carrinhos
    `PlataformaCorrente`, `PlataformaQuebra`, `ElevadorColuna`, `PisoQuente`,
    `JatoFornalha`, `LavaFornalha`).
 2. **Contrato LOCKED do N18** (`region_04/level_mechanics.png`,
@@ -16,8 +16,9 @@ legado — mudá-lo parte saves) · **Gerada por:** `tools/construir_n18_camara.
    Ígneo / Autómato Pesado. O briefing pedia "Ritmo da Fornalha". Seguiu-se o
    contrato e a estrutura A–D + arena do briefing foi **tecida à volta da lava
    que sobe**.
-3. **Guardião**: o contrato não nomeia o do N18. Usado o **Autómato de Fundição**
-   elite (um dos 4 inimigos principais do N18 na prancha). Marcado:
+3. **Guardião**: o contrato não nomeia o do N18. Usada a **Sentinela de Pressão**
+   elite (um dos 4 inimigos principais do N18 na prancha; o Autómato de Fundição
+   já é o guardião do N17). Marcado:
    **GUARDIÃO N18 — NECESSITA DECISÃO DO PAULO.**
 4. "Elemento de Lava" (contrato) não tem espécie extraída; não se inventou.
 5. Dimensão: **6800 px** de largura (briefing: 4200–4800 de referência). Razão:
@@ -47,7 +48,7 @@ desce. `elevacao_em(t)` / `em_aviso_em(t)` são funções puras (testadas).
 cair na Laje 1); **S2** E1 vai além da saída (210) → alcova (regresso: cair no
 patamar); **S3** poleiro D1 → 3 saltos → alcova (regresso directo à pedra de
 espera, antes do CP5). Inimigos: Trabalhador Corrompido, Arqueiro da Fornalha,
-Sentinela de Pressão, Autómato de Fundição (elite). **Sem chefe.**
+Sentinela de Pressão, Sentinela de Pressão (elite). **Sem chefe.**
 
 **Marco visual do nível:** a *lava eruptiva* (`r4_lava_eruptiva`, "coluna de
 magma" da prancha) a marcar a poça A e o poço C.
@@ -71,4 +72,4 @@ magma" da prancha) a marcar a poça A e o poço C.
 - Largura 6800 px acima da referência do briefing.
 - Lava do poço é não letal (20/0,6 s) mas cair no fundo é "queda sem retorno":
   o CP trata.
-- Guardião a confirmar. N17 por construir.
+- Guardião a confirmar.

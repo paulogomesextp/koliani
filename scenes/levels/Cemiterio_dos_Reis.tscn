@@ -1020,3 +1020,42 @@ usar_golden_set = true
 [node name="Porta" parent="." instance=ExtResource("37_a_porta")]
 position = Vector2(4500, 594)
 pista_ao_atravessar = ""
+
+; PAREDES DOS LAGOS: sem elas, quem cai na lava e anda ate' ao fim do chao do
+; lago passava por baixo do ChaoB/ChaoC2/ChaoD e caia no vazio (o bot experiente
+; caiu 3x em x=1630). Cada parede fecha o vao entre a barriga da laje e o fundo.
+; O lado leste do lago B fica aberto de proposito: dai' entra-se no tunel.
+[node name="MuroA" parent="." instance=ExtResource("3_a_pl")]
+position = Vector2(980, 680)
+tamanho = Vector2(40, 160)
+altura_visual = 0
+cor_base = Color(0.2, 0.16, 0.16, 1)
+cor_topo = Color(0.42, 0.3, 0.26, 1)
+
+[node name="MuroB1" parent="." instance=ExtResource("3_a_pl")]
+position = Vector2(1420, 680)
+tamanho = Vector2(40, 160)
+altura_visual = 0
+cor_base = Color(0.2, 0.16, 0.16, 1)
+cor_topo = Color(0.42, 0.3, 0.26, 1)
+
+[node name="MuroB2" parent="." instance=ExtResource("3_a_pl")]
+position = Vector2(1880, 680)
+tamanho = Vector2(40, 160)
+altura_visual = 0
+cor_base = Color(0.2, 0.16, 0.16, 1)
+cor_topo = Color(0.42, 0.3, 0.26, 1)
+
+[node name="MuroC1" parent="." instance=ExtResource("3_a_pl")]
+position = Vector2(3480, 680)
+tamanho = Vector2(40, 160)
+altura_visual = 0
+cor_base = Color(0.2, 0.16, 0.16, 1)
+cor_topo = Color(0.42, 0.3, 0.26, 1)
+
+[node name="MuroD" parent="." instance=ExtResource("3_a_pl")]
+position = Vector2(3880, 680)
+tamanho = Vector2(40, 160)
+altura_visual = 0
+cor_base = Color(0.2, 0.16, 0.16, 1)
+cor_topo = Color(0.42, 0.3, 0.26, 1)

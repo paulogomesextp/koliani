@@ -92,7 +92,7 @@
   "region.1.complete": "堕落森林已完成",
   "region.2.complete": "风之峡谷已完成",
   "chest.continue": "继续",
-  "chest.essence": "精华",
+  "chest.kolicoins": "Kolicoins",
   "chest.title": "首领奖励",
   "clue.abismo_o_que_esta_la_em_baixo.body": "那只眼没有身体，也没有自己的名字——它是一个盖子。泽里科的力量从来不属于他；那是从这口井里被拉上来的，而眼在此守望，不让别的东西再上来，也不让任何人下去查看。它放奥萝拉过去，只有一个条件，刻在岩石上：不许往下看。她继续往前走。她没有看。",
   "clue.abismo_o_que_esta_la_em_baixo.title": "眼所守的东西",
@@ -331,7 +331,7 @@
   "level.n13": "The Belfry",
   "level.n14": "The Summit of Echoes",
   "level.n15": "Furnace Gate",
-  "level.n16": "Gallery of Bones",
+  "level.n16": "Foundry",
   "level.n17": "熔岩之室",
   "level.n18": "Temple of the Serpent",
   "level.n19": "The Abyss",
@@ -796,5 +796,7 @@
   "guard.automato_de_fundicao": "铸造自动机",
   "mec.piso_quente.nome": "Hot Floor",
   "mec.piso_quente.txt": "The iron plates glow before they burn. Cross them while they are cold, or jump clear when they turn red.",
+  "guard.automato_de_fundicao": "Foundry Automaton",
+  "guard.sentinela_de_pressao": "压力哨兵",
   "combat.perfect_dodge": "完美闪避"
 }

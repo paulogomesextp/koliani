@@ -1,4 +1,6 @@
-> **N18 "Camara da Lava" (2 out 2026, master)** -- `docs/nivel_autoral_n18.md`. Seguiu o contrato LOCKED (lava que sobe), nao o 'Ritmo da Fornalha' do briefing. **Pendente do Paulo:** (1) HUMAN PLAYTEST; (2) GUARDIAO N18 = Automato de Fundicao elite, a confirmar; (3) N17 (Fundicao) por construir; (4) largura 6800 px > referencia 4800.
+> **N18 "Camara da Lava" (2 out 2026, master)** -- `docs/nivel_autoral_n18.md`. Seguiu o contrato LOCKED (lava que sobe), nao o 'Ritmo da Fornalha' do briefing. **Pendente do Paulo:** (1) HUMAN PLAYTEST; (2) GUARDIAO N18 = Sentinela de Pressao elite, a confirmar (o Automato de Fundicao ja e o do N17); (3) largura 6800 px > referencia 4800.
+
+> **N17 "Fundicao" (1 out 2026, branch `claude/project-thread-lu210k`)** -- `docs/nivel_autoral_n17.md`. Dois niveis com elevadores de corrente, carrinhos, jatos e lajes que desabam; travessia real provada nos 3 perfis do bot. Pendente: playtest humano. Depois N18-N20.
 
 > **N16 "Entrada da Fornalha" (30 set 2026, branch `claude/project-thread-lu210k`)** -- `docs/nivel_autoral_n16.md`. Regiao IV comecada: arte das pranchas (terreno, fundo, props, 8 inimigos) + piso quente, jatos de fogo, lava rasa, carrinhos de minerio; guardiao Operario Blindado elite. **Pendente do Paulo**: playtest humano. Depois N17-N20.
 

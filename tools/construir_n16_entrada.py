@@ -249,4 +249,13 @@ CAB = """
 ; D saida para a fundicao (Operario Blindado elite a guardar o portao).
 ; 2 segredos, 4 checkpoints.
 """
+
+c.com("""PAREDES DOS LAGOS: sem elas, quem cai na lava e anda ate' ao fim do chao do
+lago passava por baixo do ChaoB/ChaoC2/ChaoD e caia no vazio (o bot experiente
+caiu 3x em x=1630). Cada parede fecha o vao entre a barriga da laje e o fundo.
+O lado leste do lago B fica aberto de proposito: dai' entra-se no tunel.""")
+for nome, x0, x1 in (("MuroA", 960, 1000), ("MuroB1", 1400, 1440), ("MuroB2", 1860, 1900),
+		("MuroC1", 3460, 3500), ("MuroD", 3860, 3900)):
+	c.plat(nome, x0, x1, CH, h=160, av=0)
+
 c.escrever(SAIDA, CAB)

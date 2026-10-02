@@ -43,7 +43,7 @@ func _correr() -> void:
 	add_child(_estado)
 	_estado.modo_teste = false
 	_estado.vidas = 4
-	_estado.essencia = 123
+	_estado.kolicoins = 123
 	# Um save realista: alguns niveis feitos, para o validador ter trabalho.
 	for indice: int in [0, 1, 2, 3, 4]:
 		_estado._registar_chefe_do_nivel_sem_guardar(indice)
@@ -99,7 +99,7 @@ func _medir(titulo: String, com_cache: bool) -> Dictionary:
 	var amostras: Array[float] = []
 	_IDS.zerar_diagnostico()
 	for i: int in AMOSTRAS:
-		_estado.essencia = 100 + i
+		_estado.kolicoins = 100 + i
 		var t0 := Time.get_ticks_usec()
 		_estado.guardar_em(_base(), _base() + ".bak", _base() + ".tmp")
 		amostras.append((Time.get_ticks_usec() - t0) / 1000.0)

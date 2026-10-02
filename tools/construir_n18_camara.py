@@ -279,7 +279,8 @@ c.com("""
 Chao a 450. SEGURO | QUENTE | SEGURO | QUENTE | SEGURO. As duas faixas quentes
 ciclam em contra-fase (5 s de ciclo, desfasadas 2,5 s: nunca ardem as duas ao
 mesmo tempo) e sao propriedade da ARENA -- nada no Guardiao as controla. Pontas
-sempre seguras. Guardiao = Automato de Fundicao elite (a confirmar pelo Paulo).
+sempre seguras. Guardiao = Sentinela de Pressao elite (a confirmar pelo Paulo; o Automato de
+Fundicao ja e o guardiao do N17).
 """)
 c.plat("ChaoArena", 5870, 6780, ARENA, h=70, av=130)
 c.check("CheckD5", 5920, ARENA)
@@ -287,8 +288,8 @@ c.piso_quente("PisoArena1", 6125, ARENA, 230, fase=0.0)
 c.piso_quente("PisoArena2", 6525, ARENA, 230, fase=2.5)
 c.brasas("BrasasArena1", 6125, ARENA - 6, 230, n=12)
 c.brasas("BrasasArena2", 6525, ARENA - 6, 230, n=12)
-c.inimigo("GuardiaoN18", 6325, ARENA - 70, "automato_de_fundicao", "patrulha", 230, 20, 150,
-          elite=True, escala=1.3)
+c.inimigo("GuardiaoN18", 6325, ARENA - 70, "sentinela_de_pressao", "patrulha", 230, 20, 150,
+          elite=True, escala=1.6)
 c.assente("ColunaArena1", "r4_coluna", 5890, ARENA, esc=1.3, z=-4, mod=SOMBRA)
 c.assente("ArcoArena", "r4_arco_gotico", 6325, ARENA, esc=1.8, z=-7, mod=SOMBRA)
 c.assente("BandeiraArena1", "r4_bandeira", 6200, ARENA - 300, esc=1.0, z=-3)
@@ -307,6 +308,18 @@ c.fumo("FumoArena", 6300, ARENA + 10, 800, n=10)
 c.no("Koliani", f"position = {v(170, CH - 40)}\nusar_prototipo_premium = true\n"
                 "usar_golden_set = true", inst=c.ator("kol"))
 c.no("Porta", f"position = {v(6730, ARENA - 6)}\npista_ao_atravessar = \"\"", inst=c.ator("porta"))
+
+
+c.com("""MUROS DOS FOSSOS: sem eles, quem cai na lava anda pelo fundo do fosso e
+passa por baixo do chao (barriga a 670, fundo a 720/760) -- o defeito que o bot
+achou no N16. Cada muro fecha o vao sob a ponta do chao (do lado do CHAO, nao
+do fosso: nao toca nos carrinhos nem nas lajes).""")
+for nome, x0, x1, base in (("MuroA1", 1090, 1130, 790), ("MuroA2", 1480, 1520, 790),
+		("MuroB1a", 1580, 1620, 790), ("MuroB1b", 1900, 1940, 790),
+		("MuroB2a", 2060, 2100, 790), ("MuroB2b", 2970, 3010, 790),
+		("MuroC1", 3260, 3300, 820), ("MuroC2", 4670, 4710, 820),
+		("MuroD1", 5210, 5250, 790), ("MuroD2", 5590, 5630, 790)):
+	c.plat(nome, x0, x1, CH, h=base - CH, av=0)
 
 CAB = """
 ; REGIAO IV / nivel 18 -- CAMARA DA LAVA (`level.n17`), "O nivel sobe junto".

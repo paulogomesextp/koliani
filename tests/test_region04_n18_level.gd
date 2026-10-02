@@ -14,8 +14,7 @@ extends RefCounted
 const CENA := "res://scenes/levels/Cripta_das_Mil_Velas.tscn"
 const INDICE_N18 := 17
 const N12 := preload("res://tests/test_region03_n12_level.gd")
-const ESPECIES := ["trabalhador_corrompido", "arqueiro_da_fornalha", "sentinela_de_pressao",
-	"automato_de_fundicao"]
+const ESPECIES := ["trabalhador_corrompido", "arqueiro_da_fornalha", "sentinela_de_pressao"]
 
 
 static func executar() -> Array[String]:
@@ -33,8 +32,8 @@ static func executar() -> Array[String]:
 		"N18: anuncia a lava que sobe")
 	_verificar(falhas, raiz.get_node_or_null("Porta") != null, "N18: tem porta")
 	_verificar(falhas, EstadoJogo.NIVEIS[INDICE_N18] == CENA, "N18: indice 17 aponta para esta cena")
-	_verificar(falhas, CatalogoCampanha.CHEFE_KEY[INDICE_N18] == "guard.automato_de_fundicao",
-		"N18: a HUD diz Automato de Fundicao (Guardiao, nao chefe)")
+	_verificar(falhas, CatalogoCampanha.CHEFE_KEY[INDICE_N18] == "guard.sentinela_de_pressao",
+		"N18: a HUD diz Sentinela de Pressao (Guardiao, nao chefe)")
 	var atm := raiz.get_node_or_null("Atmosfera")
 	_verificar(falhas, atm != null and String(atm.get("bioma")) == "fornalha", "N18: bioma fornalha")
 
@@ -79,6 +78,11 @@ static func executar() -> Array[String]:
 	_verificar(falhas, n.quebra >= 6, "N18: lajes que cedem (>= 6), ha' %d" % n.quebra)
 	_verificar(falhas, n.elevador >= 3, "N18: elevadores (>= 3), ha' %d" % n.elevador)
 	_verificar(falhas, n.segredo == 3, "N18: 3 essencias secretas, ha' %d" % n.segredo)
+	var muros := 0
+	for filho in raiz.get_children():
+		if String(filho.name).begins_with("Muro"):
+			muros += 1
+	_verificar(falhas, muros >= 10, "N18: muros dos fossos (>= 10), ha' %d" % muros)
 	_verificar(falhas, n.check == 5, "N18: 5 checkpoints, ha' %d" % n.check)
 
 	# --- vaos entre plataformas fixas cabem no salto duplo --------------------
