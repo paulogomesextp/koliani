@@ -1,3 +1,9 @@
+# >>> PLANO N1-N20 -- ponto de paragem (3 out 2026, fim da sessao) <<<
+No master: Fase A, B1 (encontros N1/N2/N16/N17), B2 (hitstop v2), B4 (guardioes so' no 2.o/4.o nivel), B5 (pico do N7), B8 (avisos sonoros R4).
+B4/B5/B8 foram para o master SEM a suite completa (pedido do Paulo, fim de usage) -- os testes afetados passaram um a um (SO_TESTE).
+PRIMEIRA COISA a fazer: `powershell -ExecutionPolicy Bypass -File tools/correr_testes.ps1` e corrigir o que cair.
+Por fazer: travessia N1/N3/N6/N8/N13/N18 depois do B4; B6 toque; B7 narrativa; B3 comportamentos; C*; D*. Relatorio: docs/execution_plano_n1_n20_faseA.md.
+
 # >>> PLANO DE MELHORIA N1-N20 -- Fase A + B2 feitas (3 out 2026, branch `plano-n1-n19`) <<<
 Plano: `docs/qa/full_game_review/PROMPT_CHATGPT_PLANO_N1_N20.md`; decisoes do Paulo DEC-011..014 em `docs/decisoes.md`
 (nomes canonicos; guardioes so' no 2.o/4.o nivel + boss; 1-2 salas que FECHAM ate' limpar; N11 refeito). Relatorio:
