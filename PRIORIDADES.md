@@ -1,3 +1,5 @@
+> **PLANO N1-N20 (3 out 2026, branch `plano-n1-n19`)** -- `docs/execution_plano_n1_n20_faseA.md`. Fase A fechada (A0-A5, N11 refeito) + B2 (hitstop v2 opt-in). Decidido pelo Paulo: DEC-011..014. **Pendente de decisao do Paulo:** (1) C1 densidade de pixel/filtro unicos; (2) aprovar a arte nova do Vyrak (C2) quando houver; (3) quem faz o playtest em telemovel e quando. **Playtest humano:** N11 novo (3-5 min?), peso do hitstop v2 em N1-N5.
+
 > **AUDITORIA EXTERNA N1-N19 (3 out 2026)** -- `docs/qa/full_game_review/RELATORIO_AUDITORIA_N1_N19.md`. **Pendente de decisao do Paulo:** (1) aprovar a ordem do `PROMPT_MELHORIAS_N1_N19.md` (Fase A = P0: suite verde, catalogo duplicado, placeholders da loja, nomes de regiao canonicos, N11 refeito); (2) densidade de pixel/filtro UNICOS para o jogo todo (C1); (3) nome visivel da Regiao I (cânone "Floresta Sagrada" vs "Floresta Corrompida"); (4) cortar guardioes para 2 por regiao + boss (B4). Nao avancar para N21.
 ## PENDENTE (3 out 2026) — Região IV
 - Playtest humano do Guardião da Fornalha (N20): telégrafos, TTK ~60 s, erupção/refúgios; validar em telemóvel. Rig com resolução da prancha (macio).

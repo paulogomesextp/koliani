@@ -1,3 +1,13 @@
+# >>> PLANO DE MELHORIA N1-N20 -- Fase A + B2 feitas (3 out 2026, branch `plano-n1-n19`) <<<
+Plano: `docs/qa/full_game_review/PROMPT_CHATGPT_PLANO_N1_N20.md`; decisoes do Paulo DEC-011..014 em `docs/decisoes.md`
+(nomes canonicos; guardioes so' no 2.o/4.o nivel + boss; 1-2 salas que FECHAM ate' limpar; N11 refeito). Relatorio:
+`docs/execution_plano_n1_n20_faseA.md`. Feito: A2 (placeholders fora da loja), A3 (Floresta Sagrada/Fornalha/Guardiao Verde,
+seletor via Textos), A5 (Dev fora das builds do CI), B2 (`combate_hitstop_v2` local, ligado N1-N5+N11), A4 (N11 refeito
+por `tools/construir_n11_entrada.py` + `scripts/arena_selada.gd`), D6 (bot com habilidades e que toca sinos). A0/A1 vieram
+de outra sessao (origin 4e9e1fdf) -- FAZER `git fetch` antes de cada tarefa. Armadilha grande: testes a `time_scale` != 1 que
+contam frames medem o hitstop, nao o jogo (o do Coracao so' passava porque o v1 repunha o time_scale a 1).
+Proximo: B1 (encontros, comecar N1/N2/N16/N17) -> B4 -> B5 -> B8 -> B6 -> B7 -> B3. HUMAN PLAYTEST: N11, hitstop v2.
+
 # >>> AUDITORIA EXTERNA N1-N19 (3 out 2026, read-only, sem mexer no produto) <<<
 Relatorio: `docs/qa/full_game_review/RELATORIO_AUDITORIA_N1_N19.md`; plano pronto a colar: `docs/qa/full_game_review/PROMPT_MELHORIAS_N1_N19.md`.
 N20 excluido (feito noutra conversa). Veredito: ALPHA, nota global 5/10. Top: combate raro/raso (1-8 inimigos/nivel, hitstop 10 ms, R4 atravessa-se em <1 min),
