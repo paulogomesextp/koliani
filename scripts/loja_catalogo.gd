@@ -148,11 +148,21 @@ static func existe(id: String) -> bool:
 	return not item(id).is_empty()
 
 
+## Vai para a grelha da loja? Itens `placeholder` (sem arte final) ficam
+## FORA até haver arte -- vendiam-se como células vazias (auditoria N1–N20,
+## A2). A exceção é o item inicial (a skin base já é do jogador). Os dados
+## não se apagam: `item()`/`todos()` continuam a vê-los (saves, packs).
+static func visivel_na_loja(it: Dictionary) -> bool:
+	return bool(it.get("inicial", false)) or not bool(it.get("placeholder", false))
+
+
 ## Itens de uma categoria. "destaques" = os marcados como destaque. Ordem: os
 ## iniciais primeiro e depois do mais raro para o mais comum (estável).
 static func da_categoria(cat: String) -> Array:
 	var fora := []
 	for it: Dictionary in ITENS:
+		if not visivel_na_loja(it):
+			continue
 		if cat == "destaques":
 			if it["destaque"]:
 				fora.append(it)

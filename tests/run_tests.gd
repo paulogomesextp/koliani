@@ -4879,6 +4879,17 @@ func teste_loja_catalogo() -> void:
 	for c: String in LojaCatalogo.CATEGORIAS:
 		_ok(c == "packs" or c == "extras" or not LojaCatalogo.da_categoria(c).is_empty(),
 			"loja: categoria vazia %s" % c)
+	# A2 (auditoria N1-N20): nenhum placeholder na grelha, salvo o inicial;
+	# e a Shadowblade aparece UMA vez (A1: a 2.a entrada era um merge)
+	var n_shadow := 0
+	for c: String in LojaCatalogo.CATEGORIAS:
+		for it: Dictionary in LojaCatalogo.da_categoria(c):
+			_ok(bool(it["inicial"]) or not bool(it["placeholder"]),
+				"loja: placeholder `%s` visivel na grelha `%s`" % [it["id"], c])
+			if it["id"] == "skin_shadowblade" and c == "skins":
+				n_shadow += 1
+	_ok(n_shadow == 1, "loja: skin_shadowblade aparece %d vezes na grelha das skins" % n_shadow)
+	_ok(LojaCatalogo.existe("skin_carmesim"), "loja: esconder o placeholder apagou os dados")
 	# cobertura dos casos: so K, so V, ambas, bloqueado por regiao, inicial
 	_ok(LojaCatalogo.moedas_aceites(LojaCatalogo.item("skin_carmesim")) == ["k"], "loja: item so K")
 	_ok(LojaCatalogo.moedas_aceites(LojaCatalogo.item("skin_luar")) == ["v"], "loja: item so V")
