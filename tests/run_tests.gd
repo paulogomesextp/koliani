@@ -1680,7 +1680,10 @@ func teste_execution_8_integracao_player_facing() -> void:
 	var estado_src := FileAccess.get_file_as_string("res://scripts/estado_jogo.gd")
 	_ok(estado_src.contains("static func entrada_dev_disponivel() -> bool:")
 		and estado_src.contains("ProjectSettings.get_setting(\"koliani/qa/entrada_dev\", false)")
-		and estado_src.contains("if OS.is_debug_build():"),
+		# A5 (3 out 2026): com o interruptor presente ele manda sempre; sem
+		# ele, so' o debug abre. O CI desliga-o nas builds publicas.
+		and estado_src.contains("if ProjectSettings.has_setting(\"koliani/qa/entrada_dev\"):")
+		and estado_src.contains("return OS.is_debug_build()"),
 		"Execution 8: o portão do developer mode deixou de fechar por omissão em release")
 	_ok(menu.contains("_dev.visible = EstadoJogo.entrada_dev_disponivel()")
 		and menu.contains("--devmode\" and EstadoJogo.entrada_dev_disponivel()"),

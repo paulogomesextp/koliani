@@ -93,6 +93,8 @@ jobs:
           cp -r /root/.local/share/godot/export_templates/* ~/.local/share/godot/export_templates/ || true
       - name: Importar recursos
         run: godot --headless --import || true
+      - name: Build externa sem entrada Dev (A5)
+        run: sed -i 's#^qa/entrada_dev=true#qa/entrada_dev=false#' project.godot && grep -n 'qa/entrada_dev' project.godot
       - name: Export Web
         run: |
           mkdir -p build/web
@@ -188,6 +190,8 @@ jobs:
           echo "::warning title=Ambiente Android::$msg"
       - name: Importar recursos
         run: godot --headless --import || true
+      - name: Build externa sem entrada Dev (A5)
+        run: sed -i 's#^qa/entrada_dev=true#qa/entrada_dev=false#' project.godot && grep -n 'qa/entrada_dev' project.godot
       - name: Export APK
         env:
           GODOT_ANDROID_KEYSTORE_DEBUG_PATH: ${{ github.workspace }}/debug.keystore
@@ -250,6 +254,8 @@ jobs:
           cp -r /root/.local/share/godot/export_templates/* ~/.local/share/godot/export_templates/ || true
       - name: Importar recursos
         run: godot --headless --import || true
+      - name: Build externa sem entrada Dev (A5)
+        run: sed -i 's#^qa/entrada_dev=true#qa/entrada_dev=false#' project.godot && grep -n 'qa/entrada_dev' project.godot
       - name: Export Windows
         run: |
           mkdir -p build/windows

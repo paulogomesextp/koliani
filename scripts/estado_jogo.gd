@@ -649,10 +649,16 @@ func ha_progresso() -> bool:
 ## barra, ou seja sem FlyMode nem troca de nivel. Um export de release nao
 ## deixa de ser uma build de QA so' porque foi exportado sem debug; o que o
 ## decide e' este interruptor, que o export publico final desliga.
+##
+## A5 (auditoria N1-N20, 3 out 2026): quando o interruptor EXISTE, manda
+## sempre -- tambem em debug. O APK de Android sai em `--export-debug` e as
+## builds publicas do CI (Web, `win-latest`, APK) desligam-no antes do export
+## (`.github/workflows/ci.yml`), por isso o "DEVELOPER MODE" deixa de
+## aparecer a quem testa de fora. As builds locais do Paulo continuam com ele.
 static func entrada_dev_disponivel() -> bool:
-	if OS.is_debug_build():
-		return true
-	return bool(ProjectSettings.get_setting("koliani/qa/entrada_dev", false))
+	if ProjectSettings.has_setting("koliani/qa/entrada_dev"):
+		return bool(ProjectSettings.get_setting("koliani/qa/entrada_dev", false))
+	return OS.is_debug_build()
 
 
 func ativar_modo_dev() -> void:
