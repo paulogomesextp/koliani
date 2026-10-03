@@ -619,3 +619,10 @@ Conclusões robustas a tirar daqui (independentes da fraqueza do bot):
 - **N7** concentra 110–120 mortes no mesmo troço nos 3 perfis: pico localizado.
 - Os portões de dash sob teto (N2, N4) e as raízes (N2) são onde o bot morre em massa: **confirmar com humanos** se os telégrafos das raízes chegam.
 - O bot não vence nenhum guardião/boss de N1–N6 nem o Vyrak: a ferramenta precisa de um modo de combate antes de servir para medir TTK.
+
+---
+
+## ADENDA — N20 "Núcleo da Fornalha" (3 out 2026, build com o N20)
+
+Travessia A–D sem mortes nos 3 perfis do bot; todas as mortes na arena (x≈5 000, 29–52 por perfil em 6 min); **o perfil experiente vence o Guardião da Fornalha** (2 889 HP), o único boss que o bot venceu. Performance PC: 609 fps em combate, p99 2,59 ms, 0,1 % de frames > 33 ms (o nível mais pesado). Pontos fortes: padrões fixos, telégrafos, janelas EXPOSTO, refúgios, reset limpo, falas. Problemas: 5 dos 10 ataques da prancha; a arena não transforma na fase 2; rig macio (poses pequenas ampliadas) e vermelho sobre vermelho; exame A–D fácil; mecanismos sem som; o seletor ainda diz "Catacombs of the Abyss". Notas: Level Design 6 · Boss 7 · Arte 6 · Legibilidade 5. Bosses globais passam a **6/10**.
+Prompt único para o ChatGPT (N1–N20): `docs/qa/full_game_review/PROMPT_CHATGPT_PLANO_N1_N20.md`.

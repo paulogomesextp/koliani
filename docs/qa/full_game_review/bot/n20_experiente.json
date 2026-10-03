@@ -1,134 +1,140 @@
 {
-  "ataques": 64,
+  "ataques": 324,
   "cena": "res://scenes/levels/O_Abismo.tscn",
-  "checkpoints": 2,
-  "chefe_ataques_evitados": 0,
-  "chefe_dano_sofrido": 0,
+  "checkpoints": 6,
+  "chefe_ataques_evitados": 41,
+  "chefe_dano_sofrido": 2384,
   "chefe_derrotado": false,
-  "chefe_duracao_s": 0.0,
-  "chefe_golpes_sofridos": 0,
-  "chefe_telegrafos": 0,
-  "chefe_vida_final": 2974,
-  "chefe_vida_inicial": 2974,
-  "chefe_vida_max": 2974,
-  "chefe_vida_min": 2974,
+  "chefe_duracao_s": 192.27,
+  "chefe_golpes_sofridos": 60,
+  "chefe_telegrafos": 81,
+  "chefe_vida_inicial": 2889,
+  "chefe_vida_min": -3,
   "concluido": false,
-  "dano_total": 1026,
-  "dashes": 231,
-  "dashes_desperdicados": 86,
-  "encravamentos": 82,
-  "golpes_sofridos": 59,
-  "hesitacao_s": 1.37,
-  "hesitacoes": 6,
-  "mortes": 27,
+  "dano_total": 2431,
+  "dashes": 283,
+  "dashes_desperdicados": 1,
+  "encravamentos": 37,
+  "golpes_sofridos": 63,
+  "hesitacao_s": 0.2,
+  "hesitacoes": 1,
+  "mortes": 29,
   "mortes_pos": [
     [
-      594.0,
-      557.0
+      5071.0,
+      435.0
     ],
     [
-      -24430.0,
-      572.0
+      5059.0,
+      429.0
     ],
     [
-      -24434.0,
-      563.0
+      5115.0,
+      433.0
     ],
     [
-      -24438.0,
-      565.0
+      5147.0,
+      432.0
     ],
     [
-      -24446.0,
-      571.0
+      5145.0,
+      432.0
     ],
     [
-      -24438.0,
-      572.0
+      5139.0,
+      436.0
     ],
     [
-      -24442.0,
-      575.0
+      5019.0,
+      578.0
     ],
     [
-      -24414.0,
-      571.0
+      5137.0,
+      421.0
     ],
     [
-      -24442.0,
-      565.0
+      5138.0,
+      435.0
     ],
     [
-      -24966.0,
-      565.0
+      5143.0,
+      433.0
     ],
     [
-      -24426.0,
-      565.0
+      5140.0,
+      435.0
     ],
     [
-      -24442.0,
-      575.0
+      5118.0,
+      435.0
     ],
     [
-      -24442.0,
-      565.0
+      5019.0,
+      578.0
     ],
     [
-      -24450.0,
-      574.0
+      5094.0,
+      425.0
     ],
     [
-      -24426.0,
-      572.0
+      5083.0,
+      578.0
     ],
     [
-      -24966.0,
-      564.0
+      5118.0,
+      421.0
     ],
     [
-      -24434.0,
-      573.0
+      5125.0,
+      435.0
     ],
     [
-      -24970.0,
-      566.0
+      5149.0,
+      431.0
     ],
     [
-      -24426.0,
-      573.0
+      5133.0,
+      430.0
     ],
     [
-      -24446.0,
-      565.0
+      5121.0,
+      435.0
     ],
     [
-      -24430.0,
-      574.0
+      5144.0,
+      431.0
     ],
     [
-      -24462.0,
-      563.0
+      5149.0,
+      396.0
     ],
     [
-      -24442.0,
-      565.0
+      5132.0,
+      431.0
     ],
     [
-      -24430.0,
-      572.0
+      5151.0,
+      415.0
     ],
     [
-      -24450.0,
-      568.0
+      5135.0,
+      426.0
     ],
     [
-      -24446.0,
-      573.0
+      5116.0,
+      429.0
     ],
     [
-      -24442.0,
-      565.0
+      5139.0,
+      431.0
+    ],
+    [
+      5137.0,
+      429.0
+    ],
+    [
+      5149.0,
+      430.0
     ]
   ],
   "motivo_fim": "timeout_jogo",
@@ -138,23 +144,22 @@
   "planar_frames": 0,
   "planar_s": 0.0,
   "pontos_de_falha": {
-    "-24400": 20,
-    "-24500": 3,
-    "-25000": 3,
-    "600": 1
+    "5000": 2,
+    "5100": 26,
+    "5200": 1
   },
-  "progresso_x": 593.833312988281,
+  "progresso_x": 5589.99951171875,
   "quedas": 0,
-  "rota_passos": 5,
-  "saltos": 442,
+  "rota_passos": 10,
+  "saltos": 2017,
   "saltos_falhados": 25,
   "seed": 4242,
-  "superficies_mapeadas": 207,
-  "tempo_s": 480.02,
+  "superficies_mapeadas": 28,
+  "tempo_s": 360.0,
   "vento_entradas": 0,
   "vento_s": 0.0,
-  "x_alvo": 2300.0,
-  "x_max": 593.833312988281,
-  "y_min": -81.4294128417969,
-  "y_spawn": 489.449981689453
+  "x_alvo": 5540.0,
+  "x_max": 5589.99951171875,
+  "y_min": 291.495544433594,
+  "y_spawn": 569.450012207031
 }
