@@ -1,0 +1,64 @@
+{
+  "ataques": 17,
+  "cena": "res://scenes/levels/Torre_dos_Sinos.tscn",
+  "checkpoints": 3,
+  "chefe_ataques_evitados": 0,
+  "chefe_dano_sofrido": 0,
+  "chefe_derrotado": false,
+  "chefe_duracao_s": 0.0,
+  "chefe_golpes_sofridos": 0,
+  "chefe_telegrafos": 0,
+  "chefe_vida_inicial": 0,
+  "chefe_vida_min": 0,
+  "concluido": true,
+  "dano_total": 230,
+  "dashes": 36,
+  "dashes_desperdicados": 1,
+  "encravamentos": 7,
+  "golpes_sofridos": 13,
+  "hesitacao_s": 2.35,
+  "hesitacoes": 4,
+  "mortes": 4,
+  "mortes_pos": [
+    [
+      788.0,
+      952.0
+    ],
+    [
+      1203.0,
+      944.0
+    ],
+    [
+      1204.0,
+      952.0
+    ],
+    [
+      1203.0,
+      952.0
+    ]
+  ],
+  "motivo_fim": "porta",
+  "nan_frames": 0,
+  "nan_primeiro": null,
+  "perfil": "casual",
+  "planar_frames": 0,
+  "planar_s": 0.0,
+  "pontos_de_falha": {
+    "1200": 3,
+    "800": 1
+  },
+  "progresso_x": 1211.30810546875,
+  "quedas": 0,
+  "rota_passos": 8,
+  "saltos": 152,
+  "saltos_falhados": 3,
+  "seed": 4242,
+  "superficies_mapeadas": 18,
+  "tempo_s": 49.75,
+  "vento_entradas": 0,
+  "vento_s": 0.0,
+  "x_alvo": 1026.89660644531,
+  "x_max": 1211.30810546875,
+  "y_min": 205.0,
+  "y_spawn": 839.450012207031
+}

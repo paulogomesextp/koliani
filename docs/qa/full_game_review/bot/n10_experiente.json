@@ -1,0 +1,53 @@
+{
+  "ataques": 10,
+  "cena": "res://scenes/levels/A_Cela_Zero.tscn",
+  "checkpoints": 2,
+  "chefe_ataques_evitados": 0,
+  "chefe_dano_sofrido": 0,
+  "chefe_derrotado": false,
+  "chefe_duracao_s": 0.0,
+  "chefe_golpes_sofridos": 0,
+  "chefe_telegrafos": 0,
+  "chefe_vida_final": 1996,
+  "chefe_vida_inicial": 1996,
+  "chefe_vida_max": 1996,
+  "chefe_vida_min": 1996,
+  "concluido": false,
+  "dano_total": 0,
+  "dashes": 113,
+  "dashes_desperdicados": 94,
+  "encravamentos": 95,
+  "golpes_sofridos": 0,
+  "hesitacao_s": 0.97,
+  "hesitacoes": 4,
+  "mortes": 1,
+  "mortes_pos": [
+    [
+      931.0,
+      916.0
+    ]
+  ],
+  "motivo_fim": "timeout_jogo",
+  "nan_frames": 0,
+  "nan_primeiro": null,
+  "perfil": "experiente",
+  "planar_frames": 0,
+  "planar_s": 0.0,
+  "pontos_de_falha": {
+    "900": 1
+  },
+  "progresso_x": 992.974060058594,
+  "quedas": 0,
+  "rota_passos": 8,
+  "saltos": 4642,
+  "saltos_falhados": 1,
+  "seed": 4242,
+  "superficies_mapeadas": 24,
+  "tempo_s": 360.0,
+  "vento_entradas": 50,
+  "vento_s": 36.33,
+  "x_alvo": 900.0,
+  "x_max": 992.974060058594,
+  "y_min": 615.001953125,
+  "y_spawn": 819.450012207031
+}

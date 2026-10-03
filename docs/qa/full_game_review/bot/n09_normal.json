@@ -1,0 +1,193 @@
+{
+  "ataques": 28,
+  "cena": "res://scenes/levels/Ala_dos_Mortos.tscn",
+  "checkpoints": 6,
+  "chefe_ataques_evitados": 0,
+  "chefe_dano_sofrido": 2310,
+  "chefe_derrotado": false,
+  "chefe_duracao_s": 183.22,
+  "chefe_golpes_sofridos": 110,
+  "chefe_telegrafos": 0,
+  "chefe_vida_final": 227,
+  "chefe_vida_inicial": 227,
+  "chefe_vida_max": 0,
+  "chefe_vida_min": 227,
+  "concluido": false,
+  "dano_total": 2364,
+  "dashes": 277,
+  "dashes_desperdicados": 8,
+  "encravamentos": 3,
+  "golpes_sofridos": 115,
+  "hesitacao_s": 0.93,
+  "hesitacoes": 3,
+  "mortes": 34,
+  "mortes_pos": [
+    [
+      1167.0,
+      827.0
+    ],
+    [
+      2907.0,
+      826.0
+    ],
+    [
+      3042.0,
+      1210.0
+    ],
+    [
+      2896.0,
+      824.0
+    ],
+    [
+      2900.0,
+      825.0
+    ],
+    [
+      3289.0,
+      827.0
+    ],
+    [
+      6501.0,
+      558.0
+    ],
+    [
+      6481.0,
+      526.0
+    ],
+    [
+      6484.0,
+      541.0
+    ],
+    [
+      6468.0,
+      532.0
+    ],
+    [
+      6473.0,
+      564.0
+    ],
+    [
+      6575.0,
+      638.0
+    ],
+    [
+      6528.0,
+      547.0
+    ],
+    [
+      6497.0,
+      490.0
+    ],
+    [
+      6501.0,
+      638.0
+    ],
+    [
+      6473.0,
+      519.0
+    ],
+    [
+      6519.0,
+      638.0
+    ],
+    [
+      4760.0,
+      830.0
+    ],
+    [
+      6558.0,
+      638.0
+    ],
+    [
+      6500.0,
+      558.0
+    ],
+    [
+      6442.0,
+      522.0
+    ],
+    [
+      6379.0,
+      638.0
+    ],
+    [
+      6508.0,
+      585.0
+    ],
+    [
+      6552.0,
+      553.0
+    ],
+    [
+      6455.0,
+      547.0
+    ],
+    [
+      6551.0,
+      428.0
+    ],
+    [
+      6490.0,
+      533.0
+    ],
+    [
+      6543.0,
+      638.0
+    ],
+    [
+      6495.0,
+      593.0
+    ],
+    [
+      6477.0,
+      521.0
+    ],
+    [
+      6476.0,
+      542.0
+    ],
+    [
+      6502.0,
+      593.0
+    ],
+    [
+      6488.0,
+      546.0
+    ],
+    [
+      6307.0,
+      622.0
+    ]
+  ],
+  "motivo_fim": "timeout_jogo",
+  "nan_frames": 0,
+  "nan_primeiro": null,
+  "perfil": "normal",
+  "planar_frames": 0,
+  "planar_s": 0.0,
+  "pontos_de_falha": {
+    "1200": 1,
+    "2900": 3,
+    "3000": 1,
+    "3300": 1,
+    "4800": 1,
+    "6300": 1,
+    "6400": 2,
+    "6500": 20,
+    "6600": 4
+  },
+  "progresso_x": 6609.99951171875,
+  "quedas": 1,
+  "rota_passos": 14,
+  "saltos": 753,
+  "saltos_falhados": 29,
+  "seed": 4242,
+  "superficies_mapeadas": 25,
+  "tempo_s": 360.0,
+  "vento_entradas": 143,
+  "vento_s": 121.82,
+  "x_alvo": 6600.0,
+  "x_max": 6609.99951171875,
+  "y_min": 293.688903808594,
+  "y_spawn": 629.450012207031
+}

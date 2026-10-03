@@ -1,0 +1,69 @@
+{
+  "ataques": 17,
+  "cena": "res://scenes/levels/Galeria_dos_Ossos.tscn",
+  "checkpoints": 5,
+  "chefe_ataques_evitados": 0,
+  "chefe_dano_sofrido": 0,
+  "chefe_derrotado": false,
+  "chefe_duracao_s": 0.0,
+  "chefe_golpes_sofridos": 0,
+  "chefe_telegrafos": 0,
+  "chefe_vida_inicial": 0,
+  "chefe_vida_min": 0,
+  "concluido": true,
+  "dano_total": 521,
+  "dashes": 20,
+  "dashes_desperdicados": 3,
+  "encravamentos": 2,
+  "golpes_sofridos": 27,
+  "hesitacao_s": 3.13,
+  "hesitacoes": 6,
+  "mortes": 5,
+  "mortes_pos": [
+    [
+      3070.0,
+      838.0
+    ],
+    [
+      2732.0,
+      898.0
+    ],
+    [
+      4220.0,
+      826.0
+    ],
+    [
+      4200.0,
+      826.0
+    ],
+    [
+      4248.0,
+      825.0
+    ]
+  ],
+  "motivo_fim": "porta",
+  "nan_frames": 0,
+  "nan_primeiro": null,
+  "perfil": "casual",
+  "planar_frames": 0,
+  "planar_s": 0.0,
+  "pontos_de_falha": {
+    "2700": 1,
+    "3100": 1,
+    "4200": 3
+  },
+  "progresso_x": 5059.2958984375,
+  "quedas": 0,
+  "rota_passos": 7,
+  "saltos": 89,
+  "saltos_falhados": 5,
+  "seed": 4242,
+  "superficies_mapeadas": 33,
+  "tempo_s": 54.15,
+  "vento_entradas": 0,
+  "vento_s": 0.0,
+  "x_alvo": 5100.0,
+  "x_max": 5059.2958984375,
+  "y_min": 543.537536621094,
+  "y_spawn": 769.450012207031
+}

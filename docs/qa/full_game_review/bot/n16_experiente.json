@@ -1,0 +1,51 @@
+{
+  "ataques": 17,
+  "cena": "res://scenes/levels/Cemiterio_dos_Reis.tscn",
+  "checkpoints": 5,
+  "chefe_ataques_evitados": 0,
+  "chefe_dano_sofrido": 0,
+  "chefe_derrotado": false,
+  "chefe_duracao_s": 0.0,
+  "chefe_golpes_sofridos": 0,
+  "chefe_telegrafos": 0,
+  "chefe_vida_inicial": 0,
+  "chefe_vida_min": 0,
+  "concluido": true,
+  "dano_total": 183,
+  "dashes": 12,
+  "dashes_desperdicados": 3,
+  "encravamentos": 1,
+  "golpes_sofridos": 11,
+  "hesitacao_s": 0.17,
+  "hesitacoes": 1,
+  "mortes": 1,
+  "mortes_pos": [
+    [
+      3202.0,
+      578.0
+    ]
+  ],
+  "motivo_fim": "porta",
+  "nan_frames": 0,
+  "nan_primeiro": null,
+  "perfil": "experiente",
+  "planar_frames": 0,
+  "planar_s": 0.0,
+  "pontos_de_falha": {
+    "3200": 1
+  },
+  "progresso_x": 4460.1015625,
+  "quedas": 0,
+  "rota_passos": 8,
+  "saltos": 28,
+  "saltos_falhados": 0,
+  "seed": 4242,
+  "superficies_mapeadas": 25,
+  "tempo_s": 34.4,
+  "vento_entradas": 0,
+  "vento_s": 0.0,
+  "x_alvo": 4500.0,
+  "x_max": 4460.1015625,
+  "y_min": 450.5703125,
+  "y_spawn": 569.450012207031
+}

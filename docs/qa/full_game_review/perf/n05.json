@@ -1,0 +1,156 @@
+{
+  "desligado": [],
+  "ecra_hz": 60.0,
+  "etiqueta": "aud_n05",
+  "fases": {
+    "combate": {
+      "fps_1pc_low": 456.62100456621,
+      "fps_medio": 816.821789313671,
+      "frames": 5446,
+      "frames_acima_20ms": 0,
+      "frames_acima_33ms": 0,
+      "frames_acima_50ms": 0,
+      "ms_max": 4.556,
+      "ms_medio": 1.22425725302975,
+      "ms_p50": 1.146,
+      "ms_p95": 1.743,
+      "ms_p99": 2.19,
+      "pc_acima_33ms": 0.0
+    },
+    "movimento": {
+      "fps_1pc_low": 397.14058776807,
+      "fps_medio": 731.867678323756,
+      "frames": 4880,
+      "frames_acima_20ms": 0,
+      "frames_acima_33ms": 0,
+      "frames_acima_50ms": 0,
+      "ms_max": 16.408,
+      "ms_medio": 1.36636721311476,
+      "ms_p50": 1.254,
+      "ms_p95": 2.052,
+      "ms_p99": 2.518,
+      "pc_acima_33ms": 0.0
+    },
+    "parada": {
+      "fps_1pc_low": 473.036896877957,
+      "fps_medio": 824.213700279954,
+      "frames": 5494,
+      "frames_acima_20ms": 2,
+      "frames_acima_33ms": 1,
+      "frames_acima_50ms": 0,
+      "ms_max": 33.2,
+      "ms_medio": 1.21327757553695,
+      "ms_p50": 1.108,
+      "ms_p95": 1.725,
+      "ms_p99": 2.114,
+      "pc_acima_33ms": 0.018201674554059
+    }
+  },
+  "interpolacao_fisica": true,
+  "menu": false,
+  "monitores": {
+    "draw_calls": {
+      "fim": 101.0,
+      "max": 124.0,
+      "medio": 100.467130214918,
+      "min": 82.0
+    },
+    "fis_activos": {
+      "fim": 6.0,
+      "max": 6.0,
+      "medio": 6.0,
+      "min": 6.0
+    },
+    "fis_pares": {
+      "fim": 2.0,
+      "max": 6.0,
+      "medio": 4.27724399494311,
+      "min": 2.0
+    },
+    "fps": {
+      "fim": 885.0,
+      "max": 892.0,
+      "medio": 788.581099873578,
+      "min": 578.0
+    },
+    "mem_static": {
+      "fim": 85296289.0,
+      "max": 85296289.0,
+      "medio": 84447663.7548673,
+      "min": 83584955.0
+    },
+    "nos": {
+      "fim": 637.0,
+      "max": 648.0,
+      "medio": 643.085335018963,
+      "min": 637.0
+    },
+    "objetos": {
+      "fim": 3635.0,
+      "max": 3655.0,
+      "medio": 3633.42471554994,
+      "min": 3619.0
+    },
+    "orfaos": {
+      "fim": 0.0,
+      "max": 0.0,
+      "medio": 0.0,
+      "min": 0.0
+    },
+    "physics_ms": {
+      "fim": 0.001098,
+      "max": 0.014505,
+      "medio": 0.00260734184576471,
+      "min": 0.000385
+    },
+    "prims": {
+      "fim": 5433.0,
+      "max": 5867.0,
+      "medio": 5577.64115044248,
+      "min": 5257.0
+    },
+    "process_ms": {
+      "fim": 0.002042,
+      "max": 0.032691,
+      "medio": 0.00466703855878655,
+      "min": 0.001821
+    },
+    "tex_mem": {
+      "fim": 90330085.0,
+      "max": 90330085.0,
+      "medio": 89928187.9675095,
+      "min": 89455555.0
+    },
+    "video_mem": {
+      "fim": 105446997.0,
+      "max": 105446997.0,
+      "medio": 103524488.432238,
+      "min": 102442257.0
+    }
+  },
+  "nivel": 5,
+  "physics_tps": 60,
+  "por_ciclo": [],
+  "recargas_por_morte": 0,
+  "suavidade": {
+    "avanco_medio_px": 0.290206255664341,
+    "desvio_relativo": 3.53500483111233,
+    "frames_medidos": 10326,
+    "frames_sem_avanco_pc": 92.2913035057137
+  },
+  "total": {
+    "fps_1pc_low": 435.161009573542,
+    "fps_medio": 790.963457488266,
+    "frames": 15820,
+    "frames_acima_20ms": 2,
+    "frames_acima_33ms": 1,
+    "frames_acima_50ms": 0,
+    "ms_max": 33.2,
+    "ms_medio": 1.2642809102402,
+    "ms_p50": 1.16,
+    "ms_p95": 1.85,
+    "ms_p99": 2.298,
+    "pc_acima_33ms": 0.00632111251580278
+  },
+  "vsync": 0
+}

@@ -1,0 +1,201 @@
+{
+  "ataques": 0,
+  "cena": "res://scenes/levels/Torre_dos_Ventos.tscn",
+  "checkpoints": 2,
+  "chefe_ataques_evitados": 0,
+  "chefe_dano_sofrido": 0,
+  "chefe_derrotado": false,
+  "chefe_duracao_s": 0.0,
+  "chefe_golpes_sofridos": 0,
+  "chefe_telegrafos": 0,
+  "chefe_vida_final": 267,
+  "chefe_vida_inicial": 267,
+  "chefe_vida_max": 0,
+  "chefe_vida_min": 267,
+  "concluido": false,
+  "dano_total": 0,
+  "dashes": 293,
+  "dashes_desperdicados": 8,
+  "encravamentos": 5,
+  "golpes_sofridos": 0,
+  "hesitacao_s": 0.85,
+  "hesitacoes": 4,
+  "mortes": 37,
+  "mortes_pos": [
+    [
+      2232.0,
+      1212.0
+    ],
+    [
+      2344.0,
+      1208.0
+    ],
+    [
+      2330.0,
+      1207.0
+    ],
+    [
+      2496.0,
+      1212.0
+    ],
+    [
+      2496.0,
+      1203.0
+    ],
+    [
+      2234.0,
+      1210.0
+    ],
+    [
+      2426.0,
+      1203.0
+    ],
+    [
+      2468.0,
+      1203.0
+    ],
+    [
+      2504.0,
+      1201.0
+    ],
+    [
+      2258.0,
+      1203.0
+    ],
+    [
+      2558.0,
+      1210.0
+    ],
+    [
+      2394.0,
+      1203.0
+    ],
+    [
+      2530.0,
+      1200.0
+    ],
+    [
+      2448.0,
+      1200.0
+    ],
+    [
+      2230.0,
+      1205.0
+    ],
+    [
+      2496.0,
+      1210.0
+    ],
+    [
+      2514.0,
+      1212.0
+    ],
+    [
+      2530.0,
+      1202.0
+    ],
+    [
+      2278.0,
+      1201.0
+    ],
+    [
+      2522.0,
+      1200.0
+    ],
+    [
+      2350.0,
+      1204.0
+    ],
+    [
+      2302.0,
+      1205.0
+    ],
+    [
+      2348.0,
+      1204.0
+    ],
+    [
+      2258.0,
+      1206.0
+    ],
+    [
+      2534.0,
+      1203.0
+    ],
+    [
+      2458.0,
+      1205.0
+    ],
+    [
+      2454.0,
+      1205.0
+    ],
+    [
+      2554.0,
+      1203.0
+    ],
+    [
+      2534.0,
+      1208.0
+    ],
+    [
+      2410.0,
+      1200.0
+    ],
+    [
+      2487.0,
+      1204.0
+    ],
+    [
+      2510.0,
+      1201.0
+    ],
+    [
+      2302.0,
+      1203.0
+    ],
+    [
+      2310.0,
+      1211.0
+    ],
+    [
+      2500.0,
+      1209.0
+    ],
+    [
+      2454.0,
+      1206.0
+    ],
+    [
+      2282.0,
+      1212.0
+    ]
+  ],
+  "motivo_fim": "timeout_jogo",
+  "nan_frames": 0,
+  "nan_primeiro": null,
+  "perfil": "experiente",
+  "planar_frames": 0,
+  "planar_s": 0.0,
+  "pontos_de_falha": {
+    "2200": 3,
+    "2300": 10,
+    "2400": 5,
+    "2500": 17,
+    "2600": 2
+  },
+  "progresso_x": 2558.001953125,
+  "quedas": 37,
+  "rota_passos": 0,
+  "saltos": 1306,
+  "saltos_falhados": 37,
+  "seed": 4242,
+  "superficies_mapeadas": 34,
+  "tempo_s": 360.0,
+  "vento_entradas": 0,
+  "vento_s": 0.0,
+  "x_alvo": 2900.0,
+  "x_max": 2558.001953125,
+  "y_min": 692.074768066406,
+  "y_spawn": 969.450012207031
+}

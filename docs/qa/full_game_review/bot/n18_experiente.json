@@ -1,0 +1,66 @@
+{
+  "ataques": 19,
+  "cena": "res://scenes/levels/Cripta_das_Mil_Velas.tscn",
+  "checkpoints": 5,
+  "chefe_ataques_evitados": 0,
+  "chefe_dano_sofrido": 0,
+  "chefe_derrotado": false,
+  "chefe_duracao_s": 0.0,
+  "chefe_golpes_sofridos": 0,
+  "chefe_telegrafos": 0,
+  "chefe_vida_inicial": 0,
+  "chefe_vida_min": 0,
+  "concluido": true,
+  "dano_total": 369,
+  "dashes": 46,
+  "dashes_desperdicados": 1,
+  "encravamentos": 0,
+  "golpes_sofridos": 20,
+  "hesitacao_s": 0.23,
+  "hesitacoes": 1,
+  "mortes": 4,
+  "mortes_pos": [
+    [
+      2960.0,
+      698.0
+    ],
+    [
+      3942.0,
+      733.0
+    ],
+    [
+      4402.0,
+      731.0
+    ],
+    [
+      6132.0,
+      1207.0
+    ]
+  ],
+  "motivo_fim": "porta",
+  "nan_frames": 0,
+  "nan_primeiro": null,
+  "perfil": "experiente",
+  "planar_frames": 0,
+  "planar_s": 0.0,
+  "pontos_de_falha": {
+    "3000": 1,
+    "3900": 1,
+    "4400": 1,
+    "6100": 1
+  },
+  "progresso_x": 6689.47265625,
+  "quedas": 1,
+  "rota_passos": 0,
+  "saltos": 175,
+  "saltos_falhados": 4,
+  "seed": 4242,
+  "superficies_mapeadas": 45,
+  "tempo_s": 57.08,
+  "vento_entradas": 0,
+  "vento_s": 0.0,
+  "x_alvo": 6730.0,
+  "x_max": 6689.47265625,
+  "y_min": 81.0877914428711,
+  "y_spawn": 569.450012207031
+}

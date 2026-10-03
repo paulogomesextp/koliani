@@ -1,3 +1,10 @@
+# >>> AUDITORIA EXTERNA N1-N19 (3 out 2026, read-only, sem mexer no produto) <<<
+Relatorio: `docs/qa/full_game_review/RELATORIO_AUDITORIA_N1_N19.md`; plano pronto a colar: `docs/qa/full_game_review/PROMPT_MELHORIAS_N1_N19.md`.
+N20 excluido (feito noutra conversa). Veredito: ALPHA, nota global 5/10. Top: combate raro/raso (1-8 inimigos/nivel, hitstop 10 ms, R4 atravessa-se em <1 min),
+mistura de estilos (R1 pintada vs pixel), N11 placeholder, Vyrak provisorio, narrativa invisivel, loja com skin_shadowblade DUPLICADA, Regiao IV chamada "Catacombs of the Abyss".
+Armadilha de metodo: `tools/bot_humano_r2.gd` arranca SEM habilidades -> metricas de N3+ invalidas; usar `docs/qa/full_game_review/tools/bot_auditoria.gd`.
+Capturas (PNG) ficaram so' na worktree `C:\Projetos\koliani-audit` (101 MB, nao commitadas); no repo vao as folhas de contacto.
+
 # >>> N19 Sala das Pressoes feito (3 out 2026, branch `claude/region04-n19`, worktree `C:\Projetos\koliani-n19`, sem push) <<<
 3 commits locais (c2064210 pistao/valvula, 11f3c801 nivel, 18054961 docs). Desenho e medicoes: `docs/nivel_autoral_n19.md`. Suite = 9 falhas pre-existentes, 0 novas; piloto fisico 0 toques; alcance 100 niveis OK; baseline: so' o N19 muda.
 Falta: HUMAN PLAYTEST; canon do Guardiao N18/N19 (Lanca-Chamas e' placeholder); decidir push/PR (nao feito). Nao iniciar N20.

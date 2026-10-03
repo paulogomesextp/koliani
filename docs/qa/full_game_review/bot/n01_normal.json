@@ -1,0 +1,185 @@
+{
+  "ataques": 436,
+  "cena": "res://scenes/levels/Floresta_Putrefata.tscn",
+  "checkpoints": 4,
+  "chefe_ataques_evitados": 2,
+  "chefe_dano_sofrido": 1519,
+  "chefe_derrotado": false,
+  "chefe_duracao_s": 227.1,
+  "chefe_golpes_sofridos": 100,
+  "chefe_telegrafos": 87,
+  "chefe_vida_final": 915,
+  "chefe_vida_inicial": 915,
+  "chefe_vida_max": 915,
+  "chefe_vida_min": 433,
+  "concluido": false,
+  "dano_total": 1587,
+  "dashes": 254,
+  "dashes_desperdicados": 11,
+  "encravamentos": 11,
+  "golpes_sofridos": 106,
+  "hesitacao_s": 1.22,
+  "hesitacoes": 4,
+  "mortes": 32,
+  "mortes_pos": [
+    [
+      1545.0,
+      763.0
+    ],
+    [
+      1569.0,
+      763.0
+    ],
+    [
+      1271.0,
+      767.0
+    ],
+    [
+      1566.0,
+      767.0
+    ],
+    [
+      1853.0,
+      762.0
+    ],
+    [
+      1274.0,
+      772.0
+    ],
+    [
+      1278.0,
+      764.0
+    ],
+    [
+      1254.0,
+      761.0
+    ],
+    [
+      1278.0,
+      762.0
+    ],
+    [
+      1541.0,
+      770.0
+    ],
+    [
+      1286.0,
+      762.0
+    ],
+    [
+      1531.0,
+      773.0
+    ],
+    [
+      2963.0,
+      762.0
+    ],
+    [
+      4090.0,
+      761.0
+    ],
+    [
+      2951.0,
+      763.0
+    ],
+    [
+      5406.0,
+      548.0
+    ],
+    [
+      4999.0,
+      556.0
+    ],
+    [
+      5422.0,
+      563.0
+    ],
+    [
+      5432.0,
+      559.0
+    ],
+    [
+      5512.0,
+      643.0
+    ],
+    [
+      5005.0,
+      558.0
+    ],
+    [
+      5452.0,
+      615.0
+    ],
+    [
+      5432.0,
+      624.0
+    ],
+    [
+      5007.0,
+      556.0
+    ],
+    [
+      4997.0,
+      559.0
+    ],
+    [
+      5467.0,
+      608.0
+    ],
+    [
+      5431.0,
+      600.0
+    ],
+    [
+      5458.0,
+      556.0
+    ],
+    [
+      5442.0,
+      558.0
+    ],
+    [
+      5433.0,
+      551.0
+    ],
+    [
+      5434.0,
+      556.0
+    ],
+    [
+      5428.0,
+      590.0
+    ]
+  ],
+  "motivo_fim": "timeout_jogo",
+  "nan_frames": 0,
+  "nan_primeiro": null,
+  "perfil": "normal",
+  "planar_frames": 0,
+  "planar_s": 0.0,
+  "pontos_de_falha": {
+    "1300": 6,
+    "1500": 3,
+    "1600": 2,
+    "1900": 1,
+    "3000": 2,
+    "4100": 1,
+    "5000": 4,
+    "5400": 9,
+    "5500": 4
+  },
+  "progresso_x": 5539.11181640625,
+  "quedas": 0,
+  "rota_passos": 13,
+  "saltos": 705,
+  "saltos_falhados": 28,
+  "seed": 4242,
+  "superficies_mapeadas": 16,
+  "tempo_s": 360.0,
+  "vento_entradas": 0,
+  "vento_s": 0.0,
+  "x_alvo": 6290.0,
+  "x_max": 5539.11181640625,
+  "y_min": 420.883087158203,
+  "y_spawn": 629.450012207031
+}

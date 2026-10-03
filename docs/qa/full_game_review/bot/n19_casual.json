@@ -1,0 +1,60 @@
+{
+  "ataques": 12,
+  "cena": "res://scenes/levels/Templo_da_Serpente.tscn",
+  "checkpoints": 6,
+  "chefe_ataques_evitados": 0,
+  "chefe_dano_sofrido": 0,
+  "chefe_derrotado": false,
+  "chefe_duracao_s": 0.0,
+  "chefe_golpes_sofridos": 0,
+  "chefe_telegrafos": 0,
+  "chefe_vida_inicial": 0,
+  "chefe_vida_min": 0,
+  "concluido": true,
+  "dano_total": 281,
+  "dashes": 14,
+  "dashes_desperdicados": 6,
+  "encravamentos": 2,
+  "golpes_sofridos": 14,
+  "hesitacao_s": 0.77,
+  "hesitacoes": 2,
+  "mortes": 3,
+  "mortes_pos": [
+    [
+      4294.0,
+      698.0
+    ],
+    [
+      4294.0,
+      698.0
+    ],
+    [
+      6315.0,
+      578.0
+    ]
+  ],
+  "motivo_fim": "porta",
+  "nan_frames": 0,
+  "nan_primeiro": null,
+  "perfil": "casual",
+  "planar_frames": 0,
+  "planar_s": 0.0,
+  "pontos_de_falha": {
+    "4300": 2,
+    "6300": 1
+  },
+  "progresso_x": 6620.34033203125,
+  "quedas": 0,
+  "rota_passos": 9,
+  "saltos": 55,
+  "saltos_falhados": 0,
+  "seed": 4242,
+  "superficies_mapeadas": 28,
+  "tempo_s": 48.18,
+  "vento_entradas": 0,
+  "vento_s": 0.0,
+  "x_alvo": 6662.0,
+  "x_max": 6620.34033203125,
+  "y_min": 451.31689453125,
+  "y_spawn": 569.450012207031
+}
