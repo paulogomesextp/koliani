@@ -516,9 +516,11 @@ func _mostrar_nucleo(v: bool) -> void:
 		brilho.visible = v
 
 
-## O nucleo absorve parte da onda espectral (Especial/tiro): 60 % do dano. Assim o Especial ajuda na
-## janela sem resolver a luta -- e gasta-lo com o coracao PROTEGIDO desperdica a Energia.
-const RESIST_TIRO := 0.6
+## O nucleo absorve parte da onda espectral (Especial/tiro): passa 45 % do dano. Assim o Especial ajuda
+## na janela sem resolver a luta -- e gasta-lo com o coracao PROTEGIDO desperdica a Energia.
+## 3 out 2026: era 0,6. Medido em segundos de JOGO (o teste media mal antes -- ver `_coracao_luta`),
+## o Especial cortava o TTK a 0,48x (alvo >= 0,55x). Valor PROPOSTO, a confirmar em playtest.
+const RESIST_TIRO := 0.45
 
 
 func receber_tiro(quantidade: int, dir_empurrao := 0.0) -> void:

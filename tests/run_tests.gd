@@ -6657,6 +6657,7 @@ func _coracao_luta(modo: String, segundos: float) -> Dictionary:
 	var tj := 0.0          # segundos de jogo
 	var prox_golpe := 0.5
 	var prox_tiro := 0.333   # ranhuras fixas de 0,67 s (o `frames % 40 == 20` original)
+	var regen_pausa_ate := 0.0   # koliani.gd ESPECIAL_PAUSA_REGEN: a Energia para 0,6 s apos o disparo
 	var janelas: Array = []
 	var jan_ini := -1.0
 	var fase2_em := -1.0
@@ -6709,7 +6710,8 @@ func _coracao_luta(modo: String, segundos: float) -> Dictionary:
 		if golpe and ((modo == "casca" and not vuln) or (modo != "casca" and (modo == "spam" or vuln))):
 			g.receber_dano(50, 1.0)
 		if modo == "especial":
-			energia = minf(99.0, energia + 12.0 * dtj)   # regen 12/s
+			if tj >= regen_pausa_ate:
+				energia = minf(99.0, energia + 12.0 * dtj)   # regen 12/s
 			if vuln and golpe:
 				energia = minf(99.0, energia + 5.0)   # +5 por golpe de espada
 			var ranhura := tj >= prox_tiro
@@ -6717,6 +6719,7 @@ func _coracao_luta(modo: String, segundos: float) -> Dictionary:
 				prox_tiro += 0.6667
 			if vuln and energia >= 33.0 and ranhura:
 				energia -= 33.0
+				regen_pausa_ate = tj + 0.6
 				g.receber_tiro(130, 1.0)   # o nucleo absorve 40 % da onda
 	var ultima_contagem := {}
 	if is_instance_valid(g) and not g.is_queued_for_deletion():
