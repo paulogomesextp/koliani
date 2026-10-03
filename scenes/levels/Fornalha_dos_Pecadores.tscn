@@ -323,10 +323,13 @@ altura_visual = 110.0
 cor_base = Color(0.2, 0.24, 0.32, 1)
 cor_topo = Color(0.42, 0.54, 0.68, 1)
 
+; B5 (plano N1-N20, 3 out 2026): era o pico da curva (110-120 mortes do bot
+; aqui). Vento 1600->1350; o morcego saiu de cima da corrente e o elite da
+; zona de aterragem do ComboB. Valores PROPOSTOS -- playtest decide.
 [node name="WindCombo" parent="." instance=ExtResource("15_wind")]
 position = Vector2(4690, 560)
 direcao = Vector2(1, 0)
-intensidade = 1600.0
+intensidade = 1350.0
 velocidade_max = 140.0
 tamanho = Vector2(700, 260)
 modo = 1
@@ -335,7 +338,7 @@ intervalo_pulso = 1.2
 cor_guia = Color(0.62, 0.82, 1, 0.36)
 
 [node name="EliteCombo" parent="." instance=ExtResource("2_dem")]
-position = Vector2(4990, 636)
+position = Vector2(5080, 636)
 scale = Vector2(1.3, 1.3)
 elite = true
 especie = "golem_aereo"
@@ -346,7 +349,7 @@ alcance_patrulha = 130.0
 cor_rim = Color(0.6, 0.55, 1.0, 1)
 
 [node name="MorcegoCombo" parent="." instance=ExtResource("2_dem")]
-position = Vector2(4690, 540)
+position = Vector2(5060, 560)
 especie = "morcego_dos_ventos"
 comportamento = "voador"
 alcance_patrulha = 90.0
