@@ -21,6 +21,7 @@
 [ext_resource type="PackedScene" uid="uid://bkolianiessencia01" path="res://scenes/actors/Essencia.tscn" id="99_ess"]
 [ext_resource type="PackedScene" path="res://scenes/fx/Region1HybridVisualTarget.tscn" id="100_target"]
 [ext_resource type="Texture2D" path="res://assets/art/regions/region_01_forest/production/l1_hybrid_9h12e/terrain_hd/corrupcao.png" id="13_corr"]
+[ext_resource type="Script" path="res://scripts/arena_selada.gd" id="200_arena"]
 
 [sub_resource type="RectangleShape2D" id="rs_chk"]
 size = Vector2(44, 96)
@@ -143,7 +144,7 @@ altura_visual = 120
 cor_base = Color(0.16, 0.24, 0.1, 1)
 cor_topo = Color(0.42, 0.64, 0.29, 1)
 
-[node name="GoblinAprendiz" parent="." instance=ExtResource("2_dem")]
+[node name="GoblinAprendiz" parent="." groups=["arena_n1"] instance=ExtResource("2_dem")]
 position = Vector2(3370, 636)
 especie = "goblin"
 alcance_patrulha = 110.0
@@ -151,6 +152,49 @@ comportamento = "carga"
 piloto_combate_v1 = true
 peso = "leve"
 pode_ser_lancado = true
+
+; ===== B1 (plano N1-N20, 3 out 2026): ENCONTRO 2 = SALA QUE FECHA =====
+; DEC-013. O goblin piloto ganha companhia: uma gosma (lenta, tanque) a'
+; esquerda e um goblin de patrulha a' direita. Ao entrar sobem grades nas
+; duas pontas do chao; descem quando os tres morrem. Grades de 340 px: as
+; plataformas opcionais por cima (ate' y=485) nao deixam salta-las.
+[node name="ArenaInimigo" type="Area2D" parent="."]
+position = Vector2(3325, 535)
+script = ExtResource("200_arena")
+tamanho = Vector2(690, 260)
+altura_grade = 340.0
+grupo_inimigos = "arena_n1"
+cor_grade = Color(0.55, 0.78, 0.5, 0.95)
+
+[node name="GosmaArena" parent="." groups=["arena_n1"] instance=ExtResource("2_dem")]
+position = Vector2(3130, 636)
+especie = "gosma"
+vida = 70
+dano_contacto = 12
+alcance_patrulha = 60.0
+
+[node name="GoblinArena" parent="." groups=["arena_n1"] instance=ExtResource("2_dem")]
+position = Vector2(3580, 636)
+especie = "goblin"
+vida = 50
+dano_contacto = 12
+alcance_patrulha = 70.0
+
+; ===== B1: ENCONTRO 1 -- gosma entre as raizes (hazard + inimigo lento) =====
+[node name="GosmaRaizes" parent="." instance=ExtResource("2_dem")]
+position = Vector2(2790, 636)
+especie = "gosma"
+vida = 60
+dano_contacto = 10
+alcance_patrulha = 50.0
+
+; ===== B1: ENCONTRO 3 -- gosma no ritmo das raizes =====
+[node name="GosmaRitmo" parent="." instance=ExtResource("2_dem")]
+position = Vector2(4320, 616)
+especie = "gosma"
+vida = 40
+dano_contacto = 10
+alcance_patrulha = 30.0
 
 [node name="AltaOpc1" parent="." instance=ExtResource("9_pl")]
 position = Vector2(3095, 614)

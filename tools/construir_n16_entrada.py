@@ -158,9 +158,20 @@ c.assente("ColunaC1", "r4_coluna", 2440, CH, esc=1.3, z=-4, mod=SOMBRA)
 c.assente("MaquinaC", "r4_maquina", 2620, CH, esc=1.0, z=-4, mod=SOMBRA)
 c.assente("CaldeiraC", "r4_caldeira", 2890, CH, esc=1.0, z=-5, mod=SOMBRA)
 c.assente("BandeiraC", "r4_bandeira", 2540, CH - 260, esc=1.0, z=-3)
-c.inimigo("TrabalhadorC", 2560, CH - 50, "trabalhador_corrompido", "patrulha", 40, 12, 80)
+c.com("""B1 (plano N1-N20, 3 out 2026; vida dos inimigos dos encontros selados
+proposta para 2-3 golpes -- a espada tira 42-95 -- a afinar em playtest) -- ENCONTRO SELADO (DEC-013): a auditoria
+viu o bot chegar a' porta da Regiao IV em < 1 min sem lutar. A area de
+maquinas fecha ao entrar (grades nas bordas do ChaoC, a da direita tapa o
+vao do tunel) ate' os tres morrerem: Trabalhador + Trabalhador de CARGA no
+chao com o piso quente a ritmar, Arqueiro no estrado.""")
+c.arena("ArenaMaquinas", 2420, 3000, CH, "arena_n16c")
+c.inimigo("TrabalhadorC", 2560, CH - 50, "trabalhador_corrompido", "patrulha", 100, 12, 80,
+          grupos=["arena_n16c"])
+c.inimigo("TrabalhadorC2", 2800, CH - 50, "trabalhador_corrompido", "carga", 110, 12, 90,
+          grupos=["arena_n16c"])
 c.plat("PlatArqC", 2860, 3000, CH - 100, h=24, av=40)
-c.inimigo("ArqueiroC", 2930, CH - 100 - 50, "arqueiro_da_fornalha", "cuspidor", 30, 10, 50)
+c.inimigo("ArqueiroC", 2930, CH - 100 - 50, "arqueiro_da_fornalha", "cuspidor", 80, 10, 50,
+          grupos=["arena_n16c"])
 
 c.com("""TUNEL (passagem inferior): chao a 800, tecto = barriga do ChaoC. Segredo 2
 a oeste, vigiado por um Trabalhador. Saida: degrau T1 (700) -> ChaoC2.""")
@@ -206,6 +217,10 @@ Checkpoint antes do guardiao. Piso quente a abrir a sala, e o OPERARIO
 BLINDADO (elite, escudo a' frente -- fraco nas costas) a guardar o portao.
 """)
 c.plat("ChaoD", 3860, 4560, CH, h=70, av=130)
+c.com("""Fim do mundo: parede a seguir a' porta. Sem ela, quem passasse pela porta
+com a sala selada (porta desligada) caia do fim do nivel quando as grades
+desciam -- o bot fazia-o em loop.""")
+c.plat("MuroFimD", 4560, 4640, CH - 1400, h=1470, av=0)   # a toda a altura: escala-se paredes desde o N10
 c.check("CheckD", 3930, CH)
 c.piso_quente("PisoQuente3", 4120, CH, 220, fase=0.6)
 c.brasas("BrasasPiso3", 4120, CH - 6, 220, n=10)
@@ -214,8 +229,15 @@ c.assente("FornoD", "r4_fornalha", 4010, CH, esc=1.1, z=-5)
 c.luz("LuzFornoD", 4010, CH - 70, 0.9, FORNO_LUZ, (2.2, 1.6))
 c.assente("BandeiraD1", "r4_bandeira", 4290, CH - 300, esc=1.0, z=-3)
 c.assente("BandeiraD2", "r4_bandeira", 4480, CH - 300, esc=1.0, z=-3)
+c.com("""B1: a saida tambem FECHA ate' limpar -- o Operario ja' nao guarda o portao
+sozinho: um Trabalhador obriga a virar-lhe as costas no meio de uma luta,
+que e' o que o escudo dele pede. (Com dois e o Operario a 300 HP o bot
+nunca acabava: medido -- o escudo frontal pede pogo/costas.)""")
+c.arena("ArenaSaida", 3960, 4560, CH, "arena_n16d", sela_porta=True)
 c.inimigo("OperarioGuardiao", 4360, CH - 60, "operario_blindado", "escudeiro", 170, 18, 70,
-          elite=True, escala=1.25)
+          elite=True, escala=1.25, grupos=["arena_n16d"])
+c.inimigo("TrabalhadorD1", 4200, CH - 50, "trabalhador_corrompido", "patrulha", 90, 12, 90,
+          grupos=["arena_n16d"])
 c.assente("PortaoSaida", "r4_portao_forja", 4500, CH, esc=1.2, z=-6)
 c.luz("LuzPortaoSaida", 4500, CH - 80, 1.0, FORNO_LUZ, (2.6, 1.8))
 c.fx("BrilhoPortaoSaida", "r4_brasas", 4500, CH - 40, esc=1.5, z=-5, mod="Color(1, 0.6, 0.3, 0.7)")

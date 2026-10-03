@@ -27,6 +27,10 @@ signal abriu
 @export var limite_seg := 90.0
 ## Cor das barras (luz fria da Torre dos Ecos por omissão).
 @export var cor_grade := Color(0.62, 0.66, 0.95, 0.95)
+## A porta do nível (`Porta`, filha da raiz) está DENTRO desta sala: enquanto
+## a sala estiver fechada, a porta não deixa sair (sem isto, corria-se para a
+## porta com os inimigos vivos).
+@export var sela_porta := false
 
 var _inimigos: Array[int] = []  # instance_id: objeto libertado == null mente
 var _fechada := false
@@ -66,7 +70,8 @@ func _criar_grade(lado: float) -> StaticBody2D:
 	g.position = Vector2(lado * tamanho.x * 0.5, tamanho.y * 0.5 - altura_grade * 0.5)
 	var col := CollisionShape2D.new()
 	var r := RectangleShape2D.new()
-	r.size = Vector2(24.0, altura_grade)
+	# 40 px: com 24 o recuo de um golpe de carga atravessava a grade (visto no N16)
+	r.size = Vector2(40.0, altura_grade)
 	col.shape = r
 	col.disabled = true
 	g.add_child(col)
@@ -113,6 +118,7 @@ func _fechar() -> void:
 		vis.visible = true
 		vis.modulate.a = 0.0
 		create_tween().tween_property(vis, "modulate:a", 1.0, 0.18)
+	_porta_ativa(false)
 	Som.toca("portao_fecha", -6.0)
 	fechou.emit()
 
@@ -126,8 +132,17 @@ func _abrir() -> void:
 		var tw := create_tween()
 		tw.tween_property(vis, "modulate:a", 0.0, 0.3)
 		tw.tween_callback(func(): vis.visible = false)
+	_porta_ativa(true)
 	Som.toca("portao_abre", -6.0)
 	abriu.emit()
+
+
+func _porta_ativa(ativa: bool) -> void:
+	if not sela_porta:
+		return
+	var porta := get_parent().get_node_or_null("Porta") as Area2D
+	if porta:
+		porta.set_deferred("monitoring", ativa)
 
 
 func _physics_process(delta: float) -> void:

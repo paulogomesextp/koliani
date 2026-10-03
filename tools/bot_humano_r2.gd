@@ -194,6 +194,14 @@ func _ligar() -> void:
 		_chefe = raiz.get_node_or_null("Guardiao")
 	if _porta:
 		M["x_alvo"] = _porta.global_position.x
+		# A porta muda de cena no proprio frame em que a Koliani entra: o
+		# teste de distancia do `_fim` podia nunca a ver e o bot continuava a
+		# jogar o NIVEL SEGUINTE (x_max alem do fim do nivel, mortes do
+		# nivel seguinte -- visto no N16/N17, 3 out 2026). O sinal da porta
+		# so' dispara com ela ativa, portanto a porta selada continua a nao
+		# contar.
+		if _porta is Area2D and not (_porta as Area2D).body_entered.is_connected(_ao_entrar_porta):
+			(_porta as Area2D).body_entered.connect(_ao_entrar_porta)
 	_x_ref = _kol.global_position.x
 	if float(M["y_spawn"]) == 0.0:
 		M["y_spawn"] = _kol.global_position.y
@@ -298,7 +306,15 @@ func _correr() -> void:
 		M["chefe_vida_max"] = int(_chefe.get("_vida_max") if _chefe.get("_vida_max") else 0)
 
 
+func _ao_entrar_porta(corpo: Node) -> void:
+	if corpo.is_in_group("koliani"):
+		M["concluido"] = true
+		M["motivo_fim"] = "porta"
+
+
 func _fim() -> bool:
+	if bool(M.get("concluido", false)) and str(M.get("motivo_fim", "")) == "porta":
+		return true
 	if _porta == null or not is_instance_valid(_porta) or _kol == null:
 		return false
 	# a porta selada nao conta: so' o atravessamento real

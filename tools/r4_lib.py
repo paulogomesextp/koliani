@@ -109,13 +109,15 @@ class Cena:
             self.nos.append("; " + l if l else ";")
 
     def no(self, nome: str, corpo: str = "", tipo: str | None = None,
-           inst: str | None = None, pai: str = ".") -> None:
+           inst: str | None = None, pai: str = ".", grupos: list[str] | None = None) -> None:
         cab = f'[node name="{nome}"'
         if tipo:
             cab += f' type="{tipo}"'
         cab += f' parent="{pai}"'
         if inst:
             cab += f' instance=ExtResource("{inst}")'
+        if grupos:
+            cab += " groups=[" + ", ".join(f'"{g}"' for g in grupos) + "]"
         cab += "]"
         self.nos.append(cab)
         if corpo:
@@ -242,7 +244,7 @@ class Cena:
 
     def inimigo(self, nome: str, x: float, y: float, especie: str, comp: str, vida: int,
                 dano: int, patrulha: float, rim: str = BRASA, elite: bool = False,
-                escala: float = 1.0, extra: str = "") -> None:
+                escala: float = 1.0, extra: str = "", grupos: list[str] | None = None) -> None:
         c = f"position = {v(x, y)}\n"
         if escala != 1.0:
             c += f"scale = {v(escala, escala)}\n"
@@ -252,7 +254,18 @@ class Cena:
               f'comportamento = "{comp}"\nalcance_patrulha = {patrulha:g}\ncor_rim = {rim}')
         if extra:
             c += "\n" + extra
-        self.no(nome, c, inst=self.ator("dem"))
+        self.no(nome, c, inst=self.ator("dem"), grupos=grupos)
+
+    def arena(self, nome: str, esq: float, dir: float, topo: float, grupo: str,
+              altura_grade: float = 340.0, cor: str = "Color(1, 0.55, 0.3, 0.95)",
+              sela_porta: bool = False) -> None:
+        """SALA QUE FECHA ATE' LIMPAR (`scripts/arena_selada.gd`, DEC-013): grades
+        nas bordas `esq`/`dir` do chao `topo`; inimigos = os do grupo `grupo`."""
+        self.com_script(nome, "Area2D", "res://scripts/arena_selada.gd",
+                        f"position = {v((esq + dir) / 2.0, topo - 130.0)}\n"
+                        f"tamanho = {v(dir - esq, 260.0)}\naltura_grade = {altura_grade:g}\n"
+                        f'grupo_inimigos = "{grupo}"\ncor_grade = {cor}'
+                        + ("\nsela_porta = true" if sela_porta else ""))
 
     # ------------------------------------------------------------- props
     def assente(self, nome: str, tex: str, x: float, base_y: float, esc: float = 1.0,

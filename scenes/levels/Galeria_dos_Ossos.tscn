@@ -1,4 +1,4 @@
-[gd_scene load_steps=45 format=3 uid="uid://bkolianigaleriaossos17"]
+[gd_scene load_steps=46 format=3 uid="uid://bkolianigaleriaossos17"]
 
 ; REGIAO IV / nivel 17 -- FUNDICAO (`level.n16`).
 ; O nome do ficheiro fica (era a Galeria dos Ossos): mudá-lo partia saves.
@@ -43,13 +43,14 @@
 [ext_resource type="Script" path="res://scripts/jato_fornalha.gd" id="30_s_jato_fornalha.gd"]
 [ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/fornalha/r4_estrutura.png" id="31_t_r4_estrutura"]
 [ext_resource type="PackedScene" uid="uid://bkolianiessencia01" path="res://scenes/actors/Essencia.tscn" id="32_a_ess"]
-[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/fornalha/r4_caldeira.png" id="33_t_r4_caldeira"]
-[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/fornalha/r4_caixa.png" id="34_t_r4_caixa"]
-[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/fornalha/r4_fornalha.png" id="35_t_r4_fornalha"]
-[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/fornalha/r4_prensa.png" id="36_t_r4_prensa"]
-[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/fornalha/r4_corrente.png" id="37_t_r4_corrente"]
-[ext_resource type="PackedScene" uid="uid://bkolianiactor01" path="res://scenes/actors/Koliani.tscn" id="38_a_kol"]
-[ext_resource type="PackedScene" uid="uid://bkolianiporta01" path="res://scenes/actors/Porta.tscn" id="39_a_porta"]
+[ext_resource type="Script" path="res://scripts/arena_selada.gd" id="33_s_arena_selada.gd"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/fornalha/r4_caldeira.png" id="34_t_r4_caldeira"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/fornalha/r4_caixa.png" id="35_t_r4_caixa"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/fornalha/r4_fornalha.png" id="36_t_r4_fornalha"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/fornalha/r4_prensa.png" id="37_t_r4_prensa"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/fornalha/r4_corrente.png" id="38_t_r4_corrente"]
+[ext_resource type="PackedScene" uid="uid://bkolianiactor01" path="res://scenes/actors/Koliani.tscn" id="39_a_kol"]
+[ext_resource type="PackedScene" uid="uid://bkolianiporta01" path="res://scenes/actors/Porta.tscn" id="40_a_porta"]
 
 [sub_resource type="RectangleShape2D" id="rs_chk"]
 size = Vector2(44, 96)
@@ -739,13 +740,43 @@ scale_amount_min = 1.6
 scale_amount_max = 3.6
 color_ramp = SubResource("ramp_brasa")
 
-[node name="TrabalhadorC" parent="." instance=ExtResource("12_a_dem")]
+; B1 (plano N1-N20, 3 out 2026; vida dos inimigos dos encontros selados
+; proposta para 2-3 golpes -- a espada tira 42-95 -- a afinar em playtest) -- SALAO SELADO (DEC-013): quem chega ao
+; salao inferior fica la' ate' limpar Trabalhador + Lanca-Chamas + Drone, com
+; o piso quente a ritmar e o elevador de vaivem a passar por dentro.
+[node name="ArenaSalao" type="Area2D" parent="."]
+script = ExtResource("33_s_arena_selada.gd")
+position = Vector2(3550, 670)
+tamanho = Vector2(800, 260)
+altura_grade = 340
+grupo_inimigos = "arena_n17d"
+cor_grade = Color(1, 0.55, 0.3, 0.95)
+
+[node name="TrabalhadorC" parent="." instance=ExtResource("12_a_dem") groups=["arena_n17d"]]
 position = Vector2(3250, 750)
 especie = "trabalhador_corrompido"
-vida = 40
+vida = 110
 dano_contacto = 12
 comportamento = "patrulha"
 alcance_patrulha = 70
+cor_rim = Color(1.0, 0.52, 0.16, 1)
+
+[node name="LancaC" parent="." instance=ExtResource("12_a_dem") groups=["arena_n17d"]]
+position = Vector2(3650, 745)
+especie = "lanca_chamas"
+vida = 120
+dano_contacto = 14
+comportamento = "patrulha"
+alcance_patrulha = 60
+cor_rim = Color(1.0, 0.52, 0.16, 1)
+
+[node name="DroneC" parent="." instance=ExtResource("12_a_dem") groups=["arena_n17d"]]
+position = Vector2(3800, 630)
+especie = "drone_de_lava"
+vida = 70
+dano_contacto = 10
+comportamento = "voador"
+alcance_patrulha = 120
 cor_rim = Color(1.0, 0.52, 0.16, 1)
 
 [node name="MaquinaC" type="Sprite2D" parent="."]
@@ -758,7 +789,7 @@ modulate = Color(0.42, 0.34, 0.36, 1)
 [node name="CaldeiraC" type="Sprite2D" parent="."]
 position = Vector2(3860, 610)
 scale = Vector2(1, 1)
-texture = ExtResource("33_t_r4_caldeira")
+texture = ExtResource("34_t_r4_caldeira")
 z_index = -5
 
 [node name="LuzCaldeiraC" type="PointLight2D" parent="."]
@@ -782,7 +813,7 @@ valor = 25
 [node name="CaixasSegC" type="Sprite2D" parent="."]
 position = Vector2(3860, 669.5)
 scale = Vector2(0.5, 0.5)
-texture = ExtResource("34_t_r4_caixa")
+texture = ExtResource("35_t_r4_caixa")
 z_index = -1
 
 ; ===================  E) SAIDA PARA AS CAMARAS  ==========================
@@ -850,6 +881,15 @@ pele_terreno = true
 position = Vector2(4705, 735)
 tamanho = Vector2(890, 70)
 altura_visual = 130
+cor_base = Color(0.2, 0.16, 0.16, 1)
+cor_topo = Color(0.42, 0.3, 0.26, 1)
+
+; Fim do mundo a toda a altura (ver N16): com a sala do Automato selada a
+; porta desliga-se; sem parede, quem a passasse caia do fim do nivel.
+[node name="MuroFimE" parent="." instance=ExtResource("3_a_pl")]
+position = Vector2(5190, 35)
+tamanho = Vector2(80, 1470)
+altura_visual = 0
 cor_base = Color(0.2, 0.16, 0.16, 1)
 cor_topo = Color(0.42, 0.3, 0.26, 1)
 
@@ -924,7 +964,7 @@ textura_bocal = ExtResource("20_t_r4_piso_quente")
 [node name="FornoE" type="Sprite2D" parent="."]
 position = Vector2(4380, 583.2)
 scale = Vector2(1.1, 1.1)
-texture = ExtResource("35_t_r4_fornalha")
+texture = ExtResource("36_t_r4_fornalha")
 z_index = -5
 
 [node name="LuzFornoE" type="PointLight2D" parent="."]
@@ -937,7 +977,7 @@ scale = Vector2(2.2, 1.6)
 [node name="PrensaE" type="Sprite2D" parent="."]
 position = Vector2(4790, 586.5)
 scale = Vector2(1, 1)
-texture = ExtResource("36_t_r4_prensa")
+texture = ExtResource("37_t_r4_prensa")
 z_index = -6
 modulate = Color(0.42, 0.34, 0.36, 1)
 
@@ -953,15 +993,35 @@ scale = Vector2(1, 1)
 texture = ExtResource("10_t_r4_bandeira")
 z_index = -3
 
-[node name="AutomatoGuardiao" parent="." instance=ExtResource("12_a_dem")]
+; B1: a arena do Automato FECHA (e a porta so' abre) quando ele e o
+; Trabalhador que o acompanha caem -- antes dava para passar por ele a correr.
+[node name="ArenaGuardiao" type="Area2D" parent="."]
+script = ExtResource("33_s_arena_selada.gd")
+position = Vector2(4725, 570)
+tamanho = Vector2(850, 260)
+altura_grade = 340
+grupo_inimigos = "arena_n17e"
+cor_grade = Color(1, 0.55, 0.3, 0.95)
+sela_porta = true
+
+[node name="AutomatoGuardiao" parent="." instance=ExtResource("12_a_dem") groups=["arena_n17e"]]
 position = Vector2(4960, 640)
 scale = Vector2(1.2, 1.2)
 elite = true
 especie = "automato_de_fundicao"
-vida = 200
+vida = 340
 dano_contacto = 18
 comportamento = "patrulha"
 alcance_patrulha = 60
+cor_rim = Color(1.0, 0.52, 0.16, 1)
+
+[node name="TrabalhadorE" parent="." instance=ExtResource("12_a_dem") groups=["arena_n17e"]]
+position = Vector2(4600, 650)
+especie = "trabalhador_corrompido"
+vida = 110
+dano_contacto = 12
+comportamento = "carga"
+alcance_patrulha = 80
 cor_rim = Color(1.0, 0.52, 0.16, 1)
 
 [node name="PortaoSaida" type="Sprite2D" parent="."]
@@ -989,7 +1049,7 @@ material = SubResource("mat_add")
 position = Vector2(587.13, 0)
 scale = Vector2(0.22, 0.22)
 texture_repeat = 2
-texture = ExtResource("37_t_r4_corrente")
+texture = ExtResource("38_t_r4_corrente")
 centered = false
 region_enabled = true
 region_rect = Rect2(0, 0, 117, 1136.36)
@@ -1000,7 +1060,7 @@ modulate = Color(0.7, 0.5, 0.4, 0.8)
 position = Vector2(1287.13, 0)
 scale = Vector2(0.22, 0.22)
 texture_repeat = 2
-texture = ExtResource("37_t_r4_corrente")
+texture = ExtResource("38_t_r4_corrente")
 centered = false
 region_enabled = true
 region_rect = Rect2(0, 0, 117, 1136.36)
@@ -1011,7 +1071,7 @@ modulate = Color(0.7, 0.5, 0.4, 0.8)
 position = Vector2(1987.13, 0)
 scale = Vector2(0.22, 0.22)
 texture_repeat = 2
-texture = ExtResource("37_t_r4_corrente")
+texture = ExtResource("38_t_r4_corrente")
 centered = false
 region_enabled = true
 region_rect = Rect2(0, 0, 117, 1136.36)
@@ -1022,7 +1082,7 @@ modulate = Color(0.7, 0.5, 0.4, 0.8)
 position = Vector2(2887.13, 0)
 scale = Vector2(0.22, 0.22)
 texture_repeat = 2
-texture = ExtResource("37_t_r4_corrente")
+texture = ExtResource("38_t_r4_corrente")
 centered = false
 region_enabled = true
 region_rect = Rect2(0, 0, 117, 1136.36)
@@ -1033,7 +1093,7 @@ modulate = Color(0.7, 0.5, 0.4, 0.8)
 position = Vector2(3587.13, 0)
 scale = Vector2(0.22, 0.22)
 texture_repeat = 2
-texture = ExtResource("37_t_r4_corrente")
+texture = ExtResource("38_t_r4_corrente")
 centered = false
 region_enabled = true
 region_rect = Rect2(0, 0, 117, 1136.36)
@@ -1044,7 +1104,7 @@ modulate = Color(0.7, 0.5, 0.4, 0.8)
 position = Vector2(4487.13, 0)
 scale = Vector2(0.22, 0.22)
 texture_repeat = 2
-texture = ExtResource("37_t_r4_corrente")
+texture = ExtResource("38_t_r4_corrente")
 centered = false
 region_enabled = true
 region_rect = Rect2(0, 0, 117, 1136.36)
@@ -1087,11 +1147,11 @@ scale_amount_min = 9.0
 scale_amount_max = 20.0
 color_ramp = SubResource("ramp_fumo")
 
-[node name="Koliani" parent="." instance=ExtResource("38_a_kol")]
+[node name="Koliani" parent="." instance=ExtResource("39_a_kol")]
 position = Vector2(170, 760)
 usar_prototipo_premium = true
 usar_golden_set = true
 
-[node name="Porta" parent="." instance=ExtResource("39_a_porta")]
+[node name="Porta" parent="." instance=ExtResource("40_a_porta")]
 position = Vector2(5100, 694)
 pista_ao_atravessar = ""

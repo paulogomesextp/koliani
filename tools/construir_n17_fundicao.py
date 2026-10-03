@@ -190,7 +190,15 @@ c.no("Elevador2", f'script = ExtResource("{c.script("res://scripts/elevador_colu
 c.check("CheckC", 3560, LOW)
 c.piso_quente("PisoQuenteC", 3730, LOW, 220, fase=1.7)
 c.brasas("BrasasPisoC", 3730, LOW - 6, 220, n=10)
-c.inimigo("TrabalhadorC", 3250, LOW - 50, "trabalhador_corrompido", "patrulha", 40, 12, 70)
+c.com("""B1 (plano N1-N20, 3 out 2026; vida dos inimigos dos encontros selados
+proposta para 2-3 golpes -- a espada tira 42-95 -- a afinar em playtest) -- SALAO SELADO (DEC-013): quem chega ao
+salao inferior fica la' ate' limpar Trabalhador + Lanca-Chamas + Drone, com
+o piso quente a ritmar e o elevador de vaivem a passar por dentro.""")
+c.arena("ArenaSalao", 3150, 3950, LOW, "arena_n17d")
+c.inimigo("TrabalhadorC", 3250, LOW - 50, "trabalhador_corrompido", "patrulha", 110, 12, 70,
+          grupos=["arena_n17d"])
+c.inimigo("LancaC", 3650, LOW - 55, "lanca_chamas", "patrulha", 120, 14, 60, grupos=["arena_n17d"])
+c.inimigo("DroneC", 3800, LOW - 170, "drone_de_lava", "voador", 70, 10, 120, grupos=["arena_n17d"])
 c.assente("MaquinaC", "r4_maquina", 3290, LOW, esc=1.0, z=-4, mod=SOMBRA)
 c.assente("CaldeiraC", "r4_caldeira", 3860, LOW, esc=1.0, z=-5)
 c.luz("LuzCaldeiraC", 3860, LOW - 60, 0.9, FORNO_LUZ, (2.2, 1.6))
@@ -212,6 +220,9 @@ c.plat("MuroLavaEE", 3910, 3950, LOW, h=160, av=0)
 c.quebra("LajeE1", 4010, 4100, LOW)
 c.quebra("LajeE2", 4150, 4235, LOW - 55)
 c.plat("ChaoE", 4260, 5150, LOW - 100, h=70, av=130)
+c.com("""Fim do mundo a toda a altura (ver N16): com a sala do Automato selada a
+porta desliga-se; sem parede, quem a passasse caia do fim do nivel.""")
+c.plat("MuroFimE", 5150, 5230, LOW - 1500, h=1470, av=0)
 c.plat("MuroLavaED", 4260, 4300, LOW - 100, h=260, av=0)
 c.check("CheckE", 4330, LOW - 100)
 c.piso_quente("PisoQuenteE", 4480, LOW - 100, 220, fase=0.6)
@@ -223,8 +234,13 @@ c.luz("LuzFornoE", 4380, LOW - 170, 0.9, FORNO_LUZ, (2.2, 1.6))
 c.assente("PrensaE", "r4_prensa", 4790, LOW - 100, esc=1.0, z=-6, mod=SOMBRA)
 c.assente("BandeiraE1", "r4_bandeira", 4440, LOW - 400, esc=1.0, z=-3)
 c.assente("BandeiraE2", "r4_bandeira", 5060, LOW - 400, esc=1.0, z=-3)
-c.inimigo("AutomatoGuardiao", 4960, LOW - 100 - 60, "automato_de_fundicao", "patrulha", 200, 18, 60,
-          elite=True, escala=1.2)
+c.com("""B1: a arena do Automato FECHA (e a porta so' abre) quando ele e o
+Trabalhador que o acompanha caem -- antes dava para passar por ele a correr.""")
+c.arena("ArenaGuardiao", 4300, 5150, LOW - 100, "arena_n17e", sela_porta=True)
+c.inimigo("AutomatoGuardiao", 4960, LOW - 100 - 60, "automato_de_fundicao", "patrulha", 340, 18, 60,
+          elite=True, escala=1.2, grupos=["arena_n17e"])
+c.inimigo("TrabalhadorE", 4600, LOW - 100 - 50, "trabalhador_corrompido", "carga", 110, 12, 80,
+          grupos=["arena_n17e"])
 c.assente("PortaoSaida", "r4_portao_forja", 5100, LOW - 100, esc=1.2, z=-6)
 c.luz("LuzPortaoSaida", 5100, LOW - 180, 1.0, FORNO_LUZ, (2.6, 1.8))
 c.fx("BrilhoPortaoSaida", "r4_brasas", 5100, LOW - 140, esc=1.5, z=-5, mod="Color(1, 0.6, 0.3, 0.7)")

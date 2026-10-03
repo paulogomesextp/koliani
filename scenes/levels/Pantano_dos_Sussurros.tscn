@@ -20,6 +20,7 @@
 [ext_resource type="PackedScene" uid="uid://bkolianiraizperigo01" path="res://scenes/actors/RaizPerigo.tscn" id="12_raiz"]
 [ext_resource type="PackedScene" uid="uid://bkolianiessencia01" path="res://scenes/actors/Essencia.tscn" id="99_ess"]
 [ext_resource type="PackedScene" path="res://scenes/fx/Region1HybridVisualTarget.tscn" id="100_target"]
+[ext_resource type="Script" path="res://scripts/arena_selada.gd" id="200_arena"]
 
 [sub_resource type="RectangleShape2D" id="rs_chk"]
 size = Vector2(44, 96)
@@ -173,7 +174,7 @@ altura_visual = 120
 cor_base = Color(0.16, 0.24, 0.13, 1)
 cor_topo = Color(0.36, 0.56, 0.32, 1)
 
-[node name="EliteCarga" parent="." instance=ExtResource("2_dem")]
+[node name="EliteCarga" parent="." groups=["arena_n2"] instance=ExtResource("2_dem")]
 position = Vector2(3440, 636)
 scale = Vector2(1.4, 1.4)
 elite = true
@@ -183,6 +184,48 @@ dano_contacto = 20
 comportamento = "carga"
 alcance_patrulha = 110.0
 resistencia_recuo = 2.2
+
+; ===== B1 (plano N1-N20, 3 out 2026): ENCONTRO 2 = SALA QUE FECHA =====
+; DEC-013. O elite de carga deixa de estar sozinho: gosma (tanque lento) e
+; goblin de patrulha. Grades de 340 px nas pontas do chao (o tecto do
+; segredo, a y=399, fica por cima delas: nao ha' fuga por cima).
+[node name="ArenaElite" type="Area2D" parent="."]
+position = Vector2(3395, 535)
+script = ExtResource("200_arena")
+tamanho = Vector2(730, 260)
+altura_grade = 340.0
+grupo_inimigos = "arena_n2"
+cor_grade = Color(0.55, 0.78, 0.5, 0.95)
+
+[node name="GosmaElite" parent="." groups=["arena_n2"] instance=ExtResource("2_dem")]
+position = Vector2(3180, 636)
+especie = "gosma"
+vida = 80
+dano_contacto = 12
+alcance_patrulha = 60.0
+
+[node name="GoblinElite" parent="." groups=["arena_n2"] instance=ExtResource("2_dem")]
+position = Vector2(3660, 636)
+especie = "goblin"
+vida = 55
+dano_contacto = 12
+alcance_patrulha = 70.0
+
+; ===== B1: ENCONTRO 1 -- goblin entre as raizes do corredor =====
+[node name="GoblinRaizes" parent="." instance=ExtResource("2_dem")]
+position = Vector2(2600, 636)
+especie = "goblin"
+vida = 50
+dano_contacto = 12
+alcance_patrulha = 60.0
+
+; ===== B1: ENCONTRO 3 -- gosma a' saida dos portoes de dash =====
+[node name="GosmaPortoes" parent="." instance=ExtResource("2_dem")]
+position = Vector2(4800, 616)
+especie = "gosma"
+vida = 60
+dano_contacto = 10
+alcance_patrulha = 40.0
 
 [node name="SegredoA1" parent="." instance=ExtResource("9_pl")]
 position = Vector2(3125, 614)

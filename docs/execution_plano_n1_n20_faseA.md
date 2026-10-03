@@ -45,6 +45,30 @@ que fecham até limpar; N11 refeito agora). Branch `plano-n1-n19`, worktree
    usar um shim `python3 -> python` no PATH (não se mudou o script: o CI é
    Linux).
 
+## B1 — encontros (1.ª leva: N1, N2, N16, N17)
+
+Componente: `ArenaSelada` (+ `sela_porta` opt-in: a porta do nível não deixa
+sair com a sala fechada; grades de 40 px — com 24 o recuo de um golpe de
+carga atravessava). Geradores da Região IV: `r4_lib.Cena.arena()` e
+`inimigo(..., grupos=[...])` (opcionais: N18–N20 regeneram byte a byte iguais).
+
+| Nível | Encontros novos | Sala que fecha | Travessia (exp / normal / casual) |
+|---|---|---|---|
+| N1 | gosma nas raízes; sala do goblin piloto (+gosma +goblin); gosma no ritmo | ArenaInimigo | bloqueia no Ghorak como na auditoria (resolve-se no B4) |
+| N2 | goblin nas raízes; sala do elite (+gosma +goblin); gosma nos portões | ArenaElite | exp preso nos portões de dash (já era assim); normal 152 s; casual 554 s |
+| N16 | sala das máquinas (2 trabalhadores + arqueiro); saída selada (Operário + trabalhador) | 2 | 304 s / 511 s / 325 s (antes 25–57 s) |
+| N17 | salão inferior (trabalhador + lança + drone); arena do Autómato selada (+ trabalhador) | 2 | 154 s / 199 s / 89 s (antes 27–35 s) |
+
+Medido a meio: com 30–50 HP os comuns da Região IV morrem a UM golpe (a
+espada tira 42–95). Nos encontros selados ficaram com 90–120 HP (2–3
+golpes), elites 170–340 — valores propostos para playtest. Com o Operário
+(escudo frontal) a 300 HP + 2 trabalhadores o bot nunca acabava: ficou 170 +
+1 trabalhador.
+
+Armadilha: com a sala selada a porta fica desligada; quem passa por ela e se
+encosta à grade cai do fim do nível quando as grades descem. N16/N17 ganharam
+parede de fim a toda a altura (escala-se paredes desde o N10).
+
 ## Por fazer (ordem do plano)
 
 B1 encontros (N1, N2, N16, N17 primeiro; `ArenaSelada` já existe) → B4

@@ -150,6 +150,7 @@ func _correr_tudo() -> void:
 	await teste_n9_autoral()
 	await teste_n11_entrada_autoral()
 	await teste_hitstop_v2()
+	await teste_b1_encontros()
 	await teste_fluxo_fim_regiao2()
 	await teste_combat_lab()
 	await teste_combat_lab_combos()
@@ -7532,6 +7533,60 @@ func teste_fluxo_fim_regiao2() -> void:
 ## B2 (auditoria N1-N20): hitstop v2 opt-in. Ligado, NAO mexe no tempo
 ## global (camara/fundo continuam), congela o alvo e a animacao da Koliani e
 ## repoe tudo. Desligado (default), e' o hitstop global de sempre.
+## B1 (auditoria N1-N20, DEC-013): cada nivel tratado tem >= 3 encontros e
+## pelo menos uma SALA QUE FECHA (`ArenaSelada`) com inimigos de verdade la'
+## dentro; e uma arena com `sela_porta` desliga a porta enquanto esta' fechada.
+func teste_b1_encontros() -> void:
+	var minimos := {
+		"res://scenes/levels/Floresta_Putrefata.tscn": 5,
+		"res://scenes/levels/Pantano_dos_Sussurros.tscn": 5,
+		"res://scenes/levels/Torre_dos_Sinos.tscn": 12,
+		"res://scenes/levels/Cemiterio_dos_Reis.tscn": 9,
+		"res://scenes/levels/Galeria_dos_Ossos.tscn": 10,
+	}
+	for cena: String in minimos:
+		var n := (load(cena) as PackedScene).instantiate()
+		var comuns := 0
+		var arenas: Array[Node] = []
+		for c in n.get_children():
+			if c is DemonioBase:
+				comuns += 1
+			if c.get_script() == preload("res://scripts/arena_selada.gd"):
+				arenas.append(c)
+		_ok(comuns >= int(minimos[cena]), "B1: %s so' tem %d inimigos (min %d)" % [cena.get_file(), comuns, minimos[cena]])
+		_ok(not arenas.is_empty(), "B1: %s sem sala que fecha (ArenaSelada)" % cena.get_file())
+		for a in arenas:
+			var g := str(a.get("grupo_inimigos"))
+			var membros := 0
+			for c in n.get_children():
+				if c is DemonioBase and c.is_in_group(g):
+					membros += 1
+			_ok(membros >= 2, "B1: %s/%s tem %d inimigos no grupo `%s`" % [cena.get_file(), a.name, membros, g])
+		n.free()
+	# sela_porta: a porta da cena nao deixa sair com a sala fechada
+	var raiz := Node2D.new()
+	add_child(raiz)
+	var porta := Area2D.new()
+	porta.name = "Porta"
+	raiz.add_child(porta)
+	var arena := ArenaSelada.new()
+	arena.sela_porta = true
+	# o inimigo entra ANTES da arena na arvore: e' no `_ready` que ela os conta
+	var bicho := (load("res://scenes/actors/DemonioBase.tscn") as PackedScene).instantiate()
+	arena.add_child(bicho)
+	raiz.add_child(arena)
+	await get_tree().process_frame
+	arena.call("_fechar")
+	await get_tree().physics_frame
+	_ok(not porta.monitoring, "B1: sela_porta nao desligou a porta com a sala fechada")
+	bicho.queue_free()
+	for i in 4:
+		await get_tree().physics_frame
+	_ok(porta.monitoring and not arena.esta_fechada(), "B1: a porta nao voltou depois de limpar a sala")
+	raiz.queue_free()
+	await get_tree().process_frame
+
+
 func teste_hitstop_v2() -> void:
 	var k := (load("res://scenes/actors/Koliani.tscn") as PackedScene).instantiate()
 	add_child(k)
