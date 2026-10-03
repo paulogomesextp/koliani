@@ -1,3 +1,7 @@
+## PENDENTE (3 out 2026) — Região IV
+- Playtest humano do Guardião da Fornalha (N20): telégrafos, TTK ~60 s, erupção/refúgios; validar em telemóvel. Rig com resolução da prancha (macio).
+- `region.3.complete` não existe (Região III sem cartão de fim de região).
+
 > **N19 "Sala das Pressoes" (3 out 2026, branch `claude/region04-n19`, sem push)** -- `docs/nivel_autoral_n19.md`. Pistoes esmagadores + valvulas de pressao (componentes novos, opt-in: `PistaoFornalha`, `ValvulaFornalha`, `RelogioFornalha`) e ganchos opt-in no `JatoFornalha`/`PlataformaRitmada`; nivel gerado por `tools/construir_n19_sala_pressoes.py` (A pistoes, B 1.a valvula, C maquina sincronizada, D sala das pressoes, arena; 5 CP, 3 segredos, 6 valvulas). **Pendente do Paulo:** (1) HUMAN PLAYTEST (checklist em `docs/nivel_autoral_n19.md`); (2) **GUARDIAO N19 = Lanca-Chamas elite e' PLACEHOLDER** -- das 4 especies do contrato (Valvula Viva, Assassino Ignio, Torreta de Plasma, Gargula de Fogo) nenhuma esta' extraida; (3) combate abaixo dos 50% do contrato; (4) `guard.automato_de_fundicao` duplicado nos `*.json` (herdado do N17, 2.a em ingles ganha nas outras linguas).
 
 > **N18 "Camara da Lava" (2 out 2026, master)** -- `docs/nivel_autoral_n18.md`. Seguiu o contrato LOCKED (lava que sobe), nao o 'Ritmo da Fornalha' do briefing. **Pendente do Paulo:** (1) HUMAN PLAYTEST; (2) GUARDIAO N18 = Sentinela de Pressao elite, a confirmar (o Automato de Fundicao ja e o do N17); (3) largura 6800 px > referencia 4800.
