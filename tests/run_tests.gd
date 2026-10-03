@@ -6656,7 +6656,7 @@ func _coracao_luta(modo: String, segundos: float) -> Dictionary:
 	var frames := 0
 	var tj := 0.0          # segundos de jogo
 	var prox_golpe := 0.5
-	var prox_tiro := 0.0
+	var prox_tiro := 0.333   # ranhuras fixas de 0,67 s (o `frames % 40 == 20` original)
 	var janelas: Array = []
 	var jan_ini := -1.0
 	var fase2_em := -1.0
@@ -6712,8 +6712,10 @@ func _coracao_luta(modo: String, segundos: float) -> Dictionary:
 			energia = minf(99.0, energia + 12.0 * dtj)   # regen 12/s
 			if vuln and golpe:
 				energia = minf(99.0, energia + 5.0)   # +5 por golpe de espada
-			if vuln and energia >= 33.0 and tj >= prox_tiro:
-				prox_tiro = tj + 0.67
+			var ranhura := tj >= prox_tiro
+			if ranhura:
+				prox_tiro += 0.6667
+			if vuln and energia >= 33.0 and ranhura:
 				energia -= 33.0
 				g.receber_tiro(130, 1.0)   # o nucleo absorve 40 % da onda
 	var ultima_contagem := {}
