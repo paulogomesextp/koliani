@@ -15,6 +15,7 @@ func _ready() -> void:
 		"N18": TestesRegion04N18.executar(),
 		"pistao/valvula": TestesRegion04PistaoValvula.executar(),
 		"N19": TestesRegion04N19.executar(),
+		"N20": TestesRegion04N20.executar(),
 		"i18n": TestesI18nSemDuplicadas.executar(),
 	}
 	blocos["contacto real"] = await TestesRegion04PistaoValvula.contacto(self)

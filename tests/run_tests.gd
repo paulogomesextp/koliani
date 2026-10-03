@@ -83,6 +83,8 @@ func _correr_tudo() -> void:
 		_falhas.append(falha)
 	for falha in TestesRegion04N19.executar():
 		_falhas.append(falha)
+	for falha in TestesRegion04N20.executar():
+		_falhas.append(falha)
 	for falha in TestesI18nSemDuplicadas.executar():
 		_falhas.append(falha)
 	for falha in TestesKolianiCanonicaNiveis.executar():

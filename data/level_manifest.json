@@ -500,7 +500,7 @@
       "ownership": "authored",
       "boss_ref": {
         "boss_id": "boss_level_020",
-        "scene": "res://scenes/actors/ChefeOlhoDoAbismo.tscn"
+        "scene": "res://scenes/actors/ChefeGuardiaoDaFornalha.tscn"
       },
       "auto_regenerate": false
     },

@@ -235,7 +235,7 @@ func _abrir_guardiao() -> void:
 const HABILIDADE_DO_CHEFE := {4: "salto_duplo", 9: "escalar_paredes"}
 
 ## Cartao de fim de regiao: indice do nivel -> chave i18n.
-const REGIAO_CONCLUIDA := {4: "region.1.complete", 9: "region.2.complete"}
+const REGIAO_CONCLUIDA := {4: "region.1.complete", 9: "region.2.complete", 19: "region.4.complete"}
 ## Habilidade ganha NESTA vitoria (para o cartao); "" se ja' a tinha.
 var _hab_ganha := ""
 
