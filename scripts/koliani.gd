@@ -172,6 +172,25 @@ const HITSTOP_DANO := 0.020        # ~3,3 frames -- levar dano ja' tem tremor
 ## que a divisao precisa. O `Engine.time_scale < 0.5` que marca "estou em
 ## hitstop" continua a dar verdadeiro.
 const HITSTOP_ESCALA_TEMPO := 0.0005
+
+## B2 (auditoria N1-N20, 3 out 2026) -- HITSTOP V2, opt-in POR NIVEL (o no'
+## `Koliani` de cada cena). Default = o hitstop global de sempre.
+##
+## Causa confirmada: o hitstop v1 para o JOGO TODO (`Engine.time_scale`):
+## camara, parallax, particulas. Por isso, acima de ~25 ms, lia-se como o
+## jogo a bloquear (8.1C) e os valores ficaram em 10-24 ms -- abaixo de 1,5
+## frames a 60 Hz, ou seja, invisivel no telemovel. O v2 congela SO' os
+## atores do impacto: a animacao da Koliani e o inimigo atingido (fisica +
+## animacao). Camara, fundo, musica e o resto do nivel continuam a correr,
+## por isso pode durar o que um impacto precisa para se ler.
+## Valores propostos -- o final decide-se em playtest humano em telemovel.
+@export var combate_hitstop_v2 := false
+const HITSTOP_V2 := {
+	HITSTOP_GOLPE: 0.035, HITSTOP_REMATE: 0.060, HITSTOP_CRIT: 0.080,
+	HITSTOP_PISAO: 0.045, HITSTOP_DANO: 0.060,
+}
+## Ids dos atores congelados agora pelo v2 (objeto libertado == null mente).
+var _hitstop_v2_ate := 0.0
 const TREMOR_GOLPE := 2.0
 const TREMOR_REMATE := 3.2
 const TREMOR_CRIT := 4.5
@@ -2108,7 +2127,10 @@ func _abanar(forca: float) -> void:
 ## Pequena paragem de tempo real ("hitstop") para dar peso ao impacto.
 ##
 ## Nao poe o tempo a ZERO -- ver `HITSTOP_ESCALA_TEMPO`.
-func _hitstop(segundos: float) -> void:
+func _hitstop(segundos: float, alvo: Node = null) -> void:
+	if combate_hitstop_v2:
+		_hitstop_local(float(HITSTOP_V2.get(segundos, segundos * 3.0)), alvo)
+		return
 	if Engine.time_scale < 0.5:
 		return
 	Engine.time_scale = HITSTOP_ESCALA_TEMPO
@@ -2117,6 +2139,37 @@ func _hitstop(segundos: float) -> void:
 	# O timer vive na árvore e o Callable não segura `self`.
 	get_tree().create_timer(segundos, true, false, true).timeout.connect(
 		func() -> void: Engine.time_scale = 1.0)
+
+
+## Hitstop v2: congela a ANIMACAO da Koliani (o corpo dela continua a cair e a
+## responder ao input -- congelar a fisica do jogador perdia toques) e o ALVO
+## inteiro (`process_mode` desligado: fisica, IA e animacao param juntas).
+## O timer ignora o time_scale e nao segura `self` nem o alvo (ids), por isso
+## um reload a meio nao deixa nada preso.
+func _hitstop_local(segundos: float, alvo: Node) -> void:
+	var agora := Time.get_ticks_msec() / 1000.0
+	_hitstop_v2_ate = maxf(_hitstop_v2_ate, agora + segundos)
+	if is_instance_valid(_corpo):
+		_corpo.speed_scale = 0.0
+	var id_eu := get_instance_id()
+	var id_alvo := 0
+	var modo_antes := Node.PROCESS_MODE_INHERIT
+	if alvo != null and is_instance_valid(alvo) and not alvo.is_in_group("chefes") \
+			and alvo.process_mode != Node.PROCESS_MODE_DISABLED:
+		id_alvo = alvo.get_instance_id()
+		modo_antes = alvo.process_mode
+		alvo.process_mode = Node.PROCESS_MODE_DISABLED
+	get_tree().create_timer(segundos, true, false, true).timeout.connect(
+		func() -> void:
+			var a: Object = instance_from_id(id_alvo) if id_alvo != 0 else null
+			if a != null and is_instance_valid(a) and a is Node:
+				(a as Node).process_mode = modo_antes
+			var eu: Object = instance_from_id(id_eu)
+			if eu != null and is_instance_valid(eu) \
+					and Time.get_ticks_msec() / 1000.0 >= float(eu.get("_hitstop_v2_ate")) - 0.001:
+				var c = eu.get("_corpo")
+				if c != null and is_instance_valid(c):
+					c.speed_scale = 1.0)
 
 
 func _pogo_pode_iniciar() -> bool:
@@ -2222,7 +2275,7 @@ func _pogo_acertar() -> bool:
 		var crit: bool = alvo.has_method("esta_vulneravel") and alvo.esta_vulneravel()
 		alvo.receber_dano(_dano_golpe(), 0.0, crit)
 		_abanar(TREMOR_CRIT if crit else TREMOR_PISAO)
-		_hitstop(HITSTOP_CRIT if crit else HITSTOP_PISAO)
+		_hitstop(HITSTOP_CRIT if crit else HITSTOP_PISAO, alvo)
 	else:
 		_abanar(TREMOR_PISAO)
 		_hitstop(HITSTOP_PISAO)
@@ -2549,7 +2602,7 @@ func _ao_acertar_corpo(corpo: Node) -> void:
 		_pop_impacto((corpo as Node2D).global_position if corpo is Node2D else global_position,
 			crit or remate)
 		_abanar(TREMOR_CRIT if crit else (TREMOR_REMATE if pesado else TREMOR_GOLPE))
-		_hitstop(HITSTOP_CRIT if crit else (HITSTOP_REMATE if pesado else HITSTOP_GOLPE))
+		_hitstop(HITSTOP_CRIT if crit else (HITSTOP_REMATE if pesado else HITSTOP_GOLPE), corpo)
 		# 9H.1: acertar num inimigo levanta a camada de intensidade da música
 		# (só na Região I, e só fora do combate de chefe -- ver `Musica`).
 		Musica.intensificar()
@@ -3081,6 +3134,9 @@ const CADENCIA_MAX := 1.85
 
 func _passo_cadencia_locomocao(a: String) -> void:
 	if _corpo == null:
+		return
+	if _hitstop_v2_ate > 0.0 and Time.get_ticks_msec() / 1000.0 < _hitstop_v2_ate:
+		_corpo.speed_scale = 0.0   # B2: hitstop v2 em curso (so' a animacao para)
 		return
 	if a != "run":
 		# fora da locomocao o relogio volta ao normal, senao um ataque ou uma

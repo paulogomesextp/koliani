@@ -296,6 +296,7 @@ scale = Vector2(1.8, 1.2)
 position = Vector2(150, 620)
 usar_prototipo_premium = true
 usar_golden_set = true
+combate_hitstop_v2 = true
 
 [node name="CheckAbertura" type="Area2D" parent="."]
 position = Vector2(380, 636)

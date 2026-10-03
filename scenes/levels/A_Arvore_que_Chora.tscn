@@ -405,6 +405,7 @@ scale = Vector2(2.6, 1.6)
 position = Vector2(150, 620)
 usar_prototipo_premium = true
 usar_golden_set = true
+combate_hitstop_v2 = true
 
 [node name="CheckInicio" type="Area2D" parent="."]
 position = Vector2(300, 636)
