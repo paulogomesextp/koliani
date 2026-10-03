@@ -151,6 +151,7 @@ func _correr_tudo() -> void:
 	await teste_n11_entrada_autoral()
 	await teste_hitstop_v2()
 	await teste_b1_encontros()
+	teste_b8_sons_fornalha()
 	await teste_fluxo_fim_regiao2()
 	await teste_combat_lab()
 	await teste_combat_lab_combos()
@@ -1584,9 +1585,10 @@ func teste_execution_7_combate_e_progressao_regiao1() -> void:
 
 
 func teste_execution_7_guardioes_e_boss_regional() -> void:
-	_ok(CatalogoCampanha.CHEFE_KEY.slice(0, 4).all(
-		func(chave: String) -> bool: return chave.begins_with("guard.")),
-		"Execution 7: HUD devia classificar L1-L4 como guardiões")
+	# B4 (DEC-012): so' o 2.o e o 4.o nivel tem guardiao; o 1.o e o 3.o, "".
+	_ok(CatalogoCampanha.CHEFE_KEY[1].begins_with("guard.") and CatalogoCampanha.CHEFE_KEY[3].begins_with("guard.")
+		and CatalogoCampanha.CHEFE_KEY[0] == "" and CatalogoCampanha.CHEFE_KEY[2] == "",
+		"Execution 7: HUD devia classificar L2/L4 como guardioes e L1/L3 sem linha")
 	_ok(CatalogoCampanha.tem_chefe(4),
 		"Execution 7: HUD devia classificar L5 como boss regional")
 	var manifesto := ProgressionIDs.carregar_manifesto()
@@ -1602,12 +1604,20 @@ func teste_execution_7_guardioes_e_boss_regional() -> void:
 		"res://scenes/levels/Ninho_da_Viuva_Negra.tscn",
 		"res://scenes/levels/A_Arvore_que_Chora.tscn",
 	]
+	# B4 (DEC-012, 3 out 2026): o 1.o/3.o nivel da regiao acaba num ENCONTRO selado (`ArenaFinal`)
+	# -- N1 e N3 deixaram de ter Guardiao; N2 e N4 continuam.
+	var com_guardiao := ["Pantano_dos_Sussurros.tscn", "A_Arvore_que_Chora.tscn"]
 	for caminho in caminhos:
 		var cena: PackedScene = load(caminho)
 		var nivel := cena.instantiate() if cena else null
-		_ok(nivel != null and nivel.get_node_or_null("Guardiao") != null
-			and nivel.get_node_or_null("Chefe") == null,
-			"Execution 7: %s devia terminar em Guardiao" % caminho.get_file())
+		if caminho.get_file() in com_guardiao:
+			_ok(nivel != null and nivel.get_node_or_null("Guardiao") != null
+				and nivel.get_node_or_null("Chefe") == null,
+				"Execution 7: %s devia terminar em Guardiao" % caminho.get_file())
+		else:
+			_ok(nivel != null and nivel.get_node_or_null("Guardiao") == null
+				and nivel.get_node_or_null("ArenaFinal") != null and nivel.get_node_or_null("Chefe") == null,
+				"Execution 7: %s devia terminar num encontro (ArenaFinal), sem Guardiao" % caminho.get_file())
 		if nivel:
 			nivel.free()
 	var l5: PackedScene = load("res://scenes/levels/Coracao_da_Floresta.tscn")
@@ -5827,8 +5837,10 @@ func teste_n1_autoral() -> void:
 		if n.is_ancestor_of(c):
 			chk += 1
 	_ok(chk == 3, "N1: esperava 3 checkpoints autorais, ha %d" % chk)
-	_ok(n.get_node_or_null("Guardiao") != null and n.get_node_or_null("Chefe") == null,
-		"N1: o Ghorak tem de ser Guardiao (mini-boss), nao Chefe regional")
+	# B4 (DEC-012, 3 out 2026): o 1.o/3.o nivel da regiao acaba num ENCONTRO selado (`ArenaFinal`); o Ghorak saiu
+	_ok(n.get_node_or_null("Guardiao") == null and n.get_node_or_null("Chefe") == null
+		and n.get_node_or_null("ArenaFinal") != null,
+		"N1: devia acabar num encontro selado (ArenaFinal), sem Guardiao nem Chefe")
 	_ok(n.get_node_or_null("Porta") != null, "N1: sem Porta")
 	# nada que exija (ou ensine) uma habilidade: sem dash/pogo/wall-jump/pickups
 	var proibidos := ["serra.gd", "fogo.gd", "guilhotina.gd", "pendulo_lamina.gd", "wind_zone.gd",
@@ -5876,11 +5888,38 @@ func teste_n1_autoral() -> void:
 	EstadoJogo.habilidades.assign(antes_hab)
 
 
+## B4 (DEC-012, 3 out 2026): o 1.o/3.o nivel de cada regiao acaba num ENCONTRO
+## (`ArenaFinal`), nao num guardiao -- o Ghorak (N1), a Rainha (N3) e o
+## Carcereiro (N6) sairam desses niveis. As cenas deles continuam no jogo e os
+## testes das regras da luta tambem: este helper monta o chefe como `Guardiao`
+## na geometria do nivel antigo, ANTES do `_ready` (o `nivel_com_chefe` le o
+## `Guardiao` num `@onready`), e tira o encontro que o substituiu.
+func _nivel_com_chefe_injetado(cena: String, chefe: String, pos: Vector2, props := {}) -> Node:
+	var n := (load(cena) as PackedScene).instantiate()
+	var arena := n.get_node_or_null("ArenaFinal")
+	if arena:
+		var grupo := str(arena.get("grupo_inimigos"))
+		for c in n.get_children():
+			if c is DemonioBase and c.is_in_group(grupo):
+				n.remove_child(c)
+				c.free()
+		n.remove_child(arena)
+		arena.free()
+	var g := (load(chefe) as PackedScene).instantiate() as Node2D
+	g.name = "Guardiao"
+	g.position = pos
+	for k in props:   # os overrides que a cena antiga punha no no' (ex.: vida do Carcereiro)
+		g.set(k, props[k])
+	n.add_child(g)
+	return n
+
+
 ## Ghorak (mini-boss do N1): casca fora das janelas, janelas de vulnerabilidade,
 ## raizes com aviso, fase 2, sem estados presos, porta abre ao morrer, nada arranca
 ## fora do campo visual. NAO prova que a luta e' boa -- so' que as regras valem.
 func _ghorak_novo() -> Array:
-	var n := (load("res://scenes/levels/Floresta_Putrefata.tscn") as PackedScene).instantiate()
+	var n := _nivel_com_chefe_injetado("res://scenes/levels/Floresta_Putrefata.tscn",
+		"res://scenes/actors/ChefeGhorak.tscn", Vector2(5420, 624))
 	add_child(n)
 	for i in 8:
 		await get_tree().physics_frame
@@ -6261,7 +6300,9 @@ func teste_n3_autoral() -> void:
 		await get_tree().process_frame
 	_ok(not bool(n.get("corredor")) and bool(n.get("checkpoints_autorais")), "N3: nao e' autoral (corredor/checkpoints)")
 	_ok(n.get_node_or_null("CorredorAproximacao") == null, "N3: o gerador criou uma jornada")
-	_ok(n.get_node_or_null("Guardiao") != null and n.get_node_or_null("Porta") != null, "N3: sem Guardiao/Porta")
+	# B4 (DEC-012, 3 out 2026): o 1.o/3.o nivel da regiao acaba num ENCONTRO selado (`ArenaFinal`); a Rainha saiu
+	_ok(n.get_node_or_null("Guardiao") == null and n.get_node_or_null("ArenaFinal") != null
+		and n.get_node_or_null("Porta") != null, "N3: devia acabar num encontro selado com Porta")
 	_ok(String(n.get("mecanica_anunciada")) == "pogo", "N3: a mecanica anunciada devia ser o pogo")
 	var chk := 0
 	for c in get_tree().get_nodes_in_group("checkpoints"):
@@ -7064,8 +7105,10 @@ func teste_n6_autoral() -> void:
 	# --- estrutura: authored, sem jornada, guardiao (nao boss), sem skills novas ---
 	_ok(not bool(n.get("corredor")) and bool(n.get("checkpoints_autorais")), "N6: nao e' autoral")
 	_ok(n.get_node_or_null("CorredorAproximacao") == null, "N6: o gerador criou uma jornada")
-	_ok(n.get_node_or_null("Guardiao") is ChefeCarcereiro and n.get_node_or_null("Chefe") == null,
-		"N6: tem de fechar com o Golem como Guardiao, sem Chefe regional")
+	# B4 (DEC-012, 3 out 2026): o 1.o/3.o nivel da regiao acaba num ENCONTRO selado (`ArenaFinal`); o Carcereiro saiu
+	_ok(n.get_node_or_null("Guardiao") == null and n.get_node_or_null("Chefe") == null
+		and n.get_node_or_null("ArenaFinal") != null,
+		"N6: devia acabar num encontro selado (ArenaFinal), sem Guardiao nem Chefe")
 	_ok(n.get_node_or_null("Porta") != null, "N6: sem Porta")
 	var chk := 0
 	for c in get_tree().get_nodes_in_group("checkpoints"):
@@ -7117,7 +7160,7 @@ func teste_n6_autoral() -> void:
 	# VentoArena: mecanica authored e legivel (guia visivel, fraco, pulsado, comeca bem antes do Golem, longe do checkpoint)
 	var va := n.get_node("VentoArena") as WindZone
 	var cf := n.get_node("CheckFinal") as Node2D
-	var gg := n.get_node("Guardiao") as Node2D
+	var gg := n.get_node("EliteGolemFinal") as Node2D   # B4: o elite do encontro final
 	_ok(va.mostrar_guia and va.modo == WindZone.Modo.PULSADO and va.intensidade <= 1500.0 and va.velocidade_max <= 140.0,
 		"N6: VentoArena tem de ter guia visivel, ser pulsado e fraco")
 	_ok(va.position.x - va.tamanho.x * 0.5 >= cf.position.x + 100.0, "N6: o VentoArena nao pode cobrir/rodear o CheckFinal")
@@ -7145,7 +7188,15 @@ func teste_n6_autoral() -> void:
 		var zz := n.get_node(nome_z) as WindZone
 		_ok(absf(zz.position.x - cor_d.position.x) > zz.tamanho.x * 0.5 + 60.0,
 			"N6: a plataforma movel esta' dentro do %s" % nome_z)
-	# --- Guardiao: elite regional-lite, sela a porta e nao e' boss ---
+	# --- B4: o Carcereiro saiu do N6, mas as REGRAS dele continuam provadas:
+	# monta-se na geometria antiga (`_nivel_com_chefe_injetado`) ---
+	n.queue_free()
+	await get_tree().process_frame
+	n = _nivel_com_chefe_injetado("res://scenes/levels/Prisao_dos_Condenados.tscn",
+		"res://scenes/actors/ChefeCarcereiro.tscn", Vector2(5500, 624), {"vida": 175, "vida_minima": 175})
+	add_child(n)
+	for i in 6:
+		await get_tree().process_frame
 	var g := n.get_node("Guardiao") as ChefeCarcereiro
 	var porta := n.get_node("Porta") as Area2D
 	_ok(g.vida >= 400 and g.vida <= 900, "N6: vida do Guardiao %d fora de 400-900 (nao pode competir com o boss)" % g.vida)
@@ -7336,11 +7387,13 @@ func teste_n8_autoral() -> void:
 	# --- estrutura: authored, sem jornada, Guardiao (nao boss), sem skills novas ---
 	_ok(not bool(n.get("corredor")) and bool(n.get("checkpoints_autorais")), "N8: nao e' autoral")
 	_ok(n.get_node_or_null("CorredorAproximacao") == null, "N8: o gerador criou uma jornada")
-	_ok(n.get_node_or_null("Guardiao") is DemonioBase and n.get_node_or_null("Chefe") == null,
-		"N8: e' Combine -- fecha com um Guardiao (elite), nao com um Chefe regional")
+	_ok(n.get_node_or_null("ArenaFinal") != null and n.get_node_or_null("Chefe") == null,
+		"N8: B4 -- fecha com um encontro selado (elite + escolta), nao com um Chefe regional")
 	var porta := n.get_node_or_null("Porta") as Area2D
 	_ok(porta != null, "N8: sem Porta")
-	_ok(not porta.monitoring, "N8: porta selada com o Guardiao vivo")
+	# B4 (DEC-012, 3 out 2026): o 1.o/3.o nivel da regiao acaba num ENCONTRO selado (`ArenaFinal`): a porta so' sela com a sala FECHADA
+	var arena8 := n.get_node_or_null("ArenaFinal") as ArenaSelada
+	_ok(arena8 != null and arena8.sela_porta, "N8: devia acabar num encontro selado com sela_porta")
 	var chk := 0
 	for c in get_tree().get_nodes_in_group("checkpoints"):
 		if n.is_ancestor_of(c):
@@ -7424,16 +7477,22 @@ func teste_n8_autoral() -> void:
 		"N8: o mini-exame tem de combinar as duas direcoes de vento")
 	_ok(n.get_node_or_null("FDashApoio") != null, "N8: falta o apoio de Dash do mini-exame")
 	# --- Guardiao: elite regional-lite, sela a porta, nao e' boss, sem piso de vida de chefe ---
-	var g := n.get_node("Guardiao") as DemonioBase
+	_ok(n.get_node_or_null("Guardiao") == null, "N8: B4 -- ja' nao acaba num Guardiao")
+	var g := n.get_node("EliteFinal") as DemonioBase
 	_ok(g.vida >= 100 and g.vida <= 300, "N8: vida do Guardiao %d fora de 100-300 (nao pode competir com o boss do N10)" % g.vida)
 	var va := n.get_node("VentoArena") as WindZone
 	_ok(va.mostrar_guia and va.modo == WindZone.Modo.PULSADO and va.intensidade <= 1500.0 and va.velocidade_max <= 140.0,
 		"N8: VentoArena tem de ter guia visivel, ser pulsado e fraco")
 	_ok(g.position.x - (va.position.x - va.tamanho.x * 0.5) >= 200.0, "N8: o vento tem de se ver 200+ px antes do Guardiao")
-	g.queue_free()
-	for i in 4:
-		await get_tree().process_frame
-	_ok(porta.monitoring, "N8: a porta abre quando o Guardiao cai")
+	if arena8:
+		arena8.call("_fechar")
+		await get_tree().physics_frame
+		_ok(not porta.monitoring, "N8: porta selada com a sala fechada")
+		for e in get_tree().get_nodes_in_group(str(arena8.grupo_inimigos)):
+			(e as Node).queue_free()
+		for i in 6:
+			await get_tree().physics_frame
+	_ok(porta.monitoring, "N8: a porta abre quando a sala fica limpa")
 	_ok(EstadoJogo.bosses_derrotados == antes_bosses, "N8: o Guardiao nao pode gravar boss derrotado")
 	_ok(not EstadoJogo.tem_habilidade("escalar_paredes") and not EstadoJogo.tem_habilidade("dash_aereo"),
 		"N8: nao pode conceder habilidades")
@@ -7536,6 +7595,21 @@ func teste_fluxo_fim_regiao2() -> void:
 ## B1 (auditoria N1-N20, DEC-013): cada nivel tratado tem >= 3 encontros e
 ## pelo menos uma SALA QUE FECHA (`ArenaSelada`) com inimigos de verdade la'
 ## dentro; e uma arena com `sela_porta` desliga a porta enquanto esta' fechada.
+## B8 (plano N1-N20): os mecanismos da Fornalha avisam pelo ouvido ANTES do
+## perigo (jato a carregar, piso a aquecer, lava a subir) e a lava borbulha.
+func teste_b8_sons_fornalha() -> void:
+	for chave in ["fornalha_carga", "lava_borbulha"]:
+		_ok(Som.CAMINHOS.has(chave), "B8: falta a chave de som `%s`" % chave)
+		if Som.CAMINHOS.has(chave):
+			_ok(ResourceLoader.exists(Som.CAMINHOS[chave]), "B8: ficheiro de `%s` nao existe" % chave)
+	for par in [["res://scripts/jato_fornalha.gd", "Estado.AVISO"], ["res://scripts/piso_quente.gd", "Estado.AVISO"],
+			["res://scripts/lava_fornalha.gd", "lava_borbulha"]]:
+		var src := FileAccess.get_file_as_string(par[0])
+		_ok(src.contains("fornalha_carga") or src.contains(par[1]) and src.contains("lava_borbulha"),
+			"B8: %s nao usa o som de aviso" % par[0].get_file())
+		_ok(src.contains("fornalha_carga"), "B8: %s sem aviso sonoro antes do perigo" % par[0].get_file())
+
+
 func teste_b1_encontros() -> void:
 	var minimos := {
 		"res://scenes/levels/Floresta_Putrefata.tscn": 5,

@@ -70,6 +70,7 @@ EXT = [
     ("Script", None, "res://scripts/plataforma_roda.gd", "roda"),
     ("Script", None, "res://scripts/mecanismo_sinos.gd", "mecsin"),
     ("Script", None, "res://scripts/engrenagem_deco.gd", "gira"),
+    ("Script", None, "res://scripts/arena_selada.gd", "arena"),
 ]
 # texturas da prancha aprovada (`tools/gerar_props_prancha.py`,
 # `tools/gerar_props_n12_prancha.py`, `tools/gerar_props_n13_prancha.py`)
@@ -110,13 +111,15 @@ def com(texto: str) -> None:
 
 
 def no(nome: str, corpo: str, tipo: str | None = None, inst: str | None = None,
-       pai: str = ".") -> None:
+       pai: str = ".", grupos: list[str] | None = None) -> None:
     cab = f'[node name="{nome}"'
     if tipo:
         cab += f' type="{tipo}"'
     cab += f' parent="{pai}"'
     if inst:
         cab += f' instance=ExtResource("{ID[inst]}")'
+    if grupos:
+        cab += " groups=[" + ", ".join(f'"{g}"' for g in grupos) + "]"
     cab += "]"
     nos.append(cab)
     if corpo:
@@ -246,7 +249,7 @@ def check(nome: str, x: float, topo: float) -> None:
 
 def inimigo(nome: str, x: float, y: float, especie: str, comp: str, vida: int,
             dano: int, patrulha: float, rim: str, elite: bool = False,
-            escala: float = 1.0) -> None:
+            escala: float = 1.0, grupos: list[str] | None = None) -> None:
     c = f"position = {v(x, y)}\n"
     if escala != 1.0:
         c += f"scale = {v(escala, escala)}\n"
@@ -254,7 +257,7 @@ def inimigo(nome: str, x: float, y: float, especie: str, comp: str, vida: int,
         c += "elite = true\n"
     c += (f'especie = "{especie}"\nvida = {vida}\ndano_contacto = {dano}\n'
           f'comportamento = "{comp}"\nalcance_patrulha = {patrulha:g}\ncor_rim = {rim}')
-    no(nome, c, inst="dem")
+    no(nome, c, inst="dem", grupos=grupos)
 
 
 def _tam_png(caminho: str) -> tuple:
@@ -774,10 +777,21 @@ luz("LuzSegredo3", 2330, Y3 - 320, 0.35, ROXO, (0.9, 0.8))
 luz("LuzNucleo", NUC_X, -600, 0.4, OURO, (3.0, 2.0))
 grade("PortaNucleo", 2860, Y3, T3, "nucleo")
 
-com("""D3 -- sala do GUARDIAO: o Construto Vitral elite. A porta final so' abre
-quando ele cai.""")
-inimigo("Guardiao", 3250, Y3 - 80, "construto_vitral", "carga", 280, 24, 180,
-        "Color(0.62, 0.72, 1.0, 1)", elite=True, escala=1.6)
+com("""D3 -- sala final: B4 (plano N1-N20, DEC-012, 3 out 2026) -- o 3.o nivel da
+regiao acaba num ENCONTRO, nao num guardiao. O Construto Vitral elite fica,
+com um Espirito do Eco e um Automato do Sino, numa sala que FECHA (grade da
+esquerda junto a' PortaNucleo); a porta esta' dentro -> sela_porta. Deixa de
+se chamar `Guardiao` (era o que o `nivel_com_chefe` lia).""")
+no("ArenaFinal", f'position = {v(3210, Y3 - 130)}\nscript = ExtResource("{ID["arena"]}")\n'
+                 f"tamanho = {v(700, 260)}\naltura_grade = 340.0\n"
+                 'grupo_inimigos = "arena_n13_final"\ncor_grade = Color(0.62, 0.66, 0.95, 0.95)\n'
+                 "sela_porta = true", tipo="Area2D")
+inimigo("EliteConstruto", 3250, Y3 - 80, "construto_vitral", "carga", 280, 24, 180,
+        "Color(0.62, 0.72, 1.0, 1)", elite=True, escala=1.6, grupos=["arena_n13_final"])
+inimigo("EspiritoFinal", 3050, Y3 - 160, "espirito_do_eco", "voador", 70, 12, 160,
+        "Color(0.6, 0.75, 1.0, 1)", grupos=["arena_n13_final"])
+inimigo("AutomatoFinal", 3420, Y3 - 60, "automato_do_sino", "escudeiro", 110, 18, 60,
+        "Color(1.0, 0.78, 0.45, 1)", grupos=["arena_n13_final"])
 assente("EstatuaArena1", "estatua_anjo", 2980, Y3, esc=1.7, z=-3)
 assente("EstatuaArena2", "estatua_anjo", 3520, Y3, esc=1.7, z=-3, flip=True)
 pendurado("VitralArena", "vitral_alto", 3250, T3 + 30, esc=2.4, z=-6,

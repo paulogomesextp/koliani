@@ -288,8 +288,18 @@ c.piso_quente("PisoArena1", 6125, ARENA, 230, fase=0.0)
 c.piso_quente("PisoArena2", 6525, ARENA, 230, fase=2.5)
 c.brasas("BrasasArena1", 6125, ARENA - 6, 230, n=12)
 c.brasas("BrasasArena2", 6525, ARENA - 6, 230, n=12)
-c.inimigo("GuardiaoN18", 6325, ARENA - 70, "sentinela_de_pressao", "patrulha", 230, 20, 150,
-          elite=True, escala=1.6)
+c.com("""B4 (plano N1-N20, DEC-012, 3 out 2026): o 3.o nivel da regiao acaba num
+ENCONTRO, nao num guardiao. A Sentinela de Pressao elite fica, com um
+Trabalhador e um Lanca-Chamas, numa sala que FECHA sobre os pisos ciclicos;
+a porta esta' dentro -> sela_porta. Parede de fim a toda a altura (ver N16).""")
+c.arena("ArenaFinal", 5870, 6780, ARENA, "arena_n18_final", sela_porta=True)
+c.plat("MuroFimArena", 6780, 6860, ARENA - 1470, h=1540, av=0)
+c.inimigo("EliteSentinela", 6325, ARENA - 70, "sentinela_de_pressao", "patrulha", 230, 20, 150,
+          elite=True, escala=1.6, grupos=["arena_n18_final"])
+c.inimigo("TrabalhadorFinal", 6050, ARENA - 50, "trabalhador_corrompido", "carga", 100, 12, 90,
+          grupos=["arena_n18_final"])
+c.inimigo("LancaFinal", 6600, ARENA - 55, "lanca_chamas", "patrulha", 110, 14, 60,
+          grupos=["arena_n18_final"])
 c.assente("ColunaArena1", "r4_coluna", 5890, ARENA, esc=1.3, z=-4, mod=SOMBRA)
 c.assente("ArcoArena", "r4_arco_gotico", 6325, ARENA, esc=1.8, z=-7, mod=SOMBRA)
 c.assente("BandeiraArena1", "r4_bandeira", 6200, ARENA - 300, esc=1.0, z=-3)

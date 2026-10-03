@@ -69,6 +69,24 @@ Armadilha: com a sala selada a porta fica desligada; quem passa por ela e se
 encosta à grade cai do fim do nível quando as grades descem. N16/N17 ganharam
 parede de fim a toda a altura (escala-se paredes desde o N10).
 
+## B4 — guardiões só no 2.º e 4.º nível + boss no 5.º (DEC-012)
+
+| Nível | Antes | Depois |
+|---|---|---|
+| N1 | Ghorak (`ChefeGhorak`) | `ArenaFinal`: goblin de carga ELITE + gosma + goblin |
+| N3 | Rainha Aracnídea | `ArenaFinal` (sela_porta): goblin ELITE + gosma + goblin saltador |
+| N6 | Carcereiro | `ArenaFinal` (sela_porta): golem aéreo ELITE + 2 sentinelas |
+| N8 | elemental elite `Guardiao` | o mesmo elite + morcego + sentinela, sala selada |
+| N13 | Construto Vitral `Guardiao` | o mesmo elite + espírito + autómato, sala selada |
+| N16 | Operário (já selado no B1) | só a chave da HUD |
+| N18 | Sentinela de Pressão | a mesma + trabalhador + lança, sala selada, parede de fim |
+
+`CatalogoCampanha.CHEFE_KEY` fica "" nesses 7 índices (a HUD não mostra
+linha, como no N11). Os chefes-ator (Ghorak, Rainha, Carcereiro) continuam no
+jogo e os testes das regras da luta deles montam-nos na geometria antiga
+(`_nivel_com_chefe_injetado`). Guardiões que ficam: N2 Morvanna (537), N4
+Entrevane (829); N7, N9; N12, N14; N17, N19 — HP monotónico na Região I.
+
 ## Por fazer (ordem do plano)
 
 B1 encontros (N1, N2, N16, N17 primeiro; `ArenaSelada` já existe) → B4

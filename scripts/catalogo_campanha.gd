@@ -16,10 +16,13 @@ extends RefCounted
 ## acabam num GUARDIÃO -- um elite que sela a porta -- levam uma chave
 ## `guard.*` em vez de `boss.*`; o carrossel usa isso para dizer
 ## "Guardião: X" em vez de "Chefe: X".
+## B4 (plano N1-N20, DEC-012, 3 out 2026): nas regioes I-IV so' o 2.o e o
+## 4.o nivel acabam num GUARDIAO e o 5.o no boss; o 1.o e o 3.o acabam num
+## ENCONTRO selado (`ArenaSelada`) e ficam com "" (a HUD nao mostra linha).
 const CHEFE_KEY: Array[String] = [
-	"guard.ghorak",               # 00 Floresta Putrefacta
+	"",                           # 00 N1 -- B4/DEC-012: acaba num encontro (o Ghorak saiu)
 	"guard.morvanna",             # 01 Pântano dos Sussurros
-	"guard.rainha_aracnidea",     # 02 Ninho da Viúva Negra
+	"",                           # 02 N3 -- B4/DEC-012: encontro final (a Rainha saiu)
 	"guard.entrevane",            # 03 A Árvore que Chora
 	"boss.coracao_putrefacto",   # 04 Coração da Floresta
 	# Região II -- Desfiladeiro dos Ventos. Os quatro encontros
@@ -27,9 +30,9 @@ const CHEFE_KEY: Array[String] = [
 	# Guardião dos Céus, no N10. Os ficheiros das cenas ainda têm nomes de
 	# prisão (mudá-los partia saves e checkpoints); o que o jogador lê é a
 	# chave `level.n##` e estas.
-	"guard.golem_falesias",      # 05 N06 -- arquétipo Golem Aéreo
+	"",                          # 05 N06 -- B4/DEC-012: encontro final (o Carcereiro saiu)
 	"guard.vigia_desfiladeiro",  # 06 N07 -- arquétipo Torre Vigia
-	"guard.feiticeira_ventos",   # 07 N08 -- arquétipo Mago do Vento
+	"",                          # 07 N08 -- B4/DEC-012: encontro final (elemental + escolta)
 	"guard.espectros_gemeos",    # 08 N09 -- arquétipo Espectro das Ruínas
 	"boss.guardiao_dos_ceus",    # 09 N10 -- o chefe da Região II
 	# Região III -- Torre dos Ecos (pranchas APPROVED em
@@ -56,15 +59,15 @@ const CHEFE_KEY: Array[String] = [
 	# N13 autoral: o Voltaris (chefe de tempestade, fora do contrato) saiu;
 	# fecha com o Construto Vitral elite a guardar o nucleo, inimigo
 	# principal do N13 na prancha aprovada.
-	"guard.construto_vitral",    # 12 N13 -- Mecanismos Antigos
+	"",                          # 12 N13 -- B4/DEC-012: encontro final (Construto + escolta)
 	# N14 autoral: a Sacerdotisa Lunar (fora do contrato da Torre dos Ecos)
 	# saiu; fecha com o Monge das Correntes elite debaixo do sino gigante,
 	# inimigo principal do N14 na prancha aprovada.
 	"guard.monge_das_correntes", # 13 N14 -- Campanário
 	"boss.vyrak",                # 14 N15 -- O Topo dos Ecos (o chefe da Região III)
-	"guard.operario_blindado",    # 15 N16 -- Entrada da Fornalha (Região IV)
+	"",                           # 15 N16 -- B4/DEC-012: encontro final selado (Operário + escolta)
 	"guard.automato_de_fundicao",  # 16 N17 -- Fundição (Região IV)
-	"guard.sentinela_de_pressao", # 17 N18 -- Câmara da Lava (Região IV; guardião canónico)
+	"",                           # 17 N18 -- B4/DEC-012: encontro final (Sentinela + escolta)
 	"guard.lanca_chamas",        # 18 N19 -- Sala das Pressões (Região IV; guardião canónico)
 	"boss.guardiao_da_fornalha", # 19 N20 -- Núcleo da Fornalha (o ÚNICO boss da Região IV)
 	"boss.prefeito_sem_rosto",   # 20 Vila dos Sem-Rosto

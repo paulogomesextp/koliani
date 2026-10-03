@@ -140,7 +140,12 @@ static func executar() -> Array[String]:
 				_verificar(falhas, not _contem_ponto(zona, checkpoint.position),
 					"%s: %s não cobre %s" % [nome, zona.name, checkpoint.name])
 			# N06 e' autoral: fecha com `Guardiao` em vez de `Chefe`
-			var chefe := (raiz.get_node_or_null("Chefe") if raiz.has_node("Chefe") else raiz.get_node("Guardiao")) as Node2D
+			# B4 (DEC-012): N06/N08 acabam num ENCONTRO (`ArenaFinal`), sem `Guardiao`
+			var chefe := raiz.get_node_or_null("Chefe") as Node2D
+			if chefe == null:
+				chefe = raiz.get_node_or_null("Guardiao") as Node2D
+			if chefe == null:
+				chefe = raiz.get_node_or_null("ArenaFinal") as Node2D
 			if not _isento_n06(nome, zona.name, "arena"):
 				_verificar(falhas, not _contem_ponto(zona, chefe.position),
 					"%s: %s não cobre a arena/boss" % [nome, zona.name])

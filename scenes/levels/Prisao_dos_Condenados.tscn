@@ -12,7 +12,6 @@
 [ext_resource type="PackedScene" uid="uid://bkolianiporta01" path="res://scenes/actors/Porta.tscn" id="4_porta"]
 [ext_resource type="Script" path="res://scripts/checkpoint.gd" id="5_chk"]
 [ext_resource type="PackedScene" uid="uid://bkolianiessencia01" path="res://scenes/actors/Essencia.tscn" id="99_ess"]
-[ext_resource type="PackedScene" uid="uid://bkolianichefecarcereiro01" path="res://scenes/actors/ChefeCarcereiro.tscn" id="6_chefe"]
 [ext_resource type="Script" path="res://scripts/nivel_com_chefe.gd" id="7_niv"]
 [ext_resource type="PackedScene" uid="uid://bkolianiatmosfera01" path="res://scenes/fx/Atmosfera.tscn" id="8_atm"]
 [ext_resource type="PackedScene" uid="uid://bkolianiplataforma01" path="res://scenes/actors/Plataforma.tscn" id="9_pl"]
@@ -21,6 +20,7 @@
 [ext_resource type="PackedScene" uid="uid://bkolianiaguavenenosa01" path="res://scenes/actors/AguaVenenosa.tscn" id="13_agua"]
 [ext_resource type="PackedScene" path="res://scenes/actors/WindZone.tscn" id="14_wind"]
 [ext_resource type="Texture2D" path="res://assets/sprites/pixel/backgrounds/desfiladeiro/nuvens.png" id="90_nuvens"]
+[ext_resource type="Script" path="res://scripts/arena_selada.gd" id="200_arena"]
 
 [sub_resource type="RectangleShape2D" id="rs_chk"]
 size = Vector2(44, 96)
@@ -351,10 +351,47 @@ position = Vector2(5760, 630)
 valor = 32
 espalhar = false
 
-[node name="Guardiao" parent="." instance=ExtResource("6_chefe")]
+; ===== B4 (plano N1-N20, DEC-012, 3 out 2026) =====
+; O 1.o nivel da Regiao II acaba num ENCONTRO: o Carcereiro saiu daqui (a
+; cena e os testes dele continuam). Golem aereo ELITE (carga) + duas
+; sentinelas flutuantes. A porta fica DENTRO da sala -> sela_porta.
+[node name="ArenaFinal" type="Area2D" parent="."]
+position = Vector2(5400, 540)
+script = ExtResource("200_arena")
+tamanho = Vector2(1000, 260)
+altura_grade = 340.0
+grupo_inimigos = "arena_n6_final"
+cor_grade = Color(0.62, 0.66, 0.95, 0.95)
+sela_porta = true
+
+[node name="EliteGolemFinal" parent="." groups=["arena_n6_final"] instance=ExtResource("2_dem")]
 position = Vector2(5500, 624)
-vida = 175
-vida_minima = 175
+scale = Vector2(1.3, 1.3)
+elite = true
+especie = "golem_aereo"
+vida = 220
+dano_contacto = 20
+comportamento = "carga"
+alcance_patrulha = 120
+cor_rim = Color(0.7, 0.9, 1.0, 1)
+
+[node name="SentinelaFinal1" parent="." groups=["arena_n6_final"] instance=ExtResource("2_dem")]
+position = Vector2(5200, 600)
+especie = "sentinela_flutuante"
+vida = 70
+dano_contacto = 12
+comportamento = "voador"
+alcance_patrulha = 120
+cor_rim = Color(0.7, 0.9, 1.0, 1)
+
+[node name="SentinelaFinal2" parent="." groups=["arena_n6_final"] instance=ExtResource("2_dem")]
+position = Vector2(5750, 600)
+especie = "sentinela_flutuante"
+vida = 70
+dano_contacto = 12
+comportamento = "voador"
+alcance_patrulha = 120
+cor_rim = Color(0.7, 0.9, 1.0, 1)
 
 [node name="Porta" parent="." instance=ExtResource("4_porta")]
 position = Vector2(5860, 626)

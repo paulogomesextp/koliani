@@ -10,7 +10,6 @@
 [ext_resource type="PackedScene" uid="uid://bkolianicoletavel01" path="res://scenes/actors/Coletavel.tscn" id="3_col"]
 [ext_resource type="PackedScene" uid="uid://bkolianiporta01" path="res://scenes/actors/Porta.tscn" id="4_porta"]
 [ext_resource type="Script" path="res://scripts/checkpoint.gd" id="5_chk"]
-[ext_resource type="PackedScene" uid="uid://bkolianichefearanha03" path="res://scenes/actors/ChefeRainhaAracnidea.tscn" id="6_chefe"]
 [ext_resource type="Script" path="res://scripts/nivel_com_chefe.gd" id="7_niv"]
 [ext_resource type="PackedScene" uid="uid://bkolianiatmosfera01" path="res://scenes/fx/Atmosfera.tscn" id="8_atm"]
 [ext_resource type="PackedScene" uid="uid://bkolianiplataforma01" path="res://scenes/actors/Plataforma.tscn" id="9_pl"]
@@ -19,6 +18,7 @@
 [ext_resource type="PackedScene" uid="uid://bkolianiraizperigo01" path="res://scenes/actors/RaizPerigo.tscn" id="14_raiz"]
 [ext_resource type="PackedScene" uid="uid://bkolianiessencia01" path="res://scenes/actors/Essencia.tscn" id="99_ess"]
 [ext_resource type="PackedScene" path="res://scenes/fx/Region1HybridVisualTarget.tscn" id="100_target"]
+[ext_resource type="Script" path="res://scripts/arena_selada.gd" id="200_arena"]
 
 [sub_resource type="RectangleShape2D" id="rs_chk"]
 size = Vector2(44, 96)
@@ -299,8 +299,43 @@ position = Vector2(6760, 630)
 valor = 25
 espalhar = false
 
-[node name="Guardiao" parent="." instance=ExtResource("6_chefe")]
-position = Vector2(7000, 624)
+; ===== B4 (plano N1-N20, DEC-012, 3 out 2026) =====
+; O 3.o nivel da regiao acaba num ENCONTRO: a Rainha Aracnidea saiu daqui (a
+; cena e os testes dela continuam). A porta fica DENTRO da sala -> sela_porta.
+[node name="ArenaFinal" type="Area2D" parent="."]
+position = Vector2(6890, 535)
+script = ExtResource("200_arena")
+tamanho = Vector2(920, 260)
+altura_grade = 340.0
+grupo_inimigos = "arena_n3_final"
+cor_grade = Color(0.55, 0.78, 0.5, 0.95)
+sela_porta = true
+
+[node name="EliteGoblinFinal" parent="." groups=["arena_n3_final"] instance=ExtResource("2_dem")]
+position = Vector2(7000, 636)
+scale = Vector2(1.35, 1.35)
+elite = true
+especie = "goblin"
+vida = 190
+dano_contacto = 20
+comportamento = "carga"
+alcance_patrulha = 110
+
+[node name="GoblinFinal2" parent="." groups=["arena_n3_final"] instance=ExtResource("2_dem")]
+position = Vector2(6620, 636)
+especie = "goblin"
+vida = 90
+dano_contacto = 12
+comportamento = "patrulha"
+alcance_patrulha = 60
+
+[node name="GoblinFinal" parent="." groups=["arena_n3_final"] instance=ExtResource("2_dem")]
+position = Vector2(7150, 636)
+especie = "goblin"
+vida = 70
+dano_contacto = 14
+comportamento = "saltador"
+alcance_patrulha = 80
 
 [node name="Porta" parent="." instance=ExtResource("4_porta")]
 position = Vector2(7230, 626)

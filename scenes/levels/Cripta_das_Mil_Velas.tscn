@@ -1,4 +1,4 @@
-[gd_scene load_steps=47 format=3 uid="uid://bkolianicripta18"]
+[gd_scene load_steps=48 format=3 uid="uid://bkolianicripta18"]
 
 ; REGIAO IV / nivel 18 -- CAMARA DA LAVA (`level.n17`), "O nivel sobe junto".
 ; O nome do ficheiro fica (era a Cripta das Mil Velas): mudá-lo partia saves.
@@ -50,9 +50,10 @@
 [ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/fornalha/r4_fornalha.png" id="36_t_r4_fornalha"]
 [ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/fornalha/r4_maquina.png" id="37_t_r4_maquina"]
 [ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/fornalha/r4_carrinho_minerio.png" id="38_t_r4_carrinho_minerio"]
-[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/fornalha/r4_arco_gotico.png" id="39_t_r4_arco_gotico"]
-[ext_resource type="PackedScene" uid="uid://bkolianiactor01" path="res://scenes/actors/Koliani.tscn" id="40_a_kol"]
-[ext_resource type="PackedScene" uid="uid://bkolianiporta01" path="res://scenes/actors/Porta.tscn" id="41_a_porta"]
+[ext_resource type="Script" path="res://scripts/arena_selada.gd" id="39_s_arena_selada.gd"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/fornalha/r4_arco_gotico.png" id="40_t_r4_arco_gotico"]
+[ext_resource type="PackedScene" uid="uid://bkolianiactor01" path="res://scenes/actors/Koliani.tscn" id="41_a_kol"]
+[ext_resource type="PackedScene" uid="uid://bkolianiporta01" path="res://scenes/actors/Porta.tscn" id="42_a_porta"]
 
 [sub_resource type="RectangleShape2D" id="rs_chk"]
 size = Vector2(44, 96)
@@ -1251,7 +1252,27 @@ scale_amount_min = 1.6
 scale_amount_max = 3.6
 color_ramp = SubResource("ramp_brasa")
 
-[node name="GuardiaoN18" parent="." instance=ExtResource("16_a_dem")]
+; B4 (plano N1-N20, DEC-012, 3 out 2026): o 3.o nivel da regiao acaba num
+; ENCONTRO, nao num guardiao. A Sentinela de Pressao elite fica, com um
+; Trabalhador e um Lanca-Chamas, numa sala que FECHA sobre os pisos ciclicos;
+; a porta esta' dentro -> sela_porta. Parede de fim a toda a altura (ver N16).
+[node name="ArenaFinal" type="Area2D" parent="."]
+script = ExtResource("39_s_arena_selada.gd")
+position = Vector2(6325, 320)
+tamanho = Vector2(910, 260)
+altura_grade = 340
+grupo_inimigos = "arena_n18_final"
+cor_grade = Color(1, 0.55, 0.3, 0.95)
+sela_porta = true
+
+[node name="MuroFimArena" parent="." instance=ExtResource("3_a_pl")]
+position = Vector2(6820, -250)
+tamanho = Vector2(80, 1540)
+altura_visual = 0
+cor_base = Color(0.2, 0.16, 0.16, 1)
+cor_topo = Color(0.42, 0.3, 0.26, 1)
+
+[node name="EliteSentinela" parent="." instance=ExtResource("16_a_dem") groups=["arena_n18_final"]]
 position = Vector2(6325, 380)
 scale = Vector2(1.6, 1.6)
 elite = true
@@ -1260,6 +1281,24 @@ vida = 230
 dano_contacto = 20
 comportamento = "patrulha"
 alcance_patrulha = 150
+cor_rim = Color(1.0, 0.52, 0.16, 1)
+
+[node name="TrabalhadorFinal" parent="." instance=ExtResource("16_a_dem") groups=["arena_n18_final"]]
+position = Vector2(6050, 400)
+especie = "trabalhador_corrompido"
+vida = 100
+dano_contacto = 12
+comportamento = "carga"
+alcance_patrulha = 90
+cor_rim = Color(1.0, 0.52, 0.16, 1)
+
+[node name="LancaFinal" parent="." instance=ExtResource("16_a_dem") groups=["arena_n18_final"]]
+position = Vector2(6600, 395)
+especie = "lanca_chamas"
+vida = 110
+dano_contacto = 14
+comportamento = "patrulha"
+alcance_patrulha = 60
 cor_rim = Color(1.0, 0.52, 0.16, 1)
 
 [node name="ColunaArena1" type="Sprite2D" parent="."]
@@ -1272,7 +1311,7 @@ modulate = Color(0.42, 0.34, 0.36, 1)
 [node name="ArcoArena" type="Sprite2D" parent="."]
 position = Vector2(6325, 246.8)
 scale = Vector2(1.8, 1.8)
-texture = ExtResource("39_t_r4_arco_gotico")
+texture = ExtResource("40_t_r4_arco_gotico")
 z_index = -7
 modulate = Color(0.42, 0.34, 0.36, 1)
 
@@ -1411,12 +1450,12 @@ scale_amount_min = 9.0
 scale_amount_max = 20.0
 color_ramp = SubResource("ramp_fumo")
 
-[node name="Koliani" parent="." instance=ExtResource("40_a_kol")]
+[node name="Koliani" parent="." instance=ExtResource("41_a_kol")]
 position = Vector2(170, 560)
 usar_prototipo_premium = true
 usar_golden_set = true
 
-[node name="Porta" parent="." instance=ExtResource("41_a_porta")]
+[node name="Porta" parent="." instance=ExtResource("42_a_porta")]
 position = Vector2(6730, 444)
 pista_ao_atravessar = ""
 

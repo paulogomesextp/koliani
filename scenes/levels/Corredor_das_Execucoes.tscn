@@ -57,6 +57,7 @@
 [ext_resource type="PackedScene" uid="uid://bkolianiaguavenenosa01" path="res://scenes/actors/AguaVenenosa.tscn" id="13_lava"]
 [ext_resource type="PackedScene" path="res://scenes/actors/WindZone.tscn" id="15_wind"]
 [ext_resource type="Texture2D" path="res://assets/sprites/pixel/backgrounds/desfiladeiro/nuvens.png" id="90_nuvens"]
+[ext_resource type="Script" path="res://scripts/arena_selada.gd" id="200_arena"]
 
 [sub_resource type="RectangleShape2D" id="rs_chk"]
 size = Vector2(44, 96)
@@ -469,7 +470,39 @@ cor_guia = Color(0.62, 0.82, 1, 0.34)
 ; nao da' bau nem habilidade (ver `_abrir_guardiao` em `nivel_com_chefe.gd`).
 ; Elemental do Vento -- especie ja' usada na regiao (N10), aqui como
 ; sentinela final do N08 (Combine), distinta do Guardiao do N06/N07.
-[node name="Guardiao" parent="." instance=ExtResource("2_dem")]
+; ===== B4 (plano N1-N20, DEC-012, 3 out 2026) =====
+; O 3.o nivel da Regiao II acaba num ENCONTRO, nao num guardiao: o elemental
+; elite fica, mas acompanhado (morcego + sentinela) numa sala que fecha; a
+; porta esta' dentro -> sela_porta. Deixa de se chamar `Guardiao` (era isso
+; que o `nivel_com_chefe` lia para o tratar como guardiao).
+[node name="ArenaFinal" type="Area2D" parent="."]
+position = Vector2(6100, 530)
+script = ExtResource("200_arena")
+tamanho = Vector2(700, 260)
+altura_grade = 340.0
+grupo_inimigos = "arena_n8_final"
+cor_grade = Color(0.62, 0.66, 0.95, 0.95)
+sela_porta = true
+
+[node name="MorcegoFinal" parent="." groups=["arena_n8_final"] instance=ExtResource("2_dem")]
+position = Vector2(5900, 560)
+especie = "morcego_dos_ventos"
+vida = 70
+dano_contacto = 12
+comportamento = "voador"
+alcance_patrulha = 140.0
+cor_rim = Color(0.7, 0.9, 1.0, 1)
+
+[node name="SentinelaFinal" parent="." groups=["arena_n8_final"] instance=ExtResource("2_dem")]
+position = Vector2(6150, 580)
+especie = "sentinela_flutuante"
+vida = 80
+dano_contacto = 12
+comportamento = "voador"
+alcance_patrulha = 120.0
+cor_rim = Color(0.7, 0.9, 1.0, 1)
+
+[node name="EliteFinal" parent="." groups=["arena_n8_final"] instance=ExtResource("2_dem")]
 position = Vector2(6300, 624)
 scale = Vector2(1.4, 1.4)
 elite = true
