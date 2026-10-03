@@ -381,10 +381,10 @@ func _estado_regiao(r: int) -> String:
 
 func _texto_estado(estado: String) -> String:
     match estado:
-        "CURRENT": return "ATUAL"
-        "COMPLETED": return "CONCLUÍDO"
-        "UNLOCKED": return "DESBLOQUEADO"
-        _: return "BLOQUEADO"
+        "CURRENT": return Textos.t("selector.mark_current")
+        "COMPLETED": return Textos.t("selector.mark_completed")
+        "UNLOCKED": return Textos.t("selector.mark_unlocked")
+        _: return Textos.t("selector.mark_locked")
 
 func _transitar_vista(entrar: Control, sair: Control) -> void:
     if not is_instance_valid(entrar) or not is_instance_valid(sair):
@@ -404,13 +404,13 @@ func _actualizar() -> void:
     if _barras:
         _barras.modulate = Color(0.18, 0.12, 0.22, 1.0)
     if _vista_regioes:
-        _titulo.text = "LEVEL SELECT"
-        _subtitulo.text = "20 REGIONS  ·  100 LEVELS  ·  SELECT A REGION"
+        _titulo.text = Textos.t("selector.title")
+        _subtitulo.text = Textos.t("selector.subtitle_regions")
         _voltar.text = Textos.t("selector.back_to_menu")
     else:
         _titulo.text = "%s %s — %s" % [Textos.t("selector.region"), ROMANOS[_regiao], Textos.t(EstadoJogo.REGIOES[_regiao]["chave"]).to_upper()]
-        _subtitulo.text = "5 LEVELS  ·  BOSS N%02d  ·  %s" % [(_regiao + 1) * 5, _texto_estado(_estado_regiao(_regiao))]
-        _voltar.text = "←  REGIONS"
+        _subtitulo.text = "%s  ·  %s N%02d  ·  %s" % [Textos.t("selector.five_levels"), Textos.t("selector.boss"), (_regiao + 1) * 5, _texto_estado(_estado_regiao(_regiao))]
+        _voltar.text = Textos.t("selector.back_regions")
     _regioes_painel.visible = _vista_regioes
     _niveis_painel.visible = not _vista_regioes
     _actualizar_carousel()
@@ -427,7 +427,7 @@ func _actualizar() -> void:
         var ultimo := int(ns_regiao[ns_regiao.size() - 1]) + 1
         b.text = "%s  %02d\n%s\nN%02d–N%02d" % [ROMANOS[r], r + 1, nome.to_upper(), primeiro, ultimo]
         _estilo_cartao(b, reg.get("cor", Color.WHITE), r == _regiao, estado == "LOCKED")
-        b.tooltip_text = "LOCKED" if estado == "LOCKED" else nome
+        b.tooltip_text = _texto_estado("LOCKED") if estado == "LOCKED" else nome
         b.visible = _vista_regioes and (r == _regiao or r == _regiao - 1 or r == _regiao + 1)
     var ns: Array = EstadoJogo.REGIOES[_regiao]["niveis"]
     for i in _level_cards.size():
@@ -435,21 +435,21 @@ func _actualizar() -> void:
         var estado := _estado_nivel(indice)
         var nome := _nome_nivel(indice)
         var marca := _texto_estado(estado)
-        _level_cards[i].text = "N%02d%s\n%s" % [indice + 1, "  · BOSS" if i == 4 else "", marca]
+        _level_cards[i].text = "N%02d%s\n%s" % [indice + 1, ("  · " + Textos.t("selector.boss")) if i == 4 else "", marca]
         _estilo_cartao(_level_cards[i], tema.get("primaria", Color.WHITE), indice == _sel, estado == "LOCKED")
         if i == 4 and estado != "LOCKED":
             _level_cards[i].add_theme_color_override("font_color", Color(1.0, 0.84, 0.58))
-        _level_cards[i].tooltip_text = "LOCKED" if estado == "LOCKED" else nome
+        _level_cards[i].tooltip_text = _texto_estado("LOCKED") if estado == "LOCKED" else nome
         _nos[i]["indice"] = indice
     var passo: Array = EstadoJogo.passo_na_regiao(_sel)
     var sel_estado := _estado_nivel(_sel)
-    _detalhe.text = "%s %02d  ·  %s\n%s" % [Textos.t("selector.level"), _sel + 1, "BOSS" if int(passo[0]) == 5 else "", _nome_nivel(_sel)]
+    _detalhe.text = "%s %02d  ·  %s\n%s" % [Textos.t("selector.level"), _sel + 1, Textos.t("selector.boss") if int(passo[0]) == 5 else "", _nome_nivel(_sel)]
     _estado.text = "%s  ·  %s%s" % [_texto_estado(sel_estado), _nome_nivel(_sel), "  ·  %s" % _nome_chefe(_sel) if int(passo[0]) == 5 else ""]
     var boss_visivel := int(passo[0]) == 5
     _boss_painel.visible = boss_visivel
     if boss_visivel:
         _boss_arte.texture = load(BOSS_ART[_regiao]) as Texture2D
-        _boss_nome.text = "BOSS  ·  %s" % BOSS_NOMES[_regiao]
+        _boss_nome.text = "%s  ·  %s" % [Textos.t("selector.boss"), _nome_boss_regiao(_regiao)]
     _jogar.text = Textos.t("selector.play")
     _jogar.disabled = sel_estado == "LOCKED"
     _jogar.modulate = Color(0.6, 0.6, 0.68) if _jogar.disabled else Color.WHITE
@@ -507,10 +507,10 @@ func _actualizar_carousel() -> void:
         if EstadoJogo.nivel_esta_concluido(int(indice)):
             feitos += 1
     _regiao_nome.text = "%s  %s" % [ROMANOS[_regiao], nome.to_upper()]
-    _regiao_meta.text = "N%02d–N%02d  ·  5 LEVELS  ·  BOSS N%02d" % [int(ns[0]) + 1, int(ns[4]) + 1, int(ns[4]) + 1]
-    _regiao_estado.text = "%s  ·  %d / 5 COMPLETE" % [_texto_estado(estado), feitos]
+    _regiao_meta.text = "N%02d–N%02d  ·  %s  ·  %s N%02d" % [int(ns[0]) + 1, int(ns[4]) + 1, Textos.t("selector.five_levels"), Textos.t("selector.boss"), int(ns[4]) + 1]
+    _regiao_estado.text = "%s  ·  %s" % [_texto_estado(estado), Textos.t("selector.complete_count") % feitos]
     _regiao_progresso.value = feitos * 20.0
-    _regiao_entrar.text = "VIEW LEVELS"
+    _regiao_entrar.text = Textos.t("selector.view_levels")
     _regiao_entrar.disabled = _respeitar_bloqueio and not _regiao_aberta(_regiao)
     _regiao_entrar.modulate = Color(0.55, 0.55, 0.60) if _regiao_entrar.disabled else Color.WHITE
     _regiao_esquerda.disabled = _regiao == 0
@@ -567,6 +567,14 @@ func _nome_nivel(indice: int) -> String:
     if txt != chave:
         return txt
     return (EstadoJogo.NIVEIS[indice] as String).get_file().get_basename().replace("_", " ")
+
+## Nome do boss da região (5.o nível) na língua do jogo. Só cai para a
+## lista `BOSS_NOMES` (cânone em PT) se a região ainda não tiver chave.
+func _nome_boss_regiao(r: int) -> String:
+    var ns: Array = EstadoJogo.REGIOES[r]["niveis"]
+    var nome := _nome_chefe(int(ns[ns.size() - 1]))
+    return nome if nome != "" else str(BOSS_NOMES[r])
+
 
 func _nome_chefe(indice: int) -> String:
     var chave := CatalogoCampanha.chave_chefe(indice)

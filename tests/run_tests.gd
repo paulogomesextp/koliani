@@ -229,6 +229,7 @@ func _correr_tudo() -> void:
 
 	# --- Loja (Kolicoins / Veracoins, so cosmeticos) ---------------------
 	teste_loja_catalogo()
+	teste_nomes_canonicos_e_seletor()
 	teste_loja_compras_e_equipar()
 	teste_loja_gratis_dev()
 	teste_loja_save_e_compatibilidade()
@@ -4866,6 +4867,31 @@ func teste_r3_bestiario_canonico() -> void:
 
 
 # --- Loja ------------------------------------------------------------------
+
+## A3 (auditoria N1-N20, DEC-011): os nomes VISIVEIS seguem o canone
+## (`docs/art_direction/KOLIANI_REGION_CANON.md`) e o seletor nao tem texto
+## escrito a mao (o "ATUAL" em PT aparecia num jogo em EN). Os ids internos
+## (`floresta`, `catacumbas`, `boss.coracao_putrefacto`) NAO mudam: saves.
+func teste_nomes_canonicos_e_seletor() -> void:
+	var antes := Textos.idioma()
+	Textos.definir_idioma("en")
+	_ok(Textos.t("world.forest") == "Sacred Forest", "A3: Regiao I devia ser Sacred Forest, e' %s" % Textos.t("world.forest"))
+	_ok(Textos.t("world.catacombs") == "The Furnace", "A3: Regiao IV devia ser The Furnace, e' %s" % Textos.t("world.catacombs"))
+	_ok(Textos.t("boss.coracao_putrefacto") == "The Green Guardian", "A3: boss N5 devia ser The Green Guardian")
+	_ok(EstadoJogo.REGIOES[0]["id"] == "floresta" and EstadoJogo.REGIOES[3]["id"] == "catacumbas",
+		"A3: os ids internos das regioes mudaram (partia saves)")
+	var sel: Node = load("res://scripts/seletor_niveis.gd").new()
+	for e in ["CURRENT", "COMPLETED", "UNLOCKED", "LOCKED"]:
+		var txt := str(sel.call("_texto_estado", e))
+		_ok(txt == e, "A3: estado %s no seletor em EN aparece como `%s`" % [e, txt])
+	sel.free()
+	var fonte := FileAccess.get_file_as_string("res://scripts/seletor_niveis.gd")
+	for pt in ["\"ATUAL\"", "\"CONCLU", "\"DESBLOQUEADO\"", "\"BLOQUEADO\"", "\"LEVEL SELECT\"", "\"VIEW LEVELS\""]:
+		_ok(not fonte.contains(pt), "A3: texto escrito a mao no seletor: %s" % pt)
+	Textos.definir_idioma("pt")
+	_ok(Textos.t("world.forest") == "Floresta Sagrada", "A3: PT da Regiao I")
+	Textos.definir_idioma(antes)
+
 
 func teste_loja_catalogo() -> void:
 	var erros := LojaCatalogo.validar()
