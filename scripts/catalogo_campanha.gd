@@ -64,9 +64,9 @@ const CHEFE_KEY: Array[String] = [
 	"boss.vyrak",                # 14 N15 -- O Topo dos Ecos (o chefe da Região III)
 	"guard.operario_blindado",    # 15 N16 -- Entrada da Fornalha (Região IV)
 	"guard.automato_de_fundicao",  # 16 N17 -- Fundição (Região IV)
-	"guard.sentinela_de_pressao", # 17 N18 -- Câmara da Lava (Região IV; guardião a confirmar)
-	"guard.lanca_chamas",        # 18 N19 -- Sala das Pressões (Região IV; guardião PLACEHOLDER, decisão de canon pendente)
-	"boss.olho_do_abismo",       # 19 O Abismo
+	"guard.sentinela_de_pressao", # 17 N18 -- Câmara da Lava (Região IV; guardião canónico)
+	"guard.lanca_chamas",        # 18 N19 -- Sala das Pressões (Região IV; guardião canónico)
+	"boss.guardiao_da_fornalha", # 19 N20 -- Núcleo da Fornalha (o ÚNICO boss da Região IV)
 	"boss.prefeito_sem_rosto",   # 20 Vila dos Sem-Rosto
 	"boss.acougueiro_real",      # 21 Mercado da Carne
 	"boss.maquinista_infernal",  # 22 Trem dos Mortos

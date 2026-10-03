@@ -1111,5 +1111,28 @@
    "hurt": 12.0,
    "death": 10.0
   }
+ },
+ "guardiao_da_fornalha": {
+  "w": 520,
+  "h": 260,
+  "pes_y": 240,
+  "estados": {
+   "idle": 6,
+   "walk": 8,
+   "attack": 10,
+   "cast": 8,
+   "transform": 8,
+   "hurt": 4,
+   "death": 10
+  },
+  "fps": {
+   "idle": 7.0,
+   "walk": 9.0,
+   "attack": 12.0,
+   "cast": 9.0,
+   "transform": 8.0,
+   "hurt": 12.0,
+   "death": 9.0
+  }
  }
 }

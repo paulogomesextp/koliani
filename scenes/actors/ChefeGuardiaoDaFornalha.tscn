@@ -1,0 +1,90 @@
+[gd_scene load_steps=6 format=3 uid="uid://bkolianichefeguardiaofornalha20"]
+
+; Região IV / nível 20 -- GUARDIÃO DA FORNALHA, único boss da Região IV.
+; ARTE CANÓNICA: rig `bosses_anim/guardiao_da_fornalha`, extraído por
+; `tools/extrair_guardiao_da_fornalha.py` da prancha aprovada
+; `docs/art_direction/regions/region_04/boss_pack.png` (painel SPRITES).
+; Colisão: corpo 100x150 (pés em y=+75), contacto 150x158 -- as asas/braços
+; são silhueta; o martelo só magoa pela zona telegrafada (script).
+
+[ext_resource type="Script" path="res://scripts/chefe_guardiao_da_fornalha.gd" id="1_chefe"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/bosses_anim/guardiao_da_fornalha/idle.png" id="2_tex"]
+
+[sub_resource type="RectangleShape2D" id="rs_body"]
+size = Vector2(100, 150)
+
+[sub_resource type="RectangleShape2D" id="rs_contacto"]
+size = Vector2(150, 158)
+
+[sub_resource type="Gradient" id="grad_luz"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="tex_luz"]
+gradient = SubResource("grad_luz")
+width = 256
+height = 256
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[node name="ChefeGuardiaoDaFornalha" type="CharacterBody2D" groups=["inimigos"]]
+collision_layer = 4
+collision_mask = 1
+script = ExtResource("1_chefe")
+rig = "guardiao_da_fornalha"
+escala_visual = 1.0
+vida = 680
+dano_contacto = 18
+alcance_patrulha = 0.0
+familia_sonora = "metal"
+cor_estilhacos = Color(1, 0.5, 0.16, 1)
+cor_rim = Color(1, 0.5, 0.16, 1)
+
+[node name="Sprite" type="Node2D" parent="."]
+
+[node name="Corpo" type="Sprite2D" parent="Sprite"]
+visible = false
+texture_filter = 1
+texture = ExtResource("2_tex")
+hframes = 6
+
+[node name="Anim" type="AnimatedSprite2D" parent="Sprite"]
+visible = false
+texture_filter = 1
+
+[node name="LuzForja" type="PointLight2D" parent="Sprite"]
+position = Vector2(0, -20)
+texture = SubResource("tex_luz")
+energy = 0.5
+color = Color(1, 0.5, 0.2, 1)
+scale = Vector2(2.2, 2.0)
+
+; O NÚCLEO DE MAGMA está desenhado no peito do rig; este nó só dá a luz
+; que o faz pulsar quando o boss fica EXPOSTO.
+[node name="Nucleo" type="Node2D" parent="Sprite"]
+position = Vector2(0, -22)
+scale = Vector2(0.3, 0.3)
+
+[node name="Brilho" type="Sprite2D" parent="Sprite/Nucleo"]
+visible = false
+texture = SubResource("tex_luz")
+modulate = Color(1, 0.55, 0.2, 0.8)
+scale = Vector2(0.5, 0.5)
+
+[node name="Luz" type="PointLight2D" parent="Sprite/Nucleo"]
+texture = SubResource("tex_luz")
+energy = 0.15
+color = Color(1, 0.55, 0.2, 1)
+scale = Vector2(0.9, 0.9)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("rs_body")
+
+[node name="AreaContacto" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AreaContacto"]
+position = Vector2(0, -4)
+shape = SubResource("rs_contacto")
