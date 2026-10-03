@@ -148,6 +148,8 @@ func _correr_tudo() -> void:
 	await teste_n7_autoral()
 	await teste_n8_autoral()
 	await teste_n9_autoral()
+	await teste_n11_entrada_autoral()
+	await teste_hitstop_v2()
 	await teste_fluxo_fim_regiao2()
 	await teste_combat_lab()
 	await teste_combat_lab_combos()
@@ -6642,18 +6644,25 @@ func _coracao_novo(dev := true) -> Array:
 func _coracao_luta(modo: String, segundos: float) -> Dictionary:
 	var antes_dev: bool = EstadoJogo.modo_dev
 	var r: Array = await _coracao_novo(true)
-	Engine.time_scale = 6.0   # o bot corre a 6x: a luta mede-se em segundos de JOGO (frames de fisica)
+	Engine.time_scale = 6.0   # o bot corre a 6x
+	# Mede-se em SEGUNDOS DE JOGO (cada frame de fisica vale time_scale/60).
+	# Ate' 3 out 2026 media-se em frames/60, o que so' batia certo porque o
+	# hitstop v1 repunha o time_scale a 1,0 ao primeiro golpe levado; com o
+	# hitstop v2 (B2) o tempo global ja' nao mexe e as medicoes sairam 6x
+	# mais curtas. O ritmo dos golpes do bot tambem e' em tempo de jogo.
 	var n: Node = r[0]
 	var g: ChefeCoracaoPutrefacto = r[1]
 	var k: Node2D = r[2]
 	var frames := 0
-	var limite := int(segundos * 60.0)
+	var tj := 0.0          # segundos de jogo
+	var prox_golpe := 0.5
+	var prox_tiro := 0.0
 	var janelas: Array = []
-	var jan_ini := -1
+	var jan_ini := -1.0
 	var fase2_em := -1.0
 	var pior_estado := 0.0
 	var ult_fase := int(g._fase)
-	var t_fase := 0
+	var t_fase := 0.0
 	var especiais := 0
 	var energia := 99.0
 	var raizes_cedo := 0
@@ -6661,43 +6670,50 @@ func _coracao_luta(modo: String, segundos: float) -> Dictionary:
 	var tel_pulso: Array = []
 	var vida0: int = g.vida
 	var morreu := false
-	while frames < limite:
+	while tj < segundos:
 		await get_tree().physics_frame
 		frames += 1
+		var dtj := Engine.time_scale / 60.0
+		tj += dtj
 		if frames % 45 == 0 and is_instance_valid(g):
 			k.global_position = Vector2(g.global_position.x - 200.0, 630.0)   # o pulso empurra: mantem-na a' vista
 		if not is_instance_valid(g) or g.is_queued_for_deletion():
 			morreu = true
 			break
 		var vuln: bool = g._vulneravel()
-		if vuln and jan_ini < 0:
-			jan_ini = frames
+		if vuln and jan_ini < 0.0:
+			jan_ini = tj
 			especiais = 0
-		if not vuln and jan_ini >= 0:
-			janelas.append(float(frames - jan_ini) / 60.0)
-			jan_ini = -1
+		if not vuln and jan_ini >= 0.0:
+			janelas.append(tj - jan_ini)
+			jan_ini = -1.0
 		if int(g._fase) != ult_fase:
 			if ult_fase != int(ChefeCoracaoPutrefacto.Fase.DORME):
-				pior_estado = maxf(pior_estado, float(t_fase) / 60.0)
+				pior_estado = maxf(pior_estado, t_fase)
 			if ult_fase == int(ChefeCoracaoPutrefacto.Fase.PULSO_TEL):
-				tel_pulso.append(float(t_fase) / 60.0)
+				tel_pulso.append(t_fase)
 			ult_fase = int(g._fase)
-			t_fase = 0
-		t_fase += 1
+			t_fase = 0.0
+		t_fase += dtj
 		if g._f2 and fase2_em < 0.0:
-			fase2_em = float(frames) / 60.0
+			fase2_em = tj
 		for no in n.get_children():
 			if no is RaizPerigo and not vistas.has(no.get_instance_id()):
 				vistas[no.get_instance_id()] = true
 				if float(no.atraso) < 0.9:
 					raizes_cedo += 1
-		if frames % 30 == 0 and ((modo == "casca" and not vuln) or (modo != "casca" and (modo == "spam" or vuln))):
+		# um golpe de espada a cada 0,5 s de jogo
+		var golpe := tj >= prox_golpe
+		if golpe:
+			prox_golpe += 0.5
+		if golpe and ((modo == "casca" and not vuln) or (modo != "casca" and (modo == "spam" or vuln))):
 			g.receber_dano(50, 1.0)
 		if modo == "especial":
-			energia = minf(99.0, energia + 0.2)      # regen 12/s (60 Hz)
-			if vuln and frames % 30 == 0:
+			energia = minf(99.0, energia + 12.0 * dtj)   # regen 12/s
+			if vuln and golpe:
 				energia = minf(99.0, energia + 5.0)   # +5 por golpe de espada
-			if vuln and energia >= 33.0 and frames % 40 == 20:
+			if vuln and energia >= 33.0 and tj >= prox_tiro:
+				prox_tiro = tj + 0.67
 				energia -= 33.0
 				g.receber_tiro(130, 1.0)   # o nucleo absorve 40 % da onda
 	var ultima_contagem := {}
@@ -6709,7 +6725,7 @@ func _coracao_luta(modo: String, segundos: float) -> Dictionary:
 		await get_tree().process_frame
 		await get_tree().process_frame
 	var porta := n.get_node_or_null("Porta")
-	var res := {"ttk": float(frames) / 60.0, "morreu": morreu, "pior_estado": pior_estado, "janelas": janelas,
+	var res := {"ttk": tj, "morreu": morreu, "pior_estado": pior_estado, "janelas": janelas,
 		"fase2_em": fase2_em, "raizes_cedo": raizes_cedo, "tel_pulso": tel_pulso, "vida0": vida0,
 		"contagem": ultima_contagem,
 		"saida": n.get_node_or_null("BauChefe") != null or (porta != null and bool(porta.monitoring))}
@@ -7502,6 +7518,98 @@ func teste_fluxo_fim_regiao2() -> void:
 	EstadoJogo.recompensas_reclamadas.assign(antes_rec)
 	EstadoJogo.habilidades.assign(antes_hab)
 	EstadoJogo.indice_nivel = antes_idx
+
+
+## A4 (DEC-014): o N11 refeito de raiz por `tools/construir_n11_entrada.py`.
+## Prova o que a auditoria apontou: sem arte provisoria (sinos COM textura,
+## sem PlataformaFlutuante de poligono), comprido, 4 encontros, sem guardiao
+## (DEC-012) e a galeria que FECHA ate' limpar e ABRE depois (DEC-013).
+## B2 (auditoria N1-N20): hitstop v2 opt-in. Ligado, NAO mexe no tempo
+## global (camara/fundo continuam), congela o alvo e a animacao da Koliani e
+## repoe tudo. Desligado (default), e' o hitstop global de sempre.
+func teste_hitstop_v2() -> void:
+	var k := (load("res://scenes/actors/Koliani.tscn") as PackedScene).instantiate()
+	add_child(k)
+	await get_tree().process_frame
+	var alvo := Node2D.new()
+	add_child(alvo)
+	_ok(k.get("combate_hitstop_v2") == false, "B2: o v2 devia vir DESLIGADO por omissao")
+	k.set("combate_hitstop_v2", true)
+	k.call("_hitstop", float(k.get("HITSTOP_REMATE")), alvo)
+	_ok(is_equal_approx(Engine.time_scale, 1.0), "B2: o v2 parou o tempo global (%.4f)" % Engine.time_scale)
+	_ok(alvo.process_mode == Node.PROCESS_MODE_DISABLED, "B2: o alvo nao congelou")
+	var corpo := k.get("_corpo") as AnimatedSprite2D
+	_ok(corpo != null and is_zero_approx(corpo.speed_scale), "B2: a animacao da Koliani nao congelou")
+	var v2: Dictionary = k.get("HITSTOP_V2")
+	_ok(float(v2[k.get("HITSTOP_GOLPE")]) >= 0.033 and float(v2[k.get("HITSTOP_CRIT")]) >= 0.066,
+		"B2: os valores v2 tem de passar 2 frames (golpe) e 4 (critico) a 60 Hz")
+	await get_tree().create_timer(0.15, true, false, true).timeout
+	_ok(alvo.process_mode == Node.PROCESS_MODE_INHERIT, "B2: o alvo ficou congelado")
+	_ok(corpo == null or is_equal_approx(corpo.speed_scale, 1.0) or corpo.speed_scale > 0.0,
+		"B2: a animacao da Koliani ficou parada")
+	# default: o de sempre (tempo global)
+	k.set("combate_hitstop_v2", false)
+	k.call("_hitstop", float(k.get("HITSTOP_GOLPE")), alvo)
+	_ok(Engine.time_scale < 0.5, "B2: com o v2 desligado o hitstop global deixou de atuar")
+	await get_tree().create_timer(0.1, true, false, true).timeout
+	_ok(is_equal_approx(Engine.time_scale, 1.0), "B2: o time_scale ficou preso")
+	Engine.time_scale = 1.0
+	alvo.queue_free()
+	k.queue_free()
+	await get_tree().process_frame
+
+
+func teste_n11_entrada_autoral() -> void:
+	var antes_idx: int = EstadoJogo.indice_nivel
+	var antes_dev: bool = EstadoJogo.modo_dev
+	EstadoJogo.modo_dev = false
+	EstadoJogo.indice_nivel = 10
+	var n := (load("res://scenes/levels/Torre_dos_Sinos.tscn") as PackedScene).instantiate()
+	add_child(n)
+	for i in 6:
+		await get_tree().process_frame
+	_ok(not bool(n.get("corredor")) and bool(n.get("checkpoints_autorais")), "N11: nao e' autoral")
+	_ok(n.get_node_or_null("Guardiao") == null, "N11: tem guardiao (DEC-012: 1.o nivel da regiao nao tem)")
+	var porta := n.get_node_or_null("Porta") as Node2D
+	_ok(porta != null and porta.global_position.x > 6000.0, "N11: porta em falta ou nivel curto (< 6000 px)")
+	var inimigos := 0
+	var sinos := 0
+	var checks := 0
+	var ess := 0
+	for c in n.get_children():
+		if c is DemonioBase:
+			inimigos += 1
+		elif c is SinoTorre:
+			sinos += 1
+			_ok(c.get("textura") != null, "N11: sino `%s` sem textura (poligono placeholder)" % c.name)
+		elif c is PlataformaFlutuante:
+			_ok(false, "N11: `%s` e' PlataformaFlutuante (sem arte, poligono)" % c.name)
+		elif c is Essencia:
+			ess += 1
+		elif c.get_script() == preload("res://scripts/checkpoint.gd"):
+			checks += 1
+	_ok(inimigos >= 12, "N11: so' %d inimigos (4 encontros pedem >= 12)" % inimigos)
+	_ok(sinos >= 2, "N11: o sino da entrada e o da sala tem de existir (%d)" % sinos)
+	_ok(checks == 5, "N11: devia ter 5 checkpoints, tem %d" % checks)
+	_ok(ess >= 3, "N11: 2 segredos + bonus pedem >= 3 essencias, ha' %d" % ess)
+	var arena := n.get_node_or_null("ArenaGaleria") as ArenaSelada
+	_ok(arena != null, "N11: falta a galeria selada (ArenaSelada)")
+	var k := n.get_node_or_null("Koliani") as Node2D
+	if arena and k:
+		_ok(not arena.esta_fechada(), "N11: a arena comecou fechada")
+		k.global_position = arena.global_position + Vector2(0, 60)
+		for i in 12:
+			await get_tree().physics_frame
+		_ok(arena.esta_fechada(), "N11: a arena nao fechou com a Koliani la' dentro")
+		for e in get_tree().get_nodes_in_group("arena_n11"):
+			(e as Node).queue_free()
+		for i in 6:
+			await get_tree().physics_frame
+		_ok(not arena.esta_fechada(), "N11: a arena nao abriu depois de limpa (softlock)")
+	n.queue_free()
+	await get_tree().process_frame
+	EstadoJogo.indice_nivel = antes_idx
+	EstadoJogo.modo_dev = antes_dev
 
 
 func teste_n9_autoral() -> void:

@@ -156,6 +156,16 @@ func _init() -> void:
 		var i := int(es.NIVEIS.find(_cena))
 		if i >= 0:
 			es.indice_nivel = i
+		# D6 (auditoria N1-N20): o bot arrancava SEM habilidades, por isso as
+		# metricas de N3+ eram de um jogador que nunca existe. Da' o que um
+		# jogador de campanha ja' tem ao entrar no nivel `i` (0-based):
+		# colecionaveis de N2-N4, salto duplo do boss N5, escalada do N10.
+		var hab_por_nivel := {1: "dash", 2: "pogo", 3: "especial", 5: "salto_duplo", 10: "escalar_paredes"}
+		for k in hab_por_nivel:
+			if i >= k:
+				es.desbloquear_habilidade(hab_por_nivel[k])
+		if i >= 1:
+			es.desbloquear_habilidade("projetil")
 		es.checkpoint = Vector2.ZERO
 		es.vidas = 99          # o bot mede MORTES, nao game-overs
 	change_scene_to_file(_cena)
@@ -636,7 +646,27 @@ func _inimigo_perto(pos: Vector2) -> Node:
 		if dd < melhor_d and absf(e.global_position.y - pos.y) < 130.0:
 			melhor_d = dd
 			melhor = e
+	if melhor == null:
+		melhor = _sino_por_tocar(pos)
 	return melhor
+
+
+## Um humano TOCA o sino quando a ponte dele ainda e' fantasma (N11-N15). Sem
+## isto o bot so' atravessava pontes de eco por acaso, ao acertar no sino a
+## meio de uma luta (descoberto ao refazer o N11, 3 out 2026). So' o sino a
+## frente/ao lado, e so' enquanto houver plataforma do grupo DESLIGADA.
+func _sino_por_tocar(pos: Vector2) -> Node:
+	for s in current_scene.find_children("*", "StaticBody2D", true, false):
+		if not (s is SinoTorre) or bool(s.get("so_congela")):
+			continue
+		var sn := s as Node2D
+		if absf(sn.global_position.x - pos.x) > 200.0 or absf(sn.global_position.y - pos.y) > 120.0:
+			continue
+		for p in get_nodes_in_group(str(s.get("alterna_grupo"))):
+			var col := (p as Node).get_node_or_null("Col") as CollisionShape2D
+			if col and col.disabled:
+				return s
+	return null
 
 
 ## O combate comecou? NAO se pode testar por `_fase != 0`: so' quatro das

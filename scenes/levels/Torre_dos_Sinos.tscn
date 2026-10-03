@@ -1,97 +1,75 @@
-[gd_scene load_steps=21 format=3 uid="uid://bkolianitorresinos11"]
+[gd_scene load_steps=56 format=3 uid="uid://bkolianitorresinos11"]
 
-; REGIAO III / nivel 11 -- ENTRADA DOS ECOS (`level.n10`), primeiro nivel da
-; TORRE DOS ECOS. O nome do ficheiro fica: muda-lo partia saves e checkpoints.
+; REGIAO III / nivel 11 -- ENTRADA DOS ECOS (`level.n10`), "O Primeiro
+; Chamamento". O nome do ficheiro fica: muda-lo partia saves e checkpoints.
 ;
-; PASSE DE ENRIQUECIMENTO (29 set 2026): a reconstrucao de 28 set (auditoria
-; GM, ver historico) tinha a forma A-F certa mas ficava curta face ao
-; contrato aprovado (`docs/art_direction/regions/region_03/
-; REGION03_VISUAL_GAMEPLAY_CONTRACT.md`, LOCKED): so' 1 dos 3 "inimigos
-; principais" do nivel estava presente (faltavam Sino Flutuante e Arqueiro
-; das Sombras -- ambos ja' tinham sprite extraido e `especie` registada,
-; nunca usados em nivel nenhum), faltava a mecanica "correntes moveis" e o
-; hazard "laminas de sino rotativas lentas", e nao havia nenhum segredo.
-; Este passe ACRESCENTA sobre a sala existente (nao a reconstroi do zero):
-;   - Espinhos logo na entrada (hazard "espinhos simples" do contrato,
-;     vocabulario que o jogo ja' tem desde o N1 -- nao e' ensino novo);
-;   - Sino Flutuante (voador) a flutuar na bifurcacao O, rota curta, fora
-;     do unico caminho obrigatorio;
-;   - um RAMO OPCIONAL a partir de E1 (passarela quebrada -> corrente movel
-;     -> lamina de sino lenta a guardar o topo) que e' o Segredo 2 -- ZERO
-;     risco de softlock porque nao e' preciso para progredir, e a
-;     PlataformaQuebra tem respawn;
-;   - Segredo 1: um bonus de Essencia mesmo por cima do salto dos espinhos,
-;     visivel mas exige um salto um pouco mais alto que o minimo;
-;   - Arqueiro das Sombras (cuspidor, elevado) e Sentinela da Torre
-;     (escudeiro, patrulha) no F) MINI-TESTE, reprise leve de combate com o
-;     que ja' foi ensinado (Acolito), condizente com o racio 70/30 do
-;     contrato;
-;   - dois props ancora desenhados a proposito para a Regiao III
-;     (`tools/gerar_props_torre_ecos.py`): um sino partido junto a entrada
-;     (flavor -- algo ja' caiu desta torre) e um vitral alto iluminado por
-;     tras da 1a escalada (o par luz-fria-da-lua/luz-dourada-dos-sinos que
-;     o contrato pede como tracos LOCKED). O resto da decoracao continua
-;     automatico por `plataforma.gd` (bioma "torres" ja' estava ligado).
-; Nada do A-F original mudou de posicao; nada do que ja' estava testado foi
-; removido. Sem boss, sem miniboss disfarcado -- decisao do GM de 28 set
-; continua de pe.
+; GERADO por `tools/construir_n11_entrada.py` -- editar la', nao aqui.
+; Desenho, medicoes e o que ficou por decidir: `docs/nivel_autoral_n11.md`.
 ;
-; Reconstrucao N11 (auditoria GM, 28 set 2026): nivel AUTORAL, sala feita a
-; mao (`corredor = false` -- a jornada procedural que vinha antes foi
-; retirada, o GM pediu "SEM procedural journey"). Achados da auditoria:
-;   - a sala ja existia e ja tinha boa forma vertical (bifurcacao O/E,
-;     sinos, elite) -- REAPROVEITADA quase por inteiro, so' reorganizada;
-;   - tinha um CHEFE (ChefeSinoVivo, "O Sino Vivo") a selar a porta -- REMOVIDO:
-;     o N11 e' introducao da regiao, Vyrak (o chefe real da Regiao III) so'
-;     aparece no N15, e o GM foi explicito em "sem boss, sem miniboss
-;     disfarcado" neste nivel. A cena/script do Sino Vivo NAO foi apagada
-;     (fica disponivel para outro nivel da regiao decidir);
-;   - tinha um `Coletavel` a voltar a dar `escalar_paredes` a meio do nivel --
-;     REMOVIDO: a habilidade ja e' concedida (incondicional) ao vencer o
-;     chefe do N10 (ver `nivel_com_chefe.gd`, HABILIDADE_DO_CHEFE[9]), por
-;     isso um 2o coletavel da mesma habilidade era so' ruido/redundancia;
-;   - o grupo "sino_alterna" do `SinoTorre` (alterna plataformas ao tocar)
-;     existia no script desde sempre mas NENHUM nivel o usava -- os sinos
-;     so' congelavam inimigos. Este e' o primeiro nivel a ligar a serio
-;     (ver `PlataformaSino` / `scripts/plataforma_sino.gd`).
-;
-; Estrutura A-F (GM): A) ENTRADA -- ChaoInicio, atmosfera, sem pressao.
-; B) PRIMEIRA ESCALADA -- ParedeSubida, zona segura (chao mesmo por baixo,
-; sem vazio). C) PRIMEIRO SINO -- SinoBaixo liberta EcoBaixo (plataforma
-; fantasma -> solida), consequencia imediata e visivel. D) PLATAFORMAS
-; OSCILANTES -- O2 (introducao simples) e SubidaOeste2 (com deriva, perto do
-; fim do ramo oeste). E) SINO + MOVIMENTO -- SinoAlto liberta EcoAlto junto
-; da plataforma oscilante E2 no ramo leste. F) MINI-TESTE -- o resto do
-; ramo escolhido (leste ou oeste) ate' ao ChaoChefe, so' com o que ja' foi
-; ensinado; sem chefe, sem miniboss.
-;
-; Bifurcacao: escadaria oeste / escadaria este (convergem no ChaoChefe).
-; Elite: Acolito do Eco (cuspidor) -- fora da 1a escalada, do 1o sino e da
-; aterragem das plataformas oscilantes, como o GM pediu.
-; Vazio (trevas) em baixo -- cair = morte, mas nenhuma secao nova obriga a
-; arriscar isso (a escalada e' sempre sobre chao solido).
+; Refeito de raiz (DEC-014, 3 out 2026). Estrutura: A) entrada + 1.o sino
+; (com rede) -> Encontro 1 (atrio) -> 1.a escalada -> B) passarelas
+; externas (correntes moveis, passarela quebrada, lamina lenta) -> Encontro 2
+; (galeria SELADA ate' limpar, DEC-013) -> Encontro 3 (poco do elevador
+; com arqueiro) -> C) sala do grande sino (Encontro 4 + ponte final). Sem
+; guardiao (DEC-012). 2 segredos, 5 checkpoints, ~6 700 px.
 
 [ext_resource type="PackedScene" uid="uid://bkolianiactor01" path="res://scenes/actors/Koliani.tscn" id="1_kol"]
 [ext_resource type="PackedScene" uid="uid://bdemoniobase01" path="res://scenes/actors/DemonioBase.tscn" id="2_dem"]
-[ext_resource type="PackedScene" uid="uid://bkolianiporta01" path="res://scenes/actors/Porta.tscn" id="4_porta"]
-[ext_resource type="Script" path="res://scripts/checkpoint.gd" id="5_chk"]
-[ext_resource type="Script" path="res://scripts/nivel_com_chefe.gd" id="7_niv"]
-[ext_resource type="PackedScene" uid="uid://bkolianiatmosfera01" path="res://scenes/fx/Atmosfera.tscn" id="8_atm"]
-[ext_resource type="PackedScene" uid="uid://bkolianiplataforma01" path="res://scenes/actors/Plataforma.tscn" id="9_pl"]
-[ext_resource type="PackedScene" uid="uid://bkolianisinotorre11" path="res://scenes/actors/SinoTorre.tscn" id="10_sino"]
-[ext_resource type="PackedScene" uid="uid://bkolianiaguavenenosa01" path="res://scenes/actors/AguaVenenosa.tscn" id="11_vazio"]
-[ext_resource type="PackedScene" uid="uid://bkolianiplatflutuante01" path="res://scenes/actors/PlataformaFlutuante.tscn" id="12_flut"]
-[ext_resource type="PackedScene" uid="uid://bkolianiplatsino11" path="res://scenes/actors/PlataformaSino.tscn" id="13_eco"]
-[ext_resource type="PackedScene" uid="uid://bkolianiespinhos01" path="res://scenes/actors/Espinhos.tscn" id="14_esp"]
-[ext_resource type="PackedScene" uid="uid://bkolianipendulolamina01" path="res://scenes/actors/PenduloLamina.tscn" id="15_pend"]
-[ext_resource type="PackedScene" uid="uid://bkolianiplatcorrente06" path="res://scenes/actors/PlataformaCorrente.tscn" id="16_corr"]
-[ext_resource type="PackedScene" uid="uid://bkolianiplataquebra01" path="res://scenes/actors/PlataformaQuebra.tscn" id="17_quebra"]
-[ext_resource type="PackedScene" uid="uid://bkolianiessencia01" path="res://scenes/actors/Essencia.tscn" id="18_ess"]
-[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/sino_partido.png" id="19_sinop"]
-[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/vitral_alto.png" id="20_vitral"]
+[ext_resource type="PackedScene" uid="uid://bkolianiporta01" path="res://scenes/actors/Porta.tscn" id="3_porta"]
+[ext_resource type="Script" path="res://scripts/checkpoint.gd" id="4_chk"]
+[ext_resource type="Script" path="res://scripts/nivel_com_chefe.gd" id="5_niv"]
+[ext_resource type="Script" path="res://scripts/arena_selada.gd" id="6_arena"]
+[ext_resource type="PackedScene" uid="uid://bkolianiatmosfera01" path="res://scenes/fx/Atmosfera.tscn" id="7_atm"]
+[ext_resource type="PackedScene" uid="uid://bkolianiplataforma01" path="res://scenes/actors/Plataforma.tscn" id="8_pl"]
+[ext_resource type="PackedScene" uid="uid://bkolianisinotorre11" path="res://scenes/actors/SinoTorre.tscn" id="9_sino"]
+[ext_resource type="PackedScene" uid="uid://bkolianiaguavenenosa01" path="res://scenes/actors/AguaVenenosa.tscn" id="10_vazio"]
+[ext_resource type="PackedScene" uid="uid://bkolianiplatsino11" path="res://scenes/actors/PlataformaSino.tscn" id="11_eco"]
+[ext_resource type="PackedScene" uid="uid://bkolianipendulolamina01" path="res://scenes/actors/PenduloLamina.tscn" id="12_pend"]
+[ext_resource type="PackedScene" uid="uid://bkolianiplataquebra01" path="res://scenes/actors/PlataformaQuebra.tscn" id="13_quebra"]
+[ext_resource type="PackedScene" uid="uid://bkolianiplatcorrente06" path="res://scenes/actors/PlataformaCorrente.tscn" id="14_pcorr"]
+[ext_resource type="PackedScene" uid="uid://bkolianiespinhos01" path="res://scenes/actors/Espinhos.tscn" id="15_espinhos"]
+[ext_resource type="PackedScene" uid="uid://bkolianiessencia01" path="res://scenes/actors/Essencia.tscn" id="16_ess"]
+[ext_resource type="PackedScene" uid="uid://bkolianitumuloelev16" path="res://scenes/actors/TumuloElevador.tscn" id="17_elev"]
+[ext_resource type="Script" path="res://scripts/elevador_coluna.gd" id="18_elevcol"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/vitral_alto.png" id="19_t_vitral_alto"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/sino_m.png" id="20_t_sino_m"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/sino_g.png" id="21_t_sino_g"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/sino_partido.png" id="22_t_sino_partido"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/coluna_igreja.png" id="23_t_coluna_igreja"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/coluna_dupla.png" id="24_t_coluna_dupla"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/arco_grande.png" id="25_t_arco_grande"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/corrente_t.png" id="26_t_corrente_t"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/lanterna_eco.png" id="27_t_lanterna_eco"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/candelabro.png" id="28_t_candelabro"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/estatua_anjo.png" id="29_t_estatua_anjo"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/flamula.png" id="30_t_flamula"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/pedra_memoria.png" id="31_t_pedra_memoria"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/gargula.png" id="32_t_gargula"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/tocha.png" id="33_t_tocha"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/urna.png" id="34_t_urna"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/livros.png" id="35_t_livros"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/p_parede.png" id="36_t_p_parede"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/p_passarela.png" id="37_t_p_passarela"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/p_suporte.png" id="38_t_p_suporte"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/p_vitral_dourado.png" id="39_t_p_vitral_dourado"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/p_parede_vitral.png" id="40_t_p_parede_vitral"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/p_rosacea.png" id="41_t_p_rosacea"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/p_lamina_pendular.png" id="43_t_p_lamina_pendular"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/p_particulas_luz.png" id="44_t_p_particulas_luz"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/p_brilho_sino.png" id="45_t_p_brilho_sino"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/p_raios_luz.png" id="46_t_p_raios_luz"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/p_neblina.png" id="47_t_p_neblina"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/p_heras.png" id="48_t_p_heras"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/p_detritos.png" id="49_t_p_detritos"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/p_poeira_chao.png" id="50_t_p_poeira_chao"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/deco/torres/m_tex_correntes.png" id="51_t_m_tex_correntes"]
+[ext_resource type="Texture2D" path="res://assets/sprites/pixel/terreno/torre_ecos/corpo.png" id="52_t_corpo_te"]
 
 [sub_resource type="RectangleShape2D" id="rs_chk"]
 size = Vector2(44, 96)
+
+[sub_resource type="CanvasItemMaterial" id="mat_add"]
+blend_mode = 1
 
 [sub_resource type="Gradient" id="grad_luz"]
 offsets = PackedFloat32Array(0, 1)
@@ -106,12 +84,13 @@ fill_from = Vector2(0.5, 0.5)
 fill_to = Vector2(1, 0.5)
 
 [node name="Torre_dos_Sinos" type="Node2D"]
-script = ExtResource("7_niv")
+script = ExtResource("5_niv")
 corredor = false
+alongar_plataformas = false
 checkpoints_autorais = true
-estreia_x_autoral = 760.0
+estreia_x_autoral = 640.0
 
-[node name="Atmosfera" parent="." instance=ExtResource("8_atm")]
+[node name="Atmosfera" parent="." instance=ExtResource("7_atm")]
 cor_ambiente = Color(0.9, 0.92, 1, 1)
 cor_fundo = Color(0.05, 0.06, 0.14, 1)
 cor_silhueta = Color(0.09, 0.1, 0.2, 1)
@@ -119,7 +98,7 @@ cor_luz = Color(1, 0.78, 0.48, 1)
 cor_poeira = Color(1, 0.9, 0.72, 1)
 densidade_poeira = 1.1
 bioma = "torres"
-largura_nivel = 2600.0
+largura_nivel = 6800
 fundo_pack = "torre_ecos"
 tinta_fundo = Color(0.88, 0.94, 1.16, 1)
 neblina_fundo = 0.3
@@ -127,357 +106,1139 @@ dessaturar_fundo = 0.18
 seed_ambiente = 1370
 luzes_horizonte = true
 
-[node name="Vazio" parent="." instance=ExtResource("11_vazio")]
-position = Vector2(650, 1120)
-largura = 3000.0
-altura = 340.0
-cor = Color(0.06, 0.05, 0.12, 0.96)
+; FACHADA -- o N11 e' a ENTRADA: comeca ao ar livre (panorama do pack ao
+; fundo) e vai entrando na torre. Pilares de cantaria a toda a altura, com
+; arcadas, vitrais e tochas; escurecidos para recuar. Nada aqui colide.
+[node name="ParedeNave" type="Sprite2D" parent="."]
+position = Vector2(1900, -400)
+scale = Vector2(1, 1)
+centered = false
+texture = ExtResource("52_t_corpo_te")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 4980, 460)
+z_index = -11
+modulate = Color(0.13, 0.14, 0.25, 1)
 
-; ===================  A) ENTRADA NA TORRE  ==================
-[node name="ChaoInicio" parent="." instance=ExtResource("9_pl")]
-position = Vector2(340, 900)
-tamanho = Vector2(460, 60)
-altura_visual = 110.0
+[node name="PilarNave0" type="Sprite2D" parent="."]
+position = Vector2(1860, -400)
+scale = Vector2(1.18, 1.18)
+centered = false
+texture = ExtResource("36_t_p_parede")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 67.7966, 1186.44)
+z_index = -9
+modulate = Color(0.34, 0.37, 0.6, 1)
+
+[node name="MisulaNave0" type="Sprite2D" parent="."]
+position = Vector2(1900, 149.7)
+scale = Vector2(1.15, 1.15)
+texture = ExtResource("38_t_p_suporte")
+z_index = -8
+modulate = Color(0.34, 0.37, 0.6, 1)
+
+[node name="TochaNave0" type="Sprite2D" parent="."]
+position = Vector2(1900, 201)
+scale = Vector2(1, 1)
+texture = ExtResource("33_t_tocha")
+z_index = -8
+
+[node name="PilarNave1" type="Sprite2D" parent="."]
+position = Vector2(2660, -400)
+scale = Vector2(1.18, 1.18)
+centered = false
+texture = ExtResource("36_t_p_parede")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 67.7966, 1186.44)
+z_index = -9
+modulate = Color(0.34, 0.37, 0.6, 1)
+
+[node name="MisulaNave1" type="Sprite2D" parent="."]
+position = Vector2(2700, 149.7)
+scale = Vector2(1.15, 1.15)
+texture = ExtResource("38_t_p_suporte")
+z_index = -8
+modulate = Color(0.34, 0.37, 0.6, 1)
+
+[node name="TochaNave1" type="Sprite2D" parent="."]
+position = Vector2(2700, 201)
+scale = Vector2(1, 1)
+texture = ExtResource("33_t_tocha")
+z_index = -8
+
+[node name="PilarNave2" type="Sprite2D" parent="."]
+position = Vector2(3460, -400)
+scale = Vector2(1.18, 1.18)
+centered = false
+texture = ExtResource("36_t_p_parede")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 67.7966, 1186.44)
+z_index = -9
+modulate = Color(0.34, 0.37, 0.6, 1)
+
+[node name="MisulaNave2" type="Sprite2D" parent="."]
+position = Vector2(3500, 149.7)
+scale = Vector2(1.15, 1.15)
+texture = ExtResource("38_t_p_suporte")
+z_index = -8
+modulate = Color(0.34, 0.37, 0.6, 1)
+
+[node name="TochaNave2" type="Sprite2D" parent="."]
+position = Vector2(3500, 201)
+scale = Vector2(1, 1)
+texture = ExtResource("33_t_tocha")
+z_index = -8
+
+[node name="PilarNave3" type="Sprite2D" parent="."]
+position = Vector2(4260, -400)
+scale = Vector2(1.18, 1.18)
+centered = false
+texture = ExtResource("36_t_p_parede")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 67.7966, 1186.44)
+z_index = -9
+modulate = Color(0.34, 0.37, 0.6, 1)
+
+[node name="MisulaNave3" type="Sprite2D" parent="."]
+position = Vector2(4300, 149.7)
+scale = Vector2(1.15, 1.15)
+texture = ExtResource("38_t_p_suporte")
+z_index = -8
+modulate = Color(0.34, 0.37, 0.6, 1)
+
+[node name="TochaNave3" type="Sprite2D" parent="."]
+position = Vector2(4300, 201)
+scale = Vector2(1, 1)
+texture = ExtResource("33_t_tocha")
+z_index = -8
+
+[node name="PilarNave4" type="Sprite2D" parent="."]
+position = Vector2(5060, -400)
+scale = Vector2(1.18, 1.18)
+centered = false
+texture = ExtResource("36_t_p_parede")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 67.7966, 1186.44)
+z_index = -9
+modulate = Color(0.34, 0.37, 0.6, 1)
+
+[node name="MisulaNave4" type="Sprite2D" parent="."]
+position = Vector2(5100, 149.7)
+scale = Vector2(1.15, 1.15)
+texture = ExtResource("38_t_p_suporte")
+z_index = -8
+modulate = Color(0.34, 0.37, 0.6, 1)
+
+[node name="TochaNave4" type="Sprite2D" parent="."]
+position = Vector2(5100, 201)
+scale = Vector2(1, 1)
+texture = ExtResource("33_t_tocha")
+z_index = -8
+
+[node name="PilarNave5" type="Sprite2D" parent="."]
+position = Vector2(5860, -400)
+scale = Vector2(1.18, 1.18)
+centered = false
+texture = ExtResource("36_t_p_parede")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 67.7966, 1186.44)
+z_index = -9
+modulate = Color(0.34, 0.37, 0.6, 1)
+
+[node name="MisulaNave5" type="Sprite2D" parent="."]
+position = Vector2(5900, 149.7)
+scale = Vector2(1.15, 1.15)
+texture = ExtResource("38_t_p_suporte")
+z_index = -8
+modulate = Color(0.34, 0.37, 0.6, 1)
+
+[node name="TochaNave5" type="Sprite2D" parent="."]
+position = Vector2(5900, 201)
+scale = Vector2(1, 1)
+texture = ExtResource("33_t_tocha")
+z_index = -8
+
+[node name="ArcadaNave0" type="Sprite2D" parent="."]
+position = Vector2(1940, -164)
+scale = Vector2(1.4, 1.4)
+centered = false
+texture = ExtResource("37_t_p_passarela")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 514.286, 160)
+z_index = -10
+modulate = Color(0.32, 0.35, 0.6, 1)
+
+[node name="VitralNave0" type="Sprite2D" parent="."]
+position = Vector2(2300, -211.5)
+scale = Vector2(1.5, 1.5)
+texture = ExtResource("39_t_p_vitral_dourado")
+z_index = -8
+modulate = Color(0.78, 0.84, 1, 0.95)
+
+[node name="RaiosNave0" type="Sprite2D" parent="."]
+position = Vector2(2340, -40)
+scale = Vector2(1.5, 1.5)
+texture = ExtResource("46_t_p_raios_luz")
+z_index = -7
+modulate = Color(0.7, 0.8, 1, 0.4)
+material = SubResource("mat_add")
+
+[node name="ArcadaNave1" type="Sprite2D" parent="."]
+position = Vector2(2740, -164)
+scale = Vector2(1.4, 1.4)
+centered = false
+texture = ExtResource("37_t_p_passarela")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 514.286, 160)
+z_index = -10
+modulate = Color(0.32, 0.35, 0.6, 1)
+
+[node name="VitralNave1" type="Sprite2D" parent="."]
+position = Vector2(3100, -237)
+scale = Vector2(1.5, 1.5)
+texture = ExtResource("40_t_p_parede_vitral")
+z_index = -8
+modulate = Color(0.78, 0.84, 1, 0.95)
+
+[node name="RaiosNave1" type="Sprite2D" parent="."]
+position = Vector2(3140, -40)
+scale = Vector2(1.5, 1.5)
+texture = ExtResource("46_t_p_raios_luz")
+z_index = -7
+modulate = Color(0.7, 0.8, 1, 0.4)
+material = SubResource("mat_add")
+
+[node name="ArcadaNave2" type="Sprite2D" parent="."]
+position = Vector2(3540, -164)
+scale = Vector2(1.4, 1.4)
+centered = false
+texture = ExtResource("37_t_p_passarela")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 514.286, 160)
+z_index = -10
+modulate = Color(0.32, 0.35, 0.6, 1)
+
+[node name="VitralNave2" type="Sprite2D" parent="."]
+position = Vector2(3900, -211.5)
+scale = Vector2(1.5, 1.5)
+texture = ExtResource("39_t_p_vitral_dourado")
+z_index = -8
+modulate = Color(0.78, 0.84, 1, 0.95)
+
+[node name="RaiosNave2" type="Sprite2D" parent="."]
+position = Vector2(3940, -40)
+scale = Vector2(1.5, 1.5)
+texture = ExtResource("46_t_p_raios_luz")
+z_index = -7
+modulate = Color(0.7, 0.8, 1, 0.4)
+material = SubResource("mat_add")
+
+[node name="ArcadaNave3" type="Sprite2D" parent="."]
+position = Vector2(4340, -164)
+scale = Vector2(1.4, 1.4)
+centered = false
+texture = ExtResource("37_t_p_passarela")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 514.286, 160)
+z_index = -10
+modulate = Color(0.32, 0.35, 0.6, 1)
+
+[node name="VitralNave3" type="Sprite2D" parent="."]
+position = Vector2(4700, -237)
+scale = Vector2(1.5, 1.5)
+texture = ExtResource("40_t_p_parede_vitral")
+z_index = -8
+modulate = Color(0.78, 0.84, 1, 0.95)
+
+[node name="RaiosNave3" type="Sprite2D" parent="."]
+position = Vector2(4740, -40)
+scale = Vector2(1.5, 1.5)
+texture = ExtResource("46_t_p_raios_luz")
+z_index = -7
+modulate = Color(0.7, 0.8, 1, 0.4)
+material = SubResource("mat_add")
+
+[node name="ArcadaNave4" type="Sprite2D" parent="."]
+position = Vector2(5140, -164)
+scale = Vector2(1.4, 1.4)
+centered = false
+texture = ExtResource("37_t_p_passarela")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 514.286, 160)
+z_index = -10
+modulate = Color(0.32, 0.35, 0.6, 1)
+
+[node name="VitralNave4" type="Sprite2D" parent="."]
+position = Vector2(5500, -211.5)
+scale = Vector2(1.5, 1.5)
+texture = ExtResource("39_t_p_vitral_dourado")
+z_index = -8
+modulate = Color(0.78, 0.84, 1, 0.95)
+
+[node name="RaiosNave4" type="Sprite2D" parent="."]
+position = Vector2(5540, -40)
+scale = Vector2(1.5, 1.5)
+texture = ExtResource("46_t_p_raios_luz")
+z_index = -7
+modulate = Color(0.7, 0.8, 1, 0.4)
+material = SubResource("mat_add")
+
+[node name="RosaceaNave1" type="Sprite2D" parent="."]
+position = Vector2(2700, -243.6)
+scale = Vector2(1.2, 1.2)
+texture = ExtResource("41_t_p_rosacea")
+z_index = -8
+modulate = Color(0.72, 0.78, 1, 0.9)
+
+[node name="RosaceaNave2" type="Sprite2D" parent="."]
+position = Vector2(3500, -243.6)
+scale = Vector2(1.2, 1.2)
+texture = ExtResource("41_t_p_rosacea")
+z_index = -8
+modulate = Color(0.72, 0.78, 1, 0.9)
+
+[node name="RosaceaNave3" type="Sprite2D" parent="."]
+position = Vector2(4300, -243.6)
+scale = Vector2(1.2, 1.2)
+texture = ExtResource("41_t_p_rosacea")
+z_index = -8
+modulate = Color(0.72, 0.78, 1, 0.9)
+
+[node name="RosaceaNave4" type="Sprite2D" parent="."]
+position = Vector2(5100, -243.6)
+scale = Vector2(1.2, 1.2)
+texture = ExtResource("41_t_p_rosacea")
+z_index = -8
+modulate = Color(0.72, 0.78, 1, 0.9)
+
+; Cair ao fundo = morte (o vazio da torre). As seccoes de ensino tem rede.
+[node name="Vazio" parent="." instance=ExtResource("10_vazio")]
+position = Vector2(3400, 1270)
+largura = 7200
+altura = 340.0
+cor = Color(0.05, 0.04, 0.11, 0.97)
+
+; ===================  A) ENTRADA DA TORRE  (ensinar)  ===================
+; Sem inimigos. O GRANDE SINO DA ENTRADA (landmark) pende da arcada, partido
+; o badalo -- algo ja' caiu desta torre. Espinhos simples no chao (vocabulario
+; antigo, so' para reintroduzir o hazard). O PRIMEIRO SINO de jogo esta' ao pe'
+; do vao: tocar-lhe faz a ponte de eco aparecer. Rede por baixo do vao inteiro:
+; errar custa 3 s, nao a vida. A margem de la' fica 280 px acima da rede
+; (acima do salto duplo, ~250) -- sem a ponte so' se volta para tras.
+[node name="ChaoEntrada" parent="." instance=ExtResource("8_pl")]
+position = Vector2(360, 930)
+tamanho = Vector2(800, 60)
+altura_visual = 130
 cor_base = Color(0.24, 0.2, 0.26, 1)
 cor_topo = Color(0.5, 0.44, 0.54, 1)
 
-; Sino partido junto a entrada -- flavor: algo ja' caiu desta torre antes
-; da Koliani chegar. So' visual, sem colisao.
-[node name="SinoPartidoEntrada" type="Sprite2D" parent="."]
-position = Vector2(230, 866)
-scale = Vector2(2.2, 2.2)
-texture = ExtResource("19_sinop")
+[node name="ArcoEntradaFundo" type="Sprite2D" parent="."]
+position = Vector2(120, 520)
+scale = Vector2(1.4, 1.4)
 centered = false
+texture = ExtResource("37_t_p_passarela")
+texture_repeat = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 414.286, 171.429)
+z_index = -10
+modulate = Color(0.3, 0.33, 0.56, 1)
+
+[node name="ColunaEntrada1" type="Sprite2D" parent="."]
+position = Vector2(110, 696.8)
+scale = Vector2(1.8, 1.8)
+texture = ExtResource("23_t_coluna_igreja")
+z_index = -3
+modulate = Color(0.72, 0.74, 0.92, 1)
+
+[node name="ColunaEntrada2" type="Sprite2D" parent="."]
+position = Vector2(720, 696.8)
+scale = Vector2(1.8, 1.8)
+texture = ExtResource("23_t_coluna_igreja")
+z_index = -3
+modulate = Color(0.72, 0.74, 0.92, 1)
+
+[node name="CorrenteSinoEntrada" type="Sprite2D" parent="."]
+position = Vector2(415, 300)
+texture_repeat = 2
+texture = ExtResource("26_t_corrente_t")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 10, 220)
+z_index = -4
+modulate = Color(0.95, 0.8, 0.5, 0.9)
+
+[node name="SinoDaEntrada" type="Sprite2D" parent="."]
+position = Vector2(420, 640.8)
+scale = Vector2(2.6, 2.6)
+texture = ExtResource("21_t_sino_g")
+z_index = -3
+
+[node name="BrilhoSinoEntrada" type="Sprite2D" parent="."]
+position = Vector2(420, 640)
+scale = Vector2(2, 2)
+texture = ExtResource("45_t_p_brilho_sino")
+z_index = -2
+modulate = Color(1, 0.85, 0.6, 0.5)
+material = SubResource("mat_add")
+
+[node name="LuzSinoEntrada" type="PointLight2D" parent="."]
+position = Vector2(420, 640)
+texture = SubResource("tex_luz")
+energy = 0.7
+color = Color(1.0, 0.76, 0.45, 1)
+scale = Vector2(2.6, 2)
+
+[node name="SinoPartidoEntrada" type="Sprite2D" parent="."]
+position = Vector2(250, 856)
+scale = Vector2(2, 2)
+texture = ExtResource("22_t_sino_partido")
 z_index = -1
 
-; Hazard "espinhos simples" do contrato -- vocabulario que o jogo ja' usa
-; desde o N1, nao e' ensino novo. Chao solido dos dois lados (ChaoInicio),
-; sem vazio por baixo: salto trivial, so' introduz o hazard nesta regiao.
-[node name="EspinhosEntrada" parent="." instance=ExtResource("14_esp")]
-position = Vector2(470, 870)
-largura = 2
+[node name="EspinhosEntrada" parent="." instance=ExtResource("15_espinhos")]
+position = Vector2(544, 900)
+largura = 3
 
-; Segredo 1: Essencia mesmo por cima dos espinhos -- visivel, exige um
-; salto um pouco mais alto que o minimo para apanhar (nao bloqueia nada).
-[node name="EssenciaSegredoBaixo" parent="." instance=ExtResource("18_ess")]
-position = Vector2(470, 795)
-valor = 15
+[node name="EssenciaEspinhos" parent="." instance=ExtResource("16_ess")]
+position = Vector2(544, 824)
+valor = 10
 
-; ===================  B) PRIMEIRA ESCALADA  ==================
-; Muro estreito logo a seguir ao chao de entrada: chao solido por baixo e
-; dos dois lados (nao ha vazio aqui), sem inimigos, sem precisao
-; frame-perfect. So' se sobe se se segurar na parede (`escalar_paredes`,
-; ja concedida no N10) -- um salto normal nao chega ao topo.
-[node name="ParedeSubida" parent="." instance=ExtResource("9_pl")]
-position = Vector2(596, 790)
-tamanho = Vector2(28, 200)
-altura_visual = 0.0
-cor_base = Color(0.22, 0.19, 0.24, 1)
-cor_topo = Color(0.48, 0.42, 0.52, 1)
+[node name="SinoEntrada" parent="." instance=ExtResource("9_sino")]
+position = Vector2(690, 846)
+scale = Vector2(1.3, 1.3)
+alterna_grupo = "sino_entrada"
+textura = ExtResource("20_t_sino_m")
 
-; Vitral alto iluminado atras da escalada -- o par "luz fria da lua / luz
-; dourada dos sinos" que o contrato marca LOCKED. So' visual (parede),
-; com a mesma luz que `plataforma.gd._acender` da' aos vitrais no resto
-; do jogo, para nao destoar do resto da regiao.
-[node name="VitralEscalada" type="Sprite2D" parent="."]
-position = Vector2(690, 760)
-scale = Vector2(2.4, 2.4)
-texture = ExtResource("20_vitral")
+[node name="CorrenteSinoEntrada" type="Sprite2D" parent="."]
+position = Vector2(685, 656)
+texture_repeat = 2
+texture = ExtResource("26_t_corrente_t")
 centered = false
-z_index = -2
-modulate = Color(0.85, 0.9, 1, 0.9)
+region_enabled = true
+region_rect = Rect2(0, 0, 10, 158)
+z_index = -3
+modulate = Color(0.95, 0.8, 0.5, 0.9)
 
-[node name="LuzVitral" type="PointLight2D" parent="VitralEscalada"]
-position = Vector2(55, -150)
-texture = SubResource("tex_luz")
-energy = 0.4
-color = Color(0.55, 0.7, 1.0, 1)
-scale = Vector2(1.3, 1.7)
+[node name="BrilhoSinoEntrada" type="Sprite2D" parent="."]
+position = Vector2(690, 831)
+scale = Vector2(1, 1)
+texture = ExtResource("45_t_p_brilho_sino")
+z_index = -1
+modulate = Color(1, 0.85, 0.6, 0.55)
+material = SubResource("mat_add")
 
-[node name="B2" parent="." instance=ExtResource("9_pl")]
-position = Vector2(800, 740)
-tamanho = Vector2(150, 22)
-altura_visual = 34.0
+[node name="PonteEntrada1" parent="." instance=ExtResource("11_eco")]
+position = Vector2(840, 890)
+tamanho = Vector2(100, 20)
+altura_visual = 16
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+grupo_alternar = "sino_entrada"
+
+[node name="PonteEntrada2" parent="." instance=ExtResource("11_eco")]
+position = Vector2(960, 880)
+tamanho = Vector2(100, 20)
+altura_visual = 16
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+grupo_alternar = "sino_entrada"
+
+[node name="PonteEntrada3" parent="." instance=ExtResource("11_eco")]
+position = Vector2(1080, 870)
+tamanho = Vector2(100, 20)
+altura_visual = 16
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+grupo_alternar = "sino_entrada"
+
+[node name="RedeEntrada" parent="." instance=ExtResource("8_pl")]
+position = Vector2(960, 1053)
+tamanho = Vector2(400, 26)
+altura_visual = 34
 cor_base = Color(0.24, 0.2, 0.26, 1)
 cor_topo = Color(0.5, 0.44, 0.54, 1)
 
-; ===================  C) PRIMEIRO SINO  ======================
-; SinoBaixo: primeiro sino do jogo. Tocar-lhe faz o EcoBaixo (fantasma ate'
-; la') ficar solido -- consequencia imediata, visivel e junto do proprio
-; sino. Nao e' obrigatorio (o B3 continua alcancavel em salto normal): serve
-; para o sino ENSINAR sem arriscar nenhum softlock se algo correr mal.
-[node name="SinoBaixo" parent="." instance=ExtResource("10_sino")]
-position = Vector2(800, 680)
-
-[node name="EcoBaixo" parent="." instance=ExtResource("13_eco")]
-position = Vector2(700, 616)
-tamanho = Vector2(110, 20)
-altura_visual = 16.0
-cor_base = Color(0.24, 0.2, 0.26, 1)
-cor_topo = Color(0.5, 0.44, 0.54, 1)
-
-[node name="B3" parent="." instance=ExtResource("9_pl")]
-position = Vector2(600, 660)
-tamanho = Vector2(150, 22)
-altura_visual = 34.0
-cor_base = Color(0.24, 0.2, 0.26, 1)
-cor_topo = Color(0.5, 0.44, 0.54, 1)
-
-[node name="CentroLedge" parent="." instance=ExtResource("9_pl")]
-position = Vector2(680, 580)
-tamanho = Vector2(240, 26)
-altura_visual = 42.0
-cor_base = Color(0.24, 0.2, 0.26, 1)
-cor_topo = Color(0.5, 0.44, 0.54, 1)
-
-; N11: o `cuspidor` e' literalmente o "orbe sonoro" do Acolito. So' muda a IDENTIDADE: vida, dano,
-; comportamento e posicao ficam como estavam. Fora da 1a escalada, do 1o sino e da aterragem das
-; plataformas oscilantes (pedido do GM).
-[node name="EliteAcolito" parent="." instance=ExtResource("2_dem")]
-position = Vector2(680, 512)
+[node name="UrnaRede" type="Sprite2D" parent="."]
+position = Vector2(960, 1018.2)
 scale = Vector2(1.4, 1.4)
-elite = true
+texture = ExtResource("34_t_urna")
+z_index = -1
+
+; SEGREDO 1 -- alcova por cima da ponte, so' se ve ao chegar ao A2 e
+; olhar para tras. Sobe-se do A2 (60 px) para a esquerda.
+[node name="Segredo1" parent="." instance=ExtResource("8_pl")]
+position = Vector2(1065, 711)
+tamanho = Vector2(90, 22)
+altura_visual = 34
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+
+[node name="EssenciaSegredo1" parent="." instance=ExtResource("16_ess")]
+position = Vector2(1065, 664)
+valor = 20
+
+[node name="MemorialSegredo1" type="Sprite2D" parent="."]
+position = Vector2(1095, 676)
+scale = Vector2(1.3, 1.3)
+texture = ExtResource("31_t_pedra_memoria")
+z_index = -1
+
+[node name="LuzSegredo1" type="PointLight2D" parent="."]
+position = Vector2(1065, 670)
+texture = SubResource("tex_luz")
+energy = 0.35
+color = Color(0.72, 0.5, 1.0, 1)
+scale = Vector2(0.9, 0.8)
+
+; ===================  ENCONTRO 1: o atrio  ===================
+; Acolito do Eco (orbes) atras de uma Sentinela da Torre (escudo a' frente):
+; a Sentinela obriga a passar-lhe por cima (pogo) ou pelas costas, enquanto o
+; Acolito pressiona a distancia. Chao largo e seguro. Os dois ficam a mais de
+; 140 px do muro de escalada (regra do GM de 28 set: nada durante a 1.a
+; escalada).
+[node name="Atrio" parent="." instance=ExtResource("8_pl")]
+position = Vector2(1450, 790)
+tamanho = Vector2(660, 60)
+altura_visual = 120
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+
+[node name="ColunaAtrio1" type="Sprite2D" parent="."]
+position = Vector2(1300, 583.5)
+scale = Vector2(1.7, 1.7)
+texture = ExtResource("24_t_coluna_dupla")
+z_index = -3
+modulate = Color(0.72, 0.74, 0.92, 1)
+
+[node name="ArcoAtrio" type="Sprite2D" parent="."]
+position = Vector2(1580, 581.5)
+scale = Vector2(1.9, 1.9)
+texture = ExtResource("25_t_arco_grande")
+z_index = -4
+modulate = Color(0.7, 0.72, 0.9, 1)
+
+[node name="CandelabroAtrio" type="Sprite2D" parent="."]
+position = Vector2(1440, 713)
+scale = Vector2(1.4, 1.4)
+texture = ExtResource("28_t_candelabro")
+z_index = -1
+
+[node name="LuzAtrio" type="PointLight2D" parent="."]
+position = Vector2(1440, 700)
+texture = SubResource("tex_luz")
+energy = 0.55
+color = Color(1.0, 0.76, 0.45, 1)
+scale = Vector2(2, 1.2)
+
+[node name="SentinelaAtrio" parent="." instance=ExtResource("2_dem")]
+position = Vector2(1380, 720)
+especie = "sentinela_da_torre"
+vida = 70
+dano_contacto = 16
+comportamento = "escudeiro"
+alcance_patrulha = 90
+cor_rim = Color(0.6, 0.65, 0.85, 1)
+
+[node name="AcolitoAtrio" parent="." instance=ExtResource("2_dem")]
+position = Vector2(1580, 720)
 especie = "acolito_do_eco"
-vida = 175
-dano_contacto = 24
+vida = 55
+dano_contacto = 14
 comportamento = "cuspidor"
-alcance_patrulha = 60.0
+alcance_patrulha = 60
 cor_rim = Color(1.0, 0.72, 0.45, 1)
 
-; ===================  BIFURCACAO -- escadaria O / E  =======
-[node name="O1" parent="." instance=ExtResource("9_pl")]
-position = Vector2(470, 490)
-tamanho = Vector2(130, 18)
-altura_visual = 24.0
+; PRIMEIRA ESCALADA: muro de 290 px (acima do salto duplo, ~250) assente no
+; chao do atrio -- cair a meio custa nada. So' se sobe agarrado a' parede, a
+; habilidade que o boss do N10 deu. Em cima, um degrau de 30 px para a
+; muralha das passarelas.
+[node name="ParedeSubida" parent="." instance=ExtResource("8_pl")]
+position = Vector2(1920, 615)
+tamanho = Vector2(320, 290)
+altura_visual = 0
 cor_base = Color(0.24, 0.2, 0.26, 1)
 cor_topo = Color(0.5, 0.44, 0.54, 1)
 
-; Sino Flutuante (2o "inimigo principal" do contrato p/ N11): rota fixa
-; curta no vao entre O2/O3, fora do unico caminho obrigatorio (da' para
-; evitar so' com o timing dos saltos que a seccao D ja pede).
-[node name="SinoFlutuanteOeste" parent="." instance=ExtResource("2_dem")]
-position = Vector2(480, 450)
+[node name="LanternaMuro" type="Sprite2D" parent="."]
+position = Vector2(2020, 430)
+scale = Vector2(1.5, 1.5)
+texture = ExtResource("27_t_lanterna_eco")
+z_index = -1
+
+[node name="LuzMuro" type="PointLight2D" parent="."]
+position = Vector2(2020, 420)
+texture = SubResource("tex_luz")
+energy = 0.5
+color = Color(1.0, 0.76, 0.45, 1)
+scale = Vector2(1.4, 1.1)
+
+[node name="HerasMuro" type="Sprite2D" parent="."]
+position = Vector2(1790, 579.6)
+scale = Vector2(0.9, 0.9)
+texture = ExtResource("48_t_p_heras")
+z_index = 1
+modulate = Color(0.78, 0.84, 1, 1)
+
+[node name="Muralha" parent="." instance=ExtResource("8_pl")]
+position = Vector2(2260, 610)
+tamanho = Vector2(360, 340)
+altura_visual = 0
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+
+[node name="LanternaMuralha" type="Sprite2D" parent="."]
+position = Vector2(2380, 397.2)
+scale = Vector2(1.6, 1.6)
+texture = ExtResource("27_t_lanterna_eco")
+z_index = -1
+
+[node name="LuzMuralha" type="PointLight2D" parent="."]
+position = Vector2(2380, 390)
+texture = SubResource("tex_luz")
+energy = 0.5
+color = Color(1.0, 0.76, 0.45, 1)
+scale = Vector2(1.4, 1.1)
+
+; ===================  B) PASSARELAS EXTERNAS  (desenvolver)  ===========
+; Correntes moveis em vaivem (devagar, legiveis) sobre o vazio, depois uma
+; passarela QUEBRADA (os degraus voltam em 2,6 s) e uma LAMINA DE SINO LENTA a
+; guardar o patamar. Um Sino Flutuante cruza o vao alto -- nunca em cima de
+; uma aterragem.
+[node name="CorrenteMovel1" parent="." instance=ExtResource("14_pcorr")]
+position = Vector2(2560, 449)
+modo = "horizontal"
+amplitude = 50.0
+periodo = 3.4
+comprimento = 200.0
+largura = 120.0
+pele_terreno = true
+textura_corrente = ExtResource("51_t_m_tex_correntes")
+
+[node name="CorrenteMovel2" parent="." instance=ExtResource("14_pcorr")]
+position = Vector2(2790, 429)
+modo = "vertical"
+amplitude = 40.0
+periodo = 3.0
+fase = 0.5
+comprimento = 180.0
+largura = 120.0
+pele_terreno = true
+textura_corrente = ExtResource("51_t_m_tex_correntes")
+
+[node name="SinoFlutuanteVao" parent="." instance=ExtResource("2_dem")]
+position = Vector2(2700, 290)
 especie = "sino_flutuante"
-comportamento = "voador"
 vida = 45
 dano_contacto = 12
-alcance_patrulha = 70.0
+comportamento = "voador"
+alcance_patrulha = 90
 cor_rim = Color(1.0, 0.85, 0.6, 1)
 
-; D) PLATAFORMAS OSCILANTES -- introducao simples: so' baloico vertical,
-; sem deriva horizontal, trajetoria e velocidade bem legiveis.
-[node name="O2" parent="." instance=ExtResource("12_flut")]
-position = Vector2(560, 400)
-largura = 120.0
-balanco = 12.0
-periodo = 2.6
+[node name="Passarela1" parent="." instance=ExtResource("13_quebra")]
+position = Vector2(2975, 429)
+tamanho = Vector2(90, 18)
+pele_terreno = true
+
+[node name="Passarela2" parent="." instance=ExtResource("13_quebra")]
+position = Vector2(3105, 429)
+tamanho = Vector2(90, 18)
+pele_terreno = true
+
+[node name="PatamarLamina" parent="." instance=ExtResource("8_pl")]
+position = Vector2(3335, 435)
+tamanho = Vector2(290, 30)
+altura_visual = 34
 cor_base = Color(0.24, 0.2, 0.26, 1)
 cor_topo = Color(0.5, 0.44, 0.54, 1)
 
-[node name="O3" parent="." instance=ExtResource("9_pl")]
-position = Vector2(450, 320)
-tamanho = Vector2(120, 18)
-altura_visual = 24.0
-cor_base = Color(0.24, 0.2, 0.26, 1)
-cor_topo = Color(0.5, 0.44, 0.54, 1)
-
-[node name="E1" parent="." instance=ExtResource("9_pl")]
-position = Vector2(830, 500)
-tamanho = Vector2(130, 18)
-altura_visual = 24.0
-cor_base = Color(0.24, 0.2, 0.26, 1)
-cor_topo = Color(0.5, 0.44, 0.54, 1)
-
-; --------- RAMO OPCIONAL (Segredo 2), a partir de E1 ---------
-; Passarela quebrada -> corrente movel -> lamina de sino lenta a guardar
-; o topo. Inteiramente OPCIONAL: quem nao entrar aqui segue o caminho
-; original (SinoAlto/E2/E3) sem perder nada. Zero risco de softlock --
-; a PlataformaQuebra tem respawn e ninguem fica preso.
-[node name="PassarelaQuebrada" parent="." instance=ExtResource("17_quebra")]
-position = Vector2(900, 460)
-tamanho = Vector2(110, 18)
-
-[node name="CorrenteEco" parent="." instance=ExtResource("16_corr")]
-position = Vector2(960, 400)
-modo = "vertical"
-amplitude = 36.0
-periodo = 3.2
-comprimento = 70.0
-largura = 100.0
-
-[node name="LaminaSino" parent="." instance=ExtResource("15_pend")]
-position = Vector2(960, 250)
+[node name="LaminaSinoLenta" parent="." instance=ExtResource("12_pend")]
+position = Vector2(3335, 240)
 comprimento = 130.0
 amplitude_graus = 52.0
 periodo = 3.4
-fase = 0.3
 dano = 16
+textura = ExtResource("43_t_p_lamina_pendular")
 
-[node name="EssenciaSegredoAlto" parent="." instance=ExtResource("18_ess")]
-position = Vector2(960, 355)
-valor = 20
+[node name="HerasPatamar" type="Sprite2D" parent="."]
+position = Vector2(3450, 511.2)
+scale = Vector2(0.8, 0.8)
+texture = ExtResource("48_t_p_heras")
+z_index = 1
+modulate = Color(0.78, 0.84, 1, 1)
 
-; ===================  E) SINO + MOVIMENTO  ==================
-; SinoAlto controla o seu proprio grupo (nao o do SinoBaixo, para cada sino
-; ficar legivel por si -- tocar o de baixo nao mexe aqui em cima). O
-; EcoAlto e' um atalho curto junto da plataforma oscilante E2: ring +
-; navegacao, os dois sistemas ja ensinados a combinarem-se.
-[node name="SinoAlto" parent="." instance=ExtResource("10_sino")]
-position = Vector2(940, 450)
-alterna_grupo = "sino_alterna_alto"
-
-[node name="EcoAlto" parent="." instance=ExtResource("13_eco")]
-position = Vector2(1005, 470)
-tamanho = Vector2(90, 18)
-altura_visual = 14.0
-grupo_alternar = "sino_alterna_alto"
+; ===================  ENCONTRO 2: a galeria selada  ===================
+; `mec.arena`: ao entrar, sobem duas grades; so' descem quando os quatro
+; morrem. Combina o que o nivel ja' ensinou: Sentinela (escudo) + Acolito
+; ELITE + Acolito (orbes) no chao e um Arqueiro das Sombras na varanda interior (alcance). A
+; varanda tambem e' o caminho do Segredo 2. CheckC mesmo antes da grade.
+[node name="GaleriaSelada" parent="." instance=ExtResource("8_pl")]
+position = Vector2(3840, 450)
+tamanho = Vector2(680, 60)
+altura_visual = 120
 cor_base = Color(0.24, 0.2, 0.26, 1)
 cor_topo = Color(0.5, 0.44, 0.54, 1)
 
-[node name="E2" parent="." instance=ExtResource("12_flut")]
-position = Vector2(970, 420)
-largura = 120.0
-balanco = 14.0
-periodo = 2.3
-deriva = 40.0
-periodo_deriva = 3.4
+[node name="VarandaArena" parent="." instance=ExtResource("8_pl")]
+position = Vector2(3840, 331)
+tamanho = Vector2(160, 22)
+altura_visual = 34
 cor_base = Color(0.24, 0.2, 0.26, 1)
 cor_topo = Color(0.5, 0.44, 0.54, 1)
 
-[node name="E3" parent="." instance=ExtResource("9_pl")]
-position = Vector2(840, 340)
-tamanho = Vector2(120, 18)
-altura_visual = 24.0
-cor_base = Color(0.24, 0.2, 0.26, 1)
-cor_topo = Color(0.5, 0.44, 0.54, 1)
+[node name="ArenaGaleria" type="Area2D" parent="."]
+position = Vector2(3860, 290)
+script = ExtResource("6_arena")
+tamanho = Vector2(600, 260)
+altura_grade = 220.0
+grupo_inimigos = "arena_n11"
 
-; ===================  F) MINI-TESTE -- topo da torre  =======
-; --- degraus para o cimo: o ChaoChefe vai de x=380 a x=940 e e' TECTO
-; para quem sobe por baixo. Estes ficam FORA desse intervalo.
-[node name="SubidaOeste1" parent="." instance=ExtResource("9_pl")]
-position = Vector2(310, 312)
-tamanho = Vector2(110, 18)
-altura_visual = 24.0
-cor_base = Color(0.24, 0.2, 0.26, 1)
-cor_topo = Color(0.5, 0.44, 0.54, 1)
-
-; Ultima plataforma oscilante do nivel, com um pouco de deriva horizontal --
-; a pequena progressao de dificuldade que o GM pediu para a seccao D, mesmo
-; assim sem nada frame-perfect (o ChaoChefe a seguir e' um alvo largo).
-[node name="SubidaOeste2" parent="." instance=ExtResource("12_flut")]
-position = Vector2(250, 240)
-largura = 100.0
-balanco = 10.0
-periodo = 2.8
-deriva = 50.0
-periodo_deriva = 3.8
-cor_base = Color(0.24, 0.2, 0.26, 1)
-cor_topo = Color(0.5, 0.44, 0.54, 1)
-
-[node name="SubidaLeste1" parent="." instance=ExtResource("9_pl")]
-position = Vector2(1035, 335)
-tamanho = Vector2(110, 18)
-altura_visual = 24.0
-cor_base = Color(0.24, 0.2, 0.26, 1)
-cor_topo = Color(0.5, 0.44, 0.54, 1)
-
-[node name="SubidaLeste2" parent="." instance=ExtResource("9_pl")]
-position = Vector2(1065, 257)
-tamanho = Vector2(100, 18)
-altura_visual = 24.0
-cor_base = Color(0.24, 0.2, 0.26, 1)
-cor_topo = Color(0.5, 0.44, 0.54, 1)
-
-; Arqueiro das Sombras (3o "inimigo principal" do contrato p/ N11): posicao
-; elevada, mantem distancia -- exactamente o `cuspidor` que ja' existe,
-; so' com a identidade nova. Nao elite: reprise leve, nao um segundo
-; Acolito.
-[node name="ArqueiroSombras" parent="." instance=ExtResource("2_dem")]
-position = Vector2(1000, 300)
-especie = "arqueiro_das_sombras"
-comportamento = "cuspidor"
-vida = 50
-dano_contacto = 14
-alcance_patrulha = 60.0
-cor_rim = Color(0.55, 0.4, 0.8, 1)
-
-; Sentinela da Torre -- o "ritmo base" da regiao (contrato): patrulheiro
-; comum em N11-N12 mesmo sem estar na lista de "principais". `escudeiro`
-; bloqueia por instantes, o mais proximo do que o contrato descreve.
-[node name="SentinelaTorre" parent="." instance=ExtResource("2_dem")]
-position = Vector2(780, 175)
+[node name="SentinelaArena" parent="." instance=ExtResource("2_dem") groups=["arena_n11"]]
+position = Vector2(3700, 380)
 especie = "sentinela_da_torre"
-comportamento = "escudeiro"
-vida = 60
+vida = 70
 dano_contacto = 16
-alcance_patrulha = 80.0
+comportamento = "escudeiro"
+alcance_patrulha = 80
 cor_rim = Color(0.6, 0.65, 0.85, 1)
 
-[node name="ChaoChefe" parent="." instance=ExtResource("9_pl")]
-position = Vector2(660, 260)
-tamanho = Vector2(560, 60)
-altura_visual = 100.0
+[node name="EliteAcolito" parent="." instance=ExtResource("2_dem") groups=["arena_n11"]]
+position = Vector2(3980, 370)
+scale = Vector2(1.3, 1.3)
+elite = true
+especie = "acolito_do_eco"
+vida = 120
+dano_contacto = 20
+comportamento = "cuspidor"
+alcance_patrulha = 70
+cor_rim = Color(1.0, 0.72, 0.45, 1)
+
+[node name="AcolitoArena2" parent="." instance=ExtResource("2_dem") groups=["arena_n11"]]
+position = Vector2(4070, 380)
+especie = "acolito_do_eco"
+vida = 55
+dano_contacto = 14
+comportamento = "patrulha"
+alcance_patrulha = 60
+cor_rim = Color(1.0, 0.72, 0.45, 1)
+
+[node name="ArqueiroArena" parent="." instance=ExtResource("2_dem") groups=["arena_n11"]]
+position = Vector2(3840, 280)
+especie = "arqueiro_das_sombras"
+vida = 50
+dano_contacto = 14
+comportamento = "cuspidor"
+alcance_patrulha = 40
+cor_rim = Color(0.55, 0.4, 0.8, 1)
+
+[node name="EstatuaArena1" type="Sprite2D" parent="."]
+position = Vector2(3580, 316.4)
+scale = Vector2(1.6, 1.6)
+texture = ExtResource("29_t_estatua_anjo")
+z_index = -3
+
+[node name="EstatuaArena2" type="Sprite2D" parent="."]
+position = Vector2(4100, 316.4)
+scale = Vector2(1.6, 1.6)
+texture = ExtResource("29_t_estatua_anjo")
+z_index = -3
+flip_h = true
+
+[node name="VitralArena" type="Sprite2D" parent="."]
+position = Vector2(3840, 123.6)
+scale = Vector2(2.4, 2.4)
+texture = ExtResource("19_t_vitral_alto")
+z_index = -5
+modulate = Color(0.85, 0.9, 1, 0.9)
+
+[node name="LuzArena" type="PointLight2D" parent="."]
+position = Vector2(3840, 380)
+texture = SubResource("tex_luz")
+energy = 0.65
+color = Color(1.0, 0.76, 0.45, 1)
+scale = Vector2(3, 1.6)
+
+; SEGREDO 2 -- por cima da varanda (100 px; a varanda esta' 100 acima do chao), depois de limpar a sala.
+[node name="Segredo2" parent="." instance=ExtResource("8_pl")]
+position = Vector2(3925, 231)
+tamanho = Vector2(90, 22)
+altura_visual = 34
 cor_base = Color(0.24, 0.2, 0.26, 1)
 cor_topo = Color(0.5, 0.44, 0.54, 1)
 
-; ===================  luzes / checkpoints / porta  =======
-[node name="LuzBaixo" type="PointLight2D" parent="."]
-position = Vector2(340, 840)
+[node name="EssenciaSegredo2" parent="." instance=ExtResource("16_ess")]
+position = Vector2(3925, 184)
+valor = 25
+
+[node name="LivrosSegredo2" type="Sprite2D" parent="."]
+position = Vector2(3950, 207.7)
+scale = Vector2(1.3, 1.3)
+texture = ExtResource("35_t_livros")
+z_index = -1
+
+[node name="LuzSegredo2" type="PointLight2D" parent="."]
+position = Vector2(3925, 190)
+texture = SubResource("tex_luz")
+energy = 0.35
+color = Color(0.72, 0.5, 1.0, 1)
+scale = Vector2(0.9, 0.8)
+
+; ===================  ENCONTRO 3: o poco do elevador  ===================
+; ELEVADOR DE COLUNA (peso): sobe com a Koliani em cima, desce quando ela
+; sai. Assenta no patio (degrau de 26 px) e sobe 300 px. Ensina-se
+; primeiro em seguranca -- o patio por baixo e' chao -- e com pressao: um
+; Arqueiro das Sombras no topo dispara para o poco e um Sino Flutuante
+; patrulha o caminho. Quem preferir pode escalar a parede do poco.
+; O patio continua por baixo do topo do poco ate' a' sala: e' a REDE da
+; luta com o Arqueiro (cair do topo devolve ao elevador, nao ao vazio).
+[node name="Patio" parent="." instance=ExtResource("8_pl")]
+position = Vector2(4740, 450)
+tamanho = Vector2(1120, 60)
+altura_visual = 120
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+
+[node name="GargulaPatio" type="Sprite2D" parent="."]
+position = Vector2(4320, 384.2)
+scale = Vector2(1.4, 1.4)
+texture = ExtResource("32_t_gargula")
+z_index = -1
+
+[node name="ElevadorPoco" parent="." instance=ExtResource("17_elev")]
+position = Vector2(4630, 402)
+script = ExtResource("18_elevcol")
+curso = Vector2(0, -300)
+velocidade = 95.0
+largura = 140
+altura_ancora = 150.0
+
+[node name="LuzRoldana" type="PointLight2D" parent="."]
+position = Vector2(4630, -46)
 texture = SubResource("tex_luz")
 energy = 0.55
-color = Color(1.0, 0.7, 0.42, 1)
-scale = Vector2(2.0, 1.3)
+color = Color(1.0, 0.76, 0.45, 1)
+scale = Vector2(1.3, 1.1)
 
-[node name="LuzMeio" type="PointLight2D" parent="."]
-position = Vector2(680, 540)
-texture = SubResource("tex_luz")
-energy = 0.5
-color = Color(1.0, 0.72, 0.45, 1)
-scale = Vector2(1.9, 1.3)
+[node name="TopoEscada" parent="." instance=ExtResource("8_pl")]
+position = Vector2(4940, 140)
+tamanho = Vector2(480, 40)
+altura_visual = 90
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
 
-[node name="LuzChefe" type="PointLight2D" parent="."]
-position = Vector2(660, 240)
+[node name="SinoFlutuanteEscada" parent="." instance=ExtResource("2_dem")]
+position = Vector2(4560, 240)
+especie = "sino_flutuante"
+vida = 45
+dano_contacto = 12
+comportamento = "voador"
+alcance_patrulha = 90
+cor_rim = Color(1.0, 0.85, 0.6, 1)
+
+[node name="ArqueiroEscada" parent="." instance=ExtResource("2_dem")]
+position = Vector2(5120, 80)
+especie = "arqueiro_das_sombras"
+vida = 50
+dano_contacto = 14
+comportamento = "cuspidor"
+alcance_patrulha = 30
+cor_rim = Color(0.55, 0.4, 0.8, 1)
+
+[node name="HerasTopo" type="Sprite2D" parent="."]
+position = Vector2(4730, 221.2)
+scale = Vector2(0.8, 0.8)
+texture = ExtResource("48_t_p_heras")
+z_index = 1
+modulate = Color(0.78, 0.84, 1, 1)
+
+[node name="FlamulaTopo" type="Sprite2D" parent="."]
+position = Vector2(5060, -22.8)
+scale = Vector2(1.6, 1.6)
+texture = ExtResource("30_t_flamula")
+z_index = -3
+
+; ===================  C) SALA DO GRANDE SINO  (testar)  =================
+; Encontro 4: dois Acolitos e uma Sentinela no chao da sala. O SINO desta
+; sala fica no FUNDO, atras deles: alem de erguer a ponte final, GELA os
+; inimigos 2,6 s -- quem passar por eles (dash/pogo) e o tocar ganha a luta
+; (ensina a ler o sino como ferramenta). Longe da luta para um golpe perdido
+; nao o desligar. A ponte final cruza um vao sem rede, com uma lamina lenta a
+; meio: e' o exame do nivel.
+; DEC-012: o 1.o nivel da regiao nao tem guardiao.
+[node name="SalaSino" parent="." instance=ExtResource("8_pl")]
+position = Vector2(5570, 150)
+tamanho = Vector2(660, 60)
+altura_visual = 120
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+
+[node name="CorrenteGrandeSino" type="Sprite2D" parent="."]
+position = Vector2(5555, -460)
+texture_repeat = 2
+texture = ExtResource("26_t_corrente_t")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 10, 164)
+z_index = -4
+modulate = Color(0.95, 0.8, 0.5, 0.9)
+
+; O grande sino pende ALTO e mais escuro: e' o landmark, nao pode competir
+; com a leitura da luta que acontece por baixo.
+[node name="GrandeSino" type="Sprite2D" parent="."]
+position = Vector2(5560, -175.2)
+scale = Vector2(2.6, 2.6)
+texture = ExtResource("21_t_sino_g")
+z_index = -3
+modulate = Color(0.8, 0.78, 0.9, 1)
+
+[node name="BrilhoGrandeSino" type="Sprite2D" parent="."]
+position = Vector2(5560, -150)
+scale = Vector2(2, 2)
+texture = ExtResource("45_t_p_brilho_sino")
+z_index = -2
+modulate = Color(1, 0.85, 0.6, 0.5)
+material = SubResource("mat_add")
+
+[node name="LuzGrandeSino" type="PointLight2D" parent="."]
+position = Vector2(5560, -120)
 texture = SubResource("tex_luz")
-energy = 0.65
-color = Color(1.0, 0.78, 0.5, 1)
-scale = Vector2(2.9, 1.7)
+energy = 0.6
+color = Color(1.0, 0.76, 0.45, 1)
+scale = Vector2(3.4, 2.2)
+
+[node name="SentinelaSala" parent="." instance=ExtResource("2_dem")]
+position = Vector2(5420, 80)
+especie = "sentinela_da_torre"
+vida = 80
+dano_contacto = 18
+comportamento = "escudeiro"
+alcance_patrulha = 90
+cor_rim = Color(0.6, 0.65, 0.85, 1)
+
+[node name="AcolitoSala1" parent="." instance=ExtResource("2_dem")]
+position = Vector2(5600, 80)
+especie = "acolito_do_eco"
+vida = 60
+dano_contacto = 14
+comportamento = "cuspidor"
+alcance_patrulha = 60
+cor_rim = Color(1.0, 0.72, 0.45, 1)
+
+[node name="AcolitoSala2" parent="." instance=ExtResource("2_dem")]
+position = Vector2(5700, 80)
+especie = "acolito_do_eco"
+vida = 60
+dano_contacto = 14
+comportamento = "patrulha"
+alcance_patrulha = 60
+cor_rim = Color(1.0, 0.72, 0.45, 1)
+
+[node name="SinoSala" parent="." instance=ExtResource("9_sino")]
+position = Vector2(5860, 66)
+scale = Vector2(1.3, 1.3)
+alterna_grupo = "sino_final"
+textura = ExtResource("20_t_sino_m")
+
+[node name="CorrenteSinoSala" type="Sprite2D" parent="."]
+position = Vector2(5855, -124)
+texture_repeat = 2
+texture = ExtResource("26_t_corrente_t")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 10, 158)
+z_index = -3
+modulate = Color(0.95, 0.8, 0.5, 0.9)
+
+[node name="BrilhoSinoSala" type="Sprite2D" parent="."]
+position = Vector2(5860, 51)
+scale = Vector2(1, 1)
+texture = ExtResource("45_t_p_brilho_sino")
+z_index = -1
+modulate = Color(1, 0.85, 0.6, 0.55)
+material = SubResource("mat_add")
+
+[node name="PonteFinal1" parent="." instance=ExtResource("11_eco")]
+position = Vector2(6010, 130)
+tamanho = Vector2(100, 20)
+altura_visual = 16
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+grupo_alternar = "sino_final"
+
+[node name="PonteFinal2" parent="." instance=ExtResource("11_eco")]
+position = Vector2(6160, 120)
+tamanho = Vector2(100, 20)
+altura_visual = 16
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+grupo_alternar = "sino_final"
+
+[node name="PonteFinal3" parent="." instance=ExtResource("11_eco")]
+position = Vector2(6310, 110)
+tamanho = Vector2(100, 20)
+altura_visual = 16
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+grupo_alternar = "sino_final"
+
+[node name="LaminaPonteFinal" parent="." instance=ExtResource("12_pend")]
+position = Vector2(6160, -70)
+comprimento = 130.0
+amplitude_graus = 48.0
+periodo = 3.6
+fase = 0.4
+dano = 16
+textura = ExtResource("43_t_p_lamina_pendular")
+
+[node name="Saida" parent="." instance=ExtResource("8_pl")]
+position = Vector2(6550, 130)
+tamanho = Vector2(300, 60)
+altura_visual = 120
+cor_base = Color(0.24, 0.2, 0.26, 1)
+cor_topo = Color(0.5, 0.44, 0.54, 1)
+
+[node name="EstatuaSaida" type="Sprite2D" parent="."]
+position = Vector2(6640, -10.2)
+scale = Vector2(1.7, 1.7)
+texture = ExtResource("29_t_estatua_anjo")
+z_index = -3
+flip_h = true
+
+[node name="LuzSaida" type="PointLight2D" parent="."]
+position = Vector2(6560, 50)
+texture = SubResource("tex_luz")
+energy = 0.6
+color = Color(0.55, 0.7, 1.0, 1)
+scale = Vector2(2, 1.6)
+
+[node name="DetritosEntrada" type="Sprite2D" parent="."]
+position = Vector2(30, 859.1)
+scale = Vector2(0.55, 0.55)
+texture = ExtResource("49_t_p_detritos")
+z_index = 0
+modulate = Color(0.8, 0.82, 1, 1)
+
+[node name="PoeiraAtrio" type="Sprite2D" parent="."]
+position = Vector2(1220, 718.8)
+scale = Vector2(0.6, 0.6)
+texture = ExtResource("50_t_p_poeira_chao")
+z_index = 0
+modulate = Color(0.8, 0.82, 1, 1)
+
+[node name="DetritosMuralha" type="Sprite2D" parent="."]
+position = Vector2(2410, 406.9)
+scale = Vector2(0.45, 0.45)
+texture = ExtResource("49_t_p_detritos")
+z_index = 0
+modulate = Color(0.8, 0.82, 1, 1)
+
+[node name="PoeiraGaleria" type="Sprite2D" parent="."]
+position = Vector2(3600, 382.4)
+scale = Vector2(0.55, 0.55)
+texture = ExtResource("50_t_p_poeira_chao")
+z_index = 0
+modulate = Color(0.8, 0.82, 1, 1)
+
+[node name="DetritosSala" type="Sprite2D" parent="."]
+position = Vector2(5870, 83)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("49_t_p_detritos")
+z_index = 0
+modulate = Color(0.8, 0.82, 1, 1)
+
+[node name="NeblinaEntrada" type="Sprite2D" parent="."]
+position = Vector2(900, 980)
+scale = Vector2(3, 3)
+texture = ExtResource("47_t_p_neblina")
+z_index = 1
+modulate = Color(0.6, 0.7, 1, 0.3)
+material = SubResource("mat_add")
+
+[node name="NeblinaVao" type="Sprite2D" parent="."]
+position = Vector2(2800, 700)
+scale = Vector2(3.2, 3.2)
+texture = ExtResource("47_t_p_neblina")
+z_index = 1
+modulate = Color(0.6, 0.7, 1, 0.3)
+material = SubResource("mat_add")
+
+[node name="NeblinaPonte" type="Sprite2D" parent="."]
+position = Vector2(6150, 380)
+scale = Vector2(3, 3)
+texture = ExtResource("47_t_p_neblina")
+z_index = 1
+modulate = Color(0.6, 0.7, 1, 0.3)
+material = SubResource("mat_add")
+
+[node name="LuzVitralArena" type="Sprite2D" parent="."]
+position = Vector2(3840, 240)
+scale = Vector2(1.2, 1.2)
+texture = ExtResource("44_t_p_particulas_luz")
+z_index = 3
+modulate = Color(0.8, 0.7, 1, 0.6)
+material = SubResource("mat_add")
 
 [node name="Koliani" parent="." instance=ExtResource("1_kol")]
-position = Vector2(200, 830)
+position = Vector2(140, 860)
 usar_prototipo_premium = true
 usar_golden_set = true
+combate_hitstop_v2 = true
 
-; checkpoints_autorais = true: estes tres sao intencionais e nao se podam
-; por distancia. Nenhum fica numa plataforma movel, encostado a uma parede
-; ou a meio de uma queda -- morrer depois de tocar um sino devolve a um
-; estado coerente (o sino nao se desliga, so' se pode voltar a tocar).
+; Cinco checkpoints, nenhum em plataforma movel/fantasma/quebradica.
 [node name="CheckInicio" type="Area2D" parent="."]
-position = Vector2(460, 836)
+position = Vector2(300, 866)
 collision_layer = 16
 collision_mask = 2
-script = ExtResource("5_chk")
+script = ExtResource("4_chk")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CheckInicio"]
 shape = SubResource("rs_chk")
 
-[node name="CheckMeio" type="Area2D" parent="."]
-position = Vector2(680, 516)
+[node name="CheckAtrio" type="Area2D" parent="."]
+position = Vector2(1200, 726)
 collision_layer = 16
 collision_mask = 2
-script = ExtResource("5_chk")
+script = ExtResource("4_chk")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckMeio"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckAtrio"]
 shape = SubResource("rs_chk")
 
-[node name="CheckTopo" type="Area2D" parent="."]
-position = Vector2(450, 236)
+[node name="CheckMuralha" type="Area2D" parent="."]
+position = Vector2(2160, 406)
 collision_layer = 16
 collision_mask = 2
-script = ExtResource("5_chk")
+script = ExtResource("4_chk")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckTopo"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckMuralha"]
 shape = SubResource("rs_chk")
 
-[node name="Porta" parent="." instance=ExtResource("4_porta")]
-position = Vector2(900, 236)
+[node name="CheckGaleria" type="Area2D" parent="."]
+position = Vector2(3525, 386)
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("4_chk")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckGaleria"]
+shape = SubResource("rs_chk")
+
+[node name="CheckSala" type="Area2D" parent="."]
+position = Vector2(5280, 86)
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("4_chk")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckSala"]
+shape = SubResource("rs_chk")
+
+[node name="Porta" parent="." instance=ExtResource("3_porta")]
+position = Vector2(6600, 106)
 pista_ao_atravessar = ""

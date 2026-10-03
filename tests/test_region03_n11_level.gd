@@ -5,6 +5,13 @@ extends RefCounted
 ## 28 set 2026: nível AUTORAL introdutório, sem chefe, sem jornada
 ## procedural, que ensina `escalar_paredes` (concedida no N10) e a
 ## linguagem dos sinos. Não certifica sensação nem substitui jogar.
+##
+## 3 out 2026 (DEC-014): o N11 foi refeito de raiz por
+## `tools/construir_n11_entrada.py` (`docs/nivel_autoral_n11.md`). As regras
+## do GM continuam todas; mudaram os NOMES (o 1.o sino e' `SinoEntrada`, a
+## consequencia `PonteEntrada1`, o muro assenta no `Atrio`) e as oscilantes
+## passaram a `PlataformaCorrente` -- as `PlataformaFlutuante` so' sabiam
+## desenhar poligonos e eram o "placeholder" que a auditoria apontou.
 
 const CENA := "res://scenes/levels/Torre_dos_Sinos.tscn"
 const INDICE_N11 := 10
@@ -56,7 +63,7 @@ static func executar() -> Array[String]:
 	# --- primeiro obstáculo de escalada: zona segura, chão por baixo ------
 	var parede := raiz.get_node_or_null("ParedeSubida") as Node2D
 	_verificar(falhas, parede != null, "N11: existe um muro para a primeira escalada")
-	var chao_inicio := raiz.get_node_or_null("ChaoInicio") as Node2D
+	var chao_inicio := raiz.get_node_or_null("Atrio") as Node2D
 	if parede != null and chao_inicio != null:
 		var tam_p := parede.get("tamanho") as Vector2
 		var tam_c := chao_inicio.get("tamanho") as Vector2
@@ -84,10 +91,10 @@ static func executar() -> Array[String]:
 					"N11: %s está perto demais do muro de escalada (d=%.0f)" % [filho.name, d])
 
 	# --- primeiro sino: efeito legível e imediato -------------------------
-	var sino_baixo := raiz.get_node_or_null("SinoBaixo") as SinoTorre
-	_verificar(falhas, sino_baixo != null, "N11: SinoBaixo presente (primeiro sino)")
-	var eco_baixo := raiz.get_node_or_null("EcoBaixo")
-	_verificar(falhas, eco_baixo != null, "N11: EcoBaixo presente (consequência visível do 1º sino)")
+	var sino_baixo := raiz.get_node_or_null("SinoEntrada") as SinoTorre
+	_verificar(falhas, sino_baixo != null, "N11: SinoEntrada presente (primeiro sino)")
+	var eco_baixo := raiz.get_node_or_null("PonteEntrada1")
+	_verificar(falhas, eco_baixo != null, "N11: PonteEntrada1 presente (consequência visível do 1º sino)")
 	if sino_baixo != null and eco_baixo != null:
 		_verificar(falhas, eco_baixo.get("grupo_alternar") == sino_baixo.alterna_grupo,
 			"N11: EcoBaixo está no mesmo grupo que o SinoBaixo alterna")
@@ -105,8 +112,8 @@ static func executar() -> Array[String]:
 					"N11: %s está perto demais do 1º sino (d=%.0f)" % [filho.name, d2])
 
 	# --- 2º sino + movimento (secção E) -----------------------------------
-	var sino_alto := raiz.get_node_or_null("SinoAlto") as SinoTorre
-	var eco_alto := raiz.get_node_or_null("EcoAlto")
+	var sino_alto := raiz.get_node_or_null("SinoSala") as SinoTorre
+	var eco_alto := raiz.get_node_or_null("PonteFinal1")
 	if sino_alto != null and eco_alto != null:
 		_verificar(falhas, sino_alto.alterna_grupo != sino_baixo.alterna_grupo if sino_baixo else true,
 			"N11: o 2º sino usa um grupo diferente do 1º (cada um legível por si)")
@@ -116,12 +123,14 @@ static func executar() -> Array[String]:
 	# --- plataformas oscilantes: trajetória legível, sem nada aleatório ---
 	var oscilantes: Array[Node] = []
 	for filho in raiz.get_children():
-		if filho is PlataformaFlutuante:
+		_verificar(falhas, not (filho is PlataformaFlutuante),
+			"N11: %s e' PlataformaFlutuante (so' desenha poligonos -- placeholder)" % filho.name)
+		if filho is PlataformaCorrente:
 			oscilantes.append(filho)
 	_verificar(falhas, oscilantes.size() >= 2,
 		"N11: pelo menos 2 plataformas oscilantes (introdução + progressão) -- achadas %d" % oscilantes.size())
 	for p in oscilantes:
-		_verificar(falhas, float(p.get("balanco")) > 0.0 and float(p.get("periodo")) > 0.5,
+		_verificar(falhas, float(p.get("amplitude")) > 0.0 and float(p.get("periodo")) > 0.5,
 			"N11: %s tem baloiço e período legíveis (sem física aleatória)" % p.name)
 	# nenhum inimigo pousado exatamente na aterragem de uma oscilante
 	for p in oscilantes:

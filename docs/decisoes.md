@@ -16,6 +16,10 @@ prioridades e dashboard.
 | DEC-008 | Validação desktop não fecha problemas específicos de dispositivo. | ACEITE |
 | DEC-009 | A Execution 2 não começa durante a Execution 1C. | ACEITE |
 | DEC-010 | Paulo aprovou as 20 artes dedicadas do pacote `KOLIANI_LevelSelector_RegionBackgrounds_01-20.zip` para os backgrounds do Level Selector das regiões 1–20 (commit fonte `52ea3394`, 22 set 2026). | ACEITE |
+| DEC-011 | Nomes visíveis canónicos: Região I = "Floresta Sagrada"; boss N5 = "Guardião Verde" (ids internos não mudam). Paulo, 3 out 2026. | ACEITE |
+| DEC-012 | Guardiões só no 2.º e 4.º nível de cada região + boss no 5.º; o 1.º e o 3.º acabam em desafio de travessia/encontro. Paulo, 3 out 2026. | ACEITE |
+| DEC-013 | 1–2 zonas por nível fecham a passagem até limpar (mec.arena), incluindo a Região IV. Paulo, 3 out 2026. | ACEITE |
+| DEC-014 | N11 refeito de raiz agora, como nível autoral (pipeline N12–N14). Âmbito do plano de melhoria: N1–N20 (`PROMPT_CHATGPT_PLANO_N1_N20.md`). Paulo, 3 out 2026. | ACEITE |
 
 ## Consequências atuais
 
