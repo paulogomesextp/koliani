@@ -177,6 +177,12 @@ func _aplicar() -> void:
 	_estado_anterior = estado
 	ativa = estado == Estado.ATIVO
 	_faiscas.emitting = estado != Estado.DORME
+	if estado == Estado.AVISO:
+		# B8: o aviso tambem se OUVE (antes so' se via) -- antes do perigo
+		var som_a := get_node_or_null("/root/Som")
+		if som_a and som_a.has_method("toca_actor") and som_a.has_method("em_vista") and som_a.em_vista(self, 160.0):
+			som_a.call("toca_actor", self, "fornalha_carga", -18.0, 1.0, 0.05, 1.0,
+				"jato_aviso_%d" % get_instance_id())
 	if estado == Estado.ATIVO:
 		_t_dano = 0.0
 		_ferir_presentes()

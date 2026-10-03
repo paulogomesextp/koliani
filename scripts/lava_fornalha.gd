@@ -125,11 +125,33 @@ static func _suave(x: float) -> float:
 
 
 func _physics_process(dt: float) -> void:
+	_som_lava()
 	if sobe_amplitude <= 0.0:
 		return
 	_t_sobe += dt
 	position.y = _y_base - elevacao_em(_t_sobe)
+	var avisava := _aviso
 	_aviso = em_aviso_em(_t_sobe)
+	if _aviso and not avisava:
+		# B8: a lava que vai SUBIR avisa tambem pelo ouvido (o mais grave)
+		var som := get_node_or_null("/root/Som")
+		if som and som.has_method("toca_actor"):
+			som.call("toca_actor", self, "fornalha_carga", -14.0, 0.6, 0.03, 1.0,
+				"lava_aviso_%d" % get_instance_id())
+
+
+## B8: borbulhar baixo em laco enquanto a lava esta' a' vista (`laco_actor`
+## larga o canal sozinho quando sai do ecra; volta-se a pedir quando entra).
+var _t_som := 0.0
+
+func _som_lava() -> void:
+	_t_som -= get_physics_process_delta_time()
+	if _t_som > 0.0:
+		return
+	_t_som = 0.5
+	var som := get_node_or_null("/root/Som")
+	if som and som.has_method("laco_actor"):
+		som.call("laco_actor", self, "lava_borbulha", -26.0, 0.8)
 
 
 func _process(dt: float) -> void:

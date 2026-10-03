@@ -187,6 +187,12 @@ func _aplicar(_inicio: bool) -> void:
 	ativa = estado == Estado.QUENTE
 	_fagulhas.emitting = estado != Estado.FRIO
 	_chama.emitting = estado == Estado.QUENTE
+	if estado == Estado.AVISO:
+		# B8: o piso a aquecer ouve-se (mais grave que o jato)
+		var som_a := get_node_or_null("/root/Som")
+		if som_a and som_a.has_method("toca_actor") and som_a.has_method("em_vista") and som_a.em_vista(self):
+			som_a.call("toca_actor", self, "fornalha_carga", -22.0, 0.75, 0.05, 1.2,
+				"piso_aviso_%d" % get_instance_id())
 	if estado == Estado.QUENTE:
 		_t_dano = 0.0
 		_ferir_presentes()

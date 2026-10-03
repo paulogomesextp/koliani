@@ -134,6 +134,10 @@ const CAMINHOS := {
 	"pedra_parte": "res://assets/audio/approved/sfx/combate/pedra_parte.ogg",
 	"lamina_passa": "res://assets/audio/lamina_passa.wav",
 	"fogo_sopro": "res://assets/audio/fogo_sopro.wav",
+	# B8 (plano N1-N20): aviso "isto vai queimar" e laco da lava -- Regiao IV
+	# (`tools/gerar_audio_fornalha.py`)
+	"fornalha_carga": "res://assets/audio/fornalha_carga.wav",
+	"lava_borbulha": "res://assets/audio/lava_borbulha.wav",
 	"raio_aviso": "res://assets/audio/raio_aviso.wav",
 	"raio_cai": "res://assets/audio/raio_cai.wav",
 	"bau_abrir": "res://assets/audio/approved/sfx/chest_coin_drop.mp3",
