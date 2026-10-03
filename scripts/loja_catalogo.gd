@@ -102,9 +102,6 @@ const ITENS := [
 		"inicial": false, "destaque": true, "preview": "res://assets/sprites/koliani_skins/shadowblade/preview.png",
 		"splash": "res://assets/sprites/koliani_skins/shadowblade/apresentacao/splash_premium.png",
 		"placeholder": false, "efeito": "cosmetico"},
-	{"id": "skin_shadowblade", "categoria": "skins", "k": -1, "v": 500, "regiao": -1, "raridade": "lendario",
-		"inicial": false, "destaque": true, "preview": "res://assets/sprites/koliani_skins/shadowblade/preview.png",
-		"placeholder": false, "efeito": "cosmetico"},
 	# --- Coleção Região I: Relíquias do Coração Podre (Heartrot Relics) ------
 	{"id": "skin_coracao_podre", "categoria": "skins", "k": -1, "v": 240, "regiao": 0, "raridade": "epico",
 		"k_eq": 960, "v_eq": 240,

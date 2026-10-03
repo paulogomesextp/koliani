@@ -48,6 +48,8 @@ func _ready() -> void:
 		b.resized.connect(func() -> void:
 			if b.has_focus():
 				_mover_realce(b))
+	# escondido, mas sem a caixa legada caso volte a aparecer
+	Frontend9H.rotulo_menu(_recomecar, 26)
 	var botoes := [_continuar, _opcoes_btn, _mapa, _menu]
 	for i in botoes.size():
 		botoes[i].focus_neighbor_top = botoes[i].get_path_to(botoes[posmod(i - 1, botoes.size())])

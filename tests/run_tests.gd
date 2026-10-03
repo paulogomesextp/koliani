@@ -1138,6 +1138,11 @@ func teste_9f_ui_producao() -> void:
 	for cena in ["res://scenes/ui/Opcoes.tscn", "res://scenes/ui/Pausa.tscn"]:
 		var no: Node = load(cena).instantiate()
 		get_tree().root.add_child(no)
+		# f04d82f5: a Pausa usa a entrada de menu do frontend (caixa vazia em
+		# todos os estados); o destaque e' o no' `Realce` (placa pintada) que
+		# escorrega entre botoes -- vale como "vestido" se existir com textura.
+		var realces := no.find_children("Realce", "TextureRect", true, false)
+		var tem_realce: bool = not realces.is_empty() and (realces[0] as TextureRect).texture != null
 		for b in no.find_children("*", "Button", true, false):
 			var bt := b as Button
 			var st := bt.get_theme_stylebox("normal")
@@ -1145,7 +1150,8 @@ func teste_9f_ui_producao() -> void:
 			var carmesim: bool = st is StyleBoxFlat and \
 				(st as StyleBoxFlat).border_color.r > (st as StyleBoxFlat).border_color.b * 3.0
 			var vestido: bool = st is StyleBoxTexture or carmesim or (
-				st is StyleBoxEmpty and bt.get_theme_stylebox("hover") is StyleBoxTexture)
+				st is StyleBoxEmpty and bt.get_theme_stylebox("hover") is StyleBoxTexture) or (
+				st is StyleBoxEmpty and bt.flat and tem_realce)
 			_ok(vestido, "9F: %s -> botao '%s' ainda com estilo legado" % [cena.get_file(), b.name])
 		no.queue_free()
 
