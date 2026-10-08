@@ -24,7 +24,9 @@ func _ready() -> void:
 	Engine.time_scale = 1.0  # rede de segurança: nunca começar um nível "congelado"
 	get_tree().paused = false
 	Musica.ambiente(EstadoJogo.indice_nivel)
-	var caminho := EstadoJogo.caminho_nivel_atual()
+	# Koliani 3D (Regiao I): N01-N05 carregam a versao 3D do nivel; o resto do
+	# fluxo (HUD, Pausa, transicoes, save) e' o mesmo. `-- --2d` volta ao 2D.
+	var caminho := Nivel3D.caminho_para(EstadoJogo.indice_nivel, EstadoJogo.caminho_nivel_atual())
 	var cena_nivel: PackedScene = load(caminho)
 	if cena_nivel == null:
 		push_error("Nível não encontrado: %s" % caminho)
@@ -35,12 +37,15 @@ func _ready() -> void:
 	var koliani := nivel.get_node_or_null("Koliani") as Koliani
 	if koliani:
 		koliani.ativar_core_combate()
+	elif nivel is Nivel3D:
+		pass  # Koliani3D tem o combate proprio (combo de 4 golpes traduzido)
 	else:
 		push_error("Combate 1.2: Koliani ausente no nível %s" % caminho)
 	var boss_id := "boss_level_005" if EstadoJogo.indice_nivel == 4 else "none"
-	print("RUNTIME TRACE | build=%s | main_scene=res://scenes/Main.tscn | level_id=level_%03d | level_scene=%s | player_scene=res://scenes/actors/Koliani.tscn | boss_id=%s" % [
+	print("RUNTIME TRACE | build=%s | main_scene=res://scenes/Main.tscn | level_id=level_%03d | level_scene=%s | player_scene=%s | boss_id=%s" % [
 		str(ProjectSettings.get_setting("application/config/version", "0.0.0")),
-		EstadoJogo.indice_nivel + 1, caminho, boss_id])
+		EstadoJogo.indice_nivel + 1, caminho,
+		"Koliani3D" if nivel is Nivel3D else "res://scenes/actors/Koliani.tscn", boss_id])
 	_validar_recovery_session.call_deferred(nivel)
 
 	var porta := _procurar_porta(nivel)

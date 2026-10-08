@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/r3d/niveis/n04_3d.gd" id="1"]
+
+[node name="N04_A_Arvore_que_Chora_3D" type="Node3D"]
+script = ExtResource("1")
