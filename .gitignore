@@ -96,3 +96,7 @@ assets/audio/incoming/**
 incoming_music/**
 # MP3 originais dos SFX aprovados; as cópias runtime estão em assets/audio/approved/sfx/.
 incoming_sfx/**
+
+# Koliani 3D: identificador do build (gerado no export)
+/scripts/r3d/build_id.gd
+/scripts/r3d/build_id.gd.uid
