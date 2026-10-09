@@ -306,6 +306,7 @@ static func folhagem(pai: Node3D, centro: Vector3, raio: float, n: int, tipo := 
 	var r := _rng(semente + 900)
 	var malha: Mesh
 	match tipo:
+		"pedras": malha = K.rocha(0.16, 3, 0.55, 0.4)
 		"erva": malha = K.tufo(9, 0.55)
 		"folha_larga": malha = K.feto(5, 0.9, 0.55)
 		_: malha = K.feto(7, 1.0, 0.32)
@@ -333,7 +334,7 @@ static func folhagem(pai: Node3D, centro: Vector3, raio: float, n: int, tipo := 
 		mm.set_instance_transform(i, ts[i])
 	var mmi := MultiMeshInstance3D.new()
 	mmi.multimesh = mm
-	mmi.material_override = K.mat(tipo)
+	mmi.material_override = K.mat("rocha" if tipo == "pedras" else tipo)
 	mmi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	mmi.visibility_range_end = 70.0
 	pai.add_child(mmi)

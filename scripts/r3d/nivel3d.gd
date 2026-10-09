@@ -214,7 +214,30 @@ func chao(contorno: PackedVector2Array, centro: Vector3, esp := 3.0, mat := "ter
 func ilha(c: Vector3, rx: float, rz := -1.0, rot := 0.0, esp := 3.0, mat := "terreno", semente := 0) -> StaticBody3D:
 	if rz < 0.0:
 		rz = rx
-	return chao(_contorno(rx, rz, rot, semente + int(c.x * 3.0 + c.z)), c, esp, mat, semente)
+	var contorno := _contorno(rx, rz, rot, semente + int(c.x * 3.0 + c.z))
+	var corpo := chao(contorno, c, esp, mat, semente)
+	_bordas_pendentes(c, contorno, esp, semente)
+	_folhagem.append([c, minf(rx, rz) * 0.85, int(rx * rz * 0.5) + 3, "pedras", semente + 7, 1.0])
+	return corpo
+
+
+## Raizes e musgo pendurados da borda da ilha (le-se a espessura do relevo).
+func _bordas_pendentes(c: Vector3, contorno: PackedVector2Array, esp: float, semente: int) -> void:
+	var n := contorno.size()
+	var passo_i := maxi(2, n / 6)
+	for i in range(0, n, passo_i):
+		var p2 := contorno[i] * 1.0
+		var borda := c + Vector3(p2.x, -0.25, p2.y)
+		var fora := Vector3(p2.x, 0, p2.y).normalized()
+		var comp := clampf(esp * 0.7, 1.2, 3.0) * (0.7 + 0.5 * absf(sin(i * 1.7 + semente)))
+		if (i / passo_i) % 2 == 0:
+			var pts := K.curva(PackedVector3Array([borda - fora * 0.2, borda + fora * 0.35 + Vector3.DOWN * comp * 0.4,
+				borda + fora * 0.2 + Vector3.DOWN * comp]), 3)
+			K.inst(deco, K.tubo(pts, K.afunilar(pts.size(), 0.16, 0.02), 5, 0.2, i), K.mat("casca"))
+		else:
+			K.inst(deco, K.fita(PackedVector3Array([borda + fora * 0.05, borda + fora * 0.15 + Vector3.DOWN * comp * 0.5,
+				borda + fora * 0.1 + Vector3.DOWN * comp]), PackedFloat32Array([0.6, 0.45, 0.1]), fora.cross(Vector3.UP)),
+				K.mat("musgo_pendente"), Vector3.ZERO, Vector3.ZERO, Vector3.ONE, false)
 
 
 ## Faixa plana (caminho) de `a` a `b` (altura de `a`), com pontas arredondadas.
@@ -325,7 +348,7 @@ func laje_pedra(c: Vector3, tam := Vector3(3, 0.7, 3), rot := 0.0, semente := 0)
 		c8.append(Vector2(cos(a) * tam.x * 0.56 * k, sin(a) * tam.z * 0.56 * k))
 	K.inst(corpo, K.laje(c8, tam.y + 1.2, semente), K.mat("pedra_sagrada"), Vector3(0, tam.y * 0.5, 0))
 	# runa esmeralda gravada no topo
-	K.inst(corpo, K.anel(tam.x * 0.22, tam.x * 0.26, 0.0, 24), K.mat("vfx_runa"), Vector3(0, tam.y * 0.5 + 0.015, 0),
+	K.inst(corpo, K.anel(tam.x * 0.24, tam.x * 0.255, 0.0, 24), K.mat("vfx_runa"), Vector3(0, tam.y * 0.5 + 0.015, 0),
 		Vector3.ZERO, Vector3.ONE, false)
 	var f := CollisionShape3D.new()
 	var b := BoxShape3D.new()

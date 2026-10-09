@@ -30,8 +30,8 @@ const RESIST_CASCA := 0.05
 const PADRAO_F1 := ["RAIZES", "PULSO", "BROTOS", "PULSO"]
 const PADRAO_F2 := ["RAIZES+PULSO", "BROTOS", "PULSO+PULSO", "RAIZES+BROTOS"]
 
-@export var vida_max := 1500
-var vida := 1500
+@export var vida_max := 2200
+var vida := 2200
 var morto := false
 var raio_corpo := 2.9
 var raio_arena := 16.0

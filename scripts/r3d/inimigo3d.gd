@@ -17,7 +17,7 @@ const TIPOS := {
 		"raio": 0.45, "altura": 1.25, "detecao": 10.0, "massa": 1.0, "som": "humano"},
 	"gosma": {"vida": 70, "vel": 2.6, "dano": 10, "alcance": 3.4, "ante": 0.55, "golpe": 0.55, "rec": 0.7,
 		"raio": 0.55, "altura": 0.9, "detecao": 9.0, "massa": 0.8, "som": "gosma"},
-	"bruto": {"vida": 520, "vel": 2.5, "dano": 24, "alcance": 2.6, "ante": 0.8, "golpe": 0.3, "rec": 0.9,
+	"bruto": {"vida": 850, "vel": 2.5, "dano": 24, "alcance": 2.6, "ante": 0.8, "golpe": 0.3, "rec": 0.9,
 		"raio": 0.8, "altura": 2.3, "detecao": 13.0, "massa": 3.0, "som": "grande"},
 }
 

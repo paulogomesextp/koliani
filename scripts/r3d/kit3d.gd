@@ -210,7 +210,7 @@ static func _criar_mat(nome: String) -> ShaderMaterial:
 		"vfx_magenta", "vfx_verde", "vfx_aviso", "vfx_onda", "vfx_branco", "vfx_runa":
 			m.shader = SH_ADITIVO
 			if nome == "vfx_runa":
-				m.set_shader_parameter("forca", 0.35)
+				m.set_shader_parameter("forca", 0.16)
 			var cores := {"vfx_magenta": Color(1.0, 0.2, 0.75), "vfx_verde": Color(0.4, 1.0, 0.55), "vfx_runa": Color(0.35, 1.0, 0.7),
 				"vfx_aviso": Color(1.0, 0.15, 0.3), "vfx_onda": Color(1.0, 0.3, 0.8), "vfx_branco": Color(1, 1, 1)}
 			m.set_shader_parameter("cor", cores[nome])
