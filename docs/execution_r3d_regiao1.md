@@ -50,7 +50,7 @@ PROTEGIDO → MECÂNICA (sempre com aviso) → EXPOSTO → RECOVER.
 RAÍZES (marcas 1,5 s → irrompem), PULSO (incha → onda em anel, salta-se),
 BROTOS (rebentá-los abre o núcleo já e alonga 50 %; ignorados, abre mais tarde/curto).
 Casca: 5 % do dano. Fase 2 (<50 %): combos (raízes+pulso, pulso duplo, raízes+brotos),
-avisos −15 %, janela −20 %, 2.ª zona de raízes, rugido. Vida 2200.
+avisos −15 %, janela −20 %, 2.ª zona de raízes, rugido. Vida 1500.
 Vitória = o 2D: `marcar_chefe_derrotado_por_nivel`, concede `salto_duplo`,
 cartão `region.1.complete`, portal abre depois do cartão; música de chefe/ambiente
 pela `Musica` aprovada; `chefe_cai` + `conquista`.
