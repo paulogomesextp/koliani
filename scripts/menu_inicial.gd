@@ -69,6 +69,8 @@ func _ready() -> void:
 	_focar_principal()
 	_pronto_para_som = true
 	_agendar_prova_runtime()
+	# QA da Koliani 3D (so' com `--qa-r3d-ui`): percorre Menu -> Niveis -> N01.
+	preload("res://scripts/r3d/qa_bot_r3d.gd").instalar_ui_se_pedido(get_tree())
 	_atualizar_pwa()
 
 

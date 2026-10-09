@@ -101,7 +101,7 @@ func construir() -> void:
 	passo(Vector3(24.0, 2.6, 96.5))
 	# abismo com nevoa (sem pantano: escuridao + cristais la' em baixo)
 	K.inst(self, PlaneMesh.new(), K.mat("veneno"), Vector3(14, -7.0, 50), Vector3.ZERO, Vector3(160, 1, 160), false)
-	D.fundo_floresta(deco, Vector3(14, -2, 50), 36.0, 56.0, 40, 3, 0.4)
+	D.fundo_floresta(deco, Vector3(14, -2, 50), 36.0, 56.0, 40, 3, 0.4, rota)
 	for i in 10:
 		D.cristais(deco, Vector3(randf_range(-10, 35), -6.5, randf_range(0, 100)), randf_range(1.0, 2.0), 60 + i)
 	for i in 8:

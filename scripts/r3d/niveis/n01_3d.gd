@@ -12,8 +12,8 @@ func construir() -> void:
 	spawn = Vector3(0, 0.2, 0)
 	spawn_rumo = 0.0
 	# 1. clareira de entrada (arco sagrado atras, luar)
-	ilha(Vector3(0, 0, 0), 9.0, 8.0, 0.0, 4.0, "terreno", 1)
-	D.arco(deco, Vector3(0, 0, -5.5), 0.0, 4.4, 5.0, 3)
+	ilha(Vector3(0, 0, -1.5), 9.0, 9.5, 0.0, 4.0, "terreno", 1)
+	D.arco(deco, Vector3(0, 0, -9.0), 0.0, 4.4, 5.0, 3)
 	D.raio_luz(deco, Vector3(2, 0, 2), 16.0, 3.0)
 	D.menir(deco, Vector3(-5, 0, 2), 3.0, 1)
 	D.cogumelos(deco, Vector3(5.5, 0, -2), 6, 1)
@@ -103,7 +103,7 @@ func construir() -> void:
 	passo(Vector3(8, 3.3, 136))
 	# pantano envenenado em baixo + floresta de fundo
 	veneno(Vector3(5, -3.0, 68), Vector2(140, 190))
-	D.fundo_floresta(deco, Vector3(5, 0, 68), 38.0, 60.0, 44, 1, 0.15)
+	D.fundo_floresta(deco, Vector3(5, 0, 68), 38.0, 60.0, 44, 1, 0.15, rota)
 	for i in 14:
 		var z := 8.0 + i * 9.0
 		var x := 5.0 + (16.0 if i % 2 == 0 else -14.0) + sin(i * 1.7) * 3.0

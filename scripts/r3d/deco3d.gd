@@ -340,8 +340,17 @@ static func folhagem(pai: Node3D, centro: Vector3, raio: float, n: int, tipo := 
 
 
 ## Anel de floresta de fundo (silhuetas altas, sem colisao) a toda a volta.
+static func _longe_da_rota(p: Vector3, rota: PackedVector3Array, folga: float) -> bool:
+	for q in rota:
+		if Vector2(p.x - q.x, p.z - q.z).length() < folga:
+			return false
+	return true
+
+
+## `rota` = percurso jogavel: nada de fundo nasce a menos de `folga` dele (os
+## niveis sao compridos, nao circulares -- o anel cortava o caminho).
 static func fundo_floresta(pai: Node3D, centro: Vector3, raio_min: float, raio_max: float, n: int,
-		semente := 0, corrompida_frac := 0.15) -> void:
+		semente := 0, corrompida_frac := 0.15, rota := PackedVector3Array()) -> void:
 	var r := _rng(semente + 1500)
 	var no := Node3D.new()
 	no.name = "FlorestaFundo"
@@ -351,13 +360,21 @@ static func fundo_floresta(pai: Node3D, centro: Vector3, raio_min: float, raio_m
 		var d := r.randf_range(raio_min, raio_max)
 		var p := centro + Vector3(cos(a) * d, r.randf_range(-6.0, -2.0), sin(a) * d)
 		var alt := r.randf_range(18.0, 34.0)
-		arvore(no, p, alt, r.randf_range(0.8, 1.6), semente + i * 3, r.randf() < corrompida_frac, true, false)
+		var raio := r.randf_range(0.8, 1.6)
+		var corr := r.randf() < corrompida_frac
+		if not _longe_da_rota(p, rota, 14.0):
+			continue
+		arvore(no, p, alt, raio, semente + i * 3, corr, true, false)
 	# colinas/escarpas longinquas
 	for i in n / 3:
 		var a := r.randf() * TAU
 		var d := raio_max + r.randf_range(8.0, 25.0)
 		var p := centro + Vector3(cos(a) * d, r.randf_range(-12.0, -6.0), sin(a) * d)
-		K.inst(no, K.rocha(r.randf_range(10.0, 18.0), i + semente, r.randf_range(0.7, 1.3), 0.4), K.mat("rocha"), p)
+		var rr := r.randf_range(10.0, 18.0)
+		var ach := r.randf_range(0.7, 1.3)
+		if not _longe_da_rota(p, rota, rr + 14.0):
+			continue
+		K.inst(no, K.rocha(rr, i + semente, ach, 0.4), K.mat("rocha"), p)
 
 
 ## Torre sagrada meio afundada no pantano (landmark do N02).

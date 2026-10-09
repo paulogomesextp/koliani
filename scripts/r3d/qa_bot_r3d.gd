@@ -82,6 +82,89 @@ static func instalar_se_pedido(arvore: SceneTree) -> void:
 	arvore.root.add_child.call_deferred(b)
 
 
+## Prova do FRONT-END real: Menu -> botao Niveis -> Seletor (Regiao I) ->
+## confirmar N01 com `ui_accept` -> gameplay 3D. Grava 3 capturas e sai.
+static func instalar_ui_se_pedido(arvore: SceneTree) -> void:
+	var args := OS.get_cmdline_user_args()
+	if not ("--qa-r3d-ui" in args) or arvore.root.has_node("QAUiR3D"):
+		return
+	var u := UiBot.new()
+	u.name = "QAUiR3D"
+	for a in args:
+		if a.begins_with("--capturas="):
+			u.dir = a.get_slice("=", 1)
+	arvore.root.add_child.call_deferred(u)
+
+
+class UiBot:
+	extends Node
+	var dir := ""
+	var _passo := 0
+	var _t := 0.0
+
+	func _ready() -> void:
+		process_mode = Node.PROCESS_MODE_ALWAYS
+
+	func _aceitar() -> void:
+		for p in [true, false]:
+			var ev := InputEventKey.new()
+			ev.keycode = KEY_ENTER
+			ev.physical_keycode = KEY_ENTER
+			ev.pressed = p
+			Input.parse_input_event(ev)
+
+	func _foto(n: String) -> void:
+		if dir != "":
+			get_viewport().get_texture().get_image().save_png("%s/%s.png" % [dir, n])
+
+	func _process(dt: float) -> void:
+		_t += dt
+		var cena := get_tree().current_scene
+		if cena == null:
+			return
+		var nome := str(cena.scene_file_path)
+		match _passo:
+			0:
+				if nome.ends_with("MenuInicial.tscn") and _t > 2.0:
+					_foto("ui_1_menu")
+					var botoes: Dictionary = cena.get("_botoes")
+					print("QA_R3D_UI menu ok; a carregar em Niveis")
+					(botoes["niveis"] as Button).pressed.emit()
+					_passo = 1
+					_t = 0.0
+			1:
+				if nome.ends_with("MapaMundo.tscn") and _t > 2.5:
+					_foto("ui_2_seletor")
+					var sel: Node = cena.get("_seletor")
+					sel.call("configurar", 0, true)
+					print("QA_R3D_UI seletor ok; a confirmar N01")
+					_aceitar()
+					_passo = 10
+					_t = 0.0
+			10:
+				# o seletor abre primeiro a REGIAO (carrossel) e depois o nivel
+				if _t > 1.2:
+					_foto("ui_2b_regiao_I")
+					_aceitar()
+					_passo = 2
+					_t = 0.0
+			2:
+				var n3d := false
+				for f in cena.get_children():
+					if f is Nivel3D:
+						n3d = true
+				if n3d and _t > 3.5:
+					_foto("ui_3_n01_3d")
+					var cam := get_viewport().get_camera_3d()
+					var kk := get_tree().get_first_node_in_group("koliani") as Node3D
+					print("QA_R3D_UI camara=%s koliani=%s" % [cam.global_position if cam else "-", kk.global_position if kk else "-"])
+					print("QA_R3D_UI OK Menu -> Niveis -> N01 3D (indice=%d)" % EstadoJogo.indice_nivel)
+					get_tree().quit(0)
+				elif _t > 20.0:
+					print("QA_R3D_UI FALHA cena=%s" % nome)
+					get_tree().quit(1)
+
+
 ## O bot vive na raiz (sobrevive as trocas de cena).
 func duplicate_bot() -> Node:
 	var b := Bot.new()
@@ -116,6 +199,9 @@ class Bot:
 	var _vivo_ant := true
 	var _registo: Array[String] = []
 	var _pos_ant := Vector3.INF
+	var _fps_soma := 0.0
+	var _fps_n := 0
+	var _fps_min := 9999.0
 
 	func _ready() -> void:
 		process_mode = Node.PROCESS_MODE_ALWAYS
@@ -136,6 +222,8 @@ class Bot:
 				n = f
 		if n == null:
 			if EstadoJogo.indice_nivel + 1 > nivel_fim and _idx >= 0:
+				_registo.append("QA_R3D PASS nivel=%d t=%.1fs mortes=%d fps_med=%.0f fps_min=%.0f" % [_idx + 1, _t_nivel,
+					_mortes, _fps_soma / maxf(_fps_n, 1), _fps_min])
 				_terminar(true, "cadeia concluida")
 			return
 		if n != _nivel:
@@ -144,13 +232,17 @@ class Bot:
 			_nivel = n
 			if EstadoJogo.indice_nivel != _idx:
 				if _idx >= 0:
-					_registo.append("QA_R3D PASS nivel=%d t=%.1fs mortes=%d" % [_idx + 1, _t_nivel, _mortes])
+					_registo.append("QA_R3D PASS nivel=%d t=%.1fs mortes=%d fps_med=%.0f fps_min=%.0f" % [_idx + 1, _t_nivel,
+						_mortes, _fps_soma / maxf(_fps_n, 1), _fps_min])
 					print(_registo[_registo.size() - 1])
 					if EstadoJogo.indice_nivel + 1 > nivel_fim or EstadoJogo.indice_nivel >= 5:
 						_terminar(true, "cadeia concluida")
 						return
 				_idx = EstadoJogo.indice_nivel
 				_t_nivel = 0.0
+				_fps_soma = 0.0
+				_fps_n = 0
+				_fps_min = 9999.0
 				_mortes = 0
 				_fotos = 0
 				_proxima_foto = 2.5
@@ -159,6 +251,11 @@ class Bot:
 			_melhor = INF
 			_parado = 0.0
 		_t_nivel += dt
+		if _t_nivel > 2.0:
+			var f := Engine.get_frames_per_second()
+			_fps_soma += f
+			_fps_n += 1
+			_fps_min = minf(_fps_min, f)
 		var k := n.koliani
 		if k == null or not is_instance_valid(k):
 			return

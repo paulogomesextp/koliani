@@ -83,7 +83,7 @@ func construir() -> void:
 	passo(Vector3(21.5, 2.6, 99.0))
 	# pantano + fundo
 	veneno(Vector3(12, -1.6, 50), Vector2(150, 170))
-	D.fundo_floresta(deco, Vector3(12, 0, 50), 36.0, 58.0, 40, 2, 0.2)
+	D.fundo_floresta(deco, Vector3(12, 0, 50), 36.0, 58.0, 40, 2, 0.2, rota)
 	for i in 16:
 		var z := i * 7.0
 		var x := 12.0 + (17.0 if i % 2 == 0 else -15.0) + sin(i * 2.3) * 4.0

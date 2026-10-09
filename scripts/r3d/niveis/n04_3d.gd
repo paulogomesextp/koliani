@@ -94,7 +94,7 @@ func construir() -> void:
 	deco.add_child(lz)
 	# vazio + fundo
 	K.inst(self, PlaneMesh.new(), K.mat("veneno"), Vector3(12, -5.0, 50), Vector3.ZERO, Vector3(120, 1, 120), false)
-	D.fundo_floresta(deco, Vector3(12, -2, 50), 36.0, 55.0, 38, 4, 0.15)
+	D.fundo_floresta(deco, Vector3(12, -2, 50), 36.0, 55.0, 38, 4, 0.15, rota)
 	for i in 12:
 		var z := i * 9.0
 		var x := 12.0 + (18.0 if i % 2 == 0 else -16.0)

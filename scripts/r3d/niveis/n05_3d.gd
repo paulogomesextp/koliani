@@ -67,7 +67,10 @@ func construir() -> void:
 	# saida (abre so' depois do cartao)
 	saida(centro_arena + Vector3(0, 0, 12.5), PI, false)
 	veneno(Vector3(0, -2.5, 30), Vector2(110, 130))
-	D.fundo_floresta(deco, Vector3(0, -1, 35), 34.0, 52.0, 36, 5, 0.6)
+	var evitar := rota.duplicate()
+	for i in 10:
+		evitar.append(centro_arena + Vector3(cos(TAU * i / 10.0), 0, sin(TAU * i / 10.0)) * 10.0)
+	D.fundo_floresta(deco, Vector3(0, -1, 35), 34.0, 52.0, 36, 5, 0.6, evitar)
 	VFX.esporos(self, centro_arena + Vector3(0, 4, 0), Vector3(15, 5, 15), Color(1.0, 0.35, 0.7, 0.9), 200)
 
 
