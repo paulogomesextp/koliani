@@ -96,6 +96,7 @@ func _ready() -> void:
 	_etiqueta_build()
 	print("KOLIANI 3D REGION I | build=%s | level=%d | scene=%s" % [build_id(), indice + 1, scene_file_path])
 	_pos_construcao.call_deferred()
+	preload("res://scripts/r3d/qa_bot_r3d.gd").instalar_se_pedido(get_tree())
 
 
 ## Sobrepor nos niveis.

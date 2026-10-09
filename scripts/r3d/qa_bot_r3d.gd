@@ -49,9 +49,37 @@ func _ready() -> void:
 	Nivel3D.limpar_checkpoint()
 	Nivel3D.qa_auto = true
 	print("QA_R3D inicio niveis %d..%d god=%s" % [nivel_ini, nivel_fim, god])
-	get_tree().root.add_child.call_deferred(self.duplicate_bot())
+	var bot := duplicate_bot()
+	bot.name = "QABotR3D"
+	get_tree().root.add_child.call_deferred(bot)
 	queue_free.call_deferred()
 	get_tree().change_scene_to_file.call_deferred("res://scenes/Main.tscn")
+
+
+## Builds exportados (sem "path override"): `Koliani.exe -- --nivel=1 --ate=5
+## --qa-r3d [--capturas=dir]` -- o menu salta para o nivel e o Nivel3D chama isto.
+static func instalar_se_pedido(arvore: SceneTree) -> void:
+	var args := OS.get_cmdline_user_args()
+	if not ("--qa-r3d" in args) or arvore.root.has_node("QABotR3D"):
+		return
+	var b := Bot.new()
+	b.name = "QABotR3D"
+	for a in args:
+		if a.begins_with("--nivel="):
+			b.nivel_ini = int(a.get_slice("=", 1))
+			b.nivel_fim = maxi(b.nivel_fim, b.nivel_ini)
+		elif a.begins_with("--ate="):
+			b.nivel_fim = int(a.get_slice("=", 1))
+		elif a.begins_with("--capturas="):
+			b.dir_fotos = a.get_slice("=", 1)
+		elif a.begins_with("--limite="):
+			b.limite = float(a.get_slice("=", 1))
+		elif a == "--god":
+			b.god = true
+	Nivel3D.qa_auto = true
+	EstadoJogo.vidas = 9
+	print("QA_R3D (build) niveis %d..%d" % [b.nivel_ini, b.nivel_fim])
+	arvore.root.add_child.call_deferred(b)
 
 
 ## O bot vive na raiz (sobrevive as trocas de cena).
