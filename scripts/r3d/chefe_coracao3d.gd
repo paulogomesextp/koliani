@@ -102,15 +102,16 @@ func _construir() -> void:
 	_mat_carne = K.mat_unico("carne")
 	_mat_casca = K.mat_unico("casca_morta")
 	_mat_casca.set_shader_parameter("emissao", Color(1.0, 0.12, 0.55))
-	_mat_casca.set_shader_parameter("emissao_veias", 1.6)
+	_mat_casca.set_shader_parameter("emissao_veias", 0.55)
+	_mat_casca.set_shader_parameter("escala", 0.45)
 	_mat_casca.set_shader_parameter("pulso", 0.5)
 	# raizes-mae a irradiar para a arena (visual) e a subir para a copa
 	for i in 9:
 		var a := TAU * i / 9.0 + 0.2
 		var d := Vector3(cos(a), 0, sin(a))
-		var pts := K.curva(PackedVector3Array([d * 1.5 + Vector3.UP * 2.5, d * 4.5 + Vector3.UP * 1.0,
-			d * 9.0 + Vector3.UP * 0.1, d * (13.0 + (i % 3) * 2.0) + Vector3.DOWN * 0.6]), 4)
-		K.inst(self, K.tubo(pts, K.afunilar(pts.size(), 1.2, 0.25), 9, 0.25, i), _mat_casca)
+		var pts := K.curva(PackedVector3Array([d * 1.8 + Vector3.UP * 2.2, d * 4.0 + Vector3.UP * 0.2,
+			d * 8.0 + Vector3.DOWN * 0.35, d * (12.0 + (i % 3) * 2.0) + Vector3.DOWN * 0.8]), 4)
+		K.inst(self, K.tubo(pts, K.afunilar(pts.size(), 1.0, 0.2), 9, 0.25, i), _mat_casca)
 	for i in 5:
 		var a := TAU * i / 5.0
 		var d := Vector3(cos(a), 0, sin(a))
@@ -119,9 +120,9 @@ func _construir() -> void:
 		K.inst(self, K.tubo(pts, K.afunilar(pts.size(), 0.9, 1.6), 8, 0.25, i + 20), _mat_casca)
 	# coracao
 	_coracao = Node3D.new()
-	_coracao.position = Vector3(0, 3.6, 0)
+	_coracao.position = Vector3(0, 4.0, 0)
 	add_child(_coracao)
-	K.inst(_coracao, K.rocha(2.3, 13, 1.15, 0.22, 2), _mat_carne)
+	K.inst(_coracao, K.rocha(2.7, 13, 1.12, 0.22, 2), _mat_carne)
 	# arterias a envolver
 	for i in 6:
 		var a := TAU * i / 6.0
@@ -129,7 +130,7 @@ func _construir() -> void:
 		for k in 7:
 			var t := k / 6.0
 			var aa := a + t * 1.6
-			pts.append(Vector3(cos(aa) * 2.25, (t - 0.5) * 4.2, sin(aa) * 2.25) * (1.0 - absf(t - 0.5) * 0.35))
+			pts.append(Vector3(cos(aa) * 2.65, (t - 0.5) * 4.8, sin(aa) * 2.65) * (1.0 - absf(t - 0.5) * 0.35))
 		K.inst(_coracao, K.tubo(pts, K.afunilar(pts.size(), 0.28, 0.12), 6), _mat_carne)
 	# nucleo (aparece com a casca aberta)
 	_nucleo = K.inst(_coracao, K.rocha(1.15, 5, 1.0, 0.2, 1), K.mat("nucleo"), Vector3(0, 0, 0.9))

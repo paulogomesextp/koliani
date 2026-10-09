@@ -103,25 +103,30 @@ func _construir() -> void:
 		16, 1.0, 0.82, 0.12, 4), K.mat("saia"))
 	# pescoco + cabeca
 	pescoco = _junta(tronco, "Pescoco", Vector3(0, 0.5, 0.005))
-	K.inst(pescoco, K.torno([Vector2(0.0, 0.045), Vector2(0.09, 0.042)], 10), m_pele)
-	cabeca = _junta(pescoco, "Cabeca", Vector3(0, 0.08, 0.01))
-	K.inst(cabeca, K.torno([Vector2(0.0, 0.0), Vector2(0.02, 0.06), Vector2(0.06, 0.092), Vector2(0.12, 0.104),
-		Vector2(0.18, 0.096), Vector2(0.22, 0.06), Vector2(0.24, 0.0)], 14, 0.92, 1.0), m_pele)
-	# olhos (escuros com brilho carmesim tenue) e sobrancelhas
+	K.inst(pescoco, K.torno([Vector2(-0.02, 0.052), Vector2(0.09, 0.047)], 10), m_pele)
+	cabeca = _junta(pescoco, "Cabeca", Vector3(0, 0.075, 0.012))
+	# cranio + maxilar afilado (cara de traco anime, nao chibi)
+	K.inst(cabeca, K.torno([Vector2(0.0, 0.0), Vector2(0.012, 0.035), Vector2(0.045, 0.072), Vector2(0.09, 0.096),
+		Vector2(0.15, 0.102), Vector2(0.2, 0.088), Vector2(0.235, 0.055), Vector2(0.25, 0.0)], 16, 0.86, 1.0), m_pele)
+	# olhos amendoados escuros com reflexo carmesim, sobrancelhas, nariz, boca
 	for s in [-1.0, 1.0]:
-		K.inst(cabeca, K.rocha(1.0, 1, 1.0, 0.0), K.mat("olho"), Vector3(0.034 * s, 0.118, 0.09),
-			Vector3.ZERO, Vector3(0.019, 0.011, 0.01))
-		K.inst(cabeca, K.bloco(Vector3(0.04, 0.007, 0.012), 1, 0.0), m_negro, Vector3(0.034 * s, 0.138, 0.094),
-			Vector3(0, 0, -0.18 * s))
-	# cabelo: calote + franja + madeixas longas em cadeia (mola)
+		K.inst(cabeca, K.rocha(1.0, 1, 1.0, 0.0), K.mat("olho"), Vector3(0.033 * s, 0.112, 0.083),
+			Vector3(0, 0, 0.12 * s), Vector3(0.024, 0.013, 0.012))
+		K.inst(cabeca, K.rocha(1.0, 2, 1.0, 0.0), K.mat("gume"), Vector3(0.037 * s, 0.116, 0.093),
+			Vector3.ZERO, Vector3(0.005, 0.004, 0.003))
+		K.inst(cabeca, K.bloco(Vector3(0.042, 0.006, 0.01), 1, 0.0), K.mat("cabelo"), Vector3(0.034 * s, 0.135, 0.088),
+			Vector3(0, 0, -0.2 * s))
+	K.inst(cabeca, K.rocha(0.012, 4, 1.4, 0.0), m_pele, Vector3(0, 0.085, 0.095))
+	K.inst(cabeca, K.bloco(Vector3(0.022, 0.004, 0.006), 2, 0.0), K.mat("vermelho"), Vector3(0, 0.052, 0.082))
+	# cabelo: calote negra + franja + madeixas longas em cadeia (mola)
 	var m_cab := K.mat("cabelo")
-	K.inst(cabeca, K.torno([Vector2(-0.02, 0.0), Vector2(0.0, 0.08), Vector2(0.06, 0.112), Vector2(0.13, 0.12),
-		Vector2(0.2, 0.1), Vector2(0.245, 0.06), Vector2(0.262, 0.0)], 14, 0.98, 1.0, 0.06, 2),
-		K.mat("tecido_negro"), Vector3(0, 0.0, -0.028))
-	for i in 7:
-		var x := lerpf(-0.08, 0.08, i / 6.0)
-		var pts := PackedVector3Array([Vector3(x * 0.6, 0.235, 0.05), Vector3(x * 0.95, 0.19, 0.1), Vector3(x * 1.1, 0.13, 0.11)])
-		K.inst(cabeca, K.fita(pts, PackedFloat32Array([0.05, 0.045, 0.012]), Vector3.RIGHT, 0.3), m_cab)
+	K.inst(cabeca, _calote(), m_cab)
+	for i in 9:
+		var x := lerpf(-0.085, 0.085, i / 8.0)
+		var comp := 0.07 + 0.03 * ((i * 7) % 3)
+		var pts := PackedVector3Array([Vector3(x * 0.5, 0.245, 0.04), Vector3(x * 0.95, 0.2, 0.098),
+			Vector3(x * 1.1, 0.2 - comp, 0.104)])
+		K.inst(cabeca, K.fita(pts, PackedFloat32Array([0.045, 0.04, 0.008]), Vector3.RIGHT, 0.3), m_cab)
 	# mechas laterais a emoldurar a cara
 	for s in [-1.0, 1.0]:
 		var pts := K.curva(PackedVector3Array([Vector3(0.085 * s, 0.17, 0.05), Vector3(0.105 * s, 0.05, 0.06),
@@ -145,8 +150,8 @@ func _construir() -> void:
 		_cabelo2.append(piv2)
 	# capeleta/cachecol vermelho sobre os ombros + caudas
 	var m_cach := K.mat("cachecol")
-	K.inst(tronco, K.torno([Vector2(0.56, 0.06), Vector2(0.53, 0.09), Vector2(0.48, 0.17), Vector2(0.42, 0.215),
-		Vector2(0.38, 0.22)], 16, 1.0, 0.72, 0.08, 9), m_cach)
+	K.inst(tronco, K.torno([Vector2(0.57, 0.058), Vector2(0.54, 0.085), Vector2(0.5, 0.15), Vector2(0.45, 0.205),
+		Vector2(0.39, 0.235), Vector2(0.33, 0.25)], 18, 1.0, 0.74, 0.16, 9), m_cach)
 	for s in [-1.0, 1.0]:
 		var piv := _junta(tronco, "Cauda", Vector3(0.05 * s, 0.5, -0.1))
 		var pts := K.curva(PackedVector3Array([Vector3.ZERO, Vector3(0.03 * s, -0.2, -0.08),
@@ -195,6 +200,35 @@ func _construir() -> void:
 			joelho_d = j
 			pe_d = pe
 	_construir_espada()
+
+
+## Calote do cabelo: esfera com a CARA aberta (triangulos da frente-baixo
+## removidos), para o cabelo cobrir cranio e nuca sem tapar o rosto.
+func _calote() -> ArrayMesh:
+	var e := SphereMesh.new()
+	e.radius = 0.122
+	e.height = 0.25
+	e.radial_segments = 18
+	e.rings = 10
+	var arr := e.get_mesh_arrays()
+	var v: PackedVector3Array = arr[Mesh.ARRAY_VERTEX]
+	var idx: PackedInt32Array = arr[Mesh.ARRAY_INDEX]
+	var st := SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var off := Vector3(0, 0.132, -0.016)
+	for i in range(0, idx.size(), 3):
+		var c := (v[idx[i]] + v[idx[i + 1]] + v[idx[i + 2]]) / 3.0
+		if c.z > 0.03 and c.y < 0.05:
+			continue  # rosto
+		if c.y < -0.07 and c.z > -0.02:
+			continue  # queixo/maxilar
+		for k in 3:
+			var p := v[idx[i + k]]
+			p.x *= 1.02
+			st.set_uv(Vector2(0.5, clampf(0.5 - p.y * 2.0, 0.0, 1.0)))
+			st.add_vertex(p + off)
+	st.generate_normals()
+	return st.commit()
 
 
 func _construir_espada() -> void:

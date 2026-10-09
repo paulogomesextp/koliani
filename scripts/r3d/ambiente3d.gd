@@ -22,9 +22,9 @@ const PERFIS := [
 	{"zenite": Color(0.01, 0.035, 0.06), "horizonte": Color(0.05, 0.12, 0.16), "brilho": Color(0.1, 0.25, 0.3),
 	 "nevoa": Color(0.06, 0.13, 0.17), "dens": 0.02, "lua": Color(0.7, 0.9, 1.0), "energia": 1.45,
 	 "ambiente": Color(0.32, 0.5, 0.6), "amb_e": 0.55, "alt_nevoa": 1.0},
-	{"zenite": Color(0.04, 0.01, 0.03), "horizonte": Color(0.18, 0.04, 0.09), "brilho": Color(0.45, 0.06, 0.25),
-	 "nevoa": Color(0.16, 0.05, 0.1), "dens": 0.024, "lua": Color(1.0, 0.75, 0.8), "energia": 1.15,
-	 "ambiente": Color(0.55, 0.35, 0.45), "amb_e": 0.5, "alt_nevoa": 1.4},
+	{"zenite": Color(0.03, 0.012, 0.03), "horizonte": Color(0.12, 0.04, 0.07), "brilho": Color(0.3, 0.05, 0.16),
+	 "nevoa": Color(0.11, 0.05, 0.08), "dens": 0.02, "lua": Color(1.0, 0.82, 0.86), "energia": 1.25,
+	 "ambiente": Color(0.5, 0.4, 0.48), "amb_e": 0.5, "alt_nevoa": 1.4},
 ]
 
 

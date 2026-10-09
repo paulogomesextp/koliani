@@ -51,7 +51,7 @@ void fragment() {
 	c = mix(c, cor_flash, flash);
 	ALBEDO = c;
 	ROUGHNESS = 0.9;
-	float veia = smoothstep(0.6, 0.66, n1) * (1.0 - smoothstep(0.66, 0.74, n1));
+	float veia = smoothstep(0.615, 0.64, n1) * (1.0 - smoothstep(0.64, 0.675, n1));
 	float pul = 1.0 + pulso * sin(TIME * 3.0 + wpos.y * 1.5);
 	EMISSION = emissao * (veia * emissao_veias + emissao_plana) * pul;
 	float fr = pow(1.0 - clamp(dot(NORMAL, VIEW), 0.0, 1.0), 3.0);

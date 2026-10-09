@@ -10,8 +10,8 @@ extends Camera3D
 var alvo: Node3D
 var rota := PackedVector3Array()
 var lado := 1.0
-var dist := 7.2
-var altura := 3.3
+var dist := 6.0
+var altura := 2.75
 var lateral := 1.5
 var foco: Node3D
 var _comp := PackedFloat32Array()
@@ -105,9 +105,9 @@ func _process(dt: float) -> void:
 		f.y = 0.0
 		if f.length() > 1.0:
 			dir = f.normalized()
-		d_dist = 8.6
-		d_alt = 4.6
-		d_lat = 1.2 * lado
+		d_dist = 9.5
+		d_alt = 6.2
+		d_lat = 2.0 * lado
 		olhar_extra = minf(f.length() * 0.35, 4.0)
 	elif rota.size() >= 2:
 		var s := _s_mais_proximo(tp)

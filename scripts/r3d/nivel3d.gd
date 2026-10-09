@@ -313,10 +313,19 @@ func laje_pedra(c: Vector3, tam := Vector3(3, 0.7, 3), rot := 0.0, semente := 0)
 	corpo.position = c - Vector3.UP * tam.y * 0.5
 	corpo.rotation.y = rot
 	terreno.add_child(corpo)
-	K.inst(corpo, K.bloco(tam, semente, 0.07), K.mat("pedra_sagrada"))
+	# pedra sagrada talhada: octogono irregular com flancos partidos (nao caixa)
+	var c8 := PackedVector2Array()
+	for i in 8:
+		var a := TAU * (i + 0.5) / 8.0
+		var k := 1.0 + 0.07 * K._ruido3(Vector3(i * 1.7, semente, 0.3))
+		c8.append(Vector2(cos(a) * tam.x * 0.56 * k, sin(a) * tam.z * 0.56 * k))
+	K.inst(corpo, K.laje(c8, tam.y + 1.2, semente), K.mat("pedra_sagrada"), Vector3(0, tam.y * 0.5, 0))
+	# runa esmeralda gravada no topo
+	K.inst(corpo, K.anel(tam.x * 0.22, tam.x * 0.26, 0.0, 24), K.mat("vfx_runa"), Vector3(0, tam.y * 0.5 + 0.015, 0),
+		Vector3.ZERO, Vector3.ONE, false)
 	var f := CollisionShape3D.new()
 	var b := BoxShape3D.new()
-	b.size = tam
+	b.size = Vector3(tam.x * 0.98, tam.y, tam.z * 0.98)
 	f.shape = b
 	corpo.add_child(f)
 	return corpo

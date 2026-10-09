@@ -28,8 +28,8 @@ const MATERIAIS := {
 	"terreno_pantano": {"cor_a": Color(0.08, 0.08, 0.06), "cor_b": Color(0.15, 0.14, 0.1), "cor_topo": Color(0.13, 0.2, 0.09),
 		"topo_quant": 1.0, "topo_limiar": 0.45, "fendas": 0.3, "escala": 0.32, "rim": 0.1},
 	"terreno_corrompido": {"cor_a": Color(0.1, 0.06, 0.08), "cor_b": Color(0.17, 0.1, 0.12), "cor_topo": Color(0.16, 0.07, 0.14),
-		"topo_quant": 1.0, "topo_limiar": 0.45, "fendas": 0.45, "escala": 0.32, "rim": 0.12,
-		"emissao": Color(0.9, 0.08, 0.5), "emissao_veias": 1.2, "pulso": 0.3},
+		"topo_quant": 1.0, "topo_limiar": 0.45, "fendas": 0.45, "escala": 0.22, "rim": 0.12,
+		"emissao": Color(0.9, 0.08, 0.5), "emissao_veias": 0.35, "pulso": 0.3},
 	"rocha": {"cor_a": Color(0.15, 0.16, 0.16), "cor_b": Color(0.27, 0.28, 0.26), "cor_topo": Color(0.12, 0.28, 0.14),
 		"topo_quant": 0.85, "topo_limiar": 0.55, "fendas": 0.6, "escala": 0.5, "rim": 0.18, "contraste": 1.3},
 	"pedra_sagrada": {"cor_a": Color(0.33, 0.34, 0.31), "cor_b": Color(0.47, 0.47, 0.41), "cor_topo": Color(0.14, 0.3, 0.16),
@@ -40,9 +40,9 @@ const MATERIAIS := {
 		"topo_quant": 0.3, "topo_limiar": 0.6, "fendas": 0.9, "escala": 0.9, "rim": 0.2, "contraste": 1.6},
 	"copa": {"cor_a": Color(0.03, 0.09, 0.05), "cor_b": Color(0.09, 0.24, 0.12), "cor_topo": Color(0.18, 0.42, 0.2),
 		"topo_quant": 0.8, "topo_limiar": 0.3, "escala": 0.8, "rim": 0.3, "contraste": 1.8, "cor_rim": Color(0.35, 0.9, 0.55)},
-	"copa_corrompida": {"cor_a": Color(0.08, 0.03, 0.08), "cor_b": Color(0.2, 0.06, 0.18), "cor_topo": Color(0.35, 0.08, 0.3),
+	"copa_corrompida": {"cor_a": Color(0.06, 0.03, 0.06), "cor_b": Color(0.15, 0.05, 0.13), "cor_topo": Color(0.24, 0.06, 0.2),
 		"topo_quant": 0.7, "topo_limiar": 0.3, "escala": 0.8, "rim": 0.3, "contraste": 1.8, "cor_rim": Color(0.9, 0.3, 0.7),
-		"emissao": Color(0.9, 0.1, 0.55), "emissao_veias": 0.8},
+		"emissao": Color(0.9, 0.1, 0.55), "emissao_veias": 0.25},
 	"corrupcao": {"cor_a": Color(0.1, 0.015, 0.08), "cor_b": Color(0.24, 0.035, 0.17), "cor_topo": Color(0.3, 0.04, 0.2),
 		"topo_quant": 0.0, "escala": 1.4, "rim": 0.45, "cor_rim": Color(1.0, 0.25, 0.7), "contraste": 1.6,
 		"emissao": Color(1.0, 0.1, 0.55), "emissao_veias": 3.0, "emissao_plana": 0.12, "pulso": 0.45},
@@ -56,18 +56,18 @@ const MATERIAIS := {
 	"metal_ferrugem": {"cor_a": Color(0.16, 0.08, 0.05), "cor_b": Color(0.32, 0.2, 0.12), "escala": 4.0, "rim": 0.3,
 		"cor_rim": Color(0.9, 0.6, 0.4), "contraste": 1.6, "fendas": 0.5},
 	"couro": {"cor_a": Color(0.12, 0.07, 0.05), "cor_b": Color(0.22, 0.13, 0.08), "escala": 5.0, "rim": 0.2},
-	"tecido_negro": {"cor_a": Color(0.035, 0.03, 0.04), "cor_b": Color(0.085, 0.07, 0.09), "escala": 6.0, "rim": 0.4,
-		"cor_rim": Color(0.6, 0.35, 0.65)},
-	"vermelho": {"cor_a": Color(0.2, 0.012, 0.025), "cor_b": Color(0.34, 0.03, 0.045), "escala": 6.0, "rim": 0.18,
+	"tecido_negro": {"cor_a": Color(0.05, 0.045, 0.055), "cor_b": Color(0.1, 0.09, 0.105), "escala": 6.0, "rim": 0.5,
+		"cor_rim": Color(0.62, 0.55, 0.72)},
+	"vermelho": {"cor_a": Color(0.26, 0.015, 0.03), "cor_b": Color(0.42, 0.035, 0.05), "escala": 6.0, "rim": 0.4,
 		"cor_rim": Color(0.9, 0.3, 0.4)},
-	"pele": {"cor_a": Color(0.78, 0.58, 0.49), "cor_b": Color(0.86, 0.66, 0.56), "escala": 8.0, "rim": 0.3,
-		"cor_rim": Color(1.0, 0.6, 0.55), "degraus": 0.75},
+	"pele": {"cor_a": Color(0.88, 0.63, 0.58), "cor_b": Color(0.95, 0.74, 0.68), "escala": 8.0, "rim": 0.35,
+		"cor_rim": Color(1.0, 0.55, 0.55), "degraus": 0.6, "contraste": 0.4},
 	"olho": {"cor_a": Color(0.05, 0.02, 0.04), "cor_b": Color(0.1, 0.03, 0.05), "escala": 1.0, "rim": 0.0,
 		"emissao": Color(0.6, 0.1, 0.2), "emissao_plana": 0.08},
 	"gema": {"cor_a": Color(0.05, 0.4, 0.38), "cor_b": Color(0.2, 0.8, 0.7), "escala": 6.0, "rim": 0.6,
 		"cor_rim": Color(0.5, 1.0, 0.9), "emissao": Color(0.2, 0.95, 0.8), "emissao_plana": 1.2},
 	"pele_goblin": {"cor_a": Color(0.17, 0.21, 0.13), "cor_b": Color(0.28, 0.32, 0.19), "escala": 4.0, "rim": 0.35,
-		"cor_rim": Color(0.8, 0.3, 0.7), "contraste": 1.4, "emissao": Color(0.9, 0.1, 0.55), "emissao_veias": 0.9},
+		"cor_rim": Color(0.8, 0.3, 0.7), "contraste": 1.4, "emissao": Color(0.9, 0.1, 0.55), "emissao_veias": 0.6},
 	"pele_bruto": {"cor_a": Color(0.2, 0.14, 0.13), "cor_b": Color(0.32, 0.22, 0.2), "escala": 3.0, "rim": 0.35,
 		"cor_rim": Color(0.9, 0.3, 0.6), "contraste": 1.5, "fendas": 0.5, "emissao": Color(0.95, 0.15, 0.5), "emissao_veias": 1.4},
 	"olho_corrupto": {"cor_a": Color(1.0, 0.3, 0.75), "cor_b": Color(1.0, 0.5, 0.85), "escala": 1.0, "rim": 0.0,
@@ -76,8 +76,9 @@ const MATERIAIS := {
 		"cor_rim": Color(0.5, 1.0, 0.45), "contraste": 1.4, "emissao": Color(0.7, 0.1, 0.6), "emissao_veias": 1.6, "pulso": 0.6},
 	"carne": {"cor_a": Color(0.22, 0.03, 0.07), "cor_b": Color(0.42, 0.06, 0.12), "escala": 1.2, "rim": 0.5,
 		"cor_rim": Color(1.0, 0.3, 0.55), "contraste": 1.5, "emissao": Color(1.0, 0.15, 0.45), "emissao_veias": 2.2, "pulso": 0.6},
-	"nucleo": {"cor_a": Color(0.9, 0.2, 0.6), "cor_b": Color(1.0, 0.55, 0.85), "escala": 2.0, "rim": 1.0,
-		"cor_rim": Color(1.0, 0.7, 0.95), "emissao": Color(1.0, 0.25, 0.7), "emissao_plana": 2.4, "pulso": 0.5, "degraus": 0.0},
+	"nucleo": {"cor_a": Color(0.7, 0.08, 0.4), "cor_b": Color(0.95, 0.3, 0.7), "escala": 2.0, "rim": 0.8,
+		"cor_rim": Color(1.0, 0.5, 0.85), "emissao": Color(1.0, 0.12, 0.55), "emissao_plana": 1.1, "pulso": 0.5, "degraus": 0.0,
+		"emissao_veias": 2.0},
 	"casulo": {"cor_a": Color(0.45, 0.43, 0.5), "cor_b": Color(0.7, 0.68, 0.75), "escala": 3.0, "rim": 0.5,
 		"cor_rim": Color(0.85, 0.7, 1.0), "fendas": 0.6, "contraste": 1.4, "emissao": Color(0.9, 0.2, 0.6), "emissao_veias": 0.6, "pulso": 0.4},
 	"madeira": {"cor_a": Color(0.14, 0.09, 0.06), "cor_b": Color(0.26, 0.17, 0.1), "escala": 1.6, "rim": 0.15, "fendas": 0.7, "contraste": 1.4},
@@ -133,8 +134,8 @@ static func _criar_mat(nome: String) -> ShaderMaterial:
 			m.set_shader_parameter("cor_ponta", Color(0.45, 0.02, 0.05))
 			m.set_shader_parameter("ini", 0.25 if nome == "cabelo_pontas" else 2.0)
 			m.set_shader_parameter("fim", 1.0 if nome == "cabelo_pontas" else 3.0)
-			m.set_shader_parameter("cor_rim", Color(0.75, 0.35, 0.7))
-			m.set_shader_parameter("rim", 0.45)
+			m.set_shader_parameter("cor_rim", Color(0.55, 0.5, 0.68))
+			m.set_shader_parameter("rim", 0.3)
 		"cachecol":
 			m.shader = SH_GRADIENTE
 			m.set_shader_parameter("cor_raiz", Color(0.42, 0.025, 0.05))
@@ -187,8 +188,8 @@ static func _criar_mat(nome: String) -> ShaderMaterial:
 			m.shader = SH_FOLHAGEM
 			m.set_shader_parameter("forma", {"feto": 0, "feto_corrompido": 0, "erva": 1, "folha_larga": 2}[nome])
 			if nome == "feto_corrompido":
-				m.set_shader_parameter("cor_base", Color(0.06, 0.02, 0.06))
-				m.set_shader_parameter("cor_ponta", Color(0.45, 0.07, 0.35))
+				m.set_shader_parameter("cor_base", Color(0.05, 0.03, 0.06))
+				m.set_shader_parameter("cor_ponta", Color(0.28, 0.08, 0.26))
 				m.set_shader_parameter("cor_rim", Color(1.0, 0.3, 0.7))
 			elif nome == "erva":
 				m.set_shader_parameter("cor_base", Color(0.03, 0.07, 0.04))
@@ -206,9 +207,11 @@ static func _criar_mat(nome: String) -> ShaderMaterial:
 			m.shader = SH_RAIO
 			m.set_shader_parameter("cor", Color(0.9, 0.3, 0.75))
 			m.set_shader_parameter("forca", 0.18)
-		"vfx_magenta", "vfx_verde", "vfx_aviso", "vfx_onda", "vfx_branco":
+		"vfx_magenta", "vfx_verde", "vfx_aviso", "vfx_onda", "vfx_branco", "vfx_runa":
 			m.shader = SH_ADITIVO
-			var cores := {"vfx_magenta": Color(1.0, 0.2, 0.75), "vfx_verde": Color(0.4, 1.0, 0.55),
+			if nome == "vfx_runa":
+				m.set_shader_parameter("forca", 0.35)
+			var cores := {"vfx_magenta": Color(1.0, 0.2, 0.75), "vfx_verde": Color(0.4, 1.0, 0.55), "vfx_runa": Color(0.35, 1.0, 0.7),
 				"vfx_aviso": Color(1.0, 0.15, 0.3), "vfx_onda": Color(1.0, 0.3, 0.8), "vfx_branco": Color(1, 1, 1)}
 			m.set_shader_parameter("cor", cores[nome])
 			m.set_shader_parameter("modo", {"vfx_aviso": 2, "vfx_onda": 1}.get(nome, 0))

@@ -56,7 +56,7 @@ func construir() -> void:
 	chefe.derrotado.connect(_ao_chefe_derrotado)
 	chefe.combate_iniciado.connect(_ao_combate)
 	# a arvore-mae por tras/por cima do coracao
-	var mae := D.arvore(deco, centro_arena + Vector3(0, 0, 9), 46.0, 4.5, 66, true, true, false)
+	var mae := D.arvore(deco, centro_arena + Vector3(0, -1.0, 22.0), 50.0, 4.2, 66, true, true, false)
 	mae.scale = Vector3(1.0, 1.0, 1.0)
 	D.raio_luz(deco, centro_arena + Vector3(-3, 0, -2), 34.0, 6.0, true)
 	for i in 6:

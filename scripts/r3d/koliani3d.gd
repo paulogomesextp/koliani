@@ -111,6 +111,14 @@ func _ready() -> void:
 	modelo.rotation.y = _rumo
 	_ultimo_seguro = global_position
 	_rasto = VFX.rasto_espada(self, modelo)
+	# luz de personagem (suave, sem sombra): a Koliani le-se sempre no escuro
+	var luz := OmniLight3D.new()
+	luz.light_color = Color(0.85, 0.8, 1.0)
+	luz.light_energy = 0.9
+	luz.omni_range = 3.2
+	luz.omni_attenuation = 1.6
+	luz.position = Vector3(0.0, 1.9, 1.1)
+	add_child(luz)
 	_retrato_hud()
 	vida_mudou.emit.call_deferred(vida, VIDA_MAXIMA)
 

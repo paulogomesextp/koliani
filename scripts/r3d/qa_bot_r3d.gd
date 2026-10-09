@@ -228,7 +228,27 @@ class Bot:
 
 	## Luta com o Coracao: salta as ondas, sai das marcas de raiz, rebenta os
 	## brotos e so' bate no nucleo exposto (como um jogador que leu o chefe).
+	var _fotos_chefe := 0
+	var _t_chefe := 0.0
+
+	func _foto(nome: String) -> void:
+		if dir_fotos == "":
+			return
+		var c := "%s/%s.png" % [dir_fotos, nome]
+		get_viewport().get_texture().get_image().save_png(c)
+		print("QA_R3D foto ", c)
+
 	func _modo_chefe(chefe: ChefeCoracao3D, k: Koliani3D) -> void:
+		_t_chefe += get_physics_process_delta_time()
+		if _fotos_chefe == 0 and _t_chefe > 3.0:
+			_fotos_chefe = 1
+			_foto("n05_chefe_1")
+		elif _fotos_chefe == 1 and chefe.esta_exposto() and _t_chefe > 8.0:
+			_fotos_chefe = 2
+			_foto("n05_chefe_2_exposto")
+		elif _fotos_chefe == 2 and chefe.fase2() and chefe.get("_ondas").size() > 0:
+			_fotos_chefe = 3
+			_foto("n05_chefe_3_fase2")
 		var c := chefe.global_position
 		var kp := k.global_position
 		var rel := Vector3(kp.x - c.x, 0, kp.z - c.z)
