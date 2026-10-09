@@ -1,3 +1,10 @@
+# KOLIANI 3D — Região I (N01–N05) jogável em 3D (9 outubro 2026, sessão noturna)
+Branch `claude/koliani-3d-region01` (worktree `C:\Projetos\koliani-3d`), base origin/master 7e3f5d11. Ler `docs/execution_r3d_regiao1.md`.
+Só o GAMEPLAY de N01–N05 é 3D; menu/seletor/HUD/pausa/save/áudio intocados (decisão LOCKED do Paulo); loja fora. `main.gd` desvia os índices 0–4 para `scenes/r3d/` (`-- --2d` volta ao 2D). Tudo procedural (sem Blender): kit de malhas+shaders, Koliani 3D (Golden Set) com animação procedural, goblin/gosma/bruto, chefe Coração Putrefacto com o ciclo canónico + fase 2, 5 níveis com landmark próprio.
+Medido: suite 3D 79/79; bot isolado completa N01→N05 pelo fluxo real sem invencibilidade, 0 mortes, ~59 FPS (mín. 51); a mesma cadeia passa DENTRO do EXE exportado (`-- --nivel=1 --ate=5 --qa-r3d`); prova do front-end `--qa-r3d-ui` (Menu→SELECT LEVEL→Região I→N01→3D). Save real intacto.
+EXE: `C:\Projetos\kolianiuild\qa\Koliani-3D-Region01-QA.exe` (mostra "KOLIANI 3D REGION I build=<sha>" no canto). Controlos 3D: WASD + Espaço + J (seta ↑ = saltar, ↓ sem ação), rato direito arrasta a câmara.
+Próximo: HUMAN PLAYTEST (feel do salto/câmara/dificuldade); decidir se a direção 3D avança (mini-chefes Morvanna/Entrevane por portar; modelos são composição procedural, sem esqueleto). Sem merge para master.
+
 # >>> PLANO N1-N20 -- ponto de paragem (3 out 2026, fim da sessao) <<<
 No master: Fase A, B1 (encontros N1/N2/N16/N17), B2 (hitstop v2), B4 (guardioes so' no 2.o/4.o nivel), B5 (pico do N7), B8 (avisos sonoros R4).
 B4/B5/B8 foram para o master SEM a suite completa (pedido do Paulo, fim de usage) -- os testes afetados passaram um a um (SO_TESTE).
