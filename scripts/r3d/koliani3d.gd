@@ -23,6 +23,9 @@ signal energia_insuficiente()
 const MODELO := preload("res://scripts/r3d/koliani_modelo3d.gd")
 const VFX := preload("res://scripts/r3d/vfx3d.gd")
 
+## testes: nao recarregar a cena na morte
+static var recarregar_na_morte := true
+
 const VIDA_MAXIMA := 100
 const VEL := 6.6
 const ACEL_CHAO := 62.0
@@ -500,6 +503,8 @@ func _morrer() -> void:
 	if EstadoJogo.sem_vidas():
 		EstadoJogo.reiniciar_run()
 		Nivel3D.limpar_checkpoint()
+	if not recarregar_na_morte:
+		return
 	await get_tree().create_timer(1.3).timeout
 	if is_inside_tree():
 		Transicao.fechar_e(get_tree().reload_current_scene)

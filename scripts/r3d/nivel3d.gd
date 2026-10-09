@@ -28,6 +28,8 @@ const CENAS := [
 static var _cp := {}
 ## o bot de QA fecha sozinho os cartoes (vitoria)
 static var qa_auto := false
+## testes: concluir sem trocar de cena
+static var trocar_cena := true
 
 @export var indice := 0
 @export var perfil := 0
@@ -176,7 +178,8 @@ func concluir() -> void:
 	print("KOLIANI 3D | nivel %d concluido" % (i + 1))
 	if EstadoJogo.ha_proximo_nivel():
 		EstadoJogo.avancar_nivel()
-		get_tree().change_scene_to_file(CENA_JOGO)
+		if trocar_cena:
+			get_tree().change_scene_to_file(CENA_JOGO)
 
 
 ## ---------------------------------------------------------------------------
